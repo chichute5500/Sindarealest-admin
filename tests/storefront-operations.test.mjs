@@ -20,7 +20,7 @@ const seoDB = {
       bind(...values) {
         return {
           async first() {
-            assert.match(sql, /lower\\(slug\\)=\\?/);
+            assert.match(sql, /lower\(slug\)=\?/);
             assert.deepEqual(values, ['test-sneaker', 'test-sneaker', 'test-sneaker']);
             return { id: 'test-sneaker', slug: 'test-sneaker', sku: 'SD-SN001', title: 'Giày thử', description: 'Mô tả giày', images_json: '["images/example.webp"]', category_label: 'Sneaker', published: 1 };
           }
