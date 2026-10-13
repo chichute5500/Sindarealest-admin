@@ -13,7 +13,7 @@ export async function onRequestPost({request,env}){
   const bytes=new Uint8Array(await file.arrayBuffer());if(bytes.length<12||new TextDecoder().decode(bytes.slice(0,4))!=="RIFF"||new TextDecoder().decode(bytes.slice(8,12))!=="WEBP")return fail("Nội dung tệp không phải WebP hợp lệ.");
   const key="warranty-claims/"+crypto.randomUUID().replaceAll("-","")+".webp";
   await env.IMAGES.put(key,bytes,{httpMetadata:{contentType:"image/webp",cacheControl:"private, max-age=300"},customMetadata:{purpose:"warranty-claim",warrantyCode}});
-  await env.DB.prepare("INSERT INTO warranty_claim_uploads(upload_key,warranty_code) VALUES(?,?)").bind(key,warrantyCode).run();
+  await env.DB.prepare("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind("warranty_upload:"+key,warrantyCode).run();
   return json({ok:true,imageKey:key},201);
  }catch{return fail("Không thể lưu ảnh lỗi. Vui lòng thử lại.",503)}
 }
