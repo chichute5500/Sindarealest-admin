@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must require OTP verification before revealing records');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
+assert.ok(storefrontHtml.includes('class="hero-stamp-image-spacer"') && storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('<div class="hero-stamp"><img'), 'Remove only the cutout emblem in the Crafted With Character stamp while preserving text spacing');
 assert.ok(storefrontHtml.includes('id="checkoutProvince"') && storefrontHtml.includes('id="checkoutWard"') && storefrontHtml.includes('streetAddress'), 'Checkout must collect province, ward, and detailed street address');
 const warrantyClaimSource = readFileSync(new URL('../functions/api/warranty-claims.js', import.meta.url), 'utf8');
 assert.ok(warrantyClaimSource.includes('verified_at IS NOT NULL') && warrantyClaimSource.includes('access_expires_at') && warrantyClaimSource.includes("w.status='active'"), 'Warranty claims must require a verified OTP session and an active warranty');
