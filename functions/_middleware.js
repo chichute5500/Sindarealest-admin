@@ -1,3 +1,4 @@
+import { createSession, sessionCookie, verifySession } from "./_lib.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -8,6 +9,15 @@ function meta(html, name, content, property = false) {
 }
 export async function onRequest(context) {
   const url = new URL(context.request.url);
+  if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
+    const hadValidSession = await verifySession(context.request, context.env);
+    const response = await context.next();
+    if (!hadValidSession || !response.ok || !context.env?.SESSION_SECRET) return response;
+    const token = await createSession(context.env.SESSION_SECRET);
+    const headers = new Headers(response.headers);
+    headers.append('Set-Cookie', sessionCookie(token));
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  }
   const match = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9-]{0,119})\/?$/i);
   if (!match) {
     const response = await context.next();

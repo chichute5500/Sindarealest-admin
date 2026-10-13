@@ -1,6 +1,6 @@
 const encoder = new TextEncoder();
 const SESSION_COOKIE = "sd_admin_session";
-const SESSION_SECONDS = 8 * 60 * 60;
+const SESSION_SECONDS = 10 * 60;
 
 export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
