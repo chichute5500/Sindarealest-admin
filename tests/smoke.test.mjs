@@ -150,7 +150,27 @@ const operationsBackup = {
     customers: [{ id:'customer-1', full_name:'Khách kiểm thử', phone:'0900000000', email:'', address:'', created_at:'2026-01-01 00:00:00', updated_at:'2026-01-01 00:00:00' }],
     orders: [{ id:'order-1', order_number:'SD-TEST-123456', customer_id:'customer-1', status:'pending_confirmation', payment_status:'unpaid', subtotal:null, total:null, price_confirmation_required:1, customer_note:'', created_at:'2026-01-01 00:00:00', updated_at:'2026-01-01 00:00:00' }],
     orderItems: [{ id:'item-1', order_id:'order-1', product_id:'restore-product-1', sku:'SD-RESTORE-1', title:'Ví thử khôi phục', quantity:1, unit_price:null, line_total:null }],
-    warranties: [], warrantyClaims: [], auditLogs: [],
+    warranties: [{
+      id:'warranty-1', order_id:'order-1', order_item_id:'item-1', warranty_code:'SDW-TEST-001',
+      policy_name:'Chính sách thử', duration_months:12, starts_at:'2026-01-01', ends_at:'2027-01-01',
+      status:'active', created_at:'2026-01-01 00:00:00',
+    }],
+    warrantyClaims: [{
+      id:'claim-1', order_id:'order-1', customer_id:'customer-1', warranty_code:'SDW-TEST-001',
+      message:'Mô tả lỗi kiểm thử', status:'received', admin_note:'',
+      created_at:'2026-01-01 00:00:00', updated_at:'2026-01-01 00:00:00',
+    }],
+    auditLogs: [],
+    customerAddressDetails: [{
+      customer_id:'customer-1', province_code:'68', province:'Lâm Đồng', ward_code:'68001', ward:'Phường thử',
+      street_address:'12 Đường thử', updated_at:'2026-01-01 00:00:00',
+    }],
+    orderShippingAddresses: [{
+      order_id:'order-1', province_code:'68', province:'Lâm Đồng', ward_code:'68001', ward:'Phường thử',
+      street_address:'12 Đường thử', full_address:'12 Đường thử, Phường thử, Lâm Đồng', created_at:'2026-01-01 00:00:00',
+    }],
+    orderItemDetails: [{ item_id:'item-1', size:'42' }],
+    warrantyClaimAttachments: [{ claim_id:'claim-1', image_key:'warranty-claims/0123456789abcdef0123456789abcdef.webp' }],
   },
 };
 response = await restoreProducts({ request: makeRestoreRequest(operationsBackup), env: { DB: restoreDB, ...secrets } });
