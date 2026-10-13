@@ -15,7 +15,7 @@ assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest\.
 assert.match(text,/canonical" href="https:\/\/shop\.example\//);
 
 const seoDB = { prepare(sql) { return { bind(value) { return { async first() { assert.match(sql,/WHERE slug=/); assert.equal(value,'test-sneaker'); return {slug:'test-sneaker',title:'Giày thử',description:'Mô tả giày',images_json:'["images/example.webp"]',category_label:'Sneaker',published:1}; } }; } }; } };
-response = await seoMiddleware({ request:new Request('https://shop.example/san-pham/test-sneaker'), env:{DB:seoDB}, next:async ({request})=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
+response = await seoMiddleware({ request:new Request('https://shop.example/san-pham/test-sneaker'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
 text = await response.text();
 assert.equal(response.status,200);
 assert.match(text,/<title>Giày thử \| SinDarealest<\/title>/);
