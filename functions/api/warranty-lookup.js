@@ -24,7 +24,7 @@ function maskOrderNumber(value) {
   const order = String(value ?? "");
   return order.length > 6 ? order.slice(0, 3) + "••••" + order.slice(-3) : "••••";
 }
-function shapeWarranty(row, today) {
+function shapeWarranty(row, today, claimToken) {
   const code = String(row.warranty_code || "");
   let images = [];
   try { images = JSON.parse(row.imagesJson || "[]"); } catch {}
@@ -33,7 +33,7 @@ function shapeWarranty(row, today) {
   const eligible = status === "active" && String(row.ends_at) >= today;
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
   return {
-    warrantyCode: code,
+    claimToken,
     maskedWarrantyCode: code ? "••••" + code.slice(-4) : "••••",
     title: String(row.title || "Sản phẩm"),
     sku: String(row.sku || ""),
@@ -52,7 +52,7 @@ function shapeWarranty(row, today) {
     maskedOrderNumber: maskOrderNumber(row.orderNumber)
   };
 }
-const selectSql = "SELECT w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,c.full_name AS fullName,c.phone AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
+const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,c.full_name AS fullName,c.phone AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");
@@ -89,7 +89,13 @@ export async function onRequestPost({ request, env }) {
       rows = result.results || [];
       if (!rows.length) return fail("Không tìm thấy bảo hành theo số điện thoại này. Hãy kiểm tra lại số đã dùng khi mua hàng.", 404);
     }
-    const warranties = rows.map(row => shapeWarranty(row, today));
+    const tokenRows = rows.map(row => ({ ...row, claimToken: crypto.randomUUID().replaceAll("-", "") }));
+    const statements = [env.DB.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%' AND julianday(updated_at)<julianday('now','-15 minutes')")];
+    for (const row of tokenRows) {
+      statements.push(env.DB.prepare("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind("warranty_lookup:" + row.claimToken, JSON.stringify({ warrantyId: row.warrantyId, warrantyCode: row.warranty_code })));
+    }
+    await env.DB.batch(statements);
+    const warranties = tokenRows.map(row => shapeWarranty(row, today, row.claimToken));
     return json({ ok: true, warranties, warranty: isCode ? warranties[0] : null });
   } catch { return fail("Chưa thể tra cứu bảo hành. Vui lòng thử lại.", 503); }
 }
