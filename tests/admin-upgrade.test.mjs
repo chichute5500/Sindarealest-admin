@@ -11,7 +11,10 @@ assert.ok(!admin.includes('id="pSku"'), "SKU input should not be shown in admin 
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
 assert.ok(read("../public/index.html").includes("-webkit-tap-highlight-color: transparent"), "Storefront controls should not flash blue when tapped on Android");
 assert.ok(read("../public/index.html").includes("encodeURIComponent(p.sku||p.id)"), "Product URLs should prefer stable SKU while retaining ID fallback");
-assert.ok(!read("../public/index.html").includes("CRAFTED WITH<br>CHARACTER"), "Unwanted hero slogan should be removed");
+assert.ok(!read("../public/index.html").includes("CRAFTED WITH<br>CHARACTER") && !read("../public/index.html").includes("hero-stamp-image-spacer") && !read("../public/index.html").includes(".hero-stamp{"), "Entire hero stamp and related styles should be removed");
+assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
+assert.ok(read("../public/index.html").includes("maskedAddress") && read("../public/index.html").includes("maskedPhone"), "Warranty lookup must show masked purchase details");
+assert.ok(read("../functions/_middleware.js").includes("encodeURIComponent(product.sku)"), "Product canonical URL must use SKU");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
 assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");

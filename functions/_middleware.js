@@ -37,14 +37,14 @@ export async function onRequest(context) {
   try { product = await context.env.DB.prepare("SELECT id,slug,sku,title,description,images_json,category_label,published FROM products WHERE lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?) LIMIT 1").bind(slug,slug,slug).first(); }
   catch { return new Response("Không thể tải sản phẩm.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } }); }
   if (!product || Number(product.published) !== 1) return new Response("Không tìm thấy sản phẩm.", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" } });
-  if (String(product.id).toLowerCase() !== slug) return Response.redirect(new URL(`/san-pham/${encodeURIComponent(product.id)}`, url.origin), 301);
+  if (String(product.sku) !== match[1]) return Response.redirect(new URL(`/san-pham/${encodeURIComponent(product.sku)}`, url.origin), 301);
   let images = [];
   try { images = JSON.parse(product.images_json || "[]"); } catch {}
   const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
   const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest.jpg";
-  const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.id)}`;
+  const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.sku)}`;
   const title = `${product.title} | SinDarealest`;
-  const description = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim().slice(0, 300);
+  const description = `${String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim()} · Mã sản phẩm: ${product.sku}`.slice(0, 300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
