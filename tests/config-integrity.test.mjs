@@ -19,6 +19,10 @@ assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 ·
 assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setup must apply admin notification migration');
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty OTP migration');
 assert.ok(setupScript.includes('TWILIO_ACCOUNT_SID') && setupScript.includes('TWILIO_AUTH_TOKEN') && setupScript.includes('TWILIO_FROM_NUMBER'), 'Setup must document SMS credentials required for warranty OTP');
+assert.ok(setupScript.includes('đủ 5 secrets ADMIN_PASSWORD, SESSION_SECRET, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN và TWILIO_FROM_NUMBER'), 'Production setup must explicitly gate on required SMS credentials');
+const deployReadme = readFileSync('README-DEPLOY.txt', 'utf8');
+assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && deployReadme.includes('migrations/0005_address_warranty_verification.sql'), 'Deployment guide must match current migration sequence');
+assert.ok(deployReadme.includes('TWILIO_ACCOUNT_SID') && deployReadme.includes('TWILIO_AUTH_TOKEN') && deployReadme.includes('TWILIO_FROM_NUMBER'), 'Deployment guide must explain SMS OTP prerequisites');
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
