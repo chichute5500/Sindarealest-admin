@@ -35,15 +35,15 @@ async function encryptPayload(subscription,payload) {
 }
 async function sendOne(endpoint,keys,payload,env) {
   const body=await encryptPayload({keys},payload), token=await vapidToken(endpoint,env);
-  return fetch(endpoint,{method:"POST",headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
+  return fetch(endpoint,{method:"POST",signal:AbortSignal.timeout(3000),headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
 }
 export async function sendAdminPush(env,payload) {
   if(!env?.DB||!env.VAPID_PUBLIC_KEY||!env.VAPID_PRIVATE_KEY)return;
   let result;try{result=await env.DB.prepare("SELECT endpoint,keys_json FROM admin_push_subscriptions").all()}catch{return}
-  for(const row of result.results||[]) {
+  await Promise.allSettled((result.results||[]).map(async row=>{
     try {
       const response=await sendOne(row.endpoint,JSON.parse(row.keys_json||"{}"),payload,env);
       if(response.status===404||response.status===410)await env.DB.prepare("DELETE FROM admin_push_subscriptions WHERE endpoint=?").bind(row.endpoint).run();
     } catch {}
-  }
+  }));
 }
