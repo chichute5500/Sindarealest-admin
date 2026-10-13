@@ -14,7 +14,21 @@ assert.match(text,/og:url" content="https:\/\/shop\.example\//);
 assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest\.jpg/);
 assert.match(text,/canonical" href="https:\/\/shop\.example\//);
 
-const seoDB = { prepare(sql) { return { bind(...values) { return { async first() { assert.match(sql,/lower\(slug\)=\?/); assert.deepEqual(values,['test-sneaker','test-sneaker','test-sneaker']); return {id:'test-sneaker',slug:'test-sneaker',sku:'SD-SN001',title:'Giày thử',description:'Mô tả giày',images_json:'["images/example.webp"]',category_label:'Sneaker',published:1}; } }; } }; };
+const seoDB = {
+  prepare(sql) {
+    return {
+      bind(...values) {
+        return {
+          async first() {
+            assert.match(sql, /lower\\(slug\\)=\\?/);
+            assert.deepEqual(values, ['test-sneaker', 'test-sneaker', 'test-sneaker']);
+            return { id: 'test-sneaker', slug: 'test-sneaker', sku: 'SD-SN001', title: 'Giày thử', description: 'Mô tả giày', images_json: '["images/example.webp"]', category_label: 'Sneaker', published: 1 };
+          }
+        };
+      }
+    };
+  }
+};
 response = await seoMiddleware({ request:new Request('https://shop.example/san-pham/test-sneaker'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
 text = await response.text();
 assert.equal(response.status,200);
