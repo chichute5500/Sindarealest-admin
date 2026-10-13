@@ -26,7 +26,8 @@ assert.ok(warrantyClaimSource.includes('warranty_upload:') && warrantyClaimSourc
 assert.ok(restoreSource.includes('operations.warrantyClaimAttachments'), 'Restore must preserve claim attachment metadata');
 assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('warranty.status!=="active"'), 'Warranty claims must not require OTP and must require an active warranty');
 const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-lookup.js', import.meta.url), 'utf8');
-assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && warrantyLookupSource.includes('maskedPhone') && warrantyLookupSource.includes('maskedAddress') && !warrantyLookupSource.includes('fullName:row.full_name') && !warrantyLookupSource.includes('address:row.purchaseAddress'), 'Public warranty lookup must mask personal details in its response');
+assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && warrantyLookupSource.includes('claimToken') && !warrantyLookupSource.includes('warrantyCode: code') && warrantyLookupSource.includes('maskedPhone') && warrantyLookupSource.includes('maskedAddress'), 'Public warranty lookup must return masked data and a short-lived action token');
+assert.ok(uploadSource.includes('form.get("claimToken")') && warrantyClaimSource.includes('body?.claimToken'), 'Warranty photo upload and claim submission must resolve tokens server-side');
 assert.ok(!storefrontHtml.includes('OTP') && !storefrontHtml.includes('otp') && !warrantyClaimSource.includes('ticketId'), 'Customer warranty flows must not include OTP or session tickets');
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
 assert.ok(adminOrdersSource.includes('COALESCE(sa.full_address,c.address)') && adminOrdersSource.includes('LEFT JOIN order_shipping_addresses'), 'Admin orders must show the shipping address captured for that order');
@@ -82,36 +83,40 @@ assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
 
 const demoWarrantyCode = 'SDW-' + 'A'.repeat(24);
 const demoWarrantyRow = {
+  id:'warranty-id-1', order_id:'order-id-1', customer_id:'customer-id-1',
   warranty_code: demoWarrantyCode, duration_months: 12, starts_at: '2026-01-01', ends_at: '2027-01-01', status: 'active',
   sku: 'SD-SN001', title: 'Giày thử', size: '42', purchasedAt: '2026-02-01 12:00:00', orderNumber: 'SD-ABC-123456',
   fullName: 'Nguyễn Văn An', customerPhone: '0901234567', purchaseAddress: '123 Đường thử, Phường thử, Lâm Đồng',
   imagesJson: '["images/example.webp"]'
 };
 function warrantyDB() {
-  return {
-    prepare(sql) {
-      return {
-        bind(...values) {
-          return {
-            async run() { return { meta: { changes: 1 } }; },
-            async first() {
-              if (sql.includes('SELECT attempts FROM public_rate_limits')) return { attempts: 1 };
-              if (sql.includes('FROM warranties w') && sql.includes('upper(w.warranty_code)=?')) return demoWarrantyRow;
-              return null;
-            },
-            async all() {
-              if (sql.includes('FROM warranties w') && sql.includes('substr(')) return { results: [demoWarrantyRow] };
-              return { results: [] };
-            }
-          };
-        }
-      };
+  const settings = new Map();
+  const query = (sql, values=[]) => ({
+    async run() {
+      if (sql.includes('INSERT INTO settings')) settings.set(values[0],{value:values[1],updated_at:new Date().toISOString().replace('T',' ').replace('Z','')});
+      if (sql.includes('DELETE FROM settings WHERE key=?')) settings.delete(values[0]);
+      return { meta: { changes: 1 } };
+    },
+    async first() {
+      if (sql.includes('SELECT attempts FROM public_rate_limits')) return { attempts: 1 };
+      if (sql.includes('FROM settings WHERE key=?')) return settings.get(values[0]) || null;
+      if (sql.includes('FROM warranties w') && sql.includes('upper(w.warranty_code)=?')) return demoWarrantyRow;
+      return null;
+    },
+    async all() {
+      if (sql.includes('FROM warranties w') && sql.includes('substr(')) return { results: [demoWarrantyRow] };
+      return { results: [] };
     }
+  });
+  return {
+    prepare(sql) { return { ...query(sql), bind(...values) { return query(sql,values); } }; },
+    async batch(statements) { for (const statement of statements) await statement.run(); return []; }
   };
 }
+const warrantyDBInstance = warrantyDB();
 const codeLookup = await lookupWarranty({
   request:new Request('https://shop.example/api/warranty-lookup',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.11'},body:JSON.stringify({lookup:demoWarrantyCode})}),
-  env:{DB:warrantyDB()}
+  env:{DB:warrantyDBInstance}
 });
 assert.equal(codeLookup.status,200,'Warranty-code lookup should work without OTP');
 let lookupPayload = await codeLookup.json();
@@ -124,15 +129,26 @@ assert.equal(lookupPayload.warranty.size,'42');
 assert.equal(lookupPayload.warranty.purchasedAt,'2026-02-01');
 assert.equal(lookupPayload.warranty.eligible,true);
 assert.ok(!JSON.stringify(lookupPayload).includes('123 Đường thử'),'Raw street address must not be returned');
+assert.ok(!JSON.stringify(lookupPayload).includes(demoWarrantyCode),'Raw warranty code must not be returned');
+const codeActionToken = lookupPayload.warranty.claimToken;
+assert.match(codeActionToken,/^[0-9a-f]{32}$/);
 assert.ok(!JSON.stringify(lookupPayload).includes('Nguyễn Văn An'),'Full customer name must not be returned');
 const phoneLookup = await lookupWarranty({
   request:new Request('https://shop.example/api/warranty-lookup',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.12'},body:JSON.stringify({lookup:'090 123 4567'})}),
-  env:{DB:warrantyDB()}
+  env:{DB:warrantyDBInstance}
 });
 assert.equal(phoneLookup.status,200,'Phone lookup should return warranty records without OTP');
 lookupPayload = await phoneLookup.json();
 assert.equal(lookupPayload.warranties.length,1);
 assert.equal(lookupPayload.warranties[0].maskedWarrantyCode,'••••AAAA');
+assert.ok(!JSON.stringify(lookupPayload).includes(demoWarrantyCode),'Phone lookup must not expose the raw warranty code');
 assert.ok(!JSON.stringify(lookupPayload).includes('0901234567'),'Raw customer phone must not be returned');
 
-console.log('PASS: homepage/product SEO metadata, SKU URLs, masked warranty lookup by code/phone, sitemap/robots, and cross-origin request rejection.');
+
+const claimResponse = await createWarrantyClaim({
+  request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.13'},body:JSON.stringify({claimToken:codeActionToken,issueType:'other',contactPhone:'0901234567',message:'Lỗi bề mặt cần kiểm tra'})}),
+  env:{DB:warrantyDBInstance}
+});
+assert.equal(claimResponse.status,201,'Temporary lookup token should authorize a warranty claim without exposing the raw code');
+
+console.log('PASS: SKU SEO URLs, masked warranty lookups, expiring claim tokens, sitemap/robots, and cross-origin request rejection.');
