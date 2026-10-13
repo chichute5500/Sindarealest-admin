@@ -25,7 +25,7 @@ for (const required of [
   'package.json', 'wrangler.toml',
   'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
-  'functions/api/admin/products/[id].js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
+  'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/media/[key].js',
   'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
@@ -93,6 +93,7 @@ const endpointMap = {
   '/api/admin/logout': 'functions/api/admin/logout.js',
   '/api/admin/session': 'functions/api/admin/session.js',
   '/api/admin/products': 'functions/api/admin/products.js',
+  '/api/admin/products/reset-skus': 'functions/api/admin/products/reset-skus.js',
   '/api/admin/settings': 'functions/api/admin/settings.js',
   '/api/admin/orders': 'functions/api/admin/orders.js',
   '/api/admin/customers': 'functions/api/admin/customers.js',
@@ -107,7 +108,7 @@ for (const [route, file] of Object.entries(endpointMap)) {
   check(existsSync(join(root, file)), `Thiếu API route ${file}`);
 }
 for (const file of [
-  'functions/api/admin/products.js', 'functions/api/admin/products/[id].js', 'functions/api/admin/settings.js',
+  'functions/api/admin/products.js', 'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/settings.js',
   'functions/api/admin/upload.js', 'functions/api/admin/backup.js', 'functions/api/admin/restore.js',
   'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js',
 ]) {
@@ -127,7 +128,7 @@ for (const secretFile of ['.env', '.dev.vars', '.env.production', '.dev.vars.pro
   check(!existsSync(join(root, secretFile)), `Không đưa tệp bí mật ${secretFile} vào source/ZIP`);
 }
 
-for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs']) {
+for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs']) {
   if (existsSync(join(root, file))) runTest(file);
 }
 
