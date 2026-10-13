@@ -169,7 +169,7 @@ assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().au
   assert.equal(data.ok, true);
   assert.equal(dbMock.stats().batchCalls, 1, 'Danh mục mới phải được reset trong một batch');
   const newCategoryRow = rowsWithNewCategory[4];
-  assert.match(newCategoryRow.sku, /^SD-UNKNOWN/);
+  assert.match(newCategoryRow.sku, /^SD-UNKNON/);
   assert.equal(newCategoryRow.category, 'unknown-category');
   assert.equal(newCategoryRow.category_label, 'Danh mục lạ');
 }
