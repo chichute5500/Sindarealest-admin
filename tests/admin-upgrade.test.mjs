@@ -14,6 +14,7 @@ assert.ok(read("../public/index.html").includes("encodeURIComponent(p.sku||p.id)
 assert.ok(!read("../public/index.html").includes("CRAFTED WITH<br>CHARACTER") && !read("../public/index.html").includes("hero-stamp-image-spacer") && !read("../public/index.html").includes(".hero-stamp{"), "Entire hero stamp and related styles should be removed");
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
 assert.ok(read("../public/index.html").includes("maskedAddress") && read("../public/index.html").includes("maskedPhone"), "Warranty lookup must show masked purchase details");
+assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:") && !read("../functions/api/warranty-lookup.js").includes("warrantyCode: code"), "Lookup API must return only masked codes plus short-lived action tokens");
 assert.ok(read("../functions/_middleware.js").includes("encodeURIComponent(product.sku)"), "Product canonical URL must use SKU");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
