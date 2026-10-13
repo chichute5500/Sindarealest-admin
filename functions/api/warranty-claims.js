@@ -5,8 +5,11 @@ export async function onRequestPost({request,env}){
  const unavailable=dbOrFail(env);if(unavailable)return unavailable;
  try{const lim=await rateLimitPublicRequest(env,request,"warranty_claim",3,900);if(lim.limited)return fail("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi 15 phút.",429,{"Retry-After":"900"})}catch{return fail("Dịch vụ tiếp nhận yêu cầu chưa sẵn sàng.",503)}
  let body;try{body=await request.json()}catch{return fail("Thông tin yêu cầu bảo hành không hợp lệ.")}
- const ticketId=clean(body?.ticketId,80),warrantyCode=clean(body?.warrantyCode,100).toUpperCase(),message=clean(body?.message,1600),imageKey=clean(body?.imageKey,80);
- if(!/^[0-9a-f-]{32,36}$/i.test(ticketId)||!warrantyCode||message.length<8)return fail("Phiên xác thực, mã bảo hành hoặc mô tả chưa hợp lệ.");
+ const ticketId=clean(body?.ticketId,80),warrantyCode=clean(body?.warrantyCode,100).toUpperCase(),issueType=clean(body?.issueType,30),contactPhone=clean(body?.contactPhone,24),description=clean(body?.message,1400),imageKey=clean(body?.imageKey,100);
+ if(!/^[0-9a-f-]{32,36}$/i.test(ticketId)||!warrantyCode||!["defect","seam","material","other"].includes(issueType)||description.length<8)return fail("Phiên xác thực, mã bảo hành, loại vấn đề hoặc mô tả chưa hợp lệ.");
+ if(contactPhone&&!/^[+0-9() .-]{9,24}$/.test(contactPhone))return fail("Số điện thoại liên hệ chưa hợp lệ.");
+ const issueLabels={defect:"Lỗi sản phẩm",seam:"Đường may / hoàn thiện",material:"Chất liệu",other:"Vấn đề khác"};
+ const message="Loại vấn đề: "+issueLabels[issueType]+"\n"+(contactPhone?"Số liên hệ khác: "+contactPhone+"\n":"")+"Mô tả: "+description;
  if(imageKey&&!/^warranty-claims\/[0-9a-f]{32}\.webp$/.test(imageKey))return fail("Ảnh đính kèm không hợp lệ.");
  try{
   const ticket=await env.DB.prepare("SELECT ticket_id,customer_id,warranty_id FROM warranty_verifications WHERE ticket_id=? AND customer_id IS NOT NULL AND verified_at IS NOT NULL AND julianday(access_expires_at)>julianday('now') LIMIT 1").bind(ticketId).first();
