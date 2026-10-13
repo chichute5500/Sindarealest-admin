@@ -22,7 +22,7 @@ for (const table of ['customer_address_details','order_shipping_addresses','orde
   assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
-assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary uploads without requiring OTP tables');
+assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary upload and lookup tokens without requiring OTP tables');
 const uploadSource = readFileSync(new URL('../functions/api/warranty-claim-uploads.js', import.meta.url), 'utf8');
 assert.ok(uploadSource.includes('INSERT INTO settings(key,value,updated_at)') && uploadSource.includes('warranty_upload:'), 'New uploads must store short-lived tokens in the existing settings table');
 assert.ok(warrantyClaimSource.includes('warranty_upload:') && warrantyClaimSource.includes('DELETE FROM settings WHERE key=?'), 'Claim submission must validate and consume the upload token');
@@ -86,7 +86,7 @@ assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
 
 const demoWarrantyCode = 'SDW-' + 'A'.repeat(24);
 const demoWarrantyRow = {
-  id:'warranty-id-1', order_id:'order-id-1', customer_id:'customer-id-1',
+  id:'warranty-id-1', warrantyId:'warranty-id-1', order_id:'order-id-1', customer_id:'customer-id-1',
   warranty_code: demoWarrantyCode, duration_months: 12, starts_at: '2026-01-01', ends_at: '2027-01-01', status: 'active',
   sku: 'SD-SN001', title: 'Giày thử', size: '42', purchasedAt: '2026-02-01 12:00:00', orderNumber: 'SD-ABC-123456',
   fullName: 'Nguyễn Văn An', customerPhone: '0901234567', purchaseAddress: '123 Đường thử, Phường thử, Lâm Đồng',
@@ -153,5 +153,10 @@ const claimResponse = await createWarrantyClaim({
   env:{DB:warrantyDBInstance}
 });
 assert.equal(claimResponse.status,201,'Temporary lookup token should authorize a warranty claim without exposing the raw code');
+const reusedTokenResponse = await createWarrantyClaim({
+  request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.14'},body:JSON.stringify({claimToken:codeActionToken,issueType:'other',message:'Một lần gửi lại để thử token'})}),
+  env:{DB:warrantyDBInstance}
+});
+assert.equal(reusedTokenResponse.status,400,'A consumed lookup token must not authorize a second claim');
 
 console.log('PASS: SKU SEO URLs, masked warranty lookups, expiring claim tokens, sitemap/robots, and cross-origin request rejection.');
