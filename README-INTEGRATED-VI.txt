@@ -34,7 +34,7 @@ TÍNH NĂNG MỚI
 - Cài đặt trang chào mừng và backup/restore v2 có dữ liệu vận hành.
 
 GIỚI HẠN
-- Chưa bật đăng nhập tài khoản khách hàng; cần nhà cung cấp email/OTP và xác minh tên miền.
+- Chưa bật đăng nhập tài khoản khách hàng; cần thiết kế và triển khai cơ chế xác thực riêng nếu muốn mở tính năng này.
 - Chưa tích hợp cổng thanh toán/email/SMS/vận chuyển.
 - Ảnh R2 cũ cần tải lại qua quản trị để watermark nằm trong file gốc.
 - Watermark không thể ngăn tuyệt đối chụp/quay màn hình.

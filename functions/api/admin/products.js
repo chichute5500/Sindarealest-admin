@@ -36,7 +36,7 @@ export async function onRequestPost(context) {
   const category = categories[normalized] || (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
   if (!category) return fail("Vui lòng chọn một danh mục hợp lệ trong danh sách.");
   try {
-    const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE category=?").bind(category[0]).all();
+    const rows = await context.env.DB.prepare("SELECT sku FROM products").all();
     let max = 0;
     for (const row of rows.results || []) {
       const sku = String(row.sku || "").toUpperCase();

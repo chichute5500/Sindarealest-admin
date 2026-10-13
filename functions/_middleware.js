@@ -18,7 +18,7 @@ export async function onRequest(context) {
     headers.append('Set-Cookie', sessionCookie(token));
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
   }
-  const match = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9-]{0,119})\/?$/i);
+  const match = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   if (!match) {
     const response = await context.next();
     if (!response.ok || !["/", "/index.html"].includes(url.pathname) || !(response.headers.get("content-type") || "").includes("text/html")) return response;
@@ -34,14 +34,15 @@ export async function onRequest(context) {
   const slug = match[1].toLowerCase();
   if (!context.env?.DB) return new Response("Dịch vụ dữ liệu chưa sẵn sàng.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   let product;
-  try { product = await context.env.DB.prepare("SELECT slug,title,description,images_json,category_label,published FROM products WHERE slug=? LIMIT 1").bind(slug).first(); }
+  try { product = await context.env.DB.prepare("SELECT id,slug,sku,title,description,images_json,category_label,published FROM products WHERE lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?) LIMIT 1").bind(slug,slug,slug).first(); }
   catch { return new Response("Không thể tải sản phẩm.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } }); }
   if (!product || Number(product.published) !== 1) return new Response("Không tìm thấy sản phẩm.", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" } });
+  if (String(product.id).toLowerCase() !== slug) return Response.redirect(new URL(`/san-pham/${encodeURIComponent(product.id)}`, url.origin), 301);
   let images = [];
   try { images = JSON.parse(product.images_json || "[]"); } catch {}
   const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
   const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest.jpg";
-  const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.slug)}`;
+  const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.id)}`;
   const title = `${product.title} | SinDarealest`;
   const description = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim().slice(0, 300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
@@ -62,7 +63,7 @@ export async function onRequest(context) {
   html = meta(html, "twitter:image", new URL(imagePath, url.origin).href);
   const canonicalTag = `<link rel="canonical" href="${escapeHtml(canonical)}">`;
   html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
-  const schema = JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, description, image: [new URL(imagePath, url.origin).href], sku: undefined, url: canonical, brand: { "@type": "Brand", name: "SinDarealest" } }).replace(/<\//g, "<\\/");
+  const schema = JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, description, image: [new URL(imagePath, url.origin).href], sku: product.sku, url: canonical, brand: { "@type": "Brand", name: "SinDarealest" } }).replace(/<\//g, "<\\/");
   html = html.replace("</head>", `  <script type="application/ld+json">${schema}</script>\n</head>`);
   const headers = new Headers(response.headers);
   headers.set("Content-Type", "text/html; charset=utf-8");

@@ -28,7 +28,7 @@ BẮT ĐẦU
 
 LƯU Ý
 - Không deploy Production trong quá trình kiểm tra này; cần người vận hành xác minh đúng tài nguyên Cloudflare.
-- Đăng nhập tài khoản khách hàng chưa được bật; hồ sơ khách hàng được tạo từ yêu cầu đặt hàng. Cần nhà cung cấp email/OTP trước khi triển khai xác thực.
+- Đăng nhập tài khoản khách hàng chưa được bật; hồ sơ khách hàng được tạo từ yêu cầu đặt hàng. Cần thiết kế cơ chế xác thực riêng trước khi triển khai đăng nhập.
 - Mã bảo hành chỉ phát hành theo chính sách cửa hàng nhập rõ ràng và sau khi đơn hoàn tất.
 - Ảnh sản phẩm tĩnh đã được đóng watermark; ảnh R2 cũ cần tải lại qua quản trị để watermark nằm trong file gốc. Ảnh R2 cần sao lưu riêng.
 - Watermark không thể ngăn tuyệt đối chụp/quay màn hình.
