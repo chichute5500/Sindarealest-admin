@@ -55,7 +55,7 @@
 
 ## Những phần chưa hoàn tất / cần xác nhận trước Production
 
-1. **Đăng nhập tài khoản khách hàng chưa được bật.** Hiện hồ sơ khách hàng được tạo/gộp theo số điện thoại từ đơn hàng; chưa có xác minh email/OTP, đăng nhập, quên mật khẩu hoặc trang tài khoản. Cần chọn nhà cung cấp email/OTP và xác minh tên miền trước khi triển khai cơ chế xác thực an toàn; không thêm hệ thống mật khẩu tự chế thiếu xác minh.
+1. **Đăng nhập tài khoản khách hàng chưa được bật.** Hiện hồ sơ khách hàng được tạo/gộp theo số điện thoại từ đơn hàng; chưa có đăng nhập, quên mật khẩu hoặc trang tài khoản. Cần thiết kế cơ chế xác thực riêng trước khi triển khai; không thêm hệ thống mật khẩu tự chế thiếu xác minh.
 2. Chính sách bảo hành phải do cửa hàng quyết định và nhập khi phát hành; chưa có bộ chính sách pháp lý/điều kiện bảo hành theo từng dòng sản phẩm được cung cấp.
 3. Chưa tích hợp cổng thanh toán, hãng vận chuyển, SMS/email xác nhận đơn hoặc hóa đơn. Đơn hàng hiện là yêu cầu để cửa hàng liên hệ xác nhận. Tra cứu bảo hành dùng mã bảo hành, không gửi hoặc xác minh mã qua Twilio.
 4. Ảnh R2 đã tải lên trước đây chưa được tải lại để đóng watermark vào file gốc; watermark cũ chỉ phủ trên giao diện.
