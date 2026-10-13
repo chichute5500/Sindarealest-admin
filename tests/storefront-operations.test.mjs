@@ -11,6 +11,14 @@ assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml
 assert.ok(storefrontHtml.includes('class="hero-stamp-image-spacer"') && storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('<div class="hero-stamp"><img'), 'Remove only the cutout emblem in the Crafted With Character stamp while preserving text spacing');
 assert.ok(storefrontHtml.includes('id="checkoutProvince"') && storefrontHtml.includes('id="checkoutWard"') && storefrontHtml.includes('streetAddress'), 'Checkout must collect province, ward, and detailed street address');
 const warrantyClaimSource = readFileSync(new URL('../functions/api/warranty-claims.js', import.meta.url), 'utf8');
+const backupSource = readFileSync(new URL('../functions/api/admin/backup.js', import.meta.url), 'utf8');
+const restoreSource = readFileSync(new URL('../functions/api/admin/restore.js', import.meta.url), 'utf8');
+for (const table of ['customer_address_details','order_shipping_addresses','order_item_details','warranty_claim_attachments']) {
+  assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
+  assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
+}
+assert.ok(restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must invalidate ephemeral OTP verification sessions');
+assert.ok(restoreSource.includes('operations.warrantyClaimAttachments'), 'Restore must preserve claim attachment metadata');
 assert.ok(warrantyClaimSource.includes('verified_at IS NOT NULL') && warrantyClaimSource.includes('access_expires_at') && warrantyClaimSource.includes("w.status='active'"), 'Warranty claims must require a verified OTP session and an active warranty');
 const otpSource = readFileSync(new URL('../functions/api/warranty-verification.js', import.meta.url), 'utf8');
 assert.ok(otpSource.includes('verified_at IS NULL') && otpSource.includes('attempts<5'), 'OTP must be single-use and attempt-limited');
