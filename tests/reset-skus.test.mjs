@@ -161,14 +161,17 @@ assert.ok(mock.stats().auditStatement, 'Phải ghi audit log trong batch');
 assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().auditStatement.params[1]).count, 235);
 
 {
-  const untouched = makeRows({ unsupported: true });
-  const snapshot = JSON.stringify(untouched);
-  const dbMock = createMockDb(untouched);
+  const rowsWithNewCategory = makeRows({ unsupported: true });
+  const dbMock = createMockDb(rowsWithNewCategory);
   const result = await resetSkus(await makeContext(dbMock.db, { confirm: true }));
-  assert.equal(result.status, 400);
-  assert.match((await result.json()).error, /danh mục chưa hỗ trợ/i);
-  assert.equal(dbMock.stats().batchCalls, 0, 'Danh mục lạ phải chặn mọi ghi dữ liệu');
-  assert.equal(JSON.stringify(untouched), snapshot);
+  const data = await result.json();
+  assert.equal(result.status, 200, 'Danh mục mới phải được hỗ trợ tự động');
+  assert.equal(data.ok, true);
+  assert.equal(dbMock.stats().batchCalls, 1, 'Danh mục mới phải được reset trong một batch');
+  const newCategoryRow = rowsWithNewCategory[4];
+  assert.match(newCategoryRow.sku, /^SD-UNKNOWN/);
+  assert.equal(newCategoryRow.category, 'unknown-category');
+  assert.equal(newCategoryRow.category_label, 'Danh mục lạ');
 }
 
 {
@@ -211,4 +214,4 @@ assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().au
   assert.equal(JSON.stringify(untouched), snapshot);
 }
 
-console.log('PASS: reset SKU — 235 sản phẩm, SKU duy nhất, giữ nguyên trường khác, phân quyền, xác nhận, danh mục lạ và rollback giả lập.');
+console.log('PASS: reset SKU — 235 sản phẩm, SKU duy nhất, giữ nguyên trường khác, phân quyền, xác nhận, danh mục mới và rollback giả lập.');
