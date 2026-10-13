@@ -11,6 +11,10 @@ assert.ok(!admin.includes('id="pSku"'), "SKU input should not be shown in admin 
 assert.ok(admin.includes('<select id="pCategory"'), "Product category should be a real select");
 assert.ok(admin.includes('id="generateDescription"'), "AI description action missing");
 assert.ok(admin.includes('id="showPassword"'), "Password visibility toggle missing");
+assert.ok(admin.includes('id="passwordEye"'), "Password visibility toggle must use an eye icon");
+assert.ok(admin.includes('class="bell-icon"'), "Notification button must use a bell icon");
+assert.ok(admin.includes('id="notificationCount"'), "Unread notification count badge missing");
+assert.ok(admin.includes("sd-admin-last-seen"), "Unread notifications must be tracked against the last-read time");
 assert.ok(admin.includes('600000'), "10-minute inactivity logout missing");
 assert.ok(admin.includes('id="notificationPanel"'), "Notification center missing");
 assert.ok(lib.includes("const SESSION_SECONDS = 10 * 60"), "Session should expire after ten minutes without a renewed request");
