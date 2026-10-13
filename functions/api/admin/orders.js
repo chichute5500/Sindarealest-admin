@@ -1,4 +1,5 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
+import { sendAdminPush } from "../../_notifications.js";
 
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
@@ -44,6 +45,7 @@ export async function onRequestPatch(context) {
     statements.push(context.env.DB.prepare("UPDATE orders SET status=?,payment_status=COALESCE(?,payment_status),subtotal=?,total=?,price_confirmation_required=?,updated_at=datetime('now') WHERE id=?").bind(status,paymentStatus ?? null,subtotal,subtotal,allPriced?0:1,id));
     statements.push(context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'order_updated', 'order', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ status, paymentStatus: paymentStatus ?? null, pricesUpdated: (body.prices || []).length, priceConfirmed: allPriced })));
     await context.env.DB.batch(statements);
+    await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (paymentStatus ? " · Thanh toán: " + paymentStatus : ""), url: "/admin/" });
     return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, message: allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
   } catch { return fail("Không thể cập nhật đơn hàng.", 503); }
 }
