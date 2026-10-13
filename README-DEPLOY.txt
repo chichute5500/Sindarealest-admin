@@ -32,10 +32,12 @@ Script sẽ:
 - Xác minh R2 bucket bằng lệnh đọc thông tin; không tự tạo bucket.
 - Kiểm tra project, database, branch; branch phải khớp production branch khi Cloudflare cung cấp thông tin này.
 - Hiển thị tóm tắt, yêu cầu xác nhận bindings/secrets đã lưu, rồi yêu cầu nhập chuỗi xác nhận chính xác trước khi chạy SQL/deploy.
-- Áp dụng migrations/0001_schema.sql và migrations/0003_storefront_operations.sql theo kiểu idempotent; kiểm tra các bảng/cột bắt buộc, sau đó kiểm tra số sản phẩm.
+- Áp dụng lần lượt migrations/0001_schema.sql, migrations/0003_storefront_operations.sql, migrations/0004_admin_notifications.sql và migrations/0005_address_warranty_verification.sql; các migration này tạo bổ sung bảng/chỉ mục, không seed hay xóa sản phẩm. Script kiểm tra các bảng/cột bắt buộc rồi mới tiếp tục.
 - Chỉ nhập migrations/0002_seed_products.sql nếu bạn gõ YES và script thấy products đang có đúng 0 dòng. Nếu có sẵn sản phẩm, script từ chối seed. Migration 0003 không xóa dữ liệu sản phẩm/đơn hàng hiện có.
 - Khi chọn NO, script giữ dữ liệu sản phẩm hiện có, không seed lại.
 - Chỉ deploy vào Pages project đã tồn tại. Script không tự tạo hoặc xóa resource.
+- OTP bảo hành dùng Twilio SMS; phải cấu hình đủ TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN và TWILIO_FROM_NUMBER. Nếu thiếu, endpoint xác thực dừng với HTTP 503 và khách không thể nhận OTP.
+- Migration 0005 bổ sung địa chỉ khách hàng/giao hàng, chi tiết biến thể dòng đơn, phiên OTP và metadata ảnh yêu cầu bảo hành. Backup JSON không chứa byte ảnh trong R2 và không phục hồi phiên OTP tạm thời; hãy sao lưu R2 riêng.
 
 Nếu Wrangler chưa đăng nhập, làm theo cửa sổ trình duyệt. Đừng dán token vào mã nguồn. Nếu project, D1 hoặc R2 không xuất hiện trong danh sách, kiểm tra đúng tài khoản Cloudflare và quyền của phiên đăng nhập; không đổi sang tên đoán mò.
 
