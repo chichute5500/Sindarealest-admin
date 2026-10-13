@@ -6,7 +6,7 @@ import { onRequestGet as sitemap } from '../functions/sitemap.xml.js';
 import { onRequestGet as robots } from '../functions/robots.txt.js';
 import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must require OTP verification before revealing records');
+assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
 assert.ok(storefrontHtml.includes('class="hero-stamp-image-spacer"') && storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('<div class="hero-stamp"><img'), 'Remove only the cutout emblem in the Crafted With Character stamp while preserving text spacing');
 assert.ok(storefrontHtml.includes('id="checkoutProvince"') && storefrontHtml.includes('id="checkoutWard"') && storefrontHtml.includes('streetAddress'), 'Checkout must collect province, ward, and detailed street address');
@@ -17,11 +17,12 @@ for (const table of ['customer_address_details','order_shipping_addresses','orde
   assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
-assert.ok(restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must invalidate ephemeral OTP verification sessions');
+assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary uploads without requiring OTP tables');
 assert.ok(restoreSource.includes('operations.warrantyClaimAttachments'), 'Restore must preserve claim attachment metadata');
-assert.ok(warrantyClaimSource.includes('verified_at IS NOT NULL') && warrantyClaimSource.includes('access_expires_at') && warrantyClaimSource.includes("w.status='active'"), 'Warranty claims must require a verified OTP session and an active warranty');
-const otpSource = readFileSync(new URL('../functions/api/warranty-verification.js', import.meta.url), 'utf8');
-assert.ok(otpSource.includes('verified_at IS NULL') && otpSource.includes('attempts<5'), 'OTP must be single-use and attempt-limited');
+assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('warranty.status!=="active"'), 'Warranty claims must not require OTP and must require an active warranty');
+const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-lookup.js', import.meta.url), 'utf8');
+assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && !warrantyLookupSource.includes('customer_id') && !warrantyLookupSource.includes('phone'), 'Public warranty lookup must not expose customer personal data');
+assert.ok(!storefrontHtml.includes('OTP') && !storefrontHtml.includes('otp') && !warrantyClaimSource.includes('ticketId'), 'Customer warranty flows must not include OTP or session tickets');
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
 assert.ok(adminOrdersSource.includes('COALESCE(sa.full_address,c.address)') && adminOrdersSource.includes('LEFT JOIN order_shipping_addresses'), 'Admin orders must show the shipping address captured for that order');
 assert.ok(storefrontHtml.includes('id="claimIssueType"') && storefrontHtml.includes('id="claimContactPhone"'), 'Warranty claim form must capture issue type and contact details');

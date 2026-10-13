@@ -10,5 +10,5 @@ SINDAREALest — TÓM TẮT BẢN NÂNG CẤP SDVIP
 
 KIỂM TRA: npm run check PASS; npm test PASS; SQLite migration và 526 ảnh WebP PASS.
 
-CHƯA DEPLOY PRODUCTION. Trước khi dùng, cấu hình DB/IMAGES + secrets trên đúng Pages project, sau đó chạy npm run setup:cloudflare. Đăng nhập tài khoản khách hàng chưa được bật vì cần nhà cung cấp email/OTP; chính sách bảo hành phải do cửa hàng xác nhận. Ảnh R2 cũ cần tải lại qua quản trị để đóng watermark vào file.
+CHƯA DEPLOY PRODUCTION. Trước khi dùng, cấu hình DB/IMAGES + secrets trên đúng Pages project, sau đó chạy npm run setup:cloudflare. Đăng nhập tài khoản khách hàng chưa được bật; tra cứu bảo hành không sử dụng mã xác minh. Chính sách bảo hành phải do cửa hàng xác nhận. Ảnh R2 cũ cần tải lại qua quản trị để đóng watermark vào file.
 Xem UPGRADE-REPORT.md để biết chi tiết và các giới hạn còn lại.

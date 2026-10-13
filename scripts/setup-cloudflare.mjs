@@ -98,6 +98,7 @@ async function main() {
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0004_admin_notifications.sql'], { interactive: true });
   console.log('Áp dụng địa chỉ giao hàng và xác thực bảo hành OTP (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0005_address_warranty_verification.sql'], { interactive: true });
+   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0006_remove_warranty_otp.sql'], { interactive: true });
 
   console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
   for (const query of [

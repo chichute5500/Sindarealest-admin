@@ -32,7 +32,7 @@
 - Thêm quản trị đơn hàng, trạng thái xử lý/thanh toán, danh sách khách hàng từ hồ sơ đặt hàng, và nhật ký hoạt động gần đây.
 - Thêm form yêu cầu hỗ trợ/bảo hành, quản trị yêu cầu, và phát hành mã bảo hành chỉ sau khi đơn hoàn tất. Tên chính sách, thời hạn và ngày bắt đầu phải được quản trị nhập rõ ràng; không tự gán chính sách mặc định.
 - Thêm rate limit theo IP cho yêu cầu đặt hàng/yêu cầu hỗ trợ và từ chối request có Origin khác website.
-- Backup v2 gồm danh mục, cài đặt, đơn hàng, khách hàng, dòng đơn, bảo hành, audit logs, địa chỉ khách hàng/giao hàng, biến thể dòng đơn và metadata ảnh đính kèm; vẫn chấp nhận backup v1 cũ. Byte ảnh nằm trong R2 cần được sao lưu riêng; phiên OTP tạm thời không được phục hồi.
+- Backup v2 gồm danh mục, cài đặt, đơn hàng, khách hàng, dòng đơn, bảo hành, audit logs, địa chỉ khách hàng/giao hàng, biến thể dòng đơn và metadata ảnh đính kèm; vẫn chấp nhận backup v1 cũ. Byte ảnh nằm trong R2 cần được sao lưu riêng; các phiên OTP đã được loại bỏ khỏi luồng ứng dụng.
 - Thêm trang quản trị để bật/tắt lớp chào mừng và chỉnh hai dòng tiêu đề/lời chào; hiệu ứng Liquid và thiết kế của lớp chào mừng được giữ nguyên.
 
 ### Cơ sở dữ liệu và an toàn
@@ -51,16 +51,16 @@
 - Kiểm tra 526 đường dẫn ảnh sản phẩm: không thiếu tệp, tất cả còn là WebP hợp lệ.
 - Kiểm thử metadata trang chủ/sản phẩm, canonical, JSON-LD, sitemap/robots và từ chối request khác Origin: PASS.
 - CI GitHub Actions trên nhánh `upgrade/checklist-sindarealest-2026-10`, commit `d290ea39d9d2158a0c90b55d9f1493926fbf621f`: `npm run check` và `npm test` PASS. Các test này gồm mock/static regression; chúng không thay thế kiểm thử trực tiếp trên Cloudflare D1/R2 hoặc SMS Twilio.
-- Rà soát bổ sung: sửa backup/restore v2 để giữ địa chỉ, size và metadata ảnh yêu cầu bảo hành; khi khôi phục, các phiên OTP/upload tạm thời bị vô hiệu hóa.
+- Rà soát bổ sung: sửa backup/restore v2 để giữ địa chỉ, size và metadata ảnh yêu cầu bảo hành; khi khôi phục, các bản ghi tải ảnh tạm thời bị xóa.
 
 ## Những phần chưa hoàn tất / cần xác nhận trước Production
 
 1. **Đăng nhập tài khoản khách hàng chưa được bật.** Hiện hồ sơ khách hàng được tạo/gộp theo số điện thoại từ đơn hàng; chưa có xác minh email/OTP, đăng nhập, quên mật khẩu hoặc trang tài khoản. Cần chọn nhà cung cấp email/OTP và xác minh tên miền trước khi triển khai cơ chế xác thực an toàn; không thêm hệ thống mật khẩu tự chế thiếu xác minh.
 2. Chính sách bảo hành phải do cửa hàng quyết định và nhập khi phát hành; chưa có bộ chính sách pháp lý/điều kiện bảo hành theo từng dòng sản phẩm được cung cấp.
-3. Chưa tích hợp cổng thanh toán, hãng vận chuyển, SMS/email xác nhận đơn hoặc hóa đơn. Đơn hàng hiện là yêu cầu để cửa hàng liên hệ xác nhận. OTP tra cứu bảo hành sử dụng Twilio và sẽ không hoạt động cho đến khi cấu hình đủ `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` và `TWILIO_FROM_NUMBER`.
+3. Chưa tích hợp cổng thanh toán, hãng vận chuyển, SMS/email xác nhận đơn hoặc hóa đơn. Đơn hàng hiện là yêu cầu để cửa hàng liên hệ xác nhận. Tra cứu bảo hành dùng mã bảo hành, không gửi hoặc xác minh mã qua Twilio.
 4. Ảnh R2 đã tải lên trước đây chưa được tải lại để đóng watermark vào file gốc; watermark cũ chỉ phủ trên giao diện.
 5. Chưa chạy kiểm thử hiển thị bằng trình duyệt thật trên thiết bị/viewport thực tế; phần kiểm tra hiện tại là kiểm tra mã, cấu trúc, API mock, migration SQLite và ảnh. Cần mở Preview sau deploy để kiểm tra thủ công sáng/tối, điện thoại/máy tính và việc chia sẻ thật qua Zalo/Facebook.
-6. Trước deploy, phải sao lưu dữ liệu, xác minh Production bindings `DB`, `IMAGES` và cấu hình secrets `ADMIN_PASSWORD`, `SESSION_SECRET`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`; sau đó chạy `npm run setup:cloudflare` để áp dụng và xác minh migrations 0001, 0003, 0004, 0005. Script có xác nhận rõ Pages project/database/bucket và không tự tạo/xóa tài nguyên. Các bindings/secrets từ Cloudflare Production chưa được kiểm chứng trong phiên rà soát này; chưa chạy migration từ xa hoặc deploy.
+6. Trước deploy, phải sao lưu dữ liệu, xác minh Production bindings `DB`, `IMAGES` và cấu hình secrets `ADMIN_PASSWORD`, `SESSION_SECRET`; sau đó chạy `npm run setup:cloudflare` để áp dụng và xác minh migrations 0001, 0003, 0004, 0005, 0006. Script có xác nhận rõ Pages project/database/bucket và không tự tạo/xóa tài nguyên. Các bindings/secrets từ Cloudflare Production chưa được kiểm chứng trong phiên rà soát này; chưa chạy migration từ xa hoặc deploy.
 
 ## Lưu ý bảo vệ ảnh
 
