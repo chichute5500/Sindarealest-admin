@@ -79,7 +79,7 @@ async function main() {
   console.log(`D1 database   : ${dbName}`);
   console.log(`R2 bucket     : ${bucket}`);
   console.log(`Nạp dữ liệu gốc: ${freshAnswer}`);
-  console.log('\nTRƯỚC KHI CHẠY SQL/DEPLOY: trong Cloudflare Dashboard, hãy lưu đúng hai bindings Production (DB → D1 đã chọn; IMAGES → R2 đã chọn) và hai secrets ADMIN_PASSWORD, SESSION_SECRET.');
+  console.log('\nTRƯỚC KHI CHẠY SQL/DEPLOY: trong Cloudflare Dashboard, hãy lưu đúng hai bindings Production (DB → D1 đã chọn; IMAGES → R2 đã chọn) và hai secrets ADMIN_PASSWORD, SESSION_SECRET. Để OTP bảo hành hoạt động, cần cấu hình thêm TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN và TWILIO_FROM_NUMBER trong Pages Secrets.');
   const bindingsReady = (await ask('Bạn đã lưu và kiểm tra đủ 2 bindings + 2 secrets cho đúng Pages project này chưa? Nhập YES để tiếp tục', 'NO')).toUpperCase();
   if (bindingsReady !== 'YES') {
     throw new Error('Dừng trước mọi lệnh SQL và deploy. Hãy cấu hình bindings/secrets trong Dashboard rồi chạy lại npm run setup:cloudflare.');
