@@ -23,7 +23,7 @@ async function main() {
   const project = process.env.CLOUDFLARE_PAGES_PROJECT || (ci ? '' : await ask('Tên Pages project đã tồn tại trên Cloudflare'));
   if (!project) throw new Error('Thiếu CLOUDFLARE_PAGES_PROJECT. Script không tự tạo project.');
   assertSafeName(project, 'Tên Pages project');
-  const record = findNamedRecord(projects, project, ['name', 'project_name']);
+  const record = findNamedRecord(projects, project, ['name', 'project_name', 'Project Name']);
   if (!record) throw new Error(`Không tìm thấy project “${project}” trong tài khoản Wrangler hiện tại; deploy bị hủy.`);
 
   const expectedBranch = typeof record.production_branch === 'string' ? record.production_branch : '';
