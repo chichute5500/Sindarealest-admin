@@ -7,7 +7,7 @@ export async function onRequestPost({request,env}){
  let body;try{body=await request.json()}catch{return fail("Thông tin yêu cầu bảo hành không hợp lệ.")}
  const ticketId=clean(body?.ticketId,80),warrantyCode=clean(body?.warrantyCode,100).toUpperCase(),message=clean(body?.message,1600),imageKey=clean(body?.imageKey,80);
  if(!/^[0-9a-f-]{32,36}$/i.test(ticketId)||!warrantyCode||message.length<8)return fail("Phiên xác thực, mã bảo hành hoặc mô tả chưa hợp lệ.");
- if(imageKey&&!/^[0-9a-f]{32}\.webp$/.test(imageKey))return fail("Ảnh đính kèm không hợp lệ.");
+ if(imageKey&&!/^warranty-claims\/[0-9a-f]{32}\.webp$/.test(imageKey))return fail("Ảnh đính kèm không hợp lệ.");
  try{
   const ticket=await env.DB.prepare("SELECT ticket_id,customer_id,warranty_id FROM warranty_verifications WHERE ticket_id=? AND customer_id IS NOT NULL AND verified_at IS NOT NULL AND julianday(access_expires_at)>julianday('now') LIMIT 1").bind(ticketId).first();
   if(!ticket)return fail("Phiên xác thực đã hết hạn. Hãy tra cứu và xác thực lại.",401);

@@ -11,7 +11,7 @@ export async function onRequestPost({request,env}){
   const ticket=await env.DB.prepare("SELECT ticket_id FROM warranty_verifications WHERE ticket_id=? AND customer_id IS NOT NULL AND verified_at IS NOT NULL AND julianday(access_expires_at)>julianday('now') LIMIT 1").bind(ticketId).first();
   if(!ticket)return fail("Phiên xác thực đã hết hạn. Hãy tra cứu lại.",401);
   const bytes=new Uint8Array(await file.arrayBuffer());if(bytes.length<12||new TextDecoder().decode(bytes.slice(0,4))!=="RIFF"||new TextDecoder().decode(bytes.slice(8,12))!=="WEBP")return fail("Nội dung tệp không phải WebP hợp lệ.");
-  const key=crypto.randomUUID().replaceAll("-","")+".webp";
+  const key="warranty-claims/"+crypto.randomUUID().replaceAll("-","")+".webp";
   await env.IMAGES.put(key,bytes,{httpMetadata:{contentType:"image/webp",cacheControl:"private, max-age=300"},customMetadata:{purpose:"warranty-claim",ticketId}});
   await env.DB.prepare("INSERT INTO warranty_claim_uploads(upload_key,ticket_id) VALUES(?,?)").bind(key,ticketId).run();
   return json({ok:true,imageKey:key},201);
