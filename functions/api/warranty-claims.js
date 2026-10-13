@@ -15,9 +15,9 @@ export async function onRequestPost({request,env}){
   const warranty=await env.DB.prepare("SELECT w.id,w.order_id,w.warranty_code,o.customer_id,o.order_number,w.status,w.ends_at FROM warranties w JOIN orders o ON o.id=w.order_id WHERE upper(w.warranty_code)=? LIMIT 1").bind(warrantyCode).first();
   if(!warranty)return fail("Không tìm thấy mã bảo hành.",404);
   if(warranty.status!=="active"||String(warranty.ends_at)<new Date().toISOString().slice(0,10))return fail("Bảo hành không còn hiệu lực.",409);
-  if(imageKey){const uploaded=await env.DB.prepare("SELECT upload_key FROM warranty_claim_uploads WHERE upload_key=? AND warranty_code=? AND julianday(created_at)>julianday('now','-15 minutes') LIMIT 1").bind(imageKey,warrantyCode).first();if(!uploaded)return fail("Ảnh đính kèm không hợp lệ hoặc đã hết hạn.",400)}
+  if(imageKey){const uploaded=await env.DB.prepare("SELECT upload_key FROM warranty_claim_upload_tokens WHERE upload_key=? AND warranty_code=? AND julianday(created_at)>julianday('now','-15 minutes') LIMIT 1").bind(imageKey,warrantyCode).first();if(!uploaded)return fail("Ảnh đính kèm không hợp lệ hoặc đã hết hạn.",400)}
   const id=crypto.randomUUID(),statements=[env.DB.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message) VALUES(?,?,?,?,?)").bind(id,warranty.order_id,warranty.customer_id,warrantyCode,message)];
-  if(imageKey){statements.push(env.DB.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(id,imageKey));statements.push(env.DB.prepare("DELETE FROM warranty_claim_uploads WHERE upload_key=?").bind(imageKey))}
+  if(imageKey){statements.push(env.DB.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(id,imageKey));statements.push(env.DB.prepare("DELETE FROM warranty_claim_upload_tokens WHERE upload_key=?").bind(imageKey))}
   statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'warranty_claim_created', 'warranty_claim', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({orderNumber:warranty.order_number,warrantyCode,hasImage:Boolean(imageKey)})));
   await env.DB.batch(statements);
   return json({ok:true,claimId:id,message:"Đã tiếp nhận yêu cầu bảo hành. SinDarealest sẽ kiểm tra và liên hệ lại."},201);
