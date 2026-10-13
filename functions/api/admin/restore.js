@@ -105,7 +105,7 @@ export async function onRequestPost(context) {
     const db = context.env.DB;
     const statements = [];
     if (operations) statements.push(
-      db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM warranty_claim_upload_tokens"), db.prepare("DELETE FROM warranty_claim_uploads"),
+      db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'"), db.prepare("DELETE FROM warranty_claim_uploads"),
       db.prepare("DELETE FROM customer_address_details"), db.prepare("DELETE FROM order_shipping_addresses"), db.prepare("DELETE FROM order_item_details"),
       db.prepare("DELETE FROM warranty_claims"), db.prepare("DELETE FROM warranties"), db.prepare("DELETE FROM order_items"),
       db.prepare("DELETE FROM orders"), db.prepare("DELETE FROM customers"), db.prepare("DELETE FROM audit_logs"), db.prepare("DELETE FROM public_rate_limits")
