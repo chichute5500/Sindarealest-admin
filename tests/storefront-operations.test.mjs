@@ -18,10 +18,10 @@ for (const table of ['customer_address_details','order_shipping_addresses','orde
   assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
-assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes('DELETE FROM warranty_claim_upload_tokens') && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear old/new temporary uploads without requiring OTP tables');
+assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary uploads without requiring OTP tables');
 const uploadSource = readFileSync(new URL('../functions/api/warranty-claim-uploads.js', import.meta.url), 'utf8');
-assert.ok(uploadSource.includes('INSERT INTO warranty_claim_upload_tokens') && !uploadSource.includes('INSERT INTO warranty_claim_uploads('), 'New uploads must use the schema-compatible token table');
-assert.ok(warrantyClaimSource.includes('warranty_claim_upload_tokens'), 'Claim submission must validate and consume the new upload token');
+assert.ok(uploadSource.includes('INSERT INTO settings(key,value,updated_at)') && uploadSource.includes('warranty_upload:'), 'New uploads must store short-lived tokens in the existing settings table');
+assert.ok(warrantyClaimSource.includes('warranty_upload:') && warrantyClaimSource.includes('DELETE FROM settings WHERE key=?'), 'Claim submission must validate and consume the upload token');
 assert.ok(restoreSource.includes('operations.warrantyClaimAttachments'), 'Restore must preserve claim attachment metadata');
 assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('warranty.status!=="active"'), 'Warranty claims must not require OTP and must require an active warranty');
 const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-lookup.js', import.meta.url), 'utf8');
