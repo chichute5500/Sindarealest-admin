@@ -191,7 +191,7 @@ function optionalInteger(value, field, max = 2_000_000_000) {
 export function validateProduct(input, existing = null) {
   if (!input || typeof input !== "object" || Array.isArray(input)) return { error: "Dữ liệu sản phẩm không hợp lệ." };
   const title = String(input.title ?? "").trim();
-  const sku = String(input.sku ?? "").trim().toUpperCase();
+  const sku = String(String(input.sku ?? "").trim() || existing?.sku || "").trim().toUpperCase();
   if (!title || title.length > 180) return { error: "Tên sản phẩm là bắt buộc và tối đa 180 ký tự." };
   if (!/^[A-Z0-9][A-Z0-9._-]{0,47}$/.test(sku)) return { error: "SKU bắt buộc, chỉ gồm A–Z, 0–9, dấu chấm, gạch ngang hoặc gạch dưới (tối đa 48 ký tự)." };
   const rawCategory = String(input.category ?? "").trim();
