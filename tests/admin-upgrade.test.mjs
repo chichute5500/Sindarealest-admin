@@ -40,3 +40,8 @@ const resetSkus = read("../functions/api/admin/products/reset-skus.js");
 assert.ok(resetSkus.includes("categoryRules[row.categoryKey]"), "SKU reset should support future categories dynamically");
 assert.ok(push.includes("requireAdmin"), "Push subscriptions must require admin authentication");
 console.log("PASS: admin upgrade static regression checks.");
+
+assert.ok(!read("../public/index.html").includes('id="craftsmanship"') && !read("../public/index.html").includes("images/17599dbbaea33cdd.webp"), "Crafted-with-character image and section must be removed completely");
+assert.ok(read("../public/index.html").includes(".menu-btn{position:absolute!important;left:8px"), "Mobile hamburger menu should be positioned on the left");
+assert.ok(read("../public/index.html").includes(".checkout-fields input,.checkout-fields select,.checkout-fields textarea{"), "Province/city selector should share the same glass field styling");
+assert.ok(admin.includes("<h2>Đăng nhập</h2>") && admin.includes("<p>Đăng nhập quản trị</p>"), "Admin login UI should be labeled clearly in Vietnamese");
