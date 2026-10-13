@@ -14,8 +14,10 @@ export async function onRequestPost({ request, env }) {
   try { const limit = await rateLimitPublicRequest(env, request, "order_create", 6, 900); if (limit.limited) return fail("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi 15 phút hoặc liên hệ qua Zalo.", 429, { "Retry-After": "900" }); } catch { return fail("Dịch vụ tiếp nhận đơn chưa sẵn sàng.", 503); }
   let body;
   try { body = await request.json(); } catch { return fail("Thông tin đặt hàng không hợp lệ."); }
-  const fullName = clean(body?.fullName, 120), phone = clean(body?.phone, 24), email = clean(body?.email, 160), address = clean(body?.address, 400), customerNote = clean(body?.note, 1200);
+  const fullName = clean(body?.fullName, 120), phone = clean(body?.phone, 24), email = clean(body?.email, 160), province = clean(body?.province, 100), provinceCode = clean(body?.provinceCode, 12), ward = clean(body?.ward, 120), wardCode = clean(body?.wardCode, 12), streetAddress = clean(body?.streetAddress, 300), address = clean(body?.address || [streetAddress, ward, province].filter(Boolean).join(", "), 400), customerNote = clean(body?.note, 1200);
   if (fullName.length < 2) return fail("Vui lòng nhập họ tên.");
+  if ((province || ward || streetAddress || provinceCode || wardCode) && (!province || !ward || !streetAddress || !provinceCode || !wardCode)) return fail("Vui lòng chọn tỉnh/thành, xã/phường và nhập địa chỉ chi tiết.");
+  if (!address) return fail("Vui lòng nhập địa chỉ nhận hàng.");
   if (!phoneOk(phone)) return fail("Số điện thoại chưa hợp lệ.");
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Email chưa hợp lệ.");
   if (!Array.isArray(body?.items) || body.items.length < 1 || body.items.length > 50) return fail("Giỏ hàng không hợp lệ.");
@@ -44,7 +46,9 @@ export async function onRequestPost({ request, env }) {
     const statements = [];
     if (existing) statements.push(env.DB.prepare("UPDATE customers SET full_name=?,email=?,address=?,updated_at=datetime('now') WHERE id=?").bind(fullName,email,address,actualCustomerId));
     else statements.push(env.DB.prepare("INSERT INTO customers(id,full_name,phone,email,address) VALUES(?,?,?,?,?)").bind(actualCustomerId,fullName,phone,email,address));
+    if (province && ward && streetAddress) statements.push(env.DB.prepare("INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) VALUES(?,?,?,?,?,?,datetime('now')) ON CONFLICT(customer_id) DO UPDATE SET province_code=excluded.province_code,province=excluded.province,ward_code=excluded.ward_code,ward=excluded.ward,street_address=excluded.street_address,updated_at=datetime('now')").bind(actualCustomerId,provinceCode,province,wardCode,ward,streetAddress));
     statements.push(env.DB.prepare("INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,customer_note) VALUES(?,?,?,'pending_confirmation',?,?,?,?)").bind(orderId,orderNumber,actualCustomerId,subtotal,subtotal,priceKnown?0:1,customerNote));
+    statements.push(env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) VALUES(?,?,?,?,?,?,?)").bind(orderId,provinceCode,province,wardCode,ward,streetAddress,address));
     for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity));
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length })));
     await env.DB.batch(statements);

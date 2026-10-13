@@ -27,10 +27,10 @@ response = await createOrder({request:new Request('https://shop.example/api/orde
 assert.equal(response.status,403,'cross-origin order submission is rejected');
 response = await createWarrantyClaim({request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
 assert.equal(response.status,403,'cross-origin warranty submission is rejected');
-const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(){return {async all(){return {results:[{slug:'test-sneaker',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
+const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(){return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
 const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
-assert.match(sitemapText,/https:\/\/shop\.example\/san-pham\/test-sneaker/);
+assert.match(sitemapText,/https:\/\/shop\.example\/san-pham\/test-product-id/);
 const robotsText = await (await robots({request:new Request('https://shop.example/robots.txt')})).text();
 assert.match(robotsText,/Disallow: \/admin\//);
 assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
