@@ -32,7 +32,7 @@ const CATEGORY_ALIASES = {
 
 function resolveCategory(value) {
   const key = slugify(String(value ?? "").trim());
-  return CATEGORY_ALIASES[key] || null;
+  return CATEGORY_ALIASES[key] || key || null;
 }
 
 function buildCaseUpdate(db, rows, skuById) {
@@ -87,12 +87,25 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Assign an independent, stable sequence for each recognized category.
-    const counters = Object.fromEntries(Object.keys(CATEGORY_RULES).map((key) => [key, 0]));
-    const finalSkuById = new Map();
-    const categoryCounts = Object.fromEntries(Object.keys(CATEGORY_RULES).map((key) => [key, 0]));
+    // Build rules dynamically so future categories can also receive SKUs.
+    const categoryRules = {};
     for (const row of categorized) {
-      const rule = CATEGORY_RULES[row.categoryKey];
+      if (!categoryRules[row.categoryKey]) {
+        const known = CATEGORY_RULES[row.categoryKey];
+        let hash = 0;
+        for (const char of row.categoryKey) hash = (hash * 31 + char.charCodeAt(0)) % 1296;
+        const compact = row.categoryKey.replace(/-/g, "").toUpperCase();
+        categoryRules[row.categoryKey] = known || {
+          prefix: "SD-" + (compact.slice(0, 5) || "MISC") + hash.toString(36).toUpperCase().padStart(2, "0"),
+          label: String(row.category_label || row.category || row.categoryKey),
+        };
+      }
+    }
+    const counters = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
+    const finalSkuById = new Map();
+    const categoryCounts = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
+    for (const row of categorized) {
+      const rule = categoryRules[row.categoryKey];
       counters[row.categoryKey] += 1;
       categoryCounts[row.categoryKey] += 1;
       finalSkuById.set(
@@ -126,7 +139,7 @@ export async function onRequestPost(context) {
       ).bind(crypto.randomUUID(), JSON.stringify({
         count: rows.length,
         categories: Object.fromEntries(
-          Object.entries(categoryCounts).map(([key, count]) => [CATEGORY_RULES[key].label, count])
+          Object.entries(categoryCounts).map(([key, count]) => [categoryRules[key].label, count])
         ),
         order: "sort_order,title,id",
       })),
@@ -137,7 +150,7 @@ export async function onRequestPost(context) {
       ok: true,
       count: rows.length,
       categories: Object.fromEntries(
-        Object.entries(categoryCounts).map(([key, count]) => [key, count])
+        Object.entries(categoryCounts).map(([key, count]) => [categoryRules[key].label, count])
       ),
       message: `Đã đặt lại SKU cho ${rows.length} sản phẩm.`,
     });

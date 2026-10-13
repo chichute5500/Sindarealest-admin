@@ -1,5 +1,12 @@
 import { fail, fromRow, genericDbError, json, productInsertStatement, requireAdmin, toAdminProduct, validateProduct } from "../../_lib.js";
 
+function makeCategoryPrefix(slug) {
+  const compact = String(slug || "").replace(/-/g, "").toUpperCase();
+  let hash = 0;
+  for (const char of String(slug || "")) hash = (hash * 31 + char.charCodeAt(0)) % 1296;
+  return "SD-" + (compact.slice(0, 5) || "MISC") + hash.toString(36).toUpperCase().padStart(2, "0");
+}
+
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
@@ -26,7 +33,7 @@ export async function onRequestPost(context) {
     "day-dong-ho": ["watch-straps","SD-DH"], "watch-straps": ["watch-straps","SD-DH"],
     "op-dien-thoai": ["phone-cases","SD-ODT"], "phone-cases": ["phone-cases","SD-ODT"]
   };
-  const category = categories[normalized];
+  const category = categories[normalized] || (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
   if (!category) return fail("Vui lòng chọn một danh mục hợp lệ trong danh sách.");
   try {
     const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE category=?").bind(category[0]).all();
