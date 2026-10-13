@@ -4,6 +4,10 @@ import { onRequestPost as createOrder } from '../functions/api/orders.js';
 import { onRequestPost as createWarrantyClaim } from '../functions/api/warranty-claims.js';
 import { onRequestGet as sitemap } from '../functions/sitemap.xml.js';
 import { onRequestGet as robots } from '../functions/robots.txt.js';
+import { readFileSync } from 'node:fs';
+const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must require OTP verification before revealing records');
+assert.ok(storefrontHtml.includes('id="checkoutProvince"') && storefrontHtml.includes('id="checkoutWard"') && storefrontHtml.includes('streetAddress'), 'Checkout must collect province, ward, and detailed street address');
 
 const html = '<!doctype html><html><head><meta name="description" content="Home"><meta property="og:title" content="Home"><meta property="og:image" content="/og-sindarealest.jpg"><meta name="twitter:image" content="/og-sindarealest.jpg"><link rel="canonical" href="/"><title>Home</title></head><body></body></html>';
 const homepageContext = { request: new Request('https://shop.example/'), env: {}, next: async () => new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}) };

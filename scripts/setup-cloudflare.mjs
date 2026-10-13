@@ -94,6 +94,10 @@ async function main() {
 
   console.log('\n2/5 · Áp dụng bảng đơn hàng, khách hàng, bảo hành và audit log…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0003_storefront_operations.sql'], { interactive: true });
+  console.log('Áp dụng migration thông báo quản trị (idempotent)…');
+  runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0004_admin_notifications.sql'], { interactive: true });
+  console.log('Áp dụng địa chỉ giao hàng và xác thực bảo hành OTP (idempotent)…');
+  runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0005_address_warranty_verification.sql'], { interactive: true });
 
   console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
   for (const query of [
@@ -105,7 +109,11 @@ async function main() {
     'SELECT id, order_id, warranty_code, duration_months, status FROM warranties LIMIT 0;',
     'SELECT id, order_id, customer_id, message, status FROM warranty_claims LIMIT 0;',
     'SELECT id, actor, action, entity_type, entity_id FROM audit_logs LIMIT 0;',
-    'SELECT scope, ip_hash, window_start, attempts FROM public_rate_limits LIMIT 0;'
+    'SELECT scope, ip_hash, window_start, attempts FROM public_rate_limits LIMIT 0;',
+    'SELECT customer_id, province_code, province, ward_code, ward, street_address FROM customer_address_details LIMIT 0;',
+    'SELECT order_id, province_code, province, ward_code, ward, street_address, full_address FROM order_shipping_addresses LIMIT 0;',
+    'SELECT ticket_id, customer_id, warranty_id, otp_hash, attempts, expires_at FROM warranty_verifications LIMIT 0;',
+    'SELECT claim_id, image_key FROM warranty_claim_attachments LIMIT 0;'
   ]) {
     runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { interactive: true });
   }
