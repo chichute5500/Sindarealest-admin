@@ -12,6 +12,8 @@ assert.ok(storefrontHtml.includes('class="hero-stamp-image-spacer"') && storefro
 assert.ok(storefrontHtml.includes('id="checkoutProvince"') && storefrontHtml.includes('id="checkoutWard"') && storefrontHtml.includes('streetAddress'), 'Checkout must collect province, ward, and detailed street address');
 const warrantyClaimSource = readFileSync(new URL('../functions/api/warranty-claims.js', import.meta.url), 'utf8');
 assert.ok(warrantyClaimSource.includes('verified_at IS NOT NULL') && warrantyClaimSource.includes('access_expires_at') && warrantyClaimSource.includes("w.status='active'"), 'Warranty claims must require a verified OTP session and an active warranty');
+const otpSource = readFileSync(new URL('../functions/api/warranty-verification.js', import.meta.url), 'utf8');
+assert.ok(otpSource.includes('verified_at IS NULL') && otpSource.includes('attempts<5'), 'OTP must be single-use and attempt-limited');
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
 assert.ok(adminOrdersSource.includes('COALESCE(sa.full_address,c.address)') && adminOrdersSource.includes('LEFT JOIN order_shipping_addresses'), 'Admin orders must show the shipping address captured for that order');
 assert.ok(storefrontHtml.includes('id="claimIssueType"') && storefrontHtml.includes('id="claimContactPhone"'), 'Warranty claim form must capture issue type and contact details');

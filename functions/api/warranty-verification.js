@@ -39,9 +39,9 @@ export async function onRequestPost({request,env}){
   const ticketId=clean(body?.ticketId,80),code=clean(body?.code,10);
   if(!/^[0-9a-f-]{32,36}$/i.test(ticketId)||!/^\d{6}$/.test(code))return fail("Mã xác thực không đúng hoặc đã hết hạn.");
   try{
-   const ticket=await env.DB.prepare("SELECT ticket_id,customer_id,warranty_id,otp_hash,attempts,expires_at FROM warranty_verifications WHERE ticket_id=? LIMIT 1").bind(ticketId).first();
-   if(!ticket||!ticket.customer_id||Number(ticket.attempts)>=5||!(Date.parse(ticket.expires_at)>Date.now()))return fail("Mã xác thực không đúng hoặc đã hết hạn.",400);
-   const updated=await env.DB.prepare("UPDATE warranty_verifications SET attempts=attempts+1 WHERE ticket_id=? AND attempts<5 AND julianday(expires_at)>julianday('now')").bind(ticketId).run();
+   const ticket=await env.DB.prepare("SELECT ticket_id,customer_id,warranty_id,otp_hash,attempts,expires_at,verified_at FROM warranty_verifications WHERE ticket_id=? LIMIT 1").bind(ticketId).first();
+   if(!ticket||!ticket.customer_id||ticket.verified_at||Number(ticket.attempts)>=5||!(Date.parse(ticket.expires_at)>Date.now()))return fail("Mã xác thực không đúng hoặc đã hết hạn.",400);
+   const updated=await env.DB.prepare("UPDATE warranty_verifications SET attempts=attempts+1 WHERE ticket_id=? AND attempts<5 AND verified_at IS NULL AND julianday(expires_at)>julianday('now')").bind(ticketId).run();
    if(!updated.meta?.changes)return fail("Mã xác thực không đúng hoặc đã hết hạn.",400);
    if(!equal(await hashOtp(ticketId,code),String(ticket.otp_hash||"")))return fail("Mã xác thực không đúng hoặc đã hết hạn.",400);
    await env.DB.prepare("UPDATE warranty_verifications SET verified_at=datetime('now'),access_expires_at=datetime('now','+15 minutes') WHERE ticket_id=?").bind(ticketId).run();
