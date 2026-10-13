@@ -43,12 +43,8 @@ jobs:
           test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
       
-      - name: Diagnose Cloudflare Pages project access
-        run: |
-          echo "=== Wrangler version ==="
-          npx wrangler --version
-          echo "=== Pages projects ==="
-          npx wrangler pages project list
+            - name: Diagnose Cloudflare Pages project access
+        run: npx wrangler pages project list --json
 
       - name: Deploy to verified Pages project
         run: npm run deploy
