@@ -44,7 +44,8 @@ export async function onRequest(context) {
   const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest.jpg";
   const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.sku)}`;
   const title = `${product.title} | SinDarealest`;
-  const description = `${String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim()} · Mã sản phẩm: ${product.sku}`.slice(0, 300);
+  const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
+  const description = `${descriptionBase.slice(0, 250)} · Mã sản phẩm: ${product.sku}`.slice(0, 300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
