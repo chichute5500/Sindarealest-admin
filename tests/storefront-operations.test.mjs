@@ -11,6 +11,8 @@ assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.i
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
 assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('hero-stamp-image-spacer') && !storefrontHtml.includes('.hero-stamp{'), 'Entire unwanted hero stamp and glass styling must be removed while preserving the sneaker hero');
+assert.ok(storefrontHtml.includes('id="heroDarkShoe"') && storefrontHtml.includes('id="heroLightShoe"'), 'The primary sneaker hero imagery must remain');
+assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
 assert.ok(!storefrontHtml.includes('sd-admin-shortcut') && !storefrontHtml.includes('href="/admin/"'), 'The public storefront must not expose a management link while admin remains at its separate route');
 assert.ok(storefrontHtml.includes('sdMenuItemIn') && storefrontHtml.includes('mobile-nav.open .navlink:nth-child(6)'), 'Mobile glass menu items should animate in a staggered sequence');
 assert.ok(!storefrontHtml.includes("(mod&&['u','s','c'].includes(k))") && storefrontHtml.includes("e.target.closest('img, picture')"), 'Text selection and copy must remain available outside protected images');
@@ -70,6 +72,7 @@ assert.ok(text.includes('<title>Giày thử | SinDarealest</title>'));
 assert.ok(text.includes('og:title" content="Giày thử | SinDarealest'));
 assert.ok(text.includes('og:url" content="https://shop.example/san-pham/SD-SN001'));
 assert.ok(text.includes('og:image" content="https://shop.example/images/example.webp'));
+assert.ok(text.includes('og:description" content="Mô tả giày · Mã sản phẩm: SD-SN001'), 'Product social preview should include the SKU even when descriptions are long');
 assert.match(text,/application\/ld\+json/);
 
 response = await createOrder({request:new Request('https://shop.example/api/orders',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
