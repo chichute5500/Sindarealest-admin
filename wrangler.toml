@@ -1,0 +1,11 @@
+# Cau hinh local-only. Co y KHONG dat pages_build_output_dir:
+# deploy-cloudflare.mjs/setup-cloudflare.mjs truyen thu muc `public/` truc tiep va
+# de Cloudflare Dashboard giu vai tro nguon cau hinh production/bindings.
+# Khong them pages_build_output_dir vao file nay khi chua tai config that cua project.
+name = "sindarealest-admin"
+compatibility_date = "2026-10-12"
+
+# Production bindings can duoc cau hinh trong Workers & Pages > Settings > Bindings:
+# D1 Variable name: DB
+# R2 Variable name: IMAGES
+# Secrets (Production): ADMIN_PASSWORD, SESSION_SECRET

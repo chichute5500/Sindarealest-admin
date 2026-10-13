@@ -1,0 +1,16 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+/admin/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+/api/*
+  Cache-Control: no-store
+/watermark.webp
+  Cache-Control: public, max-age=31536000, immutable
+/og-sindarealest.jpg
+  Cache-Control: public, max-age=86400

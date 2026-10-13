@@ -1,0 +1,162 @@
+import assert from 'node:assert/strict';
+import { createSession, verifySession, validateProduct, hasSecuritySecrets } from '../functions/_lib.js';
+import { onRequestGet as publicProducts } from '../functions/api/products.js';
+import { onRequestGet as adminProducts } from '../functions/api/admin/products.js';
+import { onRequestPost as restoreProducts } from '../functions/api/admin/restore.js';
+import { onRequestPost as adminLogin } from '../functions/api/admin/login.js';
+import { readFileSync } from 'node:fs';
+
+const secrets = { ADMIN_PASSWORD: 'mau-khau-quan-tri-demonstration', SESSION_SECRET: 's'.repeat(48) };
+assert.equal(hasSecuritySecrets(secrets), true, 'secrets hợp lệ phải được chấp nhận');
+assert.equal(hasSecuritySecrets({ ADMIN_PASSWORD: 'short', SESSION_SECRET: 'tiny' }), false, 'secrets yếu phải bị từ chối');
+
+const valid = validateProduct({
+  title: 'Ví da cá sấu', sku: 'sd-236', category: 'Ví da',
+  price: null, stock: null, published: true,
+  images: ['images/example.webp', '/media/12345678-1234-1234-1234-123456789012.webp'],
+});
+assert.equal(valid.error, undefined, 'sản phẩm hợp lệ phải qua kiểm tra');
+assert.equal(valid.value.sku, 'SD-236');
+assert.equal(valid.value.category, 'wallets');
+assert.equal(valid.value.price, null, 'không tự gán giá');
+assert.equal(valid.value.stock, null, 'không tự gán tồn kho');
+assert.ok(validateProduct({ title: 'Hỏng', sku: '../x', category: 'Ví' }).error, 'SKU traversal phải bị từ chối');
+assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['../secret.webp'] }).error, 'đường dẫn ảnh traversal phải bị từ chối');
+assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['https://evil.example/x.webp'] }).error, 'ảnh remote không tin cậy phải bị từ chối');
+assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['images/payload.html'] }).error, 'đuôi tệp ảnh không hợp lệ phải bị từ chối');
+assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', price: -1 }).error, 'giá âm phải bị từ chối');
+const sourceProducts = JSON.parse(readFileSync(new URL('../data/legacy-products.json', import.meta.url), 'utf8'));
+assert.equal(sourceProducts.length, 235, 'nguồn sản phẩm phải có đủ 235 bản ghi');
+for (const product of sourceProducts) assert.equal(validateProduct(product).error, undefined, `sản phẩm nguồn không hợp lệ: ${product.sku}`);
+
+
+
+const dbState = {
+  showPrices: false,
+  rows: [
+    { id: 'p1', slug: 'vi-a', sku: 'SD001', title: 'Ví A', category: 'wallets', category_label: 'Ví da', description: '', price: 1290000, stock: 4, published: 1, images_json: '["images/example.webp"]', source_price_confirmed: 1, sort_order: 1, updated_at: '2026-01-01 00:00:00' },
+    { id: 'p2', slug: 'hidden', sku: 'SD002', title: 'Không công khai', category: 'wallets', category_label: 'Ví da', description: '', price: 999000, stock: 1, published: 0, images_json: '[]', source_price_confirmed: 1, sort_order: 2, updated_at: null },
+  ],
+};
+const mockDB = {
+  prepare(sql) {
+    let bound = [];
+    const statement = {
+      bind(...values) { bound = values; return statement; },
+      async first() {
+        if (sql.includes('FROM settings')) return { value: dbState.showPrices ? '1' : '0' };
+        return null;
+      },
+      async all() {
+        if (sql.includes('WHERE published = 1')) return { results: dbState.rows.filter(r => r.published === 1) };
+        return { results: dbState.rows };
+      },
+      async run() { return { meta: { changes: 1 }, bound }; },
+    };
+    return statement;
+  },
+  async batch() { return []; },
+};
+const wrongOriginLogin = await adminLogin({
+  request: new Request('https://shop.example/api/admin/login', {
+    method: 'POST', headers: { Origin: 'https://attacker.example', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: secrets.ADMIN_PASSWORD }),
+  }),
+  env: { DB: mockDB, ...secrets },
+});
+assert.equal(wrongOriginLogin.status, 403, 'đăng nhập từ origin ngoài phải bị từ chối');
+const loginResponse = await adminLogin({
+  request: new Request('https://shop.example/api/admin/login', {
+    method: 'POST', headers: { Origin: 'https://shop.example', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: secrets.ADMIN_PASSWORD }),
+  }),
+  env: { DB: mockDB, ...secrets },
+});
+assert.equal(loginResponse.status, 200, 'đăng nhập đúng mật khẩu phải thành công');
+assert.match(loginResponse.headers.get('Set-Cookie') || '', /HttpOnly/);
+assert.match(loginResponse.headers.get('Set-Cookie') || '', /Secure/);
+assert.match(loginResponse.headers.get('Set-Cookie') || '', /SameSite=Strict/);
+
+
+const unavailable = await publicProducts({ request: new Request('https://shop.example/api/products'), env: {} });
+assert.equal(unavailable.status, 503, 'API công khai phải báo cấu hình thiếu, không dùng dữ liệu dự phòng');
+const publicContext = { request: new Request('https://shop.example/api/products'), env: { DB: mockDB } };
+let response = await publicProducts(publicContext);
+assert.equal(response.status, 200);
+let data = await response.json();
+assert.equal(data.length, 1, 'API công khai chỉ trả về sản phẩm published');
+assert.equal(data[0].price, null, 'khi ẩn giá, API không gửi giá thật');
+assert.equal(data[0].stock, 4);
+
+dbState.showPrices = true;
+response = await publicProducts(publicContext);
+data = await response.json();
+assert.equal(data[0].price, 1290000, 'khi bật giá, API trả giá đã lưu');
+
+dbState.showPrices = false;
+const token = await createSession(secrets.SESSION_SECRET);
+const authenticatedRequest = new Request('https://shop.example/api/admin/products', {
+  headers: { Cookie: `sd_admin_session=${token}`, Origin: 'https://shop.example' },
+});
+assert.equal(await verifySession(authenticatedRequest, { ...secrets }), true, 'session hợp lệ được xác minh');
+assert.equal(await verifySession(new Request('https://shop.example/api/admin/products'), secrets), false, 'request không có cookie không được xác minh');
+
+response = await adminProducts({ request: new Request('https://shop.example/api/admin/products'), env: { DB: mockDB, ...secrets } });
+assert.equal(response.status, 401, 'API quản trị phải từ chối khi chưa đăng nhập');
+response = await adminProducts({ request: authenticatedRequest, env: { DB: mockDB, ...secrets } });
+assert.equal(response.status, 200, 'API quản trị cho phép session hợp lệ');
+data = await response.json();
+assert.equal(data.products.length, 2, 'quản trị được thấy cả sản phẩm đang ẩn');
+
+let batchCalls = 0;
+const restoreDB = {
+  ...mockDB,
+  async batch(statements) { batchCalls++; return statements.map(() => ({ success: true })); },
+};
+const restoredProduct = {
+  id: 'restore-product-1', slug: 'restore-product-1', sku: 'SD-RESTORE-1',
+  title: 'Ví thử khôi phục', category: 'wallets', categoryLabel: 'Ví da',
+  description: 'Sản phẩm kiểm tra', price: null, stock: null, published: true,
+  images: ['images/example.webp'], sourcePriceConfirmed: false, sortOrder: 7,
+};
+const makeRestoreRequest = (payload) => new Request('https://shop.example/api/admin/restore', {
+  method: 'POST',
+  headers: { Cookie: `sd_admin_session=${token}`, Origin: 'https://shop.example', 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload),
+});
+const validBackup = { format: 'sindarealest-backup-v1', settings: { showPrices: false }, products: [restoredProduct] };
+response = await restoreProducts({ request: makeRestoreRequest(validBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 200, 'backup hợp lệ phải khôi phục thành công');
+assert.equal(batchCalls, 1, 'backup hợp lệ thực hiện một batch giao dịch');
+const duplicateSlugBackup = {
+  ...validBackup,
+  products: [restoredProduct, { ...restoredProduct, id: 'restore-product-2', sku: 'SD-RESTORE-2' }],
+};
+response = await restoreProducts({ request: makeRestoreRequest(duplicateSlugBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 400, 'backup có slug trùng phải bị từ chối');
+assert.equal(batchCalls, 1, 'backup không hợp lệ không được chạm vào cơ sở dữ liệu');
+const malformedIdBackup = { ...validBackup, products: [{ ...restoredProduct, id: '../invalid' }] };
+response = await restoreProducts({ request: makeRestoreRequest(malformedIdBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 400, 'backup có ID không hợp lệ phải bị từ chối');
+assert.equal(batchCalls, 1, 'ID không hợp lệ không được ghi vào D1');
+
+console.log('PASS: kiểm tra sản phẩm, ảnh, giá/tồn kho trống, API công khai, session, quyền admin và backup/restore an toàn.');
+
+const operationsBackup = {
+  ...validBackup,
+  format: 'sindarealest-backup-v2',
+  settings: { showPrices:false, welcomeEnabled:true, welcomeTitleLine1:'Đẳng cấp thật.', welcomeTitleLine2:'Từ chất liệu thật.', welcomeText:'Lời chào kiểm thử hợp lệ.' },
+  operations: {
+    customers: [{ id:'customer-1', full_name:'Khách kiểm thử', phone:'0900000000', email:'', address:'', created_at:'2026-01-01 00:00:00', updated_at:'2026-01-01 00:00:00' }],
+    orders: [{ id:'order-1', order_number:'SD-TEST-123456', customer_id:'customer-1', status:'pending_confirmation', payment_status:'unpaid', subtotal:null, total:null, price_confirmation_required:1, customer_note:'', created_at:'2026-01-01 00:00:00', updated_at:'2026-01-01 00:00:00' }],
+    orderItems: [{ id:'item-1', order_id:'order-1', product_id:'restore-product-1', sku:'SD-RESTORE-1', title:'Ví thử khôi phục', quantity:1, unit_price:null, line_total:null }],
+    warranties: [], warrantyClaims: [], auditLogs: [],
+  },
+};
+response = await restoreProducts({ request: makeRestoreRequest(operationsBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 200, 'backup v2 có quan hệ vận hành hợp lệ phải được chấp nhận');
+assert.equal(batchCalls, 2, 'backup v2 hợp lệ khôi phục dữ liệu vận hành bằng batch');
+const brokenOperationsBackup = { ...operationsBackup, operations: { ...operationsBackup.operations, orders: [{ ...operationsBackup.operations.orders[0], customer_id:'missing-customer' }] } };
+response = await restoreProducts({ request: makeRestoreRequest(brokenOperationsBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 400, 'backup v2 tham chiếu khách hàng không tồn tại phải bị từ chối');
+assert.equal(batchCalls, 2, 'backup v2 không hợp lệ không được chạm vào D1');

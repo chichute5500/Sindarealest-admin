@@ -1,0 +1,47 @@
+name: Deploy SinDarealest to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      CLOUDFLARE_PAGES_BRANCH: ${{ vars.CLOUDFLARE_PAGES_BRANCH }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Validate project integrity
+        run: npm run check
+
+      - name: Run API and data smoke tests
+        run: npm test
+
+      - name: Require explicit Cloudflare target
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
+          test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
+
+      - name: Deploy to verified Pages project
+        run: npm run deploy

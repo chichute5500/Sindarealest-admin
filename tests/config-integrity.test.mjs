@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import { readFileSync, existsSync } from 'node:fs';
+import { parseCliJson, findNamedRecord, assertSafeName } from '../scripts/cloudflare-utils.mjs';
+
+const payload = parseCliJson('\nWrangler notice\n[{"name":"shop-prod","production_branch":"main"}]\nFinished listing projects.');
+assert.equal(findNamedRecord(payload, 'shop-prod')?.production_branch, 'main');
+assert.equal(findNamedRecord(payload, 'wrong-project'), null);
+assert.throws(() => parseCliJson('not JSON'), /không đọc được/i);
+assert.doesNotThrow(() => assertSafeName('sindarealest-prod', 'project'));
+assert.throws(() => assertSafeName('../production', 'project'), /không hợp lệ/i);
+
+const workflow = readFileSync('.github/workflows/deploy.yml', 'utf8');
+assert.ok(workflow.includes('npm run check'));
+assert.ok(workflow.includes('npm test'));
+assert.ok(workflow.includes('CLOUDFLARE_PAGES_PROJECT'));
+const setupScript = readFileSync(new URL('../scripts/setup-cloudflare.mjs', import.meta.url), 'utf8');
+assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n1/5 · Áp dụng schema SQL idempotent cho D1…'"), 'Setup must require bindings/secrets before migrations');
+assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 · Triển khai website cùng Pages Functions…'"), 'Setup must require bindings/secrets before deploy');
+const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
+assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
+assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
+assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
+assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
+assert.ok(!workflow.includes('0002_seed_products.sql'), 'Deploy workflow must not seed D1 automatically');
+const wranglerConfig = readFileSync('wrangler.toml', 'utf8');
+assert.ok(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Do not opt into Wrangler production config until actual Pages config has been downloaded and reconciled');
+assert.ok(existsSync('public/index.html'));
+assert.ok(existsSync('public/admin/index.html'));
+assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fallback must not shadow D1 failures');
+console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, and single-source catalog invariant.');
