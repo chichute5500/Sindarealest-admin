@@ -9,7 +9,18 @@ function validateOperations(operations) {
   const keys = ["customers","orders","orderItems","warranties","warrantyClaims","auditLogs"];
   if (!operations || typeof operations !== "object" || keys.some(k => !Array.isArray(operations[k])) || keys.some(k => operations[k].length > 20000)) return { error: "Bản sao lưu thiếu danh sách dữ liệu vận hành hoặc vượt giới hạn." };
   const customers = operations.customers, orders = operations.orders, items = operations.orderItems, warranties = operations.warranties, claims = operations.warrantyClaims, logs = operations.auditLogs;
+  const optionalKeys = ["customerAddressDetails","orderShippingAddresses","orderItemDetails","warrantyClaimAttachments"];
+  for (const key of optionalKeys) {
+    if (operations[key] !== undefined && (!Array.isArray(operations[key]) || operations[key].length > 20000)) {
+      return { error: "Bản sao lưu có danh sách địa chỉ/ảnh đính kèm không hợp lệ hoặc vượt giới hạn." };
+    }
+  }
+  const customerAddressDetails = operations.customerAddressDetails || [];
+  const orderShippingAddresses = operations.orderShippingAddresses || [];
+  const orderItemDetails = operations.orderItemDetails || [];
+  const warrantyClaimAttachments = operations.warrantyClaimAttachments || [];
   const customerIds = new Set(), phones = new Set(), orderIds = new Set(), orderNumbers = new Set(), itemIds = new Set(), warrantyCodes = new Set(), claimIds = new Set(), logIds = new Set();
+  const customerAddressIds = new Set(), shippingOrderIds = new Set(), itemDetailIds = new Set(), attachmentClaimIds = new Set(), attachmentKeys = new Set();
   for (const c of customers) {
     if (!str(c.id,100,true) || !str(c.full_name,120,true) || !str(c.phone,24,true) || !str(c.email,160) || !str(c.address,400) || !timestamp(c.created_at) || !timestamp(c.updated_at)) return { error: "Bản sao lưu có hồ sơ khách hàng không hợp lệ." };
     if (customerIds.has(c.id) || phones.has(c.phone)) return { error: "Bản sao lưu có ID khách hàng hoặc số điện thoại trùng." };
@@ -41,7 +52,27 @@ function validateOperations(operations) {
     if (logIds.has(l.id)) return { error: "Bản sao lưu có ID nhật ký trùng." };
     logIds.add(l.id);
   }
-  return { value: { customers,orders,items,warranties,claims,logs } };
+  for (const a of customerAddressDetails) {
+    if (!customerIds.has(a.customer_id) || !str(a.province_code,12) || !str(a.province,100) || !str(a.ward_code,12) || !str(a.ward,120) || !str(a.street_address,300) || !timestamp(a.updated_at)) return { error: "Bản sao lưu có địa chỉ khách hàng không hợp lệ hoặc thiếu khách hàng liên kết." };
+    if (customerAddressIds.has(a.customer_id)) return { error: "Bản sao lưu có địa chỉ khách hàng trùng." };
+    customerAddressIds.add(a.customer_id);
+  }
+  for (const a of orderShippingAddresses) {
+    if (!orderIds.has(a.order_id) || !str(a.province_code,12) || !str(a.province,100) || !str(a.ward_code,12) || !str(a.ward,120) || !str(a.street_address,300) || !str(a.full_address,400,true) || !timestamp(a.created_at)) return { error: "Bản sao lưu có địa chỉ giao hàng không hợp lệ hoặc thiếu đơn hàng liên kết." };
+    if (shippingOrderIds.has(a.order_id)) return { error: "Bản sao lưu có địa chỉ giao hàng trùng." };
+    shippingOrderIds.add(a.order_id);
+  }
+  for (const d of orderItemDetails) {
+    if (!itemIds.has(d.item_id) || !str(d.size,80)) return { error: "Bản sao lưu có thông tin biến thể sản phẩm không hợp lệ hoặc thiếu dòng đơn liên kết." };
+    if (itemDetailIds.has(d.item_id)) return { error: "Bản sao lưu có thông tin biến thể sản phẩm trùng." };
+    itemDetailIds.add(d.item_id);
+  }
+  for (const a of warrantyClaimAttachments) {
+    if (!claimIds.has(a.claim_id) || !/^warranty-claims\/[0-9a-f]{32}\.webp$/.test(String(a.image_key || ""))) return { error: "Bản sao lưu có ảnh bảo hành không hợp lệ hoặc thiếu yêu cầu liên kết." };
+    if (attachmentClaimIds.has(a.claim_id) || attachmentKeys.has(a.image_key)) return { error: "Bản sao lưu có ảnh bảo hành trùng." };
+    attachmentClaimIds.add(a.claim_id); attachmentKeys.add(a.image_key);
+  }
+  return { value: { customers,orders,items,warranties,claims,logs,customerAddressDetails,orderShippingAddresses,orderItemDetails,warrantyClaimAttachments } };
 }
 
 export async function onRequestPost(context) {
@@ -74,6 +105,8 @@ export async function onRequestPost(context) {
     const db = context.env.DB;
     const statements = [];
     if (operations) statements.push(
+      db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM warranty_claim_uploads"), db.prepare("DELETE FROM warranty_verifications"),
+      db.prepare("DELETE FROM customer_address_details"), db.prepare("DELETE FROM order_shipping_addresses"), db.prepare("DELETE FROM order_item_details"),
       db.prepare("DELETE FROM warranty_claims"), db.prepare("DELETE FROM warranties"), db.prepare("DELETE FROM order_items"),
       db.prepare("DELETE FROM orders"), db.prepare("DELETE FROM customers"), db.prepare("DELETE FROM audit_logs"), db.prepare("DELETE FROM public_rate_limits")
     );
@@ -85,14 +118,18 @@ export async function onRequestPost(context) {
     }
     if (operations) {
       for (const c of operations.customers) statements.push(db.prepare("INSERT INTO customers(id,full_name,phone,email,address,created_at,updated_at) VALUES(?,?,?,?,?,?,?)").bind(c.id,c.full_name,c.phone,c.email,c.address,c.created_at,c.updated_at));
+      for (const a of operations.customerAddressDetails) statements.push(db.prepare("INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) VALUES(?,?,?,?,?,?,?)").bind(a.customer_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.updated_at));
       for (const o of operations.orders) statements.push(db.prepare("INSERT INTO orders(id,order_number,customer_id,status,payment_status,subtotal,total,price_confirmation_required,customer_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)").bind(o.id,o.order_number,o.customer_id,o.status,o.payment_status,o.subtotal,o.total,Number(o.price_confirmation_required)?1:0,o.customer_note,o.created_at,o.updated_at));
+      for (const a of operations.orderShippingAddresses) statements.push(db.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(a.order_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.full_address,a.created_at));
       for (const i of operations.items) statements.push(db.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(i.id,i.order_id,i.product_id,i.sku,i.title,i.quantity,i.unit_price,i.line_total));
+      for (const d of operations.orderItemDetails) statements.push(db.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(d.item_id,d.size));
       for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
       for (const c of operations.claims) statements.push(db.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message,status,admin_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(c.id,c.order_id,c.customer_id,c.warranty_code,c.message,c.status,c.admin_note,c.created_at,c.updated_at));
+      for (const a of operations.warrantyClaimAttachments) statements.push(db.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(a.claim_id,a.image_key));
       for (const l of operations.logs) statements.push(db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES(?,?,?,?,?,?,?)").bind(l.id,l.actor,l.action,l.entity_type,l.entity_id,l.details_json,l.created_at));
     }
     await db.batch(statements);
-    const message = operations ? `Đã khôi phục ${products.length} sản phẩm cùng ${operations.orders.length} đơn hàng, ${operations.customers.length} khách hàng và dữ liệu bảo hành.` : `Đã khôi phục ${products.length} sản phẩm và cài đặt. Bản sao lưu v1 không chứa dữ liệu đơn hàng/khách hàng/bảo hành; dữ liệu vận hành hiện tại được giữ nguyên.`;
+    const message = operations ? `Đã khôi phục ${products.length} sản phẩm cùng ${operations.orders.length} đơn hàng, ${operations.customers.length} khách hàng, địa chỉ giao nhận và metadata ảnh bảo hành.` : `Đã khôi phục ${products.length} sản phẩm và cài đặt. Bản sao lưu v1 không chứa dữ liệu đơn hàng/khách hàng/bảo hành; dữ liệu vận hành hiện tại được giữ nguyên.`;
     return json({ ok: true, count: products.length, message });
   } catch { return fail("Khôi phục thất bại. D1 có thể chưa được thay đổi; hãy kiểm tra dữ liệu và thử lại.", 503); }
 }
