@@ -1,4 +1,5 @@
 import { dbOrFail, fail, getSetting, json, rateLimitPublicRequest } from "../_lib.js";
+import { sendAdminPush } from "../_notifications.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
 const phoneOk = (value) => /^[+0-9() .-]{9,20}$/.test(value);
@@ -47,6 +48,7 @@ export async function onRequestPost({ request, env }) {
     for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity));
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length })));
     await env.DB.batch(statements);
+    await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
     return json({ ok: true, orderNumber, status: "pending_confirmation", priceConfirmationRequired: !priceKnown, total: subtotal, message: priceKnown ? "Đã tiếp nhận đơn. SinDarealest sẽ liên hệ xác nhận." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
   } catch { return fail("Chưa thể lưu đơn hàng. Vui lòng thử lại hoặc liên hệ SinDarealest qua Zalo.", 503); }
 }
