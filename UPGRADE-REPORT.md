@@ -32,12 +32,12 @@
 - Thêm quản trị đơn hàng, trạng thái xử lý/thanh toán, danh sách khách hàng từ hồ sơ đặt hàng, và nhật ký hoạt động gần đây.
 - Thêm form yêu cầu hỗ trợ/bảo hành, quản trị yêu cầu, và phát hành mã bảo hành chỉ sau khi đơn hoàn tất. Tên chính sách, thời hạn và ngày bắt đầu phải được quản trị nhập rõ ràng; không tự gán chính sách mặc định.
 - Thêm rate limit theo IP cho yêu cầu đặt hàng/yêu cầu hỗ trợ và từ chối request có Origin khác website.
-- Backup v2 gồm danh mục, cài đặt, đơn hàng, khách hàng, dòng đơn, bảo hành, audit logs, địa chỉ khách hàng/giao hàng, biến thể dòng đơn và metadata ảnh đính kèm; vẫn chấp nhận backup v1 cũ. Byte ảnh nằm trong R2 cần được sao lưu riêng; các phiên OTP đã được loại bỏ khỏi luồng ứng dụng; migration 0006 giữ nguyên các bảng legacy để tránh thay đổi phá hủy schema Production và tạo bảng token tải ảnh tương thích riêng.
+- Backup v2 gồm danh mục, cài đặt, đơn hàng, khách hàng, dòng đơn, bảo hành, audit logs, địa chỉ khách hàng/giao hàng, biến thể dòng đơn và metadata ảnh đính kèm; vẫn chấp nhận backup v1 cũ. Byte ảnh nằm trong R2 cần được sao lưu riêng; các phiên OTP đã được loại bỏ khỏi luồng ứng dụng; migration 0006 không thay đổi schema Production, còn token tải ảnh tạm dùng bảng settings hiện có.
 - Thêm trang quản trị để bật/tắt lớp chào mừng và chỉnh hai dòng tiêu đề/lời chào; hiệu ứng Liquid và thiết kế của lớp chào mừng được giữ nguyên.
 
 ### Cơ sở dữ liệu và an toàn
 
-- Thêm `migrations/0003_storefront_operations.sql` với bảng khách hàng, đơn hàng, dòng đơn, bảo hành, yêu cầu bảo hành, audit log và giới hạn request công khai. Migration 0006 tạo bảng token tải ảnh độc lập, không xóa các bảng legacy.
+- Thêm `migrations/0003_storefront_operations.sql` với bảng khách hàng, đơn hàng, dòng đơn, bảo hành, yêu cầu bảo hành, audit log và giới hạn request công khai. Migration 0006 không thay đổi schema; token tải ảnh tạm được lưu trong settings hiện có và các bảng legacy được giữ nguyên.
 - Script thiết lập Cloudflare áp dụng các migration 0001, 0003, 0004 và 0005 theo thứ tự, kiểm tra bảng/cột trước khi deploy; chỉ nạp seed 0002 khi người vận hành xác nhận D1 đang trống. Script yêu cầu xác nhận đúng Pages project, D1, R2, bindings và secrets trước thao tác từ xa.
 - Thêm ghi nhật ký cho tạo/sửa/xóa sản phẩm, thay đổi cài đặt, tạo/cập nhật đơn, yêu cầu bảo hành và phát hành mã bảo hành.
 - Bổ sung header bảo mật cơ bản, kiểm tra metadata sản phẩm, kiểm tra dữ liệu backup v2 và quan hệ khóa ngoại trước khi restore.
