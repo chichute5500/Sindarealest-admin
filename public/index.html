@@ -103,14 +103,14 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .detail-image-count{position:absolute;right:12px;bottom:12px;z-index:2;padding:5px 9px;border:1px solid rgba(255,255,255,.4);border-radius:999px;background:rgba(10,10,10,.34);color:#fff;backdrop-filter:blur(12px);font-size:9px;letter-spacing:.12em}
 .detail-order-link{display:inline-block;margin-top:14px;color:var(--muted);font-size:10px;text-decoration:underline;text-decoration-color:rgba(180,145,82,.5);text-underline-offset:4px}.detail-order-link:hover{color:var(--gold)}
 /* Crafted-by-hand editorial section and five-step order process. */
-.craftsmanship-panel{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(20px,3vw,42px);padding:clamp(14px,2vw,24px);border-radius:27px;overflow:hidden}
-.craftsmanship-visual{position:relative;min-height:390px;overflow:hidden;border-radius:20px;background:#141210}
+
+
 .craftsmanship-visual::after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.45));pointer-events:none}
-.craftsmanship-visual img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}.craftsmanship-panel:hover .craftsmanship-visual img{transform:scale(1.035)}
+.craftsmanship-visual img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .craftsmanship-seal{position:absolute;z-index:1;left:16px;bottom:15px;display:flex;align-items:center;gap:10px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.4)}.craftsmanship-seal span{width:40px;height:40px;border:1px solid rgba(255,255,255,.7);border-radius:50%;display:grid;place-items:center;font:400 17px SD Serif,Georgia,serif}.craftsmanship-seal small{font-size:8px;letter-spacing:.16em}
-.craftsmanship-copy{align-self:center;padding:clamp(8px,1.6vw,22px) clamp(2px,1.4vw,12px) clamp(8px,1.6vw,22px) 0;min-width:0}
-.craftsmanship-copy h2{font:400 clamp(27px,3vw,43px)/1.14 SD Serif,Georgia,serif;letter-spacing:-.045em;margin:12px 0 13px}.craftsmanship-copy h2 em{font-style:normal;color:var(--gold)}
-.craftsmanship-copy>p{font-size:11px;line-height:1.9;color:var(--muted);margin:0 0 18px;max-width:620px}
+
+.craftsmanship-copy h2 em{font-style:normal;color:var(--gold)}
+
 .craftsmanship-points{display:grid;gap:12px;margin:16px 0 21px}.craftsmanship-points>div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding-top:11px;border-top:1px solid var(--soft-line)}.craftsmanship-points>div>span{font:400 14px SD Serif,Georgia,serif;color:var(--gold)}.craftsmanship-points strong{display:block;font-size:10px;line-height:1.5}.craftsmanship-points small{display:block;margin-top:3px;color:var(--muted);font-size:9px;line-height:1.65}
 .order-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
 .order-step{position:relative;min-width:0;overflow:hidden;padding:19px 15px 18px;border-radius:19px;box-shadow:0 10px 30px rgba(0,0,0,.055);transition:transform .32s ease,border-color .32s ease,background-color .8s ease}
@@ -119,10 +119,10 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 /* Guard against long product names and narrow controls overflowing or colliding. */
 .product-card,.product-open,.product-info,.product-title,.product-category,.detail-copy,.cart-row,.cart-row>div,.contact-link>span:last-child{min-width:0}
 .product-title{overflow-wrap:anywhere;hyphens:auto;line-height:1.38}.product-info{padding-bottom:47px}.product-card-bottom{min-width:0}.product-detail-cta{overflow-wrap:anywhere}.cart-row strong{overflow-wrap:anywhere;line-height:1.45}.cart-row small{overflow-wrap:anywhere;line-height:1.5}.detail-actions .pill-btn{line-height:1.45;white-space:normal;min-height:42px}.contact-link{overflow:hidden}.contact-link small{overflow-wrap:anywhere;word-break:break-word}
-@media(max-width:1050px){.craftsmanship-panel{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:18px}.craftsmanship-visual{min-height:340px}.craftsmanship-copy h2{font-size:clamp(25px,3.2vw,35px)}.order-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.order-step:nth-child(4),.order-step:nth-child(5){min-height:190px}}
-@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-panel{grid-template-columns:1fr;gap:16px;padding:10px;border-radius:21px}.craftsmanship-visual{min-height:230px;aspect-ratio:1.25/1}.craftsmanship-copy{padding:8px 9px 14px}.craftsmanship-copy h2{font-size:clamp(28px,7vw,39px)}.craftsmanship-copy>p{font-size:10px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.order-step{padding:15px 12px;border-radius:16px}.order-step:nth-child(4),.order-step:nth-child(5){min-height:0}.order-step:last-child{grid-column:span 2}.order-icon{margin-bottom:17px;width:34px;height:34px}.order-step h3{font-size:16px}.order-step p{font-size:9px}.order-note{flex-wrap:wrap;align-items:flex-start;padding:13px}.order-note p{flex-basis:calc(100% - 38px)}.order-note .pill-btn{margin-left:38px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
-@media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.order-step h3{font-size:14px}.order-step p{font-size:8px}.order-step{padding:13px 10px}.order-number{font-size:19px;right:10px;top:9px}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}.craftsmanship-copy h2{font-size:28px}}
-@media(hover:none){.product-card:hover,.pill-btn:hover,.order-step:hover{transform:none}.product-card:hover .product-photo img,.craftsmanship-panel:hover .craftsmanship-visual img{transform:none;filter:none}}
+@media(max-width:1050px){.order-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.order-step:nth-child(4),.order-step:nth-child(5){min-height:190px}}
+@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.order-step{padding:15px 12px;border-radius:16px}.order-step:nth-child(4),.order-step:nth-child(5){min-height:0}.order-step:last-child{grid-column:span 2}.order-icon{margin-bottom:17px;width:34px;height:34px}.order-step h3{font-size:16px}.order-step p{font-size:9px}.order-note{flex-wrap:wrap;align-items:flex-start;padding:13px}.order-note p{flex-basis:calc(100% - 38px)}.order-note .pill-btn{margin-left:38px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
+@media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.order-step h3{font-size:14px}.order-step p{font-size:8px}.order-step{padding:13px 10px}.order-number{font-size:19px;right:10px;top:9px}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
+@media(hover:none){.product-card:hover,.pill-btn:hover,.order-step:hover{transform:none}.product-card:hover .product-photo img,}
 @media(max-width:760px){.nav,.mobile-nav,.glass,.glass-soft,.service-strip,.promise-tag,.search-field,.mosaic-card,.contact-link,.order-note{backdrop-filter:blur(13px) saturate(135%);-webkit-backdrop-filter:blur(13px) saturate(135%)}.theme-bg{inset:-1%;transform:scale(1.01)}}
 @media(prefers-reduced-motion:reduce){.welcome-content{animation:none}.welcome-loader i{animation:none}.welcome-splash{transition-duration:.01ms}.detail-main-image{will-change:auto}}
 
@@ -154,11 +154,11 @@ html:not(.dark) .material-photo--dark{opacity:0}html:not(.dark) .material-photo-
 html:not(.dark) .mosaic-card.material-tile::after{background:linear-gradient(90deg,rgba(255,250,240,.78),rgba(255,250,240,.16))}
 html:not(.dark) .mosaic-card.material-tile .mosaic-content{color:#1c1913}
 #collections.section,#craftsmanship.section{padding-top:18px;padding-bottom:20px}
-.craftsmanship-panel{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(14px,2vw,26px);padding:clamp(10px,1.4vw,17px);border-radius:23px}
-.craftsmanship-visual{min-height:250px;border-radius:16px;aspect-ratio:1.12/1}
-.craftsmanship-copy{padding:3px 7px 3px 0}
-.craftsmanship-copy h2{font-size:clamp(25px,2.5vw,35px);margin:7px 0 8px}
-.craftsmanship-copy>p{font-size:10px;line-height:1.65;margin:0 0 9px}
+
+
+
+
+
 .craftsmanship-points{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:10px 0 12px}
 .craftsmanship-points>div{grid-template-columns:1fr;gap:5px;padding-top:8px}
 .craftsmanship-points>div>span{font-size:12px}
@@ -182,8 +182,8 @@ html:not(.dark) .mosaic-card.material-tile .mosaic-content{color:#1c1913}
 .contact-link strong{font-size:7.5px;line-height:1.35}
 .contact-link small{font-size:6.6px;line-height:1.3}
 .footer-bottom{margin-top:17px}
-@media(max-width:1050px){.footer-main{grid-template-columns:minmax(0,1.8fr) minmax(250px,1fr);gap:22px}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-contacts{padding-top:0;border-top:0}.mosaic-compact{grid-template-rows:clamp(170px,23vw,220px)}.craftsmanship-panel{grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr)}.craftsmanship-visual{min-height:230px}}
-@media(max-width:760px){.footer-main{grid-template-columns:1fr;gap:19px}.footer-contacts{padding-top:15px;border-top:1px solid var(--soft-line)}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mosaic-compact{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:210px 145px;gap:8px}.mosaic-compact .mosaic-card.art-main{grid-column:span 2;grid-row:auto}.mosaic-compact .mosaic-card.small{grid-row:auto}.mosaic-compact .mosaic-card.small .mosaic-title{font-size:16px}.mosaic-compact .mosaic-card.small .mosaic-sub{display:none}.mosaic-compact .mosaic-card.small .mosaic-content{max-width:95%}.craftsmanship-panel{grid-template-columns:1fr;gap:11px;padding:9px;border-radius:19px}.craftsmanship-visual{min-height:165px;aspect-ratio:2.1/1}.craftsmanship-copy{padding:5px 7px 8px}.craftsmanship-copy h2{font-size:clamp(23px,6vw,31px);margin:6px 0}.craftsmanship-copy>p{font-size:9px;line-height:1.55}.craftsmanship-points{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}.craftsmanship-points>div:last-child{grid-column:span 2}.craftsmanship-points strong{font-size:8px}.craftsmanship-points small{font-size:7px}.footer-main{gap:19px}.footer-story h2{font-size:24px}.footer-story p{font-size:9px}.footer-contacts{padding-top:15px}.footer-contacts h2{font-size:20px}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.contact-link{padding:8px 7px}.contact-link small{font-size:7px}.featured-arrow{width:27px;height:27px}}
+@media(max-width:1050px){.footer-main{grid-template-columns:minmax(0,1.8fr) minmax(250px,1fr);gap:22px}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-contacts{padding-top:0;border-top:0}.mosaic-compact{grid-template-rows:clamp(170px,23vw,220px)}}
+@media(max-width:760px){.footer-main{grid-template-columns:1fr;gap:19px}.footer-contacts{padding-top:15px;border-top:1px solid var(--soft-line)}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mosaic-compact{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:210px 145px;gap:8px}.mosaic-compact .mosaic-card.art-main{grid-column:span 2;grid-row:auto}.mosaic-compact .mosaic-card.small{grid-row:auto}.mosaic-compact .mosaic-card.small .mosaic-title{font-size:16px}.mosaic-compact .mosaic-card.small .mosaic-sub{display:none}.mosaic-compact .mosaic-card.small .mosaic-content{max-width:95%}.craftsmanship-points{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}.craftsmanship-points>div:last-child{grid-column:span 2}.craftsmanship-points strong{font-size:8px}.craftsmanship-points small{font-size:7px}.footer-main{gap:19px}.footer-story h2{font-size:24px}.footer-story p{font-size:9px}.footer-contacts{padding-top:15px}.footer-contacts h2{font-size:20px}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.contact-link{padding:8px 7px}.contact-link small{font-size:7px}.featured-arrow{width:27px;height:27px}}
 @media(max-width:390px){.mosaic-compact{grid-template-rows:190px 138px}.mosaic-compact .mosaic-title{font-size:17px}.mosaic-compact .mosaic-card.small .mosaic-title{font-size:14px}.featured-arrow{width:25px;height:25px}.featured-image-count{font-size:6.5px}}
 
 
@@ -261,10 +261,10 @@ html.dark .welcome-footnote i{color:#e5c98d}
  .filter-pill{font-size:11px;min-height:39px;padding:9px 13px}
  .page-btn{min-width:36px;height:36px;font-size:11px}
  .page-summary{font-size:10px;line-height:1.5}
- .craftsmanship-panel{gap:12px;padding:10px}
- .craftsmanship-visual{min-height:190px;aspect-ratio:1.7/1}
- .craftsmanship-copy h2{font-size:clamp(25px,6.6vw,32px);line-height:1.2}
- .craftsmanship-copy>p{font-size:10.5px;line-height:1.7}
+ 
+ 
+ 
+ 
  .craftsmanship-points strong{font-size:9px;line-height:1.4}
  .craftsmanship-points small{font-size:8.5px;line-height:1.55}
  .contact-link{min-height:48px;padding:9px 8px;gap:7px}
@@ -331,7 +331,7 @@ html.dark .welcome-footnote i{color:#e5c98d}
  .welcome-skip{margin-top:9px;min-height:36px;padding:8px 13px}
 }
 
-.warranty-help{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:20px;padding:18px;border:1px solid var(--line);border-radius:20px;margin-top:18px}.warranty-help h3{font:400 24px/1.2 SD Serif,Georgia,serif;margin:7px 0}.warranty-help p{font-size:10px;line-height:1.65;color:var(--muted);margin:0}.warranty-form{display:grid;gap:7px;min-width:0}.warranty-form input,.warranty-form textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.warranty-form input::placeholder,.warranty-form textarea::placeholder{color:var(--muted);opacity:.9}@media(max-width:760px){.warranty-help{grid-template-columns:1fr;gap:12px;padding:14px}}.checkout-form{display:grid;gap:8px;margin:12px 0}.checkout-fields{display:grid;gap:7px}.checkout-fields input,.checkout-fields textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.checkout-fields input::placeholder,.checkout-fields textarea::placeholder{color:var(--muted);opacity:.9}.checkout-message{font-size:10px;line-height:1.55;color:var(--muted);margin:0}.checkout-message:empty{display:none}
+.warranty-help{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:20px;padding:18px;border:1px solid var(--line);border-radius:20px;margin-top:18px}.warranty-help h3{font:400 24px/1.2 SD Serif,Georgia,serif;margin:7px 0}.warranty-help p{font-size:10px;line-height:1.65;color:var(--muted);margin:0}.warranty-form{display:grid;gap:7px;min-width:0}.warranty-form input,.warranty-form textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.warranty-form input::placeholder,.warranty-form textarea::placeholder{color:var(--muted);opacity:.9}@media(max-width:760px){.warranty-help{grid-template-columns:1fr;gap:12px;padding:14px}}.checkout-form{display:grid;gap:8px;margin:12px 0}.checkout-fields{display:grid;gap:7px}.checkout-fields input,.checkout-fields select,.checkout-fields textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.checkout-fields input::placeholder,.checkout-fields textarea::placeholder{color:var(--muted);opacity:.9}.checkout-message{font-size:10px;line-height:1.55;color:var(--muted);margin:0}.checkout-message:empty{display:none}
 
 /* Premium Smooth: quick theme changes and accessible left-side mobile drawer */
 html{transition:background-color .25s ease,color .25s ease}
@@ -359,6 +359,8 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .welcome-content>.welcome-skip{animation:welcomeStep .48s cubic-bezier(.2,.7,.2,1) 1.28s both}
 @keyframes welcomeStep{from{opacity:0;transform:translateY(10px);filter:blur(3px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
 @media(prefers-reduced-motion:reduce){.welcome-content>*{animation:none!important}}
+/* Keep the mobile three-line menu on the left, beside the brand. */
+@media(max-width:760px){.nav{position:relative;padding-left:48px!important}.menu-btn{position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}.nav-actions{margin-left:auto}}
 </style>
 </head>
 <body>
@@ -463,25 +465,6 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
       </article>
       <article class="mosaic-card small" data-reveal style="--reveal-delay:100ms"><img class="mosaic-photo" id="craftTileImage" src="images/2c341b173eff94f1.webp" alt="Thắt lưng da cá sấu trong không gian bàn chế tác"><div class="mosaic-content"><div class="mosaic-kicker">Craft & finish</div><h3 class="mosaic-title">Hoàn thiện thủ công</h3><p class="mosaic-sub">Chăm chút đường nét, bề mặt và từng điểm chạm trước khi bàn giao.</p><a class="text-link tap-target" href="#craftsmanship">Tìm hiểu thêm →</a></div></article>
       <article class="mosaic-card small material-tile" data-reveal style="--reveal-delay:180ms"><img class="mosaic-photo material-photo material-photo--dark" src="images/theme-croc-dark.webp" alt="Cận cảnh vân da cá sấu tông đen"><img class="mosaic-photo material-photo material-photo--light" src="images/theme-croc-albino.webp" alt="Cận cảnh vân da cá sấu tông trắng ngà"><div class="mosaic-content"><div class="mosaic-kicker">Material study</div><h3 class="mosaic-title">Chất liệu cao cấp</h3><p class="mosaic-sub">Tôn trọng cấu trúc vân tự nhiên, để mỗi bề mặt giữ được nét riêng.</p></div></article>
-    </div>
-  </section>
-
-  <section class="section wrap" id="craftsmanship" aria-labelledby="craft-title">
-    <div class="craftsmanship-panel glass" data-reveal>
-      <div class="craftsmanship-visual">
-        <img src="images/17599dbbaea33cdd.webp" alt="Ví da cá sấu bụng được cầm trên tay, thể hiện cấu trúc vân da tự nhiên" loading="lazy" decoding="async">
-      </div>
-      <div class="craftsmanship-copy">
-        <div class="eyebrow">The human touch · Every detail matters</div>
-        <h2 class="serif" id="craft-title">Không chỉ là một sản phẩm.<br><em>Là sự chăm chút trong từng đường nét.</em></h2>
-        <p>Giá trị của một thiết kế nằm ở cách chọn vân da, cân chỉnh phom dáng và hoàn thiện các điểm chạm — tỉ mỉ, hài hòa và đúng tinh thần riêng.</p>
-        <div class="craftsmanship-points">
-          <div><span>01</span><section><strong>Chọn vân da hài hòa</strong><small>Cân nhắc sắc độ và cấu trúc vân tự nhiên.</small></section></div>
-          <div><span>02</span><section><strong>Chăm chút đường nét</strong><small>Phom dáng, đường may và viền cạnh được cân chỉnh.</small></section></div>
-          <div><span>03</span><section><strong>Kiểm tra trước bàn giao</strong><small>Rà soát tổng thể trước khi gửi tới khách hàng.</small></section></div>
-        </div>
-        <a class="pill-btn primary tap-target" href="#order">Tìm hiểu quy trình đặt hàng <span class="arrow">→</span></a>
-      </div>
     </div>
   </section>
 
