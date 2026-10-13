@@ -44,7 +44,7 @@ export async function onRequest(context) {
   const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.slug)}`;
   const title = `${product.title} | SinDarealest`;
   const description = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim().slice(0, 300);
-  const response = await context.next({ request: new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }) });
+  const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
