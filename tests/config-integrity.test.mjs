@@ -20,6 +20,10 @@ assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setu
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty metadata migration');
 assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setup must apply the OTP removal migration');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_verifications/.test(setupScript), 'Setup must not depend on obsolete OTP/SMS configuration or tables');
+const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
+assert.ok(warrantyMigration.includes('CREATE TABLE IF NOT EXISTS warranty_claim_upload_tokens'), 'Migration must create the new warranty upload token table');
+assert.ok(!/DROP\\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
+assert.ok(!/CREATE TABLE IF NOT EXISTS warranty_claim_uploads\\s*\\(/i.test(warrantyMigration), 'Migration must not assume the legacy upload table has the new schema');
 const deployReadme = readFileSync('README-DEPLOY.txt', 'utf8');
 assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && deployReadme.includes('migrations/0005_address_warranty_verification.sql') && deployReadme.includes('migrations/0006_remove_warranty_otp.sql'), 'Deployment guide must match current migration sequence');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deployReadme), 'Deployment guide must not require obsolete SMS credentials');
