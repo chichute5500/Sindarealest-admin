@@ -1,5 +1,6 @@
 import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
-import { analyzeProductImage } from "../../_lib/workers-ai.js";
+import { analyzeProductImage, compareProductImages } from "../../_lib/workers-ai.js";
+import { isAllowedSourceImageUrl, isAllowedSourceProductUrl } from "../../_lib/image-audit.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
 
 const MAX_BASE64 = 7_000_000;
@@ -8,7 +9,7 @@ const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
 function safeReview(row) {
   let analysis = {};
   try { analysis = JSON.parse(row.analysis_json || "{}"); } catch {}
-  return { id: row.id, productId: row.product_id, imageRef: row.image_ref, kind: row.image_kind, status: row.status, analysis, sourceUrl: row.source_url || "", createdAt: row.created_at, updatedAt: row.updated_at };
+  return { id: row.id, productId: row.product_id, imageRef: row.image_ref, kind: row.image_kind, status: row.status, analysis, sourceUrl: row.source_url || "", sourceImageUrl: row.source_image_url || "", createdAt: row.created_at, updatedAt: row.updated_at };
 }
 function parseDataImage(value) {
   const match = String(value || "").match(/^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/i);
@@ -40,7 +41,7 @@ export async function onRequestPost(context) {
   try { body = await context.request.json(); } catch { return fail("Dữ liệu ảnh không hợp lệ."); }
   const action = String(body?.action || "");
   const db = context.env.DB;
-  if (!["analyze", "uploadCandidate"].includes(action)) return fail("Thao tác AI không hợp lệ.");
+  if (!["analyze", "uploadCandidate", "compareCandidate"].includes(action)) return fail("Thao tác AI không hợp lệ.");
   const productId = String(body?.productId || "").slice(0, 100);
   const product = await getProduct(db, productId).catch(() => null);
   if (!product) return fail("Không tìm thấy sản phẩm.", 404);
@@ -48,6 +49,11 @@ export async function onRequestPost(context) {
   if (action === "uploadCandidate") {
     const noStorage = storageOrFail(context.env);
     if (noStorage) return noStorage;
+    const sourceUrl = String(body?.sourceUrl || "").trim();
+    const sourceImageUrl = String(body?.sourceImageUrl || "").trim();
+    if (sourceUrl && !isAllowedSourceProductUrl(sourceUrl)) return fail("URL sản phẩm nguồn phải là đường dẫn HTTPS hợp lệ của Taobao, Tmall hoặc 1688.", 400);
+    if (sourceImageUrl && !isAllowedSourceImageUrl(sourceImageUrl)) return fail("URL ảnh nguồn phải trỏ tới CDN ảnh HTTPS được phép.", 400);
+    if (Boolean(sourceUrl) !== Boolean(sourceImageUrl)) return fail("Cần lưu cả trang sản phẩm nguồn và URL ảnh gốc, hoặc để trống cả hai khi tải ảnh thủ công.", 400);
     const parsed = parseDataImage(body?.dataUrl);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ứng viên phải là WebP hợp lệ.");
     const bytes = Uint8Array.from(atob(parsed.base64), c => c.charCodeAt(0));
@@ -58,11 +64,43 @@ export async function onRequestPost(context) {
     const id = crypto.randomUUID();
     try {
       await context.env.IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/webp", cacheControl: "private, no-store" }, customMetadata: { visibility: "pending-ai-review", reviewId: id } });
-      await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,'candidate',?,'pending','{}')").bind(id, productId, imageRef, key).run();
-      return json({ ok: true, review: { id, productId, imageRef, kind: "candidate", status: "pending", analysis: {} }, message: "Đã đưa ảnh vào hàng đợi kiểm duyệt. Ảnh chưa được thêm vào bộ ảnh công khai." }, 201);
+      await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json,source_url,source_image_url) VALUES(?,?,?,'candidate',?,'pending','{}',?,?)").bind(id, productId, imageRef, key, sourceUrl, sourceImageUrl).run();
+      return json({ ok: true, review: { id, productId, imageRef, kind: "candidate", status: "pending", analysis: {}, sourceUrl, sourceImageUrl }, message: "Đã tải tệp ảnh thật vào hàng chờ. Ảnh chưa được thêm vào bộ ảnh công khai." }, 201);
     } catch {
       await context.env.IMAGES.delete(key).catch(() => {});
       return fail("Không lưu được ảnh chờ duyệt. Kiểm tra D1 và R2.", 503);
+    }
+  }
+
+  if (action === "compareCandidate") {
+    const reviewId = String(body?.reviewId || "");
+    const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=? LIMIT 1").bind(reviewId, productId).first().catch(() => null);
+    if (!review || review.image_kind !== "candidate") return fail("Ảnh ứng viên không thuộc sản phẩm đã chọn.", 404);
+    if (review.status !== "pending") return fail("Chỉ được đối chiếu ảnh đang chờ duyệt.", 409);
+    const referenceImageRef = String(body?.referenceImageRef || "").trim();
+    let originalImages = [];
+    try { originalImages = JSON.parse(product.images_json || "[]"); } catch {}
+    if (!referenceImageRef || !Array.isArray(originalImages) || !originalImages.some(ref => String(ref || "").replace(/^\\/+/, "") === referenceImageRef.replace(/^\\/+/, ""))) {
+      return fail("Ảnh gốc đối chiếu không thuộc bộ ảnh của sản phẩm đã chọn.", 422);
+    }
+    const parsed = parseDataImage(body?.dataUrl);
+    if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ghép đối chiếu phải là WebP hợp lệ.", 400);
+    const quota = await consumeWorkersAiRequest(db);
+    if (!quota.ok) return fail(quota.error, quota.status);
+    const result = await compareProductImages({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, sku: product.sku });
+    if (result.error) return json({ ok: false, error: result.error, code: result.code || "WORKERS_AI_ERROR" }, result.status || 503);
+    let priorAnalysis = {};
+    try { priorAnalysis = JSON.parse(review.analysis_json || "{}"); } catch {}
+    const nextAnalysis = { ...priorAnalysis, comparison: {
+      verdict: result.verdict, similarities: result.similarities, differences: result.differences,
+      confidence: result.confidence, summary: result.summary, needsHumanReview: true,
+      calibrated: false, method: result.comparisonMethod, model: result.model
+    } };
+    try {
+      await db.prepare("UPDATE image_ai_reviews SET analysis_json=?,updated_at=datetime('now') WHERE id=? AND product_id=? AND image_kind='candidate' AND status='pending'").bind(JSON.stringify(nextAnalysis), reviewId, productId).run();
+      return json({ ok: true, comparison: nextAnalysis.comparison, message: "AI đã đối chiếu định tính hai ảnh. Kết quả không phải điểm tương đồng đã hiệu chuẩn và không tự duyệt ảnh." });
+    } catch {
+      return fail("Không lưu được kết quả đối chiếu AI.", 503);
     }
   }
 
@@ -109,12 +147,14 @@ export async function onRequestPatch(context) {
         try { images = JSON.parse(product.images_json || "[]"); } catch {}
         if (!Array.isArray(images)) images = [];
         const next = images.filter(ref => ref !== review.image_ref);
-        await db.batch([
-          db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id),
-          db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id)
-        ]);
+        const statements = [db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id)];
+        if (next.length !== images.length) statements.push(db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id));
+        await db.batch(statements);
       } else {
         await db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id).run();
+      }
+      if (review.r2_key && review.r2_key.endsWith("-ai.webp") && review.image_ref === "/media/" + review.r2_key) {
+        await context.env.IMAGES?.delete(review.r2_key).catch(() => {});
       }
     } else {
       await db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id).run();
