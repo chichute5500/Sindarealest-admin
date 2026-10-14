@@ -371,10 +371,40 @@ export async function generateSearchKeywords({ ai, imageBase64, mimeType = "imag
   return { keywords, visualSummary: String(summary || "").slice(0, 300), model: output.model };
 }
 
-// Cloudflare Workers AI exposes vision-understanding models, but this project has not
-// verified a dedicated image-matching/embedding model or a calibrated 90% threshold.
-// Fail closed rather than treating an LLM's guessed percentage as an actual match.
-export function compareProductImages() {
-  return { available: false, similarityScore: null, comparisonMethod: null, eligible: false,
-    reason: "Chưa có mô hình so khớp thị giác chuyên biệt đã được kiểm chứng và hiệu chuẩn. Không thể xác nhận ngưỡng 90%." };
+// The vision model can give a qualitative, human-review comparison of a two-panel image.
+// This is deliberately NOT a calibrated similarity percentage and cannot auto-approve a candidate.
+export async function compareProductImages({ ai, imageBase64, mimeType = "image/webp", title = "", sku = "" } = {}) {
+  if (!imageBase64) {
+    return { available: false, similarityScore: null, comparisonMethod: null, eligible: false,
+      reason: "Chưa có ảnh ghép gồm ảnh gốc và ảnh ứng viên để đối chiếu." };
+  }
+  const prompt = [
+    "Bạn là trợ lý kiểm tra ảnh sản phẩm. Hình được gửi là ảnh ghép có nhãn: BÊN TRÁI = ảnh gốc của sản phẩm đang quản trị; BÊN PHẢI = ảnh ứng viên tìm được từ Taobao/1688.",
+    "So sánh các đặc điểm nhìn thấy: dáng tổng thể, mũi/đế, số và vị trí đường may, họa tiết/vân, màu sắc, chi tiết kim loại, quai/dây và cấu trúc. Phân biệt cùng mẫu với chỉ cùng phong cách.",
+    "Không kết luận chất liệu thật chỉ dựa trên ảnh. Không bịa chi tiết bị che khuất. Nếu góc chụp hoặc chất lượng ảnh khiến không chắc chắn, chọn uncertain.",
+    "Return exactly one valid JSON object, no Markdown and no text outside JSON.",
+    'Required shape: {"verdict":"same_model_likely|similar_style_only|different_model_likely|uncertain","similarities":["visible matching feature"],"differences":["visible difference or limitation"],"confidence":"low|medium","summary":"Vietnamese short comparison","needsHumanReview":true}.',
+    "similarities and differences must each contain 1-4 concise strings. needsHumanReview must always be true. Do not return any numeric similarity score or claim a calibrated percentage.",
+    "Metadata for orientation only, not proof: SKU " + String(sku || "").slice(0, 60) + "; tên " + String(title || "").slice(0, 180) + "."
+  ].join("\n");
+  const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 512 });
+  if (output.error) return output;
+  const parsed = parseModelJson(output.text);
+  const verdicts = new Set(["same_model_likely", "similar_style_only", "different_model_likely", "uncertain"]);
+  const strings = value => Array.isArray(value) ? value.filter(item => typeof item === "string" && item.trim()).map(item => item.trim().slice(0, 240)).slice(0, 4) : [];
+  const similarities = strings(parsed?.similarities);
+  const differences = strings(parsed?.differences);
+  const confidence = parsed?.confidence;
+  if (!parsed || !verdicts.has(parsed.verdict) || !similarities.length || !differences.length ||
+      !["low", "medium"].includes(confidence) || typeof parsed.summary !== "string" || parsed.summary.trim().length < 8 ||
+      parsed.needsHumanReview !== true) {
+    return { error: "Workers AI trả về kết quả đối chiếu thiếu trường hoặc sai định dạng. Không tự động duyệt ảnh.", status: 502, code: "WORKERS_AI_INVALID_COMPARISON" };
+  }
+  return {
+    available: true, verdict: parsed.verdict, similarities, differences,
+    confidence, summary: parsed.summary.trim().slice(0, 500), needsHumanReview: true,
+    similarityScore: null, comparisonMethod: "workers-ai-qualitative-pair-review",
+    calibrated: false, eligible: false, model: output.model,
+    message: "Đối chiếu định tính bằng AI chỉ để hỗ trợ người quản trị; không phải điểm tương đồng đã hiệu chuẩn."
+  };
 }
