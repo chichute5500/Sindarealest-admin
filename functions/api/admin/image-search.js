@@ -9,11 +9,13 @@ export function isSupportedSourceUrl(value) {
   try {
     const url = new URL(value);
     const host = url.hostname.toLowerCase();
-    return url.protocol === "https:" && (
-      host === "taobao.com" || host.endsWith(".taobao.com") ||
-      host === "tmall.com" || host.endsWith(".tmall.com") ||
-      host === "1688.com" || host.endsWith(".1688.com")
-    );
+    if (url.protocol !== "https:") return false;
+    const taobaoHost = host === "taobao.com" || host.endsWith(".taobao.com") ||
+      host === "tmall.com" || host.endsWith(".tmall.com");
+    const alibabaHost = host === "1688.com" || host.endsWith(".1688.com");
+    if (taobaoHost) return /\/item\.htm$/i.test(url.pathname) || /\/item\/\d+/i.test(url.pathname);
+    if (alibabaHost) return /\/offer\/\d+\.html?$/i.test(url.pathname);
+    return false;
   } catch { return false; }
 }
 function supportedImageUrl(value) {
