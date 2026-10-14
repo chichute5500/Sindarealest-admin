@@ -81,6 +81,7 @@ function extractJsonObject(raw) {
 
 function parseJson(raw, fallbackMessage) {
   return extractJsonObject(raw) || { error: fallbackMessage };
+}
 
 export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/webp", title = "", category = "", sku = "" }) {
   const parsedImage = parseImage(imageBase64, mimeType);
