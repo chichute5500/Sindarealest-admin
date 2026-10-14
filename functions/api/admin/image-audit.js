@@ -1,5 +1,6 @@
 import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
 import { analyzeProductImage } from "../../_lib/gemini.js";
+import { evaluateSearchCandidate } from "../../_lib/image-audit.js";
 
 const MAX_BASE64 = 7_000_000;
 const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
@@ -106,6 +107,13 @@ export async function onRequestPatch(context) {
   if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Gemini và tìm ảnh từ bảng kiểm tra AI." });
   if (decision === "saveSource") {
     const sourceUrl = String(body?.sourceUrl || "").trim();
+    const candidateText = String(body?.candidateText || "").slice(0, 3000);
+    const similarityScore = Number(body?.similarityScore);
+    if (body?.comparisonMethod !== "phash-63" || !Number.isFinite(similarityScore) || similarityScore < 90) {
+      return fail("Không lưu URL: cần kết quả so sánh ảnh pHash đạt ít nhất 90%. Hãy tìm và đo ảnh trước.", 422);
+    }
+    const evaluation = evaluateSearchCandidate({ title: candidateText, similarityScore });
+    if (!evaluation.eligible) return fail("Không lưu URL: " + evaluation.reason, 422);
     let parsed;
     try { parsed = new URL(sourceUrl); } catch { return fail("URL nguồn không hợp lệ."); }
     const host = parsed.hostname.toLowerCase();
