@@ -1,7 +1,7 @@
 import { fail, requireAdmin } from "../../_lib.js";
 import { isAllowedSourceImageUrl } from "../../_lib/image-audit.js";
 
-proxy host listexport async function onRequestGet(context) {
+export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
   let source;
