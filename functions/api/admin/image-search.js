@@ -166,7 +166,8 @@ export async function onRequestPost(context) {
         galleryUrls = [...new Set([...galleryUrls, ...normalizeImageUrls(detail?.img_urls || detail?.images || detail?.image_urls || [])])].slice(0, 30);
       }
       const imageUrl = normalizeImageUrls([item?.white_image, item?.image_url, item?.pic_url, ...(galleryUrls || [])])[0] || galleryUrls[0] || "";
-      const similarityScore = null; // Never trust provider scores; client pHash must compare actual pixels before eligibility.\n      const evaluation = evaluateSearchCandidate({ title: titleText, description, similarityScore });
+      const similarityScore = null; // Never trust provider scores; client pHash must compare actual pixels before eligibility.
+      const evaluation = evaluateSearchCandidate({ title: titleText, description, similarityScore });
       results.push({
         title: titleText || "Sản phẩm Taobao/1688",
         candidateText: [titleText, description].filter(Boolean).join(" ").slice(0, 3000),
