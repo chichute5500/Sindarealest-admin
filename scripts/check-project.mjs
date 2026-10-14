@@ -86,6 +86,13 @@ const newMigration = existsSync(join(root, 'migrations/0003_storefront_operation
 for (const table of ['customers','orders','order_items','warranties','warranty_claims','audit_logs','public_rate_limits']) check(new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`).test(newMigration), `Migration 0003 thiếu bảng ${table}`);
 const aiReviewMigration = existsSync(join(root, 'migrations/0007_ai_image_reviews.sql')) ? readFileSync(join(root, 'migrations/0007_ai_image_reviews.sql'), 'utf8') : '';
 check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 thiếu hàng đợi kiểm duyệt ảnh AI');
+const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
+check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_ai_reviews WHERE r2_key=?'), 'Đường dẫn media chưa xác minh trạng thái duyệt AI');
+check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duyệt không bị chặn khỏi endpoint media');
+const aiAuditApi = existsSync(join(root, 'functions/api/admin/image-audit.js')) ? readFileSync(join(root, 'functions/api/admin/image-audit.js'), 'utf8') : '';
+check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
+const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
+check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
