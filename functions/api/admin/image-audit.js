@@ -129,6 +129,13 @@ export async function onRequestPost(context) {
   const kind = review?.image_kind || "existing";
   const storedRef = kind === "candidate" ? review.image_ref : imageRef;
   if (!storedRef || storedRef.length > 300) return fail("Thiếu tham chiếu ảnh cần kiểm tra.");
+  if (kind === "existing") {
+    let ownedImages = [];
+    try { ownedImages = JSON.parse(product.images_json || "[]"); } catch {}
+    if (!Array.isArray(ownedImages) || !ownedImages.some(ref => normalizeImageRef(ref) === normalizeImageRef(storedRef))) {
+      return fail("Ảnh cần phân tích không thuộc bộ ảnh của sản phẩm đã chọn.", 422);
+    }
+  }
   try {
     await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,?,?,'pending',?) ON CONFLICT(product_id,image_ref,image_kind) DO UPDATE SET id=excluded.id,status='pending',analysis_json=excluded.analysis_json,updated_at=datetime('now')").bind(id, productId, storedRef, kind, review?.r2_key || "", JSON.stringify(result.analysis)).run();
     return json({ ok: true, review: { id, productId, imageRef: storedRef, kind, status: "pending", analysis: result.analysis }, message: "Workers AI đã phân tích ảnh; kết quả đang chờ người quản trị duyệt." });
