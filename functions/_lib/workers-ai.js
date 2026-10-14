@@ -56,13 +56,8 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
   if (image.error) return image;
   try {
     const result = await ai.run(WORKERS_AI_VISION_MODEL, {
-      messages: [{
-        role: "user",
-        content: [
-          { type: "text", text: String(prompt || "").slice(0, 12000) },
-          { type: "image_url", image_url: { url: `data:${image.mimeType};base64,${image.base64}` } }
-        ]
-      }],
+      prompt: String(prompt || "").slice(0, 12000),
+      image: `data:${image.mimeType};base64,${image.base64}`,
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
       temperature: 0.1
     });
