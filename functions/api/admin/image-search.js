@@ -5,7 +5,7 @@ const MAX_IMAGE_BASE64 = 1_400_000;
 const API_BASE = "https://openapi.elim.asia";
 const MAX_DETAIL_LOOKUPS = 5;
 
-function supportedMarketplaceUrl(value) {
+export function isSupportedSourceUrl(value) {
   try {
     const url = new URL(value);
     const host = url.hostname.toLowerCase();
@@ -37,7 +37,7 @@ function normalizeImageUrls(value) {
 }
 function productUrl(item, platform) {
   const supplied = item?.item_url || item?.product_url || item?.url || item?.original_product_url || "";
-  if (supportedMarketplaceUrl(supplied)) return supplied;
+  if (isSupportedSourceUrl(supplied)) return supplied;
   const id = String(item?.id || item?.mi_id || item?.item_id || item?.offer_id || "");
   if (!/^\d{5,30}$/.test(id)) return "";
   return platform === "taobao"
@@ -166,7 +166,7 @@ export async function onRequestPost(context) {
         galleryUrls = [...new Set([...galleryUrls, ...normalizeImageUrls(detail?.img_urls || detail?.images || detail?.image_urls || [])])].slice(0, 30);
       }
       const imageUrl = normalizeImageUrls([item?.white_image, item?.image_url, item?.pic_url, ...(galleryUrls || [])])[0] || galleryUrls[0] || "";
-      const evaluation = evaluateSearchCandidate({ title: titleText, description, similarityScore: null });
+      const similarityScore = null; // Never trust provider scores; client pHash must compare actual pixels before eligibility.\n      const evaluation = evaluateSearchCandidate({ title: titleText, description, similarityScore });
       results.push({
         title: titleText || "Sản phẩm Taobao/1688",
         candidateText: [titleText, description].filter(Boolean).join(" ").slice(0, 3000),
