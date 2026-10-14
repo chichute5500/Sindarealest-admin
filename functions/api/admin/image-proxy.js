@@ -21,13 +21,25 @@ export async function onRequestGet(context) {
   }
 
   try {
-    const response = await fetch(source, {
-      method: "GET",
-      redirect: "follow",
-      headers: { Accept: "image/jpeg,image/png,image/webp" }
-    });
-    const finalUrl = new URL(response.url || source);
-    if (!response.ok || finalUrl.protocol !== "https:" || !ALLOWED_HOST(finalUrl.hostname.toLowerCase())) {
+    let target = source;
+    let response;
+    for (let redirects = 0; redirects <= 3; redirects++) {
+      const parsedTarget = new URL(target);
+      if (parsedTarget.protocol !== "https:" || !ALLOWED_HOST(parsedTarget.hostname.toLowerCase())) {
+        return fail("CDN chuyển hướng tới máy chủ không được phép.", 502);
+      }
+      response = await fetch(target, {
+        method: "GET",
+        redirect: "manual",
+        headers: { Accept: "image/jpeg,image/png,image/webp" }
+      });
+      if (![301, 302, 303, 307, 308].includes(response.status)) break;
+      const location = response.headers.get("location");
+      if (!location || redirects === 3) return fail("CDN chuyển hướng quá số lần cho phép.", 502);
+      target = new URL(location, target).href;
+    }
+    const finalUrl = new URL(target);
+    if (!response?.ok || finalUrl.protocol !== "https:" || !ALLOWED_HOST(finalUrl.hostname.toLowerCase())) {
       return fail("Không thể tải ảnh từ CDN được phép.", 502);
     }
     const type = (response.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
