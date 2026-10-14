@@ -90,6 +90,10 @@ const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
 check(imageSearchApi.includes('isSupportedSourceUrl'), 'API tìm ảnh chưa giới hạn URL nguồn Taobao/1688');
+check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('extractSimilarityScore'), 'API tìm ảnh thiếu cổng kiểm tra điểm tương đồng và từ khóa bắt buộc');
+const imageAuditLib = existsSync(join(root, 'functions/_lib/image-audit.js')) ? readFileSync(join(root, 'functions/_lib/image-audit.js'), 'utf8') : '';
+check(imageAuditLib.includes('score >= 90') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt ảnh thiếu ngưỡng 90%, từ khóa hoặc loại trừ giả da');
+
 const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
 check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_ai_reviews WHERE r2_key=?'), 'Đường dẫn media chưa xác minh trạng thái duyệt AI');
 check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duyệt không bị chặn khỏi endpoint media');
@@ -99,7 +103,7 @@ check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'A
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
-check(imageTests.includes('saveSource') && imageTests.includes('isSupportedSourceUrl'), 'Thiếu kiểm thử lưu URL nguồn Taobao/1688');
+check(imageTests.includes('saveSource') && imageTests.includes('isSupportedSourceUrl'), 'Thiếu kiểm thử lưu URL nguồn Taobao/1688');\ncheck(imageTests.includes('missing similarity score must fail closed') && imageTests.includes('crocodile keyword is mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
