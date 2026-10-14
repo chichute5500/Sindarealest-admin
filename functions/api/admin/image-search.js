@@ -142,6 +142,7 @@ export async function onRequestPost(context) {
       }
       if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return fail("Gemini từ chối API key. " + detail, 502);
       if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra dự án và quyền API. " + detail, 502);
+      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") return fail("Gemini Interactions API từ chối định dạng yêu cầu (HTTP 400). " + (detail || "INVALID_ARGUMENT"), 502);
       return fail("Gemini Interactions API trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra cấu hình API."), 502);
     }
     if (data?.status && data.status !== "completed") return fail("Gemini chưa hoàn tất tạo từ khóa (status: " + cleanText(data.status, 80) + "). Không tự động gửi lại.", 502);
