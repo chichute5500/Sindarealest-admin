@@ -12,6 +12,8 @@ export async function analyzeProductImage({ apiKey, imageBase64, mimeType = "ima
   const prompt = [
     "Bạn là trợ lý kiểm duyệt ảnh sản phẩm giày và phụ kiện cho cửa hàng.",
     "Chỉ phân tích bằng chứng nhìn thấy được; không khẳng định da cá sấu thật từ ảnh.",
+    "Kiểm tra từ khóa da cá sấu/giày cá sấu/cá sấu và từ khóa tương đương tiếng Trung; phân biệt da thật chưa xác minh với giả da, PU, vân dập hoặc vật liệu tổng hợp.",
+    "Không tự đặt phần trăm tương đồng ảnh. Độ tin cậy của Gemini không phải điểm tương đồng; không được xem ảnh là đạt ngưỡng 90% nếu không có điểm số từ bộ so khớp ảnh đáng tin cậy.",
     "Phân biệt: ảnh trùng/ gần trùng, cùng một mẫu ở góc khác, có khả năng là mẫu khác, hoặc không đủ chắc chắn.",
     "Ghi rõ dấu hiệu giả da/PU/vân cá sấu nhân tạo nếu nhìn thấy; hình ảnh không thể xác thực nguồn gốc vật liệu.",
     "Trả về JSON đúng schema, không markdown: {summary:string, visibleFeatures:string[], modelAssessment:'same_model_possible'|'different_model_possible'|'different_angle_possible'|'uncertain', materialAssessment:'possible_synthetic'|'crocodile_claim_unverified'|'no_visible_evidence'|'uncertain', confidence:'low'|'medium'|'high', reasons:string[], needsHumanReview:boolean}.",
