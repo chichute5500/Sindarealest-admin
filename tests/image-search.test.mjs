@@ -45,6 +45,12 @@ assert.match(imageSearchHandler, /INVALID_ARGUMENT/, "Gemini request-format erro
 assert.match(imageSearchHandler, /apiError\.message/, "The actual Google API diagnostic must be shown to admin");
 assert.match(imageSearchHandler, /đã ẩn API key/, "The API key must be redacted from diagnostics");
 assert.match(imageSearchHandler, /TimeoutError/, "Gemini timeouts must have a specific diagnostic");
+assert.match(imageSearchHandler, /v1beta\/interactions/, "Use the recommended Gemini Interactions API");
+assert.match(imageSearchHandler, /gemini-3\.8-flash/, "Use the currently recommended Gemini Flash model");
+assert.match(imageSearchHandler, /x-goog-api-key/, "Send API key in the request header");
+assert.match(imageSearchHandler, /type: "google_search"/, "Interactions API Google Search grounding must be enabled");
+assert.match(imageSearchHandler, /url_citation/, "Read source URLs from Interactions API citations");
+assert.doesNotMatch(imageSearchHandler, /gemini-2\.5-flash:generateContent/, "Do not call the unavailable legacy model endpoint");
 assert.doesNotMatch((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /NEXSCOPE/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /phash-63/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /similarityScore < 90/);
