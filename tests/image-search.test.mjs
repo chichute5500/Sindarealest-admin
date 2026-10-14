@@ -38,6 +38,13 @@ assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPa
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /google_search/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /GEMINI_API_KEY/);
+const imageSearchHandler = (await import("../functions/api/admin/image-search.js")).onRequestPost.toString();
+assert.match(imageSearchHandler, /RESOURCE_EXHAUSTED/, "Gemini quota errors must be distinguished");
+assert.match(imageSearchHandler, /PERMISSION_DENIED/, "Gemini permission errors must be distinguished");
+assert.match(imageSearchHandler, /INVALID_ARGUMENT/, "Gemini request-format errors must be distinguished");
+assert.match(imageSearchHandler, /apiError\.message/, "The actual Google API diagnostic must be shown to admin");
+assert.match(imageSearchHandler, /đã ẩn API key/, "The API key must be redacted from diagnostics");
+assert.match(imageSearchHandler, /TimeoutError/, "Gemini timeouts must have a specific diagnostic");
 assert.doesNotMatch((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /NEXSCOPE/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /phash-63/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /similarityScore < 90/);
