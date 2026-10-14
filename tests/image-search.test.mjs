@@ -36,4 +36,12 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /isSupportedSourceUrl/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
-console.log("PASS: inventory, 90% similarity gate, mandatory keywords, fake-material rejection, Gemini validation, AI publication gate");
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /Provider scores are not trusted/);
+assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /phash-63/);
+assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /similarityScore < 90/);
+assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRequestGet, "function");
+const adminHtml = (await import("node:fs")).readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
+assert.match(adminHtml, /const phashSimilarity=async/);
+assert.match(adminHtml, /api\/admin\/image-proxy\?url=/);
+assert.match(adminHtml, /score>=90&&item\.hasKeyword===true/);
+console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, AI publication gate");

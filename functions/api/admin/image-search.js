@@ -1,5 +1,5 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
-import { assessCrocodileMaterial, evaluateSearchCandidate, extractSimilarityScore, inventoryImages } from "../../_lib/image-audit.js";
+import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages } from "../../_lib/image-audit.js";
 
 function isSupportedSourceUrl(value) {
   try { const u = new URL(value); const h = u.hostname.toLowerCase(); return u.protocol === "https:" && (h === "1688.com" || h.endsWith(".1688.com") || h === "taobao.com" || h.endsWith(".taobao.com")); } catch { return false; }
@@ -64,10 +64,11 @@ export async function onRequestPost(context) {
         const description = String(item.description || item.desc || "").slice(0, 2000);
         const material = String(item.material || "").slice(0, 500);
         const properties = typeof item.properties === "string" ? item.properties.slice(0, 1000) : JSON.stringify(item.properties || {}).slice(0, 1000);
-        const similarityScore = extractSimilarityScore(item);
+        const similarityScore = null; // Provider scores are not trusted; the browser computes pHash from the actual images.
         const evaluation = evaluateSearchCandidate({ title, description, material, properties, similarityScore });
         return {
           title,
+          candidateText: [title, description, material, properties].filter(Boolean).join(" ").slice(0, 3000),
           imageUrl: String(item.imageUrl || item.image_url || item.picUrl || item.pic_url || ""),
           productUrl: String(item.productUrl || item.product_url || item.offerUrl || item.offer_url || item.url || (item.offerId ? "https://detail.1688.com/offer/" + encodeURIComponent(String(item.offerId)) + ".html" : "")),
           price: item.price == null ? null : String(item.price),
