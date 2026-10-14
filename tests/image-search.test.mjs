@@ -205,7 +205,7 @@ assert.match(adminHtml, /Chưa có mô hình so khớp thị giác chuyên biệ
 assert.match(adminHtml, /data-download-candidate/);
 assert.match(adminHtml, /data-reference-image-ref/);
 assert.match(adminHtml, /data-ai-compare/);
-assert.match(adminHtml, /api\\/admin\\/image-candidate\\?reviewId=/);
+assert.ok(adminHtml.includes('/api/admin/image-candidate?reviewId='));
 assert.match(adminHtml, /sourceImageUrl/);
 assert.match(adminHtml, /referenceImageRef/);
 assert.doesNotMatch(adminHtml, /window\\.__sdAiInventoryAutoScanned/, "Opening the AI tab must not auto-scan");
@@ -225,7 +225,7 @@ assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRe
 assert.equal(typeof (await import("../functions/api/admin/image-candidate.js")).onRequestGet, "function");
 const imageSearchSourceText = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
 assert.match(imageSearchSourceText, /imageRef/);
-assert.match(imageSearchSourceText, /ownedImages\\.some/);
+assert.ok(imageSearchSourceText.includes('ownedImages.some'));
 const auditSourceText = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
 assert.match(auditSourceText, /reference_image_ref/);
 assert.match(auditSourceText, /source_image_url/);
