@@ -90,7 +90,7 @@ const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
 check(imageSearchApi.includes('isSupportedSourceUrl'), 'API tìm ảnh chưa giới hạn URL nguồn Taobao/1688');
-check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('extractSimilarityScore'), 'API tìm ảnh thiếu cổng kiểm tra điểm tương đồng và từ khóa bắt buộc');
+check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('similarityScore = null'), 'API tìm ảnh phải tự đo điểm từ ảnh thực tế, không tin điểm nhà cung cấp tự khai');
 const imageAuditLib = existsSync(join(root, 'functions/_lib/image-audit.js')) ? readFileSync(join(root, 'functions/_lib/image-audit.js'), 'utf8') : '';
 check(imageAuditLib.includes('score >= 90') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt ảnh thiếu ngưỡng 90%, từ khóa hoặc loại trừ giả da');
 
