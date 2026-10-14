@@ -100,10 +100,41 @@ try {
     timeoutCalls++;
     throw new DOMException("timeout", "TimeoutError");
   };
-  await assert.rejects(() => requestGeminiInteraction({ apiKey: "test-key", input: "test", timeoutMs: 1000 }), /timeout/);
+  await assert.rejects(
+    () => requestGeminiInteraction({ apiKey: "test-key", input: "test", timeoutMs: 1000 }),
+    error => error.code === "GEMINI_TIMEOUT" &&
+      error.name === "TimeoutError" &&
+      error.model === "gemini-3.8-flash" &&
+      error.timeoutMs === 1000 &&
+      /timeout/i.test(error.message)
+  );
   assert.equal(timeoutCalls, 1, "A timeout must not trigger another Gemini request");
 } finally {
   globalThis.fetch = originalFetch;
 }
 
-console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, bounded 503 fallback, 45-second timeout without retry, AI publication gate");
+let networkCalls = 0;
+try {
+  globalThis.fetch = async () => {
+    networkCalls++;
+    throw new TypeError("Failed to fetch");
+  };
+  await assert.rejects(
+    () => requestGeminiInteraction({ apiKey: "test-key", input: "test", timeoutMs: 1000 }),
+    error => error.code === "GEMINI_NETWORK_ERROR" &&
+      error.name === "GeminiNetworkError" &&
+      error.model === "gemini-3.8-flash"
+  );
+  assert.equal(networkCalls, 1, "A connection failure must not trigger another Gemini request");
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
+const sharedInteractionSource = (await import("node:fs")).readFileSync(new URL("../functions/_lib/gemini-interactions.js", import.meta.url), "utf8");
+assert.match(sharedInteractionSource, /request_timeout/, "Timeouts must emit safe diagnostic metadata");
+assert.match(sharedInteractionSource, /api_response_error/, "HTTP quota and upstream API failures must be diagnosed separately");
+assert.match(sharedInteractionSource, /Never log prompts, image bytes, API keys/, "Diagnostics must not log secrets or user image content");
+assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/gemini.js", import.meta.url), "utf8"), /GEMINI_NETWORK_ERROR/);
+assert.match((await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8"), /GEMINI_NETWORK_ERROR/);
+
+console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, bounded 503 fallback, timeout/network diagnostics without retry, AI publication gate");
