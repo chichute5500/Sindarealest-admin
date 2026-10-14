@@ -41,7 +41,7 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
   if (image.error) return image;
   try {
     const result = await ai.run(WORKERS_AI_VISION_MODEL, {
-      prompt: String(prompt || "").slice(0, 12000),
+      messages: [{ role: "user", content: String(prompt || "").slice(0, 12000) }],
       image: `data:${image.mimeType};base64,${image.base64}`,
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
       temperature: 0.1
@@ -57,14 +57,34 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       responseType: typeof result?.response,
       responseLength: typeof result?.response === "string" ? result.response.length : null,
       resultFieldType: typeof result?.result,
-      resultFieldLength: typeof result?.result === "string" ? result.result.length : null
+      resultFieldLength: typeof result?.result === "string" ? result.result.length : null,
+      nestedResultKeys: result?.result && typeof result.result === "object" ? Object.keys(result.result).slice(0, 30) : [],
+      nestedResponseType: typeof result?.result?.response,
+      nestedResponseLength: typeof result?.result?.response === "string" ? result.result.response.length : null
     };
     console.info("[Workers AI diagnostic]", JSON.stringify(diagnostic));
-    const text = typeof result === "string" ? result : typeof result?.response === "string" ? result.response : typeof result?.result === "string" ? result.result : "";
-    if (!text.trim()) return { error: "Workers AI đã phản hồi nhưng không có nội dung phân tích ảnh. Hãy kiểm tra model output trong Cloudflare; không tự động gọi lại.", status: 502, code: "WORKERS_AI_EMPTY_RESPONSE" };
-    return { text: text.trim(), model: WORKERS_AI_VISION_MODEL };
+    const candidates = [
+      typeof result === "string" ? result : null,
+      result?.response,
+      result?.result,
+      result?.result?.response,
+      result?.result?.result,
+      result?.output_text,
+      result?.text
+    ];
+    const text = candidates.find(value => typeof value === "string" && value.trim())?.trim() || "";
+    if (!text) return { error: "Workers AI đã phản hồi nhưng không có nội dung phân tích ảnh. Hãy kiểm tra model output trong Cloudflare; không tự động gọi lại.", status: 502, code: "WORKERS_AI_EMPTY_RESPONSE" };
+    return { text, model: WORKERS_AI_VISION_MODEL };
   } catch (error) {
-    return classifyAiError(error);
+    const classified = classifyAiError(error);
+    console.warn("[Workers AI diagnostic]", JSON.stringify({
+      event: "workers_ai_vision_error",
+      model: WORKERS_AI_VISION_MODEL,
+      errorName: String(error?.name || "Error").slice(0, 80),
+      errorCode: classified.code,
+      errorStatus: classified.status
+    }));
+    return classified;
   }
 }
 

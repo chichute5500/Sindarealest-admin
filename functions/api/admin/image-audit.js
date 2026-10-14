@@ -75,7 +75,7 @@ export async function onRequestPost(context) {
   const quota = await consumeWorkersAiRequest(db);
   if (!quota.ok) return fail(quota.error, quota.status);
   const result = await analyzeProductImage({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
-  if (result.error) return fail(result.error, result.status || 503);
+  if (result.error) return json({ ok: false, error: result.error, code: result.code || "WORKERS_AI_ERROR" }, result.status || 503);
   const id = review?.id || crypto.randomUUID();
   const kind = review?.image_kind || "existing";
   const storedRef = kind === "candidate" ? review.image_ref : imageRef;

@@ -57,7 +57,7 @@ const analyzed = await analyzeProductImage({ ai, imageBase64: validBase64, mimeT
 assert.ok(analyzed.analysis);
 assert.equal(calls, 1, "one Workers AI request per analysis");
 assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
-assert.ok(capturedInput.prompt.includes("Không tạo phần trăm tương đồng ảnh"));
+assert.ok(capturedInput.messages[0].content.includes("Không tạo phần trăm tương đồng ảnh"));
 assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
@@ -65,7 +65,7 @@ assert.equal(analyzed.analysis.needsHumanReview, true);
 
 calls = 0;
 const search = await generateSearchKeywords({
-  ai: { async run(model, input) { calls++; assert.equal(model, WORKERS_AI_VISION_MODEL); assert.ok(input.prompt.includes("1688")); return { response: '{"keywords":["鳄鱼皮男鞋","复古皮鞋"],"visualSummary":"男鞋"}' }; } },
+  ai: { async run(model, input) { calls++; assert.equal(model, WORKERS_AI_VISION_MODEL); assert.ok(input.messages[0].content.includes("1688")); return { response: '{"keywords":["鳄鱼皮男鞋","复古皮鞋"],"visualSummary":"男鞋"}' }; } },
   imageBase64: validBase64, mimeType: "image/jpeg", platform: "1688"
 });
 assert.deepEqual(search.keywords, ["鳄鱼皮男鞋", "复古皮鞋"]);
@@ -73,6 +73,8 @@ assert.equal(calls, 1);
 
 const empty = await runWorkersAiVision({ ai: { async run() { return { response: "" }; } }, prompt: "test", imageBase64: validBase64 });
 assert.equal(empty.code, "WORKERS_AI_EMPTY_RESPONSE");
+const nested = await runWorkersAiVision({ ai: { async run() { return { result: { response: "nested documented-style response" } }; } }, prompt: "test", imageBase64: validBase64 });
+assert.equal(nested.text, "nested documented-style response", "accept a nested response envelope when the provider wraps its result");
 const noBinding = await runWorkersAiVision({ ai: null, prompt: "test", imageBase64: validBase64 });
 assert.equal(noBinding.code, "WORKERS_AI_BINDING_MISSING");
 const invalidImage = await runWorkersAiVision({ ai, prompt: "test", imageBase64: "not base64" });
@@ -97,6 +99,7 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image
 
 const adminHtml = (await import("node:fs")).readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
 assert.match(adminHtml, /Workers AI/);
+assert.match(adminHtml, /d\\.code/, "Admin API errors should display safe diagnostic codes");
 assert.match(adminHtml, /data-view="ai"/);
 assert.doesNotMatch(adminHtml, /const phashSimilarity=async/);
 assert.doesNotMatch(adminHtml, /foundGroups=await Promise\\.allSettled/);
@@ -110,6 +113,7 @@ assert.doesNotMatch(imageSearchSource, /https:\/\/s\.taobao\.com\/search|https:\
 assert.doesNotMatch(imageSearchSource, /GEMINI_API_KEY|google_search|NEXSCOPE/);
 const auditSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
 assert.match(auditSource, /saveSource/);
+assert.match(auditSource, /code: result\\.code/, "Workers AI diagnostic codes must be returned to the admin client");
 assert.match(auditSource, /chưa có mô hình so khớp thị giác chuyên biệt/i);
 assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/ai-quota.js", import.meta.url), "utf8"), /workers-ai-rolling-24h/);
 assert.equal(typeof consumeWorkersAiRequest, "function");
