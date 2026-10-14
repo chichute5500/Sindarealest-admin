@@ -138,6 +138,15 @@ assert.match(responseDiagnostic, /response\.text/);
 assert.match(responseDiagnostic, /nested model output preview/, "diagnostic must include preview for nested text envelopes");
 const invalidSchema = await analyzeProductImage({ ai: { async run() { return { response: JSON.stringify({ summary: "Có thể là giày", modelAssessment: "uncertain" }) }; } }, imageBase64: validBase64 });
 assert.equal(invalidSchema.code, "WORKERS_AI_INVALID_SCHEMA", "valid JSON with missing required fields must not be saved as an analysis");
+assert.ok(invalidSchema.diagnostic, "schema failures should include safe field-level diagnostic metrics");
+assert.ok(invalidSchema.diagnostic.issues.includes("summary_too_short"));
+assert.ok(invalidSchema.diagnostic.issues.includes("visibleFeatures_not_array"));
+assert.ok(invalidSchema.diagnostic.issues.includes("reasons_not_array"));
+assert.ok(invalidSchema.diagnostic.issues.includes("materialAssessment_invalid"));
+assert.ok(invalidSchema.diagnostic.issues.includes("confidence_invalid"));
+assert.ok(invalidSchema.diagnostic.issues.includes("needsHumanReview_not_boolean"));
+assert.match(invalidSchema.error, /visibleFeatures không phải danh sách/, "admin should receive actionable field-level diagnostics");
+assert.equal(JSON.stringify(invalidSchema.diagnostic).includes("Có thể là giày"), false, "diagnostics must not log raw model descriptions");
 
 const candidateKey = "a".repeat(36) + "-ai.webp";
 const candidateReview = { image_kind: "candidate", status: "pending", r2_key: candidateKey, image_ref: "/media/" + candidateKey };
