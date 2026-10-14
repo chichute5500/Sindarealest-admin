@@ -16,14 +16,9 @@ async function runVision(ai, prompt, image) {
     const result = await ai.run(VISION_MODEL, {
       messages: [
         { role: "system", content: "You analyze product photos carefully and return only the requested output." },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image_url", image_url: { url: image } }
-          ]
-        }
+        { role: "user", content: prompt }
       ],
+      image,
       temperature: 0.1,
       max_tokens: 900
     });
