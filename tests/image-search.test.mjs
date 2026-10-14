@@ -56,11 +56,35 @@ const malformedButRecoverableKeywordResult = await suggestMarketplaceImageKeywor
   imageBase64: "YWJj"
 });
 assert.deepEqual(malformedButRecoverableKeywordResult.keywords, ["黑色乐福鞋", "黑色男鞋"], "Common trailing commas and unquoted JSON keys should be recovered");
-const malformedKeywordResult = await suggestMarketplaceImageKeywords({
-  ai: { run: async () => ({ response: '我认为这是一双黑色鞋子，但无法按 JSON 输出。' }) },
+const stringKeywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({ response: JSON.stringify({ keywords: "黑色乐福鞋、男士皮鞋", visualSummary: "黑色鞋" }) }) },
+  imageBase64: "YWJj",
+  category: "loafers"
+});
+assert.deepEqual(stringKeywordResult.keywords, ["黑色乐福鞋", "男士皮鞋"], "a JSON string containing separated Chinese keywords should be normalized");
+
+const nestedWorkersResponse = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({ response: { text: JSON.stringify({ keywords: ["棕色皮鞋", "男士商务鞋"], visualSummary: "棕色皮鞋" }) } }) },
   imageBase64: "YWJj"
 });
-assert.match(malformedKeywordResult.error, /JSON|关键词/, "invalid model output should return a clear validation error");
+assert.deepEqual(nestedWorkersResponse.keywords, ["棕色皮鞋", "男士商务鞋"], "nested Workers AI response text should be extracted");
+
+const proseKeywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({ response: "根据图片，这是一双黑色男士乐福鞋。建议关键词：黑色乐福鞋、男鞋。" }) },
+  imageBase64: "YWJj",
+  title: "Giày lười nam",
+  category: "loafers"
+});
+assert.ok(proseKeywordResult.keywords.length >= 2, "Chinese prose without JSON should recover search keywords instead of stopping the search");
+assert.ok(proseKeywordResult.keywords.every((keyword) => /[\\u3400-\\u9fff]/.test(keyword)), "recovered keywords must contain Chinese characters");
+
+const unusableKeywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({ response: "I cannot output JSON." }) },
+  imageBase64: "YWJj",
+  title: "Giày tây nam",
+  category: "dress-shoes"
+});
+assert.deepEqual(unusableKeywordResult.keywords, ["男士皮鞋", "商务皮鞋"], "unparseable output should use deterministic category keywords without extra AI calls");
 assert.ok((await suggestMarketplaceImageKeywords({ ai: { run: async () => { throw new Error("quota limit"); } }, imageBase64: "YWJj" })).status === 429, "Workers AI quota errors should not auto-retry");
 const candidateKey = "a".repeat(36) + "-ai.webp";
 const candidateReview = { image_kind: "candidate", status: "pending", r2_key: candidateKey, image_ref: "/media/" + candidateKey };
