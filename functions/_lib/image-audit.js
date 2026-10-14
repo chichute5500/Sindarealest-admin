@@ -3,7 +3,7 @@ const CROCODILE_REAL_TERMS = [
   /鳄鱼皮/, /鳄鱼皮鞋/, /真鳄鱼/, /真皮鳄鱼/
 ];
 const CROCODILE_FAKE_TERMS = [
-  /仿鳄鱼皮/, /鳄鱼纹/, /压鳄鱼纹/, /鳄鱼压纹/, /人造鳄鱼皮/, /合成革/, /PU皮/i,
+  /(?:cá[ ]+sấu|giày[ ]+cá[ ]+sấu).{0,12}(?:giả|fake|imitation)/i, /仿鳄鱼皮/, /鳄鱼纹/, /压鳄鱼纹/, /鳄鱼压纹/, /人造鳄鱼皮/, /合成革/, /PU皮/i,
   /giả\s+da\s+c[aá]\s+s[aá]u/i, /vân\s+c[aá]\s+s[aá]u/i, /da\s+nhân\s+tạo/i, /synthetic\s+leather/i, /faux\s+leather/i
 ];
 export function normalizeImageRef(value) {
