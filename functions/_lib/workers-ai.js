@@ -117,14 +117,18 @@ export function parseModelJson(rawText) {
 
 export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/webp", title = "", category = "", sku = "" }) {
   const prompt = [
-    "Bạn là trợ lý kiểm tra ảnh sản phẩm giày và phụ kiện cho quản trị viên cửa hàng.",
-    "Chỉ mô tả dấu hiệu nhìn thấy trong ảnh; không khẳng định da cá sấu thật chỉ bằng ảnh.",
-    "Phân biệt 鳄鱼皮 (da cá sấu được mô tả là da), 鳄鱼纹/压纹 (vân cá sấu) và PU/合成革 (vật liệu tổng hợp). Không kết luận nguồn gốc vật liệu nếu không đủ bằng chứng.",
-    "Phân loại mối quan hệ ảnh thành same_model_possible, different_model_possible, different_angle_possible hoặc uncertain. Không tạo phần trăm tương đồng ảnh.",
+    "Bạn là chuyên gia kiểm tra ảnh sản phẩm giày và phụ kiện cho quản trị viên cửa hàng.",
+    "Mục tiêu: tạo bản ghi kiểm tra hữu ích, cụ thể, dễ đối chiếu bằng mắt. Chỉ dùng chi tiết thực sự nhìn thấy trong ảnh; tên/SKU/danh mục chỉ là metadata, không phải bằng chứng thị giác.",
+    "summary phải mô tả trực tiếp vật thể nhìn thấy trong ảnh bằng tiếng Việt, không lặp nguyên tên sản phẩm và không viết câu chung kiểu 'có thể là một sản phẩm thuộc danh mục...'. Nêu loại giày, màu sắc, dáng mũi, kiểu cổ/đế và đặc điểm bề mặt chỉ khi nhìn rõ.",
+    "visibleFeatures phải có 3-6 quan sát ngắn, cụ thể, độc lập, ví dụ màu, hình dáng mũi, kiểu dây/khóa, cấu trúc đế, kiểu vân bề mặt. Không dùng ví dụ nếu không thấy trong ảnh. Nếu ảnh mờ hoặc chỉ thấy một phần, ghi rõ điều đó thay vì suy đoán.",
+    "reasons phải có 2-5 lý do cụ thể nối trực tiếp tới quan sát trên ảnh. Không dùng lý do rỗng như 'dựa trên hình ảnh', 'cần kiểm tra thêm' hoặc lặp lại nhãn kết luận. Nếu không đủ chi tiết để biện minh, chọn modelAssessment='uncertain' và confidence='low'.",
+    "modelAssessment mô tả mức độ có thể đối chiếu hình dạng/model từ một ảnh đơn: same_model_possible chỉ khi có ít nhất hai chi tiết tạo hình nhìn rõ; different_model_possible chỉ khi thấy khác biệt rõ; different_angle_possible chỉ khi thật sự có bằng chứng về góc chụp khác nhau; nếu không thì uncertain. Đây không phải điểm tương đồng được đo bằng thuật toán.",
+    "Với một ảnh đơn, không thể xác minh nó trùng với ảnh sản phẩm khác nếu không có ảnh đối chiếu. Đừng tuyên bố đã so khớp với ảnh tồn kho hay tìm thấy sản phẩm nguồn.",
+    "materialAssessment: possible_synthetic chỉ khi thấy dấu hiệu trực quan cụ thể của vật liệu tổng hợp; crocodile_claim_unverified khi có vân giống cá sấu nhưng không thể xác nhận chất liệu thật; no_visible_evidence khi không thấy dấu hiệu liên quan; uncertain khi ảnh không đủ rõ. Không khẳng định da cá sấu thật chỉ dựa trên ảnh.",
     "Return exactly one valid JSON object and nothing else. No Markdown fences, no preamble, no explanation, and no text after the JSON.",
-    'Required JSON schema: {"summary":"short Vietnamese summary","visibleFeatures":["visible feature"],"modelAssessment":"same_model_possible|different_model_possible|different_angle_possible|uncertain","materialAssessment":"possible_synthetic|crocodile_claim_unverified|no_visible_evidence|uncertain","confidence":"low|medium|high","reasons":["reason"],"needsHumanReview":true}.',
-    "All required fields must be present with the correct types: summary string, visibleFeatures array of strings, reasons array of strings, needsHumanReview boolean. Use only the exact enum values shown in the schema. If uncertain, use low/medium confidence and needsHumanReview true. Never invent missing observations. Do not recommend automatically deleting or publishing an image.",
-    "Thông tin sản phẩm: SKU " + String(sku).slice(0, 60) + "; tên " + String(title).slice(0, 180) + "; danh mục " + String(category).slice(0, 80) + "."
+    'Required JSON schema: {"summary":"short concrete Vietnamese description","visibleFeatures":["specific visible observation"],"modelAssessment":"same_model_possible|different_model_possible|different_angle_possible|uncertain","materialAssessment":"possible_synthetic|crocodile_claim_unverified|no_visible_evidence|uncertain","confidence":"low|medium|high","reasons":["specific reason grounded in visible detail"],"needsHumanReview":true}.',
+    "All fields are required and must have correct types. visibleFeatures: 3-6 strings. reasons: 2-5 strings. summary must describe visible form/features, not repeat product title. confidence='high' is forbidden for material authenticity and image identity from one image. Set needsHumanReview=true whenever material authenticity or model identity cannot be verified.",
+    "Metadata for context only (do not treat as visual evidence): SKU " + String(sku).slice(0, 60) + "; tên " + String(title).slice(0, 180) + "; danh mục " + String(category).slice(0, 80) + "."
   ].join("\n");
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 768 });
   if (output.error) return output;
