@@ -12,5 +12,6 @@ assert.equal(inventory.duplicateReferenceCount, 1);
 assert.equal(inventory.duplicates[0].products.length, 2);
 assert.equal(assessCrocodileMaterial("giày da cá sấu thật").status, "review");
 assert.equal(assessCrocodileMaterial("鳄鱼纹压纹PU皮").status, "reject");
+assert.equal(assessCrocodileMaterial("giày cá sấu giả").status, "reject");
 assert.equal(assessCrocodileMaterial("giày da tổng hợp").status, "review");
 console.log("PASS: image inventory, duplicate references, and crocodile-material safety checks.");
