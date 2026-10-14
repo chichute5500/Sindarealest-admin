@@ -59,7 +59,7 @@ assert.ok(analyzed.analysis.visibleFeatures.length >= 2, "analysis returns concr
 assert.ok(analyzed.analysis.reasons.length >= 1, "analysis includes at least one reason from the model response");
 assert.equal(calls, 1, "one Workers AI request per analysis");
 assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
-assert.ok(capturedInput.prompt.includes("Không tạo phần trăm tương đồng ảnh"));
+assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must distinguish single-image inference from actual image matching");
 assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
