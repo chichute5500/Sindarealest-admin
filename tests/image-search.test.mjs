@@ -33,10 +33,10 @@ assert.equal(canServeAiCandidate(candidateReview), false, "pending AI candidate 
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "rejected" }), false, "rejected AI candidate must not be public");
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved" }), true, "approved AI candidate may be public");
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image_ref: "/media/other.webp" }), false, "mismatched image reference must be blocked");
-assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /isSupportedSourceUrl/);
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /ELIMAPI_API_KEY/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
-assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /Provider scores are not trusted/);
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /uploadReferenceImage/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /phash-63/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /similarityScore < 90/);
 assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRequestGet, "function");
