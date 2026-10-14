@@ -24,5 +24,6 @@ assert.equal(canServeAiCandidate(candidateReview), false, "pending AI candidate 
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "rejected" }), false, "rejected AI candidate must not be public");
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved" }), true, "approved AI candidate may be public");
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image_ref: "/media/other.webp" }), false, "mismatched image reference must be blocked");
-assert.ok(true, "source URL test extension placeholder");
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /isSupportedSourceUrl/);
+assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 console.log("PASS: image inventory, material safeguards, Gemini validation, AI candidate publication gate");
