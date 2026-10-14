@@ -115,7 +115,7 @@ export async function generateSearchKeywords({ ai, imageBase64, mimeType = "imag
     "现有商品标题（仅供参考）：" + String(title || "无").slice(0, 180) + "。",
     "Return exactly one valid JSON object and nothing else. Do not use Markdown fences, explanations, headings, or prose before/after the JSON.",
     "The JSON must have exactly these fields: keywords (an array of 1 to 4 short Simplified Chinese search phrases) and visualSummary (a short visible-feature summary of at most 100 Chinese characters).",
-    "Example shape only: {\\"keywords\\":[\\"棕色男士皮鞋\\",\\"鳄鱼纹压花皮鞋\\"],\\"visualSummary\\":\\"棕色皮鞋，圆头，压纹鞋面\\"}. Never copy the example unless those details are actually visible in the provided image."
+    'Example shape only: {"keywords":["棕色男士皮鞋","鳄鱼纹压花皮鞋"],"visualSummary":"棕色皮鞋，圆头，压纹鞋面"}. Never copy the example unless those details are actually visible in the provided image.'
   ].join("\n");
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 384 });
   if (output.error) return output;
