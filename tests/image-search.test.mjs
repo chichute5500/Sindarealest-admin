@@ -85,6 +85,11 @@ assert.equal(quota.status, 429);
 assert.equal(quotaCalls, 1, "quota failures are not retried");
 const license = await runWorkersAiVision({ ai: { async run() { throw new Error("must agree to license"); } }, prompt: "test", imageBase64: validBase64 });
 assert.equal(license.code, "WORKERS_AI_LICENSE_REQUIRED");
+const nestedError = await runWorkersAiVision({
+  ai: { async run() { throw Object.assign(new Error("AI API Error: invalid request data:image/webp;base64,aGVsbG8="), { cause: new Error("HTTP 400") }); } },
+  prompt: "test", imageBase64: validBase64
+});
+assert.equal(nestedError.code, "WORKERS_AI_REQUEST_FAILED");
 const invalidJson = await analyzeProductImage({ ai: { async run() { return { response: "No JSON result" }; } }, imageBase64: validBase64 });
 assert.equal(invalidJson.code, "WORKERS_AI_INVALID_JSON");
 const invalidSchema = await analyzeProductImage({ ai: { async run() { return { response: JSON.stringify({ summary: "Có thể là giày", modelAssessment: "uncertain" }) }; } }, imageBase64: validBase64 });
