@@ -46,4 +46,7 @@ const adminHtml = (await import("node:fs")).readFileSync(new URL("../public/admi
 assert.match(adminHtml, /const phashSimilarity=async/);
 assert.match(adminHtml, /api\/admin\/image-proxy\?url=/);
 assert.match(adminHtml, /score>=90&&item\.hasKeyword===true/);
+assert.match(adminHtml, /data-view="ai"/);
+assert.match(adminHtml, /window\\.__sdAiInventoryAutoScanned/);
+assert.match(adminHtml, /foundGroups=await Promise\\.allSettled/);
 console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, AI publication gate");
