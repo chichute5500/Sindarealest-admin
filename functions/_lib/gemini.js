@@ -44,7 +44,7 @@ async function runVision(ai, prompt, image) {
 }
 
 function extractJsonObject(raw) {
-  const cleaned = String(raw || "").replace(/^\\uFEFF/, "").replace(/```(?:json)?/gi, "").trim();
+  const cleaned = String(raw || "").replace(/^\uFEFF/, "").replace(/```(?:json)?/gi, "").trim();
   try {
     const parsed = JSON.parse(cleaned);
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
@@ -58,7 +58,7 @@ function extractJsonObject(raw) {
       const char = cleaned[i];
       if (inString) {
         if (escaped) escaped = false;
-        else if (char === "\\\\") escaped = true;
+        else if (char === "\\") escaped = true;
         else if (char === '"') inString = false;
         continue;
       }
