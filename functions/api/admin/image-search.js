@@ -2,6 +2,7 @@ import { fail, json, requireAdmin } from "../../_lib.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages } from "../../_lib/image-audit.js";
 import { generateSearchKeywords } from "../../_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
+import { searchElimapiProducts } from "../../_lib/elimapi.js";
 
 const MAX_IMAGE_BASE64 = 7_000_000;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -58,37 +59,35 @@ export async function onRequestPost(context) {
   });
   if (generated.error) return fail(generated.error, generated.status || 502);
 
-  const query = [title, ...generated.keywords].filter(Boolean).join(" ").replace(/\s+/g, " ").trim().slice(0, 220);
-  const searchUrl = platform === "1688"
-    ? "https://s.1688.com/selloffer/offer_search.htm?keywords=" + encodeURIComponent(query)
-    : "https://s.taobao.com/search?q=" + encodeURIComponent(query);
-  const evaluation = evaluateSearchCandidate({ title: [title, ...generated.keywords].join(" "), similarityScore: null });
+  const query = generated.keywords.join(" ").replace(/\s+/g, " ").trim().slice(0, 220);
+  const upstream = await searchElimapiProducts({
+    apiKey: context.env.ELIMAPI_API_KEY,
+    platform,
+    query
+  });
+  if (upstream.error) return fail(upstream.error, upstream.status || 502, { "X-Error-Code": upstream.code || "ELIMAPI_ERROR" });
+  const results = upstream.products.map(product => {
+    const evaluation = evaluateSearchCandidate({ title: product.title, description: product.candidateText, similarityScore: null });
+    return {
+      ...product,
+      hasKeyword: evaluation.hasKeyword,
+      eligible: false,
+      eligibilityReason: "Sản phẩm thật do Elimapi trả về, nhưng chưa có mô hình so khớp thị giác chuyên biệt đã hiệu chuẩn ngưỡng 90%. Admin phải kiểm tra ảnh, giá và chất liệu thủ công.",
+      materialCheck: evaluation.materialCheck
+    };
+  });
   return json({
     ok: true,
     platform,
-    provider: "Cloudflare Workers AI",
+    provider: "Elimapi",
+    keywordProvider: "Cloudflare Workers AI",
     model: generated.model,
     keywords: generated.keywords,
     visualSummary: generated.visualSummary,
-    results: [{
-      title: "Trang tìm kiếm " + platform + " — " + generated.keywords[0],
-      candidateText: generated.keywords.join(" "),
-      imageUrl: "",
-      productUrl: searchUrl,
-      searchUrl,
-      isSearchPage: true,
-      price: null,
-      similarityScore: null,
-      comparisonMethod: null,
-      hasKeyword: evaluation.hasKeyword,
-      eligible: false,
-      eligibilityReason: "Đây là trang kết quả tìm kiếm theo từ khóa, không phải sản phẩm nguồn đã xác minh. Chưa có mô hình so khớp thị giác chuyên biệt đã hiệu chuẩn 90%; không thể lưu như ảnh nguồn đã đạt chuẩn.",
-      materialCheck: evaluation.materialCheck
-    }],
-    message: "Workers AI đã tạo từ khóa tìm kiếm. Mở trang Taobao/1688 để tự kiểm tra sản phẩm; hệ thống chưa xác minh ứng viên ảnh hoặc ngưỡng tương đồng 90%."
+    total: upstream.total,
+    results,
+    message: results.length
+      ? "Đã nhận sản phẩm và giá từ Elimapi. Giá do API trả về tính bằng CNY; hãy mở nguồn và kiểm tra thủ công. Điểm tương đồng ảnh chưa được hiệu chuẩn, vì vậy không có kết quả nào tự động đủ điều kiện lưu."
+      : "Elimapi không trả về sản phẩm cho các từ khóa này. Thử điều chỉnh từ khóa; hệ thống không tạo sản phẩm hoặc giá giả."
   });
-}
-
-export async function onRequestPut() {
-  return fail("Phương thức không được hỗ trợ.", 405);
 }
