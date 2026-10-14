@@ -1,4 +1,4 @@
-
+ 
 name: Deploy SinDarealest to Cloudflare Pages
 
 on:
@@ -44,6 +44,9 @@ jobs:
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
+
+      - name: Apply AI review D1 schema
+        run: node scripts/apply-ai-image-migrations.mjs
 
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
