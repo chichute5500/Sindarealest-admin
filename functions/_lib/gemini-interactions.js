@@ -1,5 +1,5 @@
 // One bounded fallback for transient model-capacity errors. Never retry 429/quota errors.
-export async function requestGeminiInteraction({ apiKey, input, timeoutMs = 25000 }) {
+export async function requestGeminiInteraction({ apiKey, input, timeoutMs = 45000 }) {
   let model = "gemini-3.8-flash";
   for (let attempt = 0; attempt < 2; attempt++) {
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {

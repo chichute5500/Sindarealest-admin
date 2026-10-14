@@ -52,6 +52,9 @@ assert.match(interactionSource, /gemini-3\.8-flash/, "Use the primary Gemini Fla
 assert.match(interactionSource, /gemini-3\.6-flash/, "Use a fallback model when the primary returns HTTP 503");
 assert.match(interactionSource, /x-goog-api-key/, "Send API key in the request header");
 assert.match(interactionSource, /response.status !== 503/, "Only retry a transient HTTP 503, not quota/auth errors");
+assert.match(interactionSource, /timeoutMs = 45000/, "Allow slow Gemini requests up to 45 seconds before timing out");
+assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/gemini.js", import.meta.url), "utf8"), /sau 45 giây/);
+assert.match((await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8"), /sau 45 giây/);
 assert.doesNotMatch(imageSearchHandler, /type: "google_search"/, "Free-tier mode must not enable paid Google Search grounding");
 assert.match(imageSearchHandler, /isSearchPage: true/, "Free-tier mode returns an explicit search page, not a fabricated product URL");
 assert.match(imageSearchHandler, /consumeGeminiRequest/, "Search requests must be guarded by the shared quota limiter");
@@ -91,4 +94,16 @@ try {
   globalThis.fetch = originalFetch;
 }
 
-console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, bounded 503 fallback, AI publication gate");
+let timeoutCalls = 0;
+try {
+  globalThis.fetch = async () => {
+    timeoutCalls++;
+    throw new DOMException("timeout", "TimeoutError");
+  };
+  await assert.rejects(() => requestGeminiInteraction({ apiKey: "test-key", input: "test", timeoutMs: 1000 }), /timeout/);
+  assert.equal(timeoutCalls, 1, "A timeout must not trigger another Gemini request");
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
+console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, bounded 503 fallback, 45-second timeout without retry, AI publication gate");
