@@ -66,7 +66,12 @@ export async function analyzeProductImage({ apiKey, imageBase64, mimeType = "ima
       needsHumanReview: parsed.needsHumanReview !== false
     }};
   } catch (error) {
-    if (error?.name === "TimeoutError" || error?.name === "AbortError") return { error: "Gemini hết thời gian chờ sau 45 giây. Không tự động thử lại để bảo vệ quota.", status: 504 };
-    return { error: "Không kết nối được Gemini Interactions API. " + String(error?.message || "").slice(0, 200), status: 502 };
+    if (error?.code === "GEMINI_TIMEOUT" || error?.name === "TimeoutError" || error?.name === "AbortError") {
+      return { error: "Gemini hết thời gian chờ sau 45 giây (mô hình " + String(error?.model || "không xác định") + "). Mã chẩn đoán: GEMINI_TIMEOUT. Không tự động thử lại để bảo vệ quota.", status: 504 };
+    }
+    if (error?.code === "GEMINI_NETWORK_ERROR") {
+      return { error: "Không kết nối được tới Google Gemini API (mô hình " + String(error?.model || "không xác định") + "). Mã chẩn đoán: GEMINI_NETWORK_ERROR. Không tự động thử lại để bảo vệ quota.", status: 502 };
+    }
+    return { error: "Lỗi khi kết nối Gemini Interactions API. Mã chẩn đoán: GEMINI_REQUEST_ERROR.", status: 502 };
   }
 }
