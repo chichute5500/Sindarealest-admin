@@ -43,16 +43,44 @@ async function runVision(ai, prompt, image) {
   }
 }
 
-function parseJson(raw, fallbackMessage) {
-  const cleaned = raw.replace(/^\uFEFF/, "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  try { return JSON.parse(cleaned); } catch {}
-  const first = cleaned.indexOf("{");
-  const last = cleaned.lastIndexOf("}");
-  if (first >= 0 && last > first) {
-    try { return JSON.parse(cleaned.slice(first, last + 1)); } catch {}
+function extractJsonObject(raw) {
+  const cleaned = String(raw || "").replace(/^\\uFEFF/, "").replace(/```(?:json)?/gi, "").trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+  } catch {}
+
+  // Models may add prose around JSON. Find a balanced object without
+  // accidentally including braces that occur inside quoted strings.
+  for (let start = cleaned.indexOf("{"); start >= 0; start = cleaned.indexOf("{", start + 1)) {
+    let depth = 0, inString = false, escaped = false;
+    for (let i = start; i < cleaned.length; i++) {
+      const char = cleaned[i];
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (char === "\\\\") escaped = true;
+        else if (char === '"') inString = false;
+        continue;
+      }
+      if (char === '"') inString = true;
+      else if (char === "{") depth++;
+      else if (char === "}") {
+        depth--;
+        if (depth === 0) {
+          try {
+            const parsed = JSON.parse(cleaned.slice(start, i + 1));
+            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+          } catch {}
+          break;
+        }
+      }
+    }
   }
-  return { error: fallbackMessage };
+  return null;
 }
+
+function parseJson(raw, fallbackMessage) {
+  return extractJsonObject(raw) || { error: fallbackMessage };
 
 export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/webp", title = "", category = "", sku = "" }) {
   const parsedImage = parseImage(imageBase64, mimeType);
@@ -94,9 +122,11 @@ export async function suggestMarketplaceImageKeywords({ ai, imageBase64, mimeTyp
   const prompt = [
     "Phân tích ảnh sản phẩm để hỗ trợ tìm nguồn hàng trên Taobao hoặc 1688.",
     "Chỉ mô tả những gì nhìn thấy. Không đoán thương hiệu, mã sản phẩm, cửa hàng, URL hay giá.",
-    "Tạo 2 đến 4 từ khóa tiếng Trung giản thể ngắn mô tả đúng loại sản phẩm, kiểu dáng, màu sắc và chi tiết đặc trưng; không thêm thuộc tính không thấy rõ.",
+    "Tạo 2 đến 4 từ khóa tiếng Trung giản thể NGẮN, mỗi từ khóa là một cụm tìm kiếm thực tế trên sàn thương mại điện tử; chỉ mô tả đúng loại sản phẩm, kiểu dáng, màu sắc và chi tiết nhìn thấy.",
+    "Không thêm lời dẫn, không giải thích, không Markdown, không dùng dấu ``` và không đặt JSON trong câu văn.",
     "Nếu tiêu đề nói đến da cá sấu, phân biệt 鳄鱼皮 (da cá sấu) với 鳄鱼纹/压纹/PU (vân giả); không khẳng định vật liệu thật từ ảnh.",
-    "Trả về JSON thuần: {keywords:string[], visualSummary:string}.",
+    "Chỉ trả về MỘT đối tượng JSON hợp lệ, đúng cú pháp, không có dấu phẩy cuối, theo schema: {\\"keywords\\":[\\"中文关键词1\\",\\"中文关键词2\\"],\\"visualSummary\\":\\"简短描述\\"}.",
+    "Tự kiểm tra JSON có thể được JSON.parse phân tích và mọi giá trị keywords đều là chuỗi.",
     "Tiêu đề hiện có: " + String(title || "không có").slice(0, 180),
     "Danh mục: " + String(category || "không có").slice(0, 80)
   ].join("\n");
