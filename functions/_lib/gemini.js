@@ -14,7 +14,10 @@ async function runVision(ai, prompt, image) {
   }
   try {
     const result = await ai.run(VISION_MODEL, {
-      prompt,
+      messages: [
+        { role: "system", content: "You analyze product photos carefully and return only the requested output." },
+        { role: "user", content: prompt }
+      ],
       image,
       temperature: 0.1,
       max_tokens: 700
@@ -27,8 +30,14 @@ async function runVision(ai, prompt, image) {
     if (/license|acceptable use|prompt.*agree/i.test(message)) {
       return { error: "Workers AI yêu cầu chấp nhận điều khoản Meta cho mô hình Llama 3.2 Vision trước khi sử dụng. Mở trang mô hình trong Cloudflare Workers AI và hoàn tất bước chấp nhận điều khoản.", status: 503 };
     }
+    if (/404|not found|unknown model|model.*does not exist/i.test(message)) {
+      return { error: "Workers AI trả HTTP 404 hoặc không tìm thấy mô hình. Kiểm tra mã mô hình và binding AI ở đúng môi trường Preview/Production.", status: 503 };
+    }
     if (/limit|quota|capacity|429/i.test(message)) {
       return { error: "Workers AI đang giới hạn lượt xử lý hoặc chưa đủ dung lượng. Không tự động thử lại.", status: 429 };
+    }
+    if (/401|403|unauthorized|permission denied/i.test(message)) {
+      return { error: "Workers AI từ chối quyền truy cập. Kiểm tra binding AI và quyền Workers AI của tài khoản Cloudflare.", status: 503 };
     }
     return { error: "Workers AI không phân tích được ảnh. Kiểm tra binding AI và trạng thái dịch vụ.", status: 502 };
   }
