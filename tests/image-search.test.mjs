@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createSession } from "../functions/_lib.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, extractSimilarityScore, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage, suggestMarketplaceImageKeywords } from "../functions/_lib/gemini.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
@@ -28,7 +29,16 @@ assert.equal(evaluateSearchCandidate({ title: "真鳄鱼皮鞋", similarityScore
 assert.ok((await analyzeProductImage({ ai: null, imageBase64: "YWJj" })).error, "missing Workers AI binding must fail safely");
 assert.ok((await suggestMarketplaceImageKeywords({ ai: null, imageBase64: "YWJj" })).error, "image search must require Workers AI binding");
 assert.ok((await analyzeProductImage({ ai: { run: async () => ({ response: JSON.stringify({ summary: "Giày da", visibleFeatures: ["mũi tròn"], modelAssessment: "same_model_possible", materialAssessment: "uncertain", confidence: "medium", reasons: [], needsHumanReview: true }) }) }, imageBase64: "YWJj" })).analysis, "Workers AI JSON response should be normalized");
-const keywordResult = await suggestMarketplaceImageKeywords({ ai: { run: async () => ({ response: JSON.stringify({ keywords: ["黑色皮鞋", "男鞋"], visualSummary: "Giày đen" }) }) }, imageBase64: "YWJj" });
+const keywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async (model, input) => {
+    assert.equal(model, "@cf/meta/llama-3.2-11b-vision-instruct");
+    assert.equal(input.messages[0].role, "system");
+    assert.equal(input.messages[1].role, "user");
+    assert.equal(input.image, "data:image/jpeg;base64,YWJj");
+    return { response: JSON.stringify({ keywords: ["黑色皮鞋", "男鞋"], visualSummary: "Giày đen" }) };
+  } },
+  imageBase64: "YWJj"
+});
 assert.deepEqual(keywordResult.keywords, ["黑色皮鞋", "男鞋"], "Workers AI Chinese keywords should be preserved");
 assert.ok((await suggestMarketplaceImageKeywords({ ai: { run: async () => { throw new Error("quota limit"); } }, imageBase64: "YWJj" })).status === 429, "Workers AI quota errors should not auto-retry");
 const candidateKey = "a".repeat(36) + "-ai.webp";
@@ -54,4 +64,77 @@ assert.match(adminHtml, /const phashSimilarity=async/);
 assert.match(adminHtml, /api\/admin\/image-proxy\?url=/);
 assert.match(adminHtml, /score>=90&&item\.hasKeyword===true/);
 assert.match(adminHtml, /galleryUrls/);
+
+// Integration regression test: Workers AI -> Elimapi upload -> image search -> details.
+// This confirms the actual request shapes without spending a real API quota.
+const savedFetch = globalThis.fetch;
+const upstreamCalls = [];
+globalThis.fetch = async (input, options = {}) => {
+  const url = String(input);
+  upstreamCalls.push({ url, options });
+  if (url.endsWith("/v2/products/upload-image")) {
+    assert.ok(options.body instanceof FormData, "Elimapi image upload must use multipart FormData");
+    assert.equal(options.body.get("platform"), "alibaba");
+    return new Response(JSON.stringify({ imageId: "test-image-123" }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  if (url.endsWith("/v2/products/search-by-image")) {
+    assert.match(options.headers?.["Content-Type"] || "", /^application\/json$/i, "Elimapi JSON requests must set Content-Type");
+    const requestBody = JSON.parse(options.body);
+    assert.equal(requestBody.platform, "alibaba");
+    assert.equal(requestBody.imgId, "test-image-123");
+    assert.equal(requestBody.size, 20);
+    return new Response(JSON.stringify({ items: [{
+      id: "123456",
+      title_en: "Giày da cá sấu thật",
+      description: "Leather shoes",
+      img_urls: ["https://img.alicdn.com/example.jpg"]
+    }] }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  if (url.endsWith("/v2/products/detail")) {
+    assert.match(options.headers?.["Content-Type"] || "", /^application\/json$/i);
+    return new Response(JSON.stringify({ product: { img_urls: ["https://img.alicdn.com/detail.jpg"] } }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  throw new Error("Unexpected upstream request: " + url);
+};
+try {
+  const sessionSecret = "test-session-secret-".repeat(3);
+  const session = await createSession(sessionSecret);
+  const route = await import("../functions/api/admin/image-search.js");
+  const response = await route.onRequestPost({
+    request: new Request("https://shop.example/api/admin/image-search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://shop.example",
+        Cookie: "sd_admin_session=" + session
+      },
+      body: JSON.stringify({ platform: "1688", imageBase64: "YWJj", title: "Giày da cá sấu", category: "shoes" })
+    }),
+    env: {
+      DB: {},
+      ADMIN_PASSWORD: "long-enough-admin-password",
+      SESSION_SECRET: sessionSecret,
+      ELIMAPI_API_KEY: "test-api-key-".repeat(2),
+      AI: { run: async (model, input) => {
+        assert.equal(model, "@cf/meta/llama-3.2-11b-vision-instruct");
+        assert.equal(input.messages[1].role, "user");
+        assert.match(input.messages[1].content, /Taobao|1688/);
+        assert.equal(input.image, "data:image/jpeg;base64,YWJj");
+        return { response: JSON.stringify({ keywords: ["鳄鱼皮鞋", "黑色男鞋"], visualSummary: "Giày đen" }) };
+      } }
+    }
+  });
+  assert.equal(response.status, 200, "image-search integration should succeed");
+  const result = await response.json();
+  assert.equal(result.engine, "cloudflare-workers-ai");
+  assert.equal(result.platform, "1688");
+  assert.deepEqual(result.keywords, ["鳄鱼皮鞋", "黑色男鞋"]);
+  assert.equal(result.results.length, 1);
+  assert.equal(result.results[0].productUrl, "https://detail.1688.com/offer/123456.html");
+  assert.deepEqual(result.results[0].galleryUrls, ["https://img.alicdn.com/example.jpg", "https://img.alicdn.com/detail.jpg"]);
+  assert.equal(upstreamCalls.length, 3, "should upload image, search by image, and fetch one product detail");
+} finally {
+  globalThis.fetch = savedFetch;
+}
+
 console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Workers AI response validation, AI publication gate");
