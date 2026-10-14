@@ -33,7 +33,11 @@ assert.equal(canServeAiCandidate(candidateReview), false, "pending AI candidate 
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "rejected" }), false, "rejected AI candidate must not be public");
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved" }), true, "approved AI candidate may be public");
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image_ref: "/media/other.webp" }), false, "mismatched image reference must be blocked");
-const imageSearchModule = await import("../functions/api/admin/image-search.js");\nassert.equal(typeof imageSearchModule.onRequestPost, "function");\nassert.equal(imageSearchModule.isSupportedSourceUrl("https://item.taobao.com/item.htm?id=123456"), true);\nassert.equal(imageSearchModule.isSupportedSourceUrl("https://evil.example/item.htm?id=123456"), false);\nassert.match(imageSearchModule.onRequestPost.toString(), /ELIMAPI_API_KEY/);
+const imageSearchModule = await import("../functions/api/admin/image-search.js");
+assert.equal(typeof imageSearchModule.onRequestPost, "function");
+assert.equal(imageSearchModule.isSupportedSourceUrl("https://item.taobao.com/item.htm?id=123456"), true);
+assert.equal(imageSearchModule.isSupportedSourceUrl("https://evil.example/item.htm?id=123456"), false);
+assert.match(imageSearchModule.onRequestPost.toString(), /ELIMAPI_API_KEY/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /uploadReferenceImage/);
