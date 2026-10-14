@@ -26,8 +26,23 @@ function decodeImage(imageBase64, mimeType) {
   return { bytes, mimeType: mime, base64 };
 }
 
+function getAiErrorMessage(error) {
+  const values = [error?.message, error?.cause?.message, error?.error?.message, error?.error, error?.cause];
+  return values.filter(value => typeof value === "string" || typeof value === "number")
+    .map(value => String(value)).filter(Boolean).join(" | ").slice(0, 2000);
+}
+
+function sanitizeAiErrorMessage(value) {
+  return String(value || "")
+    .replace(/data:image\\/[a-z0-9.+-]+;base64,[a-z0-9+/=]+/gi, "[image-data-redacted]")
+    .replace(/\\bBearer\\s+[^\\s,;]+/gi, "Bearer [redacted]")
+    .replace(/(?:api[_-]?key|token|secret|password)(\\s*[=:]\\s*)[^\\s,;]+/gi, "$1[redacted]")
+    .replace(/[A-Za-z0-9+/]{160,}={0,2}/g, "[long-data-redacted]")
+    .slice(0, 600);
+}
+
 function classifyAiError(error) {
-  const message = String(error?.message || "");
+  const message = getAiErrorMessage(error);
   if (/429|quota|rate.?limit|too many requests/i.test(message)) return { error: "Workers AI đã trả về giới hạn sử dụng hoặc quota. Không tự động thử lại; hãy kiểm tra Usage/Workers AI trong Cloudflare.", status: 429, code: "WORKERS_AI_QUOTA" };
   if (/license|acceptable use|must agree|agreement|prompt.*agree/i.test(message)) return { error: "Mô hình thị giác yêu cầu chấp thuận điều khoản sử dụng trước lần chạy đầu. Hãy kiểm tra và chấp thuận giấy phép mô hình trong Cloudflare Workers AI rồi thử lại thủ công.", status: 503, code: "WORKERS_AI_LICENSE_REQUIRED" };
   if (/binding|not configured|undefined.*run|not a function/i.test(message)) return { error: "Chưa cấu hình binding Workers AI có tên AI cho Cloudflare Pages/Workers.", status: 503, code: "WORKERS_AI_BINDING_MISSING" };
@@ -82,7 +97,8 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       model: WORKERS_AI_VISION_MODEL,
       errorName: String(error?.name || "Error").slice(0, 80),
       errorCode: classified.code,
-      errorStatus: classified.status
+      errorStatus: classified.status,
+      providerMessage: sanitizeAiErrorMessage(getAiErrorMessage(error))
     }));
     return classified;
   }
