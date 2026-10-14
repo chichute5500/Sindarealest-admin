@@ -58,7 +58,7 @@ assert.ok(analyzed.analysis);
 assert.equal(calls, 1, "one Workers AI request per analysis");
 assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
 assert.ok(capturedInput.prompt.includes("Không tạo phần trăm tương đồng ảnh"));
-assert.ok(Array.isArray(capturedInput.image), "image bytes use the documented Workers AI input");
+assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
