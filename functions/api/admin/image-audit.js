@@ -76,9 +76,9 @@ export async function onRequestPost(context) {
   const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=? LIMIT 1").bind(reviewId, productId).first().catch(() => null);
   const imageRef = String(body?.imageRef || review?.image_ref || "");
   const parsed = parseDataImage(body?.dataUrl);
-  if (!parsed) return fail("Ảnh gửi Gemini không hợp lệ.");
+  if (!parsed) return fail("Ảnh gửi AI không hợp lệ.");
   if (review?.image_kind === "candidate" && review.status === "approved") return fail("Ảnh đã được duyệt; tạo lượt kiểm tra mới nếu cần.", 409);
-  const result = await analyzeProductImage({ apiKey: context.env.GEMINI_API_KEY, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
+  const result = await analyzeProductImage({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
   if (result.error) return fail(result.error, result.status || 503);
   const id = review?.id || crypto.randomUUID();
   const kind = review?.image_kind || "existing";
@@ -104,7 +104,7 @@ export async function onRequestPatch(context) {
   const db = context.env.DB;
   const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? LIMIT 1").bind(id).first().catch(() => null);
   if (!review) return fail("Không tìm thấy bản ghi kiểm duyệt.", 404);
-  if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Gemini và tìm ảnh từ bảng kiểm tra AI." });
+  if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Workers AI và tìm ảnh từ bảng kiểm tra AI." });
   if (decision === "saveSource") {
     const sourceUrl = String(body?.sourceUrl || "").trim();
     const candidateText = String(body?.candidateText || "").slice(0, 3000);
