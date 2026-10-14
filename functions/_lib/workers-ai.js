@@ -94,22 +94,45 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   } };
 }
 
+function normalizeKeywordValues(parsed) {
+  const candidates = [
+    parsed?.keywords, parsed?.searchKeywords, parsed?.search_keywords,
+    parsed?.keywordList, parsed?.keyword_list, parsed?.queries, parsed?.data?.keywords,
+    parsed?.result?.keywords, parsed?.keyword
+  ];
+  const source = candidates.find(value => Array.isArray(value) || typeof value === "string");
+  if (Array.isArray(source)) return source;
+  if (typeof source === "string") return source.split(/[\n\r,，、;；|]+/);
+  return [];
+}
+
 export async function generateSearchKeywords({ ai, imageBase64, mimeType = "image/webp", title = "", platform = "1688" }) {
   const site = platform === "taobao" ? "Taobao" : "1688";
   const prompt = [
-    "Bạn phân tích ảnh sản phẩm và gợi ý từ khóa tìm kiếm. Không truy cập web, không bịa URL hoặc sản phẩm đã tìm thấy.",
-    "Tạo tối đa 4 cụm từ khóa ngắn bằng tiếng Trung giản thể dựa trên loại sản phẩm, kiểu dáng, màu sắc và chi tiết nhìn thấy để người dùng tìm thủ công trên " + site + ".",
-    "Nếu phù hợp, phân biệt 鳄鱼皮 với 鳄鱼纹/压纹/PU; không khẳng định da thật chỉ bằng ảnh.",
-    "Tiêu đề hiện có: " + String(title || "không có").slice(0, 180) + ".",
-    "Trả JSON thuần: {keywords:string[],visualSummary:string}. Không thêm lời dẫn hoặc markdown."
+    "你是商品图片搜索关键词生成器。只根据图片中可见的商品类型、外形、颜色和细节生成关键词。",
+    "生成最多4个简体中文短语，每个短语适合在" + site + "搜索。不要声称已找到商品、价格或商品链接。",
+    "如果无法确认真鳄鱼皮，请区分鳄鱼皮、鳄鱼纹/压纹、PU/合成革，不要把纹路当成真皮证据。",
+    "现有商品标题（仅供参考）：" + String(title || "无").slice(0, 180) + "。",
+    "只输出一个JSON对象，不要Markdown或解释，严格格式：{\\"keywords\\":[\\"关键词1\\",\\"关键词2\\"],\\"visualSummary\\":\\"不超过100字的可见特征\\"}。keywords必须是字符串数组，至少1项，最多4项。"
   ].join("\n");
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 384 });
   if (output.error) return output;
-  const parsed = parseModelJson(output.text);
-  if (!parsed || !Array.isArray(parsed.keywords)) return { error: "Workers AI không trả về danh sách từ khóa đúng định dạng. Không tạo kết quả tìm kiếm giả.", status: 502, code: "WORKERS_AI_INVALID_KEYWORDS" };
-  const keywords = parsed.keywords.map(value => String(value || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 80)).filter(Boolean).slice(0, 4);
-  if (!keywords.length) return { error: "Workers AI không tạo được từ khóa đủ rõ để tìm ảnh nguồn.", status: 502, code: "WORKERS_AI_EMPTY_KEYWORDS" };
-  return { keywords, visualSummary: String(parsed.visualSummary || "").slice(0, 300), model: output.model };
+  let parsed = parseModelJson(output.text);
+  if (!parsed) {
+    const cleaned = String(output.text || "").trim().replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}\s*$/, "").trim();
+    try {
+      const array = JSON.parse(cleaned);
+      if (Array.isArray(array)) parsed = { keywords: array };
+    } catch {}
+  }
+  if (!parsed) return { error: "Workers AI không trả về JSON hợp lệ cho từ khóa tìm kiếm. Không tạo kết quả giả.", status: 502, code: "WORKERS_AI_INVALID_KEYWORDS" };
+  const keywords = [...new Set(normalizeKeywordValues(parsed)
+    .filter(value => typeof value === "string" || typeof value === "number")
+    .map(value => String(value || "").replace(/^\s*(?:[-*•]|\d+[.)、])\s*/, "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 80))
+    .filter(value => value && !/^(?:关键词|keywords?|搜索词)\s*[:：]?$/i.test(value)))].slice(0, 4);
+  if (!keywords.length) return { error: "Workers AI trả về JSON nhưng danh sách từ khóa rỗng hoặc sai định dạng.", status: 502, code: "WORKERS_AI_EMPTY_KEYWORDS" };
+  const summary = parsed.visualSummary ?? parsed.visual_summary ?? parsed.summary ?? "";
+  return { keywords, visualSummary: String(summary || "").slice(0, 300), model: output.model };
 }
 
 // Cloudflare Workers AI exposes vision-understanding models, but this project has not
