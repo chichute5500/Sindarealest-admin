@@ -85,6 +85,8 @@ const license = await runWorkersAiVision({ ai: { async run() { throw new Error("
 assert.equal(license.code, "WORKERS_AI_LICENSE_REQUIRED");
 const invalidJson = await analyzeProductImage({ ai: { async run() { return { response: "No JSON result" }; } }, imageBase64: validBase64 });
 assert.equal(invalidJson.code, "WORKERS_AI_INVALID_JSON");
+const invalidSchema = await analyzeProductImage({ ai: { async run() { return { response: JSON.stringify({ summary: "Có thể là giày", modelAssessment: "uncertain" }) }; } }, imageBase64: validBase64 });
+assert.equal(invalidSchema.code, "WORKERS_AI_INVALID_SCHEMA", "valid JSON with missing required fields must not be saved as an analysis");
 
 const candidateKey = "a".repeat(36) + "-ai.webp";
 const candidateReview = { image_kind: "candidate", status: "pending", r2_key: candidateKey, image_ref: "/media/" + candidateKey };
