@@ -104,59 +104,59 @@ export async function onRequestPost(context) {
   const prompt = [
     "Bạn là công cụ tìm kiếm sản phẩm thật trên web. Dùng ảnh đính kèm làm tham chiếu hình ảnh và tìm trang sản phẩm đang tồn tại trên sàn được chỉ định.",
     "Sàn được chỉ định: " + site + ". Chỉ tìm trang chi tiết sản phẩm thuộc miền " + site + " hoặc tên miền con chính thức của nó.",
-    "Ưu tiên mẫu giày/phụ kiện có hình dáng, đường may, đế, màu và họa tiết gần ảnh tham chiếu. Tìm kiếm web thực tế bằng Google Search grounding; không suy đoán URL, tên hàng, giá hoặc kết quả.",
+    "Ưu tiên mẫu giày/phụ kiện có hình dáng, đường may, đế, màu và họa tiết gần ảnh tham chiếu. Thực hiện Google Search grounding; không suy đoán URL, tên hàng, giá hoặc kết quả.",
     "Từ khóa sản phẩm hiện có: " + (title || "không có") + ". Ưu tiên từ khóa Trung văn liên quan như 鳄鱼皮鞋 / 真鳄鱼皮 nếu phù hợp; không gán từ khóa thật cho hàng giả/vân dập.",
-    "Chỉ liệt kê các trang sản phẩm mà công cụ tìm kiếm thực sự trả về. Nếu không tìm thấy trang đủ căn cứ trên sàn đó, hãy nói không tìm thấy; tuyệt đối không tạo dữ liệu giả.",
-    "Trả lời ngắn bằng tiếng Việt. Metadata grounding sẽ được dùng để lấy URL nguồn thực tế."
+    "Chỉ liệt kê các trang sản phẩm mà kết quả tìm kiếm thực sự trích dẫn. Nếu không tìm thấy trang đủ căn cứ trên sàn đó, hãy nói không tìm thấy; tuyệt đối không tạo dữ liệu giả.",
+    "Trả lời ngắn bằng tiếng Việt. Chỉ URL được trả về trong trích dẫn nguồn Google Search mới được xem là nguồn ứng viên."
   ].join("\n");
+  const imageMimeType = /^data:image\/webp/i.test(String(body?.imageBase64 || "")) ? "image/webp" : /^data:image\/png/i.test(String(body?.imageBase64 || "")) ? "image/png" : "image/jpeg";
   try {
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey), {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey, "Api-Revision": "2026-05-20" },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }, { inline_data: { mime_type: /^data:image\/webp/i.test(String(body?.imageBase64 || "")) ? "image/webp" : /^data:image\/png/i.test(String(body?.imageBase64 || "")) ? "image/png" : "image/jpeg", data: imageBase64 } }] }],
-        tools: [{ google_search: {} }],
-        generationConfig: { temperature: 0.1 }
+        model: "gemini-3.8-flash",
+        input: [
+          { type: "text", text: prompt },
+          { type: "image", data: imageBase64, mime_type: imageMimeType }
+        ],
+        tools: [{ type: "google_search" }]
       }),
       signal: AbortSignal.timeout(25000)
     });
     const data = await response.json().catch(() => ({}));
+    const steps = Array.isArray(data?.steps) ? data.steps : [];
+    const outputBlocks = steps.filter((step) => step?.type === "model_output").flatMap((step) => Array.isArray(step.content) ? step.content : []);
+    const outputText = outputBlocks.filter((block) => block?.type === "text").map((block) => block.text || "").join("\n");
     if (!response.ok) {
       const apiError = data?.error || {};
       const apiStatus = cleanText(apiError.status || "", 80);
-      const rawDetail = cleanText(apiError.message || "", 500);
-      // Include Google's actual diagnostic while ensuring the configured secret can never be echoed.
+      const rawDetail = cleanText(apiError.message || outputText || "", 500);
       const detail = apiKey ? rawDetail.split(apiKey).join("[đã ẩn API key]") : rawDetail;
-      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
-        return fail("Gemini Search bị giới hạn hạn mức (HTTP 429). " + (detail || "Kiểm tra RPM/RPD, hạn mức Grounding và billing trong AI Studio."), 429);
-      }
-      if (response.status === 401 || apiStatus === "UNAUTHENTICATED" || /API.?KEY_INVALID|invalid api key|api key.*invalid|reported as leaked|blocked/i.test(detail)) {
-        return fail("Gemini từ chối API key (HTTP " + response.status + "). " + (detail || "Tạo/kiểm tra key trong Google AI Studio và giới hạn key cho Gemini API."), 502);
-      }
-      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") {
-        return fail("Gemini từ chối quyền truy cập (HTTP 403). Kiểm tra key restriction, project/API access, billing và quyền sử dụng Grounding with Google Search. " + detail, 502);
-      }
-      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") {
-        return fail("Gemini từ chối định dạng yêu cầu (HTTP 400). Chi tiết Google: " + (detail || "INVALID_ARGUMENT"), 502);
-      }
-      return fail("Gemini Search trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra trạng thái dịch vụ và thử lại."), 502);
+      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") return fail("Gemini Search bị giới hạn hạn mức (HTTP 429). " + (detail || "Kiểm tra hạn mức Gemini/Google Search và billing."), 429);
+      if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return fail("Gemini từ chối API key. " + detail, 502);
+      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra key restriction, project và quyền Google Search. " + detail, 502);
+      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") return fail("Gemini Interactions API từ chối định dạng yêu cầu (HTTP 400). " + (detail || "INVALID_ARGUMENT"), 502);
+      return fail("Gemini Interactions API trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra cấu hình API."), 502);
     }
-    const candidate = data?.candidates?.[0];
-    if (!candidate) {
-      const blockReason = cleanText(data?.promptFeedback?.blockReason || data?.prompt_feedback?.block_reason || "", 100);
-      return fail("Gemini không trả về kết quả" + (blockReason ? " (blockReason: " + blockReason + ")" : "") + ". Kiểm tra nội dung ảnh/yêu cầu và thử lại.", 502);
+    if (data?.status && data.status !== "completed") {
+      return fail("Gemini Interactions API chưa hoàn tất (status: " + cleanText(data.status, 80) + "). Thử lại.", 502);
     }
-    const chunks = candidate?.groundingMetadata?.groundingChunks || candidate?.grounding_metadata?.grounding_chunks || [];
+    if (!outputBlocks.length) return fail("Gemini Interactions API không trả về nội dung kết quả. Thử lại.", 502);
     const seen = new Set();
     const grounded = [];
-    for (const chunk of chunks) {
-      const web = chunk?.web || chunk?.web?.uri ? (chunk.web || chunk) : null;
-      const uri = web?.uri || "";
-      let parsed;
-      try { parsed = new URL(uri); } catch { continue; }
-      if (!isProductUrl(parsed.href) || seen.has(parsed.href)) continue;
-      seen.add(parsed.href);
-      grounded.push({ productUrl: parsed.href, groundedTitle: cleanText(web.title || "", 300) });
+    // Interactions API returns grounded source URLs as url_citation annotations on model_output text blocks.
+    for (const block of outputBlocks) {
+      for (const annotation of (Array.isArray(block.annotations) ? block.annotations : [])) {
+        if (annotation?.type !== "url_citation") continue;
+        const uri = annotation.url || "";
+        let parsed;
+        try { parsed = new URL(uri); } catch { continue; }
+        if (!isProductUrl(parsed.href) || seen.has(parsed.href)) continue;
+        seen.add(parsed.href);
+        grounded.push({ productUrl: parsed.href, groundedTitle: cleanText(annotation.title || "", 300) });
+        if (grounded.length >= 10) break;
+      }
       if (grounded.length >= 10) break;
     }
     const results = await Promise.all(grounded.slice(0, 6).map(async (item) => {
