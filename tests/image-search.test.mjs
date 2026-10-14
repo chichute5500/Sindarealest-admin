@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { assessCrocodileMaterial, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage } from "../functions/_lib/gemini.js";
+import { canServeAiCandidate } from "../functions/media/[key].js";
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
 const inventory = inventoryImages([
   { id: "p1", sku: "SD001", title: "Giày 1", category: "dress-shoes", images_json: '["images/a.webp","images/b.webp"]' },
@@ -17,4 +18,10 @@ assert.equal(assessCrocodileMaterial("giày da cá sấu thật").status, "revie
 assert.equal(assessCrocodileMaterial("giày da").status, "review");
 assert.ok((await analyzeProductImage({ apiKey: "", imageBase64: "abc" })).error);
 assert.ok((await analyzeProductImage({ apiKey: "x".repeat(20), imageBase64: "abc" })).error);
-console.log("PASS: image inventory, duplicate references, material safeguards, Gemini input validation");
+const candidateKey = "a".repeat(36) + "-ai.webp";
+const candidateReview = { image_kind: "candidate", status: "pending", r2_key: candidateKey, image_ref: "/media/" + candidateKey };
+assert.equal(canServeAiCandidate(candidateReview), false, "pending AI candidate must not be public");
+assert.equal(canServeAiCandidate({ ...candidateReview, status: "rejected" }), false, "rejected AI candidate must not be public");
+assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved" }), true, "approved AI candidate may be public");
+assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image_ref: "/media/other.webp" }), false, "mismatched image reference must be blocked");
+console.log("PASS: image inventory, material safeguards, Gemini validation, AI candidate publication gate");
