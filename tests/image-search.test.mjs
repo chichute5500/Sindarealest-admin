@@ -3,6 +3,7 @@ import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, norm
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../functions/_lib/ai-quota.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
+import { normalizeElimapiProducts, searchElimapiProducts } from "../functions/_lib/elimapi.js";
 
 assert.equal(WORKERS_AI_VISION_MODEL, "@cf/meta/llama-3.2-11b-vision-instruct");
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
@@ -101,7 +102,9 @@ assert.match(adminHtml, /Chưa có mô hình so khớp thị giác chuyên biệ
 assert.doesNotMatch(adminHtml, /window\\.__sdAiInventoryAutoScanned/, "Opening the AI tab must not auto-scan");
 const imageSearchSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
 assert.match(imageSearchSource, /consumeWorkersAiRequest/);
-assert.match(imageSearchSource, /isSearchPage: true/);
+assert.match(imageSearchSource, /searchElimapiProducts/);
+assert.match(imageSearchSource, /ELIMAPI_API_KEY/);
+assert.doesNotMatch(imageSearchSource, /https:\/\/s\.taobao\.com\/search|https:\/\/s\.1688\.com\/selloffer/);
 assert.doesNotMatch(imageSearchSource, /GEMINI_API_KEY|google_search|NEXSCOPE/);
 const auditSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
 assert.match(auditSource, /saveSource/);
@@ -110,4 +113,49 @@ assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/a
 assert.equal(typeof consumeWorkersAiRequest, "function");
 assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRequestGet, "function");
 
-console.log("PASS: Workers AI vision input/output, one-call quota behavior, JSON validation, Chinese search keywords, fail-closed 90% gate, material screening, D1 inventory, and manual image approval.");
+
+const normalizedAliases = await generateSearchKeywords({
+  ai: { async run() { return { response: 'Here are keywords: ```json\\n{"searchKeywords":"1. 鳄鱼皮男鞋，复古皮鞋\\n鳄鱼皮钱包","visual_summary":"深棕色皮鞋"}\\n```' }; } },
+  imageBase64: validBase64, mimeType: "image/jpeg", platform: "taobao"
+});
+assert.deepEqual(normalizedAliases.keywords, ["鳄鱼皮男鞋", "复古皮鞋", "鳄鱼皮钱包"]);
+assert.equal(normalizedAliases.visualSummary, "深棕色皮鞋");
+
+const normalizedProducts = normalizeElimapiProducts({
+  paginate: { total: 1 },
+  items: [{
+    id: "12345", title: "真鳄鱼皮鞋", title_en: "Genuine crocodile leather shoes",
+    promotion_price: "288.00", price: "318.00",
+    original_product_url: "https://item.taobao.com/item.htm?id=12345",
+    img_urls: ["https://img.alicdn.com/example.jpg"], shop_name: "Demo shop"
+  }]
+}, "taobao");
+assert.equal(normalizedProducts.length, 1);
+assert.equal(normalizedProducts[0].price, "288.00");
+assert.equal(normalizedProducts[0].currency, "CNY");
+assert.equal(normalizedProducts[0].productUrl, "https://item.taobao.com/item.htm?id=12345");
+assert.equal(normalizedProducts[0].imageUrl, "https://img.alicdn.com/example.jpg");
+assert.equal(normalizedProducts[0].eligible, false, "real source results must not be auto-approved without calibrated visual matching");
+const unsafeUrl = normalizeElimapiProducts({ items: [{ id: "987", title: "Test", url: "javascript:alert(1)", price: 12 }] }, "1688");
+assert.equal(unsafeUrl[0].productUrl, "https://detail.1688.com/offer/987.html", "unsafe or off-platform product URLs are replaced with a safe platform URL");
+assert.equal(unsafeUrl[0].price, "12");
+
+let elimapiRequest;
+const elimapiResult = await searchElimapiProducts({
+  apiKey: "test-key",
+  platform: "1688",
+  query: "鳄鱼皮鞋",
+  fetchImpl: async (url, options) => {
+    elimapiRequest = { url, options };
+    return { ok: true, status: 200, async json() { return { paginate: { total: 1 }, items: [{ id: "offer001", title: "真鳄鱼皮鞋", price: 88 }] }; } };
+  }
+});
+assert.equal(elimapiResult.products.length, 1);
+assert.equal(elimapiRequest.url, "https://openapi.elim.asia/v2/products/search");
+assert.equal(elimapiRequest.options.headers["x-api-key"], "test-key");
+assert.equal(JSON.parse(elimapiRequest.options.body).platform, "alibaba");
+assert.equal(JSON.parse(elimapiRequest.options.body).q, "鳄鱼皮鞋");
+const noElimapiKey = await searchElimapiProducts({ apiKey: "", platform: "taobao", query: "鞋" });
+assert.equal(noElimapiKey.code, "ELIMAPI_KEY_MISSING");
+
+console.log("PASS: Workers AI keyword normalization, Elimapi product/price mapping, API authentication handling, safe source URLs, fail-closed 90% gate, material screening, D1 inventory, and manual image approval.");
