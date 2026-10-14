@@ -63,7 +63,9 @@ export async function onRequestPost(context) {
     if (sourceUrl && !referenceImageRef) return fail("Thiếu ảnh gốc được dùng để tìm ứng viên.", 422);
     const parsed = parseDataImage(body?.dataUrl);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ứng viên phải là WebP hợp lệ.");
-    const bytes = Uint8Array.from(atob(parsed.base64), c => c.charCodeAt(0));
+    let bytes;
+    try { bytes = Uint8Array.from(atob(parsed.base64), c => c.charCodeAt(0)); }
+    catch { return fail("Nội dung base64 của ảnh không hợp lệ.", 400); }
     if (bytes.length === 0 || bytes.length > 5 * 1024 * 1024) return fail("Ảnh phải nhỏ hơn hoặc bằng 5 MB.", 413);
     if (bytes.length < 12 || new TextDecoder().decode(bytes.slice(0,4)) !== "RIFF" || new TextDecoder().decode(bytes.slice(8,12)) !== "WEBP") return fail("Nội dung tệp không phải WebP.");
     const key = crypto.randomUUID() + "-ai.webp";
