@@ -90,7 +90,7 @@ const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
 check(imageSearchApi.includes('isMarketplaceHost'), 'API tìm ảnh chưa giới hạn URL nguồn Taobao/1688');
-check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('GEMINI_API_KEY') && imageSearchApi.includes('google_search') && !imageSearchApi.includes('NEXSCOPE'), 'API tìm ảnh phải dùng Gemini Search grounding, không phụ thuộc Nexscope hay điểm tương đồng do nhà cung cấp khai');
+check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('GEMINI_API_KEY') && imageSearchApi.includes('consumeGeminiRequest') && imageSearchApi.includes('isSearchPage') && !imageSearchApi.includes('google_search') && !imageSearchApi.includes('NEXSCOPE'), 'API tìm ảnh phải dùng Gemini vision theo gói miễn phí, giới hạn quota và không giả lập URL sản phẩm');
 const imageAuditLib = existsSync(join(root, 'functions/_lib/image-audit.js')) ? readFileSync(join(root, 'functions/_lib/image-audit.js'), 'utf8') : '';
 check(imageAuditLib.includes('score >= 90') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt ảnh thiếu ngưỡng 90%, từ khóa hoặc loại trừ giả da');
 
@@ -109,7 +109,7 @@ const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(joi
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
 const adminHtml = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
-check(adminHtml.includes('data-view="ai"') && adminHtml.includes('window.__sdAiInventoryAutoScanned'), 'Tab AI chưa được thêm hoặc chưa tự quét kho ảnh');
+check(adminHtml.includes('data-view="ai"') && !adminHtml.includes('window.__sdAiInventoryAutoScanned') && adminHtml.includes('Nhấn “Quét toàn bộ ảnh”'), 'Tab AI phải tồn tại nhưng không tự động quét khi mở');
 const endpointMap = {
   '/api/admin/login': 'functions/api/admin/login.js',
   '/api/admin/logout': 'functions/api/admin/logout.js',
