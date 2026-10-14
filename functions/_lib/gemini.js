@@ -13,10 +13,9 @@ async function runVision(ai, prompt, image) {
     return { error: "Chưa cấu hình Workers AI binding AI cho môi trường Preview/Production.", status: 503 };
   }
   try {
-    // Cloudflare's model API supports the direct prompt+image input shape.
-    // Keep messages as a compatibility field for Workers AI SDK variants and tests.
+    // Follow Cloudflare's documented Llama Vision tutorial shape: messages + data-URL image.
+    // Do not send both prompt and messages; the model schema accepts alternative input shapes.
     const result = await ai.run(VISION_MODEL, {
-      prompt,
       messages: [
         { role: "system", content: "You analyze product photos carefully and return only the requested output." },
         { role: "user", content: prompt }
@@ -26,7 +25,12 @@ async function runVision(ai, prompt, image) {
       max_tokens: 900
     });
     const raw = extractResponseText(result).trim();
-    if (!raw) return { error: "Workers AI không trả về nội dung phân tích ảnh.", status: 502 };
+    if (!raw) {
+      return {
+        error: "Workers AI trả về phản hồi rỗng. Kiểm tra đã chấp nhận Meta License/Acceptable Use Policy cho mô hình Llama 3.2 Vision trong Cloudflare chưa; tài liệu yêu cầu bước này trước lần dùng đầu tiên.",
+        status: 502
+      };
+    }
     return { raw };
   } catch (error) {
     const message = String(error?.message || "");
