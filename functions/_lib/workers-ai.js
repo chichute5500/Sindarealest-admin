@@ -23,7 +23,7 @@ function decodeImage(imageBase64, mimeType) {
   } catch {
     return { error: "Không giải mã được dữ liệu ảnh.", status: 400 };
   }
-  return { bytes, mimeType: mime };
+  return { bytes, mimeType: mime, base64 };
 }
 
 function classifyAiError(error) {
@@ -42,7 +42,7 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
   try {
     const result = await ai.run(WORKERS_AI_VISION_MODEL, {
       prompt: String(prompt || "").slice(0, 12000),
-      image: Array.from(image.bytes),
+      image: `data:${image.mimeType};base64,${image.base64}`,
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
       temperature: 0.1
     });
@@ -113,7 +113,9 @@ export async function generateSearchKeywords({ ai, imageBase64, mimeType = "imag
     "生成最多4个简体中文短语，每个短语适合在" + site + "搜索。不要声称已找到商品、价格或商品链接。",
     "如果无法确认真鳄鱼皮，请区分鳄鱼皮、鳄鱼纹/压纹、PU/合成革，不要把纹路当成真皮证据。",
     "现有商品标题（仅供参考）：" + String(title || "无").slice(0, 180) + "。",
-    "只输出一个JSON对象，不要Markdown或解释。字段必须是 keywords（1到4个字符串组成的数组）和 visualSummary（不超过100字的可见特征摘要）。",
+    "Return exactly one valid JSON object and nothing else. Do not use Markdown fences, explanations, headings, or prose before/after the JSON.",
+    "The JSON must have exactly these fields: keywords (an array of 1 to 4 short Simplified Chinese search phrases) and visualSummary (a short visible-feature summary of at most 100 Chinese characters).",
+    "Example shape only: {\\"keywords\\":[\\"棕色男士皮鞋\\",\\"鳄鱼纹压花皮鞋\\"],\\"visualSummary\\":\\"棕色皮鞋，圆头，压纹鞋面\\"}. Never copy the example unless those details are actually visible in the provided image."
   ].join("\n");
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 384 });
   if (output.error) return output;
