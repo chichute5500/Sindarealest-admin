@@ -19,6 +19,8 @@ assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 ·
 assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setup must apply admin notification migration');
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty metadata migration');
 assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setup must apply the OTP removal migration');
+assert.ok(setupScript.includes('scripts/apply-ai-image-migrations.mjs') && setupScript.includes('CLOUDFLARE_D1_DATABASE: database'), 'Setup must apply AI image schema and request-limit migrations to the selected D1');
+assert.ok(setupScript.indexOf('applyAiImageMigrations(dbName)') < setupScript.indexOf("'\\n5/5 · Triển khai website cùng Pages Functions…'"), 'AI image schema must be applied before deployment');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_verifications/.test(setupScript), 'Setup must not depend on obsolete OTP/SMS configuration or tables');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
