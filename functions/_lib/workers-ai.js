@@ -171,12 +171,20 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     materialAssessment: ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"],
     confidence: ["low", "medium", "high"]
   };
-  const validSchema = typeof parsed.summary === "string" && parsed.summary.trim().length > 0 &&
-    Array.isArray(parsed.visibleFeatures) && parsed.visibleFeatures.every(value => typeof value === "string") &&
-    Array.isArray(parsed.reasons) && parsed.reasons.every(value => typeof value === "string") &&
+  const validSummary = typeof parsed.summary === "string" &&
+    parsed.summary.trim().length >= 20 &&
+    !/có thể là một sản phẩm thuộc danh mục|dựa trên hình ảnh|chưa có mô tả/i.test(parsed.summary);
+  const validFeatures = Array.isArray(parsed.visibleFeatures) &&
+    parsed.visibleFeatures.length >= 3 && parsed.visibleFeatures.length <= 6 &&
+    parsed.visibleFeatures.every(value => typeof value === "string" && value.trim().length >= 3);
+  const validReasons = Array.isArray(parsed.reasons) &&
+    parsed.reasons.length >= 2 && parsed.reasons.length <= 5 &&
+    parsed.reasons.every(value => typeof value === "string" && value.trim().length >= 8 &&
+      !/lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm/i.test(value));
+  const validSchema = validSummary && validFeatures && validReasons &&
     typeof parsed.needsHumanReview === "boolean" &&
     Object.entries(allowed).every(([key, values]) => values.includes(parsed[key]));
-  if (!validSchema) return { error: "Workers AI trả về JSON nhưng sai cấu trúc hoặc thiếu trường bắt buộc. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_SCHEMA" };
+  if (!validSchema) return { error: "Workers AI trả về JSON nhưng thiếu quan sát cụ thể, lý do đủ rõ hoặc sai cấu trúc bắt buộc. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_SCHEMA" };
   return { analysis: {
     summary: String(parsed.summary || "Chưa có mô tả").slice(0, 800),
     visibleFeatures: Array.isArray(parsed.visibleFeatures) ? parsed.visibleFeatures.slice(0, 12).map(x => String(x).slice(0, 160)) : [],
