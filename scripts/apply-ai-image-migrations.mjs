@@ -32,4 +32,9 @@ if (column.status !== 0 && !/duplicate column name:\s*source_url/i.test(column.o
   throw new Error(`Không thể đồng bộ cột source_url trên D1 ${database}:\n${column.output}`);
 }
 
-console.log(`D1 ${database}: image_ai_reviews và source_url đã được kiểm tra/áp dụng.`);
+const quotaTable = execute([...baseArgs, "--file=migrations/0009_ai_request_limits.sql"]);
+if (quotaTable.status !== 0) {
+  throw new Error(`Không áp dụng được migration 0009 trên D1 ${database}:\n${quotaTable.output}`);
+}
+
+console.log(`D1 ${database}: image_ai_reviews, source_url và bộ giới hạn Gemini đã được kiểm tra/áp dụng.`);
