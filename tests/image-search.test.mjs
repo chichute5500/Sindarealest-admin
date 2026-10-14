@@ -76,7 +76,7 @@ const proseKeywordResult = await suggestMarketplaceImageKeywords({
   category: "loafers"
 });
 assert.ok(proseKeywordResult.keywords.length >= 2, "Chinese prose without JSON should recover search keywords instead of stopping the search");
-assert.ok(proseKeywordResult.keywords.every((keyword) => /[\\u3400-\\u9fff]/.test(keyword)), "recovered keywords must contain Chinese characters");
+assert.ok(proseKeywordResult.keywords.every((keyword) => /[\u3400-\u9fff]/.test(keyword)), "recovered keywords must contain Chinese characters");
 
 const unusableKeywordResult = await suggestMarketplaceImageKeywords({
   ai: { run: async () => ({ response: "I cannot output JSON." }) },
