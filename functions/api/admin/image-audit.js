@@ -114,6 +114,17 @@ export async function onRequestPatch(context) {
   if (review.status === "approved") return json({ ok: true, message: "Ảnh này đã được duyệt trước đó." });
   const product = await getProduct(db, review.product_id);
   if (!product) return fail("Sản phẩm không còn tồn tại.", 404);
+  const noStorage = storageOrFail(context.env);
+  if (noStorage) return noStorage;
+  if (!review.r2_key || !review.r2_key.endsWith("-ai.webp") || review.image_ref !== "/media/" + review.r2_key) {
+    return fail("Tham chiếu ảnh ứng viên không hợp lệ.", 409);
+  }
+  try {
+    const candidate = await context.env.IMAGES.head(review.r2_key);
+    if (!candidate) return fail("Không tìm thấy tệp ảnh trong R2; chưa thể duyệt.", 404);
+  } catch {
+    return fail("Không thể xác minh tệp ảnh trong R2.", 503);
+  }
   let images = [];
   try { images = JSON.parse(product.images_json || "[]"); } catch {}
   if (!Array.isArray(images)) images = [];
