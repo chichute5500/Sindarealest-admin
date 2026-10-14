@@ -96,8 +96,30 @@ const nestedError = await runWorkersAiVision({
   prompt: "test", imageBase64: validBase64
 });
 assert.equal(nestedError.code, "WORKERS_AI_REQUEST_FAILED");
-const invalidJson = await analyzeProductImage({ ai: { async run() { return { response: "No JSON result" }; } }, imageBase64: validBase64 });
+let invalidJsonDiagnostic = "";
+const originalWarn = console.warn;
+console.warn = (...args) => { invalidJsonDiagnostic += args.join(" "); };
+let invalidJson;
+try {
+  invalidJson = await analyzeProductImage({ ai: { async run() { return { response: "Model output was unexpectedly plain text, not JSON." }; } }, imageBase64: validBase64 });
+} finally {
+  console.warn = originalWarn;
+}
 assert.equal(invalidJson.code, "WORKERS_AI_INVALID_JSON");
+assert.match(invalidJsonDiagnostic, /workers_ai_invalid_json/, "invalid JSON must emit a diagnostic event");
+assert.match(invalidJsonDiagnostic, /unexpectedly plain text/, "diagnostic must include a short sanitized preview of model output");
+assert.match(invalidJsonDiagnostic, /responseLength/, "diagnostic must include the response length");
+let responseDiagnostic = "";
+const originalInfo = console.info;
+console.info = (...args) => { responseDiagnostic += args.join(" "); };
+try {
+  await runWorkersAiVision({ ai: { async run() { return { response: { text: "nested model output preview" } }; } }, prompt: "test", imageBase64: validBase64 });
+} finally {
+  console.info = originalInfo;
+}
+assert.match(responseDiagnostic, /selectedTextField/);
+assert.match(responseDiagnostic, /response\.text/);
+assert.match(responseDiagnostic, /nested model output preview/, "diagnostic must include preview for nested text envelopes");
 const invalidSchema = await analyzeProductImage({ ai: { async run() { return { response: JSON.stringify({ summary: "Có thể là giày", modelAssessment: "uncertain" }) }; } }, imageBase64: validBase64 });
 assert.equal(invalidSchema.code, "WORKERS_AI_INVALID_SCHEMA", "valid JSON with missing required fields must not be saved as an analysis");
 
