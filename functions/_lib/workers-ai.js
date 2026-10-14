@@ -71,6 +71,11 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       resultStringLength: typeof result === "string" ? result.length : null,
       responseType: typeof result?.response,
       responseLength: typeof result?.response === "string" ? result.response.length : null,
+      responseKeys: result?.response && typeof result.response === "object" ? Object.keys(result.response).slice(0, 20) : [],
+      responseNestedTextLength: typeof result?.response?.response === "string" ? result.response.response.length : null,
+      responseTextLength: typeof result?.response?.text === "string" ? result.response.text.length : null,
+      responseOutputTextLength: typeof result?.response?.output_text === "string" ? result.response.output_text.length : null,
+      responsePreview: typeof result?.response === "string" && result.response.trim() ? sanitizeAiErrorMessage(result.response).slice(0, 180) : null,
       resultFieldType: typeof result?.result,
       resultFieldLength: typeof result?.result === "string" ? result.result.length : null,
       nestedResultKeys: result?.result && typeof result.result === "object" ? Object.keys(result.result).slice(0, 30) : [],
@@ -81,9 +86,14 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
     const candidates = [
       typeof result === "string" ? result : null,
       result?.response,
+      result?.response?.response,
+      result?.response?.result,
+      result?.response?.text,
+      result?.response?.output_text,
       result?.result,
       result?.result?.response,
       result?.result?.result,
+      result?.result?.text,
       result?.output_text,
       result?.text
     ];
