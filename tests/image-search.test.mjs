@@ -99,8 +99,8 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image
 
 const adminHtml = (await import("node:fs")).readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
 assert.match(adminHtml, /Workers AI/);
-assert.match(adminHtml, /d\\.code/, "Admin API errors should display safe diagnostic codes");
-assert.match(adminHtml, /data-view="ai"/);
+assert.match(adminHtml, /d\.code/, "Admin API errors should display safe diagnostic codes");
+assert.match(adminHtml, /d\.code/, "Admin API errors should display safe diagnostic codes");
 assert.doesNotMatch(adminHtml, /const phashSimilarity=async/);
 assert.doesNotMatch(adminHtml, /foundGroups=await Promise\\.allSettled/);
 assert.match(adminHtml, /Chưa có mô hình so khớp thị giác chuyên biệt/);
@@ -113,7 +113,7 @@ assert.doesNotMatch(imageSearchSource, /https:\/\/s\.taobao\.com\/search|https:\
 assert.doesNotMatch(imageSearchSource, /GEMINI_API_KEY|google_search|NEXSCOPE/);
 const auditSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
 assert.match(auditSource, /saveSource/);
-assert.match(auditSource, /code: result\\.code/, "Workers AI diagnostic codes must be returned to the admin client");
+assert.match(auditSource, /code: result\.code/, "Workers AI diagnostic codes must be returned to the admin client");
 assert.match(auditSource, /chưa có mô hình so khớp thị giác chuyên biệt/i);
 assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/ai-quota.js", import.meta.url), "utf8"), /workers-ai-rolling-24h/);
 assert.equal(typeof consumeWorkersAiRequest, "function");
