@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
+import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../functions/_lib/ai-quota.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
@@ -7,6 +7,15 @@ import { normalizeElimapiProducts, searchElimapiProducts } from "../functions/_l
 
 assert.equal(WORKERS_AI_VISION_MODEL, "@cf/meta/llama-3.2-11b-vision-instruct");
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
+assert.equal(isAllowedSourceProductUrl("https://item.taobao.com/item.htm?id=12345"), true);
+assert.equal(isAllowedSourceProductUrl("https://detail.1688.com/offer/offer001.html"), true);
+assert.equal(isAllowedSourceProductUrl("javascript:alert(1)"), false);
+assert.equal(isAllowedSourceProductUrl("https://item.taobao.com.evil.example/item.htm?id=12345"), false);
+assert.equal(isAllowedSourceProductUrl("https://detail.1688.com/search?foo=bar"), false);
+assert.equal(isAllowedSourceImageUrl("https://img.alicdn.com/example.jpg"), true);
+assert.equal(isAllowedSourceImageUrl("http://img.alicdn.com/example.jpg"), false);
+assert.equal(isAllowedSourceImageUrl("https://example.com/pixel.jpg"), false);
+assert.equal(isAllowedSourceImageUrl("https://alicdn.com.evil.example/pixel.jpg"), false);
 const inventory = inventoryImages([
   { id: "p1", sku: "SD001", title: "Giày 1", category: "dress-shoes", images_json: '["images/a.webp","images/b.webp"]' },
   { id: "p2", sku: "SD002", title: "Giày 2", category: "loafers", images_json: '["images/a.webp"]' }
@@ -36,6 +45,31 @@ assert.equal(parseModelJson('before {"broken": } then {"valid":true} after').val
 assert.equal(compareProductImages().available, false);
 assert.equal(compareProductImages().similarityScore, null);
 assert.equal(compareProductImages().eligible, false);
+let comparisonCalls = 0;
+const pairComparison = await compareProductImages({
+  ai: { async run(model, input) {
+    comparisonCalls++;
+    assert.equal(model, WORKERS_AI_VISION_MODEL);
+    assert.ok(input.prompt.includes("BÊN TRÁI = ảnh gốc"));
+    assert.ok(input.prompt.includes("Do not return any numeric similarity score"));
+    return { response: JSON.stringify({
+      verdict: "same_model_likely",
+      similarities: ["Cùng dáng mũi giày"],
+      differences: ["Góc chụp khác nhau"],
+      confidence: "medium",
+      summary: "Hai ảnh có dáng và đường may tương đồng; cần kiểm tra thủ công.",
+      needsHumanReview: true
+    }) };
+  } },
+  imageBase64: "aGVsbG8=", mimeType: "image/webp", title: "Giày", sku: "SD001"
+});
+assert.equal(comparisonCalls, 1, "one qualitative image comparison requires one Workers AI call");
+assert.equal(pairComparison.available, true);
+assert.equal(pairComparison.verdict, "same_model_likely");
+assert.equal(pairComparison.similarityScore, null, "qualitative comparison must not fabricate a percentage");
+assert.equal(pairComparison.calibrated, false);
+assert.equal(pairComparison.eligible, false, "qualitative comparison must never auto-approve a candidate");
+assert.equal(pairComparison.needsHumanReview, true);
 
 const validBase64 = "aGVsbG8=";
 let calls = 0;
@@ -168,6 +202,12 @@ assert.match(adminHtml, /data-view="ai"/);
 assert.doesNotMatch(adminHtml, /const phashSimilarity=async/);
 assert.doesNotMatch(adminHtml, /foundGroups=await Promise\\.allSettled/);
 assert.match(adminHtml, /Chưa có mô hình so khớp thị giác chuyên biệt/);
+assert.match(adminHtml, /data-download-candidate/);
+assert.match(adminHtml, /data-reference-image-ref/);
+assert.match(adminHtml, /data-ai-compare/);
+assert.match(adminHtml, /api\\/admin\\/image-candidate\\?reviewId=/);
+assert.match(adminHtml, /sourceImageUrl/);
+assert.match(adminHtml, /referenceImageRef/);
 assert.doesNotMatch(adminHtml, /window\\.__sdAiInventoryAutoScanned/, "Opening the AI tab must not auto-scan");
 const imageSearchSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
 assert.match(imageSearchSource, /consumeWorkersAiRequest/);
@@ -182,6 +222,19 @@ assert.match(auditSource, /chưa có mô hình so khớp thị giác chuyên bi�
 assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/ai-quota.js", import.meta.url), "utf8"), /workers-ai-rolling-24h/);
 assert.equal(typeof consumeWorkersAiRequest, "function");
 assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRequestGet, "function");
+assert.equal(typeof (await import("../functions/api/admin/image-candidate.js")).onRequestGet, "function");
+const imageSearchSourceText = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
+assert.match(imageSearchSourceText, /imageRef/);
+assert.match(imageSearchSourceText, /ownedImages\\.some/);
+const auditSourceText = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
+assert.match(auditSourceText, /reference_image_ref/);
+assert.match(auditSourceText, /source_image_url/);
+assert.match(auditSourceText, /compareCandidate/);
+assert.match(auditSourceText, /isAllowedSourceProductUrl/);
+assert.match(auditSourceText, /isAllowedSourceImageUrl/);
+const migrations = (await import("node:fs")).readFileSync(new URL("../migrations/0010_ai_image_source_image_url.sql", import.meta.url), "utf8");
+assert.match(migrations, /ADD COLUMN source_image_url/);
+assert.match(migrations, /ADD COLUMN reference_image_ref/);
 
 
 const normalizedAliases = await generateSearchKeywords({
