@@ -66,7 +66,7 @@ export async function analyzeProductImage({ apiKey, imageBase64, mimeType = "ima
       needsHumanReview: parsed.needsHumanReview !== false
     }};
   } catch (error) {
-    if (error?.name === "TimeoutError" || error?.name === "AbortError") return { error: "Gemini hết thời gian chờ sau 25 giây. Không tự động thử lại để bảo vệ quota.", status: 504 };
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") return { error: "Gemini hết thời gian chờ sau 45 giây. Không tự động thử lại để bảo vệ quota.", status: 504 };
     return { error: "Không kết nối được Gemini Interactions API. " + String(error?.message || "").slice(0, 200), status: 502 };
   }
 }
