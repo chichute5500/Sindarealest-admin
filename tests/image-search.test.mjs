@@ -48,6 +48,14 @@ const wrappedJsonKeywordResult = await suggestMarketplaceImageKeywords({
   imageBase64: "YWJj"
 });
 assert.deepEqual(wrappedJsonKeywordResult.keywords, ["黑色乐福鞋", "黑色男鞋"], "Workers AI JSON surrounded by prose and markdown fences should be recovered");
+
+const malformedButRecoverableKeywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({
+    response: 'Result: {keywords: ["黑色乐福鞋", "黑色男鞋",], visualSummary: "黑色皮鞋",}'
+  }) },
+  imageBase64: "YWJj"
+});
+assert.deepEqual(malformedButRecoverableKeywordResult.keywords, ["黑色乐福鞋", "黑色男鞋"], "Common trailing commas and unquoted JSON keys should be recovered");
 const malformedKeywordResult = await suggestMarketplaceImageKeywords({
   ai: { run: async () => ({ response: '我认为这是一双黑色鞋子，但无法按 JSON 输出。' }) },
   imageBase64: "YWJj"
