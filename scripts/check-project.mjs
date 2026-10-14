@@ -103,7 +103,7 @@ check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'A
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
-check(imageTests.includes('saveSource') && imageTests.includes('isMarketplaceHost'), 'Thiếu kiểm thử lưu URL nguồn Taobao/1688');
+check(imageTests.includes('saveSource') && imageTests.includes('google_search') && imageTests.includes('NEXSCOPE'), 'Thiếu kiểm thử Gemini Search hoặc xác nhận loại bỏ Nexscope');
 check(imageTests.includes('missing similarity score must fail closed') && imageTests.includes('crocodile keyword is mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
