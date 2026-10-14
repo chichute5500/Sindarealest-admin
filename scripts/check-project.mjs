@@ -88,7 +88,6 @@ const aiReviewMigration = existsSync(join(root, 'migrations/0007_ai_image_review
 check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 thiếu hàng đợi kiểm duyệt ảnh AI');
 const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source_url.sql')) ? readFileSync(join(root, 'migrations/0008_ai_image_source_url.sql'), 'utf8') : '';
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
-check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'API kiểm duyệt AI chưa lưu/đọc URL nguồn ảnh');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
 check(imageSearchApi.includes('isSupportedSourceUrl'), 'API tìm ảnh chưa giới hạn URL nguồn Taobao/1688');
 const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
@@ -96,6 +95,7 @@ check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_a
 check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duyệt không bị chặn khỏi endpoint media');
 check(mediaRoute.includes('private, no-store'), 'Ảnh ứng viên AI chưa được đặt Cache-Control no-store');
 const aiAuditApi = existsSync(join(root, 'functions/api/admin/image-audit.js')) ? readFileSync(join(root, 'functions/api/admin/image-audit.js'), 'utf8') : '';
+check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'API kiểm duyệt AI chưa lưu/đọc URL nguồn ảnh');
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
