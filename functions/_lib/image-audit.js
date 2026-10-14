@@ -36,3 +36,46 @@ export function assessCrocodileMaterial(text) {
   if (realEvidence) return { status: "review", reason: "Có từ khóa da cá sấu nhưng cần bằng chứng xác nhận chất liệu thật." };
   return { status: "review", reason: "Chưa có đủ bằng chứng xác minh chất liệu da cá sấu thật." };
 }
+
+
+const CROCODILE_KEYWORDS = [
+  /\\bda\\s+c[aá]\\s+s[aá]u\\b/i,
+  /\\bgi[aà]y\\s+c[aá]\\s+s[aá]u\\b/i,
+  /\\bc[aá]\\s+s[aá]u\\b/i,
+  /鳄鱼皮/, /鳄鱼皮鞋/, /真鳄鱼/, /真皮鳄鱼/, /鳄鱼/
+];
+
+function normalizeSearchText(value) {
+  return String(value || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+}
+
+export function extractSimilarityScore(item) {
+  const keys = ["similarityScore", "similarity_score", "imageSimilarity", "image_similarity", "matchScore", "match_score", "similarity"];
+  for (const key of keys) {
+    const value = item?.[key];
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+      return value <= 1 ? Math.round(value * 10000) / 100 : Math.round(value * 100) / 100;
+    }
+    if (typeof value === "string" && value.trim() && /^\\d+(?:\\.\\d+)?%?$/.test(value.trim())) {
+      const numeric = Number(value.trim().replace(/%$/, ""));
+      if (Number.isFinite(numeric) && numeric >= 0) return value.trim().endsWith("%") || numeric > 1 ? Math.round(numeric * 100) / 100 : Math.round(numeric * 10000) / 100;
+    }
+  }
+  return null;
+}
+
+export function evaluateSearchCandidate({ title = "", description = "", material = "", properties = "", similarityScore = null } = {}) {
+  const combined = [title, description, material, properties].filter(Boolean).join(" ");
+  const normalized = normalizeSearchText(combined);
+  const hasKeyword = CROCODILE_KEYWORDS.some((pattern) => pattern.test(combined)) ||
+    /\\b(?:da|giay)\\s+ca\\s+sau\\b|\\bca\\s+sau\\b/.test(normalized);
+  const materialCheck = assessCrocodileMaterial(combined);
+  const score = typeof similarityScore === "number" && Number.isFinite(similarityScore) ? similarityScore : null;
+  let reason = "";
+  if (materialCheck.status === "reject") reason = materialCheck.reason;
+  else if (!hasKeyword) reason = "Không có từ khóa bắt buộc về da cá sấu trong thông tin sản phẩm nguồn.";
+  else if (score === null) reason = "Dịch vụ không cung cấp điểm tương đồng ảnh đáng tin cậy; chưa thể xác minh ngưỡng 90%.";
+  else if (score < 90) reason = "Điểm tương đồng ảnh thấp hơn ngưỡng bắt buộc 90%.";
+  else reason = "Đạt ngưỡng điểm và từ khóa; chất liệu da thật vẫn cần người quản trị xác minh.";
+  return { eligible: materialCheck.status !== "reject" && hasKeyword && score !== null && score >= 90, similarityScore: score, hasKeyword, materialCheck, reason };
+}
