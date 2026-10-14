@@ -71,5 +71,5 @@ assert.doesNotMatch(geminiSource, /gemini-2\.5-flash:generateContent/);
 assert.doesNotMatch(geminiSource, /google_search/);
 const quotaSource = (await import("../functions/_lib/ai-quota.js")).consumeGeminiRequest.toString();
 assert.match(quotaSource, /gemini-rolling-24h/);
-assert.match(quotaSource, /gemini-10-seconds/);
+assert.match(quotaSource, /gemini-15-seconds/);
 console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, AI publication gate");
