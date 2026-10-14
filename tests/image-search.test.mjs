@@ -57,15 +57,15 @@ const analyzed = await analyzeProductImage({ ai, imageBase64: validBase64, mimeT
 assert.ok(analyzed.analysis);
 assert.equal(calls, 1, "one Workers AI request per analysis");
 assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
-assert.ok(capturedInput.messages[0].content.includes("Không tạo phần trăm tương đồng ảnh"));
-assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
+assert.ok(capturedInput.messages[0].content[0].text.includes("Không tạo phần trăm tương đồng ảnh"));
+assert.deepEqual(capturedInput.messages[0].content[1], { type: "image_url", image_url: { url: "data:image/webp;base64,aGVsbG8=" } }, "vision image is passed as a multimodal message content part");
 assert.equal(capturedInput.temperature, 0.1);
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
 
 calls = 0;
 const search = await generateSearchKeywords({
-  ai: { async run(model, input) { calls++; assert.equal(model, WORKERS_AI_VISION_MODEL); assert.ok(input.messages[0].content.includes("1688")); return { response: '{"keywords":["鳄鱼皮男鞋","复古皮鞋"],"visualSummary":"男鞋"}' }; } },
+  ai: { async run(model, input) { calls++; assert.equal(model, WORKERS_AI_VISION_MODEL); assert.ok(input.messages[0].content[0].text.includes("1688")); return { response: '{"keywords":["鳄鱼皮男鞋","复古皮鞋"],"visualSummary":"男鞋"}' }; } },
   imageBase64: validBase64, mimeType: "image/jpeg", platform: "1688"
 });
 assert.deepEqual(search.keywords, ["鳄鱼皮男鞋", "复古皮鞋"]);
