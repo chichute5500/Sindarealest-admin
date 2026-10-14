@@ -42,9 +42,10 @@ assert.equal(parseModelJson('\\x60\\x60\\x60json\\n{"keywords":["鞋"]}\\n\\x60\
 assert.equal(parseModelJson("no json here"), null);
 assert.equal(parseModelJson('Model answer: {"summary":"shoe with {curved} stitching","ok":true} trailing note').summary, "shoe with {curved} stitching", "parser should handle braces inside quoted strings and harmless surrounding prose");
 assert.equal(parseModelJson('before {"broken": } then {"valid":true} after').valid, true, "parser should recover a later complete JSON object when an earlier brace block is malformed");
-assert.equal(compareProductImages().available, false);
-assert.equal(compareProductImages().similarityScore, null);
-assert.equal(compareProductImages().eligible, false);
+const unavailableComparison = await compareProductImages();
+assert.equal(unavailableComparison.available, false);
+assert.equal(unavailableComparison.similarityScore, null);
+assert.equal(unavailableComparison.eligible, false);
 let comparisonCalls = 0;
 const pairComparison = await compareProductImages({
   ai: { async run(model, input) {
