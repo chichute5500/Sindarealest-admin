@@ -181,10 +181,82 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     parsed.reasons.length >= 2 && parsed.reasons.length <= 5 &&
     parsed.reasons.every(value => typeof value === "string" && value.trim().length >= 8 &&
       !/lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm/i.test(value));
-  const validSchema = validSummary && validFeatures && validReasons &&
-    typeof parsed.needsHumanReview === "boolean" &&
-    Object.entries(allowed).every(([key, values]) => values.includes(parsed[key]));
-  if (!validSchema) return { error: "Workers AI trả về JSON nhưng thiếu quan sát cụ thể, lý do đủ rõ hoặc sai cấu trúc bắt buộc. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_SCHEMA" };
+  const schemaIssues = [];
+  if (typeof parsed.summary !== "string") schemaIssues.push("summary_not_string");
+  else {
+    if (parsed.summary.trim().length < 20) schemaIssues.push("summary_too_short");
+    if (/có thể là một sản phẩm thuộc danh mục|dựa trên hình ảnh|chưa có mô tả/i.test(parsed.summary)) schemaIssues.push("summary_too_generic");
+  }
+  if (!Array.isArray(parsed.visibleFeatures)) schemaIssues.push("visibleFeatures_not_array");
+  else {
+    if (parsed.visibleFeatures.length < 3) schemaIssues.push("visibleFeatures_too_few");
+    if (parsed.visibleFeatures.length > 6) schemaIssues.push("visibleFeatures_too_many");
+    if (!parsed.visibleFeatures.every(value => typeof value === "string" && value.trim().length >= 3)) schemaIssues.push("visibleFeatures_invalid_items");
+  }
+  if (!Array.isArray(parsed.reasons)) schemaIssues.push("reasons_not_array");
+  else {
+    if (parsed.reasons.length < 2) schemaIssues.push("reasons_too_few");
+    if (parsed.reasons.length > 5) schemaIssues.push("reasons_too_many");
+    if (!parsed.reasons.every(value => typeof value === "string" && value.trim().length >= 8 &&
+      !/lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm/i.test(value))) schemaIssues.push("reasons_invalid_items");
+  }
+  for (const [key, values] of Object.entries(allowed)) {
+    if (!values.includes(parsed[key])) schemaIssues.push(key + "_invalid");
+  }
+  if (typeof parsed.needsHumanReview !== "boolean") schemaIssues.push("needsHumanReview_not_boolean");
+
+  const schemaDiagnostic = {
+    event: "workers_ai_invalid_schema",
+    model: output.model,
+    issues: schemaIssues,
+    summary: {
+      type: typeof parsed.summary,
+      length: typeof parsed.summary === "string" ? parsed.summary.trim().length : null,
+      generic: typeof parsed.summary === "string" && /có thể là một sản phẩm thuộc danh mục|dựa trên hình ảnh|chưa có mô tả/i.test(parsed.summary)
+    },
+    visibleFeatures: {
+      type: Array.isArray(parsed.visibleFeatures) ? "array" : typeof parsed.visibleFeatures,
+      count: Array.isArray(parsed.visibleFeatures) ? parsed.visibleFeatures.length : null,
+      invalidItemCount: Array.isArray(parsed.visibleFeatures)
+        ? parsed.visibleFeatures.filter(value => typeof value !== "string" || value.trim().length < 3).length : null
+    },
+    reasons: {
+      type: Array.isArray(parsed.reasons) ? "array" : typeof parsed.reasons,
+      count: Array.isArray(parsed.reasons) ? parsed.reasons.length : null,
+      invalidItemCount: Array.isArray(parsed.reasons)
+        ? parsed.reasons.filter(value => typeof value !== "string" || value.trim().length < 8 ||
+          /lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm/i.test(value)).length : null
+    },
+    enumValidity: Object.fromEntries(Object.entries(allowed).map(([key, values]) => [key, values.includes(parsed[key])])),
+    needsHumanReviewType: typeof parsed.needsHumanReview
+  };
+  if (schemaIssues.length) {
+    const issueMessages = {
+      summary_not_string: "summary không phải chuỗi",
+      summary_too_short: "summary quá ngắn",
+      summary_too_generic: "summary quá chung chung",
+      visibleFeatures_not_array: "visibleFeatures không phải danh sách",
+      visibleFeatures_too_few: "visibleFeatures có dưới 3 quan sát",
+      visibleFeatures_too_many: "visibleFeatures vượt quá 6 quan sát",
+      visibleFeatures_invalid_items: "visibleFeatures có mục rỗng hoặc sai kiểu",
+      reasons_not_array: "reasons không phải danh sách",
+      reasons_too_few: "reasons có dưới 2 lý do",
+      reasons_too_many: "reasons vượt quá 5 lý do",
+      reasons_invalid_items: "reasons có lý do quá ngắn hoặc chung chung",
+      modelAssessment_invalid: "modelAssessment không thuộc giá trị cho phép",
+      materialAssessment_invalid: "materialAssessment không thuộc giá trị cho phép",
+      confidence_invalid: "confidence không thuộc giá trị cho phép",
+      needsHumanReview_not_boolean: "needsHumanReview không phải true/false"
+    };
+    console.warn("[Workers AI diagnostic]", JSON.stringify(schemaDiagnostic));
+    const details = schemaIssues.map(issue => issueMessages[issue] || "cấu trúc không hợp lệ");
+    return {
+      error: "Workers AI trả về JSON nhưng không đạt kiểm tra: " + details.join("; ") + ". Không lưu kết quả chưa kiểm tra.",
+      status: 502,
+      code: "WORKERS_AI_INVALID_SCHEMA",
+      diagnostic: schemaDiagnostic
+    };
+  }
   return { analysis: {
     summary: String(parsed.summary || "Chưa có mô tả").slice(0, 800),
     visibleFeatures: Array.isArray(parsed.visibleFeatures) ? parsed.visibleFeatures.slice(0, 12).map(x => String(x).slice(0, 160)) : [],
