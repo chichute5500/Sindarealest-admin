@@ -126,8 +126,32 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
 }
 
 export function parseModelJson(rawText) {
-  const text = String(rawText || "").trim().replace(/^\uFEFF/, "").replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}\s*$/, "").trim();
+  const text = String(rawText || "").trim().replace(/^\\uFEFF/, "").replace(/^\\x60{3}(?:json)?\\s*/i, "").replace(/\\s*\\x60{3}\\s*$/, "").trim();
   if (!text) return null;
+
+  // Some provider envelopes serialize the generated JSON object as a JSON string.
+  // Decode that wrapper once, then parse the contained object without another AI call.
+  try {
+    const whole = JSON.parse(text);
+    if (whole && typeof whole === "object" && !Array.isArray(whole)) return whole;
+    if (typeof whole === "string" && whole.trim() && whole.trim() !== text) {
+      const nested = parseModelJson(whole);
+      if (nested) return nested;
+    }
+  } catch {}
+
+  // Some model outputs escape all quotes in the JSON payload. Normalize this
+  // representation only as a secondary attempt; the result still must pass JSON.parse.
+  if (text.includes("\\\\"") && text.includes("{")) {
+    const unescaped = text.replace(/\\\\(["\\\\/bfnrt])/g, (_, ch) => {
+      const escapes = { '"': '"', "\\\\": "\\\\", "/": "/", b: "\\b", f: "\\f", n: "\\n", r: "\\r", t: "\\t" };
+      return escapes[ch] ?? ch;
+    });
+    if (unescaped !== text) {
+      const nested = parseModelJson(unescaped);
+      if (nested) return nested;
+    }
+  }
 
   // Tolerate harmless prose/fences around a JSON object. Balance braces while
   // respecting quoted strings and escapes so embedded braces do not truncate it.
@@ -139,7 +163,7 @@ export function parseModelJson(rawText) {
       const ch = text[i];
       if (inString) {
         if (escaped) escaped = false;
-        else if (ch === "\\") escaped = true;
+        else if (ch === "\\\\") escaped = true;
         else if (ch === '"') inString = false;
         continue;
       }
