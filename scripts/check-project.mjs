@@ -89,6 +89,7 @@ check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'),
 const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
 check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_ai_reviews WHERE r2_key=?'), 'Đường dẫn media chưa xác minh trạng thái duyệt AI');
 check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duyệt không bị chặn khỏi endpoint media');
+check(mediaRoute.includes('private, no-store'), 'Ảnh ứng viên AI chưa được đặt Cache-Control no-store');
 const aiAuditApi = existsSync(join(root, 'functions/api/admin/image-audit.js')) ? readFileSync(join(root, 'functions/api/admin/image-audit.js'), 'utf8') : '';
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
