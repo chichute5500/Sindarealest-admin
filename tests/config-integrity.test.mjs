@@ -22,6 +22,11 @@ assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setu
 assert.ok(setupScript.includes('scripts/apply-ai-image-migrations.mjs') && setupScript.includes('CLOUDFLARE_D1_DATABASE: database'), 'Setup must apply AI image schema and request-limit migrations to the selected D1');
 assert.ok(setupScript.indexOf('applyAiImageMigrations(dbName)') < setupScript.indexOf("'\\n5/5 · Triển khai website cùng Pages Functions…'"), 'AI image schema must be applied before deployment');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_verifications/.test(setupScript), 'Setup must not depend on obsolete OTP/SMS configuration or tables');
+const aiQueueMigration = readFileSync('migrations/0007_ai_image_reviews.sql', 'utf8');
+const aiSourceUrlMigration = readFileSync('migrations/0008_ai_image_source_url.sql', 'utf8');
+assert.ok(aiQueueMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 must create the AI review table');
+assert.ok(!/source_url/.test(aiQueueMigration), 'Migration 0007 must not pre-create a column that migration 0008 adds');
+assert.equal((aiSourceUrlMigration.match(/ADD COLUMN source_url/g) || []).length, 1, 'Migration 0008 must add source_url exactly once in a standard migration sequence');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
 assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migration 0006 must not change production schema');
