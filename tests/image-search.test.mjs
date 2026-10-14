@@ -31,7 +31,7 @@ assert.equal(evaluateSearchCandidate({ title: "真鳄鱼皮鞋", similarityScore
 assert.equal(parseModelJson('{"keywords":["鳄鱼皮鞋"]}').keywords[0], "鳄鱼皮鞋");
 assert.equal(parseModelJson('\\x60\\x60\\x60json\\n{"keywords":["鞋"]}\\n\\x60\\x60\\x60').keywords[0], "鞋");
 assert.equal(parseModelJson("no json here"), null);
-assert.equal(parseModelJson("Model answer: {\\"summary\\":\\"shoe with {curved} stitching\\",\\"ok\\":true} trailing note").summary, "shoe with {curved} stitching", "parser should handle braces inside quoted strings and harmless surrounding prose");
+assert.equal(parseModelJson('Model answer: {"summary":"shoe with {curved} stitching","ok":true} trailing note').summary, "shoe with {curved} stitching", "parser should handle braces inside quoted strings and harmless surrounding prose");
 assert.equal(parseModelJson('before {"broken": } then {"valid":true} after').valid, true, "parser should recover a later complete JSON object when an earlier brace block is malformed");
 assert.equal(compareProductImages().available, false);
 assert.equal(compareProductImages().similarityScore, null);
