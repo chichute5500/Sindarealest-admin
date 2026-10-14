@@ -146,7 +146,7 @@ export async function onRequestPost(context) {
   }
   const bytes = imageBytes(body?.imageBase64);
   if (!bytes) return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn an toàn.");
-  const rawMime = String(body?.imageBase64 || "").match(/^data:image\\/(?:jpeg|jpg|png|webp);base64,/i)?.[1]?.toLowerCase();
+  const rawMime = String(body?.imageBase64 || "").match(/^data:image\/(?:jpeg|jpg|png|webp);base64,/i)?.[1]?.toLowerCase();
   const mimeType = rawMime === "image/png" || rawMime === "image/webp" ? rawMime : "image/jpeg";
   const gemini = await suggestMarketplaceImageKeywords({
     apiKey: context.env.GEMINI_API_KEY,
