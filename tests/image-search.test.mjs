@@ -236,6 +236,7 @@ assert.match(imageSearchSourceText, /imageRef/);
 assert.ok(imageSearchSourceText.includes('ownedImages.some'));
 const auditSourceText = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
 assert.match(auditSourceText, /reference_image_ref/);
+assert.match(auditSourceText, /Ảnh cần phân tích không thuộc bộ ảnh của sản phẩm đã chọn/, "existing-image analysis must reject cross-product image references");
 assert.match(auditSourceText, /source_image_url/);
 assert.match(auditSourceText, /compareCandidate/);
 assert.match(auditSourceText, /isAllowedSourceProductUrl/);
