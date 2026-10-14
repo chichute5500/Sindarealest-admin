@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { assessCrocodileMaterial, evaluateSearchCandidate, extractSimilarityScore, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage } from "../functions/_lib/gemini.js";
+import { requestGeminiInteraction } from "../functions/_lib/gemini-interactions.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
 const inventory = inventoryImages([
@@ -45,9 +46,12 @@ assert.match(imageSearchHandler, /INVALID_ARGUMENT/, "Gemini request-format erro
 assert.match(imageSearchHandler, /apiError\.message/, "The actual Google API diagnostic must be shown to admin");
 assert.match(imageSearchHandler, /đã ẩn API key/, "The API key must be redacted from diagnostics");
 assert.match(imageSearchHandler, /TimeoutError/, "Gemini timeouts must have a specific diagnostic");
-assert.match(imageSearchHandler, /v1beta\/interactions/, "Use the recommended Gemini Interactions API");
-assert.match(imageSearchHandler, /gemini-3\.8-flash/, "Use the currently recommended Gemini Flash model");
-assert.match(imageSearchHandler, /x-goog-api-key/, "Send API key in the request header");
+const interactionSource = (await import("node:fs")).readFileSync(new URL("../functions/_lib/gemini-interactions.js", import.meta.url), "utf8");
+assert.match(interactionSource, /v1beta\/interactions/, "Use the recommended Gemini Interactions API");
+assert.match(interactionSource, /gemini-3\.8-flash/, "Use the primary Gemini Flash model");
+assert.match(interactionSource, /gemini-3\.6-flash/, "Use a fallback model when the primary returns HTTP 503");
+assert.match(interactionSource, /x-goog-api-key/, "Send API key in the request header");
+assert.match(interactionSource, /response.status !== 503/, "Only retry a transient HTTP 503, not quota/auth errors");
 assert.doesNotMatch(imageSearchHandler, /type: "google_search"/, "Free-tier mode must not enable paid Google Search grounding");
 assert.match(imageSearchHandler, /isSearchPage: true/, "Free-tier mode returns an explicit search page, not a fabricated product URL");
 assert.match(imageSearchHandler, /consumeGeminiRequest/, "Search requests must be guarded by the shared quota limiter");
@@ -65,11 +69,26 @@ assert.doesNotMatch(adminHtml, /window\.__sdAiInventoryAutoScanned/, "Opening th
 assert.doesNotMatch(adminHtml, /foundGroups=await Promise\.allSettled\(\[\x27taobao\x27,\x271688\x27\]/, "AI analysis must not automatically call both marketplace searches");
 assert.match(adminHtml, /20 yêu cầu Gemini trong 24 giờ/);
 const geminiSource = (await import("../functions/_lib/gemini.js")).analyzeProductImage.toString();
-assert.match(geminiSource, /gemini-3\.8-flash/);
-assert.match(geminiSource, /v1beta\/interactions/);
+assert.match(geminiSource, /requestGeminiInteraction/);
 assert.doesNotMatch(geminiSource, /gemini-2\.5-flash:generateContent/);
 assert.doesNotMatch(geminiSource, /google_search/);
 const quotaSource = (await import("../functions/_lib/ai-quota.js")).consumeGeminiRequest.toString();
 assert.match(quotaSource, /gemini-rolling-24h/);
 assert.match(quotaSource, /gemini-15-seconds/);
-console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, AI publication gate");
+
+const originalFetch = globalThis.fetch;
+const attemptedModels = [];
+try {
+  globalThis.fetch = async (_url, options) => {
+    attemptedModels.push(JSON.parse(options.body).model);
+    if (attemptedModels.length === 1) return new Response(JSON.stringify({ error: { status: "UNAVAILABLE", message: "busy" } }), { status: 503, headers: { "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ status: "completed", steps: [] }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  const fallback = await requestGeminiInteraction({ apiKey: "test-key", input: "test", timeoutMs: 1000 });
+  assert.equal(fallback.response.status, 200);
+  assert.deepEqual(attemptedModels, ["gemini-3.8-flash", "gemini-3.6-flash"], "HTTP 503 triggers exactly one fallback model request");
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
+console.log("PASS: inventory, measured pHash threshold, mandatory keywords, fake-material rejection, proxy and server-side save gate, Gemini validation, bounded 503 fallback, AI publication gate");
