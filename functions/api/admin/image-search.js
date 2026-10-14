@@ -12,6 +12,13 @@ const isImageHost = (host) => {
   const h = String(host || "").toLowerCase();
   return isMarketplaceHost(h) || h === "alicdn.com" || h.endsWith(".alicdn.com");
 };
+function isProductUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || !isMarketplaceHost(url.hostname)) return false;
+    return /\/offer\//i.test(url.pathname) || /\/item\.htm/i.test(url.pathname) || /\/item\//i.test(url.pathname);
+  } catch { return false; }
+}
 function parseProducts(rows) {
   return (rows || []).map((row) => ({ id: row.id, sku: row.sku, title: row.title, category: row.category, images_json: row.images_json }));
 }
@@ -31,14 +38,14 @@ async function productMetadata(sourceUrl) {
   let target;
   try {
     const parsed = new URL(sourceUrl);
-    if (parsed.protocol !== "https:" || !isMarketplaceHost(parsed.hostname) || parsed.username || parsed.password) return {};
+    if (!isProductUrl(parsed.href) || parsed.username || parsed.password) return {};
     target = parsed.href;
   } catch { return {}; }
   try {
     let response;
     for (let redirects = 0; redirects <= 2; redirects++) {
       const url = new URL(target);
-      if (url.protocol !== "https:" || !isMarketplaceHost(url.hostname)) return {};
+      if (!isProductUrl(url.href)) return {};
       response = await fetch(target, { redirect: "manual", headers: { Accept: "text/html", "User-Agent": "Mozilla/5.0 (compatible; SinDarealestImageAudit/1.0)" }, signal: AbortSignal.timeout(4500) });
       if (![301,302,303,307,308].includes(response.status)) break;
       const location = response.headers.get("location");
@@ -127,7 +134,7 @@ export async function onRequestPost(context) {
       const uri = web?.uri || "";
       let parsed;
       try { parsed = new URL(uri); } catch { continue; }
-      if (parsed.protocol !== "https:" || !isMarketplaceHost(parsed.hostname) || seen.has(parsed.href)) continue;
+      if (!isProductUrl(parsed.href) || seen.has(parsed.href)) continue;
       seen.add(parsed.href);
       grounded.push({ productUrl: parsed.href, groundedTitle: cleanText(web.title || "", 300) });
       if (grounded.length >= 10) break;
