@@ -1,6 +1,10 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
 import { assessCrocodileMaterial, inventoryImages } from "../../_lib/image-audit.js";
 
+function isSupportedSourceUrl(value) {
+  try { const u = new URL(value); const h = u.hostname.toLowerCase(); return u.protocol === "https:" && (h === "1688.com" || h.endsWith(".1688.com") || h === "taobao.com" || h.endsWith(".taobao.com")); } catch { return false; }
+}
+
 function parseProducts(rows) {
   return (rows || []).map((row) => ({
     id: row.id, sku: row.sku, title: row.title, category: row.category,
@@ -61,7 +65,7 @@ export async function onRequestPost(context) {
         productUrl: String(item.productUrl || item.product_url || item.offerUrl || item.offer_url || item.url || (item.offerId ? "https://detail.1688.com/offer/" + encodeURIComponent(String(item.offerId)) + ".html" : "")),
         price: item.price == null ? null : String(item.price),
         materialCheck: assessCrocodileMaterial([item.title, item.description, item.material, item.properties].filter(Boolean).join(" "))
-      })).filter((item) => /^https:\/\//i.test(item.imageUrl) && /^https:\/\//i.test(item.productUrl))
+      })).filter((item) => /^https:\/\//i.test(item.imageUrl) && isSupportedSourceUrl(item.productUrl))
     });
   } catch {
     return fail("Không kết nối được dịch vụ tìm ảnh 1688. Vui lòng thử lại.", 502);
