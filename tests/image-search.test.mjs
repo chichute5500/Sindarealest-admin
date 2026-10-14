@@ -35,4 +35,5 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved" }), tr
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image_ref: "/media/other.webp" }), false, "mismatched image reference must be blocked");
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /isSupportedSourceUrl/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
-assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);\nconsole.log("PASS: inventory, 90% similarity gate, mandatory keywords, fake-material rejection, Gemini validation, AI publication gate");
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
+console.log("PASS: inventory, 90% similarity gate, mandatory keywords, fake-material rejection, Gemini validation, AI publication gate");
