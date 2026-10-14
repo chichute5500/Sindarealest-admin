@@ -44,14 +44,10 @@ async function runVision(ai, prompt, image) {
 }
 
 function extractJsonObject(raw) {
-  const cleaned = String(raw || "").replace(/^\uFEFF/, "").replace(/```(?:json)?/gi, "").trim();
-  try {
-    const parsed = JSON.parse(cleaned);
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
-  } catch {}
+  const cleaned = String(raw || "").replace(/^\uFEFF/, "").replace(new RegExp(String.fromCharCode(96, 96, 96) + "(?:json)?", "gi"), "").trim();
+  const candidates = [cleaned];
 
-  // Models may add prose around JSON. Find a balanced object without
-  // accidentally including braces that occur inside quoted strings.
+  // Find balanced JSON objects even when the model adds prose.
   for (let start = cleaned.indexOf("{"); start >= 0; start = cleaned.indexOf("{", start + 1)) {
     let depth = 0, inString = false, escaped = false;
     for (let i = start; i < cleaned.length; i++) {
@@ -59,21 +55,29 @@ function extractJsonObject(raw) {
       if (inString) {
         if (escaped) escaped = false;
         else if (char === "\\") escaped = true;
-        else if (char === '"') inString = false;
+        else if (char === '"' ) inString = false;
         continue;
       }
-      if (char === '"') inString = true;
+      if (char === '"' ) inString = true;
       else if (char === "{") depth++;
       else if (char === "}") {
         depth--;
-        if (depth === 0) {
-          try {
-            const parsed = JSON.parse(cleaned.slice(start, i + 1));
-            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
-          } catch {}
-          break;
-        }
+        if (depth === 0) { candidates.push(cleaned.slice(start, i + 1)); break; }
       }
+    }
+  }
+
+  for (const candidate of candidates) {
+    const variants = [
+      candidate,
+      candidate.replace(/,\s*([}\]])/g, "$1"),
+      candidate.replace(/([{,]\s*)([A-Za-z][A-Za-z0-9_]*)(\s*:)/g, '$1"$2"$3').replace(/,\s*([}\]])/g, "$1")
+    ];
+    for (const variant of variants) {
+      try {
+        const parsed = JSON.parse(variant);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+      } catch {}
     }
   }
   return null;
