@@ -76,7 +76,7 @@ function extractJsonObject(raw) {
       const char = cleaned[i];
       if (inString) {
         if (escaped) escaped = false;
-        else if (char === "\\\\") escaped = true;
+        else if (char.charCodeAt(0) === 92) escaped = true;
         else if (char === '"') inString = false;
         continue;
       }
@@ -109,6 +109,75 @@ function extractJsonObject(raw) {
     }
   }
   return null;
+}
+
+function normalizeKeywordList(value) {
+  const rows = Array.isArray(value)
+    ? value
+    : typeof value === "string"
+      ? value.split(/[\r\n,，、;；|]+/)
+      : value && typeof value === "object"
+        ? Object.values(value)
+        : [];
+  return [...new Set(rows.map((entry) => {
+    const text = entry && typeof entry === "object"
+      ? entry.keyword || entry.text || entry.value || ""
+      : entry;
+    return String(text || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/[“”"'\x60{}\[\]]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 80)
+      .replace(/[<>]/g, "");
+  }))]
+    .filter((entry) => entry && /[\u3400-\u9fff]/.test(entry))
+    .slice(0, 4);
+}
+
+function recoverKeywordsFromText(raw) {
+  const text = String(raw || "")
+    .replace(/^\uFEFF/, "")
+    .replace(/\x60{3}\s*(?:json)?/gi, "")
+    .replace(/\x60{3}/g, "")
+    .replace(/[“”]/g, '"')
+    .replace(/\r/g, "\n");
+  const candidates = text.split(/[\n,，、。；;|/]+|\s+/);
+  const recovered = [];
+  for (let candidate of candidates) {
+    candidate = candidate.replace(/^[\s"'\x60{}\[\]:：=]+|[\s"'\x60{}\[\]:：=]+$/g, "");
+    candidate = candidate
+      .replace(/^(?:根据图片(?:分析)?|从图片(?:中)?(?:看)?|图片(?:中|里)?(?:展示|显示)?|这是一双|这是一款|这是一件|这是一条|这是|看起来像|我认为|可能是|关键词(?:是|为)?|搜索词(?:是|为)?|产品(?:是|为)?|商品(?:是|为)?)[\s:：，,]*/u, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!candidate) continue;
+    if (/(?:无法|不能按|抱歉|JSON格式|JSON\s*输出|格式错误|无法解析)/i.test(candidate)) continue;
+    if (!/[\u3400-\u9fff]/.test(candidate)) continue;
+    candidate = candidate.slice(0, 32);
+    if (/^(?:的|和|以及|这个|那个|图片|产品|商品|看起来|用于|适合|分析结果|以上是分析结果|搜索关键词|关键词)$/u.test(candidate)) continue;
+    recovered.push(candidate);
+  }
+  return normalizeKeywordList(recovered);
+}
+
+function fallbackMarketplaceKeywords(title, category) {
+  const text = String(category || "") + " " + String(title || "");
+  const value = text.toLowerCase();
+  if (/crocodile|cá sấu|鳄鱼/.test(value)) {
+    if (/belt|thắt lưng|皮带/.test(value)) return ["鳄鱼纹皮带", "压纹皮带"];
+    if (/wallet|ví da|ví tiền|钱包/.test(value)) return ["鳄鱼纹钱包", "压纹钱包"];
+    if (/case|ốp điện thoại|手机壳/.test(value)) return ["鳄鱼纹手机壳", "压纹手机壳"];
+    return ["鳄鱼纹皮鞋", "压纹皮鞋"];
+  }
+  if (/sneaker|运动鞋|giày thể thao/.test(value)) return ["男士运动鞋", "休闲运动鞋"];
+  if (/loafer|giày lười|乐福鞋/.test(value)) return ["男士乐福鞋", "休闲皮鞋"];
+  if (/dress-shoes|oxford|derby|giày tây|皮鞋/.test(value)) return ["男士皮鞋", "商务皮鞋"];
+  if (/belt|thắt lưng|皮带/.test(value)) return ["男士皮带", "真皮腰带"];
+  if (/wallet|ví da|ví tiền|钱包/.test(value)) return ["男士钱包", "皮夹"];
+  if (/sandals|sandal|dép|凉鞋/.test(value)) return ["男士凉鞋", "休闲凉鞋"];
+  if (/watch-straps|dây đồng hồ|表带/.test(value)) return ["皮质表带", "手表表带"];
+  if (/phone-cases|ốp điện thoại|手机壳/.test(value)) return ["手机壳", "保护套"];
+  return ["男士鞋子", "休闲皮鞋"];
 }
 
 function parseJson(raw, fallbackMessage) {
