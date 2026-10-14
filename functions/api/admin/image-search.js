@@ -178,8 +178,13 @@ export async function onRequestPost(context) {
       message: "Đã tạo trang tìm kiếm theo từ khóa hình ảnh bằng một lượt Gemini. Chưa tìm thấy hay xác minh sản phẩm cụ thể; không có URL sản phẩm giả và không thể lưu trang tìm kiếm làm nguồn."
     });
   } catch (error) {
-    if (error?.name === "TimeoutError" || error?.name === "AbortError") return fail("Gemini hết thời gian chờ sau 45 giây. Không tự động thử lại để bảo vệ quota.", 504);
-    return fail("Không kết nối được Gemini Interactions API. " + cleanText(error?.message || "", 200), 502);
+    if (error?.code === "GEMINI_TIMEOUT" || error?.name === "TimeoutError" || error?.name === "AbortError") {
+      return fail("Gemini hết thời gian chờ sau 45 giây (mô hình " + cleanText(error?.model || "không xác định", 80) + "). Mã chẩn đoán: GEMINI_TIMEOUT. Không tự động thử lại để bảo vệ quota.", 504);
+    }
+    if (error?.code === "GEMINI_NETWORK_ERROR") {
+      return fail("Không kết nối được tới Google Gemini API (mô hình " + cleanText(error?.model || "không xác định", 80) + "). Mã chẩn đoán: GEMINI_NETWORK_ERROR. Không tự động thử lại để bảo vệ quota.", 502);
+    }
+    return fail("Lỗi khi kết nối Gemini Interactions API. Mã chẩn đoán: GEMINI_REQUEST_ERROR.", 502);
   }
 }
 
