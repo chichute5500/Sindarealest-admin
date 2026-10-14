@@ -22,7 +22,7 @@ async function runVision(ai, prompt, image) {
       temperature: 0.1,
       max_tokens: 700
     });
-    const raw = String(result?.response || result?.result || result?.output || "").trim();
+    const raw = extractResponseText(result).trim();
     if (!raw) return { error: "Workers AI không trả về nội dung phân tích ảnh.", status: 502 };
     return { raw };
   } catch (error) {
@@ -43,22 +43,44 @@ async function runVision(ai, prompt, image) {
   }
 }
 
+function extractResponseText(value, depth = 0) {
+  if (depth > 5 || value == null) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    return value.map((item) => extractResponseText(item, depth + 1)).filter(Boolean).join("\n");
+  }
+  if (typeof value === "object") {
+    for (const key of ["response", "generated_text", "output_text", "text", "content", "result", "output"]) {
+      if (value[key] !== undefined && value[key] !== value) {
+        const text = extractResponseText(value[key], depth + 1);
+        if (text) return text;
+      }
+    }
+  }
+  return "";
+}
+
 function extractJsonObject(raw) {
-  const cleaned = String(raw || "").replace(/^\uFEFF/, "").replace(new RegExp(String.fromCharCode(96, 96, 96) + "(?:json)?", "gi"), "").trim();
+  const cleaned = String(raw || "")
+    .replace(/^\uFEFF/, "")
+    .replace(/\x60{3}\s*(?:json)?/gi, "")
+    .replace(/\x60{3}/g, "")
+    .replace(/[“”]/g, '"')
+    .trim();
   const candidates = [cleaned];
 
-  // Find balanced JSON objects even when the model adds prose.
+  // Find balanced JSON objects even when the model adds prose around them.
   for (let start = cleaned.indexOf("{"); start >= 0; start = cleaned.indexOf("{", start + 1)) {
     let depth = 0, inString = false, escaped = false;
     for (let i = start; i < cleaned.length; i++) {
       const char = cleaned[i];
       if (inString) {
         if (escaped) escaped = false;
-        else if (char === "\\") escaped = true;
-        else if (char === '"' ) inString = false;
+        else if (char === "\\\\") escaped = true;
+        else if (char === '"') inString = false;
         continue;
       }
-      if (char === '"' ) inString = true;
+      if (char === '"') inString = true;
       else if (char === "{") depth++;
       else if (char === "}") {
         depth--;
@@ -68,10 +90,16 @@ function extractJsonObject(raw) {
   }
 
   for (const candidate of candidates) {
+    const noTrailingCommas = candidate.replace(/,\s*([}\]])/g, "$1");
+    const singleQuotes = noTrailingCommas.replace(/'([^'\\]*(?:\\.[^'\\]*)*)'/g, (_match, value) =>
+      '"' + value.replace(/"/g, '\\"') + '"'
+    );
     const variants = [
       candidate,
-      candidate.replace(/,\s*([}\]])/g, "$1"),
-      candidate.replace(/([{,]\s*)([A-Za-z][A-Za-z0-9_]*)(\s*:)/g, '$1"$2"$3').replace(/,\s*([}\]])/g, "$1")
+      noTrailingCommas,
+      noTrailingCommas.replace(/([{,]\s*)([A-Za-z][A-Za-z0-9_]*)(\s*:)/g, '$1"$2"$3'),
+      singleQuotes,
+      singleQuotes.replace(/([{,]\s*)([A-Za-z][A-Za-z0-9_]*)(\s*:)/g, '$1"$2"$3')
     ];
     for (const variant of variants) {
       try {
@@ -138,14 +166,19 @@ export async function suggestMarketplaceImageKeywords({ ai, imageBase64, mimeTyp
   const response = await runVision(ai, prompt, parsedImage.image);
   if (response.error) return response;
   const data = parseJson(response.raw, "Workers AI trả về từ khóa sai định dạng JSON.");
-  if (data.error) return { error: data.error, status: 502 };
-  const keywords = Array.isArray(data.keywords)
-    ? [...new Set(data.keywords.map(value => String(value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 80).replace(/[<>]/g, "")))]
-        .filter(value => value && /[\u3400-\u9fff]/.test(value)).slice(0, 4)
-    : [];
-  if (!keywords.length) return { error: "Workers AI không tạo được từ khóa tiếng Trung hợp lệ.", status: 502 };
-  return {
-    keywords,
-    visualSummary: String(data.visualSummary || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 300)
-  };
+  const keywordValue = data.error
+    ? null
+    : data.keywords ?? data.searchKeywords ?? data.search_keywords ?? data.keywords_zh ?? data.data?.keywords;
+  let keywords = normalizeKeywordList(keywordValue);
+  if (!keywords.length) keywords = recoverKeywordsFromText(response.raw);
+  if (keywords.length < 2) {
+    for (const fallback of fallbackMarketplaceKeywords(title, category)) {
+      if (!keywords.includes(fallback)) keywords.push(fallback);
+      if (keywords.length >= 2) break;
+    }
+  }
+  keywords = [...new Set(keywords)].slice(0, 4);
+  if (!keywords.length) return { error: "Không thể tạo từ khóa tìm nguồn hàng từ ảnh này. Hãy thử ảnh rõ hơn hoặc chọn lại sản phẩm.", status: 502 };
+  const visualSummary = String(data.visualSummary || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 300);
+  return { keywords, visualSummary };
 }
