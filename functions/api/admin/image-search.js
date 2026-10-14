@@ -142,14 +142,14 @@ export async function onRequestPost(context) {
 
   const apiKey = context.env.ELIMAPI_API_KEY;
   if (typeof apiKey !== "string" || apiKey.length < 12) {
-    return fail("Chưa cấu hình secret ELIMAPI_API_KEY. Cần API key Elimapi để tìm ảnh thật trên Taobao/1688; Gemini vẫn dùng riêng để phân tích ảnh.", 503);
+    return fail("Chưa cấu hình secret ELIMAPI_API_KEY. Cần API key Elimapi để tìm ảnh thật trên Taobao/1688; Workers AI binding AI dùng riêng để phân tích ảnh.", 503);
   }
   const bytes = imageBytes(body?.imageBase64);
   if (!bytes) return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn an toàn.");
   const rawMime = String(body?.imageBase64 || "").match(/^data:image\/(?:jpeg|jpg|png|webp);base64,/i)?.[1]?.toLowerCase();
   const mimeType = rawMime === "image/png" || rawMime === "image/webp" ? rawMime : "image/jpeg";
   const gemini = await suggestMarketplaceImageKeywords({
-    apiKey: context.env.GEMINI_API_KEY,
+    ai: context.env.AI,
     imageBase64: body?.imageBase64,
     mimeType,
     title,
