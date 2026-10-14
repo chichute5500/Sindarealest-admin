@@ -36,7 +36,9 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /isMarketplaceHost/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
-assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /google_search/);\nassert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /GEMINI_API_KEY/);\nassert.doesNotMatch((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /NEXSCOPE/);
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /google_search/);
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /GEMINI_API_KEY/);
+assert.doesNotMatch((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /NEXSCOPE/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /phash-63/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /similarityScore < 90/);
 assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRequestGet, "function");
