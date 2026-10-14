@@ -59,7 +59,10 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       prompt: String(prompt || "").slice(0, 12000),
       image: `data:${image.mimeType};base64,${image.base64}`,
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
-      temperature: 0.1
+      temperature: 0.1,
+      // Both current AI tasks require machine-readable JSON; use the provider's JSON mode
+      // instead of relying only on prompt instructions.
+      response_format: { type: "json_object" }
     });
     // Safe diagnostics: log response shape only, never prompts, image bytes, or field contents.
     const diagnostic = {
@@ -94,7 +97,11 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       { field: "result.result", value: result?.result?.result },
       { field: "result.text", value: result?.result?.text },
       { field: "output_text", value: result?.output_text },
-      { field: "text", value: result?.text }
+      { field: "text", value: result?.text },
+      // JSON mode may return the generated object directly instead of a string.
+      { field: "response (JSON object)", value: result?.response && typeof result.response === "object" && !Array.isArray(result.response) && !("text" in result.response) && !("output_text" in result.response) && !("response" in result.response) ? JSON.stringify(result.response) : null },
+      { field: "response.response (JSON object)", value: result?.response?.response && typeof result.response.response === "object" && !Array.isArray(result.response.response) ? JSON.stringify(result.response.response) : null },
+      { field: "result (JSON object)", value: result?.result && typeof result.result === "object" && !Array.isArray(result.result) && !("response" in result.result) && !("text" in result.result) && !("output_text" in result.result) ? JSON.stringify(result.result) : null }
     ];
     const selected = candidates.find(candidate => typeof candidate.value === "string" && candidate.value.trim());
     const text = selected?.value.trim() || "";
