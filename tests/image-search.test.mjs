@@ -36,7 +36,7 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image
 assert.doesNotMatch((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /google_search/, "Free-tier search must not use paid Google Search grounding");
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
-assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /google_search/);
+assert.doesNotMatch((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /google_search/, "Free-tier search must not use paid Google Search grounding");
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /GEMINI_API_KEY/);
 const imageSearchHandler = (await import("../functions/api/admin/image-search.js")).onRequestPost.toString();
 assert.match(imageSearchHandler, /RESOURCE_EXHAUSTED/, "Gemini quota errors must be distinguished");
