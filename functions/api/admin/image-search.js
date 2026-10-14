@@ -122,10 +122,30 @@ export async function onRequestPost(context) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const status = response.status === 429 ? 429 : response.status === 401 || response.status === 403 ? 503 : 502;
-      return fail(status === 429 ? "Gemini đang giới hạn lượt gọi. Hãy chờ rồi thử lại." : "Gemini Search không hoàn tất. Kiểm tra API key, quyền Grounding with Google Search và hạn mức.", status);
+      const apiError = data?.error || {};
+      const apiStatus = cleanText(apiError.status || "", 80);
+      const rawDetail = cleanText(apiError.message || "", 500);
+      // Include Google's actual diagnostic while ensuring the configured secret can never be echoed.
+      const detail = apiKey ? rawDetail.split(apiKey).join("[đã ẩn API key]") : rawDetail;
+      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
+        return fail("Gemini Search bị giới hạn hạn mức (HTTP 429). " + (detail || "Kiểm tra RPM/RPD, hạn mức Grounding và billing trong AI Studio."), 429);
+      }
+      if (response.status === 401 || apiStatus === "UNAUTHENTICATED" || /API.?KEY_INVALID|invalid api key|api key.*invalid|reported as leaked|blocked/i.test(detail)) {
+        return fail("Gemini từ chối API key (HTTP " + response.status + "). " + (detail || "Tạo/kiểm tra key trong Google AI Studio và giới hạn key cho Gemini API."), 502);
+      }
+      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") {
+        return fail("Gemini từ chối quyền truy cập (HTTP 403). Kiểm tra key restriction, project/API access, billing và quyền sử dụng Grounding with Google Search. " + detail, 502);
+      }
+      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") {
+        return fail("Gemini từ chối định dạng yêu cầu (HTTP 400). Chi tiết Google: " + (detail || "INVALID_ARGUMENT"), 502);
+      }
+      return fail("Gemini Search trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra trạng thái dịch vụ và thử lại."), 502);
     }
     const candidate = data?.candidates?.[0];
+    if (!candidate) {
+      const blockReason = cleanText(data?.promptFeedback?.blockReason || data?.prompt_feedback?.block_reason || "", 100);
+      return fail("Gemini không trả về kết quả" + (blockReason ? " (blockReason: " + blockReason + ")" : "") + ". Kiểm tra nội dung ảnh/yêu cầu và thử lại.", 502);
+    }
     const chunks = candidate?.groundingMetadata?.groundingChunks || candidate?.grounding_metadata?.grounding_chunks || [];
     const seen = new Set();
     const grounded = [];
@@ -155,8 +175,11 @@ export async function onRequestPost(context) {
       ok: true, platform, results,
       message: results.length ? "Gemini Search trả về các trang nguồn thực tế. Chỉ kết quả có ảnh tải được mới có thể đo pHash; không có điểm tương đồng nào được giả lập." : "Gemini Search không trả về trang sản phẩm Taobao/1688 đủ căn cứ. Không có kết quả giả được tạo."
     });
-  } catch {
-    return fail("Không kết nối được Gemini Search. Thử lại hoặc kiểm tra quyền Grounding with Google Search.", 502);
+  } catch (error) {
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") {
+      return fail("Gemini Search hết thời gian chờ sau 25 giây. Thử lại; nếu lặp lại, kiểm tra tình trạng dịch vụ hoặc hạn mức.", 504);
+    }
+    return fail("Không kết nối được Gemini Search từ Cloudflare Worker. Kiểm tra kết nối ra generativelanguage.googleapis.com. " + cleanText(error?.message || "", 240), 502);
   }
 }
 
