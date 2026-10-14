@@ -142,9 +142,9 @@ export function parseModelJson(rawText) {
 
   // Some model outputs escape all quotes in the JSON payload. Normalize this
   // representation only as a secondary attempt; the result still must pass JSON.parse.
-  if (text.includes("\\\\"") && text.includes("{")) {
-    const unescaped = text.replace(/\\\\(["\\\\/bfnrt])/g, (_, ch) => {
-      const escapes = { '"': '"', "\\\\": "\\\\", "/": "/", b: "\\b", f: "\\f", n: "\\n", r: "\\r", t: "\\t" };
+  if (text.includes('\\"') && text.includes("{")) {
+    const unescaped = text.replace(/\\(["\\/bfnrt])/g, (_, ch) => {
+      const escapes = { '"': '"', "\\": "\\", "/": "/", b: "\b", f: "\f", n: "\n", r: "\r", t: "\t" };
       return escapes[ch] ?? ch;
     });
     if (unescaped !== text) {
