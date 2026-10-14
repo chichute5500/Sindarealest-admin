@@ -84,6 +84,8 @@ export async function onRequestGet(context) {
   }
 }
 
+import { consumeGeminiRequest } from "../../_lib/ai-quota.js";
+
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
@@ -99,15 +101,17 @@ export async function onRequestPost(context) {
   if (!imageBase64 || imageBase64.length > MAX_IMAGE_BASE64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) {
     return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn an toàn.");
   }
+  const quota = await consumeGeminiRequest(context.env.DB);
+  if (!quota.ok) return fail(quota.error, quota.status);
+
   const title = cleanText(body?.title || "", 180);
   const site = platform === "1688" ? "1688.com" : "taobao.com";
   const prompt = [
-    "Bạn là công cụ tìm kiếm sản phẩm thật trên web. Dùng ảnh đính kèm làm tham chiếu hình ảnh và tìm trang sản phẩm đang tồn tại trên sàn được chỉ định.",
-    "Sàn được chỉ định: " + site + ". Chỉ tìm trang chi tiết sản phẩm thuộc miền " + site + " hoặc tên miền con chính thức của nó.",
-    "Ưu tiên mẫu giày/phụ kiện có hình dáng, đường may, đế, màu và họa tiết gần ảnh tham chiếu. Thực hiện Google Search grounding; không suy đoán URL, tên hàng, giá hoặc kết quả.",
-    "Từ khóa sản phẩm hiện có: " + (title || "không có") + ". Ưu tiên từ khóa Trung văn liên quan như 鳄鱼皮鞋 / 真鳄鱼皮 nếu phù hợp; không gán từ khóa thật cho hàng giả/vân dập.",
-    "Chỉ liệt kê các trang sản phẩm mà kết quả tìm kiếm thực sự trích dẫn. Nếu không tìm thấy trang đủ căn cứ trên sàn đó, hãy nói không tìm thấy; tuyệt đối không tạo dữ liệu giả.",
-    "Trả lời ngắn bằng tiếng Việt. Chỉ URL được trả về trong trích dẫn nguồn Google Search mới được xem là nguồn ứng viên."
+    "Bạn phân tích ảnh sản phẩm và tạo từ khóa tìm kiếm; KHÔNG được truy cập web, KHÔNG được tạo URL sản phẩm giả và KHÔNG được khẳng định đã tìm thấy sản phẩm cụ thể.",
+    "Nhìn vào ảnh, xác định loại sản phẩm, kiểu dáng, màu sắc, họa tiết, chi tiết nổi bật. Trả về tối đa 4 cụm từ khóa ngắn bằng tiếng Trung giản thể để người dùng tìm thủ công trên " + site + ".",
+    "Nếu ảnh và tiêu đề gợi ý giày da/vân cá sấu, hãy phân biệt 鳄鱼皮 (da cá sấu) với 鳄鱼纹/压纹/PU (vân cá sấu giả); không khẳng định vật liệu là da thật.",
+    "Tiêu đề sản phẩm hiện có: " + (title || "không có") + ".",
+    "Trả về JSON thuần, không markdown: {\"keywords\":[string,string],\"visualSummary\":string}. Chỉ đưa từ khóa liên quan trực tiếp tới vật thể trong ảnh."
   ].join("\n");
   const imageMimeType = /^data:image\/webp/i.test(String(body?.imageBase64 || "")) ? "image/webp" : /^data:image\/png/i.test(String(body?.imageBase64 || "")) ? "image/png" : "image/jpeg";
   try {
@@ -119,67 +123,66 @@ export async function onRequestPost(context) {
         input: [
           { type: "text", text: prompt },
           { type: "image", data: imageBase64, mime_type: imageMimeType }
-        ],
-        tools: [{ type: "google_search" }]
+        ]
       }),
       signal: AbortSignal.timeout(25000)
     });
     const data = await response.json().catch(() => ({}));
-    const steps = Array.isArray(data?.steps) ? data.steps : [];
-    const outputBlocks = steps.filter((step) => step?.type === "model_output").flatMap((step) => Array.isArray(step.content) ? step.content : []);
-    const outputText = outputBlocks.filter((block) => block?.type === "text").map((block) => block.text || "").join("\n");
+    const blocks = (Array.isArray(data?.steps) ? data.steps : [])
+      .filter(step => step?.type === "model_output")
+      .flatMap(step => Array.isArray(step.content) ? step.content : []);
+    const outputText = blocks.filter(block => block?.type === "text").map(block => block.text || "").join("\n").trim();
     if (!response.ok) {
       const apiError = data?.error || {};
       const apiStatus = cleanText(apiError.status || "", 80);
-      const rawDetail = cleanText(apiError.message || outputText || "", 500);
+      const rawDetail = cleanText(apiError.message || outputText || "", 400);
       const detail = apiKey ? rawDetail.split(apiKey).join("[đã ẩn API key]") : rawDetail;
-      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") return fail("Gemini Search bị giới hạn hạn mức (HTTP 429). " + (detail || "Kiểm tra hạn mức Gemini/Google Search và billing."), 429);
+      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
+        return fail("Gemini đã từ chối yêu cầu vì quota/hạn mức của Google (HTTP 429). Không tự động thử lại để tránh tiêu hao thêm quota. Kiểm tra giới hạn thực tế trong Google AI Studio. " + detail, 429);
+      }
       if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return fail("Gemini từ chối API key. " + detail, 502);
-      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra key restriction, project và quyền Google Search. " + detail, 502);
-      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") return fail("Gemini Interactions API từ chối định dạng yêu cầu (HTTP 400). " + (detail || "INVALID_ARGUMENT"), 502);
+      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra dự án và quyền API. " + detail, 502);
       return fail("Gemini Interactions API trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra cấu hình API."), 502);
     }
-    if (data?.status && data.status !== "completed") {
-      return fail("Gemini Interactions API chưa hoàn tất (status: " + cleanText(data.status, 80) + "). Thử lại.", 502);
-    }
-    if (!outputBlocks.length) return fail("Gemini Interactions API không trả về nội dung kết quả. Thử lại.", 502);
-    const seen = new Set();
-    const grounded = [];
-    // Interactions API returns grounded source URLs as url_citation annotations on model_output text blocks.
-    for (const block of outputBlocks) {
-      for (const annotation of (Array.isArray(block.annotations) ? block.annotations : [])) {
-        if (annotation?.type !== "url_citation") continue;
-        const uri = annotation.url || "";
-        let parsed;
-        try { parsed = new URL(uri); } catch { continue; }
-        if (!isProductUrl(parsed.href) || seen.has(parsed.href)) continue;
-        seen.add(parsed.href);
-        grounded.push({ productUrl: parsed.href, groundedTitle: cleanText(annotation.title || "", 300) });
-        if (grounded.length >= 10) break;
-      }
-      if (grounded.length >= 10) break;
-    }
-    const results = await Promise.all(grounded.slice(0, 6).map(async (item) => {
-      const metadata = await productMetadata(item.productUrl);
-      const resultTitle = metadata.title || item.groundedTitle || title || "Sản phẩm từ kết quả tìm kiếm";
-      const candidateText = [resultTitle, item.groundedTitle].filter(Boolean).join(" ").slice(0, 1000);
-      const evaluation = evaluateSearchCandidate({ title: candidateText, similarityScore: null });
-      return {
-        title: resultTitle, candidateText, imageUrl: metadata.imageUrl || "", productUrl: item.productUrl, price: null,
-        similarityScore: null, hasKeyword: evaluation.hasKeyword, eligible: false,
-        eligibilityReason: metadata.imageUrl ? "Chưa đo pHash; cần đối chiếu ảnh trước khi lưu URL." : "Trang nguồn chưa cung cấp ảnh sản phẩm đọc được; chưa thể đo pHash.",
-        materialCheck: evaluation.materialCheck
-      };
-    }));
+    if (data?.status && data.status !== "completed") return fail("Gemini chưa hoàn tất tạo từ khóa (status: " + cleanText(data.status, 80) + "). Không tự động gửi lại.", 502);
+    if (!outputText) return fail("Gemini không trả về từ khóa tìm kiếm.", 502);
+
+    let parsed;
+    try { parsed = JSON.parse(outputText.replace(/^```json\s*/i, "").replace(/\s*```$/, "").trim()); }
+    catch { return fail("Gemini trả về từ khóa sai định dạng. Không tạo kết quả giả.", 502); }
+    const keywords = Array.isArray(parsed.keywords)
+      ? parsed.keywords.map(value => cleanText(value, 80)).filter(Boolean).slice(0, 4)
+      : [];
+    if (!keywords.length) return json({ ok: true, platform, results: [], message: "Gemini không tạo được từ khóa đủ rõ; không tạo URL sản phẩm giả." });
+    const query = cleanText([title, ...keywords].filter(Boolean).join(" "), 220);
+    const searchUrl = platform === "1688"
+      ? "https://s.1688.com/selloffer/offer_search.htm?keywords=" + encodeURIComponent(query)
+      : "https://s.taobao.com/search?q=" + encodeURIComponent(query);
+    const evaluation = evaluateSearchCandidate({ title: keywords.join(" "), similarityScore: null });
     return json({
-      ok: true, platform, results,
-      message: results.length ? "Gemini Search trả về các trang nguồn thực tế. Chỉ kết quả có ảnh tải được mới có thể đo pHash; không có điểm tương đồng nào được giả lập." : "Gemini Search không trả về trang sản phẩm Taobao/1688 đủ căn cứ. Không có kết quả giả được tạo."
+      ok: true,
+      platform,
+      results: [{
+        title: "Trang tìm kiếm " + platform + " — " + keywords[0],
+        candidateText: keywords.join(" "),
+        imageUrl: "",
+        productUrl: searchUrl,
+        searchUrl,
+        isSearchPage: true,
+        price: null,
+        similarityScore: null,
+        hasKeyword: evaluation.hasKeyword,
+        eligible: false,
+        eligibilityReason: "Đây chỉ là trang kết quả tìm kiếm theo từ khóa do AI gợi ý, không phải sản phẩm đã xác minh. Gói miễn phí không dùng Google Search grounding; hãy tự mở trang, chọn sản phẩm thật và đối chiếu ảnh trước khi lưu URL.",
+        materialCheck: evaluation.materialCheck,
+        keywords,
+        visualSummary: cleanText(parsed.visualSummary || "", 300)
+      }],
+      message: "Đã tạo trang tìm kiếm theo từ khóa hình ảnh bằng một lượt Gemini. Chưa tìm thấy hay xác minh sản phẩm cụ thể; không có URL sản phẩm giả và không thể lưu trang tìm kiếm làm nguồn."
     });
   } catch (error) {
-    if (error?.name === "TimeoutError" || error?.name === "AbortError") {
-      return fail("Gemini Search hết thời gian chờ sau 25 giây. Thử lại; nếu lặp lại, kiểm tra tình trạng dịch vụ hoặc hạn mức.", 504);
-    }
-    return fail("Không kết nối được Gemini Search từ Cloudflare Worker. Kiểm tra kết nối ra generativelanguage.googleapis.com. " + cleanText(error?.message || "", 240), 502);
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") return fail("Gemini hết thời gian chờ sau 25 giây. Không tự động thử lại để bảo vệ quota.", 504);
+    return fail("Không kết nối được Gemini Interactions API. " + cleanText(error?.message || "", 200), 502);
   }
 }
 
