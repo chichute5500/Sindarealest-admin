@@ -13,7 +13,10 @@ async function runVision(ai, prompt, image) {
     return { error: "Chưa cấu hình Workers AI binding AI cho môi trường Preview/Production.", status: 503 };
   }
   try {
+    // Cloudflare's model API supports the direct prompt+image input shape.
+    // Keep messages as a compatibility field for Workers AI SDK variants and tests.
     const result = await ai.run(VISION_MODEL, {
+      prompt,
       messages: [
         { role: "system", content: "You analyze product photos carefully and return only the requested output." },
         { role: "user", content: prompt }
