@@ -197,9 +197,10 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     "Return exactly one valid JSON object and nothing else. No Markdown fences, no preamble, no explanation, and no text after the JSON.",
     'Required JSON schema: {"summary":"short concrete Vietnamese description","visibleFeatures":["specific visible observation"],"modelAssessment":"same_model_possible|different_model_possible|different_angle_possible|uncertain","materialAssessment":"possible_synthetic|crocodile_claim_unverified|no_visible_evidence|uncertain","confidence":"low|medium|high","reasons":["specific reason grounded in visible detail"],"needsHumanReview":true}.',
     "All fields are required and must have correct types. visibleFeatures: 3-6 strings. reasons: 2-5 strings. summary must describe visible form/features, not repeat product title. confidence='high' is forbidden for material authenticity and image identity from one image. Set needsHumanReview=true whenever material authenticity or model identity cannot be verified.",
+    "Keep each observation concise and the complete JSON compact (ideally under 500 tokens). Escape all string contents correctly, close every array/object, and end immediately after the final closing brace.",
     "Metadata for context only (do not treat as visual evidence): SKU " + String(sku).slice(0, 60) + "; tên " + String(title).slice(0, 180) + "; danh mục " + String(category).slice(0, 80) + "."
   ].join("\n");
-  const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 768 });
+  const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 1024 });
   if (output.error) return output;
   const parsed = parseModelJson(output.text);
   if (!parsed) {
