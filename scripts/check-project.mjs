@@ -24,10 +24,10 @@ function runTest(file) {
 for (const required of [
   'package.json', 'wrangler.toml',
   'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
-  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/_lib/workers-ai.js', 'functions/_lib/elimapi.js',
+  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/api/admin/image-candidate.js', 'functions/_lib/workers-ai.js', 'functions/_lib/elimapi.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
-  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql',
+  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql', 'migrations/0010_ai_image_source_image_url.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
 ]) check(existsSync(join(root, required)), `Thiếu tệp bắt buộc: ${required}`);
@@ -88,27 +88,31 @@ const aiReviewMigration = existsSync(join(root, 'migrations/0007_ai_image_review
 check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 thiếu hàng đợi kiểm duyệt ảnh AI');
 const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source_url.sql')) ? readFileSync(join(root, 'migrations/0008_ai_image_source_url.sql'), 'utf8') : '';
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
+const aiImageSourceMigration = existsSync(join(root, 'migrations/0010_ai_image_source_image_url.sql')) ? readFileSync(join(root, 'migrations/0010_ai_image_source_image_url.sql'), 'utf8') : '';
+check(aiImageSourceMigration.includes('ADD COLUMN source_image_url') && aiImageSourceMigration.includes('ADD COLUMN reference_image_ref'), 'Migration 0010 thiếu URL CDN ảnh hoặc tham chiếu ảnh gốc');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
 const workersAi = existsSync(join(root, 'functions/_lib/workers-ai.js')) ? readFileSync(join(root, 'functions/_lib/workers-ai.js'), 'utf8') : '';
 check(workersAi.includes('@cf/meta/llama-3.2-11b-vision-instruct') && workersAi.includes('ai.run') && workersAi.includes('WORKERS_AI_EMPTY_RESPONSE'), 'Workers AI phải dùng model vision được cấu hình và báo lỗi khi phản hồi rỗng');
-check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('context.env.AI') && imageSearchApi.includes('consumeWorkersAiRequest') && imageSearchApi.includes('searchElimapiProducts') && imageSearchApi.includes('ELIMAPI_API_KEY') && !imageSearchApi.includes('https://s.taobao.com/search') && !imageSearchApi.includes('GEMINI_API_KEY') && !imageSearchApi.includes('google_search') && !imageSearchApi.includes('NEXSCOPE'), 'API tìm ảnh phải dùng Workers AI, kiểm soát quota và lấy sản phẩm thật từ Elimapi');
+check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('context.env.AI') && imageSearchApi.includes('consumeWorkersAiRequest') && imageSearchApi.includes('searchElimapiProducts') && imageSearchApi.includes('ELIMAPI_API_KEY') && imageSearchApi.includes('ownedImages.some') && imageSearchApi.includes('sourceImageRef') && !imageSearchApi.includes('https://s.taobao.com/search') && !imageSearchApi.includes('GEMINI_API_KEY') && !imageSearchApi.includes('google_search') && !imageSearchApi.includes('NEXSCOPE'), 'API tìm ảnh phải xác minh đúng bộ ảnh sản phẩm, dùng Workers AI, quota và Elimapi');
 const elimapiClient = existsSync(join(root, 'functions/_lib/elimapi.js')) ? readFileSync(join(root, 'functions/_lib/elimapi.js'), 'utf8') : '';
 check(elimapiClient.includes('openapi.elim.asia/v2/products/search') && elimapiClient.includes('x-api-key') && elimapiClient.includes('normalizeElimapiProducts'), 'Elimapi phải gọi API v2 phía máy chủ và chuẩn hóa kết quả thật');
 const imageAuditLib = existsSync(join(root, 'functions/_lib/image-audit.js')) ? readFileSync(join(root, 'functions/_lib/image-audit.js'), 'utf8') : '';
 check(imageAuditLib.includes('validated-visual-embedding-v1') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt phải yêu cầu phương pháp so khớp đã hiệu chuẩn, từ khóa và loại trừ giả da');
+check(imageAuditLib.includes('isAllowedSourceProductUrl') && imageAuditLib.includes('isAllowedSourceImageUrl'), 'Nguồn ảnh và URL sản phẩm phải được xác thực phía máy chủ');
 
 const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
 check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_ai_reviews WHERE r2_key=?'), 'Đường dẫn media chưa xác minh trạng thái duyệt AI');
 check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duyệt không bị chặn khỏi endpoint media');
 check(mediaRoute.includes('private, no-store'), 'Ảnh ứng viên AI chưa được đặt Cache-Control no-store');
 const aiAuditApi = existsSync(join(root, 'functions/api/admin/image-audit.js')) ? readFileSync(join(root, 'functions/api/admin/image-audit.js'), 'utf8') : '';
-check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'API kiểm duyệt AI chưa lưu/đọc URL nguồn ảnh');
+check(aiAuditApi.includes('source_url') && aiAuditApi.includes('source_image_url') && aiAuditApi.includes('reference_image_ref') && aiAuditApi.includes('compareCandidate'), 'API kiểm duyệt chưa nối nguồn ảnh, ảnh gốc tham chiếu và so sánh hai ảnh');
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
 check(imageTests.includes('WORKERS_AI_EMPTY_RESPONSE') && imageTests.includes('one Workers AI request per analysis') && imageTests.includes('compareProductImages().available'), 'Thiếu kiểm thử phản hồi rỗng, không retry và mô hình so khớp chưa khả dụng');
 check(imageTests.includes('must fail closed') && imageTests.includes('crocodile keyword remains mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
 check(imageTests.includes('normalizeElimapiProducts') && imageTests.includes('ELIMAPI_API_KEY') && imageTests.includes('normalizedAliases'), 'Thiếu kiểm thử Elimapi và chuẩn hóa từ khóa AI');
+check(imageTests.includes('isAllowedSourceProductUrl') && imageTests.includes('isAllowedSourceImageUrl') && imageTests.includes('qualitative comparison must never auto-approve'), 'Thiếu kiểm thử nguồn an toàn và so sánh định tính không tự duyệt ảnh');
 const workersAiSource = (await import('../functions/_lib/workers-ai.js')).analyzeProductImage.toString();
 check(workersAiSource.includes('runWorkersAiVision') && !workersAiSource.includes('GEMINI_API_KEY'), 'Phân tích ảnh phải dùng binding Workers AI, không dùng Gemini API key');
 const quotaSource = (await import('../functions/_lib/ai-quota.js')).consumeWorkersAiRequest.toString();
@@ -119,6 +123,7 @@ check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite đ�
 
 const adminHtml = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
 check(adminHtml.includes('data-view="ai"') && !adminHtml.includes('window.__sdAiInventoryAutoScanned') && adminHtml.includes('Nhấn “Quét toàn bộ ảnh”'), 'Tab AI phải tồn tại nhưng không tự động quét khi mở');
+check(adminHtml.includes('data-download-candidate') && adminHtml.includes('data-reference-image-ref') && adminHtml.includes('data-ai-compare') && adminHtml.includes('/api/admin/image-candidate?reviewId='), 'Giao diện phải tải ảnh thật vào hàng chờ, xem trước riêng và đối chiếu ảnh gốc');
 const endpointMap = {
   '/api/admin/login': 'functions/api/admin/login.js',
   '/api/admin/logout': 'functions/api/admin/logout.js',
@@ -126,6 +131,7 @@ const endpointMap = {
   '/api/admin/products': 'functions/api/admin/products.js',
   '/api/admin/image-search': 'functions/api/admin/image-search.js',
   '/api/admin/image-audit': 'functions/api/admin/image-audit.js',
+  '/api/admin/image-candidate': 'functions/api/admin/image-candidate.js',
   '/api/admin/products/reset-skus': 'functions/api/admin/products/reset-skus.js',
   '/api/admin/ai-description': 'functions/api/admin/ai-description.js',
   '/api/admin/push-subscriptions': 'functions/api/admin/push-subscriptions.js',
