@@ -126,7 +126,7 @@ export async function suggestMarketplaceImageKeywords({ ai, imageBase64, mimeTyp
     "Tạo 2 đến 4 từ khóa tiếng Trung giản thể NGẮN, mỗi từ khóa là một cụm tìm kiếm thực tế trên sàn thương mại điện tử; chỉ mô tả đúng loại sản phẩm, kiểu dáng, màu sắc và chi tiết nhìn thấy.",
     "Không thêm lời dẫn, không giải thích, không Markdown, không dùng dấu ``` và không đặt JSON trong câu văn.",
     "Nếu tiêu đề nói đến da cá sấu, phân biệt 鳄鱼皮 (da cá sấu) với 鳄鱼纹/压纹/PU (vân giả); không khẳng định vật liệu thật từ ảnh.",
-    "Chỉ trả về MỘT đối tượng JSON hợp lệ, đúng cú pháp, không có dấu phẩy cuối, theo schema: {\\"keywords\\":[\\"中文关键词1\\",\\"中文关键词2\\"],\\"visualSummary\\":\\"简短描述\\"}.",
+    'Chỉ trả về MỘT đối tượng JSON hợp lệ, đúng cú pháp, không có dấu phẩy cuối, theo schema: {"keywords":["中文关键词1","中文关键词2"],"visualSummary":"简短描述"}.',
     "Tự kiểm tra JSON có thể được JSON.parse phân tích và mọi giá trị keywords đều là chuỗi.",
     "Tiêu đề hiện có: " + String(title || "không có").slice(0, 180),
     "Danh mục: " + String(category || "không có").slice(0, 80)
