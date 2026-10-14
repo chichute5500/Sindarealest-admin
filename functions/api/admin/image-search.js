@@ -136,6 +136,7 @@ export async function onRequestPost(context) {
       if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") return fail("Gemini Search bị giới hạn hạn mức (HTTP 429). " + (detail || "Kiểm tra hạn mức Gemini/Google Search và billing."), 429);
       if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return fail("Gemini từ chối API key. " + detail, 502);
       if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra key restriction, project và quyền Google Search. " + detail, 502);
+      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") return fail("Gemini Interactions API từ chối định dạng yêu cầu (HTTP 400). " + (detail || "INVALID_ARGUMENT"), 502);
       return fail("Gemini Interactions API trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra cấu hình API."), 502);
     }
     if (data?.status && data.status !== "completed") {
