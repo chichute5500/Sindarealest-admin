@@ -31,7 +31,8 @@ export async function onRequestGet({ params, env }) {
     const headers = new Headers();
     object.writeHttpMetadata(headers);
     headers.set("Content-Type", "image/webp");
-    headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    // Candidate approval can be revoked; never cache these URLs in browsers/CDNs.
+    headers.set("Cache-Control", key.endsWith(AI_CANDIDATE_SUFFIX) ? "private, no-store" : "public, max-age=31536000, immutable");
     headers.set("X-Content-Type-Options", "nosniff");
     return new Response(object.body, { headers });
   } catch {
