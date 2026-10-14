@@ -30,7 +30,7 @@ export async function onRequestGet(context) {
     ]);
     return json({ ok: true, products: products.results || [], reviews: (reviews.results || []).map(safeReview) });
   } catch {
-    return fail("Không tải được hàng đợi AI. Hãy kiểm tra đã áp dụng migrations/0007_ai_image_reviews.sql và 0008_ai_image_source_url.sql trên môi trường này chưa.", 503);
+    return fail("Không tải được hàng đợi AI. Hãy kiểm tra migrations/0007, 0008 và 0010 đã được áp dụng trên đúng D1 của môi trường này chưa.", 503);
   }
 }
 
@@ -175,6 +175,7 @@ export async function onRequestPatch(context) {
     return json({ ok: true, message: "Đã xác nhận kết quả kiểm tra. Ảnh gốc hiện hữu không bị thay đổi." });
   }
   if (review.status === "approved") return json({ ok: true, message: "Ảnh này đã được duyệt trước đó." });
+  if (review.status === "rejected") return fail("Ảnh đã bị từ chối; hãy tải lại như một ứng viên mới nếu muốn xem xét lại.", 409);
   const product = await getProduct(db, review.product_id);
   if (!product) return fail("Sản phẩm không còn tồn tại.", 404);
   const noStorage = storageOrFail(context.env);
