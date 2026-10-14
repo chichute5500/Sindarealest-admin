@@ -37,6 +37,7 @@ const imageSearchModule = await import("../functions/api/admin/image-search.js")
 assert.equal(typeof imageSearchModule.onRequestPost, "function");
 assert.equal(imageSearchModule.isSupportedSourceUrl("https://item.taobao.com/item.htm?id=123456"), true);
 assert.equal(imageSearchModule.isSupportedSourceUrl("https://evil.example/item.htm?id=123456"), false);
+assert.equal(imageSearchModule.isSupportedSourceUrl("https://s.taobao.com/search?q=sneaker"), false);
 assert.match(imageSearchModule.onRequestPost.toString(), /ELIMAPI_API_KEY/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);
