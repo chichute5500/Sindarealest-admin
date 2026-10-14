@@ -127,6 +127,7 @@ assert.equal(invalidJson.code, "WORKERS_AI_INVALID_JSON");
 assert.ok(invalidJson.diagnostic, "invalid JSON failures should return sanitized diagnostics to the admin API");
 assert.equal(invalidJson.diagnostic.responseLength, "Model output was unexpectedly plain text, not JSON.".length);
 assert.match(invalidJson.diagnostic.responsePreview, /unexpectedly plain text/);
+assert.match(invalidJson.error, /unexpectedly plain text/, "admin-visible error should include a sanitized response preview without requiring another route change");
 assert.match(invalidJsonDiagnostic, /workers_ai_invalid_json/, "invalid JSON must emit a diagnostic event");
 assert.match(invalidJsonDiagnostic, /unexpectedly plain text/, "diagnostic must include a short sanitized preview of model output");
 assert.match(invalidJsonDiagnostic, /responseLength/, "diagnostic must include the response length");
