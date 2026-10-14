@@ -46,6 +46,20 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
       temperature: 0.1
     });
+    // Safe diagnostics: log response shape only, never prompts, image bytes, or field contents.
+    const diagnostic = {
+      event: "workers_ai_vision_result",
+      model: WORKERS_AI_VISION_MODEL,
+      resultType: typeof result,
+      resultIsArray: Array.isArray(result),
+      resultKeys: result && typeof result === "object" ? Object.keys(result).slice(0, 30) : [],
+      resultStringLength: typeof result === "string" ? result.length : null,
+      responseType: typeof result?.response,
+      responseLength: typeof result?.response === "string" ? result.response.length : null,
+      resultFieldType: typeof result?.result,
+      resultFieldLength: typeof result?.result === "string" ? result.result.length : null
+    };
+    console.info("[Workers AI diagnostic]", JSON.stringify(diagnostic));
     const text = typeof result === "string" ? result : typeof result?.response === "string" ? result.response : typeof result?.result === "string" ? result.result : "";
     if (!text.trim()) return { error: "Workers AI đã phản hồi nhưng không có nội dung phân tích ảnh. Hãy kiểm tra model output trong Cloudflare; không tự động gọi lại.", status: 502, code: "WORKERS_AI_EMPTY_RESPONSE" };
     return { text: text.trim(), model: WORKERS_AI_VISION_MODEL };
