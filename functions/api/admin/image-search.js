@@ -1,5 +1,5 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
-import { assessCrocodileMaterial, inventoryImages } from "../../_lib/image-audit.js";
+import { evaluateSearchCandidate, extractSimilarityScore, inventoryImages } from "../../_lib/image-audit.js";
 
 function isSupportedSourceUrl(value) {
   try { const u = new URL(value); const h = u.hostname.toLowerCase(); return u.protocol === "https:" && (h === "1688.com" || h.endsWith(".1688.com") || h === "taobao.com" || h.endsWith(".taobao.com")); } catch { return false; }
@@ -59,13 +59,25 @@ export async function onRequestPost(context) {
     const products = Array.isArray(payload.products) ? payload.products : [];
     return json({
       ok: true, platform: "1688",
-      results: products.map((item) => ({
-        title: String(item.title || item.subject || "").slice(0, 300),
-        imageUrl: String(item.imageUrl || item.image_url || item.picUrl || item.pic_url || ""),
-        productUrl: String(item.productUrl || item.product_url || item.offerUrl || item.offer_url || item.url || (item.offerId ? "https://detail.1688.com/offer/" + encodeURIComponent(String(item.offerId)) + ".html" : "")),
-        price: item.price == null ? null : String(item.price),
-        materialCheck: assessCrocodileMaterial([item.title, item.description, item.material, item.properties].filter(Boolean).join(" "))
-      })).filter((item) => /^https:\/\//i.test(item.imageUrl) && isSupportedSourceUrl(item.productUrl))
+      results: products.map((item) => {
+        const title = String(item.title || item.subject || "").slice(0, 300);
+        const description = String(item.description || item.desc || "").slice(0, 2000);
+        const material = String(item.material || "").slice(0, 500);
+        const properties = typeof item.properties === "string" ? item.properties.slice(0, 1000) : JSON.stringify(item.properties || {}).slice(0, 1000);
+        const similarityScore = extractSimilarityScore(item);
+        const evaluation = evaluateSearchCandidate({ title, description, material, properties, similarityScore });
+        return {
+          title,
+          imageUrl: String(item.imageUrl || item.image_url || item.picUrl || item.pic_url || ""),
+          productUrl: String(item.productUrl || item.product_url || item.offerUrl || item.offer_url || item.url || (item.offerId ? "https://detail.1688.com/offer/" + encodeURIComponent(String(item.offerId)) + ".html" : "")),
+          price: item.price == null ? null : String(item.price),
+          similarityScore: evaluation.similarityScore,
+          hasKeyword: evaluation.hasKeyword,
+          eligible: evaluation.eligible,
+          eligibilityReason: evaluation.reason,
+          materialCheck: evaluation.materialCheck
+        };
+      }).filter((item) => /^https:\/\//i.test(item.imageUrl) && isSupportedSourceUrl(item.productUrl))
     });
   } catch {
     return fail("Không kết nối được dịch vụ tìm ảnh 1688. Vui lòng thử lại.", 502);
