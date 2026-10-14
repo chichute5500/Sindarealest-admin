@@ -1,4 +1,4 @@
-const TEN_SECONDS = 10;
+const MINIMUM_INTERVAL_SECONDS = 15;
 const ROLLING_DAY_SECONDS = 24 * 60 * 60;
 const MAX_REQUESTS_PER_ROLLING_DAY = 20;
 
@@ -26,15 +26,14 @@ async function consumeWindow(db, scope, windowSeconds, maxRequests) {
 
 export async function consumeGeminiRequest(db) {
   try {
-    // Check the longer window first so a daily-limit rejection does not consume
-    // the short-window allowance.
+    // Check the short window first so repeated rapid clicks do not consume the daily allowance.
+    const recent = await consumeWindow(db, "gemini-15-seconds", MINIMUM_INTERVAL_SECONDS, 1);
+    if (!recent) {
+      return { ok: false, status: 429, error: "Vừa có một yêu cầu Gemini được gửi. Để bảo vệ quota miễn phí, hãy chờ ít nhất 15 giây trước yêu cầu tiếp theo." };
+    }
     const daily = await consumeWindow(db, "gemini-rolling-24h", ROLLING_DAY_SECONDS, MAX_REQUESTS_PER_ROLLING_DAY);
     if (!daily) {
       return { ok: false, status: 429, error: "Đã đạt giới hạn bảo vệ gói miễn phí của SinDarealest: tối đa 20 yêu cầu Gemini trong 24 giờ. Không gửi thêm yêu cầu để tránh tiêu hao quota; hãy thử lại sau khi cửa sổ 24 giờ trôi qua." };
-    }
-    const recent = await consumeWindow(db, "gemini-10-seconds", TEN_SECONDS, 1);
-    if (!recent) {
-      return { ok: false, status: 429, error: "Vừa có một yêu cầu Gemini được gửi. Để bảo vệ quota miễn phí, hãy chờ ít nhất 10 giây trước yêu cầu tiếp theo." };
     }
     return { ok: true };
   } catch {
