@@ -16,8 +16,8 @@ function safeProductUrl(value, platform, id) {
       const host = url.hostname.toLowerCase();
       const secure = url.protocol === "https:" && !url.username && !url.password && !url.port;
       const detailPath = platform === "alibaba"
-        ? /\\/offer\\/[A-Za-z0-9_-]+\\.html?$/i.test(url.pathname) && (host === "1688.com" || host.endsWith(".1688.com"))
-        : /\\/item\\.htm$/i.test(url.pathname) && /^[A-Za-z0-9_-]{1,100}$/.test(url.searchParams.get("id") || "") &&
+        ? /\/offer\/[A-Za-z0-9_-]+\.html?$/i.test(url.pathname) && (host === "1688.com" || host.endsWith(".1688.com"))
+        : /\/item\.htm$/i.test(url.pathname) && /^[A-Za-z0-9_-]{1,100}$/.test(url.searchParams.get("id") || "") &&
           (host === "taobao.com" || host.endsWith(".taobao.com") || host === "tmall.com" || host.endsWith(".tmall.com"));
       if (secure && detailPath && isAllowedHost(host, platform)) return url.href;
     } catch {}
