@@ -10,6 +10,7 @@ function safeReview(row) {
   return {
     id: row.id, productId: row.product_id, imageRef: row.image_ref,
     kind: row.image_kind, status: row.status, analysis,
+    sourceUrl: row.source_url || "",
     createdAt: row.created_at, updatedAt: row.updated_at
   };
 }
@@ -98,11 +99,27 @@ export async function onRequestPatch(context) {
   try { body = await context.request.json(); } catch { return fail("Yêu cầu duyệt ảnh không hợp lệ."); }
   const id = String(body?.reviewId || "");
   const decision = String(body?.decision || "");
-  if (!id || !["approve", "reject", "recheck"].includes(decision)) return fail("Thiếu lựa chọn duyệt ảnh hợp lệ.");
+  if (!id || !["approve", "reject", "recheck", "saveSource"].includes(decision)) return fail("Thiếu lựa chọn duyệt ảnh hợp lệ.");
   const db = context.env.DB;
   const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? LIMIT 1").bind(id).first().catch(() => null);
   if (!review) return fail("Không tìm thấy bản ghi kiểm duyệt.", 404);
-  if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Gemini từ bảng kiểm tra AI." });
+  if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Gemini và tìm ảnh từ bảng kiểm tra AI." });
+  if (decision === "saveSource") {
+    const sourceUrl = String(body?.sourceUrl || "").trim();
+    let parsed;
+    try { parsed = new URL(sourceUrl); } catch { return fail("URL nguồn không hợp lệ."); }
+    const host = parsed.hostname.toLowerCase();
+    if (parsed.protocol !== "https:" || !(host === "1688.com" || host.endsWith(".1688.com") || host === "taobao.com" || host.endsWith(".taobao.com"))) {
+      return fail("Chỉ lưu URL HTTPS thuộc Taobao hoặc 1688.");
+    }
+    if (sourceUrl.length > 2000) return fail("URL nguồn quá dài.");
+    try {
+      await db.prepare("UPDATE image_ai_reviews SET source_url=?,updated_at=datetime('now') WHERE id=?").bind(sourceUrl, id).run();
+      return json({ ok: true, sourceUrl, message: "Đã lưu URL nguồn ảnh." });
+    } catch {
+      return fail("Không lưu được URL nguồn. Hãy kiểm tra đã áp dụng migration 0008.", 503);
+    }
+  }
   if (decision === "reject") {
     if (review.image_kind === "candidate") {
       const product = await getProduct(db, review.product_id);
