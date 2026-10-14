@@ -16,11 +16,16 @@ async function runVision(ai, prompt, image) {
     const result = await ai.run(VISION_MODEL, {
       messages: [
         { role: "system", content: "You analyze product photos carefully and return only the requested output." },
-        { role: "user", content: prompt }
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: image } }
+          ]
+        }
       ],
-      image,
       temperature: 0.1,
-      max_tokens: 700
+      max_tokens: 900
     });
     const raw = extractResponseText(result).trim();
     if (!raw) return { error: "Workers AI không trả về nội dung phân tích ảnh.", status: 502 };
@@ -44,13 +49,13 @@ async function runVision(ai, prompt, image) {
 }
 
 function extractResponseText(value, depth = 0) {
-  if (depth > 5 || value == null) return "";
-  if (typeof value === "string") return value;
+  if (depth > 7 || value == null) return "";
+  if (typeof value === "string") return value.trim();
   if (Array.isArray(value)) {
-    return value.map((item) => extractResponseText(item, depth + 1)).filter(Boolean).join("\n");
+    return value.map((item) => extractResponseText(item, depth + 1)).filter(Boolean).join("\\n").trim();
   }
   if (typeof value === "object") {
-    for (const key of ["response", "generated_text", "output_text", "text", "content", "result", "output"]) {
+    for (const key of ["response", "generated_text", "output_text", "text", "content", "result", "output", "summary", "description"]) {
       if (value[key] !== undefined && value[key] !== value) {
         const text = extractResponseText(value[key], depth + 1);
         if (text) return text;
