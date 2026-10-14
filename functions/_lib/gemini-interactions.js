@@ -1,6 +1,6 @@
 // Bounded fallback only for transient HTTP 503 model-capacity errors. Never retry timeout, network, 429, or auth failures.
 function logGeminiDiagnostic(event, fields) {
-  // Deliberately log metadata only: never log prompts, image bytes, API keys, or raw Google error messages.
+  // Deliberately log metadata only: Never log prompts, image bytes, API keys, or raw Google error messages.
   console.warn("[SinDarealest Gemini]", JSON.stringify({ event, ...fields }));
 }
 
