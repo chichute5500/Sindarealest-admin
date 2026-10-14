@@ -109,7 +109,7 @@ check(aiAuditApi.includes('source_url') && aiAuditApi.includes('source_image_url
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
-check(imageTests.includes('WORKERS_AI_EMPTY_RESPONSE') && imageTests.includes('one Workers AI request per analysis') && imageTests.includes('compareProductImages().available'), 'Thiếu kiểm thử phản hồi rỗng, không retry và mô hình so khớp chưa khả dụng');
+check(imageTests.includes('WORKERS_AI_EMPTY_RESPONSE') && imageTests.includes('one Workers AI request per analysis') && imageTests.includes('unavailableComparison.available'), 'Thiếu kiểm thử phản hồi rỗng, không retry và mô hình so khớp định tính');
 check(imageTests.includes('must fail closed') && imageTests.includes('crocodile keyword remains mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
 check(imageTests.includes('normalizeElimapiProducts') && imageTests.includes('ELIMAPI_API_KEY') && imageTests.includes('normalizedAliases'), 'Thiếu kiểm thử Elimapi và chuẩn hóa từ khóa AI');
 check(imageTests.includes('isAllowedSourceProductUrl') && imageTests.includes('isAllowedSourceImageUrl') && imageTests.includes('qualitative comparison must never auto-approve'), 'Thiếu kiểm thử nguồn an toàn và so sánh định tính không tự duyệt ảnh');
