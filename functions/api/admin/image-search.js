@@ -1,5 +1,6 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages } from "../../_lib/image-audit.js";
+import { suggestMarketplaceImageKeywords } from "../../_lib/gemini.js";
 
 const MAX_IMAGE_BASE64 = 1_400_000;
 const API_BASE = "https://openapi.elim.asia";
@@ -83,14 +84,14 @@ async function uploadReferenceImage(bytes, platform, apiKey, mimeType) {
   if (!id || typeof id !== "string") throw new Error("API không trả về imageId sau khi tải ảnh tham chiếu lên.");
   return id;
 }
-async function findImageProducts(imageId, platform, apiKey, title) {
+async function findImageProducts(imageId, platform, apiKey, keyword) {
   return apiJson("/v2/products/search-by-image", apiKey, {
     platform: platform === "1688" ? "alibaba" : "taobao",
     imgId: imageId,
     lang: "vi",
     page: 1,
     size: 20,
-    ...(title ? { keyword: title.slice(0, 100) } : {})
+    ...(keyword ? { keyword: keyword.slice(0, 180) } : {})
   });
 }
 async function detailFor(item, platform, apiKey) {
@@ -145,12 +146,21 @@ export async function onRequestPost(context) {
   }
   const bytes = imageBytes(body?.imageBase64);
   if (!bytes) return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn an toàn.");
-  const rawMime = String(body?.imageBase64 || "").match(/^data:(image\/(?:jpeg|jpg|png|webp));base64,/i)?.[1]?.toLowerCase();
+  const rawMime = String(body?.imageBase64 || "").match(/^data:image\\/(?:jpeg|jpg|png|webp);base64,/i)?.[1]?.toLowerCase();
   const mimeType = rawMime === "image/png" || rawMime === "image/webp" ? rawMime : "image/jpeg";
+  const gemini = await suggestMarketplaceImageKeywords({
+    apiKey: context.env.GEMINI_API_KEY,
+    imageBase64: body?.imageBase64,
+    mimeType,
+    title,
+    category: safeText(body?.category, 80)
+  });
+  if (gemini.error) return fail(gemini.error, gemini.status || 502);
+  const searchKeyword = (gemini.keywords || []).join(" ");
 
   try {
     const imageId = await uploadReferenceImage(bytes, platform, apiKey, mimeType);
-    const response = await findImageProducts(imageId, platform, apiKey, title);
+    const response = await findImageProducts(imageId, platform, apiKey, searchKeyword);
     const rows = Array.isArray(response?.items) ? response.items
       : Array.isArray(response?.data?.items) ? response.data.items
       : Array.isArray(response?.data?.data?.items) ? response.data.data.items : [];
@@ -188,6 +198,8 @@ export async function onRequestPost(context) {
     return json({
       ok: true,
       platform,
+      keywords: gemini.keywords || [],
+      visualSummary: gemini.visualSummary || "",
       results,
       message: results.length
         ? "Đã tìm sản phẩm thật bằng ảnh và lấy thêm ảnh góc từ bộ ảnh nguồn khi API trả về. Chưa tự thêm ảnh vào website: cần đối chiếu pHash đạt ít nhất 90% và kiểm tra từ khóa trước."
