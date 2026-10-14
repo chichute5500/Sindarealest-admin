@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { assessCrocodileMaterial, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
+import { assessCrocodileMaterial, evaluateSearchCandidate, extractSimilarityScore, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage } from "../functions/_lib/gemini.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
@@ -16,6 +16,15 @@ assert.equal(assessCrocodileMaterial("giày da cá sấu giả").status, "reject
 assert.equal(assessCrocodileMaterial("鳄鱼纹压纹PU皮").status, "reject");
 assert.equal(assessCrocodileMaterial("giày da cá sấu thật").status, "review");
 assert.equal(assessCrocodileMaterial("giày da").status, "review");
+assert.equal(extractSimilarityScore({ similarity: 0.91 }), 91);
+assert.equal(extractSimilarityScore({ similarity_score: 89.5 }), 89.5);
+assert.equal(extractSimilarityScore({ score: 0.99 }), null, "generic score must not be mistaken for image similarity");
+assert.equal(evaluateSearchCandidate({ title: "Giày da cá sấu thật", similarityScore: 90 }).eligible, true);
+assert.equal(evaluateSearchCandidate({ title: "Giày da cá sấu thật", similarityScore: 89.99 }).eligible, false);
+assert.equal(evaluateSearchCandidate({ title: "Giày da cá sấu thật" }).eligible, false, "missing similarity score must fail closed");
+assert.equal(evaluateSearchCandidate({ title: "Giày da bò thật", similarityScore: 99 }).eligible, false, "crocodile keyword is mandatory");
+assert.equal(evaluateSearchCandidate({ title: "Giày da cá sấu giả PU", similarityScore: 99 }).eligible, false, "synthetic material must be rejected");
+assert.equal(evaluateSearchCandidate({ title: "真鳄鱼皮鞋", similarityScore: 95 }).eligible, true);
 assert.ok((await analyzeProductImage({ apiKey: "", imageBase64: "abc" })).error);
 assert.ok((await analyzeProductImage({ apiKey: "x".repeat(20), imageBase64: "abc" })).error);
 const candidateKey = "a".repeat(36) + "-ai.webp";
@@ -26,4 +35,4 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved" }), tr
 assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image_ref: "/media/other.webp" }), false, "mismatched image reference must be blocked");
 assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /isSupportedSourceUrl/);
 assert.match((await import("../functions/api/admin/image-audit.js")).onRequestPatch.toString(), /saveSource/);
-console.log("PASS: image inventory, material safeguards, Gemini validation, AI candidate publication gate");
+assert.match((await import("../functions/api/admin/image-search.js")).onRequestPost.toString(), /evaluateSearchCandidate/);\nconsole.log("PASS: inventory, 90% similarity gate, mandatory keywords, fake-material rejection, Gemini validation, AI publication gate");
