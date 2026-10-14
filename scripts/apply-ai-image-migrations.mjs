@@ -32,9 +32,14 @@ if (column.status !== 0 && !/duplicate column name:\s*source_url/i.test(column.o
   throw new Error(`Không thể đồng bộ cột source_url trên D1 ${database}:\n${column.output}`);
 }
 
+const sourceImageColumn = execute([...baseArgs, "--command=ALTER TABLE image_ai_reviews ADD COLUMN source_image_url TEXT NOT NULL DEFAULT ''"]);
+if (sourceImageColumn.status !== 0 && !/duplicate column name:\s*source_image_url/i.test(sourceImageColumn.output)) {
+  throw new Error(`Không thể đồng bộ cột source_image_url trên D1 ${database}:\n${sourceImageColumn.output}`);
+}
+
 const quotaTable = execute([...baseArgs, "--file=migrations/0009_ai_request_limits.sql"]);
 if (quotaTable.status !== 0) {
   throw new Error(`Không áp dụng được migration 0009 trên D1 ${database}:\n${quotaTable.output}`);
 }
 
-console.log(`D1 ${database}: image_ai_reviews, source_url và bộ giới hạn Gemini đã được kiểm tra/áp dụng.`);
+console.log(`D1 ${database}: image_ai_reviews, URL trang nguồn, URL CDN ảnh và bộ giới hạn AI đã được kiểm tra/áp dụng.`);
