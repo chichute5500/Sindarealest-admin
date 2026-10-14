@@ -82,22 +82,26 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       nestedResponseType: typeof result?.result?.response,
       nestedResponseLength: typeof result?.result?.response === "string" ? result.result.response.length : null
     };
-    console.info("[Workers AI diagnostic]", JSON.stringify(diagnostic));
     const candidates = [
-      typeof result === "string" ? result : null,
-      result?.response,
-      result?.response?.response,
-      result?.response?.result,
-      result?.response?.text,
-      result?.response?.output_text,
-      result?.result,
-      result?.result?.response,
-      result?.result?.result,
-      result?.result?.text,
-      result?.output_text,
-      result?.text
+      { field: "result", value: typeof result === "string" ? result : null },
+      { field: "response", value: result?.response },
+      { field: "response.response", value: result?.response?.response },
+      { field: "response.result", value: result?.response?.result },
+      { field: "response.text", value: result?.response?.text },
+      { field: "response.output_text", value: result?.response?.output_text },
+      { field: "result", value: result?.result },
+      { field: "result.response", value: result?.result?.response },
+      { field: "result.result", value: result?.result?.result },
+      { field: "result.text", value: result?.result?.text },
+      { field: "output_text", value: result?.output_text },
+      { field: "text", value: result?.text }
     ];
-    const text = candidates.find(value => typeof value === "string" && value.trim())?.trim() || "";
+    const selected = candidates.find(candidate => typeof candidate.value === "string" && candidate.value.trim());
+    const text = selected?.value.trim() || "";
+    diagnostic.selectedTextField = selected?.field || null;
+    diagnostic.selectedTextLength = text ? text.length : 0;
+    diagnostic.selectedTextPreview = text ? sanitizeAiErrorMessage(text).slice(0, 240) : null;
+    console.info("[Workers AI diagnostic]", JSON.stringify(diagnostic));
     if (!text) return { error: "Workers AI đã phản hồi nhưng không có nội dung phân tích ảnh. Hãy kiểm tra model output trong Cloudflare; không tự động gọi lại.", status: 502, code: "WORKERS_AI_EMPTY_RESPONSE" };
     return { text, model: WORKERS_AI_VISION_MODEL };
   } catch (error) {
@@ -143,7 +147,18 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 768 });
   if (output.error) return output;
   const parsed = parseModelJson(output.text);
-  if (!parsed) return { error: "Workers AI trả về nội dung nhưng không phải JSON hợp lệ. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_JSON" };
+  if (!parsed) {
+    console.warn("[Workers AI diagnostic]", JSON.stringify({
+      event: "workers_ai_invalid_json",
+      model: output.model,
+      responseLength: output.text.length,
+      responsePreview: sanitizeAiErrorMessage(output.text).slice(0, 240),
+      hasOpeningBrace: output.text.includes("{"),
+      hasClosingBrace: output.text.includes("}"),
+      startsWithMarkdownFence: /^\s*`{3}/.test(output.text)
+    }));
+    return { error: "Workers AI trả về nội dung nhưng không phải JSON hợp lệ. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_JSON" };
+  }
   const allowed = {
     modelAssessment: ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"],
     materialAssessment: ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"],
