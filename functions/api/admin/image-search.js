@@ -1,5 +1,6 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages } from "../../_lib/image-audit.js";
+import { requestGeminiInteraction } from "../../_lib/gemini-interactions.js";
 
 const MAX_IMAGE_BASE64 = 1_400_000;
 const isMarketplaceHost = (host) => {
@@ -115,19 +116,13 @@ export async function onRequestPost(context) {
   ].join("\n");
   const imageMimeType = /^data:image\/webp/i.test(String(body?.imageBase64 || "")) ? "image/webp" : /^data:image\/png/i.test(String(body?.imageBase64 || "")) ? "image/png" : "image/jpeg";
   try {
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey, "Api-Revision": "2026-05-20" },
-      body: JSON.stringify({
-        model: "gemini-3.8-flash",
-        input: [
-          { type: "text", text: prompt },
-          { type: "image", data: imageBase64, mime_type: imageMimeType }
-        ]
-      }),
-      signal: AbortSignal.timeout(25000)
+    const { response, data } = await requestGeminiInteraction({
+      apiKey,
+      input: [
+        { type: "text", text: prompt },
+        { type: "image", data: imageBase64, mime_type: imageMimeType }
+      ]
     });
-    const data = await response.json().catch(() => ({}));
     const blocks = (Array.isArray(data?.steps) ? data.steps : [])
       .filter(step => step?.type === "model_output")
       .flatMap(step => Array.isArray(step.content) ? step.content : []);
@@ -140,6 +135,7 @@ export async function onRequestPost(context) {
       if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
         return fail("Gemini đã từ chối yêu cầu vì quota/hạn mức của Google (HTTP 429). Không tự động thử lại để tránh tiêu hao thêm quota. Kiểm tra giới hạn thực tế trong Google AI Studio. " + detail, 429);
       }
+      if (response.status === 503 || apiStatus === "UNAVAILABLE") return fail("Gemini đang quá tải (HTTP 503). Hệ thống đã thử một lần bằng model dự phòng sau khi chờ ngắn nhưng vẫn chưa thành công. Hãy chờ một chút rồi thử lại; không bấm liên tục để bảo vệ hạn mức. " + detail, 503);
       if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return fail("Gemini từ chối API key. " + detail, 502);
       if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra dự án và quyền API. " + detail, 502);
       if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") return fail("Gemini Interactions API từ chối định dạng yêu cầu (HTTP 400). " + (detail || "INVALID_ARGUMENT"), 502);

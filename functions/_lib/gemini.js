@@ -1,3 +1,4 @@
+import { requestGeminiInteraction } from "./gemini-interactions.js";
 const MAX_IMAGE_BASE64_LENGTH = 7_000_000;
 
 export async function analyzeProductImage({ apiKey, imageBase64, mimeType = "image/webp", title = "", category = "", sku = "" }) {
@@ -21,19 +22,13 @@ export async function analyzeProductImage({ apiKey, imageBase64, mimeType = "ima
     `Thông tin sản phẩm: SKU ${String(sku).slice(0,60)}, tên ${String(title).slice(0,180)}, danh mục ${String(category).slice(0,80)}.`
   ].join("\n");
   try {
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey, "Api-Revision": "2026-05-20" },
-      body: JSON.stringify({
-        model: "gemini-3.8-flash",
-        input: [
-          { type: "text", text: prompt },
-          { type: "image", data: base64, mime_type: normalizedMime }
-        ]
-      }),
-      signal: AbortSignal.timeout(25000)
+    const { response, data } = await requestGeminiInteraction({
+      apiKey,
+      input: [
+        { type: "text", text: prompt },
+        { type: "image", data: base64, mime_type: normalizedMime }
+      ]
     });
-    const data = await response.json().catch(() => ({}));
     const blocks = (Array.isArray(data?.steps) ? data.steps : [])
       .filter(step => step?.type === "model_output")
       .flatMap(step => Array.isArray(step.content) ? step.content : []);
@@ -45,6 +40,7 @@ export async function analyzeProductImage({ apiKey, imageBase64, mimeType = "ima
       if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
         return { error: "Gemini đã từ chối yêu cầu vì hạn mức/quota của Google (HTTP 429). Không tự động thử lại để tránh tiêu hao thêm quota. Kiểm tra giới hạn đang áp dụng trong Google AI Studio. " + detail, status: 429 };
       }
+      if (response.status === 503 || apiStatus === "UNAVAILABLE") return { error: "Gemini đang quá tải (HTTP 503). Hệ thống đã thử một lần bằng model dự phòng sau khi chờ ngắn nhưng vẫn chưa thành công. Hãy chờ một chút rồi thử lại; không bấm liên tục để bảo vệ hạn mức. " + detail, status: 503 };
       if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return { error: "Gemini từ chối API key. " + detail, status: 502 };
       if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return { error: "Gemini từ chối quyền truy cập. Kiểm tra dự án, quyền API và gói đang dùng. " + detail, status: 502 };
       return { error: "Gemini Interactions API trả lỗi HTTP " + response.status + ". " + detail, status: 502 };
