@@ -24,7 +24,7 @@ function runTest(file) {
 for (const required of [
   'package.json', 'wrangler.toml',
   'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
-  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/_lib/gemini.js', 'functions/_lib/gemini-interactions.js',
+  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/_lib/workers-ai.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
   'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql',
@@ -89,12 +89,11 @@ check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'),
 const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source_url.sql')) ? readFileSync(join(root, 'migrations/0008_ai_image_source_url.sql'), 'utf8') : '';
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
-const geminiInteractions = existsSync(join(root, 'functions/_lib/gemini-interactions.js')) ? readFileSync(join(root, 'functions/_lib/gemini-interactions.js'), 'utf8') : '';
-check(geminiInteractions.includes('gemini-3.8-flash') && geminiInteractions.includes('gemini-3.6-flash') && geminiInteractions.includes('response.status !== 503'), 'Gemini phải chỉ fallback một lần sang model 3.6 khi model chính trả HTTP 503; không retry quota 429');
-check(imageSearchApi.includes('isMarketplaceHost'), 'API tìm ảnh chưa giới hạn URL nguồn Taobao/1688');
-check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('GEMINI_API_KEY') && imageSearchApi.includes('consumeGeminiRequest') && imageSearchApi.includes('isSearchPage') && !imageSearchApi.includes('google_search') && !imageSearchApi.includes('NEXSCOPE'), 'API tìm ảnh phải dùng Gemini vision theo gói miễn phí, giới hạn quota và không giả lập URL sản phẩm');
+const workersAi = existsSync(join(root, 'functions/_lib/workers-ai.js')) ? readFileSync(join(root, 'functions/_lib/workers-ai.js'), 'utf8') : '';
+check(workersAi.includes('@cf/meta/llama-3.2-11b-vision-instruct') && workersAi.includes('ai.run') && workersAi.includes('WORKERS_AI_EMPTY_RESPONSE'), 'Workers AI phải dùng model vision được cấu hình và báo lỗi khi phản hồi rỗng');
+check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('context.env.AI') && imageSearchApi.includes('consumeWorkersAiRequest') && imageSearchApi.includes('isSearchPage: true') && !imageSearchApi.includes('GEMINI_API_KEY') && !imageSearchApi.includes('google_search') && !imageSearchApi.includes('NEXSCOPE'), 'API tìm ảnh phải dùng Workers AI, kiểm soát quota và không giả lập URL sản phẩm');
 const imageAuditLib = existsSync(join(root, 'functions/_lib/image-audit.js')) ? readFileSync(join(root, 'functions/_lib/image-audit.js'), 'utf8') : '';
-check(imageAuditLib.includes('score >= 90') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt ảnh thiếu ngưỡng 90%, từ khóa hoặc loại trừ giả da');
+check(imageAuditLib.includes('validated-visual-embedding-v1') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt phải yêu cầu phương pháp so khớp đã hiệu chuẩn, từ khóa và loại trừ giả da');
 
 const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
 check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_ai_reviews WHERE r2_key=?'), 'Đường dẫn media chưa xác minh trạng thái duyệt AI');
@@ -105,8 +104,13 @@ check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'A
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
-check(imageTests.includes('saveSource') && imageTests.includes('google_search') && imageTests.includes('NEXSCOPE'), 'Thiếu kiểm thử Gemini Search hoặc xác nhận loại bỏ Nexscope');
-check(imageTests.includes('missing similarity score must fail closed') && imageTests.includes('crocodile keyword is mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
+check(imageTests.includes('WORKERS_AI_EMPTY_RESPONSE') && imageTests.includes('one Workers AI request per analysis') && imageTests.includes('compareProductImages().available'), 'Thiếu kiểm thử phản hồi rỗng, không retry và mô hình so khớp chưa khả dụng');
+check(imageTests.includes('must fail closed') && imageTests.includes('crocodile keyword remains mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
+const workersAiSource = (await import('../functions/_lib/workers-ai.js')).analyzeProductImage.toString();
+check(workersAiSource.includes('runWorkersAiVision') && !workersAiSource.includes('GEMINI_API_KEY'), 'Phân tích ảnh phải dùng binding Workers AI, không dùng Gemini API key');
+const quotaSource = (await import('../functions/_lib/ai-quota.js')).consumeWorkersAiRequest.toString();
+check(quotaSource.includes('workers-ai-rolling-24h') && quotaSource.includes('workers-ai-15-seconds'), 'Hạn mức phải được áp dụng cho Workers AI');
+check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
@@ -148,6 +152,7 @@ check(config.engines?.node === '>=22 <23', 'package.json phải pin dòng Node.j
 check(config.scripts?.deploy === 'node scripts/deploy-cloudflare.mjs', 'npm run deploy phải đi qua script xác minh project/branch');
 const wranglerConfig = existsSync(join(root, 'wrangler.toml')) ? readFileSync(join(root, 'wrangler.toml'), 'utf8') : '';
 check(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Không được bật Wrangler production-config mode trước khi tải/đối chiếu config thật của Pages project');
+check(wranglerConfig.includes('[ai]') && wranglerConfig.includes('binding'), 'wrangler.toml phải định nghĩa binding AI cho Workers AI local/dev');
 const ignore = existsSync(join(root, '.gitignore')) ? readFileSync(join(root, '.gitignore'), 'utf8') : '';
 for (const entry of ['.env', '.env.*', '.dev.vars', '.dev.vars.*', 'node_modules/', '.wrangler/']) {
   check(ignore.includes(entry), `.gitignore thiếu mục bảo vệ ${entry}`);

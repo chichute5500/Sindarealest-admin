@@ -9,3 +9,7 @@ compatibility_date = "2026-10-12"
 # D1 Variable name: DB
 # R2 Variable name: IMAGES
 # Secrets (Production): ADMIN_PASSWORD, SESSION_SECRET
+
+# Local/dev binding for Cloudflare Workers AI. Configure the AI binding separately in Pages Dashboard for Preview.
+[ai]
+binding = "AI"

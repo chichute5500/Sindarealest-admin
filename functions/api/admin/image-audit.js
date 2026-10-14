@@ -1,7 +1,6 @@
 import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
-import { analyzeProductImage } from "../../_lib/gemini.js";
-import { evaluateSearchCandidate } from "../../_lib/image-audit.js";
-import { consumeGeminiRequest } from "../../_lib/ai-quota.js";
+import { analyzeProductImage } from "../../_lib/workers-ai.js";
+import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
 
 const MAX_BASE64 = 7_000_000;
 const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
@@ -9,12 +8,7 @@ const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
 function safeReview(row) {
   let analysis = {};
   try { analysis = JSON.parse(row.analysis_json || "{}"); } catch {}
-  return {
-    id: row.id, productId: row.product_id, imageRef: row.image_ref,
-    kind: row.image_kind, status: row.status, analysis,
-    sourceUrl: row.source_url || "",
-    createdAt: row.created_at, updatedAt: row.updated_at
-  };
+  return { id: row.id, productId: row.product_id, imageRef: row.image_ref, kind: row.image_kind, status: row.status, analysis, sourceUrl: row.source_url || "", createdAt: row.created_at, updatedAt: row.updated_at };
 }
 function parseDataImage(value) {
   const match = String(value || "").match(/^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/i);
@@ -35,7 +29,7 @@ export async function onRequestGet(context) {
     ]);
     return json({ ok: true, products: products.results || [], reviews: (reviews.results || []).map(safeReview) });
   } catch {
-    return fail("Không tải được hàng đợi AI. Hãy kiểm tra đã áp dụng migrations/0007_ai_image_reviews.sql trên D1 chưa.", 503);
+    return fail("Không tải được hàng đợi AI. Hãy kiểm tra đã áp dụng migrations/0007_ai_image_reviews.sql và 0008_ai_image_source_url.sql trên môi trường này chưa.", 503);
   }
 }
 
@@ -57,15 +51,14 @@ export async function onRequestPost(context) {
     const parsed = parseDataImage(body?.dataUrl);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ứng viên phải là WebP hợp lệ.");
     const bytes = Uint8Array.from(atob(parsed.base64), c => c.charCodeAt(0));
-    if (bytes.length === 0 || bytes.length > 5 * 1024 * 1024) return fail("Ảnh phải nhỏ hơn hoặc bằng 5 MB.");
+    if (bytes.length === 0 || bytes.length > 5 * 1024 * 1024) return fail("Ảnh phải nhỏ hơn hoặc bằng 5 MB.", 413);
     if (bytes.length < 12 || new TextDecoder().decode(bytes.slice(0,4)) !== "RIFF" || new TextDecoder().decode(bytes.slice(8,12)) !== "WEBP") return fail("Nội dung tệp không phải WebP.");
     const key = crypto.randomUUID() + "-ai.webp";
     const imageRef = "/media/" + key;
     const id = crypto.randomUUID();
     try {
       await context.env.IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/webp", cacheControl: "private, no-store" }, customMetadata: { visibility: "pending-ai-review", reviewId: id } });
-      await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,'candidate',?,'pending','{}')")
-        .bind(id, productId, imageRef, key).run();
+      await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,'candidate',?,'pending','{}')").bind(id, productId, imageRef, key).run();
       return json({ ok: true, review: { id, productId, imageRef, kind: "candidate", status: "pending", analysis: {} }, message: "Đã đưa ảnh vào hàng đợi kiểm duyệt. Ảnh chưa được thêm vào bộ ảnh công khai." }, 201);
     } catch {
       await context.env.IMAGES.delete(key).catch(() => {});
@@ -77,20 +70,19 @@ export async function onRequestPost(context) {
   const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=? LIMIT 1").bind(reviewId, productId).first().catch(() => null);
   const imageRef = String(body?.imageRef || review?.image_ref || "");
   const parsed = parseDataImage(body?.dataUrl);
-  if (!parsed) return fail("Ảnh gửi Gemini không hợp lệ.");
+  if (!parsed) return fail("Ảnh gửi Workers AI không hợp lệ.");
   if (review?.image_kind === "candidate" && review.status === "approved") return fail("Ảnh đã được duyệt; tạo lượt kiểm tra mới nếu cần.", 409);
-  const quota = await consumeGeminiRequest(db);
+  const quota = await consumeWorkersAiRequest(db);
   if (!quota.ok) return fail(quota.error, quota.status);
-  const result = await analyzeProductImage({ apiKey: context.env.GEMINI_API_KEY, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
+  const result = await analyzeProductImage({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
   if (result.error) return fail(result.error, result.status || 503);
   const id = review?.id || crypto.randomUUID();
   const kind = review?.image_kind || "existing";
   const storedRef = kind === "candidate" ? review.image_ref : imageRef;
   if (!storedRef || storedRef.length > 300) return fail("Thiếu tham chiếu ảnh cần kiểm tra.");
   try {
-    await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,?,?,'pending',?) ON CONFLICT(product_id,image_ref,image_kind) DO UPDATE SET id=excluded.id,status='pending',analysis_json=excluded.analysis_json,updated_at=datetime('now')")
-      .bind(id, productId, storedRef, kind, review?.r2_key || "", JSON.stringify(result.analysis)).run();
-    return json({ ok: true, review: { id, productId, imageRef: storedRef, kind, status: "pending", analysis: result.analysis }, message: "Phân tích hoàn tất; kết quả đang chờ người quản trị duyệt." });
+    await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,?,?,'pending',?) ON CONFLICT(product_id,image_ref,image_kind) DO UPDATE SET id=excluded.id,status='pending',analysis_json=excluded.analysis_json,updated_at=datetime('now')").bind(id, productId, storedRef, kind, review?.r2_key || "", JSON.stringify(result.analysis)).run();
+    return json({ ok: true, review: { id, productId, imageRef: storedRef, kind, status: "pending", analysis: result.analysis }, message: "Workers AI đã phân tích ảnh; kết quả đang chờ người quản trị duyệt." });
   } catch {
     return fail("Không lưu được kết quả AI. Hãy kiểm tra migration 0007.", 503);
   }
@@ -107,30 +99,8 @@ export async function onRequestPatch(context) {
   const db = context.env.DB;
   const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? LIMIT 1").bind(id).first().catch(() => null);
   if (!review) return fail("Không tìm thấy bản ghi kiểm duyệt.", 404);
-  if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Gemini và tìm ảnh từ bảng kiểm tra AI." });
-  if (decision === "saveSource") {
-    const sourceUrl = String(body?.sourceUrl || "").trim();
-    const candidateText = String(body?.candidateText || "").slice(0, 3000);
-    const similarityScore = Number(body?.similarityScore);
-    if (body?.comparisonMethod !== "phash-63" || !Number.isFinite(similarityScore) || similarityScore < 90) {
-      return fail("Không lưu URL: cần kết quả so sánh ảnh pHash đạt ít nhất 90%. Hãy tìm và đo ảnh trước.", 422);
-    }
-    const evaluation = evaluateSearchCandidate({ title: candidateText, similarityScore });
-    if (!evaluation.eligible) return fail("Không lưu URL: " + evaluation.reason, 422);
-    let parsed;
-    try { parsed = new URL(sourceUrl); } catch { return fail("URL nguồn không hợp lệ."); }
-    const host = parsed.hostname.toLowerCase();
-    if (parsed.protocol !== "https:" || !(host === "1688.com" || host.endsWith(".1688.com") || host === "taobao.com" || host.endsWith(".taobao.com"))) {
-      return fail("Chỉ lưu URL HTTPS thuộc Taobao hoặc 1688.");
-    }
-    if (sourceUrl.length > 2000) return fail("URL nguồn quá dài.");
-    try {
-      await db.prepare("UPDATE image_ai_reviews SET source_url=?,updated_at=datetime('now') WHERE id=?").bind(sourceUrl, id).run();
-      return json({ ok: true, sourceUrl, message: "Đã lưu URL nguồn ảnh." });
-    } catch {
-      return fail("Không lưu được URL nguồn. Hãy kiểm tra đã áp dụng migration 0008.", 503);
-    }
-  }
+  if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Workers AI từ giao diện quản trị." });
+  if (decision === "saveSource") return fail("Chưa thể lưu URL như ảnh nguồn đã xác minh: chưa có mô hình so khớp thị giác chuyên biệt đã được kiểm chứng và hiệu chuẩn ngưỡng 90%. URL tìm kiếm không phải URL sản phẩm đã xác minh.", 422);
   if (decision === "reject") {
     if (review.image_kind === "candidate") {
       const product = await getProduct(db, review.product_id);
@@ -138,7 +108,7 @@ export async function onRequestPatch(context) {
         let images = [];
         try { images = JSON.parse(product.images_json || "[]"); } catch {}
         if (!Array.isArray(images)) images = [];
-        const next = images.filter((ref) => ref !== review.image_ref);
+        const next = images.filter(ref => ref !== review.image_ref);
         await db.batch([
           db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id),
           db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id)
@@ -160,9 +130,7 @@ export async function onRequestPatch(context) {
   if (!product) return fail("Sản phẩm không còn tồn tại.", 404);
   const noStorage = storageOrFail(context.env);
   if (noStorage) return noStorage;
-  if (!review.r2_key || !review.r2_key.endsWith("-ai.webp") || review.image_ref !== "/media/" + review.r2_key) {
-    return fail("Tham chiếu ảnh ứng viên không hợp lệ.", 409);
-  }
+  if (!review.r2_key || !review.r2_key.endsWith("-ai.webp") || review.image_ref !== "/media/" + review.r2_key) return fail("Tham chiếu ảnh ứng viên không hợp lệ.", 409);
   try {
     const candidate = await context.env.IMAGES.head(review.r2_key);
     if (!candidate) return fail("Không tìm thấy tệp ảnh trong R2; chưa thể duyệt.", 404);
@@ -178,10 +146,10 @@ export async function onRequestPatch(context) {
     await db.batch([
       db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id),
       db.prepare("UPDATE image_ai_reviews SET status='approved',updated_at=datetime('now') WHERE id=?").bind(id),
-      db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'ai_image_approved', 'product', ?, ?)").bind(crypto.randomUUID(), product.id, JSON.stringify({ reviewId:id, imageRef:review.image_ref }))
+      db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'ai_image_approved', 'product', ?, ?)").bind(crypto.randomUUID(), product.id, JSON.stringify({ reviewId: id, imageRef: review.image_ref }))
     ]);
     return json({ ok: true, message: "Đã duyệt ảnh và thêm vào bộ ảnh sản phẩm. Ảnh chỉ hiển thị công khai nếu sản phẩm đang được xuất bản." });
   } catch {
-    return fail("Không thể duyệt ảnh. Kiểm tra D1 và thử lại.", 503);
+    return fail("Không thể duyệt ảnh. Kiểm tra D1 và R2.", 503);
   }
 }
