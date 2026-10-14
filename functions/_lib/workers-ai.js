@@ -34,9 +34,9 @@ function getAiErrorMessage(error) {
 
 function sanitizeAiErrorMessage(value) {
   return String(value || "")
-    .replace(/data:image\\/[a-z0-9.+-]+;base64,[a-z0-9+/=]+/gi, "[image-data-redacted]")
-    .replace(/\\bBearer\\s+[^\\s,;]+/gi, "Bearer [redacted]")
-    .replace(/(?:api[_-]?key|token|secret|password)(\\s*[=:]\\s*)[^\\s,;]+/gi, "$1[redacted]")
+    .replace(/data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=]+/gi, "[image-data-redacted]")
+    .replace(/\bBearer\s+[^\s,;]+/gi, "Bearer [redacted]")
+    .replace(/(?:api[_-]?key|token|secret|password)(\s*[=:]\s*)[^\s,;]+/gi, "$1[redacted]")
     .replace(/[A-Za-z0-9+/]{160,}={0,2}/g, "[long-data-redacted]")
     .slice(0, 600);
 }
