@@ -127,13 +127,37 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
 
 export function parseModelJson(rawText) {
   const text = String(rawText || "").trim().replace(/^\uFEFF/, "").replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}\s*$/, "").trim();
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start < 0 || end <= start) return null;
-  try {
-    const parsed = JSON.parse(text.slice(start, end + 1));
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
-  } catch { return null; }
+  if (!text) return null;
+
+  // Tolerate harmless prose/fences around a JSON object. Balance braces while
+  // respecting quoted strings and escapes so embedded braces do not truncate it.
+  for (let start = text.indexOf("{"); start >= 0; start = text.indexOf("{", start + 1)) {
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (ch === "\\") escaped = true;
+        else if (ch === '"') inString = false;
+        continue;
+      }
+      if (ch === '"') inString = true;
+      else if (ch === "{") depth++;
+      else if (ch === "}") {
+        depth--;
+        if (depth === 0) {
+          try {
+            const parsed = JSON.parse(text.slice(start, i + 1));
+            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+          } catch {}
+          break;
+        }
+      }
+    }
+  }
+  return null;
 }
 
 export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/webp", title = "", category = "", sku = "" }) {
@@ -155,16 +179,29 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   if (output.error) return output;
   const parsed = parseModelJson(output.text);
   if (!parsed) {
-    console.warn("[Workers AI diagnostic]", JSON.stringify({
+    const invalidJsonDiagnostic = {
       event: "workers_ai_invalid_json",
       model: output.model,
       responseLength: output.text.length,
       responsePreview: sanitizeAiErrorMessage(output.text).slice(0, 240),
       hasOpeningBrace: output.text.includes("{"),
       hasClosingBrace: output.text.includes("}"),
-      startsWithMarkdownFence: /^\s*`{3}/.test(output.text)
-    }));
-    return { error: "Workers AI trả về nội dung nhưng không phải JSON hợp lệ. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_JSON" };
+      startsWithMarkdownFence: output.text.trimStart().startsWith("\x60\x60\x60")
+    };
+    console.warn("[Workers AI diagnostic]", JSON.stringify(invalidJsonDiagnostic));
+    // Expose only sanitized diagnostics, never the raw model response or image data.
+    return {
+      error: "Workers AI trả về nội dung nhưng không phải JSON hợp lệ. Không lưu kết quả chưa kiểm tra.",
+      status: 502,
+      code: "WORKERS_AI_INVALID_JSON",
+      diagnostic: {
+        responseLength: invalidJsonDiagnostic.responseLength,
+        responsePreview: invalidJsonDiagnostic.responsePreview,
+        hasOpeningBrace: invalidJsonDiagnostic.hasOpeningBrace,
+        hasClosingBrace: invalidJsonDiagnostic.hasClosingBrace,
+        startsWithMarkdownFence: invalidJsonDiagnostic.startsWithMarkdownFence
+      }
+    };
   }
   const allowed = {
     modelAssessment: ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"],
