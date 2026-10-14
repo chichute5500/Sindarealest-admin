@@ -113,7 +113,7 @@ export async function generateSearchKeywords({ ai, imageBase64, mimeType = "imag
     "生成最多4个简体中文短语，每个短语适合在" + site + "搜索。不要声称已找到商品、价格或商品链接。",
     "如果无法确认真鳄鱼皮，请区分鳄鱼皮、鳄鱼纹/压纹、PU/合成革，不要把纹路当成真皮证据。",
     "现有商品标题（仅供参考）：" + String(title || "无").slice(0, 180) + "。",
-    "只输出一个JSON对象，不要Markdown或解释，严格格式：{\\"keywords\\":[\\"关键词1\\",\\"关键词2\\"],\\"visualSummary\\":\\"不超过100字的可见特征\\"}。keywords必须是字符串数组，至少1项，最多4项。"
+    "只输出一个JSON对象，不要Markdown或解释。字段必须是 keywords（1到4个字符串组成的数组）和 visualSummary（不超过100字的可见特征摘要）。",
   ].join("\n");
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 384 });
   if (output.error) return output;
