@@ -15,6 +15,37 @@ export function normalizeImageRef(value) {
   return String(value || "").trim().replace(/^\/+/, "").replace(/^\.\//, "");
 }
 
+const IMAGE_CDN_DOMAINS = ["alicdn.com", "tbcdn.cn", "taobaocdn.com"];
+const PRODUCT_DOMAINS = ["taobao.com", "tmall.com", "1688.com"];
+
+function allowedHttpsUrl(value, domains) {
+  if (typeof value !== "string" || !value.trim() || value.length > 2048) return false;
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || url.username || url.password || url.port) return false;
+    const host = url.hostname.toLowerCase().replace(/\.$/, "");
+    return domains.some(domain => host === domain || host.endsWith("." + domain));
+  } catch {
+    return false;
+  }
+}
+
+export function isAllowedSourceProductUrl(value) {
+  if (!allowedHttpsUrl(value, PRODUCT_DOMAINS)) return false;
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    if (/(^|\.)1688\.com$/.test(host)) return /\/offer\/[A-Za-z0-9_-]+\.html?$/i.test(url.pathname);
+    return /\/item\.htm$/i.test(url.pathname) && /^[A-Za-z0-9_-]{1,100}$/.test(url.searchParams.get("id") || "");
+  } catch {
+    return false;
+  }
+}
+
+export function isAllowedSourceImageUrl(value) {
+  return allowedHttpsUrl(value, IMAGE_CDN_DOMAINS);
+}
+
 export function inventoryImages(products) {
   const references = [];
   const byImage = new Map();
