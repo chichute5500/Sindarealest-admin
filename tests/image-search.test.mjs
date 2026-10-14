@@ -79,6 +79,8 @@ const empty = await runWorkersAiVision({ ai: { async run() { return { response: 
 assert.equal(empty.code, "WORKERS_AI_EMPTY_RESPONSE");
 const nested = await runWorkersAiVision({ ai: { async run() { return { result: { response: "nested documented-style response" } }; } }, prompt: "test", imageBase64: validBase64 });
 assert.equal(nested.text, "nested documented-style response", "accept a nested response envelope when the provider wraps its result");
+const nestedResponse = await runWorkersAiVision({ ai: { async run() { return { response: { text: "text nested under response" } }; } }, prompt: "test", imageBase64: validBase64 });
+assert.equal(nestedResponse.text, "text nested under response", "accept a response.text envelope");
 const noBinding = await runWorkersAiVision({ ai: null, prompt: "test", imageBase64: validBase64 });
 assert.equal(noBinding.code, "WORKERS_AI_BINDING_MISSING");
 const invalidImage = await runWorkersAiVision({ ai, prompt: "test", imageBase64: "not base64" });
