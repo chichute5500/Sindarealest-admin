@@ -4,7 +4,7 @@ const CROCODILE_REAL_TERMS = [
 ];
 const CROCODILE_FAKE_TERMS = [
   /(?:cá[ ]+sấu|giày[ ]+cá[ ]+sấu).{0,12}(?:giả|fake|imitation)/i,
-  /c[aá]\\s+s[aá]u.{0,20}(?:giả|fake|imitation|pu|synthetic)/i, /gi[aà]y.{0,24}(?:giả|fake|pu).{0,24}c[aá]\\s+s[aá]u/i, /仿鳄鱼皮/, /鳄鱼纹/, /压鳄鱼纹/, /鳄鱼压纹/, /人造鳄鱼皮/, /合成革/, /PU皮/i,
+  /c[aá]\s+s[aá]u.{0,20}(?:giả|fake|imitation|pu|synthetic)/i, /gi[aà]y.{0,24}(?:giả|fake|pu).{0,24}c[aá]\s+s[aá]u/i, /仿鳄鱼皮/, /鳄鱼纹/, /压鳄鱼纹/, /鳄鱼压纹/, /人造鳄鱼皮/, /合成革/, /PU皮/i,
   /giả\s+da\s+c[aá]\s+s[aá]u/i, /vân\s+c[aá]\s+s[aá]u/i, /da\s+nhân\s+tạo/i, /synthetic\s+leather/i, /faux\s+leather/i
 ];
 export function normalizeImageRef(value) {
@@ -40,14 +40,14 @@ export function assessCrocodileMaterial(text) {
 
 
 const CROCODILE_KEYWORDS = [
-  /\\bda\\s+c[aá]\\s+s[aá]u\\b/i,
-  /\\bgi[aà]y\\s+c[aá]\\s+s[aá]u\\b/i,
-  /\\bc[aá]\\s+s[aá]u\\b/i,
+  /\bda\s+c[aá]\s+s[aá]u\b/i,
+  /\bgi[aà]y\s+c[aá]\s+s[aá]u\b/i,
+  /\bc[aá]\s+s[aá]u\b/i,
   /鳄鱼皮/, /鳄鱼皮鞋/, /真鳄鱼/, /真皮鳄鱼/, /鳄鱼/
 ];
 
 function normalizeSearchText(value) {
-  return String(value || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
 export function extractSimilarityScore(item) {
@@ -57,7 +57,7 @@ export function extractSimilarityScore(item) {
     if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
       return value <= 1 ? Math.round(value * 10000) / 100 : Math.round(value * 100) / 100;
     }
-    if (typeof value === "string" && value.trim() && /^\\d+(?:\\.\\d+)?%?$/.test(value.trim())) {
+    if (typeof value === "string" && value.trim() && /^\d+(?:\.\d+)?%?$/.test(value.trim())) {
       const numeric = Number(value.trim().replace(/%$/, ""));
       if (Number.isFinite(numeric) && numeric >= 0) return value.trim().endsWith("%") || numeric > 1 ? Math.round(numeric * 100) / 100 : Math.round(numeric * 10000) / 100;
     }
@@ -69,7 +69,7 @@ export function evaluateSearchCandidate({ title = "", description = "", material
   const combined = [title, description, material, properties].filter(Boolean).join(" ");
   const normalized = normalizeSearchText(combined);
   const hasKeyword = CROCODILE_KEYWORDS.some((pattern) => pattern.test(combined)) ||
-    /\\b(?:da|giay)\\s+ca\\s+sau\\b|\\bca\\s+sau\\b/.test(normalized);
+    /\b(?:da|giay)\s+ca\s+sau\b|\bca\s+sau\b/.test(normalized);
   const materialCheck = assessCrocodileMaterial(combined);
   const score = typeof similarityScore === "number" && Number.isFinite(similarityScore) ? similarityScore : null;
   let reason = "";
