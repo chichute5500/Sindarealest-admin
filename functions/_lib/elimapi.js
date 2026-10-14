@@ -41,7 +41,7 @@ function imageFrom(item) {
     if (typeof raw !== "string" || !raw.trim()) continue;
     try {
       const url = new URL(raw.trim().startsWith("//") ? "https:" + raw.trim() : raw.trim());
-      if (url.protocol === "https:" && /(^|\.)(alicdn\.com|tbcdn\.cn|taobaocdn\.com)$/i.test(url.hostname)) return url.href;
+      if (url.protocol === "https:" && !url.username && !url.password && !url.port && url.href.length <= 2048 && /(^|\.)(alicdn\.com|tbcdn\.cn|taobaocdn\.com)$/i.test(url.hostname)) return url.href;
     } catch {}
   }
   return "";
