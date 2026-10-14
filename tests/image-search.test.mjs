@@ -45,11 +45,11 @@ const ai = { async run(model, input) {
   capturedInput = input;
   return { response: JSON.stringify({
     summary: "Giày da màu nâu, mũi nhọn.",
-    visibleFeatures: ["màu nâu", "mũi nhọn"],
+    visibleFeatures: ["màu nâu", "mũi nhọn", "bề mặt có vân nổi"],
     modelAssessment: "same_model_possible",
     materialAssessment: "crocodile_claim_unverified",
     confidence: "medium",
-    reasons: ["Không thể xác minh chất liệu chỉ bằng ảnh."],
+    reasons: ["Không thể xác minh chất liệu chỉ bằng ảnh.", "Ảnh đơn lẻ không có ảnh đối chiếu để xác nhận cùng mẫu."],
     needsHumanReview: true
   }) };
 } };
@@ -65,6 +65,16 @@ assert.equal(capturedInput.temperature, 0.1);
 assert.deepEqual(capturedInput.response_format, { type: "json_object" }, "Workers AI JSON mode should be enabled for structured model outputs");
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
+const vagueAnalysis = await analyzeProductImage({
+  ai: { async run() { return { response: JSON.stringify({
+    summary: "Giày Sneaker da cá sấu – Tuyển chọn 01 có thể là một sản phẩm thuộc danh mục sneakers của cửa hàng.",
+    visibleFeatures: ["giày"], modelAssessment: "same_model_possible",
+    materialAssessment: "possible_synthetic", confidence: "low",
+    reasons: ["lý do không rõ ràng"], needsHumanReview: true
+  }) }; } },
+  imageBase64: validBase64, title: "Giày Sneaker", sku: "SD-SN001"
+});
+assert.equal(vagueAnalysis.code, "WORKERS_AI_INVALID_SCHEMA", "reject generic summaries and insufficient visual evidence instead of saving them");
 assert.ok(capturedInput.prompt.includes("summary phải mô tả trực tiếp"), "prompt requires specific visible observations instead of repeating metadata");
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must prevent unsupported single-image identity verification");
 
