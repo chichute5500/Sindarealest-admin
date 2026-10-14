@@ -24,10 +24,10 @@ function runTest(file) {
 for (const required of [
   'package.json', 'wrangler.toml',
   'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
-  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
+  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/_lib/gemini.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
-  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql',
+  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
 ]) check(existsSync(join(root, required)), `Thiếu tệp bắt buộc: ${required}`);
@@ -84,6 +84,27 @@ check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claim
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
 for (const table of ['customers','orders','order_items','warranties','warranty_claims','audit_logs','public_rate_limits']) check(new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`).test(newMigration), `Migration 0003 thiếu bảng ${table}`);
+const aiReviewMigration = existsSync(join(root, 'migrations/0007_ai_image_reviews.sql')) ? readFileSync(join(root, 'migrations/0007_ai_image_reviews.sql'), 'utf8') : '';
+check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 thiếu hàng đợi kiểm duyệt ảnh AI');
+const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source_url.sql')) ? readFileSync(join(root, 'migrations/0008_ai_image_source_url.sql'), 'utf8') : '';
+check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
+const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
+check(imageSearchApi.includes('isSupportedSourceUrl'), 'API tìm ảnh chưa giới hạn URL nguồn Taobao/1688');
+check(imageSearchApi.includes('evaluateSearchCandidate') && imageSearchApi.includes('extractSimilarityScore'), 'API tìm ảnh thiếu cổng kiểm tra điểm tương đồng và từ khóa bắt buộc');
+const imageAuditLib = existsSync(join(root, 'functions/_lib/image-audit.js')) ? readFileSync(join(root, 'functions/_lib/image-audit.js'), 'utf8') : '';
+check(imageAuditLib.includes('score >= 90') && imageAuditLib.includes('hasKeyword') && imageAuditLib.includes('CROCODILE_FAKE_TERMS'), 'Thư viện kiểm duyệt ảnh thiếu ngưỡng 90%, từ khóa hoặc loại trừ giả da');
+
+const mediaRoute = existsSync(join(root, 'functions/media/[key].js')) ? readFileSync(join(root, 'functions/media/[key].js'), 'utf8') : '';
+check(mediaRoute.includes('canServeAiCandidate') && mediaRoute.includes('image_ai_reviews WHERE r2_key=?'), 'Đường dẫn media chưa xác minh trạng thái duyệt AI');
+check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duyệt không bị chặn khỏi endpoint media');
+check(mediaRoute.includes('private, no-store'), 'Ảnh ứng viên AI chưa được đặt Cache-Control no-store');
+const aiAuditApi = existsSync(join(root, 'functions/api/admin/image-audit.js')) ? readFileSync(join(root, 'functions/api/admin/image-audit.js'), 'utf8') : '';
+check(aiAuditApi.includes('source_url') && aiAuditApi.includes('saveSource'), 'API kiểm duyệt AI chưa lưu/đọc URL nguồn ảnh');
+check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
+const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
+check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
+check(imageTests.includes('saveSource') && imageTests.includes('isSupportedSourceUrl'), 'Thiếu kiểm thử lưu URL nguồn Taobao/1688');
+check(imageTests.includes('missing similarity score must fail closed') && imageTests.includes('crocodile keyword is mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
@@ -93,6 +114,8 @@ const endpointMap = {
   '/api/admin/logout': 'functions/api/admin/logout.js',
   '/api/admin/session': 'functions/api/admin/session.js',
   '/api/admin/products': 'functions/api/admin/products.js',
+  '/api/admin/image-search': 'functions/api/admin/image-search.js',
+  '/api/admin/image-audit': 'functions/api/admin/image-audit.js',
   '/api/admin/products/reset-skus': 'functions/api/admin/products/reset-skus.js',
   '/api/admin/ai-description': 'functions/api/admin/ai-description.js',
   '/api/admin/push-subscriptions': 'functions/api/admin/push-subscriptions.js',
@@ -111,7 +134,7 @@ for (const [route, file] of Object.entries(endpointMap)) {
 }
 for (const file of [
   'functions/api/admin/products.js', 'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/settings.js',
-  'functions/api/admin/upload.js', 'functions/api/admin/backup.js', 'functions/api/admin/restore.js',
+  'functions/api/admin/upload.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/backup.js', 'functions/api/admin/restore.js',
   'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js',
 ]) {
   if (existsSync(join(root, file))) check(readFileSync(join(root, file), 'utf8').includes('requireAdmin'), `API quản trị chưa kiểm quyền: ${file}`);
@@ -130,7 +153,7 @@ for (const secretFile of ['.env', '.dev.vars', '.env.production', '.dev.vars.pro
   check(!existsSync(join(root, secretFile)), `Không đưa tệp bí mật ${secretFile} vào source/ZIP`);
 }
 
-for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs']) {
+for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs', 'tests/image-search.test.mjs']) {
   if (existsSync(join(root, file))) runTest(file);
 }
 
