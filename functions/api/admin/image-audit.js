@@ -1,6 +1,7 @@
 import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
 import { analyzeProductImage } from "../../_lib/gemini.js";
 import { evaluateSearchCandidate } from "../../_lib/image-audit.js";
+import { consumeGeminiRequest } from "../../_lib/ai-quota.js";
 
 const MAX_BASE64 = 7_000_000;
 const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
@@ -78,6 +79,8 @@ export async function onRequestPost(context) {
   const parsed = parseDataImage(body?.dataUrl);
   if (!parsed) return fail("Ảnh gửi Gemini không hợp lệ.");
   if (review?.image_kind === "candidate" && review.status === "approved") return fail("Ảnh đã được duyệt; tạo lượt kiểm tra mới nếu cần.", 409);
+  const quota = await consumeGeminiRequest(db);
+  if (!quota.ok) return fail(quota.error, quota.status);
   const result = await analyzeProductImage({ apiKey: context.env.GEMINI_API_KEY, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
   if (result.error) return fail(result.error, result.status || 503);
   const id = review?.id || crypto.randomUUID();
