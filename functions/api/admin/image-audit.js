@@ -1,6 +1,6 @@
 import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
 import { analyzeProductImage, compareProductImages } from "../../_lib/workers-ai.js";
-import { isAllowedSourceImageUrl, isAllowedSourceProductUrl } from "../../_lib/image-audit.js";
+import { isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../../_lib/image-audit.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
 
 const MAX_BASE64 = 7_000_000;
@@ -9,7 +9,7 @@ const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
 function safeReview(row) {
   let analysis = {};
   try { analysis = JSON.parse(row.analysis_json || "{}"); } catch {}
-  return { id: row.id, productId: row.product_id, imageRef: row.image_ref, kind: row.image_kind, status: row.status, analysis, sourceUrl: row.source_url || "", sourceImageUrl: row.source_image_url || "", createdAt: row.created_at, updatedAt: row.updated_at };
+  return { id: row.id, productId: row.product_id, imageRef: row.image_ref, kind: row.image_kind, status: row.status, analysis, sourceUrl: row.source_url || "", sourceImageUrl: row.source_image_url || "", referenceImageRef: row.reference_image_ref || "", createdAt: row.created_at, updatedAt: row.updated_at };
 }
 function parseDataImage(value) {
   const match = String(value || "").match(/^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/i);
@@ -51,9 +51,16 @@ export async function onRequestPost(context) {
     if (noStorage) return noStorage;
     const sourceUrl = String(body?.sourceUrl || "").trim();
     const sourceImageUrl = String(body?.sourceImageUrl || "").trim();
+    const referenceImageRef = normalizeImageRef(body?.referenceImageRef || "");
     if (sourceUrl && !isAllowedSourceProductUrl(sourceUrl)) return fail("URL sản phẩm nguồn phải là đường dẫn HTTPS hợp lệ của Taobao, Tmall hoặc 1688.", 400);
     if (sourceImageUrl && !isAllowedSourceImageUrl(sourceImageUrl)) return fail("URL ảnh nguồn phải trỏ tới CDN ảnh HTTPS được phép.", 400);
     if (Boolean(sourceUrl) !== Boolean(sourceImageUrl)) return fail("Cần lưu cả trang sản phẩm nguồn và URL ảnh gốc, hoặc để trống cả hai khi tải ảnh thủ công.", 400);
+    let originalImages = [];
+    try { originalImages = JSON.parse(product.images_json || "[]"); } catch {}
+    if (referenceImageRef && (!Array.isArray(originalImages) || !originalImages.some(ref => normalizeImageRef(ref) === referenceImageRef))) {
+      return fail("Ảnh gốc tham chiếu không thuộc sản phẩm đã chọn.", 422);
+    }
+    if (sourceUrl && !referenceImageRef) return fail("Thiếu ảnh gốc được dùng để tìm ứng viên.", 422);
     const parsed = parseDataImage(body?.dataUrl);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ứng viên phải là WebP hợp lệ.");
     const bytes = Uint8Array.from(atob(parsed.base64), c => c.charCodeAt(0));
@@ -64,8 +71,8 @@ export async function onRequestPost(context) {
     const id = crypto.randomUUID();
     try {
       await context.env.IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/webp", cacheControl: "private, no-store" }, customMetadata: { visibility: "pending-ai-review", reviewId: id } });
-      await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json,source_url,source_image_url) VALUES(?,?,?,'candidate',?,'pending','{}',?,?)").bind(id, productId, imageRef, key, sourceUrl, sourceImageUrl).run();
-      return json({ ok: true, review: { id, productId, imageRef, kind: "candidate", status: "pending", analysis: {}, sourceUrl, sourceImageUrl }, message: "Đã tải tệp ảnh thật vào hàng chờ. Ảnh chưa được thêm vào bộ ảnh công khai." }, 201);
+      await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json,source_url,source_image_url,reference_image_ref) VALUES(?,?,?,'candidate',?,'pending','{}',?,?,?)").bind(id, productId, imageRef, key, sourceUrl, sourceImageUrl, referenceImageRef).run();
+      return json({ ok: true, review: { id, productId, imageRef, kind: "candidate", status: "pending", analysis: {}, sourceUrl, sourceImageUrl, referenceImageRef }, message: "Đã tải tệp ảnh thật vào hàng chờ. Ảnh chưa được thêm vào bộ ảnh công khai." }, 201);
     } catch {
       await context.env.IMAGES.delete(key).catch(() => {});
       return fail("Không lưu được ảnh chờ duyệt. Kiểm tra D1 và R2.", 503);
@@ -77,11 +84,13 @@ export async function onRequestPost(context) {
     const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=? LIMIT 1").bind(reviewId, productId).first().catch(() => null);
     if (!review || review.image_kind !== "candidate") return fail("Ảnh ứng viên không thuộc sản phẩm đã chọn.", 404);
     if (review.status !== "pending") return fail("Chỉ được đối chiếu ảnh đang chờ duyệt.", 409);
-    const referenceImageRef = String(body?.referenceImageRef || "").trim();
+    const referenceImageRef = normalizeImageRef(body?.referenceImageRef || review.reference_image_ref || "");
+    const storedReference = normalizeImageRef(review.reference_image_ref || "");
     let originalImages = [];
     try { originalImages = JSON.parse(product.images_json || "[]"); } catch {}
-    if (!referenceImageRef || !Array.isArray(originalImages) || !originalImages.some(ref => String(ref || "").replace(/^\\/+/, "") === referenceImageRef.replace(/^\\/+/, ""))) {
-      return fail("Ảnh gốc đối chiếu không thuộc bộ ảnh của sản phẩm đã chọn.", 422);
+    if (!referenceImageRef || (storedReference && storedReference !== referenceImageRef) ||
+        !Array.isArray(originalImages) || !originalImages.some(ref => normalizeImageRef(ref) === referenceImageRef)) {
+      return fail("Ảnh gốc đối chiếu không khớp ảnh tham chiếu đã lưu hoặc không thuộc sản phẩm này.", 422);
     }
     const parsed = parseDataImage(body?.dataUrl);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ghép đối chiếu phải là WebP hợp lệ.", 400);
