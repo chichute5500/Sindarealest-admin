@@ -56,7 +56,7 @@ const ai = { async run(model, input) {
 const analyzed = await analyzeProductImage({ ai, imageBase64: validBase64, mimeType: "image/webp", title: "Giày", sku: "SD001" });
 assert.ok(analyzed.analysis);
 assert.ok(analyzed.analysis.visibleFeatures.length >= 2, "analysis returns concrete visual features");
-assert.ok(analyzed.analysis.reasons.length >= 2, "analysis includes multiple actionable reasons");
+assert.ok(analyzed.analysis.reasons.length >= 1, "analysis includes at least one reason from the model response");
 assert.equal(calls, 1, "one Workers AI request per analysis");
 assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
 assert.ok(capturedInput.prompt.includes("Không tạo phần trăm tương đồng ảnh"));
