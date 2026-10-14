@@ -1,5 +1,5 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
-import { evaluateSearchCandidate, extractSimilarityScore, inventoryImages } from "../../_lib/image-audit.js";
+import { assessCrocodileMaterial, evaluateSearchCandidate, extractSimilarityScore, inventoryImages } from "../../_lib/image-audit.js";
 
 function isSupportedSourceUrl(value) {
   try { const u = new URL(value); const h = u.hostname.toLowerCase(); return u.protocol === "https:" && (h === "1688.com" || h.endsWith(".1688.com") || h === "taobao.com" || h.endsWith(".taobao.com")); } catch { return false; }
