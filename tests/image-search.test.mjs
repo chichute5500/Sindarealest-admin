@@ -16,6 +16,8 @@ assert.equal(isAllowedSourceImageUrl("https://img.alicdn.com/example.jpg"), true
 assert.equal(isAllowedSourceImageUrl("http://img.alicdn.com/example.jpg"), false);
 assert.equal(isAllowedSourceImageUrl("https://example.com/pixel.jpg"), false);
 assert.equal(isAllowedSourceImageUrl("https://alicdn.com.evil.example/pixel.jpg"), false);
+assert.equal(isAllowedSourceImageUrl("https://img.alicdn.com:8443/example.jpg"), false, "non-standard CDN ports must be rejected");
+assert.equal(isAllowedSourceImageUrl("https://user@img.alicdn.com/example.jpg"), false, "credentials embedded in CDN URLs must be rejected");
 const inventory = inventoryImages([
   { id: "p1", sku: "SD001", title: "Giày 1", category: "dress-shoes", images_json: '["images/a.webp","images/b.webp"]' },
   { id: "p2", sku: "SD002", title: "Giày 2", category: "loafers", images_json: '["images/a.webp"]' }
@@ -223,6 +225,11 @@ assert.match(auditSource, /chưa có mô hình so khớp thị giác chuyên bi�
 assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/ai-quota.js", import.meta.url), "utf8"), /workers-ai-rolling-24h/);
 assert.equal(typeof consumeWorkersAiRequest, "function");
 assert.equal(typeof (await import("../functions/api/admin/image-proxy.js")).onRequestGet, "function");
+const imageProxySource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-proxy.js", import.meta.url), "utf8");
+assert.match(imageProxySource, /isAllowedSourceImageUrl/);
+assert.doesNotMatch(imageProxySource, /ALLOWED_HOST/, "proxy must use the same shared URL allowlist for source and redirect URLs");
+const candidateAuditSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
+assert.match(candidateAuditSource, /Nội dung base64 của ảnh không hợp lệ/, "malformed image bytes should return a controlled 400 response");
 assert.equal(typeof (await import("../functions/api/admin/image-candidate.js")).onRequestGet, "function");
 const imageSearchSourceText = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
 assert.match(imageSearchSourceText, /imageRef/);
