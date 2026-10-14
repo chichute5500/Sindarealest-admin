@@ -97,7 +97,6 @@ const endpointMap = {
   '/api/admin/products': 'functions/api/admin/products.js',
   '/api/admin/image-search': 'functions/api/admin/image-search.js',
   '/api/admin/image-audit': 'functions/api/admin/image-audit.js',
-  '/api/admin/image-audit': 'functions/api/admin/image-audit.js',
   '/api/admin/products/reset-skus': 'functions/api/admin/products/reset-skus.js',
   '/api/admin/ai-description': 'functions/api/admin/ai-description.js',
   '/api/admin/push-subscriptions': 'functions/api/admin/push-subscriptions.js',
