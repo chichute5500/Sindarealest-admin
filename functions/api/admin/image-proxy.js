@@ -1,8 +1,8 @@
 import { fail, requireAdmin } from "../../_lib.js";
 
-const ALLOWED_HOST = host => host === "alicdn.com" || host.endsWith(".alicdn.com") ||
-  host === "1688.com" || host.endsWith(".1688.com") ||
-  host === "taobao.com" || host.endsWith(".taobao.com");
+// Only image CDNs returned by the marketplace search adapter are fetchable here.
+const ALLOWED_HOST = host => ["alicdn.com", "tbcdn.cn", "taobaocdn.com"].some(domain =>
+  host === domain || host.endsWith("." + domain));
 
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
