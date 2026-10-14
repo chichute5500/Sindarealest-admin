@@ -125,26 +125,6 @@ export async function onRequestPost(context) {
       signal: AbortSignal.timeout(25000)
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const apiError = data?.error || {};
-      const apiStatus = cleanText(apiError.status || "", 80);
-      const rawDetail = cleanText(apiError.message || "", 500);
-      // Include Google's actual diagnostic while ensuring the configured secret can never be echoed.
-      const detail = apiKey ? rawDetail.split(apiKey).join("[đã ẩn API key]") : rawDetail;
-      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
-        return fail("Gemini Search bị giới hạn hạn mức (HTTP 429). " + (detail || "Kiểm tra RPM/RPD, hạn mức Grounding và billing trong AI Studio."), 429);
-      }
-      if (response.status === 401 || apiStatus === "UNAUTHENTICATED" || /API.?KEY_INVALID|invalid api key|api key.*invalid|reported as leaked|blocked/i.test(detail)) {
-        return fail("Gemini từ chối API key (HTTP " + response.status + "). " + (detail || "Tạo/kiểm tra key trong Google AI Studio và giới hạn key cho Gemini API."), 502);
-      }
-      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") {
-        return fail("Gemini từ chối quyền truy cập (HTTP 403). Kiểm tra key restriction, project/API access, billing và quyền sử dụng Grounding with Google Search. " + detail, 502);
-      }
-      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") {
-        return fail("Gemini từ chối định dạng yêu cầu (HTTP 400). Chi tiết Google: " + (detail || "INVALID_ARGUMENT"), 502);
-      }
-      return fail("Gemini Search trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra trạng thái dịch vụ và thử lại."), 502);
-    }
     const steps = Array.isArray(data?.steps) ? data.steps : [];
     const outputBlocks = steps.filter((step) => step?.type === "model_output").flatMap((step) => Array.isArray(step.content) ? step.content : []);
     const outputText = outputBlocks.filter((block) => block?.type === "text").map((block) => block.text || "").join("\n");
