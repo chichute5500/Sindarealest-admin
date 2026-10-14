@@ -215,7 +215,7 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     console.warn("[Workers AI diagnostic]", JSON.stringify(invalidJsonDiagnostic));
     // Expose only sanitized diagnostics, never the raw model response or image data.
     return {
-      error: "Workers AI trả về nội dung nhưng không phải JSON hợp lệ. Không lưu kết quả chưa kiểm tra.",
+      error: "Workers AI trả về nội dung nhưng không phải JSON hợp lệ. Không lưu kết quả chưa kiểm tra. Độ dài phản hồi: " + invalidJsonDiagnostic.responseLength + "; xem trước đã lọc dữ liệu nhạy cảm: " + invalidJsonDiagnostic.responsePreview,
       status: 502,
       code: "WORKERS_AI_INVALID_JSON",
       diagnostic: {
