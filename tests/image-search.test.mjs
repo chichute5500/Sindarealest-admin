@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { assessCrocodileMaterial, evaluateSearchCandidate, extractSimilarityScore, inventoryImages, normalizeImageRef } from "../functions/_lib/image-audit.js";
-import { analyzeProductImage } from "../functions/_lib/gemini.js";
+import { analyzeProductImage, suggestMarketplaceImageKeywords } from "../functions/_lib/gemini.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
 const inventory = inventoryImages([
@@ -26,6 +26,7 @@ assert.equal(evaluateSearchCandidate({ title: "Giày da bò thật", similarityS
 assert.equal(evaluateSearchCandidate({ title: "Giày da cá sấu giả PU", similarityScore: 99 }).eligible, false, "synthetic material must be rejected");
 assert.equal(evaluateSearchCandidate({ title: "真鳄鱼皮鞋", similarityScore: 95 }).eligible, true);
 assert.ok((await analyzeProductImage({ apiKey: "", imageBase64: "abc" })).error);
+assert.ok((await suggestMarketplaceImageKeywords({ apiKey: "", imageBase64: "abc" })).error);
 assert.ok((await analyzeProductImage({ apiKey: "x".repeat(20), imageBase64: "abc" })).error);
 const candidateKey = "a".repeat(36) + "-ai.webp";
 const candidateReview = { image_kind: "candidate", status: "pending", r2_key: candidateKey, image_ref: "/media/" + candidateKey };
