@@ -104,12 +104,12 @@ check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI c
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
 check(imageTests.includes('saveSource') && imageTests.includes('isMarketplaceHost'), 'Thiếu kiểm thử lưu URL nguồn Taobao/1688');
-check(adminHtml.includes('data-view="ai"') && adminHtml.includes('window.__sdAiInventoryAutoScanned'), 'Tab AI chưa được thêm hoặc chưa tự quét kho ảnh');
 check(imageTests.includes('missing similarity score must fail closed') && imageTests.includes('crocodile keyword is mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
 const adminHtml = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
+check(adminHtml.includes('data-view="ai"') && adminHtml.includes('window.__sdAiInventoryAutoScanned'), 'Tab AI chưa được thêm hoặc chưa tự quét kho ảnh');
 const endpointMap = {
   '/api/admin/login': 'functions/api/admin/login.js',
   '/api/admin/logout': 'functions/api/admin/logout.js',
