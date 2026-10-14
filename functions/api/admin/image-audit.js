@@ -104,8 +104,24 @@ export async function onRequestPatch(context) {
   if (!review) return fail("Không tìm thấy bản ghi kiểm duyệt.", 404);
   if (decision === "recheck") return json({ ok: true, review: safeReview(review), message: "Hãy chạy lại phân tích Gemini từ bảng kiểm tra AI." });
   if (decision === "reject") {
-    await db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id).run();
-    return json({ ok: true, message: "Đã từ chối ảnh. Ảnh không được thêm vào bộ ảnh công khai." });
+    if (review.image_kind === "candidate") {
+      const product = await getProduct(db, review.product_id);
+      if (product) {
+        let images = [];
+        try { images = JSON.parse(product.images_json || "[]"); } catch {}
+        if (!Array.isArray(images)) images = [];
+        const next = images.filter((ref) => ref !== review.image_ref);
+        await db.batch([
+          db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id),
+          db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id)
+        ]);
+      } else {
+        await db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id).run();
+      }
+    } else {
+      await db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id).run();
+    }
+    return json({ ok: true, message: "Đã từ chối ảnh. Ảnh ứng viên bị gỡ khỏi bộ ảnh công khai nếu từng được duyệt." });
   }
   if (review.image_kind !== "candidate") {
     await db.prepare("UPDATE image_ai_reviews SET status='approved',updated_at=datetime('now') WHERE id=?").bind(id).run();
