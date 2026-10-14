@@ -71,8 +71,9 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     "Chỉ mô tả dấu hiệu nhìn thấy trong ảnh; không khẳng định da cá sấu thật chỉ bằng ảnh.",
     "Phân biệt 鳄鱼皮 (da cá sấu được mô tả là da), 鳄鱼纹/压纹 (vân cá sấu) và PU/合成革 (vật liệu tổng hợp). Không kết luận nguồn gốc vật liệu nếu không đủ bằng chứng.",
     "Phân loại mối quan hệ ảnh thành same_model_possible, different_model_possible, different_angle_possible hoặc uncertain. Không tạo phần trăm tương đồng ảnh.",
-    "Trả JSON thuần theo schema: {summary:string,visibleFeatures:string[],modelAssessment:'same_model_possible'|'different_model_possible'|'different_angle_possible'|'uncertain',materialAssessment:'possible_synthetic'|'crocodile_claim_unverified'|'no_visible_evidence'|'uncertain',confidence:'low'|'medium'|'high',reasons:string[],needsHumanReview:boolean}.",
-    "Nếu không chắc chắn, confidence phải low hoặc medium và needsHumanReview phải true. Không đề nghị tự động xóa hoặc tự động công khai ảnh.",
+    "Return exactly one valid JSON object and nothing else. No Markdown fences, no preamble, no explanation, and no text after the JSON.",
+    'Required JSON schema: {"summary":"short Vietnamese summary","visibleFeatures":["visible feature"],"modelAssessment":"same_model_possible|different_model_possible|different_angle_possible|uncertain","materialAssessment":"possible_synthetic|crocodile_claim_unverified|no_visible_evidence|uncertain","confidence":"low|medium|high","reasons":["reason"],"needsHumanReview":true}.',
+    "All required fields must be present with the correct types: summary string, visibleFeatures array of strings, reasons array of strings, needsHumanReview boolean. Use only the exact enum values shown in the schema. If uncertain, use low/medium confidence and needsHumanReview true. Never invent missing observations. Do not recommend automatically deleting or publishing an image."
     "Thông tin sản phẩm: SKU " + String(sku).slice(0, 60) + "; tên " + String(title).slice(0, 180) + "; danh mục " + String(category).slice(0, 80) + "."
   ].join("\n");
   const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 768 });
@@ -84,7 +85,12 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     materialAssessment: ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"],
     confidence: ["low", "medium", "high"]
   };
-  for (const [key, values] of Object.entries(allowed)) if (!values.includes(parsed[key])) parsed[key] = key === "confidence" ? "low" : "uncertain";
+  const validSchema = typeof parsed.summary === "string" && parsed.summary.trim().length > 0 &&
+    Array.isArray(parsed.visibleFeatures) && parsed.visibleFeatures.every(value => typeof value === "string") &&
+    Array.isArray(parsed.reasons) && parsed.reasons.every(value => typeof value === "string") &&
+    typeof parsed.needsHumanReview === "boolean" &&
+    Object.entries(allowed).every(([key, values]) => values.includes(parsed[key]));
+  if (!validSchema) return { error: "Workers AI trả về JSON nhưng sai cấu trúc hoặc thiếu trường bắt buộc. Không lưu kết quả chưa kiểm tra.", status: 502, code: "WORKERS_AI_INVALID_SCHEMA" };
   return { analysis: {
     summary: String(parsed.summary || "Chưa có mô tả").slice(0, 800),
     visibleFeatures: Array.isArray(parsed.visibleFeatures) ? parsed.visibleFeatures.slice(0, 12).map(x => String(x).slice(0, 160)) : [],
