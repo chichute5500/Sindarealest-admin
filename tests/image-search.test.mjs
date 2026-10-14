@@ -100,7 +100,7 @@ assert.equal(canServeAiCandidate({ ...candidateReview, status: "approved", image
 const adminHtml = (await import("node:fs")).readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
 assert.match(adminHtml, /Workers AI/);
 assert.match(adminHtml, /d\.code/, "Admin API errors should display safe diagnostic codes");
-assert.match(adminHtml, /d\.code/, "Admin API errors should display safe diagnostic codes");
+assert.match(adminHtml, /data-view="ai"/);
 assert.doesNotMatch(adminHtml, /const phashSimilarity=async/);
 assert.doesNotMatch(adminHtml, /foundGroups=await Promise\\.allSettled/);
 assert.match(adminHtml, /Chưa có mô hình so khớp thị giác chuyên biệt/);
