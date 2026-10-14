@@ -27,6 +27,17 @@ function runLocalCheck() {
   if (result.status !== 0) throw new Error('Kiểm tra mã nguồn thất bại. Sửa toàn bộ lỗi trước khi cấu hình Cloudflare.');
 }
 
+function applyAiImageMigrations(database) {
+  const result = spawnSync(process.execPath, ['scripts/apply-ai-image-migrations.mjs'], {
+    encoding: 'utf8',
+    env: { ...process.env, CLOUDFLARE_D1_DATABASE: database },
+  });
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(`Không áp dụng được migration AI cho D1 ${database}.`);
+}
+
 async function ensureLogin() {
   try {
     runWrangler(['whoami'], { quiet: true });
@@ -99,6 +110,8 @@ async function main() {
   console.log('Áp dụng địa chỉ giao hàng và metadata bảo hành (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0005_address_warranty_verification.sql'], { interactive: true });
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0006_remove_warranty_otp.sql'], { interactive: true });
+  console.log('Áp dụng hàng chờ ảnh AI, URL nguồn và giới hạn Workers AI trên đúng D1 đã chọn…');
+  applyAiImageMigrations(dbName);
 
   console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
   for (const query of [
