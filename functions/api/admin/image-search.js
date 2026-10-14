@@ -1,5 +1,5 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
-import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages } from "../../_lib/image-audit.js";
+import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, normalizeImageRef } from "../../_lib/image-audit.js";
 import { generateSearchKeywords } from "../../_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
 import { searchElimapiProducts } from "../../_lib/elimapi.js";
@@ -44,7 +44,22 @@ export async function onRequestPost(context) {
   if (!platform) return fail("Hãy chọn Taobao hoặc 1688.");
   const image = parseImage(body?.dataUrl, body?.imageBase64);
   if (!image) return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn 5 MB.");
-  const title = String(body?.title || "").replace(/[<>]/g, "").trim().slice(0, 180);
+  const productId = String(body?.productId || "").trim().slice(0, 100);
+  const imageRef = normalizeImageRef(body?.imageRef);
+  if (!productId || !imageRef || imageRef.length > 300) return fail("Thiếu sản phẩm hoặc tham chiếu ảnh gốc.");
+  let product;
+  try {
+    product = await context.env.DB.prepare("SELECT id,sku,title,category,images_json FROM products WHERE id=? LIMIT 1").bind(productId).first();
+  } catch {
+    return fail("Không thể xác minh sản phẩm và ảnh gốc trong D1.", 503);
+  }
+  if (!product) return fail("Không tìm thấy sản phẩm được chọn.", 404);
+  let ownedImages = [];
+  try { ownedImages = JSON.parse(product.images_json || "[]"); } catch {}
+  if (!Array.isArray(ownedImages) || !ownedImages.some(ref => normalizeImageRef(ref) === imageRef)) {
+    return fail("Ảnh tham chiếu không thuộc bộ ảnh của sản phẩm đã chọn.", 422);
+  }
+  const title = String(product.title || "").replace(/[<>]/g, "").trim().slice(0, 180);
   const material = assessCrocodileMaterial(title);
   if (material.status === "reject") return fail(material.reason, 422);
   const quota = await consumeWorkersAiRequest(context.env.DB);
@@ -78,6 +93,8 @@ export async function onRequestPost(context) {
   });
   return json({
     ok: true,
+    productId: product.id,
+    sourceImageRef: imageRef,
     platform,
     provider: "Elimapi",
     keywordProvider: "Cloudflare Workers AI",
