@@ -108,7 +108,7 @@ const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readF
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
 check(imageTests.includes('WORKERS_AI_EMPTY_RESPONSE') && imageTests.includes('one Workers AI request per analysis') && imageTests.includes('compareProductImages().available'), 'Thiếu kiểm thử phản hồi rỗng, không retry và mô hình so khớp chưa khả dụng');
 check(imageTests.includes('must fail closed') && imageTests.includes('crocodile keyword remains mandatory') && imageTests.includes('synthetic material must be rejected'), 'Thiếu kiểm thử cổng điểm tương đồng, từ khóa bắt buộc và giả da');
-check(imageTests.includes('normalizeElimapiProducts') && imageTests.includes('ELIMAPI_API_KEY') && imageTests.includes('normalizeAliases'), 'Thiếu kiểm thử Elimapi và chuẩn hóa từ khóa AI');
+check(imageTests.includes('normalizeElimapiProducts') && imageTests.includes('ELIMAPI_API_KEY') && imageTests.includes('normalizedAliases'), 'Thiếu kiểm thử Elimapi và chuẩn hóa từ khóa AI');
 const workersAiSource = (await import('../functions/_lib/workers-ai.js')).analyzeProductImage.toString();
 check(workersAiSource.includes('runWorkersAiVision') && !workersAiSource.includes('GEMINI_API_KEY'), 'Phân tích ảnh phải dùng binding Workers AI, không dùng Gemini API key');
 const quotaSource = (await import('../functions/_lib/ai-quota.js')).consumeWorkersAiRequest.toString();
