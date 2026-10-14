@@ -40,6 +40,19 @@ const keywordResult = await suggestMarketplaceImageKeywords({
   imageBase64: "YWJj"
 });
 assert.deepEqual(keywordResult.keywords, ["黑色皮鞋", "男鞋"], "Workers AI Chinese keywords should be preserved");
+
+const wrappedJsonKeywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({
+    response: 'Here is the result:\n```json\n{"keywords":["黑色乐福鞋","黑色男鞋"],"visualSummary":"黑色皮鞋"}\n```\n以上是分析结果。'
+  }) },
+  imageBase64: "YWJj"
+});
+assert.deepEqual(wrappedJsonKeywordResult.keywords, ["黑色乐福鞋", "黑色男鞋"], "Workers AI JSON surrounded by prose and markdown fences should be recovered");
+const malformedKeywordResult = await suggestMarketplaceImageKeywords({
+  ai: { run: async () => ({ response: '我认为这是一双黑色鞋子，但无法按 JSON 输出。' }) },
+  imageBase64: "YWJj"
+});
+assert.match(malformedKeywordResult.error, /JSON|关键词/, "invalid model output should return a clear validation error");
 assert.ok((await suggestMarketplaceImageKeywords({ ai: { run: async () => { throw new Error("quota limit"); } }, imageBase64: "YWJj" })).status === 429, "Workers AI quota errors should not auto-retry");
 const candidateKey = "a".repeat(36) + "-ai.webp";
 const candidateReview = { image_kind: "candidate", status: "pending", r2_key: candidateKey, image_ref: "/media/" + candidateKey };
