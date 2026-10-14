@@ -58,7 +58,7 @@ export async function onRequestPost(context) {
       results: products.map((item) => ({
         title: String(item.title || item.subject || "").slice(0, 300),
         imageUrl: String(item.imageUrl || item.image_url || item.picUrl || item.pic_url || ""),
-        productUrl: String(item.productUrl || item.product_url || item.offerUrl || item.offer_url || item.url || ""),
+        productUrl: String(item.productUrl || item.product_url || item.offerUrl || item.offer_url || item.url || (item.offerId ? "https://detail.1688.com/offer/" + encodeURIComponent(String(item.offerId)) + ".html" : "")),
         price: item.price == null ? null : String(item.price),
         materialCheck: assessCrocodileMaterial([item.title, item.description, item.material, item.properties].filter(Boolean).join(" "))
       })).filter((item) => /^https:\/\//i.test(item.imageUrl) && /^https:\/\//i.test(item.productUrl))
