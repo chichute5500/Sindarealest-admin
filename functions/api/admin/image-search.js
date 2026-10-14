@@ -53,7 +53,11 @@ function safeText(value, max = 500) {
 async function apiJson(path, apiKey, body) {
   const response = await fetch(API_BASE + path, {
     method: "POST",
-    headers: { "x-api-key": apiKey, Accept: "application/json" },
+    headers: {
+      "x-api-key": apiKey,
+      Accept: "application/json",
+      ...(body instanceof FormData ? {} : { "Content-Type": "application/json" })
+    },
     body: body instanceof FormData ? body : JSON.stringify(body),
     signal: AbortSignal.timeout(12000)
   });
@@ -122,7 +126,15 @@ export async function onRequestGet(context) {
     const result = await context.env.DB.prepare(
       "SELECT id, sku, title, category, images_json FROM products ORDER BY sort_order ASC, sku ASC LIMIT 2000"
     ).all();
-    return json({ ok: true, ...inventoryImages(parseProducts(result.results || [])) });
+    return json({
+      ok: true,
+      engine: "cloudflare-workers-ai",
+      dependencies: {
+        workersAiBindingConfigured: typeof context.env?.AI?.run === "function",
+        elimapiKeyConfigured: typeof context.env?.ELIMAPI_API_KEY === "string" && context.env.ELIMAPI_API_KEY.length >= 12
+      },
+      ...inventoryImages(parseProducts(result.results || []))
+    });
   } catch {
     return fail("Không thể quét kho ảnh trong D1. Hãy kiểm tra cấu hình cơ sở dữ liệu.", 503);
   }
@@ -148,15 +160,15 @@ export async function onRequestPost(context) {
   if (!bytes) return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn an toàn.");
   const rawMime = String(body?.imageBase64 || "").match(/^data:image\/(?:jpeg|jpg|png|webp);base64,/i)?.[1]?.toLowerCase();
   const mimeType = rawMime === "image/png" || rawMime === "image/webp" ? rawMime : "image/jpeg";
-  const gemini = await suggestMarketplaceImageKeywords({
+  const workersAi = await suggestMarketplaceImageKeywords({
     ai: context.env.AI,
     imageBase64: body?.imageBase64,
     mimeType,
     title,
     category: safeText(body?.category, 80)
   });
-  if (gemini.error) return fail(gemini.error, gemini.status || 502);
-  const searchKeyword = (gemini.keywords || []).join(" ");
+  if (workersAi.error) return fail(workersAi.error, workersAi.status || 502);
+  const searchKeyword = (workersAi.keywords || []).join(" ");
 
   try {
     const imageId = await uploadReferenceImage(bytes, platform, apiKey, mimeType);
@@ -198,8 +210,9 @@ export async function onRequestPost(context) {
     return json({
       ok: true,
       platform,
-      keywords: gemini.keywords || [],
-      visualSummary: gemini.visualSummary || "",
+      engine: "cloudflare-workers-ai",
+      keywords: workersAi.keywords || [],
+      visualSummary: workersAi.visualSummary || "",
       results,
       message: results.length
         ? "Đã tìm sản phẩm thật bằng ảnh và lấy thêm ảnh góc từ bộ ảnh nguồn khi API trả về. Chưa tự thêm ảnh vào website: cần đối chiếu pHash đạt ít nhất 90% và kiểm tra từ khóa trước."
@@ -209,6 +222,7 @@ export async function onRequestPost(context) {
     const status = error?.status === 401 || error?.status === 403 ? 503 : error?.status === 429 ? 429 : 502;
     if (error?.status === 429) return fail("API tìm ảnh đang giới hạn lượt gọi. Không tự động thử lại để tránh tiêu hao quota.", 429);
     if (error?.status === 401 || error?.status === 403) return fail("API key Elimapi không hợp lệ, hết hạn hoặc chưa có quyền tìm ảnh. Kiểm tra gói và quyền API.", 503);
+    if (error?.status === 404) return fail("Elimapi trả HTTP 404. Đây là lỗi endpoint/API tìm nguồn hàng, không phải lỗi Workers AI; kiểm tra đúng API v2 và dịch vụ openapi.elim.asia.", 502);
     return fail("Không hoàn tất được tìm kiếm ảnh thật trên " + platform + ". " + safeText(error?.message || "", 180), status);
   }
 }
