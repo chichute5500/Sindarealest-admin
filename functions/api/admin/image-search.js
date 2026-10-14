@@ -28,8 +28,8 @@ function cleanText(value, max = 300) {
 function meta(html, property) {
   const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const patterns = [
-    new RegExp('<meta[^>]+(?:property|name)=["\\']' + escaped + '["\\'][^>]+content=["\\']([^"\\']+)', "i"),
-    new RegExp('<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\']' + escaped + '["\\']', "i")
+    new RegExp("<meta[^>]+(?:property|name)=[\"']" + escaped + "[\"'][^>]+content=[\"']([^\"']+)", "i"),
+    new RegExp("<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+(?:property|name)=[\"']" + escaped + "[\"']", "i")
   ];
   for (const pattern of patterns) { const match = html.match(pattern); if (match) return cleanText(match[1], 2000); }
   return "";
