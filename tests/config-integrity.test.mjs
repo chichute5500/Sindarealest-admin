@@ -34,6 +34,10 @@ assert.ok(aiQuotaMigration.includes('CREATE TABLE IF NOT EXISTS ai_request_limit
 const aiMigrationScript = readFileSync('scripts/apply-ai-image-migrations.mjs', 'utf8');
 assert.ok(aiMigrationScript.includes('migrations/0009_ai_request_limits.sql'), 'AI setup must apply migration 0009 before calling the quota guard');
 assert.ok(aiMigrationScript.indexOf('migrations/0007_ai_image_reviews.sql') < aiMigrationScript.indexOf('migrations/0009_ai_request_limits.sql'), 'AI review schema must be applied before the quota migration');
+assert.ok(aiMigrationScript.includes('PRAGMA table_info(image_ai_reviews)'), 'AI migration must inspect the live D1 table before changing columns');
+assert.ok(aiMigrationScript.includes('ensureColumn("source_image_url")') && aiMigrationScript.includes('ensureColumn("reference_image_ref")'), 'AI migration must idempotently add both missing image-review columns');
+assert.ok(aiMigrationScript.includes('columns = readReviewColumns()') && aiMigrationScript.includes('vẫn thiếu cột'), 'AI migration must re-read D1 after ALTER TABLE and fail if a column is still missing');
+assert.ok(aiMigrationScript.includes('VERIFIED: D1 '), 'AI migration must only print success after final schema verification');
 assert.ok(aiMigrationScript.includes('CLOUDFLARE_D1_TARGET'), 'AI migrations must require an explicit Preview/Production target');
 assert.ok(aiMigrationScript.includes('ALLOW_PRODUCTION_D1_MIGRATIONS') && aiMigrationScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Production AI migration must require explicit opt-in and exact database-name confirmation');
 assert.doesNotMatch(aiMigrationScript, /CLOUDFLARE_D1_DATABASE\s*\|\|\s*["']sindarealest-db["']/, 'AI migration must not silently default to the known Production database');
