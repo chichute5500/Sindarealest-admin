@@ -168,6 +168,47 @@ assert.match(shortFeatureReasonsAnalysis.analysis.reasons[0], /màu đen trắng
 assert.match(shortFeatureReasonsAnalysis.analysis.reasons[1], /cổ cao/);
 assert.equal(shortFeatureReasonsAnalysis.analysis.needsHumanReview, true);
 
+const overLimitListsAnalysis = await analyzeProductImage({
+  ai: { async run() { return { response: JSON.stringify({
+    summary: "Giày sneaker màu đen trắng, cổ cao, mũi thấp và đế trắng dày.",
+    visibleFeatures: ["Thân giày màu đen", "Thân giày màu đen", "Cổ giày cao", "Mũi giày thấp", "Đế ngoài màu trắng", "Dây giày màu đen", "Đường may nổi ở thân", "Lưỡi gà có viền"],
+    modelAssessment: "uncertain",
+    materialAssessment: "crocodile_claim_unverified",
+    confidence: "low",
+    reasons: [
+      "Thân giày màu đen nổi bật trên phần thân chính.",
+      "Cổ giày cao bao quanh khu vực mắt cá chân.",
+      "Mũi giày có dáng thấp nhìn từ góc chụp.",
+      "Đế ngoài màu trắng tạo tương phản với thân giày.",
+      "Dây giày màu đen chạy dọc trên phần thân.",
+      "Đường may nổi có thể quan sát ở mặt bên."
+    ],
+    needsHumanReview: true
+  }) }; } },
+  imageBase64: validBase64, title: "Sneaker", sku: "SD-SN005"
+});
+assert.ok(overLimitListsAnalysis.analysis, "overlong AI lists should be normalized when enough concrete observations remain");
+assert.equal(overLimitListsAnalysis.analysis.visibleFeatures.length, 6, "visible features must be capped at six");
+assert.equal(overLimitListsAnalysis.analysis.reasons.length, 5, "reasons must be capped at five");
+assert.equal(new Set(overLimitListsAnalysis.analysis.visibleFeatures.map(x => x.toLowerCase())).size, 6, "duplicate features should be removed");
+assert.equal(overLimitListsAnalysis.analysis.needsHumanReview, true, "normalized analysis must still require human review");
+
+const genericReasonsWithManyFeatures = await analyzeProductImage({
+  ai: { async run() { return { response: JSON.stringify({
+    summary: "Giày sneaker màu đen, cổ cao, mũi thấp, đế trắng và có dây buộc.",
+    visibleFeatures: ["Thân giày màu đen", "Cổ giày cao", "Mũi giày thấp", "Đế ngoài màu trắng", "Dây buộc màu đen", "Đường may ở thân"],
+    modelAssessment: "uncertain",
+    materialAssessment: "uncertain",
+    confidence: "low",
+    reasons: ["Dựa trên hình ảnh", "Cần kiểm tra thêm", "Không đủ thông tin"],
+    needsHumanReview: true
+  }) }; } },
+  imageBase64: validBase64, title: "Sneaker", sku: "SD-SN006"
+});
+assert.ok(genericReasonsWithManyFeatures.analysis, "generic reasons should be recovered from sufficient concrete visible features");
+assert.equal(genericReasonsWithManyFeatures.analysis.reasons.length, 2);
+assert.match(genericReasonsWithManyFeatures.analysis.reasons[0], /Thân giày màu đen/);
+assert.equal(genericReasonsWithManyFeatures.analysis.needsHumanReview, true);
 
 assert.ok(capturedInput.prompt.includes("summary phải mô tả trực tiếp"), "prompt requires specific visible observations instead of repeating metadata");
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must prevent unsupported single-image identity verification");
