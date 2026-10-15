@@ -206,14 +206,14 @@ export function parseModelJson(rawText) {
         escaped = false;
         continue;
       }
-      if (ch === "\\\\") {
+      if (ch === "\\") {
         repaired += ch;
         escaped = true;
         continue;
       }
       if (ch === '"') {
         let next = i + 1;
-        while (next < candidate.length && /\\s/.test(candidate[next])) next++;
+        while (next < candidate.length && /\s/.test(candidate[next])) next++;
         const nextChar = candidate[next];
         // In JSON, a closing quote is followed by a property separator or container end.
         // Otherwise treat it as an unescaped quote inside the model's string value.
@@ -221,13 +221,13 @@ export function parseModelJson(rawText) {
           inString = false;
           repaired += ch;
         } else {
-          repaired += '\\\\"';
+          repaired += '\\"';
         }
         continue;
       }
-      if (ch === "\\n") repaired += "\\\\n";
-      else if (ch === "\\r") repaired += "\\\\r";
-      else if (ch === "\\t") repaired += "\\\\t";
+      if (ch === "\n") repaired += "\\n";
+      else if (ch === "\r") repaired += "\\r";
+      else if (ch === "\t") repaired += "\\t";
       else if (ch.charCodeAt(0) < 0x20) repaired += " ";
       else repaired += ch;
     }
