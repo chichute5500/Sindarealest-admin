@@ -12,10 +12,11 @@ This branch is for isolated Preview validation only. It must not be merged into 
 - AI review schema is present in Preview: `image_ai_reviews` includes `source_url`, `source_image_url`, and `reference_image_ref`.
 - `ai_request_limits` is present in Preview.
 - Product table is initially empty; no production rows or seed data were copied.
+- Cloudflare previously reported six successful Preview deployments for this branch. The exact latest deployment URL and live runtime health have not yet been independently verified.
 
 ## Remaining before end-to-end validation
 
-1. Trigger a Preview deployment after saving Preview bindings.
+1. Independently verify the latest Preview URL and that the deployed build serves the expected branch/commit.
 2. Add a non-production admin password and session secret for Preview, without reusing or exposing Production secrets.
 3. Verify Workers AI account license/acceptable-use prerequisites before making a model call.
 4. Confirm ElimAPI account plan supports image search and set a Preview-only API key. Keep image search disabled until these conditions are verified.
@@ -24,4 +25,10 @@ This branch is for isolated Preview validation only. It must not be merged into 
 
 ## Migration guard
 
-`scripts/apply-ai-image-migrations.mjs` requires an explicit D1 name and `CLOUDFLARE_D1_TARGET`. Production requires an explicit opt-in and an exact database-name confirmation. Review the setup wizard integration before using it to deploy or migrate any environment.
+`scripts/apply-ai-image-migrations.mjs` requires an explicit D1 name and `CLOUDFLARE_D1_TARGET`. Production requires an explicit opt-in and an exact database-name confirmation. The setup wizard now requests a separate exact Production database-name confirmation before enabling the guarded migration command. This setup script has not been run against Production.
+
+## Latest code validation
+
+- Commit `05790e52a63264e6cb22d610dc83b1ee18e80159`: CI run #727 passed `npm run check` and `npm test`.
+- A regression test now also checks the setup wizard's explicit target and database-confirmation wiring.
+- Code-level CI success does not prove Cloudflare/ElimAPI end-to-end readiness.
