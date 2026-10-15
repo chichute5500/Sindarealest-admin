@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { createSession } from "../functions/_lib.js";
+import { onRequestPost as postImageAudit } from "../functions/api/admin/image-audit.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../functions/_lib/ai-quota.js";
@@ -357,5 +359,87 @@ const blockedMissingKey = await searchElimapiProductsByImage({
 assert.equal(blockedMissingKey.code, "ELIMAPI_KEY_MISSING");
 assert.equal(missingKeyCalls, 0, "missing ElimAPI credentials must be rejected before any network request");
 
+
+
+// Regression tests: an invalid cross-product reference or rejected candidate must be
+// rejected before either D1 AI quota or Workers AI is touched.
+function makeAuditTestDb(review = null) {
+  const counters = { quotaQueries: 0, writes: 0, aiCalls: 0 };
+  const product = {
+    id: "product-1", sku: "SD001", title: "Giày mẫu", category: "dress-shoes",
+    images_json: JSON.stringify(["images/reference.webp"]), published: 1
+  };
+  const DB = {
+    prepare(sql) {
+      const statement = {
+        args: [],
+        bind(...args) { this.args = args; return this; },
+        async first() {
+          if (sql.startsWith("SELECT id,sku,title,category,images_json,published FROM products WHERE id=?")) return product;
+          if (sql.startsWith("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=?")) return review;
+          if (sql.includes("INSERT INTO ai_request_limits")) {
+            counters.quotaQueries++;
+            return { request_count: 1, window_start: Math.floor(Date.now() / 1000) };
+          }
+          return null;
+        },
+        async run() { counters.writes++; return { success: true }; },
+        async all() { return { results: [] }; }
+      };
+      return statement;
+    }
+  };
+  return { DB, counters };
+}
+async function postAuditForRegression(body, review = null) {
+  const { DB, counters } = makeAuditTestDb(review);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-audit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: "sd_admin_session=" + session,
+      Origin: "https://sindarealest.test"
+    },
+    body: JSON.stringify(body)
+  });
+  const response = await postImageAudit({
+    request,
+    env: {
+      DB, ADMIN_PASSWORD: "test-admin-password",
+      SESSION_SECRET: sessionSecret,
+      AI: { async run() { counters.aiCalls++; return { response: "{}" }; } }
+    }
+  });
+  return { response, counters };
+}
+const crossProduct = await postAuditForRegression({
+  action: "analyze", productId: "product-1",
+  imageRef: "images/not-owned-by-product.webp",
+  dataUrl: "data:image/webp;base64,aGVsbG8="
+});
+assert.equal(crossProduct.response.status, 422, "cross-product references must fail validation");
+assert.equal(crossProduct.counters.quotaQueries, 0, "invalid references must not consume D1 AI quota");
+assert.equal(crossProduct.counters.aiCalls, 0, "invalid references must not call Workers AI");
+assert.equal(crossProduct.counters.writes, 0, "invalid references must not write a review");
+
+const rejectedCandidateKey = "a".repeat(36) + "-ai.webp";
+const rejectedCandidate = await postAuditForRegression({
+  action: "analyze", productId: "product-1",
+  reviewId: "review-rejected",
+  dataUrl: "data:image/webp;base64,aGVsbG8="
+}, {
+  id: "review-rejected", product_id: "product-1",
+  image_kind: "candidate", status: "rejected",
+  image_ref: "/media/" + rejectedCandidateKey,
+  r2_key: rejectedCandidateKey, analysis_json: "{}"
+});
+assert.equal(rejectedCandidate.response.status, 409, "rejected candidates must not be silently reopened by analysis");
+assert.equal(rejectedCandidate.counters.quotaQueries, 0, "rejected candidates must not consume AI quota");
+assert.equal(rejectedCandidate.counters.aiCalls, 0, "rejected candidates must not call Workers AI");
+assert.equal(rejectedCandidate.counters.writes, 0, "rejected candidates must not be rewritten as pending");
+
+console.log("PASS: AI image audit rejects cross-product references and non-pending candidates before quota/model calls.");
 
 console.log("PASS: Workers AI keyword normalization, Elimapi product/price mapping, API authentication handling, safe source URLs, fail-closed 90% gate, material screening, D1 inventory, and manual image approval.");
