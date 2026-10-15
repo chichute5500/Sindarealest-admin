@@ -59,10 +59,9 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       prompt: String(prompt || "").slice(0, 12000),
       image: `data:${image.mimeType};base64,${image.base64}`,
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
-      temperature: 0.1,
-      // Both current AI tasks require machine-readable JSON; use the provider's JSON mode
-      // instead of relying only on prompt instructions.
-      response_format: { type: "json_object" }
+      temperature: 0.1
+      // This vision model is not listed among Cloudflare Workers AI JSON Mode models.
+      // Enforce structured output with the prompt and strict server-side parsing instead.
     });
     // Safe diagnostics: log response shape only, never prompts, image bytes, or field contents.
     const diagnostic = {
