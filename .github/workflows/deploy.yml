@@ -4,8 +4,9 @@ name: Deploy SinDarealest to Cloudflare Pages
 on:
   workflow_dispatch:
   push:
+    # Must match the currently verified Cloudflare Pages Production branch.
     branches:
-      - main
+      - rewrite/ai-system-2026-10-14
 
 permissions:
   contents: read
