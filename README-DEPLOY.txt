@@ -63,7 +63,9 @@ Không đặt secrets trong public/, trong file nguồn, trong Git, hoặc gửi
 Lưu bindings/secrets trước rồi mới chạy `npm run setup:cloudflare` hoặc `npm run deploy`. Script setup sẽ chặn nếu bạn chưa xác nhận bindings/secrets. Lệnh deploy cũng yêu cầu project đã tồn tại và từ chối branch không khớp production branch nếu Cloudflare cung cấp thông tin đó.
 
 4. GITHUB ACTIONS (TÙY CHỌN)
-Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test` rồi mới deploy; workflow KHÔNG chạy migrations hoặc seed.
+Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test`, kiểm tra đích Cloudflare rồi mới deploy; workflow KHÔNG chạy migration D1 AI hoặc seed. Migration AI là thao tác riêng vì có thay đổi schema D1 từ xa.
+
+**Không chạy migration để thử mò.** Trước hết xác minh đúng tên D1 trong Cloudflare Dashboard và chọn rõ `CLOUDFLARE_D1_TARGET=preview` hoặc `production`. Script `scripts/apply-ai-image-migrations.mjs` không tự mặc định database nữa; nếu chọn Production, bắt buộc có `ALLOW_PRODUCTION_D1_MIGRATIONS=true` cùng `CONFIRM_PRODUCTION_D1_DATABASE` khớp chính xác tên database. Ưu tiên kiểm tra trên D1 Preview cô lập. Không dùng database Production để kiểm thử AI.
 
 Trong GitHub repository, thêm Secrets:
 - `CLOUDFLARE_API_TOKEN`: token chỉ có quyền tối thiểu cần cho Pages deploy và đọc danh sách project.
