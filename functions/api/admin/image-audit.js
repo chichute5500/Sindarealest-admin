@@ -2,6 +2,7 @@ import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
 import { analyzeProductImage, compareProductImages } from "../../_lib/workers-ai.js";
 import { isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../../_lib/image-audit.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
+import { inspectAiReviewSchema } from "../../_lib/ai-review-schema.js";
 
 const MAX_BASE64 = 7_000_000;
 const allowedMime = new Set(["image/webp", "image/jpeg", "image/png"]);
@@ -36,6 +37,20 @@ async function getProduct(db, id) {
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
+  const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
+  if (!schemaReadiness.reviewSchemaInspectable) {
+    return json({ ok: false, code: "AI_REVIEW_SCHEMA_UNREADABLE", error: "Không thể đọc schema hàng chờ ảnh AI trong D1." }, 503);
+  }
+  if (!schemaReadiness.reviewSchemaConfigured || !schemaReadiness.quotaTableConfigured) {
+    return json({
+      ok: false,
+      code: !schemaReadiness.quotaTableConfigured ? "AI_QUOTA_SCHEMA_MISSING" : "AI_REVIEW_SCHEMA_INCOMPLETE",
+      error: !schemaReadiness.quotaTableConfigured
+        ? "Thiếu bảng giới hạn AI D1."
+        : "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ".",
+      missingColumns: schemaReadiness.missingReviewColumns
+    }, 503);
+  }
   try {
     const [products, reviews] = await Promise.all([
       context.env.DB.prepare("SELECT id,sku,title,category,images_json,published FROM products ORDER BY sort_order,sku LIMIT 2000").all(),
@@ -50,6 +65,22 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
+  // Keep all writes/model calls disabled until every required D1 column and
+  // the quota table can be verified by a read-only preflight.
+  const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
+  if (!schemaReadiness.reviewSchemaInspectable) {
+    return json({ ok: false, code: "AI_REVIEW_SCHEMA_UNREADABLE", error: "Không thể đọc schema hàng chờ ảnh AI trong D1. Đã chặn thao tác." }, 503);
+  }
+  if (!schemaReadiness.reviewSchemaConfigured || !schemaReadiness.quotaTableConfigured) {
+    return json({
+      ok: false,
+      code: !schemaReadiness.quotaTableConfigured ? "AI_QUOTA_SCHEMA_MISSING" : "AI_REVIEW_SCHEMA_INCOMPLETE",
+      error: !schemaReadiness.quotaTableConfigured
+        ? "Thiếu bảng giới hạn AI D1. Đã chặn thao tác."
+        : "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ". Đã chặn thao tác.",
+      missingColumns: schemaReadiness.missingReviewColumns
+    }, 503);
+  }
   let body;
   try { body = await context.request.json(); } catch { return fail("Dữ liệu ảnh không hợp lệ."); }
   const action = String(body?.action || "");
