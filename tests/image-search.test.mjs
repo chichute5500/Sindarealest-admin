@@ -47,6 +47,17 @@ assert.equal(evaluateSearchCandidate({ title: "真鳄鱼皮鞋", similarityScore
 assert.equal(parseModelJson('{"keywords":["鳄鱼皮鞋"]}').keywords[0], "鳄鱼皮鞋");
 assert.equal(parseModelJson('\\x60\\x60\\x60json\\n{"keywords":["鞋"]}\\n\\x60\\x60\\x60').keywords[0], "鞋");
 assert.equal(parseModelJson("no json here"), null);
+assert.deepEqual(
+  parseModelJson('{"summary":"Sneaker có vân "đỏ" trên thân","visibleFeatures":["màu đen", "cổ cao"],"ok":true}'),
+  { summary: 'Sneaker có vân "đỏ" trên thân', visibleFeatures: ["màu đen", "cổ cao"], ok: true },
+  "parser should repair unescaped quotes inside model-generated JSON strings"
+);
+assert.deepEqual(
+  parseModelJson('{"summary":"Sneaker màu đen
+vân đỏ","ok":true}'),
+  { summary: "Sneaker màu đen\\nvân đỏ", ok: true },
+  "parser should escape literal newlines inside model-generated JSON strings"
+);
 const fencedJson = "\uFEFF" + "\x60\x60\x60json\n{\"ok\":true}\n\x60\x60\x60";
 assert.deepEqual(parseModelJson(fencedJson), { ok: true }, "parser should correctly strip a BOM and Markdown JSON fence");
 assert.equal(parseModelJson('Model answer: {"summary":"shoe with {curved} stitching","ok":true} trailing note').summary, "shoe with {curved} stitching", "parser should handle braces inside quoted strings and harmless surrounding prose");
