@@ -325,9 +325,6 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
       }
     };
   }
-  // Single-image results must remain subject to human review and cannot claim high confidence.
-  parsed.needsHumanReview = true;
-  if (parsed.confidence === "high") parsed.confidence = "medium";
   const allowed = {
     modelAssessment: ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"],
     materialAssessment: ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"],
@@ -419,6 +416,10 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
       diagnostic: schemaDiagnostic
     };
   }
+  // Apply safety defaults after validating required model fields.
+  // A single-image result always stays in human review and cannot claim high confidence.
+  parsed.needsHumanReview = true;
+  if (parsed.confidence === "high") parsed.confidence = "medium";
   return { analysis: {
     summary: String(parsed.summary || "Chưa có mô tả").slice(0, 800),
     visibleFeatures: Array.isArray(parsed.visibleFeatures) ? parsed.visibleFeatures.slice(0, 12).map(x => String(x).slice(0, 160)) : [],
