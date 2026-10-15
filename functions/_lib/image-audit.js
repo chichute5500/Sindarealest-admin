@@ -34,8 +34,9 @@ export function isAllowedSourceProductUrl(value) {
   if (!allowedHttpsUrl(value, PRODUCT_DOMAINS)) return false;
   try {
     const url = new URL(value);
-    const host = url.hostname.toLowerCase();
+    const host = url.hostname.toLowerCase().replace(/\.$/, "");
     if (/(^|\.)1688\.com$/.test(host)) return /\/offer\/[A-Za-z0-9_-]+\.html?$/i.test(url.pathname);
+    if (!/(^|\.)taobao\.com$/.test(host) && !/(^|\.)tmall\.com$/.test(host)) return false;
     return /\/item\.htm$/i.test(url.pathname) && /^[A-Za-z0-9_-]{1,100}$/.test(url.searchParams.get("id") || "");
   } catch {
     return false;
