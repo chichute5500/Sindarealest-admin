@@ -14,13 +14,20 @@ function safeReview(row) {
 function parseDataImage(value) {
   const match = String(value || "").match(/^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/i);
   if (!match || !allowedMime.has(match[1].toLowerCase()) || match[2].length > MAX_BASE64) return null;
+  const mimeType = match[1].toLowerCase();
   const base64 = match[2];
-  let byteLength;
-  try { byteLength = atob(base64).length; }
-  catch { return null; }
-  if (!byteLength) return null;
-  if (byteLength > 5 * 1024 * 1024) return { error: "Ảnh phải nhỏ hơn hoặc bằng 5 MB.", status: 413 };
-  return { mimeType: match[1].toLowerCase(), base64 };
+  let binary;
+  try { binary = atob(base64); } catch { return null; }
+  if (!binary.length) return null;
+  if (binary.length > 5 * 1024 * 1024) return { error: "Ảnh phải nhỏ hơn hoặc bằng 5 MB.", status: 413 };
+  const isJpeg = mimeType === "image/jpeg" && binary.length >= 3 &&
+    binary.charCodeAt(0) === 0xff && binary.charCodeAt(1) === 0xd8 && binary.charCodeAt(2) === 0xff;
+  const isPng = mimeType === "image/png" && binary.length >= 8 &&
+    [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((byte, i) => binary.charCodeAt(i) === byte);
+  const isWebp = mimeType === "image/webp" && binary.length >= 12 &&
+    binary.slice(0, 4) === "RIFF" && binary.slice(8, 12) === "WEBP";
+  if (!isJpeg && !isPng && !isWebp) return null;
+  return { mimeType, base64 };
 }
 async function getProduct(db, id) {
   return db.prepare("SELECT id,sku,title,category,images_json,published FROM products WHERE id=? LIMIT 1").bind(id).first();
