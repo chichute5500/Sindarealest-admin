@@ -212,6 +212,11 @@ export async function onRequestPatch(context) {
   }
   if (review.status === "approved") return json({ ok: true, message: "Ảnh này đã được duyệt trước đó." });
   if (review.status === "rejected") return fail("Ảnh đã bị từ chối; hãy tải lại như một ứng viên mới nếu muốn xem xét lại.", 409);
+  let candidateAnalysis = {};
+  try { candidateAnalysis = JSON.parse(review.analysis_json || "{}"); } catch {}
+  if (!candidateAnalysis.comparison || candidateAnalysis.comparison.needsHumanReview !== true) {
+    return fail("Cần chạy đối chiếu hai ảnh trước khi duyệt. Đối chiếu hiện vẫn là định tính, chưa chứng minh ngưỡng tương đồng 90%; hãy kiểm tra trực tiếp ảnh, SKU và URL nguồn.", 422);
+  }
   const product = await getProduct(db, review.product_id);
   if (!product) return fail("Sản phẩm không còn tồn tại.", 404);
   const noStorage = storageOrFail(context.env);
