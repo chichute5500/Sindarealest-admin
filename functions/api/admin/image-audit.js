@@ -43,7 +43,7 @@ export async function onRequestGet(context) {
     ]);
     return json({ ok: true, products: products.results || [], reviews: (reviews.results || []).map(safeReview) });
   } catch {
-    return fail("Không tải được hàng đợi AI. Hãy kiểm tra migrations/0007, 0008 và 0010 đã được áp dụng trên đúng D1 của môi trường này chưa.", 503);
+    return fail("Không tải được hàng đợi AI. Hãy kiểm tra migration 0007, cột source_url, migration 0009 và các cột bổ sung source_image_url/reference_image_ref (được đồng bộ bởi scripts/apply-ai-image-migrations.mjs) trên đúng D1 của môi trường này.", 503);
   }
 }
 
