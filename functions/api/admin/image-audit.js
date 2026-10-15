@@ -120,15 +120,14 @@ export async function onRequestPost(context) {
   const imageRef = String(body?.imageRef || review?.image_ref || "");
   const parsed = parseDataImage(body?.dataUrl);
   if (!parsed) return fail("Ảnh gửi Workers AI không hợp lệ.");
-  if (review?.image_kind === "candidate" && review.status === "approved") return fail("Ảnh đã được duyệt; tạo lượt kiểm tra mới nếu cần.", 409);
-  const quota = await consumeWorkersAiRequest(db);
-  if (!quota.ok) return fail(quota.error, quota.status);
-  const result = await analyzeProductImage({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
-  if (result.error) return json({ ok: false, error: result.error, code: result.code || "WORKERS_AI_ERROR" }, result.status || 503);
-  const id = review?.id || crypto.randomUUID();
+
+  // Validate ownership and review state before spending any AI quota or sending image bytes upstream.
   const kind = review?.image_kind || "existing";
-  const storedRef = kind === "candidate" ? review.image_ref : imageRef;
+  const storedRef = kind === "candidate" ? String(review?.image_ref || "") : imageRef;
   if (!storedRef || storedRef.length > 300) return fail("Thiếu tham chiếu ảnh cần kiểm tra.");
+  if (kind === "candidate" && review?.status !== "pending") {
+    return fail("Chỉ được phân tích ảnh ứng viên đang chờ duyệt. Ảnh đã duyệt/từ chối cần tạo ứng viên mới nếu muốn kiểm tra lại.", 409);
+  }
   if (kind === "existing") {
     let ownedImages = [];
     try { ownedImages = JSON.parse(product.images_json || "[]"); } catch {}
@@ -136,6 +135,12 @@ export async function onRequestPost(context) {
       return fail("Ảnh cần phân tích không thuộc bộ ảnh của sản phẩm đã chọn.", 422);
     }
   }
+
+  const quota = await consumeWorkersAiRequest(db);
+  if (!quota.ok) return fail(quota.error, quota.status);
+  const result = await analyzeProductImage({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
+  if (result.error) return json({ ok: false, error: result.error, code: result.code || "WORKERS_AI_ERROR" }, result.status || 503);
+  const id = review?.id || crypto.randomUUID();
   try {
     await db.prepare("INSERT INTO image_ai_reviews(id,product_id,image_ref,image_kind,r2_key,status,analysis_json) VALUES(?,?,?,?,?,'pending',?) ON CONFLICT(product_id,image_ref,image_kind) DO UPDATE SET id=excluded.id,status='pending',analysis_json=excluded.analysis_json,updated_at=datetime('now')").bind(id, productId, storedRef, kind, review?.r2_key || "", JSON.stringify(result.analysis)).run();
     return json({ ok: true, review: { id, productId, imageRef: storedRef, kind, status: "pending", analysis: result.analysis }, message: "Workers AI đã phân tích ảnh; kết quả đang chờ người quản trị duyệt." });
