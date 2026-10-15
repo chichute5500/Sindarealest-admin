@@ -653,6 +653,16 @@ assert.equal((await quotaSchemaBlockedSearch.response.json()).code, "AI_QUOTA_SC
 assert.equal(quotaSchemaBlockedSearch.counters.quotaQueries, 0, "missing quota table must block before quota consumption");
 assert.equal(quotaSchemaBlockedSearch.counters.aiCalls, 0, "missing quota table must block before Workers AI");
 
+const unreadableSchemaSearch = await postImageSearchForRegression(
+  validSearchBody,
+  counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } }),
+  { schemaReadFails: true }
+);
+assert.equal(unreadableSchemaSearch.response.status, 503, "image search must fail closed when D1 schema inspection itself fails");
+assert.equal((await unreadableSchemaSearch.response.json()).code, "AI_REVIEW_SCHEMA_UNREADABLE");
+assert.equal(unreadableSchemaSearch.counters.quotaQueries, 0, "unreadable schema must block before consuming quota");
+assert.equal(unreadableSchemaSearch.counters.aiCalls, 0, "unreadable schema must block before Workers AI");
+
 const auditSchemaBlocked = await postAuditForRegression(
   { action: "analyze", productId: "product-1", imageRef: "images/reference.webp", dataUrl: validPngDataUrl },
   null,
