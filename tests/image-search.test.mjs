@@ -53,9 +53,8 @@ assert.deepEqual(
   "parser should repair unescaped quotes inside model-generated JSON strings"
 );
 assert.deepEqual(
-  parseModelJson('{"summary":"Sneaker màu đen
-vân đỏ","ok":true}'),
-  { summary: "Sneaker màu đen\\nvân đỏ", ok: true },
+  parseModelJson('{"summary":"Sneaker màu đen\nvân đỏ","ok":true}'),
+  { summary: "Sneaker màu đen\nvân đỏ", ok: true },
   "parser should escape literal newlines inside model-generated JSON strings"
 );
 const fencedJson = "\uFEFF" + "\x60\x60\x60json\n{\"ok\":true}\n\x60\x60\x60";
