@@ -51,9 +51,10 @@ Production Variables and Secrets:
 - Secret `ADMIN_PASSWORD`: mật khẩu quản trị riêng, ít nhất 12 ký tự; khuyên dùng 16 ký tự trở lên.
 - Secret `SESSION_SECRET`: chuỗi ngẫu nhiên riêng, ít nhất 32 ký tự. Không dùng mật khẩu đăng nhập làm secret này.
 - Secret `ELIMAPI_API_KEY`: API key của tài khoản ElimAPI nếu muốn bật tìm kiếm ứng viên Taobao/1688 bằng ảnh. Cần cấu hình riêng cho Preview và Production trong mục Variables and Secrets tương ứng; không dán key vào source code hay Git.
+- Variable `ELIMAPI_IMAGE_SEARCH_ENABLED`: mặc định để trống/tắt. Chỉ đặt thành `true` riêng trong môi trường Preview sau khi xác nhận gói ElimAPI hỗ trợ tìm kiếm bằng ảnh và bạn cho phép sử dụng quota. Nếu biến chưa bật, endpoint phải từ chối trước khi gọi Workers AI hoặc ElimAPI.
 - Binding Workers AI có tên chính xác `AI`: thêm trong Settings → Bindings ở từng môi trường muốn dùng tính năng phân tích ảnh. Dòng `[ai]` trong `wrangler.toml` là cấu hình local/dev, không tự động bảo đảm Pages Preview hoặc Production đã có binding.
 
-**Lưu ý trước khi thử tính năng ảnh:** API tìm kiếm bằng ảnh của ElimAPI dùng quy trình tải ảnh lên để nhận `imageId`, rồi gọi endpoint tìm kiếm bằng ảnh. Theo tài liệu ElimAPI, tính năng này không có trong gói Free. Hãy kiểm tra gói/quyền của tài khoản ElimAPI trước khi thao tác. Nếu gói không hỗ trợ, giao diện phải hiện lỗi có mã rõ ràng; đừng bấm thử lặp lại, vì lượt tải ảnh/tìm kiếm có thể bị tính phí hoặc quota. Chỉ bấm tìm kiếm khi quản trị viên chủ động xác nhận chạy một lượt.
+**Lưu ý trước khi thử tính năng ảnh:** API tìm kiếm bằng ảnh của ElimAPI dùng quy trình tải ảnh lên để nhận `imageId`, rồi gọi endpoint tìm kiếm bằng ảnh. Theo tài liệu ElimAPI, tính năng này không có trong gói Free. Hãy kiểm tra gói/quyền của tài khoản ElimAPI trước khi thao tác. Nếu gói không hỗ trợ, giao diện phải hiện lỗi có mã rõ ràng; đừng bấm thử lặp lại, vì lượt tải ảnh/tìm kiếm có thể bị tính phí hoặc quota. Chỉ bấm tìm kiếm khi quản trị viên chủ động xác nhận chạy một lượt. Không bật `ELIMAPI_IMAGE_SEARCH_ENABLED=true` trong Production trong giai đoạn kiểm thử.
 
 Không đặt secrets trong public/, trong file nguồn, trong Git, hoặc gửi qua chat. Không thay SESSION_SECRET mỗi lần deploy; thay giá trị sẽ làm phiên đăng nhập cũ mất hiệu lực.
 
