@@ -32,7 +32,7 @@ Script sẽ:
 - Xác minh R2 bucket bằng lệnh đọc thông tin; không tự tạo bucket.
 - Kiểm tra project, database, branch; branch phải khớp production branch khi Cloudflare cung cấp thông tin này.
 - Hiển thị tóm tắt, yêu cầu xác nhận bindings/secrets đã lưu, rồi yêu cầu nhập chuỗi xác nhận chính xác trước khi chạy SQL/deploy.
-- Áp dụng lần lượt migrations/0001_schema.sql, migrations/0003_storefront_operations.sql, migrations/0004_admin_notifications.sql, migrations/0005_address_warranty_verification.sql và migrations/0006_remove_warranty_otp.sql; migration 0006 không thay đổi schema. Sau đó script gọi scripts/apply-ai-image-migrations.mjs với CLOUDFLARE_D1_DATABASE đặt bằng đúng D1 bạn đã chọn: tạo hàng chờ ảnh AI (0007), bổ sung source_url, áp dụng hạn mức Workers AI (0009), rồi bổ sung source_image_url và reference_image_ref theo cách có thể chạy lặp an toàn. Hàng chờ lưu URL trang sản phẩm, URL CDN của tệp ảnh và ảnh gốc tham chiếu riêng biệt. Token tải ảnh tạm được lưu trong bảng settings đã có. Luồng OTP đã bị loại khỏi ứng dụng nhưng các bảng cũ được giữ nguyên để tương thích. Script dừng nếu bất kỳ migration AI nào gặp lỗi ngoài trường hợp cột đã tồn tại, rồi mới kiểm tra schema/seed/deploy.
+- Áp dụng lần lượt migrations/0001_schema.sql, migrations/0003_storefront_operations.sql, migrations/0004_admin_notifications.sql migrations/0005_address_warranty_verification.sql và migrations/0006_remove_warranty_otp.sql; migration 0006 không thay đổi schema; token tải ảnh tạm được lưu trong bảng settings đã có. Luồng OTP đã bị loại khỏi ứng dụng nhưng các bảng cũ được giữ nguyên để tương thích. Script kiểm tra các bảng/cột bắt buộc rồi mới tiếp tục.
 - Chỉ nhập migrations/0002_seed_products.sql nếu bạn gõ YES và script thấy products đang có đúng 0 dòng. Nếu có sẵn sản phẩm, script từ chối seed. Migration 0003 không xóa dữ liệu sản phẩm/đơn hàng hiện có.
 - Khi chọn NO, script giữ dữ liệu sản phẩm hiện có, không seed lại.
 - Chỉ deploy vào Pages project đã tồn tại. Script không tự tạo hoặc xóa resource.
@@ -50,22 +50,13 @@ Bindings:
 Production Variables and Secrets:
 - Secret `ADMIN_PASSWORD`: mật khẩu quản trị riêng, ít nhất 12 ký tự; khuyên dùng 16 ký tự trở lên.
 - Secret `SESSION_SECRET`: chuỗi ngẫu nhiên riêng, ít nhất 32 ký tự. Không dùng mật khẩu đăng nhập làm secret này.
-- Secret `ELIMAPI_API_KEY`: API key của tài khoản ElimAPI nếu muốn bật tìm kiếm ứng viên Taobao/1688 bằng ảnh. Cần cấu hình riêng cho Preview và Production trong mục Variables and Secrets tương ứng; không dán key vào source code hay Git.
-- Variable `ELIMAPI_IMAGE_SEARCH_ENABLED`: mặc định để trống/tắt. Chỉ đặt thành `true` riêng trong môi trường Preview sau khi xác nhận gói ElimAPI hỗ trợ tìm kiếm bằng ảnh và bạn cho phép sử dụng quota. Nếu biến chưa bật, endpoint phải từ chối trước khi gọi Workers AI hoặc ElimAPI.
-- Binding Workers AI có tên chính xác `AI`: thêm trong Settings → Bindings ở từng môi trường muốn dùng tính năng phân tích ảnh. Dòng `[ai]` trong `wrangler.toml` là cấu hình local/dev, không tự động bảo đảm Pages Preview hoặc Production đã có binding.
-- Model thị giác `@cf/meta/llama-3.2-11b-vision-instruct` yêu cầu tài khoản chấp thuận Meta License và Acceptable Use Policy trước lần dùng đầu tiên. Hãy xác minh trạng thái chấp thuận trong Cloudflare trước khi thử; ứng dụng không tự gửi yêu cầu chấp thuận và không tự gọi lại khi bị từ chối.
-- Không gửi tham số `response_format`/JSON Mode cho model thị giác này: tài liệu Cloudflare hiện không liệt kê nó trong các model được hỗ trợ JSON Mode. Ứng dụng yêu cầu JSON qua prompt, sau đó phân tích/kiểm tra schema ở phía máy chủ và từ chối kết quả sai định dạng mà không tự gọi lại model.
-
-**Lưu ý trước khi thử tính năng ảnh:** API tìm kiếm bằng ảnh của ElimAPI dùng quy trình tải ảnh lên để nhận `imageId`, rồi gọi endpoint tìm kiếm bằng ảnh. Theo tài liệu ElimAPI, tính năng này không có trong gói Free. Hãy kiểm tra gói/quyền của tài khoản ElimAPI trước khi thao tác. Nếu gói không hỗ trợ, giao diện phải hiện lỗi có mã rõ ràng; đừng bấm thử lặp lại, vì lượt tải ảnh/tìm kiếm có thể bị tính phí hoặc quota. Trước khi gọi provider, trang Kho ảnh AI hiển thị trạng thái cấu hình chỉ đọc: binding Workers AI, Secret ElimAPI, công tắc bật/tắt, và bảng quota D1. Các mục này chỉ cho biết cấu hình có tồn tại, **không xác nhận** API key được ElimAPI chấp nhận, gói có quyền tìm ảnh, hay Meta License đã được chấp thuận. Nút Tìm trên Taobao/1688 hỏi xác nhận trước khi gửi ảnh tới Workers AI và tối đa hai yêu cầu ElimAPI (upload + image search). Không bấm xác nhận để thử dò gói; kiểm tra gói/quota trước. Không bật `ELIMAPI_IMAGE_SEARCH_ENABLED=true` trong Production trong giai đoạn kiểm thử.
 
 Không đặt secrets trong public/, trong file nguồn, trong Git, hoặc gửi qua chat. Không thay SESSION_SECRET mỗi lần deploy; thay giá trị sẽ làm phiên đăng nhập cũ mất hiệu lực.
 
 Lưu bindings/secrets trước rồi mới chạy `npm run setup:cloudflare` hoặc `npm run deploy`. Script setup sẽ chặn nếu bạn chưa xác nhận bindings/secrets. Lệnh deploy cũng yêu cầu project đã tồn tại và từ chối branch không khớp production branch nếu Cloudflare cung cấp thông tin đó.
 
 4. GITHUB ACTIONS (TÙY CHỌN)
-Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test`, kiểm tra đích Cloudflare rồi mới deploy; workflow KHÔNG chạy migration D1 AI hoặc seed. Migration AI là thao tác riêng vì có thay đổi schema D1 từ xa.
-
-**Không chạy migration để thử mò.** Trước hết xác minh đúng tên D1 trong Cloudflare Dashboard và chọn rõ `CLOUDFLARE_D1_TARGET=preview` hoặc `production`. Script `scripts/apply-ai-image-migrations.mjs` không tự mặc định database nữa; nếu chọn Production, bắt buộc có `ALLOW_PRODUCTION_D1_MIGRATIONS=true` cùng `CONFIRM_PRODUCTION_D1_DATABASE` khớp chính xác tên database. Ưu tiên kiểm tra trên D1 Preview cô lập. Không dùng database Production để kiểm thử AI.
+Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test` rồi mới deploy; workflow KHÔNG chạy migrations hoặc seed.
 
 Trong GitHub repository, thêm Secrets:
 - `CLOUDFLARE_API_TOKEN`: token chỉ có quyền tối thiểu cần cho Pages deploy và đọc danh sách project.
