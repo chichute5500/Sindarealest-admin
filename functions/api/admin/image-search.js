@@ -1,77 +1,39 @@
 import { fail, json, requireAdmin } from "../../_lib.js";
-import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages } from "../../_lib/image-audit.js";
-import { requestGeminiInteraction } from "../../_lib/gemini-interactions.js";
+import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, normalizeImageRef } from "../../_lib/image-audit.js";
+import { generateSearchKeywords } from "../../_lib/workers-ai.js";
+import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
+import { searchElimapiProductsByImage } from "../../_lib/elimapi.js";
+import { inspectAiReviewSchema } from "../../_lib/ai-review-schema.js";
 
-const MAX_IMAGE_BASE64 = 1_400_000;
-const isMarketplaceHost = (host) => {
-  const h = String(host || "").toLowerCase();
-  return h === "taobao.com" || h.endsWith(".taobao.com") ||
-    h === "tmall.com" || h.endsWith(".tmall.com") ||
-    h === "1688.com" || h.endsWith(".1688.com");
-};
-const isImageHost = (host) => {
-  const h = String(host || "").toLowerCase();
-  return isMarketplaceHost(h) || h === "alicdn.com" || h.endsWith(".alicdn.com");
-};
-function isProductUrl(value) {
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || !isMarketplaceHost(url.hostname)) return false;
-    return /\/offer\//i.test(url.pathname) || /\/item\.htm/i.test(url.pathname) || /\/item\//i.test(url.pathname);
-  } catch { return false; }
-}
-function parseProducts(rows) {
-  return (rows || []).map((row) => ({ id: row.id, sku: row.sku, title: row.title, category: row.category, images_json: row.images_json }));
-}
-function cleanText(value, max = 300) {
-  return String(value || "").replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim().slice(0, max);
-}
-function meta(html, property) {
-  const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const patterns = [
-    new RegExp("<meta[^>]+(?:property|name)=[\"']" + escaped + "[\"'][^>]+content=[\"']([^\"']+)", "i"),
-    new RegExp("<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+(?:property|name)=[\"']" + escaped + "[\"']", "i")
-  ];
-  for (const pattern of patterns) { const match = html.match(pattern); if (match) return cleanText(match[1], 2000); }
-  return "";
-}
-async function productMetadata(sourceUrl) {
-  let target;
-  try {
-    const parsed = new URL(sourceUrl);
-    if (!isProductUrl(parsed.href) || parsed.username || parsed.password) return {};
-    target = parsed.href;
-  } catch { return {}; }
-  try {
-    let response;
-    for (let redirects = 0; redirects <= 2; redirects++) {
-      const url = new URL(target);
-      if (!isProductUrl(url.href)) return {};
-      response = await fetch(target, { redirect: "manual", headers: { Accept: "text/html", "User-Agent": "Mozilla/5.0 (compatible; SinDarealestImageAudit/1.0)" }, signal: AbortSignal.timeout(4500) });
-      if (![301,302,303,307,308].includes(response.status)) break;
-      const location = response.headers.get("location");
-      if (!location || redirects === 2) return {};
-      target = new URL(location, target).href;
-    }
-    if (!response?.ok || !(response.headers.get("content-type") || "").includes("text/html")) return {};
-    const reader = response.body?.getReader();
-    if (!reader) return {};
-    const chunks = []; let total = 0;
-    while (total < 600_000) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const part = value.subarray(0, Math.min(value.length, 600_000 - total));
-      chunks.push(part); total += part.length;
-      if (part.length < value.length) { await reader.cancel(); break; }
-    }
-    const bytes = new Uint8Array(total); let offset = 0;
-    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
-    const html = new TextDecoder().decode(bytes);
-    const rawImage = meta(html, "og:image") || meta(html, "twitter:image");
-    let imageUrl = "";
-    try { const image = new URL(rawImage, target); if (image.protocol === "https:" && isImageHost(image.hostname)) imageUrl = image.href; } catch {}
-    return { title: meta(html, "og:title") || meta(html, "twitter:title"), imageUrl };
-  } catch { return {}; }
+const MAX_IMAGE_BASE64 = 7_000_000;
+const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+function parseImage(value, fallbackBase64 = "") {
+  let mimeType = "";
+  let imageBase64 = "";
+  const raw = String(value || "");
+  const match = raw.match(/^data:(image\/(?:jpeg|jpg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/i);
+  if (match) {
+    mimeType = match[1].toLowerCase() === "image/jpg" ? "image/jpeg" : match[1].toLowerCase();
+    imageBase64 = match[2];
+  } else {
+    imageBase64 = String(fallbackBase64 || "").replace(/^data:image\/(?:jpeg|jpg|png|webp);base64,/i, "");
+    mimeType = /^data:image\/webp/i.test(String(fallbackBase64 || "")) ? "image/webp"
+      : /^data:image\/png/i.test(String(fallbackBase64 || "")) ? "image/png" : "image/jpeg";
+  }
+  if (!ALLOWED_MIME.has(mimeType) || !imageBase64 || imageBase64.length > MAX_IMAGE_BASE64 ||
+      !/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) return null;
+  let binary;
+  try { binary = atob(imageBase64); } catch { return null; }
+  if (!binary.length || binary.length > 5 * 1024 * 1024) return null;
+  const isJpeg = mimeType === "image/jpeg" && binary.length >= 3 &&
+    binary.charCodeAt(0) === 0xff && binary.charCodeAt(1) === 0xd8 && binary.charCodeAt(2) === 0xff;
+  const isPng = mimeType === "image/png" && binary.length >= 8 &&
+    [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((byte, i) => binary.charCodeAt(i) === byte);
+  const isWebp = mimeType === "image/webp" && binary.length >= 12 &&
+    binary.slice(0, 4) === "RIFF" && binary.slice(8, 12) === "WEBP";
+  if (!isJpeg && !isPng && !isWebp) return null;
+  return { mimeType, imageBase64 };
 }
 
 export async function onRequestGet(context) {
@@ -79,13 +41,21 @@ export async function onRequestGet(context) {
   if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare("SELECT id, sku, title, category, images_json FROM products ORDER BY sort_order ASC, sku ASC LIMIT 2000").all();
-    return json({ ok: true, ...inventoryImages(parseProducts(result.results || [])) });
+    const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
+    const readiness = {
+      workersAiBindingConfigured: Boolean(context.env.AI && typeof context.env.AI.run === "function"),
+      r2BindingConfigured: Boolean(context.env.IMAGES && ["get", "put", "head", "delete"].every(method => typeof context.env.IMAGES[method] === "function")),
+      elimapiApiKeyConfigured: Boolean(String(context.env.ELIMAPI_API_KEY || "").trim()),
+      elimapiImageSearchEnabled: String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() === "true",
+      ...schemaReadiness,
+      externalApiVerified: false,
+      workersAiLicenseVerified: false
+    };
+    return json({ ok: true, readiness, ...inventoryImages((result.results || []).map(row => ({ id: row.id, sku: row.sku, title: row.title, category: row.category, images_json: row.images_json }))) });
   } catch {
     return fail("Không thể quét kho ảnh trong D1. Hãy kiểm tra cấu hình cơ sở dữ liệu.", 503);
   }
 }
-
-import { consumeGeminiRequest } from "../../_lib/ai-quota.js";
 
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
@@ -94,98 +64,122 @@ export async function onRequestPost(context) {
   try { body = await context.request.json(); } catch { return fail("Yêu cầu tìm ảnh không hợp lệ."); }
   const platform = body?.platform === "1688" ? "1688" : body?.platform === "taobao" ? "taobao" : "";
   if (!platform) return fail("Hãy chọn Taobao hoặc 1688.");
-  const material = assessCrocodileMaterial(body?.title || "");
-  if (material.status === "reject") return fail(material.reason, 422);
-  const apiKey = context.env.GEMINI_API_KEY;
-  if (typeof apiKey !== "string" || apiKey.length < 12) return fail("Chưa cấu hình Secret GEMINI_API_KEY trong môi trường Production.", 503);
-  const imageBase64 = String(body?.imageBase64 || "").replace(/^data:image\/(?:jpeg|jpg|png|webp);base64,/i, "");
-  if (!imageBase64 || imageBase64.length > MAX_IMAGE_BASE64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) {
-    return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn an toàn.");
+  const image = parseImage(body?.dataUrl, body?.imageBase64);
+  if (!image) return fail("Ảnh tham chiếu phải là JPEG/PNG/WebP hợp lệ và không vượt giới hạn 5 MB.");
+  const productId = String(body?.productId || "").trim().slice(0, 100);
+  const imageRef = normalizeImageRef(body?.imageRef);
+  if (!productId || !imageRef || imageRef.length > 300) return fail("Thiếu sản phẩm hoặc tham chiếu ảnh gốc.");
+  let product;
+  try {
+    product = await context.env.DB.prepare("SELECT id,sku,title,category,images_json FROM products WHERE id=? LIMIT 1").bind(productId).first();
+  } catch {
+    return fail("Không thể xác minh sản phẩm và ảnh gốc trong D1.", 503);
   }
-  const quota = await consumeGeminiRequest(context.env.DB);
+  if (!product) return fail("Không tìm thấy sản phẩm được chọn.", 404);
+  let ownedImages = [];
+  try { ownedImages = JSON.parse(product.images_json || "[]"); } catch {}
+  if (!Array.isArray(ownedImages) || !ownedImages.some(ref => normalizeImageRef(ref) === imageRef)) {
+    return fail("Ảnh tham chiếu không thuộc bộ ảnh của sản phẩm đã chọn.", 422);
+  }
+  const title = String(product.title || "").replace(/[<>]/g, "").trim().slice(0, 180);
+  const material = assessCrocodileMaterial(title);
+  if (material.status === "reject") return fail(material.reason, 422);
+  if (!String(context.env.ELIMAPI_API_KEY || "").trim()) {
+    return json({ ok: false, error: "Chưa cấu hình Secret ELIMAPI_API_KEY trong môi trường Preview của Cloudflare. Đã chặn yêu cầu trước khi gọi Workers AI để không tiêu hao quota vô ích.", code: "ELIMAPI_KEY_MISSING" }, 503);
+  }
+  if (String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() !== "true") {
+    return json({
+      ok: false,
+      error: "Tìm kiếm bằng ảnh đang tắt an toàn. Chỉ đặt biến Preview ELIMAPI_IMAGE_SEARCH_ENABLED=true sau khi đã xác nhận gói ElimAPI hỗ trợ tìm kiếm bằng ảnh và cho phép sử dụng quota.",
+      code: "ELIMAPI_IMAGE_SEARCH_DISABLED"
+    }, 503);
+  }
+
+  // Fail before consuming Workers AI quota or contacting ElimAPI. A valid API
+  // key and feature flag are not enough if the review queue cannot save results.
+  const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
+  if (!schemaReadiness.reviewSchemaInspectable) {
+    return json({
+      ok: false,
+      error: "Không thể đọc schema hàng chờ ảnh AI trong D1. Đã chặn tìm kiếm trước khi gọi dịch vụ bên ngoài.",
+      code: "AI_REVIEW_SCHEMA_UNREADABLE"
+    }, 503);
+  }
+  if (!schemaReadiness.reviewSchemaConfigured) {
+    return json({
+      ok: false,
+      error: "Schema hàng chờ ảnh AI chưa đầy đủ. Đã chặn tìm kiếm trước khi tiêu hao quota: thiếu cột " + schemaReadiness.missingReviewColumns.join(", ") + ".",
+      code: "AI_REVIEW_SCHEMA_INCOMPLETE",
+      missingColumns: schemaReadiness.missingReviewColumns
+    }, 503);
+  }
+  if (!schemaReadiness.quotaTableConfigured) {
+    return json({
+      ok: false,
+      error: "Thiếu bảng giới hạn AI D1. Đã chặn tìm kiếm trước khi gọi Workers AI hoặc ElimAPI.",
+      code: "AI_QUOTA_SCHEMA_MISSING"
+    }, 503);
+  }
+
+  if (!context.env.AI || typeof context.env.AI.run !== "function") {
+    return json({ ok: false, error: "Chưa cấu hình binding Workers AI có tên AI cho môi trường Preview. Không tiêu hao quota khi thiếu binding.", code: "WORKERS_AI_BINDING_MISSING" }, 503);
+  }
+  if (!context.env.IMAGES || !["get", "put", "head", "delete"].every(method => typeof context.env.IMAGES[method] === "function")) {
+    return json({
+      ok: false,
+      error: "Binding R2 IMAGES chưa cung cấp đủ thao tác đọc, lưu, kiểm tra và dọn ảnh. Đã chặn tìm kiếm trước khi tiêu hao quota.",
+      code: "IMAGE_STORAGE_BINDING_INCOMPLETE"
+    }, 503);
+  }
+
+  const quota = await consumeWorkersAiRequest(context.env.DB);
   if (!quota.ok) return fail(quota.error, quota.status);
 
-  const title = cleanText(body?.title || "", 180);
-  const site = platform === "1688" ? "1688.com" : "taobao.com";
-  const prompt = [
-    "Bạn phân tích ảnh sản phẩm và tạo từ khóa tìm kiếm; KHÔNG được truy cập web, KHÔNG được tạo URL sản phẩm giả và KHÔNG được khẳng định đã tìm thấy sản phẩm cụ thể.",
-    "Nhìn vào ảnh, xác định loại sản phẩm, kiểu dáng, màu sắc, họa tiết, chi tiết nổi bật. Trả về tối đa 4 cụm từ khóa ngắn bằng tiếng Trung giản thể để người dùng tìm thủ công trên " + site + ".",
-    "Nếu ảnh và tiêu đề gợi ý giày da/vân cá sấu, hãy phân biệt 鳄鱼皮 (da cá sấu) với 鳄鱼纹/压纹/PU (vân cá sấu giả); không khẳng định vật liệu là da thật.",
-    "Tiêu đề sản phẩm hiện có: " + (title || "không có") + ".",
-    "Trả về JSON thuần, không markdown: {\"keywords\":[string,string],\"visualSummary\":string}. Chỉ đưa từ khóa liên quan trực tiếp tới vật thể trong ảnh."
-  ].join("\n");
-  const imageMimeType = /^data:image\/webp/i.test(String(body?.imageBase64 || "")) ? "image/webp" : /^data:image\/png/i.test(String(body?.imageBase64 || "")) ? "image/png" : "image/jpeg";
-  try {
-    const { response, data } = await requestGeminiInteraction({
-      apiKey,
-      input: [
-        { type: "text", text: prompt },
-        { type: "image", data: imageBase64, mime_type: imageMimeType }
-      ]
-    });
-    const blocks = (Array.isArray(data?.steps) ? data.steps : [])
-      .filter(step => step?.type === "model_output")
-      .flatMap(step => Array.isArray(step.content) ? step.content : []);
-    const outputText = blocks.filter(block => block?.type === "text").map(block => block.text || "").join("\n").trim();
-    if (!response.ok) {
-      const apiError = data?.error || {};
-      const apiStatus = cleanText(apiError.status || "", 80);
-      const rawDetail = cleanText(apiError.message || outputText || "", 400);
-      const detail = apiKey ? rawDetail.split(apiKey).join("[đã ẩn API key]") : rawDetail;
-      if (response.status === 429 || apiStatus === "RESOURCE_EXHAUSTED") {
-        return fail("Gemini đã từ chối yêu cầu vì quota/hạn mức của Google (HTTP 429). Không tự động thử lại để tránh tiêu hao thêm quota. Kiểm tra giới hạn thực tế trong Google AI Studio. " + detail, 429);
-      }
-      if (response.status === 503 || apiStatus === "UNAVAILABLE") return fail("Gemini đang quá tải (HTTP 503). Hệ thống đã thử một lần bằng model dự phòng sau khi chờ ngắn nhưng vẫn chưa thành công. Hãy chờ một chút rồi thử lại; không bấm liên tục để bảo vệ hạn mức. " + detail, 503);
-      if (response.status === 401 || apiStatus === "UNAUTHENTICATED") return fail("Gemini từ chối API key. " + detail, 502);
-      if (response.status === 403 || apiStatus === "PERMISSION_DENIED") return fail("Gemini từ chối quyền truy cập. Kiểm tra dự án và quyền API. " + detail, 502);
-      if (response.status === 400 || apiStatus === "INVALID_ARGUMENT") return fail("Gemini Interactions API từ chối định dạng yêu cầu (HTTP 400). " + (detail || "INVALID_ARGUMENT"), 502);
-      return fail("Gemini Interactions API trả lỗi HTTP " + response.status + (apiStatus ? " (" + apiStatus + ")" : "") + ". " + (detail || "Kiểm tra cấu hình API."), 502);
-    }
-    if (data?.status && data.status !== "completed") return fail("Gemini chưa hoàn tất tạo từ khóa (status: " + cleanText(data.status, 80) + "). Không tự động gửi lại.", 502);
-    if (!outputText) return fail("Gemini không trả về từ khóa tìm kiếm.", 502);
+  const generated = await generateSearchKeywords({
+    ai: context.env.AI,
+    imageBase64: image.imageBase64,
+    mimeType: image.mimeType,
+    title,
+    platform
+  });
+  if (generated.error) return fail(generated.error, generated.status || 502);
 
-    let parsed;
-    try { parsed = JSON.parse(outputText.replace(/^```json\s*/i, "").replace(/\s*```$/, "").trim()); }
-    catch { return fail("Gemini trả về từ khóa sai định dạng. Không tạo kết quả giả.", 502); }
-    const keywords = Array.isArray(parsed.keywords)
-      ? parsed.keywords.map(value => cleanText(value, 80)).filter(Boolean).slice(0, 4)
-      : [];
-    if (!keywords.length) return json({ ok: true, platform, results: [], message: "Gemini không tạo được từ khóa đủ rõ; không tạo URL sản phẩm giả." });
-    const query = cleanText([title, ...keywords].filter(Boolean).join(" "), 220);
-    const searchUrl = platform === "1688"
-      ? "https://s.1688.com/selloffer/offer_search.htm?keywords=" + encodeURIComponent(query)
-      : "https://s.taobao.com/search?q=" + encodeURIComponent(query);
-    const evaluation = evaluateSearchCandidate({ title: keywords.join(" "), similarityScore: null });
-    return json({
-      ok: true,
-      platform,
-      results: [{
-        title: "Trang tìm kiếm " + platform + " — " + keywords[0],
-        candidateText: keywords.join(" "),
-        imageUrl: "",
-        productUrl: searchUrl,
-        searchUrl,
-        isSearchPage: true,
-        price: null,
-        similarityScore: null,
-        hasKeyword: evaluation.hasKeyword,
-        eligible: false,
-        eligibilityReason: "Đây chỉ là trang kết quả tìm kiếm theo từ khóa do AI gợi ý, không phải sản phẩm đã xác minh. Gói miễn phí không dùng Google Search grounding; hãy tự mở trang, chọn sản phẩm thật và đối chiếu ảnh trước khi lưu URL.",
-        materialCheck: evaluation.materialCheck,
-        keywords,
-        visualSummary: cleanText(parsed.visualSummary || "", 300)
-      }],
-      message: "Đã tạo trang tìm kiếm theo từ khóa hình ảnh bằng một lượt Gemini. Chưa tìm thấy hay xác minh sản phẩm cụ thể; không có URL sản phẩm giả và không thể lưu trang tìm kiếm làm nguồn."
-    });
-  } catch (error) {
-    if (error?.code === "GEMINI_TIMEOUT" || error?.name === "TimeoutError" || error?.name === "AbortError") {
-      return fail("Gemini hết thời gian chờ sau 45 giây (mô hình " + cleanText(error?.model || "không xác định", 80) + "). Mã chẩn đoán: GEMINI_TIMEOUT. Không tự động thử lại để bảo vệ quota.", 504);
-    }
-    if (error?.code === "GEMINI_NETWORK_ERROR") {
-      return fail("Không kết nối được tới Google Gemini API (mô hình " + cleanText(error?.model || "không xác định", 80) + "). Mã chẩn đoán: GEMINI_NETWORK_ERROR. Không tự động thử lại để bảo vệ quota.", 502);
-    }
-    return fail("Lỗi khi kết nối Gemini Interactions API. Mã chẩn đoán: GEMINI_REQUEST_ERROR.", 502);
+  const query = generated.keywords.join(" ").replace(/\s+/g, " ").trim().slice(0, 220);
+  const upstream = await searchElimapiProductsByImage({
+    apiKey: context.env.ELIMAPI_API_KEY,
+    platform,
+    imageBase64: image.imageBase64,
+    mimeType: image.mimeType,
+    query
+  });
+  if (upstream.error) {
+    return json({ ok: false, error: upstream.error, code: upstream.code || "ELIMAPI_IMAGE_SEARCH_ERROR" }, upstream.status || 502);
   }
+  const results = upstream.products.map(product => {
+    const evaluation = evaluateSearchCandidate({ title: product.title, description: product.candidateText, similarityScore: null });
+    return {
+      ...product,
+      hasKeyword: evaluation.hasKeyword,
+      eligible: false,
+      eligibilityReason: "Sản phẩm thật do Elimapi trả về, nhưng chưa có mô hình so khớp thị giác chuyên biệt đã hiệu chuẩn ngưỡng 90%. Admin phải kiểm tra ảnh, giá và chất liệu thủ công.",
+      materialCheck: evaluation.materialCheck
+    };
+  });
+  return json({
+    ok: true,
+    productId: product.id,
+    sourceImageRef: imageRef,
+    platform,
+    provider: "Elimapi image search",
+    searchMode: upstream.searchMode || "image",
+    keywordProvider: "Cloudflare Workers AI",
+    model: generated.model,
+    keywords: generated.keywords,
+    visualSummary: generated.visualSummary,
+    total: upstream.total,
+    results,
+    message: results.length
+      ? "ElimAPI đã trả về ứng viên qua tìm kiếm bằng ảnh kèm từ khóa. Giá lấy từ phản hồi API, đơn vị CNY; hãy mở trang nguồn và kiểm tra thủ công. Kết quả chưa được xác minh cùng mẫu hoặc hiệu chuẩn ngưỡng 90%, nên không có ảnh nào tự động được duyệt."
+      : "ElimAPI không trả về ứng viên cho ảnh và từ khóa này. Hệ thống không tự tạo sản phẩm hoặc giá giả, cũng không tự gửi yêu cầu khác."
+  });
 }
-
-export async function onRequestPut() { return fail("Phương thức không được hỗ trợ.", 405); }

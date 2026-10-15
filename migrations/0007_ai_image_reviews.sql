@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS image_ai_reviews (
   r2_key TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
   analysis_json TEXT NOT NULL DEFAULT '{}',
-  source_url TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(product_id, image_ref, image_kind)
