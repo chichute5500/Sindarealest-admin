@@ -381,6 +381,7 @@ function makeAuditTestDb(review = null) {
         bind(...args) { this.args = args; return this; },
         async first() {
           if (sql.startsWith("SELECT id,sku,title,category,images_json,published FROM products WHERE id=?")) return product;
+          if (sql.startsWith("SELECT id,sku,title,category,images_json FROM products WHERE id=?")) return product;
           if (sql.startsWith("SELECT id, sku, title, category, images_json FROM products WHERE id=?")) return product;
           if (sql.startsWith("SELECT * FROM image_ai_reviews WHERE id=")) return review;
           if (sql.includes("INSERT INTO ai_request_limits")) {
