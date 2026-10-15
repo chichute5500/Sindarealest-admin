@@ -3,7 +3,7 @@ import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAl
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../functions/_lib/ai-quota.js";
 import { canServeAiCandidate } from "../functions/media/[key].js";
-import { normalizeElimapiProducts, searchElimapiProducts } from "../functions/_lib/elimapi.js";
+import { normalizeElimapiProducts, searchElimapiProducts, searchElimapiProductsByImage } from "../functions/_lib/elimapi.js";
 
 assert.equal(WORKERS_AI_VISION_MODEL, "@cf/meta/llama-3.2-11b-vision-instruct");
 assert.equal(normalizeImageRef("/media/example.webp"), "media/example.webp");
@@ -214,7 +214,7 @@ assert.match(adminHtml, /referenceImageRef/);
 assert.doesNotMatch(adminHtml, /window\\.__sdAiInventoryAutoScanned/, "Opening the AI tab must not auto-scan");
 const imageSearchSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
 assert.match(imageSearchSource, /consumeWorkersAiRequest/);
-assert.match(imageSearchSource, /searchElimapiProducts/);
+assert.match(imageSearchSource, /searchElimapiProducts(ByImage)?/);
 assert.match(imageSearchSource, /ELIMAPI_API_KEY/);
 assert.doesNotMatch(imageSearchSource, /https:\/\/s\.taobao\.com\/search|https:\/\/s\.1688\.com\/selloffer/);
 assert.doesNotMatch(imageSearchSource, /GEMINI_API_KEY|google_search|NEXSCOPE/);
@@ -289,5 +289,71 @@ assert.equal(JSON.parse(elimapiRequest.options.body).platform, "alibaba");
 assert.equal(JSON.parse(elimapiRequest.options.body).q, "鳄鱼皮鞋");
 const noElimapiKey = await searchElimapiProducts({ apiKey: "", platform: "taobao", query: "鞋" });
 assert.equal(noElimapiKey.code, "ELIMAPI_KEY_MISSING");
+
+let imageApiCalls = [];
+const imageSearchResult = await searchElimapiProductsByImage({
+  apiKey: "test-key",
+  platform: "1688",
+  imageBase64: "aGVsbG8=",
+  mimeType: "image/jpeg",
+  query: "鳄鱼皮鞋",
+  fetchImpl: async (url, options) => {
+    imageApiCalls.push({ url, options });
+    if (url.endsWith("/upload-image")) {
+      assert.equal(options.method, "POST");
+      assert.equal(options.headers["x-api-key"], "test-key");
+      assert.ok(options.body instanceof FormData, "image upload uses multipart/form-data");
+      assert.equal(options.body.get("platform"), "alibaba");
+      const file = options.body.get("file");
+      assert.equal(file.type, "image/jpeg");
+      assert.equal(file.name, "reference.jpg");
+      return { ok: true, status: 200, async json() { return { imageId: "image-123" }; } };
+    }
+    assert.equal(url, "https://openapi.elim.asia/v2/products/search-by-image");
+    assert.equal(options.headers["x-api-key"], "test-key");
+    const body = JSON.parse(options.body);
+    assert.equal(body.platform, "alibaba");
+    assert.equal(body.imgId, "image-123");
+    assert.equal(body.keyword, "鳄鱼皮鞋");
+    assert.equal(body.page, 1);
+    assert.equal(body.size, 20);
+    return {
+      ok: true,
+      status: 200,
+      async json() {
+        return { paginate: { total: 1 }, items: [{
+          id: "offer002", title: "真鳄鱼皮鞋", price: "88.00",
+          original_product_url: "https://detail.1688.com/offer/offer002.html",
+          img_urls: ["https://img.alicdn.com/candidate.jpg"]
+        }] };
+      }
+    };
+  }
+});
+assert.equal(imageApiCalls.length, 2, "image search makes one upload and one search request, without automatic retries");
+assert.equal(imageSearchResult.searchMode, "image");
+assert.equal(imageSearchResult.total, 1);
+assert.equal(imageSearchResult.products[0].productUrl, "https://detail.1688.com/offer/offer002.html");
+assert.equal(imageSearchResult.products[0].imageUrl, "https://img.alicdn.com/candidate.jpg");
+
+let blockedImageSearchCalls = 0;
+const blockedPlan = await searchElimapiProductsByImage({
+  apiKey: "test-key", platform: "taobao", imageBase64: "aGVsbG8=", mimeType: "image/jpeg",
+  fetchImpl: async () => {
+    blockedImageSearchCalls++;
+    return { ok: false, status: 403, async json() { return { message: "Image search is not included in the Free plan" }; } };
+  }
+});
+assert.equal(blockedPlan.code, "ELIMAPI_IMAGE_SEARCH_PLAN_REQUIRED");
+assert.equal(blockedImageSearchCalls, 1, "a rejected upload must stop before the search request and must not retry");
+
+let missingKeyCalls = 0;
+const blockedMissingKey = await searchElimapiProductsByImage({
+  apiKey: "", platform: "taobao", imageBase64: "aGVsbG8=", mimeType: "image/jpeg",
+  fetchImpl: async () => { missingKeyCalls++; throw new Error("must not call provider"); }
+});
+assert.equal(blockedMissingKey.code, "ELIMAPI_KEY_MISSING");
+assert.equal(missingKeyCalls, 0, "missing ElimAPI credentials must be rejected before any network request");
+
 
 console.log("PASS: Workers AI keyword normalization, Elimapi product/price mapping, API authentication handling, safe source URLs, fail-closed 90% gate, material screening, D1 inventory, and manual image approval.");
