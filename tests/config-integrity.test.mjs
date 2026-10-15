@@ -34,7 +34,7 @@ assert.ok(aiMigrationScript.includes('migrations/0009_ai_request_limits.sql'), '
 assert.ok(aiMigrationScript.indexOf('migrations/0007_ai_image_reviews.sql') < aiMigrationScript.indexOf('migrations/0009_ai_request_limits.sql'), 'AI review schema must be applied before the quota migration');
 assert.ok(aiMigrationScript.includes('CLOUDFLARE_D1_TARGET'), 'AI migrations must require an explicit Preview/Production target');
 assert.ok(aiMigrationScript.includes('ALLOW_PRODUCTION_D1_MIGRATIONS') && aiMigrationScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Production AI migration must require explicit opt-in and exact database-name confirmation');
-assert.doesNotMatch(aiMigrationScript, /CLOUDFLARE_D1_DATABASE\\s*\\|\\|\\s*["']sindarealest-db["']/, 'AI migration must not silently default to the known Production database');
+assert.doesNotMatch(aiMigrationScript, /CLOUDFLARE_D1_DATABASE\s*\|\|\s*["']sindarealest-db["']/, 'AI migration must not silently default to the known Production database');
 assert.ok(setupScript.includes('productionDbConfirmation') && setupScript.includes("CLOUDFLARE_D1_TARGET: 'production'") && setupScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Setup wizard must confirm the exact Production D1 target before migration');
 assert.ok(setupScript.indexOf('productionDbConfirmation') < setupScript.indexOf("'\\n1/5 · Áp dụng schema SQL idempotent cho D1…'"), 'Exact Production D1 confirmation must occur before any SQL migration');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
