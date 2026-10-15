@@ -14,7 +14,13 @@ function safeReview(row) {
 function parseDataImage(value) {
   const match = String(value || "").match(/^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/i);
   if (!match || !allowedMime.has(match[1].toLowerCase()) || match[2].length > MAX_BASE64) return null;
-  return { mimeType: match[1].toLowerCase(), base64: match[2] };
+  const base64 = match[2];
+  let byteLength;
+  try { byteLength = atob(base64).length; }
+  catch { return null; }
+  if (!byteLength) return null;
+  if (byteLength > 5 * 1024 * 1024) return { error: "Ảnh phải nhỏ hơn hoặc bằng 5 MB.", status: 413 };
+  return { mimeType: match[1].toLowerCase(), base64 };
 }
 async function getProduct(db, id) {
   return db.prepare("SELECT id,sku,title,category,images_json,published FROM products WHERE id=? LIMIT 1").bind(id).first();
@@ -62,6 +68,7 @@ export async function onRequestPost(context) {
     }
     if (sourceUrl && !referenceImageRef) return fail("Thiếu ảnh gốc được dùng để tìm ứng viên.", 422);
     const parsed = parseDataImage(body?.dataUrl);
+    if (parsed?.error) return fail(parsed.error, parsed.status);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ứng viên phải là WebP hợp lệ.");
     let bytes;
     try { bytes = Uint8Array.from(atob(parsed.base64), c => c.charCodeAt(0)); }
@@ -95,6 +102,7 @@ export async function onRequestPost(context) {
       return fail("Ảnh gốc đối chiếu không khớp ảnh tham chiếu đã lưu hoặc không thuộc sản phẩm này.", 422);
     }
     const parsed = parseDataImage(body?.dataUrl);
+    if (parsed?.error) return fail(parsed.error, parsed.status);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ghép đối chiếu phải là WebP hợp lệ.", 400);
     const quota = await consumeWorkersAiRequest(db);
     if (!quota.ok) return fail(quota.error, quota.status);
@@ -119,6 +127,7 @@ export async function onRequestPost(context) {
   const review = await db.prepare("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=? LIMIT 1").bind(reviewId, productId).first().catch(() => null);
   const imageRef = String(body?.imageRef || review?.image_ref || "");
   const parsed = parseDataImage(body?.dataUrl);
+  if (parsed?.error) return fail(parsed.error, parsed.status);
   if (!parsed) return fail("Ảnh gửi Workers AI không hợp lệ.");
 
   // Validate ownership and review state before spending any AI quota or sending image bytes upstream.
