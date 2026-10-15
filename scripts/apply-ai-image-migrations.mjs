@@ -31,7 +31,7 @@ function execute(args) {
     stdio: ["ignore", "pipe", "pipe"],
   });
   if (result.error) throw result.error;
-  return { status: result.status, output: String(result.stdout || "") + "\n" + String(result.stderr || "") .trim() };
+  return { status: result.status, output: `${result.stdout || ""}\n${result.stderr || ""}`.trim() };
 }
 
 const baseArgs = ["d1", "execute", database, "--remote"];
