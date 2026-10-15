@@ -346,10 +346,22 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   // If the model returns weak reason strings but supplies enough valid visual observations,
   // derive cautious explanations from those observations rather than making another billable AI call.
   // This never infers authenticity or image identity; the resulting record still requires human review.
-  if (!validReasons && validFeatures && Array.isArray(parsed.reasons)) {
-    const groundedFeatures = [...new Set(parsed.visibleFeatures
-      .filter(value => typeof value === "string" && value.trim().length >= 8)
-      .map(value => value.trim().replace(/[.!?。]+$/, "")))];
+  if (!validReasons && validFeatures) {
+    // Some vision responses give valid but short feature labels (for example, "màu đen",
+    // "cổ cao", "đế trắng"), or omit reasons entirely. These are still usable observations.
+    // Exclude explicitly vague/uncertain statements and deduplicate without case sensitivity.
+    const groundedFeatures = [];
+    const seenFeatures = new Set();
+    for (const value of parsed.visibleFeatures) {
+      if (typeof value !== "string") continue;
+      const feature = value.trim().replace(/[.!?。]+$/, "");
+      const normalized = feature.toLocaleLowerCase();
+      if (feature.length < 3 ||
+          /dựa trên hình ảnh|cần kiểm tra thêm|cần xem xét|không đủ thông tin|không thấy rõ|không đủ chi tiết|ảnh mờ|không xác định|chưa rõ|không thể xác minh|không thể xác nhận/i.test(feature) ||
+          seenFeatures.has(normalized)) continue;
+      seenFeatures.add(normalized);
+      groundedFeatures.push(feature);
+    }
     if (groundedFeatures.length >= 2) {
       parsed.reasons = groundedFeatures.slice(0, 2).map((feature, index) =>
         index === 0
