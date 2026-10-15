@@ -44,7 +44,7 @@ export async function onRequestGet(context) {
     const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
     const readiness = {
       workersAiBindingConfigured: Boolean(context.env.AI && typeof context.env.AI.run === "function"),
-      r2BindingConfigured: Boolean(context.env.IMAGES && typeof context.env.IMAGES.get === "function" && typeof context.env.IMAGES.put === "function"),
+      r2BindingConfigured: Boolean(context.env.IMAGES && ["get", "put", "head", "delete"].every(method => typeof context.env.IMAGES[method] === "function")),
       elimapiApiKeyConfigured: Boolean(String(context.env.ELIMAPI_API_KEY || "").trim()),
       elimapiImageSearchEnabled: String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() === "true",
       ...schemaReadiness,
@@ -123,6 +123,13 @@ export async function onRequestPost(context) {
 
   if (!context.env.AI || typeof context.env.AI.run !== "function") {
     return json({ ok: false, error: "Chưa cấu hình binding Workers AI có tên AI cho môi trường Preview. Không tiêu hao quota khi thiếu binding.", code: "WORKERS_AI_BINDING_MISSING" }, 503);
+  }
+  if (!context.env.IMAGES || !["get", "put", "head", "delete"].every(method => typeof context.env.IMAGES[method] === "function")) {
+    return json({
+      ok: false,
+      error: "Binding R2 IMAGES chưa cung cấp đủ thao tác đọc, lưu, kiểm tra và dọn ảnh. Đã chặn tìm kiếm trước khi tiêu hao quota.",
+      code: "IMAGE_STORAGE_BINDING_INCOMPLETE"
+    }, 503);
   }
 
   const quota = await consumeWorkersAiRequest(context.env.DB);
