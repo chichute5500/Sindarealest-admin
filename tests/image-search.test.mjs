@@ -653,6 +653,15 @@ assert.equal((await quotaSchemaBlockedSearch.response.json()).code, "AI_QUOTA_SC
 assert.equal(quotaSchemaBlockedSearch.counters.quotaQueries, 0, "missing quota table must block before quota consumption");
 assert.equal(quotaSchemaBlockedSearch.counters.aiCalls, 0, "missing quota table must block before Workers AI");
 
+const storageBlockedSearch = await postImageSearchForRegression(
+  validSearchBody,
+  counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } })
+);
+assert.equal(storageBlockedSearch.response.status, 503, "image search must stop if R2 cannot support the candidate workflow");
+assert.equal((await storageBlockedSearch.response.json()).code, "IMAGE_STORAGE_BINDING_INCOMPLETE");
+assert.equal(storageBlockedSearch.counters.quotaQueries, 0, "missing R2 operations must block before quota consumption");
+assert.equal(storageBlockedSearch.counters.aiCalls, 0, "missing R2 operations must block before Workers AI");
+
 const unreadableSchemaSearch = await postImageSearchForRegression(
   validSearchBody,
   counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } }),
