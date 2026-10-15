@@ -30,7 +30,13 @@ function runLocalCheck() {
 function applyAiImageMigrations(database) {
   const result = spawnSync(process.execPath, ['scripts/apply-ai-image-migrations.mjs'], {
     encoding: 'utf8',
-    env: { ...process.env, CLOUDFLARE_D1_DATABASE: database },
+    env: {
+      ...process.env,
+      CLOUDFLARE_D1_DATABASE: database,
+      CLOUDFLARE_D1_TARGET: 'production',
+      ALLOW_PRODUCTION_D1_MIGRATIONS: 'true',
+      CONFIRM_PRODUCTION_D1_DATABASE: database,
+    },
   });
   if (result.stdout) process.stdout.write(result.stdout);
   if (result.stderr) process.stderr.write(result.stderr);
@@ -100,14 +106,17 @@ async function main() {
     throw new Error('Chuỗi xác nhận không khớp. Đã hủy trước khi chạy SQL hoặc deploy.');
   }
 
+  const productionDbConfirmation = await ask(`CẢNH BÁO: các bước kế tiếp sẽ chạy migration trên D1 Production “${dbName}”. Nhập chính xác tên database để xác nhận riêng:`);
+  if (productionDbConfirmation !== dbName) {
+    throw new Error('Tên D1 Production xác nhận không khớp. Đã hủy trước mọi migration.');
+  }
+
   console.log('\n1/5 · Áp dụng schema SQL idempotent cho D1…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0001_schema.sql'], { interactive: true });
 
   console.log('\n2/5 · Áp dụng bảng đơn hàng, khách hàng, bảo hành và audit log…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0003_storefront_operations.sql'], { interactive: true });
-  console.log('Áp dụng migration thông báo quản trị (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0004_admin_notifications.sql'], { interactive: true });
-  console.log('Áp dụng địa chỉ giao hàng và metadata bảo hành (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0005_address_warranty_verification.sql'], { interactive: true });
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0006_remove_warranty_otp.sql'], { interactive: true });
   console.log('Áp dụng hàng chờ ảnh AI, URL nguồn và giới hạn Workers AI trên đúng D1 đã chọn…');
