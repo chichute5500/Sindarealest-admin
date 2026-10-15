@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
 import { onRequestPost as postImageAudit, onRequestPatch as patchImageAudit } from "../functions/api/admin/image-audit.js";
-import { onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
+import { onRequestGet as getImageSearch, onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
 import { onRequestGet as getImageProxy } from "../functions/api/admin/image-proxy.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
@@ -398,6 +398,42 @@ function makeAuditTestDb(review = null) {
   };
   return { DB, counters };
 }
+async function getImageSearchForRegression(envOverrides = {}) {
+  const { DB } = makeAuditTestDb(null);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-search", {
+    headers: { Cookie: "sd_admin_session=" + session, Origin: "https://sindarealest.test" }
+  });
+  return getImageSearch({
+    request,
+    env: {
+      DB, ADMIN_PASSWORD: "test-admin-password",
+      SESSION_SECRET: sessionSecret,
+      AI: { async run() {} },
+      ELIMAPI_API_KEY: "test-key",
+      ELIMAPI_IMAGE_SEARCH_ENABLED: "true",
+      ...envOverrides
+    }
+  });
+}
+const readinessResponse = await getImageSearchForRegression();
+assert.equal(readinessResponse.status, 200, "readiness inspection should work without calling external providers");
+const readinessPayload = await readinessResponse.json();
+assert.equal(readinessPayload.readiness.workersAiBindingConfigured, true);
+assert.equal(readinessPayload.readiness.elimapiApiKeyConfigured, true);
+assert.equal(readinessPayload.readiness.elimapiImageSearchEnabled, true);
+assert.equal(readinessPayload.readiness.quotaTableConfigured, true);
+assert.equal(readinessPayload.readiness.externalApiVerified, false, "readiness must not claim it verified ElimAPI by making a request");
+assert.equal(readinessPayload.readiness.workersAiLicenseVerified, false, "readiness must not claim model license agreement without checking it");
+const disabledReadinessResponse = await getImageSearchForRegression({
+  AI: null, ELIMAPI_API_KEY: "", ELIMAPI_IMAGE_SEARCH_ENABLED: "false"
+});
+const disabledReadiness = await disabledReadinessResponse.json();
+assert.equal(disabledReadiness.readiness.workersAiBindingConfigured, false);
+assert.equal(disabledReadiness.readiness.elimapiApiKeyConfigured, false);
+assert.equal(disabledReadiness.readiness.elimapiImageSearchEnabled, false);
+
 async function postAuditForRegression(body, review = null, aiBinding = { async run() { counters.aiCalls++; return { response: "{}" }; } }) {
   const { DB, counters } = makeAuditTestDb(review);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
