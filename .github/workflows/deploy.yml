@@ -1,4 +1,3 @@
- 
 name: Deploy SinDarealest to Cloudflare Pages
 
 on:
@@ -46,8 +45,6 @@ jobs:
           test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
 
-      # AI review migrations are deliberately separate from deploy.
-      # Run the guarded migration tool manually with an explicit, verified D1 target.
 
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
