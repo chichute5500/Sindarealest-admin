@@ -129,7 +129,7 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
 }
 
 export function parseModelJson(rawText) {
-  const text = String(rawText || "").trim().replace(/^\\uFEFF/, "").replace(/^\\x60{3}(?:json)?\\s*/i, "").replace(/\\s*\\x60{3}\\s*$/, "").trim();
+  const text = String(rawText || "").replace(/^\uFEFF/, "").trim().replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}\s*$/, "").trim();
   if (!text) return null;
 
   // Some provider envelopes serialize the generated JSON object as a JSON string.
@@ -166,7 +166,7 @@ export function parseModelJson(rawText) {
       const ch = text[i];
       if (inString) {
         if (escaped) escaped = false;
-        else if (ch === "\\\\") escaped = true;
+        else if (ch === "\\") escaped = true;
         else if (ch === '"') inString = false;
         continue;
       }
@@ -185,6 +185,71 @@ export function parseModelJson(rawText) {
     }
   }
   return null;
+}
+
+
+function parseMarkdownProductImageAnalysis(rawText, title = "") {
+  const text = String(rawText || "").replace(/^\uFEFF/, "").trim();
+  if (!text) return null;
+  const labelPattern = /(?:^|\n)\s*(?:\*\*|__)?\s*(Summary|Visible Features|Model Assessment|Material Assessment|Confidence|Reasons|Needs Human Review)\s*(?:\*\*|__)?\s*[:：]?\s*|(?:\*\*|__)\s*(Summary|Visible Features|Model Assessment|Material Assessment|Confidence|Reasons|Needs Human Review)\s*[:：]?\s*(?:\*\*|__)\s*/gim;
+  const labels = [...text.matchAll(labelPattern)];
+  if (!labels.some(match => String(match[1] || match[2] || "").toLowerCase() === "summary") ||
+      !labels.some(match => String(match[1] || match[2] || "").toLowerCase() === "visible features")) return null;
+  const sections = Object.create(null);
+  for (let i = 0; i < labels.length; i++) {
+    const match = labels[i];
+    const label = String(match[1] || match[2] || "").toLowerCase().replace(/\s+/g, " ");
+    const start = match.index + match[0].length;
+    const end = i + 1 < labels.length ? labels[i + 1].index : text.length;
+    sections[label] = text.slice(start, end).trim();
+  }
+  const cleanText = value => String(value || "")
+    .replace(/\x60{3}(?:json)?/gi, " ")
+    .replace(/\[WORKERS_AI_INVALID_JSON\]/gi, " ")
+    .replace(/\*\*/g, " ")
+    .replace(/__/g, " ")
+    .replace(/\x60/g, "")
+    .replace(/^\s*[:：>*•-]+\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const extractItems = value => String(value || "")
+    .replace(/\*\*/g, " ")
+    .replace(/__/g, " ")
+    .replace(/\s+[*•]\s+/g, "\n")
+    .replace(/\s+-\s+/g, "\n")
+    .replace(/(?:^|\n)\s*\d+[.)、]\s+/g, "\n")
+    .split(/[\r\n]+/)
+    .map(item => cleanText(item))
+    .filter(item => item.length >= 3 && !/^\[WORKERS_AI_INVALID_JSON\]$/i.test(item));
+  let summary = cleanText(sections.summary);
+  const productTitle = String(title || "").trim();
+  if (productTitle && summary.toLocaleLowerCase().startsWith(productTitle.toLocaleLowerCase())) {
+    const remainder = summary.slice(productTitle.length).replace(/^\s*[-–—:|,]\s*/, "").trim();
+    if (remainder.length >= 20) summary = remainder;
+  }
+  const visibleFeatures = [...new Set(extractItems(sections["visible features"]))].slice(0, 6);
+  if (summary.length < 20 || visibleFeatures.length < 3) return null;
+  const modelText = cleanText(sections["model assessment"]).toLowerCase();
+  let modelAssessment = "uncertain";
+  for (const value of ["same_model_possible", "different_model_possible", "different_angle_possible"]) {
+    if (modelText.includes(value)) { modelAssessment = value; break; }
+  }
+  const materialText = (cleanText(sections["material assessment"]) + " " + summary + " " + visibleFeatures.join(" ")).toLowerCase();
+  let materialAssessment = "uncertain";
+  if (/\bpossible_synthetic\b|synthetic leather|faux leather|da giả|da nhân tạo|\bpu\b/i.test(materialText)) materialAssessment = "possible_synthetic";
+  else if (/\bcrocodile_claim_unverified\b|vân (?:giống )?da cá sấu|vân cá sấu|cá sấu.*(?:chưa thể|không thể) xác nhận/i.test(materialText)) materialAssessment = "crocodile_claim_unverified";
+  else if (/\bno_visible_evidence\b/i.test(materialText)) materialAssessment = "no_visible_evidence";
+  const confidenceText = cleanText(sections.confidence).toLowerCase();
+  let confidence = /\bmedium\b|trung bình/i.test(confidenceText) ? "medium" :
+    /\blow\b|thấp/i.test(confidenceText) ? "low" :
+    /\bhigh\b|cao/i.test(confidenceText) ? "medium" : "low";
+  if (confidence === "high") confidence = "medium";
+  let reasons = extractItems(sections.reasons).slice(0, 5);
+  if (reasons.length < 2) reasons = [
+    "Phản hồi của mô hình không cung cấp đủ trường có cấu trúc để xác minh từng kết luận.",
+    "Một ảnh đơn không đủ xác minh chất liệu da thật hoặc khẳng định hai ảnh là cùng một mẫu."
+  ];
+  return { summary, visibleFeatures, modelAssessment, materialAssessment, confidence, reasons, needsHumanReview: true };
 }
 
 export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/webp", title = "", category = "", sku = "" }) {
@@ -221,7 +286,20 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     }
   });
   if (output.error) return output;
-  const parsed = parseModelJson(output.text);
+  let parsed = parseModelJson(output.text);
+  if (!parsed) {
+    parsed = parseMarkdownProductImageAnalysis(output.text, title);
+    if (parsed) {
+      console.warn("[Workers AI diagnostic]", JSON.stringify({
+        event: "workers_ai_markdown_recovered",
+        model: output.model,
+        responseLength: output.text.length,
+        recoveredFields: ["summary", "visibleFeatures", "modelAssessment", "materialAssessment", "confidence", "reasons", "needsHumanReview"],
+        visibleFeatureCount: parsed.visibleFeatures.length,
+        needsHumanReview: true
+      }));
+    }
+  }
   if (!parsed) {
     const invalidJsonDiagnostic = {
       event: "workers_ai_invalid_json",
@@ -338,6 +416,10 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
       diagnostic: schemaDiagnostic
     };
   }
+  // Apply safety defaults after validating required model fields.
+  // A single-image result always stays in human review and cannot claim high confidence.
+  parsed.needsHumanReview = true;
+  if (parsed.confidence === "high") parsed.confidence = "medium";
   return { analysis: {
     summary: String(parsed.summary || "Chưa có mô tả").slice(0, 800),
     visibleFeatures: Array.isArray(parsed.visibleFeatures) ? parsed.visibleFeatures.slice(0, 12).map(x => String(x).slice(0, 160)) : [],
@@ -370,7 +452,18 @@ export async function generateSearchKeywords({ ai, imageBase64, mimeType = "imag
     "The JSON must have exactly these fields: keywords (an array of 1 to 4 short Simplified Chinese search phrases) and visualSummary (a short visible-feature summary of at most 100 Chinese characters).",
     'Example shape only: {"keywords":["棕色男士皮鞋","鳄鱼纹压花皮鞋"],"visualSummary":"棕色皮鞋，圆头，压纹鞋面"}. Never copy the example unless those details are actually visible in the provided image.'
   ].join("\n");
-  const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 384 });
+  const output = await runWorkersAiVision({
+    ai, prompt, imageBase64, mimeType, maxTokens: 384,
+    responseSchema: {
+      type: "object",
+      properties: {
+        keywords: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
+        visualSummary: { type: "string" }
+      },
+      required: ["keywords", "visualSummary"],
+      additionalProperties: false
+    }
+  });
   if (output.error) return output;
   let parsed = parseModelJson(output.text);
   if (!parsed) {
@@ -406,7 +499,22 @@ export async function compareProductImages({ ai, imageBase64, mimeType = "image/
     "similarities and differences must each contain 1-4 concise strings. needsHumanReview must always be true. Do not return any numeric similarity score or claim a calibrated percentage.",
     "Metadata for orientation only, not proof: SKU " + String(sku || "").slice(0, 60) + "; tên " + String(title || "").slice(0, 180) + "."
   ].join("\n");
-  const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 512 });
+  const output = await runWorkersAiVision({
+    ai, prompt, imageBase64, mimeType, maxTokens: 512,
+    responseSchema: {
+      type: "object",
+      properties: {
+        verdict: { type: "string", enum: ["same_model_likely", "similar_style_only", "different_model_likely", "uncertain"] },
+        similarities: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
+        differences: { type: "array", items: { type: "string" }, minItems: 1, maxItems: 4 },
+        confidence: { type: "string", enum: ["low", "medium"] },
+        summary: { type: "string" },
+        needsHumanReview: { type: "boolean", enum: [true] }
+      },
+      required: ["verdict", "similarities", "differences", "confidence", "summary", "needsHumanReview"],
+      additionalProperties: false
+    }
+  });
   if (output.error) return output;
   const parsed = parseModelJson(output.text);
   const verdicts = new Set(["same_model_likely", "similar_style_only", "different_model_likely", "uncertain"]);
