@@ -141,6 +141,23 @@ assert.equal(weakReasonsAnalysis.analysis.reasons.length, 2);
 assert.match(weakReasonsAnalysis.analysis.reasons[0], /Màu đen đồng đều trên thân giày/);
 assert.match(weakReasonsAnalysis.analysis.reasons[1], /Cổ giày cao ôm quanh mắt cá/);
 assert.equal(weakReasonsAnalysis.analysis.needsHumanReview, true, "recovered reasons must still require human review");
+const shortFeatureReasonsAnalysis = await analyzeProductImage({
+  ai: { async run() { return { response: JSON.stringify({
+    summary: "Giày sneaker đen trắng, cổ cao, mũi thấp và đế trắng dày.",
+    visibleFeatures: ["màu đen trắng", "cổ cao", "mũi thấp", "đế trắng dày"],
+    modelAssessment: "uncertain",
+    materialAssessment: "crocodile_claim_unverified",
+    confidence: "low",
+    needsHumanReview: true
+  }) }; } },
+  imageBase64: validBase64, title: "Sneaker da cá sấu", sku: "SD-SN004"
+});
+assert.ok(shortFeatureReasonsAnalysis.analysis, "missing reasons should be recovered from concrete short visual features");
+assert.equal(shortFeatureReasonsAnalysis.analysis.reasons.length, 2);
+assert.match(shortFeatureReasonsAnalysis.analysis.reasons[0], /màu đen trắng/);
+assert.match(shortFeatureReasonsAnalysis.analysis.reasons[1], /cổ cao/);
+assert.equal(shortFeatureReasonsAnalysis.analysis.needsHumanReview, true);
+
 
 assert.ok(capturedInput.prompt.includes("summary phải mô tả trực tiếp"), "prompt requires specific visible observations instead of repeating metadata");
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must prevent unsupported single-image identity verification");
