@@ -3,6 +3,7 @@ import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, norm
 import { generateSearchKeywords } from "../../_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
 import { searchElimapiProductsByImage } from "../../_lib/elimapi.js";
+import { inspectAiReviewSchema } from "../../_lib/ai-review-schema.js";
 
 const MAX_IMAGE_BASE64 = 7_000_000;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -40,26 +41,13 @@ export async function onRequestGet(context) {
   if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare("SELECT id, sku, title, category, images_json FROM products ORDER BY sort_order ASC, sku ASC LIMIT 2000").all();
-    let quotaTableConfigured = false;
-    try {
-      await context.env.DB.prepare("SELECT scope FROM ai_request_limits LIMIT 1").first();
-      quotaTableConfigured = true;
-    } catch {}
-    let reviewSchemaColumns = [];
-    try {
-      const schema = await context.env.DB.prepare("PRAGMA table_info(image_ai_reviews)").all();
-      reviewSchemaColumns = (schema.results || []).map(column => String(column.name || ""));
-    } catch {}
-    const requiredReviewColumns = ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "source_image_url", "reference_image_ref", "r2_key"];
-    const missingReviewColumns = requiredReviewColumns.filter(column => !reviewSchemaColumns.includes(column));
+    const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
     const readiness = {
       workersAiBindingConfigured: Boolean(context.env.AI && typeof context.env.AI.run === "function"),
       r2BindingConfigured: Boolean(context.env.IMAGES && typeof context.env.IMAGES.get === "function" && typeof context.env.IMAGES.put === "function"),
       elimapiApiKeyConfigured: Boolean(String(context.env.ELIMAPI_API_KEY || "").trim()),
       elimapiImageSearchEnabled: String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() === "true",
-      quotaTableConfigured,
-      reviewSchemaConfigured: missingReviewColumns.length === 0,
-      missingReviewColumns,
+      ...schemaReadiness,
       externalApiVerified: false,
       workersAiLicenseVerified: false
     };
@@ -106,6 +94,33 @@ export async function onRequestPost(context) {
       code: "ELIMAPI_IMAGE_SEARCH_DISABLED"
     }, 503);
   }
+
+  // Fail before consuming Workers AI quota or contacting ElimAPI. A valid API
+  // key and feature flag are not enough if the review queue cannot save results.
+  const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
+  if (!schemaReadiness.reviewSchemaInspectable) {
+    return json({
+      ok: false,
+      error: "Không thể đọc schema hàng chờ ảnh AI trong D1. Đã chặn tìm kiếm trước khi gọi dịch vụ bên ngoài.",
+      code: "AI_REVIEW_SCHEMA_UNREADABLE"
+    }, 503);
+  }
+  if (!schemaReadiness.reviewSchemaConfigured) {
+    return json({
+      ok: false,
+      error: "Schema hàng chờ ảnh AI chưa đầy đủ. Đã chặn tìm kiếm trước khi tiêu hao quota: thiếu cột " + schemaReadiness.missingReviewColumns.join(", ") + ".",
+      code: "AI_REVIEW_SCHEMA_INCOMPLETE",
+      missingColumns: schemaReadiness.missingReviewColumns
+    }, 503);
+  }
+  if (!schemaReadiness.quotaTableConfigured) {
+    return json({
+      ok: false,
+      error: "Thiếu bảng giới hạn AI D1. Đã chặn tìm kiếm trước khi gọi Workers AI hoặc ElimAPI.",
+      code: "AI_QUOTA_SCHEMA_MISSING"
+    }, 503);
+  }
+
   if (!context.env.AI || typeof context.env.AI.run !== "function") {
     return json({ ok: false, error: "Chưa cấu hình binding Workers AI có tên AI cho môi trường Preview. Không tiêu hao quota khi thiếu binding.", code: "WORKERS_AI_BINDING_MISSING" }, 503);
   }
