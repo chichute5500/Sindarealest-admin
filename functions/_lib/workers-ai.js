@@ -184,6 +184,58 @@ export function parseModelJson(rawText) {
       }
     }
   }
+  // Last-resort syntax repair for common vision-model JSON mistakes (unescaped quotes
+  // or literal control characters inside strings). Repaired output still goes through
+  // JSON.parse and the strict schema checks below; this never invents missing fields.
+  const firstObject = text.indexOf("{");
+  const lastObject = text.lastIndexOf("}");
+  if (firstObject >= 0 && lastObject > firstObject) {
+    const candidate = text.slice(firstObject, lastObject + 1);
+    let repaired = "";
+    let inString = false;
+    let escaped = false;
+    for (let i = 0; i < candidate.length; i++) {
+      const ch = candidate[i];
+      if (!inString) {
+        if (ch === '"') inString = true;
+        repaired += ch;
+        continue;
+      }
+      if (escaped) {
+        repaired += ch;
+        escaped = false;
+        continue;
+      }
+      if (ch === "\\\\") {
+        repaired += ch;
+        escaped = true;
+        continue;
+      }
+      if (ch === '"') {
+        let next = i + 1;
+        while (next < candidate.length && /\\s/.test(candidate[next])) next++;
+        const nextChar = candidate[next];
+        // In JSON, a closing quote is followed by a property separator or container end.
+        // Otherwise treat it as an unescaped quote inside the model's string value.
+        if (nextChar === ":" || nextChar === "," || nextChar === "}" || nextChar === "]" || next === candidate.length) {
+          inString = false;
+          repaired += ch;
+        } else {
+          repaired += '\\\\"';
+        }
+        continue;
+      }
+      if (ch === "\\n") repaired += "\\\\n";
+      else if (ch === "\\r") repaired += "\\\\r";
+      else if (ch === "\\t") repaired += "\\\\t";
+      else if (ch.charCodeAt(0) < 0x20) repaired += " ";
+      else repaired += ch;
+    }
+    try {
+      const recovered = JSON.parse(repaired);
+      if (recovered && typeof recovered === "object" && !Array.isArray(recovered)) return recovered;
+    } catch {}
+  }
   return null;
 }
 
