@@ -83,6 +83,10 @@ export async function onRequestPost(context) {
       code: "ELIMAPI_IMAGE_SEARCH_DISABLED"
     }, 503);
   }
+  if (!context.env.AI || typeof context.env.AI.run !== "function") {
+    return json({ ok: false, error: "Chưa cấu hình binding Workers AI có tên AI cho môi trường Preview. Không tiêu hao quota khi thiếu binding.", code: "WORKERS_AI_BINDING_MISSING" }, 503);
+  }
+
   const quota = await consumeWorkersAiRequest(context.env.DB);
   if (!quota.ok) return fail(quota.error, quota.status);
 
