@@ -6,7 +6,7 @@ on:
   push:
     # Must match the currently verified Cloudflare Pages Production branch.
     branches:
-      - main
+      - fix/ai-review-quota-scope-2026-10-15
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
-      CLOUDFLARE_PAGES_BRANCH: ${{ vars.CLOUDFLARE_PAGES_BRANCH }}
+      CLOUDFLARE_PAGES_BRANCH: fix/ai-review-quota-scope-2026-10-15
 
     steps:
       - name: Check out source
