@@ -20,7 +20,18 @@ function parseImage(value, fallbackBase64 = "") {
     mimeType = /^data:image\/webp/i.test(String(fallbackBase64 || "")) ? "image/webp"
       : /^data:image\/png/i.test(String(fallbackBase64 || "")) ? "image/png" : "image/jpeg";
   }
-  if (!ALLOWED_MIME.has(mimeType) || !imageBase64 || imageBase64.length > MAX_IMAGE_BASE64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) return null;
+  if (!ALLOWED_MIME.has(mimeType) || !imageBase64 || imageBase64.length > MAX_IMAGE_BASE64 ||
+      !/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) return null;
+  let binary;
+  try { binary = atob(imageBase64); } catch { return null; }
+  if (!binary.length || binary.length > 5 * 1024 * 1024) return null;
+  const isJpeg = mimeType === "image/jpeg" && binary.length >= 3 &&
+    binary.charCodeAt(0) === 0xff && binary.charCodeAt(1) === 0xd8 && binary.charCodeAt(2) === 0xff;
+  const isPng = mimeType === "image/png" && binary.length >= 8 &&
+    [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((byte, i) => binary.charCodeAt(i) === byte);
+  const isWebp = mimeType === "image/webp" && binary.length >= 12 &&
+    binary.slice(0, 4) === "RIFF" && binary.slice(8, 12) === "WEBP";
+  if (!isJpeg && !isPng && !isWebp) return null;
   return { mimeType, imageBase64 };
 }
 
