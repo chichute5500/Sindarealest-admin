@@ -6,7 +6,7 @@ on:
   push:
     # Must match the currently verified Cloudflare Pages Production branch.
     branches:
-      - rewrite/ai-system-2026-10-14
+      - main
 
 permissions:
   contents: read
