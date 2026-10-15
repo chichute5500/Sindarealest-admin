@@ -2,7 +2,7 @@ import { fail, json, requireAdmin } from "../../_lib.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, normalizeImageRef } from "../../_lib/image-audit.js";
 import { generateSearchKeywords } from "../../_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
-import { searchElimapiProducts } from "../../_lib/elimapi.js";
+import { searchElimapiProductsByImage } from "../../_lib/elimapi.js";
 
 const MAX_IMAGE_BASE64 = 7_000_000;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -62,6 +62,9 @@ export async function onRequestPost(context) {
   const title = String(product.title || "").replace(/[<>]/g, "").trim().slice(0, 180);
   const material = assessCrocodileMaterial(title);
   if (material.status === "reject") return fail(material.reason, 422);
+  if (!String(context.env.ELIMAPI_API_KEY || "").trim()) {
+    return json({ ok: false, error: "Chưa cấu hình Secret ELIMAPI_API_KEY trong môi trường Preview của Cloudflare. Đã chặn yêu cầu trước khi gọi Workers AI để không tiêu hao quota vô ích.", code: "ELIMAPI_KEY_MISSING" }, 503);
+  }
   const quota = await consumeWorkersAiRequest(context.env.DB);
   if (!quota.ok) return fail(quota.error, quota.status);
 
@@ -75,12 +78,16 @@ export async function onRequestPost(context) {
   if (generated.error) return fail(generated.error, generated.status || 502);
 
   const query = generated.keywords.join(" ").replace(/\s+/g, " ").trim().slice(0, 220);
-  const upstream = await searchElimapiProducts({
+  const upstream = await searchElimapiProductsByImage({
     apiKey: context.env.ELIMAPI_API_KEY,
     platform,
+    imageBase64: image.imageBase64,
+    mimeType: image.mimeType,
     query
   });
-  if (upstream.error) return fail(upstream.error, upstream.status || 502, { "X-Error-Code": upstream.code || "ELIMAPI_ERROR" });
+  if (upstream.error) {
+    return json({ ok: false, error: upstream.error, code: upstream.code || "ELIMAPI_IMAGE_SEARCH_ERROR" }, upstream.status || 502);
+  }
   const results = upstream.products.map(product => {
     const evaluation = evaluateSearchCandidate({ title: product.title, description: product.candidateText, similarityScore: null });
     return {
@@ -96,7 +103,8 @@ export async function onRequestPost(context) {
     productId: product.id,
     sourceImageRef: imageRef,
     platform,
-    provider: "Elimapi",
+    provider: "Elimapi image search",
+    searchMode: upstream.searchMode || "image",
     keywordProvider: "Cloudflare Workers AI",
     model: generated.model,
     keywords: generated.keywords,
@@ -104,7 +112,7 @@ export async function onRequestPost(context) {
     total: upstream.total,
     results,
     message: results.length
-      ? "Đã nhận sản phẩm và giá từ Elimapi. Giá do API trả về tính bằng CNY; hãy mở nguồn và kiểm tra thủ công. Điểm tương đồng ảnh chưa được hiệu chuẩn, vì vậy không có kết quả nào tự động đủ điều kiện lưu."
-      : "Elimapi không trả về sản phẩm cho các từ khóa này. Thử điều chỉnh từ khóa; hệ thống không tạo sản phẩm hoặc giá giả."
+      ? "ElimAPI đã trả về ứng viên qua tìm kiếm bằng ảnh kèm từ khóa. Giá lấy từ phản hồi API, đơn vị CNY; hãy mở trang nguồn và kiểm tra thủ công. Kết quả chưa được xác minh cùng mẫu hoặc hiệu chuẩn ngưỡng 90%, nên không có ảnh nào tự động được duyệt."
+      : "ElimAPI không trả về ứng viên cho ảnh và từ khóa này. Hệ thống không tự tạo sản phẩm hoặc giá giả, cũng không tự gửi yêu cầu khác."
   });
 }
