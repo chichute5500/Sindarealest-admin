@@ -214,6 +214,8 @@ assert.match(adminHtml, /referenceImageRef/);
 assert.doesNotMatch(adminHtml, /window\\.__sdAiInventoryAutoScanned/, "Opening the AI tab must not auto-scan");
 const imageSearchSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-search.js", import.meta.url), "utf8");
 assert.match(imageSearchSource, /consumeWorkersAiRequest/);
+assert.match(imageSearchSource, /ELIMAPI_IMAGE_SEARCH_ENABLED/, "image search must be explicitly enabled after confirming the ElimAPI plan");
+assert.ok(imageSearchSource.indexOf("ELIMAPI_IMAGE_SEARCH_ENABLED") < imageSearchSource.indexOf("consumeWorkersAiRequest(context.env.DB)"), "disabled image search must fail before consuming Workers AI quota");
 assert.match(imageSearchSource, /searchElimapiProducts(ByImage)?/);
 assert.match(imageSearchSource, /ELIMAPI_API_KEY/);
 assert.doesNotMatch(imageSearchSource, /https:\/\/s\.taobao\.com\/search|https:\/\/s\.1688\.com\/selloffer/);
