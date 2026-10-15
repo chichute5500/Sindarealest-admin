@@ -2,7 +2,7 @@ name: AI rewrite checks
 
 on:
   pull_request:
-    branches: [main, rewrite/ai-system-2026-10-14]
+    branches: [main, rewrite/ai-system-2026-10-14, fix/ai-image-schema-safety-2026-10-15]
 
 permissions:
   contents: read
