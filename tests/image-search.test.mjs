@@ -397,7 +397,7 @@ function makeAuditTestDb(review = null) {
   };
   return { DB, counters };
 }
-async function postAuditForRegression(body, review = null) {
+async function postAuditForRegression(body, review = null, aiBinding = { async run() { counters.aiCalls++; return { response: "{}" }; } }) {
   const { DB, counters } = makeAuditTestDb(review);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
@@ -415,7 +415,7 @@ async function postAuditForRegression(body, review = null) {
     env: {
       DB, ADMIN_PASSWORD: "test-admin-password",
       SESSION_SECRET: sessionSecret,
-      AI: { async run() { counters.aiCalls++; return { response: "{}" }; } }
+      AI: aiBinding
     }
   });
   return { response, counters };
@@ -456,7 +456,32 @@ assert.equal(malformedAuditImage.counters.quotaQueries, 0, "malformed image data
 assert.equal(malformedAuditImage.counters.aiCalls, 0, "malformed image data must not call Workers AI");
 assert.equal(malformedAuditImage.counters.writes, 0, "malformed image data must not write a review");
 
-async function postImageSearchForRegression(body) {
+const auditWithoutAi = await postAuditForRegression({
+  action: "analyze", productId: "product-1",
+  imageRef: "images/reference.webp", dataUrl: validPngDataUrl
+}, null, null);
+assert.equal(auditWithoutAi.response.status, 503, "image audit must report a missing Workers AI binding");
+assert.equal(auditWithoutAi.counters.quotaQueries, 0, "missing AI binding must not consume D1 AI quota");
+assert.equal(auditWithoutAi.counters.aiCalls, 0, "missing AI binding must not call a model");
+assert.equal(auditWithoutAi.counters.writes, 0, "missing AI binding must not create a review");
+
+const comparisonWithoutAi = await postAuditForRegression({
+  action: "compareCandidate", productId: "product-1", reviewId: "review-pending",
+  referenceImageRef: "images/reference.webp", dataUrl: "data:image/webp;base64,UklGRgAAAABXRUJQ"
+}, {
+  id: "review-pending", product_id: "product-1",
+  image_kind: "candidate", status: "pending",
+  image_ref: "/media/" + "a".repeat(36) + "-ai.webp",
+  r2_key: "a".repeat(36) + "-ai.webp",
+  reference_image_ref: "images/reference.webp",
+  analysis_json: "{}"
+}, null);
+assert.equal(comparisonWithoutAi.response.status, 503, "image comparison must report a missing Workers AI binding");
+assert.equal(comparisonWithoutAi.counters.quotaQueries, 0, "missing AI binding must not consume comparison quota");
+assert.equal(comparisonWithoutAi.counters.aiCalls, 0, "missing AI binding must not call a model");
+assert.equal(comparisonWithoutAi.counters.writes, 0, "missing AI binding must not write comparison results");
+
+async function postImageSearchForRegression(body, aiBinding = null) {
   const { DB, counters } = makeAuditTestDb(null);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
@@ -474,7 +499,7 @@ async function postImageSearchForRegression(body) {
     env: {
       DB, ADMIN_PASSWORD: "test-admin-password",
       SESSION_SECRET: sessionSecret,
-      AI: null,
+      AI: aiBinding,
       ELIMAPI_API_KEY: "test-key",
       ELIMAPI_IMAGE_SEARCH_ENABLED: "true"
     }
@@ -488,6 +513,14 @@ const malformedSearchImage = await postImageSearchForRegression({
 assert.equal(malformedSearchImage.response.status, 400, "image search must reject malformed base64 immediately");
 assert.equal(malformedSearchImage.counters.quotaQueries, 0, "invalid image search data must not consume Workers AI quota");
 assert.equal(malformedSearchImage.counters.aiCalls, 0, "invalid image search data must not call Workers AI");
+
+const searchWithoutAi = await postImageSearchForRegression({
+  platform: "taobao", productId: "product-1",
+  imageRef: "images/reference.webp", dataUrl: "data:image/jpeg;base64,/9j/"
+});
+assert.equal(searchWithoutAi.response.status, 503, "image search must fail clearly when Workers AI is not bound");
+assert.equal(searchWithoutAi.counters.quotaQueries, 0, "missing Workers AI binding must not consume quota before search");
+assert.equal(searchWithoutAi.counters.aiCalls, 0, "missing Workers AI binding must not call a model");
 
 
 
