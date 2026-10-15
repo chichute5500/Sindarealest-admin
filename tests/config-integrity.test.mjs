@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { parseCliJson, findNamedRecord, assertSafeName } from '../scripts/cloudflare-utils.mjs';
 
 const payload = parseCliJson('\nWrangler notice\n[{"name":"shop-prod","production_branch":"main"}]\nFinished listing projects.');
@@ -37,6 +38,22 @@ assert.ok(aiMigrationScript.includes('ALLOW_PRODUCTION_D1_MIGRATIONS') && aiMigr
 assert.doesNotMatch(aiMigrationScript, /CLOUDFLARE_D1_DATABASE\s*\|\|\s*["']sindarealest-db["']/, 'AI migration must not silently default to the known Production database');
 assert.ok(setupScript.includes('productionDbConfirmation') && setupScript.includes("CLOUDFLARE_D1_TARGET: 'production'") && setupScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Setup wizard must confirm the exact Production D1 target before migration');
 assert.ok(setupScript.indexOf('productionDbConfirmation') < setupScript.indexOf("'\\n1/5 · Áp dụng schema SQL idempotent cho D1…'"), 'Exact Production D1 confirmation must occur before any SQL migration');
+
+// Runtime regression: missing target configuration must stop before invoking
+// Wrangler or contacting Cloudflare.
+const migrationEnv = { ...process.env };
+for (const name of ['CLOUDFLARE_D1_DATABASE', 'CLOUDFLARE_D1_TARGET', 'ALLOW_PRODUCTION_D1_MIGRATIONS', 'CONFIRM_PRODUCTION_D1_DATABASE']) delete migrationEnv[name];
+const missingMigrationTarget = spawnSync(process.execPath, ['scripts/apply-ai-image-migrations.mjs'], { encoding: 'utf8', env: migrationEnv });
+assert.notEqual(missingMigrationTarget.status, 0, 'AI migration must fail when no explicit target is configured');
+assert.match(missingMigrationTarget.stderr || '', /CLOUDFLARE_D1_DATABASE/i, 'AI migration should explain that a named D1 target is required');
+
+const previewOnKnownProduction = spawnSync(process.execPath, ['scripts/apply-ai-image-migrations.mjs'], {
+  encoding: 'utf8',
+  env: { ...migrationEnv, CLOUDFLARE_D1_DATABASE: 'sindarealest-db', CLOUDFLARE_D1_TARGET: 'preview' }
+});
+assert.notEqual(previewOnKnownProduction.status, 0, 'Known Production D1 must never be accepted as Preview');
+assert.match(previewOnKnownProduction.stderr || '', /không thể dùng làm Preview/i);
+
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
 assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migration 0006 must not change production schema');
