@@ -45,11 +45,21 @@ export async function onRequestGet(context) {
       await context.env.DB.prepare("SELECT scope FROM ai_request_limits LIMIT 1").first();
       quotaTableConfigured = true;
     } catch {}
+    let reviewSchemaColumns = [];
+    try {
+      const schema = await context.env.DB.prepare("PRAGMA table_info(image_ai_reviews)").all();
+      reviewSchemaColumns = (schema.results || []).map(column => String(column.name || ""));
+    } catch {}
+    const requiredReviewColumns = ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "source_image_url", "reference_image_ref", "r2_key"];
+    const missingReviewColumns = requiredReviewColumns.filter(column => !reviewSchemaColumns.includes(column));
     const readiness = {
       workersAiBindingConfigured: Boolean(context.env.AI && typeof context.env.AI.run === "function"),
+      r2BindingConfigured: Boolean(context.env.IMAGES && typeof context.env.IMAGES.get === "function" && typeof context.env.IMAGES.put === "function"),
       elimapiApiKeyConfigured: Boolean(String(context.env.ELIMAPI_API_KEY || "").trim()),
       elimapiImageSearchEnabled: String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() === "true",
       quotaTableConfigured,
+      reviewSchemaConfigured: missingReviewColumns.length === 0,
+      missingReviewColumns,
       externalApiVerified: false,
       workersAiLicenseVerified: false
     };
