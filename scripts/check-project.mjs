@@ -118,6 +118,8 @@ const aiReviewSchemaSource = existsSync(join(root, 'functions/_lib/ai-review-sch
 check(aiReviewSchemaSource.includes('PRAGMA table_info(image_ai_reviews)') && aiReviewSchemaSource.includes('ai_request_limits') && aiReviewSchemaSource.includes('reviewSchemaConfigured'), 'Thiếu bộ kiểm tra schema hàng chờ và quota AI dùng chung');
 check(imageSearchApi.includes('inspectAiReviewSchema') && imageSearchApi.includes('AI_REVIEW_SCHEMA_INCOMPLETE') && imageSearchApi.includes('AI_QUOTA_SCHEMA_MISSING'), 'Image search phải chặn trước quota/API nếu schema D1 chưa đầy đủ');
 check(aiAuditApi.includes('inspectAiReviewSchema') && aiAuditApi.includes('AI_REVIEW_SCHEMA_INCOMPLETE'), 'Image audit phải chặn đọc/ghi/AI khi schema hàng chờ chưa đầy đủ');
+check((aiAuditApi.match(/inspectAiReviewSchema\\(context\\.env\\.DB\\)/g) || []).length >= 3, 'GET/POST/PATCH của image audit đều phải kiểm tra schema trước khi xử lý');
+check(imageTests.includes('approvalWithMissingSchema') && imageTests.includes('approval must not write data before schema preflight'), 'Thiếu kiểm thử chặn duyệt ảnh khi schema D1 chưa đầy đủ');
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
