@@ -29,6 +29,7 @@ This branch is for isolated Preview validation only. It must not be merged into 
 
 ## Latest code validation
 
-- Commit `05790e52a63264e6cb22d610dc83b1ee18e80159`: CI run #727 passed `npm run check` and `npm test`.
-- A regression test now also checks the setup wizard's explicit target and database-confirmation wiring.
+- Commit `0215c280d664e2f21a78339a39e1afbf86716c43`: CI run #731 passed `npm run check` and `npm test`.
+- CI run #728 passed the added regression assertions for the setup wizard's explicit target and database-confirmation wiring.
+- The missing-admin-secret error now names the active environment generically and warns not to reuse secrets across Preview and Production.
 - Code-level CI success does not prove Cloudflare/ElimAPI end-to-end readiness.
