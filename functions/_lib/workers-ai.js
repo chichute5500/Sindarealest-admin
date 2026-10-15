@@ -385,14 +385,43 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   const validSummary = typeof parsed.summary === "string" &&
     parsed.summary.trim().length >= 20 &&
     !/có thể là một sản phẩm thuộc danh mục|dựa trên hình ảnh|chưa có mô tả/i.test(parsed.summary);
+  // Normalize harmless overproduction from the model instead of rejecting otherwise
+  // usable results: trim, deduplicate, and cap visible observations at the schema maximum.
+  // Still fail closed if fewer than three distinct, non-empty observations remain.
+  if (Array.isArray(parsed.visibleFeatures)) {
+    const uniqueFeatures = [];
+    const seen = new Set();
+    for (const value of parsed.visibleFeatures) {
+      if (typeof value !== "string") continue;
+      const feature = value.trim();
+      const key = feature.toLocaleLowerCase();
+      if (feature.length < 3 || seen.has(key)) continue;
+      seen.add(key);
+      uniqueFeatures.push(feature);
+    }
+    parsed.visibleFeatures = uniqueFeatures.slice(0, 6);
+  }
+  if (Array.isArray(parsed.reasons)) {
+    const uniqueReasons = [];
+    const seen = new Set();
+    for (const value of parsed.reasons) {
+      if (typeof value !== "string") continue;
+      const reason = value.trim();
+      const key = reason.toLocaleLowerCase();
+      if (!reason || seen.has(key)) continue;
+      seen.add(key);
+      uniqueReasons.push(reason);
+    }
+    parsed.reasons = uniqueReasons.slice(0, 5);
+  }
   const validFeatures = Array.isArray(parsed.visibleFeatures) &&
-    parsed.visibleFeatures.length >= 3 && parsed.visibleFeatures.length <= 6 &&
+    parsed.visibleFeatures.length >= 3 &&
     parsed.visibleFeatures.every(value => typeof value === "string" && value.trim().length >= 3);
   const reasonIsSpecific = value => typeof value === "string" && value.trim().length >= 18 &&
     !/lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm|cần xem xét|không đủ thông tin|ảnh cho thấy|dựa vào ảnh/i.test(value);
   let reasonsRecovered = false;
   let validReasons = Array.isArray(parsed.reasons) &&
-    parsed.reasons.length >= 2 && parsed.reasons.length <= 5 &&
+    parsed.reasons.length >= 2 &&
     parsed.reasons.every(reasonIsSpecific);
 
   // If the model returns weak reason strings but supplies enough valid visual observations,
