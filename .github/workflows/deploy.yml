@@ -4,8 +4,9 @@ name: Deploy SinDarealest to Cloudflare Pages
 on:
   workflow_dispatch:
   push:
+    # Must match the currently verified Cloudflare Pages Production branch.
     branches:
-      - main
+      - rewrite/ai-system-2026-10-14
 
 permissions:
   contents: read
@@ -45,8 +46,8 @@ jobs:
           test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
 
-      - name: Apply AI review D1 schema
-        run: node scripts/apply-ai-image-migrations.mjs
+      # AI review migrations are deliberately separate from deploy.
+      # Run the guarded migration tool manually with an explicit, verified D1 target.
 
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
