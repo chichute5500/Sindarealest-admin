@@ -53,7 +53,21 @@ const previewOnKnownProduction = spawnSync(process.execPath, ['scripts/apply-ai-
   env: { ...migrationEnv, CLOUDFLARE_D1_DATABASE: 'sindarealest-db', CLOUDFLARE_D1_TARGET: 'preview' }
 });
 assert.notEqual(previewOnKnownProduction.status, 0, 'Known Production D1 must never be accepted as Preview');
-assert.match(previewOnKnownProduction.stderr || '', /không thể dùng làm Preview/i);
+assert.match(previewOnKnownProduction.stderr || '', /chỉ được trỏ tới D1 đã xác minh/i);
+
+const previewOnUnverifiedDatabase = spawnSync(process.execPath, ['scripts/apply-ai-image-migrations.mjs'], {
+  encoding: 'utf8',
+  env: { ...migrationEnv, CLOUDFLARE_D1_DATABASE: 'unknown-preview-db', CLOUDFLARE_D1_TARGET: 'preview' }
+});
+assert.notEqual(previewOnUnverifiedDatabase.status, 0, 'Preview migrations must reject an unverified D1 name');
+assert.match(previewOnUnverifiedDatabase.stderr || '', /sindarealest-ai-preview-db/i);
+
+const productionWithoutDoubleConfirmation = spawnSync(process.execPath, ['scripts/apply-ai-image-migrations.mjs'], {
+  encoding: 'utf8',
+  env: { ...migrationEnv, CLOUDFLARE_D1_DATABASE: 'sindarealest-db', CLOUDFLARE_D1_TARGET: 'production' }
+});
+assert.notEqual(productionWithoutDoubleConfirmation.status, 0, 'Production migration must require explicit opt-in and exact DB confirmation');
+assert.match(productionWithoutDoubleConfirmation.stderr || '', /ALLOW_PRODUCTION_D1_MIGRATIONS/i);
 
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
