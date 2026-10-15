@@ -68,7 +68,7 @@ trắng","visibleFeatures":["da cá sấu","vân đỏ"," đế trắng","dáng 
 let malformedVisionCalls = 0;
 const recoveredMalformedVision = await analyzeProductImage({
   ai: { async run() { malformedVisionCalls++; return { response: malformedVisionJson }; } },
-  imageBase64: validBase64,
+  imageBase64: "aGVsbG8=",
   mimeType: "image/webp",
   title: "Sneaker da cá sấu – Phối màu tương phản",
   sku: "SD-SN004"
