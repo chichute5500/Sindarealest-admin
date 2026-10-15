@@ -358,6 +358,23 @@ const blockedPlan = await searchElimapiProductsByImage({
 assert.equal(blockedPlan.code, "ELIMAPI_IMAGE_SEARCH_PLAN_REQUIRED");
 assert.equal(blockedImageSearchCalls, 1, "a rejected upload must stop before the search request and must not retry");
 
+let planErrorJsonCalls = 0;
+const blockedPlanInJson = await searchElimapiProductsByImage({
+  apiKey: "test-key", platform: "taobao", imageBase64: "aGVsbG8=", mimeType: "image/jpeg",
+  fetchImpl: async url => {
+    planErrorJsonCalls++;
+    if (url.endsWith("/upload-image")) {
+      return { ok: true, status: 200, async json() { return { imageId: "image-plan-error" }; } };
+    }
+    return {
+      ok: true, status: 200,
+      async json() { return { success: false, message: "Image search is not included in the Free plan" }; }
+    };
+  }
+});
+assert.equal(blockedPlanInJson.code, "ELIMAPI_IMAGE_SEARCH_PLAN_REQUIRED", "provider plan messages returned in HTTP 200 JSON must still be classified as plan errors");
+assert.equal(planErrorJsonCalls, 2, "a plan rejection must stop without retrying the image search");
+
 let missingKeyCalls = 0;
 const blockedMissingKey = await searchElimapiProductsByImage({
   apiKey: "", platform: "taobao", imageBase64: "aGVsbG8=", mimeType: "image/jpeg",
