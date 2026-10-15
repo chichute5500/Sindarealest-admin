@@ -278,7 +278,7 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
         modelAssessment: { type: "string", enum: ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"] },
         materialAssessment: { type: "string", enum: ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"] },
         confidence: { type: "string", enum: ["low", "medium", "high"] },
-        reasons: { type: "array", items: { type: "string" } },
+        reasons: { type: "array", minItems: 2, maxItems: 5, items: { type: "string", minLength: 18 } },
         needsHumanReview: { type: "boolean" }
       },
       required: ["summary", "visibleFeatures", "modelAssessment", "materialAssessment", "confidence", "reasons", "needsHumanReview"],
@@ -336,10 +336,29 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   const validFeatures = Array.isArray(parsed.visibleFeatures) &&
     parsed.visibleFeatures.length >= 3 && parsed.visibleFeatures.length <= 6 &&
     parsed.visibleFeatures.every(value => typeof value === "string" && value.trim().length >= 3);
-  const validReasons = Array.isArray(parsed.reasons) &&
+  const reasonIsSpecific = value => typeof value === "string" && value.trim().length >= 18 &&
+    !/lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm|cần xem xét|không đủ thông tin|ảnh cho thấy|dựa vào ảnh/i.test(value);
+  let reasonsRecovered = false;
+  let validReasons = Array.isArray(parsed.reasons) &&
     parsed.reasons.length >= 2 && parsed.reasons.length <= 5 &&
-    parsed.reasons.every(value => typeof value === "string" && value.trim().length >= 8 &&
-      !/lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm/i.test(value));
+    parsed.reasons.every(reasonIsSpecific);
+
+  // If the model returns weak reason strings but supplies enough valid visual observations,
+  // derive cautious explanations from those observations rather than making another billable AI call.
+  // This never infers authenticity or image identity; the resulting record still requires human review.
+  if (!validReasons && validFeatures && Array.isArray(parsed.reasons)) {
+    const groundedFeatures = [...new Set(parsed.visibleFeatures
+      .filter(value => typeof value === "string" && value.trim().length >= 8)
+      .map(value => value.trim().replace(/[.!?。]+$/, "")))];
+    if (groundedFeatures.length >= 2) {
+      parsed.reasons = groundedFeatures.slice(0, 2).map((feature, index) =>
+        index === 0
+          ? `Quan sát trực quan có thể đối chiếu: ${feature}.`
+          : `Một chi tiết trực quan khác cần đối chiếu độc lập: ${feature}.`);
+      validReasons = parsed.reasons.every(reasonIsSpecific);
+      reasonsRecovered = validReasons;
+    }
+  }
   const schemaIssues = [];
   if (typeof parsed.summary !== "string") schemaIssues.push("summary_not_string");
   else {
@@ -383,8 +402,8 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
       type: Array.isArray(parsed.reasons) ? "array" : typeof parsed.reasons,
       count: Array.isArray(parsed.reasons) ? parsed.reasons.length : null,
       invalidItemCount: Array.isArray(parsed.reasons)
-        ? parsed.reasons.filter(value => typeof value !== "string" || value.trim().length < 8 ||
-          /lý do không rõ ràng|dựa trên hình ảnh|cần kiểm tra thêm/i.test(value)).length : null
+        ? parsed.reasons.filter(value => !reasonIsSpecific(value)).length : null,
+      safelyRecoveredFromVisibleFeatures: reasonsRecovered
     },
     enumValidity: Object.fromEntries(Object.entries(allowed).map(([key, values]) => [key, values.includes(parsed[key])])),
     needsHumanReviewType: typeof parsed.needsHumanReview
