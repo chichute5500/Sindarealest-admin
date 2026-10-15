@@ -32,6 +32,11 @@ assert.ok(aiQuotaMigration.includes('CREATE TABLE IF NOT EXISTS ai_request_limit
 const aiMigrationScript = readFileSync('scripts/apply-ai-image-migrations.mjs', 'utf8');
 assert.ok(aiMigrationScript.includes('migrations/0009_ai_request_limits.sql'), 'AI setup must apply migration 0009 before calling the quota guard');
 assert.ok(aiMigrationScript.indexOf('migrations/0007_ai_image_reviews.sql') < aiMigrationScript.indexOf('migrations/0009_ai_request_limits.sql'), 'AI review schema must be applied before the quota migration');
+assert.ok(aiMigrationScript.includes('CLOUDFLARE_D1_TARGET'), 'AI migrations must require an explicit Preview/Production target');
+assert.ok(aiMigrationScript.includes('ALLOW_PRODUCTION_D1_MIGRATIONS') && aiMigrationScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Production AI migration must require explicit opt-in and exact database-name confirmation');
+assert.doesNotMatch(aiMigrationScript, /CLOUDFLARE_D1_DATABASE\\s*\\|\\|\\s*["']sindarealest-db["']/, 'AI migration must not silently default to the known Production database');
+assert.ok(setupScript.includes('productionDbConfirmation') && setupScript.includes("CLOUDFLARE_D1_TARGET: 'production'") && setupScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Setup wizard must confirm the exact Production D1 target before migration');
+assert.ok(setupScript.indexOf('productionDbConfirmation') < setupScript.indexOf("'\\n1/5 · Áp dụng schema SQL idempotent cho D1…'"), 'Exact Production D1 confirmation must occur before any SQL migration');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
 assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migration 0006 must not change production schema');
@@ -44,6 +49,7 @@ assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy')
 assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
 assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
 assert.ok(!workflow.includes('0002_seed_products.sql'), 'Deploy workflow must not seed D1 automatically');
+assert.ok(!workflow.includes('apply-ai-image-migrations.mjs'), 'Deploy workflow must not run AI D1 migrations automatically');
 const wranglerConfig = readFileSync('wrangler.toml', 'utf8');
 assert.ok(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Do not opt into Wrangler production config until actual Pages config has been downloaded and reconciled');
 assert.ok(existsSync('public/index.html'));
