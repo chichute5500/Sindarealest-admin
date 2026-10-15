@@ -205,6 +205,21 @@ export async function onRequestPost(context) {
 export async function onRequestPatch(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
+  // Approval/rejection writes must also fail closed when the queue schema is partial.
+  const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
+  if (!schemaReadiness.reviewSchemaInspectable) {
+    return json({ ok: false, code: "AI_REVIEW_SCHEMA_UNREADABLE", error: "Không thể đọc schema hàng chờ ảnh AI trong D1. Đã chặn thao tác duyệt." }, 503);
+  }
+  if (!schemaReadiness.reviewSchemaConfigured || !schemaReadiness.quotaTableConfigured) {
+    return json({
+      ok: false,
+      code: !schemaReadiness.quotaTableConfigured ? "AI_QUOTA_SCHEMA_MISSING" : "AI_REVIEW_SCHEMA_INCOMPLETE",
+      error: !schemaReadiness.quotaTableConfigured
+        ? "Thiếu bảng giới hạn AI D1. Đã chặn thao tác duyệt."
+        : "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ". Đã chặn thao tác duyệt.",
+      missingColumns: schemaReadiness.missingReviewColumns
+    }, 503);
+  }
   let body;
   try { body = await context.request.json(); } catch { return fail("Yêu cầu duyệt ảnh không hợp lệ."); }
   const id = String(body?.reviewId || "");
