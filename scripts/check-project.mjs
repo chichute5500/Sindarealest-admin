@@ -24,7 +24,7 @@ function runTest(file) {
 for (const required of [
   'package.json', 'wrangler.toml',
   'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
-  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/api/admin/image-candidate.js', 'functions/_lib/workers-ai.js', 'functions/_lib/elimapi.js',
+  'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/api/admin/image-candidate.js', 'functions/_lib/workers-ai.js', 'functions/_lib/elimapi.js', 'functions/_lib/ai-review-schema.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
   'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql', 'migrations/0009_ai_request_limits.sql', 'migrations/0010_ai_image_source_image_url.sql',
@@ -92,6 +92,10 @@ const aiQuotaMigration = existsSync(join(root, 'migrations/0009_ai_request_limit
 check(aiQuotaMigration.includes('CREATE TABLE IF NOT EXISTS ai_request_limits'), 'Migration 0009 thiếu bảng hạn mức Workers AI');
 const aiQuotaScript = existsSync(join(root, 'scripts/apply-ai-image-migrations.mjs')) ? readFileSync(join(root, 'scripts/apply-ai-image-migrations.mjs'), 'utf8') : '';
 check(aiQuotaScript.includes('migrations/0009_ai_request_limits.sql'), 'Script áp dụng migration AI chưa chạy migration 0009 trước khi sử dụng quota');
+check(aiQuotaScript.includes('CLOUDFLARE_D1_TARGET') && aiQuotaScript.includes('ALLOW_PRODUCTION_D1_MIGRATIONS') && aiQuotaScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Migration AI phải yêu cầu chọn môi trường và xác nhận D1 Production tường minh');
+check(!/CLOUDFLARE_D1_DATABASE\\s*\\|\\|\\s*["']sindarealest-db["']/.test(aiQuotaScript), 'Migration AI không được mặc định nhắm tới D1 Production');
+const deployWorkflow = existsSync(join(root, '.github/workflows/deploy.yml')) ? readFileSync(join(root, '.github/workflows/deploy.yml'), 'utf8') : '';
+check(!deployWorkflow.includes('node scripts/apply-ai-image-migrations.mjs'), 'Deploy tự động không được tự ý chạy migration D1 từ xa');
 const aiImageSourceMigration = existsSync(join(root, 'migrations/0010_ai_image_source_image_url.sql')) ? readFileSync(join(root, 'migrations/0010_ai_image_source_image_url.sql'), 'utf8') : '';
 check(aiImageSourceMigration.includes('ADD COLUMN source_image_url') && aiImageSourceMigration.includes('ADD COLUMN reference_image_ref'), 'Migration 0010 thiếu URL CDN ảnh hoặc tham chiếu ảnh gốc');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
@@ -110,6 +114,10 @@ check(mediaRoute.includes('!canServeAiCandidate(review)'), 'Ảnh AI chưa duy�
 check(mediaRoute.includes('private, no-store'), 'Ảnh ứng viên AI chưa được đặt Cache-Control no-store');
 const aiAuditApi = existsSync(join(root, 'functions/api/admin/image-audit.js')) ? readFileSync(join(root, 'functions/api/admin/image-audit.js'), 'utf8') : '';
 check(aiAuditApi.includes('source_url') && aiAuditApi.includes('source_image_url') && aiAuditApi.includes('reference_image_ref') && aiAuditApi.includes('compareCandidate'), 'API kiểm duyệt chưa nối nguồn ảnh, ảnh gốc tham chiếu và so sánh hai ảnh');
+const aiReviewSchemaSource = existsSync(join(root, 'functions/_lib/ai-review-schema.js')) ? readFileSync(join(root, 'functions/_lib/ai-review-schema.js'), 'utf8') : '';
+check(aiReviewSchemaSource.includes('PRAGMA table_info(image_ai_reviews)') && aiReviewSchemaSource.includes('ai_request_limits') && aiReviewSchemaSource.includes('reviewSchemaConfigured'), 'Thiếu bộ kiểm tra schema hàng chờ và quota AI dùng chung');
+check(imageSearchApi.includes('inspectAiReviewSchema') && imageSearchApi.includes('AI_REVIEW_SCHEMA_INCOMPLETE') && imageSearchApi.includes('AI_QUOTA_SCHEMA_MISSING'), 'Image search phải chặn trước quota/API nếu schema D1 chưa đầy đủ');
+check(aiAuditApi.includes('inspectAiReviewSchema') && aiAuditApi.includes('AI_REVIEW_SCHEMA_INCOMPLETE'), 'Image audit phải chặn đọc/ghi/AI khi schema hàng chờ chưa đầy đủ');
 check(aiAuditApi.includes('IMAGES.head(review.r2_key)'), 'API duyệt ảnh AI chưa xác minh ảnh tồn tại trong R2');
 const imageTests = existsSync(join(root, 'tests/image-search.test.mjs')) ? readFileSync(join(root, 'tests/image-search.test.mjs'), 'utf8') : '';
 check(imageTests.includes('pending AI candidate must not be public') && imageTests.includes('approved AI candidate may be public'), 'Thiếu kiểm thử trạng thái công khai của ảnh AI');
