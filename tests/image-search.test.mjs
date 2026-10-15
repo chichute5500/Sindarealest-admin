@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
-import { onRequestPost as postImageAudit, onRequestPatch as patchImageAudit } from "../functions/api/admin/image-audit.js";
+import { onRequestGet as getImageAudit, onRequestPost as postImageAudit, onRequestPatch as patchImageAudit } from "../functions/api/admin/image-audit.js";
 import { onRequestGet as getImageSearch, onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
 import { onRequestGet as getImageProxy } from "../functions/api/admin/image-proxy.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
@@ -109,9 +109,9 @@ assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must distinguish single-image inference from actual image matching");
 assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
-assert.equal(capturedInput.response_format.type, "json_schema", "vision analysis should request the documented Workers AI JSON schema mode");
+assert.equal(capturedInput.response_format.type, "json_schema", "image analysis should request Workers AI structured JSON output");
 assert.deepEqual(capturedInput.response_format.json_schema.required, ["summary", "visibleFeatures", "modelAssessment", "materialAssessment", "confidence", "reasons", "needsHumanReview"]);
-assert.equal(capturedInput.response_format.json_schema.additionalProperties, false);
+assert.equal(capturedInput.response_format.json_schema.additionalProperties, false, "image analysis schema must reject unexpected fields");
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
 const vagueAnalysis = await analyzeProductImage({
@@ -409,8 +409,9 @@ const validPngDataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABC
 
 // Regression tests: an invalid cross-product reference or rejected candidate must be
 // rejected before either D1 AI quota or Workers AI is touched.
-function makeAuditTestDb(review = null) {
+function makeAuditTestDb(review = null, options = {}) {
   const counters = { quotaQueries: 0, writes: 0, aiCalls: 0, storageHeads: 0 };
+  const reviewSchemaColumns = options.reviewSchemaColumns || ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "source_image_url", "reference_image_ref", "r2_key"];
   const product = {
     id: "product-1", sku: "SD001", title: "Giày mẫu", category: "dress-shoes",
     images_json: JSON.stringify(["images/reference.webp"]), published: 1
@@ -425,6 +426,10 @@ function makeAuditTestDb(review = null) {
           if (sql.startsWith("SELECT id,sku,title,category,images_json FROM products WHERE id=?")) return product;
           if (sql.startsWith("SELECT id, sku, title, category, images_json FROM products WHERE id=?")) return product;
           if (sql.startsWith("SELECT * FROM image_ai_reviews WHERE id=")) return review;
+          if (sql === "SELECT scope FROM ai_request_limits LIMIT 1") {
+            if (options.quotaTableMissing) throw new Error("missing table ai_request_limits");
+            return { scope: "workers-ai-rolling-24h" };
+          }
           if (sql.includes("INSERT INTO ai_request_limits")) {
             counters.quotaQueries++;
             return { request_count: 1, window_start: Math.floor(Date.now() / 1000) };
@@ -434,7 +439,8 @@ function makeAuditTestDb(review = null) {
         async run() { counters.writes++; return { success: true }; },
         async all() {
           if (sql === "PRAGMA table_info(image_ai_reviews)") {
-            return { results: ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "source_image_url", "reference_image_ref", "r2_key"].map(name => ({ name })) };
+            if (options.schemaReadFails) throw new Error("cannot inspect schema");
+            return { results: reviewSchemaColumns.map(name => ({ name })) };
           }
           return { results: [] };
         }
@@ -483,8 +489,8 @@ assert.equal(disabledReadiness.readiness.workersAiBindingConfigured, false);
 assert.equal(disabledReadiness.readiness.elimapiApiKeyConfigured, false);
 assert.equal(disabledReadiness.readiness.elimapiImageSearchEnabled, false);
 
-async function postAuditForRegression(body, review = null, aiBinding = { async run() { counters.aiCalls++; return { response: "{}" }; } }) {
-  const { DB, counters } = makeAuditTestDb(review);
+async function postAuditForRegression(body, review = null, aiBinding = { async run() { counters.aiCalls++; return { response: "{}" }; } }, dbOptions = {}) {
+  const { DB, counters } = makeAuditTestDb(review, dbOptions);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
   const request = new Request("https://sindarealest.test/api/admin/image-audit", {
@@ -532,8 +538,18 @@ assert.equal(rejectedCandidate.counters.quotaQueries, 0, "rejected candidates mu
 assert.equal(rejectedCandidate.counters.aiCalls, 0, "rejected candidates must not call Workers AI");
 assert.equal(rejectedCandidate.counters.writes, 0, "rejected candidates must not be rewritten as pending");
 
-async function patchAuditForRegression(review, body) {
-  const { DB, counters } = makeAuditTestDb(review);
+async function getAuditForRegression(dbOptions = {}) {
+  const { DB, counters } = makeAuditTestDb(null, dbOptions);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-audit", {
+    headers: { Cookie: "sd_admin_session=" + session, Origin: "https://sindarealest.test" }
+  });
+  const response = await getImageAudit({ request, env: { DB, ADMIN_PASSWORD: "test-admin-password", SESSION_SECRET: sessionSecret } });
+  return { response, counters };
+}
+async function patchAuditForRegression(review, body, dbOptions = {}) {
+  const { DB, counters } = makeAuditTestDb(review, dbOptions);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
   const request = new Request("https://sindarealest.test/api/admin/image-audit", {
@@ -564,6 +580,30 @@ const approvalWithoutComparison = await patchAuditForRegression({
 assert.equal(approvalWithoutComparison.response.status, 422, "candidate approval must require a recorded two-image comparison");
 assert.equal(approvalWithoutComparison.counters.storageHeads, 0, "uncompared candidates must not be promoted from R2");
 assert.equal(approvalWithoutComparison.counters.writes, 0, "uncompared candidates must not be written to the product gallery");
+
+const queueReadWithoutQuota = await getAuditForRegression({ quotaTableMissing: true });
+assert.equal(queueReadWithoutQuota.response.status, 200, "admin must still be able to inspect the review queue when the AI quota table is missing");
+
+const rejectWithoutQuota = await patchAuditForRegression({
+  id: "review-to-reject", product_id: "product-1",
+  image_kind: "existing", status: "pending",
+  image_ref: "images/reference.webp", r2_key: "", analysis_json: "{}"
+}, { reviewId: "review-to-reject", decision: "reject" }, { quotaTableMissing: true });
+assert.equal(rejectWithoutQuota.response.status, 200, "manual rejection must remain available even if AI quota setup is incomplete");
+assert.equal(rejectWithoutQuota.counters.writes, 1, "manual rejection should write the rejection status without requiring an AI quota table");
+
+const approvalWithMissingSchema = await patchAuditForRegression({
+  id: "review-missing-schema", product_id: "product-1",
+  image_kind: "candidate", status: "pending",
+  image_ref: "/media/" + "b".repeat(36) + "-ai.webp",
+  r2_key: "b".repeat(36) + "-ai.webp", analysis_json: "{}"
+}, { reviewId: "review-missing-schema", decision: "approve" }, {
+  reviewSchemaColumns: ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "r2_key"]
+});
+assert.equal(approvalWithMissingSchema.response.status, 503, "approval must fail closed when the review schema is incomplete");
+assert.equal((await approvalWithMissingSchema.response.json()).code, "AI_REVIEW_SCHEMA_INCOMPLETE");
+assert.equal(approvalWithMissingSchema.counters.writes, 0, "approval must not write data before schema preflight");
+assert.equal(approvalWithMissingSchema.counters.storageHeads, 0, "approval must not inspect/promote R2 candidates before schema preflight");
 
 const malformedAuditImage = await postAuditForRegression({
   action: "analyze", productId: "product-1",
@@ -600,8 +640,8 @@ assert.equal(comparisonWithoutAi.counters.quotaQueries, 0, "missing AI binding m
 assert.equal(comparisonWithoutAi.counters.aiCalls, 0, "missing AI binding must not call a model");
 assert.equal(comparisonWithoutAi.counters.writes, 0, "missing AI binding must not write comparison results");
 
-async function postImageSearchForRegression(body, aiBinding = null) {
-  const { DB, counters } = makeAuditTestDb(null);
+async function postImageSearchForRegression(body, aiBinding = null, dbOptions = {}) {
+  const { DB, counters } = makeAuditTestDb(null, dbOptions);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
   const request = new Request("https://sindarealest.test/api/admin/image-search", {
@@ -618,7 +658,7 @@ async function postImageSearchForRegression(body, aiBinding = null) {
     env: {
       DB, ADMIN_PASSWORD: "test-admin-password",
       SESSION_SECRET: sessionSecret,
-      AI: aiBinding,
+      AI: typeof aiBinding === "function" ? aiBinding(counters) : aiBinding,
       ELIMAPI_API_KEY: "test-key",
       ELIMAPI_IMAGE_SEARCH_ENABLED: "true"
     }
@@ -641,6 +681,62 @@ assert.equal(searchWithoutAi.response.status, 503, "image search must fail clear
 assert.equal(searchWithoutAi.counters.quotaQueries, 0, "missing Workers AI binding must not consume quota before search");
 assert.equal(searchWithoutAi.counters.aiCalls, 0, "missing Workers AI binding must not call a model");
 
+const validSearchBody = {
+  platform: "taobao", productId: "product-1",
+  imageRef: "images/reference.webp", dataUrl: validPngDataUrl
+};
+const schemaBlockedSearch = await postImageSearchForRegression(
+  validSearchBody,
+  counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } }),
+  { reviewSchemaColumns: ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "r2_key"] }
+);
+assert.equal(schemaBlockedSearch.response.status, 503, "image search must stop when required D1 review columns are missing");
+const schemaBlockedPayload = await schemaBlockedSearch.response.json();
+assert.equal(schemaBlockedPayload.code, "AI_REVIEW_SCHEMA_INCOMPLETE");
+assert.deepEqual(schemaBlockedPayload.missingColumns, ["source_image_url", "reference_image_ref"]);
+assert.equal(schemaBlockedSearch.counters.quotaQueries, 0, "missing review columns must block before consuming quota");
+assert.equal(schemaBlockedSearch.counters.aiCalls, 0, "missing review columns must block before calling Workers AI");
+
+const quotaSchemaBlockedSearch = await postImageSearchForRegression(
+  validSearchBody,
+  counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } }),
+  { quotaTableMissing: true }
+);
+assert.equal(quotaSchemaBlockedSearch.response.status, 503, "image search must stop when the D1 quota table is missing");
+assert.equal((await quotaSchemaBlockedSearch.response.json()).code, "AI_QUOTA_SCHEMA_MISSING");
+assert.equal(quotaSchemaBlockedSearch.counters.quotaQueries, 0, "missing quota table must block before quota consumption");
+assert.equal(quotaSchemaBlockedSearch.counters.aiCalls, 0, "missing quota table must block before Workers AI");
+
+const storageBlockedSearch = await postImageSearchForRegression(
+  validSearchBody,
+  counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } })
+);
+assert.equal(storageBlockedSearch.response.status, 503, "image search must stop if R2 cannot support the candidate workflow");
+assert.equal((await storageBlockedSearch.response.json()).code, "IMAGE_STORAGE_BINDING_INCOMPLETE");
+assert.equal(storageBlockedSearch.counters.quotaQueries, 0, "missing R2 operations must block before quota consumption");
+assert.equal(storageBlockedSearch.counters.aiCalls, 0, "missing R2 operations must block before Workers AI");
+
+const unreadableSchemaSearch = await postImageSearchForRegression(
+  validSearchBody,
+  counters => ({ async run() { counters.aiCalls++; return { response: "{}" }; } }),
+  { schemaReadFails: true }
+);
+assert.equal(unreadableSchemaSearch.response.status, 503, "image search must fail closed when D1 schema inspection itself fails");
+assert.equal((await unreadableSchemaSearch.response.json()).code, "AI_REVIEW_SCHEMA_UNREADABLE");
+assert.equal(unreadableSchemaSearch.counters.quotaQueries, 0, "unreadable schema must block before consuming quota");
+assert.equal(unreadableSchemaSearch.counters.aiCalls, 0, "unreadable schema must block before Workers AI");
+
+const auditSchemaBlocked = await postAuditForRegression(
+  { action: "analyze", productId: "product-1", imageRef: "images/reference.webp", dataUrl: validPngDataUrl },
+  null,
+  null,
+  { reviewSchemaColumns: ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "reference_image_ref", "r2_key"] }
+);
+assert.equal(auditSchemaBlocked.response.status, 503, "image audit must stop if a required review column is missing");
+assert.equal((await auditSchemaBlocked.response.json()).code, "AI_REVIEW_SCHEMA_INCOMPLETE");
+assert.equal(auditSchemaBlocked.counters.quotaQueries, 0, "audit schema preflight must happen before quota consumption");
+assert.equal(auditSchemaBlocked.counters.aiCalls, 0, "audit schema preflight must happen before AI calls");
+assert.equal(auditSchemaBlocked.counters.writes, 0, "audit schema preflight must happen before D1 writes");
 
 
 async function getImageProxyForRegression(url) {
