@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
-import { onRequestPost as postImageAudit } from "../functions/api/admin/image-audit.js";
+import { onRequestPost as postImageAudit, onRequestPatch as patchImageAudit } from "../functions/api/admin/image-audit.js";
 import { onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
 import { onRequestGet as getImageProxy } from "../functions/api/admin/image-proxy.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
@@ -369,7 +369,7 @@ const validPngDataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABC
 // Regression tests: an invalid cross-product reference or rejected candidate must be
 // rejected before either D1 AI quota or Workers AI is touched.
 function makeAuditTestDb(review = null) {
-  const counters = { quotaQueries: 0, writes: 0, aiCalls: 0 };
+  const counters = { quotaQueries: 0, writes: 0, aiCalls: 0, storageHeads: 0 };
   const product = {
     id: "product-1", sku: "SD001", title: "Giày mẫu", category: "dress-shoes",
     images_json: JSON.stringify(["images/reference.webp"]), published: 1
@@ -382,7 +382,7 @@ function makeAuditTestDb(review = null) {
         async first() {
           if (sql.startsWith("SELECT id,sku,title,category,images_json,published FROM products WHERE id=?")) return product;
           if (sql.startsWith("SELECT id, sku, title, category, images_json FROM products WHERE id=?")) return product;
-          if (sql.startsWith("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=?")) return review;
+          if (sql.startsWith("SELECT * FROM image_ai_reviews WHERE id=")) return review;
           if (sql.includes("INSERT INTO ai_request_limits")) {
             counters.quotaQueries++;
             return { request_count: 1, window_start: Math.floor(Date.now() / 1000) };
@@ -445,6 +445,39 @@ assert.equal(rejectedCandidate.response.status, 409, "rejected candidates must n
 assert.equal(rejectedCandidate.counters.quotaQueries, 0, "rejected candidates must not consume AI quota");
 assert.equal(rejectedCandidate.counters.aiCalls, 0, "rejected candidates must not call Workers AI");
 assert.equal(rejectedCandidate.counters.writes, 0, "rejected candidates must not be rewritten as pending");
+
+async function patchAuditForRegression(review, body) {
+  const { DB, counters } = makeAuditTestDb(review);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-audit", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: "sd_admin_session=" + session,
+      Origin: "https://sindarealest.test"
+    },
+    body: JSON.stringify(body)
+  });
+  const response = await patchImageAudit({
+    request,
+    env: {
+      DB, ADMIN_PASSWORD: "test-admin-password",
+      SESSION_SECRET: sessionSecret,
+      IMAGES: { async head() { counters.storageHeads++; return {}; }, async delete() {} }
+    }
+  });
+  return { response, counters };
+}
+const approvalWithoutComparison = await patchAuditForRegression({
+  id: "review-uncompared", product_id: "product-1",
+  image_kind: "candidate", status: "pending",
+  image_ref: "/media/" + "a".repeat(36) + "-ai.webp",
+  r2_key: "a".repeat(36) + "-ai.webp", analysis_json: "{}"
+}, { reviewId: "review-uncompared", decision: "approve" });
+assert.equal(approvalWithoutComparison.response.status, 422, "candidate approval must require a recorded two-image comparison");
+assert.equal(approvalWithoutComparison.counters.storageHeads, 0, "uncompared candidates must not be promoted from R2");
+assert.equal(approvalWithoutComparison.counters.writes, 0, "uncompared candidates must not be written to the product gallery");
 
 const malformedAuditImage = await postAuditForRegression({
   action: "analyze", productId: "product-1",
