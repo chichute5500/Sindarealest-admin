@@ -433,7 +433,7 @@ const rejectedCandidateKey = "a".repeat(36) + "-ai.webp";
 const rejectedCandidate = await postAuditForRegression({
   action: "analyze", productId: "product-1",
   reviewId: "review-rejected",
-  dataUrl: "data:image/webp;base64,aGVsbG8="
+  dataUrl: validPngDataUrl
 }, {
   id: "review-rejected", product_id: "product-1",
   image_kind: "candidate", status: "rejected",
