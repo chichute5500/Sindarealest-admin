@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
 import { onRequestPost as postImageAudit } from "../functions/api/admin/image-audit.js";
+import { onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../functions/_lib/ai-quota.js";
@@ -362,6 +363,8 @@ assert.equal(missingKeyCalls, 0, "missing ElimAPI credentials must be rejected b
 
 
 
+const validPngDataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/uO8AAAAASUVORK5CYII=";
+
 // Regression tests: an invalid cross-product reference or rejected candidate must be
 // rejected before either D1 AI quota or Workers AI is touched.
 function makeAuditTestDb(review = null) {
@@ -377,6 +380,7 @@ function makeAuditTestDb(review = null) {
         bind(...args) { this.args = args; return this; },
         async first() {
           if (sql.startsWith("SELECT id,sku,title,category,images_json,published FROM products WHERE id=?")) return product;
+          if (sql.startsWith("SELECT id, sku, title, category, images_json FROM products WHERE id=?")) return product;
           if (sql.startsWith("SELECT * FROM image_ai_reviews WHERE id=? AND product_id=?")) return review;
           if (sql.includes("INSERT INTO ai_request_limits")) {
             counters.quotaQueries++;
@@ -418,7 +422,7 @@ async function postAuditForRegression(body, review = null) {
 const crossProduct = await postAuditForRegression({
   action: "analyze", productId: "product-1",
   imageRef: "images/not-owned-by-product.webp",
-  dataUrl: "data:image/webp;base64,aGVsbG8="
+  dataUrl: validPngDataUrl
 });
 assert.equal(crossProduct.response.status, 422, "cross-product references must fail validation");
 assert.equal(crossProduct.counters.quotaQueries, 0, "invalid references must not consume D1 AI quota");
@@ -440,6 +444,50 @@ assert.equal(rejectedCandidate.response.status, 409, "rejected candidates must n
 assert.equal(rejectedCandidate.counters.quotaQueries, 0, "rejected candidates must not consume AI quota");
 assert.equal(rejectedCandidate.counters.aiCalls, 0, "rejected candidates must not call Workers AI");
 assert.equal(rejectedCandidate.counters.writes, 0, "rejected candidates must not be rewritten as pending");
+
+const malformedAuditImage = await postAuditForRegression({
+  action: "analyze", productId: "product-1",
+  imageRef: "images/reference.webp",
+  dataUrl: "data:image/webp;base64,a"
+});
+assert.equal(malformedAuditImage.response.status, 400, "malformed base64 must be rejected before AI analysis");
+assert.equal(malformedAuditImage.counters.quotaQueries, 0, "malformed image data must not consume AI quota");
+assert.equal(malformedAuditImage.counters.aiCalls, 0, "malformed image data must not call Workers AI");
+assert.equal(malformedAuditImage.counters.writes, 0, "malformed image data must not write a review");
+
+async function postImageSearchForRegression(body) {
+  const { DB, counters } = makeAuditTestDb(null);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-search", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: "sd_admin_session=" + session,
+      Origin: "https://sindarealest.test"
+    },
+    body: JSON.stringify(body)
+  });
+  const response = await postImageSearch({
+    request,
+    env: {
+      DB, ADMIN_PASSWORD: "test-admin-password",
+      SESSION_SECRET: sessionSecret,
+      AI: null,
+      ELIMAPI_API_KEY: "test-key",
+      ELIMAPI_IMAGE_SEARCH_ENABLED: "true"
+    }
+  });
+  return { response, counters };
+}
+const malformedSearchImage = await postImageSearchForRegression({
+  platform: "taobao", productId: "product-1",
+  imageRef: "images/reference.webp", dataUrl: "data:image/webp;base64,a"
+});
+assert.equal(malformedSearchImage.response.status, 400, "image search must reject malformed base64 immediately");
+assert.equal(malformedSearchImage.counters.quotaQueries, 0, "invalid image search data must not consume Workers AI quota");
+assert.equal(malformedSearchImage.counters.aiCalls, 0, "invalid image search data must not call Workers AI");
+
 
 console.log("PASS: AI image audit rejects cross-product references and non-pending candidates before quota/model calls.");
 
