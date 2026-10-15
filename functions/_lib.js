@@ -120,7 +120,7 @@ export async function requireAdmin(context) {
   const { request, env } = context;
   const noDb = dbOrFail(env);
   if (noDb) return { response: noDb };
-  if (!hasSecuritySecrets(env)) return { response: fail("Chưa cấu hình ADMIN_PASSWORD hoặc SESSION_SECRET. Hãy thêm hai secret cho môi trường Production.", 503) };
+  if (!hasSecuritySecrets(env)) return { response: fail("Chưa cấu hình ADMIN_PASSWORD hoặc SESSION_SECRET. Hãy thêm hai secret riêng cho đúng môi trường Cloudflare đang dùng (Preview hoặc Production); không dùng secret của môi trường khác.", 503) };
   if (!await verifySession(request, env)) return { response: fail("Phiên đăng nhập hết hạn hoặc chưa đăng nhập.", 401) };
   if (!sameSiteRequest(request)) return { response: fail("Yêu cầu không cùng website bị từ chối.", 403) };
   return { response: null };
