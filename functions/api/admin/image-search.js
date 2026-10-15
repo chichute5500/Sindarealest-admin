@@ -40,7 +40,20 @@ export async function onRequestGet(context) {
   if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare("SELECT id, sku, title, category, images_json FROM products ORDER BY sort_order ASC, sku ASC LIMIT 2000").all();
-    return json({ ok: true, ...inventoryImages((result.results || []).map(row => ({ id: row.id, sku: row.sku, title: row.title, category: row.category, images_json: row.images_json }))) });
+    let quotaTableConfigured = false;
+    try {
+      await context.env.DB.prepare("SELECT scope FROM ai_request_limits LIMIT 1").first();
+      quotaTableConfigured = true;
+    } catch {}
+    const readiness = {
+      workersAiBindingConfigured: Boolean(context.env.AI && typeof context.env.AI.run === "function"),
+      elimapiApiKeyConfigured: Boolean(String(context.env.ELIMAPI_API_KEY || "").trim()),
+      elimapiImageSearchEnabled: String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() === "true",
+      quotaTableConfigured,
+      externalApiVerified: false,
+      workersAiLicenseVerified: false
+    };
+    return json({ ok: true, readiness, ...inventoryImages((result.results || []).map(row => ({ id: row.id, sku: row.sku, title: row.title, category: row.category, images_json: row.images_json }))) });
   } catch {
     return fail("Không thể quét kho ảnh trong D1. Hãy kiểm tra cấu hình cơ sở dữ liệu.", 503);
   }
