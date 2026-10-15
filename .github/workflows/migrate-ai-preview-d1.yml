@@ -1,0 +1,47 @@
+name: Apply AI image schema to isolated Preview D1
+
+on:
+  push:
+    branches:
+      - fix/ai-review-quota-scope-2026-10-15
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sindarealest-ai-preview-d1-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate-preview:
+    name: Migrate isolated Preview database only
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_D1_DATABASE: sindarealest-ai-preview-db
+      CLOUDFLARE_D1_TARGET: preview
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Wrangler
+        run: npm install --no-audit --no-fund
+
+      - name: Verify this workflow can target Preview only
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          test "$CLOUDFLARE_D1_DATABASE" = "sindarealest-ai-preview-db"
+          test "$CLOUDFLARE_D1_TARGET" = "preview"
+
+      - name: Apply idempotent AI image schema to Preview D1
+        run: node scripts/apply-ai-image-migrations.mjs
