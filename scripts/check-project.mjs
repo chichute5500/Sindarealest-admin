@@ -27,7 +27,7 @@ for (const required of [
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js', 'functions/api/admin/image-search.js', 'functions/api/admin/image-audit.js', 'functions/api/admin/image-proxy.js', 'functions/api/admin/image-candidate.js', 'functions/_lib/workers-ai.js', 'functions/_lib/elimapi.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
-  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql', 'migrations/0010_ai_image_source_image_url.sql',
+  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_ai_image_reviews.sql', 'migrations/0008_ai_image_source_url.sql', 'migrations/0009_ai_request_limits.sql', 'migrations/0010_ai_image_source_image_url.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
 ]) check(existsSync(join(root, required)), `Thiếu tệp bắt buộc: ${required}`);
@@ -88,6 +88,10 @@ const aiReviewMigration = existsSync(join(root, 'migrations/0007_ai_image_review
 check(aiReviewMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 thiếu hàng đợi kiểm duyệt ảnh AI');
 const aiSourceMigration = existsSync(join(root, 'migrations/0008_ai_image_source_url.sql')) ? readFileSync(join(root, 'migrations/0008_ai_image_source_url.sql'), 'utf8') : '';
 check(aiSourceMigration.includes('ALTER TABLE image_ai_reviews ADD COLUMN source_url'), 'Migration 0008 thiếu trường lưu URL nguồn ảnh AI');
+const aiQuotaMigration = existsSync(join(root, 'migrations/0009_ai_request_limits.sql')) ? readFileSync(join(root, 'migrations/0009_ai_request_limits.sql'), 'utf8') : '';
+check(aiQuotaMigration.includes('CREATE TABLE IF NOT EXISTS ai_request_limits'), 'Migration 0009 thiếu bảng hạn mức Workers AI');
+const aiQuotaScript = existsSync(join(root, 'scripts/apply-ai-image-migrations.mjs')) ? readFileSync(join(root, 'scripts/apply-ai-image-migrations.mjs'), 'utf8') : '';
+check(aiQuotaScript.includes('migrations/0009_ai_request_limits.sql'), 'Script áp dụng migration AI chưa chạy migration 0009 trước khi sử dụng quota');
 const aiImageSourceMigration = existsSync(join(root, 'migrations/0010_ai_image_source_image_url.sql')) ? readFileSync(join(root, 'migrations/0010_ai_image_source_image_url.sql'), 'utf8') : '';
 check(aiImageSourceMigration.includes('ADD COLUMN source_image_url') && aiImageSourceMigration.includes('ADD COLUMN reference_image_ref'), 'Migration 0010 thiếu URL CDN ảnh hoặc tham chiếu ảnh gốc');
 const imageSearchApi = existsSync(join(root, 'functions/api/admin/image-search.js')) ? readFileSync(join(root, 'functions/api/admin/image-search.js'), 'utf8') : '';
