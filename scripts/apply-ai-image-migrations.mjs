@@ -31,32 +31,30 @@ function execute(args) {
     stdio: ["ignore", "pipe", "pipe"],
   });
   if (result.error) throw result.error;
-  return { status: result.status, output: `${result.stdout || ""}\n${result.stderr || ""}`.trim() };
+  return { status: result.status, output: String(result.stdout || "") + "\n" + String(result.stderr || "") .trim() };
 }
 
 const baseArgs = ["d1", "execute", database, "--remote"];
 const table = execute([...baseArgs, "--file=migrations/0007_ai_image_reviews.sql"]);
 if (table.status !== 0) {
-  throw new Error(`Không áp dụng được migration 0007 trên D1 ${database}:\n${table.output}`);
+  throw new Error("Không áp dụng được migration 0007 trên D1 " + database + ":\n" + table.output);
 }
 
-// Migration 0007 may have been applied before source_url was introduced.
-// An existing column is accepted; every other D1 error stops execution.
 const column = execute([...baseArgs, "--command=ALTER TABLE image_ai_reviews ADD COLUMN source_url TEXT NOT NULL DEFAULT ''"]);
-if (column.status !== 0 && !/duplicate column name:\\s*source_url/i.test(column.output)) {
-  throw new Error(`Không thể đồng bộ cột source_url trên D1 ${database}:\n${column.output}`);
+if (column.status !== 0 && !/duplicate column name:\s*source_url/i.test(column.output)) {
+  throw new Error("Không thể đồng bộ cột source_url trên D1 " + database + ":\n" + column.output);
 }
 
 const quotaTable = execute([...baseArgs, "--file=migrations/0009_ai_request_limits.sql"]);
 if (quotaTable.status !== 0) {
-  throw new Error(`Không áp dụng được migration 0009 trên D1 ${database}:\n${quotaTable.output}`);
+  throw new Error("Không áp dụng được migration 0009 trên D1 " + database + ":\n" + quotaTable.output);
 }
 
 for (const column of ["source_image_url", "reference_image_ref"]) {
-  const result = execute([...baseArgs, `--command=ALTER TABLE image_ai_reviews ADD COLUMN ${column} TEXT NOT NULL DEFAULT ''`]);
-  if (result.status !== 0 && !new RegExp(`duplicate column name:\\\\s*${column}`, "i").test(result.output)) {
-    throw new Error(`Không thể đồng bộ cột ${column} trên D1 ${database}:\n${result.output}`);
+  const result = execute([...baseArgs, "--command=ALTER TABLE image_ai_reviews ADD COLUMN " + column + " TEXT NOT NULL DEFAULT ''"]);
+  if (result.status !== 0 && !new RegExp("duplicate column name:\\s*" + column, "i").test(result.output)) {
+    throw new Error("Không thể đồng bộ cột " + column + " trên D1 " + database + ":\n" + result.output);
   }
 }
 
-console.log(`D1 ${database} (${target}): image_ai_reviews, source/CDN URLs, reference image and AI quota schema checked/applied.`);
+console.log("D1 " + database + " (" + target + "): image_ai_reviews, source/CDN URLs, reference image and AI quota schema checked/applied.");
