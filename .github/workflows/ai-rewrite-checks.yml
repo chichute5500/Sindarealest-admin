@@ -2,7 +2,7 @@ name: AI rewrite checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, rewrite/ai-system-2026-10-14]
 
 permissions:
   contents: read
