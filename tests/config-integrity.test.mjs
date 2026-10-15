@@ -27,6 +27,11 @@ const aiSourceUrlMigration = readFileSync('migrations/0008_ai_image_source_url.s
 assert.ok(aiQueueMigration.includes('CREATE TABLE IF NOT EXISTS image_ai_reviews'), 'Migration 0007 must create the AI review table');
 assert.ok(!/source_url/.test(aiQueueMigration), 'Migration 0007 must not pre-create a column that migration 0008 adds');
 assert.equal((aiSourceUrlMigration.match(/ADD COLUMN source_url/g) || []).length, 1, 'Migration 0008 must add source_url exactly once in a standard migration sequence');
+const aiQuotaMigration = readFileSync('migrations/0009_ai_request_limits.sql', 'utf8');
+assert.ok(aiQuotaMigration.includes('CREATE TABLE IF NOT EXISTS ai_request_limits'), 'Migration 0009 must create the Workers AI quota table');
+const aiMigrationScript = readFileSync('scripts/apply-ai-image-migrations.mjs', 'utf8');
+assert.ok(aiMigrationScript.includes('migrations/0009_ai_request_limits.sql'), 'AI setup must apply migration 0009 before calling the quota guard');
+assert.ok(aiMigrationScript.indexOf('migrations/0007_ai_image_reviews.sql') < aiMigrationScript.indexOf('migrations/0009_ai_request_limits.sql'), 'AI review schema must be applied before the quota migration');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
 assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migration 0006 must not change production schema');
