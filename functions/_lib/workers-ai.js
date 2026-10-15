@@ -191,7 +191,7 @@ export function parseModelJson(rawText) {
 function parseMarkdownProductImageAnalysis(rawText, title = "") {
   const text = String(rawText || "").replace(/^\uFEFF/, "").trim();
   if (!text) return null;
-  const labelPattern = /(?:^|\n)\s*(?:\*\*|__)?\s*(Summary|Visible Features|Model Assessment|Material Assessment|Confidence|Reasons|Needs Human Review)\s*(?:\*\*|__)?\s*[:：]?\s*|(?:\*\*|__)\s*(Summary|Visible Features|Model Assessment|Material Assessment|Confidence|Reasons|Needs Human Review)\s*(?:\*\*|__)\s*[:：]?\s*/gim;
+  const labelPattern = /(?:^|\n)\s*(?:\*\*|__)?\s*(Summary|Visible Features|Model Assessment|Material Assessment|Confidence|Reasons|Needs Human Review)\s*(?:\*\*|__)?\s*[:：]?\s*|(?:\*\*|__)\s*(Summary|Visible Features|Model Assessment|Material Assessment|Confidence|Reasons|Needs Human Review)\s*[:：]?\s*(?:\*\*|__)\s*/gim;
   const labels = [...text.matchAll(labelPattern)];
   if (!labels.some(match => String(match[1] || match[2] || "").toLowerCase() === "summary") ||
       !labels.some(match => String(match[1] || match[2] || "").toLowerCase() === "visible features")) return null;
