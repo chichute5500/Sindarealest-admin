@@ -244,9 +244,9 @@ function recoverMalformedProductAnalysis(rawText) {
   // stray/unescaped quotes, or missing commas inside visibleFeatures. Recover only
   // when the expected fields and at least three distinct observations are present.
   // This is formatting recovery, not an AI retry or an image/materiality inference.
-  const text = String(rawText || "").replace(/^\\uFEFF/, "").trim();
-  const summaryMatch = text.match(/["']summary["']\\s*:\\s*([\\s\\S]*?)\\s*,\\s*["']visibleFeatures["']\\s*:/i);
-  const featureKey = /["']visibleFeatures["']\\s*:\\s*\\[/i.exec(text);
+  const text = String(rawText || "").replace(/^\uFEFF/, "").trim();
+  const summaryMatch = text.match(/["']summary["']\s*:\s*([\s\S]*?)\s*,\s*["']visibleFeatures["']\s*:/i;
+  const featureKey = /["']visibleFeatures["']\s*:\s*\[/i.exec(text);
   if (!summaryMatch || !featureKey) return null;
 
   let summary = String(summaryMatch[1] || "").trim();
@@ -255,14 +255,14 @@ function recoverMalformedProductAnalysis(rawText) {
   summary = summary
     .replace(/\\(["'\\/])/g, "$1")
     .replace(/\\[nrt]/g, " ")
-    .replace(/[\\u0000-\\u001f]+/g, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/[\u0000-\u001f]+/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
     .slice(0, 400);
 
   const arrayStart = featureKey.index + featureKey[0].length;
   const afterArrayStart = text.slice(arrayStart);
-  const arrayEndMatch = /\\]\\s*,\\s*["'](?:modelAssessment|materialAssessment|confidence|reasons|needsHumanReview)["']\\s*:/i.exec(afterArrayStart);
+  const arrayEndMatch = /\]\s*,\s*["'](?:modelAssessment|materialAssessment|confidence|reasons|needsHumanReview)["']\s*:/i.exec(afterArrayStart);
   if (!arrayEndMatch) return null;
   const arraySource = afterArrayStart.slice(0, arrayEndMatch.index);
 
@@ -274,8 +274,8 @@ function recoverMalformedProductAnalysis(rawText) {
     .replace(/\\[nrt]/g, " ")
     // Stray quotes are syntax debris here; observations themselves remain plain text.
     .replace(/["']/g, "")
-    .replace(/[\\u0000-\\u001f]+/g, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/[\u0000-\u001f]+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 
   const visibleFeatures = [];
@@ -291,8 +291,22 @@ function recoverMalformedProductAnalysis(rawText) {
   if (summary.length < 20 || visibleFeatures.length < 3) return null;
 
   const readEnum = (field, values, fallback) => {
-    const name = field.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\
+    const pattern = new RegExp('"' + field + '"\\s*:\\s*"(' + values.join("|") + ')"', "i");
+    const match = pattern.exec(text);
+    return match ? match[1] : fallback;
+  };
 
+  return {
+    summary,
+    visibleFeatures,
+    modelAssessment: readEnum("modelAssessment", ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"], "uncertain"),
+    materialAssessment: readEnum("materialAssessment", ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"], "uncertain"),
+    confidence: readEnum("confidence", ["low", "medium", "high"], "low"),
+    // The existing validator will create cautious, feature-grounded reasons if needed.
+    reasons: [],
+    needsHumanReview: true
+  };
+}
 
 function parseMarkdownProductImageAnalysis");
     const pattern = new RegExp(`["']?${name}["']?\\\\s*:\\\\s*["']?(${values.join("|")})["']?`, "i");
