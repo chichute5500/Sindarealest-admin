@@ -412,7 +412,12 @@ function makeAuditTestDb(review = null) {
           return null;
         },
         async run() { counters.writes++; return { success: true }; },
-        async all() { return { results: [] }; }
+        async all() {
+          if (sql === "PRAGMA table_info(image_ai_reviews)") {
+            return { results: ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "source_image_url", "reference_image_ref", "r2_key"].map(name => ({ name })) };
+          }
+          return { results: [] };
+        }
       };
       return statement;
     }
@@ -445,6 +450,9 @@ assert.equal(readinessPayload.readiness.workersAiBindingConfigured, true);
 assert.equal(readinessPayload.readiness.elimapiApiKeyConfigured, true);
 assert.equal(readinessPayload.readiness.elimapiImageSearchEnabled, true);
 assert.equal(readinessPayload.readiness.quotaTableConfigured, true);
+assert.equal(readinessPayload.readiness.reviewSchemaConfigured, true, "readiness must verify the required AI review columns");
+assert.deepEqual(readinessPayload.readiness.missingReviewColumns, []);
+assert.equal(readinessPayload.readiness.r2BindingConfigured, false, "readiness must report missing R2 binding in this fixture");
 assert.equal(readinessPayload.readiness.externalApiVerified, false, "readiness must not claim it verified ElimAPI by making a request");
 assert.equal(readinessPayload.readiness.workersAiLicenseVerified, false, "readiness must not claim model license agreement without checking it");
 const disabledReadinessResponse = await getImageSearchForRegression({
