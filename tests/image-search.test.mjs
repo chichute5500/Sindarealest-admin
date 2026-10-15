@@ -106,7 +106,9 @@ assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must distinguish single-image inference from actual image matching");
 assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
-assert.equal(Object.hasOwn(capturedInput, "response_format"), false, "do not send JSON Mode to a vision model unless Cloudflare documents support");
+assert.equal(capturedInput.response_format.type, "json_schema", "image analysis should request Workers AI structured JSON output");
+assert.deepEqual(capturedInput.response_format.json_schema.required, ["summary", "visibleFeatures", "modelAssessment", "materialAssessment", "confidence", "reasons", "needsHumanReview"]);
+assert.equal(capturedInput.response_format.json_schema.additionalProperties, false, "image analysis schema must reject unexpected fields");
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
 const vagueAnalysis = await analyzeProductImage({
