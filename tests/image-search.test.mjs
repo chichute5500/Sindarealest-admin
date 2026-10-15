@@ -492,12 +492,13 @@ assert.equal(malformedSearchImage.counters.aiCalls, 0, "invalid image search dat
 
 
 async function getImageProxyForRegression(url) {
+  const { DB } = makeAuditTestDb(null);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
   const request = new Request("https://sindarealest.test/api/admin/image-proxy?url=" + encodeURIComponent(url), {
     headers: { Cookie: "sd_admin_session=" + session, Origin: "https://sindarealest.test" }
   });
-  return getImageProxy({ request, env: { ADMIN_PASSWORD: "test-admin-password", SESSION_SECRET: sessionSecret } });
+  return getImageProxy({ request, env: { DB, ADMIN_PASSWORD: "test-admin-password", SESSION_SECRET: sessionSecret } });
 }
 const originalFetch = globalThis.fetch;
 let proxyFetchCalls = 0;
