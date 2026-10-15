@@ -46,7 +46,7 @@ jobs:
           test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
 
       # AI review migrations are deliberately separate from deploy.
-      # Run scripts/apply-ai-image-migrations.mjs manually with an explicit, verified D1 target.
+      # Run the guarded migration tool manually with an explicit, verified D1 target.
 
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
