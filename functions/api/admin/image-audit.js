@@ -41,13 +41,11 @@ export async function onRequestGet(context) {
   if (!schemaReadiness.reviewSchemaInspectable) {
     return json({ ok: false, code: "AI_REVIEW_SCHEMA_UNREADABLE", error: "Không thể đọc schema hàng chờ ảnh AI trong D1." }, 503);
   }
-  if (!schemaReadiness.reviewSchemaConfigured || !schemaReadiness.quotaTableConfigured) {
+  if (!schemaReadiness.reviewSchemaConfigured) {
     return json({
       ok: false,
-      code: !schemaReadiness.quotaTableConfigured ? "AI_QUOTA_SCHEMA_MISSING" : "AI_REVIEW_SCHEMA_INCOMPLETE",
-      error: !schemaReadiness.quotaTableConfigured
-        ? "Thiếu bảng giới hạn AI D1."
-        : "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ".",
+      code: "AI_REVIEW_SCHEMA_INCOMPLETE",
+      error: "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ".",
       missingColumns: schemaReadiness.missingReviewColumns
     }, 503);
   }
@@ -65,27 +63,31 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  // Keep all writes/model calls disabled until every required D1 column and
-  // the quota table can be verified by a read-only preflight.
+  let body;
+  try { body = await context.request.json(); } catch { return fail("Dữ liệu ảnh không hợp lệ."); }
+  const action = String(body?.action || "");
+  if (!["analyze", "uploadCandidate", "compareCandidate"].includes(action)) return fail("Thao tác AI không hợp lệ.");
+
+  // All queue mutations require the review schema; only model actions require
+  // the quota table. Upload/reject/review operations must remain available
+  // even when AI rate-limit setup is incomplete.
   const schemaReadiness = await inspectAiReviewSchema(context.env.DB);
   if (!schemaReadiness.reviewSchemaInspectable) {
     return json({ ok: false, code: "AI_REVIEW_SCHEMA_UNREADABLE", error: "Không thể đọc schema hàng chờ ảnh AI trong D1. Đã chặn thao tác." }, 503);
   }
-  if (!schemaReadiness.reviewSchemaConfigured || !schemaReadiness.quotaTableConfigured) {
+  if (!schemaReadiness.reviewSchemaConfigured) {
     return json({
       ok: false,
-      code: !schemaReadiness.quotaTableConfigured ? "AI_QUOTA_SCHEMA_MISSING" : "AI_REVIEW_SCHEMA_INCOMPLETE",
-      error: !schemaReadiness.quotaTableConfigured
-        ? "Thiếu bảng giới hạn AI D1. Đã chặn thao tác."
-        : "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ". Đã chặn thao tác.",
+      code: "AI_REVIEW_SCHEMA_INCOMPLETE",
+      error: "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ". Đã chặn thao tác.",
       missingColumns: schemaReadiness.missingReviewColumns
     }, 503);
   }
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Dữ liệu ảnh không hợp lệ."); }
-  const action = String(body?.action || "");
+  if (["analyze", "compareCandidate"].includes(action) && !schemaReadiness.quotaTableConfigured) {
+    return json({ ok: false, code: "AI_QUOTA_SCHEMA_MISSING", error: "Thiếu bảng giới hạn AI D1. Đã chặn gọi Workers AI." }, 503);
+  }
+
   const db = context.env.DB;
-  if (!["analyze", "uploadCandidate", "compareCandidate"].includes(action)) return fail("Thao tác AI không hợp lệ.");
   const productId = String(body?.productId || "").slice(0, 100);
   const product = await getProduct(db, productId).catch(() => null);
   if (!product) return fail("Không tìm thấy sản phẩm.", 404);
@@ -210,13 +212,11 @@ export async function onRequestPatch(context) {
   if (!schemaReadiness.reviewSchemaInspectable) {
     return json({ ok: false, code: "AI_REVIEW_SCHEMA_UNREADABLE", error: "Không thể đọc schema hàng chờ ảnh AI trong D1. Đã chặn thao tác duyệt." }, 503);
   }
-  if (!schemaReadiness.reviewSchemaConfigured || !schemaReadiness.quotaTableConfigured) {
+  if (!schemaReadiness.reviewSchemaConfigured) {
     return json({
       ok: false,
-      code: !schemaReadiness.quotaTableConfigured ? "AI_QUOTA_SCHEMA_MISSING" : "AI_REVIEW_SCHEMA_INCOMPLETE",
-      error: !schemaReadiness.quotaTableConfigured
-        ? "Thiếu bảng giới hạn AI D1. Đã chặn thao tác duyệt."
-        : "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ". Đã chặn thao tác duyệt.",
+      code: "AI_REVIEW_SCHEMA_INCOMPLETE",
+      error: "Schema hàng chờ ảnh AI thiếu cột: " + schemaReadiness.missingReviewColumns.join(", ") + ". Đã chặn thao tác duyệt.",
       missingColumns: schemaReadiness.missingReviewColumns
     }, 503);
   }
