@@ -14,6 +14,7 @@ assert.equal(isAllowedSourceProductUrl("https://detail.1688.com/offer/offer001.h
 assert.equal(isAllowedSourceProductUrl("javascript:alert(1)"), false);
 assert.equal(isAllowedSourceProductUrl("https://item.taobao.com.evil.example/item.htm?id=12345"), false);
 assert.equal(isAllowedSourceProductUrl("https://detail.1688.com/search?foo=bar"), false);
+assert.equal(isAllowedSourceProductUrl("https://detail.1688.com./item.htm?id=12345"), false, "a trailing-dot 1688 host must not fall through to the Taobao URL-path validator");
 assert.equal(isAllowedSourceImageUrl("https://img.alicdn.com/example.jpg"), true);
 assert.equal(isAllowedSourceImageUrl("http://img.alicdn.com/example.jpg"), false);
 assert.equal(isAllowedSourceImageUrl("https://example.com/pixel.jpg"), false);
