@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
-import { onRequestPost as postImageAudit, onRequestPatch as patchImageAudit } from "../functions/api/admin/image-audit.js";
+import { onRequestGet as getImageAudit, onRequestPost as postImageAudit, onRequestPatch as patchImageAudit } from "../functions/api/admin/image-audit.js";
 import { onRequestGet as getImageSearch, onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
 import { onRequestGet as getImageProxy } from "../functions/api/admin/image-proxy.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
@@ -518,6 +518,16 @@ assert.equal(rejectedCandidate.counters.quotaQueries, 0, "rejected candidates mu
 assert.equal(rejectedCandidate.counters.aiCalls, 0, "rejected candidates must not call Workers AI");
 assert.equal(rejectedCandidate.counters.writes, 0, "rejected candidates must not be rewritten as pending");
 
+async function getAuditForRegression(dbOptions = {}) {
+  const { DB, counters } = makeAuditTestDb(null, dbOptions);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-audit", {
+    headers: { Cookie: "sd_admin_session=" + session, Origin: "https://sindarealest.test" }
+  });
+  const response = await getImageAudit({ request, env: { DB, ADMIN_PASSWORD: "test-admin-password", SESSION_SECRET: sessionSecret } });
+  return { response, counters };
+}
 async function patchAuditForRegression(review, body, dbOptions = {}) {
   const { DB, counters } = makeAuditTestDb(review, dbOptions);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
@@ -550,6 +560,17 @@ const approvalWithoutComparison = await patchAuditForRegression({
 assert.equal(approvalWithoutComparison.response.status, 422, "candidate approval must require a recorded two-image comparison");
 assert.equal(approvalWithoutComparison.counters.storageHeads, 0, "uncompared candidates must not be promoted from R2");
 assert.equal(approvalWithoutComparison.counters.writes, 0, "uncompared candidates must not be written to the product gallery");
+
+const queueReadWithoutQuota = await getAuditForRegression({ quotaTableMissing: true });
+assert.equal(queueReadWithoutQuota.response.status, 200, "admin must still be able to inspect the review queue when the AI quota table is missing");
+
+const rejectWithoutQuota = await patchAuditForRegression({
+  id: "review-to-reject", product_id: "product-1",
+  image_kind: "existing", status: "pending",
+  image_ref: "images/reference.webp", r2_key: "", analysis_json: "{}"
+}, { reviewId: "review-to-reject", decision: "reject" }, { quotaTableMissing: true });
+assert.equal(rejectWithoutQuota.response.status, 200, "manual rejection must remain available even if AI quota setup is incomplete");
+assert.equal(rejectWithoutQuota.counters.writes, 1, "manual rejection should write the rejection status without requiring an AI quota table");
 
 const approvalWithMissingSchema = await patchAuditForRegression({
   id: "review-missing-schema", product_id: "product-1",
