@@ -239,6 +239,70 @@ export function parseModelJson(rawText) {
   return null;
 }
 
+function recoverMalformedProductAnalysis(rawText) {
+  // Recover common near-JSON formatting mistakes in vision-model output only when
+  // summary + at least three distinct observations survive. No AI retry or new claims.
+  const text = String(rawText || "").replace(/^\uFEFF/, "").trim();
+  const summaryMatch = text.match(/["']summary["']\s*:\s*([\s\S]*?)\s*,\s*["']visibleFeatures["']\s*:/i);
+  const featureKey = /["']visibleFeatures["']\s*:\s*\[/i.exec(text);
+  if (!summaryMatch || !featureKey) return null;
+
+  let summary = String(summaryMatch[1] || "").trim();
+  if (summary.startsWith('"') || summary.startsWith("'")) summary = summary.slice(1);
+  if (summary.endsWith('"') || summary.endsWith("'")) summary = summary.slice(0, -1);
+  summary = summary
+    .replace(/\\(["'\\/])/g, "$1")
+    .replace(/\\[nrt]/g, " ")
+    .replace(/[\u0000-\u001f]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 400);
+
+  const arrayStart = featureKey.index + featureKey[0].length;
+  const afterArrayStart = text.slice(arrayStart);
+  const arrayEndMatch = /\]\s*,\s*["'](?:modelAssessment|materialAssessment|confidence|reasons|needsHumanReview)["']\s*:/i.exec(afterArrayStart);
+  if (!arrayEndMatch) return null;
+  const arraySource = afterArrayStart.slice(0, arrayEndMatch.index);
+
+  const normalizeItem = value => String(value || "")
+    .trim()
+    .replace(/^["']+/, "")
+    .replace(/["']+$/, "")
+    .replace(/\\(["'\\/])/g, "$1")
+    .replace(/\\[nrt]/g, " ")
+    .replace(/["']/g, "")
+    .replace(/[\u0000-\u001f]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const visibleFeatures = [];
+  const seen = new Set();
+  for (const chunk of arraySource.split(",")) {
+    const feature = normalizeItem(chunk);
+    const key = feature.toLocaleLowerCase();
+    if (feature.length < 3 || feature.length > 120 || seen.has(key)) continue;
+    seen.add(key);
+    visibleFeatures.push(feature);
+    if (visibleFeatures.length === 6) break;
+  }
+  if (summary.length < 20 || visibleFeatures.length < 3) return null;
+
+  const readEnum = (field, values, fallback) => {
+    const pattern = new RegExp('"' + field + '"\\s*:\\s*"(' + values.join("|") + ')"', "i");
+    const match = pattern.exec(text);
+    return match ? match[1] : fallback;
+  };
+
+  return {
+    summary,
+    visibleFeatures,
+    modelAssessment: readEnum("modelAssessment", ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"], "uncertain"),
+    materialAssessment: readEnum("materialAssessment", ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"], "uncertain"),
+    confidence: readEnum("confidence", ["low", "medium", "high"], "low"),
+    reasons: [],
+    needsHumanReview: true
+  };
+}
 
 function parseMarkdownProductImageAnalysis(rawText, title = "") {
   const text = String(rawText || "").replace(/^\uFEFF/, "").trim();
@@ -339,6 +403,18 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
   });
   if (output.error) return output;
   let parsed = parseModelJson(output.text);
+  if (!parsed) {
+    parsed = recoverMalformedProductAnalysis(output.text);
+    if (parsed) {
+      console.warn("[Workers AI diagnostic]", JSON.stringify({
+        event: "workers_ai_malformed_json_recovered",
+        model: output.model,
+        responseLength: output.text.length,
+        visibleFeatureCount: parsed.visibleFeatures.length,
+        needsHumanReview: true
+      }));
+    }
+  }
   if (!parsed) {
     parsed = parseMarkdownProductImageAnalysis(output.text, title);
     if (parsed) {

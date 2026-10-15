@@ -61,6 +61,24 @@ const fencedJson = "\uFEFF" + "\x60\x60\x60json\n{\"ok\":true}\n\x60\x60\x60";
 assert.deepEqual(parseModelJson(fencedJson), { ok: true }, "parser should correctly strip a BOM and Markdown JSON fence");
 assert.equal(parseModelJson('Model answer: {"summary":"shoe with {curved} stitching","ok":true} trailing note').summary, "shoe with {curved} stitching", "parser should handle braces inside quoted strings and harmless surrounding prose");
 assert.equal(parseModelJson('before {"broken": } then {"valid":true} after').valid, true, "parser should recover a later complete JSON object when an earlier brace block is malformed");
+
+const malformedVisionJson = `{"summary":"Giày sneakers da cá sấu đen với
+vân đỏ và đế
+trắng","visibleFeatures":["da cá sấu","vân đỏ"," đế trắng","dáng mũi thấp", kiểu cổ thấp","kiểu dây lacing","kiểu vân bề mặt da cá sấu","kiểu đế cao""kiểu đế dày","kiểu đế trắng"],"modelAssessment":"same_model_possible","materialAssessment":"crocodile_claim_unverified","confidence":"low","reasons":["cần kiểm tra thêm"],"needsHumanReview":true}`;
+let malformedVisionCalls = 0;
+const recoveredMalformedVision = await analyzeProductImage({
+  ai: { async run() { malformedVisionCalls++; return { response: malformedVisionJson }; } },
+  imageBase64: "aGVsbG8=",
+  mimeType: "image/webp",
+  title: "Sneaker da cá sấu – Phối màu tương phản",
+  sku: "SD-SN004"
+});
+assert.equal(malformedVisionCalls, 1, "malformed JSON recovery must not make a second AI call");
+assert.ok(recoveredMalformedVision.analysis, "recover a product analysis from the reported malformed feature-array pattern");
+assert.ok(recoveredMalformedVision.analysis.visibleFeatures.includes("kiểu cổ thấp"), "recover an unquoted feature item");
+assert.ok(recoveredMalformedVision.analysis.visibleFeatures.length >= 3, "retain at least three distinct visual observations");
+assert.equal(recoveredMalformedVision.analysis.needsHumanReview, true, "recovered model output must remain pending human review");
+
 const unavailableComparison = await compareProductImages();
 assert.equal(unavailableComparison.available, false);
 assert.equal(unavailableComparison.similarityScore, null);
