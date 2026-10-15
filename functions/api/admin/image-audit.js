@@ -111,6 +111,9 @@ export async function onRequestPost(context) {
     const parsed = parseDataImage(body?.dataUrl);
     if (parsed?.error) return fail(parsed.error, parsed.status);
     if (!parsed || parsed.mimeType !== "image/webp") return fail("Ảnh ghép đối chiếu phải là WebP hợp lệ.", 400);
+    if (!context.env.AI || typeof context.env.AI.run !== "function") {
+      return json({ ok: false, error: "Chưa cấu hình binding Workers AI có tên AI cho môi trường này. Không tiêu hao quota khi thiếu binding.", code: "WORKERS_AI_BINDING_MISSING" }, 503);
+    }
     const quota = await consumeWorkersAiRequest(db);
     if (!quota.ok) return fail(quota.error, quota.status);
     const result = await compareProductImages({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, sku: product.sku });
@@ -152,6 +155,9 @@ export async function onRequestPost(context) {
     }
   }
 
+  if (!context.env.AI || typeof context.env.AI.run !== "function") {
+    return json({ ok: false, error: "Chưa cấu hình binding Workers AI có tên AI cho môi trường này. Không tiêu hao quota khi thiếu binding.", code: "WORKERS_AI_BINDING_MISSING" }, 503);
+  }
   const quota = await consumeWorkersAiRequest(db);
   if (!quota.ok) return fail(quota.error, quota.status);
   const result = await analyzeProductImage({ ai: context.env.AI, imageBase64: parsed.base64, mimeType: parsed.mimeType, title: product.title, category: product.category, sku: product.sku });
