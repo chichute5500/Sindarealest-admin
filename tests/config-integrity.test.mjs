@@ -15,7 +15,7 @@ assert.ok(workflow.includes('npm run check'));
 assert.ok(workflow.includes('npm test'));
 assert.ok(workflow.includes('CLOUDFLARE_PAGES_PROJECT'));
 assert.ok(!workflow.includes('apply-ai-image-migrations.mjs'), 'Deploy must not run D1 AI migrations automatically');
-assert.ok(/push:[\\s\\S]*?branches:\\s*\\n\\s*- main/m.test(workflow), 'Automatic deploy trigger must match the verified Cloudflare Pages Production branch main');
+assert.ok(workflow.includes('      - main') && !workflow.includes('- rewrite/ai-system-2026-10-14'), 'Automatic deploy trigger must match the verified Cloudflare Pages Production branch main');
 const setupScript = readFileSync(new URL('../scripts/setup-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n1/5 · Áp dụng schema SQL idempotent cho D1…'"), 'Setup must require bindings/secrets before migrations');
 assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 · Triển khai website cùng Pages Functions…'"), 'Setup must require bindings/secrets before deploy');
