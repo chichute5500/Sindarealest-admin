@@ -145,7 +145,7 @@ function safePayloadText(payload) {
 function elimapiFailure(response, payload, operation) {
   const providerText = safePayloadText(payload);
   const mentionsImagePlan = /free|plan|subscription|upgrade|not available|not included|feature.*disabled|gói|nâng cấp|không hỗ trợ/i.test(providerText);
-  if ((response.status === 403 || response.status === 400 || response.status === 422) && mentionsImagePlan) {
+  if ((response.status === 403 || response.status === 400 || response.status === 422 || response.status === 502) && mentionsImagePlan) {
     return {
       error: "Gói ElimAPI hiện tại có thể chưa hỗ trợ tìm kiếm bằng ảnh. Tài liệu ElimAPI ghi tính năng này không có trong gói miễn phí; hãy kiểm tra gói trong tài khoản trước khi thử lại.",
       status: 422,
