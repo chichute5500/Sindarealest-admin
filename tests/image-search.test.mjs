@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
 import { onRequestPost as postImageAudit } from "../functions/api/admin/image-audit.js";
 import { onRequestPost as postImageSearch } from "../functions/api/admin/image-search.js";
+import { onRequestGet as getImageProxy } from "../functions/api/admin/image-proxy.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../functions/_lib/image-audit.js";
 import { analyzeProductImage, compareProductImages, generateSearchKeywords, parseModelJson, runWorkersAiVision, WORKERS_AI_VISION_MODEL } from "../functions/_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../functions/_lib/ai-quota.js";
@@ -488,6 +489,34 @@ assert.equal(malformedSearchImage.response.status, 400, "image search must rejec
 assert.equal(malformedSearchImage.counters.quotaQueries, 0, "invalid image search data must not consume Workers AI quota");
 assert.equal(malformedSearchImage.counters.aiCalls, 0, "invalid image search data must not call Workers AI");
 
+
+
+async function getImageProxyForRegression(url) {
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test/api/admin/image-proxy?url=" + encodeURIComponent(url), {
+    headers: { Cookie: "sd_admin_session=" + session, Origin: "https://sindarealest.test" }
+  });
+  return getImageProxy({ request, env: { ADMIN_PASSWORD: "test-admin-password", SESSION_SECRET: sessionSecret } });
+}
+const originalFetch = globalThis.fetch;
+let proxyFetchCalls = 0;
+try {
+  globalThis.fetch = async () => {
+    proxyFetchCalls++;
+    return new Response(null, { status: 302, headers: { Location: "https://evil.example/metadata" } });
+  };
+  const redirectAttack = await getImageProxyForRegression("https://img.alicdn.com/example.webp");
+  assert.equal(redirectAttack.status, 502, "image proxy must reject redirects to untrusted hosts");
+  assert.equal(proxyFetchCalls, 1, "image proxy must stop before fetching an untrusted redirect target");
+
+  proxyFetchCalls = 0;
+  const invalidInitialHost = await getImageProxyForRegression("https://evil.example/pixel.webp");
+  assert.equal(invalidInitialHost.status, 400, "image proxy must reject an untrusted initial host");
+  assert.equal(proxyFetchCalls, 0, "untrusted initial URLs must be rejected before network access");
+} finally {
+  globalThis.fetch = originalFetch;
+}
 
 console.log("PASS: AI image audit rejects cross-product references and non-pending candidates before quota/model calls.");
 
