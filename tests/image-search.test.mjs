@@ -105,7 +105,7 @@ assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must distinguish single-image inference from actual image matching");
 assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
-assert.deepEqual(capturedInput.response_format, { type: "json_object" }, "Workers AI JSON mode should be enabled for structured model outputs");
+assert.equal(Object.hasOwn(capturedInput, "response_format"), false, "do not send JSON Mode to a vision model unless Cloudflare documents support");
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
 const vagueAnalysis = await analyzeProductImage({
@@ -136,7 +136,7 @@ assert.equal(nested.text, "nested documented-style response", "accept a nested r
 const nestedResponse = await runWorkersAiVision({ ai: { async run() { return { response: { text: "text nested under response" } }; } }, prompt: "test", imageBase64: validBase64 });
 assert.equal(nestedResponse.text, "text nested under response", "accept a response.text envelope");
 const structuredObject = await runWorkersAiVision({
-  ai: { async run(model, input) { assert.deepEqual(input.response_format, { type: "json_object" }); return { response: { summary: "Brown shoe", confidence: "low" } }; } },
+  ai: { async run(model, input) { assert.equal(Object.hasOwn(input, "response_format"), false); return { response: { summary: "Brown shoe", confidence: "low" } }; } },
   prompt: "Return JSON", imageBase64: validBase64
 });
 assert.equal(structuredObject.text, JSON.stringify({ summary: "Brown shoe", confidence: "low" }), "accept a structured JSON object returned directly by Workers AI JSON mode");
