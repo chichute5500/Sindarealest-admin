@@ -93,7 +93,7 @@ check(aiQuotaMigration.includes('CREATE TABLE IF NOT EXISTS ai_request_limits'),
 const aiQuotaScript = existsSync(join(root, 'scripts/apply-ai-image-migrations.mjs')) ? readFileSync(join(root, 'scripts/apply-ai-image-migrations.mjs'), 'utf8') : '';
 check(aiQuotaScript.includes('migrations/0009_ai_request_limits.sql'), 'Script áp dụng migration AI chưa chạy migration 0009 trước khi sử dụng quota');
 check(aiQuotaScript.includes('CLOUDFLARE_D1_TARGET') && aiQuotaScript.includes('ALLOW_PRODUCTION_D1_MIGRATIONS') && aiQuotaScript.includes('CONFIRM_PRODUCTION_D1_DATABASE'), 'Migration AI phải yêu cầu chọn môi trường và xác nhận D1 Production tường minh');
-check(!/CLOUDFLARE_D1_DATABASE\\s*\\|\\|\\s*["']sindarealest-db["']/.test(aiQuotaScript), 'Migration AI không được mặc định nhắm tới D1 Production');
+check(!/CLOUDFLARE_D1_DATABASE\s*\|\|\s*["']sindarealest-db["']/.test(aiQuotaScript), 'Migration AI không được mặc định nhắm tới D1 Production');
 const deployWorkflow = existsSync(join(root, '.github/workflows/deploy.yml')) ? readFileSync(join(root, '.github/workflows/deploy.yml'), 'utf8') : '';
 check(!deployWorkflow.includes('node scripts/apply-ai-image-migrations.mjs'), 'Deploy tự động không được tự ý chạy migration D1 từ xa');
 const aiImageSourceMigration = existsSync(join(root, 'migrations/0010_ai_image_source_image_url.sql')) ? readFileSync(join(root, 'migrations/0010_ai_image_source_image_url.sql'), 'utf8') : '';
