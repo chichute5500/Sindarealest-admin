@@ -6,6 +6,7 @@ const wrangler = resolve("node_modules/wrangler/bin/wrangler.js");
 const database = String(process.env.CLOUDFLARE_D1_DATABASE || "").trim();
 const target = String(process.env.CLOUDFLARE_D1_TARGET || "").trim().toLowerCase();
 const knownProductionDatabase = "sindarealest-db";
+const knownPreviewDatabase = "sindarealest-ai-preview-db";
 
 if (!existsSync(wrangler)) throw new Error("Chưa cài Wrangler; không thể áp dụng migration D1.");
 if (!database) {
@@ -15,8 +16,8 @@ if (!/^[A-Za-z0-9_-]+$/.test(database)) throw new Error("Tên D1 database không
 if (!["preview", "production"].includes(target)) {
   throw new Error("Đã chặn migration: đặt CLOUDFLARE_D1_TARGET=preview hoặc production một cách tường minh. Không có lệnh D1 từ xa nào được chạy.");
 }
-if (target === "preview" && database === knownProductionDatabase) {
-  throw new Error("Đã chặn migration: sindarealest-db là D1 Production đã biết, không thể dùng làm Preview.");
+if (target === "preview" && database !== knownPreviewDatabase) {
+  throw new Error("Đã chặn migration: môi trường Preview của dự án này chỉ được trỏ tới D1 đã xác minh sindarealest-ai-preview-db. Không có lệnh D1 từ xa nào được chạy.");
 }
 if (target === "production" &&
     (process.env.ALLOW_PRODUCTION_D1_MIGRATIONS !== "true" ||
