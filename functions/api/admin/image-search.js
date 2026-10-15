@@ -65,6 +65,13 @@ export async function onRequestPost(context) {
   if (!String(context.env.ELIMAPI_API_KEY || "").trim()) {
     return json({ ok: false, error: "Chưa cấu hình Secret ELIMAPI_API_KEY trong môi trường Preview của Cloudflare. Đã chặn yêu cầu trước khi gọi Workers AI để không tiêu hao quota vô ích.", code: "ELIMAPI_KEY_MISSING" }, 503);
   }
+  if (String(context.env.ELIMAPI_IMAGE_SEARCH_ENABLED || "").trim().toLowerCase() !== "true") {
+    return json({
+      ok: false,
+      error: "Tìm kiếm bằng ảnh đang tắt an toàn. Chỉ đặt biến Preview ELIMAPI_IMAGE_SEARCH_ENABLED=true sau khi đã xác nhận gói ElimAPI hỗ trợ tìm kiếm bằng ảnh và cho phép sử dụng quota.",
+      code: "ELIMAPI_IMAGE_SEARCH_DISABLED"
+    }, 503);
+  }
   const quota = await consumeWorkersAiRequest(context.env.DB);
   if (!quota.ok) return fail(quota.error, quota.status);
 
