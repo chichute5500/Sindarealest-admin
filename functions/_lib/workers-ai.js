@@ -50,7 +50,7 @@ function classifyAiError(error) {
   return { error: "Workers AI không hoàn thành yêu cầu phân tích. Kiểm tra trạng thái model và log của Cloudflare; hệ thống không tự gọi lại.", status: 502, code: "WORKERS_AI_REQUEST_FAILED" };
 }
 
-export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "image/webp", maxTokens = 768 }) {
+export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "image/webp", maxTokens = 768, responseSchema = null }) {
   if (!ai || typeof ai.run !== "function") return { error: "Chưa cấu hình binding Workers AI có tên AI cho Cloudflare Pages/Workers.", status: 503, code: "WORKERS_AI_BINDING_MISSING" };
   const image = decodeImage(imageBase64, mimeType);
   if (image.error) return image;
@@ -59,9 +59,13 @@ export async function runWorkersAiVision({ ai, prompt, imageBase64, mimeType = "
       prompt: String(prompt || "").slice(0, 12000),
       image: `data:${image.mimeType};base64,${image.base64}`,
       max_tokens: Math.max(64, Math.min(1024, Number(maxTokens) || 768)),
-      temperature: 0.1
-      // This vision model is not listed among Cloudflare Workers AI JSON Mode models.
-      // Enforce structured output with the prompt and strict server-side parsing instead.
+      temperature: 0.1,
+      ...(responseSchema && typeof responseSchema === "object" ? {
+        response_format: {
+          type: "json_schema",
+          json_schema: responseSchema
+        }
+      } : {})
     });
     // Safe diagnostics: log response shape only, never prompts, image bytes, or field contents.
     const diagnostic = {
@@ -199,7 +203,23 @@ export async function analyzeProductImage({ ai, imageBase64, mimeType = "image/w
     "Keep each observation concise and the complete JSON compact (ideally under 500 tokens). Escape all string contents correctly, close every array/object, and end immediately after the final closing brace.",
     "Metadata for context only (do not treat as visual evidence): SKU " + String(sku).slice(0, 60) + "; tên " + String(title).slice(0, 180) + "; danh mục " + String(category).slice(0, 80) + "."
   ].join("\n");
-  const output = await runWorkersAiVision({ ai, prompt, imageBase64, mimeType, maxTokens: 1024 });
+  const output = await runWorkersAiVision({
+    ai, prompt, imageBase64, mimeType, maxTokens: 1024,
+    responseSchema: {
+      type: "object",
+      properties: {
+        summary: { type: "string" },
+        visibleFeatures: { type: "array", items: { type: "string" } },
+        modelAssessment: { type: "string", enum: ["same_model_possible", "different_model_possible", "different_angle_possible", "uncertain"] },
+        materialAssessment: { type: "string", enum: ["possible_synthetic", "crocodile_claim_unverified", "no_visible_evidence", "uncertain"] },
+        confidence: { type: "string", enum: ["low", "medium", "high"] },
+        reasons: { type: "array", items: { type: "string" } },
+        needsHumanReview: { type: "boolean" }
+      },
+      required: ["summary", "visibleFeatures", "modelAssessment", "materialAssessment", "confidence", "reasons", "needsHumanReview"],
+      additionalProperties: false
+    }
+  });
   if (output.error) return output;
   const parsed = parseModelJson(output.text);
   if (!parsed) {
