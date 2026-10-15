@@ -124,6 +124,24 @@ const vagueAnalysis = await analyzeProductImage({
   imageBase64: validBase64, title: "Giày Sneaker", sku: "SD-SN001"
 });
 assert.equal(vagueAnalysis.code, "WORKERS_AI_INVALID_SCHEMA", "reject generic summaries and insufficient visual evidence instead of saving them");
+const weakReasonsAnalysis = await analyzeProductImage({
+  ai: { async run() { return { response: JSON.stringify({
+    summary: "Giày sneaker màu đen, cổ cao, đế dày và bề mặt có vân nổi.",
+    visibleFeatures: ["Màu đen đồng đều trên thân giày", "Cổ giày cao ôm quanh mắt cá", "Đế ngoài dày với đường viền rõ", "Bề mặt có vân nổi dạng ô"],
+    modelAssessment: "uncertain",
+    materialAssessment: "crocodile_claim_unverified",
+    confidence: "low",
+    reasons: ["Dựa trên hình ảnh", "Cần kiểm tra thêm"],
+    needsHumanReview: true
+  }) }; } },
+  imageBase64: validBase64, title: "Sneaker da cá sấu", sku: "SD-SN001"
+});
+assert.ok(weakReasonsAnalysis.analysis, "weak reasons should be safely rebuilt only from sufficiently specific visual features");
+assert.equal(weakReasonsAnalysis.analysis.reasons.length, 2);
+assert.match(weakReasonsAnalysis.analysis.reasons[0], /Màu đen đồng đều trên thân giày/);
+assert.match(weakReasonsAnalysis.analysis.reasons[1], /Cổ giày cao ôm quanh mắt cá/);
+assert.equal(weakReasonsAnalysis.analysis.needsHumanReview, true, "recovered reasons must still require human review");
+
 assert.ok(capturedInput.prompt.includes("summary phải mô tả trực tiếp"), "prompt requires specific visible observations instead of repeating metadata");
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must prevent unsupported single-image identity verification");
 
