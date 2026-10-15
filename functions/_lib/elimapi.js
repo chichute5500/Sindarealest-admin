@@ -130,3 +130,129 @@ export async function searchElimapiProducts({ apiKey, platform, query, fetchImpl
   if (payload.ok === false || payload.success === false || payload.error) return { error: "Elimapi không hoàn thành tìm kiếm. Kiểm tra hạn mức và tham số API.", status: 502, code: "ELIMAPI_SEARCH_FAILED" };
   return { products: normalizeElimapiProducts(items, platform), total: payload?.paginate?.total ?? payload?.data?.paginate?.total ?? items.length };
 }
+
+
+const ELIMAPI_UPLOAD_IMAGE_URL = "https://openapi.elim.asia/v2/products/upload-image";
+const ELIMAPI_IMAGE_SEARCH_URL = "https://openapi.elim.asia/v2/products/search-by-image";
+
+function safePayloadText(payload) {
+  return [payload?.message, payload?.error, payload?.detail, payload?.code, payload?.error?.message]
+    .filter(value => typeof value === "string")
+    .join(" ")
+    .slice(0, 800);
+}
+
+function elimapiFailure(response, payload, operation) {
+  const providerText = safePayloadText(payload);
+  const mentionsImagePlan = /free|plan|subscription|upgrade|not available|not included|feature.*disabled|gói|nâng cấp|không hỗ trợ/i.test(providerText);
+  if ((response.status === 403 || response.status === 400 || response.status === 422) && mentionsImagePlan) {
+    return {
+      error: "Gói ElimAPI hiện tại có thể chưa hỗ trợ tìm kiếm bằng ảnh. Tài liệu ElimAPI ghi tính năng này không có trong gói miễn phí; hãy kiểm tra gói trong tài khoản trước khi thử lại.",
+      status: 422,
+      code: "ELIMAPI_IMAGE_SEARCH_PLAN_REQUIRED"
+    };
+  }
+  if (response.status === 401 || response.status === 403) {
+    return { error: "ElimAPI từ chối xác thực hoặc quyền truy cập. Kiểm tra API key và quyền sử dụng tính năng ảnh.", status: 502, code: "ELIMAPI_AUTH_FAILED" };
+  }
+  if (response.status === 429) {
+    return { error: "ElimAPI báo hết hạn mức hoặc giới hạn yêu cầu. Không tự động gọi lại.", status: 429, code: "ELIMAPI_QUOTA" };
+  }
+  return {
+    error: "ElimAPI không hoàn thành " + operation + " (HTTP " + response.status + "). Không tự động gọi lại để tránh phát sinh thêm lượt API.",
+    status: 502,
+    code: "ELIMAPI_IMAGE_UPSTREAM_ERROR"
+  };
+}
+
+/**
+ * Search marketplace products with the selected product image itself.
+ * This requires two ElimAPI requests (upload-image, then search-by-image).
+ * Neither request is retried, and the caller is expected to invoke this only
+ * after an explicit admin action. Image-search may require a paid ElimAPI plan.
+ */
+export async function searchElimapiProductsByImage({ apiKey, platform, imageBase64, mimeType, query = "", fetchImpl = fetch }) {
+  const key = String(apiKey || "").trim();
+  if (!key) return { error: "Chưa cấu hình Secret ELIMAPI_API_KEY trong môi trường Preview của Cloudflare. Đã chặn trước khi gọi Workers AI hoặc ElimAPI.", status: 503, code: "ELIMAPI_KEY_MISSING" };
+  if (!["taobao", "1688"].includes(platform)) return { error: "Nền tảng tìm kiếm không hợp lệ.", status: 400, code: "ELIMAPI_PLATFORM_INVALID" };
+
+  const normalizedMime = String(mimeType || "").toLowerCase() === "image/jpg" ? "image/jpeg" : String(mimeType || "").toLowerCase();
+  const acceptedMime = new Set(["image/jpeg", "image/png", "image/webp"]);
+  const base64 = String(imageBase64 || "").replace(/^data:image\/(?:jpeg|jpg|png|webp);base64,/i, "");
+  if (!acceptedMime.has(normalizedMime) || !base64 || base64.length > 7_000_000 || !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) {
+    return { error: "Ảnh tìm kiếm không hợp lệ hoặc vượt giới hạn 5 MB.", status: 400, code: "ELIMAPI_IMAGE_INVALID" };
+  }
+
+  let bytes;
+  try {
+    const binary = atob(base64);
+    if (!binary.length || binary.length > 5 * 1024 * 1024) return { error: "Ảnh tìm kiếm phải nhỏ hơn hoặc bằng 5 MB.", status: 413, code: "ELIMAPI_IMAGE_TOO_LARGE" };
+    bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+  } catch {
+    return { error: "Không giải mã được dữ liệu ảnh tìm kiếm.", status: 400, code: "ELIMAPI_IMAGE_INVALID" };
+  }
+
+  const apiPlatform = platform === "1688" ? "alibaba" : "taobao";
+  const extension = normalizedMime === "image/png" ? "png" : normalizedMime === "image/webp" ? "webp" : "jpg";
+  const form = new FormData();
+  form.append("file", new Blob([bytes], { type: normalizedMime }), "reference." + extension);
+  form.append("platform", apiPlatform);
+
+  let uploaded;
+  try {
+    const response = await fetchImpl(ELIMAPI_UPLOAD_IMAGE_URL, {
+      method: "POST",
+      headers: { "x-api-key": key },
+      body: form,
+      signal: AbortSignal.timeout(15000)
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) return elimapiFailure(response, payload, "tải ảnh lên ElimAPI");
+    if (!payload || typeof payload !== "object") return { error: "ElimAPI trả về dữ liệu upload không hợp lệ.", status: 502, code: "ELIMAPI_IMAGE_UPLOAD_INVALID" };
+    uploaded = payload.imageId || payload.image_id || payload.data?.imageId || payload.data?.image_id;
+    if (typeof uploaded !== "string" || !uploaded.trim() || uploaded.length > 200) {
+      return { error: "ElimAPI không trả imageId hợp lệ sau khi tải ảnh lên.", status: 502, code: "ELIMAPI_IMAGE_ID_MISSING" };
+    }
+  } catch (error) {
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") return { error: "ElimAPI quá thời gian tải ảnh. Không tự động gọi lại.", status: 504, code: "ELIMAPI_IMAGE_UPLOAD_TIMEOUT" };
+    return { error: "Không kết nối được ElimAPI khi tải ảnh. Không tự động gọi lại.", status: 502, code: "ELIMAPI_IMAGE_UPLOAD_NETWORK_ERROR" };
+  }
+
+  const keyword = String(query || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 220);
+  let response;
+  try {
+    response = await fetchImpl(ELIMAPI_IMAGE_SEARCH_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": key },
+      body: JSON.stringify({
+        platform: apiPlatform,
+        imgId: uploaded.trim(),
+        ...(keyword ? { keyword } : {}),
+        keywordTranslate: Boolean(keyword),
+        lang: "vi",
+        sort: "SALE_QTY_DESC",
+        page: 1,
+        size: 20
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+  } catch (error) {
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") return { error: "ElimAPI quá thời gian tìm kiếm bằng ảnh. Không tự động gửi lại yêu cầu.", status: 504, code: "ELIMAPI_IMAGE_SEARCH_TIMEOUT" };
+    return { error: "Không kết nối được ElimAPI khi tìm kiếm bằng ảnh. Không tự động gửi lại yêu cầu.", status: 502, code: "ELIMAPI_IMAGE_SEARCH_NETWORK_ERROR" };
+  }
+
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) return elimapiFailure(response, payload, "tìm kiếm bằng ảnh");
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return { error: "ElimAPI trả về dữ liệu tìm kiếm ảnh không đúng định dạng JSON.", status: 502, code: "ELIMAPI_IMAGE_SEARCH_INVALID" };
+  }
+  if (payload.ok === false || payload.success === false || payload.error) {
+    return elimapiFailure({ status: 502 }, payload, "tìm kiếm bằng ảnh");
+  }
+  const items = unwrapItems(payload);
+  return {
+    products: normalizeElimapiProducts(items, platform),
+    total: payload?.paginate?.total ?? payload?.data?.paginate?.total ?? items.length,
+    searchMode: "image"
+  };
+}
