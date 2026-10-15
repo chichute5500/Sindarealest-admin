@@ -47,6 +47,8 @@ assert.equal(evaluateSearchCandidate({ title: "真鳄鱼皮鞋", similarityScore
 assert.equal(parseModelJson('{"keywords":["鳄鱼皮鞋"]}').keywords[0], "鳄鱼皮鞋");
 assert.equal(parseModelJson('\\x60\\x60\\x60json\\n{"keywords":["鞋"]}\\n\\x60\\x60\\x60').keywords[0], "鞋");
 assert.equal(parseModelJson("no json here"), null);
+const fencedJson = "\uFEFF" + "\x60\x60\x60json\n{\"ok\":true}\n\x60\x60\x60";
+assert.deepEqual(parseModelJson(fencedJson), { ok: true }, "parser should correctly strip a BOM and Markdown JSON fence");
 assert.equal(parseModelJson('Model answer: {"summary":"shoe with {curved} stitching","ok":true} trailing note').summary, "shoe with {curved} stitching", "parser should handle braces inside quoted strings and harmless surrounding prose");
 assert.equal(parseModelJson('before {"broken": } then {"valid":true} after').valid, true, "parser should recover a later complete JSON object when an earlier brace block is malformed");
 const unavailableComparison = await compareProductImages();
@@ -60,6 +62,7 @@ const pairComparison = await compareProductImages({
     assert.equal(model, WORKERS_AI_VISION_MODEL);
     assert.ok(input.prompt.includes("BÊN TRÁI = ảnh gốc"));
     assert.ok(input.prompt.includes("Do not return any numeric similarity score"));
+     assert.equal(input.response_format.type, "json_schema", "pair comparison should request a JSON schema");
     return { response: JSON.stringify({
       verdict: "same_model_likely",
       similarities: ["Cùng dáng mũi giày"],
@@ -106,7 +109,9 @@ assert.equal(capturedModel, WORKERS_AI_VISION_MODEL);
 assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must distinguish single-image inference from actual image matching");
 assert.equal(capturedInput.image, "data:image/webp;base64,aGVsbG8=", "vision image is passed as a base64 data URL supported by Cloudflare");
 assert.equal(capturedInput.temperature, 0.1);
-assert.equal(Object.hasOwn(capturedInput, "response_format"), false, "do not send JSON Mode to a vision model unless Cloudflare documents support");
+assert.equal(capturedInput.response_format.type, "json_schema", "vision analysis should request the documented Workers AI JSON schema mode");
+assert.deepEqual(capturedInput.response_format.json_schema.required, ["summary", "visibleFeatures", "modelAssessment", "materialAssessment", "confidence", "reasons", "needsHumanReview"]);
+assert.equal(capturedInput.response_format.json_schema.additionalProperties, false);
 assert.equal(analyzed.analysis.provider, "Cloudflare Workers AI");
 assert.equal(analyzed.analysis.needsHumanReview, true);
 const vagueAnalysis = await analyzeProductImage({
@@ -124,7 +129,7 @@ assert.ok(capturedInput.prompt.includes("một ảnh đơn"), "prompt must preve
 
 calls = 0;
 const search = await generateSearchKeywords({
-  ai: { async run(model, input) { calls++; assert.equal(model, WORKERS_AI_VISION_MODEL); assert.ok(input.prompt.includes("1688")); return { response: '{"keywords":["鳄鱼皮男鞋","复古皮鞋"],"visualSummary":"男鞋"}' }; } },
+  ai: { async run(model, input) { calls++; assert.equal(model, WORKERS_AI_VISION_MODEL); assert.ok(input.prompt.includes("1688")); assert.equal(input.response_format.type, "json_schema", "keyword generation should request a JSON schema"); return { response: '{"keywords":["鳄鱼皮男鞋","复古皮鞋"],"visualSummary":"男鞋"}' }; } },
   imageBase64: validBase64, mimeType: "image/jpeg", platform: "1688"
 });
 assert.deepEqual(search.keywords, ["鳄鱼皮男鞋", "复古皮鞋"]);
@@ -173,6 +178,21 @@ assert.match(invalidJson.error, /unexpectedly plain text/, "admin-visible error 
 assert.match(invalidJsonDiagnostic, /workers_ai_invalid_json/, "invalid JSON must emit a diagnostic event");
 assert.match(invalidJsonDiagnostic, /unexpectedly plain text/, "diagnostic must include a short sanitized preview of model output");
 assert.match(invalidJsonDiagnostic, /responseLength/, "diagnostic must include the response length");
+
+const markdownAnalysis = "**Summary** Sneaker da cá sấu – Tuyển chọn 01, màu đen, dáng mũi rộng, cổ cao, đế dày, bề mặt có vân giống da cá sấu. **Visible Features:** * Màu đen * Dáng mũi rộng * Cổ cao * Đế dày * Bề mặt có vân giống da cá sấu **Model Assessment:** [WORKERS_AI_INVALID_JSON]";
+let markdownCalls = 0;
+const recoveredAnalysis = await analyzeProductImage({
+  ai: { async run(model, input) { markdownCalls++; assert.equal(input.response_format.type, "json_schema"); return { response: markdownAnalysis }; } },
+  imageBase64: validBase64, title: "Sneaker da cá sấu – Tuyển chọn 01", sku: "SD-SN001"
+});
+assert.ok(recoveredAnalysis.analysis, "valid visual data in Markdown should be safely normalized instead of rejected");
+assert.equal(markdownCalls, 1, "Markdown recovery must not issue a second billable AI request");
+assert.equal(recoveredAnalysis.analysis.modelAssessment, "uncertain", "an error placeholder must not be treated as a positive model assessment");
+assert.equal(recoveredAnalysis.analysis.materialAssessment, "crocodile_claim_unverified", "a crocodile-like pattern must not imply genuine material authenticity");
+assert.equal(recoveredAnalysis.analysis.confidence, "low", "recovered Markdown starts with conservative confidence");
+assert.equal(recoveredAnalysis.analysis.needsHumanReview, true, "recovered single-image analysis must always require human review");
+assert.ok(recoveredAnalysis.analysis.visibleFeatures.length >= 3 && recoveredAnalysis.analysis.visibleFeatures.length <= 6);
+assert.match(recoveredAnalysis.analysis.summary, /màu đen/i);
 let responseDiagnostic = "";
 const originalInfo = console.info;
 console.info = (...args) => { responseDiagnostic += args.join(" "); };
