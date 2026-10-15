@@ -17,7 +17,6 @@ const REQUIRED_AI_REVIEW_COLUMNS = [
  */
 export async function inspectAiReviewSchema(db) {
   let reviewSchemaInspectable = false;
-  let columns = [];
   let missingReviewColumns = [...REQUIRED_AI_REVIEW_COLUMNS];
 
   if (db) {
@@ -25,7 +24,7 @@ export async function inspectAiReviewSchema(db) {
       const schema = await db.prepare("PRAGMA table_info(image_ai_reviews)").all();
       if (Array.isArray(schema?.results)) {
         reviewSchemaInspectable = true;
-        columns = schema.results.map(column => String(column?.name || ""));
+        const columns = schema.results.map(column => String(column?.name || ""));
         missingReviewColumns = REQUIRED_AI_REVIEW_COLUMNS.filter(column => !columns.includes(column));
       }
     } catch {
