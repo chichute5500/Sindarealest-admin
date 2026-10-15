@@ -518,8 +518,8 @@ assert.equal(rejectedCandidate.counters.quotaQueries, 0, "rejected candidates mu
 assert.equal(rejectedCandidate.counters.aiCalls, 0, "rejected candidates must not call Workers AI");
 assert.equal(rejectedCandidate.counters.writes, 0, "rejected candidates must not be rewritten as pending");
 
-async function patchAuditForRegression(review, body) {
-  const { DB, counters } = makeAuditTestDb(review);
+async function patchAuditForRegression(review, body, dbOptions = {}) {
+  const { DB, counters } = makeAuditTestDb(review, dbOptions);
   const sessionSecret = "test-session-secret-".padEnd(40, "x");
   const session = await createSession(sessionSecret);
   const request = new Request("https://sindarealest.test/api/admin/image-audit", {
@@ -550,6 +550,19 @@ const approvalWithoutComparison = await patchAuditForRegression({
 assert.equal(approvalWithoutComparison.response.status, 422, "candidate approval must require a recorded two-image comparison");
 assert.equal(approvalWithoutComparison.counters.storageHeads, 0, "uncompared candidates must not be promoted from R2");
 assert.equal(approvalWithoutComparison.counters.writes, 0, "uncompared candidates must not be written to the product gallery");
+
+const approvalWithMissingSchema = await patchAuditForRegression({
+  id: "review-missing-schema", product_id: "product-1",
+  image_kind: "candidate", status: "pending",
+  image_ref: "/media/" + "b".repeat(36) + "-ai.webp",
+  r2_key: "b".repeat(36) + "-ai.webp", analysis_json: "{}"
+}, { reviewId: "review-missing-schema", decision: "approve" }, {
+  reviewSchemaColumns: ["id", "product_id", "image_ref", "image_kind", "status", "analysis_json", "source_url", "r2_key"]
+});
+assert.equal(approvalWithMissingSchema.response.status, 503, "approval must fail closed when the review schema is incomplete");
+assert.equal((await approvalWithMissingSchema.response.json()).code, "AI_REVIEW_SCHEMA_INCOMPLETE");
+assert.equal(approvalWithMissingSchema.counters.writes, 0, "approval must not write data before schema preflight");
+assert.equal(approvalWithMissingSchema.counters.storageHeads, 0, "approval must not inspect/promote R2 candidates before schema preflight");
 
 const malformedAuditImage = await postAuditForRegression({
   action: "analyze", productId: "product-1",
