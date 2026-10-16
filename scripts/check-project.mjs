@@ -23,10 +23,10 @@ function runTest(file) {
 
 for (const required of [
   'package.json', 'wrangler.toml',
-  'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/[[path]].js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
+  'functions/_lib.js', 'functions/_lib/watermark-settings.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/[[path]].js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
-  'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
-  'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
+  'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/watermark-logo.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
+  'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/watermark-logo.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
   'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
@@ -79,7 +79,13 @@ check(seedSkus.every(sku => source.some(p => p.sku === sku)), 'SKU trong SQL see
 const homepage = existsSync(join(root, 'public/index.html')) ? readFileSync(join(root, 'public/index.html'), 'utf8') : '';
 check(homepage.includes("fetch('/api/products'"), 'Trang chủ chưa lấy sản phẩm từ API');
 check(homepage.includes('og:title') && homepage.includes('twitter:card'), 'Thiếu metadata social preview');
-check(homepage.includes('opacity:.68'), 'Watermark chưa đặt độ mờ theo phương án');
+check(homepage.includes('sd-viewer-watermark') && homepage.includes("document.querySelector('.detail-image-stage')"), 'Watermark phải được áp dụng ở trình xem chi tiết sản phẩm');
+check(!homepage.includes("document.querySelectorAll('.product-photo,.detail-image-stage,.detail-thumb')"), 'Watermark không được phủ thẻ danh sách và thumbnail');
+const adminPageForWatermark = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
+check(adminPageForWatermark.includes('watermarkSettingsForm') && adminPageForWatermark.includes('watermarkLogoFile'), 'Admin thiếu cài đặt logo/vị trí/kích thước/độ mờ watermark');
+check(!/watermarkApplied|ctx\\.drawImage\\(markBitmap/.test(adminPageForWatermark), 'Không được đóng dấu cố định vào ảnh sản phẩm khi tải lên');
+const uploadApiForWatermark = existsSync(join(root, 'functions/api/admin/upload.js')) ? readFileSync(join(root, 'functions/api/admin/upload.js'), 'utf8') : '';
+check(uploadApiForWatermark.includes('private-originals/') && uploadApiForWatermark.includes('public-optimized-derivative'), 'Upload phải tách ảnh gốc riêng tư khỏi bản hiển thị');
 check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claims'), 'Trang chủ chưa kết nối yêu cầu đặt hàng và bảo hành');
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
@@ -134,7 +140,7 @@ for (const secretFile of ['.env', '.dev.vars', '.env.production', '.dev.vars.pro
   check(!existsSync(join(root, secretFile)), `Không đưa tệp bí mật ${secretFile} vào source/ZIP`);
 }
 
-for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs']) {
+for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs', 'tests/watermark-integrity.test.mjs']) {
   if (existsSync(join(root, file))) runTest(file);
 }
 
