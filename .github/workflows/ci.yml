@@ -1,7 +1,10 @@
 name: Validate source, tests, and Pages routing
 
 on:
+  # Keep one run per PR update. Production deployment has its own validation gate.
   push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
