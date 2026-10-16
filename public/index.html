@@ -99,7 +99,7 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .detail-main-image{cursor:zoom-in}
 .detail-zoom-btn{position:absolute;top:12px;left:12px;z-index:4;display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(20,18,15,.42);color:#fff;font-size:24px;line-height:1;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:zoom-in;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .detail-zoom-btn:hover{background:rgba(157,119,58,.82)}
-.detail-image-count{position:absolute;left:50%;right:auto;bottom:12px;z-index:2;transform:translateX(-50%);padding:5px 9px;border:1px solid rgba(255,255,255,.4);border-radius:999px;background:rgba(10,10,10,.42);color:#fff;backdrop-filter:blur(12px);font-size:9px;letter-spacing:.12em}
+
 .sd-fullscreen-viewer{position:fixed;inset:0;z-index:230;display:none;overflow:hidden;background:rgba(34,30,24,.68);color:#fff;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;backdrop-filter:blur(26px) saturate(1.25);-webkit-backdrop-filter:blur(26px) saturate(1.25)}
 .sd-fullscreen-viewer.open{display:block;animation:overlayIn .2s ease both}
 .sd-fullscreen-viewer:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(246,237,218,.12),rgba(24,22,19,.38));pointer-events:none}
@@ -108,7 +108,7 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .sd-fullscreen-stage{z-index:1}
 .sd-fullscreen-frame{border:1px solid rgba(255,255,255,.42);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25),0 0 0 1px rgba(255,255,255,.08)}
 .sd-fullscreen-close,.sd-fullscreen-arrow{display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:0;font-family:Arial,sans-serif;font-weight:400;text-align:center;line-height:1;border:1px solid rgba(255,255,255,.55);background:rgba(238,231,216,.18);box-shadow:0 8px 25px rgba(0,0,0,.18)}
-.sd-fullscreen-count{bottom:calc(78px + env(safe-area-inset-bottom));padding:7px 12px;border:1px solid rgba(255,255,255,.48);background:rgba(238,231,216,.2);box-shadow:0 8px 25px rgba(0,0,0,.12);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+
 .sd-fullscreen-thumbs{position:absolute;z-index:5;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;overflow-x:auto;padding:8px 16px;scrollbar-width:none;overscroll-behavior-x:contain}
 .sd-fullscreen-thumbs::-webkit-scrollbar{display:none}
 .sd-fullscreen-thumb{position:relative;flex:0 0 58px;width:58px;height:58px;padding:0;overflow:hidden;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:rgba(255,255,255,.1);opacity:.72;box-shadow:0 4px 12px rgba(0,0,0,.15)}
@@ -128,14 +128,14 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .sd-fullscreen-close{top:calc(13px + env(safe-area-inset-top));right:14px}
 .sd-fullscreen-arrow{top:50%;transform:translateY(-50%);font-size:32px}
 .sd-fullscreen-prev{left:12px}.sd-fullscreen-next{right:12px}
-.sd-fullscreen-count{position:absolute;z-index:7;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:7px 12px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(25,25,25,.78);font-size:11px;letter-spacing:.1em;color:#fff;white-space:nowrap}
+
 .sd-fullscreen-viewer button:focus-visible{outline:2px solid #e0bb75;outline-offset:3px}
 @media(max-width:760px){.sd-fullscreen-stage{padding:calc(66px + env(safe-area-inset-top)) 44px calc(72px + env(safe-area-inset-bottom))}.sd-fullscreen-close,.sd-fullscreen-arrow{width:38px;height:38px}.sd-fullscreen-prev{left:5px}.sd-fullscreen-next{right:5px}.sd-fullscreen-header{left:12px;right:66px}.sd-fullscreen-title{font-size:11px}.sd-fullscreen-brand{width:29px;height:29px}}
 .detail-main-image{transition:opacity .34s cubic-bezier(.22,.61,.36,1),transform .62s cubic-bezier(.22,.61,.36,1),filter .34s ease!important;will-change:opacity,transform}
 .detail-main-image.is-changing{opacity:.18;transform:scale(.975);filter:blur(3px)}
 .detail-gallery-arrow{position:absolute;top:50%;z-index:2;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;transform:translateY(-50%);border:1px solid rgba(255,255,255,.65);background:rgba(20,18,15,.33);color:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);font-size:23px;line-height:1;box-shadow:0 6px 20px rgba(0,0,0,.15);transition:background .25s ease,transform .25s ease,opacity .25s ease}
 .detail-gallery-arrow:hover{background:rgba(157,119,58,.8);transform:translateY(-50%) scale(1.06)}.detail-gallery-prev{left:12px}.detail-gallery-next{right:12px}
-.detail-image-count{position:absolute;right:12px;bottom:12px;z-index:2;padding:5px 9px;border:1px solid rgba(255,255,255,.4);border-radius:999px;background:rgba(10,10,10,.34);color:#fff;backdrop-filter:blur(12px);font-size:9px;letter-spacing:.12em}
+
 .detail-order-link{display:inline-block;margin-top:14px;color:var(--muted);font-size:10px;text-decoration:underline;text-decoration-color:rgba(180,145,82,.5);text-underline-offset:4px}.detail-order-link:hover{color:var(--gold)}
 /* Crafted-by-hand editorial section and five-step order process. */
 
@@ -155,7 +155,7 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .product-card,.product-open,.product-info,.product-title,.product-category,.detail-copy,.cart-row,.cart-row>div,.contact-link>span:last-child{min-width:0}
 .product-title{overflow-wrap:anywhere;hyphens:auto;line-height:1.38}.product-info{padding-bottom:47px}.product-card-bottom{min-width:0}.product-detail-cta{overflow-wrap:anywhere}.cart-row strong{overflow-wrap:anywhere;line-height:1.45}.cart-row small{overflow-wrap:anywhere;line-height:1.5}.detail-actions .pill-btn{line-height:1.45;white-space:normal;min-height:42px}.contact-link{overflow:hidden}.contact-link small{overflow-wrap:anywhere;word-break:break-word}
 @media(max-width:1050px){.order-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.order-step:nth-child(4),.order-step:nth-child(5){min-height:190px}}
-@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.order-step{padding:15px 12px;border-radius:16px}.order-step:nth-child(4),.order-step:nth-child(5){min-height:0}.order-step:last-child{grid-column:span 2}.order-icon{margin-bottom:17px;width:34px;height:34px}.order-step h3{font-size:16px}.order-step p{font-size:9px}.order-note{flex-wrap:wrap;align-items:flex-start;padding:13px}.order-note p{flex-basis:calc(100% - 38px)}.order-note .pill-btn{margin-left:38px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
+@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.order-step{padding:15px 12px;border-radius:16px}.order-step:nth-child(4),.order-step:nth-child(5){min-height:0}.order-step:last-child{grid-column:span 2}.order-icon{margin-bottom:17px;width:34px;height:34px}.order-step h3{font-size:16px}.order-step p{font-size:9px}.order-note{flex-wrap:wrap;align-items:flex-start;padding:13px}.order-note p{flex-basis:calc(100% - 38px)}.order-note .pill-btn{margin-left:38px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
 @media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.order-step h3{font-size:14px}.order-step p{font-size:8px}.order-step{padding:13px 10px}.order-number{font-size:19px;right:10px;top:9px}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
 @media(hover:none){.product-card:hover,.pill-btn:hover,.order-step:hover{transform:none}.product-card:hover .product-photo img,}
 @media(max-width:760px){.nav,.mobile-nav,.glass,.glass-soft,.service-strip,.promise-tag,.search-field,.mosaic-card,.contact-link,.order-note{backdrop-filter:blur(13px) saturate(135%);-webkit-backdrop-filter:blur(13px) saturate(135%)}.theme-bg{inset:-1%;transform:scale(1.01)}}
@@ -396,6 +396,64 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 @media(prefers-reduced-motion:reduce){.welcome-content>*{animation:none!important}}
 /* Keep the mobile three-line menu on the left, beside the brand. */
 @media(max-width:760px){.nav{position:relative;padding-left:48px!important}.menu-btn{position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}.nav-actions{margin-left:auto}}
+
+/* Final mobile gallery polish: compact content-sized counters and consistent liquid-glass controls. */
+.detail-image-count{
+ position:absolute;left:50%;right:auto;bottom:9px;z-index:3;
+ display:inline-flex;align-items:center;justify-content:center;
+ width:max-content;min-width:0;max-width:calc(100% - 18px);box-sizing:border-box;
+ padding:5px 10px;border:1px solid rgba(255,255,255,.5);border-radius:999px;
+ transform:translateX(-50%);background:rgba(246,240,226,.2);color:#fff;
+ box-shadow:0 4px 16px rgba(22,18,12,.1);
+ backdrop-filter:blur(8px) saturate(1.15);-webkit-backdrop-filter:blur(8px) saturate(1.15);
+ font-size:10px;line-height:1.2;letter-spacing:.08em;white-space:nowrap;
+}
+.detail-zoom-btn,.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow{
+ display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+ padding:0;line-height:1;text-align:center;
+ border:1px solid rgba(255,255,255,.62);
+ background:rgba(245,239,226,.24);color:#332c21;
+ box-shadow:0 5px 16px rgba(26,22,16,.12),inset 0 1px 0 rgba(255,255,255,.36);
+ backdrop-filter:blur(8px) saturate(1.15);-webkit-backdrop-filter:blur(8px) saturate(1.15);
+ transition:background .18s ease,transform .18s ease,box-shadow .18s ease;
+ touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+.detail-zoom-btn{width:42px;height:42px;font-size:0}
+.detail-gallery-arrow{width:42px;height:42px;font-size:0}
+.detail-zoom-btn svg,.detail-gallery-arrow svg,.sd-fullscreen-close svg,.sd-fullscreen-arrow svg{display:block;width:19px;height:19px;flex:none}
+.sd-fullscreen-close svg,.sd-fullscreen-arrow svg{width:22px;height:22px}
+.detail-zoom-btn:hover,.detail-gallery-arrow:hover,.sd-fullscreen-close:hover,.sd-fullscreen-arrow:hover{background:rgba(231,211,171,.38);box-shadow:0 8px 22px rgba(26,22,16,.16),inset 0 1px 0 rgba(255,255,255,.48)}
+.detail-zoom-btn:active,.detail-gallery-arrow:active,.sd-fullscreen-close:active,.sd-fullscreen-arrow:active{transform:scale(.93);background:rgba(216,180,110,.4)}
+.detail-gallery-arrow:hover{transform:translateY(-50%) scale(1.04)}
+.detail-gallery-arrow:active{transform:translateY(-50%) scale(.93)}
+.sd-fullscreen-viewer{background:rgba(35,30,23,.28)!important;backdrop-filter:blur(8px) saturate(1.12)!important;-webkit-backdrop-filter:blur(8px) saturate(1.12)!important}
+.sd-fullscreen-viewer:before{background:linear-gradient(145deg,rgba(246,237,218,.035),rgba(24,22,19,.085))!important}
+.sd-fullscreen-stage{padding:calc(66px + env(safe-area-inset-top)) 58px calc(132px + env(safe-area-inset-bottom))}
+.sd-fullscreen-count{
+ position:absolute;z-index:7;left:50%;right:auto;bottom:calc(91px + env(safe-area-inset-bottom));
+ width:max-content;min-width:0;max-width:calc(100% - 24px);box-sizing:border-box;
+ transform:translateX(-50%);display:inline-flex;align-items:center;justify-content:center;
+ padding:6px 11px;border:1px solid rgba(255,255,255,.48);border-radius:999px;
+ background:rgba(245,239,226,.18);color:#fff;white-space:nowrap;
+ font-size:10px;line-height:1.2;letter-spacing:.08em;
+ box-shadow:0 5px 16px rgba(0,0,0,.12);
+ backdrop-filter:blur(8px) saturate(1.12);-webkit-backdrop-filter:blur(8px) saturate(1.12);
+}
+.sd-fullscreen-thumbs{bottom:calc(8px + env(safe-area-inset-bottom));padding:7px 14px;gap:7px;min-height:58px;touch-action:pan-x;overscroll-behavior-x:contain}
+.sd-fullscreen-thumb{width:54px;height:54px;flex-basis:54px;border-radius:10px;transition:opacity .18s ease,transform .18s ease,border-color .18s ease}
+.sd-fullscreen-thumb:active{transform:scale(.95)}
+.sd-fullscreen-header{background:rgba(245,239,226,.1);border-color:rgba(255,255,255,.2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+@media(max-width:760px){
+ .detail-zoom-btn{width:40px;height:40px;top:10px;left:10px}
+ .detail-gallery-arrow{width:40px;height:40px}
+ .detail-image-count{bottom:8px;padding:5px 9px;font-size:9px}
+ .sd-fullscreen-stage{padding:calc(62px + env(safe-area-inset-top)) 43px calc(132px + env(safe-area-inset-bottom))}
+ .sd-fullscreen-count{bottom:calc(88px + env(safe-area-inset-bottom));font-size:10px;padding:6px 10px}
+ .sd-fullscreen-thumbs{padding:7px 12px;gap:6px}
+ .sd-fullscreen-thumb{width:50px;height:50px;flex-basis:50px}
+ .sd-fullscreen-close,.sd-fullscreen-arrow{width:40px;height:40px}
+}
+
 </style>
 </head>
 <body>
@@ -492,7 +550,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
         <img class="mosaic-photo" id="artSlide" src="images/5151ab24330c6931.webp" alt="Sản phẩm sneaker da cá sấu trong bộ sưu tập SinDarealest">
         <span class="slide-count" id="artSlideCount">01 / 01</span>
         <div class="mosaic-content"><div class="mosaic-kicker">The Art of Crocodile Leather</div><h3 class="mosaic-title">Tinh hoa da cá sấu<br>trong từng sản phẩm</h3><p class="mosaic-sub">Vân da độc đáo gặp gỡ phom dáng hiện đại, tạo nên dấu ấn riêng cho từng thiết kế.</p><a class="text-link tap-target" href="#products">Khám phá sản phẩm <span>→</span></a></div>
-        <div class="slide-controls"><button class="tap-target" id="artPrev" aria-label="Ảnh trước">‹</button><button class="tap-target" id="artNext" aria-label="Ảnh tiếp theo">›</button></div>
+        <div class="slide-controls"><button class="tap-target" id="artPrev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="tap-target" id="artNext" aria-label="Ảnh tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       </article>
       <article class="mosaic-card small" data-reveal style="--reveal-delay:100ms"><img class="mosaic-photo" id="craftTileImage" src="images/2c341b173eff94f1.webp" alt="Thắt lưng da cá sấu trong không gian bàn chế tác"><div class="mosaic-content"><div class="mosaic-kicker">Craft & finish</div><h3 class="mosaic-title">Hoàn thiện thủ công</h3><p class="mosaic-sub">Chăm chút đường nét, bề mặt và từng điểm chạm trước khi bàn giao.</p><a class="text-link tap-target" href="#craftsmanship">Tìm hiểu thêm →</a></div></article>
       <article class="mosaic-card small material-tile" data-reveal style="--reveal-delay:180ms"><img class="mosaic-photo material-photo material-photo--dark" src="images/theme-croc-dark.webp" alt="Cận cảnh vân da cá sấu tông đen"><img class="mosaic-photo material-photo material-photo--light" src="images/theme-croc-albino.webp" alt="Cận cảnh vân da cá sấu tông trắng ngà"><div class="mosaic-content"><div class="mosaic-kicker">Material study</div><h3 class="mosaic-title">Chất liệu cao cấp</h3><p class="mosaic-sub">Tôn trọng cấu trúc vân tự nhiên, để mỗi bề mặt giữ được nét riêng.</p></div></article>
@@ -534,7 +592,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
  </div>
 </footer>
 
-<div class="overlay" id="productOverlay" aria-hidden="true"><div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><button class="close-btn tap-target" id="detailClose" aria-label="Đóng">×</button><div class="detail-layout"><div class="detail-gallery"><div class="detail-image-stage" id="detailImageStage"><img class="detail-main-image" id="detailMainImage" alt="" decoding="async"><button type="button" class="detail-zoom-btn tap-target" id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình" title="Xem toàn ảnh">⤢</button><button type="button" class="detail-gallery-arrow detail-gallery-prev tap-target" id="detailPrev" aria-label="Ảnh sản phẩm trước">‹</button><button type="button" class="detail-gallery-arrow detail-gallery-next tap-target" id="detailNext" aria-label="Ảnh sản phẩm tiếp theo">›</button><span class="detail-image-count" id="detailImageCount" aria-live="polite">01 / 01</span></div><div class="detail-thumbs" id="detailThumbs" aria-label="Các ảnh sản phẩm"></div></div><div class="detail-copy"><div class="eyebrow" id="detailCategory">Selected piece</div><div class="product-sku" id="detailSku"></div><h2 id="detailTitle"></h2><p class="detail-desc" id="detailDescription"></p><div class="promise-tags"><div class="promise-tag"><i>✦</i>Da cá sấu tuyển chọn</div><div class="promise-tag"><i>◇</i>Hoàn thiện tỉ mỉ</div><div class="promise-tag"><i>✓</i>Hỗ trợ tận tâm</div><div class="promise-tag"><i>↗</i>Tư vấn trực tiếp</div></div><div class="detail-actions"><button class="pill-btn primary tap-target" id="detailAdd">Thêm vào giỏ chọn</button><button class="pill-btn tap-target" id="detailZalo">Tư vấn / Đặt hàng qua Zalo ↗</button></div><a href="#order" class="detail-order-link" id="detailOrderLink">Xem quy trình đặt hàng & thời gian dự kiến →</a></div></div></div></div>
+<div class="overlay" id="productOverlay" aria-hidden="true"><div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><button class="close-btn tap-target" id="detailClose" aria-label="Đóng">×</button><div class="detail-layout"><div class="detail-gallery"><div class="detail-image-stage" id="detailImageStage"><img class="detail-main-image" id="detailMainImage" alt="" decoding="async"><button type="button" class="detail-zoom-btn tap-target" id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình" title="Xem toàn ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4H4v4M4 4l6 6M16 4h4v4m0-4-6 6M8 20H4v-4m0 4 6-6m10 6h-4m4 0v-4m0 4-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-prev tap-target" id="detailPrev" aria-label="Ảnh sản phẩm trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-next tap-target" id="detailNext" aria-label="Ảnh sản phẩm tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="detail-image-count" id="detailImageCount" aria-live="polite">01 / 01</span></div><div class="detail-thumbs" id="detailThumbs" aria-label="Các ảnh sản phẩm"></div></div><div class="detail-copy"><div class="eyebrow" id="detailCategory">Selected piece</div><div class="product-sku" id="detailSku"></div><h2 id="detailTitle"></h2><p class="detail-desc" id="detailDescription"></p><div class="promise-tags"><div class="promise-tag"><i>✦</i>Da cá sấu tuyển chọn</div><div class="promise-tag"><i>◇</i>Hoàn thiện tỉ mỉ</div><div class="promise-tag"><i>✓</i>Hỗ trợ tận tâm</div><div class="promise-tag"><i>↗</i>Tư vấn trực tiếp</div></div><div class="detail-actions"><button class="pill-btn primary tap-target" id="detailAdd">Thêm vào giỏ chọn</button><button class="pill-btn tap-target" id="detailZalo">Tư vấn / Đặt hàng qua Zalo ↗</button></div><a href="#order" class="detail-order-link" id="detailOrderLink">Xem quy trình đặt hàng & thời gian dự kiến →</a></div></div></div></div>
 <div class="sd-fullscreen-viewer" id="sdFullscreenViewer" role="dialog" aria-modal="true" aria-label="Xem toàn ảnh sản phẩm" aria-hidden="true">
   <div class="sd-fullscreen-header" aria-hidden="true">
     <img class="sd-fullscreen-brand" src="images/brand-emblem.png" alt="">
@@ -546,7 +604,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
       <img class="sd-fullscreen-watermark" id="sdFullscreenWatermark" src="/watermark.webp" alt="SinDarealest" aria-hidden="true" draggable="false">
     </div>
   </div>
-  <button type="button" class="sd-fullscreen-close tap-target" id="sdFullscreenClose" aria-label="Đóng xem toàn ảnh">×</button>
+  <button type="button" class="sd-fullscreen-close tap-target" id="sdFullscreenClose" aria-label="Đóng xem toàn ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
   <button type="button" class="sd-fullscreen-arrow sd-fullscreen-prev tap-target" id="sdFullscreenPrev" aria-label="Ảnh trước">‹</button>
   <button type="button" class="sd-fullscreen-arrow sd-fullscreen-next tap-target" id="sdFullscreenNext" aria-label="Ảnh tiếp theo">›</button>
   <span class="sd-fullscreen-count" id="sdFullscreenCount" aria-live="polite">01 / 01</span>
