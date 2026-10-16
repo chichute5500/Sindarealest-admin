@@ -69,12 +69,21 @@ jobs:
           NODE
 
       - name: Deploy only to the separate preview branch
-        run: npx wrangler pages deploy public --project-name="$CLOUDFLARE_PAGES_PROJECT" --branch="$SD_PAGES_PREVIEW_BRANCH"
+        id: deploy-preview
+        shell: bash
+        run: |
+          set -o pipefail
+          npx wrangler pages deploy public --project-name="$CLOUDFLARE_PAGES_PROJECT" --branch="$SD_PAGES_PREVIEW_BRANCH" 2>&1 | tee "$RUNNER_TEMP/pages-deploy.log"
+          DEPLOYMENT_URL="$(sed -n 's/.*Deployment complete! Take a peek over at \\(https:\/\/[^[:space:]]*\\).*/\\1/p' "$RUNNER_TEMP/pages-deploy.log" | tail -n 1)"
+          test -n "$DEPLOYMENT_URL" || { echo "::error::Could not capture the immutable deployment URL"; exit 1; }
+          echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "### Liquid Glass preview deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "Use this exact deployment URL: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Verify that the live preview serves this exact Liquid Glass fix
+      - name: Verify that the exact deployment serves this Liquid Glass fix
         shell: bash
         env:
-          SD_PREVIEW_URL: https://preview-liquid-glass-2026-10.sindarealest2.pages.dev
+          SD_PREVIEW_URL: ${{ steps.deploy-preview.outputs.url }}
         run: |
           node --input-type=module <<'NODE'
           const url = process.env.SD_PREVIEW_URL;
