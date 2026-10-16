@@ -12,12 +12,13 @@ assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.i
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
 assert.ok(
-  storefrontHtml.includes('--sd-service-glass:rgba(255,255,255,.27)') &&
-  storefrontHtml.includes('--sd-service-border:rgba(255,255,255,.48)') &&
+  (storefrontHtml.match(/class="service glass tap-target"/g) || []).length === 5 &&
+  storefrontHtml.includes('<a class="service glass tap-target" href="https://zalo.me/0827049192"') &&
   storefrontHtml.includes('.service-strip .service:not(:last-child)::after{display:none!important}') &&
-  storefrontHtml.includes('backdrop-filter:blur(18px) saturate(145%)') &&
-  storefrontHtml.includes('html.dark .service-strip .service-icon{background:rgba(255,255,255,.075)}'),
-  'Each of the six service items must have its own rounded, frosted-glass layer with consistent icons and light/dark values'
+  storefrontHtml.includes('.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(145%)') &&
+  !storefrontHtml.includes('--sd-service-glass') &&
+  !storefrontHtml.includes('--sd-service-border'),
+  'All six brand-benefit tiles must use the original shared .glass component without custom dark/light surface overrides'
 );
 assert.ok(
   storefrontHtml.includes('<div class="detail-copy glass">') &&
