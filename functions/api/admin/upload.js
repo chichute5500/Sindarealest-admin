@@ -42,7 +42,7 @@ export async function onRequestPost(context) {
     if (!originalBytes.length) return fail("Tệp ảnh gốc rỗng.");
     const id = crypto.randomUUID();
     const key = `${id}.webp`;
-    const privateKey = `${id}.${originalType}`;
+    const privateKey = `private-originals/${id}.${originalType}`;
 
     await context.env.ORIGINALS.put(privateKey, originalBytes, {
       httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
