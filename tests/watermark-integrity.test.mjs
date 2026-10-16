@@ -71,6 +71,13 @@ assert.ok(protectionScript.includes("document.querySelector('.detail-image-stage
 assert.ok(!protectionScript.includes("document.querySelectorAll('.product-photo"), 'Watermark must not be overlaid on product-list cards');
 assert.ok(!protectionScript.includes('.detail-thumb'), 'Watermark must not be overlaid on detail thumbnails');
 assert.ok(protectionScript.includes("window.__sdUpdateDetailWatermark"), 'Detail watermark settings must be applied dynamically');
+assert.ok(publicPage.includes('id="sdFullscreenViewer"'), 'Product detail must provide a separate full-screen image viewer');
+assert.ok(publicPage.includes('id="detailZoom"'), 'Product detail must expose an explicit control to open the full-size view');
+assert.ok(publicPage.includes('id="sdFullscreenPrev"') && publicPage.includes('id="sdFullscreenNext"'), 'Full-screen view must allow browsing all product images');
+assert.ok(publicPage.includes('id="sdFullscreenWatermark"'), 'The full-screen view must retain the existing SinDarealest watermark overlay');
+assert.ok(protectionScript.includes("function openFullscreenImage()"), 'Tapping the detailed product image must open the full-screen viewer');
+assert.ok(protectionScript.includes("fullMark=document.getElementById('sdFullscreenWatermark')"), 'Full-screen watermark must use the same admin settings for position, size, and opacity');
+assert.ok(publicPage.includes('object-fit:contain;object-position:center'), 'The full-screen view must show the entire image instead of cropping it');
 
 const adminPage = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
 assert.ok(adminPage.includes('watermarkSettingsForm'), 'Admin must expose watermark controls');
