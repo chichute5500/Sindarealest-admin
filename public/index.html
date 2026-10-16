@@ -616,7 +616,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const ZALO='https://zalo.me/0827049192';
-let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, fullscreenSwapTimer=null, detailIndex=0, detailImages=[];
+let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, fullscreenSwapTimer=null, detailAnimationTimer=null, fullscreenAnimationTimer=null, detailTransitionId=0, fullscreenTransitionId=0, detailIndex=0, detailImages=[];
 const categoryLabels={all:'Tất cả',sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví da',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
 const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','wallets','sandals','watch-straps','phone-cases'];
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -660,24 +660,29 @@ function sizeFullscreenFrame(){
  frame.style.height=Math.max(1,Math.round(nh*scale))+'px';
 }
 function setFullscreenPhoto(src,direction='left'){
- clearTimeout(fullscreenSwapTimer);
+ clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
+ const transitionId=++fullscreenTransitionId;
  const img=$('#sdFullscreenImage'),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
+ img.onload=null;img.onerror=null;
  const same=img.getAttribute('src')===next;
  const clearSlide=()=>img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
  if(same&&img.complete&&img.naturalWidth){sizeFullscreenFrame();clearSlide();window.__sdUpdateDetailWatermark?.();return}
  const finish=()=>{
+  if(transitionId!==fullscreenTransitionId)return;
   sizeFullscreenFrame();img.onload=null;img.onerror=null;
   img.classList.remove('sd-slide-out-left','sd-slide-out-right','is-changing');
   const incoming=direction==='right'?'sd-slide-in-left':'sd-slide-in-right';
   img.classList.remove('sd-slide-in-left','sd-slide-in-right');
   img.classList.add(incoming);
-  requestAnimationFrame(()=>setTimeout(()=>img.classList.remove(incoming),560));
+  clearTimeout(fullscreenAnimationTimer);
+  fullscreenAnimationTimer=setTimeout(()=>{if(transitionId===fullscreenTransitionId&&img.getAttribute('src')===next)img.classList.remove(incoming)},620);
  };
- const fail=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';clearSlide()};
+ const fail=()=>{if(transitionId!==fullscreenTransitionId)return;img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';clearSlide()};
  if(!same){
   clearSlide();
   img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
   fullscreenSwapTimer=setTimeout(()=>{
+   if(transitionId!==fullscreenTransitionId)return;
    img.onload=finish;img.onerror=fail;img.src=next;
    if(img.complete&&img.naturalWidth)finish();
   },230);
@@ -703,10 +708,23 @@ function openFullscreenImage(){
  requestAnimationFrame(sizeFullscreenFrame);
  $('#sdFullscreenClose').focus({preventScroll:true});
 }
+function clearGalleryTransitionClasses(img){
+ if(!img)return;
+ img.onload=null;img.onerror=null;
+ img.classList.remove('is-changing','sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right');
+}
 function closeFullscreenImage(){
  const viewer=$('#sdFullscreenViewer');if(!viewer.classList.contains('open'))return;
+ clearTimeout(fullscreenSwapTimer);fullscreenSwapTimer=null;
+ clearTimeout(detailSwapTimer);detailSwapTimer=null;
+ clearTimeout(detailAnimationTimer);detailAnimationTimer=null;
+ clearTimeout(fullscreenAnimationTimer);fullscreenAnimationTimer=null;
+ ++detailTransitionId;++fullscreenTransitionId;
  viewer.classList.remove('open');viewer.setAttribute('aria-hidden','true');
- $('#detailMainImage').classList.remove('is-changing');
+ const main=$('#detailMainImage'),full=$('#sdFullscreenImage');
+ clearGalleryTransitionClasses(main);clearGalleryTransitionClasses(full);
+ const selected=imgPath(detailImages[detailIndex]||'');
+ if(main&&selected&&main.getAttribute('src')!==selected)main.src=selected;
  if($('#productOverlay').classList.contains('open')){document.body.style.overflow='hidden';scheduleDetailAutoplay();$('#detailZoom').focus({preventScroll:true})}
  else if(!$('#cartDrawer').classList.contains('open'))document.body.style.overflow='';
 }
@@ -718,6 +736,9 @@ function changeDetailImage(index,resetTimer=true,direction){
  direction=direction||(nextIndex===previousIndex?'left':((nextIndex-previousIndex+detailImages.length)%detailImages.length<=detailImages.length/2?'left':'right'));
  detailIndex=nextIndex;
  const img=$('#detailMainImage'),next=imgPath(detailImages[detailIndex]),thumbs=$('.detail-thumb');
+ const transitionId=++detailTransitionId;
+ clearTimeout(detailAnimationTimer);
+ img.onload=null;img.onerror=null;
  img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
  img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
  $('#detailImageCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
@@ -730,12 +751,14 @@ function changeDetailImage(index,resetTimer=true,direction){
  const swap=()=>{
   img.onload=null;img.onerror=null;
   const finish=()=>{
+   if(transitionId!==detailTransitionId)return;
    img.onload=null;img.onerror=null;
    img.classList.remove('sd-slide-out-left','sd-slide-out-right','is-changing');
    const incoming=direction==='right'?'sd-slide-in-left':'sd-slide-in-right';
    img.classList.remove('sd-slide-in-left','sd-slide-in-right');
    img.classList.add(incoming);
-   requestAnimationFrame(()=>setTimeout(()=>img.classList.remove(incoming),560));
+   clearTimeout(detailAnimationTimer);
+   detailAnimationTimer=setTimeout(()=>{if(transitionId===detailTransitionId&&img.getAttribute('src')===next)img.classList.remove(incoming)},620);
   };
   img.onload=finish;img.onerror=finish;img.src=next;
   if(img.complete&&img.naturalWidth)finish();
@@ -743,8 +766,18 @@ function changeDetailImage(index,resetTimer=true,direction){
  detailSwapTimer=setTimeout(swap,230);
  scheduleDetailAutoplay();
 }
-function openDetail(productId,fromUrl=false){clearTimeout(detailSwapTimer);const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;document.title=(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){history.pushState({productId:p.id},'',`/san-pham/${encodeURIComponent(p.sku||p.id)}`)}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp');img.alt=p.title||'Sản phẩm SinDarealest';$('#detailSku').textContent='SKU: '+(p.sku||'Liên hệ');$('#detailTitle').textContent=p.title||'Sản phẩm tuyển chọn';$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailCategory').textContent=p.categoryLabel||categoryLabels[p.category]||'Selected piece';$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();}
-function closeDetail(fromUrl=false){document.title='SinDarealest — Premium Crocodile Leather Fashion';clearTimeout(detailTimer);clearTimeout(detailSwapTimer);$('#sdFullscreenViewer').classList.remove('open');$('#sdFullscreenViewer').setAttribute('aria-hidden','true');if(!fromUrl&&location.pathname.startsWith('/san-pham/'))history.replaceState({},'','/');$('#productOverlay').classList.remove('open');$('#productOverlay').setAttribute('aria-hidden','true');$('#detailMainImage').classList.remove('is-changing');if(!$('#cartDrawer').classList.contains('open'))document.body.style.overflow=''}
+function openDetail(productId,fromUrl=false){clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;document.title=(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){history.pushState({productId:p.id},'',`/san-pham/${encodeURIComponent(p.sku||p.id)}`)}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp');img.alt=p.title||'Sản phẩm SinDarealest';$('#detailSku').textContent='SKU: '+(p.sku||'Liên hệ');$('#detailTitle').textContent=p.title||'Sản phẩm tuyển chọn';$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailCategory').textContent=p.categoryLabel||categoryLabels[p.category]||'Selected piece';$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();}
+function closeDetail(fromUrl=false){
+ document.title='SinDarealest — Premium Crocodile Leather Fashion';
+ clearTimeout(detailTimer);clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);
+ detailTimer=detailSwapTimer=fullscreenSwapTimer=detailAnimationTimer=fullscreenAnimationTimer=null;
+ ++detailTransitionId;++fullscreenTransitionId;
+ clearGalleryTransitionClasses($('#detailMainImage'));clearGalleryTransitionClasses($('#sdFullscreenImage'));
+ $('#sdFullscreenViewer').classList.remove('open');$('#sdFullscreenViewer').setAttribute('aria-hidden','true');
+ if(!fromUrl&&location.pathname.startsWith('/san-pham/'))history.replaceState({},'','/');
+ $('#productOverlay').classList.remove('open');$('#productOverlay').setAttribute('aria-hidden','true');
+ if(!$('#cartDrawer').classList.contains('open'))document.body.style.overflow='';
+}
 function loadCart(){try{cart=JSON.parse(localStorage.getItem('sd-cart')||'{}')||{}}catch(e){cart={}};Object.keys(cart).forEach(k=>{if(!Number.isFinite(Number(cart[k]))||Number(cart[k])<1)delete cart[k]});updateCartCount()}
 function saveCart(){try{localStorage.setItem('sd-cart',JSON.stringify(cart))}catch(e){}updateCartCount();renderCart()}
 function updateCartCount(){const n=Object.values(cart).reduce((s,v)=>s+Number(v||0),0);$('#cartCount').textContent=n>99?'99+':String(n)}
