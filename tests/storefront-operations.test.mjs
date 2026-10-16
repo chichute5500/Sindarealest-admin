@@ -170,7 +170,7 @@ for (const method of ['GET', 'POST']) {
     request: new Request('https://shop.example/api/admin/removed-experiment', { method }),
   });
   assert.equal(missingApi.status, 404, 'Unknown API routes must return 404 instead of the storefront fallback');
-  assert.match(missingApi.headers.get('Content-Type') || '', /application\\/json/i);
+  assert.ok((missingApi.headers.get('Content-Type') || '').toLowerCase().includes('application/json'));
   assert.equal(missingApi.headers.get('Cache-Control'), 'no-store');
   const missingApiPayload = await missingApi.json();
   assert.equal(missingApiPayload.code, 'API_ROUTE_NOT_FOUND');
