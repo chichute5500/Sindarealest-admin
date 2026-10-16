@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { normalizeWatermarkSettings, validateWatermarkSettingUpdates, isAllowedWatermarkLogo } from '../functions/_lib/watermark-settings.js';
+import { normalizeWatermarkSettings, validateWatermarkSettingUpdates } from '../functions/_lib/watermark-settings.js';
+import { existsSync } from 'node:fs';
 import { onRequestGet as publicSettingsGet } from '../functions/api/settings.js';
 import { onRequestGet as publicMediaGet } from '../functions/media/[key].js';
 
@@ -13,10 +14,16 @@ assert.deepEqual(defaults, {
   watermarkOpacity: 68,
 }, 'Missing settings must use stable public defaults');
 
-assert.equal(isAllowedWatermarkLogo('/watermark.webp'), true);
-assert.equal(isAllowedWatermarkLogo('/media/wm-01234567-89ab-cdef-0123-456789abcdef.webp'), true);
-assert.equal(isAllowedWatermarkLogo('https://attacker.example/logo.webp'), false);
-assert.equal(isAllowedWatermarkLogo('/media/private-originals/source.webp'), false);
+assert.equal(
+  normalizeWatermarkSettings({ watermark_logo: '/media/wm-01234567-89ab-cdef-0123-456789abcdef.webp' }).watermarkLogoUrl,
+  '/watermark.webp',
+  'Saved alternate logo settings must not replace the existing SinDarealest logo',
+);
+assert.match(
+  validateWatermarkSettingUpdates({ watermarkLogoUrl: '/media/wm-01234567-89ab-cdef-0123-456789abcdef.webp' }).error,
+  /giữ nguyên/i,
+  'Admin settings API must reject watermark-logo replacements',
+);
 assert.deepEqual(validateWatermarkSettingUpdates({
   watermarkEnabled: false,
   watermarkPosition: 'top-left',
@@ -65,7 +72,11 @@ assert.ok(protectionScript.includes("window.__sdUpdateDetailWatermark"), 'Detail
 const adminPage = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
 assert.ok(adminPage.includes('watermarkSettingsForm'), 'Admin must expose watermark controls');
 assert.ok(adminPage.includes('watermarkPosition') && adminPage.includes('watermarkSize') && adminPage.includes('watermarkOpacity'), 'Admin must expose position, size, and opacity settings');
-assert.ok(adminPage.includes('/api/admin/watermark-logo'), 'Admin must support replacing the watermark logo');
+assert.ok(adminPage.includes('src="/watermark.webp"'), 'Admin must preview the existing watermark logo asset');
+assert.ok(adminPage.includes('Giữ nguyên logo SinDarealest hiện tại'), 'Admin must state that the logo remains unchanged');
+assert.ok(!adminPage.includes('watermarkLogoFile'), 'Admin must not expose a logo replacement input');
+assert.ok(!adminPage.includes('/api/admin/watermark-logo'), 'Admin must not call a logo replacement endpoint');
+assert.equal(existsSync(new URL('../functions/api/admin/watermark-logo.js', import.meta.url)), false, 'Logo replacement API must not exist');
 assert.ok(!adminPage.includes('watermarkApplied'), 'Admin uploads must not require an image to be pre-watermarked');
 assert.ok(!adminPage.includes('ctx.drawImage(markBitmap'), 'Admin must not bake the watermark into each product image');
 
@@ -80,7 +91,4 @@ assert.ok(!uploadSource.includes('watermarkApplied'), 'The upload API must accep
 
 const mediaSource = readFileSync(new URL('../functions/media/[key].js', import.meta.url), 'utf8');
 assert.ok(mediaSource.includes('^[A-Za-z0-9-]{30,40}\\.webp$'), 'Public media routing must accept only flat WebP keys, not private-originals/ paths');
-const logoUploadSource = readFileSync(new URL('../functions/api/admin/watermark-logo.js', import.meta.url), 'utf8');
-assert.ok(logoUploadSource.includes('requireAdmin') && logoUploadSource.includes('watermark_logo'), 'Changing the watermark logo must require admin authentication and save its setting');
-
 console.log('PASS: watermark validation, admin controls, detail-only overlay, and private original upload guard.');
