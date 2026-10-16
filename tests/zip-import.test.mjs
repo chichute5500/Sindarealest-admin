@@ -86,6 +86,7 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   const upload=readFileSync(new URL('../functions/api/admin/upload.js',import.meta.url),'utf8');
   const readiness=readFileSync(new URL('../functions/api/admin/zip-import/status.js',import.meta.url),'utf8');
   assert.ok(html.includes('/admin/zip-import.js'));
+  assert.ok(source.includes('products:100'), 'ZIP import must enforce the 100-product preview limit');
   assert.ok(source.includes("if(!confirm(") && source.includes("published:false"),'writes must require confirmation and create hidden products');
   assert.ok(api.includes('product_source_imports') && api.includes('context.env.DB.batch(statements)'),'product and source metadata must be written in the same D1 batch');
   assert.ok(api.includes('ZIP_IMPORT_ENABLED !== "1"'),'product creation must be gated by an explicit environment flag');

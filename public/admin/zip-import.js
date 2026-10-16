@@ -1,6 +1,6 @@
 (() => {
 'use strict';
-const LIM={zip:120*1024*1024,expanded:220*1024*1024,files:5000,products:200,images:3000};
+const LIM={zip:120*1024*1024,expanded:220*1024*1024,files:5000,products:100,images:3000};
 const S={files:new Map(),products:[],existing:[],report:[],createdKeys:new Set(),busy:false,filter:'all',filename:'',allowNoImages:false,adminReady:false};
 const $=s=>document.querySelector(s);
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
