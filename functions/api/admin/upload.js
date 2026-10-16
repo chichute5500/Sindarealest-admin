@@ -13,6 +13,9 @@ export async function onRequestPost(context) {
   if (auth.response) return auth.response;
   const noStorage = storageOrFail(context.env);
   if (noStorage) return noStorage;
+  if (!context.env.ORIGINALS) {
+    return fail("Kho ảnh gốc chưa được cấu hình. Hãy gắn R2 bucket riêng tư bằng binding ORIGINALS trước khi tải ảnh sản phẩm mới lên.", 503);
+  }
 
   let form;
   try { form = await context.request.formData(); } catch { return fail("Không đọc được tệp ảnh."); }
@@ -39,9 +42,9 @@ export async function onRequestPost(context) {
     if (!originalBytes.length) return fail("Tệp ảnh gốc rỗng.");
     const id = crypto.randomUUID();
     const key = `${id}.webp`;
-    const privateKey = `private-originals/${id}.${originalType}`;
+    const privateKey = `${id}.${originalType}`;
 
-    await context.env.IMAGES.put(privateKey, originalBytes, {
+    await context.env.ORIGINALS.put(privateKey, originalBytes, {
       httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
       customMetadata: { visibility: "private-original" },
     });
@@ -51,7 +54,7 @@ export async function onRequestPost(context) {
         customMetadata: { visibility: "public-optimized-derivative", originalKey: privateKey },
       });
     } catch (error) {
-      try { await context.env.IMAGES.delete(privateKey); } catch {}
+      try { await context.env.ORIGINALS.delete(privateKey); } catch {}
       throw error;
     }
 
@@ -59,9 +62,9 @@ export async function onRequestPost(context) {
       ok: true,
       url: `/media/${key}`,
       originalStoredPrivately: true,
-      message: "Đã lưu ảnh gốc ở vùng riêng tư và tạo bản WebP hiển thị chưa đóng dấu.",
+      message: "Đã lưu ảnh gốc vào bucket riêng tư và tạo bản WebP hiển thị chưa đóng dấu.",
     }, 201);
   } catch {
-    return fail("Tải ảnh thất bại. Hãy kiểm tra R2 binding tên IMAGES và thử lại.", 503);
+    return fail("Tải ảnh thất bại. Hãy kiểm tra bindings IMAGES và ORIGINALS rồi thử lại.", 503);
   }
 }
