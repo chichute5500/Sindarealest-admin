@@ -897,7 +897,11 @@ html.dark .detail-info,html.dark .detail-description,html.dark .detail-traits{ba
 .service-strip .service:not(:last-child)::after{display:none!important}
 .service-strip .service strong{font-size:clamp(8px,.7vw + 3px,10px);line-height:1.35;overflow-wrap:anywhere}
 .service-strip .service small{font-size:8px;line-height:1.45;overflow-wrap:anywhere}
-.service-strip .service-icon{background:var(--glass);border-color:var(--line);box-shadow:none}.service-strip .service-copy{position:relative;z-index:0;display:block;flex:1;min-width:0;padding:7px 8px;border-radius:11px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(18px) saturate(145%);-webkit-backdrop-filter:blur(18px) saturate(145%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22);transition:background-color 1s ease,border-color 1s ease}
+.service-strip .service-icon{background:var(--glass);border-color:var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.26)}
+/* Inner glass layer behind each benefit's title and description, inspired by .order-note. */
+.service-strip .service-copy{position:relative;z-index:0;display:block;flex:1;min-width:0;padding:8px 10px;border-radius:12px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 5px 14px rgba(0,0,0,.045);transition:background-color 1s ease,border-color 1s ease,box-shadow .3s ease}
+.service-strip .service-copy strong{position:relative;z-index:1}
+.service-strip .service-copy small{position:relative;z-index:1}
 .service-strip .service:hover{border-color:var(--gold)}
 /* Layout only; the shared .glass class owns this panel's visual surface. */
 .detail-modal .detail-copy{
