@@ -1,0 +1,39 @@
+name: Restore Preview product catalog (D1 only)
+
+on:
+  push:
+    branches:
+      - fix/watermark-detail-only-2026-10-16
+    paths:
+      - scripts/restore-preview-catalog.mjs
+      - migrations/0002_seed_products.sql
+
+permissions:
+  contents: read
+
+concurrency:
+  group: restore-preview-catalog-preview-only
+  cancel-in-progress: false
+
+jobs:
+  restore-preview:
+    name: Restore catalog to the verified Preview D1 only
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install project tools
+        run: npm install --no-audit --no-fund
+
+      - name: Restore and verify the Preview catalog
+        run: node scripts/restore-preview-catalog.mjs
