@@ -7,7 +7,7 @@ compatibility_date = "2026-10-12"
 
 # Bindings phai duoc cau hinh trong Workers & Pages > Settings > Bindings:
 # D1 Variable name: DB
-# R2 public product images and watermark logos: IMAGES
-# R2 private original product uploads (separate bucket, no public access): ORIGINALS
+# R2 Variable name: IMAGES (public product images and watermark logos)
+# R2 Variable name: ORIGINALS (private originals, separate bucket, no public access)
 # Do not point IMAGES and ORIGINALS to the same bucket.
 # Secrets (Production): ADMIN_PASSWORD, SESSION_SECRET
