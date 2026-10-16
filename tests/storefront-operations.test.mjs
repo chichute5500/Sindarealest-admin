@@ -17,10 +17,10 @@ assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefr
 const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');
 assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile background URL must be versioned to invalidate old immutable cache entries');
-assert.ok(!/theme-croc-dark\\.webp(?!\\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
-assert.ok(!/theme-croc-albino\\.webp(?!\\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
-assert.ok(themeCacheHeaders.includes('/images/theme-croc-dark.webp\\n  Cache-Control: public, max-age=0, must-revalidate'), 'Dark theme asset must revalidate when its stable path is requested');
-assert.ok(themeCacheHeaders.includes('/images/theme-croc-albino.webp\\n  Cache-Control: public, max-age=0, must-revalidate'), 'Light theme asset must revalidate when its stable path is requested');
+assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
+assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
+assert.ok(themeCacheHeaders.includes('/images/theme-croc-dark.webp\n  Cache-Control: public, max-age=0, must-revalidate'), 'Dark theme asset must revalidate when its stable path is requested');
+assert.ok(themeCacheHeaders.includes('/images/theme-croc-albino.webp\n  Cache-Control: public, max-age=0, must-revalidate'), 'Light theme asset must revalidate when its stable path is requested');
 assert.ok(!storefrontHtml.includes('sd-admin-shortcut') && !storefrontHtml.includes('href="/admin/"'), 'The public storefront must not expose a management link while admin remains at its separate route');
 assert.ok(storefrontHtml.includes('sdMenuItemIn') && storefrontHtml.includes('mobile-nav.open .navlink:nth-child(6)'), 'Mobile glass menu items should animate in a staggered sequence');
 assert.ok(!storefrontHtml.includes("(mod&&['u','s','c'].includes(k))") && storefrontHtml.includes("e.target.closest('img, picture')"), 'Text selection and copy must remain available outside protected images');
