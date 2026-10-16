@@ -1,0 +1,132 @@
+name: Deploy Liquid Glass visual preview (non-production)
+
+on:
+  push:
+    branches:
+      - fix/watermark-detail-only-2026-10-16
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sindarealest-liquid-glass-preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: github.ref_name == 'fix/watermark-detail-only-2026-10-16'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      SD_PAGES_PREVIEW_BRANCH: preview-liquid-glass-2026-10-16
+    steps:
+      - name: Check out the isolated test branch
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Validate project and run regression tests
+        run: |
+          npm run check
+          npm test
+          node tests/pages-routing.test.mjs
+
+      - name: Verify Cloudflare project and refuse production branch
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
+          node --input-type=module <<'NODE'
+          import { assertSafeName, findNamedRecord, listPagesProjects } from './scripts/cloudflare-utils.mjs';
+          const projectName = process.env.CLOUDFLARE_PAGES_PROJECT;
+          const previewBranch = process.env.SD_PAGES_PREVIEW_BRANCH;
+          assertSafeName(projectName, 'Cloudflare Pages project');
+          assertSafeName(previewBranch, 'Preview branch');
+          const record = findNamedRecord(listPagesProjects(), projectName, ['name', 'project_name', 'Project Name']);
+          if (!record) throw new Error(`Cloudflare Pages project "${projectName}" not found; preview deploy stopped.`);
+          // Cloudflare's project-list response can omit production_branch. The existing
+          // production workflow pins the verified production branch to this value.
+          const configuredProductionBranch = 'fix/ai-review-quota-scope-2026-10-15';
+          const reportedProductionBranch = typeof record.production_branch === 'string' ? record.production_branch : '';
+          if (previewBranch === configuredProductionBranch || (reportedProductionBranch && previewBranch === reportedProductionBranch)) {
+            throw new Error('Preview branch matches a production branch; refusing deployment.');
+          }
+          if (reportedProductionBranch && reportedProductionBranch !== configuredProductionBranch) {
+            throw new Error(`Cloudflare production branch (${reportedProductionBranch}) differs from the repository's verified production branch; refusing deployment.`);
+          }
+          console.log(`Preview target verified: ${previewBranch}; production branch remains ${reportedProductionBranch || configuredProductionBranch}.`);
+          NODE
+
+      - name: Deploy only to the separate preview branch
+        id: deploy-preview
+        shell: bash
+        run: |
+          set -o pipefail
+          npx wrangler pages deploy public --project-name="$CLOUDFLARE_PAGES_PROJECT" --branch="$SD_PAGES_PREVIEW_BRANCH" 2>&1 | tee "$RUNNER_TEMP/pages-deploy.log"
+          DEPLOYMENT_URL="$(grep 'Deployment complete! Take a peek over at ' "$RUNNER_TEMP/pages-deploy.log" | tail -n 1 | awk '{print $NF}')"
+          test -n "$DEPLOYMENT_URL" || { echo "::error::Could not capture the immutable deployment URL"; exit 1; }
+          echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "### Liquid Glass preview deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "Use this exact deployment URL: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify that the exact deployment serves the canonical Liquid Glass surfaces
+        shell: bash
+        env:
+          SD_PREVIEW_URL: ${{ steps.deploy-preview.outputs.url }}
+        run: |
+          node --input-type=module <<'NODE'
+          const url = process.env.SD_PREVIEW_URL;
+          const expected = [
+            ['shared .glass component', /\.glass\{[^}]*background\s*:\s*var\(--glass\)[^}]*backdrop-filter\s*:\s*blur\(24px\)\s*saturate\(145%\)/i],
+            ['catalog cards reuse .glass', /class="product-card glass tap-target"/i],
+            ['featured cards reuse .glass', /class="product-card featured-product-card glass tap-target"/i],
+            ['detail pane reuses .glass', /class="detail-copy glass"/i]
+          ];
+          const conflicts = [
+            ['product-info second background layer', /\.product-card\s+\.product-info\s*\{[^}]*background\s*:/i],
+            ['late product-card background override', /\.product-card\s*\{\s*background\s*:/i],
+            ['obsolete custom detail tokens', /--sd-detail-panel|--sd-detail-highlight/]
+          ];
+          let lastError = '';
+          for (let attempt = 1; attempt <= 10; attempt++) {
+            try {
+              const res = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
+              const html = await res.text();
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const pageTitle = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.slice(0,160) || '';
+              if (/Cloudflare Access/i.test(pageTitle) || /Sign in.*Cloudflare Access/i.test(html.slice(0,10000))) {
+                const note = `NOTICE: Deployment succeeded at ${url}, but Cloudflare Access returned its sign-in page to CI. Live CSS cannot be verified without an authenticated browser session; no visual-pass claim is made.\n`;
+                console.warn(note.trim());
+                if (process.env.GITHUB_STEP_SUMMARY) {
+                  const { appendFileSync } = await import('node:fs');
+                  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Preview deployed; live inspection is access-restricted\n- URL: ${url}\n- CI received Cloudflare Access sign-in instead of the storefront. Source regression tests passed, but visual browser verification remains unconfirmed.\n`);
+                }
+                process.exit(0);
+              }
+              const missing = expected.filter(([, pattern]) => !pattern.test(html)).map(([name]) => name);
+              const presentConflicts = conflicts.filter(([, pattern]) => pattern.test(html)).map(([name]) => name);
+              if (missing.length === 0 && presentConflicts.length === 0) {
+                console.log(`PASS: exact deployment serves the canonical shared .glass surfaces (HTTP ${res.status}, ${html.length} characters).`);
+                process.exit(0);
+              }
+              const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.slice(0,120) || '(title missing)';
+              const foundRule = html.match(/\.product-card[^}]{0,300}\}/i)?.[0] || '(product-card rule not found)';
+              lastError = `HTTP ${res.status}, ${html.length} characters, title=${title}; missing: ${missing.join(', ')}; conflicts: ${presentConflicts.join(', ')}; sample rule: ${foundRule}`;
+            } catch (error) {
+              lastError = String(error);
+            }
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          throw new Error(`Preview did not serve this commit's canonical glass implementation after retries: ${lastError}`);
+          NODE

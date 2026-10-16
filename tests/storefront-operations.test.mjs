@@ -10,7 +10,70 @@ import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
-assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
+assert.ok(
+  storefrontHtml.includes('/* Theme transitions — one clock and one compositor path for all theme-dependent surfaces. */') &&
+  storefrontHtml.includes('html,body{transition:background-color var(--sd-theme-duration) ease,color var(--sd-theme-duration) ease}') &&
+  storefrontHtml.includes('body:after{transition:background var(--sd-theme-duration) ease}') &&
+  storefrontHtml.includes('transition-duration:var(--sd-theme-duration)!important;') &&
+  storefrontHtml.includes('transition-delay:0s!important;') &&
+  !storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'),
+  'Theme-related transitions must use one synchronized duration instead of conflicting 250/340/1150 ms overrides'
+);
+assert.ok(
+  (storefrontHtml.match(/<div class="service glass tap-target"/g) || []).length === 5 &&
+  storefrontHtml.includes('<a class="service glass tap-target" href="https://zalo.me/0827049192"') &&
+  storefrontHtml.includes('.service-strip .service:not(:last-child)::after{display:none!important}') &&
+  storefrontHtml.includes('.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(145%)') &&
+  !storefrontHtml.includes('--sd-service-glass') &&
+  !storefrontHtml.includes('--sd-service-border'),
+  'All six brand-benefit tiles must use the original shared .glass component without custom dark/light surface overrides'
+);
+assert.ok(
+  storefrontHtml.includes('<div class="detail-copy glass">') &&
+  storefrontHtml.includes('.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(145%)') &&
+  storefrontHtml.includes('--glass:rgba(255,255,255,.40)') &&
+  storefrontHtml.includes('html.dark{color-scheme:dark;--page:#050505;--ink:#f5f1e9;--muted:#c6bdad;--gold:#d8b36d;--gold-hi:#f1d6a0;--line:rgba(255,246,224,.28);--nav-bg:rgba(9,9,9,.50);--nav-glass-hover:rgba(255,255,255,.22);--glass:rgba(255,255,255,.40)') &&
+  !storefrontHtml.includes('--sd-detail-panel') &&
+  !storefrontHtml.includes('--sd-detail-highlight'),
+  'Product detail information must reuse the original shared .glass surface in both themes without custom competing glass tokens'
+);
+assert.ok(
+  storefrontHtml.includes('.featured-arrow:active,.slide-controls button:active{') &&
+  storefrontHtml.includes('transform:scale(.8)!important;') &&
+  storefrontHtml.includes('transform:translateY(-50%) scale(.8)!important;') &&
+  storefrontHtml.includes('cubic-bezier(.34,1.56,.64,1)') &&
+  storefrontHtml.includes('touch-action:manipulation;'),
+  'Featured, in-page gallery, and fullscreen arrows must shrink to 80% on press and spring back without losing their vertical anchor'
+);
+assert.ok(
+  storefrontHtml.includes('@keyframes sdGalleryOutLeft{to{opacity:.8;transform:translateX(-11%) scale(.985);filter:blur(1.5px)}}') &&
+  storefrontHtml.includes('@keyframes sdGalleryOutRight{to{opacity:.8;transform:translateX(11%) scale(.985);filter:blur(1.5px)}}') &&
+  storefrontHtml.includes('@keyframes sdGalleryInRight{from{opacity:.8;transform:translateX(11%) scale(.985);filter:blur(1.5px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}') &&
+  storefrontHtml.includes('@keyframes sdGalleryInLeft{from{opacity:.8;transform:translateX(-11%) scale(.985);filter:blur(1.5px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}'),
+  'Gallery transitions must briefly reduce opacity by about 20%, blur lightly, slide in the requested direction, then restore full sharpness'
+);
+assert.ok(
+  storefrontHtml.includes("thumbs=$$('.detail-thumb')") &&
+  !storefrontHtml.includes("thumbs=$('.detail-thumb')") &&
+  storefrontHtml.includes('function clearGalleryTransitionClasses(img)') &&
+  storefrontHtml.includes('clearTimeout(fullscreenSwapTimer);fullscreenSwapTimer=null;') &&
+  storefrontHtml.includes("main.getAttribute('src')!==selected"),
+  'Fullscreen arrow navigation must not throw, and closing zoom must restore a clear, correctly selected detail image'
+);
+assert.ok(
+  storefrontHtml.includes('.featured-product-card [data-feature-track]{transition:transform 1.45s') &&
+  storefrontHtml.includes('sdFeaturedImageShift .76s') &&
+  storefrontHtml.includes('transition:opacity .52s ease,filter .52s ease,transform .52s') &&
+  storefrontHtml.includes('transition:opacity .64s ease,filter .64s ease,transform .64s') &&
+  storefrontHtml.includes('@keyframes sdGalleryOutLeft') &&
+  storefrontHtml.includes('@keyframes sdGalleryOutRight') &&
+  storefrontHtml.includes('@keyframes sdGalleryInRight') &&
+  storefrontHtml.includes('@keyframes sdGalleryInLeft') &&
+  storefrontHtml.includes('setFullscreenPhoto(next,direction)') &&
+  storefrontHtml.includes('detailSwapTimer=setTimeout(swap,230)') &&
+  storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
+  'Image transitions must combine subtle fade/zoom with the requested longer timing while respecting reduced-motion preferences'
+);
 assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('hero-stamp-image-spacer') && !storefrontHtml.includes('.hero-stamp{'), 'Entire unwanted hero stamp and glass styling must be removed while preserving the sneaker hero');
 assert.ok(!storefrontHtml.includes('id="heroDarkShoe"') && !storefrontHtml.includes('id="heroLightShoe"') && !storefrontHtml.includes('hero-art'), 'Hero product images must be removed from the storefront intro');
 assert.ok(storefrontHtml.includes('SinDarealest mang đến những sản phẩm thời trang da cá sấu cao cấp') && storefrontHtml.includes('Khám phá bộ sưu tập') && storefrontHtml.includes('Khám phá sản phẩm'), 'Hero intro copy and both calls to action must remain after removing product imagery');
