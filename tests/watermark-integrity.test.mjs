@@ -95,7 +95,7 @@ assert.ok(publicPage.includes('aria-label="Ảnh sản phẩm trước"><svg'), 
 assert.ok(publicPage.includes('aria-label="Ảnh sản phẩm tiếp theo"><svg'), 'Detail next icon must use a centered SVG glyph');
 assert.ok(publicPage.includes('title="Xem toàn ảnh"><svg'), 'Zoom icon must use a crisp SVG glyph');
 assert.ok(publicPage.includes('.detail-image-count{\n position:absolute;left:50%;right:auto;bottom:9px'), 'The detail image counter must be compact and centered away from a lower-right burned-in logo');
-const galleryStart = publicPage.indexOf('function changeDetailImage(index,resetTimer=true)');
+const galleryStart = publicPage.indexOf('function changeDetailImage(index,resetTimer=true');
 const galleryEnd = publicPage.indexOf('function openDetail(', galleryStart);
 const gallerySource = publicPage.slice(galleryStart, galleryEnd);
 assert.ok(gallerySource.includes("$('.detail-thumb')"), 'Gallery navigation must select all thumbnails before iteration');
