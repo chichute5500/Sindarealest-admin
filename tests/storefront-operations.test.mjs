@@ -23,8 +23,9 @@ assert.ok(
   storefrontHtml.includes('.detail-modal .detail-copy{') &&
   storefrontHtml.includes('background:linear-gradient(145deg,var(--sd-detail-highlight),transparent 72%),var(--sd-detail-panel)') &&
   storefrontHtml.includes('backdrop-filter:blur(24px) saturate(150%)') &&
-  storefrontHtml.includes('--sd-detail-panel:rgba(255,255,255,.10)') &&
-  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.14)') &&
+  storefrontHtml.includes('--sd-detail-panel:rgba(250,246,237,.27)') &&
+  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.38)') &&
+  storefrontHtml.includes('html.dark .detail-modal .detail-copy{') &&
   storefrontHtml.includes('--sd-detail-panel:rgba(250,246,237,.27);') &&
   storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.38);'),
   'Product detail information must use its own frosted-glass panel, including a visible translucent treatment in dark mode'
