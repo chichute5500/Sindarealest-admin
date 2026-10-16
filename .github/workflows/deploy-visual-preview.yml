@@ -74,7 +74,7 @@ jobs:
         run: |
           set -o pipefail
           npx wrangler pages deploy public --project-name="$CLOUDFLARE_PAGES_PROJECT" --branch="$SD_PAGES_PREVIEW_BRANCH" 2>&1 | tee "$RUNNER_TEMP/pages-deploy.log"
-          DEPLOYMENT_URL="$(sed -n 's/.*Deployment complete! Take a peek over at \\(https:\/\/[^[:space:]]*\\).*/\\1/p' "$RUNNER_TEMP/pages-deploy.log" | tail -n 1)"
+          DEPLOYMENT_URL="$(grep 'Deployment complete! Take a peek over at ' "$RUNNER_TEMP/pages-deploy.log" | tail -n 1 | awk '{print $NF}')"
           test -n "$DEPLOYMENT_URL" || { echo "::error::Could not capture the immutable deployment URL"; exit 1; }
           echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           echo "### Liquid Glass preview deployed" >> "$GITHUB_STEP_SUMMARY"
