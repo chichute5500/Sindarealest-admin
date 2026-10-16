@@ -637,7 +637,7 @@ const revealObserver='IntersectionObserver'in window?new IntersectionObserver(en
 function preferredGallery(category,fallbackSku){const candidates=products.filter(p=>p.category===category&&allImages(p).length>1).sort((a,b)=>allImages(b).length-allImages(a).length);return candidates[0]||preferred(category,fallbackSku)}
 function featuredProductCard(p,flag='SELECTED',idx=0){const images=allImages(p);const id=escapeHtml(p.id||p.slug);const count=images.length;const track=count>1?`<span class="feature-track" data-feature-track style="--slide-count:${count};width:${count*100}%">${images.map((src,i)=>`<img class="feature-slide" ${i===0?`src="${escapeHtml(imgPath(src))}"`:`data-src="${escapeHtml(imgPath(src))}"`} alt="${escapeHtml(p.title)} — ảnh ${i+1}" ${i===0?'loading="eager"':'loading="lazy"'} decoding="async" style="flex:0 0 ${100/count}%;width:${100/count}%">`).join('')}</span>`:`<img class="feature-single" src="${escapeHtml(imgPath(images[0]||'images/theme-croc-dark.webp'))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`;return `<article class="product-card featured-product-card tap-target" data-reveal style="--reveal-delay:${Math.min(idx,3)*65}ms" data-featured-card data-feature-count="${count}" data-feature-index="0" data-product="${id}"><div class="featured-media"><button class="product-open featured-open" data-open-product="${id}" aria-label="Xem chi tiết ${escapeHtml(p.title)}"><span class="product-photo feature-photo">${track}<span class="photo-shade"></span><span class="product-flag">${escapeHtml(flag)}</span></span></button>${count>1?`<button class="featured-arrow featured-prev tap-target" data-feature-step="-1" aria-label="Ảnh trước của ${escapeHtml(p.title)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="featured-arrow featured-next tap-target" data-feature-step="1" aria-label="Ảnh tiếp theo của ${escapeHtml(p.title)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="featured-image-count" data-feature-count-label>01 / ${String(count).padStart(2,'0')}</span>`:''}</div><div class="product-info"><span class="product-sku">SKU: ${escapeHtml(p.sku||'Liên hệ')}</span><button class="featured-title product-title" data-open-product="${id}">${escapeHtml(p.title||'Sản phẩm tuyển chọn')}</button><div class="product-category">${escapeHtml(p.categoryLabel||categoryLabels[p.category]||'Sản phẩm')}</div><div class="product-card-bottom"><button class="product-detail-cta" data-open-product="${id}">Xem chi tiết <span>↗</span></button></div></div><button class="mini-add quick-add tap-target" data-add="${id}" aria-label="Thêm ${escapeHtml(p.title)} vào giỏ chọn">${iconBag()}</button></article>`}
 function renderFeatured(){const categories=['sneakers','loafers','belts','wallets'];const fallbacks=['SD001','SD064','SD167','SD138'];const flags=['SIGNATURE','CRAFT','ACCESSORY','ESSENTIAL'];const choices=categories.map((c,i)=>preferredGallery(c,fallbacks[i])).filter(Boolean);$('#featuredGrid').innerHTML=choices.map((p,i)=>featuredProductCard(p,flags[i]||'SELECTED',i)).join('');bindReveal($('#featuredGrid'));setupFeaturedAutoplay()}
-function changeFeaturedImage(card,step=1){if(!card)return;const track=card.querySelector('[data-feature-track]');const count=Number(card.dataset.featureCount||0);if(!track||count<2)return;const base=Number(card.dataset.featureRequestIndex??card.dataset.featureIndex??0);const index=(base+step+count)%count;card.dataset.featureRequestIndex=String(index);const requestId=String(Number(card.dataset.featureRequestId||0)+1);card.dataset.featureRequestId=requestId;const commit=()=>{if(card.dataset.featureRequestId!==requestId)return;card.dataset.featureIndex=String(index);track.style.transform=`translate3d(${-index*100/count}%,0,0)`;const label=card.querySelector('[data-feature-count-label]');if(label)label.textContent=String(index+1).padStart(2,'0')+' / '+String(count).padStart(2,'0');const ahead=track.children[(index+1)%count];if(ahead&&ahead.dataset.src&&!ahead.dataset.preloading){ahead.dataset.preloading='1';const preload=new Image();preload.onload=()=>{ahead.dataset.preloaded='1';delete ahead.dataset.preloading};preload.onerror=()=>{delete ahead.dataset.preloading};preload.src=ahead.dataset.src}};const target=track.children[index];if(target&&target.dataset.src&&!target.getAttribute('src')){target.onload=()=>{target.onload=null;target.dataset.loaded='1';commit()};target.onerror=()=>{target.onerror=null;commit()};target.src=target.dataset.src;delete target.dataset.src;return}commit()}
+function changeFeaturedImage(card,step=1){if(!card)return;const track=card.querySelector('[data-feature-track]');const count=Number(card.dataset.featureCount||0);if(!track||count<2)return;const base=Number(card.dataset.featureRequestIndex??card.dataset.featureIndex??0);const index=(base+step+count)%count;card.dataset.featureRequestIndex=String(index);const requestId=String(Number(card.dataset.featureRequestId||0)+1);card.dataset.featureRequestId=requestId;const commit=()=>{if(card.dataset.featureRequestId!==requestId)return;track.classList.remove('sd-image-changing');void track.offsetWidth;track.classList.add('sd-image-changing');card.dataset.featureIndex=String(index);track.style.transform=`translate3d(${-index*100/count}%,0,0)`;const label=card.querySelector('[data-feature-count-label]');if(label)label.textContent=String(index+1).padStart(2,'0')+' / '+String(count).padStart(2,'0');const ahead=track.children[(index+1)%count];if(ahead&&ahead.dataset.src&&!ahead.dataset.preloading){ahead.dataset.preloading='1';const preload=new Image();preload.onload=()=>{ahead.dataset.preloaded='1';delete ahead.dataset.preloading};preload.onerror=()=>{delete ahead.dataset.preloading};preload.src=ahead.dataset.src}};const target=track.children[index];if(target&&target.dataset.src&&!target.getAttribute('src')){target.onload=()=>{target.onload=null;target.dataset.loaded='1';commit()};target.onerror=()=>{target.onerror=null;commit()};target.src=target.dataset.src;delete target.dataset.src;return}commit()}
 let featuredPausedUntil=0;
 function pauseFeaturedAutoplay(){featuredPausedUntil=Date.now()+6000}
 function setupFeaturedAutoplay(){if(featuredTimer)clearInterval(featuredTimer);if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;featuredTimer=setInterval(()=>{if(document.hidden||Date.now()<featuredPausedUntil)return;const section=$('#featured');if(!section)return;const rect=section.getBoundingClientRect();if(rect.bottom<0||rect.top>window.innerHeight)return;$$('[data-featured-card]').forEach(card=>changeFeaturedImage(card,1))},3000)}
@@ -661,11 +661,12 @@ function sizeFullscreenFrame(){
 }
 function setFullscreenPhoto(src){
  const img=$('#sdFullscreenImage'),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
- img.onload=()=>{sizeFullscreenFrame();img.onload=null;img.onerror=null;requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),100))};
+ const same=img.getAttribute('src')===next;
+ if(same&&img.complete&&img.naturalWidth){sizeFullscreenFrame();img.classList.remove('is-changing');window.__sdUpdateDetailWatermark?.();return}
+ img.onload=()=>{sizeFullscreenFrame();img.onload=null;img.onerror=null;requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),180))};
  img.onerror=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';img.classList.remove('is-changing')};
- if(img.getAttribute('src')!==next){img.classList.add('is-changing');img.onload=()=>{sizeFullscreenFrame();img.onload=null;img.onerror=null;requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),100))};}
- img.src=next;
- if(img.complete&&img.naturalWidth){sizeFullscreenFrame();requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),100))}
+ if(!same){img.classList.add('is-changing');img.src=next}else if(!img.complete){img.classList.add('is-changing')}
+ if(img.complete&&img.naturalWidth){sizeFullscreenFrame();requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),180))}
  window.__sdUpdateDetailWatermark?.();
 }
 function renderFullscreenThumbs(){
@@ -713,7 +714,7 @@ function changeDetailImage(index,resetTimer=true){
   img.onload=finish;img.onerror=finish;img.src=next;
   if(img.complete&&img.naturalWidth)finish();
  };
- detailSwapTimer=setTimeout(swap,120);
+ detailSwapTimer=setTimeout(swap,180);
  scheduleDetailAutoplay();
 }
 function openDetail(productId,fromUrl=false){clearTimeout(detailSwapTimer);const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;document.title=(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){history.pushState({productId:p.id},'',`/san-pham/${encodeURIComponent(p.sku||p.id)}`)}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp');img.alt=p.title||'Sản phẩm SinDarealest';$('#detailSku').textContent='SKU: '+(p.sku||'Liên hệ');$('#detailTitle').textContent=p.title||'Sản phẩm tuyển chọn';$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailCategory').textContent=p.categoryLabel||categoryLabels[p.category]||'Selected piece';$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();}
@@ -728,7 +729,7 @@ function closeCart(){ $('#cartDrawer').classList.remove('open');$('#cartDrawer')
 async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch(e){}try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
 async function consultProduct(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id)||currentProduct;if(!p)return;const sku=p.sku||'Mã SKU chưa có';const title=p.title||'Sản phẩm SinDarealest';const message=`Chào SinDarealest, tôi muốn tư vấn/đặt hàng sản phẩm ${title} (SKU: ${sku})`;const ok=await copyText(message);showToast(ok?'Đã sao chép lời nhắn tư vấn/đặt hàng. Đang mở Zalo…':'Không thể tự sao chép. Đang mở Zalo để bạn tiếp tục tư vấn.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(ok?'Nội dung tư vấn đã được sao chép. Bạn có thể dán vào Zalo.':'Hãy gửi lời nhắn tư vấn khi Zalo mở.',ZALO)},1000)}
 async function consultCart(){const items=Object.entries(cart).map(([id,q])=>({p:products.find(x=>(x.id||x.slug)===id),q})).filter(x=>x.p);if(!items.length){showToast('Bạn chưa chọn sản phẩm.');return}const msg=items.map(x=>`${x.p.sku||x.p.title} × ${x.q}`).join('\n');await copyText(msg);showToast('Đã sao chép danh sách SKU. Đang mở Zalo…');setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast('Trình duyệt chặn tự mở Zalo. Danh sách SKU đã được sao chép.',ZALO)},1000)}
-function setupArtSlideshow(){const sneakerProducts=products.filter(p=>p.category==='sneakers');const imgs=uniqueImages(sneakerProducts);if(!imgs.length)return;let pool=imgs.slice().sort(()=>Math.random()-.5);if(!pool.length)return;function show(index){artIndex=(index+pool.length)%pool.length;const src=pool[artIndex];const img=$('#artSlide');const commit=()=>{img.style.opacity='.08';img.style.transform='scale(1.025)';setTimeout(()=>{img.onload=()=>{img.style.opacity='1';img.style.transform='scale(1)'};img.onerror=()=>{img.style.opacity='1';img.style.transform='scale(1)'};img.src=src;$('#artSlideCount').textContent=String(artIndex+1).padStart(2,'0')+' / '+imgs.length},260)};if(src===img.getAttribute('src')){nextRandom();return}const preload=new Image();preload.onload=commit;preload.onerror=commit;preload.src=src}function nextRandom(){if(document.hidden||pool.length<=1)return;let n=Math.floor(Math.random()*pool.length);if(n===artIndex)n=(n+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;const src=pool[n];const img=new Image();img.onload=()=>show(n);img.onerror=()=>show(n);img.src=src}$('#artNext').addEventListener('click',()=>show((artIndex+1)%pool.length));$('#artPrev').addEventListener('click',()=>show(artIndex-1));show(Math.floor(Math.random()*pool.length));artTimer=setInterval(()=>{if(!document.hidden)nextRandom()},3000)}
+function setupArtSlideshow(){const sneakerProducts=products.filter(p=>p.category==='sneakers');const imgs=uniqueImages(sneakerProducts);if(!imgs.length)return;let pool=imgs.slice().sort(()=>Math.random()-.5);if(!pool.length)return;function show(index){artIndex=(index+pool.length)%pool.length;const src=pool[artIndex];const img=$('#artSlide');const commit=()=>{img.style.opacity='.08';img.style.filter='blur(4px)';img.style.transform='scale(1.025)';setTimeout(()=>{img.onload=()=>{img.onload=null;img.onerror=null;img.style.opacity='1';img.style.filter='blur(0px) saturate(.92)';img.style.transform='scale(1)'};img.onerror=()=>{img.onload=null;img.onerror=null;img.style.opacity='1';img.style.filter='blur(0px) saturate(.92)';img.style.transform='scale(1)'};img.src=src;$('#artSlideCount').textContent=String(artIndex+1).padStart(2,'0')+' / '+imgs.length},300)};if(src===img.getAttribute('src')){nextRandom();return}const preload=new Image();preload.onload=commit;preload.onerror=commit;preload.src=src}function nextRandom(){if(document.hidden||pool.length<=1)return;let n=Math.floor(Math.random()*pool.length);if(n===artIndex)n=(n+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;const src=pool[n];const img=new Image();img.onload=()=>show(n);img.onerror=()=>show(n);img.src=src}$('#artNext').addEventListener('click',()=>show((artIndex+1)%pool.length));$('#artPrev').addEventListener('click',()=>show(artIndex-1));show(Math.floor(Math.random()*pool.length));artTimer=setInterval(()=>{if(!document.hidden)nextRandom()},3000)}
 function setActiveNav(id){$$('[data-nav]').forEach(a=>{const yes=a.dataset.nav===id;a.classList.toggle('active',yes);if(yes)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 function setMobileMenu(open){const menu=$('#mobileNav'),backdrop=$('#mobileNavBackdrop');menu.classList.toggle('open',open);backdrop.classList.toggle('open',open);$('#menuToggle').setAttribute('aria-expanded',String(open));$('#menuToggle').setAttribute('aria-label',open?'Đóng menu':'Mở menu')}function navClick(e){const a=e.target.closest('[data-nav]');if(!a)return;setActiveNav(a.dataset.nav);setMobileMenu(false)}
 function setupNavSpy(){const targets=$$('[data-nav]').map(a=>document.getElementById(a.dataset.nav)).filter(Boolean);if(!('IntersectionObserver'in window))return;const io=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)setActiveNav(visible.target.id)},{rootMargin:'-25% 0px -60% 0px',threshold:[0,.1,.25,.5]});targets.forEach(s=>io.observe(s))}
@@ -830,8 +831,106 @@ html.dark .product-info,html.dark .detail-info,html.dark .detail-description,htm
  html.dark .product-info{background:rgba(8,8,8,.28)}
  .featured-arrow{width:34px;height:34px}
 }
+/* Three requested interface refinements — test branch only. */
+:root{
+ --sd-service-glass:rgba(255,255,255,.27);
+ --sd-service-border:rgba(255,255,255,.48);
+ --sd-detail-panel:rgba(250,246,237,.27);
+ --sd-detail-highlight:rgba(255,255,255,.38);
+}
+html.dark{
+ --sd-service-glass:rgba(255,255,255,.065);
+ --sd-service-border:rgba(255,255,255,.19);
+ --sd-detail-panel:rgba(8,8,8,.23);
+ --sd-detail-highlight:rgba(255,255,255,.085);
+}
+/* Information 1: six individual glass tiles, while retaining the original strip. */
+.service-strip{gap:8px!important;padding:10px!important}
+.service-strip .service{
+ min-width:0;min-height:68px;gap:8px;padding:10px 9px;
+ border:1px solid var(--sd-service-border);border-radius:17px;
+ background:var(--sd-service-glass);
+ backdrop-filter:blur(18px) saturate(145%);-webkit-backdrop-filter:blur(18px) saturate(145%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 7px 20px rgba(0,0,0,.07);
+ transition:background .3s ease,border-color .3s ease,box-shadow .3s ease,transform .3s ease;
+}
+.service-strip .service:not(:last-child)::after{display:none!important}
+.service-strip .service strong{font-size:clamp(8px,.7vw + 3px,10px);line-height:1.35;overflow-wrap:anywhere}
+.service-strip .service small{font-size:8px;line-height:1.45;overflow-wrap:anywhere}
+.service-strip .service-icon{
+ background:rgba(255,255,255,.25);border-color:var(--sd-service-border);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 3px 9px rgba(0,0,0,.04);
+}
+html.dark .service-strip .service-icon{background:rgba(255,255,255,.075)}
+html:not(.dark) .service-strip .service:hover{background:rgba(255,255,255,.43);border-color:rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 10px 24px rgba(0,0,0,.09)}
+html.dark .service-strip .service:hover{background:rgba(255,255,255,.105);border-color:rgba(255,255,255,.29);box-shadow:inset 0 1px 0 rgba(255,255,255,.17),0 10px 24px rgba(0,0,0,.22)}
+/* Information 2: dedicated frosted-glass panel for product details. */
+.detail-modal .detail-copy{
+ position:relative;isolation:isolate;min-width:0;
+ padding:clamp(16px,2vw,24px)!important;border:1px solid var(--line);border-radius:22px;
+ background:linear-gradient(145deg,var(--sd-detail-highlight),transparent 72%),var(--sd-detail-panel);
+ backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.31),0 14px 34px rgba(0,0,0,.085);
+ transition:background .8s ease,border-color .8s ease,box-shadow .8s ease;
+}
+.detail-modal .detail-copy .product-sku{margin-top:8px}
+.detail-modal .detail-copy .detail-desc{overflow-wrap:anywhere}
+.detail-modal .detail-copy .promise-tags{gap:8px}
+@media(max-width:760px){
+ .service-strip{gap:7px!important;padding:8px!important}
+ .service-strip .service{min-height:62px;padding:8px 7px;gap:6px;border-radius:15px}
+ .service-strip .service-icon{width:26px;height:26px;flex:0 0 26px}
+ .detail-modal .detail-copy{padding:16px!important;border-radius:18px}
+}
+/* Information 3: consistent press scale and longer, clearer image transitions. */
+.featured-arrow,.slide-controls button,.detail-gallery-arrow,.sd-fullscreen-arrow{
+ transition:transform .24s cubic-bezier(.2,.8,.25,1),background .24s ease,box-shadow .24s ease;
+ touch-action:manipulation;
+}
+.featured-arrow:active,.slide-controls button:active{
+ transform:scale(.5)!important;
+ background:rgba(214,180,112,.48);
+ box-shadow:inset 0 3px 7px rgba(0,0,0,.20),0 1px 3px rgba(0,0,0,.12);
+}
+.detail-gallery-arrow:active,.sd-fullscreen-arrow:active{
+ transform:translateY(-50%) scale(.5)!important;
+ background:rgba(214,180,112,.48);
+ box-shadow:inset 0 3px 7px rgba(0,0,0,.20),0 1px 3px rgba(0,0,0,.12);
+}
+.sd-fullscreen-arrow:hover{transform:translateY(-50%) scale(1.04)}
+.sd-fullscreen-image{
+ opacity:1;filter:blur(0);transform:scale(1);
+ transition:opacity .52s ease,filter .52s ease,transform .52s cubic-bezier(.2,.75,.25,1);
+ will-change:opacity,filter,transform;
+}
+.sd-fullscreen-image.is-changing{
+ opacity:.20!important;filter:blur(4px)!important;transform:scale(.975)!important;
+ transition-duration:.26s!important;
+}
+#detailMainImage.detail-main-image{
+ transition:opacity .64s ease,filter .64s ease,transform .64s cubic-bezier(.2,.75,.25,1)!important;
+ will-change:opacity,filter,transform;
+}
+#detailMainImage.detail-main-image.is-changing{
+ opacity:.18!important;filter:blur(4px)!important;transform:scale(.975)!important;
+ transition-duration:.30s!important;
+}
+/* The real card class is featured-product-card (not featured-card). */
+.featured-product-card [data-feature-track]{transition:transform 1.45s cubic-bezier(.16,1,.3,1)!important;will-change:transform,filter,opacity}
+@keyframes sdFeaturedImageShift{
+ 0%{filter:blur(1.6px);opacity:.86}
+ 55%{filter:blur(.7px);opacity:.96}
+ 100%{filter:blur(0);opacity:1}
+}
+.featured-product-card [data-feature-track].sd-image-changing{animation:sdFeaturedImageShift .76s cubic-bezier(.22,.75,.25,1) both}
+#artSlide{
+ transition:transform 1.3s cubic-bezier(.2,.75,.25,1),opacity 1s ease,filter .52s ease!important;
+ will-change:opacity,transform,filter;
+}
 @media(prefers-reduced-motion:reduce){
- .sd-fullscreen-image,#detailMainImage,.featured-card [data-feature-track],.featured-arrow,.detail-gallery-arrow{transition-duration:.01ms!important;animation-duration:.01ms!important}
+ .sd-fullscreen-image,#detailMainImage,.featured-product-card [data-feature-track],.featured-arrow,.slide-controls button,.detail-gallery-arrow,.sd-fullscreen-arrow,#artSlide{
+  transition-duration:.01ms!important;animation-duration:.01ms!important
+ }
 }
 
 </style>
