@@ -84,7 +84,7 @@ assert.ok(publicPage.includes('window.__sdUpdateDetailWatermark?.()'), 'Fullscre
 assert.ok(publicPage.includes('background:rgba(35,30,23,.28)!important;backdrop-filter:blur(8px) saturate(1.12)!important'), 'Fullscreen viewer must use a 28% translucent glass layer with reduced blur');
 assert.ok(publicPage.includes('id="sdFullscreenThumbs"'), 'Fullscreen viewer must include a thumbnail strip for direct image selection');
 assert.ok(publicPage.includes("data-full-thumb"), 'Fullscreen thumbnails must be wired to gallery navigation');
-assert.ok(publicPage.includes("$('#detailMainImage').classList.remove('is-changing')"), 'Closing fullscreen must clear stale blur state from the detail image');
+assert.ok(publicPage.includes('clearGalleryTransitionClasses(main)'), 'Closing fullscreen must clear stale blur and slide states from the detail image');
 assert.ok(publicPage.includes('bottom:calc(91px + env(safe-area-inset-bottom))'), 'Fullscreen image counter must sit in a dedicated footer area above thumbnails');
 assert.ok(publicPage.includes('width:max-content;min-width:0;max-width:calc(100% - 24px)'), 'Fullscreen counter must use content width instead of stretching across the image');
 assert.ok(publicPage.includes('calc(132px + env(safe-area-inset-bottom))'), 'Fullscreen image stage must reserve space for counter and thumbnail tray');
