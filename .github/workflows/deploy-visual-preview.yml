@@ -80,9 +80,9 @@ jobs:
           const url = process.env.SD_PREVIEW_URL;
           const expected = [
             'Keep the card shell clear so it does not stack a second translucent layer underneath.',
-            '.product-card{\\n background:transparent!important;',
-            '.product-card .product-info{\\n background:var(--glass)!important;',
-            '.product-card:hover{\\n background:transparent!important;'
+            '.product-card{\n background:transparent!important;',
+            '.product-card .product-info{\n background:var(--glass)!important;',
+            '.product-card:hover{\n background:transparent!important;'
           ];
           let lastError = '';
           for (let attempt = 1; attempt <= 10; attempt++) {
