@@ -24,14 +24,16 @@ assert.ok(
   storefrontHtml.includes('background:linear-gradient(145deg,var(--sd-detail-highlight),transparent 72%),var(--sd-detail-panel)') &&
   storefrontHtml.includes('backdrop-filter:blur(24px) saturate(150%)') &&
   storefrontHtml.includes('--sd-detail-panel:rgba(255,255,255,.10)') &&
-  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.14)'),
+  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.14)') &&
+  storefrontHtml.includes('--sd-detail-panel:rgba(250,246,237,.27);') &&
+  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.38);'),
   'Product detail information must use its own frosted-glass panel, including a visible translucent treatment in dark mode'
 );
 assert.ok(
   storefrontHtml.includes('.featured-arrow:active,.slide-controls button:active{') &&
-  storefrontHtml.includes('transform:scale(.5)!important;') &&
-  storefrontHtml.includes('.detail-gallery-arrow:active,.sd-fullscreen-arrow:active{') &&
-  storefrontHtml.includes('transform:translateY(-50%) scale(.5)!important;') &&
+  storefrontHtml.includes('transform:scale(.65)!important;') &&
+  storefrontHtml.includes('transform:translateY(-50%) scale(.65)!important;') &&
+  storefrontHtml.includes('cubic-bezier(.34,1.56,.64,1)') &&
   storefrontHtml.includes('touch-action:manipulation;'),
   'Featured, in-page gallery, and fullscreen arrows must press to half size without losing their vertical anchor'
 );
@@ -40,6 +42,12 @@ assert.ok(
   storefrontHtml.includes('sdFeaturedImageShift .76s') &&
   storefrontHtml.includes('transition:opacity .52s ease,filter .52s ease,transform .52s') &&
   storefrontHtml.includes('transition:opacity .64s ease,filter .64s ease,transform .64s') &&
+  storefrontHtml.includes('@keyframes sdGalleryOutLeft') &&
+  storefrontHtml.includes('@keyframes sdGalleryOutRight') &&
+  storefrontHtml.includes('@keyframes sdGalleryInRight') &&
+  storefrontHtml.includes('@keyframes sdGalleryInLeft') &&
+  storefrontHtml.includes('setFullscreenPhoto(next,direction)') &&
+  storefrontHtml.includes('detailSwapTimer=setTimeout(swap,230)') &&
   storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
   'Image transitions must combine subtle fade/zoom with the requested longer timing while respecting reduced-motion preferences'
 );
