@@ -70,8 +70,10 @@ assert.ok(!adminPage.includes('watermarkApplied'), 'Admin uploads must not requi
 assert.ok(!adminPage.includes('ctx.drawImage(markBitmap'), 'Admin must not bake the watermark into each product image');
 
 const uploadSource = readFileSync(new URL('../functions/api/admin/upload.js', import.meta.url), 'utf8');
-assert.ok(uploadSource.includes('private-originals/'), 'Raw source uploads must be stored in a non-public R2 prefix');
+assert.ok(uploadSource.includes('context.env.ORIGINALS.put'), 'Raw source uploads must use a separate private R2 bucket binding');
+assert.ok(uploadSource.includes('context.env.ORIGINALS.delete'), 'Failed derivative upload must remove the newly stored private original');
 assert.ok(uploadSource.includes('visibility: "private-original"'), 'Private original storage must be tagged as private');
+assert.ok(uploadSource.includes('Kho ảnh gốc chưa được cấu hình'), 'Uploads must fail closed when the private original bucket is not bound');
 assert.ok(uploadSource.includes('visibility: "public-optimized-derivative"'), 'Public derivative storage must be distinct from the original');
 assert.ok(!uploadSource.includes('watermarkApplied'), 'The upload API must accept unwatermarked derivative images');
 
