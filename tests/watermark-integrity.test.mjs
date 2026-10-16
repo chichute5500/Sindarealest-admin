@@ -81,6 +81,11 @@ assert.ok(publicPage.includes('.sd-fullscreen-image{display:block;width:100%;hei
 assert.ok(publicPage.includes('id="sdFullscreenFrame"'), 'Full-screen image and overlay watermark must share an aspect-ratio-matched photo frame');
 assert.ok(publicPage.includes('function sizeFullscreenFrame()'), 'Full-screen frame must size itself using the loaded image dimensions');
 assert.ok(publicPage.includes('window.__sdUpdateDetailWatermark?.()'), 'Fullscreen must sync watermark settings through the supported global hook');
+assert.ok(publicPage.includes('backdrop-filter:blur(26px) saturate(1.25)'), 'Fullscreen viewer must use the storefront-matching liquid-glass backdrop');
+assert.ok(publicPage.includes('id="sdFullscreenThumbs"'), 'Fullscreen viewer must include a thumbnail strip for direct image selection');
+assert.ok(publicPage.includes("data-full-thumb"), 'Fullscreen thumbnails must be wired to gallery navigation');
+assert.ok(publicPage.includes("$('#detailMainImage').classList.remove('is-changing')"), 'Closing fullscreen must clear stale blur state from the detail image');
+assert.ok(publicPage.includes('.sd-fullscreen-count{bottom:calc(78px + env(safe-area-inset-bottom))'), 'Fullscreen image counter must not overlap the thumbnail strip');
 assert.ok(publicPage.includes('.detail-image-count{position:absolute;left:50%;right:auto;bottom:12px'), 'The detail image counter must be centered away from a lower-right burned-in logo');
 const galleryStart = publicPage.indexOf('function changeDetailImage(index,resetTimer=true)');
 const galleryEnd = publicPage.indexOf('function openDetail(', galleryStart);
