@@ -1,9 +1,6 @@
-name: Validate SinDarealest changes
+name: Manual validation for SinDarealest
 
 on:
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -11,21 +8,26 @@ permissions:
 
 jobs:
   validate:
+    name: Manual source and routing validation
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Validate project integrity
+      - name: Check source integrity
         run: npm run check
 
-      - name: Run API and data smoke tests
+      - name: Run regression tests
         run: npm test
+
+      - name: Smoke test local Cloudflare Pages routing
+        run: node tests/pages-routing.test.mjs

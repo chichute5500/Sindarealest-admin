@@ -5,6 +5,7 @@ import { onRequestPost as createWarrantyClaim } from '../functions/api/warranty-
 import { onRequestPost as lookupWarranty } from '../functions/api/warranty-lookup.js';
 import { onRequestGet as sitemap } from '../functions/sitemap.xml.js';
 import { onRequestGet as robots } from '../functions/robots.txt.js';
+import { onRequest as unknownApiRoute } from '../functions/api/[[path]].js';
 import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
@@ -25,7 +26,7 @@ for (const table of ['customer_address_details','order_shipping_addresses','orde
   assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
-assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary upload and lookup tokens without requiring OTP tables');
+assert.ok(!restoreSource.includes('warranty_claim_uploads') && !restoreSource.includes('warranty_verifications') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'"), 'Restore must clear temporary upload and lookup tokens without requiring retired OTP tables');
 const uploadSource = readFileSync(new URL('../functions/api/warranty-claim-uploads.js', import.meta.url), 'utf8');
 assert.ok(uploadSource.includes('INSERT INTO settings(key,value,updated_at)') && uploadSource.includes('warranty_upload:'), 'New uploads must store short-lived tokens in the existing settings table');
 assert.ok(warrantyClaimSource.includes('warranty_upload:') && warrantyClaimSource.includes('DELETE FROM settings WHERE key=?'), 'Claim submission must validate and consume the upload token');
@@ -162,5 +163,17 @@ const reusedTokenResponse = await createWarrantyClaim({
   env:{DB:warrantyDBInstance}
 });
 assert.equal(reusedTokenResponse.status,400,'A consumed lookup token must not authorize a second claim');
+
+
+for (const method of ['GET', 'POST']) {
+  const missingApi = await unknownApiRoute({
+    request: new Request('https://shop.example/api/admin/removed-experiment', { method }),
+  });
+  assert.equal(missingApi.status, 404, 'Unknown API routes must return 404 instead of the storefront fallback');
+  assert.ok((missingApi.headers.get('Content-Type') || '').toLowerCase().includes('application/json'));
+  assert.equal(missingApi.headers.get('Cache-Control'), 'no-store');
+  const missingApiPayload = await missingApi.json();
+  assert.equal(missingApiPayload.code, 'API_ROUTE_NOT_FOUND');
+}
 
 console.log('PASS: SKU SEO URLs, masked warranty lookups, expiring claim tokens, sitemap/robots, and cross-origin request rejection.');

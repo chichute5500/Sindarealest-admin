@@ -23,7 +23,7 @@ function runTest(file) {
 
 for (const required of [
   'package.json', 'wrangler.toml',
-  'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
+  'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/[[path]].js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
@@ -83,6 +83,10 @@ check(homepage.includes('opacity:.68'), 'Watermark chưa đặt độ mờ theo 
 check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claims'), 'Trang chủ chưa kết nối yêu cầu đặt hàng và bảo hành');
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
+const warrantyMigration = existsSync(join(root, 'migrations/0005_address_warranty_verification.sql')) ? readFileSync(join(root, 'migrations/0005_address_warranty_verification.sql'), 'utf8') : '';
+check(!/CREATE TABLE IF NOT EXISTS\s+warranty_verifications\b/i.test(warrantyMigration), 'Fresh setup must not create the retired warranty OTP table');
+check(!/CREATE TABLE IF NOT EXISTS\s+warranty_claim_uploads\b/i.test(warrantyMigration), 'Fresh setup must not create the retired OTP upload table');
+check(!/DROP TABLE\s+(IF EXISTS\s+)?(warranty_verifications|warranty_claim_uploads)\b/i.test(warrantyMigration), 'Baseline migration must not destructively remove legacy data from existing D1 databases');
 for (const table of ['customers','orders','order_items','warranties','warranty_claims','audit_logs','public_rate_limits']) check(new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`).test(newMigration), `Migration 0003 thiếu bảng ${table}`);
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
@@ -132,6 +136,66 @@ for (const secretFile of ['.env', '.dev.vars', '.env.production', '.dev.vars.pro
 
 for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs']) {
   if (existsSync(join(root, file))) runTest(file);
+}
+
+// Permanent regression guard: AI image-search experiment resources must stay out
+// of the baseline storefront/admin and deployment path.
+const removedExperimentPaths = [
+  '.github/workflows/ai-rewrite-checks.yml',
+  '.github/workflows/migrate-ai-preview-d1.yml',
+  'functions/_lib/ai-quota.js',
+  'functions/_lib/ai-review-schema.js',
+  'functions/_lib/elimapi.js',
+  'functions/_lib/image-audit.js',
+  'functions/_lib/workers-ai.js',
+  'functions/api/admin/image-audit.js',
+  'functions/api/admin/image-candidate.js',
+  'functions/api/admin/image-proxy.js',
+  'functions/api/admin/image-search.js',
+  'migrations/0007_ai_image_reviews.sql',
+  'migrations/0008_ai_image_source_url.sql',
+  'migrations/0009_ai_request_limits.sql',
+  'migrations/0010_ai_image_source_image_url.sql',
+  'scripts/apply-ai-image-migrations.mjs',
+  'tests/image-search.test.mjs',
+];
+for (const removedPath of removedExperimentPaths) {
+  check(!existsSync(join(root, removedPath)), `Removed image-search experiment file still exists: ${removedPath}`);
+}
+
+const forbiddenConfigMarkers = [
+  'ELIMAPI_API_KEY',
+  'ELIMAPI_IMAGE_SEARCH_ENABLED',
+  'apply-ai-image-migrations.mjs',
+  'migrations/0007_ai_image_reviews.sql',
+  'migrations/0008_ai_image_source_url.sql',
+  'migrations/0009_ai_request_limits.sql',
+  'migrations/0010_ai_image_source_image_url.sql',
+];
+for (const configPath of [
+  'package.json', 'wrangler.toml', '.github/workflows/deploy.yml',
+  'README-DEPLOY.txt', 'scripts/setup-cloudflare.mjs',
+  'scripts/deploy-cloudflare.mjs', 'public/admin/index.html',
+]) {
+  const fullPath = join(root, configPath);
+  if (!existsSync(fullPath)) continue;
+  const content = readFileSync(fullPath, 'utf8');
+  check(
+    !forbiddenConfigMarkers.some((marker) => content.includes(marker)),
+    `Stale AI image-search experiment configuration remains in ${configPath}`,
+  );
+}
+const deployWorkflowPath = join(root, '.github/workflows/deploy.yml');
+if (existsSync(deployWorkflowPath)) {
+  const workflowLines = readFileSync(deployWorkflowPath, 'utf8').split(String.fromCharCode(10));
+  const triggerLine = workflowLines.find((line) => line.startsWith('      - '));
+  const configuredLine = workflowLines.find((line) => line.trim().startsWith('CLOUDFLARE_PAGES_BRANCH:'));
+  const triggerBranch = triggerLine?.trim().slice(2);
+  const configuredBranch = configuredLine?.slice(configuredLine.indexOf(':') + 1).trim();
+  check(
+    Boolean(triggerBranch && configuredBranch && triggerBranch === configuredBranch),
+    'GitHub automatic-deploy trigger must match CLOUDFLARE_PAGES_BRANCH',
+  );
 }
 
 if (failures.length) {
