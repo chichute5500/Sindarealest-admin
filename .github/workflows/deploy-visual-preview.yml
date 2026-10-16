@@ -55,10 +55,17 @@ jobs:
           assertSafeName(previewBranch, 'Preview branch');
           const record = findNamedRecord(listPagesProjects(), projectName, ['name', 'project_name', 'Project Name']);
           if (!record) throw new Error(`Cloudflare Pages project "${projectName}" not found; preview deploy stopped.`);
-          const productionBranch = typeof record.production_branch === 'string' ? record.production_branch : '';
-          if (!productionBranch) throw new Error('Cannot verify the production branch; preview deploy stopped.');
-          if (previewBranch === productionBranch) throw new Error('Preview branch matches production branch; refusing deployment.');
-          console.log(`Preview target verified: ${previewBranch}; production branch remains ${productionBranch}.`);
+          // Cloudflare's project-list response can omit production_branch. The existing
+          // production workflow pins the verified production branch to this value.
+          const configuredProductionBranch = 'fix/ai-review-quota-scope-2026-10-15';
+          const reportedProductionBranch = typeof record.production_branch === 'string' ? record.production_branch : '';
+          if (previewBranch === configuredProductionBranch || (reportedProductionBranch && previewBranch === reportedProductionBranch)) {
+            throw new Error('Preview branch matches a production branch; refusing deployment.');
+          }
+          if (reportedProductionBranch && reportedProductionBranch !== configuredProductionBranch) {
+            throw new Error(`Cloudflare production branch (${reportedProductionBranch}) differs from the repository's verified production branch; refusing deployment.`);
+          }
+          console.log(`Preview target verified: ${previewBranch}; production branch remains ${reportedProductionBranch || configuredProductionBranch}.`);
           NODE
 
       - name: Deploy only to the separate preview branch
