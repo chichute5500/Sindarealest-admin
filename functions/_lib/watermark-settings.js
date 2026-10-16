@@ -1,0 +1,69 @@
+export const WATERMARK_DEFAULTS = Object.freeze({
+  watermark_enabled: "1",
+  watermark_logo: "/watermark.webp",
+  watermark_position: "bottom-right",
+  watermark_size: "16",
+  watermark_opacity: "68",
+});
+
+export const WATERMARK_POSITIONS = Object.freeze([
+  "top-left",
+  "top-right",
+  "bottom-left",
+  "bottom-right",
+  "center",
+]);
+
+function integerInRange(value, min, max) {
+  const number = typeof value === "number" ? value : Number(value);
+  return Number.isInteger(number) && number >= min && number <= max ? number : null;
+}
+
+export function isAllowedWatermarkLogo(value) {
+  return value === "/watermark.webp" ||
+    (typeof value === "string" && /^\/media\/wm-[0-9a-f-]{36}\.webp$/i.test(value));
+}
+
+export function normalizeWatermarkSettings(values = {}) {
+  const position = WATERMARK_POSITIONS.includes(values.watermark_position)
+    ? values.watermark_position : WATERMARK_DEFAULTS.watermark_position;
+  const size = integerInRange(values.watermark_size, 6, 35);
+  const opacity = integerInRange(values.watermark_opacity, 10, 100);
+  const logo = isAllowedWatermarkLogo(values.watermark_logo)
+    ? values.watermark_logo : WATERMARK_DEFAULTS.watermark_logo;
+
+  return {
+    watermarkEnabled: values.watermark_enabled === "0" ? false : true,
+    watermarkLogoUrl: logo,
+    watermarkPosition: position,
+    watermarkSize: size ?? Number(WATERMARK_DEFAULTS.watermark_size),
+    watermarkOpacity: opacity ?? Number(WATERMARK_DEFAULTS.watermark_opacity),
+  };
+}
+
+export function validateWatermarkSettingUpdates(body = {}) {
+  const updates = [];
+  if (body.watermarkEnabled !== undefined) {
+    if (typeof body.watermarkEnabled !== "boolean") {
+      return { error: "Cần chọn bật hoặc tắt watermark." };
+    }
+    updates.push(["watermark_enabled", body.watermarkEnabled ? "1" : "0"]);
+  }
+  if (body.watermarkPosition !== undefined) {
+    if (!WATERMARK_POSITIONS.includes(body.watermarkPosition)) {
+      return { error: "Vị trí watermark không hợp lệ." };
+    }
+    updates.push(["watermark_position", body.watermarkPosition]);
+  }
+  if (body.watermarkSize !== undefined) {
+    const size = integerInRange(body.watermarkSize, 6, 35);
+    if (size === null) return { error: "Kích thước watermark phải là số nguyên từ 6 đến 35%." };
+    updates.push(["watermark_size", String(size)]);
+  }
+  if (body.watermarkOpacity !== undefined) {
+    const opacity = integerInRange(body.watermarkOpacity, 10, 100);
+    if (opacity === null) return { error: "Độ mờ watermark phải là số nguyên từ 10 đến 100%." };
+    updates.push(["watermark_opacity", String(opacity)]);
+  }
+  return { updates };
+}
