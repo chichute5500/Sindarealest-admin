@@ -54,11 +54,14 @@ assert.equal(publicSettings.watermarkPosition, 'bottom-right');
 assert.equal(publicSettings.watermarkSize, 16);
 assert.equal(publicSettings.watermarkOpacity, 68);
 
+const uploadSource = readFileSync(new URL('../functions/api/admin/upload.js', import.meta.url), 'utf8');
+assert.ok(uploadSource.includes('const privateKey = `private-originals/${id}.${originalType}`'), 'Every original must use a private-only prefix so it cannot collide with flat public WebP keys');
+
 const inaccessibleOriginal = await publicMediaGet({
-  params: { key: '01234567-89ab-cdef-0123-456789abcdef.jpg' },
+  params: { key: 'private-originals/01234567-89ab-cdef-0123-456789abcdef.webp' },
   env: { IMAGES: { get() { throw new Error('Private originals must never reach R2.get through /media/[key]'); } } },
 });
-assert.equal(inaccessibleOriginal.status, 404, 'Original files must not be retrievable through the public WebP media route');
+assert.equal(inaccessibleOriginal.status, 404, 'WebP originals under the private prefix must not be retrievable through the public media route');
 
 const publicPage = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const protectionScriptStart = publicPage.indexOf('<script id="sd-protection-script">');
@@ -80,7 +83,6 @@ assert.equal(existsSync(new URL('../functions/api/admin/watermark-logo.js', impo
 assert.ok(!adminPage.includes('watermarkApplied'), 'Admin uploads must not require an image to be pre-watermarked');
 assert.ok(!adminPage.includes('ctx.drawImage(markBitmap'), 'Admin must not bake the watermark into each product image');
 
-const uploadSource = readFileSync(new URL('../functions/api/admin/upload.js', import.meta.url), 'utf8');
 assert.ok(uploadSource.includes('context.env.ORIGINALS.put'), 'Raw source uploads must use a separate private R2 bucket binding');
 assert.ok(uploadSource.includes('context.env.IMAGES.put'), 'Only optimized WebP derivatives may be stored in the public image bucket');
 assert.ok(uploadSource.includes('context.env.ORIGINALS.delete'), 'Failed derivative upload must remove the newly stored private original');
