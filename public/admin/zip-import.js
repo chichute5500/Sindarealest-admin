@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const LIM={zip:120*1024*1024,expanded:220*1024*1024,files:5000,products:200,images:3000};
-const S={files:new Map(),products:[],existing:[],report:[],busy:false,filter:'all',filename:'',allowNoImages:false};
+const S={files:new Map(),products:[],existing:[],report:[],busy:false,filter:'all',filename:'',allowNoImages:false,adminReady:false};
 const $=s=>document.querySelector(s);
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(url,opt){opt=opt||{};let r;try{r=await fetch(url,Object.assign({credentials:'same-origin',cache:'no-store',headers:opt.body instanceof FormData?{}:{'Content-Type':'application/json'}},opt))}catch(e){throw Error('Không kết nối được máy chủ.')}let d={};try{d=await r.json()}catch(e){}if(!r.ok)throw Error(d.error||('Lỗi máy chủ '+r.status));return d}
@@ -80,7 +80,7 @@ async function readFile(){
  const mf=S.files.get('export-manifest.json');if(mf){const m=JSON.parse(new TextDecoder().decode(mf));if(m.schema_version&&!/^1\./.test(String(m.schema_version)))throw Error('Schema ZIP không hỗ trợ: '+m.schema_version)}
  S.products=records.map((record,index)=>normalize(record,index,S.files));const ids=new Set();S.products.forEach(p=>{if(p.id&&ids.has(p.id)){p.errs.push('export_id bị trùng');p.selected=false}ids.add(p.id)});
  if(S.products.reduce((n,p)=>n+p.images.length,0)>LIM.images)throw Error('Vượt giới hạn '+LIM.images+' ảnh.');
- const old=await api('/api/admin/products');S.existing=old.products||[];S.products.forEach(p=>{if(duplicate(p))p.selected=false});S.filename=f.name;S.report=[];S.filter='all';$('#ziFilter').value='all';$('#ziPreview').style.display='block';$('#ziStatus').textContent='Đã đọc ZIP; chưa ghi dữ liệu sản phẩm nào.';render()
+ try{const old=await api('/api/admin/products');S.existing=old.products||[];S.adminReady=true;S.products.forEach(p=>{if(duplicate(p))p.selected=false})}catch(e){S.existing=[];S.adminReady=false}S.filename=f.name;S.report=[];S.filter='all';$('#ziFilter').value='all';$('#ziPreview').style.display='block';$('#ziStatus').textContent=S.adminReady?'Đã đọc ZIP; chưa ghi dữ liệu sản phẩm nào.':'Đã đọc ZIP để xem trước. API quản trị/Preview chưa sẵn sàng; nút nhập bị khóa.';$('#ziCommit').disabled=!S.adminReady;render()
  }catch(e){$('#ziStatus').textContent='Không thể đọc ZIP: '+e.message;$('#ziPreview').style.display='none';S.products=[]}finally{S.busy=false;$('#ziRead').disabled=false}
 }
 async function upload(bytes,name){
@@ -89,10 +89,10 @@ async function upload(bytes,name){
  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();let mark;try{const r=await fetch('/watermark.webp');if(!r.ok)throw Error();mark=await createImageBitmap(await r.blob())}catch(e){throw Error('Không tải được watermark.webp')}
  const ms=Math.min(canvas.width,canvas.height)*.19,mg=Math.max(8,Math.min(canvas.width,canvas.height)*.035);ctx.globalAlpha=.68;ctx.drawImage(mark,canvas.width-ms-mg,canvas.height-ms-mg,ms,ms);ctx.globalAlpha=1;mark.close();
  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.88));if(!blob||blob.size>5*1024*1024)throw Error('Ảnh sau tối ưu vượt 5 MB: '+name);
- const fd=new FormData();fd.append('file',blob,'product.webp');fd.append('watermarkApplied','1');const d=await api('/api/admin/upload',{method:'POST',body:fd});if(!d.url)throw Error('API upload không trả URL');return d.url
+ const fd=new FormData();fd.append('file',blob,'product.webp');fd.append('watermarkApplied','1');fd.append('zipImport','1');const d=await api('/api/admin/upload',{method:'POST',body:fd});if(!d.url)throw Error('API upload không trả URL');return d.url
 }
 async function commit(){
- if(S.busy)return;const chosen=S.products.filter(p=>p.selected&&ready(p));if(!chosen.length){alert('Chưa chọn sản phẩm hợp lệ.');return}
+ if(S.busy)return;if(!S.adminReady){alert('Preview chưa có API quản trị sẵn sàng. Không thể nhập.');return}const chosen=S.products.filter(p=>p.selected&&ready(p));if(!chosen.length){alert('Chưa chọn sản phẩm hợp lệ.');return}
  if(chosen.some(p=>p.salePrice!==''&&(!/^\d+$/.test(p.salePrice)||!Number.isSafeInteger(Number(p.salePrice)))))return alert('Giá bán phải là số nguyên VNĐ không âm hoặc để trống.');
  const possible=chosen.filter(p=>duplicate(p)).length;if(possible&&!confirm('Có '+possible+' sản phẩm trùng tên có thể cần kiểm tra. Tên giống nhau không chứng minh là cùng sản phẩm. Bạn xác nhận vẫn nhập các mục đã chọn?'))return;if(!confirm('Xác nhận tạo '+chosen.length+' sản phẩm mới? Sản phẩm hiện có sẽ không bị ghi đè; sản phẩm mới ở trạng thái ẩn.'))return;
  S.busy=true;$('#ziCommit').disabled=true;$('#ziResults').textContent='Đang nhập…';S.report=[];
