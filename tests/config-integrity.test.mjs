@@ -19,6 +19,8 @@ assert.ok(ciWorkflow.includes('npm run check'));
 assert.ok(ciWorkflow.includes('npm test'));
 assert.ok(ciWorkflow.includes('node tests/pages-routing.test.mjs'), 'Automatic CI must cover local Pages routing');
 assert.ok(ciWorkflow.includes("'fix/**'") && ciWorkflow.includes("'rewrite/**'"), 'Automatic CI must validate PRs to the verified Production branch pattern');
+assert.match(ciWorkflow, /on:\s*# Keep one run per PR update[\s\S]*?push:\s*branches:\s*- main[\s\S]*?pull_request:/, 'Automatic CI should run on main pushes and PR updates');
+assert.ok(!/push:\s*branches:\s*[\s\S]{0,100}maintenance\//.test(ciWorkflow), 'Maintenance PR branch pushes must not duplicate the PR-triggered test run');
 
 const manualValidationWorkflow = readFileSync('.github/workflows/validate.yml', 'utf8');
 assert.ok(manualValidationWorkflow.includes('workflow_dispatch:'), 'Standalone validation must remain available on demand');
