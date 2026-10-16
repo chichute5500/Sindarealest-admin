@@ -11,6 +11,38 @@ const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
+assert.ok(
+  storefrontHtml.includes('--sd-service-glass:rgba(255,255,255,.27)') &&
+  storefrontHtml.includes('--sd-service-border:rgba(255,255,255,.48)') &&
+  storefrontHtml.includes('.service-strip .service:not(:last-child)::after{display:none!important}') &&
+  storefrontHtml.includes('backdrop-filter:blur(18px) saturate(145%)') &&
+  storefrontHtml.includes('html.dark .service-strip .service-icon{background:rgba(255,255,255,.075)}'),
+  'Each of the six service items must have its own rounded, frosted-glass layer with consistent icons and light/dark values'
+);
+assert.ok(
+  storefrontHtml.includes('.detail-modal .detail-copy{') &&
+  storefrontHtml.includes('background:linear-gradient(145deg,var(--sd-detail-highlight),transparent 72%),var(--sd-detail-panel)') &&
+  storefrontHtml.includes('backdrop-filter:blur(24px) saturate(150%)') &&
+  storefrontHtml.includes('--sd-detail-panel:rgba(255,255,255,.10)') &&
+  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.14)'),
+  'Product detail information must use its own frosted-glass panel, including a visible translucent treatment in dark mode'
+);
+assert.ok(
+  storefrontHtml.includes('.featured-arrow:active,.slide-controls button:active{') &&
+  storefrontHtml.includes('transform:scale(.5)!important;') &&
+  storefrontHtml.includes('.detail-gallery-arrow:active,.sd-fullscreen-arrow:active{') &&
+  storefrontHtml.includes('transform:translateY(-50%) scale(.5)!important;') &&
+  storefrontHtml.includes('touch-action:manipulation;'),
+  'Featured, in-page gallery, and fullscreen arrows must press to half size without losing their vertical anchor'
+);
+assert.ok(
+  storefrontHtml.includes('.featured-product-card [data-feature-track]{transition:transform 1.45s') &&
+  storefrontHtml.includes('sdFeaturedImageShift .76s') &&
+  storefrontHtml.includes('transition:opacity .52s ease,filter .52s ease,transform .52s') &&
+  storefrontHtml.includes('transition:opacity .64s ease,filter .64s ease,transform .64s') &&
+  storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
+  'Image transitions must combine subtle fade/zoom with the requested longer timing while respecting reduced-motion preferences'
+);
 assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('hero-stamp-image-spacer') && !storefrontHtml.includes('.hero-stamp{'), 'Entire unwanted hero stamp and glass styling must be removed while preserving the sneaker hero');
 assert.ok(!storefrontHtml.includes('id="heroDarkShoe"') && !storefrontHtml.includes('id="heroLightShoe"') && !storefrontHtml.includes('hero-art'), 'Hero product images must be removed from the storefront intro');
 assert.ok(storefrontHtml.includes('SinDarealest mang đến những sản phẩm thời trang da cá sấu cao cấp') && storefrontHtml.includes('Khám phá bộ sưu tập') && storefrontHtml.includes('Khám phá sản phẩm'), 'Hero intro copy and both calls to action must remain after removing product imagery');
