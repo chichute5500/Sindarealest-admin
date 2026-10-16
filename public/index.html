@@ -860,9 +860,9 @@ img { -webkit-user-drag:none; user-select:none; }
 }
 html:not(.dark) .nav,html:not(.dark) .mobile-nav{background:rgba(250,246,237,.50)}
 html.dark .nav,html.dark .mobile-nav{background:rgba(9,9,9,.50)}
-html:not(.dark) .product-card,html:not(.dark) .promise,html:not(.dark) .service-strip,html:not(.dark) .mosaic-card{background:rgba(250,246,237,.28)}
-html.dark .product-card,html.dark .promise,html.dark .service-strip,html.dark .mosaic-card{background:rgba(8,8,8,.30)}
-html.dark .product-info,html.dark .detail-info,html.dark .detail-description,html.dark .detail-traits{background:rgba(8,8,8,.22)}
+html:not(.dark) .promise,html:not(.dark) .service-strip,html:not(.dark) .mosaic-card{background:rgba(250,246,237,.28)}
+html.dark .promise,html.dark .service-strip,html.dark .mosaic-card{background:rgba(8,8,8,.30)}
+html.dark .detail-info,html.dark .detail-description,html.dark .detail-traits{background:rgba(8,8,8,.22)}
 .featured-arrow,.slide-controls button,.detail-zoom-btn,.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow{
  display:flex;align-items:center;justify-content:center;padding:0;line-height:1;
  background:rgba(245,239,226,.24);border:1px solid rgba(255,255,255,.58);
@@ -886,8 +886,6 @@ html.dark .product-info,html.dark .detail-info,html.dark .detail-description,htm
  :root{--sd-glass-blur:18px}
  .nav-wrap{padding-inline:10px}
  .nav{background:var(--nav-bg);backdrop-filter:blur(24px) saturate(155%);-webkit-backdrop-filter:blur(24px) saturate(155%)}
- .product-info{background:rgba(250,246,237,.12)}
- html.dark .product-info{background:rgba(8,8,8,.28)}
  .featured-arrow{width:34px;height:34px}
 }
 /* Three requested interface refinements — test branch only. */
@@ -1033,15 +1031,38 @@ html.dark .detail-modal .detail-copy{
 }
 
 
-/* Fix: keep requested glass surfaces identical in light and dark themes. */
-html.dark .product-card{background:rgba(250,246,237,.28)!important}
-html.dark .product-info{background:transparent!important}
+/* Match product cards and their information panes to the Order With Confidence Liquid Glass tiles. */
+.product-card{
+ background:var(--sd-service-glass)!important;
+ border-color:var(--sd-service-border)!important;
+ backdrop-filter:blur(18px) saturate(145%)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(145%)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 7px 20px rgba(0,0,0,.07)!important;
+ transition:transform .38s cubic-bezier(.2,.8,.2,1),background .3s ease,border-color .3s ease,box-shadow .3s ease!important;
+}
+.product-card .product-info{
+ background:var(--sd-service-glass)!important;
+ border-top:1px solid var(--sd-service-border);
+ border-radius:0 0 12px 12px;
+ backdrop-filter:blur(18px) saturate(145%)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(145%)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.30);
+ transition:background .3s ease,border-color .3s ease,box-shadow .3s ease!important;
+}
+.product-card:hover{
+ background:rgba(255,255,255,.43)!important;
+ border-color:rgba(255,255,255,.72)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 10px 24px rgba(0,0,0,.09)!important;
+}
+.product-card:hover .product-info{
+ background:rgba(255,255,255,.43)!important;
+ border-top-color:rgba(255,255,255,.72);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.48);
+}
 html.dark .service-strip{--sd-service-glass:rgba(255,255,255,.27);--sd-service-border:rgba(255,255,255,.48)}
 html.dark .service-strip .service{background:var(--sd-service-glass)}
 html.dark .service-strip .service-icon{background:rgba(255,255,255,.25);border-color:var(--sd-service-border)}
 html.dark .service-strip .service:hover{background:rgba(255,255,255,.43);border-color:rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 10px 24px rgba(0,0,0,.09)}
-/* Mobile product-info uses the same light-theme translucent layer in both modes. */
-@media(max-width:760px){html.dark .product-info{background:rgba(250,246,237,.12)!important}}
 /* Fix theme flicker: one consistent transition window, without competing long/short rules. */
 html,body{transition:background-color .28s ease,color .28s ease}
 .theme-bg{transition:opacity .34s ease,filter .34s ease!important}
