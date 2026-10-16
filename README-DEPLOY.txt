@@ -32,11 +32,11 @@ Script sẽ:
 - Xác minh R2 bucket bằng lệnh đọc thông tin; không tự tạo bucket.
 - Kiểm tra project, database, branch; branch phải khớp production branch khi Cloudflare cung cấp thông tin này.
 - Hiển thị tóm tắt, yêu cầu xác nhận bindings/secrets đã lưu, rồi yêu cầu nhập chuỗi xác nhận chính xác trước khi chạy SQL/deploy.
-- Áp dụng lần lượt migrations/0001_schema.sql, migrations/0003_storefront_operations.sql, migrations/0004_admin_notifications.sql migrations/0005_address_warranty_verification.sql và migrations/0006_remove_warranty_otp.sql; migration 0006 không thay đổi schema; token tải ảnh tạm được lưu trong bảng settings đã có. Luồng OTP đã bị loại khỏi ứng dụng nhưng các bảng cũ được giữ nguyên để tương thích. Script kiểm tra các bảng/cột bắt buộc rồi mới tiếp tục.
+- Áp dụng lần lượt migrations/0001_schema.sql, migrations/0003_storefront_operations.sql, migrations/0004_admin_notifications.sql, migrations/0005_address_warranty_verification.sql và migrations/0006_remove_warranty_otp.sql. Token ngắn hạn cho tra cứu bảo hành/tải ảnh nằm trong bảng `settings`; luồng SMS/OTP đã bị loại khỏi ứng dụng. Migration 0005 không tạo lại các bảng OTP cũ khi thiết lập mới; trên D1 đã tồn tại, bảng cũ được giữ nguyên và không bị `DROP` tự động. Script kiểm tra các bảng/cột đang được ứng dụng sử dụng rồi mới tiếp tục.
 - Chỉ nhập migrations/0002_seed_products.sql nếu bạn gõ YES và script thấy products đang có đúng 0 dòng. Nếu có sẵn sản phẩm, script từ chối seed. Migration 0003 không xóa dữ liệu sản phẩm/đơn hàng hiện có.
 - Khi chọn NO, script giữ dữ liệu sản phẩm hiện có, không seed lại.
 - Chỉ deploy vào Pages project đã tồn tại. Script không tự tạo hoặc xóa resource.
-- Migration 0005 bổ sung địa chỉ khách hàng/giao hàng, chi tiết biến thể dòng đơn và metadata ảnh yêu cầu bảo hành. Migration 0006 không thay đổi schema; metadata token tải ảnh tạm nằm trong settings và được xóa khi khôi phục. Backup JSON không chứa byte ảnh trong R2, hãy sao lưu R2 riêng.
+- Migration 0005 bổ sung địa chỉ khách hàng/giao hàng, chi tiết biến thể dòng đơn và metadata ảnh yêu cầu bảo hành. Migration 0006 giữ tương thích với CSDL đã có; không tự xóa bảng OTP cũ vì chưa xác minh backup/dữ liệu D1. Metadata token tải ảnh tạm nằm trong `settings` và được xóa khi khôi phục. Backup JSON không chứa byte ảnh trong R2, hãy sao lưu R2 riêng.
 
 Nếu Wrangler chưa đăng nhập, làm theo cửa sổ trình duyệt. Đừng dán token vào mã nguồn. Nếu project, D1 hoặc R2 không xuất hiện trong danh sách, kiểm tra đúng tài khoản Cloudflare và quyền của phiên đăng nhập; không đổi sang tên đoán mò.
 
