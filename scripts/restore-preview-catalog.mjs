@@ -287,39 +287,68 @@ console.log("Preview sau khôi phục:", JSON.stringify({
 console.log("Production sau khôi phục:", JSON.stringify(productionAfter));
 console.log("Xác nhận: câu lệnh ghi chỉ nhắm D1 Preview; không có lệnh ghi vào Production hoặc R2.");
 
-// The already deployed Preview URL uses the Preview binding. Verify the public API and a few
-// static image assets after the D1 restore. These checks never write remote data.
+// D1 is queried directly through the authenticated Cloudflare API above.
+// A public Preview URL may return an Access/login HTML page to an automated runner.
+// Distinguish that case from a real JSON/API mismatch; never undo a successful DB restore.
 let liveVerified = false;
+let liveCheckBlocked = false;
 let lastLiveProblem = "";
-for (let attempt = 0; attempt < 6; attempt++) {
+for (let attempt = 0; attempt < 3; attempt++) {
   try {
     const response = await fetch(PREVIEW_URL + "/api/products", { signal: AbortSignal.timeout(12000) });
-    if (!response.ok) throw new Error("Preview API HTTP " + response.status);
+    const contentType = response.headers.get("content-type") || "";
+    if (!response.ok) {
+      throw new Error("Preview API HTTP " + response.status);
+    }
+    if (!contentType.toLowerCase().includes("application/json")) {
+      console.log(
+        "Bỏ qua kiểm tra HTTP trực tiếp: Preview trả Content-Type " + contentType +
+        ", không phải JSON; có thể đang hiển thị trang đăng nhập/bảo vệ Preview."
+      );
+      liveCheckBlocked = true;
+      break;
+    }
     const data = await response.json();
     if (!Array.isArray(data) || data.length < EXPECTED_SEED_ROWS) {
-      throw new Error("Preview API returned " + (Array.isArray(data) ? data.length : "a non-array") + " products.");
+      throw new Error(
+        "Preview API returned " + (Array.isArray(data) ? data.length : "a non-array") +
+        " products despite the authenticated D1 check."
+      );
     }
     const sampleImages = [...new Set(
       data.flatMap((product) => Array.isArray(product.images) ? product.images : [])
-        .map((value) => String(value).replace(/^\.\//, ""))
-        .filter((value) => /^images\/[A-Za-z0-9._-]+\.webp$/.test(value))
+        .map((value) => String(value).replace(/^\\.\\//, ""))
+        .filter((value) => /^images\\/[A-Za-z0-9._-]+\\.webp$/.test(value))
     )].slice(0, 5);
     for (const key of sampleImages) {
       const imageResponse = await fetch(new URL(key, PREVIEW_URL + "/"), { signal: AbortSignal.timeout(12000) });
-      if (!imageResponse.ok) throw new Error("Ảnh Preview không tải được: " + key + " (HTTP " + imageResponse.status + ")");
+      const imageType = imageResponse.headers.get("content-type") || "";
+      if (!imageResponse.ok || !imageType.toLowerCase().startsWith("image/")) {
+        throw new Error(
+          "Ảnh Preview không tải được: " + key + " (HTTP " + imageResponse.status + ", " + imageType + ")"
+        );
+      }
     }
     liveVerified = true;
-    console.log("Kiểm tra trực tiếp Preview thành công:", data.length, "sản phẩm API; tải được", sampleImages.length, "ảnh mẫu.");
+    console.log(
+      "Kiểm tra trực tiếp Preview thành công:", data.length,
+      "sản phẩm API; tải được", sampleImages.length, "ảnh mẫu."
+    );
     break;
   } catch (error) {
     lastLiveProblem = String(error?.message || error);
-    if (attempt < 5) await sleep(2000 * (attempt + 1));
+    if (attempt < 2) await sleep(1500 * (attempt + 1));
   }
 }
-if (!liveVerified) {
+if (!liveVerified && !liveCheckBlocked) {
   throw new Error(
-    "Dữ liệu D1 đã được khôi phục và xác minh, nhưng kiểm tra HTTP trên Preview chưa thành công: " +
-    lastLiveProblem + ". Hãy dùng log D1 phía trên để tách lỗi triển khai/API khỏi dữ liệu."
+    "D1 đã được khôi phục và xác minh, nhưng Preview trả dữ liệu JSON không đúng hoặc ảnh mẫu không tải được: " +
+    lastLiveProblem + ". D1 không bị xóa; hãy kiểm tra log này trước khi sửa thêm."
+  );
+}
+if (liveCheckBlocked) {
+  console.log(
+    "D1 đã được xác minh trực tiếp qua Cloudflare API. Kiểm tra HTTP công khai chưa kết luận được vì Preview trả trang không phải JSON."
   );
 }
 
