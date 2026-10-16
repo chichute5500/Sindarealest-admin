@@ -88,10 +88,10 @@ jobs:
           node --input-type=module <<'NODE'
           const url = process.env.SD_PREVIEW_URL;
           const expected = [
-            ['transparent product shell', /\\.product-card\\s*\\{\\s*background\\s*:\\s*transparent!important\\s*;/i],
-            ['single glass layer on product info', /\\.product-card\\s+\\.product-info\\s*\\{\\s*background\\s*:\\s*var\\(--glass\\)!important\\s*;/i],
-            ['transparent hover shell', /\\.product-card:hover\\s*\\{\\s*background\\s*:\\s*transparent!important\\s*;/i],
-            ['glass stays consistent on hover', /\\.product-card:hover\\s+\\.product-info\\s*\\{\\s*background\\s*:\\s*var\\(--glass\\)!important\\s*;/i]
+            ['transparent product shell', /\.product-card\s*\{\s*background\s*:\s*transparent!important\s*;/i],
+            ['single glass layer on product info', /\.product-card\s+\.product-info\s*\{\s*background\s*:\s*var\(--glass\)!important\s*;/i],
+            ['transparent hover shell', /\.product-card:hover\s*\{\s*background\s*:\s*transparent!important\s*;/i],
+            ['glass stays consistent on hover', /\.product-card:hover\s+\.product-info\s*\{\s*background\s*:\s*var\(--glass\)!important\s*;/i]
           ];
           let lastError = '';
           for (let attempt = 1; attempt <= 10; attempt++) {
@@ -104,8 +104,8 @@ jobs:
                 console.log(`PASS: exact deployment serves the single-layer glass CSS (HTTP ${res.status}, ${html.length} characters).`);
                 process.exit(0);
               }
-              const title = html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]?.slice(0,120) || '(title missing)';
-              const foundRule = html.match(/\\.product-card[^}]{0,300}\\}/i)?.[0] || '(product-card rule not found)';
+              const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.slice(0,120) || '(title missing)';
+              const foundRule = html.match(/\.product-card[^}]{0,300}\}/i)?.[0] || '(product-card rule not found)';
               lastError = `HTTP ${res.status}, ${html.length} characters, title=${title}; missing: ${missing.join(', ')}; sample rule: ${foundRule}`;
             } catch (error) {
               lastError = String(error);
