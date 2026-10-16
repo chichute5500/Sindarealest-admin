@@ -98,9 +98,18 @@ assert.ok(publicPage.includes('.detail-image-count{\n position:absolute;left:50%
 const galleryStart = publicPage.indexOf('function changeDetailImage(index,resetTimer=true');
 const galleryEnd = publicPage.indexOf('function openDetail(', galleryStart);
 const gallerySource = publicPage.slice(galleryStart, galleryEnd);
-assert.ok(gallerySource.includes("$('.detail-thumb')"), 'Gallery navigation must select all thumbnails before iteration');
-assert.ok(!gallerySource.includes("$('.detail-thumb').forEach"), 'Gallery navigation must not call forEach on a single querySelector result');
-assert.ok(gallerySource.includes('img.onload=finish;img.onerror=finish;img.src=next'), 'Image transition handlers must be registered before changing the src to prevent a stuck blurred image');
+assert.ok(gallerySource.includes("thumbs=$$('.detail-thumb')"), 'Gallery navigation must select every thumbnail using querySelectorAll');
+assert.ok(!gallerySource.includes("thumbs=$('.detail-thumb')"), 'Gallery navigation must not treat one thumbnail as an array');
+assert.ok(gallerySource.includes('img.onload=finish;img.onerror=finish;img.src=next'), 'Image transition handlers must be registered before changing the src');
+const fullscreenCloseStart = publicPage.indexOf('function closeFullscreenImage()');
+const fullscreenCloseEnd = publicPage.indexOf('function changeDetailImage(', fullscreenCloseStart);
+const fullscreenCloseSource = publicPage.slice(fullscreenCloseStart, fullscreenCloseEnd);
+assert.ok(fullscreenCloseSource.includes('clearTimeout(fullscreenSwapTimer)') && fullscreenCloseSource.includes('clearGalleryTransitionClasses(main)') && fullscreenCloseSource.includes('clearGalleryTransitionClasses(full)'), 'Closing fullscreen must cancel pending swaps and clear stale fade/slide classes on both images');
+assert.ok(fullscreenCloseSource.includes("main.getAttribute('src')!==selected"), 'Closing fullscreen must sync the in-page image to the selected fullscreen image');
+const fullscreenPhotoStart = publicPage.indexOf('function setFullscreenPhoto(');
+const fullscreenPhotoEnd = publicPage.indexOf('function renderFullscreenThumbs(', fullscreenPhotoStart);
+const fullscreenPhotoSource = publicPage.slice(fullscreenPhotoStart, fullscreenPhotoEnd);
+assert.ok(fullscreenPhotoSource.includes('img.onload=null;img.onerror=null;') && fullscreenPhotoSource.includes('fullscreenTransitionId'), 'Superseded fullscreen image requests must not run stale handlers');
 assert.ok(protectionScript.includes('function imageNeedsOverlay(src)'), 'Watermark code must distinguish clean uploaded images from legacy product assets');
 assert.ok(protectionScript.includes('fullMark.hidden=!fullShouldOverlay'), 'The full-screen view must hide the extra overlay on legacy assets that already contain a watermark');
 
