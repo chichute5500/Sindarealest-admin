@@ -1,0 +1,65 @@
+name: Deploy Liquid Glass visual preview (non-production)
+
+on:
+  push:
+    branches:
+      - fix/watermark-detail-only-2026-10-16
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sindarealest-liquid-glass-preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: github.ref_name == 'fix/watermark-detail-only-2026-10-16'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      SD_PAGES_PREVIEW_BRANCH: preview-liquid-glass-2026-10-16
+    steps:
+      - name: Check out the isolated test branch
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Validate project and run regression tests
+        run: |
+          npm run check
+          npm test
+          node tests/pages-routing.test.mjs
+
+      - name: Verify Cloudflare project and refuse production branch
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
+          node --input-type=module <<'NODE'
+          import { assertSafeName, findNamedRecord, listPagesProjects } from './scripts/cloudflare-utils.mjs';
+          const projectName = process.env.CLOUDFLARE_PAGES_PROJECT;
+          const previewBranch = process.env.SD_PAGES_PREVIEW_BRANCH;
+          assertSafeName(projectName, 'Cloudflare Pages project');
+          assertSafeName(previewBranch, 'Preview branch');
+          const record = findNamedRecord(listPagesProjects(), projectName, ['name', 'project_name', 'Project Name']);
+          if (!record) throw new Error(`Cloudflare Pages project "${projectName}" not found; preview deploy stopped.`);
+          const productionBranch = typeof record.production_branch === 'string' ? record.production_branch : '';
+          if (!productionBranch) throw new Error('Cannot verify the production branch; preview deploy stopped.');
+          if (previewBranch === productionBranch) throw new Error('Preview branch matches production branch; refusing deployment.');
+          console.log(`Preview target verified: ${previewBranch}; production branch remains ${productionBranch}.`);
+          NODE
+
+      - name: Deploy only to the separate preview branch
+        run: npx wrangler pages deploy public --project-name="$CLOUDFLARE_PAGES_PROJECT" --branch="$SD_PAGES_PREVIEW_BRANCH"
