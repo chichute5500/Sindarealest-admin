@@ -10,7 +10,15 @@ import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
-assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
+assert.ok(
+  storefrontHtml.includes('/* Theme transitions — one clock and one compositor path for all theme-dependent surfaces. */') &&
+  storefrontHtml.includes('html,body{transition:background-color var(--sd-theme-duration) ease,color var(--sd-theme-duration) ease}') &&
+  storefrontHtml.includes('body:after{transition:background var(--sd-theme-duration) ease}') &&
+  storefrontHtml.includes('transition-duration:var(--sd-theme-duration)!important;') &&
+  storefrontHtml.includes('transition-delay:0s!important;') &&
+  !storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'),
+  'Theme-related transitions must use one synchronized duration instead of conflicting 250/340/1150 ms overrides'
+);
 assert.ok(
   (storefrontHtml.match(/<div class="service glass tap-target"/g) || []).length === 5 &&
   storefrontHtml.includes('<a class="service glass tap-target" href="https://zalo.me/0827049192"') &&
