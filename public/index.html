@@ -625,7 +625,7 @@ function showToast(msg,link=null){const t=$('#toast');t.replaceChildren(document
 function iconBag(){return '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'}
 function setThemeIcon(){const dark=document.documentElement.classList.contains('dark');$('#themeIcon').innerHTML=dark?'<path d="M20.2 15.4A8 8 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"/>';const mode=document.documentElement.dataset.themeMode||'auto';$('#themeToggle').setAttribute('aria-label',mode==='auto'?'Đang theo giao diện thiết bị. Nhấn để đổi chế độ thủ công':dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối');$('#themeToggle').title=mode==='auto'?'Theo giao diện thiết bị':`Chế độ ${dark?'tối':'sáng'} (thủ công)`}
 function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');const meta=$('meta[name="theme-color"]');if(meta)meta.content=dark?'#050505':'#efe8dc'}
-function applyThemeMode(mode,animate=true){const root=document.documentElement;if(animate)root.classList.add('theme-transitioning');root.dataset.themeMode=mode;const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);root.classList.toggle('dark',mode==='dark'||(mode==='auto'&&systemDark));syncThemeMeta();setThemeIcon();if(animate){clearTimeout(window.__sdThemeTimer);window.__sdThemeTimer=setTimeout(()=>root.classList.remove('theme-transitioning'),320)}}
+function applyThemeMode(mode,animate=true){const root=document.documentElement;clearTimeout(window.__sdThemeTimer);if(animate)root.classList.add('theme-transitioning');root.dataset.themeMode=mode;const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);root.classList.toggle('dark',mode==='dark'||(mode==='auto'&&systemDark));syncThemeMeta();setThemeIcon();if(animate){window.__sdThemeTimer=setTimeout(()=>root.classList.remove('theme-transitioning'),420)}else{root.classList.remove('theme-transitioning')}}
 function toggleTheme(){const root=document.documentElement;const dark=root.classList.contains('dark');const next=dark?'light':'dark';try{localStorage.setItem('sd-theme-mode',next)}catch(e){}applyThemeMode(next,true)}
 function setupSystemTheme(){const media=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');if(!media)return;const onChange=()=>{if((document.documentElement.dataset.themeMode||'auto')==='auto')applyThemeMode('auto',true)};if(media.addEventListener)media.addEventListener('change',onChange);else if(media.addListener)media.addListener(onChange)}
 function uniqueImages(list){return [...new Set(list.flatMap(p=>(p.images||[]).map(imgPath)).filter(Boolean))]}
@@ -1030,6 +1030,27 @@ html.dark .detail-modal .detail-copy{
   .featured-arrow,.slide-controls button,.detail-gallery-arrow,.sd-fullscreen-arrow{transition-duration:.01ms!important}
   #detailMainImage.sd-slide-out-left,#detailMainImage.sd-slide-out-right,.sd-fullscreen-image.sd-slide-out-left,.sd-fullscreen-image.sd-slide-out-right,
   #detailMainImage.sd-slide-in-left,#detailMainImage.sd-slide-in-right,.sd-fullscreen-image.sd-slide-in-left,.sd-fullscreen-image.sd-slide-in-right{animation-duration:.01ms!important}
+}
+
+
+/* Fix: keep requested glass surfaces identical in light and dark themes. */
+html.dark .product-card{background:rgba(250,246,237,.28)!important}
+html.dark .product-info{background:transparent!important}
+html.dark .service-strip{--sd-service-glass:rgba(255,255,255,.27);--sd-service-border:rgba(255,255,255,.48)}
+html.dark .service-strip .service{background:var(--sd-service-glass)}
+html.dark .service-strip .service-icon{background:rgba(255,255,255,.25);border-color:var(--sd-service-border)}
+html.dark .service-strip .service:hover{background:rgba(255,255,255,.43);border-color:rgba(255,255,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 10px 24px rgba(0,0,0,.09)}
+/* Mobile product-info uses the same light-theme translucent layer in both modes. */
+@media(max-width:760px){html.dark .product-info{background:rgba(250,246,237,.12)!important}}
+/* Fix theme flicker: one consistent transition window, without competing long/short rules. */
+html,body{transition:background-color .28s ease,color .28s ease}
+.theme-bg{transition:opacity .34s ease,filter .34s ease!important}
+body:after{transition:background .34s ease!important}
+html.theme-transitioning .nav,html.theme-transitioning .glass,html.theme-transitioning .glass-soft,html.theme-transitioning .service-strip,html.theme-transitioning .product-card,html.theme-transitioning .promise,html.theme-transitioning .mosaic-card,html.theme-transitioning .custom-text,html.theme-transitioning .footer,html.theme-transitioning .contact-link,html.theme-transitioning .nav-wrap .nav,html.theme-transitioning .promise-tag,html.theme-transitioning .service{
+ transition-duration:.28s!important;transition-timing-function:ease!important
+}
+html.theme-transitioning body,html.theme-transitioning body:after,html.theme-transitioning .theme-bg,html.theme-transitioning .hero-product,html.theme-transitioning .welcome-splash,html.theme-transitioning .welcome-content,html.theme-transitioning .welcome-texture,html.theme-transitioning .welcome-shade{
+ transition-duration:.34s!important;transition-timing-function:ease!important
 }
 
 </style>
