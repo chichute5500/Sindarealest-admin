@@ -616,7 +616,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const ZALO='https://zalo.me/0827049192';
-let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, detailIndex=0, detailImages=[];
+let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, fullscreenSwapTimer=null, detailIndex=0, detailImages=[];
 const categoryLabels={all:'Tất cả',sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví da',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
 const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','wallets','sandals','watch-straps','phone-cases'];
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -660,6 +660,7 @@ function sizeFullscreenFrame(){
  frame.style.height=Math.max(1,Math.round(nh*scale))+'px';
 }
 function setFullscreenPhoto(src,direction='left'){
+ clearTimeout(fullscreenSwapTimer);
  const img=$('#sdFullscreenImage'),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
  const same=img.getAttribute('src')===next;
  const clearSlide=()=>img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
@@ -672,10 +673,15 @@ function setFullscreenPhoto(src,direction='left'){
   img.classList.add(incoming);
   requestAnimationFrame(()=>setTimeout(()=>img.classList.remove(incoming),560));
  };
- img.onload=finish;
- img.onerror=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';clearSlide()};
- if(!same){clearSlide();img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');img.src=next}else if(!img.complete){img.classList.add('is-changing')}
- if(img.complete&&img.naturalWidth){finish()}
+ const fail=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';clearSlide()};
+ if(!same){
+  clearSlide();
+  img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
+  fullscreenSwapTimer=setTimeout(()=>{
+   img.onload=finish;img.onerror=fail;img.src=next;
+   if(img.complete&&img.naturalWidth)finish();
+  },230);
+ }else if(!img.complete){img.onload=finish;img.onerror=fail;img.classList.add('is-changing')}
  window.__sdUpdateDetailWatermark?.();
 }
 function renderFullscreenThumbs(){
