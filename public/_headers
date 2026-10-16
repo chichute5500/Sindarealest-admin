@@ -14,3 +14,8 @@
   Cache-Control: public, max-age=31536000, immutable
 /og-sindarealest.jpg
   Cache-Control: public, max-age=86400
+
+/images/theme-croc-dark.webp
+  Cache-Control: public, max-age=0, must-revalidate
+/images/theme-croc-albino.webp
+  Cache-Control: public, max-age=0, must-revalidate
