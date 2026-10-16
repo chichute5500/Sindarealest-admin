@@ -13,6 +13,7 @@ const workflow = readFileSync('.github/workflows/deploy.yml', 'utf8');
 assert.ok(workflow.includes('npm run check'));
 assert.ok(workflow.includes('npm test'));
 assert.ok(workflow.includes('CLOUDFLARE_PAGES_PROJECT'));
+assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'GitHub Actions must receive the explicit private-original bucket readiness gate');
 
 const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
 assert.ok(ciWorkflow.includes('npm run check'));
@@ -57,6 +58,8 @@ assert.ok(deployReadme.includes('binding tên `ORIGINALS`') && deployReadme.incl
 
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
+assert.ok(deployScript.includes("process.env.CLOUDFLARE_PAGES_ORIGINALS_READY !== 'true'"), 'CI deploy must fail closed until the private ORIGINALS binding is verified');
+assert.ok(deployScript.includes('bucket R2 riêng tư ORIGINALS'), 'Manual deploy must ask the operator to verify the private originals bucket');
 assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must fail closed until the private ORIGINALS binding is confirmed');
 assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy workflow must pass the explicit ORIGINALS readiness gate');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
