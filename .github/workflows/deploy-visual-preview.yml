@@ -88,10 +88,10 @@ jobs:
           node --input-type=module <<'NODE'
           const url = process.env.SD_PREVIEW_URL;
           const expected = [
-            'Keep the card shell clear so it does not stack a second translucent layer underneath.',
-            '.product-card{\n background:transparent!important;',
-            '.product-card .product-info{\n background:var(--glass)!important;',
-            '.product-card:hover{\n background:transparent!important;'
+            ['transparent product shell', /\\.product-card\\s*\\{\\s*background\\s*:\\s*transparent!important\\s*;/i],
+            ['single glass layer on product info', /\\.product-card\\s+\\.product-info\\s*\\{\\s*background\\s*:\\s*var\\(--glass\\)!important\\s*;/i],
+            ['transparent hover shell', /\\.product-card:hover\\s*\\{\\s*background\\s*:\\s*transparent!important\\s*;/i],
+            ['glass stays consistent on hover', /\\.product-card:hover\\s+\\.product-info\\s*\\{\\s*background\\s*:\\s*var\\(--glass\\)!important\\s*;/i]
           ];
           let lastError = '';
           for (let attempt = 1; attempt <= 10; attempt++) {
@@ -99,12 +99,14 @@ jobs:
               const res = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
               const html = await res.text();
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
-              const missing = expected.filter(token => !html.includes(token));
+              const missing = expected.filter(([, pattern]) => !pattern.test(html)).map(([name]) => name);
               if (missing.length === 0) {
-                console.log(`PASS: live preview serves the new single-layer glass CSS (HTTP ${res.status}, ${html.length} characters).`);
+                console.log(`PASS: exact deployment serves the single-layer glass CSS (HTTP ${res.status}, ${html.length} characters).`);
                 process.exit(0);
               }
-              lastError = `Preview returned HTTP ${res.status} but is missing the new CSS marker(s): ${missing.join('; ')}`;
+              const title = html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]?.slice(0,120) || '(title missing)';
+              const foundRule = html.match(/\\.product-card[^}]{0,300}\\}/i)?.[0] || '(product-card rule not found)';
+              lastError = `HTTP ${res.status}, ${html.length} characters, title=${title}; missing: ${missing.join(', ')}; sample rule: ${foundRule}`;
             } catch (error) {
               lastError = String(error);
             }
