@@ -735,7 +735,7 @@ function changeDetailImage(index,resetTimer=true,direction){
  const nextIndex=(index+detailImages.length)%detailImages.length;
  direction=direction||(nextIndex===previousIndex?'left':((nextIndex-previousIndex+detailImages.length)%detailImages.length<=detailImages.length/2?'left':'right'));
  detailIndex=nextIndex;
- const img=$('#detailMainImage'),next=imgPath(detailImages[detailIndex]),thumbs=$('.detail-thumb');
+ const img=$('#detailMainImage'),next=imgPath(detailImages[detailIndex]),thumbs=$$('.detail-thumb');
  const transitionId=++detailTransitionId;
  clearTimeout(detailAnimationTimer);
  img.onload=null;img.onerror=null;
