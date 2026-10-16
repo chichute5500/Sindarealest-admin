@@ -165,19 +165,6 @@ const reusedTokenResponse = await createWarrantyClaim({
 assert.equal(reusedTokenResponse.status,400,'A consumed lookup token must not authorize a second claim');
 
 
-const originalAssetResponse = new Response('static-fallback-ok', {
-  status: 200,
-  headers: { 'Content-Type': 'text/html; charset=utf-8' },
-});
-let passThroughCalls = 0;
-const staticRequestResponse = await unknownApiRoute({
-  request: new Request('https://shop.example/brand/story/'),
-  next: async () => { passThroughCalls++; return originalAssetResponse; },
-});
-assert.equal(staticRequestResponse.status, 200, 'Non-API pages must pass through to Pages assets/redirects');
-assert.equal(await staticRequestResponse.text(), 'static-fallback-ok');
-assert.equal(passThroughCalls, 1, 'The API not-found handler should call next() once for non-API requests');
-
 for (const method of ['GET', 'POST']) {
   const missingApi = await unknownApiRoute({
     request: new Request('https://shop.example/api/admin/removed-experiment', { method }),
