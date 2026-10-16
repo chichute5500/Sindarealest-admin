@@ -16,6 +16,8 @@
   Cache-Control: public, max-age=86400
 
 /images/theme-croc-dark.webp
+  ! Cache-Control
   Cache-Control: public, max-age=0, must-revalidate
 /images/theme-croc-albino.webp
+  ! Cache-Control
   Cache-Control: public, max-age=0, must-revalidate
