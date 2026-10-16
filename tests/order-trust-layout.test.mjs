@@ -4,52 +4,68 @@ import { readFileSync } from 'node:fs';
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const start = html.indexOf('<section class="section wrap" id="order"');
 assert.notEqual(start, -1, 'The order assurance section must exist.');
-const end = html.indexOf('</section>', start);
-assert.notEqual(end, -1, 'The order assurance section must close.');
-const section = html.slice(start, end + '</section>'.length);
-const gridMatch = section.match(/<div class="order-steps"[^>]*>([\s\S]*?)\n    <\/div>\s*<\/section>/);
-assert.ok(gridMatch, 'All order assurance tiles must be inside one shared grid.');
+const next = html.indexOf('<section class="section wrap" id="featured">', start);
+assert.notEqual(next, -1, 'The order assurance section must finish before the featured-products section.');
+const section = html.slice(start, next);
+const gridMatch = section.match(/<div class="order-steps"[^>]*>([\\s\\S]*?)\\n    <\\/div>/);
+assert.ok(gridMatch, 'The four process steps must be inside one shared grid.');
 const grid = gridMatch[1];
 
-assert.equal((grid.match(/<article class="order-step\b/g) || []).length, 6,
-  'The five ordering steps and Zalo contact must be six equal-grid cards.');
-assert.match(grid, /<article class="order-step order-zalo glass"[^>]*>[\s\S]*?href="https:\/\/zalo\.me\/0827049192"[^>]*>Nhắn tin tư vấn ↗<\/a>[\s\S]*?<\/article>/,
-  'The sixth card must preserve the working Zalo link.');
-assert.doesNotMatch(section, /order-note/,
-  'The former separate full-width Zalo note must not remain.');
+assert.equal((grid.match(/<article class="order-step\\b/g) || []).length, 4,
+  'The process must contain exactly four steps, not six cards.');
+assert.match(grid, /aria-label="Quy trình đặt hàng gồm bốn bước"/,
+  'The process must have an accessible name.');
+for (const label of ['Chọn sản phẩm', 'Xác nhận đơn hàng', 'Đặt cọc & chế tác', 'Nhận hàng & hậu mãi']) {
+  assert.ok(grid.includes(label), `The process must include the step: ${label}.`);
+}
+assert.match(grid, /Đặt cọc <strong>30%<\\/strong>/,
+  'The deposit information must remain visible.');
+assert.match(grid, /5–20 ngày/,
+  'The estimated production time must remain visible.');
+assert.doesNotMatch(grid, /order-zalo-cta|zalo\\.me\\//,
+  'Zalo must not be represented as a fifth process step.');
 
-const styleBlocks = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]);
-const styles = styleBlocks.join('\n');
-const scopedBlock = html.match(/<style id="sd-order-uniform-tiles">([\s\S]*?)<\/style>/)?.[1] || '';
-assert.ok(scopedBlock, 'The authoritative order-tile stylesheet must exist.');
+assert.match(section, /class="order-assurance-footer glass"/,
+  'A compact commitment and contact footer must follow the four-step grid.');
+assert.match(section, /Cam kết hậu mãi[\\s\\S]*?Bảo hành 1 năm[\\s\\S]*?Bảo dưỡng trọn đời[\\s\\S]*?Hoàn thiện thủ công/,
+  'The compact footer must retain the supplied brand commitments.');
+assert.match(section, /href="https:\\/\\/zalo\\.me\\/0827049192"[^>]*aria-label="Tư vấn hoặc đặt hàng qua Zalo"/,
+  'The standalone Zalo CTA must use the confirmed contact URL and accessible label.');
+assert.match(section, /Tư vấn\\/đặt hàng qua Zalo/,
+  'The CTA must use the agreed consultation/order wording.');
+
+const styleBlocks = [...html.matchAll(/<style\\b[^>]*>([\\s\\S]*?)<\\/style>/g)].map(m => m[1]);
+const styles = styleBlocks.join('\\n');
+const scopedBlock = html.match(/<style id="sd-order-uniform-tiles">([\\s\\S]*?)<\\/style>/)?.[1] || '';
+assert.ok(scopedBlock, 'The authoritative order-process stylesheet must exist.');
 assert.ok(html.indexOf('id="sd-order-uniform-tiles"') > html.indexOf('id="sd-benefit-responsive-fix"'),
-  'Order-tile rules must load after the existing stylesheet blocks.');
+  'Order-process styles must load after the existing responsive benefit styles.');
 
-const rules = [...styles.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selector, body]) => ({
-  selector: selector.trim().replace(/\/\*[\s\S]*?\*\//g, '').trim(),
+const rules = [...styles.matchAll(/([^{}]+)\\{([^{}]*)\\}/g)].map(([, selector, body]) => ({
+  selector: selector.trim().replace(/\\/\\*[\\s\\S]*?\\*\\//g, '').trim(),
   body,
 }));
 const orphaned = rules.filter(({ selector }) =>
-  /order-(steps|step|number|icon|note)\b/.test(selector)
+  /\\.order-(steps|step|number|icon|note)\\b/.test(selector)
   && !selector.startsWith('#order')
   && !selector.startsWith('@media')
 );
 assert.deepEqual(orphaned.map(x => x.selector), [],
-  'Only the #order scope may style order tiles; old global selectors must be removed.');
+  'Order-process styling must stay scoped to #order; competing global selectors are forbidden.');
 
 assert.equal(rules.filter(x => x.selector === '#order .order-steps' && /display:grid/.test(x.body)).length, 1,
-  'Exactly one base rule must define the order grid.');
-assert.equal(rules.filter(x => x.selector === '#order .order-step' && /position:relative/.test(x.body)).length, 1,
-  'Exactly one base rule must define each order card.');
-assert.match(scopedBlock, /#order \.order-steps\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);grid-auto-rows:1fr/,
-  'Desktop must use equal-width columns and equal-height rows.');
-assert.match(scopedBlock, /@media\(max-width:760px\)\{\s*#order \.order-steps\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\);grid-auto-rows:1fr;gap:8px;align-items:stretch\}/,
-  'Mobile must use two equal columns and equal-height rows.');
-assert.match(scopedBlock, /@media\(max-width:390px\)\{\s*#order \.order-steps\{gap:6px\}/,
-  'Narrow phones must have tighter spacing without changing the equal-card layout.');
-assert.doesNotMatch(styles, /\.order-step:last-child\s*\{|\.order-step:nth-child\(4\)/,
-  'No positional rules may stretch or resize only selected order cards.');
-assert.doesNotMatch(styles, /,\s*\}/,
-  'Stylesheets must not retain the dangling-comma CSS parse error.');
+  'Exactly one base rule must define the process grid.');
+assert.equal(rules.filter(x => x.selector === '#order .order-step' && /display:flex/.test(x.body)).length, 1,
+  'Exactly one base rule must define each process card.');
+assert.match(scopedBlock, /#order \\.order-steps\\{display:grid;grid-template-columns:repeat\\(4,minmax\\(0,1fr)\\)/,
+  'Desktop must show four compact, equal-width steps in one row.');
+assert.match(scopedBlock, /@media\\(max-width:760px\\)\\{[\\s\\S]*?#order \\.order-steps\\{grid-template-columns:repeat\\(2,minmax\\(0,1fr)\\);gap:7px\\}/,
+  'Mobile must show two equal columns instead of stacking four tall cards.');
+assert.match(scopedBlock, /@media\\(max-width:390px\\)/,
+  'Very narrow phones must receive a dedicated spacing adjustment.');
+assert.doesNotMatch(styles, /\\.order-step:last-child\\s*\\{|\\.order-step:nth-child\\(4\\)/,
+  'No positional rule may stretch or resize a particular step.');
+assert.doesNotMatch(styles, /,\\s*\\}/,
+  'Stylesheets must not retain a dangling-comma CSS syntax issue.');
 
-console.log('PASS: six compact order tiles share a single scoped layout on desktop, tablet, mobile, and narrow phones.');
+console.log('PASS: four compact order steps, scoped styles, responsive grid, commitments, and the standalone Zalo CTA.');
