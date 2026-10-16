@@ -20,15 +20,13 @@ assert.ok(
   'Each of the six service items must have its own rounded, frosted-glass layer with consistent icons and light/dark values'
 );
 assert.ok(
-  storefrontHtml.includes('.detail-modal .detail-copy{') &&
-  storefrontHtml.includes('background:linear-gradient(145deg,var(--sd-detail-highlight),transparent 72%),var(--sd-detail-panel)') &&
-  storefrontHtml.includes('backdrop-filter:blur(24px) saturate(150%)') &&
-  storefrontHtml.includes('--sd-detail-panel:rgba(250,246,237,.27)') &&
-  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.38)') &&
-  storefrontHtml.includes('html.dark .detail-modal .detail-copy{') &&
-  storefrontHtml.includes('--sd-detail-panel:rgba(250,246,237,.27);') &&
-  storefrontHtml.includes('--sd-detail-highlight:rgba(255,255,255,.38);'),
-  'Product detail information must use its own frosted-glass panel, including a visible translucent treatment in dark mode'
+  storefrontHtml.includes('<div class="detail-copy glass">') &&
+  storefrontHtml.includes('.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(145%)') &&
+  storefrontHtml.includes('--glass:rgba(255,255,255,.40)') &&
+  storefrontHtml.includes('html.dark{color-scheme:dark;--page:#050505;--ink:#f5f1e9;--muted:#c6bdad;--gold:#d8b36d;--gold-hi:#f1d6a0;--line:rgba(255,246,224,.28);--nav-bg:rgba(9,9,9,.50);--nav-glass-hover:rgba(255,255,255,.22);--glass:rgba(255,255,255,.40)') &&
+  !storefrontHtml.includes('--sd-detail-panel') &&
+  !storefrontHtml.includes('--sd-detail-highlight'),
+  'Product detail information must reuse the original shared .glass surface in both themes without custom competing glass tokens'
 );
 assert.ok(
   storefrontHtml.includes('.featured-arrow:active,.slide-controls button:active{') &&
