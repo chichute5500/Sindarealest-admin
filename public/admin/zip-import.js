@@ -24,11 +24,10 @@ async function readZip(file){
   if(method!==0||size!==raw)throw Error('Chỉ hỗ trợ ZIP WebP không nén từ bộ xuất Taobao Shop Collector.');
   total+=raw;if(total>LIM.expanded)throw Error('Tổng dung lượng giải nén vượt 220 MB.');
   let name;try{name=dec.decode(b.slice(pos+46,pos+46+nl))}catch(e){throw Error('Tên tệp trong ZIP không phải UTF-8 hợp lệ.')}
-  pos+=46+nl+el+cl;if(name.endsWith('/'))continue;
-  if(!safePath(name))throw Error('Đường dẫn ZIP không an toàn: '+name);
+  pos+=46+nl+el+cl;if(!safePath(name))throw Error('Đường dẫn ZIP không an toàn: '+name);if(name.endsWith('/'))continue;if(/\\.zip$/i.test(name))throw Error('Không hỗ trợ ZIP lồng bên trong gói nhập: '+name);
   if(files.has(name))throw Error('Đường dẫn tệp trùng: '+name);
   if(lo+30>b.length||v.getUint32(lo,true)!==0x04034b50)throw Error('Header ZIP không hợp lệ: '+name);
-  const start=lo+30+v.getUint16(lo+26,true)+v.getUint16(lo+28,true),stop=start+size;
+  const localNameLen=v.getUint16(lo+26,true),localExtraLen=v.getUint16(lo+28,true),localNameStart=lo+30,localNameEnd=localNameStart+localNameLen;let localName;try{localName=dec.decode(b.slice(localNameStart,localNameEnd))}catch(e){throw Error('Tên tệp trong header cục bộ không hợp lệ: '+name)}if(localName!==name||v.getUint16(lo+6,true)!==flags||v.getUint16(lo+8,true)!==method)throw Error('Header cục bộ không khớp danh mục ZIP: '+name);const start=localNameEnd+localExtraLen,stop=start+size;
   if(stop>co||stop>b.length)throw Error('Tệp nằm ngoài vùng dữ liệu hợp lệ: '+name);
   const data=b.slice(start,stop);if(crc32(data)!==crc)throw Error('CRC không khớp: '+name);
   files.set(name,data)
