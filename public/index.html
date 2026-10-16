@@ -357,6 +357,69 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 /* Keep the mobile three-line menu on the left, beside the brand. */
 @media(max-width:760px){.nav{position:relative;padding-left:48px!important}.menu-btn{position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}.nav-actions{margin-left:auto}}
 </style>
+<style id="sd-order-uniform-tiles">
+/* Order assurance: compact four-step flow. Keep all rules scoped to this section. */
+#order .order-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:stretch}
+#order .order-step{box-sizing:border-box;display:flex;flex-direction:column;min-width:0;min-height:0;padding:10px 12px;overflow:hidden;border:1px solid var(--line);border-radius:15px;box-shadow:0 7px 20px rgba(0,0,0,.045);transition:transform .25s ease,border-color .25s ease,background-color .45s ease}
+#order .order-step:hover{transform:translateY(-2px);border-color:var(--gold)}
+#order .order-step-top{display:flex;align-items:center;gap:8px;margin:0 0 7px}
+#order .order-number{color:var(--gold);font:400 12px/1 SD Serif,Georgia,serif;letter-spacing:.04em;opacity:.9}
+#order .order-icon{width:26px;height:26px;display:grid;place-items:center;flex:0 0 26px;margin:0;border:1px solid var(--line);border-radius:50%;background:var(--glass);font-size:14px;line-height:1;color:var(--gold)}
+#order .order-step h3{margin:0 0 5px;font:400 13.5px/1.32 SD Serif,Georgia,serif;overflow-wrap:anywhere}
+#order .order-step p{margin:0;color:var(--muted);font-size:9.5px;line-height:1.5;overflow-wrap:anywhere}
+#order .order-step strong{color:var(--ink)}
+#order .order-assurance-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;margin-top:9px;padding:9px 11px;border:1px solid var(--line);border-radius:15px;background:var(--glass);backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%)}
+#order .order-commitment{display:flex;align-items:center;gap:9px;min-width:0;flex:1 1 auto}
+#order .order-commitment-icon{display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border:1px solid var(--line);border-radius:50%;color:var(--gold);font-size:17px}
+#order .order-commitment-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+#order .order-commitment-copy strong{font-size:10px;line-height:1.3;color:var(--ink);font-weight:700}
+#order .order-commitment-copy span{font-size:9px;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}
+#order .order-commitment-copy i{font-style:normal;padding:0 3px;color:var(--gold)}
+#order .order-zalo-cta{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;max-width:100%;min-width:0;padding:7px 10px;font-size:9px;line-height:1.3;white-space:normal;text-align:center}
+#order .order-zalo-mark{display:inline-grid;place-items:center;width:17px;height:17px;flex:0 0 17px;border-radius:5px;background:#087ff5;color:white;font:700 10px/1 Arial,sans-serif}
+@media(max-width:1050px) and (min-width:761px){
+ #order .order-steps{gap:7px}
+ #order .order-step{padding:9px 9px;border-radius:13px}
+ #order .order-step h3{font-size:12.5px}
+ #order .order-step p{font-size:9px;line-height:1.46}
+ #order .order-assurance-footer{gap:8px;padding:8px 9px}
+ #order .order-commitment-copy span{font-size:8.5px}
+ #order .order-zalo-cta{gap:5px;padding:7px 8px;font-size:8.5px}
+}
+@media(max-width:760px){
+ #order .section-note{display:none}
+ #order .order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ #order .order-step{padding:10px;border-radius:13px}
+ #order .order-step-top{gap:7px;margin-bottom:6px}
+ #order .order-icon{width:24px;height:24px;flex-basis:24px;font-size:13px}
+ #order .order-step h3{font-size:12.5px;line-height:1.32;margin-bottom:4px}
+ #order .order-step p{font-size:9.3px;line-height:1.48}
+ #order .order-assurance-footer{gap:7px;margin-top:8px;padding:8px;border-radius:13px}
+ #order .order-commitment{gap:6px}
+ #order .order-commitment-icon{width:24px;height:24px;flex-basis:24px;font-size:14px}
+ #order .order-commitment-copy strong{font-size:9px}
+ #order .order-commitment-copy span{font-size:8px;line-height:1.35}
+ #order .order-commitment-copy i{padding:0 1px}
+ #order .order-zalo-cta{gap:4px;padding:7px 8px;font-size:8.5px}
+ #order .order-zalo-mark{width:15px;height:15px;flex-basis:15px;font-size:9px}
+}
+@media(max-width:390px){
+ #order .order-steps{gap:6px}
+ #order .order-step{padding:9px 8px;border-radius:12px}
+ #order .order-step h3{font-size:12px}
+ #order .order-step p{font-size:9px;line-height:1.45}
+ #order .order-assurance-footer{gap:5px;padding:7px}
+ #order .order-commitment{gap:5px}
+ #order .order-commitment-icon{width:22px;height:22px;flex-basis:22px}
+ #order .order-commitment-copy strong{font-size:8.7px}
+ #order .order-commitment-copy span{font-size:7.6px}
+ #order .order-zalo-cta{gap:3px;padding:7px 6px;font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ #order .order-step{transition:none}
+ #order .order-step:hover{transform:none}
+}
+</style>
 </head>
 <body>
 <div class="welcome-splash" id="welcomeSplash" role="dialog" aria-modal="true" aria-label="Chào mừng đến với SinDarealest">
@@ -421,15 +484,17 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 
 
   <section class="section wrap" id="order" aria-labelledby="order-title">
-    <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title" id="order-title">Đặt hàng an tâm, từng bước rõ ràng</h2></div><p class="section-note">Từ lựa chọn ban đầu đến khi hoàn thiện và bàn giao, mọi mốc quan trọng đều được trao đổi và xác nhận trước.</p></div>
-    <div class="order-steps">
-      <article class="order-step glass" data-reveal><span class="order-number">01</span><div class="order-icon">◇</div><h3>Chọn mẫu sản phẩm</h3><p>Chọn thiết kế bạn yêu thích trong bộ sưu tập. Ghi lại mã SKU để tư vấn nhanh và chính xác.</p></article>
-      <article class="order-step glass" data-reveal style="--reveal-delay:70ms"><span class="order-number">02</span><div class="order-icon">✧</div><h3>Tư vấn & thống nhất</h3><p>Trao đổi về kiểu dáng, kích thước, sắc độ, chi tiết mong muốn và thông tin cần xác nhận trước khi đặt làm.</p></article>
-      <article class="order-step glass" data-reveal style="--reveal-delay:140ms"><span class="order-number">03</span><div class="order-icon">◷</div><h3>Xác nhận thời gian</h3><p>Thời gian dự kiến khoảng <strong>5–20 ngày tùy sản phẩm</strong>. Lịch cụ thể sẽ được thông báo theo mẫu và yêu cầu đã thống nhất.</p></article>
-      <article class="order-step glass" data-reveal style="--reveal-delay:210ms"><span class="order-number">04</span><div class="order-icon">✓</div><h3>Xác nhận đặt làm</h3><p>Sau khi thống nhất mẫu, thời gian và điều kiện đặt hàng, khách đặt cọc <strong>30% giá trị sản phẩm</strong> để xác nhận đơn.</p></article>
-      <article class="order-step glass" data-reveal style="--reveal-delay:280ms"><span class="order-number">05</span><div class="order-icon">↗</div><h3>Hoàn thiện & bàn giao</h3><p>Sản phẩm được kiểm tra trước khi gửi. Phần thanh toán còn lại và phương thức giao nhận được thực hiện theo thỏa thuận xác nhận với khách.</p></article>
+    <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title" id="order-title">Đặt hàng an tâm, từng bước rõ ràng</h2></div><p class="section-note">Bốn bước rõ ràng; mọi điều kiện quan trọng được xác nhận trước khi đặt cọc.</p></div>
+    <div class="order-steps" role="list" aria-label="Quy trình đặt hàng gồm bốn bước">
+      <article class="order-step glass" role="listitem" data-reveal><div class="order-step-top"><span class="order-number" aria-label="Bước 1">01</span><span class="order-icon" aria-hidden="true">◇</span></div><h3>Chọn sản phẩm</h3><p>Chọn mẫu yêu thích và ghi lại mã SKU để tư vấn nhanh.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:60ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 2">02</span><span class="order-icon" aria-hidden="true">✧</span></div><h3>Xác nhận đơn hàng</h3><p>Thống nhất mẫu, giá và yêu cầu trước khi đặt hàng.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:120ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 3">03</span><span class="order-icon" aria-hidden="true">◷</span></div><h3>Đặt cọc & chế tác</h3><p>Đặt cọc <strong>30%</strong>. Thời gian dự kiến <strong>5–20 ngày</strong>, tùy sản phẩm.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:180ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 4">04</span><span class="order-icon" aria-hidden="true">✓</span></div><h3>Nhận hàng & hậu mãi</h3><p>Kiểm tra sản phẩm trước khi nhận; bảo hành <strong>1 năm</strong>, bảo dưỡng trọn đời.</p></article>
     </div>
-    <div class="order-note" data-reveal><span>✦</span><p><strong>Minh bạch ngay từ đầu.</strong> Mọi mốc thời gian, yêu cầu riêng và điều kiện đặt hàng sẽ được xác nhận qua tư vấn trước khi khách tiến hành đặt cọc.</p><a class="pill-btn primary tap-target" href="https://zalo.me/0827049192" target="_blank" rel="noopener">Trao đổi qua Zalo ↗</a></div>
+    <div class="order-assurance-footer glass" data-reveal>
+      <div class="order-commitment"><span class="order-commitment-icon" aria-hidden="true">✦</span><div class="order-commitment-copy"><strong>Cam kết hậu mãi</strong><span>Bảo hành 1 năm <i aria-hidden="true">·</i> Bảo dưỡng trọn đời <i aria-hidden="true">·</i> Hoàn thiện thủ công</span></div></div>
+      <a class="pill-btn primary tap-target order-zalo-cta" href="https://zalo.me/0827049192" target="_blank" rel="noopener noreferrer" aria-label="Tư vấn hoặc đặt hàng qua Zalo"><span class="order-zalo-mark" aria-hidden="true">Z</span><span>Tư vấn/đặt hàng qua Zalo</span><span aria-hidden="true">↗</span></a>
+    </div>
   </section>
 
   <section class="section wrap" id="featured">
