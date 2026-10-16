@@ -58,7 +58,8 @@ assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?grid-template-columns:repe
   'Mobile widths must use two columns.');
 assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:9\.1px\}/,
   'Narrow phones must remain compact while improving text sizing.');
-const copyRules = [...css.matchAll(/\.service-strip \.service-copy\{([^}]*)\}/g)].map(match => match[1]);
+const copyRules = [...css.matchAll(/\.service-strip\s+\.service-copy\{([^}]*)\}/g)]
+  .map(match => match[1].replace(/\s+/g, ''));
 assert.equal(copyRules.filter(rule => /(?:^|;)background:/.test(rule)).length, 1,
   'The CTA-matched surface background must have one authoritative declaration.');
 assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
