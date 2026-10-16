@@ -20,7 +20,7 @@ Mở Termux và đi đến thư mục gốc vừa giải nén. `ls` phải cho t
 Node cần thuộc dòng 22.x. Chỉ tiếp tục nếu `npm run check` và `npm test` đều PASS.
 
 2. THIẾT LẬP D1 + DEPLOY CÓ XÁC NHẬN
-Trước hết phải hoàn thành mục 3 bên dưới: gắn bindings DB/IMAGES đúng tài nguyên Production và lưu ADMIN_PASSWORD/SESSION_SECRET trên đúng Pages project. Script sẽ hỏi xác nhận điều này; nếu trả lời NO hoặc bỏ trống, script dừng trước khi chạy SQL hay deploy.
+Trước khi setup/deploy, hoàn thành mục 3: gắn DB/IMAGES và binding ORIGINALS trỏ tới bucket R2 riêng tư khác IMAGES trên đúng môi trường Pages; lưu ADMIN_PASSWORD/SESSION_SECRET. Script xác minh hai bucket tồn tại, yêu cầu xác nhận đủ 3 bindings/secrets và chuỗi xác nhận có cả hai bucket trước mọi lệnh SQL/deploy.
 
 Chạy:
 
@@ -46,7 +46,7 @@ Trong Cloudflare Dashboard → Workers & Pages → chọn đúng Pages project �
 Bindings:
 - D1 database binding, Variable name chính xác `DB`, trỏ tới D1 database đã chọn ở bước 2.
 - R2 bucket binding, Variable name chính xác `IMAGES`, trỏ tới bucket đã chọn ở bước 2.
-- Watermark detail-only cần thêm một R2 bucket riêng chỉ dùng lưu ảnh gốc, với binding tên `ORIGINALS`. Không gắn cùng bucket với `IMAGES`; API upload mới sẽ từ chối hoạt động nếu binding này chưa được cấu hình.
+- Watermark detail-only cần thêm một R2 bucket riêng chỉ dùng lưu ảnh gốc, với binding tên `ORIGINALS`. Không gắn cùng bucket với `IMAGES`; tắt public access, r2.dev và custom domain công khai ở bucket ORIGINALS. Thêm binding vào cả Preview lẫn Production khi định kiểm thử/triển khai ở hai môi trường. API upload mới sẽ từ chối hoạt động nếu binding này chưa được cấu hình.
 
 Production Variables and Secrets:
 - Secret `ADMIN_PASSWORD`: mật khẩu quản trị riêng, ít nhất 12 ký tự; khuyên dùng 16 ký tự trở lên.
@@ -80,7 +80,7 @@ Chọn một quy trình deploy chính (Termux hoặc GitHub Actions) và dùng n
 - Đăng nhập admin bằng ADMIN_PASSWORD.
 - Kiểm tra đủ sản phẩm, giá/tồn kho trống nếu chưa được xác nhận, lưu một sản phẩm thử và thử ẩn/hiện sản phẩm.
 - Bật/tắt “Hiển thị giá cho khách hàng” và xác nhận API công khai không trả giá thật khi đang ẩn.
-- Tải lên một ảnh WebP; đường dẫn mới sẽ có dạng `/media/<key>.webp` và ảnh được lưu trong R2.
+- Tải lên một ảnh sản phẩm mới: ảnh gốc phải vào bucket riêng tư ORIGINALS; bản WebP chưa đóng dấu vào IMAGES. Watermark chỉ được phủ khi mở ảnh lớn ở trang chi tiết; thẻ sản phẩm và thumbnail không tự được phủ.
 - Tải backup JSON v2 trước khi thử Khôi phục; v2 thay thế dữ liệu danh mục, đơn hàng, khách hàng, bảo hành và nhật ký. Ảnh trong R2 phải được sao lưu riêng.
 - Đăng xuất rồi thử tải `/api/admin/products`; API không được trả dữ liệu quản trị khi chưa đăng nhập.
 
@@ -88,7 +88,7 @@ Chọn một quy trình deploy chính (Termux hoặc GitHub Actions) và dùng n
 - `Project not found`: kiểm tra tài khoản Wrangler và tên Pages Project trong Dashboard. Không cho script tạo project mới.
 - `/api/products` trả 503: kiểm tra binding DB, migrations/schema và hoạt động D1.
 - Admin không đăng nhập: kiểm tra Production Secrets và bảng admin_login_attempts trong D1.
-- Upload ảnh thất bại: kiểm tra binding IMAGES và R2 bucket.
+- Upload ảnh thất bại: kiểm tra binding IMAGES, binding ORIGINALS và xác minh ORIGINALS trỏ tới bucket riêng tư khác IMAGES.
 - Trang `/admin/` hiện trang chủ: kiểm tra đã deploy đúng gói này và file public/_redirects.
 - Nếu check/test lỗi: giữ nguyên toàn bộ thông báo để xác định lỗi trước khi deploy lại.
 - Không xóa D1 hoặc R2, không chạy lại seed trong database đã có dữ liệu, không thu hồi token đang được workflow sử dụng nếu chưa có token thay thế.
