@@ -65,8 +65,8 @@ assert.match(scopedBlock, /@media\(max-width:760px\)\{\s*#order \.section-note\{
   'The explanatory note must not consume extra vertical space on mobile.');
 assert.match(scopedBlock, /@media\(max-width:390px\)/,
   'Very narrow phones must receive a dedicated spacing adjustment.');
-assert.doesNotMatch(styles, /\.order-step:last-child\s*\{|\.order-step:nth-child\(4\)/,
-  'No positional rule may stretch or resize a particular step.');
+assert.match(scopedBlock, /@media\(max-width:760px\)\{[\s\S]*?#order \.order-step:last-child\{grid-column:auto\}/,
+  'Mobile must reset the legacy last-child span so step four stays beside step three.');
 assert.doesNotMatch(styles, /,\s*\}/,
   'Stylesheets must not retain a dangling-comma CSS syntax issue.');
 
