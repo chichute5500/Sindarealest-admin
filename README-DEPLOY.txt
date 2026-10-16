@@ -46,6 +46,7 @@ Trong Cloudflare Dashboard → Workers & Pages → chọn đúng Pages project �
 Bindings:
 - D1 database binding, Variable name chính xác `DB`, trỏ tới D1 database đã chọn ở bước 2.
 - R2 bucket binding, Variable name chính xác `IMAGES`, trỏ tới bucket đã chọn ở bước 2.
+- Watermark detail-only cần thêm một R2 bucket riêng chỉ dùng lưu ảnh gốc, với binding tên `ORIGINALS`. Không gắn cùng bucket với `IMAGES`; API upload mới sẽ từ chối hoạt động nếu binding này chưa được cấu hình.
 
 Production Variables and Secrets:
 - Secret `ADMIN_PASSWORD`: mật khẩu quản trị riêng, ít nhất 12 ký tự; khuyên dùng 16 ký tự trở lên.
