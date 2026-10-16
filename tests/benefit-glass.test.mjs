@@ -24,4 +24,18 @@ assert.doesNotMatch(surfaceRules[0][1], /background\s*:\s*rgba\(/,
 assert.equal((html.match(/html\.dark\s+\.service-strip\s+\.service-copy\s*\{/g) || []).length, 0,
   'A duplicate dark-mode selector must not override the shared glass surface.');
 
-console.log('PASS: six benefit text panels share one theme-aware translucent glass surface; dark mode has no opaque black override.');
+const surfaceRule = html.match(/\.service-strip \.service-copy\{([^}]*)\}/)?.[1] || '';
+assert.match(surfaceRule, /display:flex;[^}]*flex-direction:column;[^}]*min-height:50px/,
+  'The text panel must grow from its content rather than squeezing a two-line caption into a fixed row.');
+assert.match(surfaceRule, /background:var\(--service-copy-bg\)/,
+  'The panel base colour must continue to use the theme token.');
+assert.match(html, /\.service-strip \.service-copy::before\{[^}]*background:var\(--service-copy-gradient\)/,
+  'The subtle left-to-right glass highlight must be rendered as a separate overlay.');
+assert.match(html, /--service-copy-gradient:linear-gradient\(90deg,[^}]*rgba\(218,184,112,\.13\) 100%\)/,
+  'The shared gradient must move horizontally and finish in an extremely subtle warm gold.');
+assert.match(html, /\.service-strip \.service-copy small\{[^}]*font-size:9px;[^}]*line-height:1\.35;[^}]*white-space:normal;[^}]*opacity:1/,
+  'The supporting caption must be clearly visible, wrap naturally, and not be hidden by opacity.');
+assert.match(html, /@media\(max-width:760px\)\{\.service-strip \.service-copy\{min-height:52px;[^}]*\}\.service-strip \.service-copy strong\{font-size:9px\}\.service-strip \.service-copy small\{font-size:8\.7px;line-height:1\.35\}\}/,
+  'Mobile captions need a little more room and readable sizing.');
+
+console.log('PASS: six benefit panels use content-led height, visible subtitles, and a subtle horizontal white-to-gold glass sweep in both themes.');
