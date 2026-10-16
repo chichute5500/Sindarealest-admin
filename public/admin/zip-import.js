@@ -37,7 +37,7 @@ async function readZip(file){
   if(localName!==name||v.getUint16(lo+6,true)!==flags||v.getUint16(lo+8,true)!==method||v.getUint32(lo+14,true)!==crc||v.getUint32(lo+18,true)!==size||v.getUint32(lo+22,true)!==raw)throw Error('Header cục bộ không khớp danh mục ZIP: '+name);
   if(ranges.some(([a,z])=>lo<z&&a<stop))throw Error('Dữ liệu tệp ZIP bị chồng lấn: '+name);
   ranges.push([lo,stop]);
-  const data=b.slice(start,stop);if(crc32(data)!==crc)throw Error('CRC không khớp: '+name);
+  const data=b.subarray(start,stop);if(crc32(data)!==crc)throw Error('CRC không khớp: '+name);
   if(!name.endsWith('/'))files.set(name,data);
  }
  if(pos!==co+cs)throw Error('Kích thước danh mục ZIP không khớp.');
