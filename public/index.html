@@ -659,14 +659,23 @@ function sizeFullscreenFrame(){
  frame.style.width=Math.max(1,Math.round(nw*scale))+'px';
  frame.style.height=Math.max(1,Math.round(nh*scale))+'px';
 }
-function setFullscreenPhoto(src){
+function setFullscreenPhoto(src,direction='left'){
  const img=$('#sdFullscreenImage'),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
  const same=img.getAttribute('src')===next;
- if(same&&img.complete&&img.naturalWidth){sizeFullscreenFrame();img.classList.remove('is-changing');window.__sdUpdateDetailWatermark?.();return}
- img.onload=()=>{sizeFullscreenFrame();img.onload=null;img.onerror=null;requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),180))};
- img.onerror=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';img.classList.remove('is-changing')};
- if(!same){img.classList.add('is-changing');img.src=next}else if(!img.complete){img.classList.add('is-changing')}
- if(img.complete&&img.naturalWidth){sizeFullscreenFrame();requestAnimationFrame(()=>setTimeout(()=>img.classList.remove('is-changing'),180))}
+ const clearSlide=()=>img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
+ if(same&&img.complete&&img.naturalWidth){sizeFullscreenFrame();clearSlide();window.__sdUpdateDetailWatermark?.();return}
+ const finish=()=>{
+  sizeFullscreenFrame();img.onload=null;img.onerror=null;
+  img.classList.remove('sd-slide-out-left','sd-slide-out-right','is-changing');
+  const incoming=direction==='right'?'sd-slide-in-left':'sd-slide-in-right';
+  img.classList.remove('sd-slide-in-left','sd-slide-in-right');
+  img.classList.add(incoming);
+  requestAnimationFrame(()=>setTimeout(()=>img.classList.remove(incoming),560));
+ };
+ img.onload=finish;
+ img.onerror=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)';clearSlide()};
+ if(!same){clearSlide();img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');img.src=next}else if(!img.complete){img.classList.add('is-changing')}
+ if(img.complete&&img.naturalWidth){finish()}
  window.__sdUpdateDetailWatermark?.();
 }
 function renderFullscreenThumbs(){
@@ -695,26 +704,37 @@ function closeFullscreenImage(){
  if($('#productOverlay').classList.contains('open')){document.body.style.overflow='hidden';scheduleDetailAutoplay();$('#detailZoom').focus({preventScroll:true})}
  else if(!$('#cartDrawer').classList.contains('open'))document.body.style.overflow='';
 }
-function changeDetailImage(index,resetTimer=true){
+function changeDetailImage(index,resetTimer=true,direction){
  if(!detailImages.length)return;
  clearTimeout(detailTimer);clearTimeout(detailSwapTimer);
- detailIndex=(index+detailImages.length)%detailImages.length;
- const img=$('#detailMainImage'),next=imgPath(detailImages[detailIndex]),thumbs=$$('.detail-thumb');
- img.classList.add('is-changing');
+ const previousIndex=detailIndex;
+ const nextIndex=(index+detailImages.length)%detailImages.length;
+ direction=direction||(nextIndex===previousIndex?'left':((nextIndex-previousIndex+detailImages.length)%detailImages.length<=detailImages.length/2?'left':'right'));
+ detailIndex=nextIndex;
+ const img=$('#detailMainImage'),next=imgPath(detailImages[detailIndex]),thumbs=$('.detail-thumb');
+ img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
+ img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
  $('#detailImageCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
  thumbs.forEach((thumb,j)=>{const active=j===detailIndex;thumb.classList.toggle('active',active);if(active&&resetTimer)thumb.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})});
  if($('#sdFullscreenViewer').classList.contains('open')){
   $('#sdFullscreenCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
   $('#sdFullscreenThumbs').querySelectorAll('[data-full-thumb]').forEach((thumb,j)=>{const active=j===detailIndex;thumb.classList.toggle('active',active);thumb.setAttribute('aria-current',active?'true':'false');if(active&&resetTimer)thumb.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'})});
-  setFullscreenPhoto(next);
+  setFullscreenPhoto(next,direction);
  }
  const swap=()=>{
   img.onload=null;img.onerror=null;
-  const finish=()=>{img.onload=null;img.onerror=null;requestAnimationFrame(()=>img.classList.remove('is-changing'))};
+  const finish=()=>{
+   img.onload=null;img.onerror=null;
+   img.classList.remove('sd-slide-out-left','sd-slide-out-right','is-changing');
+   const incoming=direction==='right'?'sd-slide-in-left':'sd-slide-in-right';
+   img.classList.remove('sd-slide-in-left','sd-slide-in-right');
+   img.classList.add(incoming);
+   requestAnimationFrame(()=>setTimeout(()=>img.classList.remove(incoming),560));
+  };
   img.onload=finish;img.onerror=finish;img.src=next;
   if(img.complete&&img.naturalWidth)finish();
  };
- detailSwapTimer=setTimeout(swap,180);
+ detailSwapTimer=setTimeout(swap,230);
  scheduleDetailAutoplay();
 }
 function openDetail(productId,fromUrl=false){clearTimeout(detailSwapTimer);const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;document.title=(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){history.pushState({productId:p.id},'',`/san-pham/${encodeURIComponent(p.sku||p.id)}`)}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp');img.alt=p.title||'Sản phẩm SinDarealest';$('#detailSku').textContent='SKU: '+(p.sku||'Liên hệ');$('#detailTitle').textContent=p.title||'Sản phẩm tuyển chọn';$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailCategory').textContent=p.categoryLabel||categoryLabels[p.category]||'Selected piece';$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();}
@@ -841,8 +861,8 @@ html.dark .product-info,html.dark .detail-info,html.dark .detail-description,htm
 html.dark{
  --sd-service-glass:rgba(255,255,255,.065);
  --sd-service-border:rgba(255,255,255,.19);
- --sd-detail-panel:rgba(255,255,255,.10);
- --sd-detail-highlight:rgba(255,255,255,.14);
+ --sd-detail-panel:rgba(250,246,237,.27);
+ --sd-detail-highlight:rgba(255,255,255,.38);
 }
 /* Information 1: six individual glass tiles, while retaining the original strip. */
 .service-strip{gap:8px!important;padding:10px!important}
@@ -931,6 +951,46 @@ html.dark .service-strip .service:hover{background:rgba(255,255,255,.105);border
  .sd-fullscreen-image,#detailMainImage,.featured-product-card [data-feature-track],.featured-arrow,.slide-controls button,.detail-gallery-arrow,.sd-fullscreen-arrow,#artSlide{
   transition-duration:.01ms!important;animation-duration:.01ms!important
  }
+}
+
+
+/* SinDarealest refinements: consistent detail glass, tactile arrows, directional image slides. */
+html.dark .detail-modal .detail-copy{
+  --sd-detail-panel:rgba(250,246,237,.27);
+  --sd-detail-highlight:rgba(255,255,255,.38);
+}
+.featured-arrow,.slide-controls button,.detail-gallery-arrow,.sd-fullscreen-arrow{
+  transition:transform .42s cubic-bezier(.34,1.56,.64,1),background .24s ease,box-shadow .24s ease!important;
+  touch-action:manipulation;
+  transform-origin:center;
+}
+.featured-arrow:active,.slide-controls button:active{
+  transform:scale(.65)!important;
+  background:rgba(214,180,112,.48);
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.20),0 1px 3px rgba(0,0,0,.12);
+}
+.detail-gallery-arrow:active{
+  transform:translateY(-50%) scale(.65)!important;
+  background:rgba(214,180,112,.48);
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.20),0 1px 3px rgba(0,0,0,.12);
+}
+.sd-fullscreen-arrow:active{
+  transform:translateY(-50%) scale(.65)!important;
+  background:rgba(214,180,112,.48);
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.20),0 1px 3px rgba(0,0,0,.12);
+}
+@keyframes sdGalleryOutLeft{to{opacity:.18;transform:translateX(-11%) scale(.985);filter:blur(2px)}}
+@keyframes sdGalleryOutRight{to{opacity:.18;transform:translateX(11%) scale(.985);filter:blur(2px)}}
+@keyframes sdGalleryInRight{from{opacity:.18;transform:translateX(11%) scale(.985);filter:blur(2px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
+@keyframes sdGalleryInLeft{from{opacity:.18;transform:translateX(-11%) scale(.985);filter:blur(2px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
+#detailMainImage.sd-slide-out-left,.sd-fullscreen-image.sd-slide-out-left{animation:sdGalleryOutLeft .23s ease both!important}
+#detailMainImage.sd-slide-out-right,.sd-fullscreen-image.sd-slide-out-right{animation:sdGalleryOutRight .23s ease both!important}
+#detailMainImage.sd-slide-in-right,.sd-fullscreen-image.sd-slide-in-right{animation:sdGalleryInRight .58s cubic-bezier(.22,.75,.25,1) both!important}
+#detailMainImage.sd-slide-in-left,.sd-fullscreen-image.sd-slide-in-left{animation:sdGalleryInLeft .58s cubic-bezier(.22,.75,.25,1) both!important}
+@media(prefers-reduced-motion:reduce){
+  .featured-arrow,.slide-controls button,.detail-gallery-arrow,.sd-fullscreen-arrow{transition-duration:.01ms!important}
+  #detailMainImage.sd-slide-out-left,#detailMainImage.sd-slide-out-right,.sd-fullscreen-image.sd-slide-out-left,.sd-fullscreen-image.sd-slide-out-right,
+  #detailMainImage.sd-slide-in-left,#detailMainImage.sd-slide-in-right,.sd-fullscreen-image.sd-slide-in-left,.sd-fullscreen-image.sd-slide-in-right{animation-duration:.01ms!important}
 }
 
 </style>
