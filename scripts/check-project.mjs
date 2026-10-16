@@ -134,6 +134,56 @@ for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', '
   if (existsSync(join(root, file))) runTest(file);
 }
 
+
+// Permanent regression guard: AI image-search experiment resources must stay out
+// of the baseline storefront/admin and deployment path.
+const removedExperimentPaths = [
+  '.github/workflows/ai-rewrite-checks.yml',
+  '.github/workflows/migrate-ai-preview-d1.yml',
+  'functions/_lib/ai-quota.js',
+  'functions/_lib/ai-review-schema.js',
+  'functions/_lib/elimapi.js',
+  'functions/_lib/image-audit.js',
+  'functions/_lib/workers-ai.js',
+  'functions/api/admin/image-audit.js',
+  'functions/api/admin/image-candidate.js',
+  'functions/api/admin/image-proxy.js',
+  'functions/api/admin/image-search.js',
+  'migrations/0007_ai_image_reviews.sql',
+  'migrations/0008_ai_image_source_url.sql',
+  'migrations/0009_ai_request_limits.sql',
+  'migrations/0010_ai_image_source_image_url.sql',
+  'scripts/apply-ai-image-migrations.mjs',
+  'tests/image-search.test.mjs',
+];
+for (const removedPath of removedExperimentPaths) {
+  check(!existsSync(join(root, removedPath)), `Removed image-search experiment file still exists: ${removedPath}`);
+}
+
+for (const configPath of [
+  'package.json', 'wrangler.toml', '.github/workflows/deploy.yml',
+  'README-DEPLOY.txt', 'scripts/setup-cloudflare.mjs',
+  'scripts/deploy-cloudflare.mjs', 'public/admin/index.html',
+]) {
+  const fullPath = join(root, configPath);
+  if (!existsSync(fullPath)) continue;
+  const content = readFileSync(fullPath, 'utf8');
+  check(
+    !/ELIMAPI_API_KEY|ELIMAPI_IMAGE_SEARCH_ENABLED|apply-ai-image-migrations\\.mjs|migrations\\/000[789]_|migrations\\/0010_ai_image_source_image_url\\.sql/i.test(content),
+    `Stale AI image-search experiment configuration remains in ${configPath}`,
+  );
+}
+const deployWorkflowPath = join(root, '.github/workflows/deploy.yml');
+if (existsSync(deployWorkflowPath)) {
+  const workflow = readFileSync(deployWorkflowPath, 'utf8');
+  const triggerBranch = workflow.match(/^\\s{6}- ([A-Za-z0-9._/-]+)\\s*$/m)?.[1];
+  const configuredBranch = workflow.match(/^\\s+CLOUDFLARE_PAGES_BRANCH:\\s*([A-Za-z0-9._/-]+)\\s*$/m)?.[1];
+  check(
+    Boolean(triggerBranch && configuredBranch && triggerBranch === configuredBranch),
+    'GitHub automatic-deploy trigger must match CLOUDFLARE_PAGES_BRANCH',
+  );
+}
+
 if (failures.length) {
   console.error('\nKIỂM TRA THẤT BẠI:');
   for (const failure of failures) console.error(`- ${failure}`);
