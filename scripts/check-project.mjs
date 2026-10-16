@@ -85,7 +85,7 @@ const adminPageForWatermark = existsSync(join(root, 'public/admin/index.html')) 
 check(adminPageForWatermark.includes('watermarkSettingsForm') && adminPageForWatermark.includes('watermarkLogoFile'), 'Admin thiếu cài đặt logo/vị trí/kích thước/độ mờ watermark');
 check(!/watermarkApplied|ctx\.drawImage\(markBitmap/.test(adminPageForWatermark), 'Không được đóng dấu cố định vào ảnh sản phẩm khi tải lên');
 const uploadApiForWatermark = existsSync(join(root, 'functions/api/admin/upload.js')) ? readFileSync(join(root, 'functions/api/admin/upload.js'), 'utf8') : '';
-check(uploadApiForWatermark.includes('private-originals/') && uploadApiForWatermark.includes('public-optimized-derivative'), 'Upload phải tách ảnh gốc riêng tư khỏi bản hiển thị');
+check(uploadApiForWatermark.includes('context.env.ORIGINALS.put') && uploadApiForWatermark.includes('context.env.IMAGES.put') && uploadApiForWatermark.includes('public-optimized-derivative'), 'Upload phải lưu ảnh gốc qua binding ORIGINALS riêng tư và bản hiển thị qua IMAGES');
 check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claims'), 'Trang chủ chưa kết nối yêu cầu đặt hàng và bảo hành');
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
