@@ -34,6 +34,10 @@ assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 ·
 assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setup must apply admin notification migration');
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty metadata migration');
 assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setup must apply the OTP removal migration');
+assert.ok(setupScript.includes('binding ORIGINALS'), 'Setup must require a separate bucket for private originals');
+assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must prevent IMAGES and ORIGINALS from pointing to the same bucket');
+assert.ok(setupScript.includes('r2.dev hay custom domain công khai'), 'Setup must warn that the originals bucket cannot have public access');
+assert.ok(setupScript.includes('DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}'), 'Deployment confirmation must include the private originals bucket');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_verifications/.test(setupScript), 'Setup must not depend on obsolete OTP/SMS configuration or tables');
 
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
