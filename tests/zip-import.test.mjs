@@ -76,7 +76,7 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   await assert.rejects(()=>core.readZip(fakeFile(zip([{name:'../escape.webp',data:fakeWebp()}]))),/không an toàn/i);
 }
 {
-  await assert.rejects(()=>core.readZip(fakeFile(zip([{name:'bad.webp',data:fakeWebp()}],'bad.webp'))),/CRC thất bại/i);
+  await assert.rejects(()=>core.readZip(fakeFile(zip([{name:'bad.webp',data:fakeWebp()}],'bad.webp'))),/CRC không khớp/i);
 }
 {
   const html=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
