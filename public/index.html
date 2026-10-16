@@ -594,7 +594,7 @@ function setFullscreenPhoto(src){
  img.onerror=()=>{img.onload=null;img.onerror=null;frame.style.width='min(80vw,700px)';frame.style.height='min(62dvh,500px)'};
  img.src=imgPath(src||'');
  if(img.complete&&img.naturalWidth)sizeFullscreenFrame();
- if(typeof applyDetailWatermark==='function')applyDetailWatermark();
+ window.__sdUpdateDetailWatermark?.();
 }
 function openFullscreenImage(){
  if(!currentProduct||!detailImages.length||!$('#productOverlay').classList.contains('open'))return;
