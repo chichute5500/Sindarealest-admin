@@ -39,6 +39,14 @@ assert.ok(
   'Featured, in-page gallery, and fullscreen arrows must press to half size without losing their vertical anchor'
 );
 assert.ok(
+  storefrontHtml.includes("thumbs=$$('.detail-thumb')") &&
+  !storefrontHtml.includes("thumbs=$('.detail-thumb')") &&
+  storefrontHtml.includes('function clearGalleryTransitionClasses(img)') &&
+  storefrontHtml.includes('clearTimeout(fullscreenSwapTimer);fullscreenSwapTimer=null;') &&
+  storefrontHtml.includes("main.getAttribute('src')!==selected"),
+  'Fullscreen arrow navigation must not throw, and closing zoom must restore a clear, correctly selected detail image'
+);
+assert.ok(
   storefrontHtml.includes('.featured-product-card [data-feature-track]{transition:transform 1.45s') &&
   storefrontHtml.includes('sdFeaturedImageShift .76s') &&
   storefrontHtml.includes('transition:opacity .52s ease,filter .52s ease,transform .52s') &&
