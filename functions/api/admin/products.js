@@ -52,10 +52,39 @@ export async function onRequestPost(context) {
   if (checked.error) return fail(checked.error);
   try {
     const p = checked.value;
-    await context.env.DB.batch([
-      productInsertStatement(context.env.DB, p),
-      context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_created', 'product', ?, ?)").bind(crypto.randomUUID(),p.id,JSON.stringify({ sku:p.sku,title:p.title }))
-    ]);
+    const statements = [productInsertStatement(context.env.DB, p)];
+    const source = body?.importSource;
+    if (source !== undefined) {
+      if (!source || typeof source !== "object" || Array.isArray(source) || !String(source.exportId || "").trim()) {
+        return fail("Thông tin nguồn ZIP không hợp lệ.");
+      }
+      let sourceJson;
+      try { sourceJson = JSON.stringify(source.sourceRecord ?? {}); }
+      catch { return fail("Không thể lưu dữ liệu nguồn ZIP."); }
+      if (sourceJson.length > 100000) return fail("Dữ liệu nguồn của sản phẩm vượt giới hạn 100 KB.");
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO product_source_imports (product_id,export_id,export_folder,source_product_id,source_title,source_category,source_description,source_price,source_currency,source_url,source_record_json) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+      ).bind(
+        p.id,
+        String(source.exportId).slice(0, 180),
+        String(source.exportFolder || "").slice(0, 500),
+        String(source.productId || "").slice(0, 180),
+        String(source.title || "").slice(0, 500),
+        String(source.category || "").slice(0, 180),
+        String(source.description || "").slice(0, 10000),
+        String(source.price ?? "").slice(0, 120),
+        String(source.currency || "").slice(0, 40),
+        String(source.url || "").slice(0, 2000),
+        sourceJson
+      ));
+    }
+    statements.push(context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', ?, 'product', ?, ?)").bind(
+      crypto.randomUUID(),
+      source ? "product_created_from_zip" : "product_created",
+      p.id,
+      JSON.stringify({ sku: p.sku, title: p.title, exportId: source?.exportId || null })
+    ));
+    await context.env.DB.batch(statements);
     return json({ ok: true, product: toAdminProduct(p), message: "Đã thêm sản phẩm." }, 201);
   } catch (error) { return genericDbError(error); }
 }
