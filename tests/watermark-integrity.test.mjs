@@ -125,4 +125,12 @@ assert.ok(!uploadSource.includes('watermarkApplied'), 'The upload API must accep
 
 const mediaSource = readFileSync(new URL('../functions/media/[key].js', import.meta.url), 'utf8');
 assert.ok(mediaSource.includes('^[A-Za-z0-9-]{30,40}\\.webp$'), 'Public media routing must accept only flat WebP keys, not private-originals/ paths');
+
+assert.ok(publicPage.includes('.sd-fullscreen-image.is-changing{opacity:.38;filter:blur(2px);transform:scale(.985)}'), 'Fullscreen image must fade and soften during image changes');
+assert.ok(publicPage.includes('#detailMainImage.is-changing{opacity:.45;filter:blur(2px);transform:scale(.99)}'), 'Detail image must have a subtle blur/fade transition');
+assert.ok(publicPage.includes('transform:scale(.88) translateY(1px)'), 'Gallery controls must provide a tactile pressed-in response');
+assert.ok(publicPage.includes('--sd-glass-blur:20px'), 'Storefront glass system must define a shared blur token');
+assert.ok(publicPage.includes('html.dark .product-card,html.dark .promise,html.dark .service-strip,html.dark .mosaic-card{background:rgba(8,8,8,.30)}'), 'Dark mode cards and content panels must retain translucent glass');
+assert.ok(publicPage.includes('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5.5'), 'Featured product arrows must use aligned SVG icons instead of text glyphs');
+
 console.log('PASS: watermark validation, admin controls, detail-only overlay, and private original upload guard.');
