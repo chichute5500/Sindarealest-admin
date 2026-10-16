@@ -82,9 +82,14 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   const html=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
   const api=readFileSync(new URL('../functions/api/admin/products.js',import.meta.url),'utf8');
   const migration=readFileSync(new URL('../migrations/0011_product_source_imports.sql',import.meta.url),'utf8');
+  const upload=readFileSync(new URL('../functions/api/admin/upload.js',import.meta.url),'utf8');
+  const readiness=readFileSync(new URL('../functions/api/admin/zip-import/status.js',import.meta.url),'utf8');
   assert.ok(html.includes('/admin/zip-import.js'));
   assert.ok(source.includes("if(!confirm(") && source.includes("published:false"),'writes must require confirmation and create hidden products');
   assert.ok(api.includes('product_source_imports') && api.includes('context.env.DB.batch(statements)'),'product and source metadata must be written in the same D1 batch');
+  assert.ok(api.includes('ZIP_IMPORT_ENABLED !== "1"'),'product creation must be gated by an explicit environment flag');
+  assert.ok(upload.includes('form.get("zipImport") === "1"') && upload.includes('ZIP_IMPORT_ENABLED !== "1"'),'ZIP image uploads must be gated before writing to R2');
+  assert.ok(readiness.includes('product_source_imports') && readiness.includes('ZIP_IMPORT_ENABLED'),'Preview readiness must verify the flag and migrated table');
   assert.ok(migration.includes('REFERENCES products(id) ON DELETE CASCADE'));
 }
 console.log('PASS: ZIP parser, exact image linkage, 100-product package, CSV fallback, failure metadata, traversal and atomic source metadata checks.');
