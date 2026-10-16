@@ -80,7 +80,7 @@ jobs:
           echo "### Liquid Glass preview deployed" >> "$GITHUB_STEP_SUMMARY"
           echo "Use this exact deployment URL: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Verify that the exact deployment serves this Liquid Glass fix
+      - name: Verify that the exact deployment serves the canonical Liquid Glass surfaces
         shell: bash
         env:
           SD_PREVIEW_URL: ${{ steps.deploy-preview.outputs.url }}
@@ -88,10 +88,15 @@ jobs:
           node --input-type=module <<'NODE'
           const url = process.env.SD_PREVIEW_URL;
           const expected = [
-            ['transparent product shell', /\.product-card\s*\{\s*background\s*:\s*transparent!important\s*;/i],
-            ['single glass layer on product info', /\.product-card\s+\.product-info\s*\{\s*background\s*:\s*var\(--glass\)!important\s*;/i],
-            ['transparent hover shell', /\.product-card:hover\s*\{\s*background\s*:\s*transparent!important\s*;/i],
-            ['glass stays consistent on hover', /\.product-card:hover\s+\.product-info\s*\{\s*background\s*:\s*var\(--glass\)!important\s*;/i]
+            ['shared .glass component', /\.glass\{[^}]*background\s*:\s*var\(--glass\)[^}]*backdrop-filter\s*:\s*blur\(24px\)\s*saturate\(145%\)/i],
+            ['catalog cards reuse .glass', /class="product-card glass tap-target"/i],
+            ['featured cards reuse .glass', /class="product-card featured-product-card glass tap-target"/i],
+            ['detail pane reuses .glass', /class="detail-copy glass"/i]
+          ];
+          const conflicts = [
+            ['product-info second background layer', /\.product-card\s+\.product-info\s*\{[^}]*background\s*:/i],
+            ['late product-card background override', /\.product-card\s*\{\s*background\s*:/i],
+            ['obsolete custom detail tokens', /--sd-detail-panel|--sd-detail-highlight/]
           ];
           let lastError = '';
           for (let attempt = 1; attempt <= 10; attempt++) {
@@ -110,17 +115,18 @@ jobs:
                 process.exit(0);
               }
               const missing = expected.filter(([, pattern]) => !pattern.test(html)).map(([name]) => name);
-              if (missing.length === 0) {
-                console.log(`PASS: exact deployment serves the single-layer glass CSS (HTTP ${res.status}, ${html.length} characters).`);
+              const presentConflicts = conflicts.filter(([, pattern]) => pattern.test(html)).map(([name]) => name);
+              if (missing.length === 0 && presentConflicts.length === 0) {
+                console.log(`PASS: exact deployment serves the canonical shared .glass surfaces (HTTP ${res.status}, ${html.length} characters).`);
                 process.exit(0);
               }
               const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.slice(0,120) || '(title missing)';
               const foundRule = html.match(/\.product-card[^}]{0,300}\}/i)?.[0] || '(product-card rule not found)';
-              lastError = `HTTP ${res.status}, ${html.length} characters, title=${title}; missing: ${missing.join(', ')}; sample rule: ${foundRule}`;
+              lastError = `HTTP ${res.status}, ${html.length} characters, title=${title}; missing: ${missing.join(', ')}; conflicts: ${presentConflicts.join(', ')}; sample rule: ${foundRule}`;
             } catch (error) {
               lastError = String(error);
             }
             await new Promise(resolve => setTimeout(resolve, 3000));
           }
-          throw new Error(`Preview did not serve this commit's CSS after retries: ${lastError}`);
+          throw new Error(`Preview did not serve this commit's canonical glass implementation after retries: ${lastError}`);
           NODE
