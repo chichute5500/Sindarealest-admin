@@ -6,7 +6,7 @@ const $=s=>document.querySelector(s);
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(url,opt){opt=opt||{};let r;try{r=await fetch(url,Object.assign({credentials:'same-origin',cache:'no-store',headers:opt.body instanceof FormData?{}:{'Content-Type':'application/json'}},opt))}catch(e){throw Error('Không kết nối được máy chủ.')}let d={};try{d=await r.json()}catch(e){}if(!r.ok)throw Error(d.error||('Lỗi máy chủ '+r.status));return d}
 function crc32(b){let c=0xffffffff;for(let i=0;i<b.length;i++){c^=b[i];for(let j=0;j<8;j++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(c^0xffffffff)>>>0}
-function safePath(n){const x=String(n||'').endsWith('/')?String(n||'').slice(0,-1):String(n||'');return !!x&&!x.includes('\\\\')&&!x.startsWith('/')&&!/^[a-z]:/i.test(x)&&!x.includes(String.fromCharCode(0))&&x.split('/').every(p=>!!p&&p!=='..'&&p!=='.')}
+function safePath(n){const x=String(n||'').endsWith('/')?String(n||'').slice(0,-1):String(n||'');return !!x&&!x.includes('\\')&&!x.startsWith('/')&&!/^[a-z]:/i.test(x)&&!x.includes(String.fromCharCode(0))&&x.split('/').every(p=>!!p&&p!=='..'&&p!=='.')}
 async function readZip(file){
  if(!file||!file.name.toLowerCase().endsWith('.zip'))throw Error('Chỉ nhận file .zip.');
  if(!file.size||file.size>LIM.zip)throw Error('ZIP phải nhỏ hơn hoặc bằng 120 MB.');
