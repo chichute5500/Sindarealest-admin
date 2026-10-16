@@ -317,8 +317,8 @@ for (let attempt = 0; attempt < 3; attempt++) {
     }
     const sampleImages = [...new Set(
       data.flatMap((product) => Array.isArray(product.images) ? product.images : [])
-        .map((value) => String(value).replace(/^\\.\\//, ""))
-        .filter((value) => /^images\\/[A-Za-z0-9._-]+\\.webp$/.test(value))
+        .map((value) => String(value).replace(/^\.\//, ""))
+        .filter((value) => /^images\/[A-Za-z0-9._-]+\.webp$/.test(value))
     )].slice(0, 5);
     for (const key of sampleImages) {
       const imageResponse = await fetch(new URL(key, PREVIEW_URL + "/"), { signal: AbortSignal.timeout(12000) });
