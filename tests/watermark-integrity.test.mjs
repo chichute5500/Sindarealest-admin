@@ -139,7 +139,15 @@ assert.ok(publicPage.includes('.sd-fullscreen-image.is-changing{opacity:.38;filt
 assert.ok(publicPage.includes('#detailMainImage.is-changing{opacity:.45;filter:blur(2px);transform:scale(.99)}'), 'Detail image must have a subtle blur/fade transition');
 assert.ok(publicPage.includes('transform:scale(.88) translateY(1px)'), 'Gallery controls must provide a tactile pressed-in response');
 assert.ok(publicPage.includes('--sd-glass-blur:20px'), 'Storefront glass system must define a shared blur token');
-assert.ok(publicPage.includes('.product-card{\n background:var(--glass)!important;') && publicPage.includes('.product-card .product-info{\n background:var(--glass)!important;') && publicPage.includes('.product-card:hover{\n background:var(--glass)!important;') && publicPage.includes('.product-card:hover .product-info{\n background:var(--glass)!important;') && publicPage.includes('.detail-modal .detail-copy{\n background:var(--glass)!important;') && publicPage.includes('--glass:rgba(255,255,255,.40)'), 'Product cards, product info, hover state, and detail information must all use the same Order With Confidence glass token in both themes');
+const glassRule = publicPage.match(/\.glass\{([^}]*)\}/)?.[1] || '';
+assert.ok(glassRule.includes('background:var(--glass)') && glassRule.includes('border:1px solid var(--line)') && glassRule.includes('backdrop-filter:blur(24px) saturate(145%)'), 'Product surfaces must reuse the original shared .glass component as their single source of truth');
+assert.ok(publicPage.includes('class="product-card glass tap-target"') && publicPage.includes('class="product-card featured-product-card glass tap-target"') && publicPage.includes('<div class="detail-copy glass">'), 'Catalog cards, featured cards, and detail information must reuse the original .glass class');
+const baseProductRule = publicPage.match(/\.product-card\{([^}]*)\}/)?.[1] || '';
+assert.ok(!/(^|;)\s*(background|border|backdrop-filter|-webkit-backdrop-filter|box-shadow)\s*:/.test(baseProductRule), 'The base product-card rule must not duplicate or override the shared .glass surface');
+assert.ok(!/\.product-card\s*\{\s*background\s*:|\.product-card\s+\.product-info\s*\{\s*background\s*:|\.product-card:hover\s*\{\s*background\s*:/.test(publicPage), 'No late CSS override may reintroduce stacked or conflicting product-card backgrounds');
+const detailSurfaceRules = [...publicPage.matchAll(/\.detail-modal \.detail-copy\s*\{([^}]*)\}/g)].map(match => match[1]);
+assert.ok(detailSurfaceRules.length >= 1 && detailSurfaceRules.every(rule => !/(^|;)\s*(background|border|backdrop-filter|-webkit-backdrop-filter|box-shadow)\s*:/.test(rule)), 'Detail panel rules may control layout only; the .glass class alone must own its surface');
+assert.ok(!publicPage.includes('--sd-detail-panel') && !publicPage.includes('--sd-detail-highlight'), 'Obsolete custom detail glass tokens must be removed');
 assert.ok(publicPage.includes('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5.5'), 'Featured product arrows must use aligned SVG icons instead of text glyphs');
 
 console.log('PASS: watermark validation, admin controls, detail-only overlay, and private original upload guard.');
