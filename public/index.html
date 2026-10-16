@@ -380,7 +380,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
     <button class="welcome-skip tap-target" id="skipIntro" type="button">Vào cửa hàng <span>→</span></button>
   </div>
 </div>
-<script>(function(){var s=document.getElementById('welcomeSplash');if(!s)return;var closed=false;function dismiss(){if(closed)return;closed=true;s.classList.add('is-leaving');window.setTimeout(function(){if(s&&s.parentNode)s.parentNode.removeChild(s)},900)}window.__sdDismissWelcome=dismiss;var skip=document.getElementById('skipIntro');if(skip)skip.addEventListener('click',dismiss);var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.setTimeout(dismiss,reduced?500:2500);fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){if(!c)return;if(c.welcomeEnabled===false)dismiss();var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');if(a&&typeof c.welcomeTitleLine1==='string')a.textContent=c.welcomeTitleLine1;if(b&&typeof c.welcomeTitleLine2==='string')b.textContent=c.welcomeTitleLine2;if(p&&typeof c.welcomeText==='string')p.textContent=c.welcomeText}).catch(function(){})})();</script>
+<script>(function(){var s=document.getElementById('welcomeSplash');if(!s)return;var closed=false;function dismiss(){if(closed)return;closed=true;s.classList.add('is-leaving');window.setTimeout(function(){if(s&&s.parentNode)s.parentNode.removeChild(s)},900)}window.__sdDismissWelcome=dismiss;var skip=document.getElementById('skipIntro');if(skip)skip.addEventListener('click',dismiss);var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.setTimeout(dismiss,reduced?500:2500);window.__sdSettingsPromise=fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){if(!c)return null;window.__sdPublicSettings=c;if(c.welcomeEnabled===false)dismiss();var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');if(a&&typeof c.welcomeTitleLine1==='string')a.textContent=c.welcomeTitleLine1;if(b&&typeof c.welcomeTitleLine2==='string')b.textContent=c.welcomeTitleLine2;if(p&&typeof c.welcomeText==='string')p.textContent=c.welcomeText;return c}).catch(function(){return null})})();</script>
 <div class="theme-bg theme-bg--dark" aria-hidden="true"></div><div class="theme-bg theme-bg--light" aria-hidden="true"></div>
 <header class="nav-wrap">
   <nav class="nav tap-target" aria-label="Điều hướng chính">
@@ -611,7 +611,7 @@ init();
 <style id="sd-protection-styles">
 /* Bảo vệ giao diện ảnh ở mức trình duyệt; không thay thế bảo vệ phía máy chủ */
 img { -webkit-user-drag:none; user-select:none; }
-.sd-viewer-watermark{position:absolute;right:8px;bottom:8px;width:clamp(42px,16%,88px);height:auto;max-height:56px;object-fit:contain;opacity:.68;filter:drop-shadow(0 2px 5px #0008);pointer-events:none;z-index:8}.detail-thumb .sd-viewer-watermark{width:34%;max-height:30px;right:3px;bottom:3px}.product-photo .sd-viewer-watermark{width:clamp(34px,15%,66px);right:7px;bottom:7px}.detail-image-stage .sd-viewer-watermark{width:clamp(58px,15%,100px);right:12px;bottom:12px}
+.sd-viewer-watermark{position:absolute;width:var(--sd-watermark-size,16%);max-width:35%;height:auto;max-height:none;object-fit:contain;opacity:var(--sd-watermark-opacity,.68);filter:drop-shadow(0 2px 5px #0008);pointer-events:none;z-index:3;user-select:none;-webkit-user-drag:none}
 .sd-capture-shield{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:2147483647;transition:opacity .08s}
 .sd-capture-shield.active{opacity:.94}
 
@@ -634,13 +634,52 @@ img { -webkit-user-drag:none; user-select:none; }
  document.addEventListener('keyup',e=>{if(e.key==='PrintScreen') {shield.classList.add('active');setTimeout(()=>shield.classList.remove('active'),900);}},true);
  window.addEventListener('blur',()=>{document.documentElement.classList.add('sd-window-blurred');});
  window.addEventListener('focus',()=>{document.documentElement.classList.remove('sd-window-blurred');});
- // Phủ watermark lên mọi vùng ảnh sản phẩm công khai, không thay thế ảnh gốc.
- const logo='/watermark.webp';
- function addWatermark(parent){if(!parent||parent.querySelector(':scope > .sd-viewer-watermark'))return;const mediaImages=[...parent.querySelectorAll('img')].filter(img=>/\/media\//.test(img.getAttribute('src')||''));if(!mediaImages.length||mediaImages.every(img=>/-wm\.webp(?:[?#]|$)/i.test(img.getAttribute('src')||'')))return;const pos=getComputedStyle(parent).position;if(pos==='static')parent.style.position='relative';const mark=document.createElement('img');mark.src=logo;mark.alt='SinDarealest';mark.className='sd-viewer-watermark';mark.dataset.sdWatermarkReady='1';mark.draggable=false;mark.setAttribute('aria-hidden','true');parent.appendChild(mark)}
- function applyWatermarks(){document.querySelectorAll('.product-photo,.detail-image-stage,.detail-thumb').forEach(addWatermark);const art=document.getElementById('artSlide');if(art&&art.parentElement)addWatermark(art.parentElement);}
- const observer=new MutationObserver(applyWatermarks);
- observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src']});
- applyWatermarks();
+
+ let config={watermarkEnabled:true,watermarkLogoUrl:'/watermark.webp',watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68};
+ const allowedPositions=new Set(['top-left','top-right','bottom-left','bottom-right','center']);
+ function applyDetailWatermark(next){
+   if(next&&typeof next==='object'){
+     config={
+       watermarkEnabled:next.watermarkEnabled!==false,
+       watermarkLogoUrl:typeof next.watermarkLogoUrl==='string'&&(/^\/watermark\.webp$/.test(next.watermarkLogoUrl)||/^\/media\/wm-[0-9a-f-]{36}\.webp$/i.test(next.watermarkLogoUrl))?next.watermarkLogoUrl:'/watermark.webp',
+       watermarkPosition:allowedPositions.has(next.watermarkPosition)?next.watermarkPosition:'bottom-right',
+       watermarkSize:Number.isInteger(Number(next.watermarkSize))&&Number(next.watermarkSize)>=6&&Number(next.watermarkSize)<=35?Number(next.watermarkSize):16,
+       watermarkOpacity:Number.isInteger(Number(next.watermarkOpacity))&&Number(next.watermarkOpacity)>=10&&Number(next.watermarkOpacity)<=100?Number(next.watermarkOpacity):68,
+     };
+   }
+   const stage=document.querySelector('.detail-image-stage');
+   if(!stage)return;
+   let mark=stage.querySelector(':scope > .sd-viewer-watermark');
+   const img=stage.querySelector('#detailMainImage');
+   const oldStamped=/-wm\.webp(?:[?#]|$)/i.test(img?.getAttribute('src')||'');
+   if(!config.watermarkEnabled||oldStamped){
+     if(mark)mark.remove();
+     return;
+   }
+   if(!mark){
+     mark=document.createElement('img');
+     mark.className='sd-viewer-watermark';
+     mark.alt='SinDarealest';
+     mark.draggable=false;
+     mark.setAttribute('aria-hidden','true');
+     stage.appendChild(mark);
+   }
+   if(mark.getAttribute('src')!==config.watermarkLogoUrl)mark.src=config.watermarkLogoUrl;
+   mark.style.setProperty('--sd-watermark-size',config.watermarkSize+'%');
+   mark.style.setProperty('--sd-watermark-opacity',String(config.watermarkOpacity/100));
+   mark.style.top='';mark.style.right='';mark.style.bottom='';mark.style.left='';mark.style.transform='';
+   if(config.watermarkPosition==='top-left'){mark.style.top='12px';mark.style.left='12px'}
+   else if(config.watermarkPosition==='top-right'){mark.style.top='12px';mark.style.right='12px'}
+   else if(config.watermarkPosition==='bottom-left'){mark.style.bottom='12px';mark.style.left='12px'}
+   else if(config.watermarkPosition==='center'){mark.style.top='50%';mark.style.left='50%';mark.style.transform='translate(-50%,-50%)'}
+   else {mark.style.bottom='12px';mark.style.right='12px'}
+ }
+ window.__sdUpdateDetailWatermark=applyDetailWatermark;
+ const stageObserver=new MutationObserver(()=>applyDetailWatermark());
+ const stage=document.querySelector('.detail-image-stage');
+ if(stage)stageObserver.observe(stage,{subtree:true,childList:true,attributes:true,attributeFilter:['src']});
+ Promise.resolve(window.__sdSettingsPromise||window.__sdPublicSettings||null).then(applyDetailWatermark).catch(()=>applyDetailWatermark());
+ applyDetailWatermark(window.__sdPublicSettings||null);
 })();
 </script>
 
