@@ -32,11 +32,18 @@ assert.ok(
 );
 assert.ok(
   storefrontHtml.includes('.featured-arrow:active,.slide-controls button:active{') &&
-  storefrontHtml.includes('transform:scale(.65)!important;') &&
-  storefrontHtml.includes('transform:translateY(-50%) scale(.65)!important;') &&
+  storefrontHtml.includes('transform:scale(.8)!important;') &&
+  storefrontHtml.includes('transform:translateY(-50%) scale(.8)!important;') &&
   storefrontHtml.includes('cubic-bezier(.34,1.56,.64,1)') &&
   storefrontHtml.includes('touch-action:manipulation;'),
-  'Featured, in-page gallery, and fullscreen arrows must press to half size without losing their vertical anchor'
+  'Featured, in-page gallery, and fullscreen arrows must shrink to 80% on press and spring back without losing their vertical anchor'
+);
+assert.ok(
+  storefrontHtml.includes('@keyframes sdGalleryOutLeft{to{opacity:.8;transform:translateX(-11%) scale(.985);filter:blur(1.5px)}}') &&
+  storefrontHtml.includes('@keyframes sdGalleryOutRight{to{opacity:.8;transform:translateX(11%) scale(.985);filter:blur(1.5px)}}') &&
+  storefrontHtml.includes('@keyframes sdGalleryInRight{from{opacity:.8;transform:translateX(11%) scale(.985);filter:blur(1.5px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}') &&
+  storefrontHtml.includes('@keyframes sdGalleryInLeft{from{opacity:.8;transform:translateX(-11%) scale(.985);filter:blur(1.5px)}to{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}'),
+  'Gallery transitions must briefly reduce opacity by about 20%, blur lightly, slide in the requested direction, then restore full sharpness'
 );
 assert.ok(
   storefrontHtml.includes("thumbs=$$('.detail-thumb')") &&
