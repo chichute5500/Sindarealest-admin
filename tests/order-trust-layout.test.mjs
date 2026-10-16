@@ -61,6 +61,8 @@ assert.match(scopedBlock, /#order \.order-steps\{display:grid;grid-template-colu
   'Desktop must show four compact, equal-width steps in one row.');
 assert.match(scopedBlock, /@media\(max-width:760px\)\{[\s\S]*?#order \.order-steps\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:7px\}/,
   'Mobile must show two equal columns instead of stacking four tall cards.');
+assert.match(scopedBlock, /@media\(max-width:760px\)\{\s*#order \.section-note\{display:none\}/,
+  'The explanatory note must not consume extra vertical space on mobile.');
 assert.match(scopedBlock, /@media\(max-width:390px\)/,
   'Very narrow phones must receive a dedicated spacing adjustment.');
 assert.doesNotMatch(styles, /\.order-step:last-child\s*\{|\.order-step:nth-child\(4\)/,
