@@ -78,6 +78,18 @@ assert.ok(publicPage.includes('id="sdFullscreenWatermark"'), 'The full-screen vi
 assert.ok(publicPage.includes("function openFullscreenImage()"), 'Tapping the detailed product image must open the full-screen viewer');
 assert.ok(protectionScript.includes("fullMark=document.getElementById('sdFullscreenWatermark')"), 'Full-screen watermark must use the same admin settings for position, size, and opacity');
 assert.ok(publicPage.includes('object-fit:contain;object-position:center'), 'The full-screen view must show the entire image instead of cropping it');
+assert.ok(publicPage.includes('id="sdFullscreenFrame"'), 'Full-screen image and overlay watermark must share an aspect-ratio-matched photo frame');
+assert.ok(publicPage.includes('function sizeFullscreenFrame()'), 'Full-screen frame must size itself using the loaded image dimensions');
+assert.ok(publicPage.includes('window.__sdUpdateDetailWatermark?.()'), 'Fullscreen must sync watermark settings through the supported global hook');
+assert.ok(publicPage.includes('.detail-image-count{position:absolute;left:50%;right:auto;bottom:12px'), 'The detail image counter must be centered away from a lower-right burned-in logo');
+const galleryStart = publicPage.indexOf('function changeDetailImage(index,resetTimer=true)');
+const galleryEnd = publicPage.indexOf('function openDetail(', galleryStart);
+const gallerySource = publicPage.slice(galleryStart, galleryEnd);
+assert.ok(gallerySource.includes("$('.detail-thumb')"), 'Gallery navigation must select all thumbnails before iteration');
+assert.ok(!gallerySource.includes("$('.detail-thumb').forEach"), 'Gallery navigation must not call forEach on a single querySelector result');
+assert.ok(gallerySource.includes('img.onload=finish;img.onerror=finish;img.src=next'), 'Image transition handlers must be registered before changing the src to prevent a stuck blurred image');
+assert.ok(protectionScript.includes('function imageNeedsOverlay(src)'), 'Watermark code must distinguish clean uploaded images from legacy product assets');
+assert.ok(protectionScript.includes('fullMark.hidden=!fullShouldOverlay'), 'The full-screen view must hide the extra overlay on legacy assets that already contain a watermark');
 
 const adminPage = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
 assert.ok(adminPage.includes('watermarkSettingsForm'), 'Admin must expose watermark controls');
