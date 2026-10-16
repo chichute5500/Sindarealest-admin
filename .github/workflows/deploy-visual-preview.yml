@@ -70,3 +70,36 @@ jobs:
 
       - name: Deploy only to the separate preview branch
         run: npx wrangler pages deploy public --project-name="$CLOUDFLARE_PAGES_PROJECT" --branch="$SD_PAGES_PREVIEW_BRANCH"
+
+      - name: Verify that the live preview serves this exact Liquid Glass fix
+        shell: bash
+        env:
+          SD_PREVIEW_URL: https://preview-liquid-glass-2026-10.sindarealest2.pages.dev
+        run: |
+          node --input-type=module <<'NODE'
+          const url = process.env.SD_PREVIEW_URL;
+          const expected = [
+            'Keep the card shell clear so it does not stack a second translucent layer underneath.',
+            '.product-card{\\n background:transparent!important;',
+            '.product-card .product-info{\\n background:var(--glass)!important;',
+            '.product-card:hover{\\n background:transparent!important;'
+          ];
+          let lastError = '';
+          for (let attempt = 1; attempt <= 10; attempt++) {
+            try {
+              const res = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
+              const html = await res.text();
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const missing = expected.filter(token => !html.includes(token));
+              if (missing.length === 0) {
+                console.log(`PASS: live preview serves the new single-layer glass CSS (HTTP ${res.status}, ${html.length} characters).`);
+                process.exit(0);
+              }
+              lastError = `Preview returned HTTP ${res.status} but is missing the new CSS marker(s): ${missing.join('; ')}`;
+            } catch (error) {
+              lastError = String(error);
+            }
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          throw new Error(`Preview did not serve this commit's CSS after retries: ${lastError}`);
+          NODE
