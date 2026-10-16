@@ -19,22 +19,14 @@ function integerInRange(value, min, max) {
   return Number.isInteger(number) && number >= min && number <= max ? number : null;
 }
 
-export function isAllowedWatermarkLogo(value) {
-  return value === "/watermark.webp" ||
-    (typeof value === "string" && /^\/media\/wm-[0-9a-f-]{36}\.webp$/i.test(value));
-}
-
 export function normalizeWatermarkSettings(values = {}) {
   const position = WATERMARK_POSITIONS.includes(values.watermark_position)
     ? values.watermark_position : WATERMARK_DEFAULTS.watermark_position;
   const size = integerInRange(values.watermark_size, 6, 35);
   const opacity = integerInRange(values.watermark_opacity, 10, 100);
-  const logo = isAllowedWatermarkLogo(values.watermark_logo)
-    ? values.watermark_logo : WATERMARK_DEFAULTS.watermark_logo;
-
   return {
     watermarkEnabled: values.watermark_enabled === "0" ? false : true,
-    watermarkLogoUrl: logo,
+    watermarkLogoUrl: WATERMARK_DEFAULTS.watermark_logo,
     watermarkPosition: position,
     watermarkSize: size ?? Number(WATERMARK_DEFAULTS.watermark_size),
     watermarkOpacity: opacity ?? Number(WATERMARK_DEFAULTS.watermark_opacity),
@@ -43,6 +35,9 @@ export function normalizeWatermarkSettings(values = {}) {
 
 export function validateWatermarkSettingUpdates(body = {}) {
   const updates = [];
+  if (body.watermarkLogoUrl !== undefined) {
+    return { error: "Logo watermark hiện tại được giữ nguyên, không hỗ trợ thay đổi." };
+  }
   if (body.watermarkEnabled !== undefined) {
     if (typeof body.watermarkEnabled !== "boolean") {
       return { error: "Cần chọn bật hoặc tắt watermark." };
