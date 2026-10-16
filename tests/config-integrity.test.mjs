@@ -57,6 +57,8 @@ assert.ok(deployReadme.includes('binding tên `ORIGINALS`') && deployReadme.incl
 
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
+assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must fail closed until the private ORIGINALS binding is confirmed');
+assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy workflow must pass the explicit ORIGINALS readiness gate');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
 assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
 assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
