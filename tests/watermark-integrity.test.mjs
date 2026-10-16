@@ -75,7 +75,7 @@ assert.ok(publicPage.includes('id="sdFullscreenViewer"'), 'Product detail must p
 assert.ok(publicPage.includes('id="detailZoom"'), 'Product detail must expose an explicit control to open the full-size view');
 assert.ok(publicPage.includes('id="sdFullscreenPrev"') && publicPage.includes('id="sdFullscreenNext"'), 'Full-screen view must allow browsing all product images');
 assert.ok(publicPage.includes('id="sdFullscreenWatermark"'), 'The full-screen view must retain the existing SinDarealest watermark overlay');
-assert.ok(protectionScript.includes("function openFullscreenImage()"), 'Tapping the detailed product image must open the full-screen viewer');
+assert.ok(publicPage.includes("function openFullscreenImage()"), 'Tapping the detailed product image must open the full-screen viewer');
 assert.ok(protectionScript.includes("fullMark=document.getElementById('sdFullscreenWatermark')"), 'Full-screen watermark must use the same admin settings for position, size, and opacity');
 assert.ok(publicPage.includes('object-fit:contain;object-position:center'), 'The full-screen view must show the entire image instead of cropping it');
 
