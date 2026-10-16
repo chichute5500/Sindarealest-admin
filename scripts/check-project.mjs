@@ -184,7 +184,7 @@ for (const configPath of [
 }
 const deployWorkflowPath = join(root, '.github/workflows/deploy.yml');
 if (existsSync(deployWorkflowPath)) {
-  const workflowLines = readFileSync(deployWorkflowPath, 'utf8').split('\\n');
+  const workflowLines = readFileSync(deployWorkflowPath, 'utf8').split(String.fromCharCode(10));
   const triggerLine = workflowLines.find((line) => line.startsWith('      - '));
   const configuredLine = workflowLines.find((line) => line.trim().startsWith('CLOUDFLARE_PAGES_BRANCH:'));
   const triggerBranch = triggerLine?.trim().slice(2);
