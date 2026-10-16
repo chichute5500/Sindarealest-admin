@@ -12,7 +12,7 @@ assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.i
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
 assert.ok(
-  (storefrontHtml.match(/class="service glass tap-target"/g) || []).length === 5 &&
+  (storefrontHtml.match(/<div class="service glass tap-target"/g) || []).length === 5 &&
   storefrontHtml.includes('<a class="service glass tap-target" href="https://zalo.me/0827049192"') &&
   storefrontHtml.includes('.service-strip .service:not(:last-child)::after{display:none!important}') &&
   storefrontHtml.includes('.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(145%)') &&
