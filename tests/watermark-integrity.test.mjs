@@ -77,7 +77,7 @@ assert.ok(publicPage.includes('id="sdFullscreenPrev"') && publicPage.includes('i
 assert.ok(publicPage.includes('id="sdFullscreenWatermark"'), 'The full-screen view must retain the existing SinDarealest watermark overlay');
 assert.ok(publicPage.includes("function openFullscreenImage()"), 'Tapping the detailed product image must open the full-screen viewer');
 assert.ok(protectionScript.includes("fullMark=document.getElementById('sdFullscreenWatermark')"), 'Full-screen watermark must use the same admin settings for position, size, and opacity');
-assert.ok(publicPage.includes('object-fit:contain;object-position:center'), 'The full-screen view must show the entire image instead of cropping it');
+assert.ok(publicPage.includes('.sd-fullscreen-image{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:fill;object-position:center'), 'The full-screen image must fill an aspect-ratio-matched frame without cropping or distortion');
 assert.ok(publicPage.includes('id="sdFullscreenFrame"'), 'Full-screen image and overlay watermark must share an aspect-ratio-matched photo frame');
 assert.ok(publicPage.includes('function sizeFullscreenFrame()'), 'Full-screen frame must size itself using the loaded image dimensions');
 assert.ok(publicPage.includes('window.__sdUpdateDetailWatermark?.()'), 'Fullscreen must sync watermark settings through the supported global hook');
