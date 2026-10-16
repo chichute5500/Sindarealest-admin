@@ -102,7 +102,7 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .detail-gallery-arrow:hover{background:rgba(157,119,58,.8);transform:translateY(-50%) scale(1.06)}.detail-gallery-prev{left:12px}.detail-gallery-next{right:12px}
 .detail-image-count{position:absolute;right:12px;bottom:12px;z-index:2;padding:5px 9px;border:1px solid rgba(255,255,255,.4);border-radius:999px;background:rgba(10,10,10,.34);color:#fff;backdrop-filter:blur(12px);font-size:9px;letter-spacing:.12em}
 .detail-order-link{display:inline-block;margin-top:14px;color:var(--muted);font-size:10px;text-decoration:underline;text-decoration-color:rgba(180,145,82,.5);text-underline-offset:4px}.detail-order-link:hover{color:var(--gold)}
-/* Crafted-by-hand editorial section and five-step order process. */
+/* Crafted-by-hand editorial section and compact four-step order process. */
 
 
 .craftsmanship-visual::after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.45));pointer-events:none}
@@ -794,6 +794,7 @@ html.dark .service-strip{
  #order .order-zalo-cta{gap:5px;padding:7px 8px;font-size:8.5px}
 }
 @media(max-width:760px){
+ #order .section-note{display:none}
  #order .order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
  #order .order-step{padding:10px;border-radius:13px}
  #order .order-step-top{gap:7px;margin-bottom:6px}
