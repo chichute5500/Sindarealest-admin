@@ -84,9 +84,9 @@ check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claim
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
 const warrantyMigration = existsSync(join(root, 'migrations/0005_address_warranty_verification.sql')) ? readFileSync(join(root, 'migrations/0005_address_warranty_verification.sql'), 'utf8') : '';
-check(!/CREATE TABLE IF NOT EXISTS\\s+warranty_verifications\\b/i.test(warrantyMigration), 'Fresh setup must not create the retired warranty OTP table');
-check(!/CREATE TABLE IF NOT EXISTS\\s+warranty_claim_uploads\\b/i.test(warrantyMigration), 'Fresh setup must not create the retired OTP upload table');
-check(!/DROP TABLE\\s+(IF EXISTS\\s+)?(warranty_verifications|warranty_claim_uploads)\\b/i.test(warrantyMigration), 'Baseline migration must not destructively remove legacy data from existing D1 databases');
+check(!/CREATE TABLE IF NOT EXISTS\s+warranty_verifications\b/i.test(warrantyMigration), 'Fresh setup must not create the retired warranty OTP table');
+check(!/CREATE TABLE IF NOT EXISTS\s+warranty_claim_uploads\b/i.test(warrantyMigration), 'Fresh setup must not create the retired OTP upload table');
+check(!/DROP TABLE\s+(IF EXISTS\s+)?(warranty_verifications|warranty_claim_uploads)\b/i.test(warrantyMigration), 'Baseline migration must not destructively remove legacy data from existing D1 databases');
 for (const table of ['customers','orders','order_items','warranties','warranty_claims','audit_logs','public_rate_limits']) check(new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`).test(newMigration), `Migration 0003 thiếu bảng ${table}`);
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
