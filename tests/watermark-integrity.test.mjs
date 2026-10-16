@@ -88,7 +88,7 @@ assert.ok(publicPage.includes("$('#detailMainImage').classList.remove('is-changi
 assert.ok(publicPage.includes('bottom:calc(91px + env(safe-area-inset-bottom))'), 'Fullscreen image counter must sit in a dedicated footer area above thumbnails');
 assert.ok(publicPage.includes('width:max-content;min-width:0;max-width:calc(100% - 24px)'), 'Fullscreen counter must use content width instead of stretching across the image');
 assert.ok(publicPage.includes('calc(132px + env(safe-area-inset-bottom))'), 'Fullscreen image stage must reserve space for counter and thumbnail tray');
-assert.ok(publicPage.includes('.detail-image-count{') === false, 'Legacy duplicate detail counter declarations must be removed so the pill cannot stretch');
+assert.equal((publicPage.match(/\\.detail-image-count\\{/g)||[]).length, 1, 'Only one detail counter rule may remain, to prevent conflicting left/right widths');
 assert.ok(publicPage.includes('width:max-content;min-width:0;max-width:calc(100% - 18px)'), 'Detail counter must remain compact around its text');
 assert.ok(publicPage.includes('background:rgba(35,30,23,.28)!important;backdrop-filter:blur(8px) saturate(1.12)!important'), 'The glass backdrop must remain at about 25–30% opacity');
 assert.ok(publicPage.includes('aria-label="Ảnh sản phẩm trước"><svg'), 'Detail previous icon must use a centered SVG glyph');
