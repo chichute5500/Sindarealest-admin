@@ -899,9 +899,13 @@ html.dark .detail-info,html.dark .detail-description,html.dark .detail-traits{ba
 .service-strip .service small{font-size:8px;line-height:1.45;overflow-wrap:anywhere}
 .service-strip .service-icon{background:var(--glass);border-color:var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.26)}
 /* Inner glass layer behind each benefit's title and description, inspired by .order-note. */
-.service-strip .service-copy{position:relative;z-index:0;display:block;flex:1;min-width:0;padding:8px 10px;border-radius:12px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 5px 14px rgba(0,0,0,.045);transition:background-color 1s ease,border-color 1s ease,box-shadow .3s ease}
-.service-strip .service-copy strong{position:relative;z-index:1}
-.service-strip .service-copy small{position:relative;z-index:1}
+/* Give the inner panel real contrast; the global 40% glass was too transparent over the textured background. */
+.service-strip .service-copy{position:relative;z-index:0;display:block;flex:1;min-width:0;padding:9px 10px;border-radius:12px;background:rgba(255,252,246,.82);color:#171510;border:1px solid rgba(120,91,48,.28);backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 5px 14px rgba(0,0,0,.07);transition:background-color 1s ease,border-color 1s ease,box-shadow .3s ease}
+html.dark .service-strip .service-copy{background:rgba(9,9,9,.82);color:#f5f1e9;border-color:rgba(245,230,204,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 5px 14px rgba(0,0,0,.22)}
+.service-strip .service-copy strong{position:relative;z-index:1;color:inherit;font-weight:750}
+.service-strip .service-copy small{position:relative;z-index:1;color:#5a5144}
+html.dark .service-strip .service-copy small{color:#d2c8b8}
+@media(max-width:760px){.service-strip .service-copy{padding:8px 8px;border-radius:10px}.service-strip .service-copy strong{font-size:9px}.service-strip .service-copy small{font-size:8px;line-height:1.4}}
 .service-strip .service:hover{border-color:var(--gold)}
 /* Layout only; the shared .glass class owns this panel's visual surface. */
 .detail-modal .detail-copy{
