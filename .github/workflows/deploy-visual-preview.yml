@@ -99,13 +99,13 @@ jobs:
               const res = await fetch(url, { headers: { 'cache-control': 'no-cache' } });
               const html = await res.text();
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
-              const title = html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]?.slice(0,160) || '';
-              if (/Cloudflare Access/i.test(title) || /Sign in.*Cloudflare Access/i.test(html.slice(0,10000))) {
-                const note = `NOTICE: Deployment succeeded at ${url}, but Cloudflare Access returned its sign-in page to CI. Live CSS cannot be verified without an authenticated browser session; no visual-pass claim is made.\\n`;
+              const pageTitle = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.slice(0,160) || '';
+              if (/Cloudflare Access/i.test(pageTitle) || /Sign in.*Cloudflare Access/i.test(html.slice(0,10000))) {
+                const note = `NOTICE: Deployment succeeded at ${url}, but Cloudflare Access returned its sign-in page to CI. Live CSS cannot be verified without an authenticated browser session; no visual-pass claim is made.\n`;
                 console.warn(note.trim());
                 if (process.env.GITHUB_STEP_SUMMARY) {
                   const { appendFileSync } = await import('node:fs');
-                  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Preview deployed; live inspection is access-restricted\\n- URL: ${url}\\n- CI received Cloudflare Access sign-in instead of the storefront. Source regression tests passed, but visual browser verification remains unconfirmed.\\n`);
+                  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Preview deployed; live inspection is access-restricted\n- URL: ${url}\n- CI received Cloudflare Access sign-in instead of the storefront. Source regression tests passed, but visual browser verification remains unconfirmed.\n`);
                 }
                 process.exit(0);
               }
