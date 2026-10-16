@@ -641,7 +641,7 @@ img { -webkit-user-drag:none; user-select:none; }
    if(next&&typeof next==='object'){
      config={
        watermarkEnabled:next.watermarkEnabled!==false,
-       watermarkLogoUrl:typeof next.watermarkLogoUrl==='string'&&(/^\/watermark\.webp$/.test(next.watermarkLogoUrl)||/^\/media\/wm-[0-9a-f-]{36}\.webp$/i.test(next.watermarkLogoUrl))?next.watermarkLogoUrl:'/watermark.webp',
+       watermarkLogoUrl:'/watermark.webp',
        watermarkPosition:allowedPositions.has(next.watermarkPosition)?next.watermarkPosition:'bottom-right',
        watermarkSize:Number.isInteger(Number(next.watermarkSize))&&Number(next.watermarkSize)>=6&&Number(next.watermarkSize)<=35?Number(next.watermarkSize):16,
        watermarkOpacity:Number.isInteger(Number(next.watermarkOpacity))&&Number(next.watermarkOpacity)>=10&&Number(next.watermarkOpacity)<=100?Number(next.watermarkOpacity):68,
