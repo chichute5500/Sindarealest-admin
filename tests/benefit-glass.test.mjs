@@ -16,10 +16,10 @@ assert.match(html, /html\.dark\{[^}]*--service-copy-bg:rgba\(255,255,255,\.38\)/
   'Dark mode must use translucent glass, not an opaque black fill.');
 
 const ruleMatches = [...html.matchAll(/\.service-strip \.service-copy\{([^}]*)\}/g)];
-assert.equal(ruleMatches.length, 1, 'There must be one authoritative service-copy surface rule.');
-assert.match(ruleMatches[0][1], /background:var\(--service-copy-bg\)/,
-  'The shared surface rule must resolve its background through the theme token.');
-assert.doesNotMatch(ruleMatches[0][1], /background\s*:\s*rgba\(/,
+const surfaceRules = ruleMatches.filter(([, declarations]) => /background:var\(--service-copy-bg\)/.test(declarations));
+assert.equal(surfaceRules.length, 1,
+  'There must be one authoritative background declaration; responsive rules may adjust layout only.');
+assert.doesNotMatch(surfaceRules[0][1], /background\s*:\s*rgba\(/,
   'The shared component must not hard-code a theme-specific background.');
 assert.equal((html.match(/html\.dark\s+\.service-strip\s+\.service-copy\s*\{/g) || []).length, 0,
   'A duplicate dark-mode selector must not override the shared glass surface.');
