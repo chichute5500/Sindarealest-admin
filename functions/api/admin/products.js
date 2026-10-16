@@ -54,6 +54,7 @@ export async function onRequestPost(context) {
     const p = checked.value;
     const statements = [productInsertStatement(context.env.DB, p)];
     const source = body?.importSource;
+    if (source !== undefined && context.env.ZIP_IMPORT_ENABLED !== "1") return fail("Nhập ZIP chưa được bật trong môi trường Preview biệt lập.", 403);
     if (source !== undefined) {
       if (!source || typeof source !== "object" || Array.isArray(source) || !String(source.exportId || "").trim()) {
         return fail("Thông tin nguồn ZIP không hợp lệ.");
