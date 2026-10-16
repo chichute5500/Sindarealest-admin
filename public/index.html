@@ -388,6 +388,8 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 }
 @media(max-width:760px){
  #order .section-note{display:none}
+ /* Reset legacy mobile rule .order-step:last-child{grid-column:span 2}; all four steps must occupy two columns. */
+ #order .order-step:last-child{grid-column:auto}
  #order .order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
  #order .order-step{padding:10px;border-radius:13px}
  #order .order-step-top{gap:7px;margin-bottom:6px}
