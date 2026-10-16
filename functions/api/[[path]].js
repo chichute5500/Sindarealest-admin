@@ -1,16 +1,11 @@
 /**
- * Return a clear API 404 for unknown endpoints.
+ * Return a clear JSON 404 for unknown API endpoints.
  *
- * The root optional-multipath route can match every URL. It must pass all
- * non-API traffic through to the Pages asset/redirect handler, otherwise it
- * could shadow valid static pages and the site's /index.html fallback.
- * More specific API functions take precedence over this route.
+ * This route is scoped to /api/* by its location under functions/api/.
+ * Cloudflare Pages gives more-specific route files (such as products.js
+ * and admin/login.js) precedence over this optional multi-segment route.
  */
-export async function onRequest(context) {
-  const url = new URL(context.request.url);
-  if (url.pathname !== "/api" && !url.pathname.startsWith("/api/")) {
-    return context.next();
-  }
+export async function onRequest() {
   return new Response(JSON.stringify({
     error: "API endpoint not found.",
     code: "API_ROUTE_NOT_FOUND",
