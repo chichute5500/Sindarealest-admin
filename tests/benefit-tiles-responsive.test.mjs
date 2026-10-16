@@ -58,7 +58,14 @@ assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?grid-template-columns:repe
   'Mobile widths must use two columns.');
 assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:9\.1px\}/,
   'Narrow phones must remain compact while improving text sizing.');
-assert.equal((css.match(/\.service-strip \.service-copy\{/g) || []).length, 1,
-  'Tile surface styles must be declared once, not layered through repeated selectors.');
+const copyRules = [...css.matchAll(/\.service-strip \.service-copy\{([^}]*)\}/g)].map(match => match[1]);
+assert.equal(copyRules.filter(rule => /(?:^|;)background:/.test(rule)).length, 1,
+  'The CTA-matched surface background must have one authoritative declaration.');
+assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
+  'The CTA-matched surface border must have one authoritative declaration.');
+assert.equal(copyRules.filter(rule => /(?:^|;)-webkit-backdrop-filter:/.test(rule)).length, 1,
+  'The CTA-matched glass blur must have one authoritative declaration.');
+assert.ok(copyRules.some(rule => rule.includes('background:' + ctaGradient) && rule.includes('backdrop-filter:blur(18px)')),
+  'Responsive overrides may adjust dimensions, but not replace the shared surface treatment.');
 
 console.log('PASS: one shared CTA-matched glass surface for all six tiles; no legacy cascade; responsive checks passed.');
