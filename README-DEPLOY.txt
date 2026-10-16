@@ -3,7 +3,7 @@ SINDAREALest — HƯỚNG DẪN THIẾT LẬP VÀ DEPLOY AN TOÀN
 0. TRƯỚC KHI BẮT ĐẦU
 - Giữ nguyên ZIP gốc làm bản dự phòng. Giải nén gói mới vào thư mục riêng.
 - Không xóa project, database, bucket hoặc API token nào trong lúc chưa xác định chúng đang phục vụ website nào.
-- Trước khi chạy setup, mở Cloudflare Dashboard và ghi đúng: Pages Project name, Production branch, D1 database name, R2 bucket name.
+- Trước khi chạy setup, mở Cloudflare Dashboard và ghi đúng: Pages project name, Production branch, D1 database name, R2 bucket IMAGES cho ảnh hiển thị/logo, và một R2 bucket ORIGINALS riêng tư khác IMAGES cho ảnh gốc.
 - Nếu chưa chắc tên nào là website thật, dừng ở bước này. Đừng đoán từ tên miền hay tên thư mục.
 - wrangler.toml cố ý không chứa `pages_build_output_dir`, để deploy trực tiếp chưa bật chế độ lấy file đó làm nguồn cấu hình production. Cloudflare cảnh báo phải đối chiếu Wrangler config với cài đặt Dashboard trước khi dùng file cấu hình làm nguồn sự thật: https://developers.cloudflare.com/pages/functions/wrangler-configuration/.
 
