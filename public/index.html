@@ -446,37 +446,6 @@ html.dark .welcome-footnote i{color:#e5c98d}
 }
 
 
-/* Compact six brand-benefit tiles: one fixed ratio on desktop and mobile. */
-.service-strip{grid-template-columns:repeat(6,minmax(0,1fr));gap:7px!important;padding:8px!important}
-.service-strip .service{
-  aspect-ratio:2.05 / 1;min-height:0!important;height:auto;min-width:0;
-  padding:6px 7px!important;gap:6px!important;align-items:center;
-  border-radius:14px;overflow:hidden;
-}
-.service-strip .service-icon{width:23px;height:23px;flex:0 0 23px}
-.service-strip .service-icon svg{width:13px;height:13px}
-.service-strip .service-copy{display:flex;flex-direction:column;min-height:50px;background:var(--service-copy-bg);
-  height:auto;min-width:0;padding:5px 7px!important;border-radius:9px;justify-content:center;
-}
-.service-strip .service-copy strong{font-size:8.5px;line-height:1.25}
-.service-strip .service-copy small{margin-top:2px;font-size:7.5px;line-height:1.25}
-@media(max-width:760px){
-  .service-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important;padding:7px!important}
-  .service-strip .service{aspect-ratio:2.05 / 1;min-height:0!important;padding:6px!important;gap:5px!important;border-radius:12px}
-  .service-strip .service-icon{width:22px;height:22px;flex-basis:22px}
-  .service-strip .service-copy{padding:4px 6px!important;border-radius:8px}
-  .service-strip .service-copy strong{font-size:8.5px}
-  .service-strip .service-copy small{font-size:7.5px;line-height:1.22}
-}
-@media(max-width:390px){
-  .service-strip{gap:6px!important;padding:6px!important}
-  .service-strip .service{gap:4px!important;padding:5px!important}
-  .service-strip .service-icon{width:20px;height:20px;flex-basis:20px}
-  .service-strip .service-copy{padding:4px 5px!important}
-  .service-strip .service-copy strong{font-size:8px}
-  .service-strip .service-copy small{font-size:7px}
-}
-
 </style>
 </head>
 <body>
@@ -912,23 +881,6 @@ html.dark .detail-info,html.dark .detail-description,html.dark .detail-traits{ba
  .nav{background:var(--nav-bg);backdrop-filter:blur(24px) saturate(155%);-webkit-backdrop-filter:blur(24px) saturate(155%)}
  .featured-arrow{width:34px;height:34px}
 }
-/* Three requested interface refinements — test branch only. */
-/* Information 1: use the exact shared .glass surface on every benefit tile. */
-.service-strip{gap:8px!important;padding:10px!important}
-.service-strip .service{
- min-width:0;min-height:68px;gap:8px;padding:10px 9px;border-radius:17px;
-}
-.service-strip .service:not(:last-child)::after{display:none!important}
-.service-strip .service strong{font-size:clamp(8px,.7vw + 3px,10px);line-height:1.35;overflow-wrap:anywhere}
-.service-strip .service small{font-size:8px;line-height:1.45;overflow-wrap:anywhere}
-.service-strip .service-icon{background:var(--glass);border-color:var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.26)}
-/* Benefit text surface: content-led height prevents mobile clipping; a restrained white-to-gold sweep echoes the Zalo consultation button. */
-.service-strip .service-copy{position:relative;z-index:0;isolation:isolate;display:flex;flex:1 1 auto;flex-direction:column;justify-content:center;min-width:0;min-height:50px;padding:7px 9px;overflow:hidden;border-radius:12px;color:var(--service-copy-ink);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);box-shadow:inset 0 1px 0 rgba(255,255,255,.46),0 5px 14px rgba(0,0,0,.07);transition:background-color 1s ease,border-color 1s ease,box-shadow .3s ease,color .8s ease}
-.service-strip .service-copy::before{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;background:var(--service-copy-gradient);pointer-events:none;transition:opacity .8s ease}
-.service-strip .service-copy strong{position:relative;z-index:1;display:block;color:var(--service-copy-ink);font-size:9px;font-weight:750;line-height:1.3;white-space:normal;overflow-wrap:normal}
-.service-strip .service-copy small{position:relative;z-index:1;display:block;margin-top:4px;color:var(--service-copy-muted);font-size:9px;font-weight:500;line-height:1.35;white-space:normal;overflow-wrap:normal;word-break:normal;opacity:1}
-@media(max-width:760px){.service-strip .service-copy{min-height:52px;padding:8px 8px;border-radius:10px}.service-strip .service-copy strong{font-size:9px}.service-strip .service-copy small{font-size:8.7px;line-height:1.35}}
-.service-strip .service:hover{border-color:var(--gold)}
 /* Layout only; the shared .glass class owns this panel's visual surface. */
 .detail-modal .detail-copy{
  position:relative;isolation:isolate;min-width:0;
@@ -938,9 +890,6 @@ html.dark .detail-info,html.dark .detail-description,html.dark .detail-traits{ba
 .detail-modal .detail-copy .detail-desc{overflow-wrap:anywhere}
 .detail-modal .detail-copy .promise-tags{gap:8px}
 @media(max-width:760px){
- .service-strip{gap:7px!important;padding:8px!important}
- .service-strip .service{min-height:62px;padding:8px 7px;gap:6px;border-radius:15px}
- .service-strip .service-icon{width:26px;height:26px;flex:0 0 26px}
  .detail-modal .detail-copy{padding:16px!important;border-radius:18px}
 }
 /* Information 3: consistent press scale and longer, clearer image transitions. */
@@ -1078,6 +1027,78 @@ html.theme-transitioning body *::after{
  #order .order-step h3{font-size:12.5px}
  #order .order-step p{font-size:8px}
 }
+
+/* Service benefit tiles — single source of truth; consistent sizing within each responsive layout. */
+.service-strip{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-auto-rows:1fr;
+  gap:7px!important;
+  padding:8px!important;
+}
+.service-strip .service{
+  aspect-ratio:2.75 / 1;
+  min-height:0!important;
+  height:auto;
+  min-width:0;
+  gap:6px!important;
+  padding:6px 7px!important;
+  align-items:center;
+  border-radius:14px;
+  overflow:hidden;
+}
+.service-strip .service:not(:last-child)::after{display:none!important}
+.service-strip .service-icon{
+  width:23px;height:23px;flex:0 0 23px;
+  background:var(--glass);border-color:var(--line);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26);
+}
+.service-strip .service-icon svg{width:13px;height:13px}
+.service-strip .service-copy{
+  position:relative;z-index:0;isolation:isolate;
+  display:flex;flex:1 1 auto;flex-direction:column;justify-content:center;
+  min-width:0;min-height:50px;padding:5px 7px;
+  overflow:hidden;border-radius:9px;
+  background:var(--service-copy-bg);color:var(--service-copy-ink);
+  border:1px solid var(--line);
+  backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.46),0 5px 14px rgba(0,0,0,.07);
+  transition:background-color 1s ease,border-color 1s ease,box-shadow .3s ease,color .8s ease;
+}
+.service-strip .service-copy::before{
+  content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;
+  background:var(--service-copy-gradient);pointer-events:none;transition:opacity .8s ease;
+}
+.service-strip .service-copy strong{
+  position:relative;z-index:1;display:block;color:var(--service-copy-ink);
+  font-size:9px;font-weight:750;line-height:1.3;white-space:normal;overflow-wrap:anywhere;
+}
+.service-strip .service-copy small{
+  position:relative;z-index:1;display:block;margin-top:4px;
+  color:var(--service-copy-muted);font-size:9px;font-weight:500;line-height:1.35;
+  white-space:normal;overflow-wrap:anywhere;word-break:normal;opacity:1;
+}
+.service-strip .service:hover{border-color:var(--gold)}
+@media(max-width:760px){
+  .service-strip{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:1fr;
+    gap:7px!important;padding:7px!important;
+  }
+  .service-strip .service{aspect-ratio:2.4 / 1;padding:5px!important;gap:5px!important;border-radius:12px}
+  .service-strip .service-icon{width:22px;height:22px;flex:0 0 22px}
+  .service-strip .service-copy{min-height:52px;padding:8px 8px;border-radius:10px}
+  .service-strip .service-copy strong{font-size:9px}
+  .service-strip .service-copy small{font-size:8.7px;line-height:1.35}
+}
+@media(max-width:390px){
+  .service-strip{gap:6px!important;padding:6px!important}
+  .service-strip .service{gap:4px!important;padding:5px!important}
+  .service-strip .service-icon{width:20px;height:20px;flex-basis:20px}
+  .service-strip .service-copy{padding:7px 6px}
+  .service-strip .service-copy strong{font-size:8.5px}
+  .service-strip .service-copy small{font-size:8px;line-height:1.3}
+}
+
 </style>
 <div class="sd-capture-shield" id="sdCaptureShield" aria-hidden="true"></div>
 
