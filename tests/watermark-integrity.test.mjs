@@ -139,7 +139,7 @@ assert.ok(publicPage.includes('.sd-fullscreen-image.is-changing{opacity:.38;filt
 assert.ok(publicPage.includes('#detailMainImage.is-changing{opacity:.45;filter:blur(2px);transform:scale(.99)}'), 'Detail image must have a subtle blur/fade transition');
 assert.ok(publicPage.includes('transform:scale(.88) translateY(1px)'), 'Gallery controls must provide a tactile pressed-in response');
 assert.ok(publicPage.includes('--sd-glass-blur:20px'), 'Storefront glass system must define a shared blur token');
-assert.ok(publicPage.includes('.product-card{\n background:var(--sd-service-glass)!important;') && publicPage.includes('.product-card .product-info{\n background:var(--sd-service-glass)!important;') && publicPage.includes('html.dark .service-strip{--sd-service-glass:rgba(255,255,255,.27);--sd-service-border:rgba(255,255,255,.48)}'), 'Product cards and their info panes must use the Order With Confidence Liquid Glass tokens in dark mode');
+assert.ok(publicPage.includes('.product-card{\n background:var(--glass)!important;') && publicPage.includes('.product-card .product-info{\n background:var(--glass)!important;') && publicPage.includes('.detail-modal .detail-copy{\n background:var(--glass)!important;') && publicPage.includes('--glass:rgba(255,255,255,.40)'), 'Product cards and product information panes must use the same translucent glass token as the Order With Confidence steps in light and dark modes');
 assert.ok(publicPage.includes('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5.5'), 'Featured product arrows must use aligned SVG icons instead of text glyphs');
 
 console.log('PASS: watermark validation, admin controls, detail-only overlay, and private original upload guard.');
