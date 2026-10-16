@@ -7,7 +7,7 @@ const context = {
   window: { __SD_IMPORT_TEST__: true },
   document: { readyState: 'loading', addEventListener() {} },
   setTimeout() {},
-  TextEncoder, TextDecoder, Uint8Array, DataView, Map, Blob, URL,
+  TextEncoder, TextDecoder, Uint8Array, DataView, Map, Set, Blob, URL,
   console
 };
 vm.runInNewContext(source, context, { filename: 'zip-import.js' });
@@ -47,6 +47,7 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   const files=await core.readZip(fakeFile(zip([{name:'products.json',data:JSON.stringify([record])},{name:record.image_files[0],data:fakeWebp()},{name:record.image_files[1],data:fakeWebp()}])));
   const p=core.normalize(record,0,files);
   assert.equal(p.images.length,2); assert.equal(p.images[0],'images/0001-A/01.webp'); assert.equal(p.images[1],'images/0001-A/02.webp'); assert.equal(p.errs.length,0);
+  const sameIdSecondRow=core.normalize(record,1,files); assert.notEqual(p.key,sameIdSecondRow.key,'row keys must remain unique even when a malformed ZIP repeats export_id');
 }
 {
   const products=[], entries=[{name:'products.json',data:''}];
@@ -92,4 +93,38 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   assert.ok(readiness.includes('product_source_imports') && readiness.includes('ZIP_IMPORT_ENABLED'),'Preview readiness must verify the flag and migrated table');
   assert.ok(migration.includes('REFERENCES products(id) ON DELETE CASCADE'));
 }
-console.log('PASS: ZIP parser, exact image linkage, 100-product package, CSV fallback, failure metadata, traversal and atomic source metadata checks.');
+
+{
+  const csv='\uFEFFexport_id,export_folder,title_vi,category_vi,image_files,image_export_failed,image_export_status\r\n"0002-B","images/0002-B/","Giày B","Sneaker","images/0002-B/01.webp",0,"complete"';
+  const rows=core.csvRows(csv);
+  assert.equal(rows[0].export_id,'0002-B');
+  const files=new Map([['images/0002-B/01.webp',fakeWebp()]]);
+  const p=core.normalize(rows[0],0,files);
+  assert.deepEqual(Array.from(p.images),['images/0002-B/01.webp'],'CSV fallback must preserve the real image paths');
+  assert.equal(p.errs.length,0);
+}
+{
+  await assert.rejects(()=>core.readZip(fakeFile(zip([{name:'nested.zip',data:zip([{name:'inner.txt',data:'x'}])}]))),/ZIP lồng/i);
+}
+{
+  const noImages={export_id:'empty-1',export_folder:'images/empty-1/',title_vi:'No image',category_vi:'Sneaker',image_files:[],image_manifest:[],image_export_failed:0,image_export_status:'no_source_images'};
+  const p=core.normalize(noImages,0,new Map());
+  core.state.allowNoImages=false;
+  assert.equal(core.ready(p),false,'products with no images must not pass without explicit opt-in');
+  core.state.allowNoImages=true;
+  assert.equal(core.ready(p),true,'explicit no-image opt-in may permit product data only');
+  core.state.allowNoImages=false;
+}
+{
+  const dup={export_id:'dupe',export_folder:'images/dupe/',title_vi:'Dup',category_vi:'Sneaker',image_files:['images/dupe/01.webp','images/dupe/01.webp'],image_manifest:[],image_export_failed:0};
+  const p=core.normalize(dup,0,new Map([['images/dupe/01.webp',fakeWebp()]]));
+  assert.ok(p.errs.some(e=>e.includes('Đường dẫn ảnh bị lặp')));
+}
+{
+  const api=readFileSync(new URL('../functions/api/admin/products.js',import.meta.url),'utf8');
+  assert.ok(api.includes('body.published = false'),'server must enforce hidden products for ZIP imports, not trust the client');
+  assert.ok(source.includes("document.body.append(b)")&&!source.includes("m.append(b)"),'mobile ZIP button must not create a seventh bottom-navigation item');
+  assert.ok(source.includes("if(!name.endsWith('/')&&/\\.zip$/i.test(name))"),'nested ZIPs must be rejected');
+}
+
+console.log('PASS: ZIP parser, exact image linkage, 100-product package, CSV image fallback, missing-image opt-in, duplicate paths, nested ZIP, traversal and server gates.');
