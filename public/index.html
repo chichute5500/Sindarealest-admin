@@ -112,18 +112,13 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .craftsmanship-copy h2 em{font-style:normal;color:var(--gold)}
 
 .craftsmanship-points{display:grid;gap:12px;margin:16px 0 21px}.craftsmanship-points>div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding-top:11px;border-top:1px solid var(--soft-line)}.craftsmanship-points>div>span{font:400 14px SD Serif,Georgia,serif;color:var(--gold)}.craftsmanship-points strong{display:block;font-size:10px;line-height:1.5}.craftsmanship-points small{display:block;margin-top:3px;color:var(--muted);font-size:9px;line-height:1.65}
-.order-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
-.order-step{position:relative;min-width:0;overflow:hidden;padding:19px 15px 18px;border-radius:19px;box-shadow:0 10px 30px rgba(0,0,0,.055);transition:transform .32s ease,border-color .32s ease,background-color .8s ease}
-.order-step:hover{transform:translateY(-4px);border-color:var(--gold)}.order-number{position:absolute;right:13px;top:12px;color:var(--gold);font:400 22px SD Serif,Georgia,serif;opacity:.85}.order-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--glass);font-size:20px;color:var(--gold);margin-bottom:22px}.order-step h3{font:400 17px/1.3 SD Serif,Georgia,serif;margin:0 0 9px;overflow-wrap:anywhere}.order-step p{font-size:9px;line-height:1.8;color:var(--muted);margin:0;overflow-wrap:anywhere}.order-step strong{color:var(--ink)}
-.order-note{display:flex;align-items:center;gap:13px;margin-top:13px;padding:15px 17px;border:1px solid var(--line);border-radius:18px;background:var(--glass);backdrop-filter:blur(20px)}.order-note>span{color:var(--gold);font-size:22px;flex-shrink:0}.order-note p{font-size:10px;line-height:1.7;color:var(--muted);margin:0;flex:1;min-width:0}.order-note p strong{color:var(--ink)}.order-note .pill-btn{flex-shrink:0;white-space:nowrap}
 /* Guard against long product names and narrow controls overflowing or colliding. */
 .product-card,.product-open,.product-info,.product-title,.product-category,.detail-copy,.cart-row,.cart-row>div,.contact-link>span:last-child{min-width:0}
 .product-title{overflow-wrap:anywhere;hyphens:auto;line-height:1.38}.product-info{padding-bottom:47px}.product-card-bottom{min-width:0}.product-detail-cta{overflow-wrap:anywhere}.cart-row strong{overflow-wrap:anywhere;line-height:1.45}.cart-row small{overflow-wrap:anywhere;line-height:1.5}.detail-actions .pill-btn{line-height:1.45;white-space:normal;min-height:42px}.contact-link{overflow:hidden}.contact-link small{overflow-wrap:anywhere;word-break:break-word}
-@media(max-width:1050px){.order-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.order-step:nth-child(4),.order-step:nth-child(5){min-height:190px}}
-@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.order-step{padding:15px 12px;border-radius:16px}.order-step:nth-child(4),.order-step:nth-child(5){min-height:0}.order-step:last-child{grid-column:span 2}.order-icon{margin-bottom:17px;width:34px;height:34px}.order-step h3{font-size:16px}.order-step p{font-size:9px}.order-note{flex-wrap:wrap;align-items:flex-start;padding:13px}.order-note p{flex-basis:calc(100% - 38px)}.order-note .pill-btn{margin-left:38px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
-@media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.order-step h3{font-size:14px}.order-step p{font-size:8px}.order-step{padding:13px 10px}.order-number{font-size:19px;right:10px;top:9px}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
-@media(hover:none){.product-card:hover,.pill-btn:hover,.order-step:hover{transform:none}.product-card:hover .product-photo img,}
-@media(max-width:760px){.nav,.mobile-nav,.glass,.glass-soft,.service-strip,.promise-tag,.search-field,.mosaic-card,.contact-link,.order-note{backdrop-filter:blur(13px) saturate(135%);-webkit-backdrop-filter:blur(13px) saturate(135%)}.theme-bg{inset:-1%;transform:scale(1.01)}}
+@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
+@media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
+@media(hover:none){.product-card:hover,.pill-btn:hover{transform:none}.product-card:hover .product-photo img{transform:none;filter:none}}
+@media(max-width:760px){.nav,.mobile-nav,.glass,.glass-soft,.service-strip,.promise-tag,.search-field,.mosaic-card,.contact-link{backdrop-filter:blur(13px) saturate(135%);-webkit-backdrop-filter:blur(13px) saturate(135%)}.theme-bg{inset:-1%;transform:scale(1.01)}}
 @media(prefers-reduced-motion:reduce){.welcome-content{animation:none}.welcome-loader i{animation:none}.welcome-splash{transition-duration:.01ms}.detail-main-image{will-change:auto}}
 
 /* Final refinement: image carousels, compact editorial tiles, unified brand story/contact footer. */
@@ -249,12 +244,6 @@ html.dark .welcome-footnote i{color:#e5c98d}
  .mosaic-compact .mosaic-sub{font-size:9px;line-height:1.45}
  .custom-text h2{font-size:clamp(29px,7.3vw,35px)}
  .custom-text p{font-size:11px;line-height:1.7}
- .order-steps{gap:9px}
- .order-step{padding:15px 12px;min-height:0}
- .order-icon{width:35px;height:35px;margin-bottom:13px}
- .order-step h3{font-size:15px;line-height:1.35}
- .order-step p{font-size:10px;line-height:1.62}
- .order-note p{font-size:10.5px;line-height:1.65}
  .search-field{min-height:47px;border-radius:17px;padding:0 13px}
  .search-field input{font-size:13px;padding:12px 0}
  .filter-pills{gap:7px;padding:3px 1px 8px}
@@ -427,14 +416,14 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 
   <section class="section wrap" id="order" aria-labelledby="order-title">
     <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title" id="order-title">Đặt hàng an tâm, từng bước rõ ràng</h2></div><p class="section-note">Từ lựa chọn ban đầu đến khi hoàn thiện và bàn giao, mọi mốc quan trọng đều được trao đổi và xác nhận trước.</p></div>
-    <div class="order-steps">
+    <div class="order-steps" aria-label="Sáu bước và cách trao đổi khi đặt hàng">
       <article class="order-step glass" data-reveal><span class="order-number">01</span><div class="order-icon">◇</div><h3>Chọn mẫu sản phẩm</h3><p>Chọn thiết kế bạn yêu thích trong bộ sưu tập. Ghi lại mã SKU để tư vấn nhanh và chính xác.</p></article>
       <article class="order-step glass" data-reveal style="--reveal-delay:70ms"><span class="order-number">02</span><div class="order-icon">✧</div><h3>Tư vấn & thống nhất</h3><p>Trao đổi về kiểu dáng, kích thước, sắc độ, chi tiết mong muốn và thông tin cần xác nhận trước khi đặt làm.</p></article>
       <article class="order-step glass" data-reveal style="--reveal-delay:140ms"><span class="order-number">03</span><div class="order-icon">◷</div><h3>Xác nhận thời gian</h3><p>Thời gian dự kiến khoảng <strong>5–20 ngày tùy sản phẩm</strong>. Lịch cụ thể sẽ được thông báo theo mẫu và yêu cầu đã thống nhất.</p></article>
       <article class="order-step glass" data-reveal style="--reveal-delay:210ms"><span class="order-number">04</span><div class="order-icon">✓</div><h3>Xác nhận đặt làm</h3><p>Sau khi thống nhất mẫu, thời gian và điều kiện đặt hàng, khách đặt cọc <strong>30% giá trị sản phẩm</strong> để xác nhận đơn.</p></article>
       <article class="order-step glass" data-reveal style="--reveal-delay:280ms"><span class="order-number">05</span><div class="order-icon">↗</div><h3>Hoàn thiện & bàn giao</h3><p>Sản phẩm được kiểm tra trước khi gửi. Phần thanh toán còn lại và phương thức giao nhận được thực hiện theo thỏa thuận xác nhận với khách.</p></article>
+      <article class="order-step order-zalo glass" data-reveal style="--reveal-delay:350ms"><span class="order-number">06</span><div class="order-icon order-zalo-icon" aria-hidden="true">Z</div><h3>Trao đổi qua Zalo</h3><p><strong>Minh bạch ngay từ đầu.</strong> Xác nhận thời gian, yêu cầu riêng và điều kiện đặt hàng trước khi đặt cọc.</p><a class="pill-btn primary tap-target" href="https://zalo.me/0827049192" target="_blank" rel="noopener">Nhắn tin tư vấn ↗</a></article>
     </div>
-    <div class="order-note" data-reveal><span>✦</span><p><strong>Minh bạch ngay từ đầu.</strong> Mọi mốc thời gian, yêu cầu riêng và điều kiện đặt hàng sẽ được xác nhận qua tư vấn trước khi khách tiến hành đặt cọc.</p><a class="pill-btn primary tap-target" href="https://zalo.me/0827049192" target="_blank" rel="noopener">Trao đổi qua Zalo ↗</a></div>
   </section>
 
   <section class="section wrap" id="featured">
@@ -770,6 +759,47 @@ html.dark .service-strip{
   .service-strip .service-copy{padding:5px}
   .service-strip .service-copy strong{font-size:8.2px}
   .service-strip .service-copy small{font-size:7.2px}
+}
+</style>
+
+<style id="sd-order-uniform-tiles">
+/* Order assurance: one compact, scoped rule set; equal grid columns and equal auto rows. */
+#order .order-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:10px;align-items:stretch}
+#order .order-step{box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:flex-start;min-width:0;min-height:0;padding:12px 13px;overflow:hidden;border:1px solid var(--line);border-radius:17px;box-shadow:0 8px 24px rgba(0,0,0,.055);transition:transform .28s ease,border-color .28s ease,background-color .5s ease}
+#order .order-step:hover{transform:translateY(-2px);border-color:var(--gold)}
+#order .order-number{position:absolute;right:10px;top:8px;color:var(--gold);font:400 18px SD Serif,Georgia,serif;opacity:.78}
+#order .order-icon{width:29px;height:29px;display:grid;place-items:center;flex:0 0 29px;margin:0 0 8px;border:1px solid var(--line);border-radius:50%;background:var(--glass);font-size:16px;color:var(--gold)}
+#order .order-step h3{margin:0 0 5px;font:400 14.5px/1.3 SD Serif,Georgia,serif;overflow-wrap:anywhere}
+#order .order-step p{margin:0;color:var(--muted);font-size:8.8px;line-height:1.52;overflow-wrap:anywhere}
+#order .order-step strong{color:var(--ink)}
+#order .order-zalo{grid-column:auto}
+#order .order-zalo .order-zalo-icon{font:700 13px/1 Arial,sans-serif;border-color:rgba(0,135,255,.35);color:#1687e8}
+#order .order-zalo .pill-btn{align-self:flex-start;max-width:100%;margin-top:8px;padding:6px 9px;font-size:8.5px;line-height:1.35;white-space:normal}
+@media(max-width:1050px) and (min-width:761px){
+ #order .order-steps{gap:8px}
+ #order .order-step{padding:11px 10px;border-radius:15px}
+ #order .order-icon{width:27px;height:27px;flex-basis:27px;margin-bottom:7px}
+ #order .order-step h3{font-size:13.2px}
+ #order .order-step p{font-size:8.3px;line-height:1.48}
+ #order .order-zalo .pill-btn{margin-top:7px;padding:5px 8px;font-size:8px}
+}
+@media(max-width:760px){
+ #order .order-steps{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:8px;align-items:stretch}
+ #order .order-step{padding:11px 10px;border-radius:15px}
+ #order .order-number{right:9px;top:7px;font-size:16px}
+ #order .order-icon{width:27px;height:27px;flex-basis:27px;margin-bottom:7px;font-size:14px}
+ #order .order-step h3{font-size:13px;line-height:1.32;margin-bottom:5px}
+ #order .order-step p{font-size:8.3px;line-height:1.48}
+ #order .order-zalo .pill-btn{margin-top:7px;font-size:8.2px;padding:5px 8px}
+}
+@media(max-width:390px){
+ #order .order-steps{gap:6px}
+ #order .order-step{padding:10px 8px;border-radius:14px}
+ #order .order-number{right:7px;top:6px;font-size:15px}
+ #order .order-icon{width:25px;height:25px;flex-basis:25px;margin-bottom:6px;font-size:13px}
+ #order .order-step h3{font-size:12.2px}
+ #order .order-step p{font-size:8px;line-height:1.45}
+ #order .order-zalo .pill-btn{font-size:7.8px;padding:5px 7px}
 }
 </style>
 </body>
