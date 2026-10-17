@@ -38,3 +38,6 @@ Restore có thể thay thế dữ liệu sản phẩm và, với bản backup c�
 ## Giới hạn kiểm tra
 
 Đây là rà soát mã và workflow GitHub từ repository. Tôi không có bằng chứng xác nhận đã chạy kiểm thử HTTP/E2E trực tiếp trên phiên bản web đang phục vụ người dùng, và không xem được giá trị secrets của Cloudflare. Cần xác nhận runtime sau khi kiểm thử nhánh đề xuất; báo cáo này không tuyên bố website đã triển khai các sửa đổi.
+
+### Dependency/build integrity
+The audit also found that CI installed dependencies with `--no-audit --no-fund`, both primary workflows used old action versions that emitted a Node.js 20 deprecation warning, and the repository did not contain `package-lock.json`. On this review branch, the direct Wrangler dependency is pinned to `4.149.0`, GitHub Actions references are refreshed to `@v7`, and CI/deploy now run `npm audit --audit-level=high` after installation. **Remaining limitation:** no lockfile is committed yet, so npm can still resolve transitive dependencies to different versions on later runs. A checked-in, tested lockfile should be the next reproducibility improvement; do not claim fully reproducible builds until that is done.
