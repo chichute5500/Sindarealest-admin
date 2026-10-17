@@ -4,6 +4,7 @@ const PUSH_HOSTS = new Set([
   "fcm.googleapis.com",
   "push.services.opera.com",
   "push.services.mozilla.com",
+  "updates.push.services.mozilla.com",
   "web.push.apple.com",
   "notify.windows.com",
   "wns.windows.com",
