@@ -203,6 +203,20 @@ const operationsBackup = {
     warrantyClaimAttachments: [{ claim_id:'claim-1', image_key:'warranty-claims/0123456789abcdef0123456789abcdef.webp' }],
   },
 };
+const excessiveOperationsBackup = {
+  ...operationsBackup,
+  operations: {
+    ...operationsBackup.operations,
+    auditLogs: Array.from({ length: 4995 }, (_, i) => ({
+      id: `restore-log-${i}`, actor: 'admin', action: 'backup_test',
+      entity_type: 'test', entity_id: String(i), details_json: '{}',
+      created_at: '2026-01-01 00:00:00',
+    })),
+  },
+};
+response = await restoreProducts({ request: makeRestoreRequest(excessiveOperationsBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 413, 'oversized backup transaction must be rejected before mutation');
+assert.equal(batchCalls, 1, 'backup exceeding restore record budget must not touch D1');
 response = await restoreProducts({ request: makeRestoreRequest(operationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 200, 'backup v2 có quan hệ vận hành hợp lệ phải được chấp nhận');
 assert.equal(batchCalls, 2, 'backup v2 đời cũ vẫn được khôi phục bằng batch');
