@@ -213,3 +213,9 @@ Nguồn giới hạn: https://developers.cloudflare.com/d1/platform/limits/
 
 ### Kiểm tra preview trong lượt rà soát mới nhất
 Thử đọc preview dự kiến `audit-full-review-2026-10-17.sindarealest2.pages.dev` không truy cập được vì lớp bảo vệ trả `login_required`; không có phiên đăng nhập/ quyền phù hợp để xác nhận giao diện preview bằng trình duyệt. Production tiếp tục trả dữ liệu danh mục/cài đặt, sitemap 237 URL và robots.txt; `/api/admin/session` không có cookie trả 401. Đây là kiểm tra chỉ đọc, không sửa dữ liệu. Việc kiểm thử E2E trên preview vẫn cần môi trường preview truy cập được và cấu hình binding phù hợp.
+
+
+### Đếm chính xác tham số D1 khi khôi phục backup
+**Mức độ:** Trung bình — tránh để tệp backup vượt ngân sách tham số thực tế dù đã qua kiểm tra.
+
+Rà soát biên của bộ chặn mới phát hiện công thức đếm tham số đã tính 4 tham số cho bốn cài đặt welcome (thực tế 8) và 1 tham số cho mỗi cài đặt watermark (thực tế 2). Đã sửa công thức để tính đủ hai tham số cho từng câu lệnh upsert và điều chỉnh regression test về đúng ranh giới, nơi công thức cũ có thể chấp nhận payload nhưng công thức chính xác phải từ chối trước khi tạo batch ghi. CI đang chạy lại trên commit mới nhất.
