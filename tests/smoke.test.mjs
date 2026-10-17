@@ -124,7 +124,7 @@ assert.equal(response.status, 200);
 let data = await response.json();
 assert.equal(data.length, 1, 'API công khai chỉ trả về sản phẩm published');
 assert.equal(data[0].price, null, 'khi ẩn giá, API không gửi giá thật');
-assert.equal(data[0].stock, 4);
+assert.equal(data[0].stock, null, 'public API must not expose internal inventory counts');
 
 dbState.showPrices = true;
 response = await publicProducts(publicContext);
@@ -145,6 +145,7 @@ response = await adminProducts({ request: authenticatedRequest, env: { DB: mockD
 assert.equal(response.status, 200, 'API quản trị cho phép session hợp lệ');
 data = await response.json();
 assert.equal(data.products.length, 2, 'quản trị được thấy cả sản phẩm đang ẩn');
+assert.ok(data.products.some((product) => product.stock === 4), 'admin API must retain access to internal stock counts');
 
 let batchCalls = 0;
 const restoreBatchStatements = [];
