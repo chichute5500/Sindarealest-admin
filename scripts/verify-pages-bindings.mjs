@@ -1,3 +1,4 @@
+import { appendFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -85,6 +86,9 @@ async function main() {
     apiToken: process.env.CLOUDFLARE_API_TOKEN,
   });
   const privacy = assertPrivateR2Access(access);
+  if (process.env.GITHUB_ENV) {
+    appendFileSync(process.env.GITHUB_ENV, 'CLOUDFLARE_PAGES_ORIGINALS_VERIFIED=true\n', { encoding: 'utf8' });
+  }
   console.log(`Đã xác minh Production bindings: IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Public access ORIGINALS: r2.dev tắt, ${privacy.enabledCustomDomains} custom domain công khai đang bật.`);
 }
 
