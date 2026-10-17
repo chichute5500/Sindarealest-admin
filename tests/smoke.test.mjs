@@ -22,6 +22,9 @@ assert.equal(isWarrantyEligibleOnDate('expired', '2026-10-01', '2026-10-20', '20
 assert.equal(isWarrantyEligibleOnDate('active', 'not-a-date', '2026-10-20', '2026-10-17'), false, 'invalid start dates must fail closed');
 assert.equal(isWarrantyEligibleOnDate('active', '2026-10-18', '2026-10-20', '2026-10-17'), false, 'future start date must not be eligible');
 assert.equal(isWarrantyEligibleOnDate('active', '2026-10-01', 'not-a-date', '2026-10-17'), false, 'invalid end dates must fail closed');
+assert.equal(isWarrantyEligibleOnDate('active', '2026-02-29', '2026-12-31', '2026-10-17'), false, 'invalid non-leap dates must fail closed');
+assert.equal(isWarrantyEligibleOnDate('active', '2028-02-29', '2028-12-31', '2028-02-29'), true, 'valid leap dates must be accepted');
+assert.equal(isWarrantyEligibleOnDate('active', '2026-99-01', '2026-12-31', '2026-10-17'), false, 'out-of-range months must fail closed');
 
 const valid = validateProduct({
   title: 'Ví da cá sấu', sku: 'sd-236', category: 'Ví da',
