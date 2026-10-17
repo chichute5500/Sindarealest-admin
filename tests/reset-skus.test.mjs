@@ -214,4 +214,12 @@ assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().au
   assert.equal(JSON.stringify(untouched), snapshot);
 }
 
-console.log('PASS: reset SKU — 235 sản phẩm, SKU duy nhất, giữ nguyên trường khác, phân quyền, xác nhận, danh mục mới và rollback giả lập.');
+{
+  const prototypeRows = [{ ...makeRows()[0], category: 'constructor', category_label: 'Constructor' }];
+  const dbMock = createMockDb(prototypeRows);
+  const result = await resetSkus(await makeContext(dbMock.db, { confirm: true }));
+  assert.equal(result.status, 200, 'prototype-named custom categories must not break SKU reset');
+  assert.match(prototypeRows[0].sku, /^SD-CONST[A-Z0-9]{2}001$/);
+}
+
+console.log('PASS: reset SKU — 235 sản phẩm, SKU duy nhất, giữ nguyên trường khác, phân quyền, xác nhận, danh mục mới, prototype-safe categories và rollback giả lập.');

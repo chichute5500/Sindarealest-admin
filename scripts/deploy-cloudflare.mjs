@@ -4,6 +4,7 @@ import {
   assertSafeName,
   findNamedRecord,
   listPagesProjects,
+  parseCliJson,
   runWrangler,
 } from './cloudflare-utils.mjs';
 
@@ -15,6 +16,13 @@ const ask = async (question, fallback = '') => {
 };
 
 async function main() {
+  if (ci && process.env.CLOUDFLARE_PAGES_ORIGINALS_READY !== 'true') {
+    throw new Error('Deploy bị chặn: chưa xác minh binding ORIGINALS riêng tư. Xác minh ORIGINALS khác IMAGES, không public access/r2.dev/custom domain và được gắn trong đúng môi trường Pages; chỉ sau đó mới đặt CLOUDFLARE_PAGES_ORIGINALS_READY=true.');
+  }
+  if (!ci) {
+    const originalsReady = (await ask('Đã xác minh binding ORIGINALS là bucket riêng tư, khác IMAGES và gắn đúng môi trường Pages chưa? Nhập YES', 'NO')).toUpperCase();
+    if (originalsReady !== 'YES') throw new Error('Đã hủy deploy cho đến khi ORIGINALS được xác minh.');
+  }
   if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
     if (ci) throw new Error('Thiếu CLOUDFLARE_API_TOKEN hoặc CLOUDFLARE_ACCOUNT_ID trong GitHub Actions Secrets.');
     console.log('Lưu ý: đăng nhập Wrangler trước bằng `npx wrangler login`; không dán token vào câu lệnh.');
@@ -36,6 +44,40 @@ async function main() {
   if (ci && process.env.GITHUB_REF_NAME && branch !== process.env.GITHUB_REF_NAME) {
     throw new Error(`GitHub đang chạy từ branch ${process.env.GITHUB_REF_NAME}, không phải production branch ${branch}; deploy bị hủy để tránh đẩy nhầm mã nguồn.`);
   }
+  // The new order-contact snapshot migration is a hard prerequisite for
+  // routes and backup queries in this branch. Check schema read-only before any deploy.
+  const databaseName = process.env.CLOUDFLARE_D1_DATABASE || (ci ? '' : await ask('Tên D1 database', 'sindarealest-db'));
+  if (!databaseName) throw new Error('Thiếu CLOUDFLARE_D1_DATABASE; không thể xác minh migration bắt buộc.');
+  assertSafeName(databaseName, 'Tên D1 database');
+  console.log(`Xác minh schema và snapshot đơn hàng trong D1 ${databaseName} trước khi deploy…`);
+  const schemaCheck = runWrangler([
+    'd1', 'execute', databaseName, '--remote', '--json',
+    '--command', 'SELECT COUNT(*) AS missing_order_contact_snapshots FROM orders o LEFT JOIN order_contact_details d ON d.order_id=o.id WHERE d.order_id IS NULL;',
+  ], { quiet: true });
+  const schemaData = parseCliJson(schemaCheck.stdout, 'kiểm tra snapshot liên hệ đơn hàng');
+  const findMissingCount = (value) => {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findMissingCount(item);
+        if (found !== null) return found;
+      }
+    } else if (value && typeof value === 'object') {
+      if (Object.hasOwn(value, 'missing_order_contact_snapshots')) {
+        const count = Number(value.missing_order_contact_snapshots);
+        return Number.isSafeInteger(count) && count >= 0 ? count : null;
+      }
+      for (const item of Object.values(value)) {
+        const found = findMissingCount(item);
+        if (found !== null) return found;
+      }
+    }
+    return null;
+  };
+  const missingSnapshots = findMissingCount(schemaData);
+  if (missingSnapshots === null || missingSnapshots > 0) {
+    throw new Error(`Migration 0007 chưa sẵn sàng: còn ${missingSnapshots ?? 'không xác định'} đơn hàng thiếu snapshot liên hệ. Deploy bị chặn; không tự chạy migration.`);
+  }
+
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);
     if (confirm !== `DEPLOY ${project} ${branch}`) throw new Error('Xác nhận không khớp; đã hủy deploy.');

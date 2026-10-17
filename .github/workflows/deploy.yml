@@ -15,21 +15,27 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_R2_READ_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
       CLOUDFLARE_PAGES_BRANCH: fix/ai-review-quota-scope-2026-10-15
+      CLOUDFLARE_D1_DATABASE: sindarealest-db
+      CLOUDFLARE_PAGES_ORIGINALS_READY: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY }}
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --no-fund
+
+      - name: Audit installed dependencies
+        run: npm audit --audit-level=high
 
       - name: Validate project integrity
         run: npm run check
@@ -49,5 +55,15 @@ jobs:
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
 
+      - name: Skip production deploy until ORIGINALS is verified
+        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true'
+        run: echo "::notice::Production deploy skipped safely; verify private ORIGINALS binding before enabling it."
+
+      - name: Diagnose actual Production R2 bindings
+        if: success()
+        continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}
+        run: node scripts/verify-pages-bindings.mjs
+
       - name: Deploy to verified Pages project
+        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'
         run: npm run deploy

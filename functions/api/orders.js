@@ -1,4 +1,4 @@
-import { dbOrFail, fail, getSetting, json, rateLimitPublicRequest } from "../_lib.js";
+import { dbOrFail, fail, getSetting, json, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 import { sendAdminPush } from "../_notifications.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
@@ -12,8 +12,10 @@ export async function onRequestPost({ request, env }) {
   const unavailable = dbOrFail(env);
   if (unavailable) return unavailable;
   try { const limit = await rateLimitPublicRequest(env, request, "order_create", 6, 900); if (limit.limited) return fail("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi 15 phút hoặc liên hệ qua Zalo.", 429, { "Retry-After": "900" }); } catch { return fail("Dịch vụ tiếp nhận đơn chưa sẵn sàng.", 503); }
-  let body;
-  try { body = await request.json(); } catch { return fail("Thông tin đặt hàng không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(request, 64 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin đặt hàng vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin đặt hàng không hợp lệ.");
+  const body = parsedBody.value;
   const fullName = clean(body?.fullName, 120), phone = clean(body?.phone, 24), email = clean(body?.email, 160), province = clean(body?.province, 100), provinceCode = clean(body?.provinceCode, 12), ward = clean(body?.ward, 120), wardCode = clean(body?.wardCode, 12), streetAddress = clean(body?.streetAddress, 300), address = clean(body?.address || [streetAddress, ward, province].filter(Boolean).join(", "), 400), customerNote = clean(body?.note, 1200);
   if (fullName.length < 2) return fail("Vui lòng nhập họ tên.");
   if ((province || ward || streetAddress || provinceCode || wardCode) && (!province || !ward || !streetAddress || !provinceCode || !wardCode)) return fail("Vui lòng chọn tỉnh/thành, xã/phường và nhập địa chỉ chi tiết.");
@@ -41,13 +43,37 @@ export async function onRequestPost({ request, env }) {
     if (subtotal !== null && !Number.isSafeInteger(subtotal)) return fail("Tổng giá trị đơn vượt giới hạn hợp lệ.");
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
-    const existing = await env.DB.prepare("SELECT id FROM customers WHERE phone=? LIMIT 1").bind(phone).first();
-    const actualCustomerId = existing?.id || customerId;
     const statements = [];
-    if (existing) statements.push(env.DB.prepare("UPDATE customers SET full_name=?,email=?,address=?,updated_at=datetime('now') WHERE id=?").bind(fullName,email,address,actualCustomerId));
-    else statements.push(env.DB.prepare("INSERT INTO customers(id,full_name,phone,email,address) VALUES(?,?,?,?,?)").bind(actualCustomerId,fullName,phone,email,address));
-    if (province && ward && streetAddress) statements.push(env.DB.prepare("INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) VALUES(?,?,?,?,?,?,datetime('now')) ON CONFLICT(customer_id) DO UPDATE SET province_code=excluded.province_code,province=excluded.province,ward_code=excluded.ward_code,ward=excluded.ward,street_address=excluded.street_address,updated_at=datetime('now')").bind(actualCustomerId,provinceCode,province,wardCode,ward,streetAddress));
-    statements.push(env.DB.prepare("INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,customer_note) VALUES(?,?,?,'pending_confirmation',?,?,?,?)").bind(orderId,orderNumber,actualCustomerId,subtotal,subtotal,priceKnown?0:1,customerNote));
+
+    // The customer row is a long-lived profile, not an order form. Never
+    // overwrite it from an unauthenticated checkout where phone ownership is
+    // not verified. ON CONFLICT(phone) also makes simultaneous same-phone
+    // submissions converge on the existing profile without a race failure.
+    statements.push(env.DB.prepare(
+      "INSERT INTO customers(id,full_name,phone,email,address) VALUES(?,?,?,?,?) ON CONFLICT(phone) DO NOTHING",
+    ).bind(customerId, fullName, phone, email, address));
+
+    // Keep structured address fields only for the newly-created profile.
+    // Existing profiles must be changed only through an authenticated flow.
+    if (province && ward && streetAddress) statements.push(env.DB.prepare(
+      "INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) " +
+      "SELECT id,?,?,?,?,?,datetime('now') FROM customers WHERE phone=? AND id=? ON CONFLICT(customer_id) DO NOTHING",
+    ).bind(provinceCode, province, wardCode, ward, streetAddress, phone, customerId));
+
+    // Select the canonical customer ID after the conflict-safe insert. The
+    // statement stays inside the D1 batch so the FK is satisfied atomically.
+    statements.push(env.DB.prepare(
+      "INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,customer_note) " +
+      "SELECT ?,?,c.id,'pending_confirmation',?,?,?,? FROM customers c WHERE c.phone=?",
+    ).bind(orderId, orderNumber, subtotal, subtotal, priceKnown ? 0 : 1, customerNote, phone));
+
+    // Immutable snapshot: admin order views and warranty lookup must describe
+    // the contact details used for this purchase, not a subsequently changed
+    // customer profile.
+    statements.push(env.DB.prepare(
+      "INSERT INTO order_contact_details(order_id,full_name,phone,email,created_at) VALUES(?,?,?,?,datetime('now'))",
+    ).bind(orderId, fullName, phone, email));
+
     statements.push(env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) VALUES(?,?,?,?,?,?,?)").bind(orderId,provinceCode,province,wardCode,ward,streetAddress,address));
     for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity));
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length })));

@@ -12,7 +12,9 @@ export async function onRequest(context) {
   if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
     const hadValidSession = await verifySession(context.request, context.env);
     const response = await context.next();
-    if (!hadValidSession || !response.ok || !context.env?.SESSION_SECRET) return response;
+    // Never rotate a session on a response that already sets/clears a cookie.
+    // In particular, logout must not be followed by a fresh valid session cookie.
+    if (!hadValidSession || !response.ok || !context.env?.SESSION_SECRET || response.headers.has("Set-Cookie")) return response;
     const token = await createSession(context.env.SESSION_SECRET);
     const headers = new Headers(response.headers);
     headers.append('Set-Cookie', sessionCookie(token));

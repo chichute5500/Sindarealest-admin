@@ -1,0 +1,66 @@
+name: Verify Production Pages and R2 bindings (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-production-bindings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require credentials and project target
+        env:
+          PAGES_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          R2_READ_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
+          ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT_NAME: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        shell: bash
+        run: |
+          test -n "$PAGES_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN (Pages read access required)"; exit 1; }
+          test -n "$R2_READ_TOKEN" || { echo "::error::Missing CLOUDFLARE_R2_READ_API_TOKEN"; exit 1; }
+          test -n "$ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          test -n "$PROJECT_NAME" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
+
+      - name: Verify Production bindings and ORIGINALS privacy without writes
+        env:
+          PAGES_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          R2_READ_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
+          ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT_NAME: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          pages_url="https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/pages/projects/${PROJECT_NAME}"
+          pages="$(curl --fail --silent --show-error -H "Authorization: Bearer ${PAGES_TOKEN}" -H "Accept: application/json" "$pages_url")"
+          printf '%s' "$pages" | jq -e '.success == true and .result.name != null' >/dev/null
+          test "$(printf '%s' "$pages" | jq -r '.result.name')" = "$PROJECT_NAME" || { echo "::error::Pages project name mismatch"; exit 1; }
+
+          images="$(printf '%s' "$pages" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          originals="$(printf '%s' "$pages" | jq -r '.result.deployment_configs.production.r2_buckets.ORIGINALS.name // empty')"
+          test -n "$images" || { echo "::error::Production binding IMAGES is missing or unreadable"; exit 1; }
+          test -n "$originals" || { echo "::error::Production binding ORIGINALS is missing or unreadable"; exit 1; }
+          test "$images" != "$originals" || { echo "::error::IMAGES and ORIGINALS point to the same bucket"; exit 1; }
+
+          bucket_list="$(curl --fail --silent --show-error -H "Authorization: Bearer ${R2_READ_TOKEN}" -H "Accept: application/json" "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets")"
+          printf '%s' "$bucket_list" | jq -e '.success == true' >/dev/null
+          printf '%s' "$bucket_list" | jq -e --arg b "$images" '.result.buckets | any(.name == $b)' >/dev/null || { echo "::error::IMAGES bucket not found in account"; exit 1; }
+          printf '%s' "$bucket_list" | jq -e --arg b "$originals" '.result.buckets | any(.name == $b)' >/dev/null || { echo "::error::ORIGINALS bucket not found in account"; exit 1; }
+
+          managed="$(curl --fail --silent --show-error -H "Authorization: Bearer ${R2_READ_TOKEN}" -H "Accept: application/json" "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets/${originals}/domains/managed")"
+          custom="$(curl --fail --silent --show-error -H "Authorization: Bearer ${R2_READ_TOKEN}" -H "Accept: application/json" "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets/${originals}/domains/custom")"
+          printf '%s' "$managed" | jq -e '.success == true and (.result.enabled | type == "boolean")' >/dev/null
+          printf '%s' "$custom" | jq -e '.success == true and (.result.domains | type == "array")' >/dev/null
+          r2dev="$(printf '%s' "$managed" | jq -r '.result.enabled')"
+          enabled_custom="$(printf '%s' "$custom" | jq '[.result.domains[]? | select(.enabled == true)] | length')"
+          echo "Production project: $PROJECT_NAME"
+          echo "IMAGES bucket: $images"
+          echo "ORIGINALS bucket: $originals"
+          echo "ORIGINALS r2.dev public access enabled: $r2dev"
+          echo "ORIGINALS enabled custom domains: $enabled_custom"
+          if [ "$r2dev" = "true" ] || [ "$enabled_custom" -ne 0 ]; then
+            echo "::error::ORIGINALS appears publicly accessible; deployment remains blocked."
+            exit 1
+          fi
+          echo "Read-only verification passed. No deployment or storage writes performed."
