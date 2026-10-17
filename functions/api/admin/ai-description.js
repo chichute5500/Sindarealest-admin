@@ -1,4 +1,4 @@
-import { fail, json, requireAdmin } from "../../_lib.js";
+import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 
 const DEFAULT_WORKERS_AI_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
 const SYSTEM_PROMPT = "Bạn là copywriter tiếng Việt cho thương hiệu SinDarealest. Viết mô tả sản phẩm ngắn gọn, tinh tế, đúng dữ kiện. Không tự bịa chất liệu, nguồn gốc, kích thước, tính năng, bảo hành, chứng nhận hay công dụng. Nếu dữ kiện còn thiếu, dùng lời văn trung tính và chỉ nêu tên/danh mục đã cho. Chỉ trả về nội dung mô tả, không tiêu đề.";
@@ -17,9 +17,10 @@ export async function onRequestPost(context) {
     return fail("Chưa cấu hình Workers AI binding tên AI hoặc secret OPENAI_API_KEY cho tính năng tạo mô tả.", 503);
   }
 
-  let body;
-  try { body = await context.request.json(); }
-  catch { return fail("Thông tin sản phẩm không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin sản phẩm vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin sản phẩm không hợp lệ.");
+  const body = parsedBody.value;
 
   const title = String(body?.title || "").trim().slice(0, 180);
   const category = String(body?.category || "").trim().slice(0, 80);
