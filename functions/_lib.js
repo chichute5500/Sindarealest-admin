@@ -176,10 +176,28 @@ export async function rateLimitPublicRequest(env, request, scope, maxAttempts = 
   const ipHash = b64url(digest);
   const now = Math.floor(Date.now() / 1000);
   const windowStart = Math.floor(now / windowSeconds) * windowSeconds;
-  await env.DB.prepare("INSERT INTO public_rate_limits(scope,ip_hash,window_start,attempts) VALUES(?,?,?,1) ON CONFLICT(scope,ip_hash) DO UPDATE SET attempts=CASE WHEN public_rate_limits.window_start=excluded.window_start THEN public_rate_limits.attempts+1 ELSE 1 END,window_start=excluded.window_start").bind(scope,ipHash,windowStart).run();
-  const row = await env.DB.prepare("SELECT attempts FROM public_rate_limits WHERE scope=? AND ip_hash=? LIMIT 1").bind(scope,ipHash).first();
-  if (now % 17 === 0) await env.DB.prepare("DELETE FROM public_rate_limits WHERE window_start < ?").bind(now - windowSeconds * 4).run();
-  return { limited: Number(row?.attempts || 0) > maxAttempts };
+
+  // Increment and read the resulting count in one atomic transaction. Separate
+  // run()/first() calls let concurrent requests observe stale counts and exceed
+  // the configured limit.
+  const results = await env.DB.batch([
+    env.DB.prepare("INSERT INTO public_rate_limits(scope,ip_hash,window_start,attempts) VALUES(?,?,?,1) " +
+      "ON CONFLICT(scope,ip_hash) DO UPDATE SET " +
+      "attempts=CASE WHEN public_rate_limits.window_start=excluded.window_start THEN public_rate_limits.attempts+1 ELSE 1 END," +
+      "window_start=excluded.window_start").bind(scope,ipHash,windowStart),
+    env.DB.prepare("SELECT attempts FROM public_rate_limits WHERE scope=? AND ip_hash=? LIMIT 1").bind(scope,ipHash),
+  ]);
+  const attempts = Number(results?.[1]?.results?.[0]?.attempts || 0);
+
+  // Cleanup is opportunistic: a cleanup failure must not turn an otherwise
+  // valid order or warranty operation into a 503.
+  if (now % 17 === 0) {
+    try {
+      await env.DB.prepare("DELETE FROM public_rate_limits WHERE window_start < ?")
+        .bind(now - windowSeconds * 4).run();
+    } catch {}
+  }
+  return { limited: attempts > maxAttempts };
 }
 
 export async function getSetting(db, key, fallback = "0") {
