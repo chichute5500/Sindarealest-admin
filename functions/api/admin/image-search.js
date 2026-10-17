@@ -1,4 +1,4 @@
-import { fail, json, requireAdmin } from "../../_lib.js";
+import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 import { assessCrocodileMaterial, evaluateSearchCandidate, inventoryImages, normalizeImageRef } from "../../_lib/image-audit.js";
 import { generateSearchKeywords } from "../../_lib/workers-ai.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
@@ -72,8 +72,10 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Yêu cầu tìm ảnh không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024 * 1024);
+  if (parsedBody.error === "too_large") return fail("Yêu cầu tìm ảnh vượt giới hạn 8 MB.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Yêu cầu tìm ảnh không hợp lệ.");
+  const body = parsedBody.value;
   const platform = body?.platform === "1688" ? "1688" : body?.platform === "taobao" ? "taobao" : "";
   if (!platform) return fail("Hãy chọn Taobao hoặc 1688.");
   const image = parseImage(body?.dataUrl, body?.imageBase64);
