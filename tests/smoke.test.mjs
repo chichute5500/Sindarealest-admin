@@ -196,8 +196,39 @@ const operationsBackup = {
 };
 response = await restoreProducts({ request: makeRestoreRequest(operationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 200, 'backup v2 có quan hệ vận hành hợp lệ phải được chấp nhận');
-assert.equal(batchCalls, 2, 'backup v2 hợp lệ khôi phục dữ liệu vận hành bằng batch');
+assert.equal(batchCalls, 2, 'backup v2 đời cũ vẫn được khôi phục bằng batch');
+assert.ok(!restoreBatchStatements[1].some(statement => (statement.values || [])[0] === 'watermark_enabled'), 'Legacy v2 backups without watermark fields must preserve existing watermark settings');
+
+const watermarkBackup = {
+  ...operationsBackup,
+  settings: {
+    ...operationsBackup.settings,
+    watermarkEnabled: false,
+    watermarkPosition: 'top-left',
+    watermarkSize: 24,
+    watermarkOpacity: 73,
+  },
+};
+response = await restoreProducts({ request: makeRestoreRequest(watermarkBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 200, 'backup v2 with valid watermark settings must restore');
+assert.equal(batchCalls, 3, 'watermark settings restore must be part of the same D1 batch');
+const restoredSettings = new Map(restoreBatchStatements.at(-1)
+  .filter(statement => (statement.sql || '').includes('INSERT INTO settings'))
+  .map(statement => [statement.values[0], statement.values[1]]));
+assert.equal(restoredSettings.get('watermark_enabled'), '0');
+assert.equal(restoredSettings.get('watermark_position'), 'top-left');
+assert.equal(restoredSettings.get('watermark_size'), '24');
+assert.equal(restoredSettings.get('watermark_opacity'), '73');
+
+const invalidWatermarkBackup = {
+  ...watermarkBackup,
+  settings: { ...watermarkBackup.settings, watermarkSize: 99 },
+};
+response = await restoreProducts({ request: makeRestoreRequest(invalidWatermarkBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 400, 'backup with out-of-range watermark settings must be rejected');
+assert.equal(batchCalls, 3, 'invalid watermark settings must not touch D1');
+
 const brokenOperationsBackup = { ...operationsBackup, operations: { ...operationsBackup.operations, orders: [{ ...operationsBackup.operations.orders[0], customer_id:'missing-customer' }] } };
 response = await restoreProducts({ request: makeRestoreRequest(brokenOperationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 400, 'backup v2 tham chiếu khách hàng không tồn tại phải bị từ chối');
-assert.equal(batchCalls, 2, 'backup v2 không hợp lệ không được chạm vào D1');
+assert.equal(batchCalls, 3, 'backup v2 không hợp lệ không được chạm vào D1');
