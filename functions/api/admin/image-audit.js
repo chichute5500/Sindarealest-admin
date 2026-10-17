@@ -1,4 +1,4 @@
-import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
+import { fail, json, readJsonBodyLimited, requireAdmin, storageOrFail } from "../../_lib.js";
 import { analyzeProductImage, compareProductImages } from "../../_lib/workers-ai.js";
 import { isAllowedSourceImageUrl, isAllowedSourceProductUrl, normalizeImageRef } from "../../_lib/image-audit.js";
 import { consumeWorkersAiRequest } from "../../_lib/ai-quota.js";
@@ -50,8 +50,10 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Dữ liệu ảnh không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024 * 1024);
+  if (parsedBody.error === "too_large") return fail("Yêu cầu xử lý ảnh vượt giới hạn 8 MB.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu ảnh không hợp lệ.");
+  const body = parsedBody.value;
   const action = String(body?.action || "");
   const db = context.env.DB;
   if (!["analyze", "uploadCandidate", "compareCandidate"].includes(action)) return fail("Thao tác AI không hợp lệ.");
@@ -174,8 +176,10 @@ export async function onRequestPost(context) {
 export async function onRequestPatch(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Yêu cầu duyệt ảnh không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Yêu cầu duyệt ảnh vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Yêu cầu duyệt ảnh không hợp lệ.");
+  const body = parsedBody.value;
   const id = String(body?.reviewId || "");
   const decision = String(body?.decision || "");
   if (!id || !["approve", "reject", "recheck", "saveSource"].includes(decision)) return fail("Thiếu lựa chọn duyệt ảnh hợp lệ.");
