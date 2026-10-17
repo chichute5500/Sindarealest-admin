@@ -40,7 +40,7 @@ const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.m
 assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding verifier must inspect production, not preview, settings');
 assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
 assert.ok(bindingVerifier.includes('images === originals'), 'Binding verifier must reject the same bucket for public images and private originals');
-assert.ok(bindingVerifier.includes('/domains/managed') && bindingVerifier.includes('/domains/custom'), 'Binding verifier must check r2.dev and custom-domain public access');
+assert.ok(bindingVerifier.includes('${base}/managed') && bindingVerifier.includes('${base}/custom') && bindingVerifier.includes('verifyPrivateR2Access'), 'Binding verifier must check r2.dev and custom-domain public access');
 assert.ok(bindingVerifier.includes('CLOUDFLARE_PAGES_ORIGINALS_VERIFIED=true'), 'Successful privacy verification must be required before deploy');
 assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`'), 'Setup confirmation must include both R2 bucket names');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
