@@ -1,4 +1,4 @@
-import { fail, json, requireAdmin } from "../../_lib.js";
+import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 import { isTrustedPushEndpoint } from "../../_notifications.js";
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
@@ -6,7 +6,10 @@ export async function onRequestGet(context) {
 }
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
-  let sub; try { sub = await context.request.json(); } catch { return fail("Thông tin đăng ký thông báo không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin đăng ký thông báo vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin đăng ký thông báo không hợp lệ.");
+  const sub = parsedBody.value;
   const endpoint = String(sub?.endpoint || "");
   const p256dh = String(sub?.keys?.p256dh || ""), authKey = String(sub?.keys?.auth || "");
   if (!isTrustedPushEndpoint(endpoint) || endpoint.length > 2048 || p256dh.length > 256 || authKey.length > 256) return fail("Đăng ký thông báo không hợp lệ hoặc không thuộc dịch vụ thông báo đáng tin cậy.");
@@ -18,7 +21,10 @@ export async function onRequestPost(context) {
 }
 export async function onRequestDelete(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
-  let body; try { body = await context.request.json(); } catch { return fail("Thông tin hủy đăng ký không hợp lệ."); }
+  const parsedDeleteBody = await readJsonBodyLimited(context.request, 4 * 1024);
+  if (parsedDeleteBody.error === "too_large") return fail("Thông tin hủy đăng ký vượt giới hạn kích thước.", 413);
+  if (parsedDeleteBody.error || !parsedDeleteBody.value || typeof parsedDeleteBody.value !== "object" || Array.isArray(parsedDeleteBody.value)) return fail("Thông tin hủy đăng ký không hợp lệ.");
+  const body = parsedDeleteBody.value;
   const endpoint=String(body?.endpoint||""); if(!endpoint.startsWith("https://") || endpoint.length > 2048) return fail("Endpoint không hợp lệ.");
   try { await context.env.DB.prepare("DELETE FROM admin_push_subscriptions WHERE endpoint=?").bind(endpoint).run(); return json({ok:true}); }
   catch { return fail("Không thể hủy đăng ký thông báo.",503); }
