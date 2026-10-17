@@ -46,7 +46,7 @@ const warrantyClaimSource = readFileSync(new URL('../functions/api/warranty-clai
 const backupSource = readFileSync(new URL('../functions/api/admin/backup.js', import.meta.url), 'utf8');
 const restoreSource = readFileSync(new URL('../functions/api/admin/restore.js', import.meta.url), 'utf8');
 for (const table of ['customer_address_details','order_shipping_addresses','order_item_details','warranty_claim_attachments']) {
-  assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
+  assert.ok(backupSource.includes('boundedTableQuery(db, "' + table + '"'), 'Backup must include bounded query for ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
 assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary upload and lookup tokens without requiring OTP tables');
