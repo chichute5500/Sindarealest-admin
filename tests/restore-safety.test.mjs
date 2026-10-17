@@ -219,4 +219,24 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
   assert.equal(db.batchCalls, 1, "valid larger backup should still use one atomic D1 batch");
 }
 
+{
+  const duplicateWarrantyIds = validRelationshipsBackup();
+  duplicateWarrantyIds.operations.warranties.push(
+    {
+      id: "warranty-duplicate", order_id: "order-1", order_item_id: "item-1",
+      warranty_code: "WARRANTY-A", policy_name: "Bảo hành thử", duration_months: 12,
+      starts_at: "2026-01-01", ends_at: "2027-01-01", status: "active", created_at: "2026-01-01 00:00:00",
+    },
+    {
+      id: "warranty-duplicate", order_id: "order-2", order_item_id: "item-2",
+      warranty_code: "WARRANTY-B", policy_name: "Bảo hành thử", duration_months: 12,
+      starts_at: "2026-01-01", ends_at: "2027-01-01", status: "active", created_at: "2026-01-01 00:00:00",
+    },
+  );
+  const db = makeDB();
+  const response = await restoreBackup({ request: request(duplicateWarrantyIds), env: { ...env, DB: db } });
+  assert.equal(response.status, 400, "duplicate warranty IDs must be rejected as invalid backup data");
+  assert.equal(db.batchCalls, 0, "duplicate warranty IDs must be rejected before destructive writes");
+}
+
 console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, larger valid backup acceptance, and single-batch failure handling.");
