@@ -59,11 +59,11 @@ jobs:
               production_branch:"main",
               deployment_configs:{
                 preview:{
-                  compatibility_date:"2026-10-18",
+                  compatibility_date:"2026-10-17",
                   d1_databases:{DB:{id:$db}},
                   r2_buckets:{IMAGES:{name:$images}}
                 },
-                production:{compatibility_date:"2026-10-18"}
+                production:{compatibility_date:"2026-10-17"}
               }
             }')"
             http_status="$(curl --silent --show-error -o /tmp/pages-create-response.json -w "%{http_code}" -X POST "$api/pages/projects" \
