@@ -66,7 +66,7 @@ Trước đây trạng thái khiếu nại được cập nhật trước, sau �
 
 Trước đây API quản trị chỉ cần URL bắt đầu bằng HTTPS để lưu endpoint Web Push. Khi cập nhật đơn hàng, máy chủ gửi yêu cầu ra các endpoint đã lưu; một URL tùy ý có thể biến luồng thông báo thành kết nối outbound không mong muốn. Ngoài ra, việc tải tất cả subscription và gửi đồng thời không có giới hạn gây tải không cần thiết nếu dữ liệu phình to.
 
-**Đã sửa:** Kiểm tra endpoint theo danh sách host dịch vụ push của trình duyệt trước khi lưu và kiểm tra lại trước khi gửi; query và danh sách gửi đều giới hạn 50 subscription gần nhất. API xóa subscription vẫn cho phép xóa endpoint HTTPS cũ để không khóa đường dọn dữ liệu.
+**Đã sửa:** Kiểm tra endpoint theo danh sách host dịch vụ push của trình duyệt trước khi lưu và kiểm tra lại trước khi gửi; query và danh sách gửi đều giới hạn 50 subscription gần nhất; tắt tự động theo redirect. Service worker cũng chỉ chấp nhận URL thông báo cùng origin và trong đường dẫn /admin/, không cho payload chuyển hướng ra website khác. API xóa subscription vẫn cho phép xóa endpoint HTTPS cũ để không khóa đường dọn dữ liệu.
 
 ### 8. JSON request body cần giới hạn trước khi parse
 **Mức độ:** Trung bình — giảm nguy cơ tiêu thụ bộ nhớ quá mức ở các API công khai/quản trị nhạy cảm.
