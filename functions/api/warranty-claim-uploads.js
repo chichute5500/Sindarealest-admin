@@ -70,10 +70,10 @@ export async function onRequestPost({ request, env }) {
   let key = "";
   try {
     const warranty = await env.DB.prepare(
-      "SELECT w.id,w.warranty_code,w.status,w.ends_at FROM warranties w WHERE upper(w.warranty_code)=? LIMIT 1",
+      "SELECT w.id,w.warranty_code,w.status,w.starts_at,w.ends_at FROM warranties w WHERE upper(w.warranty_code)=? LIMIT 1",
     ).bind(warrantyCode).first();
     if (!warranty || (tokenWarrantyId && String(warranty.id) !== tokenWarrantyId) ||
-        !isWarrantyEligibleOnDate(warranty.status, warranty.ends_at, getCurrentDateInVietnam())) {
+        !isWarrantyEligibleOnDate(warranty.status, warranty.starts_at, warranty.ends_at, getCurrentDateInVietnam())) {
       return fail("Không tìm thấy bảo hành còn hiệu lực.", 404);
     }
 
