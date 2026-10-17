@@ -91,3 +91,10 @@ Chọn một quy trình deploy chính (Termux hoặc GitHub Actions) và dùng n
 - Trang `/admin/` hiện trang chủ: kiểm tra đã deploy đúng gói này và file public/_redirects.
 - Nếu check/test lỗi: giữ nguyên toàn bộ thông báo để xác định lỗi trước khi deploy lại.
 - Không xóa D1 hoặc R2, không chạy lại seed trong database đã có dữ liệu, không thu hồi token đang được workflow sử dụng nếu chưa có token thay thế.
+
+
+WATERMARK AND PRIVATE ORIGINALS SAFETY
+- `IMAGES` stores public optimized WebP derivatives and the existing `/watermark.webp` logo.
+- `ORIGINALS` must be a separate private R2 bucket. Do not enable public access, `r2.dev`, or a public custom domain for it.
+- The admin upload API refuses new uploads until the `ORIGINALS` binding exists; the original is stored privately and only the clean WebP derivative is served publicly.
+- Production deployment is blocked unless `CLOUDFLARE_PAGES_ORIGINALS_READY=true` is set after verifying the binding in the correct Pages environment. Do not set this variable merely to bypass a failed upload.
