@@ -144,6 +144,7 @@ const demoWarrantyRow = {
 function warrantyDB() {
   const settings = new Map();
   const query = (sql, values=[]) => ({
+    sql,
     async run() {
       if (sql.includes('INSERT INTO settings')) settings.set(values[0],{value:values[1],updated_at:new Date().toISOString().replace('T',' ').replace('Z','')});
       if (sql.includes('DELETE FROM settings WHERE key=?')) settings.delete(values[0]);
