@@ -94,7 +94,7 @@ Trước đây mã chỉ kiểm tra kích thước `File` sau khi `request.formD
 
 Route upload ảnh sản phẩm trước đây gọi `formData()` trước khi kiểm tra giới hạn 5 MB cho ảnh hiển thị và 20 MB cho ảnh gốc. Vì vậy một multipart body quá lớn vẫn có thể bị đọc/phân tích trước khi kiểm tra kích thước từng tệp.
 
-**Đã sửa:** Dùng chung `readBodyBytesLimited()` với trần tổng multipart 26 MB, bao gồm cả request không có `Content-Length`; chỉ sau khi nằm trong giới hạn mới parse form data. Kiểm tra riêng kích thước ảnh hiển thị/ảnh gốc và chữ ký WebP vẫn được giữ nguyên.
+**Đã sửa:** Dùng chung `readBodyBytesLimited()` với trần tổng multipart 26 MB, bao gồm cả request không có `Content-Length`; chỉ sau khi nằm trong giới hạn mới parse form data. Giữ kiểm tra chữ ký WebP cho ảnh hiển thị và bổ sung kiểm tra magic bytes JPEG/PNG/WebP cho ảnh gốc trước khi ghi R2. Regression test xác nhận tệp gốc giả mạo bị từ chối trước mọi thao tác lưu.
 
 ### 12. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
