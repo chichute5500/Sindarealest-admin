@@ -60,13 +60,13 @@ Lưu bindings/secrets trước rồi mới chạy `npm run setup:cloudflare` ho�
 Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test` rồi mới deploy; workflow KHÔNG chạy migrations hoặc seed.
 
 Trong GitHub repository, thêm Secrets:
-- `CLOUDFLARE_API_TOKEN`: token chỉ có quyền tối thiểu cần cho Pages deploy và đọc danh sách project.
+- `CLOUDFLARE_API_TOKEN`: token cần quyền Pages Read/Deploy và R2 Read để workflow xác minh binding Production cùng trạng thái public access.
 - `CLOUDFLARE_ACCOUNT_ID`: Account ID của tài khoản Cloudflare đúng.
 
 Thêm Repository Variables:
 - `CLOUDFLARE_PAGES_PROJECT`: tên Pages project đúng.
 - `CLOUDFLARE_PAGES_BRANCH`: production branch đúng.
-- `CLOUDFLARE_PAGES_ORIGINALS_READY`: chỉ đặt chuỗi `true` SAU KHI xác minh bucket `ORIGINALS` riêng tư và binding được gắn trên đúng môi trường Production Pages. Nếu chưa xác minh, để trống/false; workflow sẽ bỏ qua deploy production.
+- Workflow tự đọc cấu hình Pages Production và kiểm tra `IMAGES`/`ORIGINALS` là hai bucket khác nhau; sau đó kiểm tra API R2 để xác nhận `r2.dev` bị tắt và không có custom domain đang bật public access. Nếu token thiếu quyền, API không xác minh được hoặc bucket đang public, workflow sẽ dừng trước deploy. Không cần đặt biến `CLOUDFLARE_PAGES_ORIGINALS_READY`.
 
 Token cần được tạo trong Cloudflare Dashboard và không được commit vào repository. Trước khi bật workflow, xác nhận project đã tồn tại trong cùng tài khoản với Account ID. Nếu thiếu hoặc sai cấu hình, workflow phải thất bại trước deploy.
 
