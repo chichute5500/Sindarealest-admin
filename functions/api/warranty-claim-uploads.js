@@ -1,40 +1,9 @@
-import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, storageOrFail } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, readBodyBytesLimited, storageOrFail } from "../_lib.js";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_MULTIPART_BYTES = MAX_IMAGE_BYTES + 1024 * 1024;
 const WARRANTY_CODE_PATTERN = /^SDW-[A-Z0-9]{24}$/;
 
-async function readMultipartBodyLimited(request, maxBytes) {
-  const declaredLength = Number(request.headers.get("Content-Length") || 0);
-  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
-  if (!request.body) return { error: "invalid" };
-
-  const reader = request.body.getReader();
-  const chunks = [];
-  let total = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
-        try { await reader.cancel(); } catch {}
-        return { error: "too_large" };
-      }
-      chunks.push(value);
-    }
-  } catch {
-    return { error: "invalid" };
-  }
-
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return { bytes };
-}
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");
@@ -65,7 +34,7 @@ export async function onRequestPost({ request, env }) {
     return fail("Dịch vụ tải ảnh chưa sẵn sàng.", 503);
   }
 
-  const parsedMultipart = await readMultipartBodyLimited(request, MAX_MULTIPART_BYTES);
+  const parsedMultipart = await readBodyBytesLimited(request, MAX_MULTIPART_BYTES);
   if (parsedMultipart.error === "too_large") return fail("Biểu mẫu tải ảnh vượt quá giới hạn 6 MB.", 413);
   if (parsedMultipart.error) return fail("Không đọc được biểu mẫu ảnh.");
 
