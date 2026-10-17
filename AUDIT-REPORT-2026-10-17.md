@@ -215,3 +215,11 @@ Nguồn: https://developers.cloudflare.com/d1/platform/limits/
 Giao diện quản trị từng cho phép chọn tệp JSON tới 40 MB, trong khi API restore giới hạn 20 MB. Người dùng có thể chọn tệp được giao diện chấp nhận nhưng bị server từ chối bằng HTTP 413.
 
 **Đã sửa trên nhánh rà soát:** giao diện giờ từ chối tệp lớn hơn 20 MB ngay khi chọn; regression test xác nhận giới hạn giao diện khớp giới hạn API. Kiểm thử toàn diện pass tại [CI run 39049190761](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39049190761).
+
+
+### Backup JSON không bao gồm tệp nhị phân trong R2
+**Mức độ:** Trung bình — tránh hiểu nhầm rằng tệp backup D1 có thể phục hồi cả nội dung ảnh đã mất.
+
+Backup JSON xuất dữ liệu sản phẩm và metadata/khóa ảnh bảo hành trong D1, nhưng không tải nội dung object ảnh từ bucket R2 vào tệp JSON. Vì vậy khôi phục backup chỉ tái lập dữ liệu D1; ảnh vẫn cần tồn tại trong các bucket R2 tương ứng. Đã bổ sung cảnh báo ở giao diện tải và khôi phục backup để người quản trị sao lưu R2 riêng. Regression test xác nhận cảnh báo này không bị bỏ mất.
+
+**Giới hạn còn lại:** Quy trình sao lưu object R2 và xác minh khả năng khôi phục R2 vẫn cần thực hiện riêng; không thể tuyên bố backup JSON là bản sao lưu đầy đủ cho toàn bộ website.
