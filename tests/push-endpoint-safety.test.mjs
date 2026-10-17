@@ -29,6 +29,8 @@ assert.match(notifications, /ORDER BY updated_at DESC LIMIT 50/,
   "push delivery must query a bounded number of recent admin subscriptions");
 assert.match(notifications, /\.slice\(0,50\)/,
   "push delivery must apply a second in-memory cap");
+assert.match(notifications, /redirect:"manual"/,
+  "push delivery must not follow redirects outside the trusted endpoint allowlist");
 
 const route = readFileSync(new URL("../functions/api/admin/push-subscriptions.js", import.meta.url), "utf8");
 assert.ok(route.includes("isTrustedPushEndpoint(endpoint)"),
