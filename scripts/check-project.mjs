@@ -86,8 +86,8 @@ check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi cata
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
 for (const table of ['customers','orders','order_items','warranties','warranty_claims','audit_logs','public_rate_limits']) check(new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`).test(newMigration), `Migration 0003 thiếu bảng ${table}`);
 const orderContactsMigration = existsSync(join(root, 'migrations/0007_order_contact_details.sql')) ? readFileSync(join(root, 'migrations/0007_order_contact_details.sql'), 'utf8') : '';
-check(/CREATE TABLE IF NOT EXISTS order_contact_details\\b/.test(orderContactsMigration), 'Migration 0007 thiếu bảng order_contact_details');
-check(/INSERT OR IGNORE INTO order_contact_details[\\s\\S]*FROM orders o[\\s\\S]*JOIN customers c ON c.id = o.customer_id/i.test(orderContactsMigration), 'Migration 0007 phải backfill thông tin liên hệ cho đơn hàng hiện có');
+check(/CREATE TABLE IF NOT EXISTS order_contact_details\b/.test(orderContactsMigration), 'Migration 0007 thiếu bảng order_contact_details');
+check(/INSERT OR IGNORE INTO order_contact_details[\s\S]*FROM orders o[\s\S]*JOIN customers c ON c.id = o.customer_id/i.test(orderContactsMigration), 'Migration 0007 phải backfill thông tin liên hệ cho đơn hàng hiện có');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
