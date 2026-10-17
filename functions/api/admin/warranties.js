@@ -18,9 +18,15 @@ export async function onRequestPatch(context) {
   const id = String(body?.id || ""), status = String(body?.status || ""), note = String(body?.adminNote || "").trim().slice(0,1600);
   if (!id || !["received","reviewing","approved","rejected","resolved"].includes(status)) return fail("Trạng thái yêu cầu không hợp lệ.");
   try {
-    const result = await context.env.DB.prepare("UPDATE warranty_claims SET status=?,admin_note=?,updated_at=datetime('now') WHERE id=?").bind(status,note,id).run();
-    if (!result.meta?.changes) return fail("Không tìm thấy yêu cầu bảo hành.",404);
-    await context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'warranty_claim_updated', 'warranty_claim', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ status })).run();
+    const result = await context.env.DB.batch([
+      context.env.DB.prepare("UPDATE warranty_claims SET status=?,admin_note=?,updated_at=datetime('now') WHERE id=?").bind(status,note,id),
+      context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'warranty_claim_updated', 'warranty_claim', ?, ? " +
+        "WHERE EXISTS (SELECT 1 FROM warranty_claims WHERE id=?)",
+      ).bind(crypto.randomUUID(),id,JSON.stringify({ status }),id),
+    ]);
+    if (!result[0]?.meta?.changes) return fail("Không tìm thấy yêu cầu bảo hành.",404);
     return json({ ok:true,message:"Đã cập nhật yêu cầu hỗ trợ." });
   } catch { return fail("Không thể cập nhật yêu cầu hỗ trợ.",503); }
 }
