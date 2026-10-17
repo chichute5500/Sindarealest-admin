@@ -55,11 +55,11 @@ const response = await createOrder({
 
 assert.equal(response.status, 201, "valid checkout should create the order");
 assert.equal((await response.json()).ok, true);
-assert.ok(!batchedStatements.some((s) => /^UPDATE customers\\b/i.test(s.sql)),
+assert.ok(!batchedStatements.some((s) => /^UPDATE customers\b/i.test(s.sql)),
   "public checkout must never overwrite an existing customer profile");
-assert.ok(batchedStatements.some((s) => /INSERT INTO customers\\([^)]*\\) VALUES\\([^)]*\\) ON CONFLICT\\(phone\\) DO NOTHING/i.test(s.sql)),
+assert.ok(batchedStatements.some((s) => /INSERT INTO customers\([^)]*\) VALUES\([^)]*\) ON CONFLICT\(phone\) DO NOTHING/i.test(s.sql)),
   "profile creation must resolve same-phone races without updating an existing profile");
-const orderInsert = batchedStatements.find((s) => /INSERT INTO orders\\([^)]*\\) SELECT .*FROM customers c WHERE c\\.phone=\\?/i.test(s.sql));
+const orderInsert = batchedStatements.find((s) => /INSERT INTO orders\([^)]*\) SELECT .*FROM customers c WHERE c\.phone=\?/i.test(s.sql));
 assert.ok(orderInsert, "order must bind to the canonical customer row selected atomically by phone");
 assert.equal(orderInsert.values.at(-1), "0900000000");
 const contactSnapshot = batchedStatements.find((s) => /INSERT INTO order_contact_details/i.test(s.sql));
