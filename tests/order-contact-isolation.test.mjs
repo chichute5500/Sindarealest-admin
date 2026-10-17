@@ -66,5 +66,6 @@ assert.ok(orderInsert, "order must bind to the canonical customer row selected a
 assert.equal(orderInsert.values.at(-1), "0900000000");
 const contactSnapshot = batchedStatements.find((s) => /INSERT INTO order_contact_details/i.test(s.sql));
 assert.ok(contactSnapshot, "each order must persist its own contact snapshot");
-assert.deepEqual(contactSnapshot.values.slice(0, 4),
-  ["", "", "", ""]);
+assert.deepEqual(contactSnapshot.values.slice(1, 4),
+  ["Tên gửi lần này", "0900000000", "order@example.test"],
+  "snapshot must preserve the data submitted for this order without changing the customer profile");
