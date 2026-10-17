@@ -124,6 +124,10 @@ for (const file of [
 const config = existsSync(join(root, 'package.json')) ? JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) : {};
 check(config.engines?.node === '>=22 <23', 'package.json phải pin dòng Node.js 22.x để môi trường CI/Termux nhất quán');
 check(config.scripts?.deploy === 'node scripts/deploy-cloudflare.mjs', 'npm run deploy phải đi qua script xác minh project/branch');
+const deployScript = existsSync(join(root, 'scripts/deploy-cloudflare.mjs')) ? readFileSync(join(root, 'scripts/deploy-cloudflare.mjs'), 'utf8') : '';
+check(deployScript.includes('order_contact_details') && deployScript.includes("'d1', 'execute'") && deployScript.includes("'--remote'"), 'Deploy script phải xác minh read-only rằng migration order_contact_details đã có trong D1 trước khi deploy');
+const deployWorkflow = existsSync(join(root, '.github/workflows/deploy.yml')) ? readFileSync(join(root, '.github/workflows/deploy.yml'), 'utf8') : '';
+check(deployWorkflow.includes('CLOUDFLARE_D1_DATABASE: sindarealest-db'), 'Workflow deploy phải truyền đúng D1 database để kiểm tra schema');
 const wranglerConfig = existsSync(join(root, 'wrangler.toml')) ? readFileSync(join(root, 'wrangler.toml'), 'utf8') : '';
 check(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Không được bật Wrangler production-config mode trước khi tải/đối chiếu config thật của Pages project');
 const ignore = existsSync(join(root, '.gitignore')) ? readFileSync(join(root, '.gitignore'), 'utf8') : '';
