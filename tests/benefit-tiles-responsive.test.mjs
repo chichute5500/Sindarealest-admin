@@ -42,10 +42,12 @@ assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border
   'The reference Zalo CTA gradient and border must exist.');
 assert.match(html, /\.pill-btn\{[^}]*border-radius:999px/,
   'The reference Zalo CTA uses a pill-shaped radius.');
-assert.ok(css.includes('background:' + ctaGradient),
-  'All six tile surfaces must reuse the exact Zalo CTA gradient.');
-assert.ok(css.includes('border:1px solid rgba(220,184,114,.57)'),
-  'The glass surface must reuse the Zalo CTA border color.');
+assert.ok(css.includes('background:linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))'),
+  'The tile surface must use a stronger neutral glass gradient, not a yellow-tinted gradient.');
+assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
+  'The tile surface must have elevated, multi-layer depth.');
+assert.ok(css.includes('border:1px solid rgba(255,255,255,.82)'),
+  'The neutral tile border must remain fixed between light and dark modes.');
 
 const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
 assert.ok(stripRule.includes('background:rgba(255,255,255,.40)'),
@@ -56,8 +58,8 @@ assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
   'The outer region must match the site glass blur treatment.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?border-radius:999px/,
   'Each inner text surface must use the same pill-like rounding as the Zalo CTA.');
-assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?background:linear-gradient\(135deg,rgba\(255,255,255,\.30\),rgba\(189,145,63,\.20\)\)/,
-  'The inner glass background must remain fixed across theme switches.');
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?background:linear-gradient\(135deg,rgba\(250,251,252,\.94\),rgba\(224,228,232,\.86\)\)/,
+  'The neutral inner glass background must remain fixed across theme switches.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
   'The shared surface must keep its frosted glass treatment.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
@@ -79,6 +81,14 @@ assert.match(css, /\.service-strip \.service-text strong\{[^}]*font-size:12px/,
   'Desktop title text must be enlarged by 20% from 10px.');
 assert.match(css, /\.service-strip \.service-text small\{[^}]*font-size:10\.2px/,
   'Desktop caption text must be enlarged by 20% from 8.5px.');
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?color:#262626/,
+  'The tile text color must stay dark and readable in both themes.');
+assert.match(css, /\.service-strip \.service-text small\{[^}]*color:#53575a/,
+  'The description text must use a fixed neutral color, not the theme's warm muted color.');
+assert.doesNotMatch(css, /\.service-strip \.service-copy\{[^}]*color:var\(--ink\)/,
+  'The inner tile text must not inherit a theme-dependent ink color.');
+assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(--muted\)/,
+  'The inner tile description must not inherit a theme-dependent muted color.');
 assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:12\.24px\}[\s\S]*?\.service-strip \.service-text small\{font-size:10\.44px\}/,
   'Tablet text must retain the 20% size increase.');
 assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:11\.4px[\s\S]*?\.service-strip \.service-text small\{font-size:9\.84px/,
