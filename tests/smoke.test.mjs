@@ -3,6 +3,7 @@ import { createSession, verifySession, validateProduct, hasSecuritySecrets, getC
 import { onRequestGet as publicProducts } from '../functions/api/products.js';
 import { onRequestGet as adminProducts } from '../functions/api/admin/products.js';
 import { onRequestPost as restoreProducts } from '../functions/api/admin/restore.js';
+import { onRequestGet as createAdminBackup } from '../functions/api/admin/backup.js';
 import { onRequestPost as adminLogin } from '../functions/api/admin/login.js';
 import { readFileSync } from 'node:fs';
 
@@ -52,6 +53,8 @@ const mockDB = {
   prepare(sql) {
     let bound = [];
     const statement = {
+      sql,
+      get boundValues() { return bound; },
       bind(...values) { bound = values; return statement; },
       async first() {
         if (sql.includes('FROM settings')) return { value: dbState.showPrices ? '1' : '0' };
@@ -119,9 +122,17 @@ data = await response.json();
 assert.equal(data.products.length, 2, 'quản trị được thấy cả sản phẩm đang ẩn');
 
 let batchCalls = 0;
+const restoreBatchStatements = [];
 const restoreDB = {
   ...mockDB,
-  async batch(statements) { batchCalls++; return statements.map(() => ({ success: true })); },
+  async batch(statements) {
+    batchCalls++;
+    restoreBatchStatements.push(statements.map(statement => ({
+      sql: statement.sql,
+      values: statement.boundValues || [],
+    })));
+    return statements.map(() => ({ success: true }));
+  },
 };
 const restoredProduct = {
   id: 'restore-product-1', slug: 'restore-product-1', sku: 'SD-RESTORE-1',
