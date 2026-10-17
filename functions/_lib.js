@@ -28,6 +28,32 @@ export function storageOrFail(env) {
   return null;
 }
 
+export function getCurrentDateInVietnam(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const part = (type) => parts.find((item) => item.type === type)?.value || "";
+  return part("year") + "-" + part("month") + "-" + part("day");
+}
+
+function isIsoCalendarDate(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value ?? ""));
+}
+
+export function warrantyStatusOnDate(status, endsAt, today = getCurrentDateInVietnam()) {
+  const endDate = String(endsAt ?? "");
+  if (status === "active" && isIsoCalendarDate(endDate) && endDate < today) return "expired";
+  return status;
+}
+
+export function isWarrantyEligibleOnDate(status, endsAt, today = getCurrentDateInVietnam()) {
+  const endDate = String(endsAt ?? "");
+  return status === "active" && isIsoCalendarDate(endDate) && endDate >= today;
+}
+
 function b64url(bytesOrString) {
   const bytes = typeof bytesOrString === "string" ? encoder.encode(bytesOrString) : bytesOrString;
   let binary = "";
