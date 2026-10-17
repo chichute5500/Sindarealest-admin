@@ -162,7 +162,16 @@ function warrantyDB() {
   });
   return {
     prepare(sql) { return { ...query(sql), bind(...values) { return query(sql,values); } }; },
-    async batch(statements) { for (const statement of statements) await statement.run(); return [{ success: true }, { success: true, results: [{ attempts: 1 }] }]; }
+    async batch(statements) {
+      for (const statement of statements) await statement.run();
+      if (statements[0]?.sql.includes('INSERT INTO warranty_claims')) {
+        return statements.map((_, index) => ({ meta: { changes: 1 } }));
+      }
+      if (statements[0]?.sql.includes('INSERT INTO public_rate_limits')) {
+        return [{ success: true }, { success: true, results: [{ attempts: 1 }] }];
+      }
+      return statements.map(() => ({ meta: { changes: 1 } }));
+    }
   };
 }
 const warrantyDBInstance = warrantyDB();
