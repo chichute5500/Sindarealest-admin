@@ -9,7 +9,6 @@ const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
 const MAX_RESTORE_RECORDS = 5000;
 // D1 Workers scripts have an approximately 5,000-bindings budget. Keep margin
 // for runtime overhead and reject before building a destructive batch.
-const MAX_RESTORE_BINDINGS = 4500;
 
 
 function validateOperations(operations) {
@@ -163,28 +162,7 @@ export async function onRequestPost(context) {
     return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần khôi phục an toàn. Hãy tạo bản nhỏ hơn hoặc liên hệ để lên kế hoạch nhập theo lô.", 413);
   }
 
-  // D1 applies a per-Worker-script bound-parameter budget across a batch.
-  // Count conservatively before creating any write statements so valid-looking
-  // backups cannot fail mid-restore due to too many bindings.
-  const bindingCount = products.length * 13 + (operations
-    ? operations.customers.length * 7
-      + operations.customerAddressDetails.length * 7
-      + operations.orders.length * 11
-      + operations.orderShippingAddresses.length * 8
-      + operations.orderContactDetails.length * 5
-      + operations.items.length * 8
-      + operations.orderItemDetails.length * 2
-      + operations.warranties.length * 10
-      + operations.claims.length * 9
-      + operations.warrantyClaimAttachments.length * 2
-      + operations.logs.length * 7
-    : 0) + 1 + (v2 ? 8 + watermarkUpdates.length * 2 : 0);
-  if (bindingCount > MAX_RESTORE_BINDINGS) {
-    return fail("Bản sao lưu vượt giới hạn an toàn của số tham số D1 cho một lần khôi phục. Hãy chia dữ liệu thành các bản nhỏ hơn trước khi tiếp tục.", 413);
-  }
-
-  try {
-    const db = context.env.DB;
+  // D1 applies a per-Worker-scriptDB;
     const statements = [];
     if (operations) statements.push(
       db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'"), db.prepare("DELETE FROM warranty_claim_uploads"),
