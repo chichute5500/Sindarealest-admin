@@ -54,7 +54,7 @@ export async function onRequestPost(context) {
     return fail("Không đọc được tệp ảnh.");
   }
   const file = form.get("file");
-  const original = form.get("original") || file;
+  const original = form.get("original");
 
   if (!file || typeof file.arrayBuffer !== "function") return fail("Chưa chọn ảnh.");
   if (file.size <= 0 || file.size > MAX_DERIVATIVE_BYTES) return fail("Ảnh hiển thị sau tối ưu phải nhỏ hơn hoặc bằng 5 MB.");
