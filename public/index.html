@@ -1055,6 +1055,13 @@ img { -webkit-user-drag:none; user-select:none; }
 }
 @media(hover:none){#order .order-step:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){#order .order-step{transition:none}#order .order-step:hover{transform:none}}
+
+/* Touch devices must not retain hover styling after tap; active press feedback remains intact. */
+@media(hover:none){
+  .detail-gallery-arrow:hover:not(:active),.sd-fullscreen-arrow:hover:not(:active){transform:translateY(-50%) scale(1)}
+  .featured-arrow:hover:not(:active),.slide-controls button:hover:not(:active),.page-btn.page-arrow:hover:not(:active){transform:scale(1)}
+  .detail-gallery-arrow:hover:not(:active),.featured-arrow:hover:not(:active),.slide-controls button:hover:not(:active),.page-btn.page-arrow:hover:not(:active),.sd-fullscreen-arrow:hover:not(:active){background:var(--sd-gallery-glass);border-color:var(--sd-gallery-glass-border)}
+}
 </style>
 
 </body>
