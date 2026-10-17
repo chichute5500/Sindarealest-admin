@@ -23,7 +23,7 @@ function runTest(file) {
 
 for (const required of [
   'package.json', 'wrangler.toml',
-  'functions/_lib.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
+  'functions/_lib.js', 'functions/_lib/watermark-settings.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
@@ -79,7 +79,8 @@ check(seedSkus.every(sku => source.some(p => p.sku === sku)), 'SKU trong SQL see
 const homepage = existsSync(join(root, 'public/index.html')) ? readFileSync(join(root, 'public/index.html'), 'utf8') : '';
 check(homepage.includes("fetch('/api/products'"), 'Trang chủ chưa lấy sản phẩm từ API');
 check(homepage.includes('og:title') && homepage.includes('twitter:card'), 'Thiếu metadata social preview');
-check(homepage.includes('opacity:.68'), 'Watermark chưa đặt độ mờ theo phương án');
+check(homepage.includes('window.__sdUpdateDetailWatermark') && homepage.includes("document.querySelector('.detail-image-stage')"), 'Watermark phải phủ ảnh lớn trong chi tiết sản phẩm');
+check(!homepage.includes("document.querySelectorAll('.product-photo") && !homepage.includes('.product-photo .sd-viewer-watermark') && !homepage.includes('.detail-thumb .sd-viewer-watermark'), 'Watermark không được phủ thẻ danh sách hoặc thumbnail');
 check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claims'), 'Trang chủ chưa kết nối yêu cầu đặt hàng và bảo hành');
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
