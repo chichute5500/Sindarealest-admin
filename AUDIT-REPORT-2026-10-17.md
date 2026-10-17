@@ -94,7 +94,7 @@ Trước đây mã chỉ kiểm tra kích thước `File` sau khi `request.formD
 
 Backup/restore trước đây không có cùng giới hạn tổng bản ghi và kích thước: backup có thể xuất một tệp lớn hơn khả năng khôi phục an toàn, trong khi restore cho phép tới 20.000 bản ghi ở từng mảng riêng lẻ. Tệp lớn có thể khiến Worker phải tạo batch khổng lồ hoặc vượt thời gian/giới hạn tài nguyên.
 
-**Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn; backup cũng từ chối xuất tệp không thể khôi phục trong giới hạn hiện tại. Cả hai kiểm tra đều xảy ra trước khi có thao tác ghi/xóa D1; có regression test cho giới hạn tổng bản ghi và payload.
+**Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn. Backup đếm tổng bản ghi trong cùng D1 batch trước; mỗi truy vấn bảng chỉ trả dữ liệu nếu tổng nằm trong ngân sách, tránh nạp hàng chục nghìn dòng vào bộ nhớ rồi mới từ chối. Có regression test cho giới hạn tổng bản ghi và giới hạn từng truy vấn.
 
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
