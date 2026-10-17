@@ -18,13 +18,17 @@ function makeDB({ productRows = [], auditLogs = [] } = {}) {
       return statement;
     },
     async batch(statements) {
-      executedQueries.push(...statements.map((statement) => statement.sql));
+      executedQueries.push(...statements);
+      const total = productRows.length + auditLogs.length;
       return statements.map((statement) => ({
         results: statement.sql.startsWith("SELECT") && statement.sql.includes("AS total_count")
-          ? [{ total_count: productRows.length + auditLogs.length }]
-          : statement.sql.includes("SELECT * FROM products") ? productRows
-          : statement.sql.includes("SELECT * FROM audit_logs") ? auditLogs
-          : [],
+          ? [{ total_count: total }]
+          : statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?")
+            ? (total <= 5000
+              ? statement.sql.includes("SELECT * FROM products") ? productRows
+                : statement.sql.includes("SELECT * FROM audit_logs") ? auditLogs : []
+              : [])
+            : statement.sql.includes("FROM settings") ? [] : [],
       }));
     },
     get executedQueries() { return executedQueries; },
@@ -58,5 +62,10 @@ const response = await createBackup({
 assert.equal(response.status, 413,
   "backup export above the shared record budget must fail explicitly rather than create an unrestorable file");
 assert.match((await response.json()).error, /5\.000 bản ghi/);
-assert.equal(db.executedQueries.filter((sql) => /FROM (products|customers|orders|order_items|warranties|warranty_claims|audit_logs|customer_address_details|order_shipping_addresses|order_contact_details|order_item_details|warranty_claim_attachments)/.test(sql) && /LIMIT 5001$/.test(sql)).length, 12, "all exported data tables must be capped before D1 materializes result sets");
+const guardedQueries = db.executedQueries.filter((statement) => /SELECT \\* FROM (products|customers|orders|order_items|warranties|warranty_claims|audit_logs|customer_address_details|order_shipping_addresses|order_contact_details|order_item_details|warranty_claim_attachments)/.test(statement.sql));
+assert.equal(guardedQueries.length, 12, "all exported data tables must be queried with a shared total-row guard");
+assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?") && statement.values[0] === 5000 && /LIMIT 5001$/.test(statement.sql)),
+  "all table reads must be gated and capped before D1 materializes rows");
+assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?")),
+  "oversized backups must return no table rows before the route rejects the export");
 console.log("PASS: backup export enforces shared record and query limits.");
