@@ -396,7 +396,13 @@ export async function rateLimitLogin(db, request, secret) {
     db.prepare("SELECT attempts FROM admin_login_attempts WHERE ip_hash=?").bind(ipHash),
   ]);
 
-  const attempts = Number(results?.[1]?.results?.[0]?.attempts || 0);
+  const attempts = Number(results?.[1]?.results?.[0]?.attempts);
+  // A missing counter result is not evidence that this IP is below the
+  // threshold. Fail closed so the login endpoint returns 503 rather than
+  // allowing attempts when D1 cannot verify the limiter state.
+  if (!Number.isSafeInteger(attempts) || attempts < 1) {
+    throw new Error("Login rate-limit counter could not be verified");
+  }
   return { limited: attempts > 5, ipHash };
 }
 
