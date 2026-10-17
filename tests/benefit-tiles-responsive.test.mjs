@@ -84,7 +84,7 @@ assert.match(css, /\.service-strip \.service-text small\{[^}]*font-size:10\.2px/
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?color:#262626/,
   'The tile text color must stay dark and readable in both themes.');
 assert.match(css, /\.service-strip \.service-text small\{[^}]*color:#53575a/,
-  'The description text must use a fixed neutral color, not the theme's warm muted color.');
+  'The description text must use a fixed neutral color, not a theme-dependent warm muted color.');
 assert.doesNotMatch(css, /\.service-strip \.service-copy\{[^}]*color:var\(--ink\)/,
   'The inner tile text must not inherit a theme-dependent ink color.');
 assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(--muted\)/,
