@@ -56,6 +56,16 @@ try {
 
   const otherScope = await rateLimitPublicRequest({ DB, SESSION_SECRET }, request, "warranty_lookup", 6, 900);
   assert.equal(otherScope.limited, false, "rate limits must be isolated by API scope");
+
+  const unverifiableDB = {
+    prepare(sql) { return { sql, bind() { return this; } }; },
+    async batch() { return [{ success: true }, { success: true, results: [] }]; },
+  };
+  await assert.rejects(
+    rateLimitPublicRequest({ DB: unverifiableDB, SESSION_SECRET }, request, "order_create", 6, 900),
+    /rate-limit counter could not be verified/i,
+    "a missing counter result must fail closed instead of disabling public rate limiting",
+  );
 } finally {
   Date.now = originalNow;
 }
