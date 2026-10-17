@@ -35,29 +35,67 @@ assert.equal((markup.match(/class="service-copy"><span class="service-icon">[\s\
 assert.match(markup, /href="https:\/\/zalo\.me\/0827049192"/,
   'The Zalo tile must keep its confirmed destination.');
 assert.match(markup, /<strong>Tư vấn\/đặt hàng qua Zalo<\/strong><small>Trao đổi trực tiếp qua Zalo<\/small>/,
-  'The Zalo tile must use the approved label without an unverified 24/7 claim.');
+  'The Zalo tile must use the approved service label and avoid an unverified 24/7 claim.');
 
 const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
-assert.ok(css.includes('background:' + ctaGradient),
-  'All six tile surfaces must reuse the exact Zalo CTA gradient.');
-assert.ok(css.includes('border:1px solid rgba(220,184,114,.57)'),
-  'The glass surface must reuse the Zalo CTA border color.');
+assert.match(html, /\.pill-btn\{[^}]*border-radius:999px/,
+  'The reference Zalo CTA uses a pill-shaped radius.');
+assert.ok(css.includes('background:linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))'),
+  'The tile surface must retain the Zalo white-to-gold glass gradient with stronger opacity for dark mode.');
+assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
+  'The tile surface must have elevated, multi-layer depth.');
+assert.ok(css.includes('border:1px solid rgba(220,184,114,.67)'),
+  'The warm-gold tile border must remain fixed between light and dark modes.');
+
+const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
+assert.ok(stripRule.includes('background:rgba(255,255,255,.40)'),
+  'The outer region must use one fixed glass background in both themes.');
+assert.doesNotMatch(stripRule, /var\(--panel\)|var\(--card-glass\)|html\.dark/,
+  'The outer background must not use a theme-switching surface token.');
+assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
+  'The outer region must match the site glass blur treatment.');
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?border-radius:999px/,
+  'Each inner text surface must use the same pill-like rounding as the Zalo CTA.');
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?background:linear-gradient\(135deg,rgba\(255,255,255,\.40\),rgba\(189,145,63,\.30\)\)/,
+  'The Zalo-like warm glass background must remain fixed across theme switches.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
-  'The shared surface must match the CTA blur treatment.');
+  'The shared surface must keep its frosted glass treatment.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
   'Icons must not introduce a second background panel.');
 assert.doesNotMatch(css, /\.service-strip \.service-copy::before|--service-copy-bg|html\.dark/,
-  'Avoid the prior competing overlay and theme-specific surface colors.');
+  'Avoid competing overlays and theme-specific inner surface colors.');
+assert.doesNotMatch(css, /aspect-ratio:(?:2\.75|3\.5|2\.4|2\.25)\s*\/\s*1/,
+  'The old fixed card ratios must not create excess blank space or clip larger captions.');
+assert.match(css, /\.service-strip \.service\{[^}]*aspect-ratio:auto/,
+  'Tile height must follow content rather than a fixed ratio.');
+
 assert.match(css, /grid-template-columns:repeat\(6,minmax\(0,1fr\)/,
   'Desktop must use six equal columns.');
 assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)/,
   'Tablet widths must use three columns.');
 assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)/,
   'Mobile widths must use two columns.');
-assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:9\.1px\}/,
-  'Narrow phones must remain compact while improving text sizing.');
+assert.match(css, /\.service-strip \.service-text strong\{[^}]*font-size:12px/,
+  'Desktop title text must be enlarged by 20% from 10px.');
+assert.match(css, /\.service-strip \.service-text small\{[^}]*font-size:10\.2px/,
+  'Desktop caption text must be enlarged by 20% from 8.5px.');
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?color:#262626/,
+  'The tile text color must stay dark and readable in both themes.');
+assert.match(css, /\.service-strip \.service-text small\{[^}]*color:#53575a/,
+  'The description text must use a fixed neutral color, not a theme-dependent warm muted color.');
+assert.doesNotMatch(css, /\.service-strip \.service-copy\{[^}]*color:var\(--ink\)/,
+  'The inner tile text must not inherit a theme-dependent ink color.');
+assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(--muted\)/,
+  'The inner tile description must not inherit a theme-dependent muted color.');
+assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:12\.24px\}[\s\S]*?\.service-strip \.service-text small\{font-size:10\.44px\}/,
+  'Tablet text must retain the 20% size increase.');
+assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:11\.4px[\s\S]*?\.service-strip \.service-text small\{font-size:9\.84px/,
+  'Mobile text must retain the 20% size increase.');
+assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:10\.92px\}[\s\S]*?\.service-strip \.service-text small\{font-size:9\.48px\}/,
+  'Narrow-phone text must retain the 20% size increase.');
+
 const copyRules = [...css.matchAll(/\.service-strip\s+\.service-copy\{([^}]*)\}/g)]
   .map(match => match[1].replace(/\s+/g, ''));
 assert.equal(copyRules.filter(rule => /(?:^|;)background:/.test(rule)).length, 1,
@@ -66,7 +104,8 @@ assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
   'The CTA-matched surface border must have one authoritative declaration.');
 assert.equal(copyRules.filter(rule => /(?:^|;)-webkit-backdrop-filter:/.test(rule)).length, 1,
   'The CTA-matched glass blur must have one authoritative declaration.');
-assert.ok(copyRules.some(rule => rule.includes('background:' + ctaGradient) && rule.includes('backdrop-filter:blur(18px)')),
-  'Responsive overrides may adjust dimensions, but not replace the shared surface treatment.');
+const tileGradient = 'linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))';
+assert.ok(copyRules.some(rule => rule.includes('background:' + tileGradient) && rule.includes('backdrop-filter:blur(18px)')),
+  'Responsive overrides may adjust dimensions, but not replace the shared Zalo-like warm glass treatment.');
 
-console.log('PASS: one shared CTA-matched glass surface for all six tiles; no legacy cascade; responsive checks passed.');
+console.log('PASS: stable two-layer Liquid Glass, compact content-sized tiles, 20% larger text, and no legacy cascade.');
