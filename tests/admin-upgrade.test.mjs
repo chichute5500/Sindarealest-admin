@@ -21,7 +21,7 @@ assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should
 assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");
 assert.ok(admin.includes('id="generateDescription"'), "AI description action missing");
 assert.ok(admin.includes('id="showPassword"'), "Password visibility toggle missing");
-assert.ok(admin.includes('id="passwordEye"'), "Password visibility toggle must use an eye icon");
+assert.ok(admin.includes('class="password-eye-icon"') && !admin.includes('id="passwordEye"'), "Password eye SVG must not reuse a duplicate DOM id when toggled");
 assert.ok(admin.includes('class="bell-icon"'), "Notification button must use a bell icon");
 assert.ok(admin.includes('id="notificationCount"'), "Unread notification count badge missing");
 assert.ok(admin.includes("sd-admin-last-seen"), "Unread notifications must be tracked against the last-read time");
