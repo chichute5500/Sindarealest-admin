@@ -13,28 +13,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Verify source Preview isolation, create separate Pages project, and deploy test branch
+      - name: Verify isolation and create a separate Pages project
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           SOURCE_PROJECT: sindarealest2
           TARGET_PROJECT: sindarealest-ai-image-test
-          TEST_BRANCH: ai-image-test
         run: |
           set -euo pipefail
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN."; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID."; exit 1; }
-
           api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+
           source="$(curl --fail --silent --show-error -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api/pages/projects/$SOURCE_PROJECT")"
           printf '%s' "$source" | jq -e '.success == true' >/dev/null
-
           production_branch="$(printf '%s' "$source" | jq -r '.result.production_branch // empty')"
           preview_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
           production_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
@@ -47,16 +44,15 @@ jobs:
           test -n "$preview_images" && test -n "$production_images" || { echo "::error::Cannot verify both IMAGES buckets. Stopping."; exit 1; }
           test "$preview_images" != "$production_images" || { echo "::error::Source Preview IMAGES bucket is Production. Stopping."; exit 1; }
 
-          printf 'Verified isolated Preview DB and image bucket. Target Pages project: %s\n' "$TARGET_PROJECT"
+          printf 'Isolation verified. Target project: %s\n' "$TARGET_PROJECT"
           current="$(curl --silent --show-error -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api/pages/projects/$TARGET_PROJECT")"
           exists="$(printf '%s' "$current" | jq -r '.success // false')"
-
           if [ "$exists" = "true" ]; then
             target_db="$(printf '%s' "$current" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
             target_images="$(printf '%s' "$current" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
-            test "$target_db" = "$preview_db" || { echo "::error::Existing test project is not bound to the isolated Preview DB; refusing to overwrite configuration."; exit 1; }
-            test "$target_images" = "$preview_images" || { echo "::error::Existing test project is not bound to isolated Preview IMAGES; refusing to overwrite configuration."; exit 1; }
-            echo "Separate Pages project already exists and has the expected isolated bindings."
+            test "$target_db" = "$preview_db" || { echo "::error::Existing test project DB is not the isolated Preview DB. Refusing overwrite."; exit 1; }
+            test "$target_images" = "$preview_images" || { echo "::error::Existing test project IMAGES bucket is not isolated Preview. Refusing overwrite."; exit 1; }
+            echo "Separate Pages project already exists with expected isolated bindings."
           else
             payload="$(jq -n --arg name "$TARGET_PROJECT" --arg db "$preview_db" --arg images "$preview_images" '{
               name:$name,
@@ -67,55 +63,33 @@ jobs:
                   d1_databases:{DB:{id:$db}},
                   r2_buckets:{IMAGES:{name:$images}}
                 },
-                production:{
-                  compatibility_date:"2026-10-18"
-                }
+                production:{compatibility_date:"2026-10-18"}
               }
             }')"
-            created_response="$(curl --silent --show-error -w '\\nHTTP_STATUS:%{http_code}' -X POST "$api/pages/projects" \
+            http_status="$(curl --silent --show-error -o /tmp/pages-create-response.json -w "%{http_code}" -X POST "$api/pages/projects" \
               -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
               -H "Content-Type: application/json" --data "$payload")"
-            created="${created_response%            echo "Created a separate Pages project using only isolated Preview D1/IMAGES bindings."
-          fi
-
-      - name: Install Wrangler
-        run: npm install --no-save --no-package-lock wrangler
-
-      - name: Deploy only to the separate test project
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          TARGET_PROJECT: sindarealest-ai-image-test
-          TEST_BRANCH: ai-image-test
-        run: |
-          set -euo pipefail
-          npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch "$TEST_BRANCH" --commit-dirty=true
-          echo "Separate test project deployment requested: https://${TEST_BRANCH}.${TARGET_PROJECT}.pages.dev"
-          echo "::notice::This workflow does not change sindarealest2 Production or its production branch."
-\\n'HTTP_STATUS:*}"
-            http_status="${created_response##*HTTP_STATUS:}"
+            created="$(cat /tmp/pages-create-response.json)"
             if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
               echo "::error::Cloudflare Pages project creation returned HTTP $http_status."
               printf '%s' "$created" | jq -c '{errors, messages}' || true
               exit 1
             fi
             printf '%s' "$created" | jq -e '.success == true' >/dev/null || { printf '%s' "$created" | jq -c '{errors, messages}'; exit 1; }
-            echo "Created a separate Pages project using only isolated Preview D1/IMAGES bindings."
+            echo "Created separate Pages project with isolated Preview D1 and IMAGES bindings."
           fi
 
       - name: Install Wrangler
         run: npm install --no-save --no-package-lock wrangler
 
-      - name: Deploy only to the separate test project
+      - name: Deploy to the separate test project only
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           TARGET_PROJECT: sindarealest-ai-image-test
-          TEST_BRANCH: ai-image-test
         run: |
           set -euo pipefail
-          npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch "$TEST_BRANCH" --commit-dirty=true
-          echo "Separate test project deployment requested: https://${TEST_BRANCH}.${TARGET_PROJECT}.pages.dev"
+          npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch ai-image-test --commit-dirty=true
+          echo "Test project deployment requested: https://ai-image-test.sindarealest-ai-image-test.pages.dev"
           echo "::notice::This workflow does not change sindarealest2 Production or its production branch."
