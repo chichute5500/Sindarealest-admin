@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { onRequestGet } from "../functions/api/admin/image-groups.js";
 import { createSession } from "../functions/_lib.js";
 const ADMIN_PASSWORD="image-group-admin-password-test",SESSION_SECRET="image-group-session-secret-long-enough-for-test";
@@ -15,4 +16,7 @@ assert.equal(body.assignedCount,1);
 assert.equal(body.images.find(x=>x.key===product.images_json.match(/[a-f0-9-]{36}\.webp/)[0]).assignedTo[0].sku,"SD-SN001");
 const unauthorized=await onRequestGet({request:new Request("https://preview.example/api/admin/image-groups"),env:{DB,IMAGES,ADMIN_PASSWORD,SESSION_SECRET}});
 assert.equal(unauthorized.status,401);
+const adminHtml = await readFile(new URL("../public/admin/index.html", import.meta.url), "utf8");
+const viewAllowlist = "!['dashboard','products','orders','customers','warranties','image-groups','settings'].includes(v)";
+assert.ok(adminHtml.includes(viewAllowlist), "AI image grouping must be accepted by setView navigation.");
 console.log("PASS: image grouping inventory requires admin auth and maps existing product image assignments without modifying products.");
