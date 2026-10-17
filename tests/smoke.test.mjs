@@ -93,7 +93,12 @@ const mockDB = {
     };
     return statement;
   },
-  async batch() { return []; },
+  async batch(statements) {
+    if (statements[0]?.sql?.includes('INSERT INTO admin_login_attempts')) {
+      return [{ success: true }, { success: true, results: [{ attempts: 1 }] }];
+    }
+    return [];
+  },
 };
 const wrongOriginLogin = await adminLogin({
   request: new Request('https://shop.example/api/admin/login', {
