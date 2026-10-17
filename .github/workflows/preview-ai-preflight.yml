@@ -30,6 +30,7 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}")"
           printf '%s' "$response" | jq -e '.success == true' >/dev/null
 
+          production_branch="$(printf '%s' "$response" | jq -r '.result.production_branch // empty')"
           preview_db="$(printf '%s' "$response" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
           production_db="$(printf '%s' "$response" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
           preview_images="$(printf '%s' "$response" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
@@ -37,23 +38,30 @@ jobs:
           preview_originals="$(printf '%s' "$response" | jq -r '.result.deployment_configs.preview.r2_buckets.ORIGINALS.name // empty')"
           production_originals="$(printf '%s' "$response" | jq -r '.result.deployment_configs.production.r2_buckets.ORIGINALS.name // empty')"
 
+          printf 'Configured Pages production branch: %s\n' "${production_branch:-unknown}"
           printf 'Preview DB binding: %s\n' "${preview_db:+configured}"
           printf 'Preview IMAGES binding: %s\n' "${preview_images:+configured}"
-          printf 'Preview ORIGINALS binding: %s\n' "${preview_originals:+configured}"
+          printf 'Preview ORIGINALS binding: %s\n' "${preview_originals:+configured (optional for image grouping test)}"
 
+          test -n "$production_branch" || { echo "::error::Could not verify the configured Production branch."; exit 1; }
+          if [ "$production_branch" = "feature/ai-image-grouping" ]; then
+            echo "::error::This feature branch is configured as Production. Stopping; do not continue testing on this branch."
+            exit 1
+          fi
           test -n "$preview_db" || { echo "::error::Preview D1 binding DB is missing. No database was changed."; exit 1; }
           test -n "$preview_images" || { echo "::error::Preview R2 binding IMAGES is missing. No resources were changed."; exit 1; }
-          test -n "$preview_originals" || { echo "::error::Preview R2 binding ORIGINALS is missing. No resources were changed."; exit 1; }
           test -n "$production_db" || { echo "::error::Could not verify Production DB identity; stopping safely."; exit 1; }
           test -n "$production_images" || { echo "::error::Could not verify Production IMAGES bucket identity; stopping safely."; exit 1; }
-          test -n "$production_originals" || { echo "::error::Could not verify Production ORIGINALS bucket identity; stopping safely."; exit 1; }
 
           if [ "$preview_db" = "$production_db" ]; then
             echo "::error::Preview DB points to the Production database. Stopping before any migration or write."
             exit 1
           fi
-          if [ "$preview_images" = "$production_images" ] || [ "$preview_originals" = "$production_originals" ]; then
-            echo "::error::At least one Preview R2 binding points to a Production bucket. Stopping safely."
+          if [ "$preview_images" = "$production_images" ]; then
+            echo "::error::Preview IMAGES points to a Production bucket. Stopping safely."
             exit 1
           fi
-          echo "PASS: Preview D1 and both R2 bindings are configured and isolated from Production."
+          if [ -n "$preview_originals" ] && [ -n "$production_originals" ] && [ "$preview_originals" = "$production_originals" ]; then
+            echo "::warning::Preview ORIGINALS points to Production. Do not test upload-related admin functions until isolated."
+          fi
+          echo "PASS: Preview DB and IMAGES are configured and isolated from Production; no migration or write was performed."
