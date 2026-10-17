@@ -8,7 +8,7 @@
   },
   "scripts": {
     "check": "node scripts/check-project.mjs",
-    "test": "node tests/smoke.test.mjs && node tests/admin-login-rate-limit.test.mjs && node tests/storefront-html-safety.test.mjs && node tests/admin-orders-query.test.mjs && node tests/order-contact-isolation.test.mjs && node tests/warranty-claim-atomicity.test.mjs && node tests/admin-session-rotation.test.mjs && node tests/pages-bindings.test.mjs && node tests/config-integrity.test.mjs && node tests/storefront-operations.test.mjs && node tests/private-warranty-attachments.test.mjs && node tests/reset-skus.test.mjs && node tests/admin-upgrade.test.mjs && node tests/benefit-tiles-responsive.test.mjs && node tests/order-trust-layout.test.mjs && node tests/detail-gallery-integrity.test.mjs && node tests/watermark-integrity.test.mjs",
+    "test": "node tests/smoke.test.mjs && node tests/admin-login-rate-limit.test.mjs && node tests/public-rate-limit.test.mjs && node tests/storefront-html-safety.test.mjs && node tests/admin-orders-query.test.mjs && node tests/order-contact-isolation.test.mjs && node tests/warranty-claim-atomicity.test.mjs && node tests/admin-session-rotation.test.mjs && node tests/pages-bindings.test.mjs && node tests/config-integrity.test.mjs && node tests/storefront-operations.test.mjs && node tests/private-warranty-attachments.test.mjs && node tests/reset-skus.test.mjs && node tests/admin-upgrade.test.mjs && node tests/benefit-tiles-responsive.test.mjs && node tests/order-trust-layout.test.mjs && node tests/detail-gallery-integrity.test.mjs && node tests/watermark-integrity.test.mjs",
     "deploy": "node scripts/deploy-cloudflare.mjs",
     "setup:cloudflare": "node scripts/setup-cloudflare.mjs"
   },
