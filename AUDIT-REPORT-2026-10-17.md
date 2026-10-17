@@ -120,11 +120,11 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên nhánh rà soát đã pass ở [run 39043667254](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39043667254); các kiểm thử nguồn/tích hợp và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không có nghĩa production đã được cập nhật.
+CI mới nhất trên nhánh rà soát đã pass ở [run 39043667254](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39043667254); các kiểm thử nguồn/tích hợp và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
-**Bổ sung cổng an toàn D1:** script deploy giờ chạy truy vấn chỉ đọc trên database `sindarealest-db` để đếm số đơn hàng còn thiếu snapshot trong `order_contact_details`. Nếu bảng chưa tồn tại hoặc còn đơn hàng thiếu snapshot sau migration 0007, deploy sẽ dừng. Truy vấn không ghi/xóa dữ liệu và script không tự chạy migration.
+**Bổ sung cổng an toàn D1:** script deploy giờ chạy truy vấn chỉ đọc trên database `sindarealest-db` để đếm số đơn hàng còn thiếu snapshot trong `order_contact_details`. Nếu bảng chưa tồn tại hoặc còn đơn hàng thiếu snapshot sau migration 0007, deploy sẽ dừng. Truy vấn không ghi/xóa dữ liệu và script không tự chạy migration. CI cũng áp dụng migrations 0001–0007 lên một D1 cục bộ mới, tạo đơn hàng fixture trước migration 0007 rồi kiểm tra dữ liệu liên hệ lịch sử được backfill đúng; không dùng database từ xa.
 
 ### Ảnh bằng chứng bảo hành
 Nhánh gốc đã có các biện pháp quan trọng: ảnh khiếu nại mới phải lưu ở binding R2 riêng `ORIGINALS`, không dùng chung bucket hiển thị `IMAGES`; route đọc ảnh cần xác thực admin; media công khai từ chối đường dẫn `warranty-claims/`; script kiểm tra binding yêu cầu hai bucket tách biệt và xác minh public access của `ORIGINALS` đã tắt. Không được bỏ các kiểm tra này để “làm cho deploy chạy”.
