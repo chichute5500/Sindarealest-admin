@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createSession } from "../functions/_lib.js";
+import { createSession, getCurrentDateInVietnam } from "../functions/_lib.js";
 import { onRequestPost as uploadWarrantyPhoto } from "../functions/api/warranty-claim-uploads.js";
 import { onRequestGet as readClaimPhoto } from "../functions/api/admin/warranty-claim-image.js";
 import { onRequestGet as publicMedia } from "../functions/media/[key].js";
@@ -101,6 +101,12 @@ assert.equal(originals.calls.puts[0].options.httpMetadata.cacheControl, "private
 assert.equal(originals.calls.puts[0].options.customMetadata.visibility, "private-warranty-claim");
 assert.equal(images.calls.puts.length, 0, "customer evidence must not be written to the display-image bucket");
 assert.ok(db.state.settings.has("warranty_upload:" + uploaded.imageKey), "upload token metadata must be stored after the private object");
+
+const yearNext = String(Number(getCurrentDateInVietnam().slice(0, 4)) + 1);
+const futureOriginals = bucket();
+const futureStartUpload = await submitPhoto({ DB: mockDB(yearNext + "-01-01"), ORIGINALS: futureOriginals, IMAGES: bucket() });
+assert.equal(futureStartUpload.status, 404, "warranty photo upload must be rejected before the warranty start date");
+assert.equal(futureOriginals.calls.puts.length, 0, "future-start warranty rejection must happen before storing evidence");
 
 const missingPrivateBucket = await submitPhoto({ DB: mockDB(), IMAGES: bucket() });
 assert.equal(missingPrivateBucket.status, 503, "new warranty uploads must fail closed without private ORIGINALS");
