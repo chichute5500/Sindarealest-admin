@@ -47,6 +47,7 @@ function mockDB(startDate = '2026-01-01') {
     prepare(sql) {
       let values = [];
       const statement = {
+        sql,
         bind(...next) { values = next; return statement; },
         async first() {
           if (sql.includes("SELECT attempts FROM public_rate_limits")) return { attempts: 1 };
@@ -70,13 +71,33 @@ function mockDB(startDate = '2026-01-01') {
       };
       return statement;
     },
+    async batch(statements) {
+      const results = [];
+      for (const statement of statements) {
+        if (statement.sql.includes("SELECT attempts FROM public_rate_limits")) {
+          results.push({ results: [{ attempts: 1 }] });
+        } else {
+          const result = await statement.run();
+          results.push({ ...result, results: [] });
+        }
+      }
+      return results;
+    },
   };
   return db;
 }
 
-async function submitPhoto(env) {
+async function submitPhoto(env, includeLookupToken = true) {
   const form = new FormData();
   form.set("warrantyCode", warrantyCode);
+  if (includeLookupToken) {
+    const claimToken = "c".repeat(32);
+    env.DB.state.settings.set("warranty_lookup:" + claimToken, {
+      value: JSON.stringify({ warrantyCode, warrantyId: "warranty-id" }),
+      updated_at: "2099-12-31 00:00:00",
+    });
+    form.set("claimToken", claimToken);
+  }
   form.set("file", new Blob([webp], { type: "image/webp" }), "claim.webp");
   return uploadWarrantyPhoto({
     request: new Request("https://shop.example/api/warranty-claim-uploads", {
@@ -91,6 +112,45 @@ async function submitPhoto(env) {
 const db = mockDB();
 const originals = bucket();
 const images = bucket();
+const rawCodeOnlyUpload = await submitPhoto({ DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() }, false);
+assert.equal(rawCodeOnlyUpload.status, 403, "photo upload must require a successful lookup token rather than a raw warranty code");
+
+const oversizedUploadRequest = new Request("https://shop.example/api/warranty-claim-uploads", {
+  method: "POST",
+  headers: {
+    Origin: "https://shop.example",
+    "CF-Connecting-IP": "198.51.100.21",
+    "Content-Type": "multipart/form-data; boundary=test-boundary",
+    "Content-Length": String(7 * 1024 * 1024),
+  },
+  body: "--test-boundary--\\r\\n",
+});
+const oversizedUpload = await uploadWarrantyPhoto({
+  request: oversizedUploadRequest,
+  env: { DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() },
+});
+assert.equal(oversizedUpload.status, 413, "oversized declared multipart requests must be rejected before form parsing");
+
+const streamedOversizedUploadRequest = new Request("https://shop.example/api/warranty-claim-uploads", {
+  method: "POST",
+  headers: {
+    Origin: "https://shop.example",
+    "CF-Connecting-IP": "198.51.100.22",
+    "Content-Type": "multipart/form-data; boundary=test-boundary",
+  },
+  body: new Uint8Array(6 * 1024 * 1024 + 1),
+});
+assert.equal(streamedOversizedUploadRequest.headers.has("Content-Length"), false,
+  "streaming limit regression must exercise requests without Content-Length");
+const streamedOversizedUpload = await uploadWarrantyPhoto({
+  request: streamedOversizedUploadRequest,
+  env: { DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() },
+});
+assert.equal(streamedOversizedUpload.status, 413,
+  "oversized multipart requests without Content-Length must be rejected while streaming");
+
+
+
 const upload = await submitPhoto({ DB: db, ORIGINALS: originals, IMAGES: images });
 assert.equal(upload.status, 201, "photo uploads should succeed when private ORIGINALS is configured");
 const uploaded = await upload.json();

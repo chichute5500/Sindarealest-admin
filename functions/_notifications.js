@@ -1,4 +1,27 @@
 const enc = new TextEncoder();
+
+const PUSH_HOSTS = new Set([
+  "fcm.googleapis.com",
+  "push.services.opera.com",
+  "push.services.mozilla.com",
+  "updates.push.services.mozilla.com",
+  "web.push.apple.com",
+  "notify.windows.com",
+  "wns.windows.com",
+]);
+
+export function isTrustedPushEndpoint(value) {
+  try {
+    const url = new URL(String(value));
+    const host = url.hostname.toLowerCase().replace(/\.$/, "");
+    if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")) return false;
+    return PUSH_HOSTS.has(host) ||
+      host.endsWith(".notify.windows.com") ||
+      host.endsWith(".wns.windows.com");
+  } catch {
+    return false;
+  }
+}
 function b64urlBytes(value) { const s=String(value).replace(/-/g,"+").replace(/_/g,"/"); const b=atob(s+"=".repeat((4-s.length%4)%4)); return Uint8Array.from(b,c=>c.charCodeAt(0)); }
 function b64url(value) { let s=""; for(const b of value)s+=String.fromCharCode(b); return btoa(s).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_"); }
 async function hkdf(ikm,salt,info,length) { const key=await crypto.subtle.importKey("raw",ikm,"HKDF",false,["deriveBits"]); return new Uint8Array(await crypto.subtle.deriveBits({name:"HKDF",hash:"SHA-256",salt,info:typeof info==="string"?enc.encode(info):info},key,length*8)); }
@@ -34,13 +57,14 @@ async function encryptPayload(subscription,payload) {
   return out;
 }
 async function sendOne(endpoint,keys,payload,env) {
+  if (!isTrustedPushEndpoint(endpoint)) throw Error("Untrusted push service endpoint");
   const body=await encryptPayload({keys},payload), token=await vapidToken(endpoint,env);
-  return fetch(endpoint,{method:"POST",signal:AbortSignal.timeout(3000),headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
+  return fetch(endpoint,{method:"POST",redirect:"manual",signal:AbortSignal.timeout(3000),headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
 }
 export async function sendAdminPush(env,payload) {
   if(!env?.DB||!env.VAPID_PUBLIC_KEY||!env.VAPID_PRIVATE_KEY)return;
-  let result;try{result=await env.DB.prepare("SELECT endpoint,keys_json FROM admin_push_subscriptions").all()}catch{return}
-  await Promise.allSettled((result.results||[]).map(async row=>{
+  let result;try{result=await env.DB.prepare("SELECT endpoint,keys_json FROM admin_push_subscriptions ORDER BY updated_at DESC LIMIT 50").all()}catch{return}
+  await Promise.allSettled((result.results||[]).slice(0,50).map(async row=>{
     try {
       const response=await sendOne(row.endpoint,JSON.parse(row.keys_json||"{}"),payload,env);
       if(response.status===404||response.status===410)await env.DB.prepare("DELETE FROM admin_push_subscriptions WHERE endpoint=?").bind(row.endpoint).run();

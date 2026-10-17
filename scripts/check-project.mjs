@@ -27,14 +27,15 @@ for (const required of [
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
-  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql',
+  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_order_contact_details.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
 ]) check(existsSync(join(root, required)), `Thiếu tệp bắt buộc: ${required}`);
 
 for (const f of walk(join(root, 'functions')).filter(x => x.endsWith('.js'))
   .concat(walk(join(root, 'scripts')).filter(x => x.endsWith('.mjs')))
-  .concat(walk(join(root, 'tests')).filter(x => x.endsWith('.mjs')))) {
+  .concat(walk(join(root, 'tests')).filter(x => x.endsWith('.mjs')))
+  .concat(walk(join(root, 'public')).filter(x => x.endsWith('.js')))) {
   const result = spawnSync(process.execPath, ['--check', f], { encoding: 'utf8' });
   check(result.status === 0, `Cú pháp JavaScript lỗi: ${relative(root, f)} ${result.stderr || ''}`);
 }
@@ -85,6 +86,9 @@ check(homepage.includes('/api/orders') && homepage.includes('/api/warranty-claim
 check(!homepage.includes('/catalog-fallback.json'), 'Trang chủ còn gọi catalogue fallback tĩnh');
 const newMigration = existsSync(join(root, 'migrations/0003_storefront_operations.sql')) ? readFileSync(join(root, 'migrations/0003_storefront_operations.sql'), 'utf8') : '';
 for (const table of ['customers','orders','order_items','warranties','warranty_claims','audit_logs','public_rate_limits']) check(new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`).test(newMigration), `Migration 0003 thiếu bảng ${table}`);
+const orderContactsMigration = existsSync(join(root, 'migrations/0007_order_contact_details.sql')) ? readFileSync(join(root, 'migrations/0007_order_contact_details.sql'), 'utf8') : '';
+check(/CREATE TABLE IF NOT EXISTS order_contact_details\b/.test(orderContactsMigration), 'Migration 0007 thiếu bảng order_contact_details');
+check(/INSERT OR IGNORE INTO order_contact_details[\s\S]*FROM orders o[\s\S]*JOIN customers c ON c.id = o.customer_id/i.test(orderContactsMigration), 'Migration 0007 phải backfill thông tin liên hệ cho đơn hàng hiện có');
 const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(join(root, 'public/_redirects'), 'utf8') : '';
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
@@ -121,6 +125,11 @@ for (const file of [
 const config = existsSync(join(root, 'package.json')) ? JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) : {};
 check(config.engines?.node === '>=22 <23', 'package.json phải pin dòng Node.js 22.x để môi trường CI/Termux nhất quán');
 check(config.scripts?.deploy === 'node scripts/deploy-cloudflare.mjs', 'npm run deploy phải đi qua script xác minh project/branch');
+const deployScript = existsSync(join(root, 'scripts/deploy-cloudflare.mjs')) ? readFileSync(join(root, 'scripts/deploy-cloudflare.mjs'), 'utf8') : '';
+check(deployScript.includes('order_contact_details') && deployScript.includes("'d1', 'execute'") && deployScript.includes("'--remote'"), 'Deploy script phải xác minh read-only rằng migration order_contact_details đã có trong D1 trước khi deploy');
+const deployWorkflow = existsSync(join(root, '.github/workflows/deploy.yml')) ? readFileSync(join(root, '.github/workflows/deploy.yml'), 'utf8') : '';
+check(deployWorkflow.includes('CLOUDFLARE_D1_DATABASE: sindarealest-db'), 'Workflow deploy phải truyền đúng D1 database để kiểm tra schema');
+check(deployScript.includes('SELECT COUNT(*) AS missing_order_contact_snapshots') && !deployScript.includes("'migrations', 'apply'"), 'Deploy preflight phải chỉ đọc schema/dữ liệu, không tự chạy migration');
 const wranglerConfig = existsSync(join(root, 'wrangler.toml')) ? readFileSync(join(root, 'wrangler.toml'), 'utf8') : '';
 check(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Không được bật Wrangler production-config mode trước khi tải/đối chiếu config thật của Pages project');
 const ignore = existsSync(join(root, '.gitignore')) ? readFileSync(join(root, '.gitignore'), 'utf8') : '';
@@ -131,7 +140,7 @@ for (const secretFile of ['.env', '.dev.vars', '.env.production', '.dev.vars.pro
   check(!existsSync(join(root, secretFile)), `Không đưa tệp bí mật ${secretFile} vào source/ZIP`);
 }
 
-for (const file of ['tests/smoke.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs']) {
+for (const file of ['tests/smoke.test.mjs', 'tests/admin-login-rate-limit.test.mjs', 'tests/public-rate-limit.test.mjs', 'tests/request-json-limit.test.mjs', 'tests/admin-upload-safety.test.mjs', 'tests/ai-description-binding.test.mjs', 'tests/push-endpoint-safety.test.mjs', 'tests/backup-size-safety.test.mjs', 'tests/restore-safety.test.mjs', 'tests/sitemap-safety.test.mjs', 'tests/warranty-issuance-race.test.mjs', 'tests/admin-product-sku-race.test.mjs', 'tests/warranty-claim-atomicity.test.mjs', 'tests/warranty-claim-token-atomicity.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs', 'tests/order-contact-isolation.test.mjs']) {
   if (existsSync(join(root, file))) runTest(file);
 }
 

@@ -18,19 +18,23 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
       CLOUDFLARE_PAGES_BRANCH: fix/ai-review-quota-scope-2026-10-15
+      CLOUDFLARE_D1_DATABASE: sindarealest-db
       CLOUDFLARE_PAGES_ORIGINALS_READY: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY }}
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --no-fund
+
+      - name: Audit installed dependencies
+        run: npm audit --audit-level=high
 
       - name: Validate project integrity
         run: npm run check

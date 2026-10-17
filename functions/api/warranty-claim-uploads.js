@@ -1,7 +1,9 @@
-import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, storageOrFail } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, readBodyBytesLimited, storageOrFail } from "../_lib.js";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_MULTIPART_BYTES = MAX_IMAGE_BYTES + 1024 * 1024;
 const WARRANTY_CODE_PATTERN = /^SDW-[A-Z0-9]{24}$/;
+
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");
@@ -32,14 +34,28 @@ export async function onRequestPost({ request, env }) {
     return fail("Dịch vụ tải ảnh chưa sẵn sàng.", 503);
   }
 
+  const parsedMultipart = await readBodyBytesLimited(request, MAX_MULTIPART_BYTES);
+  if (parsedMultipart.error === "too_large") return fail("Biểu mẫu tải ảnh vượt quá giới hạn 6 MB.", 413);
+  if (parsedMultipart.error) return fail("Không đọc được biểu mẫu ảnh.");
+
   let form;
   try {
-    form = await request.formData();
+    const headers = new Headers(request.headers);
+    headers.delete("Content-Length");
+    headers.delete("Transfer-Encoding");
+    const boundedRequest = new Request(request.url, {
+      method: "POST",
+      headers,
+      body: parsedMultipart.bytes,
+    });
+    form = await boundedRequest.formData();
   } catch {
     return fail("Không đọc được biểu mẫu ảnh.");
   }
 
   const claimToken = String(form.get("claimToken") || "").trim().toLowerCase();
+  if (!claimToken) return fail("Hãy tra cứu bảo hành thành công trước khi tải ảnh lên.", 403);
+
   let warrantyCode = String(form.get("warrantyCode") || "").trim().toUpperCase();
   let tokenWarrantyId = "";
 

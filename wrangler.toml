@@ -10,3 +10,7 @@ compatibility_date = "2026-10-12"
 # R2 Variable name: IMAGES (public optimized product images and watermark logo)
 # R2 Variable name: ORIGINALS (private originals; separate non-public R2 bucket)
 # Secrets (Production): ADMIN_PASSWORD, SESSION_SECRET
+# Optional Workers AI for admin copywriting: in Pages Dashboard > Settings > Bindings,
+# add Workers AI binding with Variable name AI in Production and Preview, then redeploy.
+# WORKERS_AI_MODEL is optional; ai-description.js uses the validated default model when absent.
+# Pages binding guide: https://developers.cloudflare.com/pages/functions/bindings/

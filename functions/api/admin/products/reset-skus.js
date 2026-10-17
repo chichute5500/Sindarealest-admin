@@ -1,4 +1,4 @@
-import { fail, genericDbError, json, requireAdmin, slugify } from "../../../_lib.js";
+import { fail, genericDbError, json, readJsonBodyLimited, requireAdmin, slugify } from "../../../_lib.js";
 
 const CATEGORY_RULES = {
   sneakers: { prefix: "SD-SN", label: "Sneaker" },
@@ -32,7 +32,7 @@ const CATEGORY_ALIASES = {
 
 function resolveCategory(value) {
   const key = slugify(String(value ?? "").trim());
-  return CATEGORY_ALIASES[key] || key || null;
+  return (Object.hasOwn(CATEGORY_ALIASES, key) ? CATEGORY_ALIASES[key] : key) || null;
 }
 
 function buildCaseUpdate(db, rows, skuById) {
@@ -49,9 +49,10 @@ export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
 
-  let body;
-  try { body = await context.request.json(); }
-  catch { return fail("Yêu cầu đặt lại SKU không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Yêu cầu đặt lại SKU vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu đặt lại SKU không hợp lệ.");
+  const body = parsedBody.value;
   if (body?.confirm !== true) return fail("Thiếu xác nhận đặt lại SKU.", 400);
 
   const db = context.env.DB;
@@ -88,10 +89,10 @@ export async function onRequestPost(context) {
     }
 
     // Build rules dynamically so future categories can also receive SKUs.
-    const categoryRules = {};
+    const categoryRules = Object.create(null);
     for (const row of categorized) {
-      if (!categoryRules[row.categoryKey]) {
-        const known = CATEGORY_RULES[row.categoryKey];
+      if (!Object.hasOwn(categoryRules, row.categoryKey)) {
+        const known = Object.hasOwn(CATEGORY_RULES, row.categoryKey) ? CATEGORY_RULES[row.categoryKey] : null;
         let hash = 0;
         for (const char of row.categoryKey) hash = (hash * 31 + char.charCodeAt(0)) % 1296;
         const compact = row.categoryKey.replace(/-/g, "").toUpperCase();

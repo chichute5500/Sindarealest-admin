@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createSession, verifySession, validateProduct, hasSecuritySecrets, getCurrentDateInVietnam, warrantyStatusOnDate, isWarrantyEligibleOnDate } from '../functions/_lib.js';
+import { createSession, verifySession, validateProduct, fromRow, hasSecuritySecrets, getCurrentDateInVietnam, warrantyStatusOnDate, isWarrantyEligibleOnDate } from '../functions/_lib.js';
 import { onRequestGet as publicProducts } from '../functions/api/products.js';
 import { onRequestGet as adminProducts } from '../functions/api/admin/products.js';
 import { onRequestPost as restoreProducts } from '../functions/api/admin/restore.js';
@@ -40,6 +40,22 @@ assert.equal(valid.value.sku, 'SD-236');
 assert.equal(valid.value.category, 'wallets');
 assert.equal(valid.value.price, null, 'không tự gán giá');
 assert.equal(valid.value.stock, null, 'không tự gán tồn kho');
+
+const stockRow = {
+  id: 'stock-product', slug: 'stock-product', sku: 'SD-SN099', title: 'Sneaker thử',
+  category: 'sneakers', category_label: 'Sneaker', price: 1230000, stock: 7,
+  published: 1, images_json: '[]', description: '', source_price_confirmed: 0, sort_order: 1,
+};
+assert.equal(fromRow(stockRow, { publicView: true, showPrices: true }).stock, null,
+  'public product API must not reveal internal inventory counts even when prices are visible');
+assert.equal(fromRow(stockRow).stock, 7, 'admin view must retain the actual stock count');
+const prototypeNamedCategory = validateProduct({
+  title: 'Sản phẩm danh mục tùy chỉnh', sku: 'SD-CON001', category: 'constructor',
+  price: null, stock: null, published: true, images: [],
+});
+assert.equal(prototypeNamedCategory.error, undefined, 'prototype-named custom categories must not resolve to inherited functions');
+assert.equal(prototypeNamedCategory.value.category, 'constructor');
+assert.equal(typeof prototypeNamedCategory.value.category, 'string');
 assert.ok(validateProduct({ title: 'Hỏng', sku: '../x', category: 'Ví' }).error, 'SKU traversal phải bị từ chối');
 assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['../secret.webp'] }).error, 'đường dẫn ảnh traversal phải bị từ chối');
 assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['https://evil.example/x.webp'] }).error, 'ảnh remote không tin cậy phải bị từ chối');
@@ -77,7 +93,12 @@ const mockDB = {
     };
     return statement;
   },
-  async batch() { return []; },
+  async batch(statements) {
+    if (statements[0]?.sql?.includes('INSERT INTO admin_login_attempts')) {
+      return [{ success: true }, { success: true, results: [{ attempts: 1 }] }];
+    }
+    return [];
+  },
 };
 const wrongOriginLogin = await adminLogin({
   request: new Request('https://shop.example/api/admin/login', {
@@ -108,7 +129,7 @@ assert.equal(response.status, 200);
 let data = await response.json();
 assert.equal(data.length, 1, 'API công khai chỉ trả về sản phẩm published');
 assert.equal(data[0].price, null, 'khi ẩn giá, API không gửi giá thật');
-assert.equal(data[0].stock, 4);
+assert.equal(data[0].stock, null, 'public API must not expose internal inventory counts');
 
 dbState.showPrices = true;
 response = await publicProducts(publicContext);
@@ -129,6 +150,7 @@ response = await adminProducts({ request: authenticatedRequest, env: { DB: mockD
 assert.equal(response.status, 200, 'API quản trị cho phép session hợp lệ');
 data = await response.json();
 assert.equal(data.products.length, 2, 'quản trị được thấy cả sản phẩm đang ẩn');
+assert.ok(data.products.some((product) => product.stock === 4), 'admin API must retain access to internal stock counts');
 
 let batchCalls = 0;
 const restoreBatchStatements = [];
@@ -158,6 +180,19 @@ const validBackup = { format: 'sindarealest-backup-v1', settings: { showPrices: 
 response = await restoreProducts({ request: makeRestoreRequest(validBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 200, 'backup hợp lệ phải khôi phục thành công');
 assert.equal(batchCalls, 1, 'backup hợp lệ thực hiện một batch giao dịch');
+const oversizedDeclaredRequest = new Request('https://shop.example/api/admin/restore', {
+  method: 'POST',
+  headers: {
+    Cookie: `sd_admin_session=${token}`,
+    Origin: 'https://shop.example',
+    'Content-Type': 'application/json',
+    'Content-Length': String(20 * 1024 * 1024 + 1),
+  },
+  body: JSON.stringify(validBackup),
+});
+response = await restoreProducts({ request: oversizedDeclaredRequest, env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 413, 'restore must reject oversized declared payload before parsing JSON');
+assert.equal(batchCalls, 1, 'oversized backup must not start a database batch');
 const duplicateSlugBackup = {
   ...validBackup,
   products: [restoredProduct, { ...restoredProduct, id: 'restore-product-2', sku: 'SD-RESTORE-2' }],
@@ -203,6 +238,20 @@ const operationsBackup = {
     warrantyClaimAttachments: [{ claim_id:'claim-1', image_key:'warranty-claims/0123456789abcdef0123456789abcdef.webp' }],
   },
 };
+const excessiveOperationsBackup = {
+  ...operationsBackup,
+  operations: {
+    ...operationsBackup.operations,
+    auditLogs: Array.from({ length: 4995 }, (_, i) => ({
+      id: `restore-log-${i}`, actor: 'admin', action: 'backup_test',
+      entity_type: 'test', entity_id: String(i), details_json: '{}',
+      created_at: '2026-01-01 00:00:00',
+    })),
+  },
+};
+response = await restoreProducts({ request: makeRestoreRequest(excessiveOperationsBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 413, 'oversized backup transaction must be rejected before mutation');
+assert.equal(batchCalls, 1, 'backup exceeding restore record budget must not touch D1');
 response = await restoreProducts({ request: makeRestoreRequest(operationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 200, 'backup v2 có quan hệ vận hành hợp lệ phải được chấp nhận');
 assert.equal(batchCalls, 2, 'backup v2 đời cũ vẫn được khôi phục bằng batch');
@@ -254,18 +303,25 @@ const backupSettingValues = new Map([
   ['watermark_opacity','73'],
 ]);
 const backupDB = {
+  batchCalls: 0,
   prepare(sql) {
     let bound = [];
     const statement = {
+      sql,
       bind(...values) { bound = values; return statement; },
-      async first() {
-        if (!sql.includes('FROM settings')) return null;
-        const value = backupSettingValues.get(bound[0]);
-        return value === undefined ? null : { value };
-      },
-      async all() { return { results: [] }; },
+      boundValues() { return bound; },
     };
     return statement;
+  },
+  async batch(statements) {
+    this.batchCalls++;
+    return statements.map((statement) => ({
+      results: statement.sql.startsWith('SELECT') && statement.sql.includes('AS total_count')
+        ? [{ total_count: 0 }]
+        : statement.sql.includes('FROM settings')
+          ? [...backupSettingValues.entries()].map(([key, value]) => ({ key, value }))
+          : [],
+    }));
   },
 };
 const backupResponse = await createAdminBackup({
@@ -281,3 +337,4 @@ assert.equal(exportedBackup.settings.watermarkEnabled, false);
 assert.equal(exportedBackup.settings.watermarkPosition, 'top-left');
 assert.equal(exportedBackup.settings.watermarkSize, 24);
 assert.equal(exportedBackup.settings.watermarkOpacity, 73);
+assert.equal(backupDB.batchCalls, 1, 'backup must read tables and settings from one D1 batch snapshot');

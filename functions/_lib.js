@@ -18,6 +18,58 @@ export function fail(message, status = 400, headers = {}) {
   return json({ ok: false, error: message }, status, headers);
 }
 
+/**
+ * Read a request body with a hard byte limit, even when Content-Length is absent.
+ * Returns { bytes } on success or { error: "invalid" | "too_large" }.
+ */
+export async function readBodyBytesLimited(request, maxBytes = 64 * 1024) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) return { error: "invalid" };
+  const declaredLength = Number(request.headers.get("Content-Length") || 0);
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
+  if (!request.body) return { error: "invalid" };
+
+  // Do not allocate based on an untrusted Content-Length; grow only as bytes arrive.
+  let buffer = new Uint8Array(Math.min(maxBytes, 16 * 1024));
+  let total = 0;
+  const reader = request.body.getReader();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (total + value.byteLength > maxBytes) {
+        try { await reader.cancel(); } catch {}
+        return { error: "too_large" };
+      }
+      const required = total + value.byteLength;
+      if (required > buffer.byteLength) {
+        const capacity = Math.min(maxBytes, Math.max(required, buffer.byteLength * 2));
+        const grown = new Uint8Array(capacity);
+        grown.set(buffer.subarray(0, total));
+        buffer = grown;
+      }
+      buffer.set(value, total);
+      total = required;
+    }
+  } catch {
+    return { error: "invalid" };
+  }
+  return { bytes: buffer.subarray(0, total) };
+}
+
+/**
+ * Parse a small JSON request without buffering an unbounded body in memory.
+ * Returns { value } on success or { error: "invalid" | "too_large" }.
+ */
+export async function readJsonBodyLimited(request, maxBytes = 64 * 1024) {
+  const body = await readBodyBytesLimited(request, maxBytes);
+  if (body.error) return body;
+  try {
+    return { value: JSON.parse(new TextDecoder().decode(body.bytes)) };
+  } catch {
+    return { error: "invalid" };
+  }
+}
+
 export function dbOrFail(env) {
   if (!env?.DB) return fail("Dịch vụ dữ liệu chưa được cấu hình. Hãy gắn D1 binding tên DB.", 503);
   return null;
@@ -176,10 +228,34 @@ export async function rateLimitPublicRequest(env, request, scope, maxAttempts = 
   const ipHash = b64url(digest);
   const now = Math.floor(Date.now() / 1000);
   const windowStart = Math.floor(now / windowSeconds) * windowSeconds;
-  await env.DB.prepare("INSERT INTO public_rate_limits(scope,ip_hash,window_start,attempts) VALUES(?,?,?,1) ON CONFLICT(scope,ip_hash) DO UPDATE SET attempts=CASE WHEN public_rate_limits.window_start=excluded.window_start THEN public_rate_limits.attempts+1 ELSE 1 END,window_start=excluded.window_start").bind(scope,ipHash,windowStart).run();
-  const row = await env.DB.prepare("SELECT attempts FROM public_rate_limits WHERE scope=? AND ip_hash=? LIMIT 1").bind(scope,ipHash).first();
-  if (now % 17 === 0) await env.DB.prepare("DELETE FROM public_rate_limits WHERE window_start < ?").bind(now - windowSeconds * 4).run();
-  return { limited: Number(row?.attempts || 0) > maxAttempts };
+
+  // Increment and read the resulting count in one atomic transaction. Separate
+  // run()/first() calls let concurrent requests observe stale counts and exceed
+  // the configured limit.
+  const results = await env.DB.batch([
+    env.DB.prepare("INSERT INTO public_rate_limits(scope,ip_hash,window_start,attempts) VALUES(?,?,?,1) " +
+      "ON CONFLICT(scope,ip_hash) DO UPDATE SET " +
+      "attempts=CASE WHEN public_rate_limits.window_start=excluded.window_start THEN public_rate_limits.attempts+1 ELSE 1 END," +
+      "window_start=excluded.window_start").bind(scope,ipHash,windowStart),
+    env.DB.prepare("SELECT attempts FROM public_rate_limits WHERE scope=? AND ip_hash=? LIMIT 1").bind(scope,ipHash),
+  ]);
+  const attempts = Number(results?.[1]?.results?.[0]?.attempts);
+  // A successful write with a missing/invalid read result is not proof that the
+  // limit was applied. Fail closed so callers can return 503 instead of silently
+  // turning rate limiting off.
+  if (!Number.isSafeInteger(attempts) || attempts < 1) {
+    throw new Error("Public rate-limit counter could not be verified");
+  }
+
+  // Cleanup is opportunistic: a cleanup failure must not turn an otherwise
+  // valid order or warranty operation into a 503.
+  if (now % 17 === 0) {
+    try {
+      await env.DB.prepare("DELETE FROM public_rate_limits WHERE window_start < ?")
+        .bind(now - windowSeconds * 4).run();
+    } catch {}
+  }
+  return { limited: attempts > maxAttempts };
 }
 
 export async function getSetting(db, key, fallback = "0") {
@@ -190,7 +266,14 @@ export async function getSetting(db, key, fallback = "0") {
 export function parseImages(value) {
   try {
     const images = typeof value === "string" ? JSON.parse(value) : value;
-    return Array.isArray(images) ? images.filter((x) => typeof x === "string") : [];
+    if (!Array.isArray(images)) return [];
+    // Only serve known local WebP paths. Old or imported DB values must not turn
+    // a stored image field into a remote request or an HTML attribute payload.
+    return images.filter((x) =>
+      typeof x === "string" &&
+      (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) ||
+       /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x))
+    );
   } catch { return []; }
 }
 
@@ -205,7 +288,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     categoryLabel: row.category_label || row.category,
     description: row.description || "",
     price: !publicView || showPrices ? price : null,
-    stock: row.stock === null || row.stock === undefined ? null : Number(row.stock),
+    stock: publicView || row.stock === null || row.stock === undefined ? null : Number(row.stock),
     published: Number(row.published) === 1,
     images: parseImages(row.images_json),
     sourcePriceConfirmed: Number(row.source_price_confirmed) === 1,
@@ -238,7 +321,8 @@ export function validateProduct(input, existing = null) {
   const rawCategory = String(input.category ?? "").trim();
   if (!rawCategory || rawCategory.length > 80) return { error: "Danh mục là bắt buộc và tối đa 80 ký tự." };
   const aliases = { sneaker: "sneakers", sneakers: "sneakers", "giay-luoi": "loafers", loafers: "loafers", "giay-tay": "dress-shoes", "dress-shoes": "dress-shoes", "thắt-lưng": "belts", "that-lung": "belts", belts: "belts", "vi-da": "wallets", wallets: "wallets", dep: "sandals", sandals: "sandals", "day-dong-ho": "watch-straps", "op-dien-thoai": "phone-cases" };
-  const category = existing && rawCategory === existing.categoryLabel ? existing.category : (aliases[slugify(rawCategory)] || (/^[a-z0-9-]+$/.test(rawCategory) ? rawCategory : slugify(rawCategory)));
+  const categoryKey = slugify(rawCategory);
+  const category = existing && rawCategory === existing.categoryLabel ? existing.category : (Object.hasOwn(aliases, categoryKey) ? aliases[categoryKey] : (/^[a-z0-9-]+$/.test(rawCategory) ? rawCategory : categoryKey));
   const description = String(input.description ?? "");
   if (description.length > 10000) return { error: "Mô tả tối đa 10.000 ký tự." };
   const price = optionalInteger(input.price, "Giá");
@@ -297,14 +381,38 @@ export async function rateLimitLogin(db, request, secret) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const ipHash = b64url(await hmac(ip, secret));
   const now = Date.now();
-  const old = await db.prepare("SELECT window_start, attempts FROM admin_login_attempts WHERE ip_hash = ?").bind(ipHash).first();
-  if (!old || now - Number(old.window_start) >= 15 * 60 * 1000) {
-    await db.prepare("INSERT INTO admin_login_attempts(ip_hash,window_start,attempts) VALUES(?,?,1) ON CONFLICT(ip_hash) DO UPDATE SET window_start=excluded.window_start,attempts=1").bind(ipHash, now).run();
-    return { limited: false, ipHash };
+  const windowMs = 15 * 60 * 1000;
+
+  // Increment/reset and read the resulting counter in one D1 transaction.
+  // A separate SELECT followed by UPDATE permits concurrent login attempts to
+  // observe the same old count and race past the threshold.
+  const results = await db.batch([
+    db.prepare(
+      "INSERT INTO admin_login_attempts(ip_hash,window_start,attempts) VALUES(?,?,1) " +
+      "ON CONFLICT(ip_hash) DO UPDATE SET " +
+      "window_start=CASE WHEN ? - admin_login_attempts.window_start >= ? THEN excluded.window_start ELSE admin_login_attempts.window_start END, " +
+      "attempts=CASE WHEN ? - admin_login_attempts.window_start >= ? THEN 1 ELSE admin_login_attempts.attempts+1 END",
+    ).bind(ipHash, now, now, windowMs, now, windowMs),
+    db.prepare("SELECT attempts FROM admin_login_attempts WHERE ip_hash=?").bind(ipHash),
+  ]);
+
+  const attempts = Number(results?.[1]?.results?.[0]?.attempts);
+  // A missing counter result is not evidence that this IP is below the
+  // threshold. Fail closed so the login endpoint returns 503 rather than
+  // allowing attempts when D1 cannot verify the limiter state.
+  if (!Number.isSafeInteger(attempts) || attempts < 1) {
+    throw new Error("Login rate-limit counter could not be verified");
   }
-  if (Number(old.attempts) >= 5) return { limited: true, ipHash };
-  await db.prepare("UPDATE admin_login_attempts SET attempts=attempts+1 WHERE ip_hash=?").bind(ipHash).run();
-  return { limited: false, ipHash };
+
+  // Expired rows for one-off IPs otherwise accumulate forever. Cleanup is
+  // opportunistic and must never disable or fail an otherwise valid check.
+  if (Math.floor(now / 1000) % 17 === 0) {
+    try {
+      await db.prepare("DELETE FROM admin_login_attempts WHERE window_start < ?")
+        .bind(now - windowMs * 4).run();
+    } catch {}
+  }
+  return { limited: attempts > 5, ipHash };
 }
 
 export { SESSION_SECONDS };

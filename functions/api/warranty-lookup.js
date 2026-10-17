@@ -1,4 +1,4 @@
-import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, warrantyStatusOnDate } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, parseImages, rateLimitPublicRequest, readJsonBodyLimited, warrantyStatusOnDate } from "../_lib.js";
 
 const clean = (value, max = 120) => String(value ?? "").trim().slice(0, max);
 const normalizePhone = value => {
@@ -7,7 +7,7 @@ const normalizePhone = value => {
   else if (digits.startsWith("84") && digits.length >= 11) digits = "0" + digits.slice(2);
   return digits;
 };
-const phoneSql = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.phone,' ',''),'-',''),'(',''),')',''),'+',''),'.',''),'/','')";
+const phoneSql = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(oc.phone,c.phone),' ',''),'-',''),'(',''),')',''),'+',''),'.',''),'/','')";
 function maskPhone(value) {
   const digits = normalizePhone(value);
   return digits.length >= 7 ? digits.slice(0, 3) + "••••" + digits.slice(-2) : "••••";
@@ -26,8 +26,7 @@ function maskOrderNumber(value) {
 }
 function shapeWarranty(row, today, claimToken) {
   const code = String(row.warranty_code || "");
-  let images = [];
-  try { images = JSON.parse(row.imagesJson || "[]"); } catch {}
+  const images = parseImages(row.imagesJson);
   const status = warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today);
   const eligible = isWarrantyEligibleOnDate(row.status, row.starts_at, row.ends_at, today);
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
@@ -37,7 +36,7 @@ function shapeWarranty(row, today, claimToken) {
     title: String(row.title || "Sản phẩm"),
     sku: String(row.sku || ""),
     size: String(row.size || ""),
-    image: Array.isArray(images) ? images[0] || "" : "",
+    image: images[0] || "",
     purchasedAt: String(row.purchasedAt || "").slice(0, 10),
     startsAt: row.starts_at,
     endsAt: row.ends_at,
@@ -51,7 +50,7 @@ function shapeWarranty(row, today, claimToken) {
     maskedOrderNumber: maskOrderNumber(row.orderNumber)
   };
 }
-const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,c.full_name AS fullName,c.phone AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
+const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");
@@ -65,8 +64,10 @@ export async function onRequestPost({ request, env }) {
     const limit = await rateLimitPublicRequest(env, request, "warranty_lookup", 6, 900);
     if (limit.limited) return fail("Bạn đã tra cứu quá nhiều lần. Vui lòng đợi 15 phút.", 429, { "Retry-After": "900" });
   } catch { return fail("Dịch vụ tra cứu chưa sẵn sàng.", 503); }
-  let body;
-  try { body = await request.json(); } catch { return fail("Thông tin tra cứu không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(request, 4 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin tra cứu vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin tra cứu không hợp lệ.");
+  const body = parsedBody.value;
   const raw = clean(body?.lookup ?? body?.warrantyCode ?? body?.phone);
   if (!raw) return fail("Nhập mã bảo hành hoặc số điện thoại dùng khi mua hàng.");
   const today = getCurrentDateInVietnam();
@@ -94,6 +95,6 @@ export async function onRequestPost({ request, env }) {
     await env.DB.batch(statements);
     const warranties = tokenRows.map(row => shapeWarranty(row, today, row.claimToken));
     return json({ ok: true, warranties, warranty: isCode ? warranties[0] : null });
-  } catch { return fail("Chưa thể tra cứu bảo hành. Vui lòng thử lại.", 503); }
+  } catch { return fail("Chưa thể tra cứu bảo hành. Hãy kiểm tra các migration 0003, 0005 và 0007 rồi thử lại.", 503); }
 }
 export async function onRequestGet() { return fail("Phương thức không được hỗ trợ.", 405); }

@@ -46,7 +46,7 @@ const warrantyClaimSource = readFileSync(new URL('../functions/api/warranty-clai
 const backupSource = readFileSync(new URL('../functions/api/admin/backup.js', import.meta.url), 'utf8');
 const restoreSource = readFileSync(new URL('../functions/api/admin/restore.js', import.meta.url), 'utf8');
 for (const table of ['customer_address_details','order_shipping_addresses','order_item_details','warranty_claim_attachments']) {
-  assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
+  assert.ok(backupSource.includes('boundedTableQuery(db, "' + table + '"'), 'Backup must include bounded query for ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
 assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary upload and lookup tokens without requiring OTP tables');
@@ -144,6 +144,7 @@ const demoWarrantyRow = {
 function warrantyDB() {
   const settings = new Map();
   const query = (sql, values=[]) => ({
+    sql,
     async run() {
       if (sql.includes('INSERT INTO settings')) settings.set(values[0],{value:values[1],updated_at:new Date().toISOString().replace('T',' ').replace('Z','')});
       if (sql.includes('DELETE FROM settings WHERE key=?')) settings.delete(values[0]);
@@ -162,7 +163,16 @@ function warrantyDB() {
   });
   return {
     prepare(sql) { return { ...query(sql), bind(...values) { return query(sql,values); } }; },
-    async batch(statements) { for (const statement of statements) await statement.run(); return []; }
+    async batch(statements) {
+      for (const statement of statements) await statement.run();
+      if (statements[0]?.sql.includes('INSERT INTO warranty_claims')) {
+        return statements.map((_, index) => ({ meta: { changes: 1 } }));
+      }
+      if (statements[0]?.sql.includes('INSERT INTO public_rate_limits')) {
+        return [{ success: true }, { success: true, results: [{ attempts: 1 }] }];
+      }
+      return statements.map(() => ({ meta: { changes: 1 } }));
+    }
   };
 }
 const warrantyDBInstance = warrantyDB();
@@ -196,6 +206,12 @@ assert.equal(lookupPayload.warranties[0].maskedWarrantyCode,'••••AAAA');
 assert.ok(!JSON.stringify(lookupPayload).includes(demoWarrantyCode),'Phone lookup must not expose the raw warranty code');
 assert.ok(!JSON.stringify(lookupPayload).includes('0901234567'),'Raw customer phone must not be returned');
 
+
+const codeOnlyClaimResponse = await createWarrantyClaim({
+  request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.15'},body:JSON.stringify({warrantyCode:demoWarrantyCode,issueType:'other',message:'Thử gửi thẳng bằng mã'})}),
+  env:{DB:warrantyDBInstance}
+});
+assert.equal(codeOnlyClaimResponse.status,403,'Warranty claim must require a short-lived token from a successful lookup');
 
 const claimResponse = await createWarrantyClaim({
   request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.13'},body:JSON.stringify({claimToken:codeActionToken,issueType:'other',contactPhone:'0901234567',message:'Lỗi bề mặt cần kiểm tra'})}),
