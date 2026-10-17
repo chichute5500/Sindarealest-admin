@@ -7,7 +7,7 @@ export async function onRequestGet(context) {
     const today = getCurrentDateInVietnam();
     const warranties = (issued.results || []).map((warranty) => ({
       ...warranty,
-      status: warrantyStatusOnDate(warranty.status, warranty.endsAt, today),
+      status: warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today),
     }));
     return json({ claims: result.results || [], warranties });
   } catch { return fail("Không đọc được dữ liệu bảo hành. Hãy kiểm tra đã áp dụng migration 0003.", 503); }
