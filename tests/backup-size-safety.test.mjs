@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createSession } from "../functions/_lib.js";
 import { onRequestGet as createBackup } from "../functions/api/admin/backup.js";
 
@@ -68,5 +69,9 @@ assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SEL
   "all table reads must be gated and capped before D1 materializes rows");
 assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?")),
   "oversized backups must return no table rows before the route rejects the export");
+
+const adminHtml = readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
+assert.match(adminHtml, /Tệp JSON không chứa tệp ảnh trong R2/,
+  "backup and restore UI must explain that R2 image objects are not embedded in JSON backups");
 
 console.log("PASS: backup export enforces shared record and query limits.");
