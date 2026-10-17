@@ -1,10 +1,10 @@
-import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 const clean=(v,max=1600)=>String(v??"").trim().slice(0,max);
 export async function onRequestPost({request,env}){
  if(request.headers.get("Origin")){try{if(new URL(request.headers.get("Origin")).origin!==new URL(request.url).origin)return fail("Yêu cầu không hợp lệ.",403)}catch{return fail("Yêu cầu không hợp lệ.",403)}}
  const unavailable=dbOrFail(env);if(unavailable)return unavailable;
  try{const lim=await rateLimitPublicRequest(env,request,"warranty_claim",3,900);if(lim.limited)return fail("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi 15 phút.",429,{"Retry-After":"900"})}catch{return fail("Dịch vụ tiếp nhận yêu cầu chưa sẵn sàng.",503)}
- let body;try{body=await request.json()}catch{return fail("Thông tin yêu cầu bảo hành không hợp lệ.")}
+ const parsedBody=await readJsonBodyLimited(request,8*1024);if(parsedBody.error==="too_large")return fail("Thông tin yêu cầu bảo hành vượt giới hạn kích thước.",413);if(parsedBody.error||!parsedBody.value||typeof parsedBody.value!=="object"||Array.isArray(parsedBody.value))return fail("Thông tin yêu cầu bảo hành không hợp lệ.");const body=parsedBody.value
  const claimToken=clean(body?.claimToken,64).toLowerCase(),issueType=clean(body?.issueType,30),contactPhone=clean(body?.contactPhone,24),description=clean(body?.message,1400),imageKey=clean(body?.imageKey,100);
  if(!claimToken)return fail("Hãy tra cứu bảo hành thành công trước khi gửi yêu cầu.",403);
  let warrantyCode=clean(body?.warrantyCode,100).toUpperCase(),tokenWarrantyId="";
