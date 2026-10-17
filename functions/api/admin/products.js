@@ -61,7 +61,7 @@ export async function onRequestPost(context) {
     } catch (error) {
       // Multiple admin saves can race after reading the same highest SKU. Retry
       // only for a SKU uniqueness conflict; never mask unrelated DB failures.
-      if (!/UNIQUE constraint failed:\\s*products\\.sku/i.test(String(error?.message || ""))) {
+      if (!/UNIQUE constraint failed:\s*products\.sku/i.test(String(error?.message || ""))) {
         return genericDbError(error);
       }
       if (attempt === 4) {
@@ -74,7 +74,7 @@ export async function onRequestPost(context) {
           const sku = String(row.sku || "").toUpperCase();
           if (!sku.startsWith(category[1])) continue;
           const suffix = sku.slice(category[1].length);
-          if (/^\\d+$/.test(suffix)) {
+          if (/^\d+$/.test(suffix)) {
             const number = Number(suffix);
             if (Number.isSafeInteger(number)) max = Math.max(max, number);
           }
