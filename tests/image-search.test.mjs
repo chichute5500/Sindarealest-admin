@@ -251,6 +251,12 @@ assert.doesNotMatch(imageSearchSource, /https:\/\/s\.taobao\.com\/search|https:\
 assert.doesNotMatch(imageSearchSource, /GEMINI_API_KEY|google_search|NEXSCOPE/);
 const auditSource = (await import("node:fs")).readFileSync(new URL("../functions/api/admin/image-audit.js", import.meta.url), "utf8");
 assert.match(auditSource, /saveSource/);
+assert.match(auditSource, /readJsonBodyLimited\(context\.request, 8 \* 1024 \* 1024\)/, "AI image analysis must bound JSON payloads before parsing");
+assert.match(auditSource, /readJsonBodyLimited\(context\.request, 8 \* 1024\)/, "AI review decisions must bound JSON payloads before parsing");
+assert.match(auditSource, /json_insert\(products\.images_json,'\$\[#\]',\?\)/, "candidate approval must append to the current D1 image array atomically");
+assert.match(auditSource, /status='pending'[\s\S]*AND \(EXISTS/, "candidate approval must require the review to remain pending inside the write transaction");
+assert.match(auditSource, /json_group_array\(value\)[\s\S]*json_each\(products\.images_json\)/, "candidate rejection must remove its image from the current D1 array rather than a stale JS snapshot");
+
 assert.match(auditSource, /code: result\.code/, "Workers AI diagnostic codes must be returned to the admin client");
 assert.match(auditSource, /chưa có mô hình so khớp thị giác chuyên biệt/i);
 assert.match((await import("node:fs")).readFileSync(new URL("../functions/_lib/ai-quota.js", import.meta.url), "utf8"), /workers-ai-rolling-24h/);
