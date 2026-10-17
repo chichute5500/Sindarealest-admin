@@ -18,6 +18,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
       CLOUDFLARE_PAGES_BRANCH: fix/ai-review-quota-scope-2026-10-15
+      CLOUDFLARE_PAGES_ORIGINALS_READY: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY }}
 
     steps:
       - name: Check out source
@@ -49,5 +50,10 @@ jobs:
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
 
+      - name: Skip production deploy until ORIGINALS is verified
+        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true'
+        run: echo "::notice::Production deploy skipped safely; verify private ORIGINALS binding before enabling it."
+
       - name: Deploy to verified Pages project
+        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'
         run: npm run deploy
