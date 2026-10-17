@@ -104,7 +104,8 @@ assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
   'The CTA-matched surface border must have one authoritative declaration.');
 assert.equal(copyRules.filter(rule => /(?:^|;)-webkit-backdrop-filter:/.test(rule)).length, 1,
   'The CTA-matched glass blur must have one authoritative declaration.');
-assert.ok(copyRules.some(rule => rule.includes('background:' + ctaGradient) && rule.includes('backdrop-filter:blur(18px)')),
-  'Responsive overrides may adjust dimensions, but not replace the shared surface treatment.');
+const tileGradient = 'linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))';
+assert.ok(copyRules.some(rule => rule.includes('background:' + tileGradient) && rule.includes('backdrop-filter:blur(18px)')),
+  'Responsive overrides may adjust dimensions, but not replace the neutral shared surface treatment.');
 
 console.log('PASS: stable two-layer Liquid Glass, compact content-sized tiles, 20% larger text, and no legacy cascade.');
