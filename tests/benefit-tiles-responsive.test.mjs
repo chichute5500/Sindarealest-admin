@@ -34,8 +34,8 @@ assert.equal((markup.match(/class="service-copy"><span class="service-icon">[\s\
   'Icon and caption must share one surface.');
 assert.match(markup, /href="https:\/\/zalo\.me\/0827049192"/,
   'The Zalo tile must keep its confirmed destination.');
-assert.match(markup, /<strong>Tư Vấn 24\/7<\/strong><small>Hỗ trợ tận tâm<\/small>/,
-  'The Zalo tile copy must remain unchanged.');
+assert.match(markup, /<strong>Tư vấn\/đặt hàng qua Zalo<\/strong><small>Trao đổi trực tiếp qua Zalo<\/small>/,
+  'The Zalo tile must use the approved service label and avoid an unverified 24/7 claim.');
 
 const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
@@ -58,7 +58,7 @@ assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
   'The outer region must match the site glass blur treatment.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?border-radius:999px/,
   'Each inner text surface must use the same pill-like rounding as the Zalo CTA.');
-assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?background:linear-gradient\(135deg,rgba\(250,251,252,\.94\),rgba\(224,228,232,\.86\)\)/,
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?background:linear-gradient\(135deg,rgba\(255,255,255,\.40\),rgba\(189,145,63,\.30\)\)/,
   'The Zalo-like warm glass background must remain fixed across theme switches.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
   'The shared surface must keep its frosted glass treatment.');
