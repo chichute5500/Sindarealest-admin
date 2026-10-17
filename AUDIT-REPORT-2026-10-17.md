@@ -94,14 +94,14 @@ Trước đây mã chỉ kiểm tra kích thước `File` sau khi `request.formD
 
 Route upload ảnh sản phẩm trước đây gọi `formData()` trước khi kiểm tra giới hạn 5 MB cho ảnh hiển thị và 20 MB cho ảnh gốc. Vì vậy một multipart body quá lớn vẫn có thể bị đọc/phân tích trước khi kiểm tra kích thước từng tệp.
 
-**Đã sửa:** Dùng chung `readBodyBytesLimited()` với trần tổng multipart 26 MB, bao gồm cả request không có `Content-Length`; chỉ sau khi nằm trong giới hạn mới parse form data. Giữ kiểm tra chữ ký WebP cho ảnh hiển thị và bổ sung kiểm tra magic bytes JPEG/PNG/WebP cho ảnh gốc trước khi ghi R2. Regression test xác nhận tệp gốc giả mạo bị từ chối trước mọi thao tác lưu.
+**Đã sửa:** Dùng chung `readBodyBytesLimited()` với trần tổng multipart 26 MB, bao gồm cả request không có `Content-Length`; chỉ sau khi nằm trong giới hạn mới parse form data. Giữ kiểm tra chữ ký WebP cho ảnh hiển thị và bổ sung kiểm tra magic bytes JPEG/PNG/WebP cho ảnh gốc trước khi ghi R2. Regression test xác nhận tệp gốc giả mạo bị từ chối trước mọi thao tác lưu. Bổ sung kiểm tra trường `original` bắt buộc; nếu thiếu ảnh gốc thì từ chối trước khi ghi cả R2 riêng tư lẫn bucket ảnh công khai.
 
 ### 12. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
 
 Backup/restore trước đây không có cùng giới hạn tổng bản ghi và kích thước: backup có thể xuất một tệp lớn hơn khả năng khôi phục an toàn, trong khi restore cho phép tới 20.000 bản ghi ở từng mảng riêng lẻ. Tệp lớn có thể khiến Worker phải tạo batch khổng lồ hoặc vượt thời gian/giới hạn tài nguyên.
 
-**Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn. Backup đếm tổng bản ghi trong cùng D1 batch trước; mỗi truy vấn bảng chỉ trả dữ liệu nếu tổng nằm trong ngân sách, tránh nạp hàng chục nghìn dòng vào bộ nhớ rồi mới từ chối. Có regression test cho giới hạn tổng bản ghi và giới hạn từng truy vấn.
+**Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn. Bộ đọc dùng chung tăng buffer theo từng phần, không giữ đồng thời toàn bộ mảng chunks và bản sao byte thứ hai. Backup đếm tổng bản ghi trong cùng D1 batch trước; mỗi truy vấn bảng chỉ trả dữ liệu nếu tổng nằm trong ngân sách, tránh nạp hàng chục nghìn dòng vào bộ nhớ rồi mới từ chối. Có regression test cho giới hạn tổng bản ghi và giới hạn từng truy vấn.
 
 ### 13. Cấp SKU khi thêm sản phẩm cần giới hạn phạm vi và kiểm tra số an toàn
 **Mức độ:** Thấp–trung bình — hiệu năng và khả năng phục hồi khi dữ liệu SKU bất thường.
@@ -120,7 +120,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên nhánh rà soát đã pass ở [run 39044557227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39044557227); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
+CI mới nhất trên nhánh rà soát đã pass ở [run 39045257182](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39045257182); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
