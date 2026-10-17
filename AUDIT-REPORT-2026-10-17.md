@@ -249,3 +249,13 @@ Rà soát giao diện phát hiện thẻ sản phẩm có nền bán trong suố
 - Chưa có bản preview của đúng commit được xác minh bằng trình duyệt thật. Không tự tạo deployment vì cấu hình nhánh production trong Cloudflare phải được xác nhận trước, tránh vô tình đưa nhánh thử lên production.
 - Chưa kiểm tra được các binding/secrets trong Cloudflare Dashboard từ GitHub; đặc biệt cần xác minh D1 migration 0007 và R2 `ORIGINALS` trước khi phát hành.
 - Tệp backup JSON không chứa nội dung ảnh nhị phân của R2. Muốn có khả năng khôi phục đầy đủ phải sao lưu và kiểm tra phục hồi bucket R2 riêng.
+
+### Kết quả smoke test chỉ đọc trên production
+
+Ngày 17-10-2026, đã kiểm tra các URL công khai mà không gửi form hay thay đổi dữ liệu:
+
+- Trang chủ tải được, canonical và Open Graph trỏ đúng `https://sindarealest2.pages.dev/`.
+- `/api/products` trả 236 sản phẩm; giá công khai vẫn là `null`.
+- `/sitemap.xml` có 237 URL, bao gồm đường dẫn SKU ổn định.
+- `/api/admin/session` không có cookie trả HTTP 401, đúng hành vi bảo vệ phiên quản trị.
+- **Phát hiện production cần sửa:** API danh mục công khai đang để lộ trường tồn kho khác null cho SKU `SD-TL001`; các mã khác trong mẫu trả null. Nhánh audit đã sửa `fromRow(..., { publicView: true })` để luôn ẩn tồn kho công khai và có regression test. Vì chưa deploy, đây vẫn là vấn đề tồn tại trên web chính tại thời điểm kiểm tra.
