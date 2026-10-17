@@ -40,7 +40,7 @@ html.theme-transitioning body,html.theme-transitioning body::after,html.theme-tr
 .tap-target:active::before,.tap-target.tap-selected::before{opacity:1}
 .tap-ripple{position:absolute;z-index:0;width:16px;height:16px;pointer-events:none;border-radius:50%;background:rgba(255,255,255,.32);box-shadow:0 0 0 1px rgba(255,255,255,.45),0 0 25px rgba(221,184,112,.42);transform:translate(-50%,-50%) scale(0);animation:ringRipple .68s var(--ease) forwards}
 @keyframes ringRipple{to{transform:translate(-50%,-50%) scale(8);opacity:0}}
-/* Welcome sequence */
+/* Sequential welcome reveal: logo -> brand -> introduction -> continue. */
 .welcome-splash{--welcome-ink:#271d12;--welcome-base:#f1eadf;--welcome-panel:rgba(255,252,246,.58);--welcome-border:rgba(103,77,42,.24);--welcome-loader-track:rgba(58,42,22,.2);--welcome-skip-bg:rgba(255,252,246,.58);position:fixed;inset:0;z-index:1000;display:grid;place-items:center;overflow:hidden;isolation:isolate;background:var(--welcome-base);color:var(--welcome-ink);opacity:1;visibility:visible;transform:scale(1);transition:opacity .55s var(--ease),visibility .55s ease,transform .65s var(--ease),background-color .25s ease,color .25s ease}
 html.dark .welcome-splash{--welcome-ink:#f5eddd;--welcome-base:#080807;--welcome-panel:rgba(10,10,9,.56);--welcome-border:rgba(232,197,131,.28);--welcome-loader-track:rgba(255,255,255,.22);--welcome-skip-bg:rgba(255,255,255,.10)}
 .welcome-splash.is-leaving{opacity:0;visibility:hidden;pointer-events:none;transform:scale(1.015)}
@@ -386,3 +386,13 @@ html.js-enabled [data-reveal].is-visible{opacity:1;transform:translate3d(0,0,0);
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
  html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}
 }
+
+.welcome-content>.welcome-logo{animation:welcomeChildIn .48s var(--ease) .04s both}
+.welcome-content>.welcome-overline{animation:welcomeChildIn .48s var(--ease) .16s both}
+.welcome-content>.welcome-tagline{animation:welcomeChildIn .48s var(--ease) .23s both}
+.welcome-content>.welcome-title{animation:welcomeChildIn .52s var(--ease) .31s both}
+.welcome-content>#welcomeText{animation:welcomeChildIn .52s var(--ease) .39s both}
+.welcome-content>.welcome-points,.welcome-content>.welcome-footnote{animation:welcomeChildIn .52s var(--ease) .45s both}
+.welcome-content>.welcome-skip{animation:welcomeChildIn .52s var(--ease) .56s both}
+@keyframes welcomeChildIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1050px) and (min-width:761px){#order .order-step h3{font-size:13.5px}}
