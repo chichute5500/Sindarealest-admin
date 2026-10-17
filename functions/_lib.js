@@ -23,35 +23,39 @@ export function fail(message, status = 400, headers = {}) {
  * Returns { bytes } on success or { error: "invalid" | "too_large" }.
  */
 export async function readBodyBytesLimited(request, maxBytes = 64 * 1024) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) return { error: "invalid" };
   const declaredLength = Number(request.headers.get("Content-Length") || 0);
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
   if (!request.body) return { error: "invalid" };
 
-  const reader = request.body.getReader();
-  const chunks = [];
+  const initialCapacity = Number.isSafeInteger(declaredLength) && declaredLength > 0
+    ? Math.min(maxBytes, declaredLength)
+    : Math.min(maxBytes, 16 * 1024);
+  let buffer = new Uint8Array(initialCapacity);
   let total = 0;
+  const reader = request.body.getReader();
   try {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
+      if (total + value.byteLength > maxBytes) {
         try { await reader.cancel(); } catch {}
         return { error: "too_large" };
       }
-      chunks.push(value);
+      const required = total + value.byteLength;
+      if (required > buffer.byteLength) {
+        const capacity = Math.min(maxBytes, Math.max(required, buffer.byteLength * 2));
+        const grown = new Uint8Array(capacity);
+        grown.set(buffer.subarray(0, total));
+        buffer = grown;
+      }
+      buffer.set(value, total);
+      total = required;
     }
   } catch {
     return { error: "invalid" };
   }
-
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return { bytes };
+  return { bytes: buffer.subarray(0, total) };
 }
 
 /**
