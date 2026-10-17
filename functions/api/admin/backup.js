@@ -4,6 +4,30 @@ import { WATERMARK_DEFAULTS, normalizeWatermarkSettings } from "../../_lib/water
 const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
 const MAX_BACKUP_RECORDS = 5000;
 
+const TOTAL_RECORD_COUNT_SQL = `SELECT
+  (SELECT COUNT(*) FROM products) +
+  (SELECT COUNT(*) FROM customers) +
+  (SELECT COUNT(*) FROM orders) +
+  (SELECT COUNT(*) FROM order_items) +
+  (SELECT COUNT(*) FROM warranties) +
+  (SELECT COUNT(*) FROM warranty_claims) +
+  (SELECT COUNT(*) FROM audit_logs) +
+  (SELECT COUNT(*) FROM customer_address_details) +
+  (SELECT COUNT(*) FROM order_shipping_addresses) +
+  (SELECT COUNT(*) FROM order_contact_details) +
+  (SELECT COUNT(*) FROM order_item_details) +
+  (SELECT COUNT(*) FROM warranty_claim_attachments) AS total_count`;
+
+function boundedTableQuery(db, table, orderBy) {
+  return db.prepare(
+    `WITH backup_counts AS (${TOTAL_RECORD_COUNT_SQL})
+     SELECT * FROM ${table}
+     WHERE (SELECT total_count FROM backup_counts) <= ?
+     ORDER BY ${orderBy}
+     LIMIT 5001`,
+  ).bind(MAX_BACKUP_RECORDS);
+}
+
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
@@ -24,38 +48,46 @@ export async function onRequestGet(context) {
     // transactional read snapshot instead of mixing independent reads while
     // live orders or claims are being updated.
     const resultSets = await db.batch([
-      db.prepare("SELECT * FROM products ORDER BY sort_order ASC, sku ASC LIMIT 5001"),
-      db.prepare("SELECT * FROM customers ORDER BY created_at,id LIMIT 5001"),
-      db.prepare("SELECT * FROM orders ORDER BY created_at,id LIMIT 5001"),
-      db.prepare("SELECT * FROM order_items ORDER BY order_id,id LIMIT 5001"),
-      db.prepare("SELECT * FROM warranties ORDER BY created_at,id LIMIT 5001"),
-      db.prepare("SELECT * FROM warranty_claims ORDER BY created_at,id LIMIT 5001"),
-      db.prepare("SELECT * FROM audit_logs ORDER BY created_at,id LIMIT 5001"),
-      db.prepare("SELECT * FROM customer_address_details ORDER BY customer_id LIMIT 5001"),
-      db.prepare("SELECT * FROM order_shipping_addresses ORDER BY order_id LIMIT 5001"),
-      db.prepare("SELECT * FROM order_contact_details ORDER BY order_id LIMIT 5001"),
-      db.prepare("SELECT * FROM order_item_details ORDER BY item_id LIMIT 5001"),
-      db.prepare("SELECT * FROM warranty_claim_attachments ORDER BY claim_id LIMIT 5001"),
+      db.prepare(TOTAL_RECORD_COUNT_SQL),
+      boundedTableQuery(db, "products", "sort_order ASC, sku ASC"),
+      boundedTableQuery(db, "customers", "created_at, id"),
+      boundedTableQuery(db, "orders", "created_at, id"),
+      boundedTableQuery(db, "order_items", "order_id, id"),
+      boundedTableQuery(db, "warranties", "created_at, id"),
+      boundedTableQuery(db, "warranty_claims", "created_at, id"),
+      boundedTableQuery(db, "audit_logs", "created_at, id"),
+      boundedTableQuery(db, "customer_address_details", "customer_id"),
+      boundedTableQuery(db, "order_shipping_addresses", "order_id"),
+      boundedTableQuery(db, "order_contact_details", "order_id"),
+      boundedTableQuery(db, "order_item_details", "item_id"),
+      boundedTableQuery(db, "warranty_claim_attachments", "claim_id"),
       db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
     ]);
-    if (!Array.isArray(resultSets) || resultSets.length !== 13) {
+    if (!Array.isArray(resultSets) || resultSets.length !== 14) {
       throw new Error("D1 snapshot returned an incomplete result set");
     }
+    const totalRecords = Number(resultSets[0]?.results?.[0]?.total_count);
+    if (!Number.isSafeInteger(totalRecords) || totalRecords < 0) {
+      throw new Error("D1 snapshot returned an invalid record count");
+    }
+    if (totalRecords > MAX_BACKUP_RECORDS) {
+      return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần xử lý. Hãy lên kế hoạch xuất/nhập theo lô trước khi tiếp tục.", 413);
+    }
     const rowsAt = (index) => resultSets[index]?.results || [];
-    const settingMap = new Map(rowsAt(12).map((row) => [row.key, row.value]));
+    const settingMap = new Map(rowsAt(13).map((row) => [row.key, row.value]));
     const setting = (key, fallback) => settingMap.get(key) ?? fallback;
-    const productRows = { results: rowsAt(0) };
-    const customers = { results: rowsAt(1) };
-    const orders = { results: rowsAt(2) };
-    const orderItems = { results: rowsAt(3) };
-    const warranties = { results: rowsAt(4) };
-    const warrantyClaims = { results: rowsAt(5) };
-    const auditLogs = { results: rowsAt(6) };
-    const customerAddressDetails = { results: rowsAt(7) };
-    const orderShippingAddresses = { results: rowsAt(8) };
-    const orderContactDetails = { results: rowsAt(9) };
-    const orderItemDetails = { results: rowsAt(10) };
-    const warrantyClaimAttachments = { results: rowsAt(11) };
+    const productRows = { results: rowsAt(1) };
+    const customers = { results: rowsAt(2) };
+    const orders = { results: rowsAt(3) };
+    const orderItems = { results: rowsAt(4) };
+    const warranties = { results: rowsAt(5) };
+    const warrantyClaims = { results: rowsAt(6) };
+    const auditLogs = { results: rowsAt(7) };
+    const customerAddressDetails = { results: rowsAt(8) };
+    const orderShippingAddresses = { results: rowsAt(9) };
+    const orderContactDetails = { results: rowsAt(10) };
+    const orderItemDetails = { results: rowsAt(11) };
+    const warrantyClaimAttachments = { results: rowsAt(12) };
     const showPrices = setting("show_prices", "0");
     const welcomeEnabled = setting("welcome_enabled", "1");
     const welcomeTitleLine1 = setting("welcome_title_line_1", "Đẳng cấp thật.");
