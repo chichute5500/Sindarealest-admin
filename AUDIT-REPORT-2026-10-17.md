@@ -148,7 +148,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên head PR đã pass toàn bộ các bước kiểm tra, kiểm thử và `npm audit` ở [run 39047908793](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39047908793); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Bộ kiểm thử mới nhất cũng xác nhận số tồn kho nội bộ không được trả qua API công khai, nhưng vẫn giữ nguyên ở API quản trị. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
+CI trên head hiện tại đã pass toàn bộ các bước kiểm tra, kiểm thử và `npm audit` ở [run 39049693138](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39049693138); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Bộ kiểm thử mới nhất cũng xác nhận số tồn kho nội bộ không được trả qua API công khai, nhưng vẫn giữ nguyên ở API quản trị. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
@@ -229,3 +229,6 @@ Backup JSON xuất dữ liệu sản phẩm và metadata/khóa ảnh bảo hành
 **Mức độ:** Thấp — lỗi dữ liệu không hợp lệ cần bị từ chối trước khi bắt đầu restore.
 
 Bộ xác thực backup đã kiểm tra mã bảo hành trùng nhưng chưa kiểm tra riêng ID bản ghi bảo hành trùng. D1 vẫn sẽ rollback batch nếu khóa chính bị trùng, nhưng lỗi chỉ xuất hiện khi ghi và có thể trả lỗi dịch vụ thay vì chỉ rõ tệp backup sai. Đã bổ sung tập ID bảo hành riêng và regression test bảo đảm backup có ID bảo hành trùng trả 400 trước khi phát sinh batch ghi.
+
+### Vệ sinh danh sách kiểm thử
+Một kiểm tra cuối danh sách lệnh `npm test` phát hiện `tests/warranty-claim-atomicity.test.mjs` bị gọi lặp hai lần. Đã xóa lệnh trùng để CI không chạy lại cùng bộ test vô ích; [CI run 39049693138](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39049693138) xác nhận toàn bộ bước kiểm tra và kiểm thử vẫn pass.
