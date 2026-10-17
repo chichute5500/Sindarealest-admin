@@ -10,5 +10,5 @@ SINDAREALest — TÓM TẮT BẢN NÂNG CẤP SDVIP
 
 KIỂM TRA: npm run check PASS; npm test PASS; SQLite migration và 526 ảnh WebP PASS.
 
-CHƯA XÁC NHẬN DEPLOY PRODUCTION. Trước khi dùng, cấu hình bindings `DB`/`IMAGES`/`ORIGINALS` (`ORIGINALS` là bucket riêng tư khác `IMAGES`) cùng hai secrets trên đúng Pages project; nếu dùng GitHub Actions, chỉ đặt `CLOUDFLARE_PAGES_ORIGINALS_READY=true` sau khi xác minh, rồi mới deploy. Đăng nhập tài khoản khách hàng chưa được bật; tra cứu bảo hành không sử dụng mã xác minh. Chính sách bảo hành phải do cửa hàng xác nhận. Ảnh R2 cũ cần tải lại qua quản trị để đóng watermark vào file.
+CHƯA XÁC NHẬN DEPLOY PRODUCTION. Trước khi dùng, cấu hình bindings `DB`/`IMAGES`/`ORIGINALS` (`ORIGINALS` là bucket riêng tư khác `IMAGES`) cùng hai secrets trên đúng Pages project; nếu dùng GitHub Actions, chỉ đặt `CLOUDFLARE_PAGES_ORIGINALS_READY=true` sau khi xác minh, rồi mới deploy. Đăng nhập tài khoản khách hàng chưa được bật; tra cứu bảo hành không sử dụng mã xác minh. Chính sách bảo hành phải do cửa hàng xác nhận. Ảnh R2 cũ không tự bị thay đổi; watermark giao diện là lớp phủ trên ảnh lớn, không sửa file ảnh.
 Xem UPGRADE-REPORT.md để biết chi tiết và các giới hạn còn lại.
