@@ -115,6 +115,23 @@ const images = bucket();
 const rawCodeOnlyUpload = await submitPhoto({ DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() }, false);
 assert.equal(rawCodeOnlyUpload.status, 403, "photo upload must require a successful lookup token rather than a raw warranty code");
 
+const oversizedUploadRequest = new Request("https://shop.example/api/warranty-claim-uploads", {
+  method: "POST",
+  headers: {
+    Origin: "https://shop.example",
+    "CF-Connecting-IP": "198.51.100.21",
+    "Content-Type": "multipart/form-data; boundary=test-boundary",
+    "Content-Length": String(7 * 1024 * 1024),
+  },
+  body: "--test-boundary--\\r\\n",
+});
+const oversizedUpload = await uploadWarrantyPhoto({
+  request: oversizedUploadRequest,
+  env: { DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() },
+});
+assert.equal(oversizedUpload.status, 413, "oversized declared multipart requests must be rejected before form parsing");
+
+
 const upload = await submitPhoto({ DB: db, ORIGINALS: originals, IMAGES: images });
 assert.equal(upload.status, 201, "photo uploads should succeed when private ORIGINALS is configured");
 const uploaded = await upload.json();
