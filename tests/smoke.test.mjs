@@ -158,6 +158,19 @@ const validBackup = { format: 'sindarealest-backup-v1', settings: { showPrices: 
 response = await restoreProducts({ request: makeRestoreRequest(validBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 200, 'backup hợp lệ phải khôi phục thành công');
 assert.equal(batchCalls, 1, 'backup hợp lệ thực hiện một batch giao dịch');
+const oversizedDeclaredRequest = new Request('https://shop.example/api/admin/restore', {
+  method: 'POST',
+  headers: {
+    Cookie: `sd_admin_session=${token}`,
+    Origin: 'https://shop.example',
+    'Content-Type': 'application/json',
+    'Content-Length': String(20 * 1024 * 1024 + 1),
+  },
+  body: JSON.stringify(validBackup),
+});
+response = await restoreProducts({ request: oversizedDeclaredRequest, env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 413, 'restore must reject oversized declared payload before parsing JSON');
+assert.equal(batchCalls, 1, 'oversized backup must not start a database batch');
 const duplicateSlugBackup = {
   ...validBackup,
   products: [restoredProduct, { ...restoredProduct, id: 'restore-product-2', sku: 'SD-RESTORE-2' }],
