@@ -25,6 +25,7 @@ function validateOperations(operations) {
   const warrantyClaimAttachments = operations.warrantyClaimAttachments || [];
   const providedOrderContactDetails = operations.orderContactDetails === undefined ? null : operations.orderContactDetails;
   const customerById = new Map();
+  const orderById = new Map(), itemById = new Map();
   const customerIds = new Set(), phones = new Set(), orderIds = new Set(), orderNumbers = new Set(), itemIds = new Set(), warrantyCodes = new Set(), claimIds = new Set(), logIds = new Set();
   const contactOrderIds = new Set();
   const customerAddressIds = new Set(), shippingOrderIds = new Set(), itemDetailIds = new Set(), attachmentClaimIds = new Set(), attachmentKeys = new Set();
@@ -36,7 +37,7 @@ function validateOperations(operations) {
   for (const o of orders) {
     if (!str(o.id,100,true) || !str(o.order_number,80,true) || !customerIds.has(o.customer_id) || !["pending_confirmation","confirmed","processing","shipped","completed","cancelled"].includes(o.status) || !["unpaid","pending","paid","refunded"].includes(o.payment_status) || !nullableInteger(o.subtotal) || !nullableInteger(o.total) || ![0,1,"0","1",false,true].includes(o.price_confirmation_required) || !str(o.customer_note,1200) || !timestamp(o.created_at) || !timestamp(o.updated_at)) return { error: "Bản sao lưu có đơn hàng không hợp lệ hoặc tham chiếu khách hàng không tồn tại." };
     if (orderIds.has(o.id) || orderNumbers.has(o.order_number)) return { error: "Bản sao lưu có ID hoặc mã đơn hàng trùng." };
-    orderIds.add(o.id); orderNumbers.add(o.order_number);
+    orderIds.add(o.id); orderNumbers.add(o.order_number); orderById.set(o.id, o);
   }
   if (providedOrderContactDetails !== null) {
     if (providedOrderContactDetails.length !== orders.length) return { error: "Bản sao lưu thiếu thông tin liên hệ cho một hoặc nhiều đơn hàng." };
@@ -49,15 +50,15 @@ function validateOperations(operations) {
   for (const i of items) {
     if (!str(i.id,100,true) || !orderIds.has(i.order_id) || !str(i.product_id,100,true) || !str(i.sku,48,true) || !str(i.title,180,true) || !integer(i.quantity,1,50) || !nullableInteger(i.unit_price,2_000_000_000) || !nullableInteger(i.line_total)) return { error: "Bản sao lưu có dòng sản phẩm trong đơn không hợp lệ." };
     if (itemIds.has(i.id)) return { error: "Bản sao lưu có ID dòng đơn hàng trùng." };
-    itemIds.add(i.id);
+    itemIds.add(i.id); itemById.set(i.id, i);
   }
   for (const w of warranties) {
-    if (!str(w.id,100,true) || !orderIds.has(w.order_id) || !itemIds.has(w.order_item_id) || !str(w.warranty_code,100,true) || !str(w.policy_name,160,true) || !integer(w.duration_months,1,120) || !str(w.starts_at,10,true) || !str(w.ends_at,10,true) || !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) return { error: "Bản sao lưu có bản ghi bảo hành không hợp lệ." };
+    if (!str(w.id,100,true) || !orderIds.has(w.order_id) || !itemIds.has(w.order_item_id) || itemById.get(w.order_item_id)?.order_id !== w.order_id || !str(w.warranty_code,100,true) || !str(w.policy_name,160,true) || !integer(w.duration_months,1,120) || !str(w.starts_at,10,true) || !str(w.ends_at,10,true) || !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) return { error: "Bản sao lưu có bản ghi bảo hành không hợp lệ hoặc dòng sản phẩm không thuộc đúng đơn hàng." };
     if (warrantyCodes.has(w.warranty_code)) return { error: "Bản sao lưu có mã bảo hành trùng." };
     warrantyCodes.add(w.warranty_code);
   }
   for (const c of claims) {
-    if (!str(c.id,100,true) || !orderIds.has(c.order_id) || !customerIds.has(c.customer_id) || !str(c.warranty_code,100) || !str(c.message,1600,true) || !["received","reviewing","approved","rejected","resolved"].includes(c.status) || !str(c.admin_note,1600) || !timestamp(c.created_at) || !timestamp(c.updated_at)) return { error: "Bản sao lưu có yêu cầu bảo hành không hợp lệ." };
+    if (!str(c.id,100,true) || !orderIds.has(c.order_id) || !customerIds.has(c.customer_id) || orderById.get(c.order_id)?.customer_id !== c.customer_id || !str(c.warranty_code,100) || !str(c.message,1600,true) || !["received","reviewing","approved","rejected","resolved"].includes(c.status) || !str(c.admin_note,1600) || !timestamp(c.created_at) || !timestamp(c.updated_at)) return { error: "Bản sao lưu có yêu cầu bảo hành không hợp lệ hoặc khách hàng không thuộc đơn hàng." };
     if (claimIds.has(c.id)) return { error: "Bản sao lưu có ID yêu cầu bảo hành trùng." };
     claimIds.add(c.id);
   }
