@@ -304,14 +304,23 @@ export async function rateLimitLogin(db, request, secret) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const ipHash = b64url(await hmac(ip, secret));
   const now = Date.now();
-  const old = await db.prepare("SELECT window_start, attempts FROM admin_login_attempts WHERE ip_hash = ?").bind(ipHash).first();
-  if (!old || now - Number(old.window_start) >= 15 * 60 * 1000) {
-    await db.prepare("INSERT INTO admin_login_attempts(ip_hash,window_start,attempts) VALUES(?,?,1) ON CONFLICT(ip_hash) DO UPDATE SET window_start=excluded.window_start,attempts=1").bind(ipHash, now).run();
-    return { limited: false, ipHash };
-  }
-  if (Number(old.attempts) >= 5) return { limited: true, ipHash };
-  await db.prepare("UPDATE admin_login_attempts SET attempts=attempts+1 WHERE ip_hash=?").bind(ipHash).run();
-  return { limited: false, ipHash };
+  const windowMs = 15 * 60 * 1000;
+
+  // Increment/reset and read the resulting counter in one D1 transaction.
+  // A separate SELECT followed by UPDATE permits concurrent login attempts to
+  // observe the same old count and race past the threshold.
+  const results = await db.batch([
+    db.prepare(
+      "INSERT INTO admin_login_attempts(ip_hash,window_start,attempts) VALUES(?,?,1) " +
+      "ON CONFLICT(ip_hash) DO UPDATE SET " +
+      "window_start=CASE WHEN ? - admin_login_attempts.window_start >= ? THEN excluded.window_start ELSE admin_login_attempts.window_start END, " +
+      "attempts=CASE WHEN ? - admin_login_attempts.window_start >= ? THEN 1 ELSE admin_login_attempts.attempts+1 END",
+    ).bind(ipHash, now, now, windowMs, now, windowMs),
+    db.prepare("SELECT attempts FROM admin_login_attempts WHERE ip_hash=?").bind(ipHash),
+  ]);
+
+  const attempts = Number(results?.[1]?.results?.[0]?.attempts || 0);
+  return { limited: attempts > 5, ipHash };
 }
 
 export { SESSION_SECONDS };
