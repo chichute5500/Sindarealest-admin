@@ -247,7 +247,6 @@ export async function onRequestPatch(context) {
   }
   if (!Array.isArray(images)) return fail("Bộ ảnh hiện tại của sản phẩm không hợp lệ; chưa duyệt ảnh.", 503);
   if (!images.includes(review.image_ref) && images.length >= 30) return fail("Sản phẩm đã có 30 ảnh; hãy chỉnh bộ ảnh trước khi duyệt.");
-  const next = images.includes(review.image_ref) ? images : [...images, review.image_ref];
   try {
     const result = await db.batch([
       db.prepare(
