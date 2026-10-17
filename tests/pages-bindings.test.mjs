@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { verifyProductionR2Bindings, fetchProductionPagesProject, fetchR2BucketPublicAccess, assertPrivateR2Access } from '../scripts/verify-pages-bindings.mjs';
+import { verifyProductionR2Bindings, fetchProductionPagesProject, fetchR2BucketPublicAccess, assertPrivateR2Access, getR2ReadToken } from '../scripts/verify-pages-bindings.mjs';
+
+assert.equal(getR2ReadToken({ CLOUDFLARE_API_TOKEN: 'pages-token', CLOUDFLARE_R2_READ_API_TOKEN: 'r2-read-token' }), 'r2-read-token');
+assert.throws(() => getR2ReadToken({ CLOUDFLARE_API_TOKEN: 'pages-token' }), /CLOUDFLARE_R2_READ_API_TOKEN/);
 
 const valid = {
   name: 'sindarealest2',
