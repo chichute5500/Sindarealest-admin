@@ -55,6 +55,13 @@ assert.ok(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Do not opt i
 assert.ok(existsSync('public/index.html'));
 assert.ok(existsSync('public/admin/index.html'));
 const storefrontSource = readFileSync('public/index.html', 'utf8');
+const adminSource = readFileSync('public/admin/index.html', 'utf8');
+function assertUniqueStaticIds(source, label) {
+  const ids = [...source.matchAll(/(?:^|\s)id=["']([^"']+)["']/g)].map((match) => match[1]);
+  assert.equal(new Set(ids).size, ids.length, `${label} must not contain duplicate static HTML id attributes`);
+}
+assertUniqueStaticIds(storefrontSource, 'Storefront');
+assertUniqueStaticIds(adminSource, 'Admin');
 assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The Zalo service tile must use the approved service label');
 assert.ok(storefrontSource.includes('Trao đổi trực tiếp qua Zalo'), 'The Zalo service tile must describe only the confirmed contact channel');
 assert.ok(!storefrontSource.includes('Tư Vấn 24/7'), 'Do not claim 24/7 availability without confirmation');
