@@ -57,7 +57,7 @@ assert.ok(existsSync('public/admin/index.html'));
 const storefrontSource = readFileSync('public/index.html', 'utf8');
 const adminSource = readFileSync('public/admin/index.html', 'utf8');
 function assertUniqueStaticIds(source, label) {
-  const ids = [...source.matchAll(/(?:^|\\s)id=["']([^"']+)["']/g)].map((match) => match[1]);
+  const ids = [...source.matchAll(/(?:^|\s)id=["']([^"']+)["']/g)].map((match) => match[1]);
   assert.equal(new Set(ids).size, ids.length, `${label} must not contain duplicate static HTML id attributes`);
 }
 assertUniqueStaticIds(storefrontSource, 'Storefront');
