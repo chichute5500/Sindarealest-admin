@@ -1,4 +1,4 @@
-import { dbOrFail, fail, getSetting, json, rateLimitPublicRequest } from "../_lib.js";
+import { dbOrFail, fail, getSetting, json, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 import { sendAdminPush } from "../_notifications.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
@@ -12,8 +12,10 @@ export async function onRequestPost({ request, env }) {
   const unavailable = dbOrFail(env);
   if (unavailable) return unavailable;
   try { const limit = await rateLimitPublicRequest(env, request, "order_create", 6, 900); if (limit.limited) return fail("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi 15 phút hoặc liên hệ qua Zalo.", 429, { "Retry-After": "900" }); } catch { return fail("Dịch vụ tiếp nhận đơn chưa sẵn sàng.", 503); }
-  let body;
-  try { body = await request.json(); } catch { return fail("Thông tin đặt hàng không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(request, 64 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin đặt hàng vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin đặt hàng không hợp lệ.");
+  const body = parsedBody.value;
   const fullName = clean(body?.fullName, 120), phone = clean(body?.phone, 24), email = clean(body?.email, 160), province = clean(body?.province, 100), provinceCode = clean(body?.provinceCode, 12), ward = clean(body?.ward, 120), wardCode = clean(body?.wardCode, 12), streetAddress = clean(body?.streetAddress, 300), address = clean(body?.address || [streetAddress, ward, province].filter(Boolean).join(", "), 400), customerNote = clean(body?.note, 1200);
   if (fullName.length < 2) return fail("Vui lòng nhập họ tên.");
   if ((province || ward || streetAddress || provinceCode || wardCode) && (!province || !ward || !streetAddress || !provinceCode || !wardCode)) return fail("Vui lòng chọn tỉnh/thành, xã/phường và nhập địa chỉ chi tiết.");
