@@ -20,10 +20,10 @@ function webpBytes() {
   bytes.set([0x57, 0x45, 0x42, 0x50], 8);
   return bytes;
 }
-function makeRequest({ originalType = "image/webp", originalBytes = webpBytes() } = {}) {
+function makeRequest({ originalType = "image/webp", originalBytes = webpBytes(), includeOriginal = true } = {}) {
   const form = new FormData();
   form.append("file", new Blob([webpBytes()], { type: "image/webp" }), "display.webp");
-  form.append("original", new Blob([originalBytes], { type: originalType }), "original");
+  if (includeOriginal) form.append("original", new Blob([originalBytes], { type: originalType }), "original");
   return new Request("https://shop.example/api/admin/upload", {
     method: "POST",
     headers: {
@@ -53,5 +53,14 @@ const mislabeled = await uploadProductImage({
 assert.equal(mislabeled.status, 400, "original bytes must match the declared JPEG/PNG/WebP type");
 assert.equal(badOriginals.puts.length, 0, "mislabeled originals must be rejected before storage");
 assert.equal(badImages.puts.length, 0, "rejecting the original must not leave a public derivative behind");
+
+const missingOriginals = bucket(), missingImages = bucket();
+const missingOriginal = await uploadProductImage({
+  request: makeRequest({ includeOriginal: false }),
+  env: { DB: {}, ADMIN_PASSWORD, SESSION_SECRET, ORIGINALS: missingOriginals, IMAGES: missingImages },
+});
+assert.equal(missingOriginal.status, 400, "missing original file must be rejected instead of storing the optimized derivative as the original");
+assert.equal(missingOriginals.puts.length, 0, "missing original must not write to private storage");
+assert.equal(missingImages.puts.length, 0, "missing original must not write a public derivative");
 
 console.log("PASS: admin image uploads validate original file signatures and keep originals private.");
