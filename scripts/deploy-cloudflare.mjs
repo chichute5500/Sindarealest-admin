@@ -15,8 +15,8 @@ const ask = async (question, fallback = '') => {
 };
 
 async function main() {
-  if (ci && process.env.CLOUDFLARE_PAGES_ORIGINALS_READY !== 'true') {
-    throw new Error('Deploy bị chặn: chưa xác minh binding ORIGINALS riêng tư. Xác minh ORIGINALS khác IMAGES, không public access/r2.dev/custom domain và được gắn trong đúng môi trường Pages; chỉ sau đó mới đặt CLOUDFLARE_PAGES_ORIGINALS_READY=true.');
+  if (ci && process.env.CLOUDFLARE_PAGES_ORIGINALS_VERIFIED !== 'true') {
+    throw new Error('Deploy bị chặn: bước kiểm tra trước đó chưa xác minh được binding ORIGINALS riêng tư và quyền public access.');
   }
   if (!ci) {
     const originalsReady = (await ask('Đã xác minh binding ORIGINALS là bucket riêng tư, khác IMAGES và gắn đúng môi trường Pages chưa? Nhập YES', 'NO')).toUpperCase();
