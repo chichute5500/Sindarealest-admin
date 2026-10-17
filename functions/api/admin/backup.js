@@ -5,18 +5,18 @@ const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
 const MAX_BACKUP_RECORDS = 5000;
 
 const TOTAL_RECORD_COUNT_SQL = `SELECT
-  (SELECT COUNT(*) FROM products) +
-  (SELECT COUNT(*) FROM customers) +
-  (SELECT COUNT(*) FROM orders) +
-  (SELECT COUNT(*) FROM order_items) +
-  (SELECT COUNT(*) FROM warranties) +
-  (SELECT COUNT(*) FROM warranty_claims) +
-  (SELECT COUNT(*) FROM audit_logs) +
-  (SELECT COUNT(*) FROM customer_address_details) +
-  (SELECT COUNT(*) FROM order_shipping_addresses) +
-  (SELECT COUNT(*) FROM order_contact_details) +
-  (SELECT COUNT(*) FROM order_item_details) +
-  (SELECT COUNT(*) FROM warranty_claim_attachments) AS total_count`;
+  (SELECT COUNT(*) FROM (SELECT 1 FROM products LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM customers LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM orders LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_items LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM warranties LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM warranty_claims LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM audit_logs LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM customer_address_details LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_shipping_addresses LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_contact_details LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_item_details LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM warranty_claim_attachments LIMIT 5001)) AS total_count`;
 
 function boundedTableQuery(db, table, orderBy) {
   return db.prepare(
