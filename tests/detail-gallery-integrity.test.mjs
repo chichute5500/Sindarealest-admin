@@ -9,7 +9,7 @@ assert.equal(count('id="sdFullscreenViewer"'), 1, 'There must be exactly one ful
 assert.equal(count('id="sdFullscreenImage"'), 1, 'The fullscreen gallery needs one primary image layer.');
 assert.equal(count('id="sdFullscreenImageNext"'), 1, 'The fullscreen gallery needs a second preloaded layer to prevent blank frames.');
 assert.match(html, /id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình"/);
-assert.match(html, /function sizeFullscreenFrame\(\)/);
+assert.match(html, /function sizeFullscreenFrame\([^)]*\)/);
 assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /function renderFullscreenThumbs\(/);
 assert.match(html, /function openFullscreenImage\(\)/);
@@ -34,7 +34,7 @@ assert.ok(html.includes("$('#sdFullscreenViewer').classList.contains('open')"), 
 
 
 const fullscreenTransitionStart = html.indexOf('function setFullscreenPhoto(');
-const fullscreenTimingConstant = html.lastIndexOf('const FULLSCREEN_SLIDE_HALF_MS=150', fullscreenTransitionStart);
+const fullscreenTimingConstant = html.lastIndexOf('const FULLSCREEN_SLIDE_MS=300', fullscreenTransitionStart);
 assert.notEqual(fullscreenTimingConstant, -1, 'The fullscreen transition duration constant must be declared before the transition handler.');
 const fullscreenTransition = html.slice(
   fullscreenTimingConstant,
