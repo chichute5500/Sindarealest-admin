@@ -671,6 +671,31 @@ try {
   globalThis.fetch = originalFetch;
 }
 
+async function assertOversizedJsonRejected(handler, path, maxBytes) {
+  const { DB, counters } = makeAuditTestDb(null);
+  const sessionSecret = "test-session-secret-".padEnd(40, "x");
+  const session = await createSession(sessionSecret);
+  const request = new Request("https://sindarealest.test" + path, {
+    method: path.endsWith("image-audit") && handler === patchImageAudit ? "PATCH" : "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": String(maxBytes + 1),
+      Cookie: "sd_admin_session=" + session,
+      Origin: "https://sindarealest.test"
+    },
+    body: "{}"
+  });
+  const response = await handler({
+    request,
+    env: { DB, ADMIN_PASSWORD: "test-admin-password", SESSION_SECRET: sessionSecret }
+  });
+  assert.equal(response.status, 413, path + " must reject oversized declared JSON before parsing");
+  assert.equal(counters.quotaQueries, 0, path + " must reject oversized JSON before quota checks");
+}
+await assertOversizedJsonRejected(postImageSearch, "/api/admin/image-search", 8 * 1024 * 1024);
+await assertOversizedJsonRejected(postImageAudit, "/api/admin/image-audit", 8 * 1024 * 1024);
+await assertOversizedJsonRejected(patchImageAudit, "/api/admin/image-audit", 8 * 1024);
+
 console.log("PASS: AI image audit rejects cross-product references and non-pending candidates before quota/model calls.");
 
 console.log("PASS: Workers AI keyword normalization, Elimapi product/price mapping, API authentication handling, safe source URLs, fail-closed 90% gate, material screening, D1 inventory, and manual image approval.");
