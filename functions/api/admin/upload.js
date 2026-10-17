@@ -1,7 +1,8 @@
-import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
+import { fail, json, readBodyBytesLimited, requireAdmin, storageOrFail } from "../../_lib.js";
 
 const MAX_DERIVATIVE_BYTES = 5 * 1024 * 1024;
 const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024;
+const MAX_MULTIPART_BYTES = MAX_ORIGINAL_BYTES + MAX_DERIVATIVE_BYTES + 1024 * 1024;
 const ORIGINAL_TYPES = Object.freeze({
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -17,8 +18,23 @@ export async function onRequestPost(context) {
     return fail("Kho ảnh gốc chưa được cấu hình. Hãy gắn R2 bucket riêng tư bằng binding ORIGINALS trước khi tải ảnh sản phẩm mới lên.", 503);
   }
 
+  const parsedMultipart = await readBodyBytesLimited(context.request, MAX_MULTIPART_BYTES);
+  if (parsedMultipart.error === "too_large") return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.", 413);
+  if (parsedMultipart.error) return fail("Không đọc được tệp ảnh.");
+
   let form;
-  try { form = await context.request.formData(); } catch { return fail("Không đọc được tệp ảnh."); }
+  try {
+    const headers = new Headers(context.request.headers);
+    headers.delete("Content-Length");
+    const boundedRequest = new Request(context.request.url, {
+      method: "POST",
+      headers,
+      body: parsedMultipart.bytes,
+    });
+    form = await boundedRequest.formData();
+  } catch {
+    return fail("Không đọc được tệp ảnh.");
+  }
   const file = form.get("file");
   const original = form.get("original") || file;
 
