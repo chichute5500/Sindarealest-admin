@@ -1,4 +1,4 @@
-import { fail, fromRow, genericDbError, json, productInsertStatement, requireAdmin, toAdminProduct, validateProduct } from "../../_lib.js";
+import { fail, fromRow, genericDbError, json, productInsertStatement, readJsonBodyLimited, requireAdmin, toAdminProduct, validateProduct } from "../../_lib.js";
 
 function makeCategoryPrefix(slug) {
   const compact = String(slug || "").replace(/-/g, "").toUpperCase();
@@ -19,8 +19,10 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Biểu mẫu sản phẩm không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 32 * 1024);
+  if (parsedBody.error === "too_large") return fail("Biểu mẫu sản phẩm vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Biểu mẫu sản phẩm không hợp lệ.");
+  const body = parsedBody.value;
   const rawCategory = String(body?.category || body?.categoryLabel || "").trim();
   const normalized = rawCategory.toLocaleLowerCase("vi").replace(/đ/g,"d").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
   const categories = {
@@ -33,16 +35,16 @@ export async function onRequestPost(context) {
     "day-dong-ho": ["watch-straps","SD-DH"], "watch-straps": ["watch-straps","SD-DH"],
     "op-dien-thoai": ["phone-cases","SD-ODT"], "phone-cases": ["phone-cases","SD-ODT"]
   };
-  const category = categories[normalized] || (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
+  const category = Object.hasOwn(categories, normalized) ? categories[normalized] : (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
   if (!category) return fail("Vui lòng chọn một danh mục hợp lệ trong danh sách.");
   try {
-    const rows = await context.env.DB.prepare("SELECT sku FROM products").all();
+    const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
     let max = 0;
     for (const row of rows.results || []) {
       const sku = String(row.sku || "").toUpperCase();
       if (!sku.startsWith(category[1])) continue;
       const suffix = sku.slice(category[1].length);
-      if (/^\d+$/.test(suffix)) max = Math.max(max, Number(suffix) || 0);
+      if (/^\d+$/.test(suffix)) { const number = Number(suffix); if (Number.isSafeInteger(number)) max = Math.max(max, number); }
     }
     body.sku = category[1] + String(max + 1).padStart(3, "0");
     body.category = category[0];
@@ -50,12 +52,40 @@ export async function onRequestPost(context) {
   } catch { return fail("Không thể tạo SKU từ danh mục. Vui lòng thử lại.", 503); }
   const checked = validateProduct(body);
   if (checked.error) return fail(checked.error);
-  try {
-    const p = checked.value;
-    await context.env.DB.batch([
-      productInsertStatement(context.env.DB, p),
-      context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_created', 'product', ?, ?)").bind(crypto.randomUUID(),p.id,JSON.stringify({ sku:p.sku,title:p.title }))
-    ]);
-    return json({ ok: true, product: toAdminProduct(p), message: "Đã thêm sản phẩm." }, 201);
-  } catch (error) { return genericDbError(error); }
+  let p = checked.value;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      await context.env.DB.batch([
+        productInsertStatement(context.env.DB, p),
+        context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_created', 'product', ?, ?)").bind(crypto.randomUUID(),p.id,JSON.stringify({ sku:p.sku,title:p.title }))
+      ]);
+      return json({ ok: true, product: toAdminProduct(p), message: "Đã thêm sản phẩm." }, 201);
+    } catch (error) {
+      // Multiple admin saves can race after reading the same highest SKU. Retry
+      // only for a SKU uniqueness conflict; never mask unrelated DB failures.
+      if (!/UNIQUE constraint failed:\s*products\.sku/i.test(String(error?.message || ""))) {
+        return genericDbError(error);
+      }
+      if (attempt === 4) {
+        return fail("Không thể cấp SKU duy nhất sau nhiều lần thử đồng thời. Hãy tải lại danh sách rồi thử lại.", 409);
+      }
+      try {
+        const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
+        let max = 0;
+        for (const row of rows.results || []) {
+          const sku = String(row.sku || "").toUpperCase();
+          if (!sku.startsWith(category[1])) continue;
+          const suffix = sku.slice(category[1].length);
+          if (/^\d+$/.test(suffix)) {
+            const number = Number(suffix);
+            if (Number.isSafeInteger(number)) max = Math.max(max, number);
+          }
+        }
+        p = { ...p, sku: category[1] + String(max + 1).padStart(3, "0") };
+      } catch {
+        return fail("Không thể đọc lại SKU sau xung đột. Vui lòng thử lại.", 503);
+      }
+    }
+  }
+  return fail("Không thể tạo sản phẩm. Vui lòng thử lại.", 503);
 }

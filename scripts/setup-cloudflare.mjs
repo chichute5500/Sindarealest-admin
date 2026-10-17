@@ -59,9 +59,13 @@ async function main() {
     throw new Error(`Không tìm thấy D1 database “${dbName}”. Script không tự tạo database để tránh nhầm tài nguyên.`);
   }
 
-  const bucket = required(await ask('Tên R2 bucket CHÍNH XÁC sẽ lưu ảnh tải lên'), 'tên R2 bucket');
-  assertSafeName(bucket, 'Tên R2 bucket');
+  const bucket = required(await ask('Tên R2 bucket IMAGES dùng cho ảnh WebP hiển thị và logo'), 'tên R2 bucket IMAGES');
+  assertSafeName(bucket, 'Tên R2 bucket IMAGES');
   runWrangler(['r2', 'bucket', 'info', bucket, '--json'], { quiet: true });
+  const originalsBucket = required(await ask('Tên R2 bucket ORIGINALS RIÊNG TƯ để lưu ảnh gốc'), 'tên R2 bucket ORIGINALS');
+  assertSafeName(originalsBucket, 'Tên R2 bucket ORIGINALS');
+  if (originalsBucket === bucket) throw new Error('ORIGINALS phải là bucket riêng tư khác IMAGES.');
+  runWrangler(['r2', 'bucket', 'info', originalsBucket, '--json'], { quiet: true });
 
   const productionBranch = typeof projectRecord.production_branch === 'string' ? projectRecord.production_branch : '';
   const branch = required(await ask('Production branch của Pages project', productionBranch), 'production branch');
@@ -77,15 +81,16 @@ async function main() {
   console.log(`Pages project : ${project}`);
   console.log(`Production branch: ${branch}`);
   console.log(`D1 database   : ${dbName}`);
-  console.log(`R2 bucket     : ${bucket}`);
+  console.log(`R2 bucket IMAGES: ${bucket}`);
+  console.log(`R2 bucket ORIGINALS (riêng tư): ${originalsBucket}`);
   console.log(`Nạp dữ liệu gốc: ${freshAnswer}`);
-  console.log('\nTRƯỚC KHI CHẠY SQL/DEPLOY: trong Cloudflare Dashboard, hãy lưu đúng hai bindings Production (DB → D1 đã chọn; IMAGES → R2 đã chọn) và hai secrets ADMIN_PASSWORD, SESSION_SECRET.');
-  const bindingsReady = (await ask('Bạn đã lưu và kiểm tra đúng 2 bindings DB/IMAGES cùng 2 secrets ADMIN_PASSWORD và SESSION_SECRET trên đúng Pages project chưa? Nhập YES để tiếp tục', 'NO')).toUpperCase();
+  console.log('\nTRƯỚC KHI CHẠY SQL/DEPLOY: trong Cloudflare Dashboard, hãy lưu đúng hai bindings Production (DB → D1; IMAGES → bucket ảnh công khai; ORIGINALS → bucket R2 riêng tư khác IMAGES, không public access/r2.dev/custom domain) và hai secrets ADMIN_PASSWORD, SESSION_SECRET.');
+  const bindingsReady = (await ask('Bạn đã lưu và kiểm tra đúng 3 bindings DB/IMAGES/ORIGINALS (ORIGINALS riêng tư, khác IMAGES) cùng 2 secrets ADMIN_PASSWORD và SESSION_SECRET trên đúng Pages project chưa? Nhập YES để tiếp tục', 'NO')).toUpperCase();
   if (bindingsReady !== 'YES') {
-    throw new Error('Dừng trước mọi lệnh SQL và deploy. Hãy kiểm tra bindings DB/IMAGES và 2 secrets ADMIN_PASSWORD, SESSION_SECRET, rồi chạy lại npm run setup:cloudflare.');
+    throw new Error('Dừng trước mọi lệnh SQL và deploy. Hãy kiểm tra bindings DB/IMAGES/ORIGINALS và 2 secrets ADMIN_PASSWORD, SESSION_SECRET, rồi chạy lại npm run setup:cloudflare.');
   }
-  const confirm = await ask(`Để xác nhận, nhập chính xác: DEPLOY ${project} USING ${dbName} AND ${bucket}`);
-  if (confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket}`) {
+  const confirm = await ask(`Để xác nhận, nhập chính xác: DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`);
+  if (confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`) {
     throw new Error('Chuỗi xác nhận không khớp. Đã hủy trước khi chạy SQL hoặc deploy.');
   }
 

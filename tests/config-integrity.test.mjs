@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { parseCliJson, findNamedRecord, assertSafeName } from '../scripts/cloudflare-utils.mjs';
 
 const payload = parseCliJson('\nWrangler notice\n[{"name":"shop-prod","production_branch":"main"}]\nFinished listing projects.');
@@ -28,6 +31,21 @@ assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && de
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deployReadme), 'Deployment guide must not require obsolete SMS credentials');
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
+assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must be blocked until private ORIGINALS is verified');
+assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must require ORIGINALS separate from IMAGES');
+assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Workflow must pass the ORIGINALS readiness variable');
+assert.ok(workflow.includes("if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'"), 'Production deployment must be skipped until private ORIGINALS is verified');
+assert.ok(workflow.indexOf('Diagnose actual Production R2 bindings') < workflow.indexOf('Deploy to verified Pages project'), 'Actual production bindings must be checked before deployment');
+assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
+assert.ok(workflow.includes("continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}"), 'Binding diagnostics may not block a safely skipped deployment, but must block deployment when readiness is enabled');
+const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.mjs', import.meta.url), 'utf8');
+assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding verifier must inspect production, not preview, settings');
+assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
+assert.ok(bindingVerifier.includes('images === originals'), 'Binding verifier must reject the same bucket for public images and private originals');
+assert.ok(bindingVerifier.includes('/managed') && bindingVerifier.includes('/custom'), 'Binding verifier must inspect both r2.dev and custom-domain public access');
+assert.ok(bindingVerifier.includes('assertPrivateR2Access'), 'Deployment must fail closed if ORIGINALS is publicly accessible');
+assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`'), 'Setup confirmation must include both R2 bucket names');
+assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
 assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
 assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
@@ -36,5 +54,68 @@ const wranglerConfig = readFileSync('wrangler.toml', 'utf8');
 assert.ok(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Do not opt into Wrangler production config until actual Pages config has been downloaded and reconciled');
 assert.ok(existsSync('public/index.html'));
 assert.ok(existsSync('public/admin/index.html'));
+const storefrontSource = readFileSync('public/index.html', 'utf8');
+const adminSource = readFileSync('public/admin/index.html', 'utf8');
+function assertUniqueStaticIds(source, label) {
+  const ids = [...source.matchAll(/(?:^|\s)id=["']([^"']+)["']/g)].map((match) => match[1]);
+  assert.equal(new Set(ids).size, ids.length, `${label} must not contain duplicate static HTML id attributes`);
+}
+assertUniqueStaticIds(storefrontSource, 'Storefront');
+assertUniqueStaticIds(adminSource, 'Admin');
+assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The Zalo service tile must use the approved service label');
+assert.ok(storefrontSource.includes('Trao đổi trực tiếp qua Zalo'), 'The Zalo service tile must describe only the confirmed contact channel');
+assert.ok(!storefrontSource.includes('Tư Vấn 24/7'), 'Do not claim 24/7 availability without confirmation');
+assert.ok(!storefrontSource.includes('Da tuyển chọn'), 'Do not claim an unverified leather selection process');
+for (const unsupportedClaim of ['Da Cá Sấu Thật', 'Thiết Kế Độc Quyền', 'Bảo Hành Uy Tín', 'Giao Hàng Toàn Quốc', 'Chính sách rõ ràng', 'Đẳng Cấp Thật', 'Từ Chất Liệu Thật', 'Cam kết chất lượng']) {
+  assert.ok(!storefrontSource.includes(unsupportedClaim), `Storefront must not assert an unverified claim: ${unsupportedClaim}`);
+}
+for (const approvedPromise of ['Da cá sấu cao cấp', 'Hoàn thiện thủ công', 'Tỉ mỉ từng chi tiết', 'Bảo hành 1 năm', 'Bảo dưỡng trọn đời', 'Đa dạng mẫu mã', 'Đặt hàng theo yêu cầu']) {
+  assert.ok(storefrontSource.includes(approvedPromise), `Storefront must retain the approved brand promise: ${approvedPromise}`);
+}
 assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fallback must not shadow D1 failures');
-console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, and single-source catalog invariant.');
+
+const seedWorkflow = readFileSync('.github/workflows/import-d1-products.yml', 'utf8');
+assert.ok(seedWorkflow.includes('confirm_empty_database'), 'Manual D1 seed must require an explicit empty-database confirmation');
+assert.ok(seedWorkflow.includes('CONFIRM_EMPTY_DATABASE') && seedWorkflow.includes('"YES"'), 'Manual D1 seed must stop unless confirmation is YES');
+const productCountGuard = readFileSync('scripts/assert-product-count.mjs', 'utf8');
+assert.ok(productCountGuard.includes('if (count !== expected)'), 'Product count guard must reject counts that differ from the expected value');
+assert.ok(seedWorkflow.includes('SELECT COUNT(*) AS product_count FROM products;'), 'Manual D1 seed must query the live product count');
+assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-count.json 0'), 'Manual D1 seed must verify zero existing products before inserting');
+assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-count.json 235'), 'Manual D1 seed must verify exactly 235 products after import');
+assert.ok(seedWorkflow.includes('concurrency:') && seedWorkflow.includes('sindarealest-d1-initial-seed'), 'Initial seed workflow must serialize simultaneous runs');
+assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
+
+assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
+assert.ok(deployReadme.includes('R2 Storage: Read') && deployReadme.includes('HTTP 403'), 'Deployment guide must explain the read-only R2 permissions needed for public-access verification');
+const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
+assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
+const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
+assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
+const notificationsSource = readFileSync('functions/_notifications.js', 'utf8');
+assert.ok(notificationsSource.includes('mailto:dacasau.sindarealest@gmail.com'), 'VAPID fallback subject must use the verified SinDarealest contact');
+assert.ok(!notificationsSource.includes('mailto:admin@sindarealest.com'), 'VAPID fallback must not contain an unverified placeholder email');
+
+const guardDir = mkdtempSync(join(tmpdir(), 'sd-product-count-'));
+try {
+  const guardFile = join(guardDir, 'count.json');
+  const guardScript = new URL('../scripts/assert-product-count.mjs', import.meta.url).pathname;
+  const runGuard = (json, expected) => {
+    writeFileSync(guardFile, json);
+    return spawnSync(process.execPath, [guardScript, guardFile, String(expected)], { encoding: 'utf8' });
+  };
+  const zeroCount = runGuard('[{"results":[{"product_count":0}]}]', 0);
+  assert.equal(zeroCount.status, 0, 'Product count guard must accept an empty table before seed');
+  assert.match(zeroCount.stdout, /PASS: product_count=0/);
+  const seededCount = runGuard('[{"results":[{"product_count":235}]}]', 235);
+  assert.equal(seededCount.status, 0, 'Product count guard must accept exactly 235 seeded products');
+  const nonEmpty = runGuard('[{"results":[{"product_count":1}]}]', 0);
+  assert.notEqual(nonEmpty.status, 0, 'Product count guard must reject a non-empty target');
+  const missingCount = runGuard('[{"results":[{"total_products":235}]}]', 235);
+  assert.notEqual(missingCount.status, 0, 'Product count guard must fail closed when the count field is missing');
+  const malformed = runGuard('not-json', 0);
+  assert.notEqual(malformed.status, 0, 'Product count guard must fail closed on invalid JSON');
+} finally {
+  rmSync(guardDir, { recursive: true, force: true });
+}
+
+console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, private R2 readiness, guarded manual seed, and single-source catalog invariant.');

@@ -1,11 +1,13 @@
-import { fail, fromRow, genericDbError, json, requireAdmin, toAdminProduct, validateProduct } from "../../../_lib.js";
+import { fail, fromRow, genericDbError, json, readJsonBodyLimited, requireAdmin, toAdminProduct, validateProduct } from "../../../_lib.js";
 
 export async function onRequestPut(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
   const id = String(context.params.id || "");
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Biểu mẫu sản phẩm không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 32 * 1024);
+  if (parsedBody.error === "too_large") return fail("Biểu mẫu sản phẩm vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Biểu mẫu sản phẩm không hợp lệ.");
+  const body = parsedBody.value;
   try {
     const row = await context.env.DB.prepare("SELECT * FROM products WHERE id = ? LIMIT 1").bind(id).first();
     if (!row) return fail("Không tìm thấy sản phẩm.", 404);

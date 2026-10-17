@@ -1,0 +1,36 @@
+name: Read-only R2 token diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-r2-read-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require read-only R2 credentials
+        env:
+          R2_READ_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
+          ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          test -n "$R2_READ_TOKEN" || { echo "::error::Missing CLOUDFLARE_R2_READ_API_TOKEN secret"; exit 1; }
+          test -n "$ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+
+      - name: List R2 bucket names using read-only API
+        env:
+          R2_READ_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
+          ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${R2_READ_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets")"
+          printf '%s' "$response" | jq -e '.success == true' >/dev/null
+          echo "R2 read-only API access succeeded. Bucket names:"
+          printf '%s' "$response" | jq -r '.result.buckets[]?.name'
+          echo "No bucket objects were read, written, or deleted."

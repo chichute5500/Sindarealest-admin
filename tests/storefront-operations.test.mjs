@@ -14,6 +14,30 @@ assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHt
 assert.ok(!storefrontHtml.includes('id="heroDarkShoe"') && !storefrontHtml.includes('id="heroLightShoe"') && !storefrontHtml.includes('hero-art'), 'Hero product images must be removed from the storefront intro');
 assert.ok(storefrontHtml.includes('SinDarealest mang đến những sản phẩm thời trang da cá sấu cao cấp') && storefrontHtml.includes('Khám phá bộ sưu tập') && storefrontHtml.includes('Khám phá sản phẩm'), 'Hero intro copy and both calls to action must remain after removing product imagery');
 assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
+const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
+assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');
+assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile background URL must be versioned to invalidate old immutable cache entries');
+assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
+assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
+
+assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('images\/theme-croc-dark\.webp\?v=20261017-1'\);filter:none/,
+  'Dark mode displays the dark crocodile image directly with light text colors.');
+assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:none/,
+  'Light mode displays the albino crocodile image directly with dark text colors.');
+assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
+  'The dark welcome screen must use the dark crocodile image with its dark contrast tint.');
+assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
+  'The light welcome screen must use the albino image with its light contrast tint.');
+assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--dark" src="images\/theme-croc-dark\.webp\?v=20261017-1"/,
+  'The editorial material sample image must keep its black-material identity.');
+assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--light" src="images\/theme-croc-albino\.webp\?v=20261017-1"/,
+  'The editorial material sample image must keep its albino-material identity.');
+
+const adminThemeHtml = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
+assert.ok(adminThemeHtml.includes('theme-croc-dark.webp?v='), 'Admin dark theme background URL must also be cache-busted');
+assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(adminThemeHtml), 'Admin theme background must not retain an unversioned dark asset reference');
+assert.ok(themeCacheHeaders.includes('/images/theme-croc-dark.webp\n  ! Cache-Control\n  Cache-Control: public, max-age=0, must-revalidate'), 'Dark theme asset must detach inherited immutable caching and revalidate when its stable path is requested');
+assert.ok(themeCacheHeaders.includes('/images/theme-croc-albino.webp\n  ! Cache-Control\n  Cache-Control: public, max-age=0, must-revalidate'), 'Light theme asset must detach inherited immutable caching and revalidate when its stable path is requested');
 assert.ok(!storefrontHtml.includes('sd-admin-shortcut') && !storefrontHtml.includes('href="/admin/"'), 'The public storefront must not expose a management link while admin remains at its separate route');
 assert.ok(storefrontHtml.includes('sdMenuItemIn') && storefrontHtml.includes('mobile-nav.open .navlink:nth-child(6)'), 'Mobile glass menu items should animate in a staggered sequence');
 assert.ok(!storefrontHtml.includes("(mod&&['u','s','c'].includes(k))") && storefrontHtml.includes("e.target.closest('img, picture')"), 'Text selection and copy must remain available outside protected images');
@@ -22,7 +46,7 @@ const warrantyClaimSource = readFileSync(new URL('../functions/api/warranty-clai
 const backupSource = readFileSync(new URL('../functions/api/admin/backup.js', import.meta.url), 'utf8');
 const restoreSource = readFileSync(new URL('../functions/api/admin/restore.js', import.meta.url), 'utf8');
 for (const table of ['customer_address_details','order_shipping_addresses','order_item_details','warranty_claim_attachments']) {
-  assert.ok(backupSource.includes('SELECT * FROM ' + table), 'Backup must include ' + table);
+  assert.ok(backupSource.includes('boundedTableQuery(db, "' + table + '"'), 'Backup must include bounded query for ' + table);
   assert.ok(restoreSource.includes('INSERT INTO ' + table), 'Restore must reinsert ' + table);
 }
 assert.ok(restoreSource.includes('DELETE FROM warranty_claim_uploads') && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'") && restoreSource.includes("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'") && !restoreSource.includes('DELETE FROM warranty_verifications'), 'Restore must clear temporary upload and lookup tokens without requiring OTP tables');
@@ -30,9 +54,30 @@ const uploadSource = readFileSync(new URL('../functions/api/warranty-claim-uploa
 assert.ok(uploadSource.includes('INSERT INTO settings(key,value,updated_at)') && uploadSource.includes('warranty_upload:'), 'New uploads must store short-lived tokens in the existing settings table');
 assert.ok(warrantyClaimSource.includes('warranty_upload:') && warrantyClaimSource.includes('DELETE FROM settings WHERE key=?'), 'Claim submission must validate and consume the upload token');
 assert.ok(restoreSource.includes('operations.warrantyClaimAttachments'), 'Restore must preserve claim attachment metadata');
-assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('warranty.status!=="active"'), 'Warranty claims must not require OTP and must require an active warranty');
+assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('isWarrantyEligibleOnDate'), 'Warranty claims must not require OTP and must validate the warranty using the shared Vietnam-local date check');
+assert.ok(warrantyClaimSource.includes('w.starts_at'), 'Warranty claim validation must fetch the warranty start date');
+assert.ok(uploadSource.includes('w.starts_at'), 'Warranty photo upload validation must fetch the warranty start date');
 const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-lookup.js', import.meta.url), 'utf8');
 assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && warrantyLookupSource.includes('claimToken') && !warrantyLookupSource.includes('warrantyCode: code') && warrantyLookupSource.includes('maskedPhone') && warrantyLookupSource.includes('maskedAddress'), 'Public warranty lookup must return masked data and a short-lived action token');
+const adminWarrantiesSource = readFileSync(new URL('../functions/api/admin/warranties.js', import.meta.url), 'utf8');
+const sharedLibSource = readFileSync(new URL('../functions/_lib.js', import.meta.url), 'utf8');
+const adminHtmlSource = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
+assert.ok(warrantyLookupSource.includes("warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today)"), 'Customer lookup must use start and end dates for its visible status');
+assert.ok(adminWarrantiesSource.includes('warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today)'), 'Admin warranty list must use start and end dates for its visible status');
+assert.ok(storefrontHtml.includes("w.status==='pending'?'Chưa đến ngày bắt đầu'"), 'Customer warranty UI must explain a future-start warranty');
+assert.ok(adminHtmlSource.includes("status==='pending'?'Chưa đến ngày bắt đầu'"), 'Admin warranty UI must localize a future-start warranty');
+assert.ok(storefrontHtml.includes("w.status==='invalid'?'Cần kiểm tra thông tin bảo hành'"), 'Customer UI must not label malformed warranty dates active');
+assert.ok(adminHtmlSource.includes("status==='invalid'?'Cần kiểm tra thông tin bảo hành'"), 'Admin UI must flag malformed warranty dates for review');
+assert.ok(sharedLibSource.includes('timeZone: "Asia/Ho_Chi_Minh"') && sharedLibSource.includes('export function isWarrantyEligibleOnDate'), 'Warranty expiry must use shared Vietnam-local calendar date logic');
+for (const [fileName, source] of [
+  ['warranty lookup', warrantyLookupSource],
+  ['warranty claim submission', warrantyClaimSource],
+  ['warranty photo upload', uploadSource],
+  ['admin warranty list', adminWarrantiesSource],
+]) {
+  assert.ok(source.includes('getCurrentDateInVietnam') || source.includes('warrantyStatusOnDate'), fileName + ' must use shared Vietnam-local expiry logic');
+  assert.ok(!source.includes("new Date().toISOString().slice(0,10)") && !source.includes("date('now')"), fileName + ' must not compare warranty expiry using UTC');
+}
 assert.ok(uploadSource.includes('form.get("claimToken")') && warrantyClaimSource.includes('body?.claimToken'), 'Warranty photo upload and claim submission must resolve tokens server-side');
 assert.ok(!storefrontHtml.includes('OTP') && !storefrontHtml.includes('otp') && !warrantyClaimSource.includes('ticketId'), 'Customer warranty flows must not include OTP or session tickets');
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
@@ -99,6 +144,7 @@ const demoWarrantyRow = {
 function warrantyDB() {
   const settings = new Map();
   const query = (sql, values=[]) => ({
+    sql,
     async run() {
       if (sql.includes('INSERT INTO settings')) settings.set(values[0],{value:values[1],updated_at:new Date().toISOString().replace('T',' ').replace('Z','')});
       if (sql.includes('DELETE FROM settings WHERE key=?')) settings.delete(values[0]);
@@ -117,7 +163,16 @@ function warrantyDB() {
   });
   return {
     prepare(sql) { return { ...query(sql), bind(...values) { return query(sql,values); } }; },
-    async batch(statements) { for (const statement of statements) await statement.run(); return []; }
+    async batch(statements) {
+      for (const statement of statements) await statement.run();
+      if (statements[0]?.sql.includes('INSERT INTO warranty_claims')) {
+        return statements.map((_, index) => ({ meta: { changes: 1 } }));
+      }
+      if (statements[0]?.sql.includes('INSERT INTO public_rate_limits')) {
+        return [{ success: true }, { success: true, results: [{ attempts: 1 }] }];
+      }
+      return statements.map(() => ({ meta: { changes: 1 } }));
+    }
   };
 }
 const warrantyDBInstance = warrantyDB();
@@ -151,6 +206,12 @@ assert.equal(lookupPayload.warranties[0].maskedWarrantyCode,'••••AAAA');
 assert.ok(!JSON.stringify(lookupPayload).includes(demoWarrantyCode),'Phone lookup must not expose the raw warranty code');
 assert.ok(!JSON.stringify(lookupPayload).includes('0901234567'),'Raw customer phone must not be returned');
 
+
+const codeOnlyClaimResponse = await createWarrantyClaim({
+  request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.15'},body:JSON.stringify({warrantyCode:demoWarrantyCode,issueType:'other',message:'Thử gửi thẳng bằng mã'})}),
+  env:{DB:warrantyDBInstance}
+});
+assert.equal(codeOnlyClaimResponse.status,403,'Warranty claim must require a short-lived token from a successful lookup');
 
 const claimResponse = await createWarrantyClaim({
   request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.13'},body:JSON.stringify({claimToken:codeActionToken,issueType:'other',contactPhone:'0901234567',message:'Lỗi bề mặt cần kiểm tra'})}),
