@@ -66,9 +66,9 @@ assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-c
 assert.ok(seedWorkflow.includes('concurrency:') && seedWorkflow.includes('sindarealest-d1-initial-seed'), 'Initial seed workflow must serialize simultaneous runs');
 assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
 
-assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
+assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('R2 Read'), 'Deployment guide must explain private ORIGINALS verification and required read permission');
 const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
-assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
+assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('r2.dev'), 'Integrated guide must document private originals and public access restrictions');
 const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
 assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
 const notificationsSource = readFileSync('functions/_notifications.js', 'utf8');
