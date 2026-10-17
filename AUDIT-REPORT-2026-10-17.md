@@ -138,6 +138,13 @@ Hàm chuyển đổi sản phẩm trả trường `stock` từ D1 cả khi `publ
 
 **Đã sửa:** Khi tạo bản ghi cho public API, `stock` luôn trả `null`; trang admin vẫn nhận giá trị tồn kho thật. Regression test kiểm tra cả hai chế độ.
 
+### 17. API sản phẩm công khai không nên tiết lộ số lượng tồn kho nội bộ
+**Mức độ:** Trung bình — quyền riêng tư vận hành.
+
+Bộ chuyển đổi bản ghi sản phẩm dùng chung có thể đưa trường `stock` ra phản hồi công khai khi chế độ xem công khai bật. Số tồn kho nội bộ không cần thiết cho trang khách hàng và có thể tiết lộ thông tin vận hành.
+
+**Đã sửa:** `fromRow(..., { publicView: true })` luôn trả `stock: null`; chế độ admin vẫn giữ số lượng thật. Regression test xác nhận hai chế độ khác nhau. CI xanh tại [run 39046410365](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39046410365).
+
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
