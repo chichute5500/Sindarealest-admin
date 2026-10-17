@@ -43,6 +43,17 @@ async function main() {
   if (ci && process.env.GITHUB_REF_NAME && branch !== process.env.GITHUB_REF_NAME) {
     throw new Error(`GitHub đang chạy từ branch ${process.env.GITHUB_REF_NAME}, không phải production branch ${branch}; deploy bị hủy để tránh đẩy nhầm mã nguồn.`);
   }
+  // The new order-contact snapshot migration is a hard prerequisite for
+  // routes and backup queries in this branch. Check schema read-only before any deploy.
+  const databaseName = process.env.CLOUDFLARE_D1_DATABASE || (ci ? '' : await ask('Tên D1 database', 'sindarealest-db'));
+  if (!databaseName) throw new Error('Thiếu CLOUDFLARE_D1_DATABASE; không thể xác minh migration bắt buộc.');
+  assertSafeName(databaseName, 'Tên D1 database');
+  console.log(`Xác minh schema D1 ${databaseName} trước khi deploy…`);
+  runWrangler([
+    'd1', 'execute', databaseName, '--remote', '--json',
+    '--command', 'SELECT 1 FROM order_contact_details LIMIT 0;',
+  ], { quiet: true });
+
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);
     if (confirm !== `DEPLOY ${project} ${branch}`) throw new Error('Xác nhận không khớp; đã hủy deploy.');
