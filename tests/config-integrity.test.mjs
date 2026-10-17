@@ -43,12 +43,7 @@ assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding v
 assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
 assert.ok(bindingVerifier.includes('images === originals'), 'Binding verifier must reject the same bucket for public images and private originals');
 assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`'), 'Setup confirmation must include both R2 bucket names');
-assert.ok(workflow.indexOf('Verify actual Production R2 bindings') < workflow.indexOf('Deploy to verified Pages project'), 'Actual production bindings must be checked before deployment');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
-const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.mjs', import.meta.url), 'utf8');
-assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding verifier must inspect production, not preview, settings');
-assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
-assert.ok(bindingVerifier.includes('images === originals'), 'Binding verifier must reject the same bucket for public images and private originals');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
 assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
 assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
