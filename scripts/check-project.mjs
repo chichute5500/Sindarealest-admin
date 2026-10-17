@@ -134,7 +134,7 @@ for (const secretFile of ['.env', '.dev.vars', '.env.production', '.dev.vars.pro
   check(!existsSync(join(root, secretFile)), `Không đưa tệp bí mật ${secretFile} vào source/ZIP`);
 }
 
-for (const file of ['tests/smoke.test.mjs', 'tests/admin-login-rate-limit.test.mjs', 'tests/public-rate-limit.test.mjs', 'tests/push-endpoint-safety.test.mjs', 'tests/backup-size-safety.test.mjs', 'tests/warranty-claim-atomicity.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs', 'tests/order-contact-isolation.test.mjs']) {
+for (const file of ['tests/smoke.test.mjs', 'tests/admin-login-rate-limit.test.mjs', 'tests/public-rate-limit.test.mjs', 'tests/ai-description-binding.test.mjs', 'tests/push-endpoint-safety.test.mjs', 'tests/backup-size-safety.test.mjs', 'tests/warranty-claim-atomicity.test.mjs', 'tests/config-integrity.test.mjs', 'tests/storefront-operations.test.mjs', 'tests/reset-skus.test.mjs', 'tests/order-contact-isolation.test.mjs']) {
   if (existsSync(join(root, file))) runTest(file);
 }
 
