@@ -48,15 +48,35 @@ assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(
   'Tile descriptions must not inherit theme-dependent muted color.');
 
 const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
-const tileGradient = 'linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))';
+const tileGradient = 'linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
+const stripRule = css.match(/\\.service-strip\\{([^}]*)\\}/)?.[1] || '';
+assert.ok(stripRule.includes('background:rgba(255,255,255,.40)'),
+  'The outer section must have a fixed glass background in both themes.');
+assert.doesNotMatch(stripRule, /var\\(--panel\\)|var\\(--card-glass\\)|html\\.dark/,
+  'The outer section must not depend on theme-specific colors.');
+assert.match(stripRule, /backdrop-filter:blur\\(24px\\) saturate\\(145%\\)/,
+  'The outer section must keep the site Liquid Glass blur.');
+assert.match(css, /\\.service-strip \\.service-copy\\{[^}]*border-radius:999px/,
+  'The inner surface must be a compact pill, not a rectangle.');
+assert.doesNotMatch(css, /aspect-ratio:(?:2\\.75|3\\.5|2\\.4|2\\.25)\\s*\\/\\s*1/,
+  'Fixed card aspect ratios must not cause blank space or crop enlarged copy.');
+assert.match(css, /\\.service-strip \\.service-text strong\\{[^}]*font-size:12px/,
+  'Desktop title text must be 20% larger than the previous 10px size.');
+assert.match(css, /\\.service-strip \\.service-text small\\{[^}]*font-size:10\\.2px/,
+  'Desktop caption text must be 20% larger than the previous 8.5px size.');
+assert.match(css, /@media\\(max-width:1050px\\) and \\(min-width:761px\\)\\{[\\s\\S]*?\\.service-strip \\.service-text strong\\{font-size:12\\.24px\\}[\\s\\S]*?\\.service-strip \\.service-text small\\{font-size:10\\.44px\\}/,
+  'Tablet text must retain the 20% increase.');
+assert.match(css, /@media\\(max-width:760px\\)\\{[\\s\\S]*?\\.service-strip \\.service-text strong\\{font-size:11\\.4px[\\s\\S]*?\\.service-strip \\.service-text small\\{font-size:9\\.84px/,
+  'Mobile text must retain the 20% increase.');
+
 assert.ok(css.includes('background:' + tileGradient),
-  'Tile glass must use a stronger neutral gradient to keep text readable in dark mode.');
+  'Tile glass must keep the warm white-to-gold Zalo-like gradient with fixed colors in both themes.');
 assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
   'Tile glass must have layered elevation and highlight.');
-assert.ok(css.includes('border:1px solid rgba(255,255,255,.82)'),
-  'Tile glass must use a neutral high-contrast border.');
+assert.ok(css.includes('border:1px solid rgba(220,184,114,.67)'),
+  'Tile glass must keep its warm-gold border.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
   'The shared surface must match the CTA blur treatment.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
@@ -69,8 +89,8 @@ assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?g
   'Tablet widths must use three columns.');
 assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?grid-template-columns:repeat\(2,minmax\(0,1fr\)/,
   'Mobile widths must use two columns.');
-assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:9\.1px\}/,
-  'Narrow phones must remain compact while improving text sizing.');
+assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:10\.92px\}[\s\S]*?\.service-strip \.service-text small\{font-size:9\.48px\}/,
+  'Narrow phones must preserve the requested 20% text-size increase.');
 const copyRules = [...css.matchAll(/\.service-strip\s+\.service-copy\{([^}]*)\}/g)]
   .map(match => match[1].replace(/\s+/g, ''));
 assert.equal(copyRules.filter(rule => /(?:^|;)background:/.test(rule)).length, 1,
