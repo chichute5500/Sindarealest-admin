@@ -24,18 +24,18 @@ export async function onRequestGet(context) {
     // transactional read snapshot instead of mixing independent reads while
     // live orders or claims are being updated.
     const resultSets = await db.batch([
-      db.prepare("SELECT * FROM products ORDER BY sort_order ASC, sku ASC"),
-      db.prepare("SELECT * FROM customers ORDER BY created_at,id"),
-      db.prepare("SELECT * FROM orders ORDER BY created_at,id"),
-      db.prepare("SELECT * FROM order_items ORDER BY order_id,id"),
-      db.prepare("SELECT * FROM warranties ORDER BY created_at,id"),
-      db.prepare("SELECT * FROM warranty_claims ORDER BY created_at,id"),
-      db.prepare("SELECT * FROM audit_logs ORDER BY created_at,id"),
-      db.prepare("SELECT * FROM customer_address_details ORDER BY customer_id"),
-      db.prepare("SELECT * FROM order_shipping_addresses ORDER BY order_id"),
-      db.prepare("SELECT * FROM order_contact_details ORDER BY order_id"),
-      db.prepare("SELECT * FROM order_item_details ORDER BY item_id"),
-      db.prepare("SELECT * FROM warranty_claim_attachments ORDER BY claim_id"),
+      db.prepare("SELECT * FROM products ORDER BY sort_order ASC, sku ASC LIMIT 5001"),
+      db.prepare("SELECT * FROM customers ORDER BY created_at,id LIMIT 5001"),
+      db.prepare("SELECT * FROM orders ORDER BY created_at,id LIMIT 5001"),
+      db.prepare("SELECT * FROM order_items ORDER BY order_id,id LIMIT 5001"),
+      db.prepare("SELECT * FROM warranties ORDER BY created_at,id LIMIT 5001"),
+      db.prepare("SELECT * FROM warranty_claims ORDER BY created_at,id LIMIT 5001"),
+      db.prepare("SELECT * FROM audit_logs ORDER BY created_at,id LIMIT 5001"),
+      db.prepare("SELECT * FROM customer_address_details ORDER BY customer_id LIMIT 5001"),
+      db.prepare("SELECT * FROM order_shipping_addresses ORDER BY order_id LIMIT 5001"),
+      db.prepare("SELECT * FROM order_contact_details ORDER BY order_id LIMIT 5001"),
+      db.prepare("SELECT * FROM order_item_details ORDER BY item_id LIMIT 5001"),
+      db.prepare("SELECT * FROM warranty_claim_attachments ORDER BY claim_id LIMIT 5001"),
       db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
     ]);
     if (!Array.isArray(resultSets) || resultSets.length !== 13) {
