@@ -50,7 +50,7 @@ export async function onRequestGet(context) {
     }
     return json({ orders: [...byId.values()] });
   } catch {
-    return fail("Không đọc được đơn hàng. Hãy kiểm tra đã áp dụng migration 0003.", 503);
+    return fail("Không đọc được đơn hàng. Hãy kiểm tra các migration 0003, 0005 và 0007.", 503);
   }
 }
 export async function onRequestPatch(context) {
