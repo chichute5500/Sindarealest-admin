@@ -1,4 +1,4 @@
-import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 
 const DEFAULT_WORKERS_AI_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
 const SYSTEM_PROMPT = "Bạn là copywriter tiếng Việt cho thương hiệu SinDarealest. Viết mô tả sản phẩm ngắn gọn, tinh tế, đúng dữ kiện. Không tự bịa chất liệu, nguồn gốc, kích thước, tính năng, bảo hành, chứng nhận hay công dụng. Nếu dữ kiện còn thiếu, dùng lời văn trung tính và chỉ nêu tên/danh mục đã cho. Chỉ trả về nội dung mô tả, không tiêu đề.";
@@ -8,6 +8,12 @@ export async function onRequestPost(context) {
   if (auth.response) return auth.response;
 
   const env = context.env || {};
+  try {
+    const limit = await rateLimitPublicRequest(env, context.request, "admin_ai_description", 20, 3600);
+    if (limit.limited) return fail("Đã vượt giới hạn tạo mô tả AI trong giờ này. Vui lòng thử lại sau.", 429, { "Retry-After": "3600" });
+  } catch {
+    return fail("Không thể kiểm tra giới hạn sử dụng AI.", 503);
+  }
   const hasWorkersAI = typeof env.AI?.run === "function";
   const openAIKey = typeof env.OPENAI_API_KEY === "string" && env.OPENAI_API_KEY.length >= 20
     ? env.OPENAI_API_KEY
