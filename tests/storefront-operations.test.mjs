@@ -19,6 +19,20 @@ assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile ba
 assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile background URL must be versioned to invalidate old immutable cache entries');
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
+
+assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('images\/theme-croc-dark\.webp\?v=20261017-1'\);filter:none/,
+  'Dark mode displays the dark crocodile image directly with light text colors.');
+assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:none/,
+  'Light mode displays the albino crocodile image directly with dark text colors.');
+assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
+  'The dark welcome screen must use the dark crocodile image with its dark contrast tint.');
+assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
+  'The light welcome screen must use the albino image with its light contrast tint.');
+assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--dark" src="images\/theme-croc-dark\.webp\?v=20261017-1"/,
+  'The editorial material sample image must keep its black-material identity.');
+assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--light" src="images\/theme-croc-albino\.webp\?v=20261017-1"/,
+  'The editorial material sample image must keep its albino-material identity.');
+
 const adminThemeHtml = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
 assert.ok(adminThemeHtml.includes('theme-croc-dark.webp?v='), 'Admin dark theme background URL must also be cache-busted');
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(adminThemeHtml), 'Admin theme background must not retain an unversioned dark asset reference');
