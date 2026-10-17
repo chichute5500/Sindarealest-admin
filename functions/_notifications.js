@@ -8,7 +8,7 @@ async function vapidToken(endpoint,env) {
   const jwk={kty:"EC",crv:"P-256",x:b64url(publicKey.slice(1,33)),y:b64url(publicKey.slice(33)),d:b64url(d),ext:true};
   const key=await crypto.subtle.importKey("jwk",jwk,{name:"ECDSA",namedCurve:"P-256"},false,["sign"]);
   const head=b64url(enc.encode(JSON.stringify({typ:"JWT",alg:"ES256"})));
-  const payload=b64url(enc.encode(JSON.stringify({aud:url.origin,exp:Math.floor(Date.now()/1000)+12*60*60,sub:env.VAPID_SUBJECT||"mailto:admin@sindarealest.com"})));
+  const payload=b64url(enc.encode(JSON.stringify({aud:url.origin,exp:Math.floor(Date.now()/1000)+12*60*60,sub:env.VAPID_SUBJECT||"mailto:dacasau.sindarealest@gmail.com"})));
   const unsigned=head+"."+payload;
   const signature=new Uint8Array(await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},key,enc.encode(unsigned)));
   return unsigned+"."+b64url(signature);
