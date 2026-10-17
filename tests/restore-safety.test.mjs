@@ -195,4 +195,28 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
   assert.equal(db.batchCalls, 1, "all destructive writes must be in one atomic D1 batch");
 }
 
-console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, and single-batch failure handling.");
+{
+  const db = makeDB();
+  const customers = Array.from({ length: 650 }, (_, index) => ({
+    id: "customer-" + index,
+    full_name: "Khách hàng " + index,
+    phone: String(10000000000 + index),
+    email: "",
+    address: "",
+    created_at: "2026-01-01 00:00:00",
+    updated_at: "2026-01-01 00:00:00",
+  }));
+  const response = await restoreBackup({
+    request: request({
+      format: "sindarealest-backup-v2",
+      products: [],
+      settings: { showPrices: true, welcomeEnabled: true, welcomeTitleLine1: "Xin chào", welcomeTitleLine2: "SinDarealest", welcomeText: "Chào mừng" },
+      operations: { customers, orders: [], orderItems: [], warranties: [], warrantyClaims: [], auditLogs: [] },
+    }),
+    env: { ...env, DB: db },
+  });
+  assert.equal(response.status, 413, "restore must reject batches that exceed the conservative D1 binding budget");
+  assert.equal(db.batchCalls, 0, "binding-budget overflow must be rejected before any destructive D1 batch");
+}
+
+console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, binding-budget guard, and single-batch failure handling.");
