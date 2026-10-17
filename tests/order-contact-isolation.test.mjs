@@ -28,6 +28,9 @@ const DB = {
   },
   async batch(statements) {
     batchedStatements.push(...statements.map((s) => ({ sql: s.sql, values: s.values })));
+    if (statements[0]?.sql.includes("INSERT INTO public_rate_limits")) {
+      return [{ success: true, meta: { changes: 1 } }, { success: true, results: [{ attempts: 1 }] }];
+    }
     return statements.map(() => ({ success: true, meta: { changes: 1 } }));
   },
 };
