@@ -151,6 +151,6 @@ export async function onRequestGet(context) {
       },
     });
   } catch {
-    return fail("Không thể tạo bản sao lưu D1. Hãy xác minh các migration 0003–0005 đã được áp dụng.", 503);
+    return fail("Không thể tạo bản sao lưu D1. Hãy xác minh các migration 0003–0007 đã được áp dụng.", 503);
   }
 }
