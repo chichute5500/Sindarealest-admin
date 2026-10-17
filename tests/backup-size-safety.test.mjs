@@ -13,17 +13,15 @@ function makeDB({ productRows = [], auditLogs = [] } = {}) {
         sql,
         values: [],
         bind(...values) { this.values = values; return this; },
-        async first() {
-          if (sql.includes("SELECT value FROM settings")) return null;
-          return null;
-        },
-        async all() {
-          if (sql.includes("FROM products")) return { results: productRows };
-          if (sql.includes("FROM audit_logs")) return { results: auditLogs };
-          return { results: [] };
-        },
       };
       return statement;
+    },
+    async batch(statements) {
+      return statements.map((statement) => ({
+        results: statement.sql.includes("FROM products") ? productRows
+          : statement.sql.includes("FROM audit_logs") ? auditLogs
+          : [],
+      }));
     },
   };
 }
