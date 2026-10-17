@@ -2,17 +2,55 @@ import { fail, json, requireAdmin } from "../../_lib.js";
 import { sendAdminPush } from "../../_notifications.js";
 
 export async function onRequestGet(context) {
-  const auth = await requireAdmin(context); if (auth.response) return auth.response;
+  const auth = await requireAdmin(context);
+  if (auth.response) return auth.response;
   try {
-    const result = await context.env.DB.prepare(`SELECT o.id,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required,o.customer_note,o.created_at,o.updated_at,c.full_name,c.phone,c.email,COALESCE(sa.full_address,c.address) AS address FROM orders o JOIN customers c ON c.id=o.customer_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id ORDER BY o.created_at DESC LIMIT 1000`).all();
-    const orders = await Promise.all((result.results || []).map(async row => {
-      const items = await context.env.DB.prepare("SELECT id,product_id AS productId,sku,title,quantity,unit_price AS unitPrice,line_total AS lineTotal FROM order_items WHERE order_id=? ORDER BY rowid").bind(row.id).all();
-      return { ...row, items: items.results || [] };
-    }));
-    return json({ orders });
-  } catch { return fail("Không đọc được đơn hàng. Hãy kiểm tra đã áp dụng migration 0003.", 503); }
-}
+    // Limit parent orders first, then join all their items in one read. This
+    // avoids one D1 request per order when the admin screen loads up to 1,000.
+    const result = await context.env.DB.prepare(
+      "WITH recent_orders AS (" +
+      " SELECT o.id,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
+      " o.customer_note,o.created_at,o.updated_at,c.full_name,c.phone,c.email," +
+      " COALESCE(sa.full_address,c.address) AS address" +
+      " FROM orders o JOIN customers c ON c.id=o.customer_id" +
+      " LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id" +
+      " ORDER BY o.created_at DESC LIMIT 1000" +
+      ") " +
+      "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku," +
+      " oi.title AS itemTitle,oi.quantity AS itemQuantity,oi.unit_price AS itemUnitPrice," +
+      " oi.line_total AS itemLineTotal" +
+      " FROM recent_orders ro LEFT JOIN order_items oi ON oi.order_id=ro.id" +
+      " ORDER BY ro.created_at DESC,oi.rowid"
+    ).all();
 
+    const byId = new Map();
+    for (const row of result.results || []) {
+      const {
+        itemId, itemProductId, itemSku, itemTitle, itemQuantity, itemUnitPrice, itemLineTotal,
+        ...orderFields
+      } = row;
+      let order = byId.get(row.id);
+      if (!order) {
+        order = { ...orderFields, items: [] };
+        byId.set(row.id, order);
+      }
+      if (itemId !== null && itemId !== undefined) {
+        order.items.push({
+          id: itemId,
+          productId: itemProductId,
+          sku: itemSku,
+          title: itemTitle,
+          quantity: itemQuantity,
+          unitPrice: itemUnitPrice,
+          lineTotal: itemLineTotal
+        });
+      }
+    }
+    return json({ orders: [...byId.values()] });
+  } catch {
+    return fail("Không đọc được đơn hàng. Hãy kiểm tra đã áp dụng migration 0003.", 503);
+  }
+}
 export async function onRequestPatch(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   let body; try { body = await context.request.json(); } catch { return fail("Dữ liệu cập nhật không hợp lệ."); }
