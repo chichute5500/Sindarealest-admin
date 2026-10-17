@@ -33,9 +33,8 @@ const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', im
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
 assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must be blocked until private ORIGINALS is verified');
 assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must require ORIGINALS separate from IMAGES');
-assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Workflow must pass the ORIGINALS readiness variable');
-assert.ok(workflow.includes("if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'"), 'Production deployment must be skipped until private ORIGINALS is verified');
-assert.ok(workflow.indexOf('Diagnose actual Production R2 bindings') < workflow.indexOf('Deploy to verified Pages project'), 'Actual production bindings must be checked before deployment');
+assert.ok(workflow.includes("CLOUDFLARE_PAGES_ORIGINALS_READY: 'true'"), 'Deploy may set readiness only after the mandatory verifier succeeds');
+assert.ok(workflow.indexOf('Verify Production Pages and private R2 bindings') < workflow.indexOf('Deploy to verified Cloudflare Pages project'), 'Actual production bindings must be verified before deployment');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
 assert.ok(workflow.includes("continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}"), 'Binding diagnostics may not block a safely skipped deployment, but must block deployment when readiness is enabled');
 const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.mjs', import.meta.url), 'utf8');
@@ -48,6 +47,7 @@ assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} A
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
 assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
+assert.ok(!workflow.includes('continue-on-error:'), 'Production binding verification must fail closed');
 assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
 assert.ok(!workflow.includes('0002_seed_products.sql'), 'Deploy workflow must not seed D1 automatically');
 const wranglerConfig = readFileSync('wrangler.toml', 'utf8');
