@@ -84,7 +84,13 @@ try {
     return null;
   };
   if (findCount(parsed) !== 1) throw new Error("Migration 0007 did not backfill the existing order contact correctly.");
-  console.log("PASS: clean D1 migrations apply locally, required tables exist, and migration 0007 backfills historic order contacts.");
+  const laterMigrations = migrationFiles.filter((name) => name > contactMigration);
+  for (const name of laterMigrations) copyFileSync(join(sourceMigrations, name), join(localMigrations, name));
+  if (laterMigrations.length) {
+    run(["d1", "migrations", "apply", databaseName, "--local", "--config", configPath],
+      "Apply migrations after 0007 to temporary local D1");
+  }
+  console.log("PASS: all D1 migrations apply locally, required tables exist, and migration 0007 backfills historic order contacts.");
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
