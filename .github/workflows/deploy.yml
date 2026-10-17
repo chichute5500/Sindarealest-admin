@@ -72,4 +72,7 @@ jobs:
 
       - name: Deploy to verified Cloudflare Pages project
         if: success()
+        env:
+          # This is only set after the mandatory private-R2 verifier succeeds.
+          CLOUDFLARE_PAGES_ORIGINALS_READY: 'true'
         run: npm run deploy
