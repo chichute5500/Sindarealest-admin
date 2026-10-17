@@ -87,7 +87,7 @@ Trước đây, backup đọc sản phẩm ở một truy vấn, rồi đọc c�
 
 Trước đây mã chỉ kiểm tra kích thước `File` sau khi `request.formData()` đã phân tích toàn bộ multipart. Với request có `Content-Length` khai báo quá lớn, Worker vẫn có thể phải xử lý payload trước khi từ chối.
 
-**Đã sửa:** Từ chối request có `Content-Length` lớn hơn 6 MB trước khi gọi `formData()`; giới hạn ảnh thực tế vẫn là 5 MB và vẫn kiểm tra chữ ký RIFF/WEBP. Có regression test gửi payload khai báo 7 MB để xác nhận trả 413 trước khi phân tích biểu mẫu.
+**Đã sửa:** Đọc multipart theo luồng với trần 6 MB và từ chối ngay khi tổng byte vượt giới hạn, kể cả khi request không có `Content-Length`; chỉ sau khi body nằm trong giới hạn mới tái tạo request và gọi `formData()`. Giới hạn ảnh thực tế vẫn là 5 MB và vẫn kiểm tra chữ ký RIFF/WEBP. Regression test bao gồm cả header khai báo quá lớn lẫn body stream quá lớn không có header.
 
 ### 11. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
