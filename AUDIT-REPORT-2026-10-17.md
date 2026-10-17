@@ -113,7 +113,7 @@ Luồng thêm sản phẩm trước đây đọc toàn bộ cột SKU để tìm
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
-**Đã sửa trên nhánh rà soát:** Route ưu tiên `context.env.AI.run()`, mặc định model `@cf/meta/llama-3.2-11b-vision-instruct`, kiểm tra tên model tùy chỉnh, trả lỗi rõ nếu chưa cấu hình binding/khóa, giữ OpenAI làm đường dự phòng khi chỉ có `OPENAI_API_KEY`, và giới hạn tối đa 20 yêu cầu mỗi IP trong một giờ để hạn chế lạm dụng quota. Có regression test cho binding, model mặc định, đầu vào, cấu hình thiếu, dữ liệu không hợp lệ và chặn gọi AI khi vượt giới hạn.
+**Đã sửa trên nhánh rà soát:** Route ưu tiên `context.env.AI.run()`, mặc định model `@cf/meta/llama-3.2-11b-vision-instruct`, kiểm tra tên model tùy chỉnh, trả lỗi rõ nếu chưa cấu hình binding/khóa, giữ OpenAI làm đường dự phòng khi chỉ có `OPENAI_API_KEY`, và giới hạn tối đa 20 yêu cầu mỗi IP trong một giờ để hạn chế lạm dụng quota. Có regression test cho binding Workers AI, model mặc định/tùy chỉnh, đầu vào, cấu hình thiếu, dữ liệu không hợp lệ, fallback OpenAI, xác thực khóa API và chặn gọi AI khi vượt giới hạn.
 
 **Việc cần cấu hình ngoài mã:** Pages Functions cần một Workers AI binding có tên chính xác `AI` trong cả môi trường Production và Preview; cần redeploy để binding có hiệu lực. Tạo API token hoặc đồng ý điều khoản model không tự tạo binding cho Pages. Hướng dẫn chính thức: https://developers.cloudflare.com/pages/functions/bindings/
 
