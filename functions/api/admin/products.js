@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
     "day-dong-ho": ["watch-straps","SD-DH"], "watch-straps": ["watch-straps","SD-DH"],
     "op-dien-thoai": ["phone-cases","SD-ODT"], "phone-cases": ["phone-cases","SD-ODT"]
   };
-  const category = categories[normalized] || (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
+  const category = Object.hasOwn(categories, normalized) ? categories[normalized] : (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
   if (!category) return fail("Vui lòng chọn một danh mục hợp lệ trong danh sách.");
   try {
     const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
