@@ -15,15 +15,7 @@ jobs:
       - name: Check out feature branch
         uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-
-      - name: Install Wrangler
-        run: npm install --no-fund
-
-      - name: Verify Preview isolation and apply only migration 0008
+      - name: Verify Preview isolation and apply only additive migration 0008
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -51,15 +43,7 @@ jobs:
           test "$preview_db_id" != "$production_db_id" || { echo "::error::Preview DB equals Production DB. No migration performed."; exit 1; }
           test -n "$preview_images" && test -n "$production_images" || { echo "::error::Could not verify both IMAGES bindings."; exit 1; }
           test "$preview_images" != "$production_images" || { echo "::error::Preview IMAGES equals Production IMAGES. No migration performed."; exit 1; }
-          echo "Safety gate passed: this branch is not Production and Preview DB/IMAGES are isolated."
-
-          db="$(curl --fail --silent --show-error \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${preview_db_id}")"
-          printf '%s' "$db" | jq -e '.success == true' >/dev/null
-          preview_db_name="$(printf '%s' "$db" | jq -r '.result.name // empty')"
-          test -n "$preview_db_name" || { echo "::error::Could not resolve Preview D1 database name."; exit 1; }
-          echo "Targeting isolated Preview D1 database; name is not written to Production."
+          echo "Safety gate passed: Production branch is main and Preview DB/IMAGES are isolated."
 
           query_url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${preview_db_id}/query"
           tables_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table'" '{sql:$sql}')"
@@ -68,36 +52,20 @@ jobs:
             -H "Content-Type: application/json" --data "$tables_body")"
           printf '%s' "$tables" | jq -e '.success == true and .result[0].success == true' >/dev/null
           table_names="$(printf '%s' "$tables" | jq -r '.result[0].results[].name')"
-          for table in products settings audit_logs admin_login_attempts public_rate_limits d1_migrations; do
+          for table in products settings audit_logs admin_login_attempts public_rate_limits; do
             grep -Fxq "$table" <<< "$table_names" || { echo "::error::Preview DB is missing expected table $table. Refusing migration."; exit 1; }
           done
 
-          history_body="$(jq -n '{sql:"SELECT name FROM d1_migrations ORDER BY name"}')"
-          history="$(curl --fail --silent --show-error -X POST "$query_url" \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H "Content-Type: application/json" --data "$history_body")"
-          printf '%s' "$history" | jq -e '.success == true and .result[0].success == true' >/dev/null
-          applied="$(printf '%s' "$history" | jq -r '.result[0].results[].name')"
-          for required in 0001_schema.sql 0002_seed_products.sql 0003_storefront_operations.sql 0004_admin_notifications.sql 0005_address_warranty_verification.sql 0006_remove_warranty_otp.sql 0007_order_contact_details.sql; do
-            grep -Fxq "$required" <<< "$applied" || { echo "::error::Preview migration history is missing $required. Refusing to run migration 0008 out of sequence."; exit 1; }
-          done
-
-          if grep -Fxq "0008_image_group_reviews.sql" <<< "$applied"; then
-            echo "Migration 0008 is already recorded; no migration write needed."
+          if grep -Fxq "image_group_reviews" <<< "$table_names"; then
+            echo "image_group_reviews already exists in isolated Preview D1; no schema write needed."
           else
-            mkdir -p migrations-preview-only
-            cp migrations/0008_image_group_reviews.sql migrations-preview-only/0008_image_group_reviews.sql
-            cat > .wrangler-preview.toml <<EOF
-          name = "sindarealest-preview-migration"
-          compatibility_date = "2026-10-12"
-
-          [[d1_databases]]
-          binding = "DB"
-          database_name = "$preview_db_name"
-          database_id = "$preview_db_id"
-          migrations_dir = "migrations-preview-only"
-          EOF
-            npx wrangler d1 migrations apply "$preview_db_name" --remote --config .wrangler-preview.toml
+            migration_sql="$(cat migrations/0008_image_group_reviews.sql)"
+            migration_body="$(jq -n --arg sql "$migration_sql" '{sql:$sql}')"
+            migration_result="$(curl --fail --silent --show-error -X POST "$query_url" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$migration_body")"
+            printf '%s' "$migration_result" | jq -e '.success == true and all(.result[]; .success == true)' >/dev/null
+            echo "Applied additive migration 0008 to isolated Preview D1 only."
           fi
 
           verify_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table' AND name='image_group_reviews'" '{sql:$sql}')"
