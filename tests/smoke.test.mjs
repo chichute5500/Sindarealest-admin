@@ -16,10 +16,12 @@ assert.equal(getCurrentDateInVietnam(new Date('2026-10-17T16:59:59.000Z')), '202
 assert.equal(getCurrentDateInVietnam(new Date('2026-10-17T17:00:00.000Z')), '2026-10-18', 'Vietnam date must advance exactly at local midnight');
 assert.equal(warrantyStatusOnDate('active', '2026-10-16', '2026-10-17'), 'expired', 'a warranty ended yesterday must be expired in Vietnam');
 assert.equal(warrantyStatusOnDate('active', '2026-10-17', '2026-10-17'), 'active', 'the listed end date remains eligible through that date');
-assert.equal(isWarrantyEligibleOnDate('active', '2026-10-17', '2026-10-17'), true);
-assert.equal(isWarrantyEligibleOnDate('active', '2026-10-16', '2026-10-17'), false);
-assert.equal(isWarrantyEligibleOnDate('expired', '2026-10-20', '2026-10-17'), false);
-assert.equal(isWarrantyEligibleOnDate('active', 'not-a-date', '2026-10-17'), false);
+assert.equal(isWarrantyEligibleOnDate('active', '2026-10-01', '2026-10-17', '2026-10-17'), true, 'warranty is eligible on its start date and its end date');
+assert.equal(isWarrantyEligibleOnDate('active', '2026-10-01', '2026-10-16', '2026-10-17'), false, 'warranty is not eligible after its end date');
+assert.equal(isWarrantyEligibleOnDate('expired', '2026-10-01', '2026-10-20', '2026-10-17'), false, 'an explicitly expired warranty is not eligible');
+assert.equal(isWarrantyEligibleOnDate('active', 'not-a-date', '2026-10-20', '2026-10-17'), false, 'invalid start dates must fail closed');
+assert.equal(isWarrantyEligibleOnDate('active', '2026-10-18', '2026-10-20', '2026-10-17'), false, 'future start date must not be eligible');
+assert.equal(isWarrantyEligibleOnDate('active', '2026-10-01', 'not-a-date', '2026-10-17'), false, 'invalid end dates must fail closed');
 
 const valid = validateProduct({
   title: 'Ví da cá sấu', sku: 'sd-236', category: 'Ví da',
