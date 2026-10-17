@@ -3,6 +3,8 @@ import { WATERMARK_DEFAULTS, normalizeWatermarkSettings } from "../../_lib/water
 
 const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
 const MAX_BACKUP_RECORDS = 5000;
+// Keep exported v2 backups within the same conservative D1 binding budget as restore.
+const MAX_BACKUP_BINDINGS = 4500;
 
 const TOTAL_RECORD_COUNT_SQL = `SELECT
   (SELECT COUNT(*) FROM (SELECT 1 FROM products LIMIT 5001)) +
@@ -137,6 +139,26 @@ export async function onRequestGet(context) {
       .reduce((total, rows) => total + (Array.isArray(rows) ? rows.length : 0), 0);
     if (recordCount > MAX_BACKUP_RECORDS) {
       return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần xử lý. Hãy lên kế hoạch xuất/nhập theo lô trước khi tiếp tục.", 413);
+    }
+
+    // Restore binds one prepared statement per record. Enforce the same budget
+    // here so an exported v2 backup is not guaranteed to be rejected on import.
+    const operations = payload.operations;
+    const restoreBindingCount = payload.products.length * 13
+      + operations.customers.length * 7
+      + operations.customerAddressDetails.length * 7
+      + operations.orders.length * 11
+      + operations.orderShippingAddresses.length * 8
+      + operations.orderContactDetails.length * 5
+      + operations.orderItems.length * 8
+      + operations.orderItemDetails.length * 2
+      + operations.warranties.length * 10
+      + operations.warrantyClaims.length * 9
+      + operations.warrantyClaimAttachments.length * 2
+      + operations.auditLogs.length * 7
+      + 1 + 4 + 4; // show_prices, welcome settings, and four watermark settings.
+    if (restoreBindingCount > MAX_BACKUP_BINDINGS) {
+      return fail("Bản sao lưu vượt giới hạn an toàn của số tham số D1 cho một lần khôi phục. Hãy chia dữ liệu thành các bản nhỏ hơn trước khi tiếp tục.", 413);
     }
 
     const serialized = JSON.stringify(payload);
