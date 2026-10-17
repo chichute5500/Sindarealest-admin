@@ -59,7 +59,7 @@ async function encryptPayload(subscription,payload) {
 async function sendOne(endpoint,keys,payload,env) {
   if (!isTrustedPushEndpoint(endpoint)) throw Error("Untrusted push service endpoint");
   const body=await encryptPayload({keys},payload), token=await vapidToken(endpoint,env);
-  return fetch(endpoint,{method:"POST",signal:AbortSignal.timeout(3000),headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
+  return fetch(endpoint,{method:"POST",redirect:"manual",signal:AbortSignal.timeout(3000),headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
 }
 export async function sendAdminPush(env,payload) {
   if(!env?.DB||!env.VAPID_PUBLIC_KEY||!env.VAPID_PRIVATE_KEY)return;
