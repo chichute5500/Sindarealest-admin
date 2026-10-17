@@ -1,6 +1,7 @@
 import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, storageOrFail } from "../_lib.js";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_MULTIPART_BYTES = MAX_IMAGE_BYTES + 1024 * 1024;
 const WARRANTY_CODE_PATTERN = /^SDW-[A-Z0-9]{24}$/;
 
 export async function onRequestPost({ request, env }) {
@@ -30,6 +31,11 @@ export async function onRequestPost({ request, env }) {
     }
   } catch {
     return fail("Dịch vụ tải ảnh chưa sẵn sàng.", 503);
+  }
+
+  const declaredLength = Number(request.headers.get("Content-Length") || 0);
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_MULTIPART_BYTES) {
+    return fail("Biểu mẫu tải ảnh vượt quá giới hạn 6 MB.", 413);
   }
 
   let form;
