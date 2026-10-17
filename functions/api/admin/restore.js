@@ -1,4 +1,5 @@
 import { fail, getSetting, json, productInsertStatement, requireAdmin, validateProduct } from "../../_lib.js";
+import { validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
 const str = (v, max, required = false) => typeof v === "string" && v.length <= max && (!required || v.trim().length > 0);
 const integer = (v, min = 0, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(Number(v)) && Number(v) >= min && Number(v) <= max;
@@ -84,6 +85,26 @@ export async function onRequestPost(context) {
   const v2 = backup?.format === "sindarealest-backup-v2";
   if ((!v1 && !v2) || !Array.isArray(backup.products) || backup.products.length > 2000 || typeof backup.settings?.showPrices !== "boolean") return fail("Định dạng bản sao lưu không hợp lệ.");
   if (v2 && (typeof backup.settings.welcomeEnabled !== "boolean" || !str(backup.settings.welcomeTitleLine1,80,true) || !str(backup.settings.welcomeTitleLine2,80,true) || !str(backup.settings.welcomeText,500,true))) return fail("Bản sao lưu thiếu cài đặt trang chào mừng hợp lệ.");
+
+  let watermarkUpdates = [];
+  if (v2) {
+    const watermarkFields = ["watermarkEnabled", "watermarkPosition", "watermarkSize", "watermarkOpacity"];
+    const present = watermarkFields.filter((key) => Object.hasOwn(backup.settings, key));
+    if (present.length > 0 && present.length !== watermarkFields.length) {
+      return fail("Bản sao lưu có bộ cài đặt watermark chưa đầy đủ.");
+    }
+    if (present.length === watermarkFields.length) {
+      const checkedWatermark = validateWatermarkSettingUpdates({
+        watermarkEnabled: backup.settings.watermarkEnabled,
+        watermarkPosition: backup.settings.watermarkPosition,
+        watermarkSize: backup.settings.watermarkSize,
+        watermarkOpacity: backup.settings.watermarkOpacity,
+      });
+      if (checkedWatermark.error) return fail(`Cài đặt watermark trong bản sao lưu không hợp lệ: ${checkedWatermark.error}`);
+      watermarkUpdates = checkedWatermark.updates;
+    }
+  }
+
   const products = [], ids = new Set(), skus = new Set(), slugs = new Set();
   for (const raw of backup.products) {
     const checked = validateProduct(raw);
@@ -115,6 +136,7 @@ export async function onRequestPost(context) {
     statements.push(db.prepare("INSERT INTO settings(key,value,updated_at) VALUES('show_prices',?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(backup.settings.showPrices ? "1" : "0"));
     if (v2) {
       for (const [key,value] of [["welcome_enabled",backup.settings.welcomeEnabled?"1":"0"],["welcome_title_line_1",backup.settings.welcomeTitleLine1],["welcome_title_line_2",backup.settings.welcomeTitleLine2],["welcome_text",backup.settings.welcomeText]]) statements.push(db.prepare("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(key,value));
+      for (const [key,value] of watermarkUpdates) statements.push(db.prepare("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(key,value));
     }
     if (operations) {
       for (const c of operations.customers) statements.push(db.prepare("INSERT INTO customers(id,full_name,phone,email,address,created_at,updated_at) VALUES(?,?,?,?,?,?,?)").bind(c.id,c.full_name,c.phone,c.email,c.address,c.created_at,c.updated_at));
