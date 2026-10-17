@@ -120,7 +120,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên nhánh rà soát đã pass ở [run 39044370836](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39044370836); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
+CI mới nhất trên nhánh rà soát đã pass ở [run 39044557227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39044557227); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
@@ -133,7 +133,7 @@ Nhánh gốc đã có các biện pháp quan trọng: ảnh khiếu nại mới 
 Đã rà soát thấy thời hạn session 10 phút, cookie `HttpOnly; Secure; SameSite=Strict`, kiểm tra session trên endpoint quản trị, giới hạn thử đăng nhập và có bài test ngăn middleware cấp lại cookie hợp lệ ngay sau logout. Cần giữ các regression tests này khi sửa về sau.
 
 ### Backup/restore
-Restore có thể thay thế dữ liệu sản phẩm và, với bản backup có dữ liệu vận hành, xóa rồi khôi phục các bảng đơn hàng/khách hàng/bảo hành/nhật ký. Đây là thao tác phá hủy có chủ đích, không tự động chạy qua deploy; chỉ dùng sau khi đã tải backup mới và kiểm tra đúng môi trường D1.
+Restore có thể thay thế dữ liệu sản phẩm và, với bản backup có dữ liệu vận hành, xóa rồi khôi phục các bảng đơn hàng/khách hàng/bảo hành/nhật ký. Đây là thao tác phá hủy có chủ đích, không tự động chạy qua deploy; chỉ dùng sau khi đã tải backup mới và kiểm tra đúng môi trường D1. Regression test mới xác nhận backup v1 không xóa dữ liệu vận hành mà nó không chứa, v2 cũ được tổng hợp snapshot liên hệ, backup lỗi/trùng bị từ chối trước khi ghi và toàn bộ restore chỉ dùng một D1 batch nguyên tử.
 
 ## Giới hạn kiểm tra
 
