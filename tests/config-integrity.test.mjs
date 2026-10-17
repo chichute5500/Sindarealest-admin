@@ -68,6 +68,7 @@ assert.ok(seedWorkflow.includes('concurrency:') && seedWorkflow.includes('sindar
 assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
 
 assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
+assert.ok(deployReadme.includes('R2 Storage: Read') && deployReadme.includes('HTTP 403'), 'Deployment guide must explain the read-only R2 permissions needed for public-access verification');
 const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
 assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
 const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
