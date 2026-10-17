@@ -191,17 +191,26 @@ export async function onRequestPatch(context) {
   if (decision === "reject") {
     if (review.image_kind === "candidate") {
       const product = await getProduct(db, review.product_id);
+      const statements = [
+        db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=? AND image_kind='candidate' AND status IN ('pending','approved')").bind(id)
+      ];
       if (product) {
-        let images = [];
-        try { images = JSON.parse(product.images_json || "[]"); } catch {}
-        if (!Array.isArray(images)) images = [];
-        const next = images.filter(ref => ref !== review.image_ref);
-        const statements = [db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id)];
-        if (next.length !== images.length) statements.push(db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id));
-        await db.batch(statements);
-      } else {
-        await db.prepare("UPDATE image_ai_reviews SET status='rejected',updated_at=datetime('now') WHERE id=?").bind(id).run();
+        try {
+          const images = JSON.parse(product.images_json || "[]");
+          if (!Array.isArray(images)) return fail("Bộ ảnh hiện tại của sản phẩm không hợp lệ; chưa thay đổi trạng thái duyệt.", 503);
+        } catch {
+          return fail("Không đọc được bộ ảnh hiện tại của sản phẩm; chưa thay đổi trạng thái duyệt.", 503);
+        }
+        // Remove the candidate from the current JSON array inside D1, not from
+        // a stale JS snapshot, so a concurrent approval cannot leave a broken
+        // public image reference behind.
+        statements.push(db.prepare(
+          "UPDATE products SET images_json=COALESCE((SELECT json_group_array(value) FROM json_each(products.images_json) WHERE value<>?),'[]'),updated_at=datetime('now') " +
+          "WHERE id=? AND EXISTS (SELECT 1 FROM image_ai_reviews WHERE id=? AND image_kind='candidate' AND status='rejected')"
+        ).bind(review.image_ref, product.id, id));
       }
+      try { await db.batch(statements); }
+      catch { return fail("Không thể từ chối ảnh an toàn trong D1. Hãy thử lại.", 503); }
       if (review.r2_key && review.r2_key.endsWith("-ai.webp") && review.image_ref === "/media/" + review.r2_key) {
         await context.env.IMAGES?.delete(review.r2_key).catch(() => {});
       }
@@ -233,16 +242,30 @@ export async function onRequestPatch(context) {
     return fail("Không thể xác minh tệp ảnh trong R2.", 503);
   }
   let images = [];
-  try { images = JSON.parse(product.images_json || "[]"); } catch {}
-  if (!Array.isArray(images)) images = [];
+  try { images = JSON.parse(product.images_json || "[]"); } catch {
+    return fail("Không đọc được bộ ảnh hiện tại của sản phẩm; chưa duyệt ảnh.", 503);
+  }
+  if (!Array.isArray(images)) return fail("Bộ ảnh hiện tại của sản phẩm không hợp lệ; chưa duyệt ảnh.", 503);
   if (!images.includes(review.image_ref) && images.length >= 30) return fail("Sản phẩm đã có 30 ảnh; hãy chỉnh bộ ảnh trước khi duyệt.");
   const next = images.includes(review.image_ref) ? images : [...images, review.image_ref];
   try {
-    await db.batch([
-      db.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(next), product.id),
-      db.prepare("UPDATE image_ai_reviews SET status='approved',updated_at=datetime('now') WHERE id=?").bind(id),
-      db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'ai_image_approved', 'product', ?, ?)").bind(crypto.randomUUID(), product.id, JSON.stringify({ reviewId: id, imageRef: review.image_ref }))
+    const result = await db.batch([
+      db.prepare(
+        "UPDATE products SET images_json=CASE WHEN EXISTS (SELECT 1 FROM json_each(products.images_json) WHERE value=?) THEN products.images_json ELSE json_insert(products.images_json,'$[#]',?) END,updated_at=datetime('now') " +
+        "WHERE id=? AND EXISTS (SELECT 1 FROM image_ai_reviews WHERE id=? AND image_kind='candidate' AND status='pending') " +
+        "AND (EXISTS (SELECT 1 FROM json_each(products.images_json) WHERE value=?) OR (SELECT COUNT(*) FROM json_each(products.images_json))<30)"
+      ).bind(review.image_ref, review.image_ref, product.id, id, review.image_ref),
+      db.prepare(
+        "UPDATE image_ai_reviews SET status='approved',updated_at=datetime('now') " +
+        "WHERE id=? AND image_kind='candidate' AND status='pending' " +
+        "AND EXISTS (SELECT 1 FROM products p, json_each(p.images_json) AS image WHERE p.id=? AND image.value=?)"
+      ).bind(id, product.id, review.image_ref),
+      db.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'ai_image_approved', 'product', ?, ? WHERE EXISTS (SELECT 1 FROM image_ai_reviews WHERE id=? AND status='approved')"
+      ).bind(crypto.randomUUID(), product.id, JSON.stringify({ reviewId: id, imageRef: review.image_ref }), id)
     ]);
+    if (!result?.[1]?.meta?.changes) return fail("Ảnh đã được xử lý đồng thời hoặc bộ ảnh đã đạt giới hạn 30 ảnh. Tải lại hàng chờ rồi kiểm tra lại.", 409);
     return json({ ok: true, message: "Đã duyệt ảnh và thêm vào bộ ảnh sản phẩm. Ảnh chỉ hiển thị công khai nếu sản phẩm đang được xuất bản." });
   } catch {
     return fail("Không thể duyệt ảnh. Kiểm tra D1 và R2.", 503);
