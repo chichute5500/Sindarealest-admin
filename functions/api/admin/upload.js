@@ -9,6 +9,23 @@ const ORIGINAL_TYPES = Object.freeze({
   "image/webp": "webp",
 });
 
+function originalSignatureMatches(bytes, contentType) {
+  if (contentType === "image/jpeg") {
+    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  }
+  if (contentType === "image/png") {
+    return bytes.length >= 8 &&
+      bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 &&
+      bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
+  }
+  if (contentType === "image/webp") {
+    return bytes.length >= 12 &&
+      new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
+      new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
+  }
+  return false;
+}
+
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
@@ -55,7 +72,9 @@ export async function onRequestPost(context) {
     if (!isWebp) return fail("Nội dung tệp hiển thị không phải ảnh WebP hợp lệ.");
 
     const originalBytes = new Uint8Array(await original.arrayBuffer());
-    if (!originalBytes.length) return fail("Tệp ảnh gốc rỗng.");
+    if (!originalSignatureMatches(originalBytes, original.type)) {
+      return fail("Nội dung ảnh gốc không khớp định dạng JPEG, PNG hoặc WebP đã khai báo.");
+    }
     const id = crypto.randomUUID();
     const key = `${id}.webp`;
     const privateKey = `private-originals/${id}.${originalType}`;
