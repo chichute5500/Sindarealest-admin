@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createSession, verifySession, validateProduct, hasSecuritySecrets } from '../functions/_lib.js';
+import { createSession, verifySession, validateProduct, hasSecuritySecrets, getCurrentDateInVietnam, warrantyStatusOnDate, isWarrantyEligibleOnDate } from '../functions/_lib.js';
 import { onRequestGet as publicProducts } from '../functions/api/products.js';
 import { onRequestGet as adminProducts } from '../functions/api/admin/products.js';
 import { onRequestPost as restoreProducts } from '../functions/api/admin/restore.js';
@@ -9,6 +9,16 @@ import { readFileSync } from 'node:fs';
 const secrets = { ADMIN_PASSWORD: 'mau-khau-quan-tri-demonstration', SESSION_SECRET: 's'.repeat(48) };
 assert.equal(hasSecuritySecrets(secrets), true, 'secrets hợp lệ phải được chấp nhận');
 assert.equal(hasSecuritySecrets({ ADMIN_PASSWORD: 'short', SESSION_SECRET: 'tiny' }), false, 'secrets yếu phải bị từ chối');
+
+assert.equal(getCurrentDateInVietnam(new Date('2026-10-16T18:00:00.000Z')), '2026-10-17', 'Vietnam date must advance while UTC is still on the previous date');
+assert.equal(getCurrentDateInVietnam(new Date('2026-10-17T16:59:59.000Z')), '2026-10-17', 'Vietnam date must remain on the same day before local midnight');
+assert.equal(getCurrentDateInVietnam(new Date('2026-10-17T17:00:00.000Z')), '2026-10-18', 'Vietnam date must advance exactly at local midnight');
+assert.equal(warrantyStatusOnDate('active', '2026-10-16', '2026-10-17'), 'expired', 'a warranty ended yesterday must be expired in Vietnam');
+assert.equal(warrantyStatusOnDate('active', '2026-10-17', '2026-10-17'), 'active', 'the listed end date remains eligible through that date');
+assert.equal(isWarrantyEligibleOnDate('active', '2026-10-17', '2026-10-17'), true);
+assert.equal(isWarrantyEligibleOnDate('active', '2026-10-16', '2026-10-17'), false);
+assert.equal(isWarrantyEligibleOnDate('expired', '2026-10-20', '2026-10-17'), false);
+assert.equal(isWarrantyEligibleOnDate('active', 'not-a-date', '2026-10-17'), false);
 
 const valid = validateProduct({
   title: 'Ví da cá sấu', sku: 'sd-236', category: 'Ví da',

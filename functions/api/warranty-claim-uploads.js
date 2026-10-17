@@ -1,4 +1,4 @@
-import { dbOrFail, fail, json, rateLimitPublicRequest, storageOrFail } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, storageOrFail } from "../_lib.js";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const WARRANTY_CODE_PATTERN = /^SDW-[A-Z0-9]{24}$/;
@@ -73,7 +73,7 @@ export async function onRequestPost({ request, env }) {
       "SELECT w.id,w.warranty_code,w.status,w.ends_at FROM warranties w WHERE upper(w.warranty_code)=? LIMIT 1",
     ).bind(warrantyCode).first();
     if (!warranty || (tokenWarrantyId && String(warranty.id) !== tokenWarrantyId) ||
-        warranty.status !== "active" || String(warranty.ends_at) < new Date().toISOString().slice(0, 10)) {
+        !isWarrantyEligibleOnDate(warranty.status, warranty.ends_at, getCurrentDateInVietnam())) {
       return fail("Không tìm thấy bảo hành còn hiệu lực.", 404);
     }
 

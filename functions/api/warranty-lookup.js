@@ -1,4 +1,4 @@
-import { dbOrFail, fail, json, rateLimitPublicRequest } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, warrantyStatusOnDate } from "../_lib.js";
 
 const clean = (value, max = 120) => String(value ?? "").trim().slice(0, max);
 const normalizePhone = value => {
@@ -28,9 +28,8 @@ function shapeWarranty(row, today, claimToken) {
   const code = String(row.warranty_code || "");
   let images = [];
   try { images = JSON.parse(row.imagesJson || "[]"); } catch {}
-  const expired = row.status === "active" && String(row.ends_at) < today;
-  const status = expired ? "expired" : row.status;
-  const eligible = status === "active" && String(row.ends_at) >= today;
+  const status = warrantyStatusOnDate(row.status, row.ends_at, today);
+  const eligible = isWarrantyEligibleOnDate(row.status, row.ends_at, today);
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
   return {
     claimToken,
@@ -70,9 +69,7 @@ export async function onRequestPost({ request, env }) {
   try { body = await request.json(); } catch { return fail("Thông tin tra cứu không hợp lệ."); }
   const raw = clean(body?.lookup ?? body?.warrantyCode ?? body?.phone);
   if (!raw) return fail("Nhập mã bảo hành hoặc số điện thoại dùng khi mua hàng.");
-  const dateParts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Ho_Chi_Minh", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
-  const datePart = type => dateParts.find(part => part.type === type)?.value || "";
-  const today = datePart("year") + "-" + datePart("month") + "-" + datePart("day");
+  const today = getCurrentDateInVietnam();
   try {
     const isCode = /^SDW-[A-Z0-9]{24}$/i.test(raw);
     let rows = [];

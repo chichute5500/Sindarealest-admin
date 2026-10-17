@@ -1,10 +1,15 @@
-import { fail, json, requireAdmin } from "../../_lib.js";
+import { fail, getCurrentDateInVietnam, json, requireAdmin, warrantyStatusOnDate } from "../../_lib.js";
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare(`SELECT wc.id,wc.order_id AS orderId,o.order_number AS orderNumber,c.full_name AS fullName,c.phone,wc.warranty_code AS warrantyCode,wc.message,wc.status,wc.admin_note AS adminNote,wc.created_at AS createdAt,a.image_key AS imageKey FROM warranty_claims wc JOIN orders o ON o.id=wc.order_id JOIN customers c ON c.id=wc.customer_id LEFT JOIN warranty_claim_attachments a ON a.claim_id=wc.id ORDER BY wc.created_at DESC LIMIT 1000`).all();
-    const issued = await context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,CASE WHEN w.status='active' AND w.ends_at<date('now') THEN 'expired' ELSE w.status END AS status,o.order_number AS orderNumber,oi.sku,oi.title,c.full_name AS fullName,c.phone FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id ORDER BY w.created_at DESC LIMIT 1000`).all();
-    return json({ claims: result.results || [], warranties: issued.results || [] });
+    const issued = await context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.title,c.full_name AS fullName,c.phone FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id ORDER BY w.created_at DESC LIMIT 1000`).all();
+    const today = getCurrentDateInVietnam();
+    const warranties = (issued.results || []).map((warranty) => ({
+      ...warranty,
+      status: warrantyStatusOnDate(warranty.status, warranty.endsAt, today),
+    }));
+    return json({ claims: result.results || [], warranties });
   } catch { return fail("Không đọc được dữ liệu bảo hành. Hãy kiểm tra đã áp dụng migration 0003.", 503); }
 }
 export async function onRequestPatch(context) {

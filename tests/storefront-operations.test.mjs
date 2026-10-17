@@ -40,9 +40,21 @@ const uploadSource = readFileSync(new URL('../functions/api/warranty-claim-uploa
 assert.ok(uploadSource.includes('INSERT INTO settings(key,value,updated_at)') && uploadSource.includes('warranty_upload:'), 'New uploads must store short-lived tokens in the existing settings table');
 assert.ok(warrantyClaimSource.includes('warranty_upload:') && warrantyClaimSource.includes('DELETE FROM settings WHERE key=?'), 'Claim submission must validate and consume the upload token');
 assert.ok(restoreSource.includes('operations.warrantyClaimAttachments'), 'Restore must preserve claim attachment metadata');
-assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('warranty.status!=="active"'), 'Warranty claims must not require OTP and must require an active warranty');
+assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyClaimSource.includes('isWarrantyEligibleOnDate'), 'Warranty claims must not require OTP and must validate the warranty using the shared Vietnam-local expiry check');
 const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-lookup.js', import.meta.url), 'utf8');
 assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && warrantyLookupSource.includes('claimToken') && !warrantyLookupSource.includes('warrantyCode: code') && warrantyLookupSource.includes('maskedPhone') && warrantyLookupSource.includes('maskedAddress'), 'Public warranty lookup must return masked data and a short-lived action token');
+const adminWarrantiesSource = readFileSync(new URL('../functions/api/admin/warranties.js', import.meta.url), 'utf8');
+const sharedLibSource = readFileSync(new URL('../functions/_lib.js', import.meta.url), 'utf8');
+assert.ok(sharedLibSource.includes('timeZone: "Asia/Ho_Chi_Minh"') && sharedLibSource.includes('export function isWarrantyEligibleOnDate'), 'Warranty expiry must use shared Vietnam-local calendar date logic');
+for (const [fileName, source] of [
+  ['warranty lookup', warrantyLookupSource],
+  ['warranty claim submission', warrantyClaimSource],
+  ['warranty photo upload', uploadSource],
+  ['admin warranty list', adminWarrantiesSource],
+]) {
+  assert.ok(source.includes('getCurrentDateInVietnam') || source.includes('warrantyStatusOnDate'), fileName + ' must use shared Vietnam-local expiry logic');
+  assert.ok(!source.includes("new Date().toISOString().slice(0,10)") && !source.includes("date('now')"), fileName + ' must not compare warranty expiry using UTC');
+}
 assert.ok(uploadSource.includes('form.get("claimToken")') && warrantyClaimSource.includes('body?.claimToken'), 'Warranty photo upload and claim submission must resolve tokens server-side');
 assert.ok(!storefrontHtml.includes('OTP') && !storefrontHtml.includes('otp') && !warrantyClaimSource.includes('ticketId'), 'Customer warranty flows must not include OTP or session tickets');
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
