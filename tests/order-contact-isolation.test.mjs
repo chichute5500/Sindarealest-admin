@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { onRequestPost as createOrder } from "../functions/api/orders.js";
 
-const preparedSql = [];
 const batchedStatements = [];
 const product = {
   id: "product-1", sku: "SD-SN001", title: "Giày thử", price: 1500000,
@@ -10,7 +8,6 @@ const product = {
 };
 const DB = {
   prepare(sql) {
-    preparedSql.push(sql);
     const stmt = {
       sql,
       values: [],
@@ -69,3 +66,20 @@ assert.ok(contactSnapshot, "each order must persist its own contact snapshot");
 assert.deepEqual(contactSnapshot.values.slice(1, 4),
   ["Tên gửi lần này", "0900000000", "order@example.test"],
   "snapshot must preserve the data submitted for this order without changing the customer profile");
+
+const warrantyLookupSource = (await import("node:fs")).readFileSync(
+  new URL("../functions/api/warranty-lookup.js", import.meta.url), "utf8");
+const adminWarrantySource = (await import("node:fs")).readFileSync(
+  new URL("../functions/api/admin/warranties.js", import.meta.url), "utf8");
+const migration = (await import("node:fs")).readFileSync(
+  new URL("../migrations/0007_order_contact_details.sql", import.meta.url), "utf8");
+assert.ok(warrantyLookupSource.includes("COALESCE(oc.phone,c.phone)") &&
+  warrantyLookupSource.includes("LEFT JOIN order_contact_details oc ON oc.order_id=o.id"),
+  "public warranty lookup must use the contact number associated with the purchase");
+assert.ok(adminWarrantySource.includes("COALESCE(oc.full_name,c.full_name)") &&
+  adminWarrantySource.includes("LEFT JOIN order_contact_details oc ON oc.order_id=o.id"),
+  "admin warranty views must show purchase-time contact information");
+assert.ok(migration.includes("INSERT OR IGNORE INTO order_contact_details") &&
+  migration.includes("FROM orders o") && migration.includes("JOIN customers c ON c.id = o.customer_id"),
+  "migration must backfill historic orders without deleting operational data");
+
