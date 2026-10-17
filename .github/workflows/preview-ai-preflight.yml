@@ -42,6 +42,14 @@ jobs:
           printf 'Preview DB binding: %s\n' "${preview_db:+configured}"
           printf 'Preview IMAGES binding: %s\n' "${preview_images:+configured}"
           printf 'Preview ORIGINALS binding: %s\n' "${preview_originals:+configured (optional for image grouping test)}"
+          preview_env_keys="$(printf '%s' "$response" | jq -r '(.result.deployment_configs.preview.env_vars // {}) | keys | join(",")')"
+          preview_config_keys="$(printf '%s' "$response" | jq -r '(.result.deployment_configs.preview // {}) | keys | join(",")')"
+          preview_admin_password="$(printf '%s' "$response" | jq -r 'if ((.result.deployment_configs.preview.env_vars // {}) | has("ADMIN_PASSWORD")) then "configured" else "missing" end')"
+          preview_session_secret="$(printf '%s' "$response" | jq -r 'if ((.result.deployment_configs.preview.env_vars // {}) | has("SESSION_SECRET")) then "configured" else "missing" end')"
+          printf 'Preview config keys exposed by Pages API: %s\n' "${preview_config_keys:-none}"
+          printf 'Preview env variable names (values hidden): %s\n' "${preview_env_keys:-none}"
+          printf 'Preview ADMIN_PASSWORD key: %s\n' "$preview_admin_password"
+          printf 'Preview SESSION_SECRET key: %s\n' "$preview_session_secret"
 
           test -n "$production_branch" || { echo "::error::Could not verify the configured Production branch."; exit 1; }
           if [ "$production_branch" = "feature/ai-image-grouping" ]; then
