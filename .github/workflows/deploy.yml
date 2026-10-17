@@ -54,8 +54,9 @@ jobs:
         if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true'
         run: echo "::notice::Production deploy skipped safely; verify private ORIGINALS binding before enabling it."
 
-      - name: Verify actual Production R2 bindings
-        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'
+      - name: Diagnose actual Production R2 bindings
+        if: success()
+        continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}
         run: node scripts/verify-pages-bindings.mjs
 
       - name: Deploy to verified Pages project
