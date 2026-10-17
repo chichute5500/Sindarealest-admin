@@ -232,3 +232,43 @@ const brokenOperationsBackup = { ...operationsBackup, operations: { ...operation
 response = await restoreProducts({ request: makeRestoreRequest(brokenOperationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 400, 'backup v2 tham chiếu khách hàng không tồn tại phải bị từ chối');
 assert.equal(batchCalls, 3, 'backup v2 không hợp lệ không được chạm vào D1');
+
+const backupSettingValues = new Map([
+  ['show_prices','1'],
+  ['welcome_enabled','0'],
+  ['welcome_title_line_1','Đẳng cấp thật.'],
+  ['welcome_title_line_2','Từ chất liệu thật.'],
+  ['welcome_text','Lời chào sao lưu kiểm thử.'],
+  ['watermark_enabled','0'],
+  ['watermark_position','top-left'],
+  ['watermark_size','24'],
+  ['watermark_opacity','73'],
+]);
+const backupDB = {
+  prepare(sql) {
+    let bound = [];
+    const statement = {
+      bind(...values) { bound = values; return statement; },
+      async first() {
+        if (!sql.includes('FROM settings')) return null;
+        const value = backupSettingValues.get(bound[0]);
+        return value === undefined ? null : { value };
+      },
+      async all() { return { results: [] }; },
+    };
+    return statement;
+  },
+};
+const backupResponse = await createAdminBackup({
+  request: new Request('https://shop.example/api/admin/backup', {
+    headers: { Cookie: `sd_admin_session=${token}`, Origin: 'https://shop.example' },
+  }),
+  env: { DB: backupDB, ...secrets },
+});
+assert.equal(backupResponse.status, 200, 'admin backup must succeed for an authenticated session');
+const exportedBackup = await backupResponse.json();
+assert.equal(exportedBackup.format, 'sindarealest-backup-v2');
+assert.equal(exportedBackup.settings.watermarkEnabled, false);
+assert.equal(exportedBackup.settings.watermarkPosition, 'top-left');
+assert.equal(exportedBackup.settings.watermarkSize, 24);
+assert.equal(exportedBackup.settings.watermarkOpacity, 73);
