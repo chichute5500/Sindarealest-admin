@@ -35,4 +35,10 @@ assert.match(notifications, /redirect:"manual"/,
 const route = readFileSync(new URL("../functions/api/admin/push-subscriptions.js", import.meta.url), "utf8");
 assert.ok(route.includes("isTrustedPushEndpoint(endpoint)"),
   "subscription endpoints must be checked before being persisted");
+const serviceWorker = readFileSync(new URL("../public/admin-sw.js", import.meta.url), "utf8");
+assert.match(serviceWorker, /target\.origin !== self\.location\.origin/,
+  "notification click destinations must reject cross-origin URLs");
+assert.match(serviceWorker, /!target\.pathname\.startsWith\("\/admin\/"\)/,
+  "notification click destinations must stay inside the admin path");
+
 console.log("PASS: push endpoint SSRF guard, bounded delivery, and subscription validation.");
