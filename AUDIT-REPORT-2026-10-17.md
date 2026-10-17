@@ -71,9 +71,9 @@ Trước đây API quản trị chỉ cần URL bắt đầu bằng HTTPS để 
 ### 8. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
 
-Restore trước đây cho phép tối đa 20.000 bản ghi ở từng mảng riêng lẻ, nhưng không giới hạn tổng số bản ghi của tất cả các mảng. Backup rất lớn có thể buộc Worker tạo batch có hàng chục nghìn câu lệnh và vượt thời gian/giới hạn tài nguyên.
+Backup/restore trước đây không có cùng giới hạn tổng bản ghi và kích thước: backup có thể xuất một tệp lớn hơn khả năng khôi phục an toàn, trong khi restore cho phép tới 20.000 bản ghi ở từng mảng riêng lẻ. Tệp lớn có thể khiến Worker phải tạo batch khổng lồ hoặc vượt thời gian/giới hạn tài nguyên.
 
-**Đã sửa:** Đọc JSON theo luồng với giới hạn 20 MB và từ chối backup có tổng hơn 5.000 bản ghi trước khi xây dựng batch ghi dữ liệu. Đã thêm regression test để xác nhận backup vượt giới hạn bị từ chối trước khi đụng đến D1.
+**Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn; backup cũng từ chối xuất tệp không thể khôi phục trong giới hạn hiện tại. Cả hai kiểm tra đều xảy ra trước khi có thao tác ghi/xóa D1; có regression test cho giới hạn tổng bản ghi và payload.
 
 ## Các kiểm tra/điểm vận hành cần chú ý
 
