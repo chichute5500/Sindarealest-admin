@@ -108,7 +108,7 @@ Backup/restore trước đây không có cùng giới hạn tổng bản ghi và
 
 Luồng thêm sản phẩm trước đây đọc toàn bộ cột SKU để tìm số lớn nhất của một danh mục. Khi catalog lớn hơn, truy vấn đọc nhiều dữ liệu không liên quan; hậu tố SKU bị hỏng/quá lớn cũng có thể tạo phép tính số không an toàn.
 
-**Đã sửa:** Chỉ đọc SKU khớp prefix danh mục đang thêm và chỉ dùng hậu tố nếu `Number.isSafeInteger()` hợp lệ. Giữ vòng retry khi hai admin cùng cấp một SKU; kiểm thử đồng thời vẫn pass.
+**Đã sửa:** Chỉ đọc SKU khớp prefix danh mục đang thêm và chỉ dùng hậu tố nếu `Number.isSafeInteger()` hợp lệ. Các map alias danh mục/nhãn nhật ký cũng dùng kiểm tra own-property để khóa các khóa prototype như `constructor`; bảng quy tắc SKU động dùng object không có prototype. Giữ vòng retry khi hai admin cùng cấp một SKU; regression tests bao gồm danh mục tên `constructor`.
 
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
