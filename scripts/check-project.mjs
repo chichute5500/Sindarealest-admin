@@ -99,8 +99,8 @@ const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(joi
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
 const adminHtml = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
+check(adminHtml.indexOf('<style') === -1, 'Admin không được giữ stylesheet CSS vá nhúng');
 check(adminHtml.includes('/ui/admin.css?v=20261017-2'), 'Admin chưa liên kết stylesheet giao diện đã hợp nhất');
-check(!/<style\b/i.test(adminHtml), 'Admin không được giữ stylesheet CSS vá nhúng');
 const endpointMap = {
   '/api/admin/login': 'functions/api/admin/login.js',
   '/api/admin/logout': 'functions/api/admin/logout.js',
