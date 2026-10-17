@@ -18,6 +18,52 @@ export function fail(message, status = 400, headers = {}) {
   return json({ ok: false, error: message }, status, headers);
 }
 
+/**
+ * Read a request body with a hard byte limit even when Content-Length is absent.
+ * Returns { bytes } or { error: "invalid" | "too_large" }.
+ */
+export async function readBodyBytesLimited(request, maxBytes = 64 * 1024) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) return { error: "invalid" };
+  const declaredLength = Number(request.headers.get("Content-Length") || 0);
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
+  if (!request.body) return { error: "invalid" };
+  let buffer = new Uint8Array(Math.min(maxBytes, 16 * 1024));
+  let total = 0;
+  const reader = request.body.getReader();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (total + value.byteLength > maxBytes) {
+        try { await reader.cancel(); } catch {}
+        return { error: "too_large" };
+      }
+      const required = total + value.byteLength;
+      if (required > buffer.byteLength) {
+        const capacity = Math.min(maxBytes, Math.max(required, buffer.byteLength * 2));
+        const grown = new Uint8Array(capacity);
+        grown.set(buffer.subarray(0, total));
+        buffer = grown;
+      }
+      buffer.set(value, total);
+      total = required;
+    }
+  } catch {
+    return { error: "invalid" };
+  }
+  return { bytes: buffer.subarray(0, total) };
+}
+
+export async function readJsonBodyLimited(request, maxBytes = 64 * 1024) {
+  const body = await readBodyBytesLimited(request, maxBytes);
+  if (body.error) return body;
+  try {
+    return { value: JSON.parse(new TextDecoder().decode(body.bytes)) };
+  } catch {
+    return { error: "invalid" };
+  }
+}
+
 export function dbOrFail(env) {
   if (!env?.DB) return fail("Dịch vụ dữ liệu chưa được cấu hình. Hãy gắn D1 binding tên DB.", 503);
   return null;
