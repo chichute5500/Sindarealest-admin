@@ -115,6 +115,29 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
 }
 
 {
+  const malformedProductDB = makeDB();
+  const malformedProductResponse = await restoreBackup({
+    request: request({ format: "sindarealest-backup-v1", products: [null], settings: { showPrices: true } }),
+    env: { ...env, DB: malformedProductDB },
+  });
+  assert.equal(malformedProductResponse.status, 400, "null product rows should be rejected as a controlled validation error");
+  assert.equal(malformedProductDB.batchCalls, 0, "malformed product rows must not issue D1 writes");
+
+  const malformedOperationsDB = makeDB();
+  const malformedOperationsResponse = await restoreBackup({
+    request: request({
+      format: "sindarealest-backup-v2",
+      products: [],
+      settings: { showPrices: true, welcomeEnabled: true, welcomeTitleLine1: "Xin chào", welcomeTitleLine2: "SinDarealest", welcomeText: "Chào mừng" },
+      operations: { customers: [null], orders: [], orderItems: [], warranties: [], warrantyClaims: [], auditLogs: [] },
+    }),
+    env: { ...env, DB: malformedOperationsDB },
+  });
+  assert.equal(malformedOperationsResponse.status, 400, "null operational rows should be rejected as a controlled validation error");
+  assert.equal(malformedOperationsDB.batchCalls, 0, "malformed operational rows must not issue D1 writes");
+}
+
+{
   const validRelationshipsBackup = () => ({
     format: "sindarealest-backup-v2",
     products: [],
