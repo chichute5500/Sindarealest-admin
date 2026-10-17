@@ -60,7 +60,7 @@ Lưu bindings/secrets trước rồi mới chạy `npm run setup:cloudflare` ho�
 Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test` rồi mới deploy; workflow KHÔNG chạy migrations hoặc seed.
 
 Trong GitHub repository, thêm Secrets:
-- `CLOUDFLARE_API_TOKEN`: token chỉ có quyền tối thiểu cần cho Pages deploy và đọc danh sách project.
+- `CLOUDFLARE_API_TOKEN`: token cần quyền Pages phù hợp cho deploy/đọc cấu hình project và quyền `R2 Storage: Read` để workflow kiểm tra public access của bucket ORIGINALS. Không cấp quyền ghi/xóa R2 chỉ để chạy bước kiểm tra.
 - `CLOUDFLARE_ACCOUNT_ID`: Account ID của tài khoản Cloudflare đúng.
 
 Thêm Repository Variables:
@@ -68,7 +68,7 @@ Thêm Repository Variables:
 - `CLOUDFLARE_PAGES_BRANCH`: production branch đúng.
 - `CLOUDFLARE_PAGES_ORIGINALS_READY`: chỉ đặt chuỗi `true` SAU KHI xác minh bucket `ORIGINALS` riêng tư và binding được gắn trên đúng môi trường Production Pages. Nếu chưa xác minh, để trống/false; workflow sẽ bỏ qua deploy production.
 
-Token cần được tạo trong Cloudflare Dashboard và không được commit vào repository. Trước khi bật workflow, xác nhận project đã tồn tại trong cùng tài khoản với Account ID. Nếu thiếu hoặc sai cấu hình, workflow phải thất bại trước deploy.
+Token cần được tạo trong Cloudflare Dashboard và không được commit vào repository. Trước khi bật workflow, xác nhận project đã tồn tại trong cùng tài khoản với Account ID. Workflow đọc cấu hình Production Pages và trạng thái R2 qua hai endpoint domains/managed (r2.dev) và domains/custom; nếu log báo HTTP 403, bổ sung quyền đọc tương ứng vào token rồi chạy lại. Nếu không thể đọc/khẳng định bucket ORIGINALS không công khai, giữ `CLOUDFLARE_PAGES_ORIGINALS_READY` trống/false. Nếu thiếu hoặc sai cấu hình, workflow phải bỏ qua deploy hoặc thất bại trước deploy.
 
 Chọn một quy trình deploy chính (Termux hoặc GitHub Actions) và dùng nhất quán. Không cần đồng thời tạo nhiều Pages project cho cùng website.
 
