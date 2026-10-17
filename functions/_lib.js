@@ -18,6 +18,46 @@ export function fail(message, status = 400, headers = {}) {
   return json({ ok: false, error: message }, status, headers);
 }
 
+/**
+ * Parse a small JSON request without buffering an unbounded body in memory.
+ * Returns { value } on success or { error: "invalid" | "too_large" }.
+ */
+export async function readJsonBodyLimited(request, maxBytes = 64 * 1024) {
+  const declaredLength = Number(request.headers.get("Content-Length") || 0);
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
+  if (!request.body) return { error: "invalid" };
+
+  const reader = request.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        try { await reader.cancel(); } catch {}
+        return { error: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { error: "invalid" };
+  }
+
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { error: "invalid" };
+  }
+}
+
 export function dbOrFail(env) {
   if (!env?.DB) return fail("Dịch vụ dữ liệu chưa được cấu hình. Hãy gắn D1 binding tên DB.", 503);
   return null;
