@@ -82,6 +82,13 @@ Backup/restore trước đây không có cùng giới hạn tổng bản ghi và
 
 **Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn; backup cũng từ chối xuất tệp không thể khôi phục trong giới hạn hiện tại. Cả hai kiểm tra đều xảy ra trước khi có thao tác ghi/xóa D1; có regression test cho giới hạn tổng bản ghi và payload.
 
+### Tạo mô tả bằng AI trong trang admin
+Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
+
+**Đã sửa trên nhánh rà soát:** Route ưu tiên `context.env.AI.run()`, mặc định model `@cf/meta/llama-3.2-11b-vision-instruct`, kiểm tra tên model tùy chỉnh, trả lỗi rõ nếu chưa cấu hình binding/khóa, và giữ OpenAI làm đường dự phòng khi chỉ có `OPENAI_API_KEY`. Có regression test kiểm tra binding, model mặc định, đầu vào, cấu hình thiếu và dữ liệu không hợp lệ.
+
+**Việc cần cấu hình ngoài mã:** Pages Functions cần một Workers AI binding có tên chính xác `AI` trong cả môi trường Production và Preview; cần redeploy để binding có hiệu lực. Tạo API token hoặc đồng ý điều khoản model không tự tạo binding cho Pages. Hướng dẫn chính thức: https://developers.cloudflare.com/pages/functions/bindings/
+
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
