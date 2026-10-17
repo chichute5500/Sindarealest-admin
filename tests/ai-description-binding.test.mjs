@@ -18,7 +18,13 @@ function request(body = {}) {
     body: JSON.stringify(body),
   });
 }
-const env = { DB: {}, ADMIN_PASSWORD, SESSION_SECRET };
+const DB = {
+  prepare(sql) {
+    return { sql, values: [], bind(...values) { this.values = values; return this; } };
+  },
+  async batch() { return [{ success: true }, { success: true, results: [{ attempts: 1 }] }]; },
+};
+const env = { DB, ADMIN_PASSWORD, SESSION_SECRET };
 
 let invoked = null;
 const workersResponse = await generateDescription({
@@ -65,5 +71,19 @@ const invalidInput = await generateDescription({
   env: { ...env, AI: { async run() { throw new Error("should not run"); } } },
 });
 assert.equal(invalidInput.status, 400, "invalid product input must be rejected before invoking AI");
+
+const rateLimited = await generateDescription({
+  request: request({ title: "Giày da", category: "Giày tây" }),
+  env: {
+    DB: {
+      prepare(sql) { return { sql, bind() { return this; } }; },
+      async batch() { return [{ success: true }, { success: true, results: [{ attempts: 21 }] }]; },
+    },
+    ADMIN_PASSWORD,
+    SESSION_SECRET,
+    AI: { async run() { throw new Error("rate-limited AI must not be invoked"); } },
+  },
+});
+assert.equal(rateLimited.status, 429, "AI generation must be rate-limited per IP and hour");
 
 console.log("PASS: admin description generation supports Workers AI binding, model validation, and explicit configuration errors.");
