@@ -37,6 +37,40 @@ export async function fetchProductionPagesProject({ accountId, projectName, apiT
   return payload.result;
 }
 
+export function assertPrivateR2Access(access) {
+  if (!access || typeof access.r2devEnabled !== 'boolean' || !Array.isArray(access.customDomains) ||
+      !access.customDomains.every((domain) => domain && typeof domain.enabled === 'boolean')) {
+    throw new Error('Không đọc được đầy đủ trạng thái public access của ORIGINALS; deploy bị chặn.');
+  }
+  if (access.r2devEnabled) throw new Error('Bucket ORIGINALS đang bật public access qua r2.dev; deploy bị chặn.');
+  const enabledDomains = access.customDomains.filter((domain) => domain.enabled === true);
+  if (enabledDomains.length) throw new Error('Bucket ORIGINALS đang có custom domain công khai bật: ' + enabledDomains.map((domain) => domain.domain || '(không rõ tên)').join(', ') + '; deploy bị chặn.');
+  return { r2devEnabled: false, enabledCustomDomains: 0 };
+}
+
+export async function fetchR2BucketPublicAccess({ accountId, bucketName, apiToken, fetchImpl = fetch }) {
+  if (!accountId || !bucketName || !apiToken) throw new Error('Thiếu thông tin xác thực Cloudflare R2 để kiểm tra public access.');
+  const base = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/r2/buckets/${encodeURIComponent(bucketName)}/domains`;
+  const headers = { Authorization: `Bearer ${apiToken}`, Accept: 'application/json' };
+  const [managedResponse, customResponse] = await Promise.all([
+    fetchImpl(`${base}/managed`, { method: 'GET', headers, signal: AbortSignal.timeout(15000) }),
+    fetchImpl(`${base}/custom`, { method: 'GET', headers, signal: AbortSignal.timeout(15000) }),
+  ]);
+  if (!managedResponse.ok || !customResponse.ok) {
+    const status = !managedResponse.ok ? managedResponse.status : customResponse.status;
+    throw new Error(`Không đọc được cài đặt public access R2 (HTTP ${status}); cần quyền R2 Read và không được deploy khi chưa xác minh.`);
+  }
+  const [managedPayload, customPayload] = await Promise.all([managedResponse.json(), customResponse.json()]);
+  if (managedPayload?.success !== true || typeof managedPayload?.result?.enabled !== 'boolean' ||
+      customPayload?.success !== true || !Array.isArray(customPayload?.result?.domains)) {
+    throw new Error('Cloudflare API không trả về trạng thái public access R2 hợp lệ; deploy bị chặn.');
+  }
+  return {
+    r2devEnabled: managedPayload.result.enabled,
+    customDomains: customPayload.result.domains,
+  };
+}
+
 async function main() {
   const projectName = process.env.CLOUDFLARE_PAGES_PROJECT;
   const project = await fetchProductionPagesProject({
@@ -45,7 +79,13 @@ async function main() {
     apiToken: process.env.CLOUDFLARE_API_TOKEN,
   });
   const result = verifyProductionR2Bindings(project, projectName);
-  console.log(`Đã xác minh binding Production: IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Việc xác minh public access của bucket ORIGINALS vẫn cần hoàn tất trước khi bật readiness flag.`);
+  const access = await fetchR2BucketPublicAccess({
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+    bucketName: result.originalsBucket,
+    apiToken: process.env.CLOUDFLARE_API_TOKEN,
+  });
+  const privacy = assertPrivateR2Access(access);
+  console.log(`Đã xác minh Production bindings: IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Public access ORIGINALS: r2.dev tắt, ${privacy.enabledCustomDomains} custom domain công khai đang bật.`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
