@@ -232,3 +232,20 @@ Bộ xác thực backup đã kiểm tra mã bảo hành trùng nhưng chưa ki�
 
 ### Vệ sinh danh sách kiểm thử
 Một kiểm tra cuối danh sách lệnh `npm test` phát hiện `tests/warranty-claim-atomicity.test.mjs` bị gọi lặp hai lần. Đã xóa lệnh trùng để CI không chạy lại cùng bộ test vô ích; [CI run 39049693138](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39049693138) xác nhận toàn bộ bước kiểm tra và kiểm thử vẫn pass.
+
+### Khôi phục lớp Liquid Glass cho thẻ sản phẩm
+
+**Mức độ:** Trải nghiệm giao diện — đồng nhất bề mặt kính ở chế độ sáng/tối.
+
+Rà soát giao diện phát hiện thẻ sản phẩm có nền bán trong suốt nhưng thiếu `backdrop-filter`, vì vậy nhìn giống lớp phủ mờ phẳng hơn các thành phần kính khác.
+
+**Đã sửa trên nhánh rà soát:** thêm blur + saturate và highlight/inset border nhiều lớp cho thẻ sản phẩm; trên màn hình nhỏ giảm blur để cân bằng hiệu năng. Giữ nguyên ảnh, bố cục, dữ liệu và hiệu ứng chuyển theme. Thêm regression test để tránh mất lớp kính ở desktop/mobile.
+
+**CI sau thay đổi:** [run 39050041087 — toàn bộ bước kiểm tra và test pass](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39050041087).
+
+### Ranh giới xác minh trước khi phát hành
+
+- Mã nguồn và regression tests đã được kiểm tra trên nhánh audit; dependency audit hiện không báo lỗ hổng mức cao.
+- Chưa có bản preview của đúng commit được xác minh bằng trình duyệt thật. Không tự tạo deployment vì cấu hình nhánh production trong Cloudflare phải được xác nhận trước, tránh vô tình đưa nhánh thử lên production.
+- Chưa kiểm tra được các binding/secrets trong Cloudflare Dashboard từ GitHub; đặc biệt cần xác minh D1 migration 0007 và R2 `ORIGINALS` trước khi phát hành.
+- Tệp backup JSON không chứa nội dung ảnh nhị phân của R2. Muốn có khả năng khôi phục đầy đủ phải sao lưu và kiểm tra phục hồi bucket R2 riêng.
