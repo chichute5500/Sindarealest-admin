@@ -71,6 +71,8 @@ Restore trước đây cho phép tối đa 20.000 bản ghi ở từng mảng ri
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
+CI mới nhất trên nhánh rà soát đã pass ở [run 39041041993](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39041041993); các kiểm thử mới và kiểm tra dependency đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không có nghĩa production đã được cập nhật.
+
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
 ### Ảnh bằng chứng bảo hành
