@@ -10,7 +10,7 @@ export async function onRequestGet(context) {
       status: warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today),
     }));
     return json({ claims: result.results || [], warranties });
-  } catch { return fail("Không đọc được dữ liệu bảo hành. Hãy kiểm tra đã áp dụng migration 0003.", 503); }
+  } catch { return fail("Không đọc được dữ liệu bảo hành. Hãy kiểm tra các migration 0003, 0005 và 0007.", 503); }
 }
 export async function onRequestPatch(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
