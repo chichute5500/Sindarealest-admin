@@ -6,16 +6,17 @@ const count = text => html.split(text).length - 1;
 
 assert.equal(count('id="detailZoom"'), 1, 'The detail viewer must expose exactly one full-image control.');
 assert.equal(count('id="sdFullscreenViewer"'), 1, 'There must be exactly one full-screen viewer.');
-assert.equal(count('id="sdFullscreenImage"'), 1, 'There must be exactly one full-screen image.');
+assert.equal(count('id="sdFullscreenImage"'), 1, 'The fullscreen gallery needs one primary image layer.');
+assert.equal(count('id="sdFullscreenImageNext"'), 1, 'The fullscreen gallery needs a second preloaded layer to prevent blank frames.');
 assert.match(html, /id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình"/);
-assert.match(html, /function sizeFullscreenFrame\(\)/);
+assert.match(html, /function sizeFullscreenFrame\([^)]*\)/);
 assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /function renderFullscreenThumbs\(/);
 assert.match(html, /function openFullscreenImage\(\)/);
 assert.match(html, /function closeFullscreenImage\(\)/);
 assert.match(html, /\$\(['"]#detailZoom['"]\)\.addEventListener\(['"]click['"],openFullscreenImage\)/);
 assert.match(html, /\$\(['"]#detailMainImage['"]\)\.addEventListener\(['"]click['"]/);
-assert.match(html, /\$\(['"]#sdFullscreenImage['"]\)\.addEventListener\(['"]pointerup['"]/);
+assert.match(html, /\$\(['"]#sdFullscreenFrame['"]\)\.addEventListener\(['"]pointerup['"]/);
 assert.match(html, /\$\(['"]#sdFullscreenPrev['"]\)\.addEventListener\(['"]click['"]/);
 assert.match(html, /\$\(['"]#sdFullscreenNext['"]\)\.addEventListener\(['"]click['"]/);
 assert.match(html, /\$\(['"]#sdFullscreenThumbs['"]\)\.addEventListener\(['"]click['"]/);
@@ -33,7 +34,7 @@ assert.ok(html.includes("$('#sdFullscreenViewer').classList.contains('open')"), 
 
 
 const fullscreenTransitionStart = html.indexOf('function setFullscreenPhoto(');
-const fullscreenTimingConstant = html.lastIndexOf('const FULLSCREEN_SLIDE_HALF_MS=150', fullscreenTransitionStart);
+const fullscreenTimingConstant = html.lastIndexOf('const FULLSCREEN_SLIDE_MS=300', fullscreenTransitionStart);
 assert.notEqual(fullscreenTimingConstant, -1, 'The fullscreen transition duration constant must be declared before the transition handler.');
 const fullscreenTransition = html.slice(
   fullscreenTimingConstant,
@@ -45,12 +46,16 @@ assert.match(html, /:root\.dark\{--sd-gallery-glass:rgba\(245,239,226,\.14\);--s
 assert.match(html, /\.slide-count,\.featured-image-count,\.detail-image-count,\.sd-fullscreen-count\{[^}]*backdrop-filter:blur\(18px\)/);
 assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.85\)/);
 assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
-assert.match(html, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdGalleryOutLeft 150ms/);
-assert.match(html, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdGalleryInRight 150ms/);
-assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_HALF_MS=150/);
-assert.match(fullscreenTransition, /},swapDelay\)/);
-assert.match(fullscreenTransition, /FULLSCREEN_SLIDE_HALF_MS\+20/);
-assert.doesNotMatch(fullscreenTransition, /\b(?:230|620)\b/, 'Fullscreen transitions must not use the previous conflicting 230/620 ms timings.');
+assert.match(html, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdFullscreenOutLeft 300ms/);
+assert.match(html, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdFullscreenInRight 300ms/);
+assert.match(html, /function activeFullscreenImage\(\)/);
+assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
+assert.match(html, /active\.classList\.remove\('is-active'\);incoming\.classList\.add\('is-active'\)/);
+assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:rgba\(245,239,226,\.035\)/);
+assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_MS=300/);
+assert.match(fullscreenTransition, /incoming\.onload=finishLoad/);
+assert.match(fullscreenTransition, /fullscreenAnimationTimer=setTimeout/);
+assert.doesNotMatch(fullscreenTransition, /\b(?:150|230|620)\b/, 'Fullscreen transitions must not use conflicting legacy timings.');
 assert.doesNotMatch(html, /id="artPrev"[^>]*>‹/);
 assert.doesNotMatch(html, /class="featured-arrow[^>]*>‹/);
 assert.doesNotMatch(html, /data-page="(?:prev|next)"[^>]*>‹/);
