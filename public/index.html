@@ -117,17 +117,17 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(255,251,24
 .craftsmanship-copy h2 em{font-style:normal;color:var(--gold)}
 
 .craftsmanship-points{display:grid;gap:12px;margin:16px 0 21px}.craftsmanship-points>div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding-top:11px;border-top:1px solid var(--soft-line)}.craftsmanship-points>div>span{font:400 14px SD Serif,Georgia,serif;color:var(--gold)}.craftsmanship-points strong{display:block;font-size:10px;line-height:1.5}.craftsmanship-points small{display:block;margin-top:3px;color:var(--muted);font-size:9px;line-height:1.65}
-#order .order-steps{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
-#order .order-step{position:relative;min-width:0;overflow:hidden;padding:19px 15px 18px;border-radius:19px;box-shadow:0 10px 30px rgba(0,0,0,.055);transition:transform .32s ease,border-color .32s ease,background-color .8s ease}
-#order .order-step:hover{transform:translateY(-4px);border-color:var(--gold)}#order .order-number{position:absolute;right:13px;top:12px;color:var(--gold);font:400 22px SD Serif,Georgia,serif;opacity:.85}#order .order-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--glass);font-size:20px;color:var(--gold);margin-bottom:22px}#order .order-step h3{font:400 17px/1.3 SD Serif,Georgia,serif;margin:0 0 9px;overflow-wrap:anywhere}#order .order-step p{font-size:9px;line-height:1.8;color:var(--muted);margin:0;overflow-wrap:anywhere}#order .order-step strong{color:var(--ink)}
-#order .order-note{display:flex;align-items:center;gap:13px;margin-top:13px;padding:15px 17px;border:1px solid var(--line);border-radius:18px;background:var(--glass);backdrop-filter:blur(20px)}#order .order-note>span{color:var(--gold);font-size:22px;flex-shrink:0}#order .order-note p{font-size:10px;line-height:1.7;color:var(--muted);margin:0;flex:1;min-width:0}#order .order-note p strong{color:var(--ink)}#order .order-note .pill-btn{flex-shrink:0;white-space:nowrap}
+
+
+
+
 /* Guard against long product names and narrow controls overflowing or colliding. */
 .product-card,.product-open,.product-info,.product-title,.product-category,.detail-copy,.cart-row,.cart-row>div,.contact-link>span:last-child{min-width:0}
 .product-title{overflow-wrap:anywhere;hyphens:auto;line-height:1.38}.product-info{padding-bottom:47px}.product-card-bottom{min-width:0}.product-detail-cta{overflow-wrap:anywhere}.cart-row strong{overflow-wrap:anywhere;line-height:1.45}.cart-row small{overflow-wrap:anywhere;line-height:1.5}.detail-actions .pill-btn{line-height:1.45;white-space:normal;min-height:42px}.contact-link{overflow:hidden}.contact-link small{overflow-wrap:anywhere;word-break:break-word}
-@media(max-width:1050px){#order .order-steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}#order .order-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#order .order-step{padding:15px 12px;border-radius:16px}#order .order-icon{margin-bottom:17px;width:34px;height:34px}#order .order-step h3{font-size:16px}#order .order-step p{font-size:9px}#order .order-note{flex-wrap:wrap;align-items:flex-start;padding:13px}#order .order-note p{flex-basis:calc(100% - 38px)}#order .order-note .pill-btn{margin-left:38px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
-@media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}#order .order-step h3{font-size:14px}#order .order-step p{font-size:8px}#order .order-step{padding:13px 10px}#order .order-number{font-size:19px;right:10px;top:9px}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
-@media(hover:none){.product-card:hover,.pill-btn:hover{transform:none}.product-card:hover .product-photo img{transform:none}#order .order-step:hover{transform:none}}
+@media(max-width:1050px){}
+@media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
+@media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
+@media(hover:none){.product-card:hover,.pill-btn:hover{transform:none}.product-card:hover .product-photo img{transform:none}}
 @media(max-width:760px){.nav,.mobile-nav,.glass,.glass-soft,.promise-tag,.search-field,.mosaic-card,.contact-link{backdrop-filter:blur(13px) saturate(135%);-webkit-backdrop-filter:blur(13px) saturate(135%)}.theme-bg{inset:-1%;transform:scale(1.01)}}
 @media(prefers-reduced-motion:reduce){.welcome-content{animation:none}.welcome-loader i{animation:none}.welcome-splash{transition-duration:.01ms}.detail-main-image{will-change:auto}}
 
@@ -249,12 +249,12 @@ html.dark .welcome-footnote i{color:#e5c98d}
  .mosaic-compact .mosaic-sub{font-size:9px;line-height:1.45}
  .custom-text h2{font-size:clamp(29px,7.3vw,35px)}
  .custom-text p{font-size:11px;line-height:1.7}
- #order .order-steps{gap:9px}
- #order .order-step{padding:15px 12px;min-height:0}
- #order .order-icon{width:35px;height:35px;margin-bottom:13px}
- #order .order-step h3{font-size:15px;line-height:1.35}
- #order .order-step p{font-size:10px;line-height:1.62}
- #order .order-note p{font-size:10.5px;line-height:1.65}
+ 
+ 
+ 
+ 
+ 
+ 
  .search-field{min-height:47px;border-radius:17px;padding:0 13px}
  .search-field input{font-size:13px;padding:12px 0}
  .filter-pills{gap:7px;padding:3px 1px 8px}
@@ -1004,7 +1004,7 @@ img { -webkit-user-drag:none; user-select:none; }
 #order .order-number{color:var(--gold);font:400 12px/1 SD Serif,Georgia,serif;letter-spacing:.04em;opacity:.9}
 #order .order-icon{width:26px;height:26px;display:grid;place-items:center;flex:0 0 26px;margin:0;border:1px solid var(--line);border-radius:50%;background:var(--glass);font-size:14px;line-height:1;color:var(--gold)}
 #order .order-step h3{margin:0 0 5px;font:400 13.5px/1.32 SD Serif,Georgia,serif;overflow-wrap:anywhere}
-#order .order-step p{margin:0;color:var(--muted);font-size:9.5px;line-height:1.5;overflow-wrap:anywhere}
+#order .order-step p{margin:0;color:var(--muted);font-size:9.5px;line-height:1.5;overflow-wrap:anywhere}#order .order-step strong{color:var(--ink)}
 
 #order .order-assurance-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;margin-top:9px;padding:9px 11px;border:1px solid var(--line);border-radius:15px;background:var(--glass);backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%)}
 #order .order-commitment{display:flex;align-items:center;gap:9px;min-width:0;flex:1 1 auto}
@@ -1053,10 +1053,8 @@ img { -webkit-user-drag:none; user-select:none; }
  #order .order-commitment-copy span{font-size:7.6px}
  #order .order-zalo-cta{gap:3px;padding:7px 6px;font-size:8px}
 }
-@media(prefers-reduced-motion:reduce){
- #order .order-step{transition:none}
- #order .order-step:hover{transform:none}
-}
+@media(hover:none){#order .order-step:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){#order .order-step{transition:none}#order .order-step:hover{transform:none}}
 </style>
 
 </body>
