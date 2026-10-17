@@ -48,12 +48,12 @@ assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(
   'Tile descriptions must not inherit theme-dependent muted color.');
 
 const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
-const tileGradient = 'linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))';
+const tileGradient = 'linear-gradient(135deg,rgba(255,255,255,.98),rgba(223,208,181,.94))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
 const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
-assert.ok(stripRule.includes('background:rgba(255,255,255,.40)'),
-  'The outer section must have a fixed glass background in both themes.');
+assert.ok(stripRule.includes('background:rgba(246,246,244,.94)'),
+  'The outer section must have a high-opacity fixed glass color in both themes.');
 assert.doesNotMatch(stripRule, /var\(--panel\)|var\(--card-glass\)|html\.dark/,
   'The outer section must not depend on theme-specific colors.');
 assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
@@ -72,11 +72,11 @@ assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-
   'Mobile text must retain the 20% increase.');
 
 assert.ok(css.includes('background:' + tileGradient),
-  'Tile glass must keep the warm white-to-gold Zalo-like gradient with fixed colors in both themes.');
+  'Tile glass must keep a high-opacity warm white-to-soft-gold gradient with fixed colors in both themes.');
 assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
   'Tile glass must have layered elevation and highlight.');
-assert.ok(css.includes('border:1px solid rgba(220,184,114,.67)'),
-  'Tile glass must keep its warm-gold border.');
+assert.ok(css.includes('border:1px solid rgba(190,157,103,.72)'),
+  'Tile glass must keep its muted warm border for readable contrast.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
   'The shared surface must match the CTA blur treatment.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
