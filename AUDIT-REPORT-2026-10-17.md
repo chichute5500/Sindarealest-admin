@@ -36,7 +36,7 @@ Trước đây API đặt hàng tìm hồ sơ bằng số điện thoại rồi 
 
 **Giới hạn cần hiểu đúng:** Không có dữ liệu lịch sử riêng để khôi phục tên/điện thoại/email ban đầu trước khi xảy ra ghi đè; migration chỉ có thể lấy thông tin hiện đang lưu trong hồ sơ khách hàng để điền cho đơn cũ.
 
-**Điều kiện triển khai:** Phải sao lưu D1 và áp dụng migration 0007 thành công trước khi deploy phiên bản code tham chiếu bảng mới. Chưa chạy migration trên production trong đợt rà soát này.
+**Điều kiện triển khai — cập nhật 18-10-2026:** Backup D1 Production mới đã thành công (workflow run `39057147336`; artifact còn hiệu lực khi migration bắt đầu). Migration 0007 đã được áp dụng và hậu kiểm thành công qua workflow `39057640886`: bảng `order_contact_details` tồn tại, 1 đơn hàng, 1 snapshot liên hệ và 0 đơn hàng thiếu snapshot. Việc này chỉ thay đổi schema/dữ liệu D1; không triển khai website. Mã nguồn tham chiếu bảng mới vẫn cần được phát hành có kiểm soát sau khi hoàn tất kiểm tra binding `ORIGINALS`, xác minh đúng target Cloudflare Pages và kiểm thử preview.
 
 ### 4. Giới hạn đăng nhập có thể bị vượt khi nhiều yêu cầu chạy đồng thời
 **Mức độ:** Cao — bảo vệ thông tin đăng nhập quản trị.
