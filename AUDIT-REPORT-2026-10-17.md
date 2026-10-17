@@ -61,7 +61,14 @@ Trước đây trạng thái khiếu nại được cập nhật trước, sau �
 
 **Đã sửa:** Ghép cập nhật và ghi log vào cùng D1 batch; log chỉ được chèn nếu khiếu nại còn tồn tại. Đã bổ sung test kiểm tra cập nhật thành công/không tìm thấy và batch nguyên tử.
 
-### 7. Giới hạn kích thước và số bản ghi khi khôi phục backup
+### 7. Endpoint thông báo đẩy là đầu vào của kết nối máy chủ
+**Mức độ:** Trung bình — giảm bề mặt SSRF và tải phát sinh khi gửi thông báo.
+
+Trước đây API quản trị chỉ cần URL bắt đầu bằng HTTPS để lưu endpoint Web Push. Khi cập nhật đơn hàng, máy chủ gửi yêu cầu ra các endpoint đã lưu; một URL tùy ý có thể biến luồng thông báo thành kết nối outbound không mong muốn. Ngoài ra, việc tải tất cả subscription và gửi đồng thời không có giới hạn gây tải không cần thiết nếu dữ liệu phình to.
+
+**Đã sửa:** Kiểm tra endpoint theo danh sách host dịch vụ push của trình duyệt trước khi lưu và kiểm tra lại trước khi gửi; query và danh sách gửi đều giới hạn 50 subscription gần nhất. API xóa subscription vẫn cho phép xóa endpoint HTTPS cũ để không khóa đường dọn dữ liệu.
+
+### 8. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
 
 Restore trước đây cho phép tối đa 20.000 bản ghi ở từng mảng riêng lẻ, nhưng không giới hạn tổng số bản ghi của tất cả các mảng. Backup rất lớn có thể buộc Worker tạo batch có hàng chục nghìn câu lệnh và vượt thời gian/giới hạn tài nguyên.
