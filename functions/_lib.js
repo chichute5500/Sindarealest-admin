@@ -49,9 +49,12 @@ function isIsoCalendarDate(value) {
   return day <= daysInMonth[month - 1];
 }
 
-export function warrantyStatusOnDate(status, endsAt, today = getCurrentDateInVietnam()) {
+export function warrantyStatusOnDate(status, startsAt, endsAt, today = getCurrentDateInVietnam()) {
+  if (status !== "active") return status;
+  const startDate = String(startsAt ?? "");
   const endDate = String(endsAt ?? "");
-  if (status === "active" && isIsoCalendarDate(endDate) && endDate < today) return "expired";
+  if (isIsoCalendarDate(endDate) && endDate < today) return "expired";
+  if (isIsoCalendarDate(startDate) && startDate > today) return "pending";
   return status;
 }
 

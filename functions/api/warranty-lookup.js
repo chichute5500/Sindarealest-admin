@@ -28,7 +28,7 @@ function shapeWarranty(row, today, claimToken) {
   const code = String(row.warranty_code || "");
   let images = [];
   try { images = JSON.parse(row.imagesJson || "[]"); } catch {}
-  const status = warrantyStatusOnDate(row.status, row.ends_at, today);
+  const status = warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today);
   const eligible = isWarrantyEligibleOnDate(row.status, row.starts_at, row.ends_at, today);
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
   return {
