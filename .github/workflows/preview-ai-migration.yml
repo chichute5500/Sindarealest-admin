@@ -100,7 +100,7 @@ jobs:
             npx wrangler d1 migrations apply "$preview_db_name" --remote --config .wrangler-preview.toml
           fi
 
-          verify_body="$(jq -n '{sql:"SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'image_group_reviews\'"}')"
+          verify_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table' AND name='image_group_reviews'" '{sql:$sql}')"
           verify="$(curl --fail --silent --show-error -X POST "$query_url" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" --data "$verify_body")"
