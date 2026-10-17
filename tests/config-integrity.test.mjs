@@ -42,6 +42,8 @@ const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.m
 assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding verifier must inspect production, not preview, settings');
 assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
 assert.ok(bindingVerifier.includes('images === originals'), 'Binding verifier must reject the same bucket for public images and private originals');
+assert.ok(bindingVerifier.includes('/domains/managed') && bindingVerifier.includes('/domains/custom'), 'Binding verifier must inspect both r2.dev and custom-domain public access');
+assert.ok(bindingVerifier.includes('assertPrivateR2Access'), 'Deployment must fail closed if ORIGINALS is publicly accessible');
 assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`'), 'Setup confirmation must include both R2 bucket names');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
