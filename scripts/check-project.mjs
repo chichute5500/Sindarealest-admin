@@ -28,7 +28,7 @@ for (const required of [
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
   'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql',
-  'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
+  'public/index.html', 'public/admin/index.html', 'public/ui/storefront.css', 'public/ui/admin.css', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
 ]) check(existsSync(join(root, required)), `Thiếu tệp bắt buộc: ${required}`);
 
@@ -77,6 +77,16 @@ check(new Set(seedSkus).size === seedSkus.length, 'SKU bị trùng trong tệp s
 check(seedSkus.every(sku => source.some(p => p.sku === sku)), 'SKU trong SQL seed không khớp dữ liệu nguồn');
 
 const homepage = existsSync(join(root, 'public/index.html')) ? readFileSync(join(root, 'public/index.html'), 'utf8') : '';
+const storefrontCss = existsSync(join(root, 'public/ui/storefront.css')) ? readFileSync(join(root, 'public/ui/storefront.css'), 'utf8') : '';
+const adminCss = existsSync(join(root, 'public/ui/admin.css')) ? readFileSync(join(root, 'public/ui/admin.css'), 'utf8') : '';
+check(homepage.includes('/ui/storefront.css?v=20261017-2'), 'Trang chủ chưa liên kết stylesheet giao diện đã hợp nhất');
+check(!/<style\\b/i.test(homepage), 'Trang chủ không được giữ các khối CSS vá nhúng trong HTML');
+check(!homepage.includes('class="theme-watermark"') && !storefrontCss.includes('theme-watermark{'), 'Không được giữ watermark thử nghiệm phủ nền toàn trang');
+check(storefrontCss.includes('theme-croc-dark.webp?v=') && storefrontCss.includes('theme-croc-albino.webp?v='), 'Thiếu ảnh nền có phiên bản cho hai chế độ sáng/tối');
+check(/\\.theme-bg--dark\\{[^}]*theme-croc-dark\\.webp/.test(storefrontCss), 'Chế độ tối phải dùng ảnh nền da cá sấu tối');
+check(/\\.theme-bg--light\\{[^}]*theme-croc-albino\\.webp/.test(storefrontCss), 'Chế độ sáng phải dùng ảnh nền albino sáng');
+check(adminCss.includes('theme-croc-dark.webp?v=') && adminCss.includes('theme-croc-albino.webp?v='), 'Admin phải đồng bộ ảnh nền hai chế độ');
+check(!/<style\\b/i.test(adminHtml), 'Admin không được giữ stylesheet CSS vá nhúng');
 check(homepage.includes("fetch('/api/products'"), 'Trang chủ chưa lấy sản phẩm từ API');
 check(homepage.includes('og:title') && homepage.includes('twitter:card'), 'Thiếu metadata social preview');
 check(homepage.includes('window.__sdUpdateDetailWatermark') && homepage.includes("document.querySelector('.detail-image-stage')"), 'Watermark phải phủ ảnh lớn trong chi tiết sản phẩm');
@@ -89,6 +99,7 @@ const redirects = existsSync(join(root, 'public/_redirects')) ? readFileSync(joi
 check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite để mở trang /admin/');
 
 const adminHtml = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
+check(adminHtml.includes('/ui/admin.css?v=20261017-2'), 'Admin chưa liên kết stylesheet giao diện đã hợp nhất');
 const endpointMap = {
   '/api/admin/login': 'functions/api/admin/login.js',
   '/api/admin/logout': 'functions/api/admin/logout.js',
