@@ -20,14 +20,14 @@ assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
 
-assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
-  'The dark-mode page background must use the albino/light image after the requested inversion.');
-assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
-  'The light-mode page background must use the dark image after the requested inversion.');
-assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
-  'The dark-mode welcome backdrop must follow the inverted light image.');
-assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
-  'The light-mode welcome backdrop must follow the inverted dark image.');
+assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*linear-gradient\(180deg,rgba\(250,246,237,\.14\),rgba\(247,242,233,\.34\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
+  'The dark-mode page background must use the light image and its matching light overlay after inversion.');
+assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*linear-gradient\(180deg,rgba\(0,0,0,\.22\),rgba\(0,0,0,\.40\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
+  'The light-mode page background must use the dark image and its matching dark overlay after inversion.');
+assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.2\),rgba\(255,249,238,\.48\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
+  'The dark-mode welcome backdrop must use the light image with the matching light overlay.');
+assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.15\),rgba\(0,0,0,\.48\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
+  'The light-mode welcome backdrop must use the dark image with the matching dark overlay.');
 assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--dark" src="images\/theme-croc-dark\.webp\?v=20261017-1"/,
   'The editorial material sample image must keep its black-material identity.');
 assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--light" src="images\/theme-croc-albino\.webp\?v=20261017-1"/,
