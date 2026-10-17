@@ -215,8 +215,8 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
     }),
     env: { ...env, DB: db },
   });
-  assert.equal(response.status, 413, "restore must reject batches that exceed the conservative D1 binding budget");
-  assert.equal(db.batchCalls, 0, "binding-budget overflow must be rejected before any destructive D1 batch");
+  assert.equal(response.status, 200, "restore should not reject a valid backup based on a nonexistent global SQL binding budget");
+  assert.equal(db.batchCalls, 1, "valid larger backup should still use one atomic D1 batch");
 }
 
-console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, binding-budget guard, and single-batch failure handling.");
+console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, larger valid backup acceptance, and single-batch failure handling.");
