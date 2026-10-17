@@ -51,24 +51,24 @@ const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,6
 const tileGradient = 'linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
-const stripRule = css.match(/\\.service-strip\\{([^}]*)\\}/)?.[1] || '';
+const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
 assert.ok(stripRule.includes('background:rgba(255,255,255,.40)'),
   'The outer section must have a fixed glass background in both themes.');
-assert.doesNotMatch(stripRule, /var\\(--panel\\)|var\\(--card-glass\\)|html\\.dark/,
+assert.doesNotMatch(stripRule, /var\(--panel\)|var\(--card-glass\)|html\.dark/,
   'The outer section must not depend on theme-specific colors.');
-assert.match(stripRule, /backdrop-filter:blur\\(24px\\) saturate\\(145%\\)/,
+assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
   'The outer section must keep the site Liquid Glass blur.');
-assert.match(css, /\\.service-strip \\.service-copy\\{[^}]*border-radius:999px/,
+assert.match(css, /\.service-strip \.service-copy\{[^}]*border-radius:999px/,
   'The inner surface must be a compact pill, not a rectangle.');
-assert.doesNotMatch(css, /aspect-ratio:(?:2\\.75|3\\.5|2\\.4|2\\.25)\\s*\\/\\s*1/,
+assert.doesNotMatch(css, /aspect-ratio:(?:2\.75|3\.5|2\.4|2\.25)\s*\/\s*1/,
   'Fixed card aspect ratios must not cause blank space or crop enlarged copy.');
-assert.match(css, /\\.service-strip \\.service-text strong\\{[^}]*font-size:12px/,
+assert.match(css, /\.service-strip \.service-text strong\{[^}]*font-size:12px/,
   'Desktop title text must be 20% larger than the previous 10px size.');
-assert.match(css, /\\.service-strip \\.service-text small\\{[^}]*font-size:10\\.2px/,
+assert.match(css, /\.service-strip \.service-text small\{[^}]*font-size:10\.2px/,
   'Desktop caption text must be 20% larger than the previous 8.5px size.');
-assert.match(css, /@media\\(max-width:1050px\\) and \\(min-width:761px\\)\\{[\\s\\S]*?\\.service-strip \\.service-text strong\\{font-size:12\\.24px\\}[\\s\\S]*?\\.service-strip \\.service-text small\\{font-size:10\\.44px\\}/,
+assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:12\.24px\}[\s\S]*?\.service-strip \.service-text small\{font-size:10\.44px\}/,
   'Tablet text must retain the 20% increase.');
-assert.match(css, /@media\\(max-width:760px\\)\\{[\\s\\S]*?\\.service-strip \\.service-text strong\\{font-size:11\\.4px[\\s\\S]*?\\.service-strip \\.service-text small\\{font-size:9\\.84px/,
+assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:11\.4px[\s\S]*?\.service-strip \.service-text small\{font-size:9\.84px/,
   'Mobile text must retain the 20% increase.');
 
 assert.ok(css.includes('background:' + tileGradient),
