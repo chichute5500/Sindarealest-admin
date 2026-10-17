@@ -10,10 +10,12 @@ export async function onRequestGet(context) {
     const result = await context.env.DB.prepare(
       "WITH recent_orders AS (" +
       " SELECT o.id,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
-      " o.customer_note,o.created_at,o.updated_at,c.full_name,c.phone,c.email," +
+      " o.customer_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
+      " COALESCE(oc.phone,c.phone) AS phone,COALESCE(oc.email,c.email) AS email," +
       " COALESCE(sa.full_address,c.address) AS address" +
       " FROM orders o JOIN customers c ON c.id=o.customer_id" +
       " LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id" +
+      " LEFT JOIN order_contact_details oc ON oc.order_id=o.id" +
       " ORDER BY o.created_at DESC LIMIT 1000" +
       ") " +
       "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku," +
