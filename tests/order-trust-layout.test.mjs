@@ -36,7 +36,7 @@ assert.match(section, /Tư vấn\/đặt hàng qua Zalo/,
 const orderStyles = html.match(/<style id="sd-order-uniform-tiles">([\s\S]*?)<\/style>/)?.[1] || '';
 assert.match(orderStyles, /#order \.order-zalo-cta\{[^}]*background:#0068ff;border-color:#0068ff;color:#fff/,
   'The Zalo CTA must keep an opaque Zalo-blue surface in both light and dark themes.');
-assert.match(orderStyles, /#order \.order-step h3\{[^}]*font-size:14\.5px/,
+assert.match(orderStyles, /#order \.order-step h3\{[^}]*font:400 14\.5px/,
   'Desktop order-step headings must remain comfortably readable.');
 assert.match(orderStyles, /#order \.order-step p\{[^}]*font-size:10\.5px/,
   'Desktop order-step body text must be larger than the previous tiny 9.5px setting.');
