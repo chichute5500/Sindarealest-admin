@@ -19,6 +19,12 @@ function validateOperations(operations) {
       return { error: "Bản sao lưu có danh sách địa chỉ/ảnh đính kèm không hợp lệ hoặc vượt giới hạn." };
     }
   }
+  for (const key of [...keys, ...optionalKeys]) {
+    const rows = operations[key];
+    if (rows !== undefined && rows.some((row) => !row || typeof row !== "object" || Array.isArray(row))) {
+      return { error: "Bản sao lưu chứa bản ghi vận hành không đúng định dạng đối tượng." };
+    }
+  }
   const customerAddressDetails = operations.customerAddressDetails || [];
   const orderShippingAddresses = operations.orderShippingAddresses || [];
   const orderItemDetails = operations.orderItemDetails || [];
@@ -130,6 +136,7 @@ export async function onRequestPost(context) {
 
   const products = [], ids = new Set(), skus = new Set(), slugs = new Set();
   for (const raw of backup.products) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return fail("Bản sao lưu chứa bản ghi sản phẩm không hợp lệ.");
     const checked = validateProduct(raw);
     if (checked.error) return fail(`Bản sao lưu có sản phẩm không hợp lệ: ${checked.error}`);
     const p = checked.value, rawId = raw.id, rawSlug = raw.slug;
