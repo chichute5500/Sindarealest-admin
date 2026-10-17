@@ -208,3 +208,10 @@ Một bản sửa trước đó đã diễn giải giới hạn “approximately
 **Đã điều chỉnh trên nhánh rà soát:** gỡ chốt 4.500 tham số không có căn cứ tài liệu và thay regression test: bản backup hợp lệ có 650 hồ sơ khách hàng không còn bị từ chối vì giới hạn giả định này; vẫn phải qua xác thực schema/quan hệ, giới hạn 20 MB, giới hạn 5.000 bản ghi và batch D1 nguyên tử. Giới hạn truy vấn/thời gian thực tế của D1 vẫn áp dụng; nếu batch vượt giới hạn thực thi, restore trả lỗi có kiểm soát và batch nguyên tử không để lại một phần dữ liệu.
 
 Nguồn: https://developers.cloudflare.com/d1/platform/limits/
+
+### Đồng bộ giới hạn tệp khôi phục trên giao diện và API
+**Mức độ:** Thấp — tránh lỗi trải nghiệm khi người dùng chọn tệp backup.
+
+Giao diện quản trị từng cho phép chọn tệp JSON tới 40 MB, trong khi API restore giới hạn 20 MB. Người dùng có thể chọn tệp được giao diện chấp nhận nhưng bị server từ chối bằng HTTP 413.
+
+**Đã sửa trên nhánh rà soát:** giao diện giờ từ chối tệp lớn hơn 20 MB ngay khi chọn; regression test xác nhận giới hạn giao diện khớp giới hạn API. Kiểm thử toàn diện pass tại [CI run 39049190761](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39049190761).
