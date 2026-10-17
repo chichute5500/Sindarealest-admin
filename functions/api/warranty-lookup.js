@@ -95,6 +95,6 @@ export async function onRequestPost({ request, env }) {
     await env.DB.batch(statements);
     const warranties = tokenRows.map(row => shapeWarranty(row, today, row.claimToken));
     return json({ ok: true, warranties, warranty: isCode ? warranties[0] : null });
-  } catch { return fail("Chưa thể tra cứu bảo hành. Vui lòng thử lại.", 503); }
+  } catch { return fail("Chưa thể tra cứu bảo hành. Hãy kiểm tra các migration 0003, 0005 và 0007 rồi thử lại.", 503); }
 }
 export async function onRequestGet() { return fail("Phương thức không được hỗ trợ.", 405); }
