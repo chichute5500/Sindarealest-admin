@@ -1,4 +1,4 @@
-import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, parseImages, rateLimitPublicRequest, warrantyStatusOnDate } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, parseImages, rateLimitPublicRequest, readJsonBodyLimited, warrantyStatusOnDate } from "../_lib.js";
 
 const clean = (value, max = 120) => String(value ?? "").trim().slice(0, max);
 const normalizePhone = value => {
@@ -64,8 +64,10 @@ export async function onRequestPost({ request, env }) {
     const limit = await rateLimitPublicRequest(env, request, "warranty_lookup", 6, 900);
     if (limit.limited) return fail("Bạn đã tra cứu quá nhiều lần. Vui lòng đợi 15 phút.", 429, { "Retry-After": "900" });
   } catch { return fail("Dịch vụ tra cứu chưa sẵn sàng.", 503); }
-  let body;
-  try { body = await request.json(); } catch { return fail("Thông tin tra cứu không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(request, 4 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin tra cứu vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin tra cứu không hợp lệ.");
+  const body = parsedBody.value;
   const raw = clean(body?.lookup ?? body?.warrantyCode ?? body?.phone);
   if (!raw) return fail("Nhập mã bảo hành hoặc số điện thoại dùng khi mua hàng.");
   const today = getCurrentDateInVietnam();
