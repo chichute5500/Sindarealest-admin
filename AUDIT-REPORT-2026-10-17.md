@@ -110,7 +110,7 @@ Backup/restore trước đây không có cùng giới hạn tổng bản ghi và
 
 **Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn. Bộ đọc dùng chung tăng buffer theo từng phần, không giữ đồng thời toàn bộ mảng chunks và bản sao byte thứ hai. Backup đếm tổng bản ghi trong cùng D1 batch trước; mỗi truy vấn bảng chỉ trả dữ liệu nếu tổng nằm trong ngân sách, tránh nạp hàng chục nghìn dòng vào bộ nhớ rồi mới từ chối. Có regression test cho giới hạn tổng bản ghi và giới hạn từng truy vấn.
 
-### 13. Cấp SKU khi thêm sản phẩm cần giới hạn phạm vi và kiểm tra số an toàn
+### 14. Cấp SKU khi thêm sản phẩm cần giới hạn phạm vi và kiểm tra số an toàn
 **Mức độ:** Thấp–trung bình — hiệu năng và khả năng phục hồi khi dữ liệu SKU bất thường.
 
 Luồng thêm sản phẩm trước đây đọc toàn bộ cột SKU để tìm số lớn nhất của một danh mục. Khi catalog lớn hơn, truy vấn đọc nhiều dữ liệu không liên quan; hậu tố SKU bị hỏng/quá lớn cũng có thể tạo phép tính số không an toàn.
