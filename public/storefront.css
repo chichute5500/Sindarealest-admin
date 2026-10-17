@@ -54,3 +54,7 @@ html.theme-transitioning .theme-bg{transform:none;will-change:opacity}
 .sd-capture-shield{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .checkout-fields input,.checkout-fields select,.checkout-fields textarea{width:100%;min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--glass);color:var(--ink)}
 @media(max-width:760px){.mobile-nav.open .navlink{animation:sdMenuItemIn .28s ease both}}
+
+/* Sequential welcome reveal: logo, brand, intro, then entry action. */
+/* Sequential welcome reveal */
+@keyframes welcomeReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.welcome-content>*{opacity:0;animation:welcomeReveal .48s ease both}.welcome-content>.welcome-rule{animation-delay:.02s}.welcome-content>.welcome-overline{animation-delay:.08s}.welcome-content>.welcome-logo{animation-delay:.18s}.welcome-content>.welcome-tagline{animation-delay:.34s}.welcome-content>.welcome-title{animation-delay:.48s}.welcome-content>p{animation-delay:.64s}.welcome-content>.welcome-points{animation-delay:.8s}.welcome-content>.welcome-footnote{animation-delay:.94s}.welcome-content>.welcome-loader{animation-delay:1.04s}.welcome-content>.welcome-skip{animation-delay:1.16s}.welcome-splash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
