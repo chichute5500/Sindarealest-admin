@@ -2,6 +2,9 @@ name: Verify Production Pages and R2 bindings (read-only)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - audit/verify-r2-bindings-2026-10-18
 
 permissions:
   contents: read
