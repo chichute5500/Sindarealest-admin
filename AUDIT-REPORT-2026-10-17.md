@@ -96,7 +96,14 @@ Route upload ảnh sản phẩm trước đây gọi `formData()` trước khi k
 
 **Đã sửa:** Dùng chung `readBodyBytesLimited()` với trần tổng multipart 26 MB, bao gồm cả request không có `Content-Length`; chỉ sau khi nằm trong giới hạn mới parse form data. Giữ kiểm tra chữ ký WebP cho ảnh hiển thị và bổ sung kiểm tra magic bytes JPEG/PNG/WebP cho ảnh gốc trước khi ghi R2. Regression test xác nhận tệp gốc giả mạo bị từ chối trước mọi thao tác lưu. Bổ sung kiểm tra trường `original` bắt buộc; nếu thiếu ảnh gốc thì từ chối trước khi ghi cả R2 riêng tư lẫn bucket ảnh công khai.
 
-### 12. Giới hạn kích thước và số bản ghi khi khôi phục backup
+### 12. Chặn cấp trùng mã bảo hành khi hai admin thao tác đồng thời
+**Mức độ:** Cao — tính toàn vẹn dữ liệu bảo hành.
+
+Route cấp bảo hành trước đây kiểm tra mã đã tồn tại bằng một truy vấn, sau đó mới ghi mã mới. Hai yêu cầu đồng thời có thể cùng vượt qua bước kiểm tra ban đầu.
+
+**Đã sửa:** Chuyển điều kiện chống trùng vào chính câu lệnh `INSERT ... SELECT ... WHERE NOT EXISTS`, gộp ghi bảo hành và audit log vào một batch; chỉ trả thành công khi câu lệnh insert thực sự thêm bản ghi. Nếu một yêu cầu khác đã cấp trước, trả HTTP 409. Có regression test cho cả nhánh thành công và xung đột.
+
+### 13. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
 
 Backup/restore trước đây không có cùng giới hạn tổng bản ghi và kích thước: backup có thể xuất một tệp lớn hơn khả năng khôi phục an toàn, trong khi restore cho phép tới 20.000 bản ghi ở từng mảng riêng lẻ. Tệp lớn có thể khiến Worker phải tạo batch khổng lồ hoặc vượt thời gian/giới hạn tài nguyên.
@@ -120,7 +127,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên nhánh rà soát đã pass ở [run 39045257182](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39045257182); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
+CI mới nhất trên nhánh rà soát đã pass ở [run 39045532531](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39045532531); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
