@@ -42,6 +42,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const headers = new Headers(request.headers);
     headers.delete("Content-Length");
+    headers.delete("Transfer-Encoding");
     const boundedRequest = new Request(request.url, {
       method: "POST",
       headers,
