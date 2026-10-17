@@ -185,3 +185,10 @@ The audit also found that CI installed dependencies with `--no-audit --no-fund`,
 Rà soát sâu bổ sung phát hiện bộ giới hạn đăng nhập nguyên tử vẫn diễn giải kết quả SELECT bị thiếu/sai thành `0` lần thử. Nếu D1 trả kết quả không thể xác minh, luồng đăng nhập có thể tiếp tục mà không chứng minh được giới hạn đã áp dụng.
 
 **Đã sửa trên nhánh rà soát:** `rateLimitLogin()` giờ yêu cầu bộ đếm là số nguyên an toàn từ 1 trở lên; nếu thiếu hoặc sai, helper ném lỗi để endpoint đăng nhập trả 503 và không xác thực mật khẩu trong lượt đó. Đã bổ sung regression test cho kết quả bộ đếm rỗng; test giới hạn đồng thời và reset cửa sổ vẫn được giữ.
+
+### Kiểm tra quan hệ giữa đơn hàng, dòng đơn và yêu cầu bảo hành khi khôi phục
+**Mức độ:** Cao — tính toàn vẹn dữ liệu nghiệp vụ.
+
+Rà soát bổ sung phát hiện bộ xác thực backup kiểm tra riêng việc tồn tại của `order_id`, `order_item_id` và `customer_id`, nhưng chưa chứng minh các bản ghi có liên hệ với nhau đúng cách. Backup bị chỉnh sửa có thể gắn bảo hành vào dòng sản phẩm của đơn khác hoặc gắn yêu cầu bảo hành vào khách hàng không thuộc đơn hàng.
+
+**Đã sửa trên nhánh rà soát:** xác thực quan hệ `warranty.order_id` ↔ `order_item.order_id` và `warranty_claim.order_id` ↔ `order.customer_id` trước khi tạo bất kỳ câu lệnh ghi D1 nào. Bổ sung regression tests xác nhận hai trường hợp bị từ chối và không phát sinh batch ghi.
