@@ -124,6 +124,13 @@ Bộ giới hạn tần suất đã ghi bộ đếm nhưng nếu kết quả đ�
 
 **Đã sửa:** Yêu cầu bộ đếm sau batch phải là số nguyên an toàn từ 1 trở lên. Nếu không xác minh được, helper ném lỗi để endpoint gọi trả lỗi dịch vụ thay vì tắt giới hạn. Thêm regression test cho bộ đếm bị thiếu và cập nhật mock kiểm thử để mô phỏng kết quả D1 hợp lệ.
 
+### 16. Một timestamp sản phẩm sai định dạng có thể làm hỏng toàn bộ sitemap
+**Mức độ:** Thấp–trung bình — SEO và khả năng phục hồi.
+
+Sitemap gọi `toISOString()` trực tiếp trên mọi `updated_at`. Một giá trị ngày lỗi hoặc sai kiểu có thể làm toàn bộ endpoint trả 503 dù các URL sản phẩm vẫn hợp lệ.
+
+**Đã sửa:** Chỉ phát `lastmod` khi timestamp có thể phân tích được; URL sản phẩm vẫn có trong sitemap nếu timestamp lỗi. Regression test bao gồm ngày hợp lệ, chuỗi không hợp lệ và giá trị sai kiểu.
+
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
