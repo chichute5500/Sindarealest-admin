@@ -52,6 +52,8 @@ assert.ok(warrantyLookupSource.includes("warrantyStatusOnDate(row.status, row.st
 assert.ok(adminWarrantiesSource.includes('warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today)'), 'Admin warranty list must use start and end dates for its visible status');
 assert.ok(storefrontHtml.includes("w.status==='pending'?'Chưa đến ngày bắt đầu'"), 'Customer warranty UI must explain a future-start warranty');
 assert.ok(adminHtmlSource.includes("status==='pending'?'Chưa đến ngày bắt đầu'"), 'Admin warranty UI must localize a future-start warranty');
+assert.ok(storefrontHtml.includes("w.status==='invalid'?'Cần kiểm tra thông tin bảo hành'"), 'Customer UI must not label malformed warranty dates active');
+assert.ok(adminHtmlSource.includes("status==='invalid'?'Cần kiểm tra thông tin bảo hành'"), 'Admin UI must flag malformed warranty dates for review');
 assert.ok(sharedLibSource.includes('timeZone: "Asia/Ho_Chi_Minh"') && sharedLibSource.includes('export function isWarrantyEligibleOnDate'), 'Warranty expiry must use shared Vietnam-local calendar date logic');
 for (const [fileName, source] of [
   ['warranty lookup', warrantyLookupSource],
