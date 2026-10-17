@@ -199,3 +199,10 @@ Rà soát bổ sung phát hiện bộ xác thực backup kiểm tra riêng việ
 Các mảng backup JSON có thể chứa `null`, chuỗi hoặc mảng lồng thay vì bản ghi đối tượng. Việc truy cập trường trực tiếp có thể làm validation ném lỗi ngoài dự kiến thay vì trả lỗi dữ liệu có kiểm soát.
 
 **Đã sửa trên nhánh rà soát:** kiểm tra mọi phần tử trong các mảng dữ liệu vận hành và sản phẩm phải là đối tượng hợp lệ trước khi đọc trường; bổ sung regression tests xác nhận trả 400 và không ghi D1 với bản backup có hàng `null`.
+
+### Bảo đảm phiên tra cứu bảo hành chỉ tạo một yêu cầu khi gửi đồng thời
+**Mức độ:** Cao — ngăn gửi trùng và sử dụng lại phiên tra cứu.
+
+Trước khi sửa, endpoint kiểm tra token rồi mới chèn yêu cầu theo các bước tách rời; hai request đồng thời có thể cùng vượt qua bước kiểm tra trước khi token bị xóa.
+
+**Đã sửa trên nhánh rà soát:** câu lệnh tạo yêu cầu giờ chỉ chèn nếu token còn tồn tại và chưa hết hạn trong cùng D1 batch; xóa token, đính kèm và ghi audit chỉ diễn ra khi bản ghi yêu cầu thực sự được tạo. Nếu request thua cuộc đua, endpoint trả 409. Bổ sung regression test cho kết quả chèn thành công và token đã bị tiêu thụ.
