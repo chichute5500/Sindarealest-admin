@@ -403,6 +403,15 @@ export async function rateLimitLogin(db, request, secret) {
   if (!Number.isSafeInteger(attempts) || attempts < 1) {
     throw new Error("Login rate-limit counter could not be verified");
   }
+
+  // Expired rows for one-off IPs otherwise accumulate forever. Cleanup is
+  // opportunistic and must never disable or fail an otherwise valid check.
+  if (Math.floor(now / 1000) % 17 === 0) {
+    try {
+      await db.prepare("DELETE FROM admin_login_attempts WHERE window_start < ?")
+        .bind(now - windowMs * 4).run();
+    } catch {}
+  }
   return { limited: attempts > 5, ipHash };
 }
 
