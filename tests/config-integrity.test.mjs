@@ -31,17 +31,17 @@ assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && de
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deployReadme), 'Deployment guide must not require obsolete SMS credentials');
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
-assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must be blocked until private ORIGINALS is verified');
+assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_VERIFIED'), 'Deploy must be blocked until the live private ORIGINALS verification succeeds');
 assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must require ORIGINALS separate from IMAGES');
-assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Workflow must pass the ORIGINALS readiness variable');
-assert.ok(workflow.includes("if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'"), 'Production deployment must be skipped until private ORIGINALS is verified');
-assert.ok(workflow.indexOf('Diagnose actual Production R2 bindings') < workflow.indexOf('Deploy to verified Pages project'), 'Actual production bindings must be checked before deployment');
+assert.ok(workflow.indexOf('Verify Production R2 bindings and private access') < workflow.indexOf('Deploy to verified Pages project'), 'Actual bindings and public access must be verified before deployment');
+assert.ok(workflow.includes('run: node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding and privacy verifier');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
-assert.ok(workflow.includes("continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}"), 'Binding diagnostics may not block a safely skipped deployment, but must block deployment when readiness is enabled');
 const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.mjs', import.meta.url), 'utf8');
 assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding verifier must inspect production, not preview, settings');
 assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
 assert.ok(bindingVerifier.includes('images === originals'), 'Binding verifier must reject the same bucket for public images and private originals');
+assert.ok(bindingVerifier.includes('/domains/managed') && bindingVerifier.includes('/domains/custom'), 'Binding verifier must check r2.dev and custom-domain public access');
+assert.ok(bindingVerifier.includes('CLOUDFLARE_PAGES_ORIGINALS_VERIFIED=true'), 'Successful privacy verification must be required before deploy');
 assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`'), 'Setup confirmation must include both R2 bucket names');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
@@ -65,9 +65,9 @@ assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-c
 assert.ok(seedWorkflow.includes('concurrency:') && seedWorkflow.includes('sindarealest-d1-initial-seed'), 'Initial seed workflow must serialize simultaneous runs');
 assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
 
-assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
+assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('R2 Read'), 'Deployment guide must explain private ORIGINALS verification and required read permission');
 const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
-assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
+assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('r2.dev'), 'Integrated guide must document private originals and public access restrictions');
 const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
 assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
 const notificationsSource = readFileSync('functions/_notifications.js', 'utf8');
