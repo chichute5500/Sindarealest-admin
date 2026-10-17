@@ -34,7 +34,7 @@ function validateOperations(operations) {
   const providedOrderContactDetails = operations.orderContactDetails === undefined ? null : operations.orderContactDetails;
   const customerById = new Map();
   const orderById = new Map(), itemById = new Map();
-  const customerIds = new Set(), phones = new Set(), orderIds = new Set(), orderNumbers = new Set(), itemIds = new Set(), warrantyCodes = new Set(), claimIds = new Set(), logIds = new Set();
+  const customerIds = new Set(), phones = new Set(), orderIds = new Set(), orderNumbers = new Set(), itemIds = new Set(), warrantyIds = new Set(), warrantyCodes = new Set(), claimIds = new Set(), logIds = new Set();
   const contactOrderIds = new Set();
   const customerAddressIds = new Set(), shippingOrderIds = new Set(), itemDetailIds = new Set(), attachmentClaimIds = new Set(), attachmentKeys = new Set();
   for (const c of customers) {
@@ -62,8 +62,8 @@ function validateOperations(operations) {
   }
   for (const w of warranties) {
     if (!str(w.id,100,true) || !orderIds.has(w.order_id) || !itemIds.has(w.order_item_id) || itemById.get(w.order_item_id)?.order_id !== w.order_id || !str(w.warranty_code,100,true) || !str(w.policy_name,160,true) || !integer(w.duration_months,1,120) || !str(w.starts_at,10,true) || !str(w.ends_at,10,true) || !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) return { error: "Bản sao lưu có bản ghi bảo hành không hợp lệ hoặc dòng sản phẩm không thuộc đúng đơn hàng." };
-    if (warrantyCodes.has(w.warranty_code)) return { error: "Bản sao lưu có mã bảo hành trùng." };
-    warrantyCodes.add(w.warranty_code);
+    if (warrantyIds.has(w.id) || warrantyCodes.has(w.warranty_code)) return { error: "Bản sao lưu có ID hoặc mã bảo hành trùng." };
+    warrantyIds.add(w.id); warrantyCodes.add(w.warranty_code);
   }
   for (const c of claims) {
     if (!str(c.id,100,true) || !orderIds.has(c.order_id) || !customerIds.has(c.customer_id) || orderById.get(c.order_id)?.customer_id !== c.customer_id || !str(c.warranty_code,100) || !str(c.message,1600,true) || !["received","reviewing","approved","rejected","resolved"].includes(c.status) || !str(c.admin_note,1600) || !timestamp(c.created_at) || !timestamp(c.updated_at)) return { error: "Bản sao lưu có yêu cầu bảo hành không hợp lệ hoặc khách hàng không thuộc đơn hàng." };
