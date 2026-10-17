@@ -8,6 +8,8 @@ const middleware = read("../functions/_middleware.js");
 const ai = read("../functions/api/admin/ai-description.js");
 const push = read("../functions/api/admin/push-subscriptions.js");
 assert.ok(!admin.includes('id="pSku"'), "SKU input should not be shown in admin product form");
+assert.ok(admin.includes("Object.hasOwn(labels,log.action)"), "audit event labels must not resolve inherited prototype properties");
+assert.ok(lib.includes("Object.hasOwn(aliases, categoryKey)"), "product category aliases must be prototype-safe");
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
 assert.ok(read("../public/index.html").includes("-webkit-tap-highlight-color: transparent"), "Storefront controls should not flash blue when tapped on Android");
 assert.ok(read("../public/index.html").includes("encodeURIComponent(p.sku||p.id)"), "Product URLs should prefer stable SKU while retaining ID fallback");
