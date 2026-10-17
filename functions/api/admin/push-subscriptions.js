@@ -19,7 +19,7 @@ export async function onRequestPost(context) {
 export async function onRequestDelete(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   let body; try { body = await context.request.json(); } catch { return fail("Thông tin hủy đăng ký không hợp lệ."); }
-  const endpoint=String(body?.endpoint||""); if(!isTrustedPushEndpoint(endpoint)) return fail("Endpoint không hợp lệ hoặc không thuộc dịch vụ thông báo đáng tin cậy.");
+  const endpoint=String(body?.endpoint||""); if(!endpoint.startsWith("https://") || endpoint.length > 2048) return fail("Endpoint không hợp lệ.");
   try { await context.env.DB.prepare("DELETE FROM admin_push_subscriptions WHERE endpoint=?").bind(endpoint).run(); return json({ok:true}); }
   catch { return fail("Không thể hủy đăng ký thông báo.",503); }
 }
