@@ -294,9 +294,11 @@ const backupDB = {
   async batch(statements) {
     this.batchCalls++;
     return statements.map((statement) => ({
-      results: statement.sql.includes('FROM settings')
-        ? [...backupSettingValues.entries()].map(([key, value]) => ({ key, value }))
-        : [],
+      results: statement.sql.startsWith('SELECT') && statement.sql.includes('AS total_count')
+        ? [{ total_count: 0 }]
+        : statement.sql.includes('FROM settings')
+          ? [...backupSettingValues.entries()].map(([key, value]) => ({ key, value }))
+          : [],
     }));
   },
 };
