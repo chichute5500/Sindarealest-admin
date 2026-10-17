@@ -49,9 +49,14 @@ export function warrantyStatusOnDate(status, endsAt, today = getCurrentDateInVie
   return status;
 }
 
-export function isWarrantyEligibleOnDate(status, endsAt, today = getCurrentDateInVietnam()) {
+export function isWarrantyEligibleOnDate(status, startsAt, endsAt, today = getCurrentDateInVietnam()) {
+  const startDate = String(startsAt ?? "");
   const endDate = String(endsAt ?? "");
-  return status === "active" && isIsoCalendarDate(endDate) && endDate >= today;
+  return status === "active" &&
+    isIsoCalendarDate(startDate) &&
+    isIsoCalendarDate(endDate) &&
+    startDate <= today &&
+    endDate >= today;
 }
 
 function b64url(bytesOrString) {
