@@ -4,6 +4,7 @@ import {
   assertSafeName,
   findNamedRecord,
   listPagesProjects,
+  parseCliJson,
   runWrangler,
 } from './cloudflare-utils.mjs';
 
@@ -48,11 +49,34 @@ async function main() {
   const databaseName = process.env.CLOUDFLARE_D1_DATABASE || (ci ? '' : await ask('Tên D1 database', 'sindarealest-db'));
   if (!databaseName) throw new Error('Thiếu CLOUDFLARE_D1_DATABASE; không thể xác minh migration bắt buộc.');
   assertSafeName(databaseName, 'Tên D1 database');
-  console.log(`Xác minh schema D1 ${databaseName} trước khi deploy…`);
-  runWrangler([
+  console.log(`Xác minh schema và snapshot đơn hàng trong D1 ${databaseName} trước khi deploy…`);
+  const schemaCheck = runWrangler([
     'd1', 'execute', databaseName, '--remote', '--json',
-    '--command', 'SELECT 1 FROM order_contact_details LIMIT 0;',
+    '--command', 'SELECT COUNT(*) AS missing_order_contact_snapshots FROM orders o LEFT JOIN order_contact_details d ON d.order_id=o.id WHERE d.order_id IS NULL;',
   ], { quiet: true });
+  const schemaData = parseCliJson(schemaCheck.stdout, 'kiểm tra snapshot liên hệ đơn hàng');
+  const findMissingCount = (value) => {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findMissingCount(item);
+        if (found !== null) return found;
+      }
+    } else if (value && typeof value === 'object') {
+      if (Object.hasOwn(value, 'missing_order_contact_snapshots')) {
+        const count = Number(value.missing_order_contact_snapshots);
+        return Number.isSafeInteger(count) && count >= 0 ? count : null;
+      }
+      for (const item of Object.values(value)) {
+        const found = findMissingCount(item);
+        if (found !== null) return found;
+      }
+    }
+    return null;
+  };
+  const missingSnapshots = findMissingCount(schemaData);
+  if (missingSnapshots === null || missingSnapshots > 0) {
+    throw new Error(`Migration 0007 chưa sẵn sàng: còn ${missingSnapshots ?? 'không xác định'} đơn hàng thiếu snapshot liên hệ. Deploy bị chặn; không tự chạy migration.`);
+  }
 
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);
