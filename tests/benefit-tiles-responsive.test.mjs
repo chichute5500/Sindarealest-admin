@@ -42,12 +42,12 @@ assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border
   'The reference Zalo CTA gradient and border must exist.');
 assert.match(html, /\.pill-btn\{[^}]*border-radius:999px/,
   'The reference Zalo CTA uses a pill-shaped radius.');
-assert.ok(css.includes('background:linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))'),
-  'The tile surface must use a stronger neutral glass gradient, not a yellow-tinted gradient.');
+assert.ok(css.includes('background:linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))'),
+  'The tile surface must retain the Zalo white-to-gold glass gradient with stronger opacity for dark mode.');
 assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
   'The tile surface must have elevated, multi-layer depth.');
-assert.ok(css.includes('border:1px solid rgba(255,255,255,.82)'),
-  'The neutral tile border must remain fixed between light and dark modes.');
+assert.ok(css.includes('border:1px solid rgba(220,184,114,.67)'),
+  'The warm-gold tile border must remain fixed between light and dark modes.');
 
 const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
 assert.ok(stripRule.includes('background:rgba(255,255,255,.40)'),
@@ -59,7 +59,7 @@ assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?border-radius:999px/,
   'Each inner text surface must use the same pill-like rounding as the Zalo CTA.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?background:linear-gradient\(135deg,rgba\(250,251,252,\.94\),rgba\(224,228,232,\.86\)\)/,
-  'The neutral inner glass background must remain fixed across theme switches.');
+  'The Zalo-like warm glass background must remain fixed across theme switches.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
   'The shared surface must keep its frosted glass treatment.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
@@ -104,8 +104,8 @@ assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
   'The CTA-matched surface border must have one authoritative declaration.');
 assert.equal(copyRules.filter(rule => /(?:^|;)-webkit-backdrop-filter:/.test(rule)).length, 1,
   'The CTA-matched glass blur must have one authoritative declaration.');
-const tileGradient = 'linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))';
+const tileGradient = 'linear-gradient(135deg,rgba(255,255,255,.40),rgba(189,145,63,.30))';
 assert.ok(copyRules.some(rule => rule.includes('background:' + tileGradient) && rule.includes('backdrop-filter:blur(18px)')),
-  'Responsive overrides may adjust dimensions, but not replace the neutral shared surface treatment.');
+  'Responsive overrides may adjust dimensions, but not replace the shared Zalo-like warm glass treatment.');
 
 console.log('PASS: stable two-layer Liquid Glass, compact content-sized tiles, 20% larger text, and no legacy cascade.');
