@@ -6,6 +6,7 @@ assert.throws(() => getR2ReadToken({ CLOUDFLARE_API_TOKEN: 'pages-token' }), /CL
 
 const valid = {
   name: 'sindarealest2',
+  production_branch: 'fix/ai-review-quota-scope-2026-10-15',
   deployment_configs: {
     production: {
       r2_buckets: {
@@ -15,10 +16,13 @@ const valid = {
     },
   },
 };
-assert.deepEqual(verifyProductionR2Bindings(valid, 'sindarealest2'), {
+assert.deepEqual(verifyProductionR2Bindings(valid, 'sindarealest2', 'fix/ai-review-quota-scope-2026-10-15'), {
   imagesBucket: 'sindarealest-images',
   originalsBucket: 'sindarealest-originals-private',
+  productionBranch: 'fix/ai-review-quota-scope-2026-10-15',
 });
+assert.throws(() => verifyProductionR2Bindings(valid, 'sindarealest2', 'main'), /không khớp production branch/i);
+assert.throws(() => verifyProductionR2Bindings({ ...valid, production_branch: null }, 'sindarealest2', 'main'), /không đọc được production branch/i);
 assert.throws(() => verifyProductionR2Bindings({
   ...valid,
   deployment_configs: { production: { r2_buckets: { IMAGES: { name: 'same' }, ORIGINALS: { name: 'same' } } } },
