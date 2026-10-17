@@ -43,8 +43,8 @@ assert.equal(count('function arrowIcon('), 1, 'Arrow SVG markup must be generate
 assert.equal(count('--sd-gallery-glass:rgba'), 2, 'Gallery glass must define one material for light mode and one for dark mode.');
 assert.match(html, /:root\.dark\{--sd-gallery-glass:rgba\(245,239,226,\.14\);--sd-gallery-glass-border:rgba\(255,255,255,\.38\)\}/);
 assert.match(html, /\.slide-count,\.featured-image-count,\.detail-image-count,\.sd-fullscreen-count\{[^}]*backdrop-filter:blur\(18px\)/);
-assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.7\)/);
-assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.7\)/);
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.85\)/);
+assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
 assert.match(html, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdGalleryOutLeft 150ms/);
 assert.match(html, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdGalleryInRight 150ms/);
 assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_HALF_MS=150/);
@@ -54,5 +54,14 @@ assert.doesNotMatch(fullscreenTransition, /\b(?:230|620)\b/, 'Fullscreen transit
 assert.doesNotMatch(html, /id="artPrev"[^>]*>‹/);
 assert.doesNotMatch(html, /class="featured-arrow[^>]*>‹/);
 assert.doesNotMatch(html, /data-page="(?:prev|next)"[^>]*>‹/);
+
+
+assert.match(html, /id="sd-unified-arrow-glass-final"/, 'All arrow controls must share one final glass style.');
+assert.match(html, /\.page-btn\.page-arrow,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)!important/);
+assert.match(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(0,0,0,\.30\)!important/);
+assert.match(html, /\.sd-fullscreen-viewer\{[^}]*backdrop-filter:blur\(8px\)/);
+assert.doesNotMatch(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(8,8,8,\.94\)/, 'Fullscreen must not use an almost opaque black backdrop.');
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{\s*transform:translateY\(-50%\) scale\(\.85\)!important/);
+assert.match(html, /\.featured-arrow:active,\.slide-controls button#artPrev:active,\.slide-controls button#artNext:active,\.page-btn\.page-arrow:active\{\s*transform:scale\(\.85\)!important/);
 
 console.log('Detail gallery regression tests passed.');
