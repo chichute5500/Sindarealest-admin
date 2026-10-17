@@ -13,7 +13,7 @@ const DB = {
   prepare(sql) {
     const statement = { sql, values: [], bind(...values) { this.values = values; return this; } };
     statement.all = async () => {
-      if (sql === "SELECT sku FROM products") {
+      if (sql.startsWith("SELECT sku FROM products WHERE sku LIKE ?")) {
         skuReads++;
         return { results: skuReads === 1 ? [] : skuState.map((sku) => ({ sku })) };
       }
