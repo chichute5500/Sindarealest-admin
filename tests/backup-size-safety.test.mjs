@@ -20,8 +20,10 @@ function makeDB({ productRows = [], auditLogs = [] } = {}) {
     async batch(statements) {
       executedQueries.push(...statements.map((statement) => statement.sql));
       return statements.map((statement) => ({
-        results: statement.sql.includes("FROM products") ? productRows
-          : statement.sql.includes("FROM audit_logs") ? auditLogs
+        results: statement.sql.includes("AS total_count")
+          ? [{ total_count: productRows.length + auditLogs.length }]
+          : statement.sql.includes("SELECT * FROM products") ? productRows
+          : statement.sql.includes("SELECT * FROM audit_logs") ? auditLogs
           : [],
       }));
     },
