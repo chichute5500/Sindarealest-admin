@@ -68,21 +68,21 @@ Trước đây API quản trị chỉ cần URL bắt đầu bằng HTTPS để 
 
 **Đã sửa:** Kiểm tra endpoint theo danh sách host dịch vụ push của trình duyệt trước khi lưu và kiểm tra lại trước khi gửi; query và danh sách gửi đều giới hạn 50 subscription gần nhất. API xóa subscription vẫn cho phép xóa endpoint HTTPS cũ để không khóa đường dọn dữ liệu.
 
-### 8. Backup phải đọc dữ liệu ở cùng một thời điểm
+### 7. Backup phải đọc dữ liệu ở cùng một thời điểm
 **Mức độ:** Trung bình — tính nhất quán của bản sao lưu.
 
 Trước đây, backup đọc sản phẩm ở một truy vấn, rồi đọc các bảng vận hành/cài đặt bằng nhiều truy vấn độc lập chạy song song. Khi đơn hàng, trạng thái bảo hành hoặc cài đặt đổi trong lúc backup, tệp có nguy cơ chứa dữ liệu lấy từ các thời điểm khác nhau; liên kết đơn hàng–khách hàng hoặc thông tin liên hệ theo đơn có thể không còn nhất quán.
 
 **Đã sửa:** Gom toàn bộ các lượt đọc bảng và cài đặt vào một D1 batch duy nhất để có cùng snapshot; test xác nhận backup chỉ gọi một batch. Backup và restore cũng dùng chung giới hạn 20 MB/5.000 bản ghi, nên không xuất tệp lớn hơn khả năng khôi phục an toàn.
 
-### 8. Giới hạn payload upload ảnh bảo hành trước khi phân tích multipart
+### 9. Giới hạn payload upload ảnh bảo hành trước khi phân tích multipart
 **Mức độ:** Trung bình — chống lãng phí bộ nhớ/thời gian ở endpoint công khai.
 
 Trước đây mã chỉ kiểm tra kích thước `File` sau khi `request.formData()` đã phân tích toàn bộ multipart. Với request có `Content-Length` khai báo quá lớn, Worker vẫn có thể phải xử lý payload trước khi từ chối.
 
 **Đã sửa:** Từ chối request có `Content-Length` lớn hơn 6 MB trước khi gọi `formData()`; giới hạn ảnh thực tế vẫn là 5 MB và vẫn kiểm tra chữ ký RIFF/WEBP. Có regression test gửi payload khai báo 7 MB để xác nhận trả 413 trước khi phân tích biểu mẫu.
 
-### 9. Giới hạn kích thước và số bản ghi khi khôi phục backup
+### 10. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
 
 Backup/restore trước đây không có cùng giới hạn tổng bản ghi và kích thước: backup có thể xuất một tệp lớn hơn khả năng khôi phục an toàn, trong khi restore cho phép tới 20.000 bản ghi ở từng mảng riêng lẻ. Tệp lớn có thể khiến Worker phải tạo batch khổng lồ hoặc vượt thời gian/giới hạn tài nguyên.
