@@ -56,12 +56,16 @@ assert.doesNotMatch(html, /class="featured-arrow[^>]*>‹/);
 assert.doesNotMatch(html, /data-page="(?:prev|next)"[^>]*>‹/);
 
 
-assert.match(html, /id="sd-unified-arrow-glass-final"/, 'All arrow controls must share one final glass style.');
-assert.match(html, /\.page-btn\.page-arrow,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)!important/);
-assert.match(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(0,0,0,\.30\)!important/);
+assert.match(html, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)/, 'All arrow controls must use the shared glass material.');
+assert.match(html, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)/);
+assert.match(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(0,0,0,\.30\)/);
 assert.match(html, /\.sd-fullscreen-viewer\{[^}]*backdrop-filter:blur\(8px\)/);
 assert.doesNotMatch(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(8,8,8,\.94\)/, 'Fullscreen must not use an almost opaque black backdrop.');
-assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{\s*transform:translateY\(-50%\) scale\(\.85\)!important/);
-assert.match(html, /\.featured-arrow:active,\.slide-controls button#artPrev:active,\.slide-controls button#artNext:active,\.page-btn\.page-arrow:active\{\s*transform:scale\(\.85\)!important/);
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.85\)/);
+assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
+
+
+assert.doesNotMatch(html, /id="sd-unified-arrow-glass-final"/, "Arrow glass rules should be consolidated rather than duplicated in a late override.");
+assert.match(html, /\.detail-gallery-arrow:hover,\.featured-arrow:hover,\.slide-controls button:hover,\.page-btn\.page-arrow:hover,\.sd-fullscreen-arrow:hover\{background:rgba\(157,119,58,\.72\)/);
 
 console.log('Detail gallery regression tests passed.');
