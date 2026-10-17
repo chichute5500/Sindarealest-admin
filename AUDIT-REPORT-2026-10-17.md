@@ -155,7 +155,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên nhánh rà soát đã pass ở [run 39046410365](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39046410365); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Bộ kiểm thử mới nhất cũng xác nhận số tồn kho nội bộ không được trả qua API công khai, nhưng vẫn giữ nguyên ở API quản trị. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
+CI xác nhận sau khi bổ sung kiểm tra fail-closed cho bộ đếm đăng nhập và cập nhật test mock đã pass ở [run 39046936948](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39046936948); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Bộ kiểm thử mới nhất cũng xác nhận số tồn kho nội bộ không được trả qua API công khai, nhưng vẫn giữ nguyên ở API quản trị. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
