@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createSession, verifySession, validateProduct, hasSecuritySecrets, getCurrentDateInVietnam, warrantyStatusOnDate, isWarrantyEligibleOnDate } from '../functions/_lib.js';
+import { createSession, verifySession, validateProduct, fromRow, hasSecuritySecrets, getCurrentDateInVietnam, warrantyStatusOnDate, isWarrantyEligibleOnDate } from '../functions/_lib.js';
 import { onRequestGet as publicProducts } from '../functions/api/products.js';
 import { onRequestGet as adminProducts } from '../functions/api/admin/products.js';
 import { onRequestPost as restoreProducts } from '../functions/api/admin/restore.js';
@@ -40,6 +40,15 @@ assert.equal(valid.value.sku, 'SD-236');
 assert.equal(valid.value.category, 'wallets');
 assert.equal(valid.value.price, null, 'không tự gán giá');
 assert.equal(valid.value.stock, null, 'không tự gán tồn kho');
+
+const stockRow = {
+  id: 'stock-product', slug: 'stock-product', sku: 'SD-SN099', title: 'Sneaker thử',
+  category: 'sneakers', category_label: 'Sneaker', price: 1230000, stock: 7,
+  published: 1, images_json: '[]', description: '', source_price_confirmed: 0, sort_order: 1,
+};
+assert.equal(fromRow(stockRow, { publicView: true, showPrices: true }).stock, null,
+  'public product API must not reveal internal inventory counts even when prices are visible');
+assert.equal(fromRow(stockRow).stock, 7, 'admin view must retain the actual stock count');
 const prototypeNamedCategory = validateProduct({
   title: 'Sản phẩm danh mục tùy chỉnh', sku: 'SD-CON001', category: 'constructor',
   price: null, stock: null, published: true, images: [],
