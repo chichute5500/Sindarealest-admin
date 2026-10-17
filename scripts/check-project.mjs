@@ -34,7 +34,8 @@ for (const required of [
 
 for (const f of walk(join(root, 'functions')).filter(x => x.endsWith('.js'))
   .concat(walk(join(root, 'scripts')).filter(x => x.endsWith('.mjs')))
-  .concat(walk(join(root, 'tests')).filter(x => x.endsWith('.mjs')))) {
+  .concat(walk(join(root, 'tests')).filter(x => x.endsWith('.mjs')))
+  .concat(walk(join(root, 'public')).filter(x => x.endsWith('.js')))) {
   const result = spawnSync(process.execPath, ['--check', f], { encoding: 'utf8' });
   check(result.status === 0, `Cú pháp JavaScript lỗi: ${relative(root, f)} ${result.stderr || ''}`);
 }
