@@ -3,6 +3,7 @@ import { createSession, verifySession, validateProduct, hasSecuritySecrets, getC
 import { onRequestGet as publicProducts } from '../functions/api/products.js';
 import { onRequestGet as adminProducts } from '../functions/api/admin/products.js';
 import { onRequestPost as restoreProducts } from '../functions/api/admin/restore.js';
+import { onRequestGet as createAdminBackup } from '../functions/api/admin/backup.js';
 import { onRequestPost as adminLogin } from '../functions/api/admin/login.js';
 import { readFileSync } from 'node:fs';
 
@@ -52,6 +53,8 @@ const mockDB = {
   prepare(sql) {
     let bound = [];
     const statement = {
+      sql,
+      get boundValues() { return bound; },
       bind(...values) { bound = values; return statement; },
       async first() {
         if (sql.includes('FROM settings')) return { value: dbState.showPrices ? '1' : '0' };
@@ -119,9 +122,17 @@ data = await response.json();
 assert.equal(data.products.length, 2, 'quản trị được thấy cả sản phẩm đang ẩn');
 
 let batchCalls = 0;
+const restoreBatchStatements = [];
 const restoreDB = {
   ...mockDB,
-  async batch(statements) { batchCalls++; return statements.map(() => ({ success: true })); },
+  async batch(statements) {
+    batchCalls++;
+    restoreBatchStatements.push(statements.map(statement => ({
+      sql: statement.sql,
+      values: statement.boundValues || [],
+    })));
+    return statements.map(() => ({ success: true }));
+  },
 };
 const restoredProduct = {
   id: 'restore-product-1', slug: 'restore-product-1', sku: 'SD-RESTORE-1',
@@ -185,8 +196,79 @@ const operationsBackup = {
 };
 response = await restoreProducts({ request: makeRestoreRequest(operationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 200, 'backup v2 có quan hệ vận hành hợp lệ phải được chấp nhận');
-assert.equal(batchCalls, 2, 'backup v2 hợp lệ khôi phục dữ liệu vận hành bằng batch');
+assert.equal(batchCalls, 2, 'backup v2 đời cũ vẫn được khôi phục bằng batch');
+assert.ok(!restoreBatchStatements[1].some(statement => (statement.values || [])[0] === 'watermark_enabled'), 'Legacy v2 backups without watermark fields must preserve existing watermark settings');
+
+const watermarkBackup = {
+  ...operationsBackup,
+  settings: {
+    ...operationsBackup.settings,
+    watermarkEnabled: false,
+    watermarkPosition: 'top-left',
+    watermarkSize: 24,
+    watermarkOpacity: 73,
+  },
+};
+response = await restoreProducts({ request: makeRestoreRequest(watermarkBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 200, 'backup v2 with valid watermark settings must restore');
+assert.equal(batchCalls, 3, 'watermark settings restore must be part of the same D1 batch');
+const restoredSettings = new Map(restoreBatchStatements.at(-1)
+  .filter(statement => (statement.sql || '').includes('INSERT INTO settings'))
+  .map(statement => [statement.values[0], statement.values[1]]));
+assert.equal(restoredSettings.get('watermark_enabled'), '0');
+assert.equal(restoredSettings.get('watermark_position'), 'top-left');
+assert.equal(restoredSettings.get('watermark_size'), '24');
+assert.equal(restoredSettings.get('watermark_opacity'), '73');
+
+const invalidWatermarkBackup = {
+  ...watermarkBackup,
+  settings: { ...watermarkBackup.settings, watermarkSize: 99 },
+};
+response = await restoreProducts({ request: makeRestoreRequest(invalidWatermarkBackup), env: { DB: restoreDB, ...secrets } });
+assert.equal(response.status, 400, 'backup with out-of-range watermark settings must be rejected');
+assert.equal(batchCalls, 3, 'invalid watermark settings must not touch D1');
+
 const brokenOperationsBackup = { ...operationsBackup, operations: { ...operationsBackup.operations, orders: [{ ...operationsBackup.operations.orders[0], customer_id:'missing-customer' }] } };
 response = await restoreProducts({ request: makeRestoreRequest(brokenOperationsBackup), env: { DB: restoreDB, ...secrets } });
 assert.equal(response.status, 400, 'backup v2 tham chiếu khách hàng không tồn tại phải bị từ chối');
-assert.equal(batchCalls, 2, 'backup v2 không hợp lệ không được chạm vào D1');
+assert.equal(batchCalls, 3, 'backup v2 không hợp lệ không được chạm vào D1');
+
+const backupSettingValues = new Map([
+  ['show_prices','1'],
+  ['welcome_enabled','0'],
+  ['welcome_title_line_1','Đẳng cấp thật.'],
+  ['welcome_title_line_2','Từ chất liệu thật.'],
+  ['welcome_text','Lời chào sao lưu kiểm thử.'],
+  ['watermark_enabled','0'],
+  ['watermark_position','top-left'],
+  ['watermark_size','24'],
+  ['watermark_opacity','73'],
+]);
+const backupDB = {
+  prepare(sql) {
+    let bound = [];
+    const statement = {
+      bind(...values) { bound = values; return statement; },
+      async first() {
+        if (!sql.includes('FROM settings')) return null;
+        const value = backupSettingValues.get(bound[0]);
+        return value === undefined ? null : { value };
+      },
+      async all() { return { results: [] }; },
+    };
+    return statement;
+  },
+};
+const backupResponse = await createAdminBackup({
+  request: new Request('https://shop.example/api/admin/backup', {
+    headers: { Cookie: `sd_admin_session=${token}`, Origin: 'https://shop.example' },
+  }),
+  env: { DB: backupDB, ...secrets },
+});
+assert.equal(backupResponse.status, 200, 'admin backup must succeed for an authenticated session');
+const exportedBackup = await backupResponse.json();
+assert.equal(exportedBackup.format, 'sindarealest-backup-v2');
+assert.equal(exportedBackup.settings.watermarkEnabled, false);
+assert.equal(exportedBackup.settings.watermarkPosition, 'top-left');
+assert.equal(exportedBackup.settings.watermarkSize, 24);
+assert.equal(exportedBackup.settings.watermarkOpacity, 73);
