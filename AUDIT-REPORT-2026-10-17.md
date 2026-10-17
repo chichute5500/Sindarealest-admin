@@ -38,6 +38,36 @@ Trước đây API đặt hàng tìm hồ sơ bằng số điện thoại rồi 
 
 **Điều kiện triển khai:** Phải sao lưu D1 và áp dụng migration 0007 thành công trước khi deploy phiên bản code tham chiếu bảng mới. Chưa chạy migration trên production trong đợt rà soát này.
 
+### 4. Giới hạn đăng nhập có thể bị vượt khi nhiều yêu cầu chạy đồng thời
+**Mức độ:** Cao — bảo vệ thông tin đăng nhập quản trị.
+
+Logic cũ đọc bộ đếm bằng một truy vấn rồi mới tăng bằng truy vấn khác. Nhiều yêu cầu đồng thời có thể cùng đọc một giá trị cũ trước khi các lệnh tăng hoàn tất, khiến quá nhiều lần thử mật khẩu được cho phép trong cùng cửa sổ 15 phút.
+
+**Đã sửa:** Đổi sang một D1 batch nguyên tử gồm upsert/reset bộ đếm và đọc giá trị mới; từ lần thử thứ sáu trong cửa sổ, yêu cầu bị giới hạn. Đã thêm test cho 12 lần thử đồng thời và reset sau 15 phút. CI kiểm tra test này.
+
+### 5. Yêu cầu bảo hành và ảnh đính kèm phải đi qua phiên tra cứu hợp lệ
+**Mức độ:** Cao — hạn chế lạm dụng endpoint công khai.
+
+Trước đây API chấp nhận mã bảo hành thô khi gửi khiếu nại/tải ảnh, dù giao diện chính thức dùng token hành động ngắn hạn được tạo sau khi tra cứu.
+
+**Đã sửa:** Hai endpoint `/api/warranty-claims` và `/api/warranty-claim-uploads` từ chối yêu cầu thiếu `claimToken`; test bao gồm trường hợp cố gửi bằng mã bảo hành thô. API tra cứu cũng lọc đường dẫn ảnh từ D1 bằng `parseImages()`, thay vì tin trực tiếp JSON ảnh.
+
+**Lưu ý:** Token là quyền tạm thời do server cấp sau tra cứu, không phải bằng chứng danh tính người mua; thời hạn, giới hạn yêu cầu và che thông tin nhạy cảm vẫn cần được duy trì.
+
+### 6. Cập nhật khiếu nại bảo hành và nhật ký cần cùng thành công/thất bại
+**Mức độ:** Trung bình — khả năng kiểm toán và đối chiếu dữ liệu.
+
+Trước đây trạng thái khiếu nại được cập nhật trước, sau đó mới ghi audit log ở một truy vấn riêng. Nếu ghi nhật ký thất bại thì endpoint có thể trả lỗi dù trạng thái đã thay đổi.
+
+**Đã sửa:** Ghép cập nhật và ghi log vào cùng D1 batch; log chỉ được chèn nếu khiếu nại còn tồn tại. Đã bổ sung test kiểm tra cập nhật thành công/không tìm thấy và batch nguyên tử.
+
+### 7. Giới hạn kích thước và số bản ghi khi khôi phục backup
+**Mức độ:** Trung bình — độ ổn định của Worker và D1.
+
+Restore trước đây cho phép tối đa 20.000 bản ghi ở từng mảng riêng lẻ, nhưng không giới hạn tổng số bản ghi của tất cả các mảng. Backup rất lớn có thể buộc Worker tạo batch có hàng chục nghìn câu lệnh và vượt thời gian/giới hạn tài nguyên.
+
+**Đã sửa:** Đọc JSON theo luồng với giới hạn 20 MB và từ chối backup có tổng hơn 5.000 bản ghi trước khi xây dựng batch ghi dữ liệu. Đã thêm regression test để xác nhận backup vượt giới hạn bị từ chối trước khi đụng đến D1.
+
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
