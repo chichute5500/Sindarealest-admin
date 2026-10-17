@@ -9,7 +9,7 @@ export async function onRequestGet(context) {
     const productRows = await db.prepare("SELECT * FROM products ORDER BY sort_order ASC, sku ASC").all();
     const [
       customers, orders, orderItems, warranties, warrantyClaims, auditLogs,
-      customerAddressDetails, orderShippingAddresses, orderItemDetails, warrantyClaimAttachments,
+      customerAddressDetails, orderShippingAddresses, orderContactDetails, orderItemDetails, warrantyClaimAttachments,
       showPrices, welcomeEnabled, welcomeTitleLine1, welcomeTitleLine2, welcomeText,
       watermarkEnabled, watermarkPosition, watermarkSize, watermarkOpacity,
     ] = await Promise.all([
@@ -21,6 +21,7 @@ export async function onRequestGet(context) {
       db.prepare("SELECT * FROM audit_logs ORDER BY created_at,id").all(),
       db.prepare("SELECT * FROM customer_address_details ORDER BY customer_id").all(),
       db.prepare("SELECT * FROM order_shipping_addresses ORDER BY order_id").all(),
+      db.prepare("SELECT * FROM order_contact_details ORDER BY order_id").all(),
       db.prepare("SELECT * FROM order_item_details ORDER BY item_id").all(),
       db.prepare("SELECT * FROM warranty_claim_attachments ORDER BY claim_id").all(),
       getSetting(db, "show_prices", "0"),
@@ -63,6 +64,7 @@ export async function onRequestGet(context) {
         auditLogs: auditLogs.results || [],
         customerAddressDetails: customerAddressDetails.results || [],
         orderShippingAddresses: orderShippingAddresses.results || [],
+        orderContactDetails: orderContactDetails.results || [],
         orderItemDetails: orderItemDetails.results || [],
         warrantyClaimAttachments: warrantyClaimAttachments.results || [],
       },
