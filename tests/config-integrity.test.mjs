@@ -46,9 +46,12 @@ assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fal
 const seedWorkflow = readFileSync('.github/workflows/import-d1-products.yml', 'utf8');
 assert.ok(seedWorkflow.includes('confirm_empty_database'), 'Manual D1 seed must require an explicit empty-database confirmation');
 assert.ok(seedWorkflow.includes('CONFIRM_EMPTY_DATABASE') && seedWorkflow.includes('"YES"'), 'Manual D1 seed must stop unless confirmation is YES');
+const productCountGuard = readFileSync('scripts/assert-product-count.mjs', 'utf8');
+assert.ok(productCountGuard.includes('if (count !== expected)'), 'Product count guard must reject counts that differ from the expected value');
 assert.ok(seedWorkflow.includes('SELECT COUNT(*) AS product_count FROM products;'), 'Manual D1 seed must query the live product count');
-assert.ok(seedWorkflow.includes('if (count !== 0)'), 'Manual D1 seed must stop if the existing products table is not empty');
-assert.ok(seedWorkflow.includes('if (count !== 235)'), 'Manual D1 seed must verify the expected product count after import');
+assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-count.json 0'), 'Manual D1 seed must verify zero existing products before inserting');
+assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-count.json 235'), 'Manual D1 seed must verify exactly 235 products after import');
+assert.ok(seedWorkflow.includes('concurrency:') && seedWorkflow.includes('sindarealest-d1-initial-seed'), 'Initial seed workflow must serialize simultaneous runs');
 assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
 
 assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
