@@ -40,7 +40,7 @@ function bucket(initial = {}) {
   };
 }
 
-function mockDB() {
+function mockDB(startDate = '2026-01-01') {
   const state = { attachmentKey: "", settings: new Map() };
   const db = {
     state,
@@ -51,7 +51,7 @@ function mockDB() {
         async first() {
           if (sql.includes("SELECT attempts FROM public_rate_limits")) return { attempts: 1 };
           if (sql.includes("FROM warranties w") && sql.includes("upper(w.warranty_code)=?")) {
-            return { id: "warranty-id", warranty_code: warrantyCode, status: "active", ends_at: "2099-12-31" };
+            return { id: "warranty-id", warranty_code: warrantyCode, status: "active", starts_at: startDate, ends_at: "2099-12-31" };
           }
           if (sql.includes("SELECT image_key FROM warranty_claim_attachments")) {
             return values[0] === state.attachmentKey && state.attachmentKey
@@ -105,6 +105,15 @@ assert.ok(db.state.settings.has("warranty_upload:" + uploaded.imageKey), "upload
 const missingPrivateBucket = await submitPhoto({ DB: mockDB(), IMAGES: bucket() });
 assert.equal(missingPrivateBucket.status, 503, "new warranty uploads must fail closed without private ORIGINALS");
 assert.equal((await missingPrivateBucket.json()).ok, false);
+
+const futureOriginals = bucket();
+const futureWarrantyUpload = await submitPhoto({
+  DB: mockDB("2099-01-01"),
+  ORIGINALS: futureOriginals,
+  IMAGES: bucket(),
+});
+assert.equal(futureWarrantyUpload.status, 404, "photo upload must be rejected before the warranty start date");
+assert.equal(futureOriginals.calls.puts.length, 0, "future-start warranty evidence must not be stored");
 
 db.state.attachmentKey = uploaded.imageKey;
 const session = await createSession(sessionSecret);
