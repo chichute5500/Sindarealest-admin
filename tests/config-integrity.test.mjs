@@ -42,4 +42,19 @@ assert.ok(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Do not opt i
 assert.ok(existsSync('public/index.html'));
 assert.ok(existsSync('public/admin/index.html'));
 assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fallback must not shadow D1 failures');
-console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, and single-source catalog invariant.');
+
+const seedWorkflow = readFileSync('.github/workflows/import-d1-products.yml', 'utf8');
+assert.ok(seedWorkflow.includes('confirm_empty_database'), 'Manual D1 seed must require an explicit empty-database confirmation');
+assert.ok(seedWorkflow.includes('CONFIRM_EMPTY_DATABASE') && seedWorkflow.includes('"YES"'), 'Manual D1 seed must stop unless confirmation is YES');
+assert.ok(seedWorkflow.includes('SELECT COUNT(*) AS product_count FROM products;'), 'Manual D1 seed must query the live product count');
+assert.ok(seedWorkflow.includes('if (count !== 0)'), 'Manual D1 seed must stop if the existing products table is not empty');
+assert.ok(seedWorkflow.includes('if (count !== 235)'), 'Manual D1 seed must verify the expected product count after import');
+assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
+
+assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
+const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
+assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
+const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
+assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
+
+console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, private R2 readiness, guarded manual seed, and single-source catalog invariant.');
