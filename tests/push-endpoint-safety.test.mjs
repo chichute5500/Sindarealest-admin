@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const allowed = [
   "https://fcm.googleapis.com/fcm/send/sample",
+  "https://fcm.googleapis.com./fcm/send/sample",
   "https://updates.push.services.mozilla.com/wpush/v2/sample",
   "https://web.push.apple.com/sample",
   "https://push.services.opera.com/sample",
