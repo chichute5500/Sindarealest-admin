@@ -165,7 +165,7 @@ Restore có thể thay thế dữ liệu sản phẩm và, với bản backup c�
 
 ## Giới hạn kiểm tra
 
-Đã thực hiện kiểm tra HTTP chỉ đọc trên production ngày 2026-10-17 và chạy lại smoke check read-only:  trang chủ tải được; `/api/products` trả danh mục 236 sản phẩm; `/api/settings` trả cài đặt; `robots.txt` và `sitemap.xml` đọc được (sitemap 237 URL); `/san-pham/SD-SN001` trả nội dung và metadata OG/canonical phù hợp. Đây là smoke check bên ngoài, không phải kiểm thử trình duyệt đầy đủ.
+Đã thực hiện kiểm tra HTTP chỉ đọc trên production ngày 2026-10-17 và chạy lại smoke check read-only:  trang chủ tải được; `/api/products` trả danh mục 236 sản phẩm; `/api/settings` trả cài đặt; `robots.txt` và `sitemap.xml` đọc được (sitemap 237 URL); `/san-pham/SD-SN001` trả nội dung và metadata OG/canonical phù hợp. Đây là smoke check bên ngoài, không phải kiểm thử trình duyệt đầy đủ. Thử đọc preview theo tên nhánh rà soát trả `login_required`; không có phiên đăng nhập Preview được cung cấp nên không thể thực hiện browser E2E, và không tìm cách vượt qua lớp bảo vệ đó.
 
 Kiểm tra không có cookie đăng nhập cho `/api/admin/session`, `/api/admin/products`, `/api/admin/backup` và `/api/admin/warranties` đều nhận HTTP 401 như mong đợi. Chưa thực hiện đăng nhập admin hoặc thao tác ghi/sửa/xóa đơn hàng, sản phẩm, bảo hành trên production; không xem được giá trị secrets/bindings riêng tư của Cloudflare. Chưa thể xác nhận các sửa đổi ở nhánh rà soát đã chạy trên production. Cần kiểm thử runtime và xác minh binding sau khi bản sửa được duyệt/triển khai; báo cáo không tuyên bố website đã hoàn thiện 100%.
 
