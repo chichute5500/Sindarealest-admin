@@ -90,14 +90,9 @@ export async function onRequestPost({ request, env }) {
       customMetadata: { visibility: "private-warranty-claim", purpose: "warranty-claim", warrantyCode },
     });
 
-    try {
-      await env.DB.prepare(
-        "INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at",
-      ).bind("warranty_upload:" + key, warrantyCode).run();
-    } catch (error) {
-      try { await env.ORIGINALS.delete(key); } catch {}
-      throw error;
-    }
+    await env.DB.prepare(
+      "INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at",
+    ).bind("warranty_upload:" + key, warrantyCode).run();
 
     return json({ ok: true, imageKey: key }, 201);
   } catch {
