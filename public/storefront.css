@@ -58,3 +58,16 @@ html.theme-transitioning .theme-bg{transform:none;will-change:opacity}
 /* Sequential welcome reveal: logo, brand, intro, then entry action. */
 /* Sequential welcome reveal */
 @keyframes welcomeReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.welcome-content>*{opacity:0;animation:welcomeReveal .48s ease both}.welcome-content>.welcome-rule{animation-delay:.02s}.welcome-content>.welcome-overline{animation-delay:.08s}.welcome-content>.welcome-logo{animation-delay:.18s}.welcome-content>.welcome-tagline{animation-delay:.34s}.welcome-content>.welcome-title{animation-delay:.48s}.welcome-content>p{animation-delay:.64s}.welcome-content>.welcome-points{animation-delay:.8s}.welcome-content>.welcome-footnote{animation-delay:.94s}.welcome-content>.welcome-loader{animation-delay:1.04s}.welcome-content>.welcome-skip{animation-delay:1.16s}.welcome-splash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+
+/* Welcome brand intro: logo → brand statement → copy → entry action. */
+@keyframes sdWelcomeReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.welcome-content>.welcome-rule{animation:sdWelcomeReveal .45s ease both}
+.welcome-content>.welcome-overline{animation:sdWelcomeReveal .45s .06s ease both}
+.welcome-content>.welcome-logo{animation:sdWelcomeReveal .55s .14s ease both}
+.welcome-content>.welcome-tagline{animation:sdWelcomeReveal .5s .28s ease both}
+.welcome-content>.welcome-title{animation:sdWelcomeReveal .5s .4s ease both}
+.welcome-content>#welcomeText{animation:sdWelcomeReveal .5s .52s ease both}
+.welcome-content>.welcome-points{animation:sdWelcomeReveal .5s .62s ease both}
+.welcome-content>.welcome-footnote{animation:sdWelcomeReveal .5s .72s ease both}
+.welcome-content>.welcome-skip{animation:sdWelcomeReveal .5s .86s ease both}
+@media(prefers-reduced-motion:reduce){.welcome-content>.welcome-rule,.welcome-content>.welcome-overline,.welcome-content>.welcome-logo,.welcome-content>.welcome-tagline,.welcome-content>.welcome-title,.welcome-content>#welcomeText,.welcome-content>.welcome-points,.welcome-content>.welcome-footnote,.welcome-content>.welcome-skip{animation:none!important;opacity:1;transform:none}}
