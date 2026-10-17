@@ -62,6 +62,9 @@ const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
 assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
 const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
 assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
+const notificationsSource = readFileSync('functions/_notifications.js', 'utf8');
+assert.ok(notificationsSource.includes('mailto:dacasau.sindarealest@gmail.com'), 'VAPID fallback subject must use the verified SinDarealest contact');
+assert.ok(!notificationsSource.includes('mailto:admin@sindarealest.com'), 'VAPID fallback must not contain an unverified placeholder email');
 
 const guardDir = mkdtempSync(join(tmpdir(), 'sd-product-count-'));
 try {
