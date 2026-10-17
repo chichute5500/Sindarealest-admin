@@ -7,6 +7,7 @@ const SESSION_SECRET = "backup-size-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 
 function makeDB({ productRows = [], auditLogs = [] } = {}) {
+  const executedQueries = [];
   return {
     prepare(sql) {
       const statement = {
@@ -17,12 +18,14 @@ function makeDB({ productRows = [], auditLogs = [] } = {}) {
       return statement;
     },
     async batch(statements) {
+      executedQueries.push(...statements.map((statement) => statement.sql));
       return statements.map((statement) => ({
         results: statement.sql.includes("FROM products") ? productRows
           : statement.sql.includes("FROM audit_logs") ? auditLogs
           : [],
       }));
     },
+    get executedQueries() { return executedQueries; },
   };
 }
 
@@ -35,6 +38,7 @@ const auditLogs = Array.from({ length: 5000 }, (_, i) => ({
   details_json: "{}",
   created_at: "2026-01-01 00:00:00",
 }));
+const db = makeDB({ productRows: [{ id: "product-1", sku: "SD-SN001", images_json: "[]" }], auditLogs });
 const response = await createBackup({
   request: new Request("https://shop.example/api/admin/backup", {
     headers: {
@@ -44,7 +48,7 @@ const response = await createBackup({
     },
   }),
   env: {
-    DB: makeDB({ productRows: [{ id: "product-1", sku: "SD-SN001", images_json: "[]" }], auditLogs }),
+    DB: db,
     ADMIN_PASSWORD,
     SESSION_SECRET,
   },
@@ -52,4 +56,5 @@ const response = await createBackup({
 assert.equal(response.status, 413,
   "backup export above the shared record budget must fail explicitly rather than create an unrestorable file");
 assert.match((await response.json()).error, /5\.000 bản ghi/);
-console.log("PASS: backup export enforces the same record budget as restore.");
+assert.equal(db.executedQueries.filter((sql) => /FROM (products|customers|orders|order_items|warranties|warranty_claims|audit_logs|customer_address_details|order_shipping_addresses|order_contact_details|order_item_details|warranty_claim_attachments)/.test(sql) && /LIMIT 5001$/.test(sql)).length, 12, "all exported data tables must be capped before D1 materializes result sets");
+console.log("PASS: backup export enforces shared record and query limits.");
