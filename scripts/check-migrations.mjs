@@ -30,7 +30,7 @@ try {
   const sourceMigrations = join(root, "migrations");
   const localMigrations = join(temp, "migrations");
   mkdirSync(localMigrations, { recursive: true });
-  const migrationFiles = readdirSync(sourceMigrations).filter((name) => /^\\d{4}_.+\\.sql$/.test(name)).sort();
+  const migrationFiles = readdirSync(sourceMigrations).filter((name) => /^\d{4}_.+\.sql$/.test(name)).sort();
   const contactMigration = migrationFiles.find((name) => name.startsWith("0007_"));
   if (!contactMigration || migrationFiles.length < 7) throw new Error("Expected the complete ordered migration set through 0007.");
   for (const name of migrationFiles.filter((name) => name < contactMigration)) {
@@ -47,7 +47,7 @@ try {
     'database_id = "00000000-0000-4000-8000-000000000001"',
     'migrations_dir = "./migrations"',
     "",
-  ].join("\\n"));
+  ].join("\n"));
 
   run(["d1", "migrations", "apply", databaseName, "--local", "--config", configPath],
     "Apply migrations 0001–0006 to temporary local D1");
