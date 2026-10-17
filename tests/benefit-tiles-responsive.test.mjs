@@ -36,14 +36,26 @@ assert.match(markup, /href="https:\/\/zalo\.me\/0827049192"/,
   'The Zalo tile must keep its confirmed destination.');
 assert.match(markup, /<strong>Tư vấn\/đặt hàng qua Zalo<\/strong><small>Trao đổi trực tiếp qua Zalo<\/small>/,
   'The Zalo tile must use the approved label without an unverified 24/7 claim.');
+assert.match(css, /\.service-strip \.service-copy\{[^}]*color:#262626/,
+  'Tile text must use a fixed dark color for contrast in both themes.');
+assert.match(css, /\.service-strip \.service-text strong\{[^}]*color:#262626/,
+  'Tile titles must use a fixed dark color.');
+assert.match(css, /\.service-strip \.service-text small\{[^}]*color:#53575a/,
+  'Tile descriptions must use a fixed neutral color.');
+assert.doesNotMatch(css, /\.service-strip \.service-copy\{[^}]*color:var\(--ink\)/,
+  'Tile surface must not inherit theme-dependent text color.');
+assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(--muted\)/,
+  'Tile descriptions must not inherit theme-dependent muted color.');
 
-const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
+const tileGradient = 'linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
-assert.ok(css.includes('background:' + ctaGradient),
-  'All six tile surfaces must reuse the exact Zalo CTA gradient.');
-assert.ok(css.includes('border:1px solid rgba(220,184,114,.57)'),
-  'The glass surface must reuse the Zalo CTA border color.');
+assert.ok(css.includes('background:' + tileGradient),
+  'Tile glass must use a stronger neutral gradient to keep text readable in dark mode.');
+assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
+  'Tile glass must have layered elevation and highlight.');
+assert.ok(css.includes('border:1px solid rgba(255,255,255,.82)'),
+  'Tile glass must use a neutral high-contrast border.');
 assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
   'The shared surface must match the CTA blur treatment.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
@@ -66,7 +78,7 @@ assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
   'The CTA-matched surface border must have one authoritative declaration.');
 assert.equal(copyRules.filter(rule => /(?:^|;)-webkit-backdrop-filter:/.test(rule)).length, 1,
   'The CTA-matched glass blur must have one authoritative declaration.');
-assert.ok(copyRules.some(rule => rule.includes('background:' + ctaGradient) && rule.includes('backdrop-filter:blur(18px)')),
-  'Responsive overrides may adjust dimensions, but not replace the shared surface treatment.');
+assert.ok(copyRules.some(rule => rule.includes('background:' + tileGradient) && rule.includes('backdrop-filter:blur(18px)')),
+  'Responsive overrides may adjust dimensions, but not replace the neutral glass surface treatment.');
 
 console.log('PASS: one shared CTA-matched glass surface for all six tiles; no legacy cascade; responsive checks passed.');
