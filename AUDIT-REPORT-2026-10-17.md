@@ -41,9 +41,9 @@ Trước đây API đặt hàng tìm hồ sơ bằng số điện thoại rồi 
 ### 4. Giới hạn đăng nhập có thể bị vượt khi nhiều yêu cầu chạy đồng thời
 **Mức độ:** Cao — bảo vệ thông tin đăng nhập quản trị.
 
-Logic cũ đọc bộ đếm bằng một truy vấn rồi mới tăng bằng truy vấn khác. Nhiều yêu cầu đồng thời có thể cùng đọc một giá trị cũ trước khi các lệnh tăng hoàn tất, khiến quá nhiều lần thử mật khẩu được cho phép trong cùng cửa sổ 15 phút.
+Logic cũ đọc bộ đếm bằng một truy vấn rồi mới tăng bằng truy vấn khác. Nhiều yêu cầu đồng thời có thể cùng đọc một giá trị cũ, khiến giới hạn số lần đăng nhập hoặc gọi API công khai bị vượt.
 
-**Đã sửa:** Đổi sang một D1 batch nguyên tử gồm upsert/reset bộ đếm và đọc giá trị mới; từ lần thử thứ sáu trong cửa sổ, yêu cầu bị giới hạn. Đã thêm test cho 12 lần thử đồng thời và reset sau 15 phút. CI kiểm tra test này.
+**Đã sửa:** Cả `rateLimitLogin()` và `rateLimitPublicRequest()` dùng một D1 batch nguyên tử để cập nhật bộ đếm và đọc giá trị mới. Bước dọn bản ghi cũ là tùy chọn nên nếu nó lỗi, thao tác hợp lệ không bị đổi thành 503. Đã thêm kiểm thử nhiều yêu cầu song song, reset cửa sổ và tách scope endpoint.
 
 ### 5. Yêu cầu bảo hành và ảnh đính kèm phải đi qua phiên tra cứu hợp lệ
 **Mức độ:** Cao — hạn chế lạm dụng endpoint công khai.
