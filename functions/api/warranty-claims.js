@@ -1,4 +1,4 @@
-import { dbOrFail, fail, json, rateLimitPublicRequest } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest } from "../_lib.js";
 const clean=(v,max=1600)=>String(v??"").trim().slice(0,max);
 export async function onRequestPost({request,env}){
  if(request.headers.get("Origin")){try{if(new URL(request.headers.get("Origin")).origin!==new URL(request.url).origin)return fail("Yêu cầu không hợp lệ.",403)}catch{return fail("Yêu cầu không hợp lệ.",403)}}
@@ -23,7 +23,7 @@ export async function onRequestPost({request,env}){
  try{
   const warranty=await env.DB.prepare("SELECT w.id,w.order_id,w.warranty_code,o.customer_id,o.order_number,w.status,w.ends_at FROM warranties w JOIN orders o ON o.id=w.order_id WHERE upper(w.warranty_code)=? LIMIT 1").bind(warrantyCode).first();
   if(!warranty||(tokenWarrantyId&&String(warranty.id)!==tokenWarrantyId))return fail("Không tìm thấy phiên bảo hành hợp lệ.",404);
-  if(warranty.status!=="active"||String(warranty.ends_at)<new Date().toISOString().slice(0,10))return fail("Bảo hành không còn hiệu lực.",409);
+  if(!isWarrantyEligibleOnDate(warranty.status,warranty.ends_at,getCurrentDateInVietnam()))return fail("Bảo hành không còn hiệu lực.",409);
   if(imageKey){const uploaded=await env.DB.prepare("SELECT key FROM settings WHERE key=? AND value=? AND julianday(updated_at)>julianday('now','-15 minutes') LIMIT 1").bind("warranty_upload:"+imageKey,warrantyCode).first();if(!uploaded)return fail("Ảnh đính kèm không hợp lệ hoặc đã hết hạn.",400)}
   const id=crypto.randomUUID(),statements=[env.DB.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message) VALUES(?,?,?,?,?)").bind(id,warranty.order_id,warranty.customer_id,warrantyCode,message)];
   if(imageKey){statements.push(env.DB.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(id,imageKey));statements.push(env.DB.prepare("DELETE FROM settings WHERE key=?").bind("warranty_upload:"+imageKey))}
