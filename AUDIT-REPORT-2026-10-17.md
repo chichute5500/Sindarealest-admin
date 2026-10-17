@@ -178,3 +178,10 @@ Kiểm tra không có cookie đăng nhập cho `/api/admin/session`, `/api/admin
 
 ### Dependency/build integrity
 The audit also found that CI installed dependencies with `--no-audit --no-fund`, both primary workflows used old action versions that emitted a Node.js 20 deprecation warning, and the repository did not contain `package-lock.json`. On this review branch, the direct Wrangler dependency is pinned to `4.149.0`, GitHub Actions references are refreshed to `@v7`, and CI/deploy now run `npm audit --audit-level=high` after installation. **Remaining limitation:** no lockfile is committed yet, so npm can still resolve transitive dependencies to different versions on later runs. A checked-in, tested lockfile should be the next reproducibility improvement; do not claim fully reproducible builds until that is done.
+
+### Tăng cường giới hạn đăng nhập khi bộ đếm D1 không xác minh được
+**Mức độ:** Cao — bảo vệ chống dò mật khẩu quản trị.
+
+Rà soát sâu bổ sung phát hiện bộ giới hạn đăng nhập nguyên tử vẫn diễn giải kết quả SELECT bị thiếu/sai thành `0` lần thử. Nếu D1 trả kết quả không thể xác minh, luồng đăng nhập có thể tiếp tục mà không chứng minh được giới hạn đã áp dụng.
+
+**Đã sửa trên nhánh rà soát:** `rateLimitLogin()` giờ yêu cầu bộ đếm là số nguyên an toàn từ 1 trở lên; nếu thiếu hoặc sai, helper ném lỗi để endpoint đăng nhập trả 503 và không xác thực mật khẩu trong lượt đó. Đã bổ sung regression test cho kết quả bộ đếm rỗng; test giới hạn đồng thời và reset cửa sổ vẫn được giữ.
