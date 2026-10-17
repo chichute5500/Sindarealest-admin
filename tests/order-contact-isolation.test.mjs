@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { onRequestPost as createOrder } from "../functions/api/orders.js";
 
 const batchedStatements = [];
@@ -67,11 +68,11 @@ assert.deepEqual(contactSnapshot.values.slice(1, 4),
   ["Tên gửi lần này", "0900000000", "order@example.test"],
   "snapshot must preserve the data submitted for this order without changing the customer profile");
 
-const warrantyLookupSource = (await import("node:fs")).readFileSync(
+const warrantyLookupSource = readFileSync(
   new URL("../functions/api/warranty-lookup.js", import.meta.url), "utf8");
-const adminWarrantySource = (await import("node:fs")).readFileSync(
+const adminWarrantySource = readFileSync(
   new URL("../functions/api/admin/warranties.js", import.meta.url), "utf8");
-const migration = (await import("node:fs")).readFileSync(
+const migration = readFileSync(
   new URL("../migrations/0007_order_contact_details.sql", import.meta.url), "utf8");
 assert.ok(warrantyLookupSource.includes("COALESCE(oc.phone,c.phone)") &&
   warrantyLookupSource.includes("LEFT JOIN order_contact_details oc ON oc.order_id=o.id"),
