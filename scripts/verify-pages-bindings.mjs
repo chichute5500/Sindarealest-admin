@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export function verifyProductionR2Bindings(project, projectName = process.env.CLOUDFLARE_PAGES_PROJECT) {
+export function verifyProductionR2Bindings(project, projectName = process.env.CLOUDFLARE_PAGES_PROJECT, expectedBranch = process.env.CLOUDFLARE_PAGES_BRANCH) {
   if (!project || typeof project !== 'object') throw new Error('Cloudflare Pages trả về cấu hình project không hợp lệ.');
   const production = project.deployment_configs?.production;
   const buckets = production?.r2_buckets;
@@ -16,7 +16,13 @@ export function verifyProductionR2Bindings(project, projectName = process.env.CL
   if (project.name && projectName && project.name !== projectName) {
     throw new Error('Cloudflare API trả về project không khớp tên đã xác nhận; deploy bị chặn.');
   }
-  return { imagesBucket: images, originalsBucket: originals };
+  if (expectedBranch && (!project.production_branch || typeof project.production_branch !== 'string')) {
+    throw new Error('Không đọc được production branch của Cloudflare Pages; deploy bị chặn.');
+  }
+  if (expectedBranch && project.production_branch !== expectedBranch) {
+    throw new Error(`Branch ${expectedBranch} không khớp production branch ${project.production_branch}; deploy bị chặn.`);
+  }
+  return { imagesBucket: images, originalsBucket: originals, productionBranch: project.production_branch || null };
 }
 
 export async function fetchProductionPagesProject({ accountId, projectName, apiToken, fetchImpl = fetch }) {
@@ -85,7 +91,7 @@ async function main() {
     projectName,
     apiToken: process.env.CLOUDFLARE_API_TOKEN,
   });
-  const result = verifyProductionR2Bindings(project, projectName);
+  const result = verifyProductionR2Bindings(project, projectName, process.env.CLOUDFLARE_PAGES_BRANCH);
   const access = await fetchR2BucketPublicAccess({
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     bucketName: result.originalsBucket,
@@ -93,7 +99,7 @@ async function main() {
     apiToken: getR2ReadToken(),
   });
   const privacy = assertPrivateR2Access(access);
-  console.log(`Đã xác minh Production bindings: IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Public access ORIGINALS: r2.dev tắt, ${privacy.enabledCustomDomains} custom domain công khai đang bật.`);
+  console.log(`Đã xác minh Production branch: ${result.productionBranch}; IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Public access ORIGINALS: r2.dev tắt, ${privacy.enabledCustomDomains} custom domain công khai đang bật.`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
