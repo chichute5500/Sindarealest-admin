@@ -1,5 +1,8 @@
-import { fail, fromRow, getSetting, json, requireAdmin } from "../../_lib.js";
+import { fail, fromRow, getSetting, requireAdmin } from "../../_lib.js";
 import { WATERMARK_DEFAULTS, normalizeWatermarkSettings } from "../../_lib/watermark-settings.js";
+
+const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
+const MAX_BACKUP_RECORDS = 5000;
 
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
@@ -40,7 +43,7 @@ export async function onRequestGet(context) {
       watermark_size: watermarkSize,
       watermark_opacity: watermarkOpacity,
     });
-    return json({
+    const payload = {
       format: "sindarealest-backup-v2",
       createdAt: new Date().toISOString(),
       settings: {
@@ -67,6 +70,24 @@ export async function onRequestGet(context) {
         orderContactDetails: orderContactDetails.results || [],
         orderItemDetails: orderItemDetails.results || [],
         warrantyClaimAttachments: warrantyClaimAttachments.results || [],
+      },
+    };
+
+    const recordCount = payload.products.length + Object.values(payload.operations)
+      .reduce((total, rows) => total + (Array.isArray(rows) ? rows.length : 0), 0);
+    if (recordCount > MAX_BACKUP_RECORDS) {
+      return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần xử lý. Hãy lên kế hoạch xuất/nhập theo lô trước khi tiếp tục.", 413);
+    }
+
+    const serialized = JSON.stringify(payload);
+    if (serialized.length > MAX_BACKUP_BYTES || new TextEncoder().encode(serialized).byteLength > MAX_BACKUP_BYTES) {
+      return fail("Bản sao lưu vượt giới hạn 20 MB để có thể khôi phục an toàn. Hãy kiểm tra lượng nhật ký/dữ liệu trước khi tiếp tục.", 413);
+    }
+    return new Response(serialized, {
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch {
