@@ -49,21 +49,21 @@ assert.match(styles, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active
 assert.match(styles, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
 assert.match(styles, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdFullscreenOutLeft 300ms/);
 assert.match(styles, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdFullscreenInRight 300ms/);
-assert.match(styles, /function activeFullscreenImage\(\)/);
-assert.match(styles, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
-assert.match(styles, /active\.classList\.remove\('is-active'\);incoming\.classList\.add\('is-active'\)/);
+assert.match(html, /function activeFullscreenImage\(\)/);
+assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
+assert.match(html, /active\.classList\.remove\('is-active'\);incoming\.classList\.add\('is-active'\)/);
 assert.match(styles, /\.sd-fullscreen-frame\{[^}]*background:rgba\(245,239,226,\.035\)/);
 assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_MS=300/);
 assert.match(fullscreenTransition, /incoming\.onload=finishLoad/);
 assert.match(fullscreenTransition, /fullscreenAnimationTimer=setTimeout/);
 assert.doesNotMatch(fullscreenTransition, /\b(?:150|230|620)\b/, 'Fullscreen transitions must not use conflicting legacy timings.');
-assert.doesNotMatch(styles, /id="artPrev"[^>]*>‹/);
-assert.doesNotMatch(styles, /class="featured-arrow[^>]*>‹/);
-assert.doesNotMatch(styles, /data-page="(?:prev|next)"[^>]*>‹/);
+assert.doesNotMatch(html, /id="artPrev"[^>]*>‹/);
+assert.doesNotMatch(html, /class="featured-arrow[^>]*>‹/);
+assert.doesNotMatch(html, /data-page="(?:prev|next)"[^>]*>‹/);
 
 
-assert.match(styles, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)/, 'All arrow controls must use the shared glass material.');
-assert.match(styles, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)/);
+assert.match(styles, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--gallery-glass\)/, 'All arrow controls must use the shared glass material.');
+assert.match(styles, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--gallery-glass\)/);
 assert.match(styles, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(0,0,0,\.30\)/);
 assert.match(styles, /\.sd-fullscreen-viewer\{[^}]*backdrop-filter:blur\(8px\)/);
 assert.doesNotMatch(styles, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(8,8,8,\.94\)/, 'Fullscreen must not use an almost opaque black backdrop.');
@@ -75,7 +75,7 @@ assert.doesNotMatch(styles, /id="sd-unified-arrow-glass-final"/, "Arrow glass ru
 assert.match(styles, /\.detail-gallery-arrow:hover,\.featured-arrow:hover,\.slide-controls button:hover,\.page-btn\.page-arrow:hover,\.sd-fullscreen-arrow:hover\{background:rgba\(157,119,58,\.72\)/);
 assert.match(styles, /@media\(hover:none\)\{\s*\.detail-gallery-arrow:hover:not\(:active\),\.sd-fullscreen-arrow:hover:not\(:active\)\{transform:translateY\(-50%\) scale\(1\)\}/, 'Touch hover must not leave gallery arrows enlarged after tap');
 assert.match(styles, /\.featured-arrow:hover:not\(:active\),\.slide-controls button:hover:not\(:active\),\.page-btn\.page-arrow:hover:not\(:active\)\{transform:scale\(1\)\}/, 'Touch hover must not leave carousel and pagination arrows enlarged after tap');
-assert.match(styles, /\.detail-gallery-arrow:hover:not\(:active\),\.featured-arrow:hover:not\(:active\),\.slide-controls button:hover:not\(:active\),\.page-btn\.page-arrow:hover:not\(:active\),\.sd-fullscreen-arrow:hover:not\(:active\)\{background:var\(--sd-gallery-glass\);border-color:var\(--sd-gallery-glass-border\)\}/, 'Touch hover must not leave the gold hover surface stuck after tapping');
+assert.match(styles, /\.detail-gallery-arrow:hover:not\(:active\),\.featured-arrow:hover:not\(:active\),\.slide-controls button:hover:not\(:active\),\.page-btn\.page-arrow:hover:not\(:active\),\.sd-fullscreen-arrow:hover:not\(:active\)\{background:var\(--gallery-glass\);border-color:var\(--gallery-glass-border\)\}/, 'Touch hover must not leave the gold hover surface stuck after tapping');
 
 
 console.log('Detail gallery regression tests passed.');
