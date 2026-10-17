@@ -15,6 +15,13 @@ const ask = async (question, fallback = '') => {
 };
 
 async function main() {
+  if (ci && process.env.CLOUDFLARE_PAGES_ORIGINALS_READY !== 'true') {
+    throw new Error('Deploy bị chặn: chưa xác minh binding ORIGINALS riêng tư. Xác minh ORIGINALS khác IMAGES, không public access/r2.dev/custom domain và được gắn trong đúng môi trường Pages; chỉ sau đó mới đặt CLOUDFLARE_PAGES_ORIGINALS_READY=true.');
+  }
+  if (!ci) {
+    const originalsReady = (await ask('Đã xác minh binding ORIGINALS là bucket riêng tư, khác IMAGES và gắn đúng môi trường Pages chưa? Nhập YES', 'NO')).toUpperCase();
+    if (originalsReady !== 'YES') throw new Error('Đã hủy deploy cho đến khi ORIGINALS được xác minh.');
+  }
   if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
     if (ci) throw new Error('Thiếu CLOUDFLARE_API_TOKEN hoặc CLOUDFLARE_ACCOUNT_ID trong GitHub Actions Secrets.');
     console.log('Lưu ý: đăng nhập Wrangler trước bằng `npx wrangler login`; không dán token vào câu lệnh.');
