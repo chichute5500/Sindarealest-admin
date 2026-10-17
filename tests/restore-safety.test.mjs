@@ -115,6 +115,54 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
 }
 
 {
+  const validRelationshipsBackup = () => ({
+    format: "sindarealest-backup-v2",
+    products: [],
+    settings: {
+      showPrices: true, welcomeEnabled: true,
+      welcomeTitleLine1: "Xin chào", welcomeTitleLine2: "SinDarealest", welcomeText: "Chào mừng",
+    },
+    operations: {
+      customers: [
+        { id: "customer-1", full_name: "Nguyễn An", phone: "0900000001", email: "", address: "", created_at: "2026-01-01 00:00:00", updated_at: "2026-01-01 00:00:00" },
+        { id: "customer-2", full_name: "Nguyễn Bình", phone: "0900000002", email: "", address: "", created_at: "2026-01-01 00:00:00", updated_at: "2026-01-01 00:00:00" },
+      ],
+      orders: [
+        { id: "order-1", order_number: "ORD-0001", customer_id: "customer-1", status: "pending_confirmation", payment_status: "unpaid", subtotal: null, total: null, price_confirmation_required: 1, customer_note: "", created_at: "2026-01-01 00:00:00", updated_at: "2026-01-01 00:00:00" },
+        { id: "order-2", order_number: "ORD-0002", customer_id: "customer-2", status: "pending_confirmation", payment_status: "unpaid", subtotal: null, total: null, price_confirmation_required: 1, customer_note: "", created_at: "2026-01-01 00:00:00", updated_at: "2026-01-01 00:00:00" },
+      ],
+      orderItems: [
+        { id: "item-1", order_id: "order-1", product_id: "product-1", sku: "SD-SN001", title: "Giày một", quantity: 1, unit_price: null, line_total: null },
+        { id: "item-2", order_id: "order-2", product_id: "product-2", sku: "SD-SN002", title: "Giày hai", quantity: 1, unit_price: null, line_total: null },
+      ],
+      warranties: [], warrantyClaims: [], auditLogs: [],
+    },
+  });
+
+  const mismatchedWarranty = validRelationshipsBackup();
+  mismatchedWarranty.operations.warranties.push({
+    id: "warranty-1", order_id: "order-1", order_item_id: "item-2",
+    warranty_code: "WR-0001", policy_name: "Bảo hành thử", duration_months: 12,
+    starts_at: "2026-01-01", ends_at: "2027-01-01", status: "active", created_at: "2026-01-01 00:00:00",
+  });
+  const warrantyDB = makeDB();
+  const warrantyResponse = await restoreBackup({ request: request(mismatchedWarranty), env: { ...env, DB: warrantyDB } });
+  assert.equal(warrantyResponse.status, 400, "warranty order and order-item references must belong to the same order");
+  assert.equal(warrantyDB.batchCalls, 0, "mismatched warranty relationships must be rejected before writes");
+
+  const mismatchedClaim = validRelationshipsBackup();
+  mismatchedClaim.operations.warrantyClaims.push({
+    id: "claim-1", order_id: "order-1", customer_id: "customer-2",
+    warranty_code: "", message: "Yêu cầu kiểm tra", status: "received", admin_note: "",
+    created_at: "2026-01-01 00:00:00", updated_at: "2026-01-01 00:00:00",
+  });
+  const claimDB = makeDB();
+  const claimResponse = await restoreBackup({ request: request(mismatchedClaim), env: { ...env, DB: claimDB } });
+  assert.equal(claimResponse.status, 400, "warranty claim customer must match the order's customer");
+  assert.equal(claimDB.batchCalls, 0, "mismatched claim relationships must be rejected before writes");
+}
+
+{
   const db = makeDB({ failBatch: true });
   const response = await restoreBackup({
     request: request({ format: "sindarealest-backup-v1", products: [product()], settings: { showPrices: true } }),
