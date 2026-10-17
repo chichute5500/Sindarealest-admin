@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { parseCliJson, findNamedRecord, assertSafeName } from '../scripts/cloudflare-utils.mjs';
 
 const payload = parseCliJson('\nWrangler notice\n[{"name":"shop-prod","production_branch":"main"}]\nFinished listing projects.');
@@ -59,5 +62,28 @@ const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
 assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
 const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
 assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
+
+const guardDir = mkdtempSync(join(tmpdir(), 'sd-product-count-'));
+try {
+  const guardFile = join(guardDir, 'count.json');
+  const guardScript = new URL('../scripts/assert-product-count.mjs', import.meta.url).pathname;
+  const runGuard = (json, expected) => {
+    writeFileSync(guardFile, json);
+    return spawnSync(process.execPath, [guardScript, guardFile, String(expected)], { encoding: 'utf8' });
+  };
+  const zeroCount = runGuard('[{"results":[{"product_count":0}]}]', 0);
+  assert.equal(zeroCount.status, 0, 'Product count guard must accept an empty table before seed');
+  assert.match(zeroCount.stdout, /PASS: product_count=0/);
+  const seededCount = runGuard('[{"results":[{"product_count":235}]}]', 235);
+  assert.equal(seededCount.status, 0, 'Product count guard must accept exactly 235 seeded products');
+  const nonEmpty = runGuard('[{"results":[{"product_count":1}]}]', 0);
+  assert.notEqual(nonEmpty.status, 0, 'Product count guard must reject a non-empty target');
+  const missingCount = runGuard('[{"results":[{"total_products":235}]}]', 235);
+  assert.notEqual(missingCount.status, 0, 'Product count guard must fail closed when the count field is missing');
+  const malformed = runGuard('not-json', 0);
+  assert.notEqual(malformed.status, 0, 'Product count guard must fail closed on invalid JSON');
+} finally {
+  rmSync(guardDir, { recursive: true, force: true });
+}
 
 console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, private R2 readiness, guarded manual seed, and single-source catalog invariant.');
