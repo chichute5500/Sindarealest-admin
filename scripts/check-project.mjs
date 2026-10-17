@@ -129,6 +129,7 @@ const deployScript = existsSync(join(root, 'scripts/deploy-cloudflare.mjs')) ? r
 check(deployScript.includes('order_contact_details') && deployScript.includes("'d1', 'execute'") && deployScript.includes("'--remote'"), 'Deploy script phải xác minh read-only rằng migration order_contact_details đã có trong D1 trước khi deploy');
 const deployWorkflow = existsSync(join(root, '.github/workflows/deploy.yml')) ? readFileSync(join(root, '.github/workflows/deploy.yml'), 'utf8') : '';
 check(deployWorkflow.includes('CLOUDFLARE_D1_DATABASE: sindarealest-db'), 'Workflow deploy phải truyền đúng D1 database để kiểm tra schema');
+check(deployScript.includes('SELECT COUNT(*) AS missing_order_contact_snapshots') && !deployScript.includes('migrations', 'apply'), 'Deploy preflight phải chỉ đọc schema/dữ liệu, không tự chạy migration');
 const wranglerConfig = existsSync(join(root, 'wrangler.toml')) ? readFileSync(join(root, 'wrangler.toml'), 'utf8') : '';
 check(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Không được bật Wrangler production-config mode trước khi tải/đối chiếu config thật của Pages project');
 const ignore = existsSync(join(root, '.gitignore')) ? readFileSync(join(root, '.gitignore'), 'utf8') : '';
