@@ -197,7 +197,7 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
 
 {
   const db = makeDB();
-  const customers = Array.from({ length: 650 }, (_, index) => ({
+  const customers = Array.from({ length: 642 }, (_, index) => ({
     id: "customer-" + index,
     full_name: "Khách hàng " + index,
     phone: String(10000000000 + index),
