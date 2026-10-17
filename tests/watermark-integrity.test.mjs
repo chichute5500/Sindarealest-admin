@@ -65,7 +65,7 @@ assert.equal(privateMedia.status,404);
 
 const deploy=readFileSync(new URL('../scripts/deploy-cloudflare.mjs',import.meta.url),'utf8');
 const setup=readFileSync(new URL('../scripts/setup-cloudflare.mjs',import.meta.url),'utf8');
-const workflow=readFileSync('../.github/workflows/deploy.yml','utf8');
+const workflow=readFileSync(new URL('../.github/workflows/deploy.yml',import.meta.url),'utf8');
 assert.ok(deploy.includes("CLOUDFLARE_PAGES_ORIGINALS_READY !== 'true'"));
 assert.ok(setup.includes('originalsBucket === bucket'));
 assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'));
