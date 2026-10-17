@@ -3,6 +3,8 @@ import { rateLimitLogin } from "../functions/_lib.js";
 
 const secret = "admin-rate-limit-test-secret-with-sufficient-length";
 const state = new Map();
+let cleanupCalls = 0;
+let failCleanup = false;
 const windowMs = 15 * 60 * 1000;
 
 const DB = {
@@ -12,6 +14,13 @@ const DB = {
       sql,
       bind(...next) { values = next; return statement; },
       values: () => values,
+      async run() {
+        if (sql.includes("DELETE FROM admin_login_attempts")) {
+          cleanupCalls++;
+          if (failCleanup) throw new Error("simulated cleanup failure");
+        }
+        return { success: true, meta: { changes: 0 } };
+      },
     };
     return statement;
   },
@@ -54,6 +63,16 @@ try {
   current += windowMs + 1;
   const afterWindow = await rateLimitLogin(DB, request, secret);
   assert.equal(afterWindow.limited, false, "the counter should reset after 15 minutes");
+
+  // Expired per-IP rows are cleaned opportunistically, but a cleanup failure
+  // must not turn the login rate limiter into an outage.
+  let cleanupSecond = Math.floor(current / 1000);
+  while (cleanupSecond % 17 !== 0) cleanupSecond++;
+  current = cleanupSecond * 1000;
+  failCleanup = true;
+  const afterCleanupFailure = await rateLimitLogin(DB, request, secret);
+  assert.equal(afterCleanupFailure.limited, false, "cleanup failure must not reject a valid rate-limit check");
+  assert.equal(cleanupCalls, 1, "expired login rows should be cleaned on the opportunistic interval");
 
   const unverifiableDB = {
     prepare(sql) { return { sql, bind() { return this; } }; },
