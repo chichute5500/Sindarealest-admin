@@ -138,7 +138,7 @@ Hàm chuyển đổi sản phẩm trả trường `stock` từ D1 cả khi `publ
 
 **Đã sửa:** Khi tạo bản ghi cho public API, `stock` luôn trả `null`; trang admin vẫn nhận giá trị tồn kho thật. Regression test kiểm tra cả hai chế độ.
 
-### 17. API sản phẩm công khai không nên tiết lộ số lượng tồn kho nội bộ
+### 18. API sản phẩm công khai không nên tiết lộ số lượng tồn kho nội bộ
 **Mức độ:** Trung bình — quyền riêng tư vận hành.
 
 Bộ chuyển đổi bản ghi sản phẩm dùng chung có thể đưa trường `stock` ra phản hồi công khai khi chế độ xem công khai bật. Số tồn kho nội bộ không cần thiết cho trang khách hàng và có thể tiết lộ thông tin vận hành.
@@ -206,3 +206,13 @@ Các mảng backup JSON có thể chứa `null`, chuỗi hoặc mảng lồng th
 Trước khi sửa, endpoint kiểm tra token rồi mới chèn yêu cầu theo các bước tách rời; hai request đồng thời có thể cùng vượt qua bước kiểm tra trước khi token bị xóa.
 
 **Đã sửa trên nhánh rà soát:** câu lệnh tạo yêu cầu giờ chỉ chèn nếu token còn tồn tại và chưa hết hạn trong cùng D1 batch; xóa token, đính kèm và ghi audit chỉ diễn ra khi bản ghi yêu cầu thực sự được tạo. Nếu request thua cuộc đua, endpoint trả 409. Bổ sung regression test cho kết quả chèn thành công và token đã bị tiêu thụ.
+
+### Kiểm soát ngân sách tham số khi khôi phục backup
+**Mức độ:** Trung bình — tránh thất bại khôi phục ở batch lớn.
+
+Tài liệu Cloudflare D1 ghi nhận giới hạn khoảng 5.000 bindings cho một Workers script. Giới hạn 5.000 bản ghi backup trước đây không đảm bảo tổng số tham số bind của batch khôi phục vẫn nằm dưới giới hạn, vì mỗi hàng có thể cần từ 2 đến 13 tham số. Một backup có ít hơn 5.000 hàng vì vậy vẫn có thể thất bại khi restore.
+
+**Đã sửa trên nhánh rà soát:** tính tổng số tham số bind dự kiến trước khi tạo câu lệnh ghi và từ chối an toàn nếu vượt 4.500, để giữ khoảng dự phòng. Không gọi D1 batch và không xóa dữ liệu khi vượt giới hạn. Có regression test với 650 hồ sơ khách hàng xác nhận trả HTTP 413 trước khi ghi.
+
+Nguồn giới hạn: https://developers.cloudflare.com/d1/platform/limits/
+
