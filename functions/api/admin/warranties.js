@@ -1,4 +1,4 @@
-import { fail, getCurrentDateInVietnam, json, requireAdmin, warrantyStatusOnDate } from "../../_lib.js";
+import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin, warrantyStatusOnDate } from "../../_lib.js";
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
@@ -14,7 +14,10 @@ export async function onRequestGet(context) {
 }
 export async function onRequestPatch(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
-  let body; try { body = await context.request.json(); } catch { return fail("Dữ liệu cập nhật không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Dữ liệu cập nhật bảo hành vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu cập nhật không hợp lệ.");
+  const body = parsedBody.value;
   const id = String(body?.id || ""), status = String(body?.status || ""), note = String(body?.adminNote || "").trim().slice(0,1600);
   if (!id || !["received","reviewing","approved","rejected","resolved"].includes(status)) return fail("Trạng thái yêu cầu không hợp lệ.");
   try {
@@ -33,7 +36,10 @@ export async function onRequestPatch(context) {
 
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
-  let body; try { body = await context.request.json(); } catch { return fail("Thông tin cấp bảo hành không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Thông tin cấp bảo hành vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin cấp bảo hành không hợp lệ.");
+  const body = parsedBody.value;
   const orderNumber = String(body?.orderNumber || "").trim().toUpperCase();
   const sku = String(body?.sku || "").trim().toUpperCase();
   const policyName = String(body?.policyName || "").trim().slice(0,160);
