@@ -138,13 +138,6 @@ Hàm chuyển đổi sản phẩm trả trường `stock` từ D1 cả khi `publ
 
 **Đã sửa:** Khi tạo bản ghi cho public API, `stock` luôn trả `null`; trang admin vẫn nhận giá trị tồn kho thật. Regression test kiểm tra cả hai chế độ.
 
-### 18. API sản phẩm công khai không nên tiết lộ số lượng tồn kho nội bộ
-**Mức độ:** Trung bình — quyền riêng tư vận hành.
-
-Bộ chuyển đổi bản ghi sản phẩm dùng chung có thể đưa trường `stock` ra phản hồi công khai khi chế độ xem công khai bật. Số tồn kho nội bộ không cần thiết cho trang khách hàng và có thể tiết lộ thông tin vận hành.
-
-**Đã sửa:** `fromRow(..., { publicView: true })` luôn trả `stock: null`; chế độ admin vẫn giữ số lượng thật. Regression test xác nhận hai chế độ khác nhau. CI xanh tại [run 39046410365](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39046410365).
-
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
@@ -155,7 +148,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI xác nhận sau khi bổ sung kiểm tra fail-closed cho bộ đếm đăng nhập và cập nhật test mock đã pass ở [run 39046936948](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39046936948); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Bộ kiểm thử mới nhất cũng xác nhận số tồn kho nội bộ không được trả qua API công khai, nhưng vẫn giữ nguyên ở API quản trị. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
+CI mới nhất trên head PR đã pass toàn bộ các bước kiểm tra, kiểm thử và `npm audit` ở [run 39047908793](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39047908793); các kiểm thử nguồn/tích hợp, kiểm thử D1 migration cục bộ và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Bộ kiểm thử mới nhất cũng xác nhận số tồn kho nội bộ không được trả qua API công khai, nhưng vẫn giữ nguyên ở API quản trị. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production và không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
@@ -172,7 +165,7 @@ Restore có thể thay thế dữ liệu sản phẩm và, với bản backup c�
 
 ## Giới hạn kiểm tra
 
-Đã thực hiện kiểm tra HTTP chỉ đọc trên production ngày 2026-10-17: trang chủ tải được; `/api/products` trả danh mục 236 sản phẩm; `/api/settings` trả cài đặt; `robots.txt` và `sitemap.xml` đọc được (sitemap 237 URL); `/san-pham/SD-SN001` trả nội dung và metadata OG/canonical phù hợp. Đây là smoke check bên ngoài, không phải kiểm thử trình duyệt đầy đủ.
+Đã thực hiện kiểm tra HTTP chỉ đọc trên production ngày 2026-10-17 và chạy lại smoke check read-only:  trang chủ tải được; `/api/products` trả danh mục 236 sản phẩm; `/api/settings` trả cài đặt; `robots.txt` và `sitemap.xml` đọc được (sitemap 237 URL); `/san-pham/SD-SN001` trả nội dung và metadata OG/canonical phù hợp. Đây là smoke check bên ngoài, không phải kiểm thử trình duyệt đầy đủ.
 
 Kiểm tra không có cookie đăng nhập cho `/api/admin/session`, `/api/admin/products`, `/api/admin/backup` và `/api/admin/warranties` đều nhận HTTP 401 như mong đợi. Chưa thực hiện đăng nhập admin hoặc thao tác ghi/sửa/xóa đơn hàng, sản phẩm, bảo hành trên production; không xem được giá trị secrets/bindings riêng tư của Cloudflare. Chưa thể xác nhận các sửa đổi ở nhánh rà soát đã chạy trên production. Cần kiểm thử runtime và xác minh binding sau khi bản sửa được duyệt/triển khai; báo cáo không tuyên bố website đã hoàn thiện 100%.
 
@@ -216,3 +209,7 @@ Tài liệu Cloudflare D1 ghi nhận giới hạn khoảng 5.000 bindings cho m�
 
 Nguồn giới hạn: https://developers.cloudflare.com/d1/platform/limits/
 
+
+
+### Kiểm tra preview trong lượt rà soát mới nhất
+Thử đọc preview dự kiến `audit-full-review-2026-10-17.sindarealest2.pages.dev` không truy cập được vì lớp bảo vệ trả `login_required`; không có phiên đăng nhập/ quyền phù hợp để xác nhận giao diện preview bằng trình duyệt. Production tiếp tục trả dữ liệu danh mục/cài đặt, sitemap 237 URL và robots.txt; `/api/admin/session` không có cookie trả 401. Đây là kiểm tra chỉ đọc, không sửa dữ liệu. Việc kiểm thử E2E trên preview vẫn cần môi trường preview truy cập được và cấu hình binding phù hợp.
