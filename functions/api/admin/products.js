@@ -38,13 +38,13 @@ export async function onRequestPost(context) {
   const category = categories[normalized] || (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
   if (!category) return fail("Vui lòng chọn một danh mục hợp lệ trong danh sách.");
   try {
-    const rows = await context.env.DB.prepare("SELECT sku FROM products").all();
+    const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
     let max = 0;
     for (const row of rows.results || []) {
       const sku = String(row.sku || "").toUpperCase();
       if (!sku.startsWith(category[1])) continue;
       const suffix = sku.slice(category[1].length);
-      if (/^\d+$/.test(suffix)) max = Math.max(max, Number(suffix) || 0);
+      if (/^\d+$/.test(suffix)) { const number = Number(suffix); if (Number.isSafeInteger(number)) max = Math.max(max, number); }
     }
     body.sku = category[1] + String(max + 1).padStart(3, "0");
     body.category = category[0];
@@ -70,7 +70,7 @@ export async function onRequestPost(context) {
         return fail("Không thể cấp SKU duy nhất sau nhiều lần thử đồng thời. Hãy tải lại danh sách rồi thử lại.", 409);
       }
       try {
-        const rows = await context.env.DB.prepare("SELECT sku FROM products").all();
+        const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
         let max = 0;
         for (const row of rows.results || []) {
           const sku = String(row.sku || "").toUpperCase();
