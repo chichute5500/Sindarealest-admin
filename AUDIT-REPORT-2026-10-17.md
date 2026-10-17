@@ -151,7 +151,9 @@ Restore có thể thay thế dữ liệu sản phẩm và, với bản backup c�
 
 ## Giới hạn kiểm tra
 
-Đây là rà soát mã và workflow GitHub từ repository. Tôi không có bằng chứng xác nhận đã chạy kiểm thử HTTP/E2E trực tiếp trên phiên bản web đang phục vụ người dùng, và không xem được giá trị secrets của Cloudflare. Cần xác nhận runtime sau khi kiểm thử nhánh đề xuất; báo cáo này không tuyên bố website đã triển khai các sửa đổi.
+Đã thực hiện kiểm tra HTTP chỉ đọc trên production ngày 2026-10-17: trang chủ tải được; `/api/products` trả danh mục 236 sản phẩm; `/api/settings` trả cài đặt; `robots.txt` và `sitemap.xml` đọc được (sitemap 237 URL); `/san-pham/SD-SN001` trả nội dung và metadata OG/canonical phù hợp. Đây là smoke check bên ngoài, không phải kiểm thử trình duyệt đầy đủ.
+
+Chưa thực hiện đăng nhập admin hoặc thao tác ghi/sửa/xóa đơn hàng, sản phẩm, bảo hành trên production; không xem được giá trị secrets/bindings riêng tư của Cloudflare. Chưa thể xác nhận các sửa đổi ở nhánh rà soát đã chạy trên production. Cần kiểm thử runtime và xác minh binding sau khi bản sửa được duyệt/triển khai; báo cáo không tuyên bố website đã hoàn thiện 100%.
 
 ### Dependency/build integrity
 The audit also found that CI installed dependencies with `--no-audit --no-fund`, both primary workflows used old action versions that emitted a Node.js 20 deprecation warning, and the repository did not contain `package-lock.json`. On this review branch, the direct Wrangler dependency is pinned to `4.149.0`, GitHub Actions references are refreshed to `@v7`, and CI/deploy now run `npm audit --audit-level=high` after installation. **Remaining limitation:** no lockfile is committed yet, so npm can still resolve transitive dependencies to different versions on later runs. A checked-in, tested lockfile should be the next reproducibility improvement; do not claim fully reproducible builds until that is done.
