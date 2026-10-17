@@ -13,7 +13,7 @@ const PUSH_HOSTS = new Set([
 export function isTrustedPushEndpoint(value) {
   try {
     const url = new URL(String(value));
-    const host = url.hostname.toLowerCase().replace(/\\.$/, "");
+    const host = url.hostname.toLowerCase().replace(/\.$/, "");
     if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")) return false;
     return PUSH_HOSTS.has(host) ||
       host.endsWith(".notify.windows.com") ||
