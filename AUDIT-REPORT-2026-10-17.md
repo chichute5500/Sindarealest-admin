@@ -21,6 +21,23 @@ API quản trị lấy tối đa 1.000 đơn, rồi gọi thêm một truy vấn
 
 **Đã sửa:** Dùng CTE giới hạn 1.000 đơn trước, sau đó LEFT JOIN các dòng sản phẩm trong một truy vấn, nhóm kết quả theo ID đơn và giữ nguyên các giá chưa xác nhận ở dạng `null`. Đã thêm kiểm thử đảm bảo chỉ gọi D1 một lần và giữ đúng cấu trúc dữ liệu trả về.
 
+### 3. Đặt hàng công khai có thể ghi đè hồ sơ khách hàng
+**Mức độ:** Cao — tính toàn vẹn dữ liệu và quyền riêng tư.
+
+Trước đây API đặt hàng tìm hồ sơ bằng số điện thoại rồi cập nhật tên, email, địa chỉ và địa chỉ chi tiết mà không xác minh người gửi sở hữu số điện thoại. Người biết số điện thoại của khách có thể làm sai lệch hồ sơ khách hàng đang gắn với những đơn hàng/bảo hành khác.
+
+**Đã sửa trên nhánh rà soát:**
+- Không cập nhật hồ sơ khách hàng hiện có từ checkout công khai.
+- Tạo hồ sơ mới bằng `ON CONFLICT(phone) DO NOTHING`, rồi gắn đơn vào ID khách hàng thực tế bằng `INSERT ... SELECT` trong cùng D1 batch để xử lý cuộc gọi đồng thời có cùng số điện thoại.
+- Lưu tên, điện thoại và email tại thời điểm đặt hàng trong bảng riêng `order_contact_details`; trang quản trị đơn hàng, quản trị bảo hành và tra cứu bảo hành đọc thông tin của đơn cụ thể thay vì một hồ sơ có thể thay đổi.
+- Thêm migration `0007_order_contact_details.sql` để tạo bảng và backfill đơn cũ từ thông tin khách hàng hiện đang có.
+- Cập nhật backup/restore; bản backup v2 cũ chưa có bảng này vẫn được khôi phục bằng thông tin liên hệ khách hàng hiện có.
+- Thêm test hồi quy cho hành vi không ghi đè hồ sơ, lưu snapshot, truy vấn tra cứu bảo hành và backfill migration.
+
+**Giới hạn cần hiểu đúng:** Không có dữ liệu lịch sử riêng để khôi phục tên/điện thoại/email ban đầu trước khi xảy ra ghi đè; migration chỉ có thể lấy thông tin hiện đang lưu trong hồ sơ khách hàng để điền cho đơn cũ.
+
+**Điều kiện triển khai:** Phải sao lưu D1 và áp dụng migration 0007 thành công trước khi deploy phiên bản code tham chiếu bảng mới. Chưa chạy migration trên production trong đợt rà soát này.
+
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
