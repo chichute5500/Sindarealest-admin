@@ -73,7 +73,7 @@ Trước đây API quản trị chỉ cần URL bắt đầu bằng HTTPS để 
 
 Một số route trước đây gọi `request.json()` trực tiếp. Giới hạn số trường sau khi parse không ngăn được request có body rất lớn khiến Worker phải đọc và giải mã toàn bộ dữ liệu trước khi từ chối.
 
-**Đã sửa:** Thêm `readJsonBodyLimited()` đọc body theo luồng, kiểm tra `Content-Length` nếu có và vẫn áp giới hạn khi header thiếu/không đáng tin. Áp dụng cho tạo đơn hàng (64 KB), tra cứu bảo hành (4 KB), gửi yêu cầu bảo hành (8 KB), đăng nhập admin (4 KB), tạo mô tả AI (8 KB) và cập nhật đơn hàng admin (32 KB). Có test cho JSON hợp lệ, JSON hỏng, payload vượt giới hạn khai báo và payload vượt giới hạn thực tế.
+**Đã sửa:** Thêm `readJsonBodyLimited()` đọc body theo luồng, kiểm tra `Content-Length` nếu có và vẫn áp giới hạn khi header thiếu/không đáng tin. Áp dụng cho tạo đơn hàng (64 KB), tra cứu bảo hành (4 KB), gửi yêu cầu bảo hành (8 KB), đăng nhập admin (4 KB), tạo mô tả AI (8 KB), cập nhật đơn hàng admin (32 KB), tạo/sửa sản phẩm (32 KB), cài đặt (8 KB), thao tác bảo hành (8 KB), đăng ký push (8 KB), xóa đăng ký push (4 KB) và reset SKU (8 KB). Restore có parser riêng cùng giới hạn 20 MB. Có test cho JSON hợp lệ, JSON hỏng, payload vượt giới hạn khai báo/thực tế và xác nhận các route được áp dụng helper.
 
 ### 9. Backup phải đọc dữ liệu ở cùng một thời điểm
 **Mức độ:** Trung bình — tính nhất quán của bản sao lưu.
