@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import { onRequestGet } from "../functions/api/admin/image-groups.js";
+import { createSession } from "../functions/_lib.js";
+const ADMIN_PASSWORD="image-group-admin-password-test",SESSION_SECRET="image-group-session-secret-long-enough-for-test";
+const session=await createSession(SESSION_SECRET);
+const product={id:"p1",sku:"SD-SN001",title:"Sneaker test",images_json:JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp"])};
+const DB={prepare(sql){const st={sql,args:[],bind(...args){this.args=args;return this},async all(){if(sql.includes("SELECT id,sku,title,images_json FROM products"))return{results:[product]};if(sql.includes("SELECT id,image_a,image_b"))return{results:[]};return{results:[]}},async first(){return null},async run(){return{meta:{changes:0}}}};return st}};
+const IMAGES={async list(){return{objects:[{key:"12345678-1234-1234-1234-123456789012.webp",size:5000,uploaded:new Date("2026-01-01T00:00:00Z")},{key:"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.webp",size:6000}],truncated:false}}};
+const request=new Request("https://preview.example/api/admin/image-groups",{headers:{Cookie:"sd_admin_session="+session,Origin:"https://preview.example","Sec-Fetch-Site":"same-origin"}});
+const response=await onRequestGet({request,env:{DB,IMAGES,ADMIN_PASSWORD,SESSION_SECRET}});
+assert.equal(response.status,200);
+const body=await response.json();
+assert.equal(body.total,2);
+assert.equal(body.assignedCount,1);
+assert.equal(body.images.find(x=>x.key===product.images_json.match(/[a-f0-9-]{36}\.webp/)[0]).assignedTo[0].sku,"SD-SN001");
+const unauthorized=await onRequestGet({request:new Request("https://preview.example/api/admin/image-groups"),env:{DB,IMAGES,ADMIN_PASSWORD,SESSION_SECRET}});
+assert.equal(unauthorized.status,401);
+console.log("PASS: image grouping inventory requires admin auth and maps existing product image assignments without modifying products.");
