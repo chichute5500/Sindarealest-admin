@@ -72,6 +72,27 @@ const invalidInput = await generateDescription({
 });
 assert.equal(invalidInput.status, 400, "invalid product input must be rejected before invoking AI");
 
+const originalFetch = globalThis.fetch;
+let openAIRequest = null;
+try {
+  globalThis.fetch = async (url, init) => {
+    openAIRequest = { url: String(url), init };
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "Mô tả dự phòng từ OpenAI." } }],
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  const openAIFallback = await generateDescription({
+    request: request({ title: "Ví da", category: "Ví", facts: "Màu đen" }),
+    env: { ...env, OPENAI_API_KEY: "test-openai-key-that-is-long-enough" },
+  });
+  assert.equal(openAIFallback.status, 200, "OpenAI fallback should work when Workers AI binding is absent");
+  assert.equal((await openAIFallback.json()).description, "Mô tả dự phòng từ OpenAI.");
+  assert.equal(openAIRequest.url, "https://api.openai.com/v1/chat/completions");
+  assert.equal(openAIRequest.init.headers.Authorization, "Bearer test-openai-key-that-is-long-enough");
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
 const rateLimited = await generateDescription({
   request: request({ title: "Giày da", category: "Giày tây" }),
   env: {
