@@ -1,3 +1,4 @@
+/* Liquid Glass admin skin — rebuilt in an external stylesheet. */
 /* SinDarealest admin — clean Liquid Glass system */
 :root{color-scheme:dark;--bg:#090908;--paper:rgba(24,22,19,.88);--ink:#f4eee3;--muted:#c2b8a8;--line:rgba(220,197,158,.23);--gold:#dfbb78;--danger:#ef9a8c;--shadow:0 20px 60px rgba(0,0,0,.35);font-family:Inter,"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
 :root[data-admin-theme=dark]{color-scheme:light;--bg:#f4f0e9;--paper:rgba(255,253,249,.9);--ink:#24211c;--muted:#777166;--line:#dfd6c9;--gold:#ad8242;--danger:#a53d30;--shadow:0 14px 40px rgba(45,37,21,.1)}
