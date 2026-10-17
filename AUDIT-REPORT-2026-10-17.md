@@ -246,8 +246,10 @@ Rà soát giao diện phát hiện thẻ sản phẩm có nền bán trong suố
 ### Ranh giới xác minh trước khi phát hành
 
 - Mã nguồn và regression tests đã được kiểm tra trên nhánh audit; dependency audit hiện không báo lỗ hổng mức cao.
-- Chưa có bản preview của đúng commit được xác minh bằng trình duyệt thật. Không tự tạo deployment vì cấu hình nhánh production trong Cloudflare phải được xác nhận trước, tránh vô tình đưa nhánh thử lên production.
-- Chưa kiểm tra được các binding/secrets trong Cloudflare Dashboard từ GitHub; đặc biệt cần xác minh D1 migration 0007 và R2 `ORIGINALS` trước khi phát hành.
+- **D1 migration 0007:** đã áp dụng và hậu kiểm thành công trên Production qua workflow `39057640886`; website chưa được deploy.
+- **R2 bindings Production:** đã xác minh chỉ đọc qua workflow `39058074333`: Pages project `sindarealest2`, binding `IMAGES → sindarealest-images`, binding `ORIGINALS → sindarealest-original`; hai bucket tách biệt; `ORIGINALS` có r2.dev public access tắt và không có custom domain đang bật. Không có thao tác ghi vào R2.
+- Chưa có bản preview của đúng commit được xác minh bằng trình duyệt thật. Chưa bật cờ `CLOUDFLARE_PAGES_ORIGINALS_READY`; workflow deploy vì vậy tiếp tục bỏ qua bước deploy. Không bật cờ này hoặc triển khai Production nếu chưa có xác nhận rõ ràng.
+- Secrets/bindings riêng tư khác không được đọc ra; kiểm tra trên chỉ xác minh tên project/binding và trạng thái truy cập công khai của bucket.
 - Tệp backup JSON không chứa nội dung ảnh nhị phân của R2. Muốn có khả năng khôi phục đầy đủ phải sao lưu và kiểm tra phục hồi bucket R2 riêng.
 
 ### Kết quả smoke test chỉ đọc trên production
