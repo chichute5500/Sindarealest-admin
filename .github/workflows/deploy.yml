@@ -3,9 +3,9 @@ name: Deploy SinDarealest to Cloudflare Pages
 on:
   workflow_dispatch:
   push:
-    # Must match the currently verified Cloudflare Pages Production branch.
+    # Production is being consolidated onto main; deploy remains gated below.
     branches:
-      - fix/ai-review-quota-scope-2026-10-15
+      - main
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
       CLOUDFLARE_R2_READ_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
-      CLOUDFLARE_PAGES_BRANCH: fix/ai-review-quota-scope-2026-10-15
+      CLOUDFLARE_PAGES_BRANCH: main
       CLOUDFLARE_D1_DATABASE: sindarealest-db
       CLOUDFLARE_PAGES_ORIGINALS_READY: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY }}
 
@@ -51,6 +51,18 @@ jobs:
           test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
 
+      - name: Set Cloudflare Pages Production branch to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --fail --silent --show-error \
+            -X PATCH \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}" \
+            --data '{"production_branch":"main"}')"
+          printf '%s' "$response" | jq -e '.success == true and .result.production_branch == "main"' >/dev/null
+          echo "Cloudflare Pages Production branch is now main."
 
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
