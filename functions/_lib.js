@@ -28,10 +28,8 @@ export async function readBodyBytesLimited(request, maxBytes = 64 * 1024) {
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
   if (!request.body) return { error: "invalid" };
 
-  const initialCapacity = Number.isSafeInteger(declaredLength) && declaredLength > 0
-    ? Math.min(maxBytes, declaredLength)
-    : Math.min(maxBytes, 16 * 1024);
-  let buffer = new Uint8Array(initialCapacity);
+  // Do not allocate based on an untrusted Content-Length; grow only as bytes arrive.
+  let buffer = new Uint8Array(Math.min(maxBytes, 16 * 1024));
   let total = 0;
   const reader = request.body.getReader();
   try {
