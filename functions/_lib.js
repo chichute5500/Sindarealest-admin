@@ -288,7 +288,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     categoryLabel: row.category_label || row.category,
     description: row.description || "",
     price: !publicView || showPrices ? price : null,
-    stock: row.stock === null || row.stock === undefined ? null : Number(row.stock),
+    stock: publicView || row.stock === null || row.stock === undefined ? null : Number(row.stock),
     published: Number(row.published) === 1,
     images: parseImages(row.images_json),
     sourcePriceConfirmed: Number(row.source_price_confirmed) === 1,
