@@ -6,6 +6,7 @@ export async function onRequestPost({request,env}){
  try{const lim=await rateLimitPublicRequest(env,request,"warranty_claim",3,900);if(lim.limited)return fail("Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi 15 phút.",429,{"Retry-After":"900"})}catch{return fail("Dịch vụ tiếp nhận yêu cầu chưa sẵn sàng.",503)}
  let body;try{body=await request.json()}catch{return fail("Thông tin yêu cầu bảo hành không hợp lệ.")}
  const claimToken=clean(body?.claimToken,64).toLowerCase(),issueType=clean(body?.issueType,30),contactPhone=clean(body?.contactPhone,24),description=clean(body?.message,1400),imageKey=clean(body?.imageKey,100);
+ if(!claimToken)return fail("Hãy tra cứu bảo hành thành công trước khi gửi yêu cầu.",403);
  let warrantyCode=clean(body?.warrantyCode,100).toUpperCase(),tokenWarrantyId="";
  if(claimToken){
   if(!/^[0-9a-f]{32}$/.test(claimToken))return fail("Phiên tra cứu bảo hành không hợp lệ.");
