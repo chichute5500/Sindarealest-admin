@@ -55,10 +55,17 @@ export async function onRequestPost(context) {
     if (item.existingWarrantyId) return fail("Sản phẩm này trong đơn đã có mã bảo hành.",409);
     if (item.status !== "completed") return fail("Chỉ phát hành bảo hành sau khi đơn hàng đã được đánh dấu hoàn tất.",409);
     const id = crypto.randomUUID(), warrantyCode = `SDW-${crypto.randomUUID().replaceAll("-","").slice(0,24).toUpperCase()}`;
-    await context.env.DB.batch([
-      context.env.DB.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) VALUES(?,?,?,?,?,?,?,?, 'active')").bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10)),
-      context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'warranty_issued', 'warranty', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ orderNumber,sku,policyName,months,startsAt,endsAt:endDate.toISOString().slice(0,10) }))
+    const issued = await context.env.DB.batch([
+      context.env.DB.prepare(
+        "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
+        "SELECT ?,?,?,?,?,?,?,?,'active' WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=?)",
+      ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),item.itemId),
+      context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)",
+      ).bind(crypto.randomUUID(),id,JSON.stringify({ orderNumber,sku,policyName,months,startsAt,endsAt:endDate.toISOString().slice(0,10) }),id),
     ]);
+    if (!issued[0]?.meta?.changes) return fail("Sản phẩm này trong đơn đã được cấp mã bảo hành.",409);
     return json({ ok:true,warrantyCode,message:"Đã phát hành mã bảo hành. Hãy cung cấp mã này cho khách hàng qua kênh liên hệ an toàn." },201);
   } catch { return fail("Không thể phát hành bảo hành. Hãy kiểm tra migration 0003 và dữ liệu đơn hàng.",503); }
 }
