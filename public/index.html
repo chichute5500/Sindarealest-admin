@@ -694,7 +694,7 @@ function setFullscreenPhoto(src,direction='left',instant=false){
 function renderFullscreenThumbs(){
  const tray=$('#sdFullscreenThumbs');
  if(!tray)return;
- tray.innerHTML=detailImages.map((src,i)=>'<button type="button" class="sd-fullscreen-thumb tap-target'+(i===detailIndex?' active':'')+'" data-full-thumb="'+i+'" aria-label="Xem ảnh '+(i+1)+'" aria-current="'+(i===detailIndex?'true':'false')+'"><img src="'+imgPath(src)+'" alt="" loading="lazy" decoding="async"></button>').join('');
+ tray.innerHTML=detailImages.map((src,i)=>'<button type="button" class="sd-fullscreen-thumb tap-target'+(i===detailIndex?' active':'')+'" data-full-thumb="'+i+'" aria-label="Xem ảnh '+(i+1)+'" aria-current="'+(i===detailIndex?'true':'false')+'"><img src="'+escapeHtml(imgPath(src))+'" alt="" loading="lazy" decoding="async"></button>').join('');
  const active=tray.querySelector('.active');if(active)active.scrollIntoView({block:'nearest',inline:'center'});
 }
 function openFullscreenImage(){
