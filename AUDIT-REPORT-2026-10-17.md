@@ -103,6 +103,13 @@ Backup/restore trước đây không có cùng giới hạn tổng bản ghi và
 
 **Đã sửa:** Backup và restore thống nhất giới hạn tối đa 20 MB và tổng 5.000 bản ghi. Restore đọc JSON theo luồng và từ chối payload quá lớn. Backup đếm tổng bản ghi trong cùng D1 batch trước; mỗi truy vấn bảng chỉ trả dữ liệu nếu tổng nằm trong ngân sách, tránh nạp hàng chục nghìn dòng vào bộ nhớ rồi mới từ chối. Có regression test cho giới hạn tổng bản ghi và giới hạn từng truy vấn.
 
+### 13. Cấp SKU khi thêm sản phẩm cần giới hạn phạm vi và kiểm tra số an toàn
+**Mức độ:** Thấp–trung bình — hiệu năng và khả năng phục hồi khi dữ liệu SKU bất thường.
+
+Luồng thêm sản phẩm trước đây đọc toàn bộ cột SKU để tìm số lớn nhất của một danh mục. Khi catalog lớn hơn, truy vấn đọc nhiều dữ liệu không liên quan; hậu tố SKU bị hỏng/quá lớn cũng có thể tạo phép tính số không an toàn.
+
+**Đã sửa:** Chỉ đọc SKU khớp prefix danh mục đang thêm và chỉ dùng hậu tố nếu `Number.isSafeInteger()` hợp lệ. Giữ vòng retry khi hai admin cùng cấp một SKU; kiểm thử đồng thời vẫn pass.
+
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
@@ -113,7 +120,7 @@ Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản r
 ## Các kiểm tra/điểm vận hành cần chú ý
 
 ### Trạng thái deploy
-CI mới nhất trên nhánh rà soát đã pass ở [run 39043429625](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39043429625); các kiểm thử nguồn/tích hợp và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không có nghĩa production đã được cập nhật.
+CI mới nhất trên nhánh rà soát đã pass ở [run 39043667254](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39043667254); các kiểm thử nguồn/tích hợp và regression tests mới đều xanh, `npm audit` báo 0 vulnerability trong dependency graph đã cài ở lần chạy đó. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không phải kiểm thử E2E production. Đây chỉ xác nhận mã nguồn/test trên nhánh rà soát, không có nghĩa production đã được cập nhật.
 
 Workflow gần nhất `39037562800` trên commit gốc cho kết quả tổng thể xanh, nhưng bước **Deploy to verified Pages project** bị **skipped** vì biến repo `CLOUDFLARE_PAGES_ORIGINALS_READY` không bằng `true`. Do đó không được diễn giải kết quả workflow đó là đã triển khai mã mới lên web chính. Giữ cổng bảo vệ này cho tới khi chủ dự án quyết định rõ việc bật deploy.
 
