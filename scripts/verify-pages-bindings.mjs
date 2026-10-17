@@ -37,6 +37,13 @@ export async function fetchProductionPagesProject({ accountId, projectName, apiT
   return payload.result;
 }
 
+export function getR2ReadToken(env = process.env) {
+  if (!env.CLOUDFLARE_R2_READ_API_TOKEN) {
+    throw new Error('Thiếu CLOUDFLARE_R2_READ_API_TOKEN để xác minh quyền riêng tư R2.');
+  }
+  return env.CLOUDFLARE_R2_READ_API_TOKEN;
+}
+
 export function assertPrivateR2Access(access) {
   if (!access || typeof access.r2devEnabled !== 'boolean' || !Array.isArray(access.customDomains) ||
       !access.customDomains.every((domain) => domain && typeof domain.enabled === 'boolean')) {
@@ -83,7 +90,7 @@ async function main() {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     bucketName: result.originalsBucket,
     // R2 domain settings require R2 Read scope; keep this separate from the Pages token.
-    apiToken: process.env.CLOUDFLARE_R2_READ_API_TOKEN,
+    apiToken: getR2ReadToken(),
   });
   const privacy = assertPrivateR2Access(access);
   console.log(`Đã xác minh Production bindings: IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Public access ORIGINALS: r2.dev tắt, ${privacy.enabledCustomDomains} custom domain công khai đang bật.`);
