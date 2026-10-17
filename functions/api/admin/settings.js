@@ -1,4 +1,4 @@
-import { fail, getSetting, json, requireAdmin } from "../../_lib.js";
+import { fail, getSetting, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 import { WATERMARK_DEFAULTS, normalizeWatermarkSettings, validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
 const welcomeDefaults = {
@@ -34,8 +34,10 @@ export async function onRequestGet(context) {
 export async function onRequestPut(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  let body;
-  try { body = await context.request.json(); } catch { return fail("Cài đặt không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsedBody.error === "too_large") return fail("Cài đặt vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Cài đặt không hợp lệ.");
+  const body = parsedBody.value;
   const updates = [];
 
   if (body?.showPrices !== undefined) {
