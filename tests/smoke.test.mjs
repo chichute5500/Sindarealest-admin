@@ -281,18 +281,23 @@ const backupSettingValues = new Map([
   ['watermark_opacity','73'],
 ]);
 const backupDB = {
+  batchCalls: 0,
   prepare(sql) {
     let bound = [];
     const statement = {
+      sql,
       bind(...values) { bound = values; return statement; },
-      async first() {
-        if (!sql.includes('FROM settings')) return null;
-        const value = backupSettingValues.get(bound[0]);
-        return value === undefined ? null : { value };
-      },
-      async all() { return { results: [] }; },
+      boundValues() { return bound; },
     };
     return statement;
+  },
+  async batch(statements) {
+    this.batchCalls++;
+    return statements.map((statement) => ({
+      results: statement.sql.includes('FROM settings')
+        ? [...backupSettingValues.entries()].map(([key, value]) => ({ key, value }))
+        : [],
+    }));
   },
 };
 const backupResponse = await createAdminBackup({
@@ -308,3 +313,4 @@ assert.equal(exportedBackup.settings.watermarkEnabled, false);
 assert.equal(exportedBackup.settings.watermarkPosition, 'top-left');
 assert.equal(exportedBackup.settings.watermarkSize, 24);
 assert.equal(exportedBackup.settings.watermarkOpacity, 73);
+assert.equal(backupDB.batchCalls, 1, 'backup must read tables and settings from one D1 batch snapshot');
