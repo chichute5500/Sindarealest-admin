@@ -89,7 +89,14 @@ Trước đây mã chỉ kiểm tra kích thước `File` sau khi `request.formD
 
 **Đã sửa:** Đọc multipart theo luồng với trần 6 MB và từ chối ngay khi tổng byte vượt giới hạn, kể cả khi request không có `Content-Length`; chỉ sau khi body nằm trong giới hạn mới tái tạo request và gọi `formData()`. Giới hạn ảnh thực tế vẫn là 5 MB và vẫn kiểm tra chữ ký RIFF/WEBP. Regression test bao gồm cả header khai báo quá lớn lẫn body stream quá lớn không có header.
 
-### 11. Giới hạn kích thước và số bản ghi khi khôi phục backup
+### 11. Upload ảnh sản phẩm quản trị cũng cần giới hạn multipart trước khi parse
+**Mức độ:** Trung bình — bảo vệ bộ nhớ khi tải ảnh sản phẩm lên từ admin.
+
+Route upload ảnh sản phẩm trước đây gọi `formData()` trước khi kiểm tra giới hạn 5 MB cho ảnh hiển thị và 20 MB cho ảnh gốc. Vì vậy một multipart body quá lớn vẫn có thể bị đọc/phân tích trước khi kiểm tra kích thước từng tệp.
+
+**Đã sửa:** Dùng chung `readBodyBytesLimited()` với trần tổng multipart 26 MB, bao gồm cả request không có `Content-Length`; chỉ sau khi nằm trong giới hạn mới parse form data. Kiểm tra riêng kích thước ảnh hiển thị/ảnh gốc và chữ ký WebP vẫn được giữ nguyên.
+
+### 12. Giới hạn kích thước và số bản ghi khi khôi phục backup
 **Mức độ:** Trung bình — độ ổn định của Worker và D1.
 
 Backup/restore trước đây không có cùng giới hạn tổng bản ghi và kích thước: backup có thể xuất một tệp lớn hơn khả năng khôi phục an toàn, trong khi restore cho phép tới 20.000 bản ghi ở từng mảng riêng lẻ. Tệp lớn có thể khiến Worker phải tạo batch khổng lồ hoặc vượt thời gian/giới hạn tài nguyên.
