@@ -33,7 +33,7 @@ assert.ok(lib.includes("const SESSION_SECONDS = 10 * 60"), "Session should expir
 assert.ok(middleware.includes("sessionCookie(token)"), "Valid admin API activity should renew session cookie");
 assert.ok(products.includes("SELECT sku FROM products"), "SKU generation should use server-side database data");
 assert.ok(admin.includes("data-image-index") && admin.includes("text/x-sd-image-index"), "Admin gallery should support drag-and-drop reordering");
-assert.ok(admin.includes("Liquid Glass admin skin"), "Admin should use the matching Liquid Glass visual system");
+assert.ok(adminCss.includes("Liquid Glass admin skin") && adminCss.includes("backdrop-filter:blur(22px)"), "Admin should use the matching Liquid Glass visual system");
 assert.ok(admin.includes('<svg viewBox="0 0 24 24" aria-hidden="true">'), "Admin navigation should use consistent line icons");
 assert.ok(middleware.includes("lower(id)=?"), "Product URLs should support immutable IDs");
 assert.ok(products.includes("makeCategoryPrefix(normalized)"), "New categories should receive automatic SKU prefixes without a hardcoded category list");
