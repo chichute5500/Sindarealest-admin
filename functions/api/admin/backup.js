@@ -1,4 +1,5 @@
 import { fail, fromRow, getSetting, json, requireAdmin } from "../../_lib.js";
+import { WATERMARK_DEFAULTS, normalizeWatermarkSettings } from "../../_lib/watermark-settings.js";
 
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
@@ -10,6 +11,7 @@ export async function onRequestGet(context) {
       customers, orders, orderItems, warranties, warrantyClaims, auditLogs,
       customerAddressDetails, orderShippingAddresses, orderItemDetails, warrantyClaimAttachments,
       showPrices, welcomeEnabled, welcomeTitleLine1, welcomeTitleLine2, welcomeText,
+      watermarkEnabled, watermarkPosition, watermarkSize, watermarkOpacity,
     ] = await Promise.all([
       db.prepare("SELECT * FROM customers ORDER BY created_at,id").all(),
       db.prepare("SELECT * FROM orders ORDER BY created_at,id").all(),
@@ -26,11 +28,31 @@ export async function onRequestGet(context) {
       getSetting(db, "welcome_title_line_1", "Đẳng cấp thật."),
       getSetting(db, "welcome_title_line_2", "Từ chất liệu thật."),
       getSetting(db, "welcome_text", "Từ vân da tự nhiên đến từng đường nét hoàn thiện, mỗi thiết kế được chăm chút để tôn lên chất liệu và phong cách riêng của người sở hữu."),
+      getSetting(db, "watermark_enabled", WATERMARK_DEFAULTS.watermark_enabled),
+      getSetting(db, "watermark_position", WATERMARK_DEFAULTS.watermark_position),
+      getSetting(db, "watermark_size", WATERMARK_DEFAULTS.watermark_size),
+      getSetting(db, "watermark_opacity", WATERMARK_DEFAULTS.watermark_opacity),
     ]);
+    const watermark = normalizeWatermarkSettings({
+      watermark_enabled: watermarkEnabled,
+      watermark_position: watermarkPosition,
+      watermark_size: watermarkSize,
+      watermark_opacity: watermarkOpacity,
+    });
     return json({
       format: "sindarealest-backup-v2",
       createdAt: new Date().toISOString(),
-      settings: { showPrices: showPrices === "1", welcomeEnabled: welcomeEnabled === "1", welcomeTitleLine1, welcomeTitleLine2, welcomeText },
+      settings: {
+        showPrices: showPrices === "1",
+        welcomeEnabled: welcomeEnabled === "1",
+        welcomeTitleLine1,
+        welcomeTitleLine2,
+        welcomeText,
+        watermarkEnabled: watermark.watermarkEnabled,
+        watermarkPosition: watermark.watermarkPosition,
+        watermarkSize: watermark.watermarkSize,
+        watermarkOpacity: watermark.watermarkOpacity,
+      },
       products: (productRows.results || []).map(row => fromRow(row)),
       operations: {
         customers: customers.results || [],
