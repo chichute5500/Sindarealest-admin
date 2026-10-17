@@ -54,6 +54,16 @@ try {
   current += windowMs + 1;
   const afterWindow = await rateLimitLogin(DB, request, secret);
   assert.equal(afterWindow.limited, false, "the counter should reset after 15 minutes");
+
+  const unverifiableDB = {
+    prepare(sql) { return { sql, bind() { return this; } }; },
+    async batch() { return [{ success: true }, { success: true, results: [] }]; },
+  };
+  await assert.rejects(
+    rateLimitLogin(unverifiableDB, request, secret),
+    /login rate-limit counter could not be verified/i,
+    "a missing login counter result must fail closed instead of admitting an attempt",
+  );
 } finally {
   Date.now = oldNow;
 }
