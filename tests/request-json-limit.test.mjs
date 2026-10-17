@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { readJsonBodyLimited } from "../functions/_lib.js";
+import { readBodyBytesLimited, readJsonBodyLimited } from "../functions/_lib.js";
 
 const valid = await readJsonBodyLimited(new Request("https://shop.example/api/test", {
   method: "POST",
@@ -29,6 +29,14 @@ const streamedTooLarge = await readJsonBodyLimited(new Request("https://shop.exa
 assert.equal(streamedTooLarge.error, "too_large",
   "payloads without a trustworthy Content-Length must still be bounded while streaming");
 
+const binaryTooLarge = await readBodyBytesLimited(new Request("https://shop.example/api/test", {
+  method: "POST",
+  headers: { "Content-Type": "application/octet-stream" },
+  body: new Uint8Array(2048),
+}), 1024);
+assert.equal(binaryTooLarge.error, "too_large",
+  "shared binary body reader must cap streams without Content-Length");
+
 const invalid = await readJsonBodyLimited(new Request("https://shop.example/api/test", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -55,4 +63,12 @@ for (const path of boundedRoutes) {
   assert.match(source, /readJsonBodyLimited/,
     path + " must use the shared bounded JSON parser");
 }
-console.log("PASS: bounded JSON parser rejects oversized request bodies before unbounded buffering.");
+for (const path of [
+  "../functions/api/admin/upload.js",
+  "../functions/api/warranty-claim-uploads.js",
+]) {
+  const source = readFileSync(new URL(path, import.meta.url), "utf8");
+  assert.match(source, /readBodyBytesLimited/,
+    path + " must use the shared streaming body size limit");
+}
+console.log("PASS: bounded JSON and multipart parsers reject oversized request bodies before unbounded buffering.");
