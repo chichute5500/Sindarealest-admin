@@ -131,6 +131,25 @@ const oversizedUpload = await uploadWarrantyPhoto({
 });
 assert.equal(oversizedUpload.status, 413, "oversized declared multipart requests must be rejected before form parsing");
 
+const streamedOversizedUploadRequest = new Request("https://shop.example/api/warranty-claim-uploads", {
+  method: "POST",
+  headers: {
+    Origin: "https://shop.example",
+    "CF-Connecting-IP": "198.51.100.22",
+    "Content-Type": "multipart/form-data; boundary=test-boundary",
+  },
+  body: new Uint8Array(6 * 1024 * 1024 + 1),
+});
+assert.equal(streamedOversizedUploadRequest.headers.has("Content-Length"), false,
+  "streaming limit regression must exercise requests without Content-Length");
+const streamedOversizedUpload = await uploadWarrantyPhoto({
+  request: streamedOversizedUploadRequest,
+  env: { DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() },
+});
+assert.equal(streamedOversizedUpload.status, 413,
+  "oversized multipart requests without Content-Length must be rejected while streaming");
+
+
 
 const upload = await submitPhoto({ DB: db, ORIGINALS: originals, IMAGES: images });
 assert.equal(upload.status, 201, "photo uploads should succeed when private ORIGINALS is configured");
