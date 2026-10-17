@@ -1,0 +1,114 @@
+name: Export production D1 backup (manual, no deploy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_target:
+        description: 'Type exactly: BACKUP sindarealest-db'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-d1-backup
+  cancel-in-progress: false
+
+jobs:
+  export-d1:
+    if: ${{ inputs.confirm_target == 'BACKUP sindarealest-db' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      D1_DATABASE_ID: f6c208a1-052a-445c-a3b7-a442783f9bd3
+      D1_DATABASE_NAME: sindarealest-db
+
+    steps:
+      - name: Verify credentials and exact D1 target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          node --input-type=module <<'NODE'
+          const { CLOUDFLARE_API_TOKEN: token, CLOUDFLARE_ACCOUNT_ID: account, D1_DATABASE_ID: id, D1_DATABASE_NAME: name } = process.env;
+          const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || !j.success || j.result?.uuid !== id || j.result?.name !== name) {
+            throw new Error('Cloudflare did not confirm the exact expected D1 database. Backup stopped.');
+          }
+          console.log('Exact target D1 database verified; no data has been changed.');
+          NODE
+
+      - name: Export full D1 SQL and poll until complete
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { writeFile, mkdir } from 'node:fs/promises';
+          import { setTimeout as sleep } from 'node:timers/promises';
+
+          const token = process.env.CLOUDFLARE_API_TOKEN;
+          const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+          const id = process.env.D1_DATABASE_ID;
+          const base = `https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/${id}/export`;
+          const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+          async function call(body) {
+            const response = await fetch(base, { method: 'POST', headers, body: JSON.stringify(body) });
+            const json = await response.json().catch(() => ({}));
+            if (!response.ok || !json.success) {
+              throw new Error(`D1 export API request failed (HTTP ${response.status}); details intentionally not printed.`);
+            }
+            return json.result ?? {};
+          }
+
+          let state = await call({ output_format: 'polling' });
+          const deadline = Date.now() + 15 * 60 * 1000;
+          while (state.status !== 'complete' && state.status !== 'error') {
+            if (state.status === 'error') throw new Error('Cloudflare reported D1 export failure.');
+            if (!state.at_bookmark) throw new Error('Cloudflare did not return a polling bookmark; export stopped safely.');
+            if (Date.now() >= deadline) throw new Error('D1 export exceeded the 15-minute safety limit. Check Cloudflare status before retrying.');
+            await sleep(2000);
+            state = await call({ output_format: 'polling', current_bookmark: state.at_bookmark });
+          }
+
+          if (state.status === 'error' || state.error) {
+            throw new Error('Cloudflare reported D1 export failure. Sensitive response details were not printed.');
+          }
+          const signedUrl = state.result?.signed_url;
+          if (!signedUrl || typeof signedUrl !== 'string') throw new Error('Export completed without a download URL.');
+
+          const download = await fetch(signedUrl);
+          if (!download.ok) throw new Error(`SQL download failed (HTTP ${download.status}).`);
+          const bytes = new Uint8Array(await download.arrayBuffer());
+          if (bytes.byteLength < 100) throw new Error('Export file is unexpectedly small; refusing to publish an artifact.');
+          const sql = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+          if (!/CREATE TABLE/i.test(sql) || !/INSERT INTO|INSERT OR/i.test(sql)) {
+            throw new Error('Export does not appear to contain both schema and data; refusing to publish an artifact.');
+          }
+
+          const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const path = `backup/sindarealest-db-${stamp}.sql`;
+          await mkdir('backup', { recursive: true });
+          await writeFile(path, bytes, { flag: 'wx' });
+          console.log(`Verified full SQL export: ${path}; ${bytes.byteLength} bytes. Data contents are not printed.`);
+          NODE
+
+      - name: Store private short-lived backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sindarealest-d1-backup
+          path: backup/*.sql
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Report completion without exposing database contents
+        run: echo "D1 SQL export validated and uploaded as a short-lived Actions artifact. Download it and store it privately."
