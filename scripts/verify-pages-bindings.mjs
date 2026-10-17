@@ -82,7 +82,8 @@ async function main() {
   const access = await fetchR2BucketPublicAccess({
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     bucketName: result.originalsBucket,
-    apiToken: process.env.CLOUDFLARE_API_TOKEN,
+    // R2 domain settings require R2 Read scope; keep this separate from the Pages token.
+    apiToken: process.env.CLOUDFLARE_R2_READ_API_TOKEN,
   });
   const privacy = assertPrivateR2Access(access);
   console.log(`Đã xác minh Production bindings: IMAGES → ${result.imagesBucket}; ORIGINALS → ${result.originalsBucket}. Public access ORIGINALS: r2.dev tắt, ${privacy.enabledCustomDomains} custom domain công khai đang bật.`);
