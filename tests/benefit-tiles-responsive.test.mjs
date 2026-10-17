@@ -51,14 +51,17 @@ const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,6
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
 const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
-assert.ok(stripRule.includes('background:var(--glass)'),
-  'The outer section must reuse the same glass background as the order-assurance cards.');
-assert.ok(stripRule.includes('border:1px solid var(--line)'),
-  'The outer section must reuse the shared theme border.');
-assert.ok(stripRule.includes('box-shadow:inset 0 1px rgba(255,255,255,.29),0 12px 34px rgba(0,0,0,.055)'),
-  'The outer section must match the shared glass elevation.');
-assert.match(stripRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
-  'The outer section must keep the site Liquid Glass blur.');
+const sharedGlassRule = html.match(/\.glass\{([^}]*)\}/)?.[1] || '';
+assert.ok(html.includes('<div class="service-strip glass">'),
+  'The outer section must use the same .glass class as the order-assurance cards.');
+assert.ok(!/(?:^|;)\s*(?:background|border|backdrop-filter|-webkit-backdrop-filter|box-shadow):/.test(stripRule),
+  'The outer section must not redeclare or drift away from the authoritative shared glass treatment.');
+assert.ok(sharedGlassRule.includes('background:var(--glass)') && sharedGlassRule.includes('border:1px solid var(--line)'),
+  'The outer section must inherit the same theme background and border as the order-assurance cards.');
+assert.match(sharedGlassRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
+  'The outer section must inherit the site Liquid Glass blur.');
+assert.ok(sharedGlassRule.includes('box-shadow:inset 0 1px 0 rgba(255,255,255,.29),0 12px 34px rgba(0,0,0,.055)'),
+  'The outer section must inherit the shared glass elevation.');
 assert.match(css, /\.service-strip \.service-copy\{[^}]*border-radius:999px/,
   'The inner surface must be a compact pill, not a rectangle.');
 assert.doesNotMatch(css, /aspect-ratio:(?:2\.75|3\.5|2\.4|2\.25)\s*\/\s*1/,
@@ -72,18 +75,30 @@ assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?\
 assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-text strong\{font-size:11\.4px[\s\S]*?\.service-strip \.service-text small\{font-size:9\.84px/,
   'Mobile text must retain the 20% increase.');
 
-assert.ok(css.includes('background:var(--panel-strong)'),
-  'Tile glass must use the slightly more opaque theme-aware panel surface.');
-assert.ok(css.includes('box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(34,40,46,.12)'),
-  'Tile glass must have layered elevation and highlight.');
-assert.ok(css.includes('border:1px solid rgba(255,255,255,.82)'),
-  'Tile glass must keep a brighter, clearly visible border.');
-assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(18px\);-webkit-backdrop-filter:blur\(18px\)/,
-  'The shared surface must match the CTA blur treatment.');
+assert.ok(css.includes('background:var(--benefit-tile-glass)'),
+  'The inner face must use a dedicated per-theme glass gradient, not the generic near-black dark panel.');
+assert.ok(css.includes('box-shadow:var(--benefit-tile-shadow)') && css.includes('box-shadow:var(--benefit-tile-hover-shadow)'),
+  'Tile glass must use layered elevation/highlight and a stronger hover lift.');
+assert.ok(css.includes('border:1px solid var(--benefit-tile-border)'),
+  'Tile glass must use a brighter theme-specific border.');
+assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\(22px\) saturate\(160%\);-webkit-backdrop-filter:blur\(22px\) saturate\(160%\)/,
+  'The inner surface must have its own stronger frosted-glass blur and saturation.');
+const lightThemeTokens = html.match(/:root\{([^}]*)\}/)?.[1] || '';
+const darkThemeTokens = html.match(/html\.dark\{([^}]*)\}/)?.[1] || '';
+assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(255,255,255,\.78\)/,
+  'Light theme must provide a bright, translucent warm-glass surface.');
+assert.match(darkThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(104,100,92,\.94\)/,
+  'Dark theme must provide a lighter, high-opacity glass surface instead of a near-black transparent-looking panel.');
+assert.match(lightThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.94\)/,
+  'Light theme must retain a clear glass rim.');
+assert.match(darkThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.78\)/,
+  'Dark theme must retain a visible glass rim.');
+assert.ok(!css.includes('var(--panel-strong)'),
+  'Benefit tile opacity must not be tied to the generic panel token, which is too dark in dark mode.');
 assert.match(css, /\.service-strip \.service-icon\{[\s\S]*?background:transparent;box-shadow:none/,
   'Icons must not introduce a second background panel.');
 assert.doesNotMatch(css, /\.service-strip \.service-copy::before|--service-copy-bg|html\.dark/,
-  'Avoid the prior competing overlay and theme-specific surface colors.');
+  'Keep theme variants in shared root tokens rather than competing late CSS selectors or extra overlays.');
 assert.match(css, /grid-template-columns:repeat\(6,minmax\(0,1fr\)/,
   'Desktop must use six equal columns.');
 assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)/,
