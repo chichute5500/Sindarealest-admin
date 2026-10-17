@@ -239,7 +239,13 @@ export async function rateLimitPublicRequest(env, request, scope, maxAttempts = 
       "window_start=excluded.window_start").bind(scope,ipHash,windowStart),
     env.DB.prepare("SELECT attempts FROM public_rate_limits WHERE scope=? AND ip_hash=? LIMIT 1").bind(scope,ipHash),
   ]);
-  const attempts = Number(results?.[1]?.results?.[0]?.attempts || 0);
+  const attempts = Number(results?.[1]?.results?.[0]?.attempts);
+  // A successful write with a missing/invalid read result is not proof that the
+  // limit was applied. Fail closed so callers can return 503 instead of silently
+  // turning rate limiting off.
+  if (!Number.isSafeInteger(attempts) || attempts < 1) {
+    throw new Error("Public rate-limit counter could not be verified");
+  }
 
   // Cleanup is opportunistic: a cleanup failure must not turn an otherwise
   // valid order or warranty operation into a 503.
