@@ -162,7 +162,7 @@ function warrantyDB() {
   });
   return {
     prepare(sql) { return { ...query(sql), bind(...values) { return query(sql,values); } }; },
-    async batch(statements) { for (const statement of statements) await statement.run(); return []; }
+    async batch(statements) { for (const statement of statements) await statement.run(); return [{ success: true }, { success: true, results: [{ attempts: 1 }] }]; }
   };
 }
 const warrantyDBInstance = warrantyDB();
