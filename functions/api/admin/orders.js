@@ -1,4 +1,4 @@
-import { fail, json, requireAdmin } from "../../_lib.js";
+import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 import { sendAdminPush } from "../../_notifications.js";
 
 export async function onRequestGet(context) {
@@ -55,7 +55,10 @@ export async function onRequestGet(context) {
 }
 export async function onRequestPatch(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
-  let body; try { body = await context.request.json(); } catch { return fail("Dữ liệu cập nhật không hợp lệ."); }
+  const parsedBody = await readJsonBodyLimited(context.request, 32 * 1024);
+  if (parsedBody.error === "too_large") return fail("Dữ liệu cập nhật đơn hàng vượt giới hạn kích thước.", 413);
+  if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu cập nhật không hợp lệ.");
+  const body = parsedBody.value;
   const id = String(body?.id || ""), status = String(body?.status || ""), paymentStatus = body?.paymentStatus;
   const statuses = ["pending_confirmation","confirmed","processing","shipped","completed","cancelled"];
   const payments = ["unpaid","pending","paid","refunded"];
