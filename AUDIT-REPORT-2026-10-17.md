@@ -200,22 +200,11 @@ Trước khi sửa, endpoint kiểm tra token rồi mới chèn yêu cầu theo 
 
 **Đã sửa trên nhánh rà soát:** câu lệnh tạo yêu cầu giờ chỉ chèn nếu token còn tồn tại và chưa hết hạn trong cùng D1 batch; xóa token, đính kèm và ghi audit chỉ diễn ra khi bản ghi yêu cầu thực sự được tạo. Nếu request thua cuộc đua, endpoint trả 409. Bổ sung regression test cho kết quả chèn thành công và token đã bị tiêu thụ.
 
-### Kiểm soát ngân sách tham số khi khôi phục backup
-**Mức độ:** Trung bình — tránh thất bại khôi phục ở batch lớn.
+### Điều chỉnh giới hạn restore theo tài liệu D1
+**Mức độ:** Cần chính xác hóa — tránh từ chối backup hợp lệ.
 
-Tài liệu Cloudflare D1 ghi nhận giới hạn khoảng 5.000 bindings cho một Workers script. Giới hạn 5.000 bản ghi backup trước đây không đảm bảo tổng số tham số bind của batch khôi phục vẫn nằm dưới giới hạn, vì mỗi hàng có thể cần từ 2 đến 13 tham số. Một backup có ít hơn 5.000 hàng vì vậy vẫn có thể thất bại khi restore.
+Một bản sửa trước đó đã diễn giải giới hạn “approximately 5,000 bindings” của tài liệu D1 thành giới hạn tổng tham số SQL của một batch. Đọc đúng ngữ cảnh, giới hạn này nói về resource bindings mà Worker có thể gắn (ví dụ D1 databases), không xác lập một ngân sách 4.500 tham số SQL cho toàn bộ batch.
 
-**Đã sửa trên nhánh rà soát:** tính tổng số tham số bind dự kiến trước khi tạo câu lệnh ghi và từ chối an toàn nếu vượt 4.500, để giữ khoảng dự phòng. Không gọi D1 batch và không xóa dữ liệu khi vượt giới hạn. Có regression test với 650 hồ sơ khách hàng xác nhận trả HTTP 413 trước khi ghi.
+**Đã điều chỉnh trên nhánh rà soát:** gỡ chốt 4.500 tham số không có căn cứ tài liệu và thay regression test: bản backup hợp lệ có 650 hồ sơ khách hàng không còn bị từ chối vì giới hạn giả định này; vẫn phải qua xác thực schema/quan hệ, giới hạn 20 MB, giới hạn 5.000 bản ghi và batch D1 nguyên tử. Giới hạn truy vấn/thời gian thực tế của D1 vẫn áp dụng; nếu batch vượt giới hạn thực thi, restore trả lỗi có kiểm soát và batch nguyên tử không để lại một phần dữ liệu.
 
-Nguồn giới hạn: https://developers.cloudflare.com/d1/platform/limits/
-
-
-
-### Kiểm tra preview trong lượt rà soát mới nhất
-Thử đọc preview dự kiến `audit-full-review-2026-10-17.sindarealest2.pages.dev` không truy cập được vì lớp bảo vệ trả `login_required`; không có phiên đăng nhập/ quyền phù hợp để xác nhận giao diện preview bằng trình duyệt. Production tiếp tục trả dữ liệu danh mục/cài đặt, sitemap 237 URL và robots.txt; `/api/admin/session` không có cookie trả 401. Đây là kiểm tra chỉ đọc, không sửa dữ liệu. Việc kiểm thử E2E trên preview vẫn cần môi trường preview truy cập được và cấu hình binding phù hợp.
-
-
-### Đếm chính xác tham số D1 khi khôi phục backup
-**Mức độ:** Trung bình — tránh để tệp backup vượt ngân sách tham số thực tế dù đã qua kiểm tra.
-
-Rà soát biên của bộ chặn mới phát hiện công thức đếm tham số đã tính 4 tham số cho bốn cài đặt welcome (thực tế 8) và 1 tham số cho mỗi cài đặt watermark (thực tế 2). Đã sửa công thức để tính đủ hai tham số cho từng câu lệnh upsert và điều chỉnh regression test về đúng ranh giới, nơi công thức cũ có thể chấp nhận payload nhưng công thức chính xác phải từ chối trước khi tạo batch ghi. CI đang chạy lại trên commit mới nhất.
+Nguồn: https://developers.cloudflare.com/d1/platform/limits/
