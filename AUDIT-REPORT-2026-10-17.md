@@ -131,6 +131,13 @@ Sitemap gọi `toISOString()` trực tiếp trên mọi `updated_at`. Một giá
 
 **Đã sửa:** Chỉ phát `lastmod` khi timestamp có thể phân tích được; URL sản phẩm vẫn có trong sitemap nếu timestamp lỗi. Regression test bao gồm ngày hợp lệ, chuỗi không hợp lệ và giá trị sai kiểu.
 
+### 17. API sản phẩm công khai có thể lộ số lượng tồn kho nội bộ
+**Mức độ:** Thấp–trung bình — lộ dữ liệu vận hành không cần thiết.
+
+Hàm chuyển đổi sản phẩm trả trường `stock` từ D1 cả khi `publicView: true`. Giao diện công khai không dùng số lượng tồn kho, nên khi admin nhập tồn kho thực, API công khai có thể tiết lộ con số này.
+
+**Đã sửa:** Khi tạo bản ghi cho public API, `stock` luôn trả `null`; trang admin vẫn nhận giá trị tồn kho thật. Regression test kiểm tra cả hai chế độ.
+
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
