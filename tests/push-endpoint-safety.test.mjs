@@ -8,7 +8,6 @@ const allowed = [
   "https://web.push.apple.com/sample",
   "https://push.services.opera.com/sample",
   "https://wns2-par02p.notify.windows.com/w/",
-  "https://example.push.apple.com/sample",
 ];
 for (const endpoint of allowed) assert.equal(isTrustedPushEndpoint(endpoint), true, endpoint + " should be accepted");
 
@@ -19,6 +18,7 @@ const rejected = [
   "https://fcm.googleapis.com.attacker.test/send",
   "https://user@fcm.googleapis.com/send",
   "https://fcm.googleapis.com:8443/send",
+  "https://example.push.apple.com/sample",
   "not a URL",
 ];
 for (const endpoint of rejected) assert.equal(isTrustedPushEndpoint(endpoint), false, endpoint + " should be rejected");
