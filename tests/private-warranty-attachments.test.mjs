@@ -74,9 +74,17 @@ function mockDB(startDate = '2026-01-01') {
   return db;
 }
 
-async function submitPhoto(env) {
+async function submitPhoto(env, includeLookupToken = true) {
   const form = new FormData();
   form.set("warrantyCode", warrantyCode);
+  if (includeLookupToken) {
+    const claimToken = "c".repeat(32);
+    env.DB.state.settings.set("warranty_lookup:" + claimToken, {
+      value: JSON.stringify({ warrantyCode, warrantyId: "warranty-id" }),
+      updated_at: "2099-12-31 00:00:00",
+    });
+    form.set("claimToken", claimToken);
+  }
   form.set("file", new Blob([webp], { type: "image/webp" }), "claim.webp");
   return uploadWarrantyPhoto({
     request: new Request("https://shop.example/api/warranty-claim-uploads", {
@@ -91,6 +99,9 @@ async function submitPhoto(env) {
 const db = mockDB();
 const originals = bucket();
 const images = bucket();
+const rawCodeOnlyUpload = await submitPhoto({ DB: mockDB(), ORIGINALS: bucket(), IMAGES: bucket() }, false);
+assert.equal(rawCodeOnlyUpload.status, 403, "photo upload must require a successful lookup token rather than a raw warranty code");
+
 const upload = await submitPhoto({ DB: db, ORIGINALS: originals, IMAGES: images });
 assert.equal(upload.status, 201, "photo uploads should succeed when private ORIGINALS is configured");
 const uploaded = await upload.json();
