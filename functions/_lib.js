@@ -313,7 +313,8 @@ export function validateProduct(input, existing = null) {
   const rawCategory = String(input.category ?? "").trim();
   if (!rawCategory || rawCategory.length > 80) return { error: "Danh mục là bắt buộc và tối đa 80 ký tự." };
   const aliases = { sneaker: "sneakers", sneakers: "sneakers", "giay-luoi": "loafers", loafers: "loafers", "giay-tay": "dress-shoes", "dress-shoes": "dress-shoes", "thắt-lưng": "belts", "that-lung": "belts", belts: "belts", "vi-da": "wallets", wallets: "wallets", dep: "sandals", sandals: "sandals", "day-dong-ho": "watch-straps", "op-dien-thoai": "phone-cases" };
-  const category = existing && rawCategory === existing.categoryLabel ? existing.category : (aliases[slugify(rawCategory)] || (/^[a-z0-9-]+$/.test(rawCategory) ? rawCategory : slugify(rawCategory)));
+  const categoryKey = slugify(rawCategory);
+  const category = existing && rawCategory === existing.categoryLabel ? existing.category : (Object.hasOwn(aliases, categoryKey) ? aliases[categoryKey] : (/^[a-z0-9-]+$/.test(rawCategory) ? rawCategory : categoryKey));
   const description = String(input.description ?? "");
   if (description.length > 10000) return { error: "Mô tả tối đa 10.000 ký tự." };
   const price = optionalInteger(input.price, "Giá");
