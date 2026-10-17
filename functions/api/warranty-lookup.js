@@ -1,4 +1,4 @@
-import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, warrantyStatusOnDate } from "../_lib.js";
+import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, parseImages, rateLimitPublicRequest, warrantyStatusOnDate } from "../_lib.js";
 
 const clean = (value, max = 120) => String(value ?? "").trim().slice(0, max);
 const normalizePhone = value => {
@@ -26,8 +26,7 @@ function maskOrderNumber(value) {
 }
 function shapeWarranty(row, today, claimToken) {
   const code = String(row.warranty_code || "");
-  let images = [];
-  try { images = JSON.parse(row.imagesJson || "[]"); } catch {}
+  const images = parseImages(row.imagesJson);
   const status = warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today);
   const eligible = isWarrantyEligibleOnDate(row.status, row.starts_at, row.ends_at, today);
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
@@ -37,7 +36,7 @@ function shapeWarranty(row, today, claimToken) {
     title: String(row.title || "Sản phẩm"),
     sku: String(row.sku || ""),
     size: String(row.size || ""),
-    image: Array.isArray(images) ? images[0] || "" : "",
+    image: images[0] || "",
     purchasedAt: String(row.purchasedAt || "").slice(0, 10),
     startsAt: row.starts_at,
     endsAt: row.ends_at,
