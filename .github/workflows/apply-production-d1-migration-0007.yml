@@ -1,0 +1,141 @@
+name: Apply D1 migration 0007 (guarded, no deploy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type exactly: APPLY 0007 TO sindarealest-db'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-d1-migration-0007
+  cancel-in-progress: false
+
+jobs:
+  apply-migration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_D1_DATABASE: sindarealest-db
+      EXPECTED_D1_ID: f6c208a1-052a-445c-a3b7-a442783f9bd3
+      GH_TOKEN: ${{ github.token }}
+      BACKUP_RUN_ID: '39057147336'
+
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+
+      - name: Require explicit confirmation and fresh successful backup
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+          GH_REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$CONFIRMATION" = "APPLY 0007 TO sindarealest-db" || { echo "::error::Confirmation text does not match; refusing to write."; exit 1; }
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN."; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID."; exit 1; }
+          node --input-type=module <<'NODE'
+          const headers = { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json' };
+          const base = `https://api.github.com/repos/${process.env.GH_REPOSITORY}/actions/runs/${process.env.BACKUP_RUN_ID}`;
+          const runRes = await fetch(base, { headers });
+          if (!runRes.ok) throw new Error('Cannot verify backup workflow run.');
+          const run = await runRes.json();
+          if (run.conclusion !== 'success' || run.path !== '.github/workflows/backup-d1-production.yml' || run.head_branch !== 'main') throw new Error('Backup run was not a successful main-branch D1 backup.');
+          const artifactRes = await fetch(base + '/artifacts', { headers });
+          if (!artifactRes.ok) throw new Error('Cannot verify backup artifact.');
+          const data = await artifactRes.json();
+          const artifact = (data.artifacts || []).find(a => a.name === 'sindarealest-d1-backup' && !a.expired);
+          if (!artifact || Date.parse(artifact.expires_at) <= Date.now()) throw new Error('Verified D1 backup artifact is missing or expired. Create a fresh backup and update BACKUP_RUN_ID before retrying.');
+          console.log('PASS: successful main-branch D1 backup artifact is present and unexpired; digest=' + artifact.digest);
+          NODE
+
+      - name: Verify exact production D1 target
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database" \
+            -o "$RUNNER_TEMP/d1-list.json"
+          node --input-type=module - "$RUNNER_TEMP/d1-list.json" <<'NODE'
+          import fs from 'node:fs';
+          const data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (data.success !== true) throw new Error('Cloudflare API did not confirm D1 listing success.');
+          const matches = (data.result || []).filter(db => db.name === process.env.CLOUDFLARE_D1_DATABASE);
+          if (matches.length !== 1 || matches[0].uuid !== process.env.EXPECTED_D1_ID) {
+            throw new Error('Refusing write: database name/ID did not exactly match the approved production D1.');
+          }
+          console.log('PASS: exact D1 name and ID verified.');
+          NODE
+
+      - name: Install pinned project tools
+        run: npm install --no-fund
+
+      - name: Preflight — migration not already applied and historical rows can be backfilled
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler d1 execute "$CLOUDFLARE_D1_DATABASE" --remote --json --command "SELECT COUNT(*) AS table_exists FROM sqlite_master WHERE type='table' AND name='order_contact_details';" > "$RUNNER_TEMP/table-check.json"
+          node --input-type=module - "$RUNNER_TEMP/table-check.json" <<'NODE'
+          import fs from 'node:fs';
+          const v = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          function find(input, key) {
+            if (Array.isArray(input)) for (const x of input) { const n=find(x,key); if(n!==null)return n; }
+            else if (input && typeof input==='object') {
+              if (Object.hasOwn(input,key)) { const n=Number(input[key]); return Number.isSafeInteger(n)&&n>=0?n:null; }
+              for (const x of Object.values(input)) { const n=find(x,key); if(n!==null)return n; }
+            }
+            return null;
+          }
+          if (find(v,'table_exists') !== 0) throw new Error('Table already exists or table state is unknown; refusing to apply migration blindly.');
+          console.log('PASS: target table does not exist.');
+          NODE
+          npx wrangler d1 execute "$CLOUDFLARE_D1_DATABASE" --remote --json --command "SELECT COUNT(*) AS orphan_orders FROM orders o LEFT JOIN customers c ON c.id=o.customer_id WHERE c.id IS NULL;" > "$RUNNER_TEMP/orphan-check.json"
+          node --input-type=module - "$RUNNER_TEMP/orphan-check.json" <<'NODE'
+          import fs from 'node:fs';
+          const v = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          function find(input,key) {
+            if(Array.isArray(input)) for(const x of input){const n=find(x,key);if(n!==null)return n;}
+            else if(input&&typeof input==='object'){
+              if(Object.hasOwn(input,key)){const n=Number(input[key]);return Number.isSafeInteger(n)&&n>=0?n:null;}
+              for(const x of Object.values(input)){const n=find(x,key);if(n!==null)return n;}
+            }
+            return null;
+          }
+          const count=find(v,'orphan_orders');
+          if(count!==0) throw new Error('Historical orders without a matching customer: '+(count===null?'unknown':count)+'. Refusing migration to avoid incomplete backfill.');
+          console.log('PASS: all historical orders have a matching customer for backfill.');
+          NODE
+
+      - name: Apply migration 0007 to verified production D1
+        run: npx wrangler d1 execute "$CLOUDFLARE_D1_DATABASE" --remote --file=migrations/0007_order_contact_details.sql
+
+      - name: Verify post-migration table and backfill
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler d1 execute "$CLOUDFLARE_D1_DATABASE" --remote --json --command "SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='order_contact_details') AS table_exists, (SELECT COUNT(*) FROM orders o LEFT JOIN order_contact_details d ON d.order_id=o.id WHERE d.order_id IS NULL) AS missing_snapshots, (SELECT COUNT(*) FROM orders) AS total_orders, (SELECT COUNT(*) FROM order_contact_details) AS snapshots;" > "$RUNNER_TEMP/postflight.json"
+          node --input-type=module - "$RUNNER_TEMP/postflight.json" <<'NODE'
+          import fs from 'node:fs';
+          const v = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          function find(input,key) {
+            if(Array.isArray(input)) for(const x of input){const n=find(x,key);if(n!==null)return n;}
+            else if(input&&typeof input==='object'){
+              if(Object.hasOwn(input,key)){const n=Number(input[key]);return Number.isSafeInteger(n)&&n>=0?n:null;}
+              for(const x of Object.values(input)){const n=find(x,key);if(n!==null)return n;}
+            }
+            return null;
+          }
+          const exists=find(v,'table_exists'), missing=find(v,'missing_snapshots'), orders=find(v,'total_orders'), snapshots=find(v,'snapshots');
+          console.log(JSON.stringify({table_exists:exists,total_orders:orders,snapshots,missing_snapshots:missing}));
+          if(exists!==1 || missing!==0 || orders===null || snapshots===null || snapshots<orders) throw new Error('Post-migration verification failed. Inspect production D1 before any further changes.');
+          console.log('PASS: migration verified; all orders have contact snapshots.');
+          NODE
