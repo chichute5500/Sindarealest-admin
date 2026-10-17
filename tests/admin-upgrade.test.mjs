@@ -47,3 +47,9 @@ assert.ok(!read("../public/index.html").includes('id="craftsmanship"') && !read(
 assert.ok(read("../public/index.html").includes(".menu-btn{position:absolute!important;left:8px"), "Mobile hamburger menu should be positioned on the left");
 assert.ok(read("../public/index.html").includes(".checkout-fields input,.checkout-fields select,.checkout-fields textarea{"), "Province/city selector should share the same glass field styling");
 assert.ok(admin.includes("<h2>Đăng nhập</h2>") && admin.includes("<p>Đăng nhập quản trị</p>"), "Admin login UI should be labeled clearly in Vietnamese");
+
+const restoreApi = read("../functions/api/admin/restore.js");
+assert.ok(admin.includes("f.size>20*1024*1024") && admin.includes("Tệp sao lưu vượt 20 MB."),
+  "Admin restore picker must enforce the same 20 MB file limit as the API");
+assert.ok(restoreApi.includes("const MAX_BACKUP_BYTES = 20 * 1024 * 1024"),
+  "Restore API must retain its 20 MB hard limit");
