@@ -15,8 +15,6 @@ export function isTrustedPushEndpoint(value) {
     const host = url.hostname.toLowerCase().replace(/\\.$/, "");
     if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")) return false;
     return PUSH_HOSTS.has(host) ||
-      host.endsWith(".push.services.mozilla.com") ||
-      host.endsWith(".push.apple.com") ||
       host.endsWith(".notify.windows.com") ||
       host.endsWith(".wns.windows.com");
   } catch {
