@@ -254,10 +254,18 @@ Rà soát giao diện phát hiện thẻ sản phẩm có nền bán trong suố
 
 ### Kết quả smoke test chỉ đọc trên production
 
-Ngày 17-10-2026, đã kiểm tra các URL công khai mà không gửi form hay thay đổi dữ liệu:
+Ngày 18-10-2026, đã kiểm tra lại các URL công khai mà không gửi form hay thay đổi dữ liệu:
 
-- Trang chủ tải được, canonical và Open Graph trỏ đúng `https://sindarealest2.pages.dev/`.
-- `/api/products` trả 236 sản phẩm; giá công khai vẫn là `null`.
-- `/sitemap.xml` có 237 URL, bao gồm đường dẫn SKU ổn định.
-- `/api/admin/session` không có cookie trả HTTP 401, đúng hành vi bảo vệ phiên quản trị.
-- **Phát hiện production cần sửa:** API danh mục công khai đang để lộ trường tồn kho khác null cho SKU `SD-TL001`; các mã khác trong mẫu trả null. Nhánh audit đã sửa `fromRow(..., { publicView: true })` để luôn ẩn tồn kho công khai và có regression test. Vì chưa deploy, đây vẫn là vấn đề tồn tại trên web chính tại thời điểm kiểm tra.
+- Trang chủ tải được; canonical và Open Graph trỏ đúng `https://sindarealest2.pages.dev/`.
+- `/api/products` trả 236 sản phẩm; kiểm tra toàn bộ kết quả hiện tại cho thấy trường `stock` đều là `null`, gồm cả SKU `SD-TL001`. Vấn đề lộ tồn kho được ghi nhận trong lần rà soát trước không tái hiện ở lần kiểm tra này.
+- `/api/settings` trả các thiết lập giao diện công khai dự kiến; không phát hiện giá trị bí mật trong payload đã kiểm tra.
+- `/sitemap.xml` liệt kê đường dẫn sản phẩm theo SKU ổn định; `/robots.txt` chặn thu thập `/admin/` và `/api/`.
+- `/api/admin/session` không thể đọc từ trình trích xuất công khai; chưa dùng phiên đăng nhập nên không kết luận thêm về giao diện quản trị.
+
+### Phát hiện trong kiểm tra deploy — đã sửa trên nhánh audit
+
+Workflow deploy dùng token Pages để đọc cài đặt public-access của R2; token đó nhận HTTP 403 vì không có quyền R2 Read, dù token R2 đọc riêng đã được cấu hình cho workflow xác minh độc lập. Đã cập nhật `scripts/verify-pages-bindings.mjs` và `.github/workflows/deploy.yml` để dùng secret riêng `CLOUDFLARE_R2_READ_API_TOKEN`, đồng thời bổ sung test xác nhận token R2 được chọn riêng. CI mới nhất pass: [run 39058505670](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39058505670); bước chẩn đoán binding R2 cũng pass trong [deploy workflow run 39058505606](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39058505606). Bước deploy Production vẫn bị bỏ qua có chủ ý.
+
+### Preview và dependency lockfile còn chờ
+
+Preview của nhánh audit yêu cầu đăng nhập/Cloudflare Access khi kiểm tra không có phiên hợp lệ (`login_required`). Chưa dùng browser profile đã đăng nhập vì hiện không có profile nào xác nhận đã đăng nhập vào miền Preview. Ngoài ra, repo vẫn chưa có `package-lock.json`; CI hiện cài bằng `npm install`, không phải `npm ci`. Hai mục này vẫn cần xử lý trước khi xác nhận phát hành hoàn tất.
