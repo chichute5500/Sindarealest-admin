@@ -192,3 +192,10 @@ Rà soát sâu bổ sung phát hiện bộ giới hạn đăng nhập nguyên t�
 Rà soát bổ sung phát hiện bộ xác thực backup kiểm tra riêng việc tồn tại của `order_id`, `order_item_id` và `customer_id`, nhưng chưa chứng minh các bản ghi có liên hệ với nhau đúng cách. Backup bị chỉnh sửa có thể gắn bảo hành vào dòng sản phẩm của đơn khác hoặc gắn yêu cầu bảo hành vào khách hàng không thuộc đơn hàng.
 
 **Đã sửa trên nhánh rà soát:** xác thực quan hệ `warranty.order_id` ↔ `order_item.order_id` và `warranty_claim.order_id` ↔ `order.customer_id` trước khi tạo bất kỳ câu lệnh ghi D1 nào. Bổ sung regression tests xác nhận hai trường hợp bị từ chối và không phát sinh batch ghi.
+
+### Từ chối bản ghi backup rỗng/sai kiểu trước khi kiểm tra trường
+**Mức độ:** Trung bình — độ bền của API khôi phục.
+
+Các mảng backup JSON có thể chứa `null`, chuỗi hoặc mảng lồng thay vì bản ghi đối tượng. Việc truy cập trường trực tiếp có thể làm validation ném lỗi ngoài dự kiến thay vì trả lỗi dữ liệu có kiểm soát.
+
+**Đã sửa trên nhánh rà soát:** kiểm tra mọi phần tử trong các mảng dữ liệu vận hành và sản phẩm phải là đối tượng hợp lệ trước khi đọc trường; bổ sung regression tests xác nhận trả 400 và không ghi D1 với bản backup có hàng `null`.
