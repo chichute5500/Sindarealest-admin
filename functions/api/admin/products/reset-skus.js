@@ -32,7 +32,7 @@ const CATEGORY_ALIASES = {
 
 function resolveCategory(value) {
   const key = slugify(String(value ?? "").trim());
-  return CATEGORY_ALIASES[key] || key || null;
+  return (Object.hasOwn(CATEGORY_ALIASES, key) ? CATEGORY_ALIASES[key] : key) || null;
 }
 
 function buildCaseUpdate(db, rows, skuById) {
