@@ -5,7 +5,7 @@
 - Gói nguồn được dùng: `SDVIP.zip`.
 - Gói nguồn `SDVIP.zip` ban đầu không bị sửa; bản nâng cấp được tạo trong thư mục riêng.
 - Kiến trúc vẫn là HTML/CSS/JavaScript tĩnh + Cloudflare Pages Functions + D1 + R2; không chuyển sang React/Vite.
-- **Chưa deploy lên Cloudflare Production.** Không có quyền truy cập/tài nguyên Production được xác minh trong lượt làm việc này; không chạy SQL hoặc thay đổi website đang hoạt động từ xa.
+- **Chưa deploy phiên bản mới lên Cloudflare Production.** Workflow đã xác nhận binding Production `IMAGES` → `sindarealest-images` và `ORIGINALS` → `sindarealest-original` là hai bucket khác nhau. Bước kiểm tra tiếp theo xác minh trạng thái public access qua R2 API; không chạy SQL hoặc thay đổi dữ liệu D1 trong bước xác minh.
 
 ## Đã làm
 
