@@ -1,3 +1,7 @@
+@font-face{font-family:"SD Sans";src:url("/fonts/NotoSans-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"SD Sans";src:url("/fonts/NotoSans-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"SD Serif";src:url("/fonts/NotoSerif-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"SD Serif";src:url("/fonts/NotoSerif-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
 /* SinDarealest Admin UI — clean, single-source Liquid Glass system. */
 :root{color-scheme:light;--bg:#eee8dd;--paper:rgba(255,252,246,.73);--paper-strong:rgba(255,252,246,.88);--ink:#241f18;--muted:#766e62;--line:rgba(125,103,71,.20);--line-strong:rgba(125,103,71,.32);--gold:#a77d3c;--gold-strong:#90672d;--gold-soft:rgba(173,130,66,.12);--danger:#a84033;--success:#277551;--shadow:0 16px 48px rgba(47,37,22,.09);--radius:20px;--ease:cubic-bezier(.2,.7,.2,1)}
 :root[data-admin-theme=dark]{color-scheme:dark;--bg:#080807;--paper:rgba(22,21,18,.72);--paper-strong:rgba(25,23,20,.90);--ink:#f4eee3;--muted:#c2b8a8;--line:rgba(220,197,158,.23);--line-strong:rgba(220,197,158,.37);--gold:#dfbb78;--gold-strong:#f0d5a0;--gold-soft:rgba(223,187,120,.13);--danger:#ef9a8c;--success:#83d5a6;--shadow:0 20px 60px rgba(0,0,0,.35)}
