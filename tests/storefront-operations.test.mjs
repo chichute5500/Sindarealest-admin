@@ -47,6 +47,11 @@ const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-loo
 assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && warrantyLookupSource.includes('claimToken') && !warrantyLookupSource.includes('warrantyCode: code') && warrantyLookupSource.includes('maskedPhone') && warrantyLookupSource.includes('maskedAddress'), 'Public warranty lookup must return masked data and a short-lived action token');
 const adminWarrantiesSource = readFileSync(new URL('../functions/api/admin/warranties.js', import.meta.url), 'utf8');
 const sharedLibSource = readFileSync(new URL('../functions/_lib.js', import.meta.url), 'utf8');
+const adminHtmlSource = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
+assert.ok(warrantyLookupSource.includes("warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today)"), 'Customer lookup must use start and end dates for its visible status');
+assert.ok(adminWarrantiesSource.includes('warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today)'), 'Admin warranty list must use start and end dates for its visible status');
+assert.ok(storefrontHtml.includes("w.status==='pending'?'Chưa đến ngày bắt đầu'"), 'Customer warranty UI must explain a future-start warranty');
+assert.ok(adminHtmlSource.includes("status==='pending'?'Chưa đến ngày bắt đầu'"), 'Admin warranty UI must localize a future-start warranty');
 assert.ok(sharedLibSource.includes('timeZone: "Asia/Ho_Chi_Minh"') && sharedLibSource.includes('export function isWarrantyEligibleOnDate'), 'Warranty expiry must use shared Vietnam-local calendar date logic');
 for (const [fileName, source] of [
   ['warranty lookup', warrantyLookupSource],
