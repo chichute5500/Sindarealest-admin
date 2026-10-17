@@ -31,6 +31,8 @@ assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from 
 assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must be blocked until private ORIGINALS is verified');
 assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must require ORIGINALS separate from IMAGES');
 assert.ok(workflow.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Workflow must pass the ORIGINALS readiness variable');
+assert.ok(workflow.includes("if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'"), 'Production deployment must be skipped until private ORIGINALS is verified');
+assert.ok(setupScript.includes('confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`'), 'Setup confirmation must include both R2 bucket names');
 assert.ok(workflow.indexOf('npm run check') < workflow.indexOf('npm run deploy'));
 assert.ok(workflow.indexOf('npm test') < workflow.indexOf('npm run deploy'));
 assert.ok(!workflow.includes('migrations/0001_schema.sql'), 'Deploy workflow must not modify D1 schema automatically');
