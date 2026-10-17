@@ -1,4 +1,4 @@
-import { fail, getSetting, json, productInsertStatement, requireAdmin, validateProduct } from "../../_lib.js";
+import { fail, getSetting, json, productInsertStatement, readJsonBodyLimited, requireAdmin, validateProduct } from "../../_lib.js";
 import { validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
 const str = (v, max, required = false) => typeof v === "string" && v.length <= max && (!required || v.trim().length > 0);
@@ -8,38 +8,6 @@ const timestamp = (v) => str(v, 50, true);
 const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
 const MAX_RESTORE_RECORDS = 5000;
 
-async function readJsonLimited(request, maxBytes) {
-  const declaredLength = Number(request.headers.get("Content-Length") || 0);
-  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
-  if (!request.body) return { error: "invalid" };
-
-  const reader = request.body.getReader();
-  const chunks = [];
-  let total = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
-        try { await reader.cancel(); } catch {}
-        return { error: "too_large" };
-      }
-      chunks.push(value);
-    }
-  } catch {
-    return { error: "invalid" };
-  }
-
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  try { return { value: JSON.parse(new TextDecoder().decode(bytes)) }; }
-  catch { return { error: "invalid" }; }
-}
 
 function validateOperations(operations) {
   const keys = ["customers","orders","orderItems","warranties","warrantyClaims","auditLogs"];
@@ -129,7 +97,7 @@ function validateOperations(operations) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
-  const parsed = await readJsonLimited(context.request, MAX_BACKUP_BYTES);
+  const parsed = await readJsonBodyLimited(context.request, MAX_BACKUP_BYTES);
   if (parsed.error === "too_large") return fail("Tệp sao lưu vượt giới hạn 20 MB. Hãy tạo bản sao lưu nhỏ hơn.", 413);
   if (parsed.error || !parsed.value || typeof parsed.value !== "object" || Array.isArray(parsed.value)) {
     return fail("Tệp sao lưu JSON không đọc được.");
