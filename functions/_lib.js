@@ -19,10 +19,10 @@ export function fail(message, status = 400, headers = {}) {
 }
 
 /**
- * Parse a small JSON request without buffering an unbounded body in memory.
- * Returns { value } on success or { error: "invalid" | "too_large" }.
+ * Read a request body with a hard byte limit, even when Content-Length is absent.
+ * Returns { bytes } on success or { error: "invalid" | "too_large" }.
  */
-export async function readJsonBodyLimited(request, maxBytes = 64 * 1024) {
+export async function readBodyBytesLimited(request, maxBytes = 64 * 1024) {
   const declaredLength = Number(request.headers.get("Content-Length") || 0);
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { error: "too_large" };
   if (!request.body) return { error: "invalid" };
@@ -51,8 +51,18 @@ export async function readJsonBodyLimited(request, maxBytes = 64 * 1024) {
     bytes.set(chunk, offset);
     offset += chunk.byteLength;
   }
+  return { bytes };
+}
+
+/**
+ * Parse a small JSON request without buffering an unbounded body in memory.
+ * Returns { value } on success or { error: "invalid" | "too_large" }.
+ */
+export async function readJsonBodyLimited(request, maxBytes = 64 * 1024) {
+  const body = await readBodyBytesLimited(request, maxBytes);
+  if (body.error) return body;
   try {
-    return { value: JSON.parse(new TextDecoder().decode(bytes)) };
+    return { value: JSON.parse(new TextDecoder().decode(body.bytes)) };
   } catch {
     return { error: "invalid" };
   }
