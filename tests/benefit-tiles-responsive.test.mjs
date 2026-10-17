@@ -115,7 +115,7 @@ assert.equal(copyRules.filter(rule => /(?:^|;)border:/.test(rule)).length, 1,
   'The CTA-matched surface border must have one authoritative declaration.');
 assert.equal(copyRules.filter(rule => /(?:^|;)-webkit-backdrop-filter:/.test(rule)).length, 1,
   'The CTA-matched glass blur must have one authoritative declaration.');
-assert.ok(copyRules.some(rule => rule.includes('background:var(--panel-strong)') && rule.includes('backdrop-filter:blur(18px)')),
-  'Responsive overrides may adjust dimensions, but not replace the theme-aware glass surface treatment.');
+assert.ok(copyRules.some(rule => rule.includes('background:var(--benefit-tile-glass)') && rule.includes('backdrop-filter:blur(22px) saturate(160%)')),
+  'Responsive overrides may adjust dimensions, but not replace the authoritative per-theme glass surface treatment.');
 
 console.log('PASS: theme-aware three-layer benefit tiles; one authoritative stylesheet; responsive checks passed.');
