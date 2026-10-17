@@ -223,3 +223,9 @@ Giao diện quản trị từng cho phép chọn tệp JSON tới 40 MB, trong k
 Backup JSON xuất dữ liệu sản phẩm và metadata/khóa ảnh bảo hành trong D1, nhưng không tải nội dung object ảnh từ bucket R2 vào tệp JSON. Vì vậy khôi phục backup chỉ tái lập dữ liệu D1; ảnh vẫn cần tồn tại trong các bucket R2 tương ứng. Đã bổ sung cảnh báo ở giao diện tải và khôi phục backup để người quản trị sao lưu R2 riêng. Regression test xác nhận cảnh báo này không bị bỏ mất.
 
 **Giới hạn còn lại:** Quy trình sao lưu object R2 và xác minh khả năng khôi phục R2 vẫn cần thực hiện riêng; không thể tuyên bố backup JSON là bản sao lưu đầy đủ cho toàn bộ website.
+
+
+### Kiểm tra trùng ID mã bảo hành trong backup
+**Mức độ:** Thấp — lỗi dữ liệu không hợp lệ cần bị từ chối trước khi bắt đầu restore.
+
+Bộ xác thực backup đã kiểm tra mã bảo hành trùng nhưng chưa kiểm tra riêng ID bản ghi bảo hành trùng. D1 vẫn sẽ rollback batch nếu khóa chính bị trùng, nhưng lỗi chỉ xuất hiện khi ghi và có thể trả lỗi dịch vụ thay vì chỉ rõ tệp backup sai. Đã bổ sung tập ID bảo hành riêng và regression test bảo đảm backup có ID bảo hành trùng trả 400 trước khi phát sinh batch ghi.
