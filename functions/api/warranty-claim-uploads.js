@@ -40,6 +40,8 @@ export async function onRequestPost({ request, env }) {
   }
 
   const claimToken = String(form.get("claimToken") || "").trim().toLowerCase();
+  if (!claimToken) return fail("Hãy tra cứu bảo hành thành công trước khi tải ảnh lên.", 403);
+
   let warrantyCode = String(form.get("warrantyCode") || "").trim().toUpperCase();
   let tokenWarrantyId = "";
 
