@@ -117,6 +117,13 @@ Luồng thêm sản phẩm trước đây đọc toàn bộ cột SKU để tìm
 
 **Đã sửa:** Chỉ đọc SKU khớp prefix danh mục đang thêm và chỉ dùng hậu tố nếu `Number.isSafeInteger()` hợp lệ. Các map alias danh mục/nhãn nhật ký cũng dùng kiểm tra own-property để khóa các khóa prototype như `constructor`; bảng quy tắc SKU động dùng object không có prototype. Giữ vòng retry khi hai admin cùng cấp một SKU; regression tests bao gồm danh mục tên `constructor`.
 
+### 15. Giới hạn công khai phải fail-closed nếu không đọc được bộ đếm
+**Mức độ:** Trung bình — chống lạm dụng API công khai.
+
+Bộ giới hạn tần suất đã ghi bộ đếm nhưng nếu kết quả đọc bộ đếm không có hoặc sai định dạng thì trước đây có thể diễn giải thành 0 lần thử và cho phép yêu cầu tiếp tục.
+
+**Đã sửa:** Yêu cầu bộ đếm sau batch phải là số nguyên an toàn từ 1 trở lên. Nếu không xác minh được, helper ném lỗi để endpoint gọi trả lỗi dịch vụ thay vì tắt giới hạn. Thêm regression test cho bộ đếm bị thiếu và cập nhật mock kiểm thử để mô phỏng kết quả D1 hợp lệ.
+
 ### Tạo mô tả bằng AI trong trang admin
 Giao diện admin đang gọi `/api/admin/ai-description`, nhưng phiên bản route ban đầu chỉ đọc `OPENAI_API_KEY` và không sử dụng Workers AI binding dù dự án đang ưu tiên Cloudflare Workers AI.
 
