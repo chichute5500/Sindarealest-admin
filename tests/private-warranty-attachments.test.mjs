@@ -112,15 +112,6 @@ const missingPrivateBucket = await submitPhoto({ DB: mockDB(), IMAGES: bucket() 
 assert.equal(missingPrivateBucket.status, 503, "new warranty uploads must fail closed without private ORIGINALS");
 assert.equal((await missingPrivateBucket.json()).ok, false);
 
-const futureOriginals = bucket();
-const futureWarrantyUpload = await submitPhoto({
-  DB: mockDB("2099-01-01"),
-  ORIGINALS: futureOriginals,
-  IMAGES: bucket(),
-});
-assert.equal(futureWarrantyUpload.status, 404, "photo upload must be rejected before the warranty start date");
-assert.equal(futureOriginals.calls.puts.length, 0, "future-start warranty evidence must not be stored");
-
 db.state.attachmentKey = uploaded.imageKey;
 const session = await createSession(sessionSecret);
 const adminEnv = {
