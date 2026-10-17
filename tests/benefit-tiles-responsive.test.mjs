@@ -47,6 +47,7 @@ assert.doesNotMatch(css, /\.service-strip \.service-copy\{[^}]*color:var\(--ink\
 assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:var\(--muted\)/,
   'Tile descriptions must not inherit theme-dependent muted color.');
 
+const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
 const tileGradient = 'linear-gradient(135deg,rgba(250,251,252,.94),rgba(224,228,232,.86))';
 assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
   'The reference Zalo CTA gradient and border must exist.');
