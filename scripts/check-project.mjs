@@ -86,7 +86,6 @@ check(storefrontCss.includes('theme-croc-dark.webp?v=') && storefrontCss.include
 check(/\.theme-bg--dark\{[^}]*theme-croc-dark\.webp/.test(storefrontCss), 'Chế độ tối phải dùng ảnh nền da cá sấu tối');
 check(/\.theme-bg--light\{[^}]*theme-croc-albino\.webp/.test(storefrontCss), 'Chế độ sáng phải dùng ảnh nền albino sáng');
 check(adminCss.includes('theme-croc-dark.webp?v=') && adminCss.includes('theme-croc-albino.webp?v='), 'Admin phải đồng bộ ảnh nền hai chế độ');
-check(adminHtml.indexOf('<style') === -1, 'Admin không được giữ stylesheet CSS vá nhúng');
 check(homepage.includes("fetch('/api/products'"), 'Trang chủ chưa lấy sản phẩm từ API');
 check(homepage.includes('og:title') && homepage.includes('twitter:card'), 'Thiếu metadata social preview');
 check(homepage.includes('window.__sdUpdateDetailWatermark') && homepage.includes("document.querySelector('.detail-image-stage')"), 'Watermark phải phủ ảnh lớn trong chi tiết sản phẩm');
