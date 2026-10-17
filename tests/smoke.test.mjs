@@ -40,6 +40,13 @@ assert.equal(valid.value.sku, 'SD-236');
 assert.equal(valid.value.category, 'wallets');
 assert.equal(valid.value.price, null, 'không tự gán giá');
 assert.equal(valid.value.stock, null, 'không tự gán tồn kho');
+const prototypeNamedCategory = validateProduct({
+  title: 'Sản phẩm danh mục tùy chỉnh', sku: 'SD-CON001', category: 'constructor',
+  price: null, stock: null, published: true, images: [],
+});
+assert.equal(prototypeNamedCategory.error, undefined, 'prototype-named custom categories must not resolve to inherited functions');
+assert.equal(prototypeNamedCategory.value.category, 'constructor');
+assert.equal(typeof prototypeNamedCategory.value.category, 'string');
 assert.ok(validateProduct({ title: 'Hỏng', sku: '../x', category: 'Ví' }).error, 'SKU traversal phải bị từ chối');
 assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['../secret.webp'] }).error, 'đường dẫn ảnh traversal phải bị từ chối');
 assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', images: ['https://evil.example/x.webp'] }).error, 'ảnh remote không tin cậy phải bị từ chối');
