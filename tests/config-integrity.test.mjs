@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { parseCliJson, findNamedRecord, assertSafeName } from '../scripts/cloudflare-utils.mjs';
 
 const payload = parseCliJson('\nWrangler notice\n[{"name":"shop-prod","production_branch":"main"}]\nFinished listing projects.');
@@ -42,4 +45,45 @@ assert.ok(!/^\s*pages_build_output_dir\s*=/m.test(wranglerConfig), 'Do not opt i
 assert.ok(existsSync('public/index.html'));
 assert.ok(existsSync('public/admin/index.html'));
 assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fallback must not shadow D1 failures');
-console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, and single-source catalog invariant.');
+
+const seedWorkflow = readFileSync('.github/workflows/import-d1-products.yml', 'utf8');
+assert.ok(seedWorkflow.includes('confirm_empty_database'), 'Manual D1 seed must require an explicit empty-database confirmation');
+assert.ok(seedWorkflow.includes('CONFIRM_EMPTY_DATABASE') && seedWorkflow.includes('"YES"'), 'Manual D1 seed must stop unless confirmation is YES');
+const productCountGuard = readFileSync('scripts/assert-product-count.mjs', 'utf8');
+assert.ok(productCountGuard.includes('if (count !== expected)'), 'Product count guard must reject counts that differ from the expected value');
+assert.ok(seedWorkflow.includes('SELECT COUNT(*) AS product_count FROM products;'), 'Manual D1 seed must query the live product count');
+assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-count.json 0'), 'Manual D1 seed must verify zero existing products before inserting');
+assert.ok(seedWorkflow.includes('node scripts/assert-product-count.mjs product-count.json 235'), 'Manual D1 seed must verify exactly 235 products after import');
+assert.ok(seedWorkflow.includes('concurrency:') && seedWorkflow.includes('sindarealest-d1-initial-seed'), 'Initial seed workflow must serialize simultaneous runs');
+assert.ok(seedWorkflow.indexOf('Refuse to seed a database that already has products') < seedWorkflow.indexOf('Import initial products'), 'Manual D1 seed preflight must run before SQL inserts');
+
+assert.ok(deployReadme.includes('`ORIGINALS`') && deployReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deployment guide must explain the private ORIGINALS binding and readiness guard');
+const integratedReadme = readFileSync('README-INTEGRATED-VI.txt', 'utf8');
+assert.ok(integratedReadme.includes('`ORIGINALS`') && integratedReadme.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Integrated guide must document private originals and deployment readiness');
+const upgradeReport = readFileSync('UPGRADE-REPORT.md', 'utf8');
+assert.ok(upgradeReport.includes('không đóng dấu logo trực tiếp vào file WebP mới'), 'Upgrade report must match the clean WebP upload implementation');
+
+const guardDir = mkdtempSync(join(tmpdir(), 'sd-product-count-'));
+try {
+  const guardFile = join(guardDir, 'count.json');
+  const guardScript = new URL('../scripts/assert-product-count.mjs', import.meta.url).pathname;
+  const runGuard = (json, expected) => {
+    writeFileSync(guardFile, json);
+    return spawnSync(process.execPath, [guardScript, guardFile, String(expected)], { encoding: 'utf8' });
+  };
+  const zeroCount = runGuard('[{"results":[{"product_count":0}]}]', 0);
+  assert.equal(zeroCount.status, 0, 'Product count guard must accept an empty table before seed');
+  assert.match(zeroCount.stdout, /PASS: product_count=0/);
+  const seededCount = runGuard('[{"results":[{"product_count":235}]}]', 235);
+  assert.equal(seededCount.status, 0, 'Product count guard must accept exactly 235 seeded products');
+  const nonEmpty = runGuard('[{"results":[{"product_count":1}]}]', 0);
+  assert.notEqual(nonEmpty.status, 0, 'Product count guard must reject a non-empty target');
+  const missingCount = runGuard('[{"results":[{"total_products":235}]}]', 235);
+  assert.notEqual(missingCount.status, 0, 'Product count guard must fail closed when the count field is missing');
+  const malformed = runGuard('not-json', 0);
+  assert.notEqual(malformed.status, 0, 'Product count guard must fail closed on invalid JSON');
+} finally {
+  rmSync(guardDir, { recursive: true, force: true });
+}
+
+console.log('PASS: JSON preflight helpers, explicit deployment target, CI gates, private R2 readiness, guarded manual seed, and single-source catalog invariant.');

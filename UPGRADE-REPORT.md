@@ -14,8 +14,8 @@
 - Giữ cấu trúc giao diện tĩnh, logo thương hiệu, font, bố cục cửa hàng, hiệu ứng nền Liquid hiện có, và cơ chế chuyển nền sáng/tối; không thay nền bằng gradient/hình mới.
 - Giữ 235 sản phẩm, ID/SKU/slug và các đường dẫn ảnh sản phẩm hiện có.
 - Đóng dấu logo SinDarealest lên 526 ảnh sản phẩm tĩnh bằng ảnh dẫn xuất WebP, độ mờ watermark khoảng 68%; URL ảnh giữ nguyên. `SDVIP.zip` gốc vẫn là bản đối chiếu nguyên trạng.
-- Ảnh mới tải lên từ trang quản trị được tối ưu WebP và đóng dấu trước khi gửi vào R2; tên khóa mới có hậu tố `-wm` để tránh phủ watermark lần thứ hai trên giao diện.
-- Với ảnh R2 cũ đã tải lên trước gói này, giao diện vẫn phủ watermark khi hiển thị; file gốc cũ trong R2 chưa được di trú vì không kết nối được Production. Muốn watermark nằm trong chính file R2 cũ, cần tải lại ảnh qua trang quản trị sau khi triển khai gói mới.
+- Ảnh tải mới từ trang quản trị được chuyển sang WebP sạch trong `IMAGES`; file gốc JPEG/PNG/WebP được lưu trong bucket riêng tư `ORIGINALS`. Mã hiện tại không đóng dấu logo trực tiếp vào file WebP mới và không dùng hậu tố `-wm`; watermark theo cài đặt được phủ bằng overlay trên ảnh lớn ở trang chi tiết/toàn ảnh, không phủ thẻ danh sách hoặc thumbnail.
+- Với ảnh R2 cũ đã tải lên trước gói này, không tự di trú hoặc thay đổi file. Route xem ảnh bằng chứng bảo hành vẫn hỗ trợ đọc bản ghi cũ từ `IMAGES` thông qua API quản trị đã xác thực; ảnh bằng chứng mới được ghi vào `ORIGINALS`. Không thể kết luận tài nguyên R2/Production thật đã được cấu hình hoặc di trú khi chưa xác minh trực tiếp trên Cloudflare.
 - Thêm ảnh chia sẻ Open Graph riêng 1200×630, không thay ảnh/logo gốc thương hiệu.
 
 ### SEO và chia sẻ liên kết
@@ -64,4 +64,4 @@
 
 ## Lưu ý bảo vệ ảnh
 
-Watermark giúp nhận diện nguồn ảnh và làm giảm khả năng tái sử dụng trực tiếp, nhưng không thể ngăn tuyệt đối chụp màn hình/quay màn hình. Gói này đóng dấu vào các ảnh tĩnh công khai và ảnh tải mới qua giao diện quản trị; ảnh R2 cũ cần được tải lại như đã nêu trên.
+Watermark giúp nhận diện nguồn ảnh và làm giảm khả năng tái sử dụng trực tiếp, nhưng không thể ngăn tuyệt đối chụp màn hình/quay màn hình. Ảnh tĩnh công khai trong gói nền đã được xử lý riêng. Watermark overlay chỉ áp dụng tại vị trí ảnh lớn theo thiết lập giao diện; ảnh upload mới dùng WebP sạch và bản gốc được lưu riêng tư trong `ORIGINALS`.

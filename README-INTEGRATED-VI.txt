@@ -5,7 +5,8 @@ KIẾN TRÚC
 - Trang quản trị: public/admin/index.html, truy cập /admin/.
 - Pages Functions: functions/.
 - Dữ liệu chính thức: Cloudflare D1 qua binding DB.
-- Ảnh upload: Cloudflare R2 qua binding IMAGES.
+- Ảnh WebP hiển thị/logo: Cloudflare R2 binding `IMAGES`.
+- Ảnh gốc sản phẩm và ảnh bằng chứng bảo hành: Cloudflare R2 binding `ORIGINALS`, bắt buộc là bucket riêng tư khác `IMAGES`.
 - Ảnh sản phẩm tĩnh được đóng watermark trên file WebP; các đường dẫn ảnh đang dùng được giữ nguyên.
 
 NGUYÊN TẮC
@@ -23,9 +24,9 @@ KIỂM TRA
 4. npm test.
 
 TRƯỚC KHI DEPLOY
-- Trong Cloudflare Dashboard, gắn binding DB tới đúng D1 database và binding IMAGES tới đúng R2 bucket trên Production.
-- Tạo Production Secrets ADMIN_PASSWORD (ít nhất 12 ký tự) và SESSION_SECRET (ít nhất 32 ký tự, nên dùng chuỗi ngẫu nhiên dài).
-- Đọc README-DEPLOY.txt. Chạy `npm run setup:cloudflare` để áp dụng migration 0003 và deploy có xác nhận. Workflow GitHub Actions không tự chạy migration/seed.
+- Trong Cloudflare Dashboard, gắn bindings `DB`, `IMAGES` và `ORIGINALS` tới đúng tài nguyên trên Production. `ORIGINALS` phải là bucket R2 riêng tư khác `IMAGES`, không public access, `r2.dev` hay custom domain công khai.
+- Tạo Production Secrets `ADMIN_PASSWORD` (ít nhất 12 ký tự) và `SESSION_SECRET` (ít nhất 32 ký tự, nên dùng chuỗi ngẫu nhiên dài). Nếu dùng GitHub Actions để deploy, chỉ đặt repository variable `CLOUDFLARE_PAGES_ORIGINALS_READY=true` sau khi đã xác minh `ORIGINALS` riêng tư và binding đúng Production; guard sẽ chặn deploy nếu chưa xác minh.
+- Đọc README-DEPLOY.txt. Chạy `npm run setup:cloudflare` để áp dụng các migration `0001`, `0003`–`0006` theo thứ tự và deploy có xác nhận; chỉ seed `0002` khi người vận hành chọn YES và D1 được xác minh đang trống. Workflow GitHub Actions deploy không tự chạy migration/seed.
 
 TÍNH NĂNG MỚI
 - SEO metadata cho trang chủ và URL sản phẩm, Product JSON-LD, sitemap.xml, robots.txt.
@@ -36,6 +37,6 @@ TÍNH NĂNG MỚI
 GIỚI HẠN
 - Chưa bật đăng nhập tài khoản khách hàng; cần thiết kế và triển khai cơ chế xác thực riêng nếu muốn mở tính năng này.
 - Chưa tích hợp cổng thanh toán/email/SMS/vận chuyển.
-- Ảnh R2 cũ cần tải lại qua quản trị để watermark nằm trong file gốc.
+- Watermark được phủ trên ảnh lớn ở trang chi tiết/toàn ảnh theo cài đặt; không phủ thẻ danh sách/thumbnail. Watermark overlay không sửa file ảnh. Ảnh sản phẩm tĩnh trong gói nền đã được xử lý riêng; ảnh tải mới lưu WebP sạch trong `IMAGES`, file gốc trong `ORIGINALS`.
 - Watermark không thể ngăn tuyệt đối chụp/quay màn hình.
 - Chưa deploy Production hoặc kiểm tra bằng trình duyệt thật; xem UPGRADE-REPORT.md.
