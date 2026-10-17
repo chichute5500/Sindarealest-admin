@@ -60,7 +60,7 @@ Lưu bindings/secrets trước rồi mới chạy `npm run setup:cloudflare` ho�
 Workflow `.github/workflows/deploy.yml` chạy `npm install`, `npm run check`, `npm test` rồi mới deploy; workflow KHÔNG chạy migrations hoặc seed.
 
 Trong GitHub repository, thêm Secrets:
-- `CLOUDFLARE_API_TOKEN`: token chỉ có quyền tối thiểu cần cho Pages deploy và đọc danh sách project.
+- `CLOUDFLARE_API_TOKEN`: token cần quyền Pages Read/Deploy và R2 Read để workflow xác minh binding Production cùng trạng thái public access.
 - `CLOUDFLARE_ACCOUNT_ID`: Account ID của tài khoản Cloudflare đúng.
 
 Thêm Repository Variables:
@@ -99,4 +99,4 @@ WATERMARK AND PRIVATE ORIGINALS SAFETY
 - `IMAGES` stores public optimized WebP derivatives and the existing `/watermark.webp` logo.
 - `ORIGINALS` must be a separate private R2 bucket. Do not enable public access, `r2.dev`, or a public custom domain for it.
 - The admin upload API refuses new uploads until the `ORIGINALS` binding exists; the original is stored privately and only the clean WebP derivative is served publicly.
-- Production deployment is blocked unless `CLOUDFLARE_PAGES_ORIGINALS_READY=true` is set after verifying the binding in the correct Pages environment. Do not set this variable merely to bypass a failed upload.
+- Workflow tự đọc binding Pages Production và kiểm tra R2 API để xác nhận `ORIGINALS` khác `IMAGES`, `r2.dev` bị tắt và không có custom domain đang public. Nếu token thiếu quyền hoặc không xác minh được, workflow dừng trước deploy; không cần đặt biến readiness thủ công.
