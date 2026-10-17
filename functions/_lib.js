@@ -53,8 +53,9 @@ export function warrantyStatusOnDate(status, startsAt, endsAt, today = getCurren
   if (status !== "active") return status;
   const startDate = String(startsAt ?? "");
   const endDate = String(endsAt ?? "");
-  if (isIsoCalendarDate(endDate) && endDate < today) return "expired";
-  if (isIsoCalendarDate(startDate) && startDate > today) return "pending";
+  if (!isIsoCalendarDate(startDate) || !isIsoCalendarDate(endDate) || startDate > endDate) return "invalid";
+  if (endDate < today) return "expired";
+  if (startDate > today) return "pending";
   return status;
 }
 

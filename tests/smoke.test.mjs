@@ -17,6 +17,9 @@ assert.equal(getCurrentDateInVietnam(new Date('2026-10-17T17:00:00.000Z')), '202
 assert.equal(warrantyStatusOnDate('active', '2026-10-01', '2026-10-16', '2026-10-17'), 'expired', 'a warranty ended yesterday must be expired in Vietnam');
 assert.equal(warrantyStatusOnDate('active', '2026-10-01', '2026-10-17', '2026-10-17'), 'active', 'the listed end date remains eligible through that date');
 assert.equal(warrantyStatusOnDate('active', '2026-10-18', '2026-10-20', '2026-10-17'), 'pending', 'a future-start warranty must not be labelled active');
+assert.equal(warrantyStatusOnDate('active', 'invalid-date', '2026-10-20', '2026-10-17'), 'invalid', 'invalid start dates must not be labelled active');
+assert.equal(warrantyStatusOnDate('active', '2026-10-01', '2026-99-20', '2026-10-17'), 'invalid', 'invalid end dates must not be labelled active');
+assert.equal(warrantyStatusOnDate('active', '2026-11-01', '2026-10-20', '2026-10-17'), 'invalid', 'a start date after the end date must be flagged');
 assert.equal(isWarrantyEligibleOnDate('active', '2026-10-01', '2026-10-17', '2026-10-17'), true, 'warranty is eligible on its start date and its end date');
 assert.equal(isWarrantyEligibleOnDate('active', '2026-10-01', '2026-10-16', '2026-10-17'), false, 'warranty is not eligible after its end date');
 assert.equal(isWarrantyEligibleOnDate('expired', '2026-10-01', '2026-10-20', '2026-10-17'), false, 'an explicitly expired warranty is not eligible');
