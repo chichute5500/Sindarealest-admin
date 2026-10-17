@@ -178,7 +178,7 @@ export async function onRequestPost(context) {
       + operations.claims.length * 9
       + operations.warrantyClaimAttachments.length * 2
       + operations.logs.length * 7
-    : 0) + 1 + (v2 ? 4 + watermarkUpdates.length : 0);
+    : 0) + 1 + (v2 ? 8 + watermarkUpdates.length * 2 : 0);
   if (bindingCount > MAX_RESTORE_BINDINGS) {
     return fail("Bản sao lưu vượt giới hạn an toàn của số tham số D1 cho một lần khôi phục. Hãy chia dữ liệu thành các bản nhỏ hơn trước khi tiếp tục.", 413);
   }
