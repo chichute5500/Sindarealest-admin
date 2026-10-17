@@ -25,7 +25,7 @@ KIỂM TRA
 
 TRƯỚC KHI DEPLOY
 - Trong Cloudflare Dashboard, gắn bindings `DB`, `IMAGES` và `ORIGINALS` tới đúng tài nguyên trên Production. `ORIGINALS` phải là bucket R2 riêng tư khác `IMAGES`, không public access, `r2.dev` hay custom domain công khai.
-- Tạo Production Secrets `ADMIN_PASSWORD` (ít nhất 12 ký tự) và `SESSION_SECRET` (ít nhất 32 ký tự, nên dùng chuỗi ngẫu nhiên dài). Nếu dùng GitHub Actions để deploy, chỉ đặt repository variable `CLOUDFLARE_PAGES_ORIGINALS_READY=true` sau khi đã xác minh `ORIGINALS` riêng tư và binding đúng Production; guard sẽ chặn deploy nếu chưa xác minh.
+- Tạo Production Secrets `ADMIN_PASSWORD` (ít nhất 12 ký tự) và `SESSION_SECRET` (ít nhất 32 ký tự, nên dùng chuỗi ngẫu nhiên dài). GitHub Actions tự xác minh binding Production `IMAGES`/`ORIGINALS`, kiểm tra `r2.dev` tắt và không có custom domain public trên `ORIGINALS` trước khi deploy. Token cần quyền Pages Read/Deploy và R2 Read; nếu không xác minh được, deploy bị chặn.
 - Đọc README-DEPLOY.txt. Chạy `npm run setup:cloudflare` để áp dụng các migration `0001`, `0003`–`0006` theo thứ tự và deploy có xác nhận; chỉ seed `0002` khi người vận hành chọn YES và D1 được xác minh đang trống. Workflow GitHub Actions deploy không tự chạy migration/seed.
 
 TÍNH NĂNG MỚI
