@@ -1,0 +1,59 @@
+name: Preview binding preflight (read-only)
+
+on:
+  push:
+    branches:
+      - feature/ai-image-grouping
+
+permissions:
+  contents: read
+
+jobs:
+  preview-bindings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect Cloudflare Pages Preview bindings without changing configuration
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN GitHub secret."; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID GitHub secret."; exit 1; }
+          test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT GitHub variable."; exit 1; }
+
+          response="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}")"
+          printf '%s' "$response" | jq -e '.success == true' >/dev/null
+
+          preview_db="$(printf '%s' "$response" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          production_db="$(printf '%s' "$response" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          preview_images="$(printf '%s' "$response" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          production_images="$(printf '%s' "$response" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          preview_originals="$(printf '%s' "$response" | jq -r '.result.deployment_configs.preview.r2_buckets.ORIGINALS.name // empty')"
+          production_originals="$(printf '%s' "$response" | jq -r '.result.deployment_configs.production.r2_buckets.ORIGINALS.name // empty')"
+
+          printf 'Preview DB binding: %s\n' "${preview_db:+configured}"
+          printf 'Preview IMAGES binding: %s\n' "${preview_images:+configured}"
+          printf 'Preview ORIGINALS binding: %s\n' "${preview_originals:+configured}"
+
+          test -n "$preview_db" || { echo "::error::Preview D1 binding DB is missing. No database was changed."; exit 1; }
+          test -n "$preview_images" || { echo "::error::Preview R2 binding IMAGES is missing. No resources were changed."; exit 1; }
+          test -n "$preview_originals" || { echo "::error::Preview R2 binding ORIGINALS is missing. No resources were changed."; exit 1; }
+          test -n "$production_db" || { echo "::error::Could not verify Production DB identity; stopping safely."; exit 1; }
+          test -n "$production_images" || { echo "::error::Could not verify Production IMAGES bucket identity; stopping safely."; exit 1; }
+          test -n "$production_originals" || { echo "::error::Could not verify Production ORIGINALS bucket identity; stopping safely."; exit 1; }
+
+          if [ "$preview_db" = "$production_db" ]; then
+            echo "::error::Preview DB points to the Production database. Stopping before any migration or write."
+            exit 1
+          fi
+          if [ "$preview_images" = "$production_images" ] || [ "$preview_originals" = "$production_originals" ]; then
+            echo "::error::At least one Preview R2 binding points to a Production bucket. Stopping safely."
+            exit 1
+          fi
+          echo "PASS: Preview D1 and both R2 bindings are configured and isolated from Production."
