@@ -90,7 +90,7 @@ async function main() {
     throw new Error('Dừng trước mọi lệnh SQL và deploy. Hãy kiểm tra bindings DB/IMAGES/ORIGINALS và 2 secrets ADMIN_PASSWORD, SESSION_SECRET, rồi chạy lại npm run setup:cloudflare.');
   }
   const confirm = await ask(`Để xác nhận, nhập chính xác: DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`);
-  if (confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket}`) {
+  if (confirm !== `DEPLOY ${project} USING ${dbName} AND ${bucket} AND ${originalsBucket}`) {
     throw new Error('Chuỗi xác nhận không khớp. Đã hủy trước khi chạy SQL hoặc deploy.');
   }
 
