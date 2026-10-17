@@ -66,7 +66,7 @@ Trong GitHub repository, thêm Secrets:
 Thêm Repository Variables:
 - `CLOUDFLARE_PAGES_PROJECT`: tên Pages project đúng.
 - `CLOUDFLARE_PAGES_BRANCH`: production branch đúng.
-- `CLOUDFLARE_PAGES_ORIGINALS_READY`: chỉ đặt chuỗi `true` SAU KHI xác minh bucket `ORIGINALS` riêng tư và binding được gắn trên đúng môi trường Production Pages. Nếu chưa xác minh, để trống/false; workflow sẽ bỏ qua deploy production.
+- Workflow tự đọc binding Pages Production và kiểm tra R2 API để xác nhận `ORIGINALS` khác `IMAGES`, `r2.dev` bị tắt và không có custom domain đang public. Nếu token thiếu quyền hoặc không xác minh được, workflow dừng trước deploy; không cần đặt biến readiness thủ công.
 
 Token cần được tạo trong Cloudflare Dashboard và không được commit vào repository. Trước khi bật workflow, xác nhận project đã tồn tại trong cùng tài khoản với Account ID. Nếu thiếu hoặc sai cấu hình, workflow phải thất bại trước deploy.
 
