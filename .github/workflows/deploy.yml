@@ -3,7 +3,6 @@ name: Deploy SinDarealest to Cloudflare Pages
 on:
   workflow_dispatch:
   push:
-    # Production is being consolidated onto main; deploy remains gated below.
     branches:
       - main
 
@@ -20,7 +19,6 @@ jobs:
       CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
       CLOUDFLARE_PAGES_BRANCH: main
       CLOUDFLARE_D1_DATABASE: sindarealest-db
-      CLOUDFLARE_PAGES_ORIGINALS_READY: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY }}
 
     steps:
       - name: Check out source
@@ -46,10 +44,12 @@ jobs:
       - name: Require explicit Cloudflare target
         shell: bash
         run: |
+          set -euo pipefail
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_R2_READ_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_R2_READ_API_TOKEN secret"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
           test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT repository variable"; exit 1; }
-          test -n "$CLOUDFLARE_PAGES_BRANCH" || { echo "::error::Missing CLOUDFLARE_PAGES_BRANCH repository variable"; exit 1; }
+          test "$CLOUDFLARE_PAGES_BRANCH" = "main" || { echo "::error::Production branch must be main"; exit 1; }
 
       - name: Set Cloudflare Pages Production branch to main
         shell: bash
@@ -62,20 +62,14 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}" \
             --data '{"production_branch":"main"}')"
           printf '%s' "$response" | jq -e '.success == true and .result.production_branch == "main"' >/dev/null
-          echo "Cloudflare Pages Production branch is now main."
+          echo "Cloudflare Pages Production branch is main."
 
       - name: Diagnose Cloudflare Pages project access
         run: npx wrangler pages project list --json
 
-      - name: Skip production deploy until ORIGINALS is verified
-        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true'
-        run: echo "::notice::Production deploy skipped safely; verify private ORIGINALS binding before enabling it."
-
-      - name: Diagnose actual Production R2 bindings
-        if: success()
-        continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}
+      - name: Verify Production Pages and private R2 bindings
         run: node scripts/verify-pages-bindings.mjs
 
-      - name: Deploy to verified Pages project
-        if: vars.CLOUDFLARE_PAGES_ORIGINALS_READY == 'true'
+      - name: Deploy to verified Cloudflare Pages project
+        if: success()
         run: npm run deploy
