@@ -190,7 +190,14 @@ export async function getSetting(db, key, fallback = "0") {
 export function parseImages(value) {
   try {
     const images = typeof value === "string" ? JSON.parse(value) : value;
-    return Array.isArray(images) ? images.filter((x) => typeof x === "string") : [];
+    if (!Array.isArray(images)) return [];
+    // Only serve known local WebP paths. Old or imported DB values must not turn
+    // a stored image field into a remote request or an HTML attribute payload.
+    return images.filter((x) =>
+      typeof x === "string" &&
+      (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) ||
+       /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x))
+    );
   } catch { return []; }
 }
 
