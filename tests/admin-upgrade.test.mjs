@@ -2,14 +2,16 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const read = path => readFileSync(new URL(path, import.meta.url).pathname, "utf8");
 const admin = read("../public/admin/index.html");
+const adminCss = read("../public/admin/admin.css");
+const storefrontCss = read("../public/storefront.css");
 const lib = read("../functions/_lib.js");
 const products = read("../functions/api/admin/products.js");
 const middleware = read("../functions/_middleware.js");
 const ai = read("../functions/api/admin/ai-description.js");
 const push = read("../functions/api/admin/push-subscriptions.js");
 assert.ok(!admin.includes('id="pSku"'), "SKU input should not be shown in admin product form");
-assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
-assert.ok(read("../public/index.html").includes("-webkit-tap-highlight-color: transparent"), "Storefront controls should not flash blue when tapped on Android");
+assert.ok(adminCss.includes("-webkit-tap-highlight-color:transparent"), "Admin controls should not flash blue when tapped on Android");
+assert.ok(storefrontCss.includes("-webkit-tap-highlight-color:transparent"), "Storefront controls should not flash blue when tapped on Android");
 assert.ok(read("../public/index.html").includes("encodeURIComponent(p.sku||p.id)"), "Product URLs should prefer stable SKU while retaining ID fallback");
 assert.ok(!read("../public/index.html").includes("CRAFTED WITH<br>CHARACTER") && !read("../public/index.html").includes("hero-stamp-image-spacer") && !read("../public/index.html").includes(".hero-stamp{"), "Entire hero stamp and related styles should be removed");
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
@@ -18,7 +20,7 @@ assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:
 assert.ok(read("../functions/_middleware.js").includes("encodeURIComponent(product.sku)"), "Product canonical URL must use SKU");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
-assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");
+assert.ok(adminCss.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");
 assert.ok(admin.includes('id="generateDescription"'), "AI description action missing");
 assert.ok(admin.includes('id="showPassword"'), "Password visibility toggle missing");
 assert.ok(admin.includes('id="passwordEye"'), "Password visibility toggle must use an eye icon");
@@ -31,7 +33,7 @@ assert.ok(lib.includes("const SESSION_SECONDS = 10 * 60"), "Session should expir
 assert.ok(middleware.includes("sessionCookie(token)"), "Valid admin API activity should renew session cookie");
 assert.ok(products.includes("SELECT sku FROM products"), "SKU generation should use server-side database data");
 assert.ok(admin.includes("data-image-index") && admin.includes("text/x-sd-image-index"), "Admin gallery should support drag-and-drop reordering");
-assert.ok(admin.includes("Liquid Glass admin skin"), "Admin should use the matching Liquid Glass visual system");
+assert.ok(adminCss.includes("Liquid Glass admin skin") && adminCss.includes("backdrop-filter:blur(22px)"), "Admin should use the matching Liquid Glass visual system");
 assert.ok(admin.includes('<svg viewBox="0 0 24 24" aria-hidden="true">'), "Admin navigation should use consistent line icons");
 assert.ok(middleware.includes("lower(id)=?"), "Product URLs should support immutable IDs");
 assert.ok(products.includes("makeCategoryPrefix(normalized)"), "New categories should receive automatic SKU prefixes without a hardcoded category list");
@@ -42,6 +44,6 @@ assert.ok(push.includes("requireAdmin"), "Push subscriptions must require admin 
 console.log("PASS: admin upgrade static regression checks.");
 
 assert.ok(!read("../public/index.html").includes('id="craftsmanship"') && !read("../public/index.html").includes("images/17599dbbaea33cdd.webp"), "Crafted-with-character image and section must be removed completely");
-assert.ok(read("../public/index.html").includes(".menu-btn{position:absolute!important;left:8px"), "Mobile hamburger menu should be positioned on the left");
-assert.ok(read("../public/index.html").includes(".checkout-fields input,.checkout-fields select,.checkout-fields textarea{"), "Province/city selector should share the same glass field styling");
+assert.ok(storefrontCss.includes(".menu-btn{position:absolute!important;left:8px!important"), "Mobile hamburger menu should be positioned on the left");
+assert.ok(storefrontCss.includes(".checkout-fields input,.checkout-fields select,.checkout-fields textarea{"), "Province/city selector should share the same glass field styling");
 assert.ok(admin.includes("<h2>Đăng nhập</h2>") && admin.includes("<p>Đăng nhập quản trị</p>"), "Admin login UI should be labeled clearly in Vietnamese");
