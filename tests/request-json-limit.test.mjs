@@ -43,6 +43,12 @@ const boundedRoutes = [
   "../functions/api/admin/login.js",
   "../functions/api/admin/ai-description.js",
   "../functions/api/admin/orders.js",
+  "../functions/api/admin/products.js",
+  "../functions/api/admin/products/[id].js",
+  "../functions/api/admin/products/reset-skus.js",
+  "../functions/api/admin/settings.js",
+  "../functions/api/admin/warranties.js",
+  "../functions/api/admin/push-subscriptions.js",
 ];
 for (const path of boundedRoutes) {
   const source = readFileSync(new URL(path, import.meta.url), "utf8");
