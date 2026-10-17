@@ -197,6 +197,12 @@ assert.ok(!JSON.stringify(lookupPayload).includes(demoWarrantyCode),'Phone looku
 assert.ok(!JSON.stringify(lookupPayload).includes('0901234567'),'Raw customer phone must not be returned');
 
 
+const codeOnlyClaimResponse = await createWarrantyClaim({
+  request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.15'},body:JSON.stringify({warrantyCode:demoWarrantyCode,issueType:'other',message:'Thử gửi thẳng bằng mã'})}),
+  env:{DB:warrantyDBInstance}
+});
+assert.equal(codeOnlyClaimResponse.status,403,'Warranty claim must require a short-lived token from a successful lookup');
+
 const claimResponse = await createWarrantyClaim({
   request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.13'},body:JSON.stringify({claimToken:codeActionToken,issueType:'other',contactPhone:'0901234567',message:'Lỗi bề mặt cần kiểm tra'})}),
   env:{DB:warrantyDBInstance}
