@@ -24,10 +24,10 @@ assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('imag
   'Dark mode displays the dark crocodile image directly with light text colors.');
 assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:none/,
   'Light mode displays the albino crocodile image directly with dark text colors.');
-assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
-  'The dark welcome screen must tint its albino image dark for contrast.');
-assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
-  'The light welcome screen must tint its dark crocodile image light for contrast.');
+assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
+  'The dark welcome screen must use the dark crocodile image with its dark contrast tint.');
+assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
+  'The light welcome screen must use the albino image with its light contrast tint.');
 assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--dark" src="images\/theme-croc-dark\.webp\?v=20261017-1"/,
   'The editorial material sample image must keep its black-material identity.');
 assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--light" src="images\/theme-croc-albino\.webp\?v=20261017-1"/,
