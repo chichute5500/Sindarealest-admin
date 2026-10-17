@@ -53,8 +53,6 @@ export async function onRequestPost(context) {
   if (parsedBody.error === "too_large") return fail("Yêu cầu đặt lại SKU vượt giới hạn kích thước.", 413);
   if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu đặt lại SKU không hợp lệ.");
   const body = parsedBody.value;
-  try { /* validation below intentionally uses the bounded parsed body */ }
-  catch { return fail("Yêu cầu đặt lại SKU không hợp lệ."); }
   if (body?.confirm !== true) return fail("Thiếu xác nhận đặt lại SKU.", 400);
 
   const db = context.env.DB;
