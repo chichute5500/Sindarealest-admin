@@ -137,8 +137,7 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
   assert.equal(malformedOperationsDB.batchCalls, 0, "malformed operational rows must not issue D1 writes");
 }
 
-{
-  const validRelationshipsBackup = () => ({
+const validRelationshipsBackup = () => ({
     format: "sindarealest-backup-v2",
     products: [],
     settings: {
@@ -160,8 +159,9 @@ const env = { ADMIN_PASSWORD, SESSION_SECRET };
       ],
       warranties: [], warrantyClaims: [], auditLogs: [],
     },
-  });
+});
 
+{
   const mismatchedWarranty = validRelationshipsBackup();
   mismatchedWarranty.operations.warranties.push({
     id: "warranty-1", order_id: "order-1", order_item_id: "item-2",
