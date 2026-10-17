@@ -33,16 +33,16 @@ assert.match(section, /href="https:\/\/zalo\.me\/0827049192"[^>]*aria-label="Tư
   'The standalone Zalo CTA must use the confirmed contact URL and accessible label.');
 assert.match(section, /Tư vấn\/đặt hàng qua Zalo/,
   'The CTA must use the agreed consultation/order wording.');
-const orderStyles = html.match(/<style id="sd-order-uniform-tiles">([\\s\\S]*?)<\\/style>/)?.[1] || '';
-assert.match(orderStyles, /#order \.order-zalo-cta\\{[^}]*background:#0068ff;border-color:#0068ff;color:#fff/,
+const orderStyles = html.match(/<style id="sd-order-uniform-tiles">([\s\S]*?)<\/style>/)?.[1] || '';
+assert.match(orderStyles, /#order \.order-zalo-cta\{[^}]*background:#0068ff;border-color:#0068ff;color:#fff/,
   'The Zalo CTA must keep an opaque Zalo-blue surface in both light and dark themes.');
-assert.match(orderStyles, /#order \.order-step h3\\{[^}]*font-size:14\.5px/,
+assert.match(orderStyles, /#order \.order-step h3\{[^}]*font-size:14\.5px/,
   'Desktop order-step headings must remain comfortably readable.');
-assert.match(orderStyles, /#order \.order-step p\\{[^}]*font-size:10\.5px/,
+assert.match(orderStyles, /#order \.order-step p\{[^}]*font-size:10\.5px/,
   'Desktop order-step body text must be larger than the previous tiny 9.5px setting.');
-assert.match(orderStyles, /@media\\(max-width:760px\\)[\\s\\S]*?#order \.order-step p\\{font-size:10\.5px/,
+assert.match(orderStyles, /@media\(max-width:760px\)[\s\S]*?#order \.order-step p\{font-size:10\.5px/,
   'Mobile order-step body text must remain readable.');
-assert.match(orderStyles, /#order \.order-zalo-cta:hover\\{background:#0068ff;border-color:#0068ff/,
+assert.match(orderStyles, /#order \.order-zalo-cta:hover\{background:#0068ff;border-color:#0068ff/,
   'The Zalo CTA must not turn translucent or lose its brand surface on hover.');
 
 
