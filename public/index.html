@@ -374,9 +374,9 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .detail-zoom-btn svg{display:block;width:19px;height:19px}
 .detail-gallery-arrow svg,.sd-fullscreen-arrow svg,.featured-arrow svg,.slide-controls button svg,.page-btn.page-arrow svg{display:block;width:18px;height:18px;flex:none;pointer-events:none}
 .detail-gallery-arrow svg path,.sd-fullscreen-arrow svg path,.featured-arrow svg path,.slide-controls button svg path,.page-btn.page-arrow svg path{stroke-width:1.8}
-.sd-fullscreen-viewer{position:fixed;inset:0;z-index:230;display:none;overflow:hidden;background:rgba(8,8,8,.94);color:#fff;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2)}
+.sd-fullscreen-viewer{position:fixed;inset:0;z-index:230;display:none;overflow:hidden;background:rgba(0,0,0,.30);color:#fff;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;backdrop-filter:blur(8px) saturate(1.05);-webkit-backdrop-filter:blur(8px) saturate(1.05)}
 .sd-fullscreen-viewer.open{display:block;animation:overlayIn .2s ease both}
-.sd-fullscreen-viewer:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(246,237,218,.08),rgba(24,22,19,.25));pointer-events:none}
+.sd-fullscreen-viewer:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(246,237,218,.025),rgba(24,22,19,.055));pointer-events:none}
 .sd-fullscreen-viewer>*{z-index:1}
 .sd-fullscreen-header{position:absolute;z-index:6;top:calc(13px + env(safe-area-inset-top));left:16px;right:72px;display:flex;align-items:center;gap:10px;min-height:40px;padding:7px 12px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(245,239,226,.12);box-shadow:0 8px 28px rgba(0,0,0,.12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);pointer-events:none;box-sizing:border-box}
 .sd-fullscreen-brand-mark{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border:1px solid rgba(216,180,110,.8);border-radius:50%;color:#e0bb75;font:600 10px/1 Arial,sans-serif;letter-spacing:.04em}
@@ -393,10 +393,10 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .sd-fullscreen-prev{left:12px}.sd-fullscreen-next{right:12px}
 .sd-fullscreen-arrow:hover,.sd-fullscreen-close:hover{background:rgba(157,119,58,.86)}
 /* One shared Liquid Glass material keeps gallery controls and image counters consistent. */
-.detail-zoom-btn,.detail-gallery-arrow,.featured-arrow,.slide-controls button,.sd-fullscreen-close,.sd-fullscreen-arrow{border:1px solid var(--sd-gallery-glass-border);background:var(--sd-gallery-glass);color:#fff;backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);box-shadow:var(--sd-gallery-glass-shadow);transition:transform .34s cubic-bezier(.34,1.56,.64,1),background .22s ease,border-color .22s ease,box-shadow .22s ease,opacity .22s ease}
+.detail-zoom-btn,.detail-gallery-arrow,.featured-arrow,.slide-controls button,.page-btn.page-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow{border:1px solid var(--sd-gallery-glass-border);background:var(--sd-gallery-glass);color:#fff;backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);box-shadow:var(--sd-gallery-glass-shadow);transition:transform .34s cubic-bezier(.34,1.56,.64,1),background .22s ease,border-color .22s ease,box-shadow .22s ease,opacity .22s ease}
 .slide-count,.featured-image-count,.detail-image-count,.sd-fullscreen-count{border:1px solid var(--sd-gallery-glass-border);border-radius:999px;background:var(--sd-gallery-glass);color:#fff;backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);box-shadow:var(--sd-gallery-glass-shadow);text-shadow:0 1px 8px rgba(0,0,0,.5)}
-.detail-gallery-arrow:active,.sd-fullscreen-arrow:active{transform:translateY(-50%) scale(.7);transition-duration:90ms;transition-timing-function:cubic-bezier(.2,.75,.25,1)}
-.featured-arrow:active,.slide-controls button:active,.page-btn.page-arrow:active{transform:scale(.7);transition-duration:90ms;transition-timing-function:cubic-bezier(.2,.75,.25,1)}
+.detail-gallery-arrow:active,.sd-fullscreen-arrow:active{transform:translateY(-50%) scale(.85);transition-duration:90ms;transition-timing-function:cubic-bezier(.2,.75,.25,1)}
+.featured-arrow:active,.slide-controls button:active,.page-btn.page-arrow:active{transform:scale(.85);transition-duration:90ms;transition-timing-function:cubic-bezier(.2,.75,.25,1)}
 .sd-fullscreen-count{position:absolute;z-index:6;left:50%;bottom:calc(79px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:5px 10px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
 .sd-fullscreen-thumbs{position:absolute;z-index:5;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;overflow-x:auto;padding:8px 16px;scrollbar-width:none;overscroll-behavior-x:contain}
 .sd-fullscreen-thumbs::-webkit-scrollbar{display:none}
@@ -1049,5 +1049,44 @@ img { -webkit-user-drag:none; user-select:none; }
  #order .order-step:hover{transform:none}
 }
 </style>
+
+<style id="sd-unified-arrow-glass-final">
+/* One source of truth for every arrow control across desktop and mobile. */
+.detail-gallery-arrow,.featured-arrow,.slide-controls button#artPrev,.slide-controls button#artNext,
+.page-btn.page-arrow,.sd-fullscreen-arrow{
+  border:1px solid var(--sd-gallery-glass-border)!important;
+  background:var(--sd-gallery-glass)!important;
+  color:#fff!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.35)!important;
+  backdrop-filter:blur(18px) saturate(1.35)!important;
+  box-shadow:var(--sd-gallery-glass-shadow)!important;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),background .22s ease,border-color .22s ease,box-shadow .22s ease,opacity .22s ease!important;
+}
+.detail-gallery-arrow:hover,.featured-arrow:hover,.slide-controls button#artPrev:hover,.slide-controls button#artNext:hover,
+.page-btn.page-arrow:hover,.sd-fullscreen-arrow:hover{
+  background:rgba(157,119,58,.72)!important;
+  border-color:rgba(255,255,255,.62)!important;
+}
+.detail-gallery-arrow:active,.sd-fullscreen-arrow:active{
+  transform:translateY(-50%) scale(.85)!important;
+  transition-duration:90ms!important;
+  transition-timing-function:cubic-bezier(.2,.75,.25,1)!important;
+}
+.featured-arrow:active,.slide-controls button#artPrev:active,.slide-controls button#artNext:active,.page-btn.page-arrow:active{
+  transform:scale(.85)!important;
+  transition-duration:90ms!important;
+  transition-timing-function:cubic-bezier(.2,.75,.25,1)!important;
+}
+/* Fullscreen is a 30% dark translucent veil, not an opaque black canvas. */
+.sd-fullscreen-viewer{
+  background:rgba(0,0,0,.30)!important;
+  -webkit-backdrop-filter:blur(8px) saturate(1.05)!important;
+  backdrop-filter:blur(8px) saturate(1.05)!important;
+}
+.sd-fullscreen-viewer:before{
+  background:linear-gradient(145deg,rgba(246,237,218,.025),rgba(24,22,19,.055))!important;
+}
+</style>
+
 </body>
 </html>
