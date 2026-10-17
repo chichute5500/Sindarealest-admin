@@ -36,7 +36,7 @@ assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must requir
 assert.ok(workflow.includes("CLOUDFLARE_PAGES_ORIGINALS_READY: 'true'"), 'Deploy may set readiness only after the mandatory verifier succeeds');
 assert.ok(workflow.indexOf('Verify Production Pages and private R2 bindings') < workflow.indexOf('Deploy to verified Cloudflare Pages project'), 'Actual production bindings must be verified before deployment');
 assert.ok(workflow.includes('node scripts/verify-pages-bindings.mjs'), 'Deployment must run the production binding verifier');
-assert.ok(workflow.includes("continue-on-error: ${{ vars.CLOUDFLARE_PAGES_ORIGINALS_READY != 'true' }}"), 'Binding diagnostics may not block a safely skipped deployment, but must block deployment when readiness is enabled');
+assert.ok(!workflow.includes('continue-on-error:'), 'Production binding verification must fail closed');
 const bindingVerifier = readFileSync(new URL('../scripts/verify-pages-bindings.mjs', import.meta.url), 'utf8');
 assert.ok(bindingVerifier.includes('deployment_configs?.production'), 'Binding verifier must inspect production, not preview, settings');
 assert.ok(bindingVerifier.includes('buckets.IMAGES?.name') && bindingVerifier.includes('buckets.ORIGINALS?.name'), 'Binding verifier must require IMAGES and ORIGINALS');
