@@ -20,10 +20,10 @@ assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
 
-assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*linear-gradient\(180deg,rgba\(0,0,0,\.62\),rgba\(0,0,0,\.80\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
-  'Dark mode keeps the albino image but darkens it for the light text palette.');
-assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*linear-gradient\(180deg,rgba\(250,246,237,\.60\),rgba\(247,242,233,\.78\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
-  'Light mode keeps the dark crocodile image but lightens it for the dark text palette.');
+assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:none/,
+  'Dark mode displays the albino background image directly without a full-page tint.');
+assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-dark\.webp\?v=20261017-1'\);filter:none/,
+  'Light mode displays the dark crocodile background image directly without a full-page tint.');
 assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
   'The dark welcome screen must tint its albino image dark for contrast.');
 assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
