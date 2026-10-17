@@ -40,7 +40,13 @@ export function getCurrentDateInVietnam(date = new Date()) {
 }
 
 function isIsoCalendarDate(value) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(String(value ?? ""));
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value ?? ""));
+  if (!match) return false;
+  const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+  if (year < 1 || month < 1 || month > 12 || day < 1) return false;
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysInMonth[month - 1];
 }
 
 export function warrantyStatusOnDate(status, endsAt, today = getCurrentDateInVietnam()) {
@@ -49,9 +55,14 @@ export function warrantyStatusOnDate(status, endsAt, today = getCurrentDateInVie
   return status;
 }
 
-export function isWarrantyEligibleOnDate(status, endsAt, today = getCurrentDateInVietnam()) {
+export function isWarrantyEligibleOnDate(status, startsAt, endsAt, today = getCurrentDateInVietnam()) {
+  const startDate = String(startsAt ?? "");
   const endDate = String(endsAt ?? "");
-  return status === "active" && isIsoCalendarDate(endDate) && endDate >= today;
+  return status === "active" &&
+    isIsoCalendarDate(startDate) &&
+    isIsoCalendarDate(endDate) &&
+    startDate <= today &&
+    endDate >= today;
 }
 
 function b64url(bytesOrString) {

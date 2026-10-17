@@ -21,9 +21,9 @@ export async function onRequestPost({request,env}){
  const message="Loại vấn đề: "+issueLabels[issueType]+"\n"+(contactPhone?"Số liên hệ: "+contactPhone+"\n":"")+"Mô tả: "+description;
  if(imageKey&&!/^warranty-claims\/[0-9a-f]{32}\.webp$/.test(imageKey))return fail("Ảnh đính kèm không hợp lệ.");
  try{
-  const warranty=await env.DB.prepare("SELECT w.id,w.order_id,w.warranty_code,o.customer_id,o.order_number,w.status,w.ends_at FROM warranties w JOIN orders o ON o.id=w.order_id WHERE upper(w.warranty_code)=? LIMIT 1").bind(warrantyCode).first();
+  const warranty=await env.DB.prepare("SELECT w.id,w.order_id,w.warranty_code,o.customer_id,o.order_number,w.status,w.starts_at,w.ends_at FROM warranties w JOIN orders o ON o.id=w.order_id WHERE upper(w.warranty_code)=? LIMIT 1").bind(warrantyCode).first();
   if(!warranty||(tokenWarrantyId&&String(warranty.id)!==tokenWarrantyId))return fail("Không tìm thấy phiên bảo hành hợp lệ.",404);
-  if(!isWarrantyEligibleOnDate(warranty.status,warranty.ends_at,getCurrentDateInVietnam()))return fail("Bảo hành không còn hiệu lực.",409);
+  if(!isWarrantyEligibleOnDate(warranty.status,warranty.starts_at,warranty.ends_at,getCurrentDateInVietnam()))return fail("Bảo hành không còn hiệu lực.",409);
   if(imageKey){const uploaded=await env.DB.prepare("SELECT key FROM settings WHERE key=? AND value=? AND julianday(updated_at)>julianday('now','-15 minutes') LIMIT 1").bind("warranty_upload:"+imageKey,warrantyCode).first();if(!uploaded)return fail("Ảnh đính kèm không hợp lệ hoặc đã hết hạn.",400)}
   const id=crypto.randomUUID(),statements=[env.DB.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message) VALUES(?,?,?,?,?)").bind(id,warranty.order_id,warranty.customer_id,warrantyCode,message)];
   if(imageKey){statements.push(env.DB.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(id,imageKey));statements.push(env.DB.prepare("DELETE FROM settings WHERE key=?").bind("warranty_upload:"+imageKey))}
