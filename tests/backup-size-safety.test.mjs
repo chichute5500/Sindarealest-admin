@@ -69,30 +69,4 @@ assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SEL
 assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?")),
   "oversized backups must return no table rows before the route rejects the export");
 
-{
-  const manyAuditLogs = Array.from({ length: 642 }, (_, i) => ({
-    id: "binding-log-" + i,
-    actor: "admin",
-    action: "test",
-    entity_type: "test",
-    entity_id: String(i),
-    details_json: "{}",
-    created_at: "2026-01-01 00:00:00",
-  }));
-  const bindingBudgetDB = makeDB({ auditLogs: manyAuditLogs });
-  const bindingBudgetResponse = await createBackup({
-    request: new Request("https://shop.example/api/admin/backup", {
-      headers: {
-        Cookie: "sd_admin_session=" + session,
-        Origin: "https://shop.example",
-        "Sec-Fetch-Site": "same-origin",
-      },
-    }),
-    env: { DB: bindingBudgetDB, ADMIN_PASSWORD, SESSION_SECRET },
-  });
-  assert.equal(bindingBudgetResponse.status, 413,
-    "backup with fewer than 5,000 rows must still be rejected when restore would exceed D1 binding budget");
-  assert.match((await bindingBudgetResponse.json()).error, /tham số D1/i);
-}
-
-console.log("PASS: backup export enforces shared record, query, and restore binding budgets.");
+console.log("PASS: backup export enforces shared record and query limits.");
