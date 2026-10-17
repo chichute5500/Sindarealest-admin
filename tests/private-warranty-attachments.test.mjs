@@ -47,6 +47,7 @@ function mockDB(startDate = '2026-01-01') {
     prepare(sql) {
       let values = [];
       const statement = {
+        sql,
         bind(...next) { values = next; return statement; },
         async first() {
           if (sql.includes("SELECT attempts FROM public_rate_limits")) return { attempts: 1 };
@@ -69,6 +70,18 @@ function mockDB(startDate = '2026-01-01') {
         },
       };
       return statement;
+    },
+    async batch(statements) {
+      const results = [];
+      for (const statement of statements) {
+        if (statement.sql.includes("SELECT attempts FROM public_rate_limits")) {
+          results.push({ results: [{ attempts: 1 }] });
+        } else {
+          const result = await statement.run();
+          results.push({ ...result, results: [] });
+        }
+      }
+      return results;
     },
   };
   return db;
