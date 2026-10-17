@@ -80,11 +80,11 @@ const homepage = existsSync(join(root, 'public/index.html')) ? readFileSync(join
 const storefrontCss = existsSync(join(root, 'public/ui/storefront.css')) ? readFileSync(join(root, 'public/ui/storefront.css'), 'utf8') : '';
 const adminCss = existsSync(join(root, 'public/ui/admin.css')) ? readFileSync(join(root, 'public/ui/admin.css'), 'utf8') : '';
 check(homepage.includes('/ui/storefront.css?v=20261017-2'), 'Trang chủ chưa liên kết stylesheet giao diện đã hợp nhất');
-check(!/<style\\b/i.test(homepage), 'Trang chủ không được giữ các khối CSS vá nhúng trong HTML');
+check(!/<style\b/i.test(homepage), 'Trang chủ không được giữ các khối CSS vá nhúng trong HTML');
 check(!homepage.includes('class="theme-watermark"') && !storefrontCss.includes('theme-watermark{'), 'Không được giữ watermark thử nghiệm phủ nền toàn trang');
 check(storefrontCss.includes('theme-croc-dark.webp?v=') && storefrontCss.includes('theme-croc-albino.webp?v='), 'Thiếu ảnh nền có phiên bản cho hai chế độ sáng/tối');
-check(/\\.theme-bg--dark\\{[^}]*theme-croc-dark\\.webp/.test(storefrontCss), 'Chế độ tối phải dùng ảnh nền da cá sấu tối');
-check(/\\.theme-bg--light\\{[^}]*theme-croc-albino\\.webp/.test(storefrontCss), 'Chế độ sáng phải dùng ảnh nền albino sáng');
+check(/\.theme-bg--dark\{[^}]*theme-croc-dark\.webp/.test(storefrontCss), 'Chế độ tối phải dùng ảnh nền da cá sấu tối');
+check(/\.theme-bg--light\{[^}]*theme-croc-albino\.webp/.test(storefrontCss), 'Chế độ sáng phải dùng ảnh nền albino sáng');
 check(adminCss.includes('theme-croc-dark.webp?v=') && adminCss.includes('theme-croc-albino.webp?v='), 'Admin phải đồng bộ ảnh nền hai chế độ');
 check(!/<style\\b/i.test(adminHtml), 'Admin không được giữ stylesheet CSS vá nhúng');
 check(homepage.includes("fetch('/api/products'"), 'Trang chủ chưa lấy sản phẩm từ API');
@@ -100,6 +100,7 @@ check(redirects.includes('/admin/ /admin/index.html 200'), 'Thiếu rewrite đ�
 
 const adminHtml = existsSync(join(root, 'public/admin/index.html')) ? readFileSync(join(root, 'public/admin/index.html'), 'utf8') : '';
 check(adminHtml.includes('/ui/admin.css?v=20261017-2'), 'Admin chưa liên kết stylesheet giao diện đã hợp nhất');
+check(!/<style\b/i.test(adminHtml), 'Admin không được giữ stylesheet CSS vá nhúng');
 const endpointMap = {
   '/api/admin/login': 'functions/api/admin/login.js',
   '/api/admin/logout': 'functions/api/admin/logout.js',
