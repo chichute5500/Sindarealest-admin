@@ -162,7 +162,8 @@ export async function onRequestPost(context) {
     return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần khôi phục an toàn. Hãy tạo bản nhỏ hơn hoặc liên hệ để lên kế hoạch nhập theo lô.", 413);
   }
 
-  // D1 applies a per-Worker-scriptDB;
+  try {
+    const db = context.env.DB;
     const statements = [];
     if (operations) statements.push(
       db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'"), db.prepare("DELETE FROM warranty_claim_uploads"),
