@@ -72,5 +72,9 @@ assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.pag
 
 assert.doesNotMatch(html, /id="sd-unified-arrow-glass-final"/, "Arrow glass rules should be consolidated rather than duplicated in a late override.");
 assert.match(html, /\.detail-gallery-arrow:hover,\.featured-arrow:hover,\.slide-controls button:hover,\.page-btn\.page-arrow:hover,\.sd-fullscreen-arrow:hover\{background:rgba\(157,119,58,\.72\)/);
+assert.match(html, /@media\(hover:none\)\{\s*\.detail-gallery-arrow:hover:not\(:active\),\.sd-fullscreen-arrow:hover:not\(:active\)\{transform:translateY\(-50%\) scale\(1\)\}/, 'Touch hover must not leave gallery arrows enlarged after tap');
+assert.match(html, /\.featured-arrow:hover:not\(:active\),\.slide-controls button:hover:not\(:active\),\.page-btn\.page-arrow:hover:not\(:active\)\{transform:scale\(1\)\}/, 'Touch hover must not leave carousel and pagination arrows enlarged after tap');
+assert.match(html, /\.detail-gallery-arrow:hover:not\(:active\),\.featured-arrow:hover:not\(:active\),\.slide-controls button:hover:not\(:active\),\.page-btn\.page-arrow:hover:not\(:active\),\.sd-fullscreen-arrow:hover:not\(:active\)\{background:var\(--sd-gallery-glass\);border-color:var\(--sd-gallery-glass-border\)\}/, 'Touch hover must not leave the gold hover surface stuck after tapping');
+
 
 console.log('Detail gallery regression tests passed.');
