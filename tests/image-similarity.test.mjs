@@ -118,4 +118,20 @@ assert.equal(crossCategory.groups.length, 1, "different product categories and u
 assert.deepEqual(crossCategory.groups[0].imageKeys, ["category/shoe-2.webp", "category/shoe.webp"]);
 assert.equal(crossCategory.groups[0].category, "sneaker");
 
-console.log("PASS: full-inventory comparisons, category-first isolation, anchor-first grouping, no transitive bridge grouping, and same-SKU skip.");
+
+const uncertainCategory = descriptor("category/uncertain.webp", "0011223344556677", shapeA, colorsA);
+uncertainCategory.features.categoryConfidence = 69;
+uncertainCategory.features.categoryStatus = "needs_review";
+assert.equal((await findSimilarGroups([
+  descriptor("category/certain-a.webp", "0011223344556677", shapeA, colorsA),
+  { ...uncertainCategory, key: "category/uncertain-a.webp" }
+])).groups.length, 0, "a valid-looking category below the 70% confidence gate must not enter visual grouping");
+const flaggedCategory = descriptor("category/flagged.webp", "0011223344556677", shapeA, colorsA);
+flaggedCategory.features.categoryConfidence = 94;
+flaggedCategory.features.categoryStatus = "needs_review";
+assert.equal((await findSimilarGroups([
+  descriptor("category/certain-b.webp", "0011223344556677", shapeA, colorsA),
+  { ...flaggedCategory, key: "category/flagged-b.webp" }
+])).groups.length, 0, "an explicitly review-needed category must remain excluded even if its confidence field is high");
+
+console.log("PASS: full-inventory comparisons, category-first isolation, low-confidence exclusion, anchor-first grouping, no transitive bridge grouping, and same-SKU skip.");
