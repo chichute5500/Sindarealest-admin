@@ -78,25 +78,59 @@ jobs:
             echo "Created separate Pages project with isolated Preview D1 and IMAGES bindings."
           fi
 
-      - name: Configure isolated test bindings in the separate project's default environment
+      - name: Configure isolated test bindings and optional test credentials
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AI_TEST_ADMIN_PASSWORD: ${{ secrets.AI_TEST_ADMIN_PASSWORD }}
           TARGET_PROJECT: sindarealest-ai-image-test
         run: |
           set -euo pipefail
           api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
           source="$(curl --fail --silent --show-error -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api/pages/projects/sindarealest2")"
+          printf '%s' "$source" | jq -e '.success == true' >/dev/null
           preview_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
           preview_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
-          test -n "$preview_db" && test -n "$preview_images" || { echo "::error::Missing isolated Preview resources."; exit 1; }
+          production_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          production_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          production_branch="$(printf '%s' "$source" | jq -r '.result.production_branch // empty')"
+          test "$production_branch" = "main" || { echo "::error::Source Production branch is not main."; exit 1; }
+          test -n "$preview_db" && test -n "$production_db" && test "$preview_db" != "$production_db" || { echo "::error::Preview D1 is missing or points to Production."; exit 1; }
+          test -n "$preview_images" && test -n "$production_images" && test "$preview_images" != "$production_images" || { echo "::error::Preview IMAGES is missing or points to Production."; exit 1; }
+
           payload="$(jq -n --arg db "$preview_db" --arg images "$preview_images" '{deployment_configs:{production:{compatibility_date:"2026-10-17",d1_databases:{DB:{id:$db}},r2_buckets:{IMAGES:{name:$images}}}}}')"
           response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" --data "$payload")"
           printf '%s' "$response" | jq -e '.success == true' >/dev/null
-          echo "The separate test project's default environment now uses isolated Preview D1/IMAGES."
+          echo "PASS: test project's D1 and R2 bindings point to the checked Preview resources, not source Production."
+
+          if [ -n "${AI_TEST_ADMIN_PASSWORD:-}" ]; then
+            test "${#AI_TEST_ADMIN_PASSWORD}" -ge 12 || { echo "::error::AI_TEST_ADMIN_PASSWORD must be at least 12 characters."; exit 1; }
+            target="$(curl --fail --silent --show-error \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              "$api/pages/projects/$TARGET_PROJECT")"
+            printf '%s' "$target" | jq -e '.success == true' >/dev/null
+            session_type="$(printf '%s' "$target" | jq -r '.result.deployment_configs.production.env_vars.SESSION_SECRET.type // empty')"
+            if [ "$session_type" = "secret_text" ]; then
+              env_vars="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" '{ADMIN_PASSWORD:{type:"secret_text",value:$password}}')"
+              echo "An existing test SESSION_SECRET is retained; only the dedicated test admin password is updated."
+            else
+              session_secret="$(openssl rand -hex 32)"
+              env_vars="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" --arg session "$session_secret" '{ADMIN_PASSWORD:{type:"secret_text",value:$password},SESSION_SECRET:{type:"secret_text",value:$session}}')"
+              unset session_secret
+              echo "Dedicated test admin secret and a new random SESSION_SECRET are being configured; values are not logged."
+            fi
+            secret_payload="$(jq -n --argjson env_vars "$env_vars" '{deployment_configs:{production:{env_vars:$env_vars}}}')"
+            secret_response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$secret_payload")"
+            printf '%s' "$secret_response" | jq -e '.success == true' >/dev/null
+            echo "PASS: dedicated test admin credentials were saved as Cloudflare secret_text values."
+          else
+            echo "::warning::AI_TEST_ADMIN_PASSWORD is not configured. Site deploy and unauthenticated smoke checks will run, but authenticated D1/R2/AI checks will be skipped. Add a dedicated test-only GitHub Actions secret with this name; do not reuse Production credentials."
+          fi
       
       - name: Install Wrangler
         run: npm install --no-save --no-package-lock wrangler
@@ -107,6 +141,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           TARGET_PROJECT: sindarealest-ai-image-test
+          AI_TEST_ADMIN_PASSWORD: ${{ secrets.AI_TEST_ADMIN_PASSWORD }}
         run: |
           set -euo pipefail
           api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
@@ -187,5 +222,56 @@ jobs:
           api_status="$(curl --silent --show-error -o /tmp/ai-test-api.json -w "%{http_code}" "$base/api/admin/image-groups")"
           test "$api_status" = "401" || { echo "::error::Unauthenticated admin API should return 401, received HTTP $api_status."; exit 1; }
           echo "PASS: test site, admin route, and protected API smoke checks."
+
+          if [ -n "${AI_TEST_ADMIN_PASSWORD:-}" ]; then
+            login_payload="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" '{password:$password}')"
+            login_status="$(curl --silent --show-error -o /tmp/ai-test-login.json -w "%{http_code}" \
+              -X POST "$base/api/admin/login" \
+              -H "Origin: $base" -H "Sec-Fetch-Site: same-origin" -H "Content-Type: application/json" \
+              -c /tmp/ai-test-cookies --data "$login_payload")"
+            test "$login_status" = "200" || { echo "::error::Dedicated test admin login failed with HTTP $login_status. Response body omitted to avoid exposing details."; exit 1; }
+            echo "PASS: dedicated test admin credentials work."
+
+            inventory_status="$(curl --silent --show-error -o /tmp/ai-test-inventory.json -w "%{http_code}" \
+              -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=100")"
+            test "$inventory_status" = "200" || { echo "::error::Authenticated D1/R2 inventory returned HTTP $inventory_status."; exit 1; }
+            image_key="$(jq -r '.images[0].key // empty' /tmp/ai-test-inventory.json)"
+            echo "PASS: authenticated D1/R2 inventory endpoint responded."
+            if [ -n "$image_key" ]; then
+              encoded_key="$(jq -rn --arg key "$image_key" '$key|@uri')"
+              curl --fail --silent --show-error -b /tmp/ai-test-cookies \
+                "$base/api/admin/image-groups-image?key=$encoded_key" -o /tmp/ai-test-source-image
+              node --input-type=module - <<'NODE'
+          import sharp from "sharp";
+          const input = await import("node:fs/promises").then(fs => fs.readFile("/tmp/ai-test-source-image"));
+          const output = await sharp(input, { failOn: "error" })
+            .rotate()
+            .resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true })
+            .jpeg({ quality: 65, mozjpeg: true })
+            .toBuffer();
+          if (!output.length || output.length > 180000) throw new Error("Smoke image exceeds the safe payload size.");
+          await import("node:fs/promises").then(fs => fs.writeFile("/tmp/ai-test-source-image.jpg", output));
+          NODE
+              image_data_url="data:image/jpeg;base64,$(base64 -w0 /tmp/ai-test-source-image.jpg)"
+              classify_payload="$(jq -n --arg key "$image_key" --arg data "$image_data_url" '{action:"classify-categories",imageKeys:[$key],imageData:[{key:$key,dataUrl:$data}]}')"
+              classify_status="$(curl --silent --show-error -o /tmp/ai-test-classify.json -w "%{http_code}" \
+                -X POST "$base/api/admin/image-groups" \
+                -H "Origin: $base" -H "Sec-Fetch-Site: same-origin" -H "Content-Type: application/json" \
+                -b /tmp/ai-test-cookies --data "$classify_payload")"
+              if [ "$classify_status" != "200" ]; then
+                echo "::error::Real Workers AI vision smoke test failed with HTTP $classify_status. Response body omitted."
+                exit 1
+              fi
+              jq -e --arg key "$image_key" '.ok == true and .items[0].key == $key and (.items[0].status == "classified" or .items[0].status == "needs_review")' /tmp/ai-test-classify.json >/dev/null || {
+                echo "::error::Workers AI vision response was malformed or incomplete."; exit 1;
+              }
+              echo "PASS: real Preview R2 image reached Workers AI and returned a validated classification. No product gallery was changed."
+            else
+              echo "::warning::Preview R2 inventory contains no raster images. D1/R2 and login checks passed, but vision inference could not be tested against a real R2 image."
+            fi
+          else
+            echo "::warning::Authenticated/AI runtime smoke tests skipped because AI_TEST_ADMIN_PASSWORD is not configured as a dedicated GitHub Actions secret."
+          fi
+          rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-classify.json
           echo "Test project deployment: $base"
           echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
