@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { compareDescriptors, findExactDuplicateGroups, findSimilarGroups, hashDistance } from "../public/admin/image-similarity.js";
+import { categoryOf, compareDescriptors, findExactDuplicateGroups, findSimilarGroups, hashDistance } from "../public/admin/image-similarity.js";
 
 const colorsA = [1,0,0,0, 1,0,0,0, 0,0,1,0];
 const colorsB = [0,0,0,1, 0,0,0,1, 1,0,0,0];
@@ -11,6 +11,15 @@ const descriptor = (key, p_hash, shape, colors, assignedTo=[], category="sneaker
 
 assert.equal(hashDistance("0000000000000000", "0000000000000000"), 0);
 assert.equal(hashDistance("0000000000000000", "ffffffffffffffff"), 64);
+
+assert.equal(categoryOf({ category: "sneaker", features: { category: "sneaker", categoryStatus: "classified", categoryConfidence: 92 } }), "sneaker");
+assert.equal(categoryOf({ category: "sneaker", features: { category: "sneaker", categoryStatus: "needs_review", categoryConfidence: 92 } }), "unknown",
+  "review-needed vision categories must not drive automatic grouping");
+assert.equal(categoryOf({ category: "sneaker", features: { category: "sneaker", categoryStatus: "classified", categoryConfidence: 69 } }), "unknown",
+  "low-confidence categories must not be treated as confirmed");
+assert.equal(categoryOf({ features_json: JSON.stringify({ category: "loafer", categoryStatus: "classified", categoryConfidence: 88, shape: shapeA, colors: colorsA }) }), "loafer",
+  "persisted JSON feature rows should retain confirmed category");
+
 assert.equal(compareDescriptors(
   descriptor("a.webp", "0011223344556677", shapeA, colorsA),
   descriptor("b.webp", "0011223344556677", shapeA, colorsA)
