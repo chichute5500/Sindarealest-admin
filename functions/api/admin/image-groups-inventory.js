@@ -18,18 +18,22 @@ function rasterMime(object) {
   return expected || "";
 }
 
-function referenceMatches(reference, key) {
+function keyFromReference(reference) {
   const value = String(reference || "").trim();
-  if (value === key || value === "/media/" + key || value === "media/" + key || value.endsWith("/" + key)) return true;
+  if (!value) return "";
   try {
-    const parsed = new URL(value, "https://inventory.invalid");
-    const pathname = decodeURIComponent(parsed.pathname);
-    return pathname === "/media/" + key || pathname.endsWith("/" + key);
-  } catch {
-    return false;
+    const pathname = new URL(value, "https://inventory.invalid").pathname;
+    const marker = "/media/";
+    const position = pathname.indexOf(marker);
+    if (position >= 0) return decodeURIComponent(pathname.slice(position + marker.length));
+  } catch {}
+  if (value.startsWith("media/")) return value.slice(6);
+  if (value.startsWith("/media/")) {
+    try { return decodeURIComponent(value.slice(7).split(/[?#]/, 1)[0]); } catch { return value.slice(7).split(/[?#]/, 1)[0]; }
   }
+  if (value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")) return "";
+  return value;
 }
-
 export async function onRequestGet({ request, env }) {
   const auth = await requireAdmin({ request, env });
   if (auth.response) return auth.response;
@@ -48,11 +52,10 @@ export async function onRequestGet({ request, env }) {
       let refs = [];
       try { refs = JSON.parse(product.images_json || "[]"); } catch {}
       for (const reference of Array.isArray(refs) ? refs : []) {
-        for (const object of [String(reference || "")]) {
-          // The key check below is intentionally against actual R2 keys rather than a filename pattern.
-          if (!object) continue;
-          if (!assignments.has(object)) assignments.set(object, []);
-        }
+        const key = keyFromReference(reference);
+        if (!key) continue;
+        if (!assignments.has(key)) assignments.set(key, []);
+        assignments.get(key).push({ id: product.id, sku: product.sku, title: product.title });
       }
     }
     const page = await env.IMAGES.list({ limit, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
@@ -61,21 +64,13 @@ export async function onRequestGet({ request, env }) {
       .filter(item => item.key && item.key.length <= 1024 && !item.key.endsWith("/") && item.mimeType);
     const images = [];
     for (const item of keys) {
-      const assignedTo = [];
-      for (const product of products.results || []) {
-        let refs = [];
-        try { refs = JSON.parse(product.images_json || "[]"); } catch {}
-        if ((Array.isArray(refs) ? refs : []).some(reference => referenceMatches(reference, item.key))) {
-          assignedTo.push({ id: product.id, sku: product.sku, title: product.title });
-        }
-      }
       images.push({
         key: item.key,
         url: "/api/admin/image-groups-image?key=" + encodeURIComponent(item.key),
         size: Number(item.object.size || 0),
         uploaded: item.object.uploaded ? new Date(item.object.uploaded).toISOString() : "",
         mimeType: item.mimeType,
-        assignedTo
+        assignedTo: assignments.get(item.key) || []
       });
     }
     const scannedObjects = (page.objects || []).length;
