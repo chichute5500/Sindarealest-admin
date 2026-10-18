@@ -44,7 +44,7 @@ const objects=await Promise.all(keys.map(k=>env.IMAGES.head?env.IMAGES.head(k):e
 if(objects.some(x=>!x))return fail("Ảnh đã biến mất khỏi R2; hãy quét lại kho.",409);
 const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",700,3600);
 if(limit.limited)return fail("Đã đạt giới hạn phân loại ảnh trong một giờ. Hãy đợi rồi quét tiếp; kết quả chưa rõ sẽ không được gom.",429,{"Retry-After":"3600"});
-const prompt="Nhìn ảnh và phân loại sản phẩm chính. Chỉ chọn một category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Phân biệt watch_strap (chỉ dây đồng hồ) với watch (đồng hồ nguyên chiếc). Nếu không rõ hoặc confidence dưới 70, dùng unknown. Trả đúng một JSON object không markdown theo mẫu: {\\"category\\":\\"sneaker\\",\\"confidence\\":90}. confidence là số nguyên 0-100.";
+const prompt="Nhìn ảnh và phân loại sản phẩm chính. Chỉ chọn một category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Phân biệt watch_strap (chỉ dây đồng hồ) với watch (đồng hồ nguyên chiếc). Nếu không rõ hoặc confidence dưới 70, dùng unknown. Trả đúng một JSON object không markdown, chỉ có hai khóa category và confidence. confidence là số nguyên 0-100.";
 const allowed=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
 const items=[];
 for(let i=0;i<keys.length;i++){
