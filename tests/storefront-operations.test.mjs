@@ -24,8 +24,10 @@ assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('imag
   'Dark mode must recolor the dark crocodile background toward the reference deep-blue/navy palette while retaining the source asset.');
 assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:hue-rotate\(25deg\) saturate\(\.58\) brightness\(1\.08\)/,
   'Light mode must recolor the albino crocodile background toward the reference ice-blue palette while retaining the source asset.');
-assert.match(storefrontHtml, /\.theme-bg--light\{filter:blur\(\.8px\) hue-rotate\(25deg\) saturate\(\.60\) brightness\(1\.03\)\}/,
+assert.match(storefrontHtml, /\.theme-bg--light\{filter:blur\(\.5px\) hue-rotate\(25deg\) saturate\(\.60\) brightness\(1\.03\)\}/,
   'The final light-mode filter override must keep the ice-blue palette and avoid a warm/pink cast.');
+assert.ok(storefrontHtml.includes('linear-gradient(118deg,rgba(225,241,255,.72),rgba(211,231,249,.68) 52%,rgba(237,247,255,.74))'),
+  'The final light glaze must leave medium crocodile-texture visibility instead of washing the background flat.');
 assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.68\)/,
   'Light background must soften the high-contrast texture without removing the crocodile material.');
 assert.match(storefrontHtml, /\.theme-bg--dark::after\{[^}]*rgba\(3,20,36,\.62\)/,
