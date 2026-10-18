@@ -135,11 +135,21 @@ export async function onRequestPost(context) {
       // Normalize older pending proposals first: one image may belong to only
       // one pending set. The oldest set keeps a shared image; later sets lose it.
       const oldPending = await env.DB.prepare(
-        "SELECT g.id AS group_id,g.status,g.created_at,m.image_key FROM image_group_sets g JOIN image_group_set_members m ON m.group_id=g.id WHERE g.status IN ('approved','pending') ORDER BY CASE g.status WHEN 'approved' THEN 0 ELSE 1 END,g.created_at ASC,g.id ASC,m.image_key ASC"
+        "SELECT g.id AS group_id,g.status,g.created_at,g.rationale,m.image_key FROM image_group_sets g JOIN image_group_set_members m ON m.group_id=g.id WHERE g.status IN ('approved','pending') ORDER BY CASE g.status WHEN 'approved' THEN 0 ELSE 1 END,g.created_at ASC,g.id ASC,m.image_key ASC"
       ).all();
       const claimed = new Set();
       const membersByGroup = new Map();
+      const legacyRejected = new Set();
       for (const row of oldPending.results || []) {
+        // Proposals generated before category-first grouping have no trustworthy
+        // Tier-1 label. Retire those pending proposals instead of showing mixed sets.
+        if (row.status === "pending" && !String(row.rationale || "").includes("Tầng 1 đã phân loại ảnh vào nhóm")) {
+          if (!legacyRejected.has(row.group_id)) {
+            await env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(row.group_id).run();
+            legacyRejected.add(row.group_id);
+          }
+          continue;
+        }
         if (row.status === "pending" && !membersByGroup.has(row.group_id)) membersByGroup.set(row.group_id, []);
         if (claimed.has(row.image_key)) {
           // Preserve approved history; remove the duplicate only from pending proposals.
