@@ -141,9 +141,10 @@ assert.equal(compareResponse.status, 201, JSON.stringify(compareResult));
 assert.equal(compareResult.matches, 1);
 assert.equal(modelCalls, beforeCompareCalls + 2, "pair comparison should retry exactly once after a transient 503");
 assert.equal(reviewInsertBatches, beforeReviewWrites + 1, "successful retry should save a single pending review batch");
-assert.ok(Array.isArray(lastModelInput.input.messages[0].content), "pair comparison must send the image content parts to the model");
+assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison must include the verified system instruction");
+assert.ok(Array.isArray(lastModelInput.input.messages[1].content), "pair comparison must send the image content parts in the user message");
 assert.equal(lastModelInput.input.response_format, undefined, "multi-image comparison must avoid the schema-constrained format that failed real Preview inference");
-assert.equal(lastModelInput.input.messages[0].content.filter(part => part.type === "image_url").length, 2, "both real candidate images must be present in the comparison input");
+assert.equal(lastModelInput.input.messages[1].content.filter(part => part.type === "image_url").length, 2, "both real candidate images must be present in the comparison input");
 
 // Malformed compare output must fail closed before any review batch is written.
 malformed = true;
