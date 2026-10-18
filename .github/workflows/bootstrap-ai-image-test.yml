@@ -298,7 +298,7 @@ jobs:
               if (handlerResponse.status !== 200 || result?.ok !== true || !Array.isArray(result.items) || result.items.length !== 1) {
                 return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, 502);
               }
-              return response({ ok: true, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, imageBytes: body.dataUrl.length });
+              return response({ ok: true, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: body.dataUrl.length });
             } catch (error) {
               return response({ ok: false, reason: "classification_handler_exception", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
             }
@@ -347,6 +347,11 @@ jobs:
               }
               result_summary="$(jq -r '"category=" + .category + ", confidence=" + (.confidence|tostring) + ", status=" + .status' /tmp/ai-test-vision.json)"
               echo "PASS: real admin classifier on Preview R2 image: $result_summary. No database or product gallery was modified."
+              if jq -e '.adminPasswordConfigured == true and .sessionSecretConfigured == true' /tmp/ai-test-vision.json >/dev/null; then
+                echo "PASS: test-project admin security secrets are present (values not read or logged)."
+              else
+                echo "::warning::AI inference passed, but ADMIN_PASSWORD and/or SESSION_SECRET is missing/too short on the test project; admin browser login remains unverified."
+              fi
             else
               diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
               echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
