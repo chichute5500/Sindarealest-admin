@@ -56,5 +56,5 @@ malformed = true;
 const invalid = await call();
 assert.equal(invalid.status, 502, "malformed model output must stop classification safely");
 assert.equal(invalid.body.items, undefined, "malformed output must not be accepted as a classification");
-assert.equal(modelCalls, 2);
+assert.equal(modelCalls, 3, "malformed output is retried once, then rejected");
 console.log("PASS: mocked Workers AI endpoint sends JSON schema, accepts valid vision output, and fails closed on malformed output.");
