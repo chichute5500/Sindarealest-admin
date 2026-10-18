@@ -16,12 +16,15 @@ function resolveKey(context) {
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  if (!env?.IMAGES || typeof env.IMAGES.get !== "function") {
+  if (!env?.DB || !env?.IMAGES || typeof env.IMAGES.get !== "function") {
     return new Response("Ảnh chưa sẵn sàng.", { status: 503, headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" } });
   }
   const key = resolveKey(context);
   if (!key) return new Response("Mã ảnh không hợp lệ.", { status: 400, headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" } });
   try {
+    const publicReference = "/media/" + key.split("/").map(segment => encodeURIComponent(segment)).join("/");
+    const visible = await env.DB.prepare("SELECT 1 AS allowed FROM products WHERE published=1 AND instr(images_json, ?) > 0 LIMIT 1").bind(publicReference).first();
+    if (!visible) return new Response("Không tìm thấy ảnh công khai.", { status: 404, headers: { "Cache-Control": "public, max-age=60", "Content-Type": "text/plain; charset=utf-8" } });
     const object = await env.IMAGES.get(key);
     if (!object) return new Response("Không tìm thấy ảnh.", { status: 404, headers: { "Cache-Control": "public, max-age=60", "Content-Type": "text/plain; charset=utf-8" } });
     if (Number(object.size || 0) > MAX_IMAGE_BYTES) return new Response("Ảnh vượt giới hạn xem.", { status: 413, headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" } });
