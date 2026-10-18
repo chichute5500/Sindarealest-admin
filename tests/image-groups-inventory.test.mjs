@@ -6,14 +6,16 @@ const ADMIN_PASSWORD = "image-group-admin-password-test";
 const SESSION_SECRET = "image-group-session-secret-long-enough-for-test";
 const session = await createSession(SESSION_SECRET);
 const product = { id: "p1", sku: "SD-SN001", title: "Test product", images_json: JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp"]) };
+let productRows = [product];
 const DB = {
   prepare(sql) {
     return {
+      offset: 0,
       async all() {
-        if (sql.includes("SELECT id,sku,title,images_json FROM products")) return { results: [product] };
+        if (sql.includes("SELECT id,sku,title,images_json FROM products")) return { results: productRows.slice(this.offset, this.offset + 500) };
         return { results: [] };
       },
-      bind() { return this; }
+      bind(offset) { this.offset = Number(offset) || 0; return this; }
     };
   }
 };
@@ -54,6 +56,20 @@ const secondBody = await second.json();
 assert.equal(secondBody.images.length, 1);
 assert.equal(secondBody.hasMore, false);
 assert.equal(secondBody.images[0].key, "shop/photos/another-photo.png");
+
+// Assignment lookup must not stop at the old 2,000-product cap.
+productRows = Array.from({ length: 2001 }, (_, index) => ({
+  id: "p" + index,
+  sku: "SKU-" + String(index).padStart(4, "0"),
+  title: "Catalog product " + index,
+  images_json: index === 2000 ? JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp"]) : "[]"
+}));
+const largeCatalog = await onRequestGet({ request: requestFor("https://preview.example/api/admin/image-groups-inventory?limit=500"), env: { DB, IMAGES, ADMIN_PASSWORD, SESSION_SECRET } });
+assert.equal(largeCatalog.status, 200);
+const largeCatalogBody = await largeCatalog.json();
+assert.equal(largeCatalogBody.diagnostics.productsIndexed, 2001);
+assert.equal(largeCatalogBody.diagnostics.assignmentsIncomplete, false);
+assert.deepEqual(largeCatalogBody.images.find(item => item.key === "12345678-1234-1234-1234-123456789012.webp").assignedTo.map(owner => owner.sku), ["SKU-2000"]);
 const unauthorized = await onRequestGet({ request: new Request("https://preview.example/api/admin/image-groups-inventory"), env: { DB, IMAGES, ADMIN_PASSWORD, SESSION_SECRET } });
 assert.equal(unauthorized.status, 401);
 console.log("PASS: inventory pagination walks complete R2 pages and includes raster images regardless of nested paths or filename format.");
