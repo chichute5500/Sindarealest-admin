@@ -55,8 +55,17 @@ function colorSimilarity(a, b) {
 
 export function compareDescriptors(left, right) {
   const leftFeatures = parseFeatures(left), rightFeatures = parseFeatures(right);
+  const leftContentHash = String(leftFeatures?.contentHash || "").toLowerCase();
+  const rightContentHash = String(rightFeatures?.contentHash || "").toLowerCase();
+  const exactDuplicate = /^[0-9a-f]{64}$/.test(leftContentHash) && leftContentHash === rightContentHash;
   const phashDistance = hashDistance(left?.p_hash || left?.phash, right?.p_hash || right?.phash);
   const phashSimilarity = 1 - phashDistance / 64;
+  // An exact byte hash proves identical files, not the identity of a physical
+  // product/SKU. It is a strong duplicate signal for the admin review queue,
+  // but public/product assignment still remains human-approved.
+  if (exactDuplicate) {
+    return { score: 100, phashDistance, shapeSimilarity: 100, colorSimilarity: 100, exactDuplicate: true, match: true };
+  }
   const shape = shapeSimilarity(leftFeatures?.shape, rightFeatures?.shape);
   const color = colorSimilarity(leftFeatures?.colors, rightFeatures?.colors);
   // The score is a review-oriented visual similarity index, not a probability.
@@ -65,7 +74,7 @@ export function compareDescriptors(left, right) {
   // large white backgrounds make unrelated catalog photos look deceptively alike.
   // Require shape AND foreground-color agreement, with a stronger score gate.
   const match = score >= 70 && shape >= 0.58 && color >= 0.58 && phashDistance <= 24;
-  return { score, phashDistance, shapeSimilarity: Math.round(shape * 100), colorSimilarity: Math.round(color * 100), match };
+  return { score, phashDistance, shapeSimilarity: Math.round(shape * 100), colorSimilarity: Math.round(color * 100), exactDuplicate: false, match };
 }
 
 function nextFrame() {
@@ -109,17 +118,24 @@ export async function findSimilarGroups(items, options = {}) {
   }
   options.onProgress?.({ phase: "matching", done: total, total, matches });
 
-  // Anchor-first grouping: the first unprocessed inventory image is the anchor.
-  // Its direct matches across the inventory form one proposed set. Do not use
-  // transitive connectivity (A~B and B~C does not imply A~C), and never let a
-  // later anchor pull an already assigned image into a second set.
+  // Conservative complete-link grouping: each candidate must match the anchor
+  // AND every already selected member. A single strong edge cannot bridge two
+  // incompatible products into one set. This deliberately prefers a smaller
+  // review queue over an unsafe merge.
   const assigned = new Uint8Array(count);
   const groups = [];
   for (let anchor = 0; anchor < count; anchor++) {
     if (assigned[anchor]) continue;
     const indices = [anchor];
-    for (const edge of matchesByIndex[anchor]) {
-      if (!assigned[edge.index]) indices.push(edge.index);
+    const orderedEdges = [...matchesByIndex[anchor]].sort((a, b) =>
+      b.score - a.score || valid[a.index].key.localeCompare(valid[b.index].key)
+    );
+    for (const edge of orderedEdges) {
+      if (assigned[edge.index]) continue;
+      const compatibleWithEveryMember = indices.every(memberIndex =>
+        matchesByIndex[edge.index].some(otherEdge => otherEdge.index === memberIndex)
+      );
+      if (compatibleWithEveryMember) indices.push(edge.index);
     }
     if (indices.length < 2) continue;
     for (const index of indices) assigned[index] = 1;
@@ -209,6 +225,26 @@ function createDctHash(gray) {
   return hash;
 }
 
+export function findExactDuplicateGroups(items) {
+  const byHash = new Map();
+  for (const item of Array.isArray(items) ? items : []) {
+    const features = parseFeatures(item);
+    const hash = String(features?.contentHash || "").toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(hash) || typeof item?.key !== "string") continue;
+    if (!byHash.has(hash)) byHash.set(hash, []);
+    byHash.get(hash).push({ key: item.key, category: categoryOf(item) });
+  }
+  return [...byHash.entries()]
+    .filter(([, members]) => members.length > 1)
+    .map(([contentHash, members]) => ({
+      contentHash,
+      imageKeys: members.map(member => member.key).sort((a, b) => a.localeCompare(b)),
+      categories: [...new Set(members.map(member => member.category))].sort(),
+      categoryConflict: new Set(members.map(member => member.category)).size > 1
+    }))
+    .sort((a, b) => b.imageKeys.length - a.imageKeys.length || a.imageKeys[0].localeCompare(b.imageKeys[0]));
+}
+
 export async function computeImageDescriptor(url, metadata = {}) {
   if (typeof createImageBitmap !== "function" || typeof document === "undefined") {
     throw new Error("Trình duyệt không hỗ trợ đọc ảnh bằng canvas.");
@@ -216,6 +252,8 @@ export async function computeImageDescriptor(url, metadata = {}) {
   const response = await fetch(url, { credentials: "same-origin", cache: "no-store" });
   if (!response.ok) throw new Error("Không tải được ảnh (HTTP " + response.status + ").");
   const blob = await response.blob();
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await blob.arrayBuffer()));
+  const contentHash = [...digest].map(byte => byte.toString(16).padStart(2, "0")).join("");
   let bitmap;
   try { bitmap = await createImageBitmap(blob); }
   catch { throw new Error("Tệp không giải mã được thành ảnh: " + (metadata.key || "không rõ mã ảnh")); }
@@ -320,7 +358,7 @@ export async function computeImageDescriptor(url, metadata = {}) {
     return {
       key: String(metadata.key || ""),
       p_hash: createDctHash(gray),
-      features: { shape, colors: colorCounts },
+      features: { shape, colors: colorCounts, contentHash },
       width, height,
       sourceSize: Number(metadata.size || blob.size || 0),
       sourceUploaded: String(metadata.uploaded || ""),
