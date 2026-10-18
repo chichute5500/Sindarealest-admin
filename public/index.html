@@ -1093,6 +1093,26 @@ html.dark .theme-bg--dark{filter:hue-rotate(0deg) saturate(.72) brightness(.88) 
 }
 @media(prefers-reduced-motion:reduce){.hero-visual,.hero-visual img{transition:none!important}}
 
+
+/* Final background calibration: keep the branded texture subtle and remove the oversized page-level watermark. */
+.theme-watermark,html.dark .theme-watermark{opacity:0!important;visibility:hidden!important}
+.theme-bg--light::after{
+ background:
+  linear-gradient(118deg,rgba(239,247,255,.86),rgba(226,240,251,.88) 52%,rgba(246,250,255,.85)),
+  radial-gradient(ellipse at 17% 13%,rgba(255,255,255,.48),transparent 37%),
+  linear-gradient(145deg,transparent 28%,rgba(255,255,255,.24) 42%,transparent 54%),
+  linear-gradient(28deg,transparent 22%,rgba(190,220,241,.15) 42%,transparent 61%);
+}
+.theme-bg--dark::after{
+ background:
+  linear-gradient(118deg,rgba(3,20,36,.86),rgba(7,31,51,.83) 52%,rgba(3,17,30,.88)),
+  radial-gradient(ellipse at 18% 14%,rgba(100,166,211,.18),transparent 39%),
+  radial-gradient(ellipse at 82% 58%,rgba(40,108,158,.15),transparent 43%),
+  linear-gradient(145deg,transparent 27%,rgba(119,174,211,.10) 42%,transparent 55%),
+  linear-gradient(28deg,transparent 20%,rgba(66,127,168,.09) 42%,transparent 62%);
+}
+html.dark .theme-bg--dark{filter:hue-rotate(0deg) saturate(.68) brightness(.90) contrast(.80)}
+
 </style>
 
 </body>
