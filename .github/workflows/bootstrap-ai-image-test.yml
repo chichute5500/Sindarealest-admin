@@ -204,7 +204,7 @@ jobs:
           echo "Deploying the AI binding only to $TARGET_PROJECT. DB/IMAGES point to the checked source Preview resources."
           npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
 
-          # Read-only smoke checks against the test project URL; do not log in or mutate data.
+          # Every deploy gets public-route/auth-guard smoke checks. If a dedicated test credential exists, the optional follow-up logs in and calls classification on one existing Preview R2 object; it does not edit product galleries or image objects.
           base="https://${TARGET_PROJECT}.pages.dev"
           home_status="$(curl --silent --show-error -o /tmp/ai-test-home.html -w "%{http_code}" "$base/")"
           admin_status="$(curl --silent --show-error -o /tmp/ai-test-admin.html -w "%{http_code}" "$base/admin/")"
@@ -270,6 +270,6 @@ jobs:
           else
             echo "::warning::Authenticated/AI runtime smoke tests skipped because AI_TEST_ADMIN_PASSWORD is not configured as a dedicated GitHub Actions secret."
           fi
-          rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-classify.json
+          rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-source-image.b64 /tmp/ai-test-classify.json /tmp/ai-test-classify-request.json
           echo "Test project deployment: $base"
           echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
