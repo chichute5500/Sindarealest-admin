@@ -544,6 +544,48 @@ jobs:
               inventory_cursor="$(jq -r ".nextCursor // empty" /tmp/ai-test-inventory.json)"
             done
             echo "PASS: authenticated D1/R2 inventory endpoint responded; scanned up to 10,000 inventory objects to find real same-SKU gallery pairs."
+            # Stable positive control: use two different, real images from one product gallery in the repository.
+            # The smoke route stubs only R2 existence for these fixture keys; Workers AI receives the actual image bytes.
+            node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          import { existsSync } from "node:fs";
+          import { createHash } from "node:crypto";
+          import path from "node:path";
+          import sharp from "sharp";
+          const products = JSON.parse(await readFile("data/legacy-products.json", "utf8"));
+          let selected = null;
+          for (const product of products) {
+            const candidates = [];
+            for (const image of Array.isArray(product.images) ? product.images : []) {
+              if (typeof image !== "string" || !image.startsWith("images/") || image.split("/").includes("..")) continue;
+              const file = path.join("public", image);
+              if (!existsSync(file)) continue;
+              try {
+                const bytes = await readFile(file);
+                const hash = createHash("sha256").update(bytes).digest("hex");
+                if (!candidates.some(item => item.hash === hash)) candidates.push({ file, bytes, hash, image });
+              } catch {}
+            }
+            if (candidates.length >= 2) { selected = { product, pair: candidates.slice(0, 2) }; break; }
+          }
+          if (!selected) throw new Error("No product gallery with two distinct repository image files was found.");
+          const keys = selected.pair.map((item, index) => `test-fixtures/${String(selected.product.sku || selected.product.id).replace(/[^A-Za-z0-9_-]/g, "_")}/${index + 1}-${path.basename(item.image)}`);
+          const imageData = [];
+          for (let index = 0; index < selected.pair.length; index++) {
+            const jpeg = await sharp(selected.pair[index].bytes, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+            if (!jpeg.length || jpeg.length > 180000) throw new Error("Repository gallery test image exceeds safe size.");
+            imageData.push({ key: keys[index], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
+          }
+          await writeFile("/tmp/ai-test-repository-gallery-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData }));
+          console.log("Prepared two distinct image files from one repository product gallery for a no-write AI comparison.");
+          NODE
+            repository_gallery_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-repository-gallery.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-repository-gallery-request.json "$base/api/ai-smoke-ci")"
+            if [ "$repository_gallery_status" != "200" ]; then
+              diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"
+              echo "::error::Same-gallery real-image AI comparison failed with HTTP $repository_gallery_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
+            fi
+            jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-repository-gallery.json >/dev/null || { echo "::error::AI did not match two distinct real image files from the same product gallery at confidence 91 or higher."; exit 1; }
+            echo "PASS: real Workers AI matched two distinct real gallery images from one product at the 91% confidence gate; no database or product gallery was modified."
             # Stronger positive control: compare two distinct gallery images assigned to the same SKU.
             # This is more meaningful than comparing the same bytes under two different keys.
             same_sku_keys="$(jq -r '[.images[] | select((.size|tonumber)>0 and (.size|tonumber)<=5000000 and (.assignedTo|type)=="array" and (.assignedTo|length)>0) | {key,sku:.assignedTo[0].sku}] | group_by(.sku) | map(select(length>=2) | .[0:2]) | first // [] | .[].key' /tmp/ai-test-inventory.json)"
