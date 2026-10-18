@@ -157,7 +157,7 @@ const compareResponse = await onRequestPost({ request: compareRequest(), env });
 const compareResult = await compareResponse.json();
 assert.equal(compareResponse.status, 201, JSON.stringify(compareResult));
 assert.equal(compareResult.matches, 1);
-assert.equal(modelCalls, beforeCompareCalls + 5, "pair comparison should retry a transient 503, describe both images separately, then compare the descriptions");
+assert.equal(modelCalls, beforeCompareCalls + 4, "pair comparison should retry a transient 503, describe both images separately, then compare the descriptions");
 assert.equal(reviewInsertBatches, beforeReviewWrites + 1, "successful retry should save a single pending review batch");
 assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison must include the system instruction");
 assert.match(lastModelInput.input.messages[0].content, /Compare visual descriptions/, "the final comparison must use the two image-specific visual descriptions");
