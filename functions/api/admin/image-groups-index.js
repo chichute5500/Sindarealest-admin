@@ -150,7 +150,10 @@ export async function onRequestPost(context) {
         // Tier-1 label. Retire those pending proposals instead of showing mixed sets.
         if (row.status === "pending" && !String(row.rationale || "").includes("Tầng 1 đã phân loại ảnh vào nhóm")) {
           if (!legacyRejected.has(row.group_id)) {
-            await env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(row.group_id).run();
+            await env.DB.batch([
+              env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(row.group_id),
+              env.DB.prepare("DELETE FROM image_group_image_claims WHERE group_id=? AND status='pending'").bind(row.group_id)
+            ]);
             legacyRejected.add(row.group_id);
           }
           continue;
@@ -159,7 +162,10 @@ export async function onRequestPost(context) {
         if (claimed.has(row.image_key)) {
           // Preserve approved history; remove the duplicate only from pending proposals.
           if (row.status === "pending") {
-            await env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=?").bind(row.group_id, row.image_key).run();
+            await env.DB.batch([
+              env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=?").bind(row.group_id, row.image_key),
+              env.DB.prepare("DELETE FROM image_group_image_claims WHERE group_id=? AND image_key=? AND status='pending'").bind(row.group_id, row.image_key)
+            ]);
           }
         } else {
           claimed.add(row.image_key);
@@ -168,7 +174,10 @@ export async function onRequestPost(context) {
       }
       for (const [groupId, remaining] of membersByGroup) {
         if (remaining.length < 2) {
-          await env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(groupId).run();
+          await env.DB.batch([
+            env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(groupId),
+            env.DB.prepare("DELETE FROM image_group_image_claims WHERE group_id=? AND status='pending'").bind(groupId)
+          ]);
         }
       }
 
@@ -206,6 +215,10 @@ export async function onRequestPost(context) {
         ];
         for (const key of uniqueKeys) {
           const memberScore = memberScores.get(key);
+          // The primary key on image_key is a database-level lock against
+          // simultaneous scans creating overlapping active groups.
+          statements.push(env.DB.prepare("INSERT INTO image_group_image_claims(image_key,group_id,status) VALUES(?,?,'pending')")
+            .bind(key, id));
           statements.push(env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) VALUES(?,?,?)")
             .bind(id, key, Number.isInteger(memberScore) ? Math.max(0, Math.min(100, memberScore)) : similarity));
         }
@@ -215,7 +228,9 @@ export async function onRequestPost(context) {
       }
       return json({ ok: true, saved, skipped, message: "Đã lưu " + saved + " nhóm tương đồng vào hàng chờ duyệt; không ảnh nào được công khai." }, 201);
     } catch (error) {
-      return fail("Không thể lưu nhóm ảnh đề xuất: " + safeError(error), 503);
+      const detail = safeError(error);
+      if (/unique|constraint/i.test(detail)) return fail("Ảnh vừa được giữ bởi một nhóm khác trong lượt quét đồng thời. Hãy tải lại kho và quét lại.", 409);
+      return fail("Không thể lưu nhóm ảnh đề xuất: " + detail, 503);
     }
   }
 
@@ -223,9 +238,12 @@ export async function onRequestPost(context) {
     const id = String(body.groupId || "");
     if (!/^[0-9a-f-]{36}$/i.test(id)) return fail("Mã nhóm không hợp lệ.", 400);
     try {
-      const result = await env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(id).run();
-      if (!result.meta?.changes) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
-      return json({ ok: true, message: "Đã loại nhóm đề xuất; không xóa ảnh gốc." });
+      const results = await env.DB.batch([
+        env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(id),
+        env.DB.prepare("DELETE FROM image_group_image_claims WHERE group_id=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='rejected')").bind(id, id)
+      ]);
+      if (!results?.[0]?.meta?.changes) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
+      return json({ ok: true, message: "Đã loại nhóm đề xuất; ảnh gốc không bị xóa." });
     } catch (error) {
       return fail("Không thể cập nhật trạng thái nhóm: " + safeError(error), 503);
     }
