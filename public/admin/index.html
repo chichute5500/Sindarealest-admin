@@ -110,7 +110,7 @@ async function loadImageGroups(options={}) {
   }
   const indexedRows=[];let offset=0,first=null,pages=0;
   do{
-    const query=new URLSearchParams({limit:"500",offset:String(offset)});
+    const query=new URLSearchParams({limit:"500",offset:String(offset),includeGroups:offset===0?"true":"false"});
     const data=await api("/api/admin/image-groups-index?"+query.toString());
     if(!first)first=data;
     indexedRows.push(...(data.indexedImages||[]));
