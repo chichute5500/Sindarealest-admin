@@ -3,55 +3,114 @@ const MODEL="@cf/meta/llama-3.2-11b-vision-instruct", KEY_RE=/^[A-Za-z0-9-]{30,4
 function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
 
-function parseCategoryResult(result,allowed){
-  const candidates=[];
-  const seen=new Set();
-  function collect(value,depth=0){
-    if(depth>5||value==null)return;
-    if(typeof value==="string"){const t=value.trim();if(t&&!seen.has(t)){seen.add(t);candidates.push(t)}return}
-    if(Array.isArray(value)){for(const item of value.slice(0,8))collect(item,depth+1);return}
-    if(typeof value==="object"){
-      for(const key of ["response","text","content","generated_text","output_text","result","message","choices","output"]){
-        if(key in value)collect(value[key],depth+1);
-      }
-      if(value.category||value.product_category) candidates.unshift(JSON.stringify(value));
+export function parseCategoryResult(result, allowed = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"])) {
+  const candidates = [];
+  const visitedObjects = new Set();
+  const visitedStrings = new Set();
+  let visited = 0;
+
+  const aliases = {
+    sneakers:"sneaker", sneaker_shoes:"sneaker", trainers:"sneaker", trainer:"sneaker", running_shoes:"sneaker", athletic_shoes:"sneaker", giay_the_thao:"sneaker",
+    loafers:"loafer", loafer_shoes:"loafer", slip_on_shoes:"loafer", giay_luoi:"loafer",
+    dress_shoes:"dress_shoe", dressshoe:"dress_shoe", formal_shoe:"dress_shoe", formal_shoes:"dress_shoe", giay_tay:"dress_shoe",
+    boots:"boot", sandals:"sandal", belts:"belt", that_lung:"belt", wallets:"wallet", vi:"wallet",
+    watchstraps:"watch_strap", watch_band:"watch_strap", watch_bands:"watch_strap", watchbands:"watch_strap", day_dong_ho:"watch_strap",
+    watches:"watch", dong_ho:"watch", bags:"bag", tui:"bag", unknown_product:"unknown", unknown_item:"unknown", khong_xac_dinh:"unknown", other_product:"other", khac:"other"
+  };
+  const normalize = value => {
+    if (value && typeof value === "object") value = value.category ?? value.label ?? value.name ?? value.value ?? value.text;
+    let category = String(value ?? "").trim().toLowerCase()
+      .replace(/đ/g, "d").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[ -]+/g, "_").replace(/[^a-z_]/g, "").replace(/^_+|_+$/g, "");
+    category = aliases[category] || category;
+    return allowed.has(category) ? category : null;
+  };
+  const scalar = value => {
+    if (value && typeof value === "object") return value.value ?? value.score ?? value.confidence ?? value.number ?? null;
+    return value;
+  };
+  const confidenceValue = value => {
+    value = scalar(value);
+    if (typeof value === "string") value = value.trim().replace(/%$/, "");
+    let confidence = Number(value);
+    if (Number.isFinite(confidence) && confidence > 0 && confidence <= 1) confidence *= 100;
+    return Number.isFinite(confidence) && confidence >= 0 && confidence <= 100 ? Math.round(confidence) : null;
+  };
+  const evaluateObject = value => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    const categoryRaw = value.category ?? value.product_category ?? value.productCategory ?? value.product_type ?? value.label ?? value.type;
+    const category = normalize(categoryRaw);
+    const confidence = confidenceValue(value.confidence ?? value.score ?? value.confidence_score ?? value.confidenceScore ?? value.confidence_percent ?? value.probability);
+    return category && confidence !== null ? { category, confidence } : null;
+  };
+  const parseText = raw => {
+    const text = raw.trim().replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}$/i, "").trim();
+    if (!text) return null;
+    const candidatesToParse = [text];
+    const objectMatch = text.match(/\{[\s\S]*\}/);
+    if (objectMatch && objectMatch[0] !== text) candidatesToParse.push(objectMatch[0]);
+    for (const candidate of candidatesToParse) {
+      try {
+        const parsed = JSON.parse(candidate);
+        const direct = evaluateObject(parsed);
+        if (direct) return direct;
+        collect(parsed, 1);
+      } catch {}
     }
-  }
-  collect(result);
-  const aliases={sneakers:"sneaker",trainer:"sneaker",trainers:"sneaker",loafers:"loafer",loafer_shoes:"loafer",dress_shoes:"dress_shoe",formal_shoe:"dress_shoe",formal_shoes:"dress_shoe",boots:"boot",sandals:"sandal",belts:"belt",wallets:"wallet",watchstraps:"watch_strap",watch_band:"watch_strap",watch_bands:"watch_strap",watches:"watch",bags:"bag",unknown_product:"unknown",other_product:"other"};
-  const normalize=(v)=>{let c=String(v??"").toLowerCase().trim().replace(/[ -]+/g,"_").replace(/[^a-z_]/g,"");c=aliases[c]||c;return allowed.has(c)?c:null};
-  for(let raw of candidates){
-    raw=raw.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");
-    let value;
-    try{value=JSON.parse(raw)}catch{
-      const match=raw.match(/\{[^{}]*\}/);
-      if(match)try{value=JSON.parse(match[0])}catch{}
-    }
-    if(value&&typeof value==="object"&&!Array.isArray(value)){
-      const category=normalize(value.category??value.product_category??value.productCategory??value.label??value.type);
-      let confidenceRaw=value.confidence??value.score??value.confidence_score??value.confidenceScore;
-      if(typeof confidenceRaw==="string")confidenceRaw=confidenceRaw.trim().replace("%","");
-      let confidence=Number(confidenceRaw);
-      if(Number.isFinite(confidence)&&confidence>0&&confidence<=1)confidence*=100;
-      if(category&&Number.isFinite(confidence)&&confidence>=0&&confidence<=100)return{category,confidence:Math.round(confidence)};
-    }
-    // Models sometimes return a plain label or prose instead of JSON.
-    const categoryPatterns=[
-      [/\bwatch[ _-]?strap\b|\bwatch[ _-]?band\b/i,"watch_strap"],
-      [/\bdress[ _-]?shoe(?:s)?\b|\bformal[ _-]?shoe(?:s)?\b/i,"dress_shoe"],
-      [/\bsneakers?\b|\btrainers?\b/i,"sneaker"],
-      [/\b loafers?\b|^loafers?$/i,"loafer"],
-      [/\bboots?\b/i,"boot"],[/\bsandals?\b/i,"sandal"],[/\bbelts?\b/i,"belt"],
-      [/\bwallets?\b/i,"wallet"],[/\bwatches?\b/i,"watch"],[/\bbags?\b/i,"bag"],[/\bunknown\b/i,"unknown"],[/\bother\b/i,"other"]
+    const categoryPatterns = [
+      [/\bwatch[ _-]?strap\b|\bwatch[ _-]?band\b|\bday dong ho\b/i, "watch_strap"],
+      [/\bdress[ _-]?shoe(?:s)?\b|\bformal[ _-]?shoe(?:s)?\b|\bgiay tay\b/i, "dress_shoe"],
+      [/\bsneakers?\b|\btrainers?\b|\brunning shoes\b|\bgiay the thao\b/i, "sneaker"],
+      [/\bloafers?\b|\bgiay luoi\b/i, "loafer"],
+      [/\bboots?\b/i, "boot"], [/\bsandals?\b/i, "sandal"], [/\bbelts?\b|\bthat lung\b/i, "belt"],
+      [/\bwallets?\b|\bvi\b/i, "wallet"], [/\bwatches?\b|\bdong ho\b/i, "watch"], [/\bbags?\b|\btui\b/i, "bag"],
+      [/\bunknown\b|\bkhong xac dinh\b/i, "unknown"], [/\bother\b|\bkhac\b/i, "other"]
     ];
-    for(const [pattern,category] of categoryPatterns){
-      if(pattern.test(raw)){
-        const cm=raw.match(/(?:confidence|score|độ_tin_cậy)\s*["'\x60]*\s*[:=]\s*["'\x60]*([0-9.]+)\s*%?/i);
-        if(cm){let confidence=Number(cm[1]);if(confidence>0&&confidence<=1)confidence*=100;if(Number.isFinite(confidence)&&confidence>=0&&confidence<=100)return{category,confidence:Math.round(confidence)}}
+    const confidenceMatch = text.match(/(?:confidence|score|confidence_score|confidenceScore|độ[_ ]tin[_ ]cậy|do[_ ]tin[_ ]cay|probability)\s*[ "'\x60]*[:=]\s*[ "'\x60]*([0-9]+(?:\.[0-9]+)?)\s*%?/i);
+    if (confidenceMatch) {
+      const confidence = confidenceValue(confidenceMatch[1]);
+      if (confidence !== null) {
+        for (const [pattern, name] of categoryPatterns) {
+          if (pattern.test(text)) {
+            const category = normalize(name);
+            if (category) return { category, confidence };
+          }
+        }
       }
     }
+    return null;
+  };
+  function collect(value, depth = 0) {
+    if (depth > 8 || value == null || visited++ > 300) return;
+    if (typeof value === "string") {
+      const raw = value.trim();
+      if (!raw || visitedStrings.has(raw)) return;
+      visitedStrings.add(raw);
+      const parsed = parseText(raw);
+      if (parsed) candidates.push(parsed);
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value.slice(0, 20)) collect(item, depth + 1);
+      return;
+    }
+    if (typeof value !== "object" || visitedObjects.has(value)) return;
+    visitedObjects.add(value);
+    const parsed = evaluateObject(value);
+    if (parsed) candidates.push(parsed);
+    // Workers AI can put generated JSON in response, in content parts, or in
+    // function-call arguments. Walk bounded nested payloads instead of guessing
+    // that response is always a plain string.
+    const preferred = ["response","tool_calls","content","text","generated_text","output_text","result","message","choices","output","function","arguments","args","input","data","json","parsed","payload"];
+    for (const key of preferred) if (Object.prototype.hasOwnProperty.call(value, key)) collect(value[key], depth + 1);
+    for (const [key, child] of Object.entries(value)) {
+      if (preferred.includes(key) || ["usage","timings","metrics","logprobs","id","created","model","object","finish_reason"].includes(key)) continue;
+      collect(child, depth + 1);
+    }
   }
-  return null;
+
+  collect(result);
+  return candidates[0] || null;
 }
 
 async function inventory(env){const ps=await env.DB.prepare("SELECT id,sku,title,images_json FROM products ORDER BY sku ASC LIMIT 2000").all(),assigned=new Map();for(const p of ps.results||[]){let arr=[];try{arr=JSON.parse(p.images_json||"[]")}catch{}for(const entry of Array.isArray(arr)?arr:[]){const s=String(entry||""),m=s.match(/(?:^|\/)media\/([A-Za-z0-9-]{30,40}\.webp)(?:[?#].*)?$/i)||s.match(/^([A-Za-z0-9-]{30,40}\.webp)$/i);if(m){if(!assigned.has(m[1]))assigned.set(m[1],[]);assigned.get(m[1]).push({id:p.id,sku:p.sku,title:p.title})}}}const images=[];let cursor,scannedObjects=0,webpObjects=0,rejectedWebpCount=0;const sampleRejectedKeys=[];do{const page=await env.IMAGES.list({limit:1000,...(cursor?{cursor}:{})});for(const o of page.objects||[]){scannedObjects++;const key=String(o.key||"");if(/\.webp$/i.test(key))webpObjects++;if(KEY_RE.test(key))images.push({key,url:"/media/"+encodeURIComponent(key),size:Number(o.size||0),uploaded:o.uploaded?new Date(o.uploaded).toISOString():null,assignedTo:assigned.get(key)||[]});else if(/\.webp$/i.test(key)){rejectedWebpCount++;if(sampleRejectedKeys.length<5)sampleRejectedKeys.push(key.slice(0,120))}if(images.length>=MAX_SCAN)break}if(images.length>=MAX_SCAN||!page.truncated)break;cursor=page.cursor}while(cursor);return{images,truncated:images.length>=MAX_SCAN,total:images.length,assignedCount:images.filter(x=>x.assignedTo.length).length,diagnostics:{scannedObjects,webpObjects,rejectedWebpCount,sampleRejectedKeys,scanLimit:MAX_SCAN}}}
