@@ -430,6 +430,30 @@ jobs:
                 jq -e '.ok == true and (.matches | type == "array" or type == "number")' /tmp/ai-test-compare.json >/dev/null || { echo "::error::Workers AI pair comparison returned an invalid result."; exit 1; }
                 compare_summary="$(jq -r 'if (.matches|type)=="array" then "candidate_pairs=" + (.matches|length|tostring) else "candidate_pairs=" + (.matches|tostring) end' /tmp/ai-test-compare.json)"
                 echo "PASS: real Workers AI pair comparison on two distinct decodable Preview R2 images: $compare_summary. Any review writes were intercepted by the no-write test DB."
+                # Positive control: compare the same verified image bytes under
+                # two existing R2 keys. This must yield at least one high-confidence
+                # pair, proving the live model can recognize an identical product image.
+                AI_TEST_IMAGE_KEY_ENCODED="$image_key_encoded" AI_TEST_SECOND_IMAGE_KEY_ENCODED="$second_key_encoded" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const first = JSON.parse(await readFile("/tmp/ai-test-vision-request.json", "utf8"));
+          const secondKey = decodeURIComponent(process.env.AI_TEST_SECOND_IMAGE_KEY_ENCODED || "");
+          await writeFile("/tmp/ai-test-identical-compare-request.json", JSON.stringify({
+            action: "compare",
+            imageKeys: [first.imageKey, secondKey],
+            imageData: [
+              { key: first.imageKey, dataUrl: first.dataUrl },
+              { key: secondKey, dataUrl: first.dataUrl }
+            ]
+          }));
+          NODE
+                identical_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-identical-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-identical-compare-request.json "$base/api/ai-smoke-ci")"
+                if [ "$identical_status" != "200" ]; then
+                  echo "::error::Positive-control AI comparison failed with HTTP $identical_status."; exit 1
+                fi
+                jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-identical-compare.json >/dev/null || {
+                  echo "::error::AI failed the identical-image positive control; it did not produce a high-confidence match."; exit 1;
+                }
+                echo "PASS: real Workers AI identical-image positive control returned at least one pending candidate; the no-write DB prevented persistence."
               elif [ "$second_status" = "424" ]; then
                 echo "::warning::Only one byte-verified small raster image exists in Preview R2; live pair-comparison smoke was skipped."
               else
