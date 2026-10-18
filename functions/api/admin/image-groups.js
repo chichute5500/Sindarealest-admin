@@ -142,8 +142,11 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
         {type:"image_url",image_url:{url:supplied[i].dataUrl}}
       ]}],
       temperature:0,
-      max_tokens:180,
-      response_format:{type:"json_schema",json_schema:{type:"object",properties:{category:{type:"string",enum:["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]},confidence:{type:"integer",minimum:0,maximum:100}},required:["category","confidence"],additionalProperties:false}}
+      // Do not send response_format/json_schema to this vision model:
+      // Cloudflare's published JSON Mode support list does not include
+      // @cf/meta/llama-3.2-11b-vision-instruct. Parse and validate the actual
+      // response below, and fail closed if it is malformed.
+      max_tokens:180
     });
   }catch(error){
     const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
