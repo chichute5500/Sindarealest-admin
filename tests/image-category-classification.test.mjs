@@ -38,8 +38,17 @@ const env = {
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
         { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
     }
-    if (compareMode) return malformed ? { response: "not valid JSON", tool_calls: [] } :
-      { response: { pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Trùng vân da, đường may và chi tiết đế." }] }, tool_calls: [], usage: {} };
+    if (compareMode) {
+      const systemPrompt = String(input.messages?.[0]?.content || "");
+      if (systemPrompt.includes("forensic shoe-photo analyst")) {
+        return { response: JSON.stringify({ shoe_type: "dress_shoe", texture: "vân da", toe: "mũi tròn", sole: "đế đen", stitching: "đường may rõ" }), tool_calls: [], usage: {} };
+      }
+      if (systemPrompt.includes("Compare visual descriptions")) {
+        return malformed ? { response: "not valid JSON", tool_calls: [] } :
+          { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Trùng vân da, đường may và chi tiết đế." }] }), tool_calls: [], usage: {} };
+      }
+      return { response: "unexpected comparison request shape", tool_calls: [], usage: {} };
+    }
     return malformed ? { response: "not valid JSON", tool_calls: [] } :
       { response: { category: "dress_shoe", confidence: 91 }, tool_calls: [], usage: {} };
   } }
@@ -148,12 +157,12 @@ const compareResponse = await onRequestPost({ request: compareRequest(), env });
 const compareResult = await compareResponse.json();
 assert.equal(compareResponse.status, 201, JSON.stringify(compareResult));
 assert.equal(compareResult.matches, 1);
-assert.equal(modelCalls, beforeCompareCalls + 2, "pair comparison should retry exactly once after a transient 503");
+assert.equal(modelCalls, beforeCompareCalls + 5, "pair comparison should retry a transient 503, describe both images separately, then compare the descriptions");
 assert.equal(reviewInsertBatches, beforeReviewWrites + 1, "successful retry should save a single pending review batch");
-assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison must include the verified system instruction");
-assert.ok(Array.isArray(lastModelInput.input.messages[1].content), "pair comparison must send the image content parts in the user message");
-assert.equal(lastModelInput.input.response_format, undefined, "multi-image comparison must avoid the schema-constrained format that failed real Preview inference");
-assert.equal(lastModelInput.input.messages[1].content.filter(part => part.type === "image_url").length, 2, "both real candidate images must be present in the comparison input");
+assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison must include the system instruction");
+assert.match(lastModelInput.input.messages[0].content, /Compare visual descriptions/, "the final comparison must use the two image-specific visual descriptions");
+assert.equal(lastModelInput.input.image, undefined, "the final comparison uses text descriptors after each image was analyzed separately");
+assert.equal(lastModelInput.input.response_format, undefined, "comparison must avoid schema-constrained decoding that failed real Preview inference");
 
 // A live-style 3030 error on multi-image inference falls back to two documented
 // single-image vision calls plus a text comparison, and saves only pending review.
@@ -173,7 +182,7 @@ const beforeMalformedCalls = modelCalls;
 const beforeMalformedWrites = reviewInsertBatches;
 const malformedCompareResponse = await onRequestPost({ request: compareRequest(), env });
 assert.equal(malformedCompareResponse.status, 502);
-assert.equal(modelCalls, beforeMalformedCalls + 1);
+assert.equal(modelCalls, beforeMalformedCalls + 3, "malformed comparison output is rejected after both image descriptions and one text comparison");
 assert.equal(reviewInsertBatches, beforeMalformedWrites, "invalid model output must not persist partial pair proposals");
 malformed = false;
 
