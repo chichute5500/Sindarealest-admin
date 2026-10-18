@@ -439,9 +439,14 @@ export async function onRequestPost(context) {
       ]);
       if (objects.some(object => !object)) return fail("Một hoặc nhiều ảnh đã bị xóa khỏi R2. Quét lại kho trước khi duyệt.", 409);
       if (!product) return fail("Không tìm thấy sản phẩm đích.", 404);
-      let images = [];
-      try { images = JSON.parse(product.images_json || "[]"); } catch {}
-      if (!Array.isArray(images)) images = [];
+      const previousImagesJson = String(product.images_json ?? "[]");
+      let images;
+      try { images = JSON.parse(previousImagesJson); } catch {
+        return fail("Dữ liệu ảnh của sản phẩm hiện tại không hợp lệ. Không ghi đè để tránh mất dữ liệu.", 409);
+      }
+      if (!Array.isArray(images) || images.some(value => typeof value !== "string")) {
+        return fail("Danh sách ảnh sản phẩm không hợp lệ. Không ghi đè dữ liệu cũ.", 409);
+      }
       const others = await env.DB.prepare("SELECT id,sku,images_json FROM products WHERE id<>?").bind(productId).all();
       const owners = new Map();
       for (const row of others.results || []) {
@@ -461,6 +466,12 @@ export async function onRequestPost(context) {
         if (!known.has(url) && !known.has(url.slice(1)) && !known.has(key)) images.push(url);
       }
       if (images.length > 30) return fail("Bộ ảnh sản phẩm sẽ vượt giới hạn 30 ảnh. Hãy chia nhóm nhỏ hơn.", 409);
+      const nextImagesJson = JSON.stringify(images);
+      const claimsResult = await env.DB.prepare("SELECT image_key,group_id,status FROM image_group_image_claims WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
+      const claims = new Map((claimsResult.results || []).map(row => [String(row.image_key), row]));
+      if (keys.some(key => claims.get(key)?.group_id !== id || claims.get(key)?.status !== "pending")) {
+        return fail("Lượt giữ ảnh đã thay đổi hoặc thiếu claim an toàn. Hãy quét lại nhóm trước khi duyệt.", 409);
+      }
       // Once approved, these images are exclusively owned by this set.
       // Remove them from every other pending proposal so the same image cannot
       // appear in two groups in the review queue either.
@@ -475,27 +486,85 @@ export async function onRequestPost(context) {
       const cleanup = [];
       for (const [otherGroupId, overlapKeys] of overlappingByGroup) {
         for (const key of overlapKeys) {
-          cleanup.push(env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=?")
-            .bind(otherGroupId, key));
+          cleanup.push(env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+            .bind(otherGroupId, key, id, productId),
+            env.DB.prepare("DELETE FROM image_group_image_claims WHERE group_id=? AND image_key=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+              .bind(otherGroupId, key, id, productId));
         }
         const countRow = await env.DB.prepare("SELECT COUNT(*) AS count FROM image_group_set_members WHERE group_id=? AND image_key NOT IN (" + keys.map(() => "?").join(",") + ")")
           .bind(otherGroupId, ...keys).first();
         if (Number(countRow?.count || 0) < 2) {
-          cleanup.push(env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'")
-            .bind(otherGroupId));
+          cleanup.push(env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+            .bind(otherGroupId, id, productId),
+            env.DB.prepare("DELETE FROM image_group_image_claims WHERE group_id=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+              .bind(otherGroupId, id, productId));
         }
       }
+      const oldFingerprint = String(group.fingerprint || "");
       const results = await env.DB.batch([
-        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(images), productId),
-        env.DB.prepare("UPDATE image_group_sets SET status='approved',product_id=?,reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(productId, id),
-        env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'image_similarity_group_approved', 'product', ?, ?)")
-          .bind(crypto.randomUUID(), productId, JSON.stringify({ groupId: id, keys, sku: product.sku, similarity: Number(group.similarity) || 0 })),
+        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND COALESCE(images_json,'[]')=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+          .bind(nextImagesJson, productId, previousImagesJson, id, oldFingerprint),
+        env.DB.prepare("UPDATE image_group_sets SET status='approved',product_id=?,reviewed_at=datetime('now') WHERE id=? AND status='pending' AND fingerprint=? AND changes()=1")
+          .bind(productId, id, oldFingerprint),
+        env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_similarity_group_approved', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+          .bind(crypto.randomUUID(), productId, JSON.stringify({ groupId: id, keys, sku: product.sku, similarity: Number(group.similarity) || 0, previousImagesJson, nextImagesJson }), id, productId),
+        env.DB.prepare("UPDATE image_group_image_claims SET status='approved' WHERE group_id=? AND status='pending' AND image_key IN (" + keys.map(() => "?").join(",") + ") AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+          .bind(id, ...keys, id, productId),
         ...cleanup
       ]);
-      if (!results?.[0]?.meta?.changes || !results?.[1]?.meta?.changes) return fail("Không thể lưu bộ ảnh hoặc nhóm đã được xử lý.", 409);
-      return json({ ok: true, message: "Đã thêm " + keys.length + " ảnh vào bộ ảnh sản phẩm.", sku: product.sku, imageCount: images.length });
+      if (!results?.[0]?.meta?.changes || !results?.[1]?.meta?.changes) return fail("Nhóm hoặc danh sách ảnh sản phẩm đã thay đổi đồng thời. Không ghi đè dữ liệu; hãy tải lại và kiểm tra.", 409);
+      if (Number(results[3]?.meta?.changes || 0) !== keys.length) return fail("Thiếu claim ảnh sau thao tác duyệt. Hãy dừng và kiểm tra hàng chờ; không thử duyệt lại.", 409);
+      return json({ ok: true, message: "Đã thêm " + keys.length + " ảnh vào bộ ảnh sản phẩm; có thể hoàn tác nếu danh sách chưa bị chỉnh sửa tiếp.", sku: product.sku, imageCount: images.length });
     } catch (error) {
       return fail("Không thể duyệt nhóm ảnh: " + safeError(error), 503);
+    }
+  }
+
+
+  if (action === "undo-approval") {
+    const auditId = String(body.auditId || "");
+    if (!/^[0-9a-f-]{36}$/i.test(auditId)) return fail("Mã nhật ký duyệt không hợp lệ.", 400);
+    try {
+      const alreadyUndone = await env.DB.prepare("SELECT id FROM audit_logs WHERE action='image_similarity_group_approval_undone' AND details_json LIKE ? LIMIT 1")
+        .bind("%" + auditId + "%").first();
+      if (alreadyUndone) return fail("Lượt duyệt này đã được hoàn tác.", 409);
+      const original = await env.DB.prepare("SELECT id,entity_id,details_json FROM audit_logs WHERE id=? AND action='image_similarity_group_approved' LIMIT 1").bind(auditId).first();
+      if (!original) return fail("Không tìm thấy nhật ký duyệt ảnh.", 404);
+      let details = {};
+      try { details = JSON.parse(original.details_json || "{}"); } catch {}
+      const groupId = String(details.groupId || "");
+      const keys = Array.isArray(details.keys) ? details.keys.map(String) : [];
+      const previousImagesJson = typeof details.previousImagesJson === "string" ? details.previousImagesJson : null;
+      const nextImagesJson = typeof details.nextImagesJson === "string" ? details.nextImagesJson : null;
+      const productId = String(original.entity_id || "");
+      if (!validId(groupId) || !productId || !keys.length || previousImagesJson === null || nextImagesJson === null) {
+        return fail("Nhật ký duyệt cũ không có snapshot cần thiết; không thể hoàn tác an toàn.", 409);
+      }
+      const product = await env.DB.prepare("SELECT id,images_json FROM products WHERE id=? LIMIT 1").bind(productId).first();
+      if (!product || String(product.images_json ?? "[]") !== nextImagesJson) {
+        return fail("Danh sách ảnh sản phẩm đã được chỉnh sửa sau khi duyệt. Không hoàn tác vì có thể ghi đè thay đổi mới.", 409);
+      }
+      const group = await env.DB.prepare("SELECT id,status,product_id FROM image_group_sets WHERE id=? LIMIT 1").bind(groupId).first();
+      if (!group || group.status !== "approved" || group.product_id !== productId) {
+        return fail("Trạng thái nhóm đã thay đổi; không thể hoàn tác lượt duyệt này.", 409);
+      }
+      const results = await env.DB.batch([
+        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND images_json=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
+          .bind(previousImagesJson, productId, nextImagesJson, groupId, productId),
+        env.DB.prepare("UPDATE image_group_sets SET status='pending',product_id=NULL,reviewed_at=NULL WHERE id=? AND status='approved' AND product_id=? AND changes()=1")
+          .bind(groupId, productId),
+        env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_similarity_group_approval_undone', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND product_id IS NULL)")
+          .bind(crypto.randomUUID(), productId, JSON.stringify({ approvalAuditId: auditId, groupId, keys, restoredImagesJson: previousImagesJson, revertedImagesJson: nextImagesJson }), groupId),
+        env.DB.prepare("UPDATE image_group_image_claims SET status='pending' WHERE group_id=? AND status='approved' AND image_key IN (" + keys.map(() => "?").join(",") + ") AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND product_id IS NULL)")
+          .bind(groupId, ...keys, groupId)
+      ]);
+      if (!results?.[0]?.meta?.changes || !results?.[1]?.meta?.changes) {
+        return fail("Sản phẩm hoặc nhóm vừa thay đổi đồng thời; không hoàn tác. Hãy tải lại và kiểm tra.", 409);
+      }
+      if (Number(results[3]?.meta?.changes || 0) !== keys.length) return fail("Không khôi phục đủ claim ảnh; dừng để kiểm tra dữ liệu trước khi thao tác tiếp.", 409);
+      return json({ ok: true, message: "Đã khôi phục danh sách ảnh trước lượt duyệt. Nhóm trở lại chờ duyệt; ảnh gốc R2 không bị thay đổi." });
+    } catch (error) {
+      return fail("Không thể hoàn tác lượt duyệt ảnh: " + safeError(error), 503);
     }
   }
 
