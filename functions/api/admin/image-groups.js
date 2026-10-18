@@ -166,7 +166,7 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
   classification=parseCategoryResult(result,allowed);
 }
 if(!classification){const source=result&&typeof result==="object"?result:{};const describe=(key,value)=>key+(Array.isArray(value)?"["+value.length+"]":value&&typeof value==="object"?"{"+Object.keys(value).slice(0,6).join(",")+"}":"("+typeof value+")");const shape=Object.entries(source).slice(0,8).map(([key,value])=>describe(key,value)).join(",")||typeof result;let sample="";try{sample=JSON.stringify({response:source.response,tool_calls:source.tool_calls,choices:Array.isArray(source.choices)?source.choices.slice(0,1):undefined,output_text:source.output_text})||""}catch{}sample=sample.replace(/[\\r\\n]+/g," ").slice(0,220);return fail("Workers AI trả phản hồi không hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" (dạng: "+shape+(sample?"; mẫu JSON: "+sample:"")+"). Không lưu lô này; hãy thử lại.",502)}
-const candidate=classification.category,confidence=classification.confidence,valid=candidate!=="unknown"&&confidence>=91;
+const candidate=classification.category,confidence=classification.confidence,valid=candidate!=="unknown"&&confidence>=70;
 items.push({key:keys[i],category:valid?candidate:"unknown",confidence:Math.round(confidence),status:valid?"classified":"needs_review"});
 }
 return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.category!=="unknown").length+"/"+items.length+" ảnh. Ảnh chưa đủ chắc chắn được giữ ở trạng thái chưa xác định."});
