@@ -158,10 +158,13 @@ try {
       dark: document.documentElement.classList.contains('dark'),
       mode: document.documentElement.dataset.themeMode || 'auto',
       cards: document.querySelectorAll('#catalogGrid .product-card').length,
+      heroImage: (() => { const img = document.querySelector('#heroProductImage'); return { present: !!img, loaded: !!img && img.complete && img.naturalWidth > 0, source: img?.getAttribute('src') || '' }; })(),
       title: document.title,
     }));
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
+    audit.interactions.push({ theme, check: 'hero-product-image-loaded-from-catalog', pass: startup.heroImage.present && startup.heroImage.loaded && !!startup.heroImage.source });
+    if (!startup.heroImage.present || !startup.heroImage.loaded || !startup.heroImage.source) hardFailures.push('Hero product image failed to load from existing catalog data: ' + theme);
 
     for (const vp of viewports) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
