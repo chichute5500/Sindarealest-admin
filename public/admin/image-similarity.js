@@ -162,8 +162,10 @@ export async function findSimilarGroups(items, options = {}) {
       groups.push({
         category,
         categoryLabel: ({sneaker:"Giày thể thao",loafer:"Giày lười",dress_shoe:"Giày tây",boot:"Bốt",sandal:"Dép / sandal",belt:"Thắt lưng",wallet:"Ví",watch_strap:"Dây đồng hồ",watch:"Đồng hồ",bag:"Túi",other:"Sản phẩm khác",unknown:"Chưa xác định"})[category],
-        imageKeys: chunk.map(item => item.key).sort((a, b) => a.localeCompare(b)),
-        members: [...chunk].sort((a, b) => a.key.localeCompare(b.key)),
+        // Preserve the computed strongest-match-first order. Sorting by filename
+        // here discards the ranking above and creates an arbitrary gallery order.
+        imageKeys: chunk.map(item => item.key),
+        members: [...chunk],
         similarity: average,
         rationale: (indices.length > 30
           ? "Bộ ảnh có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. "
