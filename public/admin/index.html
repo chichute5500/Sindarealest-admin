@@ -130,6 +130,8 @@ function imageGroupsPage(){
   const pending=imageSimilarityGroups.filter(group=>group.status==="pending");
   const indexed=imageSimilarityPageStatus();
   const filtered=imageInventory.filter(item=>!imageSearch||String(item.key+" "+item.assignedTo.map(owner=>owner.sku+" "+owner.title).join(" ")).toLocaleLowerCase("vi").includes(imageSearch.toLocaleLowerCase("vi"))).slice(0,120);
+  const indexedFeaturesByKey=new Map(imageIndexedRows.map(row=>{let features={};try{features=JSON.parse(row.features_json||"{}")}catch{}return [row.image_key,features]}));
+  const needsReviewCount=imageInventory.filter(item=>{const features=indexedFeaturesByKey.get(item.key);return !features||features.category==="unknown"||features.categoryStatus==="needs_review"}).length;
   const status=imageGroupBusy?imageScanProgress:"Sẵn sàng quét toàn bộ kho; ảnh đã lập chỉ mục sẽ được tái sử dụng nếu không thay đổi.";
   const duplicateCards=imageExactDuplicateGroups.map(group=>{
     const thumbs=group.imageKeys.map(key=>{
@@ -153,13 +155,13 @@ function imageGroupsPage(){
   }).join("");
   return `${head("Kho hình ảnh","Tìm ảnh tương đồng toàn kho","Quét toàn bộ object ảnh trong R2, tạo chỉ mục hình dạng/màu/hash rồi so sánh chéo toàn kho. Không giới hạn trong một nhóm 8 ảnh.",`<button class="btn" id="refreshImageGroups" ${imageGroupBusy?"disabled":""}>↻ Tải lại kho</button>`)}
     <section class="panel">
-      <div class="switchrow"><div><b>${imageInventory.length.toLocaleString("vi-VN")} ảnh trong toàn kho</b><div class="tiny muted">${indexed.indexed.toLocaleString("vi-VN")}/${indexed.total.toLocaleString("vi-VN")} ảnh đã có chỉ mục · ${imageInventory.filter(item=>!item.assignedTo.length).length} ảnh chưa gắn SKU</div></div><span class="status ${imageInventory.length?"on":"unknown"}">${imageInventory.length?"Đã liệt kê toàn kho":"Chưa quét kho"}</span></div>
+      <div class="switchrow"><div><b>${imageInventory.length.toLocaleString("vi-VN")} ảnh trong toàn kho</b><div class="tiny muted">${indexed.indexed.toLocaleString("vi-VN")}/${indexed.total.toLocaleString("vi-VN")} ảnh đã có chỉ mục · ${imageInventory.filter(item=>!item.assignedTo.length).length} ảnh chưa gắn SKU · ${needsReviewCount} ảnh cần xác nhận loại</div></div><span class="status ${imageInventory.length?"on":"unknown"}">${imageInventory.length?"Đã liệt kê toàn kho":"Chưa quét kho"}</span></div>
       <p class="tiny muted">Hệ thống duyệt tất cả trang R2, lập chỉ mục từng ảnh, sau đó so sánh mọi cặp trong toàn kho — vì vậy ảnh ở đợt đầu vẫn có thể ghép với ảnh ở đợt sau. Điểm tương đồng dựa trên dấu vân tay cảm nhận, hình dạng vùng sản phẩm và phân bố màu sau chuẩn hóa nền; đây là điểm tương đồng ảnh, không phải xác suất cùng sản phẩm. Chỉ mục được lưu để lần sau xử lý nhanh hơn.</p>
       <div class="toolbar"><div class="field"><label for="imageSearch">Lọc ảnh trong danh sách xem trước</label><input id="imageSearch" class="control" value="${esc(imageSearch)}" placeholder="Tên file hoặc SKU…"></div><button class="btn primary" id="scanWholeImageInventory" ${imageGroupBusy||imageInventory.length<2?"disabled":""}>${imageGroupBusy?"Đang quét toàn kho…":"Quét toàn kho & tìm nhóm"}</button></div>
       <p id="imageScanProgress" class="tiny muted" role="status" aria-live="polite" style="white-space:pre-wrap;margin-top:10px">${esc(status)}</p>
       <div class="tiny muted" style="margin-top:6px">Đã kiểm tra ${Number(imageDiagnostics.scannedObjects||0).toLocaleString("vi-VN")} object R2 · Có ${Number(imageDiagnostics.nonImageObjects||0).toLocaleString("vi-VN")} object không phải ảnh raster được hỗ trợ. ${imageDiagnostics.assignmentsIncomplete?"Lưu ý: danh sách sản phẩm vượt 2.000 bản ghi nên ánh xạ SKU có thể chưa đầy đủ.":""}</div>
       <div class="toolbar" style="margin-top:12px"><b>Ảnh xem trước (${filtered.length} ảnh hiển thị tối đa)</b><span class="tiny muted">Không cần chọn ảnh thủ công</span></div>
-      <div class="image-grid-review">${filtered.map(item=>'<div class="image-review-tile"><img src="'+esc(item.url)+'" loading="lazy" alt=""><span class="tiny" style="overflow-wrap:anywhere">'+esc(item.key)+'</span><span class="status '+(item.assignedTo.length?"on":"unknown")+'">'+(item.assignedTo.length?esc(item.assignedTo.map(owner=>owner.sku).join(", ")):"Chưa gắn SKU")+'</span></div>').join("")||'<div class="empty">Không tìm thấy ảnh phù hợp.</div>'}</div>
+      <div class="image-grid-review">${filtered.map(item=>{const features=indexedFeaturesByKey.get(item.key)||{};const needsReview=!features.category||features.category==="unknown"||features.categoryStatus==="needs_review";const categoryLabels={sneaker:"Giày thể thao",loafer:"Giày lười",dress_shoe:"Giày tây",boot:"Bốt",sandal:"Sandal",belt:"Thắt lưng",wallet:"Ví",watch_strap:"Dây đồng hồ",watch:"Đồng hồ",bag:"Túi",other:"Khác",unknown:"Chưa xác định"};return '<div class="image-review-tile"><img src="'+esc(item.url)+'" loading="lazy" alt=""><span class="tiny" style="overflow-wrap:anywhere">'+esc(item.key)+'</span><span class="status '+(needsReview?"unknown":"on")+'">'+(needsReview?"Cần xác nhận loại":esc(categoryLabels[features.category]||features.category))+'</span><span class="tiny muted">AI: '+(Number.isInteger(Number(features.categoryConfidence))?Number(features.categoryConfidence):0)+'% · '+(needsReview?"không được gom tự động":"đã phân loại")+'</span><span class="status '+(item.assignedTo.length?"on":"unknown")+'">'+(item.assignedTo.length?esc(item.assignedTo.map(owner=>owner.sku).join(", ")):"Chưa gắn SKU")+'</span></div>'}).join("")||'<div class="empty">Không tìm thấy ảnh phù hợp.</div>'}</div>
     </section>
     <section class="panel" style="margin-top:16px"><h3>Ảnh trùng nội dung</h3><p class="tiny muted">Chỉ phát hiện khi hash SHA-256 của file gốc trùng hoàn toàn. Các bản sao được giữ nguyên; không có thao tác xóa tự động.</p>${duplicateCards||'<p class="muted">Chưa phát hiện bản sao byte-for-byte trong lượt quét gần nhất.</p>'}</section>
     <section class="panel" style="margin-top:16px"><h3>Nhóm tương đồng cần duyệt (${pending.length})</h3><p class="tiny muted">Duyệt bằng mắt trước khi lưu. Khi duyệt, toàn bộ ảnh trong nhóm sẽ được thêm vào bộ ảnh của SKU đã chọn. Nếu ảnh đã gắn với SKU khác, hệ thống sẽ chặn để tránh ghép nhầm. Ảnh gốc trong R2 không bị xóa.</p>${groupCards||'<p class="muted">Chưa có nhóm nào chờ duyệt. Nhấn “Quét toàn kho & tìm nhóm” để bắt đầu.</p>'}</section>
@@ -176,7 +178,7 @@ async function scanWholeImageInventory(){
       const row=indexedByKey.get(item.key);
       let features={};try{features=JSON.parse(row?.features_json||"{}")}catch{}
       // Re-index once when the two-tier category has not yet been stored.
-      return !row||!features.category||! /^[0-9a-f]{64}$/i.test(String(features.contentHash||""))||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
+      return !row||!features.category||!Number.isInteger(Number(features.categoryConfidence))||!["classified","needs_review"].includes(String(features.categoryStatus||""))||! /^[0-9a-f]{64}$/i.test(String(features.contentHash||""))||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
     });
     const failedKeys=new Set(),failureDetails=[],pendingIndexWrites=[];
     async function flushIndexWrites(){if(!pendingIndexWrites.length)return;const batch=pendingIndexWrites.splice(0,20);await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"index",images:batch})});}
@@ -197,9 +199,12 @@ async function scanWholeImageInventory(){
           imageKeys:calculated.map(item=>item.key),
           imageData:calculated.map(item=>({key:item.key,dataUrl:item.previewDataUrl}))
         })});
-        const categories=new Map((classification.items||[]).map(item=>[item.key,item.category]));
+        const decisions=new Map((classification.items||[]).map(item=>[item.key,item]));
         for(const descriptor of calculated){
-          descriptor.features.category=categories.get(descriptor.key)||"unknown";
+          const decision=decisions.get(descriptor.key);
+          descriptor.features.category=decision?.category||"unknown";
+          descriptor.features.categoryConfidence=Number.isInteger(Number(decision?.confidence))?Math.max(0,Math.min(100,Number(decision.confidence))):0;
+          descriptor.features.categoryStatus=descriptor.features.category==="unknown"||decision?.status==="needs_review"?"needs_review":"classified";
           delete descriptor.previewDataUrl;
           indexedByKey.set(descriptor.key,{image_key:descriptor.key,p_hash:descriptor.p_hash,features_json:JSON.stringify(descriptor.features),width:descriptor.width,height:descriptor.height,source_size:descriptor.sourceSize,source_uploaded:descriptor.sourceUploaded});
           pendingIndexWrites.push(descriptor);
