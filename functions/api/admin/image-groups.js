@@ -2,6 +2,33 @@ import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin }
 const MODEL="@cf/meta/llama-3.2-11b-vision-instruct", KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
 function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
+
+function parseCategoryResult(result,allowed){
+  let raw=result?.response??result?.choices?.[0]?.message?.content??result?.output_text??result?.result??"";
+  if(typeof raw!=="string"){try{raw=JSON.stringify(raw)}catch{raw=""}}
+  raw=raw.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");
+  let value;
+  try{value=JSON.parse(raw)}catch{
+    const match=raw.match(/\{[\s\S]*?\}/);
+    if(match)try{value=JSON.parse(match[0])}catch{}
+  }
+  if(value&&typeof value==="object"&&!Array.isArray(value)){
+    const category=String(value.category??value.product_category??value.type??"").toLowerCase().trim().replace(/[ -]+/g,"_");
+    const confidence=Number(String(value.confidence??value.score??"").replace("%","").trim());
+    if(allowed.has(category)&&Number.isFinite(confidence)&&confidence>=0&&confidence<=100)
+      return {category,confidence:Math.round(confidence)};
+  }
+  // Recover a plain key/value answer if the model ignores the JSON-only instruction.
+  const categoryMatch=raw.match(/(?:category|product_category|loại|danh_mục)\s*["'\x60]*\s*[:=]\s*["'\x60]*([a-z_ -]+)/i);
+  const confidenceMatch=raw.match(/(?:confidence|score|độ_tin_cậy)\s*["'\x60]*\s*[:=]\s*["'\x60]*(\d{1,3})\s*%?/i);
+  if(categoryMatch&&confidenceMatch){
+    const category=categoryMatch[1].trim().toLowerCase().replace(/[ -]+/g,"_");
+    const confidence=Number(confidenceMatch[1]);
+    if(allowed.has(category)&&confidence>=0&&confidence<=100)return {category,confidence};
+  }
+  return null;
+}
+
 async function inventory(env){const ps=await env.DB.prepare("SELECT id,sku,title,images_json FROM products ORDER BY sku ASC LIMIT 2000").all(),assigned=new Map();for(const p of ps.results||[]){let arr=[];try{arr=JSON.parse(p.images_json||"[]")}catch{}for(const entry of Array.isArray(arr)?arr:[]){const s=String(entry||""),m=s.match(/(?:^|\/)media\/([A-Za-z0-9-]{30,40}\.webp)(?:[?#].*)?$/i)||s.match(/^([A-Za-z0-9-]{30,40}\.webp)$/i);if(m){if(!assigned.has(m[1]))assigned.set(m[1],[]);assigned.get(m[1]).push({id:p.id,sku:p.sku,title:p.title})}}}const images=[];let cursor,scannedObjects=0,webpObjects=0,rejectedWebpCount=0;const sampleRejectedKeys=[];do{const page=await env.IMAGES.list({limit:1000,...(cursor?{cursor}:{})});for(const o of page.objects||[]){scannedObjects++;const key=String(o.key||"");if(/\.webp$/i.test(key))webpObjects++;if(KEY_RE.test(key))images.push({key,url:"/media/"+encodeURIComponent(key),size:Number(o.size||0),uploaded:o.uploaded?new Date(o.uploaded).toISOString():null,assignedTo:assigned.get(key)||[]});else if(/\.webp$/i.test(key)){rejectedWebpCount++;if(sampleRejectedKeys.length<5)sampleRejectedKeys.push(key.slice(0,120))}if(images.length>=MAX_SCAN)break}if(images.length>=MAX_SCAN||!page.truncated)break;cursor=page.cursor}while(cursor);return{images,truncated:images.length>=MAX_SCAN,total:images.length,assignedCount:images.filter(x=>x.assignedTo.length).length,diagnostics:{scannedObjects,webpObjects,rejectedWebpCount,sampleRejectedKeys,scanLimit:MAX_SCAN}}}
 export async function onRequestGet({request,env}){const auth=await requireAdmin({request,env});if(auth.response)return auth.response;if(!env.DB||!env.IMAGES)return fail("Thiếu binding D1 DB hoặc R2 IMAGES.",503);try{const [stock,rows]=await Promise.all([inventory(env),env.DB.prepare("SELECT id,image_a,image_b,same_product,confidence,rationale,status,product_id,created_at FROM image_group_reviews ORDER BY created_at DESC LIMIT 200").all()]);return json({...stock,reviews:rows.results||[]})}catch{return fail("Không thể kiểm kê kho ảnh. Kiểm tra binding R2 IMAGES và migration 0008.",503)}}
 export async function onRequestPost(context){const auth=await requireAdmin(context);if(auth.response)return auth.response;const env=context.env||{};if(!env.DB||!env.IMAGES)return fail("Thiếu binding D1 DB hoặc R2 IMAGES.",503);const parsed=await readJsonBodyLimited(context.request,3*1024*1024);if(parsed.error==="too_large")return fail("Yêu cầu vượt giới hạn.",413);if(parsed.error||!parsed.value||typeof parsed.value!=="object"||Array.isArray(parsed.value))return fail("Yêu cầu không hợp lệ.");const body=parsed.value,action=String(body.action||"");
@@ -17,31 +44,30 @@ const objects=await Promise.all(keys.map(k=>env.IMAGES.head?env.IMAGES.head(k):e
 if(objects.some(x=>!x))return fail("Ảnh đã biến mất khỏi R2; hãy quét lại kho.",409);
 const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",700,3600);
 if(limit.limited)return fail("Đã đạt giới hạn phân loại ảnh trong một giờ. Hãy đợi rồi quét tiếp; kết quả chưa rõ sẽ không được gom.",429,{"Retry-After":"3600"});
-const prompt="Phân loại DUY NHẤT sản phẩm chính trong ảnh. Chọn chính xác một category trong danh sách: sneaker (giày thể thao), loafer (giày lười), dress_shoe (giày tây), boot (bốt), sandal (dép/sandal), belt (thắt lưng), wallet (ví), watch_strap (dây đồng hồ), watch (đồng hồ nguyên chiếc), bag (túi), other (sản phẩm khác), unknown (không nhìn rõ hoặc không đủ chắc chắn). Phân biệt dây đồng hồ với đồng hồ nguyên chiếc; không đoán từ nền hoặc phụ kiện phụ. Trả DUY NHẤT JSON, không markdown: {\"category\":\"sneaker\",\"confidence\":90}. Confidence là số nguyên 0-100. Nếu dưới 70, category phải là unknown.";
+const prompt="Nhìn ảnh và phân loại sản phẩm chính. Chỉ chọn một category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Phân biệt watch_strap (chỉ dây đồng hồ) với watch (đồng hồ nguyên chiếc). Nếu không rõ hoặc confidence dưới 70, dùng unknown. Trả đúng một JSON object không markdown theo mẫu: {\\"category\\":\\"sneaker\\",\\"confidence\\":90}. confidence là số nguyên 0-100.";
 const allowed=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
 const items=[];
 for(let i=0;i<keys.length;i++){
-let result;
-try{
-/* Vision inputs must be part of the user's message content. A top-level image
-   field with text-only messages causes Workers AI 3030. Keep one image per call
-   to limit request size and make failures attributable to a single inventory item. */
-result=await env.AI.run(MODEL,{
-messages:[{role:"user",content:[
-{type:"text",text:prompt},
-{type:"image_url",image_url:{url:supplied[i].dataUrl}}
-]}],
-temperature:0,
-max_tokens:120
-});
-}catch(error){
-const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
-return fail("Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử quét lại.",502);
+let result,classification=null;
+for(let attempt=0;attempt<2&&!classification;attempt++){
+  try{
+    /* Vision inputs must be part of the user's message content. */
+    result=await env.AI.run(MODEL,{
+      messages:[{role:"user",content:[
+        {type:"text",text:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")},
+        {type:"image_url",image_url:{url:supplied[i].dataUrl}}
+      ]}],
+      temperature:0,
+      max_tokens:180
+    });
+  }catch(error){
+    const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
+    return fail("Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử quét lại.",502);
+  }
+  classification=parseCategoryResult(result,allowed);
 }
-let raw=String(result?.response||result?.choices?.[0]?.message?.content||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,""),parsed;
-try{parsed=JSON.parse(raw)}catch{const m=raw.match(/\{[\s\S]*\}/);if(m)try{parsed=JSON.parse(m[0])}catch{}}
-if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))return fail("Workers AI không trả JSON phân loại hợp lệ cho ảnh "+(i+1)+"/"+keys.length+". Không lưu lô này; hãy thử lại.",502);
-const candidate=String(parsed.category||"unknown").toLowerCase(),confidence=Number(parsed.confidence),valid=allowed.has(candidate)&&candidate!=="unknown"&&Number.isFinite(confidence)&&confidence>=70;
+if(!classification)return fail("Workers AI vẫn không trả được category/confidence hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" sau 2 lần thử. Không lưu lô này; hãy thử lại.",502);
+const candidate=classification.category,confidence=classification.confidence,valid=candidate!=="unknown"&&confidence>=70;
 items.push({key:keys[i],category:valid?candidate:"unknown",confidence:valid?Math.round(confidence):0});
 }
 return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.category!=="unknown").length+"/"+items.length+" ảnh. Ảnh chưa đủ chắc chắn được giữ ở trạng thái chưa xác định."});
