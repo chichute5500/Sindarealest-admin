@@ -2,6 +2,9 @@ import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
 
 const MAX_BODY = 2 * 1024 * 1024;
 const KEY_MAX = 1024;
+// The browser submits groups in batches of ten, with at most 30 members each.
+// Bound one transactional insert batch well below the statement count ceiling.
+const MAX_PROPOSAL_BATCH_STATEMENTS = 900;
 const KEY_CONTROL = /[\u0000-\u001f\u007f]/;
 const validKey = value => typeof value === "string" && value.length > 0 && value.length <= KEY_MAX && !KEY_CONTROL.test(value);
 const safeError = error => String(error?.message || error || "Unknown image grouping error").replace(/[\r\n]+/g, " ").slice(0, 200);
@@ -136,6 +139,7 @@ export async function onRequestPost(context) {
     const groups = Array.isArray(body.groups) ? body.groups : [];
     if (!groups.length || groups.length > 25) return fail("Mỗi lượt lưu cần từ 1 đến 25 nhóm đề xuất.", 400);
     let saved = 0, skipped = 0;
+    const proposalStatements = [];
     try {
       // Normalize older pending proposals first: one image may belong to only
       // one pending set. The oldest set keeps a shared image; later sets lose it.
@@ -237,9 +241,22 @@ export async function onRequestPost(context) {
           statements.push(env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) VALUES(?,?,?)")
             .bind(id, key, Number.isInteger(memberScore) ? Math.max(0, Math.min(100, memberScore)) : similarity));
         }
-        await env.DB.batch(statements);
+        if (proposalStatements.length + statements.length > MAX_PROPOSAL_BATCH_STATEMENTS) {
+          return fail("Lượt lưu có quá nhiều thành viên cho một giao dịch nguyên tử. Hãy gửi ít nhóm hơn trong mỗi lượt.", 413);
+        }
+        proposalStatements.push(...statements);
         for (const key of uniqueKeys) claimed.add(key);
         saved++;
+      }
+      // Validate every submitted proposal before writing any of the new groups.
+      // A single D1 batch makes group rows, membership rows, and image claims
+      // commit together; a concurrent claim conflict rolls the entire request back.
+      if (proposalStatements.length) {
+        const results = await env.DB.batch(proposalStatements);
+        if (!Array.isArray(results) || results.length !== proposalStatements.length ||
+            results.some(result => Number(result?.meta?.changes) !== 1)) {
+          throw new Error("D1 proposal transaction did not confirm every inserted row");
+        }
       }
       return json({ ok: true, saved, skipped, message: "Đã lưu " + saved + " nhóm tương đồng vào hàng chờ duyệt; không ảnh nào được công khai." }, 201);
     } catch (error) {
