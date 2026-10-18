@@ -53,8 +53,10 @@ export function compareDescriptors(left, right) {
   const color = colorSimilarity(leftFeatures?.colors, rightFeatures?.colors);
   // The score is a review-oriented visual similarity index, not a probability.
   const score = Math.round((phashSimilarity * 0.30 + shape * 0.35 + color * 0.35) * 100);
-  const match = (phashDistance <= 8 && shape >= 0.40) ||
-    (score >= 62 && shape >= 0.55 && color >= 0.45);
+  // A perceptual-hash match alone is not evidence of the same product:
+  // large white backgrounds make unrelated catalog photos look deceptively alike.
+  // Require shape AND foreground-color agreement, with a stronger score gate.
+  const match = score >= 70 && shape >= 0.58 && color >= 0.58 && phashDistance <= 24;
   return { score, phashDistance, shapeSimilarity: Math.round(shape * 100), colorSimilarity: Math.round(color * 100), match };
 }
 
@@ -91,7 +93,7 @@ export async function findSimilarGroups(items, options = {}) {
     for (let j = i + 1; j < count; j++) {
       const result = compareDescriptors(valid[i], valid[j]);
       compared++;
-      if (result.match && (result.score >= threshold || (result.phashDistance <= 8 && result.shapeSimilarity >= 40))) {
+      if (result.match && result.score >= Math.max(70, threshold)) {
         union(i, j);
         bestScore[i] = Math.max(bestScore[i], result.score);
         bestScore[j] = Math.max(bestScore[j], result.score);
@@ -111,7 +113,30 @@ export async function findSimilarGroups(items, options = {}) {
     components.get(root).push(i);
   }
   const groups = [];
-  for (const indices of components.values()) {
+  for (const componentIndices of components.values()) {
+    if (componentIndices.length < 2) continue;
+    // Connected components alone are unsafe: one weak bridge can join a shoe,
+    // wallet and belt into a single group. Split each component using complete-link
+    // checks so every member must match every other member in the proposed set.
+    const orderedIndices = [...componentIndices].sort((a, b) => bestScore[b] - bestScore[a] || valid[a].key.localeCompare(valid[b].key));
+    const coherentClusters = [];
+    for (const candidateIndex of orderedIndices) {
+      let bestCluster = -1, bestMinimum = -1;
+      for (let clusterIndex = 0; clusterIndex < coherentClusters.length; clusterIndex++) {
+        const cluster = coherentClusters[clusterIndex];
+        let minimumScore = 101, coherent = true;
+        for (const existingIndex of cluster) {
+          const pair = compareDescriptors(valid[candidateIndex], valid[existingIndex]);
+          if (!pair.match || pair.score < Math.max(70, threshold)) { coherent = false; break; }
+          minimumScore = Math.min(minimumScore, pair.score);
+        }
+        if (coherent && minimumScore > bestMinimum) { bestMinimum = minimumScore; bestCluster = clusterIndex; }
+      }
+      if (bestCluster < 0) coherentClusters.push([candidateIndex]);
+      else coherentClusters[bestCluster].push(candidateIndex);
+      if ((compared + orderedIndices.length + candidateIndex) % 20000 === 0) await nextFrame();
+    }
+    for (const indices of coherentClusters) {
     if (indices.length < 2) continue;
     const members = indices.map(index => valid[index]);
     const assignedSkus = new Set(members.flatMap(item => (item.assignedTo || []).map(owner => String(owner.sku || "")).filter(Boolean)));
@@ -143,6 +168,7 @@ export async function findSimilarGroups(items, options = {}) {
         rationale: (indices.length > 30 ? "Cụm liên thông lớn có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. " : "") +
           "So sánh dấu vân tay cảm nhận, hình dạng vùng sản phẩm và phân bố màu sau chuẩn hóa nền. Điểm là mức tương đồng ảnh, không phải xác suất cùng SKU."
       });
+    }
     }
   }
   groups.sort((a, b) => b.similarity - a.similarity || a.imageKeys.join("|").localeCompare(b.imageKeys.join("|")));
