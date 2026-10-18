@@ -41,7 +41,7 @@ const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (c) => ({
 }[c]));
 
 async function capture(page, filename, fullPage = false) {
-  await page.screenshot({ path: path.join(outDir, filename), fullPage, animations: 'disabled' });
+  await page.screenshot({ path: path.join(outDir, filename), fullPage, animations: 'disabled', type: 'jpeg', quality: 86 });
   audit.screenshots.push({ filename, fullPage });
 }
 async function settle(page) {
@@ -105,6 +105,12 @@ try {
       return route.continue();
     });
     // This test-only API response is served from source data and is never written anywhere.
+    await context.route('**/api/settings', (route) => route.fulfill({
+      status: 200, contentType: 'application/json; charset=utf-8', body: '{}',
+    }));
+    await context.route('https://provinces.open-api.vn/api/v2/p/', (route) => route.fulfill({
+      status: 200, contentType: 'application/json; charset=utf-8', body: '[]',
+    }));
     await context.route('**/api/products', (route) => route.fulfill({
       status: 200,
       contentType: 'application/json; charset=utf-8',
@@ -177,8 +183,8 @@ try {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.waitForTimeout(100);
-      await capture(page, vp.name + '-' + theme + '-viewport.png');
-      if (vp.name !== 'mobile-320') await capture(page, vp.name + '-' + theme + '-full.png', true);
+      await capture(page, vp.name + '-' + theme + '-viewport.jpg');
+      if (vp.name !== 'mobile-320') await capture(page, vp.name + '-' + theme + '-full.jpg', true);
     }
 
     // Theme toggle writes only browser localStorage; no settings endpoint is called.
@@ -196,7 +202,7 @@ try {
     const detail = page.locator('#productOverlay.open');
     await detail.waitFor({ state: 'visible' });
     await settle(page);
-    await capture(page, 'detail-mobile-' + theme + '.png');
+    await capture(page, 'detail-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'open-product-detail', pass: true });
     await page.keyboard.press('Escape');
     await page.locator('#productOverlay.open').waitFor({ state: 'hidden' });
@@ -205,7 +211,7 @@ try {
     await page.locator('#cartOpen').click();
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await settle(page);
-    await capture(page, 'cart-mobile-' + theme + '.png');
+    await capture(page, 'cart-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'add-to-cart-and-open-cart', pass: true });
     await context.close();
   }
@@ -229,7 +235,7 @@ const imageCards = audit.screenshots.map((v) =>
 const rows = audit.responsive.map((v) =>
   '<tr><td>' + escapeHtml(v.theme) + '</td><td>' + escapeHtml(v.viewport) + '</td><td>' + v.viewportWidth + 'px</td><td>' + v.documentWidth + 'px</td><td>' + (v.horizontalOverflow ? 'OVERFLOW' : 'PASS') + '</td></tr>'
 ).join('\n');
-const report = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest Liquid Glass Preview</title><style>body{margin:0;padding:24px;font:15px/1.6 system-ui,sans-serif;background:#eef6fd;color:#142a3c}main{max-width:1400px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}.status{font-weight:700}table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:8px;border:1px solid #c8dceb;text-align:left}section{margin:28px 0}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}figure{margin:0;padding:10px;border:1px solid #c8dceb;border-radius:14px;background:#fff}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}@media(max-width:480px){body{padding:12px}}</style><main><h1>SinDarealest2 — Liquid Glass Preview</h1><p>Rendered locally from this branch on a static HTTP server. The test uses the repository’s legacy product source as read-only fixture; unknown prices and stock are not invented. External calls and all non-GET requests are blocked. No Cloudflare, D1 or R2 binding is used.</p><p class="status">Automated audit: ' + (audit.passed ? 'PASS' : 'NEEDS REVIEW') + ' — horizontal overflow: ' + audit.responsiveOverflowCount + '; page errors: ' + audit.pageErrors.length + '; same-origin HTTP errors: ' + audit.httpErrors.length + '.</p><h2>Responsive width audit</h2><table><thead><tr><th>Theme</th><th>Viewport</th><th>CSS viewport</th><th>Document scroll width</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table><h2>Screenshots</h2><section class="shots">' + imageCards + '</section><h2>Interaction checks</h2><pre>' + escapeHtml(JSON.stringify(audit.interactions, null, 2)) + '</pre><h2>Diagnostics</h2><p>See <a href="visual-audit.json">visual-audit.json</a> for console, failed-request and overflow details. This report makes no subjective 95–100% visual-similarity claim.</p></main></html>';
+const report = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest Liquid Glass Preview</title><style>body{margin:0;padding:24px;font:15px/1.6 system-ui,sans-serif;background:#eef6fd;color:#142a3c}main{max-width:1400px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}.status{font-weight:700}table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:8px;border:1px solid #c8dceb;text-align:left}section{margin:28px 0}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}figure{margin:0;padding:10px;border:1px solid #c8dceb;border-radius:14px;background:#fff}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}@media(max-width:480px){body{padding:12px}}</style><main><h1>SinDarealest2 — Liquid Glass Preview</h1><p>Rendered locally from this branch on a static HTTP server. The test uses the repository’s legacy product source as read-only fixture; unknown prices and stock are not invented. External calls and all non-GET requests are blocked. No Cloudflare, D1 or R2 binding is used.</p><p class="status">Automated audit: ' + (audit.passed ? 'PASS' : 'NEEDS REVIEW') + ' — horizontal overflow: ' + audit.responsiveOverflowCount + '; page errors: ' + audit.pageErrors.length + '; console errors: ' + audit.consoleErrors.length + '; same-origin HTTP errors: ' + audit.httpErrors.length + '.</p><h2>Responsive width audit</h2><table><thead><tr><th>Theme</th><th>Viewport</th><th>CSS viewport</th><th>Document scroll width</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table><h2>Screenshots</h2><section class="shots">' + imageCards + '</section><h2>Interaction checks</h2><pre>' + escapeHtml(JSON.stringify(audit.interactions, null, 2)) + '</pre><h2>Diagnostics</h2><p>See <a href="visual-audit.json">visual-audit.json</a> for console, failed-request and overflow details. This report makes no subjective 95–100% visual-similarity claim.</p></main></html>';
 await fs.writeFile(path.join(outDir, 'report.html'), report, 'utf8');
 console.log(JSON.stringify({
   passed: audit.passed, fixtureProducts: audit.productFixtureCount,
