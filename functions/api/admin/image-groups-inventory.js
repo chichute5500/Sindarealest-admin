@@ -28,7 +28,10 @@ function keyFromReference(reference) {
     const position = pathname.indexOf(marker);
     if (position >= 0) return decodeURIComponent(pathname.slice(position + marker.length));
   } catch {}
-  if (value.startsWith("media/")) return value.slice(6);
+  if (value.startsWith("media/")) {
+    const path = value.slice(6).split(/[?#]/, 1)[0];
+    try { return decodeURIComponent(path); } catch { return path; }
+  }
   if (value.startsWith("/media/")) {
     try { return decodeURIComponent(value.slice(7).split(/[?#]/, 1)[0]); } catch { return value.slice(7).split(/[?#]/, 1)[0]; }
   }
