@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false;
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false;
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -26,6 +26,7 @@ const env = {
   IMAGES: { async head(imageKey) { return { key: imageKey }; } },
   AI: { async run(model, input) {
     modelCalls++; lastModelInput = { model, input };
+    if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     return malformed ? { response: "not valid JSON", tool_calls: [] } :
       { response: { category: "dress_shoe", confidence: 91 }, tool_calls: [], usage: {} };
   } }
@@ -83,4 +84,25 @@ assert.equal(alternateResponse.status, 200, JSON.stringify(alternateBody));
 assert.deepEqual(alternateBody.items, [{ key: alternateKey, category: "dress_shoe", confidence: 91, status: "classified" }]);
 assert.equal(modelCalls, 4, "nested PNG/JPEG-like keys must actually be sent through the vision model");
 
-console.log("PASS: mocked Workers AI endpoint parses structured output, fails closed on malformed JSON, and accepts nested raster inventory keys.");
+// A transient upstream timeout is retried once; a successful retry completes the item.
+failNextTransient = true;
+const retryRequest = new Request("https://preview.example/api/admin/image-groups", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Cookie: "sd_admin_session=" + session,
+    Origin: "https://preview.example",
+    "Sec-Fetch-Site": "same-origin"
+  },
+  body: JSON.stringify({
+    action: "classify-categories",
+    imageKeys: [alternateKey],
+    imageData: [{ key: alternateKey, dataUrl }]
+  })
+});
+const retryResponse = await onRequestPost({ request: retryRequest, env });
+const retryBody = await retryResponse.json();
+assert.equal(retryResponse.status, 200, JSON.stringify(retryBody));
+assert.equal(modelCalls, 6, "one transient 503 must cause exactly one retry before success");
+
+console.log("PASS: mocked Workers AI endpoint passes actual images, accepts nested raster keys, rejects malformed output, and retries one transient 503.");
