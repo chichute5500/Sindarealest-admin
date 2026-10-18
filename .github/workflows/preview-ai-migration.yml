@@ -68,6 +68,24 @@ jobs:
             echo "Applied additive migration 0008 to isolated Preview D1 only."
           fi
 
+          if grep -Fxq "image_group_index" <<< "$table_names"; then
+            echo "image_group_index already exists in isolated Preview D1; no schema write needed."
+          else
+            migration_sql="$(cat migrations/0011_image_similarity_index.sql)"
+            migration_body="$(jq -n --arg sql "$migration_sql" '{sql:$sql}')"
+            migration_result="$(curl --fail --silent --show-error -X POST "$query_url" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$migration_body")"
+            printf '%s' "$migration_result" | jq -e '.success == true and all(.result[]; .success == true)' >/dev/null
+            echo "Applied additive migration 0011 to isolated Preview D1 only."
+          fi
+
+          verify_similarity_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('image_group_index','image_group_sets','image_group_set_members')" '{sql:$sql}')"
+          verify_similarity="$(curl --fail --silent --show-error -X POST "$query_url" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$verify_similarity_body")"
+          printf '%s' "$verify_similarity" | jq -e '.success == true and .result[0].success == true and ([.result[0].results[].name] | sort) == ["image_group_index","image_group_set_members","image_group_sets"]' >/dev/null
+          echo "PASS: the whole-inventory image index and review-group tables exist in isolated Preview D1."
           verify_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table' AND name='image_group_reviews'" '{sql:$sql}')"
           verify="$(curl --fail --silent --show-error -X POST "$query_url" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
