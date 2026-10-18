@@ -158,8 +158,19 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
       max_tokens:180
     });
   }catch(error){
-    const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
-    return fail("Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử quét lại.",502);
+    const detail=String(error?.message||error).replace(/[\\r\\n]+/g," ").slice(0,180);
+    const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
+    const quota=upstreamStatus===429||/\\b429\\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+    const transient=upstreamStatus===500||upstreamStatus===502||upstreamStatus===503||upstreamStatus===504||
+      /\\b(500|502|503|504)\\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+    // Do not hammer a quota-limited model. Retry one transient upstream failure only.
+    if(attempt===0&&transient&&!quota){
+      await new Promise(resolve=>setTimeout(resolve,250));
+      continue;
+    }
+    const status=quota?429:(transient?503:502);
+    const message="Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử quét lại.";
+    return fail(message,status,quota?{"Retry-After":"60"}:{});
   }
   classification=parseCategoryResult(result,allowed);
 }
