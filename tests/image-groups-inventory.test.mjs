@@ -22,7 +22,8 @@ const pages = {
     objects: [
       { key: "12345678-1234-1234-1234-123456789012.webp", size: 5000, uploaded: new Date("2026-01-01T00:00:00Z"), httpMetadata: { contentType: "image/webp" } },
       { key: "Videodouyin-ket-qua/sample-photo.jpg", size: 7000, uploaded: new Date("2026-01-02T00:00:00Z"), httpMetadata: { contentType: "image/jpeg" } },
-      { key: "notes/readme.txt", size: 50, uploaded: new Date("2026-01-03T00:00:00Z"), httpMetadata: { contentType: "text/plain" } }
+      { key: "notes/readme.txt", size: 50, uploaded: new Date("2026-01-03T00:00:00Z"), httpMetadata: { contentType: "text/plain" } },
+      { key: "photos/fake-raster.jpg", size: 90, uploaded: new Date("2026-01-03T01:00:00Z"), httpMetadata: { contentType: "image/svg+xml" } }
     ], truncated: true, cursor: "page-2"
   },
   "page-2": {
@@ -45,7 +46,8 @@ assert.equal(firstBody.hasMore, true);
 assert.equal(firstBody.nextCursor, "page-2");
 assert.equal(firstBody.images.find(item => item.key.includes("Videodouyin-ket-qua/")).mimeType, "image/jpeg");
 assert.ok(firstBody.images.some(item => item.url.includes("Videodouyin-ket-qua%2Fsample-photo.jpg")));
-assert.equal(firstBody.diagnostics.scannedObjects, 3);
+assert.equal(firstBody.diagnostics.scannedObjects, 4);
+assert.equal(firstBody.diagnostics.nonImageObjects, 2, "SVG content must not be reclassified as raster from a .jpg filename");
 const second = await onRequestGet({ request: requestFor("https://preview.example/api/admin/image-groups-inventory?cursor=page-2&limit=500"), env: { DB, IMAGES, ADMIN_PASSWORD, SESSION_SECRET } });
 assert.equal(second.status, 200);
 const secondBody = await second.json();
