@@ -514,8 +514,8 @@ export async function onRequestPost(context) {
       }
       const oldFingerprint = String(group.fingerprint || "");
       const results = await env.DB.batch([
-        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND COALESCE(images_json,'[]')=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
-          .bind(nextImagesJson, productId, previousImagesJson, id, oldFingerprint),
+        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND COALESCE(images_json,'[]')=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?) AND (SELECT COUNT(*) FROM image_group_image_claims WHERE group_id=? AND status='pending')=? AND (SELECT COUNT(*) FROM image_group_image_claims WHERE group_id=? AND status='pending' AND image_key IN (" + keys.map(() => "?").join(",") + "))=?")
+          .bind(nextImagesJson, productId, previousImagesJson, id, oldFingerprint, id, keys.length, id, ...keys, keys.length),
         env.DB.prepare("UPDATE image_group_sets SET status='approved',product_id=?,reviewed_at=datetime('now') WHERE id=? AND status='pending' AND fingerprint=? AND changes()=1")
           .bind(productId, id, oldFingerprint),
         env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_similarity_group_approved', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
@@ -561,8 +561,8 @@ export async function onRequestPost(context) {
         return fail("Trạng thái nhóm đã thay đổi; không thể hoàn tác lượt duyệt này.", 409);
       }
       const results = await env.DB.batch([
-        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND images_json=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
-          .bind(previousImagesJson, productId, nextImagesJson, groupId, productId),
+        env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND images_json=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?) AND (SELECT COUNT(*) FROM image_group_image_claims WHERE group_id=? AND status='approved')=? AND (SELECT COUNT(*) FROM image_group_image_claims WHERE group_id=? AND status='approved' AND image_key IN (" + keys.map(() => "?").join(",") + "))=?")
+          .bind(previousImagesJson, productId, nextImagesJson, groupId, productId, groupId, keys.length, groupId, ...keys, keys.length),
         env.DB.prepare("UPDATE image_group_sets SET status='pending',product_id=NULL,reviewed_at=NULL WHERE id=? AND status='approved' AND product_id=? AND changes()=1")
           .bind(groupId, productId),
         env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_similarity_group_approval_undone', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND product_id IS NULL)")
