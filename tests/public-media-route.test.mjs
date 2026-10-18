@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { onRequestGet } from "../functions/media/[[path]].js";
 
-function makeContext(url, { publicRef = true, object = true, includeDb = true } = {}) {
+function makeContext(url, { publicRef = true, object = true, includeDb = true, contentType = "image/webp" } = {}) {
   let imageRead = 0;
   let queriedReference = "";
   const DB = {
@@ -25,7 +25,7 @@ function makeContext(url, { publicRef = true, object = true, includeDb = true } 
       return {
         size: bytes.length,
         body: new Response(bytes).body,
-        httpMetadata: { contentType: "image/webp" },
+        httpMetadata: { contentType },
         etag: '"test-etag"'
       };
     }
@@ -59,3 +59,7 @@ const absent = makeContext("https://preview.example/media/folder%20name/sample.w
 const absentResponse = await onRequestGet(absent.context);
 assert.equal(absentResponse.status, 404);
 console.log("PASS: public media proxy exposes only images referenced by published products and supports nested R2 keys.");
+
+const svg = makeContext("https://preview.example/media/folder%20name/sample.webp", { contentType: "image/svg+xml" });
+const svgResponse = await onRequestGet(svg.context);
+assert.equal(svgResponse.status, 415, "SVG must not be served as WebP based on the filename extension");
