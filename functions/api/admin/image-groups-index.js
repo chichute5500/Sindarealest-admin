@@ -116,7 +116,8 @@ export async function onRequestPost(context) {
       ).bind(
         item.key, String(item.p_hash).toLowerCase(), JSON.stringify({
           shape: item.features.shape.map(Number),
-          colors: item.features.colors.map(Number)
+          colors: item.features.colors.map(Number),
+          category: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"].includes(String(item.features.category || "").toLowerCase()) ? String(item.features.category).toLowerCase() : "unknown"
         }), Number(item.width), Number(item.height), Number(item.sourceSize), String(item.sourceUploaded || "")
       ));
       await env.DB.batch(statements);
