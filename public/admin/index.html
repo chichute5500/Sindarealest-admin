@@ -274,7 +274,8 @@ async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcome
 <script>
 /* Temporary Preview-only helper for the approved 50-image AI grouping test. */
 (() => {
-  if (new URLSearchParams(location.search).get("view") !== "image-groups") return;
+  const params = new URLSearchParams(location.search);
+  if (params.get("view") !== "image-groups" || params.get("testImport") !== "1") return;
   const button = document.createElement("button");
   button.type = "button";
   button.textContent = "Nhập 50 ảnh thử nghiệm";
