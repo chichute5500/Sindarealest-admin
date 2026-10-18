@@ -54,7 +54,7 @@ export function compareDescriptors(left, right) {
   // The score is a review-oriented visual similarity index, not a probability.
   const score = Math.round((phashSimilarity * 0.30 + shape * 0.35 + color * 0.35) * 100);
   const match = (phashDistance <= 8 && shape >= 0.40) ||
-    (score >= 70 && shape >= 0.52 && color >= 0.45);
+    (score >= 62 && shape >= 0.55 && color >= 0.45);
   return { score, phashDistance, shapeSimilarity: Math.round(shape * 100), colorSimilarity: Math.round(color * 100), match };
 }
 
@@ -63,7 +63,7 @@ function nextFrame() {
 }
 
 export async function findSimilarGroups(items, options = {}) {
-  const threshold = Math.max(55, Math.min(95, Number(options.threshold) || 70));
+  const threshold = Math.max(55, Math.min(95, Number(options.threshold) || 62));
   const valid = (Array.isArray(items) ? items : []).filter(item =>
     item && typeof item.key === "string" && /^[0-9a-f]{16}$/i.test(String(item.p_hash || item.phash || "")) &&
     parseFeatures(item)
@@ -92,7 +92,7 @@ export async function findSimilarGroups(items, options = {}) {
     for (let j = i + 1; j < count; j++) {
       const result = compareDescriptors(valid[i], valid[j]);
       compared++;
-      if (result.match && result.score >= threshold) {
+      if (result.match && (result.score >= threshold || (result.phashDistance <= 8 && result.shapeSimilarity >= 40))) {
         union(i, j);
         edgeScores.set(i + ":" + j, result.score);
         bestScore[i] = Math.max(bestScore[i], result.score);
