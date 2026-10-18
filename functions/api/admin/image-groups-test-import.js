@@ -16,17 +16,47 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
+    let sources = [];
+    let sourceListError = "";
     const listResponse = await fetch(SOURCE_API, {
       headers: { Accept: "application/vnd.github+json", "User-Agent": "SinDarealest-AI-image-test" }
     });
-    if (!listResponse.ok) return fail("Không đọc được danh sách ảnh GitHub nguồn.", 502);
-    const entries = await listResponse.json();
-    if (!Array.isArray(entries)) return fail("Danh sách ảnh nguồn không hợp lệ.", 502);
+    if (listResponse.ok) {
+      const entries = await listResponse.json();
+      if (Array.isArray(entries)) {
+        sources = entries
+          .filter((entry) => entry && entry.type === "file" && SOURCE_NAME.test(String(entry.name || "")))
+          .map((entry) => ({ name: String(entry.name) }));
+      } else {
+        sourceListError = "GitHub API không trả về danh sách file.";
+      }
+    } else {
+      sourceListError = "GitHub Contents API HTTP " + listResponse.status;
+    }
 
-    const sources = entries
-      .filter((entry) => entry && entry.type === "file" && SOURCE_NAME.test(String(entry.name || "")))
+    // Fallback to GitHub's public directory HTML if the unauthenticated Contents API is rate-limited.
+    if (sources.length < TARGET_COUNT) {
+      const htmlResponse = await fetch("https://github.com/chichute5500/Sindarealest-admin/tree/main/public/images", {
+        headers: { Accept: "text/html", "User-Agent": "SinDarealest-AI-image-test" }
+      });
+      if (htmlResponse.ok) {
+        const html = await htmlResponse.text();
+        const found = new Set();
+        const pattern = /(?:public\\/images\\/)([a-f0-9]{16}\\.webp)/gi;
+        for (const match of html.matchAll(pattern)) found.add(match[1]);
+        sources = [...found].map((name) => ({ name }));
+      } else {
+        sourceListError += "; GitHub HTML fallback HTTP " + htmlResponse.status;
+      }
+    }
+
+    sources = sources
+      .filter((entry) => SOURCE_NAME.test(entry.name))
       .sort((a, b) => a.name.localeCompare(b.name))
       .slice(0, 500);
+    if (sources.length < TARGET_COUNT && sourceListError) {
+      return fail("Không đọc đủ danh sách ảnh GitHub nguồn (" + sourceListError + "; tìm thấy " + sources.length + " file phù hợp).", 502);
+    }
     if (sources.length < TARGET_COUNT) {
       return fail("Nguồn chỉ có " + sources.length + " ảnh WebP sản phẩm phù hợp; cần ít nhất 50.", 422);
     }
