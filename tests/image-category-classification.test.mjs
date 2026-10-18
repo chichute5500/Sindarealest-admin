@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, compareMode = false, reviewInsertBatches = 0;
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, reviewInsertBatches = 0;
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -27,6 +27,7 @@ const env = {
   IMAGES: { async head(imageKey) { return { key: imageKey }; }, async get(imageKey) { return { key: imageKey }; } },
   AI: { async run(model, input) {
     modelCalls++; lastModelInput = { model, input };
+    if (failNextQuota) { failNextQuota = false; const error = new Error("Workers AI quota exceeded (429)"); error.status = 429; throw error; }
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     if (compareMode) return malformed ? { response: "not valid JSON", tool_calls: [] } :
       { response: { pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Trùng vân da, đường may và chi tiết đế." }] }, tool_calls: [], usage: {} };
@@ -151,4 +152,15 @@ assert.equal(modelCalls, beforeMalformedCalls + 1);
 assert.equal(reviewInsertBatches, beforeMalformedWrites, "invalid model output must not persist partial pair proposals");
 malformed = false;
 
-console.log("PASS: mocked Workers AI endpoint passes actual images, accepts nested raster keys, rejects malformed output, retries transient classification and comparison failures, and avoids partial compare writes.");
+// Upstream quota errors must not be retried or persisted as successful proposals.
+const beforeQuotaCalls = modelCalls;
+const beforeQuotaWrites = reviewInsertBatches;
+failNextQuota = true;
+const quotaResponse = await onRequestPost({ request: compareRequest(), env });
+const quotaResult = await quotaResponse.json();
+assert.equal(quotaResponse.status, 429, JSON.stringify(quotaResult));
+assert.equal(quotaResponse.headers.get("Retry-After"), "60");
+assert.equal(modelCalls, beforeQuotaCalls + 1, "quota errors should not trigger a second paid model request");
+assert.equal(reviewInsertBatches, beforeQuotaWrites, "quota failure must not save proposed image pairs");
+
+console.log("PASS: mocked Workers AI endpoint passes actual images, accepts nested raster keys, rejects malformed output, retries transient failures, distinguishes quota errors, and avoids partial compare writes.");
