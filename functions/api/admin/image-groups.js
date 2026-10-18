@@ -142,7 +142,8 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
         {type:"image_url",image_url:{url:supplied[i].dataUrl}}
       ]}],
       temperature:0,
-      max_tokens:180
+      max_tokens:180,
+      response_format:{type:"json_schema",json_schema:{type:"object",properties:{category:{type:"string",enum:["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]},confidence:{type:"integer",minimum:0,maximum:100}},required:["category","confidence"],additionalProperties:false}}
     });
   }catch(error){
     const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
