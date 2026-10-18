@@ -10,7 +10,7 @@ function resolveKey(context) {
   const raw = pathname.slice("/media/".length);
   let key;
   try { key = decodeURIComponent(raw); } catch { return ""; }
-  if (!key || key.length > 1024 || key.includes("\0") || key.split("/").some(part => part === "." || part === "..")) return "";
+  if (!key || key.length > 1024 || /[\u0000-\u001f\u007f]/.test(key) || key.split("/").some(part => part === "." || part === "..")) return "";
   return key;
 }
 
