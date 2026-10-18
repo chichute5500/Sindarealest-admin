@@ -196,9 +196,24 @@ export async function onRequestPost(context) {
         const uniqueKeys = rawKeys.filter(key => !claimed.has(key));
         if (uniqueKeys.length < 2) { skipped++; continue; }
         const placeholders = uniqueKeys.map(() => "?").join(",");
-        const indexed = await env.DB.prepare("SELECT image_key FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...uniqueKeys).all();
-        const indexedKeys = new Set((indexed.results || []).map(row => row.image_key));
+        const indexed = await env.DB.prepare("SELECT image_key,features_json FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...uniqueKeys).all();
+        const indexedRows = indexed.results || [];
+        const indexedKeys = new Set(indexedRows.map(row => row.image_key));
         if (uniqueKeys.some(key => !indexedKeys.has(key))) return fail("Có ảnh chưa được lập chỉ mục. Hãy hoàn tất quét toàn kho trước khi lưu nhóm.", 409);
+        // Never trust category labels or rationale supplied by the browser.
+        // The server independently rejects unknown, review-needed, or mixed-category groups.
+        const indexedCategories = [];
+        for (const row of indexedRows) {
+          let features = {};
+          try { features = JSON.parse(row.features_json || "{}"); } catch {}
+          const category = String(features.category || "unknown").toLowerCase();
+          if (category === "unknown" || features.categoryStatus === "needs_review" ||
+              !["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other"].includes(category)) {
+            return fail("Nhóm có ảnh chưa được phân loại chắc chắn. Hãy giữ ảnh ở hàng chờ xác nhận loại.", 409);
+          }
+          indexedCategories.push(category);
+        }
+        if (new Set(indexedCategories).size !== 1) return fail("Không thể lưu một nhóm chứa nhiều danh mục sản phẩm khác nhau.", 409);
         const groupFingerprint = await fingerprint(uniqueKeys);
         const existing = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(groupFingerprint).first();
         if (existing) {
