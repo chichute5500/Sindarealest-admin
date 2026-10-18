@@ -59,4 +59,12 @@ assert.equal(compareDescriptors(chainA, chainC).match, false, "the endpoints are
 const coherent = await findSimilarGroups([chainA, chainB, chainC]);
 assert.deepEqual(coherent.groups.map(group => group.imageKeys.length).sort((a,b)=>a-b), [2], "a transitive bridge must not create a mixed 3-image set");
 assert.ok(coherent.groups.some(group => group.imageKeys.includes("chain/a.webp") && group.imageKeys.includes("chain/b.webp")));
-console.log("PASS: similarity index compares every pair across the full descriptor set and skips groups already attached to one SKU.");
+// The anchor decides membership by its direct matches, not by candidate-to-candidate similarity.
+const anchor = descriptor("anchor/a.webp", "0011223344556677", shapeA, colorsA);
+const directMatchB = descriptor("anchor/b.webp", "0011223344556677", shapeA, colorsA);
+const directMatchC = descriptor("anchor/c.webp", "0011223344556677", shapeA, colorsA);
+const anchored = await findSimilarGroups([anchor, directMatchB, directMatchC]);
+assert.equal(anchored.groups.length, 1, "the first unprocessed image forms a set from its own direct matches");
+assert.deepEqual(anchored.groups[0].imageKeys, ["anchor/a.webp", "anchor/b.webp", "anchor/c.webp"]);
+
+console.log("PASS: full-inventory comparisons, anchor-first grouping, no transitive bridge grouping, and same-SKU skip.");
