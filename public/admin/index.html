@@ -116,4 +116,42 @@ $('#deleteProduct').addEventListener('click',async()=>{if(!editing)return;if(!co
 async function saveWatermarkSettings(e){e.preventDefault();const b=$('#saveWatermarkSettings'),m=$('#watermarkSaveMessage');b.disabled=true;m.textContent='Đang lưu…';try{const payload={watermarkEnabled:$('#watermarkEnabled').checked,watermarkPosition:$('#watermarkPosition').value,watermarkSize:Number($('#watermarkSize').value),watermarkOpacity:Number($('#watermarkOpacity').value)};const result=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});settings={...settings,...payload};m.textContent=result.message||'Đã lưu cài đặt watermark.';toast(m.textContent)}catch(ex){m.textContent=ex.message;toast(ex.message)}finally{b.disabled=false}}
 async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcomeSettings'),m=$('#welcomeSaveMessage');b.disabled=true;m.textContent='Đang lưu…';try{const payload={welcomeEnabled:$('#welcomeEnabled').checked,welcomeTitleLine1:$('#welcomeLine1').value.trim(),welcomeTitleLine2:$('#welcomeLine2').value.trim(),welcomeText:$('#welcomeCopy').value.trim()};const result=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});settings={...settings,...payload};m.textContent=result.message||'Đã lưu. Nội dung sẽ áp dụng khi khách tải lại website.';toast(m.textContent)}catch(ex){m.textContent=ex.message}finally{b.disabled=false}}async function savePriceSetting(e){const c=e.target.checked;e.target.disabled=true;try{const r=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify({showPrices:c})});settings.showPrices=r.showPrices;render();toast(r.message)}catch(ex){e.target.checked=!c;toast(ex.message)}finally{if($('#showPrices'))$('#showPrices').disabled=false}}async function downloadBackup(){try{const d=await api('/api/admin/backup'),blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`sindarealest-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);toast('Đã tạo bản sao lưu dữ liệu D1. Tệp JSON không chứa tệp ảnh trong R2; hãy sao lưu các bucket R2 riêng.')}catch(e){toast(e.message)}}async function restoreBackup(e){const f=e.target.files?.[0];e.target.value='';if(!f)return;if(f.size>20*1024*1024){toast('Tệp sao lưu vượt 20 MB.');return}try{const backup=JSON.parse(await f.text()),v2=backup?.format==='sindarealest-backup-v2';const message=v2?'Khôi phục v2 sẽ thay thế danh mục, đơn hàng, khách hàng, bảo hành và nhật ký hiện tại. Tệp JSON không chứa tệp ảnh trong R2; các object ảnh phải còn trong bucket. Bạn đã tải bản sao lưu mới nhất và muốn tiếp tục?':'Bản sao lưu cũ chỉ khôi phục danh mục và cài đặt, không thay thế dữ liệu vận hành. Tệp JSON không chứa tệp ảnh trong R2. Bạn muốn tiếp tục?';if(!confirm(message))return;const d=await api('/api/admin/restore',{method:'POST',body:JSON.stringify(backup)});await loadData();render();toast(d.message)}catch(ex){toast(ex.message||'Không đọc được tệp sao lưu.')}}
 (async()=>{try{await start()}catch(e){showLogin();$('#conn').textContent='Chưa kết nối';err($('#loginError'),e.message)}})();})();
-</script></body></html>
+</script>
+<script>
+/* Temporary Preview-only helper for the approved 50-image AI grouping test. */
+(() => {
+  if (new URLSearchParams(location.search).get("view") !== "image-groups") return;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = "Nhập 50 ảnh thử nghiệm";
+  button.setAttribute("aria-label", "Nhập 50 ảnh WebP thật vào R2 của môi trường thử nghiệm hiện tại");
+  button.style.cssText = "position:fixed;right:14px;bottom:84px;z-index:9999;padding:12px 15px;border:1px solid #98703a;border-radius:12px;background:#292720;color:#fff;font:600 12px system-ui;box-shadow:0 8px 24px #0003;max-width:calc(100vw - 28px)";
+  button.addEventListener("click", async () => {
+    if (!confirm("Chỉ nhập tối đa 50 ảnh WebP thật từ public/images của GitHub vào R2 đang gắn với môi trường này. Không xóa ảnh và không sửa Production. Tiếp tục?")) return;
+    button.disabled = true;
+    button.textContent = "Đang nhập ảnh…";
+    try {
+      const response = await fetch("/api/admin/image-groups-test-import", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: "{}"
+      });
+      const data = await response.json();
+      alert((data.message || data.error || "Không có thông báo từ máy chủ") +
+        "\n\nĐã nhập: " + (data.imported ?? 0) + "/50" +
+        "\nBỏ qua ảnh đã có: " + (data.skippedExisting ?? 0) +
+        "\nLỗi: " + (Array.isArray(data.failures) ? data.failures.length : 0));
+      if (response.ok && data.imported === 50) location.reload();
+      else { button.disabled = false; button.textContent = "Thử nhập lại 50 ảnh"; }
+    } catch {
+      alert("Không gọi được API nhập ảnh. Kiểm tra phiên đăng nhập và deployment Preview.");
+      button.disabled = false;
+      button.textContent = "Thử nhập lại 50 ảnh";
+    }
+  });
+  document.body.appendChild(button);
+})();
+</script>
+
+</body></html>
