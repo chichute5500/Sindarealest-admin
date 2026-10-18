@@ -126,10 +126,15 @@ async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcome
   button.textContent = "Nhập 50 ảnh thử nghiệm";
   button.setAttribute("aria-label", "Nhập 50 ảnh WebP thật vào R2 của môi trường thử nghiệm hiện tại");
   button.style.cssText = "position:fixed;right:14px;bottom:84px;z-index:9999;padding:12px 15px;border:1px solid #98703a;border-radius:12px;background:#292720;color:#fff;font:600 12px system-ui;box-shadow:0 8px 24px #0003;max-width:calc(100vw - 28px)";
+  const status = document.createElement("div");
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  status.style.cssText = "position:fixed;right:14px;bottom:142px;z-index:9999;max-width:min(420px,calc(100vw - 28px));padding:10px 12px;border-radius:10px;background:#f5f1e8;color:#292720;border:1px solid #98703a;font:12px/1.5 system-ui;white-space:pre-wrap;display:none";
   button.addEventListener("click", async () => {
-    if (!confirm("Chỉ nhập tối đa 50 ảnh WebP thật từ public/images của GitHub vào R2 đang gắn với môi trường này. Không xóa ảnh và không sửa Production. Tiếp tục?")) return;
     button.disabled = true;
     button.textContent = "Đang nhập ảnh…";
+    status.style.display = "block";
+    status.textContent = "Đang gọi API nhập ảnh vào R2 của môi trường thử nghiệm…";
     try {
       const response = await fetch("/api/admin/image-groups-test-import", {
         method: "POST",
@@ -137,20 +142,31 @@ async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcome
         headers: { "Content-Type": "application/json" },
         body: "{}"
       });
-      const data = await response.json();
-      alert((data.message || data.error || "Không có thông báo từ máy chủ") +
-        "\n\nĐã nhập: " + (data.imported ?? 0) + "/50" +
-        "\nBỏ qua ảnh đã có: " + (data.skippedExisting ?? 0) +
-        "\nLỗi: " + (Array.isArray(data.failures) ? data.failures.length : 0));
-      if (response.ok && data.imported === 50) location.reload();
-      else { button.disabled = false; button.textContent = "Thử nhập lại 50 ảnh"; }
-    } catch {
-      alert("Không gọi được API nhập ảnh. Kiểm tra phiên đăng nhập và deployment Preview.");
+      const raw = await response.text();
+      let data;
+      try { data = JSON.parse(raw); } catch { throw new Error("API trả về HTTP " + response.status + " nhưng không phải JSON: " + raw.slice(0, 180)); }
+      status.textContent = (data.message || data.error || "Không có thông báo từ máy chủ") +
+        "\\nHTTP: " + response.status +
+        "\\nĐã nhập: " + (data.imported ?? 0) + "/50" +
+        "\\nBỏ qua ảnh đã có: " + (data.skippedExisting ?? 0) +
+        "\\nLỗi: " + (Array.isArray(data.failures) ? data.failures.length : 0) +
+        (Array.isArray(data.failures) && data.failures.length ? "\\n" + data.failures.slice(0, 3).map(x => x.source + ": " + x.error).join("\\n") : "");
+      if (response.ok && data.imported === 50) {
+        button.textContent = "Đã nhập đủ 50 ảnh";
+        button.disabled = true;
+        setTimeout(() => location.reload(), 1800);
+      } else {
+        button.disabled = false;
+        button.textContent = "Thử nhập lại 50 ảnh";
+      }
+    } catch (error) {
+      status.textContent = "Lỗi nhập ảnh: " + String(error && error.message || error);
       button.disabled = false;
       button.textContent = "Thử nhập lại 50 ảnh";
     }
   });
   document.body.appendChild(button);
+  document.body.appendChild(status);
 })();
 </script>
 
