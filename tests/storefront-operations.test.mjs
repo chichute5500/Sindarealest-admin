@@ -26,6 +26,10 @@ assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('ima
   'Light mode must recolor the albino crocodile background toward the reference ice-blue palette while retaining the source asset.');
 assert.match(storefrontHtml, /\.theme-bg--light\{filter:blur\(\.5px\) hue-rotate\(25deg\) saturate\(\.60\) brightness\(1\.03\)\}/,
   'The final light-mode filter override must keep the ice-blue palette and avoid a warm/pink cast.');
+assert.match(storefrontHtml, /\.mobile-bottom-nav\{background:rgba\(244,250,255,\.82\)\}/,
+  'Mobile bottom navigation must keep enough light-theme opacity for labels to remain readable over page content.');
+assert.match(storefrontHtml, /html\.dark \.mobile-bottom-nav\{background:rgba\(5,22,38,\.84\);border-color:rgba\(174,207,231,\.34\)\}/,
+  'Mobile bottom navigation must retain a readable navy glass surface in dark mode.');
 assert.ok(storefrontHtml.includes('linear-gradient(118deg,rgba(225,241,255,.72),rgba(211,231,249,.68) 52%,rgba(237,247,255,.74))'),
   'The final light glaze must leave medium crocodile-texture visibility instead of washing the background flat.');
 assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.68\)/,
