@@ -165,5 +165,34 @@ assert.equal(mixedGroup.status, 409, "the server rejects a proposal that mixes s
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND rationale LIKE '%giày thể thao%'").get().count, 0,
   "a mixed-category proposal must never enter the pending queue");
 
-console.log("PASS: SQLite integration fixtures verified split, merge, move, category conflict rejection, snapshot-protected approval, undo, claims, audit entries, and server-side mixed-category rejection.");
+// Regressions: reject split/merge/move if a claim is missing or points at another group.
+ids.badSplit = crypto.randomUUID();
+await seedGroup(ids.badSplit, ["bad-split-a.webp","bad-split-b.webp","bad-split-c.webp","bad-split-d.webp"]);
+sqlite.prepare("DELETE FROM image_group_image_claims WHERE image_key=?").run("bad-split-a.webp");
+const badSplit = await call({ action: "split-group", groupId: ids.badSplit, selectedKeys: ["bad-split-a.webp","bad-split-b.webp"] });
+assert.equal(badSplit.status, 409, "split must refuse a member without its pending claim");
+assert.deepEqual(members(ids.badSplit), ["bad-split-a.webp","bad-split-b.webp","bad-split-c.webp","bad-split-d.webp"]);
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND id<>? AND rationale LIKE '%tách thủ công%'").get(ids.badSplit).count, 2,
+  "failed split must not create a second pending group");
+
+ids.badMergeA = crypto.randomUUID(); ids.badMergeB = crypto.randomUUID();
+await seedGroup(ids.badMergeA, ["bad-merge-a.webp","bad-merge-b.webp"]);
+await seedGroup(ids.badMergeB, ["bad-merge-c.webp","bad-merge-d.webp"]);
+sqlite.prepare("UPDATE image_group_image_claims SET group_id=? WHERE image_key=?").run(crypto.randomUUID(), "bad-merge-c.webp");
+const badMerge = await call({ action: "merge-groups", groupIds: [ids.badMergeA, ids.badMergeB], targetGroupId: ids.badMergeA });
+assert.equal(badMerge.status, 409, "merge must refuse a claim owned by a different group");
+assert.deepEqual(members(ids.badMergeA), ["bad-merge-a.webp","bad-merge-b.webp"]);
+assert.deepEqual(members(ids.badMergeB), ["bad-merge-c.webp","bad-merge-d.webp"]);
+assert.equal(sqlite.prepare("SELECT status FROM image_group_sets WHERE id=?").get(ids.badMergeB).status, "pending");
+
+ids.badMoveA = crypto.randomUUID(); ids.badMoveB = crypto.randomUUID();
+await seedGroup(ids.badMoveA, ["bad-move-a.webp","bad-move-b.webp","bad-move-c.webp"]);
+await seedGroup(ids.badMoveB, ["bad-move-d.webp","bad-move-e.webp"]);
+sqlite.prepare("DELETE FROM image_group_image_claims WHERE image_key=?").run("bad-move-a.webp");
+const badMove = await call({ action: "move-image", sourceGroupId: ids.badMoveA, targetGroupId: ids.badMoveB, imageKey: "bad-move-a.webp" });
+assert.equal(badMove.status, 409, "move must refuse a source member without its pending claim");
+assert.deepEqual(members(ids.badMoveA), ["bad-move-a.webp","bad-move-b.webp","bad-move-c.webp"]);
+assert.deepEqual(members(ids.badMoveB), ["bad-move-d.webp","bad-move-e.webp"]);
+
+console.log("PASS: SQLite integration fixtures verified split, merge, move, category conflict rejection, snapshot-protected approval, undo, claims, audit entries, server-side mixed-category rejection, and inconsistent-claim fail-closed behavior.");
 sqlite.close();
