@@ -174,11 +174,9 @@ function averageCornerColor(data, width, height) {
 
 function foregroundPixel(r, g, b, background) {
   const delta = Math.abs(r - background[0]) + Math.abs(g - background[1]) + Math.abs(b - background[2]);
-  const bgLuma = (background[0] + background[1] + background[2]) / 3;
-  const luma = (r + g + b) / 3;
-  const saturation = Math.max(r, g, b) - Math.min(r, g, b);
-  if (bgLuma > 205 && luma > 195 && saturation < 42) return false;
-  return delta > 54;
+  // Do not automatically discard bright neutral pixels: white shoes on a white
+  // background still need their subtle edges included in the silhouette mask.
+  return delta > 36;
 }
 
 function createDctHash(gray) {
