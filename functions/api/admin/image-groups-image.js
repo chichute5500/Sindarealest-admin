@@ -1,4 +1,4 @@
-import { fail } from "../../_lib.js";
+import { fail, requireAdmin } from "../../_lib.js";
 
 const MIME_BY_EXTENSION = {
   webp: "image/webp", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png",
