@@ -180,6 +180,7 @@ jobs:
           original_config="$RUNNER_TEMP/wrangler.toml.original"
           smoke_route="$GITHUB_WORKSPACE/functions/api/ai-smoke-ci.js"
           smoke_token="$(openssl rand -hex 32)"
+          echo "::add-mask::$smoke_token"
           cp "$GITHUB_WORKSPACE/wrangler.toml" "$original_config"
           cleanup() {
             status=$?
