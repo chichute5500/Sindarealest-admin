@@ -94,15 +94,16 @@ assert.equal(parseCategoryResult({ response: { category: "car", confidence: 99 }
 assert.equal(parseCategoryResult({ response: "I think this is a sneaker." }, allowed), null);
 
 const source = await readFile(new URL("../functions/api/admin/image-groups.js", import.meta.url), "utf8");
-assert.match(source, /role:"system"/,
+const classificationSource = source.slice(source.indexOf('if(action==="classify-categories")'), source.indexOf('if(action==="compare")'));
+assert.match(classificationSource, /role:"system"/,
   "vision classification must include the system message shape that passed the real Preview inference test");
-assert.match(source, /role:"user",content:prompt/,
+assert.match(classificationSource, /role:"user",content:prompt/,
   "vision classification must send the actual category prompt as a user message");
-assert.match(source, /image:supplied\[i\]\.dataUrl/,
+assert.match(classificationSource, /image:supplied\[i\]\.dataUrl/,
   "the converted JPEG data URL must reach the dedicated vision image field");
-assert.match(source, /parseCategoryResult\(result,allowed\)/,
+assert.match(classificationSource, /parseCategoryResult\(result,allowed\)/,
   "free-form model output must be strictly validated before a classification is accepted");
-assert.doesNotMatch(source, /response_format:\s*\{/,
+assert.doesNotMatch(classificationSource, /response_format:\s*\{/,
   "avoid the schema-constrained request shape that failed the real Preview vision smoke test");
 
 console.log("PASS: parser handles nested Workers AI payloads and aliases; live-tested system/user vision request is strictly parsed.");
