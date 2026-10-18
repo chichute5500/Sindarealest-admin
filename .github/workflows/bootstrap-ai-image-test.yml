@@ -246,14 +246,15 @@ jobs:
                 const ext = String(object.key || "").split(".").pop().toLowerCase();
                 const fallback = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || "";
                 const declared = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
-                if (object.key === excludedKey || (requestedKey && object.key !== requestedKey) || !declared || Number(object.size) <= 0 || Number(object.size) > 350000) continue;
+                const maxBytes = requestedKey ? 5000000 : 350000;
+                if (object.key === excludedKey || (requestedKey && object.key !== requestedKey) || !declared || Number(object.size) <= 0 || Number(object.size) > maxBytes) continue;
                 // Metadata and file extensions can be stale. Verify the bytes before
                 // selecting a candidate, otherwise an HTML/XML placeholder can make
                 // Sharp fail before the AI request is even reached.
                 const candidate = await env.IMAGES.get(object.key);
                 if (!candidate) continue;
                 const bytes = new Uint8Array(await candidate.arrayBuffer());
-                if (!bytes.length || bytes.length > 350000) continue;
+                if (!bytes.length || bytes.length > (requestedKey ? 5000000 : 350000)) continue;
                 let mime = "";
                 if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) mime = "image/jpeg";
                 else if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a) mime = "image/png";
@@ -499,7 +500,7 @@ jobs:
             echo "PASS: authenticated D1/R2 inventory endpoint responded; scanned up to 10,000 inventory objects to find real same-SKU gallery pairs."
             # Stronger positive control: compare two distinct gallery images assigned to the same SKU.
             # This is more meaningful than comparing the same bytes under two different keys.
-            same_sku_keys="$(jq -r '[.images[] | select((.size|tonumber)>0 and (.size|tonumber)<=350000 and (.assignedTo|type)=="array" and (.assignedTo|length)>0) | {key,sku:.assignedTo[0].sku}] | group_by(.sku) | map(select(length>=2) | .[0:2]) | first // [] | .[].key' /tmp/ai-test-inventory.json)"
+            same_sku_keys="$(jq -r '[.images[] | select((.size|tonumber)>0 and (.size|tonumber)<=5000000 and (.assignedTo|type)=="array" and (.assignedTo|length)>0) | {key,sku:.assignedTo[0].sku}] | group_by(.sku) | map(select(length>=2) | .[0:2]) | first // [] | .[].key' /tmp/ai-test-inventory.json)"
             same_sku_key_1="$(printf '%s\n' "$same_sku_keys" | sed -n '1p')"
             same_sku_key_2="$(printf '%s\n' "$same_sku_keys" | sed -n '2p')"
             if [ -n "$same_sku_key_1" ] && [ -n "$same_sku_key_2" ]; then
