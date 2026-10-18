@@ -15,7 +15,7 @@ if(supplied.reduce((sum,x)=>sum+x.dataUrl.length,0)>1200000)return fail("Lô ả
 try{
 const objects=await Promise.all(keys.map(k=>env.IMAGES.head?env.IMAGES.head(k):env.IMAGES.get(k)));
 if(objects.some(x=>!x))return fail("Ảnh đã biến mất khỏi R2; hãy quét lại kho.",409);
-const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",500,3600);
+const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",700,3600);
 if(limit.limited)return fail("Đã đạt giới hạn phân loại ảnh trong một giờ. Hãy đợi rồi quét tiếp; kết quả chưa rõ sẽ không được gom.",429,{"Retry-After":"3600"});
 const content=[{type:"text",text:"Bạn là hệ thống phân loại ảnh hàng hóa. Với mỗi ảnh, xác định loại sản phẩm chính nhìn thấy trong ảnh, không đoán theo nền hoặc phụ kiện phụ. Phân loại riêng biệt các loại: sneaker (giày thể thao), loafer (giày lười), dress_shoe (giày tây), boot (bốt), sandal (dép/sandal), belt (thắt lưng), wallet (ví), watch_strap (dây đồng hồ), watch (đồng hồ nguyên chiếc), bag (túi), other (sản phẩm khác), unknown (không đủ chắc chắn/ảnh không rõ). Giày phải chọn đúng loại giày nếu nhìn thấy đủ dấu hiệu. Không dùng unknown chỉ vì góc chụp khác. Nếu độ tin cậy dưới 70, trả unknown. Trả duy nhất JSON dạng {\"items\":[{\"index\":0,\"category\":\"sneaker\",\"confidence\":90}]} với một phần tử cho mỗi ảnh, đúng chỉ số tương ứng."}];
 for(let i=0;i<keys.length;i++)content.push({type:"text",text:"Ảnh số "+i},{type:"image_url",image_url:{url:supplied[i].dataUrl}});
