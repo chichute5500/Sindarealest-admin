@@ -132,7 +132,7 @@ jobs:
           echo "PASS: disposable test admin credentials were saved as Cloudflare secret_text values."
 
       - name: Install Wrangler and image smoke-test converter
-        run: npm install --no-save --no-package-lock wrangler sharp
+        run: npm install --no-save --no-package-lock wrangler sharp @napi-rs/canvas
 
       - name: Deploy AI-enabled configuration to the separate test project only
         shell: bash
