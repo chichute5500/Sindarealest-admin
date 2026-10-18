@@ -15,4 +15,9 @@ assert.ok(html.includes(".contact-link,.product-card{backdrop-filter:blur(13px) 
 assert.ok(html.includes("html.theme-transitioning .product-card"),
   "product card glass should participate in the existing light/dark transition");
 
-console.log("PASS: storefront product cards preserve layered Liquid Glass on desktop/mobile and during theme transitions.");
+assert.match(html, /--page:#eaf3fb/, "Light mode must use the reference ice-blue palette.");
+assert.match(html, /--card-glass:rgba\(236,246,255,\.78\)/, "Light product cards must have a clearly visible frosted surface.");
+assert.match(html, /--page:#061522/, "Dark mode must use deep navy instead of pure black.");
+assert.match(html, /--card-glass:rgba\(8,27,46,\.86\)/, "Dark product cards must remain distinct from the page background.");
+assert.match(html, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(36,66,91,\.96\)/, "Dark commitment tiles must use layered navy glass.");
+console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
