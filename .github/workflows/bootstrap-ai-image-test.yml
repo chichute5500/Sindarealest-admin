@@ -297,7 +297,7 @@ jobs:
               if (handlerResponse.status !== 200 || result?.ok !== true || !Array.isArray(result.items) || result.items.length !== 1) {
                 return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, 502);
               }
-              return response({ ok: true, category: result.items[0].category, confidence: result.items[0].confidence, imageBytes: body.dataUrl.length });
+              return response({ ok: true, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, imageBytes: body.dataUrl.length });
             } catch (error) {
               return response({ ok: false, reason: "classification_handler_exception", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
             }
@@ -341,10 +341,11 @@ jobs:
           NODE
             ai_smoke_status="$(curl --connect-timeout 10 --max-time 60 --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-vision-request.json "$base/api/ai-smoke-ci")"
             if [ "$ai_smoke_status" = "200" ]; then
-              jq -e '.ok == true and (.category | type == "string") and (.confidence | type == "number") and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
+              jq -e '.ok == true and (.category | type == "string") and (.confidence | type == "number") and (.status == "classified" or .status == "needs_review") and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
                 echo "::error::Real Workers AI smoke response was invalid. Response body omitted."; exit 1;
               }
-              echo "PASS: real Workers AI inference used a JPEG-converted image from Preview R2. No database or product gallery was modified."
+              result_summary="$(jq -r '"category=" + .category + ", confidence=" + (.confidence|tostring) + ", status=" + .status' /tmp/ai-test-vision.json)"
+              echo "PASS: real admin classifier on Preview R2 image: $result_summary. No database or product gallery was modified."
             else
               diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
               echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
