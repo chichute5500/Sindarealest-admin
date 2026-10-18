@@ -158,11 +158,11 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
       max_tokens:180
     });
   }catch(error){
-    const detail=String(error?.message||error).replace(/[\\r\\n]+/g," ").slice(0,180);
+    const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
     const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
-    const quota=upstreamStatus===429||/\\b429\\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+    const quota=upstreamStatus===429||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
     const transient=upstreamStatus===500||upstreamStatus===502||upstreamStatus===503||upstreamStatus===504||
-      /\\b(500|502|503|504)\\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+      /\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
     // Do not hammer a quota-limited model. Retry one transient upstream failure only.
     if(attempt===0&&transient&&!quota){
       await new Promise(resolve=>setTimeout(resolve,250));
