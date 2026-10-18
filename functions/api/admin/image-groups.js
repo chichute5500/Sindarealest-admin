@@ -142,10 +142,21 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
         {type:"image_url",image_url:{url:supplied[i].dataUrl}}
       ]}],
       temperature:0,
-      // Do not send response_format/json_schema to this vision model:
-      // Cloudflare's published JSON Mode support list does not include
-      // @cf/meta/llama-3.2-11b-vision-instruct. Parse and validate the actual
-      // response below, and fail closed if it is malformed.
+      // Cloudflare's current Workers AI docs list this vision model as JSON Mode
+      // compatible. Keep strict schema validation here, but still parse defensively
+      // because the provider does not guarantee schema compliance in every case.
+      response_format:{
+        type:"json_schema",
+        json_schema:{
+          type:"object",
+          properties:{
+            category:{type:"string",enum:["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]},
+            confidence:{type:"integer",minimum:0,maximum:100}
+          },
+          required:["category","confidence"],
+          additionalProperties:false
+        }
+      },
       max_tokens:180
     });
   }catch(error){
