@@ -83,7 +83,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          AI_TEST_ADMIN_PASSWORD: ${{ secrets.AI_TEST_ADMIN_PASSWORD }}
           TARGET_PROJECT: sindarealest-ai-image-test
         run: |
           set -euo pipefail
@@ -106,24 +105,25 @@ jobs:
           printf '%s' "$response" | jq -e '.success == true' >/dev/null
           echo "PASS: test project's D1 and R2 bindings point to the checked Preview resources, not source Production."
 
-          if [ -n "${AI_TEST_ADMIN_PASSWORD:-}" ]; then
-            test "${#AI_TEST_ADMIN_PASSWORD}" -ge 12 || { echo "::error::AI_TEST_ADMIN_PASSWORD must be at least 12 characters."; exit 1; }
-            # This is a disposable test environment; rotate its session secret
-            # per workflow so test credentials are dedicated and never reused in Production.
-            session_secret="$(openssl rand -hex 32)"
-            env_vars="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" --arg session "$session_secret" '{ADMIN_PASSWORD:{type:"secret_text",value:$password},SESSION_SECRET:{type:"secret_text",value:$session}}')"
-            unset session_secret
-            echo "Dedicated test admin secret and a fresh random SESSION_SECRET are being configured; values are not logged."
-            secret_payload="$(jq -n --argjson env_vars "$env_vars" '{deployment_configs:{production:{env_vars:$env_vars}}}')"
-            secret_response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json" --data "$secret_payload")"
-            printf '%s' "$secret_response" | jq -e '.success == true' >/dev/null
-            echo "PASS: dedicated test admin credentials were saved as Cloudflare secret_text values."
-          else
-            echo "::warning::AI_TEST_ADMIN_PASSWORD is not configured. Site deploy and unauthenticated smoke checks will run, but authenticated D1/R2/AI checks will be skipped. Add a dedicated test-only GitHub Actions secret with this name; do not reuse Production credentials."
-          fi
-      
+          # Always create disposable credentials for the isolated test site. If a
+          # dedicated test-only password secret exists, use it; otherwise generate
+          # a random one so authenticated Preview/AI smoke tests are not silently skipped.
+          test_admin_password="${AI_TEST_ADMIN_PASSWORD:-$(openssl rand -hex 24)}"
+          test "${#test_admin_password}" -ge 12 || { echo "::error::Dedicated test password must be at least 12 characters."; exit 1; }
+          session_secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$test_admin_password"
+          echo "AI_TEST_ADMIN_PASSWORD=$test_admin_password" >> "$GITHUB_ENV"
+          env_vars="$(jq -n --arg password "$test_admin_password" --arg session "$session_secret" '{ADMIN_PASSWORD:{type:"secret_text",value:$password},SESSION_SECRET:{type:"secret_text",value:$session}}')"
+          unset session_secret test_admin_password
+          echo "Configuring disposable admin credentials and a fresh random SESSION_SECRET only on the isolated test project; values are not logged."
+          secret_payload="$(jq -n --argjson env_vars "$env_vars" '{deployment_configs:{production:{env_vars:$env_vars}}}')"
+          secret_response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$secret_payload")"
+          printf '%s' "$secret_response" | jq -e '.success == true' >/dev/null
+          unset env_vars secret_payload secret_response
+          echo "PASS: disposable test admin credentials were saved as Cloudflare secret_text values."
+
       - name: Install Wrangler and image smoke-test converter
         run: npm install --no-save --no-package-lock wrangler sharp
 
