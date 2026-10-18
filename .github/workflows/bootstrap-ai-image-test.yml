@@ -267,10 +267,12 @@ jobs:
               const body = await request.json();
               if (!body || typeof body.dataUrl !== "string" || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(body.dataUrl) || body.dataUrl.length > 250000) return response({ ok: false, reason: "invalid_jpeg_payload" }, 400);
               const result = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
-                messages: [{ role: "user", content: "Classify the main product in this image as exactly one category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Return only JSON with category and integer confidence from 0 to 100." }],
+                messages: [
+                  { role: "system", content: "You are a product image classification engine. Follow the user's classification categories exactly and return only a JSON object with category and integer confidence." },
+                  { role: "user", content: "Classify the main product in this image as exactly one category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Return only JSON with category and integer confidence from 0 to 100." }
+                ],
                 image: body.dataUrl,
                 temperature: 0,
-                response_format: { type: "json_schema", json_schema: { type: "object", properties: { category: { type: "string", enum: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"] }, confidence: { type: "integer", minimum: 0, maximum: 100 } }, required: ["category","confidence"], additionalProperties: false } },
                 max_tokens: 180
               });
               const parsed = parseCategoryResult(result);
