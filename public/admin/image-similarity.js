@@ -127,16 +127,31 @@ export async function findSimilarGroups(items, options = {}) {
       }
     }
     const average = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : Math.min(...indices.map(index => bestScore[index]));
+    const indexByKey = new Map(members.map((item, position) => [item.key, indices[position]]));
     const sorted = members.map((item, position) => ({
       key: item.key,
       similarity: bestScore[indices[position]] || average
-    })).sort((a, b) => a.key.localeCompare(b.key));
-    groups.push({
-      imageKeys: sorted.map(item => item.key),
-      members: sorted,
-      similarity: average,
-      rationale: "So sánh dấu vân tay cảm nhận, hình dạng vùng sản phẩm và phân bố màu sau chuẩn hóa nền. Điểm là mức tương đồng ảnh, không phải xác suất cùng SKU."
-    });
+    })).sort((a, b) => b.similarity - a.similarity || a.key.localeCompare(b.key));
+    const chunks = [];
+    for (let offset = 0; offset < sorted.length; offset += 30) chunks.push(sorted.slice(offset, offset + 30));
+    for (let part = 0; part < chunks.length; part++) {
+      const chunk = chunks[part], chunkScores = [];
+      for (let a = 0; a < chunk.length; a++) {
+        for (let b = a + 1; b < chunk.length; b++) {
+          const x = indexByKey.get(chunk[a].key), y = indexByKey.get(chunk[b].key);
+          const edge = edgeScores.get(Math.min(x, y) + ":" + Math.max(x, y));
+          if (edge !== undefined) chunkScores.push(edge);
+        }
+      }
+      const chunkAverage = chunkScores.length ? Math.round(chunkScores.reduce((sum, value) => sum + value, 0) / chunkScores.length) : average;
+      groups.push({
+        imageKeys: chunk.map(item => item.key).sort((a, b) => a.localeCompare(b)),
+        members: [...chunk].sort((a, b) => a.key.localeCompare(b.key)),
+        similarity: chunkAverage,
+        rationale: (indices.length > 30 ? "Cụm liên thông lớn có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. " : "") +
+          "So sánh dấu vân tay cảm nhận, hình dạng vùng sản phẩm và phân bố màu sau chuẩn hóa nền. Điểm là mức tương đồng ảnh, không phải xác suất cùng SKU."
+      });
+    }
   }
   groups.sort((a, b) => b.similarity - a.similarity || a.imageKeys.join("|").localeCompare(b.imageKeys.join("|")));
   return { groups, compared, matches, validCount: count, skippedCount: (Array.isArray(items) ? items.length : 0) - count };
