@@ -372,6 +372,47 @@ jobs:
               else
                 echo "::warning::AI inference passed, but ADMIN_PASSWORD and/or SESSION_SECRET is missing/too short on the test project; admin browser login remains unverified."
               fi
+
+              # Exercise the real pair-comparison action with a second, distinct,
+              # byte-verified Preview R2 image. The temporary route uses a no-write
+              # DB stub, so any proposal is validated but never persisted.
+              second_status="$(curl --connect-timeout 10 --max-time 30 --silent --show-error -D /tmp/ai-test-vision-headers-2 -o /tmp/ai-test-vision-source-2 -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci?exclude=$image_key_encoded")"
+              if [ "$second_status" = "200" ]; then
+                node --input-type=module - <<'NODE'
+          import sharp from "sharp";
+          import { readFile, writeFile } from "node:fs/promises";
+          const source = await readFile("/tmp/ai-test-vision-source-2");
+          const jpeg = await sharp(source, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+          if (!jpeg.length || jpeg.length > 180000) throw new Error("Second comparison image exceeds safe size.");
+          await writeFile("/tmp/ai-test-vision-jpeg-2.b64", jpeg.toString("base64"));
+          NODE
+                second_key_encoded="$(awk 'tolower($1)=="x-preview-image-key:" {gsub("\r","",$2); print $2}' /tmp/ai-test-vision-headers-2)"
+                test -n "$second_key_encoded" || { echo "::error::Second Preview R2 image key header is missing."; exit 1; }
+                AI_TEST_IMAGE_KEY_ENCODED="$image_key_encoded" AI_TEST_SECOND_IMAGE_KEY_ENCODED="$second_key_encoded" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const first = JSON.parse(await readFile("/tmp/ai-test-vision-request.json", "utf8"));
+          const secondKey = decodeURIComponent(process.env.AI_TEST_SECOND_IMAGE_KEY_ENCODED || "");
+          const secondEncoded = (await readFile("/tmp/ai-test-vision-jpeg-2.b64", "utf8")).trim();
+          await writeFile("/tmp/ai-test-compare-request.json", JSON.stringify({
+            action: "compare",
+            imageKeys: [first.imageKey, secondKey],
+            imageData: [
+              { key: first.imageKey, dataUrl: first.dataUrl },
+              { key: secondKey, dataUrl: "data:image/jpeg;base64," + secondEncoded }
+            ]
+          }));
+          NODE
+                compare_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-compare-request.json "$base/api/ai-smoke-ci")"
+                test "$compare_status" = "200" || { echo "::error::Real Workers AI pair comparison failed with HTTP $compare_status. Response body omitted."; exit 1; }
+                jq -e '.ok == true and (.matches | type == "array" or type == "number")' /tmp/ai-test-compare.json >/dev/null || { echo "::error::Workers AI pair comparison returned an invalid result."; exit 1; }
+                compare_summary="$(jq -r 'if (.matches|type)=="array" then "candidate_pairs=" + (.matches|length|tostring) else "candidate_pairs=" + (.matches|tostring) end' /tmp/ai-test-compare.json)"
+                echo "PASS: real Workers AI pair comparison on two distinct Preview R2 images: $compare_summary. Any review writes were intercepted by the no-write test DB."
+              elif [ "$second_status" = "424" ]; then
+                echo "::warning::Only one byte-verified small raster image exists in Preview R2; live pair-comparison smoke was skipped."
+              else
+                echo "::error::Could not retrieve a second Preview R2 image for pair comparison (HTTP $second_status)."
+                exit 1
+              fi
             else
               diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
               echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
