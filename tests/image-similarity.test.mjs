@@ -46,4 +46,17 @@ assert.ok(split.groups.every(group => group.imageKeys.length <= 30), "no propose
 const alreadyAssigned = items.slice(0,2).map(item => ({ ...item, assignedTo: [{ sku: "SD-SN001" }] }));
 const skipped = await findSimilarGroups(alreadyAssigned);
 assert.equal(skipped.groups.length, 0, "do not re-propose images already assigned to the same SKU");
+
+// A bridge image must not transitively combine otherwise incompatible products.
+const chainA = descriptor("chain/a.webp", "0011223344556677", Array(64).fill(0), colorsA);
+const chainBShape = Array.from({ length: 64 }, (_, i) => i < 40 ? 0.5 : 0);
+const chainCShape = Array.from({ length: 64 }, (_, i) => i < 40 ? 1 : 0);
+const chainB = descriptor("chain/b.webp", "0011223344556677", chainBShape, colorsA);
+const chainC = descriptor("chain/c.webp", "0011223344556677", chainCShape, colorsA);
+assert.equal(compareDescriptors(chainA, chainB).match, true, "neighboring views may be grouped when shape/color both agree");
+assert.equal(compareDescriptors(chainB, chainC).match, true, "the bridge pair is individually similar");
+assert.equal(compareDescriptors(chainA, chainC).match, false, "the endpoints are not similar enough to belong to one set");
+const coherent = await findSimilarGroups([chainA, chainB, chainC]);
+assert.deepEqual(coherent.groups.map(group => group.imageKeys.length).sort((a,b)=>a-b), [2], "a transitive bridge must not create a mixed 3-image set");
+assert.ok(coherent.groups.some(group => group.imageKeys.includes("chain/a.webp") && group.imageKeys.includes("chain/b.webp")));
 console.log("PASS: similarity index compares every pair across the full descriptor set and skips groups already attached to one SKU.");
