@@ -86,6 +86,20 @@ export async function onRequestPost(context) {
   if (parsed.error || !parsed.value || typeof parsed.value !== "object" || Array.isArray(parsed.value)) return fail("Yêu cầu không hợp lệ.", 400);
   const body = parsed.value, action = String(body.action || "");
 
+  if (action === "invalidate-index") {
+    const keys = Array.isArray(body.keys) ? body.keys : [];
+    if (!keys.length || keys.length > 100 || keys.some(key => !validKey(key)) || new Set(keys).size !== keys.length) {
+      return fail("Danh sách ảnh cần làm mới chỉ mục không hợp lệ (tối đa 100 mã mỗi lô).", 400);
+    }
+    try {
+      const placeholders = keys.map(() => "?").join(",");
+      const result = await env.DB.prepare("DELETE FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...keys).run();
+      return json({ ok: true, invalidated: Number(result.meta?.changes || 0), message: "Đã loại chỉ mục cũ để ảnh lỗi được thử đọc lại ở lần quét tiếp theo." });
+    } catch (error) {
+      return fail("Không thể loại chỉ mục ảnh lỗi: " + safeError(error), 503);
+    }
+  }
+
   if (action === "index") {
     const descriptors = Array.isArray(body.images) ? body.images : [];
     if (!descriptors.length || descriptors.length > 100 || descriptors.some(item => !validDescriptor(item))) {
