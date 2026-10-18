@@ -179,16 +179,16 @@ async function scanWholeImageInventory(){
     if(imageInventory.length<2)throw Error("Kho cần ít nhất 2 ảnh để tìm điểm tương đồng.");
     const similarity=await import("/admin/image-similarity.js");
     const indexedByKey=new Map(imageIndexedRows.map(row=>[row.image_key,row]));
+    const validCategories=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
     const missing=imageInventory.filter(item=>{
       const row=indexedByKey.get(item.key);
       let features={};try{features=JSON.parse(row?.features_json||"{}")}catch{}
-      const categories=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
       const validShape=Array.isArray(features.shape)&&features.shape.length===64&&features.shape.every(value=>typeof value==="number"&&Number.isFinite(value));
       const validColors=Array.isArray(features.colors)&&features.colors.length===12&&features.colors.every(value=>typeof value==="number"&&Number.isFinite(value));
       const validHash=/^[0-9a-f]{16}$/i.test(String(row?.p_hash||""));
       // Re-index incomplete or malformed cached descriptors, not just absent rows.
       // Otherwise stale JSON could silently remove images from matching.
-      return !row||!validShape||!validColors||!validHash||!categories.has(String(features.category||""))||!Number.isInteger(Number(features.categoryConfidence))||!["classified","needs_review"].includes(String(features.categoryStatus||""))||! /^[0-9a-f]{64}$/i.test(String(features.contentHash||""))||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
+      return !row||!validShape||!validColors||!validHash||!validCategories.has(String(features.category||""))||!Number.isInteger(Number(features.categoryConfidence))||!["classified","needs_review"].includes(String(features.categoryStatus||""))||! /^[0-9a-f]{64}$/i.test(String(features.contentHash||""))||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
     });
     const failedKeys=new Set(),failureDetails=[],pendingIndexWrites=[];
     async function flushIndexWrites(){if(!pendingIndexWrites.length)return;const batch=pendingIndexWrites.splice(0,20);await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"index",images:batch})});}
