@@ -15,7 +15,7 @@ export function parseCategoryResult(result, allowed = new Set(["sneaker","loafer
     dress_shoes:"dress_shoe", dressshoe:"dress_shoe", formal_shoe:"dress_shoe", formal_shoes:"dress_shoe", giay_tay:"dress_shoe",
     boots:"boot", sandals:"sandal", belts:"belt", that_lung:"belt", wallets:"wallet", vi:"wallet",
     watchstraps:"watch_strap", watch_band:"watch_strap", watch_bands:"watch_strap", watchbands:"watch_strap", day_dong_ho:"watch_strap",
-    watches:"watch", dong_ho:"watch", bags:"bag", tui:"bag", unknown_product:"unknown", unknown_item:"unknown", khong_xac_dinh:"unknown", other_product:"other", khac:"other"
+    watches:"watch", dong_ho:"watch", bags:"bag", tui:"bag", shoe:"unknown", shoes:"unknown", footwear:"unknown", footwear_product:"unknown", unknown_product:"unknown", unknown_item:"unknown", khong_xac_dinh:"unknown", other_product:"other", khac:"other"
   };
   const normalize = value => {
     if (value && typeof value === "object") value = value.category ?? value.label ?? value.name ?? value.value ?? value.text;
@@ -128,7 +128,7 @@ const objects=await Promise.all(keys.map(k=>env.IMAGES.head?env.IMAGES.head(k):e
 if(objects.some(x=>!x))return fail("Ảnh đã biến mất khỏi R2; hãy quét lại kho.",409);
 const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",700,3600);
 if(limit.limited)return fail("Đã đạt giới hạn phân loại ảnh trong một giờ. Hãy đợi rồi quét tiếp; kết quả chưa rõ sẽ không được gom.",429,{"Retry-After":"3600"});
-const prompt="Nhìn ảnh và phân loại sản phẩm chính. Chỉ chọn một category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Phân biệt watch_strap (chỉ dây đồng hồ) với watch (đồng hồ nguyên chiếc). Nếu không rõ hoặc confidence dưới 70, dùng unknown. Trả đúng một JSON object không markdown, chỉ có hai khóa category và confidence. confidence là số nguyên 0-100.";
+const prompt="Phân loại vật thể chính trong ảnh thành ĐÚNG MỘT category trong danh sách: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Không được trả category chung chung như shoe, shoes hoặc footwear. Nếu là giày, bắt buộc chọn sneaker (giày thể thao), loafer (giày lười), dress_shoe (giày tây/giày công sở), boot (bốt) hoặc sandal; chỉ chọn unknown nếu ảnh không đủ rõ để phân biệt. watch_strap là dây đồng hồ riêng lẻ; watch là đồng hồ nguyên chiếc. Không suy đoán chỉ từ nền ảnh. Trả đúng JSON object gồm category và confidence; confidence là số nguyên 0-100. Không gọi tool, không markdown, không giải thích.";
 const allowed=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
 const items=[];
 for(let i=0;i<keys.length;i++){
