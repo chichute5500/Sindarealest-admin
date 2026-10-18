@@ -19,9 +19,8 @@ export async function onRequestGet({ request, env }) {
     if (Number(object.size || 0) > MAX_IMAGE_BYTES) return fail("Ảnh vượt giới hạn xem trước 20 MB.", 413);
     const ext = key.includes(".") ? key.split(".").pop().toLowerCase() : "";
     const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
-    const contentType = supplied.startsWith("image/") && supplied !== "image/svg+xml" && supplied !== "image/svg"
-      ? supplied
-      : MIME_BY_EXTENSION[ext];
+    if (supplied === "image/svg+xml" || supplied === "image/svg") return fail("SVG không được hỗ trợ trong hàng chờ ảnh raster.", 415);
+    const contentType = supplied.startsWith("image/") ? supplied : MIME_BY_EXTENSION[ext];
     if (!contentType) return fail("Object trong kho không phải định dạng ảnh raster được hỗ trợ.", 415);
     const headers = new Headers({
       "Content-Type": contentType,
