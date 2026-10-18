@@ -135,12 +135,10 @@ for(let i=0;i<keys.length;i++){
 let result,classification=null;
 for(let attempt=0;attempt<2&&!classification;attempt++){
   try{
-    /* Vision inputs must be part of the user's message content. */
+    // Cloudflare's Llama Vision binding takes the base64 image in its dedicated image field.
     result=await env.AI.run(MODEL,{
-      messages:[{role:"user",content:[
-        {type:"text",text:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")},
-        {type:"image_url",image_url:{url:supplied[i].dataUrl}}
-      ]}],
+      messages:[{role:"user",content:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")}],
+      image:supplied[i].dataUrl,
       temperature:0,
       // Cloudflare's current Workers AI docs list this vision model as JSON Mode
       // compatible. Keep strict schema validation here, but still parse defensively
