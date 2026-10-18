@@ -597,6 +597,48 @@ jobs:
             fi
             jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-repository-gallery.json >/dev/null || { echo "::error::AI did not match two distinct real image files from the same product gallery at confidence 91 or higher."; exit 1; }
             echo "PASS: real Workers AI matched two distinct real gallery images from one product at the 91% confidence gate; no database or product gallery was modified."
+            # Negative control: two different products in the same shoe category must not be auto-grouped.
+            node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          import { existsSync } from "node:fs";
+          import { createHash } from "node:crypto";
+          import path from "node:path";
+          import sharp from "sharp";
+          const products = JSON.parse(await readFile("data/legacy-products.json", "utf8"));
+          const candidates = [];
+          for (const product of products) {
+            if (product.category !== "sneakers" || !product.sku) continue;
+            for (const image of Array.isArray(product.images) ? product.images : []) {
+              if (typeof image !== "string" || !image.startsWith("images/") || image.split("/").includes("..")) continue;
+              const file = path.join("public", image); if (!existsSync(file)) continue;
+              try {
+                const bytes = await readFile(file);
+                const hash = createHash("sha256").update(bytes).digest("hex");
+                if (candidates.some(item => item.sku === product.sku || item.hash === hash)) continue;
+                candidates.push({ sku: product.sku, image, bytes, hash });
+                break;
+              } catch {}
+            }
+            if (candidates.length >= 2) break;
+          }
+          if (candidates.length < 2) throw new Error("Could not find two distinct sneaker products for the negative control.");
+          const keys = candidates.map((item, index) => `test-fixtures/negative/${String(item.sku).replace(/[^A-Za-z0-9_-]/g, "_")}-${index + 1}-${path.basename(item.image)}`);
+          const imageData = [];
+          for (let index = 0; index < candidates.length; index++) {
+            const jpeg = await sharp(candidates[index].bytes, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+            if (!jpeg.length || jpeg.length > 180000) throw new Error("Negative-control image exceeds safe size.");
+            imageData.push({ key: keys[index], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
+          }
+          await writeFile("/tmp/ai-test-distinct-products-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData }));
+          console.log("Prepared distinct SKU sneaker images for false-positive control.");
+          NODE
+            negative_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-distinct-products.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-distinct-products-request.json "$base/api/ai-smoke-ci")"
+            if [ "$negative_status" != "200" ]; then
+              diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-distinct-products.json 2>/dev/null || true)"
+              echo "::error::Distinct-product negative control failed with HTTP $negative_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
+            fi
+            jq -e '.ok == true and (((.matches|type)=="number" and .matches==0) or ((.matches|type)=="array" and (.matches|length)==0))' /tmp/ai-test-distinct-products.json >/dev/null || { echo "::error::AI proposed a high-confidence match for distinct SKU sneakers; false-positive control failed."; exit 1; }
+            echo "PASS: real Workers AI did not group two distinct SKU sneakers; false-positive control passed with no writes."
             # Stronger positive control: use two distinct images actually listed in one product gallery.
             sku_pair_status="$(curl --connect-timeout 10 --max-time 45 --silent --show-error -D /tmp/ai-test-sku-pair-headers -o /tmp/ai-test-sku-pair-source -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci?sameSkuPair=1")"
             if [ "$sku_pair_status" = "200" ]; then
