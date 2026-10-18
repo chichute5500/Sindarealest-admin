@@ -135,7 +135,7 @@ function imageGroupsPage(){
     const members=(group.members||[]).map(member=>({...member,image:imageInventory.find(item=>item.key===member.key)}));
     const preview=members.map(member=>member.image?'<div style="min-width:0"><img src="'+esc(member.image.url)+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:contain;background:var(--paper);border:1px solid var(--line);border-radius:10px"><div class="tiny" style="overflow-wrap:anywhere;margin-top:4px">'+esc(member.key)+'</div><div class="tiny muted">Tương đồng '+Number(member.similarity||group.similarity||0)+'%</div></div>':'<div class="empty">Ảnh không còn trong kho: '+esc(member.key)+'</div>').join("");
     const options=products.map(product=>'<option value="'+esc(product.id)+'">'+esc(product.sku+" — "+product.title)+'</option>').join("");
-    return '<article class="panel" style="margin-top:12px"><div class="switchrow"><div><b>Nhóm đề xuất · '+members.length+' ảnh</b><div class="tiny muted">Mức tương đồng tổng hợp: '+Number(group.similarity||0)+'% · '+esc(group.created_at||"")+'</div></div><span class="status unknown">Chờ duyệt</span></div><p class="tiny muted">'+esc(group.rationale||"Nhóm được tìm bằng chỉ mục hình ảnh toàn kho.")+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:10px 0">'+preview+'</div>'+(members.length>30?'<div class="callout">Nhóm có hơn 30 ảnh nên cần chia nhỏ trước khi gắn vào một bộ ảnh sản phẩm.</div>':'<div class="field"><label for="target-group-'+esc(group.id)+'">Bộ ảnh sản phẩm đích</label><select class="control" id="target-group-'+esc(group.id)+'">'+options+'</select></div>')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+(members.length<=30?'<button class="btn primary" data-approve-image-group="'+esc(group.id)+'">Duyệt và lưu nhóm vào bộ ảnh</button>':'')+'<button class="btn" data-reject-image-group="'+esc(group.id)+'">Loại nhóm</button></div></article>';
+    return '<article class="panel" style="margin-top:12px"><div class="switchrow"><div><b>NHÓM LOẠI: '+esc(group.categoryLabel||"Chưa xác định")+'</b><div><b>BỘ ẢNH ĐỀ XUẤT · '+members.length+' ảnh</b></div><div class="tiny muted">Mức tương đồng tổng hợp: '+Number(group.similarity||0)+'% · '+esc(group.created_at||"")+'</div></div><span class="status unknown">Chờ duyệt</span></div><p class="tiny muted">'+esc(group.rationale||"Nhóm được tìm bằng chỉ mục hình ảnh toàn kho.")+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:10px 0">'+preview+'</div>'+(members.length>30?'<div class="callout">Nhóm có hơn 30 ảnh nên cần chia nhỏ trước khi gắn vào một bộ ảnh sản phẩm.</div>':'<div class="field"><label for="target-group-'+esc(group.id)+'">Bộ ảnh sản phẩm đích</label><select class="control" id="target-group-'+esc(group.id)+'">'+options+'</select></div>')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+(members.length<=30?'<button class="btn primary" data-approve-image-group="'+esc(group.id)+'">Duyệt và lưu nhóm vào bộ ảnh</button>':'')+'<button class="btn" data-reject-image-group="'+esc(group.id)+'">Loại nhóm</button></div></article>';
   }).join("");
   const legacyCards=imageReviews.filter(review=>review.status==="pending").map(review=>{
     const a=imageInventory.find(item=>item.key===review.image_a),b=imageInventory.find(item=>item.key===review.image_b);
@@ -163,7 +163,9 @@ async function scanWholeImageInventory(){
     const indexedByKey=new Map(imageIndexedRows.map(row=>[row.image_key,row]));
     const missing=imageInventory.filter(item=>{
       const row=indexedByKey.get(item.key);
-      return !row||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
+      let features={};try{features=JSON.parse(row?.features_json||"{}")}catch{}
+      // Re-index once when the two-tier category has not yet been stored.
+      return !row||!features.category||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
     });
     const failedKeys=new Set(),failureDetails=[],pendingIndexWrites=[];
     async function flushIndexWrites(){if(!pendingIndexWrites.length)return;const batch=pendingIndexWrites.splice(0,20);await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"index",images:batch})});}
@@ -176,12 +178,24 @@ async function scanWholeImageInventory(){
         if(outcome.status==="fulfilled")calculated.push(outcome.value);
         else{const item=batch[i];failedKeys.add(item.key);indexedByKey.delete(item.key);failureDetails.push({key:item.key,error:String(outcome.reason?.message||outcome.reason||"Không đọc được ảnh").slice(0,180)});}
       }
-      for(const descriptor of calculated){
-        indexedByKey.set(descriptor.key,{image_key:descriptor.key,p_hash:descriptor.p_hash,features_json:JSON.stringify(descriptor.features),width:descriptor.width,height:descriptor.height,source_size:descriptor.sourceSize,source_uploaded:descriptor.sourceUploaded});
-        pendingIndexWrites.push(descriptor);
+      if(calculated.length){
+        // Tier 1: ask vision to classify each new/legacy image before any visual grouping.
+        // If classification fails, stop the scan instead of falling back to unsafe mixed groups.
+        const classification=await api("/api/admin/image-groups",{method:"POST",body:JSON.stringify({
+          action:"classify-categories",
+          imageKeys:calculated.map(item=>item.key),
+          imageData:calculated.map(item=>({key:item.key,dataUrl:item.previewDataUrl}))
+        })});
+        const categories=new Map((classification.items||[]).map(item=>[item.key,item.category]));
+        for(const descriptor of calculated){
+          descriptor.features.category=categories.get(descriptor.key)||"unknown";
+          delete descriptor.previewDataUrl;
+          indexedByKey.set(descriptor.key,{image_key:descriptor.key,p_hash:descriptor.p_hash,features_json:JSON.stringify(descriptor.features),width:descriptor.width,height:descriptor.height,source_size:descriptor.sourceSize,source_uploaded:descriptor.sourceUploaded});
+          pendingIndexWrites.push(descriptor);
+        }
       }
       if(pendingIndexWrites.length>=20)await flushIndexWrites();
-      imageScanProgress="Đã phân tích "+Math.min(offset+batch.length,missing.length)+"/"+missing.length+" ảnh mới/thay đổi; lỗi đọc ảnh: "+failureDetails.length+"; tổng kho "+imageInventory.length+" ảnh.";
+      imageScanProgress="Đã lập chỉ mục và phân loại "+Math.min(offset+batch.length,missing.length)+"/"+missing.length+" ảnh mới/thay đổi; lỗi đọc ảnh: "+failureDetails.length+"; tổng kho "+imageInventory.length+" ảnh.";
       const progress=$("#imageScanProgress");if(progress)progress.textContent=imageScanProgress;
       await new Promise(resolve=>setTimeout(resolve,0));
     }
