@@ -356,9 +356,13 @@ jobs:
                 },
                 async batch() { return [{ meta: { changes: 1 } }, { results: [{ attempts: 1 }] }]; }
               };
+              const fixtureOnly = action === "compare" && imageKeys.every(key => key.startsWith("test-fixtures/"));
+              const imageBinding = fixtureOnly
+                ? { async get(key) { return imageKeys.includes(key) ? { key } : null; } }
+                : env.IMAGES;
               const handlerResponse = await classifyImages({
                 request: internalRequest,
-                env: { ...env, DB: fakeDB, ADMIN_PASSWORD: sessionSecret, SESSION_SECRET: sessionSecret },
+                env: { ...env, DB: fakeDB, IMAGES: imageBinding, ADMIN_PASSWORD: sessionSecret, SESSION_SECRET: sessionSecret },
                 context: { request: internalRequest }
               });
               const result = await handlerResponse.json();
