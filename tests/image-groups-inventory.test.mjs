@@ -5,7 +5,7 @@ import { createSession } from "../functions/_lib.js";
 const ADMIN_PASSWORD = "image-group-admin-password-test";
 const SESSION_SECRET = "image-group-session-secret-long-enough-for-test";
 const session = await createSession(SESSION_SECRET);
-const product = { id: "p1", sku: "SD-SN001", title: "Test product", images_json: JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp"]) };
+const product = { id: "p1", sku: "SD-SN001", title: "Test product", images_json: JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp", "media/shop/photos/another-photo.png?cache=1"]) };
 let productRows = [product];
 const DB = {
   prepare(sql) {
@@ -56,6 +56,7 @@ const secondBody = await second.json();
 assert.equal(secondBody.images.length, 1);
 assert.equal(secondBody.hasMore, false);
 assert.equal(secondBody.images[0].key, "shop/photos/another-photo.png");
+assert.deepEqual(secondBody.images[0].assignedTo.map(owner => owner.sku), ["SD-SN001"], "relative media references with query strings must still map to the owning product");
 
 // Assignment lookup must not stop at the old 2,000-product cap.
 productRows = Array.from({ length: 2001 }, (_, index) => ({
