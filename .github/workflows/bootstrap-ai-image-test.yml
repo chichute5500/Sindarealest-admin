@@ -101,7 +101,7 @@ jobs:
       - name: Install Wrangler
         run: npm install --no-save --no-package-lock wrangler
 
-      - name: Deploy to the separate test project only
+      - name: Deploy AI-enabled configuration to the separate test project only
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -109,6 +109,72 @@ jobs:
           TARGET_PROJECT: sindarealest-ai-image-test
         run: |
           set -euo pipefail
-          npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
-          echo "Test project deployment requested: https://sindarealest-ai-image-test.pages.dev"
-          echo "::notice::This workflow does not change sindarealest2 Production or its production branch."
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+
+          # Re-check isolation in the deployment step itself. Never deploy a test
+          # config if the source project's Preview DB or IMAGES points to Production.
+          source="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$api/pages/projects/sindarealest2")"
+          printf '%s' "$source" | jq -e '.success == true' >/dev/null
+          source_production_branch="$(printf '%s' "$source" | jq -r '.result.production_branch // empty')"
+          preview_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          production_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          preview_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          production_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          test "$source_production_branch" = "main" || { echo "::error::Source Production branch is not main; refusing test deployment."; exit 1; }
+          test -n "$preview_db" && test -n "$production_db" && test "$preview_db" != "$production_db" || { echo "::error::Preview D1 is missing or not isolated; refusing test deployment."; exit 1; }
+          test -n "$preview_images" && test -n "$production_images" && test "$preview_images" != "$production_images" || { echo "::error::Preview IMAGES is missing or not isolated; refusing test deployment."; exit 1; }
+
+          d1="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$api/d1/database/$preview_db")"
+          printf '%s' "$d1" | jq -e '.success == true' >/dev/null
+          preview_db_name="$(printf '%s' "$d1" | jq -r '.result.name // empty')"
+          test -n "$preview_db_name" || { echo "::error::Could not resolve the isolated Preview D1 name."; exit 1; }
+
+          target="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$api/pages/projects/$TARGET_PROJECT")"
+          printf '%s' "$target" | jq -e '.success == true' >/dev/null
+          target_branch="$(printf '%s' "$target" | jq -r '.result.production_branch // empty')"
+          test "$target_branch" = "main" || { echo "::error::Target test project's Production branch is not main; refusing deploy."; exit 1; }
+
+          # Preserve plain-text Dashboard vars if present. Secrets are not removed
+          # by Wrangler deployments and their values are never read or logged here.
+          target_vars="$(printf '%s' "$target" | jq -c '
+            ((.result.deployment_configs.production.env_vars // {})
+              | with_entries(select(.value.type == "plain_text"))
+              | with_entries(.value = .value.value))')"
+          config="$GITHUB_WORKSPACE/wrangler.ai-image-test.json"
+          trap 'rm -f "$config"' EXIT
+          jq -n \
+            --arg name "$TARGET_PROJECT" \
+            --arg db_name "$preview_db_name" \
+            --arg db_id "$preview_db" \
+            --arg images "$preview_images" \
+            --argjson vars "$target_vars" \
+            '{
+              name: $name,
+              pages_build_output_dir: "public",
+              compatibility_date: "2026-10-19",
+              ai: { binding: "AI" },
+              d1_databases: [{ binding: "DB", database_name: $db_name, database_id: $db_id }],
+              r2_buckets: [{ binding: "IMAGES", bucket_name: $images }]
+            } + (if ($vars | length) > 0 then { vars: $vars } else {} end)' > "$config"
+
+          echo "Deploying the AI binding only to $TARGET_PROJECT. DB/IMAGES point to the checked source Preview resources."
+          npx wrangler pages deploy public --config "$config" --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
+
+          # Read-only smoke checks against the test project URL; do not log in or mutate data.
+          base="https://${TARGET_PROJECT}.pages.dev"
+          home_status="$(curl --silent --show-error -o /tmp/ai-test-home.html -w "%{http_code}" "$base/")"
+          admin_status="$(curl --silent --show-error -o /tmp/ai-test-admin.html -w "%{http_code}" "$base/admin/")"
+          test "$home_status" = "200" || { echo "::error::AI test project home smoke check returned HTTP $home_status."; exit 1; }
+          test "$admin_status" = "200" || { echo "::error::AI test project admin route smoke check returned HTTP $admin_status."; exit 1; }
+          grep -q "Đăng nhập quản trị" /tmp/ai-test-admin.html || { echo "::error::Admin login content missing from test deployment."; exit 1; }
+          api_status="$(curl --silent --show-error -o /tmp/ai-test-api.json -w "%{http_code}" "$base/api/admin/image-groups")"
+          test "$api_status" = "401" || { echo "::error::Unauthenticated admin API should return 401, received HTTP $api_status."; exit 1; }
+          echo "PASS: test site, admin route, and protected API smoke checks."
+          echo "Test project deployment: $base"
+          echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
