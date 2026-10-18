@@ -62,8 +62,8 @@ function assertUniqueStaticIds(source, label) {
 }
 assertUniqueStaticIds(storefrontSource, 'Storefront');
 assertUniqueStaticIds(adminSource, 'Admin');
-assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The Zalo service tile must use the approved service label');
-assert.ok(storefrontSource.includes('Trao đổi trực tiếp qua Zalo'), 'The Zalo service tile must describe only the confirmed contact channel');
+assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The separate Zalo contact CTA must keep the approved label');
+assert.ok(storefrontSource.includes('title="Trao đổi trực tiếp qua Zalo"'), 'The separate Zalo contact CTA must describe only the confirmed contact channel');
 assert.ok(!storefrontSource.includes('Tư Vấn 24/7'), 'Do not claim 24/7 availability without confirmation');
 assert.ok(!storefrontSource.includes('Da tuyển chọn'), 'Do not claim an unverified leather selection process');
 for (const unsupportedClaim of ['Da Cá Sấu Thật', 'Thiết Kế Độc Quyền', 'Bảo Hành Uy Tín', 'Giao Hàng Toàn Quốc', 'Chính sách rõ ràng', 'Đẳng Cấp Thật', 'Từ Chất Liệu Thật', 'Cam kết chất lượng']) {
