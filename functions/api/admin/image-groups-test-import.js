@@ -3,7 +3,7 @@ import { fail, json, requireAdmin } from "../../_lib.js";
 const SOURCE_API = "https://api.github.com/repos/chichute5500/Sindarealest-admin/contents/public/images?ref=main";
 const SOURCE_RAW = "https://raw.githubusercontent.com/chichute5500/Sindarealest-admin/main/public/images/";
 const SOURCE_NAME = /^[a-f0-9]{16}\.webp$/i;
-const MAX_IMAGE_BYTES = 500 * 1024;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const TARGET_COUNT = 50;
 
 // Isolated, admin-only test helper. It writes ONLY to the bound R2 bucket for this deployment.
@@ -74,7 +74,7 @@ export async function onRequestPost({ request, env }) {
     const skippedExisting = [];
     const failures = [];
     for (const source of sources) {
-      if (imported.length >= TARGET_COUNT) break;
+      if (imported.length + skippedExisting.length >= TARGET_COUNT) break;
       // Duplicate the 16-character source hash to create a valid 32-character flat R2 key
       // accepted by the current inventory API, while preserving a deterministic mapping.
       const base = source.name.slice(0, -5).toLowerCase();
@@ -102,17 +102,19 @@ export async function onRequestPost({ request, env }) {
       }
     }
 
+    const totalPresent = imported.length + skippedExisting.length;
     return json({
-      ok: imported.length === TARGET_COUNT,
+      ok: totalPresent >= TARGET_COUNT,
       target: TARGET_COUNT,
       imported: imported.length,
       skippedExisting: skippedExisting.length,
+      totalPresent,
       failures: failures.slice(0, 10),
       images: imported,
-      message: imported.length === TARGET_COUNT
-        ? "Đã nhập đủ 50 ảnh WebP thật vào R2 của môi trường hiện tại; không xóa ảnh nào."
-        : "Chưa đủ 50 ảnh. Không xóa ảnh nào; xem danh sách lỗi để xử lý tiếp."
-    }, imported.length === TARGET_COUNT ? 200 : 502);
+      message: totalPresent >= TARGET_COUNT
+        ? "Đã xác nhận đủ 50 ảnh WebP thật trong R2 của môi trường hiện tại; không xóa ảnh nào."
+        : "Hiện có " + totalPresent + "/50 ảnh phù hợp trong R2. Không xóa ảnh nào; hãy chạy lại để tiếp tục."
+    }, totalPresent >= TARGET_COUNT ? 200 : 502);
   } catch {
     return fail("Không thể nhập ảnh thử nghiệm. Không có thao tác xóa nào được thực hiện.", 502);
   }
