@@ -282,7 +282,7 @@ jobs:
             for(const ref of Array.isArray(refs)?refs:[]){
               const value=String(ref||"").trim().split(/[?#]/,1)[0];if(!value)continue;
               let key="";
-              try{const pathname=new URL(value,"https://inventory.invalid").pathname;const marker="/media/";const position=pathname.indexOf(marker);if(position>=0)key=decodeURIComponent(pathname.slice(position+marker.length)}catch{}
+              try{const pathname=new URL(value,"https://inventory.invalid").pathname;const marker="/media/";const position=pathname.indexOf(marker);if(position>=0)key=decodeURIComponent(pathname.slice(position+marker.length))}catch{}
               if(!key&&value.startsWith("media/")){try{key=decodeURIComponent(value.slice(6))}catch{key=value.slice(6)}}
               if(!key&&!value.startsWith("/")&&!/^https?:\/\//i.test(value)){try{key=decodeURIComponent(value)}catch{key=value}}
               if(key&&key.length<=1024&&!/[\u0000-\u001f\u007f]/.test(key)&&!keys.includes(key))keys.push(key);
