@@ -231,6 +231,172 @@ export async function onRequestPost(context) {
     }
   }
 
+
+  if (action === "split-group" || action === "merge-groups" || action === "move-image") {
+    const validId = value => /^[0-9a-f-]{36}$/i.test(String(value || ""));
+    const getPendingGroup = async id => {
+      const group = await env.DB.prepare("SELECT * FROM image_group_sets WHERE id=? AND status='pending'").bind(id).first();
+      if (!group) return null;
+      const members = await env.DB.prepare("SELECT image_key,similarity FROM image_group_set_members WHERE group_id=? ORDER BY similarity DESC,image_key ASC").bind(id).all();
+      return { ...group, members: (members.results || []).map(row => ({ key: String(row.image_key), similarity: Number(row.similarity) || 0 })) };
+    };
+    const average = members => Math.round(members.reduce((sum, member) => sum + member.similarity, 0) / Math.max(1, members.length));
+    const categoryFor = async keys => {
+      if (!keys.length) return null;
+      const rows = await env.DB.prepare("SELECT image_key,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
+      if ((rows.results || []).length !== keys.length) return null;
+      const categories = [];
+      for (const row of rows.results || []) {
+        let features = {};
+        try { features = JSON.parse(row.features_json || "{}"); } catch {}
+        categories.push(String(features.category || "unknown"));
+      }
+      return categories.every(category => category === categories[0]) && categories[0] !== "unknown" ? categories[0] : null;
+    };
+    const fingerprintConflict = async (value, excludedIds) => {
+      const found = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(value).first();
+      return found && !excludedIds.includes(String(found.id)) ? found : null;
+    };
+    const audit = (actionName, id, details) => env.DB.prepare(
+      "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', ?, 'image_group_set', ?, ?)"
+    ).bind(crypto.randomUUID(), actionName, id, JSON.stringify(details));
+    try {
+      if (action === "split-group") {
+        const groupId = String(body.groupId || "");
+        const selected = Array.isArray(body.selectedKeys) ? body.selectedKeys.map(String) : [];
+        if (!validId(groupId) || selected.length < 2 || selected.length > 48 || new Set(selected).size !== selected.length || selected.some(key => !validKey(key))) {
+          return fail("Tách bộ cần chọn từ 2 đến 48 ảnh hợp lệ, không trùng.", 400);
+        }
+        const group = await getPendingGroup(groupId);
+        if (!group) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
+        const byKey = new Map(group.members.map(member => [member.key, member]));
+        if (selected.some(key => !byKey.has(key))) return fail("Có ảnh được chọn không còn nằm trong nhóm nguồn.", 409);
+        const chosen = selected.map(key => byKey.get(key));
+        const remaining = group.members.filter(member => !selected.includes(member.key));
+        if (chosen.length < 2 || remaining.length < 2) return fail("Mỗi nhóm sau khi tách phải còn ít nhất 2 ảnh. Để tách nhóm 4 ảnh, hãy chọn 2 ảnh.", 400);
+        if (group.members.length > 50) return fail("Nhóm nguồn vượt giới hạn an toàn.", 409);
+        const category = await categoryFor(group.members.map(member => member.key));
+        if (!category || await categoryFor(chosen.map(member => member.key)) !== category || await categoryFor(remaining.map(member => member.key)) !== category) {
+          return fail("Danh mục của ảnh trong nhóm không nhất quán hoặc còn chưa xác định; không tách tự động.", 409);
+        }
+        const oldFingerprint = String(group.fingerprint || "");
+        const remainingFingerprint = await fingerprint(remaining.map(member => member.key));
+        const chosenFingerprint = await fingerprint(chosen.map(member => member.key));
+        if (await fingerprintConflict(remainingFingerprint, [groupId]) || await fingerprintConflict(chosenFingerprint, [groupId])) {
+          return fail("Một trong hai bộ ảnh sau khi tách đã tồn tại trong lịch sử nhóm. Không thay đổi dữ liệu.", 409);
+        }
+        const newId = crypto.randomUUID();
+        const rationaleSource = String(group.rationale || "").slice(0, 400);
+        const remainingRationale = (rationaleSource + " Đã tách thủ công; nhóm còn lại giữ trạng thái chờ duyệt.").slice(0, 700);
+        const chosenRationale = ("Được tách thủ công từ nhóm " + groupId + ". Danh mục: " + category + ". Chờ người quản trị duyệt.").slice(0, 700);
+        const statements = [
+          env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key IN (" + selected.map(() => "?").join(",") + ") AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(groupId, ...selected, groupId, oldFingerprint),
+          env.DB.prepare("INSERT INTO image_group_sets(id,fingerprint,similarity,rationale,status,created_at) SELECT ?,?,?,?,'pending',datetime('now') WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(newId, chosenFingerprint, average(chosen), chosenRationale, groupId, oldFingerprint)
+        ];
+        for (const member of chosen) {
+          statements.push(env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) SELECT ?,?,? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(newId, member.key, member.similarity, groupId, oldFingerprint));
+        }
+        statements.push(
+          env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=?")
+            .bind(remainingFingerprint, average(remaining), remainingRationale, groupId, oldFingerprint),
+          audit("image_group_split", groupId, { newGroupId: newId, selectedKeys: selected, remainingKeys: remaining.map(member => member.key), category })
+        );
+        const results = await env.DB.batch(statements);
+        if (!results?.[1]?.meta?.changes || !results?.[results.length - 2]?.meta?.changes) return fail("Nhóm đã thay đổi trong lúc thao tác. Tải lại danh sách; không xác nhận tách.", 409);
+        return json({ ok: true, groupId, newGroupId: newId, moved: selected.length, remaining: remaining.length, message: "Đã tách thành hai nhóm chờ duyệt; ảnh gốc và SKU không bị thay đổi." });
+      }
+
+      if (action === "merge-groups") {
+        const rawIds = Array.isArray(body.groupIds) ? body.groupIds.map(String) : [];
+        const groupIds = [...new Set(rawIds)];
+        const targetId = String(body.targetGroupId || groupIds[0] || "");
+        if (groupIds.length < 2 || groupIds.length > 5 || rawIds.length !== groupIds.length || groupIds.some(id => !validId(id)) || !groupIds.includes(targetId)) {
+          return fail("Gộp cần chọn 2–5 nhóm chờ duyệt khác nhau và một nhóm đích hợp lệ.", 400);
+        }
+        const groups = await Promise.all(groupIds.map(getPendingGroup));
+        if (groups.some(group => !group)) return fail("Một nhóm đã được duyệt, loại bỏ hoặc thay đổi. Tải lại danh sách.", 409);
+        const target = groups[groupIds.indexOf(targetId)];
+        const allMembers = groups.flatMap(group => group.members);
+        const allKeys = allMembers.map(member => member.key);
+        if (allKeys.length > 50) return fail("Nhóm sau khi gộp vượt giới hạn 50 ảnh.", 409);
+        if (new Set(allKeys).size !== allKeys.length) return fail("Các nhóm có ảnh trùng lặp. Hãy xử lý xung đột trước khi gộp.", 409);
+        const category = await categoryFor(allKeys);
+        if (!category) return fail("Không thể gộp các nhóm có danh mục khác nhau hoặc chưa xác định.", 409);
+        const combinedFingerprint = await fingerprint(allKeys);
+        if (await fingerprintConflict(combinedFingerprint, groupIds)) return fail("Bộ ảnh tổng hợp đã tồn tại trong lịch sử. Không thay đổi dữ liệu.", 409);
+        const memberByKey = new Map(allMembers.map(member => [member.key, member]));
+        const orderedMembers = allKeys.map(key => memberByKey.get(key)).sort((a,b) => b.similarity-a.similarity || a.key.localeCompare(b.key));
+        const guardSql = groupIds.map(() => "EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)").join(" AND ");
+        const guardArgs = groups.flatMap(group => [group.id, String(group.fingerprint || "")]);
+        const newRationale = ("Đã gộp thủ công " + groups.length + " nhóm của danh mục " + category + ". Cần người quản trị xác nhận cùng sản phẩm.").slice(0, 700);
+        const statements = [];
+        for (const group of groups.filter(item => item.id !== targetId)) {
+          for (const member of group.members) {
+            statements.push(env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) SELECT ?,?,? WHERE " + guardSql)
+              .bind(targetId, member.key, member.similarity, ...guardArgs));
+          }
+        }
+        statements.push(
+          env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND " + guardSql)
+            .bind(combinedFingerprint, average(orderedMembers), newRationale, targetId, String(target.fingerprint || ""), ...guardArgs)
+        );
+        for (const group of groups.filter(item => item.id !== targetId)) {
+          statements.push(env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(group.id, String(group.fingerprint || ""), targetId, combinedFingerprint));
+        }
+        statements.push(audit("image_group_merge", targetId, { mergedGroupIds: groupIds, retiredGroupIds: groupIds.filter(id => id !== targetId), imageKeys: allKeys, category }));
+        const results = await env.DB.batch(statements);
+        const targetUpdateIndex = groups.filter(item => item.id !== targetId).reduce((sum, group) => sum + group.members.length, 0);
+        if (!results?.[targetUpdateIndex]?.meta?.changes) return fail("Các nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận gộp.", 409);
+        return json({ ok: true, groupId: targetId, mergedGroups: groupIds.length, imageCount: allKeys.length, message: "Đã gộp các đề xuất thành một nhóm chờ duyệt; không sửa ảnh gốc hoặc sản phẩm công khai." });
+      }
+
+      if (action === "move-image") {
+        const sourceId = String(body.sourceGroupId || ""), targetId = String(body.targetGroupId || ""), imageKey = String(body.imageKey || "");
+        if (!validId(sourceId) || !validId(targetId) || sourceId === targetId || !validKey(imageKey)) return fail("Nhóm nguồn, nhóm đích hoặc mã ảnh không hợp lệ.", 400);
+        const [source, target] = await Promise.all([getPendingGroup(sourceId), getPendingGroup(targetId)]);
+        if (!source || !target) return fail("Cả nhóm nguồn và nhóm đích phải đang chờ duyệt.", 409);
+        const moving = source.members.find(member => member.key === imageKey);
+        if (!moving) return fail("Ảnh không nằm trong nhóm nguồn.", 409);
+        if (target.members.some(member => member.key === imageKey)) return fail("Ảnh đã nằm trong nhóm đích.", 409);
+        if (source.members.length <= 2) return fail("Chuyển ảnh sẽ khiến nhóm nguồn còn dưới 2 ảnh; hãy loại/tách nhóm thủ công theo cách khác.", 409);
+        if (target.members.length >= 50) return fail("Nhóm đích đã đạt giới hạn 50 ảnh.", 409);
+        const allKeys = [...source.members, ...target.members].map(member => member.key);
+        const category = await categoryFor(allKeys);
+        if (!category) return fail("Không thể chuyển ảnh giữa các nhóm khác danh mục hoặc chưa xác định.", 409);
+        const sourceMembers = source.members.filter(member => member.key !== imageKey);
+        const targetMembers = [...target.members, moving].sort((a,b)=>b.similarity-a.similarity||a.key.localeCompare(b.key));
+        const sourceFingerprint = await fingerprint(sourceMembers.map(member => member.key));
+        const targetFingerprint = await fingerprint(targetMembers.map(member => member.key));
+        if (await fingerprintConflict(sourceFingerprint, [sourceId, targetId]) || await fingerprintConflict(targetFingerprint, [sourceId, targetId])) {
+          return fail("Một bộ ảnh sau khi chuyển đã tồn tại trong lịch sử. Không thay đổi dữ liệu.", 409);
+        }
+        const sourceOld = String(source.fingerprint || ""), targetOld = String(target.fingerprint || "");
+        const deleteGate = "EXISTS (SELECT 1 FROM image_group_sets s JOIN image_group_sets t ON t.id=? WHERE s.id=? AND s.status='pending' AND s.fingerprint=? AND t.status='pending' AND t.fingerprint=?)";
+        const insertGate = "EXISTS (SELECT 1 FROM image_group_sets s JOIN image_group_sets t ON t.id=? WHERE s.id=? AND s.status='pending' AND s.fingerprint=? AND t.status='pending' AND t.fingerprint=?)";
+        const statements = [
+          env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=? AND " + deleteGate)
+            .bind(sourceId, imageKey, targetId, sourceId, sourceOld, targetOld),
+          env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) SELECT ?,?,? WHERE " + insertGate)
+            .bind(targetId, imageKey, moving.similarity, targetId, sourceId, sourceOld, targetOld),
+          env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(sourceFingerprint, average(sourceMembers), (String(source.rationale || "") + " Đã chuyển một ảnh sang nhóm " + targetId + ".").slice(0,700), sourceId, sourceOld, targetId, targetOld),
+          env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(targetFingerprint, average(targetMembers), (String(target.rationale || "") + " Đã nhận ảnh chuyển từ nhóm " + sourceId + ".").slice(0,700), targetId, targetOld, sourceId, sourceFingerprint),
+          audit("image_group_move", sourceId, { sourceGroupId: sourceId, targetGroupId: targetId, imageKey, category })
+        ];
+        const results = await env.DB.batch(statements);
+        if (!results?.[2]?.meta?.changes || !results?.[3]?.meta?.changes) return fail("Nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận chuyển ảnh.", 409);
+        return json({ ok: true, imageKey, sourceGroupId: sourceId, targetGroupId: targetId, message: "Đã chuyển ảnh giữa hai đề xuất cùng danh mục; hai nhóm vẫn chờ duyệt." });
+      }
+    } catch (error) {
+      return fail("Không thể thay đổi nhóm ảnh: " + safeError(error), 503);
+    }
+  }
+
   if (action === "approve-group") {
     const id = String(body.groupId || ""), productId = String(body.productId || "");
     if (!/^[0-9a-f-]{36}$/i.test(id) || !productId || productId.length > 120) return fail("Thiếu nhóm đề xuất hoặc sản phẩm đích.", 400);
