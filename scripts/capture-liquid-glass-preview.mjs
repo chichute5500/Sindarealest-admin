@@ -159,12 +159,15 @@ try {
       mode: document.documentElement.dataset.themeMode || 'auto',
       cards: document.querySelectorAll('#catalogGrid .product-card').length,
       heroImage: (() => { const img = document.querySelector('#heroProductImage'); return { present: !!img, loaded: !!img && img.complete && img.naturalWidth > 0, source: img?.getAttribute('src') || '' }; })(),
+      mobileNav: (() => { const nav = document.querySelector('#mobileBottomNav'); return { present: !!nav, visible: !!nav && getComputedStyle(nav).display !== 'none', tabs: nav?.querySelectorAll('[data-mobile-tab]').length || 0 }; })(),
       title: document.title,
     }));
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
     audit.interactions.push({ theme, check: 'hero-product-image-loaded-from-catalog', pass: startup.heroImage.present && startup.heroImage.loaded && !!startup.heroImage.source });
     if (!startup.heroImage.present || !startup.heroImage.loaded || !startup.heroImage.source) hardFailures.push('Hero product image failed to load from existing catalog data: ' + theme);
+    audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
+    if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
     for (const vp of viewports) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
@@ -234,9 +237,14 @@ try {
     await page.locator('#catalogGrid .mini-add').first().click();
     await page.locator('#cartOpen').click();
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#cartClose').click();
+    await page.locator('#cartDrawer.open').waitFor({ state: 'hidden' });
+    await page.locator('#mobileCartNav').click();
+    await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await settle(page);
     await capture(page, 'cart-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'add-to-cart-and-open-cart', pass: true });
+    audit.interactions.push({ theme, check: 'mobile-bottom-cart-navigation-opens-cart', pass: true });
     await context.close();
   }
 } finally {
