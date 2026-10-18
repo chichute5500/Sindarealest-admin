@@ -290,6 +290,27 @@ export async function onRequestPost(context) {
       const found = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(value).first();
       return found && !excludedIds.includes(String(found.id)) ? found : null;
     };
+    // Membership rows and claims are two parts of one logical relationship.
+    // Fail before any write if legacy/manual data drift has left a missing or
+    // wrong claim; checking only group fingerprints after DB.batch() is too late
+    // because a guarded UPDATE may change zero rows without aborting the batch.
+    const claimsAreConsistent = async (groups) => {
+      const expected = groups.flatMap(group =>
+        group.members.map(member => ({ imageKey: member.key, groupId: String(group.id) }))
+      );
+      if (!expected.length || new Set(expected.map(item => item.imageKey)).size !== expected.length) return false;
+      const keys = expected.map(item => item.imageKey);
+      const result = await env.DB.prepare(
+        "SELECT image_key,group_id,status FROM image_group_image_claims WHERE image_key IN (" + keys.map(() => "?").join(",") + ")"
+      ).bind(...keys).all();
+      const claims = result.results || [];
+      if (claims.length !== expected.length) return false;
+      const byKey = new Map(claims.map(claim => [String(claim.image_key), claim]));
+      return expected.every(item => {
+        const claim = byKey.get(item.imageKey);
+        return claim && String(claim.group_id) === item.groupId && String(claim.status) === "pending";
+      });
+    };
     try {
       if (action === "split-group") {
         const groupId = String(body.groupId || "");
@@ -299,6 +320,7 @@ export async function onRequestPost(context) {
         }
         const group = await getPendingGroup(groupId);
         if (!group) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
+        if (!await claimsAreConsistent([group])) return fail("Dữ liệu claim không khớp với thành viên nhóm. Đã dừng tách và không thay đổi dữ liệu; cần kiểm tra lại chỉ mục.", 409);
         const byKey = new Map(group.members.map(member => [member.key, member]));
         if (selected.some(key => !byKey.has(key))) return fail("Có ảnh được chọn không còn nằm trong nhóm nguồn.", 409);
         const chosen = selected.map(key => byKey.get(key));
@@ -356,6 +378,7 @@ export async function onRequestPost(context) {
         const allKeys = allMembers.map(member => member.key);
         if (allKeys.length > 50) return fail("Nhóm sau khi gộp vượt giới hạn 50 ảnh.", 409);
         if (new Set(allKeys).size !== allKeys.length) return fail("Các nhóm có ảnh trùng lặp. Hãy xử lý xung đột trước khi gộp.", 409);
+        if (!await claimsAreConsistent(groups)) return fail("Dữ liệu claim không khớp với thành viên một hoặc nhiều nhóm. Đã dừng gộp và không thay đổi dữ liệu; cần kiểm tra lại chỉ mục.", 409);
         const category = await categoryFor(allKeys);
         if (!category) return fail("Không thể gộp các nhóm có danh mục khác nhau hoặc chưa xác định.", 409);
         const combinedFingerprint = await fingerprint(allKeys);
@@ -400,6 +423,7 @@ export async function onRequestPost(context) {
         if (target.members.some(member => member.key === imageKey)) return fail("Ảnh đã nằm trong nhóm đích.", 409);
         if (source.members.length <= 2) return fail("Chuyển ảnh sẽ khiến nhóm nguồn còn dưới 2 ảnh; hãy loại/tách nhóm thủ công theo cách khác.", 409);
         if (target.members.length >= 50) return fail("Nhóm đích đã đạt giới hạn 50 ảnh.", 409);
+        if (!await claimsAreConsistent([source, target])) return fail("Dữ liệu claim không khớp với thành viên nhóm nguồn hoặc đích. Đã dừng chuyển ảnh và không thay đổi dữ liệu; cần kiểm tra lại chỉ mục.", 409);
         const allKeys = [...source.members, ...target.members].map(member => member.key);
         const category = await categoryFor(allKeys);
         if (!category) return fail("Không thể chuyển ảnh giữa các nhóm khác danh mục hoặc chưa xác định.", 409);
