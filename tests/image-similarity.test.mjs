@@ -5,8 +5,8 @@ const colorsA = [1,0,0,0, 1,0,0,0, 0,0,1,0];
 const colorsB = [0,0,0,1, 0,0,0,1, 1,0,0,0];
 const shapeA = Array.from({ length: 64 }, (_, index) => index > 20 && index < 44 ? 0.9 : 0.05);
 const shapeB = Array.from({ length: 64 }, (_, index) => index < 16 || index > 47 ? 0.95 : 0.02);
-const descriptor = (key, p_hash, shape, colors, assignedTo=[]) => ({
-  key, p_hash, features: { shape, colors }, assignedTo
+const descriptor = (key, p_hash, shape, colors, assignedTo=[], category="sneaker") => ({
+  key, p_hash, features: { shape, colors, category }, assignedTo
 });
 
 assert.equal(hashDistance("0000000000000000", "0000000000000000"), 0);
@@ -66,5 +66,16 @@ const directMatchC = descriptor("anchor/c.webp", "0011223344556677", shapeA, col
 const anchored = await findSimilarGroups([anchor, directMatchB, directMatchC]);
 assert.equal(anchored.groups.length, 1, "the first unprocessed image forms a set from its own direct matches");
 assert.deepEqual(anchored.groups[0].imageKeys, ["anchor/a.webp", "anchor/b.webp", "anchor/c.webp"]);
+assert.equal(anchored.groups[0].category, "sneaker", "every second-tier image set belongs to a first-tier product category");
 
-console.log("PASS: full-inventory comparisons, anchor-first grouping, no transitive bridge grouping, and same-SKU skip.");
+const crossCategory = await findSimilarGroups([
+  descriptor("category/shoe.webp", "0011223344556677", shapeA, colorsA, [], "sneaker"),
+  descriptor("category/belt.webp", "0011223344556677", shapeA, colorsA, [], "belt"),
+  descriptor("category/unknown.webp", "0011223344556677", shapeA, colorsA, [], "unknown"),
+  descriptor("category/shoe-2.webp", "0011223344556677", shapeA, colorsA, [], "sneaker")
+]);
+assert.equal(crossCategory.groups.length, 1, "different product categories and unknown classifications must never be grouped together");
+assert.deepEqual(crossCategory.groups[0].imageKeys, ["category/shoe-2.webp", "category/shoe.webp"]);
+assert.equal(crossCategory.groups[0].category, "sneaker");
+
+console.log("PASS: full-inventory comparisons, category-first isolation, anchor-first grouping, no transitive bridge grouping, and same-SKU skip.");
