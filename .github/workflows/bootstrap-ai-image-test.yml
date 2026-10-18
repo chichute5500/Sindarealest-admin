@@ -239,8 +239,20 @@ jobs:
                 const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
                 const ext = String(object.key || "").split(".").pop().toLowerCase();
                 const fallback = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || "";
-                const mime = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
-                if (mime && Number(object.size) > 0 && Number(object.size) <= 350000) return { key: object.key, mime };
+                const declared = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
+                if (!declared || Number(object.size) <= 0 || Number(object.size) > 350000) continue;
+                // Metadata and file extensions can be stale. Verify the bytes before
+                // selecting a candidate, otherwise an HTML/XML placeholder can make
+                // Sharp fail before the AI request is even reached.
+                const candidate = await env.IMAGES.get(object.key);
+                if (!candidate) continue;
+                const bytes = new Uint8Array(await candidate.arrayBuffer());
+                if (!bytes.length || bytes.length > 350000) continue;
+                let mime = "";
+                if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) mime = "image/jpeg";
+                else if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a) mime = "image/png";
+                else if (bytes.length >= 12 && String.fromCharCode(...bytes.slice(0,4)) === "RIFF" && String.fromCharCode(...bytes.slice(8,12)) === "WEBP") mime = "image/webp";
+                if (mime) return { key: object.key, mime, bytes };
               }
               if (!page.truncated || !page.cursor) break;
               cursor = page.cursor;
@@ -253,10 +265,7 @@ jobs:
             try {
               const chosen = await findSmallRaster(env);
               if (!chosen) return response({ ok: false, reason: "no_small_preview_raster" }, 424);
-              const object = await env.IMAGES.get(chosen.key);
-              if (!object) return response({ ok: false, reason: "r2_object_disappeared" }, 409);
-              const bytes = await object.arrayBuffer();
-              if (!bytes.byteLength || bytes.byteLength > 350000) return response({ ok: false, reason: "unsafe_image_size" }, 413);
+              const bytes = chosen.bytes;
               return new Response(bytes, { status: 200, headers: { "Content-Type": chosen.mime, "X-Preview-Image-Key": encodeURIComponent(chosen.key), "Cache-Control": "no-store" } });
             } catch (error) {
               return response({ ok: false, reason: "r2_read_error", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 120) }, 502);
