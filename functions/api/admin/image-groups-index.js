@@ -131,21 +131,54 @@ export async function onRequestPost(context) {
     if (!groups.length || groups.length > 25) return fail("Mỗi lượt lưu cần từ 1 đến 25 nhóm đề xuất.", 400);
     let saved = 0, skipped = 0;
     try {
-      for (const group of groups) {
-        const imageKeys = Array.isArray(group?.imageKeys) ? group.imageKeys : [];
-        const uniqueKeys = [...new Set(imageKeys)];
-        const similarity = Number(group?.similarity);
-        if (uniqueKeys.length !== imageKeys.length || uniqueKeys.length < 2 || uniqueKeys.length > 50 ||
-            uniqueKeys.some(key => !validKey(key)) || !Number.isInteger(similarity) || similarity < 0 || similarity > 100) {
-          return fail("Một nhóm có danh sách ảnh hoặc điểm tương đồng không hợp lệ.", 400);
+      // Normalize older pending proposals first: one image may belong to only
+      // one pending set. The oldest set keeps a shared image; later sets lose it.
+      const oldPending = await env.DB.prepare(
+        "SELECT g.id AS group_id,g.created_at,m.image_key FROM image_group_sets g JOIN image_group_set_members m ON m.group_id=g.id WHERE g.status='pending' ORDER BY g.created_at ASC,g.id ASC,m.image_key ASC"
+      ).all();
+      const claimed = new Set();
+      const membersByGroup = new Map();
+      for (const row of oldPending.results || []) {
+        if (!membersByGroup.has(row.group_id)) membersByGroup.set(row.group_id, []);
+        if (claimed.has(row.image_key)) {
+          await env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=?").bind(row.group_id, row.image_key).run();
+        } else {
+          claimed.add(row.image_key);
+          membersByGroup.get(row.group_id).push(row.image_key);
         }
+      }
+      for (const [groupId, remaining] of membersByGroup) {
+        if (remaining.length < 2) {
+          await env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(groupId).run();
+        }
+      }
+
+      for (const group of groups) {
+        const rawKeys = Array.isArray(group?.imageKeys) ? group.imageKeys : [];
+        if (rawKeys.length < 2 || rawKeys.length > 50 || rawKeys.some(key => !validKey(key)) ||
+            new Set(rawKeys).size !== rawKeys.length) {
+          return fail("Một nhóm có danh sách ảnh không hợp lệ (2–50 ảnh khác nhau).", 400);
+        }
+        const similarity = Number(group?.similarity);
+        if (!Number.isInteger(similarity) || similarity < 0 || similarity > 100) {
+          return fail("Điểm tương đồng của nhóm không hợp lệ.", 400);
+        }
+        // Keep only images not already claimed by another pending group or an
+        // earlier group in this same request. A duplicate can never enter two sets.
+        const uniqueKeys = rawKeys.filter(key => !claimed.has(key));
+        if (uniqueKeys.length < 2) { skipped++; continue; }
         const placeholders = uniqueKeys.map(() => "?").join(",");
         const indexed = await env.DB.prepare("SELECT image_key FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...uniqueKeys).all();
         const indexedKeys = new Set((indexed.results || []).map(row => row.image_key));
         if (uniqueKeys.some(key => !indexedKeys.has(key))) return fail("Có ảnh chưa được lập chỉ mục. Hãy hoàn tất quét toàn kho trước khi lưu nhóm.", 409);
         const groupFingerprint = await fingerprint(uniqueKeys);
         const existing = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(groupFingerprint).first();
-        if (existing) { skipped++; continue; }
+        if (existing) {
+          const priorMembers = await env.DB.prepare("SELECT image_key FROM image_group_set_members WHERE group_id=?").bind(existing.id).all();
+          for (const row of priorMembers.results || []) claimed.add(row.image_key);
+          skipped++;
+          continue;
+        }
         const id = crypto.randomUUID();
         const memberScores = new Map((Array.isArray(group.members) ? group.members : []).map(member => [member?.key, Number(member?.similarity)]));
         const statements = [
@@ -158,6 +191,7 @@ export async function onRequestPost(context) {
             .bind(id, key, Number.isInteger(memberScore) ? Math.max(0, Math.min(100, memberScore)) : similarity));
         }
         await env.DB.batch(statements);
+        for (const key of uniqueKeys) claimed.add(key);
         saved++;
       }
       return json({ ok: true, saved, skipped, message: "Đã lưu " + saved + " nhóm tương đồng vào hàng chờ duyệt; không ảnh nào được công khai." }, 201);
