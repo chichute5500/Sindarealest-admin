@@ -252,11 +252,36 @@ export async function onRequestPost(context) {
         if (!known.has(url) && !known.has(url.slice(1)) && !known.has(key)) images.push(url);
       }
       if (images.length > 30) return fail("Bộ ảnh sản phẩm sẽ vượt giới hạn 30 ảnh. Hãy chia nhóm nhỏ hơn.", 409);
+      // Once approved, these images are exclusively owned by this set.
+      // Remove them from every other pending proposal so the same image cannot
+      // appear in two groups in the review queue either.
+      const overlapping = await env.DB.prepare(
+        "SELECT g.id AS group_id,m.image_key FROM image_group_sets g JOIN image_group_set_members m ON m.group_id=g.id WHERE g.status='pending' AND g.id<>? AND m.image_key IN (" + keys.map(() => "?").join(",") + ")"
+      ).bind(id, ...keys).all();
+      const overlappingByGroup = new Map();
+      for (const row of overlapping.results || []) {
+        if (!overlappingByGroup.has(row.group_id)) overlappingByGroup.set(row.group_id, new Set());
+        overlappingByGroup.get(row.group_id).add(row.image_key);
+      }
+      const cleanup = [];
+      for (const [otherGroupId, overlapKeys] of overlappingByGroup) {
+        for (const key of overlapKeys) {
+          cleanup.push(env.DB.prepare("DELETE FROM image_group_set_members WHERE group_id=? AND image_key=?")
+            .bind(otherGroupId, key));
+        }
+        const countRow = await env.DB.prepare("SELECT COUNT(*) AS count FROM image_group_set_members WHERE group_id=? AND image_key NOT IN (" + keys.map(() => "?").join(",") + ")")
+          .bind(otherGroupId, ...keys).first();
+        if (Number(countRow?.count || 0) < 2) {
+          cleanup.push(env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending'")
+            .bind(otherGroupId));
+        }
+      }
       const results = await env.DB.batch([
         env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=?").bind(JSON.stringify(images), productId),
         env.DB.prepare("UPDATE image_group_sets SET status='approved',product_id=?,reviewed_at=datetime('now') WHERE id=? AND status='pending'").bind(productId, id),
         env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'image_similarity_group_approved', 'product', ?, ?)")
-          .bind(crypto.randomUUID(), productId, JSON.stringify({ groupId: id, keys, sku: product.sku, similarity: Number(group.similarity) || 0 }))
+          .bind(crypto.randomUUID(), productId, JSON.stringify({ groupId: id, keys, sku: product.sku, similarity: Number(group.similarity) || 0 })),
+        ...cleanup
       ]);
       if (!results?.[0]?.meta?.changes || !results?.[1]?.meta?.changes) return fail("Không thể lưu bộ ảnh hoặc nhóm đã được xử lý.", 409);
       return json({ ok: true, message: "Đã thêm " + keys.length + " ảnh vào bộ ảnh sản phẩm.", sku: product.sku, imageCount: images.length });
