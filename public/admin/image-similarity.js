@@ -21,6 +21,16 @@ function parseFeatures(item) {
 export function categoryOf(item) {
   const features = parseFeatures(item);
   const category = String(item?.category || features?.category || "unknown").toLowerCase();
+  // A stored category is not sufficient when its vision result was explicitly
+  // marked for review or carries a confidence below the classifier's 70% gate.
+  // Older rows without confidence metadata remain readable for compatibility;
+  // current scan writes always include both status and confidence.
+  const status = String(item?.categoryStatus || features?.categoryStatus || "").toLowerCase();
+  const confidenceValue = item?.categoryConfidence ?? features?.categoryConfidence;
+  const confidence = confidenceValue === undefined || confidenceValue === null || confidenceValue === ""
+    ? null : Number(confidenceValue);
+  if (status && status !== "classified") return "unknown";
+  if (confidence !== null && (!Number.isFinite(confidence) || confidence < 70 || confidence > 100)) return "unknown";
   return PRODUCT_CATEGORIES.has(category) ? category : "unknown";
 }
 
