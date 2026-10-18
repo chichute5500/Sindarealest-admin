@@ -8,6 +8,13 @@ on:
 permissions:
   contents: read
 
+# This workflow deploys a temporary token-gated route and then removes it.
+# Serialize runs so overlapping deploy/cleanup cycles cannot invalidate each
+# other's smoke token or test deployment.
+concurrency:
+  group: ai-image-test-project-bootstrap
+  cancel-in-progress: false
+
 jobs:
   create-isolated-pages-project:
     runs-on: ubuntu-latest
