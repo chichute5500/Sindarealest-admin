@@ -20,13 +20,15 @@ function parseFeatures(item) {
 
 export function categoryOf(item) {
   const features = parseFeatures(item);
-  const category = String(item?.category || features?.category || "unknown").toLowerCase();
-  // A stored category is not sufficient when its vision result was explicitly
-  // marked for review or carries a confidence below the classifier's 70% gate.
-  // Older rows without confidence metadata remain readable for compatibility;
-  // current scan writes always include both status and confidence.
-  const status = String(item?.categoryStatus || features?.categoryStatus || "").toLowerCase();
-  const confidenceValue = item?.categoryConfidence ?? features?.categoryConfidence;
+  let rawFeatures = item?.features && typeof item.features === "object" ? item.features : null;
+  if (!rawFeatures) {
+    try { rawFeatures = JSON.parse(item?.features_json || "{}"); } catch { rawFeatures = null; }
+  }
+  const category = String(item?.category || features?.category || rawFeatures?.category || "unknown").toLowerCase();
+  // Read safety metadata independently from shape/color validity: uncertain
+  // classifications must never become confirmed just because descriptors are incomplete.
+  const status = String(item?.categoryStatus || rawFeatures?.categoryStatus || "").toLowerCase();
+  const confidenceValue = item?.categoryConfidence ?? rawFeatures?.categoryConfidence;
   const confidence = confidenceValue === undefined || confidenceValue === null || confidenceValue === ""
     ? null : Number(confidenceValue);
   if (status && status !== "classified") return "unknown";
