@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
-import { compareDescriptors, findSimilarGroups, hashDistance } from "../public/admin/image-similarity.js";
+import { compareDescriptors, findExactDuplicateGroups, findSimilarGroups, hashDistance } from "../public/admin/image-similarity.js";
 
 const colorsA = [1,0,0,0, 1,0,0,0, 0,0,1,0];
 const colorsB = [0,0,0,1, 0,0,0,1, 1,0,0,0];
 const shapeA = Array.from({ length: 64 }, (_, index) => index > 20 && index < 44 ? 0.9 : 0.05);
 const shapeB = Array.from({ length: 64 }, (_, index) => index < 16 || index > 47 ? 0.95 : 0.02);
-const descriptor = (key, p_hash, shape, colors, assignedTo=[], category="sneaker") => ({
-  key, p_hash, features: { shape, colors, category }, assignedTo
+const descriptor = (key, p_hash, shape, colors, assignedTo=[], category="sneaker", contentHash="") => ({
+  key, p_hash, features: { shape, colors, category, ...(contentHash ? { contentHash } : {}) }, assignedTo
 });
 
 assert.equal(hashDistance("0000000000000000", "0000000000000000"), 0);
@@ -59,7 +59,29 @@ assert.equal(compareDescriptors(chainA, chainC).match, false, "the endpoints are
 const coherent = await findSimilarGroups([chainA, chainB, chainC]);
 assert.deepEqual(coherent.groups.map(group => group.imageKeys.length).sort((a,b)=>a-b), [2], "a transitive bridge must not create a mixed 3-image set");
 assert.ok(coherent.groups.some(group => group.imageKeys.includes("chain/a.webp") && group.imageKeys.includes("chain/b.webp")));
-// The anchor decides membership by its direct matches, not by candidate-to-candidate similarity.
+// Complete-link grouping must not combine a pairwise-conflicting lookalike into one product set.
+const allZeroShape = Array(64).fill(0);
+const firstHalfShape = Array.from({ length: 64 }, (_, i) => i < 32 ? 0.8 : 0);
+const secondHalfShape = Array.from({ length: 64 }, (_, i) => i >= 32 ? 0.8 : 0);
+const pairA = descriptor("strict/a.webp", "1111111111111111", allZeroShape, colorsA);
+const pairB = descriptor("strict/b.webp", "1111111111111111", firstHalfShape, colorsA);
+const pairC = descriptor("strict/c.webp", "1111111111111111", secondHalfShape, colorsA);
+assert.equal(compareDescriptors(pairA, pairB).match, true);
+assert.equal(compareDescriptors(pairA, pairC).match, true);
+assert.equal(compareDescriptors(pairB, pairC).match, false);
+const strict = await findSimilarGroups([pairA, pairB, pairC]);
+assert.ok(strict.groups.every(group => group.imageKeys.length < 3), "a candidate must directly match every member, not just the anchor");
+
+const duplicateHash = "a".repeat(64);
+const duplicateA = descriptor("duplicate/a.webp", "0011223344556677", shapeA, colorsA, [], "sneaker", duplicateHash);
+const duplicateB = descriptor("duplicate/b.webp", "0011223344556677", shapeA, colorsA, [], "sneaker", duplicateHash);
+const exactDuplicates = findExactDuplicateGroups([duplicateA, duplicateB]);
+assert.equal(exactDuplicates.length, 1, "byte-identical copies are detected with SHA-256, not only perceptual similarity");
+assert.deepEqual(exactDuplicates[0].imageKeys, ["duplicate/a.webp", "duplicate/b.webp"]);
+assert.equal(compareDescriptors(duplicateA, duplicateB).exactDuplicate, true);
+assert.equal(findExactDuplicateGroups([duplicateA, { ...duplicateB, features: { ...duplicateB.features, contentHash: "b".repeat(64) } }]).length, 0);
+
+ // The anchor decides membership by its direct matches and not by candidate-to-candidate similarity.
 const anchor = descriptor("anchor/a.webp", "0011223344556677", shapeA, colorsA);
 const directMatchB = descriptor("anchor/b.webp", "0011223344556677", shapeA, colorsA);
 const directMatchC = descriptor("anchor/c.webp", "0011223344556677", shapeA, colorsA);
