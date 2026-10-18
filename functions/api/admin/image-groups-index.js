@@ -316,11 +316,14 @@ export async function onRequestPost(context) {
         for (const member of chosen) {
           statements.push(env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) SELECT ?,?,? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
             .bind(newId, member.key, member.similarity, groupId, oldFingerprint));
+          statements.push(env.DB.prepare("UPDATE image_group_image_claims SET group_id=?,status='pending' WHERE image_key=? AND group_id=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(newId, member.key, groupId, groupId, oldFingerprint));
         }
         statements.push(
           env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=?")
             .bind(remainingFingerprint, average(remaining), remainingRationale, groupId, oldFingerprint),
-          audit("image_group_split", groupId, { newGroupId: newId, selectedKeys: selected, remainingKeys: remaining.map(member => member.key), category })
+          env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_split', 'image_group_set', ?, ? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?) AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending')")
+            .bind(crypto.randomUUID(), groupId, JSON.stringify({ newGroupId: newId, selectedKeys: selected, remainingKeys: remaining.map(member => member.key), category }), groupId, remainingFingerprint, newId)
         );
         const results = await env.DB.batch(statements);
         if (!results?.[1]?.meta?.changes || !results?.[results.length - 2]?.meta?.changes) return fail("Nhóm đã thay đổi trong lúc thao tác. Tải lại danh sách; không xác nhận tách.", 409);
@@ -355,6 +358,8 @@ export async function onRequestPost(context) {
           for (const member of group.members) {
             statements.push(env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) SELECT ?,?,? WHERE " + guardSql)
               .bind(targetId, member.key, member.similarity, ...guardArgs));
+            statements.push(env.DB.prepare("UPDATE image_group_image_claims SET group_id=? WHERE image_key=? AND group_id=? AND status='pending' AND " + guardSql)
+              .bind(targetId, member.key, group.id, ...guardArgs));
           }
         }
         statements.push(
@@ -365,7 +370,8 @@ export async function onRequestPost(context) {
           statements.push(env.DB.prepare("UPDATE image_group_sets SET status='rejected',reviewed_at=datetime('now') WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
             .bind(group.id, String(group.fingerprint || ""), targetId, combinedFingerprint));
         }
-        statements.push(audit("image_group_merge", targetId, { mergedGroupIds: groupIds, retiredGroupIds: groupIds.filter(id => id !== targetId), imageKeys: allKeys, category }));
+        statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_merge', 'image_group_set', ?, ? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+          .bind(crypto.randomUUID(), targetId, JSON.stringify({ mergedGroupIds: groupIds, retiredGroupIds: groupIds.filter(id => id !== targetId), imageKeys: allKeys, category }), targetId, combinedFingerprint));
         const results = await env.DB.batch(statements);
         const targetUpdateIndex = groups.filter(item => item.id !== targetId).reduce((sum, group) => sum + group.members.length, 0);
         if (!results?.[targetUpdateIndex]?.meta?.changes) return fail("Các nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận gộp.", 409);
@@ -400,11 +406,14 @@ export async function onRequestPost(context) {
             .bind(sourceId, imageKey, targetId, sourceId, sourceOld, targetOld),
           env.DB.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) SELECT ?,?,? WHERE " + insertGate)
             .bind(targetId, imageKey, moving.similarity, targetId, sourceId, sourceOld, targetOld),
+          env.DB.prepare("UPDATE image_group_image_claims SET group_id=? WHERE image_key=? AND group_id=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?) AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(targetId, imageKey, sourceId, sourceId, sourceOld, targetId, targetOld),
           env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
             .bind(sourceFingerprint, average(sourceMembers), (String(source.rationale || "") + " Đã chuyển một ảnh sang nhóm " + targetId + ".").slice(0,700), sourceId, sourceOld, targetId, targetOld),
           env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
             .bind(targetFingerprint, average(targetMembers), (String(target.rationale || "") + " Đã nhận ảnh chuyển từ nhóm " + sourceId + ".").slice(0,700), targetId, targetOld, sourceId, sourceFingerprint),
-          audit("image_group_move", sourceId, { sourceGroupId: sourceId, targetGroupId: targetId, imageKey, category })
+          env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_move', 'image_group_set', ?, ? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?) AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
+            .bind(crypto.randomUUID(), sourceId, JSON.stringify({ sourceGroupId: sourceId, targetGroupId: targetId, imageKey, category }), sourceId, sourceFingerprint, targetId, targetFingerprint)
         ];
         const results = await env.DB.batch(statements);
         if (!results?.[2]?.meta?.changes || !results?.[3]?.meta?.changes) return fail("Nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận chuyển ảnh.", 409);
