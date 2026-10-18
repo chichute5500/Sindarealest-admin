@@ -230,7 +230,7 @@ jobs:
           function response(body, status = 200, headers = {}) {
             return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers } });
           }
-          async function findSmallRaster(env) {
+          async function findSmallRaster(env, excludedKey = "") {
             let cursor;
             for (let pageNumber = 0; pageNumber < 20; pageNumber++) {
               const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
@@ -239,7 +239,7 @@ jobs:
                 const ext = String(object.key || "").split(".").pop().toLowerCase();
                 const fallback = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || "";
                 const declared = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
-                if (!declared || Number(object.size) <= 0 || Number(object.size) > 350000) continue;
+                if (object.key === excludedKey || !declared || Number(object.size) <= 0 || Number(object.size) > 350000) continue;
                 // Metadata and file extensions can be stale. Verify the bytes before
                 // selecting a candidate, otherwise an HTML/XML placeholder can make
                 // Sharp fail before the AI request is even reached.
@@ -262,7 +262,8 @@ jobs:
             if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
             if (typeof env?.IMAGES?.list !== "function") return response({ ok: false, reason: "r2_binding_missing" }, 503);
             try {
-              const chosen = await findSmallRaster(env);
+              const excludedKey = new URL(request.url).searchParams.get("exclude") || "";
+              const chosen = await findSmallRaster(env, excludedKey);
               if (!chosen) return response({ ok: false, reason: "no_small_preview_raster" }, 424);
               const bytes = chosen.bytes;
               return new Response(bytes, { status: 200, headers: { "Content-Type": chosen.mime, "X-Preview-Image-Key": encodeURIComponent(chosen.key), "Cache-Control": "no-store" } });
@@ -274,10 +275,13 @@ jobs:
             if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
             try {
               const body = await request.json();
-              if (!body || typeof body.imageKey !== "string" || !body.imageKey || typeof body.dataUrl !== "string" || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(body.dataUrl) || body.dataUrl.length > 250000) return response({ ok: false, reason: "invalid_jpeg_payload" }, 400);
-              // Invoke the real admin classification handler with a short-lived
-              // synthetic session and a no-write rate-limit stub. This exercises
-              // the same validation, prompt, response parser and R2 existence check.
+              const action = body?.action === "compare" ? "compare" : "classify";
+              const imageKeys = action === "compare" ? body.imageKeys : [body?.imageKey];
+              const imageData = action === "compare" ? body.imageData : [{ key: body?.imageKey, dataUrl: body?.dataUrl }];
+              if (!Array.isArray(imageKeys) || imageKeys.length !== (action === "compare" ? 2 : 1) || imageKeys.some(key => typeof key !== "string" || !key) || !Array.isArray(imageData) || imageData.length !== imageKeys.length || imageData.some((image, index) => !image || image.key !== imageKeys[index] || typeof image.dataUrl !== "string" || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(image.dataUrl) || image.dataUrl.length > 250000)) return response({ ok: false, reason: "invalid_jpeg_payload" }, 400);
+              // Invoke the real admin handler with a short-lived synthetic session
+              // and a no-write DB stub. Both classification and pair comparison
+              // exercise actual Workers AI without persisting products or reviews.
               const sessionSecret = "__SMOKE_TOKEN__";
               const session = await createSession(sessionSecret);
               const origin = new URL(request.url).origin;
@@ -289,7 +293,9 @@ jobs:
                   "Origin": origin,
                   "Sec-Fetch-Site": "same-origin"
                 },
-                body: JSON.stringify({ action: "classify-categories", imageKeys: [body.imageKey], imageData: [{ key: body.imageKey, dataUrl: body.dataUrl }] })
+                body: JSON.stringify(action === "compare"
+                  ? { action: "compare", imageKeys, imageData }
+                  : { action: "classify-categories", imageKeys, imageData })
               });
               const fakeDB = {
                 prepare(sql) {
@@ -303,10 +309,16 @@ jobs:
                 context: { request: internalRequest }
               });
               const result = await handlerResponse.json();
-              if (handlerResponse.status !== 200 || result?.ok !== true || !Array.isArray(result.items) || result.items.length !== 1) {
-                return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, 502);
+              if (action === "classify") {
+                if (handlerResponse.status !== 200 || result?.ok !== true || !Array.isArray(result.items) || result.items.length !== 1) {
+                  return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, 502);
+                }
+                return response({ ok: true, action, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: imageData[0].dataUrl.length });
               }
-              return response({ ok: true, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: body.dataUrl.length });
+              if (![200, 201].includes(handlerResponse.status) || result?.ok !== true || !(Array.isArray(result.matches) || Number.isInteger(result.matches))) {
+                return response({ ok: false, reason: "comparison_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated comparison result").slice(0, 160) }, 502);
+              }
+              return response({ ok: true, action, matches: result.matches, batches: result.batches ?? null });
             } catch (error) {
               return response({ ok: false, reason: "classification_handler_exception", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
             }
