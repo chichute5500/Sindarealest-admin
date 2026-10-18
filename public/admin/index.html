@@ -186,6 +186,12 @@ async function scanWholeImageInventory(){
       await new Promise(resolve=>setTimeout(resolve,0));
     }
     await flushIndexWrites();
+    if(failedKeys.size){
+      const failedList=[...failedKeys];
+      for(let offset=0;offset<failedList.length;offset+=100){
+        await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"invalidate-index",keys:failedList.slice(offset,offset+100)})});
+      }
+    }
     const allDescriptors=imageInventory.filter(item=>!failedKeys.has(item.key)).map(item=>{const row=indexedByKey.get(item.key);return row?{...row,key:item.key,assignedTo:item.assignedTo}:null;});
     const invalid=allDescriptors.filter(item=>!item);
     if(invalid.length)throw Error("Còn "+invalid.length+" ảnh chưa có chỉ mục do dữ liệu kho không đồng nhất. Hãy quét lại để hoàn tất.");
