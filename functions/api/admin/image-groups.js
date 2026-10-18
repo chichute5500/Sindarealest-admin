@@ -135,26 +135,17 @@ for(let i=0;i<keys.length;i++){
 let result,classification=null;
 for(let attempt=0;attempt<2&&!classification;attempt++){
   try{
-    // Cloudflare's Llama Vision binding takes the base64 image in its dedicated image field.
+    // The live Preview smoke test showed that the vision binding rejects the
+    // schema-constrained, user-only request with AI error 3030. Use the documented
+    // system + user message shape that passed real inference, then validate JSON
+    // strictly with parseCategoryResult before storing any classification.
     result=await env.AI.run(MODEL,{
-      messages:[{role:"user",content:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")}],
+      messages:[
+        {role:"system",content:"You are a strict product image classification engine. Follow the user's category list exactly. Return one JSON object only, with category and integer confidence from 0 to 100. Never add markdown or explanation."},
+        {role:"user",content:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")}
+      ],
       image:supplied[i].dataUrl,
       temperature:0,
-      // Cloudflare's current Workers AI docs list this vision model as JSON Mode
-      // compatible. Keep strict schema validation here, but still parse defensively
-      // because the provider does not guarantee schema compliance in every case.
-      response_format:{
-        type:"json_schema",
-        json_schema:{
-          type:"object",
-          properties:{
-            category:{type:"string",enum:["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]},
-            confidence:{type:"integer",minimum:0,maximum:100}
-          },
-          required:["category","confidence"],
-          additionalProperties:false
-        }
-      },
       max_tokens:180
     });
   }catch(error){
