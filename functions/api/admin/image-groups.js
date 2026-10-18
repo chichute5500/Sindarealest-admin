@@ -23,10 +23,17 @@ const items=[];
 for(let i=0;i<keys.length;i++){
 let result;
 try{
-/* Llama Vision is more reliable with one image per inference. Pass the JPEG data URL
-   in the documented top-level image field rather than packing multiple image_url
-   parts into one message, which can trigger Workers AI 3030 internal errors. */
-result=await env.AI.run(MODEL,{messages:[{role:"user",content:prompt}],image:supplied[i].dataUrl,temperature:0,max_tokens:120});
+/* Vision inputs must be part of the user's message content. A top-level image
+   field with text-only messages causes Workers AI 3030. Keep one image per call
+   to limit request size and make failures attributable to a single inventory item. */
+result=await env.AI.run(MODEL,{
+messages:[{role:"user",content:[
+{type:"text",text:prompt},
+{type:"image_url",image_url:{url:supplied[i].dataUrl}}
+]}],
+temperature:0,
+max_tokens:120
+});
 }catch(error){
 const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
 return fail("Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử quét lại.",502);
