@@ -603,6 +603,7 @@ jobs:
             localItems.push({ key, p_hash: descriptor.p_hash, features: { ...descriptor.features, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 }, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 });
           }
           const localGroups = await findSimilarGroups(localItems, { threshold: 70 });
+          if (!localGroups.groups.length || !localGroups.groups.some(group => group.imageKeys.length >= 2)) throw new Error("The production local-similarity algorithm did not group any two distinct images from the same real product gallery.");
           console.log(JSON.stringify({ sameGalleryImageCount: localItems.length, sameGalleryLocalGroups: localGroups.groups.length, sameGalleryLocalPairs: localGroups.groups.map(group => group.imageKeys.length) }));
           globalThis.fetch = originalFetch;
           await writeFile("/tmp/ai-test-repository-gallery-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData }));
