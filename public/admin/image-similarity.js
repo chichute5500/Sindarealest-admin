@@ -7,6 +7,8 @@ const POPCOUNT = Array.from({ length: 16 }, (_, value) => {
   return count;
 });
 
+const PRODUCT_CATEGORIES = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
+
 function parseFeatures(item) {
   if (item?.features && Array.isArray(item.features.shape) && Array.isArray(item.features.colors)) return item.features;
   try {
@@ -14,6 +16,12 @@ function parseFeatures(item) {
     if (Array.isArray(value.shape) && Array.isArray(value.colors)) return value;
   } catch {}
   return null;
+}
+
+export function categoryOf(item) {
+  const features = parseFeatures(item);
+  const category = String(item?.category || features?.category || "unknown").toLowerCase();
+  return PRODUCT_CATEGORIES.has(category) ? category : "unknown";
 }
 
 export function hashDistance(left, right) {
@@ -79,6 +87,10 @@ export async function findSimilarGroups(items, options = {}) {
   let compared = 0, matches = 0;
   for (let i = 0; i < count; i++) {
     for (let j = i + 1; j < count; j++) {
+      // Tier 1: category classification. Unknown or different categories are
+      // never compared in Tier 2; a weak category guess must fail closed.
+      const categoryA = categoryOf(valid[i]), categoryB = categoryOf(valid[j]);
+      if (categoryA === "unknown" || categoryB === "unknown" || categoryA !== categoryB) continue;
       const result = compareDescriptors(valid[i], valid[j]);
       compared++;
       if (result.match && result.score >= Math.max(70, threshold)) {
@@ -112,6 +124,7 @@ export async function findSimilarGroups(items, options = {}) {
     for (const index of indices) assigned[index] = 1;
 
     const members = indices.map(index => valid[index]);
+    const category = categoryOf(members[0]);
     const assignedSkus = new Set(members.flatMap(item =>
       (item.assignedTo || []).map(owner => String(owner.sku || "")).filter(Boolean)
     ));
@@ -130,13 +143,15 @@ export async function findSimilarGroups(items, options = {}) {
       const scores = chunk.map(item => item.similarity).filter(score => score > 0);
       const average = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : 0;
       groups.push({
+        category,
+        categoryLabel: ({sneaker:"Giày thể thao",loafer:"Giày lười",dress_shoe:"Giày tây",boot:"Bốt",sandal:"Dép / sandal",belt:"Thắt lưng",wallet:"Ví",watch_strap:"Dây đồng hồ",watch:"Đồng hồ",bag:"Túi",other:"Sản phẩm khác",unknown:"Chưa xác định"})[category],
         imageKeys: chunk.map(item => item.key).sort((a, b) => a.localeCompare(b)),
         members: [...chunk].sort((a, b) => a.key.localeCompare(b.key)),
         similarity: average,
         rationale: (indices.length > 30
           ? "Bộ ảnh có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. "
           : "") +
-          "Nhóm được tạo bằng cách lấy ảnh gốc theo thứ tự kho, so sánh trực tiếp với toàn bộ kho và gom các ảnh đạt ngưỡng vào cùng bộ. Không dùng liên kết bắc cầu để kéo ảnh không khớp trực tiếp vào bộ. Điểm là mức tương đồng hình ảnh, không phải xác suất cùng sản phẩm."
+          "Tầng 1 đã phân loại ảnh vào nhóm “" + (({sneaker:"giày thể thao",loafer:"giày lười",dress_shoe:"giày tây",boot:"bốt",sandal:"dép / sandal",belt:"thắt lưng",wallet:"ví",watch_strap:"dây đồng hồ",watch:"đồng hồ",bag:"túi",other:"sản phẩm khác"})[category] || category) + "”. Tầng 2 so sánh trực tiếp các ảnh trong cùng loại; không dùng liên kết bắc cầu. Đây là đề xuất theo đặc trưng hình ảnh, cần người quản trị xác nhận cùng sản phẩm."
       });
     }
   }
