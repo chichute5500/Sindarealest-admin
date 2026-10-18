@@ -225,53 +225,57 @@ jobs:
           # It reads one small Preview R2 raster, calls Workers AI once, and writes no data.
           mkdir -p "$GITHUB_WORKSPACE/functions/api"
           cat > "$smoke_route" <<'SMOKE_ROUTE'
-          function response(body, status = 200) {
-            return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+          import { parseCategoryResult } from "./admin/image-groups.js";
+          function response(body, status = 200, headers = {}) {
+            return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers } });
           }
-          function toBase64(bytes) {
-            let binary = "";
-            for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + 0x8000, bytes.length)));
-            return btoa(binary);
-          }
-          export async function onRequestPost({ request, env }) {
-            if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
-            if (typeof env?.AI?.run !== "function" || typeof env?.IMAGES?.list !== "function") return response({ ok: false, reason: "binding_missing" }, 503);
-            try {
-              let cursor, chosen;
-              for (let pageNumber = 0; pageNumber < 20 && !chosen; pageNumber++) {
-                const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
-                for (const object of page.objects || []) {
-                  const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
-                  const ext = String(object.key || "").split(".").pop().toLowerCase();
-                  const mime = supplied === "image/svg+xml" ? "" : (["image/jpeg", "image/png", "image/webp"].includes(supplied) ? supplied : ({jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || ""));
-                  if (mime && Number(object.size) > 0 && Number(object.size) <= 350000) { chosen = { key: object.key, mime }; break; }
-                }
-                if (!page.truncated || !page.cursor) break;
-                cursor = page.cursor;
+          async function findSmallRaster(env) {
+            let cursor;
+            for (let pageNumber = 0; pageNumber < 20; pageNumber++) {
+              const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
+              for (const object of page.objects || []) {
+                const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
+                const ext = String(object.key || "").split(".").pop().toLowerCase();
+                const fallback = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || "";
+                const mime = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
+                if (mime && Number(object.size) > 0 && Number(object.size) <= 350000) return { key: object.key, mime };
               }
+              if (!page.truncated || !page.cursor) break;
+              cursor = page.cursor;
+            }
+            return null;
+          }
+          export async function onRequestGet({ request, env }) {
+            if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
+            if (typeof env?.IMAGES?.list !== "function") return response({ ok: false, reason: "r2_binding_missing" }, 503);
+            try {
+              const chosen = await findSmallRaster(env);
               if (!chosen) return response({ ok: false, reason: "no_small_preview_raster" }, 424);
               const object = await env.IMAGES.get(chosen.key);
               if (!object) return response({ ok: false, reason: "r2_object_disappeared" }, 409);
-              const bytes = new Uint8Array(await object.arrayBuffer());
-              if (!bytes.length || bytes.length > 350000) return response({ ok: false, reason: "unsafe_image_size" }, 413);
+              const bytes = await object.arrayBuffer();
+              if (!bytes.byteLength || bytes.byteLength > 350000) return response({ ok: false, reason: "unsafe_image_size" }, 413);
+              return new Response(bytes, { status: 200, headers: { "Content-Type": chosen.mime, "Cache-Control": "no-store" } });
+            } catch (error) {
+              return response({ ok: false, reason: "r2_read_error", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 120) }, 502);
+            }
+          }
+          export async function onRequestPost({ request, env }) {
+            if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
+            if (typeof env?.AI?.run !== "function") return response({ ok: false, reason: "ai_binding_missing" }, 503);
+            try {
+              const body = await request.json();
+              if (!body || typeof body.dataUrl !== "string" || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(body.dataUrl) || body.dataUrl.length > 250000) return response({ ok: false, reason: "invalid_jpeg_payload" }, 400);
               const result = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
                 messages: [{ role: "user", content: "Classify the main product in this image as exactly one category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Return only JSON with category and integer confidence from 0 to 100." }],
-                image: "data:" + chosen.mime + ";base64," + toBase64(bytes),
+                image: body.dataUrl,
                 temperature: 0,
                 response_format: { type: "json_schema", json_schema: { type: "object", properties: { category: { type: "string", enum: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"] }, confidence: { type: "integer", minimum: 0, maximum: 100 } }, required: ["category","confidence"], additionalProperties: false } },
                 max_tokens: 180
               });
-              let parsed = result?.response;
-              if (typeof parsed === "string") {
-                try { parsed = JSON.parse(parsed); } catch {
-                  const match = parsed.match(/\{[\s\S]*\}/);
-                  if (match) { try { parsed = JSON.parse(match[0]); } catch {} }
-                }
-              }
-              const allowed = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
-              const confidence = Number(parsed?.confidence);
-              if (!parsed || typeof parsed !== "object" || !allowed.has(parsed.category) || !Number.isInteger(confidence) || confidence < 0 || confidence > 100) return response({ ok: false, reason: "invalid_model_response" }, 502);
-              return response({ ok: true, imageKey: chosen.key, imageBytes: bytes.length, category: parsed.category, confidence });
+              const parsed = parseCategoryResult(result);
+              if (!parsed) return response({ ok: false, reason: "invalid_model_response" }, 502);
+              return response({ ok: true, category: parsed.category, confidence: parsed.confidence, imageBytes: body.dataUrl.length });
             } catch (error) {
               return response({ ok: false, reason: "workers_ai_error", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
             }
@@ -293,17 +297,37 @@ jobs:
           test "$api_status" = "401" || { echo "::error::Unauthenticated admin API should return 401, received HTTP $api_status."; exit 1; }
           echo "PASS: test site, admin route, and protected API smoke checks."
 
-          ai_smoke_status="$(curl --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci")"
-          if [ "$ai_smoke_status" = "200" ]; then
-            jq -e '.ok == true and (.category | type == "string") and (.confidence | type == "number") and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
-              echo "::error::Real Workers AI smoke response was invalid. Response body omitted."; exit 1;
-            }
-            echo "PASS: real Workers AI inference used one small image from Preview R2. No database or product gallery was modified."
-          elif [ "$ai_smoke_status" = "424" ]; then
+          source_status="$(curl --connect-timeout 10 --max-time 30 --silent --show-error -o /tmp/ai-test-vision-source -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci")"
+          if [ "$source_status" = "424" ]; then
             echo "::warning::No suitable small raster image exists in Preview R2; actual vision inference could not be tested."
+          elif [ "$source_status" = "200" ]; then
+            node --input-type=module - <<'NODE'
+          import sharp from "sharp";
+          import { readFile, writeFile } from "node:fs/promises";
+          const source = await readFile("/tmp/ai-test-vision-source");
+          const jpeg = await sharp(source, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+          if (!jpeg.length || jpeg.length > 180000) throw new Error("Converted smoke image exceeds safe size.");
+          await writeFile("/tmp/ai-test-vision-jpeg.b64", jpeg.toString("base64"));
+          NODE
+            node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const encoded = (await readFile("/tmp/ai-test-vision-jpeg.b64", "utf8")).trim();
+          await writeFile("/tmp/ai-test-vision-request.json", JSON.stringify({ dataUrl: "data:image/jpeg;base64," + encoded }));
+          NODE
+            ai_smoke_status="$(curl --connect-timeout 10 --max-time 60 --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-vision-request.json "$base/api/ai-smoke-ci")"
+            if [ "$ai_smoke_status" = "200" ]; then
+              jq -e '.ok == true and (.category | type == "string") and (.confidence | type == "number") and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
+                echo "::error::Real Workers AI smoke response was invalid. Response body omitted."; exit 1;
+              }
+              echo "PASS: real Workers AI inference used a JPEG-converted image from Preview R2. No database or product gallery was modified."
+            else
+              diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
+              echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
+              exit 1
+            fi
           else
-            diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
-            echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
+            diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision-source 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
+            echo "::error::Could not retrieve a test image from Preview R2 (HTTP $source_status). Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
             exit 1
           fi
 
@@ -362,6 +386,6 @@ jobs:
           else
             echo "::warning::Authenticated/AI runtime smoke tests skipped because AI_TEST_ADMIN_PASSWORD is not configured as a dedicated GitHub Actions secret."
           fi
-          rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-source-image.b64 /tmp/ai-test-classify.json /tmp/ai-test-classify-request.json
+          rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-source-image.b64 /tmp/ai-test-classify.json /tmp/ai-test-classify-request.json /tmp/ai-test-vision-source /tmp/ai-test-vision-jpeg.b64 /tmp/ai-test-vision-request.json /tmp/ai-test-vision.json
           echo "Test project deployment: $base"
           echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
