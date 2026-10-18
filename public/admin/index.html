@@ -194,17 +194,21 @@ async function scanWholeImageInventory(){
     }});
     const groups=result.groups||[];
     let saved=0,skipped=0;
-    for(let offset=0;offset<groups.length;offset+=10){
-      const batch=groups.slice(offset,offset+10).map(group=>({imageKeys:group.imageKeys,similarity:group.similarity,rationale:group.rationale,members:group.members}));
+    const oversizedGroups=groups.filter(group=>group.imageKeys.length>50);
+    const saveableGroups=groups.filter(group=>group.imageKeys.length<=50);
+    for(let offset=0;offset<saveableGroups.length;offset+=10){
+      const batch=saveableGroups.slice(offset,offset+10).map(group=>({imageKeys:group.imageKeys,similarity:group.similarity,rationale:group.rationale,members:group.members}));
       const response=await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"save-groups",groups:batch})});
       saved+=Number(response.saved||0);skipped+=Number(response.skipped||0);
-      imageScanProgress="Đang lưu nhóm đề xuất "+Math.min(offset+batch.length,groups.length)+"/"+groups.length+"…";
-      const el=$('#imageScanProgress');if(el)el.textContent=imageScanProgress;
+      imageScanProgress="Đang lưu nhóm đề xuất "+Math.min(offset+batch.length,saveableGroups.length)+"/"+saveableGroups.length+"…";
+      const el=$("#imageScanProgress");if(el)el.textContent=imageScanProgress;
     }
     await loadImageGroups({refreshInventory:false});
-    const summary="Quét xong "+imageInventory.length+" ảnh; đã so sánh "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp trên toàn kho; tìm thấy "+groups.length+" nhóm, lưu mới "+saved+", nhóm đã có/bị từ chối "+skipped+".";
+    const failureNote=failureDetails.length?" Bỏ qua "+failureDetails.length+" ảnh không đọc được; ví dụ: "+failureDetails.slice(0,3).map(item=>item.key+" ("+item.error+")").join("; ")+".":"";
+    const largeNote=oversizedGroups.length?" "+oversizedGroups.length+" nhóm có trên 50 ảnh không được đưa vào hàng chờ để tránh lưu nhóm quá lớn; cần chia nhỏ trước khi duyệt.":"";
+    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã so sánh "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp xuyên toàn kho; tìm thấy "+groups.length+" nhóm, lưu mới "+saved+", nhóm đã có/bị từ chối "+skipped+"."+failureNote+largeNote;
     imageScanProgress=summary;
-    return {ok:true,message:summary,skippedCount:result.skippedCount||0};
+    return {ok:true,message:summary,skippedCount:result.skippedCount||0,failedImages:failureDetails.length,oversizedGroups:oversizedGroups.length};
   }catch(error){
     imageScanProgress="Chưa hoàn tất: "+String(error?.message||error)+"\nKhông lưu nhóm đề xuất nếu bước đối chiếu toàn kho chưa hoàn thành.";
     throw error;
