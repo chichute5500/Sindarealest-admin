@@ -302,7 +302,8 @@ jobs:
           elif [ "$ai_smoke_status" = "424" ]; then
             echo "::warning::No suitable small raster image exists in Preview R2; actual vision inference could not be tested."
           else
-            echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Response body omitted."
+            diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
+            echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
             exit 1
           fi
 
