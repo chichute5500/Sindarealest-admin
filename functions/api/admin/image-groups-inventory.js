@@ -12,9 +12,10 @@ function rasterMime(object) {
   const ext = key.includes(".") ? key.split(".").pop().toLowerCase() : "";
   const expected = IMAGE_EXTENSIONS.get(ext);
   const supplied = String(object?.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
-  if (supplied.startsWith("image/") && supplied !== "image/svg+xml" && supplied !== "image/svg") {
-    return expected && supplied === "application/octet-stream" ? expected : supplied;
-  }
+  // Never fall back to the filename extension when R2 explicitly identifies SVG.
+  // SVG is active content and this inventory accepts raster images only.
+  if (supplied === "image/svg+xml" || supplied === "image/svg") return "";
+  if (supplied.startsWith("image/")) return supplied;
   return expected || "";
 }
 
