@@ -1,0 +1,85 @@
+import assert from "node:assert/strict";
+import { parseCategoryResult } from "../functions/api/admin/image-groups.js";
+
+const allowed = new Set([
+  "sneaker", "loafer", "dress_shoe", "boot", "sandal", "belt",
+  "wallet", "watch_strap", "watch", "bag", "other", "unknown"
+]);
+
+// Native binding can return a structured response object instead of a string.
+assert.deepEqual(
+  parseCategoryResult({
+    response: { category: "sneaker", confidence: 94 },
+    tool_calls: [],
+    usage: { prompt_tokens: 200 }
+  }, allowed),
+  { category: "sneaker", confidence: 94 }
+);
+
+// Some model responses carry the classification in tool-call arguments.
+assert.deepEqual(
+  parseCategoryResult({
+    response: "",
+    tool_calls: [{
+      name: "classify_product",
+      arguments: { category: "dress_shoe", confidence: "0.88" }
+    }],
+    usage: {}
+  }, allowed),
+  { category: "dress_shoe", confidence: 88 }
+);
+
+// Tool-call arguments may themselves be JSON encoded as a string.
+assert.deepEqual(
+  parseCategoryResult({
+    response: null,
+    tool_calls: [{
+      function: {
+        name: "classify_product",
+        arguments: "{\"category\":\"watch_band\",\"confidence\":\"92%\"}"
+      }
+    }],
+    usage: {}
+  }, allowed),
+  { category: "watch_strap", confidence: 92 }
+);
+
+// OpenAI-compatible wrapper may put JSON inside content parts.
+assert.deepEqual(
+  parseCategoryResult({
+    response: { content: [{ type: "text", text: "{\"category\":\"belt\",\"confidence\":97}" }] },
+    tool_calls: [],
+    usage: {}
+  }, allowed),
+  { category: "belt", confidence: 97 }
+);
+
+// Nested response values and Vietnamese category labels are handled.
+assert.deepEqual(
+  parseCategoryResult({
+    response: {
+      result: {
+        product_category: { label: "giày thể thao" },
+        confidence_score: { value: 0.91 }
+      }
+    }
+  }, allowed),
+  { category: "sneaker", confidence: 91 }
+);
+
+// Plain JSON strings, aliases, percentage and decimal scores remain supported.
+assert.deepEqual(
+  parseCategoryResult({ response: "{\"category\":\"loafers\",\"score\":0.9}" }, allowed),
+  { category: "loafer", confidence: 90 }
+);
+assert.deepEqual(
+  parseCategoryResult({ response: "Category: wallet; confidence: 86%" }, allowed),
+  { category: "wallet", confidence: 86 }
+);
+
+// Never fabricate a confidence or accept an unrecognized category.
+assert.equal(parseCategoryResult({ response: { category: "sneaker" } }, allowed), null);
+assert.equal(parseCategoryResult({ response: { category: "car", confidence: 99 } }, allowed), null);
+assert.equal(parseCategoryResult({ response: "I think this is a sneaker." }, allowed), null);
+
+console.log("PASS: parser handles nested response objects, tool_calls, content parts, aliases and confidence formats.");
