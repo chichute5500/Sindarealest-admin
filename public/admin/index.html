@@ -230,7 +230,7 @@ async function scanWholeImageInventory(){
     await loadImageGroups({refreshInventory:false});
     const failureNote=failureDetails.length?" Bỏ qua "+failureDetails.length+" ảnh không đọc được; ví dụ: "+failureDetails.slice(0,3).map(item=>item.key+" ("+item.error+")").join("; ")+".":"";
     const largeNote=oversizedGroups.length?" "+oversizedGroups.length+" nhóm có trên 50 ảnh không được đưa vào hàng chờ để tránh lưu nhóm quá lớn; cần chia nhỏ trước khi duyệt.":"";
-    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã so sánh "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp xuyên toàn kho; tìm thấy "+groups.length+" nhóm, lưu mới "+saved+", nhóm đã có/bị từ chối "+skipped+"."+failureNote+largeNote;
+    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã so sánh "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp cùng nhóm loại sau khi kiểm tra toàn kho; tìm thấy "+groups.length+" bộ ảnh đề xuất, lưu mới "+saved+", nhóm đã có/bị từ chối "+skipped+"."+failureNote+largeNote;
     imageScanProgress=summary;
     return {ok:true,message:summary,skippedCount:result.skippedCount||0,failedImages:failureDetails.length,oversizedGroups:oversizedGroups.length};
   }catch(error){
