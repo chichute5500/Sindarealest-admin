@@ -49,6 +49,8 @@ const valid = await call();
 assert.equal(valid.status, 200, JSON.stringify(valid.body));
 assert.deepEqual(valid.body.items, [{ key, category: "dress_shoe", confidence: 91, status: "classified" }]);
 assert.equal(lastModelInput.model, "@cf/meta/llama-3.2-11b-vision-instruct");
+assert.equal(lastModelInput.input.image, dataUrl, "the actual image bytes must be passed in the documented vision image field");
+assert.equal(typeof lastModelInput.input.messages[0].content, "string", "instructions should be text, not unsupported image_url content parts");
 assert.equal(lastModelInput.input.response_format.type, "json_schema");
 assert.deepEqual(lastModelInput.input.response_format.json_schema.required, ["category", "confidence"]);
 
