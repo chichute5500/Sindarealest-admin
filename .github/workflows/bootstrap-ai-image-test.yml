@@ -483,9 +483,20 @@ jobs:
             echo "PASS: dedicated test admin credentials work."
 
             inventory_status="$(curl --silent --show-error -o /tmp/ai-test-inventory.json -w "%{http_code}" \
-              -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=100")"
+              -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=1000")"
             test "$inventory_status" = "200" || { echo "::error::Authenticated D1/R2 inventory returned HTTP $inventory_status."; exit 1; }
-            echo "PASS: authenticated D1/R2 inventory endpoint responded. Real image bytes and Workers AI inference are verified by the isolated, format-checked vision smoke route above."
+            inventory_cursor="$(jq -r ".nextCursor // empty" /tmp/ai-test-inventory.json)"
+            for inventory_page in $(seq 2 10); do
+              [ -n "$inventory_cursor" ] || break
+              encoded_cursor="$(jq -rn --arg cursor "$inventory_cursor" '$cursor|@uri')"
+              page_status="$(curl --silent --show-error -o /tmp/ai-test-inventory-page.json -w "%{http_code}" \
+                -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=1000&cursor=$encoded_cursor")"
+              test "$page_status" = "200" || { echo "::error::Authenticated inventory page $inventory_page failed with HTTP $page_status."; exit 1; }
+              jq -s '{images:(.[0].images + .[1].images),hasMore:.[1].hasMore,nextCursor:.[1].nextCursor}' /tmp/ai-test-inventory.json /tmp/ai-test-inventory-page.json > /tmp/ai-test-inventory-merged.json
+              mv /tmp/ai-test-inventory-merged.json /tmp/ai-test-inventory.json
+              inventory_cursor="$(jq -r ".nextCursor // empty" /tmp/ai-test-inventory.json)"
+            done
+            echo "PASS: authenticated D1/R2 inventory endpoint responded; scanned up to 10,000 inventory objects to find real same-SKU gallery pairs."
             # Stronger positive control: compare two distinct gallery images assigned to the same SKU.
             # This is more meaningful than comparing the same bytes under two different keys.
             same_sku_keys="$(jq -r '[.images[] | select((.size|tonumber)>0 and (.size|tonumber)<=350000 and (.assignedTo|type)=="array" and (.assignedTo|length)>0) | {key,sku:.assignedTo[0].sku}] | group_by(.sku) | map(select(length>=2) | .[0:2]) | first // [] | .[].key' /tmp/ai-test-inventory.json)"
