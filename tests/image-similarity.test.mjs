@@ -47,6 +47,18 @@ const alreadyAssigned = items.slice(0,2).map(item => ({ ...item, assignedTo: [{ 
 const skipped = await findSimilarGroups(alreadyAssigned);
 assert.equal(skipped.groups.length, 0, "do not re-propose images already assigned to the same SKU");
 
+// Sort proposed gallery members by the computed similarity rank, not by file name.
+const rankAnchor = descriptor("z-anchor.webp", "1111111111111111", Array(64).fill(0), colorsA);
+const rankStrong = descriptor("b-strong.webp", "1111111111111111", Array(64).fill(0.1), colorsA);
+const rankWeak = descriptor("a-weaker.webp", "1111111111111111", Array(64).fill(0.3), colorsA);
+const ranked = await findSimilarGroups([rankAnchor, rankStrong, rankWeak]);
+const rankedGroup = ranked.groups.find(group => group.imageKeys.length === 3);
+assert.ok(rankedGroup, "fixture should propose one coherent 3-image set");
+assert.deepEqual(rankedGroup.imageKeys, rankedGroup.members.map(member => member.key),
+  "imageKeys and member ordering should remain aligned");
+assert.notDeepEqual(rankedGroup.imageKeys, [...rankedGroup.imageKeys].sort(),
+  "proposal ordering must not be replaced by lexical filename ordering");
+
 // A bridge image must not transitively combine otherwise incompatible products.
 const chainA = descriptor("chain/a.webp", "0011223344556677", Array(64).fill(0), colorsA);
 const chainBShape = Array.from({ length: 64 }, (_, i) => i < 40 ? 0.5 : 0);
