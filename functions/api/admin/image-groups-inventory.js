@@ -47,9 +47,19 @@ export async function onRequestGet({ request, env }) {
   const cursor = url.searchParams.get("cursor") || "";
   if (cursor.length > MAX_CURSOR_LENGTH) return fail("Cursor quét kho không hợp lệ.", 400);
   try {
-    const products = await env.DB.prepare("SELECT id,sku,title,images_json FROM products ORDER BY sku ASC LIMIT 2000").all();
+    // Read every product in bounded pages so a large catalog cannot silently
+    // make already-assigned images appear unassigned in the similarity review.
+    const products = [];
+    let productOffset = 0;
+    while (true) {
+      const productPage = await env.DB.prepare("SELECT id,sku,title,images_json FROM products ORDER BY sku ASC, id ASC LIMIT 500 OFFSET ?").bind(productOffset).all();
+      const rows = productPage.results || [];
+      products.push(...rows);
+      if (rows.length < 500) break;
+      productOffset += rows.length;
+    }
     const assignments = new Map();
-    for (const product of products.results || []) {
+    for (const product of products) {
       let refs = [];
       try { refs = JSON.parse(product.images_json || "[]"); } catch {}
       for (const reference of Array.isArray(refs) ? refs : []) {
@@ -85,7 +95,8 @@ export async function onRequestGet({ request, env }) {
         scannedObjects,
         imageObjects: images.length,
         nonImageObjects: nonImages,
-        assignmentsIncomplete: (products.results || []).length >= 2000
+        productsIndexed: products.length,
+        assignmentsIncomplete: false
       }
     });
   } catch (error) {
