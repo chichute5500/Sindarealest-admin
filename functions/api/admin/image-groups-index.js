@@ -49,7 +49,7 @@ export async function onRequestGet({ request, env }) {
       env.DB.prepare("SELECT image_key,p_hash,features_json,width,height,source_size,source_uploaded FROM image_group_index ORDER BY image_key LIMIT ? OFFSET ?").bind(limit, offset).all(),
       env.DB.prepare("SELECT COUNT(*) AS count FROM image_group_index").first(),
       includeGroups ? env.DB.prepare("SELECT id,fingerprint,similarity,rationale,status,product_id,created_at FROM image_group_sets WHERE status='pending' ORDER BY similarity DESC,created_at DESC LIMIT 300").all() : Promise.resolve({results:[]}),
-      includeGroups ? env.DB.prepare("SELECT m.group_id,m.image_key,m.similarity FROM image_group_set_members m JOIN image_group_sets g ON g.id=m.group_id WHERE g.status='pending' ORDER BY m.group_id,m.image_key").all() : Promise.resolve({results:[]}),
+      includeGroups ? env.DB.prepare("SELECT m.group_id,m.image_key,m.similarity FROM image_group_set_members m JOIN image_group_sets g ON g.id=m.group_id WHERE g.status='pending' AND g.id IN (SELECT id FROM image_group_sets WHERE status='pending' ORDER BY similarity DESC,created_at DESC LIMIT 300) ORDER BY m.group_id,m.image_key").all() : Promise.resolve({results:[]}),
       includeGroups ? env.DB.prepare("SELECT id,image_a,image_b,same_product,confidence,rationale,status,product_id,created_at FROM image_group_reviews WHERE status='pending' ORDER BY created_at DESC LIMIT 100").all() : Promise.resolve({results:[]})
     ]);
     const memberMap = new Map();
