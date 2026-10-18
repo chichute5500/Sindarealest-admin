@@ -93,4 +93,12 @@ assert.equal(parseCategoryResult({ response: { category: "sneaker" } }, allowed)
 assert.equal(parseCategoryResult({ response: { category: "car", confidence: 99 } }, allowed), null);
 assert.equal(parseCategoryResult({ response: "I think this is a sneaker." }, allowed), null);
 
-console.log("PASS: parser handles nested response objects, tool_calls, content parts, aliases and confidence formats.");
+const source = await readFile(new URL("../functions/api/admin/image-groups.js", import.meta.url), "utf8");
+assert.match(source, /response_format:\s*\{/,
+  "classification should use Cloudflare's documented JSON schema mode");
+assert.match(source, /type:"json_schema"/,
+  "classification should request structured JSON rather than free-form output");
+assert.match(source, /additionalProperties:false/,
+  "the schema should reject extra fields where the model honors it");
+
+console.log("PASS: parser handles nested Workers AI payloads, aliases and confidence formats; classifier requests documented JSON schema mode.");
