@@ -73,7 +73,6 @@ export async function findSimilarGroups(items, options = {}) {
   const parent = Int32Array.from({ length: count }, (_, index) => index);
   const rank = new Uint8Array(count);
   const bestScore = new Uint8Array(count);
-  const edgeScores = new Map();
   const find = value => {
     let root = value;
     while (parent[root] !== root) root = parent[root];
@@ -94,7 +93,6 @@ export async function findSimilarGroups(items, options = {}) {
       compared++;
       if (result.match && (result.score >= threshold || (result.phashDistance <= 8 && result.shapeSimilarity >= 40))) {
         union(i, j);
-        edgeScores.set(i + ":" + j, result.score);
         bestScore[i] = Math.max(bestScore[i], result.score);
         bestScore[j] = Math.max(bestScore[j], result.score);
         matches++;
@@ -119,14 +117,12 @@ export async function findSimilarGroups(items, options = {}) {
     const assignedSkus = new Set(members.flatMap(item => (item.assignedTo || []).map(owner => String(owner.sku || "")).filter(Boolean)));
     const allAssigned = members.every(item => Array.isArray(item.assignedTo) && item.assignedTo.length > 0);
     if (allAssigned && assignedSkus.size === 1) continue; // Already grouped under the same SKU.
-    const scores = [];
-    for (let a = 0; a < indices.length; a++) {
-      for (let b = a + 1; b < indices.length; b++) {
-        const x = indices[a], y = indices[b], edge = edgeScores.get(Math.min(x, y) + ":" + Math.max(x, y));
-        if (edge !== undefined) scores.push(edge);
-      }
-    }
-    const average = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : Math.min(...indices.map(index => bestScore[index]));
+    // Keep memory bounded: do not retain every matching pair for dense inventories.
+    // Member best-match scores provide a useful review score without an O(matches) edge map.
+    const memberBestScores = indices.map(index => bestScore[index]).filter(score => score > 0);
+    const average = memberBestScores.length
+      ? Math.round(memberBestScores.reduce((sum, value) => sum + value, 0) / memberBestScores.length)
+      : 0;
     const indexByKey = new Map(members.map((item, position) => [item.key, indices[position]]));
     const sorted = members.map((item, position) => ({
       key: item.key,
@@ -135,15 +131,11 @@ export async function findSimilarGroups(items, options = {}) {
     const chunks = [];
     for (let offset = 0; offset < sorted.length; offset += 30) chunks.push(sorted.slice(offset, offset + 30));
     for (let part = 0; part < chunks.length; part++) {
-      const chunk = chunks[part], chunkScores = [];
-      for (let a = 0; a < chunk.length; a++) {
-        for (let b = a + 1; b < chunk.length; b++) {
-          const x = indexByKey.get(chunk[a].key), y = indexByKey.get(chunk[b].key);
-          const edge = edgeScores.get(Math.min(x, y) + ":" + Math.max(x, y));
-          if (edge !== undefined) chunkScores.push(edge);
-        }
-      }
-      const chunkAverage = chunkScores.length ? Math.round(chunkScores.reduce((sum, value) => sum + value, 0) / chunkScores.length) : average;
+      const chunk = chunks[part];
+      const chunkBestScores = chunk.map(item => bestScore[indexByKey.get(item.key)]).filter(score => score > 0);
+      const chunkAverage = chunkBestScores.length
+        ? Math.round(chunkBestScores.reduce((sum, value) => sum + value, 0) / chunkBestScores.length)
+        : average;
       groups.push({
         imageKeys: chunk.map(item => item.key).sort((a, b) => a.localeCompare(b)),
         members: [...chunk].sort((a, b) => a.key.localeCompare(b.key)),
