@@ -13,7 +13,9 @@ function validDescriptor(item) {
   if (!Number.isFinite(Number(item.sourceSize)) || Number(item.sourceSize) < 0 || Number(item.sourceSize) > 100000000) return false;
   if (String(item.sourceUploaded || "").length > 48) return false;
   const shape = item.features?.shape, colors = item.features?.colors;
-  return Array.isArray(shape) && shape.length === 64 &&
+  const contentHash = String(item.features?.contentHash || "");
+  return /^[0-9a-f]{64}$/i.test(contentHash) &&
+    Array.isArray(shape) && shape.length === 64 &&
     shape.every(value => Number.isFinite(Number(value)) && Number(value) >= 0 && Number(value) <= 1) &&
     Array.isArray(colors) && colors.length === 12 &&
     colors.every(value => Number.isFinite(Number(value)) && Number(value) >= 0 && Number(value) <= 1);
@@ -49,7 +51,7 @@ export async function onRequestGet({ request, env }) {
       env.DB.prepare("SELECT image_key,p_hash,features_json,width,height,source_size,source_uploaded FROM image_group_index ORDER BY image_key LIMIT ? OFFSET ?").bind(limit, offset).all(),
       env.DB.prepare("SELECT COUNT(*) AS count FROM image_group_index").first(),
       includeGroups ? env.DB.prepare("SELECT id,fingerprint,similarity,rationale,status,product_id,created_at FROM image_group_sets WHERE status='pending' ORDER BY similarity DESC,created_at DESC LIMIT 300").all() : Promise.resolve({results:[]}),
-      includeGroups ? env.DB.prepare("SELECT m.group_id,m.image_key,m.similarity FROM image_group_set_members m JOIN image_group_sets g ON g.id=m.group_id WHERE g.status='pending' AND g.id IN (SELECT id FROM image_group_sets WHERE status='pending' ORDER BY similarity DESC,created_at DESC LIMIT 300) ORDER BY m.group_id,m.image_key").all() : Promise.resolve({results:[]}),
+      includeGroups ? env.DB.prepare("SELECT m.group_id,m.image_key,m.similarity FROM image_group_set_members m JOIN image_group_sets g ON g.id=m.group_id WHERE g.status='pending' AND g.id IN (SELECT id FROM image_group_sets WHERE status='pending' ORDER BY similarity DESC,created_at DESC LIMIT 300) ORDER BY m.group_id,m.similarity DESC,m.image_key").all() : Promise.resolve({results:[]}),
       includeGroups ? env.DB.prepare("SELECT id,image_a,image_b,same_product,confidence,rationale,status,product_id,created_at FROM image_group_reviews WHERE status='pending' ORDER BY created_at DESC LIMIT 100").all() : Promise.resolve({results:[]})
     ]);
     const memberMap = new Map();
@@ -117,6 +119,7 @@ export async function onRequestPost(context) {
         item.key, String(item.p_hash).toLowerCase(), JSON.stringify({
           shape: item.features.shape.map(Number),
           colors: item.features.colors.map(Number),
+          contentHash: String(item.features.contentHash).toLowerCase(),
           category: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"].includes(String(item.features.category || "").toLowerCase()) ? String(item.features.category).toLowerCase() : "unknown"
         }), Number(item.width), Number(item.height), Number(item.sourceSize), String(item.sourceUploaded || "")
       ));
@@ -232,7 +235,7 @@ export async function onRequestPost(context) {
     try {
       const group = await env.DB.prepare("SELECT * FROM image_group_sets WHERE id=? AND status='pending'").bind(id).first();
       if (!group) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
-      const memberRows = await env.DB.prepare("SELECT image_key,similarity FROM image_group_set_members WHERE group_id=? ORDER BY image_key").bind(id).all();
+      const memberRows = await env.DB.prepare("SELECT image_key,similarity FROM image_group_set_members WHERE group_id=? ORDER BY similarity DESC,image_key ASC").bind(id).all();
       const keys = (memberRows.results || []).map(row => String(row.image_key || ""));
       if (keys.length < 2 || keys.length > 50) return fail("Nhóm không có số lượng ảnh hợp lệ.", 409);
       const [objects, product] = await Promise.all([
