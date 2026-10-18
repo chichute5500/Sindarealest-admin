@@ -84,9 +84,10 @@ export async function findSimilarGroups(items, options = {}) {
   // Each image is compared against the complete inventory before groups are formed.
   const matchesByIndex = Array.from({ length: count }, () => []);
   const bestScore = new Uint8Array(count);
-  let compared = 0, matches = 0;
+  let compared = 0, visited = 0, matches = 0;
   for (let i = 0; i < count; i++) {
     for (let j = i + 1; j < count; j++) {
+      visited++;
       // Tier 1: category classification. Unknown or different categories are
       // never compared in Tier 2; a weak category guess must fail closed.
       const categoryA = categoryOf(valid[i]), categoryB = categoryOf(valid[j]);
@@ -100,8 +101,8 @@ export async function findSimilarGroups(items, options = {}) {
         bestScore[j] = Math.max(bestScore[j], result.score);
         matches++;
       }
-      if (compared % 20000 === 0) {
-        options.onProgress?.({ phase: "matching", done: compared, total, matches });
+      if (visited % 20000 === 0) {
+        options.onProgress?.({ phase: "matching", done: visited, total, matches });
         await nextFrame();
       }
     }
