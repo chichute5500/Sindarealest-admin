@@ -486,6 +486,41 @@ jobs:
               -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=100")"
             test "$inventory_status" = "200" || { echo "::error::Authenticated D1/R2 inventory returned HTTP $inventory_status."; exit 1; }
             echo "PASS: authenticated D1/R2 inventory endpoint responded. Real image bytes and Workers AI inference are verified by the isolated, format-checked vision smoke route above."
+            # Stronger positive control: compare two distinct gallery images assigned to the same SKU.
+            # This is more meaningful than comparing the same bytes under two different keys.
+            same_sku_keys="$(jq -r '[.images[] | select((.size|tonumber)>0 and (.size|tonumber)<=350000 and (.assignedTo|type)=="array" and (.assignedTo|length)>0) | {key,sku:.assignedTo[0].sku}] | group_by(.sku) | map(select(length>=2) | .[0:2]) | first // [] | .[].key' /tmp/ai-test-inventory.json)"
+            same_sku_key_1="$(printf '%s\n' "$same_sku_keys" | sed -n '1p')"
+            same_sku_key_2="$(printf '%s\n' "$same_sku_keys" | sed -n '2p')"
+            if [ -n "$same_sku_key_1" ] && [ -n "$same_sku_key_2" ]; then
+              for slot in 1 2; do
+                if [ "$slot" = "1" ]; then key="$same_sku_key_1"; else key="$same_sku_key_2"; fi
+                encoded_key="$(jq -rn --arg key "$key" '$key|@uri')"
+                status="$(curl --connect-timeout 10 --max-time 30 --silent --show-error -D "/tmp/ai-test-sku-$slot-headers" -o "/tmp/ai-test-sku-$slot-source" -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci?key=$encoded_key")"
+                test "$status" = "200" || { echo "::error::Could not fetch assigned same-SKU image $slot for positive control (HTTP $status)."; exit 1; }
+              done
+              AI_TEST_SKU_KEY_1="$same_sku_key_1" AI_TEST_SKU_KEY_2="$same_sku_key_2" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          import sharp from "sharp";
+          const keys = [process.env.AI_TEST_SKU_KEY_1, process.env.AI_TEST_SKU_KEY_2];
+          const data = [];
+          for (const slot of [1, 2]) {
+            const source = await readFile(`/tmp/ai-test-sku-${slot}-source`);
+            const jpeg = await sharp(source, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+            if (!jpeg.length || jpeg.length > 180000) throw new Error("Same-SKU test image exceeds safe size.");
+            data.push({ key: keys[slot - 1], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
+          }
+          await writeFile("/tmp/ai-test-same-sku-compare-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData: data }));
+          NODE
+              sku_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-same-sku-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-same-sku-compare-request.json "$base/api/ai-smoke-ci")"
+              if [ "$sku_status" != "200" ]; then
+                diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-same-sku-compare.json 2>/dev/null || true)"
+                echo "::error::Same-SKU different-image AI comparison failed with HTTP $sku_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
+              fi
+              jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-same-sku-compare.json >/dev/null || { echo "::error::AI did not identify a high-confidence match between two distinct images assigned to the same SKU."; exit 1; }
+              echo "PASS: real Workers AI matched two distinct Preview gallery images assigned to the same SKU; the no-write DB prevented persistence."
+            else
+              echo "::warning::No same-SKU pair of two small inventory images was available; same-product different-angle matching remains unverified in this run."
+            fi
           rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-source-image.b64 /tmp/ai-test-classify.json /tmp/ai-test-classify-request.json /tmp/ai-test-vision-source /tmp/ai-test-vision-headers /tmp/ai-test-vision-jpeg.b64 /tmp/ai-test-vision-request.json /tmp/ai-test-vision.json
           echo "Test project deployment: $base"
           echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
