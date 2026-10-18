@@ -94,11 +94,15 @@ assert.equal(parseCategoryResult({ response: { category: "car", confidence: 99 }
 assert.equal(parseCategoryResult({ response: "I think this is a sneaker." }, allowed), null);
 
 const source = await readFile(new URL("../functions/api/admin/image-groups.js", import.meta.url), "utf8");
-assert.match(source, /response_format:\s*\{/,
-  "classification should use Cloudflare's documented JSON schema mode");
-assert.match(source, /type:"json_schema"/,
-  "classification should request structured JSON rather than free-form output");
-assert.match(source, /additionalProperties:false/,
-  "the schema should reject extra fields where the model honors it");
+assert.match(source, /role:"system"/,
+  "vision classification must include the system message shape that passed the real Preview inference test");
+assert.match(source, /role:"user",content:prompt/,
+  "vision classification must send the actual category prompt as a user message");
+assert.match(source, /image:supplied\[i\]\.dataUrl/,
+  "the converted JPEG data URL must reach the dedicated vision image field");
+assert.match(source, /parseCategoryResult\(result,allowed\)/,
+  "free-form model output must be strictly validated before a classification is accepted");
+assert.doesNotMatch(source, /response_format:\s*\{/,
+  "avoid the schema-constrained request shape that failed the real Preview vision smoke test");
 
-console.log("PASS: parser handles nested Workers AI payloads, aliases and confidence formats; classifier requests documented JSON schema mode.");
+console.log("PASS: parser handles nested Workers AI payloads and aliases; live-tested system/user vision request is strictly parsed.");
