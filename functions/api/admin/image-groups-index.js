@@ -120,7 +120,9 @@ export async function onRequestPost(context) {
           shape: item.features.shape.map(Number),
           colors: item.features.colors.map(Number),
           contentHash: String(item.features.contentHash).toLowerCase(),
-          category: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"].includes(String(item.features.category || "").toLowerCase()) ? String(item.features.category).toLowerCase() : "unknown"
+          category: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"].includes(String(item.features.category || "").toLowerCase()) ? String(item.features.category).toLowerCase() : "unknown",
+          categoryConfidence: Number.isInteger(Number(item.features.categoryConfidence)) && Number(item.features.categoryConfidence) >= 0 && Number(item.features.categoryConfidence) <= 100 ? Number(item.features.categoryConfidence) : 0,
+          categoryStatus: String(item.features.category || "").toLowerCase() === "unknown" || !["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other"].includes(String(item.features.category || "").toLowerCase()) ? "needs_review" : "classified"
         }), Number(item.width), Number(item.height), Number(item.sourceSize), String(item.sourceUploaded || "")
       ));
       await env.DB.batch(statements);
