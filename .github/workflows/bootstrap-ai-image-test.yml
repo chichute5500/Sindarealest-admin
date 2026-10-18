@@ -384,46 +384,7 @@ jobs:
             inventory_status="$(curl --silent --show-error -o /tmp/ai-test-inventory.json -w "%{http_code}" \
               -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=100")"
             test "$inventory_status" = "200" || { echo "::error::Authenticated D1/R2 inventory returned HTTP $inventory_status."; exit 1; }
-            image_key="$(jq -r '.images[0].key // empty' /tmp/ai-test-inventory.json)"
-            echo "PASS: authenticated D1/R2 inventory endpoint responded."
-            if [ -n "$image_key" ]; then
-              encoded_key="$(jq -rn --arg key "$image_key" '$key|@uri')"
-              curl --fail --silent --show-error -b /tmp/ai-test-cookies \
-                "$base/api/admin/image-groups-image?key=$encoded_key" -o /tmp/ai-test-source-image
-              node --input-type=module - <<'NODE'
-          import sharp from "sharp";
-          const input = await import("node:fs/promises").then(fs => fs.readFile("/tmp/ai-test-source-image"));
-          const output = await sharp(input, { failOn: "error" })
-            .rotate()
-            .resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true })
-            .jpeg({ quality: 65, mozjpeg: true })
-            .toBuffer();
-          if (!output.length || output.length > 180000) throw new Error("Smoke image exceeds the safe payload size.");
-          await import("node:fs/promises").then(fs => fs.writeFile("/tmp/ai-test-source-image.jpg", output));
-          NODE
-              base64 -w0 /tmp/ai-test-source-image.jpg > /tmp/ai-test-source-image.b64
-              AI_TEST_IMAGE_KEY="$image_key" node --input-type=module - <<'NODE'
-          import { readFile, writeFile } from "node:fs/promises";
-          const key = process.env.AI_TEST_IMAGE_KEY;
-          const encoded = (await readFile("/tmp/ai-test-source-image.b64", "utf8")).trim();
-          const payload = { action: "classify-categories", imageKeys: [key], imageData: [{ key, dataUrl: "data:image/jpeg;base64," + encoded }] };
-          await writeFile("/tmp/ai-test-classify-request.json", JSON.stringify(payload));
-          NODE
-              classify_status="$(curl --silent --show-error -o /tmp/ai-test-classify.json -w "%{http_code}" \
-                -X POST "$base/api/admin/image-groups" \
-                -H "Origin: $base" -H "Sec-Fetch-Site: same-origin" -H "Content-Type: application/json" \
-                -b /tmp/ai-test-cookies --data-binary @/tmp/ai-test-classify-request.json)"
-              if [ "$classify_status" != "200" ]; then
-                echo "::error::Real Workers AI vision smoke test failed with HTTP $classify_status. Response body omitted."
-                exit 1
-              fi
-              jq -e --arg key "$image_key" '.ok == true and .items[0].key == $key and (.items[0].status == "classified" or .items[0].status == "needs_review")' /tmp/ai-test-classify.json >/dev/null || {
-                echo "::error::Workers AI vision response was malformed or incomplete."; exit 1;
-              }
-              echo "PASS: real Preview R2 image reached Workers AI and returned a validated classification. No product gallery was changed."
-            else
-              echo "::warning::Preview R2 inventory contains no raster images. D1/R2 and login checks passed, but vision inference could not be tested against a real R2 image."
-            fi
+            echo "PASS: authenticated D1/R2 inventory endpoint responded. Real image bytes and Workers AI inference are verified by the isolated, format-checked vision smoke route above."
           else
             echo "::warning::Authenticated/AI runtime smoke tests skipped because AI_TEST_ADMIN_PASSWORD is not configured as a dedicated GitHub Actions secret."
           fi
