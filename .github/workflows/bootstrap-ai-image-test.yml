@@ -423,7 +423,6 @@ jobs:
                 jq -e '.ok == true and (.matches | type == "array" or type == "number")' /tmp/ai-test-compare.json >/dev/null || { echo "::error::Workers AI pair comparison returned an invalid result."; exit 1; }
                 compare_summary="$(jq -r 'if (.matches|type)=="array" then "candidate_pairs=" + (.matches|length|tostring) else "candidate_pairs=" + (.matches|tostring) end' /tmp/ai-test-compare.json)"
                 echo "PASS: real Workers AI pair comparison on two distinct decodable Preview R2 images: $compare_summary. Any review writes were intercepted by the no-write test DB."
-              else
               elif [ "$second_status" = "424" ]; then
                 echo "::warning::Only one byte-verified small raster image exists in Preview R2; live pair-comparison smoke was skipped."
               else
