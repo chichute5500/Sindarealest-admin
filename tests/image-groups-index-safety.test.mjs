@@ -18,6 +18,11 @@ const DB = {
         return { meta: { changes: this.args.length } };
       }
     };
+  },
+  async batch(statements) {
+    const snapshot = statements.map(statement => ({ sql: statement.sql, args: statement.args }));
+    executed.push(...snapshot);
+    return snapshot.map(statement => ({ meta: { changes: statement.args.length } }));
   }
 };
 const request = body => new Request("https://preview.example/api/admin/image-groups-index", {
@@ -38,6 +43,32 @@ assert.equal((await response.json()).invalidated, 2);
 assert.match(executed[0].sql, /^DELETE FROM image_group_index WHERE image_key IN \(\?,\?\)$/);
 assert.deepEqual(executed[0].args, ["nested/a.webp", "nested/b.webp"]);
 
+const descriptor = {
+  key: "nested/review-needed.webp",
+  p_hash: "a".repeat(16),
+  width: 120,
+  height: 90,
+  sourceSize: 5000,
+  sourceUploaded: "2026-01-01T00:00:00.000Z",
+  features: {
+    shape: Array(64).fill(0.5),
+    colors: Array(12).fill(0.25),
+    contentHash: "b".repeat(64),
+    category: "unknown",
+    categoryConfidence: 61,
+    categoryStatus: "needs_review"
+  }
+};
+const indexResponse = await onRequestPost({ request: request({ action: "index", images: [descriptor] }), env });
+assert.equal(indexResponse.status, 200);
+const insertIndex = executed.find(statement => statement.sql.includes("INSERT INTO image_group_index"));
+assert.ok(insertIndex, "image descriptor must be saved to the index");
+const storedFeatures = JSON.parse(insertIndex.args[2]);
+assert.equal(storedFeatures.contentHash, "b".repeat(64));
+assert.equal(storedFeatures.category, "unknown");
+assert.equal(storedFeatures.categoryConfidence, 61);
+assert.equal(storedFeatures.categoryStatus, "needs_review");
+
 const oversized = await onRequestPost({ request: request({ action: "invalidate-index", keys: Array.from({ length: 101 }, (_, i) => "image-" + i + ".webp") }), env });
 assert.equal(oversized.status, 400);
 
@@ -49,5 +80,8 @@ assert.match(source, /WHERE g\.status IN \('approved','pending'\)/, "approved an
 assert.match(source, /DELETE FROM image_group_set_members WHERE group_id=\? AND image_key=\?/, "overlapping members are removed from competing pending groups");
 assert.match(source, /if \(remaining\.length < 2\)/, "a group with fewer than two members after de-duplication is rejected");
 assert.match(source, /Remove them from every other pending proposal/, "approval removes its image keys from competing proposals");
+assert.match(source, /categoryConfidence:/, "classification confidence is persisted for administrator review");
+assert.match(source, /categoryStatus:/, "uncertain classifications retain a needs_review status");
+assert.match(source, /contentHash:/, "SHA-256 content hashes are stored to detect byte-identical files");
 
 console.log("PASS: stale-index invalidation is protected, and image membership is exclusive across pending/approved groups.");
