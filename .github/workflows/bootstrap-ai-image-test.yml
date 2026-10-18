@@ -577,7 +577,7 @@ jobs:
                 if (!candidates.some(item => item.hash === hash)) candidates.push({ file, bytes, hash, image });
               } catch {}
             }
-            if (candidates.length >= 2) { selected = { product, pair: candidates.slice(0, 2) }; break; }
+            if (candidates.length >= 2) { selected = { product, pair: candidates.slice(0, 2), gallery: candidates.slice(0, 6) }; break; }
           }
           if (!selected) throw new Error("No product gallery with two distinct repository image files was found.");
           const keys = selected.pair.map((item, index) => `test-fixtures/${String(selected.product.sku || selected.product.id).replace(/[^A-Za-z0-9_-]/g, "_")}/${index + 1}-${path.basename(item.image)}`);
@@ -587,6 +587,24 @@ jobs:
             if (!jpeg.length || jpeg.length > 180000) throw new Error("Repository gallery test image exceeds safe size.");
             imageData.push({ key: keys[index], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
           }
+          // Measure the browser-side grouping algorithm on up to six distinct photos from this same gallery.
+          const { createCanvas, loadImage } = await import("@napi-rs/canvas");
+          const originalFetch = globalThis.fetch;
+          const fixtureBytes = new Map(selected.gallery.map((item, index) => [`https://fixture.local/${index}`, item.bytes]));
+          globalThis.document = { createElement(tag) { if (tag !== "canvas") throw new Error("Unexpected DOM element: " + tag); return createCanvas(1, 1); } };
+          globalThis.createImageBitmap = async blob => loadImage(Buffer.from(await blob.arrayBuffer()));
+          globalThis.fetch = async input => { const bytes = fixtureBytes.get(String(input)); return bytes ? new Response(bytes, { status: 200, headers: { "Content-Type": "image/webp" } }) : originalFetch(input); };
+          const { computeImageDescriptor, findSimilarGroups } = await import(path.resolve("public/admin/image-similarity.js"));
+          const localItems = [];
+          for (let index = 0; index < selected.gallery.length; index++) {
+            const item = selected.gallery[index];
+            const key = `test-fixtures/local/${index}-${path.basename(item.image)}`;
+            const descriptor = await computeImageDescriptor(`https://fixture.local/${index}`, { key, size: item.bytes.length });
+            localItems.push({ key, p_hash: descriptor.p_hash, features: { ...descriptor.features, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 }, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 });
+          }
+          const localGroups = await findSimilarGroups(localItems, { threshold: 70 });
+          console.log(JSON.stringify({ sameGalleryImageCount: localItems.length, sameGalleryLocalGroups: localGroups.groups.length, sameGalleryLocalPairs: localGroups.groups.map(group => group.imageKeys.length) }));
+          globalThis.fetch = originalFetch;
           await writeFile("/tmp/ai-test-repository-gallery-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData }));
           console.log("Prepared two distinct image files from one repository product gallery for a no-write AI comparison.");
           NODE
