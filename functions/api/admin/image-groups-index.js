@@ -196,7 +196,7 @@ export async function onRequestPost(context) {
       }
       const known = new Set(images.map(reference => String(reference)));
       for (const key of keys) {
-        const url = "/media/" + key;
+        const url = "/media/" + key.split("/").map(segment => encodeURIComponent(segment)).join("/");
         if (!known.has(url) && !known.has(url.slice(1)) && !known.has(key)) images.push(url);
       }
       if (images.length > 30) return fail("Bộ ảnh sản phẩm sẽ vượt giới hạn 30 ảnh. Hãy chia nhóm nhỏ hơn.", 409);
