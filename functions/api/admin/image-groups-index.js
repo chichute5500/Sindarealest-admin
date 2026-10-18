@@ -275,9 +275,6 @@ export async function onRequestPost(context) {
       const found = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(value).first();
       return found && !excludedIds.includes(String(found.id)) ? found : null;
     };
-    const audit = (actionName, id, details) => env.DB.prepare(
-      "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', ?, 'image_group_set', ?, ?)"
-    ).bind(crypto.randomUUID(), actionName, id, JSON.stringify(details));
     try {
       if (action === "split-group") {
         const groupId = String(body.groupId || "");
@@ -373,7 +370,7 @@ export async function onRequestPost(context) {
         statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_merge', 'image_group_set', ?, ? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
           .bind(crypto.randomUUID(), targetId, JSON.stringify({ mergedGroupIds: groupIds, retiredGroupIds: groupIds.filter(id => id !== targetId), imageKeys: allKeys, category }), targetId, combinedFingerprint));
         const results = await env.DB.batch(statements);
-        const targetUpdateIndex = groups.filter(item => item.id !== targetId).reduce((sum, group) => sum + group.members.length, 0);
+        const targetUpdateIndex = groups.filter(item => item.id !== targetId).reduce((sum, group) => sum + group.members.length * 2, 0);
         if (!results?.[targetUpdateIndex]?.meta?.changes) return fail("Các nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận gộp.", 409);
         return json({ ok: true, groupId: targetId, mergedGroups: groupIds.length, imageCount: allKeys.length, message: "Đã gộp các đề xuất thành một nhóm chờ duyệt; không sửa ảnh gốc hoặc sản phẩm công khai." });
       }
@@ -416,7 +413,7 @@ export async function onRequestPost(context) {
             .bind(crypto.randomUUID(), sourceId, JSON.stringify({ sourceGroupId: sourceId, targetGroupId: targetId, imageKey, category }), sourceId, sourceFingerprint, targetId, targetFingerprint)
         ];
         const results = await env.DB.batch(statements);
-        if (!results?.[2]?.meta?.changes || !results?.[3]?.meta?.changes) return fail("Nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận chuyển ảnh.", 409);
+        if (!results?.[3]?.meta?.changes || !results?.[4]?.meta?.changes) return fail("Nhóm đã thay đổi đồng thời. Tải lại danh sách; không xác nhận chuyển ảnh.", 409);
         return json({ ok: true, imageKey, sourceGroupId: sourceId, targetGroupId: targetId, message: "Đã chuyển ảnh giữa hai đề xuất cùng danh mục; hai nhóm vẫn chờ duyệt." });
       }
     } catch (error) {
@@ -537,7 +534,7 @@ export async function onRequestPost(context) {
       const previousImagesJson = typeof details.previousImagesJson === "string" ? details.previousImagesJson : null;
       const nextImagesJson = typeof details.nextImagesJson === "string" ? details.nextImagesJson : null;
       const productId = String(original.entity_id || "");
-      if (!validId(groupId) || !productId || !keys.length || previousImagesJson === null || nextImagesJson === null) {
+      if (!/^[0-9a-f-]{36}$/i.test(groupId) || !productId || !keys.length || previousImagesJson === null || nextImagesJson === null) {
         return fail("Nhật ký duyệt cũ không có snapshot cần thiết; không thể hoàn tác an toàn.", 409);
       }
       const product = await env.DB.prepare("SELECT id,images_json FROM products WHERE id=? LIMIT 1").bind(productId).first();
