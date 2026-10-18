@@ -14,6 +14,7 @@ const DB = {
       bind(...args) { this.args = args; return this; },
       async first() {
         if (this.sql.includes("FROM image_group_reviews WHERE id=? AND status='pending'")) {
+          if (this.sql.includes("confidence>=91") && reviewConfidence < 91) return null;
           return { id: reviewId, image_a: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp", image_b: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.webp", same_product: 1, confidence: reviewConfidence, status: "pending" };
         }
         if (this.sql.includes("SELECT * FROM products WHERE id=?")) {
