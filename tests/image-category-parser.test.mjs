@@ -77,6 +77,16 @@ assert.deepEqual(
   { category: "wallet", confidence: 86 }
 );
 
+// A generic shoe label must never be guessed into one shoe subtype.
+assert.deepEqual(
+  parseCategoryResult({ response: { category: "shoe", confidence: 100 }, tool_calls: [], usage: {} }, allowed),
+  { category: "unknown", confidence: 100 }
+);
+assert.deepEqual(
+  parseCategoryResult({ response: { category: "footwear", confidence: 99 } }, allowed),
+  { category: "unknown", confidence: 99 }
+);
+
 // Never fabricate a confidence or accept an unrecognized category.
 assert.equal(parseCategoryResult({ response: { category: "sneaker" } }, allowed), null);
 assert.equal(parseCategoryResult({ response: { category: "car", confidence: 99 } }, allowed), null);
