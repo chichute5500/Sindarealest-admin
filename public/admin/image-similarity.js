@@ -72,29 +72,18 @@ export async function findSimilarGroups(items, options = {}) {
   );
   const count = valid.length;
   const total = count * (count - 1) / 2;
-  const parent = Int32Array.from({ length: count }, (_, index) => index);
-  const rank = new Uint8Array(count);
+  // Store only matching edges; this keeps memory proportional to actual matches.
+  // Each image is compared against the complete inventory before groups are formed.
+  const matchesByIndex = Array.from({ length: count }, () => []);
   const bestScore = new Uint8Array(count);
-  const find = value => {
-    let root = value;
-    while (parent[root] !== root) root = parent[root];
-    while (parent[value] !== value) { const next = parent[value]; parent[value] = root; value = next; }
-    return root;
-  };
-  const union = (a, b) => {
-    let ra = find(a), rb = find(b);
-    if (ra === rb) return;
-    if (rank[ra] < rank[rb]) [ra, rb] = [rb, ra];
-    parent[rb] = ra;
-    if (rank[ra] === rank[rb]) rank[ra]++;
-  };
   let compared = 0, matches = 0;
   for (let i = 0; i < count; i++) {
     for (let j = i + 1; j < count; j++) {
       const result = compareDescriptors(valid[i], valid[j]);
       compared++;
       if (result.match && result.score >= Math.max(70, threshold)) {
-        union(i, j);
+        matchesByIndex[i].push({ index: j, score: result.score });
+        matchesByIndex[j].push({ index: i, score: result.score });
         bestScore[i] = Math.max(bestScore[i], result.score);
         bestScore[j] = Math.max(bestScore[j], result.score);
         matches++;
@@ -106,69 +95,49 @@ export async function findSimilarGroups(items, options = {}) {
     }
   }
   options.onProgress?.({ phase: "matching", done: total, total, matches });
-  const components = new Map();
-  for (let i = 0; i < count; i++) {
-    const root = find(i);
-    if (!components.has(root)) components.set(root, []);
-    components.get(root).push(i);
-  }
+
+  // Anchor-first grouping: the first unprocessed inventory image is the anchor.
+  // Its direct matches across the inventory form one proposed set. Do not use
+  // transitive connectivity (A~B and B~C does not imply A~C), and never let a
+  // later anchor pull an already assigned image into a second set.
+  const assigned = new Uint8Array(count);
   const groups = [];
-  for (const componentIndices of components.values()) {
-    if (componentIndices.length < 2) continue;
-    // Connected components alone are unsafe: one weak bridge can join a shoe,
-    // wallet and belt into a single group. Split each component using complete-link
-    // checks so every member must match every other member in the proposed set.
-    const orderedIndices = [...componentIndices].sort((a, b) => bestScore[b] - bestScore[a] || valid[a].key.localeCompare(valid[b].key));
-    const coherentClusters = [];
-    for (const candidateIndex of orderedIndices) {
-      let bestCluster = -1, bestMinimum = -1;
-      for (let clusterIndex = 0; clusterIndex < coherentClusters.length; clusterIndex++) {
-        const cluster = coherentClusters[clusterIndex];
-        let minimumScore = 101, coherent = true;
-        for (const existingIndex of cluster) {
-          const pair = compareDescriptors(valid[candidateIndex], valid[existingIndex]);
-          if (!pair.match || pair.score < Math.max(70, threshold)) { coherent = false; break; }
-          minimumScore = Math.min(minimumScore, pair.score);
-        }
-        if (coherent && minimumScore > bestMinimum) { bestMinimum = minimumScore; bestCluster = clusterIndex; }
-      }
-      if (bestCluster < 0) coherentClusters.push([candidateIndex]);
-      else coherentClusters[bestCluster].push(candidateIndex);
-      if ((compared + orderedIndices.length + candidateIndex) % 20000 === 0) await nextFrame();
+  for (let anchor = 0; anchor < count; anchor++) {
+    if (assigned[anchor]) continue;
+    const indices = [anchor];
+    for (const edge of matchesByIndex[anchor]) {
+      if (!assigned[edge.index]) indices.push(edge.index);
     }
-    for (const indices of coherentClusters) {
     if (indices.length < 2) continue;
+    for (const index of indices) assigned[index] = 1;
+
     const members = indices.map(index => valid[index]);
-    const assignedSkus = new Set(members.flatMap(item => (item.assignedTo || []).map(owner => String(owner.sku || "")).filter(Boolean)));
+    const assignedSkus = new Set(members.flatMap(item =>
+      (item.assignedTo || []).map(owner => String(owner.sku || "")).filter(Boolean)
+    ));
     const allAssigned = members.every(item => Array.isArray(item.assignedTo) && item.assignedTo.length > 0);
-    if (allAssigned && assignedSkus.size === 1) continue; // Already grouped under the same SKU.
-    // Keep memory bounded: do not retain every matching pair for dense inventories.
-    // Member best-match scores provide a useful review score without an O(matches) edge map.
-    const memberBestScores = indices.map(index => bestScore[index]).filter(score => score > 0);
-    const average = memberBestScores.length
-      ? Math.round(memberBestScores.reduce((sum, value) => sum + value, 0) / memberBestScores.length)
-      : 0;
+    if (allAssigned && assignedSkus.size === 1) continue;
+
     const indexByKey = new Map(members.map((item, position) => [item.key, indices[position]]));
-    const sorted = members.map((item, position) => ({
+    const sorted = members.map(item => ({
       key: item.key,
-      similarity: bestScore[indices[position]] || average
+      similarity: bestScore[indexByKey.get(item.key)] || 0
     })).sort((a, b) => b.similarity - a.similarity || a.key.localeCompare(b.key));
     const chunks = [];
     for (let offset = 0; offset < sorted.length; offset += 30) chunks.push(sorted.slice(offset, offset + 30));
     for (let part = 0; part < chunks.length; part++) {
       const chunk = chunks[part];
-      const chunkBestScores = chunk.map(item => bestScore[indexByKey.get(item.key)]).filter(score => score > 0);
-      const chunkAverage = chunkBestScores.length
-        ? Math.round(chunkBestScores.reduce((sum, value) => sum + value, 0) / chunkBestScores.length)
-        : average;
+      const scores = chunk.map(item => item.similarity).filter(score => score > 0);
+      const average = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : 0;
       groups.push({
         imageKeys: chunk.map(item => item.key).sort((a, b) => a.localeCompare(b)),
         members: [...chunk].sort((a, b) => a.key.localeCompare(b.key)),
-        similarity: chunkAverage,
-        rationale: (indices.length > 30 ? "Cụm liên thông lớn có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. " : "") +
-          "So sánh dấu vân tay cảm nhận, hình dạng vùng sản phẩm và phân bố màu sau chuẩn hóa nền. Điểm là mức tương đồng ảnh, không phải xác suất cùng SKU."
+        similarity: average,
+        rationale: (indices.length > 30
+          ? "Bộ ảnh có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. "
+          : "") +
+          "Nhóm được tạo bằng cách lấy ảnh gốc theo thứ tự kho, so sánh trực tiếp với toàn bộ kho và gom các ảnh đạt ngưỡng vào cùng bộ. Không dùng liên kết bắc cầu để kéo ảnh không khớp trực tiếp vào bộ. Điểm là mức tương đồng hình ảnh, không phải xác suất cùng sản phẩm."
       });
-    }
     }
   }
   groups.sort((a, b) => b.similarity - a.similarity || a.imageKeys.join("|").localeCompare(b.imageKeys.join("|")));
