@@ -47,8 +47,8 @@ assert.doesNotMatch(css, /\.service-strip \.service-copy\{[^}]*color:#262626/,
 assert.doesNotMatch(css, /\.service-strip \.service-text small\{[^}]*color:#53575a/,
   'Tile descriptions must not force a fixed gray in dark mode.');
 
-const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.30),rgba(189,145,63,.20))';
-assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(220,184,114,.57)}'),
+const ctaGradient = 'linear-gradient(135deg,rgba(255,255,255,.42),rgba(126,177,215,.24))';
+assert.ok(html.includes('.pill-btn.primary{background:' + ctaGradient + ';border-color:rgba(116,171,211,.62)}'),
   'The reference Zalo CTA gradient and border must exist.');
 const stripRule = css.match(/\.service-strip\{([^}]*)\}/)?.[1] || '';
 const sharedGlassRule = html.match(/\.glass\{([^}]*)\}/)?.[1] || '';
@@ -85,13 +85,13 @@ assert.match(css, /\.service-strip \.service-copy\{[\s\S]*?backdrop-filter:blur\
   'The inner surface must have its own stronger frosted-glass blur and saturation.');
 const lightThemeTokens = html.match(/:root\{([^}]*)\}/)?.[1] || '';
 const darkThemeTokens = html.match(/html\.dark\{([^}]*)\}/)?.[1] || '';
-assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(255,255,255,\.78\)/,
-  'Light theme must provide a bright, translucent warm-glass surface.');
-assert.match(darkThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(104,100,92,\.94\)/,
-  'Dark theme must provide a lighter, high-opacity glass surface instead of a near-black transparent-looking panel.');
-assert.match(lightThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.94\)/,
+assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(255,255,255,\.88\)/,
+  'Light theme must provide a bright, translucent ice-blue glass surface.');
+assert.match(darkThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(36,66,91,\.96\)/,
+  'Dark theme must provide a high-opacity navy glass surface instead of a near-black transparent-looking panel.');
+assert.match(lightThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.96\)/,
   'Light theme must retain a clear glass rim.');
-assert.match(darkThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.78\)/,
+assert.match(darkThemeTokens, /--benefit-tile-border:rgba\(204,231,250,\.68\)/,
   'Dark theme must retain a visible glass rim.');
 assert.ok(!css.includes('var(--panel-strong)'),
   'Benefit tile opacity must not be tied to the generic panel token, which is too dark in dark mode.');
