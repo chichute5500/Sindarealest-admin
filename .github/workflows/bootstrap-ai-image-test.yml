@@ -300,7 +300,7 @@ jobs:
                   const first=await findSmallRaster(env,"",keys[i]);if(!first)continue;
                   for(let j=i+1;j<keys.length;j++){
                     const second=await findSmallRaster(env,first.key,keys[j]);
-                    if(second)return{sku:String(product.sku||""),first,second};
+                    if(second){const identical=first.bytes.length===second.bytes.length&&first.bytes.every((byte,index)=>byte===second.bytes[index]);if(!identical)return{sku:String(product.sku||""),first,second};}
                   }
                 }
               }
