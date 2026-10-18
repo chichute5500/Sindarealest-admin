@@ -30,9 +30,8 @@ export async function onRequestGet(context) {
     if (Number(object.size || 0) > MAX_IMAGE_BYTES) return new Response("Ảnh vượt giới hạn xem.", { status: 413, headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" } });
     const ext = key.includes(".") ? key.split(".").pop().toLowerCase() : "";
     const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
-    const contentType = supplied.startsWith("image/") && supplied !== "image/svg+xml" && supplied !== "image/svg"
-      ? supplied
-      : MIME_BY_EXTENSION[ext];
+    if (supplied === "image/svg+xml" || supplied === "image/svg") return new Response("SVG không được hỗ trợ.", { status: 415, headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" } });
+    const contentType = supplied.startsWith("image/") ? supplied : MIME_BY_EXTENSION[ext];
     if (!contentType) return new Response("Object không phải ảnh raster được hỗ trợ.", { status: 415, headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" } });
     const headers = new Headers({
       "Content-Type": contentType,
