@@ -146,8 +146,19 @@ jobs:
             ((.result.deployment_configs.production.env_vars // {})
               | with_entries(select(.value.type == "plain_text"))
               | with_entries(.value = .value.value))')"
-          config="$GITHUB_WORKSPACE/wrangler.ai-image-test.json"
-          trap 'rm -f "$config"' EXIT
+          # Pages Wrangler accepts its standard config filenames only. Keep the
+          # repository's local-only TOML out of the way for this runner step,
+          # generate a temporary wrangler.jsonc, and always restore the original.
+          config="$GITHUB_WORKSPACE/wrangler.jsonc"
+          original_config="$RUNNER_TEMP/wrangler.toml.original"
+          cp "$GITHUB_WORKSPACE/wrangler.toml" "$original_config"
+          cleanup() {
+            rm -f "$config"
+            cp "$original_config" "$GITHUB_WORKSPACE/wrangler.toml"
+            rm -f "$original_config"
+          }
+          trap cleanup EXIT
+          rm "$GITHUB_WORKSPACE/wrangler.toml"
           jq -n \
             --arg name "$TARGET_PROJECT" \
             --arg db_name "$preview_db_name" \
@@ -164,7 +175,7 @@ jobs:
             } + (if ($vars | length) > 0 then { vars: $vars } else {} end)' > "$config"
 
           echo "Deploying the AI binding only to $TARGET_PROJECT. DB/IMAGES point to the checked source Preview resources."
-          npx wrangler pages deploy public --config "$config" --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
+          npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
 
           # Read-only smoke checks against the test project URL; do not log in or mutate data.
           base="https://${TARGET_PROJECT}.pages.dev"
