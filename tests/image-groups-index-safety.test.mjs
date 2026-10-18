@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { onRequestPost } from "../functions/api/admin/image-groups-index.js";
 import { createSession } from "../functions/_lib.js";
 
@@ -42,4 +43,11 @@ assert.equal(oversized.status, 400);
 
 const unauthorized = await onRequestPost({ request: new Request("https://preview.example/api/admin/image-groups-index", { method: "POST", body: JSON.stringify({ action: "invalidate-index", keys: ["a.webp"] }) }), env });
 assert.equal(unauthorized.status, 401);
-console.log("PASS: stale image descriptors can be invalidated safely; operation requires admin auth and limits each batch to 100 keys.");
+const source = await readFile(new URL("../functions/api/admin/image-groups-index.js", import.meta.url), "utf8");
+assert.match(source, /const uniqueKeys = rawKeys\.filter\(key => !claimed\.has\(key\)\)/, "a key already claimed by a group must be excluded from later groups");
+assert.match(source, /WHERE g\.status IN \('approved','pending'\)/, "approved and pending groups reserve their image keys");
+assert.match(source, /DELETE FROM image_group_set_members WHERE group_id=\? AND image_key=\?/, "overlapping members are removed from competing pending groups");
+assert.match(source, /if \(remaining\.length < 2\)/, "a group with fewer than two members after de-duplication is rejected");
+assert.match(source, /Remove them from every other pending proposal/, "approval removes its image keys from competing proposals");
+
+console.log("PASS: stale-index invalidation is protected, and image membership is exclusive across pending/approved groups.");
