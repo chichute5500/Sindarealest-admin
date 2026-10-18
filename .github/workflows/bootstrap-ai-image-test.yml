@@ -371,7 +371,6 @@ jobs:
             exit 1
           fi
 
-          if [ -n "${AI_TEST_ADMIN_PASSWORD:-}" ]; then
             login_payload="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" '{password:$password}')"
             login_status="$(curl --silent --show-error -o /tmp/ai-test-login.json -w "%{http_code}" \
               -X POST "$base/api/admin/login" \
@@ -384,9 +383,6 @@ jobs:
               -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=100")"
             test "$inventory_status" = "200" || { echo "::error::Authenticated D1/R2 inventory returned HTTP $inventory_status."; exit 1; }
             echo "PASS: authenticated D1/R2 inventory endpoint responded. Real image bytes and Workers AI inference are verified by the isolated, format-checked vision smoke route above."
-          else
-            echo "::warning::Authenticated/AI runtime smoke tests skipped because AI_TEST_ADMIN_PASSWORD is not configured as a dedicated GitHub Actions secret."
-          fi
           rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-source-image.b64 /tmp/ai-test-classify.json /tmp/ai-test-classify-request.json /tmp/ai-test-vision-source /tmp/ai-test-vision-headers /tmp/ai-test-vision-jpeg.b64 /tmp/ai-test-vision-request.json /tmp/ai-test-vision.json
           echo "Test project deployment: $base"
           echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
