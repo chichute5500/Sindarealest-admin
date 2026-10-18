@@ -166,28 +166,28 @@ async function scanWholeImageInventory(){
       const row=indexedByKey.get(item.key);
       return !row||Number(row.source_size)!==Number(item.size)||String(row.source_uploaded||"")!==String(item.uploaded||"");
     });
-    let indexedNow=0;
+    const failedKeys=new Set(),failureDetails=[];
     for(let offset=0;offset<missing.length;offset+=4){
       const batch=missing.slice(offset,offset+4);
-      const calculated=await Promise.all(batch.map(async item=>{
-        try{return await similarity.computeImageDescriptor(item.url,item);}
-        catch(error){throw Error("Không thể phân tích toàn kho tại ảnh "+item.key+": "+(error?.message||error));}
-      }));
-      await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"index",images:calculated})});
-      for(const descriptor of calculated){
-        indexedByKey.set(descriptor.key,{image_key:descriptor.key,p_hash:descriptor.p_hash,features_json:JSON.stringify(descriptor.features),width:descriptor.width,height:descriptor.height,source_size:descriptor.sourceSize,source_uploaded:descriptor.sourceUploaded});
+      const settled=await Promise.allSettled(batch.map(item=>similarity.computeImageDescriptor(item.url,item)));
+      const calculated=[];
+      for(let i=0;i<settled.length;i++){
+        const outcome=settled[i];
+        if(outcome.status==="fulfilled")calculated.push(outcome.value);
+        else{const item=batch[i];failedKeys.add(item.key);indexedByKey.delete(item.key);failureDetails.push({key:item.key,error:String(outcome.reason?.message||outcome.reason||"Không đọc được ảnh").slice(0,180)});}
       }
-      indexedNow+=calculated.length;
-      imageScanProgress="Đã lập chỉ mục "+Math.min(offset+batch.length,missing.length)+"/"+missing.length+" ảnh mới hoặc đã thay đổi; tổng kho "+imageInventory.length+" ảnh.";
-      const progress=$('#imageScanProgress');if(progress)progress.textContent=imageScanProgress;
+      if(calculated.length){
+        await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"index",images:calculated})});
+        for(const descriptor of calculated) indexedByKey.set(descriptor.key,{image_key:descriptor.key,p_hash:descriptor.p_hash,features_json:JSON.stringify(descriptor.features),width:descriptor.width,height:descriptor.height,source_size:descriptor.sourceSize,source_uploaded:descriptor.sourceUploaded});
+      }
+      imageScanProgress="Đã xử lý "+Math.min(offset+batch.length,missing.length)+"/"+missing.length+" ảnh mới/thay đổi; lỗi đọc ảnh: "+failureDetails.length+"; tổng kho "+imageInventory.length+" ảnh.";
+      const progress=$("#imageScanProgress");if(progress)progress.textContent=imageScanProgress;
       await new Promise(resolve=>setTimeout(resolve,0));
     }
-    const allDescriptors=imageInventory.map(item=>{
-      const row=indexedByKey.get(item.key);
-      return row?{...row,key:item.key,assignedTo:item.assignedTo}:null;
-    });
+    const allDescriptors=imageInventory.filter(item=>!failedKeys.has(item.key)).map(item=>{const row=indexedByKey.get(item.key);return row?{...row,key:item.key,assignedTo:item.assignedTo}:null;});
     const invalid=allDescriptors.filter(item=>!item);
-    if(invalid.length)throw Error("Chưa có chỉ mục cho "+invalid.length+" ảnh. Không tạo nhóm một phần; hãy chạy lại để hoàn tất.");
+    if(invalid.length)throw Error("Còn "+invalid.length+" ảnh chưa có chỉ mục do dữ liệu kho không đồng nhất. Hãy quét lại để hoàn tất.");
+    if(allDescriptors.length<2)throw Error("Chỉ có "+allDescriptors.length+" ảnh đọc được; cần ít nhất 2 ảnh hợp lệ để so sánh.");
     const result=await similarity.findSimilarGroups(allDescriptors,{threshold:70,onProgress:progress=>{
       imageScanProgress="Đang đối chiếu chéo toàn kho: "+Number(progress.done||0).toLocaleString("vi-VN")+"/"+Number(progress.total||0).toLocaleString("vi-VN")+" cặp · tìm được "+Number(progress.matches||0).toLocaleString("vi-VN")+" liên kết.";
       const el=$('#imageScanProgress');if(el)el.textContent=imageScanProgress;
