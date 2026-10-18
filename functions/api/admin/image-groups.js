@@ -4,39 +4,51 @@ function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
 
 function parseCategoryResult(result,allowed){
-  const candidates=[
-    typeof result==="string"?result:null,
-    result?.response,
-    result?.result?.response,
-    result?.result,
-    result?.choices?.[0]?.message?.content,
-    result?.output_text,
-    result?.content
-  ];
-  for(const candidate of candidates){
-    if(candidate==null)continue;
-    let raw=typeof candidate==="string"?candidate:"";
-    if(!raw&&typeof candidate==="object"){try{raw=JSON.stringify(candidate)}catch{continue}}
-    raw=raw.trim();
-    raw=raw.replace(new RegExp("^"+String.fromCharCode(96).repeat(3)+"(?:json)?\\s*","i"),"");
-    raw=raw.replace(new RegExp("\\s*"+String.fromCharCode(96).repeat(3)+"$","i"),"");
-    const values=[];
-    try{values.push(JSON.parse(raw))}catch{}
-    const match=raw.match(/\{[\s\S]*\}/);
-    if(match)try{values.push(JSON.parse(match[0]))}catch{}
-    for(const value of values){
-      if(!value||typeof value!=="object"||Array.isArray(value))continue;
-      const category=String(value.category??value.product_category??value.type??"").toLowerCase().trim().replace(/[ -]+/g,"_");
-      const rawConfidence=value.confidence??value.score;
-      const confidence=typeof rawConfidence==="string"?Number(rawConfidence.replace("%","").trim()):Number(rawConfidence);
-      if(allowed.has(category)&&Number.isFinite(confidence)&&confidence>=0&&confidence<=100)return{category,confidence:Math.round(confidence)};
+  const candidates=[];
+  const seen=new Set();
+  function collect(value,depth=0){
+    if(depth>5||value==null)return;
+    if(typeof value==="string"){const t=value.trim();if(t&&!seen.has(t)){seen.add(t);candidates.push(t)}return}
+    if(Array.isArray(value)){for(const item of value.slice(0,8))collect(item,depth+1);return}
+    if(typeof value==="object"){
+      for(const key of ["response","text","content","generated_text","output_text","result","message","choices","output"]){
+        if(key in value)collect(value[key],depth+1);
+      }
+      if(value.category||value.product_category) candidates.unshift(JSON.stringify(value));
     }
-    const categoryMatch=raw.match(/(?:category|product_category|loại|danh_mục)\s*["']*\s*[:=]\s*["']*([a-z_ -]+)/i);
-    const confidenceMatch=raw.match(/(?:confidence|score|độ_tin_cậy)\s*["']*\s*[:=]\s*["']*(\d{1,3})\s*%?/i);
-    if(categoryMatch&&confidenceMatch){
-      const category=categoryMatch[1].trim().toLowerCase().replace(/[ -]+/g,"_");
-      const confidence=Number(confidenceMatch[1]);
-      if(allowed.has(category)&&confidence>=0&&confidence<=100)return{category,confidence};
+  }
+  collect(result);
+  const aliases={sneakers:"sneaker",trainer:"sneaker",trainers:"sneaker",loafers:"loafer",loafer_shoes:"loafer",dress_shoes:"dress_shoe",formal_shoe:"dress_shoe",formal_shoes:"dress_shoe",boots:"boot",sandals:"sandal",belts:"belt",wallets:"wallet",watchstraps:"watch_strap",watch_band:"watch_strap",watch_bands:"watch_strap",watches:"watch",bags:"bag",unknown_product:"unknown",other_product:"other"};
+  const normalize=(v)=>{let c=String(v??"").toLowerCase().trim().replace(/[ -]+/g,"_").replace(/[^a-z_]/g,"");c=aliases[c]||c;return allowed.has(c)?c:null};
+  for(let raw of candidates){
+    raw=raw.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");
+    let value;
+    try{value=JSON.parse(raw)}catch{
+      const match=raw.match(/\{[^{}]*\}/);
+      if(match)try{value=JSON.parse(match[0])}catch{}
+    }
+    if(value&&typeof value==="object"&&!Array.isArray(value)){
+      const category=normalize(value.category??value.product_category??value.productCategory??value.label??value.type);
+      let confidenceRaw=value.confidence??value.score??value.confidence_score??value.confidenceScore;
+      if(typeof confidenceRaw==="string")confidenceRaw=confidenceRaw.trim().replace("%","");
+      let confidence=Number(confidenceRaw);
+      if(Number.isFinite(confidence)&&confidence>0&&confidence<=1)confidence*=100;
+      if(category&&Number.isFinite(confidence)&&confidence>=0&&confidence<=100)return{category,confidence:Math.round(confidence)};
+    }
+    // Models sometimes return a plain label or prose instead of JSON.
+    const categoryPatterns=[
+      [/\bwatch[ _-]?strap\b|\bwatch[ _-]?band\b/i,"watch_strap"],
+      [/\bdress[ _-]?shoe(?:s)?\b|\bformal[ _-]?shoe(?:s)?\b/i,"dress_shoe"],
+      [/\bsneakers?\b|\btrainers?\b/i,"sneaker"],
+      [/\b loafers?\b|^loafers?$/i,"loafer"],
+      [/\bboots?\b/i,"boot"],[/\bsandals?\b/i,"sandal"],[/\bbelts?\b/i,"belt"],
+      [/\bwallets?\b/i,"wallet"],[/\bwatches?\b/i,"watch"],[/\bbags?\b/i,"bag"],[/\bunknown\b/i,"unknown"],[/\bother\b/i,"other"]
+    ];
+    for(const [pattern,category] of categoryPatterns){
+      if(pattern.test(raw)){
+        const cm=raw.match(/(?:confidence|score|độ_tin_cậy)\s*["'\x60]*\s*[:=]\s*["'\x60]*([0-9.]+)\s*%?/i);
+        if(cm){let confidence=Number(cm[1]);if(confidence>0&&confidence<=1)confidence*=100;if(Number.isFinite(confidence)&&confidence>=0&&confidence<=100)return{category,confidence:Math.round(confidence)}}
+      }
     }
   }
   return null;
@@ -79,7 +91,7 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
   }
   classification=parseCategoryResult(result,allowed);
 }
-if(!classification)return fail("Workers AI vẫn không trả được category/confidence hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" sau 2 lần thử. Không lưu lô này; hãy thử lại.",502);
+if(!classification){const shape=Object.keys(result&&typeof result==="object"?result:{}).slice(0,8).join(",")||typeof result;const sample=String(result?.response??result?.choices?.[0]?.message?.content??result?.output_text??"").replace(/[\\r\\n]+/g," ").slice(0,140);return fail("Workers AI trả phản hồi không hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" (dạng: "+shape+(sample?"; mẫu: "+sample:"")+"). Không lưu lô này; hãy thử lại.",502)}
 const candidate=classification.category,confidence=classification.confidence,valid=candidate!=="unknown"&&confidence>=70;
 items.push({key:keys[i],category:valid?candidate:"unknown",confidence:valid?Math.round(confidence):0});
 }
