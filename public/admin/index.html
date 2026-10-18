@@ -231,7 +231,7 @@ async function scanWholeImageInventory(){
     const invalid=allDescriptors.filter(item=>!item);
     if(invalid.length)throw Error("Còn "+invalid.length+" ảnh chưa có chỉ mục do dữ liệu kho không đồng nhất. Hãy quét lại để hoàn tất.");
     if(allDescriptors.length<2)throw Error("Chỉ có "+allDescriptors.length+" ảnh đọc được; cần ít nhất 2 ảnh hợp lệ để so sánh.");
-    const result=await similarity.findSimilarGroups(allDescriptors,{threshold:70,onProgress:progress=>{
+    const result=await similarity.findSimilarGroups(allDescriptors,{threshold:91,onProgress:progress=>{
       imageScanProgress="Đang đối chiếu chéo toàn kho: "+Number(progress.done||0).toLocaleString("vi-VN")+"/"+Number(progress.total||0).toLocaleString("vi-VN")+" cặp · tìm được "+Number(progress.matches||0).toLocaleString("vi-VN")+" liên kết.";
       const el=$('#imageScanProgress');if(el)el.textContent=imageScanProgress;
     }});
