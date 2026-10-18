@@ -146,6 +146,9 @@ export async function findSimilarGroups(items, options = {}) {
       (item.assignedTo || []).map(owner => String(owner.sku || "")).filter(Boolean)
     ));
     const allAssigned = members.every(item => Array.isArray(item.assignedTo) && item.assignedTo.length > 0);
+    // Existing SKU ownership is stronger than visual similarity. Never even
+    // propose a cross-SKU group; approval should not be the first safety gate.
+    if (assignedSkus.size > 1) continue;
     if (allAssigned && assignedSkus.size === 1) continue;
 
     const indexByKey = new Map(members.map((item, position) => [item.key, indices[position]]));
