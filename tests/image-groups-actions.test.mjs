@@ -172,8 +172,9 @@ sqlite.prepare("DELETE FROM image_group_image_claims WHERE image_key=?").run("ba
 const badSplit = await call({ action: "split-group", groupId: ids.badSplit, selectedKeys: ["bad-split-a.webp","bad-split-b.webp"] });
 assert.equal(badSplit.status, 409, "split must refuse a member without its pending claim");
 assert.deepEqual(members(ids.badSplit), ["bad-split-a.webp","bad-split-b.webp","bad-split-c.webp","bad-split-d.webp"]);
-assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND id<>? AND rationale LIKE '%tách thủ công%'").get(ids.badSplit).count, 2,
-  "failed split must not create a second pending group");
+const badSplitFingerprint = await hashGroup(["bad-split-a.webp","bad-split-b.webp"]);
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(badSplitFingerprint).count, 0,
+  "failed split must not create a new group with the selected images");
 
 ids.badMergeA = crypto.randomUUID(); ids.badMergeB = crypto.randomUUID();
 await seedGroup(ids.badMergeA, ["bad-merge-a.webp","bad-merge-b.webp"]);
