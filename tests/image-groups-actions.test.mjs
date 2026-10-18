@@ -26,9 +26,25 @@ class D1Statement {
     return { meta: { changes: Number(result.changes), last_row_id: Number(result.lastInsertRowid || 0) } };
   }
 }
+let pendingConcurrentClaim = null;
 const DB = {
   prepare(sql) { return new D1Statement(sql); },
   async batch(statements) {
+    // Simulate another request acquiring a member after this request's reads
+    // but immediately before its final transactional group insert.
+    if (pendingConcurrentClaim && statements.some(statement =>
+      statement.sql.includes("INSERT INTO image_group_image_claims") &&
+      statement.args[0] === pendingConcurrentClaim.imageKey
+    )) {
+      const fixture = pendingConcurrentClaim;
+      pendingConcurrentClaim = null;
+      sqlite.prepare("INSERT INTO image_group_sets(id,fingerprint,similarity,rationale,status) VALUES(?,?,?,'Tầng 1 đã phân loại ảnh vào nhóm giày thể thao.','pending')")
+        .run(fixture.id, fixture.fingerprint, 90);
+      for (const [key, score] of [[fixture.imageKey, 90], [fixture.peerKey, 88]]) {
+        sqlite.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) VALUES(?,?,?)").run(fixture.id, key, score);
+        sqlite.prepare("INSERT INTO image_group_image_claims(image_key,group_id,status) VALUES(?,?,'pending')").run(key, fixture.id);
+      }
+    }
     sqlite.exec("BEGIN");
     try {
       const results = statements.map(statement => {
@@ -195,5 +211,46 @@ assert.equal(badMove.status, 409, "move must refuse a source member without its 
 assert.deepEqual(members(ids.badMoveA), ["bad-move-a.webp","bad-move-b.webp","bad-move-c.webp"]);
 assert.deepEqual(members(ids.badMoveB), ["bad-move-d.webp","bad-move-e.webp"]);
 
-console.log("PASS: SQLite integration fixtures verified split, merge, move, category conflict rejection, snapshot-protected approval, undo, claims, audit entries, server-side mixed-category rejection, and inconsistent-claim fail-closed behavior.");
+// save-groups must not persist early valid proposals when a later proposal fails validation.
+for (const key of ["atomic-first-a.webp", "atomic-first-b.webp", "atomic-invalid-a.webp", "atomic-invalid-b.webp"]) seedImage(key);
+seedImage("atomic-invalid-b.webp", "watch_strap");
+const atomicFirstFingerprint = await hashGroup(["atomic-first-a.webp","atomic-first-b.webp"]);
+const invalidBatch = await call({
+  action: "save-groups",
+  groups: [
+    { imageKeys: ["atomic-first-a.webp","atomic-first-b.webp"], similarity: 96, rationale: "atomic-first-valid", members: [] },
+    { imageKeys: ["atomic-invalid-a.webp","atomic-invalid-b.webp"], similarity: 94, rationale: "atomic-second-mixed", members: [] }
+  ]
+});
+assert.equal(invalidBatch.status, 409, "a later mixed-category proposal should reject the whole request");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(atomicFirstFingerprint).count, 0,
+  "no earlier valid group may be stored when any proposal in the request fails validation");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_image_claims WHERE image_key IN ('atomic-first-a.webp','atomic-first-b.webp')").get().count, 0);
+
+// A competing claim appearing after validation must roll back all proposed groups from this save request.
+for (const key of ["race-first-a.webp", "race-first-b.webp", "race-second-owned.webp", "race-second-new.webp", "race-concurrent-peer.webp"]) seedImage(key);
+const raceFirstFingerprint = await hashGroup(["race-first-a.webp","race-first-b.webp"]);
+const raceSecondFingerprint = await hashGroup(["race-second-owned.webp","race-second-new.webp"]);
+pendingConcurrentClaim = {
+  id: crypto.randomUUID(),
+  fingerprint: await hashGroup(["race-second-owned.webp","race-concurrent-peer.webp"]),
+  imageKey: "race-second-owned.webp",
+  peerKey: "race-concurrent-peer.webp"
+};
+const raceConflict = await call({
+  action: "save-groups",
+  groups: [
+    { imageKeys: ["race-first-a.webp","race-first-b.webp"], similarity: 96, rationale: "Tầng 1 đã phân loại ảnh vào nhóm giày thể thao.", members: [] },
+    { imageKeys: ["race-second-owned.webp","race-second-new.webp"], similarity: 95, rationale: "Tầng 1 đã phân loại ảnh vào nhóm giày thể thao.", members: [] }
+  ]
+});
+assert.equal(raceConflict.status, 409, "a concurrent claim conflict must fail closed");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint IN (?,?)").get(raceFirstFingerprint, raceSecondFingerprint).count, 0,
+  "D1 must roll back all new proposals when any claim in the request conflicts");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_image_claims WHERE image_key='race-second-owned.webp'").get().count, 1,
+  "the competing request's winning claim is preserved");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_set_members WHERE group_id=?").get(pendingConcurrentClaim?.id || sqlite.prepare("SELECT id FROM image_group_sets WHERE fingerprint=?").get(await hashGroup(["race-second-owned.webp","race-concurrent-peer.webp"])).id).count, 2,
+  "the winning concurrent group stays intact");
+
+console.log("PASS: SQLite integration fixtures verify group mutations, claim integrity, approval/undo, no partial save on invalid proposals, and atomic rollback on a simulated concurrent claim.");
 sqlite.close();
