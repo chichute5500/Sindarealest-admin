@@ -146,5 +146,24 @@ assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM audit_logs WHERE acti
 const repeatedUndo = await call({ action: "undo-approval", auditId: approvalAudit.id });
 assert.equal(repeatedUndo.status, 409, "an approval can be undone only once");
 
-console.log("PASS: SQLite integration fixtures verified split, merge, move, category conflict rejection, snapshot-protected approval, undo, claims, and audit entries.");
+// Server must reject a mixed-category proposal even if a browser submits it.
+seedImage("mixed-shoe.webp", "sneaker");
+seedImage("mixed-watch-strap.webp", "watch_strap");
+const mixedGroup = await call({
+  action: "save-groups",
+  groups: [{
+    imageKeys: ["mixed-shoe.webp", "mixed-watch-strap.webp"],
+    similarity: 96,
+    rationale: "Tầng 1 đã phân loại ảnh vào nhóm “giày thể thao”.",
+    members: [
+      { key: "mixed-shoe.webp", similarity: 96 },
+      { key: "mixed-watch-strap.webp", similarity: 96 }
+    ]
+  }]
+});
+assert.equal(mixedGroup.status, 409, "the server rejects a proposal that mixes shoes and watch straps");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND rationale LIKE '%giày thể thao%'").get().count, 0,
+  "a mixed-category proposal must never enter the pending queue");
+
+console.log("PASS: SQLite integration fixtures verified split, merge, move, category conflict rejection, snapshot-protected approval, undo, claims, audit entries, and server-side mixed-category rejection.");
 sqlite.close();
