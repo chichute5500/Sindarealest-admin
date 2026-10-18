@@ -24,6 +24,15 @@ assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('imag
   'Dark mode must recolor the dark crocodile background toward the reference deep-blue/navy palette while retaining the source asset.');
 assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:hue-rotate\(165deg\) saturate\(\.58\) brightness\(1\.08\)/,
   'Light mode must recolor the albino crocodile background toward the reference ice-blue palette while retaining the source asset.');
+assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.56\)/,
+  'Light background must soften the high-contrast texture without removing the crocodile material.');
+assert.match(storefrontHtml, /\.theme-bg--dark::after\{[^}]*rgba\(3,20,36,\.48\)/,
+  'Dark background must receive a deep-navy glaze rather than remain nearly black.');
+assert.ok(storefrontHtml.includes('.theme-watermark{opacity:.035}') &&
+  storefrontHtml.includes('html.dark .theme-watermark{opacity:.045}'),
+  'The background brand watermark must stay subtle and not compete with content.');
+assert.match(storefrontHtml, /@media\(max-width:850px\) and \(min-width:761px\)\{\s*\.navlinks\{display:none\}/,
+  'Compact tablet navigation must prevent the full desktop navbar from clipping at 768 CSS pixels.');
 assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
   'The dark welcome screen must use the dark crocodile image with its dark contrast tint.');
 assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,

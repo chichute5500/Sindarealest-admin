@@ -11,7 +11,9 @@ const themes = ['light', 'dark'];
 const viewports = [
   { name: 'mobile-320', width: 320, height: 720 },
   { name: 'mobile-360', width: 360, height: 800 },
+  { name: 'mobile-375', width: 375, height: 812 },
   { name: 'mobile-390', width: 390, height: 844 },
+  { name: 'mobile-412', width: 412, height: 915 },
   { name: 'mobile-430', width: 430, height: 932 },
   { name: 'tablet-768', width: 768, height: 1024 },
   { name: 'tablet-1024', width: 1024, height: 768 },
@@ -58,6 +60,21 @@ async function settle(page) {
     })));
   });
   await page.waitForTimeout(200);
+}
+async function prepareFullPage(page) {
+  await page.evaluate(async () => {
+    document.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; });
+    const step = Math.max(260, Math.floor(window.innerHeight * 0.68));
+    const height = document.documentElement.scrollHeight;
+    for (let y = 0; y < height; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      await new Promise((resolve) => setTimeout(resolve, 65));
+    }
+    window.scrollTo(0, 0);
+  });
+  await settle(page);
+  await page.waitForTimeout(300);
 }
 
 await ensureDir(outDir);
@@ -175,16 +192,20 @@ try {
       audit.responsive.push({ theme, viewport: vp.name, ...metric });
     }
 
-    for (const vp of [
-      { name: 'mobile-320', width: 320, height: 720 },
-      { name: 'mobile-390', width: 390, height: 844 },
-      { name: 'desktop-1366', width: 1366, height: 768 },
-    ]) {
+    // Capture every requested viewport in both themes, not only the representative three.
+    for (const vp of viewports) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.waitForTimeout(100);
       await capture(page, vp.name + '-' + theme + '-viewport.jpg');
-      if (vp.name !== 'mobile-320') await capture(page, vp.name + '-' + theme + '-full.jpg', true);
+    }
+    for (const vp of [
+      { name: 'mobile-390', width: 390, height: 844 },
+      { name: 'desktop-1366', width: 1366, height: 768 },
+    ]) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await prepareFullPage(page);
+      await capture(page, vp.name + '-' + theme + '-full.jpg', true);
     }
 
     // Theme toggle writes only browser localStorage; no settings endpoint is called.

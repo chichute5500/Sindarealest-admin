@@ -1040,6 +1040,21 @@ img { -webkit-user-drag:none; user-select:none; }
   .featured-arrow:hover:not(:active),.slide-controls button:hover:not(:active),.page-btn.page-arrow:hover:not(:active){transform:scale(1)}
   .detail-gallery-arrow:hover:not(:active),.featured-arrow:hover:not(:active),.slide-controls button:hover:not(:active),.page-btn.page-arrow:hover:not(:active),.sd-fullscreen-arrow:hover:not(:active){background:var(--sd-gallery-glass);border-color:var(--sd-gallery-glass-border)}
 }
+
+/* Reference-match finishing pass: keep crocodile texture present but behind the content. */
+.theme-bg::after{content:"";position:absolute;inset:0;pointer-events:none}
+.theme-bg--light::after{background:linear-gradient(118deg,rgba(239,247,255,.56),rgba(226,240,251,.64) 52%,rgba(246,250,255,.52))}
+.theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.48),rgba(7,31,51,.44) 52%,rgba(3,17,30,.54))}
+.theme-watermark{opacity:.035}
+html.dark .theme-watermark{opacity:.045}
+@media(max-width:850px) and (min-width:761px){
+ .navlinks{display:none}
+ .nav{position:relative;padding-left:48px!important}
+ .menu-btn{display:grid;position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}
+ .nav-actions{margin-left:auto}
+ .mobile-nav{width:min(100%,400px);margin:8px 18px 0 auto;grid-template-columns:1fr;gap:5px}
+ .mobile-nav .navlink{justify-content:flex-start;min-height:42px;padding:0 14px}
+}
 </style>
 
 </body>
