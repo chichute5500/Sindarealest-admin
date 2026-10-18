@@ -24,9 +24,9 @@ assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('imag
   'Dark mode must recolor the dark crocodile background toward the reference deep-blue/navy palette while retaining the source asset.');
 assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:hue-rotate\(165deg\) saturate\(\.58\) brightness\(1\.08\)/,
   'Light mode must recolor the albino crocodile background toward the reference ice-blue palette while retaining the source asset.');
-assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.56\)/,
+assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.68\)/,
   'Light background must soften the high-contrast texture without removing the crocodile material.');
-assert.match(storefrontHtml, /\.theme-bg--dark::after\{[^}]*rgba\(3,20,36,\.48\)/,
+assert.match(storefrontHtml, /\.theme-bg--dark::after\{[^}]*rgba\(3,20,36,\.62\)/,
   'Dark background must receive a deep-navy glaze rather than remain nearly black.');
 assert.ok(storefrontHtml.includes('.theme-watermark{opacity:.035}') &&
   storefrontHtml.includes('html.dark .theme-watermark{opacity:.045}'),
