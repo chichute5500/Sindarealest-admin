@@ -178,11 +178,31 @@ jobs:
           # generate a temporary wrangler.jsonc, and always restore the original.
           config="$GITHUB_WORKSPACE/wrangler.jsonc"
           original_config="$RUNNER_TEMP/wrangler.toml.original"
+          smoke_route="$GITHUB_WORKSPACE/functions/api/ai-smoke-ci.js"
+          smoke_token="$(openssl rand -hex 32)"
           cp "$GITHUB_WORKSPACE/wrangler.toml" "$original_config"
           cleanup() {
+            status=$?
+            set +e
+            rm -f "$smoke_route"
+            # Remove the temporary inference route from the deployed test project
+            # even if the smoke request or later checks fail.
+            if [ -f "$config" ] && [ -f "$original_config" ]; then
+              npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true > /tmp/ai-test-cleanup-deploy.log 2>&1
+              cleanup_status=$?
+              if [ "$cleanup_status" -eq 0 ]; then
+                echo "PASS: temporary AI smoke route removed from the test deployment."
+              else
+                echo "::error::Could not confirm cleanup deployment; inspect the test project before reuse."
+                if [ "$status" -eq 0 ]; then status=1; fi
+              fi
+            fi
             rm -f "$config"
             cp "$original_config" "$GITHUB_WORKSPACE/wrangler.toml"
             rm -f "$original_config"
+            rm -f /tmp/ai-test-cleanup-deploy.log
+            trap - EXIT
+            exit "$status"
           }
           trap cleanup EXIT
           rm "$GITHUB_WORKSPACE/wrangler.toml"
@@ -201,10 +221,68 @@ jobs:
               r2_buckets: [{ binding: "IMAGES", bucket_name: $images }]
             } + (if ($vars | length) > 0 then { vars: $vars } else {} end)' > "$config"
 
+          # Install a one-run, token-gated smoke route only in the isolated test project.
+          # It reads one small Preview R2 raster, calls Workers AI once, and writes no data.
+          mkdir -p "$GITHUB_WORKSPACE/functions/api"
+          cat > "$smoke_route" <<'SMOKE_ROUTE'
+          function response(body, status = 200) {
+            return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+          }
+          function toBase64(bytes) {
+            let binary = "";
+            for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + 0x8000, bytes.length)));
+            return btoa(binary);
+          }
+          export async function onRequestPost({ request, env }) {
+            if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
+            if (typeof env?.AI?.run !== "function" || typeof env?.IMAGES?.list !== "function") return response({ ok: false, reason: "binding_missing" }, 503);
+            try {
+              let cursor, chosen;
+              for (let pageNumber = 0; pageNumber < 20 && !chosen; pageNumber++) {
+                const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
+                for (const object of page.objects || []) {
+                  const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
+                  const ext = String(object.key || "").split(".").pop().toLowerCase();
+                  const mime = supplied === "image/svg+xml" ? "" : (["image/jpeg", "image/png", "image/webp"].includes(supplied) ? supplied : ({jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || ""));
+                  if (mime && Number(object.size) > 0 && Number(object.size) <= 350000) { chosen = { key: object.key, mime }; break; }
+                }
+                if (!page.truncated || !page.cursor) break;
+                cursor = page.cursor;
+              }
+              if (!chosen) return response({ ok: false, reason: "no_small_preview_raster" }, 424);
+              const object = await env.IMAGES.get(chosen.key);
+              if (!object) return response({ ok: false, reason: "r2_object_disappeared" }, 409);
+              const bytes = new Uint8Array(await object.arrayBuffer());
+              if (!bytes.length || bytes.length > 350000) return response({ ok: false, reason: "unsafe_image_size" }, 413);
+              const result = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
+                messages: [{ role: "user", content: "Classify the main product in this image as exactly one category: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Return only JSON with category and integer confidence from 0 to 100." }],
+                image: "data:" + chosen.mime + ";base64," + toBase64(bytes),
+                temperature: 0,
+                response_format: { type: "json_schema", json_schema: { type: "object", properties: { category: { type: "string", enum: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"] }, confidence: { type: "integer", minimum: 0, maximum: 100 } }, required: ["category","confidence"], additionalProperties: false } },
+                max_tokens: 180
+              });
+              let parsed = result?.response;
+              if (typeof parsed === "string") {
+                try { parsed = JSON.parse(parsed); } catch {
+                  const match = parsed.match(/\{[\s\S]*\}/);
+                  if (match) { try { parsed = JSON.parse(match[0]); } catch {} }
+                }
+              }
+              const allowed = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
+              const confidence = Number(parsed?.confidence);
+              if (!parsed || typeof parsed !== "object" || !allowed.has(parsed.category) || !Number.isInteger(confidence) || confidence < 0 || confidence > 100) return response({ ok: false, reason: "invalid_model_response" }, 502);
+              return response({ ok: true, imageKey: chosen.key, imageBytes: bytes.length, category: parsed.category, confidence });
+            } catch (error) {
+              return response({ ok: false, reason: "workers_ai_error", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
+            }
+          }
+          SMOKE_ROUTE
+          sed -i "s/__SMOKE_TOKEN__/$smoke_token/" "$smoke_route"
+
           echo "Deploying the AI binding only to $TARGET_PROJECT. DB/IMAGES point to the checked source Preview resources."
           npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
 
-          # Every deploy gets public-route/auth-guard smoke checks. If a dedicated test credential exists, the optional follow-up logs in and calls classification on one existing Preview R2 object; it does not edit product galleries or image objects.
+          # Every deploy gets public-route/auth-guard smoke checks. The temporary AI route is token-gated and removed by the EXIT cleanup above.
           base="https://${TARGET_PROJECT}.pages.dev"
           home_status="$(curl --silent --show-error -o /tmp/ai-test-home.html -w "%{http_code}" "$base/")"
           admin_status="$(curl --silent --show-error -o /tmp/ai-test-admin.html -w "%{http_code}" "$base/admin/")"
@@ -214,6 +292,19 @@ jobs:
           api_status="$(curl --silent --show-error -o /tmp/ai-test-api.json -w "%{http_code}" "$base/api/admin/image-groups")"
           test "$api_status" = "401" || { echo "::error::Unauthenticated admin API should return 401, received HTTP $api_status."; exit 1; }
           echo "PASS: test site, admin route, and protected API smoke checks."
+
+          ai_smoke_status="$(curl --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci")"
+          if [ "$ai_smoke_status" = "200" ]; then
+            jq -e '.ok == true and (.category | type == "string") and (.confidence | type == "number") and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
+              echo "::error::Real Workers AI smoke response was invalid. Response body omitted."; exit 1;
+            }
+            echo "PASS: real Workers AI inference used one small image from Preview R2. No database or product gallery was modified."
+          elif [ "$ai_smoke_status" = "424" ]; then
+            echo "::warning::No suitable small raster image exists in Preview R2; actual vision inference could not be tested."
+          else
+            echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Response body omitted."
+            exit 1
+          fi
 
           if [ -n "${AI_TEST_ADMIN_PASSWORD:-}" ]; then
             login_payload="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" '{password:$password}')"
