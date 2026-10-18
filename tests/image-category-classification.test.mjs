@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, reviewInsertBatches = 0;
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, failNextMultiImage = false, compareMode = false, reviewInsertBatches = 0;
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -29,6 +29,15 @@ const env = {
     modelCalls++; lastModelInput = { model, input };
     if (failNextQuota) { failNextQuota = false; const error = new Error("Workers AI quota exceeded (429)"); error.status = 429; throw error; }
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
+    if (failNextMultiImage && input.messages?.some(message => Array.isArray(message.content) && message.content.some(part => part.type === "image_url"))) {
+      failNextMultiImage = false;
+      throw new Error("3030: Internal Server Error");
+    }
+    if (compareMode && input.image) return { response: JSON.stringify({ shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }), tool_calls: [], usage: {} };
+    if (compareMode && input.messages?.some(message => typeof message.content === "string" && message.content.includes("mô tả từ phân tích thị giác"))) {
+      return malformed ? { response: "not valid JSON", tool_calls: [] } :
+        { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
+    }
     if (compareMode) return malformed ? { response: "not valid JSON", tool_calls: [] } :
       { response: { pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Trùng vân da, đường may và chi tiết đế." }] }, tool_calls: [], usage: {} };
     return malformed ? { response: "not valid JSON", tool_calls: [] } :
@@ -145,6 +154,18 @@ assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison m
 assert.ok(Array.isArray(lastModelInput.input.messages[1].content), "pair comparison must send the image content parts in the user message");
 assert.equal(lastModelInput.input.response_format, undefined, "multi-image comparison must avoid the schema-constrained format that failed real Preview inference");
 assert.equal(lastModelInput.input.messages[1].content.filter(part => part.type === "image_url").length, 2, "both real candidate images must be present in the comparison input");
+
+// A live-style 3030 error on multi-image inference falls back to two documented
+// single-image vision calls plus a text comparison, and saves only pending review.
+failNextMultiImage = true;
+const beforeFallbackCalls = modelCalls;
+const beforeFallbackWrites = reviewInsertBatches;
+const fallbackResponse = await onRequestPost({ request: compareRequest(), env });
+const fallbackResult = await fallbackResponse.json();
+assert.equal(fallbackResponse.status, 201, JSON.stringify(fallbackResult));
+assert.equal(fallbackResult.matches, 1);
+assert.equal(modelCalls, beforeFallbackCalls + 4, "3030 fallback must analyze each image separately and compare descriptors");
+assert.equal(reviewInsertBatches, beforeFallbackWrites + 1, "fallback proposal remains a pending review, not a public image update");
 
 // Malformed compare output must fail closed before any review batch is written.
 malformed = true;
