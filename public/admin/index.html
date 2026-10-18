@@ -147,11 +147,12 @@ async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcome
       try { data = JSON.parse(raw); } catch { throw new Error("API trả về HTTP " + response.status + " nhưng không phải JSON: " + raw.slice(0, 180)); }
       status.textContent = (data.message || data.error || "Không có thông báo từ máy chủ") +
         "\\nHTTP: " + response.status +
-        "\\nĐã nhập: " + (data.imported ?? 0) + "/50" +
+        "\\nNhập mới lần này: " + (data.imported ?? 0) +
+        "\\nẢnh hiện có/đã nhập: " + (data.totalPresent ?? data.imported ?? 0) + "/50" +
         "\\nBỏ qua ảnh đã có: " + (data.skippedExisting ?? 0) +
         "\\nLỗi: " + (Array.isArray(data.failures) ? data.failures.length : 0) +
         (Array.isArray(data.failures) && data.failures.length ? "\\n" + data.failures.slice(0, 3).map(x => x.source + ": " + x.error).join("\\n") : "");
-      if (response.ok && data.imported === 50) {
+      if (response.ok && (data.totalPresent ?? data.imported) >= 50) {
         button.textContent = "Đã nhập đủ 50 ảnh";
         button.disabled = true;
         setTimeout(() => location.reload(), 1800);
