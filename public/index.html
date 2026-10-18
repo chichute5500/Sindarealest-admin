@@ -496,7 +496,10 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
       <p class="hero-description">SinDarealest mang đến những sản phẩm thời trang da cá sấu cao cấp, kết hợp giữa tinh hoa thủ công và phong cách hiện đại.</p>
       <div class="hero-actions"><a class="pill-btn primary tap-target" href="#collections">Khám phá bộ sưu tập <span class="arrow">→</span></a><a class="pill-btn tap-target" href="#products">Khám phá sản phẩm <span class="arrow">↘</span></a></div>
     </div>
-    
+    <div class="hero-visual glass" aria-hidden="true">
+      <div class="hero-visual-glow"></div>
+      <img id="heroProductImage" alt="" decoding="async" fetchpriority="high">
+      <span class="hero-visual-caption">SINDAREALEST · SIGNATURE</span>
     </div>
   </section>
   <section class="wrap" aria-label="Quyền lợi thương hiệu" data-reveal>
@@ -634,6 +637,7 @@ function bindReveal(root=document){const els=root.querySelectorAll('[data-reveal
 const revealObserver='IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');revealObserver.unobserve(entry.target)}}),{threshold:.08,rootMargin:'0px 0px -30px 0px'}):null;
 function preferredGallery(category,fallbackSku){const candidates=products.filter(p=>p.category===category&&allImages(p).length>1).sort((a,b)=>allImages(b).length-allImages(a).length);return candidates[0]||preferred(category,fallbackSku)}
 function featuredProductCard(p,flag='SELECTED',idx=0){const images=allImages(p);const id=escapeHtml(p.id||p.slug);const count=images.length;const track=count>1?`<span class="feature-track" data-feature-track style="--slide-count:${count};width:${count*100}%">${images.map((src,i)=>`<img class="feature-slide" ${i===0?`src="${escapeHtml(imgPath(src))}"`:`data-src="${escapeHtml(imgPath(src))}"`} alt="${escapeHtml(p.title)} — ảnh ${i+1}" ${i===0?'loading="eager"':'loading="lazy"'} decoding="async" style="flex:0 0 ${100/count}%;width:${100/count}%">`).join('')}</span>`:`<img class="feature-single" src="${escapeHtml(imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1'))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`;return `<article class="product-card featured-product-card tap-target" data-reveal style="--reveal-delay:${Math.min(idx,3)*65}ms" data-featured-card data-feature-count="${count}" data-feature-index="0" data-product="${id}"><div class="featured-media"><button class="product-open featured-open" data-open-product="${id}" aria-label="Xem chi tiết ${escapeHtml(p.title)}"><span class="product-photo feature-photo">${track}<span class="photo-shade"></span><span class="product-flag">${escapeHtml(flag)}</span></span></button>${count>1?`<button type="button" class="featured-arrow featured-prev tap-target" data-feature-step="-1" aria-label="Ảnh trước của ${escapeHtml(p.title)}">${arrowIcon('left')}</button><button type="button" class="featured-arrow featured-next tap-target" data-feature-step="1" aria-label="Ảnh tiếp theo của ${escapeHtml(p.title)}">${arrowIcon('right')}</button><span class="featured-image-count" data-feature-count-label>01 / ${String(count).padStart(2,'0')}</span>`:''}</div><div class="product-info"><span class="product-sku">SKU: ${escapeHtml(p.sku||'Liên hệ')}</span><button class="featured-title product-title" data-open-product="${id}">${escapeHtml(p.title||'Sản phẩm tuyển chọn')}</button><div class="product-category">${escapeHtml(p.categoryLabel||categoryLabels[p.category]||'Sản phẩm')}</div><div class="product-card-bottom"><button class="product-detail-cta" data-open-product="${id}">Xem chi tiết <span>↗</span></button></div></div><button class="mini-add quick-add tap-target" data-add="${id}" aria-label="Thêm ${escapeHtml(p.title)} vào giỏ chọn">${iconBag()}</button></article>`}
+function syncHeroProductImage(){const target=$('#heroProductImage');if(!target)return;const source=$('#catalogGrid .product-photo img')||$('#featuredGrid .feature-slide');if(!source)return;const url=source.currentSrc||source.src||source.dataset.src||source.getAttribute('data-src');if(url){target.src=url;target.dataset.sourceProductImage='true'}}
 function renderFeatured(){const categories=['sneakers','loafers','belts','wallets'];const fallbacks=['SD001','SD064','SD167','SD138'];const flags=['SIGNATURE','CRAFT','ACCESSORY','ESSENTIAL'];const choices=categories.map((c,i)=>preferredGallery(c,fallbacks[i])).filter(Boolean);$('#featuredGrid').innerHTML=choices.map((p,i)=>featuredProductCard(p,flags[i]||'SELECTED',i)).join('');bindReveal($('#featuredGrid'));setupFeaturedAutoplay()}
 function changeFeaturedImage(card,step=1){if(!card)return;const track=card.querySelector('[data-feature-track]');const count=Number(card.dataset.featureCount||0);if(!track||count<2)return;const base=Number(card.dataset.featureRequestIndex??card.dataset.featureIndex??0);const index=(base+step+count)%count;card.dataset.featureRequestIndex=String(index);const requestId=String(Number(card.dataset.featureRequestId||0)+1);card.dataset.featureRequestId=requestId;const commit=()=>{if(card.dataset.featureRequestId!==requestId)return;card.dataset.featureIndex=String(index);track.style.transform=`translate3d(${-index*100/count}%,0,0)`;const label=card.querySelector('[data-feature-count-label]');if(label)label.textContent=String(index+1).padStart(2,'0')+' / '+String(count).padStart(2,'0');const ahead=track.children[(index+1)%count];if(ahead&&ahead.dataset.src&&!ahead.dataset.preloading){ahead.dataset.preloading='1';const preload=new Image();preload.onload=()=>{ahead.dataset.preloaded='1';delete ahead.dataset.preloading};preload.onerror=()=>{delete ahead.dataset.preloading};preload.src=ahead.dataset.src}};const target=track.children[index];if(target&&target.dataset.src&&!target.getAttribute('src')){target.onload=()=>{target.onload=null;target.dataset.loaded='1';commit()};target.onerror=()=>{target.onerror=null;commit()};target.src=target.dataset.src;delete target.dataset.src;return}commit()}
 let featuredPausedUntil=0;
@@ -860,7 +864,7 @@ $('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetai
  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();closeCart();$('#mobileNav').classList.remove('open')}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowRight'){changeDetailImage(detailIndex+1,true)}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowLeft'){changeDetailImage(detailIndex-1,true)}});setupTapRing();
 }
 async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();bindEvents();try{const res=await fetch('/api/products',{cache:'no-store'});if(!res.ok)throw new Error('API sản phẩm trả về HTTP '+res.status);const payload=await res.json();products=Array.isArray(payload)?payload:(payload.products||payload.data||[]);if(!Array.isArray(products))throw new Error('Dữ liệu sản phẩm không hợp lệ');products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));}catch(err){$('#catalogGrid').innerHTML='<p class="section-note">Không thể tải danh mục từ /api/products. Hãy kiểm tra Cloudflare Pages Functions, binding D1 tên DB và các tệp SQL trong migrations/. Website không dùng danh mục tĩnh cũ khi API gặp lỗi.</p>';return}
- renderFeatured();renderFilters();renderCatalog();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();const productRoute=location.pathname.match(/^\/san-pham\/([^/]+)/);if(productRoute)openDetail(decodeURIComponent(productRoute[1]),true);
+ renderFeatured();renderFilters();renderCatalog();syncHeroProductImage();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();const productRoute=location.pathname.match(/^\/san-pham\/([^/]+)/);if(productRoute)openDetail(decodeURIComponent(productRoute[1]),true);
 }
 init();
 })();
@@ -1055,6 +1059,40 @@ html.dark .theme-watermark{opacity:.045}
  .mobile-nav{width:min(100%,400px);margin:8px 18px 0 auto;grid-template-columns:1fr;gap:5px}
  .mobile-nav .navlink{justify-content:flex-start;min-height:42px;padding:0 14px}
 }
+
+/* Reference-aligned hero composition: reuse a real catalog image; never invent product content. */
+.hero{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:clamp(16px,2.5vw,36px);align-items:center;padding:clamp(24px,4vw,48px) 0 28px}
+.hero-copy{max-width:none;min-width:0;padding:4px 0 12px 10px}
+.hero h1{font-size:clamp(30px,4.1vw,58px);line-height:1.04;max-width:660px}
+.hero-visual{position:relative;isolation:isolate;display:grid;place-items:center;min-width:0;aspect-ratio:1.02/1;overflow:hidden;border:1px solid var(--line);border-radius:clamp(18px,2.3vw,30px);background:linear-gradient(145deg,var(--panel-strong),var(--glass));box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.12),0 18px 42px rgba(0,12,28,.12)}
+.hero-visual::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(145deg,rgba(255,255,255,.28),transparent 38%,rgba(67,130,175,.09));}
+.hero-visual-glow{position:absolute;inset:8% 7%;border-radius:50%;background:radial-gradient(ellipse,rgba(132,190,230,.26),transparent 68%);filter:blur(14px)}
+.hero-visual img{position:relative;z-index:0;width:100%;height:100%;object-fit:contain;padding:5%;filter:drop-shadow(0 16px 22px rgba(0,15,30,.17));}
+.hero-visual-caption{position:absolute;z-index:2;left:13px;bottom:12px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--muted);font-size:8px;font-weight:700;letter-spacing:.13em}
+html.dark .hero-visual{box-shadow:inset 0 1px 0 rgba(231,246,255,.24),inset 0 0 0 1px rgba(176,215,243,.12),0 20px 46px rgba(0,0,0,.25)}
+.theme-bg--light::after{background:linear-gradient(118deg,rgba(239,247,255,.78),rgba(226,240,251,.80) 52%,rgba(246,250,255,.76)),radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.38),transparent 38%)}
+.theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.76),rgba(7,31,51,.72) 52%,rgba(3,17,30,.78)),radial-gradient(ellipse at 20% 15%,rgba(91,157,202,.15),transparent 40%),radial-gradient(ellipse at 82% 58%,rgba(37,100,148,.12),transparent 42%)}
+html.dark .theme-bg--dark{filter:hue-rotate(0deg) saturate(.72) brightness(.88) contrast(.84)}
+@media(max-width:760px){
+ .hero{grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:8px;padding:25px 0 17px}
+ .hero-copy{padding:0 0 4px;align-self:center}
+ .hero .eyebrow{font-size:7px;letter-spacing:.14em;line-height:1.5}
+ .hero h1{font-size:clamp(22px,6.2vw,30px);line-height:1.08;letter-spacing:-.045em;margin:8px 0}
+ .hero-description{font-size:10px;line-height:1.55}
+ .hero-actions{gap:5px;margin-top:10px}
+ .hero-actions .pill-btn{min-height:31px;padding:7px 8px;font-size:8px;line-height:1.25;gap:5px}
+ .hero-visual{aspect-ratio:.78/1;border-radius:18px}
+ .hero-visual img{padding:3%}
+ .hero-visual-caption{left:6px;right:6px;bottom:6px;padding:5px 6px;text-align:center;font-size:6px;letter-spacing:.08em}
+}
+@media(max-width:350px){
+ .hero{gap:6px}
+ .hero h1{font-size:22px}
+ .hero-description{font-size:9px}
+ .hero-actions .pill-btn{font-size:7px;padding:6px}
+}
+@media(prefers-reduced-motion:reduce){.hero-visual,.hero-visual img{transition:none!important}}
+
 </style>
 
 </body>
