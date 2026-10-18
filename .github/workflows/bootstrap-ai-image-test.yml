@@ -168,7 +168,7 @@ jobs:
             '{
               name: $name,
               pages_build_output_dir: "public",
-              compatibility_date: "2026-10-19",
+              compatibility_date: "2026-10-17",
               ai: { binding: "AI" },
               d1_databases: [{ binding: "DB", database_name: $db_name, database_id: $db_id }],
               r2_buckets: [{ binding: "IMAGES", bucket_name: $images }]
