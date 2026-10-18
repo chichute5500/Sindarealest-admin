@@ -35,6 +35,14 @@ assert.ok(result.groups.some(group => group.imageKeys.includes("batch-1/a.webp")
 assert.ok(result.groups.some(group => group.imageKeys.includes("batch-3/c.webp") && group.imageKeys.includes("batch-4/d.webp")));
 assert.equal(lastProgress.total, 6);
 
+const large = Array.from({ length: 65 }, (_, index) =>
+  descriptor("large-batch/" + String(index).padStart(3, "0") + ".webp", "0011223344556677", shapeA, colorsA)
+);
+const split = await findSimilarGroups(large);
+assert.equal(split.compared, 65 * 64 / 2, "large inventory still compares all cross-batch image pairs");
+assert.deepEqual(split.groups.map(group => group.imageKeys.length).sort((a,b)=>a-b), [5,30,30]);
+assert.ok(split.groups.every(group => group.imageKeys.length <= 30), "no proposed group exceeds product gallery capacity");
+
 const alreadyAssigned = items.slice(0,2).map(item => ({ ...item, assignedTo: [{ sku: "SD-SN001" }] }));
 const skipped = await findSimilarGroups(alreadyAssigned);
 assert.equal(skipped.groups.length, 0, "do not re-propose images already assigned to the same SKU");
