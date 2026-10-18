@@ -177,12 +177,12 @@ async function runVisionWithRetry(input){
   for(let attempt=0;attempt<2;attempt++){
     try{return await env.AI.run(MODEL,input)}
     catch(error){
-      const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\\r\\n]+/g," ").slice(0,180);
+      const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
       const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
-      const quota=upstreamStatus===429||/\\b429\\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
-      const transient=[500,502,503,504].includes(upstreamStatus)||/\\b(500|502|503|504)\\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+      const quota=upstreamStatus===429||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+      const transient=[500,502,503,504].includes(upstreamStatus)||/\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
       if(quota){error.status=429;throw error}
-      if(attempt===0&&transient&&!/\\b3030\\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
+      if(attempt===0&&transient&&!/\b3030\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
       error.status=transient?503:upstreamStatus||502;
       throw error;
     }
@@ -209,8 +209,8 @@ try{
   }
   const compared=await runVisionWithRetry({
     messages:[
-      {role:"system",content:"Compare visual descriptions of shoe photos. Decide which pairs show the SAME physical product, not merely the same style. Differences in view angle, lighting or background are acceptable; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Return only valid JSON: {\\"pairs\\":[{\\"a\\":0,\\"b\\":1,\\"same_product\\":true,\\"confidence\\":91,\\"rationale\\":\\"brief Vietnamese reason\\"}]}. Use zero-based image indices, never pair an image with itself, and return an empty pairs array if uncertain. Only report confidence >= 91."},
-      {role:"user",content:promptBase+"\\n\\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mô tả từ phân tích thị giác):\\n"+description).join("\\n\\n")+"\\n\\nChỉ ghép khi có đủ bằng chứng về cùng một sản phẩm vật lý. Chỉ trả JSON duy nhất, confidence phải từ 91 trở lên."}
+      {role:"system",content:"Compare visual descriptions of shoe photos. Decide which pairs show the SAME physical product, not merely the same style. Differences in view angle, lighting or background are acceptable; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Return only valid JSON: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":91,\"rationale\":\"brief Vietnamese reason\"}]}. Use zero-based image indices, never pair an image with itself, and return an empty pairs array if uncertain. Only report confidence >= 91."},
+      {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mô tả từ phân tích thị giác):\n"+description).join("\n\n")+"\n\nChỉ ghép khi có đủ bằng chứng về cùng một sản phẩm vật lý. Chỉ trả JSON duy nhất, confidence phải từ 91 trở lên."}
     ],
     temperature:0,
     max_tokens:350
@@ -219,9 +219,9 @@ try{
   if(typeof comparedText!=="string"||!comparedText.trim())throw new Error("text comparison response was empty");
   result={response:comparedText.trim()};
 }catch(error){
-  const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\\r\\n]+/g," ").slice(0,180);
+  const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
   const status=Number(error?.status||error?.statusCode||error?.status_code||0);
-  if(status===429||/\\b429\\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
+  if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
   return fail("Workers AI không thể so sánh ảnh bằng mô tả thị giác đơn ảnh: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
 }
 batches++;const responseValue=result?.response??result?.choices?.[0]?.message?.content??result?.output_text;let parsed=responseValue&&typeof responseValue==="object"&&!Array.isArray(responseValue)?responseValue:null;const raw=typeof responseValue==="string"?responseValue.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,""):"";if(!parsed&&raw){try{parsed=JSON.parse(raw)}catch{const m=raw.match(/\{[\s\S]*\}/);if(m)try{parsed=JSON.parse(m[0])}catch{}}}if(!parsed||!Array.isArray(parsed.pairs))return fail("AI không trả về danh sách cặp ảnh hợp lệ ở cụm "+batches+". Chưa lưu đề xuất nào; thử lại hoặc kiểm tra model/binding AI.",502);for(const pair of parsed.pairs){const a=Number(pair?.a),b=Number(pair?.b),confidence=Number(pair?.confidence);if(pair?.same_product!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=batchKeys.length||b>=batchKeys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100)continue;const first=batchKeys[a]<batchKeys[b]?batchKeys[a]:batchKeys[b],second=batchKeys[a]<batchKeys[b]?batchKeys[b]:batchKeys[a],id=first+"|"+second;if(seen.has(id))continue;seen.add(id);prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||"").trim().slice(0,900)})}}if(!prepared.length)return json({ok:true,matches:[],batches,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong các cụm ảnh đã kiểm tra. Với 5–8 ảnh, các cụm 4 ảnh có chồng lấp để giảm lỗi nội bộ của model; nếu nghi ngờ cặp ở hai đầu danh sách, hãy chạy lượt riêng với hai ảnh đó."});const statements=prepared.map(p=>env.DB.prepare("INSERT INTO image_group_reviews(id,image_a,image_b,same_product,confidence,rationale,status,created_at) VALUES(?,?,?,1,?,?,'pending',datetime('now'))").bind(crypto.randomUUID(),p.first,p.second,p.confidence,p.rationale));await env.DB.batch(statements);return json({ok:true,matches:prepared.length,batches,message:"AI đã tạo "+prepared.length+" cặp ảnh đề xuất sau "+batches+" lượt phân tích. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201)}catch(error){const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,220);return fail("Không thể tìm nhóm ảnh bằng Workers AI. Chi tiết kỹ thuật: "+detail,502)}}if(action==="reject"){const id=String(body.reviewId||"");if(!/^[0-9a-f-]{36}$/i.test(id))return fail("Mã lượt duyệt không hợp lệ.");const r=await env.DB.prepare("UPDATE image_group_reviews SET status='rejected' WHERE id=? AND status='pending'").bind(id).run();if(!r.meta?.changes)return fail("Lượt duyệt không tồn tại hoặc đã được xử lý.",409);return json({ok:true,message:"Đã loại đề xuất này."})}
