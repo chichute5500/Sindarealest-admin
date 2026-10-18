@@ -237,7 +237,7 @@ jobs:
           function response(body, status = 200, headers = {}) {
             return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers } });
           }
-          async function findSmallRaster(env, excludedKey = "") {
+          async function findSmallRaster(env, excludedKey = "", requestedKey = "") {
             let cursor;
             for (let pageNumber = 0; pageNumber < 20; pageNumber++) {
               const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
@@ -246,7 +246,7 @@ jobs:
                 const ext = String(object.key || "").split(".").pop().toLowerCase();
                 const fallback = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || "";
                 const declared = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
-                if (object.key === excludedKey || !declared || Number(object.size) <= 0 || Number(object.size) > 350000) continue;
+                if (object.key === excludedKey || (requestedKey && object.key !== requestedKey) || !declared || Number(object.size) <= 0 || Number(object.size) > 350000) continue;
                 // Metadata and file extensions can be stale. Verify the bytes before
                 // selecting a candidate, otherwise an HTML/XML placeholder can make
                 // Sharp fail before the AI request is even reached.
@@ -269,8 +269,11 @@ jobs:
             if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
             if (typeof env?.IMAGES?.list !== "function") return response({ ok: false, reason: "r2_binding_missing" }, 503);
             try {
-              const excludedKey = new URL(request.url).searchParams.get("exclude") || "";
-              const chosen = await findSmallRaster(env, excludedKey);
+              const params = new URL(request.url).searchParams;
+              const excludedKey = params.get("exclude") || "";
+              const requestedKey = params.get("key") || "";
+              if (requestedKey.length > 1024) return response({ ok: false, reason: "invalid_requested_key" }, 400);
+              const chosen = await findSmallRaster(env, excludedKey, requestedKey);
               if (!chosen) return response({ ok: false, reason: "no_small_preview_raster" }, 424);
               const bytes = chosen.bytes;
               return new Response(bytes, { status: 200, headers: { "Content-Type": chosen.mime, "X-Preview-Image-Key": encodeURIComponent(chosen.key), "Cache-Control": "no-store" } });
