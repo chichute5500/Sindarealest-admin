@@ -322,7 +322,8 @@ export async function computeImageDescriptor(url, metadata = {}) {
       features: { shape, colors: colorCounts },
       width, height,
       sourceSize: Number(metadata.size || blob.size || 0),
-      sourceUploaded: String(metadata.uploaded || "")
+      sourceUploaded: String(metadata.uploaded || ""),
+      previewDataUrl: base.toDataURL("image/jpeg", 0.68)
     };
   } finally {
     bitmap.close?.();
