@@ -238,6 +238,16 @@ jobs:
             return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers } });
           }
           async function findSmallRaster(env, excludedKey = "", requestedKey = "") {
+            if(requestedKey){
+              if(requestedKey===excludedKey)return null;
+              const candidate=await env.IMAGES.get(requestedKey);if(!candidate)return null;
+              const bytes=new Uint8Array(await candidate.arrayBuffer());if(!bytes.length||bytes.length>5000000)return null;
+              let mime="";
+              if(bytes.length>=3&&bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff)mime="image/jpeg";
+              else if(bytes.length>=8&&bytes[0]===0x89&&bytes[1]===0x50&&bytes[2]===0x4e&&bytes[3]===0x47&&bytes[4]===0x0d&&bytes[5]===0x0a&&bytes[6]===0x1a&&bytes[7]===0x0a)mime="image/png";
+              else if(bytes.length>=12&&String.fromCharCode(...bytes.slice(0,4))==="RIFF"&&String.fromCharCode(...bytes.slice(8,12))==="WEBP")mime="image/webp";
+              return mime?{key:requestedKey,mime,bytes}:null;
+            }
             let cursor;
             for (let pageNumber = 0; pageNumber < 20; pageNumber++) {
               const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
@@ -263,6 +273,38 @@ jobs:
               }
               if (!page.truncated || !page.cursor) break;
               cursor = page.cursor;
+            }
+            return null;
+          }
+          function productImageKeys(raw) {
+            let refs=[];try{refs=JSON.parse(raw||"[]")}catch{}
+            const keys=[];
+            for(const ref of Array.isArray(refs)?refs:[]){
+              const value=String(ref||"").trim().split(/[?#]/,1)[0];if(!value)continue;
+              let key="";
+              try{const pathname=new URL(value,"https://inventory.invalid").pathname;const marker="/media/";const position=pathname.indexOf(marker);if(position>=0)key=decodeURIComponent(pathname.slice(position+marker.length)}catch{}
+              if(!key&&value.startsWith("media/")){try{key=decodeURIComponent(value.slice(6))}catch{key=value.slice(6)}}
+              if(!key&&!value.startsWith("/")&&!/^https?:\/\//i.test(value)){try{key=decodeURIComponent(value)}catch{key=value}}
+              if(key&&key.length<=1024&&!/[\u0000-\u001f\u007f]/.test(key)&&!keys.includes(key))keys.push(key);
+            }
+            return keys;
+          }
+          async function findAssignedProductPair(env) {
+            let offset=0;
+            while(true){
+              const page=await env.DB.prepare("SELECT sku,images_json FROM products ORDER BY sku ASC,id ASC LIMIT 500 OFFSET ?").bind(offset).all();
+              const rows=page.results||[];
+              for(const product of rows){
+                const keys=productImageKeys(product.images_json);if(keys.length<2)continue;
+                for(let i=0;i<keys.length;i++){
+                  const first=await findSmallRaster(env,"",keys[i]);if(!first)continue;
+                  for(let j=i+1;j<keys.length;j++){
+                    const second=await findSmallRaster(env,first.key,keys[j]);
+                    if(second)return{sku:String(product.sku||""),first,second};
+                  }
+                }
+              }
+              if(rows.length<500)break;offset+=rows.length;
             }
             return null;
           }
