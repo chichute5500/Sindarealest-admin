@@ -42,7 +42,7 @@ export async function onRequestPost({ request, env }) {
       if (htmlResponse.ok) {
         const html = await htmlResponse.text();
         const found = new Set();
-        const pattern = /(?:public\\/images\\/)([a-f0-9]{16}\\.webp)/gi;
+        const pattern = /public\/images\/([a-f0-9]{16}\.webp)/gi;
         for (const match of html.matchAll(pattern)) found.add(match[1]);
         sources = [...found].map((name) => ({ name }));
       } else {
