@@ -36,4 +36,7 @@ assert.equal(unauthorized.status,401);
 const adminHtml = await readFile(new URL("../public/admin/index.html", import.meta.url), "utf8");
 const viewAllowlist = "!['dashboard','products','orders','customers','warranties','image-groups','settings'].includes(v)";
 assert.ok(adminHtml.includes(viewAllowlist), "AI image grouping must be accepted by setView navigation.");
+assert.ok(adminHtml.includes("features.shape.length===64") && adminHtml.includes("features.colors.length===12"), "malformed cached shape/color descriptors must be re-indexed instead of silently skipped");
+assert.ok(adminHtml.includes("validHash=/^[0-9a-f]{16}$/i.test(String(row?.p_hash||\"\")"), "malformed cached perceptual hashes must be re-indexed");
+assert.ok(adminHtml.includes("validCategories.has(String(features.category||\"\")"), "invalid cached category values must be re-indexed before whole-inventory matching");
 console.log("PASS: image grouping inventory requires admin auth and maps existing product image assignments without modifying products.");
