@@ -108,20 +108,12 @@ jobs:
 
           if [ -n "${AI_TEST_ADMIN_PASSWORD:-}" ]; then
             test "${#AI_TEST_ADMIN_PASSWORD}" -ge 12 || { echo "::error::AI_TEST_ADMIN_PASSWORD must be at least 12 characters."; exit 1; }
-            target="$(curl --fail --silent --show-error \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "$api/pages/projects/$TARGET_PROJECT")"
-            printf '%s' "$target" | jq -e '.success == true' >/dev/null
-            session_type="$(printf '%s' "$target" | jq -r '.result.deployment_configs.production.env_vars.SESSION_SECRET.type // empty')"
-            if [ "$session_type" = "secret_text" ]; then
-              env_vars="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" '{ADMIN_PASSWORD:{type:"secret_text",value:$password}}')"
-              echo "An existing test SESSION_SECRET is retained; only the dedicated test admin password is updated."
-            else
-              session_secret="$(openssl rand -hex 32)"
-              env_vars="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" --arg session "$session_secret" '{ADMIN_PASSWORD:{type:"secret_text",value:$password},SESSION_SECRET:{type:"secret_text",value:$session}}')"
-              unset session_secret
-              echo "Dedicated test admin secret and a new random SESSION_SECRET are being configured; values are not logged."
-            fi
+            # This is a disposable test environment; rotate its session secret
+            # per workflow so test credentials are dedicated and never reused in Production.
+            session_secret="$(openssl rand -hex 32)"
+            env_vars="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" --arg session "$session_secret" '{ADMIN_PASSWORD:{type:"secret_text",value:$password},SESSION_SECRET:{type:"secret_text",value:$session}}')"
+            unset session_secret
+            echo "Dedicated test admin secret and a fresh random SESSION_SECRET are being configured; values are not logged."
             secret_payload="$(jq -n --argjson env_vars "$env_vars" '{deployment_configs:{production:{env_vars:$env_vars}}}')"
             secret_response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
               -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
@@ -132,8 +124,8 @@ jobs:
             echo "::warning::AI_TEST_ADMIN_PASSWORD is not configured. Site deploy and unauthenticated smoke checks will run, but authenticated D1/R2/AI checks will be skipped. Add a dedicated test-only GitHub Actions secret with this name; do not reuse Production credentials."
           fi
       
-      - name: Install Wrangler
-        run: npm install --no-save --no-package-lock wrangler
+      - name: Install Wrangler and image smoke-test converter
+        run: npm install --no-save --no-package-lock wrangler sharp
 
       - name: Deploy AI-enabled configuration to the separate test project only
         shell: bash
@@ -252,12 +244,18 @@ jobs:
           if (!output.length || output.length > 180000) throw new Error("Smoke image exceeds the safe payload size.");
           await import("node:fs/promises").then(fs => fs.writeFile("/tmp/ai-test-source-image.jpg", output));
           NODE
-              image_data_url="data:image/jpeg;base64,$(base64 -w0 /tmp/ai-test-source-image.jpg)"
-              classify_payload="$(jq -n --arg key "$image_key" --arg data "$image_data_url" '{action:"classify-categories",imageKeys:[$key],imageData:[{key:$key,dataUrl:$data}]}')"
+              base64 -w0 /tmp/ai-test-source-image.jpg > /tmp/ai-test-source-image.b64
+              AI_TEST_IMAGE_KEY="$image_key" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const key = process.env.AI_TEST_IMAGE_KEY;
+          const encoded = (await readFile("/tmp/ai-test-source-image.b64", "utf8")).trim();
+          const payload = { action: "classify-categories", imageKeys: [key], imageData: [{ key, dataUrl: "data:image/jpeg;base64," + encoded }] };
+          await writeFile("/tmp/ai-test-classify-request.json", JSON.stringify(payload));
+          NODE
               classify_status="$(curl --silent --show-error -o /tmp/ai-test-classify.json -w "%{http_code}" \
                 -X POST "$base/api/admin/image-groups" \
                 -H "Origin: $base" -H "Sec-Fetch-Site: same-origin" -H "Content-Type: application/json" \
-                -b /tmp/ai-test-cookies --data "$classify_payload")"
+                -b /tmp/ai-test-cookies --data-binary @/tmp/ai-test-classify-request.json)"
               if [ "$classify_status" != "200" ]; then
                 echo "::error::Real Workers AI vision smoke test failed with HTTP $classify_status. Response body omitted."
                 exit 1
