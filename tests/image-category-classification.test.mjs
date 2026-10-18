@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, reviewInsertBatches = 0;
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, reviewInsertBatches = 0;
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -32,7 +32,7 @@ const env = {
     if (compareMode && input.image) return { response: JSON.stringify({ shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }), tool_calls: [], usage: {} };
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && message.content.includes("mô tả từ phân tích thị giác"))) {
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
-        { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
+        { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
     }
     if (compareMode) {
       const systemPrompt = String(input.messages?.[0]?.content || "");
@@ -41,7 +41,7 @@ const env = {
       }
       if (systemPrompt.includes("Compare visual descriptions")) {
         return malformed ? { response: "not valid JSON", tool_calls: [] } :
-          { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: 95, rationale: "Trùng vân da, đường may và chi tiết đế." }] }), tool_calls: [], usage: {} };
+          { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: compareConfidence, rationale: "Trùng vân da, đường may và chi tiết đế." }] }), tool_calls: [], usage: {} };
       }
       return { response: "unexpected comparison request shape", tool_calls: [], usage: {} };
     }
@@ -159,6 +159,15 @@ assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison m
 assert.match(lastModelInput.input.messages[0].content, /Compare visual descriptions/, "the final comparison must use the two image-specific visual descriptions");
 assert.equal(lastModelInput.input.image, undefined, "the final comparison uses text descriptors after each image was analyzed separately");
 assert.equal(lastModelInput.input.response_format, undefined, "comparison must avoid schema-constrained decoding that failed real Preview inference");
+
+compareConfidence = 90;
+const beforeLowConfidenceWrites = reviewInsertBatches;
+const lowConfidenceResponse = await onRequestPost({ request: compareRequest(), env });
+const lowConfidenceResult = await lowConfidenceResponse.json();
+assert.equal(lowConfidenceResponse.status, 200, JSON.stringify(lowConfidenceResult));
+assert.deepEqual(lowConfidenceResult.matches, [], "pairs below 91 confidence must not be proposed for review");
+assert.equal(reviewInsertBatches, beforeLowConfidenceWrites, "low-confidence pair proposals must not be persisted");
+compareConfidence = 95;
 
 // Malformed compare output must fail closed before any review batch is written.
 malformed = true;
