@@ -46,6 +46,12 @@ assert.ok(split.groups.every(group => group.imageKeys.length <= 30), "no propose
 const alreadyAssigned = items.slice(0,2).map(item => ({ ...item, assignedTo: [{ sku: "SD-SN001" }] }));
 const skipped = await findSimilarGroups(alreadyAssigned);
 assert.equal(skipped.groups.length, 0, "do not re-propose images already assigned to the same SKU");
+const crossSku = items.slice(0,2).map((item, index) => ({
+  ...item,
+  assignedTo: [{ sku: index === 0 ? "SD-TL001" : "SD-TL002" }]
+}));
+assert.equal((await findSimilarGroups(crossSku)).groups.length, 0,
+  "never propose visually similar images that already belong to different SKUs");
 
 // Sort proposed gallery members by the computed similarity rank, not by file name.
 const rankAnchor = descriptor("z-anchor.webp", "1111111111111111", Array(64).fill(0), colorsA);
