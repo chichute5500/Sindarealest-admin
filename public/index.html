@@ -807,7 +807,7 @@ async function loadCheckoutWards(){const province=$('#checkoutProvince'),ward=$(
 $('#checkoutProvince').addEventListener('change',loadCheckoutWards);$('#checkoutWard').addEventListener('change',()=>{$('#checkoutWardCode').value=$('#checkoutWard').selectedOptions[0]&&$('#checkoutWard').selectedOptions[0].dataset.code||''});
 function bindEvents(){
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
- $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#cartZalo').addEventListener('click',consultCart);$('#warrantyLookupForm').addEventListener('submit',async e=>{
+ $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',openCart);$('#mobileCartNav').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#cartZalo').addEventListener('click',consultCart);$('#warrantyLookupForm').addEventListener('submit',async e=>{
  e.preventDefault();
  const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),lookup=$('#warrantyLookupValue').value.trim();
  b.disabled=true;b.textContent='Đang tra cứu…';m.textContent='';$('#warrantyResults').hidden=true;$('#warrantyClaimForm').hidden=true;
