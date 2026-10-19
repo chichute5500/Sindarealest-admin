@@ -80,11 +80,9 @@ test('captures the real source ADMIN login in the requested viewport/theme matri
       documentWidth: document.documentElement.scrollWidth,
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
     }));
-    await page.screenshot({
-      path: testInfo.outputPath(`admin-login__${viewport.label}__light.png`),
-      fullPage: true,
-      animations: 'disabled'
-    });
+    const lightShotName = `admin-login__${viewport.label}__light.png`;
+    const lightShot = await page.screenshot({ fullPage: true, animations: 'disabled' });
+    await testInfo.attach(lightShotName, { body: lightShot, contentType: 'image/png' });
 
     await page.locator('#adminThemeToggle').click();
     await expect(page.locator('html')).toHaveAttribute('data-admin-theme', 'dark');
@@ -96,11 +94,9 @@ test('captures the real source ADMIN login in the requested viewport/theme matri
       documentWidth: document.documentElement.scrollWidth,
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
     }));
-    await page.screenshot({
-      path: testInfo.outputPath(`admin-login__${viewport.label}__dark.png`),
-      fullPage: true,
-      animations: 'disabled'
-    });
+    const darkShotName = `admin-login__${viewport.label}__dark.png`;
+    const darkShot = await page.screenshot({ fullPage: true, animations: 'disabled' });
+    await testInfo.attach(darkShotName, { body: darkShot, contentType: 'image/png' });
 
     matrix.push({ viewport: `${viewport.width}x${viewport.height}`, light, dark });
     await page.locator('#adminThemeToggle').click();
