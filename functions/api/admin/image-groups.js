@@ -266,7 +266,7 @@ try{
     temperature:0,
     max_tokens:350
   });
-  const comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+  let comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
   if(!parsePairList(comparedText)){
     compared=await runVisionWithRetry({
       messages:[
