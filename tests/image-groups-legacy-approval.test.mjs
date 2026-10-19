@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "legacy-image-approval-test-password";
 const SESSION_SECRET = "legacy-image-approval-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const reviewId = crypto.randomUUID();
-let batchCalls = 0, reviewConfidence = 94;
+let batchCalls = 0, reviewConfidence = 94, missingImageKey = null;
 const DB = {
   prepare(sql) {
     return {
@@ -38,13 +38,19 @@ const request = () => new Request("https://preview.example/api/admin/image-group
   },
   body: JSON.stringify({ action: "approve", reviewId, productId: "product-1" })
 });
-const env = { DB, ADMIN_PASSWORD, SESSION_SECRET, IMAGES: { async get(key) { return { key }; }, async head(key) { return { key }; } } };
+const env = { DB, ADMIN_PASSWORD, SESSION_SECRET, IMAGES: { async get(key) { return key === missingImageKey ? null : { key }; }, async head(key) { return key === missingImageKey ? null : { key }; } } };
 reviewConfidence = 70;
 const lowConfidenceResponse = await onRequestPost({ request: request(), env });
 assert.equal(lowConfidenceResponse.status, 409);
 assert.match(await lowConfidenceResponse.text(), /độ tin cậy từ 91% trở lên/);
 assert.equal(batchCalls, 0, "low-confidence proposal must be rejected before any database write");
 reviewConfidence = 94;
+missingImageKey = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
+const missingObjectResponse = await onRequestPost({ request: request(), env });
+assert.equal(missingObjectResponse.status, 409);
+assert.match(await missingObjectResponse.text(), /không còn tồn tại trong R2/i);
+assert.equal(batchCalls, 0, "legacy approval must not publish a reference to an image that disappeared after comparison");
+missingImageKey = null;
 const response = await onRequestPost({ request: request(), env });
 assert.equal(response.status, 409);
 assert.match(await response.text(), /Không ghi đè để tránh mất dữ liệu/);
