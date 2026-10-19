@@ -190,7 +190,7 @@ assert.ok(text.includes('<title>Giày thử | SinDarealest</title>'));
 assert.ok(text.includes('og:title" content="Giày thử | SinDarealest'));
 assert.ok(text.includes('og:url" content="https://shop.example/san-pham/SD-SN001'));
 assert.ok(text.includes('og:image" content="https://shop.example/images/example.webp'));
-assert.ok(text.includes('og:description" content="Mô tả giày · Mã sản phẩm: SD-SN001'), 'Product social preview should include the SKU even when descriptions are long');
+assert.ok(text.includes('og:description" content="Mô tả giày · SKU: SD-SN001'), 'Product social preview should include the explicitly verified SKU even when descriptions are long');
 assert.match(text,/application\/ld\+json/);
 
 response = await createOrder({request:new Request('https://shop.example/api/orders',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
