@@ -7,7 +7,7 @@ Mục tiêu đồng thời:
 - Khôi phục/hoàn thiện UI ADMIN theo ảnh tham chiếu được lưu trong repository.
 - Giữ nguyên nghiệp vụ, API, auth, schema và tích hợp backend đang hoạt động.
 - Kiểm thử bằng ứng dụng thực tế và Playwright, chụp ảnh thật, so sánh, sửa và chụp lại theo vòng lặp.
-- Sau MỖI vòng lặp sửa đổi có ý nghĩa → chạy lại test → chụp ảnh đối chiếu, cập nhật ảnh + trạng thái + kết quả test lên đúng nhánh fix để AI tiếp theo không phụ thuộc lịch sử chat. Không chờ đến cuối task mới lưu.
+- Sau MỖI vòng lặp sửa đổi có ý nghĩa → chạy lại test → chụp ảnh đối chiếu, cập nhật ảnh + trạng thái + kết quả test lên nhánh ADMIN riêng `feature/admin-isolated-handoff-2026-10-20` để AI tiếp theo không phụ thuộc lịch sử chat. Không chờ đến cuối task mới lưu.
 - Không tuyên bố hoàn thành nếu thiếu bằng chứng.
 
 ## 2. Repository, nhánh và vùng tham chiếu — QUY TẮC CÔ LẬP BẮT BUỘC
@@ -104,7 +104,7 @@ Nếu một viewport không thể kiểm tra vì giới hạn môi trường, gh
 6. Chạy lại ứng dụng và Playwright, chụp lại cùng route, viewport, theme, trạng thái và điều kiện càng giống ảnh trước càng tốt.
 7. So sánh lại. Chạy kiểm tra hồi quy liên quan.
 8. Lặp lại cho đến khi mọi sai lệch có thể sửa trong phạm vi (Critical/High/Medium/Low) được xử lý hoặc có lý do cụ thể được ghi lại; không dừng chỉ vì đã hết Critical/High. Không có regression nghiêm trọng; mọi blocker phải có bằng chứng.
-9. Sau MỖI vòng sửa → chạy lại kiểm tra → chụp ảnh/so sánh (mỗi vòng lặp hoàn chỉnh), ngay lập tức lưu ảnh trước/sau, cập nhật báo cáo, `LATEST-STATUS.md`, `latest-test-results.json` và commit lên branch fix nếu quyền/công cụ cho phép. Không đợi đến cuối toàn dự án. Nếu chỉ một kiểm tra riêng lẻ chạy mà chưa có vòng sửa hoàn chỉnh, hãy ghi trạng thái tạm thời rõ ràng thay vì giả vờ đã hoàn tất iteration.
+9. Sau MỖI vòng sửa → chạy lại kiểm tra → chụp ảnh/so sánh (mỗi vòng lặp hoàn chỉnh), ngay lập tức lưu ảnh trước/sau, cập nhật báo cáo, `LATEST-STATUS.md`, `latest-test-results.json` và commit lên nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20` nếu quyền/công cụ cho phép. Không đợi đến cuối toàn dự án. Nếu chỉ một kiểm tra riêng lẻ chạy mà chưa có vòng sửa hoàn chỉnh, hãy ghi trạng thái tạm thời rõ ràng thay vì giả vờ đã hoàn tất iteration.
 10. Nếu một lỗi không tiến triển sau 3 vòng, điều tra lại nguyên nhân gốc, thay chiến lược; không lặp lại cùng thao tác vô ích. Con số 3 không phải giới hạn để dừng công việc.
 Không dùng ảnh mockup hay ảnh tham chiếu thay cho screenshot từ ứng dụng đang chạy. Không tuyên bố ảnh cuối phản ánh code mới nhất nếu SHA không khớp.
 
