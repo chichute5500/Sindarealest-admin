@@ -1,13 +1,22 @@
 {
   "status": "NOT_TESTED",
   "repository": "chichute5500/Sindarealest-admin",
-  "targetBranch": "fix/liquid-glass-audit-2026-10-19",
+  "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
+  "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "testedCommitSha": null,
   "capturedAt": null,
-  "note": "Initial template only. Replace fields with actual Playwright/test results. Do not claim PASS without evidence.",
+  "note": "Initial handoff template on isolated ADMIN branch. Branch/document setup does not mean the application was tested. Replace fields only with actual test and screenshot evidence.",
+  "branchIsolation": {
+    "adminBranchCreated": true,
+    "staticWebsiteBranchMustNotBeModified": true,
+    "autoMergeOrCherryPick": false,
+    "mainMerge": false,
+    "productionDeployment": false
+  },
   "screenshots": [],
   "checks": {
     "baselineGitState": "NOT_TESTED",
+    "branchIsolationDiffReview": "NOT_TESTED",
     "applicationStartup": "NOT_TESTED",
     "playwright": "NOT_TESTED",
     "visualComparison": "NOT_TESTED",
@@ -21,15 +30,18 @@
     "typecheck": "NOT_TESTED",
     "automatedTests": "NOT_TESTED",
     "build": "NOT_TESTED",
-    "businessFlows": "NOT_TESTED"
+    "businessFlows": "NOT_TESTED",
+    "sharedBackendRegression": "NOT_TESTED"
   },
   "remainingIssues": [],
   "blockedItems": [],
   "nextActions": [
-    "Verify repository branch, HEAD SHA and working tree.",
+    "Verify repository, current branch, HEAD SHA, working tree, and uncommitted changes.",
+    "Ensure all ADMIN edits and commits are made only on feature/admin-isolated-handoff-2026-10-20.",
     "Inspect project scripts, routes, authentication and existing Playwright setup.",
-    "Capture genuine baseline screenshots before edits.",
-    "Run available checks and update this file with evidence."
+    "Capture genuine baseline screenshots before editing.",
+    "Review the diff to ensure the static website branch and public UI are not being modified.",
+    "Run available checks and update this file only with evidence."
   ],
   "productionDeployment": "NOT_PERFORMED"
 }
