@@ -372,3 +372,49 @@ This entry supersedes earlier statements in this document that the `sindarealest
 ### Current completion estimate
 
 **84% of the code-and-automated-test checklist**, not 84% pixel similarity and not production readiness. The unfinished portion is concentrated in (1) visual comparison and adjustments against the actual 12-screen reference mockups, (2) missing verified catalog/logo assets, (3) physical Android acceptance, and (4) authorized staging/production integration acceptance. The existing user-provided reference composites establish the desired appearance, but the current app is not yet identical to them. No 100% completion claim is made while these objective blockers remain.
+
+
+## Bổ sung bằng chứng kiểm toán — 19/10/2026 (lần cập nhật sau SHA \`37111af3b8863b23f38f2aff1c35a2a67067efbf\`)
+
+### 1. Source và phạm vi an toàn
+
+- SHA mã nguồn đã được kiểm thử: \`37111af3b8863b23f38f2aff1c35a2a67067efbf\`.
+- Nhánh làm việc: \`fix/liquid-glass-audit-2026-10-19\`.
+- \`main\` tại lần đối chiếu này vẫn là \`f38cefe4647b33bd42f9018fde00c420ee5c7c66\`; không merge, không deploy và không sửa dữ liệu production.
+- Commit \`60b2ffc8b8bb3cbfb3c48a997b51726fa530148c\` từng làm CI thất bại do thiếu dấu đóng hàm trong \`functions/_lib.js\`; lỗi cú pháp được sửa trong \`3ad1550fa67d385787f9feb984eb5ac8b4c0b0e1\`. Không sử dụng run thất bại của commit trung gian làm bằng chứng nghiệm thu.
+- Lớp response sản phẩm công khai chỉ trả \`price\` khi công tắc \`show_prices\` bật, \`source_price_confirmed\` đã xác nhận và giá là số nguyên VND không âm an toàn. Giá thiếu/chuỗi rỗng/âm/thập phân không được chuyển thành số tiền công khai.
+- Endpoint tạo đơn \`functions/api/orders.js\` đã được sửa cùng nguyên tắc: snapshot \`order_items\`, \`line_total\`, subtotal và total đều để \`NULL\` khi giá chưa xác nhận, bị ẩn hoặc không hợp lệ. Điều này ngăn giá D1 sai kiểu/âm bị lưu vào snapshot đơn hàng dù tổng đơn đang chờ xác nhận.
+
+### 2. Kết quả CI trên SHA mã nguồn đã kiểm thử
+
+- Validation workflow #2674, run [39217253313](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39217253313): **SUCCESS** trên SHA \`37111af3b8863b23f38f2aff1c35a2a67067efbf\`. Các bước \`npm run check\` và \`npm test\` đều thành công.
+- Visual preview workflow [39217253318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39217253318): **SUCCESS** trên cùng SHA; các bước project tests, migrations/check, cài Chromium, capture Light/Dark và upload artifact đều thành công.
+- Artifact đầy đủ: \`sindarealest-liquid-glass-preview-198\`, artifact ID \`12170017749\`, SHA-256 \`sha256:074d76d3fc8296fb0b1426746a4b004a1c6f7873baf908ce0733b9d436ee9b77\`. ZIP gồm 54 ảnh JPG, \`report.html\` và \`visual-audit.json\`.
+- Audit JSON: \`passed=true\`; 235 fixture sản phẩm; 20 kiểm tra viewport/theme; 91 mục tương tác; 0 hard failures; 0 overflow; 0 lỗi console, page, HTTP hoặc request thất bại; 0 request ghi dữ liệu trong preview.
+
+### 3. Kiểm chứng giá công khai và checkout
+
+Bộ kiểm thử chạy trong trình duyệt Chromium với response API được intercept trong bộ nhớ. Giá \`1.234.567₫\` là dữ liệu tổng hợp chỉ dành cho test, không được ghi vào fixture/catalog và không chụp vào screenshot sản phẩm thông thường. Mọi POST đơn hàng trong ngữ cảnh audit đều bị chặn; số lần gọi POST trong các kịch bản giá là 0.
+
+Kết quả Light và Dark đều **PASS** cho:
+1. Catalog legacy không có giá đã xác minh: không lộ giá trên thẻ; giá chi tiết ban đầu bị ẩn.
+2. Giá xác nhận + bật công tắc: 8 card catalog và 4 featured card hiển thị; trang chi tiết và giỏ hàng hiển thị \`1.234.567₫\` nhất quán.
+3. Giá chưa xác nhận: card/featured/detail không hiển thị giá; giỏ hàng thể hiện “Chờ xác nhận giá” và “Giá sẽ được xác nhận”; checkout không hiển thị số tiền tổng hợp.
+4. Giá \`NULL\`: hành vi ẩn/đợi xác nhận giống giá chưa xác nhận.
+5. Checkout được mở để kiểm tra UI nhưng không gửi đơn, không ghi DB và không gọi API tạo đơn.
+
+Regression tests cũng kiểm tra ở lớp serializer D1/public response và endpoint tạo đơn cho: giá âm, thập phân, chuỗi rỗng, cờ xác nhận false, công tắc công khai tắt và trường hợp giá hợp lệ được xác nhận. Đây là kiểm chứng bằng fake/in-memory DB trong test, không phải nghiệm thu môi trường D1 production.
+
+### 4. Screenshot và đối chiếu ảnh mẫu
+
+- Đã tạo đủ 54 screenshot trên SHA mã nguồn nêu trên, bao gồm Light/Dark, mobile 320/360/375/390/412/430 px, tablet 768/1024 px, desktop 1366/1440 px, homepage/full page, grid, detail/fullscreen, cart, checkout, account, favorites, orders, address, art, contact/footer, warranty và order-process.
+- Các ảnh mẫu composite có trong Library đã được mở để đối chiếu: “Bộ giao diện SinDarealest sáng tối sang trọng.png”, “Bộ sưu tập giao diện SinDarealest sang trọng.png”, “Bảng thiết kế giao diện da cá sấu sang trọng.png” và “Giao Diện Thời Trang Da Cá Sấu Hai Tông Màu.png”.
+- Kết quả đối chiếu ở mức bố cục/tổng thể: nền sáng dạng da bạch tạng, nền tối da cá sấu và vật liệu glass của bản preview có hướng thẩm mỹ tương đồng với bộ mẫu. Tuy nhiên, không được gọi là pixel-match: một số board là moodboard ghép nhiều layout và chứa hình/giá/SKU minh họa không phải dữ liệu thương mại. Trang thực tế hiện vẫn có hero chia cột chữ + ảnh giày thay vì hoàn toàn giống các board có tiêu đề căn giữa; cấu trúc một số khu vực cũng không trùng tuyệt đối. Không sao chép giá/SKU/sản phẩm giả từ board vào catalog.
+- Contact sheets Light/Dark và dải viewport được tạo ngoài repo từ chính artifact #198; ZIP gốc giữ nguyên toàn bộ ảnh cùng audit report.
+
+### 5. Tiến độ sau đợt này và blocker còn lại
+
+- **Phạm vi code + kiểm thử tự động của đợt giá/UI audit: PASS** trên SHA \`37111af3b8863b23f38f2aff1c35a2a67067efbf\`.
+- Ước tính checklist code và tự động hóa tổng thể: **khoảng 90%** (tăng từ 84% trước đợt này do public API price gating, order snapshot sanitation, test hồi quy và preview mới đều PASS). Không phải tỷ lệ pixel-match và không phải độ sẵn sàng production.
+- Các hạng mục chưa được coi là hoàn thành: test trên thiết bị Android thật; kiểm tra D1/R2/admin/auth/orders/warranty trong staging có quyền truy cập; kiểm chứng upload/ảnh riêng tư/watermark ở endpoint thật; dịch vụ tìm kiếm Taobao/1688 và quyền/plan Workers AI; triển khai và thử thanh toán trên staging; đối chiếu thủ công chi tiết từng screen với bộ ảnh chuẩn và ghi danh sách sai khác nhỏ còn lại.
+- Chưa có phê duyệt merge/deploy. Không chạy migration trên production, không thay đổi secrets và không tạo giao dịch/đơn hàng thật.
