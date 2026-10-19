@@ -18,9 +18,9 @@ export function normalizeIdentityDescriptor(value) {
       .join("; ");
   }
   return String(text || "")
-    .replace(/[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]/g, " ")
-    .replace(/[\\r\\n\\t]+/g, " ")
-    .replace(/\\s{2,}/g, " ")
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, " ")
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/\s{2,}/g, " ")
     .trim()
     .slice(0, 1100);
 }
@@ -35,14 +35,14 @@ export function isIdentityDescriptorValid(value) {
 export function stripAIIdentityRationale(rationale) {
   const text = String(rationale || "");
   if (!text.startsWith(META_PREFIX)) return text.trim();
-  const newline = text.indexOf("\\n");
+  const newline = text.indexOf("\n");
   return newline < 0 ? "" : text.slice(newline + 1).trim();
 }
 
 export function parseAIIdentityRationale(rationale) {
   const text = String(rationale || "");
   if (!text.startsWith(META_PREFIX)) return null;
-  const newline = text.indexOf("\\n");
+  const newline = text.indexOf("\n");
   if (newline < 0) return null;
   try {
     const value = JSON.parse(text.slice(META_PREFIX.length, newline));
@@ -53,7 +53,7 @@ export function parseAIIdentityRationale(rationale) {
     return {
       status,
       confidence,
-      reason: String(value.reason || "").replace(/[\\r\\n]+/g, " ").slice(0, 700),
+      reason: String(value.reason || "").replace(/[\r\n]+/g, " ").slice(0, 700),
       checkedAt: String(value.checkedAt || "").slice(0, 40)
     };
   } catch {
@@ -68,24 +68,24 @@ export function encodeAIIdentityRationale(meta, rationale) {
   const safe = {
     status,
     confidence: confidence === null ? null : Math.round(confidence),
-    reason: String(meta?.reason || "").replace(/[\\r\\n]+/g, " ").slice(0, 700),
+    reason: String(meta?.reason || "").replace(/[\r\n]+/g, " ").slice(0, 700),
     checkedAt: String(meta?.checkedAt || new Date().toISOString()).slice(0, 40)
   };
   const human = stripAIIdentityRationale(rationale).slice(0, 700);
-  return META_PREFIX + JSON.stringify(safe) + "\\n" + human;
+  return META_PREFIX + JSON.stringify(safe) + "\n" + human;
 }
 
 function dailyAllocationExhausted(value) {
-  return /\\b(?:4006|3036)\\b|daily free allocation|used up.{0,60}allocation.{0,40}neurons?|allocation of [\\d,]+ neurons?/i.test(String(value || ""));
+  return /\b(?:4006|3036)\b|daily free allocation|used up.{0,60}allocation.{0,40}neurons?|allocation of [\d,]+ neurons?/i.test(String(value || ""));
 }
 
 function quotaError(status, value) {
   return Number(status) === 429 || dailyAllocationExhausted(value) ||
-    /\\b429\\b|too many requests|rate.?limit|quota exceeded/i.test(String(value || ""));
+    /\b429\b|too many requests|rate.?limit|quota exceeded/i.test(String(value || ""));
 }
 
 function failureResult(error) {
-  const detail = String(error?.message || error || "Workers AI error").replace(/[\\r\\n]+/g, " ").slice(0, 160);
+  const detail = String(error?.message || error || "Workers AI error").replace(/[\r\n]+/g, " ").slice(0, 160);
   const status = Number(error?.status || error?.statusCode || error?.status_code || 0);
   if (quotaError(status, detail)) {
     return {
@@ -95,7 +95,7 @@ function failureResult(error) {
       httpStatus: 429
     };
   }
-  if ([500, 502, 503, 504].includes(status) || /\\b(500|502|503|504)\\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail)) {
+  if ([500, 502, 503, 504].includes(status) || /\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail)) {
     return {
       status: "unverified",
       confidence: null,
@@ -114,10 +114,10 @@ function failureResult(error) {
 function parseEnvelope(value, depth = 0, seen = new Set()) {
   if (depth > 8 || value === null || value === undefined) return null;
   if (typeof value === "string") {
-    const text = value.trim().replace(/^\\x60{3}(?:json)?\\s*/i, "").replace(/\\s*\\x60{3}$/i, "");
+    const text = value.trim().replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}$/i, "");
     if (!text) return null;
     try { return parseEnvelope(JSON.parse(text), depth + 1, seen); } catch {}
-    const match = text.match(/\\{[\\s\\S]*\\}/);
+    const match = text.match(/\{[\s\S]*\}/);
     if (match) {
       try { return parseEnvelope(JSON.parse(match[0]), depth + 1, seen); } catch {}
     }
@@ -164,7 +164,7 @@ function normalizedPairList(raw, count) {
     seen.add(id);
     normalized.push({
       a: low, b: high, sameProduct: same, confidence: Math.round(confidence),
-      rationale: String(pair?.rationale || pair?.reason || pair?.explanation || "").replace(/[\\r\\n]+/g, " ").trim().slice(0, 240)
+      rationale: String(pair?.rationale || pair?.reason || pair?.explanation || "").replace(/[\r\n]+/g, " ").trim().slice(0, 240)
     });
   }
   return seen.size === expected.size ? normalized : null;
@@ -203,11 +203,11 @@ export async function verifyIdentityGroup(env, indexedRows, keys) {
   }
   const allPairs = [];
   for (let a = 0; a < keys.length; a++) for (let b = a + 1; b < keys.length; b++) allPairs.push({ a, b });
-  const descriptorText = ordered.map((item, index) => "Ảnh " + index + " — danh mục " + categories[index] + "\\nĐặc trưng nhận diện quan sát được: " + normalizeIdentityDescriptor(item.features.identityDescriptor)).join("\\n\\n");
+  const descriptorText = ordered.map((item, index) => "Ảnh " + index + " — danh mục " + categories[index] + "\nĐặc trưng nhận diện quan sát được: " + normalizeIdentityDescriptor(item.features.identityDescriptor)).join("\n\n");
   const system = "Bạn là chuyên gia xác minh danh tính mẫu sản phẩm qua ảnh. Bạn phải phân biệt cùng một mẫu/biến thể cụ thể với sản phẩm khác chỉ cùng loại, màu, chất liệu chung hoặc silhouette. Không được xác nhận chỉ vì cùng loại giày, cùng màu, cùng dáng hoặc cùng vân giả da. Đối chiếu các dấu hiệu bền vững: họa tiết/vân cụ thể, cách bố trí đường may, logo và vị trí, mũi/đế, lỗ dây, khóa/phụ kiện, panel và điểm riêng. Khác góc chụp, crop, nền, ánh sáng, watermark có thể vẫn cùng sản phẩm. Mô tả mơ hồ hoặc thiếu dấu hiệu riêng phải trả same_product=false và giải thích sự không chắc chắn. Trả đúng JSON duy nhất có mảng pairs; phải có đúng một verdict cho TỪNG cặp được liệt kê, không bỏ cặp nào. confidence là mức chắc chắn của verdict, số 0–100.";
   const user = "Hãy đối chiếu tất cả cặp không thứ tự dưới đây và không suy luận thêm ngoài mô tả được cung cấp. Cặp cần đánh giá: " + JSON.stringify(allPairs) +
-    "\\nTrả JSON theo schema: {\\"pairs\\":[{\\"a\\":0,\\"b\\":1,\\"same_product\\":true,\\"confidence\\":95,\\"rationale\\":\\"lý do ngắn bằng tiếng Việt\\"}]}. " +
-    "Bắt buộc có " + allPairs.length + " cặp chính xác; nếu không chắc cùng một mẫu cụ thể, hãy trả false.\\n\\n" + descriptorText;
+    "\nTrả JSON theo schema: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":95,\"rationale\":\"lý do ngắn bằng tiếng Việt\"}]}. " +
+    "Bắt buộc có " + allPairs.length + " cặp chính xác; nếu không chắc cùng một mẫu cụ thể, hãy trả false.\n\n" + descriptorText;
   const request = {
     messages: [
       { role: "system", content: system },
@@ -253,7 +253,7 @@ export async function verifyIdentityGroup(env, indexedRows, keys) {
     if (attempt === 0) {
       request.messages = [
         { role: "system", content: "Return only valid JSON with exactly one top-level pairs array. It must include exactly one verdict for every unordered pair listed, numeric indices a and b, boolean same_product, confidence number 0-100 and short rationale. No markdown or prose." },
-        { role: "user", content: "The previous response was malformed or incomplete. Return the complete verdict list with exactly " + allPairs.length + " pairs in the required schema. Do not omit negative or uncertain pairs.\\n\\n" + user }
+        { role: "user", content: "The previous response was malformed or incomplete. Return the complete verdict list with exactly " + allPairs.length + " pairs in the required schema. Do not omit negative or uncertain pairs.\n\n" + user }
       ];
     }
   }
