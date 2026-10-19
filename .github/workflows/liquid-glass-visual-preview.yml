@@ -6,8 +6,8 @@ on:
       - fix/liquid-glass-redesign
       - fix/liquid-glass-audit-2026-10-19
     paths-ignore:
-      - 'docs/static-web-reference/website-start-of-work.jpg'
-      - 'docs/static-web-reference/website-end-of-work.jpg'
+      - 'docs/website-screenshots/start-of-work/**'
+      - 'docs/website-screenshots/end-of-work/**'
   workflow_dispatch:
 
 permissions:
@@ -53,22 +53,6 @@ jobs:
           exit 1
       - name: Capture Light/Dark screenshots and audit responsive layouts
         run: node scripts/capture-liquid-glass-preview.mjs
-      - name: Save start/end full-page website screenshots to reference folder
-        if: success()
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p docs/static-web-reference
-          test -s artifacts/liquid-glass-preview/desktop-1440-light-full.jpg
-          cp artifacts/liquid-glass-preview/desktop-1440-light-full.jpg docs/static-web-reference/website-start-of-work.jpg
-          cp artifacts/liquid-glass-preview/desktop-1440-light-full.jpg docs/static-web-reference/website-end-of-work.jpg
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/static-web-reference/website-start-of-work.jpg docs/static-web-reference/website-end-of-work.jpg
-          if ! git diff --cached --quiet; then
-            git commit -m "docs: save Playwright start and end website screenshots"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
       - name: Upload screenshots and HTML audit report
         if: always()
         uses: actions/upload-artifact@v4
