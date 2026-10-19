@@ -199,6 +199,26 @@ assert.equal(lowScore.status, 400, "the server must reject a submitted grouping 
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(lowScoreFingerprint).count, 0);
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_image_claims WHERE image_key IN (?,?)").get(...lowScoreKeys).count, 0);
 
+const verifiedMemberKeys = ["verified-member-a.webp", "verified-member-b.webp"];
+verifiedMemberKeys.forEach(key => seedImage(key));
+const verifiedMemberFingerprint = await hashGroup(verifiedMemberKeys);
+const verifiedMemberProposal = await call({
+  action: "save-groups",
+  groups: [{
+    imageKeys: verifiedMemberKeys,
+    similarity: 96,
+    rationale: "valid verified visual pair",
+    members: verifiedMemberKeys.map(key => ({ key, similarity: 1 }))
+  }]
+});
+assert.equal(verifiedMemberProposal.status, 201, JSON.stringify(verifiedMemberProposal));
+const verifiedMemberGroup = sqlite.prepare("SELECT similarity FROM image_group_sets WHERE fingerprint=?").get(verifiedMemberFingerprint);
+assert.equal(verifiedMemberGroup.similarity, 100, "persist the server-recomputed weakest-pair score");
+const verifiedMemberScores = sqlite.prepare("SELECT similarity FROM image_group_set_members WHERE group_id=(SELECT id FROM image_group_sets WHERE fingerprint=?)").all(verifiedMemberFingerprint);
+assert.equal(verifiedMemberScores.length, 2);
+assert.ok(verifiedMemberScores.every(row => row.similarity >= 91), "member confidence must be recomputed by the server, not copied from browser input");
+
+
 const reviewKeys = ["review-needed-a.webp", "review-needed-b.webp"];
 seedImage(reviewKeys[0], "sneaker", "needs_review", 69);
 seedImage(reviewKeys[1]);
