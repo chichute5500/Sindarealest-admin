@@ -34,7 +34,7 @@ assert.match(html, /function featuredProductCard\([^\n]+product-price/, 'Feature
 const helpers = html.match(/function hasPublicPrice\(value\)\{[^\n]+\}\nfunction hasConfirmedPublicPrice\(product\)\{[^\n]+\}\nfunction customerPriceLabel\(product\)\{[^\n]+\}\nfunction formatVnd\(value\)\{[^\n]+\}/)?.[0];
 assert.ok(helpers, 'the complete safe price-helper group must exist for behavior-level regression tests');
 const priceSandbox = { Intl };
-vm.runInNewContext(helpers + '\\nthis.priceTools = { hasPublicPrice, hasConfirmedPublicPrice, customerPriceLabel, formatVnd };', priceSandbox);
+vm.runInNewContext(helpers + '\nthis.priceTools = { hasPublicPrice, hasConfirmedPublicPrice, customerPriceLabel, formatVnd };', priceSandbox);
 const priceTools = priceSandbox.priceTools;
 assert.ok(priceTools.customerPriceLabel({ price: 1234567, sourcePriceConfirmed: true }).includes('1.234.567'),
   'a confirmed, public numeric price should be formatted in Vietnamese currency');
