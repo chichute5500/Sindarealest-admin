@@ -263,6 +263,51 @@ try {
       await capture(page, vp.name + '-' + theme + '-full.jpg', true);
     }
 
+    // The contact footer is a key reference area; capture it at readable mobile scale rather than only in a long-page thumbnail.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      root.dataset.previewPreviousScrollBehavior = root.style.scrollBehavior || '';
+      root.style.scrollBehavior = 'auto';
+      const contact = document.querySelector('#contact');
+      if (contact) window.scrollTo(0, window.scrollY + contact.getBoundingClientRect().top);
+    });
+    await settle(page);
+    const contactScreen = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('#contact .contact-link')];
+      const visibleRows = rows.filter((el) => {
+        const rect = el.getBoundingClientRect();
+        const style = getComputedStyle(el);
+        return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+      });
+      const address = rows.find((el) => el.textContent.includes('Địa chỉ'));
+      return {
+        rowCount: rows.length,
+        visibleRowCount: visibleRows.length,
+        fullAddressVisible: !!address && address.textContent.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'),
+        zaloActionPresent: !!document.querySelector('#contact a[href="https://zalo.me/0827049192"]'),
+        phoneActionPresent: !!document.querySelector('#contact a[href="tel:+84827049192"]'),
+        contactTitleVisible: !!document.querySelector('#footer-contact-title') && document.querySelector('#footer-contact-title').getBoundingClientRect().height > 0,
+      };
+    });
+    const contactPass = contactScreen.rowCount === 6
+      && contactScreen.visibleRowCount === 6
+      && contactScreen.fullAddressVisible
+      && contactScreen.zaloActionPresent
+      && contactScreen.phoneActionPresent
+      && contactScreen.contactTitleVisible;
+    audit.interactions.push({ theme, check: 'footer-contact-six-rows-address-and-zalo-phone-actions', pass: contactPass, result: contactScreen });
+    if (!contactPass) hardFailures.push('Footer contact rows, full address or Zalo/phone actions missing: ' + theme);
+    await capture(page, 'footer-contact-mobile-' + theme + '.jpg');
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      const previous = root.dataset.previewPreviousScrollBehavior || '';
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 0);
+      root.style.scrollBehavior = previous;
+      delete root.dataset.previewPreviousScrollBehavior;
+    });
+
     // Theme toggle writes only browser localStorage; no settings endpoint is called.
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator('#mobileAccountNav').click();
