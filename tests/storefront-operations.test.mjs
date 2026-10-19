@@ -21,7 +21,7 @@ assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contact
 assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
 const legacyProducts = JSON.parse(readFileSync(new URL('../data/legacy-products.json', import.meta.url), 'utf8'));
 assert.equal(legacyProducts.length, 235, 'The read-only legacy product fixture should retain all 235 product records.');
-assert.ok(legacyProducts.every(product => typeof product.sku === 'string' && product.sku.startsWith('SD') && product.skuVerified === false), 'Legacy fixture identifiers must remain available internally but be explicitly marked as unverified.');
+assert.ok(legacyProducts.every(product => product.sku === null && product.skuVerified === false), 'Legacy fixture SKUs must be null when unverified; do not retain generated commercial SKU values.');
 assert.ok(storefrontHtml.includes("function visibleSku(p){return p&&p.skuVerified!==false?String(p.sku||'').trim():''}"), 'Storefront must have one explicit helper that hides unverified fixture identifiers.');
 assert.ok(storefrontHtml.includes("Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}"), 'Storefront product cards must clearly disclose when no verified SKU is available.');
 assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');
