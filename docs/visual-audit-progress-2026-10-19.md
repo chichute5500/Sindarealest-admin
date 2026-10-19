@@ -254,3 +254,17 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Đã kiểm tra nội dung artifact trực tiếp: các ảnh Light/Dark cho trang chủ, danh mục, chi tiết, giỏ, checkout, liên hệ/bảo hành, yêu thích, sổ địa chỉ và lịch sử yêu cầu đặt hàng đều được đóng gói. Dữ liệu sản phẩm là fixture chỉ đọc; 2 yêu cầu đơn hàng là fixture Playwright trong bộ nhớ, không gửi đến D1/backend.
 - Main vẫn giữ SHA `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; không merge và không deploy production.
 - Tiến độ checklist hiện tại vẫn **80%**. Preview PASS chứng minh các kiểm tra tự động đã khai báo chạy qua, không chứng minh mọi màn hình giống ảnh mẫu hoặc mọi nghiệp vụ production đã hoàn tất. Các blocker còn lại vẫn là đối chiếu pixel với đủ ảnh gốc, dữ liệu SKU/giá/tồn kho đã được xác nhận, trải nghiệm trên Android vật lý và kiểm thử backend/thanh toán staging.
+
+
+## Cập nhật dữ liệu SKU và kiểm thử — preview 148
+
+- Code SHA đã kiểm thử: `fa3146f4ffff840a0905320f8fb5a07670d5e94d`.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39201964359).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39201964346).
+- Artifact: `sindarealest-liquid-glass-preview-148.zip`, ID `12164466319`.
+- Preview 148: 52 ảnh chụp, 73 kiểm tra tương tác, 20 viewport/theme, 0 tràn ngang, 0 page error, 0 console error, 0 HTTP error, `passed=true`.
+- Phát hiện từ kiểm tra nguồn: 235 bản ghi fixture có mã SD001…SD235 được tạo cho bố cục thử nghiệm, không phải bảng SKU được thương hiệu xác nhận. Đã thêm cờ `skuVerified:false` để giữ tính tương thích dữ liệu nội bộ nhưng không hiển thị các mã này như SKU thật; catalog, chi tiết, yêu thích, giỏ hàng, lịch sử yêu cầu và nội dung Zalo hiện báo rõ khi mã SKU chưa được cung cấp. URL sản phẩm thử nghiệm dùng ID/slug khi SKU chưa được xác nhận. SKU hợp lệ từ dữ liệu quản trị thực vẫn được hỗ trợ.
+- Thêm regression assertions cho nguồn gốc SKU và cập nhật kiểm tra gallery để xác nhận URL dùng ID/slug khi mã SKU chưa xác nhận. Toàn bộ test source/migration và preview đã PASS sau khi cập nhật các assertion tương ứng.
+- Tiến độ checklist được điều chỉnh từ 80% lên **81%** do đóng được một lỗi dữ liệu có tác động trực tiếp đến khách hàng; đây không phải điểm số pixel similarity.
+- Chưa merge/deploy. `main` vẫn là SHA đã xác nhận `f38cefe4647b33bd42f9018fde00c420ee5c7c66`.
+- Blocker để đạt 100% vẫn còn: chưa đối chiếu pixel với đầy đủ bộ ảnh gốc, cần bảng SKU/giá/tồn kho được xác nhận, chưa test trên thiết bị Android vật lý, chưa kiểm thử backend/thanh toán trên staging thật và chưa xác minh mọi màn hình/luồng production end-to-end.
