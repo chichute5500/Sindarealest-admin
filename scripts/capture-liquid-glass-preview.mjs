@@ -483,7 +483,7 @@ try {
     const zaloMessagePass = zaloConsultState.message.startsWith('Chào SinDarealest, tôi muốn tư vấn/đặt hàng sản phẩm ')
       && zaloConsultState.message.includes(zaloConsultState.title)
       && zaloConsultState.message.includes('mã SKU chưa được cung cấp')
-      && !/\\b(null|undefined|SD\\d{3})\\b/i.test(zaloConsultState.message)
+      && !/\b(null|undefined|SD\d{3})\b/i.test(zaloConsultState.message)
       && zaloConsultState.openedUrl === 'https://zalo.me/0827049192';
     audit.interactions.push({ theme, check: 'zalo-message-uses-product-title-without-unverified-sku', pass: zaloMessagePass, result: zaloConsultState });
     if (!zaloMessagePass) hardFailures.push('Zalo consultation message disclosed a fabricated SKU or omitted the product title: ' + theme);
@@ -548,7 +548,7 @@ try {
     const cartSkuLabels = (await page.locator('#cartList .cart-row-copy small').allTextContents())
       .map(value => value.trim()).filter(value => value.startsWith('Mã SKU'));
     const cartSkuPass = cartSkuLabels.length === 2
-      && cartSkuLabels.every(value => value.includes('Chưa được cung cấp') && !/\\b(null|undefined|SD\\d{3})\\b/i.test(value));
+      && cartSkuLabels.every(value => value.includes('Chưa được cung cấp') && !/\b(null|undefined|SD\d{3})\b/i.test(value));
     audit.interactions.push({ theme, check: 'cart-hides-unverified-sku-values', pass: cartSkuPass, result: { labels: cartSkuLabels } });
     if (!cartSkuPass) hardFailures.push('Cart displayed a missing, null, undefined or unverified legacy SKU: ' + theme);
     await capture(page, 'cart-mobile-' + theme + '.jpg');
