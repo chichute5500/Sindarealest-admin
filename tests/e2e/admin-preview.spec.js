@@ -4,6 +4,8 @@ import { join } from 'node:path';
 
 const adminUrl = process.env.ADMIN_TEST_URL;
 const adminPassword = process.env.ADMIN_TEST_PASSWORD;
+const accessClientId = process.env.CF_ACCESS_CLIENT_ID;
+const accessClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
 const commitKey = (process.env.GITHUB_SHA || 'local').slice(0, 12);
 const evidenceDir = join(process.cwd(), 'artifacts', 'admin-preview-evidence', commitKey);
 
@@ -68,6 +70,13 @@ function isCloudflareAccessGate(page, details) {
 
 async function openLoginPage(page, testInfo) {
   if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
+  // Optional Cloudflare Access service-token headers; values are never logged or attached.
+  if (accessClientId && accessClientSecret) {
+    await page.setExtraHTTPHeaders({
+      'CF-Access-Client-Id': accessClientId,
+      'CF-Access-Client-Secret': accessClientSecret
+    });
+  }
   let response;
   try {
     response = await page.goto(adminUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
