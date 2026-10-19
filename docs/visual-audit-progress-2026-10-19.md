@@ -50,3 +50,27 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 2. Kiểm tra các trạng thái/route chưa có screenshot bằng browser automation.
 3. Khi ZIP gốc có thể truy cập, kiểm kê đúng 28 ảnh và so sánh từng viewport/theme.
 4. Giữ branch thử nghiệm; không merge/deploy production.
+
+
+## Cập nhật tiếp theo — 19/10/2026 (preview 80)
+
+### Thay đổi code
+- Commit giao diện: `68989d03bd254af8eede93628833012ac5d6389f`.
+- File: `public/index.html`.
+- Thêm lớp màu nhận diện riêng cho 7 kênh liên hệ (điện thoại, Zalo, Facebook, Messenger, Instagram, email, địa chỉ), tăng độ tương phản của biểu tượng và điều chỉnh kích thước icon mobile. Không thay đổi URL hoặc thông tin liên hệ.
+- Đây là cải thiện thị giác có phạm vi hẹp; không được xem là hoàn tất toàn bộ footer hoặc độ giống ảnh mẫu.
+
+### Kiểm thử sau thay đổi
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39188855230).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39188855223).
+- Artifact mới: [sindarealest-liquid-glass-preview-80](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39188855223).
+- Đã tải và kiểm tra artifact 80: 36 screenshot, 20 tổ hợp viewport/theme, 42 interaction checks; `passed=true`, `responsiveOverflowCount=0`, `hardFailures=[]`, không có console errors, page errors, same-origin HTTP errors hoặc failed requests.
+- Đã mở và xem `mobile-390-light-full.jpg` sau thay đổi; biểu tượng kênh liên hệ thể hiện màu nhận diện rõ hơn. Đây là kiểm tra trực quan của ảnh screenshot, không phải kiểm thử thiết bị vật lý.
+
+### Trạng thái repository
+- Nhánh thử nghiệm HEAD sau thay đổi code: `68989d03bd254af8eede93628833012ac5d6389f` (sau đó có thể có commit tài liệu).
+- `main` được xác minh riêng, HEAD `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; không có thao tác ghi vào `main`.
+- Không deploy production.
+
+### Tiến độ được đánh giá lại
+**72% — ước tính theo các nhóm nhiệm vụ và bằng chứng, không phải điểm tương đồng pixel.** CI/test và visual preview tiếp tục đạt. Phần còn lại chủ yếu là sai lệch thị giác lớn giữa storefront hiện tại và ảnh tham chiếu, nguồn ZIP gốc 28 ảnh chưa truy cập được, cần dữ liệu ảnh/catalog đã xác nhận để thay thế fixture phù hợp, và chưa có kiểm thử Android vật lý/backend production. Không báo 100% cho đến khi các hạng mục còn lại có bằng chứng nghiệm thu.
