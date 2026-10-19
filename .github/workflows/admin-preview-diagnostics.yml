@@ -116,24 +116,22 @@ jobs:
             cp "$SOURCE_DIR/preview-diagnostics.json" "$DEST/preview-diagnostics.json"
           fi
 
-          cat > "$DEST/report.md" <<EOF
-          # ADMIN Playwright evidence
+          {
+            printf '# ADMIN Playwright evidence\n\n'
+            printf -- '- Tested source commit: `%s`\n' "$GITHUB_SHA"
+            printf -- '- GitHub Actions run: https://github.com/%s/actions/runs/%s\n' "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf -- '- Captured at (UTC): %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            printf -- '- Project checks: `%s`\n' "$CHECK_OUTCOME"
+            printf -- '- Automated tests: `%s`\n' "$UNIT_OUTCOME"
+            printf -- '- Local source screenshots: `%s`\n' "$BASELINE_OUTCOME"
+            printf -- '- Deployed Preview check: `%s`\n' "$PREVIEW_OUTCOME"
+            printf -- '- Route: `/admin/`\n'
+            printf '%s\n' '- Local screenshots only exercise the real source HTML/CSS with a mocked unauthenticated session response; they do not write or read business data.'
+            printf '%s\n' '- Screenshots are captured in light and dark themes for 320x640, 360x800, 375x812, 390x844, 412x915, 768x1024, 1280x800 and 1440x900.'
+            printf '%s\n' '- If preview-diagnostics.json reports Cloudflare Access, the deployed app itself was not reached and its authenticated modules remain untested.'
+            printf -- '- Cloudflare production deployment: `NOT PERFORMED`.\n'
+          } > "$DEST/report.md"
 
-          - Tested source commit: `$GITHUB_SHA`
-          - GitHub Actions run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
-          - Captured at (UTC): $(date -u +%Y-%m-%dT%H:%M:%SZ)
-          - Project checks: `$CHECK_OUTCOME`
-          - Automated tests: `$UNIT_OUTCOME`
-          - Local source screenshots: `$BASELINE_OUTCOME`
-          - Deployed Preview check: `$PREVIEW_OUTCOME`
-          - Route: `/admin/`
-          - Local screenshots only exercise the real source HTML/CSS with a mocked unauthenticated session response; they do not write or read business data.
-          - Screenshots are captured in light and dark themes for 320x640, 360x800, 375x812, 390x844, 412x915, 768x1024, 1280x800 and 1440x900.
-          - If `preview-diagnostics.json` reports Cloudflare Access, the deployed app itself was not reached and its authenticated modules remain untested.
-          - Cloudflare production deployment: `NOT PERFORMED`.
-          EOF
-
-          export SHA_SHORT DEST
           node --input-type=module <<'NODE'
           import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
           import { join } from 'node:path';
@@ -177,7 +175,7 @@ jobs:
           data.checks.build = 'NOT_CONFIGURED_IN_PACKAGE_SCRIPTS';
           data.checks.productionDeployment = 'NOT_PERFORMED';
           data.screenshots = imageFiles.map(file => {
-            const match = file.match(/__(d+xd+)__(light|dark).png$/);
+            const match = file.match(/__(\\d+x\\d+)__(light|dark)\\.png$/);
             return {
               path: `${dest}/screenshots/${file}`,
               route: meta.route || '/admin/',
