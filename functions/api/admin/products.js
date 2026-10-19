@@ -49,7 +49,7 @@ export async function onRequestPost(context) {
         const sku = String(row.sku || "").toUpperCase();
         if (!sku.startsWith(category[1])) continue;
         const suffix = sku.slice(category[1].length);
-        if (/^\\d+$/.test(suffix)) { const number = Number(suffix); if (Number.isSafeInteger(number)) max = Math.max(max, number); }
+        if (/^\d+$/.test(suffix)) { const number = Number(suffix); if (Number.isSafeInteger(number)) max = Math.max(max, number); }
       }
       body.sku = category[1] + String(max + 1).padStart(3, "0");
       body.skuVerified = false;
