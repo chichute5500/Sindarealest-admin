@@ -875,8 +875,7 @@ function closeCheckout(restoreFocus=true){
   },0);
  }
 }
-function openAccount(){
- dismissToast();accountReturnFocus=document.activeElement;
+function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
  closeCheckout();closeCart();closeDetail();
  const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
  const close=$('#accountClose');if(close)setTimeout(()=>close.focus({preventScroll:true}),0);
