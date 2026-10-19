@@ -231,6 +231,18 @@ try {
             featuredHeading: box('#featured .section-head'),
             artMosaic: box('#collections .mosaic-compact'),
             artMainCard: box('#collections .mosaic-card.art-main'),
+            artHeroImageLoaded: (() => { const img = document.querySelector('#artSlide'); return !!img && img.complete && img.naturalWidth > 0; })(),
+            artHeroCopyHidden: (() => {
+              const title = document.querySelector('#collections .art-main .mosaic-title');
+              const sub = document.querySelector('#collections .art-main .mosaic-sub');
+              return !!title && !!sub && getComputedStyle(title).display === 'none' && getComputedStyle(sub).display === 'none';
+            })(),
+            artHeroCtaVisible: (() => {
+              const link = document.querySelector('#collections .art-main .text-link');
+              const r = link?.getBoundingClientRect();
+              return !!link && !!r && r.width > 0 && r.height > 0 && getComputedStyle(link).display !== 'none';
+            })(),
+            artHeroControlCount: document.querySelectorAll('#collections .art-main .slide-controls button').length,
             artSmallCards: Array.from(document.querySelectorAll('#collections .mosaic-card.small')).map((el) => {
               const r = el.getBoundingClientRect();
               return { width: Math.round(r.width), height: Math.round(r.height) };
@@ -250,6 +262,17 @@ try {
           smallCards: visualMetrics.artSmallCards,
         } });
         if (!artMosaicOk) hardFailures.push('The Art mobile mosaic collapsed or has undersized cards: ' + theme);
+        const artHeroPass = visualMetrics.artHeroImageLoaded
+          && visualMetrics.artHeroCopyHidden
+          && visualMetrics.artHeroCtaVisible
+          && visualMetrics.artHeroControlCount === 2;
+        audit.interactions.push({ theme, check: 'mobile-art-hero-image-emphasis-with-working-controls-and-cta', pass: artHeroPass, result: {
+          imageLoaded: visualMetrics.artHeroImageLoaded,
+          copyHidden: visualMetrics.artHeroCopyHidden,
+          ctaVisible: visualMetrics.artHeroCtaVisible,
+          controlCount: visualMetrics.artHeroControlCount,
+        } });
+        if (!artHeroPass) hardFailures.push('The Art mobile hero lost its image, CTA or navigation controls: ' + theme);
       }
     }
 
