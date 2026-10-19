@@ -405,7 +405,7 @@ jobs:
               if (![200, 201].includes(handlerResponse.status) || result?.ok !== true || !(Array.isArray(result.matches) || Number.isInteger(result.matches))) {
                 return response({ ok: false, reason: "comparison_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated comparison result").slice(0, 160) }, 502);
               }
-              return response({ ok: true, action, matches: result.matches, batches: result.batches ?? null });
+              return response({ ok: true, action, matches: result.matches, batches: result.batches ?? null, diagnostics: result.diagnostics ?? null });
             } catch (error) {
               return response({ ok: false, reason: "classification_handler_exception", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
             }
