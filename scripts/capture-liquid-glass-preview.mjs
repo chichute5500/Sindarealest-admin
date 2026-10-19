@@ -34,6 +34,7 @@ const audit = {
   failedRequests: [],
   externalRequestsBlocked: [],
   writeRequestsBlocked: [],
+  mockedRequests: [],
   startedAt: new Date().toISOString(),
 };
 const hardFailures = [];
@@ -148,6 +149,23 @@ try {
       contentType: 'application/json; charset=utf-8',
       body: JSON.stringify(products),
     }));
+    // Mock only order POSTs for the end-to-end UI test; this fixture is fulfilled in memory and never reaches the local server or D1.
+    await context.route('**/api/orders', async (route) => {
+      if (route.request().method() !== 'POST') return route.abort();
+      audit.mockedRequests.push({ theme, method: 'POST', url: route.request().url(), fixtureOnly: true });
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json; charset=utf-8',
+        body: JSON.stringify({
+          ok: true,
+          orderNumber: 'SD-TEST-' + theme.toUpperCase(),
+          status: 'pending_confirmation',
+          priceConfirmationRequired: true,
+          total: null,
+          message: 'Đã tiếp nhận yêu cầu kiểm thử.',
+        }),
+      });
+    });
 
     const page = await context.newPage();
     page.setDefaultTimeout(10000);
@@ -685,6 +703,70 @@ try {
     if (!emptyFavoritesPass) hardFailures.push('Favorites empty state did not return after removing the last product: ' + theme);
     await page.locator('#accountClose').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
+
+    // The test-only /api/orders response is mocked above; verify we record only the accepted request summary, never checkout PII.
+    await page.locator('#mobileCartNav').click();
+    await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#cartCheckout').click();
+    await page.locator('#checkoutDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#checkoutForm input[name="fullName"]').fill('Nguyen Test');
+    await page.locator('#checkoutForm input[name="phone"]').fill('0900000000');
+    await page.locator('#checkoutForm input[name="email"]').fill('test@example.com');
+    await page.locator('#checkoutProvince').selectOption('Tỉnh kiểm thử');
+    await page.waitForFunction(() => {
+      const ward = document.querySelector('#checkoutWard');
+      return !!ward && !ward.disabled && Array.from(ward.options).some(option => option.textContent.includes('Phường kiểm thử'));
+    });
+    await page.locator('#checkoutWard').selectOption({ label: 'Phường kiểm thử' });
+    await page.locator('#checkoutStreet').fill('12 Đường Kiểm thử');
+    await page.locator('#checkoutSubmit').click();
+    await page.waitForFunction((expected) => {
+      try {
+        const rows = JSON.parse(localStorage.getItem('sd-local-order-history') || '[]');
+        return Array.isArray(rows) && rows.length === 1 && rows[0].orderNumber === expected;
+      } catch { return false; }
+    }, 'SD-TEST-' + theme.toUpperCase());
+    const localOrderRecord = await page.evaluate(() => {
+      const record = JSON.parse(localStorage.getItem('sd-local-order-history') || '[]')[0];
+      return {
+        orderNumber: record?.orderNumber || '',
+        status: record?.status || '',
+        items: record?.items?.length || 0,
+        storesCustomerName: !!record && ('fullName' in record),
+        storesPhone: !!record && ('phone' in record),
+        storesEmail: !!record && ('email' in record),
+        storesAddress: !!record && ('address' in record),
+      };
+    });
+    const localOrderSavePass = localOrderRecord.orderNumber === 'SD-TEST-' + theme.toUpperCase()
+      && localOrderRecord.status === 'pending_confirmation'
+      && localOrderRecord.items === 2
+      && !localOrderRecord.storesCustomerName
+      && !localOrderRecord.storesPhone
+      && !localOrderRecord.storesEmail
+      && !localOrderRecord.storesAddress;
+    audit.interactions.push({ theme, check: 'accepted-order-request-saved-locally-without-pii', pass: localOrderSavePass, result: localOrderRecord });
+    if (!localOrderSavePass) hardFailures.push('Order history did not store the accepted request safely: ' + theme);
+    await page.locator('#checkoutClose').click();
+    await page.locator('#checkoutDrawer.open').waitFor({ state: 'hidden' });
+    await page.locator('#mobileAccountNav').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#accountOrdersAction').click();
+    await page.locator('#accountOrdersView:not([hidden])').waitFor({ state: 'visible' });
+    const orderHistoryUi = await page.evaluate(() => ({
+      count: document.querySelectorAll('#accountOrdersList .local-order-card').length,
+      orderNumber: document.querySelector('#accountOrdersList .local-order-head strong')?.textContent?.trim() || '',
+      counter: document.querySelector('#accountOrderCount')?.textContent?.trim() || '',
+      localNotice: document.querySelector('#accountOrdersView .orders-local-note')?.textContent?.includes('không phải lịch sử tài khoản đồng bộ') || false,
+    }));
+    const orderHistoryUiPass = orderHistoryUi.count === 1
+      && orderHistoryUi.orderNumber === 'SD-TEST-' + theme.toUpperCase()
+      && orderHistoryUi.counter === '1'
+      && orderHistoryUi.localNotice;
+    audit.interactions.push({ theme, check: 'account-orders-view-shows-accepted-local-request-and-disclosure', pass: orderHistoryUiPass, result: orderHistoryUi });
+    if (!orderHistoryUiPass) hardFailures.push('Account order history UI did not show the received request safely: ' + theme);
+    await page.locator('#accountClose').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
     await context.close();
   }
 
@@ -799,7 +881,7 @@ const imageCards = audit.screenshots.map((v) =>
 const rows = audit.responsive.map((v) =>
   '<tr><td>' + escapeHtml(v.theme) + '</td><td>' + escapeHtml(v.viewport) + '</td><td>' + v.viewportWidth + 'px</td><td>' + v.documentWidth + 'px</td><td>' + (v.horizontalOverflow ? 'OVERFLOW' : 'PASS') + '</td></tr>'
 ).join('\n');
-const report = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest Liquid Glass Preview</title><style>body{margin:0;padding:24px;font:15px/1.6 system-ui,sans-serif;background:#eef6fd;color:#142a3c}main{max-width:1400px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}.status{font-weight:700}table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:8px;border:1px solid #c8dceb;text-align:left}section{margin:28px 0}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}figure{margin:0;padding:10px;border:1px solid #c8dceb;border-radius:14px;background:#fff}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}@media(max-width:480px){body{padding:12px}}</style><main><h1>SinDarealest2 — Liquid Glass Preview</h1><p>Rendered locally from this branch on a static HTTP server. The test uses the repository’s legacy product source as read-only fixture; unknown prices and stock are not invented. External calls and all non-GET requests are blocked. No Cloudflare, D1 or R2 binding is used.</p><p class="status">Automated audit: ' + (audit.passed ? 'PASS' : 'NEEDS REVIEW') + ' — horizontal overflow: ' + audit.responsiveOverflowCount + '; page errors: ' + audit.pageErrors.length + '; console errors: ' + audit.consoleErrors.length + '; same-origin HTTP errors: ' + audit.httpErrors.length + '.</p><h2>Responsive width audit</h2><table><thead><tr><th>Theme</th><th>Viewport</th><th>CSS viewport</th><th>Document scroll width</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table><h2>Screenshots</h2><section class="shots">' + imageCards + '</section><h2>Interaction checks</h2><pre>' + escapeHtml(JSON.stringify(audit.interactions, null, 2)) + '</pre><h2>Diagnostics</h2><p>See <a href="visual-audit.json">visual-audit.json</a> for console, failed-request and overflow details. This report makes no subjective 95–100% visual-similarity claim.</p></main></html>';
+const report = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest Liquid Glass Preview</title><style>body{margin:0;padding:24px;font:15px/1.6 system-ui,sans-serif;background:#eef6fd;color:#142a3c}main{max-width:1400px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}.status{font-weight:700}table{border-collapse:collapse;width:100%;background:#fff}td,th{padding:8px;border:1px solid #c8dceb;text-align:left}section{margin:28px 0}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}figure{margin:0;padding:10px;border:1px solid #c8dceb;border-radius:14px;background:#fff}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}@media(max-width:480px){body{padding:12px}}</style><main><h1>SinDarealest2 — Liquid Glass Preview</h1><p>Rendered locally from this branch on a static HTTP server. The test uses the repository’s legacy product source as a read-only fixture; unknown prices and stock are not invented. External calls and non-GET requests are blocked, except the explicit <code>/api/orders</code> test request, which is fulfilled by an in-memory Playwright fixture and never reaches the local server or D1. No Cloudflare, D1 or R2 binding is used.</p><p class="status">Automated audit: ' + (audit.passed ? 'PASS' : 'NEEDS REVIEW') + ' — horizontal overflow: ' + audit.responsiveOverflowCount + '; page errors: ' + audit.pageErrors.length + '; console errors: ' + audit.consoleErrors.length + '; same-origin HTTP errors: ' + audit.httpErrors.length + '; offline order fixtures: ' + audit.mockedRequests.length + ' (never sent to backend).</p><h2>Responsive width audit</h2><table><thead><tr><th>Theme</th><th>Viewport</th><th>CSS viewport</th><th>Document scroll width</th><th>Result</th></tr></thead><tbody>' + rows + '</tbody></table><h2>Screenshots</h2><section class="shots">' + imageCards + '</section><h2>Interaction checks</h2><pre>' + escapeHtml(JSON.stringify(audit.interactions, null, 2)) + '</pre><h2>Diagnostics</h2><p>See <a href="visual-audit.json">visual-audit.json</a> for console, failed-request and overflow details. This report makes no subjective 95–100% visual-similarity claim.</p></main></html>';
 await fs.writeFile(path.join(outDir, 'report.html'), report, 'utf8');
 console.log(JSON.stringify({
   passed: audit.passed, fixtureProducts: audit.productFixtureCount,
