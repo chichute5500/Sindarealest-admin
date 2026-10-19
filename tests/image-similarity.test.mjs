@@ -6,7 +6,7 @@ const colorsB = [0,0,0,1, 0,0,0,1, 1,0,0,0];
 const shapeA = Array.from({ length: 64 }, (_, index) => index > 20 && index < 44 ? 0.9 : 0.05);
 const shapeB = Array.from({ length: 64 }, (_, index) => index < 16 || index > 47 ? 0.95 : 0.02);
 const descriptor = (key, p_hash, shape, colors, assignedTo=[], category="sneaker", contentHash="") => ({
-  key, p_hash, features: { shape, colors, category, ...(contentHash ? { contentHash } : {}) }, assignedTo
+  key, p_hash, features: { shape, colors, category, categoryStatus: "classified", categoryConfidence: 95, identityDescriptor: "loại=giày; chất liệu=da; vân=ô nhỏ; silhouette=mũi tròn; đế=đen; đường may=đôi; logo=nhỏ; dấu hiệu=khóa kim loại", ...(contentHash ? { contentHash } : {}) }, assignedTo
 });
 
 assert.equal(hashDistance("0000000000000000", "0000000000000000"), 0);
@@ -25,6 +25,7 @@ const cacheFeatures = {
   shape: Array(64).fill(0.5),
   colors: Array(12).fill(0.25),
   contentHash: "a".repeat(64),
+  identityDescriptor: "loại=giày; chất liệu=da; vân=ô nhỏ; silhouette=mũi tròn; đế=đen; đường may=đôi; logo=nhỏ; dấu hiệu=khóa kim loại",
   category: "sneaker",
   categoryStatus: "classified",
   categoryConfidence: 95
@@ -88,8 +89,8 @@ const large = Array.from({ length: 65 }, (_, index) =>
 );
 const split = await findSimilarGroups(large);
 assert.equal(split.compared, 65 * 64 / 2, "large inventory still compares all cross-batch image pairs");
-assert.deepEqual(split.groups.map(group => group.imageKeys.length).sort((a,b)=>a-b), [5,30,30]);
-assert.ok(split.groups.every(group => group.imageKeys.length <= 30), "no proposed group exceeds product gallery capacity");
+assert.deepEqual(split.groups.map(group => group.imageKeys.length).sort((a,b)=>a-b), [7,7,7,7,7,7,7,8,8]);
+assert.ok(split.groups.every(group => group.imageKeys.length <= 8), "every candidate group is small enough for exhaustive AI pairwise verification");
 
 const alreadyAssigned = items.slice(0,2).map(item => ({ ...item, assignedTo: [{ sku: "SD-SN001" }] }));
 const skipped = await findSimilarGroups(alreadyAssigned);
@@ -145,6 +146,8 @@ const exactDuplicates = findExactDuplicateGroups([duplicateA, duplicateB]);
 assert.equal(exactDuplicates.length, 1, "byte-identical copies are detected with SHA-256, not only perceptual similarity");
 assert.deepEqual(exactDuplicates[0].imageKeys, ["duplicate/a.webp", "duplicate/b.webp"]);
 assert.equal(compareDescriptors(duplicateA, duplicateB).exactDuplicate, true);
+assert.equal(compareDescriptors(duplicateA, duplicateB).match, false, "byte-identical duplicates stay in the duplicate-review section");
+assert.equal((await findSimilarGroups([duplicateA, duplicateB])).groups.length, 0, "exact duplicates must not be proposed as same-product views");
 assert.equal(findExactDuplicateGroups([duplicateA, { ...duplicateB, features: { ...duplicateB.features, contentHash: "b".repeat(64) } }]).length, 0);
 
  // The anchor decides membership by its direct matches and not by candidate-to-candidate similarity.

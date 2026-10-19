@@ -9,6 +9,9 @@ const POPCOUNT = Array.from({ length: 16 }, (_, value) => {
 
 const PRODUCT_CATEGORIES = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
 
+export function normalizeIdentityDescriptor(value) { return String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim().slice(0, 1100); }
+export function isIdentityDescriptorValid(value) { const text=normalizeIdentityDescriptor(value); return text.length>=48 && text.split(/[;|]/).map(part=>part.trim()).filter(Boolean).length>=5; }
+
 function parseFeatures(item) {
   if (item?.features && Array.isArray(item.features.shape) && Array.isArray(item.features.colors)) return item.features;
   try {
@@ -31,6 +34,7 @@ export function isCachedDescriptorValid(row, inventoryItem) {
       !validValues(features.shape, 64) ||
       !validValues(features.colors, 12) ||
       !/^[0-9a-f]{64}$/i.test(String(features.contentHash || "")) ||
+      !isIdentityDescriptorValid(features.identityDescriptor) ||
       !PRODUCT_CATEGORIES.has(category) ||
       !Number.isInteger(confidence) || confidence < 0 || confidence > 100 ||
       !["classified", "needs_review"].includes(status) ||
@@ -101,7 +105,7 @@ export function compareDescriptors(left, right) {
   // product/SKU. It is a strong duplicate signal for the admin review queue,
   // but public/product assignment still remains human-approved.
   if (exactDuplicate) {
-    return { score: 100, phashDistance, shapeSimilarity: 100, colorSimilarity: 100, exactDuplicate: true, match: true };
+    return { score: 100, phashDistance, shapeSimilarity: 100, colorSimilarity: 100, exactDuplicate: true, match: false };
   }
   const shape = shapeSimilarity(leftFeatures?.shape, rightFeatures?.shape);
   const color = colorSimilarity(leftFeatures?.colors, rightFeatures?.colors);
@@ -122,7 +126,7 @@ export async function findSimilarGroups(items, options = {}) {
   const threshold = Math.max(55, Math.min(95, Number(options.threshold) || 62));
   const valid = (Array.isArray(items) ? items : []).filter(item =>
     item && typeof item.key === "string" && /^[0-9a-f]{16}$/i.test(String(item.p_hash || item.phash || "")) &&
-    parseFeatures(item)
+    parseFeatures(item) && isIdentityDescriptorValid(parseFeatures(item)?.identityDescriptor)
   );
   const count = valid.length;
   const total = count * (count - 1) / 2;
@@ -194,7 +198,15 @@ export async function findSimilarGroups(items, options = {}) {
       similarity: bestScore[indexByKey.get(item.key)] || 0
     })).sort((a, b) => b.similarity - a.similarity || a.key.localeCompare(b.key));
     const chunks = [];
-    for (let offset = 0; offset < sorted.length; offset += 30) chunks.push(sorted.slice(offset, offset + 30));
+    const chunkCount = Math.ceil(sorted.length / 8);
+    const chunkBase = Math.floor(sorted.length / chunkCount);
+    const chunkExtra = sorted.length % chunkCount;
+    let chunkOffset = 0;
+    for (let part = 0; part < chunkCount; part++) {
+      const chunkSize = chunkBase + (part < chunkExtra ? 1 : 0);
+      chunks.push(sorted.slice(chunkOffset, chunkOffset + chunkSize));
+      chunkOffset += chunkSize;
+    }
     for (let part = 0; part < chunks.length; part++) {
       const chunk = chunks[part];
       const scores = chunk.map(item => item.similarity).filter(score => score > 0);
@@ -207,8 +219,8 @@ export async function findSimilarGroups(items, options = {}) {
         imageKeys: chunk.map(item => item.key),
         members: [...chunk],
         similarity: average,
-        rationale: (indices.length > 30
-          ? "Bộ ảnh có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 30 ảnh mỗi phần) để phù hợp giới hạn bộ ảnh. "
+        rationale: (indices.length > 8
+          ? "Bộ ảnh có " + indices.length + " ảnh đã được chia thành phần " + (part + 1) + "/" + chunks.length + " (tối đa 8 ảnh mỗi phần để AI xác minh mọi cặp). "
           : "") +
           "Tầng 1 đã phân loại ảnh vào nhóm “" + (({sneaker:"giày thể thao",loafer:"giày lười",dress_shoe:"giày tây",boot:"bốt",sandal:"dép / sandal",belt:"thắt lưng",wallet:"ví",watch_strap:"dây đồng hồ",watch:"đồng hồ",bag:"túi",other:"sản phẩm khác"})[category] || category) + "”. Tầng 2 so sánh trực tiếp các ảnh trong cùng loại; không dùng liên kết bắc cầu. Đây là đề xuất theo đặc trưng hình ảnh, cần người quản trị xác nhận cùng sản phẩm."
       });

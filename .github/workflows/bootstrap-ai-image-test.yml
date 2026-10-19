@@ -415,7 +415,7 @@ jobs:
                   const exposedStatus = handlerResponse.status >= 400 && handlerResponse.status <= 599 ? handlerResponse.status : 502;
                   return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, exposedStatus);
                 }
-                return response({ ok: true, action, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: imageData[0].dataUrl.length });
+                return response({ ok: true, action, category: result.items[0].category, confidence: result.items[0].confidence, identityDescriptor: result.items[0].identityDescriptor ?? null, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: imageData[0].dataUrl.length });
               }
               if (![200, 201].includes(handlerResponse.status) || result?.ok !== true || !(Array.isArray(result.matches) || Number.isInteger(result.matches))) {
                 return response({ ok: false, reason: "comparison_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated comparison result").slice(0, 160) }, 502);
@@ -464,7 +464,7 @@ jobs:
           NODE
             ai_smoke_status="$(curl --connect-timeout 10 --max-time 60 --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-vision-request.json "$base/api/ai-smoke-ci")"
             if [ "$ai_smoke_status" = "200" ]; then
-              jq -e '.ok == true and (.category | type == "string") and (.confidence | type == "number") and (.status == "classified" or .status == "needs_review") and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
+              jq -e '.ok == true and (.category | type == "string") and (.category != "unknown") and (.confidence | type == "number") and (.confidence >= 70) and (.status == "classified") and (.identityDescriptor | type == "string") and (.identityDescriptor | length >= 48) and ((.identityDescriptor | split(";") | length) >= 5) and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
                 echo "::error::Real Workers AI smoke response was invalid. Response body omitted."; exit 1;
               }
               result_summary="$(jq -r '"category=" + .category + ", confidence=" + (.confidence|tostring) + ", status=" + .status' /tmp/ai-test-vision.json)"

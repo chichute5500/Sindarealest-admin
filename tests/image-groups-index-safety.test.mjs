@@ -54,6 +54,7 @@ const descriptor = {
     shape: Array(64).fill(0.5),
     colors: Array(12).fill(0.25),
     contentHash: "b".repeat(64),
+    identityDescriptor: "loại=giày; chất liệu=da; vân=ô nhỏ; silhouette=mũi tròn; đế=đen; đường may=đôi; logo=nhỏ; dấu hiệu=khóa kim loại",
     category: "unknown",
     categoryConfidence: 61,
     categoryStatus: "needs_review"
@@ -65,6 +66,7 @@ const insertIndex = executed.find(statement => statement.sql.includes("INSERT IN
 assert.ok(insertIndex, "image descriptor must be saved to the index");
 const storedFeatures = JSON.parse(insertIndex.args[2]);
 assert.equal(storedFeatures.contentHash, "b".repeat(64));
+assert.equal(storedFeatures.identityDescriptor, descriptor.features.identityDescriptor, "persist AI identity descriptor for later verification");
 assert.equal(storedFeatures.category, "unknown");
 assert.equal(storedFeatures.categoryConfidence, 61);
 assert.equal(storedFeatures.categoryStatus, "needs_review");
@@ -126,5 +128,24 @@ assert.match(source, /Remove them from every other pending proposal/, "approval 
 assert.match(source, /categoryConfidence\s*[:,]/, "classification confidence is persisted for administrator review");
 assert.match(source, /categoryStatus\s*[:,}]/, "uncertain classifications retain a needs_review status");
 assert.match(source, /contentHash\s*[:,]/, "SHA-256 content hashes are stored to detect byte-identical files");
+
+  
+// Live-verifier contract: complete pair coverage, conservative negative verdicts and quota errors.
+const { encodeAIIdentityRationale, parseAIIdentityRationale, stripAIIdentityRationale, verifyIdentityGroup } = await import("../functions/_lib/image-identity.js");
+const identityRows = [
+  { image_key: "test/a.webp", features_json: JSON.stringify({ category: "sneaker", categoryStatus: "classified", categoryConfidence: 95, contentHash: "a".repeat(64), identityDescriptor: "loại=sneaker; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông" }) },
+  { image_key: "test/b.webp", features_json: JSON.stringify({ category: "sneaker", categoryStatus: "classified", categoryConfidence: 95, contentHash: "b".repeat(64), identityDescriptor: "loại=sneaker; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông" }) }
+];
+const positiveIdentity = await verifyIdentityGroup({ AI: { async run() { return { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: 96, rationale: "Vân, mũi, đường may và vị trí logo nhất quán." }] }) }; } } }, identityRows, ["test/a.webp", "test/b.webp"]);
+assert.equal(positiveIdentity.status, "verified");
+assert.equal(positiveIdentity.confidence, 96);
+const negativeIdentity = await verifyIdentityGroup({ AI: { async run() { return { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: false, confidence: 97, rationale: "Khác đường may và phần đế." }] }) }; } } }, identityRows, ["test/a.webp", "test/b.webp"]);
+assert.equal(negativeIdentity.status, "review_required", "a confident different-product verdict must never become a confirmed match");
+const quotaIdentity = await verifyIdentityGroup({ AI: { async run() { throw new Error("4006: you have used up your daily free allocation of 10,000 neurons"); } } }, identityRows, ["test/a.webp", "test/b.webp"]);
+assert.equal(quotaIdentity.status, "unverified");
+assert.equal(quotaIdentity.httpStatus, 429, "daily allocation errors without status must be recognized");
+const identityRationale = encodeAIIdentityRationale(positiveIdentity, "human review explanation");
+assert.equal(parseAIIdentityRationale(identityRationale).status, "verified");
+assert.equal(stripAIIdentityRationale(identityRationale), "human review explanation");
 
 console.log("PASS: stale-index invalidation is protected, and image membership is exclusive across pending/approved groups.");

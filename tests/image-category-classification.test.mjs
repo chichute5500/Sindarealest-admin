@@ -66,7 +66,7 @@ const env = {
       return { response: "unexpected comparison request shape", tool_calls: [], usage: {} };
     }
     return malformed ? { response: "not valid JSON", tool_calls: [] } :
-      { response: { category: "dress_shoe", confidence: 91 }, tool_calls: [], usage: {} };
+      { response: { category: "dress_shoe", confidence: 91, identity_descriptor: "loại=giày tây; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông" }, tool_calls: [], usage: {} };
   } }
 };
 const dataUrl = "data:image/jpeg;base64," + Buffer.from("fixture-image").toString("base64");
@@ -86,7 +86,7 @@ async function call() {
 }
 const valid = await call();
 assert.equal(valid.status, 200, JSON.stringify(valid.body));
-assert.deepEqual(valid.body.items, [{ key, category: "dress_shoe", confidence: 91, status: "classified" }]);
+assert.deepEqual(valid.body.items, [{ key, category: "dress_shoe", confidence: 91, identityDescriptor: "loại=giày tây; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông", status: "classified" }]);
 assert.equal(lastModelInput.model, "@cf/meta/llama-3.2-11b-vision-instruct");
 assert.equal(lastModelInput.input.image, dataUrl, "the actual image bytes must be passed in the documented vision image field");
 assert.equal(lastModelInput.input.messages[0].role, "system", "the system instruction must be present for the verified vision request shape");
