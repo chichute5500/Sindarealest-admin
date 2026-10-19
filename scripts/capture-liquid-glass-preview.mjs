@@ -580,6 +580,85 @@ try {
     if (!accountFocusRestored || !accountHiddenInert) hardFailures.push('Account drawer did not restore focus/close accessibly: ' + theme);
     await context.close();
   }
+
+  // Verify OS theme auto-mode on startup and while the simulated system preference changes.
+  const autoContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    colorScheme: 'light',
+    reducedMotion: 'reduce',
+    serviceWorkers: 'block',
+  });
+  await autoContext.addInitScript(() => {
+    try { localStorage.removeItem('sd-theme-mode'); } catch {}
+  });
+  await autoContext.route('**/*', async (route) => {
+    const req = route.request();
+    const url = new URL(req.url());
+    if (url.origin !== origin) {
+      audit.externalRequestsBlocked.push({ theme: 'system-auto', method: req.method(), url: req.url() });
+      return route.abort();
+    }
+    if (!['GET', 'HEAD'].includes(req.method())) {
+      audit.writeRequestsBlocked.push({ theme: 'system-auto', method: req.method(), url: req.url() });
+      return route.abort();
+    }
+    return route.continue();
+  });
+  await autoContext.route('**/api/settings', (route) => route.fulfill({
+    status: 200, contentType: 'application/json; charset=utf-8', body: '{}',
+  }));
+  await autoContext.route('**/api/products', (route) => route.fulfill({
+    status: 200, contentType: 'application/json; charset=utf-8', body: JSON.stringify(products),
+  }));
+  const autoPage = await autoContext.newPage();
+  autoPage.setDefaultTimeout(10000);
+  autoPage.on('console', (m) => { if (m.type() === 'error') audit.consoleErrors.push({ theme: 'system-auto', message: m.text() }); });
+  autoPage.on('pageerror', (e) => audit.pageErrors.push({ theme: 'system-auto', message: e.message }));
+  autoPage.on('response', (res) => {
+    if (res.status() >= 400 && new URL(res.url()).origin === origin) {
+      audit.httpErrors.push({ theme: 'system-auto', status: res.status(), url: res.url() });
+    }
+  });
+  autoPage.on('requestfailed', (req) => {
+    if (req.url().startsWith(origin) && !String(req.failure()?.errorText || '').includes('ERR_ABORTED')) {
+      audit.failedRequests.push({ theme: 'system-auto', url: req.url(), failure: req.failure()?.errorText || 'unknown' });
+    }
+  });
+  const autoResponse = await autoPage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  if (!autoResponse || !autoResponse.ok()) throw new Error('Local storefront failed in system-auto theme test.');
+  await autoPage.locator('#catalogGrid .product-card').first().waitFor({ state: 'visible' });
+  const autoInitial = await autoPage.evaluate(() => ({
+    mode: document.documentElement.dataset.themeMode || '',
+    dark: document.documentElement.classList.contains('dark'),
+  }));
+  const autoLightPass = autoInitial.mode === 'auto' && !autoInitial.dark;
+  audit.interactions.push({ theme: 'system-light', check: 'auto-theme-starts-from-light-os-preference', pass: autoLightPass, result: autoInitial });
+  if (!autoLightPass) hardFailures.push('Automatic theme did not start in light mode under a light system preference.');
+
+  await autoPage.emulateMedia({ colorScheme: 'dark' });
+  await autoPage.waitForFunction(() =>
+    document.documentElement.dataset.themeMode === 'auto' && document.documentElement.classList.contains('dark')
+  );
+  const autoDark = await autoPage.evaluate(() => ({
+    mode: document.documentElement.dataset.themeMode || '',
+    dark: document.documentElement.classList.contains('dark'),
+  }));
+  const autoDarkPass = autoDark.mode === 'auto' && autoDark.dark;
+  audit.interactions.push({ theme: 'system-dark', check: 'auto-theme-follows-live-dark-os-change', pass: autoDarkPass, result: autoDark });
+  if (!autoDarkPass) hardFailures.push('Automatic theme did not follow a live switch to dark system preference.');
+
+  await autoPage.emulateMedia({ colorScheme: 'light' });
+  await autoPage.waitForFunction(() =>
+    document.documentElement.dataset.themeMode === 'auto' && !document.documentElement.classList.contains('dark')
+  );
+  const autoLightAgain = await autoPage.evaluate(() => ({
+    mode: document.documentElement.dataset.themeMode || '',
+    dark: document.documentElement.classList.contains('dark'),
+  }));
+  const autoLightAgainPass = autoLightAgain.mode === 'auto' && !autoLightAgain.dark;
+  audit.interactions.push({ theme: 'system-light-return', check: 'auto-theme-follows-live-light-os-change', pass: autoLightAgainPass, result: autoLightAgain });
+  if (!autoLightAgainPass) hardFailures.push('Automatic theme did not follow a live switch back to light system preference.');
+  await autoContext.close();
 } finally {
   await browser.close();
 }
