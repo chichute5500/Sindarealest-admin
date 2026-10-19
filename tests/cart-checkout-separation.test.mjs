@@ -39,7 +39,8 @@ assert.match(html, /id="checkoutStreet"/, 'Detailed delivery address must be pre
 assert.match(html, /data-qty="-1"/, 'Quantity decrement must remain available.');
 assert.match(html, /data-qty="1"/, 'Quantity increment must remain available.');
 assert.match(html, /data-remove=/, 'Removing an item must remain available.');
-assert.match(html, /\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto/, 'The long checkout form must scroll inside the drawer.');
+assert.match(html, /\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*align-content:start;grid-auto-rows:max-content/, 'The checkout grid must scroll without stretching auto rows to the full drawer height.');
+assert.match(html, /\.checkout-drawer #checkoutSubmit\{[^}]*max-height:52px;height:auto/, 'The order submit action must remain a compact pill instead of stretching vertically.');
 assert.match(html, /env\(safe-area-inset-top\)/, 'Drawer layout must respect the device top safe area.');
 assert.match(html, /env\(safe-area-inset-bottom\)/, 'Drawer layout must respect the device bottom safe area.');
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.checkout-backdrop,\.checkout-drawer\{transition:none!important\}\}/, 'Checkout drawer must honor reduced-motion preferences.');
