@@ -9,6 +9,67 @@ const KEY_CONTROL = /[\u0000-\u001f\u007f]/;
 const validKey = value => typeof value === "string" && value.length > 0 && value.length <= KEY_MAX && !KEY_CONTROL.test(value);
 const safeError = error => String(error?.message || error || "Unknown image grouping error").replace(/[\r\n]+/g, " ").slice(0, 200);
 
+const GROUPABLE_CATEGORIES = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other"]);
+function parseGroupableFeatures(row) {
+  let features;
+  try { features = JSON.parse(row?.features_json || "{}"); } catch { return null; }
+  if (!features || typeof features !== "object" || Array.isArray(features)) return null;
+  const category = String(features.category || "").toLowerCase();
+  const confidence = features.categoryConfidence;
+  const validVector = (value, length) => Array.isArray(value) && value.length === length &&
+    value.every(number => typeof number === "number" && Number.isFinite(number) && number >= 0 && number <= 1);
+  if (!GROUPABLE_CATEGORIES.has(category) ||
+      features.categoryStatus !== "classified" ||
+      !Number.isInteger(confidence) || confidence < 70 || confidence > 100 ||
+      !validVector(features.shape, 64) || !validVector(features.colors, 12) ||
+      !/^[0-9a-f]{64}$/i.test(String(features.contentHash || "")) ||
+      !/^[0-9a-f]{16}$/i.test(String(row?.p_hash || ""))) return null;
+  return { ...features, category };
+}
+function compareIndexedRows(left, right) {
+  const a = parseGroupableFeatures(left), b = parseGroupableFeatures(right);
+  if (!a || !b || a.category !== b.category) return { match: false, score: 0, reason: "classification_gate" };
+  if (a.contentHash.toLowerCase() === b.contentHash.toLowerCase()) return { match: true, score: 100, exactDuplicate: true };
+  const hashA = String(left.p_hash).toLowerCase(), hashB = String(right.p_hash).toLowerCase();
+  let distance = 0;
+  for (let i = 0; i < 16; i++) {
+    let bits = parseInt(hashA[i], 16) ^ parseInt(hashB[i], 16);
+    while (bits) { distance++; bits &= bits - 1; }
+  }
+  let shapeDelta = 0;
+  for (let i = 0; i < 64; i++) shapeDelta += Math.abs(a.shape[i] - b.shape[i]);
+  const shape = Math.max(0, Math.min(1, 1 - shapeDelta / 64));
+  let colorOverlap = 0;
+  for (let channel = 0; channel < 3; channel++) {
+    let channelOverlap = 0;
+    for (let bin = 0; bin < 4; bin++) {
+      const index = channel * 4 + bin;
+      channelOverlap += Math.min(a.colors[index], b.colors[index]);
+    }
+    colorOverlap += Math.max(0, Math.min(1, channelOverlap));
+  }
+  const color = colorOverlap / 3;
+  const score = Math.round(((1 - distance / 64) * 0.30 + shape * 0.35 + color * 0.35) * 100);
+  return { match: score >= 91 && shape >= 0.58 && color >= 0.58 && distance <= 24, score, shape, color, distance, exactDuplicate: false };
+}
+function validateCandidateGroup(rows, keys) {
+  if (!Array.isArray(rows) || rows.length !== keys.length || rows.length < 2) return { valid: false, reason: "missing_index" };
+  const byKey = new Map(rows.map(row => [String(row.image_key), row]));
+  const ordered = keys.map(key => byKey.get(key));
+  if (ordered.some(row => !row || !parseGroupableFeatures(row))) return { valid: false, reason: "unconfirmed_classification" };
+  const category = parseGroupableFeatures(ordered[0]).category;
+  let minimumScore = 100;
+  for (let i = 0; i < ordered.length; i++) {
+    for (let j = i + 1; j < ordered.length; j++) {
+      const result = compareIndexedRows(ordered[i], ordered[j]);
+      if (!result.match || result.score < 91) return { valid: false, reason: result.reason || "similarity_below_threshold" };
+      minimumScore = Math.min(minimumScore, result.score);
+    }
+  }
+  return { valid: true, category, similarity: minimumScore };
+}
+
+
 function validDescriptor(item) {
   if (!item || !validKey(item.key) || !/^[0-9a-f]{16}$/i.test(String(item.p_hash || ""))) return false;
   if (!Number.isInteger(Number(item.width)) || Number(item.width) < 1 || Number(item.width) > 100000) return false;
@@ -116,18 +177,30 @@ export async function onRequestPost(context) {
         const present = await Promise.all(descriptors.map(item => env.IMAGES.head(item.key)));
         if (present.some(item => !item)) return fail("Có ảnh đã biến mất khỏi R2 trong khi lập chỉ mục. Hãy quét lại kho.", 409);
       }
-      const statements = descriptors.map(item => env.DB.prepare(
-        "INSERT INTO image_group_index(image_key,p_hash,features_json,width,height,source_size,source_uploaded,updated_at) VALUES(?,?,?,?,?,?,?,datetime('now')) ON CONFLICT(image_key) DO UPDATE SET p_hash=excluded.p_hash,features_json=excluded.features_json,width=excluded.width,height=excluded.height,source_size=excluded.source_size,source_uploaded=excluded.source_uploaded,updated_at=datetime('now')"
-      ).bind(
-        item.key, String(item.p_hash).toLowerCase(), JSON.stringify({
-          shape: item.features.shape.map(Number),
-          colors: item.features.colors.map(Number),
-          contentHash: String(item.features.contentHash).toLowerCase(),
-          category: ["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"].includes(String(item.features.category || "").toLowerCase()) ? String(item.features.category).toLowerCase() : "unknown",
-          categoryConfidence: Number.isInteger(Number(item.features.categoryConfidence)) && Number(item.features.categoryConfidence) >= 0 && Number(item.features.categoryConfidence) <= 100 ? Number(item.features.categoryConfidence) : 0,
-          categoryStatus: String(item.features.category || "").toLowerCase() === "unknown" || !["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other"].includes(String(item.features.category || "").toLowerCase()) ? "needs_review" : "classified"
-        }), Number(item.width), Number(item.height), Number(item.sourceSize), String(item.sourceUploaded || "")
-      ));
+      const statements = descriptors.map(item => {
+        const rawCategory = String(item.features.category || "").toLowerCase();
+        const category = GROUPABLE_CATEGORIES.has(rawCategory) || rawCategory === "unknown" ? rawCategory : "unknown";
+        const rawConfidence = Number(item.features.categoryConfidence);
+        const categoryConfidence = Number.isInteger(rawConfidence) && rawConfidence >= 0 && rawConfidence <= 100 ? rawConfidence : 0;
+        // The server, not the browser, decides whether this indexed image is
+        // eligible for grouping. Missing/weak confidence or an explicit review
+        // status must never be silently upgraded to "classified".
+        const categoryStatus = GROUPABLE_CATEGORIES.has(category) &&
+          item.features.categoryStatus === "classified" &&
+          categoryConfidence >= 70 ? "classified" : "needs_review";
+        return env.DB.prepare(
+          "INSERT INTO image_group_index(image_key,p_hash,features_json,width,height,source_size,source_uploaded,updated_at) VALUES(?,?,?,?,?,?,?,datetime('now')) ON CONFLICT(image_key) DO UPDATE SET p_hash=excluded.p_hash,features_json=excluded.features_json,width=excluded.width,height=excluded.height,source_size=excluded.source_size,source_uploaded=excluded.source_uploaded,updated_at=datetime('now')"
+        ).bind(
+          item.key, String(item.p_hash).toLowerCase(), JSON.stringify({
+            shape: item.features.shape.map(Number),
+            colors: item.features.colors.map(Number),
+            contentHash: String(item.features.contentHash).toLowerCase(),
+            category,
+            categoryConfidence,
+            categoryStatus
+          }), Number(item.width), Number(item.height), Number(item.sourceSize), String(item.sourceUploaded || "")
+        );
+      });
       await env.DB.batch(statements);
       return json({ ok: true, indexed: descriptors.length, message: "Đã lưu chỉ mục hình ảnh cho lô hiện tại." });
     } catch (error) {
@@ -192,32 +265,32 @@ export async function onRequestPost(context) {
           return fail("Một nhóm có danh sách ảnh không hợp lệ (2–50 ảnh khác nhau).", 400);
         }
         const similarity = Number(group?.similarity);
-        if (!Number.isInteger(similarity) || similarity < 0 || similarity > 100) {
-          return fail("Điểm tương đồng của nhóm không hợp lệ.", 400);
+        if (!Number.isInteger(similarity) || similarity < 91 || similarity > 100) {
+          return fail("Chỉ chấp nhận đề xuất ghép ảnh đạt ngưỡng tối thiểu 91/100.", 400);
         }
         // Keep only images not already claimed by another pending group or an
         // earlier group in this same request. A duplicate can never enter two sets.
         const uniqueKeys = rawKeys.filter(key => !claimed.has(key));
         if (uniqueKeys.length < 2) { skipped++; continue; }
         const placeholders = uniqueKeys.map(() => "?").join(",");
-        const indexed = await env.DB.prepare("SELECT image_key,features_json FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...uniqueKeys).all();
+        const indexed = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...uniqueKeys).all();
         const indexedRows = indexed.results || [];
         const indexedKeys = new Set(indexedRows.map(row => row.image_key));
         if (uniqueKeys.some(key => !indexedKeys.has(key))) return fail("Có ảnh chưa được lập chỉ mục. Hãy hoàn tất quét toàn kho trước khi lưu nhóm.", 409);
-        // Never trust category labels or rationale supplied by the browser.
-        // The server independently rejects unknown, review-needed, or mixed-category groups.
-        const indexedCategories = [];
-        for (const row of indexedRows) {
-          let features = {};
-          try { features = JSON.parse(row.features_json || "{}"); } catch {}
-          const category = String(features.category || "unknown").toLowerCase();
-          if (category === "unknown" || features.categoryStatus === "needs_review" ||
-              !["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other"].includes(category)) {
-            return fail("Nhóm có ảnh chưa được phân loại chắc chắn. Hãy giữ ảnh ở hàng chờ xác nhận loại.", 409);
-          }
-          indexedCategories.push(category);
+        // Recompute all pair scores from persisted descriptors. Never trust the
+        // browser's submitted score/category labels as proof of a 91/100 match.
+        const verification = validateCandidateGroup(indexedRows, uniqueKeys);
+        if (!verification.valid) {
+          const message = verification.reason === "unconfirmed_classification"
+            ? "Nhóm có ảnh chưa được phân loại chắc chắn. Ảnh thiếu đặc trưng, độ tin cậy thấp hoặc cần xem xét phải ở hàng chờ thủ công."
+            : verification.reason === "similarity_below_threshold"
+              ? "Nhóm có ít nhất một cặp ảnh chưa đạt ngưỡng ghép 91/100 khi kiểm tra lại phía máy chủ."
+              : "Không thể xác minh danh mục hoặc chỉ mục của toàn bộ ảnh trong nhóm.";
+          return fail(message, 409);
         }
-        if (new Set(indexedCategories).size !== 1) return fail("Không thể lưu một nhóm chứa nhiều danh mục sản phẩm khác nhau.", 409);
+        // The persisted score is the weakest pair in the group; this is more
+        // conservative than trusting the browser's average/best-member score.
+        const verifiedSimilarity = verification.similarity;
         const groupFingerprint = await fingerprint(uniqueKeys);
         const existing = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(groupFingerprint).first();
         if (existing) {
@@ -230,7 +303,7 @@ export async function onRequestPost(context) {
         const memberScores = new Map((Array.isArray(group.members) ? group.members : []).map(member => [member?.key, Number(member?.similarity)]));
         const statements = [
           env.DB.prepare("INSERT INTO image_group_sets(id,fingerprint,similarity,rationale,status,created_at) VALUES(?,?,?,?,'pending',datetime('now'))")
-            .bind(id, groupFingerprint, similarity, String(group.rationale || "").slice(0, 700))
+            .bind(id, groupFingerprint, verifiedSimilarity, String(group.rationale || "").slice(0, 700))
         ];
         for (const key of uniqueKeys) {
           const memberScore = memberScores.get(key);
@@ -293,15 +366,15 @@ export async function onRequestPost(context) {
     const average = members => Math.round(members.reduce((sum, member) => sum + member.similarity, 0) / Math.max(1, members.length));
     const categoryFor = async keys => {
       if (!keys.length) return null;
-      const rows = await env.DB.prepare("SELECT image_key,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
+      const rows = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
       if ((rows.results || []).length !== keys.length) return null;
       const categories = [];
       for (const row of rows.results || []) {
-        let features = {};
-        try { features = JSON.parse(row.features_json || "{}"); } catch {}
-        categories.push(String(features.category || "unknown"));
+        const features = parseGroupableFeatures(row);
+        if (!features) return null;
+        categories.push(features.category);
       }
-      return categories.every(category => category === categories[0]) && categories[0] !== "unknown" ? categories[0] : null;
+      return categories.every(category => category === categories[0]) ? categories[0] : null;
     };
     const fingerprintConflict = async (value, excludedIds) => {
       const found = await env.DB.prepare("SELECT id,status FROM image_group_sets WHERE fingerprint=? LIMIT 1").bind(value).first();
@@ -485,7 +558,13 @@ export async function onRequestPost(context) {
       if (!group) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
       const memberRows = await env.DB.prepare("SELECT image_key,similarity FROM image_group_set_members WHERE group_id=? ORDER BY similarity DESC,image_key ASC").bind(id).all();
       const keys = (memberRows.results || []).map(row => String(row.image_key || ""));
-      if (keys.length < 2 || keys.length > 50) return fail("Nhóm không có số lượng ảnh hợp lệ.", 409);
+      if (keys.length < 2 || keys.length > 50 || new Set(keys).size !== keys.length) return fail("Nhóm không có số lượng ảnh hợp lệ hoặc chứa mã ảnh trùng.", 409);
+      if (!Number.isInteger(Number(group.similarity)) || Number(group.similarity) < 91 || Number(group.similarity) > 100) {
+        return fail("Chỉ được duyệt nhóm đã qua kiểm tra ghép ảnh tối thiểu 91/100.", 409);
+      }
+      const indexed = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
+      const verification = validateCandidateGroup(indexed.results || [], keys);
+      if (!verification.valid) return fail("Nhóm không còn đủ điều kiện an toàn để duyệt: danh mục, đặc trưng hoặc ngưỡng ghép ảnh chưa được xác minh.", 409);
       const [objects, product] = await Promise.all([
         Promise.all(keys.map(key => env.IMAGES.head ? env.IMAGES.head(key) : env.IMAGES.get(key))),
         env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(productId).first()
