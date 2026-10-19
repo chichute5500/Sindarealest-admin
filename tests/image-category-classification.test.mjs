@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -40,6 +40,7 @@ const env = {
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     if (compareMode && input.image) return { response: JSON.stringify({ shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }), tool_calls: [], usage: {} };
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && message.content.includes("mô tả từ phân tích thị giác"))) {
+      if (malformedCompareOnce) { malformedCompareOnce = false; return { response: "not valid JSON", tool_calls: [] }; }
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
         { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
     }
@@ -48,7 +49,7 @@ const env = {
       if (systemPrompt.includes("forensic shoe-photo analyst")) {
         return { response: JSON.stringify({ shoe_type: "dress_shoe", texture: "vân da", toe: "mũi tròn", sole: "đế đen", stitching: "đường may rõ" }), tool_calls: [], usage: {} };
       }
-      if (systemPrompt.includes("Compare visual descriptions")) {
+      if (systemPrompt.includes("Compare visual descriptions") || systemPrompt.includes("Return ONLY valid JSON with a top-level pairs array")) {
         return malformed ? { response: "not valid JSON", tool_calls: [] } :
           { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: compareConfidence, rationale: "Trùng vân da, đường may và chi tiết đế." }] }), tool_calls: [], usage: {} };
       }
@@ -207,9 +208,19 @@ const beforeMalformedCalls = modelCalls;
 const beforeMalformedWrites = reviewInsertBatches;
 const malformedCompareResponse = await onRequestPost({ request: compareRequest(), env });
 assert.equal(malformedCompareResponse.status, 502);
-assert.equal(modelCalls, beforeMalformedCalls + 3, "malformed comparison output is rejected after both image descriptions and one text comparison");
+assert.equal(modelCalls, beforeMalformedCalls + 4, "malformed comparison output is rejected only after one format retry");
 assert.equal(reviewInsertBatches, beforeMalformedWrites, "invalid model output must not persist partial pair proposals");
 malformed = false;
+
+malformedCompareOnce = true;
+const beforeFormatRetryCalls = modelCalls;
+const beforeFormatRetryWrites = reviewInsertBatches;
+const recoveredFormatResponse = await onRequestPost({ request: compareRequest(), env });
+const recoveredFormatResult = await recoveredFormatResponse.json();
+assert.equal(recoveredFormatResponse.status, 201, JSON.stringify(recoveredFormatResult));
+assert.equal(recoveredFormatResult.matches, 1, "one malformed JSON response should recover on the bounded format retry");
+assert.equal(modelCalls, beforeFormatRetryCalls + 4, "format retry should add exactly one text-only model request");
+assert.equal(reviewInsertBatches, beforeFormatRetryWrites + 1, "only the recovered valid result may be persisted");
 
 // Upstream quota errors must not be retried or persisted as successful proposals.
 const beforeQuotaCalls = modelCalls;
