@@ -45,6 +45,8 @@ assert.match(html, /env\(safe-area-inset-top\)/, 'Drawer layout must respect the
 assert.match(html, /env\(safe-area-inset-bottom\)/, 'Drawer layout must respect the device bottom safe area.');
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.checkout-backdrop,\.checkout-drawer\{transition:none!important\}\}/, 'Checkout drawer must honor reduced-motion preferences.');
 
+assert.match(html, /\.cart-drawer\{width:min\(460px,100%\);background:var\(--glass\);/, 'The cart drawer must retain the page texture through a translucent glass surface.');
+assert.match(html, /\.checkout-drawer\{position:fixed;z-index:186;[^}]*background:var\(--glass\);/, 'The checkout drawer must retain the page texture through a translucent glass surface.');
 assert.match(html, /function dismissToast\(\)/, 'Drawers must be able to dismiss a toast before it overlaps their action area.');
 assert.match(html, /function showToast\(msg,link=null\)\{const t=\$\('#toast'\);const panelOpen=\['#cartDrawer','#checkoutDrawer','#accountDrawer','#productOverlay'\]/, 'Toast display must be suppressed while a blocking panel is open.');
 assert.match(html, /function openCart\(\)\{dismissToast\(\)/, 'Opening the cart must clear a previously displayed toast.');
