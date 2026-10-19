@@ -231,7 +231,7 @@ fallbackConfidence = 96;
 const fallbackResponse = await onRequestPost({ request: compareRequest(), env });
 const fallbackResult = await fallbackResponse.json();
 assert.equal(fallbackResponse.status, 201, JSON.stringify(fallbackResult));
-assert.ok(fallbackResult.matches.length >= 1, "an explicit pairwise retry may recover a valid >=91 match after the first pass was below threshold; result="+JSON.stringify(fallbackResult)+" calls="+(modelCalls-beforeFallbackCalls));
+assert.equal(fallbackResult.matches, 1, "an explicit pairwise retry may recover a valid >=91 match after the first pass was below threshold");
 assert.equal(modelCalls, beforeFallbackCalls + 4, "low-confidence first-pass verdict triggers exactly one exhaustive pairwise retry after two image descriptions");
 assert.equal(reviewInsertBatches, beforeLowConfidenceWrites + 1, "only the recovered high-confidence result is persisted for manual review");
 fallbackConfidence = null;
