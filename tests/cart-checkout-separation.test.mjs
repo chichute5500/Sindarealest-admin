@@ -44,4 +44,10 @@ assert.match(html, /env\(safe-area-inset-top\)/, 'Drawer layout must respect the
 assert.match(html, /env\(safe-area-inset-bottom\)/, 'Drawer layout must respect the device bottom safe area.');
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.checkout-backdrop,\.checkout-drawer\{transition:none!important\}\}/, 'Checkout drawer must honor reduced-motion preferences.');
 
-console.log('PASS: cart/checkout separation, unconfirmed prices, modal controls, address fields, and existing order API wiring.');
+assert.match(html, /function dismissToast\(\)/, 'Drawers must be able to dismiss a toast before it overlaps their action area.');
+assert.match(html, /function showToast\(msg,link=null\)\{const t=\$\('#toast'\);const panelOpen=\['#cartDrawer','#checkoutDrawer','#accountDrawer','#productOverlay'\]/, 'Toast display must be suppressed while a blocking panel is open.');
+assert.match(html, /function openCart\(\)\{dismissToast\(\)/, 'Opening the cart must clear a previously displayed toast.');
+assert.match(html, /function openCheckout\(\)\{\s*dismissToast\(\)/, 'Opening checkout must clear a previously displayed toast.');
+assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'Checkout must be reachable from the cart CTA.');
+
+console.log('PASS: cart/checkout separation, unconfirmed prices, modal controls, address fields, order API wiring, and toast collision prevention.');
