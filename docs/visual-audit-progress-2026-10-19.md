@@ -418,3 +418,28 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Ước tính checklist code và tự động hóa tổng thể: **khoảng 90%** (tăng từ 84% trước đợt này do public API price gating, order snapshot sanitation, test hồi quy và preview mới đều PASS). Không phải tỷ lệ pixel-match và không phải độ sẵn sàng production.
 - Các hạng mục chưa được coi là hoàn thành: test trên thiết bị Android thật; kiểm tra D1/R2/admin/auth/orders/warranty trong staging có quyền truy cập; kiểm chứng upload/ảnh riêng tư/watermark ở endpoint thật; dịch vụ tìm kiếm Taobao/1688 và quyền/plan Workers AI; triển khai và thử thanh toán trên staging; đối chiếu thủ công chi tiết từng screen với bộ ảnh chuẩn và ghi danh sách sai khác nhỏ còn lại.
 - Chưa có phê duyệt merge/deploy. Không chạy migration trên production, không thay đổi secrets và không tạo giao dịch/đơn hàng thật.
+
+## Bổ sung kiểm toán watermark và bằng chứng giao diện — 19/10/2026
+
+### Thay đổi đã hoàn tất trên nhánh thử nghiệm
+
+- Admin cho phép cấu hình đường dẫn logo watermark nội bộ, vị trí, kích thước và độ mờ; URL ngoài, đường dẫn sai định dạng và logo R2 không tồn tại bị từ chối.
+- Giao diện chi tiết/fullscreen lấy đúng `watermarkLogoUrl` từ public settings thay vì luôn cố định `/watermark.webp`. Watermark vẫn chỉ là lớp phủ khi xem ảnh lớn; không ghi đè ảnh gốc và không phủ thumbnail/thẻ danh sách.
+- Backup v2 bao gồm logo watermark đã chọn. Restore v2 xác thực logo khi trường có mặt, đồng thời vẫn tương thích với backup v2 cũ chưa có trường này.
+- Bổ sung kiểm thử cho đường dẫn nội bộ an toàn, chặn URL ngoài, sự tồn tại của ảnh R2, truyền cấu hình ra viewer và bảo toàn cài đặt qua backup/restore.
+- Giữ nguyên bố cục sáu ô cam kết chính đã được kiểm thử; cam kết “Đặt hàng theo yêu cầu” vẫn nằm trong khu vực quy trình đặt hàng. Không đổi thiết kế đã duyệt chỉ để ép thành bảy ô trong dải chính.
+
+### Bằng chứng mới nhất
+
+- Source HEAD: `a9456c3071bfc6070645408f32f82f1163df6a54`.
+- Validation workflow [39223554864](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39223554864): **SUCCESS**, gồm `npm run check`, kiểm toán dependency và toàn bộ `npm test`.
+- Visual preview workflow [39223554394](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39223554394): **SUCCESS** trên cùng SHA.
+- Artifact `sindarealest-liquid-glass-preview-214`, ID `12172876965`, SHA-256 `sha256:2d4b643010221111038f16c34607018f52ecbd1e35d116c481554ea9fa03a23c`.
+- Báo cáo máy: `passed=true`; 54 ảnh; 20 kiểm tra viewport/theme; 91 tương tác; 235 sản phẩm fixture; 0 lỗi cứng, 0 tràn ngang, 0 lỗi console/page/HTTP/request và 0 request ghi dữ liệu. Mọi đơn hàng/API ghi dữ liệu đều được mock/chặn trong preview; không dùng dữ liệu khách hàng hay giao dịch thật.
+
+### Ranh giới nghiệm thu chưa thể xác nhận bằng CI
+
+- Đây là preview tĩnh, fixture và fake/in-memory DB; không chứng minh D1/R2/auth/đơn hàng/bảo hành hoạt động với binding production thực.
+- Chưa có phiên đăng nhập Cloudflare được xác nhận cho browser profile, chưa có môi trường staging được cấp quyền và chưa có thiết bị Android thật nối vào môi trường kiểm thử.
+- Chưa thực hiện triển khai production, migration production, thanh toán thật hoặc ghi dữ liệu thật. Cần quyền staging/thiết bị/duyệt triển khai phù hợp trước khi đóng các mục nghiệm thu ngoài mã nguồn.
+- Taobao/1688 tiếp tục bị loại khỏi phạm vi theo yêu cầu hiện tại.
