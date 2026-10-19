@@ -326,8 +326,9 @@ if(action==="compare"){
         temperature:0,
         max_tokens:320
       });
-      const descriptorText=vision?.response??vision?.choices?.[0]?.message?.content??vision?.output_text;
-      if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty");
+      const descriptorValue=vision?.response??vision?.choices?.[0]?.message?.content??vision?.output_text??vision?.generated_text??vision?.text??vision?.content;
+      const descriptorText=typeof descriptorValue==="string"?descriptorValue:descriptorValue&&typeof descriptorValue==="object"?JSON.stringify(descriptorValue):"";
+      if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty (response type="+typeof descriptorValue+(vision&&typeof vision==="object"?", keys="+Object.keys(vision).slice(0,8).join(","):"")+")");
       descriptors.push(descriptorText.trim().slice(0,2200));
     }
     const comparisonMessages=[
