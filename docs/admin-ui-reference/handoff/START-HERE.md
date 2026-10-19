@@ -7,7 +7,7 @@ Các file này lưu trạng thái bền vững nhưng không tự khởi động
 
 ## Trước khi làm bất cứ việc gì
 1. Xác nhận repository `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, HEAD SHA và `git status`.
-2. Đọc file này, rồi đọc `LATEST-STATUS.md`, `latest-test-results.json` và `../reference-instructions.md`.
+2. Đọc file này, rồi đọc `LATEST-STATUS.md`, `latest-test-results.json`, `PROMPT-COMPLETENESS-AUDIT.md` và `../reference-instructions.md`.
 3. Mở ảnh thiết kế gốc `../admin-mobile-reference.png`; dùng `../admin-mobile-reference.html` và ZIP tham chiếu khi cần.
 4. Kiểm tra ảnh gần nhất trong thư mục `history/` và đối chiếu SHA trong báo cáo với HEAD hiện tại. Nếu lệch, không coi ảnh đó là ảnh của code hiện tại.
 5. Đọc MASTER PROMPT tại `../MASTER-PROMPT-AUTO-HANDOFF.md` và thực hiện đầy đủ.
@@ -23,7 +23,8 @@ Các file này lưu trạng thái bền vững nhưng không tự khởi động
 ## Tệp trong thư mục này
 - `LATEST-STATUS.md`: trạng thái bàn giao mới nhất.
 - `latest-test-results.json`: mẫu/cập nhật kết quả kiểm thử.
-- `MASTER-PROMPT-AUTO-HANDOFF.md` ở thư mục cha: prompt duy nhất dùng để khởi động và tiếp tục công việc.
+- `PROMPT-COMPLETENESS-AUDIT.md`: bảng đối chiếu yêu cầu đã ghi nhận và các giới hạn còn lại của prompt.
+- `MASTER-PROMPT-AUTO-HANDOFF.md` ở thư mục cha: prompt chuẩn dùng để khởi động và tiếp tục công việc.
 - `history/`: ảnh/báo cáo theo từng mốc, giữ lịch sử không ghi đè.
 
 ## Lưu ý về ảnh
