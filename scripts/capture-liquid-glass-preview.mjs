@@ -287,24 +287,34 @@ try {
         return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
       });
       const address = rows.find((el) => el.textContent.includes('Địa chỉ'));
+      const contactGrid = document.querySelector('#contact .contact-grid');
+      const warranty = document.querySelector('footer .warranty-help');
+      const warrantyForm = document.querySelector('footer #warrantyLookupForm');
       return {
         rowCount: rows.length,
         visibleRowCount: visibleRows.length,
+        contactColumnCount: contactGrid ? getComputedStyle(contactGrid).gridTemplateColumns.trim().split(/\\s+/).length : 0,
         fullAddressVisible: !!address && address.textContent.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'),
         zaloActionPresent: !!document.querySelector('#contact a[href="https://zalo.me/0827049192"]'),
         phoneActionPresent: !!document.querySelector('#contact a[href="tel:+84827049192"]'),
         contactTitleVisible: !!document.querySelector('#footer-contact-title') && document.querySelector('#footer-contact-title').getBoundingClientRect().height > 0,
+        warrantySeparatedFromContact: !!warranty && !document.querySelector('#contact').contains(warranty),
+        warrantyFormPreserved: !!warrantyForm && !!warrantyForm.querySelector('#warrantyLookupSubmit'),
       };
     });
     const contactPass = contactScreen.rowCount === 6
       && contactScreen.visibleRowCount === 6
+      && contactScreen.contactColumnCount === 1
       && contactScreen.fullAddressVisible
       && contactScreen.zaloActionPresent
       && contactScreen.phoneActionPresent
-      && contactScreen.contactTitleVisible;
-    audit.interactions.push({ theme, check: 'footer-contact-six-rows-address-and-zalo-phone-actions', pass: contactPass, result: contactScreen });
-    if (!contactPass) hardFailures.push('Footer contact rows, full address or Zalo/phone actions missing: ' + theme);
+      && contactScreen.contactTitleVisible
+      && contactScreen.warrantySeparatedFromContact
+      && contactScreen.warrantyFormPreserved;
+    audit.interactions.push({ theme, check: 'mobile-contact-single-column-with-separate-warranty-support', pass: contactPass, result: contactScreen });
+    if (!contactPass) hardFailures.push('Mobile contact layout or separate warranty support failed: ' + theme);
     await capture(page, 'footer-contact-mobile-' + theme + '.jpg');
+    await captureElement(page, '.warranty-help', 'warranty-support-mobile-' + theme + '.jpg');
     await page.evaluate(() => {
       const root = document.documentElement;
       const previous = root.dataset.previewPreviousScrollBehavior || '';
