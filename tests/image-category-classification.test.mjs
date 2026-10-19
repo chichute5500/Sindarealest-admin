@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { onRequestPost } from "../functions/api/admin/image-groups.js";
 import { createSession } from "../functions/_lib.js";
+import { normalizeIdentityDescriptor, isIdentityDescriptorValid } from "../functions/_lib/image-identity.js";
 
+const pipeDescriptor = "type=sneaker | color=black | material=crocodile-pattern leather | texture=small scales | toe=round | sole=black rubber";
+assert.equal(normalizeIdentityDescriptor(pipeDescriptor).split(";").length, 6, "pipe-separated model descriptors must be canonicalized to semicolons for consistent display and smoke validation");
+assert.equal(isIdentityDescriptorValid(pipeDescriptor), true, "valid pipe-separated identity descriptors must not be rejected");
 const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
