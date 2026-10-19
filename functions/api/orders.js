@@ -37,7 +37,18 @@ export async function onRequestPost({ request, env }) {
     if (byId.size !== ids.length || ids.some(id => !byId.has(id) || Number(byId.get(id).published) !== 1)) return fail("Một hoặc nhiều sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.", 409);
     for (const id of ids) { const product = byId.get(id), stock = product.stock; if (stock !== null && stock !== undefined && requested.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của ${Number(product.sku_verified) === 1 ? "SKU " + product.sku : "sản phẩm " + product.title} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
     const showPrices = (await getSetting(env.DB, "show_prices", "0")) === "1";
-    const items = ids.map(id => { const p = byId.get(id), quantity = requested.get(id); return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, title: p.title, quantity, price: showPrices && p.price !== null && Number(p.source_price_confirmed) === 1 ? Number(p.price) : null }; });
+    const items = ids.map(id => {
+      const p = byId.get(id), quantity = requested.get(id);
+      const rawPrice = p.price;
+      const candidatePrice = rawPrice === null || rawPrice === undefined || (typeof rawPrice === "string" && !rawPrice.trim())
+        ? null
+        : Number(rawPrice);
+      const confirmedPrice = showPrices && Number(p.source_price_confirmed) === 1
+        && Number.isSafeInteger(candidatePrice) && candidatePrice >= 0
+        ? candidatePrice
+        : null;
+      return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, title: p.title, quantity, price: confirmedPrice };
+    });
     const priceKnown = items.every(i => Number.isSafeInteger(i.price) && i.price >= 0);
     const subtotal = priceKnown ? items.reduce((sum, i) => sum + i.price * i.quantity, 0) : null;
     if (subtotal !== null && !Number.isSafeInteger(subtotal)) return fail("Tổng giá trị đơn vượt giới hạn hợp lệ.");
