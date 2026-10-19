@@ -2,6 +2,9 @@
 
 > Thư mục này là điểm bàn giao bền vững giữa các phiên AI. Nội dung chỉ phản ánh trạng thái đã được ghi và kiểm chứng; không coi báo cáo cũ là bằng chứng nếu chưa xác minh lại.
 
+## Lưu ý về tự động tiếp tục
+Các file này lưu trạng thái bền vững nhưng không tự khởi động một phiên ChatGPT mới khi phiên hiện tại hết giới hạn. Tự động chạy tiếp cần có agent/automation riêng thực sự được cấu hình. Khi một phiên AI/automation được khởi chạy, hãy tự đọc tài liệu này và prompt tổng; người dùng không cần viết lại prompt dài.
+
 ## Trước khi làm bất cứ việc gì
 1. Xác nhận repository `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, HEAD SHA và `git status`.
 2. Đọc file này, rồi đọc `LATEST-STATUS.md`, `latest-test-results.json` và `../reference-instructions.md`.
@@ -9,10 +12,10 @@
 4. Kiểm tra ảnh gần nhất trong thư mục `history/` và đối chiếu SHA trong báo cáo với HEAD hiện tại. Nếu lệch, không coi ảnh đó là ảnh của code hiện tại.
 5. Đọc MASTER PROMPT tại `../MASTER-PROMPT-AUTO-HANDOFF.md` và thực hiện đầy đủ.
 
-## Quy tắc cập nhật sau mỗi mốc công việc
-- Sau mỗi mốc sửa có ý nghĩa và đã chạy kiểm tra, dùng Playwright chụp ảnh giao diện đang chạy thật; không tạo ảnh giả.
-- Lưu ảnh theo commit/mốc vào `history/<short-sha-or-run-id>/screenshots/` và cập nhật bản mới nhất nếu môi trường hỗ trợ.
-- Cập nhật `LATEST-STATUS.md`, kết quả kiểm thử và danh sách lỗi còn lại. Ghi SHA thực tế; không tự bịa thời gian, route, kết quả hoặc commit.
+## Quy tắc cập nhật sau mỗi vòng lặp
+- Một vòng lặp là: thực hiện một sửa đổi có ý nghĩa → chạy lại kiểm tra → chụp lại cùng màn hình/điều kiện → so sánh kết quả.
+- Sau MỖI vòng lặp hoàn chỉnh, dùng Playwright chụp ảnh ứng dụng đang chạy thật; lưu ảnh trước/sau và báo cáo trong `history/<short-sha-or-run-id>/screenshots/` cùng metadata. Không đợi kết thúc toàn bộ công việc mới lưu.
+- Cập nhật `LATEST-STATUS.md`, `latest-test-results.json`, danh sách lỗi còn lại và commit mỗi vòng lặp đã kiểm tra thành công nếu có quyền/công cụ. Ghi SHA thực tế; không tự bịa thời gian, route, kết quả hoặc commit.
 - Chỉ ghi PASS khi có bằng chứng. Dùng BLOCKED/NOT TESTED khi chưa kiểm tra được.
 - Commit chỉ trên branch fix này. Không merge main, không deploy production, không đổi schema/binding/secret hay dữ liệu thật.
 - Nếu quyền truy cập, Playwright hoặc GitHub bị lỗi, ghi rõ trở ngại và hướng tiếp tục; không tuyên bố đã lưu nếu API chưa xác nhận.
