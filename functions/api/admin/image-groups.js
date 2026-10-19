@@ -7,6 +7,27 @@ function isWorkersAIDailyAllocationExhausted(value){
 function isWorkersAIQuotaError(status,value){
   return Number(status)===429||isWorkersAIDailyAllocationExhausted(value)||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(String(value||""));
 }
+function safeWorkersAIFailure(error){
+  const detail=String(error?.message||error||"").replace(/[\r\n]+/g," ").slice(0,220);
+  const status=Number(error?.status||error?.statusCode||error?.status_code||0);
+  if(isWorkersAIDailyAllocationExhausted(detail)){
+    return {status:429,message:"Workers AI đã hết hạn mức neuron miễn phí hằng ngày. Chưa có kết quả AI được xác minh; hãy thử lại sau khi hạn mức được cấp lại.",headers:{}};
+  }
+  if(isWorkersAIQuotaError(status,detail)){
+    return {status:429,message:"Workers AI đang giới hạn số lượt gọi. Chưa có kết quả AI được xác minh; vui lòng đợi rồi thử lại.",headers:{"Retry-After":"60"}};
+  }
+  if([401,403].includes(status)||/unauthori[sz]ed|forbidden|permission denied|authentication failed|not authorized/i.test(detail)){
+    return {status:503,message:"Workers AI từ chối quyền truy cập. Kiểm tra binding AI, quyền tài khoản Cloudflare và model trong môi trường Preview.",headers:{}};
+  }
+  if(status===504||/time.?out|timed out|deadline exceeded|request aborted/i.test(detail)){
+    return {status:504,message:"Workers AI phản hồi quá thời gian cho phép. Chưa có kết quả AI được xác minh; thử lại sau.",headers:{}};
+  }
+  if([500,502,503].includes(status)||/\b(500|502|503)\b|temporar|unavailable|overloaded|network error|internal server error/i.test(detail)){
+    return {status:503,message:"Workers AI tạm thời không khả dụng. Chưa có kết quả AI được xác minh; vui lòng thử lại sau.",headers:{}};
+  }
+  return {status:502,message:"Không thể hoàn tất yêu cầu AI. Chi tiết lỗi nội bộ đã được giữ kín; kết quả chưa được xác minh.",headers:{}};
+}
+
 const KEY_RE=/^(?=.{1,1024}$)[^\u0000-\u001f\u007f]+$/, LEGACY_KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
 function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
@@ -278,23 +299,22 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
       await new Promise(resolve=>setTimeout(resolve,250));
       continue;
     }
-    const status=quota?429:(transient?503:502);
-    const message=dailyAllocationExhausted?"Workers AI đã hết hạn mức neuron miễn phí hằng ngày (mã Cloudflare 4006). Chưa ghi kết quả; cần chờ hạn mức được cấp lại hoặc nâng cấp gói Workers AI.":"Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử lại.";
-    return fail(message,status,quota&&!dailyAllocationExhausted?{"Retry-After":"60"}:{});
+    const failure=safeWorkersAIFailure(error);
+    return fail("Không thể phân loại ảnh "+(i+1)+"/"+keys.length+". "+failure.message,failure.status,failure.headers);
   }
   classification=parseCategoryResult(result,allowed);
   // A category-only answer is insufficient for identity grouping. Retry once for
   // a required, concrete per-image descriptor instead of returning a false success.
   if(classification&&!isIdentityDescriptorValid(classification.identityDescriptor))classification=null;
 }
-if(!classification){const source=result&&typeof result==="object"?result:{};const describe=(key,value)=>key+(Array.isArray(value)?"["+value.length+"]":value&&typeof value==="object"?"{"+Object.keys(value).slice(0,6).join(",")+"}":"("+typeof value+")");const shape=Object.entries(source).slice(0,8).map(([key,value])=>describe(key,value)).join(",")||typeof result;let sample="";try{sample=JSON.stringify({response:source.response,tool_calls:source.tool_calls,choices:Array.isArray(source.choices)?source.choices.slice(0,1):undefined,output_text:source.output_text})||""}catch{}sample=sample.replace(/[\\r\\n]+/g," ").slice(0,220);return fail("Workers AI trả phản hồi không hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" (dạng: "+shape+(sample?"; mẫu JSON: "+sample:"")+"). Không lưu lô này; hãy thử lại.",502)}
+if(!classification){return fail("Workers AI trả phản hồi không đúng định dạng cho ảnh "+(i+1)+"/"+keys.length+". Không lưu lô phân loại này; hãy thử lại sau.",502)}
 const candidate=classification.category,confidence=classification.confidence,categoryValid=candidate!=="unknown"&&confidence>=70;
 const identityDescriptor=normalizeIdentityDescriptor(classification.identityDescriptor);
 const confirmed=categoryValid&&isIdentityDescriptorValid(identityDescriptor);
 items.push({key:keys[i],category:categoryValid?candidate:"unknown",confidence:Math.round(confidence),identityDescriptor,status:confirmed?"classified":"needs_review"});
 }
 return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.status==="classified").length+"/"+items.length+" ảnh với mô tả nhận diện hợp lệ. Ảnh thiếu đặc trưng hoặc chưa chắc chắn được giữ để xem xét thủ công."});
-}catch(error){return fail("Không thể phân loại ảnh. "+String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180),502)}
+}catch{ return fail("Không thể hoàn tất phân loại ảnh do dịch vụ xử lý hoặc dữ liệu chưa sẵn sàng. Kết quả chưa được xác minh; chi tiết nội bộ đã được giữ kín.",503) }
 }
 if(action==="compare"){
   if(typeof env.AI?.run!=="function")return fail("Chưa cấu hình Workers AI binding tên AI trên Preview. Chưa gọi AI và chưa lưu kết quả.",503);
@@ -407,11 +427,8 @@ if(action==="compare"){
     await env.DB.batch(statements);
     return json({ok:true,matches:prepared.length,batches:1,message:"AI đã so sánh đầy đủ "+keys.length+" ảnh và tạo "+prepared.length+" cặp đề xuất sau khi kiểm tra ngưỡng và đặc trưng. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201);
   }catch(error){
-    const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,220);
-    const status=Number(error?.status||error?.statusCode||error?.status_code||0);
-    if(isWorkersAIDailyAllocationExhausted(detail))return fail("Workers AI đã hết hạn mức neuron miễn phí hằng ngày (mã Cloudflare 4006). Chưa lưu đề xuất; cần chờ hạn mức được cấp lại hoặc nâng cấp gói Workers AI.",429);
-    if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
-    return fail("Không thể so sánh đủ các ảnh bằng Workers AI: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
+    const failure=safeWorkersAIFailure(error);
+    return fail(failure.message,failure.status,failure.headers);
   }
 }
 if(action==="reject"){const id=String(body.reviewId||"");if(!/^[0-9a-f-]{36}$/i.test(id))return fail("Mã lượt duyệt không hợp lệ.");const r=await env.DB.prepare("UPDATE image_group_reviews SET status='rejected' WHERE id=? AND status='pending'").bind(id).run();if(!r.meta?.changes)return fail("Lượt duyệt không tồn tại hoặc đã được xử lý.",409);return json({ok:true,message:"Đã loại đề xuất này."})}
