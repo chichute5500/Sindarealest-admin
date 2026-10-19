@@ -69,6 +69,49 @@ assert.equal(storedFeatures.category, "unknown");
 assert.equal(storedFeatures.categoryConfidence, 61);
 assert.equal(storedFeatures.categoryStatus, "needs_review");
 
+// A known category label must not override weak confidence or an explicit
+// needs_review status supplied by the browser.
+const weakCategoryDescriptor = {
+  ...descriptor,
+  key: "nested/weak-category.webp",
+  features: {
+    ...descriptor.features,
+    category: "sneaker",
+    categoryConfidence: 61,
+    categoryStatus: "needs_review"
+  }
+};
+const weakCategoryResponse = await onRequestPost({
+  request: request({ action: "index", images: [weakCategoryDescriptor] }),
+  env
+});
+assert.equal(weakCategoryResponse.status, 200);
+const weakCategoryInsert = executed.filter(statement => statement.sql.includes("INSERT INTO image_group_index")).at(-1);
+const weakStoredFeatures = JSON.parse(weakCategoryInsert.args[2]);
+assert.equal(weakStoredFeatures.category, "sneaker", "keep the label for admin diagnosis");
+assert.equal(weakStoredFeatures.categoryConfidence, 61);
+assert.equal(weakStoredFeatures.categoryStatus, "needs_review", "do not upgrade an uncertain known category to classified");
+
+const forgedClassifiedDescriptor = {
+  ...descriptor,
+  key: "nested/forged-classified.webp",
+  features: {
+    ...descriptor.features,
+    category: "loafer",
+    categoryConfidence: 65,
+    categoryStatus: "classified"
+  }
+};
+const forgedResponse = await onRequestPost({
+  request: request({ action: "index", images: [forgedClassifiedDescriptor] }),
+  env
+});
+assert.equal(forgedResponse.status, 200);
+const forgedInsert = executed.filter(statement => statement.sql.includes("INSERT INTO image_group_index")).at(-1);
+const forgedFeatures = JSON.parse(forgedInsert.args[2]);
+assert.equal(forgedFeatures.categoryStatus, "needs_review", "the server also applies the 70/100 category confidence gate");
+
+
 const oversized = await onRequestPost({ request: request({ action: "invalidate-index", keys: Array.from({ length: 101 }, (_, i) => "image-" + i + ".webp") }), env });
 assert.equal(oversized.status, 400);
 
