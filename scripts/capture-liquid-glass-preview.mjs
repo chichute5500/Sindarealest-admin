@@ -623,6 +623,68 @@ try {
     const accountHiddenInert = await page.locator('#accountDrawer').evaluate(el => el.hasAttribute('inert') && el.getAttribute('aria-hidden') === 'true');
     audit.interactions.push({ theme, check: 'account-close-restores-focus-and-hides-drawer', pass: accountFocusRestored && accountHiddenInert, result: { accountFocusRestored, accountHiddenInert } });
     if (!accountFocusRestored || !accountHiddenInert) hardFailures.push('Account drawer did not restore focus/close accessibly: ' + theme);
+
+    // Exercise local favorites end-to-end without any customer account or backend writes.
+    await page.locator('#catalogGrid .product-card .product-open').first().click();
+    await page.locator('#productOverlay.open').waitFor({ state: 'visible' });
+    const favoriteProductTitle = (await page.locator('#detailTitle').textContent() || '').trim();
+    await page.locator('#detailFavorite').click();
+    await page.waitForFunction(() => {
+      try { const ids = JSON.parse(localStorage.getItem('sd-favorites') || '[]'); return Array.isArray(ids) && ids.length === 1; } catch { return false; }
+    });
+    const favoriteSavedState = await page.evaluate(() => {
+      const ids = JSON.parse(localStorage.getItem('sd-favorites') || '[]');
+      return {
+        count: ids.length,
+        key: ids[0] || '',
+        pressed: document.querySelector('#detailFavorite')?.getAttribute('aria-pressed') === 'true',
+      };
+    });
+    const favoriteSavePass = favoriteSavedState.count === 1 && !!favoriteSavedState.key && favoriteSavedState.pressed;
+    audit.interactions.push({ theme, check: 'favorite-heart-persists-product-locally', pass: favoriteSavePass, result: favoriteSavedState });
+    if (!favoriteSavePass) hardFailures.push('Favorite heart did not persist a selected product locally: ' + theme);
+    await page.keyboard.press('Escape');
+    await page.locator('#productOverlay.open').waitFor({ state: 'hidden' });
+    await page.locator('#mobileAccountNav').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#accountFavoritesAction').click();
+    await page.locator('#accountFavoritesView:not([hidden])').waitFor({ state: 'visible' });
+    const favoritesListState = await page.evaluate(() => ({
+      count: document.querySelectorAll('#accountFavoritesList [data-favorite-open]').length,
+      title: document.querySelector('#accountFavoritesList .favorite-product-copy strong')?.textContent?.trim() || '',
+      total: document.querySelector('#accountFavoriteCount')?.textContent || '',
+    }));
+    const favoritesListPass = favoritesListState.count === 1
+      && favoritesListState.title === favoriteProductTitle
+      && favoritesListState.total === '1';
+    audit.interactions.push({ theme, check: 'account-favorites-view-renders-saved-product', pass: favoritesListPass, result: favoritesListState });
+    if (!favoritesListPass) hardFailures.push('Account favorites view did not render its locally saved product: ' + theme);
+    await page.locator('#accountFavoritesList [data-favorite-open]').first().click();
+    await page.locator('#productOverlay.open').waitFor({ state: 'visible' });
+    const reopenedFavoriteTitle = (await page.locator('#detailTitle').textContent() || '').trim();
+    const favoritesOpenPass = reopenedFavoriteTitle === favoriteProductTitle;
+    audit.interactions.push({ theme, check: 'favorite-row-reopens-correct-product', pass: favoritesOpenPass, result: { expected: favoriteProductTitle, actual: reopenedFavoriteTitle } });
+    if (!favoritesOpenPass) hardFailures.push('Selecting a favorite did not open the same product: ' + theme);
+    await page.locator('#detailFavorite').click();
+    await page.waitForFunction(() => {
+      try { const ids = JSON.parse(localStorage.getItem('sd-favorites') || '[]'); return Array.isArray(ids) && ids.length === 0; } catch { return false; }
+    });
+    const favoriteRemovePass = await page.locator('#detailFavorite').getAttribute('aria-pressed') === 'false'
+      && await page.evaluate(() => JSON.parse(localStorage.getItem('sd-favorites') || '[]').length === 0);
+    audit.interactions.push({ theme, check: 'favorite-heart-removes-saved-product', pass: favoriteRemovePass });
+    if (!favoriteRemovePass) hardFailures.push('Favorite heart did not remove the selected product: ' + theme);
+    await page.keyboard.press('Escape');
+    await page.locator('#productOverlay.open').waitFor({ state: 'hidden' });
+    await page.locator('#mobileAccountNav').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#accountFavoritesAction').click();
+    await page.locator('#accountFavoritesView:not([hidden])').waitFor({ state: 'visible' });
+    const emptyFavoritesPass = await page.locator('#accountFavoritesList .favorites-empty').count() === 1
+      && await page.locator('#accountFavoriteCount').textContent().then(v => v.trim() === '0');
+    audit.interactions.push({ theme, check: 'favorites-empty-state-after-removal', pass: emptyFavoritesPass });
+    if (!emptyFavoritesPass) hardFailures.push('Favorites empty state did not return after removing the last product: ' + theme);
+    await page.locator('#accountClose').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
     await context.close();
   }
 
