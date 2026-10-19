@@ -211,7 +211,7 @@ async function scanWholeImageInventory(){
       }
       if(calculated.length){
         // Tier 1: ask vision to classify each new/legacy image before any visual grouping.
-        // If classification fails, stop the scan instead of falling back to unsafe mixed groups.
+        // Only quota exhaustion may degrade to needs_review; all other classification errors still stop the scan.
         let decisions=new Map();
         if(!aiClassificationQuotaBlocked){
           try{
@@ -225,7 +225,6 @@ async function scanWholeImageInventory(){
             const message=String(error?.message||error);
             if(!/(?:4006|\b429\b|hết hạn mức neuron|quota exceeded|rate.?limit|đã giới hạn)/i.test(message))throw error;
             aiClassificationQuotaBlocked=true;
-
           }
         }
         // Never infer a category when vision is quota-blocked. Keep the visual
