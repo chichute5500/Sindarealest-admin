@@ -19,26 +19,29 @@ assert.ok(start > html.indexOf('id="sd-protection-script"'),
 
 const stripStart = html.indexOf('<div class="service-strip glass">');
 const stripEnd = html.indexOf('\n    </div>\n  </section>', stripStart);
-assert.notEqual(stripStart, -1, 'The seven-tile commitment strip must exist.');
+assert.notEqual(stripStart, -1, 'The six-tile commitment strip must exist.');
 assert.notEqual(stripEnd, -1, 'The commitment strip must close in its section.');
 const markup = html.slice(stripStart, stripEnd);
-assert.equal((markup.match(/class="service tap-target"/g) || []).length, 7,
-  'All seven supplied brand commitments must remain separate tiles.');
-assert.equal((markup.match(/class="service-copy"/g) || []).length, 7,
+assert.equal((markup.match(/class="service tap-target"/g) || []).length, 6,
+  'The primary strip must keep the six reference commitments as separate tiles.');
+assert.equal((markup.match(/class="service-copy"/g) || []).length, 6,
   'Every commitment must have one shared glass face.');
-assert.equal((markup.match(/class="service-icon"/g) || []).length, 7,
+assert.equal((markup.match(/class="service-icon"/g) || []).length, 6,
   'Each commitment tile must have an icon.');
-assert.equal((markup.match(/class="service-text"/g) || []).length, 7,
+assert.equal((markup.match(/class="service-text"/g) || []).length, 6,
   'Each commitment must have one shrink-safe text wrapper.');
 for (const label of [
   'Bảo hành 1 năm', 'Bảo dưỡng trọn đời', 'Da cá sấu cao cấp',
   'Hoàn thiện thủ công', 'Tỉ mỉ từng chi tiết', 'Đa dạng mẫu mã',
-  'Đặt hàng theo yêu cầu',
 ]) {
   assert.ok(markup.includes('<strong>' + label + '</strong>'), 'Missing separate brand commitment: ' + label);
 }
-assert.doesNotMatch(markup, /zalo\.me\/|Tư vấn\/đặt hàng qua Zalo/,
-  'Zalo must remain a separate contact CTA, not replace a supplied commitment.');
+assert.doesNotMatch(markup, /Đặt hàng theo yêu cầu|zalo\.me\/|Tư vấn\/đặt hàng qua Zalo/,
+  'The additional custom-order promise belongs in the order-assurance area, not the six-tile primary strip.');
+const orderStart = html.indexOf('<section class="section wrap" id="order"');
+const featuredStart = html.indexOf('<section class="section wrap" id="featured">', orderStart);
+assert.ok(orderStart >= 0 && featuredStart > orderStart, 'Order assurance section must remain after the six primary commitments.');
+assert.ok(html.slice(orderStart, featuredStart).includes('Đặt hàng theo yêu cầu'), 'The supplemental custom-order promise must remain available in the order-assurance section.');
 
 assert.ok(html.includes('<div class="service-strip glass">'),
   'The commitment strip must inherit the shared order-assurance glass material.');
@@ -53,8 +56,8 @@ assert.match(sharedGlassRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
 assert.ok(sharedGlassRule.includes('box-shadow:inset 0 1px 0 rgba(255,255,255,.29),0 12px 34px rgba(0,0,0,.055)'),
   'The outer strip must inherit the shared glass elevation.');
 
-assert.match(css, /grid-template-columns:repeat\(7,minmax\(0,1fr\)/,
-  'Desktop must provide one equal column per brand commitment.');
+assert.match(css, /grid-template-columns:repeat\(6,minmax\(0,1fr\)/,
+  'Desktop must provide six equal columns for the primary commitment tiles.');
 assert.match(css, /border-radius:15px/,
   'Commitment faces must be compact rounded cards, not long pills.');
 assert.match(css, /background:var\(--benefit-tile-glass\)/,
@@ -86,4 +89,4 @@ assert.doesNotMatch(css, /aspect-ratio:(?:2\.75|3\.5|2\.4|2\.25)\s*\/\s*1/,
 
 assert.ok(html.includes('.pill-btn.primary{background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(126,177,215,.24));border-color:rgba(116,171,211,.62)}'),
   'Primary actions must keep their cool glass gradient and blue-steel rim.');
-console.log('PASS: seven separate commitment tiles, cool theme glass, and desktop/tablet/mobile grids.');
+console.log('PASS: six primary commitment tiles, retained supplemental promise, cool theme glass, and desktop/tablet/mobile grids.');
