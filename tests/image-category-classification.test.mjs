@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, structuredDescriptorOnce = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, failNextDailyAllocation = false, compareMode = false, structuredDescriptorOnce = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -36,7 +36,8 @@ const env = {
   IMAGES: { async head(imageKey) { return { key: imageKey }; }, async get(imageKey) { return { key: imageKey }; } },
   AI: { async run(model, input) {
     modelCalls++; lastModelInput = { model, input };
-    if (failNextQuota) { failNextQuota = false; throw new Error("4006: you have used up your daily free allocation of 10,000 neurons, please upgrade to Cloudflare Workers Paid plan."); }
+    if (failNextDailyAllocation) { failNextDailyAllocation = false; throw new Error("4006: you have used up your daily free allocation of 10,000 neurons, please upgrade to Cloudflare Workers Paid plan."); }
+    if (failNextQuota) { failNextQuota = false; const error = new Error("Workers AI quota exceeded (429)"); error.status = 429; throw error; }
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     if (compareMode && input.image) { const description = { shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }; if (structuredDescriptorOnce) { structuredDescriptorOnce = false; return { response: description, tool_calls: [], usage: {} }; } return { response: JSON.stringify(description), tool_calls: [], usage: {} }; }
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && (
@@ -299,7 +300,7 @@ assert.equal(reviewInsertBatches, beforeQuotaWrites, "quota failure must not sav
 // must not masquerade as an ordinary gateway failure.
 compareMode = false;
 const beforeDailyAllocationFailure = modelCalls;
-failNextQuota = true;
+failNextDailyAllocation = true;
 const dailyAllocationResponse = await call();
 const dailyAllocationResult = await dailyAllocationResponse.json();
 assert.equal(dailyAllocationResponse.status, 429, JSON.stringify(dailyAllocationResult));
