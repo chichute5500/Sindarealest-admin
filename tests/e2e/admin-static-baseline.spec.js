@@ -36,12 +36,18 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
   });
   page.on('response', response => {
     const url = new URL(response.url());
-    // The local static server intentionally has no API. Its unauthenticated
-    // session probe is expected to return 404 and display the login form.
     if (response.status() >= 400 && url.pathname !== '/api/admin/session') {
       httpErrors.push({ url: url.origin + url.pathname, status: response.status() });
     }
   });
+
+  // Keep this a genuine local source-page test without a live backend or
+  // business data: only the session check is stubbed to return unauthenticated.
+  await page.route('**/api/admin/session', route => route.fulfill({
+    status: 401,
+    contentType: 'application/json',
+    body: JSON.stringify({ error: 'Chưa đăng nhập' })
+  }));
 
   await page.setViewportSize(viewportMatrix[3]);
   const response = await page.goto(localAdminUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
