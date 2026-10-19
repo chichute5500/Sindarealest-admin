@@ -451,8 +451,10 @@ try {
       url: location.pathname,
       thumbnailCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
     }));
-    const expectedRoute = galleryState.url === '/san-pham/SD004';
-    const galleryBasePass = galleryState.dialogSemantics && galleryState.focusOnClose && galleryState.sku.includes('SD004') && expectedRoute && galleryState.thumbnailCount >= 2;
+    const expectedRoute = galleryState.url === '/san-pham/sneakers-new-sneaker-contrast';
+    const galleryBasePass = galleryState.dialogSemantics && galleryState.focusOnClose
+      && galleryState.sku.includes('Chưa được cung cấp')
+      && expectedRoute && galleryState.thumbnailCount >= 2;
     audit.interactions.push({ theme, check: 'open-multi-image-detail-and-route', pass: galleryBasePass, result: galleryState });
     if (!galleryBasePass) hardFailures.push('Multi-image detail route/dialog did not open correctly: ' + theme);
     const firstThumbSrc = await page.locator('#detailThumbs .detail-thumb').first().locator('img').getAttribute('src');
