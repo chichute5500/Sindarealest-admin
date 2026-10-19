@@ -6,15 +6,16 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, reviewInsertBatches = 0;
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, reviewInsertBatches = 0, visualMode = "similar";
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
       async first() { return null; }, async all() {
               if (sql.includes("FROM image_group_index WHERE image_key IN")) {
-                const shape = Array(64).fill(0.5);
-                const colors = [1,0,0,0,1,0,0,0,0,0,1,0];
-                return { results: this.args.map((imageKey, index) => ({ image_key: imageKey, p_hash: "0011223344556677", features_json: JSON.stringify({ category: "sneaker", categoryStatus: "classified", categoryConfidence: 95, shape, colors, contentHash: String(index ? "c" : "b").repeat(64) }) })) };
+                const similar = visualMode === "similar";
+                const shapeA = Array(64).fill(0.9), shapeB = Array(64).fill(0.05);
+                const colorsA = [1,0,0,0,1,0,0,0,0,0,1,0], colorsB = [0,0,0,1,0,0,0,1,1,0,0,0];
+                return { results: this.args.map((imageKey, index) => ({ image_key: imageKey, p_hash: similar ? "0011223344556677" : (index ? "ffffffffffffffff" : "0000000000000000"), features_json: JSON.stringify({ category: "sneaker", categoryStatus: "classified", categoryConfidence: 95, shape: similar ? Array(64).fill(0.5) : (index ? shapeB : shapeA), colors: similar ? colorsA : (index ? colorsB : colorsA), contentHash: String(index ? "c" : "b").repeat(64) }) })) };
               }
               return { results: [] };
             },
@@ -175,6 +176,16 @@ assert.equal(lowConfidenceResponse.status, 200, JSON.stringify(lowConfidenceResu
 assert.deepEqual(lowConfidenceResult.matches, [], "pairs below 91 confidence must not be proposed for review");
 assert.equal(reviewInsertBatches, beforeLowConfidenceWrites, "low-confidence pair proposals must not be persisted");
 compareConfidence = 95;
+
+// Even a confident AI verdict is rejected when indexed visual descriptors disagree.
+visualMode = "different";
+const beforeVisualGateWrites = reviewInsertBatches;
+const visualGateResponse = await onRequestPost({ request: compareRequest(), env });
+const visualGateResult = await visualGateResponse.json();
+assert.equal(visualGateResponse.status, 200, JSON.stringify(visualGateResult));
+assert.deepEqual(visualGateResult.matches, [], "AI text similarity cannot override mismatched pHash, shape, or color descriptors");
+assert.equal(reviewInsertBatches, beforeVisualGateWrites, "descriptor-rejected pairs must not be persisted");
+visualMode = "similar";
 
 // Malformed compare output must fail closed before any review batch is written.
 malformed = true;
