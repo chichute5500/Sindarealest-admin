@@ -61,3 +61,14 @@ Khi kết thúc phiên làm việc, cập nhật:
 - Việc tiếp theo có thể thực hiện ngay (tối đa 3–5 mục, sắp xếp ưu tiên).
 
 Không ghi “hoàn thành 100%” nếu còn FAIL, BLOCKED hoặc hạng mục bắt buộc chưa được kiểm thử. Không deploy Production.
+
+## Cập nhật xác minh phiên 2026-10-20
+
+- Run [39320885814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39320885814), job `118295011697`, đã chạy thành công trên source commit `c1757447f3b30aee9923297aca2c8ab89a42775d`.
+- Log xác nhận `npm test` PASS, `npm run check` PASS; Playwright local static preview báo 235 fixture products, 54 screenshots, 0 responsive overflow, 0 page errors, 0 HTTP errors, không có hard failure. [Artifact screenshots/report](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39320885814/artifacts/12218939627).
+- Giới hạn quan trọng: workflow phục vụ thư mục `public` qua Python local server tại `http://127.0.0.1:4173/`; đây **không phải** Cloudflare Preview. Kết quả không chứng minh đường dẫn Pages Functions, dữ liệu/bindings Preview hoặc tương đồng pixel với ảnh mẫu.
+- Workflow file `.github/workflows/liquid-glass-visual-preview.yml` có lưu ảnh vào `docs/website-screenshots/${STAGE}/` chỉ khi sự kiện là `workflow_dispatch`. Run vừa xác minh là sự kiện push nên bước lưu stage bị skip. Hiện chưa tồn tại `docs/website-screenshots/manifest.json` trên nhánh theo kiểm tra GitHub Contents API.
+- Lần truy cập tự động trước đó tới Preview `https://3ed49bcc.sindarealest2.pages.dev/` trả `login_required`; do đó deployed Preview vẫn BLOCKED/UNVERIFIED. Không dùng ảnh local fixture thay cho ảnh Preview.
+- Chưa sửa HTML/CSS/JS storefront và chưa đổi route. Đã cập nhật task ledger/test results bằng commit docs-only; Production không bị deploy/merge hoặc thay đổi.
+- Tiếp theo: (1) giải quyết điều kiện truy cập Preview hoặc xác định rõ capture local được chấp nhận làm baseline nội bộ; (2) chạy capture với stage `start-of-work`, lưu đúng thư mục cố định và manifest, ghi rõ nguồn capture; (3) mở/xem hai ảnh mẫu gốc và baseline thật; (4) chỉ sau đó mới sửa Liquid Glass hoặc route sản phẩm; (5) chụp end-of-work và so sánh cùng viewport/theme.
+
