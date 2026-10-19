@@ -206,18 +206,30 @@ const mixedGroup = await call({
 });
 assert.equal(mixedGroup.status, 409, "the server rejects a proposal that mixes shoes and watch straps");
 
-// Server-side gates reject client-supplied low scores, unconfirmed categories,
-// and visually dissimilar descriptors even when the browser claims 96/100.
+// The browser's score is only a prefilter hint. The server recomputes similarity
+// from persisted descriptors and keeps the AI result pending until confidence is
+// verified at >=91 or an explicit audited human override is recorded.
 const lowScoreKeys = ["low-score-a.webp", "low-score-b.webp"];
 lowScoreKeys.forEach(key => seedImage(key));
 const lowScoreFingerprint = await hashGroup(lowScoreKeys);
 const lowScore = await call({
   action: "save-groups",
-  groups: [{ imageKeys: lowScoreKeys, similarity: 90, rationale: "browser score spoof", members: [] }]
+  groups: [{
+    imageKeys: lowScoreKeys,
+    similarity: 90,
+    rationale: "Tầng 1 đã phân loại ảnh vào nhóm giày thể thao.",
+    members: []
+  }]
 });
-assert.equal(lowScore.status, 400, "the server must reject a submitted grouping score below 91/100");
-assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(lowScoreFingerprint).count, 0);
-assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_image_claims WHERE image_key IN (?,?)").get(...lowScoreKeys).count, 0);
+assert.equal(lowScore.status, 201, JSON.stringify(lowScore));
+const recomputedGroup = sqlite.prepare("SELECT similarity,status FROM image_group_sets WHERE fingerprint=?").get(lowScoreFingerprint);
+assert.equal(recomputedGroup.similarity, 100, "the server must recompute the stored visual score rather than copy the browser's 90");
+assert.equal(recomputedGroup.status, "pending", "a proposal is never published merely because its visual descriptors match");
+assert.equal(lowScore.aiVerified, 0, "a request without a live AI binding cannot be counted as AI-verified");
+assert.equal(lowScore.aiUnverified, 1, "unverified proposals must be disclosed as such");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_image_claims WHERE image_key IN (?,?) AND status='pending'").get(...lowScoreKeys).count, 2);
+assert.equal(sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json, '["/media/existing.webp"]',
+  "saving an unverified proposal must not touch a public product gallery");
 
 const verifiedMemberKeys = ["verified-member-a.webp", "verified-member-b.webp"];
 verifiedMemberKeys.forEach(key => seedImage(key));
