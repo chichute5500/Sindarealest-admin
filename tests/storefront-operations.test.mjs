@@ -21,8 +21,9 @@ assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contact
 assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
 const legacyProducts = JSON.parse(readFileSync(new URL('../data/legacy-products.json', import.meta.url), 'utf8'));
 assert.equal(legacyProducts.length, 235, 'The read-only legacy product fixture should retain all 235 product records.');
-assert.ok(legacyProducts.every(product => product.sku === null), 'Legacy fixture records must not expose generated identifiers as verified SKUs.');
-assert.ok(storefrontHtml.includes('Mã SKU: ${escapeHtml(p.sku||\'Chưa được cung cấp\')}'), 'Storefront product cards must clearly disclose when no verified SKU is available.');
+assert.ok(legacyProducts.every(product => /^SD\\d+$/.test(product.sku) && product.skuVerified === false), 'Legacy fixture identifiers must remain available internally but be explicitly marked as unverified.');
+assert.ok(storefrontHtml.includes('function visibleSku(p){return p&&p.skuVerified!==false?String(p.sku||\'\').trim():\'\'}'), 'Storefront must have one explicit helper that hides unverified fixture identifiers.');
+assert.ok(storefrontHtml.includes('Mã SKU: ${escapeHtml(visibleSku(p)||\'Chưa được cung cấp\')}'), 'Storefront product cards must clearly disclose when no verified SKU is available.');
 assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');
 assert.ok(!storefrontHtml.includes('ghi lại mã SKU để tư vấn nhanh'), 'Order guidance must not instruct customers to record unverified fixture SKUs.');
 assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
