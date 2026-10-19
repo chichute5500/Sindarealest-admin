@@ -633,6 +633,8 @@ try {
         .filter(el => !el.closest('[inert]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
       return { first: items[0]?.id || '', last: items[items.length - 1]?.id || '', count: items.length };
     });
+    // Restore the known first target after screenshot capture so the reverse-wrap assertion starts from a deterministic state.
+    await page.locator('#accountClose').focus();
     await page.keyboard.press('Shift+Tab');
     const accountShiftTabWrapped = await page.evaluate(expected => document.activeElement?.id === expected, accountFocusEndpoints.last);
     await page.keyboard.press('Tab');
