@@ -634,7 +634,7 @@ jobs:
             fi
             jq -e '.ok == true and ((.matches|type)=="number" or (.matches|type)=="array")' /tmp/ai-test-repository-gallery.json >/dev/null || { echo "::error::Repository-gallery diagnostic returned an invalid response."; exit 1; }
             echo "::notice::Repository-image bytes were sent to real AI, but synthetic test keys have no persistent image index; match accuracy is asserted only by the following real Preview gallery and distinct-SKU controls."
-            echo "PASS: real Workers AI matched two distinct real gallery images from one product at the 91% confidence gate; no database or product gallery was modified."
+            echo "::notice::Repository-gallery AI diagnostic completed without persistent writes; match accuracy is not certified because synthetic keys have no indexed descriptors."
             # Negative control: two different products in the same shoe category must not be auto-grouped.
             node --input-type=module - <<'NODE'
           import { readFile, writeFile } from "node:fs/promises";
