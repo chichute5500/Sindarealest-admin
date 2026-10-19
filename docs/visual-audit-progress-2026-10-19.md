@@ -307,3 +307,15 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Bốn assertion liên quan SKU/Zalo/giỏ hàng PASS trên cả Light và Dark. Artifact mới nhất đã được tải về và kiểm tra nội dung, không chỉ dựa vào tên artifact.
 - `npm test` và `npm run check` đều PASS trên workflow này. Dữ liệu sản phẩm vẫn là fixture chỉ đọc, các yêu cầu đặt hàng chỉ mô phỏng trong bộ nhớ.
 - Tình trạng đối chiếu ảnh gốc, kiểm thử Android vật lý và backend/thanh toán production không thay đổi; không được tính là hoàn thành.
+
+
+## Accessibility-contract regression and preview 176 — 19/10/2026
+
+- Added `tests/storefront-accessibility-contract.test.mjs` and included it in the `npm test` suite. The checks enforce the presence of reduced-motion CSS, keyboard focus indicators, top/bottom safe-area handling, dialog semantics, polite live regions, a 44px minimum touch-target rule, and Escape-key handling. These are source contracts, not a standalone WCAG certification.
+- Commits: `e87ebb871cc529ec556a7bcd3cafb16c31f5eef2` (new test); `b1055b8bb8b9bdf497b2f1661f63845a27de5f33` (suite wiring).
+- [Liquid Glass preview #176 — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39209189491). Both `npm test` (including the new test) and `npm run check` passed; Chromium preview and screenshot audit also passed.
+- Artifact `sindarealest-liquid-glass-preview-176.zip`, ID `12167246043`, was downloaded and opened directly. SHA-256: `b151d77c5dd0b2618198104a2b3a95b3efbb9fb5392f3de162fd8f51c01e08cb`.
+- Verified `visual-audit.json`: `passed=true`; 52 screenshots; 77 interaction checks; 20 responsive viewport entries for 10 viewport widths across Light/Dark; zero horizontal overflow; zero hard failures; zero console errors, page errors, same-origin HTTP errors, failed requests, or failed interaction assertions.
+- Branch comparison against `main`: fix branch is ahead by 188 commits and behind by 0 at this check; no merge or production deploy was performed.
+- Searched the accessible Library for `sindarealest-liquid-glass-preview-21.zip` and the 28 reference screenshots. The exact ZIP was not identified; search returned older standalone HTML assets instead. Pixel-level comparison against the missing original 28-image pack therefore remains unverified.
+- Current checklist estimate: **83% overall**. Source/tests/isolated preview are stronger after this change, but the remaining 17% is not safely claimable as complete without the original reference assets, physical Android verification, and authorized staging/production integration checks (D1/R2, admin operations, real orders/payment and watermark access controls). No production writes were made.
