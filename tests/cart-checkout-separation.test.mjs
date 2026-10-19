@@ -28,6 +28,15 @@ assert.match(html, /Chờ xác nhận giá/, 'Unknown prices must never be fabri
 assert.match(html, /Giá sẽ được xác nhận/, 'An item without a confirmed public price must be clearly identified.');
 assert.match(html, /function openCheckout\(/, 'The checkout drawer must have a dedicated open action.');
 assert.match(html, /function closeCheckout\(/, 'The checkout drawer must have a dedicated close action.');
+assert.match(html, /id="cartDrawer"[^>]*aria-hidden="true" inert/, 'A closed cart drawer must be removed from keyboard interaction.');
+assert.match(html, /id="checkoutDrawer"[^>]*aria-hidden="true" tabindex="-1" inert/, 'A closed checkout drawer must be hidden from keyboard interaction.');
+assert.match(html, /panel\.removeAttribute\('inert'\);panel\.classList\.add\('open'\)/, 'Opening checkout must expose it to keyboard and assistive technology.');
+assert.match(html, /panel\.setAttribute\('inert',''\)/, 'Closing checkout must remove the hidden drawer from keyboard navigation.');
+assert.match(html, /function trapCheckoutTab\(event\)/, 'Checkout must trap keyboard Tab navigation within the modal.');
+assert.match(html, /if\(event\.shiftKey&&\(document\.activeElement===first\|\|!panel\.contains\(document\.activeElement\)\)\)/, 'Shift+Tab from the first checkout control must wrap to the last control.');
+assert.match(html, /else if\(!event\.shiftKey&&\(document\.activeElement===last\|\|!panel\.contains\(document\.activeElement\)\)\)/, 'Tab from the last checkout control must wrap to the first control.');
+assert.match(html, /const target=checkoutReturnFocus;checkoutReturnFocus=null/, 'Checkout must remember and restore focus to the opening control.');
+assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(\);openCart\(\)\}\)/, 'The back-to-cart action must restore the cart interaction state.');
 assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'The cart action must open checkout.');
 assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(\);openCart\(\)\}\)/, 'Back action must return to the cart.');
 assert.match(html, /\$\('#checkoutBackdrop'\)\.addEventListener\('click',closeCheckout\)/, 'Backdrop interaction must close checkout.');
