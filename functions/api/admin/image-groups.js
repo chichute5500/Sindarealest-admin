@@ -2,12 +2,69 @@ import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin }
 const MODEL="@cf/meta/llama-3.2-11b-vision-instruct", KEY_RE=/^(?=.{1,1024}$)[^\u0000-\u001f\u007f]+$/, LEGACY_KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
 function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
-function parsePairList(value){
-  if(value&&typeof value==="object"&&!Array.isArray(value)&&Array.isArray(value.pairs))return value;
-  const raw=typeof value==="string"?value.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,""):"";
-  let parsed=null;
-  if(raw){try{parsed=JSON.parse(raw)}catch{const match=raw.match(/\{[\s\S]*\}/);if(match)try{parsed=JSON.parse(match[0])}catch{}}}
-  return parsed&&typeof parsed==="object"&&!Array.isArray(parsed)&&Array.isArray(parsed.pairs)?parsed:null;
+function parsePairList(value,imageCount=0){
+  const visited=new Set();
+  const pairLike=item=>item&&typeof item==="object"&&!Array.isArray(item)&&
+    ["a","b","imageA","imageB","image_a","image_b","left","right","left_index","right_index","first","second"].some(key=>Object.prototype.hasOwnProperty.call(item,key));
+  function extract(node,depth=0){
+    if(depth>8||node===null||node===undefined)return null;
+    if(typeof node==="string"){
+      const raw=node.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");
+      if(!raw)return null;
+      try{return extract(JSON.parse(raw),depth+1)}catch{}
+      // Some model responses wrap JSON in prose. Scan balanced JSON values
+      // instead of greedily parsing from the first to last brace.
+      for(let start=0;start<raw.length;start++){
+        if(raw[start]!=="{"&&raw[start]!=="[")continue;
+        const stack=[];let inString=false,escaped=false;
+        for(let end=start;end<raw.length;end++){
+          const ch=raw[end];
+          if(inString){
+            if(escaped)escaped=false;
+            else if(ch==="\\")escaped=true;
+            else if(ch==='"')inString=false;
+            continue;
+          }
+          if(ch==='"'){inString=true;continue}
+          if(ch==="{"||ch==="[")stack.push(ch);
+          else if(ch==="}"||ch==="]"){
+            const opener=stack.pop();
+            if(!opener||((ch==="}"&&opener!=="{")||(ch==="]"&&opener!=="[")))break;
+            if(!stack.length){
+              try{const found=extract(JSON.parse(raw.slice(start,end+1)),depth+1);if(found)return found}catch{}
+              break;
+            }
+          }
+        }
+      }
+      return null;
+    }
+    if(Array.isArray(node)){
+      if(node.length&&node.every(pairLike))return{pairs:node};
+      for(const item of node.slice(0,20)){const found=extract(item,depth+1);if(found)return found}
+      return null;
+    }
+    if(typeof node!=="object"||visited.has(node))return null;
+    visited.add(node);
+    if(Array.isArray(node.pairs))return{pairs:node.pairs};
+    for(const key of ["matches","comparisons","pairMatches","pair_matches","pair_results"]){
+      if(Array.isArray(node[key]))return{pairs:node[key]};
+    }
+    if(imageCount===2&&typeof (node.same_product??node.sameProduct)==="boolean"){
+      const confidence=node.confidence??node.score??node.confidence_score;
+      if(Number.isFinite(Number(confidence)))return{pairs:[{a:0,b:1,same_product:node.same_product??node.sameProduct,confidence:Number(confidence),rationale:node.rationale??node.reason??""}]};
+    }
+    for(const key of ["response","choices","output_text","generated_text","text","content","message","result","data","output","json","parsed","payload","structured_output","function_call","arguments"]){
+      if(Object.prototype.hasOwnProperty.call(node,key)){const found=extract(node[key],depth+1);if(found)return found}
+    }
+    return null;
+  }
+  return extract(value);
+}
+function summarizePairResponse(value){
+  if(typeof value==="string")return "response_type=string,length="+value.length+",prefix="+value.replace(/[\r\n]+/g," ").slice(0,140);
+  if(value&&typeof value==="object")return "response_type=object,keys="+Object.keys(value).slice(0,12).join(",");
+  return "response_type="+typeof value;
 }
 function parseIndexedFeatures(row){let features={};try{features=JSON.parse(row?.features_json||"{}")}catch{}return{key:String(row?.image_key||""),pHash:String(row?.p_hash||"").toLowerCase(),features}}
 function visualPairGate(left,right){
@@ -274,28 +331,30 @@ if(action==="compare"){
       descriptors.push(descriptorText.trim().slice(0,2200));
     }
     const comparisonMessages=[
-      {role:"system",content:"Compare all supplied visual descriptions. Check every pair in the complete list, including pairs far apart in the list. Decide which show the SAME physical product, not merely similar styles. View angle, lighting and background may differ; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Use zero-based indices matching the labels exactly. Return only valid JSON: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":91,\"rationale\":\"brief Vietnamese reason\"}]}. Include only credible same-product pairs with confidence >= 91; never pair an image with itself. Return an empty pairs array if no pair qualifies."},
-      {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+", mô tả từ phân tích thị giác):\n"+description).join("\n\n")+"\n\nCó "+keys.length+" ảnh trong danh sách. Kiểm tra TẤT CẢ các cặp i<j, bao gồm ảnh đầu và ảnh cuối. Chỉ trả JSON, chỉ đề xuất cặp có confidence từ 91 trở lên."}
+      {role:"system",content:"You are a strict pairwise product-photo matcher. Compare all supplied descriptions. Two images match only with strong evidence they show the same physical item, not merely the same style. Differences in camera angle, lighting or background are acceptable; differences in material or crocodile texture, stitching, logo, toe/sole, color or hardware are evidence against a match. Return ONLY a valid JSON object in this exact schema: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":95,\"rationale\":\"brief Vietnamese reason\"}]}. Always include a top-level pairs array, use [] when none qualify, use zero-based indices, and evaluate every unordered pair i<j. Only include matches with confidence >= 91."},
+      {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+":\n"+description).join("\n\n")+"\n\nCó "+keys.length+" ảnh, đánh số từ 0 đến "+(keys.length-1)+". Hãy xét TẤT CẢ cặp không lặp, kể cả cặp giữa ảnh đầu và ảnh cuối. Chỉ trả JSON đúng schema; không giải thích ngoài JSON."}
     ];
-    let compared=await runVisionWithRetry({messages:comparisonMessages,temperature:0,max_tokens:1400});
+    let compared=await runVisionWithRetry({messages:comparisonMessages,temperature:0,max_tokens:1024});
     let comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
-    if(!parsePairList(comparedText)){
+    if(!parsePairList(comparedText,keys.length)){
       compared=await runVisionWithRetry({
         messages:[
-          {role:"system",content:"Return ONLY valid JSON with a top-level pairs array. Each pair must have numeric a and b indices, boolean same_product, integer confidence 0-100, and a short Vietnamese rationale. No markdown or explanation. Only report confidence >= 91 and inspect every pair from the full image-description list."},
-          {role:"user",content:"The previous response was malformed. Re-evaluate the complete list below, checking all pairs including first-to-last. Return valid JSON only. "+promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+"):\n"+description).join("\n\n")}
+          {role:"system",content:"Return ONLY valid JSON with exactly one top-level pairs array. Each element needs numeric a and b indices, boolean same_product, numeric confidence 0-100, and a short Vietnamese rationale. No markdown or explanation. Return pairs:[] if no match qualifies."},
+          {role:"user",content:"The previous response was not valid JSON. Correct the format and compare every unordered pair in the complete list, including first-to-last. "+promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+":\n"+description).join("\n\n")+"\n\nSchema: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":95,\"rationale\":\"reason\"}]}. Use pairs:[] if none qualify."}
         ],
         temperature:0,
-        max_tokens:1400
+        max_tokens:1024
       });
       comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
     }
-    let parsedPairs=parsePairList(comparedText);
-    if(!parsedPairs)throw new Error("text comparison response did not contain a valid pairs array after one format retry");
+    let parsedPairs=parsePairList(comparedText,keys.length);
+    if(!parsedPairs)throw new Error("text comparison response did not contain a valid pairs array after one format retry ("+summarizePairResponse(comparedText)+")");
     if(typeof comparedText!=="string")comparedText=JSON.stringify(parsedPairs);
     for(const pair of parsedPairs.pairs){
-      const a=Number(pair?.a),b=Number(pair?.b),confidence=Number(pair?.confidence);
-      if(pair?.same_product!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100)continue;
+      const a=Number(pair?.a??pair?.imageA??pair?.image_a??pair?.left_index??pair?.left??pair?.first),b=Number(pair?.b??pair?.imageB??pair?.image_b??pair?.right_index??pair?.right??pair?.second);
+      let confidence=Number(pair?.confidence??pair?.score??pair?.confidence_score??pair?.confidenceScore??pair?.probability);
+      if(confidence>0&&confidence<=1)confidence*=100;
+      if((pair?.same_product??pair?.sameProduct??pair?.match)!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100)continue;
       const visual=visualPairGate(indexedByKey.get(keys[a]),indexedByKey.get(keys[b]));
       if(!visual.match)continue;
       const first=keys[a]<keys[b]?keys[a]:keys[b],second=keys[a]<keys[b]?keys[b]:keys[a],id=first+"|"+second;
@@ -303,7 +362,7 @@ if(action==="compare"){
       if(ownerA.size>1||ownerB.size>1||(ownerA.size===1&&ownerB.size===1&&[...ownerA][0]!==[...ownerB][0]))continue;
       if(seen.has(id))continue;
       seen.add(id);
-      prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||"").trim().slice(0,900)});
+      prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||pair.reason||pair.explanation||"").trim().slice(0,900)});
     }
     if(!prepared.length)return json({ok:true,matches:[],batches:1,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong toàn bộ "+keys.length+" ảnh đã kiểm tra. Có thể chạy lại với cặp ảnh nghi vấn; không có đề xuất nào được lưu."});
     const statements=prepared.map(p=>env.DB.prepare("INSERT INTO image_group_reviews(id,image_a,image_b,same_product,confidence,rationale,status,created_at) VALUES(?,?,?,1,?,?,'pending',datetime('now'))").bind(crypto.randomUUID(),p.first,p.second,p.confidence,p.rationale));
