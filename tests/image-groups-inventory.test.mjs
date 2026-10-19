@@ -63,7 +63,7 @@ productRows = Array.from({ length: 2001 }, (_, index) => ({
   id: "p" + index,
   sku: "SKU-" + String(index).padStart(4, "0"),
   title: "Catalog product " + index,
-  images_json: index === 2000 ? JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp"]) : "[]"
+  images_json: index === 2000 ? JSON.stringify(["/media/12345678-1234-1234-1234-123456789012.webp", "/media/catalog/large-2000.webp"]) : "[]"
 }));
 const largeCatalog = await onRequestGet({ request: requestFor("https://preview.example/api/admin/image-groups-inventory?limit=500"), env: { DB, IMAGES, ADMIN_PASSWORD, SESSION_SECRET } });
 assert.equal(largeCatalog.status, 200);
@@ -71,6 +71,55 @@ const largeCatalogBody = await largeCatalog.json();
 assert.equal(largeCatalogBody.diagnostics.productsIndexed, 2001);
 assert.equal(largeCatalogBody.diagnostics.assignmentsIncomplete, false);
 assert.deepEqual(largeCatalogBody.images.find(item => item.key === "12345678-1234-1234-1234-123456789012.webp").assignedTo.map(owner => owner.sku), ["SKU-2000"]);
+
+// R2 pagination must also remain complete above 2,000 image objects, not just
+// above 2,000 product rows. Walk every opaque cursor as the admin UI does.
+const largeR2Objects = Array.from({ length: 2001 }, (_, index) => ({
+  key: "catalog/large-" + String(index).padStart(4, "0") + ".webp",
+  size: 1000 + index,
+  uploaded: new Date("2026-02-01T00:00:00.000Z"),
+  httpMetadata: { contentType: "image/webp" }
+}));
+const LARGE_IMAGES = {
+  async list(options) {
+    const offset = options.cursor ? Number(String(options.cursor).slice(7)) : 0;
+    const end = Math.min(offset + Number(options.limit || 1000), largeR2Objects.length);
+    return {
+      objects: largeR2Objects.slice(offset, end),
+      truncated: end < largeR2Objects.length,
+      cursor: end < largeR2Objects.length ? "cursor-" + end : undefined
+    };
+  }
+};
+const largePage1Response = await onRequestGet({
+  request: requestFor("https://preview.example/api/admin/image-groups-inventory?limit=1000"),
+  env: { DB, IMAGES: LARGE_IMAGES, ADMIN_PASSWORD, SESSION_SECRET }
+});
+assert.equal(largePage1Response.status, 200);
+const largePage1 = await largePage1Response.json();
+assert.equal(largePage1.images.length, 1000);
+assert.equal(largePage1.nextCursor, "cursor-1000");
+const largePage2Response = await onRequestGet({
+  request: requestFor("https://preview.example/api/admin/image-groups-inventory?limit=1000&cursor=" + encodeURIComponent(largePage1.nextCursor)),
+  env: { DB, IMAGES: LARGE_IMAGES, ADMIN_PASSWORD, SESSION_SECRET }
+});
+assert.equal(largePage2Response.status, 200);
+const largePage2 = await largePage2Response.json();
+assert.equal(largePage2.images.length, 1000);
+assert.equal(largePage2.nextCursor, "cursor-2000");
+const largePage3Response = await onRequestGet({
+  request: requestFor("https://preview.example/api/admin/image-groups-inventory?limit=1000&cursor=" + encodeURIComponent(largePage2.nextCursor)),
+  env: { DB, IMAGES: LARGE_IMAGES, ADMIN_PASSWORD, SESSION_SECRET }
+});
+assert.equal(largePage3Response.status, 200);
+const largePage3 = await largePage3Response.json();
+assert.equal(largePage3.images.length, 1);
+assert.equal(largePage3.hasMore, false);
+assert.equal(largePage1.images.length + largePage2.images.length + largePage3.images.length, 2001);
+assert.equal(largePage3.images[0].key, "catalog/large-2000.webp");
+assert.deepEqual(largePage3.images[0].assignedTo.map(owner => owner.sku), ["SKU-2000"],
+  "the product/SKU mapping must remain available for an image on the final R2 page");
+
 const unauthorized = await onRequestGet({ request: new Request("https://preview.example/api/admin/image-groups-inventory"), env: { DB, IMAGES, ADMIN_PASSWORD, SESSION_SECRET } });
 assert.equal(unauthorized.status, 401);
 console.log("PASS: inventory pagination walks complete R2 pages and includes raster images regardless of nested paths or filename format.");
