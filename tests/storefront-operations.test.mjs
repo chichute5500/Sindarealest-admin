@@ -173,7 +173,7 @@ const seoDB = {
           async first() {
             assert.match(sql, /lower\(slug\)=\?/);
             assert.deepEqual(values, [new URL('https://shop.example/san-pham/'+values[0]).pathname.split('/').pop().toLowerCase(),new URL('https://shop.example/san-pham/'+values[0]).pathname.split('/').pop().toLowerCase(),new URL('https://shop.example/san-pham/'+values[0]).pathname.split('/').pop().toLowerCase()]);
-            return { id: 'product-id-123', slug: 'test-sneaker', sku: 'SD-SN001', title: 'Giày thử', description: 'Mô tả giày', images_json: '["images/example.webp"]', category_label: 'Sneaker', published: 1 };
+            return { id: 'product-id-123', slug: 'test-sneaker', sku: 'SD-SN001', sku_verified: 1, title: 'Giày thử', description: 'Mô tả giày', images_json: '["images/example.webp"]', category_label: 'Sneaker', published: 1 };
           }
         };
       }
@@ -197,7 +197,7 @@ response = await createOrder({request:new Request('https://shop.example/api/orde
 assert.equal(response.status,403,'cross-origin order submission is rejected');
 response = await createWarrantyClaim({request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
 assert.equal(response.status,403,'cross-origin warranty submission is rejected');
-const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,updated_at/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
+const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,sku_verified,updated_at/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',sku_verified:1,updated_at:'2026-01-01 00:00:00'}]}}}}}} });
 const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
 assert.match(sitemapText,/https:\/\/shop\.example\/san-pham\/SD-SN001/);
@@ -209,7 +209,7 @@ const demoWarrantyCode = 'SDW-' + 'A'.repeat(24);
 const demoWarrantyRow = {
   id:'warranty-id-1', warrantyId:'warranty-id-1', order_id:'order-id-1', customer_id:'customer-id-1',
   warranty_code: demoWarrantyCode, duration_months: 12, starts_at: '2026-01-01', ends_at: '2027-01-01', status: 'active',
-  sku: 'SD-SN001', title: 'Giày thử', size: '42', purchasedAt: '2026-02-01 12:00:00', orderNumber: 'SD-ABC-123456',
+  sku: 'SD-SN001', skuVerified: 0, title: 'Giày thử', size: '42', purchasedAt: '2026-02-01 12:00:00', orderNumber: 'SD-ABC-123456',
   fullName: 'Nguyễn Văn An', customerPhone: '0901234567', purchaseAddress: '123 Đường thử, Phường thử, Lâm Đồng',
   imagesJson: '["images/example.webp"]'
 };
@@ -259,6 +259,7 @@ assert.equal(lookupPayload.warranty.maskedPhone,'090••••67');
 assert.equal(lookupPayload.warranty.maskedAddress,'••••, Phường thử, Lâm Đồng');
 assert.equal(lookupPayload.warranty.maskedName,'N••• V••• A•••');
 assert.equal(lookupPayload.warranty.title,'Giày thử');
+assert.equal(lookupPayload.warranty.sku,'','Warranty lookup must not expose an unverified internal SKU');
 assert.equal(lookupPayload.warranty.size,'42');
 assert.equal(lookupPayload.warranty.purchasedAt,'2026-02-01');
 assert.equal(lookupPayload.warranty.eligible,true);

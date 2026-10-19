@@ -7,7 +7,7 @@ const products = read("../functions/api/admin/products.js");
 const middleware = read("../functions/_middleware.js");
 const ai = read("../functions/api/admin/ai-description.js");
 const push = read("../functions/api/admin/push-subscriptions.js");
-assert.ok(!admin.includes('id="pSku"'), "SKU input should not be shown in admin product form");
+assert.ok(admin.includes('id="pSku"') && admin.includes('id="pSkuVerified"') && admin.includes("skuVerified:$('#pSkuVerified').checked"), "Admin must allow a commercial SKU to be entered and explicitly verified");
 assert.ok(admin.includes("Object.hasOwn(labels,log.action)"), "audit event labels must not resolve inherited prototype properties");
 assert.ok(lib.includes("Object.hasOwn(aliases, categoryKey)"), "product category aliases must be prototype-safe");
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
@@ -17,7 +17,7 @@ assert.ok(!read("../public/index.html").includes("CRAFTED WITH<br>CHARACTER") &&
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
 assert.ok(read("../public/index.html").includes("maskedAddress") && read("../public/index.html").includes("maskedPhone"), "Warranty lookup must show masked purchase details");
 assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:") && !read("../functions/api/warranty-lookup.js").includes("warrantyCode: code"), "Lookup API must return only masked codes plus short-lived action tokens");
-assert.ok(read("../functions/_middleware.js").includes("encodeURIComponent(product.sku)"), "Product canonical URL must use SKU");
+assert.ok(read("../functions/_middleware.js").includes("isVerifiedCommercialSku(product)") && read("../functions/_middleware.js").includes("encodeURIComponent(productKey)"), "Product canonical URL must use a verified SKU or immutable ID");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
 assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");

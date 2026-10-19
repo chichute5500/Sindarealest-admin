@@ -85,7 +85,7 @@ function createMockDb(rows, { failAudit = false } = {}) {
           for (const row of draft) {
             if (!ids.includes(row.id)) continue;
             const pair = pairs.find(([id]) => id === row.id);
-            if (pair) row.sku = pair[1];
+            if (pair) { row.sku = pair[1]; row.sku_verified = 0; }
           }
           assert.equal(
             new Set(draft.map((row) => row.sku)).size,
@@ -148,7 +148,8 @@ const prefixByCategory = Object.fromEntries(categories.map(([key, , , prefix]) =
 for (const row of rows) {
   counters[row.category]++;
   const expectedSku = prefixByCategory[row.category] + String(counters[row.category]).padStart(3, '0');
-  assert.equal(row.sku, expectedSku, `SKU không đúng thứ tự tại ${row.title}`);
+  assert.equal(row.sku, expectedSku, `Mã nội bộ không đúng thứ tự tại ${row.title}`);
+  assert.equal(row.sku_verified, 0, `Mã reset phải được đánh dấu chưa xác minh tại ${row.title}`);
 }
 for (let i = 0; i < rows.length; i++) {
   for (const field of ['id', 'title', 'category', 'category_label', 'sort_order', 'price', 'stock', 'images_json', 'published', 'slug', 'description']) {
