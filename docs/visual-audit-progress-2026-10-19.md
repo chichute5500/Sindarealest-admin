@@ -1,56 +1,52 @@
 # SinDarealest — tiến độ kiểm toán giao diện
 
-Cập nhật: 19/10/2026 08:46 ICT  
+Cập nhật: 19/10/2026 (UTC; GitHub Actions preview gần nhất)  
 Repository: `chichute5500/Sindarealest-admin`  
 Nhánh thử nghiệm: `fix/liquid-glass-audit-2026-10-19`  
-HEAD đã xác minh: `3cd310a0dd909c2e12feacb5a3530a1ab79ed35d`  
+HEAD đã xác minh: `ec71f534ab9e5bd1ced92f497ce0f8e05e8616eb`  
 Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/R2.
 
-## Bằng chứng mới nhất sau commit CSS
+## Thay đổi đã thực hiện trong lượt tiếp tục
 
-- Commit mới nhất sửa các override mobile khiến thẻ cam kết bị ép `min-height:88px` và `min-height:78px`; hai quy tắc được chuyển về `min-height:0`, để chiều cao do nội dung và design token responsive quyết định.
-- CI `Validate source and tests`: **success** tại commit `3cd310a0dd90`.
-- CI `Liquid Glass isolated visual preview`: **success** tại commit `3cd310a0dd90`.
-- [Kết quả Validate source and tests](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39186615070)
-- [Kết quả visual preview](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39186615033)
-- Artifact screenshot mới: `sindarealest-liquid-glass-preview-71`, khoảng 4.92 MB; [artifact trên GitHub Actions](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39186615033).
-- Workflow xác nhận thành công các bước project/migration checks, khởi chạy Chromium cô lập, mở preview chỉ đọc, chụp Light/Dark và audit responsive, tải artifact báo cáo.
-- CI success chỉ xác nhận các bước kiểm tra được cấu hình trong workflow; không tự động chứng minh giao diện giống ảnh mẫu 100%.
+1. Sửa hai override CSS mobile của thẻ cam kết trước đó để chiều cao không bị ép cứng.
+2. Xóa khối `#promise` lặp lại sau “Sản phẩm nổi bật”. Sáu cam kết đã có ngay dưới hero; khối lặp còn thêm “Đặt hàng theo yêu cầu” thành thẻ thứ bảy và làm trang dài hơn mẫu. Nội dung quy trình đặt hàng vẫn được giữ trong CTA “Đặt hàng an tâm” dạng thu gọn và có thể mở chi tiết.
+3. Cập nhật tài liệu tiến độ để các phiên tiếp theo tiếp tục từ đúng branch/commit.
 
-## Kiểm tra kiến trúc source hiện tại
+## Kiểm thử và bằng chứng
 
-- `public/index.html` là storefront đơn trang lớn (~202 KB), có các section `#home`, `#featured`, `#products`, `#about`, `#contact`, cùng drawer/modal cho sản phẩm, giỏ hàng, checkout, tài khoản và gallery.
-- Bottom navigation hiện tại có đủ bốn mục theo mẫu: Trang chủ, Sản phẩm, Giỏ hàng, Tài khoản; mục Giỏ hàng mở drawer và Tài khoản mở account drawer. Không chỉ đổi nhãn sang một route giả.
-- Trang chủ hiện có hero, thẻ cam kết, CTA “Đặt hàng an tâm”, sản phẩm nổi bật, phần mosaic/The Art, catalog và phần giới thiệu/liên hệ. Đây là lý do chiều dài trang và cảm giác điều hướng khác mockup nhiều màn hình: phần lớn trải nghiệm vẫn được triển khai thành một trang dài với anchor/drawer.
-- Mô tả meta/OG hiện nhắc sneaker, giày lười, giày tây, ví và phụ kiện; cần bảo đảm nội dung metadata theo danh mục thực tế đã xác minh, không lấy fixture cũ làm bằng chứng về catalog production.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39186985036) — commit `ec71f534ab9e`.
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39186985064) — commit `ec71f534ab9e`.
+- Artifact screenshot mới nhất: [sindarealest-liquid-glass-preview-73](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39186985064).
+- Đã tải và đọc `visual-audit.json` của artifact 73: 36 screenshot; 20 tổ hợp responsive (10 viewport × 2 theme); 40 interaction checks; `passed=true`; `responsiveOverflowCount=0`; `hardFailures=[]`; không có page errors, console errors, same-origin HTTP errors hoặc failed requests.
+- Viewport đã chụp bao gồm 320/360/375/390/412/430 px, tablet 768/1024 px, desktop 1366/1440 px, Light/Dark. Cũng có screenshot detail, fullscreen gallery, cart, checkout, order process và account.
+- Những kết quả này là từ Chromium/Playwright chạy preview tĩnh cô lập, dùng fixture sản phẩm cũ ở chế độ chỉ đọc; không phải kiểm thử thiết bị Android vật lý hay backend production.
 
-## Sai lệch thị giác còn tồn tại — chưa nghiệm thu
+## Quan sát còn tồn tại
 
-1. **P1 — Mô hình điều hướng:** ảnh mẫu tách rõ Home, Product list, Product detail, Cart, Checkout/Order, Account/settings và fullscreen gallery thành các màn hình. Source hiện tại vẫn chủ yếu là section anchor cùng drawer/modal. Cần đánh giá từng luồng trước khi tách route để không làm mất state, tìm kiếm/lọc/phân trang hoặc hành vi back.
-2. **P1 — Chiều dài trang chủ:** trang chủ đang chứa catalog đầy đủ và phần The Art/giới thiệu; cần đối chiếu lại thứ tự, chiều cao và mức độ ưu tiên để gần ảnh mẫu hơn, không xóa tính năng.
-3. **P1 — Hình ảnh sản phẩm:** preview fixture có sneaker làm ảnh chính; mockup dùng túi xách. Không thay ảnh thật bằng hình giả. Cần ảnh catalog được chủ dự án xác nhận hoặc ghi rõ giới hạn dữ liệu so sánh.
-4. **P2 — So sánh trực tiếp:** chưa có bằng chứng pixel-diff/overlay đáng tin cậy giữa ZIP gốc `sindarealest-liquid-glass-preview-21.zip` (28 ảnh) và screenshot mẫu được cung cấp trong cùng môi trường chạy. Artifact 71 là screenshot mới, không thay thế ZIP gốc.
-5. **P2 — Animation trên thiết bị thật:** CI dùng Chromium/Playwright; không phải kiểm thử Android vật lý. Không kết luận về hiệu năng GPU, cảm giác swipe hay bàn phím trên thiết bị thật.
-6. **P2 — Backend/production:** preview dùng môi trường cô lập/fixture chỉ đọc; không chứng minh dữ liệu sản phẩm, tài khoản, thanh toán hoặc backend production đang hoạt động đầy đủ.
+1. **P1 — Mức độ giống mẫu:** screenshot trang chủ vẫn là storefront dài, trong khi ảnh tham chiếu trình bày nhiều màn hình app riêng. Header/hero, tỷ lệ ảnh, mật độ thông tin, texture nền và độ sâu Liquid Glass chưa đủ bằng chứng để tuyên bố khớp mẫu.
+2. **P1 — Dữ liệu hình ảnh:** ảnh preview hiện dùng catalog fixture có sneaker/giày/phụ kiện; ảnh tham chiếu có túi xách/ví/thắt lưng cụ thể. Không thay ảnh bằng dữ liệu giả để làm cho screenshot giống mẫu. Cần catalog/ảnh sản phẩm thực tế được xác nhận.
+3. **P1 — Cấu trúc trải nghiệm:** một số luồng đang dùng drawer/modal và anchor trong cùng trang. Audit đã xác minh các luồng detail/gallery/cart/checkout/account hiện có; vẫn cần quyết định có căn cứ trước khi tách route vì có thể ảnh hưởng lịch sử trình duyệt và trạng thái giỏ.
+4. **P2 — So sánh ảnh nguồn:** đã đọc report/visual-audit của artifact 73, nhưng chưa tìm được ZIP nguồn `sindarealest-liquid-glass-preview-21.zip` với 28 screenshot trong Library/tài nguyên hiện có. Artifact 73 là bộ screenshot mới 36 ảnh, không thay thế bộ ZIP nguồn.
+5. **P2 — Animation/thiết bị:** Playwright kiểm tra luồng và trạng thái tự động nhưng không chứng minh cảm giác animation/blur trên thiết bị Android thật. Cần kiểm tra thực tế nếu có môi trường thiết bị.
+6. **P2 — Backend:** preview chặn request ngoài và request ghi, không dùng Cloudflare/D1/R2; không thể suy ra đơn hàng, đăng nhập, thanh toán hay tồn kho production đã hoạt động.
 
-## An toàn và phạm vi
+## Trạng thái theo nhóm
 
-- Branch được kiểm tra là `fix/liquid-glass-audit-2026-10-19`, HEAD `3cd310a0dd909c2e12feacb5a3530a1ab79ed35d`.
-- Không merge vào `main`, không deploy production, không sửa DNS/secrets, không chạy migration phá hủy, không ghi dữ liệu D1/R2.
-- Không dùng giá/SKU/ảnh/stock từ fixture legacy như dữ liệu production đã xác minh.
+- Bảo toàn branch, không chạm production: **đã xác minh trong lượt này**.
+- Source/test CI: **pass** tại HEAD `ec71f534ab9e`.
+- Visual preview automation: **pass** tại HEAD `ec71f534ab9e`.
+- Responsive overflow ở 20 tổ hợp viewport/theme: **0** theo report tự động.
+- Luồng tương tác được script kiểm tra: **40 checks, không có hard failure**.
+- Kiểm kê ZIP nguồn 28 ảnh và pixel/overlay comparison trực tiếp với ảnh mẫu: **chưa hoàn thành**.
+- Nghiệm thu thị giác tổng thể và kiểm thử Android thật: **chưa hoàn thành**.
 
-## Tiến độ theo bằng chứng
+## Tiến độ ước tính
 
-- **CI source/tests:** pass ở HEAD mới nhất.
-- **Visual preview automation:** pass ở HEAD mới nhất; artifact 71 đã được tạo.
-- **Responsive/interaction trong preview:** workflow chạy thành công; chỉ các kiểm tra và viewport do workflow cấu hình mới được coi là đã xác minh.
-- **Độ giống hai ảnh mẫu và nghiệm thu toàn bộ:** chưa hoàn thành.
-- **Tiến độ tổng thể ước tính: 62%** — ước lượng theo nhóm nhiệm vụ, không phải điểm similarity. Tăng từ 60% do đã sửa thêm override mobile và xác nhận lại hai workflow cùng artifact sau commit. Không tăng thêm chỉ vì CI xanh.
+**65%** theo nhóm nhiệm vụ và bằng chứng; không phải điểm similarity. Mức tăng phản ánh việc loại bỏ khối cam kết trùng lặp và xác minh lại toàn bộ automated preview 36 ảnh/40 interaction checks. Không nâng lên 100% vì thiếu ZIP nguồn, đối chiếu trực tiếp với mẫu, xác nhận dữ liệu hình ảnh và kiểm thử thiết bị/backend.
 
-## Việc tiếp theo
+## Tiếp theo
 
-1. Truy cập và kiểm kê ZIP gốc 28 screenshot cùng `report.html`/`visual-audit.json`; nếu tài nguyên không thể truy cập, ghi rõ chứ không dựng lại giả.
-2. Mở artifact 71 và rà soát report, danh sách screenshot, lỗi/measurements sau CSS change.
-3. So sánh cùng viewport/theme giữa screenshot mới và ảnh mẫu; ghi nhận khác biệt bằng hình ảnh hoặc số đo có thể kiểm chứng.
-4. Ưu tiên chỉnh thứ tự/độ gọn section trang chủ và phân biệt rõ các trải nghiệm Home/Product list/detail/Cart/Account, nhưng không thay đổi nghiệp vụ thiếu căn cứ.
-5. Chạy lại check/test/preview sau mỗi nhóm sửa; giữ production nguyên trạng.
+1. Tìm/tiếp nhận ZIP gốc 28 ảnh nếu được cung cấp trong tài nguyên có thể truy cập; không giả vờ đã đọc.
+2. Chạy visual preview sau mọi sửa đổi và so sánh cùng viewport/theme.
+3. Tiếp tục sửa các sai lệch có bằng chứng trong Liquid Glass, hero, section density, product cards và gallery; tránh thay ảnh/dữ liệu nghiệp vụ khi chưa được xác nhận.
+4. Giữ branch thử nghiệm; không merge/deploy production.
