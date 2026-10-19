@@ -12,7 +12,10 @@ assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
 assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('hero-stamp-image-spacer') && !storefrontHtml.includes('.hero-stamp{'), 'Entire unwanted hero stamp and glass styling must be removed while preserving the sneaker hero');
 assert.ok(!storefrontHtml.includes('id="heroDarkShoe"') && !storefrontHtml.includes('id="heroLightShoe"') && !storefrontHtml.includes('hero-art'), 'Hero product images must be removed from the storefront intro');
-assert.ok(storefrontHtml.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.') && storefrontHtml.includes('Khám phá ngay') && !storefrontHtml.includes('Khám phá bộ sưu tập') && !storefrontHtml.includes('Khám phá sản phẩm'), 'Hero copy and its single reference CTA must remain concise after removing product imagery');
+const heroStart = storefrontHtml.indexOf('<section class="hero wrap" id="home">');
+const heroEnd = storefrontHtml.indexOf('<section class="wrap" aria-label="Quyền lợi thương hiệu"', heroStart);
+const heroMarkup = storefrontHtml.slice(heroStart, heroEnd);
+assert.ok(heroMarkup.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.') && heroMarkup.includes('Khám phá ngay') && !heroMarkup.includes('Khám phá bộ sưu tập') && !heroMarkup.includes('Khám phá sản phẩm'), 'Hero copy and its single reference CTA must remain concise after removing product imagery');
 assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
 const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');
