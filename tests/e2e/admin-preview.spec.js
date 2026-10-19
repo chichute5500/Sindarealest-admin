@@ -5,7 +5,7 @@ const adminPassword = process.env.ADMIN_TEST_PASSWORD;
 
 test.describe('SinDarealest2 Admin Preview', () => {
   test('opens the admin login page without exposing protected content', async ({ page }) => {
-    test.skip(!adminUrl, 'Set ADMIN_TEST_URL in GitHub Actions secrets.');
+    if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
     await page.goto(adminUrl, { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('#loginView')).toBeVisible();
@@ -15,8 +15,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
   });
 
   test('logs in once and verifies the admin dashboard', async ({ page }) => {
-    test.skip(!adminUrl, 'Set ADMIN_TEST_URL in GitHub Actions secrets.');
-    test.skip(!adminPassword, 'Set ADMIN_TEST_PASSWORD in GitHub Actions secrets.');
+    if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
+    if (!adminPassword) throw new Error('Missing GitHub Actions secret ADMIN_TEST_PASSWORD.');
 
     const serverErrors = [];
     page.on('response', response => {
