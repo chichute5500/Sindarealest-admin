@@ -311,6 +311,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     sortOrder: Number(row.sort_order || 0),
     updatedAt: row.updated_at || null,
   };
+}
 
 export function slugify(input) {
   return String(input || "san-pham")
