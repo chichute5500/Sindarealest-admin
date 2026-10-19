@@ -85,6 +85,7 @@ export async function onRequestPut(context) {
     if (body.showPrices !== undefined) response.showPrices = body.showPrices;
     if (body.welcomeEnabled !== undefined) response.welcomeEnabled = body.welcomeEnabled;
     if (body.watermarkEnabled !== undefined) response.watermarkEnabled = body.watermarkEnabled;
+    if (body.watermarkLogoUrl !== undefined) response.watermarkLogoUrl = body.watermarkLogoUrl.trim();
     if (body.watermarkPosition !== undefined) response.watermarkPosition = body.watermarkPosition;
     if (body.watermarkSize !== undefined) response.watermarkSize = Number(body.watermarkSize);
     if (body.watermarkOpacity !== undefined) response.watermarkOpacity = Number(body.watermarkOpacity);
