@@ -201,7 +201,22 @@ try {
 
     const page = await context.newPage();
     page.setDefaultTimeout(10000);
-    page.on('console', (m) => { if (m.type() === 'error') audit.consoleErrors.push({ theme, message: m.text() }); });
+    page.on('console', (m) => {
+      if (m.type() !== 'error') return;
+      const message = m.text();
+      const location = m.location?.() || {};
+      const expectedWarrantyFixture503 = /Failed to load resource: the server responded with a status of 503/i.test(message)
+        && audit.mockedRequests.some(request => request.theme === theme
+          && request.fixtureOnly === true
+          && request.scenario === 'warranty-error-state')
+        && String(location.url || '').includes('/api/warranty-lookup');
+      if (expectedWarrantyFixture503) {
+        audit.expectedMockErrors = audit.expectedMockErrors || [];
+        audit.expectedMockErrors.push({ theme, url: location.url, message, fixtureOnly: true });
+        return;
+      }
+      audit.consoleErrors.push({ theme, message, url: location.url || '' });
+    });
     page.on('pageerror', (e) => audit.pageErrors.push({ theme, message: e.message }));
     page.on('response', (res) => {
       const expectedWarrantyFixtureError = res.url().includes('/api/warranty-lookup')
@@ -772,7 +787,11 @@ try {
     await page.locator('#orderDetailsToggle').click();
     await page.locator('#mobileAccountNav').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
-    await page.waitForTimeout(120);
+    const accountFocusReached = await page.waitForFunction(
+      () => document.activeElement?.id === 'accountClose',
+      null,
+      { timeout: 900 },
+    ).then(() => true).catch(() => false);
     const accountFocusBeforeSettle = await page.evaluate(() => document.activeElement?.id || '');
     await settle(page);
     const accountStructure = await page.evaluate(() => ({
@@ -790,9 +809,10 @@ try {
       activeElementAfterSettle: document.activeElement?.id || '',
     }));
     const accountStructurePass = accountStructure.accessibleDialog && accountStructure.drawerNotInertWhenOpen
-      && accountStructure.initialFocusOnCloseButton && accountStructure.addressPanelHiddenUntilSelected
-      && accountStructure.favoritesPanelHiddenUntilSelected && accountStructure.ordersPanelHiddenUntilSelected;
-    audit.interactions.push({ theme, check: 'account-dialog-semantics-and-initial-focus', pass: accountStructurePass, result: { ...accountStructure, accountFocusBeforeSettle } });
+      && accountFocusReached && accountStructure.initialFocusOnCloseButton
+      && accountStructure.addressPanelHiddenUntilSelected && accountStructure.favoritesPanelHiddenUntilSelected
+      && accountStructure.ordersPanelHiddenUntilSelected;
+    audit.interactions.push({ theme, check: 'account-dialog-semantics-and-initial-focus', pass: accountStructurePass, result: { ...accountStructure, accountFocusReached, accountFocusBeforeSettle } });
     if (!accountStructurePass) hardFailures.push('Account drawer accessibility/hidden-panel state failed: ' + theme);
     await capture(page, 'account-mobile-' + theme + '.jpg');
 
