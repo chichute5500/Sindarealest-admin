@@ -226,7 +226,7 @@ jobs:
             '- The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.',
             '- Production deployment: NOT PERFORMED.'
           ];
-          status += statusLines.join('\\n') + '\\n';
+          status += statusLines.join(String.fromCharCode(10)) + String.fromCharCode(10);
           writeFileSync(statusPath, status);
           NODE
 
