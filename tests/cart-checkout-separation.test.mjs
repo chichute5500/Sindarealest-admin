@@ -36,9 +36,9 @@ assert.match(html, /function trapCheckoutTab\(event\)/, 'Checkout must trap keyb
 assert.match(html, /if\(event\.shiftKey&&\(document\.activeElement===first\|\|!panel\.contains\(document\.activeElement\)\)\)/, 'Shift+Tab from the first checkout control must wrap to the last control.');
 assert.match(html, /else if\(!event\.shiftKey&&\(document\.activeElement===last\|\|!panel\.contains\(document\.activeElement\)\)\)/, 'Tab from the last checkout control must wrap to the first control.');
 assert.match(html, /const target=checkoutReturnFocus;checkoutReturnFocus=null/, 'Checkout must remember and restore focus to the opening control.');
-assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(\);openCart\(\)\}\)/, 'The back-to-cart action must restore the cart interaction state.');
+assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(false\);openCart\(\);setTimeout\(\(\)=>\$\('#cartCheckout'\)\?\.focus\(\{preventScroll:true\}\),0\)\}\)/, 'The back-to-cart action must reopen the cart and restore focus to its continue-order action.');
 assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'The cart action must open checkout.');
-assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(\);openCart\(\)\}\)/, 'Back action must return to the cart.');
+assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(false\);openCart\(\);setTimeout\(\(\)=>\$\('#cartCheckout'\)\?\.focus\(\{preventScroll:true\}\),0\)\}\)/, 'Back action must return to the cart and focus the continue-order action.');
 assert.match(html, /\$\('#checkoutBackdrop'\)\.addEventListener\('click',closeCheckout\)/, 'Backdrop interaction must close checkout.');
 assert.match(html, /e\.key!=='Escape'/, 'Escape-key handling should be present for modal drawers.');
 assert.match(html, /fetch\('\/api\/orders',\{method:'POST'/, 'The real existing order API submission must be preserved.');
