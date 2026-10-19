@@ -123,8 +123,8 @@ assert.match(source, /WHERE g\.status IN \('approved','pending'\)/, "approved an
 assert.match(source, /DELETE FROM image_group_set_members WHERE group_id=\? AND image_key=\?/, "overlapping members are removed from competing pending groups");
 assert.match(source, /if \(remaining\.length < 2\)/, "a group with fewer than two members after de-duplication is rejected");
 assert.match(source, /Remove them from every other pending proposal/, "approval removes its image keys from competing proposals");
-assert.match(source, /categoryConfidence\\s*[:,]/, "classification confidence is persisted for administrator review");
-assert.match(source, /categoryStatus\\s*[:,]/, "uncertain classifications retain a needs_review status");
-assert.match(source, /contentHash\\s*[:,]/, "SHA-256 content hashes are stored to detect byte-identical files");
+assert.match(source, /categoryConfidence\s*[:,]/, "classification confidence is persisted for administrator review");
+assert.match(source, /categoryStatus\s*[:,]/, "uncertain classifications retain a needs_review status");
+assert.match(source, /contentHash\s*[:,]/, "SHA-256 content hashes are stored to detect byte-identical files");
 
 console.log("PASS: stale-index invalidation is protected, and image membership is exclusive across pending/approved groups.");
