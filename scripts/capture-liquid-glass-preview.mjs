@@ -223,11 +223,27 @@ try {
             firstCommitment: sr ? { top: Math.round(sr.top), height: Math.round(sr.height) } : null,
             orderCta: box('#orderDetailsToggle'),
             featuredHeading: box('#featured .section-head'),
+            artMosaic: box('#collections .mosaic-compact'),
+            artMainCard: box('#collections .mosaic-card.art-main'),
+            artSmallCards: Array.from(document.querySelectorAll('#collections .mosaic-card.small')).map((el) => {
+              const r = el.getBoundingClientRect();
+              return { width: Math.round(r.width), height: Math.round(r.height) };
+            }),
             viewportWidth: innerWidth,
             documentWidth: document.documentElement.scrollWidth,
           };
         });
         audit.layoutMetrics.push({ theme, viewport: vp.name, ...visualMetrics });
+        const artMosaicOk = !!visualMetrics.artMosaic && visualMetrics.artMosaic.height >= 300
+          && !!visualMetrics.artMainCard && visualMetrics.artMainCard.height >= 180
+          && visualMetrics.artSmallCards.length === 2
+          && visualMetrics.artSmallCards.every((card) => card.width >= 100 && card.height >= 100);
+        audit.interactions.push({ theme, check: 'mobile-editorial-mosaic-has-visible-grid-rows', pass: artMosaicOk, result: {
+          mosaicHeight: visualMetrics.artMosaic?.height ?? null,
+          mainCardHeight: visualMetrics.artMainCard?.height ?? null,
+          smallCards: visualMetrics.artSmallCards,
+        } });
+        if (!artMosaicOk) hardFailures.push('The Art mobile mosaic collapsed or has undersized cards: ' + theme);
       }
     }
 
