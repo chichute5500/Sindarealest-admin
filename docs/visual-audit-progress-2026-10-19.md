@@ -150,3 +150,28 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Branch `fix/liquid-glass-audit-2026-10-19`; HEAD được xác minh tại `88cb40a1363b076e3145ecb44996f10746a35338`.
 - `main` vẫn ở `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; không có merge, deploy hay thay đổi cấu hình production từ nhiệm vụ này.
 - Tiến độ đánh giá: **75%**. Đã củng cố Liquid Glass nav, gom và xác minh nội dung liên hệ, thêm regression tests và thêm screenshot/assertions cho vùng product/contact. Chưa thể nâng lên 100% vì còn độ lệch bố cục/hero so với mẫu, thiếu danh mục túi và giá sản phẩm đã xác nhận, trải nghiệm vẫn là storefront dài với drawer/modal, cùng giới hạn kiểm thử thiết bị/backend nêu trên.
+
+
+## Cập nhật kiểm thử chế độ tự động — 19/10/2026 (preview 93)
+
+### Đã kiểm tra thay đổi system theme trong trình duyệt
+- Commit script cuối: `278a72943c14712b50cfc04aba52d841c1cdb308`, file `scripts/capture-liquid-glass-preview.mjs`.
+- Thêm một Chromium context riêng không đặt theme thủ công và xóa `sd-theme-mode` trong `localStorage` trước khi trang khởi tạo. Context giữ nguyên các giới hạn an toàn: chỉ GET/HEAD cùng nguồn, mock địa chỉ offline, không dùng backend/DB thật.
+- Ba runtime check mới:
+  1. OS Light + mode `auto` → trang khởi động Light.
+  2. Giả lập OS chuyển sang Dark → trang chuyển Dark trong khi mode vẫn là `auto`.
+  3. Giả lập OS chuyển lại Light → trang chuyển lại Light, mode vẫn là `auto`.
+- Cả ba check đều PASS trong `visual-audit.json` của preview 93.
+
+### Sự cố trung gian trong test harness đã được xử lý
+- Lượt đầu thêm auto-theme test ghi nhận đúng các trạng thái Light/Dark nhưng audit tổng hợp FAIL vì context bổ sung chưa mock `https://provinces.open-api.vn/api/v2/p/`; yêu cầu ngoài bị chặn và sinh một console error `ERR_FAILED`. Không tắt console audit.
+- Lượt sửa fixture kế tiếp có regex route escape sai, CI báo `SyntaxError: Invalid regular expression flags`. Đã sửa regex bằng cách sao chép chính xác pattern đang dùng ở các context Light/Dark hiện có.
+- Commit cuối `278a729...` đạt cả source/test và visual preview; không còn console error hoặc request ngoài bị chặn trong audit mới.
+
+### Bằng chứng cuối hiện tại
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39192739990).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39192739985).
+- Artifact `sindarealest-liquid-glass-preview-93`, ID `12160841603`, source SHA `278a72943c14712b50cfc04aba52d841c1cdb308`.
+- Kết quả preview 93: 44 screenshot, 20 responsive viewport/theme cases, 49 interaction checks, `passed=true`, 235 sản phẩm fixture đọc-only, overflow 0, hard failures 0, page errors 0, console errors 0, same-origin HTTP errors 0, failed requests 0, write requests 0, external requests blocked 0.
+- Trạng thái tổng thể vẫn **76%**; kiểm thử tự động theme đã phủ tốt hơn, nhưng chưa làm biến mất khoảng cách giữa dữ liệu/catalog thật hiện có và ảnh tham chiếu, chưa biến các drawer thành mọi route riêng, và chưa có kiểm thử Android vật lý/backend production.
+- Nhánh trước lần cập nhật tài liệu là `fix/liquid-glass-audit-2026-10-19`, code HEAD `278a729...`. Không merge/deploy production.
