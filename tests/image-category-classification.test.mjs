@@ -36,7 +36,7 @@ const env = {
   IMAGES: { async head(imageKey) { return { key: imageKey }; }, async get(imageKey) { return { key: imageKey }; } },
   AI: { async run(model, input) {
     modelCalls++; lastModelInput = { model, input };
-    if (failNextQuota) { failNextQuota = false; const error = new Error("Workers AI quota exceeded (429)"); error.status = 429; throw error; }
+    if (failNextQuota) { failNextQuota = false; throw new Error("4006: you have used up your daily free allocation of 10,000 neurons, please upgrade to Cloudflare Workers Paid plan."); }
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     if (compareMode && input.image) { const description = { shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }; if (structuredDescriptorOnce) { structuredDescriptorOnce = false; return { response: description, tool_calls: [], usage: {} }; } return { response: JSON.stringify(description), tool_calls: [], usage: {} }; }
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && (
@@ -292,4 +292,18 @@ assert.equal(quotaResponse.headers.get("Retry-After"), "60");
 assert.equal(modelCalls, beforeQuotaCalls + 1, "quota errors should not trigger a second paid model request");
 assert.equal(reviewInsertBatches, beforeQuotaWrites, "quota failure must not save proposed image pairs");
 
+
+  
+// Cloudflare's daily free-neuron exhaustion arrives as error 4006 without an
+// HTTP status property. It must become a visible 429, must not retry, and
+// must not masquerade as an ordinary gateway failure.
+compareMode = false;
+const beforeDailyAllocationFailure = modelCalls;
+failNextQuota = true;
+const dailyAllocationResponse = await call();
+const dailyAllocationResult = await dailyAllocationResponse.json();
+assert.equal(dailyAllocationResponse.status, 429, JSON.stringify(dailyAllocationResult));
+assert.equal(dailyAllocationResponse.headers.get("Retry-After"), null, "daily allocation exhaustion must not promise a 60-second retry");
+assert.match(JSON.stringify(dailyAllocationResult), /hết hạn mức neuron miễn phí hằng ngày/i);
+assert.equal(modelCalls, beforeDailyAllocationFailure + 1, "daily allocation exhaustion must stop without a second model request");
 console.log("PASS: mocked Workers AI endpoint passes actual images, accepts nested raster keys, uses single-image descriptors for comparison, rejects malformed output, retries transient failures, distinguishes quota errors, and avoids partial compare writes.");

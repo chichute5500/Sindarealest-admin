@@ -399,7 +399,8 @@ jobs:
               const result = await handlerResponse.json();
               if (action === "classify") {
                 if (handlerResponse.status !== 200 || result?.ok !== true || !Array.isArray(result.items) || result.items.length !== 1) {
-                  return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, 502);
+                  const exposedStatus = handlerResponse.status >= 400 && handlerResponse.status <= 599 ? handlerResponse.status : 502;
+        return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, exposedStatus);
                 }
                 return response({ ok: true, action, category: result.items[0].category, confidence: result.items[0].confidence, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: imageData[0].dataUrl.length });
               }

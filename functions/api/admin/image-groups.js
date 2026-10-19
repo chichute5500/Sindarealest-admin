@@ -1,5 +1,12 @@
 import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
-const MODEL="@cf/meta/llama-3.2-11b-vision-instruct", KEY_RE=/^(?=.{1,1024}$)[^\u0000-\u001f\u007f]+$/, LEGACY_KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
+const MODEL="@cf/meta/llama-3.2-11b-vision-instruct";
+function isWorkersAIDailyAllocationExhausted(value){
+  return /\b4006\b|daily free allocation|used up.{0,60}allocation.{0,40}neurons?|allocation of [\d,]+ neurons?/i.test(String(value||""));
+}
+function isWorkersAIQuotaError(status,value){
+  return Number(status)===429||isWorkersAIDailyAllocationExhausted(value)||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(String(value||""));
+}
+const KEY_RE=/^(?=.{1,1024}$)[^\u0000-\u001f\u007f]+$/, LEGACY_KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
 function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
 function parsePairList(value,imageCount=0){
@@ -259,7 +266,8 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
   }catch(error){
     const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
     const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
-    const quota=upstreamStatus===429||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+    const dailyAllocationExhausted=isWorkersAIDailyAllocationExhausted(detail);
+    const quota=isWorkersAIQuotaError(upstreamStatus,detail);
     const transient=upstreamStatus===500||upstreamStatus===502||upstreamStatus===503||upstreamStatus===504||
       /\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
     // Do not hammer a quota-limited model. Retry one transient upstream failure only.
@@ -268,8 +276,8 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
       continue;
     }
     const status=quota?429:(transient?503:502);
-    const message="Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử quét lại.";
-    return fail(message,status,quota?{"Retry-After":"60"}:{});
+    const message=dailyAllocationExhausted?"Workers AI đã hết hạn mức neuron miễn phí hằng ngày (mã Cloudflare 4006). Chưa ghi kết quả; cần chờ hạn mức được cấp lại hoặc nâng cấp gói Workers AI.":"Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử lại.";
+    return fail(message,status,quota&&!dailyAllocationExhausted?{"Retry-After":"60"}:{});
   }
   classification=parseCategoryResult(result,allowed);
 }
@@ -302,7 +310,7 @@ if(action==="compare"){
         catch(error){
           const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
           const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
-          const quota=upstreamStatus===429||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+          const quota=isWorkersAIQuotaError(upstreamStatus,detail);
           const transient=[500,502,503,504].includes(upstreamStatus)||/\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
           if(quota){error.status=429;throw error}
           if(attempt===0&&transient&&!/\b3030\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
@@ -393,7 +401,8 @@ if(action==="compare"){
   }catch(error){
     const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,220);
     const status=Number(error?.status||error?.statusCode||error?.status_code||0);
-    if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
+    if(isWorkersAIDailyAllocationExhausted(detail))return fail("Workers AI đã hết hạn mức neuron miễn phí hằng ngày (mã Cloudflare 4006). Chưa lưu đề xuất; cần chờ hạn mức được cấp lại hoặc nâng cấp gói Workers AI.",429);
+    if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
     return fail("Không thể so sánh đủ các ảnh bằng Workers AI: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
   }
 }
