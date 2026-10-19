@@ -317,7 +317,7 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Artifact `sindarealest-liquid-glass-preview-176.zip`, ID `12167246043`, was downloaded and opened directly. SHA-256: `b151d77c5dd0b2618198104a2b3a95b3efbb9fb5392f3de162fd8f51c01e08cb`.
 - Verified `visual-audit.json`: `passed=true`; 52 screenshots; 77 interaction checks; 20 responsive viewport entries for 10 viewport widths across Light/Dark; zero horizontal overflow; zero hard failures; zero console errors, page errors, same-origin HTTP errors, failed requests, or failed interaction assertions.
 - Branch comparison against `main`: fix branch is ahead by 188 commits and behind by 0 at this check; no merge or production deploy was performed.
-- Searched the accessible Library for `sindarealest-liquid-glass-preview-21.zip` and the 28 reference screenshots. The exact ZIP was not identified; search returned older standalone HTML assets instead. Pixel-level comparison against the missing original 28-image pack therefore remains unverified.
+- Historical note, superseded by the later correction below: during this earlier check the ZIP had not yet been identified. A subsequent search of the attachments at the start of the conversation found `70041.png`, `70042.png`, and `sindarealest-liquid-glass-preview-21.zip`; the two PNGs are the user's actual Light/Dark target mockups.
 - Current checklist estimate: **83% overall**. Source/tests/isolated preview are stronger after this change, but the remaining 17% is not safely claimable as complete without the original reference assets, physical Android verification, and authorized staging/production integration checks (D1/R2, admin operations, real orders/payment and watermark access controls). No production writes were made.
 
 
@@ -343,7 +343,13 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 
 ## Audit correction and requirements checklist — 19/10/2026
 
-This entry supersedes earlier statements in this document that the `sindarealest-liquid-glass-preview-21.zip` archive could not be found. It was found in the current working session at `/mnt/data/sindarealest-liquid-glass-preview-21.zip` and inspected directly. It contains 28 old **automated website preview screenshots**, plus `report.html` and `visual-audit.json` (30 archive entries total). Its audit reports 235 fixture products, `passed=true`, 20 responsive entries, 14 interactions, zero overflow and zero recorded browser/network errors. This archive is a previous test baseline, **not** the user-provided 12-screen target mockups; the target mockups are the two conversation images (Light and Dark).
+This entry supersedes earlier statements in this document that the `sindarealest-liquid-glass-preview-21.zip` archive could not be found. The exact original attachments have now been identified and inspected:
+
+- `70041.png` — user's **Light Mode target mockup**, 1024 × 1536 px; a 12-panel mobile UI reference collage.
+- `70042.png` — user's **Dark Mode target mockup**, 1024 × 1536 px; the matching 12-panel dark UI reference collage.
+- `sindarealest-liquid-glass-preview-21.zip` — inspected directly at `/mnt/data/sindarealest-liquid-glass-preview-21.zip`. It contains 28 old **automated website preview screenshots**, plus `report.html` and `visual-audit.json` (30 archive entries total). Its audit reports 235 fixture products, `passed=true`, 20 responsive entries, 14 interactions, zero overflow and zero recorded browser/network errors.
+
+Important distinction: the two PNGs are the actual target mockups from the user. The ZIP is the older site-preview baseline used for comparison; it is not source code and is not a substitute for the target mockups. The ZIP’s old audit passing only means the previous automated checks passed, not that its interface matches the target images. Visual acceptance must compare current screenshots against `70041.png` and `70042.png`, screen by screen. Any sample prices/SKU shown in a mockup are not automatically verified business data and must not be invented into the catalog.
 
 ### Revalidated source/tests
 - Source/test commit validated by preview #181: `b79fd25491913003e7110eb2aaf617cf982bcd36`.
