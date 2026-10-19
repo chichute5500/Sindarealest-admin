@@ -709,6 +709,49 @@ try {
       && await page.locator('#accountFavoriteCount').textContent().then(v => v.trim() === '0');
     audit.interactions.push({ theme, check: 'favorites-empty-state-after-removal', pass: emptyFavoritesPass });
     if (!emptyFavoritesPass) hardFailures.push('Favorites empty state did not return after removing the last product: ' + theme);
+    // Verify the editable shipping address book stores data only after explicit submit and can prefill checkout.
+    await page.locator('#accountFavoritesBack').click();
+    await page.locator('#accountAddressAction').click();
+    await page.locator('#accountAddressView:not([hidden])').waitFor({ state: 'visible' });
+    await page.waitForFunction(() => {
+      const province = document.querySelector('#accountAddressProvince');
+      return !!province && !province.disabled && Array.from(province.options).some(option => option.textContent.includes('Tỉnh kiểm thử'));
+    });
+    await page.locator('#accountAddressFullName').fill('Nguyen Address Test');
+    await page.locator('#accountAddressPhone').fill('0912345678');
+    await page.locator('#accountAddressEmail').fill('address@example.com');
+    await page.locator('#accountAddressProvince').selectOption('Tỉnh kiểm thử');
+    await page.waitForFunction(() => {
+      const ward = document.querySelector('#accountAddressWard');
+      return !!ward && !ward.disabled && Array.from(ward.options).some(option => option.textContent.includes('Phường kiểm thử'));
+    });
+    await page.locator('#accountAddressWard').selectOption({ label: 'Phường kiểm thử' });
+    await page.locator('#accountAddressStreet').fill('15 Đường Thử nghiệm');
+    await page.locator('#accountAddressSave').click();
+    await page.waitForFunction(() => {
+      try { const a = JSON.parse(localStorage.getItem('sd-shipping-address') || 'null'); return !!a && a.fullName === 'Nguyen Address Test'; } catch { return false; }
+    });
+    const savedAddressState = await page.evaluate(() => {
+      const a = JSON.parse(localStorage.getItem('sd-shipping-address') || 'null');
+      return {
+        name: a?.fullName || '',
+        phone: a?.phone || '',
+        email: a?.email || '',
+        province: a?.province || '',
+        ward: a?.ward || '',
+        streetAddress: a?.streetAddress || '',
+        privacyNotice: document.querySelector('#accountAddressPrivacy')?.textContent?.includes('chỉ nằm trong bộ nhớ trình duyệt trên thiết bị hiện tại') || false,
+      };
+    });
+    const savedAddressPass = savedAddressState.name === 'Nguyen Address Test'
+      && savedAddressState.phone === '0912345678'
+      && savedAddressState.email === 'address@example.com'
+      && savedAddressState.province === 'Tỉnh kiểm thử'
+      && savedAddressState.ward === 'Phường kiểm thử'
+      && savedAddressState.streetAddress === '15 Đường Thử nghiệm'
+      && savedAddressState.privacyNotice;
+    audit.interactions.push({ theme, check: 'shipping-address-saves-locally-with-clear-privacy-notice', pass: savedAddressPass, result: savedAddressState });
+    if (!savedAddressPass) hardFailures.push('Shipping address local save/privacy disclosure failed: ' + theme);
     await page.locator('#accountClose').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
 
@@ -717,6 +760,23 @@ try {
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#cartCheckout').click();
     await page.locator('#checkoutDrawer.open').waitFor({ state: 'visible' });
+    await page.waitForFunction(() => document.querySelector('#checkoutForm input[name="fullName"]')?.value === 'Nguyen Address Test'
+      && document.querySelector('#checkoutForm input[name="phone"]')?.value === '0912345678'
+      && document.querySelector('#checkoutStreet')?.value === '15 Đường Thử nghiệm');
+    const checkoutPrefillState = await page.evaluate(() => ({
+      name: document.querySelector('#checkoutForm input[name="fullName"]')?.value || '',
+      phone: document.querySelector('#checkoutForm input[name="phone"]')?.value || '',
+      province: document.querySelector('#checkoutProvince')?.value || '',
+      ward: document.querySelector('#checkoutWard')?.value || '',
+      streetAddress: document.querySelector('#checkoutStreet')?.value || '',
+    }));
+    const checkoutPrefillPass = checkoutPrefillState.name === 'Nguyen Address Test'
+      && checkoutPrefillState.phone === '0912345678'
+      && checkoutPrefillState.province === 'Tỉnh kiểm thử'
+      && checkoutPrefillState.ward === 'Phường kiểm thử'
+      && checkoutPrefillState.streetAddress === '15 Đường Thử nghiệm';
+    audit.interactions.push({ theme, check: 'saved-address-prefills-editable-checkout', pass: checkoutPrefillPass, result: checkoutPrefillState });
+    if (!checkoutPrefillPass) hardFailures.push('Saved address did not prefill editable checkout fields: ' + theme);
     await page.locator('#checkoutForm input[name="fullName"]').fill('Nguyen Test');
     await page.locator('#checkoutForm input[name="phone"]').fill('0900000000');
     await page.locator('#checkoutForm input[name="email"]').fill('test@example.com');
