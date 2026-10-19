@@ -17,6 +17,11 @@ has('backdrop-filter:blur(22px)', 'liquid-glass blur layer');
 has('data-admin-theme="dark"', 'dark-theme rules');
 has('prefers-reduced-motion:reduce', 'reduced-motion support');
 
+// System theme is the default until the administrator explicitly chooses light/dark.
+has("let adminThemeMode='auto';", 'system theme default');
+has("localStorage.getItem('sd-theme-mode')||'auto'", 'system theme fallback when no preference is saved');
+has("if(mode==='auto')applyAdminTheme('auto')", 'system theme change listener');
+
 // Preserve authentication markup and the core API integration contract.
 for (const id of ['loginView', 'loginForm', 'password', 'appView', 'adminThemeToggle', 'logout']) {
   has(`id="${id}"`, `#${id} element`);
