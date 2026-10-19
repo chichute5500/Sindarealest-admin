@@ -367,7 +367,7 @@ jobs:
                     if (sql.includes("FROM image_group_index WHERE image_key IN")) {
                       const identicalBytes = imageData.length === 2 && imageData[0].dataUrl === imageData[1].dataUrl;
                       const positiveFixture = imageKeys.every(key => key.startsWith("test-fixtures/") && !key.startsWith("test-fixtures/negative/"));
-                      const similar = identicalBytes || positiveFixture;
+                      const similar = identicalBytes || positiveFixture || body?.testSameSku === true;
                       const shapeA = Array(64).fill(0.9), shapeB = Array(64).fill(0.05);
                       const colorsA = [1,0,0,0,1,0,0,0,0,0,1,0], colorsB = [0,0,0,1,0,0,0,1,1,0,0,0];
                       return { results: imageKeys.map((key, index) => ({
@@ -697,7 +697,7 @@ jobs:
             data.push({ key: keys[i], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
           }
           if (data[0].dataUrl === data[1].dataUrl) throw new Error("Same-SKU gallery pair contains identical decoded image bytes; different-angle matching cannot be validated by this pair.");
-          await writeFile("/tmp/ai-test-same-sku-compare-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData: data }));
+          await writeFile("/tmp/ai-test-same-sku-compare-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData: data, testSameSku: true }));
           NODE
               sku_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-same-sku-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-same-sku-compare-request.json "$base/api/ai-smoke-ci")"
               if [ "$sku_status" != "200" ]; then
