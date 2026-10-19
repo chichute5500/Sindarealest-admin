@@ -875,6 +875,24 @@ function closeCheckout(restoreFocus=true){
   },0);
  }
 }
+function openAccount(){
+ dismissToast();accountReturnFocus=document.activeElement;
+ closeCheckout();closeCart();closeDetail();
+ const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ const close=$('#accountClose');if(close)setTimeout(()=>close.focus({preventScroll:true}),0);
+}
+function closeAccount(restoreFocus=true){
+ const panel=$('#accountDrawer');if(!panel)return;
+ const wasOpen=panel.classList.contains('open');
+ panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');
+ if(!$('#checkoutDrawer').classList.contains('open')&&!$('#cartDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';
+ const target=accountReturnFocus;accountReturnFocus=null;
+ if(restoreFocus&&wasOpen)setTimeout(()=>{
+  const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');
+  const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';
+  (available?target:($('#mobileAccountNav')||$('#accountOpen')))?.focus({preventScroll:true});
+ },0);
+}
 function trapTabWithin(panel,event){
  if(!panel||!panel.classList.contains('open')||event.key!=='Tab')return;
  const items=[...panel.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
