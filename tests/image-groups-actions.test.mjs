@@ -169,6 +169,25 @@ assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM audit_logs WHERE acti
 const repeatedUndo = await call({ action: "undo-approval", auditId: approvalAudit.id });
 assert.equal(repeatedUndo.status, 409, "an approval can be undone only once");
 
+const changedApprovalId = crypto.randomUUID();
+await seedGroup(changedApprovalId, ["changed-undo-a.webp", "changed-undo-b.webp"]);
+const changedApproved = await call({ action: "approve-group", groupId: changedApprovalId, productId: ids.product });
+assert.equal(changedApproved.status, 200, JSON.stringify(changedApproved));
+const changedAuditRow = sqlite.prepare("SELECT id,details_json FROM audit_logs WHERE action='image_similarity_group_approved'")
+  .all().find(row => JSON.parse(row.details_json).groupId === changedApprovalId);
+assert.ok(changedAuditRow, "the changed-gallery fixture must have an approval snapshot");
+const newerGalleryJson = JSON.stringify([
+  ...JSON.parse(sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json),
+  "/media/admin-added-after-approval.webp"
+]);
+sqlite.prepare("UPDATE products SET images_json=? WHERE id=?").run(newerGalleryJson, ids.product);
+const guardedUndo = await call({ action: "undo-approval", auditId: changedAuditRow.id });
+assert.equal(guardedUndo.status, 409, "undo must refuse to overwrite a gallery edited after approval");
+assert.equal(sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json, newerGalleryJson,
+  "a refused undo must preserve the newer gallery exactly");
+sqlite.prepare("UPDATE products SET images_json=? WHERE id=?").run('["/media/existing.webp"]', ids.product);
+
+
 // Server must reject a mixed-category proposal even if a browser submits it.
 seedImage("mixed-shoe.webp", "sneaker");
 seedImage("mixed-watch-strap.webp", "watch_strap");
