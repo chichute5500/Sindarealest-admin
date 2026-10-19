@@ -770,6 +770,8 @@ try {
     await page.locator('#checkoutDrawer.open').waitFor({ state: 'visible' });
     await page.waitForFunction(() => document.querySelector('#checkoutForm input[name="fullName"]')?.value === 'Nguyen Address Test'
       && document.querySelector('#checkoutForm input[name="phone"]')?.value === '0912345678'
+      && document.querySelector('#checkoutProvince')?.value === 'Tỉnh kiểm thử'
+      && document.querySelector('#checkoutWard')?.value === 'Phường kiểm thử'
       && document.querySelector('#checkoutStreet')?.value === '15 Đường Thử nghiệm');
     const checkoutPrefillState = await page.evaluate(() => ({
       name: document.querySelector('#checkoutForm input[name="fullName"]')?.value || '',
