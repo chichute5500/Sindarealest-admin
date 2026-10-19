@@ -249,7 +249,30 @@ try {
     await capture(page, 'cart-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'add-to-cart-and-open-cart', pass: true });
     audit.interactions.push({ theme, check: 'mobile-bottom-cart-navigation-opens-cart', pass: true });
+
+    await page.locator('#cartCheckout').click();
+    await page.locator('#checkoutDrawer.open').waitFor({ state: 'visible' });
+    await page.locator('#checkoutForm').waitFor({ state: 'visible' });
+    await settle(page);
+    const checkoutStructure = await page.evaluate(() => ({
+      checkoutFormInsideCheckout: !!document.querySelector('#checkoutDrawer #checkoutForm'),
+      checkoutFormInsideCart: !!document.querySelector('#cartDrawer #checkoutForm'),
+      closeButtonPresent: !!document.querySelector('#checkoutClose'),
+      backButtonPresent: !!document.querySelector('#checkoutBack'),
+      submitButtonPresent: !!document.querySelector('#checkoutSubmit'),
+    }));
+    const checkoutPass = checkoutStructure.checkoutFormInsideCheckout
+      && !checkoutStructure.checkoutFormInsideCart
+      && checkoutStructure.closeButtonPresent
+      && checkoutStructure.backButtonPresent
+      && checkoutStructure.submitButtonPresent;
+    audit.interactions.push({ theme, check: 'cart-checkout-form-separated', pass: checkoutPass, result: checkoutStructure });
+    if (!checkoutPass) hardFailures.push('Cart and checkout are not separated correctly: ' + theme);
+    await capture(page, 'checkout-mobile-' + theme + '.jpg');
+    await page.locator('#checkoutBack').click();
+    await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#cartClose').click();
+
     await page.locator('#orderDetailsToggle').click();
     await page.locator('#orderDetailsPanel:not([hidden])').waitFor({ state: 'visible' });
     await settle(page);
@@ -275,7 +298,9 @@ audit.hardFailures = hardFailures;
 audit.passed = hardFailures.length === 0
   && audit.responsiveOverflowCount === 0
   && audit.pageErrors.length === 0
+  && audit.consoleErrors.length === 0
   && audit.httpErrors.length === 0
+  && audit.failedRequests.length === 0
   && audit.writeRequestsBlocked.length === 0;
 await fs.writeFile(path.join(outDir, 'visual-audit.json'), JSON.stringify(audit, null, 2), 'utf8');
 
