@@ -350,21 +350,23 @@ if(action==="compare"){
     let parsedPairs=parsePairList(comparedText,keys.length);
     if(!parsedPairs)throw new Error("text comparison response did not contain a valid pairs array after one format retry ("+summarizePairResponse(comparedText)+")");
     if(typeof comparedText!=="string")comparedText=JSON.stringify(parsedPairs);
+    const comparisonDiagnostics={modelPairs:parsedPairs.pairs.length,invalidOrLowConfidence:0,visualGateRejected:0,ownershipRejected:0,accepted:0};
     for(const pair of parsedPairs.pairs){
       const a=Number(pair?.a??pair?.imageA??pair?.image_a??pair?.left_index??pair?.left??pair?.first),b=Number(pair?.b??pair?.imageB??pair?.image_b??pair?.right_index??pair?.right??pair?.second);
       let confidence=Number(pair?.confidence??pair?.score??pair?.confidence_score??pair?.confidenceScore??pair?.probability);
       if(confidence>0&&confidence<=1)confidence*=100;
-      if((pair?.same_product??pair?.sameProduct??pair?.match)!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100)continue;
+      if((pair?.same_product??pair?.sameProduct??pair?.match)!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100){comparisonDiagnostics.invalidOrLowConfidence++;continue;}
       const visual=visualPairGate(indexedByKey.get(keys[a]),indexedByKey.get(keys[b]));
-      if(!visual.match)continue;
+      if(!visual.match){comparisonDiagnostics.visualGateRejected++;continue;}
       const first=keys[a]<keys[b]?keys[a]:keys[b],second=keys[a]<keys[b]?keys[b]:keys[a],id=first+"|"+second;
       const ownerA=ownersByKey.get(first)||new Set(),ownerB=ownersByKey.get(second)||new Set();
-      if(ownerA.size>1||ownerB.size>1||(ownerA.size===1&&ownerB.size===1&&[...ownerA][0]!==[...ownerB][0]))continue;
+      if(ownerA.size>1||ownerB.size>1||(ownerA.size===1&&ownerB.size===1&&[...ownerA][0]!==[...ownerB][0])){comparisonDiagnostics.ownershipRejected++;continue;}
       if(seen.has(id))continue;
       seen.add(id);
       prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||pair.reason||pair.explanation||"").trim().slice(0,900)});
+      comparisonDiagnostics.accepted++;
     }
-    if(!prepared.length)return json({ok:true,matches:[],batches:1,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong toàn bộ "+keys.length+" ảnh đã kiểm tra. Có thể chạy lại với cặp ảnh nghi vấn; không có đề xuất nào được lưu."});
+    if(!prepared.length)return json({ok:true,matches:[],batches:1,diagnostics:comparisonDiagnostics,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong toàn bộ "+keys.length+" ảnh đã kiểm tra. Có thể chạy lại với cặp ảnh nghi vấn; không có đề xuất nào được lưu."});
     const statements=prepared.map(p=>env.DB.prepare("INSERT INTO image_group_reviews(id,image_a,image_b,same_product,confidence,rationale,status,created_at) VALUES(?,?,?,1,?,?,'pending',datetime('now'))").bind(crypto.randomUUID(),p.first,p.second,p.confidence,p.rationale));
     await env.DB.batch(statements);
     return json({ok:true,matches:prepared.length,batches:1,message:"AI đã so sánh đầy đủ "+keys.length+" ảnh và tạo "+prepared.length+" cặp đề xuất sau khi kiểm tra ngưỡng và đặc trưng. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201);
