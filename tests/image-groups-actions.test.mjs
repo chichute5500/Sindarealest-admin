@@ -90,6 +90,7 @@ function seedImage(key, category = "sneaker", categoryStatus = "classified", cat
   const contentHash = [...key].map(character => character.charCodeAt(0).toString(16).padStart(2, "0")).join("").padEnd(64, "0").slice(0, 64);
   const features = {
     category, categoryStatus, categoryConfidence,
+    identityDescriptor: `product_type=${category}; dominant_colors=black; visible_material=leather; texture_pattern=visible grain; silhouette=distinct outline; toe_or_edge_shape=visible contour; sole_or_edge_profile=visible edge; stitching=visible seams; logo_placement=not clearly visible; hardware_or_closure=visible closure; distinctive_details=fixture-specific seams; visible_uncertainty=some details not visible`,
     shape: Array(64).fill(0.5),
     colors: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
     contentHash
