@@ -699,6 +699,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
   <div class="account-panel-content">
     <div id="accountMenuView" class="account-menu-view">
       <div class="account-guest glass"><span class="account-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4.1 3.4-6.2 8-6.2s7.3 2.1 8 6.2"/></svg></span><div><strong>Chào mừng bạn</strong><small>Khám phá và kết nối cùng SinDarealest</small></div></div>
+      <button type="button" class="account-action tap-target" id="accountAddressAction" aria-controls="accountAddressView"><span aria-hidden="true">⌖</span><span><strong>Địa chỉ giao hàng</strong><small id="accountAddressSummary">Chưa lưu địa chỉ trên thiết bị này</small></span><span>›</span></button>
       <button type="button" class="account-action tap-target" id="accountOrdersAction" aria-controls="accountOrdersView"><span aria-hidden="true">▤</span><span><strong>Đơn hàng của tôi</strong><small><span id="accountOrderCount">0</span> yêu cầu đã gửi trên thiết bị này</small></span><span>›</span></button>
       <button type="button" class="account-action tap-target" id="accountFavoritesAction" aria-controls="accountFavoritesView"><span aria-hidden="true">♡</span><span><strong>Sản phẩm yêu thích</strong><small><span id="accountFavoriteCount">0</span> sản phẩm đã lưu trên thiết bị này</small></span><span>›</span></button>
       <button type="button" class="account-action tap-target" id="accountThemeAction"><span aria-hidden="true">◐</span><span><strong>Chế độ hiển thị</strong><small>Chuyển giữa giao diện sáng và tối</small></span><span>›</span></button>
@@ -713,6 +714,20 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
       <div class="orders-view-heading"><button type="button" class="favorites-back tap-target" id="accountOrdersBack">← Tài khoản</button><span>Chỉ trên thiết bị này</span></div>
       <p class="orders-local-note">Danh sách này chỉ ghi nhận yêu cầu được tiếp nhận thành công từ trình duyệt hiện tại. Đây không phải lịch sử tài khoản đồng bộ.</p>
       <div id="accountOrdersList" class="account-orders-list" aria-live="polite"></div>
+    </div>
+    <div id="accountAddressView" class="account-address-view" hidden>
+      <div class="orders-view-heading"><button type="button" class="favorites-back tap-target" id="accountAddressBack">← Tài khoản</button><span>Thông tin giao hàng</span></div>
+      <p class="orders-local-note" id="accountAddressPrivacy">Thông tin bạn lưu dưới đây chỉ nằm trong bộ nhớ trình duyệt trên thiết bị hiện tại. Khi gửi yêu cầu đặt hàng, các trường cần thiết sẽ được gửi để cửa hàng tiếp nhận. Không có đồng bộ tài khoản.</p>
+      <form id="accountAddressForm" class="account-address-form">
+        <label class="address-field"><span>Họ tên *</span><input id="accountAddressFullName" name="fullName" maxlength="120" required autocomplete="name"></label>
+        <label class="address-field"><span>Số điện thoại *</span><input id="accountAddressPhone" name="phone" maxlength="24" required autocomplete="tel" inputmode="tel"></label>
+        <label class="address-field"><span>Email (không bắt buộc)</span><input id="accountAddressEmail" name="email" type="email" maxlength="160" autocomplete="email"></label>
+        <label class="address-field"><span>Tỉnh/thành phố *</span><select id="accountAddressProvince" name="province" required disabled><option value="">Đang tải tỉnh/thành…</option></select></label>
+        <label class="address-field"><span>Xã/phường *</span><select id="accountAddressWard" name="ward" required disabled><option value="">Chọn tỉnh/thành trước</option></select></label>
+        <label class="address-field"><span>Số nhà, tên đường, thôn/tổ *</span><input id="accountAddressStreet" name="streetAddress" maxlength="300" required autocomplete="street-address"></label>
+        <button type="submit" class="pill-btn primary tap-target" id="accountAddressSave">Lưu địa chỉ trên thiết bị</button>
+        <p id="accountAddressMessage" class="address-form-message" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </div>
 </aside>
@@ -1566,6 +1581,16 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
 .orders-view-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:10px}
 .orders-local-note{margin:0;padding:10px 12px;border:1px solid var(--sd-glass-edge);border-radius:14px;color:var(--muted);font-size:10px;line-height:1.55;background:var(--sd-card-glass)}
 .account-orders-list{display:grid;gap:9px;min-width:0}
+.account-address-view{display:grid;gap:12px;min-width:0}
+.account-address-form{display:grid;gap:10px;min-width:0}
+.address-field{display:grid;gap:5px;min-width:0;color:var(--ink);font-size:11px;font-weight:600}
+.address-field input,.address-field select{box-sizing:border-box;width:100%;min-width:0;min-height:43px;padding:10px 12px;border:1px solid var(--sd-glass-edge);border-radius:13px;background:var(--sd-card-glass);color:var(--ink);font:400 12px/1.4 inherit}
+.address-field input::placeholder{color:var(--muted)}
+.address-field select:disabled{opacity:.58}
+.account-address-form #accountAddressSave{width:100%;min-height:44px;margin-top:2px}
+.address-form-message{min-height:1em;margin:0;color:var(--muted);font-size:10px;line-height:1.5}
+.address-form-message[data-state="error"]{color:#bd3949}
+
 .orders-empty{padding:24px 14px;border:1px dashed var(--sd-glass-edge);border-radius:18px;color:var(--muted);text-align:center;font-size:11px;line-height:1.6}
 .local-order-card{display:grid;gap:8px;padding:12px;border:1px solid var(--sd-glass-edge);border-radius:17px;background:var(--sd-card-glass);min-width:0}
 .local-order-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
