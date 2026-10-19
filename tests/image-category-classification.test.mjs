@@ -41,6 +41,7 @@ const env = {
     if (compareMode && input.image) return { response: JSON.stringify({ shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }), tool_calls: [], usage: {} };
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && (
       message.content.includes("mô tả từ phân tích thị giác") ||
+      message.content.includes("You are a strict pairwise product-photo matcher") ||
       message.content.includes("The previous response was malformed") ||
       message.content.includes("The previous response was not valid JSON") ||
       message.content.includes("Compare all supplied visual descriptions") ||
