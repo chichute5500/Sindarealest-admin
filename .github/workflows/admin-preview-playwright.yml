@@ -1,10 +1,12 @@
 name: Admin Preview Playwright
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
   workflow_dispatch:
+    inputs:
+      preview_url:
+        description: "HTTPS Preview URL ending in .sindarealest2.pages.dev/admin/; leave blank to use ADMIN_TEST_URL secret"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -19,21 +21,28 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out test branch
+      - name: Check out selected branch
         uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install project dependencies and Playwright
         run: |
           npm install --no-save @playwright/test
           npx playwright install --with-deps chromium
 
-      - name: Test the supplied Preview URL
+      - name: Validate Preview URL and required secret presence
+        id: preview
+        env:
+          ADMIN_TEST_URL: ${{ inputs.preview_url || secrets.ADMIN_TEST_URL }}
+          ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+        run: node scripts/admin-preview-url.mjs
+
+      - name: Run read-only Playwright authentication checks
         run: npx playwright test tests/e2e/admin-preview.spec.js
         env:
-          ADMIN_TEST_URL: ${{ secrets.ADMIN_TEST_URL }}
+          ADMIN_TEST_URL: ${{ steps.preview.outputs.safe_url }}
           ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
