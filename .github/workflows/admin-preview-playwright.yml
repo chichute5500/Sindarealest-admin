@@ -17,6 +17,9 @@ concurrency:
 
 jobs:
   admin-preview:
+    # Credentials must never be passed to test code selected from an untrusted feature branch.
+    # After review/integration, run this workflow from the trusted default branch only.
+    if: github.ref == 'refs/heads/main'
     name: Test Admin Preview (read-only smoke checks)
     runs-on: ubuntu-latest
     timeout-minutes: 15
