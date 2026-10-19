@@ -51,6 +51,17 @@ export async function onRequestPut(context) {
 
   const watermark = validateWatermarkSettingUpdates(body || {});
   if (watermark.error) return fail(watermark.error);
+  if (body.watermarkLogoUrl !== undefined && body.watermarkLogoUrl !== WATERMARK_DEFAULTS.watermark_logo) {
+    const key = body.watermarkLogoUrl.slice("/media/".length);
+    if (!context.env.IMAGES || typeof context.env.IMAGES.head !== "function") {
+      return fail("Kho ảnh hiển thị chưa được cấu hình để xác minh logo.", 503);
+    }
+    try {
+      if (!await context.env.IMAGES.head(key)) return fail("Không tìm thấy ảnh logo trong kho ảnh. Hãy tải ảnh WebP lên trước.", 404);
+    } catch {
+      return fail("Không thể xác minh ảnh logo trong kho ảnh.", 503);
+    }
+  }
   updates.push(...watermark.updates);
 
   const fields = [
