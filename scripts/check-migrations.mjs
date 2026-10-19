@@ -90,7 +90,29 @@ try {
     run(["d1", "migrations", "apply", databaseName, "--local", "--config", configPath],
       "Apply migrations after 0007 to temporary local D1");
   }
-  console.log("PASS: all D1 migrations apply locally, required tables exist, and migration 0007 backfills historic order contacts.");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT sku_verified FROM products LIMIT 0;"],
+    "Verify product SKU verification column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT sku_verified FROM order_items LIMIT 0;"],
+    "Verify order-item SKU snapshot column");
+  const skuCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
+    "--command", "SELECT COUNT(*) AS unverified_seed_count FROM products WHERE sku_verified=0;"],
+    "Verify existing seed SKUs default to unverified");
+  const skuCountPayload = parseCliJson(skuCountResult.stdout, "kết quả kiểm tra SKU seed chưa xác minh");
+  const findUnverifiedCount = (value) => {
+    if (Array.isArray(value)) { for (const item of value) { const found = findUnverifiedCount(item); if (found !== null) return found; } }
+    else if (value && typeof value === "object") {
+      if (Object.hasOwn(value, "unverified_seed_count")) {
+        const count = Number(value.unverified_seed_count);
+        return Number.isSafeInteger(count) && count >= 0 ? count : null;
+      }
+      for (const item of Object.values(value)) { const found = findUnverifiedCount(item); if (found !== null) return found; }
+    }
+    return null;
+  };
+  if (findUnverifiedCount(skuCountPayload) !== 235) throw new Error("Migration 0008 must conservatively mark all 235 generated seed identifiers as unverified.");
+  console.log("PASS: all D1 migrations apply locally; 0007 backfills historic order contacts; migration 0008 keeps the 235 seed codes unverified.");
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
