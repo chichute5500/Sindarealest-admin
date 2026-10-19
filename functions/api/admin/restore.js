@@ -127,6 +127,7 @@ export async function onRequestPost(context) {
     if (present.length === watermarkFields.length) {
       const checkedWatermark = validateWatermarkSettingUpdates({
         watermarkEnabled: backup.settings.watermarkEnabled,
+        ...(Object.hasOwn(backup.settings, "watermarkLogoUrl") ? { watermarkLogoUrl: backup.settings.watermarkLogoUrl } : {}),
         watermarkPosition: backup.settings.watermarkPosition,
         watermarkSize: backup.settings.watermarkSize,
         watermarkOpacity: backup.settings.watermarkOpacity,
