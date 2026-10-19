@@ -98,17 +98,85 @@ document.addEventListener('click',e=>{const n=e.target.closest('[data-view]');if
 async function resetAllSkus(button){if(resetBusy||busy)return;const count=products.length;const approved=window.confirm(`Bạn sắp đánh lại SKU cho toàn bộ ${count} sản phẩm. Mã mới sẽ bắt đầu từ 001 riêng theo từng danh mục và được xếp theo thứ tự sản phẩm. Chỉ SKU thay đổi; tên, ảnh, giá, tồn kho, trạng thái hiển thị và slug được giữ nguyên. Tiếp tục?`);if(!approved)return;resetBusy=true;if(button){button.disabled=true;button.textContent='Đang đặt lại SKU…'}try{const result=await api('/api/admin/products/reset-skus',{method:'POST',body:JSON.stringify({confirm:true})});await loadData();render();toast(result.message||`Đã đặt lại SKU cho ${result.count||0} sản phẩm.`)}catch(ex){window.alert('Không thể đặt lại SKU: '+(ex.message||'Lỗi không xác định.'))}finally{resetBusy=false;if(button){button.disabled=false;button.textContent='↻ Reset toàn bộ SKU · Beta'}}}
 function refreshCategoryOptions(){const defaults=['Sneaker','Giày lười','Giày tây','Thắt lưng','Ví da','Dép','Dây đồng hồ','Ốp điện thoại'];const names=[...new Set([...defaults,...products.map(p=>String(p.categoryLabel||p.category||'').trim()).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,'vi'));$('#categoryOptions').innerHTML=names.map(name=>'<option value="'+esc(name)+'"></option>').join('')}
 function openEditor(p){editing=p||null;gallery=(p?.images||[]).map(url=>({url,file:null,temporary:false}));$('#pId').value=p?.id||'';$('#editorTitle').textContent=p?'Chỉnh sửa sản phẩm':'Thêm sản phẩm mới';$('#pTitle').value=p?.title||'';$('#pCategory').value=p?.categoryLabel||CAT[p?.category]||p?.category||'';$('#pDescription').value=p?.description||'';$('#pPrice').value=p?.price??'';$('#pStock').value=p?.stock??'';$('#pPublished').checked=p?Boolean(p.published):true;$('#deleteProduct').classList.toggle('hidden',!p);err($('#saveError'),'');renderGallery();$('#backdrop').classList.remove('hidden');$('#backdrop').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';setTimeout(()=>$('#pTitle').focus(),80)}function closeEditor(force=false){if(busy&&force!==true)return;$('#backdrop').classList.add('hidden');$('#backdrop').setAttribute('aria-hidden','true');document.body.style.overflow='';gallery.forEach(g=>{if(g.temporary)URL.revokeObjectURL(g.url)});gallery=[];editing=null}$('#editorClose').addEventListener('click',closeEditor);$('#editorCancel').addEventListener('click',closeEditor);$('#backdrop').addEventListener('click',e=>{if(e.target===$('#backdrop'))closeEditor()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#backdrop').classList.contains('hidden'))closeEditor()});
-function renderGallery(){const grid=$('#imageGrid');if(!gallery.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px">Chưa có ảnh. Chọn ảnh từ điện thoại để tạo bộ ảnh cùng SKU.</div>';return}grid.innerHTML=gallery.map((g,i)=>`<div class="imageitem" draggable="true" data-image-index="${i}">${i===0?'<span class="covertag">ẢNH ĐẠI DIỆN</span>':''}<img src="${esc(g.url ? (g.url.startsWith('/') ? g.url : '/'+g.url) : '')}" alt="Ảnh ${i+1}"><div class="imagebuttons"><button type="button" data-gallery="up" data-index="${i}" aria-label="Chuyển lên" ${i===0?'disabled':''}>←</button><button type="button" data-gallery="down" data-index="${i}" aria-label="Chuyển xuống" ${i===gallery.length-1?'disabled':''}>→</button><button type="button" data-gallery="remove" data-index="${i}" aria-label="Xóa ảnh">×</button></div></div>`).join('')}
-$('#imageGrid').addEventListener('click',e=>{const b=e.target.closest('[data-gallery]');if(!b)return;const i=+b.dataset.index;if(b.dataset.gallery==='up'&&i>0)[gallery[i-1],gallery[i]]=[gallery[i],gallery[i-1]];else if(b.dataset.gallery==='down'&&i<gallery.length-1)[gallery[i+1],gallery[i]]=[gallery[i],gallery[i+1]];else if(b.dataset.gallery==='remove'){if(gallery[i].temporary)URL.revokeObjectURL(gallery[i].url);gallery.splice(i,1)}renderGallery()});
-function addImageFiles(files){for(const file of [...files||[]]){if(!file.type.startsWith('image/'))continue;if(gallery.length>=30){toast('Mỗi sản phẩm tối đa 30 ảnh.');break}if(file.size>20*1024*1024){toast(`Bỏ qua ${file.name}: ảnh gốc vượt 20 MB.`);continue}gallery.push({url:URL.createObjectURL(file),file,temporary:true})}renderGallery()}
+function renderGallery(){const grid=$('#imageGrid');if(!gallery.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px">Chưa có ảnh. Chọn ảnh từ điện thoại để tạo bộ ảnh cùng SKU.</div>';return}grid.innerHTML=gallery.map((g,i)=>`<div class="imageitem" draggable="true" data-image-index="${i}">${i===0?'<span class="covertag">ẢNH ĐẠI DIỆN</span>':''}<img src="${esc(g.url ? (g.url.startsWith('/') ? g.url : '/'+g.url) : '')}" alt="Ảnh ${i+1}"><div class="imagebuttons"><button type="button" data-gallery="up" data-index="${i}" aria-label="Chuyển lên" ${i===0?'disabled':''}>←</button><button type="button" data-gallery="down" data-index="${i}" aria-label="Chuyển xuống" ${i===gallery.length-1?'disabled':''}>→</button><button type="button" data-gallery="remove" data-index="${i}" aria-label="Xóa ảnh">×</button></div></div>`).join('');if(busy)grid.querySelectorAll('[data-gallery]').forEach(button=>{button.disabled=true;button.setAttribute('aria-disabled','true')})}
+$('#imageGrid').addEventListener('click',e=>{if(busy)return;const b=e.target.closest('[data-gallery]');if(!b)return;const i=+b.dataset.index;if(b.dataset.gallery==='up'&&i>0)[gallery[i-1],gallery[i]]=[gallery[i],gallery[i-1]];else if(b.dataset.gallery==='down'&&i<gallery.length-1)[gallery[i+1],gallery[i]]=[gallery[i],gallery[i+1]];else if(b.dataset.gallery==='remove'){if(gallery[i].temporary)URL.revokeObjectURL(gallery[i].url);gallery.splice(i,1)}renderGallery()});
+function addImageFiles(files){if(busy)return;for(const file of [...files||[]]){if(!file.type.startsWith('image/'))continue;if(gallery.length>=30){toast('Mỗi sản phẩm tối đa 30 ảnh.');break}if(file.size>20*1024*1024){toast(`Bỏ qua ${file.name}: ảnh gốc vượt 20 MB.`);continue}gallery.push({url:URL.createObjectURL(file),file,temporary:true})}renderGallery()}
 $('#imageInput').addEventListener('change',e=>{addImageFiles(e.target.files);e.target.value=''});
-$('#imageGrid').addEventListener('dragstart',e=>{const item=e.target.closest('[data-image-index]');if(!item)return;item.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/x-sd-image-index',item.dataset.imageIndex)});
+$('#imageGrid').addEventListener('dragstart',e=>{const item=e.target.closest('[data-image-index]');if(busy||!item)return;item.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/x-sd-image-index',item.dataset.imageIndex)});
 $('#imageGrid').addEventListener('dragend',e=>e.target.closest('[data-image-index]')?.classList.remove('dragging'));
-$('#imageGrid').addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/x-sd-image-index'))e.preventDefault()});
-$('#imageGrid').addEventListener('drop',e=>{const target=e.target.closest('[data-image-index]');if(!target||!e.dataTransfer.types.includes('text/x-sd-image-index'))return;e.preventDefault();const from=Number(e.dataTransfer.getData('text/x-sd-image-index')),to=Number(target.dataset.imageIndex);if(Number.isInteger(from)&&Number.isInteger(to)&&from>=0&&from<gallery.length&&to>=0&&to<gallery.length&&from!==to){const [item]=gallery.splice(from,1);gallery.splice(to,0,item);renderGallery()}});
-const imageDropZone=$('#imageDropZone');['dragenter','dragover'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(e.dataTransfer?.types?.includes('Files')){e.preventDefault();imageDropZone.classList.add('is-dragover')}}));['dragleave','drop'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(type==='drop'&&e.dataTransfer?.files?.length){e.preventDefault();addImageFiles(e.dataTransfer.files)}imageDropZone.classList.remove('is-dragover')}));
+$('#imageGrid').addEventListener('dragover',e=>{if(!busy&&e.dataTransfer.types.includes('text/x-sd-image-index'))e.preventDefault()});
+$('#imageGrid').addEventListener('drop',e=>{const target=e.target.closest('[data-image-index]');if(busy||!target||!e.dataTransfer.types.includes('text/x-sd-image-index'))return;e.preventDefault();const from=Number(e.dataTransfer.getData('text/x-sd-image-index')),to=Number(target.dataset.imageIndex);if(Number.isInteger(from)&&Number.isInteger(to)&&from>=0&&from<gallery.length&&to>=0&&to<gallery.length&&from!==to){const [item]=gallery.splice(from,1);gallery.splice(to,0,item);renderGallery()}});
+const imageDropZone=$('#imageDropZone');['dragenter','dragover'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(e.dataTransfer?.types?.includes('Files')){e.preventDefault();imageDropZone.classList.add('is-dragover')}}));['dragleave','drop'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(type==='drop'&&!busy&&e.dataTransfer?.files?.length){e.preventDefault();addImageFiles(e.dataTransfer.files)}imageDropZone.classList.remove('is-dragover')}));
 async function optimizeUpload(file){if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Ảnh gốc cần là JPEG, PNG hoặc WebP.');if(file.size>20*1024*1024)throw Error('Ảnh gốc vượt giới hạn 20 MB.');let bitmap;try{bitmap=await createImageBitmap(file)}catch{throw Error(`Không đọc được ảnh ${file.name}.`)}const scale=Math.min(1,1800/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext('2d',{alpha:false});ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.88));if(!blob||blob.size>5*1024*1024)throw Error(`Ảnh ${file.name} vượt giới hạn 5 MB sau tối ưu.`);const body=new FormData();body.append('file',blob,'product.webp');body.append('original',file,file.name||'original');return (await api('/api/admin/upload',{method:'POST',body})).url}
-$('#productForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;const b=$('#saveProduct');b.disabled=true;b.textContent='Đang lưu…';err($('#saveError'),'');try{if(!$('#pTitle').value.trim()||!$('#pCategory').value.trim())throw Error('Vui lòng nhập tên và chọn danh mục.');const id=$('#pId').value;for(const g of gallery){if(g.file){g.url=await optimizeUpload(g.file);g.file=null;g.temporary=false}}const payload={title:$('#pTitle').value.trim(),category:$('#pCategory').value.trim(),categoryLabel:$('#pCategory').value.trim(),description:$('#pDescription').value,price:$('#pPrice').value===''?null:Number($('#pPrice').value),stock:$('#pStock').value===''?null:Number($('#pStock').value),published:$('#pPublished').checked,images:gallery.map(g=>g.url)};const result=await api(id?`/api/admin/products/${encodeURIComponent(id)}`:'/api/admin/products',{method:id?'PUT':'POST',body:JSON.stringify(payload)});await loadData();closeEditor(true);render();toast(result.message||'Đã lưu sản phẩm.')}catch(ex){err($('#saveError'),ex.message)}finally{busy=false;b.disabled=false;b.textContent='Lưu sản phẩm'}});
+$('#productForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(busy)return;
+  busy=true;
+  $('#imageInput').disabled=true;
+  renderGallery();
+  const b=$('#saveProduct');
+  b.disabled=true;
+  b.textContent='Đang lưu…';
+  err($('#saveError'),'');
+  try{
+    if(!$('#pTitle').value.trim()||!$('#pCategory').value.trim())throw Error('Vui lòng nhập tên và chọn danh mục.');
+    const id=$('#pId').value;
+    for(const g of gallery){
+      if(!g.file)continue;
+      const fileName=g.file.name||'ảnh đã chọn';
+      const previewUrl=g.url;
+      try{
+        const uploadedUrl=await optimizeUpload(g.file);
+        if(typeof uploadedUrl!=='string'||!/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(uploadedUrl)){
+          throw Error('Máy chủ không trả đường dẫn ảnh /media/ hợp lệ.');
+        }
+        if(g.temporary&&/^blob:/i.test(previewUrl))URL.revokeObjectURL(previewUrl);
+        g.url=uploadedUrl;
+        g.file=null;
+        g.temporary=false;
+        renderGallery();
+      }catch(uploadError){
+        throw Error('Tải ảnh "'+fileName+'" thất bại: '+String(uploadError?.message||'Lỗi không xác định.')+' Ảnh chưa tải xong vẫn được giữ để bạn thử lại.');
+      }
+    }
+    const payload={
+      title:$('#pTitle').value.trim(),
+      category:$('#pCategory').value.trim(),
+      categoryLabel:$('#pCategory').value.trim(),
+      description:$('#pDescription').value,
+      price:$('#pPrice').value===''?null:Number($('#pPrice').value),
+      stock:$('#pStock').value===''?null:Number($('#pStock').value),
+      published:$('#pPublished').checked,
+      images:gallery.map(g=>g.url)
+    };
+    let result;
+    try{
+      result=await api(id?'/api/admin/products/'+encodeURIComponent(id):'/api/admin/products',{method:id?'PUT':'POST',body:JSON.stringify(payload)});
+    }catch(saveError){
+      const detail=String(saveError?.message||'Lỗi không xác định.');
+      const isD1=/D1|database|cơ sở dữ liệu|SQLITE|no such column/i.test(detail);
+      const hasR2Images=gallery.some(g=>typeof g.url==='string'&&g.url.startsWith('/media/'));
+      throw Error((isD1?'Không lưu được sản phẩm vào D1: ':'Không lưu được sản phẩm trên máy chủ: ')+detail+(hasR2Images?' Các đường dẫn ảnh đã tải lên vẫn được giữ trong biểu mẫu; không tự động xóa ảnh khỏi R2.':''));
+    }
+    try{
+      await loadData();
+    }catch(refreshError){
+      err($('#saveError'),'Đã lưu sản phẩm nhưng chưa làm mới được danh sách: '+String(refreshError?.message||'Lỗi tải dữ liệu.')+' Hãy tải lại danh sách để xác minh.');
+      return;
+    }
+    closeEditor(true);
+    render();
+    toast(result.message||'Đã lưu sản phẩm.');
+  }catch(ex){
+    err($('#saveError'),String(ex?.message||'Đã xảy ra lỗi không xác định.'));
+  }finally{
+    busy=false;
+    if(!$('#backdrop').classList.contains('hidden'))renderGallery();
+    b.disabled=false;
+    $('#imageInput').disabled=false;
+    b.textContent='Lưu sản phẩm';
+  }
+});
 $('#deleteProduct').addEventListener('click',async()=>{if(!editing)return;if(!confirm(`Bạn chắc chắn muốn xóa “${editing.title}” (SKU ${editing.sku})? Thao tác này không thể hoàn tác nếu chưa có bản sao lưu.`))return;busy=true;$('#deleteProduct').disabled=true;try{const r=await api(`/api/admin/products/${encodeURIComponent(editing.id)}`,{method:'DELETE'});await loadData();closeEditor(true);render();toast(r.message)}catch(e){err($('#saveError'),e.message)}finally{busy=false;$('#deleteProduct').disabled=false}});
 async function saveWatermarkSettings(e){e.preventDefault();const b=$('#saveWatermarkSettings'),m=$('#watermarkSaveMessage');b.disabled=true;m.textContent='Đang lưu…';try{const payload={watermarkEnabled:$('#watermarkEnabled').checked,watermarkPosition:$('#watermarkPosition').value,watermarkSize:Number($('#watermarkSize').value),watermarkOpacity:Number($('#watermarkOpacity').value)};const result=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});settings={...settings,...payload};m.textContent=result.message||'Đã lưu cài đặt watermark.';toast(m.textContent)}catch(ex){m.textContent=ex.message;toast(ex.message)}finally{b.disabled=false}}
 async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcomeSettings'),m=$('#welcomeSaveMessage');b.disabled=true;m.textContent='Đang lưu…';try{const payload={welcomeEnabled:$('#welcomeEnabled').checked,welcomeTitleLine1:$('#welcomeLine1').value.trim(),welcomeTitleLine2:$('#welcomeLine2').value.trim(),welcomeText:$('#welcomeCopy').value.trim()};const result=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});settings={...settings,...payload};m.textContent=result.message||'Đã lưu. Nội dung sẽ áp dụng khi khách tải lại website.';toast(m.textContent)}catch(ex){m.textContent=ex.message}finally{b.disabled=false}}async function savePriceSetting(e){const c=e.target.checked;e.target.disabled=true;try{const r=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify({showPrices:c})});settings.showPrices=r.showPrices;render();toast(r.message)}catch(ex){e.target.checked=!c;toast(ex.message)}finally{if($('#showPrices'))$('#showPrices').disabled=false}}async function downloadBackup(){try{const d=await api('/api/admin/backup'),blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`sindarealest-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);toast('Đã tạo bản sao lưu dữ liệu D1. Tệp JSON không chứa tệp ảnh trong R2; hãy sao lưu các bucket R2 riêng.')}catch(e){toast(e.message)}}async function restoreBackup(e){const f=e.target.files?.[0];e.target.value='';if(!f)return;if(f.size>20*1024*1024){toast('Tệp sao lưu vượt 20 MB.');return}try{const backup=JSON.parse(await f.text()),v2=backup?.format==='sindarealest-backup-v2';const message=v2?'Khôi phục v2 sẽ thay thế danh mục, đơn hàng, khách hàng, bảo hành và nhật ký hiện tại. Tệp JSON không chứa tệp ảnh trong R2; các object ảnh phải còn trong bucket. Bạn đã tải bản sao lưu mới nhất và muốn tiếp tục?':'Bản sao lưu cũ chỉ khôi phục danh mục và cài đặt, không thay thế dữ liệu vận hành. Tệp JSON không chứa tệp ảnh trong R2. Bạn muốn tiếp tục?';if(!confirm(message))return;const d=await api('/api/admin/restore',{method:'POST',body:JSON.stringify(backup)});await loadData();render();toast(d.message)}catch(ex){toast(ex.message||'Không đọc được tệp sao lưu.')}}
