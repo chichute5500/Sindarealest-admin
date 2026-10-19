@@ -229,3 +229,16 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Source/test validation: [SUCCESS — run 39197993223](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197993223).
 - Đánh giá vẫn **80%**. Kết quả này củng cố các luồng tương tác và responsive nhưng không thay thế đối chiếu pixel với ảnh mẫu, thử trên Android thật hay xác minh backend production. Các mục chặn 100% trong phần trước vẫn còn nguyên.
 
+
+
+## Cập nhật ảnh trạng thái tài khoản và thumbnail — preview 133
+
+- Code SHA: `32199a3f60200fb038143b4d3663eb728ab03c79`.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39198676697).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39198676769).
+- Artifact: `sindarealest-liquid-glass-preview-133.zip`, ID `12162787072`.
+- Preview 133: 52 screenshot, 73 interaction checks, `passed=true`, overflow 0, page errors 0, console errors 0, HTTP errors 0, failed requests 0, write requests 0, external requests blocked 0.
+- Bổ sung screenshot riêng ở Light/Dark cho ba màn hình tài khoản: sổ địa chỉ, sản phẩm yêu thích, lịch sử yêu cầu đặt hàng.
+- Phát hiện và xử lý thumbnail yêu thích chưa kịp tải lúc chụp: ảnh trong danh sách yêu thích chuyển sang `loading="eager"`; test mới chờ ảnh có `naturalWidth > 0`. Thumbnail thật đã load thành công trong cả Light và Dark.
+- Các luồng địa chỉ, prefill checkout, yêu thích, lịch sử đơn hàng và focus trap vẫn PASS. Checkout tiếp tục dùng fixture mock offline, không phải giao dịch/backend production.
+- Mức checklist vẫn **80%**. Chưa có căn cứ tăng lên 100% vì các blocker về pixel-diff đủ ảnh mẫu, tài sản/dữ liệu sản phẩm được xác nhận, Android vật lý và backend/thanh toán staging thật vẫn chưa giải quyết.
