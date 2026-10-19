@@ -89,11 +89,11 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: a4edc1f6fc6006e68105247df6a3dce3fba4f978
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39325621140
+- Tested commit: f1df95b5ea5d5fa7925df19a026a7d73434158ab
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39326220373
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/.
+- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/f1df95b5ea5d/screenshots/.
 - Deployed Preview: BLOCKED_CLOUDFLARE_ACCESS.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
