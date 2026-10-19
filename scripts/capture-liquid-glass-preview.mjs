@@ -237,14 +237,64 @@ try {
     audit.interactions.push({ theme, check: 'manual-theme-toggle-round-trip', pass: togglePass });
     if (!togglePass) hardFailures.push('Theme toggle failed: ' + theme);
 
-    await page.locator('#catalogGrid .product-open').first().click();
+    // Choose an existing catalog item with a real multi-image gallery instead of testing a single-image item.
+    const galleryOpen = page.locator('#catalogGrid .product-card[data-product="sneakers-new-sneaker-contrast"] .product-open');
+    await galleryOpen.waitFor({ state: 'visible' });
+    await galleryOpen.click();
     const detail = page.locator('#productOverlay.open');
     await detail.waitFor({ state: 'visible' });
     await settle(page);
+    const galleryState = await page.evaluate(() => ({
+      dialogSemantics: document.querySelector('#productOverlay')?.getAttribute('role') === 'dialog'
+        && document.querySelector('#productOverlay')?.getAttribute('aria-modal') === 'true'
+        && document.querySelector('#productOverlay')?.getAttribute('aria-hidden') === 'false'
+        && !document.querySelector('#productOverlay')?.hasAttribute('inert'),
+      focusOnClose: document.activeElement?.id === 'detailClose',
+      sku: document.querySelector('#detailSku')?.textContent || '',
+      url: location.pathname,
+      thumbnailCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
+    }));
+    const expectedRoute = galleryState.url === '/san-pham/SD004';
+    const galleryBasePass = galleryState.dialogSemantics && galleryState.focusOnClose && galleryState.sku.includes('SD004') && expectedRoute && galleryState.thumbnailCount >= 2;
+    audit.interactions.push({ theme, check: 'open-multi-image-detail-and-route', pass: galleryBasePass, result: galleryState });
+    if (!galleryBasePass) hardFailures.push('Multi-image detail route/dialog did not open correctly: ' + theme);
+    const firstThumbSrc = await page.locator('#detailThumbs .detail-thumb').first().locator('img').getAttribute('src');
+    const secondThumbSrc = await page.locator('#detailThumbs .detail-thumb').nth(1).locator('img').getAttribute('src');
+    await page.locator('#detailThumbs .detail-thumb').nth(1).click();
+    await page.waitForFunction((expected) => document.querySelector('#detailMainImage')?.getAttribute('src') === expected, secondThumbSrc);
+    const secondImageSelected = await page.locator('#detailMainImage').getAttribute('src') === secondThumbSrc
+      && await page.locator('#detailThumbs .detail-thumb').nth(1).getAttribute('class').then(v => v.includes('active'));
+    audit.interactions.push({ theme, check: 'product-thumbnail-changes-main-image', pass: secondImageSelected, result: { firstThumbSrc, secondThumbSrc, active: secondImageSelected } });
+    if (!secondImageSelected) hardFailures.push('Selecting a gallery thumbnail did not change the main image: ' + theme);
+    await page.locator('#detailThumbs .detail-thumb').first().click();
+    await page.waitForFunction((expected) => document.querySelector('#detailMainImage')?.getAttribute('src') === expected, firstThumbSrc);
+    await page.locator('#detailZoom').click();
+    await page.locator('#sdFullscreenViewer.open').waitFor({ state: 'visible' });
+    await settle(page);
+    const fullscreenState = await page.evaluate(() => ({
+      dialogSemantics: document.querySelector('#sdFullscreenViewer')?.getAttribute('role') === 'dialog'
+        && document.querySelector('#sdFullscreenViewer')?.getAttribute('aria-modal') === 'true'
+        && document.querySelector('#sdFullscreenViewer')?.getAttribute('aria-hidden') === 'false'
+        && !document.querySelector('#sdFullscreenViewer')?.hasAttribute('inert'),
+      focusOnClose: document.activeElement?.id === 'sdFullscreenClose',
+    }));
+    const fullscreenPass = fullscreenState.dialogSemantics && fullscreenState.focusOnClose;
+    audit.interactions.push({ theme, check: 'fullscreen-gallery-dialog-and-focus', pass: fullscreenPass, result: fullscreenState });
+    if (!fullscreenPass) hardFailures.push('Fullscreen product gallery dialog state failed: ' + theme);
+    await capture(page, 'fullscreen-detail-mobile-' + theme + '.jpg');
+    await page.keyboard.press('Escape');
+    await page.locator('#sdFullscreenViewer.open').waitFor({ state: 'hidden' });
+    const fullscreenClosedAndDetailRemains = await page.locator('#productOverlay.open').count() === 1
+      && await page.locator('#sdFullscreenViewer').evaluate(el => el.hasAttribute('inert') && el.getAttribute('aria-hidden') === 'true');
+    audit.interactions.push({ theme, check: 'escape-closes-fullscreen-only', pass: fullscreenClosedAndDetailRemains });
+    if (!fullscreenClosedAndDetailRemains) hardFailures.push('Escape did not close only the fullscreen viewer: ' + theme);
     await capture(page, 'detail-mobile-' + theme + '.jpg');
-    audit.interactions.push({ theme, check: 'open-product-detail', pass: true });
     await page.keyboard.press('Escape');
     await page.locator('#productOverlay.open').waitFor({ state: 'hidden' });
+    await page.waitForFunction(() => !location.pathname.startsWith('/san-pham/'));
+    const detailClosedAndInert = await page.locator('#productOverlay').evaluate(el => el.hasAttribute('inert') && el.getAttribute('aria-hidden') === 'true');
+    audit.interactions.push({ theme, check: 'escape-closes-detail-and-restores-route', pass: detailClosedAndInert });
+    if (!detailClosedAndInert) hardFailures.push('Product detail did not close or restore route: ' + theme);
 
     await page.locator('#catalogGrid .mini-add').first().click();
     await page.locator('#catalogGrid .mini-add').nth(1).click();
