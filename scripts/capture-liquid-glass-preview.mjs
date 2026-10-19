@@ -184,6 +184,49 @@ try {
 
     const response = await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     if (!response || !response.ok()) throw new Error('Local storefront failed to load: ' + theme);
+
+    // Audit and capture the real intro before the page's 2.5s auto-dismiss.
+    await page.setViewportSize({ width: 390, height: 844 });
+    const splash = page.locator('#welcomeSplash');
+    await splash.waitFor({ state: 'visible' });
+    const logoLoaded = await page.waitForFunction(() => {
+      const logo = document.querySelector('#welcomeSplash .welcome-logo');
+      return !!logo && logo.complete && logo.naturalWidth > 0;
+    }, null, { timeout: 1800 }).then(() => true).catch(() => false);
+    const splashState = await page.evaluate(() => {
+      const node = document.querySelector('#welcomeSplash');
+      if (!node) return null;
+      const rect = node.getBoundingClientRect();
+      const lightTexture = node.querySelector('.welcome-texture--light');
+      const darkTexture = node.querySelector('.welcome-texture--dark');
+      return {
+        role: node.getAttribute('role'),
+        modal: node.getAttribute('aria-modal'),
+        label: node.getAttribute('aria-label'),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height),
+        viewportWidth: innerWidth,
+        viewportHeight: innerHeight,
+        title: node.querySelector('#welcomeTitleLine1')?.textContent || '',
+        hasSkip: !!node.querySelector('#skipIntro'),
+        lightTextureOpacity: lightTexture ? getComputedStyle(lightTexture).opacity : null,
+        darkTextureOpacity: darkTexture ? getComputedStyle(darkTexture).opacity : null,
+      };
+    });
+    const splashPass = !!splashState
+      && splashState.role === 'dialog'
+      && splashState.modal === 'true'
+      && !!splashState.label
+      && splashState.width >= splashState.viewportWidth - 1
+      && splashState.height >= splashState.viewportHeight - 1
+      && !!splashState.title.trim()
+      && splashState.hasSkip
+      && logoLoaded;
+    audit.interactions.push({ theme, check: 'welcome-splash-fullscreen-brand-and-dismiss-control', pass: splashPass, result: { ...splashState, logoLoaded } });
+    if (!splashPass) hardFailures.push('Welcome splash missing accessible full-screen bounds, brand logo, title or skip control: ' + theme);
+    await capture(page, 'welcome-splash-' + theme + '.jpg');
+    await page.evaluate(() => window.__sdDismissWelcome?.());
+    await page.waitForFunction(() => !document.querySelector('#welcomeSplash'), null, { timeout: 2000 }).catch(() => {});
     await page.locator('#catalogGrid .product-card').first().waitFor({ state: 'visible' });
     await page.waitForTimeout(3600);
     await settle(page);
