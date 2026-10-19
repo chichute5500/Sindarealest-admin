@@ -303,9 +303,10 @@ try {
     // Verify price visibility logic using an in-memory-only clone. The synthetic amount is
     // never written to fixture files, submitted to an API, or captured in a screenshot.
     const priceVisibility = await page.evaluate(() => {
-      const index = products.findIndex(p => p && (p.id || p.slug) && Array.isArray(p.images));
-      if (index < 0) return { eligibleCardFound: false };
-      const base = products[index];
+      const productEntries = Array.isArray(products) ? products.map((p, i) => [i, p]) : Object.entries(products || {});
+      const entry = productEntries.find(([, p]) => p && (p.id || p.slug) && Array.isArray(p.images));
+      if (!entry) return { eligibleCardFound: false };
+      const [productKey, base] = entry;
       const getCardPrice = markup => {
         const holder = document.createElement('div');
         holder.innerHTML = markup;
@@ -322,18 +323,18 @@ try {
       const maskedHidden = getCardPrice(productCard(masked)) === ''
         && getCardPrice(featuredProductCard(masked)) === '';
 
-      products[index] = confirmed;
+      products[productKey] = confirmed;
       openDetail(confirmed.id || confirmed.slug);
       const detailConfirmed = !document.querySelector('#detailPrice')?.hidden
         && document.querySelector('#detailPrice')?.textContent === confirmedLabel;
       closeDetail(false, false);
 
-      products[index] = masked;
+      products[productKey] = masked;
       openDetail(masked.id || masked.slug);
       const detailMasked = !!document.querySelector('#detailPrice')?.hidden
         && document.querySelector('#detailPrice')?.textContent === '';
       closeDetail(false, false);
-      products[index] = base;
+      products[productKey] = base;
 
       return { eligibleCardFound: true, confirmedCard, confirmedFeatured, unconfirmedHidden, maskedHidden, detailConfirmed, detailMasked };
     });
