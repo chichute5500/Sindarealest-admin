@@ -50,7 +50,11 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
 
   page.on('pageerror', error => pageErrors.push(error.message.slice(0, 300)));
   page.on('console', message => {
-    if (message.type() === 'error') consoleErrors.push(message.text().slice(0, 300));
+    if (message.type() !== 'error') return;
+    const text = message.text();
+    // Expected: the intentionally stubbed session endpoint returns 401 on this unauthenticated baseline.
+    if (text === 'Failed to load resource: the server responded with a status of 401 (Unauthorized)') return;
+    consoleErrors.push(text.slice(0, 300));
   });
   page.on('requestfailed', request => {
     const url = safePath(request.url());
