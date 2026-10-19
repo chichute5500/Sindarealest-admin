@@ -24,90 +24,105 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
   const consoleErrors = [];
   const failedRequests = [];
   const httpErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message.slice(0, 300)));
-  page.on('console', message => {
-    if (message.type() === 'error') consoleErrors.push(message.text().slice(0, 300));
-  });
-  page.on('requestfailed', request => {
-    const url = new URL(request.url());
-    if (url.pathname !== '/api/admin/session') {
-      failedRequests.push({ url: url.origin + url.pathname, error: (request.failure()?.errorText || 'failed').slice(0, 180) });
+  const safePath = value => {
+    try {
+      const url = new URL(value);
+      return url.origin + url.pathname;
+    } catch {
+      return '[unparseable URL]';
     }
-  });
-  page.on('response', response => {
-    const url = new URL(response.url());
-    if (response.status() >= 400 && url.pathname !== '/api/admin/session') {
-      httpErrors.push({ url: url.origin + url.pathname, status: response.status() });
-    }
-  });
-
-  // Keep this a genuine local source-page test without a live backend or
-  // business data: only the session check is stubbed to return unauthenticated.
-  await page.route('**/api/admin/session', route => route.fulfill({
-    status: 401,
-    contentType: 'application/json',
-    body: JSON.stringify({ error: 'Chưa đăng nhập' })
-  }));
-
-  await page.setViewportSize(viewportMatrix[3]);
-  const response = await page.goto(localAdminUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
-  expect(response?.status(), 'Local static ADMIN page should load').toBe(200);
-  await expect(page.locator('#loginView')).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator('#loginForm')).toBeVisible();
-  await expect(page.locator('#password')).toHaveAttribute('type', 'password');
-  await expect(page.locator('#appView')).toBeHidden();
-  await expect(page.locator('#adminThemeToggle')).toBeVisible();
-
+  };
   const metadata = {
     test: 'local-static-admin-baseline',
     sourceCommit: sourceSha,
     capturedAt: new Date().toISOString(),
-    route: new URL(localAdminUrl).pathname,
+    route: safePath(localAdminUrl).replace(/^https?:\/\/[^/]+/, '') || '/',
     screenshots: [],
     viewportMatrix,
     metrics: [],
     pageErrors,
     consoleErrors,
     failedRequests,
-    httpErrors
+    httpErrors,
+    completed: false,
+    failure: null
   };
 
-  for (const viewport of viewportMatrix) {
-    await page.setViewportSize(viewport);
-    for (const theme of ['light', 'dark']) {
-      const expectedTheme = theme;
-      const currentTheme = await page.locator('html').getAttribute('data-admin-theme');
-      if (currentTheme !== expectedTheme) {
-        await page.locator('#adminThemeToggle').click();
-      }
-      await expect(page.locator('html')).toHaveAttribute('data-admin-theme', expectedTheme);
-      await expect(page.locator('#loginView')).toBeVisible();
-
-      const metrics = await page.evaluate(() => ({
-        title: document.title,
-        lang: document.documentElement.lang,
-        theme: document.documentElement.dataset.adminTheme || null,
-        viewportWidth: window.innerWidth,
-        viewportHeight: window.innerHeight,
-        documentWidth: document.documentElement.scrollWidth,
-        horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
-      }));
-      metadata.metrics.push(metrics);
-
-      const filename = `admin-login__${viewport.width}x${viewport.height}__${theme}.png`;
-      await page.screenshot({ path: join(screenshotDir, filename), fullPage: true });
-      metadata.screenshots.push(filename);
-
-      expect(metrics.lang, 'ADMIN should declare Vietnamese').toBe('vi');
-      expect(metrics.horizontalOverflow, `No horizontal overflow at ${viewport.width}px in ${theme} mode`).toBe(false);
+  page.on('pageerror', error => pageErrors.push(error.message.slice(0, 300)));
+  page.on('console', message => {
+    if (message.type() === 'error') consoleErrors.push(message.text().slice(0, 300));
+  });
+  page.on('requestfailed', request => {
+    const url = safePath(request.url());
+    if (!url.endsWith('/api/admin/session')) {
+      failedRequests.push({ url, error: (request.failure()?.errorText || 'failed').slice(0, 180) });
     }
+  });
+  page.on('response', response => {
+    const url = safePath(response.url());
+    if (response.status() >= 400 && !url.endsWith('/api/admin/session')) {
+      httpErrors.push({ url, status: response.status() });
+    }
+  });
+
+  try {
+    // Use the real source HTML/CSS without a live backend or business data.
+    // Only the unauthenticated session check is stubbed; no business API is mocked.
+    await page.route('**/api/admin/session', route => route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ error: 'Chưa đăng nhập' })
+    }));
+
+    await page.setViewportSize(viewportMatrix[3]);
+    const response = await page.goto(localAdminUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
+    expect(response?.status(), 'Local static ADMIN page should load').toBe(200);
+    await expect(page.locator('#loginView')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#loginForm')).toBeVisible();
+    await expect(page.locator('#password')).toHaveAttribute('type', 'password');
+    await expect(page.locator('#appView')).toBeHidden();
+    await expect(page.locator('#adminThemeToggle')).toBeVisible();
+
+    for (const viewport of viewportMatrix) {
+      await page.setViewportSize(viewport);
+      for (const theme of ['light', 'dark']) {
+        const currentTheme = await page.locator('html').getAttribute('data-admin-theme');
+        if (currentTheme !== theme) await page.locator('#adminThemeToggle').click();
+        await expect(page.locator('html')).toHaveAttribute('data-admin-theme', theme);
+        await expect(page.locator('#loginView')).toBeVisible();
+
+        const metrics = await page.evaluate(() => ({
+          title: document.title,
+          lang: document.documentElement.lang,
+          theme: document.documentElement.dataset.adminTheme || null,
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+          documentWidth: document.documentElement.scrollWidth,
+          horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
+        }));
+        metadata.metrics.push(metrics);
+
+        const filename = `admin-login__${viewport.width}x${viewport.height}__${theme}.png`;
+        await page.screenshot({ path: join(screenshotDir, filename), fullPage: true });
+        metadata.screenshots.push(filename);
+
+        expect(metrics.lang, 'ADMIN should declare Vietnamese').toBe('vi');
+        expect(metrics.horizontalOverflow, `No horizontal overflow at ${viewport.width}px in ${theme} mode`).toBe(false);
+      }
+    }
+
+    expect(pageErrors, 'ADMIN source should not throw browser runtime errors').toEqual([]);
+    metadata.completed = true;
+  } catch (error) {
+    metadata.failure = String(error?.message || error).slice(0, 1200);
+    throw error;
+  } finally {
+    // Preserve partial diagnostics even when a viewport assertion or screenshot fails.
+    metadata.capturedAt = new Date().toISOString();
+    metadata.pageErrors = pageErrors;
+    metadata.consoleErrors = consoleErrors;
+    metadata.failedRequests = failedRequests;
+    metadata.httpErrors = httpErrors;
+    writeFileSync(join(outputDir, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n');
   }
-
-  metadata.pageErrors = pageErrors;
-  metadata.consoleErrors = consoleErrors;
-  metadata.failedRequests = failedRequests;
-  metadata.httpErrors = httpErrors;
-  writeFileSync(join(outputDir, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n');
-
-  expect(pageErrors, 'ADMIN source should not throw browser runtime errors').toEqual([]);
 });
