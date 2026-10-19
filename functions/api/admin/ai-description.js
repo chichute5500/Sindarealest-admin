@@ -69,8 +69,20 @@ export async function onRequestPost(context) {
     description = description.slice(0, 10000);
     if (!description) return fail("AI chưa tạo được mô tả. Vui lòng thử lại.", 502);
     return json({ ok: true, description });
-  } catch {
-    return fail("Không kết nối được dịch vụ AI. Hãy kiểm tra binding AI hoặc khóa dịch vụ đã cấu hình.", 502);
+  } catch (error) {
+    // Return a useful, sanitized category without exposing provider payloads,
+    // tokens, request headers, or internal account details.
+    const detail = String(error?.message || error || "").toLowerCase();
+    if (/timeout|timed out|deadline exceeded|aborted/.test(detail)) {
+      return fail("Dịch vụ AI phản hồi quá thời gian cho phép. Vui lòng thử lại sau.", 504);
+    }
+    if (/quota|rate.?limit|too many requests|resource exhausted/.test(detail)) {
+      return fail("Dịch vụ AI đã đạt hạn mức. Vui lòng kiểm tra quota và thử lại sau.", 429, { "Retry-After": "60" });
+    }
+    if (/403|401|unauthori[sz]ed|forbidden|permission|authentication|not authorized/.test(detail)) {
+      return fail("Workers AI từ chối quyền truy cập. Kiểm tra binding AI, quyền tài khoản Cloudflare và model được cấu hình trong môi trường Preview.", 503);
+    }
+    return fail("Không kết nối được dịch vụ AI. Kiểm tra binding AI hoặc khóa dịch vụ; chi tiết nội bộ đã được giữ kín.", 502);
   }
 }
 
