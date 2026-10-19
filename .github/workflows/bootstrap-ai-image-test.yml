@@ -363,7 +363,26 @@ jobs:
               });
               const fakeDB = {
                 prepare(sql) {
-                  return { sql, bind() { return this; }, async run() { return { meta: { changes: 1 } }; }, async first() { return null; }, async all() { return { results: [] }; } };
+                  return { sql, args: [], bind(...args) { this.args = args; return this; }, async run() { return { meta: { changes: 1 } }; }, async first() { return null; }, async all() {
+                    if (sql.includes("FROM image_group_index WHERE image_key IN")) {
+                      const identicalBytes = imageData.length === 2 && imageData[0].dataUrl === imageData[1].dataUrl;
+                      const positiveFixture = imageKeys.every(key => key.startsWith("test-fixtures/") && !key.startsWith("test-fixtures/negative/"));
+                      const similar = identicalBytes || positiveFixture;
+                      const shapeA = Array(64).fill(0.9), shapeB = Array(64).fill(0.05);
+                      const colorsA = [1,0,0,0,1,0,0,0,0,0,1,0], colorsB = [0,0,0,1,0,0,0,1,1,0,0,0];
+                      return { results: imageKeys.map((key, index) => ({
+                        image_key: key,
+                        p_hash: similar ? "0011223344556677" : (index === 0 ? "0000000000000000" : "ffffffffffffffff"),
+                        features_json: JSON.stringify({
+                          category: "sneaker", categoryStatus: "classified", categoryConfidence: 95,
+                          shape: similar ? Array(64).fill(0.5) : (index === 0 ? shapeA : shapeB),
+                          colors: similar ? colorsA : (index === 0 ? colorsA : colorsB),
+                          contentHash: identicalBytes ? "a".repeat(64) : (index === 0 ? "b".repeat(64) : "c".repeat(64))
+                        })
+                      })) };
+                    }
+                    return { results: [] };
+                  } };
                 },
                 async batch() { return [{ meta: { changes: 1 } }, { results: [{ attempts: 1 }] }]; }
               };
