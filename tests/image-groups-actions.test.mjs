@@ -298,8 +298,9 @@ assert.equal(manualOverride.status, 200, "audited manual review must retain the 
 assert.equal(sqlite.prepare("SELECT status FROM image_group_sets WHERE id=?").get(manualOverrideId).status, "approved");
 
 
-assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND rationale LIKE '%giày thể thao%'").get().count, 0,
-  "a mixed-category proposal must never enter the pending queue");
+const mixedGroupFingerprint = await hashGroup(["mixed-shoe.webp", "mixed-watch-strap.webp"]);
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=? AND status='pending'").get(mixedGroupFingerprint).count, 0,
+  "the specific mixed-category proposal must never enter the pending queue");
 
 // Regressions: reject split/merge/move if a claim is missing or points at another group.
 ids.badSplit = crypto.randomUUID();
