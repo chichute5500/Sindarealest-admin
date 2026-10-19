@@ -122,6 +122,14 @@ async function loadImageGroups(options={}) {
   imageSimilarityGroups=first?.groups||[];
   imageReviews=first?.reviews||[];
 }
+function readImageGroupIdentityMeta(rationale){
+  const text=String(rationale||"");
+  if(!text.startsWith("[[AI_IDENTITY_V1]]"))return null;
+  const newline=text.indexOf("\n");if(newline<0)return null;
+  try{const value=JSON.parse(text.slice("[[AI_IDENTITY_V1]]".length,newline));if(!value||typeof value!=="object")return null;return{status:["verified","review_required","unverified"].includes(value.status)?value.status:"unverified",confidence:value.confidence===null||value.confidence===undefined?null:(Number.isFinite(Number(value.confidence))?Number(value.confidence):null),reason:String(value.reason||"").slice(0,700)}}catch{return null}
+}
+function stripImageGroupIdentityMeta(rationale){const text=String(rationale||"");if(!text.startsWith("[[AI_IDENTITY_V1]]"))return text.trim();const newline=text.indexOf("\n");return newline<0?"":text.slice(newline+1).trim()}
+function hasImageIdentityDescriptor(value){const text=String(value||"").trim();return text.length>=48&&text.split(/[;|]/).map(part=>part.trim()).filter(Boolean).length>=5}
 function imageSimilarityPageStatus() {
   const current=new Set(imageInventory.map(item=>item.key));
   const indexed=new Set(imageIndexedRows.map(item=>item.image_key));
@@ -134,7 +142,7 @@ function imageGroupsPage(){
   const indexed=imageSimilarityPageStatus();
   const filtered=imageInventory.filter(item=>!imageSearch||String(item.key+" "+item.assignedTo.map(owner=>owner.sku+" "+owner.title).join(" ")).toLocaleLowerCase("vi").includes(imageSearch.toLocaleLowerCase("vi"))).slice(0,120);
   const indexedFeaturesByKey=new Map(imageIndexedRows.map(row=>{let features={};try{features=JSON.parse(row.features_json||"{}")}catch{}return [row.image_key,features]}));
-  const needsReviewCount=imageInventory.filter(item=>{const features=indexedFeaturesByKey.get(item.key);return !features||features.category==="unknown"||features.categoryStatus==="needs_review"}).length;
+  const needsReviewCount=imageInventory.filter(item=>{const features=indexedFeaturesByKey.get(item.key);return !features||features.category==="unknown"||features.categoryStatus==="needs_review"||!hasImageIdentityDescriptor(features.identityDescriptor)}).length;
   const status=imageGroupBusy?imageScanProgress:"Sẵn sàng quét toàn bộ kho; ảnh đã lập chỉ mục sẽ được tái sử dụng nếu không thay đổi.";
   const duplicateCards=imageExactDuplicateGroups.map(group=>{
     const thumbs=group.imageKeys.map(key=>{
@@ -146,12 +154,17 @@ function imageGroupsPage(){
   }).join("");
   const groupCards=pending.map(group=>{
     const members=(group.members||[]).map(member=>({...member,image:imageInventory.find(item=>item.key===member.key)}));
-    const categoryFromRationale=String(group.rationale||"").match(/Tầng 1 đã phân loại ảnh vào nhóm “([^”]+)”/i);
+    const identityMeta=readImageGroupIdentityMeta(group.rationale);
+    const aiVerified=identityMeta?.status==="verified"&&Number(identityMeta.confidence)>=91;
+    const identityTitle=aiVerified?"AI xác minh cùng mẫu sản phẩm":identityMeta?.status==="review_required"?"AI chưa xác nhận cùng sản phẩm — cần xem thủ công":"AI chưa xác minh — cần xem thủ công";
+    const identityReason=String(identityMeta?.reason||"Nhóm này chưa có kết luận AI hợp lệ.");
+    const humanRationale=stripImageGroupIdentityMeta(group.rationale);
+    const categoryFromRationale=String(humanRationale||"").match(/Tầng 1 đã phân loại ảnh vào nhóm “([^”]+)”/i);
     const categoryTitle=group.categoryLabel||(categoryFromRationale?categoryFromRationale[1]:"Chưa xác định");
     const preview=members.map(member=>member.image?'<div style="min-width:0"><label style="display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 0"><input type="checkbox" data-group-member-select="'+esc(group.id)+'" value="'+esc(member.key)+'">Chọn ảnh</label><img src="'+esc(member.image.url)+'" data-open-group-image alt="Chạm để xem ảnh lớn" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:contain;background:var(--paper);border:1px solid var(--line);border-radius:10px;cursor:zoom-in"><div class="tiny" style="overflow-wrap:anywhere;margin-top:4px">'+esc(member.key)+'</div><div class="tiny muted">Tương đồng '+Number(member.similarity||group.similarity||0)+'%</div></div>':'<div class="empty">Ảnh không còn trong kho: '+esc(member.key)+'</div>').join("");
     const options=products.map(product=>'<option value="'+esc(product.id)+'">'+esc(product.sku+" — "+product.title)+'</option>').join("");
     const groupOptions=pending.filter(other=>other.id!==group.id).map(other=>'<option value="'+esc(other.id)+'">'+esc("Nhóm "+other.id.slice(0,8))+'</option>').join("");
-    return '<article class="panel" style="margin-top:12px"><div class="switchrow"><label style="display:flex;align-items:center;gap:7px;font-size:11px;max-width:90px"><input type="checkbox" data-merge-group-select value="'+esc(group.id)+'">Chọn nhóm</label><div><b>NHÓM LOẠI: '+esc(categoryTitle)+'</b><div><b>BỘ ẢNH ĐỀ XUẤT · '+members.length+' ảnh</b></div><div class="tiny muted">Mức tương đồng tổng hợp: '+Number(group.similarity||0)+'% · '+esc(group.created_at||"")+'</div></div><span class="status unknown">Chờ duyệt</span></div><p class="tiny muted">'+esc(group.rationale||"Nhóm được tìm bằng chỉ mục hình ảnh toàn kho.")+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:10px 0">'+preview+'</div>'+(members.length>30?'<div class="callout">Nhóm có hơn 30 ảnh nên cần chia nhỏ trước khi gắn vào một bộ ảnh sản phẩm.</div>':'<div class="field"><label for="target-group-'+esc(group.id)+'">Bộ ảnh sản phẩm đích</label><select class="control" id="target-group-'+esc(group.id)+'">'+options+'</select></div>')+(members.length>=4?'<button class="btn" data-split-image-group="'+esc(group.id)+'">Tách ảnh đã chọn thành bộ mới</button>':'')+(groupOptions?'<div class="field"><label for="move-target-'+esc(group.id)+'">Chuyển 1 ảnh đã chọn sang nhóm</label><select class="control" id="move-target-'+esc(group.id)+'">'+groupOptions+'</select><button class="btn small" data-move-image-group="'+esc(group.id)+'">Chuyển ảnh</button></div>':'')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+(members.length<=30?'<button class="btn primary" data-approve-image-group="'+esc(group.id)+'">Duyệt và lưu nhóm vào bộ ảnh</button>':'')+'<button class="btn" data-reject-image-group="'+esc(group.id)+'">Loại nhóm</button></div></article>';
+    return '<article class="panel" style="margin-top:12px"><div class="switchrow"><label style="display:flex;align-items:center;gap:7px;font-size:11px;max-width:90px"><input type="checkbox" data-merge-group-select value="'+esc(group.id)+'">Chọn nhóm</label><div><b>NHÓM LOẠI: '+esc(categoryTitle)+'</b><div><b>BỘ ẢNH ĐỀ XUẤT · '+members.length+' ảnh</b></div><div class="tiny muted">Điểm tương đồng ảnh (chỉ lọc ứng viên, không phải xác suất cùng sản phẩm): '+Number(group.similarity||0)+'/100 · '+esc(group.created_at||"")+'</div></div><span class="status unknown">Chờ duyệt</span></div><div class="callout"><b>'+esc(identityTitle)+'</b>'+(identityMeta?.confidence!==null&&identityMeta?.confidence!==undefined?'<div class="tiny muted">Độ chắc chắn của verdict AI: '+Number(identityMeta.confidence)+'/100; đây không phải độ chính xác đã đo trên tập kiểm thử.</div>':'')+'<p class="tiny">'+esc(identityReason)+'</p></div><p class="tiny muted">'+esc(humanRationale||"Nhóm được tìm bằng chỉ mục hình ảnh toàn kho.")+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:10px 0">'+preview+'</div>'+(members.length>30?'<div class="callout">Nhóm có hơn 30 ảnh nên cần chia nhỏ trước khi gắn vào một bộ ảnh sản phẩm.</div>':'<div class="field"><label for="target-group-'+esc(group.id)+'">Bộ ảnh sản phẩm đích</label><select class="control" id="target-group-'+esc(group.id)+'">'+options+'</select></div>')+(members.length>=4?'<button class="btn" data-split-image-group="'+esc(group.id)+'">Tách ảnh đã chọn thành bộ mới</button>':'')+(groupOptions?'<div class="field"><label for="move-target-'+esc(group.id)+'">Chuyển 1 ảnh đã chọn sang nhóm</label><select class="control" id="move-target-'+esc(group.id)+'">'+groupOptions+'</select><button class="btn small" data-move-image-group="'+esc(group.id)+'">Chuyển ảnh</button></div>':'')+'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+'<button class="btn" data-recheck-image-group="'+esc(group.id)+'">Kiểm tra lại bằng AI</button>'+(members.length<=30?'<button class="btn primary" data-approve-image-group="'+esc(group.id)+'">'+(aiVerified?'Duyệt và lưu nhóm vào bộ ảnh':'Duyệt thủ công…')+'</button>':'')+'<button class="btn" data-reject-image-group="'+esc(group.id)+'">Loại nhóm</button></div></article>';
   }).join("");
   const legacyCards=imageReviews.filter(review=>review.status==="pending").map(review=>{
     const a=imageInventory.find(item=>item.key===review.image_a),b=imageInventory.find(item=>item.key===review.image_b);
@@ -160,12 +173,12 @@ function imageGroupsPage(){
   return `${head("Kho hình ảnh","Tìm ảnh tương đồng toàn kho","Quét toàn bộ object ảnh trong R2, tạo chỉ mục hình dạng/màu/hash rồi so sánh chéo toàn kho. Không giới hạn trong một nhóm 8 ảnh.",`<button class="btn" id="refreshImageGroups" ${imageGroupBusy?"disabled":""}>↻ Tải lại kho</button>`)}
     <section class="panel">
       <div class="switchrow"><div><b>${imageInventory.length.toLocaleString("vi-VN")} ảnh trong toàn kho</b><div class="tiny muted">${indexed.indexed.toLocaleString("vi-VN")}/${indexed.total.toLocaleString("vi-VN")} ảnh đã có chỉ mục · ${imageInventory.filter(item=>!item.assignedTo.length).length} ảnh chưa gắn SKU · ${needsReviewCount} ảnh cần xác nhận loại</div></div><span class="status ${imageInventory.length?"on":"unknown"}">${imageInventory.length?"Đã liệt kê toàn kho":"Chưa quét kho"}</span></div>
-      <p class="tiny muted">Hệ thống duyệt tất cả trang R2, lập chỉ mục từng ảnh, sau đó so sánh mọi cặp trong toàn kho — vì vậy ảnh ở đợt đầu vẫn có thể ghép với ảnh ở đợt sau. Điểm tương đồng dựa trên dấu vân tay cảm nhận, hình dạng vùng sản phẩm và phân bố màu sau chuẩn hóa nền; đây là điểm tương đồng ảnh, không phải xác suất cùng sản phẩm. Chỉ mục được lưu để lần sau xử lý nhanh hơn.</p>
+      <p class="tiny muted">Hệ thống duyệt toàn bộ R2, lập chỉ mục từng ảnh và dùng hash/hình dạng/màu chỉ để lọc ứng viên. Trước khi nhóm được xác nhận, Workers AI phải đối chiếu các mô tả đặc trưng riêng của từng ảnh và đánh giá đủ mọi cặp. Điểm tương đồng ảnh không phải xác suất cùng sản phẩm; nhóm chưa được AI xác minh vẫn cần người quản trị xem thủ công.</p>
       <div class="toolbar"><div class="field"><label for="imageSearch">Lọc ảnh trong danh sách xem trước</label><input id="imageSearch" class="control" value="${esc(imageSearch)}" placeholder="Tên file hoặc SKU…"></div><button class="btn primary" id="scanWholeImageInventory" ${imageGroupBusy||imageInventory.length<2?"disabled":""}>${imageGroupBusy?"Đang quét toàn kho…":"Quét toàn kho & tìm nhóm"}</button></div>
       <p id="imageScanProgress" class="tiny muted" role="status" aria-live="polite" style="white-space:pre-wrap;margin-top:10px">${esc(status)}</p>
       <div class="tiny muted" style="margin-top:6px">Đã kiểm tra ${Number(imageDiagnostics.scannedObjects||0).toLocaleString("vi-VN")} object R2 · Có ${Number(imageDiagnostics.nonImageObjects||0).toLocaleString("vi-VN")} object không phải ảnh raster được hỗ trợ. ${imageDiagnostics.assignmentsIncomplete?"Lưu ý: danh sách sản phẩm vượt 2.000 bản ghi nên ánh xạ SKU có thể chưa đầy đủ.":""}</div>
       <div class="toolbar" style="margin-top:12px"><b>Ảnh xem trước (${filtered.length} ảnh hiển thị tối đa)</b><span class="tiny muted">Không cần chọn ảnh thủ công</span></div>
-      <div class="image-grid-review">${filtered.map(item=>{const features=indexedFeaturesByKey.get(item.key)||{};const needsReview=!features.category||features.category==="unknown"||features.categoryStatus==="needs_review";const categoryLabels={sneaker:"Giày thể thao",loafer:"Giày lười",dress_shoe:"Giày tây",boot:"Bốt",sandal:"Sandal",belt:"Thắt lưng",wallet:"Ví",watch_strap:"Dây đồng hồ",watch:"Đồng hồ",bag:"Túi",other:"Khác",unknown:"Chưa xác định"};return '<div class="image-review-tile"><img src="'+esc(item.url)+'" loading="lazy" alt=""><span class="tiny" style="overflow-wrap:anywhere">'+esc(item.key)+'</span><span class="status '+(needsReview?"unknown":"on")+'">'+(needsReview?"Cần xác nhận loại":esc(categoryLabels[features.category]||features.category))+'</span><span class="tiny muted">AI: '+(Number.isInteger(Number(features.categoryConfidence))?Number(features.categoryConfidence):0)+'% · '+(needsReview?"không được gom tự động":"đã phân loại")+'</span><span class="status '+(item.assignedTo.length?"on":"unknown")+'">'+(item.assignedTo.length?esc(item.assignedTo.map(owner=>owner.sku).join(", ")):"Chưa gắn SKU")+'</span></div>'}).join("")||'<div class="empty">Không tìm thấy ảnh phù hợp.</div>'}</div>
+      <div class="image-grid-review">${filtered.map(item=>{const features=indexedFeaturesByKey.get(item.key)||{};const needsReview=!features.category||features.category==="unknown"||features.categoryStatus==="needs_review"||!hasImageIdentityDescriptor(features.identityDescriptor);const categoryLabels={sneaker:"Giày thể thao",loafer:"Giày lười",dress_shoe:"Giày tây",boot:"Bốt",sandal:"Sandal",belt:"Thắt lưng",wallet:"Ví",watch_strap:"Dây đồng hồ",watch:"Đồng hồ",bag:"Túi",other:"Khác",unknown:"Chưa xác định"};return '<div class="image-review-tile"><img src="'+esc(item.url)+'" loading="lazy" alt=""><span class="tiny" style="overflow-wrap:anywhere">'+esc(item.key)+'</span><span class="status '+(needsReview?"unknown":"on")+'">'+(needsReview?"Cần xác nhận loại":esc(categoryLabels[features.category]||features.category))+'</span><span class="tiny muted">AI: '+(Number.isInteger(Number(features.categoryConfidence))?Number(features.categoryConfidence):0)+'% · '+(needsReview?"không được gom tự động":"đã phân loại")+'</span><span class="status '+(item.assignedTo.length?"on":"unknown")+'">'+(item.assignedTo.length?esc(item.assignedTo.map(owner=>owner.sku).join(", ")):"Chưa gắn SKU")+'</span></div>'}).join("")||'<div class="empty">Không tìm thấy ảnh phù hợp.</div>'}</div>
     </section>
     <section class="panel" style="margin-top:16px"><h3>Nhật ký duyệt có thể hoàn tác</h3><p class="tiny muted">Hoàn tác sẽ đưa danh sách ảnh sản phẩm về snapshot trước lượt duyệt và đưa nhóm về trạng thái chờ duyệt. Nếu sản phẩm đã được chỉnh sửa tiếp, hệ thống sẽ từ chối để tránh mất thay đổi mới.</p>${undoCards||'<p class="muted">Không có lượt duyệt mới nào đủ snapshot để hoàn tác.</p>'}</section>
     <section class="panel" style="margin-top:16px"><h3>Ảnh trùng nội dung</h3><p class="tiny muted">Chỉ phát hiện khi hash SHA-256 của file gốc trùng hoàn toàn. Các bản sao được giữ nguyên; không có thao tác xóa tự động.</p>${duplicateCards||(imageExactDuplicateScanDone?'<p class="muted">Không phát hiện bản sao byte-for-byte trong lượt quét gần nhất.</p>':'<p class="muted">Chưa kiểm tra hash nội dung trong phiên này. Hãy chạy quét toàn kho để xác minh.</p>')}</section>
@@ -208,7 +221,8 @@ async function scanWholeImageInventory(){
           const decision=decisions.get(descriptor.key);
           descriptor.features.category=decision?.category||"unknown";
           descriptor.features.categoryConfidence=Number.isInteger(Number(decision?.confidence))?Math.max(0,Math.min(100,Number(decision.confidence))):0;
-          descriptor.features.categoryStatus=descriptor.features.category==="unknown"||decision?.status==="needs_review"?"needs_review":"classified";
+          descriptor.features.identityDescriptor=similarity.normalizeIdentityDescriptor(decision?.identityDescriptor||"");
+          descriptor.features.categoryStatus=descriptor.features.category==="unknown"||decision?.status==="needs_review"||!similarity.isIdentityDescriptorValid(descriptor.features.identityDescriptor)?"needs_review":"classified";
           delete descriptor.previewDataUrl;
           indexedByKey.set(descriptor.key,{image_key:descriptor.key,p_hash:descriptor.p_hash,features_json:JSON.stringify(descriptor.features),width:descriptor.width,height:descriptor.height,source_size:descriptor.sourceSize,source_uploaded:descriptor.sourceUploaded});
           pendingIndexWrites.push(descriptor);
@@ -230,7 +244,7 @@ async function scanWholeImageInventory(){
     const invalid=allDescriptors.filter(item=>!item);
     if(invalid.length)throw Error("Còn "+invalid.length+" ảnh chưa có chỉ mục do dữ liệu kho không đồng nhất. Hãy quét lại để hoàn tất.");
     if(allDescriptors.length<2)throw Error("Chỉ có "+allDescriptors.length+" ảnh đọc được; cần ít nhất 2 ảnh hợp lệ để so sánh.");
-    const result=await similarity.findSimilarGroups(allDescriptors,{threshold:91,onProgress:progress=>{
+    const result=await similarity.findSimilarGroups(allDescriptors,{threshold:80,onProgress:progress=>{
       imageScanProgress="Đang đối chiếu chéo toàn kho: "+Number(progress.done||0).toLocaleString("vi-VN")+"/"+Number(progress.total||0).toLocaleString("vi-VN")+" cặp · tìm được "+Number(progress.matches||0).toLocaleString("vi-VN")+" liên kết.";
       const el=$('#imageScanProgress');if(el)el.textContent=imageScanProgress;
     }});
@@ -240,19 +254,20 @@ async function scanWholeImageInventory(){
     imageExactDuplicateGroups=similarity.findExactDuplicateGroups(allDescriptors);
     imageExactDuplicateScanDone=true;
     let saved=0,skipped=0;
-    const oversizedGroups=groups.filter(group=>group.imageKeys.length>50);
-    const saveableGroups=groups.filter(group=>group.imageKeys.length<=50);
-    for(let offset=0;offset<saveableGroups.length;offset+=10){
-      const batch=saveableGroups.slice(offset,offset+10).map(group=>({imageKeys:group.imageKeys,similarity:group.similarity,rationale:group.rationale,members:group.members}));
+    const oversizedGroups=groups.filter(group=>group.imageKeys.length>8);
+    const saveableGroups=groups.filter(group=>group.imageKeys.length<=8);
+    let aiVerifiedSaved=0,aiNeedsReviewSaved=0,aiUnverifiedSaved=0;
+    for(let offset=0;offset<saveableGroups.length;offset+=2){
+      const batch=saveableGroups.slice(offset,offset+2).map(group=>({imageKeys:group.imageKeys,similarity:group.similarity,rationale:group.rationale,members:group.members}));
       const response=await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"save-groups",groups:batch})});
-      saved+=Number(response.saved||0);skipped+=Number(response.skipped||0);
+      saved+=Number(response.saved||0);skipped+=Number(response.skipped||0);aiVerifiedSaved+=Number(response.aiVerified||0);aiNeedsReviewSaved+=Number(response.aiNeedsReview||0);aiUnverifiedSaved+=Number(response.aiUnverified||0);
       imageScanProgress="Đang lưu nhóm đề xuất "+Math.min(offset+batch.length,saveableGroups.length)+"/"+saveableGroups.length+"…";
       const el=$("#imageScanProgress");if(el)el.textContent=imageScanProgress;
     }
     await loadImageGroups({refreshInventory:false});
     const failureNote=failureDetails.length?" Bỏ qua "+failureDetails.length+" ảnh không đọc được; ví dụ: "+failureDetails.slice(0,3).map(item=>item.key+" ("+item.error+")").join("; ")+".":"";
-    const largeNote=oversizedGroups.length?" "+oversizedGroups.length+" nhóm có trên 50 ảnh không được đưa vào hàng chờ để tránh lưu nhóm quá lớn; cần chia nhỏ trước khi duyệt.":"";
-    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã so sánh "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp cùng nhóm loại sau khi kiểm tra toàn kho; tìm thấy "+groups.length+" bộ ảnh đề xuất, lưu mới "+saved+", nhóm đã có/bị từ chối "+skipped+"."+failureNote+largeNote;
+    const largeNote=oversizedGroups.length?" "+oversizedGroups.length+" nhóm có trên 8 ảnh không được gửi làm một lượt xác minh AI; cần chia nhỏ trước khi lưu.":"";
+    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã lọc "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp thị giác; tìm thấy "+groups.length+" ứng viên, lưu "+saved+" nhóm chờ duyệt. AI xác minh "+aiVerifiedSaved+"; cần xem thủ công "+aiNeedsReviewSaved+"; chưa xác minh do lỗi/quota "+aiUnverifiedSaved+"; bỏ qua/trùng "+skipped+"."+failureNote+largeNote;
     imageScanProgress=summary;
     return {ok:true,message:summary,skippedCount:result.skippedCount||0,failedImages:failureDetails.length,oversizedGroups:oversizedGroups.length};
   }catch(error){
@@ -273,7 +288,17 @@ if(!confirm('Hoàn tác lượt duyệt này và khôi phục chính xác danh s
 button.disabled=true;
 try{const result=await api('/api/admin/image-groups-index',{method:'POST',body:JSON.stringify({action:'undo-approval',auditId})});await loadData();await loadImageGroups({refreshInventory:true});render();toast(result.message)}catch(ex){toast(ex.message)}finally{button.disabled=false}
 }));
-main.querySelectorAll('[data-approve-image-group]').forEach(button=>button.addEventListener('click',async()=>{const id=button.dataset.approveImageGroup;const productId=$('#target-group-'+CSS.escape(id))?.value;if(!productId){toast('Chọn sản phẩm đích.');return}if(!confirm('Duyệt '+(imageSimilarityGroups.find(group=>group.id===id)?.members?.length||0)+' ảnh và thêm vào bộ ảnh sản phẩm? Không xóa ảnh gốc.'))return;button.disabled=true;try{const result=await api('/api/admin/image-groups-index',{method:'POST',body:JSON.stringify({action:'approve-group',groupId:id,productId})});await loadData();await loadImageGroups({refreshInventory:true});render();toast(result.message+' ('+result.sku+')')}catch(ex){toast(ex.message)}finally{button.disabled=false}}));
+main.querySelectorAll('[data-recheck-image-group]').forEach(button=>button.addEventListener('click',async()=>{
+const groupId=button.dataset.recheckImageGroup;button.disabled=true;
+try{const result=await api('/api/admin/image-groups-index',{method:'POST',body:JSON.stringify({action:'recheck-group',groupId})});await loadImageGroups({refreshInventory:false});render();toast(result.message||'Đã cập nhật kết quả xác minh AI.')}catch(ex){toast(ex.message||'Không thể xác minh lại nhóm bằng AI.')}finally{button.disabled=false}
+}));
+main.querySelectorAll('[data-approve-image-group]').forEach(button=>button.addEventListener('click',async()=>{
+const id=button.dataset.approveImageGroup,productId=$('#target-group-'+CSS.escape(id))?.value;if(!productId){toast('Chọn sản phẩm đích.');return}
+const group=imageSimilarityGroups.find(item=>item.id===id),meta=readImageGroupIdentityMeta(group?.rationale),verified=meta?.status==='verified'&&Number(meta.confidence)>=91,manualOverride=!verified;
+const confirmText=manualOverride?'AI chưa xác nhận nhóm này là cùng một mẫu sản phẩm. Chỉ tiếp tục nếu bạn đã xem trực tiếp mọi ảnh và tự xác nhận chúng thuộc đúng sản phẩm. Thao tác sẽ được ghi audit là duyệt thủ công.':'AI đã xác minh các cặp trong nhóm ở ngưỡng 91/100. Duyệt và thêm ảnh vào bộ ảnh sản phẩm?';
+if(!confirm(confirmText))return;button.disabled=true;
+try{const result=await api('/api/admin/image-groups-index',{method:'POST',body:JSON.stringify({action:'approve-group',groupId:id,productId,manualOverride})});await loadData();await loadImageGroups({refreshInventory:true});render();toast(result.message+' ('+result.sku+')')}catch(ex){toast(ex.message)}finally{button.disabled=false}
+}));
 main.querySelectorAll('img[data-open-group-image]').forEach(thumbnail=>thumbnail.addEventListener('click',()=>{
 const overlay=document.createElement('div');
 overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Xem ảnh sản phẩm');
