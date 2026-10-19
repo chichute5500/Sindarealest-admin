@@ -528,7 +528,7 @@ jobs:
           NODE
                 identical_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-identical-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-identical-compare-request.json "$base/api/ai-smoke-ci")"
                 if [ "$identical_status" != "200" ] || ! jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-identical-compare.json >/dev/null; then
-                  diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches}' /tmp/ai-test-identical-compare.json 2>/dev/null || true)"
+                  diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches,diagnostics}' /tmp/ai-test-identical-compare.json 2>/dev/null || true)"
                   echo "::error::Real Workers AI failed the identical-image positive control (HTTP $identical_status). The same verified image bytes must produce a high-confidence pair; safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
                   exit 1
                 fi
@@ -632,7 +632,7 @@ jobs:
               diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"
               echo "::error::Same-gallery real-image AI comparison failed with HTTP $repository_gallery_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
             fi
-            jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-repository-gallery.json >/dev/null || { diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"; echo "::error::Real Workers AI failed the positive control for two distinct images from one repository product gallery. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1; }
+            jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-repository-gallery.json >/dev/null || { diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches,diagnostics}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"; echo "::error::Real Workers AI failed the positive control for two distinct images from one repository product gallery. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1; }
             echo "PASS: real Workers AI matched two distinct images from one repository product gallery at the 91% gate; all writes were intercepted by the no-write test DB."
             # Negative control: two different products in the same shoe category must not be auto-grouped.
             node --input-type=module - <<'NODE'
