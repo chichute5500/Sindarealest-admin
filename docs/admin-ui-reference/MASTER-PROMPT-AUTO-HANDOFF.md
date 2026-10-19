@@ -1,13 +1,13 @@
 # MASTER PROMPT DUY NHẤT — KIỂM TOÁN, REDESIGN ADMIN VÀ TỰ BÀN GIAO BẰNG ẢNH PLAYWRIGHT
 
 ## 1. Vai trò và mục tiêu
-Bạn là AI kỹ sư phần mềm chịu trách nhiệm trực tiếp kiểm tra, sửa lỗi, hoàn thiện giao diện ADMIN SinDarealest và lưu trạng thái bàn giao bền vững lên GitHub để các AI ở phiên sau tự tiếp tục mà người dùng không phải viết prompt mới. Không chỉ đưa kế hoạch: hãy thực hiện các bước có thể thực hiện bằng công cụ và quyền truy cập hiện có, kiểm tra kết quả thật, ghi bằng chứng và báo cáo trung thực.
+Bạn là AI kỹ sư phần mềm chịu trách nhiệm trực tiếp kiểm tra, sửa lỗi, hoàn thiện giao diện ADMIN SinDarealest và lưu trạng thái bàn giao bền vững lên GitHub để phiên AI tiếp theo có thể tiếp tục từ trạng thái đã ghi thay vì suy luận lại lịch sử chat. Không chỉ đưa kế hoạch: hãy thực hiện các bước có thể thực hiện bằng công cụ và quyền truy cập hiện có, kiểm tra kết quả thật, ghi bằng chứng và báo cáo trung thực. LƯU Ý THỰC TẾ: các file Markdown trên GitHub chỉ lưu quy trình/trạng thái, không tự khởi động một phiên ChatGPT mới khi phiên cũ hết giới hạn. Việc tự khởi chạy một AI ở phiên tiếp theo chỉ khả thi nếu có một agent/automation riêng được cấu hình và thực sự chạy. Khi phiên mới hoặc automation được khởi chạy, AI phải tự đọc handoff trước tiên; người dùng không cần viết lại prompt dài.
 
 Mục tiêu đồng thời:
 - Khôi phục/hoàn thiện UI ADMIN theo ảnh tham chiếu được lưu trong repository.
 - Giữ nguyên nghiệp vụ, API, auth, schema và tích hợp backend đang hoạt động.
 - Kiểm thử bằng ứng dụng thực tế và Playwright, chụp ảnh thật, so sánh, sửa và chụp lại theo vòng lặp.
-- Sau mỗi mốc công việc đã kiểm tra, cập nhật ảnh + trạng thái + kết quả test lên đúng nhánh fix để AI tiếp theo không phụ thuộc lịch sử chat.
+- Sau MỖI vòng lặp sửa đổi có ý nghĩa → chạy lại test → chụp ảnh đối chiếu, cập nhật ảnh + trạng thái + kết quả test lên đúng nhánh fix để AI tiếp theo không phụ thuộc lịch sử chat. Không chờ đến cuối task mới lưu.
 - Không tuyên bố hoàn thành nếu thiếu bằng chứng.
 
 ## 2. Repository, branch và vùng tham chiếu
@@ -22,7 +22,7 @@ Mục tiêu đồng thời:
   - `docs/admin-ui-reference/handoff/START-HERE.md`
   - `docs/admin-ui-reference/handoff/LATEST-STATUS.md`
   - `docs/admin-ui-reference/handoff/latest-test-results.json`
-- File prompt này là prompt gốc duy nhất. Các phiên sau phải đọc `handoff/START-HERE.md` và `handoff/LATEST-STATUS.md`, xác minh trạng thái thực tế rồi tiếp tục; người dùng không cần tạo prompt mới.
+- File prompt này là tài liệu chuẩn duy nhất để hướng dẫn công việc. Mỗi phiên AI/automation được giao tác vụ phải đọc `handoff/START-HERE.md`, `handoff/LATEST-STATUS.md`, `handoff/latest-test-results.json` và prompt này, xác minh code thực tế rồi tiếp tục. Repository không tự kích hoạt phiên AI mới; nếu không có agent/automation chạy tự động, người dùng vẫn cần mở/khởi chạy phiên tiếp theo, nhưng chỉ cần yêu cầu ngắn như “Tiếp tục theo MASTER PROMPT AUTO-HANDOFF trên nhánh fix”, không cần tự soạn lại toàn bộ prompt.
 
 ## 3. Quy tắc an toàn và phạm vi
 - Chỉ làm trên branch mục tiêu đã xác minh. Nếu đang ở branch khác, không tự sửa/commit nhầm; chuyển đúng cách hoặc báo BLOCKED.
@@ -45,6 +45,7 @@ Mục tiêu đồng thời:
 
 ## 5. Thiết kế và UX
 - Bám sát ảnh tham chiếu SinDarealest: luxury minimalism, Apple Liquid Glass, cảm giác cao cấp, bề mặt kính nhiều lớp có kiểm soát, bo góc nhất quán, chuyển động tinh tế và bố cục sạch.
+- Đọc và tuân theo `reference-instructions.md`; bảng màu hướng dẫn đã ghi trong tài liệu là nền ice-blue/pearl `#eaf3fb`, chữ navy `#142a3c`, điểm nhấn xanh `#5c91b9` cùng bề mặt kính sáng trong. Ảnh PNG là mục tiêu thị giác đã duyệt; HTML chỉ là viewer/tài liệu tham chiếu tự chứa. Không được tự ý thay màu thương hiệu hay dùng ảnh tham chiếu làm mã runtime. Khi ảnh tham chiếu có khác biệt với màu gợi ý trong văn bản, ưu tiên phân tích hình ảnh và ghi nhận quyết định rõ ràng.
 - Ưu tiên mobile-first/Android, sau đó tablet và desktop. Không làm vỡ layout hiện hữu hoặc loại bỏ chức năng.
 - Hỗ trợ light/dark mode, đọc đúng system preference nếu hệ thống hiện có yêu cầu, nút chuyển theme hoạt động và không flash màu gây khó chịu.
 - Kiểm tra tiếng Việt đầy đủ dấu (ă â ê ô ơ ư đ và dấu thanh), font fallback, line-height, wrap, truncation, contrast và không đè chữ.
@@ -93,8 +94,8 @@ Nếu một viewport không thể kiểm tra vì giới hạn môi trường, gh
 5. Xác định nguyên nhân gốc; sửa code tối thiểu cần thiết, giữ nghiệp vụ và API.
 6. Chạy lại ứng dụng và Playwright, chụp lại cùng route, viewport, theme, trạng thái và điều kiện càng giống ảnh trước càng tốt.
 7. So sánh lại. Chạy kiểm tra hồi quy liên quan.
-8. Lặp lại cho đến khi không còn lỗi Critical/High có thể sửa trong phạm vi và không có regression nghiêm trọng, hoặc có blocker thực sự được ghi bằng chứng.
-9. Sau mỗi mốc sửa có ý nghĩa đã được kiểm tra, cập nhật ảnh/báo cáo bàn giao và commit nếu có quyền. Không đợi đến cuối toàn dự án.
+8. Lặp lại cho đến khi mọi sai lệch có thể sửa trong phạm vi (Critical/High/Medium/Low) được xử lý hoặc có lý do cụ thể được ghi lại; không dừng chỉ vì đã hết Critical/High. Không có regression nghiêm trọng; mọi blocker phải có bằng chứng.
+9. Sau MỖI vòng sửa → chạy lại kiểm tra → chụp ảnh/so sánh (mỗi vòng lặp hoàn chỉnh), ngay lập tức lưu ảnh trước/sau, cập nhật báo cáo, `LATEST-STATUS.md`, `latest-test-results.json` và commit lên branch fix nếu quyền/công cụ cho phép. Không đợi đến cuối toàn dự án. Nếu chỉ một kiểm tra riêng lẻ chạy mà chưa có vòng sửa hoàn chỉnh, hãy ghi trạng thái tạm thời rõ ràng thay vì giả vờ đã hoàn tất iteration.
 10. Nếu một lỗi không tiến triển sau 3 vòng, điều tra lại nguyên nhân gốc, thay chiến lược; không lặp lại cùng thao tác vô ích. Con số 3 không phải giới hạn để dừng công việc.
 Không dùng ảnh mockup hay ảnh tham chiếu thay cho screenshot từ ứng dụng đang chạy. Không tuyên bố ảnh cuối phản ánh code mới nhất nếu SHA không khớp.
 
@@ -109,7 +110,7 @@ Sau mỗi mốc đã kiểm thử thành công, thực hiện tất cả bước
 7. Commit lên branch fix đã xác minh với message mô tả công việc; không force-push. Nếu có thay đổi chưa commit của người dùng, không xóa hoặc ghi đè.
 8. Xác minh commit trên GitHub và đọc lại các file bàn giao sau khi ghi. Chỉ khi được xác nhận mới báo “đã cập nhật GitHub”.
 9. Giữ lịch sử các mốc trước đó; không ghi đè ảnh lịch sử. Nếu dung lượng ảnh lớn, tối ưu kích thước hợp lý nhưng không làm ảnh mất giá trị so sánh.
-10. Nếu môi trường không có quyền ghi file binary/commit hoặc Playwright không hoạt động, ghi rõ BLOCKED, nguyên nhân và lệnh/bước cần chạy. Không tự khẳng định hệ thống tự chạy giữa các phiên: nó chỉ chạy khi AI/automation thực sự được khởi động.
+10. Nếu môi trường không có quyền ghi file binary/commit hoặc Playwright không hoạt động, ghi rõ BLOCKED, nguyên nhân và lệnh/bước cần chạy. Không tự khẳng định hệ thống tự chạy giữa các phiên: nó chỉ chạy khi AI/automation thực sự được khởi động. Nếu người dùng yêu cầu tiếp tục tự động sau khi phiên chat kết thúc, phải kiểm tra có agent/automation thực sự được cấu hình hay chưa; không xem file bàn giao đơn thuần là bộ lập lịch.
 
 ## 10. So sánh và chất lượng ảnh
 - Ưu tiên so sánh cùng viewport, route, theme, scroll position và trạng thái UI.
@@ -131,7 +132,7 @@ Chạy các scripts thực sự có trong repo, ví dụ lint/typecheck/test/bui
 ## 12. Tiêu chí nghiệm thu
 Chỉ đánh dấu PASS khi có bằng chứng cho tiêu chí:
 - Build và các kiểm tra có sẵn chạy thành công.
-- Không có lỗi Critical/High chưa xử lý trong phạm vi kiểm tra; nếu còn, ghi FAIL/BLOCKED và lý do.
+- Không còn sai lệch có thể sửa trong phạm vi từ Critical đến Low mà không có lý do giải trình; nếu còn, ghi FAIL/BLOCKED/KNOWN ISSUE thay vì báo hoàn tất.
 - Các route/module thực sự tồn tại đã được kiểm kê và kiểm tra hoặc ghi rõ chưa test.
 - Mobile, tablet, desktop và light/dark đã được kiểm tra theo ma trận hoặc có lý do BLOCKED.
 - Không có regression nghiêm trọng về chức năng/API/auth.
@@ -155,5 +156,5 @@ Báo cáo tiếng Việt, ngắn gọn nhưng có bằng chứng:
 Không ghi thông tin bí mật. Ghi rõ `Cloudflare production deployment: NOT PERFORMED`.
 
 ## 14. Bắt đầu ngay
-Thực hiện theo thứ tự: xác minh Git → đọc handoff và reference → khám phá source/scripts/auth/Playwright → chạy baseline → chụp ảnh baseline thật → lập inventory và sai lệch → sửa theo mức độ ưu tiên → chụp/so sánh/test lặp lại → cập nhật ảnh và handoff sau mỗi mốc → chạy test cuối → xác minh commit trên GitHub → báo cáo bằng chứng.
+Thực hiện theo thứ tự: xác minh Git → đọc handoff và reference → khám phá source/scripts/auth/Playwright → chạy baseline → chụp ảnh baseline thật → lập inventory và sai lệch → sửa theo mức độ ưu tiên → sau MỖI vòng sửa/test chụp ảnh/so sánh và cập nhật handoff/commit nếu có quyền → chạy test cuối → xác minh commit trên GitHub → báo cáo bằng chứng.
 Không dừng ở việc viết kế hoạch. Hãy bắt đầu kiểm tra và thực hiện công việc trong giới hạn quyền truy cập hiện có.
