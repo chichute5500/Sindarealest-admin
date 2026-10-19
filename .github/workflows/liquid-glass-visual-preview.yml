@@ -131,13 +131,41 @@ jobs:
           manifest.captureSource = 'GitHub Actions read-only local static preview; not the deployed Cloudflare Preview';
           manifest.updatedAtUtc = process.env.CAPTURED_AT;
           manifest.stages ??= {};
+          const imageNames = fs.readdirSync(`docs/website-screenshots/${process.env.STAGE}/`).filter(name => name.endsWith('.jpg')).sort();
+          let audit = {};
+          try { audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/visual-audit.json', 'utf8')); } catch {}
+          const baselineDir = 'docs/website-screenshots/start-of-work/';
+          const resultDir = 'docs/website-screenshots/end-of-work/';
+          const counterpartDir = process.env.STAGE === 'start-of-work' ? resultDir : baselineDir;
+          const counterpartNames = new Set(fs.existsSync(counterpartDir) ? fs.readdirSync(counterpartDir) : []);
+          const infer = (name) => {
+            const theme = /(^|[-_])(light|dark)([-_.]|$)/i.exec(name)?.[2]?.toLowerCase() || 'UNVERIFIED';
+            const viewport = /(mobile|tablet|desktop)[-_]?(320|360|375|390|412|430|768|1024|1366|1440)/i.exec(name);
+            const widthHeight = viewport ? ({
+              320:[320,720],360:[360,800],375:[375,812],390:[390,844],412:[412,915],
+              430:[430,932],768:[768,1024],1024:[1024,768],1366:[1366,768],1440:[1440,900]
+            })[Number(viewport[2])] : null;
+            const route = name.startsWith('welcome-splash-') || name.startsWith('mobile-') || name.startsWith('tablet-') || name.startsWith('desktop-')
+              ? '/' : name.replace(/-(light|dark).*$/i, '').replace(/\.jpg$/i, '');
+            return { theme, viewportName: viewport?.[0] || 'UNVERIFIED', viewport: widthHeight ? {width:widthHeight[0],height:widthHeight[1]} : null, route };
+          };
           manifest.stages[process.env.STAGE] = {
             capturedAtUtc: process.env.CAPTURED_AT,
             runId: process.env.RUN_ID,
+            sourceCommit: process.env.SOURCE_SHA,
             imageCount: Number(process.env.IMAGE_COUNT),
             directory: `docs/website-screenshots/${process.env.STAGE}/`,
-            images: fs.readdirSync(`docs/website-screenshots/${process.env.STAGE}/`).filter(name => name.endsWith('.jpg')).sort().map(name => ({
+            sourceKind: 'local-static-preview-with-test-fixtures',
+            overallVisualComparison: 'UNVERIFIED',
+            responsiveOverflowCount: audit.responsiveOverflowCount ?? null,
+            pageErrorCount: audit.pageErrors?.length ?? null,
+            consoleErrorCount: audit.consoleErrors?.length ?? null,
+            images: imageNames.map(name => ({
               path: `docs/website-screenshots/${process.env.STAGE}/${name}`,
+              ...infer(name),
+              baselinePath: `${baselineDir}${name}`,
+              resultPath: `${resultDir}${name}`,
+              counterpartExists: counterpartNames.has(name),
               status: 'captured-local-preview',
               comparisonStatus: 'UNVERIFIED'
             }))
