@@ -53,6 +53,9 @@ export async function onRequestPost(context) {
   } catch {
     return fail("Không đọc được tệp ảnh.");
   }
+  if (form.get("zipImport") === "1" && context.env.ZIP_IMPORT_ENABLED !== "1") {
+    return fail("Nhập ZIP chưa được bật trong môi trường cách ly.", 403);
+  }
   const file = form.get("file");
   const original = form.get("original");
 
