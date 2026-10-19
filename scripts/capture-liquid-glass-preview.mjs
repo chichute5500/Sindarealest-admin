@@ -337,12 +337,18 @@ try {
       const cards = [...document.querySelectorAll('#catalogGrid .product-card')];
       const first = cards[0]?.getBoundingClientRect();
       const second = cards[1]?.getBoundingClientRect();
+      const title = cards[0]?.querySelector('.product-title');
+      const info = cards[0]?.querySelector('.product-info');
+      const quickAdd = cards[0]?.querySelector('.quick-add');
       return {
         gridVisible: !!grid && grid.getBoundingClientRect().height > 0,
         productCount: cards.length,
         firstRowHasTwoColumns: !!first && !!second && Math.abs(first.top - second.top) <= 4 && second.left > first.left,
         firstCardWidth: first ? Math.round(first.width) : 0,
         secondCardWidth: second ? Math.round(second.width) : 0,
+        titleFontSize: title ? parseFloat(getComputedStyle(title).fontSize) : 0,
+        infoHeight: info ? Math.round(info.getBoundingClientRect().height) : 0,
+        quickAddSize: quickAdd ? Math.round(quickAdd.getBoundingClientRect().width) : 0,
         viewportWidth: innerWidth,
         documentWidth: document.documentElement.scrollWidth,
       };
@@ -355,6 +361,12 @@ try {
       && productGridScreen.documentWidth <= productGridScreen.viewportWidth + 1;
     audit.interactions.push({ theme, check: 'mobile-product-grid-two-column-layout', pass: productGridPass, result: productGridScreen });
     if (!productGridPass) hardFailures.push('Mobile product grid was not a visible two-column layout: ' + theme);
+    const productDensityPass = productGridScreen.titleFontSize > 0
+      && productGridScreen.titleFontSize <= 13
+      && productGridScreen.infoHeight <= 130
+      && productGridScreen.quickAddSize >= 26;
+    audit.interactions.push({ theme, check: 'mobile-product-card-compact-density-and-touch-target', pass: productDensityPass, result: productGridScreen });
+    if (!productDensityPass) hardFailures.push('Mobile product card density or quick-add target failed: ' + theme);
     await capture(page, 'products-grid-mobile-' + theme + '.jpg');
 
     await page.evaluate((selector) => {
