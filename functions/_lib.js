@@ -283,7 +283,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
   // Historical seed migration used SD001–SD235 as technical identifiers, not verified commercial SKUs.
   // If an explicit verification column is introduced later, its persisted value takes precedence.
   const skuVerified = row.sku_verified === null || row.sku_verified === undefined
-    ? !/^SD\\d{3}$/.test(storedSku)
+    ? !/^SD\d{3}$/.test(storedSku)
     : Number(row.sku_verified) === 1;
   return {
     id: row.id,
