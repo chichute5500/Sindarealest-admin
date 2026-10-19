@@ -42,8 +42,10 @@ const env = {
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && (
       message.content.includes("mô tả từ phân tích thị giác") ||
       message.content.includes("The previous response was malformed") ||
+      message.content.includes("The previous response was not valid JSON") ||
       message.content.includes("Compare all supplied visual descriptions") ||
-      message.content.includes("Return ONLY valid JSON with a top-level pairs array")
+      message.content.includes("Return ONLY valid JSON with a top-level pairs array") ||
+      message.content.includes("Return ONLY valid JSON with exactly one top-level pairs array")
     ))) {
       if (malformedCompareOnce) { malformedCompareOnce = false; return { response: "not valid JSON", tool_calls: [] }; }
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
@@ -54,7 +56,7 @@ const env = {
       if (systemPrompt.includes("forensic shoe-photo analyst")) {
         return { response: JSON.stringify({ shoe_type: "dress_shoe", texture: "vân da", toe: "mũi tròn", sole: "đế đen", stitching: "đường may rõ" }), tool_calls: [], usage: {} };
       }
-      if (systemPrompt.includes("Compare visual descriptions") || systemPrompt.includes("Return ONLY valid JSON with a top-level pairs array")) {
+      if (systemPrompt.includes("Compare visual descriptions") || systemPrompt.includes("Return ONLY valid JSON with a top-level pairs array") || systemPrompt.includes("Return ONLY valid JSON with exactly one top-level pairs array")) {
         return malformed ? { response: "not valid JSON", tool_calls: [] } :
           { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: compareConfidence, rationale: "Trùng vân da, đường may và chi tiết đế." }] }), tool_calls: [], usage: {} };
       }
