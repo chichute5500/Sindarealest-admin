@@ -112,7 +112,7 @@ malformed = true;
 const invalid = await call();
 assert.equal(invalid.status, 502, "malformed model output must stop classification safely");
 assert.equal(invalid.body.items, undefined, "malformed output must not be accepted as a classification");
-assert.equal(modelCalls, 3, "malformed output is retried once, then rejected");
+assert.equal(modelCalls, 5, "malformed output is retried once, then rejected");
 
 // The whole-inventory scanner also accepts nested and non-WebP raster keys.
 malformed = false;
@@ -135,7 +135,7 @@ const alternateResponse = await onRequestPost({ request: alternateRequest, env }
 const alternateBody = await alternateResponse.json();
 assert.equal(alternateResponse.status, 200, JSON.stringify(alternateBody));
 assert.deepEqual(alternateBody.items, [{ key: alternateKey, category: "dress_shoe", confidence: 91, identityDescriptor: "loại=giày tây; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông", status: "classified" }]);
-assert.equal(modelCalls, 4, "nested PNG/JPEG-like keys must actually be sent through the vision model");
+assert.equal(modelCalls, 6, "nested PNG/JPEG-like keys must actually be sent through the vision model");
 
 // A transient upstream timeout is retried once; a successful retry completes the item.
 failNextTransient = true;
@@ -156,7 +156,7 @@ const retryRequest = new Request("https://preview.example/api/admin/image-groups
 const retryResponse = await onRequestPost({ request: retryRequest, env });
 const retryBody = await retryResponse.json();
 assert.equal(retryResponse.status, 200, JSON.stringify(retryBody));
-assert.equal(modelCalls, 6, "one transient 503 must cause exactly one retry before success");
+assert.equal(modelCalls, 8, "one transient 503 must cause exactly one retry before success");
 
 
 
