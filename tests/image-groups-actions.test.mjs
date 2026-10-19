@@ -230,6 +230,22 @@ const weakApproval = await call({ action: "approve-group", groupId: weakApproval
 assert.equal(weakApproval.status, 409, "legacy or corrupted pending groups below 91/100 must not bypass the approval gate");
 assert.equal(sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json, beforeWeakApproval);
 
+// An explicit audited administrator merge may resolve a visual false negative.
+// This is a human decision, not an AI proposal bypass: the stored score must
+// still be >=91 and all indexed descriptors/categories must remain valid.
+const manualOverrideId = crypto.randomUUID();
+const manualOverrideKeys = ["manual-override-a.webp", "manual-override-b.webp"];
+await seedGroup(manualOverrideId, manualOverrideKeys);
+sqlite.prepare("UPDATE image_group_index SET p_hash=? WHERE image_key=?").run("0".repeat(16), manualOverrideKeys[0]);
+sqlite.prepare("UPDATE image_group_index SET p_hash=? WHERE image_key=?").run("f".repeat(16), manualOverrideKeys[1]);
+sqlite.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,?,?,?,?,?)")
+  .run(crypto.randomUUID(), "admin", "image_group_merge", "image_group_set", manualOverrideId,
+    JSON.stringify({ mergedGroupIds: [manualOverrideId], imageKeys: manualOverrideKeys }));
+const manualOverride = await call({ action: "approve-group", groupId: manualOverrideId, productId: ids.product });
+assert.equal(manualOverride.status, 200, "audited manual review must retain the ability to merge a visual false negative");
+assert.equal(sqlite.prepare("SELECT status FROM image_group_sets WHERE id=?").get(manualOverrideId).status, "approved");
+
+
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND rationale LIKE '%giày thể thao%'").get().count, 0,
   "a mixed-category proposal must never enter the pending queue");
 
