@@ -97,8 +97,8 @@ jobs:
           SHA_SHORT="${GITHUB_SHA:0:12}"
           SOURCE_DIR="artifacts/admin-preview-evidence/$SHA_SHORT"
 
-          if [[ ! -d "$SOURCE_DIR" ]] || ! compgen -G "$SOURCE_DIR/*.png" >/dev/null; then
-            echo "No genuine source screenshots were produced; preserving logs/artifacts only."
+          if [[ ! -d "$SOURCE_DIR" ]] || ! compgen -G "$SOURCE_DIR/*.png" >/dev/null || [[ ! -f "$SOURCE_DIR/metadata.json" ]]; then
+            echo "Complete screenshot evidence/metadata was not produced; preserving logs/artifacts only."
             exit 0
           fi
 
@@ -109,6 +109,7 @@ jobs:
           fi
 
           DEST="docs/admin-ui-reference/handoff/history/$SHA_SHORT"
+          export DEST
           mkdir -p "$DEST/screenshots"
           cp "$SOURCE_DIR"/*.png "$DEST/screenshots/"
           cp "$SOURCE_DIR/metadata.json" "$DEST/metadata.json"
