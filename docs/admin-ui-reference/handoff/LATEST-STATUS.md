@@ -1,16 +1,15 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — VISUAL/PLAYWRIGHT VERIFICATION BLOCKED`  
-**Ước tính tiến độ:** 25% theo các giai đoạn công việc (không phải tỷ lệ code đã hoàn tất)  
+**Trạng thái tổng thể:** `IN PROGRESS — VISUAL/PLAYWRIGHT VERIFICATION PENDING`  
+**Ước tính tiến độ:** 30% theo các giai đoạn công việc, không phải số dòng code.  
 **Repository:** `chichute5500/Sindarealest-admin`  
-**Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
-**Commit sửa UI ADMIN đã tạo:** `ea9bcd1a542dab2891916c14015a7fae21143a56`  
-**Commit gần nhất của nhánh tại lần xác minh:** `ea9bcd1a542dab2891916c14015a7fae21143a56`  
-**Ảnh Playwright sau sửa:** CHƯA CÓ  
-**Cloudflare production deployment:** `NOT PERFORMED`
+**Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
+**Commit code/giao diện mới nhất đã xác minh:** `d0f5b52d9bef9b903ed58ecc2d4bb2b9a5fb46f6`  
+**Ảnh Playwright sau thay đổi:** Chưa xác minh có artifact chạy sau commit mới nhất.  
+**Cloudflare Production deployment:** `NOT PERFORMED`
 
-> Lưu ý: có thể đọc và sửa file qua GitHub connector, nhưng môi trường hiện tại không có checkout Git cục bộ để chạy `git status`, kiểm tra thay đổi chưa commit hay chạy app trực tiếp. Không được xem các commit từ GitHub connector là bằng chứng app đã chạy/test. Sau các commit mới, chưa quan sát thấy workflow Actions mới; vì vậy không ghi PASS cho bất kỳ bài test nào chưa chạy.
+> Phân biệt bằng chứng: kiểm tra source từ GitHub đã xác nhận các token màu, selector theme, markup đăng nhập, chuỗi API và việc gắn contract test vào `npm test`. Đây là kiểm tra tĩnh của source, **không phải** kết quả thực thi `npm test` hoặc kiểm thử browser. Không đánh dấu bất kỳ test nào PASS nếu chưa có run/artifact của đúng commit.
 
 ## Những việc vừa thực hiện
 
