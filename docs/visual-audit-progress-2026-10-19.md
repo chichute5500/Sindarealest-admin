@@ -296,3 +296,14 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Phạm vi kiểm thử vẫn là preview local, dữ liệu fixture chỉ đọc và đơn hàng mô phỏng trong bộ nhớ. Đây không phải kiểm thử Android vật lý, D1/R2 production hay thanh toán thật.
 - Ước tính checklist code/kiểm thử tự động: **82%**. Tỷ lệ tổng thể chưa thể là 100% vì còn thiếu đối chiếu pixel với đầy đủ 28 ảnh gốc, xác minh tài sản/dữ liệu thương mại, thử Android vật lý, backend/staging thật và kiểm thử end-to-end các tích hợp production.
 - Không merge vào `main`; không deploy production.
+
+
+## Xác nhận lại sau cập nhật tài liệu — preview 173
+
+- Commit tài liệu: `9f061b2424f9585ec54b28057db3e1e4b5b1732d`; không thay đổi source code so với code đã kiểm thử tại `ad7a030ef96ccc056c788b8012668f44eadcbf5d`.
+- [Preview 173 — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39208596153), chạy trên nhánh fix sau cập nhật tài liệu.
+- Đã tải và mở artifact `sindarealest-liquid-glass-preview-173.zip`, ID `12166473906`; SHA-256 `81c2f128618918321dc63b71c71caa0104f446191dca08b0c2b6ee29e0b0bd96`.
+- Xác minh trực tiếp `visual-audit.json`: `passed=true`; 52 screenshot; 77 interaction checks; 20 viewport/theme combinations; 0 horizontal overflow; 0 hard failures; 0 console/page/HTTP errors; 0 failed requests; không có tương tác thất bại.
+- Bốn assertion liên quan SKU/Zalo/giỏ hàng PASS trên cả Light và Dark. Artifact mới nhất đã được tải về và kiểm tra nội dung, không chỉ dựa vào tên artifact.
+- `npm test` và `npm run check` đều PASS trên workflow này. Dữ liệu sản phẩm vẫn là fixture chỉ đọc, các yêu cầu đặt hàng chỉ mô phỏng trong bộ nhớ.
+- Tình trạng đối chiếu ảnh gốc, kiểm thử Android vật lý và backend/thanh toán production không thay đổi; không được tính là hoàn thành.
