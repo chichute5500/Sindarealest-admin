@@ -277,14 +277,17 @@ export function parseImages(value) {
   } catch { return []; }
 }
 
+export function isVerifiedCommercialSku(row) {
+  if (!row || typeof row !== "object") return false;
+  if (row.sku_verified !== null && row.sku_verified !== undefined) return Number(row.sku_verified) === 1;
+  if (row.skuVerified !== null && row.skuVerified !== undefined) return row.skuVerified === true || Number(row.skuVerified) === 1;
+  const storedSku = String(row.sku ?? "").trim();
+  return Boolean(storedSku) && !/^(?:SD\d{3}|SD-[A-Z0-9-]{2,12}\d{3,})$/i.test(storedSku);
+}
+
 export function fromRow(row, { publicView = false, showPrices = false } = {}) {
   const price = row.price === null || row.price === undefined ? null : Number(row.price);
-  const storedSku = String(row.sku ?? "").trim();
-  // Historical seed migration used SD001–SD235 as technical identifiers, not verified commercial SKUs.
-  // If an explicit verification column is introduced later, its persisted value takes precedence.
-  const skuVerified = row.sku_verified === null || row.sku_verified === undefined
-    ? !/^SD\d{3}$/.test(storedSku)
-    : Number(row.sku_verified) === 1;
+  const skuVerified = isVerifiedCommercialSku(row);
   return {
     id: row.id,
     slug: row.slug,
@@ -322,9 +325,15 @@ function optionalInteger(value, field, max = 2_000_000_000) {
 export function validateProduct(input, existing = null) {
   if (!input || typeof input !== "object" || Array.isArray(input)) return { error: "Dữ liệu sản phẩm không hợp lệ." };
   const title = String(input.title ?? "").trim();
-  const sku = String(String(input.sku ?? "").trim() || existing?.sku || "").trim().toUpperCase();
+  const rawSku = String(input.sku ?? "").trim().toUpperCase();
+  const sku = rawSku || String(existing?.sku ?? "").trim().toUpperCase();
+  const flag = input.skuVerified ?? input.sku_verified;
+  const skuVerified = flag === undefined || flag === null
+    ? Boolean(existing ? isVerifiedCommercialSku(existing) : false)
+    : flag === true || flag === 1 || flag === "1";
   if (!title || title.length > 180) return { error: "Tên sản phẩm là bắt buộc và tối đa 180 ký tự." };
-  if (!/^[A-Z0-9][A-Z0-9._-]{0,47}$/.test(sku)) return { error: "SKU bắt buộc, chỉ gồm A–Z, 0–9, dấu chấm, gạch ngang hoặc gạch dưới (tối đa 48 ký tự)." };
+  if (skuVerified && !rawSku) return { error: "Nhập SKU thương mại đã xác nhận trước khi đánh dấu SKU là chính thức." };
+  if (!/^[A-Z0-9][A-Z0-9._-]{0,47}$/.test(sku)) return { error: "Mã sản phẩm nội bộ/SKU không hợp lệ. SKU thương mại phải được nhập và xác nhận rõ ràng." };
   const rawCategory = String(input.category ?? "").trim();
   if (!rawCategory || rawCategory.length > 80) return { error: "Danh mục là bắt buộc và tối đa 80 ký tự." };
   const aliases = { sneaker: "sneakers", sneakers: "sneakers", "giay-luoi": "loafers", loafers: "loafers", "giay-tay": "dress-shoes", "dress-shoes": "dress-shoes", "thắt-lưng": "belts", "that-lung": "belts", belts: "belts", "vi-da": "wallets", wallets: "wallets", dep: "sandals", sandals: "sandals", "day-dong-ho": "watch-straps", "op-dien-thoai": "phone-cases" };
@@ -347,6 +356,7 @@ export function validateProduct(input, existing = null) {
       id,
       slug,
       sku,
+      skuVerified,
       title,
       category,
       categoryLabel: String(input.categoryLabel ?? rawCategory).trim().slice(0, 80),
@@ -363,13 +373,13 @@ export function validateProduct(input, existing = null) {
 
 export function productInsertStatement(db, p, ignore = false) {
   const verb = ignore ? "INSERT OR IGNORE" : "INSERT";
-  return db.prepare(`${verb} INTO products (id,slug,sku,title,category,category_label,description,price,stock,published,images_json,source_price_confirmed,sort_order,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
-    .bind(p.id, p.slug, p.sku, p.title, p.category, p.categoryLabel, p.description, p.price, p.stock, p.published, JSON.stringify(p.images), p.sourcePriceConfirmed ? 1 : 0, p.sortOrder);
+  return db.prepare(`${verb} INTO products (id,slug,sku,sku_verified,title,category,category_label,description,price,stock,published,images_json,source_price_confirmed,sort_order,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
+    .bind(p.id, p.slug, p.sku, p.skuVerified ? 1 : 0, p.title, p.category, p.categoryLabel, p.description, p.price, p.stock, p.published, JSON.stringify(p.images), p.sourcePriceConfirmed ? 1 : 0, p.sortOrder);
 }
 
 export function toAdminProduct(p) {
   return {
-    id: p.id, slug: p.slug, sku: p.sku, title: p.title,
+    id: p.id, slug: p.slug, sku: p.sku, skuVerified: Boolean(p.skuVerified), title: p.title,
     category: p.category, categoryLabel: p.categoryLabel,
     description: p.description, price: p.price, stock: p.stock,
     published: Boolean(p.published), images: p.images,

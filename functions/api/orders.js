@@ -32,12 +32,12 @@ export async function onRequestPost({ request, env }) {
   if ([...requested.values()].some(q => q > 50)) return fail("Số lượng mỗi sản phẩm tối đa là 50.");
   try {
     const ids = [...requested.keys()];
-    const rows = await env.DB.prepare(`SELECT id,sku,title,price,stock,published,source_price_confirmed FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
+    const rows = await env.DB.prepare(`SELECT id,sku,sku_verified,title,price,stock,published,source_price_confirmed FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
     const byId = new Map((rows.results || []).map(p => [p.id, p]));
     if (byId.size !== ids.length || ids.some(id => !byId.has(id) || Number(byId.get(id).published) !== 1)) return fail("Một hoặc nhiều sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.", 409);
-    for (const id of ids) { const stock = byId.get(id).stock; if (stock !== null && stock !== undefined && requested.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của SKU ${byId.get(id).sku} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
+    for (const id of ids) { const product = byId.get(id), stock = product.stock; if (stock !== null && stock !== undefined && requested.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của ${Number(product.sku_verified) === 1 ? "SKU " + product.sku : "sản phẩm " + product.title} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
     const showPrices = (await getSetting(env.DB, "show_prices", "0")) === "1";
-    const items = ids.map(id => { const p = byId.get(id), quantity = requested.get(id); return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, title: p.title, quantity, price: showPrices && p.price !== null && Number(p.source_price_confirmed) === 1 ? Number(p.price) : null }; });
+    const items = ids.map(id => { const p = byId.get(id), quantity = requested.get(id); return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, title: p.title, quantity, price: showPrices && p.price !== null && Number(p.source_price_confirmed) === 1 ? Number(p.price) : null }; });
     const priceKnown = items.every(i => Number.isSafeInteger(i.price) && i.price >= 0);
     const subtotal = priceKnown ? items.reduce((sum, i) => sum + i.price * i.quantity, 0) : null;
     if (subtotal !== null && !Number.isSafeInteger(subtotal)) return fail("Tổng giá trị đơn vượt giới hạn hợp lệ.");
@@ -75,7 +75,7 @@ export async function onRequestPost({ request, env }) {
     ).bind(orderId, fullName, phone, email));
 
     statements.push(env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) VALUES(?,?,?,?,?,?,?)").bind(orderId,provinceCode,province,wardCode,ward,streetAddress,address));
-    for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity));
+    for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.skuVerified?1:0,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity));
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length })));
     await env.DB.batch(statements);
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });

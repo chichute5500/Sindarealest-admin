@@ -39,7 +39,7 @@ function buildCaseUpdate(db, rows, skuById) {
   const pairs = rows.map((row) => [row.id, skuById.get(row.id)]);
   const cases = pairs.map(() => "WHEN ? THEN ?").join(" ");
   const ids = pairs.map(() => "?").join(",");
-  const sql = `UPDATE products SET sku = CASE id ${cases} ELSE sku END WHERE id IN (${ids})`;
+  const sql = `UPDATE products SET sku = CASE id ${cases} ELSE sku END, sku_verified = 0 WHERE id IN (${ids})`;
   const params = [...pairs.flat(), ...pairs.map(([id]) => id)];
   if (params.length > 100) throw new Error("Quá nhiều sản phẩm trong một lô cập nhật SKU.");
   return db.prepare(sql).bind(...params);
