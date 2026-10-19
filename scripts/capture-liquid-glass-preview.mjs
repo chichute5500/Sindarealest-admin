@@ -357,11 +357,11 @@ try {
     await page.locator('#checkoutProvince').selectOption('');
 
     // Exercise a real keyboard trap around the checkout drawer.
-    await page.locator('input[name="fullName"]').focus();
+    await page.locator('#checkoutBack').focus();
     await page.keyboard.press('Shift+Tab');
     const shiftTabWrapped = await page.evaluate(() => document.activeElement?.id === 'checkoutSubmit');
     await page.keyboard.press('Tab');
-    const tabWrapped = await page.evaluate(() => document.activeElement?.matches('input[name="fullName"]') === true);
+    const tabWrapped = await page.evaluate(() => document.activeElement?.id === 'checkoutBack');
     audit.interactions.push({ theme, check: 'checkout-keyboard-focus-trap', pass: shiftTabWrapped && tabWrapped, result: { shiftTabWrapped, tabWrapped } });
     if (!shiftTabWrapped || !tabWrapped) hardFailures.push('Checkout keyboard focus trap failed: ' + theme);
 
