@@ -19,6 +19,12 @@ assert.equal((contactMarkup.match(/class="contact-link/g) || []).length, 6, 'The
 assert.ok(contactMarkup.includes('<strong>Zalo / Điện thoại</strong>'), 'Zalo and phone must share one contact row as in the reference.');
 assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contactMarkup.includes('href="tel:+84827049192"'), 'The combined contact row must keep both the Zalo and phone actions usable.');
 assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
+const legacyProducts = JSON.parse(readFileSync(new URL('../data/legacy-products.json', import.meta.url), 'utf8'));
+assert.equal(legacyProducts.length, 235, 'The read-only legacy product fixture should retain all 235 product records.');
+assert.ok(legacyProducts.every(product => product.sku === null), 'Legacy fixture records must not expose generated identifiers as verified SKUs.');
+assert.ok(storefrontHtml.includes('Mã SKU: ${escapeHtml(p.sku||\'Chưa được cung cấp\')}'), 'Storefront product cards must clearly disclose when no verified SKU is available.');
+assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');
+assert.ok(!storefrontHtml.includes('ghi lại mã SKU để tư vấn nhanh'), 'Order guidance must not instruct customers to record unverified fixture SKUs.');
 assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
 assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
