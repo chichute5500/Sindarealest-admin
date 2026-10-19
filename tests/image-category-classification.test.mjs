@@ -120,7 +120,7 @@ const alternateRequest = new Request("https://preview.example/api/admin/image-gr
 const alternateResponse = await onRequestPost({ request: alternateRequest, env });
 const alternateBody = await alternateResponse.json();
 assert.equal(alternateResponse.status, 200, JSON.stringify(alternateBody));
-assert.deepEqual(alternateBody.items, [{ key: alternateKey, category: "dress_shoe", confidence: 91, status: "classified" }]);
+assert.deepEqual(alternateBody.items, [{ key: alternateKey, category: "dress_shoe", confidence: 91, identityDescriptor: "loại=giày tây; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông", status: "classified" }]);
 assert.equal(modelCalls, 4, "nested PNG/JPEG-like keys must actually be sent through the vision model");
 
 // A transient upstream timeout is retried once; a successful retry completes the item.
