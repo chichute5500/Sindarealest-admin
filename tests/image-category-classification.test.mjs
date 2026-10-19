@@ -293,6 +293,19 @@ assert.equal(quotaResponse.headers.get("Retry-After"), "60");
 assert.equal(modelCalls, beforeQuotaCalls + 1, "quota errors should not trigger a second paid model request");
 assert.equal(reviewInsertBatches, beforeQuotaWrites, "quota failure must not save proposed image pairs");
 
+// Cloudflare's daily allocation failure must also be classified correctly in
+// pair comparison, stop after one call, and never persist proposed matches.
+const beforeDailyCompareCalls = modelCalls;
+const beforeDailyCompareWrites = reviewInsertBatches;
+failNextDailyAllocation = true;
+const dailyCompareResponse = await onRequestPost({ request: compareRequest(), env });
+const dailyCompareResult = await dailyCompareResponse.json();
+assert.equal(dailyCompareResponse.status, 429, JSON.stringify(dailyCompareResult));
+assert.equal(dailyCompareResponse.headers.get("Retry-After"), null);
+assert.match(JSON.stringify(dailyCompareResult), /hết hạn mức neuron miễn phí hằng ngày/i);
+assert.equal(modelCalls, beforeDailyCompareCalls + 1, "daily quota failure should not retry the vision model");
+assert.equal(reviewInsertBatches, beforeDailyCompareWrites, "daily quota failure must not persist pending matches");
+
 
   
 // Cloudflare's daily free-neuron exhaustion arrives as error 4006 without an
