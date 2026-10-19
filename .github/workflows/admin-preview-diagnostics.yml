@@ -29,6 +29,8 @@ jobs:
     env:
       ADMIN_TEST_URL: ${{ secrets.ADMIN_TEST_URL }}
       ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       LOCAL_ADMIN_URL: http://127.0.0.1:4173/admin/
     steps:
       - name: Check out the exact tested commit
