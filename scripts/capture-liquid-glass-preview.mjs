@@ -322,6 +322,7 @@ try {
       checkoutFormInsideCart: !!document.querySelector('#cartDrawer #checkoutForm'),
       checkoutVisibleAndAccessible: document.querySelector('#checkoutDrawer')?.getAttribute('aria-hidden') === 'false' && !document.querySelector('#checkoutDrawer')?.hasAttribute('inert'),
       cartInertWhileCheckoutOpen: document.querySelector('#cartDrawer')?.hasAttribute('inert') === true,
+      cartHiddenWhileCheckoutOpen: document.querySelector('#cartDrawer')?.getAttribute('aria-hidden') === 'true' && !document.querySelector('#cartDrawer')?.classList.contains('open'),
       closeButtonPresent: !!document.querySelector('#checkoutClose'),
       backButtonPresent: !!document.querySelector('#checkoutBack'),
       submitButtonPresent: !!document.querySelector('#checkoutSubmit'),
@@ -334,6 +335,7 @@ try {
       && !checkoutStructure.checkoutFormInsideCart
       && checkoutStructure.checkoutVisibleAndAccessible
       && checkoutStructure.cartInertWhileCheckoutOpen
+      && checkoutStructure.cartHiddenWhileCheckoutOpen
       && checkoutStructure.closeButtonPresent
       && checkoutStructure.backButtonPresent
       && checkoutStructure.submitButtonPresent
@@ -356,13 +358,44 @@ try {
     if (!wardFixtureLoaded) hardFailures.push('Checkout test-only ward fixture did not load: ' + theme);
     await page.locator('#checkoutProvince').selectOption('');
 
-    // Exercise a real keyboard trap around the checkout drawer.
-    await page.locator('#checkoutBack').focus();
-    await page.keyboard.press('Shift+Tab');
-    const shiftTabWrapped = await page.evaluate(() => document.activeElement?.id === 'checkoutSubmit');
-    await page.keyboard.press('Tab');
-    const tabWrapped = await page.evaluate(() => document.activeElement?.id === 'checkoutBack');
-    audit.interactions.push({ theme, check: 'checkout-keyboard-focus-trap', pass: shiftTabWrapped && tabWrapped, result: { shiftTabWrapped, tabWrapped } });
+    // Compute actual first/last focusable controls, then verify reverse and forward wrapping.
+    const focusOrder = await page.locator('#checkoutDrawer').evaluate((panel) => {
+      const selector = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+      return [...panel.querySelectorAll(selector)]
+        .filter(el => !el.closest('[inert]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden')
+        .map(el => ({ id: el.id || '', name: el.getAttribute('name') || '', tag: el.tagName }));
+    });
+    const firstFocus = focusOrder[0];
+    const lastFocus = focusOrder[focusOrder.length - 1];
+    let shiftTabWrapped = false, tabWrapped = false, focusBeforeReverse = '';
+    if (firstFocus && lastFocus) {
+      await page.locator('#checkoutDrawer').evaluate((panel) => {
+        const selector = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+        const items = [...panel.querySelectorAll(selector)].filter(el => !el.closest('[inert]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+        items[0]?.focus({ preventScroll: true });
+      });
+      await page.waitForTimeout(40);
+      focusBeforeReverse = await page.evaluate(() => document.activeElement?.id || document.activeElement?.getAttribute('name') || document.activeElement?.tagName || '');
+      await page.keyboard.press('Shift+Tab');
+      await page.waitForTimeout(30);
+      shiftTabWrapped = await page.evaluate((expected) => {
+        const el = document.activeElement;
+        return !!el && (el.id === expected.id || (!expected.id && el.getAttribute('name') === expected.name));
+      }, lastFocus);
+      await page.locator('#checkoutDrawer').evaluate((panel) => {
+        const selector = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+        const items = [...panel.querySelectorAll(selector)].filter(el => !el.closest('[inert]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+        items[items.length - 1]?.focus({ preventScroll: true });
+      });
+      await page.waitForTimeout(30);
+      await page.keyboard.press('Tab');
+      await page.waitForTimeout(30);
+      tabWrapped = await page.evaluate((expected) => {
+        const el = document.activeElement;
+        return !!el && (el.id === expected.id || (!expected.id && el.getAttribute('name') === expected.name));
+      }, firstFocus);
+    }
+    audit.interactions.push({ theme, check: 'checkout-keyboard-focus-trap', pass: shiftTabWrapped && tabWrapped, result: { firstFocus, lastFocus, focusBeforeReverse, shiftTabWrapped, tabWrapped } });
     if (!shiftTabWrapped || !tabWrapped) hardFailures.push('Checkout keyboard focus trap failed: ' + theme);
 
     await page.locator('#checkoutBack').click();
@@ -381,6 +414,8 @@ try {
     await page.locator('#orderDetailsToggle').click();
     await page.locator('#mobileAccountNav').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
+    await page.waitForTimeout(120);
+    const accountFocusBeforeSettle = await page.evaluate(() => document.activeElement?.id || '');
     await settle(page);
     const accountStructure = await page.evaluate(() => ({
       accessibleDialog: document.querySelector('#accountDrawer')?.getAttribute('role') === 'dialog'
@@ -388,9 +423,10 @@ try {
         && document.querySelector('#accountDrawer')?.getAttribute('aria-hidden') === 'false',
       drawerNotInertWhenOpen: !document.querySelector('#accountDrawer')?.hasAttribute('inert'),
       initialFocusOnCloseButton: document.activeElement?.id === 'accountClose',
+      activeElementAfterSettle: document.activeElement?.id || '',
     }));
     const accountStructurePass = accountStructure.accessibleDialog && accountStructure.drawerNotInertWhenOpen && accountStructure.initialFocusOnCloseButton;
-    audit.interactions.push({ theme, check: 'account-dialog-semantics-and-initial-focus', pass: accountStructurePass, result: accountStructure });
+    audit.interactions.push({ theme, check: 'account-dialog-semantics-and-initial-focus', pass: accountStructurePass, result: { ...accountStructure, accountFocusBeforeSettle } });
     if (!accountStructurePass) hardFailures.push('Account drawer accessibility state failed: ' + theme);
     await capture(page, 'account-mobile-' + theme + '.jpg');
 

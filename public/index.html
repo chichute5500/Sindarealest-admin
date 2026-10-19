@@ -844,14 +844,14 @@ function renderCart(){
   return `<div class="cart-row"><img src="${escapeHtml(allImages(p)[0])}" alt="${escapeHtml(p.title)}"><div class="cart-row-copy"><strong>${escapeHtml(p.title)}</strong><small>SKU: ${escapeHtml(p.sku||'Liên hệ')}</small><small class="cart-row-price">${priceText}</small><div class="qty-controls"><button class="tap-target" data-qty="-1" data-id="${escapeHtml(id)}" aria-label="Giảm số lượng">−</button><span>${q}</span><button class="tap-target" data-qty="1" data-id="${escapeHtml(id)}" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item tap-target" data-remove="${escapeHtml(id)}" aria-label="Xóa sản phẩm">×</button></div>`;
  }).join('');
 }
-function openCart(){dismissToast();closeCheckout();closeDetail();const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart()}
+function openCart(){dismissToast();closeCheckout(false);closeDetail(false,false);const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart()}
 function closeCart(){const panel=$('#cartDrawer');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow=''}
 function openCheckout(){
  dismissToast();
  renderCart();
  if(!Object.values(cart).some(q=>Number(q)>0)){showToast('Hãy thêm sản phẩm vào giỏ trước khi đặt hàng.');return}
  checkoutReturnFocus=document.activeElement;
- closeCart();
+ closeCart();$('#cartDrawer').setAttribute('inert','');
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
@@ -876,9 +876,9 @@ function closeCheckout(restoreFocus=true){
  }
 }
 function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
- closeCheckout();closeCart();closeDetail();
+ closeCheckout(false);closeCart();closeDetail(false,false);
  const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
- const close=$('#accountClose');if(close)setTimeout(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))close.focus({preventScroll:true})},50);
+ const close=$('#accountClose');const focusClose=()=>{if(close&&panel.classList.contains('open')&&!panel.hasAttribute('inert'))close.focus({preventScroll:true})};focusClose();requestAnimationFrame(()=>requestAnimationFrame(focusClose));setTimeout(focusClose,80);
 }
 function closeAccount(restoreFocus=true){
  const panel=$('#accountDrawer');if(!panel)return;
