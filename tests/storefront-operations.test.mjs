@@ -19,6 +19,9 @@ assert.equal((contactMarkup.match(/class="contact-link/g) || []).length, 6, 'The
 assert.ok(contactMarkup.includes('<strong>Zalo / Điện thoại</strong>'), 'Zalo and phone must share one contact row as in the reference.');
 assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contactMarkup.includes('href="tel:+84827049192"'), 'The combined contact row must keep both the Zalo and phone actions usable.');
 assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
+assert.ok(storefrontHtml.includes('<h1 class="serif"><span>Đẳng Cấp Thật</span><span>Từ Chất Liệu Thật</span></h1>'), 'Hero heading must match the supplied luxury storefront reference.');
+assert.ok(storefrontHtml.includes('SinDarealest mang đến những sản phẩm thời trang da cá sấu cao cấp, kết hợp giữa tinh hoa thủ công và phong cách hiện đại.'), 'Hero description must communicate the supplied brand positioning.');
+assert.ok(storefrontHtml.includes('Khám phá bộ sưu tập <span class="arrow">→</span>'), 'Hero CTA must use the reference collection wording.');
 assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
 assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
