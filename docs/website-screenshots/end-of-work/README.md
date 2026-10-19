@@ -1,17 +1,18 @@
 # Ảnh chụp website — SAU khi hoàn thành
 
-Thư mục này lưu bộ ảnh chụp trạng thái website **sau khi hoàn tất một nhiệm vụ sửa đổi**, để so sánh trực tiếp với bộ ảnh trong `../start-of-work/`.
+Thư mục này chỉ lưu bộ screenshot kết quả mới nhất đã được chụp và kiểm tra thực tế trong chu kỳ hiện tại.
 
 ## Quy tắc chụp
-- Chụp lại cùng các trang, khu vực, trạng thái tương tác, viewport và chế độ màu như bộ ảnh bắt đầu; chụp thêm khu vực mới phát sinh do thay đổi.
-- Mỗi trang/khu vực cần có ảnh riêng. Dùng ảnh full-page để ghi lại chiều dài trang và ảnh chi tiết khi cần; tuyệt đối không sao chép cùng một ảnh vào các vị trí khác nhau để giả làm ảnh bắt đầu/kết thúc.
-- Chụp nhiều kích thước thiết bị cần thiết (ít nhất desktop và mobile với giao diện responsive); kiểm tra sáng/tối nếu có.
-- Ghi rõ URL Preview, nhánh và commit được chụp. Nếu chưa kiểm chứng bằng ảnh sau sửa thì không đánh dấu là hoàn tất.
-- Không đưa ảnh này lên Production hay triển khai Production chỉ vì đã chụp ảnh.
+- Chụp cùng các trang, trạng thái, viewport, theme và nguồn Preview với baseline khi tương ứng; chụp thêm khu vực bị ảnh hưởng.
+- Chụp ảnh viewport và full-page khi phù hợp; các khu vực quan trọng cần ảnh riêng đủ rõ để kiểm tra.
+- Kiểm tra tối thiểu mobile 360×800, mobile 390×844, tablet 768×1024 và desktop 1440×900; các trang quan trọng cần Light và Dark.
+- Không sao chép baseline hoặc ảnh tham chiếu để giả làm kết quả sau sửa.
+- Ghi rõ route, Preview URL, branch, commit, theme, viewport, trạng thái file và kết quả so sánh trong `../manifest.json`.
+- Nếu ảnh thiếu, trang trắng, sai Preview hoặc chưa mở để kiểm tra, ghi trạng thái tương ứng; không coi bộ ảnh là PASS.
 
-## Quy tắc đặt tên
-Dùng tên mô tả nhiệm vụ, trang, thiết bị và giao diện, ví dụ:
-`2026-10-20-admin-home-desktop-light-full.jpg`
-`2026-10-20-catalog-mobile-dark-full.jpg`
-
-Lưu nhiều ảnh trong thư mục này; không gom cả website thành một tấm duy nhất, không ghi đè bộ ảnh kết quả của nhiệm vụ trước. Sau khi chụp, đối chiếu với bộ ảnh tương ứng trong `../start-of-work/` và ghi lại các khác biệt hoặc lỗi còn tồn tại.
+## Quy tắc lưu
+- Đây là một trong đúng hai thư mục ảnh chuẩn tắc.
+- Không tạo thư mục con theo ngày, phiên chat, tên AI, commit hay Run ID.
+- Ảnh cùng tên được thay bằng kết quả hợp lệ mới nhất của cùng trang/trạng thái.
+- Khi bắt đầu chu kỳ mới, chỉ sau khi bộ kết quả này đã được xác minh hợp lệ mới sao chép/chuyển nó thành baseline mới; không cập nhật baseline giữa chu kỳ.
+- Không tuyên bố hoàn thành nếu thư mục chỉ chứa README hoặc .gitkeep.
