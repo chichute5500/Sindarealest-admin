@@ -218,6 +218,33 @@ body{
   .topright #logout::before{content:"↗";font-size:18px;line-height:1}
 }
 
+
+/* Complete the ADMIN glass palette for dense data surfaces and overlays. */
+th{background:rgba(218,235,247,.60);color:#365c78}
+th,td{border-bottom-color:rgba(62,105,139,.16)}
+.thumb,.imageitem{background:rgba(218,235,247,.42);border-color:var(--line)}
+.side-note{background:rgba(255,255,255,.52);border-color:var(--line)}
+.imagedrop{background:rgba(218,235,247,.35);border-color:rgba(92,145,185,.52)}
+.eyebrow{color:#3f7296}
+.error{background:rgba(255,237,234,.88);border-color:rgba(165,67,67,.25);color:#853d38}
+.toast{background:#142a3c;color:#eaf3fb}
+.backdrop{background:rgba(9,19,29,.52);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.editorhead,.editorfooter{border-color:var(--line)}
+:root[data-admin-theme="dark"] th{background:rgba(92,145,185,.15);color:#c8e2f4}
+:root[data-admin-theme="dark"] th,
+:root[data-admin-theme="dark"] td{border-bottom-color:var(--line)}
+:root[data-admin-theme="dark"] .thumb,
+:root[data-admin-theme="dark"] .imageitem{background:rgba(5,14,23,.62);border-color:var(--line)}
+:root[data-admin-theme="dark"] .side-note{background:rgba(5,14,23,.38);border-color:var(--line);color:var(--muted)}
+:root[data-admin-theme="dark"] .imagedrop{background:rgba(92,145,185,.12);border-color:rgba(142,188,224,.38);color:var(--ink)}
+:root[data-admin-theme="dark"] .eyebrow{color:#a8cde8}
+:root[data-admin-theme="dark"] .error{background:rgba(165,67,67,.16);border-color:rgba(255,182,167,.24);color:#ffc5bc}
+:root[data-admin-theme="dark"] .toast{background:#eaf3fb;color:#142a3c}
+:root[data-admin-theme="dark"] .backdrop{background:rgba(0,0,0,.66)}
+:root[data-admin-theme="dark"] .passwordrow .password-toggle{color:#a8bfd1}
+:root[data-admin-theme="dark"] .passwordrow .password-toggle:hover{color:#eaf3fb;background:rgba(92,145,185,.16)}
+@media(prefers-reduced-motion:reduce){.topbar,.sidebar,.mobiletabs,.panel,.stat,.setting,.editor,.logincard,.shortcut,.control,.btn{scroll-behavior:auto!important;transition:none!important}}
+
 </style></head>
 <body>
 <header class="topbar"><div class="brand"><img class="brand-logo" src="/images/brand-emblem.png" alt="SinDarealest"><div><h1>SINDAREAL EST</h1><p>Admin · Crocodile Leather</p></div></div><div class="topright"><span class="badge" id="conn">Đang kiểm tra…</span><button class="btn small" id="adminThemeToggle" type="button" aria-label="Đổi giao diện sáng tối">◐ Giao diện</button><button class="btn small" id="notificationToggle" type="button" aria-expanded="false" aria-controls="notificationPanel"><svg class="bell-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span>Thông báo</span><span id="notificationCount" class="notif-count hidden" aria-label="Số thông báo chưa đọc">0</span></button><button class="btn small" id="logout" type="button" aria-label="Đăng xuất" title="Đăng xuất" hidden>Đăng xuất ↗</button></div></header><section id="notificationPanel" class="notification-panel hidden" aria-label="Trung tâm thông báo"><div class="panelhead" style="padding:0 0 10px"><h3>Hoạt động gần đây</h3><button class="btn small" id="markNotificationsRead" type="button">Đánh dấu đã đọc</button></div><div id="notificationList" class="tiny muted">Đang tải thông báo…</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn small" id="enablePush" type="button">Bật thông báo đẩy</button><span id="pushStatus" class="tiny muted" style="align-self:center"></span></div></section>
