@@ -349,6 +349,25 @@ if(action==="compare"){
     }
     let parsedPairs=parsePairList(comparedText,keys.length);
     if(!parsedPairs)throw new Error("text comparison response did not contain a valid pairs array after one format retry ("+summarizePairResponse(comparedText)+")");
+    // A valid empty match list can mean either "no pair matches" or that the
+    // model declined to enumerate pair-level verdicts. Ask for an explicit
+    // verdict for every unordered pair once; the server still accepts only
+    // same_product=true with confidence >=91 and the visual/ownership gates.
+    if(parsedPairs.pairs.length===0&&keys.length>1){
+      const allPairLabels=[];
+      for(let a=0;a<keys.length;a++)for(let b=a+1;b<keys.length;b++)allPairLabels.push({a,b});
+      const exhaustive=await runVisionWithRetry({
+        messages:[
+          {role:"system",content:"You are a strict pairwise product-identity evaluator. Return ONLY JSON: {\\"pairs\\":[{\\"a\\":0,\\"b\\":1,\\"same_product\\":false,\\"confidence\\":95,\\"rationale\\":\\"reason\\"}]}. You MUST provide exactly one verdict for EVERY listed pair, including negative verdicts. Never omit a pair. same_product=true only when the descriptions support the same specific physical product model/variant, not merely a similar style. Angle, lighting, crop, watermark and background differences alone do not mean different products. Distinct visible material texture, stitching, logo, toe/sole, hardware or unique marks are evidence for different products. If evidence is vague, set same_product=false and explain uncertainty. Confidence is 0-100."},
+          {role:"user",content:promptBase+"\\n\\nReturn one verdict for each of these pairs: "+JSON.stringify(allPairLabels)+". Use only the supplied visual descriptions, not image keys.\\n\\n"+descriptors.map((description,index)=>"Image "+index+" visual description:\\n"+description).join("\\n\\n")+"\\n\\nSchema: {\\"pairs\\":[{\\"a\\":0,\\"b\\":1,\\"same_product\\":false,\\"confidence\\":95,\\"rationale\\":\\"brief reason\\"}]}. Include all "+allPairLabels.length+" pairs exactly once."}
+        ],
+        temperature:0,
+        max_tokens:Math.min(2048,512+allPairLabels.length*90)
+      });
+      const exhaustiveText=exhaustive?.response??exhaustive?.choices?.[0]?.message?.content??exhaustive?.output_text;
+      const exhaustivePairs=parsePairList(exhaustiveText,keys.length);
+      if(exhaustivePairs)parsedPairs=exhaustivePairs;
+    }
     if(typeof comparedText!=="string")comparedText=JSON.stringify(parsedPairs);
     const comparisonDiagnostics={modelPairs:parsedPairs.pairs.length,invalidOrLowConfidence:0,visualGateRejected:0,ownershipRejected:0,accepted:0};
     for(const pair of parsedPairs.pairs){
