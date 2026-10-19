@@ -92,6 +92,7 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   assert.ok(api.includes('ZIP_IMPORT_ENABLED !== "1"'),'product creation must be gated by an explicit environment flag');
   assert.ok(upload.includes('form.get("zipImport") === "1"') && upload.includes('ZIP_IMPORT_ENABLED !== "1"'),'ZIP image uploads must be gated before writing to R2');
   assert.ok(readiness.includes('product_source_imports') && readiness.includes('ZIP_IMPORT_ENABLED'),'Preview readiness must verify the flag and migrated table');
+  assert.ok(readiness.includes('context.env.ORIGINALS'),'Preview readiness must require the private originals bucket, not only public IMAGES');
   assert.ok(migration.includes('REFERENCES products(id) ON DELETE CASCADE'));
 }
 
