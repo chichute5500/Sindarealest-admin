@@ -332,10 +332,32 @@ try {
     await page.locator('#mobileAccountNav').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
     await settle(page);
+    const accountStructure = await page.evaluate(() => ({
+      accessibleDialog: document.querySelector('#accountDrawer')?.getAttribute('role') === 'dialog'
+        && document.querySelector('#accountDrawer')?.getAttribute('aria-modal') === 'true'
+        && document.querySelector('#accountDrawer')?.getAttribute('aria-hidden') === 'false',
+      drawerNotInertWhenOpen: !document.querySelector('#accountDrawer')?.hasAttribute('inert'),
+      initialFocusOnCloseButton: document.activeElement?.id === 'accountClose',
+    }));
+    const accountStructurePass = accountStructure.accessibleDialog && accountStructure.drawerNotInertWhenOpen && accountStructure.initialFocusOnCloseButton;
+    audit.interactions.push({ theme, check: 'account-dialog-semantics-and-initial-focus', pass: accountStructurePass, result: accountStructure });
+    if (!accountStructurePass) hardFailures.push('Account drawer accessibility state failed: ' + theme);
     await capture(page, 'account-mobile-' + theme + '.jpg');
-    audit.interactions.push({ theme, check: 'open-account-panel', pass: true });
+
+    await page.keyboard.press('Shift+Tab');
+    const accountShiftTabWrapped = await page.evaluate(() => document.activeElement?.id === 'accountContactAction');
+    await page.keyboard.press('Tab');
+    const accountTabWrapped = await page.evaluate(() => document.activeElement?.id === 'accountClose');
+    audit.interactions.push({ theme, check: 'account-keyboard-focus-trap', pass: accountShiftTabWrapped && accountTabWrapped, result: { accountShiftTabWrapped, accountTabWrapped } });
+    if (!accountShiftTabWrapped || !accountTabWrapped) hardFailures.push('Account keyboard focus trap failed: ' + theme);
+
     await page.locator('#accountClose').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
+    await page.waitForFunction(() => document.activeElement?.id === 'mobileAccountNav');
+    const accountFocusRestored = await page.evaluate(() => document.activeElement?.id === 'mobileAccountNav');
+    const accountHiddenInert = await page.locator('#accountDrawer').evaluate(el => el.hasAttribute('inert') && el.getAttribute('aria-hidden') === 'true');
+    audit.interactions.push({ theme, check: 'account-close-restores-focus-and-hides-drawer', pass: accountFocusRestored && accountHiddenInert, result: { accountFocusRestored, accountHiddenInert } });
+    if (!accountFocusRestored || !accountHiddenInert) hardFailures.push('Account drawer did not restore focus/close accessibly: ' + theme);
     await context.close();
   }
 } finally {
