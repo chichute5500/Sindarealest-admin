@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "zip-import-admin-password-test";
 const SESSION_SECRET = "zip-import-session-secret-long-enough-for-tests";
 const session = await createSession(SESSION_SECRET);
 
-function database() {
+function database(batchError = null) {
   const batchCalls = [];
   const prepared = [];
   const DB = {
@@ -21,6 +21,7 @@ function database() {
     },
     async batch(statements) {
       batchCalls.push(statements);
+      if (batchError) throw batchError;
       return statements.map(() => ({ success: true, meta: { changes: 1 } }));
     },
   };
@@ -105,6 +106,18 @@ const product = {
   assert.ok(auditInsert, "ZIP creation should create an audit log in the same batch");
   assert.equal(auditInsert.args[1], "product_created_from_zip");
   assert.equal(JSON.parse(auditInsert.args[3]).exportId, "collector-export-0001");
+}
+
+// Database uniqueness is the final guard even if a client bypasses the ZIP preview duplicate filter.
+{
+  const { DB, batchCalls } = database(new Error("UNIQUE constraint failed: product_source_imports.source_product_id"));
+  const response = await createProduct({
+    request: request(product),
+    env: { DB, ADMIN_PASSWORD, SESSION_SECRET, ZIP_IMPORT_ENABLED: "1" },
+  });
+  assert.equal(response.status, 409);
+  assert.match((await response.json()).error, /đã được nhập trước đó/i);
+  assert.equal(batchCalls.length, 1, "duplicate source should fail the atomic batch rather than leave a product without provenance");
 }
 
 console.log("PASS: ZIP product API is feature-gated, forces imported products hidden, and batches product/source/audit writes atomically.");
