@@ -231,7 +231,7 @@ if(action==="compare"){
     const objects=await Promise.all(keys.map(k=>env.IMAGES.get(k)));
     if(objects.some(x=>!x))return fail("Một hoặc nhiều ảnh không còn tồn tại trong R2.",404);
     const supplied=Array.isArray(body.imageData)?body.imageData:[];
-    if(supplied.length!==keys.length||supplied.some((x,i)=>!x||x.key!==keys[i]||typeof x.dataUrl!=="string"||!/^data:image\\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(x.dataUrl)))return fail("Không nhận được ảnh JPEG đã chuyển đổi từ trình duyệt. Hãy tải lại trang và thử lại.",400);
+    if(supplied.length!==keys.length||supplied.some((x,i)=>!x||x.key!==keys[i]||typeof x.dataUrl!=="string"||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(x.dataUrl)))return fail("Không nhận được ảnh JPEG đã chuyển đổi từ trình duyệt. Hãy tải lại trang và thử lại.",400);
     if(supplied.some(x=>x.dataUrl.length>700000))return fail("Ảnh sau chuyển đổi vẫn quá lớn. Hãy thử ảnh nhỏ hơn.",413);
     const limit=await rateLimitPublicRequest(env,context.request,"admin_image_group_compare",30,3600);
     if(limit.limited)return fail("Đã đạt giới hạn 30 lượt tìm nhóm AI mỗi giờ. Vui lòng thử lại sau.",429,{"Retry-After":"3600"});
@@ -243,12 +243,12 @@ if(action==="compare"){
       for(let attempt=0;attempt<2;attempt++){
         try{return await env.AI.run(MODEL,input)}
         catch(error){
-          const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\\r\\n]+/g," ").slice(0,180);
+          const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
           const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
-          const quota=upstreamStatus===429||/\\b429\\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
-          const transient=[500,502,503,504].includes(upstreamStatus)||/\\b(500|502|503|504)\\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+          const quota=upstreamStatus===429||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+          const transient=[500,502,503,504].includes(upstreamStatus)||/\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
           if(quota){error.status=429;throw error}
-          if(attempt===0&&transient&&!/\\b3030\\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
+          if(attempt===0&&transient&&!/\b3030\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
           error.status=transient?503:upstreamStatus||502;
           throw error;
         }
@@ -274,8 +274,8 @@ if(action==="compare"){
       descriptors.push(descriptorText.trim().slice(0,2200));
     }
     const comparisonMessages=[
-      {role:"system",content:"Compare all supplied visual descriptions. Check every pair in the complete list, including pairs far apart in the list. Decide which show the SAME physical product, not merely similar styles. View angle, lighting and background may differ; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Use zero-based indices matching the labels exactly. Return only valid JSON: {\\"pairs\\":[{\\"a\\":0,\\"b\\":1,\\"same_product\\":true,\\"confidence\\":91,\\"rationale\\":\\"brief Vietnamese reason\\"}]}. Include only credible same-product pairs with confidence >= 91; never pair an image with itself. Return an empty pairs array if no pair qualifies."},
-      {role:"user",content:promptBase+"\\n\\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+", mô tả từ phân tích thị giác):\\n"+description).join("\\n\\n")+"\\n\\nCó "+keys.length+" ảnh trong danh sách. Kiểm tra TẤT CẢ các cặp i<j, bao gồm ảnh đầu và ảnh cuối. Chỉ trả JSON, chỉ đề xuất cặp có confidence từ 91 trở lên."}
+      {role:"system",content:"Compare all supplied visual descriptions. Check every pair in the complete list, including pairs far apart in the list. Decide which show the SAME physical product, not merely similar styles. View angle, lighting and background may differ; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Use zero-based indices matching the labels exactly. Return only valid JSON: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":91,\"rationale\":\"brief Vietnamese reason\"}]}. Include only credible same-product pairs with confidence >= 91; never pair an image with itself. Return an empty pairs array if no pair qualifies."},
+      {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+", mô tả từ phân tích thị giác):\n"+description).join("\n\n")+"\n\nCó "+keys.length+" ảnh trong danh sách. Kiểm tra TẤT CẢ các cặp i<j, bao gồm ảnh đầu và ảnh cuối. Chỉ trả JSON, chỉ đề xuất cặp có confidence từ 91 trở lên."}
     ];
     let compared=await runVisionWithRetry({messages:comparisonMessages,temperature:0,max_tokens:1400});
     let comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
@@ -283,7 +283,7 @@ if(action==="compare"){
       compared=await runVisionWithRetry({
         messages:[
           {role:"system",content:"Return ONLY valid JSON with a top-level pairs array. Each pair must have numeric a and b indices, boolean same_product, integer confidence 0-100, and a short Vietnamese rationale. No markdown or explanation. Only report confidence >= 91 and inspect every pair from the full image-description list."},
-          {role:"user",content:"The previous response was malformed. Re-evaluate the complete list below, checking all pairs including first-to-last. Return valid JSON only. "+promptBase+"\\n\\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+"):\\n"+description).join("\\n\\n")}
+          {role:"user",content:"The previous response was malformed. Re-evaluate the complete list below, checking all pairs including first-to-last. Return valid JSON only. "+promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+"):\n"+description).join("\n\n")}
         ],
         temperature:0,
         max_tokens:1400
@@ -310,9 +310,9 @@ if(action==="compare"){
     await env.DB.batch(statements);
     return json({ok:true,matches:prepared.length,batches:1,message:"AI đã so sánh đầy đủ "+keys.length+" ảnh và tạo "+prepared.length+" cặp đề xuất sau khi kiểm tra ngưỡng và đặc trưng. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201);
   }catch(error){
-    const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\\r\\n]+/g," ").slice(0,220);
+    const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,220);
     const status=Number(error?.status||error?.statusCode||error?.status_code||0);
-    if(status===429||/\\b429\\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
+    if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
     return fail("Không thể so sánh đủ các ảnh bằng Workers AI: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
   }
 }
