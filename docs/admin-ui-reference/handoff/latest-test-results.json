@@ -1,0 +1,35 @@
+{
+  "status": "NOT_TESTED",
+  "repository": "chichute5500/Sindarealest-admin",
+  "targetBranch": "fix/liquid-glass-audit-2026-10-19",
+  "testedCommitSha": null,
+  "capturedAt": null,
+  "note": "Initial template only. Replace fields with actual Playwright/test results. Do not claim PASS without evidence.",
+  "screenshots": [],
+  "checks": {
+    "baselineGitState": "NOT_TESTED",
+    "applicationStartup": "NOT_TESTED",
+    "playwright": "NOT_TESTED",
+    "visualComparison": "NOT_TESTED",
+    "consoleErrors": "NOT_TESTED",
+    "networkErrors": "NOT_TESTED",
+    "responsiveViewports": "NOT_TESTED",
+    "lightMode": "NOT_TESTED",
+    "darkMode": "NOT_TESTED",
+    "accessibilityAndVietnameseTypography": "NOT_TESTED",
+    "lint": "NOT_TESTED",
+    "typecheck": "NOT_TESTED",
+    "automatedTests": "NOT_TESTED",
+    "build": "NOT_TESTED",
+    "businessFlows": "NOT_TESTED"
+  },
+  "remainingIssues": [],
+  "blockedItems": [],
+  "nextActions": [
+    "Verify repository branch, HEAD SHA and working tree.",
+    "Inspect project scripts, routes, authentication and existing Playwright setup.",
+    "Capture genuine baseline screenshots before edits.",
+    "Run available checks and update this file with evidence."
+  ],
+  "productionDeployment": "NOT_PERFORMED"
+}
