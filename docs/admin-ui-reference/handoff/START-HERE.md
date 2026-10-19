@@ -1,0 +1,27 @@
+# SinDarealest ADMIN — điểm bắt đầu bàn giao cho AI
+
+> Thư mục này là điểm bàn giao bền vững giữa các phiên AI. Nội dung chỉ phản ánh trạng thái đã được ghi và kiểm chứng; không coi báo cáo cũ là bằng chứng nếu chưa xác minh lại.
+
+## Trước khi làm bất cứ việc gì
+1. Xác nhận repository `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, HEAD SHA và `git status`.
+2. Đọc file này, rồi đọc `LATEST-STATUS.md`, `latest-test-results.json` và `../reference-instructions.md`.
+3. Mở ảnh thiết kế gốc `../admin-mobile-reference.png`; dùng `../admin-mobile-reference.html` và ZIP tham chiếu khi cần.
+4. Kiểm tra ảnh gần nhất trong thư mục `history/` và đối chiếu SHA trong báo cáo với HEAD hiện tại. Nếu lệch, không coi ảnh đó là ảnh của code hiện tại.
+5. Đọc MASTER PROMPT tại `../MASTER-PROMPT-AUTO-HANDOFF.md` và thực hiện đầy đủ.
+
+## Quy tắc cập nhật sau mỗi mốc công việc
+- Sau mỗi mốc sửa có ý nghĩa và đã chạy kiểm tra, dùng Playwright chụp ảnh giao diện đang chạy thật; không tạo ảnh giả.
+- Lưu ảnh theo commit/mốc vào `history/<short-sha-or-run-id>/screenshots/` và cập nhật bản mới nhất nếu môi trường hỗ trợ.
+- Cập nhật `LATEST-STATUS.md`, kết quả kiểm thử và danh sách lỗi còn lại. Ghi SHA thực tế; không tự bịa thời gian, route, kết quả hoặc commit.
+- Chỉ ghi PASS khi có bằng chứng. Dùng BLOCKED/NOT TESTED khi chưa kiểm tra được.
+- Commit chỉ trên branch fix này. Không merge main, không deploy production, không đổi schema/binding/secret hay dữ liệu thật.
+- Nếu quyền truy cập, Playwright hoặc GitHub bị lỗi, ghi rõ trở ngại và hướng tiếp tục; không tuyên bố đã lưu nếu API chưa xác nhận.
+
+## Tệp trong thư mục này
+- `LATEST-STATUS.md`: trạng thái bàn giao mới nhất.
+- `latest-test-results.json`: mẫu/cập nhật kết quả kiểm thử.
+- `MASTER-PROMPT-AUTO-HANDOFF.md` ở thư mục cha: prompt duy nhất dùng để khởi động và tiếp tục công việc.
+- `history/`: ảnh/báo cáo theo từng mốc, giữ lịch sử không ghi đè.
+
+## Lưu ý về ảnh
+Các file `latest-*.png` chỉ được coi là ảnh chụp thực tế sau khi được tạo bởi Playwright từ ứng dụng đang chạy và lưu thành công. Nếu chưa có ảnh, không tạo placeholder PNG và không đánh dấu hoàn thành.
