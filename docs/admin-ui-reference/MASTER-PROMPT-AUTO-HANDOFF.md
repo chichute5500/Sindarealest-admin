@@ -26,7 +26,7 @@ Mục tiêu đồng thời:
   - `docs/admin-ui-reference/handoff/START-HERE.md`
   - `docs/admin-ui-reference/handoff/LATEST-STATUS.md`
   - `docs/admin-ui-reference/handoff/latest-test-results.json`
-- File prompt này là tài liệu chuẩn duy nhất để hướng dẫn công việc. Mỗi phiên AI/automation được giao tác vụ phải đọc `handoff/START-HERE.md`, `handoff/LATEST-STATUS.md`, `handoff/latest-test-results.json` và prompt này, xác minh code thực tế rồi tiếp tục. Repository không tự kích hoạt phiên AI mới; nếu không có agent/automation chạy tự động, người dùng vẫn cần mở/khởi chạy phiên tiếp theo, nhưng chỉ cần yêu cầu ngắn như “Tiếp tục theo MASTER PROMPT AUTO-HANDOFF trên nhánh fix”, không cần tự soạn lại toàn bộ prompt.
+- File prompt này là tài liệu chuẩn duy nhất để hướng dẫn công việc. Mỗi phiên AI/automation được giao tác vụ phải đọc `handoff/START-HERE.md`, `handoff/LATEST-STATUS.md`, `handoff/latest-test-results.json` và prompt này, xác minh code thực tế rồi tiếp tục. Repository không tự kích hoạt phiên AI mới; nếu không có agent/automation chạy tự động, người dùng vẫn cần mở/khởi chạy phiên tiếp theo, nhưng chỉ cần yêu cầu ngắn như “Tiếp tục theo MASTER PROMPT AUTO-HANDOFF trên nhánh ADMIN riêng”, không cần tự soạn lại toàn bộ prompt.
 
 ## 3. Quy tắc an toàn và phạm vi
 - Bắt đầu bằng việc xác minh branch, HEAD SHA, working tree và nhánh remote. Nhánh mục tiêu duy nhất để sửa/commit ADMIN là `feature/admin-isolated-handoff-2026-10-20`.
@@ -45,13 +45,12 @@ Mục tiêu đồng thời:
 ## 4. Bắt buộc xác minh trước khi sửa
 1. Xác minh repo `chichute5500/Sindarealest-admin`, nhánh hiện tại, HEAD SHA, remote và `git status`; bắt buộc branch hiện tại phải là `feature/admin-isolated-handoff-2026-10-20` trước khi sửa/commit.
 2. Ghi nhận HEAD của nhánh website tĩnh `fix/liquid-glass-audit-2026-10-19` để làm mốc đối chiếu, nhưng không checkout để sửa nhánh đó và không tự đồng bộ code từ nhánh đó.
-3. Lập danh sách thay đổi hiện có và các file ADMIN/public/shared. Không xóa, reset, stash, revert hay ghi đè thay đổi của người khác.
-2. Đọc README, package scripts, lockfile, cấu hình build, test, Playwright và hướng dẫn repo.
-3. Đọc `handoff/LATEST-STATUS.md` và `handoff/latest-test-results.json`; coi đó là manh mối, không phải sự thật nếu không khớp với code hiện tại.
-4. Mở ảnh tham chiếu PNG. Kiểm tra HTML và ZIP; nếu có thể, trích xuất asset vào thư mục tạm để đối chiếu, không ghi đè source. Ghi rõ nếu không đọc được.
-5. Khảo sát source để lập danh sách route, module, component, API calls, auth guards, backend bindings và tính năng đang tồn tại.
-6. Chạy các kiểm thử baseline phù hợp trước sửa. Lưu log lỗi có thể chia sẻ, loại bỏ secrets/PII.
-7. Xác định cách khởi chạy ADMIN thật và cách xác nhận trang đã sẵn sàng trước khi chụp.
+3. Đọc README, package scripts, lockfile, cấu hình build, test, Playwright và hướng dẫn repo.
+4. Đọc `handoff/LATEST-STATUS.md` và `handoff/latest-test-results.json`; coi đó là manh mối, không phải sự thật nếu không khớp với code hiện tại.
+5. Mở ảnh tham chiếu PNG. Kiểm tra HTML và ZIP; nếu có thể, trích xuất asset vào thư mục tạm để đối chiếu, không ghi đè source. Ghi rõ nếu không đọc được.
+6. Khảo sát source để lập danh sách route, module, component, API calls, auth guards, backend bindings và tính năng đang tồn tại.
+7. Chạy các kiểm thử baseline phù hợp trước sửa. Lưu log lỗi có thể chia sẻ, loại bỏ secrets/PII.
+8. Xác định cách khởi chạy ADMIN thật và cách xác nhận trang đã sẵn sàng trước khi chụp.
 
 ## 5. Thiết kế và UX
 - Bám sát ảnh tham chiếu SinDarealest: luxury minimalism, Apple Liquid Glass, cảm giác cao cấp, bề mặt kính nhiều lớp có kiểm soát, bo góc nhất quán, chuyển động tinh tế và bố cục sạch.
