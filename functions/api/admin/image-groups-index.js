@@ -52,21 +52,28 @@ function compareIndexedRows(left, right) {
   const score = Math.round(((1 - distance / 64) * 0.30 + shape * 0.35 + color * 0.35) * 100);
   return { match: score >= 91 && shape >= 0.58 && color >= 0.58 && distance <= 24, score, shape, color, distance, exactDuplicate: false };
 }
-function validateCandidateGroup(rows, keys) {
+function validateClassifiedGroup(rows, keys) {
   if (!Array.isArray(rows) || rows.length !== keys.length || rows.length < 2) return { valid: false, reason: "missing_index" };
   const byKey = new Map(rows.map(row => [String(row.image_key), row]));
   const ordered = keys.map(key => byKey.get(key));
-  if (ordered.some(row => !row || !parseGroupableFeatures(row))) return { valid: false, reason: "unconfirmed_classification" };
-  const category = parseGroupableFeatures(ordered[0]).category;
+  const features = ordered.map(row => row && parseGroupableFeatures(row));
+  if (features.some(item => !item)) return { valid: false, reason: "unconfirmed_classification" };
+  const category = features[0].category;
+  if (features.some(item => item.category !== category)) return { valid: false, reason: "mixed_categories" };
+  return { valid: true, category, ordered };
+}
+function validateCandidateGroup(rows, keys) {
+  const classified = validateClassifiedGroup(rows, keys);
+  if (!classified.valid) return classified;
   let minimumScore = 100;
-  for (let i = 0; i < ordered.length; i++) {
-    for (let j = i + 1; j < ordered.length; j++) {
-      const result = compareIndexedRows(ordered[i], ordered[j]);
+  for (let i = 0; i < classified.ordered.length; i++) {
+    for (let j = i + 1; j < classified.ordered.length; j++) {
+      const result = compareIndexedRows(classified.ordered[i], classified.ordered[j]);
       if (!result.match || result.score < 91) return { valid: false, reason: result.reason || "similarity_below_threshold" };
       minimumScore = Math.min(minimumScore, result.score);
     }
   }
-  return { valid: true, category, similarity: minimumScore };
+  return { valid: true, category: classified.category, similarity: minimumScore };
 }
 
 
@@ -563,8 +570,28 @@ export async function onRequestPost(context) {
         return fail("Chỉ được duyệt nhóm đã qua kiểm tra ghép ảnh tối thiểu 91/100.", 409);
       }
       const indexed = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
-      const verification = validateCandidateGroup(indexed.results || [], keys);
-      if (!verification.valid) return fail("Nhóm không còn đủ điều kiện an toàn để duyệt: danh mục, đặc trưng hoặc ngưỡng ghép ảnh chưa được xác minh.", 409);
+      const classified = validateClassifiedGroup(indexed.results || [], keys);
+      if (!classified.valid) return fail("Nhóm không còn đủ điều kiện an toàn để duyệt: phân loại, đặc trưng hoặc danh mục chưa được xác minh.", 409);
+      // Original AI proposals must still pass the 91/100 pairwise gate at
+      // approval time. Deliberate administrator edits (split/merge/move) are
+      // the manual-review path: they may override visual similarity, but never
+      // the confirmed-category, descriptor-integrity or group-score safeguards.
+      const manualAudit = await env.DB.prepare(
+        "SELECT action,entity_id,details_json FROM audit_logs WHERE entity_type='image_group_set' AND action IN ('image_group_split','image_group_merge','image_group_move') ORDER BY created_at DESC LIMIT 200"
+      ).all();
+      const manuallyAdjusted = (manualAudit.results || []).some(row => {
+        if (String(row.entity_id || "") === id) return true;
+        let details = {};
+        try { details = JSON.parse(row.details_json || "{}"); } catch {}
+        return String(details.newGroupId || "") === id ||
+          String(details.sourceGroupId || "") === id ||
+          String(details.targetGroupId || "") === id ||
+          (Array.isArray(details.mergedGroupIds) && details.mergedGroupIds.map(String).includes(id));
+      });
+      if (!manuallyAdjusted) {
+        const verification = validateCandidateGroup(indexed.results || [], keys);
+        if (!verification.valid) return fail("Nhóm AI không còn đạt ngưỡng ghép ảnh 91/100 khi kiểm tra lại. Hãy xem xét thủ công hoặc loại đề xuất.", 409);
+      }
       const [objects, product] = await Promise.all([
         Promise.all(keys.map(key => env.IMAGES.head ? env.IMAGES.head(key) : env.IMAGES.get(key))),
         env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(productId).first()
