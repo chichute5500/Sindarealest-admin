@@ -620,11 +620,19 @@ try {
         && document.querySelector('#accountDrawer')?.getAttribute('aria-hidden') === 'false',
       drawerNotInertWhenOpen: !document.querySelector('#accountDrawer')?.hasAttribute('inert'),
       initialFocusOnCloseButton: document.activeElement?.id === 'accountClose',
+      addressPanelHiddenUntilSelected: !!document.querySelector('#accountAddressView')?.hidden
+        && getComputedStyle(document.querySelector('#accountAddressView')).display === 'none',
+      favoritesPanelHiddenUntilSelected: !!document.querySelector('#accountFavoritesView')?.hidden
+        && getComputedStyle(document.querySelector('#accountFavoritesView')).display === 'none',
+      ordersPanelHiddenUntilSelected: !!document.querySelector('#accountOrdersView')?.hidden
+        && getComputedStyle(document.querySelector('#accountOrdersView')).display === 'none',
       activeElementAfterSettle: document.activeElement?.id || '',
     }));
-    const accountStructurePass = accountStructure.accessibleDialog && accountStructure.drawerNotInertWhenOpen && accountStructure.initialFocusOnCloseButton;
+    const accountStructurePass = accountStructure.accessibleDialog && accountStructure.drawerNotInertWhenOpen
+      && accountStructure.initialFocusOnCloseButton && accountStructure.addressPanelHiddenUntilSelected
+      && accountStructure.favoritesPanelHiddenUntilSelected && accountStructure.ordersPanelHiddenUntilSelected;
     audit.interactions.push({ theme, check: 'account-dialog-semantics-and-initial-focus', pass: accountStructurePass, result: { ...accountStructure, accountFocusBeforeSettle } });
-    if (!accountStructurePass) hardFailures.push('Account drawer accessibility state failed: ' + theme);
+    if (!accountStructurePass) hardFailures.push('Account drawer accessibility/hidden-panel state failed: ' + theme);
     await capture(page, 'account-mobile-' + theme + '.jpg');
 
     const accountFocusEndpoints = await page.evaluate(() => {
