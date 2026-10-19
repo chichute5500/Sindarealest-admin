@@ -1164,10 +1164,10 @@ img { -webkit-user-drag:none; user-select:none; }
  document.addEventListener('keyup',e=>{if(e.key==='PrintScreen'){shield?.classList.add('active');setTimeout(()=>shield?.classList.remove('active'),900)}},true);
  window.addEventListener('blur',()=>document.documentElement.classList.add('sd-window-blurred'));
  window.addEventListener('focus',()=>document.documentElement.classList.remove('sd-window-blurred'));
- let config={watermarkEnabled:true,watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68};
+ let config={watermarkEnabled:true,watermarkLogoUrl:'/watermark.webp',watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68};
  const positions=new Set(['top-left','top-right','bottom-left','bottom-right','center']);
  function styleWatermark(mark){
-  mark.src='/watermark.webp';
+  mark.src=config.watermarkLogoUrl||'/watermark.webp';
   mark.style.setProperty('--sd-watermark-size',config.watermarkSize+'%');
   mark.style.setProperty('--sd-watermark-opacity',String(config.watermarkOpacity/100));
   mark.style.top='';mark.style.right='';mark.style.bottom='';mark.style.left='';mark.style.transform='';
@@ -1184,6 +1184,7 @@ img { -webkit-user-drag:none; user-select:none; }
  function applyDetailWatermark(next){
   if(next&&typeof next==='object')config={
    watermarkEnabled:next.watermarkEnabled!==false,
+   watermarkLogoUrl:typeof next.watermarkLogoUrl==='string'&&(next.watermarkLogoUrl==='/watermark.webp'||/^\\/media\\/[A-Za-z0-9-]{30,40}\\.webp$/.test(next.watermarkLogoUrl))?next.watermarkLogoUrl:'/watermark.webp',
    watermarkPosition:positions.has(next.watermarkPosition)?next.watermarkPosition:'bottom-right',
    watermarkSize:Number.isInteger(Number(next.watermarkSize))&&Number(next.watermarkSize)>=6&&Number(next.watermarkSize)<=35?Number(next.watermarkSize):16,
    watermarkOpacity:Number.isInteger(Number(next.watermarkOpacity))&&Number(next.watermarkOpacity)>=10&&Number(next.watermarkOpacity)<=100?Number(next.watermarkOpacity):68
