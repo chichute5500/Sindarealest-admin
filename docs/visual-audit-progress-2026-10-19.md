@@ -115,3 +115,38 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - `main` không bị ghi; không merge production và không có thao tác deploy production từ nhiệm vụ này.
 - Tiến độ ước tính sau kiểm tra: **73%** theo checklist, không phải visual-similarity score. Tiến độ tăng nhẹ do tìm/đọc ZIP nguồn, sửa một sai lệch Liquid Glass có bằng chứng, điều chỉnh test và đạt lại source/test CI cùng preview.
 - Chưa nghiệm thu 100%: đối chiếu pixel/overlay đầy đủ 28 ảnh với các màn hình mới; dữ liệu/catalog phù hợp ảnh mẫu; hoàn tất mọi sai lệch thị giác lớn; kiểm thử route/state bổ sung; kiểm thử Android vật lý và backend production. Không suy diễn kết quả preview cô lập sang D1/R2, login, order hay payment production.
+
+
+## Cập nhật nghiệm thu mở rộng — 19/10/2026 (preview 89)
+
+### Liên hệ đã được căn chỉnh theo ảnh mẫu
+- Commit UI: `8b00d5937a47ebaf1bdc5c861a1df2e779a48b00`; file `public/index.html`.
+- Hợp nhất dòng Điện thoại và Zalo thành mục `Zalo / Điện thoại`; vẫn giữ hai hành động độc lập: mở `https://zalo.me/0827049192` và gọi `tel:+84827049192`.
+- Phần địa chỉ hiển thị đủ `Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam`.
+- Chuyển lưới liên hệ desktop sang sáu cột ở breakpoint desktop; điều chỉnh mapping màu biểu tượng theo thứ tự sáu mục.
+- Commit test: `cd4cba65b77e524b3eba72c701344f51fd9a0c77`; regression kiểm tra đúng sáu mục, hai liên kết, tiêu đề nhóm và địa chỉ.
+- Test kiểm tra nguồn trên commit test đạt SUCCESS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39191624992.
+
+### Audit mở rộng theo màn hình tại viewport mobile
+- Commit script: `275aa3d582dc287bd0a70d18dfd09922923a24b0`; sau đó mở rộng tiếp tại `88cb40a1363b076e3145ecb44996f10746a35338`.
+- File: `scripts/capture-liquid-glass-preview.mjs`.
+- Thêm ảnh chụp theo viewport của footer contact; thêm capture riêng cho lưới sản phẩm và khu vực The Art of…; thêm ảnh crop trực tiếp vùng contact để dễ đọc và so sánh.
+- Thêm runtime assertion xác nhận ở viewport 390 px có hai cột sản phẩm, đủ card, không overflow; thêm assertion contact sáu mục, địa chỉ đủ, và hai liên kết Zalo/điện thoại.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39192137749).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39192137753).
+- Artifact mới nhất: `sindarealest-liquid-glass-preview-89`, ID `12160681209`, source SHA `88cb40a1363b076e3145ecb44996f10746a35338`.
+- Báo cáo audit preview 89: 44 screenshot; 20 viewport/theme cases; 46 interaction checks; `passed=true`; `productFixtureCount=235`; responsive overflow 0; `hardFailures=[]`; page errors 0; console errors 0; HTTP errors 0; failed requests 0; test không phát sinh write requests.
+- Các check mobile product-grid và footer contact đều PASS ở cả Light/Dark. Đã mở screenshot `products-grid-mobile-light.jpg`, `art-section-mobile-light.jpg`, `contact-section-element-mobile-light.jpg` và ảnh tương ứng Dark để xem trực tiếp.
+
+### Những sai lệch vẫn còn — không thể xử lý bằng CSS đơn thuần
+- Nguồn `data/legacy-products.json` có 235 sản phẩm: sneakers 62, loafers 52, dress-shoes 22, wallets 28, belts 22, sandals 22, watch-straps 21, phone-cases 6. Không có nhóm túi xách/handbag.
+- Cả 235 sản phẩm đều chưa có giá đã được xác nhận (`price` trống/null; `sourcePriceConfirmed=true` là 0). Không điền giá giả.
+- 63 sản phẩm có từ hai ảnh trở lên. Ảnh preview hero/catalog vì thế đang dùng tài sản thật của catalog (nhiều giày/dép); không thay thành túi giả để bắt chước ảnh.
+- Ảnh crop khu vực contact cho thấy lưới sáu mục và địa chỉ đầy đủ, nhưng contact vẫn là một section cuối trang dài cùng phần tra cứu bảo hành, không phải route/màn hình độc lập như ảnh tham chiếu. Không tự viết lại routing/state rộng trong cùng một thay đổi nhỏ.
+- Header logo hiện đang sử dụng tài sản thương hiệu có sẵn trong repo; asset `brand-emblem.png` là huy hiệu cá sấu kèm chữ SD, khác hình cá sấu nằm ngang trong ảnh tham chiếu. Không chế logo mới khi chưa có asset gốc phù hợp.
+- CI/Playwright chạy trên Chromium emulation; chưa có nghiệm thu điện thoại Android vật lý hay backend production.
+
+### Trạng thái sau cập nhật
+- Branch `fix/liquid-glass-audit-2026-10-19`; HEAD được xác minh tại `88cb40a1363b076e3145ecb44996f10746a35338`.
+- `main` vẫn ở `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; không có merge, deploy hay thay đổi cấu hình production từ nhiệm vụ này.
+- Tiến độ đánh giá: **75%**. Đã củng cố Liquid Glass nav, gom và xác minh nội dung liên hệ, thêm regression tests và thêm screenshot/assertions cho vùng product/contact. Chưa thể nâng lên 100% vì còn độ lệch bố cục/hero so với mẫu, thiếu danh mục túi và giá sản phẩm đã xác nhận, trải nghiệm vẫn là storefront dài với drawer/modal, cùng giới hạn kiểm thử thiết bị/backend nêu trên.
