@@ -47,6 +47,12 @@ async function capture(page, filename, fullPage = false) {
   await page.screenshot({ path: path.join(outDir, filename), fullPage, animations: 'disabled', type: 'jpeg', quality: 86 });
   audit.screenshots.push({ filename, fullPage });
 }
+async function captureElement(page, selector, filename) {
+  const element = page.locator(selector);
+  await element.waitFor({ state: 'visible' });
+  await element.screenshot({ path: path.join(outDir, filename), animations: 'disabled', type: 'jpeg', quality: 88 });
+  audit.screenshots.push({ filename, fullPage: false, element: selector });
+}
 async function settle(page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
@@ -308,8 +314,50 @@ try {
       delete root.dataset.previewPreviousScrollBehavior;
     });
 
-    // Theme toggle writes only browser localStorage; no settings endpoint is called.
+    // Capture the two most important reference sections at mobile viewport size.
     await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate((selector) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      const element = document.querySelector(selector);
+      if (element) window.scrollTo(0, Math.max(0, window.scrollY + element.getBoundingClientRect().top - 92));
+    }, '#products');
+    await settle(page);
+    const productGridScreen = await page.evaluate(() => {
+      const grid = document.querySelector('#catalogGrid');
+      const cards = [...document.querySelectorAll('#catalogGrid .product-card')];
+      const first = cards[0]?.getBoundingClientRect();
+      const second = cards[1]?.getBoundingClientRect();
+      return {
+        gridVisible: !!grid && grid.getBoundingClientRect().height > 0,
+        productCount: cards.length,
+        firstRowHasTwoColumns: !!first && !!second && Math.abs(first.top - second.top) <= 4 && second.left > first.left,
+        firstCardWidth: first ? Math.round(first.width) : 0,
+        secondCardWidth: second ? Math.round(second.width) : 0,
+        viewportWidth: innerWidth,
+        documentWidth: document.documentElement.scrollWidth,
+      };
+    });
+    const productGridPass = productGridScreen.gridVisible
+      && productGridScreen.productCount >= 4
+      && productGridScreen.firstRowHasTwoColumns
+      && productGridScreen.firstCardWidth >= 100
+      && productGridScreen.secondCardWidth >= 100
+      && productGridScreen.documentWidth <= productGridScreen.viewportWidth + 1;
+    audit.interactions.push({ theme, check: 'mobile-product-grid-two-column-layout', pass: productGridPass, result: productGridScreen });
+    if (!productGridPass) hardFailures.push('Mobile product grid was not a visible two-column layout: ' + theme);
+    await capture(page, 'products-grid-mobile-' + theme + '.jpg');
+
+    await page.evaluate((selector) => {
+      const element = document.querySelector(selector);
+      if (element) window.scrollTo(0, Math.max(0, window.scrollY + element.getBoundingClientRect().top - 92));
+    }, '#collections');
+    await settle(page);
+    await capture(page, 'art-section-mobile-' + theme + '.jpg');
+    await captureElement(page, '#contact', 'contact-section-element-mobile-' + theme + '.jpg');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await settle(page);
+
+    // Theme toggle writes only browser localStorage; no settings endpoint is called.
     await page.locator('#mobileAccountNav').click();
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
     const before = await page.locator('html').evaluate((el) => el.classList.contains('dark'));
