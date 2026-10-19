@@ -1415,6 +1415,26 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
   .nav-actions #searchJump,.nav-actions #cartOpen{display:grid}
 }
 
+
+/* Reference alignment: keep editorial and catalog subtitles below their headings on narrow screens. */
+@media(max-width:760px){
+  #collections .section-head,
+  #products .section-head{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:5px;
+  }
+  #collections .section-head{margin-bottom:12px}
+  #collections .section-note,
+  #products .section-note{
+    max-width:none;
+    width:100%;
+    font-size:10px;
+    line-height:1.5;
+  }
+}
+
 </style>
 
 
