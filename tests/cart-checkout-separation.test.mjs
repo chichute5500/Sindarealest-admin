@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const once = (id) => assert.equal((html.match(new RegExp('id="' + id + '"', 'g')) || []).length, 1, id + ' must exist exactly once.');
@@ -22,8 +23,29 @@ assert.match(html, /id="cartSubtotal"/, 'Cart must expose a subtotal summary.');
 assert.match(html, /id="cartTitle"/, 'Cart must display a dynamic item count.');
 assert.match(html, /id="cartCheckout"/, 'Cart must expose a dedicated continue-to-order action.');
 assert.match(html, /function hasPublicPrice\(/, 'Price display must be guarded by a shared real-value validator.');
+assert.match(html, /function hasConfirmedPublicPrice\(product\)\{return !!product&&product\.sourcePriceConfirmed===true&&hasPublicPrice\(product\.price\)\}/, 'Public price must require explicit price confirmation, not merely a numeric field.');
+assert.match(html, /function customerPriceLabel\(product\)\{return hasConfirmedPublicPrice\(product\)\?formatVnd\(product\.price\):''\}/, 'Customer price labels must stay blank for hidden, missing or unconfirmed prices.');
 assert.match(html, /function formatVnd\(/, 'Visible prices must use Vietnamese currency formatting.');
-assert.match(html, /entries\.every\(\(\{p\}\)=>hasPublicPrice\(p\.price\)\)/, 'Subtotal must stay unconfirmed if any cart item has no known price.');
+assert.match(html, /class="detail-price" id="detailPrice" hidden/, 'Product detail must contain a price field that starts hidden.');
+assert.match(html, /detailPrice\.hidden=!detailPrice/, 'Product detail price visibility must follow the confirmed/public-price result.');
+assert.match(html, /function productCard\([^\n]+product-price/, 'Catalog cards must render a price when customerPriceLabel returns a confirmed public price.');
+assert.match(html, /function featuredProductCard\([^\n]+product-price/, 'Featured cards must render only confirmed public prices.');
+
+const helpers = html.match(/function hasPublicPrice\(value\)\{[^\n]+\}\nfunction hasConfirmedPublicPrice\(product\)\{[^\n]+\}\nfunction customerPriceLabel\(product\)\{[^\n]+\}\nfunction formatVnd\(value\)\{[^\n]+\}/)?.[0];
+assert.ok(helpers, 'the complete safe price-helper group must exist for behavior-level regression tests');
+const priceSandbox = { Intl };
+vm.runInNewContext(helpers + '\\nthis.priceTools = { hasPublicPrice, hasConfirmedPublicPrice, customerPriceLabel, formatVnd };', priceSandbox);
+const priceTools = priceSandbox.priceTools;
+assert.ok(priceTools.customerPriceLabel({ price: 1234567, sourcePriceConfirmed: true }).includes('1.234.567'),
+  'a confirmed, public numeric price should be formatted in Vietnamese currency');
+assert.equal(priceTools.customerPriceLabel({ price: 1234567, sourcePriceConfirmed: false }), '',
+  'a historical/source-derived price must stay hidden until a business user confirms it');
+assert.equal(priceTools.customerPriceLabel({ price: null, sourcePriceConfirmed: true }), '',
+  'a public visibility setting that masks price as null must hide it in the storefront');
+assert.equal(priceTools.customerPriceLabel({ price: -1, sourcePriceConfirmed: true }), '',
+  'negative prices must never render to customers');
+
+assert.match(html, /entries\.every\(\(\{p\}\)=>hasConfirmedPublicPrice\(p\)\)/, 'Subtotal must stay unconfirmed unless every item price is both public and explicitly confirmed.');
 assert.match(html, /Chờ xác nhận giá/, 'Unknown prices must never be fabricated.');
 assert.match(html, /Giá sẽ được xác nhận/, 'An item without a confirmed public price must be clearly identified.');
 assert.match(html, /function openCheckout\(/, 'The checkout drawer must have a dedicated open action.');
