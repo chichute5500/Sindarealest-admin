@@ -4,6 +4,19 @@ on:
   push:
     branches:
       - feature/ai-image-grouping
+    # Real inference is expensive and shares a daily account allocation. Run
+    # the live matrix only when AI runtime, inventory/grouping logic, fixtures,
+    # or dependencies change—not on test-only, diagnostic, or workflow edits.
+    paths:
+      - 'functions/api/admin/image-groups*.js'
+      - 'functions/_lib.js'
+      - 'public/admin/**'
+      - 'migrations/0008_image_group_reviews.sql'
+      - 'migrations/0011_image_similarity_index.sql'
+      - 'migrations/0012_image_group_claims.sql'
+      - 'data/legacy-products.json'
+      - 'package.json'
+      - 'package-lock.json'
 
 permissions:
   contents: read
