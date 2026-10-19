@@ -279,6 +279,7 @@ try{
     comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
   }
   if(!parsePairList(comparedText))throw new Error("text comparison response did not contain a valid pairs array after one format retry");
+  if(typeof comparedText!=="string"&&parsePairList(comparedText))comparedText=JSON.stringify(comparedText);
   if(typeof comparedText!=="string"||!comparedText.trim())throw new Error("text comparison response was empty");
   result={response:comparedText.trim()};
 }catch(error){
