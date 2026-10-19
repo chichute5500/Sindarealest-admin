@@ -620,7 +620,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
     <p class="account-note">Đăng nhập, địa chỉ giao hàng và lịch sử đơn hàng chưa được kết nối trong phiên bản hiện tại.</p>
   </div>
 </aside>
-<div class="cart-drawer" id="cartDrawer" aria-label="Giỏ hàng" aria-hidden="true">
+<div class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Giỏ hàng" aria-hidden="true" inert>
   <div class="cart-header"><h2 id="cartTitle">Giỏ hàng (0)</h2><button class="icon-btn tap-target" id="cartClose" aria-label="Đóng giỏ hàng">×</button></div>
   <div class="cart-list" id="cartList" aria-live="polite"></div>
   <div class="cart-bottom">
@@ -631,7 +631,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
   </div>
 </div>
 <button type="button" class="checkout-backdrop" id="checkoutBackdrop" aria-label="Đóng biểu mẫu đặt hàng" tabindex="-1"></button>
-<aside class="checkout-drawer glass" id="checkoutDrawer" role="dialog" aria-modal="true" aria-label="Thông tin đặt hàng" aria-hidden="true" tabindex="-1">
+<aside class="checkout-drawer glass" id="checkoutDrawer" role="dialog" aria-modal="true" aria-label="Thông tin đặt hàng" aria-hidden="true" tabindex="-1" inert>
   <div class="cart-header checkout-header">
     <div class="checkout-heading"><button type="button" class="checkout-backlink tap-target" id="checkoutBack">← Giỏ hàng</button><h2>Đặt hàng</h2></div>
     <button class="icon-btn tap-target" type="button" id="checkoutClose" aria-label="Đóng đặt hàng">×</button>
@@ -842,25 +842,46 @@ function renderCart(){
   return `<div class="cart-row"><img src="${escapeHtml(allImages(p)[0])}" alt="${escapeHtml(p.title)}"><div class="cart-row-copy"><strong>${escapeHtml(p.title)}</strong><small>SKU: ${escapeHtml(p.sku||'Liên hệ')}</small><small class="cart-row-price">${priceText}</small><div class="qty-controls"><button class="tap-target" data-qty="-1" data-id="${escapeHtml(id)}" aria-label="Giảm số lượng">−</button><span>${q}</span><button class="tap-target" data-qty="1" data-id="${escapeHtml(id)}" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item tap-target" data-remove="${escapeHtml(id)}" aria-label="Xóa sản phẩm">×</button></div>`;
  }).join('');
 }
-function openCart(){dismissToast();closeCheckout();closeDetail();$('#cartDrawer').classList.add('open');$('#cartDrawer').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart()}
+function openCart(){dismissToast();closeCheckout();closeDetail();const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart()}
 function closeCart(){ $('#cartDrawer').classList.remove('open');$('#cartDrawer').setAttribute('aria-hidden','true');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow=''}
 function openCheckout(){
  dismissToast();
  renderCart();
  if(!Object.values(cart).some(q=>Number(q)>0)){showToast('Hãy thêm sản phẩm vào giỏ trước khi đặt hàng.');return}
+ checkoutReturnFocus=document.activeElement;
  closeCart();
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
- panel.classList.add('open');panel.setAttribute('aria-hidden','false');
+ panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  const first=panel.querySelector('input[name="fullName"]');
  if(first) setTimeout(()=>first.focus({preventScroll:true}),100);
 }
-function closeCheckout(){
+function closeCheckout(restoreFocus=true){
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  if(!panel)return;
- panel.classList.remove('open');panel.setAttribute('aria-hidden','true');
+ const wasOpen=panel.classList.contains('open');
+ panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');
  backdrop.classList.remove('open');
  if(!$('#cartDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';
+ const target=checkoutReturnFocus;checkoutReturnFocus=null;
+ if(restoreFocus&&wasOpen){
+  setTimeout(()=>{
+   const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');
+   const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';
+   const fallback=$('#cartOpen')||$('#mobileCartNav');
+   (available?target:fallback)?.focus({preventScroll:true});
+  },0);
+ }
+}
+function trapCheckoutTab(event){
+ const panel=$('#checkoutDrawer');
+ if(!panel||!panel.classList.contains('open')||event.key!=='Tab')return;
+ const items=[...panel.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+  .filter(el=>!el.closest('[inert]')&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+ if(!items.length){event.preventDefault();panel.focus({preventScroll:true});return}
+ const first=items[0],last=items[items.length-1];
+ if(event.shiftKey&&(document.activeElement===first||!panel.contains(document.activeElement))){event.preventDefault();last.focus({preventScroll:true})}
+ else if(!event.shiftKey&&(document.activeElement===last||!panel.contains(document.activeElement))){event.preventDefault();first.focus({preventScroll:true})}
 }
 function openAccount(){dismissToast();closeDetail();closeCheckout();closeCart();const panel=$('#accountDrawer');if(!panel)return;panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
 function closeAccount(){const panel=$('#accountDrawer');if(!panel)return;panel.classList.remove('open');panel.setAttribute('aria-hidden','true');if(!$('#cartDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow=''}
@@ -872,13 +893,13 @@ function setActiveNav(id){$$('[data-nav]').forEach(a=>{const yes=a.dataset.nav==
 function setMobileMenu(open){const menu=$('#mobileNav'),backdrop=$('#mobileNavBackdrop');menu.classList.toggle('open',open);backdrop.classList.toggle('open',open);$('#menuToggle').setAttribute('aria-expanded',String(open));$('#menuToggle').setAttribute('aria-label',open?'Đóng menu':'Mở menu')}function navClick(e){const a=e.target.closest('[data-nav]');if(!a)return;setActiveNav(a.dataset.nav);setMobileMenu(false)}
 function setupNavSpy(){const targets=$$('[data-nav]').map(a=>document.getElementById(a.dataset.nav)).filter(Boolean);if(!('IntersectionObserver'in window))return;const io=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)setActiveNav(visible.target.id)},{rootMargin:'-25% 0px -60% 0px',threshold:[0,.1,.25,.5]});targets.forEach(s=>io.observe(s))}
 function setupTapRing(){document.addEventListener('pointerdown',e=>{const el=e.target.closest('.tap-target,button,a,.product-card,.service,.promise-tag');if(!el||el.disabled)return;const rect=el.getBoundingClientRect();const ripple=document.createElement('span');ripple.className='tap-ripple';ripple.style.left=(e.clientX-rect.left)+'px';ripple.style.top=(e.clientY-rect.top)+'px';el.appendChild(ripple);setTimeout(()=>ripple.remove(),720);if(el.matches('.navlink')){const peers=el.parentElement.querySelectorAll('.navlink');peers.forEach(x=>x.classList.remove('tap-selected'));el.classList.add('tap-selected');setTimeout(()=>el.classList.remove('tap-selected'),800)}},{passive:true})}
-const ADMIN_DIVISIONS_API='https://provinces.open-api.vn/api/v2';let checkoutProvinces=[],checkoutWardRequest=0;
+const ADMIN_DIVISIONS_API='https://provinces.open-api.vn/api/v2';let checkoutProvinces=[],checkoutWardRequest=0,checkoutReturnFocus=null;
 async function loadCheckoutProvinces(){const select=$('#checkoutProvince'),message=$('#checkoutAddressMessage');select.disabled=true;message.textContent='Đang tải danh mục tỉnh/thành hiện hành…';try{const r=await fetch(ADMIN_DIVISIONS_API+'/p/',{cache:'force-cache'});if(!r.ok)throw Error('HTTP '+r.status);const rows=await r.json();if(!Array.isArray(rows)||!rows.length)throw Error('Danh mục không hợp lệ');checkoutProvinces=rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi'));select.innerHTML='<option value="">Chọn tỉnh/thành phố *</option>'+checkoutProvinces.map(p=>'<option value="'+escapeHtml(p.name)+'" data-code="'+escapeHtml(p.code)+'">'+escapeHtml(p.name)+'</option>').join('');select.disabled=false;message.textContent=''}catch{select.innerHTML='<option value="">Không tải được tỉnh/thành</option>';select.disabled=true;message.textContent='Không tải được danh mục hành chính. Kiểm tra mạng rồi tải lại trang.'}}
 async function loadCheckoutWards(){const province=$('#checkoutProvince'),ward=$('#checkoutWard'),code=province.selectedOptions[0]&&province.selectedOptions[0].dataset.code||'',message=$('#checkoutAddressMessage'),requestId=++checkoutWardRequest;$('#checkoutProvinceCode').value=code;$('#checkoutWardCode').value='';ward.disabled=true;ward.innerHTML='<option value="">Đang tải xã/phường…</option>';if(!code){ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';return}try{const r=await fetch(ADMIN_DIVISIONS_API+'/p/'+encodeURIComponent(code)+'?depth=2',{cache:'force-cache'});if(!r.ok)throw Error('HTTP '+r.status);const data=await r.json();if(requestId!==checkoutWardRequest)return;const wards=Array.isArray(data.wards)?data.wards:[];if(!wards.length)throw Error('Không có xã/phường');ward.innerHTML='<option value="">Chọn xã/phường *</option>'+wards.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(w=>'<option value="'+escapeHtml(w.name)+'" data-code="'+escapeHtml(w.code)+'">'+escapeHtml(w.name)+'</option>').join('');ward.disabled=false;message.textContent=''}catch{if(requestId!==checkoutWardRequest)return;ward.innerHTML='<option value="">Không tải được xã/phường</option>';ward.disabled=true;message.textContent='Không tải được xã/phường. Hãy thử chọn lại tỉnh/thành khi có mạng.'}}
 $('#checkoutProvince').addEventListener('change',loadCheckoutWards);$('#checkoutWard').addEventListener('change',()=>{$('#checkoutWardCode').value=$('#checkoutWard').selectedOptions[0]&&$('#checkoutWard').selectedOptions[0].dataset.code||''});
 function bindEvents(){
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
- $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',closeCheckout);$('#checkoutBackdrop').addEventListener('click',closeCheckout);$('#checkoutBack').addEventListener('click',()=>{closeCheckout();openCart()});$('#accountClose')?.addEventListener('click',closeAccount);$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',()=>{closeAccount()});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});$('#cartZalo').addEventListener('click',consultCart);document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))closeCheckout();else if($('#cartDrawer').classList.contains('open'))closeCart();else if($('#accountDrawer').classList.contains('open'))closeAccount()});$('#warrantyLookupForm').addEventListener('submit',async e=>{
+ $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',closeCheckout);$('#checkoutBackdrop').addEventListener('click',closeCheckout);$('#checkoutBack').addEventListener('click',()=>{closeCheckout();openCart()});$('#accountClose')?.addEventListener('click',closeAccount);$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',()=>{closeAccount()});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});$('#cartZalo').addEventListener('click',consultCart);document.addEventListener('keydown',e=>{if(e.key==='Tab'&&$('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))closeCheckout();else if($('#cartDrawer').classList.contains('open'))closeCart();else if($('#accountDrawer').classList.contains('open'))closeAccount()});$('#warrantyLookupForm').addEventListener('submit',async e=>{
  e.preventDefault();
  const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),lookup=$('#warrantyLookupValue').value.trim();
  b.disabled=true;b.textContent='Đang tra cứu…';m.textContent='';$('#warrantyResults').hidden=true;$('#warrantyClaimForm').hidden=true;
