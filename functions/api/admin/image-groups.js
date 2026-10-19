@@ -2,6 +2,13 @@ import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin }
 const MODEL="@cf/meta/llama-3.2-11b-vision-instruct", KEY_RE=/^(?=.{1,1024}$)[^\u0000-\u001f\u007f]+$/, LEGACY_KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
 function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
 function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
+function parsePairList(value){
+  if(value&&typeof value==="object"&&!Array.isArray(value)&&Array.isArray(value.pairs))return value;
+  const raw=typeof value==="string"?value.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,""):"";
+  let parsed=null;
+  if(raw){try{parsed=JSON.parse(raw)}catch{const match=raw.match(/\{[\s\S]*\}/);if(match)try{parsed=JSON.parse(match[0])}catch{}}}
+  return parsed&&typeof parsed==="object"&&!Array.isArray(parsed)&&Array.isArray(parsed.pairs)?parsed:null;
+}
 function parseIndexedFeatures(row){let features={};try{features=JSON.parse(row?.features_json||"{}")}catch{}return{key:String(row?.image_key||""),pHash:String(row?.p_hash||"").toLowerCase(),features}}
 function visualPairGate(left,right){
   if(!left||!right||!left.key||!right.key)return{match:false,reason:"missing_index"};
@@ -251,7 +258,7 @@ try{
     if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty");
     descriptors.push(descriptorText.trim().slice(0,3000));
   }
-  const compared=await runVisionWithRetry({
+  let compared=await runVisionWithRetry({
     messages:[
       {role:"system",content:"Compare visual descriptions of shoe photos. Decide which pairs show the SAME physical product, not merely the same style. Differences in view angle, lighting or background are acceptable; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Return only valid JSON: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":91,\"rationale\":\"brief Vietnamese reason\"}]}. Use zero-based image indices, never pair an image with itself, and return an empty pairs array if uncertain. Only report confidence >= 91."},
       {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mô tả từ phân tích thị giác):\n"+description).join("\n\n")+"\n\nChỉ ghép khi có đủ bằng chứng về cùng một sản phẩm vật lý. Chỉ trả JSON duy nhất, confidence phải từ 91 trở lên."}
@@ -260,6 +267,18 @@ try{
     max_tokens:350
   });
   const comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+  if(!parsePairList(comparedText)){
+    compared=await runVisionWithRetry({
+      messages:[
+        {role:"system",content:"Return ONLY valid JSON with a top-level pairs array. Each pair must have numeric a and b indices, boolean same_product, integer confidence 0-100, and a short Vietnamese rationale. Do not include markdown or explanations. Only report confidence >= 91."},
+        {role:"user",content:"The previous response was malformed. Re-evaluate these shoe descriptions and return valid JSON only. "+promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+":\n"+description).join("\n\n")}
+      ],
+      temperature:0,
+      max_tokens:700
+    },env,context.request);
+    comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+  }
+  if(!parsePairList(comparedText))throw new Error("text comparison response did not contain a valid pairs array after one format retry");
   if(typeof comparedText!=="string"||!comparedText.trim())throw new Error("text comparison response was empty");
   result={response:comparedText.trim()};
 }catch(error){
