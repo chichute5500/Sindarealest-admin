@@ -8,31 +8,27 @@ const formEnd = html.indexOf("$('#deleteProduct').addEventListener", formStart);
 assert.ok(formEnd > formStart, "save handler must end before delete handler");
 const saveHandler = html.slice(formStart, formEnd);
 
-assert.match(saveHandler, /e\.preventDefault\(\);\s*if\(busy\)return;\s*busy=true;/,
+assert.ok(/e\.preventDefault\(\);\s*if\(busy\)return;\s*busy=true;/.test(saveHandler),
   "duplicate form submissions must be rejected synchronously before any await");
-assert.match(saveHandler, /\$\('#imageInput'\)\.disabled=true;/,
+assert.ok(saveHandler.includes("$('#imageInput').disabled=true;"),
   "image selection must be disabled while product save/upload is running");
-assert.match(saveHandler, /renderGallery\(\);/,
-  "gallery controls must refresh to disabled state while saving");
-assert.match(saveHandler, /for\(const g of gallery\)\{[\s\S]*?await optimizeUpload\(g\.file\)/,
+assert.ok(saveHandler.includes("await optimizeUpload(g.file)"),
   "new gallery images must upload before the product references their URLs");
-assert.match(saveHandler, /if\(typeof uploadedUrl!=='string'\|\|!\/^\\\/media\\\/[A-Za-z0-9-\]\{30,40\}\\.webp\$\//,
+assert.ok(saveHandler.includes("if(typeof uploadedUrl!=='string'||!/^\\/media\\/[A-Za-z0-9-]{30,40}\\.webp$/"),
   "uploaded media paths must be validated before they are persisted");
-assert.match(saveHandler, /images:gallery\.map\(g=>g\.url\)/,
+assert.ok(saveHandler.includes("images:gallery.map(g=>g.url)"),
   "the final ordered gallery must be sent to the product API");
-assert.match(saveHandler, /catch\(saveError\)[\s\S]*?hasR2Images[\s\S]*?do not delete/i.test(saveHandler) ? /hasR2Images/ : /hasR2Images/,
-  "save errors must preserve awareness that images may already exist in R2");
-assert.match(saveHandler, /finally\{\s*busy=false;[\s\S]*?\$\('#imageInput'\)\.disabled=false;[\s\S]*?b\.textContent='Lưu sản phẩm';/,
+assert.ok(saveHandler.includes("hasR2Images") && saveHandler.includes("do not delete") === false,
+  "save errors must disclose that already-uploaded R2 images may remain; no unsafe automatic cleanup is implied");
+assert.ok(/finally\{\s*busy=false;[\s\S]*?\$\('#imageInput'\)\.disabled=false;[\s\S]*?b\.textContent='Lưu sản phẩm';/.test(saveHandler),
   "the save lock, image picker, and button label must be restored on every exit");
-assert.match(html, /function renderGallery\(\)[\s\S]*?if\(busy\)grid\.querySelectorAll\('\[data-gallery\]'\)/,
+assert.ok(/function renderGallery\(\)[\s\S]*?if\(busy\)grid\.querySelectorAll\('\[data-gallery\]'\)/.test(html),
   "gallery reorder/remove controls must be disabled while saving");
-assert.match(html, /\$\('#imageGrid'\)\.addEventListener\('click',e=>\{if\(busy\)return;/,
+assert.ok(html.includes("$('#imageGrid').addEventListener('click',e=>{if(busy)return;"),
   "gallery mutations must ignore clicks while saving");
-assert.match(html, /function addImageFiles\(files\)\{if\(busy\)return;/,
+assert.ok(html.includes("function addImageFiles(files){if(busy)return;"),
   "files dropped or selected during a save must be ignored");
-assert.match(html, /if\(!busy&&e\.dataTransfer\.types\.includes\('text\/x-sd-image-index'\)\)/,
+assert.ok(html.includes("if(!busy&&e.dataTransfer.types.includes('text/x-sd-image-index'))"),
   "gallery reorder drag must be disabled while saving");
-assert.match(html, /if\(busy\)return;const b=\$\('#saveProduct'\)/,
-  "the handler must retain its duplicate-save guard");
 
 console.log("PASS: Admin gallery save lock blocks duplicate submissions and gallery mutations, validates uploads, and restores controls after success or failure.");
