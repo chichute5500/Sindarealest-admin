@@ -1413,6 +1413,13 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
 }
 @media(max-width:360px){.nav-wrap .nav .brand-tagline{font-size:6.5px}}
 
+
+/* Mobile header follows the reference: search + cart stay visible; contact and theme controls live in the account/contact destinations. */
+@media(max-width:760px){
+  .nav-actions #contactJump,.nav-actions #themeToggle{display:none!important}
+  .nav-actions #searchJump,.nav-actions #cartOpen{display:grid}
+}
+
 </style>
 
 
