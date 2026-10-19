@@ -114,6 +114,17 @@ try {
     await context.addInitScript((mode) => {
       try { localStorage.setItem('sd-theme-mode', mode); } catch {}
     }, theme);
+    // Keep only the intro auto-dismiss timer alive long enough to capture the genuine splash.
+    // The script still dismisses it manually immediately after the screenshot below.
+    await context.addInitScript(() => {
+      const nativeSetTimeout = window.setTimeout.bind(window);
+      window.setTimeout = (callback, delay, ...args) => {
+        const source = typeof callback === 'function' ? String(callback) : '';
+        const isWelcomeAutoDismiss = source.includes("s.classList.add('is-leaving')")
+          && (delay === 500 || delay === 2500);
+        return nativeSetTimeout(callback, isWelcomeAutoDismiss ? 10000 : delay, ...args);
+      };
+    });
 
     // Block every external request and every non-read request.
     await context.route('**/*', async (route) => {
@@ -207,6 +218,9 @@ try {
         height: Math.round(rect.height),
         viewportWidth: innerWidth,
         viewportHeight: innerHeight,
+        visible: getComputedStyle(node).visibility === 'visible',
+        opacity: Number(getComputedStyle(node).opacity),
+        leaving: node.classList.contains('is-leaving'),
         title: node.querySelector('#welcomeTitleLine1')?.textContent || '',
         hasSkip: !!node.querySelector('#skipIntro'),
         lightTextureOpacity: lightTexture ? getComputedStyle(lightTexture).opacity : null,
@@ -219,6 +233,9 @@ try {
       && !!splashState.label
       && splashState.width >= splashState.viewportWidth - 1
       && splashState.height >= splashState.viewportHeight - 1
+      && splashState.visible
+      && splashState.opacity >= 0.95
+      && !splashState.leaving
       && !!splashState.title.trim()
       && splashState.hasSkip
       && logoLoaded;
