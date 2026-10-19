@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { categoryOf, compareDescriptors, findExactDuplicateGroups, findSimilarGroups, hashDistance } from "../public/admin/image-similarity.js";
+import { categoryOf, compareDescriptors, findExactDuplicateGroups, findSimilarGroups, hashDistance, isCachedDescriptorValid } from "../public/admin/image-similarity.js";
 
 const colorsA = [1,0,0,0, 1,0,0,0, 0,0,1,0];
 const colorsB = [0,0,0,1, 0,0,0,1, 1,0,0,0];
@@ -19,6 +19,45 @@ assert.equal(categoryOf({ category: "sneaker", features: { shape: shapeA, colors
   "low-confidence categories must not be treated as confirmed");
 assert.equal(categoryOf({ features_json: JSON.stringify({ category: "loafer", categoryStatus: "classified", categoryConfidence: 88, shape: shapeA, colors: colorsA }) }), "loafer",
   "persisted JSON feature rows should retain confirmed category");
+
+const cacheKey = "cached/shoes/front.webp";
+const cacheFeatures = {
+  shape: Array(64).fill(0.5),
+  colors: Array(12).fill(0.25),
+  contentHash: "a".repeat(64),
+  category: "sneaker",
+  categoryStatus: "classified",
+  categoryConfidence: 95
+};
+const cacheRow = {
+  image_key: cacheKey,
+  p_hash: "0123456789abcdef",
+  features_json: JSON.stringify(cacheFeatures),
+  width: 128,
+  height: 96,
+  source_size: 500,
+  source_uploaded: "2026-01-01T00:00:00.000Z"
+};
+const cacheInventoryItem = {
+  key: cacheKey,
+  size: 500,
+  uploaded: "2026-01-01T00:00:00.000Z"
+};
+assert.equal(isCachedDescriptorValid(cacheRow, cacheInventoryItem), true,
+  "a complete, confidence-qualified cache row should be reusable");
+assert.equal(isCachedDescriptorValid({ ...cacheRow, features_json: JSON.stringify({ ...cacheFeatures, shape: [1.2, ...cacheFeatures.shape.slice(1)] }) }, cacheInventoryItem), false,
+  "out-of-range shape features must trigger re-indexing");
+assert.equal(isCachedDescriptorValid({ ...cacheRow, features_json: JSON.stringify({ ...cacheFeatures, categoryConfidence: 65 }) }, cacheInventoryItem), false,
+  "a low-confidence row incorrectly marked classified must trigger re-indexing");
+assert.equal(isCachedDescriptorValid({ ...cacheRow, p_hash: "not-a-hash" }, cacheInventoryItem), false,
+  "invalid perceptual hashes must trigger re-indexing");
+assert.equal(isCachedDescriptorValid({ ...cacheRow, source_size: 499 }, cacheInventoryItem), false,
+  "stale source metadata must trigger re-indexing");
+assert.equal(isCachedDescriptorValid({
+  ...cacheRow,
+  features_json: JSON.stringify({ ...cacheFeatures, category: "unknown", categoryStatus: "needs_review", categoryConfidence: 40 })
+}, cacheInventoryItem), true,
+  "a valid needs_review row should stay in manual review rather than be mislabeled as a successful group");
 
 assert.equal(compareDescriptors(
   descriptor("a.webp", "0011223344556677", shapeA, colorsA),
