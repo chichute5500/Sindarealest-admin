@@ -90,6 +90,8 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
         const currentTheme = await page.locator('html').getAttribute('data-admin-theme');
         if (currentTheme !== theme) await page.locator('#adminThemeToggle').click();
         await expect(page.locator('html')).toHaveAttribute('data-admin-theme', theme);
+        // Let the real 250ms theme transition settle before capturing a stable screenshot.
+        await page.waitForTimeout(350);
         await expect(page.locator('#loginView')).toBeVisible();
 
         const metrics = await page.evaluate(() => ({
