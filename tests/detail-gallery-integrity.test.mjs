@@ -77,4 +77,16 @@ assert.match(html, /\.featured-arrow:hover:not\(:active\),\.slide-controls butto
 assert.match(html, /\.detail-gallery-arrow:hover:not\(:active\),\.featured-arrow:hover:not\(:active\),\.slide-controls button:hover:not\(:active\),\.page-btn\.page-arrow:hover:not\(:active\),\.sd-fullscreen-arrow:hover:not\(:active\)\{background:var\(--sd-gallery-glass\);border-color:var\(--sd-gallery-glass-border\)\}/, 'Touch hover must not leave the warm hover surface stuck after tapping');
 
 
-console.log('Detail gallery regression tests passed.');
+assert.match(html, /id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert/, 'Closed product details must be a modal dialog removed from focus and accessibility navigation.');
+assert.match(html, /id="sdFullscreenViewer" role="dialog" aria-modal="true" aria-label="Xem toàn ảnh sản phẩm" aria-hidden="true" tabindex="-1" inert/, 'Closed fullscreen gallery must be inert and hidden from assistive technology.');
+assert.match(html, /function openDetail\(productId,fromUrl=false\)\{dismissToast\(\);detailReturnFocus=fromUrl\?null:document\.activeElement/, 'Opening a product detail must remember its invoker for focus restoration.');
+assert.match(html, /\$\('#productOverlay'\)\.removeAttribute\('inert'\);\$\('#productOverlay'\)\.classList\.add\('open'\);\$\('#productOverlay'\)\.setAttribute\('aria-hidden','false'\)/, 'Opening product detail must remove inert before exposing the dialog.');
+assert.match(html, /function closeDetail\(fromUrl=false,restoreFocus=true\)[\s\S]*?overlay\.setAttribute\('aria-hidden','true'\);overlay\.setAttribute\('inert',''\)/, 'Closing product detail must hide and inert the dialog.');
+assert.match(html, /function trapTabWithin\(panel,event\)/, 'A shared focus-trap helper must exist for modal dialogs.');
+assert.match(html, /function trapProductTab\(event\)\{trapTabWithin\(\$\('#productOverlay'\),event\)\}/, 'Product detail must trap keyboard Tab navigation.');
+assert.match(html, /function trapFullscreenTab\(event\)\{trapTabWithin\(\$\('#sdFullscreenViewer'\),event\)\}/, 'Fullscreen gallery must trap keyboard Tab navigation.');
+assert.match(html, /viewer\.removeAttribute\('inert'\);viewer\.classList\.add\('open'\);viewer\.setAttribute\('aria-hidden','false'\)/, 'Opening fullscreen gallery must expose it to keyboard and assistive technology.');
+assert.match(html, /viewer\.classList\.remove\('open'\);viewer\.setAttribute\('aria-hidden','true'\);viewer\.setAttribute\('inert',''\)/, 'Closing fullscreen gallery must make it inert again.');
+assert.match(html, /if\(\$\('#sdFullscreenViewer'\)\.classList\.contains\('open'\)\)\{trapFullscreenTab\(e\);return\}if\(\$\('#productOverlay'\)\.classList\.contains\('open'\)\)\{trapProductTab\(e\);return\}/, 'Keyboard focus trapping must respect the topmost gallery dialog.');
+
+console.log('Detail gallery and modal accessibility regression tests passed.');
