@@ -104,31 +104,47 @@ jobs:
             *) echo "Refused invalid capture stage"; exit 1 ;;
           esac
           source_dir="artifacts/liquid-glass-preview"
-          target_dir="docs/website-screenshots/${STAGE}/${RUN_ID}"
+          target_dir="docs/website-screenshots/${STAGE}"
+          manifest_path="docs/website-screenshots/manifest.json"
           test -d "${source_dir}"
-          mkdir -p "${target_dir}"
+          mkdir -p "${target_dir}" docs/website-screenshots
           find "${source_dir}" -maxdepth 1 -type f -name '*.jpg' -print -quit | grep -q .
+          # Replace only this stage's generated captures; never create RUN_ID subfolders.
+          find "${target_dir}" -maxdepth 1 -type f -name '*.jpg' -delete
+          rm -f "${target_dir}/MANIFEST.md"
           while IFS= read -r file; do
             name="$(basename "$file")"
             cp "$file" "${target_dir}/${name}"
           done < <(find "${source_dir}" -maxdepth 1 -type f -name '*.jpg' -print | sort)
           image_count="$(find "${target_dir}" -maxdepth 1 -type f -name '*.jpg' | wc -l | tr -d ' ')"
           test "${image_count}" -gt 1
-          cat > "${target_dir}/MANIFEST.md" <<EOF
-          # Website screenshot capture
-
-          - Stage: ${STAGE}
-          - Captured at (UTC): $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          - Repository: ${REPOSITORY}
-          - Branch: ${REF_NAME}
-          - Source commit before this archive commit: ${SOURCE_SHA}
-          - GitHub Actions run: ${RUN_ID} (run #${RUN_NUMBER})
-          - Capture URL: http://127.0.0.1:4173/ (read-only local static preview built from this branch's public/ directory)
-          - Viewports/themes: see image filenames and audit report in the matching Actions artifact
-          - Image count: ${image_count}
-          - Safety: this job serves local static files and mocks relevant API calls in memory; it does not target Production or write to D1/R2.
-          EOF
-          git add "${target_dir}"
+          CAPTURED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" IMAGE_COUNT="${image_count}" node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const file = 'docs/website-screenshots/manifest.json';
+          let manifest = {};
+          try { manifest = JSON.parse(fs.readFileSync(file, 'utf8')); } catch {}
+          manifest.schemaVersion = 1;
+          manifest.repository = process.env.REPOSITORY;
+          manifest.branch = process.env.REF_NAME;
+          manifest.sourceCommit = process.env.SOURCE_SHA;
+          manifest.previewUrl = 'http://127.0.0.1:4173/';
+          manifest.captureSource = 'GitHub Actions read-only local static preview; not the deployed Cloudflare Preview';
+          manifest.updatedAtUtc = process.env.CAPTURED_AT;
+          manifest.stages ??= {};
+          manifest.stages[process.env.STAGE] = {
+            capturedAtUtc: process.env.CAPTURED_AT,
+            runId: process.env.RUN_ID,
+            imageCount: Number(process.env.IMAGE_COUNT),
+            directory: `docs/website-screenshots/${process.env.STAGE}/`,
+            images: fs.readdirSync(`docs/website-screenshots/${process.env.STAGE}/`).filter(name => name.endsWith('.jpg')).sort().map(name => ({
+              path: `docs/website-screenshots/${process.env.STAGE}/${name}`,
+              status: 'captured-local-preview',
+              comparisonStatus: 'UNVERIFIED'
+            }))
+          };
+          fs.writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
+          NODE
+          git add "${target_dir}" "${manifest_path}"
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive ${STAGE} website screenshots (run ${RUN_ID})"
           git push origin "HEAD:${REF_NAME}"
       - name: Upload screenshots and HTML audit report
