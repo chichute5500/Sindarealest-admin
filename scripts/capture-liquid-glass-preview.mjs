@@ -683,6 +683,7 @@ try {
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#accountFavoritesAction').click();
     await page.locator('#accountFavoritesView:not([hidden])').waitFor({ state: 'visible' });
+    await capture(page, 'account-favorites-mobile-' + theme + '.jpg');
     const favoritesListState = await page.evaluate(() => ({
       count: document.querySelectorAll('#accountFavoritesList [data-favorite-open]').length,
       title: document.querySelector('#accountFavoritesList .favorite-product-copy strong')?.textContent?.trim() || '',
@@ -725,6 +726,7 @@ try {
       const province = document.querySelector('#accountAddressProvince');
       return !!province && !province.disabled && Array.from(province.options).some(option => option.textContent.includes('Tỉnh kiểm thử'));
     });
+    await capture(page, 'account-address-mobile-' + theme + '.jpg');
     await page.locator('#accountAddressFullName').fill('Nguyen Address Test');
     await page.locator('#accountAddressPhone').fill('0912345678');
     await page.locator('#accountAddressEmail').fill('address@example.com');
@@ -831,6 +833,7 @@ try {
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#accountOrdersAction').click();
     await page.locator('#accountOrdersView:not([hidden])').waitFor({ state: 'visible' });
+    await capture(page, 'account-orders-mobile-' + theme + '.jpg');
     const orderHistoryUi = await page.evaluate(() => ({
       count: document.querySelectorAll('#accountOrdersList .local-order-card').length,
       orderNumber: document.querySelector('#accountOrdersList .local-order-head strong')?.textContent?.trim() || '',
