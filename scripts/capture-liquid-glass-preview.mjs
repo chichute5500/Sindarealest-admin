@@ -627,11 +627,17 @@ try {
     if (!accountStructurePass) hardFailures.push('Account drawer accessibility state failed: ' + theme);
     await capture(page, 'account-mobile-' + theme + '.jpg');
 
+    const accountFocusEndpoints = await page.evaluate(() => {
+      const panel = document.querySelector('#accountDrawer');
+      const items = [...panel.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+        .filter(el => !el.closest('[inert]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+      return { first: items[0]?.id || '', last: items[items.length - 1]?.id || '', count: items.length };
+    });
     await page.keyboard.press('Shift+Tab');
-    const accountShiftTabWrapped = await page.evaluate(() => document.activeElement?.id === 'accountContactAction');
+    const accountShiftTabWrapped = await page.evaluate(expected => document.activeElement?.id === expected, accountFocusEndpoints.last);
     await page.keyboard.press('Tab');
-    const accountTabWrapped = await page.evaluate(() => document.activeElement?.id === 'accountClose');
-    audit.interactions.push({ theme, check: 'account-keyboard-focus-trap', pass: accountShiftTabWrapped && accountTabWrapped, result: { accountShiftTabWrapped, accountTabWrapped } });
+    const accountTabWrapped = await page.evaluate(expected => document.activeElement?.id === expected, accountFocusEndpoints.first);
+    audit.interactions.push({ theme, check: 'account-keyboard-focus-trap', pass: accountShiftTabWrapped && accountTabWrapped, result: { ...accountFocusEndpoints, accountShiftTabWrapped, accountTabWrapped } });
     if (!accountShiftTabWrapped || !accountTabWrapped) hardFailures.push('Account keyboard focus trap failed: ' + theme);
 
     await page.locator('#accountClose').click();
