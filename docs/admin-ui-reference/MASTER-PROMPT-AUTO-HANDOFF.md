@@ -10,9 +10,13 @@ Mục tiêu đồng thời:
 - Sau MỖI vòng lặp sửa đổi có ý nghĩa → chạy lại test → chụp ảnh đối chiếu, cập nhật ảnh + trạng thái + kết quả test lên đúng nhánh fix để AI tiếp theo không phụ thuộc lịch sử chat. Không chờ đến cuối task mới lưu.
 - Không tuyên bố hoàn thành nếu thiếu bằng chứng.
 
-## 2. Repository, branch và vùng tham chiếu
+## 2. Repository, nhánh và vùng tham chiếu — QUY TẮC CÔ LẬP BẮT BUỘC
 - Repository: `chichute5500/Sindarealest-admin`
-- Branch mục tiêu: `fix/liquid-glass-audit-2026-10-19`
+- Nhánh website tĩnh đang được AI website sử dụng và phải được bảo vệ: `fix/liquid-glass-audit-2026-10-19`.
+- Nhánh làm việc riêng của ADMIN: `feature/admin-isolated-handoff-2026-10-20`.
+- Nhánh ADMIN được tạo từ trạng thái của nhánh website tĩnh tại thời điểm tách. Đây là điểm khởi đầu, KHÔNG phải quyền cho phép sửa trực tiếp nhánh website tĩnh.
+- Tất cả sửa đổi ADMIN, ảnh chụp, báo cáo và commit tiếp theo phải thực hiện trên nhánh ADMIN riêng. Không commit vào `fix/liquid-glass-audit-2026-10-19`, `main` hoặc nhánh website khác.
+- Vì nhánh ADMIN ban đầu được tách từ nhánh website, code website có thể hiện diện trong cây thư mục; sự hiện diện đó không cho phép chỉnh sửa website. Không cherry-pick/merge thay đổi mới từ nhánh website vào ADMIN một cách tự động. Chỉ đồng bộ khi đã so sánh commit/diff, xác định phạm vi và có chỉ thị rõ ràng.
 - Bộ tham chiếu hiện có:
   - `docs/admin-ui-reference/admin-mobile-reference.png`
   - `docs/admin-ui-reference/admin-mobile-reference.html`
@@ -25,17 +29,23 @@ Mục tiêu đồng thời:
 - File prompt này là tài liệu chuẩn duy nhất để hướng dẫn công việc. Mỗi phiên AI/automation được giao tác vụ phải đọc `handoff/START-HERE.md`, `handoff/LATEST-STATUS.md`, `handoff/latest-test-results.json` và prompt này, xác minh code thực tế rồi tiếp tục. Repository không tự kích hoạt phiên AI mới; nếu không có agent/automation chạy tự động, người dùng vẫn cần mở/khởi chạy phiên tiếp theo, nhưng chỉ cần yêu cầu ngắn như “Tiếp tục theo MASTER PROMPT AUTO-HANDOFF trên nhánh fix”, không cần tự soạn lại toàn bộ prompt.
 
 ## 3. Quy tắc an toàn và phạm vi
-- Chỉ làm trên branch mục tiêu đã xác minh. Nếu đang ở branch khác, không tự sửa/commit nhầm; chuyển đúng cách hoặc báo BLOCKED.
+- Bắt đầu bằng việc xác minh branch, HEAD SHA, working tree và nhánh remote. Nhánh mục tiêu duy nhất để sửa/commit ADMIN là `feature/admin-isolated-handoff-2026-10-20`.
+- Nếu môi trường không ở nhánh ADMIN, không tự động checkout/reset/stash hoặc chuyển nhánh theo cách có thể làm mất thay đổi; xác định thay đổi đang có và báo BLOCKED nếu không thể chuyển an toàn.
+- Không sửa/commit vào `fix/liquid-glass-audit-2026-10-19`: nhánh đó thuộc luồng làm website tĩnh. Không sửa/commit vào `main`.
 - Không merge vào `main`, không deploy lên Cloudflare/production, không sửa cấu hình production, secret, token, database binding, D1 schema hay R2 data trong nhiệm vụ này.
 - Không xóa dữ liệu, không thực hiện CRUD lên dữ liệu khách hàng/đơn hàng thật. Dùng fixture/test account và môi trường thử nghiệm nếu có.
 - Không vô hiệu hóa auth, không bỏ qua kiểm soát truy cập, không brute-force mật khẩu. Nếu cần đăng nhập, kiểm tra fixtures/session thử nghiệm hợp lệ hoặc xin thông tin truy cập thử nghiệm tối thiểu khi thực sự cần; không yêu cầu production password.
 - Không đưa secret, token, thông tin cá nhân hay dữ liệu khách hàng vào screenshot, log, commit hoặc báo cáo.
 - Không thay giao diện customer-facing hay hiệu ứng nền public site ngoài phạm vi được yêu cầu; không dùng ảnh tham chiếu như code runtime.
+- Bảo vệ nghiêm ngặt website tĩnh: không chỉnh storefront, homepage, product listing/detail, cart/checkout, navbar/footer công khai, nền Liquid Glass, hiệu ứng động, theme system, typography hoặc responsive public UI. Nếu file/component dùng chung, không sửa trước khi ghi rõ phụ thuộc và đánh giá tác động; ưu tiên tách adapter/component ADMIN riêng. Nếu không thể tách an toàn, ghi BLOCKED và tiếp tục các hạng mục độc lập.
+- Không để hai AI cùng sửa một file. Trước khi sửa, ghi danh sách file dự kiến; kiểm tra diff/commit mới nhất khi có thể. Nếu phát hiện file thuộc công việc website tĩnh hoặc đang có thay đổi không rõ nguồn, tránh ghi đè và báo cáo.
 - Không bịa dữ liệu, route, tính năng, ảnh, test result, commit SHA hoặc tiến độ. Không xóa tính năng chỉ để làm UI gọn hơn.
 - Không cài thêm công cụ nếu Playwright đã có; trước tiên khám phá cấu hình hiện tại.
 
 ## 4. Bắt buộc xác minh trước khi sửa
-1. Ghi lại repo, branch, HEAD SHA, `git status`, remote và các thay đổi chưa commit.
+1. Xác minh repo `chichute5500/Sindarealest-admin`, nhánh hiện tại, HEAD SHA, remote và `git status`; bắt buộc branch hiện tại phải là `feature/admin-isolated-handoff-2026-10-20` trước khi sửa/commit.
+2. Ghi nhận HEAD của nhánh website tĩnh `fix/liquid-glass-audit-2026-10-19` để làm mốc đối chiếu, nhưng không checkout để sửa nhánh đó và không tự đồng bộ code từ nhánh đó.
+3. Lập danh sách thay đổi hiện có và các file ADMIN/public/shared. Không xóa, reset, stash, revert hay ghi đè thay đổi của người khác.
 2. Đọc README, package scripts, lockfile, cấu hình build, test, Playwright và hướng dẫn repo.
 3. Đọc `handoff/LATEST-STATUS.md` và `handoff/latest-test-results.json`; coi đó là manh mối, không phải sự thật nếu không khớp với code hiện tại.
 4. Mở ảnh tham chiếu PNG. Kiểm tra HTML và ZIP; nếu có thể, trích xuất asset vào thư mục tạm để đối chiếu, không ghi đè source. Ghi rõ nếu không đọc được.
@@ -100,14 +110,14 @@ Nếu một viewport không thể kiểm tra vì giới hạn môi trường, gh
 Không dùng ảnh mockup hay ảnh tham chiếu thay cho screenshot từ ứng dụng đang chạy. Không tuyên bố ảnh cuối phản ánh code mới nhất nếu SHA không khớp.
 
 ## 9. Quy trình lưu ảnh và bàn giao tự động
-Sau MỖI vòng sửa đổi → chạy kiểm tra → chụp ảnh/so sánh đã hoàn tất, thực hiện tất cả bước có thể:
+Sau MỖI vòng sửa đổi → chạy kiểm tra → chụp ảnh/so sánh đã hoàn tất, thực hiện tất cả bước có thể. Mọi file handoff và screenshot do nhiệm vụ ADMIN tạo phải được ghi trên `feature/admin-isolated-handoff-2026-10-20`, không ghi trên nhánh website tĩnh:
 1. Tạo thư mục lịch sử riêng, ví dụ `docs/admin-ui-reference/handoff/history/<short-sha-or-run-id>/screenshots/`.
 2. Lưu ảnh Playwright thật; kèm báo cáo `report.md` liệt kê route, viewport, theme, SHA, sai lệch, sửa đổi, test và vấn đề còn lại.
 3. Cập nhật `handoff/LATEST-STATUS.md` với trạng thái mới, commit SHA, hạng mục đã xong/chưa xong/blocked, lỗi còn lại và next actions.
 4. Cập nhật `handoff/latest-test-results.json` bằng kết quả thật và đường dẫn ảnh. Không điền PASS cho test chưa chạy.
 5. Nếu phù hợp, cập nhật các shortcut ảnh `latest-*.png` để trỏ đến ảnh mới nhất. Nếu không có binary-write capability, không giả vờ đã cập nhật PNG; lưu bằng cơ chế git/terminal thật hoặc ghi rõ BLOCKED.
 6. Kiểm tra diff, tránh secret/PII, đảm bảo không thêm file build lớn không cần thiết.
-7. Commit lên branch fix đã xác minh với message mô tả công việc; không force-push. Nếu có thay đổi chưa commit của người dùng, không xóa hoặc ghi đè.
+7. Commit lên nhánh ADMIN riêng `feature/admin-isolated-handoff-2026-10-20` sau khi kiểm tra diff; không force-push. Không commit lên nhánh website tĩnh hoặc `main`. Nếu có thay đổi chưa commit của người dùng, không xóa hoặc ghi đè.
 8. Xác minh commit trên GitHub và đọc lại các file bàn giao sau khi ghi. Chỉ khi được xác nhận mới báo “đã cập nhật GitHub”.
 9. Giữ lịch sử các mốc trước đó; không ghi đè ảnh lịch sử. Nếu dung lượng ảnh lớn, tối ưu kích thước hợp lý nhưng không làm ảnh mất giá trị so sánh.
 10. Nếu môi trường không có quyền ghi file binary/commit hoặc Playwright không hoạt động, ghi rõ BLOCKED, nguyên nhân và lệnh/bước cần chạy. Không tự khẳng định hệ thống tự chạy giữa các phiên: nó chỉ chạy khi AI/automation thực sự được khởi động. Nếu người dùng yêu cầu tiếp tục tự động sau khi phiên chat kết thúc, phải kiểm tra có agent/automation thực sự được cấu hình hay chưa; không xem file bàn giao đơn thuần là bộ lập lịch.
@@ -138,7 +148,7 @@ Chỉ đánh dấu PASS khi có bằng chứng cho tiêu chí:
 - Không có regression nghiêm trọng về chức năng/API/auth.
 - Ảnh sau sửa được tạo từ code mới nhất, SHA/route/viewport/theme được ghi rõ.
 - File trạng thái và test-results được cập nhật; lịch sử ảnh được giữ.
-- Git diff được rà soát và commit chỉ nằm trên branch fix.
+- Git diff được rà soát và commit chỉ nằm trên nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; không có commit mới do nhiệm vụ này ghi vào nhánh website tĩnh hoặc `main`.
 - Không deploy production.
 Không tự tuyên bố “100%” chỉ dựa trên cảm giác hoặc số lượng file sửa.
 
@@ -156,5 +166,5 @@ Báo cáo tiếng Việt, ngắn gọn nhưng có bằng chứng:
 Không ghi thông tin bí mật. Ghi rõ `Cloudflare production deployment: NOT PERFORMED`.
 
 ## 14. Bắt đầu ngay
-Thực hiện theo thứ tự: xác minh Git → đọc handoff và reference → khám phá source/scripts/auth/Playwright → chạy baseline → chụp ảnh baseline thật → lập inventory và sai lệch → sửa theo mức độ ưu tiên → sau MỖI vòng sửa/test chụp ảnh/so sánh và cập nhật handoff/commit nếu có quyền → chạy test cuối → xác minh commit trên GitHub → báo cáo bằng chứng.
+Thực hiện theo thứ tự: xác minh Git và bắt buộc branch ADMIN riêng → ghi nhận mốc nhánh website tĩnh mà không sửa nó → đọc handoff và reference → khám phá source/scripts/auth/Playwright → chạy baseline → chụp ảnh baseline thật → lập inventory và sai lệch → sửa ADMIN theo mức độ ưu tiên → sau MỖI vòng sửa/test chụp ảnh/so sánh và cập nhật handoff/commit trên nhánh ADMIN nếu có quyền → chạy test cuối → xác minh commit trên GitHub → báo cáo bằng chứng. Không tự merge/cherry-pick sang nhánh website tĩnh, không merge `main`, không deploy Cloudflare/Production.
 Không dừng ở việc viết kế hoạch. Hãy bắt đầu kiểm tra và thực hiện công việc trong giới hạn quyền truy cập hiện có.
