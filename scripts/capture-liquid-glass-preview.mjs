@@ -177,13 +177,36 @@ try {
         }),
       });
     });
+    // Warranty lookup success-empty and HTTP error states are mocked in memory only.
+    await context.route('**/api/warranty-lookup', async (route) => {
+      if (route.request().method() !== 'POST') return route.abort();
+      let payload = {};
+      try { payload = JSON.parse(route.request().postData() || '{}'); } catch {}
+      const isErrorScenario = payload.lookup === 'SIMULATE-ERROR';
+      audit.mockedRequests.push({
+        theme,
+        method: 'POST',
+        url: route.request().url(),
+        fixtureOnly: true,
+        scenario: isErrorScenario ? 'warranty-error-state' : 'warranty-no-match-state',
+      });
+      return route.fulfill({
+        status: isErrorScenario ? 503 : 200,
+        contentType: 'application/json; charset=utf-8',
+        body: JSON.stringify(isErrorScenario
+          ? { error: 'Dịch vụ tra cứu kiểm thử tạm thời không khả dụng.' }
+          : { warranties: [] }),
+      });
+    });
 
     const page = await context.newPage();
     page.setDefaultTimeout(10000);
     page.on('console', (m) => { if (m.type() === 'error') audit.consoleErrors.push({ theme, message: m.text() }); });
     page.on('pageerror', (e) => audit.pageErrors.push({ theme, message: e.message }));
     page.on('response', (res) => {
-      if (res.status() >= 400 && new URL(res.url()).origin === origin) {
+      const expectedWarrantyFixtureError = res.url().includes('/api/warranty-lookup')
+        && res.status() === 503;
+      if (res.status() >= 400 && new URL(res.url()).origin === origin && !expectedWarrantyFixtureError) {
         audit.httpErrors.push({ theme, status: res.status(), url: res.url() });
       }
     });
@@ -416,6 +439,39 @@ try {
     if (!contactPass) hardFailures.push('Mobile contact layout or separate warranty support failed: ' + theme);
     await capture(page, 'footer-contact-mobile-' + theme + '.jpg');
     await captureElement(page, '.warranty-help', 'warranty-support-mobile-' + theme + '.jpg');
+
+    // Exercise a legitimate no-match result without inventing a warranty record.
+    await page.locator('#warrantyLookupForm').scrollIntoViewIfNeeded();
+    await page.locator('#warrantyLookupValue').fill('NO-MATCH-TEST');
+    await page.locator('#warrantyLookupSubmit').click();
+    await page.waitForFunction(() => document.querySelector('#warrantyMessage')?.textContent.includes('Đã tra cứu xong'));
+    const warrantyEmptyState = await page.evaluate(() => ({
+      message: document.querySelector('#warrantyMessage')?.textContent || '',
+      resultVisible: document.querySelector('#warrantyResults')?.hidden === false,
+      noRecordMessage: document.querySelector('#warrantyRecords')?.textContent.includes('Không tìm thấy bản ghi bảo hành phù hợp.') || false,
+      claimFormHidden: document.querySelector('#warrantyClaimForm')?.hidden === true,
+      submitEnabled: !document.querySelector('#warrantyLookupSubmit')?.disabled,
+    }));
+    const warrantyEmptyPass = warrantyEmptyState.message.includes('Đã tra cứu xong')
+      && warrantyEmptyState.resultVisible && warrantyEmptyState.noRecordMessage
+      && warrantyEmptyState.claimFormHidden && warrantyEmptyState.submitEnabled;
+    audit.interactions.push({ theme, check: 'warranty-no-match-empty-state-and-reenabled-submit', pass: warrantyEmptyPass, result: warrantyEmptyState });
+    if (!warrantyEmptyPass) hardFailures.push('Warranty no-match state or submit reset failed: ' + theme);
+
+    // Simulate a transient API error and confirm it is surfaced to the user without leaving loading disabled.
+    await page.locator('#warrantyLookupValue').fill('SIMULATE-ERROR');
+    await page.locator('#warrantyLookupSubmit').click();
+    await page.waitForFunction(() => document.querySelector('#warrantyMessage')?.textContent.includes('Dịch vụ tra cứu kiểm thử tạm thời không khả dụng.'));
+    const warrantyErrorState = await page.evaluate(() => ({
+      message: document.querySelector('#warrantyMessage')?.textContent || '',
+      submitEnabled: !document.querySelector('#warrantyLookupSubmit')?.disabled,
+      submitLabel: document.querySelector('#warrantyLookupSubmit')?.textContent?.trim() || '',
+    }));
+    const warrantyErrorPass = warrantyErrorState.message.includes('Dịch vụ tra cứu kiểm thử tạm thời không khả dụng.')
+      && warrantyErrorState.submitEnabled && warrantyErrorState.submitLabel === 'Tra cứu bảo hành';
+    audit.interactions.push({ theme, check: 'warranty-transient-error-feedback-and-reenabled-submit', pass: warrantyErrorPass, result: warrantyErrorState });
+    if (!warrantyErrorPass) hardFailures.push('Warranty transient error feedback or submit reset failed: ' + theme);
+
     await page.evaluate(() => {
       const root = document.documentElement;
       const previous = root.dataset.previewPreviousScrollBehavior || '';
