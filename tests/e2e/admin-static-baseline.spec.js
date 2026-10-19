@@ -96,6 +96,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
           title: document.title,
           lang: document.documentElement.lang,
           theme: document.documentElement.dataset.adminTheme || null,
+          backgroundToken: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
           viewportWidth: window.innerWidth,
           viewportHeight: window.innerHeight,
           documentWidth: document.documentElement.scrollWidth,
@@ -108,6 +109,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
         metadata.screenshots.push(filename);
 
         expect(metrics.lang, 'ADMIN should declare Vietnamese').toBe('vi');
+        expect(metrics.backgroundToken, `Theme token matches ${theme} mode`).toBe(theme === 'dark' ? '#09131d' : '#eaf3fb');
         expect(metrics.horizontalOverflow, `No horizontal overflow at ${viewport.width}px in ${theme} mode`).toBe(false);
       }
     }
