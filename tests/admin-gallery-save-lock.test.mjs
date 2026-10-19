@@ -18,7 +18,7 @@ assert.ok(saveHandler.includes("if(typeof uploadedUrl!=='string'||!/^\\/media\\/
   "uploaded media paths must be validated before they are persisted");
 assert.ok(saveHandler.includes("images:gallery.map(g=>g.url)"),
   "the final ordered gallery must be sent to the product API");
-assert.ok(saveHandler.includes("hasR2Images") && saveHandler.includes("do not delete") === false,
+assert.ok(saveHandler.includes("hasR2Images") && saveHandler.includes("không tự động xóa ảnh khỏi R2."),
   "save errors must disclose that already-uploaded R2 images may remain; no unsafe automatic cleanup is implied");
 assert.ok(/finally\{\s*busy=false;[\s\S]*?\$\('#imageInput'\)\.disabled=false;[\s\S]*?b\.textContent='Lưu sản phẩm';/.test(saveHandler),
   "the save lock, image picker, and button label must be restored on every exit");
