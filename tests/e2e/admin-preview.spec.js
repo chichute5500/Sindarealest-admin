@@ -20,7 +20,7 @@ function redact(value) {
     .slice(0, 700);
 }
 
-async function logPageDiagnostics(page, label, response) {
+async function readPageDiagnostics(page, label, response) {
   const details = await page.evaluate(() => ({
     title: document.title,
     lang: document.documentElement.lang || null,
@@ -43,7 +43,7 @@ async function logPageDiagnostics(page, label, response) {
     contentType: document.contentType
   })).catch(error => ({ evaluationError: String(error) }));
 
-  const safeDetails = {
+  return {
     label,
     pageUrl: safeUrl(page.url()),
     navigationStatus: response?.status() ?? null,
@@ -52,8 +52,14 @@ async function logPageDiagnostics(page, label, response) {
     bodyText: redact(details.bodyText),
     headingText: (details.headingText || []).map(redact)
   };
-  console.error(`[ADMIN_PREVIEW_DIAGNOSTICS] ${JSON.stringify(safeDetails)}`);
-  return safeDetails;
+}
+
+function isCloudflareAccessGate(page, details) {
+  let hostname = '';
+  try { hostname = new URL(page.url()).hostname.toLowerCase(); } catch {}
+  return (details.title || '').toLowerCase().includes('cloudflare access')
+    || hostname.endsWith('.cloudflareaccess.com')
+    || (details.documentUrl || '').includes('/cdn-cgi/access/login/');
 }
 
 async function openLoginPage(page, testInfo) {
@@ -62,35 +68,61 @@ async function openLoginPage(page, testInfo) {
   try {
     response = await page.goto(adminUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   } catch (error) {
-    await logPageDiagnostics(page, 'navigation-error', response).catch(() => {});
+    const details = await readPageDiagnostics(page, 'navigation-error', response).catch(() => ({}));
+    console.error(`[ADMIN_PREVIEW_DIAGNOSTICS] ${JSON.stringify(details)}`);
     throw new Error(`Could not open ADMIN_TEST_URL (${safeUrl(adminUrl)}): ${error.message}`);
+  }
+
+  // Cloudflare Access is a separate authentication boundary. Do not submit the
+  // ADMIN password to it, automate email-code verification, or try to bypass it.
+  const initial = await readPageDiagnostics(page, 'initial-page', response);
+  if (isCloudflareAccessGate(page, initial)) {
+    const blocked = {
+      status: 'BLOCKED_CLOUDFLARE_ACCESS',
+      message: 'Preview is protected by Cloudflare Access. ADMIN smoke tests require an authorized test route or an explicitly configured Access service token.',
+      page: initial
+    };
+    console.warn(`[ADMIN_PREVIEW_BLOCKED] ${JSON.stringify(blocked)}`);
+    await testInfo.attach('admin-preview-blocked-cloudflare-access.json', {
+      body: Buffer.from(JSON.stringify(blocked, null, 2)),
+      contentType: 'application/json'
+    });
+    testInfo.annotations.push({
+      type: 'blocked',
+      description: 'Cloudflare Access stopped the browser before the ADMIN login page. Authentication was not bypassed.'
+    });
+    return { type: 'blocked', details: blocked };
   }
 
   try {
     await expect(page.locator('#loginView')).toBeVisible({ timeout: 6_000 });
     await expect(page.locator('#loginForm')).toBeVisible();
-    return response;
+    return { type: 'admin', response, details: initial };
   } catch (error) {
-    const details = await logPageDiagnostics(page, 'expected-login-markup-missing', response);
+    const details = await readPageDiagnostics(page, 'expected-login-markup-missing', response);
+    console.error(`[ADMIN_PREVIEW_DIAGNOSTICS] ${JSON.stringify(details)}`);
     await testInfo.attach('admin-preview-diagnostics.json', {
       body: Buffer.from(JSON.stringify(details, null, 2)),
       contentType: 'application/json'
     });
     throw new Error(
       `Preview opened at ${safeUrl(page.url())}, but the expected ADMIN login markup was missing. ` +
-      `See [ADMIN_PREVIEW_DIAGNOSTICS] in the job log and the attached safe diagnostics. ${error.message}`
+      `See [ADMIN_PREVIEW_DIAGNOSTICS] in the job log and attached diagnostics. ${error.message}`
     );
   }
 }
 
 test.describe('SinDarealest2 Admin Preview', () => {
   test('opens the admin login page without exposing protected content', async ({ page }, testInfo) => {
-    await openLoginPage(page, testInfo);
+    const opened = await openLoginPage(page, testInfo);
+    if (opened.type === 'blocked') test.skip(true, 'BLOCKED: Cloudflare Access requires a separately authorized test path.');
     await expect(page.locator('#password')).toHaveAttribute('type', 'password');
     await expect(page.locator('#appView')).toBeHidden();
   });
 
   test('logs in once and verifies the admin dashboard', async ({ page }, testInfo) => {
+    const opened = await openLoginPage(page, testInfo);
+    if (opened.type === 'blocked') test.skip(true, 'BLOCKED: Cloudflare Access requires a separately authorized test path.');
     if (!adminPassword) throw new Error('Missing GitHub Actions secret ADMIN_TEST_PASSWORD.');
 
     const serverErrors = [];
@@ -104,7 +136,6 @@ test.describe('SinDarealest2 Admin Preview', () => {
       }
     });
 
-    await openLoginPage(page, testInfo);
     await page.locator('#password').fill(adminPassword);
     await page.locator('#loginForm button[type="submit"]').click();
 
