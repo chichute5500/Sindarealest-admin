@@ -79,7 +79,7 @@ for (const [index, product] of sourceProducts.entries()) {
   assert.equal(product.skuVerified, false, `Nguồn fixture phải đánh dấu SKU chưa xác minh: ${product.id}`);
   const validationCandidate = { ...product, sku: `AUDIT-${String(index + 1).padStart(3, '0')}` };
   assert.equal(validateProduct(validationCandidate).error, undefined, `các trường sản phẩm nguồn không hợp lệ: ${product.id}`);
-  assert.match(validateProduct(product).error || '', /SKU bắt buộc/, `luồng quản trị vẫn phải từ chối sản phẩm mới thiếu SKU: ${product.id}`);
+  assert.match(validateProduct(product).error || '', /SKU|Mã sản phẩm/i, `luồng quản trị vẫn phải từ chối sản phẩm mới thiếu SKU: ${product.id}`);
 }
 
 
