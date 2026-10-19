@@ -93,6 +93,14 @@ function fakeFile(bytes, name='fixture.zip') { return { name, size: bytes.length
   assert.ok(upload.includes('form.get("zipImport") === "1"') && upload.includes('ZIP_IMPORT_ENABLED !== "1"'),'ZIP image uploads must be gated before writing to R2');
   assert.ok(readiness.includes('product_source_imports') && readiness.includes('ZIP_IMPORT_ENABLED'),'Preview readiness must verify the flag and migrated table');
   assert.ok(readiness.includes('context.env.ORIGINALS'),'Preview readiness must require the private originals bucket, not only public IMAGES');
+  assert.ok(readiness.includes('existingSources'),'ZIP readiness must return imported source identifiers for repeat-import detection');
+  assert.ok(readiness.includes('source_product_id') && readiness.includes('source_url'),'repeat-import lookup must include stable source product IDs and source URLs');
+  assert.ok(readiness.includes('LIMIT 5000'),'the preview list of known sources must be bounded');
+  assert.ok(readiness.includes('sourceDuplicate(p)') && readiness.includes('Đã nhập nguồn này'),'the UI must flag exact source duplicates separately from title-only warnings');
+  assert.ok(readiness.includes('disabled title="Nguồn này đã được nhập"'),'already-imported source items must not be manually reselected in the preview');
+  assert.ok(readiness.includes('product_id nguồn bị trùng trong ZIP') && readiness.includes('URL nguồn bị trùng trong ZIP'),'duplicate source IDs/URLs within one ZIP must be detected');
+  assert.ok(readiness.includes('idx_product_source_imports_source_product_id_unique') && readiness.includes('idx_product_source_imports_source_url_unique'),'migration must enforce source deduplication atomically');
+
   assert.ok(migration.includes('REFERENCES products(id) ON DELETE CASCADE'));
 }
 
