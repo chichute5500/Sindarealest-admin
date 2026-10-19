@@ -301,7 +301,7 @@ assert.equal(reviewInsertBatches, beforeQuotaWrites, "quota failure must not sav
 compareMode = false;
 const beforeDailyAllocationFailure = modelCalls;
 failNextDailyAllocation = true;
-const dailyAllocationResponse = await call();
+const dailyAllocationResponse = await onRequestPost({ request: request(), env });
 const dailyAllocationResult = await dailyAllocationResponse.json();
 assert.equal(dailyAllocationResponse.status, 429, JSON.stringify(dailyAllocationResult));
 assert.equal(dailyAllocationResponse.headers.get("Retry-After"), null, "daily allocation exhaustion must not promise a 60-second retry");
