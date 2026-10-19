@@ -319,7 +319,7 @@ export async function onRequestPost(context) {
           const message = verification.reason === "unconfirmed_classification"
             ? "Nhóm có ảnh chưa được phân loại chắc chắn. Ảnh thiếu đặc trưng, độ tin cậy thấp hoặc cần xem xét phải ở hàng chờ thủ công."
             : verification.reason === "similarity_below_threshold"
-              ? "Nhóm có ít nhất một cặp ảnh chưa đạt ngưỡng ghép 91/100 khi kiểm tra lại phía máy chủ."
+              ? "Nhóm có ít nhất một cặp ảnh chưa đạt ngưỡng lọc thị giác 70/100 khi kiểm tra lại phía máy chủ."
               : "Không thể xác minh danh mục hoặc chỉ mục của toàn bộ ảnh trong nhóm.";
           return fail(message, 409);
         }
