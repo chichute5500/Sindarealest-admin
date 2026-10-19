@@ -9,22 +9,56 @@ on:
       - 'docs/website-screenshots/start-of-work/**'
       - 'docs/website-screenshots/end-of-work/**'
   workflow_dispatch:
+    inputs:
+      capture_stage:
+        description: 'Save this real capture as the start or end snapshot'
+        required: true
+        type: choice
+        options:
+          - start-of-work
+          - end-of-work
+      confirm_preview_only:
+        description: 'Confirm this is a fix/Preview branch only; never Production'
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: write
 
 concurrency:
   group: liquid-glass-preview-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   visual-preview:
     if: github.ref == 'refs/heads/fix/liquid-glass-redesign' || github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
+      - name: Reject unsafe manual capture
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          STAGE: ${{ inputs.capture_stage }}
+          PREVIEW_ONLY: ${{ inputs.confirm_preview_only }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          test "${PREVIEW_ONLY}" = "true"
+          case "${REF_NAME}" in
+            fix/liquid-glass-redesign|fix/liquid-glass-audit-2026-10-19) ;;
+            *) echo "Refused: only an approved fix branch is allowed."; exit 1 ;;
+          esac
+          case "${STAGE}" in
+            start-of-work|end-of-work) ;;
+            *) echo "Refused: capture stage must be explicitly selected."; exit 1 ;;
+          esac
       - name: Check out source
         uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+      - name: Record source revision before screenshot commit
+        run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
@@ -53,6 +87,50 @@ jobs:
           exit 1
       - name: Capture Light/Dark screenshots and audit responsive layouts
         run: node scripts/capture-liquid-glass-preview.mjs
+      - name: Save independently captured images into selected repository archive
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          STAGE: ${{ inputs.capture_stage }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          SOURCE_SHA: ${{ env.SOURCE_SHA }}
+          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${STAGE}" in
+            start-of-work|end-of-work) ;;
+            *) echo "Refused invalid capture stage"; exit 1 ;;
+          esac
+          source_dir="artifacts/liquid-glass-preview"
+          target_dir="docs/website-screenshots/${STAGE}/${RUN_ID}"
+          test -d "${source_dir}"
+          mkdir -p "${target_dir}"
+          find "${source_dir}" -maxdepth 1 -type f -name '*.jpg' -print -quit | grep -q .
+          while IFS= read -r file; do
+            name="$(basename "$file")"
+            cp "$file" "${target_dir}/${name}"
+          done < <(find "${source_dir}" -maxdepth 1 -type f -name '*.jpg' -print | sort)
+          image_count="$(find "${target_dir}" -maxdepth 1 -type f -name '*.jpg' | wc -l | tr -d ' ')"
+          test "${image_count}" -gt 1
+          cat > "${target_dir}/MANIFEST.md" <<EOF
+          # Website screenshot capture
+
+          - Stage: ${STAGE}
+          - Captured at (UTC): $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          - Repository: ${REPOSITORY}
+          - Branch: ${REF_NAME}
+          - Source commit before this archive commit: ${SOURCE_SHA}
+          - GitHub Actions run: ${RUN_ID} (run #${RUN_NUMBER})
+          - Capture URL: http://127.0.0.1:4173/ (read-only local static preview built from this branch's public/ directory)
+          - Viewports/themes: see image filenames and audit report in the matching Actions artifact
+          - Image count: ${image_count}
+          - Safety: this job serves local static files and mocks relevant API calls in memory; it does not target Production or write to D1/R2.
+          EOF
+          git add "${target_dir}"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive ${STAGE} website screenshots (run ${RUN_ID})"
+          git push origin "HEAD:${REF_NAME}"
       - name: Upload screenshots and HTML audit report
         if: always()
         uses: actions/upload-artifact@v4
