@@ -1388,6 +1388,19 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
   .section#featured{padding-top:22px}
 }
 
+
+/* QA correction: the two-column hero must stay inside the viewport after enlarging the reference proportions. */
+@media(max-width:760px){
+  #home.hero.wrap{width:calc(100vw - 26px)!important;max-width:calc(100vw - 26px);margin-left:auto;margin-right:auto;box-sizing:border-box}
+  #home .hero-visual{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+  .service-strip>.service{min-height:88px!important;height:auto}
+  #order .order-cta--compact #orderDetailsToggle{min-height:50px}
+}
+@media(max-width:360px){
+  .service-strip>.service{min-height:78px!important}
+  #order .order-cta--compact #orderDetailsToggle{min-height:44px}
+}
+
 </style>
 
 

@@ -26,6 +26,7 @@ const audit = {
   productFixtureCount: 0,
   screenshots: [],
   responsive: [],
+  layoutMetrics: [],
   interactions: [],
   consoleErrors: [],
   pageErrors: [],
@@ -204,6 +205,30 @@ try {
         };
       });
       audit.responsive.push({ theme, viewport: vp.name, ...metric });
+      if (vp.name === 'mobile-390') {
+        const visualMetrics = await page.evaluate(() => {
+          const box = (selector) => {
+            const el = document.querySelector(selector);
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { left: Math.round(r.left), top: Math.round(r.top), right: Math.round(r.right), width: Math.round(r.width), height: Math.round(r.height) };
+          };
+          const service = document.querySelector('.service-strip .service');
+          const sr = service?.getBoundingClientRect();
+          return {
+            hero: box('#home.hero'),
+            heroCopy: box('#home .hero-copy'),
+            heroImage: box('#home .hero-visual'),
+            commitmentStrip: box('.service-strip'),
+            firstCommitment: sr ? { top: Math.round(sr.top), height: Math.round(sr.height) } : null,
+            orderCta: box('#orderDetailsToggle'),
+            featuredHeading: box('#featured .section-head'),
+            viewportWidth: innerWidth,
+            documentWidth: document.documentElement.scrollWidth,
+          };
+        });
+        audit.layoutMetrics.push({ theme, viewport: vp.name, ...visualMetrics });
+      }
     }
 
     // Capture every requested viewport in both themes, not only the representative three.
