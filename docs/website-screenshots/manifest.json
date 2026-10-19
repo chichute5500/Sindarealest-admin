@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "repository": "chichute5500/Sindarealest-admin",
+  "branch": "fix/liquid-glass-audit-2026-10-19",
+  "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
+  "productionUrl": "https://sindarealest2.pages.dev",
+  "updatedAtUtc": "2026-10-20T00:00:00Z",
+  "status": "BLOCKED",
+  "note": "Timestamp above records the initial manifest entry, not a screenshot capture time. No website screenshots have been verified or stored yet.",
+  "stages": {
+    "start-of-work": {
+      "status": "BLOCKED",
+      "directory": "docs/website-screenshots/start-of-work/",
+      "images": [],
+      "reason": "The provided Cloudflare Preview returned login_required during read-only fetch. No browser session authorized to access it; local fixture screenshots must not be represented as Preview baseline."
+    },
+    "end-of-work": {
+      "status": "NOT TESTED",
+      "directory": "docs/website-screenshots/end-of-work/",
+      "images": [],
+      "reason": "No code-level website change has been made; end screenshots require a valid baseline and accessible Preview."
+    }
+  },
+  "referenceImages": {
+    "directory": "docs/static-web-reference/",
+    "light": "file_0000000017088207af45f5e6dd90cfa4.png",
+    "dark": "file_00000000fcb48207a23aeda23caa5eeb.png",
+    "visuallyInspected": false
+  },
+  "previewRoutes": [
+    {
+      "url": "/",
+      "status": "BLOCKED",
+      "result": "login_required"
+    },
+    {
+      "url": "/san-pham/sd2929",
+      "status": "BLOCKED",
+      "result": "login_required"
+    },
+    {
+      "url": "/sanpham/giaytay/sd2929",
+      "status": "BLOCKED",
+      "result": "login_required"
+    }
+  ],
+  "comparisonStatus": "NOT TESTED",
+  "remainingBlockers": [
+    "Authorized read-only access to the supplied Cloudflare Preview is required for real Preview screenshots and route checks.",
+    "The original reference PNGs still need to be opened and visually inspected with an image-capable tool."
+  ]
+}
