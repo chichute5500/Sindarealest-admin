@@ -968,7 +968,7 @@ function trapTabWithin(panel,event){
  else if(!event.shiftKey&&(document.activeElement===last||!panel.contains(document.activeElement))){event.preventDefault();first.focus({preventScroll:true})}
 }
 function trapCheckoutTab(event){trapTabWithin($('#checkoutDrawer'),event)}
-function trapAccountTab(event){trapTabWithin($('#accountDrawer'),event)}
+function trapAccountTab(event){trapTabWithin($('#accountDrawer'),event)} function guardAccountFocus(event){const panel=$('#accountDrawer');if(!panel||!panel.classList.contains('open')||panel.hasAttribute('inert')||panel.contains(event.target))return;const close=$('#accountClose');if(!close)return;requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert')&&!panel.contains(document.activeElement))close.focus({preventScroll:true})})} document.addEventListener('focusin',guardAccountFocus,true)
 function trapProductTab(event){trapTabWithin($('#productOverlay'),event)}
 function trapFullscreenTab(event){trapTabWithin($('#sdFullscreenViewer'),event)}
 async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch(e){}try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
