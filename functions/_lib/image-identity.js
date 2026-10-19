@@ -18,6 +18,7 @@ export function normalizeIdentityDescriptor(value) {
       .join("; ");
   }
   return String(text || "")
+    .replace(/\s*\|\s*/g, "; ")
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, " ")
     .replace(/[\r\n\t]+/g, " ")
     .replace(/\s{2,}/g, " ")
