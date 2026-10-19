@@ -40,6 +40,7 @@ assert.ok(adminHtml.includes("similarity.isCachedDescriptorValid(indexedByKey.ge
 assert.ok(adminHtml.includes("let aiClassificationQuotaBlocked=false") && adminHtml.includes("aiClassificationQuotaBlocked=true"), "daily AI quota exhaustion must be detected once and stop repeated classification calls in the same scan");
 assert.ok(adminHtml.includes("Never infer a category when vision is quota-blocked.") && adminHtml.includes('categoryStatus==="needs_review"'), "quota-blocked images must remain unclassified and excluded from automatic grouping rather than receiving guessed labels");
 assert.ok(adminHtml.includes("Missing identity descriptors make this cache") && adminHtml.includes("retries classification after quota resets"), "quota-blocked image descriptors must be retried on a later scan after quota resets");
+assert.ok(adminHtml.includes("const quotaNote=aiClassificationQuotaBlocked?") && adminHtml.includes("không được tự động ghép"), "scan summary must distinguish quota-blocked images from unreadable files and disclose that they are not auto-grouped");
 assert.ok(adminHtml.includes("similarity.findSimilarGroups(allDescriptors,{threshold:70,onProgress:progress=>{"),
   "use the conservative server-supported 70/100 visual prefilter so different-angle candidates reach the AI identity verifier");
 const similarityModule = await readFile(new URL("../public/admin/image-similarity.js", import.meta.url), "utf8");
