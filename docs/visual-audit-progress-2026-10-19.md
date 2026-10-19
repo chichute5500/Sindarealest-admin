@@ -3,7 +3,7 @@
 Cập nhật: 19/10/2026  
 Repository: `chichute5500/Sindarealest-admin`  
 Nhánh thử nghiệm: `fix/liquid-glass-audit-2026-10-19`  
-Source HEAD đã xác minh: `56a94091f63d6ec1b973581b7a488a8e806f22eb`  
+Source HEAD đã xác minh: `68989d03bd254af8eede93628833012ac5d6389f` (mã nguồn); commit tài liệu cập nhật sau đó: `f806e4390f1b38adcc39f5445cc00ddf6ba042ed`  
 Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/R2.
 
 ## Các thay đổi thực tế gần nhất
