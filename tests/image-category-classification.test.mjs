@@ -212,7 +212,7 @@ assert.equal(largeResult.matches, 1, "the first-to-last pair must be considered"
 assert.equal(modelCalls, beforeLargeCalls + 6, "five selected images must each be analyzed before one complete-list text comparison");
 assert.equal(reviewInsertBatches, beforeLargeWrites + 1, "all qualifying pairs are saved only after the complete comparison succeeds");
 assert.match(lastModelInput.input.messages.find(message => message.role === "user").content, /Ảnh 4/, "the comparison prompt must contain the last selected image");
-assert.ok(lastModelInput.input.messages.find(message => message.role === "user").content.includes(largeKeys[4]), "the complete pair comparison must retain the last image key");
+assert.ok(lastModelInput.input.messages.find(message => message.role === "user").content.includes("Ảnh 4 (mô tả từ phân tích thị giác):"), "the complete pair comparison must retain the last image-specific visual description without sending storage keys as visual evidence");
 comparePair = [0, 1];
 
 
