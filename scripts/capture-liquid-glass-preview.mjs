@@ -239,6 +239,7 @@ try {
     await page.locator('#productOverlay.open').waitFor({ state: 'hidden' });
 
     await page.locator('#catalogGrid .mini-add').first().click();
+    await page.locator('#catalogGrid .mini-add').nth(1).click();
     await page.locator('#cartOpen').click();
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#cartClose').click();
@@ -246,6 +247,10 @@ try {
     await page.locator('#mobileCartNav').click();
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await settle(page);
+    const cartRowCount = await page.locator('#cartList .cart-row').count();
+    const cartHasMultipleProducts = cartRowCount === 2;
+    audit.interactions.push({ theme, check: 'cart-renders-two-distinct-product-rows', pass: cartHasMultipleProducts, result: { rowCount: cartRowCount } });
+    if (!cartHasMultipleProducts) hardFailures.push('Cart did not render both selected product rows: ' + theme);
     await capture(page, 'cart-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'add-to-cart-and-open-cart', pass: true });
     audit.interactions.push({ theme, check: 'mobile-bottom-cart-navigation-opens-cart', pass: true });
