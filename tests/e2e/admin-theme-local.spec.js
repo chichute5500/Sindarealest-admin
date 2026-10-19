@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.use({ serviceWorkers: "block" });
 
 test("Admin defaults to light mode and explicit theme changes are not inverted", async ({ page }) => {
-  await page.addInitScript(() => localStorage.removeItem("sd-theme-mode"));
+  await page.addInitScript(() => { if (sessionStorage.getItem("admin-theme-test-initialized") !== "1") { localStorage.removeItem("sd-theme-mode"); sessionStorage.setItem("admin-theme-test-initialized", "1"); } });
   await page.route("**/api/admin/session", route => route.fulfill({
     status: 401,
     contentType: "application/json",
