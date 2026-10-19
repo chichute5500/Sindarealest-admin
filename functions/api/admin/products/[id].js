@@ -21,7 +21,7 @@ export async function onRequestPut(context) {
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_updated', 'product', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ sku:p.sku,title:p.title,published:!!p.published }))
     ]);
     return json({ ok: true, product: toAdminProduct(p), message: "Đã lưu thay đổi sản phẩm." });
-  } catch (error) { return genericDbError(error); }
+  } catch (error) { return genericDbError(error, "admin.products.update"); }
 }
 
 export async function onRequestDelete(context) {
@@ -36,5 +36,5 @@ export async function onRequestDelete(context) {
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_deleted', 'product', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ sku:product.sku,title:product.title }))
     ]);
     return json({ ok: true, message: "Đã xóa sản phẩm khỏi danh mục." });
-  } catch (error) { return genericDbError(error); }
+  } catch (error) { return genericDbError(error, "admin.products.delete"); }
 }
