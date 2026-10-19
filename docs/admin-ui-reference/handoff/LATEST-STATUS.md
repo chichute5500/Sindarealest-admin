@@ -22,7 +22,7 @@
 | Hạng mục | Trạng thái | Bằng chứng / việc cần làm |
 |---|---|---|
 | Tạo nhánh ADMIN riêng | COMPLETED — BRANCH CREATED | Xác minh branch `feature/admin-isolated-handoff-2026-10-20` trên GitHub |
-| Cập nhật prompt tổng và handoff để cô lập nhánh | IN PROGRESS | Xác minh từng file sau khi cập nhật; prompt tổng đang được chỉnh để cấm sửa nhánh website |
+| Cập nhật prompt tổng và handoff để cô lập nhánh | COMPLETED — DOCS UPDATED | Đã cập nhật và đọc lại các file master prompt, START-HERE, LATEST-STATUS, JSON, README, reference instructions và prompt audit trên nhánh ADMIN |
 | Xác minh branch/HEAD/working tree trong môi trường chạy app | NOT TESTED | Chạy git status, ghi SHA, remote và thay đổi chưa commit |
 | Đọc source và kiến trúc ADMIN | NOT TESTED | Lập danh sách route, module, API, auth và bindings hiện có |
 | Mở/đối chiếu ảnh tham chiếu | REFERENCE FILES PRESENT | Mở PNG; kiểm tra HTML/ZIP nếu có thể |
