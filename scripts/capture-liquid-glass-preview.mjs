@@ -125,8 +125,16 @@ try {
     await context.route('**/api/settings', (route) => route.fulfill({
       status: 200, contentType: 'application/json; charset=utf-8', body: '{}',
     }));
+    // Offline-only fixture: keep address inputs usable in screenshots without calling the live administrative API.
     await context.route('https://provinces.open-api.vn/api/v2/p/', (route) => route.fulfill({
-      status: 200, contentType: 'application/json; charset=utf-8', body: '[]',
+      status: 200,
+      contentType: 'application/json; charset=utf-8',
+      body: JSON.stringify([{ code: 99, name: 'Tỉnh kiểm thử' }]),
+    }));
+    await context.route(/https:\/\/provinces\.open-api\.vn\/api\/v2\/p\/99\?depth=2$/, (route) => route.fulfill({
+      status: 200,
+      contentType: 'application/json; charset=utf-8',
+      body: JSON.stringify({ wards: [{ code: 99001, name: 'Phường kiểm thử' }] }),
     }));
     await context.route('**/api/products', (route) => route.fulfill({
       status: 200,
@@ -265,15 +273,31 @@ try {
       closeButtonPresent: !!document.querySelector('#checkoutClose'),
       backButtonPresent: !!document.querySelector('#checkoutBack'),
       submitButtonPresent: !!document.querySelector('#checkoutSubmit'),
+      provinceEnabled: !!document.querySelector('#checkoutProvince') && !document.querySelector('#checkoutProvince').disabled,
+      addressMessage: document.querySelector('#checkoutAddressMessage')?.textContent || '',
+      submitButtonHeight: document.querySelector('#checkoutSubmit')?.getBoundingClientRect().height || 0,
+      formValidityBlocksEmptySubmission: !!document.querySelector('#checkoutForm') && !document.querySelector('#checkoutForm').checkValidity(),
     }));
     const checkoutPass = checkoutStructure.checkoutFormInsideCheckout
       && !checkoutStructure.checkoutFormInsideCart
       && checkoutStructure.closeButtonPresent
       && checkoutStructure.backButtonPresent
-      && checkoutStructure.submitButtonPresent;
-    audit.interactions.push({ theme, check: 'cart-checkout-form-separated', pass: checkoutPass, result: checkoutStructure });
-    if (!checkoutPass) hardFailures.push('Cart and checkout are not separated correctly: ' + theme);
+      && checkoutStructure.submitButtonPresent
+      && checkoutStructure.provinceEnabled
+      && !checkoutStructure.addressMessage
+      && checkoutStructure.submitButtonHeight >= 40
+      && checkoutStructure.submitButtonHeight <= 56
+      && checkoutStructure.formValidityBlocksEmptySubmission;
+    audit.interactions.push({ theme, check: 'cart-checkout-form-separated-and-validates', pass: checkoutPass, result: checkoutStructure });
+    if (!checkoutPass) hardFailures.push('Cart/checkout layout, address mock or validation failed: ' + theme);
     await capture(page, 'checkout-mobile-' + theme + '.jpg');
+
+    await page.locator('#checkoutProvince').selectOption('Tỉnh kiểm thử');
+    await page.locator('#checkoutWard:enabled').waitFor({ state: 'visible' });
+    const wardFixtureLoaded = await page.locator('#checkoutWard option').filter({ hasText: 'Phường kiểm thử' }).count() === 1;
+    audit.interactions.push({ theme, check: 'checkout-address-ward-options-load-from-offline-fixture', pass: wardFixtureLoaded });
+    if (!wardFixtureLoaded) hardFailures.push('Checkout test-only ward fixture did not load: ' + theme);
+    await page.locator('#checkoutProvince').selectOption('');
     await page.locator('#checkoutBack').click();
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#cartClose').click();
