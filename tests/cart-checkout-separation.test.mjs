@@ -62,4 +62,15 @@ assert.match(html, /function openCart\(\)\{dismissToast\(\)/, 'Opening the cart 
 assert.match(html, /function openCheckout\(\)\{\s*dismissToast\(\)/, 'Opening checkout must clear a previously displayed toast.');
 assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'Checkout must be reachable from the cart CTA.');
 
-console.log('PASS: cart/checkout separation, unconfirmed prices, modal controls, address fields, order API wiring, and toast collision prevention.');
+const accountStart = html.indexOf('<aside class="account-drawer glass" id="accountDrawer"');
+const accountEnd = html.indexOf('</aside>', accountStart);
+assert.ok(accountStart >= 0 && accountEnd > accountStart, 'Account drawer must exist.');
+const accountMarkup = html.slice(accountStart, accountEnd);
+assert.match(accountMarkup, /role="dialog" aria-modal="true" aria-label="Tài khoản" aria-hidden="true" tabindex="-1" inert/, 'Account drawer must be an accessible hidden modal before opening.');
+assert.match(html, /function openAccount\(\)\{dismissToast\(\);accountReturnFocus=document\.activeElement[\s\S]*?panel\.removeAttribute\('inert'\)[\s\S]*?panel\.setAttribute\('aria-hidden','false'\)/, 'Opening account must reveal it to assistive technology and remove inert.');
+assert.match(html, /function closeAccount\(restoreFocus=true\)[\s\S]*?panel\.setAttribute\('aria-hidden','true'\);panel\.setAttribute\('inert',''\)/, 'Closing account must hide it and remove its descendants from keyboard navigation.');
+assert.match(html, /function trapAccountTab\(event\)/, 'Account must trap keyboard navigation while modal.');
+assert.match(html, /if\(\$\('#accountDrawer'\)\.classList\.contains\('open'\)\)\{trapAccountTab\(e\);return\}/, 'The global keyboard handler must enforce the account focus trap.');
+assert.match(html, /const target=accountReturnFocus;accountReturnFocus=null/, 'Account must remember its invoker for focus restoration.');
+
+console.log('PASS: separate cart/checkout, safe prices, address mock, toast handling, and accessible keyboard behavior for cart, checkout and account.');
