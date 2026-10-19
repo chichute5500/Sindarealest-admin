@@ -22,9 +22,7 @@ test.describe("SinDarealest2 Admin Preview", () => {
     expect(response?.status() ?? 0).toBeGreaterThan(0);
     expect(response?.status() ?? 0).toBeLessThan(500);
 
-    const finalHost = new URL(page.url()).hostname.toLowerCase();
-    expect(finalHost).not.toBe("sindarealest2.pages.dev");
-    expect(finalHost.endsWith(".sindarealest2.pages.dev")).toBe(true);
+    expect(() => validateAdminPreviewUrl(page.url())).not.toThrow();
 
     await expect(page.locator("#loginView")).toBeVisible();
     await expect(page.locator("#loginForm")).toBeVisible();
