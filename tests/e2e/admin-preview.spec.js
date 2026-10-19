@@ -67,7 +67,7 @@ test.describe("SinDarealest2 Admin Preview", () => {
     await page.locator("#logout").click();
     await expect(page.locator("#loginView")).toBeVisible({ timeout: 10_000 });
     await expect(page.locator("#appView")).toBeHidden();
-    await expectProtectedProductsApiDenied(request, adminUrl);
+    await expectProtectedProductsApiDenied(page.request, adminUrl);
 
     expect(serverErrors, "Preview should not return unexpected HTTP 5xx responses during authentication").toEqual([]);
   });
