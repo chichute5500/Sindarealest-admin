@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const adminUrl = process.env.ADMIN_TEST_URL;
 const adminPassword = process.env.ADMIN_TEST_PASSWORD;
+const commitKey = (process.env.GITHUB_SHA || 'local').slice(0, 12);
+const evidenceDir = join(process.cwd(), 'artifacts', 'admin-preview-evidence', commitKey);
 
 function safeUrl(value) {
   try {
@@ -83,6 +87,8 @@ async function openLoginPage(page, testInfo) {
       page: initial
     };
     console.warn(`[ADMIN_PREVIEW_BLOCKED] ${JSON.stringify(blocked)}`);
+    mkdirSync(evidenceDir, { recursive: true });
+    writeFileSync(join(evidenceDir, 'preview-diagnostics.json'), JSON.stringify(blocked, null, 2));
     await testInfo.attach('admin-preview-blocked-cloudflare-access.json', {
       body: Buffer.from(JSON.stringify(blocked, null, 2)),
       contentType: 'application/json'
@@ -101,6 +107,8 @@ async function openLoginPage(page, testInfo) {
   } catch (error) {
     const details = await readPageDiagnostics(page, 'expected-login-markup-missing', response);
     console.error(`[ADMIN_PREVIEW_DIAGNOSTICS] ${JSON.stringify(details)}`);
+    mkdirSync(evidenceDir, { recursive: true });
+    writeFileSync(join(evidenceDir, 'preview-diagnostics.json'), JSON.stringify(details, null, 2));
     await testInfo.attach('admin-preview-diagnostics.json', {
       body: Buffer.from(JSON.stringify(details, null, 2)),
       contentType: 'application/json'
