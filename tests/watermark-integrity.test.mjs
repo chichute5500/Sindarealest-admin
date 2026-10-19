@@ -13,13 +13,15 @@ assert.deepEqual(normalizeWatermarkSettings({}), {
 });
 assert.equal(normalizeWatermarkSettings({watermark_enabled:'0'}).watermarkEnabled,false);
 assert.equal(normalizeWatermarkSettings({watermark_logo:'/other.webp'}).watermarkLogoUrl,'/watermark.webp');
+assert.equal(normalizeWatermarkSettings({watermark_logo:'/media/01234567-89ab-cdef-0123-456789abcdef.webp'}).watermarkLogoUrl,'/media/01234567-89ab-cdef-0123-456789abcdef.webp');
 assert.deepEqual(validateWatermarkSettingUpdates({watermarkEnabled:false,watermarkPosition:'top-left',watermarkSize:24,watermarkOpacity:75}).updates,[
  ['watermark_enabled','0'],['watermark_position','top-left'],['watermark_size','24'],['watermark_opacity','75'],
 ]);
 assert.match(validateWatermarkSettingUpdates({watermarkPosition:'outside'}).error,/vị trí/i);
 assert.match(validateWatermarkSettingUpdates({watermarkSize:99}).error,/6 đến 35/i);
 assert.match(validateWatermarkSettingUpdates({watermarkOpacity:0}).error,/10 đến 100/i);
-assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'/other.webp'}).error,/giữ nguyên/i);
+assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'https://evil.example/logo.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
+assert.deepEqual(validateWatermarkSettingUpdates({watermarkLogoUrl:'/media/01234567-89ab-cdef-0123-456789abcdef.webp'}).updates,[['watermark_logo','/media/01234567-89ab-cdef-0123-456789abcdef.webp']]);
 
 const mockDB={prepare(){return{bind(){return this},async first(){return null}}}};
 const response=await publicSettingsGet({env:{DB:mockDB}});
@@ -46,7 +48,8 @@ assert.ok(home.includes("window.__sdSettingsPromise||window.__sdPublicSettings")
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 assert.ok(admin.includes('watermarkSettingsForm'));
 assert.ok(admin.includes('saveWatermarkSettings'));
-assert.ok(admin.includes('src="/watermark.webp"'));
+assert.ok(admin.includes('id="watermarkLogoUrl"'));
+assert.ok(admin.includes('watermarkLogoPreview'));
 assert.ok(admin.includes("body.append('original',file,file.name||'original')"));
 assert.ok(!/watermarkApplied|ctx\.drawImage\(markBitmap/.test(admin));
 
