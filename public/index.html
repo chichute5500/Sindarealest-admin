@@ -1019,7 +1019,13 @@ function closeCheckout(restoreFocus=true){
 function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
  closeCheckout(false);closeCart();closeDetail(false,false);
  const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
- const close=$('#accountClose');const focusClose=()=>{if(close&&panel.classList.contains('open')&&!panel.hasAttribute('inert'))close.focus({preventScroll:true})};focusClose();requestAnimationFrame(()=>requestAnimationFrame(focusClose));setTimeout(focusClose,80);
+ const close=$('#accountClose');
+ const focusClose=()=>{if(!close||!panel.classList.contains('open')||panel.hasAttribute('inert'))return;close.focus({preventScroll:true})};
+ // Retry after layout/visibility transitions so opening the drawer cannot leave focus on the bottom-nav trigger.
+ clearTimeout(window.__sdAccountFocusRetry);
+ focusClose();
+ requestAnimationFrame(()=>requestAnimationFrame(focusClose));
+ window.__sdAccountFocusRetry=setTimeout(focusClose,180);
 }
 function closeAccount(restoreFocus=true){
  const panel=$('#accountDrawer');if(!panel)return;
