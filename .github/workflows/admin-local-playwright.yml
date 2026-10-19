@@ -1,0 +1,68 @@
+name: Admin Local Playwright
+
+on:
+  push:
+    branches: [fix/playwright-preview-safety-2026-10-20]
+    paths:
+      - 'public/admin/index.html'
+      - 'tests/e2e/admin-local.spec.js'
+      - '.github/workflows/admin-local-playwright.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'public/admin/index.html'
+      - 'tests/e2e/admin-local.spec.js'
+      - '.github/workflows/admin-local-playwright.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-local-playwright-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-admin:
+    name: Local Admin authentication browser smoke (no secrets, no remote writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies and Chromium
+        run: |
+          npm install
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Start isolated local Pages server
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages dev public --ip 127.0.0.1 --port 8788 > /tmp/admin-local-pages.log 2>&1 &
+          echo "$!" > /tmp/admin-local-pages.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8788/admin/ >/dev/null; then
+              echo "PASS: local Admin Pages server is ready."
+              exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/admin-local-pages.pid)" 2>/dev/null; then
+              cat /tmp/admin-local-pages.log
+              echo "::error::Local Pages server exited before readiness."
+              exit 1
+            fi
+            sleep 1
+          done
+          cat /tmp/admin-local-pages.log
+          echo "::error::Timed out waiting for local Pages server."
+          exit 1
+      - name: Run local Admin browser check with mocked APIs
+        run: npx playwright test tests/e2e/admin-local.spec.js
+      - name: Stop local Pages server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f /tmp/admin-local-pages.pid ]; then kill "$(cat /tmp/admin-local-pages.pid)" 2>/dev/null || true; fi
+          if [ -f /tmp/admin-local-pages.log ]; then tail -n 80 /tmp/admin-local-pages.log; fi
