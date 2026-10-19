@@ -19,6 +19,10 @@ assert.equal((contactMarkup.match(/class="contact-link/g) || []).length, 6, 'The
 assert.ok(contactMarkup.includes('<strong>Zalo / Điện thoại</strong>'), 'Zalo and phone must share one contact row as in the reference.');
 assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contactMarkup.includes('href="tel:+84827049192"'), 'The combined contact row must keep both the Zalo and phone actions usable.');
 assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
+assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
+assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
+assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
+
 
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
