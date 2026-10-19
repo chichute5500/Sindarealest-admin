@@ -10,7 +10,14 @@ let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient 
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
-      async first() { return null; }, async all() { return { results: [] }; },
+      async first() { return null; }, async all() {
+              if (sql.includes("FROM image_group_index WHERE image_key IN")) {
+                const shape = Array(64).fill(0.5);
+                const colors = [1,0,0,0,1,0,0,0,0,0,1,0];
+                return { results: this.args.map((imageKey, index) => ({ image_key: imageKey, p_hash: "0011223344556677", features_json: JSON.stringify({ category: "sneaker", categoryStatus: "classified", categoryConfidence: 95, shape, colors, contentHash: String(index ? "c" : "b").repeat(64) }) })) };
+              }
+              return { results: [] };
+            },
       async run() { return { meta: { changes: 1 } }; }
     };
   },
