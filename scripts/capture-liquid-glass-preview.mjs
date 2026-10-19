@@ -270,6 +270,8 @@ try {
     const checkoutStructure = await page.evaluate(() => ({
       checkoutFormInsideCheckout: !!document.querySelector('#checkoutDrawer #checkoutForm'),
       checkoutFormInsideCart: !!document.querySelector('#cartDrawer #checkoutForm'),
+      checkoutVisibleAndAccessible: document.querySelector('#checkoutDrawer')?.getAttribute('aria-hidden') === 'false' && !document.querySelector('#checkoutDrawer')?.hasAttribute('inert'),
+      cartInertWhileCheckoutOpen: document.querySelector('#cartDrawer')?.hasAttribute('inert') === true,
       closeButtonPresent: !!document.querySelector('#checkoutClose'),
       backButtonPresent: !!document.querySelector('#checkoutBack'),
       submitButtonPresent: !!document.querySelector('#checkoutSubmit'),
@@ -280,6 +282,8 @@ try {
     }));
     const checkoutPass = checkoutStructure.checkoutFormInsideCheckout
       && !checkoutStructure.checkoutFormInsideCart
+      && checkoutStructure.checkoutVisibleAndAccessible
+      && checkoutStructure.cartInertWhileCheckoutOpen
       && checkoutStructure.closeButtonPresent
       && checkoutStructure.backButtonPresent
       && checkoutStructure.submitButtonPresent
@@ -301,8 +305,22 @@ try {
     audit.interactions.push({ theme, check: 'checkout-address-ward-options-load-from-offline-fixture', pass: wardFixtureLoaded });
     if (!wardFixtureLoaded) hardFailures.push('Checkout test-only ward fixture did not load: ' + theme);
     await page.locator('#checkoutProvince').selectOption('');
+
+    // Exercise a real keyboard trap around the checkout drawer.
+    await page.locator('input[name="fullName"]').focus();
+    await page.keyboard.press('Shift+Tab');
+    const shiftTabWrapped = await page.evaluate(() => document.activeElement?.id === 'checkoutSubmit');
+    await page.keyboard.press('Tab');
+    const tabWrapped = await page.evaluate(() => document.activeElement?.matches('input[name="fullName"]') === true);
+    audit.interactions.push({ theme, check: 'checkout-keyboard-focus-trap', pass: shiftTabWrapped && tabWrapped, result: { shiftTabWrapped, tabWrapped } });
+    if (!shiftTabWrapped || !tabWrapped) hardFailures.push('Checkout keyboard focus trap failed: ' + theme);
+
     await page.locator('#checkoutBack').click();
     await page.locator('#cartDrawer.open').waitFor({ state: 'visible' });
+    await page.waitForFunction(() => document.activeElement?.id === 'cartCheckout');
+    const focusRestored = await page.evaluate(() => document.activeElement?.id === 'cartCheckout');
+    audit.interactions.push({ theme, check: 'checkout-back-restores-focus-to-cart-action', pass: focusRestored });
+    if (!focusRestored) hardFailures.push('Checkout did not restore focus to the cart action: ' + theme);
     await page.locator('#cartClose').click();
 
     await page.locator('#orderDetailsToggle').click();
