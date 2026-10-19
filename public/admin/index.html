@@ -198,6 +198,7 @@ async function scanWholeImageInventory(){
     // handling instead of being mistaken for a successful automatic grouping.
     const missing=imageInventory.filter(item=>!similarity.isCachedDescriptorValid(indexedByKey.get(item.key),item));
     const failedKeys=new Set(),failureDetails=[],pendingIndexWrites=[];
+    let aiClassificationQuotaBlocked=false;
     async function flushIndexWrites(){if(!pendingIndexWrites.length)return;const batch=pendingIndexWrites.splice(0,20);await api("/api/admin/image-groups-index",{method:"POST",body:JSON.stringify({action:"index",images:batch})});}
     for(let offset=0;offset<missing.length;offset+=4){
       const batch=missing.slice(offset,offset+4);
@@ -211,12 +212,26 @@ async function scanWholeImageInventory(){
       if(calculated.length){
         // Tier 1: ask vision to classify each new/legacy image before any visual grouping.
         // If classification fails, stop the scan instead of falling back to unsafe mixed groups.
-        const classification=await api("/api/admin/image-groups",{method:"POST",body:JSON.stringify({
-          action:"classify-categories",
-          imageKeys:calculated.map(item=>item.key),
-          imageData:calculated.map(item=>({key:item.key,dataUrl:item.previewDataUrl}))
-        })});
-        const decisions=new Map((classification.items||[]).map(item=>[item.key,item]));
+        let decisions=new Map();
+        if(!aiClassificationQuotaBlocked){
+          try{
+            const classification=await api("/api/admin/image-groups",{method:"POST",body:JSON.stringify({
+              action:"classify-categories",
+              imageKeys:calculated.map(item=>item.key),
+              imageData:calculated.map(item=>({key:item.key,dataUrl:item.previewDataUrl}))
+            })});
+            decisions=new Map((classification.items||[]).map(item=>[item.key,item]));
+          }catch(error){
+            const message=String(error?.message||error);
+            if(!/(?:4006|\b429\b|hết hạn mức neuron|quota exceeded|rate.?limit|đã giới hạn)/i.test(message))throw error;
+            aiClassificationQuotaBlocked=true;
+            failureDetails.push({key:calculated.map(item=>item.key).join(", "),error:"Workers AI hết hạn mức; ảnh được giữ ở trạng thái cần xác minh và sẽ thử phân loại lại ở lượt quét sau."});
+          }
+        }
+        // Never infer a category when vision is quota-blocked. Keep the visual
+        // descriptors, mark these images needs_review, and allow already-classified
+        // inventory to finish scanning. Missing identity descriptors make this cache
+        // intentionally invalid so the next scan retries classification after quota resets.
         for(const descriptor of calculated){
           const decision=decisions.get(descriptor.key);
           descriptor.features.category=decision?.category||"unknown";
