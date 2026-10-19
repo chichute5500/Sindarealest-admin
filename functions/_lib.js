@@ -393,11 +393,25 @@ export function toAdminProduct(p) {
   };
 }
 
-export function genericDbError(error) {
-  const message = String(error?.message || "");
-  if (/UNIQUE constraint failed/i.test(message)) return fail("SKU hoặc mã đường dẫn đã tồn tại. Hãy kiểm tra SKU rồi lưu lại.", 409);
-  if (/no such table|no such column|D1_ERROR|database/i.test(message)) return fail("Cơ sở dữ liệu chưa khởi tạo đúng. Hãy chạy hai tệp SQL trong thư mục migrations/.", 503);
-  return fail("Không thể lưu dữ liệu. Hãy kiểm tra cấu hình D1 và thử lại.", 500);
+export function genericDbError(error, operation = "database operation") {
+  const message = String(error?.message || "Unknown database error").slice(0, 500);
+  const errorName = String(error?.name || "Error").slice(0, 80);
+
+  // Runtime logs are for diagnosis only. Never log request bodies, bound values,
+  // credentials, cookies, session tokens, or raw stack traces.
+  console.error("[SinDarealest] Database operation failed", {
+    operation: String(operation || "database operation").slice(0, 100),
+    errorName,
+    errorMessage: message,
+  });
+
+  if (/UNIQUE constraint failed/i.test(message)) {
+    return fail("SKU hoặc mã đường dẫn đã tồn tại. Hãy kiểm tra SKU rồi lưu lại.", 409);
+  }
+  if (/no such table|no such column|has no column named|no column named/i.test(message)) {
+    return fail("Cấu trúc D1 của môi trường này chưa khớp với ứng dụng. Cần kiểm tra migration đã áp dụng đúng database.", 503);
+  }
+  return fail("Không thể lưu dữ liệu do lỗi xử lý cơ sở dữ liệu. Vui lòng thử lại; nếu tiếp tục lỗi, cần kiểm tra nhật ký máy chủ.", 500);
 }
 
 export async function rateLimitLogin(db, request, secret) {
