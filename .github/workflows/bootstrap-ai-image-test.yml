@@ -10,6 +10,8 @@ on:
     paths:
       - 'functions/api/admin/image-groups*.js'
       - 'functions/_lib.js'
+      - 'functions/_lib/image-identity.js'
+      - 'tests/image-category-classification.test.mjs'
       - 'public/admin/**'
       - 'migrations/0008_image_group_reviews.sql'
       - 'migrations/0011_image_similarity_index.sql'
@@ -464,8 +466,8 @@ jobs:
           NODE
             ai_smoke_status="$(curl --connect-timeout 10 --max-time 60 --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-vision-request.json "$base/api/ai-smoke-ci")"
             if [ "$ai_smoke_status" = "200" ]; then
-              jq -e '.ok == true and (.category | type == "string") and (.category != "unknown") and (.confidence | type == "number") and (.confidence >= 70) and (.status == "classified") and (.identityDescriptor | type == "string") and (.identityDescriptor | length >= 48) and ((.identityDescriptor | split(";") | length) >= 5) and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
-                echo "::error::Real Workers AI smoke response was invalid. Response body omitted."; exit 1;
+              jq -e '.ok == true and (.category | type == "string") and (.category != "unknown") and (.confidence | type == "number") and (.confidence >= 70) and (.status == "classified") and (.identityDescriptor | type == "string") and (.identityDescriptor | length >= 48) and ((.identityDescriptor | split("[;|]") | length) >= 5) and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
+                diagnostic="$(jq -c '{ok,reason,category,confidence,status,identityDescriptorLength:(.identityDescriptor|if type=="string" then length else 0 end),identityDescriptorParts:(.identityDescriptor|if type=="string" then (split("[;|]")|length) else 0 end),imageBytes,handler_status,detail}' /tmp/ai-test-vision.json 2>/dev/null || true)"; echo "::error::Real Workers AI smoke response was invalid. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1;
               }
               result_summary="$(jq -r '"category=" + .category + ", confidence=" + (.confidence|tostring) + ", status=" + .status' /tmp/ai-test-vision.json)"
               echo "PASS: real admin classifier on Preview R2 image: $result_summary. No database or product gallery was modified."
