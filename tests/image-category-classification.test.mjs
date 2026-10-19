@@ -6,11 +6,12 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, reviewInsertBatches = 0, visualMode = "similar";
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
       async first() { return null; }, async all() {
+              if (sql.includes("FROM products") && sql.includes("images_json")) return { results: compareOwners };
               if (sql.includes("FROM image_group_index WHERE image_key IN")) {
                 const similar = visualMode === "similar";
                 const shapeA = Array(64).fill(0.9), shapeB = Array(64).fill(0.05);
@@ -186,6 +187,19 @@ assert.equal(visualGateResponse.status, 200, JSON.stringify(visualGateResult));
 assert.deepEqual(visualGateResult.matches, [], "AI text similarity cannot override mismatched pHash, shape, or color descriptors");
 assert.equal(reviewInsertBatches, beforeVisualGateWrites, "descriptor-rejected pairs must not be persisted");
 visualMode = "similar";
+
+// Even a high-confidence visual match is discarded when the two images already belong to different SKUs.
+compareOwners = [
+  { id: "product-a", sku: "SKU-A", images_json: JSON.stringify(["/media/catalog/shoes/a.webp"]) },
+  { id: "product-b", sku: "SKU-B", images_json: JSON.stringify(["/media/catalog/shoes/b.webp"]) }
+];
+const beforeCrossSkuWrites = reviewInsertBatches;
+const crossSkuResponse = await onRequestPost({ request: compareRequest(), env });
+const crossSkuResult = await crossSkuResponse.json();
+assert.equal(crossSkuResponse.status, 200, JSON.stringify(crossSkuResult));
+assert.deepEqual(crossSkuResult.matches, [], "visual similarity must not override existing different-SKU ownership");
+assert.equal(reviewInsertBatches, beforeCrossSkuWrites, "cross-SKU pair must not be persisted as a pending review");
+compareOwners = [];
 
 // Malformed compare output must fail closed before any review batch is written.
 malformed = true;
