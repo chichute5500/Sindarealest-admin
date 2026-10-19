@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -45,12 +45,13 @@ const env = {
       message.content.includes("The previous response was malformed") ||
       message.content.includes("The previous response was not valid JSON") ||
       message.content.includes("Compare all supplied visual descriptions") ||
+      message.content.includes("You are a strict pairwise product-identity evaluator") ||
       message.content.includes("Return ONLY valid JSON with a top-level pairs array") ||
       message.content.includes("Return ONLY valid JSON with exactly one top-level pairs array")
     ))) {
       if (malformedCompareOnce) { malformedCompareOnce = false; return { response: "not valid JSON", tool_calls: [] }; }
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
-        { response: JSON.stringify({ pairs: [{ a: comparePair[0], b: comparePair[1], same_product: true, confidence: compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
+        { response: JSON.stringify({ pairs: [{ a: comparePair[0], b: comparePair[1], same_product: true, confidence: input.messages.some(message => String(message.content).includes("You are a strict pairwise product-identity evaluator")) ? (fallbackConfidence ?? compareConfidence) : compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
     }
     if (compareMode) {
       const systemPrompt = String(input.messages?.[0]?.content || "");
@@ -225,6 +226,15 @@ const lowConfidenceResult = await lowConfidenceResponse.json();
 assert.equal(lowConfidenceResponse.status, 200, JSON.stringify(lowConfidenceResult));
 assert.deepEqual(lowConfidenceResult.matches, [], "pairs below 91 confidence must not be proposed for review");
 assert.equal(reviewInsertBatches, beforeLowConfidenceWrites, "low-confidence pair proposals must not be persisted");
+const beforeFallbackCalls = modelCalls;
+fallbackConfidence = 96;
+const fallbackResponse = await onRequestPost({ request: compareRequest(), env });
+const fallbackResult = await fallbackResponse.json();
+assert.equal(fallbackResponse.status, 200, JSON.stringify(fallbackResult));
+assert.ok(fallbackResult.matches.length >= 1, "an explicit pairwise retry may recover a valid >=91 match after the first pass was below threshold");
+assert.equal(modelCalls, beforeFallbackCalls + 4, "low-confidence first-pass verdict triggers exactly one exhaustive pairwise retry after two image descriptions");
+assert.equal(reviewInsertBatches, beforeLowConfidenceWrites + 1, "only the recovered high-confidence result is persisted for manual review");
+fallbackConfidence = null;
 compareConfidence = 95;
 
 // Even a confident AI verdict is rejected when indexed visual descriptors disagree.
