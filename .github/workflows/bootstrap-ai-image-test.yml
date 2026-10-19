@@ -9,6 +9,7 @@ on:
     # or dependencies change—not on test-only, diagnostic, or workflow edits.
     paths:
       - 'functions/api/admin/image-groups*.js'
+      - '.github/workflows/bootstrap-ai-image-test.yml'
       - 'functions/_lib.js'
       - 'functions/_lib/image-identity.js'
       - 'tests/image-category-classification.test.mjs'
@@ -635,7 +636,7 @@ jobs:
             const item = selected.gallery[index];
             const key = `test-fixtures/local/${index}-${path.basename(item.image)}`;
             const descriptor = await computeImageDescriptor(`https://fixture.local/${index}`, { key, size: item.bytes.length });
-            localItems.push({ key, p_hash: descriptor.p_hash, features: { ...descriptor.features, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 }, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 });
+            localItems.push({ key, p_hash: descriptor.p_hash, features: { ...descriptor.features, identityDescriptor: "product_type=sneaker; dominant_colors=black; visible_material=leather; texture_pattern=crocodile scales; distinctive_details=stitching and sole", category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 }, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 });
           }
           const localGroups = await findSimilarGroups(localItems, { threshold: 70 });
           if (!localGroups.groups.length || !localGroups.groups.some(group => group.imageKeys.length >= 2)) throw new Error("The production local-similarity algorithm did not group any two distinct images from the same real product gallery.");
