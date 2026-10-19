@@ -683,6 +683,13 @@ try {
     await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
     await page.locator('#accountFavoritesAction').click();
     await page.locator('#accountFavoritesView:not([hidden])').waitFor({ state: 'visible' });
+    await page.waitForFunction(() => {
+      const image = document.querySelector('#accountFavoritesList img');
+      return !!image && image.complete && image.naturalWidth > 0;
+    });
+    const favoriteThumbnailPass = await page.locator('#accountFavoritesList img').evaluate(img => img.complete && img.naturalWidth > 0);
+    audit.interactions.push({ theme, check: 'favorite-thumbnail-loads-a-real-product-image', pass: favoriteThumbnailPass });
+    if (!favoriteThumbnailPass) hardFailures.push('Favorite list product thumbnail did not load: ' + theme);
     await capture(page, 'account-favorites-mobile-' + theme + '.jpg');
     const favoritesListState = await page.evaluate(() => ({
       count: document.querySelectorAll('#accountFavoritesList [data-favorite-open]').length,
