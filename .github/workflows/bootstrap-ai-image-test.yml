@@ -724,7 +724,7 @@ jobs:
               jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-same-sku-compare.json >/dev/null || { echo "::error::AI did not identify a high-confidence match between two distinct images assigned to the same SKU."; exit 1; }
               echo "PASS: real Workers AI matched two distinct Preview gallery images assigned to the same SKU; the no-write DB prevented persistence."
             elif [ "$sku_pair_status" = "424" ]; then
-              echo "::warning::Preview D1 contains no product gallery with two distinct small raster images; same-product different-angle matching remains unverified."
+              echo "::warning::The additional D1-backed gallery-pair check was unavailable because Preview D1 has no product gallery with two distinct small raster images. The separate real Workers AI test using two distinct images from one repository product gallery passed above; only the D1-backed variant remains unverified."
             else
               echo "::error::Could not discover a same-SKU gallery pair (HTTP $sku_pair_status)."; exit 1
             fi
