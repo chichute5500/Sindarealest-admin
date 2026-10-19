@@ -216,11 +216,15 @@ try {
 
     // Theme toggle writes only browser localStorage; no settings endpoint is called.
     await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator('#mobileAccountNav').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
     const before = await page.locator('html').evaluate((el) => el.classList.contains('dark'));
-    await page.locator('#themeToggle').click();
+    await page.locator('#accountThemeAction').click();
     const after = await page.locator('html').evaluate((el) => el.classList.contains('dark'));
-    await page.locator('#themeToggle').click();
+    await page.locator('#accountThemeAction').click();
     const restored = await page.locator('html').evaluate((el) => el.classList.contains('dark'));
+    await page.locator('#accountClose').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
     const togglePass = before !== after && before === restored;
     audit.interactions.push({ theme, check: 'manual-theme-toggle-round-trip', pass: togglePass });
     if (!togglePass) hardFailures.push('Theme toggle failed: ' + theme);
