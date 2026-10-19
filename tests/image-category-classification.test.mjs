@@ -10,7 +10,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, omitDescriptorOnce = false, failNextTransient = false, failNextQuota = false, failNextDailyAllocation = false, compareMode = false, structuredDescriptorOnce = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
+let modelCalls = 0, lastModelInput = null, malformed = false, omitDescriptorOnce = false, failNextTransient = false, failNextQuota = false, failNextDailyAllocation = false, failNextPermission = false, failTimeoutCount = 0, compareMode = false, structuredDescriptorOnce = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -41,6 +41,8 @@ const env = {
   AI: { async run(model, input) {
     modelCalls++; lastModelInput = { model, input };
     if (failNextDailyAllocation) { failNextDailyAllocation = false; throw new Error("4006: you have used up your daily free allocation of 10,000 neurons, please upgrade to Cloudflare Workers Paid plan."); }
+    if (failNextPermission) { failNextPermission = false; const error = new Error("403 permission denied provider-secret-marker"); error.status = 403; throw error; }
+    if (failTimeoutCount > 0) { failTimeoutCount--; const error = new Error("deadline exceeded provider-secret-marker"); error.status = 504; throw error; }
     if (failNextQuota) { failNextQuota = false; const error = new Error("Workers AI quota exceeded (429)"); error.status = 429; throw error; }
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     if (compareMode && input.image) { const description = { shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }; if (structuredDescriptorOnce) { structuredDescriptorOnce = false; return { response: description, tool_calls: [], usage: {} }; } return { response: JSON.stringify(description), tool_calls: [], usage: {} }; }
@@ -334,4 +336,41 @@ assert.equal(dailyAllocationResponse.status, 429, JSON.stringify(dailyAllocation
 assert.equal(dailyAllocationResponse.headers.get("Retry-After"), null, "daily allocation exhaustion must not promise a 60-second retry");
 assert.match(JSON.stringify(dailyAllocationResult), /hết hạn mức neuron miễn phí hằng ngày/i);
 assert.equal(modelCalls, beforeDailyAllocationFailure + 1, "daily allocation exhaustion must stop without a second model request");
+
+assert.doesNotMatch(JSON.stringify(dailyAllocationResult), /4006|10,000|Paid plan|provider-secret/i,
+  "daily allocation errors must not expose Cloudflare provider details or plan prompts");
+
+// Permission failures should be actionable without echoing provider error details.
+const beforePermissionCalls = modelCalls;
+failNextPermission = true;
+const permissionResponse = await onRequestPost({ request: request(), env });
+const permissionResult = await permissionResponse.json();
+assert.equal(permissionResponse.status, 503, JSON.stringify(permissionResult));
+assert.match(permissionResult.error, /quyền truy cập/i);
+assert.doesNotMatch(JSON.stringify(permissionResult), /provider-secret-marker|permission denied|403/i,
+  "permission failure messages must not leak raw upstream diagnostics");
+assert.equal(modelCalls, beforePermissionCalls + 1, "permission failures should not retry the model");
+
+// A timeout persisting across the bounded retry must become a sanitized 504.
+const beforeTimeoutCalls = modelCalls;
+failTimeoutCount = 2;
+const timeoutResponse = await onRequestPost({ request: request(), env });
+const timeoutResult = await timeoutResponse.json();
+assert.equal(timeoutResponse.status, 504, JSON.stringify(timeoutResult));
+assert.match(timeoutResult.error, /quá thời gian/i);
+assert.doesNotMatch(JSON.stringify(timeoutResult), /provider-secret-marker|deadline exceeded/i,
+  "timeout responses must not expose provider-specific details");
+assert.equal(modelCalls, beforeTimeoutCalls + 2, "a transient timeout should use only one bounded retry");
+
+// Malformed model output is reported without exposing a raw response snippet.
+const beforeMalformedClassifyCalls = modelCalls;
+malformed = true;
+const malformedClassifyResponse = await onRequestPost({ request: request(), env });
+const malformedClassifyResult = await malformedClassifyResponse.json();
+assert.equal(malformedClassifyResponse.status, 502, JSON.stringify(malformedClassifyResult));
+assert.match(malformedClassifyResult.error, /không đúng định dạng/i);
+assert.doesNotMatch(JSON.stringify(malformedClassifyResult), /not valid JSON|response:|tool_calls/i);
+assert.equal(modelCalls, beforeMalformedClassifyCalls + 2, "malformed classification gets only one bounded format retry");
+malformed = false;
+
 console.log("PASS: mocked Workers AI endpoint passes actual images, accepts nested raster keys, uses single-image descriptors for comparison, rejects malformed output, retries transient failures, distinguishes quota errors, and avoids partial compare writes.");
