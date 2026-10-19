@@ -293,7 +293,10 @@ try {
     await capture(page, 'checkout-mobile-' + theme + '.jpg');
 
     await page.locator('#checkoutProvince').selectOption('Tỉnh kiểm thử');
-    await page.locator('#checkoutWard:enabled').waitFor({ state: 'visible' });
+    await page.waitForFunction(() => {
+      const ward = document.querySelector('#checkoutWard');
+      return !!ward && !ward.disabled && Array.from(ward.options).some((option) => option.textContent.includes('Phường kiểm thử'));
+    });
     const wardFixtureLoaded = await page.locator('#checkoutWard option').filter({ hasText: 'Phường kiểm thử' }).count() === 1;
     audit.interactions.push({ theme, check: 'checkout-address-ward-options-load-from-offline-fixture', pass: wardFixtureLoaded });
     if (!wardFixtureLoaded) hardFailures.push('Checkout test-only ward fixture did not load: ' + theme);
