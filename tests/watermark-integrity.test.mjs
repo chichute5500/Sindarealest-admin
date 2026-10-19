@@ -31,6 +31,9 @@ assert.ok(backupSource.includes('"watermark_logo"'), 'Backup must include the se
 assert.ok(backupSource.includes('watermarkLogoUrl: watermark.watermarkLogoUrl'), 'Backup JSON must preserve the selected watermark logo');
 assert.ok(backupSource.includes('IN (?,?,?,?,?,?,?,?,?,?)'), 'Backup settings query must include all ten settings');
 assert.ok(restoreSource.includes('Object.hasOwn(backup.settings, "watermarkLogoUrl")'), 'Restore must accept the logo field while remaining compatible with older v2 backups');
+const adminSettingsSource=readFileSync(new URL('../functions/api/admin/settings.js',import.meta.url),'utf8');
+assert.ok(adminSettingsSource.includes('context.env.IMAGES.head(key)'), 'Custom watermark logo must exist in R2 before settings can be saved');
+assert.ok(adminSettingsSource.includes('Không tìm thấy ảnh logo trong kho ảnh'), 'Invalid watermark image paths must return actionable feedback');
 
 const mockDB={prepare(){return{bind(){return this},async first(){return null}}}};
 const response=await publicSettingsGet({env:{DB:mockDB}});
