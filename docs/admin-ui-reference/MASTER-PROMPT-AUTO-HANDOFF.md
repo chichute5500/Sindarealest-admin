@@ -100,7 +100,7 @@ Nếu một viewport không thể kiểm tra vì giới hạn môi trường, gh
 Không dùng ảnh mockup hay ảnh tham chiếu thay cho screenshot từ ứng dụng đang chạy. Không tuyên bố ảnh cuối phản ánh code mới nhất nếu SHA không khớp.
 
 ## 9. Quy trình lưu ảnh và bàn giao tự động
-Sau mỗi mốc đã kiểm thử thành công, thực hiện tất cả bước có thể:
+Sau MỖI vòng sửa đổi → chạy kiểm tra → chụp ảnh/so sánh đã hoàn tất, thực hiện tất cả bước có thể:
 1. Tạo thư mục lịch sử riêng, ví dụ `docs/admin-ui-reference/handoff/history/<short-sha-or-run-id>/screenshots/`.
 2. Lưu ảnh Playwright thật; kèm báo cáo `report.md` liệt kê route, viewport, theme, SHA, sai lệch, sửa đổi, test và vấn đề còn lại.
 3. Cập nhật `handoff/LATEST-STATUS.md` với trạng thái mới, commit SHA, hạng mục đã xong/chưa xong/blocked, lỗi còn lại và next actions.
