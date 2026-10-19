@@ -457,6 +457,43 @@ try {
       && expectedRoute && galleryState.thumbnailCount >= 2;
     audit.interactions.push({ theme, check: 'open-multi-image-detail-and-route', pass: galleryBasePass, result: galleryState });
     if (!galleryBasePass) hardFailures.push('Multi-image detail route/dialog did not open correctly: ' + theme);
+
+    // Verify the actual customer-facing Zalo message for a fixture with no verified SKU.
+    await page.evaluate(() => {
+      window.__sdOriginalOpen = window.open.bind(window);
+      window.__sdConsultCopiedText = '';
+      window.__sdConsultOpenedUrl = '';
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText: async (value) => { window.__sdConsultCopiedText = String(value); } },
+      });
+      window.open = (url) => {
+        window.__sdConsultOpenedUrl = String(url || '');
+        return { closed: false, opener: null };
+      };
+    });
+    await page.locator('#detailZalo').click();
+    await page.waitForFunction(() => window.__sdConsultCopiedText.length > 0);
+    await page.waitForFunction(() => window.__sdConsultOpenedUrl === 'https://zalo.me/0827049192', null, { timeout: 3000 });
+    const zaloConsultState = await page.evaluate(() => ({
+      message: window.__sdConsultCopiedText,
+      openedUrl: window.__sdConsultOpenedUrl,
+      title: document.querySelector('#detailTitle')?.textContent || '',
+    }));
+    const zaloMessagePass = zaloConsultState.message.startsWith('Chào SinDarealest, tôi muốn tư vấn/đặt hàng sản phẩm ')
+      && zaloConsultState.message.includes(zaloConsultState.title)
+      && zaloConsultState.message.includes('mã SKU chưa được cung cấp')
+      && !/\\b(null|undefined|SD\\d{3})\\b/i.test(zaloConsultState.message)
+      && zaloConsultState.openedUrl === 'https://zalo.me/0827049192';
+    audit.interactions.push({ theme, check: 'zalo-message-uses-product-title-without-unverified-sku', pass: zaloMessagePass, result: zaloConsultState });
+    if (!zaloMessagePass) hardFailures.push('Zalo consultation message disclosed a fabricated SKU or omitted the product title: ' + theme);
+    await page.evaluate(() => {
+      if (window.__sdOriginalOpen) window.open = window.__sdOriginalOpen;
+      delete window.__sdOriginalOpen;
+      delete window.__sdConsultCopiedText;
+      delete window.__sdConsultOpenedUrl;
+      try { delete navigator.clipboard; } catch {}
+    });
     const firstThumbSrc = await page.locator('#detailThumbs .detail-thumb').first().locator('img').getAttribute('src');
     const secondThumbSrc = await page.locator('#detailThumbs .detail-thumb').nth(1).locator('img').getAttribute('src');
     await page.locator('#detailThumbs .detail-thumb').nth(1).click();
@@ -508,6 +545,12 @@ try {
     const cartHasMultipleProducts = cartRowCount === 2;
     audit.interactions.push({ theme, check: 'cart-renders-two-distinct-product-rows', pass: cartHasMultipleProducts, result: { rowCount: cartRowCount } });
     if (!cartHasMultipleProducts) hardFailures.push('Cart did not render both selected product rows: ' + theme);
+    const cartSkuLabels = (await page.locator('#cartList .cart-row-copy small').allTextContents())
+      .map(value => value.trim()).filter(value => value.startsWith('Mã SKU'));
+    const cartSkuPass = cartSkuLabels.length === 2
+      && cartSkuLabels.every(value => value.includes('Chưa được cung cấp') && !/\\b(null|undefined|SD\\d{3})\\b/i.test(value));
+    audit.interactions.push({ theme, check: 'cart-hides-unverified-sku-values', pass: cartSkuPass, result: { labels: cartSkuLabels } });
+    if (!cartSkuPass) hardFailures.push('Cart displayed a missing, null, undefined or unverified legacy SKU: ' + theme);
     await capture(page, 'cart-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'add-to-cart-and-open-cart', pass: true });
     audit.interactions.push({ theme, check: 'mobile-bottom-cart-navigation-opens-cart', pass: true });
