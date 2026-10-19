@@ -7,6 +7,14 @@ import { onRequestGet as sitemap } from '../functions/sitemap.xml.js';
 import { onRequestGet as robots } from '../functions/robots.txt.js';
 import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+const contactStart = storefrontHtml.indexOf('<div class="contact-grid">');
+const contactEnd = storefrontHtml.indexOf('<div class="warranty-help', contactStart);
+const contactMarkup = storefrontHtml.slice(contactStart, contactEnd);
+assert.equal((contactMarkup.match(/class="contact-link/g) || []).length, 6, 'The contact area should use six reference-aligned rows, grouping Zalo and phone without duplicating the same number.');
+assert.ok(contactMarkup.includes('<strong>Zalo / Điện thoại</strong>'), 'Zalo and phone must share one contact row as in the reference.');
+assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contactMarkup.includes('href="tel:+84827049192"'), 'The combined contact row must keep both the Zalo and phone actions usable.');
+assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
+
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
 assert.ok(storefrontHtml.includes('<span class="brand-copy"><span class="brand-name">SinDarealest</span><small class="brand-tagline">Thời Trang Da Cá Sấu</small></span>'), 'The primary brand lockup must include its Vietnamese descriptor.');
