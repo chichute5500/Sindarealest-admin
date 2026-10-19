@@ -117,6 +117,9 @@ export async function onRequestPost(context) {
       await context.env.DB.batch(statements);
       return json({ ok: true, product: toAdminProduct(p), message: "Đã thêm sản phẩm." }, 201);
     } catch (error) {
+      if (importSource && /UNIQUE constraint failed:\s*product_source_imports\.(?:source_product_id|source_url)/i.test(String(error?.message || ""))) {
+        return fail("Sản phẩm nguồn này đã được nhập trước đó. Không tạo sản phẩm trùng.", 409);
+      }
       // Multiple admin saves can race after reading the same highest SKU. Retry
       // only for a SKU uniqueness conflict; never mask unrelated DB failures.
       if (!/UNIQUE constraint failed:\s*products\.sku/i.test(String(error?.message || ""))) {
