@@ -9,6 +9,9 @@ export async function onRequestGet(context) {
   if (!context.env.IMAGES) {
     return json({ ok: true, enabled: false, reason: "Thiếu R2 binding IMAGES trong môi trường Preview." });
   }
+  if (!context.env.ORIGINALS) {
+    return json({ ok: true, enabled: false, reason: "Thiếu R2 binding ORIGINALS riêng tư; chưa thể nhập ảnh an toàn." });
+  }
   try {
     await context.env.DB.prepare("SELECT product_id FROM product_source_imports LIMIT 0").all();
     return json({ ok: true, enabled: true });
