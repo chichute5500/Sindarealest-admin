@@ -245,6 +245,20 @@ try {
     await capture(page, 'cart-mobile-' + theme + '.jpg');
     audit.interactions.push({ theme, check: 'add-to-cart-and-open-cart', pass: true });
     audit.interactions.push({ theme, check: 'mobile-bottom-cart-navigation-opens-cart', pass: true });
+    await page.locator('#cartClose').click();
+    await page.locator('#orderDetailsToggle').click();
+    await page.locator('#orderDetailsPanel:not([hidden])').waitFor({ state: 'visible' });
+    await settle(page);
+    await capture(page, 'order-process-mobile-' + theme + '.jpg');
+    audit.interactions.push({ theme, check: 'expand-order-process', pass: true });
+    await page.locator('#orderDetailsToggle').click();
+    await page.locator('#mobileAccountNav').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'visible' });
+    await settle(page);
+    await capture(page, 'account-mobile-' + theme + '.jpg');
+    audit.interactions.push({ theme, check: 'open-account-panel', pass: true });
+    await page.locator('#accountClose').click();
+    await page.locator('#accountDrawer.open').waitFor({ state: 'hidden' });
     await context.close();
   }
 } finally {
