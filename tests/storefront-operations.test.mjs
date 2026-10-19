@@ -22,6 +22,10 @@ assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm
 assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
 assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
+assert.ok(storefrontHtml.includes('id="accountOrdersAction"') && storefrontHtml.includes('id="accountOrdersView"') && storefrontHtml.includes('id="accountOrdersList"'), 'Account must expose a history view for accepted order requests from the current device.');
+assert.ok(storefrontHtml.includes("const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history'") && storefrontHtml.includes('rememberOrderRequest(result,items)'), 'Only a successful server acceptance should enter the local order-request history.');
+assert.ok(storefrontHtml.includes('không phải lịch sử tài khoản đồng bộ') && storefrontHtml.includes("'fullName' in record") && storefrontHtml.includes("'phone' in record") === false, 'Order history must disclose its local-only scope and avoid storing checkout contact details.');
+
 
 
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
