@@ -217,3 +217,15 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 ### Trạng thái hoàn thành sau preview 128
 - Checklist hiện vẫn ước tính **80%**, chưa đủ căn cứ nâng lên 100%. Việc sửa regression làm tăng độ tin cậy của giao diện, nhưng không giải quyết những giới hạn lớn: chưa pixel-diff đủ 28 ảnh gốc, thiếu dữ liệu/tài sản túi xách và giá được xác nhận, một số màn hình vẫn dùng drawer/modal, chưa có kiểm thử Android vật lý và chưa có kiểm thử staging backend/thanh toán thật.
 - Không merge/deploy production. `main` giữ nguyên SHA đã xác nhận `f38cefe4647b33bd42f9018fde00c420ee5c7c66`.
+
+## Kiểm thử sổ địa chỉ và prefill checkout — preview 128
+
+- Preview 126 phát hiện checkout có thể đã điền họ tên/số điện thoại/đường phố trong khi xã/phường chưa hoàn tất. Điều kiện kiểm thử được chỉnh để chờ đủ cả tỉnh và xã/phường, không đọc trạng thái giữa chừng.
+- Điều tra tiếp cho thấy luồng sản phẩm cần chờ danh sách xã/phường được tải xong trước khi chọn địa chỉ đã lưu. Đã sửa `prefillCheckoutFromLocalAddress()` để chờ options của ward trước khi đặt giá trị và mã xã/phường.
+- Thêm kiểm thử hai theme cho sổ địa chỉ: nhập địa chỉ mẫu offline, lưu bằng thao tác rõ ràng, xác minh localStorage và thông báo quyền riêng tư; sau đó mở checkout và xác minh họ tên/số điện thoại/tỉnh/xã/đường phố được điền sẵn mà vẫn có thể sửa.
+- Preview cuối cho code fix: [Liquid Glass isolated visual preview — SUCCESS, run 39197993162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197993162).
+- Artifact `sindarealest-liquid-glass-preview-128`, ID `12162004111`, source SHA `90caa026f383419cecc777431d3ed6facbf1be82`.
+- Preview 128: 46 screenshots, 71 interaction checks, `passed=true`, overflow 0, hard failures 0, page/console/HTTP errors 0, failed requests 0, write requests bị chặn 0, external requests bị chặn 0. Hai POST đặt hàng là fixture mock trong bộ nhớ, không gửi tới backend.
+- Source/test validation: [SUCCESS — run 39197993223](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197993223).
+- Đánh giá vẫn **80%**. Kết quả này củng cố các luồng tương tác và responsive nhưng không thay thế đối chiếu pixel với ảnh mẫu, thử trên Android thật hay xác minh backend production. Các mục chặn 100% trong phần trước vẫn còn nguyên.
+
