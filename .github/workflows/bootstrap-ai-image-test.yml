@@ -527,12 +527,12 @@ jobs:
           }));
           NODE
                 identical_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-identical-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-identical-compare-request.json "$base/api/ai-smoke-ci")"
-                if [ "$identical_status" = "200" ] && jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-identical-compare.json >/dev/null; then
-                  echo "PASS: real Workers AI identical-image diagnostic returned a candidate; the no-write DB prevented persistence."
-                else
+                if [ "$identical_status" != "200" ] || ! jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-identical-compare.json >/dev/null; then
                   diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches}' /tmp/ai-test-identical-compare.json 2>/dev/null || true)"
-                  echo "::warning::Identical-byte diagnostic did not yield a candidate (HTTP $identical_status). This synthetic-key check is non-blocking; real same-gallery and distinct-SKU controls below remain required. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
+                  echo "::error::Real Workers AI failed the identical-image positive control (HTTP $identical_status). The same verified image bytes must produce a high-confidence pair; safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
+                  exit 1
                 fi
+                echo "PASS: real Workers AI matched identical verified image bytes at the 91% gate; the no-write DB prevented persistence."
               elif [ "$second_status" = "424" ]; then
                 echo "::warning::Only one byte-verified small raster image exists in Preview R2; live pair-comparison smoke was skipped."
               else
