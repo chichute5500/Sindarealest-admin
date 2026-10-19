@@ -185,6 +185,51 @@ const mixedGroup = await call({
   }]
 });
 assert.equal(mixedGroup.status, 409, "the server rejects a proposal that mixes shoes and watch straps");
+
+// Server-side gates reject client-supplied low scores, unconfirmed categories,
+// and visually dissimilar descriptors even when the browser claims 96/100.
+const lowScoreKeys = ["low-score-a.webp", "low-score-b.webp"];
+lowScoreKeys.forEach(key => seedImage(key));
+const lowScoreFingerprint = await hashGroup(lowScoreKeys);
+const lowScore = await call({
+  action: "save-groups",
+  groups: [{ imageKeys: lowScoreKeys, similarity: 90, rationale: "browser score spoof", members: [] }]
+});
+assert.equal(lowScore.status, 400, "the server must reject a submitted grouping score below 91/100");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(lowScoreFingerprint).count, 0);
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_image_claims WHERE image_key IN (?,?)").get(...lowScoreKeys).count, 0);
+
+const reviewKeys = ["review-needed-a.webp", "review-needed-b.webp"];
+seedImage(reviewKeys[0], "sneaker", "needs_review", 69);
+seedImage(reviewKeys[1]);
+const reviewFingerprint = await hashGroup(reviewKeys);
+const reviewProposal = await call({
+  action: "save-groups",
+  groups: [{ imageKeys: reviewKeys, similarity: 96, rationale: "unconfirmed category", members: [] }]
+});
+assert.equal(reviewProposal.status, 409, "needs_review or category confidence below 70 must fail closed");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(reviewFingerprint).count, 0);
+
+const spoofKeys = ["spoofed-similarity-a.webp", "spoofed-similarity-b.webp"];
+spoofKeys.forEach(key => seedImage(key));
+sqlite.prepare("UPDATE image_group_index SET p_hash=? WHERE image_key=?").run("0".repeat(16), spoofKeys[0]);
+sqlite.prepare("UPDATE image_group_index SET p_hash=? WHERE image_key=?").run("f".repeat(16), spoofKeys[1]);
+const spoofFingerprint = await hashGroup(spoofKeys);
+const spoofedScore = await call({
+  action: "save-groups",
+  groups: [{ imageKeys: spoofKeys, similarity: 96, rationale: "browser score spoof", members: [] }]
+});
+assert.equal(spoofedScore.status, 409, "the server must recompute pair similarity from stored perceptual hashes");
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE fingerprint=?").get(spoofFingerprint).count, 0);
+
+const weakApprovalId = crypto.randomUUID();
+await seedGroup(weakApprovalId, ["weak-approval-a.webp", "weak-approval-b.webp"]);
+sqlite.prepare("UPDATE image_group_sets SET similarity=90 WHERE id=?").run(weakApprovalId);
+const beforeWeakApproval = sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json;
+const weakApproval = await call({ action: "approve-group", groupId: weakApprovalId, productId: ids.product });
+assert.equal(weakApproval.status, 409, "legacy or corrupted pending groups below 91/100 must not bypass the approval gate");
+assert.equal(sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json, beforeWeakApproval);
+
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_sets WHERE status='pending' AND rationale LIKE '%giày thể thao%'").get().count, 0,
   "a mixed-category proposal must never enter the pending queue");
 
