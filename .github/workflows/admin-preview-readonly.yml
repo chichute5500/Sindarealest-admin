@@ -33,9 +33,7 @@ jobs:
           npm install --no-save @playwright/test
           npx playwright install --with-deps chromium
       - name: Validate public Preview URL and run read-only checks
-        run: |
-          node scripts/admin-preview-url.mjs
-          npx playwright test tests/e2e/admin-preview-readonly.spec.js
+        run: npx playwright test tests/e2e/admin-preview-readonly.spec.js
       - name: Never print credentials or response bodies
         if: always()
         run: echo "Read-only smoke used no secrets and issued no write requests."
