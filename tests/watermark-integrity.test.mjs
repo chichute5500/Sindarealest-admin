@@ -53,6 +53,8 @@ assert.ok(!script.includes('.detail-thumb'));
 assert.ok(!home.includes('.product-photo .sd-viewer-watermark'));
 assert.ok(!home.includes('.detail-thumb .sd-viewer-watermark'));
 assert.ok(home.includes("window.__sdSettingsPromise||window.__sdPublicSettings"));
+assert.ok(home.includes("mark.src=config.watermarkLogoUrl||'/watermark.webp'"), 'Detail viewer must use the configurable watermark logo');
+assert.ok(home.includes("watermarkLogoUrl:typeof next.watermarkLogoUrl==='string'"), 'Public viewer must validate and apply the selected internal logo path');
 
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 assert.ok(admin.includes('watermarkSettingsForm'));
