@@ -175,3 +175,28 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Kết quả preview 93: 44 screenshot, 20 responsive viewport/theme cases, 49 interaction checks, `passed=true`, 235 sản phẩm fixture đọc-only, overflow 0, hard failures 0, page errors 0, console errors 0, same-origin HTTP errors 0, failed requests 0, write requests 0, external requests blocked 0.
 - Trạng thái tổng thể vẫn **76%**; kiểm thử tự động theme đã phủ tốt hơn, nhưng chưa làm biến mất khoảng cách giữa dữ liệu/catalog thật hiện có và ảnh tham chiếu, chưa biến các drawer thành mọi route riêng, và chưa có kiểm thử Android vật lý/backend production.
 - Nhánh trước lần cập nhật tài liệu là `fix/liquid-glass-audit-2026-10-19`, code HEAD `278a729...`. Không merge/deploy production.
+
+## Bàn giao tiếp tục — 19/10/2026 (preview 121)
+
+### Công việc bổ sung đã thực hiện trên nhánh kiểm thử
+- Thêm chức năng sản phẩm yêu thích ở trang chi tiết: trạng thái trái tim có `aria-pressed`, lưu cục bộ bằng `localStorage`, mở lại đúng sản phẩm, bỏ yêu thích và trạng thái rỗng.
+- Bổ sung màn hình “Đơn hàng của tôi” trong ngăn tài khoản. Chỉ ghi nhận mã yêu cầu/trạng thái/danh sách sản phẩm/ngày gửi sau phản hồi thành công từ API; không lưu họ tên, số điện thoại, email hoặc địa chỉ vào lịch sử cục bộ. Hiển thị rõ lịch sử chỉ nằm trên thiết bị, chưa đồng bộ tài khoản.
+- Bổ sung kiểm thử tương tác cho lưu/mở/xóa yêu thích và lịch sử yêu cầu đặt hàng trong Light/Dark. API đặt hàng trong kiểm thử được mock bằng fixture trong bộ nhớ; không gọi backend thật và không ghi D1.
+- Sửa kiểm thử vòng focus bàn phím của tài khoản để lấy phần tử đầu/cuối thực tế từ DOM sau khi bổ sung các mục menu, thay vì giữ giả định cũ rằng “Liên hệ” luôn là phần tử cuối.
+- Sửa chú thích trong tài khoản để không còn nói sai rằng địa chỉ/lịch sử chưa có: nêu đúng chức năng lưu cục bộ, không có đăng nhập khách hàng hoặc đồng bộ giữa thiết bị.
+
+### Kết quả kiểm thử đã xác minh
+- Source/test validation: [SUCCESS — run 39197424120](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197424120).
+- Liquid Glass isolated visual preview: [SUCCESS — run 39197424021](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197424021).
+- Artifact: `sindarealest-liquid-glass-preview-121`, ID `12162785474`, source SHA `e22c87ff8d778a00e25580437e0abbc5fc0f714d`.
+- Preview 121: 46 screenshots, 67 interaction checks, `passed=true`, 235 sản phẩm fixture chỉ đọc, tràn ngang 0, hard failures 0, page errors 0, console errors 0, same-origin HTTP errors 0, failed requests 0, write requests bị chặn 0, yêu cầu ngoài bị chặn 0. Có 2 yêu cầu POST `/api/orders` được mock riêng trong bộ nhớ phục vụ kiểm thử lịch sử; không chuyển tới backend thật.
+
+### Tiến độ cập nhật
+- Checklist triển khai/UX hiện ước tính **80%** (không phải phần trăm pixel-match). Các luồng tài khoản cục bộ và kiểm thử đã được mở rộng, nhưng chưa đủ bằng chứng để gọi là hoàn thiện 100%.
+- Còn chặn 100%: chưa xác minh pixel-diff với toàn bộ 28 ảnh tham chiếu ban đầu; chưa có tài sản/dữ liệu túi xách và giá sản phẩm được chủ cửa hàng xác nhận; cần tiếp tục so khớp bố cục hero/khoảng cách/tỷ lệ thẻ với ảnh mẫu; chưa kiểm thử thiết bị Android vật lý; chưa có kiểm thử đầu-cuối trên Cloudflare production với D1/R2/đơn hàng thật; chưa xác minh mọi trạng thái lỗi/rỗng/keyboard/safe-area và hiệu năng trên nhiều thiết bị thực.
+- Không có dữ liệu sản phẩm, giá, chứng nhận, chính sách hoặc hình ảnh nguồn mới nào được tự bịa để làm đầy phần còn thiếu.
+
+### Ranh giới an toàn triển khai
+- Làm việc trên `fix/liquid-glass-audit-2026-10-19`; không merge vào `main`, không deploy production, không thay đổi binding/D1/R2 thật.
+- Các luồng yêu thích, địa chỉ giao hàng và lịch sử yêu cầu hiện là lưu cục bộ; không được mô tả thành tài khoản khách hàng hoặc lịch sử đồng bộ.
+
