@@ -293,7 +293,7 @@ sqlite.prepare("UPDATE image_group_index SET p_hash=? WHERE image_key=?").run("f
 sqlite.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,?,?,?,?,?)")
   .run(crypto.randomUUID(), "admin", "image_group_merge", "image_group_set", manualOverrideId,
     JSON.stringify({ mergedGroupIds: [manualOverrideId], imageKeys: manualOverrideKeys }));
-const manualOverride = await call({ action: "approve-group", groupId: manualOverrideId, productId: ids.product });
+const manualOverride = await call({ action: "approve-group", groupId: manualOverrideId, productId: ids.product, manualOverride: true });
 assert.equal(manualOverride.status, 200, "audited manual review must retain the ability to merge a visual false negative");
 assert.equal(sqlite.prepare("SELECT status FROM image_group_sets WHERE id=?").get(manualOverrideId).status, "approved");
 
