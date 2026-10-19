@@ -77,7 +77,7 @@ function sku(p){
  for(let i=0;i<index;i++){const prior=S.products[i];if(prior.selected&&!S.createdKeys.has(prior.key)&&ready(prior)&&prefix(prior.retailCategory)===pre)max++}
  return pre+String(max+1).padStart(3,'0')
 }
-function normalizeSourceUrl(value){try{const u=new URL(String(value||''));u.hash='';return u.href.replace(/\\/$/,'')}catch{return String(value||'').trim()}}
+function normalizeSourceUrl(value){try{const u=new URL(String(value||''));u.hash='';const href=u.href;return href.endsWith('/')?href.slice(0,-1):href}catch{return String(value||'').trim()}}
 function sourceDuplicate(p){const id=String(p.productId||'').trim(),url=normalizeSourceUrl(p.sourceUrl);return S.existingSources.find(x=>(id&&String(x.sourceProductId||'').trim()===id)||(url&&String(x.sourceUrl||'').trim()===url))||null}
 function duplicate(p){return sourceDuplicate(p)||(()=>{const t=String(p.retailTitle||'').trim().toLocaleLowerCase('vi');return S.existing.find(x=>t&&String(x.title||'').trim().toLocaleLowerCase('vi')===t)||null})()}
 function isImageIssue(message){return /^(Ảnh không thuộc thư mục sản phẩm:|Thiếu file ảnh:|File không phải WebP hợp lệ:|Đường dẫn ảnh bị lặp:|Đường dẫn ảnh không có đuôi \.webp:|image_files không hợp lệ\.|image_manifest không hợp lệ\.|Bộ xuất báo ảnh lỗi|Không có ảnh WebP hợp lệ|Có \d+ ảnh;)/.test(String(message||''))}
