@@ -632,9 +632,8 @@ jobs:
               diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"
               echo "::error::Same-gallery real-image AI comparison failed with HTTP $repository_gallery_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
             fi
-            jq -e '.ok == true and ((.matches|type)=="number" or (.matches|type)=="array")' /tmp/ai-test-repository-gallery.json >/dev/null || { echo "::error::Repository-gallery diagnostic returned an invalid response."; exit 1; }
-            echo "::notice::Repository-image bytes were sent to real AI, but synthetic test keys have no persistent image index; match accuracy is asserted only by the following real Preview gallery and distinct-SKU controls."
-            echo "::notice::Repository-gallery AI diagnostic completed without persistent writes; match accuracy is not certified because synthetic keys have no indexed descriptors."
+            jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-repository-gallery.json >/dev/null || { diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"; echo "::error::Real Workers AI failed the positive control for two distinct images from one repository product gallery. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1; }
+            echo "PASS: real Workers AI matched two distinct images from one repository product gallery at the 91% gate; all writes were intercepted by the no-write test DB."
             # Negative control: two different products in the same shoe category must not be auto-grouped.
             node --input-type=module - <<'NODE'
           import { readFile, writeFile } from "node:fs/promises";
