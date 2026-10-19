@@ -260,11 +260,11 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
     result=await env.AI.run(MODEL,{
       messages:[
         {role:"system",content:"You are a strict product image classification engine. Return exactly one JSON object with category, integer confidence 0-100 and identity_descriptor: at least five semicolon-separated visible product-defining traits. Do not hallucinate unseen details; record uncertainty explicitly. Never return markdown or prose."},
-        {role:"user",content:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")}
+        {role:"user",content:prompt+(attempt===1?"\nReturn only JSON with all required fields. identity_descriptor MUST be a string with at least five semicolon-separated concrete visible traits, for example product_type=...; dominant_colors=...; visible_material=...; texture_pattern=...; distinctive_details=.... Do not omit it. No explanation or markdown.":"")}
       ],
       image:supplied[i].dataUrl,
       temperature:0,
-      max_tokens:300
+      max_tokens:420
     });
   }catch(error){
     const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
@@ -283,6 +283,9 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
     return fail(message,status,quota&&!dailyAllocationExhausted?{"Retry-After":"60"}:{});
   }
   classification=parseCategoryResult(result,allowed);
+  // A category-only answer is insufficient for identity grouping. Retry once for
+  // a required, concrete per-image descriptor instead of returning a false success.
+  if(classification&&!isIdentityDescriptorValid(classification.identityDescriptor))classification=null;
 }
 if(!classification){const source=result&&typeof result==="object"?result:{};const describe=(key,value)=>key+(Array.isArray(value)?"["+value.length+"]":value&&typeof value==="object"?"{"+Object.keys(value).slice(0,6).join(",")+"}":"("+typeof value+")");const shape=Object.entries(source).slice(0,8).map(([key,value])=>describe(key,value)).join(",")||typeof result;let sample="";try{sample=JSON.stringify({response:source.response,tool_calls:source.tool_calls,choices:Array.isArray(source.choices)?source.choices.slice(0,1):undefined,output_text:source.output_text})||""}catch{}sample=sample.replace(/[\\r\\n]+/g," ").slice(0,220);return fail("Workers AI trả phản hồi không hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" (dạng: "+shape+(sample?"; mẫu JSON: "+sample:"")+"). Không lưu lô này; hãy thử lại.",502)}
 const candidate=classification.category,confidence=classification.confidence,categoryValid=candidate!=="unknown"&&confidence>=70;
