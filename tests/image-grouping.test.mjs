@@ -37,6 +37,8 @@ const adminHtml = await readFile(new URL("../public/admin/index.html", import.me
 const viewAllowlist = "!['dashboard','products','orders','customers','warranties','image-groups','settings'].includes(v)";
 assert.ok(adminHtml.includes(viewAllowlist), "AI image grouping must be accepted by setView navigation.");
 assert.ok(adminHtml.includes("similarity.isCachedDescriptorValid(indexedByKey.get(item.key),item)"), "whole-inventory scans must use the shared cached descriptor validator");
+assert.ok(adminHtml.includes("similarity.findSimilarGroups(allDescriptors,{threshold:70,onProgress:progress=>{"),
+  "use the conservative server-supported 70/100 visual prefilter so different-angle candidates reach the AI identity verifier");
 const similarityModule = await readFile(new URL("../public/admin/image-similarity.js", import.meta.url), "utf8");
 assert.ok(similarityModule.includes("export function isCachedDescriptorValid"), "cache validation must reject malformed shape/color/hash/category/confidence metadata");
 console.log("PASS: image grouping inventory requires admin auth and maps existing product image assignments without modifying products.");
