@@ -225,7 +225,7 @@ async function scanWholeImageInventory(){
             const message=String(error?.message||error);
             if(!/(?:4006|\b429\b|hết hạn mức neuron|quota exceeded|rate.?limit|đã giới hạn)/i.test(message))throw error;
             aiClassificationQuotaBlocked=true;
-            failureDetails.push({key:calculated.map(item=>item.key).join(", "),error:"Workers AI hết hạn mức; ảnh được giữ ở trạng thái cần xác minh và sẽ thử phân loại lại ở lượt quét sau."});
+
           }
         }
         // Never infer a category when vision is quota-blocked. Keep the visual
@@ -281,8 +281,9 @@ async function scanWholeImageInventory(){
     }
     await loadImageGroups({refreshInventory:false});
     const failureNote=failureDetails.length?" Bỏ qua "+failureDetails.length+" ảnh không đọc được; ví dụ: "+failureDetails.slice(0,3).map(item=>item.key+" ("+item.error+")").join("; ")+".":"";
+    const quotaNote=aiClassificationQuotaBlocked?" Workers AI đã hết hạn mức trong lượt quét; ảnh mới chưa phân loại được giữ ở trạng thái cần xem thủ công, không được tự động ghép và sẽ được thử phân loại lại ở lượt quét sau.":"";
     const largeNote=oversizedGroups.length?" "+oversizedGroups.length+" nhóm có trên 8 ảnh không được gửi làm một lượt xác minh AI; cần chia nhỏ trước khi lưu.":"";
-    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã lọc "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp thị giác; tìm thấy "+groups.length+" ứng viên, lưu "+saved+" nhóm chờ duyệt. AI xác minh "+aiVerifiedSaved+"; cần xem thủ công "+aiNeedsReviewSaved+"; chưa xác minh do lỗi/quota "+aiUnverifiedSaved+"; bỏ qua/trùng "+skipped+"."+failureNote+largeNote;
+    const summary="Quét xong "+imageInventory.length+" object ảnh; lập chỉ mục "+allDescriptors.length+" ảnh hợp lệ; đã lọc "+Number(result.compared||0).toLocaleString("vi-VN")+" cặp thị giác; tìm thấy "+groups.length+" ứng viên, lưu "+saved+" nhóm chờ duyệt. AI xác minh "+aiVerifiedSaved+"; cần xem thủ công "+aiNeedsReviewSaved+"; chưa xác minh do lỗi/quota "+aiUnverifiedSaved+"; bỏ qua/trùng "+skipped+"."+failureNote+quotaNote+largeNote;
     imageScanProgress=summary;
     return {ok:true,message:summary,skippedCount:result.skippedCount||0,failedImages:failureDetails.length,oversizedGroups:oversizedGroups.length};
   }catch(error){
