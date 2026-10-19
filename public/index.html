@@ -517,6 +517,16 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
   .product-card .quick-add{right:8px;bottom:8px;width:28px;height:28px}
   .product-flag{top:7px;left:7px;padding:4px 6px;font-size:7px}
 }
+/* On mobile the hero slide is editorial photography first, matching the supplied reference. Copy remains in the section heading and supporting tiles. */
+@media(max-width:760px){
+  .mosaic-compact .mosaic-card.art-main .mosaic-content{display:none}
+  .mosaic-compact .mosaic-card.art-main .slide-controls{
+    left:10px;right:10px;bottom:50%;transform:translateY(50%);
+    width:auto;justify-content:space-between;gap:0
+  }
+  .mosaic-compact .mosaic-card.art-main .slide-controls button{width:32px;height:32px}
+  .footer-contacts .contact-grid .contact-icon--zalo{font-size:9px;letter-spacing:-.45px}
+}
 </style>
 
 </head>
