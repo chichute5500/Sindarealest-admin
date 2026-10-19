@@ -72,6 +72,27 @@ const invalidInput = await generateDescription({
 });
 assert.equal(invalidInput.status, 400, "invalid product input must be rejected before invoking AI");
 
+
+const workersPermissionDenied = await generateDescription({
+  request: request({ title: "Ví da", category: "Ví" }),
+  env: { ...env, AI: { async run() { throw new Error("403 authentication error: permission denied"); } } },
+});
+assert.equal(workersPermissionDenied.status, 503, "Workers AI permission failures must be classified as configuration/access errors");
+assert.match((await workersPermissionDenied.json()).error, /quyền truy cập/i, "permission errors should give actionable, sanitized guidance");
+
+const workersTimedOut = await generateDescription({
+  request: request({ title: "Ví da", category: "Ví" }),
+  env: { ...env, AI: { async run() { throw new Error("request timed out"); } } },
+});
+assert.equal(workersTimedOut.status, 504, "Workers AI timeouts must return a timeout status");
+
+const workersQuotaExceeded = await generateDescription({
+  request: request({ title: "Ví da", category: "Ví" }),
+  env: { ...env, AI: { async run() { throw new Error("resource exhausted: quota exceeded"); } } },
+});
+assert.equal(workersQuotaExceeded.status, 429, "Workers AI quota failures must return a rate-limit status");
+assert.equal(workersQuotaExceeded.headers.get("Retry-After"), "60", "quota responses should provide a retry hint");
+
 const originalFetch = globalThis.fetch;
 let openAIRequest = null;
 try {
