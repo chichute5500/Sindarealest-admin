@@ -223,72 +223,100 @@ items.push({key:keys[i],category:valid?candidate:"unknown",confidence:Math.round
 return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.category!=="unknown").length+"/"+items.length+" ảnh. Ảnh chưa đủ chắc chắn được giữ ở trạng thái chưa xác định."});
 }catch(error){return fail("Không thể phân loại ảnh. "+String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180),502)}
 }
-if(action==="compare"){if(typeof env.AI?.run!=="function")return fail("Chưa cấu hình Workers AI binding tên AI trên Preview. Chưa gọi AI và chưa lưu kết quả.",503);const keys=Array.isArray(body.imageKeys)?body.imageKeys.map(x=>String(x||"")):[String(body.imageA||""),String(body.imageB||"")];if(keys.length<2||keys.length>8||new Set(keys).size!==keys.length||keys.some(k=>!KEY_RE.test(k)))return fail("Chọn từ 2 đến 8 ảnh khác nhau trong kho ảnh.");try{const objects=await Promise.all(keys.map(k=>env.IMAGES.get(k)));if(objects.some(x=>!x))return fail("Một hoặc nhiều ảnh không còn tồn tại trong R2.",404);const supplied=Array.isArray(body.imageData)?body.imageData:[];if(supplied.length!==keys.length||supplied.some((x,i)=>!x||x.key!==keys[i]||typeof x.dataUrl!=="string"||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(x.dataUrl)))return fail("Không nhận được ảnh JPEG đã chuyển đổi từ trình duyệt. Hãy tải lại trang và thử lại.",400);if(supplied.some(x=>x.dataUrl.length>700000))return fail("Ảnh sau chuyển đổi vẫn quá lớn. Hãy thử ít ảnh hơn.",413);const limit=await rateLimitPublicRequest(env,context.request,"admin_image_group_compare",30,3600);if(limit.limited)return fail("Đã đạt giới hạn 30 lượt tìm nhóm AI mỗi giờ. Vui lòng thử lại sau.",429,{"Retry-After":"3600"});const indexedResult=await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN ("+keys.map(()=>"?").join(",")+")").bind(...keys).all();const indexedByKey=new Map((indexedResult.results||[]).map(row=>{const parsed=parseIndexedFeatures(row);return[parsed.key,parsed]}));const promptBase="Bạn là chuyên gia đối chiếu ảnh sản phẩm giày. Hãy tìm các cặp có bằng chứng đủ mạnh rằng chúng chụp CÙNG MỘT ĐÔI GIÀY VẬT LÝ, không phải chỉ cùng mẫu hoặc kiểu dáng. Đối chiếu vân da/cá sấu, đường may, logo, khóa, mũi giày, đế, lỗ dây và dấu hiệu sản xuất. Góc chụp, ánh sáng, nền và khoảng cách có thể khác. Chỉ đưa vào kết quả các cặp có khả năng cùng một đôi; bỏ qua cặp chỉ giống kiểu dáng. Trả duy nhất JSON có trường pairs là mảng đối tượng; mỗi đối tượng có trường a, b (chỉ số ảnh), same_product (boolean), confidence (số 0-100), rationale (lý do ngắn bằng tiếng Việt).";const ownersByKey=await ownersForImageKeys(env,keys);const prepared=[];const seen=new Set();let batches=0;const starts=[];for(let offset=0;offset+4<keys.length;offset+=2)starts.push(offset);if(!starts.length)starts.push(0);const finalStart=Math.max(0,keys.length-4);if(starts[starts.length-1]+4<keys.length&&!starts.includes(finalStart))starts.push(finalStart);for(const offset of starts){const end=Math.min(offset+4,keys.length);if(end-offset<2)continue;const batchKeys=keys.slice(offset,end),batchImages=supplied.slice(offset,end);const batchSize=batchImages.reduce((sum,x)=>sum+x.dataUrl.length,0);if(batchSize>2*1024*1024)return fail("Cụm ảnh "+(batches+1)+" vượt 2 MB sau chuyển đổi. Hãy chọn ảnh ít hơn.",413);const descriptors=[];let result;
-async function runVisionWithRetry(input){
-  for(let attempt=0;attempt<2;attempt++){
-    try{return await env.AI.run(MODEL,input)}
-    catch(error){
-      const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
-      const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
-      const quota=upstreamStatus===429||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
-      const transient=[500,502,503,504].includes(upstreamStatus)||/\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
-      if(quota){error.status=429;throw error}
-      if(attempt===0&&transient&&!/\b3030\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
-      error.status=transient?503:upstreamStatus||502;
-      throw error;
+if(action==="compare"){
+  if(typeof env.AI?.run!=="function")return fail("Chưa cấu hình Workers AI binding tên AI trên Preview. Chưa gọi AI và chưa lưu kết quả.",503);
+  const keys=Array.isArray(body.imageKeys)?body.imageKeys.map(x=>String(x||"")):[String(body.imageA||""),String(body.imageB||"")];
+  if(keys.length<2||keys.length>8||new Set(keys).size!==keys.length||keys.some(k=>!KEY_RE.test(k)))return fail("Chọn từ 2 đến 8 ảnh khác nhau trong kho ảnh.");
+  try{
+    const objects=await Promise.all(keys.map(k=>env.IMAGES.get(k)));
+    if(objects.some(x=>!x))return fail("Một hoặc nhiều ảnh không còn tồn tại trong R2.",404);
+    const supplied=Array.isArray(body.imageData)?body.imageData:[];
+    if(supplied.length!==keys.length||supplied.some((x,i)=>!x||x.key!==keys[i]||typeof x.dataUrl!=="string"||!/^data:image\\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(x.dataUrl)))return fail("Không nhận được ảnh JPEG đã chuyển đổi từ trình duyệt. Hãy tải lại trang và thử lại.",400);
+    if(supplied.some(x=>x.dataUrl.length>700000))return fail("Ảnh sau chuyển đổi vẫn quá lớn. Hãy thử ảnh nhỏ hơn.",413);
+    const limit=await rateLimitPublicRequest(env,context.request,"admin_image_group_compare",30,3600);
+    if(limit.limited)return fail("Đã đạt giới hạn 30 lượt tìm nhóm AI mỗi giờ. Vui lòng thử lại sau.",429,{"Retry-After":"3600"});
+    const indexedResult=await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN ("+keys.map(()=>"?").join(",")+")").bind(...keys).all();
+    const indexedByKey=new Map((indexedResult.results||[]).map(row=>{const parsed=parseIndexedFeatures(row);return[parsed.key,parsed]}));
+    const promptBase="Bạn là chuyên gia đối chiếu ảnh sản phẩm. Hãy tìm các cặp có bằng chứng đủ mạnh rằng chúng chụp CÙNG MỘT SẢN PHẨM VẬT LÝ, không phải chỉ cùng mẫu hoặc kiểu dáng. Với giày, đối chiếu vân da/cá sấu, đường may, logo, khóa, mũi giày, đế, lỗ dây và dấu hiệu sản xuất; với phụ kiện, đối chiếu chất liệu, hình dáng, đường may, khóa, logo và dấu hiệu riêng. Góc chụp, ánh sáng, nền và khoảng cách có thể khác. Chỉ đưa vào kết quả các cặp có bằng chứng đủ mạnh; bỏ qua cặp chỉ giống kiểu dáng. Trả duy nhất JSON có trường pairs là mảng đối tượng; mỗi đối tượng có trường a, b (chỉ số ảnh), same_product (boolean), confidence (số 0-100), rationale (lý do ngắn bằng tiếng Việt).";
+    const ownersByKey=await ownersForImageKeys(env,keys),prepared=[],seen=new Set();
+    async function runVisionWithRetry(input){
+      for(let attempt=0;attempt<2;attempt++){
+        try{return await env.AI.run(MODEL,input)}
+        catch(error){
+          const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\\r\\n]+/g," ").slice(0,180);
+          const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
+          const quota=upstreamStatus===429||/\\b429\\b|too many requests|rate.?limit|quota exceeded/i.test(detail);
+          const transient=[500,502,503,504].includes(upstreamStatus)||/\\b(500|502|503|504)\\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+          if(quota){error.status=429;throw error}
+          if(attempt===0&&transient&&!/\\b3030\\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
+          error.status=transient?503:upstreamStatus||502;
+          throw error;
+        }
+      }
+      throw new Error("Workers AI did not return a result");
     }
+    // Analyze every selected image exactly once as a vision input. Do not
+    // compare isolated four-image windows: for eight images that silently
+    // misses pairs at opposite ends of the selection.
+    const descriptors=[];
+    for(let imageIndex=0;imageIndex<keys.length;imageIndex++){
+      const vision=await runVisionWithRetry({
+        messages:[
+          {role:"system",content:"You are a forensic product-photo analyst. Describe only visible, distinguishing physical details in concise Vietnamese. For shoes include product type, material and texture (including crocodile pattern only if visibly present), toe shape, sole profile, stitching, logo placement, laces/buckles, color and unique marks. For accessories describe visible material, silhouette, seams, hardware, logo and unique marks. Do not infer hidden details. Return a compact JSON object only."},
+          {role:"user",content:"Describe this product image so it can be compared with photos of a possibly identical physical product."}
+        ],
+        image:supplied[imageIndex].dataUrl,
+        temperature:0,
+        max_tokens:220
+      });
+      const descriptorText=vision?.response??vision?.choices?.[0]?.message?.content??vision?.output_text;
+      if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty");
+      descriptors.push(descriptorText.trim().slice(0,2200));
+    }
+    const comparisonMessages=[
+      {role:"system",content:"Compare all supplied visual descriptions. Check every pair in the complete list, including pairs far apart in the list. Decide which show the SAME physical product, not merely similar styles. View angle, lighting and background may differ; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Use zero-based indices matching the labels exactly. Return only valid JSON: {\\"pairs\\":[{\\"a\\":0,\\"b\\":1,\\"same_product\\":true,\\"confidence\\":91,\\"rationale\\":\\"brief Vietnamese reason\\"}]}. Include only credible same-product pairs with confidence >= 91; never pair an image with itself. Return an empty pairs array if no pair qualifies."},
+      {role:"user",content:promptBase+"\\n\\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+", mô tả từ phân tích thị giác):\\n"+description).join("\\n\\n")+"\\n\\nCó "+keys.length+" ảnh trong danh sách. Kiểm tra TẤT CẢ các cặp i<j, bao gồm ảnh đầu và ảnh cuối. Chỉ trả JSON, chỉ đề xuất cặp có confidence từ 91 trở lên."}
+    ];
+    let compared=await runVisionWithRetry({messages:comparisonMessages,temperature:0,max_tokens:1400});
+    let comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+    if(!parsePairList(comparedText)){
+      compared=await runVisionWithRetry({
+        messages:[
+          {role:"system",content:"Return ONLY valid JSON with a top-level pairs array. Each pair must have numeric a and b indices, boolean same_product, integer confidence 0-100, and a short Vietnamese rationale. No markdown or explanation. Only report confidence >= 91 and inspect every pair from the full image-description list."},
+          {role:"user",content:"The previous response was malformed. Re-evaluate the complete list below, checking all pairs including first-to-last. Return valid JSON only. "+promptBase+"\\n\\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mã "+keys[index]+"):\\n"+description).join("\\n\\n")}
+        ],
+        temperature:0,
+        max_tokens:1400
+      });
+      comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+    }
+    let parsedPairs=parsePairList(comparedText);
+    if(!parsedPairs)throw new Error("text comparison response did not contain a valid pairs array after one format retry");
+    if(typeof comparedText!=="string")comparedText=JSON.stringify(parsedPairs);
+    for(const pair of parsedPairs.pairs){
+      const a=Number(pair?.a),b=Number(pair?.b),confidence=Number(pair?.confidence);
+      if(pair?.same_product!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100)continue;
+      const visual=visualPairGate(indexedByKey.get(keys[a]),indexedByKey.get(keys[b]));
+      if(!visual.match)continue;
+      const first=keys[a]<keys[b]?keys[a]:keys[b],second=keys[a]<keys[b]?keys[b]:keys[a],id=first+"|"+second;
+      const ownerA=ownersByKey.get(first)||new Set(),ownerB=ownersByKey.get(second)||new Set();
+      if(ownerA.size>1||ownerB.size>1||(ownerA.size===1&&ownerB.size===1&&[...ownerA][0]!==[...ownerB][0]))continue;
+      if(seen.has(id))continue;
+      seen.add(id);
+      prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||"").trim().slice(0,900)});
+    }
+    if(!prepared.length)return json({ok:true,matches:[],batches:1,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong toàn bộ "+keys.length+" ảnh đã kiểm tra. Có thể chạy lại với cặp ảnh nghi vấn; không có đề xuất nào được lưu."});
+    const statements=prepared.map(p=>env.DB.prepare("INSERT INTO image_group_reviews(id,image_a,image_b,same_product,confidence,rationale,status,created_at) VALUES(?,?,?,1,?,?,'pending',datetime('now'))").bind(crypto.randomUUID(),p.first,p.second,p.confidence,p.rationale));
+    await env.DB.batch(statements);
+    return json({ok:true,matches:prepared.length,batches:1,message:"AI đã so sánh đầy đủ "+keys.length+" ảnh và tạo "+prepared.length+" cặp đề xuất sau khi kiểm tra ngưỡng và đặc trưng. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201);
+  }catch(error){
+    const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\\r\\n]+/g," ").slice(0,220);
+    const status=Number(error?.status||error?.statusCode||error?.status_code||0);
+    if(status===429||/\\b429\\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
+    return fail("Không thể so sánh đủ các ảnh bằng Workers AI: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
   }
-  throw new Error("Workers AI did not return a result");
 }
-try{
-  // Send each image separately using the documented vision input; this avoids
-  // the live-tested 3030 failure from multi-image requests. Compare the resulting
-  // grounded visual fingerprints, never publish automatically, and fail closed.
-  for(let imageIndex=0;imageIndex<batchKeys.length;imageIndex++){
-    const vision=await runVisionWithRetry({
-      messages:[
-        {role:"system",content:"You are a forensic shoe-photo analyst. Describe only visible, distinguishing physical details in concise Vietnamese. Include shoe type, material and texture (including crocodile pattern only if visibly present), toe shape, sole profile, stitching, logo placement, laces/buckles, color and unique marks. Do not infer hidden details. Return a compact JSON object only."},
-        {role:"user",content:"Describe this shoe image so it can be compared with photos of possibly identical physical shoes."}
-      ],
-      image:batchImages[imageIndex].dataUrl,
-      temperature:0,
-      max_tokens:220
-    });
-    const descriptorText=vision?.response??vision?.choices?.[0]?.message?.content??vision?.output_text;
-    if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty");
-    descriptors.push(descriptorText.trim().slice(0,3000));
-  }
-  let compared=await runVisionWithRetry({
-    messages:[
-      {role:"system",content:"Compare visual descriptions of shoe photos. Decide which pairs show the SAME physical product, not merely the same style. Differences in view angle, lighting or background are acceptable; different material pattern, stitching, logo, sole, hardware or unique marks are evidence against a match. Return only valid JSON: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":91,\"rationale\":\"brief Vietnamese reason\"}]}. Use zero-based image indices, never pair an image with itself, and return an empty pairs array if uncertain. Only report confidence >= 91."},
-      {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mô tả từ phân tích thị giác):\n"+description).join("\n\n")+"\n\nChỉ ghép khi có đủ bằng chứng về cùng một sản phẩm vật lý. Chỉ trả JSON duy nhất, confidence phải từ 91 trở lên."}
-    ],
-    temperature:0,
-    max_tokens:350
-  });
-  let comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
-  if(!parsePairList(comparedText)){
-    compared=await runVisionWithRetry({
-      messages:[
-        {role:"system",content:"Return ONLY valid JSON with a top-level pairs array. Each pair must have numeric a and b indices, boolean same_product, integer confidence 0-100, and a short Vietnamese rationale. Do not include markdown or explanations. Only report confidence >= 91."},
-        {role:"user",content:"The previous response was malformed. Re-evaluate these shoe descriptions and return valid JSON only. "+promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+":\n"+description).join("\n\n")}
-      ],
-      temperature:0,
-      max_tokens:700
-    },env,context.request);
-    comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
-  }
-  if(!parsePairList(comparedText))throw new Error("text comparison response did not contain a valid pairs array after one format retry");
-  if(typeof comparedText!=="string"&&parsePairList(comparedText))comparedText=JSON.stringify(comparedText);
-  if(typeof comparedText!=="string"||!comparedText.trim())throw new Error("text comparison response was empty");
-  result={response:comparedText.trim()};
-}catch(error){
-  const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
-  const status=Number(error?.status||error?.statusCode||error?.status_code||0);
-  if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn hoặc hết hạn mức khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
-  return fail("Workers AI không thể so sánh ảnh bằng mô tả thị giác đơn ảnh: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
-}
-batches++;const responseValue=result?.response??result?.choices?.[0]?.message?.content??result?.output_text;let parsed=responseValue&&typeof responseValue==="object"&&!Array.isArray(responseValue)?responseValue:null;const raw=typeof responseValue==="string"?responseValue.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,""):"";if(!parsed&&raw){try{parsed=JSON.parse(raw)}catch{const m=raw.match(/\{[\s\S]*\}/);if(m)try{parsed=JSON.parse(m[0])}catch{}}}if(!parsed||!Array.isArray(parsed.pairs))return fail("AI không trả về danh sách cặp ảnh hợp lệ ở cụm "+batches+". Chưa lưu đề xuất nào; thử lại hoặc kiểm tra model/binding AI.",502);for(const pair of parsed.pairs){const a=Number(pair?.a),b=Number(pair?.b),confidence=Number(pair?.confidence);if(pair?.same_product!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=batchKeys.length||b>=batchKeys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100)continue;const visual=visualPairGate(indexedByKey.get(batchKeys[a]),indexedByKey.get(batchKeys[b]));if(!visual.match)continue;const first=batchKeys[a]<batchKeys[b]?batchKeys[a]:batchKeys[b],second=batchKeys[a]<batchKeys[b]?batchKeys[b]:batchKeys[a],id=first+"|"+second;const ownerA=ownersByKey.get(first)||new Set(),ownerB=ownersByKey.get(second)||new Set();if(ownerA.size>1||ownerB.size>1||(ownerA.size===1&&ownerB.size===1&&[...ownerA][0]!==[...ownerB][0]))continue;if(seen.has(id))continue;seen.add(id);prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||"").trim().slice(0,900)})}}if(!prepared.length)return json({ok:true,matches:[],batches,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong các cụm ảnh đã kiểm tra. Với 5–8 ảnh, các cụm 4 ảnh có chồng lấp để giảm lỗi nội bộ của model; nếu nghi ngờ cặp ở hai đầu danh sách, hãy chạy lượt riêng với hai ảnh đó."});const statements=prepared.map(p=>env.DB.prepare("INSERT INTO image_group_reviews(id,image_a,image_b,same_product,confidence,rationale,status,created_at) VALUES(?,?,?,1,?,?,'pending',datetime('now'))").bind(crypto.randomUUID(),p.first,p.second,p.confidence,p.rationale));await env.DB.batch(statements);return json({ok:true,matches:prepared.length,batches,message:"AI đã tạo "+prepared.length+" cặp ảnh đề xuất sau "+batches+" lượt phân tích. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201)}catch(error){const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,220);return fail("Không thể tìm nhóm ảnh bằng Workers AI. Chi tiết kỹ thuật: "+detail,502)}}if(action==="reject"){const id=String(body.reviewId||"");if(!/^[0-9a-f-]{36}$/i.test(id))return fail("Mã lượt duyệt không hợp lệ.");const r=await env.DB.prepare("UPDATE image_group_reviews SET status='rejected' WHERE id=? AND status='pending'").bind(id).run();if(!r.meta?.changes)return fail("Lượt duyệt không tồn tại hoặc đã được xử lý.",409);return json({ok:true,message:"Đã loại đề xuất này."})}
+if(action==="reject"){const id=String(body.reviewId||"");if(!/^[0-9a-f-]{36}$/i.test(id))return fail("Mã lượt duyệt không hợp lệ.");const r=await env.DB.prepare("UPDATE image_group_reviews SET status='rejected' WHERE id=? AND status='pending'").bind(id).run();if(!r.meta?.changes)return fail("Lượt duyệt không tồn tại hoặc đã được xử lý.",409);return json({ok:true,message:"Đã loại đề xuất này."})}
 if(action==="approve"){const id=String(body.reviewId||""),productId=String(body.productId||"");if(!/^[0-9a-f-]{36}$/i.test(id)||!productId||productId.length>120)return fail("Thiếu lượt duyệt hoặc sản phẩm đích.");const review=await env.DB.prepare("SELECT * FROM image_group_reviews WHERE id=? AND status='pending' AND same_product=1 AND confidence>=91").bind(id).first();if(!review)return fail("Chỉ có thể duyệt đề xuất AI đánh giá cùng sản phẩm với độ tin cậy từ 91% trở lên.",409);const product=await env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(productId).first();if(!product)return fail("Không tìm thấy sản phẩm đích.",404);let images;const previousImagesJson=String(product.images_json??"[]");try{images=JSON.parse(previousImagesJson)}catch{return fail("Dữ liệu ảnh hiện tại của sản phẩm không hợp lệ. Không ghi đè để tránh mất dữ liệu.",409)}if(!Array.isArray(images)||images.some(value=>typeof value!=="string"))return fail("Danh sách ảnh hiện tại không hợp lệ. Không ghi đè dữ liệu cũ.",409);const keys=[review.image_a,review.image_b],others=await env.DB.prepare("SELECT id,sku,images_json FROM products WHERE id<>?").bind(productId).all(),owners=new Map();for(const row of others.results||[]){let refs=[];try{refs=JSON.parse(row.images_json||"[]")}catch{}for(const ref of Array.isArray(refs)?refs:[])for(const key of keys)if(String(ref||"").includes(key))owners.set(key,row.sku)}if(keys.some(k=>owners.has(k)))return fail("Một ảnh đã thuộc SKU khác. Hãy kiểm tra và gỡ liên kết cũ trước để tránh ghép nhầm sản phẩm.",409);const known=new Set(images.map(String));for(const key of keys){const url="/media/"+key;if(!known.has(url)&&!known.has(url.slice(1))&&!known.has(key))images.push(url)}if(images.length>30)return fail("Bộ ảnh sản phẩm đã đạt giới hạn 30 ảnh.",409);const nextImagesJson=JSON.stringify(images);const results=await env.DB.batch([env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND COALESCE(images_json,'[]')=? AND EXISTS (SELECT 1 FROM image_group_reviews WHERE id=? AND status='pending' AND same_product=1 AND confidence>=91)").bind(nextImagesJson,productId,previousImagesJson,id),env.DB.prepare("UPDATE image_group_reviews SET status='approved',product_id=? WHERE id=? AND status='pending' AND changes()=1").bind(productId,id),env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_approved', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_reviews WHERE id=? AND status='approved' AND product_id=?)").bind(crypto.randomUUID(),productId,JSON.stringify({reviewId:id,keys,sku:product.sku,previousImagesJson,nextImagesJson}),id,productId)]);if(!results?.[0]?.meta?.changes||!results?.[1]?.meta?.changes)return fail("Sản phẩm hoặc đề xuất đã thay đổi đồng thời. Không ghi đè; hãy tải lại và kiểm tra.",409);return json({ok:true,message:"Đã thêm ảnh vào bộ ảnh sản phẩm.",sku:product.sku,imageCount:images.length})}
 return fail("Thao tác không được hỗ trợ.")}
 export async function onRequestDelete(){return fail("Phương thức không được hỗ trợ.",405)}
