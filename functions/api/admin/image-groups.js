@@ -319,12 +319,12 @@ if(action==="compare"){
     for(let imageIndex=0;imageIndex<keys.length;imageIndex++){
       const vision=await runVisionWithRetry({
         messages:[
-          {role:"system",content:"You are a forensic product-photo analyst. Describe only visible, distinguishing physical details in concise Vietnamese. For shoes include product type, material and texture (including crocodile pattern only if visibly present), toe shape, sole profile, stitching, logo placement, laces/buckles, color and unique marks. For accessories describe visible material, silhouette, seams, hardware, logo and unique marks. Do not infer hidden details. Return a compact JSON object only."},
-          {role:"user",content:"Describe this product image so it can be compared with photos of a possibly identical physical product."}
+          {role:"system",content:"You are a forensic product-photo analyst. Return one compact JSON object in Vietnamese with these fields: product_type, dominant_colors, visible_material, texture_pattern, silhouette, toe_or_edge_shape, sole_or_edge_profile, stitching, logo_placement, hardware_or_closure, distinctive_details, visible_uncertainty. Describe only what is visible; use 'không thấy rõ' instead of guessing. For shoes, distinguish crocodile texture from generic embossing only when visibly supported; record toe, sole, seam layout, lace holes, buckle and logo placement. For accessories, record silhouette, panel layout, seams, texture, hardware and logo placement. Prioritize stable product identity features over background, angle, lighting, crop and watermark. Be specific enough to compare another view of the same product; do not claim unseen details."},
+          {role:"user",content:"Analyze this product photo for exact model/variant matching. Record the most distinctive visible traits and clearly mark what cannot be seen from this angle. Return JSON only."}
         ],
         image:supplied[imageIndex].dataUrl,
         temperature:0,
-        max_tokens:220
+        max_tokens:320
       });
       const descriptorText=vision?.response??vision?.choices?.[0]?.message?.content??vision?.output_text;
       if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty");
@@ -369,12 +369,12 @@ if(action==="compare"){
       if(exhaustivePairs)parsedPairs=exhaustivePairs;
     }
     if(typeof comparedText!=="string")comparedText=JSON.stringify(parsedPairs);
-    const comparisonDiagnostics={modelPairs:parsedPairs.pairs.length,invalidOrLowConfidence:0,visualGateRejected:0,ownershipRejected:0,accepted:0};
+    const comparisonDiagnostics={modelPairs:parsedPairs.pairs.length,invalidOrLowConfidence:0,visualGateRejected:0,ownershipRejected:0,accepted:0,rejectedPairs:[]};
     for(const pair of parsedPairs.pairs){
       const a=Number(pair?.a??pair?.imageA??pair?.image_a??pair?.left_index??pair?.left??pair?.first),b=Number(pair?.b??pair?.imageB??pair?.image_b??pair?.right_index??pair?.right??pair?.second);
       let confidence=Number(pair?.confidence??pair?.score??pair?.confidence_score??pair?.confidenceScore??pair?.probability);
       if(confidence>0&&confidence<=1)confidence*=100;
-      if((pair?.same_product??pair?.sameProduct??pair?.match)!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100){comparisonDiagnostics.invalidOrLowConfidence++;continue;}
+      if((pair?.same_product??pair?.sameProduct??pair?.match)!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100){comparisonDiagnostics.invalidOrLowConfidence++;comparisonDiagnostics.rejectedPairs.push({a,b,same_product:pair?.same_product??pair?.sameProduct??pair?.match??null,confidence:Number.isFinite(confidence)?confidence:null,rationale:String(pair?.rationale||pair?.reason||"").slice(0,180)});continue;}
       const visual=visualPairGate(indexedByKey.get(keys[a]),indexedByKey.get(keys[b]));
       if(!visual.match){comparisonDiagnostics.visualGateRejected++;continue;}
       const first=keys[a]<keys[b]?keys[a]:keys[b],second=keys[a]<keys[b]?keys[b]:keys[a],id=first+"|"+second;
