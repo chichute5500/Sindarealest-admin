@@ -1,0 +1,46 @@
+name: Storefront Preview Playwright
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview_url:
+        description: "Preview ADMIN URL for the target Pages deployment, e.g. https://<preview-hash>.sindarealest2.pages.dev/admin/"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storefront-preview-playwright
+  cancel-in-progress: false
+
+jobs:
+  storefront-preview:
+    name: Test storefront Preview (read-only, no credentials)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out selected branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install project dependencies and Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Validate target is an allowed Preview URL
+        id: preview
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+        run: node scripts/validate-storefront-preview-url.mjs
+
+      - name: Run read-only storefront browser checks
+        run: npx playwright test tests/e2e/storefront-preview.spec.js
+        env:
+          ADMIN_TEST_URL: ${{ steps.preview.outputs.safe_url }}
