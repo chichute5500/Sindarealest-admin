@@ -616,7 +616,7 @@ try {
     contentType: 'application/json; charset=utf-8',
     body: JSON.stringify([{ code: 99, name: 'Tỉnh kiểm thử' }]),
   }));
-  await autoContext.route(/https:\/\/provinces\\.open-api\\.vn\\/api\\/v2\\/p\\/99\\?depth=2$/, (route) => route.fulfill({
+  await autoContext.route(/https:\/\/provinces\.open-api\.vn\/api\/v2\/p\/99\?depth=2$/, (route) => route.fulfill({
     status: 200,
     contentType: 'application/json; charset=utf-8',
     body: JSON.stringify({ wards: [{ code: 99001, name: 'Phường kiểm thử' }] }),
