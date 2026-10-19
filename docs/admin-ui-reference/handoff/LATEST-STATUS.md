@@ -67,6 +67,15 @@
 5. Xác minh branch/HEAD/diff, test toàn bộ, cập nhật trạng thái bằng bằng chứng và chỉ commit trên nhánh ADMIN.
 6. Không merge sang website/main và không deploy Production.
 
+## Tiếp tục kiểm thử ma trận — cập nhật mới nhất
+
+- Bài baseline Playwright đã được mở rộng lên **16 ảnh dự kiến** (8 kích thước × 2 giao diện light/dark), gồm mobile nhỏ 320px đến desktop 1440px.
+- Đã cấu hình stub 401 có chủ đích cho `/api/admin/session` trong test local. Đây chỉ là giả lập phiên chưa đăng nhập; không giả lập dữ liệu nghiệp vụ, không gọi/ghi sản phẩm hay đơn hàng.
+- Đã sửa workflow để lấy ảnh từ `artifacts/admin-preview-evidence/<SHA-12>/screenshots/` thay vì tìm PNG ở thư mục cha. Đây là lỗi đường dẫn có thể làm bước lưu bằng chứng bỏ qua ảnh hợp lệ.
+- Metadata JSON được lưu cùng thư mục ảnh; workflow sau đó sao chép PNG/metadata vào lịch sử bàn giao trên nhánh ADMIN khi nhánh vẫn đứng đúng commit đã kiểm thử.
+- **Tình trạng thực thi:** chưa có workflow run/artifact được xác minh cho commit code mới nhất. Vì vậy không ghi 16 ảnh là đã tạo, không đánh dấu Playwright/npm PASS.
+- **Tiến độ 30%** vẫn là ước tính theo các giai đoạn: kiểm tra source/handoff và bổ sung harness đã làm; kiểm thử trình duyệt, so sánh PNG tham chiếu và nghiệm thu các màn hình nghiệp vụ vẫn còn mở.
+
 ## Lịch sử các commit của mốc công việc hiện tại
 
 - `ac6c4193e76ee6e4a86d36ea1fc41152d76d69f6` — thêm chẩn đoán an toàn cho lỗi Preview.
