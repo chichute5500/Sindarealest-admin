@@ -297,8 +297,8 @@ export async function onRequestPost(context) {
           return fail("Mỗi nhóm AI cần từ 2 đến 8 ảnh khác nhau để đối chiếu đủ mọi cặp.", 400);
         }
         const similarity = Number(group?.similarity);
-        if (!Number.isInteger(similarity) || similarity < 91 || similarity > 100) {
-          return fail("Đề xuất nhóm phải đạt điểm gửi lên ít nhất 91/100 trước khi xác minh AI.", 400);
+        if (!Number.isInteger(similarity) || similarity < 70 || similarity > 100) {
+          return fail("Nhóm chỉ được đưa vào bước xác minh AI khi điểm lọc thị giác đạt ít nhất 70/100.", 400);
         }
         // Keep only images not already claimed by another pending group or an
         // earlier group in this same request. A duplicate can never enter two sets.
