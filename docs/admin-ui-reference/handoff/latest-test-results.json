@@ -1,47 +1,110 @@
 {
-  "status": "NOT_TESTED",
+  "status": "IN_PROGRESS_BLOCKED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
+  "latestCodeCommitSha": "ea9bcd1a542dab2891916c14015a7fae21143a56",
   "testedCommitSha": null,
   "capturedAt": null,
-  "note": "Initial handoff template on isolated ADMIN branch. Branch/document setup does not mean the application was tested. Replace fields only with actual test and screenshot evidence.",
+  "progressEstimatePercent": 25,
+  "progressBasis": "Weighted project phases, not lines of code. Source and CI audit partial; diagnostic harness and an initial ADMIN-only visual CSS pass committed; post-change browser verification not yet available.",
+  "note": "Do not claim tests passed for the latest code. The repository has no local checkout in the current environment. New workflows/specs are committed but no run/artifacts have been observed after those commits. The approved PNG reference could not be decoded through the available GitHub connector.",
   "branchIsolation": {
-    "adminBranchCreated": true,
+    "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
     "autoMergeOrCherryPick": false,
     "mainMerge": false,
-    "productionDeployment": false
+    "productionDeployment": false,
+    "fullDiffIsolationReview": "PARTIAL_NOT_VERIFIED_WITH_LOCAL_GIT"
   },
+  "changes": [
+    {
+      "path": "tests/e2e/admin-preview.spec.js",
+      "purpose": "Adds redacted URL/status/title/DOM diagnostics when expected login markup is missing.",
+      "commitSha": "ac6c4193e76ee6e4a86d36ea1fc41152d76d69f6",
+      "verifiedOnGitHub": true,
+      "executed": false
+    },
+    {
+      "path": ".github/workflows/admin-preview-diagnostics.yml",
+      "purpose": "Creates an ADMIN-branch-only workflow for project checks, local static Playwright baselines, optional Preview smoke checks, and test artifacts.",
+      "commitSha": "0ca32ae5413e647950c48933f9e5017e2769fdf9",
+      "verifiedOnGitHub": true,
+      "executed": false
+    },
+    {
+      "path": "tests/e2e/admin-static-baseline.spec.js",
+      "purpose": "Captures intended real-source screenshots at 390x844 light/dark and 1440x900 dark, verifies login markup/theme and horizontal overflow.",
+      "commitSha": "6b8542691c39b26e2d4f5aa2742c5db3e17f114d",
+      "verifiedOnGitHub": true,
+      "executed": false
+    },
+    {
+      "path": "public/admin/index.html",
+      "purpose": "Applies initial ADMIN-only ice-blue/pearl/navy liquid-glass CSS layer without changing JavaScript business logic or API strings.",
+      "commitSha": "ea9bcd1a542dab2891916c14015a7fae21143a56",
+      "verifiedOnGitHub": true,
+      "executed": false
+    }
+  ],
+  "priorCiRuns": [
+    {
+      "runId": 39311972164,
+      "name": "Validate source and tests",
+      "conclusion": "success",
+      "note": "Historical result from before the latest UI and test-harness commits; not a post-change verification."
+    },
+    {
+      "runId": 39311972209,
+      "name": "Admin Preview Playwright",
+      "conclusion": "failure",
+      "failedChecks": [
+        "locator('#loginView') not found/visible",
+        "locator('#loginForm') not found/visible"
+      ],
+      "rootCause": "NOT_CONFIRMED",
+      "note": "The deployed URL/actual response was not exposed in the sanitized workflow log. HTML source on the ADMIN branch contains these IDs. New safe diagnostic test is committed but not yet run."
+    }
+  ],
   "screenshots": [],
   "checks": {
-    "baselineGitState": "NOT_TESTED",
-    "branchIsolationDiffReview": "NOT_TESTED",
+    "baselineGitState": "BLOCKED_NO_LOCAL_CHECKOUT",
+    "branchIsolationDiffReview": "PARTIAL",
     "applicationStartup": "NOT_TESTED",
-    "playwright": "NOT_TESTED",
-    "visualComparison": "NOT_TESTED",
+    "playwrightPreviewDiagnostics": "NOT_TESTED",
+    "localStaticPlaywrightBaseline": "NOT_TESTED",
+    "visualComparisonAgainstApprovedPng": "BLOCKED_REFERENCE_IMAGE_NOT_READABLE",
     "consoleErrors": "NOT_TESTED",
     "networkErrors": "NOT_TESTED",
     "responsiveViewports": "NOT_TESTED",
-    "lightMode": "NOT_TESTED",
-    "darkMode": "NOT_TESTED",
-    "accessibilityAndVietnameseTypography": "NOT_TESTED",
-    "lint": "NOT_TESTED",
-    "typecheck": "NOT_TESTED",
-    "automatedTests": "NOT_TESTED",
+    "lightMode": "NOT_TESTED_AFTER_CHANGE",
+    "darkMode": "NOT_TESTED_AFTER_CHANGE",
+    "accessibilityAndVietnameseTypography": "NOT_TESTED_AFTER_CHANGE",
+    "lint": "NOT_TESTED_AFTER_CHANGE",
+    "typecheck": "NOT_TESTED_AFTER_CHANGE",
+    "automatedTests": "NOT_TESTED_AFTER_CHANGE",
     "build": "NOT_TESTED",
     "businessFlows": "NOT_TESTED",
-    "sharedBackendRegression": "NOT_TESTED"
+    "sharedBackendRegression": "NOT_TESTED",
+    "productionDeployment": "NOT_PERFORMED"
   },
-  "remainingIssues": [],
-  "blockedItems": [],
+  "remainingIssues": [
+    "No Playwright screenshot evidence exists for the latest UI change.",
+    "Preview Playwright root cause is unresolved; need real page diagnostics from GitHub Actions.",
+    "The reference PNG has not been visually inspected because binary retrieval failed.",
+    "Full git status and branch diff have not been inspected in a local checkout."
+  ],
+  "blockedItems": [
+    "The current environment has no local repository checkout and cannot resolve github.com through shell networking, preventing local git status, test execution, or screenshot generation.",
+    "No new Actions run was observed for the commits made through the GitHub connector; workflow_dispatch is not exposed in the available GitHub tool set."
+  ],
   "nextActions": [
-    "Verify repository, current branch, HEAD SHA, working tree, and uncommitted changes.",
-    "Ensure all ADMIN edits and commits are made only on feature/admin-isolated-handoff-2026-10-20.",
-    "Inspect project scripts, routes, authentication and existing Playwright setup.",
-    "Capture genuine baseline screenshots before editing.",
-    "Review the diff to ensure the static website branch and public UI are not being modified.",
-    "Run available checks and update this file only with evidence."
+    "Run the Admin Preview diagnostic smoke test workflow from the ADMIN branch using a real GitHub Actions push or workflow_dispatch, and inspect its artifacts/logs.",
+    "Read the actual admin-mobile-reference.png using a method that returns the binary image; then visually compare genuine baseline screenshots.",
+    "Fix only proven defects, preserve APIs/auth/backend and public website behavior, rerun npm run check and npm test, and capture same-condition screenshots.",
+    "Verify full diff and working tree using a safe checkout before final acceptance.",
+    "Update this JSON and LATEST-STATUS.md only with evidence-backed results.",
+    "Keep the public website branch/main untouched; do not merge or deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED"
 }
