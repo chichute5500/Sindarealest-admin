@@ -32,7 +32,7 @@ export function validateAdminPreviewUrl(value) {
   if (url.search || url.hash) {
     throw new Error("Preview URL must not contain a query string or fragment.");
   }
-  if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.sindarealest2\\.pages\\.dev$/.test(hostname)) {
+  if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.sindarealest2\.pages\.dev$/.test(hostname)) {
     throw new Error("Only a SinDarealest2 Cloudflare Pages Preview hostname is allowed; Production is blocked.");
   }
   if (url.pathname !== "/admin" && url.pathname !== "/admin/") {
