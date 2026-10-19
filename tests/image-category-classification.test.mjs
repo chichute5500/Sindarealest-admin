@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
+let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, compareMode = false, compareConfidence = 95, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -42,7 +42,7 @@ const env = {
     if (compareMode && input.messages?.some(message => typeof message.content === "string" && message.content.includes("mô tả từ phân tích thị giác"))) {
       if (malformedCompareOnce) { malformedCompareOnce = false; return { response: "not valid JSON", tool_calls: [] }; }
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
-        { response: JSON.stringify({ pairs: [{ a: 0, b: 1, same_product: true, confidence: compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
+        { response: JSON.stringify({ pairs: [{ a: comparePair[0], b: comparePair[1], same_product: true, confidence: compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
     }
     if (compareMode) {
       const systemPrompt = String(input.messages?.[0]?.content || "");
@@ -166,9 +166,47 @@ assert.equal(compareResult.matches, 1);
 assert.equal(modelCalls, beforeCompareCalls + 4, "pair comparison should retry a transient 503, describe both images separately, then compare the descriptions");
 assert.equal(reviewInsertBatches, beforeReviewWrites + 1, "successful retry should save a single pending review batch");
 assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison must include the system instruction");
-assert.match(lastModelInput.input.messages[0].content, /Compare visual descriptions/, "the final comparison must use the two image-specific visual descriptions");
+assert.match(lastModelInput.input.messages[0].content, /Compare all supplied visual descriptions/, "the final comparison must use all image-specific visual descriptions");
 assert.equal(lastModelInput.input.image, undefined, "the final comparison uses text descriptors after each image was analyzed separately");
 assert.equal(lastModelInput.input.response_format, undefined, "comparison must avoid schema-constrained decoding that failed real Preview inference");
+
+// Compare the complete selection, including the first and last image. Older
+// four-image windows omitted pairs at opposite ends of a five-to-eight image
+// request; a single text-only comparison must now cover the entire selection.
+const largeKeys = [
+  "catalog/shoes/first.webp",
+  "catalog/shoes/second.webp",
+  "catalog/shoes/third.webp",
+  "catalog/shoes/fourth.webp",
+  "catalog/shoes/last.webp"
+];
+const largeRequest = () => new Request("https://preview.example/api/admin/image-groups", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Cookie: "sd_admin_session=" + session,
+    Origin: "https://preview.example",
+    "Sec-Fetch-Site": "same-origin"
+  },
+  body: JSON.stringify({
+    action: "compare",
+    imageKeys: largeKeys,
+    imageData: largeKeys.map(key => ({ key, dataUrl }))
+  })
+});
+comparePair = [0, 4];
+const beforeLargeCalls = modelCalls;
+const beforeLargeWrites = reviewInsertBatches;
+const largeResponse = await onRequestPost({ request: largeRequest(), env });
+const largeResult = await largeResponse.json();
+assert.equal(largeResponse.status, 201, JSON.stringify(largeResult));
+assert.equal(largeResult.matches, 1, "the first-to-last pair must be considered");
+assert.equal(modelCalls, beforeLargeCalls + 6, "five selected images must each be analyzed before one complete-list text comparison");
+assert.equal(reviewInsertBatches, beforeLargeWrites + 1, "all qualifying pairs are saved only after the complete comparison succeeds");
+assert.match(lastModelInput.input.messages.find(message => message.role === "user").content, /Ảnh 4/, "the comparison prompt must contain the last selected image");
+assert.match(lastModelInput.input.messages.find(message => message.role === "user").content, /catalog\\/shoes\\/last\\.webp/, "the complete pair comparison must retain stable image order and keys");
+comparePair = [0, 1];
+
 
 compareConfidence = 90;
 const beforeLowConfidenceWrites = reviewInsertBatches;
