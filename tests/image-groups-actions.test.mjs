@@ -86,17 +86,24 @@ async function hashGroup(keys) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical));
   return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
-function seedImage(key, category = "sneaker") {
+function seedImage(key, category = "sneaker", categoryStatus = "classified", categoryConfidence = 95) {
+  const contentHash = [...key].map(character => character.charCodeAt(0).toString(16).padStart(2, "0")).join("").padEnd(64, "0").slice(0, 64);
+  const features = {
+    category, categoryStatus, categoryConfidence,
+    shape: Array(64).fill(0.5),
+    colors: [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
+    contentHash
+  };
   sqlite.prepare("INSERT OR REPLACE INTO image_group_index(image_key,p_hash,features_json,width,height,source_size,source_uploaded) VALUES(?,?,?,?,?,?,?)")
-    .run(key, "a".repeat(16), JSON.stringify({ category, contentHash: "b".repeat(64) }), 120, 90, 5000, "");
+    .run(key, "a".repeat(16), JSON.stringify(features), 120, 90, 5000, "");
 }
 async function seedGroup(id, keys, category = "sneaker", scores = []) {
   sqlite.prepare("INSERT INTO image_group_sets(id,fingerprint,similarity,rationale,status) VALUES(?,?,?,?, 'pending')")
-    .run(id, await hashGroup(keys), 88, "fixture proposal");
+    .run(id, await hashGroup(keys), 94, "fixture proposal");
   keys.forEach((key, index) => {
     seedImage(key, category);
     sqlite.prepare("INSERT INTO image_group_set_members(group_id,image_key,similarity) VALUES(?,?,?)")
-      .run(id, key, scores[index] ?? (90 - index));
+      .run(id, key, scores[index] ?? (96 - index));
     sqlite.prepare("INSERT INTO image_group_image_claims(image_key,group_id,status) VALUES(?,?,'pending')").run(key, id);
   });
 }
