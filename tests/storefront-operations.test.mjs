@@ -24,7 +24,17 @@ assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.inclu
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
 assert.ok(storefrontHtml.includes('id="accountOrdersAction"') && storefrontHtml.includes('id="accountOrdersView"') && storefrontHtml.includes('id="accountOrdersList"'), 'Account must expose a history view for accepted order requests from the current device.');
 assert.ok(storefrontHtml.includes("const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history'") && storefrontHtml.includes('rememberOrderRequest(result,items)'), 'Only a successful server acceptance should enter the local order-request history.');
-assert.ok(storefrontHtml.includes('không phải lịch sử tài khoản đồng bộ') && storefrontHtml.includes("'fullName' in record") && storefrontHtml.includes("'phone' in record") === false, 'Order history must disclose its local-only scope and avoid storing checkout contact details.');
+const orderHistoryFunctionStart = storefrontHtml.indexOf('function rememberOrderRequest(');
+const orderHistoryFunctionEnd = storefrontHtml.indexOf('function hasPublicPrice(', orderHistoryFunctionStart);
+const orderHistoryFunction = storefrontHtml.slice(orderHistoryFunctionStart, orderHistoryFunctionEnd);
+assert.ok(storefrontHtml.includes('không phải lịch sử tài khoản đồng bộ')
+  && orderHistoryFunctionStart >= 0
+  && orderHistoryFunctionEnd > orderHistoryFunctionStart
+  && !orderHistoryFunction.includes('fullName')
+  && !orderHistoryFunction.includes('phone')
+  && !orderHistoryFunction.includes('email')
+  && !orderHistoryFunction.includes('address'),
+'Order history must disclose its local-only scope and not persist checkout contact details.');
 
 
 
