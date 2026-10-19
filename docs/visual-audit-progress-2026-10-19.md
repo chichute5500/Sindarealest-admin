@@ -339,3 +339,36 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Fixture contains 235 products and is read-only; unknown prices/stock were not modified. These are isolated preview results, not proof of production backend, real checkout/payment, or physical Android behavior.
 - SKU source audit confirms card, detail, favorite, cart, order-history, warranty and Zalo UI paths use a safe missing-SKU fallback or omit SKU where appropriate. Product routing falls back to technical ID/slug when SKU is missing; technical identifiers are not displayed as commercial SKU.
 - Overall estimate remains **84%** pending reference-pack/pixel comparison, Android-device verification, and authorized real/staging backend checks (D1/R2, admin CRUD, order/payment and watermark access control). No merge to `main` or production deployment occurred.
+
+
+## Audit correction and requirements checklist — 19/10/2026
+
+This entry supersedes earlier statements in this document that the `sindarealest-liquid-glass-preview-21.zip` archive could not be found. It was found in the current working session at `/mnt/data/sindarealest-liquid-glass-preview-21.zip` and inspected directly. It contains 28 old **automated website preview screenshots**, plus `report.html` and `visual-audit.json` (30 archive entries total). Its audit reports 235 fixture products, `passed=true`, 20 responsive entries, 14 interactions, zero overflow and zero recorded browser/network errors. This archive is a previous test baseline, **not** the user-provided 12-screen target mockups; the target mockups are the two conversation images (Light and Dark).
+
+### Revalidated source/tests
+- Source/test commit validated by preview #181: `b79fd25491913003e7110eb2aaf617cf982bcd36`.
+- [Preview #181 — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39210023818); artifact ID `12166898786`, SHA-256 `d8e900c7df20c57fdef9c212e8e4ebd4a459b7a797426d10db2df8d691295655`.
+- Directly read `visual-audit.json` from the downloaded artifact: 52 screenshots, 77 interaction checks, 20 viewport/theme entries, 235 fixture products, `passed=true`, no overflow, no hard failures, zero console/page/same-origin HTTP errors and zero failed requests.
+- `npm test`, `npm run check`, Chromium capture, screenshot audit and artifact upload all completed successfully.
+- Fixture integrity check: all 235 fixture records have `skuVerified:false` and `sku:null`; featured product selection no longer uses hard-coded unverified SKU identifiers. Source assertions cover missing SKU display, Zalo message fallback and accessibility contracts.
+
+### Requirements status by workstream
+
+| Workstream | Status | Evidence / outstanding work |
+|---|---|---|
+| Branch/production safety | Done | Work stayed on `fix/liquid-glass-audit-2026-10-19`; no main merge or production deploy. Compare to main showed fix branch ahead and not behind at the last check. |
+| SKU and missing-data safety | Automated pass | All 235 fixture SKU fields blank/unverified; card/detail/cart/Zalo/order-history/warranty paths use safe fallback or omit unverified SKU; regression test included in `npm test`. Verify new admin-created commercial SKUs only from authorized real business data. |
+| Source, migration and isolated browser tests | Automated pass on #181 | `npm test`, `npm run check`, Chromium, responsive and interaction audit pass in a local read-only preview. |
+| Theme/responsive/UI interactions | Automated partial pass | 10 viewport sizes × Light/Dark, 77 interaction assertions, zero overflow and browser/request errors. Automation does not confirm subjective similarity or physical-device rendering. |
+| User target mockups | Partial; visual gaps remain | Compared the conversation's 70041/70042 mockups with #181 screen captures. The structural pattern (two-column hero, six benefit tiles, order CTA, two-column catalogue, detail/cart/account drawers and bottom nav) is represented, but visual match is not pixel-verified. Major content gap: the target mockups show handbag products and prices/SKUs that are not verified in the fixture; do not fabricate those. Target's horizontal crocodile silhouette logo and flowing liquid-fold background also differ from the current SD emblem / crocodile-scale background and need authenticated brand asset/design approval before replacement. |
+| Baseline ZIP | Found and inspected | `preview-21.zip` is available as an old automated baseline. It should not be mislabelled as the target mockup pack and cannot substitute for a target-image pixel comparison. |
+| Category/product catalogue | Partially blocked by source data | Fixture categories: sneakers, loafers, dress shoes, wallets, belts, sandals, watch straps and phone cases; no handbag category. Do not invent bag entries, prices, live stock or product SKUs. |
+| Accessibility/keyboard/reduced motion/safe areas | Automated partial pass | Source contracts and modal/drawer/focus/Escape tests are present. Still requires physical Android and assistive-technology checks, plus an independent contrast/semantics review for a full accessibility sign-off. |
+| Contact, warranty, customer account and order request | Fixture-level pass only | Local storage and offline mocks are covered by automated assertions; no evidence this confirms actual production records or warranty/transaction writes. |
+| D1/R2/admin CRUD/authentication/orders/payment/watermark permissions | Not production-verified | Requires authorized staging/production access and real binding/configuration evidence. Do not make live writes or transactions without explicit approval. |
+| Android physical-device acceptance | Not done | No physical Android device is connected to this automation environment. |
+| Progress documentation | Updated by this correction | Historic entries remain as history; this newer checklist corrects the ZIP availability and labels evidence scope precisely. |
+
+### Current completion estimate
+
+**84% of the code-and-automated-test checklist**, not 84% pixel similarity and not production readiness. The unfinished portion is concentrated in (1) visual comparison and adjustments against the actual 12-screen reference mockups, (2) missing verified catalog/logo assets, (3) physical Android acceptance, and (4) authorized staging/production integration acceptance. The existing user-provided reference composites establish the desired appearance, but the current app is not yet identical to them. No 100% completion claim is made while these objective blockers remain.
