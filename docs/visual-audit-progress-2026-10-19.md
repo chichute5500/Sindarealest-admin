@@ -319,3 +319,11 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Branch comparison against `main`: fix branch is ahead by 188 commits and behind by 0 at this check; no merge or production deploy was performed.
 - Searched the accessible Library for `sindarealest-liquid-glass-preview-21.zip` and the 28 reference screenshots. The exact ZIP was not identified; search returned older standalone HTML assets instead. Pixel-level comparison against the missing original 28-image pack therefore remains unverified.
 - Current checklist estimate: **83% overall**. Source/tests/isolated preview are stronger after this change, but the remaining 17% is not safely claimable as complete without the original reference assets, physical Android verification, and authorized staging/production integration checks (D1/R2, admin operations, real orders/payment and watermark access controls). No production writes were made.
+
+
+## Final documentation-commit verification — preview 177
+
+- [Preview #177 — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39209419752) ran on documentation commit `4de8f100b3bedcb41751181c84de95d761b42494`; no storefront source changed after the passing preview #176.
+- Downloaded and opened artifact `sindarealest-liquid-glass-preview-177.zip`, ID `12167525438`, SHA-256 `4e52bd02989f4ee66d399ac91508ccfe5fa1d40dd45178e5d855b77fa9380b60`.
+- Direct artifact verification: `passed=true`; 52 screenshots; 77 interactions; 20 viewport/theme entries; 0 overflow; 0 hard failures; 0 console/page/HTTP errors; 0 failed requests or interaction assertions.
+- `npm test`, `npm run check`, Chromium capture and artifact upload all completed successfully. This confirms the documentation commit did not break the automated preview.
