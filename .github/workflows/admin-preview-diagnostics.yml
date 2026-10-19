@@ -213,17 +213,20 @@ jobs:
           const sectionMarker = '## Kết quả kiểm thử tự động gần nhất';
           const existing = status.indexOf(sectionMarker);
           if (existing >= 0) status = status.slice(0, existing).trimEnd() + '\n';
-          status += `\n${sectionMarker}
-
-          - Tested commit: \`${sha}\`
-          - Run: [GitHub Actions](https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
-          - `npm run check`: \`${checkState(process.env.CHECK_OUTCOME)}\`
-          - `npm test`: \`${checkState(process.env.UNIT_OUTCOME)}\`
-          - Local source Playwright matrix: \`${checkState(process.env.BASELINE_OUTCOME)}\`; ${imageFiles.length} real PNG screenshots saved under \`${dest}/screenshots/\`.
-          - Deployed Preview: \`${previewState}\`.
-          - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
-          - Production deployment: `NOT PERFORMED`.
-          `;
+          const statusLines = [
+            '',
+            sectionMarker,
+            '',
+            '- Tested commit: ' + sha,
+            '- Run: https://github.com/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID,
+            '- npm run check: ' + checkState(process.env.CHECK_OUTCOME),
+            '- npm test: ' + checkState(process.env.UNIT_OUTCOME),
+            '- Local source Playwright matrix: ' + checkState(process.env.BASELINE_OUTCOME) + '; ' + imageFiles.length + ' real PNG screenshots saved under ' + dest + '/screenshots/.',
+            '- Deployed Preview: ' + previewState + '.',
+            '- The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.',
+            '- Production deployment: NOT PERFORMED.'
+          ];
+          status += statusLines.join('\\n') + '\\n';
           writeFileSync(statusPath, status);
           NODE
 
