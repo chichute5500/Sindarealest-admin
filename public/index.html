@@ -471,7 +471,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 <div class="theme-bg theme-bg--dark" aria-hidden="true"></div><div class="theme-bg theme-bg--light" aria-hidden="true"></div>
 <header class="nav-wrap">
   <nav class="nav tap-target" aria-label="Điều hướng chính">
-    <a class="brand" href="#home" aria-label="SinDarealest - Trang chủ"><img class="brand-symbol" src="images/brand-emblem.png" alt=""><span class="brand-name">SinDarealest</span></a>
+    <a class="brand" href="#home" aria-label="SinDarealest - Trang chủ"><img class="brand-symbol" src="images/brand-emblem.png" alt=""><span class="brand-copy"><span class="brand-name">SinDarealest</span><small class="brand-tagline">Thời Trang Da Cá Sấu</small></span></a>
     <div class="navlinks" id="desktopLinks">
       <a class="navlink active tap-target" href="#home" data-nav="home">Trang chủ</a><a class="navlink tap-target" href="#products" data-nav="products">Sản phẩm</a><a class="navlink tap-target" href="#collections" data-nav="collections">Bộ sưu tập</a><a class="navlink tap-target" href="#about" data-nav="about">Giới thiệu</a><a class="navlink tap-target" href="#contact" data-nav="contact">Liên hệ</a><a class="navlink tap-target" href="#warrantyHelpTitle" data-nav="warrantyHelpTitle">Kiểm tra bảo hành</a>
     </div>
@@ -1400,6 +1400,18 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
   .service-strip>.service{min-height:78px!important}
   #order .order-cta--compact #orderDetailsToggle{min-height:44px}
 }
+
+
+/* Brand lockup: name plus Vietnamese descriptor, following both supplied references. */
+.brand-copy{display:flex;flex-direction:column;justify-content:center;min-width:0;line-height:1.05}
+.brand-copy .brand-name{display:block}
+.brand-tagline{display:block;margin-top:2px;color:var(--nav-muted);font-size:8px;line-height:1.1;font-weight:400;letter-spacing:.015em;white-space:nowrap}
+@media(max-width:760px){
+  .nav-wrap .nav .brand-copy{min-width:0;max-width:100%;text-align:left}
+  .nav-wrap .nav .brand-name{font-size:12px;line-height:1.08}
+  .nav-wrap .nav .brand-tagline{margin-top:2px;font-size:7px;line-height:1.08;letter-spacing:0}
+}
+@media(max-width:360px){.nav-wrap .nav .brand-tagline{font-size:6.5px}}
 
 </style>
 
