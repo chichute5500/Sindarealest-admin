@@ -37,6 +37,9 @@ const adminHtml = await readFile(new URL("../public/admin/index.html", import.me
 const viewAllowlist = "!['dashboard','products','orders','customers','warranties','image-groups','settings'].includes(v)";
 assert.ok(adminHtml.includes(viewAllowlist), "AI image grouping must be accepted by setView navigation.");
 assert.ok(adminHtml.includes("similarity.isCachedDescriptorValid(indexedByKey.get(item.key),item)"), "whole-inventory scans must use the shared cached descriptor validator");
+assert.ok(adminHtml.includes("let aiClassificationQuotaBlocked=false") && adminHtml.includes("aiClassificationQuotaBlocked=true"), "daily AI quota exhaustion must be detected once and stop repeated classification calls in the same scan");
+assert.ok(adminHtml.includes("Never infer a category when vision is quota-blocked.") && adminHtml.includes('categoryStatus==="needs_review"'), "quota-blocked images must remain unclassified and excluded from automatic grouping rather than receiving guessed labels");
+assert.ok(adminHtml.includes("Missing identity descriptors make this cache") && adminHtml.includes("retries classification after quota resets"), "quota-blocked image descriptors must be retried on a later scan after quota resets");
 assert.ok(adminHtml.includes("similarity.findSimilarGroups(allDescriptors,{threshold:70,onProgress:progress=>{"),
   "use the conservative server-supported 70/100 visual prefilter so different-angle candidates reach the AI identity verifier");
 const similarityModule = await readFile(new URL("../public/admin/image-similarity.js", import.meta.url), "utf8");
