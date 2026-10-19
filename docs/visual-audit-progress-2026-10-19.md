@@ -327,3 +327,15 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Downloaded and opened artifact `sindarealest-liquid-glass-preview-177.zip`, ID `12167525438`, SHA-256 `4e52bd02989f4ee66d399ac91508ccfe5fa1d40dd45178e5d855b77fa9380b60`.
 - Direct artifact verification: `passed=true`; 52 screenshots; 77 interactions; 20 viewport/theme entries; 0 overflow; 0 hard failures; 0 console/page/HTTP errors; 0 failed requests or interaction assertions.
 - `npm test`, `npm run check`, Chromium capture and artifact upload all completed successfully. This confirms the documentation commit did not break the automated preview.
+
+
+## SKU fallback regression and Preview 181 — 19/10/2026
+
+- Removed SKU-coded fallbacks from featured-product selection. Featured cards now choose by category and gallery availability, not unverified commerce codes.
+- Added `tests/sku-missing-data-contract.test.mjs` and wired it into the main `npm test` chain. It checks empty/missing SKU presentation, truthful Zalo consultation fallback, and the absence of the former hard-coded SKU fallback list.
+- Commits: `13b1ff2f86b09ea693c5cea71df6f5540e6c0403` (selector fix), `5ecf128e25d5544106c28e8d84eff23fc12930da` (regression test and test wiring).
+- [Preview #181 — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39210023818). All steps completed successfully: complete project tests, source/migration checks, isolated Chromium install, read-only preview, screenshot/responsive audit, and artifact upload.
+- Downloaded and inspected artifact `sindarealest-liquid-glass-preview-181`, ID `12166898786`. The embedded `visual-audit.json` reports `passed=true`, 52 screenshots, 77 interaction checks, 20 theme/viewport entries, 0 responsive overflow, 0 hard failures, 0 console errors, 0 page errors, 0 same-origin HTTP errors, and 0 failed requests.
+- Fixture contains 235 products and is read-only; unknown prices/stock were not modified. These are isolated preview results, not proof of production backend, real checkout/payment, or physical Android behavior.
+- SKU source audit confirms card, detail, favorite, cart, order-history, warranty and Zalo UI paths use a safe missing-SKU fallback or omit SKU where appropriate. Product routing falls back to technical ID/slug when SKU is missing; technical identifiers are not displayed as commercial SKU.
+- Overall estimate remains **84%** pending reference-pack/pixel comparison, Android-device verification, and authorized real/staging backend checks (D1/R2, admin CRUD, order/payment and watermark access control). No merge to `main` or production deployment occurred.
