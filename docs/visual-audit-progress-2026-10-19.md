@@ -268,3 +268,14 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Tiến độ checklist được điều chỉnh từ 80% lên **81%** do đóng được một lỗi dữ liệu có tác động trực tiếp đến khách hàng; đây không phải điểm số pixel similarity.
 - Chưa merge/deploy. `main` vẫn là SHA đã xác nhận `f38cefe4647b33bd42f9018fde00c420ee5c7c66`.
 - Blocker để đạt 100% vẫn còn: chưa đối chiếu pixel với đầy đủ bộ ảnh gốc, cần bảng SKU/giá/tồn kho được xác nhận, chưa test trên thiết bị Android vật lý, chưa kiểm thử backend/thanh toán trên staging thật và chưa xác minh mọi màn hình/luồng production end-to-end.
+
+
+## Cập nhật SKU chưa xác minh — 19/10/2026
+
+- Nhánh: `fix/liquid-glass-audit-2026-10-19`; không merge/deploy production.
+- Commit dữ liệu: [`32ab97b48bba64fc5a694dcb232e62391608605c`](https://github.com/chichute5500/Sindarealest-admin/commit/32ab97b48bba64fc5a694dcb232e62391608605c).
+- Commit regression test: [`8881bb30ddeea8181ac4d15a49bd303b738418ca`](https://github.com/chichute5500/Sindarealest-admin/commit/8881bb30ddeea8181ac4d15a49bd303b738418ca).
+- Đã xác minh trực tiếp dữ liệu trên nhánh sau cập nhật: 235 bản ghi; cả 235 bản ghi có `skuVerified:false` và `sku:null`; không còn SKU tạo tự động dạng SD001…SD235 trong trường SKU fixture.
+- Cập nhật assertion trong `tests/storefront-operations.test.mjs` để bắt buộc SKU của fixture chưa xác minh phải là `null`. Các helper storefront hiện tại vẫn ẩn SKU chưa xác minh và hiển thị trạng thái “Chưa được cung cấp”; CTA Zalo giữ tên sản phẩm và không đưa chuỗi `null`/SKU giả vào lời nhắn.
+- Trạng thái CI sau các commit trên: chưa xác nhận được kết quả chạy mới cho HEAD này; trạng thái commit API chưa trả về status checks. Không dùng kết quả Preview 138 hoặc Preview 148 làm bằng chứng cho thay đổi mới.
+- Chưa tuyên bố hạng mục SKU hoàn tất cho đến khi workflow source/test và visual preview chạy trên HEAD mới nhất và được kiểm tra kết quả.
