@@ -279,10 +279,17 @@ export function parseImages(value) {
 
 export function fromRow(row, { publicView = false, showPrices = false } = {}) {
   const price = row.price === null || row.price === undefined ? null : Number(row.price);
+  const storedSku = String(row.sku ?? "").trim();
+  // Historical seed migration used SD001–SD235 as technical identifiers, not verified commercial SKUs.
+  // If an explicit verification column is introduced later, its persisted value takes precedence.
+  const skuVerified = row.sku_verified === null || row.sku_verified === undefined
+    ? !/^SD\\d{3}$/.test(storedSku)
+    : Number(row.sku_verified) === 1;
   return {
     id: row.id,
     slug: row.slug,
-    sku: row.sku,
+    sku: publicView && !skuVerified ? null : row.sku,
+    skuVerified,
     title: row.title,
     category: row.category,
     categoryLabel: row.category_label || row.category,
