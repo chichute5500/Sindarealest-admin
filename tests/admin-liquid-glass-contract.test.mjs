@@ -15,6 +15,7 @@ has('--bg:#09131d;', 'dark background token');
 has('--ink:#eaf3fb;', 'dark text token');
 has('backdrop-filter:blur(22px)', 'liquid-glass blur layer');
 has('data-admin-theme="dark"', 'dark-theme rules');
+has("$('#backdrop').classList.add('hidden')", 'editor overlay reset before login session check');
 has('prefers-reduced-motion:reduce', 'reduced-motion support');
 
 // System theme is the default until the administrator explicitly chooses light/dark.
