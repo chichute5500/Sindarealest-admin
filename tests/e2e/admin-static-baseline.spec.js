@@ -1,6 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const localAdminUrl = process.env.LOCAL_ADMIN_URL || 'http://127.0.0.1:4173/admin/';
+const sourceCommit = process.env.GITHUB_SHA || 'local';
+const sourceCommitShort = sourceCommit.slice(0, 12);
+const evidenceDir = join(process.cwd(), 'artifacts', 'admin-preview-evidence', sourceCommitShort);
+mkdirSync(evidenceDir, { recursive: true });
+
 const viewports = [
   { width: 320, height: 640, label: '320x640' },
   { width: 360, height: 800, label: '360x800' },
@@ -81,7 +88,8 @@ test('captures the real source ADMIN login in the requested viewport/theme matri
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
     }));
     const lightShotName = `admin-login__${viewport.label}__light.png`;
-    const lightShot = await page.screenshot({ fullPage: true, animations: 'disabled' });
+    const lightShotPath = join(evidenceDir, lightShotName);
+    const lightShot = await page.screenshot({ path: lightShotPath, fullPage: true, animations: 'disabled' });
     await testInfo.attach(lightShotName, { body: lightShot, contentType: 'image/png' });
 
     await page.locator('#adminThemeToggle').click();
@@ -95,7 +103,8 @@ test('captures the real source ADMIN login in the requested viewport/theme matri
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
     }));
     const darkShotName = `admin-login__${viewport.label}__dark.png`;
-    const darkShot = await page.screenshot({ fullPage: true, animations: 'disabled' });
+    const darkShotPath = join(evidenceDir, darkShotName);
+    const darkShot = await page.screenshot({ path: darkShotPath, fullPage: true, animations: 'disabled' });
     await testInfo.attach(darkShotName, { body: darkShot, contentType: 'image/png' });
 
     matrix.push({ viewport: `${viewport.width}x${viewport.height}`, light, dark });
@@ -105,7 +114,7 @@ test('captures the real source ADMIN login in the requested viewport/theme matri
 
   const metadata = {
     test: 'local-static-admin-baseline',
-    sourceCommit: process.env.GITHUB_SHA || null,
+    sourceCommit,
     capturedAt: new Date().toISOString(),
     route: new URL(localAdminUrl).pathname,
     screenshotCount: viewports.length * 2,
@@ -119,6 +128,7 @@ test('captures the real source ADMIN login in the requested viewport/theme matri
     failedRequests: failedRequests.slice(0, 30),
     httpErrors: httpErrors.slice(0, 30)
   };
+  writeFileSync(join(evidenceDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
   await testInfo.attach('admin-baseline-metadata.json', {
     body: Buffer.from(JSON.stringify(metadata, null, 2)),
     contentType: 'application/json'
