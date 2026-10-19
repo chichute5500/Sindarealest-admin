@@ -49,6 +49,13 @@ const stockRow = {
 assert.equal(fromRow(stockRow, { publicView: true, showPrices: true }).stock, null,
   'public product API must not reveal internal inventory counts even when prices are visible');
 assert.equal(fromRow(stockRow).stock, 7, 'admin view must retain the actual stock count');
+assert.equal(fromRow(stockRow, { publicView: true, showPrices: true }).skuVerified, true,
+  'category-prefixed SKU codes remain usable for products outside the historical seed range');
+const legacySeedRow = { ...stockRow, id: 'legacy-seed-row', sku: 'SD001' };
+assert.equal(fromRow(legacySeedRow).skuVerified, false,
+  'historic SD001–SD235 fixture identifiers must not be treated as verified commercial SKUs');
+assert.equal(fromRow(legacySeedRow, { publicView: true }).sku, null,
+  'public product responses must not expose unverified historic seed identifiers');
 const prototypeNamedCategory = validateProduct({
   title: 'Sản phẩm danh mục tùy chỉnh', sku: 'SD-CON001', category: 'constructor',
   price: null, stock: null, published: true, images: [],
