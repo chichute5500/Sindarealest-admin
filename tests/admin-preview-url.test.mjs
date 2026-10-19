@@ -19,6 +19,7 @@ const unsafeUrls = [
   "https://sindarealest2.pages.dev/admin/",
   "https://example.com/admin/",
   "https://sindarealest2.pages.dev.evil.example/admin/",
+  "https://nested.preview.sindarealest2.pages.dev/admin/",
   "https://user:password@preview.sindarealest2.pages.dev/admin/",
   "https://preview.sindarealest2.pages.dev/admin/?token=secret",
   "https://preview.sindarealest2.pages.dev/admin/#session",
