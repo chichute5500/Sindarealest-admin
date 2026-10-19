@@ -16,7 +16,7 @@ test("Admin defaults to light mode and explicit theme changes are not inverted",
   const toggle = page.locator("#adminThemeToggle");
   await expect(toggle).toBeVisible();
   await expect(root).toHaveAttribute("data-admin-theme", "light");
-  await expect.poll(() => root.evaluate(el => getComputedStyle(el).getPropertyValue("--bg").trim())).toBe("#f4f0e9");
+  await expect.poll(() => root.evaluate(el => getComputedStyle(el).getPropertyValue("--bg").trim())).toBe("#f2eee6");
   await expect(toggle).toHaveAttribute("aria-pressed", "false");
 
   await toggle.click();
@@ -31,6 +31,6 @@ test("Admin defaults to light mode and explicit theme changes are not inverted",
 
   await toggle.click();
   await expect(root).toHaveAttribute("data-admin-theme", "light");
-  await expect.poll(() => root.evaluate(el => getComputedStyle(el).getPropertyValue("--bg").trim())).toBe("#f4f0e9");
+  await expect.poll(() => root.evaluate(el => getComputedStyle(el).getPropertyValue("--bg").trim())).toBe("#f2eee6");
   await expect.poll(() => page.evaluate(() => localStorage.getItem("sd-theme-mode"))).toBe("light");
 });
