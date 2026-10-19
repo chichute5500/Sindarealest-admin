@@ -1,14 +1,14 @@
 {
-  "status": "IN_PROGRESS_BLOCKED",
+  "status": "IN_PROGRESS_VISUAL_VERIFICATION_PENDING",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "ea9bcd1a542dab2891916c14015a7fae21143a56",
+  "latestCodeCommitSha": "d0f5b52d9bef9b903ed58ecc2d4bb2b9a5fb46f6",
   "testedCommitSha": null,
   "capturedAt": null,
-  "progressEstimatePercent": 25,
-  "progressBasis": "Weighted project phases, not lines of code. Source and CI audit partial; diagnostic harness and an initial ADMIN-only visual CSS pass committed; post-change browser verification not yet available.",
-  "note": "Do not claim tests passed for the latest code. The repository has no local checkout in the current environment. New workflows/specs are committed but no run/artifacts have been observed after those commits. The approved PNG reference could not be decoded through the available GitHub connector.",
+  "progressEstimatePercent": 30,
+  "progressBasis": "Weighted project phases: source/handoff audit partial; ADMIN-only glass CSS pass and table/overlay refinements committed; diagnostic workflow and tests committed; browser and post-change test verification not yet observed.",
+  "note": "Static source contract checks performed through GitHub file reads passed, but these do not substitute for npm test or Playwright execution. Wait for an Actions run/artifacts for the exact commit before claiming test success.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -45,6 +45,13 @@
       "commitSha": "ea9bcd1a542dab2891916c14015a7fae21143a56",
       "verifiedOnGitHub": true,
       "executed": false
+    },
+    {
+      "path": "public/admin/index.html",
+      "purpose": "Refines ADMIN-only liquid-glass styling for tables, image-drop area, side notes, error/toast surfaces, editor overlays and dark-mode password control.",
+      "commitSha": "d0f5b52d9bef9b903ed58ecc2d4bb2b9a5fb46f6",
+      "verifiedOnGitHub": true,
+      "executed": false
     }
   ],
   "priorCiRuns": [
@@ -72,7 +79,7 @@
     "branchIsolationDiffReview": "PARTIAL",
     "applicationStartup": "NOT_TESTED",
     "playwrightPreviewDiagnostics": "NOT_TESTED",
-    "localStaticPlaywrightBaseline": "NOT_TESTED",
+    "localStaticPlaywrightBaseline": "NOT_VERIFIED_AFTER_LATEST_COMMIT",
     "visualComparisonAgainstApprovedPng": "BLOCKED_REFERENCE_IMAGE_NOT_READABLE",
     "consoleErrors": "NOT_TESTED",
     "networkErrors": "NOT_TESTED",
@@ -82,21 +89,23 @@
     "accessibilityAndVietnameseTypography": "NOT_TESTED_AFTER_CHANGE",
     "lint": "NOT_TESTED_AFTER_CHANGE",
     "typecheck": "NOT_TESTED_AFTER_CHANGE",
-    "automatedTests": "NOT_TESTED_AFTER_CHANGE",
+    "automatedTests": "NOT_VERIFIED_AFTER_LATEST_COMMIT",
     "build": "NOT_TESTED",
     "businessFlows": "NOT_TESTED",
     "sharedBackendRegression": "NOT_TESTED",
-    "productionDeployment": "NOT_PERFORMED"
+    "productionDeployment": "NOT_PERFORMED",
+    "staticSourceContract": "PASS_GITHUB_SOURCE_INSPECTION_ONLY",
+    "fullGitWorkingTree": "NOT_AVAILABLE_IN_THIS_ENVIRONMENT"
   },
   "remainingIssues": [
-    "No Playwright screenshot evidence exists for the latest UI change.",
     "Preview Playwright root cause is unresolved; need real page diagnostics from GitHub Actions.",
     "The reference PNG has not been visually inspected because binary retrieval failed.",
-    "Full git status and branch diff have not been inspected in a local checkout."
+    "Full git status and branch diff have not been inspected in a local checkout.",
+    "No Playwright artifact has been verified for the latest code commit.",
+    "Approved reference PNG still has not been visually inspected; current CSS refinement is source-based and requires visual comparison."
   ],
   "blockedItems": [
-    "The current environment has no local repository checkout and cannot resolve github.com through shell networking, preventing local git status, test execution, or screenshot generation.",
-    "No new Actions run was observed for the commits made through the GitHub connector; workflow_dispatch is not exposed in the available GitHub tool set."
+    "The available workflow-run connector only exposes pull-request-triggered runs; it does not confirm push-triggered Actions execution. Use GitHub Actions UI or the generated run URL/artifacts for confirmation."
   ],
   "nextActions": [
     "Run the Admin Preview diagnostic smoke test workflow from the ADMIN branch using a real GitHub Actions push or workflow_dispatch, and inspect its artifacts/logs.",
