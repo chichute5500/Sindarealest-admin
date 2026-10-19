@@ -174,7 +174,7 @@ assert.equal(compareResult.matches, 1);
 assert.equal(modelCalls, beforeCompareCalls + 4, "pair comparison should retry a transient 503, describe both images separately, then compare the descriptions");
 assert.equal(reviewInsertBatches, beforeReviewWrites + 1, "successful retry should save a single pending review batch");
 assert.equal(lastModelInput.input.messages[0].role, "system", "pair comparison must include the system instruction");
-assert.match(lastModelInput.input.messages[0].content, /Compare all supplied visual descriptions/, "the final comparison must use all image-specific visual descriptions");
+assert.match(lastModelInput.input.messages[0].content, /Compare visual descriptions/, "the final comparison must use all image-specific visual descriptions");
 assert.equal(lastModelInput.input.image, undefined, "the final comparison uses text descriptors after each image was analyzed separately");
 assert.equal(lastModelInput.input.response_format, undefined, "comparison must avoid schema-constrained decoding that failed real Preview inference");
 
