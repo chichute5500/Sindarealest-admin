@@ -279,3 +279,20 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Cập nhật assertion trong `tests/storefront-operations.test.mjs` để bắt buộc SKU của fixture chưa xác minh phải là `null`. Các helper storefront hiện tại vẫn ẩn SKU chưa xác minh và hiển thị trạng thái “Chưa được cung cấp”; CTA Zalo giữ tên sản phẩm và không đưa chuỗi `null`/SKU giả vào lời nhắn.
 - Trạng thái CI sau các commit trên: chưa xác nhận được kết quả chạy mới cho HEAD này; trạng thái commit API chưa trả về status checks. Không dùng kết quả Preview 138 hoặc Preview 148 làm bằng chứng cho thay đổi mới.
 - Chưa tuyên bố hạng mục SKU hoàn tất cho đến khi workflow source/test và visual preview chạy trên HEAD mới nhất và được kiểm tra kết quả.
+
+
+## Cập nhật hồi quy SKU trống và preview 160 — 19/10/2026
+
+- Code được chạy kiểm thử: `ad7a030ef96ccc056c788b8012668f44eadcbf5d`.
+- [Liquid Glass isolated visual preview #160 — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39203914769).
+- Artifact đã tải và mở trực tiếp: [`sindarealest-liquid-glass-preview-160.zip`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39203914769); artifact ID `12165275941`, SHA-256 `5abde969f0dfcd55f1f6e118d53a70fce1b42bf0638955bfeace83e9c92b61b5`.
+- Đã xác minh file `visual-audit.json` bên trong artifact: `passed=true`, 52 screenshot, 77 interaction assertions, 20 viewport/theme combinations, 0 horizontal overflow, 0 hard failures, 0 console errors, 0 page errors, 0 same-origin HTTP errors, 0 failed requests. Artifact có đủ ảnh Light/Dark cho các viewport mobile/tablet/desktop và các trang chính.
+- Regression assertions mới chạy PASS ở cả Light và Dark:
+  - Chi tiết sản phẩm hiển thị “Mã SKU: Chưa được cung cấp” và dùng URL ID/slug thay vì tạo SKU giả.
+  - CTA mở đúng `https://zalo.me/0827049192`, lời nhắn giữ tên sản phẩm và ghi rõ mã SKU chưa được cung cấp; không chứa `null`, `undefined` hoặc mã SD001…SD235 chưa xác minh.
+  - Hai dòng sản phẩm trong giỏ đều hiển thị trạng thái SKU chưa được cung cấp, không lộ mã giả.
+- Trong cùng workflow, `npm test` và `npm run check` đều hoàn thành thành công trước bước Chromium/preview.
+- Một lượt preview trước đó (#159) bị hủy khi workflow mới hơn thay thế trong hàng đợi; không dùng lượt đó làm kết quả cuối. Preview #160 là lượt mới nhất đã xác nhận SUCCESS.
+- Phạm vi kiểm thử vẫn là preview local, dữ liệu fixture chỉ đọc và đơn hàng mô phỏng trong bộ nhớ. Đây không phải kiểm thử Android vật lý, D1/R2 production hay thanh toán thật.
+- Ước tính checklist code/kiểm thử tự động: **82%**. Tỷ lệ tổng thể chưa thể là 100% vì còn thiếu đối chiếu pixel với đầy đủ 28 ảnh gốc, xác minh tài sản/dữ liệu thương mại, thử Android vật lý, backend/staging thật và kiểm thử end-to-end các tích hợp production.
+- Không merge vào `main`; không deploy production.
