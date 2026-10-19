@@ -200,3 +200,20 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Làm việc trên `fix/liquid-glass-audit-2026-10-19`; không merge vào `main`, không deploy production, không thay đổi binding/D1/R2 thật.
 - Các luồng yêu thích, địa chỉ giao hàng và lịch sử yêu cầu hiện là lưu cục bộ; không được mô tả thành tài khoản khách hàng hoặc lịch sử đồng bộ.
 
+
+
+## Cập nhật regression audit — preview 128
+
+- Code SHA đã kiểm thử: `90caa026f383419cecc777431d3ed6facbf1be82`.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197993223).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39197993162).
+- Artifact: `sindarealest-liquid-glass-preview-128.zip`, ID `12162004111`.
+- Preview 128: 46 screenshots, 71 interaction checks, 235 fixture products, `passed=true`, overflow 0, page errors 0, console errors 0, HTTP errors 0, failed requests 0, write requests 0 and external requests blocked 0.
+- Regression được phát hiện và sửa: CSS `display:grid` đã làm panel địa chỉ giao hàng hiện ngay trong menu tài khoản dù mang thuộc tính `hidden`. Đã thêm quy tắc ẩn tường minh cho `#accountAddressView[hidden]` và assertion tự động cho panel địa chỉ/yêu thích/đơn hàng.
+- Regression được phát hiện và sửa tiếp: tự điền địa chỉ checkout có thể đọc danh sách xã/phường trước khi request hiện hành hoàn tất. Đã chờ danh sách lựa chọn tải xong trước khi chọn xã/phường đã lưu. Preview 128 xác nhận tự điền đúng tên, số điện thoại, tỉnh, xã/phường và đường ở cả Light/Dark.
+- Kiểm thử focus trap của account và checkout đều PASS ở Light/Dark. Yêu thích, lịch sử yêu cầu đặt hàng và trạng thái rỗng tiếp tục PASS.
+- Các kết quả checkout và địa chỉ hành chính vẫn dùng fixture offline; không đại diện cho thanh toán hoặc backend production.
+
+### Trạng thái hoàn thành sau preview 128
+- Checklist hiện vẫn ước tính **80%**, chưa đủ căn cứ nâng lên 100%. Việc sửa regression làm tăng độ tin cậy của giao diện, nhưng không giải quyết những giới hạn lớn: chưa pixel-diff đủ 28 ảnh gốc, thiếu dữ liệu/tài sản túi xách và giá được xác nhận, một số màn hình vẫn dùng drawer/modal, chưa có kiểm thử Android vật lý và chưa có kiểm thử staging backend/thanh toán thật.
+- Không merge/deploy production. `main` giữ nguyên SHA đã xác nhận `f38cefe4647b33bd42f9018fde00c420ee5c7c66`.
