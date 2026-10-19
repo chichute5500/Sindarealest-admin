@@ -87,7 +87,7 @@ async function mockAdminApis(page, { writes }) {
     if (path.endsWith("/customers")) return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ customers: [] }) });
     if (path.endsWith("/warranties")) return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ claims: [], warranties: [] }) });
     if (path.endsWith("/audit-logs")) return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ logs: [] }) });
-    if (path.endsWith("/session")) return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ authenticated: true }) });
+    if (path.endsWith("/session")) return route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ ok: false, error: "Chưa đăng nhập." }) });
     return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
   });
 }
