@@ -353,7 +353,7 @@ if(action==="compare"){
     // model declined to enumerate pair-level verdicts. Ask for an explicit
     // verdict for every unordered pair once; the server still accepts only
     // same_product=true with confidence >=91 and the visual/ownership gates.
-    if(parsedPairs.pairs.length===0&&keys.length>1){
+    if(keys.length>1&&!parsedPairs.pairs.some(pair=>(pair?.same_product??pair?.sameProduct??pair?.match)===true&&Number.isFinite(Number(pair?.confidence??pair?.score))&&Number(pair?.confidence??pair?.score)>=91&&Number(pair?.confidence??pair?.score)<=100)){
       const allPairLabels=[];
       for(let a=0;a<keys.length;a++)for(let b=a+1;b<keys.length;b++)allPairLabels.push({a,b});
       const exhaustive=await runVisionWithRetry({
