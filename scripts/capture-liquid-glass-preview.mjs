@@ -610,6 +610,17 @@ try {
   await autoContext.route('**/api/products', (route) => route.fulfill({
     status: 200, contentType: 'application/json; charset=utf-8', body: JSON.stringify(products),
   }));
+  // Keep the address API fully offline in the extra auto-theme context, just as in Light/Dark contexts.
+  await autoContext.route('https://provinces.open-api.vn/api/v2/p/', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json; charset=utf-8',
+    body: JSON.stringify([{ code: 99, name: 'Tỉnh kiểm thử' }]),
+  }));
+  await autoContext.route(/https:\/\/provinces\\.open-api\\.vn\\/api\\/v2\\/p\\/99\\?depth=2$/, (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json; charset=utf-8',
+    body: JSON.stringify({ wards: [{ code: 99001, name: 'Phường kiểm thử' }] }),
+  }));
   const autoPage = await autoContext.newPage();
   autoPage.setDefaultTimeout(10000);
   autoPage.on('console', (m) => { if (m.type() === 'error') audit.consoleErrors.push({ theme: 'system-auto', message: m.text() }); });
