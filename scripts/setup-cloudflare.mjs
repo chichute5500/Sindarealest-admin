@@ -7,6 +7,7 @@ import {
   listD1Databases,
   listPagesProjects,
   readProductCount,
+  parseCliJson,
   runWrangler,
 } from './cloudflare-utils.mjs';
 
@@ -106,8 +107,24 @@ async function main() {
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0006_remove_warranty_otp.sql'], { interactive: true });
   console.log('Áp dụng snapshot liên hệ đơn hàng (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0007_order_contact_details.sql'], { interactive: true });
-  console.log('Áp dụng trạng thái xác minh SKU (idempotent)…');
-  runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0008_product_sku_verification.sql'], { interactive: true });
+  console.log('Đảm bảo schema migration 0008_product_sku_verification.sql; chỉ bổ sung các cột còn thiếu…');
+  const d1HasColumn = (tableName, columnName) => {
+    const result = runWrangler(['d1', 'execute', dbName, '--remote', '--json', '--command', `PRAGMA table_info(${tableName});`], { quiet: true });
+    const parsed = parseCliJson(result.stdout, `schema D1 ${tableName}`);
+    const containsColumn = (value) => {
+      if (Array.isArray(value)) return value.some(containsColumn);
+      if (!value || typeof value !== 'object') return false;
+      if (value.name === columnName) return true;
+      return Object.values(value).some(containsColumn);
+    };
+    return containsColumn(parsed);
+  };
+  if (!d1HasColumn('products', 'sku_verified')) {
+    runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE products ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
+  }
+  if (!d1HasColumn('order_items', 'sku_verified')) {
+    runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE order_items ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
+  }
 
   console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
   for (const query of [

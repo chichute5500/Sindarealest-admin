@@ -23,6 +23,7 @@ assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setu
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty metadata migration');
 assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setup must apply the OTP removal migration');
 assert.ok(setupScript.includes('migrations/0007_order_contact_details.sql') && setupScript.includes('migrations/0008_product_sku_verification.sql'), 'Setup must apply order contact and SKU verification migrations');
+assert.ok(setupScript.includes('d1HasColumn') && setupScript.includes('ALTER TABLE products ADD COLUMN sku_verified') && setupScript.includes('ALTER TABLE order_items ADD COLUMN sku_verified'), 'Setup must add SKU verification columns idempotently instead of rerunning ALTER TABLE blindly');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_verifications/.test(setupScript), 'Setup must not depend on obsolete OTP/SMS configuration or tables');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');

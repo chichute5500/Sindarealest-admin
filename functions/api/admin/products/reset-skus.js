@@ -153,7 +153,7 @@ export async function onRequestPost(context) {
       categories: Object.fromEntries(
         Object.entries(categoryCounts).map(([key, count]) => [categoryRules[key].label, count])
       ),
-      message: `Đã đặt lại SKU cho ${rows.length} sản phẩm.`,
+      message: `Đã tạo lại mã nội bộ cho ${rows.length} sản phẩm; các mã chưa được xác minh là SKU thương mại.`,
     });
   } catch (error) {
     return genericDbError(error);
