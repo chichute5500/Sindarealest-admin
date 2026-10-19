@@ -152,7 +152,7 @@ assert.equal(sqlite.prepare("SELECT COUNT(*) AS count FROM image_group_set_membe
 // Approval stores exact before/after snapshots; undo restores the exact previous product gallery without deleting R2 objects.
 ids.approval = crypto.randomUUID();
 await seedGroup(ids.approval, ["undo-a.webp","undo-b.webp"], "sneaker");
-const approved = await call({ action: "approve-group", groupId: ids.approval, productId: ids.product });
+const approved = await call({ action: "approve-group", groupId: ids.approval, productId: ids.product, manualOverride: true });
 assert.equal(approved.status, 200, JSON.stringify(approved));
 const afterApprove = sqlite.prepare("SELECT images_json FROM products WHERE id=?").get(ids.product).images_json;
 assert.deepEqual(JSON.parse(afterApprove), ["/media/existing.webp","/media/undo-a.webp","/media/undo-b.webp"]);
@@ -172,7 +172,7 @@ assert.equal(repeatedUndo.status, 409, "an approval can be undone only once");
 
 const changedApprovalId = crypto.randomUUID();
 await seedGroup(changedApprovalId, ["changed-undo-a.webp", "changed-undo-b.webp"]);
-const changedApproved = await call({ action: "approve-group", groupId: changedApprovalId, productId: ids.product });
+const changedApproved = await call({ action: "approve-group", groupId: changedApprovalId, productId: ids.product, manualOverride: true });
 assert.equal(changedApproved.status, 200, JSON.stringify(changedApproved));
 const changedAuditRow = sqlite.prepare("SELECT id,details_json FROM audit_logs WHERE action='image_similarity_group_approved'")
   .all().find(row => JSON.parse(row.details_json).groupId === changedApprovalId);
