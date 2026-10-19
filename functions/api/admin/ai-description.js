@@ -76,6 +76,9 @@ export async function onRequestPost(context) {
     if (/timeout|timed out|deadline exceeded|aborted/.test(detail)) {
       return fail("Dịch vụ AI phản hồi quá thời gian cho phép. Vui lòng thử lại sau.", 504);
     }
+    if (/\b4006\b|daily free allocation|used up.{0,60}allocation.{0,40}neurons?|allocation of [\d,]+ neurons?/i.test(detail)) {
+      return fail("Workers AI đã hết hạn mức neuron miễn phí hằng ngày. Chưa thay đổi dữ liệu; hãy chờ quota được cấp lại hoặc kiểm tra gói Workers AI.", 429, { "Retry-After": "3600" });
+    }
     if (/quota|rate.?limit|too many requests|resource exhausted/.test(detail)) {
       return fail("Dịch vụ AI đã đạt hạn mức. Vui lòng kiểm tra quota và thử lại sau.", 429, { "Retry-After": "60" });
     }
