@@ -8,7 +8,7 @@ import { onRequestGet as robots } from '../functions/robots.txt.js';
 import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const contactStart = storefrontHtml.indexOf('<div class="contact-grid">');
-const contactSectionStart = storefrontHtml.indexOf('<section class="footer-contacts"', contactStart);
+const contactSectionStart = storefrontHtml.lastIndexOf('<section class="footer-contacts"', contactStart);
 const contactEnd = storefrontHtml.indexOf('</section>', contactSectionStart);
 const contactMarkup = storefrontHtml.slice(contactStart, contactEnd);
 const warrantyHelpStart = storefrontHtml.indexOf('<div class="warranty-help');
