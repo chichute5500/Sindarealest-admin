@@ -66,14 +66,17 @@ function validateCandidateGroup(rows, keys) {
   const classified = validateClassifiedGroup(rows, keys);
   if (!classified.valid) return classified;
   let minimumScore = 100;
+  const memberScores = classified.ordered.map(() => 100);
   for (let i = 0; i < classified.ordered.length; i++) {
     for (let j = i + 1; j < classified.ordered.length; j++) {
       const result = compareIndexedRows(classified.ordered[i], classified.ordered[j]);
       if (!result.match || result.score < 91) return { valid: false, reason: result.reason || "similarity_below_threshold" };
       minimumScore = Math.min(minimumScore, result.score);
+      memberScores[i] = Math.min(memberScores[i], result.score);
+      memberScores[j] = Math.min(memberScores[j], result.score);
     }
   }
-  return { valid: true, category: classified.category, similarity: minimumScore };
+  return { valid: true, category: classified.category, similarity: minimumScore, memberScores };
 }
 
 
@@ -307,13 +310,13 @@ export async function onRequestPost(context) {
           continue;
         }
         const id = crypto.randomUUID();
-        const memberScores = new Map((Array.isArray(group.members) ? group.members : []).map(member => [member?.key, Number(member?.similarity)]));
+        const verifiedMemberScores = new Map(uniqueKeys.map((key, index) => [key, verification.memberScores[index]]));
         const statements = [
           env.DB.prepare("INSERT INTO image_group_sets(id,fingerprint,similarity,rationale,status,created_at) VALUES(?,?,?,?,'pending',datetime('now'))")
             .bind(id, groupFingerprint, verifiedSimilarity, String(group.rationale || "").slice(0, 700))
         ];
         for (const key of uniqueKeys) {
-          const memberScore = memberScores.get(key);
+          const memberScore = verifiedMemberScores.get(key);
           // The primary key on image_key is a database-level lock against
           // simultaneous scans creating overlapping active groups.
           statements.push(env.DB.prepare("INSERT INTO image_group_image_claims(image_key,group_id,status) VALUES(?,?,'pending')")
