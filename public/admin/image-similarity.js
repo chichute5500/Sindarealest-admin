@@ -18,6 +18,31 @@ function parseFeatures(item) {
   return null;
 }
 
+export function isCachedDescriptorValid(row, inventoryItem) {
+  if (!row || !inventoryItem || String(row.image_key || "") !== String(inventoryItem.key || "")) return false;
+  const features = parseFeatures(row);
+  if (!features) return false;
+  const category = String(features.category || "").toLowerCase();
+  const status = String(features.categoryStatus || "").toLowerCase();
+  const confidence = features.categoryConfidence;
+  const validValues = (values, length) => Array.isArray(values) && values.length === length &&
+    values.every(value => typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1);
+  if (!/^[0-9a-f]{16}$/i.test(String(row.p_hash || "")) ||
+      !validValues(features.shape, 64) ||
+      !validValues(features.colors, 12) ||
+      !/^[0-9a-f]{64}$/i.test(String(features.contentHash || "")) ||
+      !PRODUCT_CATEGORIES.has(category) ||
+      !Number.isInteger(confidence) || confidence < 0 || confidence > 100 ||
+      !["classified", "needs_review"].includes(status) ||
+      (status === "classified" && (category === "unknown" || confidence < 70)) ||
+      !Number.isInteger(Number(row.width)) || Number(row.width) < 1 ||
+      !Number.isInteger(Number(row.height)) || Number(row.height) < 1 ||
+      !Number.isFinite(Number(inventoryItem.size)) ||
+      Number(row.source_size) !== Number(inventoryItem.size) ||
+      String(row.source_uploaded || "") !== String(inventoryItem.uploaded || "")) return false;
+  return true;
+}
+
 export function categoryOf(item) {
   const features = parseFeatures(item);
   let rawFeatures = item?.features && typeof item.features === "object" ? item.features : null;
