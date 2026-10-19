@@ -93,6 +93,14 @@ const workersQuotaExceeded = await generateDescription({
 assert.equal(workersQuotaExceeded.status, 429, "Workers AI quota failures must return a rate-limit status");
 assert.equal(workersQuotaExceeded.headers.get("Retry-After"), "60", "quota responses should provide a retry hint");
 
+const dailyNeuronAllocation = await generateDescription({
+  request: request({ title: "Ví da", category: "Ví" }),
+  env: { ...env, AI: { async run() { throw new Error("Cloudflare error 4006: Daily free allocation of 10,000 neurons exceeded for this account"); } } },
+});
+assert.equal(dailyNeuronAllocation.status, 429, "Cloudflare error 4006 daily neuron allocation must be classified as quota exhaustion");
+assert.equal(dailyNeuronAllocation.headers.get("Retry-After"), "3600", "daily quota exhaustion should not encourage rapid retries");
+assert.match((await dailyNeuronAllocation.json()).error, /hằng ngày/i, "daily quota response should distinguish account-wide daily exhaustion");
+
 const originalFetch = globalThis.fetch;
 let openAIRequest = null;
 try {
