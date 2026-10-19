@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCliJson } from "./cloudflare-utils.mjs";
+import { assertUniqueMigrationPrefixes } from "./migration-prefixes.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const wrangler = join(root, "node_modules", "wrangler", "bin", "wrangler.js");
@@ -31,6 +32,7 @@ try {
   const localMigrations = join(temp, "migrations");
   mkdirSync(localMigrations, { recursive: true });
   const migrationFiles = readdirSync(sourceMigrations).filter((name) => /^\d{4}_.+\.sql$/.test(name)).sort();
+  assertUniqueMigrationPrefixes(migrationFiles);
   const contactMigration = migrationFiles.find((name) => name.startsWith("0007_"));
   if (!contactMigration || migrationFiles.length < 7) throw new Error("Expected the complete ordered migration set through 0007.");
   for (const name of migrationFiles.filter((name) => name < contactMigration)) {
