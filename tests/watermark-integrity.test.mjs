@@ -22,6 +22,15 @@ assert.match(validateWatermarkSettingUpdates({watermarkSize:99}).error,/6 đến
 assert.match(validateWatermarkSettingUpdates({watermarkOpacity:0}).error,/10 đến 100/i);
 assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'https://evil.example/logo.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
 assert.deepEqual(validateWatermarkSettingUpdates({watermarkLogoUrl:'/media/01234567-89ab-cdef-0123-456789abcdef.webp'}).updates,[['watermark_logo','/media/01234567-89ab-cdef-0123-456789abcdef.webp']]);
+assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'//evil.example/logo.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
+assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'/media/not-a-uuid.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
+
+const backupSource=readFileSync(new URL('../functions/api/admin/backup.js',import.meta.url),'utf8');
+const restoreSource=readFileSync(new URL('../functions/api/admin/restore.js',import.meta.url),'utf8');
+assert.ok(backupSource.includes('"watermark_logo"'), 'Backup must include the selected watermark logo setting');
+assert.ok(backupSource.includes('watermarkLogoUrl: watermark.watermarkLogoUrl'), 'Backup JSON must preserve the selected watermark logo');
+assert.ok(backupSource.includes('IN (?,?,?,?,?,?,?,?,?,?)'), 'Backup settings query must include all ten settings');
+assert.ok(restoreSource.includes('Object.hasOwn(backup.settings, "watermarkLogoUrl")'), 'Restore must accept the logo field while remaining compatible with older v2 backups');
 
 const mockDB={prepare(){return{bind(){return this},async first(){return null}}}};
 const response=await publicSettingsGet({env:{DB:mockDB}});
