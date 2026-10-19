@@ -74,3 +74,44 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 
 ### Tiến độ được đánh giá lại
 **72% — ước tính theo các nhóm nhiệm vụ và bằng chứng, không phải điểm tương đồng pixel.** CI/test và visual preview tiếp tục đạt. Phần còn lại chủ yếu là sai lệch thị giác lớn giữa storefront hiện tại và ảnh tham chiếu, nguồn ZIP gốc 28 ảnh chưa truy cập được, cần dữ liệu ảnh/catalog đã xác nhận để thay thế fixture phù hợp, và chưa có kiểm thử Android vật lý/backend production. Không báo 100% cho đến khi các hạng mục còn lại có bằng chứng nghiệm thu.
+
+
+## Cập nhật tiếp theo — 19/10/2026 (preview 84 và xác minh ZIP nguồn)
+
+### ZIP nguồn 28 screenshot — đã tìm thấy và đọc
+- ZIP `sindarealest-liquid-glass-preview-21.zip` được cung cấp trực tiếp trong cuộc hội thoại và có thể đọc trong môi trường này; không còn là tài nguyên chưa tìm thấy.
+- Kiểm kê: 28 ảnh JPG, `report.html`, `visual-audit.json`.
+- Audit lịch sử trong ZIP: `passed=true`; 28 screenshot; 20 tổ hợp viewport/theme; 14 kiểm tra tương tác; fixture 235 sản phẩm; `responsiveOverflowCount=0`; `hardFailures=[]`; không có page errors, console errors, lỗi HTTP cùng nguồn, failed requests hoặc write requests bị chặn.
+- Đây là bộ screenshot cũ (18/10), không thay thế preview mới. Các số liệu trên mô tả kết quả lần chạy cũ chứ không xác nhận trạng thái production.
+
+### Sửa giao diện có phạm vi hẹp
+- Commit UI: `019b68f9d6bd3a2fd446182fc983b5fecad086be`.
+- File: `public/index.html`.
+- Nguyên nhân: hai override CSS cuối của thanh điều hướng mobile đặt nền ở opacity `.94` cho cả Light và Dark, che đáng kể nội dung/nếp nền phía dưới và làm mặt kính gần như đặc.
+- Thay đổi: nền thanh điều hướng mobile Light `.94 → .78`, Dark `.94 → .82`. Giữ nguyên blur 24px, saturation 155%, viền, bóng, safe-area, vị trí cố định, 4 tab và logic điều hướng.
+- Không thay đổi dữ liệu sản phẩm, giá/SKU, nghiệp vụ giỏ hàng/checkout, backend, D1/R2, secret, DNS hoặc cấu hình production.
+
+### Sửa hồi quy và CI
+- Commit cập nhật test: `f9a0d3a19c8aeda76eaefb2b56b17f60b86d03fb`.
+- File: `tests/storefront-operations.test.mjs`.
+- Nguyên nhân CI đỏ ngay sau thay đổi UI: test khóa cứng opacity cũ `.94`; các assertion không phản ánh material mới. Cập nhật regex/mô tả Light thành `.78`, Dark thành `.82`; giữ nguyên kiểm tra nền tab đang chọn `.96/.97` để bảo vệ độ tương phản.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39190869696).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39190869723).
+
+### Artifact preview 84
+- Artifact: `sindarealest-liquid-glass-preview-84`, artifact ID `12159638690`; source SHA `f9a0d3a19c8aeda76eaefb2b56b17f60b86d03fb`.
+- 36 screenshot; 20 tổ hợp viewport/theme; 42 kiểm tra tương tác; `passed=true`; tràn ngang 0; `hardFailures=[]`; page errors 0; console errors 0; same-origin HTTP errors 0; failed requests 0; write requests blocked 0.
+- Đã mở trực tiếp `mobile-390-light-viewport.jpg` và `mobile-390-dark-viewport.jpg`: thanh điều hướng 4 mục vẫn đọc được và tab active vẫn rõ, nền thanh điều hướng bớt đặc. Đây là screenshot từ Chromium/Playwright, không phải kiểm thử điện thoại Android vật lý.
+
+### Kết quả đối chiếu với hai ảnh chủ dự án
+- Đã xem ảnh tham chiếu Light/Dark và các screenshot tương ứng sau sửa; thanh điều hướng mobile là một sai lệch cụ thể đã được chỉnh.
+- Sai lệch lớn vẫn còn: preview dùng fixture nhiều giày/sneaker/phụ kiện trong khi ảnh mẫu chủ yếu có túi xách/ví/thắt lưng; không được thay fixture bằng ảnh hoặc giá giả. Cần catalog/ảnh sản phẩm thật đã được chủ dự án cung cấp/xác nhận.
+- Source vẫn thiên về một storefront dài với anchor và drawer/modal, khác phần nào trải nghiệm app nhiều màn hình trong ảnh mẫu. Việc chuyển thành route riêng chưa thực hiện vì có thể ảnh hưởng lịch sử trình duyệt và state; cần xử lý tách biệt, kèm test hồi quy.
+- Nền crocodile texture hiện tại có chủ đích và đang được test bảo vệ; chưa thay asset nền để bắt chước nếp lụa bằng dữ liệu minh họa mới.
+
+### Trạng thái branch và tiến độ
+- Nhánh: `fix/liquid-glass-audit-2026-10-19`.
+- HEAD được xác nhận qua hai workflow xanh: `f9a0d3a19c8aeda76eaefb2b56b17f60b86d03fb`.
+- `main` không bị ghi; không merge production và không có thao tác deploy production từ nhiệm vụ này.
+- Tiến độ ước tính sau kiểm tra: **73%** theo checklist, không phải visual-similarity score. Tiến độ tăng nhẹ do tìm/đọc ZIP nguồn, sửa một sai lệch Liquid Glass có bằng chứng, điều chỉnh test và đạt lại source/test CI cùng preview.
+- Chưa nghiệm thu 100%: đối chiếu pixel/overlay đầy đủ 28 ảnh với các màn hình mới; dữ liệu/catalog phù hợp ảnh mẫu; hoàn tất mọi sai lệch thị giác lớn; kiểm thử route/state bổ sung; kiểm thử Android vật lý và backend production. Không suy diễn kết quả preview cô lập sang D1/R2, login, order hay payment production.
