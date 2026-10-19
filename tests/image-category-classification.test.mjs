@@ -10,7 +10,7 @@ const ADMIN_PASSWORD = "classification-test-admin-password";
 const SESSION_SECRET = "classification-test-session-secret-long-enough";
 const session = await createSession(SESSION_SECRET);
 const key = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.webp";
-let modelCalls = 0, lastModelInput = null, malformed = false, failNextTransient = false, failNextQuota = false, failNextDailyAllocation = false, compareMode = false, structuredDescriptorOnce = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
+let modelCalls = 0, lastModelInput = null, malformed = false, omitDescriptorOnce = false, failNextTransient = false, failNextQuota = false, failNextDailyAllocation = false, compareMode = false, structuredDescriptorOnce = false, compareConfidence = 95, fallbackConfidence = null, comparePair = [0, 1], malformedCompareOnce = false, reviewInsertBatches = 0, visualMode = "similar", compareOwners = [];
 const DB = {
   prepare(sql) {
     return { sql, args: [], bind(...args) { this.args = args; return this; },
@@ -69,6 +69,7 @@ const env = {
       }
       return { response: "unexpected comparison request shape", tool_calls: [], usage: {} };
     }
+    if (omitDescriptorOnce) { omitDescriptorOnce = false; return { response: { category: "dress_shoe", confidence: 99 }, tool_calls: [] }; }
     return malformed ? { response: "not valid JSON", tool_calls: [] } :
       { response: { category: "dress_shoe", confidence: 91, identity_descriptor: "loại=giày tây; chất liệu=da; vân=ô nhỏ; mũi=tròn; đế=đen thấp; đường may=đôi; logo=nhỏ bên hông" }, tool_calls: [], usage: {} };
   } }
@@ -97,6 +98,15 @@ assert.equal(lastModelInput.input.messages[0].role, "system", "the system instru
 assert.equal(lastModelInput.input.messages[1].role, "user", "the user message must carry the category prompt");
 assert.equal(typeof lastModelInput.input.messages[1].content, "string", "classification prompt should be plain text");
 assert.equal(lastModelInput.input.response_format, undefined, "do not send the schema-constrained shape that failed real Preview inference");
+
+// A high-confidence category-only answer is incomplete; retry and require identity traits.
+omitDescriptorOnce = true;
+const beforeDescriptorRetry = modelCalls;
+const descriptorRetry = await call();
+assert.equal(descriptorRetry.status, 200, JSON.stringify(descriptorRetry.body));
+assert.equal(descriptorRetry.body.items[0].status, "classified");
+assert.ok(descriptorRetry.body.items[0].identityDescriptor.length >= 48);
+assert.equal(modelCalls, beforeDescriptorRetry + 2, "a missing identity descriptor must trigger exactly one format retry");
 
 malformed = true;
 const invalid = await call();
