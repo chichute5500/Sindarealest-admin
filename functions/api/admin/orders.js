@@ -18,7 +18,7 @@ export async function onRequestGet(context) {
       " LEFT JOIN order_contact_details oc ON oc.order_id=o.id" +
       " ORDER BY o.created_at DESC LIMIT 1000" +
       ") " +
-      "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku," +
+      "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku,oi.sku_verified AS itemSkuVerified," +
       " oi.title AS itemTitle,oi.quantity AS itemQuantity,oi.unit_price AS itemUnitPrice," +
       " oi.line_total AS itemLineTotal" +
       " FROM recent_orders ro LEFT JOIN order_items oi ON oi.order_id=ro.id" +
@@ -28,7 +28,7 @@ export async function onRequestGet(context) {
     const byId = new Map();
     for (const row of result.results || []) {
       const {
-        itemId, itemProductId, itemSku, itemTitle, itemQuantity, itemUnitPrice, itemLineTotal,
+        itemId, itemProductId, itemSku, itemSkuVerified, itemTitle, itemQuantity, itemUnitPrice, itemLineTotal,
         ...orderFields
       } = row;
       let order = byId.get(row.id);
@@ -41,6 +41,7 @@ export async function onRequestGet(context) {
           id: itemId,
           productId: itemProductId,
           sku: itemSku,
+          skuVerified: Number(itemSkuVerified) === 1,
           title: itemTitle,
           quantity: itemQuantity,
           unitPrice: itemUnitPrice,
