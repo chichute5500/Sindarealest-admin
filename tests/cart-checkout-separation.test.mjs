@@ -27,7 +27,7 @@ assert.match(html, /function hasConfirmedPublicPrice\(product\)\{return !!produc
 assert.match(html, /function customerPriceLabel\(product\)\{return hasConfirmedPublicPrice\(product\)\?formatVnd\(product\.price\):''\}/, 'Customer price labels must stay blank for hidden, missing or unconfirmed prices.');
 assert.match(html, /function formatVnd\(/, 'Visible prices must use Vietnamese currency formatting.');
 assert.match(html, /class="detail-price" id="detailPrice" hidden/, 'Product detail must contain a price field that starts hidden.');
-assert.match(html, /detailPrice\.hidden=!detailPrice/, 'Product detail price visibility must follow the confirmed/public-price result.');
+assert.match(html, /\$\('#detailPrice'\)\.hidden=!detailPrice/, 'Product detail price visibility must follow the confirmed/public-price result.');
 assert.match(html, /function productCard\([^\n]+product-price/, 'Catalog cards must render a price when customerPriceLabel returns a confirmed public price.');
 assert.match(html, /function featuredProductCard\([^\n]+product-price/, 'Featured cards must render only confirmed public prices.');
 
