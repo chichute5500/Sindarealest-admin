@@ -519,7 +519,11 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 }
 /* On mobile the hero slide is editorial photography first, matching the supplied reference. Copy remains in the section heading and supporting tiles. */
 @media(max-width:760px){
-  .mosaic-compact .mosaic-card.art-main .mosaic-content{display:none}
+  .mosaic-compact .mosaic-card.art-main .mosaic-content{left:12px;right:auto;bottom:12px;max-width:unset}
+  .mosaic-compact .mosaic-card.art-main .mosaic-kicker,
+  .mosaic-compact .mosaic-card.art-main .mosaic-title,
+  .mosaic-compact .mosaic-card.art-main .mosaic-sub{display:none}
+  .mosaic-compact .mosaic-card.art-main .text-link{margin:0;padding:8px 11px;font-size:8px}
   .mosaic-compact .mosaic-card.art-main .slide-controls{
     left:10px;right:10px;bottom:50%;transform:translateY(50%);
     width:auto;justify-content:space-between;gap:0
