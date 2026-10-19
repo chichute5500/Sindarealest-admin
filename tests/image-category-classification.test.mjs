@@ -39,7 +39,12 @@ const env = {
     if (failNextQuota) { failNextQuota = false; const error = new Error("Workers AI quota exceeded (429)"); error.status = 429; throw error; }
     if (failNextTransient) { failNextTransient = false; throw new Error("Workers AI gateway timeout (503)"); }
     if (compareMode && input.image) return { response: JSON.stringify({ shoe_type: "sneaker", material_texture: "vân da rõ", toe: "tròn", sole: "đế thấp", stitching: "đường may đôi", logo: "logo nhỏ bên hông", unique_marks: "vân da và đường may giống nhau" }), tool_calls: [], usage: {} };
-    if (compareMode && input.messages?.some(message => typeof message.content === "string" && message.content.includes("mô tả từ phân tích thị giác"))) {
+    if (compareMode && input.messages?.some(message => typeof message.content === "string" && (
+      message.content.includes("mô tả từ phân tích thị giác") ||
+      message.content.includes("The previous response was malformed") ||
+      message.content.includes("Compare all supplied visual descriptions") ||
+      message.content.includes("Return ONLY valid JSON with a top-level pairs array")
+    ))) {
       if (malformedCompareOnce) { malformedCompareOnce = false; return { response: "not valid JSON", tool_calls: [] }; }
       return malformed ? { response: "not valid JSON", tool_calls: [] } :
         { response: JSON.stringify({ pairs: [{ a: comparePair[0], b: comparePair[1], same_product: true, confidence: compareConfidence, rationale: "Mô tả trùng vân da, đường may và đế." }] }), tool_calls: [], usage: {} };
