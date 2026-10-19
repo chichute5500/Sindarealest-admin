@@ -85,6 +85,162 @@ async function prepareFullPage(page) {
   await page.waitForTimeout(300);
 }
 
+async function auditPriceRenderingInMemory(browser, theme, sourceProducts, baseUrl, origin, audit, hardFailures) {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    colorScheme: theme,
+    reducedMotion: 'reduce',
+    serviceWorkers: 'block',
+  });
+  let scenario = 'confirmed';
+  let scenarioProducts = [];
+  let attemptedOrderPosts = 0;
+  await context.addInitScript((mode) => {
+    try { localStorage.setItem('sd-theme-mode', mode); } catch {}
+  }, theme);
+  await context.route('**/*', async (route) => {
+    const req = route.request();
+    const url = new URL(req.url());
+    if (url.hostname === 'provinces.open-api.vn') {
+      if (!['GET', 'HEAD'].includes(req.method())) {
+        audit.writeRequestsBlocked.push({ theme, method: req.method(), url: req.url(), priceAuditFixture: true });
+        return route.abort();
+      }
+      if (url.pathname === '/api/v2/p/') {
+        return route.fulfill({ status: 200, contentType: 'application/json; charset=utf-8', body: JSON.stringify([{ code: 99, name: 'Tỉnh kiểm thử' }]) });
+      }
+      if (url.pathname === '/api/v2/p/99') {
+        return route.fulfill({ status: 200, contentType: 'application/json; charset=utf-8', body: JSON.stringify({ wards: [{ code: 99001, name: 'Phường kiểm thử' }] }) });
+      }
+      return route.abort();
+    }
+    if (url.origin !== origin) {
+      audit.externalRequestsBlocked.push({ theme, method: req.method(), url: req.url(), priceAuditFixture: true });
+      return route.abort();
+    }
+    if (url.pathname === '/api/settings' && ['GET', 'HEAD'].includes(req.method())) {
+      return route.fulfill({ status: 200, contentType: 'application/json; charset=utf-8', body: '{}' });
+    }
+    if (url.pathname === '/api/products' && ['GET', 'HEAD'].includes(req.method())) {
+      audit.mockedRequests.push({ theme, method: req.method(), url: req.url(), fixtureOnly: true, scenario: 'in-memory-price-' + scenario });
+      return route.fulfill({ status: 200, contentType: 'application/json; charset=utf-8', body: JSON.stringify(scenarioProducts) });
+    }
+    if (url.pathname === '/api/orders' && req.method() === 'POST') {
+      attemptedOrderPosts++;
+      return route.fulfill({ status: 409, contentType: 'application/json; charset=utf-8', body: JSON.stringify({ error: 'Read-only price audit: order POST blocked.' }) });
+    }
+    if (!['GET', 'HEAD'].includes(req.method())) {
+      audit.writeRequestsBlocked.push({ theme, method: req.method(), url: req.url(), priceAuditFixture: true });
+      return route.abort();
+    }
+    return route.continue();
+  });
+
+  const page = await context.newPage();
+  page.setDefaultTimeout(10000);
+  page.on('console', (message) => {
+    if (message.type() === 'error') audit.consoleErrors.push({ theme, message: message.text(), url: message.location()?.url || '', priceAuditFixture: true });
+  });
+  page.on('pageerror', (error) => audit.pageErrors.push({ theme, message: error.message, priceAuditFixture: true }));
+  page.on('response', (response) => {
+    if (response.status() >= 400 && new URL(response.url()).origin === origin) {
+      audit.httpErrors.push({ theme, status: response.status(), url: response.url(), priceAuditFixture: true });
+    }
+  });
+  page.on('requestfailed', (request) => {
+    if (request.url().startsWith(origin) && !String(request.failure()?.errorText || '').includes('ERR_ABORTED')) {
+      audit.failedRequests.push({ theme, url: request.url(), failure: request.failure()?.errorText || 'unknown', priceAuditFixture: true });
+    }
+  });
+
+  let visited = false;
+  async function visit(nextScenario) {
+    scenario = nextScenario;
+    scenarioProducts = sourceProducts.map((product) => {
+      if (nextScenario === 'confirmed') return { ...product, price: 1234567, sourcePriceConfirmed: true };
+      if (nextScenario === 'unconfirmed') return { ...product, price: 1234567, sourcePriceConfirmed: false };
+      return { ...product, price: null, sourcePriceConfirmed: true };
+    });
+    if (visited) {
+      await page.evaluate(() => { try { localStorage.clear(); sessionStorage.clear(); } catch {} }).catch(() => {});
+    }
+    const response = await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    if (!response || !response.ok()) throw new Error('Price-audit preview page failed to load: ' + theme);
+    visited = true;
+    await page.locator('#catalogGrid .product-card').first().waitFor({ state: 'visible' });
+    await page.evaluate(() => window.__sdDismissWelcome?.());
+    await page.waitForFunction(() => !document.querySelector('#welcomeSplash'), null, { timeout: 2500 }).catch(() => {});
+    await page.waitForTimeout(80);
+    return page.evaluate(() => ({
+      catalogPriceCount: Array.from(document.querySelectorAll('#catalogGrid .product-price')).filter((node) => node.getClientRects().length && node.textContent.trim()).length,
+      featuredPriceCount: Array.from(document.querySelectorAll('#featuredGrid .product-price')).filter((node) => node.getClientRects().length && node.textContent.trim()).length,
+      expectedLabel: new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 }).format(1234567) + '₫',
+    }));
+  }
+
+  try {
+    const confirmedCatalog = await visit('confirmed');
+    await page.locator('#catalogGrid .product-open').first().click();
+    const confirmedDetail = await page.locator('#detailPrice').evaluate((node) => ({ visible: !node.hidden && node.getClientRects().length > 0, text: node.textContent.trim() }));
+    await page.locator('#detailClose').click();
+    await page.locator('#catalogGrid .quick-add').first().click();
+    await page.locator('#mobileCartNav').click();
+    await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'));
+    const confirmedCart = await page.evaluate(() => ({
+      subtotal: document.querySelector('#cartSubtotal')?.textContent.trim() || '',
+      rowPrice: document.querySelector('#cartList .cart-row-price')?.textContent.trim() || '',
+    }));
+    await page.locator('#cartCheckout').click();
+    await page.waitForFunction(() => document.querySelector('#checkoutDrawer')?.classList.contains('open'));
+    const confirmedCheckoutShowsAmount = await page.locator('#checkoutDrawer').innerText().then((value) => value.includes('1.234.567'));
+    const confirmedPass = confirmedCatalog.catalogPriceCount > 0
+      && confirmedCatalog.featuredPriceCount > 0
+      && confirmedDetail.visible && confirmedDetail.text === confirmedCatalog.expectedLabel
+      && confirmedCart.subtotal === confirmedCatalog.expectedLabel
+      && confirmedCart.rowPrice === confirmedCatalog.expectedLabel
+      && !confirmedCheckoutShowsAmount && attemptedOrderPosts === 0;
+    audit.interactions.push({ theme, check: 'confirmed-price-renders-catalog-featured-detail-cart', pass: confirmedPass, result: {
+      catalogPriceCount: confirmedCatalog.catalogPriceCount, featuredPriceCount: confirmedCatalog.featuredPriceCount,
+      detail: confirmedDetail, cart: confirmedCart, checkoutShowsAmount: confirmedCheckoutShowsAmount,
+      orderPosts: attemptedOrderPosts, fixtureOnly: true,
+    }});
+    if (!confirmedPass) hardFailures.push('Confirmed price rendering failed in catalogue/featured/detail/cart: ' + theme);
+
+    const hiddenScenarios = [
+      { key: 'unconfirmed', check: 'unconfirmed-price-stays-hidden-through-catalog-featured-detail-cart-checkout' },
+      { key: 'null-hidden', check: 'null-price-stays-hidden-through-catalog-featured-detail-cart-checkout' },
+    ];
+    for (const testCase of hiddenScenarios) {
+      const catalog = await visit(testCase.key);
+      await page.locator('#catalogGrid .product-open').first().click();
+      const detail = await page.locator('#detailPrice').evaluate((node) => ({ hidden: node.hidden, text: node.textContent.trim() }));
+      await page.locator('#detailClose').click();
+      await page.locator('#catalogGrid .quick-add').first().click();
+      await page.locator('#mobileCartNav').click();
+      await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'));
+      const cart = await page.evaluate(() => ({
+        subtotal: document.querySelector('#cartSubtotal')?.textContent.trim() || '',
+        rowPrice: document.querySelector('#cartList .cart-row-price')?.textContent.trim() || '',
+      }));
+      await page.locator('#cartCheckout').click();
+      await page.waitForFunction(() => document.querySelector('#checkoutDrawer')?.classList.contains('open'));
+      const checkoutShowsAmount = await page.locator('#checkoutDrawer').innerText().then((value) => value.includes('1.234.567'));
+      const pass = catalog.catalogPriceCount === 0 && catalog.featuredPriceCount === 0
+        && detail.hidden && detail.text === ''
+        && cart.subtotal === 'Chờ xác nhận giá' && cart.rowPrice === 'Giá sẽ được xác nhận'
+        && !checkoutShowsAmount && attemptedOrderPosts === 0;
+      audit.interactions.push({ theme, check: testCase.check, pass, result: {
+        catalogPriceCount: catalog.catalogPriceCount, featuredPriceCount: catalog.featuredPriceCount,
+        detail, cart, checkoutShowsAmount, orderPosts: attemptedOrderPosts, fixtureOnly: true,
+      }});
+      if (!pass) hardFailures.push('Unconfirmed/null price leaked or was counted in cart/checkout: ' + testCase.key + ' ' + theme);
+    }
+  } finally {
+    await context.close();
+  }
+}
+
 await ensureDir(outDir);
 const rawProducts = JSON.parse(await fs.readFile(path.join(root, 'data', 'legacy-products.json'), 'utf8'));
 const products = [];
@@ -300,9 +456,7 @@ try {
     audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
     if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
-    // Verify the real fixture never leaks unverified prices. Positive-path formatting and
-    // confirmed-price behavior are covered by the source-level behavior test; this browser
-    // check verifies actual rendered catalog/detail DOM for the current unverified fixture.
+    // Real 235-product fixture remains read-only; unknown source prices should stay absent.
     const priceVisibility = await page.evaluate(() => {
       const visiblePriceNodes = Array.from(document.querySelectorAll('#catalogGrid .product-price, #featuredGrid .product-price'))
         .filter(node => node.getClientRects().length && node.textContent.trim());
@@ -314,8 +468,12 @@ try {
       };
     });
     const priceVisibilityPass = priceVisibility.fixtureHasNoUnverifiedVisiblePrices && priceVisibility.detailPriceInitiallyHidden;
-    audit.interactions.push({ theme, check: 'unverified-fixture-prices-stay-hidden', pass: priceVisibilityPass, result: priceVisibility });
-    if (!priceVisibilityPass) hardFailures.push('Unverified fixture price became visible in storefront: ' + theme);
+    audit.interactions.push({ theme, check: 'unverified-real-fixture-prices-stay-hidden', pass: priceVisibilityPass, result: priceVisibility });
+    if (!priceVisibilityPass) hardFailures.push('Unverified real-fixture price became visible in storefront: ' + theme);
+
+    // Positive/negative rendering paths use a separate context with intercepted in-memory prices.
+    // It never captures images and never sends an order; POST attempts are explicitly blocked.
+    await auditPriceRenderingInMemory(browser, theme, products, baseUrl, origin, audit, hardFailures);
 
     for (const vp of viewports) {
       await page.setViewportSize({ width: vp.width, height: vp.height });

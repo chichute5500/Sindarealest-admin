@@ -286,8 +286,14 @@ export function isVerifiedCommercialSku(row) {
 }
 
 export function fromRow(row, { publicView = false, showPrices = false } = {}) {
-  const price = row.price === null || row.price === undefined ? null : Number(row.price);
+  const rawPrice = row.price;
+  const parsedPrice = rawPrice === null || rawPrice === undefined || rawPrice === "" ? null : Number(rawPrice);
+  const price = parsedPrice !== null && Number.isFinite(parsedPrice) ? parsedPrice : null;
   const skuVerified = isVerifiedCommercialSku(row);
+  const sourcePriceConfirmed = row.source_price_confirmed !== null && row.source_price_confirmed !== undefined
+    ? Number(row.source_price_confirmed) === 1
+    : row.sourcePriceConfirmed === true || Number(row.sourcePriceConfirmed) === 1;
+  const publicPriceIsValid = Number.isSafeInteger(price) && price >= 0;
   return {
     id: row.id,
     slug: row.slug,
@@ -297,15 +303,14 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     category: row.category,
     categoryLabel: row.category_label || row.category,
     description: row.description || "",
-    price: !publicView || showPrices ? price : null,
+    price: !publicView ? price : (showPrices && sourcePriceConfirmed && publicPriceIsValid ? price : null),
     stock: publicView || row.stock === null || row.stock === undefined ? null : Number(row.stock),
     published: Number(row.published) === 1,
     images: parseImages(row.images_json),
-    sourcePriceConfirmed: Number(row.source_price_confirmed) === 1,
+    sourcePriceConfirmed,
     sortOrder: Number(row.sort_order || 0),
     updatedAt: row.updated_at || null,
   };
-}
 
 export function slugify(input) {
   return String(input || "san-pham")
