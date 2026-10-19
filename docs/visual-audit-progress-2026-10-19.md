@@ -242,3 +242,15 @@ Production: không merge vào `main`, không deploy, không thay DNS/secrets/DB/
 - Phát hiện và xử lý thumbnail yêu thích chưa kịp tải lúc chụp: ảnh trong danh sách yêu thích chuyển sang `loading="eager"`; test mới chờ ảnh có `naturalWidth > 0`. Thumbnail thật đã load thành công trong cả Light và Dark.
 - Các luồng địa chỉ, prefill checkout, yêu thích, lịch sử đơn hàng và focus trap vẫn PASS. Checkout tiếp tục dùng fixture mock offline, không phải giao dịch/backend production.
 - Mức checklist vẫn **80%**. Chưa có căn cứ tăng lên 100% vì các blocker về pixel-diff đủ ảnh mẫu, tài sản/dữ liệu sản phẩm được xác nhận, Android vật lý và backend/thanh toán staging thật vẫn chưa giải quyết.
+
+
+## Cập nhật kiểm thử mới nhất — preview 138
+
+- Code SHA: `9fff67e67fe44d0ab1ecb28f132b6777f9a53a49`.
+- [Validate source and tests — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39199639948).
+- [Liquid Glass isolated visual preview — SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39199639981).
+- Artifact: `sindarealest-liquid-glass-preview-138.zip`, ID `12163407410`.
+- Preview 138: 52 ảnh chụp, 73 mục kiểm tra tương tác, 20 viewport ở 2 theme, 0 horizontal overflow, 0 page error, 0 console error, 0 same-origin HTTP error, 0 failed request; `passed=true`.
+- Đã kiểm tra nội dung artifact trực tiếp: các ảnh Light/Dark cho trang chủ, danh mục, chi tiết, giỏ, checkout, liên hệ/bảo hành, yêu thích, sổ địa chỉ và lịch sử yêu cầu đặt hàng đều được đóng gói. Dữ liệu sản phẩm là fixture chỉ đọc; 2 yêu cầu đơn hàng là fixture Playwright trong bộ nhớ, không gửi đến D1/backend.
+- Main vẫn giữ SHA `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; không merge và không deploy production.
+- Tiến độ checklist hiện tại vẫn **80%**. Preview PASS chứng minh các kiểm tra tự động đã khai báo chạy qua, không chứng minh mọi màn hình giống ảnh mẫu hoặc mọi nghiệp vụ production đã hoàn tất. Các blocker còn lại vẫn là đối chiếu pixel với đủ ảnh gốc, dữ liệu SKU/giá/tồn kho đã được xác nhận, trải nghiệm trên Android vật lý và kiểm thử backend/thanh toán staging.
