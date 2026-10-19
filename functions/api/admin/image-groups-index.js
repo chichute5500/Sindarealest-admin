@@ -1,9 +1,10 @@
 import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { encodeAIIdentityRationale, parseAIIdentityRationale, stripAIIdentityRationale, verifyIdentityGroup, normalizeIdentityDescriptor, isIdentityDescriptorValid } from "../../_lib/image-identity.js";
 
 const MAX_BODY = 2 * 1024 * 1024;
 const KEY_MAX = 1024;
-// The browser submits groups in batches of ten, with at most 30 members each.
-// Bound one transactional insert batch well below the statement count ceiling.
+// Groups contain at most eight images so AI can issue a verdict for every unordered pair.
+// Bound one transactional insert batch well below the D1 statement count ceiling.
 const MAX_PROPOSAL_BATCH_STATEMENTS = 900;
 const KEY_CONTROL = /[\u0000-\u001f\u007f]/;
 const validKey = value => typeof value === "string" && value.length > 0 && value.length <= KEY_MAX && !KEY_CONTROL.test(value);
@@ -16,20 +17,22 @@ function parseGroupableFeatures(row) {
   if (!features || typeof features !== "object" || Array.isArray(features)) return null;
   const category = String(features.category || "").toLowerCase();
   const confidence = features.categoryConfidence;
+  const identityDescriptor = normalizeIdentityDescriptor(features.identityDescriptor);
   const validVector = (value, length) => Array.isArray(value) && value.length === length &&
     value.every(number => typeof number === "number" && Number.isFinite(number) && number >= 0 && number <= 1);
   if (!GROUPABLE_CATEGORIES.has(category) ||
       features.categoryStatus !== "classified" ||
       !Number.isInteger(confidence) || confidence < 70 || confidence > 100 ||
+      !isIdentityDescriptorValid(identityDescriptor) ||
       !validVector(features.shape, 64) || !validVector(features.colors, 12) ||
       !/^[0-9a-f]{64}$/i.test(String(features.contentHash || "")) ||
       !/^[0-9a-f]{16}$/i.test(String(row?.p_hash || ""))) return null;
-  return { ...features, category };
+  return { ...features, identityDescriptor, category };
 }
 function compareIndexedRows(left, right) {
   const a = parseGroupableFeatures(left), b = parseGroupableFeatures(right);
   if (!a || !b || a.category !== b.category) return { match: false, score: 0, reason: "classification_gate" };
-  if (a.contentHash.toLowerCase() === b.contentHash.toLowerCase()) return { match: true, score: 100, exactDuplicate: true };
+  if (a.contentHash.toLowerCase() === b.contentHash.toLowerCase()) return { match: false, score: 100, exactDuplicate: true, reason: "exact_duplicate" };
   const hashA = String(left.p_hash).toLowerCase(), hashB = String(right.p_hash).toLowerCase();
   let distance = 0;
   for (let i = 0; i < 16; i++) {
@@ -50,7 +53,7 @@ function compareIndexedRows(left, right) {
   }
   const color = colorOverlap / 3;
   const score = Math.round(((1 - distance / 64) * 0.30 + shape * 0.35 + color * 0.35) * 100);
-  return { match: score >= 91 && shape >= 0.58 && color >= 0.58 && distance <= 24, score, shape, color, distance, exactDuplicate: false };
+  return { match: score >= 70 && shape >= 0.58 && color >= 0.58 && distance <= 24, score, shape, color, distance, exactDuplicate: false };
 }
 function validateClassifiedGroup(rows, keys) {
   if (!Array.isArray(rows) || rows.length !== keys.length || rows.length < 2) return { valid: false, reason: "missing_index" };
@@ -70,7 +73,7 @@ function validateCandidateGroup(rows, keys) {
   for (let i = 0; i < classified.ordered.length; i++) {
     for (let j = i + 1; j < classified.ordered.length; j++) {
       const result = compareIndexedRows(classified.ordered[i], classified.ordered[j]);
-      if (!result.match || result.score < 91) return { valid: false, reason: result.reason || "similarity_below_threshold" };
+      if (!result.match || result.score < 70) return { valid: false, reason: result.reason || "similarity_below_threshold" };
       minimumScore = Math.min(minimumScore, result.score);
       memberScores[i] = Math.min(memberScores[i], result.score);
       memberScores[j] = Math.min(memberScores[j], result.score);
@@ -195,9 +198,10 @@ export async function onRequestPost(context) {
         // The server, not the browser, decides whether this indexed image is
         // eligible for grouping. Missing/weak confidence or an explicit review
         // status must never be silently upgraded to "classified".
+        const identityDescriptor = normalizeIdentityDescriptor(item.features.identityDescriptor);
         const categoryStatus = GROUPABLE_CATEGORIES.has(category) &&
           item.features.categoryStatus === "classified" &&
-          categoryConfidence >= 70 ? "classified" : "needs_review";
+          categoryConfidence >= 70 && isIdentityDescriptorValid(identityDescriptor) ? "classified" : "needs_review";
         return env.DB.prepare(
           "INSERT INTO image_group_index(image_key,p_hash,features_json,width,height,source_size,source_uploaded,updated_at) VALUES(?,?,?,?,?,?,?,datetime('now')) ON CONFLICT(image_key) DO UPDATE SET p_hash=excluded.p_hash,features_json=excluded.features_json,width=excluded.width,height=excluded.height,source_size=excluded.source_size,source_uploaded=excluded.source_uploaded,updated_at=datetime('now')"
         ).bind(
@@ -205,6 +209,7 @@ export async function onRequestPost(context) {
             shape: item.features.shape.map(Number),
             colors: item.features.colors.map(Number),
             contentHash: String(item.features.contentHash).toLowerCase(),
+            identityDescriptor,
             category,
             categoryConfidence,
             categoryStatus
@@ -221,7 +226,8 @@ export async function onRequestPost(context) {
   if (action === "save-groups") {
     const groups = Array.isArray(body.groups) ? body.groups : [];
     if (!groups.length || groups.length > 25) return fail("Mỗi lượt lưu cần từ 1 đến 25 nhóm đề xuất.", 400);
-    let saved = 0, skipped = 0;
+    let saved = 0, skipped = 0, aiVerified = 0, aiNeedsReview = 0, aiUnverified = 0;
+    let aiDailyQuotaBlocked = false;
     const proposalStatements = [];
     try {
       // Normalize older pending proposals first: one image may belong to only
@@ -268,20 +274,39 @@ export async function onRequestPost(context) {
         }
       }
 
+      // Enforce existing product ownership on the server. Client filtering is not a security boundary.
+      const submittedKeys = new Set(groups.flatMap(group => Array.isArray(group?.imageKeys) ? group.imageKeys.filter(validKey) : []));
+      const ownershipByKey = new Map();
+      const productRows = await env.DB.prepare("SELECT id,sku,images_json FROM products").all();
+      for (const product of productRows.results || []) {
+        let refs = [];
+        try { refs = JSON.parse(product.images_json || "[]"); } catch {}
+        for (const reference of Array.isArray(refs) ? refs : []) {
+          for (const key of submittedKeys) {
+            if (!referenceMatches(reference, key)) continue;
+            if (!ownershipByKey.has(key)) ownershipByKey.set(key, new Map());
+            ownershipByKey.get(key).set(String(product.id), String(product.sku || product.id));
+          }
+        }
+      }
+
       for (const group of groups) {
         const rawKeys = Array.isArray(group?.imageKeys) ? group.imageKeys : [];
-        if (rawKeys.length < 2 || rawKeys.length > 50 || rawKeys.some(key => !validKey(key)) ||
+        if (rawKeys.length < 2 || rawKeys.length > 8 || rawKeys.some(key => !validKey(key)) ||
             new Set(rawKeys).size !== rawKeys.length) {
-          return fail("Một nhóm có danh sách ảnh không hợp lệ (2–50 ảnh khác nhau).", 400);
+          return fail("Mỗi nhóm AI cần từ 2 đến 8 ảnh khác nhau để đối chiếu đủ mọi cặp.", 400);
         }
         const similarity = Number(group?.similarity);
-        if (!Number.isInteger(similarity) || similarity < 91 || similarity > 100) {
-          return fail("Chỉ chấp nhận đề xuất ghép ảnh đạt ngưỡng tối thiểu 91/100.", 400);
+        if (!Number.isInteger(similarity) || similarity < 70 || similarity > 100) {
+          return fail("Nhóm chỉ được đưa vào bước xác minh AI khi điểm lọc thị giác đạt ít nhất 70/100.", 400);
         }
         // Keep only images not already claimed by another pending group or an
         // earlier group in this same request. A duplicate can never enter two sets.
         const uniqueKeys = rawKeys.filter(key => !claimed.has(key));
         if (uniqueKeys.length < 2) { skipped++; continue; }
+        const groupOwners = new Set(uniqueKeys.flatMap(key => [...(ownershipByKey.get(key)?.keys() || [])]));
+        if (groupOwners.size > 1) { skipped++; continue; }
+        if (groupOwners.size === 1 && uniqueKeys.every(key => ownershipByKey.has(key))) { skipped++; continue; }
         const placeholders = uniqueKeys.map(() => "?").join(",");
         const indexed = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + placeholders + ")").bind(...uniqueKeys).all();
         const indexedRows = indexed.results || [];
@@ -309,11 +334,18 @@ export async function onRequestPost(context) {
           skipped++;
           continue;
         }
+        const aiResult = aiDailyQuotaBlocked
+          ? { status: "unverified", confidence: null, reason: "Workers AI đã hết hạn mức neuron trong lượt quét này. Nhóm được giữ để xem xét thủ công; hãy kiểm tra lại khi quota được cấp lại.", httpStatus: 429 }
+          : await verifyIdentityGroup(env, indexedRows, uniqueKeys);
+        if (aiResult.httpStatus === 429) aiDailyQuotaBlocked = true;
+        if (aiResult.status === "verified" && Number(aiResult.confidence) >= 91) aiVerified++;
+        else if (aiResult.status === "review_required") aiNeedsReview++;
+        else aiUnverified++;
         const id = crypto.randomUUID();
         const verifiedMemberScores = new Map(uniqueKeys.map((key, index) => [key, verification.memberScores[index]]));
         const statements = [
           env.DB.prepare("INSERT INTO image_group_sets(id,fingerprint,similarity,rationale,status,created_at) VALUES(?,?,?,?,'pending',datetime('now'))")
-            .bind(id, groupFingerprint, verifiedSimilarity, String(group.rationale || "").slice(0, 700))
+            .bind(id, groupFingerprint, verifiedSimilarity, encodeAIIdentityRationale(aiResult, String(group.rationale || "")))
         ];
         for (const key of uniqueKeys) {
           const memberScore = verifiedMemberScores.get(key);
@@ -341,11 +373,35 @@ export async function onRequestPost(context) {
           throw new Error("D1 proposal transaction did not confirm every inserted row");
         }
       }
-      return json({ ok: true, saved, skipped, message: "Đã lưu " + saved + " nhóm tương đồng vào hàng chờ duyệt; không ảnh nào được công khai." }, 201);
+      return json({ ok: true, saved, skipped, aiVerified, aiNeedsReview, aiUnverified, message: "Đã lưu " + saved + " nhóm chờ duyệt. AI xác nhận: " + aiVerified + "; cần xem thủ công: " + aiNeedsReview + "; chưa xác minh do lỗi/quota/định dạng: " + aiUnverified + ". Chưa ảnh nào được công khai." }, 201);
     } catch (error) {
       const detail = safeError(error);
       if (/unique|constraint/i.test(detail)) return fail("Ảnh vừa được giữ bởi một nhóm khác trong lượt quét đồng thời. Hãy tải lại kho và quét lại.", 409);
       return fail("Không thể lưu nhóm ảnh đề xuất: " + detail, 503);
+    }
+  }
+
+  if (action === "recheck-group") {
+    const id = String(body.groupId || "");
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return fail("Mã nhóm không hợp lệ.", 400);
+    try {
+      const group = await env.DB.prepare("SELECT * FROM image_group_sets WHERE id=? AND status='pending'").bind(id).first();
+      if (!group) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
+      const memberRows = await env.DB.prepare("SELECT image_key,similarity FROM image_group_set_members WHERE group_id=? ORDER BY similarity DESC,image_key ASC").bind(id).all();
+      const keys = (memberRows.results || []).map(row => String(row.image_key || ""));
+      if (keys.length < 2 || keys.length > 8 || new Set(keys).size !== keys.length) return fail("Nhóm cần từ 2 đến 8 ảnh hợp lệ để xác minh AI.", 409);
+      const indexed = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
+      const candidate = validateCandidateGroup(indexed.results || [], keys);
+      if (!candidate.valid) return fail("Không thể xác minh nhóm vì danh mục, mô tả nhận diện hoặc điểm lọc thị giác không còn hợp lệ.", 409);
+      const aiResult = await verifyIdentityGroup(env, indexed.results || [], keys);
+      if (aiResult.httpStatus !== 200) return fail(aiResult.reason, aiResult.httpStatus);
+      const rationale = encodeAIIdentityRationale(aiResult, stripAIIdentityRationale(group.rationale));
+      const updated = await env.DB.prepare("UPDATE image_group_sets SET rationale=? WHERE id=? AND status='pending' AND fingerprint=?")
+        .bind(rationale, id, String(group.fingerprint || "")).run();
+      if (!Number(updated.meta?.changes || 0)) return fail("Nhóm đã thay đổi đồng thời. Hãy tải lại và xác minh lại.", 409);
+      return json({ ok: true, status: aiResult.status, confidence: aiResult.confidence, reason: aiResult.reason, message: aiResult.status === "verified" ? "AI đã xác minh nhóm với mọi cặp đạt ngưỡng 91/100." : "AI chưa thể xác nhận cùng sản phẩm; nhóm vẫn chờ bạn xem xét thủ công." });
+    } catch (error) {
+      return fail("Không thể xác minh lại nhóm ảnh: " + safeError(error), 503);
     }
   }
 
@@ -438,7 +494,7 @@ export async function onRequestPost(context) {
           return fail("Một trong hai bộ ảnh sau khi tách đã tồn tại trong lịch sử nhóm. Không thay đổi dữ liệu.", 409);
         }
         const newId = crypto.randomUUID();
-        const rationaleSource = String(group.rationale || "").slice(0, 400);
+        const rationaleSource = stripAIIdentityRationale(group.rationale).slice(0, 400);
         const remainingRationale = (rationaleSource + " Đã tách thủ công; nhóm còn lại giữ trạng thái chờ duyệt.").slice(0, 700);
         const chosenRationale = ("Được tách thủ công từ nhóm " + groupId + ". Danh mục: " + category + ". Chờ người quản trị duyệt.").slice(0, 700);
         const statements = [
@@ -545,9 +601,9 @@ export async function onRequestPost(context) {
           env.DB.prepare("UPDATE image_group_image_claims SET group_id=? WHERE image_key=? AND group_id=? AND status='pending' AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?) AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
             .bind(targetId, imageKey, sourceId, sourceId, sourceOld, targetId, targetOld),
           env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
-            .bind(sourceFingerprint, average(sourceMembers), (String(source.rationale || "") + " Đã chuyển một ảnh sang nhóm " + targetId + ".").slice(0,700), sourceId, sourceOld, targetId, targetOld),
+            .bind(sourceFingerprint, average(sourceMembers), (stripAIIdentityRationale(source.rationale) + " Đã chuyển một ảnh sang nhóm " + targetId + ".").slice(0,700), sourceId, sourceOld, targetId, targetOld),
           env.DB.prepare("UPDATE image_group_sets SET fingerprint=?,similarity=?,rationale=? WHERE id=? AND status='pending' AND fingerprint=? AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
-            .bind(targetFingerprint, average(targetMembers), (String(target.rationale || "") + " Đã nhận ảnh chuyển từ nhóm " + sourceId + ".").slice(0,700), targetId, targetOld, sourceId, sourceFingerprint),
+            .bind(targetFingerprint, average(targetMembers), (stripAIIdentityRationale(target.rationale) + " Đã nhận ảnh chuyển từ nhóm " + sourceId + ".").slice(0,700), targetId, targetOld, sourceId, sourceFingerprint),
           env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_move', 'image_group_set', ?, ? WHERE EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?) AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='pending' AND fingerprint=?)")
             .bind(crypto.randomUUID(), sourceId, JSON.stringify({ sourceGroupId: sourceId, targetGroupId: targetId, imageKey, category }), sourceId, sourceFingerprint, targetId, targetFingerprint)
         ];
@@ -568,10 +624,14 @@ export async function onRequestPost(context) {
       if (!group) return fail("Nhóm không tồn tại hoặc đã được xử lý.", 409);
       const memberRows = await env.DB.prepare("SELECT image_key,similarity FROM image_group_set_members WHERE group_id=? ORDER BY similarity DESC,image_key ASC").bind(id).all();
       const keys = (memberRows.results || []).map(row => String(row.image_key || ""));
-      if (keys.length < 2 || keys.length > 50 || new Set(keys).size !== keys.length) return fail("Nhóm không có số lượng ảnh hợp lệ hoặc chứa mã ảnh trùng.", 409);
-      if (!Number.isInteger(Number(group.similarity)) || Number(group.similarity) < 91 || Number(group.similarity) > 100) {
-        return fail("Chỉ được duyệt nhóm đã qua kiểm tra ghép ảnh tối thiểu 91/100.", 409);
+      if (keys.length < 2 || keys.length > 8 || new Set(keys).size !== keys.length) return fail("Nhóm không có số lượng ảnh hợp lệ hoặc chứa mã ảnh trùng.", 409);
+      if (!Number.isInteger(Number(group.similarity)) || Number(group.similarity) < 70 || Number(group.similarity) > 100) {
+        return fail("Nhóm phải đạt điểm lọc thị giác tối thiểu 70/100 trước khi xác minh danh tính.", 409);
       }
+      const identityMeta = parseAIIdentityRationale(group.rationale);
+      const aiVerified = identityMeta?.status === "verified" && Number(identityMeta.confidence) >= 91;
+      const manualOverride = !aiVerified && body.manualOverride === true;
+      if (!aiVerified && !manualOverride) return fail("AI chưa xác nhận mọi cặp cùng một mẫu ở ngưỡng 91/100. Chỉ tiếp tục sau khi người quản trị xem ảnh và gửi xác nhận duyệt thủ công.", 409);
       const indexed = await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN (" + keys.map(() => "?").join(",") + ")").bind(...keys).all();
       const classified = validateClassifiedGroup(indexed.results || [], keys);
       if (!classified.valid) return fail("Nhóm không còn đủ điều kiện an toàn để duyệt: phân loại, đặc trưng hoặc danh mục chưa được xác minh.", 409);
@@ -593,7 +653,7 @@ export async function onRequestPost(context) {
       });
       if (!manuallyAdjusted) {
         const verification = validateCandidateGroup(indexed.results || [], keys);
-        if (!verification.valid) return fail("Nhóm AI không còn đạt ngưỡng ghép ảnh 91/100 khi kiểm tra lại. Hãy xem xét thủ công hoặc loại đề xuất.", 409);
+        if (!verification.valid) return fail("Nhóm không còn đạt điểm lọc thị giác tối thiểu 70/100 hoặc thiếu đặc trưng nhận diện hợp lệ. Hãy quét lại.", 409);
       }
       const [objects, product] = await Promise.all([
         Promise.all(keys.map(key => env.IMAGES.head ? env.IMAGES.head(key) : env.IMAGES.get(key))),
@@ -669,7 +729,7 @@ export async function onRequestPost(context) {
         env.DB.prepare("UPDATE image_group_sets SET status='approved',product_id=?,reviewed_at=datetime('now') WHERE id=? AND status='pending' AND fingerprint=? AND changes()=1")
           .bind(productId, id, oldFingerprint),
         env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_similarity_group_approved', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
-          .bind(crypto.randomUUID(), productId, JSON.stringify({ groupId: id, keys, sku: product.sku, similarity: Number(group.similarity) || 0, previousImagesJson, nextImagesJson }), id, productId),
+          .bind(crypto.randomUUID(), productId, JSON.stringify({ groupId: id, keys, sku: product.sku, similarity: Number(group.similarity) || 0, aiIdentityStatus: identityMeta?.status || "unverified", aiIdentityConfidence: identityMeta?.confidence ?? null, manualOverride: Boolean(manualOverride), previousImagesJson, nextImagesJson }), id, productId),
         env.DB.prepare("UPDATE image_group_image_claims SET status='approved' WHERE group_id=? AND status='pending' AND image_key IN (" + keys.map(() => "?").join(",") + ") AND EXISTS (SELECT 1 FROM image_group_sets WHERE id=? AND status='approved' AND product_id=?)")
           .bind(id, ...keys, id, productId),
         ...cleanup

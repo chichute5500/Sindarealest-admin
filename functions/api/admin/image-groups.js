@@ -1,4 +1,5 @@
 import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { normalizeIdentityDescriptor, isIdentityDescriptorValid } from "../../_lib/image-identity.js";
 const MODEL="@cf/meta/llama-3.2-11b-vision-instruct";
 function isWorkersAIDailyAllocationExhausted(value){
   return /\b4006\b|daily free allocation|used up.{0,60}allocation.{0,40}neurons?|allocation of [\d,]+ neurons?/i.test(String(value||""));
@@ -132,7 +133,9 @@ export function parseCategoryResult(result, allowed = new Set(["sneaker","loafer
     const categoryRaw = value.category ?? value.product_category ?? value.productCategory ?? value.product_type ?? value.label ?? value.type;
     const category = normalize(categoryRaw);
     const confidence = confidenceValue(value.confidence ?? value.score ?? value.confidence_score ?? value.confidenceScore ?? value.confidence_percent ?? value.probability);
-    return category && confidence !== null ? { category, confidence } : null;
+    const identityRaw = value.identity_descriptor ?? value.identityDescriptor ?? value.visual_descriptor ?? value.visualDescriptor ?? value.product_identity_descriptor ?? value.identity;
+    const identityDescriptor = normalizeIdentityDescriptor(identityRaw);
+    return category && confidence !== null ? { category, confidence, ...(isIdentityDescriptorValid(identityDescriptor) ? { identityDescriptor } : {}) } : null;
   };
   const parseText = raw => {
     const text = raw.trim().replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}$/i, "").trim();
@@ -243,7 +246,7 @@ const objects=await Promise.all(keys.map(k=>env.IMAGES.head?env.IMAGES.head(k):e
 if(objects.some(x=>!x))return fail("Ảnh đã biến mất khỏi R2; hãy quét lại kho.",409);
 const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",700,3600);
 if(limit.limited)return fail("Đã đạt giới hạn phân loại ảnh trong một giờ. Hãy đợi rồi quét tiếp; kết quả chưa rõ sẽ không được gom.",429,{"Retry-After":"3600"});
-const prompt="Phân loại vật thể chính trong ảnh thành ĐÚNG MỘT category trong danh sách: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Không được trả category chung chung như shoe, shoes hoặc footwear. Nếu là giày, bắt buộc chọn sneaker (giày thể thao), loafer (giày lười), dress_shoe (giày tây/giày công sở), boot (bốt) hoặc sandal; chỉ chọn unknown nếu ảnh không đủ rõ để phân biệt. watch_strap là dây đồng hồ riêng lẻ; watch là đồng hồ nguyên chiếc. Không suy đoán chỉ từ nền ảnh. Trả đúng JSON object gồm category và confidence; confidence là số nguyên 0-100. Không gọi tool, không markdown, không giải thích.";
+const prompt="Phân loại vật thể chính trong ảnh thành ĐÚNG MỘT category trong danh sách: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Không được trả category chung chung như shoe, shoes hoặc footwear. Nếu là giày, bắt buộc chọn sneaker (giày thể thao), loafer (giày lười), dress_shoe (giày tây/giày công sở), boot (bốt) hoặc sandal; chỉ chọn unknown nếu ảnh không đủ rõ để phân biệt. watch_strap là dây đồng hồ riêng lẻ; watch là đồng hồ nguyên chiếc. Ngoài category và confidence, trả identity_descriptor bằng tiếng Việt gồm ít nhất 5 trường ngăn bằng dấu chấm phẩy, chỉ ghi dấu hiệu nhìn thấy về chất liệu/vân cụ thể, mũi/đế, đường may, logo/vị trí, khóa/phụ kiện, dấu hiệu riêng và phần chưa nhìn rõ. Không dùng nền, màu chung hoặc loại giày làm bằng chứng duy nhất về danh tính mẫu; không bịa điều không thấy. Trả JSON duy nhất với category, confidence (0-100), identity_descriptor. Không markdown hoặc giải thích.";
 const allowed=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
 const items=[];
 for(let i=0;i<keys.length;i++){
@@ -256,12 +259,12 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
     // strictly with parseCategoryResult before storing any classification.
     result=await env.AI.run(MODEL,{
       messages:[
-        {role:"system",content:"You are a strict product image classification engine. Follow the user's category list exactly. Return one JSON object only, with category and integer confidence from 0 to 100. Never add markdown or explanation."},
+        {role:"system",content:"You are a strict product image classification engine. Return exactly one JSON object with category, integer confidence 0-100 and identity_descriptor: at least five semicolon-separated visible product-defining traits. Do not hallucinate unseen details; record uncertainty explicitly. Never return markdown or prose."},
         {role:"user",content:prompt+(attempt===1?"\nReturn only the JSON object. No explanation, no markdown, no extra keys.":"")}
       ],
       image:supplied[i].dataUrl,
       temperature:0,
-      max_tokens:180
+      max_tokens:300
     });
   }catch(error){
     const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
@@ -282,10 +285,12 @@ for(let attempt=0;attempt<2&&!classification;attempt++){
   classification=parseCategoryResult(result,allowed);
 }
 if(!classification){const source=result&&typeof result==="object"?result:{};const describe=(key,value)=>key+(Array.isArray(value)?"["+value.length+"]":value&&typeof value==="object"?"{"+Object.keys(value).slice(0,6).join(",")+"}":"("+typeof value+")");const shape=Object.entries(source).slice(0,8).map(([key,value])=>describe(key,value)).join(",")||typeof result;let sample="";try{sample=JSON.stringify({response:source.response,tool_calls:source.tool_calls,choices:Array.isArray(source.choices)?source.choices.slice(0,1):undefined,output_text:source.output_text})||""}catch{}sample=sample.replace(/[\\r\\n]+/g," ").slice(0,220);return fail("Workers AI trả phản hồi không hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" (dạng: "+shape+(sample?"; mẫu JSON: "+sample:"")+"). Không lưu lô này; hãy thử lại.",502)}
-const candidate=classification.category,confidence=classification.confidence,valid=candidate!=="unknown"&&confidence>=70;
-items.push({key:keys[i],category:valid?candidate:"unknown",confidence:Math.round(confidence),status:valid?"classified":"needs_review"});
+const candidate=classification.category,confidence=classification.confidence,categoryValid=candidate!=="unknown"&&confidence>=70;
+const identityDescriptor=normalizeIdentityDescriptor(classification.identityDescriptor);
+const confirmed=categoryValid&&isIdentityDescriptorValid(identityDescriptor);
+items.push({key:keys[i],category:categoryValid?candidate:"unknown",confidence:Math.round(confidence),identityDescriptor,status:confirmed?"classified":"needs_review"});
 }
-return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.category!=="unknown").length+"/"+items.length+" ảnh. Ảnh chưa đủ chắc chắn được giữ ở trạng thái chưa xác định."});
+return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.status==="classified").length+"/"+items.length+" ảnh với mô tả nhận diện hợp lệ. Ảnh thiếu đặc trưng hoặc chưa chắc chắn được giữ để xem xét thủ công."});
 }catch(error){return fail("Không thể phân loại ảnh. "+String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180),502)}
 }
 if(action==="compare"){
