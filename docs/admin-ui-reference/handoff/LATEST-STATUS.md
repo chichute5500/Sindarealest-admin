@@ -86,3 +86,14 @@
 - `ea9bcd1a542dab2891916c14015a7fae21143a56` — pass CSS ice-blue/liquid-glass cho ADMIN.
 
 **Cloudflare production deployment: NOT PERFORMED**
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: a4edc1f6fc6006e68105247df6a3dce3fba4f978
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39325621140
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/.
+- Deployed Preview: BLOCKED_CLOUDFLARE_ACCESS.
+- The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
+- Production deployment: NOT PERFORMED.

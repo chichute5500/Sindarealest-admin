@@ -1,11 +1,11 @@
 {
-  "status": "IN_PROGRESS_VISUAL_VERIFICATION_PENDING",
+  "status": "IN_PROGRESS_BLOCKED_PREVIEW_ACCESS",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "d0f5b52d9bef9b903ed58ecc2d4bb2b9a5fb46f6",
-  "testedCommitSha": null,
-  "capturedAt": null,
+  "latestCodeCommitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+  "testedCommitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+  "capturedAt": "2026-10-19T21:14:15.351Z",
   "progressEstimatePercent": 30,
   "progressBasis": "Weighted project phases: source/handoff audit partial; ADMIN-only liquid-glass styling and responsive baseline harness committed; real browser execution and visual comparison remain unverified.",
   "note": "Static source inspections through GitHub verified expected theme tokens, login markup, API strings, and test wiring. The baseline test now targets eight viewports in light/dark (16 PNGs) and stubs only the unauthenticated session endpoint. The workflow screenshot path mismatch has been corrected. None of these changes counts as passing npm or Playwright until a real Actions run and artifacts are inspected.",
@@ -73,29 +73,191 @@
       "note": "The deployed URL/actual response was not exposed in the sanitized workflow log. HTML source on the ADMIN branch contains these IDs. New safe diagnostic test is committed but not yet run."
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__1280x800__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__1280x800__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__1440x900__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__1440x900__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__320x640__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__320x640__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__360x800__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__360x800__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__375x812__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__375x812__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__390x844__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__390x844__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__412x915__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__412x915__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__768x1024__dark.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/history/a4edc1f6fc60/screenshots/admin-login__768x1024__light.png",
+      "route": "/admin/",
+      "viewport": null,
+      "theme": null,
+      "commitSha": "a4edc1f6fc6006e68105247df6a3dce3fba4f978",
+      "capturedAt": "2026-10-19T21:14:15.351Z",
+      "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
+      "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
+    }
+  ],
   "checks": {
-    "baselineGitState": "BLOCKED_NO_LOCAL_CHECKOUT",
+    "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "branchIsolationDiffReview": "PARTIAL",
-    "applicationStartup": "NOT_TESTED",
-    "playwrightPreviewDiagnostics": "NOT_TESTED",
-    "localStaticPlaywrightBaseline": "NOT_TESTED_AFTER_MATRIX_UPDATE",
+    "applicationStartup": "PASS",
+    "playwrightPreviewDiagnostics": "BLOCKED_CLOUDFLARE_ACCESS",
+    "localStaticPlaywrightBaseline": "PASS",
     "visualComparisonAgainstApprovedPng": "BLOCKED_REFERENCE_IMAGE_NOT_READABLE",
-    "consoleErrors": "NOT_TESTED_AFTER_MATRIX_UPDATE",
-    "networkErrors": "NOT_TESTED_AFTER_MATRIX_UPDATE",
-    "responsiveViewports": "NOT_TESTED_AFTER_MATRIX_UPDATE",
-    "lightMode": "NOT_TESTED_AFTER_MATRIX_UPDATE",
-    "darkMode": "NOT_TESTED_AFTER_MATRIX_UPDATE",
+    "consoleErrors": "ERRORS_RECORDED_OR_NOT_RUN",
+    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
+    "responsiveViewports": "PASS_LOGIN_SCREEN_MATRIX",
+    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "accessibilityAndVietnameseTypography": "NOT_TESTED_AFTER_CHANGE",
     "lint": "NOT_TESTED_AFTER_CHANGE",
     "typecheck": "NOT_TESTED_AFTER_CHANGE",
-    "automatedTests": "NOT_TESTED_AFTER_LATEST_CODE",
-    "build": "NOT_TESTED",
+    "automatedTests": "PASS",
+    "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "businessFlows": "NOT_TESTED",
     "sharedBackendRegression": "NOT_TESTED",
     "productionDeployment": "NOT_PERFORMED",
     "staticSourceContract": "PASS_GITHUB_SOURCE_INSPECTION_ONLY",
-    "fullGitWorkingTree": "NOT_AVAILABLE_IN_THIS_ENVIRONMENT"
+    "fullGitWorkingTree": "NOT_AVAILABLE_IN_THIS_ENVIRONMENT",
+    "playwright": "PASS_LOCAL_MATRIX_BLOCKED_PREVIEW_ACCESS"
   },
   "remainingIssues": [
     "Preview Playwright root cause is unresolved; need real page diagnostics from GitHub Actions.",
@@ -103,17 +265,21 @@
     "Full git status and branch diff have not been inspected in a local checkout.",
     "No Playwright artifact has been verified for the latest code commit.",
     "Approved reference PNG still has not been visually inspected; current CSS refinement is source-based and requires visual comparison.",
-    "No verified GitHub Actions run/artifact exists yet for the latest code and the expanded 16-screenshot matrix."
+    "No verified GitHub Actions run/artifact exists yet for the latest code and the expanded 16-screenshot matrix.",
+    "Deployed Preview is intercepted by Cloudflare Access; authenticated ADMIN UI could not be reached by the read-only smoke test.",
+    "Local baseline metadata records browser or network errors; inspect history evidence before accepting the UI."
   ],
   "blockedItems": [
-    "The available workflow-run connector only exposes pull-request-triggered runs; it does not confirm push-triggered Actions execution. Use GitHub Actions UI or the generated run URL/artifacts for confirmation."
+    "The available workflow-run connector only exposes pull-request-triggered runs; it does not confirm push-triggered Actions execution. Use GitHub Actions UI or the generated run URL/artifacts for confirmation.",
+    "Cloudflare Access authentication gate prevents the remote Playwright job from reaching the ADMIN login/dashboard. The remote test has not entered credentials or bypassed Access."
   ],
   "nextActions": [
-    "Inspect GitHub Actions run for the current ADMIN branch commit and verify npm run check and npm test outcomes.",
-    "Inspect the real artifact: confirm 16 PNGs, metadata.json, page errors, console errors, failed requests, and HTTP errors.",
-    "Read the approved admin-mobile-reference.png and compare it visually with real baseline images; do not approve the UI based only on CSS tokens.",
-    "Fix proven UI or test failures on the ADMIN branch only, then repeat checks and screenshots.",
-    "Keep the protected public website branch and main untouched; no merge or Production deployment."
+    "Review the latest real screenshots and metadata under the recorded history path.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
-  "productionDeployment": "NOT_PERFORMED"
+  "productionDeployment": "NOT_PERFORMED",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39325621140"
 }
