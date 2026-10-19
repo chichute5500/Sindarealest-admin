@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix/liquid-glass-redesign
+      - fix/liquid-glass-audit-2026-10-19
   workflow_dispatch:
 
 permissions:
@@ -15,7 +16,7 @@ concurrency:
 
 jobs:
   visual-preview:
-    if: github.ref == 'refs/heads/fix/liquid-glass-redesign'
+    if: github.ref == 'refs/heads/fix/liquid-glass-redesign' || github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
