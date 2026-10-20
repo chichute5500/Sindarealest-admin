@@ -3,8 +3,8 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "2d528e1a3701c3e5309a28d1628e9b82333c33e7",
-  "testedCommitSha": null,
+  "latestCodeCommitSha": "6df3658c8971bf8f06be71dd2ee36d9dba5e29ad",
+  "testedCommitSha": "6df3658c8971bf8f06be71dd2ee36d9dba5e29ad",
   "capturedAt": "2026-10-20T18:22:44.240Z",
   "progressEstimatePercent": 43,
   "progressBasis": "43% estimated by work stages; local checks and 16 login-shell screenshots pass, but remote Preview source signature mismatch and authenticated module QA/full visual comparison remain incomplete.",
@@ -265,7 +265,10 @@
     "sourceRouteInventory": "PASS_STATIC_GITHUB_SOURCE_INSPECTION",
     "apiEndpointExistence": "PASS_STATIC_FILE_EXISTENCE_CHECK_ONLY",
     "authenticatedFlows": "NOT_VERIFIED",
-    "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND"
+    "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
+    "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
+    "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
+    "currentBranchHeadTests": "NOT_RUN_ON_EVIDENCE_ONLY_HEAD"
   },
   "remainingIssues": [
     "Configured ADMIN_TEST_URL serves a UI signature that differs from the tested ADMIN source; exact secret value remains masked. Repository owner must correct the secret to the intended Admin Preview URL.",
@@ -275,10 +278,10 @@
     "Complete local git status and full branch diff review remain unavailable; GitHub API file review is partial.",
     "PR #111 is open against main and contains 260 changed files including storefront/backend. Do not merge until isolated scope is fully audited.",
     "Visual inspection found login copy/brand lockup differs from reference: current tagline says 'Đăng nhập quản trị' and heading says 'Đăng nhập'; reference uses brand tagline 'Luxury in Every Detail' and heading 'Đăng nhập quản trị'. Update carefully without changing password-only auth.",
-    "Current branch HEAD e7a1510a8936f20fabed7fb9da71d044fdd7613f has not been retested; last passing source test commit is f75cb4d38980af17781c1428133d6e27417865b2.",
     "PR #111 has broad storefront/backend scope and remains OPEN/unmerged; full diff audit is blocked without local checkout.",
     "Reference PNG was not directly decoded in this session; use the existing HTML viewer but verify original image before visual parity claims.",
-    "Authenticated modules and real business-data workflows remain NOT TESTED."
+    "Authenticated modules and real business-data workflows remain NOT TESTED.",
+    "Evidence workflow commit 3f4af3f9c3cbedd5a43e408797d52cf4e1474f48 only adds test evidence/handoff artifacts; source tests ran on 6df3658c8971bf8f06be71dd2ee36d9dba5e29ad. Do not treat the evidence-only HEAD as a new application-source test."
   ],
   "blockedItems": [
     "Remote authenticated Playwright testing is blocked by ADMIN_TEST_URL pointing to a source/layout that does not match the tested Admin source; update secret to a valid Admin Preview URL and provide valid access if Cloudflare Access protects it.",
@@ -293,7 +296,7 @@
     "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39474007679",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39473301554",
   "branchHeadSha": "e7a1510a8936f20fabed7fb9da71d044fdd7613f",
   "latestVerifiedAt": "2026-10-20T15:20:00Z",
   "latestVerifiedSourceCommit": "7c742407530dbcf2f9407d6a82c48c70620b98a7",
@@ -456,5 +459,6 @@
     "Reference product/order/customer lists are image/card-based; current source uses tables. Orders table min-width 820px and customers table min-width 720px; verify mobile usability before changes.",
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
-  ]
+  ],
+  "updatedAt": "2026-10-21"
 }
