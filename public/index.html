@@ -1703,6 +1703,14 @@ html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.9
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72))}
 .welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261020-2');filter:none}
 .welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261020-2');filter:none}
+
+/* Portrait screens use a dedicated tall composition so the curved satin ribbons remain visible instead of cropping into diagonal bands. */
+@media(max-width:760px){
+ .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261020-3')}
+ .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261020-3')}
+ .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261020-3')}
+ .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261020-3')}
+}
 </style>
 </body>
 </html>
