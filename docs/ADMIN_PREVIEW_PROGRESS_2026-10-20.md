@@ -101,3 +101,28 @@
 - Không lưu ảnh vào kho archive chuẩn vì workflow này là push/diagnostic và không phải lần capture thủ công có xác nhận stage. Artifact đã có đủ báo cáo/ảnh để review; các bước archive start/end và pixel comparison vẫn CHƯA THỰC HIỆN, không được đánh dấu hoàn tất.
 - PR #108 vẫn mở để chủ dự án review.
 - **Kết luận:** Live Preview visual audit + deployment verification đã PASS ở SHA `963adaf...`; tuy nhiên toàn bộ quy trình archive start/end + pixel comparison chưa được chạy, nên tổng thể công việc không được tuyên bố 100% hoàn tất.
+
+## Final rerun after transient-overlay hardening — 2026-10-20 19:16 UTC+7
+
+### Kết quả xác minh tại SHA 'd222cc5735a3451b692d15d14d24adc792b976bb'
+- PR #108 và branch head cùng SHA; PR vẫn OPEN, chưa merge.
+- Validate source/tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39419835027
+- Admin Preview Playwright PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39419834832
+- Liquid Glass isolated visual preview PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39419834770
+- Artifact 'sindarealest-liquid-glass-preview-358', ID '12262598622', upload thành công, chưa hết hạn; gồm 66 PNG Live Preview và HTML/JSON report, cùng 54 ảnh local fixture trong cùng artifact.
+- Live report passed=true, captureCompleted=true, accessBlocked=false; sourceCommit=d222cc5735a3451b692d15d14d24adc792b976bb.
+- Coverage: 66 ảnh thật; 8/8 viewport/theme; 4 full-page; 7 section × 4 ảnh; menu 2; order expanded 4; 12 route checks; 4/4 product-detail contexts PASS (click card, direct-open, reload HTTP 200).
+- Console/page/HTTP errors=0; failed requests=0; broken images=0; overflow=0; read-only violations=0; hard failures=0. 32 external requests were blocked by the audit allowlist, not recorded as failed requests or HTTP errors.
+- Local fixture report PASS: 54 screenshots, 235 products, 20 responsive cases, 93 interaction checks; overflow/console/page/HTTP/hard failures=0.
+- Cloudflare Pages API verification PASS: alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/; Preview environment; branch đúng; deployment ID 'f954e594-cfb2-4fa3-8c6e-0254a3d192f9'; expectedCommitSha=commitHash=d222cc5735a3451b692d15d14d24adc792b976bb; commitMatchesExpected=true; deploy stage success.
+
+### Bản sửa transient overlay
+- Run trước ở SHA '921b441...' có một lần fail vì welcome splash bị detach trong lúc screenshot, khiến một viewport không hoàn tất dù các route khác PASS.
+- Đã bổ sung retry cho captureLocator và coi welcome splash là ảnh trạng thái tùy chọn nếu nó tự đóng giữa lúc chụp; lỗi mục tiêu bắt buộc vẫn là hard failure. Test assertion cho logic này được sửa và Validate PASS ở SHA 'd222cc...'.
+- Rerun mới tại SHA 'd222cc...' đã PASS đủ toàn bộ live coverage và exact deployment SHA; không còn lỗi transient overlay.
+
+### Phân biệt phạm vi hoàn tất
+- Toàn bộ checklist nghiệm thu nêu trong MASTER PROMPT đã có bằng chứng PASS tại SHA 'd222cc...' (PR/branch, Admin Playwright, Validate, live capture, screenshot threshold, viewport/theme, routes/product details, zero audit hard failures, exact deployment branch/SHA, artifact upload, Production không bị merge/deploy, PR vẫn mở).
+- Các bước manual archive vào 'docs/website-screenshots/start-of-work' / 'end-of-work' và pixel comparison không chạy trong push audit này; đây là workflow riêng cần chọn stage thủ công. Không ghi chúng là đã thực hiện, và không tạo/ghi đè archive baseline chỉ để làm xanh workflow.
+- Không merge PR, không sửa main, không triển khai Production.
+- Sau commit cập nhật tài liệu này, GitHub Actions sẽ chạy lại theo head mới; cần kiểm tra lại kết quả và SHA trước khi báo cáo cuối cùng.
