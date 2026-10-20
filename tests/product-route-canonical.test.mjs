@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { onRequest as middleware } from "../functions/_middleware.js";
 import { productCategoryRouteSlug } from "../functions/_lib.js";
 
@@ -67,3 +68,19 @@ assert.equal(productCategoryRouteSlug("sandals"), "dep");
 assert.equal(productCategoryRouteSlug("watch-straps"), "daydongho");
 assert.equal(productCategoryRouteSlug("phone-cases"), "oplung");
 assert.equal(productCategoryRouteSlug("custom-category"), "custom-category", "unknown categories use a normalized fallback");
+
+
+// Keep the duplicated browser and Pages Functions route maps in sync.
+// Parse source text as JSON-compatible object literals instead of evaluating code.
+const storefrontSource = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+const sharedLibrarySource = readFileSync(new URL("../functions/_lib.js", import.meta.url), "utf8");
+const frontendRouteMapMatch = storefrontSource.match(/const productCategoryRouteSlugs=Object\\.freeze\\((\\{[^;]*\\})\\);function routeSlug/);
+const backendRouteMapMatch = sharedLibrarySource.match(/const PRODUCT_CATEGORY_ROUTE_SLUGS = Object\\.freeze\\((\\{[\\s\\S]*?\\})\\);/);
+assert.ok(frontendRouteMapMatch, "the public storefront must declare its category route slug map");
+assert.ok(backendRouteMapMatch, "Pages Functions must declare its category route slug map");
+const parseRouteMap = (match) => JSON.parse(match[1].replace(/,\\s*([}\\]])/g, "$1"));
+assert.deepEqual(
+  parseRouteMap(frontendRouteMapMatch),
+  parseRouteMap(backendRouteMapMatch),
+  "frontend and Pages Functions category route maps must match",
+);
