@@ -2,17 +2,1405 @@
   "schemaVersion": 1,
   "repository": "chichute5500/Sindarealest-admin",
   "branch": "fix/liquid-glass-audit-2026-10-19",
-  "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
+  "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T11:06:00Z",
-  "status": "BLOCKED",
+  "updatedAtUtc": "2026-10-20T12:41:14Z",
+  "status": "IN PROGRESS",
   "note": "Latest source validation [39411977732](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977732) passed on commit 5f181d994bf0edb7a4e553c64ba97cddf55e31c4. Latest visual workflow [39411977810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810) has an overall successful diagnostic/artifact job, but live visual acceptance is NOT PASSED: Playwright captured 46 genuine diagnostic screenshots from https://3ed49bcc.sindarealest2.pages.dev/, completed 8/8 viewport/theme pairs and all 7 required sections in 4 contexts each, with zero horizontal overflow, console/page/HTTP errors, failed requests or broken images. Four product-card route checks failed because the live Preview returned /san-pham/sneakers-26-41-a rather than the source branch's canonical /sanpham/{category-slug}/{product-key}. The deployment verifier returned API_AUTHENTICATION_REJECTED (HTTP 401), so the live alias's actual Pages deployment ID/branch/commit is unverified. Access service-token headers are now configured and the storefront renders, but the 46 images are diagnostic-only and must not be archived into canonical start/end folders.",
   "stages": {
     "start-of-work": {
-      "status": "BLOCKED",
+      "status": "CAPTURED_PASS",
+      "capturedAtUtc": "2026-10-20T12:41:14Z",
+      "runId": "39423635778",
+      "sourceCommit": "853e40f661d1d2718ab8d4f1dec9a33b81dacaae",
+      "previewDeploymentCommit": "853e40f661d1d2718ab8d4f1dec9a33b81dacaae",
+      "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
+      "previewDeploymentId": "131cfcce-4174-4541-9f23-b99bc2cbfd6c",
+      "previewDeploymentCreatedOn": "2026-10-20T12:36:57.816Z",
+      "previewDeploymentVerified": true,
+      "imageCount": 66,
       "directory": "docs/website-screenshots/start-of-work/",
-      "images": [],
-      "reason": "Run 39411977810 captured 46 real Preview diagnostic screenshots but cannot establish a valid baseline: Pages deployment metadata verification failed with API_AUTHENTICATION_REJECTED (HTTP 401), and four product-card route checks returned legacy path /san-pham/sneakers-26-41-a instead of canonical /sanpham/{category-slug}/{product-key}. Do not archive screenshots until the account-scoped Pages Read token is accepted and deployment branch/commit are verified."
+      "sourceKind": "cloudflare-pages-preview-live-read-only",
+      "auditPassed": true,
+      "overallVisualComparison": "UNVERIFIED",
+      "responsiveOverflowCount": 0,
+      "pageErrorCount": 0,
+      "consoleErrorCount": 0,
+      "readOnlyViolationCount": 0,
+      "routeChecks": [
+        {
+          "kind": "product-card-navigation",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": "PASS",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "context": "mobile-390-light",
+          "note": "Path derived from an actual rendered Preview product card; no sample SKU assumed."
+        },
+        {
+          "kind": "product-detail-direct-open",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "mobile-390-light"
+        },
+        {
+          "kind": "product-detail-reload",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "mobile-390-light"
+        },
+        {
+          "kind": "product-card-navigation",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": "PASS",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "context": "desktop-1440-light",
+          "note": "Path derived from an actual rendered Preview product card; no sample SKU assumed."
+        },
+        {
+          "kind": "product-detail-direct-open",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "desktop-1440-light"
+        },
+        {
+          "kind": "product-detail-reload",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "desktop-1440-light"
+        },
+        {
+          "kind": "product-card-navigation",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": "PASS",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "context": "mobile-390-dark",
+          "note": "Path derived from an actual rendered Preview product card; no sample SKU assumed."
+        },
+        {
+          "kind": "product-detail-direct-open",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "mobile-390-dark"
+        },
+        {
+          "kind": "product-detail-reload",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "mobile-390-dark"
+        },
+        {
+          "kind": "product-card-navigation",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": "PASS",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "context": "desktop-1440-dark",
+          "note": "Path derived from an actual rendered Preview product card; no sample SKU assumed."
+        },
+        {
+          "kind": "product-detail-direct-open",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "desktop-1440-dark"
+        },
+        {
+          "kind": "product-detail-reload",
+          "path": "/sanpham/sneaker/sneakers-26-41-a",
+          "status": 200,
+          "finalPath": "/sanpham/sneaker/sneakers-26-41-a",
+          "productTitleMatches": true,
+          "detailModalOpen": true,
+          "result": "PASS",
+          "context": "desktop-1440-dark"
+        }
+      ],
+      "images": [
+        {
+          "path": "docs/website-screenshots/start-of-work/home-desktop-dark-1440x900-full-page.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "full-page",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-dark-1440x900-full-page.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-desktop-dark-1440x900-full-page.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-desktop-dark-1440x900-viewport.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-dark-1440x900-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-desktop-dark-1440x900-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-desktop-light-1440x900-full-page.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "full-page",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-light-1440x900-full-page.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-desktop-light-1440x900-full-page.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-desktop-light-1440x900-viewport.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-light-1440x900-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-desktop-light-1440x900-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-mobile-dark-360x800-viewport.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-360",
+          "viewport": {
+            "width": 360,
+            "height": 800
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-dark-360x800-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-mobile-dark-360x800-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-mobile-dark-390x844-full-page.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "full-page",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-dark-390x844-full-page.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-mobile-dark-390x844-full-page.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-mobile-dark-390x844-viewport.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-dark-390x844-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-mobile-dark-390x844-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-mobile-light-360x800-viewport.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-360",
+          "viewport": {
+            "width": 360,
+            "height": 800
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-light-360x800-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-mobile-light-360x800-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-mobile-light-390x844-full-page.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "full-page",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-light-390x844-full-page.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-mobile-light-390x844-full-page.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-mobile-light-390x844-viewport.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-light-390x844-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-mobile-light-390x844-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-tablet-dark-768x1024-viewport.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "tablet-768",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-tablet-dark-768x1024-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-tablet-dark-768x1024-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/home-tablet-light-768x1024-viewport.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "tablet-768",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "captureType": "viewport",
+          "state": "default-home",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/home-tablet-light-768x1024-viewport.png",
+          "resultPath": "docs/website-screenshots/end-of-work/home-tablet-light-768x1024-viewport.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-direct-open-desktop-dark-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-direct-open",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-direct-open-desktop-light-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-direct-open",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-direct-open-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-direct-open",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-direct-open-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-direct-open",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-from-grid-desktop-dark-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail",
+          "state": "opened-from-product-grid",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-from-grid-desktop-light-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail",
+          "state": "opened-from-product-grid",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-from-grid-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail",
+          "state": "opened-from-product-grid",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-from-grid-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail",
+          "state": "opened-from-product-grid",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-desktop-dark-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-modal",
+          "state": "after-reload",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-desktop-light-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-modal",
+          "state": "after-reload",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-modal",
+          "state": "after-reload",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-modal",
+          "state": "after-reload",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-desktop-dark-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-modal",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-desktop-light-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-modal",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-modal",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-modal",
+          "state": "direct-open",
+          "sectionKey": null,
+          "elementSelector": "#productOverlay",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-reload-desktop-dark-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-reload",
+          "state": "reloaded-direct-route",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-reload-desktop-light-1440x900.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "product-detail-reload",
+          "state": "reloaded-direct-route",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-reload-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-reload",
+          "state": "reloaded-direct-route",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/product-detail-reload-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "product-detail-reload",
+          "state": "reloaded-direct-route",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-benefits-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "benefits",
+          "elementSelector": ".service-strip",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-benefits-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-benefits-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "benefits",
+          "elementSelector": ".service-strip",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-benefits-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-benefits-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "benefits",
+          "elementSelector": ".service-strip",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-benefits-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-benefits-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "benefits",
+          "elementSelector": ".service-strip",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-benefits-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-collections-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "collections",
+          "elementSelector": "#collections",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-collections-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-collections-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-collections-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "collections",
+          "elementSelector": "#collections",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-collections-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-collections-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-collections-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "collections",
+          "elementSelector": "#collections",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-collections-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-collections-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-collections-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "collections",
+          "elementSelector": "#collections",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-collections-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-collections-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-featured-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "featured",
+          "elementSelector": "#featured",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-featured-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-featured-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-featured-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "featured",
+          "elementSelector": "#featured",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-featured-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-featured-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-featured-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "featured",
+          "elementSelector": "#featured",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-featured-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-featured-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-featured-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "featured",
+          "elementSelector": "#featured",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-featured-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-featured-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-footer-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "footer",
+          "elementSelector": "#siteFooter",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-footer-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-footer-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-footer-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "footer",
+          "elementSelector": "#siteFooter",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-footer-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-footer-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-footer-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "footer",
+          "elementSelector": "#siteFooter",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-footer-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-footer-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-footer-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "footer",
+          "elementSelector": "#siteFooter",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-footer-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-footer-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-hero-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "hero",
+          "elementSelector": "#home",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-hero-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-hero-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-hero-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "hero",
+          "elementSelector": "#home",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-hero-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-hero-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-hero-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "hero",
+          "elementSelector": "#home",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-hero-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-hero-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-hero-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "hero",
+          "elementSelector": "#home",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-hero-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-hero-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-order-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-order-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-order-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-order-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-order-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-order-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-order-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-order-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-order-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-order-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-order-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-order-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-products-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "products",
+          "elementSelector": "#products",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-products-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-products-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-products-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "products",
+          "elementSelector": "#products",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-products-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-products-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-products-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "products",
+          "elementSelector": "#products",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-products-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-products-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-products-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "products",
+          "elementSelector": "#products",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-products-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-products-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-menu-open-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "menu-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-menu-open-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-menu-open-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-menu-open-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "menu-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-menu-open-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-menu-open-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-order-expanded-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "state",
+          "state": "order-details-expanded",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-order-expanded-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "state",
+          "state": "order-details-expanded",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-order-expanded-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "order-details-expanded",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-order-expanded-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "order-details-expanded",
+          "sectionKey": "order",
+          "elementSelector": "#order",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        }
+      ]
     },
     "end-of-work": {
       "status": "NOT TESTED",
@@ -548,5 +1936,43 @@
     "latestProductRouteStatus": "FAIL: /san-pham/sneakers-26-41-a (four contexts)",
     "noProductionDeployOrMerge": true,
     "nextStep": "Replace CLOUDFLARE_PAGES_READ_TOKEN with a valid account-scoped Pages Read token, set CLOUDFLARE_ACCOUNT_ID explicitly, rerun Preview deployment verification, then diagnose the legacy product route against the verified deployed SHA before changing storefront runtime."
-  }
+  },
+  "sourceCommit": "853e40f661d1d2718ab8d4f1dec9a33b81dacaae",
+  "previewDeploymentCommit": "853e40f661d1d2718ab8d4f1dec9a33b81dacaae",
+  "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
+  "previewDeploymentId": "131cfcce-4174-4541-9f23-b99bc2cbfd6c",
+  "previewDeploymentCreatedOn": "2026-10-20T12:36:57.816Z",
+  "previewCommitVerification": "VERIFIED via Cloudflare Pages API read-only deployment metadata; target alias matched an environment=preview deployment with successful stage status.",
+  "captureSource": "Direct Cloudflare Pages Preview capture, read-only; no fixture API",
+  "captureCoverage": {
+    "requiredViewportThemePairs": 8,
+    "completedViewportThemePairs": 8,
+    "homeViewportScreenshots": 8,
+    "homeFullPageCount": 4,
+    "requiredSectionKeys": [
+      "hero",
+      "benefits",
+      "order",
+      "featured",
+      "collections",
+      "products",
+      "footer"
+    ],
+    "sectionScreenshotCounts": {
+      "hero": 4,
+      "benefits": 4,
+      "order": 4,
+      "featured": 4,
+      "collections": 4,
+      "products": 4,
+      "footer": 4
+    },
+    "requiredSectionScreenshotsComplete": true,
+    "menuOpenCount": 2,
+    "orderExpandedCount": 4,
+    "productDetailContextsComplete": true,
+    "totalScreenshotCount": 66
+  },
+  "liveAuditPassed": true,
+  "accessServiceTokenConfigured": true
 }
