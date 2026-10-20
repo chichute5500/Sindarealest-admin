@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { sanitizeText, sanitizeUrl } from './sanitize-audit-value.mjs';
 
 const requested = process.env.PREVIEW_URL || 'https://3ed49bcc.sindarealest2.pages.dev/';
 const allowedHost = /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i;
@@ -72,26 +73,34 @@ async function makePage(browser, viewport, theme, label) {
     let u;
     try { u = new URL(req.url()); } catch { return route.abort(); }
     if (u.origin !== origin) {
-      audit.blockedExternalRequests.push({ context: label, method: req.method(), url: req.url(), type: req.resourceType() });
+      audit.blockedExternalRequests.push({ context: label, method: req.method(), url: sanitizeUrl(req.url()), type: req.resourceType() });
       return route.abort();
     }
     if (!['GET', 'HEAD'].includes(req.method().toUpperCase())) {
-      audit.readOnlyViolations.push({ context: label, method: req.method(), url: req.url(), note: 'Blocked before reaching the Preview.' });
+      audit.readOnlyViolations.push({ context: label, method: req.method(), url: sanitizeUrl(req.url()), note: 'Blocked before reaching the Preview.' });
       return route.abort();
     }
     return route.continue();
   });
   const page = await context.newPage();
   page.setDefaultTimeout(12000);
-  page.on('console', (msg) => { if (msg.type() === 'error') audit.consoleErrors.push({ context: label, message: msg.text(), url: msg.location()?.url || '' }); });
-  page.on('pageerror', (error) => audit.pageErrors.push({ context: label, message: error.message }));
+  page.on('console', (msg) => {
+    if (msg.type() !== 'error') return;
+    const sourceUrl = msg.location()?.url || page.url();
+    try { if (new URL(sourceUrl).origin !== origin) return; } catch { return; }
+    audit.consoleErrors.push({ context: label, message: sanitizeText(msg.text()), url: sanitizeUrl(sourceUrl) });
+  });
+  page.on('pageerror', (error) => {
+    try { if (new URL(page.url()).origin !== origin) return; } catch { return; }
+    audit.pageErrors.push({ context: label, message: sanitizeText(error.message) });
+  });
   page.on('response', (res) => {
-    if (res.status() >= 400 && new URL(res.url()).origin === origin) audit.httpErrors.push({ context: label, status: res.status(), method: res.request().method(), url: res.url() });
+    if (res.status() >= 400 && new URL(res.url()).origin === origin) audit.httpErrors.push({ context: label, status: res.status(), method: res.request().method(), url: sanitizeUrl(res.url()) });
   });
   page.on('requestfailed', (req) => {
     let u; try { u = new URL(req.url()); } catch { return; }
     if (u.origin === origin && ['GET', 'HEAD'].includes(req.method().toUpperCase()) && !String(req.failure()?.errorText || '').includes('ERR_ABORTED')) {
-      audit.failedRequests.push({ context: label, method: req.method(), url: req.url(), reason: req.failure()?.errorText || 'unknown' });
+      audit.failedRequests.push({ context: label, method: req.method(), url: sanitizeUrl(req.url()), reason: sanitizeText(req.failure()?.errorText || 'unknown') });
     }
   });
   return { context, page };
@@ -99,7 +108,7 @@ async function makePage(browser, viewport, theme, label) {
 async function navigate(page, url) {
   let response = null;
   try { response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 }); }
-  catch (error) { audit.hardFailures.push('Navigation failed for ' + url + ': ' + String(error.message || error)); }
+  catch (error) { audit.hardFailures.push(sanitizeText('Navigation failed for ' + url + ': ' + String(error.message || error))); }
   if (!response) return { response: null, blocked: false, status: null, title: '', url: page.url(), bodyText: '' };
   await page.waitForTimeout(400);
   const info = await page.evaluate(() => ({ title: document.title || '', url: location.href, bodyText: (document.body?.innerText || '').slice(0, 12000) }))
@@ -108,9 +117,9 @@ async function navigate(page, url) {
   if (blocked) {
     audit.accessBlocked = true;
     audit.accessBlockReason = 'Cloudflare Access or login_required detected; no screenshot can be saved as a baseline.';
-    audit.hardFailures.push('Access gate detected at ' + info.url);
+    audit.hardFailures.push('Access gate detected at ' + sanitizeUrl(info.url));
   }
-  return { response, blocked, status: response.status(), ...info };
+  return { response, blocked, status: response.status(), ...info, url: sanitizeUrl(info.url) };
 }
 async function settle(page) {
   await page.evaluate(async () => {
@@ -189,7 +198,7 @@ async function main() {
             });
           }
         } catch (error) {
-          audit.hardFailures.push('Capture failed for ' + label + ': ' + String(error.message || error));
+          audit.hardFailures.push(sanitizeText('Capture failed for ' + label + ': ' + String(error.message || error)));
         } finally {
           await context.close();
         }
@@ -234,7 +243,7 @@ async function main() {
   if (!audit.captureCompleted || audit.accessBlocked) process.exitCode = 1;
 }
 main().catch(async (error) => {
-  audit.hardFailures.push(String(error.stack || error));
+  audit.hardFailures.push(sanitizeText(error.stack || error));
   audit.finishedAtUtc = new Date().toISOString();
   await fs.mkdir(outputDir, { recursive: true }).catch(() => {});
   await fs.writeFile(path.join(outputDir, 'visual-audit.json'), JSON.stringify(audit, null, 2) + '\n', 'utf8').catch(() => {});

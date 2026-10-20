@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { sanitizeText, sanitizeUrl } from '../scripts/sanitize-audit-value.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
@@ -25,6 +26,10 @@ assert.match(live, /GET', 'HEAD'/,
   'The live capture must allow only GET/HEAD requests.');
 assert.match(live, /accessBlocked/,
   'The live capture must detect and report Access gates.');
+assert.match(live, /new URL\(sourceUrl\)\.origin !== origin/,
+  'Console errors from the external Access login page must not be reported as storefront errors.');
+assert.match(live, /sanitizeUrl\(info\.url\)/,
+  'Access redirect query strings must be removed before they are saved.');
 assert.doesNotMatch(live, /legacy-products\.json|scenarioProducts/,
   'The direct capture must not use legacy fixtures or mock product API responses.');
 assert.match(compare, /pixelmatch[\s\S]*start-of-work[\s\S]*end-of-work/,
@@ -36,6 +41,7 @@ for (const scriptPath of [
   '../scripts/capture-cloudflare-preview.mjs',
   '../scripts/compare-website-screenshots.mjs',
   '../scripts/validate-cloudflare-preview-url.mjs',
+  '../scripts/sanitize-audit-value.mjs',
 ]) {
   const absolutePath = fileURLToPath(new URL(scriptPath, import.meta.url));
   const syntax = spawnSync(process.execPath, ['--check', absolutePath], { encoding: 'utf8' });
@@ -58,4 +64,7 @@ for (const [candidate, expected] of [
     'Preview URL allowlist case failed for ' + candidate + ': ' + (checked.stderr || checked.stdout || 'no diagnostic'));
 }
 
-console.log('PASS: live Preview capture is source-restricted/read-only, source URL allowlist rejects Production, and capture/diff scripts pass Node syntax validation.');
+assert.equal(sanitizeUrl('https://example.pages.dev/cdn-cgi/access/login?meta=signed.secret&kid=key#token'), 'https://example.pages.dev/cdn-cgi/access/login');
+assert.equal(sanitizeUrl('https://example.pages.dev/path?token=secret'), 'https://example.pages.dev/path');
+assert.doesNotMatch(sanitizeText('Redirect to https://example.pages.dev/login?meta=secret.jwt&state=signed'), /secret|signed/);
+console.log('PASS: live Preview capture is source-restricted/read-only, Production URLs are rejected, Access redirect tokens are redacted, and scripts pass syntax validation.');

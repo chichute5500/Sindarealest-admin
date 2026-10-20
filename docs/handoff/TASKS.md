@@ -97,3 +97,11 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - Đã thêm capture script trực tiếp Preview, allowlist host non-production, chỉ GET/HEAD, phát hiện Cloudflare Access và từ chối archive nếu capture không phải live/không hoàn tất.
 - Đã thêm pixel-diff cho PNG cùng tên giữa hai stage; report sẽ có JSON, HTML và diff mask. Chưa có kết quả so sánh vì hai thư mục stage còn trống.
 - UI-001: **NOT TESTED against a real Preview baseline**; storefront HTML/CSS/JS không đổi trong lần bổ sung này.
+
+## Live Preview probe result — 2026-10-20 (run 39352778226)
+
+- **SHOT-002: BLOCKED by Cloudflare Access.** Direct Playwright reached the supplied Preview URL and was redirected to the Cloudflare Access login host. Challenge query parameters were excluded from the saved handoff record.
+- Artifact: [12232894712](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226/artifacts/12232894712). The audit JSON confirms `captureCompleted=false`, `accessBlocked=true`, `screenshotCount=0`, and no write requests were sent. Route probes were not attempted because the homepage was gated.
+- The push probe uses `continue-on-error: true` only so diagnostics can be uploaded; it does **not** mean the live Preview check passed.
+- Safe next step: obtain a user-authorized browser session or Preview-only Access permission for this test alias, then rerun. Do not weaken Production Access.
+- Updated audit safeguards redact URL query/fragment values and ignore console errors from the external Cloudflare Access login page, so gate diagnostics are not mislabelled as storefront errors.

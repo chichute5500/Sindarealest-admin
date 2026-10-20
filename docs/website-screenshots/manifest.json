@@ -4,21 +4,21 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T01:05:00Z",
+  "updatedAtUtc": "2026-10-20T01:23:00Z",
   "status": "BLOCKED",
-  "note": "Original design references have now been visually inspected from the GitHub Actions artifact. The Cloudflare Preview itself remains blocked until a direct, read-only capture run reaches the supplied Preview URL; no live baseline is claimed.",
+  "note": "The direct, read-only GitHub Actions browser probe reached the supplied Pages Preview URL but Cloudflare Access redirected it to the Access login host. No live storefront screenshot was produced or archived. Original reference PNGs were visually inspected from an artifact. Local fixture captures remain separate from the blocked live Preview baseline.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
       "directory": "docs/website-screenshots/start-of-work/",
       "images": [],
-      "reason": "Retried read-only fetch on 2026-10-20 for /, /san-pham/sd2929, and /sanpham/giaytay/sd2929; all returned login_required. The directory contains a placeholder only. Do not substitute local fixture captures."
+      "reason": "Prior read-only probes and GitHub Actions run 39352778226 were blocked by Cloudflare Access (login_required / redirect to the Access login host). Zero live screenshots; no fixture or reference images substituted."
     },
     "end-of-work": {
       "status": "NOT TESTED",
       "directory": "docs/website-screenshots/end-of-work/",
       "images": [],
-      "reason": "No storefront HTML/CSS/JS change has been made. Directory contains a placeholder only."
+      "reason": "No storefront HTML/CSS/JS change has been made; no live baseline is available. Keep this directory empty until an authorized read-only Preview capture succeeds."
     }
   },
   "referenceImages": {
@@ -38,28 +38,28 @@
     {
       "url": "/",
       "status": "BLOCKED",
-      "result": "login_required"
+      "result": "Cloudflare Access/login_required redirect; 0 screenshots"
     },
     {
       "url": "/san-pham/sd2929",
       "status": "BLOCKED",
-      "result": "login_required"
+      "result": "Prior read-only fetch returned login_required; live browser route probe not run because home route was gated"
     },
     {
       "url": "/sanpham/giaytay/sd2929",
       "status": "BLOCKED",
-      "result": "login_required"
+      "result": "Prior read-only fetch returned login_required; live browser route probe not run because home route was gated"
     }
   ],
   "comparisonStatus": "NOT TESTED",
   "remainingBlockers": [
-    "A successful direct read-only capture of the deployed Cloudflare Preview is required to fill start-of-work; if Cloudflare Access returns login_required, an authorized browser session is needed before proceeding.",
-    "No post-change end-of-work capture exists; local fixture screenshots must not be put into the canonical start/end folders.",
-    "Pixel-diff comparison will run automatically for an end-of-work live Preview capture and requires same-name, same-size PNG pairs; human visual review remains necessary.",
-    "The proposed /sanpham/{category-slug}/{product-code} route requires verified product codes and category mapping; do not infer codes from the legacy fixture.",
-    "The open fix branch is divergent from main and contains changes outside the visual UI task; PR #108 must not be merged without a separate scope review."
+    "Cloudflare Access blocks the Preview from the GitHub Actions browser. A user-authorized browser context or Preview-only Access permission is required before capturing a true start-of-work baseline.",
+    "No post-change end-of-work capture exists; local fixture screenshots must not enter canonical stage folders.",
+    "Pixel-diff comparison requires real same-name, same-size PNGs in both stage folders; human visual review is still required.",
+    "The proposed /sanpham/{category-slug}/{product-code} route requires verified product codes/category mapping; do not infer them from legacy fixture data.",
+    "PR #108 branch is divergent from main and includes changes outside this UI task; do not merge before a separate scope review."
   ],
-  "lastAccessCheckUtc": "2026-10-20T00:54:00Z",
+  "lastAccessCheckUtc": "2026-10-20T01:22:01Z",
   "localAudit": {
     "status": "PASS",
     "scope": "local static preview with legacy fixture data; not Cloudflare Pages Preview",
@@ -81,5 +81,24 @@
     "hardFailures": 0,
     "passed": true,
     "caveat": "Local fixture audit only. The canonical start/end screenshot directories remain unfilled until a direct live Preview capture succeeds."
+  },
+  "liveProbe": {
+    "workflowRun": 39352778226,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226",
+    "artifactId": 12232894712,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226/artifacts/12232894712",
+    "sourceCommit": "3942f9c2b5a67d2464679f3b437f20bc398b443c",
+    "attemptedAtUtc": "2026-10-20T01:22:00Z",
+    "sourceKind": "cloudflare-pages-preview-live-read-only",
+    "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
+    "status": "BLOCKED_ACCESS_GATE",
+    "accessBlocked": true,
+    "finalUrlWithoutQuery": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev",
+    "screenshotCount": 0,
+    "viewportCount": 0,
+    "routeProbeCount": 0,
+    "readOnlyViolations": 0,
+    "noWriteRequestsSent": true,
+    "note": "The root request redirected to the Cloudflare Access login host before any storefront content rendered. No screenshot is claimed."
   }
 }
