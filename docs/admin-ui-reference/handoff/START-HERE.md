@@ -42,6 +42,7 @@ Các file này lưu trạng thái bền vững nhưng không tự khởi động
 ## Tệp bàn giao
 
 - `LATEST-STATUS.md`: trạng thái mới nhất.
+- `PROMPT-NEXT-CHAT.md`: prompt ngắn, đầy đủ để phiên chat tiếp theo tiếp tục đúng trạng thái hiện tại.
 - `latest-test-results.json`: kết quả kiểm thử có bằng chứng.
 - `PROMPT-COMPLETENESS-AUDIT.md`: bảng đối chiếu yêu cầu và giới hạn.
 - `../MASTER-PROMPT-AUTO-HANDOFF.md`: prompt chuẩn.
