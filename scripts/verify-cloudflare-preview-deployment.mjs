@@ -36,7 +36,7 @@ export function matchesPreviewDeployment(deployment, previewUrlOrOrigin) {
   return origins.includes(targetOrigin) || deploymentOrigin === targetOrigin;
 }
 
-export function inspectPreviewDeployment(deployment, expectedBranch = '') {
+export function inspectPreviewDeployment(deployment, expectedBranch = '', expectedCommitSha = '') {
   const metadata = deployment?.deployment_trigger?.metadata || {};
   const commitHash = String(metadata.commit_hash || '').trim();
   const deploymentBranch = String(metadata.branch || '').trim();
@@ -46,12 +46,14 @@ export function inspectPreviewDeployment(deployment, expectedBranch = '') {
   const status = String(deployment?.status || latestStageStatus).toLowerCase();
   const commitHashValid = /^[a-f0-9]{7,64}$/i.test(commitHash);
   const branchMatchesExpected = expectedBranch ? deploymentBranch === expectedBranch : null;
+  const commitMatchesExpected = expectedCommitSha ? commitHash.toLowerCase() === expectedCommitSha.toLowerCase() : null;
   const verified = environment === 'preview'
     && latestStageStatus === 'success'
     && status === 'success'
     && commitHashValid
     && Boolean(deploymentBranch)
     && (!expectedBranch || branchMatchesExpected === true)
+    && (!expectedCommitSha || commitMatchesExpected === true)
     && Boolean(deployment?.id)
     && deployment?.is_skipped !== true;
   return {
@@ -64,6 +66,8 @@ export function inspectPreviewDeployment(deployment, expectedBranch = '') {
       branch: deploymentBranch || null,
       expectedBranch: expectedBranch || null,
       branchMatchesExpected,
+      expectedCommitSha: expectedCommitSha || null,
+      commitMatchesExpected,
       commitHash: commitHashValid ? commitHash : null,
       commitMessage: typeof metadata.commit_message === 'string' ? metadata.commit_message.slice(0, 300) : null,
       createdOn: shortDate(deployment?.created_on),
@@ -149,12 +153,19 @@ async function main() {
     return;
   }
   const expectedBranch = String(process.env.EXPECTED_DEPLOYMENT_BRANCH || '').trim();
+  const expectedCommitSha = String(process.env.EXPECTED_DEPLOYMENT_SHA || '').trim();
   if (!expectedBranch) {
     report.status = 'BLOCKED_CONFIGURATION';
     await fail(report, 'Missing EXPECTED_DEPLOYMENT_BRANCH; deployment verification must be scoped to the selected fix branch.', 2);
     return;
   }
   report.expectedBranch = expectedBranch;
+  if (!/^[a-f0-9]{40}$/i.test(expectedCommitSha)) {
+    report.status = 'BLOCKED_CONFIGURATION';
+    await fail(report, 'Missing or invalid EXPECTED_DEPLOYMENT_SHA; verification must match the exact source commit SHA.', 2);
+    return;
+  }
+  report.expectedCommitSha = expectedCommitSha;
 
   const matches = [];
   const branchCandidates = [];
@@ -252,7 +263,7 @@ async function main() {
   }
 
   const deployment = uniqueMatches[0];
-  const inspection = inspectPreviewDeployment(deployment, expectedBranch);
+  const inspection = inspectPreviewDeployment(deployment, expectedBranch, expectedCommitSha);
   report.deployment = inspection.metadata;
   const verified = inspection.verified;
 
