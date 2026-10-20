@@ -19,6 +19,17 @@ Không dùng kết quả của commit cũ để tuyên bố commit mới đã PA
 
 ## Kết quả đã xác minh
 
+### 2026-10-20 04:11 UTC — kiểm tra nguồn mới nhất và smoke test Preview
+
+- Code-bearing commit: `562d7d77624f7431296cb217b2b6d6592aca9ce4`. Validation chạy trên docs-only commit `7d5de0114025df35974067c0c1bf481f95be7fd6`.
+- Source/test validation: **PASS**, [run 39368493275](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493275). Project-integrity checks và automated tests đều hoàn thành thành công.
+- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39368493324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493324). Hai test không tìm thấy `#loginView`/`#loginForm`; workflow inject `ADMIN_TEST_URL` và `ADMIN_TEST_PASSWORD` nhưng không inject Access service-token headers. Vì vậy chưa xác minh được login/dashboard thật và không kết luận đây là lỗi mật khẩu hay app.
+- Live storefront probe gần nhất vẫn là [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 screenshot/route/viewport thật. Các commit mới là docs-only nên chưa phát sinh capture live mới.
+- Local fixture audit [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618) vẫn PASS trong phạm vi fixture (54 ảnh, 235 sản phẩm, 20 responsive cases, 93 interaction checks); không thể thay cho website Preview thật.
+- Hướng dẫn an toàn để mở access chỉ cho Preview: [PREVIEW-ACCESS-SETUP.md](PREVIEW-ACCESS-SETUP.md). Không đưa token vào chat/log/commit; không mở policy cho Production.
+- Production không được merge/deploy/chỉnh cấu hình trong lượt kiểm tra này.
+
+
 ### 2026-10-20 04:02–04:03 UTC — kiểm tra HEAD tài liệu mới nhất
 
 - Commit đã được kiểm thử: `1d261598c4e481ede062eed8ff32c374ffe67373`; nhánh `fix/liquid-glass-audit-2026-10-19`.
