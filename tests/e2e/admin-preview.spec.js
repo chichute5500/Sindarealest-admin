@@ -137,7 +137,39 @@ test.describe('SinDarealest2 Admin Preview', () => {
     if (opened.type === 'blocked') test.skip(true, 'BLOCKED: Cloudflare Access requires a separately authorized test path.');
     await expect(page.locator('#password')).toHaveAttribute('type', 'password');
     await expect(page.locator('#appView')).toBeHidden();
-    await expect(page.locator('.topbar > .brand'), 'Configured ADMIN_TEST_URL should serve the ADMIN login CSS, not a stale unrelated preview').toBeHidden();
+    // Record a safe CSS signature before failing: this distinguishes an old deployment
+    // missing the ADMIN override from a selector/state cascade issue in the deployed DOM.
+    const loginCssSignature = await page.evaluate(() => {
+      const brand = document.querySelector('.topbar > .brand');
+      const login = document.querySelector('#loginView');
+      const styleText = [...document.querySelectorAll('style')].map(style => style.textContent || '').join('\n');
+      const hideSelector = 'body:has(#loginView:not(.hidden)) .topbar>.brand';
+      const stylesheetSources = [...document.styleSheets].map(sheet => {
+        let readableRules = [];
+        try { readableRules = [...sheet.cssRules].slice(0, 500).map(rule => rule.cssText || ''); } catch {}
+        return {
+          href: sheet.href ? (() => { try { const u = new URL(sheet.href); return u.origin + u.pathname; } catch { return '[unparseable stylesheet]'; } })() : '[inline stylesheet]',
+          ruleCount: readableRules.length,
+          hasLoginHideRule: readableRules.some(rule => rule.includes(hideSelector))
+        };
+      });
+      return {
+        title: document.title,
+        lang: document.documentElement.lang || null,
+        loginViewClass: login?.className || null,
+        topbarBrandDisplay: brand ? getComputedStyle(brand).display : 'missing',
+        topbarBrandVisibility: brand ? getComputedStyle(brand).visibility : 'missing',
+        topbarBrandOpacity: brand ? getComputedStyle(brand).opacity : 'missing',
+        inlineHideRulePresent: styleText.includes(hideSelector),
+        stylesheetSources
+      };
+    });
+    console.info(`[ADMIN_PREVIEW_CSS_SIGNATURE] ${JSON.stringify(loginCssSignature)}`);
+    await testInfo.attach('admin-preview-css-signature.json', {
+      body: Buffer.from(JSON.stringify(loginCssSignature, null, 2)),
+      contentType: 'application/json'
+    });
+    await expect(page.locator('.topbar > .brand'), 'Login header should be hidden by the ADMIN login-shell CSS signature').toBeHidden();
     await expect(page.locator('#notificationToggle')).toBeHidden();
     await expect(page.locator('#adminThemeToggle')).toBeVisible();
   });
