@@ -72,3 +72,10 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - Cả 235 bản ghi có `price: null`; không dùng file fixture này để suy ra giá thực hay SKU thật.
 - Hệ quả: chưa thể triển khai route dạng `/sanpham/{category-slug}/{product-code}` một cách trung thực chỉ dựa trên fixture này. Cần đối chiếu nguồn dữ liệu sản phẩm thực/Preview được cấp quyền hoặc có bảng ánh xạ đã xác minh. Không tự suy SKU từ slug.
 - Bằng chứng test local được tải từ artifact [12222942329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329): 235 fixture products, 0 responsive horizontal overflow, 0 page errors, 0 HTTP errors, 0 console errors; các request mock và hai lỗi 503 kỳ vọng ở warranty lookup là fixture-only. Đây vẫn là test local, không phải Cloudflare Preview.
+
+## Bổ sung 2026-10-20 — điều kiện và rủi ro mới
+
+- SHOT-002 remains BLOCKED: Preview access probes previously returned `login_required`; browser automation retry did not start because the TinyFish wallet is negative. No screenshot was captured in this retry.
+- ROUTE-001 (new): TODO — map actual verified product codes to category slugs; preserve existing `/san-pham/{key}` compatibility; coordinate middleware, sitemap, canonical metadata, JS `pushState`/popstate and tests. Do not infer SKU from legacy fixture.
+- SAFE-002 (new): TODO — review the full fix-branch diff against the latest main before any merge recommendation. Compare result at the time of audit was `diverged`, ahead 275 / behind 6, and includes public admin/API/migration/config changes outside this visual task. No merge/deploy authorized.
+- SHOT-001/REG-001: the latest observed run `39327473706` passed the local capture/test job; archive-save step was skipped because the run was triggered by push.
