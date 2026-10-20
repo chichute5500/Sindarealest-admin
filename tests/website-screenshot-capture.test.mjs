@@ -26,6 +26,12 @@ assert.match(live, /GET', 'HEAD'/,
   'The live capture must allow only GET/HEAD requests.');
 assert.match(live, /accessBlocked/,
   'The live capture must detect and report Access gates.');
+assert.match(live, /u\.hostname\.toLowerCase\(\)\.endsWith\('\.cloudflareaccess\.com'\)/,
+  'A cross-origin Cloudflare Access login redirect must be classified before the browser navigation is blocked.');
+assert.match(live, /external navigation was blocked and no credentials were entered/i,
+  'Access-gated Preview checks must record a non-bypass decision and must not enter credentials.');
+assert.match(live, /blocked: audit\.accessBlocked/,
+  'A blocked Access redirect must stop route probing instead of repeating generic navigation failures.');
 assert.match(live, /new URL\(sourceUrl\)\.origin !== origin/,
   'Console errors from the external Access login page must not be reported as storefront errors.');
 assert.match(live, /sanitizeUrl\(info\.url\)/,
