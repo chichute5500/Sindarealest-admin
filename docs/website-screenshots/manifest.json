@@ -4,21 +4,21 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T03:13:24Z",
+  "updatedAtUtc": "2026-10-20T03:18:00Z",
   "status": "BLOCKED",
-  "note": "Source/tests passed on 968ec2e3af591dd39bbadc911de655a60135dd0f and local fixture audit run 39362960193 passed with 54 screenshots, 235 fixtures, 20 responsive cases, 93 interactions and no recorded local errors/overflow. The same run's real Preview probe was blocked by Cloudflare Access and returned zero actual screenshots/routes/viewports. Canonical start/end screenshots and pixel comparison remain unverified.",
+  "note": "Latest HEAD 562d7d77624f7431296cb217b2b6d6592aca9ce4 passed source/test validation run 39363358025. Admin Preview Playwright run 39363358006 failed because the expected #loginForm was absent; Preview remains behind Cloudflare Access. Latest live probe run 39362960193 had accessServiceTokenConfigured=false, accessBlocked=true, and zero real screenshots/routes/viewports. Local fixture visual audit run 39362960193 passed on older commit 968ec2e3af591dd39bbadc911de655a60135dd0f with 54 fixture screenshots, 235 fixture products, 20 responsive cases and 93 interaction checks; do not treat it as a visual pass for current HEAD or real Preview evidence.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
       "directory": "docs/website-screenshots/start-of-work/",
       "images": [],
-      "reason": "Real Preview baseline is not archived: run 39362960193 reports missing CF_ACCESS_CLIENT_ID/CF_ACCESS_CLIENT_SECRET, accessBlocked=true, zero screenshots. Confirm the deployment commit once Access is enabled before claiming this is the original pre-edit state; do not substitute local fixture screenshots."
+      "reason": "Real Preview baseline still unavailable: latest live probe confirms missing CF_ACCESS_CLIENT_ID/CF_ACCESS_CLIENT_SECRET and accessBlocked=true, with zero real screenshots. Do not substitute local fixture captures or claim the baseline represents the pre-edit deployment."
     },
     "end-of-work": {
       "status": "NOT TESTED",
       "directory": "docs/website-screenshots/end-of-work/",
       "images": [],
-      "reason": "No genuine Preview screenshots or verified baseline are available. Source changed on the fix branch, but local fixtures cannot serve as the end-of-work archive."
+      "reason": "Current HEAD source validation passes, but current-HEAD visual fixture capture has not been confirmed and real Preview remains blocked. End-of-work archive and pixel comparison cannot be completed until Access is configured and a real Preview capture succeeds."
     }
   },
   "referenceImages": {
@@ -367,5 +367,39 @@
     "detailRoutePolicy": "Derive actual detail URL from a live rendered product card; test direct open and reload. Do not use guessed SKU examples.",
     "archivePolicy": "Require passing full live Preview coverage before replacing canonical screenshot folders.",
     "status": "TOOLING_SOURCE_VALIDATED_LIVE_ACCESS_BLOCKED"
+  },
+  "latestVerifiedState": {
+    "head": "562d7d77624f7431296cb217b2b6d6592aca9ce4",
+    "sourceValidation": {
+      "status": "PASS",
+      "run": 39363358025,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358025"
+    },
+    "adminPreviewPlaywright": {
+      "status": "BLOCKED_BY_CLOUDFLARE_ACCESS",
+      "run": 39363358006,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358006",
+      "details": "Expected #loginForm was not present; no protected-content or login acceptance should be inferred."
+    },
+    "latestLiveProbe": {
+      "status": "BLOCKED",
+      "run": 39362960193,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193",
+      "accessServiceTokenConfigured": false,
+      "accessBlocked": true,
+      "realScreenshots": 0,
+      "realRoutes": 0,
+      "realViewports": 0
+    },
+    "latestLocalVisualFixture": {
+      "status": "PASS_LOCAL_ONLY",
+      "testedCommit": "968ec2e3af591dd39bbadc911de655a60135dd0f",
+      "run": 39362960193,
+      "artifactId": 12237724618,
+      "screenshots": 54,
+      "fixtureProducts": 235,
+      "responsiveCases": 20,
+      "interactionChecks": 93
+    }
   }
 }

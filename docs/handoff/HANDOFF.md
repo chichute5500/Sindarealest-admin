@@ -13,6 +13,16 @@
   - Sáng: [file_0000000017088207af45f5e6dd90cfa4.png](../static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png)
   - Tối: [file_00000000fcb48207a23aeda23caa5eeb.png](../static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png)
 
+
+## Cập nhật trạng thái xác minh — 2026-10-20 03:18 UTC
+
+- HEAD hiện tại: `562d7d77624f7431296cb217b2b6d6592aca9ce4` trên `fix/liquid-glass-audit-2026-10-19`.
+- Source/test validation: **PASS**, [run 39363358025](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358025).
+- Admin Preview Playwright: **BLOCKED/FAIL do trang Preview không hiện `#loginForm`**, [run 39363358006](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358006). Log phù hợp với Cloudflare Access đang chặn trước ứng dụng; không suy diễn thành lỗi mật khẩu hoặc xác nhận đăng nhập.
+- Live storefront capture: vẫn **BLOCKED** theo [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 ảnh thật / 0 route / 0 viewport.
+- Local fixture visual audit: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193) và [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618) PASS trên commit cũ `968ec2e3` với 54 ảnh fixture, 235 sản phẩm fixture, 20 responsive cases, 93 interaction checks. Kết quả này **không phải ảnh Preview thật và không đại diện cho HEAD mới nhất**.
+- Không deploy/merge Production. Chưa đủ bằng chứng để đóng baseline/end screenshots hoặc pixel comparison.
+
 ## Cập nhật kiểm tra gần nhất — 2026-10-19/20 UTC
 
 - Nhánh đang làm: `fix/liquid-glass-audit-2026-10-19`.

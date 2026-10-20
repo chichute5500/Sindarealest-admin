@@ -19,6 +19,16 @@ Không dùng kết quả của commit cũ để tuyên bố commit mới đã PA
 
 ## Kết quả đã xác minh
 
+### 2026-10-20 03:15 UTC — Source validation và Admin Preview trên HEAD mới nhất
+
+- Commit: `562d7d77624f7431296cb217b2b6d6592aca9ce4`; branch: `fix/liquid-glass-audit-2026-10-19`.
+- Source/test validation: **PASS**, [run 39363358025](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358025).
+- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39363358006](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358006). Hai test không thấy `#loginForm` trên Preview. Do trang bị Cloudflare Access chặn trước app, đây không phải bằng chứng lỗi mật khẩu hoặc lỗi form đăng nhập ứng dụng.
+- Live capture gần nhất: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), `accessServiceTokenConfigured=false`, `accessBlocked=true`, zero live screenshots/routes/viewports.
+- Local visual fixture audit gần nhất: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618), PASS trên commit cũ `968ec2e3` (54 fixture screenshots, 235 fixture products, 20 responsive cases, 93 interaction checks). Không áp dụng làm visual PASS cho HEAD `562d7d77624f7431296cb217b2b6d6592aca9ce4` hay Preview thật.
+- Task IDs: SETUP-001, SHOT-001, SHOT-002, REG-001.
+
+
 ### 2026-10-19 20:39–20:41 UTC — GitHub Actions visual-preview
 
 - Commit: `c1757447f3b30aee9923297aca2c8ab89a42775d`
