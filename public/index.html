@@ -1718,6 +1718,8 @@ html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.9
  #productOverlay .detail-modal{width:100%;max-width:none;height:100dvh;max-height:100dvh;border:0;border-radius:0;box-shadow:none;padding-bottom:env(safe-area-inset-bottom)}
  #productOverlay .detail-layout{grid-template-columns:minmax(0,1fr);gap:8px;padding:calc(10px + env(safe-area-inset-top)) 14px 18px}
  #productOverlay .detail-image-stage{border-radius:0;background:transparent;border:0}
+ /* Keep the gallery favorite control clear of the sticky close button on narrow screens. */
+ #productOverlay .detail-favorite-btn{right:58px;top:calc(10px + env(safe-area-inset-top))}
  #productOverlay .detail-main-image{aspect-ratio:1/.84;border:0;border-radius:0;background:transparent}
  #productOverlay .detail-thumbs{padding:8px 0 12px;gap:8px}
  #productOverlay .detail-thumb{width:58px;height:58px;border-radius:11px}
