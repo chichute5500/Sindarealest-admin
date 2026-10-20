@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_REQUIRES_VERIFICATION",
+  "status": "SOURCE_CHECKS_PASS_LOCAL_UI_FIXTURES_PASS_PREVIEW_CSS_SIGNATURE_FAIL",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6",
   "testedCommitSha": "26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6",
-  "capturedAt": "2026-10-20T18:55:03.108Z",
+  "capturedAt": "2026-10-21",
   "progressEstimatePercent": 43,
-  "progressBasis": "43% estimated by work stages; local checks and 16 login-shell screenshots pass, but remote Preview source signature mismatch and authenticated module QA/full visual comparison remain incomplete.",
-  "note": "Verified run 39464800722 on source commit 994fefada36ebcc3d63da32e1fe7e01e532ef712: project checks PASS, automated tests PASS, local responsive/theme login screenshot matrix PASS (16 images), remote Preview FAIL. The remote page had login markup but the topbar brand was visible in unauthenticated state, violating the expected source signature. This points to ADMIN_TEST_URL serving a different/stale UI or layout; exact secret value remains masked and is not logged. PR #111 remains OPEN/unmerged and has broad 260-file scope including storefront/backend; DO NOT MERGE. Direct visual review on 2026-10-21 opened the embedded approved reference (12 screen inventory) and viewed a real 390x844 light login screenshot. Login is visually a reasonable glass-card baseline but not accepted as full reference parity. A markup-copy edit attempt was blocked before writing; no source change was made from that attempt.",
+  "progressBasis": "43% estimated by work stages. npm run check/npm test/local Playwright source matrix and UI fixture screenshots pass; remote Preview CSS signature mismatch, full 12-screen visual comparison, authenticated backend workflows and whole-PR diff audit remain incomplete.",
+  "note": "Verified run 39478738647 on source commit 26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6: npm run check PASS, npm test PASS, local Playwright source baseline PASS. Artifact metadata reports 42 PNG screenshots and 36 metrics, no page/console errors, attempted writes or unexpected API paths in the local fixture. Remote Preview test FAIL: topbar brand computed display=flex/visibility=visible, inlineHideRulePresent=false and no stylesheet rule body:has(#loginView:not(.hidden)) .topbar>.brand; the source commit includes the rule. This proves a source/served CSS signature mismatch, but does not yet identify the exact stale deployment or URL root cause. Keep assertion strict; do not alter secrets or Cloudflare settings. Branch HEAD e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4 is evidence-only, not newer application code. PR #111 remains OPEN/unmerged; do not merge.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -880,5 +880,32 @@
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
-  "updatedAt": "2026-10-21"
+  "updatedAt": "2026-10-21",
+  "currentBranchHeadAtHandoff": "e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4",
+  "sourceInventoryOnly": true,
+  "sourceModifiedThisTurn": true,
+  "previewDiagnostics": {
+    "runId": 39478738647,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478738647",
+    "conclusion": "FAIL",
+    "topbarBrandDisplay": "flex",
+    "topbarBrandVisibility": "visible",
+    "inlineHideRulePresent": false,
+    "stylesheetHasLoginHideRule": false,
+    "sourceContainsExpectedRule": true,
+    "rootCauseStatus": "SERVED_PREVIEW_CSS_SIGNATURE_MISMATCH_ROOT_URL_OR_DEPLOYMENT_NOT_YET_IDENTIFIED"
+  },
+  "latestLocalEvidence": {
+    "runId": 39478738647,
+    "sourceCommit": "26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6",
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS",
+    "localPlaywright": "PASS",
+    "screenshotPngCount": 42,
+    "metricCount": 36,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "attemptedWrites": [],
+    "unexpectedApiPaths": []
+  }
 }
