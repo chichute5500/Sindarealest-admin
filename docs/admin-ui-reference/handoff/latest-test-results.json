@@ -8,7 +8,7 @@
   "capturedAt": "2026-10-20T14:20:00Z",
   "progressEstimatePercent": 38,
   "progressBasis": "Raised from 35% to 38% after successfully rendering the approved 12-screen PNG reference embedded in admin-mobile-reference.html, inventorying real ADMIN views/API routes, and identifying PR #111 merge-scope risk. No app source changed during this audit.",
-  "note": "Latest verified source test run is on 7c742407530dbcf2f9407d6a82c48c70620b98a7. Branch HEAD 1b41349971367b51d16091ccf4a3d1d4a4db2bb6 is a handoff/evidence commit, not a new source-code test. Do not repeat the 16-screenshot matrix without a source change; use existing artifacts and continue with reference image retrieval and authorized Preview access.",
+  "note": "Latest verified source test run is on 7c742407530dbcf2f9407d6a82c48c70620b98a7. Branch HEAD 1b41349971367b51d16091ccf4a3d1d4a4db2bb6 is a handoff/evidence commit, not a new source-code test. Do not repeat the 16-screenshot matrix without a source change; use existing artifacts and continue with reference image retrieval and authorized Preview access. Reference image is now viewable from embedded base64 in admin-mobile-reference.html. Current app screenshot comparison remains blocked; do not call these static gap candidates visually verified defects.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -358,5 +358,73 @@
     ],
     "sourceInventoryOnly": true,
     "sourceModifiedThisTurn": false
-  }
+  },
+  "adminReferenceMapping": [
+    {
+      "referenceScreen": "login",
+      "source": "public/admin/index.html #loginView/#loginForm",
+      "status": "SOURCE_VERIFIED_AUTH_NOT_CHANGED"
+    },
+    {
+      "referenceScreen": "dashboard",
+      "source": "dashboard()",
+      "status": "SOURCE_VERIFIED_BROWSER_NOT_TESTED"
+    },
+    {
+      "referenceScreen": "products",
+      "source": "productList() table/search/filter/pagination",
+      "status": "SOURCE_VERIFIED_LAYOUT_DIFF_CANDIDATE"
+    },
+    {
+      "referenceScreen": "product-edit",
+      "source": "#backdrop/#productForm/openEditor()",
+      "status": "SOURCE_VERIFIED_MODAL"
+    },
+    {
+      "referenceScreen": "image-manager",
+      "source": "Gallery/upload inside product editor",
+      "status": "SOURCE_VERIFIED_NO_SEPARATE_ROUTE"
+    },
+    {
+      "referenceScreen": "orders",
+      "source": "ordersPage() table min-width 820px",
+      "status": "SOURCE_VERIFIED_MOBILE_BROWSER_NOT_TESTED"
+    },
+    {
+      "referenceScreen": "order-detail",
+      "source": "No dedicated data-view; order rows inline",
+      "status": "STATIC_GAP_CANDIDATE_NOT_YET_DESIGNED"
+    },
+    {
+      "referenceScreen": "customers",
+      "source": "customersPage() table min-width 720px",
+      "status": "SOURCE_VERIFIED_MOBILE_BROWSER_NOT_TESTED"
+    },
+    {
+      "referenceScreen": "warranty-support",
+      "source": "warrantiesPage() combines issuance and claims",
+      "status": "SOURCE_VERIFIED"
+    },
+    {
+      "referenceScreen": "settings",
+      "source": "settingsPage() prices/welcome/watermark/SKU/backup",
+      "status": "SOURCE_VERIFIED"
+    },
+    {
+      "referenceScreen": "backup-restore",
+      "source": "Embedded in settingsPage()",
+      "status": "SOURCE_VERIFIED_NO_SEPARATE_ROUTE"
+    },
+    {
+      "referenceScreen": "activity-log",
+      "source": "Latest 8 entries on dashboard + notifications panel",
+      "status": "SOURCE_VERIFIED_NO_SEPARATE_ROUTE"
+    }
+  ],
+  "visualGapCandidates": [
+    "Mobile reference shows 5 bottom-nav items; current source has 6 mobile nav buttons. Needs browser-tested design that preserves warranty and settings access.",
+    "Reference product/order/customer lists are image/card-based; current source uses tables. Orders table min-width 820px and customers table min-width 720px; verify mobile usability before changes.",
+    "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
+    "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
+  ]
 }
