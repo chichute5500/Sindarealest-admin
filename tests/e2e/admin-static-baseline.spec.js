@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const localAdminUrl = process.env.LOCAL_ADMIN_URL || 'http://127.0.0.1:4173/admin/';
@@ -163,5 +163,316 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
     metadata.failedRequests = failedRequests;
     metadata.httpErrors = httpErrors;
     writeFileSync(join(outputDir, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n');
+  }
+});
+
+
+test('captures read-only Admin module UI states using explicit local fixtures', async ({ page }) => {
+  test.setTimeout(120_000);
+  mkdirSync(screenshotDir, { recursive: true });
+
+  const fixtureProduct = {
+    id: 'UI-ONLY-PRODUCT',
+    slug: 'ui-only-product',
+    title: 'Sản phẩm thử nghiệm giao diện',
+    sku: 'UI-FIXTURE-001',
+    skuVerified: false,
+    category: 'wallets',
+    categoryLabel: 'Ví da',
+    description: 'Dữ liệu tổng hợp chỉ dùng kiểm tra bố cục; không phải sản phẩm thật.',
+    price: null,
+    stock: null,
+    published: true,
+    images: []
+  };
+  const fixtureApi = {
+    '/api/admin/session': { authenticated: true, fixtureOnly: true },
+    '/api/admin/products': { products: [fixtureProduct] },
+    '/api/admin/settings': {
+      showPrices: false,
+      welcomeEnabled: true,
+      welcomeTitleLine1: 'Tiêu đề thử nghiệm',
+      welcomeTitleLine2: 'Chỉ phục vụ kiểm tra',
+      welcomeText: 'Nội dung giả lập chỉ cho bài kiểm tra giao diện.',
+      watermarkEnabled: true,
+      watermarkLogoUrl: '/watermark.webp',
+      watermarkPosition: 'bottom-right',
+      watermarkSize: 16,
+      watermarkOpacity: 68
+    },
+    '/api/admin/orders': {
+      orders: [{
+        id: 'UI-ONLY-ORDER',
+        order_number: 'UI-ONLY-ORDER',
+        created_at: 'DỮ LIỆU TEST',
+        full_name: 'Khách thử nghiệm giao diện',
+        phone: '—',
+        email: '',
+        address: '',
+        items: [{
+          id: 'UI-ONLY-ITEM',
+          title: 'Sản phẩm thử nghiệm giao diện',
+          quantity: 1,
+          sku: 'UI-FIXTURE-001',
+          skuVerified: false,
+          unitPrice: null
+        }],
+        total: null,
+        status: 'pending_confirmation',
+        payment_status: 'unpaid',
+        price_confirmation_required: true
+      }]
+    },
+    '/api/admin/customers': {
+      customers: [{
+        id: 'UI-ONLY-CUSTOMER',
+        fullName: 'Khách thử nghiệm giao diện',
+        phone: '—',
+        email: '—',
+        address: '—',
+        orderCount: 0,
+        lastOrderAt: null,
+        createdAt: 'DỮ LIỆU TEST'
+      }]
+    },
+    '/api/admin/warranties': {
+      claims: [{
+        id: 'UI-ONLY-CLAIM',
+        createdAt: 'DỮ LIỆU TEST',
+        orderNumber: 'UI-ONLY-ORDER',
+        warrantyCode: '',
+        sku: 'UI-FIXTURE-001',
+        skuVerified: false,
+        title: 'Sản phẩm thử nghiệm giao diện',
+        fullName: 'Khách thử nghiệm giao diện',
+        phone: '—',
+        message: 'Yêu cầu mẫu chỉ để kiểm tra bố cục giao diện.',
+        status: 'received',
+        adminNote: ''
+      }],
+      warranties: []
+    },
+    '/api/admin/audit-logs': {
+      logs: [{
+        created_at: '2026-10-21 00:00:00',
+        action: 'product_updated',
+        entity_type: 'product',
+        entity_id: 'UI-ONLY-PRODUCT',
+        actor: 'UI fixture',
+        details_json: JSON.stringify({
+          title: fixtureProduct.title,
+          sku: fixtureProduct.sku
+        })
+      }]
+    }
+  };
+
+  const screenshots = [];
+  const metrics = [];
+  const pageErrors = [];
+  const consoleErrors = [];
+  const attemptedWrites = [];
+  const unexpectedApiPaths = [];
+  const mobile = { width: 390, height: 844 };
+  const desktop = { width: 1280, height: 800 };
+  const variants = [
+    { viewport: mobile, theme: 'light' },
+    { viewport: mobile, theme: 'dark' },
+    { viewport: desktop, theme: 'light' }
+  ];
+  const viewLabels = {
+    dashboard: 'Thao tác nhanh',
+    products: 'Tìm sản phẩm',
+    orders: 'Mã đơn / thời gian',
+    customers: 'Số đơn',
+    warranties: 'Mã bảo hành đã phát hành',
+    settings: 'Watermark ảnh sản phẩm'
+  };
+  const visualAudit = {
+    test: 'local-static-admin-ui-fixture-visuals',
+    sourceCommit: sourceSha,
+    capturedAt: new Date().toISOString(),
+    fixtureOnly: true,
+    auth: 'Local session API is stubbed to enter appView for layout screenshots only; no live authentication is tested.',
+    data: 'All returned API objects are synthetic fixture data with explicit UI-ONLY IDs, no real PII, no real price/stock/warranty facts.',
+    writePolicy: 'Every non-GET API request is blocked and recorded; no backend, D1, R2 or production data is read or mutated.',
+    viewportMatrix: variants,
+    screenshots,
+    metrics,
+    pageErrors,
+    consoleErrors,
+    attemptedWrites,
+    unexpectedApiPaths,
+    completed: false,
+    failure: null
+  };
+
+  page.on('pageerror', error => pageErrors.push(error.message.slice(0, 300)));
+  page.on('console', message => {
+    if (message.type() === 'error') consoleErrors.push(message.text().slice(0, 300));
+  });
+
+  await page.addInitScript(() => {
+    try {
+      localStorage.removeItem('sd-theme-mode');
+      localStorage.removeItem('sd-admin-last-seen');
+    } catch {}
+  });
+  await page.route('**/api/admin/**', async route => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+    if (request.method() !== 'GET') {
+      attemptedWrites.push({ method: request.method(), path: pathname });
+      await route.fulfill({
+        status: 405,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Read-only UI fixture blocked this request.' })
+      });
+      return;
+    }
+    if (!Object.prototype.hasOwnProperty.call(fixtureApi, pathname)) {
+      unexpectedApiPaths.push(pathname);
+      await route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'No fixture configured for this path.' })
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(fixtureApi[pathname])
+    });
+  });
+
+  const chooseTheme = async theme => {
+    const current = await page.locator('html').getAttribute('data-admin-theme');
+    if (current !== theme) await page.locator('#adminThemeToggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-admin-theme', theme);
+  };
+
+  const navigateTo = async view => {
+    let button = page.locator('[data-view="' + view + '"]:visible').first();
+    if (await button.count() === 0) {
+      const more = page.locator('[data-action="toggle-more"]:visible').first();
+      await expect(more).toBeVisible();
+      const menu = page.locator('#mobileMorePanel');
+      if (await menu.isHidden()) await more.click();
+      button = page.locator('[data-view="' + view + '"]:visible').first();
+    }
+    await expect(button, 'A real visible navigation control should exist for ' + view).toBeVisible();
+    await button.click();
+    await expect(page.locator('#main')).toContainText(viewLabels[view]);
+  };
+
+  const saveScreenshot = async (name, variant, extra = {}) => {
+    const filename = name + '__' + variant.viewport.width + 'x' + variant.viewport.height + '__' + variant.theme + '.png';
+    const filePath = join(screenshotDir, filename);
+    const measurement = await page.evaluate(() => ({
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      documentWidth: document.documentElement.scrollWidth,
+      horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+      theme: document.documentElement.dataset.adminTheme || null,
+      lang: document.documentElement.lang
+    }));
+    metrics.push({ screen: name, ...variant, ...measurement, ...extra });
+    await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
+    expect(measurement.horizontalOverflow, name + ' should not overflow horizontally at ' + variant.viewport.width + 'px').toBe(false);
+    await page.screenshot({ path: filePath, animations: 'disabled' });
+    screenshots.push({ file: filename, screen: name, ...variant, ...extra });
+  };
+
+  const captureView = async (name, view, prepare, fullPageAtMobileLight = false) => {
+    await navigateTo(view);
+    for (const variant of variants) {
+      await page.setViewportSize(variant.viewport);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await chooseTheme(variant.theme);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      if (prepare) await prepare();
+      await saveScreenshot(name, variant);
+      if (fullPageAtMobileLight && variant.theme === 'light' && variant.viewport.width === mobile.width) {
+        const filename = name + '__' + variant.viewport.width + 'x' + variant.viewport.height + '__light__full.png';
+        await page.screenshot({ path: join(screenshotDir, filename), fullPage: true, animations: 'disabled' });
+        screenshots.push({ file: filename, screen: name, ...variant, fullPage: true });
+      }
+      if (name === 'notifications') {
+        const panel = page.locator('#notificationPanel');
+        if (await panel.isVisible()) await page.locator('#notificationToggle').click();
+      }
+    }
+  };
+
+  const openEditor = async variant => {
+    await page.setViewportSize(variant.viewport);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await chooseTheme(variant.theme);
+    await page.locator('[data-action="edit"]:visible').first().click();
+    await expect(page.locator('#backdrop')).toBeVisible();
+    await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
+    await page.locator('.editorcontent').evaluate(el => { el.scrollTop = 0; });
+  };
+
+  try {
+    await page.setViewportSize(mobile);
+    await page.emulateMedia({ colorScheme: 'light' });
+    const response = await page.goto(localAdminUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
+    expect(response?.status(), 'Local source ADMIN should load for fixture-only visual review').toBe(200);
+    await expect(page.locator('#appView')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#main .statgrid')).toBeVisible();
+
+    await captureView('dashboard', 'dashboard', null, true);
+    await captureView('products', 'products', null, true);
+
+    // Product editor and image gallery are true source components. Only their input data is fixture-only.
+    for (const variant of variants) {
+      await openEditor(variant);
+      await saveScreenshot('product-editor', variant, { dialog: true });
+      await page.locator('.editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
+      await page.locator('#imageGrid').scrollIntoViewIfNeeded();
+      await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 0 });
+      await page.locator('#editorClose').click();
+    }
+
+    await captureView('orders', 'orders', null, true);
+    await captureView('order-row-details', 'orders', async () => {
+      await page.locator('#main .order-table tbody tr[data-order-row]').scrollIntoViewIfNeeded();
+    });
+    await captureView('customers', 'customers', null, true);
+    await captureView('warranties', 'warranties', null, true);
+    await captureView('settings', 'settings', null, true);
+    await captureView('backup-restore', 'settings', async () => {
+      await page.locator('#main .setting').filter({ hasText: 'Sao lưu & khôi phục' }).scrollIntoViewIfNeeded();
+    });
+    await captureView('dashboard-activity', 'dashboard', async () => {
+      await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
+    });
+    await captureView('notifications', 'dashboard', async () => {
+      await page.locator('#notificationToggle').click();
+      await expect(page.locator('#notificationPanel')).toBeVisible();
+    });
+
+    expect(pageErrors, 'Fixture visual renders should not throw browser runtime exceptions').toEqual([]);
+    expect(attemptedWrites, 'The local fixture should block all mutating API calls').toEqual([]);
+    expect(unexpectedApiPaths, 'Every Admin API request should use an explicit synthetic fixture').toEqual([]);
+    visualAudit.completed = true;
+  } catch (error) {
+    visualAudit.failure = String(error?.message || error).slice(0, 1200);
+    throw error;
+  } finally {
+    visualAudit.capturedAt = new Date().toISOString();
+    visualAudit.pageErrors = pageErrors;
+    visualAudit.consoleErrors = consoleErrors;
+    visualAudit.attemptedWrites = attemptedWrites;
+    visualAudit.unexpectedApiPaths = unexpectedApiPaths;
+    const metadataPath = join(outputDir, 'metadata.json');
+    let existing = {};
+    try {
+      if (existsSync(metadataPath)) existing = JSON.parse(readFileSync(metadataPath, 'utf8'));
+    } catch {}
+    existing.uiFixtureVisualAudit = visualAudit;
+    writeFileSync(metadataPath, JSON.stringify(existing, null, 2) + '\n');
   }
 });
