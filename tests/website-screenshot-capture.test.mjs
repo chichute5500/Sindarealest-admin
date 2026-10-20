@@ -164,6 +164,8 @@ assert.match(live, /captureKeySections[\s\S]*sectionTargets/,
   'Live capture must cover core page sections, including the six benefit tiles and footer.');
 assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
   'Live capture must directly open and reload a route derived from a real rendered product.');
+assert.match(live, /waitForResponse\(response =>[\s\S]*response\.request\(\)\.isNavigationRequest\(\)[\s\S]*reloadStatus !== null/,
+  'A detail reload must be validated against a real navigation HTTP response even if Playwright reload returns null.');
 assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
   'Gallery-next interaction must only be required when the live product actually has multiple gallery images.');
 assert.match(live, /Path derived from an actual rendered Preview product card/i,
