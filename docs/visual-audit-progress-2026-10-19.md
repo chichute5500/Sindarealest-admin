@@ -484,3 +484,36 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 2. Đọc kết quả từng bước, đặc biệt bước xác minh Cloudflare Pages deployment metadata. Chỉ kết luận token đúng khi bước này PASS.
 3. Nếu token check PASS nhưng browser bị Access redirect, điều tra riêng cấu hình Service Token cho Preview.
 4. Sau khi xác minh deployment và capture live đạt toàn bộ điều kiện coverage, lưu baseline `start-of-work`; chỉ chụp `end-of-work` sau khi đã có baseline. Tiếp tục giữ Production nguyên trạng.
+
+## Cập nhật xác minh thực tế — 2026-10-20 10:20 UTC
+
+### Nhánh và bằng chứng GitHub
+- Nhánh được kiểm tra: `fix/liquid-glass-audit-2026-10-19`. Source commit của workflow mới nhất là `0c5b436c114e094f1ee7ae5a44a4c54b3f79692b` ([commit](https://github.com/chichute5500/Sindarealest-admin/commit/0c5b436c114e094f1ee7ae5a44a4c54b3f79692b)).
+- Workflow source/tests [39371075248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075248): job `validate` và các bước kiểm tra source/test đều SUCCESS.
+- Workflow trực quan [39371072049](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049), artifact [12240964807](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049/artifacts/12240964807): job tổng kết SUCCESS nhưng **không phải live visual PASS**. Đây là push run; bước xác minh dành cho `workflow_dispatch` và các bước lưu baseline/end đã SKIPPED.
+- So sánh GitHub ghi nhánh fix đã diverge khỏi `main` (393 commit ahead, 6 behind; merge base `f38cefe4647b33bd42f9018fde00c420ee5c7c66`). Danh sách thay đổi gồm Admin, API, migration, dữ liệu, deploy/config và các file không thuộc giao diện công khai. Không merge toàn bộ nhánh này; không có thao tác merge/deploy Production.
+- Chỉ xem trạng thái repository từ GitHub API; không có local clone/working tree để xác minh các thay đổi chưa push. Không sửa code trong lần kiểm tra này.
+
+### Blocker được xác nhận từ log và artifact
+- Bước `Verify supplied Preview deployment metadata on push (diagnostic only)` dừng với `Missing or invalid CLOUDFLARE_ACCOUNT_ID`. Trong môi trường của run, `CLOUDFLARE_ACCOUNT_ID` và `CLOUDFLARE_PAGES_READ_TOKEN` đều rỗng; vì thiếu Account ID, API chưa xác minh được token. **Chưa thể kết luận token sai hay đúng quyền**.
+- Bước `Probe supplied Cloudflare Preview on push` chạy nhưng report ghi `accessServiceTokenConfigured=false`, `accessBlocked=true`, `captureCompleted=false`. Log xác nhận cả `CF_ACCESS_CLIENT_ID` và `CF_ACCESS_CLIENT_SECRET` rỗng trong run.
+- URL bị chặn: `https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev`. Phân loại chính xác hiện tại là **Cloudflare Access/login gate**, không phải lỗi render storefront. Không nhập tài khoản, không bypass Access và không sửa policy Production.
+- `deployment-verification.json` có trạng thái `BLOCKED_CONFIGURATION`; báo cáo live có 0 screenshot, 0 viewport, 0 route, 0 section và 0 product-detail check. Các bước chỉ tiếp tục để upload diagnostic artifact vì được cấu hình `continue-on-error`; không được tính là PASS.
+
+### Đã mở và xem ảnh tham chiếu
+- Đã tải artifact `sindarealest-liquid-glass-preview-322` chỉ để kiểm tra, sau đó mở cả hai PNG tham chiếu gốc `file_0000000017088207af45f5e6dd90cfa4.png` (Light) và `file_00000000fcb48207a23aeda23caa5eeb.png` (Dark) ở trong artifact. Hai ảnh là collage màn hình mobile kiểu ứng dụng, nền kính xanh băng ở Light/xanh navy ở Dark, lưới quyền lợi sáu ô 3×2, và các ví dụ túi xách, ví, giày, thắt lưng.
+- Đã mở ảnh `mobile-390-light-viewport.jpg` trong cùng artifact để xác định loại bằng chứng: đây là ảnh Playwright của **local static fixture**, có bố cục storefront dài và ảnh sản phẩm giày. Nó cho thấy khác biệt hình ảnh đáng kể so với collage tham chiếu nhưng **không phải ảnh Preview thật**, vì vậy không được dùng làm baseline hoặc làm bằng chứng nghiệm thu live.
+- Artifact local audit có 54 screenshot, 235 fixture products, 20 responsive cases và 93 interaction checks; các chỉ số này chỉ nghiệm thu được đường chạy fixture. Kết quả local ghi 0 tràn ngang/lỗi console/page/HTTP/request và 0 hard failures; không chứng minh Preview, D1/R2 hoặc dữ liệu sản phẩm thực.
+- Đã kiểm tra mã nguồn `public/index.html`: `syncHeroProductImage()` lấy ảnh từ ảnh sản phẩm đầu tiên ở `#catalogGrid .product-photo img`, rồi fallback sang `#featuredGrid .feature-slide`; không cần hardcode ảnh Hero mới. CSS sáu ô nằm trong nhóm selector `.service-strip`/`.service-strip .service-copy` có breakpoint mobile và lớp nền/blur/viền riêng. Chưa có ảnh live để kết luận ngoại quan sau render nên không sửa CSS theo phỏng đoán.
+
+### URL sản phẩm và ảnh chuẩn
+- Kiểm tra source/tests: middleware có pattern route mới `/sanpham/{category-slug}/{product-key}`, route cũ `/san-pham/{key}` và redirect sang category canonical; danh mục lấy từ mapping dùng chung. Test `tests/product-route-canonical.test.mjs` xác minh mapping/redirect/metadata trên dữ liệu test.
+- Không có bằng chứng mở trực tiếp, reload, Back/Forward hoặc click card cho URL sản phẩm trên **Preview thật** vì homepage chưa vượt qua Cloudflare Access. Không đánh dấu route runtime PASS; không tự tạo mapping từ fixture như dữ liệu catalog thật.
+- Hai thư mục chuẩn `docs/website-screenshots/start-of-work/` và `docs/website-screenshots/end-of-work/` vẫn không có ảnh PNG live. Manifest hiện giữ trạng thái BLOCKED; pixel comparison chưa được chạy. Không copy ảnh fixture/reference vào hai thư mục chuẩn.
+
+### Tiến độ thực tế và bước tiếp theo
+- Đã xác minh: source/test CI xanh; định nghĩa workflow có input `capture_stage`, `confirm_preview_only`, `capture_source`, `preview_url`; hai ảnh tham chiếu gốc đã được mở; root cause của lần chạy này là cấu hình GitHub Actions không được cung cấp trong run và Access login gate.
+- Chưa xác minh: Pages token hợp lệ/quyền Pages Read, deployment ID/branch/SHA gắn với alias, ảnh Preview thật, visual diff, section “Phong cách đẳng cấp từ da cá sấu” trên live, Liquid Glass sau render live, URL sản phẩm runtime và đầy đủ theme/responsive trên Preview.
+- Ước tính checklist **không tăng từ lần trước; chưa đủ bằng chứng để nâng tiến độ**. Local fixture success không bù cho live capture bị chặn.
+- Để mở khóa, repository cần có GitHub Actions variable `CLOUDFLARE_ACCOUNT_ID` và secrets `CLOUDFLARE_PAGES_READ_TOKEN`, `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET` với đúng phạm vi; đồng thời phải có Cloudflare Access Service Auth policy giới hạn an toàn ở Preview alias. Log hiện tại cho thấy các giá trị này chưa được cấp vào run, dù các tên secret từng được nhắc trong ghi chú trước. Không gửi giá trị secret vào chat.
+- Sau khi cấu hình hoàn tất, chạy thủ công workflow `liquid-glass-visual-preview.yml` trên đúng branch với `capture_stage=start-of-work`, `confirm_preview_only=true`, `capture_source=cloudflare-preview`, `preview_url=https://3ed49bcc.sindarealest2.pages.dev/`. Chỉ dùng baseline sau khi deployment API xác minh Preview branch/SHA và live audit đủ coverage; mới sau đó mới chạy end-of-work.
