@@ -1,0 +1,436 @@
+name: Liquid Glass isolated visual preview
+
+on:
+  push:
+    branches:
+      - fix/liquid-glass-redesign
+      - fix/liquid-glass-audit-2026-10-19
+    paths-ignore:
+      - 'docs/website-screenshots/start-of-work/**'
+      - 'docs/website-screenshots/end-of-work/**'
+      - 'docs/website-screenshots/manifest.json'
+      - 'docs/website-screenshots/README.md'
+      - 'docs/handoff/**'
+      - 'docs/static-web-reference/**'
+      - 'docs/visual-audit-progress-2026-10-19.md'
+  workflow_dispatch:
+    inputs:
+      capture_stage:
+        description: 'Save this real capture as the start or end snapshot'
+        required: true
+        type: choice
+        options:
+          - start-of-work
+          - end-of-work
+      confirm_preview_only:
+        description: 'Confirm this is a fix/Preview branch only; never Production'
+        required: true
+        type: boolean
+        default: true
+      capture_source:
+        description: 'Only Cloudflare Preview can be archived into start/end folders'
+        required: true
+        type: choice
+        options:
+          - cloudflare-preview
+          - local-static-fixture
+        default: cloudflare-preview
+      preview_url:
+        description: 'HTTPS Preview alias only; Production hostname is rejected'
+        required: true
+        type: string
+        default: 'https://3ed49bcc.sindarealest2.pages.dev/'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: liquid-glass-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  visual-preview:
+    if: github.ref == 'refs/heads/fix/liquid-glass-redesign' || github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Reject unsafe manual capture
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          STAGE: ${{ inputs.capture_stage }}
+          PREVIEW_ONLY: ${{ inputs.confirm_preview_only }}
+          CAPTURE_SOURCE: ${{ inputs.capture_source }}
+          PREVIEW_URL: ${{ inputs.preview_url }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          test "${PREVIEW_ONLY}" = "true"
+          case "${REF_NAME}" in
+            fix/liquid-glass-redesign|fix/liquid-glass-audit-2026-10-19) ;;
+            *) echo "Refused: only an approved fix branch is allowed."; exit 1 ;;
+          esac
+          case "${STAGE}" in
+            start-of-work|end-of-work) ;;
+            *) echo "Refused: capture stage must be explicitly selected."; exit 1 ;;
+          esac
+          case "${CAPTURE_SOURCE}" in
+            cloudflare-preview|local-static-fixture) ;;
+            *) echo "Refused: unknown capture source."; exit 1 ;;
+          esac
+          if [ "${CAPTURE_SOURCE}" = "cloudflare-preview" ]; then
+            node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
+          fi
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+      - name: Record source revision before screenshot commit
+        run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install temporary Playwright and PNG comparison dependencies
+        run: npm install --no-save --no-package-lock playwright@1.56.1 pixelmatch@6.0.0 pngjs@7.0.0
+      - name: Run complete project tests
+        run: npm test
+      - name: Run project and migration checks
+        run: npm run check
+      - name: Install isolated Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start read-only local static preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --directory public > /tmp/sindarealest-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then
+              echo "Local static preview is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/sindarealest-preview.log
+          exit 1
+      - name: Capture local Light/Dark screenshots and run fixture audit
+        run: node scripts/capture-liquid-glass-preview.mjs
+      - name: Verify supplied Preview deployment metadata on push (diagnostic only)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+          EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+        run: node scripts/verify-cloudflare-preview-deployment.mjs
+      - name: Probe supplied Cloudflare Preview on push (artifact only; never archives)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
+          node scripts/capture-cloudflare-preview.mjs
+      - name: Verify actual Cloudflare Pages deployment before manual capture/archive
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+          EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+        run: node scripts/verify-cloudflare-preview-deployment.mjs
+      - name: Capture live Cloudflare Pages Preview (read-only)
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: node scripts/capture-cloudflare-preview.mjs
+      - name: Explain local fixture captures are artifact-only
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'local-static-fixture'
+        run: echo "Local fixture screenshots are uploaded for review only; canonical start/end folders are unchanged."
+      - name: Save live Preview images into selected repository archive
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
+        env:
+          STAGE: ${{ inputs.capture_stage }}
+          RUN_ID: ${{ github.run_id }}
+          SOURCE_SHA: ${{ env.SOURCE_SHA }}
+          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+          PREVIEW_URL: ${{ inputs.preview_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${STAGE}" in
+            start-of-work|end-of-work) ;;
+            *) echo "Refused invalid capture stage"; exit 1 ;;
+          esac
+          source_dir="artifacts/liquid-glass-preview/live-preview"
+          target_dir="docs/website-screenshots/${STAGE}"
+          manifest_path="docs/website-screenshots/manifest.json"
+          test -s "${source_dir}/visual-audit.json"
+          test -s "artifacts/liquid-glass-preview/deployment-verification.json"
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
+          const verification = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/deployment-verification.json', 'utf8'));
+          const deployed = verification.deployment || {};
+          const verifiedDeployment = verification.passed === true
+            && verification.status === 'VERIFIED_PREVIEW_DEPLOYMENT'
+            && deployed.environment === 'preview'
+            && /^[a-f0-9]{7,64}$/i.test(deployed.commitHash || '')
+            && Boolean(deployed.branch)
+            && deployed.branch === process.env.REF_NAME
+            && deployed.branchMatchesExpected === true
+            && Boolean(deployed.id)
+            && (() => { try { return (deployed.aliases || []).some(alias => new URL(alias).origin === new URL(process.env.PREVIEW_URL).origin) || new URL(deployed.url).origin === new URL(process.env.PREVIEW_URL).origin; } catch { return false; } })();
+          if (!verifiedDeployment) {
+            console.error('Refused to archive: Cloudflare Pages API did not verify the exact Preview alias, deployment environment, branch and commit SHA.');
+            process.exit(1);
+          }
+          if (process.env.STAGE === 'end-of-work') {
+            const currentManifest = JSON.parse(fs.readFileSync('docs/website-screenshots/manifest.json', 'utf8'));
+            const baselineDirectory = 'docs/website-screenshots/start-of-work';
+            const baselineFiles = fs.existsSync(baselineDirectory)
+              ? fs.readdirSync(baselineDirectory).filter(name => /\.png$/i.test(name))
+              : [];
+            const baselineStage = currentManifest.stages?.['start-of-work'];
+            if (!baselineFiles.length || baselineStage?.status !== 'CAPTURED_PASS' || baselineStage?.previewDeploymentVerified !== true) {
+              console.error('Refused end-of-work archive: a verified start-of-work Preview baseline with PNGs must be captured first.');
+              process.exit(1);
+            }
+          }
+          const requiredSectionKeys = ['hero', 'benefits', 'order', 'featured', 'collections', 'products', 'footer'];
+          const coverage = audit.coverage || {};
+          const requiredSectionsComplete = requiredSectionKeys.every(key => coverage.sectionScreenshotCounts?.[key] === 4);
+          const originMatches = (() => {
+            try { return new URL(audit.previewUrl).origin === new URL(process.env.PREVIEW_URL).origin; }
+            catch { return false; }
+          })();
+          if (audit.sourceKind !== 'cloudflare-pages-preview-live-read-only'
+              || audit.captureCompleted !== true || audit.accessBlocked === true || audit.passed !== true
+              || !originMatches
+              || !Array.isArray(audit.screenshots) || !Array.isArray(audit.productDetailChecks)
+              || coverage.requiredViewportThemePairs !== coverage.completedViewportThemePairs
+              || coverage.homeFullPageCount !== 4 || !coverage.requiredSectionScreenshotsComplete
+              || !requiredSectionsComplete || coverage.menuOpenCount !== 2 || coverage.orderExpandedCount !== 4
+              || coverage.productDetailContextsComplete !== true || coverage.totalScreenshotCount < 50
+              || audit.productDetailChecks.length !== 4
+              || !audit.productDetailChecks.every(x => x.status === 'PASS' && x.directOpenPassed === true && x.reloadPassed === true)
+              || audit.screenshots.filter(x => x.captureType === 'viewport' && x.state === 'default-home').length !== coverage.requiredViewportThemePairs) {
+            console.error('Refused to archive: live Preview, viewport/theme, section, menu, order or product-detail coverage did not pass.');
+            process.exit(1);
+          }
+          NODE
+          mkdir -p "${target_dir}" docs/website-screenshots
+          find "${source_dir}" -maxdepth 1 -type f -name '*.png' -print -quit | grep -q .
+          find "${target_dir}" -maxdepth 1 -type f \( -name '*.png' -o -name '*.jpg' \) -delete
+          while IFS= read -r file; do
+            name="$(basename "$file")"
+            cp "$file" "${target_dir}/${name}"
+          done < <(find "${source_dir}" -maxdepth 1 -type f -name '*.png' -print | sort)
+          image_count="$(find "${target_dir}" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
+          test "${image_count}" -gt 1
+          CAPTURED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" IMAGE_COUNT="${image_count}" node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const file = 'docs/website-screenshots/manifest.json';
+          const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
+          const deploymentVerification = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/deployment-verification.json', 'utf8'));
+          const deployed = deploymentVerification.deployment;
+          manifest.schemaVersion = 1;
+          manifest.repository = process.env.REPOSITORY;
+          manifest.branch = process.env.REF_NAME;
+          manifest.sourceCommit = process.env.SOURCE_SHA;
+          manifest.previewUrl = process.env.PREVIEW_URL;
+          manifest.previewDeploymentCommit = deployed.commitHash;
+          manifest.previewDeploymentBranch = deployed.branch;
+          manifest.previewDeploymentId = deployed.id;
+          manifest.previewDeploymentCreatedOn = deployed.createdOn;
+          manifest.previewCommitVerification = 'VERIFIED via Cloudflare Pages API read-only deployment metadata; target alias matched an environment=preview deployment with successful stage status.';
+          manifest.captureSource = 'Direct Cloudflare Pages Preview capture, read-only; no fixture API';
+          manifest.captureCoverage = audit.coverage;
+          manifest.liveAuditPassed = audit.passed === true;
+          manifest.accessServiceTokenConfigured = audit.accessServiceTokenConfigured === true;
+          manifest.updatedAtUtc = process.env.CAPTURED_AT;
+          manifest.status = 'IN PROGRESS';
+          manifest.stages ??= {};
+          const imageNames = fs.readdirSync('docs/website-screenshots/' + process.env.STAGE + '/').filter(name => name.endsWith('.png')).sort();
+          const baselineDir = 'docs/website-screenshots/start-of-work/';
+          const resultDir = 'docs/website-screenshots/end-of-work/';
+          const counterpartDir = process.env.STAGE === 'start-of-work' ? resultDir : baselineDir;
+          const counterpartNames = new Set(fs.existsSync(counterpartDir) ? fs.readdirSync(counterpartDir) : []);
+          const screenshotByName = new Map((audit.screenshots || []).map(item => [item.filename, item]));
+          const infer = (name) => {
+            const item = screenshotByName.get(name) || {};
+            const theme = item.theme || /(^|[-_])(light|dark)([-_.]|$)/i.exec(name)?.[2]?.toLowerCase() || 'UNVERIFIED';
+            const matched = /(mobile|tablet|desktop)[-_](?:light|dark)[-_](\d{3,4})x(\d{3,4})/i.exec(name);
+            const legacy = /(mobile|tablet|desktop)[-_]?(320|360|375|390|412|430|768|1024|1366|1440)/i.exec(name);
+            const width = item.viewportWidth || (matched ? Number(matched[2]) : legacy ? Number(legacy[2]) : null);
+            const height = item.viewportHeight || (matched ? Number(matched[3]) : null);
+            return {
+              route: item.route || 'UNVERIFIED',
+              theme,
+              viewportName: item.viewport || legacy?.[0] || 'UNVERIFIED',
+              viewport: width && height ? { width, height } : null,
+              captureType: item.captureType || 'UNVERIFIED',
+              state: item.state || null,
+              sectionKey: item.sectionKey || null,
+              elementSelector: item.elementSelector || null,
+              status: 'captured-live-preview',
+            };
+          };
+          manifest.stages[process.env.STAGE] = {
+            status: audit.passed ? 'CAPTURED_PASS' : 'CAPTURED_WITH_ISSUES',
+            capturedAtUtc: process.env.CAPTURED_AT, runId: process.env.RUN_ID, sourceCommit: process.env.SOURCE_SHA,
+            previewDeploymentCommit: deployed.commitHash, previewDeploymentBranch: deployed.branch,
+            previewDeploymentId: deployed.id, previewDeploymentCreatedOn: deployed.createdOn,
+            previewDeploymentVerified: true,
+            imageCount: Number(process.env.IMAGE_COUNT),
+            directory: 'docs/website-screenshots/' + process.env.STAGE + '/',
+            sourceKind: audit.sourceKind, auditPassed: audit.passed,
+            overallVisualComparison: 'UNVERIFIED',
+            responsiveOverflowCount: audit.responsiveOverflowCount ?? null,
+            pageErrorCount: audit.pageErrors?.length ?? null,
+            consoleErrorCount: audit.consoleErrors?.length ?? null,
+            readOnlyViolationCount: audit.readOnlyViolations?.length ?? null,
+            routeChecks: audit.routeChecks || [],
+            images: imageNames.map(name => ({
+              path: 'docs/website-screenshots/' + process.env.STAGE + '/' + name,
+              ...infer(name), baselinePath: baselineDir + name, resultPath: resultDir + name,
+              counterpartExists: counterpartNames.has(name), status: 'captured-live-preview', comparisonStatus: 'UNVERIFIED'
+            }))
+          };
+          fs.writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
+          NODE
+          git add "${target_dir}" "${manifest_path}"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive live Preview ${STAGE} screenshots (run ${RUN_ID})"
+          git push origin "HEAD:${REF_NAME}"
+      - name: Compare start/end screenshots using pixel diff
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work'
+        run: node scripts/compare-website-screenshots.mjs
+      - name: Record pixel comparison summary in manifest
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/website-screenshot-diffs/comparison.json || { echo "No comparison report exists; manifest left unchanged."; exit 0; }
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const manifestPath = 'docs/website-screenshots/manifest.json';
+          const comparison = JSON.parse(fs.readFileSync('artifacts/website-screenshot-diffs/comparison.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          manifest.updatedAtUtc = new Date().toISOString();
+          manifest.comparisonStatus = comparison.status;
+          const hasComparablePairs = Number(comparison.summary?.comparablePairs || 0) > 0;
+          manifest.status = hasComparablePairs ? 'AWAITING_HUMAN_VISUAL_REVIEW' : 'BLOCKED';
+          manifest.humanVisualReview = {
+            required: true,
+            status: hasComparablePairs ? 'PENDING' : 'BLOCKED',
+            note: 'Pixel diff is a review aid; a person must inspect matched screenshots and the report before visual acceptance.'
+          };
+          manifest.pixelComparison = {
+            runId: process.env.RUN_ID,
+            report: 'comparison.json and report.html in the GitHub Actions artifact',
+            status: comparison.status, summary: comparison.summary,
+            matchingFilenameCount: comparison.matchingFilenameCount,
+            baselineImageCount: comparison.baselineImageCount, resultImageCount: comparison.resultImageCount,
+            note: 'Pixel differences are a review aid, not an aesthetic score. Human visual review remains required.'
+          };
+          if (manifest.stages && manifest.stages['end-of-work']) {
+            manifest.stages['end-of-work'].overallVisualComparison = comparison.status;
+            manifest.stages['end-of-work'].pixelComparisonSummary = comparison.summary;
+            manifest.stages['end-of-work'].humanVisualReviewStatus = hasComparablePairs ? 'PENDING' : 'BLOCKED';
+          }
+          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+          NODE
+          git add docs/website-screenshots/manifest.json
+          if git diff --cached --quiet; then echo "Manifest already records the comparison."; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: record end-of-work pixel comparison (run ${RUN_ID})"
+          git push origin "HEAD:${REF_NAME}"
+      - name: Attach original design references to audit artifact
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png
+          test -s docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png
+          mkdir -p artifacts/liquid-glass-preview/reference-images
+          cp docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png artifacts/liquid-glass-preview/reference-images/
+          cp docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png artifacts/liquid-glass-preview/reference-images/
+      - name: Summarize local fixture, live Preview, and deployment verification separately
+        if: always()
+        shell: bash
+        run: |
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const readJson = (file) => {
+            try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
+          };
+          const local = readJson('artifacts/liquid-glass-preview/visual-audit.json');
+          const live = readJson('artifacts/liquid-glass-preview/live-preview/visual-audit.json');
+          const deployment = readJson('artifacts/liquid-glass-preview/deployment-verification.json');
+          const manifest = readJson('docs/website-screenshots/manifest.json');
+          const lines = [
+            '## Liquid Glass audit — evidence separated by environment',
+            '',
+            'This summary distinguishes local fixture tests from the protected Cloudflare Pages Preview. A green local fixture audit is not live Preview acceptance.',
+            '',
+          ];
+          if (local) {
+            const count = (value) => Array.isArray(value) ? value.length : Number(value || 0);
+            lines.push(
+              '- **Local fixture audit:** ' + (local.passed === true ? 'PASS' : 'FAIL') +
+              ' — ' + count(local.screenshots) + ' screenshots, ' + Number(local.productFixtureCount || 0) +
+              ' fixture products, ' + count(local.responsive) + ' responsive cases, ' +
+              count(local.interactions) + ' interaction checks; overflow=' + Number(local.responsiveOverflowCount || 0) +
+              ', console=' + count(local.consoleErrors) + ', page=' + count(local.pageErrors) +
+              ', HTTP=' + count(local.httpErrors) + ', hard failures=' + count(local.hardFailures) + '.'
+            );
+          } else lines.push('- **Local fixture audit:** NO REPORT — inspect failed workflow steps.');
+          if (live) {
+            let liveStatus = 'NOT PASSED';
+            if (live.accessBlocked === true) liveStatus = 'BLOCKED_ACCESS_GATE';
+            else if (live.passed === true) liveStatus = 'PASS';
+            lines.push(
+              '- **Live Cloudflare Pages Preview:** ' + liveStatus +
+              ' — real screenshots=' + count(live.screenshots) +
+              ', viewport/theme pairs=' + Number(live.coverage?.completedViewportThemePairs || 0) +
+              '/' + Number(live.coverage?.requiredViewportThemePairs || 8) +
+              ', route checks=' + count(live.routeChecks) +
+              ', Access service token configured=' + String(live.accessServiceTokenConfigured === true) + '.'
+            );
+            if (live.accessBlocked === true) lines.push('- **Important:** no storefront content was accepted as a real screenshot baseline; do not interpret this run as a live visual pass.');
+          } else lines.push('- **Live Cloudflare Pages Preview:** NO REPORT — live probe may not have run on this event.');
+          if (deployment) {
+            lines.push('- **Actual Preview deployment verification:** ' + String(deployment.status || 'UNKNOWN') +
+              (deployment.error ? ' — ' + String(deployment.error).replace(/[\r\n]+/g, ' ').slice(0, 240) : '') + '.');
+            if (deployment.passed !== true) lines.push('- Screenshot archiving must remain blocked until the exact Preview alias, successful Preview deployment, selected branch and commit SHA are verified.');
+            else lines.push('- Verified deployment branch: ' + String(deployment.deployment?.branch || 'unknown') +
+              '; commit SHA: ' + String(deployment.deployment?.commitHash || 'unknown') + '.');
+          } else lines.push('- **Actual Preview deployment verification:** NO REPORT — no manual archival is authorized.');
+          if (manifest) {
+            lines.push('- **Canonical screenshot archive:** baseline=' + String(manifest.stages?.['start-of-work']?.status || 'BLOCKED') +
+              '; end=' + String(manifest.stages?.['end-of-work']?.status || 'NOT TESTED') +
+              '; comparison=' + String(manifest.comparisonStatus || 'NOT TESTED') + '.');
+          }
+          lines.push('', 'Production was not merged, deployed, or reconfigured by this workflow.');
+          const summary = lines.join('\n') + '\n';
+          if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+          console.log(summary);
+          NODE
+      - name: Upload screenshots and HTML audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sindarealest-liquid-glass-preview-${{ github.run_number }}
+          path: |
+            artifacts/liquid-glass-preview/
+            artifacts/website-screenshot-diffs/
+          if-no-files-found: warn
+          retention-days: 14

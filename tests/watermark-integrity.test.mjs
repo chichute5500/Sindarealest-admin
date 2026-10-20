@@ -13,13 +13,27 @@ assert.deepEqual(normalizeWatermarkSettings({}), {
 });
 assert.equal(normalizeWatermarkSettings({watermark_enabled:'0'}).watermarkEnabled,false);
 assert.equal(normalizeWatermarkSettings({watermark_logo:'/other.webp'}).watermarkLogoUrl,'/watermark.webp');
+assert.equal(normalizeWatermarkSettings({watermark_logo:'/media/01234567-89ab-cdef-0123-456789abcdef.webp'}).watermarkLogoUrl,'/media/01234567-89ab-cdef-0123-456789abcdef.webp');
 assert.deepEqual(validateWatermarkSettingUpdates({watermarkEnabled:false,watermarkPosition:'top-left',watermarkSize:24,watermarkOpacity:75}).updates,[
  ['watermark_enabled','0'],['watermark_position','top-left'],['watermark_size','24'],['watermark_opacity','75'],
 ]);
 assert.match(validateWatermarkSettingUpdates({watermarkPosition:'outside'}).error,/vị trí/i);
 assert.match(validateWatermarkSettingUpdates({watermarkSize:99}).error,/6 đến 35/i);
 assert.match(validateWatermarkSettingUpdates({watermarkOpacity:0}).error,/10 đến 100/i);
-assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'/other.webp'}).error,/giữ nguyên/i);
+assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'https://evil.example/logo.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
+assert.deepEqual(validateWatermarkSettingUpdates({watermarkLogoUrl:'/media/01234567-89ab-cdef-0123-456789abcdef.webp'}).updates,[['watermark_logo','/media/01234567-89ab-cdef-0123-456789abcdef.webp']]);
+assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'//evil.example/logo.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
+assert.match(validateWatermarkSettingUpdates({watermarkLogoUrl:'/media/not-a-uuid.webp'}).error,/đường dẫn ảnh WebP nội bộ/i);
+
+const backupSource=readFileSync(new URL('../functions/api/admin/backup.js',import.meta.url),'utf8');
+const restoreSource=readFileSync(new URL('../functions/api/admin/restore.js',import.meta.url),'utf8');
+assert.ok(backupSource.includes('"watermark_logo"'), 'Backup must include the selected watermark logo setting');
+assert.ok(backupSource.includes('watermarkLogoUrl: watermark.watermarkLogoUrl'), 'Backup JSON must preserve the selected watermark logo');
+assert.ok(backupSource.includes('IN (?,?,?,?,?,?,?,?,?,?)'), 'Backup settings query must include all ten settings');
+assert.ok(restoreSource.includes('Object.hasOwn(backup.settings, "watermarkLogoUrl")'), 'Restore must accept the logo field while remaining compatible with older v2 backups');
+const adminSettingsSource=readFileSync(new URL('../functions/api/admin/settings.js',import.meta.url),'utf8');
+assert.ok(adminSettingsSource.includes('context.env.IMAGES.head(key)'), 'Custom watermark logo must exist in R2 before settings can be saved');
+assert.ok(adminSettingsSource.includes('Không tìm thấy ảnh logo trong kho ảnh'), 'Invalid watermark image paths must return actionable feedback');
 
 const mockDB={prepare(){return{bind(){return this},async first(){return null}}}};
 const response=await publicSettingsGet({env:{DB:mockDB}});
@@ -42,11 +56,14 @@ assert.ok(!script.includes('.detail-thumb'));
 assert.ok(!home.includes('.product-photo .sd-viewer-watermark'));
 assert.ok(!home.includes('.detail-thumb .sd-viewer-watermark'));
 assert.ok(home.includes("window.__sdSettingsPromise||window.__sdPublicSettings"));
+assert.ok(home.includes("mark.src=config.watermarkLogoUrl||'/watermark.webp'"), 'Detail viewer must use the configurable watermark logo');
+assert.ok(home.includes("watermarkLogoUrl:typeof next.watermarkLogoUrl==='string'"), 'Public viewer must validate and apply the selected internal logo path');
 
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 assert.ok(admin.includes('watermarkSettingsForm'));
 assert.ok(admin.includes('saveWatermarkSettings'));
-assert.ok(admin.includes('src="/watermark.webp"'));
+assert.ok(admin.includes('id="watermarkLogoUrl"'));
+assert.ok(admin.includes('watermarkLogoPreview'));
 assert.ok(admin.includes("body.append('original',file,file.name||'original')"));
 assert.ok(!/watermarkApplied|ctx\.drawImage\(markBitmap/.test(admin));
 

@@ -43,12 +43,23 @@ assert.equal(valid.value.stock, null, 'không tự gán tồn kho');
 
 const stockRow = {
   id: 'stock-product', slug: 'stock-product', sku: 'SD-SN099', title: 'Sneaker thử',
-  category: 'sneakers', category_label: 'Sneaker', price: 1230000, stock: 7,
+  category: 'sneakers', category_label: 'Sneaker', price: 1230000, stock: 7, sku_verified: 1,
   published: 1, images_json: '[]', description: '', source_price_confirmed: 0, sort_order: 1,
 };
 assert.equal(fromRow(stockRow, { publicView: true, showPrices: true }).stock, null,
   'public product API must not reveal internal inventory counts even when prices are visible');
 assert.equal(fromRow(stockRow).stock, 7, 'admin view must retain the actual stock count');
+assert.equal(fromRow(stockRow, { publicView: true, showPrices: true }).skuVerified, true,
+  'category-prefixed SKU codes remain usable for products outside the historical seed range');
+const legacySeedRow = { ...stockRow, id: 'legacy-seed-row', sku: 'SD001', sku_verified: 0 };
+assert.equal(fromRow(legacySeedRow).skuVerified, false,
+  'historic SD001–SD235 fixture identifiers must not be treated as verified commercial SKUs');
+assert.equal(fromRow(legacySeedRow, { publicView: true }).sku, null,
+  'public product responses must not expose unverified historic seed identifiers');
+const generatedCodeRow = { ...stockRow, sku: 'SD-SN099', sku_verified: 0 };
+assert.equal(fromRow(generatedCodeRow).skuVerified, false, 'persisted flag overrides a SKU-looking pattern for generated internal codes');
+assert.equal(fromRow(generatedCodeRow, { publicView: true }).sku, null, 'public API hides generated category-prefixed codes');
+assert.equal(fromRow(stockRow, { publicView: true }).sku, 'SD-SN099', 'explicitly verified SKU remains visible even if it resembles a generated pattern');
 const prototypeNamedCategory = validateProduct({
   title: 'Sản phẩm danh mục tùy chỉnh', sku: 'SD-CON001', category: 'constructor',
   price: null, stock: null, published: true, images: [],
@@ -63,7 +74,13 @@ assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', imag
 assert.ok(validateProduct({ title: 'Hỏng', sku: 'SD237', category: 'Ví', price: -1 }).error, 'giá âm phải bị từ chối');
 const sourceProducts = JSON.parse(readFileSync(new URL('../data/legacy-products.json', import.meta.url), 'utf8'));
 assert.equal(sourceProducts.length, 235, 'nguồn sản phẩm phải có đủ 235 bản ghi');
-for (const product of sourceProducts) assert.equal(validateProduct(product).error, undefined, `sản phẩm nguồn không hợp lệ: ${product.sku}`);
+for (const [index, product] of sourceProducts.entries()) {
+  assert.equal(product.sku, null, `SKU fixture phải để trống khi chưa được xác minh: ${product.id}`);
+  assert.equal(product.skuVerified, false, `Nguồn fixture phải đánh dấu SKU chưa xác minh: ${product.id}`);
+  const validationCandidate = { ...product, sku: `AUDIT-${String(index + 1).padStart(3, '0')}` };
+  assert.equal(validateProduct(validationCandidate).error, undefined, `các trường sản phẩm nguồn không hợp lệ: ${product.id}`);
+  assert.match(validateProduct(product).error || '', /SKU|Mã sản phẩm/i, `luồng quản trị vẫn phải từ chối sản phẩm mới thiếu SKU: ${product.id}`);
+}
 
 
 

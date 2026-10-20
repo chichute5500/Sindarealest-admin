@@ -85,7 +85,7 @@ function createMockDb(rows, { failAudit = false } = {}) {
           for (const row of draft) {
             if (!ids.includes(row.id)) continue;
             const pair = pairs.find(([id]) => id === row.id);
-            if (pair) row.sku = pair[1];
+            if (pair) { row.sku = pair[1]; row.sku_verified = 0; }
           }
           assert.equal(
             new Set(draft.map((row) => row.sku)).size,
@@ -148,7 +148,8 @@ const prefixByCategory = Object.fromEntries(categories.map(([key, , , prefix]) =
 for (const row of rows) {
   counters[row.category]++;
   const expectedSku = prefixByCategory[row.category] + String(counters[row.category]).padStart(3, '0');
-  assert.equal(row.sku, expectedSku, `SKU không đúng thứ tự tại ${row.title}`);
+  assert.equal(row.sku, expectedSku, `Mã nội bộ không đúng thứ tự tại ${row.title}`);
+  assert.equal(row.sku_verified, 0, `Mã reset phải được đánh dấu chưa xác minh tại ${row.title}`);
 }
 for (let i = 0; i < rows.length; i++) {
   for (const field of ['id', 'title', 'category', 'category_label', 'sort_order', 'price', 'stock', 'images_json', 'published', 'slug', 'description']) {
@@ -159,6 +160,24 @@ assert.equal(mock.stats().batchCalls, 1, 'Reset phải gửi một DB.batch');
 assert.equal(mock.stats().selectCalls, 1);
 assert.ok(mock.stats().auditStatement, 'Phải ghi audit log trong batch');
 assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().auditStatement.params[1]).count, 235);
+
+{
+  const mixedRows = makeRows();
+  mixedRows[0].sku = 'SD-SN001';
+  mixedRows[0].sku_verified = 1;
+  const verifiedSnapshot = { sku: mixedRows[0].sku, sku_verified: mixedRows[0].sku_verified };
+  const dbMock = createMockDb(mixedRows);
+  const result = await resetSkus(await makeContext(dbMock.db, { confirm: true }));
+  const payload = await result.json();
+  assert.equal(result.status, 200);
+  assert.equal(payload.count, 234, 'Only products without a verified commercial SKU should be reset');
+  assert.equal(mixedRows[0].sku, verifiedSnapshot.sku, 'Reset must preserve the commercial SKU');
+  assert.equal(mixedRows[0].sku_verified, verifiedSnapshot.sku_verified, 'Reset must preserve the verification flag');
+  assert.equal(mixedRows[1].sku, 'SD-SN002', 'Internal code allocation must skip a verified SKU collision');
+  assert.equal(mixedRows[1].sku_verified, 0);
+  assert.equal(new Set(mixedRows.map((row) => row.sku)).size, mixedRows.length, 'verified and internal SKU values must remain unique');
+  assert.equal(JSON.parse(dbMock.stats().auditStatement.params[1]).count, 234, 'audit log counts only internal codes changed');
+}
 
 {
   const rowsWithNewCategory = makeRows({ unsupported: true });

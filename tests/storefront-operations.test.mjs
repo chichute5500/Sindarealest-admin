@@ -7,12 +7,63 @@ import { onRequestGet as sitemap } from '../functions/sitemap.xml.js';
 import { onRequestGet as robots } from '../functions/robots.txt.js';
 import { readFileSync } from 'node:fs';
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+const contactStart = storefrontHtml.indexOf('<div class="contact-grid">');
+const contactSectionStart = storefrontHtml.lastIndexOf('<section class="footer-contacts"', contactStart);
+const contactEnd = storefrontHtml.indexOf('</section>', contactSectionStart);
+const contactMarkup = storefrontHtml.slice(contactStart, contactEnd);
+const warrantyHelpStart = storefrontHtml.indexOf('<div class="warranty-help');
+const footerBottomStart = storefrontHtml.indexOf('<div class="footer-bottom">');
+assert.ok(contactEnd > contactStart && warrantyHelpStart > contactEnd && footerBottomStart > warrantyHelpStart, 'Warranty support must remain available but live outside the contact section.');
+assert.match(storefrontHtml, /@media\(max-width:760px\)\{\s*\.footer-contacts \.contact-grid\{grid-template-columns:minmax\(0,1fr\)/, 'Mobile contact links must follow the one-column reference layout.');
+assert.equal((contactMarkup.match(/class="contact-link/g) || []).length, 6, 'The contact area should use six reference-aligned rows, grouping Zalo and phone without duplicating the same number.');
+assert.ok(contactMarkup.includes('<strong>Zalo / Điện thoại</strong>'), 'Zalo and phone must share one contact row as in the reference.');
+assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contactMarkup.includes('href="tel:+84827049192"'), 'The combined contact row must keep both the Zalo and phone actions usable.');
+assert.ok(contactMarkup.includes('Hẻm 48 Võ Trường Toàn, Đà Lạt, Lâm Đồng, Việt Nam'), 'The exact supplied street address must be shown in the contact area.');
+const legacyProducts = JSON.parse(readFileSync(new URL('../data/legacy-products.json', import.meta.url), 'utf8'));
+assert.equal(legacyProducts.length, 235, 'The read-only legacy product fixture should retain all 235 product records.');
+assert.ok(legacyProducts.every(product => product.sku === null && product.skuVerified === false), 'Legacy fixture SKUs must be null when unverified; do not retain generated commercial SKU values.');
+assert.ok(storefrontHtml.includes("function visibleSku(p){return p&&p.skuVerified!==false?String(p.sku||'').trim():''}"), 'Storefront must have one explicit helper that hides unverified fixture identifiers.');
+assert.ok(storefrontHtml.includes("Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}"), 'Storefront product cards must clearly disclose when no verified SKU is available.');
+assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');
+assert.ok(!storefrontHtml.includes('ghi lại mã SKU để tư vấn nhanh'), 'Order guidance must not instruct customers to record unverified fixture SKUs.');
+assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
+assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
+assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
+assert.ok(storefrontHtml.includes('id="accountAddressAction"') && storefrontHtml.includes('id="accountAddressView"') && storefrontHtml.includes('id="accountAddressForm"'), 'Account must expose an editable shipping-address book.');
+assert.ok(storefrontHtml.includes('#accountAddressView[hidden]{display:none!important}'), 'The editable address panel must remain hidden until the user selects it; a display:grid rule must not override the hidden state.');
+assert.ok(storefrontHtml.includes("const LOCAL_ADDRESS_KEY='sd-shipping-address'") && storefrontHtml.includes("localStorage.setItem(LOCAL_ADDRESS_KEY,JSON.stringify(next))"), 'Shipping address is saved only after explicit user submit and remains on the current device.');
+assert.ok(storefrontHtml.includes('Thông tin bạn lưu dưới đây chỉ nằm trong bộ nhớ trình duyệt trên thiết bị hiện tại'), 'The local-only shipping address behavior must be disclosed clearly.');
+assert.ok(storefrontHtml.includes('prefillCheckoutFromLocalAddress()') && storefrontHtml.includes('accountAddressProvince') && storefrontHtml.includes('accountAddressWard'), 'Saved local address should prefill checkout fields while keeping them editable.');
+assert.ok(storefrontHtml.includes('id="accountOrdersAction"') && storefrontHtml.includes('id="accountOrdersView"') && storefrontHtml.includes('id="accountOrdersList"'), 'Account must expose a history view for accepted order requests from the current device.');
+assert.ok(storefrontHtml.includes("const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history'") && storefrontHtml.includes('rememberOrderRequest(result,items)'), 'Only a successful server acceptance should enter the local order-request history.');
+const orderHistoryFunctionStart = storefrontHtml.indexOf('function rememberOrderRequest(');
+const orderHistoryFunctionEnd = storefrontHtml.indexOf('function hasPublicPrice(', orderHistoryFunctionStart);
+const orderHistoryFunction = storefrontHtml.slice(orderHistoryFunctionStart, orderHistoryFunctionEnd);
+assert.ok(storefrontHtml.includes('không phải lịch sử tài khoản đồng bộ')
+  && orderHistoryFunctionStart >= 0
+  && orderHistoryFunctionEnd > orderHistoryFunctionStart
+  && !orderHistoryFunction.includes('fullName')
+  && !orderHistoryFunction.includes('phone')
+  && !orderHistoryFunction.includes('email')
+  && !orderHistoryFunction.includes('address'),
+'Order history must disclose its local-only scope and not persist checkout contact details.');
+
+
+
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
 assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
+assert.ok(storefrontHtml.includes('<span class="brand-copy"><span class="brand-name">SinDarealest</span><small class="brand-tagline">Thời Trang Da Cá Sấu</small></span>'), 'The primary brand lockup must include its Vietnamese descriptor.');
+assert.match(storefrontHtml, /@media\(max-width:760px\)\{\s*\.nav-actions #contactJump,\.nav-actions #themeToggle\{display:none!important\}/, 'Mobile header should match the reference with compact search/cart actions; contact and theme remain in their dedicated account/footer destinations.');
+assert.match(storefrontHtml, /\.nav-actions #searchJump,\.nav-actions #cartOpen\{display:grid\}/, 'Search and cart must remain visible in the compact mobile header.');
+assert.match(storefrontHtml, /\.brand-tagline\{display:block;margin-top:2px;color:var\(--nav-muted\);font-size:8px/, 'The brand descriptor must remain small, legible and aligned to the wordmark.');
+assert.match(storefrontHtml, /\.nav-wrap \.nav \.brand-tagline\{margin-top:2px;font-size:7px/, 'The brand descriptor must fit the mobile reference header without widening the navigation.');
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
 assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('hero-stamp-image-spacer') && !storefrontHtml.includes('.hero-stamp{'), 'Entire unwanted hero stamp and glass styling must be removed while preserving the sneaker hero');
 assert.ok(!storefrontHtml.includes('id="heroDarkShoe"') && !storefrontHtml.includes('id="heroLightShoe"') && !storefrontHtml.includes('hero-art'), 'Hero product images must be removed from the storefront intro');
-assert.ok(storefrontHtml.includes('SinDarealest mang đến những sản phẩm thời trang da cá sấu cao cấp') && storefrontHtml.includes('Khám phá bộ sưu tập') && storefrontHtml.includes('Khám phá sản phẩm'), 'Hero intro copy and both calls to action must remain after removing product imagery');
+const heroStart = storefrontHtml.indexOf('<section class="hero wrap" id="home">');
+const heroEnd = storefrontHtml.indexOf('<section class="wrap" aria-label="Quyền lợi thương hiệu"', heroStart);
+const heroMarkup = storefrontHtml.slice(heroStart, heroEnd);
+assert.ok(heroMarkup.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.') && heroMarkup.includes('Khám phá ngay') && !heroMarkup.includes('Khám phá bộ sưu tập') && !heroMarkup.includes('Khám phá sản phẩm'), 'Hero copy and its single reference CTA must remain concise after removing product imagery');
 assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
 const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');
@@ -20,10 +71,31 @@ assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
 
-assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('images\/theme-croc-dark\.webp\?v=20261017-1'\);filter:none/,
-  'Dark mode displays the dark crocodile image directly with light text colors.');
-assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:none/,
-  'Light mode displays the albino crocodile image directly with dark text colors.');
+assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('images\/theme-croc-dark\.webp\?v=20261017-1'\);filter:hue-rotate\(0deg\) saturate\(\.82\) brightness\(\.82\) contrast\(\.92\)/,
+  'Dark mode must recolor the dark crocodile background toward the reference deep-blue/navy palette while retaining the source asset.');
+assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:hue-rotate\(25deg\) saturate\(\.58\) brightness\(1\.08\)/,
+  'Light mode must recolor the albino crocodile background toward the reference ice-blue palette while retaining the source asset.');
+assert.match(storefrontHtml, /\.theme-bg--light\{filter:blur\(\.5px\) hue-rotate\(25deg\) saturate\(\.60\) brightness\(1\.03\)\}/,
+  'The final light-mode filter override must keep the ice-blue palette and avoid a warm/pink cast.');
+assert.match(storefrontHtml, /\.mobile-bottom-nav\{background:rgba\(244,250,255,\.78\)\}/,
+  'Mobile bottom navigation must balance visible Liquid Glass translucency with label readability.');
+assert.match(storefrontHtml, /\.mobile-tab\.is-active\{color:var\(--nav-ink\);border-color:var\(--line\);background:rgba\(226,241,252,\.96\)/,
+  'The selected mobile tab must remain visually distinct and opaque enough to keep its label readable.');
+assert.match(storefrontHtml, /html\.dark \.mobile-tab\.is-active\{background:rgba\(13,39,58,\.97\)\}/,
+  'The selected mobile tab must retain a clear navy glass state in dark mode.');
+assert.match(storefrontHtml, /html\.dark \.mobile-bottom-nav\{background:rgba\(5,22,38,\.82\);border-color:rgba\(174,207,231,\.34\)\}/,
+  'Mobile bottom navigation must retain a readable translucent navy glass surface in dark mode.');
+assert.ok(storefrontHtml.includes('linear-gradient(118deg,rgba(225,241,255,.72),rgba(211,231,249,.68) 52%,rgba(237,247,255,.74))'),
+  'The final light glaze must leave medium crocodile-texture visibility instead of washing the background flat.');
+assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.68\)/,
+  'Light background must soften the high-contrast texture without removing the crocodile material.');
+assert.match(storefrontHtml, /\.theme-bg--dark::after\{[^}]*rgba\(3,20,36,\.62\)/,
+  'Dark background must receive a deep-navy glaze rather than remain nearly black.');
+assert.ok(storefrontHtml.includes('.theme-watermark{opacity:.035}') &&
+  storefrontHtml.includes('html.dark .theme-watermark{opacity:.045}'),
+  'The background brand watermark must stay subtle and not compete with content.');
+assert.match(storefrontHtml, /@media\(max-width:850px\) and \(min-width:761px\)\{\s*\.navlinks\{display:none\}/,
+  'Compact tablet navigation must prevent the full desktop navbar from clipping at 768 CSS pixels.');
 assert.match(storefrontHtml, /\.welcome-texture--dark\{[^}]*linear-gradient\(125deg,rgba\(0,0,0,\.35\),rgba\(0,0,0,\.60\)\),url\('images\/theme-croc-dark\.webp\?v=20261017-1'\)/,
   'The dark welcome screen must use the dark crocodile image with its dark contrast tint.');
 assert.match(storefrontHtml, /\.welcome-texture--light\{[^}]*linear-gradient\(125deg,rgba\(255,248,233,\.55\),rgba\(255,249,238,\.72\)\),url\('images\/theme-croc-albino\.webp\?v=20261017-1'\)/,
@@ -101,7 +173,7 @@ const seoDB = {
           async first() {
             assert.match(sql, /lower\(slug\)=\?/);
             assert.deepEqual(values, [new URL('https://shop.example/san-pham/'+values[0]).pathname.split('/').pop().toLowerCase(),new URL('https://shop.example/san-pham/'+values[0]).pathname.split('/').pop().toLowerCase(),new URL('https://shop.example/san-pham/'+values[0]).pathname.split('/').pop().toLowerCase()]);
-            return { id: 'product-id-123', slug: 'test-sneaker', sku: 'SD-SN001', title: 'Giày thử', description: 'Mô tả giày', images_json: '["images/example.webp"]', category_label: 'Sneaker', published: 1 };
+            return { id: 'product-id-123', slug: 'test-sneaker', sku: 'SD-SN001', sku_verified: 1, title: 'Giày thử', description: 'Mô tả giày', images_json: '["images/example.webp"]', category: 'sneakers', category_label: 'Sneaker', published: 1 };
           }
         };
       }
@@ -110,25 +182,25 @@ const seoDB = {
 };
 const legacyResponse = await seoMiddleware({ request:new Request('https://shop.example/san-pham/test-sneaker'), env:{DB:seoDB}, next:async () => new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}) });
 assert.equal(legacyResponse.status,301,'Legacy slug routes must redirect to the SKU URL');
-assert.equal(legacyResponse.headers.get('Location'),'https://shop.example/san-pham/SD-SN001');
-response = await seoMiddleware({ request:new Request('https://shop.example/san-pham/SD-SN001'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
+assert.equal(legacyResponse.headers.get('Location'),'https://shop.example/sanpham/sneaker/SD-SN001');
+response = await seoMiddleware({ request:new Request('https://shop.example/sanpham/sneaker/SD-SN001'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
 text = await response.text();
 assert.equal(response.status,200);
 assert.ok(text.includes('<title>Giày thử | SinDarealest</title>'));
 assert.ok(text.includes('og:title" content="Giày thử | SinDarealest'));
-assert.ok(text.includes('og:url" content="https://shop.example/san-pham/SD-SN001'));
+assert.ok(text.includes('og:url" content="https://shop.example/sanpham/sneaker/SD-SN001'));
 assert.ok(text.includes('og:image" content="https://shop.example/images/example.webp'));
-assert.ok(text.includes('og:description" content="Mô tả giày · Mã sản phẩm: SD-SN001'), 'Product social preview should include the SKU even when descriptions are long');
+assert.ok(text.includes('og:description" content="Mô tả giày · SKU: SD-SN001'), 'Product social preview should include the explicitly verified SKU even when descriptions are long');
 assert.match(text,/application\/ld\+json/);
 
 response = await createOrder({request:new Request('https://shop.example/api/orders',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
 assert.equal(response.status,403,'cross-origin order submission is rejected');
 response = await createWarrantyClaim({request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
 assert.equal(response.status,403,'cross-origin warranty submission is rejected');
-const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,updated_at/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
+const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,sku_verified,category,category_label,updated_at/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',sku_verified:1,category:'sneakers',category_label:'Sneaker',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
 const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
-assert.match(sitemapText,/https:\/\/shop\.example\/san-pham\/SD-SN001/);
+assert.match(sitemapText,/https:\/\/shop\.example\/sanpham\/sneaker\/SD-SN001/);
 const robotsText = await (await robots({request:new Request('https://shop.example/robots.txt')})).text();
 assert.match(robotsText,/Disallow: \/admin\//);
 assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
@@ -137,7 +209,7 @@ const demoWarrantyCode = 'SDW-' + 'A'.repeat(24);
 const demoWarrantyRow = {
   id:'warranty-id-1', warrantyId:'warranty-id-1', order_id:'order-id-1', customer_id:'customer-id-1',
   warranty_code: demoWarrantyCode, duration_months: 12, starts_at: '2026-01-01', ends_at: '2027-01-01', status: 'active',
-  sku: 'SD-SN001', title: 'Giày thử', size: '42', purchasedAt: '2026-02-01 12:00:00', orderNumber: 'SD-ABC-123456',
+  sku: 'SD-SN001', skuVerified: 0, title: 'Giày thử', size: '42', purchasedAt: '2026-02-01 12:00:00', orderNumber: 'SD-ABC-123456',
   fullName: 'Nguyễn Văn An', customerPhone: '0901234567', purchaseAddress: '123 Đường thử, Phường thử, Lâm Đồng',
   imagesJson: '["images/example.webp"]'
 };
@@ -187,6 +259,7 @@ assert.equal(lookupPayload.warranty.maskedPhone,'090••••67');
 assert.equal(lookupPayload.warranty.maskedAddress,'••••, Phường thử, Lâm Đồng');
 assert.equal(lookupPayload.warranty.maskedName,'N••• V••• A•••');
 assert.equal(lookupPayload.warranty.title,'Giày thử');
+assert.equal(lookupPayload.warranty.sku,'','Warranty lookup must not expose an unverified internal SKU');
 assert.equal(lookupPayload.warranty.size,'42');
 assert.equal(lookupPayload.warranty.purchasedAt,'2026-02-01');
 assert.equal(lookupPayload.warranty.eligible,true);

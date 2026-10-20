@@ -7,6 +7,7 @@ import {
   listD1Databases,
   listPagesProjects,
   readProductCount,
+  parseCliJson,
   runWrangler,
 } from './cloudflare-utils.mjs';
 
@@ -104,10 +105,30 @@ async function main() {
   console.log('Áp dụng địa chỉ giao hàng và metadata bảo hành (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0005_address_warranty_verification.sql'], { interactive: true });
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0006_remove_warranty_otp.sql'], { interactive: true });
+  console.log('Áp dụng snapshot liên hệ đơn hàng (idempotent)…');
+  runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0007_order_contact_details.sql'], { interactive: true });
+  console.log('Đảm bảo schema migrations/0008_product_sku_verification.sql; chỉ bổ sung các cột còn thiếu…');
+  const d1HasColumn = (tableName, columnName) => {
+    const result = runWrangler(['d1', 'execute', dbName, '--remote', '--json', '--command', `PRAGMA table_info(${tableName});`], { quiet: true });
+    const parsed = parseCliJson(result.stdout, `schema D1 ${tableName}`);
+    const containsColumn = (value) => {
+      if (Array.isArray(value)) return value.some(containsColumn);
+      if (!value || typeof value !== 'object') return false;
+      if (value.name === columnName) return true;
+      return Object.values(value).some(containsColumn);
+    };
+    return containsColumn(parsed);
+  };
+  if (!d1HasColumn('products', 'sku_verified')) {
+    runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE products ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
+  }
+  if (!d1HasColumn('order_items', 'sku_verified')) {
+    runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE order_items ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
+  }
 
   console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
   for (const query of [
-    'SELECT id, slug, sku, title, category, category_label, description, price, stock, published, images_json, source_price_confirmed, sort_order, created_at, updated_at FROM products LIMIT 0;',
+    'SELECT id, slug, sku, sku_verified, title, category, category_label, description, price, stock, published, images_json, source_price_confirmed, sort_order, created_at, updated_at FROM products LIMIT 0;',
     'SELECT key, value, updated_at FROM settings LIMIT 0;',
     'SELECT ip_hash, window_start, attempts FROM admin_login_attempts LIMIT 0;',
     'SELECT id, order_number, customer_id, status, total FROM orders LIMIT 0;',
@@ -118,7 +139,8 @@ async function main() {
     'SELECT scope, ip_hash, window_start, attempts FROM public_rate_limits LIMIT 0;',
     'SELECT customer_id, province_code, province, ward_code, ward, street_address FROM customer_address_details LIMIT 0;',
     'SELECT order_id, province_code, province, ward_code, ward, street_address, full_address FROM order_shipping_addresses LIMIT 0;',
-    'SELECT claim_id, image_key FROM warranty_claim_attachments LIMIT 0;'
+    'SELECT claim_id, image_key FROM warranty_claim_attachments LIMIT 0;',
+    'SELECT sku_verified FROM order_items LIMIT 0;'
   ]) {
     runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { interactive: true });
   }

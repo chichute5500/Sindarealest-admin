@@ -77,6 +77,12 @@ async function main() {
   if (missingSnapshots === null || missingSnapshots > 0) {
     throw new Error(`Migration 0007 chưa sẵn sàng: còn ${missingSnapshots ?? 'không xác định'} đơn hàng thiếu snapshot liên hệ. Deploy bị chặn; không tự chạy migration.`);
   }
+  try {
+    runWrangler(['d1', 'execute', databaseName, '--remote', '--command', 'SELECT sku_verified FROM products LIMIT 0;'], { quiet: true });
+    runWrangler(['d1', 'execute', databaseName, '--remote', '--command', 'SELECT sku_verified FROM order_items LIMIT 0;'], { quiet: true });
+  } catch {
+    throw new Error('Migration 0008_product_sku_verification.sql chưa được áp dụng trên D1. Deploy bị chặn; áp dụng và xác minh schema thủ công trước. Script không tự chạy migration production.');
+  }
 
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);

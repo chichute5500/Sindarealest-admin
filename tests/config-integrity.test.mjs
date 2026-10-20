@@ -22,12 +22,14 @@ assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 ·
 assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setup must apply admin notification migration');
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty metadata migration');
 assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setup must apply the OTP removal migration');
+assert.ok(setupScript.includes('migrations/0007_order_contact_details.sql') && setupScript.includes('migrations/0008_product_sku_verification.sql'), 'Setup must apply order contact and SKU verification migrations');
+assert.ok(setupScript.includes('d1HasColumn') && setupScript.includes('ALTER TABLE products ADD COLUMN sku_verified') && setupScript.includes('ALTER TABLE order_items ADD COLUMN sku_verified'), 'Setup must add SKU verification columns idempotently instead of rerunning ALTER TABLE blindly');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_verifications/.test(setupScript), 'Setup must not depend on obsolete OTP/SMS configuration or tables');
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
 assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migration 0006 must not change production schema');
 const deployReadme = readFileSync('README-DEPLOY.txt', 'utf8');
-assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && deployReadme.includes('migrations/0005_address_warranty_verification.sql') && deployReadme.includes('migrations/0006_remove_warranty_otp.sql'), 'Deployment guide must match current migration sequence');
+assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && deployReadme.includes('migrations/0005_address_warranty_verification.sql') && deployReadme.includes('migrations/0006_remove_warranty_otp.sql') && deployReadme.includes('migrations/0007_order_contact_details.sql') && deployReadme.includes('migrations/0008_product_sku_verification.sql'), 'Deployment guide must match current migration sequence');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deployReadme), 'Deployment guide must not require obsolete SMS credentials');
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
@@ -62,8 +64,8 @@ function assertUniqueStaticIds(source, label) {
 }
 assertUniqueStaticIds(storefrontSource, 'Storefront');
 assertUniqueStaticIds(adminSource, 'Admin');
-assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The Zalo service tile must use the approved service label');
-assert.ok(storefrontSource.includes('Trao đổi trực tiếp qua Zalo'), 'The Zalo service tile must describe only the confirmed contact channel');
+assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The separate Zalo contact CTA must keep the approved label');
+assert.ok(storefrontSource.includes('title="Trao đổi trực tiếp qua Zalo"'), 'The separate Zalo contact CTA must describe only the confirmed contact channel');
 assert.ok(!storefrontSource.includes('Tư Vấn 24/7'), 'Do not claim 24/7 availability without confirmation');
 assert.ok(!storefrontSource.includes('Da tuyển chọn'), 'Do not claim an unverified leather selection process');
 for (const unsupportedClaim of ['Da Cá Sấu Thật', 'Thiết Kế Độc Quyền', 'Bảo Hành Uy Tín', 'Giao Hàng Toàn Quốc', 'Chính sách rõ ràng', 'Đẳng Cấp Thật', 'Từ Chất Liệu Thật', 'Cam kết chất lượng']) {

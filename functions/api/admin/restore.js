@@ -127,6 +127,7 @@ export async function onRequestPost(context) {
     if (present.length === watermarkFields.length) {
       const checkedWatermark = validateWatermarkSettingUpdates({
         watermarkEnabled: backup.settings.watermarkEnabled,
+        ...(Object.hasOwn(backup.settings, "watermarkLogoUrl") ? { watermarkLogoUrl: backup.settings.watermarkLogoUrl } : {}),
         watermarkPosition: backup.settings.watermarkPosition,
         watermarkSize: backup.settings.watermarkSize,
         watermarkOpacity: backup.settings.watermarkOpacity,
@@ -184,7 +185,7 @@ export async function onRequestPost(context) {
       for (const o of operations.orders) statements.push(db.prepare("INSERT INTO orders(id,order_number,customer_id,status,payment_status,subtotal,total,price_confirmation_required,customer_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)").bind(o.id,o.order_number,o.customer_id,o.status,o.payment_status,o.subtotal,o.total,Number(o.price_confirmation_required)?1:0,o.customer_note,o.created_at,o.updated_at));
       for (const a of operations.orderShippingAddresses) statements.push(db.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(a.order_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.full_address,a.created_at));
       for (const c of operations.orderContactDetails) statements.push(db.prepare("INSERT INTO order_contact_details(order_id,full_name,phone,email,created_at) VALUES(?,?,?,?,?)").bind(c.order_id,c.full_name,c.phone,c.email,c.created_at));
-      for (const i of operations.items) statements.push(db.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(i.id,i.order_id,i.product_id,i.sku,i.title,i.quantity,i.unit_price,i.line_total));
+      for (const i of operations.items) statements.push(db.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?,?)").bind(i.id,i.order_id,i.product_id,i.sku,Number(i.sku_verified ?? i.skuVerified)===1?1:0,i.title,i.quantity,i.unit_price,i.line_total));
       for (const d of operations.orderItemDetails) statements.push(db.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(d.item_id,d.size));
       for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
       for (const c of operations.claims) statements.push(db.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message,status,admin_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(c.id,c.order_id,c.customer_id,c.warranty_code,c.message,c.status,c.admin_note,c.created_at,c.updated_at));

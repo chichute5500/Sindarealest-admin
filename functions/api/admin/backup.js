@@ -40,6 +40,7 @@ export async function onRequestGet(context) {
       "welcome_title_line_2",
       "welcome_text",
       "watermark_enabled",
+      "watermark_logo",
       "watermark_position",
       "watermark_size",
       "watermark_opacity",
@@ -61,7 +62,7 @@ export async function onRequestGet(context) {
       boundedTableQuery(db, "order_contact_details", "order_id"),
       boundedTableQuery(db, "order_item_details", "item_id"),
       boundedTableQuery(db, "warranty_claim_attachments", "claim_id"),
-      db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
+      db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
     ]);
     if (!Array.isArray(resultSets) || resultSets.length !== 14) {
       throw new Error("D1 snapshot returned an incomplete result set");
@@ -94,11 +95,13 @@ export async function onRequestGet(context) {
     const welcomeTitleLine2 = setting("welcome_title_line_2", "Từ chất liệu thật.");
     const welcomeText = setting("welcome_text", "Từ vân da tự nhiên đến từng đường nét hoàn thiện, mỗi thiết kế được chăm chút để tôn lên chất liệu và phong cách riêng của người sở hữu.");
     const watermarkEnabled = setting("watermark_enabled", WATERMARK_DEFAULTS.watermark_enabled);
+    const watermarkLogo = setting("watermark_logo", WATERMARK_DEFAULTS.watermark_logo);
     const watermarkPosition = setting("watermark_position", WATERMARK_DEFAULTS.watermark_position);
     const watermarkSize = setting("watermark_size", WATERMARK_DEFAULTS.watermark_size);
     const watermarkOpacity = setting("watermark_opacity", WATERMARK_DEFAULTS.watermark_opacity);
     const watermark = normalizeWatermarkSettings({
       watermark_enabled: watermarkEnabled,
+      watermark_logo: watermarkLogo,
       watermark_position: watermarkPosition,
       watermark_size: watermarkSize,
       watermark_opacity: watermarkOpacity,
@@ -113,6 +116,7 @@ export async function onRequestGet(context) {
         welcomeTitleLine2,
         welcomeText,
         watermarkEnabled: watermark.watermarkEnabled,
+        watermarkLogoUrl: watermark.watermarkLogoUrl,
         watermarkPosition: watermark.watermarkPosition,
         watermarkSize: watermark.watermarkSize,
         watermarkOpacity: watermark.watermarkOpacity,

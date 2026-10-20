@@ -39,7 +39,7 @@ function buildCaseUpdate(db, rows, skuById) {
   const pairs = rows.map((row) => [row.id, skuById.get(row.id)]);
   const cases = pairs.map(() => "WHEN ? THEN ?").join(" ");
   const ids = pairs.map(() => "?").join(",");
-  const sql = `UPDATE products SET sku = CASE id ${cases} ELSE sku END WHERE id IN (${ids})`;
+  const sql = `UPDATE products SET sku = CASE id ${cases} ELSE sku END, sku_verified = 0 WHERE id IN (${ids})`;
   const params = [...pairs.flat(), ...pairs.map(([id]) => id)];
   if (params.length > 100) throw new Error("Quá nhiều sản phẩm trong một lô cập nhật SKU.");
   return db.prepare(sql).bind(...params);
@@ -58,11 +58,12 @@ export async function onRequestPost(context) {
   const db = context.env.DB;
   try {
     const query = await db.prepare(
-      "SELECT id, sku, title, category, category_label, sort_order FROM products ORDER BY sort_order ASC, title COLLATE NOCASE ASC, id ASC"
+      "SELECT id, sku, sku_verified, title, category, category_label, sort_order FROM products ORDER BY sort_order ASC, title COLLATE NOCASE ASC, id ASC"
     ).all();
-    const rows = query.results || [];
+    const allRows = query.results || [];
+    const rows = allRows.filter((row) => Number(row.sku_verified) !== 1);
     if (!rows.length) {
-      return json({ ok: true, count: 0, categories: {}, message: "Không có sản phẩm cần đặt lại SKU." });
+      return json({ ok: true, count: 0, categories: {}, message: "Không có mã nội bộ cần tạo lại; SKU thương mại đã xác nhận được giữ nguyên." });
     }
 
     // Validate every category before creating any mutation statement.
@@ -105,18 +106,27 @@ export async function onRequestPost(context) {
     const counters = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
     const finalSkuById = new Map();
     const categoryCounts = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
+    const verifiedSkuValues = new Set(allRows
+      .filter((row) => Number(row.sku_verified) === 1)
+      .map((row) => String(row.sku || "").trim().toUpperCase())
+      .filter(Boolean));
+    const assignedInternalSkuValues = new Set();
     for (const row of categorized) {
       const rule = categoryRules[row.categoryKey];
-      counters[row.categoryKey] += 1;
+      let serial = counters[row.categoryKey];
+      let nextSku = "";
+      do {
+        serial += 1;
+        nextSku = rule.prefix + String(serial).padStart(3, "0");
+      } while (verifiedSkuValues.has(nextSku.toUpperCase()) || assignedInternalSkuValues.has(nextSku.toUpperCase()));
+      counters[row.categoryKey] = serial;
       categoryCounts[row.categoryKey] += 1;
-      finalSkuById.set(
-        row.id,
-        rule.prefix + String(counters[row.categoryKey]).padStart(3, "0")
-      );
+      assignedInternalSkuValues.add(nextSku.toUpperCase());
+      finalSkuById.set(row.id, nextSku);
     }
 
-    // Generate temporary unique values that cannot collide with existing or other temporary SKUs.
-    const occupied = new Set(rows.map((row) => String(row.sku || "").toUpperCase()));
+    // Only internal identifiers are temporarily moved; confirmed commercial SKUs are reserved.
+    const occupied = new Set(allRows.map((row) => String(row.sku || "").toUpperCase()));
     const temporarySkuById = new Map();
     for (const row of rows) {
       let temporarySku;
@@ -153,7 +163,7 @@ export async function onRequestPost(context) {
       categories: Object.fromEntries(
         Object.entries(categoryCounts).map(([key, count]) => [categoryRules[key].label, count])
       ),
-      message: `Đã đặt lại SKU cho ${rows.length} sản phẩm.`,
+      message: `Đã tạo lại mã nội bộ cho ${rows.length} sản phẩm chưa xác minh. SKU thương mại đã xác nhận được giữ nguyên.`,
     });
   } catch (error) {
     return genericDbError(error);
