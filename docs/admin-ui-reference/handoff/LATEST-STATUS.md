@@ -1,12 +1,13 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — VISUAL/PLAYWRIGHT VERIFICATION PENDING`  
-**Ước tính tiến độ:** 30% theo các giai đoạn công việc, không phải số dòng code.  
+**Trạng thái tổng thể:** `IN PROGRESS — AUTHENTICATED UI AND REFERENCE COMPARISON BLOCKED/PENDING`  
+**Ước tính tiến độ:** 35% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.  
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
-**Commit code/giao diện mới nhất đã xác minh:** `d0f5b52d9bef9b903ed58ecc2d4bb2b9a5fb46f6`  
-**Ảnh Playwright sau thay đổi:** Chưa xác minh có artifact chạy sau commit mới nhất.  
+**HEAD hiện tại của nhánh ADMIN (đã xác minh):** `1b41349971367b51d16091ccf4a3d1d4a4db2bb6` (commit lưu bằng chứng/handoff)  
+**Commit code ADMIN đã kiểm thử gần nhất:** `7c742407530dbcf2f9407d6a82c48c70620b98a7`  
+**Kết quả kiểm thử:** `npm run check`, `npm test` và ma trận Playwright 16 ảnh PASS trên commit code nêu trên; Preview bị chặn bởi Cloudflare Access.  
 **Cloudflare Production deployment:** `NOT PERFORMED`
 
 > Phân biệt bằng chứng: kiểm tra source từ GitHub đã xác nhận các token màu, selector theme, markup đăng nhập, chuỗi API và việc gắn contract test vào `npm test`. Đây là kiểm tra tĩnh của source, **không phải** kết quả thực thi `npm test` hoặc kiểm thử browser. Không đánh dấu bất kỳ test nào PASS nếu chưa có run/artifact của đúng commit.
@@ -97,3 +98,46 @@
 - Deployed Preview: BLOCKED_CLOUDFLARE_ACCESS.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+---
+
+## CẬP NHẬT PHIÊN LÀM VIỆC — 2026-10-20 (đã xác minh qua GitHub)
+
+Phần này là trạng thái mới hơn và được ưu tiên hơn các ghi chú lịch sử bên dưới nếu có mâu thuẫn.
+
+### Trạng thái Git / phạm vi
+- Repo: `chichute5500/Sindarealest-admin`.
+- Nhánh ADMIN mục tiêu: `feature/admin-isolated-handoff-2026-10-20`.
+- HEAD nhánh ADMIN lúc kiểm tra: `1b41349971367b51d16091ccf4a3d1d4a4db2bb6`; commit này chỉ ghi báo cáo/metadata/ảnh bằng chứng cho lần chạy trước, không sửa source code ADMIN.
+- Source code đã được kiểm thử gần nhất: `7c742407530dbcf2f9407d6a82c48c70620b98a7` (sửa hiển thị placeholder mật khẩu ở màn hình nhỏ).
+- PR #111 vẫn mở, chưa merge: https://github.com/chichute5500/Sindarealest-admin/pull/111
+- Nhánh website tĩnh `fix/liquid-glass-audit-2026-10-19` được giữ nguyên; không merge/cherry-pick, không deploy Production.
+- Kiểm tra so sánh qua GitHub API cho thấy nhánh ADMIN có nhiều commit hơn điểm tách; danh sách thay đổi PR chứa chủ yếu tài liệu handoff/evidence, 1 file source ADMIN `public/admin/index.html`, `package.json`, test và workflow. Đây CHƯA phải xác nhận full diff từ local checkout; chưa thể xác nhận `git status`/working tree local.
+
+### Bằng chứng test mới nhất đã xác minh
+- Workflow run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39326639051
+- Tested source SHA: `7c742407530dbcf2f9407d6a82c48c70620b98a7`.
+- `npm run check`: PASS.
+- `npm test`: PASS.
+- Playwright local source matrix: PASS, 16 ảnh thật (8 viewport × light/dark) trong `docs/admin-ui-reference/handoff/history/7c742407530d/screenshots/`.
+- Ảnh chỉ kiểm tra login shell chưa đăng nhập; session API được stub 401 có chủ đích, không kiểm tra dữ liệu nghiệp vụ.
+- Preview từ xa: BLOCKED bởi Cloudflare Access; dashboard và các module yêu cầu đăng nhập chưa được kiểm thử.
+- PNG tham chiếu `admin-mobile-reference.png`: connector GitHub trả metadata SHA nhưng không trả bytes ảnh đọc được; vì vậy chưa có so sánh trực quan hợp lệ. Không tuyên bố đã đối chiếu xong.
+
+### Tiến độ
+- Ước tính hiện tại: **35%**.
+- Cơ sở: đã có source/UI pass ban đầu, workflow/harness và một lần chạy kiểm thử có artifact được xác minh. Phần kiểm thử module đã đăng nhập, so sánh với PNG tham chiếu, sửa theo sai lệch thực tế, regression và nghiệm thu toàn diện còn chưa hoàn thành.
+- Không cộng điểm cho test chưa chạy hoặc ảnh chưa xem được.
+
+### Việc tiếp theo — làm theo thứ tự, không lặp lại việc đã có bằng chứng
+1. Đọc lại `MASTER-PROMPT-AUTO-HANDOFF.md`, `START-HERE.md`, file này và `latest-test-results.json` trước khi tiếp tục.
+2. Xác minh HEAD nhánh ADMIN và nhánh static mới nhất; không tự đồng bộ nhánh static.
+3. Mở được PNG tham chiếu từ ZIP/HTML/repository bằng phương pháp đọc binary hợp lệ; nếu không thể, ghi BLOCKED và yêu cầu nguồn ảnh có thể truy cập, không đoán thiết kế.
+4. Giải quyết đường truy cập Preview hợp lệ qua Cloudflare Access hoặc môi trường thử nghiệm được cấp quyền; không bỏ qua Access và không dùng production credentials.
+5. Kiểm tra source/test/config hiện tại, tái sử dụng 16 ảnh đã có thay vì chụp lại vô ích; chạy lại test nếu source SHA đổi.
+6. Khi có quyền vào app, lập inventory route/module thật và test các luồng an toàn bằng tài khoản/fixture thử nghiệm. Không ghi CRUD lên dữ liệu thật.
+7. Mỗi vòng sửa ADMIN có ý nghĩa phải chạy test, chụp ảnh cùng điều kiện, so sánh trước/sau, cập nhật báo cáo và JSON trên nhánh ADMIN.
+8. Trước khi kết luận, kiểm tra diff đầy đủ và bảo đảm không sửa storefront; không merge, không deploy Production.
+
+**Handoff mới nhất:** chưa có thay đổi source code trong phiên cập nhật trạng thái này; phiên này chỉ xác minh bằng chứng và ghi lại tiến độ để phiên sau tiếp tục đúng điểm.
