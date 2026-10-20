@@ -48,21 +48,21 @@ assert.match(finalBackgroundCss, /html\.dark \.theme-bg--dark\{filter:blur\(1\.5
   "Dark backdrop should preserve deep navy tone and soft sapphire highlights.");
 
 
-const ambientLight = html.match(/\\.theme-bg--light\\{[^}]+\\}/)?.[0] || "";
-const ambientDark = html.match(/\\.theme-bg--dark\\{[^}]+\\}/)?.[0] || "";
-assert.match(ambientLight, /background-image:radial-gradient\\(/,
+const ambientLight = html.split(".theme-bg--light{")[1]?.split("}")[0] || "";
+const ambientDark = html.split(".theme-bg--dark{")[1]?.split("}")[0] || "";
+assert.ok(ambientLight.includes("background-image:radial-gradient("),
   "The light ambient background must be generated as soft glacial gradients rather than reuse a crocodile-scale product texture.");
-assert.match(ambientDark, /background-image:radial-gradient\\(/,
+assert.ok(ambientDark.includes("background-image:radial-gradient("),
   "The dark ambient background must be generated as flowing navy/sapphire gradients rather than reuse a crocodile-scale product texture.");
 assert.doesNotMatch(ambientLight, /theme-croc-/,
   "Light page ambience must not use the crocodile-scale raster texture as its background.");
 assert.doesNotMatch(ambientDark, /theme-croc-/,
   "Dark page ambience must not use the crocodile-scale raster texture as its background.");
-const welcomeLight = html.match(/\\.welcome-texture--light\\{[^}]+\\}/)?.[0] || "";
-const welcomeDark = html.match(/\\.welcome-texture--dark\\{[^}]+\\}/)?.[0] || "";
-assert.match(welcomeLight, /radial-gradient\\(/,
+const welcomeLight = html.split(".welcome-texture--light{")[1]?.split("}")[0] || "";
+const welcomeDark = html.split(".welcome-texture--dark{")[1]?.split("}")[0] || "";
+assert.ok(welcomeLight.includes("radial-gradient("),
   "Light welcome splash must use the same pearl/glacial ambient design language.");
-assert.match(welcomeDark, /radial-gradient\\(/,
+assert.ok(welcomeDark.includes("radial-gradient("),
   "Dark welcome splash must use the same navy/sapphire ambient design language.");
 assert.doesNotMatch(welcomeLight, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in light mode.");
