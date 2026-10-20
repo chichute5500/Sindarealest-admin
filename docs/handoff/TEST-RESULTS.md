@@ -149,3 +149,18 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Visual workflow [39357805505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505) completed successfully as a diagnostic/artifact workflow; this is not a live visual PASS. Artifact [12236385238](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505/artifacts/12236385238) local fixture audit: 54 screenshots, 20 responsive cases, 91 interactions, 235 fixture records, 0 overflow, 0 console/page/HTTP errors, 0 failed requests, 0 hard failures.
 - The same artifact's live audit reports `accessServiceTokenConfigured=false`, `accessBlocked=true`, `captureCompleted=false`, `passed=false`, 0 viewport checks, 0 route checks, 0 live screenshots, one Access-gate hard failure. Final destination: `https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev`.
 - Read-only guard sent no write requests. No canonical screenshot folder was overwritten; no live pixel comparison, Liquid Glass render acceptance, URL migration or Preview deployment commit verification occurred.
+
+
+### 2026-10-20 02:26–02:28 UTC — latest source validation and live Preview probe
+
+- Commit: `8955a8aa5e1bd3bc99ef7cdb1456670908c01a5d`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Environment / URL: local static fixture audit plus read-only probe of `https://3ed49bcc.sindarealest2.pages.dev/`; not a successful live Preview render.
+- Tool / workflow run: [source/test CI 39358935696](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358935696) and [visual workflow 39358931718](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358931718). Artifact: [12236194129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358931718/artifacts/12236194129).
+- Viewport / theme / state: local fixture workflow reports 54 screenshots; the real Preview probe captured 0 screenshots and tested 0 viewport/theme pairs.
+- Status: **PASS (source/test CI and local fixture only); BLOCKED (live Preview)**.
+- Result: source/test CI succeeded. Visual workflow completed and uploaded artifact, but the live read-only probe reported `accessServiceTokenConfigured=false`, `accessBlocked=true`, and redirected to Cloudflare Access login. No baseline, end-of-work screenshots, or live pixel comparison exists.
+- Logs/artifacts: [workflow log/artifact](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358931718), [CI](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358935696).
+- Task IDs: SETUP-001, SHOT-002, UI-001, UI-002, THEME-001, FUNC-001, SHOT-003.
+- Required next step: configure a Preview-only Cloudflare Access Service Auth policy and GitHub Actions secrets `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`; rerun the real baseline capture. Never paste the values into chat/logs.
+- Limitation: local fixture images are not evidence of deployed Preview appearance; do not close the blocked tasks.
