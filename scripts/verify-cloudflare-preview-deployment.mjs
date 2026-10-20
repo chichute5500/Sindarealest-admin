@@ -5,7 +5,7 @@ const projectName = process.env.CLOUDFLARE_PAGES_PROJECT || 'sindarealest2';
 const requestedUrl = process.env.PREVIEW_URL || '';
 const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
 const apiToken = String(process.env.CLOUDFLARE_PAGES_READ_TOKEN || '').trim();
-const outputDir = path.join(process.cwd(), 'artifacts', 'liquid-glass-preview', 'live-preview');
+const outputDir = path.join(process.cwd(), 'artifacts', 'liquid-glass-preview');
 const outputPath = path.join(outputDir, 'deployment-verification.json');
 
 function validatePreviewUrl(value) {
@@ -185,7 +185,7 @@ async function main() {
       createdOn: report.deployment.createdOn,
       latestStage: report.deployment.latestStage,
     },
-    reportPath: 'artifacts/liquid-glass-preview/live-preview/deployment-verification.json',
+    reportPath: 'artifacts/liquid-glass-preview/deployment-verification.json',
   }, null, 2));
 }
 
