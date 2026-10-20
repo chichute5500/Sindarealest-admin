@@ -85,6 +85,8 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
     await expect(page.locator('#loginForm')).toBeVisible();
     await expect(page.locator('#password')).toHaveAttribute('type', 'password');
     await expect(page.locator('#appView')).toBeHidden();
+    await expect(page.locator('.topbar > .brand')).toBeHidden();
+    await expect(page.locator('#notificationToggle')).toBeHidden();
     await expect(page.locator('#adminThemeToggle')).toBeVisible();
   await expect(page.locator('#backdrop')).toBeHidden();
 

@@ -70,6 +70,8 @@ function isCloudflareAccessGate(page, details) {
 
 async function openLoginPage(page, testInfo) {
   if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
+  // Log only the origin/path (safeUrl removes query and hash) so we can verify the Preview target without exposing tokens.
+  console.info(`[ADMIN_PREVIEW_TARGET] ${safeUrl(adminUrl)}`);
   // Optional Cloudflare Access service-token headers; values are never logged or attached.
   if (accessClientId && accessClientSecret) {
     await page.setExtraHTTPHeaders({
