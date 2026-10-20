@@ -1,0 +1,226 @@
+{
+  "test": "local-static-admin-baseline",
+  "sourceCommit": "de8b7770ac2e077ad9ef0926f5e9053b400a9993",
+  "capturedAt": "2026-10-20T15:16:31.257Z",
+  "route": "/admin/",
+  "screenshots": [
+    "admin-login__320x640__light.png",
+    "admin-login__320x640__dark.png",
+    "admin-login__360x800__light.png",
+    "admin-login__360x800__dark.png",
+    "admin-login__375x812__light.png",
+    "admin-login__375x812__dark.png",
+    "admin-login__390x844__light.png",
+    "admin-login__390x844__dark.png",
+    "admin-login__412x915__light.png",
+    "admin-login__412x915__dark.png",
+    "admin-login__768x1024__light.png",
+    "admin-login__768x1024__dark.png",
+    "admin-login__1280x800__light.png",
+    "admin-login__1280x800__dark.png",
+    "admin-login__1440x900__light.png",
+    "admin-login__1440x900__dark.png"
+  ],
+  "viewportMatrix": [
+    {
+      "width": 320,
+      "height": 640
+    },
+    {
+      "width": 360,
+      "height": 800
+    },
+    {
+      "width": 375,
+      "height": 812
+    },
+    {
+      "width": 390,
+      "height": 844
+    },
+    {
+      "width": 412,
+      "height": 915
+    },
+    {
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "metrics": [
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 320,
+      "viewportHeight": 640,
+      "documentWidth": 320,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 320,
+      "viewportHeight": 640,
+      "documentWidth": 320,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 360,
+      "viewportHeight": 800,
+      "documentWidth": 360,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 360,
+      "viewportHeight": 800,
+      "documentWidth": 360,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 375,
+      "viewportHeight": 812,
+      "documentWidth": 375,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 375,
+      "viewportHeight": 812,
+      "documentWidth": 375,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 390,
+      "viewportHeight": 844,
+      "documentWidth": 390,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 390,
+      "viewportHeight": 844,
+      "documentWidth": 390,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 412,
+      "viewportHeight": 915,
+      "documentWidth": 412,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 412,
+      "viewportHeight": 915,
+      "documentWidth": 412,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 768,
+      "viewportHeight": 1024,
+      "documentWidth": 768,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 768,
+      "viewportHeight": 1024,
+      "documentWidth": 768,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "documentWidth": 1280,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "documentWidth": 1280,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "documentWidth": 1440,
+      "horizontalOverflow": false
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "documentWidth": 1440,
+      "horizontalOverflow": false
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "httpErrors": [],
+  "completed": true,
+  "failure": null
+}
