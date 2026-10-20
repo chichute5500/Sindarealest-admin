@@ -2,9 +2,9 @@
 
 > Hồ sơ bàn giao giữa các AI. Đây là bản đồ trạng thái, không thay thế bằng chứng từ GitHub, CI, test và ảnh chụp thực tế.
 
-## Mốc mới nhất — 2026-10-20 17:08 ICT (10:08 UTC)
+## Mốc mới nhất — 2026-10-20 18:13 ICT (11:13 UTC)
 
-## Cập nhật xác minh sau mốc 11:06 UTC — 2026-10-20 17:08 ICT (10:08 UTC)
+## Cập nhật xác minh sau mốc 11:06 UTC — 2026-10-20 18:13 ICT (11:13 UTC)
 
 - **PR HEAD hiện tại:** `d646934407daee83b3bdd58240e23506e7442305`; PR #108 vẫn OPEN, chưa merge, 81 file thay đổi / 403 commits. So với code audit `5f181d994bf0edb7a4e553c64ba97cddf55e31c4`, commit này chỉ cập nhật hồ sơ tiến độ, hướng dẫn Preview và manifest; không thay runtime HTML/CSS.
 - **Validate source/tests PASS** trên HEAD hiện tại: [run 39412627375](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39412627375).
