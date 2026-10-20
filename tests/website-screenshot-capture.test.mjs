@@ -76,8 +76,8 @@ assert.match(workflow, /audit\.sourceKind !== 'cloudflare-pages-preview-live-rea
   'The archive must reject non-live or fixture-only reports.');
 assert.match(workflow, /Verify actual Cloudflare Pages deployment before manual capture\/archive/,
   'Manual screenshot archiving must verify the actual deployed revision before capturing.');
-assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID:\s*\$\{\{\s*vars\.CLOUDFLARE_ACCOUNT_ID\s*\}\}/,
-  'The deployment verifier must read the Cloudflare account ID from a GitHub Actions variable.');
+assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID:\s*\$\{\{\s*vars\.CLOUDFLARE_ACCOUNT_ID\s*\|\|\s*'[a-f0-9]{32}'\s*\}\}/,
+  'The deployment verifier must prefer the repository variable and may use a non-secret, 32-character account ID fallback for read-only diagnostics.');
 assert.match(workflow, /CLOUDFLARE_PAGES_READ_TOKEN:\s*\$\{\{\s*secrets\.CLOUDFLARE_PAGES_READ_TOKEN\s*\}\}/,
   'The deployment verifier must use a read-only token from GitHub Actions secrets.');
 assert.match(workflow, /EXPECTED_DEPLOYMENT_BRANCH:\s*\$\{\{\s*github\.ref_name\s*\}\}/,

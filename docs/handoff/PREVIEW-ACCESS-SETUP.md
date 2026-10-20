@@ -51,6 +51,8 @@ Go to **Settings → Secrets and variables → Actions**.
 Create this repository **Variable**:
 - `CLOUDFLARE_ACCOUNT_ID` = the 32-character Cloudflare account ID containing the Pages project. This is an identifier, not an API credential.
 
+The visual workflow now also has a non-secret fallback to the previously recorded account identifier for read-only deployment diagnostics when the variable is absent. Keep the repository variable configured as the primary, explicit setting; the separate `CLOUDFLARE_PAGES_READ_TOKEN` remains mandatory for API verification.
+
 Create these repository **Secrets**:
 - `CLOUDFLARE_PAGES_READ_TOKEN` = the separate account-scoped Pages Read API token.
 - `CF_ACCESS_CLIENT_ID` = Access Service Token Client ID.
