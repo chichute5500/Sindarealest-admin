@@ -162,9 +162,17 @@ async function main() {
       return;
     }
     if (!response.ok || payload?.success !== true || !Array.isArray(payload?.result)) {
-      report.status = 'API_REJECTED';
       report.httpStatus = response.status;
-      await fail(report, 'Cloudflare Pages API did not return a successful Preview deployment list. Check the Pages Read permission and account/project scope; response body is intentionally not logged.');
+      if (response.status === 401) {
+        report.status = 'API_AUTHENTICATION_REJECTED';
+        await fail(report, 'Cloudflare Pages API returned HTTP 401: the configured API token was not accepted for this request. Replace it with a valid account-scoped Pages Read token and verify the account ID. Credential values and response bodies are not logged.');
+      } else if (response.status === 403) {
+        report.status = 'API_PERMISSION_DENIED';
+        await fail(report, 'Cloudflare Pages API returned HTTP 403: verify the token has Account / Cloudflare Pages / Read permission in the account containing this project. Credential values and response bodies are not logged.');
+      } else {
+        report.status = 'API_REJECTED';
+        await fail(report, 'Cloudflare Pages API did not return a successful Preview deployment list. Check the Pages Read permission and account/project scope; response body is intentionally not logged.');
+      }
       return;
     }
 

@@ -100,6 +100,8 @@ assert.match(workflow, /baselineStage\?\.status !== 'CAPTURED_PASS'[\s\S]*baseli
   'The final screenshot archive must require an existing verified start-of-work baseline.');
 assert.match(workflow, /manifest\.status = hasComparablePairs \? 'AWAITING_HUMAN_VISUAL_REVIEW' : 'BLOCKED'/,
   'Pixel comparison must not silently leave the manifest marked in progress or claim automated visual acceptance.');
+assert.match(deploymentVerifier, /response\.status === 401[\s\S]*API_AUTHENTICATION_REJECTED[\s\S]*response\.status === 403[\s\S]*API_PERMISSION_DENIED/,
+  'The deployment verifier must distinguish an unaccepted API token (401) from a denied permission (403) without logging credentials or response bodies.');
 assert.match(deploymentVerifier, /searchParams\.set\('env', 'preview'\)/,
   'The Cloudflare API query must list Preview deployments only.');
 assert.match(deploymentVerifier, /metadata\.commit_hash/,
