@@ -19,6 +19,19 @@ Không dùng kết quả của commit cũ để tuyên bố commit mới đã PA
 
 ## Kết quả đã xác minh
 
+### 2026-10-20 04:43–04:45 UTC — regression validation, screenshot workflow and Preview probe
+
+- Branch: `fix/liquid-glass-audit-2026-10-19`; validated commit `0c5b436c114e094f1ee7ae5a44a4c54b3f79692b`.
+- **Source/test validation: PASS** — [run 39371075248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075248). The project-integrity and automated-test steps completed successfully after fixing the test assertion regex. The prior failure was in the new test's regex ordering, not storefront runtime.
+- **Local fixture visual audit: PASS (fixture-only)** — [run 39371072049](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049), [artifact 12240964807](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049/artifacts/12240964807). It captured 54 screenshots with 235 fixture products, 20 responsive cases and 93 interaction checks; 0 responsive overflow, console/page/HTTP errors, failed requests or hard failures. Requests/data are local fixture/mock traffic, not a live Preview test.
+- **Live Preview probe: BLOCKED_ACCESS_GATE** in the same artifact. The capture report records `accessServiceTokenConfigured=false`, redirect to Cloudflare Access, 0 genuine screenshots, 0 viewport/theme pairs and 0 route probes. Because push-triggered capture is diagnostic-only, canonical start/end archive folders were not written.
+- **Deployment metadata verification: BLOCKED_CONFIGURATION** in `deployment-verification.json`. Missing GitHub repository variable `CLOUDFLARE_ACCOUNT_ID`; after that, verification also requires a read-only `CLOUDFLARE_PAGES_READ_TOKEN` secret. It rejects archive until the exact alias maps to a successful Preview deployment on the selected fix branch with a verified SHA.
+- **Admin Preview Playwright: FAIL/BLOCKED** — [run 39371075239](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075239). The tests fail to find `#loginView`/`#loginForm`. The admin workflow currently passes `ADMIN_TEST_URL`/`ADMIN_TEST_PASSWORD`, not Cloudflare Access headers; this result is not proof of an app-password/login defect.
+- Added unit assertions for Preview host validation, alias match, expected branch, deployment environment, success stage and verified commit SHA. The test suite including those assertions is covered by run 39371075248.
+- Production was not merged/deployed or reconfigured. No genuine start/end screenshots or pixel comparison are claimed.
+- Required next owner action: configure Preview-only Access Service Auth + repo Secrets `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET`, `CLOUDFLARE_PAGES_READ_TOKEN`, and repo Variable `CLOUDFLARE_ACCOUNT_ID` as explained in [PREVIEW-ACCESS-SETUP.md](PREVIEW-ACCESS-SETUP.md). Do not paste secret values into chat or code.
+
+
 ### 2026-10-20 04:11 UTC — kiểm tra nguồn mới nhất và smoke test Preview
 
 - Code-bearing commit: `562d7d77624f7431296cb217b2b6d6592aca9ce4`. Validation chạy trên docs-only commit `7d5de0114025df35974067c0c1bf481f95be7fd6`.
