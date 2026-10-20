@@ -209,3 +209,21 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - **URL-001 ROUTE-001: source and tests PASS; live data UNVERIFIED** — explicit mapping `dress-shoes→giaytay`, `sneakers→sneaker`, `loafers→giayluoi`, `belts→thatlung`, `wallets→vida`, `sandals→dep`, `watch-straps→daydongho`, `phone-cases→oplung`. Canonical format `/sanpham/{mapped-category-slug}/{verified-SKU-or-product-ID}`; legacy route redirects 301; unverified SKU is not exposed in Product JSON-LD. Test real card click/direct-open/reload/Back/Forward/share only after Access opens the Preview.
 - **Admin Preview test: FAIL / separate blocker** — [run 39362965143](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965143) cannot find `#loginView` / `#loginForm` at its configured target. Do not count this as storefront pass or alter admin within this static-public task without verifying its target.
 - **Scope guard:** no Production merge/deploy, no data or bindings changes. PR #108 contains unrelated admin/API/migration/config diffs; don't merge wholesale.
+
+
+## Mốc kiểm toán tiếp tục — 2026-10-20 04:20 UTC (supersedes statuses above when conflicting)
+
+| ID | Trạng thái | Bằng chứng mới nhất | Bước tiếp theo |
+|---|---|---|---|
+| SETUP-001 | PASS cho trạng thái repo; FAIL cho merge readiness | PR #108 open, HEAD `33e0d4e0a051d767d7d027006d872872f4517e96`; [source validation 39368810377](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810377) PASS; 75 files, compare 361 ahead / 6 behind. | Review/isolated scope before any merge discussion. |
+| REG-001 | PASS — source/test CI | [Run 39368810377](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810377) PASS on current docs HEAD. | Rerun after further runtime/test changes. |
+| ROUTE-MAP-001 | PASS — new regression guard | Added map-parity assertion in `tests/product-route-canonical.test.mjs`; after fixing the assertion regex, [run 39368679776](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368679776) PASS on code/test commit `f23032e`. | Keep this regression guard; do not change route runtime based on Production before Preview is accessible. |
+| SHOT-001 | PASS — local fixture only | [Visual run 39368675236](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368675236), [artifact 12240562466](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368675236/artifacts/12240562466): 235 fixture products, 54 screenshots, 0 overflow, 0 page/HTTP/hard failures. | Retain as local-only evidence. |
+| SHOT-002 | BLOCKED_ACCESS_GATE | Preview `3ed49bcc` returns `login_required`; run 39368675236 reports no paired service token, access blocked, 0 screenshot/viewport/route checks. | Owner must configure Preview-only Service Auth + paired secrets. |
+| UI-001/UI-002/THEME-001 | NOT VERIFIED on Preview | Only fixture images and references are available; no authentic Preview screenshot or pixel diff. | Capture live at 360×800, 390×844, 768×1024, 1440×900 in Light/Dark after Access setup. |
+| URL-001/FUNC-001 | Source/local tests PASS; live Preview BLOCKED | Source route map has parity test. Production read-only baseline shows old `/san-pham/{SKU}` URLs work, while new `/sanpham/{category}/{key}` paths fall back to homepage metadata. This is not Preview evidence. | Do not change Production; validate new routes and legacy redirects on accessible Preview before acceptance. |
+| SHOT-003 | NOT TESTED | No authentic baseline/end screenshot pair and no pixel diff. | Keep canonical end folder unmodified until live capture passes. |
+| SAFE-001/SAFE-002 | FAIL — merge readiness | PR has 75 files and 361 commits ahead / 6 behind; includes out-of-scope admin/API/migration/data/deploy changes. | Isolate/review these changes; do not merge wholesale. |
+| ADMIN-SMOKE-001 | FAIL, out of scope | [Run 39368810463](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810463) is the admin Playwright failure; selectors absent. | Leave for separate admin workstream. |
+
+Estimated progress index, equal weight across code/tooling 85%, local test 100%, live Preview 0%, visual comparison 0%, documentation 90% = **55%**. This is an audit-progress estimate, not a claim that the website is 55% built or accepted; live visual gates are still blocked.

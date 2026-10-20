@@ -4,7 +4,7 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T04:17:26.954Z",
+  "updatedAtUtc": "2026-10-20T04:20:00Z",
   "status": "BLOCKED",
   "note": "Latest source/test validation run 39368493275 passed on docs-only commit 7d5de0114025df35974067c0c1bf481f95be7fd6; the app source remains code commit 562d7d77624f7431296cb217b2b6d6592aca9ce4. Admin Preview Playwright run 39368493324 failed to find #loginView/#loginForm; its workflow does not pass Cloudflare Access service-token headers. The last live storefront probe 39362960193 remains blocked by Cloudflare Access, with the secrets missing and zero real screenshots/routes/viewports. Local fixture audit passed (54 screenshots, 235 fixtures, 20 responsive cases, 93 interaction checks), but is not a live Preview visual pass. Safe unblock instructions: docs/handoff/PREVIEW-ACCESS-SETUP.md.",
   "stages": {
@@ -406,5 +406,91 @@
       "appliesToCodeCommit": "562d7d77624f7431296cb217b2b6d6592aca9ce4",
       "caveat": "Fixture-only evidence. It is not a genuine Cloudflare Preview screenshot or live visual acceptance."
     }
+  },
+  "latestContinuationCheckpoint": {
+    "recordedAtUtc": "2026-10-20T04:20:00Z",
+    "branch": "fix/liquid-glass-audit-2026-10-19",
+    "prNumber": 108,
+    "prState": "open",
+    "branchHead": "33e0d4e0a051d767d7d027006d872872f4517e96",
+    "sourceValidation": {
+      "run": 39368810377,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810377",
+      "status": "PASS"
+    },
+    "categoryRouteParityTest": {
+      "sourceCommit": "f23032ebf536c30ea6a5432e22870cba51c5b8b5",
+      "validationRun": 39368679776,
+      "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368679776",
+      "status": "PASS",
+      "runtimeCodeChanged": false
+    },
+    "localVisualAudit": {
+      "run": 39368675236,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368675236",
+      "artifactId": 12240562466,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368675236/artifacts/12240562466",
+      "sourceCommit": "f23032ebf536c30ea6a5432e22870cba51c5b8b5",
+      "status": "PASS_LOCAL_FIXTURE_ONLY",
+      "screenshots": 54,
+      "fixtureProducts": 235,
+      "responsiveOverflowCount": 0,
+      "pageErrors": 0,
+      "httpErrors": 0,
+      "hardFailures": 0
+    },
+    "latestDirectPreviewProbe": {
+      "url": "https://3ed49bcc.sindarealest2.pages.dev/",
+      "attemptedAtUtc": "2026-10-20T04:18:00Z",
+      "status": "BLOCKED_ACCESS_GATE",
+      "result": "login_required",
+      "screenshots": 0,
+      "routeChecks": 0,
+      "viewportChecks": 0,
+      "deploymentCommit": "UNVERIFIED"
+    },
+    "productionRouteBaseline": {
+      "checkedAtUtc": "2026-10-20T04:04:00Z",
+      "sitemapUrl": "https://sindarealest2.pages.dev/sitemap.xml",
+      "listedUrlCount": 237,
+      "legacyPattern": "/san-pham/{SKU}",
+      "legacyDetailRoutes": [
+        "/san-pham/SD-SN001",
+        "/san-pham/SD-ODT007"
+      ],
+      "newRouteProbes": [
+        "/sanpham/sneaker/SD-SN001",
+        "/sanpham/sneaker/sneakers-26-41-a"
+      ],
+      "newRouteResult": "homepage metadata/canonical root; not active on Production at inspection time",
+      "safeAction": "No Production changes or deployment"
+    },
+    "adminSmoke": {
+      "run": 39368810463,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810463",
+      "status": "FAIL_OUT_OF_SCOPE",
+      "selectors": [
+        "#loginView",
+        "#loginForm"
+      ]
+    },
+    "branchCompare": {
+      "status": "diverged",
+      "aheadBy": 361,
+      "behindBy": 6,
+      "changedFiles": 75,
+      "additions": 9994,
+      "deletions": 364,
+      "mergeAllowed": false
+    },
+    "canonicalScreenshots": {
+      "startOfWork": "BLOCKED/no authentic Preview images",
+      "endOfWork": "NOT TESTED",
+      "pixelDiff": "NOT TESTED"
+    },
+    "noProductionDeployOrMerge": true,
+    "previewAccessStatus": "BLOCKED_ACCESS_GATE",
+    "previewAccessSecretConfigured": false,
+    "previewAccessInstruction": "Configure Preview-only Cloudflare Access Service Auth and paired GitHub Actions secrets; do not paste secret values into chat."
   }
 }

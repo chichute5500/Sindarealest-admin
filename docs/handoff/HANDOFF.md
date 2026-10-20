@@ -192,3 +192,22 @@ Nếu không có quyền tạo service token/Secrets, không thể chụp baseli
 - Admin smoke workflow riêng [run 39362965143](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965143) còn FAIL vì Playwright không tìm thấy `#loginView`/`#loginForm` trên target cấu hình. Đây là hạng mục admin riêng, không chứng minh storefront public sai và chưa được sửa ở đây.
 - Branch fix còn các diff không liên quan trong admin/API/migration/config; không merge wholesale.
 - Tiếp theo: cấu hình Service Auth policy chỉ dành cho Preview và GitHub Actions secrets `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET` (không dán giá trị vào chat); xác minh đúng deployment commit; sau đó kiểm tra URL bằng sản phẩm thật, chụp bộ ảnh start/end cùng viewport/theme và làm pixel + visual comparison. Nếu alias không giữ code trước sửa thì không được gắn nhãn baseline gốc cho ảnh chụp muộn.
+
+
+## Tiếp tục kiểm toán — 2026-10-20 04:20 UTC (mốc mới nhất)
+
+- **PR/nhánh:** [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108) vẫn open/unmerged. HEAD tại checkpoint `33e0d4e0a051d767d7d027006d872872f4517e96`; 75 tệp, 361 commit, +9994/−364. Compare `main...` báo diverged, 361 ahead / 6 behind. Không merge hay deploy Production.
+- **Source CI trên HEAD hiện hành:** [run 39368810377](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810377) — PASS trên `33e0d4e0a051d767d7d027006d872872f4517e96`.
+- **Regression test vừa bổ sung:** commit `f23032ebf536c30ea6a5432e22870cba51c5b8b5` thêm assertion để ánh xạ slug danh mục trong `public/index.html` và `functions/_lib.js` không lệch nhau. Regex được sửa sau khi run đầu [39368562410](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368562410) phát hiện lỗi của chính test mới; bản sửa [run 39368679776](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368679776) PASS. Không có runtime website change trong commit test này.
+- **Visual workflow mới nhất cho code commit có test đã sửa:** [run 39368675236](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368675236), [artifact 12240562466](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368675236/artifacts/12240562466) — local fixture pipeline PASS: 235 sản phẩm fixture, 54 ảnh, 0 tràn ngang, 0 lỗi trang/HTTP/hard failure. Embedded direct Preview probe báo `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0/8 viewport-theme pairs, 0 ảnh thật. Visual workflow success không có nghĩa live Preview PASS.
+- **Preview trực tiếp:** `https://3ed49bcc.sindarealest2.pages.dev/` vẫn trả `login_required`. Không có screenshot, DOM, deployed commit marker hoặc kiểm thử route live. Cần chủ sở hữu cấu hình Preview-only Cloudflare Access Service Auth và secrets `CF_ACCESS_CLIENT_ID` + `CF_ACCESS_CLIENT_SECRET`; không gửi giá trị secret trong chat.
+- **Production route baseline (read-only):** sitemap `https://sindarealest2.pages.dev/sitemap.xml` liệt kê 237 URLs, theo dạng `/san-pham/{SKU}`. `/san-pham/SD-SN001` và `/san-pham/SD-ODT007` trả metadata sản phẩm. Ngược lại, `/sanpham/sneaker/SD-SN001` và `/sanpham/sneaker/sneakers-26-41-a` trả homepage metadata/canonical root; route hai đoạn chưa hoạt động trên Production vào lúc kiểm tra. Không sửa/triển khai Production trong công việc này. Điều này cũng **không** xác minh code trên Preview vì Preview bị Access chặn.
+- **Admin smoke:** [run 39368810463](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810463) FAIL với selector đăng nhập admin không tìm thấy; đây là phạm vi admin riêng, không dùng làm kết luận lỗi storefront.
+- **Phạm vi PR:** ngoài storefront/audit có `public/admin/index.html`, admin APIs, shared middleware/functions, migration, fixture dữ liệu, deploy/config và tài liệu admin. Không merge nguyên PR.
+- Không thay đổi HTML/CSS/JS runtime hoặc dữ liệu; không merge/deploy Production.
+
+### Gate còn mở
+
+1. Mở quyền Preview bằng policy/service token chỉ cho alias Preview, sau đó chạy đủ 8 viewport/theme pairs và route checks từ sản phẩm thật.
+2. Chụp ảnh baseline/end-of-work thật cùng viewport/theme/state và đối chiếu với hai ảnh PNG gốc. Không dùng fixture screenshot thay thế.
+3. Cô lập và review các thay đổi ngoài scope trước khi xem xét merge.
