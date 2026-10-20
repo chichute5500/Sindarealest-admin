@@ -113,3 +113,14 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - The storefront category keys are explicitly `sneakers`, `loafers`, `dress-shoes`, `belts`, `wallets`, `sandals`, `watch-straps`, `phone-cases`; the labels are display names and must not be used as slugs. The requested example `/sanpham/giaytay/sd2929` cannot be assumed valid without confirming the database product's category and SKU verification.
 - Implementation scope once baseline is available: add an explicit mapping from stored category key to canonical URL slug, validate category + verified SKU/product identity together in middleware, keep legacy single-segment URLs working, update the client route parser/close handler and sitemap, then add positive/negative route tests. Do not create an unverified alias or change canonical URLs before the baseline is archived.
 - No route or storefront UI code was changed during this audit.
+
+
+## Latest continuation checkpoint — 2026-10-20 (commit `fa7445b74661faf260c32b3ab32dfa85e3538e78`)
+
+- **REG-001: PASS — local pipeline only.** [Run 39355499185](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185) completed; project tests, `npm run check`, local Playwright screenshot capture and artifact upload passed. Artifact [12235310623](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623).
+- **SHOT-002: BLOCKED_ACCESS_GATE.** The live Preview probe in the same run detected a redirect to the Cloudflare Access login host: `accessBlocked=true`, `captureCompleted=false`, `screenshotCount=0`. Do not mark the live Preview test as passed just because the overall workflow is green.
+- **REF-001: PASS — reference images visually inspected** (artifact includes the original PNGs). This does not establish that the live page matches the references.
+- **UI-001/UI-002/UI-003/THEME-001/FUNC-001..005: NOT VERIFIED against live Preview.** No storefront HTML/CSS/JS was changed in this checkpoint; do not claim the visual redesign is complete.
+- **SAFE-001: IN PROGRESS.** No merge or Production deployment; public static website scope preserved.
+- Separate Admin Preview smoke run [39355503580](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355503580) failed because `#loginView` and `#loginForm` were absent. This is explicitly outside the current public static website scope; track and repair only in the dedicated admin workstream.
+- Next: obtain authorized Preview-only Access, then capture the true start baseline, perform evidence-based UI corrections, capture end state, compare screenshots, and review the complete branch diff before any merge recommendation.
