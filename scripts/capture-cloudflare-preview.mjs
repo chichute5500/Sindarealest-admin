@@ -405,6 +405,66 @@ async function waitForProductDetail(page) {
     return Boolean(img && img.complete && img.naturalWidth > 0);
   }, null, { timeout: 10000 }).catch(() => {});
 }
+async function captureGalleryCartCheckoutStates(page, viewport, theme, label, route) {
+  // UI-only probe in an isolated browser session: add one item locally and open
+  // checkout for a screenshot. No order is submitted and all network writes are blocked.
+  if (viewport.name !== 'mobile-390') return;
+  const stateCapture = async (selector, filename, state) => {
+    await captureLocator(page, selector, filename, {
+      ...captureMeta(viewport, theme, route), captureType: 'state', state,
+    });
+  };
+  try {
+    const zoom = page.locator('#detailZoom');
+    if (!await zoom.isVisible().catch(() => false)) throw new Error('Full-screen product gallery control is not visible.');
+    await zoom.click();
+    await page.waitForFunction(() => {
+      const viewer = document.querySelector('#sdFullscreenViewer');
+      const image = document.querySelector('#sdFullscreenImage');
+      return Boolean(viewer?.classList.contains('open') && image && image.complete && image.naturalWidth > 0);
+    }, null, { timeout: 12000 });
+    await stateCapture('#sdFullscreenViewer', screenshotStem('state-fullscreen-gallery', viewport, theme) + '.png', 'fullscreen-gallery');
+    audit.commerceStateChecks.push({ state: 'fullscreen-gallery', status: 'PASS', viewport: viewport.name, theme, route });
+    await page.locator('#sdFullscreenClose').click();
+    await page.waitForFunction(() => !document.querySelector('#sdFullscreenViewer')?.classList.contains('open'), null, { timeout: 5000 });
+
+    const addButton = page.locator('#detailAdd');
+    if (!await addButton.isVisible().catch(() => false)) throw new Error('Add-to-cart control is not visible.');
+    await addButton.click();
+    await page.waitForFunction(() => {
+      const text = document.querySelector('#cartCount')?.textContent || '0';
+      return Number.parseInt(text, 10) > 0 || text.trim() === '99+';
+    }, null, { timeout: 5000 });
+
+    const cartNav = page.locator('#mobileCartNav');
+    if (!await cartNav.isVisible().catch(() => false)) throw new Error('Mobile cart tab is not visible after adding the isolated test item.');
+    await cartNav.click();
+    await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'), null, { timeout: 5000 });
+    await page.waitForFunction(() => Boolean(document.querySelector('#cartList .cart-row')), null, { timeout: 5000 });
+    await stateCapture('#cartDrawer', screenshotStem('state-cart-with-item', viewport, theme) + '.png', 'cart-with-item');
+    audit.commerceStateChecks.push({ state: 'cart-with-item', status: 'PASS', viewport: viewport.name, theme, route });
+
+    const checkout = page.locator('#cartCheckout');
+    if (await checkout.isDisabled()) throw new Error('Checkout remains disabled after adding the item.');
+    await checkout.click();
+    await page.waitForFunction(() => document.querySelector('#checkoutDrawer')?.classList.contains('open'), null, { timeout: 5000 });
+    await stateCapture('#checkoutDrawer', screenshotStem('state-checkout-form', viewport, theme) + '.png', 'checkout-form-open');
+    audit.commerceStateChecks.push({ state: 'checkout-form-open', status: 'PASS', viewport: viewport.name, theme, route, submitted: false });
+    await page.locator('#checkoutClose').click();
+    await page.waitForFunction(() => !document.querySelector('#checkoutDrawer')?.classList.contains('open'), null, { timeout: 5000 });
+  } catch (error) {
+    audit.commerceStateChecks.push({
+      state: 'gallery-cart-checkout', status: 'FAIL', viewport: viewport.name, theme, route,
+      note: sanitizeText(String(error?.message || error).slice(0, 200)),
+    });
+    audit.hardFailures.push('Full-screen gallery/cart/checkout capture failed at ' + label + ': ' + sanitizeText(error?.message || error));
+    await page.locator('#sdFullscreenClose').click({ timeout: 800 }).catch(() => {});
+    await page.locator('#checkoutClose').click({ timeout: 800 }).catch(() => {});
+    await page.locator('#cartClose').click({ timeout: 800 }).catch(() => {});
+    await page.locator('#detailClose').click({ timeout: 800 }).catch(() => {});
+  }
+}
+
 async function captureProductDetailFlow(page, viewport, theme, label) {
   let cardButton = page.locator('#catalogGrid [data-open-product]').first();
   if (await cardButton.count().catch(() => 0) === 0) cardButton = page.locator('#featuredGrid [data-open-product]').first();
