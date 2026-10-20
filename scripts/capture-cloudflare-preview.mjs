@@ -261,7 +261,9 @@ async function captureMenuOpen(page, viewport, theme) {
   await capture(page, screenshotStem('state-menu-open', viewport, theme) + '.png', false, {
     ...captureMeta(viewport, theme), captureType: 'state', state: 'menu-open',
   });
-  await button.click();
+  // The open drawer overlays the toggle, so a second pointer click is intercepted.
+  // Use the storefront's supported Escape handler to close it without bypassing hit-testing.
+  await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('#mobileNav')?.classList.contains('open'), null, { timeout: 5000 });
 }
 async function captureOrderExpanded(page, viewport, theme) {
@@ -307,7 +309,13 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     title: (document.querySelector('#detailTitle')?.textContent || '').trim(),
     imageCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
   }));
-  if (!/^\/sanpham\/[^/]+\/[^/]+\/?$/i.test(clicked.path) || !clicked.title) {
+  const currentRouteMatches = /^\/sanpham\/[^/]+\/[^/]+\/?$/i.test(clicked.path) && Boolean(clicked.title);
+  if (!currentRouteMatches) {
+    audit.routeChecks.push({
+      kind: 'product-card-navigation', path: clicked.path, status: 'FAIL', result: 'FAIL',
+      productTitleMatches: Boolean(clicked.title), detailModalOpen: true, context: label,
+      expectedPattern: '/sanpham/{category-slug}/{product-key}',
+    });
     audit.productDetailChecks.push({ context: label, status: 'FAIL', clickedPath: clicked.path, productTitlePresent: Boolean(clicked.title) });
     audit.hardFailures.push('Clicking a live product did not produce an expected current detail route (' + label + ').');
     return;

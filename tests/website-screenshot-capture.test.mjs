@@ -8,6 +8,7 @@ import { validatePreviewUrl, matchesPreviewDeployment, inspectPreviewDeployment 
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
+const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const deploymentVerifier = readFileSync(new URL('../scripts/verify-cloudflare-preview-deployment.mjs', import.meta.url), 'utf8');
 const compare = readFileSync(new URL('../scripts/compare-website-screenshots.mjs', import.meta.url), 'utf8');
 
@@ -151,6 +152,12 @@ assert.match(live, /name: 'tablet-768', width: 768, height: 1024/,
   'Live Preview capture must include the required 768×1024 tablet viewport.');
 assert.match(live, /name: 'desktop-1440', width: 1440, height: 900/,
   'Live Preview capture must include the required 1440×900 desktop viewport.');
+assert.match(live, /async function captureMenuOpen[\s\S]*await page\.keyboard\.press\('Escape'\);[\s\S]*waitForFunction\(\(\) => !document\.querySelector\('#mobileNav'\)\?\.classList\.contains\('open'\)/,
+  'Live menu-state capture must close the drawer with Escape rather than clicking a toggle covered by the open drawer.');
+assert.ok(storefrontHtml.includes("e.key==='Escape'&&$('#mobileNav').classList.contains('open'))setMobileMenu(false)"),
+  'The public storefront must expose its own Escape-to-close behavior used by the read-only Playwright check.');
+assert.match(live, /currentRouteMatches[\s\S]*audit\.routeChecks\.push[\s\S]*expectedPattern/,
+  'A live product card that uses a non-canonical route must be recorded as an explicit route-check failure.');
 assert.match(live, /captureKeySections[\s\S]*sectionTargets/,
   'Live capture must cover core page sections, including the six benefit tiles and footer.');
 assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
