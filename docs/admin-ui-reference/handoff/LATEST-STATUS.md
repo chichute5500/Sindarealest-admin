@@ -123,3 +123,14 @@
 - **Giới hạn:** chỉ quan sát được ảnh đăng nhập source cục bộ. Chưa có ảnh Playwright của các màn hình sau đăng nhập để đối chiếu với 11 màn hình còn lại. Preview từ xa vẫn sai signature và không thể dùng để xác nhận source hiện tại.
 - Một lần cập nhật markup đăng nhập qua connector đã bị chặn trước khi ghi; không tuyên bố thay đổi copy này đã được áp dụng. Cần dùng một đường chỉnh sửa an toàn khác hoặc tiếp tục sau khi có môi trường checkout/patch được chấp nhận.
 
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: f75cb4d38980af17781c1428133d6e27417865b2
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39470193389
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/f75cb4d38980/screenshots/.
+- Deployed Preview: failure.
+- The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
+- Production deployment: NOT PERFORMED.
