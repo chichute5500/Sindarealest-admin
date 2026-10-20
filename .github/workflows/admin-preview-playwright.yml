@@ -1,6 +1,9 @@
 name: Admin Preview Playwright
 
 on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened]
