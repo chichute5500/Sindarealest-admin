@@ -164,7 +164,7 @@ assert.match(live, /captureKeySections[\s\S]*sectionTargets/,
   'Live capture must cover core page sections, including the six benefit tiles and footer.');
 assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
   'Live capture must directly open and reload a route derived from a real rendered product.');
-assert.match(live, /galleryImageCount > 1[\s\S]*detailThumbs \.detail-thumb[\s\S]*galleryImageCount > 1/,
+assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
   'Gallery-next interaction must only be required when the live product actually has multiple gallery images.');
 assert.match(live, /Path derived from an actual rendered Preview product card/i,
   'Product route checks must be derived from actual Preview card navigation.');
