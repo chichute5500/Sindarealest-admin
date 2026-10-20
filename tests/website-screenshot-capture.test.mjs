@@ -48,6 +48,11 @@ assert.equal(inspected.verified, true, 'Only a successful Preview with a concret
 assert.equal(inspected.metadata.commitHash, 'a'.repeat(40));
 assert.equal(inspected.metadata.environment, 'preview');
 assert.equal(inspected.metadata.branch, 'fix/liquid-glass-audit-2026-10-19');
+const branchVerified = inspectPreviewDeployment(validDeployment, 'fix/liquid-glass-audit-2026-10-19');
+assert.equal(branchVerified.verified, true, 'Deployment must pass when its branch matches the selected branch.');
+assert.equal(branchVerified.metadata.branchMatchesExpected, true);
+assert.equal(inspectPreviewDeployment(validDeployment, 'fix/another-branch').verified, false,
+  'A Preview deployment from another branch must fail closed.');
 assert.equal(inspectPreviewDeployment({ ...validDeployment, environment: 'production' }).verified, false,
   'Production deployments must never be accepted as Preview evidence.');
 assert.equal(inspectPreviewDeployment({ ...validDeployment, status: 'active' }).verified, false,
@@ -74,6 +79,10 @@ assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID:\s*\$\{\{\s*vars\.CLOUDFLARE_ACCOU
   'The deployment verifier must read the Cloudflare account ID from a GitHub Actions variable.');
 assert.match(workflow, /CLOUDFLARE_PAGES_READ_TOKEN:\s*\$\{\{\s*secrets\.CLOUDFLARE_PAGES_READ_TOKEN\s*\}\}/,
   'The deployment verifier must use a read-only token from GitHub Actions secrets.');
+assert.match(workflow, /EXPECTED_DEPLOYMENT_BRANCH:\s*\$\{\{\s*github\.ref_name\s*\}\}/,
+  'Deployment verification must bind to the selected fix branch.');
+assert.match(workflow, /deployed\.branch === process\.env\.REF_NAME/,
+  'The archive gate must reject Preview deployments from a different branch.');
 assert.match(workflow, /deployment-verification\.json[\s\S]*verification\.passed === true[\s\S]*deployed\.environment === 'preview'/,
   'The archive gate must reject any deployment not positively verified as a Preview.');
 assert.match(workflow, /manifest\.previewDeploymentCommit = deployed\.commitHash/,
