@@ -420,8 +420,11 @@ async function captureGalleryCartCheckoutStates(page, viewport, theme, label, ro
     await zoom.click();
     await page.waitForFunction(() => {
       const viewer = document.querySelector('#sdFullscreenViewer');
-      const image = document.querySelector('#sdFullscreenImage');
-      return Boolean(viewer?.classList.contains('open') && image && image.complete && image.naturalWidth > 0);
+      // The gallery uses two buffered image layers and can load the first photo into
+      // #sdFullscreenImageNext. Accept either loaded layer instead of assuming layer 1.
+      const images = Array.from(document.querySelectorAll('#sdFullscreenViewer .sd-fullscreen-image'));
+      return Boolean(viewer?.classList.contains('open')
+        && images.some(image => image.complete && image.naturalWidth > 0));
     }, null, { timeout: 12000 });
     await stateCapture('#sdFullscreenViewer', screenshotStem('state-fullscreen-gallery', viewport, theme) + '.png', 'fullscreen-gallery');
     audit.commerceStateChecks.push({ state: 'fullscreen-gallery', status: 'PASS', viewport: viewport.name, theme, route });
