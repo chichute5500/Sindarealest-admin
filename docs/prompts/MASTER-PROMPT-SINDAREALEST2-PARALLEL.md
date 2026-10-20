@@ -82,3 +82,94 @@ Khi hai nhánh gần hoàn thành:
 Người dùng có thể nói: **“Tiếp tục theo MASTER PROMPT TỔNG HỢP SinDarealest2. Đọc tài liệu nguồn và handoff, xác minh nhánh/SHA, cập nhật các ý mới vào cả hai file prompt, rồi tiếp tục công việc trên Preview; tuyệt đối không đụng Production.”**
 
 Không chỉ trả lời bằng kế hoạch nếu có thể thực hiện thật.
+
+---
+
+## PHẦN PROMPT GỬI RIÊNG CHO CHAT ĐANG LÀM WEB ADMIN
+
+Sử dụng nguyên phần này khi cần bàn giao trực tiếp cho chat Admin:
+
+# BÀN GIAO BẮT BUỘC — PHỐI HỢP THIẾT KẾ WEB TĨNH VÀ WEB ADMIN SINDAREALEST2
+
+## 1. Vấn đề cần hiểu đúng
+
+Hiện tại có hai công việc thiết kế giao diện đang được thực hiện song song:
+
+- **Web tĩnh:** nhánh `fix/liquid-glass-audit-2026-10-19`.
+- **Web admin:** đang làm trên một nhánh `feature/*`. Hãy tự kiểm tra GitHub để xác định chính xác tên nhánh và commit hiện tại, không tự đoán.
+
+Hai công việc **độc lập, triển khai song song, không phụ thuộc nhau và không cần chờ nhau hoàn thành**.
+
+Tôi cho phép thay đổi đáng kể giao diện cũ để đạt đúng hình ảnh tham chiếu. Không được để cấu trúc, CSS, font chữ hoặc cách bố trí của giao diện cũ trở thành rào cản khiến thiết kế mới không đạt yêu cầu.
+
+## 2. Những gì được phép thay đổi
+
+Trong phạm vi giao diện admin, chủ động thiết kế lại những phần cần thiết để phù hợp với ảnh tham chiếu và trải nghiệm quản trị hiện đại, bao gồm:
+
+- Bố cục, cấu trúc các khu vực và cách tổ chức nội dung.
+- Font chữ, cỡ chữ, độ đậm, khoảng cách và căn chỉnh.
+- Màu sắc, nền, đường viền, bóng, hiệu ứng và trạng thái tương tác.
+- Sidebar, thanh điều hướng, dashboard, thẻ thống kê, bảng dữ liệu, biểu mẫu, hộp thoại và các thành phần giao diện.
+- Responsive trên điện thoại và máy tính.
+- CSS và cấu trúc HTML phục vụ giao diện, khi cần thiết.
+
+Không được chỉ sửa vài màu sắc hoặc thêm hiệu ứng lên giao diện cũ nếu cách đó không đáp ứng ảnh tham chiếu.
+
+## 3. Những gì phải bảo vệ
+
+Không tự ý thay đổi hoặc làm hỏng:
+
+- Logo, tên thương hiệu SinDarealest và nhận diện thương hiệu cốt lõi.
+- Dữ liệu sản phẩm, SKU, slug, giá, mô tả, ảnh và liên kết ảnh hiện có.
+- API, đăng nhập, phân quyền, phiên làm việc và các chức năng nghiệp vụ.
+- D1, R2, bindings, secrets, cấu hình môi trường và dữ liệu thật.
+- Các chức năng quản lý sản phẩm, đơn hàng, khách hàng và những chức năng admin hiện có.
+
+Được thay đổi cách hiển thị, nhưng phải bảo đảm chức năng vẫn hoạt động. Không được viết lại toàn bộ kiến trúc chỉ để làm giao diện nếu chưa có sự cho phép riêng.
+
+## 4. Quy tắc làm việc song song
+
+- Tiếp tục công việc admin trên đúng nhánh admin hiện tại.
+- Không chờ web tĩnh hoàn thành mới thiết kế admin.
+- Không tự ý merge, cherry-pick hoặc ghi đè mã giữa hai nhánh.
+- Không sửa nhánh `main`, không thay đổi Production, không deploy Production.
+- Không giả định rằng hai nhánh đã có cùng mã nguồn hoặc cùng cấu hình Preview.
+- Khi gặp thành phần có thể liên quan cả hai bên — ví dụ logo, font, theme, nền, CSS dùng chung, ảnh, responsive hoặc quy tắc giao diện — hãy ghi rõ quyết định và rủi ro tiềm ẩn để đối chiếu sau. Không vì khả năng xung đột mà dừng thiết kế.
+
+## 5. Tài liệu đối chiếu giữa hai nhánh
+
+Tài liệu bàn giao:
+https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/handoff/STOREFRONT-ADMIN-CROSSCHECK-2026-10-20.md
+
+Hãy đọc tài liệu này nếu truy cập được. Lưu ý tài liệu có thể chưa tồn tại trên nhánh admin. Nếu không truy cập được, hãy ghi nhận rõ và tiếp tục dựa trên yêu cầu trong prompt này; không được dừng toàn bộ công việc.
+
+## 6. Cách thực hiện
+
+1. Xác minh nhánh admin, commit hiện tại và trạng thái GitHub.
+2. Đọc ảnh tham chiếu, yêu cầu giao diện và mã admin hiện tại.
+3. Chỉ ra những rào cản của giao diện cũ đang khiến thiết kế không đạt ảnh mẫu.
+4. Chủ động sửa giao diện trong phạm vi được phép.
+5. Chạy kiểm tra mã và Playwright qua GitHub Actions; chỉ dùng Preview.
+6. Chụp ảnh giao diện Preview ở các kích thước điện thoại và máy tính, chế độ sáng/tối nếu có.
+7. Đối chiếu ảnh thực tế với ảnh tham chiếu; tiếp tục sửa các sai lệch cụ thể.
+8. Kiểm tra lại chức năng admin sau khi sửa giao diện.
+9. Ghi lại các thay đổi có thể ảnh hưởng đến việc đối chiếu với web tĩnh, kèm file, lý do và trạng thái kiểm tra.
+
+## 7. Điều kiện báo hoàn thành
+
+Không được báo hoàn thành 100% chỉ vì code đã sửa hoặc CI đã chạy thành công.
+
+Phải phân biệt rõ:
+- Kiểm tra mã và CI.
+- Kiểm tra chức năng.
+- Kiểm tra giao diện thực tế trên Preview.
+- Đối chiếu trực quan với ảnh tham chiếu.
+- Những mục chưa thể xác minh.
+
+**Yêu cầu cuối cùng:** Hãy xác nhận bạn hiểu rằng hai nhánh được phát triển độc lập song song, không bị giao diện cũ trói buộc trong phạm vi được cho phép, và phải ghi lại các điểm cần đối chiếu sau này. Sau đó tiếp tục công việc admin hiện có, không chỉ trả lời bằng kế hoạch và không chờ tôi nhắc lại các nguyên tắc trên.
+
+## Ghi chú về prompt gốc
+
+Prompt gốc đầy đủ về kiểm toán Admin, thiết kế lại, Playwright, ảnh và handoff vẫn được lưu nguyên bản tại:
+`docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`.
+Không thay thế hay xóa file nguồn đó; file master tổng hợp này kết nối prompt nguồn với các quy tắc phối hợp mới.
