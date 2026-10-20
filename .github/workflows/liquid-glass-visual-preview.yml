@@ -1,5 +1,5 @@
 name: Liquid Glass isolated visual preview
-# Guarded capture: only an explicit [capture-start-of-work] commit on the fix branch may archive a verified live Preview baseline.
+# Guarded capture: explicit start/end capture commits on the fix branch may archive only verified live Cloudflare Preview screenshots.
 
 on:
   push:
@@ -85,8 +85,8 @@ jobs:
           if [ "${CAPTURE_SOURCE}" = "cloudflare-preview" ]; then
             node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           fi
-      - name: Validate guarded push baseline request
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-start-of-work]')
+      - name: Validate guarded push capture request
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]'))
         env:
           REF_NAME: ${{ github.ref_name }}
           PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
@@ -145,7 +145,7 @@ jobs:
           node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           node scripts/capture-cloudflare-preview.mjs
       - name: Verify actual Cloudflare Pages deployment before manual capture/archive
-        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-start-of-work]'))
+        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')))
         env:
           PREVIEW_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.preview_url || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
@@ -154,7 +154,7 @@ jobs:
           EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Capture live Cloudflare Pages Preview (read-only)
-        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-start-of-work]'))
+        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')))
         env:
           PREVIEW_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.preview_url || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/' }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
@@ -164,9 +164,9 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'local-static-fixture'
         run: echo "Local fixture screenshots are uploaded for review only; canonical start/end folders are unchanged."
       - name: Save live Preview images into selected repository archive
-        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-start-of-work]'))
+        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')))
         env:
-          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_stage || 'start-of-work' }}
+          STAGE: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_stage || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-end-of-work]') && 'end-of-work') || 'start-of-work' }}
           RUN_ID: ${{ github.run_id }}
           SOURCE_SHA: ${{ env.SOURCE_SHA }}
           REF_NAME: ${{ github.ref_name }}
@@ -322,10 +322,10 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive live Preview ${STAGE} screenshots (run ${RUN_ID})"
           git push origin "HEAD:${REF_NAME}"
       - name: Compare start/end screenshots using pixel diff
-        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work'
+        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-end-of-work]'))
         run: node scripts/compare-website-screenshots.mjs
       - name: Record pixel comparison summary in manifest
-        if: always() && github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work'
+        if: always() && ((github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-end-of-work]')))
         env:
           REF_NAME: ${{ github.ref_name }}
           RUN_ID: ${{ github.run_id }}
