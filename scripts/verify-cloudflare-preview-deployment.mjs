@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const projectName = process.env.CLOUDFLARE_PAGES_PROJECT || 'sindarealest2';
+const projectName = 'sindarealest2';
 const requestedUrl = process.env.PREVIEW_URL || '';
 const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
 const apiToken = String(process.env.CLOUDFLARE_PAGES_READ_TOKEN || '').trim();
@@ -36,7 +36,7 @@ export function matchesPreviewDeployment(deployment, previewUrlOrOrigin) {
   return origins.includes(targetOrigin) || deploymentOrigin === targetOrigin;
 }
 
-export function inspectPreviewDeployment(deployment) {
+export function inspectPreviewDeployment(deployment, expectedBranch = '') {
   const metadata = deployment?.deployment_trigger?.metadata || {};
   const commitHash = String(metadata.commit_hash || '').trim();
   const deploymentBranch = String(metadata.branch || '').trim();
@@ -45,11 +45,13 @@ export function inspectPreviewDeployment(deployment) {
   const environment = String(deployment?.environment || '').toLowerCase();
   const status = String(deployment?.status || latestStageStatus).toLowerCase();
   const commitHashValid = /^[a-f0-9]{7,64}$/i.test(commitHash);
+  const branchMatchesExpected = expectedBranch ? deploymentBranch === expectedBranch : null;
   const verified = environment === 'preview'
     && latestStageStatus === 'success'
     && status === 'success'
     && commitHashValid
     && Boolean(deploymentBranch)
+    && (!expectedBranch || branchMatchesExpected === true)
     && Boolean(deployment?.id)
     && deployment?.is_skipped !== true;
   return {
@@ -60,6 +62,8 @@ export function inspectPreviewDeployment(deployment) {
       aliases: Array.isArray(deployment?.aliases) ? deployment.aliases.filter(x => typeof x === 'string') : [],
       environment,
       branch: deploymentBranch || null,
+      expectedBranch: expectedBranch || null,
+      branchMatchesExpected,
       commitHash: commitHashValid ? commitHash : null,
       commitMessage: typeof metadata.commit_message === 'string' ? metadata.commit_message.slice(0, 300) : null,
       createdOn: shortDate(deployment?.created_on),
@@ -124,11 +128,13 @@ async function main() {
     await fail(report, 'Missing CLOUDFLARE_PAGES_READ_TOKEN. Configure a separate read-only Pages API token as a GitHub Actions secret.', 2);
     return;
   }
-  if (!/^[a-z0-9][a-z0-9-]{0,61}$/.test(projectName)) {
+  const expectedBranch = String(process.env.EXPECTED_DEPLOYMENT_BRANCH || '').trim();
+  if (!expectedBranch) {
     report.status = 'BLOCKED_CONFIGURATION';
-    await fail(report, 'Invalid CLOUDFLARE_PAGES_PROJECT setting.', 2);
+    await fail(report, 'Missing EXPECTED_DEPLOYMENT_BRANCH; deployment verification must be scoped to the selected fix branch.', 2);
     return;
   }
+  report.expectedBranch = expectedBranch;
 
   const matches = [];
   let totalPages = 1;
@@ -180,13 +186,13 @@ async function main() {
   }
 
   const deployment = uniqueMatches[0];
-  const inspection = inspectPreviewDeployment(deployment);
+  const inspection = inspectPreviewDeployment(deployment, expectedBranch);
   report.deployment = inspection.metadata;
   const verified = inspection.verified;
 
   if (!verified) {
     report.status = 'DEPLOYMENT_METADATA_UNVERIFIED';
-    await fail(report, 'The matched deployment is not a completed Preview with a verified commit SHA and branch. Refusing to archive screenshot stages.');
+    await fail(report, 'The matched deployment is not a completed Preview on the selected branch with a verified commit SHA. Refusing to archive screenshot stages.');
     return;
   }
 
@@ -201,6 +207,7 @@ async function main() {
     deployment: {
       environment: report.deployment.environment,
       branch: report.deployment.branch,
+      branchMatchesExpected: report.deployment.branchMatchesExpected,
       commitHash: report.deployment.commitHash,
       createdOn: report.deployment.createdOn,
       latestStage: report.deployment.latestStage,
@@ -212,11 +219,11 @@ async function main() {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch(async () => {
     const report = {
-    sourceKind: 'cloudflare-pages-api-read-only',
-    passed: false,
-    status: 'UNEXPECTED_ERROR',
-    error: 'Unexpected deployment verification error; details omitted to avoid leaking request credentials.',
-  };
+      sourceKind: 'cloudflare-pages-api-read-only',
+      passed: false,
+      status: 'UNEXPECTED_ERROR',
+      error: 'Unexpected deployment verification error; details omitted to avoid leaking request credentials.',
+    };
     await writeReport(report).catch(() => {});
     console.error(report.error);
     process.exitCode = 1;
