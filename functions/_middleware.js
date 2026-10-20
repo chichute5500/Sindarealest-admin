@@ -41,7 +41,7 @@ export async function onRequest(context) {
   catch { return new Response("Không thể tải sản phẩm.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } }); }
   if (!product || Number(product.published) !== 1) return new Response("Không tìm thấy sản phẩm.", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" } });
   const productKey = isVerifiedCommercialSku(product) ? String(product.sku) : String(product.id);
-  const categoryPath = slugify(product.category_label || product.category);
+  const categoryPath = slugify(product.category);
   const canonicalPath = `/sanpham/${categoryPath}/${encodeURIComponent(productKey)}`;
   if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath, url.origin), 301);
   let images = [];

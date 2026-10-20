@@ -34,13 +34,13 @@ const baseProduct = {
 
 const legacy = await middleware(contextFor(baseProduct, "/san-pham/internal-abc123"));
 assert.equal(legacy.status, 301, "legacy detail route should redirect permanently");
-assert.equal(legacy.headers.get("Location"), "https://shop.example/sanpham/giay-tay/internal-abc123");
+assert.equal(legacy.headers.get("Location"), "https://shop.example/sanpham/dress-shoes/internal-abc123");
 
-const wrongCategory = await middleware(contextFor(baseProduct, "/sanpham/vi-da/internal-abc123"));
+const wrongCategory = await middleware(contextFor(baseProduct, "/sanpham/wallets/internal-abc123"));
 assert.equal(wrongCategory.status, 301, "a mismatched category segment should redirect to the product's canonical category");
-assert.equal(wrongCategory.headers.get("Location"), "https://shop.example/sanpham/giay-tay/internal-abc123");
+assert.equal(wrongCategory.headers.get("Location"), "https://shop.example/sanpham/dress-shoes/internal-abc123");
 
-const canonical = await middleware(contextFor(baseProduct, "/sanpham/giay-tay/internal-abc123"));
+const canonical = await middleware(contextFor(baseProduct, "/sanpham/dress-shoes/internal-abc123"));
 assert.equal(canonical.status, 200, "canonical category route should render the product page");
 const body = await canonical.text();
 assert.match(body, /<link rel="canonical" href="https:\/\/shop\.example\/sanpham\/giay-tay\/internal-abc123">/);
@@ -52,6 +52,6 @@ assert.match(body, /Giày tây da cá sấu/);
 const verifiedProduct = { ...baseProduct, sku: "SD-REAL-001", sku_verified: 1 };
 const skuLegacy = await middleware(contextFor(verifiedProduct, "/san-pham/sd-real-001"));
 assert.equal(skuLegacy.status, 301, "SKU lookup should stay case-insensitive for legacy links");
-assert.equal(skuLegacy.headers.get("Location"), "https://shop.example/sanpham/giay-tay/SD-REAL-001");
+assert.equal(skuLegacy.headers.get("Location"), "https://shop.example/sanpham/dress-shoes/SD-REAL-001");
 
 console.log("PASS: canonical category/product URLs, legacy redirects, mismatch redirects, SEO metadata, and verified SKU case normalization.");
