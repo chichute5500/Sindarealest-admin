@@ -87,6 +87,14 @@ assert.match(workflow, /deployment-verification\.json[\s\S]*verification\.passed
   'The archive gate must reject any deployment not positively verified as a Preview.');
 assert.match(workflow, /manifest\.previewDeploymentCommit = deployed\.commitHash/,
   'The manifest must record the API-verified deployed commit, separate from the workflow source commit.');
+assert.match(workflow, /Summarize local fixture, live Preview, and deployment verification separately/,
+  'The workflow summary must explicitly separate fixture results from live Preview acceptance.');
+assert.match(workflow, /A green local fixture audit is not live Preview acceptance/,
+  'The workflow run summary must not imply a green fixture audit means the live Preview passed.');
+assert.match(workflow, /BLOCKED_ACCESS_GATE/,
+  'The workflow summary must report a blocked Cloudflare Access gate distinctly.');
+assert.match(workflow, /Screenshot archiving must remain blocked until the exact Preview alias/,
+  'The workflow summary must state the deployment-verification archive gate.');
 assert.match(workflow, /baselineStage\?\.status !== 'CAPTURED_PASS'[\s\S]*baselineStage\?\.previewDeploymentVerified !== true[\s\S]*Refused end-of-work archive/,
   'The final screenshot archive must require an existing verified start-of-work baseline.');
 assert.match(workflow, /manifest\.status = hasComparablePairs \? 'AWAITING_HUMAN_VISUAL_REVIEW' : 'BLOCKED'/,
