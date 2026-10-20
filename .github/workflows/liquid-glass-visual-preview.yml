@@ -55,6 +55,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: true
       - name: Reject unsafe manual capture
         if: github.event_name == 'workflow_dispatch'
         env:
@@ -90,10 +94,6 @@ jobs:
           set -euo pipefail
           test "${REF_NAME}" = "fix/liquid-glass-audit-2026-10-19"
           node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
-      - name: Check out source
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: true
       - name: Record source revision before screenshot commit
         run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Set up Node.js
