@@ -157,11 +157,25 @@ jobs:
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
+          const requiredSectionKeys = ['hero', 'benefits', 'order', 'featured', 'collections', 'products', 'footer'];
+          const coverage = audit.coverage || {};
+          const requiredSectionsComplete = requiredSectionKeys.every(key => coverage.sectionScreenshotCounts?.[key] === 4);
+          const originMatches = (() => {
+            try { return new URL(audit.previewUrl).origin === new URL(process.env.PREVIEW_URL).origin; }
+            catch { return false; }
+          })();
           if (audit.sourceKind !== 'cloudflare-pages-preview-live-read-only'
-              || audit.captureCompleted !== true || audit.accessBlocked === true
-              || !Array.isArray(audit.screenshots)
-              || audit.screenshots.filter(x => x.captureType === 'viewport').length < 2) {
-            console.error('Refused to archive: no verified read-only live Preview capture is available.');
+              || audit.captureCompleted !== true || audit.accessBlocked === true || audit.passed !== true
+              || !originMatches
+              || !Array.isArray(audit.screenshots) || !Array.isArray(audit.productDetailChecks)
+              || coverage.requiredViewportThemePairs !== coverage.completedViewportThemePairs
+              || coverage.homeFullPageCount !== 4 || !coverage.requiredSectionScreenshotsComplete
+              || !requiredSectionsComplete || coverage.menuOpenCount !== 2 || coverage.orderExpandedCount !== 4
+              || coverage.productDetailContextsComplete !== true || coverage.totalScreenshotCount < 50
+              || audit.productDetailChecks.length !== 4
+              || !audit.productDetailChecks.every(x => x.status === 'PASS' && x.directOpenPassed === true && x.reloadPassed === true)
+              || audit.screenshots.filter(x => x.captureType === 'viewport' && x.state === 'default-home').length !== coverage.requiredViewportThemePairs) {
+            console.error('Refused to archive: live Preview, viewport/theme, section, menu, order or product-detail coverage did not pass.');
             process.exit(1);
           }
           NODE
@@ -184,7 +198,11 @@ jobs:
           manifest.branch = process.env.REF_NAME;
           manifest.sourceCommit = process.env.SOURCE_SHA;
           manifest.previewUrl = process.env.PREVIEW_URL;
+          manifest.previewDeploymentCommit = null;
+          manifest.previewCommitVerification = 'UNVERIFIED: the deployed Pages Preview commit was not exposed by the read-only browser capture.';
           manifest.captureSource = 'Direct Cloudflare Pages Preview capture, read-only; no fixture API';
+          manifest.captureCoverage = audit.coverage;
+          manifest.liveAuditPassed = audit.passed === true;
           manifest.updatedAtUtc = process.env.CAPTURED_AT;
           manifest.status = 'IN PROGRESS';
           manifest.stages ??= {};
@@ -193,15 +211,25 @@ jobs:
           const resultDir = 'docs/website-screenshots/end-of-work/';
           const counterpartDir = process.env.STAGE === 'start-of-work' ? resultDir : baselineDir;
           const counterpartNames = new Set(fs.existsSync(counterpartDir) ? fs.readdirSync(counterpartDir) : []);
+          const screenshotByName = new Map((audit.screenshots || []).map(item => [item.filename, item]));
           const infer = (name) => {
-            const theme = /(^|[-_])(light|dark)([-_.]|$)/i.exec(name)?.[2]?.toLowerCase() || 'UNVERIFIED';
-            const viewport = /(mobile|tablet|desktop)[-_]?(320|360|375|390|412|430|768|1024|1366|1440)/i.exec(name);
-            const widthHeight = viewport ? ({
-              320:[320,720],360:[360,800],375:[375,812],390:[390,844],412:[412,915],
-              430:[430,932],768:[768,1024],1024:[1024,768],1366:[1366,768],1440:[1440,900]
-            })[Number(viewport[2])] : null;
-            const route = name.startsWith('welcome-splash-') || name.startsWith('mobile-') || name.startsWith('tablet-') || name.startsWith('desktop-') ? '/' : 'UNVERIFIED';
-            return { theme, viewportName: viewport?.[0] || 'UNVERIFIED', viewport: widthHeight ? {width:widthHeight[0],height:widthHeight[1]} : null, route };
+            const item = screenshotByName.get(name) || {};
+            const theme = item.theme || /(^|[-_])(light|dark)([-_.]|$)/i.exec(name)?.[2]?.toLowerCase() || 'UNVERIFIED';
+            const matched = /(mobile|tablet|desktop)[-_](?:light|dark)[-_](\d{3,4})x(\d{3,4})/i.exec(name);
+            const legacy = /(mobile|tablet|desktop)[-_]?(320|360|375|390|412|430|768|1024|1366|1440)/i.exec(name);
+            const width = item.viewportWidth || (matched ? Number(matched[2]) : legacy ? Number(legacy[2]) : null);
+            const height = item.viewportHeight || (matched ? Number(matched[3]) : null);
+            return {
+              route: item.route || 'UNVERIFIED',
+              theme,
+              viewportName: item.viewport || legacy?.[0] || 'UNVERIFIED',
+              viewport: width && height ? { width, height } : null,
+              captureType: item.captureType || 'UNVERIFIED',
+              state: item.state || null,
+              sectionKey: item.sectionKey || null,
+              elementSelector: item.elementSelector || null,
+              status: 'captured-live-preview',
+            };
           };
           manifest.stages[process.env.STAGE] = {
             status: audit.passed ? 'CAPTURED_PASS' : 'CAPTURED_WITH_ISSUES',
