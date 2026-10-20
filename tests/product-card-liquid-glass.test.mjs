@@ -35,19 +35,23 @@ assert.match(mobileReferenceCss, /\.service-strip \.service-copy\{min-height:52p
 assert.match(html, /\.hero-visual\{height:clamp\(155px,46vw,175px\);min-height:0;aspect-ratio:\.9\/1\}/,
   "Narrow phones must keep the Hero image frame compact without restoring the oversized crop.");
 const finalBackgroundStart = html.lastIndexOf(".theme-bg--light::after{");
-const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart + 2200);
+const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart + 6000);
 assert.ok(finalBackgroundStart > html.indexOf("/* Reference-match finishing pass"),
   "The softened background calibration must be the final authoritative rule, not an unused earlier selector.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(225,241,255,\.52\),rgba\(211,231,249,\.46\) 52%,rgba\(237,247,255,\.54\)\)/,
   "Light background must provide a soft frosted veil over the newly generated glacial gradient backdrop.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(3,20,36,\.68\),rgba\(7,31,51,\.63\) 52%,rgba\(3,17,30,\.72\)\)/,
   "Dark background must provide a deep navy translucent veil over the newly generated sapphire gradient backdrop.");
-assert.match(finalBackgroundCss, /\.theme-bg--light\{filter:blur\(1px\) hue-rotate\(25deg\) saturate\(\.70\) brightness\(1\.035\) contrast\(\.95\)\}/,
-  "Light backdrop should keep the pearl-blue gradient fluid and softly diffused.");
-assert.match(finalBackgroundCss, /html\.dark \.theme-bg--dark\{filter:blur\(1\.5px\) hue-rotate\(0deg\) saturate\(\.86\) brightness\(\.86\) contrast\(\.92\)\}/,
+assert.ok(finalBackgroundCss.includes(".theme-bg--light{filter:blur(1px) hue-rotate(0deg) saturate(.88) brightness(1.02) contrast(1.03)}"),
+  "Light backdrop should preserve the cold pearl-blue hue and keep the wave highlights visible.");
+assert.match(finalBackgroundCss, /html\.dark \.theme-bg--dark\{filter:blur\(1\.5px\) hue-rotate\(0deg\) saturate\(\.86\) brightness\(\.90\) contrast\(\.92\)\}/,
   "Dark backdrop should preserve deep navy tone and soft sapphire highlights.");
 
 
+assert.ok(finalBackgroundCss.includes("linear-gradient(145deg,transparent 16%,rgba(255,255,255,.84)"),
+  "Light background must expose broad pearl-white ribbon highlights over the blue haze.");
+assert.ok(finalBackgroundCss.includes("linear-gradient(146deg,transparent 15%,rgba(165,211,241,.56)"),
+  "Dark background must expose metallic sapphire ribbon highlights rather than a flat navy fill.");
 const ambientLight = html.split(".theme-bg--light{")[1]?.split("}")[0] || "";
 const ambientDark = html.split(".theme-bg--dark{")[1]?.split("}")[0] || "";
 assert.ok(ambientLight.includes("background-image:radial-gradient("),
