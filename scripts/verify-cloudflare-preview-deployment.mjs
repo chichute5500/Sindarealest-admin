@@ -88,6 +88,26 @@ async function writeReport(report) {
   await fs.writeFile(outputPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
 }
 
+function safeCloudflareErrors(payload) {
+  const errors = Array.isArray(payload?.errors) ? payload.errors : [];
+  return errors.slice(0, 5).map((item) => ({
+    code: Number.isInteger(item?.code) ? item.code : null,
+    message: String(item?.message || '')
+      .replace(/Bearer\\s+\\S+/gi, 'Bearer [REDACTED]')
+      .replace(/(token|authorization|secret)\\s*[:=]\\s*[^\\s,;]+/gi, '$1=[REDACTED]')
+      .replace(/[a-f0-9]{32,}/gi, '[REDACTED_IDENTIFIER]')
+      .replace(/[\\r\\n]+/g, ' ')
+      .slice(0, 240),
+  })).filter((item) => item.code !== null || item.message);
+}
+
+function formatCloudflareErrors(errors) {
+  if (!errors.length) return '';
+  return ' Sanitized Cloudflare error details: ' + errors.map((item) =>
+    [item.code !== null ? 'code ' + item.code : '', item.message].filter(Boolean).join(' — ')
+  ).join('; ');
+}
+
 function fail(report, message, exitCode = 1) {
   report.passed = false;
   report.status ||= 'FAILED';
@@ -163,15 +183,21 @@ async function main() {
     }
     if (!response.ok || payload?.success !== true || !Array.isArray(payload?.result)) {
       report.httpStatus = response.status;
+      const safeErrors = safeCloudflareErrors(payload);
+      if (safeErrors.length) {
+        report.apiErrorCodes = safeErrors.map((item) => item.code).filter((code) => code !== null);
+        report.apiErrors = safeErrors;
+      }
+      const detail = formatCloudflareErrors(safeErrors);
       if (response.status === 401) {
         report.status = 'API_AUTHENTICATION_REJECTED';
-        await fail(report, 'Cloudflare Pages API returned HTTP 401: the configured API token was not accepted for this request. Replace it with a valid account-scoped Pages Read token and verify the account ID. Credential values and response bodies are not logged.');
+        await fail(report, 'Cloudflare Pages API returned HTTP 401: the configured API token was not accepted for this request. Replace it with a valid account-scoped Pages Read token and verify the account ID. Secret values and unfiltered response bodies are never logged.' + detail);
       } else if (response.status === 403) {
         report.status = 'API_PERMISSION_DENIED';
-        await fail(report, 'Cloudflare Pages API returned HTTP 403: verify the token has Account / Cloudflare Pages / Read permission in the account containing this project. Credential values and response bodies are not logged.');
+        await fail(report, 'Cloudflare Pages API returned HTTP 403: verify the token has Account / Pages / Read permission in the account containing this project. Secret values and unfiltered response bodies are never logged.' + detail);
       } else {
         report.status = 'API_REJECTED';
-        await fail(report, 'Cloudflare Pages API did not return a successful Preview deployment list. Check the Pages Read permission and account/project scope; response body is intentionally not logged.');
+        await fail(report, 'Cloudflare Pages API did not return a successful Preview deployment list (HTTP ' + response.status + '). Check token validity, Pages Read permission, and account/project scope. Secret values and unfiltered response bodies are never logged.' + detail);
       }
       return;
     }
