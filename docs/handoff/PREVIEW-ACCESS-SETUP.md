@@ -77,9 +77,10 @@ After the baseline checkpoint is established, run the same workflow for `end-of-
 
 The end-of-work workflow then produces a same-name PNG pixel-diff report for human review. Pixel differences are evidence, not an automatic aesthetic pass.
 
-## Current status before configuration
+## Current status before configuration — 2026-10-20 04:45 UTC
 
-- Latest live probe: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193). It reports `accessServiceTokenConfigured=false`, `accessBlocked=true`, and zero genuine screenshots/routes/viewports.
-- Local fixtures passed, but they are not genuine Preview screenshots.
-- Validation now also runs on commit `a5939fedfe31bafda1867d3feb25989ae82d2845` and subsequent test changes; see the latest validation workflow on the branch for current status.
-- Production remains untouched. If the Access policy cannot be scoped to Preview, stop and do not widen permissions.
+- Source/test validation: **PASS**, [run 39371075248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075248), commit `0c5b436c114e094f1ee7ae5a44a4c54b3f79692b`.
+- Latest visual audit: [run 39371072049](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049), [artifact 12240964807](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049/artifacts/12240964807). The local fixture audit passed with 54 screenshots/235 fixture products/20 responsive cases/93 interaction checks. Its separate live probe was blocked by Cloudflare Access, with zero real screenshots/routes/viewports and `accessServiceTokenConfigured=false`.
+- The same artifact contains `deployment-verification.json` with status `BLOCKED_CONFIGURATION` because `CLOUDFLARE_ACCOUNT_ID` is not configured. The verifier also needs `CLOUDFLARE_PAGES_READ_TOKEN` before it can confirm the alias's actual Preview deployment, branch and commit.
+- The separate Admin Preview Playwright [run 39371075239](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075239) still fails to find `#loginView`/`#loginForm`; it has not authenticated through Cloudflare Access.
+- Production remains untouched. If the Access policy cannot be safely scoped to Preview only, stop and do not widen permissions.
