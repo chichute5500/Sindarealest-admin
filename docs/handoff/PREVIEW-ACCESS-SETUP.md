@@ -86,3 +86,14 @@ The end-of-work workflow then produces a same-name PNG pixel-diff report for hum
 - The same artifact contains `deployment-verification.json` with status `BLOCKED_CONFIGURATION` because `CLOUDFLARE_ACCOUNT_ID` is not configured. The verifier also needs `CLOUDFLARE_PAGES_READ_TOKEN` before it can confirm the alias's actual Preview deployment, branch and commit.
 - The separate Admin Preview Playwright [run 39371075239](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075239) still fails to find `#loginView`/`#loginForm`; it has not authenticated through Cloudflare Access.
 - Production remains untouched. If the Access policy cannot be safely scoped to Preview only, stop and do not widen permissions.
+
+
+## Current status update — 2026-10-20 11:06 UTC
+
+Supersedes the earlier “before configuration” status above:
+- Cloudflare Access Service Token is now being sent by the live Playwright workflow. Run [39411977810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810) captured 46 real Preview diagnostic screenshots with 8/8 viewport/theme pairs and all seven required sections. Access is no longer the blocker.
+- [Source/test validation 39411977732](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977732) passed on commit `5f181d994bf0edb7a4e553c64ba97cddf55e31c4` including `npm run check` and `npm test`.
+- Cloudflare Pages deployment API still returns `API_AUTHENTICATION_REJECTED` / HTTP 401 even though the secret is supplied. Replace `CLOUDFLARE_PAGES_READ_TOKEN` with a valid account-scoped custom API token granting only Account / Cloudflare Pages / Read, and set `CLOUDFLARE_ACCOUNT_ID` as an explicit repository variable. Do not send token values in chat.
+- Four live card navigation checks currently resolve to legacy `/san-pham/sneakers-26-41-a`, rather than the source branch's expected `/sanpham/{category-slug}/{product-key}`. Because the Preview deployment SHA/branch remains unverified, do not modify storefront runtime to accommodate this observation yet.
+- Canonical `start-of-work` and `end-of-work` folders remain empty; the latest 46 live images remain diagnostic-only inside the Actions artifact. Do not copy them into canonical folders.
+- Production remains untouched; do not merge PR #108.

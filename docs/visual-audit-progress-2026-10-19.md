@@ -544,3 +544,29 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Vẫn bị chặn bởi cấu hình Pages Read (Account ID và token chưa được đưa vào run gần nhất) cùng hai secret Cloudflare Access chưa được đưa vào run. Không bypass Access.
 - Bước bắt buộc tiếp theo: một run Actions mới trên branch hiện tại để thực thi `npm run check`/`npm test` và probe live; nếu Access/Pages config đã được bổ sung kể từ run cũ, chỉ kết luận theo log mới. Nếu chưa, chủ dự án cần cấu hình variable/secrets theo mục “Unblock and verify read-only Cloudflare Pages Preview capture” trong `docs/handoff/PREVIEW-ACCESS-SETUP.md`.
 - Không tăng tiến độ tổng thể: chưa có CI mới, ảnh live, route runtime hoặc so sánh trước/sau. Production vẫn không được merge/deploy.
+
+
+## Cập nhật thực thi — 2026-10-20 11:06 UTC
+
+### CI, kiểm thử và các thay đổi đã thực hiện
+- HEAD hiện tại trên nhánh `fix/liquid-glass-audit-2026-10-19`: `5f181d994bf0edb7a4e553c64ba97cddf55e31c4`.
+- [Validate source and tests — SUCCESS]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977732 ) trên cùng SHA. Các bước `npm run check` và toàn bộ `npm test` đều hoàn tất thành công.
+- Commit `109a4f2ef33cfd91ccec404cf63d05602182f70e` sửa việc đóng menu trong kiểm thử live: dùng Escape theo hành vi storefront thay vì click toggle khi drawer đang che toggle. Bổ sung ghi nhận rõ lỗi nếu card không tạo route canonical.
+- Commit `2697cc5bcbcaa99896fdaac3d82921e482cea707` khiến verifier ưu tiên GitHub Actions variable `CLOUDFLARE_ACCOUNT_ID` và dùng fallback account ID không bí mật khi variable bị thiếu; secret Pages Read vẫn bắt buộc.
+- Commit `5f181d994bf0edb7a4e553c64ba97cddf55e31c4` phân biệt lỗi Cloudflare API HTTP 401 (`API_AUTHENTICATION_REJECTED`) và 403 (`API_PERMISSION_DENIED`) mà không ghi credential/response body vào log. Các test CI mới PASS.
+
+### Live Preview — có ảnh thật nhưng chưa đạt điều kiện nghiệm thu
+- [Liquid Glass isolated visual preview — run 39411977810]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810 ), [artifact 12260286017]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810/artifacts/12260286017 ). Workflow job kết thúc SUCCESS vì bước probe chỉ tạo báo cáo chẩn đoán; không được coi là live acceptance PASS.
+- Playwright đã truy cập `https://3ed49bcc.sindarealest2.pages.dev/` với Cloudflare Access service-token headers, `accessServiceTokenConfigured=true`, `accessBlocked=false`, `captureCompleted=true`. Đây là bằng chứng website Preview thực tế đã render.
+- Đã chụp 46 ảnh chẩn đoán vào artifact: 8/8 cặp viewport/theme (360×800, 390×844, 768×1024, 1440×900 × Light/Dark); 4 ảnh full page; 7 section bắt buộc mỗi section có 4 ảnh; 2 ảnh menu mở và 4 ảnh quy trình đặt hàng mở rộng.
+- Báo cáo live: horizontal overflow 0; console errors 0; page errors 0; same-origin HTTP errors 0; failed requests 0; broken image contexts 0; read-only violations 0. Đây là kết quả về responsive/render cho các màn hình đã chụp, không đồng nghĩa mọi hạng mục PASS.
+- Đã mở/xem trực tiếp `home-mobile-light-390x844-viewport.png` và `section-benefits-mobile-light-390x844.png` từ artifact. Hero đang lấy ảnh giày đen từ catalog theo cơ chế động; sáu ô 3×2 hiển thị đủ và đọc được, không có tràn ngang quan sát thấy trong ảnh. Catalog hiện tại thiên về giày/phụ kiện trong khi ảnh mẫu là collage app với túi/ví/thắt lưng; đây là khác biệt thị giác cần xem lại khi deployment được xác minh và catalog ảnh đúng đã được xác nhận.
+- **4/4 product-card route checks FAIL** ở mobile Light, desktop Light, mobile Dark và desktop Dark: card mở detail modal đúng tiêu đề nhưng URL thật đang là `/san-pham/sneakers-26-41-a`. Nhánh code hiện tại dùng canonical `/sanpham/{category-slug}/{product-key}`. Chưa mở trực tiếp/reload được canonical route. Không đổi code runtime để làm phù hợp URL legacy này trước khi xác minh alias đang trỏ tới commit/nhánh nào; có khả năng Preview alias đang phục vụ deployment cũ/khác nhưng hiện chưa được API chứng minh.
+- [Pages deployment verification report]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810 ) trả về `API_AUTHENTICATION_REJECTED`, HTTP 401. Account ID fallback đã được gửi, Pages Read token secret được truyền nhưng Cloudflare không chấp nhận token trong request. Không thể lấy deployment ID, branch hoặc commit SHA. Do đó chỉ được giữ ảnh trong artifact chẩn đoán, không được chép vào baseline chuẩn.
+- Thay đổi workflow/test đã được thực hiện trên nhánh fix; không thay đổi `public/index.html`, dữ liệu sản phẩm, Admin, API nghiệp vụ, bindings, secrets hoặc Production trong chu kỳ này.
+
+### Trạng thái ảnh chuẩn, manifest và phạm vi còn lại
+- `docs/website-screenshots/start-of-work/` vẫn **BLOCKED, 0 ảnh chuẩn**; `end-of-work/` **NOT TESTED, 0 ảnh chuẩn**; pixel diff **NOT TESTED**. Artifact live thật không được coi là baseline cho đến khi xác minh deployment identity và route checks đạt.
+- Manifest đã được cập nhật để ghi run 39411977810, artifact 12260286017, 46 ảnh live diagnostic, coverage 8/8, 4 lỗi URL, trạng thái API 401 và Access service token thành công. Các thư mục chuẩn giữ nguyên rỗng.
+- Bước cần người dùng hỗ trợ duy nhất để vượt blocker API: thay/đặt secret `CLOUDFLARE_PAGES_READ_TOKEN` bằng token mới hợp lệ, giới hạn đúng `Account / Cloudflare Pages / Read` trong tài khoản chứa project; đặt explicit variable `CLOUDFLARE_ACCOUNT_ID` theo cùng tài khoản. Không gửi token vào chat. Sau đó chạy lại workflow trực quan để lấy deployment ID/branch/SHA; chỉ sửa đường dẫn runtime nếu log xác minh chứng minh deployment hiện tại là đúng branch/commit.
+- Production không merge/deploy, không sửa Access policy Production, không chạy migration hay ghi dữ liệu thật.
