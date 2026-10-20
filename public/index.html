@@ -2225,6 +2225,71 @@ html.dark .sd-fullscreen-share{
   html.dark #home.hero:after{background:linear-gradient(90deg,rgba(4,20,34,.96) 0%,rgba(4,20,34,.84) 25%,rgba(4,20,34,.38) 40%,rgba(4,20,34,.06) 54%,rgba(4,20,34,0) 64%)}
   html.dark #home .hero-visual img{opacity:1!important;mix-blend-mode:normal!important;object-fit:contain!important;object-position:center right!important}
 }
+
+/* Full storefront visual pass: restore satin depth and match the mobile reference rhythm. */
+/* sd-static-reference-final-pass-2026-10-21 */
+.theme-bg--light::after{
+  background:
+    linear-gradient(145deg,transparent 14%,rgba(255,255,255,.72) 22%,rgba(255,255,255,.16) 28%,transparent 38%),
+    linear-gradient(31deg,transparent 20%,rgba(128,183,220,.20) 31%,rgba(255,255,255,.62) 36%,transparent 48%),
+    linear-gradient(157deg,transparent 48%,rgba(255,255,255,.68) 54%,rgba(150,202,234,.22) 60%,transparent 70%),
+    linear-gradient(118deg,rgba(225,241,255,.20),rgba(211,231,249,.14) 52%,rgba(237,247,255,.22));
+}
+.theme-bg--dark::after{
+  background:
+    linear-gradient(145deg,transparent 14%,rgba(188,222,245,.18) 22%,rgba(255,255,255,.04) 28%,transparent 38%),
+    linear-gradient(31deg,transparent 20%,rgba(56,121,164,.25) 31%,rgba(218,240,255,.22) 36%,transparent 48%),
+    linear-gradient(157deg,transparent 48%,rgba(183,220,245,.22) 54%,rgba(38,91,127,.22) 60%,transparent 70%),
+    linear-gradient(118deg,rgba(3,20,36,.38),rgba(7,31,51,.27) 52%,rgba(3,17,30,.40));
+}
+/* The reference headline breaks after “Phong cách”, not after “đẳng”. */
+@media(max-width:760px){
+  #home .hero h1{
+    font-size:clamp(22px,6vw,25px)!important;
+    line-height:1.12!important;
+    letter-spacing:-.035em!important;
+  }
+  #home .hero h1 span:first-child{max-width:6em}
+  #home .hero h1 span:last-child{max-width:7em}
+  #home .hero-visual img[hidden]{display:none!important}
+  #home .hero-visual img:not([hidden]){
+    object-fit:contain!important;
+    object-position:center right!important;
+    mix-blend-mode:normal!important;
+    opacity:1!important;
+    filter:drop-shadow(0 12px 20px rgba(0,22,42,.20))!important;
+  }
+}
+/* Keep the welcome screen airy like the supplied splash reference while retaining its existing entry action and copy. */
+.welcome-content{
+  width:min(90vw,480px)!important;
+  padding:clamp(14px,3.5vh,28px) 12px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.welcome-rule{margin-bottom:16px!important}
+.welcome-logo{width:min(56vw,230px)!important;max-height:200px!important}
+.welcome-points span{border-radius:14px!important;padding:5px 8px!important}
+.welcome-skip{margin-top:12px!important}
+@media(max-width:760px){
+  .welcome-content{width:min(90vw,420px)!important;max-height:calc(100dvh - 20px)!important;padding:10px 8px!important}
+  .welcome-logo{width:min(54vw,185px)!important;max-height:145px!important}
+  .welcome-tagline{font-size:8px!important;letter-spacing:.12em!important}
+  .welcome-title{font-size:clamp(23px,6vw,28px)!important;margin:8px 0!important}
+  .welcome-content p{font-size:11.5px!important;line-height:1.5!important;margin:7px 0 10px!important}
+  .welcome-points{gap:4px!important;margin-bottom:5px!important}
+  .welcome-points span{min-height:24px!important;padding:4px 7px!important;font-size:7.5px!important}
+  .welcome-footnote{font-size:7.5px!important}
+  .welcome-loader{margin-top:7px!important}
+  .welcome-skip{min-height:36px!important;padding:8px 14px!important}
+}
+/* A hidden hero image must never be rendered as an empty full-size IMG element. */
+#heroProductImage[hidden]{display:none!important}
+
 </style>
 
 </body>
