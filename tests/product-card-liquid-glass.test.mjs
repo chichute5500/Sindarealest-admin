@@ -90,11 +90,11 @@ const lightMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-gla
 const darkMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark-mobile.svg", import.meta.url), "utf8");
 assert.ok(lightMobileWaveArtwork.includes('viewBox="0 0 390 844"')
   && lightMobileWaveArtwork.includes('id="satin-crease-detail"')
-  && lightMobileWaveArtwork.includes('id="fold"') && lightMobileWaveArtwork.includes('id="glint"'),
+  && lightMobileWaveArtwork.includes('id="fold"') && lightMobileWaveArtwork.includes('id="shine"'),
   "The light mobile SVG must use a portrait canvas and layered fine satin creases.");
 assert.ok(darkMobileWaveArtwork.includes('viewBox="0 0 390 844"')
   && darkMobileWaveArtwork.includes('id="satin-crease-detail"')
-  && darkMobileWaveArtwork.includes('id="fold"') && darkMobileWaveArtwork.includes('id="glint"'),
+  && darkMobileWaveArtwork.includes('id="fold"') && darkMobileWaveArtwork.includes('id="shine"'),
   "The dark mobile SVG must use a portrait canvas and layered fine satin creases.");
 
 const lightWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light.svg", import.meta.url), "utf8");
