@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T02:13:42.983Z",
+  "updatedAtUtc": "2026-10-20T02:12:00Z",
   "status": "BLOCKED",
-  "note": "Live Preview capture still redirects to Cloudflare Access despite the optional service-token helper being present. The latest direct probe saved zero Preview screenshots; local fixture screenshots remain artifact-only. No public UI changes or live visual acceptance are claimed.",
+  "note": "Latest Playwright visual workflow passed project tests and local fixture audit, but the live Preview remains behind Cloudflare Access. The latest run confirmed both optional GitHub Actions service-token secret variables are empty; live capture produced zero screenshots. No baseline/end screenshot or real Preview comparison is claimed.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -53,21 +53,21 @@
   ],
   "comparisonStatus": "NOT TESTED",
   "remainingBlockers": [
-    "Cloudflare Access blocks the Preview from the GitHub Actions browser. A user-authorized browser context or Preview-only Access permission is required before capturing a true start-of-work baseline.",
-    "No post-change end-of-work capture exists; local fixture screenshots must not enter canonical stage folders.",
-    "Pixel-diff comparison requires real same-name, same-size PNGs in both stage folders; human visual review is still required.",
-    "The proposed /sanpham/{category-slug}/{product-code} route requires verified product codes/category mapping; do not infer them from legacy fixture data.",
-    "PR #108 branch is divergent from main and includes changes outside this UI task; do not merge before a separate scope review."
+    "The latest workflow log shows CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET are empty; create a Preview-only Cloudflare Access Service Auth policy and store both values as GitHub Actions repository secrets before rerunning capture.",
+    "No live start-of-work/end-of-work screenshots exist; local fixture captures must not be used as their substitute.",
+    "Pixel-diff comparison requires matching real Preview screenshots at both stages; human visual review is also required.",
+    "New product detail URLs require a verified source mapping for category and actual product identifiers; legacy fixture records do not verify SKU.",
+    "The current PR branch contains unrelated admin/API/migration/config changes; isolate or explicitly review scope before any merge."
   ],
-  "lastAccessCheckUtc": "2026-10-20T01:22:01Z",
+  "lastAccessCheckUtc": "2026-10-20T02:11:51Z",
   "localAudit": {
     "status": "PASS",
     "scope": "local static preview with legacy fixture data; not Cloudflare Pages Preview",
-    "workflowRun": 39355499185,
-    "sourceCommit": "fa7445b74661faf260c32b3ab32dfa85e3538e78",
-    "artifactId": 12235310623,
-    "artifactName": "sindarealest-liquid-glass-preview-273",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623",
+    "workflowRun": 39357400764,
+    "sourceCommit": "2a66c96457aa2c2b8235bece34a37dc916c6b25f",
+    "artifactId": 12235773515,
+    "artifactName": "sindarealest-liquid-glass-preview-281",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764/artifacts/12235773515",
     "referenceImagesIncluded": true,
     "productFixtureCount": 235,
     "screenshotsCaptured": 54,
@@ -80,7 +80,7 @@
     "failedRequests": 0,
     "hardFailures": 0,
     "passed": true,
-    "caveat": "Local fixture audit only. Live Preview probe was blocked by Cloudflare Access; canonical start/end screenshot directories remain unfilled."
+    "caveat": "Latest local fixture audit and Playwright test suite passed. This run's live Preview probe was separately blocked by Cloudflare Access and produced zero real Preview screenshots."
   },
   "liveProbe": {
     "workflowRun": 39357400764,
@@ -88,31 +88,23 @@
     "artifactId": 12235773515,
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764/artifacts/12235773515",
     "sourceCommit": "2a66c96457aa2c2b8235bece34a37dc916c6b25f",
-    "attemptedAtUtc": "2026-10-20T02:11:50.018Z",
+    "attemptedAtUtc": "2026-10-20T02:11:49Z",
     "sourceKind": "cloudflare-pages-preview-live-read-only",
     "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
     "status": "BLOCKED_ACCESS_GATE",
     "accessBlocked": true,
-    "accessServiceTokenConfigured": "NOT RECORDED in this run; a safe boolean-only field is added for the next diagnostic.",
+    "serviceTokenConfiguration": "MISSING_GITHUB_ACTIONS_SECRETS",
+    "configuredSecretNames": [
+      "CF_ACCESS_CLIENT_ID",
+      "CF_ACCESS_CLIENT_SECRET"
+    ],
     "finalUrlWithoutQuery": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev",
     "screenshotCount": 0,
     "viewportCount": 0,
     "routeProbeCount": 0,
-    "requiredViewportThemePairs": 8,
-    "completedViewportThemePairs": 0,
-    "sectionScreenshotCounts": {
-      "hero": 0,
-      "benefits": 0,
-      "order": 0,
-      "featured": 0,
-      "collections": 0,
-      "products": 0,
-      "footer": 0
-    },
-    "productDetailChecks": 0,
     "readOnlyViolations": 0,
     "noWriteRequestsSent": true,
-    "note": "The latest Playwright probe detected the Access redirect before storefront content rendered. Overall workflow success reflects artifact upload/local tests only; it is not a Preview pass."
+    "note": "The live capture log shows both optional service-token environment variables are empty. Code now supports the Cloudflare Access service-token header pair but does not bypass Access. Configure both secrets and a Preview-only Service Auth policy, then rerun the read-only baseline capture."
   },
   "latestToolingValidation": {
     "workflowRun": 39357404831,
