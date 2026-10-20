@@ -1,4 +1,15 @@
-# MASTER PROMPT TỔNG HỢP — SINDAREALEST2 WEB TĨNH + ADMIN, LÀM SONG SONG VÀ BÀN GIAO KHÔNG MẤT Ý
+# MASTER PROMPT
+
+## Cập nhật bắt buộc — bàn giao phiên 2026-10-21 (ưu tiên hơn các mốc cũ)
+
+- Nhánh web tĩnh: `fix/liquid-glass-audit-2026-10-19`; HEAD đã xác minh tại thời điểm bàn giao: `170304495869886a344b6fa02bdbaf6148d75100` — commit `improve readability of glass commerce drawers`.
+- Preview alias đã được Cloudflare Pages API xác minh đúng nhánh và SHA: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`; deployment ID `d416f4c3-5be3-4717-8539-ee425582b1da`, environment `preview`, stage/status success. Không dùng Production.
+- Source/tests PASS: [run 39486732685](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732685). Admin Preview Playwright PASS: [run 39486732956](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732956). Storefront Preview deploy PASS: [run 39486732736](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732736).
+- Visual workflow [run 39486732727](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732727), [artifact 12292874474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732727/artifacts/12292874474): capture thật đã hoàn tất, 78 screenshots, 8/8 viewport-theme pairs, 12/12 product detail direct-open/reload/navigation checks PASS; 0 console errors, 0 page errors, 0 same-origin HTTP errors, 0 failed requests, 0 broken image contexts, 0 read-only violations, không tràn ngang ở 8 viewport-theme checks. Tuy nhiên JSON audit `passed=false` do **SKU SD-GL052 không có trong public verified product payload**. Hero fail-closed đúng cách và không hiển thị ảnh thay thế. Không tự thêm ảnh, sửa D1 hoặc đánh dấu SKU public nếu chưa có xác minh.
+- Ảnh live cho thấy logo/header mobile đã gần đúng bố cục mẫu hơn; nền vẫn có các dải cong lớn, vì vậy cần tiếp tục đối chiếu trực quan và chỉnh nền satin có kiểm tra hồi quy. Đã tăng độ đục bề mặt drawer cart/account/checkout để chữ trang phía sau không xuyên qua quá nhiều; cần xác minh bằng screenshot state mới. Không tuyên bố giao diện đã giống 100% chỉ vì CI xanh.
+- Việc tiếp theo: (1) mở artifact 12292874474, xem các ảnh mới và so với PNG tham chiếu gốc; (2) xử lý texture nền trên Light/Dark, mobile/desktop, tăng chất satin nếp mảnh thay vì vòng cong lớn; (3) kiểm tra drawer cart/checkout/account sau sửa; (4) cập nhật cache-busting URL và assertion đúng phiên bản nếu asset đổi; (5) chạy lại source tests, Preview deploy, Playwright và live capture; (6) ghi audit JSON thực tế, không chỉ kết luận workflow xanh.
+- Không merge PR #108; không chạm `main`, Production, D1/R2 production, bindings, secrets, DNS hoặc Access policy. Không dùng mock thay live acceptance. Không hỏi lại người dùng điều mà GitHub/Actions có thể tự kiểm tra. Báo cáo tiến độ rồi tiếp tục tự động; chỉ dừng khi cần quyền/thao tác người dùng hoặc cần họ xác minh dữ liệu SKU thật.
+ TỔNG HỢP — SINDAREALEST2 WEB TĨNH + ADMIN, LÀM SONG SONG VÀ BÀN GIAO KHÔNG MẤT Ý
 
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh web tĩnh đang làm:** `fix/liquid-glass-audit-2026-10-19`  
