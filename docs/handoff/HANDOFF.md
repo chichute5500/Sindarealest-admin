@@ -14,14 +14,16 @@
   - Tối: [file_00000000fcb48207a23aeda23caa5eeb.png](../static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png)
 
 
-## Cập nhật trạng thái xác minh — 2026-10-20 03:18 UTC
+## Trạng thái xác minh mới nhất — 2026-10-20 UTC
 
-- HEAD hiện tại: `4ba5dae9cb10a5283f48abaf1a2a1d20a17308df` trên `fix/liquid-glass-audit-2026-10-19` (chỉ cập nhật nhật ký kiểm thử; web source không đổi từ code commit `562d7d77624f7431296cb217b2b6d6592aca9ce4`).
-- Source/test validation mới nhất: **PASS**, [run 39367417810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417810) trên HEAD tài liệu trước đó `1d261598c4e481ede062eed8ff32c374ffe67373`; thay đổi tiếp theo chỉ là docs.
-- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39367417804](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417804), không tìm thấy `#loginView`/`#loginForm`. Probe live riêng [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193) xác nhận Cloudflare Access redirect và cặp service-token secrets không được truyền vào Actions; chưa thể kết luận lỗi mật khẩu/form của ứng dụng.
-- Live storefront capture: vẫn **BLOCKED** theo [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 ảnh thật / 0 route / 0 viewport. Workflow ảnh bỏ qua các thay đổi docs-only nên chưa có lần capture mới.
-- Local fixture visual audit: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193) và [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618) PASS trên commit `968ec2e3` với 54 ảnh fixture, 235 sản phẩm fixture, 20 responsive cases, 93 interaction checks. GitHub compare xác nhận từ `968ec2e3` đến `562d7d77` chỉ thay đổi tài liệu, không thay đổi source/test/capture script; vì vậy fixture audit áp dụng cho cùng source code. Tuy nhiên đây **không phải ảnh Preview thật**.
-- Không deploy/merge Production. Chưa đủ bằng chứng để đóng baseline/end screenshots hoặc pixel comparison.
+- Code-bearing commit đang được kiểm tra: `562d7d77624f7431296cb217b2b6d6592aca9ce4`. Những commit mới hơn chỉ cập nhật handoff/manifest/setup guide, không chỉnh web source.
+- Source/test validation: **PASS**, [run 39368493275](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493275), chạy trên docs-only commit `7d5de0114025df35974067c0c1bf481f95be7fd6`.
+- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39368493324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493324): hai test không tìm thấy `#loginView`/`#loginForm`. Workflow hiện chỉ inject `ADMIN_TEST_URL`/`ADMIN_TEST_PASSWORD`, không inject Access service token; không kết luận đó là lỗi form/mật khẩu của app.
+- Live storefront capture: vẫn **BLOCKED_ACCESS_GATE** theo probe thật gần nhất [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 screenshot/route/viewport thực tế. Không có start-of-work/end-of-work screenshot thật và chưa có pixel diff.
+- Local fixture audit [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618) PASS trên source-identical code tree: 54 fixture screenshots, 235 fixture products, 20 responsive cases, 93 interaction checks; 0 overflow/console/page/HTTP errors trong phạm vi fixture. Đây **không phải** live Preview acceptance.
+- Ảnh tham chiếu sáng/tối đã được mở trực quan qua artifact [12233192824](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824); đây chỉ xác minh nội dung reference, không nói rằng live site đã khớp.
+- Hướng dẫn thao tác gỡ access cho Preview (không mở quyền Production): [PREVIEW-ACCESS-SETUP.md](PREVIEW-ACCESS-SETUP.md).
+- Không deploy/merge Production. Chưa đóng baseline/end screenshots hay pixel comparison vì quyền truy cập và trạng thái deployment chưa được xác minh.
 
 ## Cập nhật kiểm tra gần nhất — 2026-10-19/20 UTC
 
