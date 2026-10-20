@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_REQUIRES_VERIFICATION",
+  "status": "SOURCE_CHECKS_PASS_LOCAL_MODULE_FIXTURES_PASS_PREVIEW_CSS_SIGNATURE_FAIL",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
@@ -7,7 +7,7 @@
   "testedCommitSha": "7e41313efcc1bba8302bacbad79327696a1fb0d1",
   "capturedAt": "2026-10-20T19:09:03.622Z",
   "progressEstimatePercent": 43,
-  "progressBasis": "43% estimated by work stages. npm run check/npm test/local Playwright source matrix and UI fixture screenshots pass; remote Preview CSS signature mismatch, full 12-screen visual comparison, authenticated backend workflows and whole-PR diff audit remain incomplete.",
+  "progressBasis": "43% estimated by stages. Latest local checks and fixture screenshot matrix pass, but deployed Preview CSS mismatch, 12-screen visual comparison, real authenticated backend workflow QA, customer screenshot artifact investigation, and full PR diff audit remain open.",
   "note": "Verified run 39478738647 on source commit 26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6: npm run check PASS, npm test PASS, local Playwright source baseline PASS. Artifact metadata reports 42 PNG screenshots and 36 metrics, no page/console errors, attempted writes or unexpected API paths in the local fixture. Remote Preview test FAIL: topbar brand computed display=flex/visibility=visible, inlineHideRulePresent=false and no stylesheet rule body:has(#loginView:not(.hidden)) .topbar>.brand; the source commit includes the rule. This proves a source/served CSS signature mismatch, but does not yet identify the exact stale deployment or URL root cause. Keep assertion strict; do not alter secrets or Cloudflare settings. Branch HEAD e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4 is evidence-only, not newer application code. PR #111 remains OPEN/unmerged; do not merge.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -660,7 +660,7 @@
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "branchIsolationDiffReview": "PARTIAL_GITHUB_API_FILE_REVIEW_NO_LOCAL_CHECKOUT",
     "applicationStartup": "PASS",
-    "playwrightPreviewDiagnostics": "failure",
+    "playwrightPreviewDiagnostics": "FAIL_SOURCE_CSS_SIGNATURE_MISMATCH",
     "localStaticPlaywrightBaseline": "PASS",
     "visualComparisonAgainstApprovedPng": "INCOMPLETE_LOGIN_ONLY",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
@@ -678,7 +678,7 @@
     "productionDeployment": "NOT_PERFORMED",
     "staticSourceContract": "PASS_GITHUB_SOURCE_INSPECTION_ONLY",
     "fullGitWorkingTree": "NOT_AVAILABLE_NO_LOCAL_CHECKOUT",
-    "playwright": "FAILURE",
+    "playwright": "PASS_LOCAL_LOGIN_AND_UI_FIXTURE_MATRIX_FAIL_DEPLOYED_PREVIEW",
     "referenceImageRead": "PASS_OPENED_EMBEDDED_IMAGE_FROM_ADMIN_MOBILE_REFERENCE_HTML",
     "referenceScreenInventory": "PASS_12_SCREENS_IDENTIFIED",
     "currentAppScreenshotComparison": "PARTIAL_LOGIN_390X844_LIGHT_VIEWED; VISUAL_PARITY_NOT_ACCEPTED",
@@ -688,11 +688,13 @@
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
-    "currentBranchHeadTests": "NOT_RUN_ON_EVIDENCE_ONLY_HEAD",
+    "currentBranchHeadTests": "EVIDENCE_ONLY_HEAD_AFTER_TESTED_COMMIT",
     "authenticatedBackendModules": "NOT_TESTED_WITH_REAL_BACKEND",
     "visualReferenceParity": "INCOMPLETE_12_SCREEN_COMPARISON",
     "mobileOrderCustomerUsability": "PARTIAL_FIXTURE_SCREENSHOTS_STATIC_GAP_AUDIT_REQUIRED",
-    "prFullDiffAudit": "BLOCKED_NO_VERIFIED_LOCAL_CHECKOUT_DIFF_IN_THIS_SESSION"
+    "prFullDiffAudit": "BLOCKED_NO_VERIFIED_LOCAL_CHECKOUT_DIFF_IN_THIS_SESSION",
+    "uiFixtureModules": "PASS_READ_ONLY_FIXTURE_SCREENSHOTS",
+    "rawClosingTagVisibleText": "PASS_TEXT_NODE_ASSERTION_DID_NOT_REPRODUCE; CHECK_PSEUDO_ELEMENTS_AND_LATEST_CUSTOMER_SCREENSHOT"
   },
   "remainingIssues": [
     "Configured ADMIN_TEST_URL serves a UI signature that differs from the tested ADMIN source; exact secret value remains masked. Repository owner must correct the secret to the intended Admin Preview URL.",
@@ -885,12 +887,12 @@
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
   "updatedAt": "2026-10-21",
-  "currentBranchHeadAtHandoff": "e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4",
+  "currentBranchHeadAtHandoff": "cdec188efa2198caaf0ac65cd294b682d1088fc9",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": true,
   "previewDiagnostics": {
-    "runId": 39478738647,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478738647",
+    "runId": 39480806835,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39480806835",
     "conclusion": "FAIL",
     "topbarBrandDisplay": "flex",
     "topbarBrandVisibility": "visible",
@@ -900,18 +902,21 @@
     "rootCauseStatus": "SERVED_PREVIEW_CSS_SIGNATURE_MISMATCH_ROOT_URL_OR_DEPLOYMENT_NOT_YET_IDENTIFIED"
   },
   "latestLocalEvidence": {
-    "runId": 39478738647,
-    "sourceCommit": "26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6",
+    "runId": 39480806835,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39480806835",
+    "sourceCommit": "7e41313efcc1bba8302bacbad79327696a1fb0d1",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
-    "screenshotPngCount": 42,
-    "metricCount": 36,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 42,
+    "uiFixtureMetricCount": 36,
     "pageErrors": [],
     "consoleErrors": [],
+    "failedRequests": [],
+    "httpErrors": [],
     "attemptedWrites": [],
     "unexpectedApiPaths": [],
-    "metricsCount": 36,
-    "scope": "LOCAL SOURCE, LOGIN SHELL AND FIXTURE MODULE SCREENS; NOT AUTHENTICATED PRODUCTION BACKEND"
+    "scope": "LOCAL SOURCE + READ-ONLY FIXTURE UI; NOT REAL AUTHENTICATED BACKEND"
   }
 }
