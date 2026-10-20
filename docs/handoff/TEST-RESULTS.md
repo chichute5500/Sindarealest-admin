@@ -105,3 +105,11 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Run [39351043779](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779), job `118395178265`: **SUCCESS** ở commit `577087c4813450de089a3e1c1c47e53ee8625bf6`.
 - Artifact [sindarealest-liquid-glass-preview-265](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824) chứa 54 ảnh local-fixture và 2 PNG tham chiếu gốc. Audit: 20 responsive cases, 91 interaction checks, 0 root document overflow, 0 console/page/HTTP errors, 0 failed requests, 0 hard failures.
 - Giới hạn: test ở trên là local fixture. Các file capture live và comparator vừa bổ sung cần được xác nhận qua CI mới; chưa tuyên bố đã chạy capture thật.
+
+## Live Preview gate verification — 2026-10-20
+
+- Run [39352778226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226), commit `3942f9c2b5a67d2464679f3b437f20bc398b443c`.
+- Project tests and `npm run check` passed. The live browser probe was redirected to Cloudflare Access before the storefront rendered; status is `BLOCKED_ACCESS_GATE`, 0 screenshots, 0 write violations. This is an environment/access blocker, not a storefront pass.
+- Artifact [12232894712](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226/artifacts/12232894712) includes the local fixture audit and live-probe diagnostic JSON/HTML.
+- One CSP console message originated from the external Access login page, not the storefront. The new commit `aaec8026c8eca4aef3027dcb5a5c1e49d6189930` now filters console/page errors by Preview origin and redacts query/fragment values from stored URLs and error text.
+- The new safeguards must be revalidated by CI. No UI change, screenshot baseline, route migration or Production deployment has occurred.

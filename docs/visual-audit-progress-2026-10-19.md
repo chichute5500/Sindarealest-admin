@@ -455,3 +455,10 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Đã mở hai ảnh mẫu gốc từ artifact [12233192824](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824). Mẫu là collage nhiều màn hình app mobile. Trang home mẫu có nền kính xanh băng ở Light/xanh navy sâu ở Dark, lưới sáu ô 3×2, nhãn thường xuống hai dòng, chip/halo cho icon, CTA “Đặt hàng an tâm” gọn và bottom navigation 4 mục. Đây là mô tả ảnh mẫu, không phải kết luận website hiện tại khớp.
 - Đã chuẩn bị workflow chụp trực tiếp Cloudflare Pages Preview bằng Playwright ở chế độ read-only, chỉ lưu hai stage chuẩn khi nguồn được xác minh là live Preview; local fixture chỉ ở artifact. Khi chụp stage end, workflow so sánh các PNG cùng tên/kích thước và xuất pixel-diff report.
 - Chưa sửa storefront HTML/CSS/JS vì chưa có baseline Preview thật. Hai thư mục stage tiếp tục trống; không merge/deploy Production.
+
+## Live browser probe — 2026-10-20
+
+- Run [39352778226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226) navigated to the supplied Preview with Playwright in read-only mode. Cloudflare Access redirected to its login host before the homepage rendered.
+- Audit: `accessBlocked=true`, `captureCompleted=false`, zero screenshots and zero route probes. The probe step continues only so the report/artifact are uploaded; it is not a PASS.
+- One console message originated from Access login CSP, not the storefront. Commit `aaec8026c8eca4aef3027dcb5a5c1e49d6189930` adds a sanitizer to remove URL credentials/query/fragment values and ignores console/page errors emitted by non-Preview origins.
+- No storefront HTML/CSS/JS has changed. The start/end folders remain empty until authorized Preview capture is possible; do not change Production Access to get around this blocker.

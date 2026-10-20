@@ -18,4 +18,4 @@ The `.gitkeep` files only preserve the directory structure. They are **not scree
 
 ## Current status
 
-The manifest is the source of truth. At initial setup, the supplied Cloudflare Preview returned `login_required` for the home route and both old/new product URL probes. No real Preview screenshot has been verified. Existing CI screenshots are local fixture evidence only and must not be represented as a deployed Preview baseline.
+The manifest is the source of truth. Read-only fetches and GitHub Actions Playwright run `39352778226` confirmed that the supplied Preview redirects to the Cloudflare Access login host before storefront content renders. That direct probe produced zero screenshots; no live Preview baseline is verified. Local fixture captures remain artifact-only and must never be represented as deployed Preview screenshots. A user-authorized session or Preview-only Access permission is required; never weaken Production Access.

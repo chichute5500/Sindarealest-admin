@@ -105,3 +105,7 @@ Không ghi “hoàn thành 100%” nếu còn FAIL, BLOCKED hoặc hạng mục 
 
 ### Công cụ browser
 - Lượt TinyFish browser automation không khởi chạy vì wallet âm `-$0.16`; không có ảnh mới. Kết quả này không xác minh được trang hiển thị hay Access gate.
+
+## Live Preview blocker — 2026-10-20
+
+The direct, read-only GitHub Actions browser probe against `https://3ed49bcc.sindarealest2.pages.dev/` (run [39352778226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226)) was redirected to the Cloudflare Access login host before storefront content rendered. Artifact [12232894712](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226/artifacts/12232894712) records `accessBlocked=true`, `captureCompleted=false` and zero screenshots. No writes were sent and the canonical screenshot folders remain empty. A user-authorized session or Preview-only Access permission is required; do not weaken Production Access. The subsequent commit `aaec8026c8eca4aef3027dcb5a5c1e49d6189930` adds URL query/fragment redaction and filters console errors by Preview origin.
