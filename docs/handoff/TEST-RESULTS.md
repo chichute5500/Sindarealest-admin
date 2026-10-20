@@ -19,6 +19,17 @@ Không dùng kết quả của commit cũ để tuyên bố commit mới đã PA
 
 ## Kết quả đã xác minh
 
+### 2026-10-20 04:02–04:03 UTC — kiểm tra HEAD tài liệu mới nhất
+
+- Commit đã được kiểm thử: `1d261598c4e481ede062eed8ff32c374ffe67373`; nhánh `fix/liquid-glass-audit-2026-10-19`.
+- Source/test validation: **PASS**, [run 39367417810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417810). Commit này chỉ thay đổi docs so với code HEAD `562d7d77624f7431296cb217b2b6d6592aca9ce4`; các commit ghi nhật ký sau đó cũng chỉ sửa docs.
+- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39367417804](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417804). Hai bài test không tìm thấy `#loginView`/`#loginForm`. Bằng chứng live độc lập [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193) cho thấy redirect Cloudflare Access, cặp secrets service-token không được cấu hình trong Actions và 0 ảnh/route/viewport thật. Log Playwright này không tự xác định trang đích, nên không kết luận là lỗi mật khẩu hay lỗi form ứng dụng.
+- Live storefront capture **chưa chạy lại** trên docs-only pushes vì workflow bỏ qua các đường dẫn tài liệu; kết quả live gần nhất vẫn **BLOCKED_ACCESS_GATE**.
+- Local fixture audit [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618): 54 ảnh fixture, 235 sản phẩm fixture, 20 responsive cases, 93 interaction checks; 0 overflow/console/page/HTTP errors trong phạm vi fixture. So sánh commit xác nhận source/test/capture script không đổi giữa fixture audit và code HEAD; đây **không** phải screenshot Preview thật.
+- Production không được merge/deploy/thay cấu hình trong lượt kiểm tra này.
+- Điều kiện còn thiếu để kết thúc nghiệm thu trực quan: cấu hình Cloudflare Access Service Auth policy chỉ cho Preview; thêm GitHub Actions secrets `CF_ACCESS_CLIENT_ID` và `CF_ACCESS_CLIENT_SECRET` (không gửi giá trị trong chat); chạy capture baseline trên Preview đã xác minh commit; sau đó mới chạy route/theme/responsive kiểm thử trực tiếp và lưu ảnh end-of-work để pixel-compare với baseline ở cùng viewport/theme/state.
+
+
 ### 2026-10-20 03:15 UTC — Source validation và Admin Preview trên HEAD mới nhất
 
 - Commit: `562d7d77624f7431296cb217b2b6d6592aca9ce4`; branch: `fix/liquid-glass-audit-2026-10-19`.
