@@ -106,19 +106,20 @@ assert.ok(finalThemeCss.includes("#productOverlay .detail-favorite-btn{right:58p
 
 assert.ok(html.includes('id="sd-reference-parity-2026-10-21"'),
   "The shared reference-design stylesheet must remain identifiable for later visual audits.");
-assert.match(html, /\.brand-symbol,[\\s\\S]*?filter:drop-shadow\\(0 1px 3px rgba\\(74,111,139,\\.16\\)\\)!important/ ,
+
+assert.ok(html.includes('.brand-symbol,\nhtml.dark .brand-symbol{\n  filter:drop-shadow(0 1px 3px rgba(74,111,139,.16))!important;'),
   "The official brand emblem must retain its source appearance instead of being forced to grayscale or recolored.");
 assert.ok(html.includes('<span class="sd-fullscreen-brand-mark"><img src="images/brand-emblem.png" alt=""></span>'),
   "The fullscreen gallery must use the official brand emblem asset, not a text monogram pretending to be the logo.");
-assert.match(html, /sd-fullscreen-brand-footer[\\s\\S]*?images\\/brand-emblem\\.png/ ,
+assert.ok(html.includes('sd-fullscreen-brand-footer') && html.includes('<img src="images/brand-emblem.png" alt=""><span class="sd-fullscreen-brand-copy">'),
   "The fullscreen gallery footer must display the actual emblem asset.");
-assert.match(html, /\.sd-fullscreen-viewer\\{[\\s\\S]*?background:rgba\\(231,244,253,\\.76\\)/,
+assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  background:rgba(231,244,253,.76);'),
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
-assert.match(html, /html\\.dark \\.sd-fullscreen-viewer\\{color:#edf7ff;background:rgba\\(3,18,32,\\.84\\)\\}/,
+assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-assert.match(html, /#home \\.hero-visual img\\{[\\s\\S]*?mix-blend-mode:multiply/,
+assert.ok(html.includes('#home .hero-visual img{\n    width:100%;height:100%;object-fit:cover;object-position:center right;\n    padding:0;opacity:.98;mix-blend-mode:multiply;'),
   "Mobile hero imagery should blend into the single editorial banner instead of reading as a separate outlined card.");
-assert.match(html, /\.service-strip\\{[\\s\\S]*?grid-template-columns:repeat\\(3,minmax\\(0,1fr\\)\\)/,
+assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
 
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
