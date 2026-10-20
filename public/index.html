@@ -1645,6 +1645,55 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
 .detail-favorite-btn:active{transform:scale(.92)}
 @media(max-width:760px){.favorite-row{grid-template-columns:minmax(0,1fr) 36px}.favorite-product-open img{width:58px;height:58px;flex-basis:58px}.detail-favorite-btn{top:8px;right:8px;width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){.detail-favorite-btn{transition:none}}
+
+/* Reference wave calibration: glossy ribbons sit above the frosted veil so both themes retain depth. */
+.theme-bg--light::after{
+ background:
+  linear-gradient(145deg,transparent 16%,rgba(255,255,255,.84) 23%,rgba(255,255,255,.16) 29%,transparent 38%),
+  linear-gradient(152deg,transparent 29%,rgba(159,205,235,.24) 35%,rgba(255,255,255,.82) 40%,transparent 52%),
+  linear-gradient(27deg,transparent 18%,rgba(148,197,230,.28) 29%,rgba(255,255,255,.78) 34%,transparent 42%),
+  linear-gradient(162deg,transparent 48%,rgba(255,255,255,.76) 55%,rgba(147,200,233,.22) 60%,transparent 69%),
+  linear-gradient(204deg,transparent 63%,rgba(255,255,255,.50) 70%,transparent 78%),
+  radial-gradient(ellipse at 15% 15%,rgba(255,255,255,.78),transparent 36%),
+  radial-gradient(ellipse at 85% 38%,rgba(141,194,228,.30),transparent 32%),
+  radial-gradient(ellipse at 42% 83%,rgba(255,255,255,.62),transparent 38%),
+  linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54));
+}
+.theme-bg--dark::after{
+ background:
+  linear-gradient(146deg,transparent 15%,rgba(165,211,241,.56) 22%,rgba(56,115,155,.22) 28%,transparent 38%),
+  linear-gradient(154deg,transparent 31%,rgba(100,167,207,.32) 36%,rgba(213,235,250,.50) 40%,transparent 51%),
+  linear-gradient(27deg,transparent 20%,rgba(91,160,204,.40) 31%,rgba(189,223,244,.55) 35%,transparent 43%),
+  linear-gradient(162deg,transparent 48%,rgba(164,206,233,.42) 55%,rgba(47,111,153,.24) 60%,transparent 69%),
+  linear-gradient(204deg,transparent 63%,rgba(149,197,226,.34) 70%,transparent 78%),
+  radial-gradient(ellipse at 18% 14%,rgba(112,181,222,.32),transparent 37%),
+  radial-gradient(ellipse at 82% 65%,rgba(40,114,163,.30),transparent 36%),
+  linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72));
+}
+.theme-bg--light{filter:blur(1px) hue-rotate(0deg) saturate(.88) brightness(1.02) contrast(1.03)}
+html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brightness(.90) contrast(.92)}
+.welcome-texture--light{
+ background-image:
+  linear-gradient(145deg,transparent 15%,rgba(255,255,255,.84) 23%,rgba(255,255,255,.12) 29%,transparent 38%),
+  linear-gradient(152deg,transparent 29%,rgba(155,203,234,.22) 35%,rgba(255,255,255,.80) 40%,transparent 52%),
+  linear-gradient(27deg,transparent 18%,rgba(146,196,230,.22) 29%,rgba(255,255,255,.76) 34%,transparent 42%),
+  linear-gradient(162deg,transparent 48%,rgba(255,255,255,.75) 55%,rgba(147,200,233,.20) 60%,transparent 69%),
+  radial-gradient(ellipse at 15% 15%,rgba(255,255,255,.80),transparent 36%),
+  radial-gradient(ellipse at 85% 38%,rgba(141,194,228,.28),transparent 32%),
+  linear-gradient(132deg,#eaf4fc 0%,#dbeaf7 22%,#fafdff 42%,#d6e9f7 58%,#e8f3fc 75%,#fbfdff 100%);
+ filter:hue-rotate(0deg) saturate(.72) brightness(1.04) contrast(.96);
+}
+.welcome-texture--dark{
+ background-image:
+  linear-gradient(146deg,transparent 15%,rgba(165,211,241,.56) 22%,rgba(56,115,155,.22) 28%,transparent 38%),
+  linear-gradient(154deg,transparent 31%,rgba(100,167,207,.32) 36%,rgba(213,235,250,.50) 40%,transparent 51%),
+  linear-gradient(27deg,transparent 20%,rgba(91,160,204,.40) 31%,rgba(189,223,244,.55) 35%,transparent 43%),
+  linear-gradient(162deg,transparent 48%,rgba(164,206,233,.42) 55%,rgba(47,111,153,.24) 60%,transparent 69%),
+  radial-gradient(ellipse at 18% 14%,rgba(112,181,222,.32),transparent 37%),
+  radial-gradient(ellipse at 82% 65%,rgba(40,114,163,.30),transparent 36%),
+  linear-gradient(128deg,#030e1a 0%,#0a2740 26%,#142e45 46%,#061725 63%,#12334b 80%,#03101c 100%);
+ filter:hue-rotate(0deg) saturate(.88) brightness(.94) contrast(1.02);
+}
 </style>
 </body>
 </html>
