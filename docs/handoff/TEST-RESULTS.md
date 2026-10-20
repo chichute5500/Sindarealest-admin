@@ -164,3 +164,14 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Task IDs: SETUP-001, SHOT-002, UI-001, UI-002, THEME-001, FUNC-001, SHOT-003.
 - Required next step: configure a Preview-only Cloudflare Access Service Auth policy and GitHub Actions secrets `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`; rerun the real baseline capture. Never paste the values into chat/logs.
 - Limitation: local fixture images are not evidence of deployed Preview appearance; do not close the blocked tasks.
+
+
+### 2026-10-20 02:59–03:01 UTC — canonical category routes + Liquid Glass cascade guard
+
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Tested source commit: `878528620fc519b04fe0a3b36b961eb53d2647d3`
+- Source/test validation: **PASS** — [run 39361899889](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361899889). Includes product route canonical/legacy redirects, wrong-category redirects, canonical and OG metadata, omission of unverified SKU in Product JSON-LD, sitemap URLs using stored category keys, and benefit-tile CSS cascade guards.
+- Visual workflow: [run 39361896954](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361896954), artifact [12237048814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361896954/artifacts/12237048814). Local Playwright fixture audit: **PASS**, 235 fixture products, 54 screenshots, 20 responsive cases, 93 interaction checks, 12 mock requests, zero document overflow, console/page/HTTP errors, failed requests or hard failures.
+- Separate real Preview probe from that same job: **BLOCKED_ACCESS_GATE**, `accessServiceTokenConfigured=false`, zero screenshots/viewports/routes; final destination is the Cloudflare Access login host. It sent no write requests. Therefore no real Preview visual pass, baseline, end-of-work capture or pixel comparison is claimed.
+- Separate Admin Preview Playwright [run 39361899892](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361899892): **FAIL** because expected `#loginView` / `#loginForm` were not found on the configured target; this remains outside the public static storefront test scope.
+- Changes remain on the fix branch only. No Production merge/deployment. Task IDs: UI-001, URL-001/ROUTE-001, SHOT-001/SHOT-002/SHOT-003, REG-001.
