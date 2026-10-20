@@ -33,6 +33,10 @@ assert.match(live, /external navigation was blocked and no credentials were ente
   'Access-gated Preview checks must record a non-bypass decision and must not enter credentials.');
 assert.match(live, /blocked: audit\.accessBlocked/,
   'A blocked Access redirect must stop route probing instead of repeating generic navigation failures.');
+assert.match(live, /accessServiceTokenConfigured: Object\.keys\(accessHeaders\)\.length > 0/,
+  'The audit must record only a boolean indicating whether optional Access token headers are configured.');
+assert.match(live, /accessServiceTokenConfigured: audit\.accessServiceTokenConfigured/,
+  'The safe Access-token configuration boolean must be visible in the diagnostic summary.');
 assert.match(live, /buildCloudflareAccessHeaders/,
   'Preview capture must use the tested optional Cloudflare Access service-token helper.');
 assert.match(live, /Object\.keys\(accessHeaders\)\.length > 0[\s\S]*route\.continue\(\{ headers: \{ \.\.\.req\.headers\(\), \.\.\.accessHeaders \} \}\)/,

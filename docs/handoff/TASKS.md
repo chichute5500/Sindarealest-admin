@@ -131,3 +131,17 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - **SAFE-002: FAIL for merge readiness / IN PROGRESS for remediation.** Compare at commit `fa7445b74661faf260c32b3ab32dfa85e3538e78` reports `diverged`, 293 commits ahead, 6 behind and 72 changed files: [compare](https://github.com/chichute5500/Sindarealest-admin/compare/28c768ba26b1d9f7d40e14efac5112526ed1c8b3...fa7445b74661faf260c32b3ab32dfa85e3538e78).
 - Scope contamination confirmed: `public/admin/index.html`, multiple `functions/api/admin/*` files, shared middleware/API code, migration `0008_product_sku_verification.sql`, setup/deploy scripts and `data/legacy-products.json` changed alongside `public/index.html` and visual-audit tooling.
 - Do not merge PR #108 as-is and do not deploy Production. Before integration, isolate public static UI/audit commits from unrelated admin/API/database/config changes and review the remaining diff against a freshly fetched base.
+
+
+## Latest static-website continuation — 2026-10-20
+
+- `SHOT-001` Baseline in `docs/website-screenshots/start-of-work/`: **BLOCKED** — live Preview remains behind Cloudflare Access; 0 valid Preview screenshots. Do not substitute the 54 local fixture images.
+- `SHOT-002` Result archive in `docs/website-screenshots/end-of-work/`: **NOT TESTED** — no baseline or public UI change to compare.
+- `CAPTURE-001` Playwright tooling coverage: **IN PROGRESS** — required four viewport sizes and both themes; homepage viewport/full-page images; seven named sections including `.service-strip`; mobile menu; expanded order details; actual product-card click, direct detail route and reload. Capture report records route, theme, viewport, section and state metadata.
+- `ARCHIVE-001` Safe screenshot replacement: **IN PROGRESS** — workflow now requires a passing full live audit, complete theme/viewport/section coverage and four direct/reload product checks before it can replace a canonical stage. Failed Access probes do not archive images.
+- `ACCESS-001` Preview authorization: **BLOCKED_ACCESS_GATE** — run [39357400764](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764), source `2a66c96457aa2c2b8235bece34a37dc916c6b25f`, final redirect to the Cloudflare Access login host, 0 screenshots. Next diagnostic records only whether the paired optional Access secrets are configured.
+- `REF-001` Original reference PNGs: **PASS** — both files were opened and visually reviewed; that is not proof that the blocked live Preview matches them.
+- `UI-001/UI-002/THEME-001` Live visual/background/Liquid Glass verification: **BLOCKED** pending a valid live baseline. Keep public HTML/CSS unchanged until capture succeeds.
+- `URL-001` Product detail URL audit: **IN PROGRESS / NOT VERIFIED against real Preview data**. Source currently uses `/san-pham/{key}` and middleware/sitemap reflect that one-segment format; target `/sanpham/{category}/{product-code}` is not implemented. Do not invent SKU/category values or change routes until real published product rows and legacy mapping are verified.
+- `FUNC-001` Live interactions: **NOT TESTED** — the capture gate prevents storefront content from rendering. Local fixture checks are not substitutes.
+- Safety: **PASS for this checkpoint** — only Playwright capture tooling, workflow validation and handoff records were changed; no admin, public UI, D1/R2 data, production configuration, merge or deployment.

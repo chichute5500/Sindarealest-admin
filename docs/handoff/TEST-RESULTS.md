@@ -121,3 +121,11 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - The same workflow's direct live Preview probe returned `captureCompleted=false`, `accessBlocked=true`, and `screenshotCount=0`. The workflow is green because the push probe is diagnostic/continue-on-error; the live Preview itself is still BLOCKED by Cloudflare Access.
 - [Admin Preview smoke run 39355503580](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355503580) failed on selectors `#loginView` and `#loginForm` not being found. This failure belongs to the separate admin workflow and is not evidence of a public storefront regression; it should be handled in the admin workstream, not by changing this website scope.
 - No live baseline/end screenshots, pixel comparison, route migration, storefront UI changes, merge, or Production deployment were completed in this run.
+
+
+## Extended capture audit — 2026-10-20
+
+- Source-validation run [39357404831](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357404831) at `2a66c96457aa2c2b8235bece34a37dc916c6b25f`: **PASS**. Dependency audit, project integrity and automated tests completed successfully after adding live-capture coverage assertions.
+- Visual-audit workflow [39357400764](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764): **workflow SUCCESS, live Preview audit BLOCKED**. The local fixture capture step completed and artifact [12235773515](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764/artifacts/12235773515) uploaded. Its local `visual-audit.json` reports 54 screenshots, `passed=true`, 0 console errors, 0 page errors, 0 HTTP errors, 0 hard failures and 0 horizontal overflow. These values apply only to local fixture rendering.
+- The same artifact's `live-preview/visual-audit.json` reports `captureCompleted=false`, `accessBlocked=true`, `passed=false`, 0 viewport audits, 0 route checks, 0 screenshots and one Access-gate hard failure; attempted URL redirects to `https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev`. No baseline was archived.
+- New capture script source syntax and assertions are covered by the green test run. Visual render comparisons, Liquid Glass acceptance and the new two-segment route remain **BLOCKED / NOT TESTED** because no live storefront page was reached.

@@ -59,6 +59,7 @@ const audit = {
   sectionChecks: [],
   productDetailChecks: [],
   brokenImages: [],
+  accessServiceTokenConfigured: Object.keys(accessHeaders).length > 0,
   sourceCommit: process.env.SOURCE_SHA || null,
 };
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
@@ -501,7 +502,7 @@ async function main() {
   const references = '<section><h2>Original mobile design references</h2><p>The references are multi-screen collages intended for visual review, not a pixel-perfect comparison of unlike layouts.</p><div class="shots"><figure><figcaption>Light reference</figcaption><img src="../reference-images/file_0000000017088207af45f5e6dd90cfa4.png" alt="Light reference"></figure><figure><figcaption>Dark reference</figcaption><img src="../reference-images/file_00000000fcb48207a23aeda23caa5eeb.png" alt="Dark reference"></figure></div></section>';
   const reportHtml = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest live Preview capture</title><style>body{font:14px/1.55 system-ui,sans-serif;color:#142a3c;background:#eef6fc;margin:0;padding:18px}main{max-width:1500px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:12px;border-radius:10px}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}figure{margin:0;padding:10px;border:1px solid #c5d9e8;border-radius:12px;background:#fff;min-width:0}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}</style><main><h1>SinDarealest2 — direct Cloudflare Pages Preview capture</h1><p>Source: ' + esc(audit.previewUrl) + ' · captured: ' + esc(audit.captureCompleted) + ' · audit pass: ' + esc(audit.passed) + '</p><h2>Coverage</h2><pre>' + esc(JSON.stringify(audit.coverage || {}, null, 2)) + '</pre><h2>Route checks</h2><pre>' + esc(JSON.stringify(audit.routeChecks, null, 2)) + '</pre><h2>Content checks</h2><pre>' + esc(JSON.stringify(audit.contentChecks, null, 2)) + '</pre>' + references + '<h2>Captured Preview screens</h2><section class="shots">' + imageCards + '</section><h2>Full diagnostics</h2><pre>' + esc(JSON.stringify(audit, null, 2)) + '</pre></main></html>';
   await fs.writeFile(path.join(outputDir, 'report.html'), reportHtml, 'utf8');
-  console.log(JSON.stringify({ previewUrl: audit.previewUrl, sourceCommit: audit.sourceCommit, captureCompleted: audit.captureCompleted, accessBlocked: audit.accessBlocked, passed: audit.passed, coverage: audit.coverage, summary: audit.summary }, null, 2));
+  console.log(JSON.stringify({ previewUrl: audit.previewUrl, sourceCommit: audit.sourceCommit, accessServiceTokenConfigured: audit.accessServiceTokenConfigured, captureCompleted: audit.captureCompleted, accessBlocked: audit.accessBlocked, passed: audit.passed, coverage: audit.coverage, summary: audit.summary }, null, 2));
   if (!audit.captureCompleted || audit.accessBlocked || !audit.passed) process.exitCode = 1;
 }
 main().catch(async (error) => {

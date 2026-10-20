@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T01:52:09Z",
+  "updatedAtUtc": "2026-10-20T02:13:42.983Z",
   "status": "BLOCKED",
-  "note": "Latest workflow confirms the local fixture pipeline and reference image artifact pass, but the direct Cloudflare Pages Preview capture is blocked by Cloudflare Access (accessBlocked=true, captureCompleted=false, zero screenshots). No storefront UI change or live visual comparison is claimed.",
+  "note": "Live Preview capture still redirects to Cloudflare Access despite the optional service-token helper being present. The latest direct probe saved zero Preview screenshots; local fixture screenshots remain artifact-only. No public UI changes or live visual acceptance are claimed.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -83,22 +83,101 @@
     "caveat": "Local fixture audit only. Live Preview probe was blocked by Cloudflare Access; canonical start/end screenshot directories remain unfilled."
   },
   "liveProbe": {
-    "workflowRun": 39355499185,
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185",
-    "artifactId": 12235310623,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623",
-    "sourceCommit": "fa7445b74661faf260c32b3ab32dfa85e3538e78",
-    "attemptedAtUtc": "2026-10-20T01:52:04Z",
+    "workflowRun": 39357400764,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764",
+    "artifactId": 12235773515,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764/artifacts/12235773515",
+    "sourceCommit": "2a66c96457aa2c2b8235bece34a37dc916c6b25f",
+    "attemptedAtUtc": "2026-10-20T02:11:50.018Z",
     "sourceKind": "cloudflare-pages-preview-live-read-only",
     "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
     "status": "BLOCKED_ACCESS_GATE",
     "accessBlocked": true,
+    "accessServiceTokenConfigured": "NOT RECORDED in this run; a safe boolean-only field is added for the next diagnostic.",
     "finalUrlWithoutQuery": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev",
     "screenshotCount": 0,
     "viewportCount": 0,
     "routeProbeCount": 0,
+    "requiredViewportThemePairs": 8,
+    "completedViewportThemePairs": 0,
+    "sectionScreenshotCounts": {
+      "hero": 0,
+      "benefits": 0,
+      "order": 0,
+      "featured": 0,
+      "collections": 0,
+      "products": 0,
+      "footer": 0
+    },
+    "productDetailChecks": 0,
     "readOnlyViolations": 0,
     "noWriteRequestsSent": true,
-    "note": "The latest Playwright probe classified the Cloudflare Access redirect before storefront content rendered. The job's continue-on-error behavior permits diagnostics to upload; it does not indicate a live Preview pass."
+    "note": "The latest Playwright probe detected the Access redirect before storefront content rendered. Overall workflow success reflects artifact upload/local tests only; it is not a Preview pass."
+  },
+  "latestToolingValidation": {
+    "workflowRun": 39357404831,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357404831",
+    "sourceCommit": "2a66c96457aa2c2b8235bece34a37dc916c6b25f",
+    "status": "PASS",
+    "note": "Source validation and automated tests passed for viewport/theme/section/product-route coverage assertions; this is not a live Preview pass."
+  },
+  "liveProbeHistory": [
+    {
+      "workflowRun": 39355499185,
+      "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185",
+      "artifactId": 12235310623,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623",
+      "sourceCommit": "fa7445b74661faf260c32b3ab32dfa85e3538e78",
+      "attemptedAtUtc": "2026-10-20T01:52:04Z",
+      "sourceKind": "cloudflare-pages-preview-live-read-only",
+      "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
+      "status": "BLOCKED_ACCESS_GATE",
+      "accessBlocked": true,
+      "finalUrlWithoutQuery": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev",
+      "screenshotCount": 0,
+      "viewportCount": 0,
+      "routeProbeCount": 0,
+      "readOnlyViolations": 0,
+      "noWriteRequestsSent": true,
+      "note": "The latest Playwright probe classified the Cloudflare Access redirect before storefront content rendered. The job's continue-on-error behavior permits diagnostics to upload; it does not indicate a live Preview pass."
+    }
+  ],
+  "captureTooling": {
+    "sourceCommit": "2a66c96457aa2c2b8235bece34a37dc916c6b25f",
+    "requiredViewports": [
+      {
+        "width": 360,
+        "height": 800
+      },
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "width": 1440,
+        "height": 900
+      }
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "homepageAndSections": [
+      "/",
+      "hero",
+      "#service-strip six tiles",
+      "#order",
+      "#featured",
+      "#collections",
+      "#products",
+      "#siteFooter"
+    ],
+    "detailRoutePolicy": "Derive only from an actual live product-card interaction; test direct open/reload. Do not use guessed SKU examples.",
+    "archivePolicy": "Require complete passing live Preview capture before replacing either canonical screenshot folder.",
+    "status": "TOOLING_SOURCE_VALIDATED_LIVE_ACCESS_BLOCKED"
   }
 }

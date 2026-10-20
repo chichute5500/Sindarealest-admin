@@ -139,3 +139,13 @@ The GitHub compare from base commit `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` t
 3. Mở **Actions → Liquid Glass isolated visual preview → Run workflow**, chọn nhánh `fix/liquid-glass-audit-2026-10-19`, stage `start-of-work`, xác nhận Preview-only, nguồn `cloudflare-preview`, URL mặc định. Chỉ khi run capture hoàn tất và manifest ghi nhận ảnh live mới bắt đầu vòng đối chiếu giao diện.
 
 Nếu không có quyền tạo service token/Secrets, không thể chụp baseline Preview bằng GitHub Actions một cách trung thực; tiếp tục dùng test local riêng nhưng giữ baseline live ở trạng thái BLOCKED.
+
+
+## Live Preview capture and coverage checkpoint — 2026-10-20
+
+- Tooling source checks passed at commit `2a66c96457aa2c2b8235bece34a37dc916c6b25f`: [Validate source and tests run 39357404831](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357404831).
+- The updated live capture script now targets required viewports 360×800, 390×844, 768×1024 and 1440×900 in both light/dark; it captures the hero, six benefit tiles, order section, featured products, collections, catalog and footer; it derives detail URLs from actual live cards and checks direct open/reload. Sample SKU URLs were removed from the live probe. The archive gate now rejects incomplete/failed coverage before deleting or replacing canonical screenshots.
+- [Live-probe workflow 39357400764](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764) completed as a diagnostic workflow, but its embedded live audit was `captureCompleted=false`, `accessBlocked=true`, `screenshotCount=0`. The final URL was Cloudflare Access login on `sindarealest2-pages.cloudflareaccess.com`; no public storefront DOM was captured and canonical screenshot folders were not changed.
+- Local Playwright fixture artifact [12235773515](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764/artifacts/12235773515) contains 54 local-fixture screenshots with zero recorded console, page, HTTP or hard failures and zero horizontal overflow. This is explicitly artifact-only and is **not** a Preview baseline or visual acceptance.
+- A safe boolean `accessServiceTokenConfigured` is being added to the next live diagnostic; it reports only whether the optional paired GitHub secrets are present, not their values. No secret is logged or serialized.
+- No public storefront UI, product URL routing, image URL, R2/D1 data, admin file, production setting, merge or deployment was changed by this checkpoint.

@@ -203,6 +203,7 @@ jobs:
           manifest.captureSource = 'Direct Cloudflare Pages Preview capture, read-only; no fixture API';
           manifest.captureCoverage = audit.coverage;
           manifest.liveAuditPassed = audit.passed === true;
+          manifest.accessServiceTokenConfigured = audit.accessServiceTokenConfigured === true;
           manifest.updatedAtUtc = process.env.CAPTURED_AT;
           manifest.status = 'IN PROGRESS';
           manifest.stages ??= {};
