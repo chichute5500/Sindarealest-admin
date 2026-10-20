@@ -1,0 +1,18 @@
+{
+  "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
+  "checkedAt": "2026-10-20T20:50:16.963Z",
+  "title": "Quản trị SinDarealest",
+  "lang": "vi",
+  "loginViewClass": "loginwrap",
+  "topbarBrandDisplay": "flex",
+  "topbarBrandVisibility": "visible",
+  "topbarBrandOpacity": "1",
+  "inlineHideRulePresent": false,
+  "stylesheetSources": [
+    {
+      "href": "[inline stylesheet]",
+      "ruleCount": 181,
+      "hasLoginHideRule": false
+    }
+  ]
+}
