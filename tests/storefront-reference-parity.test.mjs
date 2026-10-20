@@ -50,10 +50,20 @@ assert.match(finalCss, /@media\(max-width:760px\)\{[\s\S]*?\.nav-wrap \.nav \.br
   'The mobile brand lockup must sit beside the menu, matching the supplied reference rather than being centered.');
 for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobileDark], ['desktop light', desktopLight], ['desktop dark', desktopDark]]) {
   assert.match(svg, /id="satin-crease-detail"/, name + ' background must retain layered satin crease highlights.');
+  assert.doesNotMatch(svg, /stroke-width="(?:[6-9][0-9]|[1-9][0-9]{2,})"/,
+    name + ' background must avoid oversized ribbon bands and retain fine folds.');
 }
 
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
+
+assert.match(html, /liquid-glass-light\\.svg\\?v=20261021-2/);
+assert.match(html, /liquid-glass-dark\\.svg\\?v=20261021-2/);
+assert.match(html, /liquid-glass-light-mobile\\.svg\\?v=20261021-2/);
+assert.match(html, /liquid-glass-dark-mobile\\.svg\\?v=20261021-2/);
+assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\\.svg\\?v=20261021-1/,
+  'All four satin backgrounds must use the updated cache key.');
+
 assert.match(html, /html\.dark\{[\s\S]*?--sd-reference-surface-strong:rgba\(7,27,45,\.94\)/,
   'Dark theme drawers must retain a readable navy-glass surface.');
 assert.match(html, /\.account-drawer,\.cart-drawer,\.checkout-drawer\{[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\)/,
