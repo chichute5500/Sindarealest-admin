@@ -52,3 +52,12 @@
 - Visual audit report gần nhất (Live chưa đạt): https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810
 - Preview: https://3ed49bcc.sindarealest2.pages.dev/
 - Production — chỉ để xác định ranh giới, không chỉnh sửa: https://sindarealest2.pages.dev/
+
+
+## Cập nhật điều tra trực tiếp — 2026-10-20 18:45 UTC+7
+- Head trước sửa: `7a0c5091ed3ec6c73fabbf7fe432287a95a32e21`. Admin Playwright và Validate source/tests PASS tại SHA này: [Admin](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39416521269), [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39416521283).
+- Đã đọc artifact của run [39416521293](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39416521293), không chỉ dựa vào job conclusion. Báo cáo Live: 46 ảnh, 8/8 viewport/theme, đủ 28 ảnh section, menu 2, order 4; product detail 4/4 FAIL vì URL Preview thực tế là `/san-pham/sneakers-26-41-a`, trong khi source của nhánh sinh canonical route `/sanpham/{category}/{product-key}`. Console/page/HTTP errors = 0, broken images = 0, nhưng 4 hard failures route; live audit NOT PASSED.
+- Nguyên nhân deployment metadata: API xác minh hoạt động nhưng alias `https://3ed49bcc.sindarealest2.pages.dev/` không gắn với deployment gần nhất của nhánh. API trả về candidate Preview đã thành công cho đúng branch và SHA: deployment `648acb3d-ec92-4e05-83d0-d815a79e6af9`, commit `7a0c5091ed3ec6c73fabbf7fe432287a95a32e21`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev`. Trạng thái trước đó là `DEPLOYMENT_NOT_FOUND`, không phải lỗi token 401 ở lần mới nhất.
+- Sửa trực tiếp trên đúng nhánh hai mặc định/đích của workflow: `.github/workflows/liquid-glass-visual-preview.yml` và `scripts/capture-cloudflare-preview.mjs` chuyển sang alias branch đã được Cloudflare API trả về. Không nới lỏng điều kiện route/context, không sửa main, không merge PR và không triển khai production.
+- Commit workflow URL: `43403b2d4e67e814b11ec2f4c086f7aa5ce411ab`; commit capture default: `eb21835f0783bbed72c3fcc4f18039e3b9887521`. Chờ các Actions mới kích hoạt từ commit mới để xác minh lại; không coi các run cũ là bằng chứng cho sửa đổi này.
+- Trạng thái tại thời điểm ghi: Admin/Validate của SHA trước PASS; Live capture và deployment verification cho SHA mới CHƯA XÁC MINH; archive chuẩn vẫn BLOCKED; Production không bị thay đổi; PR #108 vẫn mở.
