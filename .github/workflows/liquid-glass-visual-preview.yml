@@ -119,6 +119,8 @@ jobs:
         continue-on-error: true
         env:
           PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           node scripts/capture-cloudflare-preview.mjs
@@ -126,6 +128,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
         env:
           PREVIEW_URL: ${{ inputs.preview_url }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: node scripts/capture-cloudflare-preview.mjs
       - name: Explain local fixture captures are artifact-only
         if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'local-static-fixture'
