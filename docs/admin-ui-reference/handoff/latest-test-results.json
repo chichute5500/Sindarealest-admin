@@ -925,15 +925,15 @@
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceCodeChanged": false,
     "testsRunInThisUpdate": false,
-    "userRequest": "Record the latest guidance about copying the full Master Prompt into a new chat and create a concise handoff prompt.",
+    "userRequest": "Record guidance about copying the full Master Prompt into a new chat and create a handoff prompt.",
     "completed": [
-      "Added Master Prompt section 18.9 describing how a new chat should start and verify actual repository/tool access.",
-      "Added handoff status note explaining the guidance given and current safety boundaries.",
-      "Created PROMPT-NEXT-CHAT.md with instructions to read current handoff files, verify GitHub state, continue actual work, and avoid repeating verified tests."
+      "Added Master Prompt section 18.9 about new-chat startup and verifying actual repository/tool access.",
+      "Updated LATEST-STATUS.md with the guidance given and safety boundaries.",
+      "Created PROMPT-NEXT-CHAT.md with steps to read current handoff files, verify GitHub state, continue work, and avoid repeating verified tests."
     ],
     "notVerifiedOrNotDone": [
-      "No new application source edits were made.",
-      "No tests were run as part of this documentation update.",
+      "No application source edits were made.",
+      "No tests were run in this documentation update.",
       "No new screenshot was captured.",
       "No merge or Production deployment was performed."
     ],
