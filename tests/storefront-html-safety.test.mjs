@@ -19,7 +19,7 @@ assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\bsrc=/,
   "do not hardcode a Hero image source in HTML; its source is selected dynamically");
 
 const heroSyncStart = html.indexOf("function syncHeroProductImage()");
-const heroSyncEnd = html.indexOf("\\nfunction renderFeatured()", heroSyncStart);
+const heroSyncEnd = html.indexOf("\nfunction renderFeatured()", heroSyncStart);
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the dynamic Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
