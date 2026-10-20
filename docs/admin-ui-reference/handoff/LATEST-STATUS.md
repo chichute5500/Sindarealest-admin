@@ -102,50 +102,41 @@
 
 ---
 
-## Handoff cập nhật — 2026-10-20, sau vòng kiểm tra login
+## Handoff mới nhất — 2026-10-20 22:20 giờ Việt Nam
 
-### Source/UI đã sửa và có screenshot
-- Chỉ sửa `public/admin/index.html` trên nhánh ADMIN:
-  1. Ẩn logo topbar và notification khi login screen hiện; giữ nút theme Light/Dark dạng icon.
-  2. Rút gọn lời mời đăng nhập và thay ghi chú hạ tầng bằng thông báo quyền truy cập chung.
-  3. Thêm nền vảy da cá sấu bằng CSS với độ tương phản thấp. Vòng đầu quá nổi; vòng sau đã giảm alpha và được chụp lại.
-- Source SHA có thay đổi UI mới nhất: `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`.
-- Screenshot mới nhất cho source hiện tại: `docs/admin-ui-reference/handoff/history/b5ce11f92995/screenshots/` (16 ảnh, 8 viewport × Light/Dark). Đã xem ảnh 390×844 Light/Dark; pattern hiện dịu hơn, login card không còn logo trùng, theme toggle còn hoạt động.
-- Run gần nhất: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39446733271
-- `npm run check` và `npm test`: PASS; local Playwright matrix: PASS, không có lỗi page/console/request/HTTP và không có horizontal overflow.
-- Test contract mới xác nhận topbar brand + notification ẩn trên login shell local.
+**Trạng thái:** `IN PROGRESS — LOCAL LOGIN MATRIX PASS; REMOTE PREVIEW SOURCE MISMATCH; FULL MODULE QA OPEN`  
+**Tiến độ ước tính:** **42%** (ước tính theo giai đoạn, không phải tỷ lệ code; giữ nguyên vì vòng này chủ yếu xác minh CI và ghi bàn giao, chưa hoàn tất module nghiệp vụ).  
+**HEAD ADMIN đã xác minh trước khi cập nhật handoff này:** `ed27fc5c67152ba900c8b10f5acd358dae8e8096`. Các cập nhật tài liệu dưới đây sẽ tạo commit mới, nên luôn xác minh HEAD mới khi phiên tiếp theo bắt đầu.  
+**Source UI gần nhất được kiểm tra bằng ảnh:** `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`.  
+**Commit source/test harness được workflow ma trận kiểm tra:** `de8b7770ac2e077ad9ef0926f5e9053b400a9993`. Không đồng nhất hai SHA này: test harness đã tạo ảnh local từ source được checkout theo commit chạy workflow; cần kiểm tra lại workflow metadata nếu tiếp tục sửa source.
 
-### Rủi ro Preview được xác minh
-- Secret `ADMIN_TEST_URL` đang trỏ tới một Preview có thể mở login và đăng nhập tới dashboard, nhưng **không phục vụ CSS login mới của source ADMIN**: remote test nhận thấy `.topbar > .brand` vẫn visible, trong khi source hiện tại yêu cầu hidden. Vì vậy, không được coi lần login/dashboard trước đó là xác nhận Preview đang chạy source mới.
-- URL bị GitHub secret masking, không thể đọc giá trị qua log. Test đã thêm log `[ADMIN_PREVIEW_TARGET]` an toàn nhưng GitHub vẫn mask target.
-- Run `39446733271`: local source matrix PASS; remote Preview check FAIL ở kiểm tra nhận diện source mới. Đây là lỗi cấu hình/đích Preview, không phải lỗi login source.
-- **Cần người quản lý repository cập nhật secret `ADMIN_TEST_URL`** sang URL Preview đúng của nhánh `feature/admin-isolated-handoff-2026-10-20` (path `/admin/`) hoặc cung cấp URL Preview đúng. Giữ nguyên các Access service-token secrets hiện có; không bypass Cloudflare Access.
-- Không chụp ảnh module có dữ liệu khách hàng/đơn hàng thật trước khi có fixture an toàn hoặc cơ chế che PII.
+### Xác minh bổ sung trong phiên này
 
-### 12 màn hình mockup ↔ source (kiểm kê tĩnh)
-1. Login: `#loginView/#loginForm`, auth mật khẩu hiện có; không thay auth contract.
-2. Dashboard: `dashboard()`, thống kê + 8 log gần nhất.
-3. Sản phẩm: `productList()`, table/search/filter/pagination; khác card list trong mockup.
-4. Thêm/sửa sản phẩm: `#productForm` trong modal.
-5. Hình ảnh: gallery/upload nằm trong product editor.
-6. Đơn hàng: `ordersPage()`, bảng min-width 820px.
-7. Chi tiết đơn: chưa có `data-view` riêng; cần xác minh nghiệp vụ trước khi thêm.
-8. Khách hàng: `customersPage()`, bảng min-width 720px.
-9. Bảo hành/yêu cầu hỗ trợ: `warrantiesPage()`.
-10. Cài đặt: `settingsPage()`, giá, welcome overlay, watermark, reset SKU, backup.
-11. Sao lưu/khôi phục: nằm trong Cài đặt.
-12. Nhật ký: 8 log gần nhất trên Dashboard; chưa có view nhật ký riêng.
+- Nhánh ADMIN hiện ở HEAD `ed27fc5c67152ba900c8b10f5acd358dae8e8096`; commit đó chỉ sửa `LATEST-STATUS.md` và `latest-test-results.json`, không sửa source app.
+- Workflow kiểm tra tổng quát mới nhất: [run 39447109288](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39447109288) — **SUCCESS**; các bước cài dependency, audit dependency, kiểm tra integrity và automated tests đều thành công trên HEAD `ed27fc5...`.
+- Workflow chẩn đoán Preview: [run 39446733271](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39446733271) — **FAIL tổng thể chỉ tại bước kiểm tra Preview đã cấu hình**; các bước source checks, `npm test`, Chromium và ma trận 16 screenshot local đều PASS; ảnh/báo cáo được lưu thành công. Preview không đạt CSS signature vì trang từ `ADMIN_TEST_URL` vẫn hiện `.topbar > .brand`, khác source hiện tại.
+- Diagnostic run trước đó [39446212149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39446212149) SUCCESS trên một commit cũ hơn; không được dùng nó để tuyên bố Preview của source hiện tại đã PASS.
+- Bằng chứng screenshot local hiện có: `docs/admin-ui-reference/handoff/history/b5ce11f92995/screenshots/` (16 ảnh login shell, 8 viewport × Light/Dark). Chỉ đại diện login chưa đăng nhập; không chứng minh module có dữ liệu đã được kiểm thử.
+- Ảnh tham chiếu: HTML viewer đã hiển thị mockup 12 màn hình và login shell đã được xem định tính ở 390×844 Light/Dark. PNG gốc vẫn cần xác minh khả năng truy xuất trực tiếp; không khẳng định đã làm pixel-diff.
+- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) vẫn **OPEN / NOT MERGED**, base `main`, head `feature/admin-isolated-handoff-2026-10-20`. GitHub API hiện ghi nhận **318 commits / 223 files changed**. PR bao gồm phạm vi storefront/backend ngoài ADMIN; tuyệt đối không merge, không đổi base, không cherry-pick.
+- Nhánh website tĩnh `fix/liquid-glass-audit-2026-10-19` không được sửa trong công việc ADMIN này. Không deploy Production.
 
-### Cảnh báo PR — KHÔNG MERGE
-- PR #111: https://github.com/chichute5500/Sindarealest-admin/pull/111
-- Base `main`, head `feature/admin-isolated-handoff-2026-10-20`; GitHub API ghi nhận 317 commits / 223 files / +11,167 −352 ở thời điểm kiểm tra.
-- PR chứa thay đổi storefront/backend cùng tài liệu/evidence, không phải ADMIN-only. Không merge, không đổi base, không cherry-pick hoặc đồng bộ nhánh.
-- Không có local checkout; full `git status` và diff cục bộ vẫn chưa xác minh.
+### Việc cần làm tiếp theo — thứ tự ưu tiên
 
-### Việc tiếp theo
-1. Chờ người quản lý repo cập nhật `ADMIN_TEST_URL` đúng Preview của nhánh ADMIN; sau đó chạy lại smoke tests và xác nhận CSS signature PASS.
-2. Thêm screenshot/kiểm tra read-only cho dashboard và từng module, nhưng phải loại PII khỏi artifacts.
-3. Sửa từng khác biệt mobile theo mockup: 5 mục bottom nav với “Khác”, table/card mobile, chi tiết đơn, backup và nhật ký; không tạo route giả hoặc thay API contract khi chưa kiểm tra.
-4. Mỗi vòng: source/test → workflow → xem PNG → cập nhật file này và JSON.
-5. Không sửa nhánh web tĩnh, không merge, không deploy Production.
+1. Yêu cầu chủ repository cập nhật secret GitHub Actions `ADMIN_TEST_URL` thành URL Preview đúng của nhánh ADMIN, path `/admin/`. Không in secret vào log, không bypass Cloudflare Access và không yêu cầu mật khẩu Production. Sau đó chạy lại diagnostic workflow; cần CSS signature, login và dashboard đều PASS.
+2. Kiểm tra nguồn của 12 mockup và PNG/ZIP tham chiếu; ghi rõ asset nào xem được. Thực hiện so sánh ảnh định lượng/định tính khi có đủ ảnh thật cùng viewport/theme.
+3. Bổ sung Playwright an toàn cho dashboard và module sản phẩm, đơn hàng, khách hàng, bảo hành, cài đặt, gallery và backup/restore. Chỉ dùng fixture hoặc dữ liệu giả đã che PII; không CRUD dữ liệu thật. Ghi rõ các màn hình chưa có route riêng (ví dụ chi tiết đơn/nhật ký) thay vì dựng route giả.
+4. Kiểm tra mobile nav (mockup 5 mục + “Khác” so với source hiện có 6 mục), table/card mobile, overflow, contrast, tiếng Việt, theme, focus/keyboard, runtime console và failed network. Giữ nguyên API/auth/business logic.
+5. Cần checkout Git an toàn để xác minh `git status`, merge-base và full diff PR #111. Hiện connector review chưa tương đương local diff đầy đủ. Không merge trong nhiệm vụ này.
+6. Sau mỗi vòng sửa có ý nghĩa: chạy test → chụp ảnh mới từ app → xem ảnh/artifact → cập nhật status + JSON và commit chỉ trên nhánh ADMIN.
 
+### Trạng thái nghiệm thu
+
+- Source checks / automated tests của workflow mới nhất: **PASS**.
+- Local Playwright login screenshot matrix: **PASS, 16 ảnh** trên run 39446733271.
+- Remote Preview đúng source hiện tại: **FAIL / cần URL Preview đúng**.
+- Authenticated business modules: **NOT TESTED**.
+- Full local diff / working tree audit: **BLOCKED / chưa có local checkout**.
+- Full visual acceptance against original PNG: **PARTIAL**.
+- Merge PR #111: **FORBIDDEN / NOT PERFORMED**.
+- Cloudflare Production deployment: **NOT PERFORMED**.
