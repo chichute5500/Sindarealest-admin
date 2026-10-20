@@ -4,11 +4,59 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { sanitizeText, sanitizeUrl } from '../scripts/sanitize-audit-value.mjs';
 import { buildCloudflareAccessHeaders } from '../scripts/cloudflare-access-service-token.mjs';
+import { validatePreviewUrl, matchesPreviewDeployment, inspectPreviewDeployment } from '../scripts/verify-cloudflare-preview-deployment.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
 const deploymentVerifier = readFileSync(new URL('../scripts/verify-cloudflare-preview-deployment.mjs', import.meta.url), 'utf8');
 const compare = readFileSync(new URL('../scripts/compare-website-screenshots.mjs', import.meta.url), 'utf8');
+
+const allowedPreview = validatePreviewUrl('https://3ed49bcc.sindarealest2.pages.dev/');
+assert.equal(allowedPreview.origin, 'https://3ed49bcc.sindarealest2.pages.dev');
+for (const invalidUrl of [
+  'https://sindarealest2.pages.dev/',
+  'http://3ed49bcc.sindarealest2.pages.dev/',
+  'https://example.com/',
+  'https://3ed49bcc.sindarealest2.pages.dev/?token=secret',
+  'https://user:pass@3ed49bcc.sindarealest2.pages.dev/',
+]) {
+  assert.throws(() => validatePreviewUrl(invalidUrl), /Refused URL/,
+    'Deployment verifier must reject unsafe Preview target: ' + invalidUrl);
+}
+const validDeployment = {
+  id: 'deployment-preview-123',
+  url: 'https://3ed49bcc.sindarealest2.pages.dev',
+  aliases: ['https://3ed49bcc.sindarealest2.pages.dev'],
+  environment: 'preview',
+  status: 'success',
+  created_on: '2026-10-20T01:00:00.000Z',
+  latest_stage: { name: 'deploy', status: 'success' },
+  deployment_trigger: {
+    metadata: {
+      branch: 'fix/liquid-glass-audit-2026-10-19',
+      commit_hash: 'a'.repeat(40),
+      commit_message: 'Test Preview commit',
+    },
+  },
+};
+assert.equal(matchesPreviewDeployment(validDeployment, allowedPreview), true,
+  'A matching deployment alias must be recognized.');
+assert.equal(matchesPreviewDeployment(validDeployment, 'https://other.sindarealest2.pages.dev'), false,
+  'A different Preview hostname must not match.');
+const inspected = inspectPreviewDeployment(validDeployment);
+assert.equal(inspected.verified, true, 'Only a successful Preview with a concrete branch and SHA should verify.');
+assert.equal(inspected.metadata.commitHash, 'a'.repeat(40));
+assert.equal(inspected.metadata.environment, 'preview');
+assert.equal(inspected.metadata.branch, 'fix/liquid-glass-audit-2026-10-19');
+assert.equal(inspectPreviewDeployment({ ...validDeployment, environment: 'production' }).verified, false,
+  'Production deployments must never be accepted as Preview evidence.');
+assert.equal(inspectPreviewDeployment({ ...validDeployment, status: 'active' }).verified, false,
+  'An unfinished deployment must fail closed.');
+assert.equal(inspectPreviewDeployment({
+  ...validDeployment,
+  deployment_trigger: { metadata: { branch: 'fix/test', commit_hash: 'not-a-sha' } },
+}).verified, false, 'A missing/invalid deployment commit SHA must fail closed.');
+
 
 assert.match(workflow, /capture_source[\s\S]*cloudflare-preview[\s\S]*local-static-fixture/,
   'Capture source must be explicit with a live Preview option.');
