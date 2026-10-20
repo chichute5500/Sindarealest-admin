@@ -732,3 +732,123 @@ Khi code cũ cản trở thiết kế, hãy tìm cách tái cấu trúc an toàn
 Không dùng mockup thay cho ảnh ứng dụng thật. Không bịa kết quả Playwright. Không tự ý sửa website tĩnh. Không merge "main". Không deploy Production.
 
 ƯU TIÊN CAO NHẤT: THIẾT KẾ ADMIN SÁT ẢNH MẪU — GIỮ NGUYÊN LOGO, THƯƠNG HIỆU, SẢN PHẨM THẬT — DUY TRÌ NGHIỆP VỤ — TỰ KIỂM THỬ VÀ ĐỐI CHIẾU BẰNG CHỨNG THẬT — LƯU BÀN GIAO TRÊN NHÁNH ADMIN RIÊNG.
+
+---
+
+18. QUY TRÌNH HANDOFF DUY NHẤT VÀ PHỐI HỢP ADMIN – WEBSITE TĨNH
+
+Mục tiêu: mọi phiên làm việc mới phải tiếp tục từ trạng thái thực tế trên GitHub, không phụ thuộc vào trí nhớ của cuộc trò chuyện trước, không tạo nhiều prompt tổng cạnh tranh nhau và không lặp lại công việc đã hoàn thành.
+
+18.1. File này là nguồn chỉ dẫn tổng duy nhất
+
+- Đây là MASTER PROMPT / HANDOFF TỔNG cho công việc tái thiết kế ADMIN.
+- Khi cần chuyển sang chat mới, dùng chính file này làm prompt chính; không tạo một prompt tổng riêng song song.
+- Các file trạng thái và kết quả kiểm thử được dẫn chiếu trong file này chỉ lưu bằng chứng tiến độ hiện tại; chúng không thay thế các quy tắc và ranh giới an toàn của Master Prompt.
+- Không tự ý tạo một bản handoff tổng khác có nội dung trùng lặp. Nếu cấu trúc tài liệu thay đổi, hãy cập nhật đường dẫn trong chính file này.
+- Mỗi phiên mới phải đọc lại file này từ nhánh ADMIN đang hoạt động, cùng các file trạng thái được liệt kê ở mục 6, trước khi sửa code.
+
+18.2. Kiểm tra trạng thái thực tế trước khi bắt đầu
+
+Trước khi thực hiện bất kỳ thay đổi nào, phải xác minh trực tiếp:
+
+1. Repository đúng: chichute5500/Sindarealest-admin.
+2. Nhánh ADMIN được phép làm việc và HEAD SHA hiện tại.
+3. Nội dung hiện tại của Master Prompt, START-HERE.md, LATEST-STATUS.md và latest-test-results.json.
+4. Trạng thái PR #111 và các PR liên quan; không merge.
+5. Những file đã thay đổi trong commit gần nhất và các công việc đã thực hiện.
+6. GitHub Actions/checks của đúng SHA, không lấy trạng thái của commit cũ làm bằng chứng cho code mới.
+7. Preview URL, deployment SHA và khả năng truy cập thực tế nếu có.
+
+Nếu nhánh hoặc SHA khác thông tin bàn giao, không được mặc định là lỗi hay ghi đè. Đọc commit mới nhất và điều chỉnh theo trạng thái thực tế. Không force-push, không ghi đè cập nhật mới của người khác. Khi cập nhật ref, dùng kiểm tra expected SHA/force-with-lease nếu công cụ hỗ trợ; nếu thất bại do HEAD thay đổi, đọc lại trạng thái và hòa giải thay vì thử ghi đè.
+
+18.3. Phối hợp với website tĩnh mà không trộn nhánh
+
+Website tĩnh và ADMIN đang được phát triển song song, độc lập. Không yêu cầu bên này chờ bên kia, không sao chép giao diện của bên kia một cách tự động và không giả định hai giao diện phải giống hệt nhau.
+
+Biên bản tham khảo trên nhánh website tĩnh:
+https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/handoff/STOREFRONT-ADMIN-CROSSCHECK-2026-10-20.md
+
+Chỉ đọc biên bản trên nhánh fix để hiểu các nguyên tắc phối hợp. Không chỉnh sửa file đó trong công việc ADMIN và không cherry-pick/merge nhánh fix. Ghi nhận các nguyên tắc liên quan trực tiếp đến ADMIN trong tài liệu bàn giao/trạng thái đã có trên nhánh ADMIN; không tạo file prompt tổng thứ hai.
+
+Các điểm cần đối chiếu khi có bằng chứng liên quan:
+- Font chữ và font fallback; logo, biểu tượng thương hiệu và đường dẫn asset.
+- Quy ước theme sáng/tối. Storefront có thể dùng html.dark/data-theme-mode trong khi ADMIN dùng data-admin-theme="dark"; không tự đồng nhất class, token hoặc localStorage key.
+- Phạm vi CSS/selector toàn cục, inline CSS/JS, component hoặc tài nguyên có thể được dùng chung.
+- Gallery sản phẩm, trình sửa ảnh, modal, overlay, menu và breakpoint responsive.
+- Route, cache, service worker (bao gồm public/admin-sw.js nếu có liên quan), URL Preview và SHA deployment.
+- Nguy cơ thay đổi ADMIN gây hồi quy storefront hoặc ngược lại.
+
+Nguyên tắc:
+- Giữ CSS/JS ADMIN được cô lập nếu chưa chứng minh có lý do cần dùng chung.
+- ADMIN được tự thiết kế theo ảnh mẫu của ADMIN; không bắt buộc bắt chước Liquid Glass hay layout của storefront.
+- Chỉ kết luận có xung đột khi đã kiểm tra file, import/selector, route hoặc hành vi liên quan.
+- Không sửa website tĩnh trong nhiệm vụ ADMIN. Nếu cần thay đổi file dùng chung mà chưa thể cô lập an toàn, ghi rõ BLOCKED, nêu bằng chứng và tiếp tục các hạng mục độc lập.
+
+18.4. Ghi nhận quyết định và tác động
+
+Với mỗi thay đổi đáng kể, cập nhật trạng thái/handoff trên nhánh ADMIN, tối thiểu ghi:
+- Ngày hoặc chu kỳ làm việc.
+- File/đường dẫn đã thay đổi.
+- Phạm vi thay đổi và lý do.
+- Tác động dự kiến đến giao diện, nghiệp vụ hoặc tích hợp.
+- Bằng chứng kiểm thử đã chạy và kết quả.
+- Những kiểm thử chưa chạy hoặc bị bỏ qua, kèm lý do.
+- Commit SHA và Preview URL/SHA nếu có.
+- Việc tiếp theo và blocker cụ thể.
+
+Không ghi “đã hoàn thành” chỉ vì đã sửa code hoặc workflow báo thành công. Nếu chưa xác minh được, ghi CHƯA XÁC MINH.
+
+18.5. Kiểm thử và tiêu chuẩn chấp nhận
+
+Phân biệt rõ:
+- PASS: đã thực sự chạy và có kết quả.
+- FAIL: đã chạy và có lỗi.
+- BLOCKED: không thể chạy do thiếu quyền, dịch vụ, dữ liệu hoặc điều kiện.
+- SKIPPED: chủ động không chạy; phải ghi lý do.
+- NOT VERIFIED: chưa có bằng chứng đủ để kết luận.
+
+Baseline ảnh đăng nhập chỉ chứng minh trạng thái đăng nhập theo fixture/mô phỏng đã được kiểm tra. Nó không chứng minh dashboard sau đăng nhập, CRUD, API thật hoặc toàn bộ hệ thống đã hoạt động.
+
+Khi có thể, phải kiểm tra:
+- So sánh ảnh chụp ứng dụng thực tế với ảnh mẫu ở các viewport điện thoại, tablet và desktop.
+- Theme sáng/tối, đổi theme, font tiếng Việt, tràn ngang, clipping và chồng lấn.
+- Login/logout, điều hướng, sidebar, modal, form, trạng thái loading/error/success.
+- Sản phẩm: đọc/lưu/sửa dữ liệu, giá, SKU, ảnh, nhóm ảnh và upload theo nghiệp vụ hiện có.
+- Đơn hàng, khách hàng, bảo hành, cài đặt, backup/restore và các module có trong hệ thống.
+- API/auth/session, console errors, failed requests và hành vi trên Preview.
+- Playwright, npm run check, npm test và GitHub Actions phù hợp với repository.
+
+Không dùng mock hoặc stub để tuyên bố các nghiệp vụ thật đã được xác minh. Có thể dùng fixture để kiểm tra giao diện, nhưng phải ghi rõ giới hạn. Không thực hiện thao tác phá hủy trên dữ liệu thật; dùng môi trường thử nghiệm hoặc fixture an toàn.
+
+Nếu không truy cập được Preview do Cloudflare Access hoặc thiếu thông tin xác thực, ghi rõ điều đó. Không coi lỗi đăng nhập bảo vệ Preview là bằng chứng ứng dụng đã lỗi, cũng không coi trang login là bằng chứng toàn bộ ứng dụng đã đạt.
+
+18.6. Cập nhật handoff để phiên tiếp theo không làm lại
+
+Sau mỗi chu kỳ làm việc đáng kể:
+1. Cập nhật LATEST-STATUS.md và latest-test-results.json hiện có, theo đúng cấu trúc của chúng.
+2. Ghi commit SHA mới nhất và trạng thái kiểm thử thực tế.
+3. Liệt kê việc đã hoàn thành, việc còn thiếu, lỗi còn mở, blocker và bước tiếp theo có thể thực hiện ngay.
+4. Nếu có quyết định phối hợp Admin–storefront đáng kể, ghi vào tài liệu phối hợp/trạng thái sẵn có trên nhánh ADMIN.
+5. Commit các cập nhật tài liệu cùng nhánh ADMIN khi có quyền; sau đó đọc lại từ GitHub để xác minh chúng thực sự được lưu.
+6. Không ghi một SHA dự kiến như thể đó là SHA đã tạo. Chỉ ghi SHA sau khi GitHub xác nhận.
+7. Không cập nhật tiến độ theo phần trăm dựa trên cảm giác; nêu hạng mục và bằng chứng cụ thể. Nếu dùng phần trăm, giải thích cách tính và phạm vi.
+
+Không cần lặp lại một hạng mục đã có bằng chứng PASS còn hợp lệ trên đúng commit, trừ khi code phụ thuộc đã thay đổi hoặc có dấu hiệu hồi quy. Nếu code đã đổi, chạy lại các test bị ảnh hưởng.
+
+18.7. Quy tắc bàn giao cho chat mới
+
+Khi người dùng yêu cầu bàn giao:
+- Cập nhật trực tiếp file Master Prompt này nếu cần bổ sung quy tắc tổng quát; không tạo prompt tổng riêng.
+- Cập nhật file trạng thái hiện có để phản ánh tiến độ thực tế và bước tiếp theo.
+- Ghi đúng branch, HEAD SHA, PR, Preview URL/deployment SHA, test PASS/FAIL/BLOCKED/SKIPPED và các giới hạn xác minh.
+- Trong phần báo cáo cho người dùng, cung cấp đường dẫn GitHub tới Master Prompt và tóm tắt ngắn những việc còn phải làm.
+- Prompt gửi sang chat mới phải yêu cầu đọc file Master Prompt và trạng thái mới nhất trên GitHub trước khi hành động.
+- Không tuyên bố handoff đã được lưu nếu chưa xác minh nội dung trên GitHub sau commit.
+
+18.8. Giới hạn an toàn không thay đổi
+
+- PR #111 (ADMIN) và PR #108 (website tĩnh) phải giữ nguyên trạng thái chưa merge trong phạm vi công việc này.
+- Không deploy Production, không sửa nhánh main, không sửa nhánh storefront.
+- Không làm thay đổi dữ liệu thật, secrets, auth, D1/R2 hoặc backend ngoài phạm vi được cho phép.
+- Nếu cần người dùng cung cấp quyền, thông tin hoặc quyết định không thể suy ra an toàn, hỏi một câu cụ thể; còn lại tiếp tục các việc độc lập có thể làm.
+
