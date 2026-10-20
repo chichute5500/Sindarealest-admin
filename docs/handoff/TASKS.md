@@ -61,3 +61,14 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - Run [39327473706](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706) thành công trên commit `e3c5c08e633bc73900343933dc3145720fbaefa2`; artifact [12222942329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329) tồn tại.
 - Phân loại chính xác: SHOT-001/REG-001 PASS cho pipeline local fixture; SHOT-002 vẫn BLOCKED; SHOT-003 chưa làm. Không được nâng trạng thái kiểm tra Preview hoặc so sánh giao diện.
 - Lý do không sửa giao diện: chưa có baseline thật và chưa xem trực quan ảnh mẫu. Chuyển route hiện tại cũng chưa đủ căn cứ do legacy records có SKU chưa xác minh.
+
+
+## Bằng chứng kiểm kê route/dữ liệu legacy — 2026-10-20
+
+Đã đọc `data/legacy-products.json` từ nhánh mục tiêu, blob `99080accf6dd155d24f899231f0b9ffe26bf9b0b`:
+
+- Có 235 bản ghi; cả 235 đều có `sku: null`, `skuVerified: false`; tất cả có `id` và `slug`.
+- Phân bố category: `sneakers` 62, `loafers` 52, `dress-shoes` 22, `wallets` 28, `belts` 22, `sandals` 22, `watch-straps` 21, `phone-cases` 6.
+- Cả 235 bản ghi có `price: null`; không dùng file fixture này để suy ra giá thực hay SKU thật.
+- Hệ quả: chưa thể triển khai route dạng `/sanpham/{category-slug}/{product-code}` một cách trung thực chỉ dựa trên fixture này. Cần đối chiếu nguồn dữ liệu sản phẩm thực/Preview được cấp quyền hoặc có bảng ánh xạ đã xác minh. Không tự suy SKU từ slug.
+- Bằng chứng test local được tải từ artifact [12222942329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329): 235 fixture products, 0 responsive horizontal overflow, 0 page errors, 0 HTTP errors, 0 console errors; các request mock và hai lỗi 503 kỳ vọng ở warranty lookup là fixture-only. Đây vẫn là test local, không phải Cloudflare Preview.
