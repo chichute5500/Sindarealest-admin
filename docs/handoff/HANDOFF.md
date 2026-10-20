@@ -158,3 +158,13 @@ Nếu không có quyền tạo service token/Secrets, không thể chụp baseli
 - Local-only fixture run produced 54 screenshots, 20 responsive cases and 91 interaction checks with zero overflow, console/page/HTTP errors, failed requests or hard failures. The captures stay artifact-only.
 - Required authorized action: configure a Preview-only Cloudflare Access Service Auth policy and supply `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` through GitHub Actions Secrets. Do not send their values in chat or commit them. Rerun capture and require a passing full live coverage audit before storefront UI or routing changes.
 - Deployed Preview commit correspondence is still **UNVERIFIED** because Access blocked before a storefront response/build marker could be inspected. No public UI/routing, admin, Production or D1/R2 data was changed in this checkpoint.
+
+
+## Latest verified checkpoint — 2026-10-20 02:28 UTC
+
+- Current source HEAD at the latest tested run: `8955a8aa5e1bd3bc99ef7cdb1456670908c01a5d`.
+- Source/test CI: [run 39358935696](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358935696) — PASS.
+- Visual workflow: [run 39358931718](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358931718), artifact [12236194129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39358931718/artifacts/12236194129). Local fixture checks/artifact upload passed; live Preview probe did not pass.
+- Live Access result: `accessServiceTokenConfigured=false`, `accessBlocked=true`, zero real screenshots and zero route/viewport probes. Separate read-only fetches of Preview aliases `3ed49bcc`, `9c82d72c`, and `95780a45` all returned `login_required`.
+- The screenshot manifest was refreshed at commit `605db27dfb8690647491417a37278d3d916e6a1a`; task ledger and test log were refreshed afterward. No public-site source code was changed during this checkpoint; no Production merge/deploy or data write occurred.
+- Continue with independent static source/test work, but do not invent product category/code URL mapping or claim visual completion without real product data and a real Preview baseline. To finish live visual tasks, configure the Preview-only Cloudflare Access Service Auth policy and repository secrets `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, then rerun baseline capture.
