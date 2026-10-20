@@ -1,5 +1,5 @@
 {
-  "status": "LOCAL_TESTS_PASS_PREVIEW_MISMATCH_VISUAL_AUDIT_INCOMPLETE",
+  "status": "LOCAL_CHECKS_PASS_PREVIEW_MISMATCH_FULL_UI_QA_INCOMPLETE",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
@@ -7,7 +7,7 @@
   "testedCommitSha": "994fefada36ebcc3d63da32e1fe7e01e532ef712",
   "capturedAt": "2026-10-21",
   "progressEstimatePercent": 43,
-  "progressBasis": "43% estimated by work stages after direct opening of the approved 12-screen reference and inspection of a real local Playwright login screenshot. Source checks and 16-image login matrix pass; remote Preview uses a mismatched source/layout. Only login screen has been visually inspected; authenticated modules and full visual acceptance remain open.",
+  "progressBasis": "43% estimated by work stages; local checks and 16 login-shell screenshots pass, but remote Preview source signature mismatch and authenticated module QA/full visual comparison remain incomplete.",
   "note": "Verified run 39464800722 on source commit 994fefada36ebcc3d63da32e1fe7e01e532ef712: project checks PASS, automated tests PASS, local responsive/theme login screenshot matrix PASS (16 images), remote Preview FAIL. The remote page had login markup but the topbar brand was visible in unauthenticated state, violating the expected source signature. This points to ADMIN_TEST_URL serving a different/stale UI or layout; exact secret value remains masked and is not logged. PR #111 remains OPEN/unmerged and has broad 260-file scope including storefront/backend; DO NOT MERGE. Direct visual review on 2026-10-21 opened the embedded approved reference (12 screen inventory) and viewed a real 390x844 light login screenshot. Login is visually a reasonable glass-card baseline but not accepted as full reference parity. A markup-copy edit attempt was blocked before writing; no source change was made from that attempt.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -282,11 +282,12 @@
     "No local checkout is available to verify git status and complete local branch diff."
   ],
   "nextActions": [
-    "Continue Admin-only UI improvements and tests using the existing design reference and preserve all APIs/auth/backend contracts.",
-    "Compare real Playwright screenshots with the approved reference screen by screen; do not claim parity from login-only screenshots.",
-    "Run npm run check, npm test, and the Playwright matrix after meaningful UI edits.",
-    "Correct ADMIN_TEST_URL to the current Admin Preview URL and use only authorized Cloudflare Access credentials; never log secrets or bypass access controls.",
-    "Keep PR #111 open and unmerged; do not modify the static website branch or main; do not deploy Production."
+    "Re-verify branch HEAD and PR #111 before edits.",
+    "Continue Admin-only UI work against the approved reference; preserve auth/API/backend contracts.",
+    "Add safe Playwright coverage for authenticated modules only when an authorized current-source Preview and safe fixtures exist.",
+    "Capture and compare real screenshots for all available views; do not claim visual parity from login-only images.",
+    "Run npm run check, npm test and Playwright after meaningful edits; update this JSON and LATEST-STATUS.md with verified commit evidence.",
+    "Keep PR #111 open and unmerged; do not change the static website branch or main; do not deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39464800722",
