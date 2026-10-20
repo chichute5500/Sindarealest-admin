@@ -161,7 +161,16 @@ assert.ok(storefrontHtml.includes("e.key==='Escape'&&$('#mobileNav').classList.c
 assert.match(live, /currentRouteMatches[\s\S]*audit\.routeChecks\.push[\s\S]*expectedPattern/,
   'A live product card that uses a non-canonical route must be recorded as an explicit route-check failure.');
 assert.match(live, /captureKeySections[\s\S]*sectionTargets/,
-  'Live capture must cover core page sections, including the six benefit tiles and footer.');
+  'Live capture must cover core page sections, including the six benefit tiles, contact section and footer.');
+assert.match(live, /\{ key: 'contact', selector: '#contact' \}/,
+  'The live audit must screenshot the actual contact screen independently from the rest of the footer.');
+assert.match(live, /async function captureAccountDrawer[\s\S]*account-menu-open/,
+  'The live audit must capture the mobile account menu state in both themes.');
+assert.match(live, /async function captureGalleryCartCheckoutStates[\s\S]*fullscreen-gallery[\s\S]*cart-with-item[\s\S]*checkout-form-open/,
+  'The live audit must capture full-screen product gallery, populated cart and checkout form without submitting an order.');
+assert.match(live, /commerceStatesComplete[\s\S]*fullscreenGalleryCount === 2[\s\S]*cartWithItemCount === 2[\s\S]*checkoutFormCount === 2/,
+  'Visual acceptance must require evidence for gallery/cart/checkout in Light and Dark mobile contexts.');
+
 assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
   'Live capture must directly open and reload a route derived from a real rendered product.');
 assert.match(live, /typeof reloadResponse\?\.status === 'function' \? reloadResponse\.status\(\) : null/,

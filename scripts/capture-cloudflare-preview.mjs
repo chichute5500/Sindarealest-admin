@@ -58,6 +58,7 @@ const audit = {
   contentChecks: [],
   heroSkuChecks: [],
   sectionChecks: [],
+  commerceStateChecks: [],
   productDetailChecks: [],
   brokenImages: [],
   accessServiceTokenConfigured: Object.keys(accessHeaders).length > 0,
@@ -332,6 +333,7 @@ const sectionTargets = [
   { key: 'featured', selector: '#featured' },
   { key: 'collections', selector: '#collections' },
   { key: 'products', selector: '#products' },
+  { key: 'contact', selector: '#contact' },
   { key: 'footer', selector: '#siteFooter' },
 ];
 async function captureKeySections(page, viewport, theme) {
@@ -359,6 +361,23 @@ async function captureMenuOpen(page, viewport, theme) {
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('#mobileNav')?.classList.contains('open'), null, { timeout: 5000 });
 }
+async function captureAccountDrawer(page, viewport, theme) {
+  const button = page.locator('#mobileAccountNav');
+  if (!await button.isVisible().catch(() => false)) {
+    audit.hardFailures.push('Account navigation is not visible at the required mobile viewport.');
+    audit.commerceStateChecks.push({ state: 'account-menu-open', status: 'FAIL', viewport: viewport.name, theme });
+    return;
+  }
+  await button.click();
+  await page.waitForFunction(() => document.querySelector('#accountDrawer')?.classList.contains('open'), null, { timeout: 5000 });
+  await captureLocator(page, '#accountDrawer', screenshotStem('state-account-menu', viewport, theme) + '.png', {
+    ...captureMeta(viewport, theme), captureType: 'state', state: 'account-menu-open',
+  });
+  audit.commerceStateChecks.push({ state: 'account-menu-open', status: 'PASS', viewport: viewport.name, theme });
+  await page.locator('#accountClose').click();
+  await page.waitForFunction(() => !document.querySelector('#accountDrawer')?.classList.contains('open'), null, { timeout: 5000 });
+}
+
 async function captureOrderExpanded(page, viewport, theme) {
   const button = page.locator('#orderDetailsToggle');
   const panel = page.locator('#orderDetailsPanel');
@@ -420,6 +439,7 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     kind: 'product-card-navigation', path: clicked.path, status: 'PASS', productTitleMatches: true,
     detailModalOpen: true, context: label, note: 'Path derived from an actual rendered Preview product card; no sample SKU assumed.',
   });
+  await captureGalleryCartCheckoutStates(page, viewport, theme, label, clicked.path);
 
   const directResponse = await navigate(page, new URL(clicked.path, origin).href);
   if (directResponse.blocked || !directResponse.response) {
@@ -568,7 +588,10 @@ async function main() {
               ...captureMeta(viewport, theme), captureType: 'full-page', state: 'default-home',
             });
             await captureKeySections(page, viewport, theme);
-            if (viewport.name === 'mobile-390') await captureMenuOpen(page, viewport, theme);
+            if (viewport.name === 'mobile-390') {
+              await captureMenuOpen(page, viewport, theme);
+              await captureAccountDrawer(page, viewport, theme);
+            }
             await captureOrderExpanded(page, viewport, theme);
             await captureProductDetailFlow(page, viewport, theme, label);
           }
@@ -595,11 +618,18 @@ async function main() {
   const homeFullPageCount = audit.screenshots.filter(shot => shot.captureType === 'full-page').length;
   const menuOpenCount = audit.screenshots.filter(shot => shot.state === 'menu-open').length;
   const orderExpandedCount = audit.screenshots.filter(shot => shot.state === 'order-details-expanded').length;
+  const accountMenuCount = audit.screenshots.filter(shot => shot.state === 'account-menu-open').length;
+  const fullscreenGalleryCount = audit.screenshots.filter(shot => shot.state === 'fullscreen-gallery').length;
+  const cartWithItemCount = audit.screenshots.filter(shot => shot.state === 'cart-with-item').length;
+  const checkoutFormCount = audit.screenshots.filter(shot => shot.state === 'checkout-form-open').length;
+  const commerceStatesComplete = accountMenuCount === 2 && fullscreenGalleryCount === 2 && cartWithItemCount === 2 && checkoutFormCount === 2
+    && audit.commerceStateChecks.filter(check => check.status === 'PASS').length >= 8;
   audit.coverage = {
     requiredViewportThemePairs, completedViewportThemePairs,
     homeViewportScreenshots: audit.screenshots.filter(shot => shot.captureType === 'viewport' && shot.state === 'default-home').length,
     homeFullPageCount, requiredSectionKeys: sectionTargets.map(section => section.key),
     sectionScreenshotCounts, requiredSectionScreenshotsComplete, menuOpenCount, orderExpandedCount,
+    accountMenuCount, fullscreenGalleryCount, cartWithItemCount, checkoutFormCount, commerceStatesComplete,
     productDetailContextsComplete, totalScreenshotCount: audit.screenshots.length,
   };
   audit.passed = audit.captureCompleted
@@ -608,7 +638,7 @@ async function main() {
     && audit.responsiveOverflowCount === 0
     && audit.contentChecks.length >= requiredViewportThemePairs && audit.contentChecks.every(check => check.status === 'PASS')
     && homeFullPageCount === 4 && requiredSectionScreenshotsComplete && menuOpenCount === 2 && orderExpandedCount === 4
-    && productDetailContextsComplete && audit.brokenImages.length === 0
+    && commerceStatesComplete && productDetailContextsComplete && audit.brokenImages.length === 0
     && audit.pageErrors.length === 0 && audit.consoleErrors.length === 0 && audit.httpErrors.length === 0
     && audit.failedRequests.length === 0 && audit.readOnlyViolations.length === 0 && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
@@ -617,7 +647,8 @@ async function main() {
     responsiveOverflowCount: audit.responsiveOverflowCount, consoleErrorCount: audit.consoleErrors.length,
     pageErrorCount: audit.pageErrors.length, httpErrorCount: audit.httpErrors.length, failedRequestCount: audit.failedRequests.length,
     brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
-    productDetailContextCount: audit.productDetailChecks.length, blockedExternalRequestCount: audit.blockedExternalRequests.length,
+    productDetailContextCount: audit.productDetailChecks.length, commerceStateCheckCount: audit.commerceStateChecks.length,
+    blockedExternalRequestCount: audit.blockedExternalRequests.length,
     readOnlyViolationCount: audit.readOnlyViolations.length, hardFailureCount: audit.hardFailures.length,
     requiredSectionScreenshotsComplete, productDetailContextsComplete,
   };
