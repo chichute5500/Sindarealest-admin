@@ -2217,6 +2217,14 @@ html.dark .sd-fullscreen-share{
   .sd-fullscreen-share{width:38px;height:38px}
   .sd-fullscreen-share svg{width:18px;height:18px}
 }
+
+/* Keep the hero product crisp on small screens: do not wash it out with multiply blending. */
+@media(max-width:760px){
+  #home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow(0 12px 20px rgba(0,22,42,.20))!important}
+  #home.hero:after{background:linear-gradient(90deg,rgba(237,247,255,.98) 0%,rgba(237,247,255,.94) 28%,rgba(237,247,255,.60) 48%,rgba(237,247,255,.02) 78%,rgba(237,247,255,0) 100%)}
+  html.dark #home.hero:after{background:linear-gradient(90deg,rgba(4,20,34,.97) 0%,rgba(4,20,34,.90) 28%,rgba(4,20,34,.52) 48%,rgba(4,20,34,.02) 78%,rgba(4,20,34,0) 100%)}
+  html.dark #home .hero-visual img{opacity:.98!important;mix-blend-mode:normal!important}
+}
 </style>
 
 </body>
