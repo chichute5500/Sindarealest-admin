@@ -148,3 +148,9 @@
 - First guarded end-capture run: [39424692332](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39424692332) did capture a passing live audit (66 screenshots, 8/8 viewport/theme pairs, all 12 route checks PASS, zero hard failures), but safely refused to archive because the branch advanced during the run.
 - The verifier expected source SHA `b20944686aa879fbd3324644c43e7323da903a22`; Cloudflare Pages had already deployed newer branch SHA `516d154c2a941fba1809eaf1c280f31ef123087a`. Exact-SHA guard worked as intended; no unverified end snapshot was saved.
 - Current retry is deliberately tagged `[capture-end-of-work]` against the current branch head so the deployment and workflow source can converge on the same SHA. Do not claim end archive or pixel comparison passed until the latest run confirms both.
+
+
+### Retry note — exact deployment SHA guard worked as intended
+- First end-capture attempt at source SHA `b20944686aa879fbd3324644c43e7323da903a22` was correctly blocked before archiving because Cloudflare's current Preview deployment had advanced to `516d154c2a941fba1809eaf1c280f31ef123087a`.
+- No end screenshots were archived and no pixel comparison was falsely reported as complete in that attempt. Live capture itself passed 66 screenshots and all 8/8 viewport/theme pairs, but deployment metadata did not match the run SHA.
+- The current branch head is `9d9b3fa8c6d221c4e2748f4fa674d459757d0d1c`. This commit requests a fresh guarded end capture against the latest branch revision; exact Preview SHA verification must pass before any end archive or pixel comparison is accepted.
