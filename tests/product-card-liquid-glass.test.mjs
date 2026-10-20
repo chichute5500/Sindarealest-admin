@@ -83,8 +83,8 @@ assert.doesNotMatch(welcomeDark, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in dark mode.");
 
 
-assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261020-3')}")
-  && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261020-3')}"),
+assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-1')}")
+  && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-1')}"),
   "Portrait viewports must use dedicated vertical wave compositions so the curved ribbons remain visible.");
 const lightMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light-mobile.svg", import.meta.url), "utf8");
 const darkMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark-mobile.svg", import.meta.url), "utf8");
