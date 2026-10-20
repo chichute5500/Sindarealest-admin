@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T01:23:00Z",
+  "updatedAtUtc": "2026-10-20T01:52:09Z",
   "status": "BLOCKED",
-  "note": "The direct, read-only GitHub Actions browser probe reached the supplied Pages Preview URL but Cloudflare Access redirected it to the Access login host. No live storefront screenshot was produced or archived. Original reference PNGs were visually inspected from an artifact. Local fixture captures remain separate from the blocked live Preview baseline.",
+  "note": "Latest workflow confirms the local fixture pipeline and reference image artifact pass, but the direct Cloudflare Pages Preview capture is blocked by Cloudflare Access (accessBlocked=true, captureCompleted=false, zero screenshots). No storefront UI change or live visual comparison is claimed.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -63,11 +63,11 @@
   "localAudit": {
     "status": "PASS",
     "scope": "local static preview with legacy fixture data; not Cloudflare Pages Preview",
-    "workflowRun": 39351043779,
-    "sourceCommit": "577087c4813450de089a3e1c1c47e53ee8625bf6",
-    "artifactId": 12233192824,
-    "artifactName": "sindarealest-liquid-glass-preview-265",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824",
+    "workflowRun": 39355499185,
+    "sourceCommit": "fa7445b74661faf260c32b3ab32dfa85e3538e78",
+    "artifactId": 12235310623,
+    "artifactName": "sindarealest-liquid-glass-preview-273",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623",
     "referenceImagesIncluded": true,
     "productFixtureCount": 235,
     "screenshotsCaptured": 54,
@@ -80,15 +80,15 @@
     "failedRequests": 0,
     "hardFailures": 0,
     "passed": true,
-    "caveat": "Local fixture audit only. The canonical start/end screenshot directories remain unfilled until a direct live Preview capture succeeds."
+    "caveat": "Local fixture audit only. Live Preview probe was blocked by Cloudflare Access; canonical start/end screenshot directories remain unfilled."
   },
   "liveProbe": {
-    "workflowRun": 39352778226,
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226",
-    "artifactId": 12232894712,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226/artifacts/12232894712",
-    "sourceCommit": "3942f9c2b5a67d2464679f3b437f20bc398b443c",
-    "attemptedAtUtc": "2026-10-20T01:22:00Z",
+    "workflowRun": 39355499185,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185",
+    "artifactId": 12235310623,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623",
+    "sourceCommit": "fa7445b74661faf260c32b3ab32dfa85e3538e78",
+    "attemptedAtUtc": "2026-10-20T01:52:04Z",
     "sourceKind": "cloudflare-pages-preview-live-read-only",
     "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
     "status": "BLOCKED_ACCESS_GATE",
@@ -99,6 +99,6 @@
     "routeProbeCount": 0,
     "readOnlyViolations": 0,
     "noWriteRequestsSent": true,
-    "note": "The root request redirected to the Cloudflare Access login host before any storefront content rendered. No screenshot is claimed."
+    "note": "The latest Playwright probe classified the Cloudflare Access redirect before storefront content rendered. The job's continue-on-error behavior permits diagnostics to upload; it does not indicate a live Preview pass."
   }
 }
