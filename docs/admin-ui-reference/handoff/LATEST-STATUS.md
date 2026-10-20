@@ -1,12 +1,12 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
 **Trạng thái tổng thể:** `IN PROGRESS — AUTHENTICATED UI AND REFERENCE COMPARISON BLOCKED/PENDING`  
-**Ước tính tiến độ:** 35% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.  
+**Ước tính tiến độ:** 38% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.  
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
-**HEAD hiện tại của nhánh ADMIN (đã xác minh):** `1b41349971367b51d16091ccf4a3d1d4a4db2bb6` (commit lưu bằng chứng/handoff)  
-**Commit code ADMIN đã kiểm thử gần nhất:** `7c742407530dbcf2f9407d6a82c48c70620b98a7`  
+**HEAD nhánh ADMIN trước lần cập nhật handoff này:** `e34e783da27b5cc54f6223d955f8db50ca9a2ac7` (xác minh qua PR #111 và Actions; commit tài liệu)  
+**Commit code ADMIN gần nhất:** `7c742407530dbcf2f9407d6a82c48c70620b98a7` (so sánh tới HEAD e34 cho thấy các commit sau chỉ thay đổi handoff/evidence, không đổi source)  
 **Kết quả kiểm thử:** `npm run check`, `npm test` và ma trận Playwright 16 ảnh PASS trên commit code nêu trên; Preview bị chặn bởi Cloudflare Access.  
 **Cloudflare Production deployment:** `NOT PERFORMED`
 
@@ -141,3 +141,44 @@ Phần này là trạng thái mới hơn và được ưu tiên hơn các ghi ch
 8. Trước khi kết luận, kiểm tra diff đầy đủ và bảo đảm không sửa storefront; không merge, không deploy Production.
 
 **Handoff mới nhất:** chưa có thay đổi source code trong phiên cập nhật trạng thái này; phiên này chỉ xác minh bằng chứng và ghi lại tiến độ để phiên sau tiếp tục đúng điểm.
+
+
+---
+
+## CẬP NHẬT TIẾP TỤC — 2026-10-20
+
+### 1. Đã mở được ảnh tham chiếu chuẩn
+- Lấy được nội dung thực của `docs/admin-ui-reference/admin-mobile-reference.html` qua GitHub Contents API; HTML có PNG nhúng dạng base64. Đã render và xem ảnh mockup 1024×1536 thành công.
+- Ảnh tham chiếu gồm 12 màn hình mobile: đăng nhập, tổng quan, sản phẩm, thêm/sửa sản phẩm, quản lý ảnh, đơn hàng, chi tiết đơn, khách hàng, bảo hành/yêu cầu hỗ trợ, cài đặt, sao lưu/khôi phục, nhật ký hoạt động.
+- Hướng hình ảnh xác nhận: nền xanh băng/ngọc trai có texture da cá sấu rất nhẹ; thẻ Liquid Glass sáng, viền sáng mảnh, bóng mềm, chữ navy; bố cục mobile-first; thanh điều hướng dưới 5 mục gồm Tổng quan, Sản phẩm, Đơn hàng, Khách hàng, Khác.
+- **Giới hạn:** đã xem ảnh mục tiêu, nhưng chưa thể so sánh pixel/visual trực tiếp với screenshot app hiện hành do connector không cung cấp bytes của PNG screenshot và browser automation không khởi chạy được trong phiên này. Không tuyên bố đã hoàn tất vòng lặp screenshot-comparison.
+
+### 2. Inventory source ADMIN đã xác minh
+- File source: `public/admin/index.html`, blob SHA `da564401ea0825daa1c7be64ff62c0b8e013a64e`.
+- Có 6 view chính: `dashboard`, `products`, `orders`, `customers`, `warranties`, `settings`.
+- Các hàm chính hiện hữu gồm dashboard, product list/editor/gallery/upload optimization, orders, customers, warranties, settings, notifications, watermark settings, price visibility, backup/restore.
+- Các API call từ source gồm products, settings, orders, customers, warranties, audit logs, AI description, session/login/logout, push subscriptions, reset SKUs, upload, backup và restore.
+- Đã xác minh các file API `functions/api/admin/customers.js`, `audit-logs.js`, `ai-description.js`, `session.js`, `login.js`, `logout.js`, `push-subscriptions.js`, `upload.js`, `products.js`, `orders.js`, `warranties.js` và `public/admin-sw.js` tồn tại trên nhánh. Đây là kiểm kê source, chưa phải kiểm thử các endpoint đang chạy.
+- Source chưa được chỉnh sửa trong lượt audit này.
+
+### 3. Kiểm tra test và SHA
+- Run kiểm tra mới nhất: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39443233585
+- Commit run: `e34e783da27b5cc54f6223d955f8db50ca9a2ac7`; `Validate source and tests` kết thúc SUCCESS, gồm project integrity và automated tests.
+- Compare từ source SHA `7c742407530dbcf2f9407d6a82c48c70620b98a7` tới `e34e783da27b5cc54f6223d955f8db50ca9a2ac7` chỉ cho thấy thay đổi tài liệu handoff và 16 PNG evidence; không có thay đổi source app. Do đó 16 ảnh Playwright cũ vẫn phản ánh cùng source code, nhưng chỉ cover login shell chưa đăng nhập.
+- Không có Playwright run mới sau các commit chỉ cập nhật tài liệu. Không cần lặp lại 16 ảnh chỉ vì handoff đổi; chạy lại khi source/test thay đổi hoặc khi cần chụp các view đã đăng nhập.
+
+### 4. Cảnh báo an toàn PR — KHÔNG MERGE
+- PR #111: https://github.com/chichute5500/Sindarealest-admin/pull/111
+- Trạng thái: OPEN, chưa merge; base branch là `main`, head branch là `feature/admin-isolated-handoff-2026-10-20`.
+- GitHub API ghi nhận 299 commits, 115 files changed, +9,580 / −352. Danh sách file bao gồm `public/index.html`, `public/admin/index.html`, `functions/**`, `migrations/**`, workflow và các file website tĩnh.
+- Vì nhánh ADMIN được tách từ nhánh website tĩnh, PR hiện tại không được coi là PR chỉ chứa ADMIN. **Không merge, không đổi base, không cherry-pick và không đồng bộ nhánh** trong phạm vi này. Trước mọi quyết định tích hợp, phải phân tích merge-base và diff thực tế, tách phạm vi ADMIN khỏi các thay đổi storefront/backend.
+- Chưa có local checkout trong môi trường này nên chưa xác minh được `git status` hoặc full diff cục bộ; đánh giá file/PR hiện chỉ qua GitHub API.
+
+### 5. Tiến độ và bước tiếp theo
+- Tiến độ ước tính tăng từ 35% lên **38%** vì đã đọc được ảnh chuẩn, lập inventory route/API và xác định rủi ro PR. Đây không phải tỷ lệ code hoàn tất.
+- Tiếp theo:
+  1. Lập bảng đối chiếu 12 màn hình tham chiếu với markup/route/module thật; không tạo module giả.
+  2. Giải quyết đường kiểm thử có quyền truy cập: Preview hiện bị Cloudflare Access chặn; không bypass Access, không dùng production credentials. Browser automation không chạy trong phiên do wallet của dịch vụ automation thiếu số dư; chưa có browser run mới.
+  3. Tìm cách lấy screenshot binary từ artifact/HTML viewer để đối chiếu thật. Nếu không lấy được, đánh dấu BLOCKED, không đoán ảnh app.
+  4. Chỉ sửa ADMIN khi có sai lệch cụ thể, có danh sách file trước khi sửa, rồi chạy source checks + Playwright + screenshot cùng điều kiện.
+  5. Tiếp tục bảo vệ storefront; không merge PR #111, không deploy Production.
