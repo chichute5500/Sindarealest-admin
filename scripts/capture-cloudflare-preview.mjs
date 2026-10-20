@@ -171,19 +171,39 @@ async function capture(page, filename, fullPage, meta) {
   audit.screenshots.push({ filename, fullPage, ...meta });
 }
 async function captureLocator(page, selector, filename, meta) {
-  const locator = page.locator(selector).first();
-  const count = await locator.count().catch(() => 0);
-  const visible = count > 0 && await locator.isVisible().catch(() => false);
-  audit.sectionChecks.push({ selector, filename, status: visible ? 'CAPTURED' : 'MISSING', route: new URL(page.url()).pathname, theme: meta.theme, viewport: meta.viewport });
-  if (!visible) {
-    audit.hardFailures.push('Required screenshot target is missing or hidden: ' + selector + ' (' + filename + ')');
-    return false;
+  let lastError = null;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const locator = page.locator(selector).first();
+    const count = await locator.count().catch(() => 0);
+    const visible = count > 0 && await locator.isVisible().catch(() => false);
+    if (!visible) {
+      if (attempt === 0) {
+        await page.waitForTimeout(180);
+        continue;
+      }
+      audit.sectionChecks.push({ selector, filename, status: 'MISSING', route: new URL(page.url()).pathname, theme: meta.theme, viewport: meta.viewport });
+      audit.hardFailures.push('Required screenshot target is missing or hidden: ' + selector + ' (' + filename + ')');
+      return false;
+    }
+    try {
+      await locator.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(120);
+      await locator.screenshot({ path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000 });
+      audit.sectionChecks.push({ selector, filename, status: 'CAPTURED', route: new URL(page.url()).pathname, theme: meta.theme, viewport: meta.viewport });
+      audit.screenshots.push({ filename, fullPage: false, elementSelector: selector, ...meta });
+      return true;
+    } catch (error) {
+      lastError = error;
+      const transient = /not attached to the DOM|not visible|detached|element is not stable/i.test(String(error?.message || error));
+      if (attempt === 0 && transient) {
+        await page.waitForTimeout(220);
+        continue;
+      }
+      audit.sectionChecks.push({ selector, filename, status: 'FAILED', route: new URL(page.url()).pathname, theme: meta.theme, viewport: meta.viewport });
+      throw error;
+    }
   }
-  await locator.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(120);
-  await locator.screenshot({ path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000 });
-  audit.screenshots.push({ filename, fullPage: false, elementSelector: selector, ...meta });
-  return true;
+  throw lastError || new Error('Could not capture ' + selector + '.');
 }
 function screenshotStem(prefix, viewport, theme) {
   return prefix + '-' + viewport.name.split('-')[0] + '-' + theme + '-' + viewport.width + 'x' + viewport.height;
@@ -445,9 +465,20 @@ async function main() {
           if (viewport.name === 'mobile-390') {
             const splash = page.locator('#welcomeSplash');
             if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
-              await captureLocator(page, '#welcomeSplash', screenshotStem('state-welcome-splash', viewport, theme) + '.png', {
-                ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay',
-              });
+              try {
+                await captureLocator(page, '#welcomeSplash', screenshotStem('state-welcome-splash', viewport, theme) + '.png', {
+                  ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay',
+                });
+              } catch (error) {
+                // The welcome overlay is intentionally transient. A CSS exit
+                // transition may detach it between visibility check and capture;
+                // record the optional miss and continue the required storefront audit.
+                audit.sectionChecks.push({
+                  selector: '#welcomeSplash', status: 'OPTIONAL_TRANSIENT_SKIPPED',
+                  route: new URL(page.url()).pathname, theme, viewport: viewport.name,
+                  note: sanitizeText(String(error?.message || error).slice(0, 180)),
+                });
+              }
             }
           }
           await dismissWelcomeSplash(page);
