@@ -39,10 +39,14 @@ const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart
 const finalThemeCss = html.slice(html.lastIndexOf("/* Organic liquid-glass wave assets"));
 assert.ok(finalBackgroundStart > html.indexOf("/* Reference-match finishing pass"),
   "The softened background calibration must be the final authoritative rule, not an unused earlier selector.");
-assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(225,241,255,\.52\),rgba\(211,231,249,\.46\) 52%,rgba\(237,247,255,\.54\)\)/,
-  "Light background must provide a soft frosted veil over the newly generated glacial gradient backdrop.");
-assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(3,20,36,\.68\),rgba\(7,31,51,\.63\) 52%,rgba\(3,17,30,\.72\)\)/,
-  "Dark background must provide a deep navy translucent veil over the newly generated sapphire gradient backdrop.");
+assert.match(finalBackgroundCss, /linear-gradient\(145deg,transparent 14%,rgba\(255,255,255,\.72\) 22%,rgba\(255,255,255,\.16\) 28%,transparent 38%\)/,
+  "Light background must preserve a pearlescent satin highlight crossing the base SVG.");
+assert.match(finalBackgroundCss, /linear-gradient\(31deg,transparent 20%,rgba\(128,183,220,\.20\) 31%,rgba\(255,255,255,\.62\) 36%,transparent 48%\)/,
+  "Light background must add a diagonal ice-blue silk edge without flattening the SVG.");
+assert.match(finalBackgroundCss, /linear-gradient\(145deg,transparent 14%,rgba\(188,222,245,\.18\) 22%,rgba\(255,255,255,\.04\) 28%,transparent 38%\)/,
+  "Dark background must preserve subtle sapphire-satin highlights.");
+assert.match(finalBackgroundCss, /linear-gradient\(31deg,transparent 20%,rgba\(56,121,164,\.25\) 31%,rgba\(218,240,255,\.22\) 36%,transparent 48%\)/,
+  "Dark background must add a diagonal blue-steel ribbon over the navy SVG.");
 assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
   "Light theme must use the final cache-versioned pearl-glass SVG background.");
 assert.ok(finalThemeCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}"),
