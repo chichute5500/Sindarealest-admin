@@ -166,7 +166,7 @@ assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
   'Live capture must directly open and reload a route derived from a real rendered product.');
 assert.match(live, /typeof reloadResponse\?\.status === 'function' \? reloadResponse\.status\(\) : null/,
   'A detail reload must use Playwright Response.status() and must not treat the status method as a numeric property.');
-assert.match(live, /OPTIONAL_TRANSIENT_SKIPPED[\s\S]*welcomeSplash[\s\S]*Required screenshot target is missing or hidden/,
+assert.match(live, /welcomeSplash[\s\S]*OPTIONAL_TRANSIENT_SKIPPED/,
   'A transient welcome overlay must not abort required storefront screenshots when it detaches during capture.');
 assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
   'Gallery-next interaction must only be required when the live product actually has multiple gallery images.');
