@@ -46,7 +46,7 @@ jobs:
           echo "PASS: correct Pages project confirmed; Production branch is main; target branch is fix/liquid-glass-audit-2026-10-19."
 
       - name: Install project dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       - name: Run project integrity checks and tests before deployment
         run: |
