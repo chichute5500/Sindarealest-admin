@@ -381,13 +381,8 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     audit.sectionChecks.push({ selector: '#detailNext', status: 'NOT APPLICABLE', route: clicked.path, theme, viewport: viewport.name, note: 'Selected live product exposes one image or no visible next control.' });
   }
 
-  const expectedReloadUrl = new URL(clicked.path, origin).href;
-  const reloadResponseObserved = page.waitForResponse(response =>
-    response.request().isNavigationRequest() && response.url() === expectedReloadUrl,
-  { timeout: 45000 }).catch(() => null);
   const reloadResponse = await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
-  const observedReloadResponse = await reloadResponseObserved;
-  const reloadStatus = reloadResponse?.status() ?? observedReloadResponse?.status() ?? null;
+  const reloadStatus = typeof reloadResponse?.status === 'function' ? reloadResponse.status() : null;
   await waitForStorefront(page, label + '-reload');
   await waitForProductDetail(page);
   const reloadState = await page.evaluate(() => ({
