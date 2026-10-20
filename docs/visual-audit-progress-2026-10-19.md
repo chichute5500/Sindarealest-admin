@@ -570,3 +570,17 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Manifest đã được cập nhật để ghi run 39411977810, artifact 12260286017, 46 ảnh live diagnostic, coverage 8/8, 4 lỗi URL, trạng thái API 401 và Access service token thành công. Các thư mục chuẩn giữ nguyên rỗng.
 - Bước cần người dùng hỗ trợ duy nhất để vượt blocker API: thay/đặt secret `CLOUDFLARE_PAGES_READ_TOKEN` bằng token mới hợp lệ, giới hạn đúng `Account / Cloudflare Pages / Read` trong tài khoản chứa project; đặt explicit variable `CLOUDFLARE_ACCOUNT_ID` theo cùng tài khoản. Không gửi token vào chat. Sau đó chạy lại workflow trực quan để lấy deployment ID/branch/SHA; chỉ sửa đường dẫn runtime nếu log xác minh chứng minh deployment hiện tại là đúng branch/commit.
 - Production không merge/deploy, không sửa Access policy Production, không chạy migration hay ghi dữ liệu thật.
+
+
+## Cập nhật xác minh sau mốc 11:06 UTC — 2026-10-20 17:08 ICT (10:08 UTC)
+
+- **PR HEAD hiện tại:** `d646934407daee83b3bdd58240e23506e7442305`; PR #108 vẫn OPEN, chưa merge, 81 file thay đổi / 403 commits. So với code audit `5f181d994bf0edb7a4e553c64ba97cddf55e31c4`, commit này chỉ cập nhật hồ sơ tiến độ, hướng dẫn Preview và manifest; không thay runtime HTML/CSS.
+- **Validate source/tests PASS** trên HEAD hiện tại: [run 39412627375](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39412627375).
+- **Admin Preview Playwright PASS, 2/2** trên HEAD hiện tại: [run 39412627328](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39412627328).
+- **Live visual audit gần nhất** vẫn là [run 39411977810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810), [artifact 12260286017](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810/artifacts/12260286017), chạy source commit `5f181d994bf0edb7a4e553c64ba97cddf55e31c4`: workflow outer SUCCESS nhưng JSON audit `passed=false`, 46 ảnh; 8/8 viewport-theme pairs; đủ ảnh 7 section; menu-open=2, order-expanded=4; 4/4 product route checks FAIL.
+- **Live Preview status:** `accessBlocked=false`, `accessServiceTokenConfigured=true`, 0 overflow, console/page/same-origin HTTP errors, failed requests, broken image contexts và read-only violations. Đây không xoá bỏ lỗi route.
+- **Deployment verifier:** `API_AUTHENTICATION_REJECTED`, HTTP 401; Cloudflare không chấp nhận `CLOUDFLARE_PAGES_READ_TOKEN`. Chưa xác minh được deployment ID/branch/SHA nên chưa phân biệt được runtime route bug với Preview chạy source cũ.
+- **Route mismatch:** live click path `/san-pham/sneakers-26-41-a`; code/test kỳ vọng canonical `/sanpham/{category-slug}/{product-key}`. Không sửa runtime route chỉ để làm xanh Playwright trước khi verifier chứng minh Preview đang chạy đúng SHA.
+- **Ảnh chuẩn:** baseline BLOCKED, end-of-work NOT TESTED, pixel diff NOT TESTED. Artifact 12260286017 chỉ là bằng chứng chẩn đoán; không chép vào thư mục chuẩn.
+- **Tiến độ ước tính giữ ở 62%** cho audit/QA tổng thể. Chưa đạt 100% vì deployment metadata, route checks, live acceptance, baseline/end và visual review vẫn chưa đạt.
+

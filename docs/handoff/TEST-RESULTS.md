@@ -19,6 +19,18 @@ Không dùng kết quả của commit cũ để tuyên bố commit mới đã PA
 
 ## Kết quả đã xác minh
 
+### 2026-10-20 17:08 ICT (10:08 UTC) — CI trên HEAD hiện tại và live audit cuối cùng
+
+- Branch `fix/liquid-glass-audit-2026-10-19`; HEAD `d646934407daee83b3bdd58240e23506e7442305`. Commit code/runtime đã chạy visual audit gần nhất: `5f181d994bf0edb7a4e553c64ba97cddf55e31c4`; commits kế tiếp trước HEAD chỉ cập nhật docs/manifest, không sửa storefront runtime.
+- Source/test validation: **PASS** — [run 39412627375](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39412627375).
+- Admin Preview Playwright: **PASS, 2/2** — [run 39412627328](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39412627328).
+- Live visual run: [39411977810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810), [artifact 12260286017](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810/artifacts/12260286017). Outer workflow SUCCESS is diagnostic-only; actual `live-preview/visual-audit.json` is `passed=false`.
+- Actual live coverage: 46 screenshots; 8/8 viewport-theme pairs; 7 required sections have 4 each; menu-open=2; order-expanded=4; 4/4 product route checks FAIL on `/san-pham/sneakers-26-41-a` vs expected `/sanpham/{category-slug}/{product-key}`.
+- Responsive/runtime signal: overflow=0; console/page/same-origin HTTP errors=0; failed requests=0; broken image contexts=0; read-only violations=0; Cloudflare Access passed.
+- Deployment metadata verifier: **API_AUTHENTICATION_REJECTED, HTTP 401**. The secret `CLOUDFLARE_PAGES_READ_TOKEN` is rejected by Cloudflare, so alias-to-deployment branch/SHA remains unverified.
+- Canonical screenshots: baseline BLOCKED / end NOT TESTED / pixel diff NOT TESTED. Production unchanged; PR #108 remains open/unmerged and too broad to merge wholesale.
+
+
 ### 2026-10-20 04:43–04:45 UTC — regression validation, screenshot workflow and Preview probe
 
 - Branch: `fix/liquid-glass-audit-2026-10-19`; validated commit `0c5b436c114e094f1ee7ae5a44a4c54b3f79692b`.
