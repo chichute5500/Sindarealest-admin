@@ -918,5 +918,36 @@
     "attemptedWrites": [],
     "unexpectedApiPaths": [],
     "scope": "LOCAL SOURCE + READ-ONLY FIXTURE UI; NOT REAL AUTHENTICATED BACKEND"
+  },
+  "handoffUpdate": {
+    "updatedAt": "2026-10-21T02:50:00+07:00",
+    "type": "DOCUMENTATION_ONLY",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "sourceCodeChanged": false,
+    "testsRunInThisUpdate": false,
+    "userRequest": "Record the latest guidance about copying the full Master Prompt into a new chat and create a concise handoff prompt.",
+    "completed": [
+      "Added Master Prompt section 18.9 describing how a new chat should start and verify actual repository/tool access.",
+      "Added handoff status note explaining the guidance given and current safety boundaries.",
+      "Created PROMPT-NEXT-CHAT.md with instructions to read current handoff files, verify GitHub state, continue actual work, and avoid repeating verified tests."
+    ],
+    "notVerifiedOrNotDone": [
+      "No new application source edits were made.",
+      "No tests were run as part of this documentation update.",
+      "No new screenshot was captured.",
+      "No merge or Production deployment was performed."
+    ],
+    "constraints": {
+      "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
+      "protectedBranches": [
+        "fix/liquid-glass-audit-2026-10-19",
+        "main"
+      ],
+      "pullRequestsRemainUnmerged": [
+        111,
+        108
+      ],
+      "productionDeployment": "NOT_PERFORMED"
+    }
   }
 }
