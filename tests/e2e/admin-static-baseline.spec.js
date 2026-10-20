@@ -382,22 +382,80 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     const filePath = join(screenshotDir, filename);
     const measurement = await page.evaluate(() => {
       const rawClosingTagNodes = [];
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const rawClosingTagPseudoContent = [];
+      // Search the full document tree, not only body text. Range geometry tells us
+      // whether the exact token is actually painted; parent boxes alone can miss
+      // text that overflows a zero-sized/positioned wrapper.
+      const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT);
       while (walker.nextNode()) {
-        const value = walker.currentNode.nodeValue || '';
-        if (!value.includes('</div>')) continue;
-        const parent = walker.currentNode.parentElement;
-        const rect = parent?.getBoundingClientRect();
-        if (rect && rect.width > 0 && rect.height > 0 && getComputedStyle(parent).visibility !== 'hidden' && getComputedStyle(parent).display !== 'none') {
-          rawClosingTagNodes.push({
-            text: value.trim().slice(0, 120),
-            tag: parent.tagName,
-            id: parent.id || null,
-            className: typeof parent.className === 'string' ? parent.className.slice(0, 120) : null,
-            outerHTML: parent.outerHTML.slice(0, 320),
-            x: Math.round(rect.x),
-            y: Math.round(rect.y)
-          });
+        const node = walker.currentNode;
+        const value = node.nodeValue || '';
+        const parent = node.parentElement;
+        if (!parent || parent.closest('script,style,template,noscript')) continue;
+        let index = value.indexOf('</div>');
+        while (index >= 0) {
+          const range = document.createRange();
+          range.setStart(node, index);
+          range.setEnd(node, index + 6);
+          const paintedRects = [...range.getClientRects()].filter(rect =>
+            rect.width > 0 && rect.height > 0 &&
+            rect.right > 0 && rect.left < window.innerWidth &&
+            rect.bottom > 0 && rect.top < window.innerHeight
+          );
+          let visible = true;
+          for (let element = parent; element; element = element.parentElement) {
+            const style = getComputedStyle(element);
+            if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) {
+              visible = false;
+              break;
+            }
+          }
+          if (visible && paintedRects.length) {
+            const rect = paintedRects[0];
+            rawClosingTagNodes.push({
+              token: '</div>',
+              text: value.trim().slice(0, 120),
+              tag: parent.tagName,
+              id: parent.id || null,
+              className: typeof parent.className === 'string' ? parent.className.slice(0, 120) : null,
+              outerHTML: parent.outerHTML.slice(0, 320),
+              x: Math.round(rect.x),
+              y: Math.round(rect.y)
+            });
+          }
+          index = value.indexOf('</div>', index + 6);
+        }
+      }
+
+      // CSS-generated content is not represented by SHOW_TEXT nodes, so inspect
+      // visible pseudo-elements separately and retain a safe diagnostic signature.
+      for (const element of document.querySelectorAll('body *')) {
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0 ||
+            rect.right <= 0 || rect.left >= window.innerWidth ||
+            rect.bottom <= 0 || rect.top >= window.innerHeight) continue;
+        let visible = true;
+        for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+          const style = getComputedStyle(ancestor);
+          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) {
+            visible = false;
+            break;
+          }
+        }
+        if (!visible) continue;
+        for (const pseudo of ['::before', '::after', '::marker']) {
+          const content = getComputedStyle(element, pseudo).content || '';
+          if (content.includes('</div>') && content !== 'none' && content !== 'normal') {
+            rawClosingTagPseudoContent.push({
+              pseudo,
+              content: content.slice(0, 120),
+              tag: element.tagName,
+              id: element.id || null,
+              className: typeof element.className === 'string' ? element.className.slice(0, 120) : null,
+              x: Math.round(rect.x),
+              y: Math.round(rect.y)
+            });
+          }
         }
       }
       return {
@@ -407,10 +465,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
         theme: document.documentElement.dataset.adminTheme || null,
         lang: document.documentElement.lang,
-        rawClosingTagNodes: rawClosingTagNodes.slice(0, 10)
+        rawClosingTagNodes: rawClosingTagNodes.slice(0, 10),
+        rawClosingTagPseudoContent: rawClosingTagPseudoContent.slice(0, 10)
       };
     });
-    expect(measurement.rawClosingTagNodes, name + ' must not display raw closing-tag text').toEqual([]);
+    expect(measurement.rawClosingTagNodes, name + ' must not render raw closing-tag text in the viewport').toEqual([]);
+    expect(measurement.rawClosingTagPseudoContent, name + ' must not render closing-tag text through CSS pseudo-elements').toEqual([]);
     metrics.push({ screen: name, ...variant, ...measurement, ...extra });
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
     expect(measurement.horizontalOverflow, name + ' should not overflow horizontally at ' + variant.viewport.width + 'px').toBe(false);
