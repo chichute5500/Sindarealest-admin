@@ -294,10 +294,10 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39447109288",
-  "branchHeadSha": "ed27fc5c67152ba900c8b10f5acd358dae8e8096",
+  "branchHeadSha": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "latestVerifiedAt": "2026-10-20T15:20:00Z",
   "latestVerifiedSourceCommit": "7c742407530dbcf2f9407d6a82c48c70620b98a7",
-  "currentAdminBranchHead": "ed27fc5c67152ba900c8b10f5acd358dae8e8096",
+  "currentAdminBranchHead": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "latestVerificationSummary": {
     "latestSourceChecksRunId": 39447109288,
     "latestSourceChecksRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39447109288",
@@ -330,13 +330,14 @@
       "merged": false,
       "base": "main",
       "head": "feature/admin-isolated-handoff-2026-10-20",
-      "commits": 318,
-      "changedFiles": 223,
-      "mergeAllowed": false
+      "commits": 323,
+      "changedFiles": 224,
+      "mergeAllowed": false,
+      "snapshotNote": "Live PR metadata was queried immediately before this JSON update; the update itself adds one documentation-only commit. Re-query PR #111 at the start of the next session."
     },
     "productionDeployment": "NOT_PERFORMED"
   },
-  "branchHeadBeforeHandoffUpdate": "ed27fc5c67152ba900c8b10f5acd358dae8e8096",
+  "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
