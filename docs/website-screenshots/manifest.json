@@ -6,19 +6,19 @@
   "productionUrl": "https://sindarealest2.pages.dev",
   "updatedAtUtc": "2026-10-19T21:25:18Z",
   "status": "BLOCKED",
-  "note": "Timestamp above records the initial manifest entry, not a screenshot capture time. No website screenshots have been verified or stored yet.",
+  "note": "No screenshot files are being claimed as captured. The two required stage directories are present with .gitkeep placeholders only. Read-only fetch of the home route and both old/new product-route probes again returned login_required; no authorized browser session is available in this run.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
       "directory": "docs/website-screenshots/start-of-work/",
       "images": [],
-      "reason": "The provided Cloudflare Preview returned login_required during read-only fetch. No browser session authorized to access it; local fixture screenshots must not be represented as Preview baseline."
+      "reason": "Retried read-only fetch on 2026-10-20 for /, /san-pham/sd2929, and /sanpham/giaytay/sd2929; all returned login_required. The directory contains a placeholder only. Do not substitute local fixture captures."
     },
     "end-of-work": {
       "status": "NOT TESTED",
       "directory": "docs/website-screenshots/end-of-work/",
       "images": [],
-      "reason": "No code-level website change has been made; end screenshots require a valid baseline and accessible Preview."
+      "reason": "No storefront HTML/CSS/JS change has been made. Directory contains a placeholder only."
     }
   },
   "referenceImages": {
@@ -46,7 +46,9 @@
   ],
   "comparisonStatus": "NOT TESTED",
   "remainingBlockers": [
-    "Authorized read-only access to the supplied Cloudflare Preview is required for real Preview screenshots and route checks.",
-    "The original reference PNGs still need to be opened and visually inspected with an image-capable tool."
-  ]
+    "Authorized read-only access to the supplied Cloudflare Preview is required for real Preview screenshots and route checks. Fresh fetch of the homepage, existing /san-pham/sd2929, and requested-style /sanpham/giaytay/sd2929 returned login_required.",
+    "The original reference PNGs still need to be opened and visually inspected with an image-capable tool.",
+    "Current visual workflow archives screenshots of a local static preview using fixture data, not the deployed Cloudflare Preview; do not treat that output as a real Preview baseline."
+  ],
+  "lastAccessCheckUtc": "2026-10-20T00:50:00Z"
 }
