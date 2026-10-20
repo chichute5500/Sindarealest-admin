@@ -19,6 +19,13 @@ assert.ok(heroSync.includes("sku-not-found"),
 assert.ok(heroSync.includes("image-missing"),
   "The hero must separately mark a matched SKU that has no image.");
 
+const visualAudit = readFileSync(new URL("../scripts/capture-liquid-glass-preview.mjs", import.meta.url), "utf8");
+assert.ok(visualAudit.includes("hero-selects-exact-sd-gl052-or-fails-closed"),
+  "The read-only visual audit must validate exact SKU image selection and allow a safe missing-SKU fixture state.");
+assert.ok(visualAudit.includes("startup.heroImage.status === 'sku-not-found'"),
+  "The read-only visual audit must expect the hero to hide instead of using a guessed fixture image when SD-GL052 is unavailable.");
+assert.ok(visualAudit.includes("startup.heroImage.source === expectedHeroImage"),
+  "The read-only visual audit must compare the rendered hero source to the exact target product image.");
 const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the hero product crisp on small screens"));
 assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
   "The hero product should retain its real colors and use a natural drop shadow rather than color-altering blending.");

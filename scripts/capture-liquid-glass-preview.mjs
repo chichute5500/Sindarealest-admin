@@ -445,14 +445,46 @@ try {
       dark: document.documentElement.classList.contains('dark'),
       mode: document.documentElement.dataset.themeMode || 'auto',
       cards: document.querySelectorAll('#catalogGrid .product-card').length,
-      heroImage: (() => { const img = document.querySelector('#heroProductImage'); return { present: !!img, loaded: !!img && img.complete && img.naturalWidth > 0, source: img?.getAttribute('src') || '' }; })(),
+      heroImage: (() => {
+        const img = document.querySelector('#heroProductImage');
+        return {
+          present: !!img,
+          loaded: !!img && img.complete && img.naturalWidth > 0,
+          source: img?.getAttribute('src') || '',
+          hidden: !!img?.hidden,
+          sku: img?.dataset.productSku || '',
+          status: img?.dataset.productImageStatus || '',
+        };
+      })(),
       mobileNav: (() => { const nav = document.querySelector('#mobileBottomNav'); return { present: !!nav, visible: !!nav && getComputedStyle(nav).display !== 'none', tabs: nav?.querySelectorAll('[data-mobile-tab]').length || 0 }; })(),
       title: document.title,
     }));
+    const expectedHeroProduct = products.find((product) =>
+      product && product.skuVerified !== false
+      && String(product.sku || '').trim().toUpperCase() === 'SD-GL052') || null;
+    const expectedHeroImage = expectedHeroProduct
+      ? String((Array.isArray(expectedHeroProduct.images) && expectedHeroProduct.images.length
+        ? expectedHeroProduct.images[0] : expectedHeroProduct.image) || '').replace(/^\\.\\//, '')
+      : '';
+    const heroImagePass = expectedHeroProduct
+      ? startup.heroImage.present
+        && startup.heroImage.loaded
+        && startup.heroImage.source === expectedHeroImage
+        && startup.heroImage.sku === 'SD-GL052'
+        && startup.heroImage.status === 'ready'
+      : startup.heroImage.present
+        && startup.heroImage.hidden
+        && startup.heroImage.status === 'sku-not-found'
+        && !startup.heroImage.source;
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
-    audit.interactions.push({ theme, check: 'hero-product-image-loaded-from-catalog', pass: startup.heroImage.present && startup.heroImage.loaded && !!startup.heroImage.source });
-    if (!startup.heroImage.present || !startup.heroImage.loaded || !startup.heroImage.source) hardFailures.push('Hero product image failed to load from existing catalog data: ' + theme);
+    audit.interactions.push({
+      theme,
+      check: 'hero-selects-exact-sd-gl052-or-fails-closed',
+      pass: heroImagePass,
+      result: { ...startup.heroImage, expectedProductAvailableInReadOnlyFixture: !!expectedHeroProduct, expectedImage: expectedHeroImage },
+    });
+    if (!heroImagePass) hardFailures.push('Hero image did not use exact SD-GL052 data or fail closed when the read-only fixture lacks that SKU: ' + theme);
     audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
     if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
