@@ -74,11 +74,11 @@ assert.equal(productCategoryRouteSlug("custom-category"), "custom-category", "un
 // Parse source text as JSON-compatible object literals instead of evaluating code.
 const storefrontSource = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const sharedLibrarySource = readFileSync(new URL("../functions/_lib.js", import.meta.url), "utf8");
-const frontendRouteMapMatch = storefrontSource.match(/const productCategoryRouteSlugs=Object\\.freeze\\((\\{[^;]*\\})\\);function routeSlug/);
-const backendRouteMapMatch = sharedLibrarySource.match(/const PRODUCT_CATEGORY_ROUTE_SLUGS = Object\\.freeze\\((\\{[\\s\\S]*?\\})\\);/);
+const frontendRouteMapMatch = storefrontSource.match(/const productCategoryRouteSlugs=Object\.freeze\((\{[^;]*\})\);function routeSlug/);
+const backendRouteMapMatch = sharedLibrarySource.match(/const PRODUCT_CATEGORY_ROUTE_SLUGS = Object\.freeze\((\{[\s\S]*?\})\);/);
 assert.ok(frontendRouteMapMatch, "the public storefront must declare its category route slug map");
 assert.ok(backendRouteMapMatch, "Pages Functions must declare its category route slug map");
-const parseRouteMap = (match) => JSON.parse(match[1].replace(/,\\s*([}\\]])/g, "$1"));
+const parseRouteMap = (match) => JSON.parse(match[1].replace(/,\s*([}\]])/g, "$1"));
 assert.deepEqual(
   parseRouteMap(frontendRouteMapMatch),
   parseRouteMap(backendRouteMapMatch),
