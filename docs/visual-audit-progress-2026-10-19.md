@@ -584,3 +584,16 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - **Ảnh chuẩn:** baseline BLOCKED, end-of-work NOT TESTED, pixel diff NOT TESTED. Artifact 12260286017 chỉ là bằng chứng chẩn đoán; không chép vào thư mục chuẩn.
 - **Tiến độ ước tính giữ ở 62%** cho audit/QA tổng thể. Chưa đạt 100% vì deployment metadata, route checks, live acceptance, baseline/end và visual review vẫn chưa đạt.
 
+
+
+## Cập nhật xác minh sau workflow 39425677039 — 2026-10-20
+
+> Phần này bổ sung trạng thái mới hơn vào hồ sơ cũ bên dưới. Các kết luận trước đây nói baseline/end-of-work chưa có ảnh là trạng thái lịch sử, không còn phản ánh hiện trạng sau lần capture mới nhất.
+
+- **Nhánh:** `fix/liquid-glass-audit-2026-10-19`. **Source commit của lần capture:** `37163dc3c17af332f948311bc395c9839a10e345`. **Preview deployment đã xác minh:** `1ab8617f-aac1-42f2-9112-4acc6b0d007a`, đúng nhánh fix. Không có thao tác Production.
+- **Workflow live Preview:** [run 39425677039](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039) — SUCCESS; các bước test project, capture live Preview, lưu ảnh, pixel comparison và upload audit report đều PASS.
+- **Ảnh chuẩn:** `docs/website-screenshots/start-of-work/` có 66 ảnh; `docs/website-screenshots/end-of-work/` có 66 ảnh. Cả hai là capture live Cloudflare Pages Preview đã xác minh, không phải local fixture.
+- **So sánh ảnh trước/sau:** 66 cặp được đối chiếu; 57 cặp pixel-identical, 9 cặp có khác biệt, 0 sai kích thước, 0 cặp thiếu/không hợp lệ. Các khác biệt được manifest mô tả: bốn ảnh full-page trang chủ và bốn ảnh collection thay đổi do carousel tự chạy sang ảnh sản phẩm khác, cùng một khác biệt nhỏ ở trang chi tiết desktop-Light. Chưa được xem là lỗi layout đã xác minh; cần xem ảnh trực tiếp để quyết định.
+- **Kiểm tra live:** 8/8 cặp viewport/theme PASS; điều hướng từ thẻ sản phẩm, mở trực tiếp route canonical và reload trang chi tiết PASS. Không ghi nhận horizontal overflow, page error, console error hoặc hành động ghi dữ liệu ngoài ý muốn.
+- **Còn thiếu:** người đánh giá vẫn cần xem trực tiếp ảnh cuối và đối chiếu với hai ảnh tham chiếu gốc `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` và `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`. Pixel diff giữa ảnh bắt đầu/kết thúc chỉ phát hiện thay đổi, không chứng minh mức độ giống ảnh mẫu. Vì vậy trạng thái vẫn là `AWAITING_HUMAN_VISUAL_REVIEW`, chưa thể tuyên bố đạt 100%.
+- **Phạm vi:** lần cập nhật này chỉ làm đồng bộ hồ sơ bàn giao với manifest và kết quả workflow mới. Không sửa runtime HTML/CSS/JS, không đổi dữ liệu sản phẩm, không sửa Admin, không merge PR, không deploy Production, không thay binding/secret hoặc ghi D1/R2.
