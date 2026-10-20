@@ -449,7 +449,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
 
     await captureView('orders', 'orders', null, true);
     await captureView('order-row-details', 'orders', async () => {
-      await page.locator('#main .order-table tbody tr[data-order-row]').scrollIntoViewIfNeeded();
+      await page.locator('#main .order-table tbody tr').first().scrollIntoViewIfNeeded();
     });
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', null, true);
