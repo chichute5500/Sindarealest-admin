@@ -66,3 +66,10 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - The changed-file set includes `public/admin/index.html`, multiple `functions/api/admin/*` files, shared API/middleware files, `migrations/0008_product_sku_verification.sql`, deployment/setup scripts, the large `data/legacy-products.json` fixture, and `public/index.html`. This exceeds a narrowly isolated public static UI task.
 - Decision: do not merge this branch as-is and do not deploy it to Production. First separate or explicitly review each out-of-scope change against the correct base. No admin/API/DB/production changes are authorized by this visual-audit continuation.
 - Evidence: [GitHub compare](https://github.com/chichute5500/Sindarealest-admin/compare/28c768ba26b1d9f7d40e14efac5112526ed1c8b3...fa7445b74661faf260c32b3ab32dfa85e3538e78), [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108).
+
+
+## DEC-010 — Do not change storefront while Preview auth is absent (2026-10-20)
+
+- Run [39357805505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505) and artifact [12236385238](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505/artifacts/12236385238) report `accessServiceTokenConfigured=false` and `accessBlocked=true` before the storefront rendered.
+- Decision: never substitute fixture screenshots into canonical screenshot folders and do not modify HTML/CSS or product routing against an unobserved render. First enable Preview-only Service Auth, then validate a genuine baseline.
+- Compare at commit `8dda620a6e2fede306de9ad3440ff5e34b338eb1`: diverged, 311 ahead / 6 behind / 73 files changed. Keep PR #108 unmerged and do not deploy Production until out-of-scope admin/API/migration/config changes are isolated and reviewed.

@@ -149,3 +149,12 @@ Nếu không có quyền tạo service token/Secrets, không thể chụp baseli
 - Local Playwright fixture artifact [12235773515](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357400764/artifacts/12235773515) contains 54 local-fixture screenshots with zero recorded console, page, HTTP or hard failures and zero horizontal overflow. This is explicitly artifact-only and is **not** a Preview baseline or visual acceptance.
 - A safe boolean `accessServiceTokenConfigured` is being added to the next live diagnostic; it reports only whether the optional paired GitHub secrets are present, not their values. No secret is logged or serialized.
 - No public storefront UI, product URL routing, image URL, R2/D1 data, admin file, production setting, merge or deployment was changed by this checkpoint.
+
+
+## Exact Preview Access blocker confirmed — 2026-10-20
+
+- Run [39357805505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505) used capture-code commit `39389c66c97f88f49d6994e1178ceeaf6eb264e3`; artifact [12236385238](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505/artifacts/12236385238). Its safe diagnostic reports `accessServiceTokenConfigured=false`, `accessBlocked=true`, `captureCompleted=false`, `passed=false`, and zero live screenshots.
+- GitHub Actions did not receive the optional paired Access service-token values. This is an access/configuration blocker, not evidence the storefront rendered incorrectly. The browser was redirected to Cloudflare Access before the page DOM was reached.
+- Local-only fixture run produced 54 screenshots, 20 responsive cases and 91 interaction checks with zero overflow, console/page/HTTP errors, failed requests or hard failures. The captures stay artifact-only.
+- Required authorized action: configure a Preview-only Cloudflare Access Service Auth policy and supply `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` through GitHub Actions Secrets. Do not send their values in chat or commit them. Rerun capture and require a passing full live coverage audit before storefront UI or routing changes.
+- Deployed Preview commit correspondence is still **UNVERIFIED** because Access blocked before a storefront response/build marker could be inspected. No public UI/routing, admin, Production or D1/R2 data was changed in this checkpoint.

@@ -156,3 +156,12 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - **UI-001 to UI-004, THEME-001, NAV-001, FUNC-001 to FUNC-005, SHOT-003: NOT VERIFIED against the real Preview.** No end-of-work screenshots or image diff exist. This continuation changed audit tooling/docs, not storefront HTML/CSS/JS.
 - **SAFE-002: FAIL for merge readiness.** PR #108 remains open and the broad branch diff includes admin/API/migration/config changes outside the static website audit. No merge or Production deployment.
 - Next action required to unlock the live-baseline path: configure both secrets as described in `docs/handoff/HANDOFF.md`, rerun `Liquid Glass isolated visual preview` with `start-of-work` and `cloudflare-preview`, then continue the visual discrepancy list only after a complete real capture passes.
+
+
+## Recheck — current live Access diagnostic (2026-10-20)
+
+- `ACCESS-001`: **BLOCKED_ACCESS_GATE** — [run 39357805505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505), artifact [12236385238](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505/artifacts/12236385238), capture source commit `39389c66c97f88f49d6994e1178ceeaf6eb264e3`. `accessServiceTokenConfigured=false`, 0 viewport/theme captures, 0 section captures, 0 product-route probes, 0 screenshots.
+- `SHOT-001`: **BLOCKED**, start archive empty. `SHOT-002`: **NOT TESTED**, end archive empty. Pixel comparison **NOT TESTED**.
+- `UI-001/UI-002/THEME-001`: **BLOCKED / NOT TESTED live**. Keep public styling unchanged until authorized Preview access and code-to-deployment match can be checked.
+- `URL-001`: **NOT VERIFIED against live data**. Current source route remains `/san-pham/{key}`; `/sanpham/{category}/{product-code}` is not implemented. Do not infer codes/categories from the 235-row legacy fixture.
+- Branch compare at `8dda620a6e2fede306de9ad3440ff5e34b338eb1`: diverged, 311 ahead / 6 behind / 73 files changed. Scope includes unrelated admin/API/migration/config changes; no merge/deploy.

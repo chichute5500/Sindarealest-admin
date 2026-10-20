@@ -141,3 +141,11 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - New live capture requirements now include 8 viewport/theme combinations (4 viewport sizes in both themes), content-section captures, menu/order expanded states, route checks derived from a real Preview product card and a detail reload, plus an image-integrity check. Archiving requires the completeness checks to pass. These checks did not run against live storefront content because Access stopped navigation first.
 - [Admin Preview Playwright run 39357404765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357404765) failed separately; it remains an admin-workstream issue and was not “fixed” by weakening selectors or changing admin code here.
 - No live baseline, end screenshots, pixel diff, storefront code change, merge or Production deploy is claimed.
+
+
+## Live capture with safe Access-secret status — run 39357805505 (2026-10-20)
+
+- Source validation [39357805503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805503): **PASS** on capture-code commit `39389c66c97f88f49d6994e1178ceeaf6eb264e3`.
+- Visual workflow [39357805505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505) completed successfully as a diagnostic/artifact workflow; this is not a live visual PASS. Artifact [12236385238](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505/artifacts/12236385238) local fixture audit: 54 screenshots, 20 responsive cases, 91 interactions, 235 fixture records, 0 overflow, 0 console/page/HTTP errors, 0 failed requests, 0 hard failures.
+- The same artifact's live audit reports `accessServiceTokenConfigured=false`, `accessBlocked=true`, `captureCompleted=false`, `passed=false`, 0 viewport checks, 0 route checks, 0 live screenshots, one Access-gate hard failure. Final destination: `https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev`.
+- Read-only guard sent no write requests. No canonical screenshot folder was overwritten; no live pixel comparison, Liquid Glass render acceptance, URL migration or Preview deployment commit verification occurred.
