@@ -182,3 +182,28 @@ Phần này là trạng thái mới hơn và được ưu tiên hơn các ghi ch
   3. Tìm cách lấy screenshot binary từ artifact/HTML viewer để đối chiếu thật. Nếu không lấy được, đánh dấu BLOCKED, không đoán ảnh app.
   4. Chỉ sửa ADMIN khi có sai lệch cụ thể, có danh sách file trước khi sửa, rồi chạy source checks + Playwright + screenshot cùng điều kiện.
   5. Tiếp tục bảo vệ storefront; không merge PR #111, không deploy Production.
+
+
+## 12 màn hình tham chiếu ↔ source hiện có — kiểm kê tĩnh
+
+| Màn hình trong mockup | Source thực tế đã tìm thấy | Trạng thái kiểm tra |
+|---|---|---|
+| 1. Đăng nhập | `#loginView`, `#loginForm`; xác thực hiện dùng mật khẩu quản trị | Source verified; không đổi auth theo mockup |
+| 2. Tổng quan | `dashboard()`; thống kê, thao tác nhanh, 8 nhật ký gần nhất | Source verified; browser chưa test |
+| 3. Sản phẩm | `productList()`; tìm kiếm, lọc, phân trang 12 dòng | Source verified; markup dạng bảng, khác card list trong mockup |
+| 4. Thêm/sửa sản phẩm | `#backdrop`, `#productForm`, `openEditor()`, `saveProduct` | Source verified; modal hiện có |
+| 5. Hình ảnh sản phẩm | Gallery và upload nằm trong product editor; có tối ưu upload | Source verified; chưa có route riêng |
+| 6. Đơn hàng | `ordersPage()`; bảng có `min-width:820px`, cập nhật trạng thái/thanh toán inline | Source verified; chưa browser test mobile |
+| 7. Chi tiết đơn hàng | Không thấy view/route độc lập trong danh sách `data-view`; dữ liệu đơn hiển thị trong bảng đơn hàng | Static gap candidate; cần xác minh nghiệp vụ trước khi thiết kế route mới |
+| 8. Khách hàng | `customersPage()`; bảng có `min-width:720px` | Source verified; có khả năng cần kiểm tra thao tác ngang trên mobile |
+| 9. Bảo hành/yêu cầu hỗ trợ | `warrantiesPage()`; gộp phát hành bảo hành và quản lý yêu cầu hỗ trợ | Source verified |
+| 10. Cài đặt | `settingsPage()`; hiển thị giá, welcome overlay, watermark, reset SKU, sao lưu/khôi phục | Source verified; nhiều nhóm cài đặt trong một view |
+| 11. Sao lưu/khôi phục | Nằm trong `settingsPage()`; không có view độc lập | Source verified |
+| 12. Nhật ký hoạt động | Dashboard hiển thị 8 bản ghi gần nhất; thông báo có panel riêng; API audit logs tồn tại | Source verified; chưa có view nhật ký độc lập trong `data-view` |
+
+### Các khác biệt cần kiểm tra bằng browser trước khi sửa
+- Mockup có 5 mục thanh điều hướng mobile (Tổng quan, Sản phẩm, Đơn hàng, Khách hàng, Khác); source hiện có 6 nút mobile riêng (Tổng quan, Sản phẩm, Đơn hàng, Khách hàng, Bảo hành, Cài đặt). Đây là khác biệt markup xác nhận được; chưa sửa vì chưa có browser screenshot để kiểm tra menu thay thế mà vẫn giữ đủ chức năng.
+- Mockup dùng card có ảnh cho danh sách sản phẩm/đơn hàng/khách hàng; source hiện dùng bảng ở các view này. Orders đặt `min-width:820px`, customers `min-width:720px`. Cần xác minh UX ngang ở điện thoại và thực hiện từng view một để tránh làm mất thao tác quản trị.
+- Mockup có màn hình chi tiết đơn riêng; source hiện không có `data-view` riêng cho chi tiết đơn. Không tự thêm route trước khi xác minh cách xử lý đơn hiện có và URL contract.
+- Các khác biệt trên là kết quả đọc source so với mockup, **không phải** kết luận screenshot app hiện tại bị vỡ. Chưa có screenshot app đã đăng nhập để xác nhận trực quan.
+
