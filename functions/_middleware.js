@@ -37,7 +37,7 @@ export async function onRequest(context) {
   const slug = (modernMatch ? modernMatch[2] : legacyMatch[1]).toLowerCase();
   if (!context.env?.DB) return new Response("Dịch vụ dữ liệu chưa sẵn sàng.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   let product;
-  try { product = await context.env.DB.prepare("SELECT id,slug,sku,sku_verified,title,description,images_json,category_label,published FROM products WHERE lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?) LIMIT 1").bind(slug,slug,slug).first(); }
+  try { product = await context.env.DB.prepare("SELECT id,slug,sku,sku_verified,title,description,images_json,category,category_label,published FROM products WHERE lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?) LIMIT 1").bind(slug,slug,slug).first(); }
   catch { return new Response("Không thể tải sản phẩm.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } }); }
   if (!product || Number(product.published) !== 1) return new Response("Không tìm thấy sản phẩm.", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" } });
   const productKey = isVerifiedCommercialSku(product) ? String(product.sku) : String(product.id);
