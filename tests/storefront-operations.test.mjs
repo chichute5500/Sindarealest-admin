@@ -71,10 +71,10 @@ assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
 
-assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-image:url\('images\/theme-croc-dark\.webp\?v=20261017-1'\);filter:hue-rotate\(0deg\) saturate\(\.82\) brightness\(\.82\) contrast\(\.92\)/,
-  'Dark mode must recolor the dark crocodile background toward the reference deep-blue/navy palette while retaining the source asset.');
-assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-image:url\('images\/theme-croc-albino\.webp\?v=20261017-1'\);filter:hue-rotate\(25deg\) saturate\(\.58\) brightness\(1\.08\)/,
-  'Light mode must recolor the albino crocodile background toward the reference ice-blue palette while retaining the source asset.');
+assert.match(storefrontHtml, /\.theme-bg--dark\{[^}]*background-color:#061522;background-image:radial-gradient\(/,
+  'Dark ambient mode must use reference-aligned flowing navy/sapphire gradients rather than a hard crocodile-scale texture.');
+assert.match(storefrontHtml, /\.theme-bg--light\{[^}]*background-color:#eaf3fb;background-image:radial-gradient\(/,
+  'Light ambient mode must use reference-aligned pearl-blue gradients rather than a hard crocodile-scale texture.');
 assert.match(storefrontHtml, /\.theme-bg--light\{filter:blur\(\.5px\) hue-rotate\(25deg\) saturate\(\.60\) brightness\(1\.03\)\}/,
   'The final light-mode filter override must keep the ice-blue palette and avoid a warm/pink cast.');
 assert.match(storefrontHtml, /\.mobile-bottom-nav\{background:rgba\(244,250,255,\.78\)\}/,
