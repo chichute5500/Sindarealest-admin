@@ -36,21 +36,22 @@ assert.match(html, /\.hero-visual\{height:clamp\(155px,46vw,175px\);min-height:0
   "Narrow phones must keep the Hero image frame compact without restoring the oversized crop.");
 const finalBackgroundStart = html.lastIndexOf(".theme-bg--light::after{");
 const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart + 6000);
+const finalThemeCss = html.slice(html.lastIndexOf("/* Organic liquid-glass wave assets"));
 assert.ok(finalBackgroundStart > html.indexOf("/* Reference-match finishing pass"),
   "The softened background calibration must be the final authoritative rule, not an unused earlier selector.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(225,241,255,\.52\),rgba\(211,231,249,\.46\) 52%,rgba\(237,247,255,\.54\)\)/,
   "Light background must provide a soft frosted veil over the newly generated glacial gradient backdrop.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(3,20,36,\.68\),rgba\(7,31,51,\.63\) 52%,rgba\(3,17,30,\.72\)\)/,
   "Dark background must provide a deep navy translucent veil over the newly generated sapphire gradient backdrop.");
-assert.ok(finalBackgroundCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
+assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
   "Light theme must use the final cache-versioned pearl-glass SVG background.");
-assert.ok(finalBackgroundCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}"),
+assert.ok(finalThemeCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}"),
   "Dark theme must preserve the navy-sapphire SVG backdrop without the old color cast.");
 
 
-assert.ok(finalBackgroundCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
+assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
   "The light background must use the dedicated curved pearl-glass wave artwork.");
-assert.ok(finalBackgroundCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261020-2')"),
+assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261020-2')"),
   "The dark background must use the dedicated curved sapphire-glass wave artwork.");
 const ambientLightStart = html.lastIndexOf(".theme-bg--light{");
 const ambientLight = html.slice(ambientLightStart).split("}")[0] || "";
