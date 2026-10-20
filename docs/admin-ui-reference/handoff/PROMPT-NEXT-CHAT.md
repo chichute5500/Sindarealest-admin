@@ -37,7 +37,7 @@ Mở theo thứ tự:
 - Lỗi Preview hiện tại: GitHub Actions secret `ADMIN_TEST_URL` đang trỏ đến trang có `.topbar > .brand` còn hiển thị khi đăng nhập, khác với source ADMIN mới. Giá trị secret được GitHub mask; không cố đọc/in giá trị secret.
 - 16 ảnh local tại `docs/admin-ui-reference/handoff/history/b5ce11f92995/screenshots/` chỉ bao phủ login shell chưa đăng nhập ở 8 viewport × Light/Dark; **không** chứng minh các module nghiệp vụ đã PASS.
 - HTML viewer đã hiển thị mockup 12 màn hình; đọc PNG gốc trực tiếp và full pixel-diff vẫn chưa được xác nhận hoàn tất.
-- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) vẫn OPEN/NOT MERGED, base `main`; GitHub API gần nhất ghi 318 commits/223 files changed. Không merge.
+- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) vẫn OPEN/NOT MERGED, base `main`. Số commits/files thay đổi theo từng cập nhật handoff; truy vấn metadata live ngay khi bắt đầu, không dựa vào snapshot cũ. PR chứa phạm vi storefront/backend ngoài ADMIN; tuyệt đối không merge.
 - Cloudflare Production: NOT PERFORMED.
 
 ## 4. Việc phải làm tiếp theo — làm theo thứ tự
