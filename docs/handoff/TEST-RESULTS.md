@@ -113,3 +113,11 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Artifact [12232894712](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39352778226/artifacts/12232894712) includes the local fixture audit and live-probe diagnostic JSON/HTML.
 - One CSP console message originated from the external Access login page, not the storefront. The new commit `aaec8026c8eca4aef3027dcb5a5c1e49d6189930` now filters console/page errors by Preview origin and redacts query/fragment values from stored URLs and error text.
 - The new safeguards must be revalidated by CI. No UI change, screenshot baseline, route migration or Production deployment has occurred.
+
+
+## Latest CI verification — 2026-10-20, commit `fa7445b74661faf260c32b3ab32dfa85e3538e78`
+
+- [Liquid Glass isolated visual preview run 39355499185](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185) completed successfully. Project tests and `npm run check` passed; the local Playwright fixture audit and screenshot artifact upload passed. Artifact [12235310623](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355499185/artifacts/12235310623) (about 9.8 MB) contains the generated audit bundle and reference PNGs.
+- The same workflow's direct live Preview probe returned `captureCompleted=false`, `accessBlocked=true`, and `screenshotCount=0`. The workflow is green because the push probe is diagnostic/continue-on-error; the live Preview itself is still BLOCKED by Cloudflare Access.
+- [Admin Preview smoke run 39355503580](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355503580) failed on selectors `#loginView` and `#loginForm` not being found. This failure belongs to the separate admin workflow and is not evidence of a public storefront regression; it should be handled in the admin workstream, not by changing this website scope.
+- No live baseline/end screenshots, pixel comparison, route migration, storefront UI changes, merge, or Production deployment were completed in this run.
