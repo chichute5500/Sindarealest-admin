@@ -757,7 +757,7 @@ try {
       url: location.pathname,
       thumbnailCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
     }));
-    const expectedRoute = galleryState.url === '/san-pham/sneakers-new-sneaker-contrast';
+    const expectedRoute = galleryState.url === '/sanpham/sneaker/sneakers-new-sneaker-contrast';
     const galleryBasePass = galleryState.dialogSemantics && galleryState.focusOnClose
       && galleryState.sku.includes('Chưa được cung cấp')
       && expectedRoute && galleryState.thumbnailCount >= 2;
@@ -833,7 +833,7 @@ try {
     await capture(page, 'detail-mobile-' + theme + '.jpg');
     await page.keyboard.press('Escape');
     await page.locator('#productOverlay.open').waitFor({ state: 'hidden' });
-    await page.waitForFunction(() => !location.pathname.startsWith('/san-pham/'));
+    await page.waitForFunction(() => location.pathname === '/');
     const detailClosedAndInert = await page.locator('#productOverlay').evaluate(el => el.hasAttribute('inert') && el.getAttribute('aria-hidden') === 'true');
     audit.interactions.push({ theme, check: 'escape-closes-detail-and-restores-route', pass: detailClosedAndInert });
     if (!detailClosedAndInert) hardFailures.push('Product detail did not close or restore route: ' + theme);
@@ -853,7 +853,7 @@ try {
       overlayInert: document.querySelector('#productOverlay')?.hasAttribute('inert') === true,
       overlayHidden: document.querySelector('#productOverlay')?.getAttribute('aria-hidden') === 'true',
     }));
-    const backNavigationPass = routeBeforeBack.startsWith('/san-pham/')
+    const backNavigationPass = routeBeforeBack.startsWith('/sanpham/')
       && backNavigationState.pathname === '/'
       && backNavigationState.overlayClosed
       && backNavigationState.overlayInert
