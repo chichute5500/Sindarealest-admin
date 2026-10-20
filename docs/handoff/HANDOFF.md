@@ -16,10 +16,10 @@
 
 ## Cập nhật trạng thái xác minh — 2026-10-20 03:18 UTC
 
-- HEAD hiện tại: `562d7d77624f7431296cb217b2b6d6592aca9ce4` trên `fix/liquid-glass-audit-2026-10-19`.
-- Source/test validation: **PASS**, [run 39363358025](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358025).
-- Admin Preview Playwright: **BLOCKED/FAIL do trang Preview không hiện `#loginForm`**, [run 39363358006](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39363358006). Log phù hợp với Cloudflare Access đang chặn trước ứng dụng; không suy diễn thành lỗi mật khẩu hoặc xác nhận đăng nhập.
-- Live storefront capture: vẫn **BLOCKED** theo [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 ảnh thật / 0 route / 0 viewport.
+- HEAD hiện tại: `4ba5dae9cb10a5283f48abaf1a2a1d20a17308df` trên `fix/liquid-glass-audit-2026-10-19` (chỉ cập nhật nhật ký kiểm thử; web source không đổi từ code commit `562d7d77624f7431296cb217b2b6d6592aca9ce4`).
+- Source/test validation mới nhất: **PASS**, [run 39367417810](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417810) trên HEAD tài liệu trước đó `1d261598c4e481ede062eed8ff32c374ffe67373`; thay đổi tiếp theo chỉ là docs.
+- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39367417804](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417804), không tìm thấy `#loginView`/`#loginForm`. Probe live riêng [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193) xác nhận Cloudflare Access redirect và cặp service-token secrets không được truyền vào Actions; chưa thể kết luận lỗi mật khẩu/form của ứng dụng.
+- Live storefront capture: vẫn **BLOCKED** theo [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 ảnh thật / 0 route / 0 viewport. Workflow ảnh bỏ qua các thay đổi docs-only nên chưa có lần capture mới.
 - Local fixture visual audit: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193) và [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618) PASS trên commit `968ec2e3` với 54 ảnh fixture, 235 sản phẩm fixture, 20 responsive cases, 93 interaction checks. GitHub compare xác nhận từ `968ec2e3` đến `562d7d77` chỉ thay đổi tài liệu, không thay đổi source/test/capture script; vì vậy fixture audit áp dụng cho cùng source code. Tuy nhiên đây **không phải ảnh Preview thật**.
 - Không deploy/merge Production. Chưa đủ bằng chứng để đóng baseline/end screenshots hoặc pixel comparison.
 
