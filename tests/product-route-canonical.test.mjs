@@ -46,6 +46,7 @@ const body = await canonical.text();
 assert.match(body, /<link rel="canonical" href="https:\/\/shop\.example\/sanpham\/giay-tay\/internal-abc123">/);
 assert.match(body, /<meta property="og:url" content="https:\/\/shop\.example\/sanpham\/giay-tay\/internal-abc123">/);
 assert.match(body, /"@type":"Product"/);
+assert.doesNotMatch(body, /\"sku\":\"SD001\"/, 'unverified internal SKU values must not be exposed as a commercial schema.org SKU');
 assert.match(body, /Giày tây da cá sấu/);
 
 const verifiedProduct = { ...baseProduct, sku: "SD-REAL-001", sku_verified: 1 };
