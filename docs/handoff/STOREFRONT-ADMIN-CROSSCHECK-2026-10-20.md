@@ -2,13 +2,13 @@
 
 **Ngày ghi nhận:** 20/10/2026 (UTC+7)  
 **Repository:** `chichute5500/Sindarealest-admin`  
-**Nhánh làm việc Preview:** `fix/liquid-glass-audit-2026-10-19`  
-**PR:** [#108 — Fix/liquid glass audit 2026 10 19](https://github.com/chichute5500/Sindarealest-admin/pull/108) — đang mở, không merge trong công việc này.  
+**Mô hình phát triển:** hai nhánh song song, độc lập — `fix/liquid-glass-audit-2026-10-19` cho web tĩnh và nhánh `feature/*` cho web admin (tên nhánh feature cụ thể cần xác minh từ GitHub trước khi ghi cứng). Không xem admin là giao diện cũ cần giữ nguyên, và không mặc định storefront là nguồn để áp đặt thiết kế admin.  
+**PR web tĩnh:** [#108 — Fix/liquid glass audit 2026 10 19](https://github.com/chichute5500/Sindarealest-admin/pull/108) — không merge trong công việc này.  
 **Storefront Preview:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/  
-**Admin Preview:** cần xác minh lại URL/deployment SHA đang phục vụ admin trước khi kiểm thử cuối.  
+**Admin Preview:** cần xác minh branch feature, URL và deployment SHA đang phục vụ admin trước khi kiểm thử cuối.  
 **Production:** https://sindarealest2.pages.dev/ — chỉ để phân biệt; không sửa, không merge và không triển khai Production.
 
-> Mục đích: ghi lại chính xác những thay đổi giao diện web tĩnh có thể liên quan tới admin, và lập danh sách kiểm tra sau khi cả hai phần hoàn tất. Đây là biên bản đối chiếu, không phải kết luận rằng các phần đã xung đột hoặc đã nghiệm thu.
+> Mục đích: ghi lại hai luồng thiết kế đang phát triển song song, độc lập và lập danh sách kiểm tra chéo sau khi cả hai hoàn tất. Mỗi nhánh được tự do thiết kế lại giao diện trong phạm vi đã duyệt; chỉ so sánh các quy ước chung và phát hiện xung đột khi có bằng chứng. Biên bản này không yêu cầu admin giữ nguyên giao diện cũ hoặc phải sao chép nguyên trạng storefront.
 
 ## 1. Phạm vi công việc song song
 
@@ -24,14 +24,24 @@
 - Phạm vi giao diện được phép chỉnh theo chấp thuận của chủ dự án: bố cục, font, khoảng cách, màu, nền/gradient, kính mờ, kích thước/vị trí điều khiển, responsive, cấu trúc giao diện cần thiết để khớp ảnh mẫu.
 - Không tự ý thay logo/tên thương hiệu, ảnh sản phẩm hoặc mapping ảnh, SKU, giá, mô tả, dữ liệu, API, xác thực, backend, D1/R2 hay chức năng kinh doanh.
 
-### B. Web admin / công việc đang diễn ra
+### B. Web admin / nhánh feature đang phát triển song song
+- Nguyên tắc: admin cũng được phép tháo bỏ ràng buộc của code giao diện cũ và tái thiết kế theo ảnh mẫu. Không áp dụng CSS/layout storefront lên admin một cách máy móc; không trì hoãn việc thiết kế admin để chờ storefront hoàn tất.
+- Nhánh feature cụ thể và SHA hiện hành: cần xác minh trực tiếp trong GitHub; không tự đoán tên nhánh hoặc revision.
 - Mã giao diện admin: `public/admin/index.html`; hiện có CSS và JS inline riêng, không thấy trang này nạp stylesheet dùng chung với `public/index.html` trong phần đầu file đã kiểm tra.
 - Admin có bộ biến CSS và thành phần riêng như `--bg`, `--paper`, `--ink`, `--line`, `--gold`; giao diện tối được điều khiển bằng selector `:root[data-admin-theme="dark"]`.
 - Admin sử dụng logo tại `/images/brand-emblem.png`; các nội dung sản phẩm/ảnh trong admin còn liên quan tới API và luồng tải/lưu, nên thay đổi giao diện không được làm đổi hợp đồng API hoặc hành vi lưu dữ liệu.
 - Phạm vi theo báo cáo admin hiện có: hoàn thiện kiểm toán Admin Preview/Liquid Glass, kiểm tra trực quan so với mẫu, xác minh deployment theo branch/SHA, kiểm tra Playwright, các route và responsive. Báo cáo admin được lưu ở `docs/ADMIN_PREVIEW_PROGRESS_2026-10-20.md`; prompt bàn giao admin ở `docs/MASTER_PROMPT_HANDOFF_ADMIN_PREVIEW_2026-10-20.md`.
 - Trạng thái không được mặc định là đã hoàn tất: đọc báo cáo/Actions mới nhất tại đúng SHA trước khi tuyên bố nghiệm thu; review trực quan cuối cùng vẫn là tiêu chí riêng.
 
-## 2. Bản đồ phụ thuộc và nguy cơ xung đột
+## 2. Nguyên tắc phát triển song song
+
+1. Nhánh `fix` tiếp tục hoàn thiện web tĩnh theo ảnh gốc; nhánh `feature` tiếp tục hoàn thiện admin theo ảnh gốc. Hai nhánh không phụ thuộc thiết kế của nhau để có thể tiến triển.
+2. Mỗi nhánh có thể thay đổi cấu trúc HTML, CSS, font, layout, responsive và JS giao diện trong phạm vi được chủ dự án cho phép; các thay đổi chức năng/data/backend/API/auth vẫn phải tuân theo giới hạn đã thống nhất và xin phép riêng nếu vượt phạm vi.
+3. Không merge/cherry-pick hoặc sao chép thay đổi giữa hai nhánh trong bước làm việc này. Ghi nhận các quy ước chung và điểm cần đối chiếu sau khi hai bên hoàn tất.
+4. Sau khi cả hai có bản Preview gần hoàn thiện, chốt SHA riêng cho từng nhánh, chụp ảnh cùng kích thước/điều kiện phù hợp, lập bảng sai khác và regression. Chỉ khi đó mới quyết định thay đổi nào cần đồng bộ, giữ riêng hoặc giải quyết xung đột.
+5. “Đồng bộ thương hiệu” không có nghĩa là hai giao diện phải giống pixel: admin ưu tiên vận hành, storefront ưu tiên trải nghiệm mua hàng.
+
+## 3. Bản đồ phụ thuộc và nguy cơ xung đột
 
 | Khu vực | Hiện trạng đã xác minh / cần đối chiếu | Cách xử lý khi nghiệm thu |
 |---|---|---|
@@ -47,7 +57,7 @@
 | Định tuyến / service worker | Storefront và `/admin/` cùng được phục vụ trong một Pages project; có `public/admin-sw.js`. | Kiểm tra trực tiếp URL storefront, `/admin/`, tải lại trang, direct-open route sản phẩm và cache/service worker. Không sửa scope/caching/redirect như một giải pháp “chữa” lỗi giao diện nếu chưa xác định nguyên nhân. |
 | Build/deploy và môi trường | Hai giao diện ở cùng repository, nhưng link Preview/deployment và cấu hình có thể lệch SHA theo từng lần chạy. | Trước khi so sánh cuối, ghi SHA commit, branch, Preview URL và deployment ID của cả hai. Không so ảnh từ hai revision khác nhau mà không ghi rõ. Preview-only; Production bất biến. |
 
-## 3. Những điểm cần kiểm tra chéo sau khi hai phần hoàn tất
+## 4. Những điểm cần kiểm tra chéo sau khi hai phần hoàn tất
 
 ### 3.1. Đồng nhất nhận diện nhưng không ép hai trang giống hệt
 - Logo, tên SinDarealest và giọng điệu thương hiệu giữ nguyên.
@@ -61,9 +71,9 @@
 - Sau bất kỳ thay đổi shared asset, font, global CSS, route/cache hoặc markup chung: chạy cả storefront visual workflow lẫn Admin Preview Playwright. Workflow bị skipped hoặc chỉ dùng fixture không được tính là live acceptance.
 - So sánh ảnh ở cùng viewport, màu/theme và URL/route. Lưu before/after cùng tên quy ước; giữ nguyên thư mục `start-of-work`, không ghi đè baseline lịch sử.
 
-## 4. Quy trình xử lý xung đột
+## 5. Quy trình xử lý xung đột
 
-1. **Chốt revision:** ghi commit SHA và Preview URL của storefront/admin; xác minh deployment đang chạy đúng SHA.
+1. **Chốt revision riêng:** ghi commit SHA, tên nhánh và Preview URL của web tĩnh (`fix`) và admin (`feature`); xác minh mỗi deployment đang chạy đúng SHA.
 2. **Xác định nguồn lỗi:** phân loại lỗi thành (a) storefront-only, (b) admin-only, (c) tài sản/quy tắc dùng chung, (d) API/data/backend, hoặc (e) cache/deployment.
 3. **Sửa đúng lớp:** CSS scoped hoặc HTML trang tương ứng trước; không sửa API/backend để chữa lỗi trình bày.
 4. **Ghi thay đổi:** cập nhật bảng dưới đây với file, selectors/IDs, lý do, kiểm thử và SHA.
@@ -71,15 +81,15 @@
 6. **Chấp nhận có điều kiện:** không gọi 100% nếu visual parity còn cần người xem, live deployment chưa đúng SHA, workflow bị skip, hoặc có regression chưa xử lý.
 7. **Triển khai:** tiếp tục chỉ ở nhánh/Preview. Tuyệt đối không merge/deploy Production trong quá trình này.
 
-## 5. Nhật ký thay đổi có thể ảnh hưởng tới admin
+## 6. Nhật ký thay đổi của hai nhánh
 
 | Ngày / SHA | File / vùng | Thay đổi | Ảnh hưởng admin dự kiến | Cần kiểm tra lại | Trạng thái |
 |---|---|---|---|---|---|
-| Vòng công việc hiện tại; nhánh ở thời điểm ghi biên bản là `db21d489923cde19730cd5076051410b0f0f91a5` | `public/index.html` | Điều chỉnh CSS/JS giao diện khách hàng, nền, theme, product detail overlay và responsive. | Không thấy CSS/JS inline của admin được import trực tiếp; nguy cơ trực tiếp thấp. Tác động gián tiếp ở nhận diện/đường dẫn tài sản và những sửa đổi global về sau. | Xác nhận admin login/CRUD/gallery/theme/responsive vẫn PASS trên SHA admin mới nhất. | Cần xác minh cross-regression cuối |
-| Vòng công việc hiện tại | `public/images/liquid-glass-*.svg` | Thêm bốn SVG nền Liquid Glass sáng/tối, desktop/mobile cho storefront. | Không phải thay đổi chức năng admin; tránh tự áp các asset này lên admin. | Tải SVG thành công ở storefront; admin không bị đổi nền ngoài dự định. | Đã ghi nhận; chờ cross-check |
+| Web tĩnh — vòng công việc hiện tại; SHA trước commit ghi biên bản: `db21d489923cde19730cd5076051410b0f0f91a5` | `public/index.html` | Điều chỉnh CSS/JS giao diện khách hàng, nền, theme, product detail overlay và responsive. | Không thấy CSS/JS inline của admin được import trực tiếp; nguy cơ trực tiếp thấp. Tác động gián tiếp ở nhận diện/đường dẫn tài sản và những sửa đổi global về sau. | Xác nhận admin login/CRUD/gallery/theme/responsive vẫn PASS trên SHA admin mới nhất. | Cần xác minh cross-regression cuối |
+| Web tĩnh — vòng công việc hiện tại | `public/images/liquid-glass-*.svg` | Thêm bốn SVG nền Liquid Glass sáng/tối, desktop/mobile cho storefront. | Không phải thay đổi chức năng admin; tránh tự áp các asset này lên admin. | Tải SVG thành công ở storefront; admin không bị đổi nền ngoài dự định. | Đã ghi nhận; chờ cross-check |
 | Vòng công việc hiện tại | `public/admin/index.html` | Không sửa trong bước ghi biên bản này. Admin tiếp tục theo đầu việc/PR hiện hữu. | Không phát sinh chỉnh sửa admin từ commit ghi chú này. | Đọc trạng thái Actions mới nhất trước khi nghiệm thu cả hai. | Không thay đổi |
 
-## 6. Trạng thái chụp ảnh trước/sau và giới hạn bằng chứng
+## 7. Trạng thái chụp ảnh trước/sau và giới hạn bằng chứng
 
 - Thư mục chuẩn ảnh: `docs/website-screenshots/start-of-work/` và `docs/website-screenshots/end-of-work/`.
 - Manifest: `docs/website-screenshots/manifest.json`.
@@ -87,7 +97,7 @@
 - Không ghi đè ảnh baseline để che khác biệt. Khi capture mới, xác minh branch + exact deployment SHA và sử dụng đúng Preview live read-only.
 - Ảnh tham chiếu storefront sáng/tối được chỉ định trong `docs/static-web-reference/README.md`; đừng nhầm chúng với ảnh chụp kết quả hiện tại hoặc ảnh admin.
 
-## 7. Những điều không được làm khi giải quyết xung đột
+## 8. Những điều không được làm khi giải quyết xung đột
 
 - Không sửa `main`, không merge PR #108, không deploy Production.
 - Không đổi logo/tên thương hiệu hoặc ảnh/mapping/dữ liệu sản phẩm chỉ để tạo pixel diff đẹp hơn.
@@ -96,7 +106,7 @@
 - Không đánh dấu PASS khi workflow/step bị skip, capture là fixture-only, SHA không khớp hoặc chưa có ảnh cần xem.
 - Không yêu cầu người dùng chạy thủ công các kiểm tra mà có thể được xác minh qua GitHub Actions; không yêu cầu họ gửi bí mật trong chat.
 
-## 8. Cập nhật nhật ký sau này
+## 9. Cập nhật nhật ký sau này
 
 Mỗi khi chỉnh storefront mà có thể ảnh hưởng admin, thêm một dòng vào mục 5 kèm:
 - SHA, file và selectors/IDs cụ thể.
