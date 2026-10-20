@@ -21,9 +21,17 @@ assert.ok(end >= 0, 'The final storefront visual-pass stylesheet must remain ide
 const finalCss = html.slice(end, html.indexOf('</style>', end));
 assert.match(finalCss, /\.theme-bg--light::after\{[\s\S]*?linear-gradient\(145deg,transparent 14%,rgba\(255,255,255,\.72\) 22%/);
 assert.match(finalCss, /\.theme-bg--dark::after\{[\s\S]*?rgba\(183,220,245,\.22\)/);
+assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
+  'The hero headline must keep the exact three-line hierarchy from the supplied mobile reference.');
 assert.match(finalCss, /#home \.hero h1 span:first-child\{max-width:6em\}/);
 assert.match(finalCss, /#home \.hero h1 span:last-child\{max-width:7em\}/);
 assert.match(finalCss, /#home \.hero-visual img\[hidden\]\{display:none!important\}/);
+assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\)\{grid-template-columns:minmax\(0,1fr\)!important\}/,
+  'When the exact SKU is unavailable, the hero must not retain an empty second column.');
+assert.match(html, /#home \.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important\}/,
+  'A hidden exact-SKU image must hide its empty image frame.');
+assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\) \.hero-copy\{width:100%;max-width:100%\}/,
+  'The hero copy must use the available width when no verified product image can be shown.');
 assert.match(finalCss, /\.welcome-content\{[\s\S]*?background:transparent!important;[\s\S]*?box-shadow:none!important/);
 assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 

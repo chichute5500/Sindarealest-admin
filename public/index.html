@@ -576,7 +576,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 <main>
   <section class="hero wrap" id="home">
     <div class="hero-copy" data-reveal>
-      <h1 class="serif"><span>Phong cách đẳng cấp</span><span>từ da cá sấu</span></h1>
+      <h1 class="serif"><span>Phong cách</span><span>đẳng cấp</span><span>từ da cá sấu</span></h1>
        <p class="hero-description">Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.</p>
        <div class="hero-actions"><a class="pill-btn primary tap-target" href="#products">Khám phá ngay <span class="arrow">→</span></a></div>
     </div>
@@ -2287,7 +2287,11 @@ html.dark .sd-fullscreen-share{
   .welcome-loader{margin-top:7px!important}
   .welcome-skip{min-height:36px!important;padding:8px 14px!important}
 }
-/* A hidden hero image must never be rendered as an empty full-size IMG element. */
+/* Match the three-line hero hierarchy and avoid an empty image frame when the exact SKU is not public. */
+#home .hero h1 span{display:block}
+#home.hero:has(#heroProductImage[hidden]){grid-template-columns:minmax(0,1fr)!important}
+#home.hero:has(#heroProductImage[hidden]) .hero-copy{width:100%;max-width:100%}
+#home .hero-visual:has(#heroProductImage[hidden]){display:none!important}
 #heroProductImage[hidden]{display:none!important}
 
 </style>
