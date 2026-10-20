@@ -144,3 +144,14 @@
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+## Vòng kiểm thử mới nhất — 2026-10-21 (run 39480806835)
+
+- Workflow: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39480806835
+- Tested commit: `7e41313efcc1bba8302bacbad79327696a1fb0d1`; HEAD sau commit evidence-only: `cdec188efa2198caaf0ac65cd294b682d1088fc9`.
+- `npm run check`: PASS; `npm test`: PASS; local Playwright: PASS. Artifact tổng hợp có 16 ảnh login-shell + 42 ảnh UI fixture cho các module/biến thể, với 36 bộ metrics UI fixture; không có page errors, console errors, failed requests hoặc HTTP errors trong local run.
+- Đã thêm assertion phát hiện text node hiển thị literal `</div>`. Assertion không thất bại trong vòng chạy này, nên chuỗi thấy ở ảnh customer từ artifact cũ **chưa được tái hiện bởi kiểm tra text-node**; chưa được kết luận đã sửa hoặc đã tìm ra nguyên nhân. Cần kiểm tra cả pseudo-element/CSS và xác minh ảnh mới nhất của màn khách hàng trước khi đóng lỗi.
+- Preview từ xa tiếp tục FAIL: computed brand display `flex`, visibility `visible`, `inlineHideRulePresent=false`, stylesheet không có rule login-hide trong khi source có. Đây là mismatch source/served CSS; root cause chính xác chưa xác định. Không sửa secret/cấu hình Cloudflare, không bypass Access và không nới lỏng assertion.
+- Hạn chế: module screenshots dùng fixture read-only, không phải test đăng nhập với backend thật; full visual comparison 12 màn hình và audit toàn bộ PR vẫn chưa xong. Tiến độ giữ **43%**.
+- PR #111 OPEN/unmerged; không deploy Production, không sửa nhánh storefront/main.
