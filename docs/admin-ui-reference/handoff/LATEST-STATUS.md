@@ -90,14 +90,26 @@
 - `ea9bcd1a542dab2891916c14015a7fae21143a56` — pass CSS ice-blue/liquid-glass cho ADMIN.
 
 **Cloudflare production deployment: NOT PERFORMED**
+## Báo cáo tiến độ và bằng chứng mới nhất — 2026-10-21
 
-## Kết quả kiểm thử tự động gần nhất
+- **Tiến độ ước tính: 42%** theo giai đoạn; không phải tỷ lệ code hay mức độ giống ảnh mẫu.
+- **Nhánh làm việc:** `feature/admin-isolated-handoff-2026-10-20`. PR #111 vẫn OPEN, chưa merge; PR hiện có phạm vi rộng gồm storefront/backend, do đó tuyệt đối không merge.
+- **Source commit đã chạy test:** `994fefada36ebcc3d63da32e1fe7e01e532ef712`.
+- **GitHub Actions:** [run 39464800722](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39464800722).
+- `npm run check`: **PASS**.
+- `npm test`: **PASS**.
+- Local Playwright screenshot matrix: **PASS**, 16 ảnh thật, 8 viewport (320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900), light/dark. Chỉ kiểm tra login shell với endpoint session giả lập 401; không kiểm tra module có dữ liệu thật.
+- Preview từ xa: **FAIL — source không khớp**. Browser truy cập được trang có `#loginView`, `#loginForm`, `#password`, nhưng `.topbar > .brand` vẫn hiện khi kiểm tra đăng nhập, trái với signature mong đợi từ source hiện tại. Đây là bằng chứng URL `ADMIN_TEST_URL` đang phục vụ một phiên bản/bố cục khác hoặc cũ; chưa xác nhận được URL cụ thể vì secret được che. Không kết luận lỗi này là do giao diện local.
+- Artifact Playwright: [admin-preview-evidence-45](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39464800722/artifacts/12284581356).
+- Module đăng nhập thật/dashboard và CRUD sản phẩm, đơn hàng, khách hàng, bảo hành, cài đặt, upload, backup/restore, audit logs: **NOT VERIFIED end-to-end**.
+- So sánh toàn diện từng màn hình với ảnh mẫu: **INCOMPLETE**; không được dùng ảnh login-only để tuyên bố đạt visual parity.
+- Rà soát toàn bộ branch diff và trạng thái working tree local: **PARTIAL/BLOCKED**, do không có checkout local trong phiên; PR #111 có 260 file thay đổi và phạm vi rộng, cần audit trước khi cân nhắc merge.
+- Production deployment: **NOT PERFORMED**. Không merge, không cherry-pick, không sửa nhánh website tĩnh hoặc `main`.
 
-- Tested commit: 994fefada36ebcc3d63da32e1fe7e01e532ef712
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39464800722
-- npm run check: PASS
-- npm test: PASS
-- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/994fefada36e/screenshots/.
-- Deployed Preview: failure.
-- The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
-- Production deployment: NOT PERFORMED.
+### Hành động tiếp theo
+
+1. Tiếp tục cải thiện và kiểm thử UI ADMIN riêng dựa trên reference và source; giữ nguyên API, auth, D1/R2, dữ liệu và nghiệp vụ.
+2. Mở/đối chiếu ảnh reference thật và ảnh Playwright từng màn hình; không đánh dấu hoàn tất nếu chưa có bằng chứng.
+3. Chạy lại `npm run check`, `npm test`, ma trận Playwright sau mỗi thay đổi có ý nghĩa.
+4. Với Preview, cần một URL Preview trỏ đúng source nhánh ADMIN và quyền truy cập hợp lệ; không in secret, không bỏ qua Cloudflare Access.
+5. Giữ PR #111 OPEN, không merge; không deploy Production.
