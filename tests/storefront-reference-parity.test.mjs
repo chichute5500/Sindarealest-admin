@@ -52,4 +52,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
   assert.match(svg, /id="satin-crease-detail"/, name + ' background must retain layered satin crease highlights.');
 }
 
+assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
+  'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
+assert.match(html, /html\.dark\{[\s\S]*?--sd-reference-surface-strong:rgba\(7,27,45,\.94\)/,
+  'Dark theme drawers must retain a readable navy-glass surface.');
+assert.match(html, /\.account-drawer,\.cart-drawer,\.checkout-drawer\{[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\)/,
+  'Cart, account and checkout drawers must blur the storefront behind the translucent surface.');
 console.log('PASS: mobile/desktop satin assets, reference-aligned splash and headline, and key storefront screen contracts.');

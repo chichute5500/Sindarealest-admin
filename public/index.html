@@ -1747,13 +1747,13 @@ html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.9
    This styles existing public storefront views; product data, endpoints and interactions stay unchanged. */
 :root{
   --sd-reference-surface:rgba(246,251,255,.68);
-  --sd-reference-surface-strong:rgba(249,253,255,.86);
+  --sd-reference-surface-strong:rgba(249,253,255,.95);
   --sd-reference-edge:rgba(255,255,255,.90);
   --sd-reference-shadow:0 12px 34px rgba(38,82,116,.12),inset 0 1px 0 rgba(255,255,255,.82);
 }
 html.dark{
   --sd-reference-surface:rgba(7,27,45,.74);
-  --sd-reference-surface-strong:rgba(9,32,52,.90);
+  --sd-reference-surface-strong:rgba(7,27,45,.94);
   --sd-reference-edge:rgba(155,198,229,.38);
   --sd-reference-shadow:0 14px 36px rgba(0,5,15,.30),inset 0 1px 0 rgba(219,241,255,.10);
 }
@@ -2310,6 +2310,12 @@ html.dark .sd-fullscreen-share{
   .nav-wrap .nav .brand-copy{min-width:0;max-width:100%;text-align:left}
   .nav-wrap .nav .brand-name{white-space:nowrap}
   .nav-wrap .nav .nav-actions{margin-left:auto!important;flex:0 0 auto}
+}
+/* Make drawers read as frosted-glass sheets, not let storefront text ghost through. */
+.account-drawer,.cart-drawer,.checkout-drawer{
+  background:var(--sd-reference-surface-strong)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%);
+  backdrop-filter:blur(24px) saturate(145%);
 }
 </style>
 
