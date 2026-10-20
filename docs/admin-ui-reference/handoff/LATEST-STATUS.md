@@ -1,13 +1,13 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — AUTHENTICATED UI AND REFERENCE COMPARISON BLOCKED/PENDING`  
-**Ước tính tiến độ:** 40% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.  
+**Trạng thái tổng thể:** `IN PROGRESS — LOGIN SHELL VERIFIED; CONFIGURED PREVIEW TARGET STALE`
+**Ước tính tiến độ:** 42% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
-**HEAD nhánh ADMIN trước lần cập nhật handoff này:** `e34e783da27b5cc54f6223d955f8db50ca9a2ac7` (xác minh qua PR #111 và Actions; commit tài liệu)  
-**Commit code ADMIN gần nhất:** `7c742407530dbcf2f9407d6a82c48c70620b98a7` (so sánh tới HEAD e34 cho thấy các commit sau chỉ thay đổi handoff/evidence, không đổi source)  
-**Kết quả kiểm thử:** `npm run check`, `npm test` và ma trận Playwright 16 ảnh PASS trên commit code nêu trên; Preview bị chặn bởi Cloudflare Access.  
+**HEAD nhánh ADMIN trước cập nhật handoff:** `e6e4529ff23a0c61f384f06a13ce6d878fe3f528` (evidence commit; source không đổi)
+**Commit source ADMIN gần nhất:** `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`; **commit test gần nhất:** `de8b7770ac2e077ad9ef0926f5e9053b400a9993`.
+**Kết quả kiểm thử:** `npm run check`, `npm test`, local Playwright 16 ảnh PASS; Preview login/dashboard test có 1 PASS và 1 FAIL vì URL cấu hình không phục vụ CSS login của source ADMIN hiện tại.
 **Cloudflare Production deployment:** `NOT PERFORMED`
 
 > Phân biệt bằng chứng: kiểm tra source từ GitHub đã xác nhận các token màu, selector theme, markup đăng nhập, chuỗi API và việc gắn contract test vào `npm test`. Đây là kiểm tra tĩnh của source, **không phải** kết quả thực thi `npm test` hoặc kiểm thử browser. Không đánh dấu bất kỳ test nào PASS nếu chưa có run/artifact của đúng commit.
@@ -98,3 +98,54 @@
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+---
+
+## Handoff cập nhật — 2026-10-20, sau vòng kiểm tra login
+
+### Source/UI đã sửa và có screenshot
+- Chỉ sửa `public/admin/index.html` trên nhánh ADMIN:
+  1. Ẩn logo topbar và notification khi login screen hiện; giữ nút theme Light/Dark dạng icon.
+  2. Rút gọn lời mời đăng nhập và thay ghi chú hạ tầng bằng thông báo quyền truy cập chung.
+  3. Thêm nền vảy da cá sấu bằng CSS với độ tương phản thấp. Vòng đầu quá nổi; vòng sau đã giảm alpha và được chụp lại.
+- Source SHA có thay đổi UI mới nhất: `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`.
+- Screenshot mới nhất cho source hiện tại: `docs/admin-ui-reference/handoff/history/b5ce11f92995/screenshots/` (16 ảnh, 8 viewport × Light/Dark). Đã xem ảnh 390×844 Light/Dark; pattern hiện dịu hơn, login card không còn logo trùng, theme toggle còn hoạt động.
+- Run gần nhất: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39446733271
+- `npm run check` và `npm test`: PASS; local Playwright matrix: PASS, không có lỗi page/console/request/HTTP và không có horizontal overflow.
+- Test contract mới xác nhận topbar brand + notification ẩn trên login shell local.
+
+### Rủi ro Preview được xác minh
+- Secret `ADMIN_TEST_URL` đang trỏ tới một Preview có thể mở login và đăng nhập tới dashboard, nhưng **không phục vụ CSS login mới của source ADMIN**: remote test nhận thấy `.topbar > .brand` vẫn visible, trong khi source hiện tại yêu cầu hidden. Vì vậy, không được coi lần login/dashboard trước đó là xác nhận Preview đang chạy source mới.
+- URL bị GitHub secret masking, không thể đọc giá trị qua log. Test đã thêm log `[ADMIN_PREVIEW_TARGET]` an toàn nhưng GitHub vẫn mask target.
+- Run `39446733271`: local source matrix PASS; remote Preview check FAIL ở kiểm tra nhận diện source mới. Đây là lỗi cấu hình/đích Preview, không phải lỗi login source.
+- **Cần người quản lý repository cập nhật secret `ADMIN_TEST_URL`** sang URL Preview đúng của nhánh `feature/admin-isolated-handoff-2026-10-20` (path `/admin/`) hoặc cung cấp URL Preview đúng. Giữ nguyên các Access service-token secrets hiện có; không bypass Cloudflare Access.
+- Không chụp ảnh module có dữ liệu khách hàng/đơn hàng thật trước khi có fixture an toàn hoặc cơ chế che PII.
+
+### 12 màn hình mockup ↔ source (kiểm kê tĩnh)
+1. Login: `#loginView/#loginForm`, auth mật khẩu hiện có; không thay auth contract.
+2. Dashboard: `dashboard()`, thống kê + 8 log gần nhất.
+3. Sản phẩm: `productList()`, table/search/filter/pagination; khác card list trong mockup.
+4. Thêm/sửa sản phẩm: `#productForm` trong modal.
+5. Hình ảnh: gallery/upload nằm trong product editor.
+6. Đơn hàng: `ordersPage()`, bảng min-width 820px.
+7. Chi tiết đơn: chưa có `data-view` riêng; cần xác minh nghiệp vụ trước khi thêm.
+8. Khách hàng: `customersPage()`, bảng min-width 720px.
+9. Bảo hành/yêu cầu hỗ trợ: `warrantiesPage()`.
+10. Cài đặt: `settingsPage()`, giá, welcome overlay, watermark, reset SKU, backup.
+11. Sao lưu/khôi phục: nằm trong Cài đặt.
+12. Nhật ký: 8 log gần nhất trên Dashboard; chưa có view nhật ký riêng.
+
+### Cảnh báo PR — KHÔNG MERGE
+- PR #111: https://github.com/chichute5500/Sindarealest-admin/pull/111
+- Base `main`, head `feature/admin-isolated-handoff-2026-10-20`; GitHub API ghi nhận 317 commits / 223 files / +11,167 −352 ở thời điểm kiểm tra.
+- PR chứa thay đổi storefront/backend cùng tài liệu/evidence, không phải ADMIN-only. Không merge, không đổi base, không cherry-pick hoặc đồng bộ nhánh.
+- Không có local checkout; full `git status` và diff cục bộ vẫn chưa xác minh.
+
+### Việc tiếp theo
+1. Chờ người quản lý repo cập nhật `ADMIN_TEST_URL` đúng Preview của nhánh ADMIN; sau đó chạy lại smoke tests và xác nhận CSS signature PASS.
+2. Thêm screenshot/kiểm tra read-only cho dashboard và từng module, nhưng phải loại PII khỏi artifacts.
+3. Sửa từng khác biệt mobile theo mockup: 5 mục bottom nav với “Khác”, table/card mobile, chi tiết đơn, backup và nhật ký; không tạo route giả hoặc thay API contract khi chưa kiểm tra.
+4. Mỗi vòng: source/test → workflow → xem PNG → cập nhật file này và JSON.
+5. Không sửa nhánh web tĩnh, không merge, không deploy Production.
+
