@@ -4,8 +4,8 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T13:00:28Z",
-  "status": "IN PROGRESS",
+  "updatedAtUtc": "2026-10-20T13:00:41.744Z",
+  "status": "AWAITING_HUMAN_VISUAL_REVIEW",
   "note": "Latest verified live baseline: workflow run 39423635778 on source commit 853e40f661d1d2718ab8d4f1dec9a33b81dacaae captured and archived 66 real Cloudflare Pages Preview screenshots into docs/website-screenshots/start-of-work/. Cloudflare Pages API verified Preview deployment ID 131cfcce-4174-4541-9f23-b99bc2cbfd6c, branch fix/liquid-glass-audit-2026-10-19, and exact source commit. Playwright passed all 4 product-detail route contexts (click, direct open, reload), 8/8 viewport/theme pairs, required sections, and recorded zero overflow, page/console errors, or read-only violations. End-of-work screenshots and pixel comparison have NOT been run; overall visual similarity to the mobile Light/Dark references remains UNVERIFIED. Do not mark complete until changes are reviewed against the references, a matching end capture passes, and actual pixel comparison is recorded. Production remains untouched.",
   "stages": {
     "start-of-work": {
@@ -1416,7 +1416,7 @@
       "directory": "docs/website-screenshots/end-of-work/",
       "sourceKind": "cloudflare-pages-preview-live-read-only",
       "auditPassed": true,
-      "overallVisualComparison": "UNVERIFIED",
+      "overallVisualComparison": "COMPLETE_NEEDS_VISUAL_REVIEW",
       "responsiveOverflowCount": 0,
       "pageErrorCount": 0,
       "consoleErrorCount": 0,
@@ -2794,7 +2794,17 @@
           "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         }
-      ]
+      ],
+      "pixelComparisonSummary": {
+        "comparablePairs": 66,
+        "identicalPairs": 57,
+        "changedPairs": 9,
+        "dimensionMismatches": 0,
+        "invalidPngPairs": 0,
+        "unmatchedBaselineImages": 0,
+        "unmatchedResultImages": 0
+      },
+      "humanVisualReviewStatus": "PENDING"
     }
   },
   "referenceImages": {
@@ -2827,7 +2837,7 @@
       "result": "The actual canonical detail route was not directly opened/reloaded because the clicked Preview card emitted a legacy route; no direct-open/reload assertion is counted as passed."
     }
   ],
-  "comparisonStatus": "NOT TESTED",
+  "comparisonStatus": "COMPLETE_NEEDS_VISUAL_REVIEW",
   "remainingBlockers": [
     "Cloudflare Pages deployment verification returned HTTP 401 / API_AUTHENTICATION_REJECTED. Replace GitHub secret CLOUDFLARE_PAGES_READ_TOKEN with a fresh account-scoped custom API token granting Account / Cloudflare Pages / Read for the account containing the sindarealest2 project. Never paste the token into chat or source.",
     "Set the GitHub Actions variable CLOUDFLARE_ACCOUNT_ID explicitly to the 32-character account ID. The workflow currently has a non-secret fallback for diagnosis, but that did not resolve the API 401.",
@@ -3362,5 +3372,28 @@
     "totalScreenshotCount": 66
   },
   "liveAuditPassed": true,
-  "accessServiceTokenConfigured": true
+  "accessServiceTokenConfigured": true,
+  "humanVisualReview": {
+    "required": true,
+    "status": "PENDING",
+    "note": "Pixel diff is a review aid; a person must inspect matched screenshots and the report before visual acceptance."
+  },
+  "pixelComparison": {
+    "runId": "39425677039",
+    "report": "comparison.json and report.html in the GitHub Actions artifact",
+    "status": "COMPLETE_NEEDS_VISUAL_REVIEW",
+    "summary": {
+      "comparablePairs": 66,
+      "identicalPairs": 57,
+      "changedPairs": 9,
+      "dimensionMismatches": 0,
+      "invalidPngPairs": 0,
+      "unmatchedBaselineImages": 0,
+      "unmatchedResultImages": 0
+    },
+    "matchingFilenameCount": 66,
+    "baselineImageCount": 66,
+    "resultImageCount": 66,
+    "note": "Pixel differences are a review aid, not an aesthetic score. Human visual review remains required."
+  }
 }
