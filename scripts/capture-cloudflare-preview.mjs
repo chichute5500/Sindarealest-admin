@@ -4,7 +4,7 @@ import path from 'node:path';
 import { sanitizeText, sanitizeUrl } from './sanitize-audit-value.mjs';
 import { buildCloudflareAccessHeaders } from './cloudflare-access-service-token.mjs';
 
-const requested = process.env.PREVIEW_URL || 'https://3ed49bcc.sindarealest2.pages.dev/';
+const requested = process.env.PREVIEW_URL || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/';
 const allowedHost = /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i;
 let previewUrl;
 try {
