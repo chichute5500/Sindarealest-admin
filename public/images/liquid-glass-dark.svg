@@ -53,4 +53,18 @@
   <path d="M-160 520 C110 390 264 505 438 614 S738 782 921 674 S1223 485 1610 544" fill="none" stroke="url(#glint)" stroke-width="19" stroke-linecap="round" opacity=".68"/>
   <path d="M165 -100 C305 80 354 225 300 382 S174 680 320 1080" fill="none" stroke="#b7dbf1" stroke-opacity=".48" stroke-width="29" filter="url(#fine)"/>
   <path d="M990 -120 C1120 70 1060 220 1190 346 S1405 568 1300 1100" fill="none" stroke="url(#glint)" stroke-width="26" stroke-linecap="round" opacity=".66"/>
+
+  <!-- Layered satin folds, tuned to deep navy with blue-silver highlights. -->
+  <g id="satin-crease-detail" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-170 250 C95 42 300 83 480 260 S826 432 1020 275 S1350 120 1615 262" stroke="#367aa2" stroke-opacity=".23" stroke-width="52" filter="url(#soft)"/>
+    <path d="M-170 250 C95 42 300 83 480 260 S826 432 1020 275 S1350 120 1615 262" stroke="url(#silk)" stroke-width="29" opacity=".48"/>
+    <path d="M-166 239 C98 31 304 72 484 249 S830 421 1024 264 S1354 109 1619 251" stroke="url(#glint)" stroke-width="4" opacity=".78"/>
+    <path d="M-160 555 C95 361 300 394 488 562 S825 739 1032 570 S1352 408 1610 563" stroke="#28658a" stroke-opacity=".25" stroke-width="46" filter="url(#soft)"/>
+    <path d="M-160 555 C95 361 300 394 488 562 S825 739 1032 570 S1352 408 1610 563" stroke="url(#silk)" stroke-width="25" opacity=".42"/>
+    <path d="M-155 544 C100 350 305 383 493 551 S830 728 1037 559 S1357 397 1615 552" stroke="url(#glint)" stroke-width="3.5" opacity=".76"/>
+    <path d="M-145 845 C105 660 310 690 500 850 S830 1015 1040 855 S1360 690 1605 845" stroke="#245b7d" stroke-opacity=".24" stroke-width="44" filter="url(#soft)"/>
+    <path d="M-145 845 C105 660 310 690 500 850 S830 1015 1040 855 S1360 690 1605 845" stroke="url(#silk)" stroke-width="23" opacity=".40"/>
+    <path d="M-140 834 C110 649 315 679 505 839 S835 1004 1045 844 S1365 679 1610 834" stroke="url(#glint)" stroke-width="3" opacity=".70"/>
+  </g>
+
 </svg>

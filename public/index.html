@@ -1708,20 +1708,20 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
 }
 
 /* Organic liquid-glass wave assets: curved satin ribbons are the primary ambient backdrop. */
-.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
-.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261020-2');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-1');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-1');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
 html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54))}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72))}
-.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261020-2');filter:none}
-.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261020-2');filter:none}
+.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-1');filter:none}
+.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-1');filter:none}
 
 /* Portrait screens use a dedicated tall composition so the curved satin ribbons remain visible instead of cropping into diagonal bands. */
 @media(max-width:760px){
- .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261020-3')}
- .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261020-3')}
- .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261020-3')}
- .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261020-3')}
+ .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-1')}
+ .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-1')}
+ .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-1')}
+ .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-1')}
 }
 
 /* Mobile product detail follows the full-screen gallery layout in the supplied app reference. */
@@ -2294,6 +2294,23 @@ html.dark .sd-fullscreen-share{
 #home .hero-visual:has(#heroProductImage[hidden]){display:none!important}
 #heroProductImage[hidden]{display:none!important}
 
+
+/* Reference-aligned mobile navigation: brand beside the menu, with action icons on the right. */
+@media(max-width:760px){
+  .nav-wrap .nav .brand{
+    position:static!important;
+    left:auto!important;
+    transform:none!important;
+    width:auto!important;
+    max-width:calc(100% - 132px)!important;
+    min-width:0!important;
+    flex:0 1 auto!important;
+    margin:0 auto 0 0!important;
+  }
+  .nav-wrap .nav .brand-copy{min-width:0;max-width:100%;text-align:left}
+  .nav-wrap .nav .brand-name{white-space:nowrap}
+  .nav-wrap .nav .nav-actions{margin-left:auto!important;flex:0 0 auto}
+}
 </style>
 
 </body>

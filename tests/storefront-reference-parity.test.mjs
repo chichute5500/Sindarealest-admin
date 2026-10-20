@@ -45,4 +45,11 @@ assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
 assert.ok(html.includes('id="contact"') && html.includes('id="siteFooter"'), 'Contact and brand footer screens remain.');
 assert.ok(html.includes('id="mobileBottomNav"'), 'The mobile app-style bottom navigation remains.');
+
+assert.match(finalCss, /@media\(max-width:760px\)\{[\s\S]*?\.nav-wrap \.nav \.brand\{[\s\S]*?position:static!important;[\s\S]*?left:auto!important;[\s\S]*?transform:none!important/,
+  'The mobile brand lockup must sit beside the menu, matching the supplied reference rather than being centered.');
+for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobileDark], ['desktop light', desktopLight], ['desktop dark', desktopDark]]) {
+  assert.match(svg, /id="satin-crease-detail"/, name + ' background must retain layered satin crease highlights.');
+}
+
 console.log('PASS: mobile/desktop satin assets, reference-aligned splash and headline, and key storefront screen contracts.');

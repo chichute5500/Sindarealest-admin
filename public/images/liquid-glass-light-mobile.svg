@@ -38,4 +38,18 @@
   <path d="M-104 570 C22 444 120 516 190 610 S306 780 430 704" fill="none" stroke="url(#shine)" stroke-width="17" stroke-linecap="round" opacity=".88"/>
   <path d="M-50 330 C64 258 116 306 175 358 S272 426 430 350" fill="none" stroke="#fff" stroke-opacity=".64" stroke-width="34" filter="url(#glow)"/>
   <path d="M-50 330 C64 258 116 306 175 358 S272 426 430 350" fill="none" stroke="url(#shine)" stroke-width="10" stroke-linecap="round" opacity=".74"/>
+
+  <!-- Fine satin creases add the layered silk highlights visible in the supplied mobile reference. -->
+  <g id="satin-crease-detail" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-54 185 C18 112 82 128 145 184 S291 246 438 157" stroke="#9bc3e2" stroke-opacity=".24" stroke-width="28" filter="url(#blur)"/>
+    <path d="M-54 185 C18 112 82 128 145 184 S291 246 438 157" stroke="url(#ribbon)" stroke-width="14" opacity=".48"/>
+    <path d="M-50 175 C22 102 86 118 149 174 S295 236 442 147" stroke="url(#shine)" stroke-width="2.8" opacity=".82"/>
+    <path d="M-66 423 C12 342 83 365 153 425 S301 492 444 407" stroke="#9dc7e5" stroke-opacity=".20" stroke-width="24" filter="url(#blur)"/>
+    <path d="M-66 423 C12 342 83 365 153 425 S301 492 444 407" stroke="url(#ribbon)" stroke-width="12" opacity=".42"/>
+    <path d="M-61 414 C17 333 88 356 158 416 S306 483 449 398" stroke="url(#shine)" stroke-width="2.4" opacity=".70"/>
+    <path d="M-78 660 C4 583 77 610 151 668 S307 731 454 644" stroke="#9dc7e5" stroke-opacity=".18" stroke-width="26" filter="url(#blur)"/>
+    <path d="M-78 660 C4 583 77 610 151 668 S307 731 454 644" stroke="url(#ribbon)" stroke-width="12" opacity=".38"/>
+    <path d="M-73 651 C9 574 82 601 156 659 S312 722 459 635" stroke="url(#shine)" stroke-width="2.2" opacity=".64"/>
+  </g>
+
 </svg>
