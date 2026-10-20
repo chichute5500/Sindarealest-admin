@@ -168,6 +168,8 @@ assert.match(live, /async function captureAccountDrawer[\s\S]*account-menu-open/
   'The live audit must capture the mobile account menu state in both themes.');
 assert.match(live, /async function captureGalleryCartCheckoutStates[\s\S]*fullscreen-gallery[\s\S]*cart-with-item[\s\S]*checkout-form-open/,
   'The live audit must define the full-screen gallery, populated cart and checkout-form capture helper.');
+assert.match(live, /await addButton\.click\(\)[\s\S]*await page\.locator\('#detailClose'\)\.click\(\)[\s\S]*await page\.waitForFunction\(\(\) => !document\.querySelector\('#productOverlay'\)\?\.classList\.contains\('open'\)[\s\S]*const cartNav = page\.locator\('#mobileCartNav'\)/,
+  'The read-only commerce audit must close the covering product-detail modal before clicking the mobile cart tab.');
 assert.match(live, /const images = Array\.from\(document\.querySelectorAll\('#sdFullscreenViewer \.sd-fullscreen-image'\)\)[\s\S]*images\.some\(image => image\.complete && image\.naturalWidth > 0\)/,
   'Fullscreen gallery readiness must accept either double-buffered image layer, not only #sdFullscreenImage.');
 assert.match(live, /UI-only probe in an isolated browser session[\s\S]*all network writes are blocked/i,

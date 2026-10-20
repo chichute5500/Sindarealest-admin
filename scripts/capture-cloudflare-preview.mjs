@@ -439,6 +439,12 @@ async function captureGalleryCartCheckoutStates(page, viewport, theme, label, ro
       return Number.parseInt(text, 10) > 0 || text.trim() === '99+';
     }, null, { timeout: 5000 });
 
+    // The product-detail modal intentionally covers the bottom navigation.
+    // Close the detail UI before clicking the cart tab; otherwise Playwright's
+    // pointer click is correctly intercepted by the still-open dialog.
+    await page.locator('#detailClose').click();
+    await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 5000 });
+
     const cartNav = page.locator('#mobileCartNav');
     if (!await cartNav.isVisible().catch(() => false)) throw new Error('Mobile cart tab is not visible after adding the isolated test item.');
     await cartNav.click();
