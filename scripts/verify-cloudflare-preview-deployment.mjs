@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const projectName = process.env.CLOUDFLARE_PAGES_PROJECT || 'sindarealest2';
 const requestedUrl = process.env.PREVIEW_URL || '';
@@ -8,7 +9,7 @@ const apiToken = String(process.env.CLOUDFLARE_PAGES_READ_TOKEN || '').trim();
 const outputDir = path.join(process.cwd(), 'artifacts', 'liquid-glass-preview');
 const outputPath = path.join(outputDir, 'deployment-verification.json');
 
-function validatePreviewUrl(value) {
+export function validatePreviewUrl(value) {
   let url;
   try { url = new URL(value); } catch { throw new Error('PREVIEW_URL must be a valid HTTPS Pages Preview URL.'); }
   if (url.protocol !== 'https:'
@@ -19,6 +20,57 @@ function validatePreviewUrl(value) {
     throw new Error('Refused URL: deployment verification is limited to an HTTPS non-production sindarealest2.pages.dev alias.');
   }
   return url;
+}
+
+export function matchesPreviewDeployment(deployment, previewUrlOrOrigin) {
+  const targetOrigin = (typeof previewUrlOrOrigin === 'string'
+    ? previewUrlOrOrigin
+    : previewUrlOrOrigin?.origin || '').toLowerCase();
+  if (!targetOrigin) return false;
+  const aliases = Array.isArray(deployment?.aliases) ? deployment.aliases : [];
+  const origins = aliases.map((alias) => {
+    try { return new URL(alias).origin.toLowerCase(); } catch { return ''; }
+  });
+  let deploymentOrigin = '';
+  try { deploymentOrigin = new URL(deployment?.url || '').origin.toLowerCase(); } catch {}
+  return origins.includes(targetOrigin) || deploymentOrigin === targetOrigin;
+}
+
+export function inspectPreviewDeployment(deployment) {
+  const metadata = deployment?.deployment_trigger?.metadata || {};
+  const commitHash = String(metadata.commit_hash || '').trim();
+  const deploymentBranch = String(metadata.branch || '').trim();
+  const latestStage = deployment?.latest_stage || (Array.isArray(deployment?.stages) ? deployment.stages.at(-1) : null);
+  const latestStageStatus = String(latestStage?.status || '').toLowerCase();
+  const environment = String(deployment?.environment || '').toLowerCase();
+  const status = String(deployment?.status || latestStageStatus).toLowerCase();
+  const commitHashValid = /^[a-f0-9]{7,64}$/i.test(commitHash);
+  const verified = environment === 'preview'
+    && latestStageStatus === 'success'
+    && status === 'success'
+    && commitHashValid
+    && Boolean(deploymentBranch)
+    && Boolean(deployment?.id)
+    && deployment?.is_skipped !== true;
+  return {
+    verified,
+    metadata: {
+      id: typeof deployment?.id === 'string' ? deployment.id : null,
+      url: typeof deployment?.url === 'string' ? deployment.url : null,
+      aliases: Array.isArray(deployment?.aliases) ? deployment.aliases.filter(x => typeof x === 'string') : [],
+      environment,
+      branch: deploymentBranch || null,
+      commitHash: commitHashValid ? commitHash : null,
+      commitMessage: typeof metadata.commit_message === 'string' ? metadata.commit_message.slice(0, 300) : null,
+      createdOn: shortDate(deployment?.created_on),
+      modifiedOn: shortDate(deployment?.modified_on),
+      status,
+      latestStage: {
+        name: typeof latestStage?.name === 'string' ? latestStage.name : null,
+        status: latestStageStatus || null,
+      },
+    },
+  };
 }
 
 function shortDate(value) {
@@ -112,19 +164,13 @@ async function main() {
 
     totalPages = Number(payload?.result_info?.total_pages || 1);
     for (const deployment of payload.result) {
-      const aliases = Array.isArray(deployment?.aliases) ? deployment.aliases : [];
-      const origins = aliases.map((alias) => {
-        try { return new URL(alias).origin.toLowerCase(); } catch { return ''; }
-      });
-      let deploymentOrigin = '';
-      try { deploymentOrigin = new URL(deployment?.url || '').origin.toLowerCase(); } catch {}
-      if (origins.includes(previewUrl.origin.toLowerCase()) || deploymentOrigin === previewUrl.origin.toLowerCase()) {
-        matches.push(deployment);
-      }
+      if (matchesPreviewDeployment(deployment, previewUrl)) matches.push(deployment);
     }
   }
 
-  const uniqueMatches = [...new Map(matches.map(item => [item.id, item])).values()];
+  const uniqueMatches = matches.filter((item, index, all) => item?.id
+    ? all.findIndex(other => other?.id === item.id) === index
+    : true);
   if (uniqueMatches.length !== 1) {
     report.status = uniqueMatches.length === 0 ? 'DEPLOYMENT_NOT_FOUND' : 'AMBIGUOUS_DEPLOYMENT';
     await fail(report, uniqueMatches.length === 0
@@ -134,35 +180,9 @@ async function main() {
   }
 
   const deployment = uniqueMatches[0];
-  const metadata = deployment?.deployment_trigger?.metadata || {};
-  const commitHash = String(metadata.commit_hash || '').trim();
-  const deploymentBranch = String(metadata.branch || '').trim();
-  const latestStage = deployment?.latest_stage || (Array.isArray(deployment?.stages) ? deployment.stages.at(-1) : null);
-  const latestStageStatus = String(latestStage?.status || '').toLowerCase();
-  const environment = String(deployment?.environment || '').toLowerCase();
-  const status = String(deployment?.status || latestStageStatus).toLowerCase();
-  const verified = environment === 'preview'
-    && latestStageStatus === 'success'
-    && /^[a-f0-9]{7,64}$/i.test(commitHash)
-    && Boolean(deploymentBranch)
-    && !deployment.is_skipped;
-
-  report.deployment = {
-    id: typeof deployment.id === 'string' ? deployment.id : null,
-    url: typeof deployment.url === 'string' ? deployment.url : null,
-    aliases: Array.isArray(deployment.aliases) ? deployment.aliases.filter(x => typeof x === 'string') : [],
-    environment,
-    branch: deploymentBranch || null,
-    commitHash: /^[a-f0-9]{7,64}$/i.test(commitHash) ? commitHash : null,
-    commitMessage: typeof metadata.commit_message === 'string' ? metadata.commit_message.slice(0, 300) : null,
-    createdOn: shortDate(deployment.created_on),
-    modifiedOn: shortDate(deployment.modified_on),
-    status,
-    latestStage: {
-      name: typeof latestStage?.name === 'string' ? latestStage.name : null,
-      status: latestStageStatus || null,
-    },
-  };
+  const inspection = inspectPreviewDeployment(deployment);
+  report.deployment = inspection.metadata;
+  const verified = inspection.verified;
 
   if (!verified) {
     report.status = 'DEPLOYMENT_METADATA_UNVERIFIED';
@@ -189,14 +209,16 @@ async function main() {
   }, null, 2));
 }
 
-main().catch(async () => {
-  const report = {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(async () => {
+    const report = {
     sourceKind: 'cloudflare-pages-api-read-only',
     passed: false,
     status: 'UNEXPECTED_ERROR',
     error: 'Unexpected deployment verification error; details omitted to avoid leaking request credentials.',
   };
-  await writeReport(report).catch(() => {});
-  console.error(report.error);
-  process.exitCode = 1;
-});
+    await writeReport(report).catch(() => {});
+    console.error(report.error);
+    process.exitCode = 1;
+  });
+}
