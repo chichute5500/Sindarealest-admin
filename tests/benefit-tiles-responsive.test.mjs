@@ -49,6 +49,15 @@ assert.ok(!/(?:^|;)\s*(?:background|border|backdrop-filter|-webkit-backdrop-filt
   css.match(/\.service-strip\{([^}]*)\}/)?.[1] || ''
 ), 'The outer strip must not redeclare the shared glass surface.');
 const sharedGlassRule = html.match(/\.glass\{([^}]*)\}/)?.[1] || '';
+const refinementStart = html.indexOf('/* === Reference-aligned Liquid Glass refinement (light/dark) === */');
+const refinementEnd = html.indexOf('/* Reference-aligned cart and a separate order-details step. */', refinementStart);
+assert.ok(refinementStart >= 0 && refinementEnd > refinementStart,
+  'The later shared-glass refinement block must remain identifiable.');
+const refinementCss = html.slice(refinementStart, refinementEnd);
+assert.doesNotMatch(refinementCss, /\.glass\s*,\s*\.service-strip\\b/,
+  'The later shared-glass grouping must not separately override the outer commitment strip.');
+assert.doesNotMatch(refinementCss, /\.service-strip\{[^}]*\\b(?:background|border|backdrop-filter|-webkit-backdrop-filter|box-shadow)\\s*:/,
+  'The later refinement must not replace the outer strip material; it must inherit the shared glass layer.');
 assert.ok(sharedGlassRule.includes('background:var(--glass)') && sharedGlassRule.includes('border:1px solid var(--line)'),
   'The outer section must inherit the shared theme background and border.');
 assert.match(sharedGlassRule, /backdrop-filter:blur\(24px\) saturate\(145%\)/,
