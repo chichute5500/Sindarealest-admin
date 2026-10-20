@@ -56,6 +56,7 @@ for (const scriptPath of [
   '../scripts/compare-website-screenshots.mjs',
   '../scripts/validate-cloudflare-preview-url.mjs',
   '../scripts/sanitize-audit-value.mjs',
+  '../scripts/cloudflare-access-service-token.mjs',
 ]) {
   const absolutePath = fileURLToPath(new URL(scriptPath, import.meta.url));
   const syntax = spawnSync(process.execPath, ['--check', absolutePath], { encoding: 'utf8' });
