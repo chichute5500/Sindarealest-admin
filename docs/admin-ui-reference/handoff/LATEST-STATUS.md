@@ -123,37 +123,13 @@
 - **Giới hạn:** chỉ quan sát được ảnh đăng nhập source cục bộ. Chưa có ảnh Playwright của các màn hình sau đăng nhập để đối chiếu với 11 màn hình còn lại. Preview từ xa vẫn sai signature và không thể dùng để xác nhận source hiện tại.
 - Một lần cập nhật markup đăng nhập qua connector đã bị chặn trước khi ghi; không tuyên bố thay đổi copy này đã được áp dụng. Cần dùng một đường chỉnh sửa an toàn khác hoặc tiếp tục sau khi có môi trường checkout/patch được chấp nhận.
 
-
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: f75cb4d38980af17781c1428133d6e27417865b2
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39470193389
+- Tested commit: 6df3658c8971bf8f06be71dd2ee36d9dba5e29ad
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39473301554
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/f75cb4d38980/screenshots/.
+- Local source Playwright matrix: PASS; 16 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/6df3658c8971/screenshots/.
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
-
-
-## Xác minh tiếp theo — 2026-10-21
-
-- HEAD Admin được xác minh trước cập nhật tài liệu: `e7a1510a8936f20fabed7fb9da71d044fdd7613f`; commit này chỉ cập nhật `docs/admin-ui-reference/handoff/latest-test-results.json` từ phiên trước.
-- Đã kiểm tra PR #111 qua GitHub: trạng thái OPEN, chưa merge, base `main`, head `feature/admin-isolated-handoff-2026-10-20`; PR có 278 file thay đổi, 12,794 additions và 356 deletions tại lần đọc này. Phạm vi rộng có storefront/backend; KHÔNG MERGE.
-- Đã đọc lại Master Prompt, START-HERE, LATEST-STATUS, latest-test-results.json và reference-instructions. File JSON trước đó còn ghi HEAD cũ `fbf2955fc0983137cb882f683ec3a17c6695db17`, do đó đã sửa JSON để phân biệt rõ HEAD với SHA thực sự được test.
-- Test PASS gần nhất vẫn là commit `f75cb4d38980af17781c1428133d6e27417865b2`: `npm run check`, `npm test`, 16 ảnh Playwright đăng nhập. Không có bằng chứng rằng các bài test đó chạy trên HEAD hiện tại; test trên HEAD hiện tại được ghi `NOT RUN ON CURRENT HEAD`.
-- Workflow `39470193389`: repository checks, automated tests và chụp ma trận 16 ảnh thành công; chẩn đoán Preview từ xa thất bại. Ảnh chỉ kiểm tra login shell với fixture session chưa đăng nhập; không kiểm tra CRUD hoặc module sau đăng nhập.
-- Đã rà soát tĩnh source `public/admin/index.html`: có view dashboard/products/orders/customers/warranties/settings; các endpoint tham chiếu gồm products, settings, orders, customers, warranties, audit-logs, session/login/logout, upload, backup/restore. Đây là kiểm kê source, không phải xác nhận API chạy thực tế.
-- Ảnh PNG gốc không được giải mã trực tiếp thành ảnh xem được trong lượt này; tài liệu trước ghi HTML viewer đã hiển thị mockup 12 màn hình. Không tuyên bố đã đối chiếu đủ 12 màn hình với ứng dụng thật.
-- Tiến độ giữ ở **43% ước tính**; không tăng khi chưa có bằng chứng mới về visual parity và nghiệp vụ sau đăng nhập.
-- Cập nhật `latest-test-results.json` đã được ghi thành commit `e35b6a9d43ab5d3b2a03b431b225a4e2d16bb8de`; xác minh lại GitHub sau khi hoàn tất cập nhật trạng thái.
-- Blocker còn lại: chưa có checkout cục bộ để rà soát toàn bộ diff và chạy test trực tiếp; Preview/source mismatch; thiếu bằng chứng E2E có xác thực.
-- Ranh giới: PR #111 OPEN/unmerged; không sửa nhánh website tĩnh hoặc main; không merge/cherry-pick/force-push; Cloudflare production deployment: **NOT PERFORMED**.
-
-### Tiếp tục thực hiện
-
-1. Thử nghiệm đường chạy CI an toàn cho đúng HEAD hiện tại, nếu có quyền trigger workflow mà không thay đổi cấu hình hay dữ liệu.
-2. Tiếp tục lấy bằng chứng screenshot/metadata hiện có và kiểm tra nguồn reference.
-3. Tìm phương án checkout cục bộ/CI để rà soát toàn bộ diff và kiểm thử Admin-only.
-4. Khi có quyền Preview được ủy quyền và source đúng, kiểm thử các module sau đăng nhập với fixture an toàn.
-5. Không nâng phần trăm cho đến khi có bằng chứng kiểm thử mới.
