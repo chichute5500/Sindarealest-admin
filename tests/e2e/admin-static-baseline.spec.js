@@ -380,14 +380,37 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const saveScreenshot = async (name, variant, extra = {}) => {
     const filename = name + '__' + variant.viewport.width + 'x' + variant.viewport.height + '__' + variant.theme + '.png';
     const filePath = join(screenshotDir, filename);
-    const measurement = await page.evaluate(() => ({
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      documentWidth: document.documentElement.scrollWidth,
-      horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
-      theme: document.documentElement.dataset.adminTheme || null,
-      lang: document.documentElement.lang
-    }));
+    const measurement = await page.evaluate(() => {
+      const rawClosingTagNodes = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const value = walker.currentNode.nodeValue || '';
+        if (!value.includes('</div>')) continue;
+        const parent = walker.currentNode.parentElement;
+        const rect = parent?.getBoundingClientRect();
+        if (rect && rect.width > 0 && rect.height > 0 && getComputedStyle(parent).visibility !== 'hidden' && getComputedStyle(parent).display !== 'none') {
+          rawClosingTagNodes.push({
+            text: value.trim().slice(0, 120),
+            tag: parent.tagName,
+            id: parent.id || null,
+            className: typeof parent.className === 'string' ? parent.className.slice(0, 120) : null,
+            outerHTML: parent.outerHTML.slice(0, 320),
+            x: Math.round(rect.x),
+            y: Math.round(rect.y)
+          });
+        }
+      }
+      return {
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        documentWidth: document.documentElement.scrollWidth,
+        horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+        theme: document.documentElement.dataset.adminTheme || null,
+        lang: document.documentElement.lang,
+        rawClosingTagNodes: rawClosingTagNodes.slice(0, 10)
+      };
+    });
+    expect(measurement.rawClosingTagNodes, name + ' must not display raw closing-tag text').toEqual([]);
     metrics.push({ screen: name, ...variant, ...measurement, ...extra });
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
     expect(measurement.horizontalOverflow, name + ' should not overflow horizontally at ' + variant.viewport.width + 'px').toBe(false);
