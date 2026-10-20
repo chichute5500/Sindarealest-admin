@@ -126,3 +126,19 @@
 - Các bước manual archive vào 'docs/website-screenshots/start-of-work' / 'end-of-work' và pixel comparison không chạy trong push audit này; đây là workflow riêng cần chọn stage thủ công. Không ghi chúng là đã thực hiện, và không tạo/ghi đè archive baseline chỉ để làm xanh workflow.
 - Không merge PR, không sửa main, không triển khai Production.
 - Sau commit cập nhật tài liệu này, GitHub Actions sẽ chạy lại theo head mới; cần kiểm tra lại kết quả và SHA trước khi báo cáo cuối cùng.
+
+
+## Follow-up — canonical baseline archive and guarded end capture
+
+### Baseline archive verified
+- Live Preview start-of-work screenshots have now been archived successfully; this supersedes the earlier note above that archive stages were not yet performed.
+- Baseline capture run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39423635778
+- Baseline source/deployment SHA: `853e40f661d1d2718ab8d4f1dec9a33b81dacaae`; Cloudflare Pages API verified the exact Preview alias, branch, environment and commit SHA before archiving.
+- Archive manifest reports `CAPTURED_PASS`, 66 live PNG screenshots, 12 product-detail route checks, zero responsive overflow, zero console/page errors and zero read-only violations.
+- Baseline is an evidence snapshot of the current audited storefront; it is not claimed to represent an earlier pre-fix visual state.
+
+### End-of-work capture and pixel comparison
+- Updated the isolated visual workflow to accept a guarded `[capture-end-of-work]` commit on this fix branch. It reuses the checked-in Preview URL validator, requires the exact Preview deployment SHA, verifies the saved start baseline, and only then archives end screenshots and runs pixel comparison.
+- This commit requests the end-of-work capture. Its result is not considered complete until the corresponding GitHub Actions run reports successful deployment verification, archive creation, and comparison output.
+- Expected remaining review: inspect the generated matched-image pixel-diff report; pixel differences are evidence for human review, not an automatic aesthetic pass/fail.
+- Production remains untouched; no main edits or PR merge.
