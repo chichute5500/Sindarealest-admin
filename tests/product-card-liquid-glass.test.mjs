@@ -66,9 +66,9 @@ assert.doesNotMatch(ambientLight, /theme-croc-/,
 assert.doesNotMatch(ambientDark, /theme-croc-/,
   "Dark page ambience must not use the crocodile-scale raster texture as its background.");
 const welcomeLightStart = finalThemeCss.indexOf(".welcome-texture--light{");
-const welcomeLight = html.slice(welcomeLightStart).split("}")[0] || "";
+const welcomeLight = finalThemeCss.slice(welcomeLightStart).split("}")[0] || "";
 const welcomeDarkStart = finalThemeCss.indexOf(".welcome-texture--dark{");
-const welcomeDark = html.slice(welcomeDarkStart).split("}")[0] || "";
+const welcomeDark = finalThemeCss.slice(welcomeDarkStart).split("}")[0] || "";
 assert.ok(welcomeLight.includes("images/liquid-glass-light.svg?v=20261020-2"),
   "Light welcome splash must use the same pearl/glacial ambient design language.");
 assert.ok(welcomeDark.includes("images/liquid-glass-dark.svg?v=20261020-2"),
