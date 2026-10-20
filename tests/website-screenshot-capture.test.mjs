@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
@@ -27,4 +29,15 @@ assert.match(compare, /pixelmatch[\s\S]*start-of-work[\s\S]*end-of-work/,
   'The screenshot comparator must compare start/end archives.');
 assert.match(compare, /DIMENSION_MISMATCH|PIXEL_CHANGED/,
   'The comparator must report pixel differences and dimension mismatch separately.');
-console.log('PASS: live Preview capture is source-restricted/read-only, fixtures cannot enter canonical archives, and pixel comparison is configured.');
+
+for (const scriptPath of [
+  '../scripts/capture-cloudflare-preview.mjs',
+  '../scripts/compare-website-screenshots.mjs',
+]) {
+  const absolutePath = fileURLToPath(new URL(scriptPath, import.meta.url));
+  const syntax = spawnSync(process.execPath, ['--check', absolutePath], { encoding: 'utf8' });
+  assert.equal(syntax.status, 0,
+    'Script syntax must validate: ' + scriptPath + '\\n' + (syntax.stderr || syntax.stdout || 'no diagnostic'));
+}
+
+console.log('PASS: live Preview capture is source-restricted/read-only, fixture capture is artifact-only, and live scripts pass Node syntax validation.');
