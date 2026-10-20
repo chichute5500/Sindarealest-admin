@@ -838,6 +838,29 @@ try {
     audit.interactions.push({ theme, check: 'escape-closes-detail-and-restores-route', pass: detailClosedAndInert });
     if (!detailClosedAndInert) hardFailures.push('Product detail did not close or restore route: ' + theme);
 
+    // Verify browser Back closes an open product overlay and restores the catalog URL.
+    // The marker entry makes this deterministic even when Playwright starts at a fresh origin.
+    await page.evaluate(() => history.pushState({ auditBackMarker: true }, '', '/'));
+    await page.locator('#catalogGrid .product-card .product-open').first().click();
+    await page.locator('#productOverlay.open').waitFor({ state: 'visible' });
+    const routeBeforeBack = await page.evaluate(() => location.pathname);
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'));
+    await page.waitForFunction(() => location.pathname === '/');
+    const backNavigationState = await page.evaluate(() => ({
+      pathname: location.pathname,
+      overlayClosed: !document.querySelector('#productOverlay')?.classList.contains('open'),
+      overlayInert: document.querySelector('#productOverlay')?.hasAttribute('inert') === true,
+      overlayHidden: document.querySelector('#productOverlay')?.getAttribute('aria-hidden') === 'true',
+    }));
+    const backNavigationPass = routeBeforeBack.startsWith('/san-pham/')
+      && backNavigationState.pathname === '/'
+      && backNavigationState.overlayClosed
+      && backNavigationState.overlayInert
+      && backNavigationState.overlayHidden;
+    audit.interactions.push({ theme, check: 'browser-back-closes-product-overlay-and-restores-catalog', pass: backNavigationPass, result: { routeBeforeBack, ...backNavigationState } });
+    if (!backNavigationPass) hardFailures.push('Browser Back did not close product detail and restore catalog route: ' + theme);
+
     await page.locator('#catalogGrid .mini-add').first().click();
     await page.locator('#catalogGrid .mini-add').nth(1).click();
     await page.locator('#cartOpen').click();
