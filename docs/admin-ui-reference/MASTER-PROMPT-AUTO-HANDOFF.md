@@ -779,3 +779,123 @@ Không chỉ viết hướng dẫn để người dùng tự làm. Hãy chủ đ
 Không giả vờ đã chạy test, không làm giả ảnh chụp, không tuyên bố đạt 100% khi chưa đủ bằng chứng.
 
 Ưu tiên cao nhất: ĐẠT ĐÚNG THIẾT KẾ MẪU — GIỮ NGUYÊN LOGO, THƯƠNG HIỆU, SẢN PHẨM — KIỂM THỬ BẰNG CHỨNG THẬT — CHỈ LÀM VIỆC TRONG PREVIEW VÀ NHÁNH FIX — KHÔNG ĐỘNG ĐẾN PRODUCTION.
+
+
+---
+
+XX. QUY TRÌNH QUẢN LÝ NGỮ CẢNH — GIÚP AI HIỂU ĐÚNG, KHÔNG NHIỄU THÔNG TIN
+
+Mục tiêu của phần này là để AI ở bất kỳ cuộc chat nào cũng tiếp quản đúng nhiệm vụ, không bị lẫn giữa prompt cũ, báo cáo cũ, nhánh khác hoặc suy đoán của AI. Phần này được tích hợp trực tiếp vào prompt handoff; không tạo thêm một file bổ sung chỉ để lặp lại các quy tắc dưới đây.
+
+1. NGUYÊN TẮC ĐỌC TÀI LIỆU THEO TỪNG LỚP
+
+Không đọc tràn lan tất cả file cùng lúc. Đọc theo thứ tự:
+
+Lớp 1 — Prompt này:
+- Đọc prompt handoff này để hiểu mục tiêu, quyền được phép, điều cấm và tiêu chí nghiệm thu.
+- Prompt này quy định nhiệm vụ website công khai; không tự áp dụng nó cho công việc Admin hoặc dự án khác.
+- Không tự rút gọn, viết lại hoặc thay thế các yêu cầu bắt buộc bằng bản tóm tắt của AI.
+
+Lớp 2 — Trạng thái hiện tại:
+- Xác minh branch, commit mới nhất, working tree, các thay đổi chưa commit, Preview URL và trạng thái workflow.
+- Đọc báo cáo trạng thái mới nhất nếu có, nhưng xem đó là thông tin định hướng cần đối chiếu, không phải bằng chứng tự xác thực.
+- Nếu không có file trạng thái chuyên biệt, tự tổng hợp trạng thái từ GitHub, CI, Preview và các bằng chứng hiện có; không tạo file trạng thái mới nếu chưa cần thiết.
+
+Lớp 3 — Tài liệu đúng với việc sắp làm:
+- Chỉ đọc những file mã nguồn, ảnh tham chiếu, test, log hoặc tài liệu có liên quan trực tiếp đến hạng mục hiện tại.
+- Mở rộng việc đọc khi phát hiện dependency hoặc hợp đồng chức năng liên quan.
+- Không nạp toàn bộ lịch sử, mọi báo cáo và mọi file trong repository vào ngữ cảnh nếu chúng không giúp giải quyết nhiệm vụ hiện tại.
+- Không bỏ qua tài liệu bắt buộc chỉ vì muốn làm nhanh.
+
+2. PHÂN LOẠI THÔNG TIN — KHÔNG ĐƯỢC COI MỌI FILE LÀ NGANG QUYỀN
+
+Trước khi sử dụng thông tin, xác định nó thuộc loại nào:
+
+A. Quy tắc, giới hạn và tiêu chí nghiệm thu còn hiệu lực.
+B. Yêu cầu bổ sung đã được người dùng xác nhận.
+C. Trạng thái kỹ thuật cần kiểm tra lại (branch, commit, Preview, workflow, test).
+D. Báo cáo hoặc nhận định cũ.
+E. Giả thuyết, đề xuất hoặc suy luận của AI.
+
+Không trình bày loại D hoặc E như sự thật đã được xác minh. Không để một báo cáo cũ ghi đè trạng thái GitHub/Preview mới hơn. Không để bản tóm tắt của AI thay thế prompt nguồn.
+
+Nếu hai nguồn mâu thuẫn:
+1. Xác định chính xác hai nội dung mâu thuẫn và nguồn của chúng.
+2. Kiểm tra ngày, commit, nhánh và bằng chứng liên quan.
+3. Áp dụng yêu cầu mới của người dùng chỉ cho phạm vi mà người dùng thực sự thay đổi; các giới hạn khác vẫn giữ nguyên.
+4. Không tự suy ra quyền sửa Production, dữ liệu thật, secrets, binding hoặc phạm vi Admin từ một yêu cầu thiết kế giao diện.
+5. Nếu mâu thuẫn ảnh hưởng đáng kể đến tính đúng đắn hoặc an toàn và không thể giải quyết bằng bằng chứng, ghi rõ điểm chưa chắc chắn và chỉ hỏi người dùng về quyết định thực sự cần thiết. Trong lúc đó, tiếp tục các phần độc lập an toàn.
+
+3. KIỂM TRA HIỂU ĐÚNG TRƯỚC KHI SỬA
+
+Trước khi thực hiện thay đổi lớn hoặc thay đổi cấu trúc, tự lập bản tóm tắt nội bộ ngắn gồm:
+- Nhiệm vụ hiện tại và phạm vi được phép.
+- Branch, commit và Preview đã xác minh.
+- Những điều bắt buộc bảo toàn.
+- Những file hoặc thành phần dự kiến thay đổi và lý do.
+- Các tiêu chí nghiệm thu, test cần chạy và bằng chứng cần thu thập.
+- Những điều chưa xác minh hoặc có rủi ro.
+
+Đối chiếu bản tóm tắt này với prompt và repository. Đây là bước tự kiểm tra của AI, không phải lý do bắt người dùng xác nhận lại những thông tin đã rõ.
+
+Không bắt đầu thay đổi lớn nếu bản tóm tắt đang nhầm nhiệm vụ, nhánh, môi trường hoặc ranh giới an toàn.
+
+4. LÀM VIỆC THEO CÁC HẠNG MỤC NHỎ CÓ THỂ KIỂM CHỨNG
+
+Mỗi hạng mục phải có:
+- Mục tiêu cụ thể.
+- Phạm vi file/thành phần liên quan.
+- Điều kiện hoàn thành có thể quan sát.
+- Test hoặc cách xác minh tương ứng.
+- Kết quả thực tế và đường dẫn bằng chứng.
+
+Ưu tiên vòng lặp: kiểm tra → thay đổi có mục tiêu → chạy test phù hợp → xem kết quả thật → cập nhật trạng thái. Không sửa nhiều khu vực không liên quan trong một lần chỉ để giảm số lượt thao tác.
+
+Nếu một test thất bại, đọc lỗi và xác định nguyên nhân trước khi sửa. Không tự hạ tiêu chuẩn, xóa test hoặc dùng mock để tuyên bố nghiệm thu thực tế.
+
+5. QUẢN LÝ NGUỒN SỰ THẬT VÀ BẰNG CHỨNG
+
+- GitHub commit xác nhận nội dung đã commit; không tự chứng minh website Preview đang phục vụ commit đó.
+- Workflow PASS chỉ chứng minh những bước thực sự được workflow chạy; không tự chứng minh giao diện giống ảnh mẫu.
+- HTTP 200 chỉ chứng minh phản hồi HTTP; không chứng minh chức năng và hình ảnh đúng.
+- Ảnh chụp chỉ là bằng chứng cho đúng URL, commit/triển khai, route, viewport, theme và thời điểm đã ghi nhận.
+- Kết quả từ Preview khác không được dùng thay bằng chứng của Preview đang nghiệm thu.
+- Kết quả của nhánh Admin không được gán cho nhánh website công khai, và ngược lại.
+- Khi chưa chạy được test, ghi rõ “chưa kiểm thử” hoặc “bị chặn”, nêu nguyên nhân; không ghi PASS.
+- Chỉ báo phần trăm tiến độ dựa trên tiêu chí đã hoàn thành và bằng chứng, không dựa trên cảm giác hoặc số lượng file đã sửa.
+
+6. CHUYỂN TIẾP GIỮA CÁC CUỘC CHAT
+
+Khi chuẩn bị bàn giao:
+- Cập nhật tài liệu trạng thái hiện có nếu có và thuộc phạm vi được phép.
+- Ghi branch, commit mới nhất, Preview đã xác minh, workflow/test gần nhất và kết quả.
+- Ghi việc đã hoàn thành kèm bằng chứng.
+- Ghi việc chưa xong, lỗi hiện tại, nguyên nhân đã biết và bước tiếp theo cụ thể.
+- Ghi những quyết định người dùng đã xác nhận và giới hạn vẫn còn hiệu lực.
+- Không sao chép toàn bộ prompt này sang một file mới.
+- Không tạo nhiều bản handoff trùng nhau hoặc để các bản tóm tắt trở thành nguồn chỉ dẫn cạnh tranh.
+- Nếu cần file hướng dẫn chat tiếp theo, file đó chỉ nên trỏ về prompt này và trạng thái hiện hành, đồng thời nêu đúng nhánh/nhiệm vụ; không tự viết lại các quy tắc gốc theo cách có thể làm mất nghĩa.
+
+Khi bắt đầu chat mới, không tin mù quáng vào phần bàn giao. Đọc prompt nguồn này, xác minh trạng thái GitHub mới nhất, rồi chỉ truy xuất các bằng chứng cần cho bước tiếp theo.
+
+7. KHÔNG LÀM LẪN CÁC NHIỆM VỤ ĐỘC LẬP
+
+Prompt này chỉ điều khiển nhiệm vụ website công khai trong phạm vi đã nêu. Nếu repository đồng thời có công việc Admin, AI phân loại ảnh, import ZIP hoặc dự án khác:
+- Không tự đưa các nhiệm vụ đó vào phạm vi hiện tại.
+- Không trộn trạng thái, test, ảnh chụp, commit hoặc kết quả giữa các nhiệm vụ.
+- Có thể ghi nhận một dependency hoặc phát hiện liên quan, nhưng chỉ sửa khi thuộc phạm vi cho phép.
+- Không chờ công việc độc lập khác hoàn thành nếu hạng mục hiện tại có thể tiếp tục an toàn.
+- Không sao chép, merge hoặc cherry-pick code giữa các nhánh khi chưa được người dùng cho phép.
+
+8. CẬP NHẬT PROMPT MÀ KHÔNG LÀM MẤT NGUỒN CHUẨN
+
+Khi người dùng đưa ra yêu cầu bổ sung:
+- Thêm trực tiếp vào phần phù hợp của prompt handoff này nếu đó là quy tắc lâu dài hoặc tiêu chí của nhiệm vụ.
+- Nếu yêu cầu thay đổi một quy tắc cũ, ghi rõ phần nào được thay thế và phạm vi thay thế; không âm thầm xóa các giới hạn không liên quan.
+- Không tạo file bổ sung riêng chỉ để lặp lại phần thay đổi.
+- Không xóa hoặc ghi đè prompt nguồn nếu người dùng chưa yêu cầu.
+- Sau khi cập nhật, đọc lại nội dung đã lưu trên đúng branch để xác minh thay đổi thực sự tồn tại.
+- Nếu cập nhật bị lỗi hoặc không có quyền ghi, báo rõ là chưa cập nhật; tuyệt đối không tuyên bố đã hoàn thành khi chưa xác minh.
+
+Mệnh lệnh cuối của phần quản lý ngữ cảnh:
+HÃY ĐỌC ĐÚNG NGUỒN, XÁC MINH TRẠNG THÁI, CHỈ NẠP THÔNG TIN CẦN THIẾT, PHÂN BIỆT BẰNG CHỨNG VỚI SUY ĐOÁN, VÀ CẬP NHẬT BÀN GIAO TẠI NGUỒN CHUẨN. MỤC TIÊU LÀ GIÚP AI HIỂU ĐÚNG VÀ TIẾP TỤC ĐƯỢC CÔNG VIỆC, KHÔNG PHẢI TẠO THÊM NHIỀU FILE PROMPT TRÙNG LẶP.
