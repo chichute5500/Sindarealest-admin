@@ -117,3 +117,8 @@ The direct, read-only GitHub Actions browser probe against `https://3ed49bcc.sin
 - Project tests, `npm run check`, and the local Playwright capture completed successfully. The direct Preview probe explicitly recorded `accessBlocked=true`, `captureCompleted=false`, and `screenshotCount=0`; this is a confirmed Access gate, not a live UI pass.
 - The separate Admin Preview smoke workflow [39355503580](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355503580) failed because its expected `#loginView` / `#loginForm` elements were not found. This is outside the public static website scope; no admin code was changed as part of this audit. Investigate only in the dedicated admin workstream.
 - The live capture script now classifies navigation to `*.cloudflareaccess.com` as an Access gate and stops route probing without credentials. No public storefront HTML/CSS/JS was changed, no screenshots were archived into canonical start/end folders, and no Production deploy or merge was performed.
+
+
+## Branch-scope safety review — 2026-10-20
+
+The GitHub compare from base commit `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` to audit commit `fa7445b74661faf260c32b3ab32dfa85e3538e78` reports a diverged branch (293 commits ahead, 6 behind) and 72 changed files. The diff includes public storefront work but also admin HTML, admin API endpoints, shared middleware/API logic, a database migration, deployment/setup scripts and the large legacy product fixture. This branch is not safe to merge as one unit for the public static UI task. Keep PR #108 open; do not merge or deploy Production. Isolate/review out-of-scope files against the correct base before any integration.
