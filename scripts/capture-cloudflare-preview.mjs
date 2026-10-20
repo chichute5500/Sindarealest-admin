@@ -307,7 +307,7 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     title: (document.querySelector('#detailTitle')?.textContent || '').trim(),
     imageCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
   }));
-  if (!/^\/san-pham\/[^/]+\/?$/i.test(clicked.path) || !clicked.title) {
+  if (!/^\/sanpham\/[^/]+\/[^/]+\/?$/i.test(clicked.path) || !clicked.title) {
     audit.productDetailChecks.push({ context: label, status: 'FAIL', clickedPath: clicked.path, productTitlePresent: Boolean(clicked.title) });
     audit.hardFailures.push('Clicking a live product did not produce an expected current detail route (' + label + ').');
     return;
