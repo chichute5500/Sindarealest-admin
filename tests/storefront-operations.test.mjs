@@ -71,11 +71,11 @@ assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
 
-assert.ok(storefrontHtml.includes(".theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261020-2')"),
+assert.ok(storefrontHtml.includes(".theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-1')"),
   'Dark ambient mode must use the curved navy-sapphire SVG ribbons.');
-assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
+assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-1')"),
   'Light ambient mode must use the curved pearl-blue SVG ribbons.');
-assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}"),
+assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-1');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}"),
   'The final light ambient rule must keep the reference blue hue without the old color-cast filter.');
 assert.match(storefrontHtml, /\.mobile-bottom-nav\{background:rgba\(244,250,255,\.78\)\}/,
   'Mobile bottom navigation must balance visible Liquid Glass translucency with label readability.');
@@ -96,9 +96,9 @@ assert.ok(storefrontHtml.includes('.theme-watermark{opacity:.035}') &&
   'The background brand watermark must stay subtle and not compete with content.');
 assert.match(storefrontHtml, /@media\(max-width:850px\) and \(min-width:761px\)\{\s*\.navlinks\{display:none\}/,
   'Compact tablet navigation must prevent the full desktop navbar from clipping at 768 CSS pixels.');
-assert.ok(storefrontHtml.includes(".welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261020-2');filter:none}"),
+assert.ok(storefrontHtml.includes(".welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-1');filter:none}"),
   'The dark welcome screen must share the curated sapphire wave artwork.');
-assert.ok(storefrontHtml.includes(".welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261020-2');filter:none}"),
+assert.ok(storefrontHtml.includes(".welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-1');filter:none}"),
   'The light welcome screen must share the curated pearl wave artwork.');
 assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--dark" src="images\/theme-croc-dark\.webp\?v=20261017-1"/,
   'The editorial material sample image must keep its black-material identity.');
