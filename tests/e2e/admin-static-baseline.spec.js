@@ -385,7 +385,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     // animation suppression/render flush; this catches delayed UI artifacts.
     await page.screenshot({ path: filePath, animations: 'disabled' });
     await page.waitForTimeout(100);
-    const measurement = await page.evaluate(() => {
+    const measurement = await page.evaluate((screenName) => {
       const rawClosingTagNodes = [];
       const rawClosingTagPseudoContent = [];
       // Search the full document tree, not only body text. Range geometry tells us
@@ -476,16 +476,57 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         theme: document.documentElement.dataset.adminTheme || null,
         lang: document.documentElement.lang,
         rawClosingTagNodes: rawClosingTagNodes.slice(0, 10),
-        rawClosingTagPseudoContent: rawClosingTagPseudoContent.slice(0, 10)
+        rawClosingTagPseudoContent: rawClosingTagPseudoContent.slice(0, 10),
+        hitTestDiagnostics: (() => {
+          // Target the exact blank area where the screenshot showed a stray </div>
+          // while DOM text and pseudo-element scans were unexpectedly empty.
+          if (screenName !== 'customers' || window.innerWidth !== 390 ||
+              document.documentElement.dataset.adminTheme !== 'light') return [];
+          const findings = [];
+          for (let y = 620; y <= 700; y += 4) {
+            for (let x = 0; x <= 84; x += 4) {
+              const range = document.caretRangeFromPoint?.(x, y);
+              const node = range?.startContainer?.nodeType === Node.TEXT_NODE
+                ? range.startContainer : null;
+              const text = node?.nodeValue || '';
+              const element = document.elementFromPoint(x, y);
+              const pseudo = element ? ['::before', '::after', '::marker']
+                .map(name => ({ name, content: getComputedStyle(element, name).content || '' }))
+                .filter(item => item.content.toLowerCase().includes('div') || item.content.includes('<'))
+                : [];
+              if (/<\\/?div|\\/div>/i.test(text) || pseudo.length) {
+                findings.push({
+                  x, y, offset: range?.startOffset ?? null,
+                  nodeText: text.slice(0, 180),
+                  nodeTag: node?.parentElement?.tagName || null,
+                  nodeId: node?.parentElement?.id || null,
+                  nodeClass: typeof node?.parentElement?.className === 'string' ? node.parentElement.className.slice(0, 140) : null,
+                  nodeOuterHTML: node?.parentElement?.outerHTML?.slice(0, 500) || null,
+                  hitTag: element?.tagName || null,
+                  hitId: element?.id || null,
+                  hitClass: typeof element?.className === 'string' ? element.className.slice(0, 140) : null,
+                  hitOuterHTML: element?.outerHTML?.slice(0, 500) || null,
+                  pseudo
+                });
+              }
+            }
+          }
+          return findings.slice(0, 40);
+        })()
       };
-    });
-    if (measurement.rawClosingTagNodes.length || measurement.rawClosingTagPseudoContent.length) {
+    }, name);
+    const hasSuspiciousHitTest = measurement.hitTestDiagnostics.some(item =>
+      /<\\/?div|\\/div>/i.test(item.nodeText || '') ||
+      item.pseudo.some(p => /<\\/?div|\\/div>/i.test(p.content || ''))
+    );
+    if (measurement.rawClosingTagNodes.length || measurement.rawClosingTagPseudoContent.length || hasSuspiciousHitTest) {
       visibleClosingTagIssues.push({
         screen: name,
         viewport: variant.viewport,
         theme: variant.theme,
         textNodes: measurement.rawClosingTagNodes,
-        pseudoElements: measurement.rawClosingTagPseudoContent
+        pseudoElements: measurement.rawClosingTagPseudoContent,
+        hitTestDiagnostics: measurement.hitTestDiagnostics
       });
     }
     metrics.push({ screen: name, ...variant, ...measurement, ...extra });
