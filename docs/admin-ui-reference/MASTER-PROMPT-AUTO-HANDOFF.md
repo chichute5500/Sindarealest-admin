@@ -852,3 +852,15 @@ Khi người dùng yêu cầu bàn giao:
 - Không làm thay đổi dữ liệu thật, secrets, auth, D1/R2 hoặc backend ngoài phạm vi được cho phép.
 - Nếu cần người dùng cung cấp quyền, thông tin hoặc quyết định không thể suy ra an toàn, hỏi một câu cụ thể; còn lại tiếp tục các việc độc lập có thể làm.
 
+
+
+18.9. QUY TẮC KHỞI ĐỘNG PHIÊN CHAT MỚI — COPY MASTER PROMPT
+
+Khi người dùng mở một chat mới để tiếp tục ADMIN, hướng dẫn thao tác phải rõ ràng:
+1. Mở và sao chép TOÀN BỘ nội dung của file Master Prompt này; dán vào chat AI mới. Chỉ gửi URL không thay thế việc đọc nội dung nếu AI không có quyền truy cập repository.
+2. Đọc tiếp START-HERE.md, LATEST-STATUS.md, latest-test-results.json và PROMPT-NEXT-CHAT.md từ đúng nhánh ADMIN. Không yêu cầu người dùng kể lại nội dung đã được ghi trong handoff.
+3. Prompt chỉ là chỉ dẫn, không tự cấp quyền GitHub, không tự khởi động công cụ hoặc phiên chat, không bảo đảm AI có thể chạy test hay truy cập Preview. Trước khi sửa code, AI phải kiểm tra quyền/công cụ thực tế và xác minh repository, branch, HEAD SHA, trạng thái Git và PR hiện tại.
+4. Nếu không thể kiểm tra local git status vì không có checkout, ghi rõ giới hạn; không giả vờ đã kiểm tra. Nếu không thể truy cập Preview do sai URL hoặc Cloudflare Access, ghi BLOCKED và không bỏ qua Access.
+5. Chỉ làm việc trên `feature/admin-isolated-handoff-2026-10-20`. Bảo vệ `fix/liquid-glass-audit-2026-10-19` và `main`; giữ PR #111 và PR #108 chưa merge; không force-push, tự merge/cherry-pick, đổi secrets/backend/data hoặc deploy Production.
+6. Sau mỗi vòng công việc có bằng chứng, cập nhật LATEST-STATUS.md, latest-test-results.json và PROMPT-NEXT-CHAT.md nếu cần; ghi kết quả PASS/FAIL/BLOCKED/SKIPPED/NOT VERIFIED theo bằng chứng. Đọc lại file từ GitHub để xác minh sau khi commit.
+7. Không lặp lại công việc đã PASS trên cùng source commit trừ khi code phụ thuộc thay đổi. Ưu tiên bước tiếp theo có thể thực hiện ngay, không dừng ở kế hoạch nếu có công việc an toàn thực sự có thể tiến hành.
