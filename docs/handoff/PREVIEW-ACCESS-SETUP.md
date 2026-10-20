@@ -1,59 +1,85 @@
-# Unblock read-only Cloudflare Pages Preview capture
+# Unblock and verify read-only Cloudflare Pages Preview capture
 
-Purpose: allow GitHub Actions to read and screenshot the **Preview hostname only** so the live Playwright capture can verify layout and product routes. This is not a request to deploy, merge, or change Production.
+Purpose: enable GitHub Actions to read and screenshot the **Preview hostname only**, verify the exact alias maps to a successful Cloudflare Pages Preview deployment, and record its actual deployment commit. This is not permission to deploy, merge, or change Production.
+
+The screenshot workflow now requires both:
+1. Cloudflare Access service credentials to pass the protected hostname.
+2. A separate Cloudflare API token with **Pages Read** permission to identify the deployment/branch/commit behind that exact alias.
 
 ## 1. Create a dedicated Cloudflare Access service token
 
 1. Open Cloudflare Zero Trust.
 2. Go to **Access controls → Service credentials → Service Tokens**.
 3. Create a token named `Sindarealest2 Preview Playwright`.
-4. Copy both the Client ID and Client Secret when Cloudflare shows them. Cloudflare only displays the client secret once; if it is lost, rotate/create a new token. Do not paste either value into a chat, issue, commit, screenshot, or workflow log.
+4. Copy both its Client ID and Client Secret when Cloudflare shows them. The client secret is only displayed once; if lost, rotate or create another token.
 
 Official documentation: https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/
 
 ## 2. Scope Access to the exact Preview alias
 
-The target currently configured in the screenshot workflow is:
+The current screenshot workflow target is:
 
 `https://3ed49bcc.sindarealest2.pages.dev/`
 
 In **Access controls → Applications**, verify which Access application protects that exact hostname.
 
-- Prefer a dedicated Access application/domain scoped to this Preview hostname, then add a **Service Auth** policy that includes the newly created service token.
+- Prefer a dedicated Access application/domain scoped to this Preview hostname, then add a **Service Auth** policy that includes the new service token.
 - Do not add a broad allow/service-auth policy to an application that also protects `sindarealest2.pages.dev` (Production) or other production hosts.
-- Do not weaken or delete existing identity policies. If the hostname is covered by a shared wildcard application and a Preview-only scope cannot be established safely, stop rather than broadening access.
-- Keep the service-token use limited to the read-only capture jobs; the capture script validates that the target is a non-production Pages alias and only sends the token headers to that Preview origin.
+- Do not weaken or delete existing identity policies. If the hostname is covered by a shared wildcard application and Preview-only scope cannot be established safely, stop rather than broadening access.
+- The Playwright capture script validates a non-production Pages alias, attaches service-token headers only to that exact Preview origin, and blocks writes/external navigation.
 
 Cloudflare policy reference: https://developers.cloudflare.com/cloudflare-one/access-controls/policies/common-policies/
 
-## 3. Save the values as GitHub Actions repository secrets
+## 3. Create a separate read-only Cloudflare Pages API token
 
-In https://github.com/chichute5500/Sindarealest-admin:
+In Cloudflare Dashboard → **My Profile → API Tokens → Create Token**:
 
-1. Open **Settings → Secrets and variables → Actions → New repository secret**.
-2. Add `CF_ACCESS_CLIENT_ID` with the Cloudflare Client ID.
-3. Add `CF_ACCESS_CLIENT_SECRET` with the Cloudflare Client Secret.
+- Choose a custom token with **Account / Cloudflare Pages / Read** (Pages Read) permission only, scoped to the account containing the `sindarealest2` Pages project.
+- Do not grant Pages Write, Workers Write, D1, R2, or unrelated permissions.
+- Copy the token once. This API token is separate from the Access Service Token above.
 
-Do not add these as plain workflow variables, do not commit them to files, and do not send their values in chat. GitHub's official guide: https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
+The verifier calls only the Cloudflare Pages deployments list endpoint with `env=preview`, finds the exact alias, and requires a successful deployment, Preview environment, branch and commit hash before the archive step can run.
 
-## 4. Run the Preview capture workflow
+Official API reference: https://developers.cloudflare.com/api/resources/pages/subresources/projects/subresources/deployments/methods/list/
 
-Open **Actions → Liquid Glass isolated visual preview → Run workflow** and select:
+## 4. Save the configuration in GitHub Actions
+
+Open the repository: https://github.com/chichute5500/Sindarealest-admin
+
+Go to **Settings → Secrets and variables → Actions**.
+
+Create this repository **Variable**:
+- `CLOUDFLARE_ACCOUNT_ID` = the 32-character Cloudflare account ID containing the Pages project. This is an identifier, not an API credential.
+
+Create these repository **Secrets**:
+- `CLOUDFLARE_PAGES_READ_TOKEN` = the separate account-scoped Pages Read API token.
+- `CF_ACCESS_CLIENT_ID` = Access Service Token Client ID.
+- `CF_ACCESS_CLIENT_SECRET` = Access Service Token Client Secret.
+
+Do not paste any token/secret value into chat, issues, commits, screenshots or workflow logs. Do not put secrets in plain variables or source files. GitHub documentation: https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
+
+## 5. Run the Preview capture workflow
+
+Open **Actions → Liquid Glass isolated visual preview → Run workflow** and choose:
 
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - `confirm_preview_only`: `true`
 - `capture_source`: `cloudflare-preview`
 - `preview_url`: `https://3ed49bcc.sindarealest2.pages.dev/`
 
-Do not archive a baseline until the deployment behind that alias has been verified to represent the intended pre-change state. If its deployed commit cannot be verified, keep `start-of-work/` marked BLOCKED rather than treating a screenshot of the current state as a historical baseline. Once a genuine baseline exists, run the same workflow for `end-of-work`; it requires full live coverage before archiving, then produces a pixel-diff report for human review.
+Choose `start-of-work` only when the deployment commit shown by the verifier is the intended starting checkpoint. The API verifies which revision the alias currently points to; it cannot reconstruct a historical screenshot that was never captured. If the preview already contains the changes and the actual old state cannot be recovered, do not backdate it as the original baseline. Review the verified SHA in the workflow artifact/manifest.
 
-## 5. Expected acceptance evidence
+After the baseline checkpoint is established, run the same workflow for `end-of-work`. Before any screenshots are copied into canonical folders, the workflow requires:
+- a real, unblocked Cloudflare Preview capture;
+- API verification of the exact alias, Preview environment, successful deployment stage, branch and commit SHA;
+- 8/8 viewport/theme pairs, complete required section captures, two open-menu captures, four expanded-order captures and four product detail direct-open/reload checks;
+- zero hard failures, read-only violations, console/page/HTTP errors or broken image contexts.
 
-- Live audit: all required viewport/theme pairs complete; required section screenshots complete; 4 product detail contexts pass direct-open and reload; no blocked Access gate; no unexpected write request.
-- Screenshot archive: genuine Preview PNGs only, never reference images or local fixture images.
-- End comparison: identical viewport/theme/state file pairs and a generated pixel-diff report.
-- Production stays unchanged throughout.
-  
+The end-of-work workflow then produces a same-name PNG pixel-diff report for human review. Pixel differences are evidence, not an automatic aesthetic pass.
+
 ## Current status before configuration
 
-Latest live probe: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193). It found `accessServiceTokenConfigured=false`, `accessBlocked=true`, and zero real screenshots/routes/viewports. The local fixture audit passed, but it is not a substitute for the live Preview capture. The separate Admin Preview Playwright job also failed to find `#loginView`/`#loginForm` in [run 39368126990](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368126990); the workflow currently passes only `ADMIN_TEST_URL` and `ADMIN_TEST_PASSWORD`, so this guide does not claim the service-token secrets alone fix that separate job.
+- Latest live probe: [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193). It reports `accessServiceTokenConfigured=false`, `accessBlocked=true`, and zero genuine screenshots/routes/viewports.
+- Local fixtures passed, but they are not genuine Preview screenshots.
+- Validation now also runs on commit `a5939fedfe31bafda1867d3feb25989ae82d2845` and subsequent test changes; see the latest validation workflow on the branch for current status.
+- Production remains untouched. If the Access policy cannot be scoped to Preview, stop and do not widen permissions.
