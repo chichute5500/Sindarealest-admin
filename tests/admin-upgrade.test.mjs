@@ -46,7 +46,7 @@ console.log("PASS: admin upgrade static regression checks.");
 assert.ok(!read("../public/index.html").includes('id="craftsmanship"') && !read("../public/index.html").includes("images/17599dbbaea33cdd.webp"), "Crafted-with-character image and section must be removed completely");
 assert.ok(read("../public/index.html").includes(".menu-btn{position:absolute!important;left:8px"), "Mobile hamburger menu should be positioned on the left");
 assert.ok(read("../public/index.html").includes(".checkout-fields input,.checkout-fields select,.checkout-fields textarea{"), "Province/city selector should share the same glass field styling");
-assert.ok(admin.includes("<h2>Đăng nhập</h2>") && admin.includes("<p>Đăng nhập quản trị</p>"), "Admin login UI should be labeled clearly in Vietnamese");
+assert.ok(admin.includes("<h2>Đăng nhập quản trị</h2>") && admin.includes("<p>Luxury in Every Detail</p>"), "Admin login UI should use the approved Vietnamese heading and brand tagline");
 
 const restoreApi = read("../functions/api/admin/restore.js");
 assert.ok(admin.includes("f.size>20*1024*1024") && admin.includes("Tệp sao lưu vượt 20 MB."),
