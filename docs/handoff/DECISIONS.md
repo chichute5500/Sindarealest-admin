@@ -58,3 +58,11 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Điều kiện: Không dùng ảnh local làm ảnh baseline/end-of-work của Preview; không tuyên bố đã xem trực quan ảnh PNG nếu công cụ không trả được nội dung hình ảnh; không bypass xác thực hoặc truy cập trái phép.
 - Hành động tiếp theo: tiếp tục audit route, CSS khu vực sáu ô, responsive/Light-Dark từ source; thử các kênh truy cập hợp lệ khác cho Preview và ảnh tham chiếu. Chỉ sửa giao diện sau khi có bằng chứng đủ cụ thể; route mới chỉ làm khi mã sản phẩm/danh mục đã xác minh.
 - Bằng chứng mới nhất: workflow [39350484564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564) PASS; artifact [12232777359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564/artifacts/12232777359). Đây là kiểm thử local, không phải Preview thật.
+
+
+## DEC-009 — Do not merge the visual-audit branch without scope isolation (2026-10-20)
+
+- The current branch comparison against `main` is `diverged`, ahead by 293 commits and behind by 6 at commit `fa7445b74661faf260c32b3ab32dfa85e3538e78`; the compare reports 72 changed files.
+- The changed-file set includes `public/admin/index.html`, multiple `functions/api/admin/*` files, shared API/middleware files, `migrations/0008_product_sku_verification.sql`, deployment/setup scripts, the large `data/legacy-products.json` fixture, and `public/index.html`. This exceeds a narrowly isolated public static UI task.
+- Decision: do not merge this branch as-is and do not deploy it to Production. First separate or explicitly review each out-of-scope change against the correct base. No admin/API/DB/production changes are authorized by this visual-audit continuation.
+- Evidence: [GitHub compare](https://github.com/chichute5500/Sindarealest-admin/compare/28c768ba26b1d9f7d40e14efac5112526ed1c8b3...fa7445b74661faf260c32b3ab32dfa85e3538e78), [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108).
