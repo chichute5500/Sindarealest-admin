@@ -88,17 +88,21 @@ assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{ba
   "Portrait viewports must use dedicated vertical wave compositions so the curved ribbons remain visible.");
 const lightMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light-mobile.svg", import.meta.url), "utf8");
 const darkMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark-mobile.svg", import.meta.url), "utf8");
-assert.ok(lightMobileWaveArtwork.includes('viewBox="0 0 390 844"') && lightMobileWaveArtwork.includes('stroke="url(#ribbon)"'),
-  "The light mobile SVG must use a portrait canvas and broad curved ribbons.");
-assert.ok(darkMobileWaveArtwork.includes('viewBox="0 0 390 844"') && darkMobileWaveArtwork.includes('stroke="url(#ribbon)"'),
-  "The dark mobile SVG must use a portrait canvas and broad curved ribbons.");
+assert.ok(lightMobileWaveArtwork.includes('viewBox="0 0 390 844"')
+  && lightMobileWaveArtwork.includes('id="satin-crease-detail"')
+  && lightMobileWaveArtwork.includes('id="fold"') && lightMobileWaveArtwork.includes('id="glint"'),
+  "The light mobile SVG must use a portrait canvas and layered fine satin creases.");
+assert.ok(darkMobileWaveArtwork.includes('viewBox="0 0 390 844"')
+  && darkMobileWaveArtwork.includes('id="satin-crease-detail"')
+  && darkMobileWaveArtwork.includes('id="fold"') && darkMobileWaveArtwork.includes('id="glint"'),
+  "The dark mobile SVG must use a portrait canvas and layered fine satin creases.");
 
 const lightWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light.svg", import.meta.url), "utf8");
 const darkWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark.svg", import.meta.url), "utf8");
-assert.ok(lightWaveArtwork.includes('stroke="url(#silk)"') && lightWaveArtwork.includes('C70 20 280 70 430 280'),
-  "Light SVG must include smooth curved pearl-satin ribbons.");
-assert.ok(darkWaveArtwork.includes('stroke="url(#silk)"') && darkWaveArtwork.includes('C70 20 280 70 430 280'),
-  "Dark SVG must include smooth curved sapphire-satin ribbons.");
+assert.ok(lightWaveArtwork.includes('id="satin-crease-detail"') && lightWaveArtwork.includes('id="fold"') && lightWaveArtwork.includes('id="glint"'),
+  "Light desktop SVG must include layered pearl-satin folds and narrow highlights.");
+assert.ok(darkWaveArtwork.includes('id="satin-crease-detail"') && darkWaveArtwork.includes('id="fold"') && darkWaveArtwork.includes('id="glint"'),
+  "Dark desktop SVG must include layered sapphire-satin folds and narrow highlights.");
 
 assert.ok(finalThemeCss.includes("#productOverlay{align-items:stretch;justify-content:stretch;padding:0"),
   "Mobile product detail must use the reference full-screen gallery composition rather than a floating inset modal.");
