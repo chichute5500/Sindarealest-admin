@@ -246,6 +246,35 @@ th,td{border-bottom-color:rgba(62,105,139,.16)}
 @media(prefers-reduced-motion:reduce){.topbar,.sidebar,.mobiletabs,.panel,.stat,.setting,.editor,.logincard,.shortcut,.control,.btn{scroll-behavior:auto!important;transition:none!important}}
 
 :root[data-admin-theme="light"]{color-scheme:light}
+
+
+/* Login shell: hide duplicate app chrome while keeping the theme toggle available. */
+body:has(#loginView:not(.hidden)) .topbar{
+  position:fixed;top:14px;right:14px;z-index:20;width:auto;
+  padding:0;border:0;background:transparent;box-shadow:none;
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+body:has(#loginView:not(.hidden)) .topbar>.brand,
+body:has(#loginView:not(.hidden)) #conn,
+body:has(#loginView:not(.hidden)) #notificationToggle,
+body:has(#loginView:not(.hidden)) #logout{display:none!important}
+body:has(#loginView:not(.hidden)) .topright{gap:0}
+body:has(#loginView:not(.hidden)) #adminThemeToggle{
+  display:grid;place-items:center;width:40px;min-width:40px;min-height:40px;
+  padding:0!important;font-size:0!important;line-height:1;
+  color:#142a3c;background:rgba(255,255,255,.76);
+  border:1px solid rgba(92,145,185,.28);border-radius:14px;
+  box-shadow:0 8px 22px rgba(20,42,60,.08);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+}
+body:has(#loginView:not(.hidden)) #adminThemeToggle::before{content:"◐";font-size:18px}
+body:has(#loginView:not(.hidden)) #adminThemeToggle[aria-pressed="true"]::before{content:"☀"}
+body:has(#loginView:not(.hidden)) .loginwrap{min-height:100vh;min-height:100svh;padding:80px 20px 20px}
+:root[data-admin-theme="dark"] body:has(#loginView:not(.hidden)) #adminThemeToggle{
+  color:#eaf3fb;background:rgba(17,34,49,.82);border-color:rgba(142,188,224,.28);
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+@media(max-width:390px){body:has(#loginView:not(.hidden)) .topbar{top:10px;right:10px}}
 </style></head>
 <body>
 <header class="topbar"><div class="brand"><img class="brand-logo" src="/images/brand-emblem.png" alt="SinDarealest"><div><h1>SINDAREAL EST</h1><p>Admin · Crocodile Leather</p></div></div><div class="topright"><span class="badge" id="conn">Đang kiểm tra…</span><button class="btn small" id="adminThemeToggle" type="button" aria-label="Đổi giao diện sáng tối">◐ Giao diện</button><button class="btn small" id="notificationToggle" type="button" aria-expanded="false" aria-controls="notificationPanel"><svg class="bell-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span>Thông báo</span><span id="notificationCount" class="notif-count hidden" aria-label="Số thông báo chưa đọc">0</span></button><button class="btn small" id="logout" type="button" aria-label="Đăng xuất" title="Đăng xuất" hidden>Đăng xuất ↗</button></div></header><section id="notificationPanel" class="notification-panel hidden" aria-label="Trung tâm thông báo"><div class="panelhead" style="padding:0 0 10px"><h3>Hoạt động gần đây</h3><button class="btn small" id="markNotificationsRead" type="button">Đánh dấu đã đọc</button></div><div id="notificationList" class="tiny muted">Đang tải thông báo…</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn small" id="enablePush" type="button">Bật thông báo đẩy</button><span id="pushStatus" class="tiny muted" style="align-self:center"></span></div></section>
