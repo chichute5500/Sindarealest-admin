@@ -26,7 +26,7 @@ assert.ok(visualAudit.includes("startup.heroImage.status === 'sku-not-found'"),
   "The read-only visual audit must expect the hero to hide instead of using a guessed fixture image when SD-GL052 is unavailable.");
 assert.ok(visualAudit.includes("startup.heroImage.source === expectedHeroImage"),
   "The read-only visual audit must compare the rendered hero source to the exact target product image.");
-const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the hero product crisp on small screens"));
+const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the exact product crisp and blend it into the satin-glass background"));
 assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
   "The hero product should retain its real colors and use a natural drop shadow rather than color-altering blending.");
 assert.ok(lastHeroImageRule.includes("object-fit:contain!important;object-position:center right!important"),
