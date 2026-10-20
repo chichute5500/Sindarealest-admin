@@ -89,3 +89,19 @@ Không ghi “hoàn thành 100%” nếu còn FAIL, BLOCKED hoặc hạng mục 
 - Kết quả này là giới hạn của công cụ trình duyệt, tách biệt với `login_required` trả về từ lần fetch URL trước đó. Không được ghi là đã kiểm tra trực quan hoặc chụp được Preview.
 - Các cập nhật tài liệu đã thực hiện trong nhánh fix: tạo README cho kho ảnh, xác minh/cập nhật manifest trung thực, sửa task ledger và handoff để không còn khẳng định sai rằng manifest chưa tồn tại.
 - Commit tài liệu mới nhất: [5440da821c5aabeb89c65336d7d5ce319516d60c](https://github.com/chichute5500/Sindarealest-admin/commit/5440da821c5aabeb89c65336d7d5ce319516d60c). Chỉ là commit docs; không có thay đổi storefront và không có deploy Production.
+
+## Kiểm tra bổ sung — 2026-10-20
+
+### Kiểm kê nhánh trước mọi thay đổi code
+- So sánh GitHub API `main` (`28c768ba26b1d9f7d40e14efac5112526ed1c8b3`) với `fix/liquid-glass-audit-2026-10-19`: trạng thái `diverged`, nhánh fix ahead 275 commits và behind 6 commits tại thời điểm kiểm tra.
+- Danh sách diff bao gồm nhiều khu vực ngoài công việc giao diện public, ví dụ `public/admin/index.html`, các `functions/api/admin/*`, API khác, `migrations/0008_product_sku_verification.sql`, script/config Cloudflare và fixture sản phẩm. Đây là cảnh báo phạm vi từ diff; chưa kết luận mỗi thay đổi đều có lỗi.
+- Không merge/deploy nhánh này. Trước khi sửa code hoặc đề xuất merge, cần xem xét phạm vi từng commit/file và xác minh những thay đổi ngoài phạm vi. Production không bị đụng đến.
+
+### Định tuyến sản phẩm
+- Middleware hiện chỉ nhận `/san-pham/{key}`; key tra theo slug/id/SKU, và redirect về key chuẩn theo trạng thái SKU đã xác minh.
+- Sitemap hiện phát URL `/san-pham/{SKU đã xác minh hoặc ID}`.
+- JavaScript storefront cũng tạo và đọc `/san-pham/{key}`; đổi sang `/sanpham/{danh-mục}/{mã-sản-phẩm}` cần đồng bộ middleware, canonical/OG, sitemap, JS mở chi tiết, popstate và test.
+- Fixture legacy có 235 records nhưng SKU null/chưa xác minh toàn bộ; không thể lấy fixture đó để bịa mã sản phẩm hoặc khẳng định đường dẫn mới đã đúng. Chưa thay đổi route vì baseline website còn bị chặn và cần nguồn product code đã xác minh.
+
+### Công cụ browser
+- Lượt TinyFish browser automation không khởi chạy vì wallet âm `-$0.16`; không có ảnh mới. Kết quả này không xác minh được trang hiển thị hay Access gate.
