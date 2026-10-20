@@ -87,6 +87,10 @@ assert.match(workflow, /deployment-verification\.json[\s\S]*verification\.passed
   'The archive gate must reject any deployment not positively verified as a Preview.');
 assert.match(workflow, /manifest\.previewDeploymentCommit = deployed\.commitHash/,
   'The manifest must record the API-verified deployed commit, separate from the workflow source commit.');
+assert.match(workflow, /end-of-work archive:[\s\S]*baselineStage\?\.status !== 'CAPTURED_PASS'[\s\S]*baselineStage\.previewDeploymentVerified !== true/,
+  'The final screenshot archive must require an existing verified start-of-work baseline.');
+assert.match(workflow, /manifest\.status = hasComparablePairs \? 'AWAITING_HUMAN_VISUAL_REVIEW' : 'BLOCKED'/,
+  'Pixel comparison must not silently leave the manifest marked in progress or claim automated visual acceptance.');
 assert.match(deploymentVerifier, /searchParams\.set\('env', 'preview'\)/,
   'The Cloudflare API query must list Preview deployments only.');
 assert.match(deploymentVerifier, /metadata\.commit_hash/,
