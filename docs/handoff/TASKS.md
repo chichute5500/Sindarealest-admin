@@ -124,3 +124,10 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - **SAFE-001: IN PROGRESS.** No merge or Production deployment; public static website scope preserved.
 - Separate Admin Preview smoke run [39355503580](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39355503580) failed because `#loginView` and `#loginForm` were absent. This is explicitly outside the current public static website scope; track and repair only in the dedicated admin workstream.
 - Next: obtain authorized Preview-only Access, then capture the true start baseline, perform evidence-based UI corrections, capture end state, compare screenshots, and review the complete branch diff before any merge recommendation.
+
+
+## SAFE-002 branch-scope audit — 2026-10-20
+
+- **SAFE-002: FAIL for merge readiness / IN PROGRESS for remediation.** Compare at commit `fa7445b74661faf260c32b3ab32dfa85e3538e78` reports `diverged`, 293 commits ahead, 6 behind and 72 changed files: [compare](https://github.com/chichute5500/Sindarealest-admin/compare/28c768ba26b1d9f7d40e14efac5112526ed1c8b3...fa7445b74661faf260c32b3ab32dfa85e3538e78).
+- Scope contamination confirmed: `public/admin/index.html`, multiple `functions/api/admin/*` files, shared middleware/API code, migration `0008_product_sku_verification.sql`, setup/deploy scripts and `data/legacy-products.json` changed alongside `public/index.html` and visual-audit tooling.
+- Do not merge PR #108 as-is and do not deploy Production. Before integration, isolate public static UI/audit commits from unrelated admin/API/database/config changes and review the remaining diff against a freshly fetched base.
