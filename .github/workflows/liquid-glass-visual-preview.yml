@@ -363,6 +363,67 @@ jobs:
           mkdir -p artifacts/liquid-glass-preview/reference-images
           cp docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png artifacts/liquid-glass-preview/reference-images/
           cp docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png artifacts/liquid-glass-preview/reference-images/
+      - name: Summarize local fixture, live Preview, and deployment verification separately
+        if: always()
+        shell: bash
+        run: |
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const readJson = (file) => {
+            try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
+          };
+          const local = readJson('artifacts/liquid-glass-preview/visual-audit.json');
+          const live = readJson('artifacts/liquid-glass-preview/live-preview/visual-audit.json');
+          const deployment = readJson('artifacts/liquid-glass-preview/deployment-verification.json');
+          const manifest = readJson('docs/website-screenshots/manifest.json');
+          const lines = [
+            '## Liquid Glass audit — evidence separated by environment',
+            '',
+            'This summary distinguishes local fixture tests from the protected Cloudflare Pages Preview. A green local fixture audit is not live Preview acceptance.',
+            '',
+          ];
+          if (local) {
+            const count = (value) => Array.isArray(value) ? value.length : Number(value || 0);
+            lines.push(
+              '- **Local fixture audit:** ' + (local.passed === true ? 'PASS' : 'FAIL') +
+              ' — ' + count(local.screenshots) + ' screenshots, ' + Number(local.productFixtureCount || 0) +
+              ' fixture products, ' + count(local.responsive) + ' responsive cases, ' +
+              count(local.interactions) + ' interaction checks; overflow=' + Number(local.responsiveOverflowCount || 0) +
+              ', console=' + count(local.consoleErrors) + ', page=' + count(local.pageErrors) +
+              ', HTTP=' + count(local.httpErrors) + ', hard failures=' + count(local.hardFailures) + '.'
+            );
+          } else lines.push('- **Local fixture audit:** NO REPORT — inspect failed workflow steps.');
+          if (live) {
+            let liveStatus = 'NOT PASSED';
+            if (live.accessBlocked === true) liveStatus = 'BLOCKED_ACCESS_GATE';
+            else if (live.passed === true) liveStatus = 'PASS';
+            lines.push(
+              '- **Live Cloudflare Pages Preview:** ' + liveStatus +
+              ' — real screenshots=' + count(live.screenshots) +
+              ', viewport/theme pairs=' + Number(live.coverage?.completedViewportThemePairs || 0) +
+              '/' + Number(live.coverage?.requiredViewportThemePairs || 8) +
+              ', route checks=' + count(live.routeChecks) +
+              ', Access service token configured=' + String(live.accessServiceTokenConfigured === true) + '.'
+            );
+            if (live.accessBlocked === true) lines.push('- **Important:** no storefront content was accepted as a real screenshot baseline; do not interpret this run as a live visual pass.');
+          } else lines.push('- **Live Cloudflare Pages Preview:** NO REPORT — live probe may not have run on this event.');
+          if (deployment) {
+            lines.push('- **Actual Preview deployment verification:** ' + String(deployment.status || 'UNKNOWN') +
+              (deployment.error ? ' — ' + String(deployment.error).replace(/[\r\n]+/g, ' ').slice(0, 240) : '') + '.');
+            if (deployment.passed !== true) lines.push('- Screenshot archiving must remain blocked until the exact Preview alias, successful Preview deployment, selected branch and commit SHA are verified.');
+            else lines.push('- Verified deployment branch: ' + String(deployment.deployment?.branch || 'unknown') +
+              '; commit SHA: ' + String(deployment.deployment?.commitHash || 'unknown') + '.');
+          } else lines.push('- **Actual Preview deployment verification:** NO REPORT — no manual archival is authorized.');
+          if (manifest) {
+            lines.push('- **Canonical screenshot archive:** baseline=' + String(manifest.stages?.['start-of-work']?.status || 'BLOCKED') +
+              '; end=' + String(manifest.stages?.['end-of-work']?.status || 'NOT TESTED') +
+              '; comparison=' + String(manifest.comparisonStatus || 'NOT TESTED') + '.');
+          }
+          lines.push('', 'Production was not merged, deployed, or reconfigured by this workflow.');
+          const summary = lines.join('\n') + '\n';
+          if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+          console.log(summary);
+          NODE
       - name: Upload screenshots and HTML audit report
         if: always()
         uses: actions/upload-artifact@v4
