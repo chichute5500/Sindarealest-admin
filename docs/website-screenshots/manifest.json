@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T01:02:00Z",
+  "updatedAtUtc": "2026-10-20T01:05:00Z",
   "status": "BLOCKED",
-  "note": "Fallback path used: inspect GitHub source and run isolated local Playwright audit while Preview fetch remains blocked. No Preview screenshot is claimed.",
+  "note": "Original design references have now been visually inspected from the GitHub Actions artifact. The Cloudflare Preview itself remains blocked until a direct, read-only capture run reaches the supplied Preview URL; no live baseline is claimed.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -25,7 +25,14 @@
     "directory": "docs/static-web-reference/",
     "light": "file_0000000017088207af45f5e6dd90cfa4.png",
     "dark": "file_00000000fcb48207a23aeda23caa5eeb.png",
-    "visuallyInspected": false
+    "visuallyInspected": true,
+    "inspectionEvidence": {
+      "workflowRun": 39351043779,
+      "artifactId": 12233192824,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824",
+      "method": "Original PNG files were copied unchanged into the workflow artifact and opened for visual inspection.",
+      "notes": "The reference collage depicts app-like mobile screens, ice-blue light and deep-navy dark glass surfaces, a six-tile 3x2 home benefits grid, two-line labels, soft icon chips, compact order assurance CTA and four-item bottom navigation. These facts describe the reference only, not an assertion that the live Preview matches."
+    }
   },
   "previewRoutes": [
     {
@@ -46,23 +53,22 @@
   ],
   "comparisonStatus": "NOT TESTED",
   "remainingBlockers": [
-    "Authorized read-only access to the supplied Cloudflare Preview is required for real Preview screenshots and route checks. Fresh fetch of the homepage, existing /san-pham/sd2929, and requested-style /sanpham/giaytay/sd2929 returned login_required.",
-    "The original reference PNGs still need to be opened and visually inspected with an image-capable tool.",
-    "The local static-preview artifact uses fixture data and does not establish deployed Cloudflare Preview behavior; do not treat it as a real Preview baseline.",
-    "Current legacy-products.json contains 235 entries with null/unverified SKU and null price; do not invent the product-code/category mapping required for the proposed route format."
+    "A successful direct read-only capture of the deployed Cloudflare Preview is required to fill start-of-work; if Cloudflare Access returns login_required, an authorized browser session is needed before proceeding.",
+    "No post-change end-of-work capture exists; local fixture screenshots must not be put into the canonical start/end folders.",
+    "Pixel-diff comparison will run automatically for an end-of-work live Preview capture and requires same-name, same-size PNG pairs; human visual review remains necessary.",
+    "The proposed /sanpham/{category-slug}/{product-code} route requires verified product codes and category mapping; do not infer codes from the legacy fixture.",
+    "The open fix branch is divergent from main and contains changes outside the visual UI task; PR #108 must not be merged without a separate scope review."
   ],
   "lastAccessCheckUtc": "2026-10-20T00:54:00Z",
   "localAudit": {
     "status": "PASS",
-    "scope": "local static preview with fixture data only; not Cloudflare Pages Preview",
-    "workflowRun": 39350484564,
-    "sourceCommit": "26406bec56dac69d665c450b6641f03a5ee9f979",
-    "artifactId": 12232777359,
-    "artifactName": "sindarealest-liquid-glass-preview-257",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564/artifacts/12232777359",
-    "report": "visual-audit.json inside the workflow artifact",
-    "startedAtUtc": "2026-10-20T00:52:46.025Z",
-    "finishedAtUtc": "2026-10-20T00:57:34Z",
+    "scope": "local static preview with legacy fixture data; not Cloudflare Pages Preview",
+    "workflowRun": 39351043779,
+    "sourceCommit": "577087c4813450de089a3e1c1c47e53ee8625bf6",
+    "artifactId": 12233192824,
+    "artifactName": "sindarealest-liquid-glass-preview-265",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824",
+    "referenceImagesIncluded": true,
     "productFixtureCount": 235,
     "screenshotsCaptured": 54,
     "responsiveCases": 20,
@@ -74,6 +80,6 @@
     "failedRequests": 0,
     "hardFailures": 0,
     "passed": true,
-    "caveat": "Latest workflow PASS confirms local tests/capture only. Screenshot files remain in the temporary GitHub Actions artifact; not added to Preview baseline/result directories. Two expected fixture-only 503 responses occurred for warranty lookup."
+    "caveat": "Local fixture audit only. The canonical start/end screenshot directories remain unfilled until a direct live Preview capture succeeds."
   }
 }

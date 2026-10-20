@@ -99,3 +99,9 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Blockers: supplied Preview URLs return `login_required`; GitHub base64 fetch returned empty bytes for the reference PNGs and web fetch returned cache miss. Therefore no Preview screenshot, no direct visual comparison to references, and no route behavior on deployed Preview has been verified.
 - Change safety: this commit series only updates documentation/workflow records; storefront HTML/CSS/JS remains unchanged. No Production merge or deployment.
 - Task IDs: SHOT-001, REG-001, ROUTE-001, SHOT-002, REF-001.
+
+## Bổ sung 2026-10-20 — evidence cho nguồn tham chiếu và quy trình mới
+
+- Run [39351043779](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779), job `118395178265`: **SUCCESS** ở commit `577087c4813450de089a3e1c1c47e53ee8625bf6`.
+- Artifact [sindarealest-liquid-glass-preview-265](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824) chứa 54 ảnh local-fixture và 2 PNG tham chiếu gốc. Audit: 20 responsive cases, 91 interaction checks, 0 root document overflow, 0 console/page/HTTP errors, 0 failed requests, 0 hard failures.
+- Giới hạn: test ở trên là local fixture. Các file capture live và comparator vừa bổ sung cần được xác nhận qua CI mới; chưa tuyên bố đã chạy capture thật.

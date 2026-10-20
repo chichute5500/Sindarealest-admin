@@ -8,6 +8,11 @@ on:
     paths-ignore:
       - 'docs/website-screenshots/start-of-work/**'
       - 'docs/website-screenshots/end-of-work/**'
+      - 'docs/website-screenshots/manifest.json'
+      - 'docs/website-screenshots/README.md'
+      - 'docs/handoff/**'
+      - 'docs/static-web-reference/**'
+      - 'docs/visual-audit-progress-2026-10-19.md'
   workflow_dispatch:
     inputs:
       capture_stage:
@@ -22,6 +27,19 @@ on:
         required: true
         type: boolean
         default: true
+      capture_source:
+        description: 'Only Cloudflare Preview can be archived into start/end folders'
+        required: true
+        type: choice
+        options:
+          - cloudflare-preview
+          - local-static-fixture
+        default: cloudflare-preview
+      preview_url:
+        description: 'HTTPS Preview alias only; Production hostname is rejected'
+        required: true
+        type: string
+        default: 'https://3ed49bcc.sindarealest2.pages.dev/'
 
 permissions:
   contents: write
@@ -41,6 +59,8 @@ jobs:
         env:
           STAGE: ${{ inputs.capture_stage }}
           PREVIEW_ONLY: ${{ inputs.confirm_preview_only }}
+          CAPTURE_SOURCE: ${{ inputs.capture_source }}
+          PREVIEW_URL: ${{ inputs.preview_url }}
           REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
@@ -53,6 +73,23 @@ jobs:
             start-of-work|end-of-work) ;;
             *) echo "Refused: capture stage must be explicitly selected."; exit 1 ;;
           esac
+          case "${CAPTURE_SOURCE}" in
+            cloudflare-preview|local-static-fixture) ;;
+            *) echo "Refused: unknown capture source."; exit 1 ;;
+          esac
+          if [ "${CAPTURE_SOURCE}" = "cloudflare-preview" ]; then
+            PREVIEW_URL="${PREVIEW_URL}" node --input-type=module - <<'NODE'
+            const url = new URL(process.env.PREVIEW_URL);
+            const projectPreviewHost = /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i;
+            if (url.protocol !== 'https:' || !projectPreviewHost.test(url.hostname)
+                || url.hostname.toLowerCase() === 'sindarealest2.pages.dev'
+                || url.username || url.password || url.search || url.hash
+                || (url.pathname !== '/' && url.pathname !== '')) {
+              console.error('Refused: only an HTTPS non-production sindarealest2 Pages alias is allowed.');
+              process.exit(1);
+            }
+            NODE
+          fi
       - name: Check out source
         uses: actions/checkout@v7
         with:
@@ -63,8 +100,8 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: '22'
-      - name: Install temporary Playwright dependency
-        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install temporary Playwright and PNG comparison dependencies
+        run: npm install --no-save --no-package-lock playwright@1.56.1 pixelmatch@6.0.0 pngjs@7.0.0
       - name: Run complete project tests
         run: npm test
       - name: Run project and migration checks
@@ -85,17 +122,25 @@ jobs:
           done
           cat /tmp/sindarealest-preview.log
           exit 1
-      - name: Capture Light/Dark screenshots and audit responsive layouts
+      - name: Capture local Light/Dark screenshots and run fixture audit
         run: node scripts/capture-liquid-glass-preview.mjs
-      - name: Save independently captured images into selected repository archive
-        if: github.event_name == 'workflow_dispatch'
+      - name: Capture live Cloudflare Pages Preview (read-only)
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+        run: node scripts/capture-cloudflare-preview.mjs
+      - name: Explain local fixture captures are artifact-only
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'local-static-fixture'
+        run: echo "Local fixture screenshots are uploaded for review only; canonical start/end folders are unchanged."
+      - name: Save live Preview images into selected repository archive
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
         env:
           STAGE: ${{ inputs.capture_stage }}
           RUN_ID: ${{ github.run_id }}
-          RUN_NUMBER: ${{ github.run_number }}
           SOURCE_SHA: ${{ env.SOURCE_SHA }}
           REF_NAME: ${{ github.ref_name }}
           REPOSITORY: ${{ github.repository }}
+          PREVIEW_URL: ${{ inputs.preview_url }}
         shell: bash
         run: |
           set -euo pipefail
@@ -103,37 +148,45 @@ jobs:
             start-of-work|end-of-work) ;;
             *) echo "Refused invalid capture stage"; exit 1 ;;
           esac
-          source_dir="artifacts/liquid-glass-preview"
+          source_dir="artifacts/liquid-glass-preview/live-preview"
           target_dir="docs/website-screenshots/${STAGE}"
           manifest_path="docs/website-screenshots/manifest.json"
-          test -d "${source_dir}"
+          test -s "${source_dir}/visual-audit.json"
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
+          if (audit.sourceKind !== 'cloudflare-pages-preview-live-read-only'
+              || audit.captureCompleted !== true || audit.accessBlocked === true
+              || !Array.isArray(audit.screenshots)
+              || audit.screenshots.filter(x => x.captureType === 'viewport').length < 2) {
+            console.error('Refused to archive: no verified read-only live Preview capture is available.');
+            process.exit(1);
+          }
+          NODE
           mkdir -p "${target_dir}" docs/website-screenshots
-          find "${source_dir}" -maxdepth 1 -type f -name '*.jpg' -print -quit | grep -q .
-          # Replace only this stage's generated captures; never create RUN_ID subfolders.
-          find "${target_dir}" -maxdepth 1 -type f -name '*.jpg' -delete
-          rm -f "${target_dir}/MANIFEST.md"
+          find "${source_dir}" -maxdepth 1 -type f -name '*.png' -print -quit | grep -q .
+          find "${target_dir}" -maxdepth 1 -type f \( -name '*.png' -o -name '*.jpg' \) -delete
           while IFS= read -r file; do
             name="$(basename "$file")"
             cp "$file" "${target_dir}/${name}"
-          done < <(find "${source_dir}" -maxdepth 1 -type f -name '*.jpg' -print | sort)
-          image_count="$(find "${target_dir}" -maxdepth 1 -type f -name '*.jpg' | wc -l | tr -d ' ')"
+          done < <(find "${source_dir}" -maxdepth 1 -type f -name '*.png' -print | sort)
+          image_count="$(find "${target_dir}" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
           test "${image_count}" -gt 1
           CAPTURED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" IMAGE_COUNT="${image_count}" node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const file = 'docs/website-screenshots/manifest.json';
-          let manifest = {};
-          try { manifest = JSON.parse(fs.readFileSync(file, 'utf8')); } catch {}
+          const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
           manifest.schemaVersion = 1;
           manifest.repository = process.env.REPOSITORY;
           manifest.branch = process.env.REF_NAME;
           manifest.sourceCommit = process.env.SOURCE_SHA;
-          manifest.previewUrl = 'http://127.0.0.1:4173/';
-          manifest.captureSource = 'GitHub Actions read-only local static preview; not the deployed Cloudflare Preview';
+          manifest.previewUrl = process.env.PREVIEW_URL;
+          manifest.captureSource = 'Direct Cloudflare Pages Preview capture, read-only; no fixture API';
           manifest.updatedAtUtc = process.env.CAPTURED_AT;
+          manifest.status = 'IN PROGRESS';
           manifest.stages ??= {};
-          const imageNames = fs.readdirSync(`docs/website-screenshots/${process.env.STAGE}/`).filter(name => name.endsWith('.jpg')).sort();
-          let audit = {};
-          try { audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/visual-audit.json', 'utf8')); } catch {}
+          const imageNames = fs.readdirSync('docs/website-screenshots/' + process.env.STAGE + '/').filter(name => name.endsWith('.png')).sort();
           const baselineDir = 'docs/website-screenshots/start-of-work/';
           const resultDir = 'docs/website-screenshots/end-of-work/';
           const counterpartDir = process.env.STAGE === 'start-of-work' ? resultDir : baselineDir;
@@ -145,35 +198,68 @@ jobs:
               320:[320,720],360:[360,800],375:[375,812],390:[390,844],412:[412,915],
               430:[430,932],768:[768,1024],1024:[1024,768],1366:[1366,768],1440:[1440,900]
             })[Number(viewport[2])] : null;
-            const route = name.startsWith('welcome-splash-') || name.startsWith('mobile-') || name.startsWith('tablet-') || name.startsWith('desktop-')
-              ? '/' : name.replace(/-(light|dark).*$/i, '').replace(/\.jpg$/i, '');
+            const route = name.startsWith('welcome-splash-') || name.startsWith('mobile-') || name.startsWith('tablet-') || name.startsWith('desktop-') ? '/' : 'UNVERIFIED';
             return { theme, viewportName: viewport?.[0] || 'UNVERIFIED', viewport: widthHeight ? {width:widthHeight[0],height:widthHeight[1]} : null, route };
           };
           manifest.stages[process.env.STAGE] = {
-            capturedAtUtc: process.env.CAPTURED_AT,
-            runId: process.env.RUN_ID,
-            sourceCommit: process.env.SOURCE_SHA,
+            status: audit.passed ? 'CAPTURED_PASS' : 'CAPTURED_WITH_ISSUES',
+            capturedAtUtc: process.env.CAPTURED_AT, runId: process.env.RUN_ID, sourceCommit: process.env.SOURCE_SHA,
             imageCount: Number(process.env.IMAGE_COUNT),
-            directory: `docs/website-screenshots/${process.env.STAGE}/`,
-            sourceKind: 'local-static-preview-with-test-fixtures',
+            directory: 'docs/website-screenshots/' + process.env.STAGE + '/',
+            sourceKind: audit.sourceKind, auditPassed: audit.passed,
             overallVisualComparison: 'UNVERIFIED',
             responsiveOverflowCount: audit.responsiveOverflowCount ?? null,
             pageErrorCount: audit.pageErrors?.length ?? null,
             consoleErrorCount: audit.consoleErrors?.length ?? null,
+            readOnlyViolationCount: audit.readOnlyViolations?.length ?? null,
+            routeChecks: audit.routeChecks || [],
             images: imageNames.map(name => ({
-              path: `docs/website-screenshots/${process.env.STAGE}/${name}`,
-              ...infer(name),
-              baselinePath: `${baselineDir}${name}`,
-              resultPath: `${resultDir}${name}`,
-              counterpartExists: counterpartNames.has(name),
-              status: 'captured-local-preview',
-              comparisonStatus: 'UNVERIFIED'
+              path: 'docs/website-screenshots/' + process.env.STAGE + '/' + name,
+              ...infer(name), baselinePath: baselineDir + name, resultPath: resultDir + name,
+              counterpartExists: counterpartNames.has(name), status: 'captured-live-preview', comparisonStatus: 'UNVERIFIED'
             }))
           };
-          fs.writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
+          fs.writeFileSync(file, JSON.stringify(manifest, null, 2) + '\\n');
           NODE
           git add "${target_dir}" "${manifest_path}"
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive ${STAGE} website screenshots (run ${RUN_ID})"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive live Preview ${STAGE} screenshots (run ${RUN_ID})"
+          git push origin "HEAD:${REF_NAME}"
+      - name: Compare start/end screenshots using pixel diff
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work'
+        run: node scripts/compare-website-screenshots.mjs
+      - name: Record pixel comparison summary in manifest
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/website-screenshot-diffs/comparison.json || { echo "No comparison report exists; manifest left unchanged."; exit 0; }
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const manifestPath = 'docs/website-screenshots/manifest.json';
+          const comparison = JSON.parse(fs.readFileSync('artifacts/website-screenshot-diffs/comparison.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          manifest.updatedAtUtc = new Date().toISOString();
+          manifest.comparisonStatus = comparison.status;
+          manifest.pixelComparison = {
+            runId: process.env.RUN_ID,
+            report: 'comparison.json and report.html in the GitHub Actions artifact',
+            status: comparison.status, summary: comparison.summary,
+            matchingFilenameCount: comparison.matchingFilenameCount,
+            baselineImageCount: comparison.baselineImageCount, resultImageCount: comparison.resultImageCount,
+            note: 'Pixel differences are a review aid, not an aesthetic score. Human visual review remains required.'
+          };
+          if (manifest.stages && manifest.stages['end-of-work']) {
+            manifest.stages['end-of-work'].overallVisualComparison = comparison.status;
+            manifest.stages['end-of-work'].pixelComparisonSummary = comparison.summary;
+          }
+          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\\n');
+          NODE
+          git add docs/website-screenshots/manifest.json
+          if git diff --cached --quiet; then echo "Manifest already records the comparison."; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: record end-of-work pixel comparison (run ${RUN_ID})"
           git push origin "HEAD:${REF_NAME}"
       - name: Attach original design references to audit artifact
         if: always()
@@ -190,6 +276,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sindarealest-liquid-glass-preview-${{ github.run_number }}
-          path: artifacts/liquid-glass-preview/
-          if-no-files-found: error
+          path: |
+            artifacts/liquid-glass-preview/
+            artifacts/website-screenshot-diffs/
+          if-no-files-found: warn
           retention-days: 14

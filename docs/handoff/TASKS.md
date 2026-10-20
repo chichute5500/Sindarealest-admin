@@ -87,3 +87,13 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - ROUTE-001: **TODO / UNVERIFIED mapping** — đã đọc `public/index.html` và `functions/_middleware.js`: JS `pushState` + `popstate` và middleware hiện đang dùng `/san-pham/{key}`; middleware tra DB theo slug/id/SKU và redirect key chuẩn. Chưa đổi route sang `/sanpham/{category-slug}/{product-code}` vì 235 fixture legacy không có SKU đã xác minh; cần nguồn dữ liệu thực được cấp quyền.
 - UI-001: **NOT TESTED against references** — source có biến CSS `--benefit-tile-glass`, `--benefit-tile-border`, `--benefit-tile-shadow` và style Liquid Glass chung, nhưng chưa đủ bằng chứng để xác nhận bố cục/lớp kính của khu vực sáu ô khớp ảnh gốc. Không sửa CSS theo phỏng đoán.
 - SAFE-001: **IN PROGRESS** — không có thay đổi storefront, không merge/deploy Production; tiếp tục audit riêng trên nhánh fix.
+
+## Bổ sung 2026-10-20 — capture thật và so sánh ảnh
+
+- REF-001: **DONE** — ảnh PNG mẫu sáng/tối được đưa nguyên byte vào artifact [12233192824](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824) và xem trực quan.
+- SHOT-001 / REG-001: **PASS — local fixture only** — run [39351043779](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779), 54 screenshots, 20 responsive cases, 91 interaction checks, không có overflow/error theo audit.
+- SHOT-002: **BLOCKED** — chưa có baseline Cloudflare Preview thật; không dùng ảnh local để điền thư mục start/end.
+- SAFE-002: **IN PROGRESS** — không merge/deploy; nhánh đang diverged và cần review phạm vi trước mọi đề xuất merge.
+- Đã thêm capture script trực tiếp Preview, allowlist host non-production, chỉ GET/HEAD, phát hiện Cloudflare Access và từ chối archive nếu capture không phải live/không hoàn tất.
+- Đã thêm pixel-diff cho PNG cùng tên giữa hai stage; report sẽ có JSON, HTML và diff mask. Chưa có kết quả so sánh vì hai thư mục stage còn trống.
+- UI-001: **NOT TESTED against a real Preview baseline**; storefront HTML/CSS/JS không đổi trong lần bổ sung này.

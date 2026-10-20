@@ -449,3 +449,9 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Chưa có phiên đăng nhập Cloudflare được xác nhận cho browser profile, chưa có môi trường staging được cấp quyền và chưa có thiết bị Android thật nối vào môi trường kiểm thử.
 - Chưa thực hiện triển khai production, migration production, thanh toán thật hoặc ghi dữ liệu thật. Cần quyền staging/thiết bị/duyệt triển khai phù hợp trước khi đóng các mục nghiệm thu ngoài mã nguồn.
 - Taobao/1688 tiếp tục bị loại khỏi phạm vi theo yêu cầu hiện tại.
+
+## Bổ sung — 2026-10-20: trực quan ảnh mẫu và chuẩn bị vòng capture/compare
+
+- Đã mở hai ảnh mẫu gốc từ artifact [12233192824](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824). Mẫu là collage nhiều màn hình app mobile. Trang home mẫu có nền kính xanh băng ở Light/xanh navy sâu ở Dark, lưới sáu ô 3×2, nhãn thường xuống hai dòng, chip/halo cho icon, CTA “Đặt hàng an tâm” gọn và bottom navigation 4 mục. Đây là mô tả ảnh mẫu, không phải kết luận website hiện tại khớp.
+- Đã chuẩn bị workflow chụp trực tiếp Cloudflare Pages Preview bằng Playwright ở chế độ read-only, chỉ lưu hai stage chuẩn khi nguồn được xác minh là live Preview; local fixture chỉ ở artifact. Khi chụp stage end, workflow so sánh các PNG cùng tên/kích thước và xuất pixel-diff report.
+- Chưa sửa storefront HTML/CSS/JS vì chưa có baseline Preview thật. Hai thư mục stage tiếp tục trống; không merge/deploy Production.
