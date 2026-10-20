@@ -97,4 +97,9 @@ assert.ok(lightWaveArtwork.includes('stroke="url(#silk)"') && lightWaveArtwork.i
 assert.ok(darkWaveArtwork.includes('stroke="url(#silk)"') && darkWaveArtwork.includes('C70 20 280 70 430 280'),
   "Dark SVG must include smooth curved sapphire-satin ribbons.");
 
+assert.ok(finalThemeCss.includes("#productOverlay{align-items:stretch;justify-content:stretch;padding:0"),
+  "Mobile product detail must use the reference full-screen gallery composition rather than a floating inset modal.");
+assert.ok(finalThemeCss.includes("#productOverlay .detail-modal{width:100%;max-width:none;height:100dvh;max-height:100dvh;border:0;border-radius:0"),
+  "The mobile product detail surface must occupy the full viewport while preserving desktop modal behavior.");
+
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
