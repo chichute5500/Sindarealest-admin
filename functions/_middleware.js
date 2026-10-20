@@ -70,7 +70,7 @@ export async function onRequest(context) {
   html = meta(html, "twitter:image", new URL(imagePath, url.origin).href);
   const canonicalTag = `<link rel="canonical" href="${escapeHtml(canonical)}">`;
   html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
-  const schema = JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, description, image: [new URL(imagePath, url.origin).href], sku: product.sku, url: canonical, brand: { "@type": "Brand", name: "SinDarealest" } }).replace(/<\//g, "<\\/");
+  const schema = JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, description, image: [new URL(imagePath, url.origin).href], ...(isVerifiedCommercialSku(product) ? { sku: product.sku } : {}), url: canonical, brand: { "@type": "Brand", name: "SinDarealest" } }).replace(/<\//g, "<\\/");
   html = html.replace("</head>", `  <script type="application/ld+json">${schema}</script>\n</head>`);
   const headers = new Headers(response.headers);
   headers.set("Content-Type", "text/html; charset=utf-8");
