@@ -164,7 +164,20 @@ test.describe('SinDarealest2 Admin Preview', () => {
         stylesheetSources
       };
     });
-    console.info(`[ADMIN_PREVIEW_CSS_SIGNATURE] ${JSON.stringify(loginCssSignature)}`);
+    const previewSignature = {
+      status: loginCssSignature.topbarBrandDisplay === 'none'
+        ? 'PASS_LOGIN_CSS_SIGNATURE'
+        : (loginCssSignature.stylesheetSources.some(source => source.hasLoginHideRule)
+          ? 'PREVIEW_CSS_CASCADE_MISMATCH'
+          : 'PREVIEW_CSS_SIGNATURE_MISMATCH'),
+      checkedAt: new Date().toISOString(),
+      ...loginCssSignature
+    };
+    // Persist the actual remote signature for the branch handoff. This contains
+    // CSS/DOM diagnostics only; never includes secret values or credentials.
+    mkdirSync(evidenceDir, { recursive: true });
+    writeFileSync(join(evidenceDir, 'preview-diagnostics.json'), JSON.stringify(previewSignature, null, 2));
+    console.info(`[ADMIN_PREVIEW_CSS_SIGNATURE] ${JSON.stringify(previewSignature)}`);
     await testInfo.attach('admin-preview-css-signature.json', {
       body: Buffer.from(JSON.stringify(loginCssSignature, null, 2)),
       contentType: 'application/json'
