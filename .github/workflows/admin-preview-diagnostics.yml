@@ -119,6 +119,11 @@ jobs:
             cp "$SOURCE_DIR/preview-diagnostics.json" "$DEST/preview-diagnostics.json"
           fi
 
+          PREVIEW_REPORT_STATE="$PREVIEW_OUTCOME"
+          if [[ -f "$SOURCE_DIR/preview-diagnostics.json" ]] && grep -q '"status"[[:space:]]*:[[:space:]]*"BLOCKED_CLOUDFLARE_ACCESS"' "$SOURCE_DIR/preview-diagnostics.json"; then
+            PREVIEW_REPORT_STATE="BLOCKED_CLOUDFLARE_ACCESS (browser did not reach ADMIN)"
+          fi
+
           {
             printf '# ADMIN Playwright evidence\n\n'
             printf -- '- Tested source commit: `%s`\n' "$GITHUB_SHA"
@@ -127,7 +132,7 @@ jobs:
             printf -- '- Project checks: `%s`\n' "$CHECK_OUTCOME"
             printf -- '- Automated tests: `%s`\n' "$UNIT_OUTCOME"
             printf -- '- Local source screenshots: `%s`\n' "$BASELINE_OUTCOME"
-            printf -- '- Deployed Preview check: `%s`\n' "$PREVIEW_OUTCOME"
+            printf -- '- Deployed Preview check: `%s`\n' "$PREVIEW_REPORT_STATE"
             printf -- '- Route: `/admin/`\n'
             printf '%s\n' '- Local screenshots only exercise the real source HTML/CSS with a mocked unauthenticated session response; they do not write or read business data.'
             printf '%s\n' '- Screenshots are captured in light and dark themes for 320x640, 360x800, 375x812, 390x844, 412x915, 768x1024, 1280x800 and 1440x900.'
