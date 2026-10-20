@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+// UI fixture tests must let Playwright routes own all /api/admin/* traffic; the real app's service worker is not under test here.
+test.use({ serviceWorkers: 'block' });
+
 const localAdminUrl = process.env.LOCAL_ADMIN_URL || 'http://127.0.0.1:4173/admin/';
 const sourceSha = process.env.GITHUB_SHA || 'local-unpinned';
 const outputDir = join(process.cwd(), 'artifacts', 'admin-preview-evidence', sourceSha.slice(0, 12));
@@ -273,6 +276,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const consoleErrors = [];
   const attemptedWrites = [];
   const unexpectedApiPaths = [];
+  const fixtureApiRequests = [];
+  const fixtureApiErrors = [];
   const mobile = { width: 390, height: 844 };
   const desktop = { width: 1280, height: 800 };
   const variants = [
@@ -321,6 +326,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   await page.route('**/api/admin/**', async route => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
+    fixtureApiRequests.push({ method: request.method(), path: pathname });
     if (request.method() !== 'GET') {
       attemptedWrites.push({ method: request.method(), path: pathname });
       await route.fulfill({
@@ -339,11 +345,16 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       });
       return;
     }
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(fixtureApi[pathname])
-    });
+    try {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(fixtureApi[pathname])
+      });
+    } catch (error) {
+      fixtureApiErrors.push({ path: pathname, error: String(error?.message || error).slice(0, 180) });
+      throw error;
+    }
   });
 
   const chooseTheme = async theme => {
@@ -460,6 +471,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     visualAudit.completed = true;
   } catch (error) {
     visualAudit.failure = String(error?.message || error).slice(0, 1200);
+    visualAudit.failureContext = {
+      appViewVisible: await page.locator('#appView').isVisible().catch(() => false),
+      loginViewVisible: await page.locator('#loginView').isVisible().catch(() => false),
+      connectionStatus: await page.locator('#conn').innerText().catch(() => null),
+      fixtureApiRequests: fixtureApiRequests.slice(-30),
+      fixtureApiErrors: fixtureApiErrors.slice(-10),
+      unexpectedApiPaths: unexpectedApiPaths.slice(-20)
+    };
     throw error;
   } finally {
     visualAudit.capturedAt = new Date().toISOString();
@@ -467,6 +486,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     visualAudit.consoleErrors = consoleErrors;
     visualAudit.attemptedWrites = attemptedWrites;
     visualAudit.unexpectedApiPaths = unexpectedApiPaths;
+    visualAudit.fixtureApiRequests = fixtureApiRequests;
+    visualAudit.fixtureApiErrors = fixtureApiErrors;
     const metadataPath = join(outputDir, 'metadata.json');
     let existing = {};
     try {
