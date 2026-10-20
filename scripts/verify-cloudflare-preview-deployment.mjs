@@ -164,7 +164,8 @@ async function main() {
       `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(projectName)}/deployments`
     );
     endpoint.searchParams.set('env', 'preview');
-    endpoint.searchParams.set('per_page', '100');
+    // Cloudflare Pages deployments API rejects per_page=100; use its supported 20-item page size.
+    endpoint.searchParams.set('per_page', '20');
     endpoint.searchParams.set('page', String(page));
 
     let response;
