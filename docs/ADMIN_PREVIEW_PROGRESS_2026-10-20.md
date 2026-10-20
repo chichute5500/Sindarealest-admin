@@ -142,3 +142,9 @@
 - This commit requests the end-of-work capture. Its result is not considered complete until the corresponding GitHub Actions run reports successful deployment verification, archive creation, and comparison output.
 - Expected remaining review: inspect the generated matched-image pixel-diff report; pixel differences are evidence for human review, not an automatic aesthetic pass/fail.
 - Production remains untouched; no main edits or PR merge.
+
+
+### Retry end-of-work capture after concurrent branch advancement — 2026-10-20
+- First guarded end-capture run: [39424692332](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39424692332) did capture a passing live audit (66 screenshots, 8/8 viewport/theme pairs, all 12 route checks PASS, zero hard failures), but safely refused to archive because the branch advanced during the run.
+- The verifier expected source SHA `b20944686aa879fbd3324644c43e7323da903a22`; Cloudflare Pages had already deployed newer branch SHA `516d154c2a941fba1809eaf1c280f31ef123087a`. Exact-SHA guard worked as intended; no unverified end snapshot was saved.
+- Current retry is deliberately tagged `[capture-end-of-work]` against the current branch head so the deployment and workflow source can converge on the same SHA. Do not claim end archive or pixel comparison passed until the latest run confirms both.
