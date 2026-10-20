@@ -200,7 +200,7 @@ assert.equal(response.status,403,'cross-origin warranty submission is rejected')
 const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,sku_verified,category,category_label,updated_at/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',sku_verified:1,category:'sneakers',category_label:'Sneaker',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
 const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
-assert.match(sitemapText,/https:\/\/shop\.example\/san-pham\/SD-SN001/);
+assert.match(sitemapText,/https:\/\/shop\.example\/sanpham\/sneaker\/SD-SN001/);
 const robotsText = await (await robots({request:new Request('https://shop.example/robots.txt')})).text();
 assert.match(robotsText,/Disallow: \/admin\//);
 assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
