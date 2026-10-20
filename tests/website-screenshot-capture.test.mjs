@@ -46,6 +46,22 @@ assert.match(live, /sanitizeUrl\(info\.url\)/,
   'Access redirect query strings must be removed before they are saved.');
 assert.doesNotMatch(live, /legacy-products\.json|scenarioProducts/,
   'The direct capture must not use legacy fixtures or mock product API responses.');
+assert.match(live, /name: 'mobile-360', width: 360, height: 800/,
+  'Live Preview capture must include the required 360×800 mobile viewport.');
+assert.match(live, /name: 'mobile-390', width: 390, height: 844/,
+  'Live Preview capture must include the required 390×844 mobile viewport.');
+assert.match(live, /name: 'tablet-768', width: 768, height: 1024/,
+  'Live Preview capture must include the required 768×1024 tablet viewport.');
+assert.match(live, /name: 'desktop-1440', width: 1440, height: 900/,
+  'Live Preview capture must include the required 1440×900 desktop viewport.');
+assert.match(live, /captureKeySections[\s\S]*sectionTargets/,
+  'Live capture must cover core page sections, including the six benefit tiles and footer.');
+assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
+  'Live capture must directly open and reload a route derived from a real rendered product.');
+assert.match(live, /Path derived from an actual rendered Preview product card/i,
+  'Product route checks must be derived from actual Preview card navigation.');
+assert.doesNotMatch(live, /\/san-pham\/sd2929|\/sanpham\/giaytay\/sd2929/,
+  'Do not probe example product URLs as if their product/category were verified.');
 assert.match(compare, /pixelmatch[\s\S]*start-of-work[\s\S]*end-of-work/,
   'The screenshot comparator must compare start/end archives.');
 assert.match(compare, /DIMENSION_MISMATCH|PIXEL_CHANGED/,
@@ -53,6 +69,7 @@ assert.match(compare, /DIMENSION_MISMATCH|PIXEL_CHANGED/,
 
 for (const scriptPath of [
   '../scripts/capture-cloudflare-preview.mjs',
+  '../scripts/cloudflare-access-service-token.mjs',
   '../scripts/compare-website-screenshots.mjs',
   '../scripts/validate-cloudflare-preview-url.mjs',
   '../scripts/sanitize-audit-value.mjs',
