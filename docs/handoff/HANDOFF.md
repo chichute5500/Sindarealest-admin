@@ -14,16 +14,19 @@
   - Tối: [file_00000000fcb48207a23aeda23caa5eeb.png](../static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png)
 
 
-## Trạng thái xác minh mới nhất — 2026-10-20 UTC
+## Trạng thái xác minh mới nhất — 2026-10-20 04:45 UTC
 
-- Code-bearing commit đang được kiểm tra: `562d7d77624f7431296cb217b2b6d6592aca9ce4`. Những commit mới hơn chỉ cập nhật handoff/manifest/setup guide, không chỉnh web source.
-- Source/test validation: **PASS**, [run 39368493275](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493275), chạy trên docs-only commit `7d5de0114025df35974067c0c1bf481f95be7fd6`.
-- Admin Preview Playwright: **FAIL/BLOCKED**, [run 39368493324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493324): hai test không tìm thấy `#loginView`/`#loginForm`. Workflow hiện chỉ inject `ADMIN_TEST_URL`/`ADMIN_TEST_PASSWORD`, không inject Access service token; không kết luận đó là lỗi form/mật khẩu của app.
-- Live storefront capture: vẫn **BLOCKED_ACCESS_GATE** theo probe thật gần nhất [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193): `accessServiceTokenConfigured=false`, `accessBlocked=true`, 0 screenshot/route/viewport thực tế. Không có start-of-work/end-of-work screenshot thật và chưa có pixel diff.
-- Local fixture audit [run 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618) PASS trên source-identical code tree: 54 fixture screenshots, 235 fixture products, 20 responsive cases, 93 interaction checks; 0 overflow/console/page/HTTP errors trong phạm vi fixture. Đây **không phải** live Preview acceptance.
-- Ảnh tham chiếu sáng/tối đã được mở trực quan qua artifact [12233192824](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39351043779/artifacts/12233192824); đây chỉ xác minh nội dung reference, không nói rằng live site đã khớp.
-- Hướng dẫn thao tác gỡ access cho Preview (không mở quyền Production): [PREVIEW-ACCESS-SETUP.md](PREVIEW-ACCESS-SETUP.md).
-- Không deploy/merge Production. Chưa đóng baseline/end screenshots hay pixel comparison vì quyền truy cập và trạng thái deployment chưa được xác minh.
+- Nhánh: `fix/liquid-glass-audit-2026-10-19`. Code ứng dụng storefront vẫn ở source commit `562d7d77624f7431296cb217b2b6d6592aca9ce4`; commits mới bổ sung helper xác minh deployment, assertion CI và workflow gate, không thay đổi HTML/CSS giao diện đang được kiểm thử.
+- **Source/test validation: PASS** — [run 39371075248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075248), HEAD workflow `0c5b436c114e094f1ee7ae5a44a4c54b3f79692b). Project integrity checks và toàn bộ automated tests xanh sau khi sửa assertion baseline guard.
+- **Local fixture audit: PASS — không phải live Preview** — [run 39371072049](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049), [artifact 12240964807](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371072049/artifacts/12240964807): 54 ảnh fixture, 235 sản phẩm mẫu, 20 responsive cases, 93 interaction checks, 0 responsive overflow/console/page/HTTP errors, 0 hard failures.
+- **Live storefront capture: BLOCKED_ACCESS_GATE** — trong artifact mới nhất, `accessServiceTokenConfigured=false`, redirect đến Cloudflare Access và 0 screenshot/route/viewport thật. Không có baseline/end ảnh thật; không có pixel diff.
+- **Deployment verifier: BLOCKED_CONFIGURATION** — báo cáo `deployment-verification.json` trong cùng artifact ghi thiếu `CLOUDFLARE_ACCOUNT_ID`. Sau khi biến này có mặt, verifier còn cần secret `CLOUDFLARE_PAGES_READ_TOKEN` và bắt buộc khớp alias, environment=preview, deployment success, branch fix được chọn và commit SHA trước khi cho phép archive.
+- **Admin Preview Playwright: FAIL/BLOCKED** — [run 39371075239](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39371075239) không tìm thấy `#loginView`/`#loginForm`. Đây là pipeline smoke test admin riêng; workflow chỉ truyền `ADMIN_TEST_URL`/`ADMIN_TEST_PASSWORD`, chưa truyền Access headers. Không kết luận lỗi mật khẩu hoặc thay đổi login/security ngoài phạm vi.
+- **Hướng dẫn gỡ chặn**: [PREVIEW-ACCESS-SETUP.md](PREVIEW-ACCESS-SETUP.md). Cần Preview-only Service Auth + repo Secrets `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET`, `CLOUDFLARE_PAGES_READ_TOKEN`, và repo Variable `CLOUDFLARE_ACCOUNT_ID`. Không gửi secret values trong chat, không mở policy cho Production.
+- Workflow giờ từ chối archive end-of-work nếu chưa có baseline thật đã verify; pixel-diff sẽ đặt trạng thái chờ con người xem ảnh, không tự động chấm đẹp/đạt.
+- Không merge/deploy Production, không sửa D1/R2/bindings/secrets Production. PR #108 vẫn không an toàn để merge nguyên trạng do chứa nhiều admin/API/migration/data/deploy changes ngoài scope.
+
+- Không đóng baseline/end screenshots hoặc pixel comparison trước khi có ảnh Preview thật và kiểm tra người xem.
 
 ## Cập nhật kiểm tra gần nhất — 2026-10-19/20 UTC
 
