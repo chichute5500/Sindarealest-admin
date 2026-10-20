@@ -82,3 +82,10 @@ Không ghi “hoàn thành 100%” nếu còn FAIL, BLOCKED hoặc hạng mục 
 - Audit route tiếp tục xác nhận generator và parser hiện tại dùng `/san-pham/{SKU hoặc ID/slug}`; chưa có bằng chứng đủ để đổi sang `/sanpham/{category-slug}/{product-code}`. Không sửa route/UI trước baseline và kiểm kê dữ liệu/SKU thật.
 - Preview được cung cấp vẫn đang ghi nhận `login_required` trong các lần truy cập trước; ảnh PNG tham chiếu vẫn chưa được hiển thị/xem trực quan. Hai blocker này chưa được gỡ.
 - Website HTML/CSS/JS chưa bị sửa trong lượt này. Các cập nhật chỉ bổ sung hồ sơ kiểm thử. Không merge/deploy Production.
+
+## Bổ sung kiểm tra 2026-10-20 — công cụ trình duyệt
+
+- Thử mở lại Preview bằng trình duyệt tự động ở chế độ chỉ đọc để xác định màn hình website hoặc Cloudflare Access. Lượt chạy không bắt đầu vì số dư TinyFish wallet âm `-$0.16`; không có screenshot mới và không phát sinh thay đổi website.
+- Kết quả này là giới hạn của công cụ trình duyệt, tách biệt với `login_required` trả về từ lần fetch URL trước đó. Không được ghi là đã kiểm tra trực quan hoặc chụp được Preview.
+- Các cập nhật tài liệu đã thực hiện trong nhánh fix: tạo README cho kho ảnh, xác minh/cập nhật manifest trung thực, sửa task ledger và handoff để không còn khẳng định sai rằng manifest chưa tồn tại.
+- Commit tài liệu mới nhất: [5440da821c5aabeb89c65336d7d5ce319516d60c](https://github.com/chichute5500/Sindarealest-admin/commit/5440da821c5aabeb89c65336d7d5ce319516d60c). Chỉ là commit docs; không có thay đổi storefront và không có deploy Production.
