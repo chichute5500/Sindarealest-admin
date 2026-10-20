@@ -72,3 +72,13 @@ Không ghi “hoàn thành 100%” nếu còn FAIL, BLOCKED hoặc hạng mục 
 - Chưa sửa HTML/CSS/JS storefront và chưa đổi route. Đã cập nhật task ledger/test results bằng commit docs-only; Production không bị deploy/merge hoặc thay đổi.
 - Tiếp theo: (1) giải quyết điều kiện truy cập Preview hoặc xác định rõ capture local được chấp nhận làm baseline nội bộ; (2) chạy capture với stage `start-of-work`, lưu đúng thư mục cố định và manifest, ghi rõ nguồn capture; (3) mở/xem hai ảnh mẫu gốc và baseline thật; (4) chỉ sau đó mới sửa Liquid Glass hoặc route sản phẩm; (5) chụp end-of-work và so sánh cùng viewport/theme.
 
+
+
+## Bằng chứng bổ sung sau lần rà soát tiếp theo — 2026-10-20
+
+- Workflow [39327473706](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706) đã kết thúc `success` trên commit `e3c5c08e633bc73900343933dc3145720fbaefa2`; toàn bộ các bước trong job `visual-preview` đều PASS/skipped theo điều kiện. Artifact [12222942329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329) đã được tạo.
+- Run này được kích hoạt bởi push, nên bước lưu ảnh vào kho chuẩn tắc bị skip. Ảnh chỉ nằm trong artifact tạm thời; **không** có nghĩa là baseline đã lưu. Không đánh dấu SHOT-002 PASS.
+- Đã đọc mã workflow và capture script. Chúng chạy server tĩnh cục bộ từ thư mục `public/` tại `http://127.0.0.1:4173/`, chặn một số request bên ngoài và dùng fixture/in-memory data cho các kịch bản giá. Kết quả hữu ích cho hồi quy cục bộ, nhưng không kiểm tra trực tiếp URL Cloudflare Preview, Pages Functions hoặc dữ liệu Preview thật.
+- Audit route tiếp tục xác nhận generator và parser hiện tại dùng `/san-pham/{SKU hoặc ID/slug}`; chưa có bằng chứng đủ để đổi sang `/sanpham/{category-slug}/{product-code}`. Không sửa route/UI trước baseline và kiểm kê dữ liệu/SKU thật.
+- Preview được cung cấp vẫn đang ghi nhận `login_required` trong các lần truy cập trước; ảnh PNG tham chiếu vẫn chưa được hiển thị/xem trực quan. Hai blocker này chưa được gỡ.
+- Website HTML/CSS/JS chưa bị sửa trong lượt này. Các cập nhật chỉ bổ sung hồ sơ kiểm thử. Không merge/deploy Production.
