@@ -1,0 +1,65 @@
+name: Deploy storefront fix branch to Cloudflare Pages Preview
+
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storefront-preview-fix-branch
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'sindarealest2' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+    steps:
+      - name: Check out the exact fix branch commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate deployment credentials and confirm Production remains main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/fix/liquid-glass-audit-2026-10-19"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$CLOUDFLARE_PAGES_PROJECT" = "sindarealest2"
+          [[ "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret; no deploy attempted."; exit 1; }
+          response="$(curl --fail --silent --show-error --max-time 20             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"             -H "Accept: application/json"             "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}")"
+          printf '%s' "$response" | jq -e '.success == true and .result.name == "sindarealest2" and .result.production_branch == "main"' >/dev/null || {
+            echo "::error::Preview deployment blocked: project identity or Production branch main could not be confirmed. No Cloudflare settings were changed."
+            exit 1
+          }
+          echo "PASS: correct Pages project confirmed; Production branch is main; target branch is fix/liquid-glass-audit-2026-10-19."
+
+      - name: Install project dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run project integrity checks and tests before deployment
+        run: |
+          npm run check
+          npm test
+
+      - name: Install and confirm Wrangler
+        run: npm install --no-save --no-package-lock --no-audit --no-fund wrangler@4.149.0
+
+      - name: Deploy only the named fix branch as a Preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "fix/liquid-glass-audit-2026-10-19"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          npx wrangler pages deploy public             --project-name="$CLOUDFLARE_PAGES_PROJECT"             --branch="$GITHUB_REF_NAME"             --commit-hash="$GITHUB_SHA"             --commit-message="$(git log -1 --format=%s)"
