@@ -47,4 +47,26 @@ assert.match(finalBackgroundCss, /\.theme-bg--light\{filter:blur\(1px\) hue-rota
 assert.match(finalBackgroundCss, /html\.dark \.theme-bg--dark\{filter:blur\(1\.5px\) hue-rotate\(0deg\) saturate\(\.86\) brightness\(\.86\) contrast\(\.92\)\}/,
   "Dark backdrop should preserve navy tone, soft highlights and visible texture.");
 
+
+const ambientLight = html.match(/\\.theme-bg--light\\{[^}]+\\}/)?.[0] || "";
+const ambientDark = html.match(/\\.theme-bg--dark\\{[^}]+\\}/)?.[0] || "";
+assert.match(ambientLight, /background-image:radial-gradient\\(/,
+  "The light ambient background must be generated as soft glacial gradients rather than reuse a crocodile-scale product texture.");
+assert.match(ambientDark, /background-image:radial-gradient\\(/,
+  "The dark ambient background must be generated as flowing navy/sapphire gradients rather than reuse a crocodile-scale product texture.");
+assert.doesNotMatch(ambientLight, /theme-croc-/,
+  "Light page ambience must not use the crocodile-scale raster texture as its background.");
+assert.doesNotMatch(ambientDark, /theme-croc-/,
+  "Dark page ambience must not use the crocodile-scale raster texture as its background.");
+const welcomeLight = html.match(/\\.welcome-texture--light\\{[^}]+\\}/)?.[0] || "";
+const welcomeDark = html.match(/\\.welcome-texture--dark\\{[^}]+\\}/)?.[0] || "";
+assert.match(welcomeLight, /radial-gradient\\(/,
+  "Light welcome splash must use the same pearl/glacial ambient design language.");
+assert.match(welcomeDark, /radial-gradient\\(/,
+  "Dark welcome splash must use the same navy/sapphire ambient design language.");
+assert.doesNotMatch(welcomeLight, /theme-croc-/,
+  "Welcome splash must not bring the hard crocodile scale texture back in light mode.");
+assert.doesNotMatch(welcomeDark, /theme-croc-/,
+  "Welcome splash must not bring the hard crocodile scale texture back in dark mode.");
+
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
