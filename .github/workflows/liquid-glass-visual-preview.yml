@@ -219,7 +219,7 @@ jobs:
               counterpartExists: counterpartNames.has(name), status: 'captured-live-preview', comparisonStatus: 'UNVERIFIED'
             }))
           };
-          fs.writeFileSync(file, JSON.stringify(manifest, null, 2) + '\\n');
+          fs.writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
           NODE
           git add "${target_dir}" "${manifest_path}"
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive live Preview ${STAGE} screenshots (run ${RUN_ID})"
@@ -255,7 +255,7 @@ jobs:
             manifest.stages['end-of-work'].overallVisualComparison = comparison.status;
             manifest.stages['end-of-work'].pixelComparisonSummary = comparison.summary;
           }
-          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\\n');
+          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
           NODE
           git add docs/website-screenshots/manifest.json
           if git diff --cached --quiet; then echo "Manifest already records the comparison."; exit 0; fi

@@ -11,7 +11,7 @@ assert.match(workflow, /inputs\.capture_source == 'cloudflare-preview'/,
   'Only real Cloudflare Preview captures may be archived into start/end folders.');
 assert.match(workflow, /artifacts\/liquid-glass-preview\/live-preview/,
   'The archive must source files from the dedicated live-capture directory.');
-assert.match(workflow, /sourceKind === 'cloudflare-pages-preview-live-read-only'/,
+assert.match(workflow, /audit\.sourceKind !== 'cloudflare-pages-preview-live-read-only'/,
   'The archive must reject non-live or fixture-only reports.');
 assert.match(live, /cloudflare-pages-preview-live-read-only/,
   'The direct capture must identify its source.');
