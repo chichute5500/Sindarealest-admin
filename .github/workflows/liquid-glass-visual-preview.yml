@@ -93,7 +93,15 @@ jobs:
         run: |
           set -euo pipefail
           test "${REF_NAME}" = "fix/liquid-glass-audit-2026-10-19"
-          node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
+          node --input-type=module - "${PREVIEW_URL}" <<'NODE'
+          const url = new URL(process.argv[2]);
+          if (url.protocol !== 'https:' || !/^[a-z0-9-]+\\.sindarealest2\\.pages\\.dev$/i.test(url.hostname)
+              || url.hostname.toLowerCase() === 'sindarealest2.pages.dev'
+              || url.username || url.password || url.search || url.hash || !['', '/'].includes(url.pathname)) {
+            throw new Error('Refused unsafe or production URL');
+          }
+          console.log('PASS: safe non-production Preview alias');
+          NODE
       - name: Record source revision before screenshot commit
         run: echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Set up Node.js
