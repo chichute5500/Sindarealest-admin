@@ -39,13 +39,13 @@ const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart
 assert.ok(finalBackgroundStart > html.indexOf("/* Reference-match finishing pass"),
   "The softened background calibration must be the final authoritative rule, not an unused earlier selector.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(225,241,255,\.52\),rgba\(211,231,249,\.46\) 52%,rgba\(237,247,255,\.54\)\)/,
-  "Light background must diffuse hard crocodile-scale detail while preserving its original source image.");
+  "Light background must provide a soft frosted veil over the newly generated glacial gradient backdrop.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(3,20,36,\.68\),rgba\(7,31,51,\.63\) 52%,rgba\(3,17,30,\.72\)\)/,
-  "Dark background must retain visible source texture while softening its contrast.");
+  "Dark background must provide a deep navy translucent veil over the newly generated sapphire gradient backdrop.");
 assert.match(finalBackgroundCss, /\.theme-bg--light\{filter:blur\(1px\) hue-rotate\(25deg\) saturate\(\.70\) brightness\(1\.035\) contrast\(\.95\)\}/,
-  "Light backdrop should keep its original theme image while softening sharp texture.");
+  "Light backdrop should keep the pearl-blue gradient fluid and softly diffused.");
 assert.match(finalBackgroundCss, /html\.dark \.theme-bg--dark\{filter:blur\(1\.5px\) hue-rotate\(0deg\) saturate\(\.86\) brightness\(\.86\) contrast\(\.92\)\}/,
-  "Dark backdrop should preserve navy tone, soft highlights and visible texture.");
+  "Dark backdrop should preserve deep navy tone and soft sapphire highlights.");
 
 
 const ambientLight = html.match(/\\.theme-bg--light\\{[^}]+\\}/)?.[0] || "";
