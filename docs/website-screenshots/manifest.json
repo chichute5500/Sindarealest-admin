@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T00:53:37Z",
+  "updatedAtUtc": "2026-10-20T01:02:00Z",
   "status": "BLOCKED",
-  "note": "No screenshot files are being claimed as captured. The two required stage directories are present with .gitkeep placeholders only. Read-only fetch of the home route and both old/new product-route probes again returned login_required; no authorized browser session is available in this run.",
+  "note": "Fallback path used: inspect GitHub source and run isolated local Playwright audit while Preview fetch remains blocked. No Preview screenshot is claimed.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -55,14 +55,14 @@
   "localAudit": {
     "status": "PASS",
     "scope": "local static preview with fixture data only; not Cloudflare Pages Preview",
-    "workflowRun": 39350150510,
-    "sourceCommit": "45c0b881d6d4068f0471e6deb19aaeb3063951cc",
-    "artifactId": 12232682056,
-    "artifactName": "sindarealest-liquid-glass-preview-255",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350150510/artifacts/12232682056",
+    "workflowRun": 39350484564,
+    "sourceCommit": "26406bec56dac69d665c450b6641f03a5ee9f979",
+    "artifactId": 12232777359,
+    "artifactName": "sindarealest-liquid-glass-preview-257",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564/artifacts/12232777359",
     "report": "visual-audit.json inside the workflow artifact",
     "startedAtUtc": "2026-10-20T00:52:46.025Z",
-    "finishedAtUtc": "2026-10-20T00:53:32.606Z",
+    "finishedAtUtc": "2026-10-20T00:57:34Z",
     "productFixtureCount": 235,
     "screenshotsCaptured": 54,
     "responsiveCases": 20,
@@ -74,6 +74,6 @@
     "failedRequests": 0,
     "hardFailures": 0,
     "passed": true,
-    "caveat": "Screenshots remain in the temporary GitHub Actions artifact. They are not added to start-of-work or end-of-work because those canonical folders are reserved for real Preview baseline/result evidence. Two expected fixture-only 503 responses were observed for warranty lookup."
+    "caveat": "Latest workflow PASS confirms local tests/capture only. Screenshot files remain in the temporary GitHub Actions artifact; not added to Preview baseline/result directories. Two expected fixture-only 503 responses occurred for warranty lookup."
   }
 }
