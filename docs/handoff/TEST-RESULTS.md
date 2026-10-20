@@ -77,3 +77,12 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Artifact: [sindarealest-liquid-glass-preview-247](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329) (retention listed through 2026-11-02 UTC).
 - Limitation: the automatic push-triggered run skipped “Save independently captured images into selected repository archive”; therefore this run did **not** archive screenshots into the canonical `start-of-work/` or `end-of-work/` folders and does not unblock baseline capture. The workflow is configured to serve local `public/` files and use fixtures; it is not proof of deployed Preview routing, Pages Functions, or visual similarity to reference PNGs.
 - Task IDs: SHOT-001, PERF-001, REG-001.
+
+## Bổ sung xác minh — 2026-10-20
+
+### 2026-10-20 — GitHub Actions run 39327473706
+- Run: [39327473706](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706), job `118316975031`.
+- Status: SUCCESS; các bước setup Node, `npm test`, `npm run check`, cài Chromium, capture local preview đều thành công. Bước lưu ảnh vào thư mục stage bị SKIPPED vì đây là push run, không phải `workflow_dispatch`.
+- Artifact: [12222942329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329).
+- Giới hạn: local static preview/fixture, không phải Cloudflare Preview; không phải baseline thật và không phải xác nhận pixel match.
+- Task IDs: SHOT-001, REG-001.
