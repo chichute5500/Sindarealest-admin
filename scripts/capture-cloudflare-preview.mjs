@@ -361,16 +361,24 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
 
   let galleryNextPassed = null;
   const next = page.locator('#detailNext');
-  if (await next.isVisible().catch(() => false)) {
+  const galleryImageCount = await page.locator('#detailThumbs .detail-thumb').count().catch(() => 0);
+  // Some site styles can override the browser's [hidden] presentation. Trust the
+  // actual rendered gallery data, not visibility of the arrow alone.
+  if (galleryImageCount > 1 && await next.isVisible().catch(() => false)) {
     const before = await page.locator('#detailImageCount').textContent().catch(() => '');
     await next.click();
-    await page.waitForFunction(previous => (document.querySelector('#detailImageCount')?.textContent || '') !== previous, before, { timeout: 5000 });
+    await page.waitForFunction(previous => {
+      const counter = document.querySelector('#detailImageCount')?.textContent || '';
+      const current = Number.parseInt(counter.split('/')[0], 10);
+      const previousIndex = Number.parseInt(String(previous || '').split('/')[0], 10);
+      return Number.isFinite(current) && Number.isFinite(previousIndex) && current !== previousIndex;
+    }, before, { timeout: 5000 });
     await captureLocator(page, '#productOverlay', screenshotStem('product-gallery-next', viewport, theme) + '.png', {
       ...captureMeta(viewport, theme, directState.path), captureType: 'product-gallery', state: 'next-image', productTitle: clicked.title,
     });
     galleryNextPassed = true;
   } else {
-    audit.sectionChecks.push({ selector: '#detailNext', status: 'NOT APPLICABLE', route: clicked.path, theme, viewport: viewport.name, note: 'Selected live product exposes one image.' });
+    audit.sectionChecks.push({ selector: '#detailNext', status: 'NOT APPLICABLE', route: clicked.path, theme, viewport: viewport.name, note: 'Selected live product exposes one image or no visible next control.' });
   }
 
   const reloadResponse = await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
