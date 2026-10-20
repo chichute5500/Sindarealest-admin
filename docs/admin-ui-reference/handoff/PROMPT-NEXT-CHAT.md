@@ -1,84 +1,42 @@
-# PROMPT BÀN GIAO — TIẾP TỤC HOÀN THIỆN ADMIN SINDAREALEST
+# PROMPT BÀN GIAO — TIẾP TỤC HOÀN THIỆN SINDAREAL EST ADMIN
 
-Bạn tiếp quản trực tiếp công việc đang dang dở. Không bắt đầu lại từ đầu, không chỉ viết kế hoạch. Hãy đọc các file trạng thái mới nhất trên GitHub, xác minh bằng chứng thực tế, rồi tiếp tục thực hiện bằng các công cụ/quyền truy cập hiện có.
+Bạn phải tiếp tục công việc thực tế, không chỉ lập kế hoạch. Trước khi hành động, hãy đọc toàn bộ các file sau từ nhánh `feature/admin-isolated-handoff-2026-10-20` trong repository `chichute5500/Sindarealest-admin`:
 
-## 1. Đọc bắt buộc trước khi hành động
+1. [MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md)
+2. [START-HERE.md](START-HERE.md)
+3. [LATEST-STATUS.md](LATEST-STATUS.md)
+4. [latest-test-results.json](latest-test-results.json)
+5. [PROMPT-COMPLETENESS-AUDIT.md](PROMPT-COMPLETENESS-AUDIT.md)
+6. [reference-instructions.md](../reference-instructions.md)
 
-Repository: `chichute5500/Sindarealest-admin`
+## Bắt đầu bằng xác minh, không đoán
 
-Mở theo thứ tự:
-1. [START-HERE.md](START-HERE.md)
-2. [LATEST-STATUS.md](LATEST-STATUS.md)
-3. [latest-test-results.json](latest-test-results.json)
-4. [MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md)
-5. [reference-instructions.md](../reference-instructions.md)
-6. [PROMPT-COMPLETENESS-AUDIT.md](PROMPT-COMPLETENESS-AUDIT.md) nếu có trong nhánh hiện tại.
+- Xác minh repository, nhánh ADMIN, HEAD SHA, Git status/working tree nếu có checkout, PR hiện tại và workflow mới nhất.
+- Nếu không có local checkout hoặc không có quyền đọc một phần trạng thái, nói rõ giới hạn; không giả vờ đã chạy lệnh hoặc xem file.
+- Đọc handoff trước khi làm để tránh lặp lại các bước đã có bằng chứng.
+- Không dựa vào test PASS của commit cũ để tuyên bố HEAD hiện tại đã PASS. Mọi kết quả phải gắn với source commit/workflow cụ thể.
 
-Đừng tin SHA hoặc trạng thái ghi trong file mà không đối chiếu với GitHub hiện tại. Xác minh branch HEAD, workflow runs, các file source và commit chứa bằng chứng mới nhất. Không lặp lại test/ảnh đã có bằng chứng hợp lệ nếu source/commit không thay đổi.
+## Phạm vi và bảo vệ bắt buộc
 
-## 2. Nhánh và ranh giới an toàn — BẮT BUỘC
+- Chỉ sửa và commit trên `feature/admin-isolated-handoff-2026-10-20`.
+- Bảo vệ nhánh website tĩnh `fix/liquid-glass-audit-2026-10-19` và nhánh `main`.
+- Giữ PR #111 (ADMIN) và PR #108 (website tĩnh) OPEN/chưa merge. Không tự merge, cherry-pick, force-push hoặc đồng bộ hai nhánh.
+- Không deploy Production; không sửa secrets, cấu hình môi trường, D1/R2, schema, dữ liệu thật, API/auth/backend hay nghiệp vụ ngoài phạm vi được cho phép.
+- Không bỏ qua Cloudflare Access. Nếu Preview bị chặn hoặc phục vụ sai source/signature, ghi BLOCKED và tiếp tục công việc độc lập có thể thực hiện an toàn.
 
-- Chỉ được sửa/commit công việc ADMIN trên `feature/admin-isolated-handoff-2026-10-20`.
-- Bảo vệ nhánh website tĩnh `fix/liquid-glass-audit-2026-10-19`; không sửa nhánh này, không sửa `main).
-- Không merge PR #111, không đổi base, không cherry-pick, không đồng bộ branch tự động. PR #111 mở tới `main` và có thay đổi storefront/backend ngoài phạm vi ADMIN.
-- Không deploy Cloudflare Production, không sửa production secrets/config, D1 schema, R2 data hoặc dữ liệu khách hàng/đơn hàng thật.
-- Không tắt/bypass auth hay Cloudflare Access. Không in secret/token/PII vào log, ảnh hoặc báo cáo.
-- Giữ nguyên API, auth, schema và nghiệp vụ hiện có. Không tạo route giả chỉ để khớp mockup. Nếu không thể cô lập thay đổi an toàn, ghi BLOCKED và tiếp tục hạng mục độc lập.
-- Nếu không có checkout Git cục bộ hoặc không thể xác nhận `git status`/diff đầy đủ, ghi rõ giới hạn; không tuyên bố full diff đã sạch.
+## Tiếp tục công việc
 
-## 3. Trạng thái đã xác minh gần nhất (phải kiểm tra lại)
+1. Đối chiếu trạng thái và bằng chứng gần nhất trong LATEST-STATUS.md / JSON; xác minh lại các kết quả mới nhất từ GitHub Actions.
+2. Xử lý các việc còn mở theo thứ tự ưu tiên: Preview URL/source mismatch; kiểm thử Playwright trên source hiện tại; so sánh các màn hình với ảnh tham chiếu; đánh giá responsive và nghiệp vụ ADMIN bằng fixture/read-only trước; chỉ kiểm tra backend thật khi có Preview và quyền hợp lệ.
+3. Không coi ảnh fixture hoặc login-only là bằng chứng cho nghiệp vụ đã đăng nhập. Không dùng dữ liệu cá nhân/thật cho screenshot.
+4. Với mỗi thay đổi có ý nghĩa: sửa trên nhánh ADMIN → chạy test phù hợp → lưu screenshot/metadata thực → đối chiếu → cập nhật LATEST-STATUS.md và latest-test-results.json. Dùng PASS/FAIL/BLOCKED/SKIPPED/NOT VERIFIED chính xác.
+5. Không dừng sau báo cáo tiến độ nếu vẫn còn việc an toàn có thể thực hiện. Chỉ dừng khi cần người dùng cấp quyền, cung cấp URL Preview hợp lệ, hoặc quyết định mà AI không thể suy ra an toàn.
+6. Trước khi kết thúc phiên, cập nhật file handoff, ghi commit SHA chỉ sau khi GitHub xác nhận, đọc lại file từ GitHub để xác minh và đưa ra bước tiếp theo cụ thể.
 
-- Tiến độ ước tính ghi nhận: **42%**. Đây là ước tính theo giai đoạn, không phải tỷ lệ code.
-- HEAD trước khi ghi handoff mới: `ed27fc5c67152ba900c8b10f5acd358dae8e8096`; các cập nhật handoff tiếp theo sẽ tạo SHA mới.
-- Source UI gần nhất được ghi nhận: `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`.
-- Commit test harness được workflow ma trận kiểm tra: `de8b7770ac2e077ad9ef0926f5e9053b400a9993`. Kiểm tra lại quan hệ giữa source SHA và test SHA trước khi gán ảnh cho code mới hơn.
-- [Workflow source checks 39447109288](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39447109288): SUCCESS trên HEAD trước handoff.
-- [Preview diagnostic 39446733271](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39446733271): tổng thể FAIL ở bước Preview đã cấu hình; source checks, npm checks và local Playwright 16 ảnh PASS.
-- Lỗi Preview hiện tại: GitHub Actions secret `ADMIN_TEST_URL` đang trỏ đến trang có `.topbar > .brand` còn hiển thị khi đăng nhập, khác với source ADMIN mới. Giá trị secret được GitHub mask; không cố đọc/in giá trị secret.
-- 16 ảnh local tại `docs/admin-ui-reference/handoff/history/b5ce11f92995/screenshots/` chỉ bao phủ login shell chưa đăng nhập ở 8 viewport × Light/Dark; **không** chứng minh các module nghiệp vụ đã PASS.
-- HTML viewer đã hiển thị mockup 12 màn hình; đọc PNG gốc trực tiếp và full pixel-diff vẫn chưa được xác nhận hoàn tất.
-- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) vẫn OPEN/NOT MERGED, base `main`. Số commits/files thay đổi theo từng cập nhật handoff; truy vấn metadata live ngay khi bắt đầu, không dựa vào snapshot cũ. PR chứa phạm vi storefront/backend ngoài ADMIN; tuyệt đối không merge.
-- Cloudflare Production: NOT PERFORMED.
+## Trạng thái khởi điểm được ghi nhận — 2026-10-21
 
-## Trạng thái bổ sung đã xác minh — 2026-10-21
+- Lượt cập nhật bàn giao gần nhất chỉ cập nhật tài liệu; không có thay đổi source ADMIN và không chạy test mới.
+- Bằng chứng kiểm thử cũ phải được đọc từ JSON và xác minh workflow/commit trước khi tái sử dụng. Preview mismatch và kiểm thử module nghiệp vụ đã đăng nhập là các vấn đề còn cần xử lý theo trạng thái mới nhất.
+- Không tuyên bố hoàn tất 100% cho đến khi từng tiêu chí nghiệm thu có bằng chứng phù hợp.
 
-- Source commit đã test gần nhất: `26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6`; source blob `public/admin/index.html`: `6a0cf778f5d234a0f5084a796a73dec163ea52d7`. Current branch HEAD tại lần kiểm tra này: `e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4` (evidence-only, chưa có source code mới hơn).
-- Run local checks: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478738647 — `npm run check` PASS, `npm test` PASS, local Playwright PASS; artifact metadata có 42 PNG và 36 metrics, không có page/console errors, attempted writes hoặc unexpected API paths.
-- Remote Preview FAIL với signature được ghi ở log: `topbarBrandDisplay=flex`, `topbarBrandVisibility=visible`, `inlineHideRulePresent=false`, stylesheet không có login-hide rule trong khi source có rule. Đây là CSS signature mismatch đã có bằng chứng; root cause chính xác (URL/deployment) chưa được xác định. Không đọc/in secret, không bypass Access, không nới assertion.
-- PR #111 hiện được GitHub trả về trạng thái OPEN/unmerged, nhưng số changed files live là 488 ở lần kiểm tra gần nhất. PR chứa storefront/backend ngoài ADMIN; tuyệt đối không merge. Truy vấn lại PR live trước mọi hành động.
-- Tiến độ 43%, không nâng phần trăm trước khi Preview, đủ 12 màn hình, backend QA và audit diff được xử lý.
-
-## Kết quả kiểm thử mới nhất — 2026-10-21
-
-- Run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39480806835 trên commit `7e41313efcc1bba8302bacbad79327696a1fb0d1`: `npm run check` PASS, `npm test` PASS, local Playwright PASS; 16 ảnh login shell + 42 ảnh module fixture + 36 metrics. Module dùng fixture read-only, không phải backend thật.
-- Preview vẫn FAIL CSS signature: header brand hiện visible, stylesheet từ xa thiếu login-hide rule có trong source. Root cause URL/deployment chưa xác định.
-- Đã thêm assertion text-node cho literal `</div>`; nó không tái hiện trong run này dù ảnh customer cũ từng có chuỗi đó. Chưa đóng lỗi: kiểm tra pseudo-element/CSS và mở ảnh customer từ artifact mới trước khi sửa source.
-- Branch HEAD sau lưu evidence: `cdec188efa2198caaf0ac65cd294b682d1088fc9` (evidence-only). PR #111 OPEN/unmerged; không merge hoặc deploy Production.
-
-## 4. Việc phải làm tiếp theo — làm theo thứ tự
-
-### A. Xác minh Preview đúng nguồn
-1. Kiểm tra workflow và file cấu hình diagnostic hiện tại. Xác minh `ADMIN_TEST_URL` có được cấu hình hay không mà không tiết lộ giá trị.
-2. Nếu cần, báo người quản lý repo cập nhật secret `ADMIN_TEST_URL` thành URL Preview đúng của nhánh `feature/admin-isolated-handoff-2026-10-20`, path `/admin/`. Giữ nguyên Cloudflare Access service-token secrets; không bypass Access.
-3. Chạy lại diagnostic. Chỉ đánh dấu remote Preview PASS khi CSS signature đúng source hiện tại, login và dashboard đều qua. Đọc log/artifact thật, không suy đoán từ trạng thái workflow tổng quát.
-
-### B. Hoàn thiện kiểm thử bằng chứng
-1. Kiểm tra tính hợp lệ và SHA metadata của ảnh hiện có; không chụp lại ma trận 16 ảnh login nếu source không đổi và evidence còn dùng được.
-2. Xác minh khả năng xem PNG gốc/ZIP tham chiếu; ghi rõ asset nào thực sự đọc được. So sánh screenshot app với mockup ở cùng viewport/theme; không tuyên bố pixel-diff nếu chưa chạy.
-3. Bổ sung Playwright read-only cho dashboard, sản phẩm, đơn hàng, khách hàng, bảo hành, cài đặt, gallery và backup/restore. Chỉ dùng fixture/test data an toàn; che/loại PII; không CRUD dữ liệu thật.
-4. Kiểm tra mobile nav, table/card layout, overflow ngang, light/dark, tiếng Việt, focus/keyboard, trạng thái loading/error/empty, console và failed requests. Source hiện có 6 mục điều hướng; mockup thể hiện 5 mục + “Khác”. Điều tra bằng chứng trước khi sửa.
-5. Ghi rõ các chức năng chưa có route riêng (ví dụ chi tiết đơn/nhật ký) và xác minh business/API contract trước khi đề xuất thêm.
-
-### C. Chỉnh sửa và nghiệm thu
-- Chỉ sau khi có ảnh/bug tái hiện, sửa một nhóm thay đổi ADMIN nhỏ, chạy `npm run check`, `npm test`, Playwright và xem lại screenshot.
-- Mỗi vòng sửa có ý nghĩa phải cập nhật `LATEST-STATUS.md`, `latest-test-results.json`, lưu ảnh/metadata/log an toàn vào `history/<sha-or-run-id>/`, rồi commit trên nhánh ADMIN.
-- Kiểm tra full diff/merge-base PR #111 nếu có checkout an toàn. Nếu chưa có checkout, ghi BLOCKED và không tuyên bố đã rà soát toàn bộ.
-- Giữ PR #111 chưa merge; không deploy Production.
-
-## 5. Quy tắc báo cáo
-
-Báo cáo tiến độ bằng các mục: đã làm, bằng chứng/URL workflow, còn lỗi, blocker cần người dùng thao tác, bước kế tiếp. Tách rõ PASS / FAIL / NOT TESTED / BLOCKED. Không nâng phần trăm chỉ vì đã đọc source hoặc thêm tài liệu. Chỉ dừng khi thực sự cần người dùng thao tác (ví dụ cập nhật secret Preview hoặc cung cấp URL Preview hợp lệ); trong thời gian chờ, tiếp tục các việc độc lập có thể làm an toàn.
-
-## Câu lệnh ngắn để bắt đầu
-
-**“Tiếp tục theo PROMPT-NEXT-CHAT.md và MASTER-PROMPT-AUTO-HANDOFF.md. Đọc handoff mới nhất, xác minh HEAD/CI, rồi thực hiện các việc còn lại trên nhánh ADMIN riêng; không sửa website tĩnh, không merge PR #111, không deploy Production.”**
+**Bắt đầu ngay bằng việc xác minh GitHub và đọc các file bàn giao trên; sau đó thực hiện bước tiếp theo an toàn có thể làm, cập nhật file và tiếp tục.**
