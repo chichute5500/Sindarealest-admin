@@ -462,3 +462,25 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Audit: `accessBlocked=true`, `captureCompleted=false`, zero screenshots and zero route probes. The probe step continues only so the report/artifact are uploaded; it is not a PASS.
 - One console message originated from Access login CSP, not the storefront. Commit `aaec8026c8eca4aef3027dcb5a5c1e49d6189930` adds a sanitizer to remove URL credentials/query/fragment values and ignores console/page errors emitted by non-Preview origins.
 - No storefront HTML/CSS/JS has changed. The start/end folders remain empty until authorized Preview capture is possible; do not change Production Access to get around this blocker.
+
+
+## Bổ sung bàn giao mới nhất — 2026-10-20: xác minh token và trạng thái Playwright
+
+### Điều đã xác minh được
+- Người dùng báo đã thêm secret `CLOUDFLARE_PAGES_READ_TOKEN` vào GitHub Actions, nhưng chưa chắc giá trị có đúng loại/quyền hay không. Giá trị secret không thể đọc ngược từ GitHub; tuyệt đối không yêu cầu người dùng dán token vào chat.
+- Run [39405151215 — Admin Preview Playwright](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39405151215), branch `fix/liquid-glass-audit-2026-10-19`, commit `45cb80cb8568ec6ccb0b3acae55f5f20e9d4106d`, hoàn tất **SUCCESS** ngày 2026-10-20. Job tên “Test Admin Preview (read-only smoke checks)”; các bước checkout, setup Node, cài Playwright và “Test the supplied Preview URL” đều thành công.
+- **Giới hạn bằng chứng:** run 39405151215 là workflow Admin Preview Playwright, không phải bước xác minh Cloudflare Pages API token. Vì vậy không được suy ra rằng `CLOUDFLARE_PAGES_READ_TOKEN` đã đúng hoặc có quyền `Account → Cloudflare Pages → Read` chỉ từ trạng thái SUCCESS này.
+- Workflow chuyên biệt cần chạy để xác minh token là [Liquid Glass isolated visual preview](https://github.com/chichute5500/Sindarealest-admin/actions/workflows/liquid-glass-visual-preview.yml), trên branch `fix/liquid-glass-audit-2026-10-19`, với `capture_source=cloudflare-preview`, `capture_stage=start-of-work`, xác nhận Preview-only, URL `https://3ed49bcc.sindarealest2.pages.dev/`. Bước “Verify actual Cloudflare Pages deployment before manual capture/archive” dùng `CLOUDFLARE_ACCOUNT_ID` (GitHub variable) và `CLOUDFLARE_PAGES_READ_TOKEN` (GitHub secret).
+- Nếu bước xác minh token thất bại, xem lỗi của chính bước này để phân biệt secret rỗng/sai, token thiếu quyền, account ID sai hoặc alias/branch deployment không khớp. Không chia sẻ giá trị token trong logs; nếu log có thông tin nhạy cảm, không chép lại công khai.
+- Nếu xác minh API thành công nhưng capture bị Cloudflare Access chặn, đó là blocker riêng: kiểm tra cấu hình Service Token `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`; không nới Access hay sửa Production để vượt qua.
+
+### Trạng thái ảnh chuẩn và ranh giới an toàn
+- Chưa có bằng chứng mới cho thấy ảnh chụp live Preview đã hoàn tất; run Admin Preview PASS không phải nghiệm thu visual capture.
+- `docs/website-screenshots/start-of-work/` và `docs/website-screenshots/end-of-work/` chỉ được điền bằng ảnh từ live Preview đã xác minh. Chưa ghi nhận baseline mới; end stage phải đợi start baseline đạt điều kiện.
+- Không có thay đổi storefront HTML/CSS/JS được thực hiện trong bước kiểm tra token này. Không merge, deploy, chạy migration hoặc thay đổi binding/secret của Production.
+
+### Việc tiếp theo cho chat mới
+1. Mở workflow chuyên biệt ở link trên, chọn đúng branch `fix/liquid-glass-audit-2026-10-19` và chạy thủ công với các input Preview-only nêu trên.
+2. Đọc kết quả từng bước, đặc biệt bước xác minh Cloudflare Pages deployment metadata. Chỉ kết luận token đúng khi bước này PASS.
+3. Nếu token check PASS nhưng browser bị Access redirect, điều tra riêng cấu hình Service Token cho Preview.
+4. Sau khi xác minh deployment và capture live đạt toàn bộ điều kiện coverage, lưu baseline `start-of-work`; chỉ chụp `end-of-work` sau khi đã có baseline. Tiếp tục giữ Production nguyên trạng.
