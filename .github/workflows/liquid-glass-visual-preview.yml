@@ -114,6 +114,14 @@ jobs:
           exit 1
       - name: Capture local Light/Dark screenshots and run fixture audit
         run: node scripts/capture-liquid-glass-preview.mjs
+      - name: Verify supplied Preview deployment metadata on push (diagnostic only)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+        run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Probe supplied Cloudflare Preview on push (artifact only; never archives)
         if: github.event_name == 'push'
         continue-on-error: true
@@ -124,6 +132,13 @@ jobs:
         run: |
           node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           node scripts/capture-cloudflare-preview.mjs
+      - name: Verify actual Cloudflare Pages deployment before manual capture/archive
+        if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
+        env:
+          PREVIEW_URL: ${{ inputs.preview_url }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+        run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Capture live Cloudflare Pages Preview (read-only)
         if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
         env:
@@ -154,9 +169,23 @@ jobs:
           target_dir="docs/website-screenshots/${STAGE}"
           manifest_path="docs/website-screenshots/manifest.json"
           test -s "${source_dir}/visual-audit.json"
+          test -s "artifacts/liquid-glass-preview/deployment-verification.json"
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
+          const verification = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/deployment-verification.json', 'utf8'));
+          const deployed = verification.deployment || {};
+          const verifiedDeployment = verification.passed === true
+            && verification.status === 'VERIFIED_PREVIEW_DEPLOYMENT'
+            && deployed.environment === 'preview'
+            && /^[a-f0-9]{7,64}$/i.test(deployed.commitHash || '')
+            && Boolean(deployed.branch)
+            && Boolean(deployed.id)
+            && (() => { try { return (deployed.aliases || []).some(alias => new URL(alias).origin === new URL(process.env.PREVIEW_URL).origin) || new URL(deployed.url).origin === new URL(process.env.PREVIEW_URL).origin; } catch { return false; } })();
+          if (!verifiedDeployment) {
+            console.error('Refused to archive: Cloudflare Pages API did not verify the exact Preview alias, deployment environment, branch and commit SHA.');
+            process.exit(1);
+          }
           const requiredSectionKeys = ['hero', 'benefits', 'order', 'featured', 'collections', 'products', 'footer'];
           const coverage = audit.coverage || {};
           const requiredSectionsComplete = requiredSectionKeys.every(key => coverage.sectionScreenshotCounts?.[key] === 4);
@@ -193,13 +222,18 @@ jobs:
           const file = 'docs/website-screenshots/manifest.json';
           const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
           const audit = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/live-preview/visual-audit.json', 'utf8'));
+          const deploymentVerification = JSON.parse(fs.readFileSync('artifacts/liquid-glass-preview/deployment-verification.json', 'utf8'));
+          const deployed = deploymentVerification.deployment;
           manifest.schemaVersion = 1;
           manifest.repository = process.env.REPOSITORY;
           manifest.branch = process.env.REF_NAME;
           manifest.sourceCommit = process.env.SOURCE_SHA;
           manifest.previewUrl = process.env.PREVIEW_URL;
-          manifest.previewDeploymentCommit = null;
-          manifest.previewCommitVerification = 'UNVERIFIED: the deployed Pages Preview commit was not exposed by the read-only browser capture.';
+          manifest.previewDeploymentCommit = deployed.commitHash;
+          manifest.previewDeploymentBranch = deployed.branch;
+          manifest.previewDeploymentId = deployed.id;
+          manifest.previewDeploymentCreatedOn = deployed.createdOn;
+          manifest.previewCommitVerification = 'VERIFIED via Cloudflare Pages API read-only deployment metadata; target alias matched an environment=preview deployment with successful stage status.';
           manifest.captureSource = 'Direct Cloudflare Pages Preview capture, read-only; no fixture API';
           manifest.captureCoverage = audit.coverage;
           manifest.liveAuditPassed = audit.passed === true;
@@ -235,6 +269,9 @@ jobs:
           manifest.stages[process.env.STAGE] = {
             status: audit.passed ? 'CAPTURED_PASS' : 'CAPTURED_WITH_ISSUES',
             capturedAtUtc: process.env.CAPTURED_AT, runId: process.env.RUN_ID, sourceCommit: process.env.SOURCE_SHA,
+            previewDeploymentCommit: deployed.commitHash, previewDeploymentBranch: deployed.branch,
+            previewDeploymentId: deployed.id, previewDeploymentCreatedOn: deployed.createdOn,
+            previewDeploymentVerified: true,
             imageCount: Number(process.env.IMAGE_COUNT),
             directory: 'docs/website-screenshots/' + process.env.STAGE + '/',
             sourceKind: audit.sourceKind, auditPassed: audit.passed,
