@@ -29,16 +29,11 @@ try {
   process.exit(2);
 }
 const outputDir = path.join(process.cwd(), 'artifacts', 'liquid-glass-preview', 'live-preview');
+// Required responsive matrix: small mobile, common mobile, tablet, and desktop.
 const viewports = [
-  { name: 'mobile-320', width: 320, height: 720 },
   { name: 'mobile-360', width: 360, height: 800 },
-  { name: 'mobile-375', width: 375, height: 812 },
   { name: 'mobile-390', width: 390, height: 844 },
-  { name: 'mobile-412', width: 412, height: 915 },
-  { name: 'mobile-430', width: 430, height: 932 },
   { name: 'tablet-768', width: 768, height: 1024 },
-  { name: 'tablet-1024', width: 1024, height: 768 },
-  { name: 'desktop-1366', width: 1366, height: 768 },
   { name: 'desktop-1440', width: 1440, height: 900 },
 ];
 const audit = {
@@ -60,6 +55,11 @@ const audit = {
   blockedExternalRequests: [],
   readOnlyViolations: [],
   hardFailures: [],
+  contentChecks: [],
+  sectionChecks: [],
+  productDetailChecks: [],
+  brokenImages: [],
+  sourceCommit: process.env.SOURCE_SHA || null,
 };
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
 
@@ -169,7 +169,229 @@ async function capture(page, filename, fullPage, meta) {
   await page.screenshot({ path: path.join(outputDir, filename), type: 'png', fullPage, animations: 'disabled', timeout: 30000 });
   audit.screenshots.push({ filename, fullPage, ...meta });
 }
+async function captureLocator(page, selector, filename, meta) {
+  const locator = page.locator(selector).first();
+  const count = await locator.count().catch(() => 0);
+  const visible = count > 0 && await locator.isVisible().catch(() => false);
+  audit.sectionChecks.push({ selector, filename, status: visible ? 'CAPTURED' : 'MISSING', route: new URL(page.url()).pathname, theme: meta.theme, viewport: meta.viewport });
+  if (!visible) {
+    audit.hardFailures.push('Required screenshot target is missing or hidden: ' + selector + ' (' + filename + ')');
+    return false;
+  }
+  await locator.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(120);
+  await locator.screenshot({ path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000 });
+  audit.screenshots.push({ filename, fullPage: false, elementSelector: selector, ...meta });
+  return true;
+}
+function screenshotStem(prefix, viewport, theme) {
+  return prefix + '-' + viewport.name.split('-')[0] + '-' + theme + '-' + viewport.width + 'x' + viewport.height;
+}
+function captureMeta(viewport, theme, route = '/') {
+  return {
+    route, theme, viewport: viewport.name, viewportWidth: viewport.width, viewportHeight: viewport.height,
+    captureSource: 'cloudflare-pages-preview-live-read-only',
+  };
+}
+async function waitForStorefront(page, label) {
+  await page.waitForFunction(() => !!document.querySelector('#home')
+    && !!document.querySelector('.service-strip')
+    && document.querySelectorAll('#catalogGrid .product-card').length > 0,
+  null, { timeout: 18000 });
+  const state = await page.evaluate(() => ({
+    title: document.title || '',
+    serviceCount: document.querySelectorAll('.service-strip .service').length,
+    catalogProductCount: document.querySelectorAll('#catalogGrid .product-card').length,
+    hasHero: Boolean(document.querySelector('#home .hero-visual img')),
+    hasFooter: Boolean(document.querySelector('#siteFooter')),
+    path: location.pathname,
+  }));
+  const status = state.serviceCount === 6 && state.hasHero && state.hasFooter && Boolean(state.title.trim()) ? 'PASS' : 'FAIL';
+  audit.contentChecks.push({ context: label, ...state, status });
+  if (status !== 'PASS') throw new Error('Storefront content check failed at ' + label + ': six-tile grid, hero, footer or document title is missing.');
+}
+async function dismissWelcomeSplash(page) {
+  await page.evaluate(() => window.__sdDismissWelcome?.()).catch(() => {});
+  await page.waitForFunction(() => {
+    const splash = document.querySelector('#welcomeSplash');
+    return !splash || splash.classList.contains('is-leaving');
+  }, null, { timeout: 4000 }).catch(() => {});
+  await page.waitForTimeout(950);
+}
+async function auditImageElements(page, label) {
+  const broken = await page.evaluate(() => Array.from(document.images).filter((img) => {
+    const src = img.currentSrc || img.getAttribute('src') || '';
+    return Boolean(src) && img.complete && img.naturalWidth === 0;
+  }).map((img) => ({
+    src: (() => { try { return new URL(img.currentSrc || img.src, location.href).pathname; } catch { return ''; } })(),
+    alt: String(img.alt || '').slice(0, 160),
+  }))).catch(() => []);
+  if (broken.length) {
+    audit.brokenImages.push({ context: label, count: broken.length, images: broken });
+    audit.hardFailures.push('Broken image elements detected at ' + label + ': ' + broken.length);
+  }
+}
+const sectionTargets = [
+  { key: 'hero', selector: '#home' },
+  { key: 'benefits', selector: '.service-strip' },
+  { key: 'order', selector: '#order' },
+  { key: 'featured', selector: '#featured' },
+  { key: 'collections', selector: '#collections' },
+  { key: 'products', selector: '#products' },
+  { key: 'footer', selector: '#siteFooter' },
+];
+async function captureKeySections(page, viewport, theme) {
+  const meta = captureMeta(viewport, theme, '/');
+  for (const section of sectionTargets) {
+    const filename = screenshotStem('section-' + section.key, viewport, theme) + '.png';
+    await captureLocator(page, section.selector, filename, {
+      ...meta, captureType: 'section', sectionKey: section.key, state: 'default',
+    });
+  }
+}
+async function captureMenuOpen(page, viewport, theme) {
+  const button = page.locator('#menuToggle');
+  if (!await button.isVisible().catch(() => false)) {
+    audit.sectionChecks.push({ selector: '#menuToggle', status: 'NOT APPLICABLE', route: '/', theme, viewport: viewport.name, note: 'Mobile menu button is not visible at this viewport.' });
+    return;
+  }
+  await button.click();
+  await page.waitForFunction(() => document.querySelector('#mobileNav')?.classList.contains('open'), null, { timeout: 5000 });
+  await capture(page, screenshotStem('state-menu-open', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme), captureType: 'state', state: 'menu-open',
+  });
+  await button.click();
+  await page.waitForFunction(() => !document.querySelector('#mobileNav')?.classList.contains('open'), null, { timeout: 5000 });
+}
+async function captureOrderExpanded(page, viewport, theme) {
+  const button = page.locator('#orderDetailsToggle');
+  const panel = page.locator('#orderDetailsPanel');
+  if (!(await button.count()) || !(await panel.count())) {
+    audit.hardFailures.push('Order assurance controls are missing; expanded-state screenshot cannot be captured.');
+    return;
+  }
+  await button.scrollIntoViewIfNeeded();
+  if (await panel.isHidden().catch(() => true)) await button.click();
+  await page.waitForFunction(() => {
+    const element = document.querySelector('#orderDetailsPanel');
+    return Boolean(element && !element.hidden);
+  }, null, { timeout: 5000 });
+  await captureLocator(page, '#order', screenshotStem('state-order-expanded', viewport, theme) + '.png', {
+    ...captureMeta(viewport, theme), captureType: 'state', state: 'order-details-expanded', sectionKey: 'order',
+  });
+}
+async function waitForProductDetail(page) {
+  await page.waitForFunction(() => Boolean(document.querySelector('#productOverlay.open')
+    && document.querySelector('#detailTitle')?.textContent.trim()
+    && document.querySelector('#detailMainImage')), null, { timeout: 18000 });
+  await dismissWelcomeSplash(page);
+  await page.waitForFunction(() => {
+    const img = document.querySelector('#detailMainImage');
+    return Boolean(img && img.complete && img.naturalWidth > 0);
+  }, null, { timeout: 10000 }).catch(() => {});
+}
+async function captureProductDetailFlow(page, viewport, theme, label) {
+  let cardButton = page.locator('#catalogGrid [data-open-product]').first();
+  if (await cardButton.count().catch(() => 0) === 0) cardButton = page.locator('#featuredGrid [data-open-product]').first();
+  if (await cardButton.count().catch(() => 0) === 0) {
+    audit.productDetailChecks.push({ context: label, status: 'NOT TESTED', reason: 'No live product card rendered.' });
+    audit.hardFailures.push('No live product card is available for the detail route check at ' + label + '.');
+    return;
+  }
+  await cardButton.scrollIntoViewIfNeeded();
+  await cardButton.click({ timeout: 15000 });
+  await waitForProductDetail(page);
+  const clicked = await page.evaluate(() => ({
+    path: location.pathname,
+    title: (document.querySelector('#detailTitle')?.textContent || '').trim(),
+    imageCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
+  }));
+  if (!/^\/san-pham\/[^/]+\/?$/i.test(clicked.path) || !clicked.title) {
+    audit.productDetailChecks.push({ context: label, status: 'FAIL', clickedPath: clicked.path, productTitlePresent: Boolean(clicked.title) });
+    audit.hardFailures.push('Clicking a live product did not produce an expected current detail route (' + label + ').');
+    return;
+  }
+  await captureLocator(page, '#productOverlay', screenshotStem('product-detail-from-grid', viewport, theme) + '.png', {
+    ...captureMeta(viewport, theme, clicked.path), captureType: 'product-detail', state: 'opened-from-product-grid', productTitle: clicked.title,
+  });
+  audit.routeChecks.push({
+    kind: 'product-card-navigation', path: clicked.path, status: 'PASS', productTitleMatches: true,
+    detailModalOpen: true, context: label, note: 'Path derived from an actual rendered Preview product card; no sample SKU assumed.',
+  });
 
+  const directResponse = await navigate(page, new URL(clicked.path, origin).href);
+  if (directResponse.blocked || !directResponse.response) {
+    audit.productDetailChecks.push({ context: label, status: 'BLOCKED', path: clicked.path, directOpenPassed: false, reloadPassed: false });
+    return;
+  }
+  if (directResponse.status < 200 || directResponse.status >= 400) {
+    audit.productDetailChecks.push({ context: label, status: 'FAIL', path: clicked.path, directStatus: directResponse.status, directOpenPassed: false, reloadPassed: false });
+    audit.hardFailures.push('Product detail direct navigation returned an unsuccessful status at ' + label + '.');
+    return;
+  }
+  await waitForStorefront(page, label + '-direct-open');
+  await waitForProductDetail(page);
+  const directState = await page.evaluate(() => ({
+    path: location.pathname, title: (document.querySelector('#detailTitle')?.textContent || '').trim(),
+    modalOpen: Boolean(document.querySelector('#productOverlay.open')),
+  }));
+  const directOpenPassed = directState.path === clicked.path && directState.title === clicked.title && directState.modalOpen;
+  audit.routeChecks.push({
+    kind: 'product-detail-direct-open', path: clicked.path, status: directResponse.status, finalPath: directState.path,
+    productTitleMatches: directState.title === clicked.title, detailModalOpen: directState.modalOpen,
+    result: directOpenPassed ? 'PASS' : 'FAIL', context: label,
+  });
+  if (!directOpenPassed) audit.hardFailures.push('Direct open did not resolve to the same real product: ' + clicked.path + ' (' + label + ').');
+  await settle(page);
+  await capture(page, screenshotStem('product-detail-direct-open', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme, directState.path), captureType: 'product-detail-direct-open', state: 'direct-open', productTitle: clicked.title,
+  });
+  await captureLocator(page, '#productOverlay', screenshotStem('product-detail-modal-direct-open', viewport, theme) + '.png', {
+    ...captureMeta(viewport, theme, directState.path), captureType: 'product-detail-modal', state: 'direct-open', productTitle: clicked.title,
+  });
+
+  let galleryNextPassed = null;
+  const next = page.locator('#detailNext');
+  if (await next.isVisible().catch(() => false)) {
+    const before = await page.locator('#detailImageCount').textContent().catch(() => '');
+    await next.click();
+    await page.waitForFunction(previous => (document.querySelector('#detailImageCount')?.textContent || '') !== previous, before, { timeout: 5000 });
+    await captureLocator(page, '#productOverlay', screenshotStem('product-gallery-next', viewport, theme) + '.png', {
+      ...captureMeta(viewport, theme, directState.path), captureType: 'product-gallery', state: 'next-image', productTitle: clicked.title,
+    });
+    galleryNextPassed = true;
+  } else {
+    audit.sectionChecks.push({ selector: '#detailNext', status: 'NOT APPLICABLE', route: clicked.path, theme, viewport: viewport.name, note: 'Selected live product exposes one image.' });
+  }
+
+  const reloadResponse = await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
+  await waitForStorefront(page, label + '-reload');
+  await waitForProductDetail(page);
+  const reloadState = await page.evaluate(() => ({
+    path: location.pathname, title: (document.querySelector('#detailTitle')?.textContent || '').trim(),
+    modalOpen: Boolean(document.querySelector('#productOverlay.open')),
+  }));
+  const reloadPassed = Boolean(reloadResponse && reloadResponse.status >= 200 && reloadResponse.status < 400
+    && reloadState.path === clicked.path && reloadState.title === clicked.title && reloadState.modalOpen);
+  audit.routeChecks.push({
+    kind: 'product-detail-reload', path: clicked.path, status: reloadResponse?.status ?? null, finalPath: reloadState.path,
+    productTitleMatches: reloadState.title === clicked.title, detailModalOpen: reloadState.modalOpen,
+    result: reloadPassed ? 'PASS' : 'FAIL', context: label,
+  });
+  if (!reloadPassed) audit.hardFailures.push('Reload did not preserve the same real product detail: ' + clicked.path + ' (' + label + ').');
+  await settle(page);
+  await capture(page, screenshotStem('product-detail-reload', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme, reloadState.path), captureType: 'product-detail-reload', state: 'reloaded-direct-route', productTitle: clicked.title,
+  });
+  await captureLocator(page, '#productOverlay', screenshotStem('product-detail-modal-after-reload', viewport, theme) + '.png', {
+    ...captureMeta(viewport, theme, reloadState.path), captureType: 'product-detail-modal', state: 'after-reload', productTitle: clicked.title,
+  });
+  const passed = directOpenPassed && reloadPassed;
+  audit.productDetailChecks.push({
+    context: label, status: passed ? 'PASS' : 'FAIL', path: clicked.path, directOpenPassed, reloadPassed,
+    productTitleMatches: true, galleryNext: galleryNextPassed === null ? 'NOT APPLICABLE' : 'PASS',
+  });
+}
 async function main() {
   await fs.mkdir(outputDir, { recursive: true });
   for (const item of await fs.readdir(outputDir, { withFileTypes: true })) {
@@ -186,6 +408,8 @@ async function main() {
           const result = await navigate(page, previewUrl.href);
           if (result.blocked) break;
           if (!result.response) continue;
+          if (result.status < 200 || result.status >= 300) throw new Error('Homepage returned HTTP ' + result.status + '.');
+          await waitForStorefront(page, label);
           const metrics = await page.evaluate(() => ({
             viewportWidth: window.innerWidth,
             documentWidth: document.documentElement.scrollWidth,
@@ -203,20 +427,25 @@ async function main() {
           if (viewport.name === 'mobile-390') {
             const splash = page.locator('#welcomeSplash');
             if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
-              const splashName = 'welcome-splash-' + theme + '.png';
-              await capture(splash, splashName, false, { route: '/', theme, viewport: viewport.name, viewportWidth: viewport.width, viewportHeight: viewport.height, captureType: 'welcome-splash' });
-              await page.evaluate(() => window.__sdDismissWelcome?.()).catch(() => {});
-              await page.waitForFunction(() => !document.querySelector('#welcomeSplash') || getComputedStyle(document.querySelector('#welcomeSplash')).display === 'none', null, { timeout: 3000 }).catch(() => {});
+              await captureLocator(page, '#welcomeSplash', screenshotStem('state-welcome-splash', viewport, theme) + '.png', {
+                ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay',
+              });
             }
           }
+          await dismissWelcomeSplash(page);
           await settle(page);
-          await capture(page, viewport.name + '-' + theme + '-viewport.png', false, {
-            route: '/', theme, viewport: viewport.name, viewportWidth: viewport.width, viewportHeight: viewport.height, captureType: 'viewport',
+          await auditImageElements(page, label);
+          await capture(page, screenshotStem('home', viewport, theme) + '-viewport.png', false, {
+            ...captureMeta(viewport, theme), captureType: 'viewport', state: 'default-home',
           });
-          if (viewport.name === 'mobile-390' || viewport.name === 'desktop-1366') {
-            await capture(page, viewport.name + '-' + theme + '-full.png', true, {
-              route: '/', theme, viewport: viewport.name, viewportWidth: viewport.width, viewportHeight: viewport.height, captureType: 'full-page',
+          if (['mobile-390', 'desktop-1440'].includes(viewport.name)) {
+            await capture(page, screenshotStem('home', viewport, theme) + '-full-page.png', true, {
+              ...captureMeta(viewport, theme), captureType: 'full-page', state: 'default-home',
             });
+            await captureKeySections(page, viewport, theme);
+            if (viewport.name === 'mobile-390') await captureMenuOpen(page, viewport, theme);
+            await captureOrderExpanded(page, viewport, theme);
+            await captureProductDetailFlow(page, viewport, theme, label);
           }
         } catch (error) {
           audit.hardFailures.push(sanitizeText('Capture failed for ' + label + ': ' + String(error.message || error)));
@@ -225,26 +454,36 @@ async function main() {
         }
       }
     }
-    if (!audit.accessBlocked && audit.screenshots.some((shot) => shot.captureType === 'viewport')) {
-      const { context, page } = await makePage(browser, { width: 390, height: 844 }, 'light', 'product-route-probes');
-      try {
-        for (const routePath of ['/san-pham/sd2929', '/sanpham/giaytay/sd2929']) {
-          const url = new URL(routePath, origin).href;
-          const result = await navigate(page, url);
-          audit.routeChecks.push({
-            path: routePath, url, status: result.status, finalUrl: result.url || page.url(), title: result.title || '',
-            accessBlocked: result.blocked,
-            note: routePath.startsWith('/sanpham/') ? 'Probe only; route mapping not presumed valid.' : 'Legacy route probe; no state mutation.',
-          });
-          if (result.blocked) break;
-        }
-      } finally { await context.close(); }
-    }
   } finally { await browser.close(); }
 
-  audit.responsiveOverflowCount = audit.viewportAudits.filter((item) => item.horizontalOverflow).length;
-  audit.captureCompleted = !audit.accessBlocked && audit.screenshots.some((item) => item.captureType === 'viewport');
-  audit.passed = audit.captureCompleted && audit.responsiveOverflowCount === 0
+  audit.responsiveOverflowCount = audit.viewportAudits.filter(item => item.horizontalOverflow).length;
+  audit.captureCompleted = !audit.accessBlocked && audit.viewportAudits.length === viewports.length * 2
+    && audit.screenshots.some(item => item.captureType === 'viewport');
+  const sectionScreenshotCounts = Object.fromEntries(sectionTargets.map(section => [
+    section.key, audit.screenshots.filter(shot => shot.captureType === 'section' && shot.sectionKey === section.key).length,
+  ]));
+  const requiredSectionScreenshotsComplete = sectionTargets.every(section => sectionScreenshotCounts[section.key] === 4);
+  const requiredViewportThemePairs = viewports.length * 2;
+  const completedViewportThemePairs = audit.viewportAudits.length;
+  const productDetailContextsComplete = audit.productDetailChecks.length === 4
+    && audit.productDetailChecks.every(check => check.status === 'PASS' && check.directOpenPassed && check.reloadPassed);
+  const homeFullPageCount = audit.screenshots.filter(shot => shot.captureType === 'full-page').length;
+  const menuOpenCount = audit.screenshots.filter(shot => shot.state === 'menu-open').length;
+  const orderExpandedCount = audit.screenshots.filter(shot => shot.state === 'order-details-expanded').length;
+  audit.coverage = {
+    requiredViewportThemePairs, completedViewportThemePairs,
+    homeViewportScreenshots: audit.screenshots.filter(shot => shot.captureType === 'viewport' && shot.state === 'default-home').length,
+    homeFullPageCount, requiredSectionKeys: sectionTargets.map(section => section.key),
+    sectionScreenshotCounts, requiredSectionScreenshotsComplete, menuOpenCount, orderExpandedCount,
+    productDetailContextsComplete, totalScreenshotCount: audit.screenshots.length,
+  };
+  audit.passed = audit.captureCompleted
+    && completedViewportThemePairs === requiredViewportThemePairs
+    && audit.themeChecks.length === requiredViewportThemePairs && audit.themeChecks.every(check => check.themeMatches)
+    && audit.responsiveOverflowCount === 0
+    && audit.contentChecks.length >= requiredViewportThemePairs && audit.contentChecks.every(check => check.status === 'PASS')
+    && homeFullPageCount === 4 && requiredSectionScreenshotsComplete && menuOpenCount === 2 && orderExpandedCount === 4
+    && productDetailContextsComplete && audit.brokenImages.length === 0
     && audit.pageErrors.length === 0 && audit.consoleErrors.length === 0 && audit.httpErrors.length === 0
     && audit.failedRequests.length === 0 && audit.readOnlyViolations.length === 0 && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
@@ -252,16 +491,18 @@ async function main() {
     screenshotCount: audit.screenshots.length, viewportCount: audit.viewportAudits.length, routeCheckCount: audit.routeChecks.length,
     responsiveOverflowCount: audit.responsiveOverflowCount, consoleErrorCount: audit.consoleErrors.length,
     pageErrorCount: audit.pageErrors.length, httpErrorCount: audit.httpErrors.length, failedRequestCount: audit.failedRequests.length,
-    blockedExternalRequestCount: audit.blockedExternalRequests.length, readOnlyViolationCount: audit.readOnlyViolations.length,
-    hardFailureCount: audit.hardFailures.length,
+    brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
+    productDetailContextCount: audit.productDetailChecks.length, blockedExternalRequestCount: audit.blockedExternalRequests.length,
+    readOnlyViolationCount: audit.readOnlyViolations.length, hardFailureCount: audit.hardFailures.length,
+    requiredSectionScreenshotsComplete, productDetailContextsComplete,
   };
   await fs.writeFile(path.join(outputDir, 'visual-audit.json'), JSON.stringify(audit, null, 2) + '\n', 'utf8');
-  const imageCards = audit.screenshots.map((shot) => '<figure><figcaption>' + esc(shot.filename) + '</figcaption><a href="' + esc(shot.filename) + '"><img loading="lazy" src="' + esc(shot.filename) + '" alt="' + esc(shot.filename) + '"></a></figure>').join('\n');
-  const references = '<section><h2>Original mobile design references</h2><p>The references are multi-screen collages; this side-by-side board aids manual review but does not claim pixel-perfect comparison between unlike layouts.</p><div class="shots"><figure><figcaption>Light reference</figcaption><img src="../reference-images/file_0000000017088207af45f5e6dd90cfa4.png" alt="Light reference"></figure><figure><figcaption>Dark reference</figcaption><img src="../reference-images/file_00000000fcb48207a23aeda23caa5eeb.png" alt="Dark reference"></figure></div></section>';
-  const reportHtml = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest live Preview audit</title><style>body{font:14px/1.55 system-ui,sans-serif;color:#142a3c;background:#eef6fc;margin:0;padding:18px}main{max-width:1500px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:12px;border-radius:10px}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}figure{margin:0;padding:10px;border:1px solid #c5d9e8;border-radius:12px;background:#fff;min-width:0}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}</style><main><h1>SinDarealest2 — direct Cloudflare Pages Preview capture</h1><p>Source: ' + esc(audit.previewUrl) + ' · captured: ' + esc(audit.captureCompleted) + ' · audit pass: ' + esc(audit.passed) + '</p><p>This script does not use legacy product fixtures and does not mock API responses. It blocks non-GET/HEAD same-origin requests before they reach the Preview and blocks all external origins. An Access/login gate prevents stage archiving.</p><h2>Summary</h2><pre>' + esc(JSON.stringify(audit.summary, null, 2)) + '</pre><h2>Route probes</h2><pre>' + esc(JSON.stringify(audit.routeChecks, null, 2)) + '</pre>' + references + '<h2>Captured Preview screens</h2><section class="shots">' + imageCards + '</section><h2>Full diagnostics</h2><pre>' + esc(JSON.stringify(audit, null, 2)) + '</pre></main></html>';
+  const imageCards = audit.screenshots.map(shot => '<figure><figcaption>' + esc(shot.filename) + ' · ' + esc(shot.route || '/') + ' · ' + esc(shot.theme || '') + '</figcaption><a href="' + esc(shot.filename) + '"><img loading="lazy" src="' + esc(shot.filename) + '" alt="' + esc(shot.filename) + '"></a></figure>').join('\n');
+  const references = '<section><h2>Original mobile design references</h2><p>The references are multi-screen collages intended for visual review, not a pixel-perfect comparison of unlike layouts.</p><div class="shots"><figure><figcaption>Light reference</figcaption><img src="../reference-images/file_0000000017088207af45f5e6dd90cfa4.png" alt="Light reference"></figure><figure><figcaption>Dark reference</figcaption><img src="../reference-images/file_00000000fcb48207a23aeda23caa5eeb.png" alt="Dark reference"></figure></div></section>';
+  const reportHtml = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest live Preview capture</title><style>body{font:14px/1.55 system-ui,sans-serif;color:#142a3c;background:#eef6fc;margin:0;padding:18px}main{max-width:1500px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:12px;border-radius:10px}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}figure{margin:0;padding:10px;border:1px solid #c5d9e8;border-radius:12px;background:#fff;min-width:0}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}</style><main><h1>SinDarealest2 — direct Cloudflare Pages Preview capture</h1><p>Source: ' + esc(audit.previewUrl) + ' · captured: ' + esc(audit.captureCompleted) + ' · audit pass: ' + esc(audit.passed) + '</p><h2>Coverage</h2><pre>' + esc(JSON.stringify(audit.coverage || {}, null, 2)) + '</pre><h2>Route checks</h2><pre>' + esc(JSON.stringify(audit.routeChecks, null, 2)) + '</pre><h2>Content checks</h2><pre>' + esc(JSON.stringify(audit.contentChecks, null, 2)) + '</pre>' + references + '<h2>Captured Preview screens</h2><section class="shots">' + imageCards + '</section><h2>Full diagnostics</h2><pre>' + esc(JSON.stringify(audit, null, 2)) + '</pre></main></html>';
   await fs.writeFile(path.join(outputDir, 'report.html'), reportHtml, 'utf8');
-  console.log(JSON.stringify({ previewUrl: audit.previewUrl, captureCompleted: audit.captureCompleted, accessBlocked: audit.accessBlocked, passed: audit.passed, summary: audit.summary }, null, 2));
-  if (!audit.captureCompleted || audit.accessBlocked) process.exitCode = 1;
+  console.log(JSON.stringify({ previewUrl: audit.previewUrl, sourceCommit: audit.sourceCommit, captureCompleted: audit.captureCompleted, accessBlocked: audit.accessBlocked, passed: audit.passed, coverage: audit.coverage, summary: audit.summary }, null, 2));
+  if (!audit.captureCompleted || audit.accessBlocked || !audit.passed) process.exitCode = 1;
 }
 main().catch(async (error) => {
   audit.hardFailures.push(sanitizeText(error.stack || error));
