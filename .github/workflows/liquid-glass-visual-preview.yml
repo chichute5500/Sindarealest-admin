@@ -78,17 +78,7 @@ jobs:
             *) echo "Refused: unknown capture source."; exit 1 ;;
           esac
           if [ "${CAPTURE_SOURCE}" = "cloudflare-preview" ]; then
-            PREVIEW_URL="${PREVIEW_URL}" node --input-type=module - <<'NODE'
-          const url = new URL(process.env.PREVIEW_URL);
-          const projectPreviewHost = /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i;
-          if (url.protocol !== 'https:' || !projectPreviewHost.test(url.hostname)
-              || url.hostname.toLowerCase() === 'sindarealest2.pages.dev'
-              || url.username || url.password || url.search || url.hash
-              || (url.pathname !== '/' && url.pathname !== '')) {
-            console.error('Refused: only an HTTPS non-production sindarealest2 Pages alias is allowed.');
-            process.exit(1);
-          }
-          NODE
+            node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           fi
       - name: Check out source
         uses: actions/checkout@v7
