@@ -136,11 +136,11 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 2e4897ee9300c1ae7d1908a6746c82120759bf50
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478044941
+- Tested commit: 26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478738647
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 58 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/2e4897ee9300/screenshots/.
+- Local source Playwright matrix: PASS; 58 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/26b93b3f6ff5/screenshots/.
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
