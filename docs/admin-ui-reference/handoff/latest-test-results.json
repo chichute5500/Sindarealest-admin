@@ -688,7 +688,11 @@
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
-    "currentBranchHeadTests": "NOT_RUN_ON_EVIDENCE_ONLY_HEAD"
+    "currentBranchHeadTests": "NOT_RUN_ON_EVIDENCE_ONLY_HEAD",
+    "authenticatedBackendModules": "NOT_TESTED_WITH_REAL_BACKEND",
+    "visualReferenceParity": "INCOMPLETE_12_SCREEN_COMPARISON",
+    "mobileOrderCustomerUsability": "PARTIAL_FIXTURE_SCREENSHOTS_STATIC_GAP_AUDIT_REQUIRED",
+    "prFullDiffAudit": "BLOCKED_NO_VERIFIED_LOCAL_CHECKOUT_DIFF_IN_THIS_SESSION"
   },
   "remainingIssues": [
     "Configured ADMIN_TEST_URL serves a UI signature that differs from the tested ADMIN source; exact secret value remains masked. Repository owner must correct the secret to the intended Admin Preview URL.",
@@ -774,15 +778,15 @@
     "baseBranch": "main",
     "headBranch": "feature/admin-isolated-handoff-2026-10-20",
     "commits": 317,
-    "changedFiles": 223,
+    "changedFiles": 488,
     "additions": 11167,
     "deletions": 352,
     "containsPublicStorefrontAndBackendFiles": true,
-    "warning": "DO NOT MERGE. PR #111 targets main and includes public storefront/backend files and ongoing evidence. No base changes, cherry-picks, merges, or branch sync without explicit separate decision and full diff audit."
+    "warning": "Live PR #111 currently reports 488 changed files and includes storefront/backend files plus ongoing evidence; DO NOT MERGE. Re-fetch PR metadata before any future action."
   },
   "adminInventory": {
     "sourcePath": "public/admin/index.html",
-    "sourceBlobSha": "da564401ea0825daa1c7be64ff62c0b8e013a64e",
+    "sourceBlobSha": "6a0cf778f5d234a0f5084a796a73dec163ea52d7",
     "views": [
       "dashboard",
       "products",
@@ -906,6 +910,8 @@
     "pageErrors": [],
     "consoleErrors": [],
     "attemptedWrites": [],
-    "unexpectedApiPaths": []
+    "unexpectedApiPaths": [],
+    "metricsCount": 36,
+    "scope": "LOCAL SOURCE, LOGIN SHELL AND FIXTURE MODULE SCREENS; NOT AUTHENTICATED PRODUCTION BACKEND"
   }
 }
