@@ -79,6 +79,14 @@ assert.ok(css.includes('border:1px solid var(--benefit-tile-border)'),
   'Commitment faces must retain a theme-specific visible rim.');
 assert.match(css, /backdrop-filter:blur\(22px\) saturate\(160%\);-webkit-backdrop-filter:blur\(22px\) saturate\(160%\)/,
   'Commitment faces must retain the frosted-glass treatment.');
+assert.match(css, /\.service-strip \.service-icon\{[^}]*border:1px solid rgba\(122,168,198,\.42\)[^}]*border-radius:50%[^}]*background:rgba\(255,255,255,\.58\)[^}]*box-shadow:/,
+  'Reference-aligned benefit icons must have a subtle rounded glass chip inside each tile.');
+assert.match(css, /html\.dark \.service-strip \.service-icon\{[^}]*border-color:rgba\(204,231,250,\.38\)[^}]*background:rgba\(130,179,215,\.16\)[^}]*box-shadow:/,
+  'Dark mode must use its own restrained translucent icon-chip surface.');
+assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-icon\{flex-basis:19px;width:19px;height:19px\}[\s\S]*?\.service-strip \.service-icon svg\{width:12px;height:12px\}/,
+  'Mobile icon chips and symbols must shrink to protect the 3×2 tile layout.');
+assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-icon\{flex-basis:18px;width:18px;height:18px\}[\s\S]*?\.service-strip \.service-icon svg\{width:11px;height:11px\}/,
+  'Very narrow phones must use smaller icon chips and symbols.');
 const lightThemeTokens = html.match(/:root\{([^}]*)\}/)?.[1] || '';
 const darkThemeTokens = html.match(/html\.dark\{([^}]*)\}/)?.[1] || '';
 assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(255,255,255,\.88\)/,
