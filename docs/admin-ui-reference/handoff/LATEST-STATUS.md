@@ -144,3 +144,14 @@
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+## Bàn giao cho chat mới — 2026-10-21 02:50 (Asia/Ho_Chi_Minh)
+
+- Người dùng hỏi liệu chỉ cần sao chép Master Prompt tổng và gửi vào chat mới có thể bắt đầu làm việc không. Đã hướng dẫn: sao chép toàn bộ nội dung Master Prompt (không chỉ gửi URL), sau đó yêu cầu AI xác minh repository/nhánh/HEAD/Git status và đọc handoff trước khi sửa code.
+- Đã làm rõ giới hạn: prompt không tự cấp quyền GitHub, không tự khởi động phiên mới, không chứng minh test đã chạy; AI cần công cụ/quyền phù hợp và phải báo đúng các blocker.
+- Đã cập nhật Master Prompt mục 18.9 để quy định cách khởi động chat mới và tiếp tục công việc an toàn.
+- Đã bổ sung file PROMPT-NEXT-CHAT.md để người dùng có một đoạn bàn giao ngắn, đồng thời yêu cầu chat mới đọc Master Prompt và các trạng thái mới nhất trên GitHub.
+- Đây là cập nhật tài liệu/bàn giao, KHÔNG phải thay đổi source ADMIN và KHÔNG phải bằng chứng test mới. Không chạy test mới trong lượt cập nhật tài liệu này.
+- Ràng buộc giữ nguyên: chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`; không sửa nhánh website `fix/liquid-glass-audit-2026-10-19` hoặc `main`; PR #111 và #108 giữ OPEN/chưa merge; không deploy Production.
+- Việc chat mới phải làm ngay: xác minh HEAD/PR và working tree theo công cụ có sẵn; đọc trạng thái/JSON; kiểm tra workflow và preview mismatch đang ghi nhận; tiếp tục các kiểm tra ADMIN an toàn, không tuyên bố nghiệm thu toàn bộ.
