@@ -1,14 +1,17 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — LOGIN SHELL VERIFIED; CONFIGURED PREVIEW TARGET STALE`
+**Trạng thái tổng thể:** `IN PROGRESS — LOCAL LOGIN MATRIX PASS; REMOTE PREVIEW SOURCE MISMATCH; FULL MODULE QA OPEN`
 **Ước tính tiến độ:** 42% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
-**HEAD nhánh ADMIN trước cập nhật handoff:** `e6e4529ff23a0c61f384f06a13ce6d878fe3f528` (evidence commit; source không đổi)
-**Commit source ADMIN gần nhất:** `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`; **commit test gần nhất:** `de8b7770ac2e077ad9ef0926f5e9053b400a9993`.
-**Kết quả kiểm thử:** `npm run check`, `npm test`, local Playwright 16 ảnh PASS; Preview login/dashboard test có 1 PASS và 1 FAIL vì URL cấu hình không phục vụ CSS login của source ADMIN hiện tại.
+**HEAD đã xác minh trước các cập nhật handoff mới nhất:** `ed27fc5c67152ba900c8b10f5acd358dae8e8096` (các commit sau chỉ cập nhật tài liệu handoff; xác minh lại HEAD khi bắt đầu phiên mới).
+**Source UI gần nhất được ghi nhận:** `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`; **commit test harness:** `de8b7770ac2e077ad9ef0926f5e9053b400a9993`.
+**Kết quả gần nhất:** workflow source checks PASS trên HEAD trước handoff; local Playwright 16 ảnh login-shell PASS; diagnostic Preview FAIL ở CSS signature của URL đã cấu hình. Module nghiệp vụ đã đăng nhập chưa được kiểm thử.
+**PR #111:** OPEN, chưa merge; base `main`, có phạm vi storefront/backend ngoài ADMIN — KHÔNG MERGE.
 **Cloudflare Production deployment:** `NOT PERFORMED`
+
+> **Ưu tiên trạng thái:** phần “Handoff mới nhất” ở cuối file và `latest-test-results.json` là bản cập nhật có thẩm quyền hơn các mục lịch sử cũ phía dưới. Những ghi chú cũ về test chưa chạy được giữ để lưu lịch sử, không thay thế bằng chứng mới.
 
 > Phân biệt bằng chứng: kiểm tra source từ GitHub đã xác nhận các token màu, selector theme, markup đăng nhập, chuỗi API và việc gắn contract test vào `npm test`. Đây là kiểm tra tĩnh của source, **không phải** kết quả thực thi `npm test` hoặc kiểm thử browser. Không đánh dấu bất kỳ test nào PASS nếu chưa có run/artifact của đúng commit.
 
