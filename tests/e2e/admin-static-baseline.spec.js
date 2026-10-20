@@ -494,7 +494,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
                 .map(name => ({ name, content: getComputedStyle(element, name).content || '' }))
                 .filter(item => item.content.toLowerCase().includes('div') || item.content.includes('<'))
                 : [];
-              if (/<\\/?div|\\/div>/i.test(text) || pseudo.length) {
+              if (text.includes('</div>') || text.includes('/div>') || text.includes('<div') || pseudo.length) {
                 findings.push({
                   x, y, offset: range?.startOffset ?? null,
                   nodeText: text.slice(0, 180),
@@ -516,8 +516,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       };
     }, name);
     const hasSuspiciousHitTest = measurement.hitTestDiagnostics.some(item =>
-      /<\\/?div|\\/div>/i.test(item.nodeText || '') ||
-      item.pseudo.some(p => /<\\/?div|\\/div>/i.test(p.content || ''))
+      (item.nodeText || '').includes('</div>') ||
+      (item.nodeText || '').includes('/div>') ||
+      item.pseudo.some(p => (p.content || '').includes('</div>') || (p.content || '').includes('/div>'))
     );
     if (measurement.rawClosingTagNodes.length || measurement.rawClosingTagPseudoContent.length || hasSuspiciousHitTest) {
       visibleClosingTagIssues.push({
