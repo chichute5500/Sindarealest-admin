@@ -168,9 +168,9 @@ assert.match(live, /async function captureAccountDrawer[\s\S]*account-menu-open/
   'The live audit must capture the mobile account menu state in both themes.');
 assert.match(live, /async function captureGalleryCartCheckoutStates[\\s\\S]*fullscreen-gallery[\\s\\S]*cart-with-item[\\s\\S]*checkout-form-open/,
   'The live audit must define the full-screen gallery, populated cart and checkout-form capture helper.');
-assert.match(live, /UI-only probe in an isolated browser session[\\s\\S]*all network writes are blocked/i,
+assert.match(live, /UI-only probe in an isolated browser session[\s\S]*all network writes are blocked/i,
   'The commerce-state capture must be explicitly isolated and read-only.');
-assert.match(live, /stateCapture\\('#checkoutDrawer'[\\s\\S]*submitted: false/,
+assert.match(live, /stateCapture\('#checkoutDrawer'[\s\S]*submitted: false/,
   'The live audit may capture checkout but must not submit an order.');
 assert.match(live, /commerceStatesComplete[\s\S]*fullscreenGalleryCount === 2[\s\S]*cartWithItemCount === 2[\s\S]*checkoutFormCount === 2/,
   'Visual acceptance must require evidence for gallery/cart/checkout in Light and Dark mobile contexts.');
