@@ -137,6 +137,9 @@ test.describe('SinDarealest2 Admin Preview', () => {
     if (opened.type === 'blocked') test.skip(true, 'BLOCKED: Cloudflare Access requires a separately authorized test path.');
     await expect(page.locator('#password')).toHaveAttribute('type', 'password');
     await expect(page.locator('#appView')).toBeHidden();
+    await expect(page.locator('.topbar > .brand'), 'Configured ADMIN_TEST_URL should serve the ADMIN login CSS, not a stale unrelated preview').toBeHidden();
+    await expect(page.locator('#notificationToggle')).toBeHidden();
+    await expect(page.locator('#adminThemeToggle')).toBeVisible();
   });
 
   test('logs in once and verifies the admin dashboard', async ({ page }, testInfo) => {
