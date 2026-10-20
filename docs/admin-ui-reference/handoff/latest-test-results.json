@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_REQUIRES_VERIFICATION",
+  "status": "SOURCE_CHECKS_PASS_LOCAL_MATRIX_PASS_REMOTE_PREVIEW_SOURCE_MISMATCH",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "994fefada36ebcc3d63da32e1fe7e01e532ef712",
   "testedCommitSha": "994fefada36ebcc3d63da32e1fe7e01e532ef712",
-  "capturedAt": "2026-10-20T17:18:50.468Z",
+  "capturedAt": "2026-10-21",
   "progressEstimatePercent": 42,
-  "progressBasis": "42% estimated by work stages. This session verified latest source-check workflow success and confirmed the local 16-image login-shell matrix, but did not finish authenticated modules, correct Preview target, full local diff review, or full visual acceptance.",
-  "note": "Latest source-check workflow run 39447109288 passed on HEAD ed27fc5c67152ba900c8b10f5acd358dae8e8096. Diagnostic run 39446733271 passed npm checks and local 16-image login matrix but failed remote Preview CSS signature because configured ADMIN_TEST_URL serves a different/stale source. PR #111 targets main and contains 223 changed files including storefront/backend; DO NOT MERGE.",
+  "progressBasis": "42% estimated by work stages. Latest confirmed run passes npm run check, npm test and 16 real local Playwright login-shell screenshots. Remote Preview fails because the configured URL serves a different/stale UI signature. Authenticated business modules and full reference parity remain unverified.",
+  "note": "Verified run 39464800722 on source commit 994fefada36ebcc3d63da32e1fe7e01e532ef712: project checks PASS, automated tests PASS, local responsive/theme login screenshot matrix PASS (16 images), remote Preview FAIL. The remote page had login markup but the topbar brand was visible in unauthenticated state, violating the expected source signature. This points to ADMIN_TEST_URL serving a different/stale UI or layout; exact secret value remains masked and is not logged. PR #111 remains OPEN/unmerged and has broad 260-file scope including storefront/backend; DO NOT MERGE.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -16,7 +16,7 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "branchHeadSha": "1b41349971367b51d16091ccf4a3d1d4a4db2bb6"
+    "branchHeadSha": "2aa1f60d956cca3b543188d5dc3d0cb0f38841f6"
   },
   "changes": [
     {
@@ -238,11 +238,11 @@
   ],
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
-    "branchIsolationDiffReview": "PARTIAL_GITHUB_API_FILE_REVIEW",
-    "applicationStartup": "PASS",
-    "playwrightPreviewDiagnostics": "failure",
-    "localStaticPlaywrightBaseline": "PASS",
-    "visualComparisonAgainstApprovedPng": "PASS_QUALITATIVE_LOGIN_SHELL_ONLY",
+    "branchIsolationDiffReview": "PARTIAL_GITHUB_API_FILE_REVIEW_NO_LOCAL_CHECKOUT",
+    "applicationStartup": "PASS_LOCAL_STATIC_SERVER",
+    "playwrightPreviewDiagnostics": "FAIL_PREVIEW_SOURCE_SIGNATURE_MISMATCH",
+    "localStaticPlaywrightBaseline": "PASS_16_REAL_LOGIN_SHELL_SCREENSHOTS",
+    "visualComparisonAgainstApprovedPng": "INCOMPLETE_LOGIN_SHELL_ONLY",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
     "responsiveViewports": "PASS_LOGIN_SCREEN_MATRIX",
@@ -253,41 +253,39 @@
     "typecheck": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
     "automatedTests": "PASS",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
-    "businessFlows": "NOT_TESTED",
+    "businessFlows": "NOT_TESTED_AUTHENTICATED",
     "sharedBackendRegression": "NOT_TESTED",
     "productionDeployment": "NOT_PERFORMED",
     "staticSourceContract": "PASS_GITHUB_SOURCE_INSPECTION_ONLY",
     "fullGitWorkingTree": "NOT_AVAILABLE_NO_LOCAL_CHECKOUT",
-    "playwright": "FAILURE",
-    "referenceImageRead": "PASS_EMBEDDED_BASE64_RENDERED_FROM_ADMIN_MOBILE_REFERENCE_HTML",
+    "playwright": "PASS_LOCAL_MATRIX_FAIL_REMOTE_PREVIEW",
+    "referenceImageRead": "PASS_EMBEDDED_REFERENCE_VIEWER_REPORTED_IN_PRIOR_HANDOFF; FULL_SCREEN_BY_SCREEN_COMPARISON_INCOMPLETE",
     "referenceScreenInventory": "PASS_12_SCREENS_IDENTIFIED",
     "currentAppScreenshotComparison": "PASS_LOGIN_SHELL_390X844_LIGHT_DARK_QUALITATIVE",
     "sourceRouteInventory": "PASS_STATIC_GITHUB_SOURCE_INSPECTION",
     "apiEndpointExistence": "PASS_STATIC_FILE_EXISTENCE_CHECK_ONLY",
-    "authenticatedFlows": "LOGIN_DASHBOARD_ENDPOINT_REACHED_BUT_TARGET_SOURCE_STALE",
+    "authenticatedFlows": "NOT_VERIFIED",
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND"
   },
   "remainingIssues": [
-    "Local git status and complete local branch diff are unavailable; GitHub API review is not equivalent to a clean local checkout.",
-    "Existing 16 Playwright screenshots cover only the unauthenticated login shell; authenticated business modules have not been exercised.",
-    "PR #111 targets main and includes public storefront/backend files; do not merge pending a full branch-scope audit.",
-    "Configured ADMIN_TEST_URL fails the current-source CSS signature; repository owner must update it to the intended ADMIN branch Preview URL.",
-    "Need safe read-only tests/screenshots for dashboard, products, orders, customers, warranties, settings, image gallery, backup/restore and logs without exposing customer/order PII.",
-    "Original PNG direct visual inspection and full visual comparison remain incomplete; HTML viewer shows a 12-screen reference but is not a pixel-diff.",
-    "Mobile nav and table/card layouts differ from the mockup; inspect against the reference before editing, preserve API/auth/business logic.",
-    "Confirm workflow screenshot metadata/source SHA consistency before using those artifacts as evidence for newer source commits."
+    "Configured ADMIN_TEST_URL serves a UI signature that differs from the tested ADMIN source; exact secret value remains masked. Repository owner must correct the secret to the intended Admin Preview URL.",
+    "Only the unauthenticated login shell is covered by the 16-image local Playwright matrix. Dashboard and authenticated business modules are not verified end-to-end.",
+    "Need safe, read-only screenshots and functional checks for products, orders, customers, warranties, settings, gallery, uploads, backup/restore and audit logs without exposing PII.",
+    "Full screen-by-screen visual comparison against admin-mobile-reference.png is incomplete; login-only screenshots cannot establish visual parity.",
+    "Complete local git status and full branch diff review remain unavailable; GitHub API file review is partial.",
+    "PR #111 is open against main and contains 260 changed files including storefront/backend. Do not merge until isolated scope is fully audited."
   ],
   "blockedItems": [
-    "GitHub Actions secret ADMIN_TEST_URL is masked and its configured Preview fails the current-source CSS signature. Repository owner must update it to the correct ADMIN branch Preview URL or provide the URL; do not bypass Cloudflare Access.",
-    "Authenticated business-module screenshots require a current-source Preview and a no-PII fixture/masking plan.",
-    "No local checkout is available to verify git status and the complete local diff."
+    "Remote authenticated Playwright testing is blocked by ADMIN_TEST_URL pointing to a source/layout that does not match the tested Admin source; update secret to a valid Admin Preview URL and provide valid access if Cloudflare Access protects it.",
+    "Authenticated module screenshot tests need a current-source Preview plus a safe test-data/PII masking strategy.",
+    "No local checkout is available to verify git status and complete local branch diff."
   ],
   "nextActions": [
-    "Review the latest real screenshots and metadata under the recorded history path.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Continue Admin-only UI improvements and tests using the existing design reference and preserve all APIs/auth/backend contracts.",
+    "Compare real Playwright screenshots with the approved reference screen by screen; do not claim parity from login-only screenshots.",
+    "Run npm run check, npm test, and the Playwright matrix after meaningful UI edits.",
+    "Correct ADMIN_TEST_URL to the current Admin Preview URL and use only authorized Cloudflare Access credentials; never log secrets or bypass access controls.",
+    "Keep PR #111 open and unmerged; do not modify the static website branch or main; do not deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39464800722",
