@@ -65,9 +65,9 @@ assert.doesNotMatch(ambientLight, /theme-croc-/,
   "Light page ambience must not use the crocodile-scale raster texture as its background.");
 assert.doesNotMatch(ambientDark, /theme-croc-/,
   "Dark page ambience must not use the crocodile-scale raster texture as its background.");
-const welcomeLightStart = html.lastIndexOf(".welcome-texture--light{");
+const welcomeLightStart = finalThemeCss.indexOf(".welcome-texture--light{");
 const welcomeLight = html.slice(welcomeLightStart).split("}")[0] || "";
-const welcomeDarkStart = html.lastIndexOf(".welcome-texture--dark{");
+const welcomeDarkStart = finalThemeCss.indexOf(".welcome-texture--dark{");
 const welcomeDark = html.slice(welcomeDarkStart).split("}")[0] || "";
 assert.ok(welcomeLight.includes("images/liquid-glass-light.svg?v=20261020-2"),
   "Light welcome splash must use the same pearl/glacial ambient design language.");
@@ -78,6 +78,17 @@ assert.doesNotMatch(welcomeLight, /theme-croc-/,
 assert.doesNotMatch(welcomeDark, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in dark mode.");
 
+
+const mobileWaveCss = finalThemeCss.slice(finalThemeCss.lastIndexOf("@media(max-width:760px)"));
+assert.ok(mobileWaveCss.includes("images/liquid-glass-light-mobile.svg?v=20261020-3")
+  && mobileWaveCss.includes("images/liquid-glass-dark-mobile.svg?v=20261020-3"),
+  "Portrait viewports must use dedicated vertical wave compositions so the curved ribbons remain visible.");
+const lightMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light-mobile.svg", import.meta.url), "utf8");
+const darkMobileWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark-mobile.svg", import.meta.url), "utf8");
+assert.ok(lightMobileWaveArtwork.includes('viewBox="0 0 390 844"') && lightMobileWaveArtwork.includes('stroke="url(#ribbon)"'),
+  "The light mobile SVG must use a portrait canvas and broad curved ribbons.");
+assert.ok(darkMobileWaveArtwork.includes('viewBox="0 0 390 844"') && darkMobileWaveArtwork.includes('stroke="url(#ribbon)"'),
+  "The dark mobile SVG must use a portrait canvas and broad curved ribbons.");
 
 const lightWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light.svg", import.meta.url), "utf8");
 const darkWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark.svg", import.meta.url), "utf8");
