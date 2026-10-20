@@ -190,6 +190,18 @@ jobs:
             console.error('Refused to archive: Cloudflare Pages API did not verify the exact Preview alias, deployment environment, branch and commit SHA.');
             process.exit(1);
           }
+          if (process.env.STAGE === 'end-of-work') {
+            const currentManifest = JSON.parse(fs.readFileSync('docs/website-screenshots/manifest.json', 'utf8'));
+            const baselineDirectory = 'docs/website-screenshots/start-of-work';
+            const baselineFiles = fs.existsSync(baselineDirectory)
+              ? fs.readdirSync(baselineDirectory).filter(name => /\.png$/i.test(name))
+              : [];
+            const baselineStage = currentManifest.stages?.['start-of-work'];
+            if (!baselineFiles.length || baselineStage?.status !== 'CAPTURED_PASS' || baselineStage?.previewDeploymentVerified !== true) {
+              console.error('Refused end-of-work archive: a verified start-of-work Preview baseline with PNGs must be captured first.');
+              process.exit(1);
+            }
+          }
           const requiredSectionKeys = ['hero', 'benefits', 'order', 'featured', 'collections', 'products', 'footer'];
           const coverage = audit.coverage || {};
           const requiredSectionsComplete = requiredSectionKeys.every(key => coverage.sectionScreenshotCounts?.[key] === 4);
@@ -315,6 +327,13 @@ jobs:
           const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
           manifest.updatedAtUtc = new Date().toISOString();
           manifest.comparisonStatus = comparison.status;
+          const hasComparablePairs = Number(comparison.summary?.comparablePairs || 0) > 0;
+          manifest.status = hasComparablePairs ? 'AWAITING_HUMAN_VISUAL_REVIEW' : 'BLOCKED';
+          manifest.humanVisualReview = {
+            required: true,
+            status: hasComparablePairs ? 'PENDING' : 'BLOCKED',
+            note: 'Pixel diff is a review aid; a person must inspect matched screenshots and the report before visual acceptance.'
+          };
           manifest.pixelComparison = {
             runId: process.env.RUN_ID,
             report: 'comparison.json and report.html in the GitHub Actions artifact',
@@ -326,6 +345,7 @@ jobs:
           if (manifest.stages && manifest.stages['end-of-work']) {
             manifest.stages['end-of-work'].overallVisualComparison = comparison.status;
             manifest.stages['end-of-work'].pixelComparisonSummary = comparison.summary;
+            manifest.stages['end-of-work'].humanVisualReviewStatus = hasComparablePairs ? 'PENDING' : 'BLOCKED';
           }
           fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
           NODE
