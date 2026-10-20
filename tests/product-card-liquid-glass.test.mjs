@@ -53,10 +53,10 @@ assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-ligh
   "The light background must use the dedicated curved pearl-glass wave artwork.");
 assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261020-2')"),
   "The dark background must use the dedicated curved sapphire-glass wave artwork.");
-const ambientLightStart = html.lastIndexOf(".theme-bg--light{");
-const ambientLight = html.slice(ambientLightStart).split("}")[0] || "";
-const ambientDarkStart = html.lastIndexOf(".theme-bg--dark{");
-const ambientDark = html.slice(ambientDarkStart).split("}")[0] || "";
+const ambientLightStart = finalThemeCss.indexOf(".theme-bg--light{");
+const ambientLight = finalThemeCss.slice(ambientLightStart).split("}")[0] || "";
+const ambientDarkStart = finalThemeCss.indexOf(".theme-bg--dark{");
+const ambientDark = finalThemeCss.slice(ambientDarkStart).split("}")[0] || "";
 assert.ok(ambientLight.includes("images/liquid-glass-light.svg?v=20261020-2"),
   "The light ambient background must be generated as soft glacial gradients rather than reuse a crocodile-scale product texture.");
 assert.ok(ambientDark.includes("images/liquid-glass-dark.svg?v=20261020-2"),
