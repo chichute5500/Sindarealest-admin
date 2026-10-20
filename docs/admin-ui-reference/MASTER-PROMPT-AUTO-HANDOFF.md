@@ -944,3 +944,54 @@ XXI. BÀN GIAO TRẠNG THÁI THỰC TẾ CHO CHAT MỚI — CẬP NHẬT 2026-10
 - Sau mỗi lượt: ghi rõ đã làm gì, test nào PASS/FAIL, link run/commit, phần còn thiếu và tiến độ ước tính có căn cứ; sau đó tiếp tục bước tiếp theo nếu không cần người dùng quyết định.
 
 MỆNH LỆNH TIẾP QUẢN: KHÔNG LẶP LẠI CÁC BƯỚC ĐÃ PASS NẾU KHÔNG CÓ REGRESSION. ĐI THẲNG VÀO VIỆC CÒN THIẾU LÀ ĐỐI CHIẾU THỊ GIÁC VỚI ẢNH MẪU, SỬA ĐÚNG KHÁC BIỆT ĐÃ XÁC MINH, CHẠY LẠI PLAYWRIGHT, VÀ CẬP NHẬT BÀN GIAO.
+
+
+## CẬP NHẬT BÀN GIAO MỚI NHẤT CHO CHAT TIẾP THEO — 2026-10-21
+
+Đây là trạng thái mới hơn các ghi chú cũ ở phía trên. Khi có mâu thuẫn, ưu tiên xác minh live từ GitHub Actions, manifest và branch HEAD hiện tại; không dùng trạng thái lịch sử như thể còn là hiện trạng.
+
+### 1. Phạm vi và giới hạn bắt buộc
+- Chỉ tiếp tục **website tĩnh công khai SinDarealest2** trên nhánh `fix/liquid-glass-audit-2026-10-19` trong repo `chichute5500/Sindarealest-admin`.
+- Không làm phần Admin trong nhiệm vụ này. Không merge PR, không đẩy thay đổi sang `main`, không deploy/đụng Production, không sửa Cloudflare Access policy, bindings, secrets, D1/R2 hoặc dữ liệu thật nếu người dùng chưa cho phép rõ ràng.
+- Không tự ý sửa giao diện chỉ vì có pixel difference. Trước hết phân biệt thay đổi do carousel tự chạy với khác biệt layout/typography/spacing thực sự. Bảo toàn logo, thương hiệu, danh tính sản phẩm, SKU, dữ liệu và URL ảnh hiện hữu. Người dùng đã cho phép thay đổi font chữ và tái thiết kế UI để bám ảnh mẫu; không được viện cớ giao diện cũ để từ chối cải tiến, nhưng vẫn giữ nguyên chức năng và hợp đồng nghiệp vụ/API.
+- Người dùng làm việc chủ yếu trên Android; dùng GitHub Actions + Cloudflare Pages Preview + Playwright, không yêu cầu chạy Wrangler cục bộ.
+
+### 2. Bằng chứng mới nhất đã xác minh
+- Branch: `fix/liquid-glass-audit-2026-10-19`.
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — chưa được merge theo trạng thái được kiểm tra gần nhất; xác minh lại trước mọi hành động.
+- Live Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
+- Workflow live capture/comparison: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039 — SUCCESS.
+- Preview deployment đã xác minh cho ảnh end-of-work: `1ab8617f-aac1-42f2-9112-4acc6b0d007a`, branch đúng là nhánh fix, source commit `37163dc3c17af332f948311bc395c9839a10e345`.
+- Ảnh chuẩn: `docs/website-screenshots/start-of-work/` = 66 ảnh; `docs/website-screenshots/end-of-work/` = 66 ảnh. Cả hai là ảnh live Preview read-only đã xác minh, không phải local fixture.
+- Pixel comparison: 66 cặp; 57 cặp pixel-identical, 9 cặp có khác biệt, 0 sai kích thước, 0 cặp thiếu/không hợp lệ.
+- Live Playwright audit: 8/8 cặp viewport/theme PASS; product-card navigation, direct-open canonical product route và reload PASS; không ghi nhận horizontal overflow, page error, console error hoặc read-only violation.
+- Manifest: `docs/website-screenshots/manifest.json`, status hiện tại `AWAITING_HUMAN_VISUAL_REVIEW`. Đây là trạng thái đúng: CI/capture/diff thành công không đồng nghĩa giao diện đã giống ảnh mẫu 100%.
+
+### 3. Những khác biệt cần đánh giá trước khi sửa
+- Bốn ảnh full-page trang chủ và bốn ảnh collection khác nhau vì carousel tự chạy sang ảnh sản phẩm khác. Trước khi gọi là lỗi, kiểm tra xem cấu trúc, kích thước, vị trí và kiểu hiển thị có ổn định không. Nếu cần so sánh pixel chính xác, thiết lập trạng thái carousel ổn định trong test/capture mà không thay đổi trải nghiệm người dùng một cách không cần thiết.
+- Một ảnh product-detail desktop-Light có khác biệt nhỏ; cần mở ảnh và xác định khác biệt thực sự trước khi sửa.
+- Đối chiếu trực tiếp giao diện cuối với hai ảnh mẫu gốc:
+  - `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png`
+  - `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`
+- Pixel diff start/end chỉ xác định nội dung thay đổi, không đo mức độ giống ảnh mẫu. Không tuyên bố đạt 100% nếu chưa có visual review có căn cứ.
+
+### 4. Tài liệu và hồ sơ tiến độ
+- Hướng dẫn archive: `docs/website-screenshots/README.md`.
+- Manifest nguồn sự thật: `docs/website-screenshots/manifest.json`.
+- Báo cáo tiến độ đã được cập nhật bổ sung kết quả workflow mới: `docs/visual-audit-progress-2026-10-19.md`.
+- Commit cập nhật báo cáo: https://github.com/chichute5500/Sindarealest-admin/commit/d57d8882cfaafa12e7c7242a6a8228df1d5df7d4 .
+- Hai ảnh mẫu: `docs/static-web-reference/`; không sao chép ảnh mẫu vào thư mục start/end.
+
+### 5. Việc tiếp theo — bắt đầu ngay, không lặp test đã PASS
+1. Xác minh branch HEAD, trạng thái PR #108, manifest và workflow mới nhất; kiểm tra xem có commit mới hơn mốc nêu trên không.
+2. Mở và kiểm tra trực quan ảnh tham chiếu và ảnh end-of-work (ưu tiên mobile Light, mobile Dark, desktop Light/Dark, hero, sáu ô, product card/detail, order section và footer). Dùng artifact/ảnh đã lưu hoặc chạy workflow capture nếu ảnh không truy cập được; không giả vờ đã nhìn ảnh nếu chỉ đọc metadata.
+3. Ghi danh sách sai khác cụ thể theo mức độ: blocking, lớn, nhỏ, không phải lỗi (carousel). Chỉ sửa những khác biệt được chứng minh; không thay đổi phạm vi Admin/backend.
+4. Sau sửa, chạy validate source/tests và live Preview Playwright trên đúng branch. Capture ảnh end-of-work mới, cập nhật manifest/report để khớp commit/deployment mới nhất, rồi xem lại ảnh sau sửa.
+5. Tiếp tục vòng lặp sửa → test → capture → đối chiếu cho đến khi không còn sai khác thiết kế đã xác minh hoặc gặp blocker cần người dùng thao tác/ra quyết định. Nếu gặp blocker cần token/secret hoặc cần quyết định đổi hướng thiết kế, dừng đúng chỗ đó và hỏi người dùng; không yêu cầu họ lặp lại thao tác đã hoàn tất.
+
+### 6. Báo cáo và phần trăm
+- Mỗi lần báo cáo phải nêu: phần trăm ước tính kèm tiêu chí, việc đã làm, link commit/run, kết quả PASS/FAIL, phần còn thiếu và bước kế tiếp.
+- Tỷ lệ kỹ thuật capture/Playwright/diff đã hoàn thành; phần còn lại chủ yếu là visual review theo ảnh mẫu, xử lý khác biệt đã xác minh và xác nhận hồi quy sau sửa. Không dùng số 62% cũ nếu chưa tính lại theo checklist hiện tại. Không tuyên bố 100% chỉ vì workflow SUCCESS.
+- Người dùng đã yêu cầu: tiếp tục làm và chỉ báo cáo tiến độ, không dừng giữa chừng; chỉ dừng để hỏi khi cần người dùng thao tác hoặc cần ý kiến về thay đổi thiết kế/phạm vi. Khi gửi báo cáo, nếu vẫn còn bước tự thực hiện được thì tiếp tục ngay sau đó.
+
+**MỆNH LỆNH TIẾP QUẢN:** Bắt đầu từ mục 5. Không quay lại kiểm tra CRUD Admin, không sửa Admin, không merge PR và không đụng Production. Chỉ tiếp tục frontend website tĩnh, bằng chứng live Preview và đối chiếu ảnh mẫu.
