@@ -524,3 +524,23 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - Kết quả source/test gần nhất được ghi nhận ở trên là run `39371075248` trên commit `0c5b436c114e094f1ee7ae5a44a4c54b3f79692b`, không phải HEAD hiện tại. GitHub connector không trả về status checks cho HEAD `dca1aa2`; do đó không tuyên bố toàn bộ code ở HEAD đã được CI chạy lại.
 - So sánh source commit `0c5b436` với HEAD mới có các thay đổi tích lũy ở một số file, bao gồm `public/index.html` (thêm chip kính cho icon sáu ô), workflow trực quan (bổ sung tóm tắt tách bạch local/live/deployment), và các test tương ứng. Chúng cần chạy lại qua workflow/CI trước khi coi là đã kiểm chứng ở HEAD.
 - Không tạo commit code chỉ để kích hoạt deploy khi chưa xác minh môi trường Pages/nhánh Production. Không dùng một run cũ để thay cho test tại HEAD. Bước an toàn tiếp theo vẫn là cấp đúng GitHub Actions variable/secrets và Service Auth chỉ cho Preview; sau đó chủ dự án hoặc workflow dispatch có quyền chạy workflow `liquid-glass-visual-preview.yml` với cấu hình Preview-only đã nêu ở phần trên.
+
+## Tiếp tục thực thi — kiểm tra hồi quy Hero và giới hạn xác minh CI (2026-10-20)
+
+### Thay đổi trong phạm vi an toàn
+- Bổ sung regression assertions vào `tests/storefront-html-safety.test.mjs`, commit code/test `a248566d2b603f2dc0e3feb485ebdeb2db727d93`, sau đó sửa ranh giới chuỗi test để phù hợp với dòng nguồn thực tế ở commit `b9d1dc6b33ef9ec37de7b6b6109a9e74609b1be6`.
+- Nội dung test bảo vệ: tiêu đề Hero chính xác; ảnh `#heroProductImage` không có `src` hardcode trong HTML; `syncHeroProductImage()` ưu tiên ảnh từ catalog, fallback sang ảnh nổi bật và hỗ trợ URL đã resolve/lazy-loaded.
+- Đã đối chiếu logic các assertion trực tiếp với HTML hiện tại từ GitHub. 10 kiểm tra string/regex riêng cho Hero, dynamic image source và script package đều khớp. Đây là source-level assertion check, **không phải** báo cáo `npm test` đã chạy.
+- Hai commit test-only được đẩy lên nhánh fix; không sửa `public/index.html`, Admin, API, binding, secrets hoặc Production.
+
+### CI và workflow hiện tại
+- Sau các commit trên, kiểm tra GitHub connector không trả về workflow run liên kết với các SHA mới và combined status endpoint không có status checks. Không có bằng chứng đủ để khẳng định CI hoặc Playwright đã thực thi trên HEAD mới.
+- Đã thử kiểm tra danh sách Actions qua trình duyệt automation công khai nhưng phiên này không khởi chạy được do số dư công cụ browser automation không đủ. Chưa dùng công cụ đó để đăng nhập, đổi setting hay thực hiện thao tác ghi.
+- Workflow hiện có `.github/workflows/ci.yml` chạy `npm run check` và `npm test` theo sự kiện push/PR; workflow trực quan chạy local fixture và probe live riêng. Không được coi commit test hoặc màu xanh run cũ là bằng chứng cho HEAD mới.
+- Tài liệu `docs/visual-audit-progress-2026-10-19.md` và manifest không thay đổi trạng thái nghiệm thu live: baseline vẫn BLOCKED, end capture NOT TESTED, pixel diff NOT TESTED.
+
+### Trạng thái sau lần tiếp tục này
+- Đã có thêm regression test cụ thể cho yêu cầu bảo toàn Hero động; HTML/runtime chưa sửa vì chưa có screenshot Preview xác thực để so sánh.
+- Vẫn bị chặn bởi cấu hình Pages Read (Account ID và token chưa được đưa vào run gần nhất) cùng hai secret Cloudflare Access chưa được đưa vào run. Không bypass Access.
+- Bước bắt buộc tiếp theo: một run Actions mới trên branch hiện tại để thực thi `npm run check`/`npm test` và probe live; nếu Access/Pages config đã được bổ sung kể từ run cũ, chỉ kết luận theo log mới. Nếu chưa, chủ dự án cần cấu hình variable/secrets theo mục “Unblock and verify read-only Cloudflare Pages Preview capture” trong `docs/handoff/PREVIEW-ACCESS-SETUP.md`.
+- Không tăng tiến độ tổng thể: chưa có CI mới, ảnh live, route runtime hoặc so sánh trước/sau. Production vẫn không được merge/deploy.
