@@ -144,3 +144,16 @@
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+## Cập nhật kiểm thử và điều tra Preview — 2026-10-21 (run 39478738647)
+
+- **Source code đã kiểm thử:** `26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6`. HEAD hiện tại sau lưu evidence là `e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4`; đây là commit lưu evidence, không phải source code mới.
+- **Workflow:** https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478738647
+- `npm run check`: PASS; `npm test`: PASS; Playwright local source baseline: PASS.
+- Artifact evidence có **42 PNG** và **36 bộ metrics** trong `docs/admin-ui-reference/handoff/history/26b93b3f6ff5/screenshots/`; metadata báo `pageErrors=[]`, `consoleErrors=[]`, `attemptedWrites=[]`, `unexpectedApiPaths=[]`. Không gọi đây là 42 tổ hợp metric; chỉ 36 metric được ghi.
+- Preview remote vẫn FAIL ở bài kiểm tra login shell. Bằng chứng log `ADMIN_PREVIEW_CSS_SIGNATURE`: `topbarBrandDisplay=flex`, `topbarBrandVisibility=visible`, `inlineHideRulePresent=false`, và stylesheet được đọc không có rule `body:has(#loginView:not(.hidden)) .topbar>.brand`. Source `public/admin/index.html` của commit đã test có rule này. Kết luận được hỗ trợ: HTML/CSS đang được phục vụ bởi Preview không khớp signature source; chưa xác định chính xác deployment/URL nào gây ra sai khác. Không thay đổi secret, cấu hình Cloudflare hay nới lỏng assertion.
+- Test harness hiện chặn service worker trong test fixture để API fixture được kiểm soát, ghi thêm request diagnostics, dùng locator đúng với hàng đơn hàng thực tế và giữ nguyên assertion nghiêm ngặt cho Preview.
+- Rà soát tĩnh 12 màn hình: có 6 view chính trong source; màn chi tiết đơn hàng riêng chưa có route, quản lý ảnh/sao lưu/nhật ký đang nằm trong view khác; bảng đơn hàng và khách hàng cần kiểm thử mobile sâu hơn; nav mobile có 6 mục trong khi reference ghi nhận 5. Đây là các khoảng trống cần xử lý, chưa được coi là đạt visual parity.
+- **Tiến độ giữ ở 43%**: local checks/module fixture screenshots đã tiến bộ, nhưng Preview mismatch, xác thực module với backend thật, so sánh đủ 12 màn hình và audit toàn bộ PR chưa xong.
+- PR #111 vẫn OPEN, chưa merge. Không triển khai Production, không sửa nhánh storefront/main, không thay đổi API/auth/schema/secrets/dữ liệu vận hành.
