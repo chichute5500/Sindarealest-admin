@@ -51,3 +51,10 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Tác động/điều kiện:
 - Người dùng đã xác nhận? Nếu cần:
 - Commit hoặc bằng chứng liên quan:
+
+### DEC-008 — Phương án dự phòng khi Preview bị chặn — 2026-10-20
+- Quyết định: Không dừng toàn bộ công việc khi URL Preview trả về `login_required`. Tiếp tục các phần có thể xác minh độc lập bằng mã nguồn GitHub, test suite, kiểm thử Playwright trên local static preview và artifact ảnh kiểm thử.
+- Phân loại bằng chứng: (1) kiểm thử mã nguồn/local; (2) ảnh tham chiếu gốc; (3) baseline/kết quả trên Cloudflare Preview; ba loại phải được ghi tách biệt.
+- Điều kiện: Không dùng ảnh local làm ảnh baseline/end-of-work của Preview; không tuyên bố đã xem trực quan ảnh PNG nếu công cụ không trả được nội dung hình ảnh; không bypass xác thực hoặc truy cập trái phép.
+- Hành động tiếp theo: tiếp tục audit route, CSS khu vực sáu ô, responsive/Light-Dark từ source; thử các kênh truy cập hợp lệ khác cho Preview và ảnh tham chiếu. Chỉ sửa giao diện sau khi có bằng chứng đủ cụ thể; route mới chỉ làm khi mã sản phẩm/danh mục đã xác minh.
+- Bằng chứng mới nhất: workflow [39350484564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564) PASS; artifact [12232777359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564/artifacts/12232777359). Đây là kiểm thử local, không phải Preview thật.
