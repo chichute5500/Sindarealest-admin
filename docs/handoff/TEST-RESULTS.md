@@ -254,3 +254,13 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Fresh direct read of Preview alias `https://3ed49bcc.sindarealest2.pages.dev/` returns `login_required`. No genuine live screenshot, viewport test or direct product route run was possible. The owner needs a Preview-only Access Service Auth policy and secrets `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`; never paste secret values in chat.
 - Separate admin smoke [run 39368810463](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368810463) FAIL; selectors `#loginView`/`#loginForm` absent. Treat as admin out-of-scope, not a storefront result.
 - No runtime HTML/CSS/JS was modified by the route-map parity test. No merge, Production deploy, database write, R2 write, secret or Access-policy change was performed.
+
+
+## 2026-10-20 19:51 UTC — live Preview audit artifact 441
+
+- Branch: `fix/liquid-glass-audit-2026-10-19`; source commit `170304495869886a344b6fa02bdbaf6148d75100`.
+- Source/tests PASS [run 39486732685](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732685); Preview deployment PASS [run 39486732736](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732736); Admin Preview Playwright PASS [run 39486732956](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732956).
+- Live visual capture [run 39486732727](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732727), artifact [12292874474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732727/artifacts/12292874474): 78 screenshots, 8/8 viewport-theme pairs, all 12 route navigation/direct-open/reload checks pass. Zero console/page/same-origin HTTP errors, failed requests, broken image contexts, read-only violations or horizontal overflow in the eight viewport audits.
+- Overall audit **FAIL** due only to exact SKU `SD-GL052` missing from the public verified product payload. Hero image is hidden fail-closed; no substitute image was used. Need owner-verified SKU/public visibility and exact image data to clear this condition.
+- Cloudflare deployment verifier: PASS; deployment ID `d416f4c3-5be3-4717-8539-ee425582b1da`, preview alias verified to exact branch and SHA.
+- Visual similarity still requires human/AI image comparison: current background retains large curved bands versus finer satin reference; drawer opacity needs state screenshots. No Production deployment or data writes.

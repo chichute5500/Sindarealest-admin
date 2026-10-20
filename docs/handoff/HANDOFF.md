@@ -1,5 +1,15 @@
 # SinDarealest2 — Handoff trạng thái công việc
 
+
+## Mốc xác minh mới nhất — 2026-10-21 (artifact 441)
+
+- HEAD trước cập nhật hồ sơ: `170304495869886a344b6fa02bdbaf6148d75100`. Preview deployment được Cloudflare Pages API xác minh: ID `d416f4c3-5be3-4717-8539-ee425582b1da`, branch `fix/liquid-glass-audit-2026-10-19`, exact commit match, environment Preview, deploy success. Alias: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- CI: source/tests PASS [39486732685](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732685); storefront Preview deploy PASS [39486732736](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732736); Admin Preview Playwright PASS [39486732956](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732956).
+- Live visual workflow [39486732727](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732727), artifact [12292874474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39486732727/artifacts/12292874474), completed capture. `live-preview/visual-audit.json`: `captureCompleted=true`, `accessBlocked=false`, `passed=false`, 78 screenshots, 8/8 viewport-theme checks, 12/12 product-detail route checks pass (navigation/direct open/reload across mobile/desktop and Light/Dark). 0 console/page/same-origin HTTP errors, 0 failed requests, 0 broken image contexts, 0 read-only violations, 0 horizontal overflow across the eight viewport audits.
+- Single explicit hard failure: SKU `SD-GL052` absent from the public verified product payload. Public products API returns 200 but the exact SKU is not present; hero image fails closed/hidden. Do not substitute another product image, mutate D1 or mark the SKU public without owner-confirmed product data.
+- Visual observations from current live screenshot: mobile logo/header placement improved; large curved background bands still diverge from the reference's finer satin-fold texture. Drawer surface opacity was adjusted for readability but needs state screenshots and visual confirmation. Pixel-perfect comparison and complete visual acceptance are still NOT DONE.
+- Current next tasks: compare artifact 441 against original Light/Dark PNG references; refine satin texture in both themes and mobile/desktop with regression assertions; inspect cart/account/checkout drawer screenshots; rerun source/test, Preview deployment, Playwright and live capture; update this ledger with new evidence. No Production changes; PR #108 remains unmerged.
+
 > Hồ sơ bàn giao giữa các AI. Đây là bản đồ trạng thái, không thay thế bằng chứng từ GitHub, CI, test và ảnh chụp thực tế.
 
 ## Mốc mới nhất — 2026-10-20 18:13 ICT (11:13 UTC)
