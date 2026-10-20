@@ -54,6 +54,7 @@ const refinementEnd = html.indexOf('/* Reference-aligned cart and a separate ord
 assert.ok(refinementStart >= 0 && refinementEnd > refinementStart,
   'The later shared-glass refinement block must remain identifiable.');
 const refinementCss = html.slice(refinementStart, refinementEnd);
+assert.doesNotMatch(html, /html\\.dark\\s+\\.service\\s*,\\s*html\\.dark\\s+\\.order-cta/,\n  'Dark-mode shared styling must not add an opaque background to the six transparent tile wrappers.');
 assert.doesNotMatch(refinementCss, /\.glass\s*,\s*\.service-strip\b/,
   'The later shared-glass grouping must not separately override the outer commitment strip.');
 assert.doesNotMatch(refinementCss, /\.service-strip\{[^}]*\b(?:background|border|backdrop-filter|-webkit-backdrop-filter|box-shadow)\s*:/,
