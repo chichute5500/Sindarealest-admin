@@ -114,6 +114,14 @@ jobs:
           exit 1
       - name: Capture local Light/Dark screenshots and run fixture audit
         run: node scripts/capture-liquid-glass-preview.mjs
+      - name: Probe supplied Cloudflare Preview on push (artifact only; never archives)
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+        run: |
+          node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
+          node scripts/capture-cloudflare-preview.mjs
       - name: Capture live Cloudflare Pages Preview (read-only)
         if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview'
         env:
