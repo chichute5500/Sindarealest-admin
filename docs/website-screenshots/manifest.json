@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T03:18:00Z",
+  "updatedAtUtc": "2026-10-20T04:02:00Z",
   "status": "BLOCKED",
-  "note": "Latest HEAD 562d7d77624f7431296cb217b2b6d6592aca9ce4 passed source/test validation run 39363358025. Admin Preview Playwright run 39363358006 failed because the expected #loginForm was absent; Preview remains behind Cloudflare Access. Latest live probe run 39362960193 had accessServiceTokenConfigured=false, accessBlocked=true, and zero real screenshots/routes/viewports. Local fixture visual audit run 39362960193 passed on older commit 968ec2e3af591dd39bbadc911de655a60135dd0f with 54 fixture screenshots, 235 fixture products, 20 responsive cases and 93 interaction checks; do not treat it as a visual pass for current HEAD or real Preview evidence.",
+  "note": "Current source tree at code commit 562d7d77624f7431296cb217b2b6d6592aca9ce4 passed source/test validation run 39363358025. A GitHub compare confirms the later commit to 968ec2e3 contains only documentation changes, so the local fixture visual audit run 39362960193 applies to the same source code: 54 fixture screenshots, 235 fixture products, 20 responsive cases and 93 interaction checks. It is not a real Preview visual pass. The real Preview probe was blocked by Cloudflare Access, with zero actual screenshots/routes/viewports.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -18,7 +18,7 @@
       "status": "NOT TESTED",
       "directory": "docs/website-screenshots/end-of-work/",
       "images": [],
-      "reason": "Current HEAD source validation passes, but current-HEAD visual fixture capture has not been confirmed and real Preview remains blocked. End-of-work archive and pixel comparison cannot be completed until Access is configured and a real Preview capture succeeds."
+      "reason": "The local fixture visual audit passed on a source-identical commit, but real Preview remains behind Cloudflare Access. The required end-of-work archive must contain genuine Preview screenshots; pixel comparison against a verified real baseline remains NOT TESTED."
     }
   },
   "referenceImages": {
@@ -369,7 +369,7 @@
     "status": "TOOLING_SOURCE_VALIDATED_LIVE_ACCESS_BLOCKED"
   },
   "latestVerifiedState": {
-    "head": "562d7d77624f7431296cb217b2b6d6592aca9ce4",
+    "head": "fb1acaf7ed5f9b6370c5cdb1a67e0a7db5cfb88a",
     "sourceValidation": {
       "status": "PASS",
       "run": 39363358025,
@@ -400,6 +400,11 @@
       "fixtureProducts": 235,
       "responsiveCases": 20,
       "interactionChecks": 93
+    },
+    "sourceCodeComparison": {
+      "from": "968ec2e3af591dd39bbadc911de655a60135dd0f",
+      "to": "562d7d77624f7431296cb217b2b6d6592aca9ce4",
+      "result": "Only docs/handoff and docs/website-screenshots files changed; storefront source, tests, and capture script are unchanged. Therefore the local fixture visual audit is applicable to the same source code, but not to live Preview."
     }
   }
 }
