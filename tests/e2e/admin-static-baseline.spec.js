@@ -84,6 +84,17 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
     await expect(page.locator('#loginView')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('#loginForm')).toBeVisible();
     await expect(page.locator('#password')).toHaveAttribute('type', 'password');
+    await expect(page.getByLabel('Mật khẩu quản trị')).toBeVisible();
+    await expect(page.locator('#showPassword')).toHaveAttribute('aria-pressed', 'false');
+
+    // Exercise the real visibility toggle without submitting credentials or calling login.
+    await page.locator('#showPassword').click();
+    await expect(page.locator('#password')).toHaveAttribute('type', 'text');
+    await expect(page.locator('#showPassword')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('#showPassword').click();
+    await expect(page.locator('#password')).toHaveAttribute('type', 'password');
+    await expect(page.locator('#showPassword')).toHaveAttribute('aria-pressed', 'false');
+
     await expect(page.locator('#appView')).toBeHidden();
     await expect(page.locator('.topbar > .brand')).toBeHidden();
     await expect(page.locator('#notificationToggle')).toBeHidden();
@@ -100,17 +111,34 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
         await page.waitForTimeout(350);
         await expect(page.locator('#loginView')).toBeVisible();
 
-        const metrics = await page.evaluate(() => ({
-          title: document.title,
-          lang: document.documentElement.lang,
-          theme: document.documentElement.dataset.adminTheme || null,
-          backgroundToken: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
-          viewportWidth: window.innerWidth,
-          viewportHeight: window.innerHeight,
-          documentWidth: document.documentElement.scrollWidth,
-          horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth
-        }));
+        const metrics = await page.evaluate(() => {
+          const fitsViewport = element => {
+            if (!element) return false;
+            const rect = element.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0 &&
+              rect.left >= -1 && rect.right <= window.innerWidth + 1;
+          };
+          return {
+            title: document.title,
+            lang: document.documentElement.lang,
+            theme: document.documentElement.dataset.adminTheme || null,
+            backgroundToken: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            documentWidth: document.documentElement.scrollWidth,
+            horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+            loginCardFitsViewport: fitsViewport(document.querySelector('#loginView .logincard')),
+            passwordFieldFitsViewport: fitsViewport(document.querySelector('#password')),
+            passwordToggleFitsViewport: fitsViewport(document.querySelector('#showPassword')),
+            submitButtonFitsViewport: fitsViewport(document.querySelector('#loginForm button[type="submit"]'))
+          };
+        });
         metadata.metrics.push(metrics);
+
+        expect(metrics.loginCardFitsViewport, `Login card fits within ${viewport.width}px viewport`).toBe(true);
+        expect(metrics.passwordFieldFitsViewport, `Password field fits within ${viewport.width}px viewport`).toBe(true);
+        expect(metrics.passwordToggleFitsViewport, `Password visibility toggle fits within ${viewport.width}px viewport`).toBe(true);
+        expect(metrics.submitButtonFitsViewport, `Login submit button fits within ${viewport.width}px viewport`).toBe(true);
 
         const filename = `admin-login__${viewport.width}x${viewport.height}__${theme}.png`;
         await page.screenshot({ path: join(screenshotDir, filename), fullPage: true });
