@@ -61,3 +61,6 @@
 - Sửa trực tiếp trên đúng nhánh hai mặc định/đích của workflow: `.github/workflows/liquid-glass-visual-preview.yml` và `scripts/capture-cloudflare-preview.mjs` chuyển sang alias branch đã được Cloudflare API trả về. Không nới lỏng điều kiện route/context, không sửa main, không merge PR và không triển khai production.
 - Commit workflow URL: `43403b2d4e67e814b11ec2f4c086f7aa5ce411ab`; commit capture default: `eb21835f0783bbed72c3fcc4f18039e3b9887521`. Chờ các Actions mới kích hoạt từ commit mới để xác minh lại; không coi các run cũ là bằng chứng cho sửa đổi này.
 - Trạng thái tại thời điểm ghi: Admin/Validate của SHA trước PASS; Live capture và deployment verification cho SHA mới CHƯA XÁC MINH; archive chuẩn vẫn BLOCKED; Production không bị thay đổi; PR #108 vẫn mở.
+
+- Bổ sung thêm guard nghiệm thu: deployment verification hiện yêu cầu `EXPECTED_DEPLOYMENT_SHA` là SHA 40 ký tự hợp lệ và chỉ xác nhận khi commit Cloudflare trùng SHA nguồn chính xác; bước archive cũng so sánh trực tiếp `deployed.commitHash === SOURCE_SHA`. Không được archive chỉ vì deployment cùng branch.
+- Verifier commit: `193054fb64ec7efad116e9e4c32102be1ac01bf4`; workflow guard commit: `9b59569c81a3c9b9ce76ac5d9788a31bd5237783`. Các workflow do các commit mới kích hoạt phải được đọc lại trước khi kết luận.
