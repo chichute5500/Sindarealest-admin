@@ -4,9 +4,9 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T04:04:00Z",
+  "updatedAtUtc": "2026-10-20T04:17:26.954Z",
   "status": "BLOCKED",
-  "note": "Source/test validation passed on docs-only commit 1d261598c4e481ede062eed8ff32c374ffe67373 (run 39367417810); later updates to the handoff ledger are documentation-only and leave web source unchanged from code commit 562d7d77624f7431296cb217b2b6d6592aca9ce4. Local fixture audit run 39362960193 covers that source-identical tree: 54 fixture screenshots, 235 fixture products, 20 responsive cases and 93 interaction checks. This is not a real Preview visual pass. The live probe is still blocked by Cloudflare Access, missing Actions service-token secrets, and zero real screenshots/routes/viewports.",
+  "note": "Latest source/test validation run 39368493275 passed on docs-only commit 7d5de0114025df35974067c0c1bf481f95be7fd6; the app source remains code commit 562d7d77624f7431296cb217b2b6d6592aca9ce4. Admin Preview Playwright run 39368493324 failed to find #loginView/#loginForm; its workflow does not pass Cloudflare Access service-token headers. The last live storefront probe 39362960193 remains blocked by Cloudflare Access, with the secrets missing and zero real screenshots/routes/viewports. Local fixture audit passed (54 screenshots, 235 fixtures, 20 responsive cases, 93 interaction checks), but is not a live Preview visual pass. Safe unblock instructions: docs/handoff/PREVIEW-ACCESS-SETUP.md.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
@@ -57,7 +57,8 @@
     "No genuine start-of-work/end-of-work Preview screenshots exist. Verify the Preview deployment commit before assigning baseline semantics; never copy local fixtures or reference designs into canonical stage folders.",
     "Pixel comparison and visual acceptance require paired real Preview screenshots at identical viewport/theme/state, followed by human review.",
     "Category route mapping is explicit in source (for example dress-shoes→giaytay, sneakers→sneaker); actual published products must still pass click, direct-open, refresh, legacy redirect, Back/Forward and share URL checks on an accessible Preview.",
-    "The current fix branch contains unrelated admin/API/migration/config changes. Do not merge it wholesale; no Production merge/deployment is authorized."
+    "The current fix branch contains unrelated admin/API/migration/config changes. Do not merge it wholesale; no Production merge/deployment is authorized.",
+    "Follow the Preview-only Access setup checklist in docs/handoff/PREVIEW-ACCESS-SETUP.md; do not broaden the Access policy to Production."
   ],
   "lastAccessCheckUtc": "2026-10-20T03:13:18Z",
   "localAudit": {
@@ -169,11 +170,11 @@
     }
   },
   "latestToolingValidation": {
-    "workflowRun": 39367417810,
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417810",
-    "sourceCommit": "1d261598c4e481ede062eed8ff32c374ffe67373",
+    "workflowRun": 39368493275,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493275",
+    "sourceCommit": "7d5de0114025df35974067c0c1bf481f95be7fd6",
     "status": "PASS",
-    "note": "Full source and test validation passed. This was a docs-only commit; app source remains code commit 562d7d77624f7431296cb217b2b6d6592aca9ce4."
+    "note": "Project integrity checks and automated tests passed; commit only added/updated documentation, leaving app source unchanged from 562d7d77624f7431296cb217b2b6d6592aca9ce4."
   },
   "liveProbeHistory": [
     {
@@ -369,21 +370,21 @@
     "status": "TOOLING_SOURCE_VALIDATED_LIVE_ACCESS_BLOCKED"
   },
   "latestVerifiedState": {
-    "lastCiValidatedCommit": "1d261598c4e481ede062eed8ff32c374ffe67373",
+    "lastCiValidatedCommit": "7d5de0114025df35974067c0c1bf481f95be7fd6",
     "codeSourceCommit": "562d7d77624f7431296cb217b2b6d6592aca9ce4",
     "sourceValidation": {
       "status": "PASS",
-      "run": 39367417810,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417810"
+      "run": 39368493275,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493275"
     },
     "adminPreviewPlaywright": {
       "status": "FAIL_BLOCKED",
-      "run": 39367417804,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39367417804",
-      "details": "Could not find #loginView/#loginForm. A separate live capture confirms Cloudflare Access gate and missing Actions service-token secrets. The admin run's selector failure alone does not establish an app login defect."
+      "run": 39368493324,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39368493324",
+      "details": "Tests could not find #loginView/#loginForm. This workflow passes only ADMIN_TEST_URL and ADMIN_TEST_PASSWORD, not Cloudflare Access service-token headers; no live admin login/dashboard acceptance."
     },
     "latestLiveProbe": {
-      "status": "BLOCKED",
+      "status": "BLOCKED_ACCESS_GATE",
       "run": 39362960193,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193",
       "accessServiceTokenConfigured": false,
@@ -391,7 +392,7 @@
       "realScreenshots": 0,
       "realRoutes": 0,
       "realViewports": 0,
-      "note": "No newer live probe was triggered by documentation-only commits."
+      "note": "No newer live probe ran because recent branch commits only changed documentation; all canonical start/end screenshot folders remain unpopulated by real Preview images."
     },
     "latestLocalVisualFixture": {
       "status": "PASS_LOCAL_ONLY",
