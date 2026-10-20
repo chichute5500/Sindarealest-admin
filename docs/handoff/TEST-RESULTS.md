@@ -86,3 +86,16 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Artifact: [12222942329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329).
 - Giới hạn: local static preview/fixture, không phải Cloudflare Preview; không phải baseline thật và không phải xác nhận pixel match.
 - Task IDs: SHOT-001, REG-001.
+
+### 2026-10-20 00:57 UTC — GitHub Actions visual-preview fallback audit
+- Commit under test: `26406bec56dac69d665c450b6641f03a5ee9f979`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Environment: local static preview from `public/` at `http://127.0.0.1:4173/`; not Cloudflare Preview.
+- Workflow run: [39350484564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564), job `visual-preview` ID `118393352211`.
+- Status: **PASS — local/fixture pipeline only**. Project tests, project/migration checks, Chromium installation, screenshot capture, responsive audit and artifact upload completed successfully.
+- Artifact: [sindarealest-liquid-glass-preview-257](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350484564/artifacts/12232777359), created `2026-10-20T00:57:34Z`.
+- Audit numbers recorded from the latest successful local report: 54 screenshots, 20 responsive cases, 91 interaction checks, 235 fixture products, zero responsive overflows, zero console/page/HTTP errors, zero failed requests and zero hard failures; two fixture-only warranty lookup 503 responses were expected.
+- Route/source audit: `public/index.html` uses `history.pushState` and `popstate` for `/san-pham/{key}`; `functions/_middleware.js` accepts that route and resolves a key through D1 using slug/id/SKU, then redirects to a canonical key. No route change was made.
+- Blockers: supplied Preview URLs return `login_required`; GitHub base64 fetch returned empty bytes for the reference PNGs and web fetch returned cache miss. Therefore no Preview screenshot, no direct visual comparison to references, and no route behavior on deployed Preview has been verified.
+- Change safety: this commit series only updates documentation/workflow records; storefront HTML/CSS/JS remains unchanged. No Production merge or deployment.
+- Task IDs: SHOT-001, REG-001, ROUTE-001, SHOT-002, REF-001.
