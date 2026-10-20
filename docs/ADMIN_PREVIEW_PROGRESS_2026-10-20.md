@@ -4,22 +4,37 @@
 **Nhánh làm việc:** `fix/liquid-glass-audit-2026-10-19`  
 **PR:** https://github.com/chichute5500/Sindarealest-admin/pull/108  
 **Production:** https://sindarealest2.pages.dev/  
-**Preview đã dùng trong kiểm thử:** https://3ed49bcc.sindarealest2.pages.dev/
+**Preview đã xác minh:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 
-## Kết luận nhanh
-**Chưa hoàn thành 100%.** Kiểm thử admin Preview và kiểm tra source/migration mới nhất đã xanh, nhưng kiểm toán trực quan Live Preview chưa đạt tiêu chí nghiệm thu và xác minh deployment bằng Cloudflare API bị HTTP 401. Không được coi workflow xanh tổng thể là xác nhận giao diện Live Preview đã đạt.
+## Trạng thái hiện tại — cập nhật mới nhất
+**Chưa tuyên bố 100% hoàn tất.** Các bước kiểm thử kỹ thuật, chụp ảnh đầu/cuối và pixel comparison đã chạy thành công; việc chấp nhận độ tương đồng thiết kế cuối cùng vẫn cần xem xét trực quan. Không merge PR và không deploy Production.
 
-## Trạng thái đã xác minh
-| Hạng mục | Trạng thái | Bằng chứng |
+| Hạng mục | Trạng thái mới nhất | Bằng chứng |
 |---|---|---|
-| PR #108 | Đang mở, chưa merge | https://github.com/chichute5500/Sindarealest-admin/pull/108 |
-| Admin Preview Playwright | PASS ở commit hiện tại | Run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39413543764 — 1 job thành công |
-| Validate source and tests | PASS ở commit hiện tại | Run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39413543869 — validate thành công |
-| Local fixture visual audit | PASS trong lần audit có báo cáo gần nhất | 54 screenshots, 235 fixture products, 20 responsive cases, 93 interaction checks; overflow/console/page/HTTP/hard failures đều 0 |
-| Live Cloudflare Pages Preview visual audit | NOT PASSED | Run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810: 46 ảnh thật, 8/8 cặp viewport/theme, 4 route checks; product detail contexts chưa hoàn chỉnh |
-| Xác minh deployment thật | BLOCKED | Cùng run báo `API_AUTHENTICATION_REJECTED`, Cloudflare Pages API HTTP 401. Thông báo chỉ ra API token không được chấp nhận; cần token account-scoped Pages Read hợp lệ và xác minh account ID |
-| Lưu ảnh Live Preview vào kho ảnh chuẩn | Chưa được phép | Phải chặn đến khi xác minh được deployment/branch/commit chính xác và đủ điều kiện route/context |
-| Production | Không được đụng | Không merge PR, không deploy production, không đổi cấu hình production |
+| PR #108 | OPEN, chưa merge | https://github.com/chichute5500/Sindarealest-admin/pull/108 |
+| Validate source and tests | PASS ở commit tài liệu mới nhất | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432371090 |
+| Admin Preview Playwright | PASS ở commit tài liệu mới nhất | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432370939 |
+| Live Preview capture | PASS, exact deployment branch/SHA đã xác minh | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039 |
+| Ảnh đầu kỳ | CAPTURED_PASS — 66 ảnh thật | Run 39423635778 |
+| Ảnh cuối kỳ | CAPTURED_PASS — 66 ảnh thật | Run 39425677039 |
+| Pixel comparison | COMPLETE_NEEDS_VISUAL_REVIEW — 66 cặp, 57 giống hệt, 9 khác, 0 lệch kích thước | Artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039/artifacts/12265723084 |
+| Live route/responsive audit | PASS: 8/8 viewport/theme, 12 route checks, 0 overflow, 0 page/console errors, 0 read-only violations | Artifact của run 39425677039 |
+| Production | Không thay đổi | Không merge/deploy |
+
+### Diễn giải 9 cặp ảnh có khác biệt
+- 4 ảnh chụp toàn trang có khác biệt vì phần nội dung luân phiên có thể thay đổi giữa hai lần chụp.
+- 4 ảnh của khu vực “The art of…” cho thấy carousel tự chạy đã hiển thị ảnh sản phẩm khác; kiểm tra trực quan một cặp mobile dark xác nhận bố cục/thẻ không đổi, chỉ ảnh sản phẩm luân phiên.
+- 1 ảnh chi tiết sản phẩm desktop/light có khác biệt nhỏ (0,206% pixel).
+- Đây là giải thích cho khác biệt pixel, không phải chứng nhận rằng website khớp hoàn toàn với ảnh thiết kế tham chiếu.
+
+### Phạm vi còn phải chốt
+- Manifest hiện đã đồng bộ để không còn báo sai rằng deployment verification là HTTP 401 hoặc rằng end capture chưa chạy.
+- So khớp thiết kế với ảnh tham chiếu app-like Light/Dark vẫn chưa được xác nhận hoàn toàn: ảnh tham chiếu có bố cục mobile và nhóm sản phẩm khác với storefront live hiện tại. Không tự tạo dữ liệu/ảnh sản phẩm giả và không đổi giao diện storefront trong đợt kiểm tra Admin Preview khi chưa có phê duyệt phạm vi.
+- Nhánh fix chứa nhiều thay đổi Admin/API/migration/data/deploy/config ngoài phần kiểm toán giao diện. Không merge toàn bộ nhánh hoặc deploy Production như một phần của việc này.
+- Commit `245dcaed91557a67aeae1e7f67e5835f4abefa0e` chỉ đồng bộ tài liệu manifest; bằng chứng chụp ảnh cuối kỳ thuộc commit runtime `37163dc3c17af332f948311bc395c9839a10e345`. Workflow Validate và Admin Playwright đã PASS lại trên commit tài liệu mới.
+
+## Kết luận
+Phần kiểm thử kỹ thuật và lưu trữ ảnh so sánh đã hoàn tất. Phần chưa được đánh dấu hoàn tất là chấp nhận trực quan thiết kế cuối cùng và kiểm soát phạm vi trước khi PR được người dùng duyệt. Production vẫn nguyên trạng; PR #108 vẫn mở.
 
 ## Đã sửa trong nhánh thử nghiệm
 1. Sửa bài Playwright admin Preview để xác thực URL HTTPS thuộc hostname Cloudflare Pages Preview không phải production; chỉ cho phép đường dẫn admin đã định nghĩa.
