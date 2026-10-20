@@ -687,6 +687,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
       <img class="sd-fullscreen-image is-active" id="sdFullscreenImage" alt="" decoding="async"><img class="sd-fullscreen-image" id="sdFullscreenImageNext" alt="" decoding="async" aria-hidden="true">
     </div>
   </div>
+  <button type="button" class="sd-fullscreen-share tap-target" id="sdFullscreenShare" aria-label="Chia sẻ sản phẩm" title="Chia sẻ sản phẩm"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 15V3m-5 5 5-5 5 5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button type="button" class="sd-fullscreen-close tap-target" id="sdFullscreenClose" aria-label="Đóng xem toàn ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
   <button type="button" class="sd-fullscreen-arrow sd-fullscreen-prev tap-target" id="sdFullscreenPrev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button type="button" class="sd-fullscreen-arrow sd-fullscreen-next tap-target" id="sdFullscreenNext" aria-label="Ảnh tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1108,6 +1109,16 @@ $('#detailZoom').addEventListener('click',openFullscreenImage);
 $('#detailPrev').addEventListener('click',()=>changeDetailImage(detailIndex-1,true,'right'));
 $('#detailNext').addEventListener('click',()=>changeDetailImage(detailIndex+1,true,'left'));
 $('#sdFullscreenClose').addEventListener('click',closeFullscreenImage);
+$('#sdFullscreenShare').addEventListener('click',async()=>{
+ const p=currentProduct,title=p?.title||'Sản phẩm SinDarealest',url=window.location.href;
+ try{
+  if(typeof navigator.share==='function'){await navigator.share({title,text:title+' · SinDarealest',url});return}
+  const copied=await copyText(url);
+  showToast(copied?'Đã sao chép liên kết sản phẩm.':'Trình duyệt không hỗ trợ chia sẻ hoặc sao chép liên kết.');
+ }catch(error){
+  if(error?.name!=='AbortError')showToast('Không thể chia sẻ liên kết lúc này.');
+ }
+});
 $('#sdFullscreenThumbs').addEventListener('click',e=>{const b=e.target.closest('[data-full-thumb]');if(b)changeDetailImage(Number(b.dataset.fullThumb),true)});
 $('#sdFullscreenPrev').addEventListener('click',()=>changeDetailImage(detailIndex-1,true,'right'));
 $('#sdFullscreenNext').addEventListener('click',()=>changeDetailImage(detailIndex+1,true,'left'));
@@ -2129,6 +2140,82 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
 }
 @media(prefers-reduced-motion:reduce){
   #home .hero-visual img,.sd-fullscreen-viewer,.sd-fullscreen-frame{transition:none!important;animation:none!important}
+}
+
+/* Second visual QA pass: remove the unnecessary boxed hero and restore useful product-image contrast. */
+@media(max-width:760px){
+  #home.hero.wrap{
+    margin:10px auto 6px;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:hidden;
+  }
+  #home.hero:after{
+    background:linear-gradient(90deg,
+      rgba(237,247,255,.96) 0%,
+      rgba(237,247,255,.84) 25%,
+      rgba(237,247,255,.38) 40%,
+      rgba(237,247,255,.04) 56%,
+      rgba(237,247,255,0) 64%);
+  }
+  #home .hero-visual img{
+    mix-blend-mode:multiply;
+    opacity:1;
+    filter:contrast(1.24) saturate(1.06);
+  }
+  html.dark #home.hero:after{
+    background:linear-gradient(90deg,
+      rgba(4,20,34,.96) 0%,
+      rgba(4,20,34,.84) 25%,
+      rgba(4,20,34,.38) 40%,
+      rgba(4,20,34,.06) 56%,
+      rgba(4,20,34,0) 64%);
+  }
+  html.dark #home .hero-visual img{
+    mix-blend-mode:normal;
+    opacity:.96;
+    filter:contrast(1.10) saturate(.96);
+  }
+  .service-strip>.service{min-height:78px;height:auto}
+  .service-strip .service-copy{min-height:66px;gap:7px}
+  .service-icon{width:27px;height:27px}
+  .service-icon svg{width:19px;height:19px}
+  .service-text strong{font-size:clamp(10px,2.8vw,11.5px);line-height:1.32}
+}
+/* Keep the share affordance in the same glass control family as close/arrows. */
+.sd-fullscreen-share{
+  position:absolute;z-index:7;
+  top:calc(13px + env(safe-area-inset-top));right:68px;
+  display:grid;place-items:center;
+  width:42px;height:42px;padding:0;
+  border:1px solid var(--sd-reference-edge);border-radius:50%;
+  background:var(--sd-reference-surface-strong);color:var(--ink);
+  box-shadow:var(--sd-reference-shadow);
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+  backdrop-filter:blur(18px) saturate(145%);
+}
+.sd-fullscreen-share svg{width:20px;height:20px;display:block;stroke:currentColor}
+html.dark .sd-fullscreen-share{
+  color:#edf7ff;background:rgba(7,29,48,.80);
+  border-color:rgba(170,211,239,.40);
+  box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(235,247,255,.12);
+}
+@media(min-width:761px){
+  .sd-fullscreen-close{top:calc(13px + env(safe-area-inset-top));right:16px;left:auto}
+  .sd-fullscreen-share{right:68px}
+  .sd-fullscreen-stage{padding-bottom:calc(166px + env(safe-area-inset-bottom))}
+  .sd-fullscreen-thumbs{bottom:calc(78px + env(safe-area-inset-bottom))}
+  .sd-fullscreen-brand-footer{bottom:calc(8px + env(safe-area-inset-bottom))}
+}
+@media(max-width:760px){
+  .sd-fullscreen-close{top:calc(12px + env(safe-area-inset-top));left:12px;right:auto}
+  .sd-fullscreen-share{top:calc(12px + env(safe-area-inset-top));right:12px}
+}
+@media(max-width:390px){
+  .sd-fullscreen-share{width:38px;height:38px}
+  .sd-fullscreen-share svg{width:18px;height:18px}
 }
 </style>
 
