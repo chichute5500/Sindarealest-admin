@@ -7,6 +7,7 @@ import { buildCloudflareAccessHeaders } from '../scripts/cloudflare-access-servi
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
+const deploymentVerifier = readFileSync(new URL('../scripts/verify-cloudflare-preview-deployment.mjs', import.meta.url), 'utf8');
 const compare = readFileSync(new URL('../scripts/compare-website-screenshots.mjs', import.meta.url), 'utf8');
 
 assert.match(workflow, /capture_source[\s\S]*cloudflare-preview[\s\S]*local-static-fixture/,
@@ -19,6 +20,29 @@ assert.match(workflow, /artifacts\/liquid-glass-preview\/live-preview/,
   'The archive must source files from the dedicated live-capture directory.');
 assert.match(workflow, /audit\.sourceKind !== 'cloudflare-pages-preview-live-read-only'/,
   'The archive must reject non-live or fixture-only reports.');
+assert.match(workflow, /Verify actual Cloudflare Pages deployment before manual capture\/archive/,
+  'Manual screenshot archiving must verify the actual deployed revision before capturing.');
+assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID:\s*\$\{\{\s*vars\.CLOUDFLARE_ACCOUNT_ID\s*\}\}/,
+  'The deployment verifier must read the Cloudflare account ID from a GitHub Actions variable.');
+assert.match(workflow, /CLOUDFLARE_PAGES_READ_TOKEN:\s*\$\{\{\s*secrets\.CLOUDFLARE_PAGES_READ_TOKEN\s*\}\}/,
+  'The deployment verifier must use a read-only token from GitHub Actions secrets.');
+assert.match(workflow, /deployment-verification\.json[\s\S]*verification\.passed === true[\s\S]*deployed\.environment === 'preview'/,
+  'The archive gate must reject any deployment not positively verified as a Preview.');
+assert.match(workflow, /manifest\.previewDeploymentCommit = deployed\.commitHash/,
+  'The manifest must record the API-verified deployed commit, separate from the workflow source commit.');
+assert.match(deploymentVerifier, /searchParams\.set\('env', 'preview'\)/,
+  'The Cloudflare API query must list Preview deployments only.');
+assert.match(deploymentVerifier, /metadata\.commit_hash/,
+  'The verifier must extract the actual deployment-trigger commit hash.');
+assert.match(deploymentVerifier, /latestStageStatus === 'success'/,
+  'The verifier must reject Preview deployments that have not completed successfully.');
+assert.match(deploymentVerifier, /new URL\(alias\)\.origin\.toLowerCase\(\)/,
+  'The verifier must match the requested deployment alias to the API metadata.');
+assert.match(deploymentVerifier, /environment === 'preview'/,
+  'The verifier must fail closed unless the matched deployment is explicitly a Preview.');
+assert.doesNotMatch(deploymentVerifier, /method:\s*'POST'|method:\s*'PATCH'|method:\s*'DELETE'/,
+  'The deployment verifier must remain read-only.');
+
 assert.match(live, /cloudflare-pages-preview-live-read-only/,
   'The direct capture must identify its source.');
 assert.match(live, /sindarealest2\\\.pages\\\.dev/,
@@ -73,6 +97,7 @@ assert.match(compare, /DIMENSION_MISMATCH|PIXEL_CHANGED/,
 
 for (const scriptPath of [
   '../scripts/capture-cloudflare-preview.mjs',
+  '../scripts/verify-cloudflare-preview-deployment.mjs',
   '../scripts/cloudflare-access-service-token.mjs',
   '../scripts/compare-website-screenshots.mjs',
   '../scripts/validate-cloudflare-preview-url.mjs',
