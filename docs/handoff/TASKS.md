@@ -105,3 +105,11 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - The push probe uses `continue-on-error: true` only so diagnostics can be uploaded; it does **not** mean the live Preview check passed.
 - Safe next step: obtain a user-authorized browser session or Preview-only Access permission for this test alias, then rerun. Do not weaken Production Access.
 - Updated audit safeguards redact URL query/fragment values and ignore console errors from the external Cloudflare Access login page, so gate diagnostics are not mislabelled as storefront errors.
+
+## Route audit before URL changes — 2026-10-20
+
+- Current middleware accepts only `/san-pham/{single-segment-key}` and looks up `products.slug`, `products.id`, or `products.sku`. It canonicalizes the path to the existing `/san-pham/{verified SKU or product id}` format.
+- Sitemap currently emits `/san-pham/{verified SKU or id}`. Storefront JavaScript only recognizes `/^\/san-pham\/([^/]+)/` to open the detail modal on initial load, and close-detail logic only replaces paths starting `/san-pham/`.
+- The storefront category keys are explicitly `sneakers`, `loafers`, `dress-shoes`, `belts`, `wallets`, `sandals`, `watch-straps`, `phone-cases`; the labels are display names and must not be used as slugs. The requested example `/sanpham/giaytay/sd2929` cannot be assumed valid without confirming the database product's category and SKU verification.
+- Implementation scope once baseline is available: add an explicit mapping from stored category key to canonical URL slug, validate category + verified SKU/product identity together in middleware, keep legacy single-segment URLs working, update the client route parser/close handler and sitemap, then add positive/negative route tests. Do not create an unverified alias or change canonical URLs before the baseline is archived.
+- No route or storefront UI code was changed during this audit.
