@@ -122,3 +122,20 @@ The direct, read-only GitHub Actions browser probe against `https://3ed49bcc.sin
 ## Branch-scope safety review — 2026-10-20
 
 The GitHub compare from base commit `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` to audit commit `fa7445b74661faf260c32b3ab32dfa85e3538e78` reports a diverged branch (293 commits ahead, 6 behind) and 72 changed files. The diff includes public storefront work but also admin HTML, admin API endpoints, shared middleware/API logic, a database migration, deployment/setup scripts and the large legacy product fixture. This branch is not safe to merge as one unit for the public static UI task. Keep PR #108 open; do not merge or deploy Production. Isolate/review out-of-scope files against the correct base before any integration.
+
+
+## Gỡ chặn Cloudflare Access đúng cách — 2026-10-20
+
+Đã bổ sung hỗ trợ *tùy chọn* Cloudflare Access service token cho công cụ chụp Preview ở các commit trên nhánh kiểm toán; không tự tạo hoặc vượt qua quyền truy cập.
+
+- Hai GitHub Actions repository secrets được hỗ trợ: `CF_ACCESS_CLIENT_ID` và `CF_ACCESS_CLIENT_SECRET`. Phải cấu hình cả cặp; cấu hình thiếu một giá trị sẽ dừng an toàn với thông báo không chứa giá trị bí mật.
+- Script chỉ gắn hai header service-token sau khi đã xác thực URL thuộc alias Pages không phải Production, và chỉ cho request `GET`/`HEAD` cùng origin Preview. Các request cross-origin bị chặn trước khi gắn header. Giá trị secret không được ghi vào JSON, HTML, ảnh hoặc log kiểm toán.
+- Khi hai secret chưa được cấu hình hoặc token không có quyền với hostname Preview, capture tiếp tục báo **BLOCKED_ACCESS_GATE**; ảnh fixture local không được đưa vào thư mục baseline.
+
+### Cách thiết lập cần người có quyền Cloudflare/GitHub thực hiện
+
+1. Trong Cloudflare Zero Trust, tạo service token dành riêng cho kiểm thử và policy chỉ cho phép alias Preview `3ed49bcc.sindarealest2.pages.dev`. Không nới quyền của Production.
+2. Trong repo GitHub, mở **Settings → Secrets and variables → Actions → New repository secret**. Tạo secret `CF_ACCESS_CLIENT_ID` rồi `CF_ACCESS_CLIENT_SECRET` bằng hai giá trị từ Cloudflare. Không gửi hai giá trị này trong chat và không commit vào file.
+3. Mở **Actions → Liquid Glass isolated visual preview → Run workflow**, chọn nhánh `fix/liquid-glass-audit-2026-10-19`, stage `start-of-work`, xác nhận Preview-only, nguồn `cloudflare-preview`, URL mặc định. Chỉ khi run capture hoàn tất và manifest ghi nhận ảnh live mới bắt đầu vòng đối chiếu giao diện.
+
+Nếu không có quyền tạo service token/Secrets, không thể chụp baseline Preview bằng GitHub Actions một cách trung thực; tiếp tục dùng test local riêng nhưng giữ baseline live ở trạng thái BLOCKED.
