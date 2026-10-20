@@ -73,6 +73,14 @@ async function makePage(browser, viewport, theme, label) {
     let u;
     try { u = new URL(req.url()); } catch { return route.abort(); }
     if (u.origin !== origin) {
+      // An Access sign-in commonly lives on a separate *.cloudflareaccess.com host.
+      // Block the cross-origin navigation before it can leave the Preview boundary,
+      // but classify it as an Access gate instead of a generic navigation failure.
+      if (req.isNavigationRequest() && u.hostname.toLowerCase().endsWith('.cloudflareaccess.com')) {
+        audit.accessBlocked = true;
+        audit.accessBlockReason = 'The Preview redirected to a Cloudflare Access sign-in host; the external navigation was blocked and no credentials were entered.';
+        audit.hardFailures.push('Cloudflare Access sign-in redirect detected at ' + sanitizeUrl(req.url()));
+      }
       audit.blockedExternalRequests.push({ context: label, method: req.method(), url: sanitizeUrl(req.url()), type: req.resourceType() });
       return route.abort();
     }
@@ -109,7 +117,7 @@ async function navigate(page, url) {
   let response = null;
   try { response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 }); }
   catch (error) { audit.hardFailures.push(sanitizeText('Navigation failed for ' + url + ': ' + String(error.message || error))); }
-  if (!response) return { response: null, blocked: false, status: null, title: '', url: page.url(), bodyText: '' };
+  if (!response) return { response: null, blocked: audit.accessBlocked, status: null, title: '', url: page.url(), bodyText: '' };
   await page.waitForTimeout(400);
   const info = await page.evaluate(() => ({ title: document.title || '', url: location.href, bodyText: (document.body?.innerText || '').slice(0, 12000) }))
     .catch(() => ({ title: '', url: page.url(), bodyText: '' }));
