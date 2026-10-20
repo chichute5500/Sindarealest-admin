@@ -54,7 +54,7 @@ const refinementEnd = html.indexOf('/* Reference-aligned cart and a separate ord
 assert.ok(refinementStart >= 0 && refinementEnd > refinementStart,
   'The later shared-glass refinement block must remain identifiable.');
 const refinementCss = html.slice(refinementStart, refinementEnd);
-assert.doesNotMatch(refinementCss, /\.glass\s*,\s*\.service-strip\\b/,
+assert.doesNotMatch(refinementCss, /\.glass\s*,\s*\.service-strip\b/,
   'The later shared-glass grouping must not separately override the outer commitment strip.');
 assert.doesNotMatch(refinementCss, /\.service-strip\{[^}]*\b(?:background|border|backdrop-filter|-webkit-backdrop-filter|box-shadow)\s*:/,
   'The later refinement must not replace the outer strip material; it must inherit the shared glass layer.');
