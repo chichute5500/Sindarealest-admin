@@ -1,171 +1,120 @@
-# Báo cáo tiến độ — SinDarealest2 Admin Preview & Liquid Glass
-**Cập nhật:** 2026-10-20 (UTC+7)  
-**Repo:** https://github.com/chichute5500/Sindarealest-admin  
-**Nhánh làm việc:** `fix/liquid-glass-audit-2026-10-19`  
+# BÁO CÁO TIẾN ĐỘ & BÀN GIAO — SinDarealest2 Admin Preview / Liquid Glass
+
+**Cập nhật:** 20/10/2026 (UTC+7)  
+**Repository:** https://github.com/chichute5500/Sindarealest-admin  
+**Nhánh:** `fix/liquid-glass-audit-2026-10-19`  
 **PR:** https://github.com/chichute5500/Sindarealest-admin/pull/108  
-**Production:** https://sindarealest2.pages.dev/  
-**Preview đã xác minh:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+**Cloudflare Pages Preview:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/  
+**Production (chỉ để phân biệt, tuyệt đối không sửa):** https://sindarealest2.pages.dev/  
+**Branch/PR head đã xác minh:** `b3b006eb107a3d90e0a8777f49839575a9c23f72`
 
-## Trạng thái hiện tại — cập nhật mới nhất
-**Chưa tuyên bố 100% hoàn tất.** Các bước kiểm thử kỹ thuật, chụp ảnh đầu/cuối và pixel comparison đã chạy thành công; việc chấp nhận độ tương đồng thiết kế cuối cùng vẫn cần xem xét trực quan. Không merge PR và không deploy Production.
+## 1. Tiến độ thực tế
 
-| Hạng mục | Trạng thái mới nhất | Bằng chứng |
+**Ước lượng hoàn thành: 90% cho phạm vi kiểm toán Admin Preview/Liquid Glass.** Đây là ước lượng tiến độ, không phải kết quả nghiệm thu 100%.
+
+- **Đã hoàn thành:** baseline ảnh Live Preview, end-of-work capture, so sánh pixel tự động, kiểm tra route/responsive, xác minh deployment theo branch + SHA, cập nhật guard an toàn; các workflow source validation và Admin Preview Playwright mới nhất đều PASS.
+- **Còn lại để đóng công việc:** hoàn thành review trực quan cuối cùng, xác định rõ các khác biệt so với ảnh tham chiếu Light/Dark được cung cấp, ghi kết luận có căn cứ vào manifest/báo cáo và chạy lại các kiểm tra cần thiết sau mọi sửa đổi.
+- **Không được tuyên bố 100%** khi chưa chốt review trực quan. Pixel comparison chỉ chỉ ra cặp ảnh khác nhau, không tự chứng minh thiết kế đúng hoặc sai.
+- **Không cần người dùng thao tác ở thời điểm hiện tại** nếu có thể tiếp tục đọc artifact, source, workflow và tài liệu qua GitHub. Chỉ hỏi người dùng nếu thiếu ảnh tham chiếu gốc hoặc cần quyết định phạm vi thiết kế không thể suy ra an toàn.
+
+## 2. Trạng thái mới nhất đã kiểm chứng
+
+| Hạng mục | Kết quả | Bằng chứng |
 |---|---|---|
-| PR #108 | OPEN, chưa merge | https://github.com/chichute5500/Sindarealest-admin/pull/108 |
-| Validate source and tests | PASS ở commit tài liệu mới nhất | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432371090 |
-| Admin Preview Playwright | PASS ở commit tài liệu mới nhất | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432370939 |
-| Live Preview capture | PASS, exact deployment branch/SHA đã xác minh | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039 |
-| Ảnh đầu kỳ | CAPTURED_PASS — 66 ảnh thật | Run 39423635778 |
-| Ảnh cuối kỳ | CAPTURED_PASS — 66 ảnh thật | Run 39425677039 |
-| Pixel comparison | COMPLETE_NEEDS_VISUAL_REVIEW — 66 cặp, 57 giống hệt, 9 khác, 0 lệch kích thước | Artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039/artifacts/12265723084 |
-| Live route/responsive audit | PASS: 8/8 viewport/theme, 12 route checks, 0 overflow, 0 page/console errors, 0 read-only violations | Artifact của run 39425677039 |
-| Production | Không thay đổi | Không merge/deploy |
+| Branch head và PR head | Cùng SHA `b3b006eb107a3d90e0a8777f49839575a9c23f72` | Branch API và PR #108 đã đọc |
+| PR #108 | OPEN, chưa merge; base `main` | https://github.com/chichute5500/Sindarealest-admin/pull/108 |
+| Validate source and tests | PASS tại head hiện tại | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432636732 |
+| Admin Preview Playwright | PASS tại head hiện tại | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432636764 |
+| Liquid Glass isolated visual preview | Job PASS tại head hiện tại; đây là push run, các bước capture/archive live bị SKIPPED | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39432636819 |
+| Start-of-work archive | CAPTURED_PASS — 66 ảnh Live Preview | Run 39423635778 |
+| End-of-work archive | CAPTURED_PASS — 66 ảnh Live Preview | Run 39425677039 |
+| Pixel comparison | 66 cặp: 57 giống hệt, 9 khác, 0 lệch kích thước, 0 ảnh lỗi/thiếu cặp | Artifact run 39425677039, ID 12265723084 |
+| Live responsive/route audit của capture được xác minh | 8/8 viewport-theme pairs; 12 route checks; 4/4 product-detail contexts; zero overflow, page/console errors, read-only violations | Run 39425677039 và manifest |
+| Cloudflare Preview deployment verification | PASS cho capture SHA `37163dc3c17af332f948311bc395c9839a10e345`, deployment ID `1ab8617f-aac1-42f2-9112-4acc6b0d007a` | Manifest + run 39425677039 |
+| Production | Không thay đổi bởi công việc này | Không merge/deploy Production |
 
-### Diễn giải 9 cặp ảnh có khác biệt
-- 4 ảnh chụp toàn trang có khác biệt vì phần nội dung luân phiên có thể thay đổi giữa hai lần chụp.
-- 4 ảnh của khu vực “The art of…” cho thấy carousel tự chạy đã hiển thị ảnh sản phẩm khác; kiểm tra trực quan một cặp mobile dark xác nhận bố cục/thẻ không đổi, chỉ ảnh sản phẩm luân phiên.
-- 1 ảnh chi tiết sản phẩm desktop/light có khác biệt nhỏ (0,206% pixel).
-- Đây là giải thích cho khác biệt pixel, không phải chứng nhận rằng website khớp hoàn toàn với ảnh thiết kế tham chiếu.
+**Lưu ý về SHA:** bằng chứng chụp end-of-work thuộc runtime SHA `37163dc3c17af332f948311bc395c9839a10e345`; tài liệu/PR đã tiến tới SHA mới `b3b006eb107a3d90e0a8777f49839575a9c23f72`. Các workflow Validate và Admin Playwright đã PASS trên SHA mới. Workflow Liquid Glass run 39432636819 là push diagnostic run và bỏ qua các bước live archive/comparison; không mô tả nhầm run đó là một lần chụp Live mới.
 
-### Phạm vi còn phải chốt
-- Manifest hiện đã đồng bộ để không còn báo sai rằng deployment verification là HTTP 401 hoặc rằng end capture chưa chạy.
-- So khớp thiết kế với ảnh tham chiếu app-like Light/Dark vẫn chưa được xác nhận hoàn toàn: ảnh tham chiếu có bố cục mobile và nhóm sản phẩm khác với storefront live hiện tại. Không tự tạo dữ liệu/ảnh sản phẩm giả và không đổi giao diện storefront trong đợt kiểm tra Admin Preview khi chưa có phê duyệt phạm vi.
-- Nhánh fix chứa nhiều thay đổi Admin/API/migration/data/deploy/config ngoài phần kiểm toán giao diện. Không merge toàn bộ nhánh hoặc deploy Production như một phần của việc này.
-- Commit `245dcaed91557a67aeae1e7f67e5835f4abefa0e` chỉ đồng bộ tài liệu manifest; bằng chứng chụp ảnh cuối kỳ thuộc commit runtime `37163dc3c17af332f948311bc395c9839a10e345`. Workflow Validate và Admin Playwright đã PASS lại trên commit tài liệu mới.
+## 3. Giải thích pixel comparison
 
-## Kết luận
-Phần kiểm thử kỹ thuật và lưu trữ ảnh so sánh đã hoàn tất. Phần chưa được đánh dấu hoàn tất là chấp nhận trực quan thiết kế cuối cùng và kiểm soát phạm vi trước khi PR được người dùng duyệt. Production vẫn nguyên trạng; PR #108 vẫn mở.
+Manifest `docs/website-screenshots/manifest.json` đang ghi `AWAITING_HUMAN_VISUAL_REVIEW`.
 
-## Đã sửa trong nhánh thử nghiệm
-1. Sửa bài Playwright admin Preview để xác thực URL HTTPS thuộc hostname Cloudflare Pages Preview không phải production; chỉ cho phép đường dẫn admin đã định nghĩa.
-2. Cloudflare Access service-token headers chỉ được gửi đến đúng origin Preview, không gửi theo redirect hoặc sang domain khác; không in giá trị secret vào log.
-3. Thêm chẩn đoán DOM an toàn khi thiếu `#loginView` / `#loginForm`, gồm HTTP status, URL không có query string, title và sự hiện diện của các selector.
-4. Bật workflow Admin Preview Playwright khi push lên nhánh audit để có thể tự xác nhận bản sửa.
-5. Sửa phạm vi helper `count` trong bước tổng hợp báo cáo Liquid Glass.
-6. Sau các sửa đổi, run Admin Preview và Validate source/tests mới nhất đều PASS.
+- 66 ảnh baseline và 66 ảnh end-of-work đã được ghép cặp theo tên.
+- 57 cặp pixel-identical.
+- 9 cặp có khác biệt; không có khác biệt kích thước, ảnh PNG lỗi, ảnh baseline không ghép được hay ảnh kết quả không ghép được.
+- 4 ảnh full-page có thay đổi do nội dung/ảnh luân phiên.
+- 4 ảnh khu vực “The art of…” có ảnh sản phẩm khác vì carousel autoplay; kiểm tra một cặp xác nhận layout/thẻ ổn định.
+- 1 ảnh product-detail desktop/light có khác biệt nhỏ, báo cáo trước ghi khoảng 0,206% pixel.
+- Các giải thích trên không thay thế việc xem artifact và đối chiếu ảnh tham chiếu thiết kế. Ảnh tham chiếu app-like Light/Dark khác đáng kể về bố cục mobile và nhóm sản phẩm so với storefront hiện hữu. Không tự sửa storefront hay tạo dữ liệu/ảnh giả chỉ để ép giống ảnh tham chiếu khi chưa xác định rõ phạm vi.
 
-## Công việc còn lại — bắt buộc trước khi tuyên bố hoàn tất
-1. Đọc chính xác các artifact và log của lần visual audit gần nhất; đối chiếu screenshot, manifest, report và test route.
-2. Tìm nguyên nhân vì sao live capture chỉ có 46 ảnh và `productDetailContextsComplete=false`; cần đủ các ngữ cảnh trang chi tiết sản phẩm hợp lệ, không được giả lập dữ liệu live.
-3. Sửa script `scripts/capture-cloudflare-preview.mjs` theo DOM/route thực tế trong `public/index.html`; không hardcode route cũ nếu ứng dụng dùng canonical route khác. Kiểm tra mở menu mobile, mở từng product detail và đợi đúng tín hiệu giao diện trước khi chụp.
-4. Xác minh việc chụp ảnh phải thất bại rõ ràng nếu thiếu trang, thiếu route, hoặc screenshot không phải nội dung storefront. Đảm bảo local fixture và live Preview được báo cáo tách biệt.
-5. Xử lý Cloudflare API HTTP 401 bằng cách kiểm tra tên/điều kiện secret và quyền token mà không đọc hoặc in secret. Không yêu cầu người dùng dán token. Nếu cần thao tác thủ công trong Cloudflare dashboard, chỉ hỏi đúng bước tối thiểu sau khi tự hoàn tất phần có thể làm.
-6. Chạy lại visual audit trên **commit hiện tại**; kiểm tra báo cáo mới và artifact. Không chấp nhận chỉ vì job tổng thể màu xanh nếu các bước live capture/verify bị skip, fail hoặc báo NOT PASSED.
-7. Xác nhận cuối cùng: Admin Playwright PASS; source/tests PASS; Live visual audit PASS với đủ ảnh/route/context; deployment verification PASS; artifact được tạo; production không thay đổi; PR vẫn mở chờ người dùng duyệt.
+Artifact chính: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039/artifacts/12265723084  
+Báo cáo manifest: https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/website-screenshots/manifest.json
 
-## Quy tắc an toàn không được vi phạm
-- Không merge PR #108, không deploy hoặc thay đổi production.
-- Không ghi token, mật khẩu, service secret hoặc response body nhạy cảm vào file/log.
-- Không gửi Cloudflare Access headers đến production hay bên thứ ba.
-- Không tự đánh dấu pass nếu workflow chỉ chạy local fixture hoặc live steps bị skipped.
-- Mọi sửa đổi tiếp tục nằm trong nhánh `fix/liquid-glass-audit-2026-10-19`.
+## 4. Các thay đổi/kết quả kỹ thuật đã ghi nhận
 
-## Các liên kết chính
-- PR: https://github.com/chichute5500/Sindarealest-admin/pull/108
-- Admin Preview latest PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39413543764
-- Validate source/tests latest PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39413543869
-- Visual audit report gần nhất (Live chưa đạt): https://github.com/chichute5500/Sindarealest-admin/actions/runs/39411977810
-- Preview: https://3ed49bcc.sindarealest2.pages.dev/
-- Production — chỉ để xác định ranh giới, không chỉnh sửa: https://sindarealest2.pages.dev/
+1. Playwright Admin Preview kiểm tra URL HTTPS thuộc đúng Cloudflare Pages Preview, tránh production và chỉ mở các đường dẫn admin đã định nghĩa.
+2. Cloudflare Access service-token headers chỉ gửi tới đúng Preview origin; không chuyển tiếp theo redirect hoặc gửi sang domain khác; không in secret.
+3. Bổ sung chẩn đoán an toàn khi thiếu selector login; không đưa query string/secret vào log.
+4. Bật workflow Admin Preview Playwright trên push vào nhánh audit.
+5. Sửa helper tổng hợp số lượng trong workflow Liquid Glass.
+6. Sửa verifier/capture để dùng alias Preview của nhánh và yêu cầu deployment SHA trùng chính xác source SHA trước khi archive.
+7. Sửa product detail route checks theo canonical route thực tế; kiểm tra click từ card, direct-open và reload.
+8. Sửa gallery check cho sản phẩm có một ảnh; sửa đọc HTTP status khi reload.
+9. Thêm xử lý retry khi welcome splash/transient overlay tự biến mất trong lúc chụp, nhưng vẫn giữ hard failure cho lỗi thực sự.
+10. Tạo archive start/end và báo cáo pixel comparison, không dựa đơn thuần vào màu xanh của workflow.
 
+## 5. Việc còn lại để đạt 100%
 
-## Cập nhật điều tra trực tiếp — 2026-10-20 18:45 UTC+7
-- Head trước sửa: `7a0c5091ed3ec6c73fabbf7fe432287a95a32e21`. Admin Playwright và Validate source/tests PASS tại SHA này: [Admin](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39416521269), [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39416521283).
-- Đã đọc artifact của run [39416521293](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39416521293), không chỉ dựa vào job conclusion. Báo cáo Live: 46 ảnh, 8/8 viewport/theme, đủ 28 ảnh section, menu 2, order 4; product detail 4/4 FAIL vì URL Preview thực tế là `/san-pham/sneakers-26-41-a`, trong khi source của nhánh sinh canonical route `/sanpham/{category}/{product-key}`. Console/page/HTTP errors = 0, broken images = 0, nhưng 4 hard failures route; live audit NOT PASSED.
-- Nguyên nhân deployment metadata: API xác minh hoạt động nhưng alias `https://3ed49bcc.sindarealest2.pages.dev/` không gắn với deployment gần nhất của nhánh. API trả về candidate Preview đã thành công cho đúng branch và SHA: deployment `648acb3d-ec92-4e05-83d0-d815a79e6af9`, commit `7a0c5091ed3ec6c73fabbf7fe432287a95a32e21`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev`. Trạng thái trước đó là `DEPLOYMENT_NOT_FOUND`, không phải lỗi token 401 ở lần mới nhất.
-- Sửa trực tiếp trên đúng nhánh hai mặc định/đích của workflow: `.github/workflows/liquid-glass-visual-preview.yml` và `scripts/capture-cloudflare-preview.mjs` chuyển sang alias branch đã được Cloudflare API trả về. Không nới lỏng điều kiện route/context, không sửa main, không merge PR và không triển khai production.
-- Commit workflow URL: `43403b2d4e67e814b11ec2f4c086f7aa5ce411ab`; commit capture default: `eb21835f0783bbed72c3fcc4f18039e3b9887521`. Chờ các Actions mới kích hoạt từ commit mới để xác minh lại; không coi các run cũ là bằng chứng cho sửa đổi này.
-- Trạng thái tại thời điểm ghi: Admin/Validate của SHA trước PASS; Live capture và deployment verification cho SHA mới CHƯA XÁC MINH; archive chuẩn vẫn BLOCKED; Production không bị thay đổi; PR #108 vẫn mở.
+1. Mở artifact run 39425677039 (ID 12265723084), xem `report.html`, `comparison.json` và đủ 9 cặp ảnh thay đổi; xác nhận nguyên nhân từng cặp, không chỉ dựa trên phần mô tả.
+2. Đối chiếu các ảnh tham chiếu gốc Light/Dark đã được cung cấp với phạm vi đang kiểm tra. Tách rõ yêu cầu giao diện Admin Preview khỏi yêu cầu thiết kế storefront khách hàng. Không tự ý đổi giao diện web tĩnh.
+3. Nếu có sai lệch thiết kế thuộc đúng phạm vi Admin Preview, tìm file/selector liên quan, sửa trên nhánh fix, bổ sung test phù hợp và không đụng Production. Nếu khác biệt chỉ do carousel autoplay/nội dung động, ghi rõ là khác biệt phi cấu trúc và không sửa hành vi chỉ để làm pixel diff xanh.
+4. Nếu sửa runtime, chờ Cloudflare Preview deploy đúng SHA; chạy lại Validate, Admin Playwright, live visual audit; xác minh exact deployment SHA; tạo artifact; cập nhật manifest/báo cáo. Không chụp/archive khi deployment SHA không khớp.
+5. Đồng bộ báo cáo và manifest để chúng phản ánh đúng các run hiện hành. Sau khi cập nhật tài liệu, kiểm tra lại Actions tại head mới; phân biệt push diagnostic (các bước live bị skip) với end-capture run thật.
+6. Kết luận theo bằng chứng: PASS, FAIL hoặc NEEDS HUMAN REVIEW cho từng tiêu chí. Chỉ đánh dấu 100% khi các mục bắt buộc đã đóng và không còn review bắt buộc.
+7. Giữ PR #108 OPEN, không merge, không deploy Production, trừ khi người dùng đưa chỉ thị rõ ràng riêng.
 
-- Bổ sung thêm guard nghiệm thu: deployment verification hiện yêu cầu `EXPECTED_DEPLOYMENT_SHA` là SHA 40 ký tự hợp lệ và chỉ xác nhận khi commit Cloudflare trùng SHA nguồn chính xác; bước archive cũng so sánh trực tiếp `deployed.commitHash === SOURCE_SHA`. Không được archive chỉ vì deployment cùng branch.
-- Verifier commit: `193054fb64ec7efad116e9e4c32102be1ac01bf4`; workflow guard commit: `9b59569c81a3c9b9ce76ac5d9788a31bd5237783`. Các workflow do các commit mới kích hoạt phải được đọc lại trước khi kết luận.
+## 6. Quy tắc an toàn / phạm vi
 
+- Không sửa `main`, không merge PR #108, không deploy Production.
+- Không đọc, in, ghi hoặc yêu cầu người dùng dán token/mật khẩu/service secret.
+- Không gửi Cloudflare Access headers tới production hoặc domain ngoài Preview.
+- Không ghi “PASS” cho bước bị skipped, fixture-only, artifact thiếu hoặc deployment SHA không khớp.
+- Giữ nguyên giao diện web tĩnh khách hàng ngoài phạm vi đã được xác nhận; ưu tiên Admin Preview audit.
+- Tiếp tục làm trực tiếp qua GitHub Actions/repository; chỉ yêu cầu người dùng thao tác nếu thật sự cần quyền hoặc quyết định không thể tự thực hiện.
 
-## Kết quả nghiệm thu Live Preview mới nhất — 2026-10-20 19:02 UTC+7
+## 7. Prompt bàn giao cho ChatGPT mới (copy toàn bộ)
 
-### Commit đã được kiểm thử đầy đủ
-- **SHA:** `963adaf309d3cea8f5bfab669fca8be57144e295`.
-- **PR #108:** vẫn OPEN, chưa merge; base `main`; branch head và PR head cùng SHA tại thời điểm kiểm tra.
-- **Admin Preview Playwright:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/39418613033
-- **Validate source and tests:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/39418612494
-- **Liquid Glass isolated visual preview:** workflow/job PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/39418612604
+Bạn tiếp quản trực tiếp công việc **SinDarealest2 Admin Preview & Liquid Glass audit**, không bắt đầu lại từ đầu và không chỉ hướng dẫn người dùng tự làm. Người dùng chủ yếu dùng Android và không phải lập trình viên; hãy tự đọc repository, file, GitHub Actions, artifacts và sửa trên GitHub khi có thể.
 
-### Đã đọc artifact và JSON, không chỉ dựa vào trạng thái workflow
-- Artifact: `sindarealest-liquid-glass-preview-354`, ID `12262491730`, tải lên thành công, chưa hết hạn; gồm HTML report, 54 ảnh fixture và 66 ảnh Live Preview thật.
-- Live report: `passed=true`, `captureCompleted=true`, `accessBlocked=false`; `sourceCommit` khớp SHA nguồn `963adaf309d3cea8f5bfab669fca8be57144e295`.
-- Coverage: 66 ảnh Live; 8/8 viewport/theme pairs; 4 ảnh full-page; đủ 7 section × 4 ảnh; 2 menu-open; 4 order-expanded; 12 route checks; 4/4 product-detail contexts PASS gồm click từ card, direct-open và reload HTTP 200.
-- Lỗi: console=0, page=0, HTTP=0, failed requests=0, broken images=0, overflow=0, read-only violations=0, hard failures=0. Có 32 request ngoài origin bị chặn theo allowlist của audit (Cloudflare beacon và API tỉnh/thành); không có failed request/HTTP error được ghi nhận.
-- Local fixture audit trong cùng artifact: PASS; 54 ảnh, 235 fixture products, 20 responsive cases, 93 interaction checks; overflow/console/page/HTTP/hard failures đều 0.
+**Repo:** `chichute5500/Sindarealest-admin`  
+**Nhánh duy nhất đang làm:** `fix/liquid-glass-audit-2026-10-19`  
+**PR:** https://github.com/chichute5500/Sindarealest-admin/pull/108 (OPEN, chưa merge)  
+**Branch/PR head đã xác minh gần nhất:** `b3b006eb107a3d90e0a8777f49839575a9c23f72`  
+**Preview:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/  
+**Production:** https://sindarealest2.pages.dev/ — chỉ đọc để phân biệt, tuyệt đối không sửa/deploy.
 
-### Xác minh deployment bằng Cloudflare Pages API
-- `passed=true`, `status=VERIFIED_PREVIEW_DEPLOYMENT`.
-- Alias: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
-- Branch: `fix/liquid-glass-audit-2026-10-19`; environment `preview`; deployment ID `ffb3867c-8319-40e1-9c20-ac55f8244a45`; stage `deploy=success`.
-- `expectedCommitSha`, `commitHash` đều là `963adaf309d3cea8f5bfab669fca8be57144e295`; `commitMatchesExpected=true`. Không còn là xác minh theo branch-only.
-- Không còn lỗi HTTP 401 ở lần này; lỗi trước đó với alias `3ed49bcc...` được xử lý bằng cách chuyển sang alias Preview theo branch được Cloudflare API trả về. Không thay token/secret, không yêu cầu người dùng cung cấp bí mật.
+### Trạng thái cần tin cậy
+- Validate source/tests PASS tại run 39432636732.
+- Admin Preview Playwright PASS tại run 39432636764.
+- Liquid Glass push diagnostic run 39432636819 kết thúc success, nhưng live capture/archive steps bị skipped; đừng gọi đây là lần chụp Live mới.
+- Baseline start-of-work: run 39423635778, 66 ảnh Live Preview.
+- End-of-work + pixel comparison: run 39425677039, artifact ID 12265723084, 66 ảnh end. 66 cặp: 57 pixel-identical, 9 changed, 0 dimension mismatch, 0 unmatched/invalid pairs.
+- Capture SHA đã được Cloudflare Pages API xác minh exact-match là `37163dc3c17af332f948311bc395c9839a10e345`, deployment ID `1ab8617f-aac1-42f2-9112-4acc6b0d007a`.
+- Live audit trong capture đã PASS 8/8 viewport/theme, 12 route checks, 4/4 product-detail contexts; zero overflow, page/console errors và read-only violations.
+- Manifest status `AWAITING_HUMAN_VISUAL_REVIEW`. Công việc khoảng 90%, chưa được tuyên bố 100%.
+- 9 cặp ảnh khác nhau được mô tả ở phần 3 của báo cáo này; phải mở artifact để review thật.
+- Production chưa bị thay đổi bởi đợt công việc này; PR vẫn mở.
 
-### Sửa lỗi dẫn đến PASS
-1. Đổi workflow/capture sang alias Preview theo branch đã được API xác nhận; route thật của nhánh là `/sanpham/{category}/{product-key}`.
-2. Bổ sung `EXPECTED_DEPLOYMENT_SHA` và guard archive yêu cầu SHA deployment trùng chính xác `SOURCE_SHA`.
-3. Gallery check dựa trên số thumbnail thực tế để không timeout khi sản phẩm chỉ có một ảnh.
-4. Reload check đọc `Response.status()` đúng cách, không đọc hàm như thuộc tính; xác minh HTTP status thực tế và state chi tiết sau reload.
-5. Đã sửa một assertion test không đúng ở commit trung gian `5d63ff...`; các lần Validate tiếp theo trên SHA `963adaf...` đều PASS. Không dùng run fail trung gian làm bằng chứng trạng thái hiện tại.
+### Hành động tiếp theo — thực hiện theo thứ tự
+1. Đọc file báo cáo này và `docs/website-screenshots/manifest.json` ở branch head mới nhất trước khi làm gì.
+2. Kiểm tra branch head, PR head và workflow runs hiện tại bằng GitHub tools; không dựa vào thông tin cũ nếu SHA đã đổi.
+3. Đọc artifact 12265723084 của run 39425677039: xem `report.html`, `comparison.json` và đủ 9 cặp changed screenshots. Phân loại từng khác biệt: carousel/dynamic content, thay đổi cấu trúc, hoặc sai lệch so với reference.
+4. Xác định rõ phạm vi: công việc chính là Admin Preview audit; không thiết kế lại public static storefront, không thay Liquid background/hiệu ứng của storefront, không tạo dữ liệu sản phẩm giả.
+5. Nếu tìm thấy lỗi thực sự thuộc phạm vi Admin Preview, sửa trên branch fix, thêm/sửa test, và chạy các workflow. Không nới lỏng assertion chỉ để có màu xanh.
+6. Sau mỗi sửa runtime, đợi Preview deploy đúng commit; xác minh bằng Cloudflare deployment metadata và exact SHA trước khi chụp. Nếu SHA không khớp, không archive.
+7. Chạy lại Validate source/tests, Admin Preview Playwright và live visual capture theo đúng workflow; đọc job steps/logs và artifact, không chỉ nhìn conclusion.
+8. Cập nhật `docs/ADMIN_PREVIEW_PROGRESS_2026-10-20.md` và `docs/website-screenshots/manifest.json` chính xác theo bằng chứng mới nhất; không để tài liệu cũ mô tả nhầm rằng live capture bị thiếu hoặc deployment verification lỗi nếu điều đó đã được khắc phục.
+9. Khi tất cả tiêu chí được xác minh, ghi kết luận từng tiêu chí, % tiến độ và phần còn cần người dùng duyệt. Chỉ báo 100% nếu không còn review bắt buộc.
+10. Không merge PR, không sửa main, không deploy Production. Không yêu cầu người dùng cung cấp secrets. Chỉ dừng để hỏi người dùng nếu cần ảnh tham chiếu không còn truy cập được hoặc cần quyết định thiết kế/phạm vi không thể suy ra an toàn.
 
-### An toàn / trạng thái còn lại
-- Không sửa `main`, không merge PR, không chạy deploy Production; các deployment xác nhận trong báo cáo đều là Cloudflare Pages **Preview**.
-- Không lưu ảnh vào kho archive chuẩn vì workflow này là push/diagnostic và không phải lần capture thủ công có xác nhận stage. Artifact đã có đủ báo cáo/ảnh để review; các bước archive start/end và pixel comparison vẫn CHƯA THỰC HIỆN, không được đánh dấu hoàn tất.
-- PR #108 vẫn mở để chủ dự án review.
-- **Kết luận:** Live Preview visual audit + deployment verification đã PASS ở SHA `963adaf...`; tuy nhiên toàn bộ quy trình archive start/end + pixel comparison chưa được chạy, nên tổng thể công việc không được tuyên bố 100% hoàn tất.
-
-## Final rerun after transient-overlay hardening — 2026-10-20 19:16 UTC+7
-
-### Kết quả xác minh tại SHA 'd222cc5735a3451b692d15d14d24adc792b976bb'
-- PR #108 và branch head cùng SHA; PR vẫn OPEN, chưa merge.
-- Validate source/tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39419835027
-- Admin Preview Playwright PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39419834832
-- Liquid Glass isolated visual preview PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39419834770
-- Artifact 'sindarealest-liquid-glass-preview-358', ID '12262598622', upload thành công, chưa hết hạn; gồm 66 PNG Live Preview và HTML/JSON report, cùng 54 ảnh local fixture trong cùng artifact.
-- Live report passed=true, captureCompleted=true, accessBlocked=false; sourceCommit=d222cc5735a3451b692d15d14d24adc792b976bb.
-- Coverage: 66 ảnh thật; 8/8 viewport/theme; 4 full-page; 7 section × 4 ảnh; menu 2; order expanded 4; 12 route checks; 4/4 product-detail contexts PASS (click card, direct-open, reload HTTP 200).
-- Console/page/HTTP errors=0; failed requests=0; broken images=0; overflow=0; read-only violations=0; hard failures=0. 32 external requests were blocked by the audit allowlist, not recorded as failed requests or HTTP errors.
-- Local fixture report PASS: 54 screenshots, 235 products, 20 responsive cases, 93 interaction checks; overflow/console/page/HTTP/hard failures=0.
-- Cloudflare Pages API verification PASS: alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/; Preview environment; branch đúng; deployment ID 'f954e594-cfb2-4fa3-8c6e-0254a3d192f9'; expectedCommitSha=commitHash=d222cc5735a3451b692d15d14d24adc792b976bb; commitMatchesExpected=true; deploy stage success.
-
-### Bản sửa transient overlay
-- Run trước ở SHA '921b441...' có một lần fail vì welcome splash bị detach trong lúc screenshot, khiến một viewport không hoàn tất dù các route khác PASS.
-- Đã bổ sung retry cho captureLocator và coi welcome splash là ảnh trạng thái tùy chọn nếu nó tự đóng giữa lúc chụp; lỗi mục tiêu bắt buộc vẫn là hard failure. Test assertion cho logic này được sửa và Validate PASS ở SHA 'd222cc...'.
-- Rerun mới tại SHA 'd222cc...' đã PASS đủ toàn bộ live coverage và exact deployment SHA; không còn lỗi transient overlay.
-
-### Phân biệt phạm vi hoàn tất
-- Toàn bộ checklist nghiệm thu nêu trong MASTER PROMPT đã có bằng chứng PASS tại SHA 'd222cc...' (PR/branch, Admin Playwright, Validate, live capture, screenshot threshold, viewport/theme, routes/product details, zero audit hard failures, exact deployment branch/SHA, artifact upload, Production không bị merge/deploy, PR vẫn mở).
-- Các bước manual archive vào 'docs/website-screenshots/start-of-work' / 'end-of-work' và pixel comparison không chạy trong push audit này; đây là workflow riêng cần chọn stage thủ công. Không ghi chúng là đã thực hiện, và không tạo/ghi đè archive baseline chỉ để làm xanh workflow.
-- Không merge PR, không sửa main, không triển khai Production.
-- Sau commit cập nhật tài liệu này, GitHub Actions sẽ chạy lại theo head mới; cần kiểm tra lại kết quả và SHA trước khi báo cáo cuối cùng.
-
-
-## Follow-up — canonical baseline archive and guarded end capture
-
-### Baseline archive verified
-- Live Preview start-of-work screenshots have now been archived successfully; this supersedes the earlier note above that archive stages were not yet performed.
-- Baseline capture run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39423635778
-- Baseline source/deployment SHA: `853e40f661d1d2718ab8d4f1dec9a33b81dacaae`; Cloudflare Pages API verified the exact Preview alias, branch, environment and commit SHA before archiving.
-- Archive manifest reports `CAPTURED_PASS`, 66 live PNG screenshots, 12 product-detail route checks, zero responsive overflow, zero console/page errors and zero read-only violations.
-- Baseline is an evidence snapshot of the current audited storefront; it is not claimed to represent an earlier pre-fix visual state.
-
-### End-of-work capture and pixel comparison
-- Updated the isolated visual workflow to accept a guarded `[capture-end-of-work]` commit on this fix branch. It reuses the checked-in Preview URL validator, requires the exact Preview deployment SHA, verifies the saved start baseline, and only then archives end screenshots and runs pixel comparison.
-- This commit requests the end-of-work capture. Its result is not considered complete until the corresponding GitHub Actions run reports successful deployment verification, archive creation, and comparison output.
-- Expected remaining review: inspect the generated matched-image pixel-diff report; pixel differences are evidence for human review, not an automatic aesthetic pass/fail.
-- Production remains untouched; no main edits or PR merge.
-
-
-### Retry end-of-work capture after concurrent branch advancement — 2026-10-20
-- First guarded end-capture run: [39424692332](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39424692332) did capture a passing live audit (66 screenshots, 8/8 viewport/theme pairs, all 12 route checks PASS, zero hard failures), but safely refused to archive because the branch advanced during the run.
-- The verifier expected source SHA `b20944686aa879fbd3324644c43e7323da903a22`; Cloudflare Pages had already deployed newer branch SHA `516d154c2a941fba1809eaf1c280f31ef123087a`. Exact-SHA guard worked as intended; no unverified end snapshot was saved.
-- Current retry is deliberately tagged `[capture-end-of-work]` against the current branch head so the deployment and workflow source can converge on the same SHA. Do not claim end archive or pixel comparison passed until the latest run confirms both.
-
-
-### Retry note — exact deployment SHA guard worked as intended
-- First end-capture attempt at source SHA `b20944686aa879fbd3324644c43e7323da903a22` was correctly blocked before archiving because Cloudflare's current Preview deployment had advanced to `516d154c2a941fba1809eaf1c280f31ef123087a`.
-- No end screenshots were archived and no pixel comparison was falsely reported as complete in that attempt. Live capture itself passed 66 screenshots and all 8/8 viewport/theme pairs, but deployment metadata did not match the run SHA.
-- The current branch head is `9d9b3fa8c6d221c4e2748f4fa674d459757d0d1c`. This commit requests a fresh guarded end capture against the latest branch revision; exact Preview SHA verification must pass before any end archive or pixel comparison is accepted.
+Hãy tiếp tục thực thi ngay, báo cáo ngắn gọn theo bằng chứng và chỉ yêu cầu người dùng thao tác khi thực sự không thể tự làm tiếp.
