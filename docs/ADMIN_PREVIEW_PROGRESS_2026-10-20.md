@@ -64,3 +64,40 @@
 
 - Bổ sung thêm guard nghiệm thu: deployment verification hiện yêu cầu `EXPECTED_DEPLOYMENT_SHA` là SHA 40 ký tự hợp lệ và chỉ xác nhận khi commit Cloudflare trùng SHA nguồn chính xác; bước archive cũng so sánh trực tiếp `deployed.commitHash === SOURCE_SHA`. Không được archive chỉ vì deployment cùng branch.
 - Verifier commit: `193054fb64ec7efad116e9e4c32102be1ac01bf4`; workflow guard commit: `9b59569c81a3c9b9ce76ac5d9788a31bd5237783`. Các workflow do các commit mới kích hoạt phải được đọc lại trước khi kết luận.
+
+
+## Kết quả nghiệm thu Live Preview mới nhất — 2026-10-20 19:02 UTC+7
+
+### Commit đã được kiểm thử đầy đủ
+- **SHA:** `963adaf309d3cea8f5bfab669fca8be57144e295`.
+- **PR #108:** vẫn OPEN, chưa merge; base `main`; branch head và PR head cùng SHA tại thời điểm kiểm tra.
+- **Admin Preview Playwright:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/39418613033
+- **Validate source and tests:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/39418612494
+- **Liquid Glass isolated visual preview:** workflow/job PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/39418612604
+
+### Đã đọc artifact và JSON, không chỉ dựa vào trạng thái workflow
+- Artifact: `sindarealest-liquid-glass-preview-354`, ID `12262491730`, tải lên thành công, chưa hết hạn; gồm HTML report, 54 ảnh fixture và 66 ảnh Live Preview thật.
+- Live report: `passed=true`, `captureCompleted=true`, `accessBlocked=false`; `sourceCommit` khớp SHA nguồn `963adaf309d3cea8f5bfab669fca8be57144e295`.
+- Coverage: 66 ảnh Live; 8/8 viewport/theme pairs; 4 ảnh full-page; đủ 7 section × 4 ảnh; 2 menu-open; 4 order-expanded; 12 route checks; 4/4 product-detail contexts PASS gồm click từ card, direct-open và reload HTTP 200.
+- Lỗi: console=0, page=0, HTTP=0, failed requests=0, broken images=0, overflow=0, read-only violations=0, hard failures=0. Có 32 request ngoài origin bị chặn theo allowlist của audit (Cloudflare beacon và API tỉnh/thành); không có failed request/HTTP error được ghi nhận.
+- Local fixture audit trong cùng artifact: PASS; 54 ảnh, 235 fixture products, 20 responsive cases, 93 interaction checks; overflow/console/page/HTTP/hard failures đều 0.
+
+### Xác minh deployment bằng Cloudflare Pages API
+- `passed=true`, `status=VERIFIED_PREVIEW_DEPLOYMENT`.
+- Alias: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Branch: `fix/liquid-glass-audit-2026-10-19`; environment `preview`; deployment ID `ffb3867c-8319-40e1-9c20-ac55f8244a45`; stage `deploy=success`.
+- `expectedCommitSha`, `commitHash` đều là `963adaf309d3cea8f5bfab669fca8be57144e295`; `commitMatchesExpected=true`. Không còn là xác minh theo branch-only.
+- Không còn lỗi HTTP 401 ở lần này; lỗi trước đó với alias `3ed49bcc...` được xử lý bằng cách chuyển sang alias Preview theo branch được Cloudflare API trả về. Không thay token/secret, không yêu cầu người dùng cung cấp bí mật.
+
+### Sửa lỗi dẫn đến PASS
+1. Đổi workflow/capture sang alias Preview theo branch đã được API xác nhận; route thật của nhánh là `/sanpham/{category}/{product-key}`.
+2. Bổ sung `EXPECTED_DEPLOYMENT_SHA` và guard archive yêu cầu SHA deployment trùng chính xác `SOURCE_SHA`.
+3. Gallery check dựa trên số thumbnail thực tế để không timeout khi sản phẩm chỉ có một ảnh.
+4. Reload check đọc `Response.status()` đúng cách, không đọc hàm như thuộc tính; xác minh HTTP status thực tế và state chi tiết sau reload.
+5. Đã sửa một assertion test không đúng ở commit trung gian `5d63ff...`; các lần Validate tiếp theo trên SHA `963adaf...` đều PASS. Không dùng run fail trung gian làm bằng chứng trạng thái hiện tại.
+
+### An toàn / trạng thái còn lại
+- Không sửa `main`, không merge PR, không chạy deploy Production; các deployment xác nhận trong báo cáo đều là Cloudflare Pages **Preview**.
+- Không lưu ảnh vào kho archive chuẩn vì workflow này là push/diagnostic và không phải lần capture thủ công có xác nhận stage. Artifact đã có đủ báo cáo/ảnh để review; các bước archive start/end và pixel comparison vẫn CHƯA THỰC HIỆN, không được đánh dấu hoàn tất.
+- PR #108 vẫn mở để chủ dự án review.
+- **Kết luận:** Live Preview visual audit + deployment verification đã PASS ở SHA `963adaf...`; tuy nhiên toàn bộ quy trình archive start/end + pixel comparison chưa được chạy, nên tổng thể công việc không được tuyên bố 100% hoàn tất.
