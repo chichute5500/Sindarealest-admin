@@ -56,6 +56,7 @@ const audit = {
   readOnlyViolations: [],
   hardFailures: [],
   contentChecks: [],
+  heroSkuChecks: [],
   sectionChecks: [],
   productDetailChecks: [],
   brokenImages: [],
@@ -239,6 +240,78 @@ async function dismissWelcomeSplash(page) {
   }, null, { timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(950);
 }
+async function auditHeroSku(page, label) {
+  const result = await page.evaluate(async () => {
+    const wantedSku = 'SD-GL052';
+    const imageElement = document.querySelector('#heroProductImage');
+    let apiStatus = null;
+    let publicProduct = null;
+    let expectedImage = '';
+    let apiError = null;
+    try {
+      const response = await fetch('/api/products', {
+        method: 'GET',
+        cache: 'no-store',
+        headers: { Accept: 'application/json' },
+      });
+      apiStatus = response.status;
+      if (!response.ok) throw new Error('public product API returned HTTP ' + response.status);
+      const payload = await response.json();
+      const products = Array.isArray(payload) ? payload : Array.isArray(payload?.products) ? payload.products : [];
+      publicProduct = products.find((product) =>
+        String(product?.sku || '').trim().toUpperCase() === wantedSku) || null;
+      if (publicProduct) {
+        expectedImage = String((Array.isArray(publicProduct.images) && publicProduct.images.length
+          ? publicProduct.images[0] : publicProduct.image) || '');
+      }
+    } catch (error) {
+      apiError = String(error?.message || error).slice(0, 180);
+    }
+    const normalize = (value) => {
+      const path = String(value || '');
+      return path.startsWith('./') ? path.slice(2) : path;
+    };
+    const source = imageElement?.getAttribute('src') || '';
+    const loaded = Boolean(imageElement && imageElement.complete && imageElement.naturalWidth > 0);
+    const status = imageElement?.dataset.productImageStatus || '';
+    const targetSku = imageElement?.dataset.productSku || '';
+    return {
+      requestedSku: wantedSku,
+      apiStatus,
+      apiError,
+      targetSkuInPublicApi: Boolean(publicProduct),
+      expectedImage: normalize(expectedImage),
+      actualImage: normalize(source),
+      targetSku,
+      status,
+      loaded,
+      hidden: Boolean(imageElement?.hidden),
+      matchesExactProductImage: Boolean(publicProduct)
+        && normalize(source) === normalize(expectedImage)
+        && targetSku === wantedSku
+        && status === 'ready'
+        && loaded
+        && !imageElement?.hidden,
+      missingSkuFailsClosed: !publicProduct
+        && Boolean(imageElement?.hidden)
+        && status === 'sku-not-found'
+        && !source,
+    };
+  });
+  const pass = result.apiStatus === 200 && result.matchesExactProductImage === true;
+  audit.heroSkuChecks.push({ context: label, status: pass ? 'PASS' : 'FAIL', pass, result });
+  if (!pass) {
+    const reason = result.apiStatus !== 200
+      ? 'public product API unavailable while verifying hero SKU'
+      : !result.targetSkuInPublicApi
+        ? 'SD-GL052 is not present in the public verified product payload'
+        : !result.matchesExactProductImage
+          ? 'Hero image does not match the first image of public SKU SD-GL052'
+          : 'Hero SKU verification failed';
+    audit.hardFailures.push(reason + ' at ' + label + '.');
+  }
+}
+
 async function auditImageElements(page, label) {
   const broken = await page.evaluate(() => Array.from(document.images).filter((img) => {
     const src = img.currentSrc || img.getAttribute('src') || '';
@@ -483,6 +556,9 @@ async function main() {
           }
           await dismissWelcomeSplash(page);
           await settle(page);
+          if (viewport.name === 'mobile-390' && theme === 'light') {
+            await auditHeroSku(page, label);
+          }
           await auditImageElements(page, label);
           await capture(page, screenshotStem('home', viewport, theme) + '-viewport.png', false, {
             ...captureMeta(viewport, theme), captureType: 'viewport', state: 'default-home',

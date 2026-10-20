@@ -30,4 +30,13 @@ const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the hero product 
 assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
   "The hero product should retain its real colors and use a natural drop shadow rather than color-altering blending.");
 
+const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
+assert.ok(liveCapture.includes("async function auditHeroSku(page, label)"),
+  "The live Preview capture must verify the requested SKU against the customer-visible public API.");
+assert.ok(liveCapture.includes("targetSkuInPublicApi: Boolean(publicProduct)"),
+  "The live audit must distinguish a missing/hidden SKU from a successfully loaded target image.");
+assert.ok(liveCapture.includes("normalize(source) === normalize(expectedImage)"),
+  "The live audit must confirm that the hero renders the exact image associated with SD-GL052.");
+assert.ok(liveCapture.includes("SD-GL052 is not present in the public verified product payload"),
+  "The live audit must report SKU visibility as a real blocker rather than declaring a hidden hero accepted.");
 console.log("PASS: storefront hero targets the exact SD-GL052 SKU and never substitutes another product image.");
