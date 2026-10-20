@@ -272,6 +272,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
 
   const screenshots = [];
   const metrics = [];
+  const visibleClosingTagIssues = [];
   const pageErrors = [];
   const consoleErrors = [];
   const attemptedWrites = [];
@@ -469,8 +470,15 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         rawClosingTagPseudoContent: rawClosingTagPseudoContent.slice(0, 10)
       };
     });
-    expect(measurement.rawClosingTagNodes, name + ' must not render raw closing-tag text in the viewport').toEqual([]);
-    expect(measurement.rawClosingTagPseudoContent, name + ' must not render closing-tag text through CSS pseudo-elements').toEqual([]);
+    if (measurement.rawClosingTagNodes.length || measurement.rawClosingTagPseudoContent.length) {
+      visibleClosingTagIssues.push({
+        screen: name,
+        viewport: variant.viewport,
+        theme: variant.theme,
+        textNodes: measurement.rawClosingTagNodes,
+        pseudoElements: measurement.rawClosingTagPseudoContent
+      });
+    }
     metrics.push({ screen: name, ...variant, ...measurement, ...extra });
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
     expect(measurement.horizontalOverflow, name + ' should not overflow horizontally at ' + variant.viewport.width + 'px').toBe(false);
@@ -551,6 +559,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     expect(pageErrors, 'Fixture visual renders should not throw browser runtime exceptions').toEqual([]);
     expect(attemptedWrites, 'The local fixture should block all mutating API calls').toEqual([]);
     expect(unexpectedApiPaths, 'Every Admin API request should use an explicit synthetic fixture').toEqual([]);
+    // Finish capturing every screen before failing so CI retains complete screenshots and DOM evidence.
+    visualAudit.visibleClosingTagIssues = visibleClosingTagIssues;
+    expect(visibleClosingTagIssues, 'No ADMIN screen should paint a raw HTML closing tag').toEqual([]);
     visualAudit.completed = true;
   } catch (error) {
     visualAudit.failure = String(error?.message || error).slice(0, 1200);
