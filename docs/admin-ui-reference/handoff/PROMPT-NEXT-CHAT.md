@@ -40,6 +40,14 @@ Mở theo thứ tự:
 - PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) vẫn OPEN/NOT MERGED, base `main`. Số commits/files thay đổi theo từng cập nhật handoff; truy vấn metadata live ngay khi bắt đầu, không dựa vào snapshot cũ. PR chứa phạm vi storefront/backend ngoài ADMIN; tuyệt đối không merge.
 - Cloudflare Production: NOT PERFORMED.
 
+## Trạng thái bổ sung đã xác minh — 2026-10-21
+
+- Source commit đã test gần nhất: `26b93b3f6ff5c93d69a3e8dc0b374e1744935ee6`; source blob `public/admin/index.html`: `6a0cf778f5d234a0f5084a796a73dec163ea52d7`. Current branch HEAD tại lần kiểm tra này: `e54d20cee1fb659cc5fad0a5a8d4ab06889d28e4` (evidence-only, chưa có source code mới hơn).
+- Run local checks: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39478738647 — `npm run check` PASS, `npm test` PASS, local Playwright PASS; artifact metadata có 42 PNG và 36 metrics, không có page/console errors, attempted writes hoặc unexpected API paths.
+- Remote Preview FAIL với signature được ghi ở log: `topbarBrandDisplay=flex`, `topbarBrandVisibility=visible`, `inlineHideRulePresent=false`, stylesheet không có login-hide rule trong khi source có rule. Đây là CSS signature mismatch đã có bằng chứng; root cause chính xác (URL/deployment) chưa được xác định. Không đọc/in secret, không bypass Access, không nới assertion.
+- PR #111 hiện được GitHub trả về trạng thái OPEN/unmerged, nhưng số changed files live là 488 ở lần kiểm tra gần nhất. PR chứa storefront/backend ngoài ADMIN; tuyệt đối không merge. Truy vấn lại PR live trước mọi hành động.
+- Tiến độ 43%, không nâng phần trăm trước khi Preview, đủ 12 màn hình, backend QA và audit diff được xử lý.
+
 ## 4. Việc phải làm tiếp theo — làm theo thứ tự
 
 ### A. Xác minh Preview đúng nguồn
