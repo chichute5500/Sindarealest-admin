@@ -1,7 +1,7 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
 **Trạng thái tổng thể:** `IN PROGRESS — AUTHENTICATED UI AND REFERENCE COMPARISON BLOCKED/PENDING`  
-**Ước tính tiến độ:** 38% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.  
+**Ước tính tiến độ:** 40% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.  
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
@@ -98,3 +98,30 @@
 - Deployed Preview: success.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+## Vòng sửa UI đã hoàn tất — login shell — 2026-10-20
+
+### Sai lệch trước sửa
+- Screenshot thật từ Playwright tại `390×844` Light/Dark cho thấy thanh topbar lặp logo bên cạnh logo trong thẻ đăng nhập; nút thông báo và nhãn kết nối cũng xuất hiện trước khi đăng nhập. Đây là khác biệt trực quan so với mockup đã mở (logo nằm trong thẻ, màn hình đăng nhập không có app header đầy đủ).
+
+### Thay đổi đã thực hiện
+- File: `public/admin/index.html`; commit source: `e8f12357b9fcd9838d778ff1a0bcc46588e1d837`.
+- Thêm CSS chỉ áp dụng khi `#loginView` đang hiện: ẩn logo topbar, nhãn kết nối, nút thông báo và logout; giữ nút đổi Light/Dark dạng icon nhỏ ở góc trên phải.
+- Không thay đổi JS đăng nhập, API, auth, dữ liệu hay các màn hình app đã đăng nhập.
+
+### Kiểm thử và bằng chứng
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39444345149
+- `npm run check`: PASS.
+- `npm test`: PASS.
+- Playwright local source matrix: PASS, 16 PNG thật ở 8 viewport × Light/Dark, không có page errors, console errors, failed requests hoặc HTTP errors; không có horizontal overflow trên ma trận.
+- Playwright Preview thật: 2/2 test PASS — mở trang login và đăng nhập xác minh dashboard. Test dùng secret đã cấu hình trong GitHub Actions; giá trị không được ghi vào log.
+- Artifact: `admin-preview-evidence-38`; lịch sử commit được workflow ghi vào `docs/admin-ui-reference/handoff/history/e8f12357b9fc/`.
+- Đã tải artifact và xem trực tiếp `admin-login__390x844__light.png` và `admin-login__390x844__dark.png`: logo topbar và nút thông báo đã biến mất; logo trong card còn một lần; nút theme vẫn hoạt động và hiển thị. Không thấy lỗi hiển thị rõ ràng trong hai ảnh này.
+- Ảnh app hiện tại được so sánh định tính với mockup tham chiếu. Chưa có pixel-diff tự động; chưa có screenshot module đã đăng nhập.
+- Lưu ý: test Preview hiện chỉ xác minh login + dashboard visibility; chưa test CRUD hay các view nghiệp vụ khác. Local matrix chỉ chụp login shell.
+
+### Trạng thái Preview
+- Trong run này, Cloudflare Access không chặn: Playwright Preview test login/dashboard thành công qua đường truy cập đã được cấu hình. Không còn coi Preview là blocker tuyệt đối.
+- Bước tiếp theo là chụp/kiểm thử các view sau đăng nhập theo cách chỉ đọc và không để lộ dữ liệu khách hàng/đơn hàng trong artifact.
+
