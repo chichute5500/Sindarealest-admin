@@ -1,6 +1,6 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — LOCAL LOGIN MATRIX PASS; REMOTE PREVIEW SOURCE MISMATCH; FULL MODULE QA OPEN`
+**Trạng thái tổng thể:** `IN PROGRESS — LOCAL CHECKS PASS; PREVIEW SOURCE MISMATCH; VISUAL AUDIT AND FULL MODULE QA OPEN`
 **Ước tính tiến độ:** 42% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
 **Repository:** `chichute5500/Sindarealest-admin`  
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
@@ -113,3 +113,13 @@
 3. Chạy lại `npm run check`, `npm test`, ma trận Playwright sau mỗi thay đổi có ý nghĩa.
 4. Với Preview, cần một URL Preview trỏ đúng source nhánh ADMIN và quyền truy cập hợp lệ; không in secret, không bỏ qua Cloudflare Access.
 5. Giữ PR #111 OPEN, không merge; không deploy Production.
+
+## Đối chiếu trực quan thực tế — 2026-10-21
+
+- Đã mở ảnh tham chiếu nhúng trong `admin-mobile-reference.html` (ảnh chuẩn gồm 12 màn hình: đăng nhập, dashboard, danh sách/thêm-sửa sản phẩm, gallery, danh sách/chi tiết đơn hàng, khách hàng, bảo hành/hỗ trợ, cài đặt, sao lưu/khôi phục, nhật ký hoạt động).
+- Đã tải artifact thật của workflow 39464800722 và xem ảnh Playwright `admin-login__390x844__light.png` từ source commit `994fefada36ebcc3d63da32e1fe7e01e532ef712`.
+- Ảnh source hiện tại cho thấy login shell có nền vảy nhạt, card kính sáng, logo căn giữa, ô mật khẩu, nút hiện/ẩn và nút đăng nhập; không có tràn ngang ở viewport được kiểm tra.
+- Sai khác nhìn thấy so với ảnh tham chiếu: tagline thương hiệu hiện là “Đăng nhập quản trị” trong khi reference dùng lockup “Luxury in Every Detail”; heading hiện là “Đăng nhập” thay vì “Đăng nhập quản trị”. Ảnh tham chiếu còn có email/số điện thoại, “Ghi nhớ đăng nhập” và “Quên mật khẩu”; source backend hiện xác thực bằng mật khẩu quản trị duy nhất, vì vậy không tự thêm trường/checkbox/luồng giả làm thay đổi hợp đồng xác thực.
+- **Giới hạn:** chỉ quan sát được ảnh đăng nhập source cục bộ. Chưa có ảnh Playwright của các màn hình sau đăng nhập để đối chiếu với 11 màn hình còn lại. Preview từ xa vẫn sai signature và không thể dùng để xác nhận source hiện tại.
+- Một lần cập nhật markup đăng nhập qua connector đã bị chặn trước khi ghi; không tuyên bố thay đổi copy này đã được áp dụng. Cần dùng một đường chỉnh sửa an toàn khác hoặc tiếp tục sau khi có môi trường checkout/patch được chấp nhận.
+
