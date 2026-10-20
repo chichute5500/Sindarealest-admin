@@ -899,3 +899,48 @@ Khi người dùng đưa ra yêu cầu bổ sung:
 
 Mệnh lệnh cuối của phần quản lý ngữ cảnh:
 HÃY ĐỌC ĐÚNG NGUỒN, XÁC MINH TRẠNG THÁI, CHỈ NẠP THÔNG TIN CẦN THIẾT, PHÂN BIỆT BẰNG CHỨNG VỚI SUY ĐOÁN, VÀ CẬP NHẬT BÀN GIAO TẠI NGUỒN CHUẨN. MỤC TIÊU LÀ GIÚP AI HIỂU ĐÚNG VÀ TIẾP TỤC ĐƯỢC CÔNG VIỆC, KHÔNG PHẢI TẠO THÊM NHIỀU FILE PROMPT TRÙNG LẶP.
+
+
+XXI. BÀN GIAO TRẠNG THÁI THỰC TẾ CHO CHAT MỚI — CẬP NHẬT 2026-10-20
+
+Đây là phần bàn giao trạng thái mới nhất của nhiệm vụ WEBSITE TĨNH. Khi có khác biệt giữa ghi chú cũ và bằng chứng mới bên dưới, hãy xác minh manifest/workflow mới nhất và ưu tiên bằng chứng có thời gian mới hơn. Không xóa lịch sử cũ.
+
+### A. Phạm vi và ranh giới
+- Repository: `chichute5500/Sindarealest-admin`.
+- Nhánh làm việc được phép: `fix/liquid-glass-audit-2026-10-19`.
+- Preview cần kiểm tra: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Production: `https://sindarealest2.pages.dev` — TUYỆT ĐỐI không merge/deploy, không đổi cấu hình Production, DNS, secrets, bindings, D1/R2 hoặc dữ liệu thật.
+- Chỉ xử lý website công khai/static storefront. Không sửa giao diện Admin trong nhiệm vụ này; không trộn với AI grouping, ZIP import hoặc công việc độc lập khác.
+- Người dùng yêu cầu: tiếp tục chạy và chỉ báo cáo tiến độ; không tự dừng giữa chừng. Chỉ dừng để hỏi khi thực sự cần người dùng thao tác hoặc cần quyết định thay đổi ngoài phạm vi đã duyệt. Báo cáo ngắn, có bằng chứng, rồi tiếp tục bước kế tiếp.
+
+### B. Bằng chứng đã xác minh gần nhất
+- Workflow live Preview + screenshot comparison: [GitHub Actions run 39425677039](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39425677039) — SUCCESS.
+- Preview deployment được xác minh: `1ab8617f-aac1-42f2-9112-4acc6b0d007a`, branch `fix/liquid-glass-audit-2026-10-19`, source commit `37163dc3c17af332f948311bc395c9839a10e345`.
+- Ảnh live baseline: `docs/website-screenshots/start-of-work/` — 66 ảnh.
+- Ảnh live sau công việc: `docs/website-screenshots/end-of-work/` — 66 ảnh.
+- Pixel comparison: 66 cặp; 57 cặp giống hệt, 9 cặp khác biệt, 0 mismatch kích thước, 0 cặp thiếu hoặc PNG không hợp lệ.
+- Live Playwright audit: 8/8 cặp viewport/theme PASS; kiểm tra mở chi tiết từ thẻ sản phẩm, mở trực tiếp canonical URL và reload PASS; không ghi nhận horizontal overflow, page/console errors hoặc hành động ghi dữ liệu ngoài ý muốn.
+- Manifest nguồn sự thật: `docs/website-screenshots/manifest.json`. Báo cáo audit: `docs/visual-audit-progress-2026-10-19.md`.
+
+### C. Hai ảnh mẫu gốc phải được đối chiếu
+- Mobile Light: `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png`.
+- Mobile Dark: `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`.
+- Hướng dẫn tham chiếu: `docs/static-web-reference/README.md`.
+- Không tráo vai trò Light/Dark. Ảnh trước/sau chỉ xác định phần nào đã thay đổi; nó KHÔNG chứng minh giao diện đã giống mẫu.
+
+### D. Việc chưa hoàn thành — bắt đầu tại đây
+1. Mở và kiểm tra trực tiếp hai ảnh mẫu gốc và ảnh cuối tương ứng ở cả Light/Dark trên mobile. Không chỉ đọc pixel-diff summary.
+2. Đánh giá khác biệt bố cục, tỷ lệ, khoảng cách, font, màu, nền/ảnh, các thẻ/ô nội dung và thứ tự thị giác. Tách biệt lỗi layout thực sự với thay đổi ảnh sản phẩm do carousel autoplay.
+3. Đặc biệt kiểm tra khác biệt nhỏ ở product-detail desktop-Light; xác định xem đó là khác biệt thiết kế hay trạng thái/ảnh động trước khi sửa.
+4. Nếu cần chỉnh giao diện, thực hiện thay đổi nhỏ nhất nhưng đủ để hướng đến ảnh mẫu; được phép tái thiết kế frontend theo các nguyên tắc của prompt này. Không thay đổi business logic/API, dữ liệu sản phẩm, URL/SKU/ảnh nguồn, backend hoặc Admin ngoài phạm vi.
+5. Chạy kiểm tra source/tests và workflow Playwright Preview sau mỗi nhóm thay đổi. Chụp lại đúng viewport/theme/route, so sánh với ảnh mẫu và baseline, xem kết quả mới nhất. Giữ lại bằng chứng và cập nhật manifest + báo cáo + prompt này.
+6. Lặp lại cho đến khi không còn khác biệt thiết kế trọng yếu đã xác minh và các test liên quan PASS. Không tuyên bố 100% nếu chưa có đánh giá trực quan có căn cứ.
+
+### E. Cách tiếp tục trong chat mới
+- Trước hết đọc prompt này, `docs/visual-audit-progress-2026-10-19.md`, `docs/website-screenshots/manifest.json`, hai README tham chiếu và PR/workflow hiện tại.
+- Xác minh branch HEAD, PR #108, Preview deployment identity và workflow run mới nhất trước khi sửa; đừng dựa mù quáng vào SHA cũ.
+- Dùng GitHub Actions/Cloudflare Pages Preview và Playwright; người dùng làm việc trên Android nên không yêu cầu họ chạy Wrangler cục bộ.
+- Tiến độ phần kiểm thử kỹ thuật: capture/so sánh tự động đã hoàn tất. Nghiệm thu thiết kế cuối cùng vẫn PENDING human visual review. Không dùng lại con số tiến độ cũ nếu chưa tính lại theo các hạng mục hiện tại.
+- Sau mỗi lượt: ghi rõ đã làm gì, test nào PASS/FAIL, link run/commit, phần còn thiếu và tiến độ ước tính có căn cứ; sau đó tiếp tục bước tiếp theo nếu không cần người dùng quyết định.
+
+MỆNH LỆNH TIẾP QUẢN: KHÔNG LẶP LẠI CÁC BƯỚC ĐÃ PASS NẾU KHÔNG CÓ REGRESSION. ĐI THẲNG VÀO VIỆC CÒN THIẾU LÀ ĐỐI CHIẾU THỊ GIÁC VỚI ẢNH MẪU, SỬA ĐÚNG KHÁC BIỆT ĐÃ XÁC MINH, CHẠY LẠI PLAYWRIGHT, VÀ CẬP NHẬT BÀN GIAO.
