@@ -157,6 +157,7 @@ async function main() {
   report.expectedBranch = expectedBranch;
 
   const matches = [];
+  const branchCandidates = [];
   let totalPages = 1;
   const maxPages = 10;
   for (let page = 1; page <= Math.min(totalPages, maxPages); page += 1) {
@@ -206,6 +207,32 @@ async function main() {
     totalPages = Number(payload?.result_info?.total_pages || 1);
     for (const deployment of payload.result) {
       if (matchesPreviewDeployment(deployment, previewUrl)) matches.push(deployment);
+      const metadata = deployment?.deployment_trigger?.metadata || {};
+      const deploymentBranch = String(metadata.branch || '').trim();
+      const stage = deployment?.latest_stage || (Array.isArray(deployment?.stages) ? deployment.stages.at(-1) : null);
+      if (String(deployment?.environment || '').toLowerCase() === 'preview'
+          && deploymentBranch === expectedBranch && branchCandidates.length < 12) {
+        const aliases = Array.isArray(deployment?.aliases) ? deployment.aliases
+          .filter((alias) => {
+            try { return new URL(alias).hostname.toLowerCase().endsWith('.sindarealest2.pages.dev'); }
+            catch { return false; }
+          }).slice(0, 5) : [];
+        branchCandidates.push({
+          id: typeof deployment?.id === 'string' ? deployment.id : null,
+          url: typeof deployment?.url === 'string' ? deployment.url : null,
+          aliases,
+          environment: 'preview',
+          branch: deploymentBranch,
+          commitHash: /^[a-f0-9]{7,64}$/i.test(String(metadata.commit_hash || '')) ? metadata.commit_hash : null,
+          status: String(deployment?.status || stage?.status || '').toLowerCase() || null,
+          latestStage: {
+            name: typeof stage?.name === 'string' ? stage.name : null,
+            status: String(stage?.status || '').toLowerCase() || null,
+          },
+          createdOn: shortDate(deployment?.created_on),
+          modifiedOn: shortDate(deployment?.modified_on),
+        });
+      }
     }
   }
 
@@ -214,6 +241,10 @@ async function main() {
     : true);
   if (uniqueMatches.length !== 1) {
     report.status = uniqueMatches.length === 0 ? 'DEPLOYMENT_NOT_FOUND' : 'AMBIGUOUS_DEPLOYMENT';
+    if (uniqueMatches.length === 0 && branchCandidates.length) {
+      report.sameBranchPreviewCandidates = branchCandidates;
+      report.note = 'The exact supplied alias was not found among recent Preview deployments. Candidate deployments below are limited to the expected branch; use an alias returned by Cloudflare for the intended current Preview, not a guessed deployment URL.';
+    }
     await fail(report, uniqueMatches.length === 0
       ? 'Cloudflare Pages API could not associate the exact Preview alias with a Preview deployment. No screenshots can be archived as verified.'
       : 'The exact Preview alias matched more than one deployment record. Refusing to guess which commit is live.');
