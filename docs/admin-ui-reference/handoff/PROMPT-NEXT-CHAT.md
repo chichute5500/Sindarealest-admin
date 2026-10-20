@@ -48,6 +48,13 @@ Mở theo thứ tự:
 - PR #111 hiện được GitHub trả về trạng thái OPEN/unmerged, nhưng số changed files live là 488 ở lần kiểm tra gần nhất. PR chứa storefront/backend ngoài ADMIN; tuyệt đối không merge. Truy vấn lại PR live trước mọi hành động.
 - Tiến độ 43%, không nâng phần trăm trước khi Preview, đủ 12 màn hình, backend QA và audit diff được xử lý.
 
+## Kết quả kiểm thử mới nhất — 2026-10-21
+
+- Run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39480806835 trên commit `7e41313efcc1bba8302bacbad79327696a1fb0d1`: `npm run check` PASS, `npm test` PASS, local Playwright PASS; 16 ảnh login shell + 42 ảnh module fixture + 36 metrics. Module dùng fixture read-only, không phải backend thật.
+- Preview vẫn FAIL CSS signature: header brand hiện visible, stylesheet từ xa thiếu login-hide rule có trong source. Root cause URL/deployment chưa xác định.
+- Đã thêm assertion text-node cho literal `</div>`; nó không tái hiện trong run này dù ảnh customer cũ từng có chuỗi đó. Chưa đóng lỗi: kiểm tra pseudo-element/CSS và mở ảnh customer từ artifact mới trước khi sửa source.
+- Branch HEAD sau lưu evidence: `cdec188efa2198caaf0ac65cd294b682d1088fc9` (evidence-only). PR #111 OPEN/unmerged; không merge hoặc deploy Production.
+
 ## 4. Việc phải làm tiếp theo — làm theo thứ tự
 
 ### A. Xác minh Preview đúng nguồn
