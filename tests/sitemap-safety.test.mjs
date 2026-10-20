@@ -25,7 +25,7 @@ const response = await sitemap({
 assert.equal(response.status, 200, "malformed product timestamps must not break the entire sitemap");
 assert.match(response.headers.get("Content-Type"), /application\/xml/);
 const xml = await response.text();
-assert.match(xml, /<loc>https:\/\/shop\.example\/sanpham\/dress-shoes\/SD-SN001<\/loc><lastmod>2026-10-17T10:00:00\.000Z<\/lastmod>/);
-assert.match(xml, /<loc>https:\/\/shop\.example\/sanpham\/wallets\/SD-SN002<\/loc><\/url>/);
-assert.match(xml, /<loc>https:\/\/shop\.example\/sanpham\/belts\/SD-SN003<\/loc><\/url>/);
+assert.match(xml, /<loc>https:\/\/shop\.example\/sanpham\/giaytay\/SD-SN001<\/loc><lastmod>2026-10-17T10:00:00\.000Z<\/lastmod>/);
+assert.match(xml, /<loc>https:\/\/shop\.example\/sanpham\/vida\/SD-SN002<\/loc><\/url>/);
+assert.match(xml, /<loc>https:\/\/shop\.example\/sanpham\/thatlung\/SD-SN003<\/loc><\/url>/);
 console.log("PASS: sitemap skips invalid lastmod values instead of returning 503.");

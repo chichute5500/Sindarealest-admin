@@ -1,4 +1,4 @@
-import { createSession, sessionCookie, verifySession, isVerifiedCommercialSku, slugify } from "./_lib.js";
+import { createSession, sessionCookie, verifySession, isVerifiedCommercialSku, productCategoryRouteSlug } from "./_lib.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -41,7 +41,7 @@ export async function onRequest(context) {
   catch { return new Response("Không thể tải sản phẩm.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } }); }
   if (!product || Number(product.published) !== 1) return new Response("Không tìm thấy sản phẩm.", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" } });
   const productKey = isVerifiedCommercialSku(product) ? String(product.sku) : String(product.id);
-  const categoryPath = slugify(product.category);
+  const categoryPath = productCategoryRouteSlug(product.category);
   const canonicalPath = `/sanpham/${categoryPath}/${encodeURIComponent(productKey)}`;
   if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath, url.origin), 301);
   let images = [];

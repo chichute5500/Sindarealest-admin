@@ -182,13 +182,13 @@ const seoDB = {
 };
 const legacyResponse = await seoMiddleware({ request:new Request('https://shop.example/san-pham/test-sneaker'), env:{DB:seoDB}, next:async () => new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}) });
 assert.equal(legacyResponse.status,301,'Legacy slug routes must redirect to the SKU URL');
-assert.equal(legacyResponse.headers.get('Location'),'https://shop.example/sanpham/sneakers/SD-SN001');
-response = await seoMiddleware({ request:new Request('https://shop.example/sanpham/sneakers/SD-SN001'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
+assert.equal(legacyResponse.headers.get('Location'),'https://shop.example/sanpham/sneaker/SD-SN001');
+response = await seoMiddleware({ request:new Request('https://shop.example/sanpham/sneaker/SD-SN001'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
 text = await response.text();
 assert.equal(response.status,200);
 assert.ok(text.includes('<title>Giày thử | SinDarealest</title>'));
 assert.ok(text.includes('og:title" content="Giày thử | SinDarealest'));
-assert.ok(text.includes('og:url" content="https://shop.example/sanpham/sneakers/SD-SN001'));
+assert.ok(text.includes('og:url" content="https://shop.example/sanpham/sneaker/SD-SN001'));
 assert.ok(text.includes('og:image" content="https://shop.example/images/example.webp'));
 assert.ok(text.includes('og:description" content="Mô tả giày · SKU: SD-SN001'), 'Product social preview should include the explicitly verified SKU even when descriptions are long');
 assert.match(text,/application\/ld\+json/);
@@ -200,7 +200,7 @@ assert.equal(response.status,403,'cross-origin warranty submission is rejected')
 const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,sku_verified,category,category_label,updated_at/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',sku_verified:1,category:'sneakers',category_label:'Sneaker',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
 const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
-assert.match(sitemapText,/https:\/\/shop\.example\/sanpham\/sneakers\/SD-SN001/);
+assert.match(sitemapText,/https:\/\/shop\.example\/sanpham\/sneaker\/SD-SN001/);
 const robotsText = await (await robots({request:new Request('https://shop.example/robots.txt')})).text();
 assert.match(robotsText,/Disallow: \/admin\//);
 assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);

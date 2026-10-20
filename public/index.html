@@ -761,7 +761,7 @@ const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history';
 const LOCAL_ADDRESS_KEY='sd-shipping-address';
 const categoryLabels={all:'Tất cả',sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví da',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
 const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','wallets','sandals','watch-straps','phone-cases'];
-function routeSlug(value){return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
+const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vida","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const imgPath=x=>String(x||'').replace(/^\.\//,'');
 function dismissToast(){const t=$('#toast');if(t)t.classList.remove('show');clearTimeout(toastTimer)}

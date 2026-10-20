@@ -321,6 +321,24 @@ export function slugify(input) {
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 100) || "san-pham";
 }
 
+const PRODUCT_CATEGORY_ROUTE_SLUGS = Object.freeze({
+  "sneakers": "sneaker",
+  "loafers": "giayluoi",
+  "dress-shoes": "giaytay",
+  "belts": "thatlung",
+  "wallets": "vida",
+  "sandals": "dep",
+  "watch-straps": "daydongho",
+  "phone-cases": "oplung"
+});
+
+export function productCategoryRouteSlug(category) {
+  const key = String(category || "").trim().toLocaleLowerCase("en");
+  return Object.hasOwn(PRODUCT_CATEGORY_ROUTE_SLUGS, key)
+    ? PRODUCT_CATEGORY_ROUTE_SLUGS[key]
+    : slugify(key);
+}
+
 function optionalInteger(value, field, max = 2_000_000_000) {
   if (value === "" || value === null || value === undefined) return { value: null };
   const number = Number(value);

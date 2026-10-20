@@ -757,7 +757,7 @@ try {
       url: location.pathname,
       thumbnailCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
     }));
-    const expectedRoute = galleryState.url === '/sanpham/sneakers/sneakers-new-sneaker-contrast';
+    const expectedRoute = galleryState.url === '/sanpham/sneaker/sneakers-new-sneaker-contrast';
     const galleryBasePass = galleryState.dialogSemantics && galleryState.focusOnClose
       && galleryState.sku.includes('Chưa được cung cấp')
       && expectedRoute && galleryState.thumbnailCount >= 2;
