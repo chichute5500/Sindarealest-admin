@@ -39,7 +39,7 @@ on:
         description: 'HTTPS Preview alias only; Production hostname is rejected'
         required: true
         type: string
-        default: 'https://3ed49bcc.sindarealest2.pages.dev/'
+        default: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
 
 permissions:
   contents: write
@@ -118,7 +118,7 @@ jobs:
         if: github.event_name == 'push'
         continue-on-error: true
         env:
-          PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+          PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
           CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
           EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
@@ -127,7 +127,7 @@ jobs:
         if: github.event_name == 'push'
         continue-on-error: true
         env:
-          PREVIEW_URL: 'https://3ed49bcc.sindarealest2.pages.dev/'
+          PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
