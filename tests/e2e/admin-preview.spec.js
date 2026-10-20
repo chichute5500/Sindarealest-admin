@@ -77,10 +77,10 @@ async function loginDomDiagnostics(page, response) {
     page.locator('#password').count(),
     page.locator('#appView').count(),
   ]);
-  const title = (await page.title()).replace(/[\\r\\n\\t]/g, ' ').slice(0, 120);
-  const possibleAccessGate = /cloudflareaccess|cdn-cgi\\/access/i.test(
-    finalUrl.hostname + finalUrl.pathname
-  ) || /cloudflare access/i.test(title);
+  const title = (await page.title()).replace(/[\r\n\t]/g, ' ').slice(0, 120);
+  const possibleAccessGate = /cloudflareaccess/i.test(finalUrl.hostname)
+    || finalUrl.pathname.includes('/cdn-cgi/access')
+    || /cloudflare access/i.test(title);
 
   return [
     'Expected admin login DOM was not found on the Preview page.',
@@ -89,7 +89,7 @@ async function loginDomDiagnostics(page, response) {
     `Page title: ${title || '(empty)'}`,
     `DOM presence: #loginView=${counts[0] > 0}, #loginForm=${counts[1] > 0}, #password=${counts[2] > 0}, #appView=${counts[3] > 0}`,
     `Cloudflare Access interstitial detected: ${possibleAccessGate}`,
-  ].join('\\n');
+  ].join('\n');
 }
 
 test.describe('SinDarealest2 Admin Preview', () => {
@@ -135,8 +135,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
       const safeDetails = [
         loginError ? `Admin login message: ${loginError.trim()}` : '',
         serverErrors.length ? `HTTP 5xx responses: ${serverErrors.join(', ')}` : '',
-      ].filter(Boolean).join('\\n');
-      throw new Error(`Admin Preview login/dashboard check failed.${safeDetails ? `\\n${safeDetails}` : ''}\\n${error.message}`);
+      ].filter(Boolean).join('\n');
+      throw new Error(`Admin Preview login/dashboard check failed.${safeDetails ? `\n${safeDetails}` : ''}\n${error.message}`);
     }
   });
 });
