@@ -175,6 +175,16 @@ jobs:
           git add "${target_dir}" "${manifest_path}"
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "docs: archive ${STAGE} website screenshots (run ${RUN_ID})"
           git push origin "HEAD:${REF_NAME}"
+      - name: Attach original design references to audit artifact
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png
+          test -s docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png
+          mkdir -p artifacts/liquid-glass-preview/reference-images
+          cp docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png artifacts/liquid-glass-preview/reference-images/
+          cp docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png artifacts/liquid-glass-preview/reference-images/
       - name: Upload screenshots and HTML audit report
         if: always()
         uses: actions/upload-artifact@v4
