@@ -1,69 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice">
   <defs>
     <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e9f3fb"/>
-      <stop offset=".24" stop-color="#d8e9f7"/>
-      <stop offset=".48" stop-color="#fafdff"/>
-      <stop offset=".67" stop-color="#e0effa"/>
-      <stop offset="1" stop-color="#f4f9fe"/>
+      <stop offset="0" stop-color="#edf5fc"/>
+      <stop offset=".24" stop-color="#e0edf8"/>
+      <stop offset=".48" stop-color="#f9fcff"/>
+      <stop offset=".72" stop-color="#e5f0f9"/>
+      <stop offset="1" stop-color="#f4f9fd"/>
     </linearGradient>
-    <linearGradient id="silk" x1="0" y1="0" x2="1" y2=".24">
-      <stop offset="0" stop-color="#fff" stop-opacity=".14"/>
-      <stop offset=".19" stop-color="#fff" stop-opacity=".92"/>
-      <stop offset=".29" stop-color="#b9d8ef" stop-opacity=".42"/>
-      <stop offset=".39" stop-color="#fff" stop-opacity=".95"/>
-      <stop offset=".49" stop-color="#d3e8f7" stop-opacity=".18"/>
-      <stop offset=".65" stop-color="#fff" stop-opacity=".86"/>
-      <stop offset=".8" stop-color="#b9d8ef" stop-opacity=".28"/>
-      <stop offset="1" stop-color="#fff" stop-opacity=".78"/>
+    <linearGradient id="fold" x1="0" y1="0" x2="1" y2=".22">
+      <stop offset="0" stop-color="#d8e8f5" stop-opacity=".10"/>
+      <stop offset=".22" stop-color="#fff" stop-opacity=".70"/>
+      <stop offset=".38" stop-color="#b8d4e9" stop-opacity=".24"/>
+      <stop offset=".53" stop-color="#fff" stop-opacity=".66"/>
+      <stop offset=".72" stop-color="#c5dced" stop-opacity=".18"/>
+      <stop offset=".86" stop-color="#fff" stop-opacity=".60"/>
+      <stop offset="1" stop-color="#d7e7f4" stop-opacity=".10"/>
     </linearGradient>
     <linearGradient id="glint" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#fff" stop-opacity="0"/>
-      <stop offset=".27" stop-color="#fff" stop-opacity=".98"/>
-      <stop offset=".48" stop-color="#fff" stop-opacity=".32"/>
-      <stop offset=".72" stop-color="#fff" stop-opacity=".94"/>
+      <stop offset=".3" stop-color="#fff" stop-opacity=".78"/>
+      <stop offset=".52" stop-color="#fff" stop-opacity=".34"/>
+      <stop offset=".76" stop-color="#fff" stop-opacity=".72"/>
       <stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#93bddc" stop-opacity="0"/>
-      <stop offset=".46" stop-color="#8cb9db" stop-opacity=".42"/>
-      <stop offset=".56" stop-color="#fff" stop-opacity=".9"/>
-      <stop offset=".72" stop-color="#b4d3eb" stop-opacity=".24"/>
-      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </linearGradient>
-    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="18"/>
-    </filter>
-    <filter id="fine" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4"/>
-    </filter>
+    <filter id="haze" x="-15%" y="-25%" width="130%" height="150%"><feGaussianBlur stdDeviation="24"/></filter>
+    <filter id="soft" x="-15%" y="-25%" width="130%" height="150%"><feGaussianBlur stdDeviation="5"/></filter>
   </defs>
   <rect width="1440" height="1000" fill="url(#base)"/>
-  <ellipse cx="260" cy="110" rx="420" ry="250" fill="#fff" opacity=".48" filter="url(#soft)"/>
-  <ellipse cx="1210" cy="460" rx="300" ry="350" fill="#b9d9f0" opacity=".30" filter="url(#soft)"/>
-  <path d="M-180 250 C70 20 280 70 430 280 S700 640 925 410 S1280 95 1620 270" fill="none" stroke="#8db9db" stroke-opacity=".22" stroke-width="190" filter="url(#soft)"/>
-  <path d="M-180 250 C70 20 280 70 430 280 S700 640 925 410 S1280 95 1620 270" fill="none" stroke="url(#silk)" stroke-width="148" stroke-linecap="round" opacity=".84"/>
-  <path d="M-170 226 C90 0 286 56 446 266 S712 606 944 383 S1296 74 1638 249" fill="none" stroke="url(#glint)" stroke-width="23" stroke-linecap="round" opacity=".92"/>
-  <path d="M-155 280 C105 56 300 115 452 304 S716 662 940 436 S1284 131 1616 295" fill="none" stroke="url(#edge)" stroke-width="11" stroke-linecap="round" opacity=".65"/>
-  <path d="M-130 780 C150 540 324 900 602 720 S960 350 1180 528 S1485 830 1620 642" fill="none" stroke="#95c2e3" stroke-opacity=".24" stroke-width="170" filter="url(#soft)"/>
-  <path d="M-130 780 C150 540 324 900 602 720 S960 350 1180 528 S1485 830 1620 642" fill="none" stroke="url(#silk)" stroke-width="124" stroke-linecap="round" opacity=".72"/>
-  <path d="M-136 752 C140 526 324 858 600 686 S960 322 1187 500 S1480 794 1617 612" fill="none" stroke="url(#glint)" stroke-width="19" stroke-linecap="round" opacity=".84"/>
-  <path d="M-190 530 C100 398 255 512 432 624 S740 800 914 688 S1215 500 1635 560" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="58" filter="url(#fine)"/>
-  <path d="M-160 520 C110 390 264 505 438 614 S738 782 921 674 S1223 485 1610 544" fill="none" stroke="url(#glint)" stroke-width="17" stroke-linecap="round" opacity=".66"/>
-  <path d="M165 -100 C305 80 354 225 300 382 S174 680 320 1080" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="26" filter="url(#fine)"/>
-  <path d="M990 -120 C1120 70 1060 220 1190 346 S1405 568 1300 1100" fill="none" stroke="url(#glint)" stroke-width="24" stroke-linecap="round" opacity=".58"/>
-
-  <!-- Layered satin folds: broad soft creases with thin bright edges, not a flat color overlay. -->
+  <ellipse cx="170" cy="130" rx="470" ry="280" fill="#fff" opacity=".50" filter="url(#haze)"/>
+  <ellipse cx="1230" cy="570" rx="390" ry="340" fill="#c2ddef" opacity=".26" filter="url(#haze)"/>
+  <ellipse cx="600" cy="1030" rx="660" ry="260" fill="#fff" opacity=".22" filter="url(#haze)"/>
   <g id="satin-crease-detail" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M-170 250 C95 42 300 83 480 260 S826 432 1020 275 S1350 120 1615 262" stroke="#abcfe8" stroke-opacity=".18" stroke-width="48" filter="url(#soft)"/>
-    <path d="M-170 250 C95 42 300 83 480 260 S826 432 1020 275 S1350 120 1615 262" stroke="url(#silk)" stroke-width="29" opacity=".48"/>
-    <path d="M-166 239 C98 31 304 72 484 249 S830 421 1024 264 S1354 109 1619 251" stroke="url(#glint)" stroke-width="4" opacity=".78"/>
-    <path d="M-160 555 C95 361 300 394 488 562 S825 739 1032 570 S1352 408 1610 563" stroke="#b3d4ec" stroke-opacity=".16" stroke-width="44" filter="url(#soft)"/>
-    <path d="M-160 555 C95 361 300 394 488 562 S825 739 1032 570 S1352 408 1610 563" stroke="url(#silk)" stroke-width="25" opacity=".40"/>
-    <path d="M-155 544 C100 350 305 383 493 551 S830 728 1037 559 S1357 397 1615 552" stroke="url(#glint)" stroke-width="3.5" opacity=".72"/>
-    <path d="M-145 845 C105 660 310 690 500 850 S830 1015 1040 855 S1360 690 1605 845" stroke="#a8cbe5" stroke-opacity=".14" stroke-width="42" filter="url(#soft)"/>
-    <path d="M-145 845 C105 660 310 690 500 850 S830 1015 1040 855 S1360 690 1605 845" stroke="url(#silk)" stroke-width="23" opacity=".36"/>
-    <path d="M-140 834 C110 649 315 679 505 839 S835 1004 1045 844 S1365 679 1610 834" stroke="url(#glint)" stroke-width="3" opacity=".68"/>
+    <path d="M-90 154 C145 74 296 203 493 160 S842 73 1050 144 S1376 198 1532 109" stroke="#8fb8d6" stroke-opacity=".13" stroke-width="26" filter="url(#soft)"/>
+    <path d="M-90 154 C145 74 296 203 493 160 S842 73 1050 144 S1376 198 1532 109" stroke="url(#fold)" stroke-width="13" opacity=".62"/>
+    <path d="M-82 146 C152 67 300 193 496 152 S843 65 1054 136 S1378 190 1538 101" stroke="url(#glint)" stroke-width="1.8" opacity=".76"/>
+    <path d="M-80 348 C168 265 321 397 548 350 S883 263 1086 332 S1379 390 1525 299" stroke="#afcce2" stroke-opacity=".11" stroke-width="23" filter="url(#soft)"/>
+    <path d="M-80 348 C168 265 321 397 548 350 S883 263 1086 332 S1379 390 1525 299" stroke="url(#fold)" stroke-width="10" opacity=".44"/>
+    <path d="M-73 341 C174 258 326 389 552 343 S884 256 1090 325 S1380 382 1530 291" stroke="url(#glint)" stroke-width="1.5" opacity=".66"/>
+    <path d="M-94 585 C155 499 341 633 565 587 S883 496 1082 566 S1378 627 1534 536" stroke="#8fb9d9" stroke-opacity=".12" stroke-width="27" filter="url(#soft)"/>
+    <path d="M-94 585 C155 499 341 633 565 587 S883 496 1082 566 S1378 627 1534 536" stroke="url(#fold)" stroke-width="12" opacity=".48"/>
+    <path d="M-85 576 C162 491 345 624 569 579 S886 488 1086 558 S1380 619 1540 528" stroke="url(#glint)" stroke-width="1.8" opacity=".72"/>
+    <path d="M-92 828 C160 741 346 866 567 830 S892 736 1101 808 S1380 868 1530 778" stroke="#9bbfda" stroke-opacity=".10" stroke-width="24" filter="url(#soft)"/>
+    <path d="M-92 828 C160 741 346 866 567 830 S892 736 1101 808 S1380 868 1530 778" stroke="url(#fold)" stroke-width="11" opacity=".40"/>
+    <path d="M-85 820 C166 734 351 858 571 822 S895 728 1105 800 S1383 860 1536 770" stroke="url(#glint)" stroke-width="1.6" opacity=".62"/>
+    <path d="M160 -80 C245 114 204 234 260 360 S338 568 289 735 S274 924 337 1080" stroke="#bfd8ea" stroke-opacity=".11" stroke-width="22" filter="url(#soft)"/>
+    <path d="M160 -80 C245 114 204 234 260 360 S338 568 289 735 S274 924 337 1080" stroke="url(#fold)" stroke-width="9" opacity=".30"/>
+    <path d="M1160 -90 C1096 95 1174 240 1123 380 S1060 612 1135 762 S1195 936 1145 1080" stroke="#b6d3e8" stroke-opacity=".10" stroke-width="20" filter="url(#soft)"/>
+    <path d="M1160 -90 C1096 95 1174 240 1123 380 S1060 612 1135 762 S1195 936 1145 1080" stroke="url(#glint)" stroke-width="1.6" opacity=".46"/>
   </g>
-
 </svg>
