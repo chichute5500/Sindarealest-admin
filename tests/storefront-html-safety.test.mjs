@@ -23,19 +23,19 @@ const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "f
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the dynamic Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.match(heroSync, /const wantedSku='SD-GL052'/,
+assert.ok(heroSync.includes("const wantedSku='SD-GL052'"),
   "the Hero image must target the specifically requested SD-GL052 SKU");
-assert.match(heroSync, /products\\.find\\(p=>String\\(p&&p\\.sku\\|\\|''\\)\\.trim\\(\\)\\.toUpperCase\\(\\)===wantedSku\\)/,
+assert.ok(heroSync.includes("products.find(p=>String(p&&p.sku||'').trim().toUpperCase()===wantedSku)"),
   "the Hero image must be resolved from that exact SKU in the API product list");
-assert.match(heroSync, /const image=allImages\\(product\\)\\[0\\]\\|\\|product\\.image\\|\\|''/,
+assert.ok(heroSync.includes("const image=allImages(product)[0]||product.image||''"),
   "the Hero must use an image belonging to the selected SD-GL052 product");
 assert.doesNotMatch(heroSync, /catalogGrid|featuredGrid/,
   "the Hero must not silently fall back to a different product image");
-assert.match(heroSync, /target\\.hidden=true;target\\.dataset\\.productImageStatus='sku-not-found'/,
+assert.ok(heroSync.includes("target.hidden=true;target.dataset.productImageStatus='sku-not-found'"),
   "a missing target SKU must fail closed instead of showing an unrelated product");
-assert.match(heroSync, /target\\.hidden=true;target\\.dataset\\.productImageStatus='image-missing'/,
+assert.ok(heroSync.includes("target.hidden=true;target.dataset.productImageStatus='image-missing'"),
   "a target SKU without an image must be distinguished from a missing SKU");
-assert.match(heroSync, /target\\.src=url;target\\.dataset\\.sourceProductImage='true';target\\.dataset\\.productImageStatus='ready'/,
+assert.ok(heroSync.includes("target.src=url;target.dataset.sourceProductImage='true';target.dataset.productImageStatus='ready'"),
   "the Hero image source must update only from the matched SKU");
 
 const helperStart = html.indexOf("const escapeHtml=");
