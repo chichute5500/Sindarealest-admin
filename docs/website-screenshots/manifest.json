@@ -4,7 +4,7 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-19T21:25:18Z",
+  "updatedAtUtc": "2026-10-20T00:53:37Z",
   "status": "BLOCKED",
   "note": "No screenshot files are being claimed as captured. The two required stage directories are present with .gitkeep placeholders only. Read-only fetch of the home route and both old/new product-route probes again returned login_required; no authorized browser session is available in this run.",
   "stages": {
@@ -48,7 +48,32 @@
   "remainingBlockers": [
     "Authorized read-only access to the supplied Cloudflare Preview is required for real Preview screenshots and route checks. Fresh fetch of the homepage, existing /san-pham/sd2929, and requested-style /sanpham/giaytay/sd2929 returned login_required.",
     "The original reference PNGs still need to be opened and visually inspected with an image-capable tool.",
-    "Current visual workflow archives screenshots of a local static preview using fixture data, not the deployed Cloudflare Preview; do not treat that output as a real Preview baseline."
+    "The local static-preview artifact uses fixture data and does not establish deployed Cloudflare Preview behavior; do not treat it as a real Preview baseline.",
+    "Current legacy-products.json contains 235 entries with null/unverified SKU and null price; do not invent the product-code/category mapping required for the proposed route format."
   ],
-  "lastAccessCheckUtc": "2026-10-20T00:50:00Z"
+  "lastAccessCheckUtc": "2026-10-20T00:54:00Z",
+  "localAudit": {
+    "status": "PASS",
+    "scope": "local static preview with fixture data only; not Cloudflare Pages Preview",
+    "workflowRun": 39350150510,
+    "sourceCommit": "45c0b881d6d4068f0471e6deb19aaeb3063951cc",
+    "artifactId": 12232682056,
+    "artifactName": "sindarealest-liquid-glass-preview-255",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39350150510/artifacts/12232682056",
+    "report": "visual-audit.json inside the workflow artifact",
+    "startedAtUtc": "2026-10-20T00:52:46.025Z",
+    "finishedAtUtc": "2026-10-20T00:53:32.606Z",
+    "productFixtureCount": 235,
+    "screenshotsCaptured": 54,
+    "responsiveCases": 20,
+    "interactionChecks": 91,
+    "responsiveOverflowCount": 0,
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "httpErrors": 0,
+    "failedRequests": 0,
+    "hardFailures": 0,
+    "passed": true,
+    "caveat": "Screenshots remain in the temporary GitHub Actions artifact. They are not added to start-of-work or end-of-work because those canonical folders are reserved for real Preview baseline/result evidence. Two expected fixture-only 503 responses were observed for warranty lookup."
+  }
 }
