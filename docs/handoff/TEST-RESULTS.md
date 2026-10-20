@@ -65,3 +65,15 @@ Chỉ chạy lại khi:
 4. Lượt test trước không đáng tin cậy hoặc không kiểm tra đúng điều kiện.
 
 Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay vì lặp lại test vô ích.
+
+
+### 2026-10-19 21:26–21:28 UTC — GitHub Actions visual-preview (latest verified)
+
+- Commit: `e3c5c08e633bc73900343933dc3145720fbaefa2`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Environment / URL: local static server `http://127.0.0.1:4173/`, served from `public`; **not** the Cloudflare Preview URL.
+- Workflow run: [39327473706](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706), job `visual-preview` ID `118316975031`.
+- Status: **PASS — local/fixture pipeline only**. GitHub reports the job and steps as completed successfully, including `npm test`, `npm run check`, Chromium setup, screenshot capture and upload.
+- Artifact: [sindarealest-liquid-glass-preview-247](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39327473706/artifacts/12222942329) (retention listed through 2026-11-02 UTC).
+- Limitation: the automatic push-triggered run skipped “Save independently captured images into selected repository archive”; therefore this run did **not** archive screenshots into the canonical `start-of-work/` or `end-of-work/` folders and does not unblock baseline capture. The workflow is configured to serve local `public/` files and use fixtures; it is not proof of deployed Preview routing, Pages Functions, or visual similarity to reference PNGs.
+- Task IDs: SHOT-001, PERF-001, REG-001.
