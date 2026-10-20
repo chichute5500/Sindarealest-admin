@@ -4,21 +4,21 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T03:01:51Z",
+  "updatedAtUtc": "2026-10-20T03:13:24Z",
   "status": "BLOCKED",
-  "note": "Source/tests and local fixture audit passed on 878528620fc519b04fe0a3b36b961eb53d2647d3; visual workflow 39361896954 uploaded artifact 12237048814 (54 local screenshots, 235 fixtures, 20 responsive cases, 93 interactions, zero local errors/overflow). Its real Cloudflare Preview probe was blocked by Access: 0 live screenshots, 0 routes/viewports. No live baseline/end screenshots or pixel comparison are claimed.",
+  "note": "Source/tests passed on 968ec2e3af591dd39bbadc911de655a60135dd0f and local fixture audit run 39362960193 passed with 54 screenshots, 235 fixtures, 20 responsive cases, 93 interactions and no recorded local errors/overflow. The same run's real Preview probe was blocked by Cloudflare Access and returned zero actual screenshots/routes/viewports. Canonical start/end screenshots and pixel comparison remain unverified.",
   "stages": {
     "start-of-work": {
       "status": "BLOCKED",
       "directory": "docs/website-screenshots/start-of-work/",
       "images": [],
-      "reason": "Latest live probe 39361896954: CF_ACCESS_CLIENT_ID/CF_ACCESS_CLIENT_SECRET are missing, accessBlocked=true, and zero real Preview screenshots were captured. Local fixtures and reference PNGs are not valid substitutes."
+      "reason": "Real Preview baseline is not archived: run 39362960193 reports missing CF_ACCESS_CLIENT_ID/CF_ACCESS_CLIENT_SECRET, accessBlocked=true, zero screenshots. Confirm the deployment commit once Access is enabled before claiming this is the original pre-edit state; do not substitute local fixture screenshots."
     },
     "end-of-work": {
       "status": "NOT TESTED",
       "directory": "docs/website-screenshots/end-of-work/",
       "images": [],
-      "reason": "Storefront source has changed on the fix branch, but no valid real Preview baseline or live screenshots are available because Cloudflare Access blocks the browser. Do not treat local fixture captures as end-of-work screenshots."
+      "reason": "No genuine Preview screenshots or verified baseline are available. Source changed on the fix branch, but local fixtures cannot serve as the end-of-work archive."
     }
   },
   "referenceImages": {
@@ -38,36 +38,36 @@
     {
       "url": "/",
       "status": "BLOCKED",
-      "result": "Cloudflare Access/login_required redirect before storefront render; zero screenshots."
+      "result": "Cloudflare Access/login_required redirect before storefront render; zero real screenshots."
     },
     {
       "url": "/san-pham/{legacy-key}",
       "status": "NOT PROBED",
-      "result": "Legacy route pattern remains supported in source; live check not attempted because the homepage is gated."
+      "result": "Legacy route pattern is supported in source; real redirect was not tested because the homepage is gated."
     },
     {
-      "url": "/sanpham/{stored-category-key}/{verified-SKU-or-product-id}",
+      "url": "/sanpham/{mapped-category-slug}/{verified-SKU-or-product-id}",
       "status": "NOT PROBED",
-      "result": "Canonical route pattern is implemented in source; live direct-open/reload from a rendered product card remains unverified because the homepage is gated."
+      "result": "Canonical path shape is implemented in source with an explicit stored-category mapping; real direct-open/reload was not tested because no live product card rendered."
     }
   ],
   "comparisonStatus": "NOT TESTED",
   "remainingBlockers": [
-    "The latest workflow logs show CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET are empty; configure a Preview-only Cloudflare Access Service Auth policy and add these as GitHub Actions repository secrets before rerunning live capture.",
-    "No real start-of-work or end-of-work Preview screenshots exist. Keep both canonical stage folders free of local fixture screenshots and reference-image substitutes.",
-    "Pixel-diff and human visual review require equivalent real Preview screenshots from both stages.",
-    "Product canonical URL code now uses the persisted category key and verified SKU or internal product ID fallback; live direct-open, legacy redirect, reload and share checks still require an accessible Preview and real published data.",
-    "The current fix branch contains unrelated admin/API/migration/config changes. Review/isolate scope before any merge; no merge or Production deployment is authorized."
+    "Preview live probe is blocked by Cloudflare Access; configure a Preview-only Service Auth policy and GitHub Actions repository secrets CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET.",
+    "No genuine start-of-work/end-of-work Preview screenshots exist. Verify the Preview deployment commit before assigning baseline semantics; never copy local fixtures or reference designs into canonical stage folders.",
+    "Pixel comparison and visual acceptance require paired real Preview screenshots at identical viewport/theme/state, followed by human review.",
+    "Category route mapping is explicit in source (for example dress-shoes→giaytay, sneakers→sneaker); actual published products must still pass click, direct-open, refresh, legacy redirect, Back/Forward and share URL checks on an accessible Preview.",
+    "The current fix branch contains unrelated admin/API/migration/config changes. Do not merge it wholesale; no Production merge/deployment is authorized."
   ],
-  "lastAccessCheckUtc": "2026-10-20T03:01:46Z",
+  "lastAccessCheckUtc": "2026-10-20T03:13:18Z",
   "localAudit": {
     "status": "PASS",
-    "scope": "local static preview with legacy fixture data and mock responses; not Cloudflare Pages Preview",
-    "workflowRun": 39361896954,
-    "sourceCommit": "878528620fc519b04fe0a3b36b961eb53d2647d3",
-    "artifactId": 12237048814,
-    "artifactName": "sindarealest-liquid-glass-preview-306",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361896954/artifacts/12237048814",
+    "scope": "local static preview with legacy fixture data and mocked requests; not Cloudflare Pages Preview",
+    "workflowRun": 39362960193,
+    "sourceCommit": "968ec2e3af591dd39bbadc911de655a60135dd0f",
+    "artifactId": 12237724618,
+    "artifactName": "sindarealest-liquid-glass-preview-307",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618",
     "referenceImagesIncluded": true,
     "productFixtureCount": 235,
     "screenshotsCaptured": 54,
@@ -81,18 +81,18 @@
     "failedRequests": 0,
     "hardFailures": 0,
     "passed": true,
-    "caveat": "PASS applies only to the local fixture audit. The separate real Preview probe was blocked by Cloudflare Access and saved zero live screenshots.",
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361896954",
+    "caveat": "Local fixtures passed. The separate live Preview probe in the same workflow was blocked by Cloudflare Access and produced zero actual Preview screenshots.",
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193",
     "environment": "local static preview; data/legacy-products.json fixtures and in-memory mock requests; not Cloudflare Pages Preview",
-    "finishedAtUtc": "2026-10-20T03:01:45Z"
+    "finishedAtUtc": "2026-10-20T03:13:17Z"
   },
   "liveProbe": {
-    "workflowRun": 39361896954,
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361896954",
-    "artifactId": 12237048814,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361896954/artifacts/12237048814",
-    "sourceCommit": "878528620fc519b04fe0a3b36b961eb53d2647d3",
-    "attemptedAtUtc": "2026-10-20T03:01:45Z",
+    "workflowRun": 39362960193,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193",
+    "artifactId": 12237724618,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618",
+    "sourceCommit": "968ec2e3af591dd39bbadc911de655a60135dd0f",
+    "attemptedAtUtc": "2026-10-20T03:13:18Z",
     "sourceKind": "cloudflare-pages-preview-live-read-only",
     "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
     "status": "BLOCKED_ACCESS_GATE",
@@ -122,20 +122,58 @@
     "readOnlyViolations": 0,
     "noWriteRequestsSent": true,
     "previewDeploymentCommit": null,
-    "previewCommitVerification": "UNVERIFIED: Access blocked before a storefront response/build marker was available.",
-    "note": "Real Preview check failed closed on the Cloudflare Access gate; no actual Preview content was rendered and no screenshots were archived. Green workflow status means the local fixture audit and artifact upload succeeded, not that the live Preview passed.",
+    "previewCommitVerification": "UNVERIFIED: Cloudflare Access blocked before storefront markup/build marker or deployed commit could be checked.",
+    "note": "The live read-only probe did not render storefront content and saved no genuine Preview screenshots. Workflow success only covers the local fixture audit and artifact upload.",
     "responsiveOverflowCount": 0,
     "consoleErrorCount": 0,
     "pageErrorCount": 0,
     "httpErrorCount": 0,
-    "failedRequestCount": 0
+    "failedRequestCount": 0,
+    "coverage": {
+      "requiredViewportThemePairs": 8,
+      "completedViewportThemePairs": 0,
+      "homeViewportScreenshots": 0,
+      "homeFullPageCount": 0,
+      "sectionScreenshotCounts": {
+        "hero": 0,
+        "benefits": 0,
+        "order": 0,
+        "featured": 0,
+        "collections": 0,
+        "products": 0,
+        "footer": 0
+      },
+      "requiredSectionScreenshotsComplete": false,
+      "menuOpenCount": 0,
+      "orderExpandedCount": 0,
+      "productDetailContextsComplete": false,
+      "totalScreenshotCount": 0
+    },
+    "summary": {
+      "screenshotCount": 0,
+      "viewportCount": 0,
+      "routeCheckCount": 0,
+      "responsiveOverflowCount": 0,
+      "consoleErrorCount": 0,
+      "pageErrorCount": 0,
+      "httpErrorCount": 0,
+      "failedRequestCount": 0,
+      "brokenImageContextCount": 0,
+      "sectionTargetCheckCount": 0,
+      "productDetailContextCount": 0,
+      "blockedExternalRequestCount": 0,
+      "readOnlyViolationCount": 0,
+      "hardFailureCount": 1,
+      "requiredSectionScreenshotsComplete": false,
+      "productDetailContextsComplete": false
+    }
   },
   "latestToolingValidation": {
-    "workflowRun": 39361899889,
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361899889",
-    "sourceCommit": "878528620fc519b04fe0a3b36b961eb53d2647d3",
+    "workflowRun": 39362965160,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965160",
+    "sourceCommit": "968ec2e3af591dd39bbadc911de655a60135dd0f",
     "status": "PASS",
-    "note": "Validate source and tests passed on the latest storefront-code commit. Separate Admin Preview Playwright run 39361899892 failed because expected #loginView/#loginForm elements were not found on its configured target; this is not a public static storefront pass."
+    "note": "Validate source and complete automated test suite passed on the latest code commit with explicit category-to-URL slug mapping."
   },
   "liveProbeHistory": [
     {
@@ -251,10 +289,49 @@
       "previewDeploymentCommit": null,
       "previewCommitVerification": "UNVERIFIED: Access blocked before a storefront response/build marker was available.",
       "note": "Real Preview check failed closed on the Cloudflare Access gate; no actual Preview content was rendered and no screenshots were archived. Green workflow status means the local fixture audit and artifact upload succeeded, not that the live Preview passed."
+    },
+    {
+      "workflowRun": 39362960193,
+      "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193",
+      "artifactId": 12237724618,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618",
+      "sourceCommit": "968ec2e3af591dd39bbadc911de655a60135dd0f",
+      "attemptedAtUtc": "2026-10-20T03:13:18Z",
+      "sourceKind": "cloudflare-pages-preview-live-read-only",
+      "requestedPreviewUrl": "https://3ed49bcc.sindarealest2.pages.dev/",
+      "status": "BLOCKED_ACCESS_GATE",
+      "accessBlocked": true,
+      "accessServiceTokenConfigured": false,
+      "serviceTokenConfiguration": "MISSING_GITHUB_ACTIONS_SECRETS",
+      "configuredSecretNames": [
+        "CF_ACCESS_CLIENT_ID",
+        "CF_ACCESS_CLIENT_SECRET"
+      ],
+      "finalUrlWithoutQuery": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/3ed49bcc.sindarealest2.pages.dev",
+      "screenshotCount": 0,
+      "viewportCount": 0,
+      "routeProbeCount": 0,
+      "requiredViewportThemePairs": 8,
+      "completedViewportThemePairs": 0,
+      "sectionScreenshotCounts": {
+        "hero": 0,
+        "benefits": 0,
+        "order": 0,
+        "featured": 0,
+        "collections": 0,
+        "products": 0,
+        "footer": 0
+      },
+      "productDetailChecks": 0,
+      "readOnlyViolations": 0,
+      "noWriteRequestsSent": true,
+      "previewDeploymentCommit": null,
+      "previewCommitVerification": "UNVERIFIED: Cloudflare Access blocked before storefront markup/build marker or deployed commit could be checked.",
+      "note": "The live read-only probe did not render storefront content and saved no genuine Preview screenshots. Workflow success only covers the local fixture audit and artifact upload."
     }
   ],
   "captureTooling": {
-    "sourceCommit": "878528620fc519b04fe0a3b36b961eb53d2647d3",
+    "sourceCommit": "968ec2e3af591dd39bbadc911de655a60135dd0f",
     "requiredViewports": [
       {
         "width": 360,

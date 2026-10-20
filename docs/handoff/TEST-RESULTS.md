@@ -175,3 +175,14 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Separate real Preview probe from that same job: **BLOCKED_ACCESS_GATE**, `accessServiceTokenConfigured=false`, zero screenshots/viewports/routes; final destination is the Cloudflare Access login host. It sent no write requests. Therefore no real Preview visual pass, baseline, end-of-work capture or pixel comparison is claimed.
 - Separate Admin Preview Playwright [run 39361899892](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39361899892): **FAIL** because expected `#loginView` / `#loginForm` were not found on the configured target; this remains outside the public static storefront test scope.
 - Changes remain on the fix branch only. No Production merge/deployment. Task IDs: UI-001, URL-001/ROUTE-001, SHOT-001/SHOT-002/SHOT-003, REG-001.
+
+
+### 2026-10-20 03:11–03:13 UTC — stable category URL slugs and fixture visual recheck
+
+- Current code commit: `968ec2e3af591dd39bbadc911de655a60135dd0f`
+- Source/tests: **PASS** — [validation run 39362965160](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965160).
+- Explicit stored category key → route slug map now lives in shared Pages Functions code and is mirrored in the static storefront: `sneakers→sneaker`, `loafers→giayluoi`, `dress-shoes→giaytay`, `belts→thatlung`, `wallets→vida`, `sandals→dep`, `watch-straps→daydongho`, `phone-cases→oplung`. Middleware canonical/legacy redirects, sitemap, browser history/detail route, and tests use the mapped slugs. SKU appears in canonical path/schema only when verified; otherwise a product ID is used and schema omits SKU.
+- Visual workflow [39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), artifact [12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618): local fixture audit **PASS**, 235 fixture products, 54 screenshots, 20 responsive cases, 93 interaction checks, 12 mocked requests, zero recorded overflow, console/page/HTTP/failed-request/hard-failure counts.
+- Same workflow's direct Preview probe: **BLOCKED_ACCESS_GATE**; `accessServiceTokenConfigured=false`, `accessBlocked=true`, zero real Preview screenshots/viewports/routes, no writes. Start/end screenshots and pixel comparison remain untested.
+- Separate Admin Preview smoke [39362965143](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965143) fails because `#loginView`/`#loginForm` aren't found on the configured target; treat as an independent admin test blocker.
+- No Production merge/deployment. Task status remains partial until live Preview access and screenshot/route evidence are available.

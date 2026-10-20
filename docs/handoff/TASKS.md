@@ -198,3 +198,14 @@ Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, k
 - Current PR #108: open/unmerged; 74 files changed; 345 commits; +9693/-364; diverged from main by 345 ahead / 6 behind. This PR is not merge-ready due out-of-scope admin/API/migration/data/setup changes.
 - Admin smoke [39362467402](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362467402) FAIL: login selectors absent; this is outside public storefront scope.
 - No merge, source change, secrets/config change or Production deployment was performed by this session.
+
+## Recheck mới nhất — 2026-10-20 03:14 UTC (supersedes earlier evidence below)
+
+- **REG-001 source/tests: PASS** — commit `968ec2e3af591dd39bbadc911de655a60135dd0f`, [run 39362965160](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965160).
+- **SHOT-001 fixture capture: PASS — local only** — [visual workflow 39362960193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193), [artifact 12237724618](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362960193/artifacts/12237724618); 54 local screenshots, 235 fixture products, 20 responsive cases, 93 interactions, 12 mocked requests, 0 local overflow/errors/hard failures. These are not Preview screenshots.
+- **SHOT-002 genuine Preview baseline: BLOCKED** — live probe in the same artifact has `accessBlocked=true`, `accessServiceTokenConfigured=false`, 0 screenshots/viewports/routes. Canonical start archive remains empty.
+- **SHOT-003 end archive/pixel diff: NOT TESTED** — need genuine matched Preview captures; do not put local fixtures in the canonical archive.
+- **UI-001/002 Liquid Glass: source updated, live visual review BLOCKED** — removed redundant late glass overrides and the dark opaque wrapper background. Local screenshots were inspected; acceptance against the deployed site/reference still needs live before/after comparison.
+- **URL-001 ROUTE-001: source and tests PASS; live data UNVERIFIED** — explicit mapping `dress-shoes→giaytay`, `sneakers→sneaker`, `loafers→giayluoi`, `belts→thatlung`, `wallets→vida`, `sandals→dep`, `watch-straps→daydongho`, `phone-cases→oplung`. Canonical format `/sanpham/{mapped-category-slug}/{verified-SKU-or-product-ID}`; legacy route redirects 301; unverified SKU is not exposed in Product JSON-LD. Test real card click/direct-open/reload/Back/Forward/share only after Access opens the Preview.
+- **Admin Preview test: FAIL / separate blocker** — [run 39362965143](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39362965143) cannot find `#loginView` / `#loginForm` at its configured target. Do not count this as storefront pass or alter admin within this static-public task without verifying its target.
+- **Scope guard:** no Production merge/deploy, no data or bindings changes. PR #108 contains unrelated admin/API/migration/config diffs; don't merge wholesale.
