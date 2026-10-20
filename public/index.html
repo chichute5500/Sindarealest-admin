@@ -1485,7 +1485,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 /* Visual compare pass 2 — restore more of the pearl/navy liquid-glass depth visible in the supplied references. */
 .theme-bg--light::after{
   background:
-    linear-gradient(118deg,rgba(225,241,255,.34),rgba(211,231,249,.28) 52%,rgba(237,247,255,.38)),
+    linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54)),
     radial-gradient(ellipse at 17% 13%,rgba(255,255,255,.34),transparent 37%),
     linear-gradient(145deg,transparent 24%,rgba(255,255,255,.52) 37%,rgba(164,207,237,.20) 42%,transparent 54%),
     linear-gradient(28deg,transparent 22%,rgba(154,204,237,.22) 42%,transparent 61%),
@@ -1493,15 +1493,15 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 }
 .theme-bg--dark::after{
   background:
-    linear-gradient(118deg,rgba(3,20,36,.54),rgba(7,31,51,.48) 52%,rgba(3,17,30,.58)),
+    linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72)),
     radial-gradient(ellipse at 18% 14%,rgba(132,190,226,.28),transparent 39%),
     radial-gradient(ellipse at 82% 58%,rgba(54,133,185,.24),transparent 43%),
     linear-gradient(145deg,transparent 25%,rgba(170,215,245,.30) 37%,rgba(54,119,164,.18) 42%,transparent 55%),
     linear-gradient(28deg,transparent 20%,rgba(94,159,201,.20) 42%,transparent 62%),
     linear-gradient(157deg,transparent 48%,rgba(188,222,245,.18) 53%,transparent 60%);
 }
-.theme-bg--light{filter:blur(.25px) hue-rotate(25deg) saturate(.76) brightness(1.035) contrast(1.045)}
-html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brightness(.84) contrast(1.04)}
+.theme-bg--light{filter:blur(1px) hue-rotate(25deg) saturate(.70) brightness(1.035) contrast(.95)}
+html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brightness(.86) contrast(.92)}
 @keyframes sdLiquidGlassDrift{
   0%{transform:translate3d(-.35%,-.2%,0) scale(1.025)}
   100%{transform:translate3d(.35%,.25%,0) scale(1.035)}
@@ -1518,13 +1518,15 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
   .hero{padding-top:21px;padding-bottom:20px}
   .hero h1{font-size:clamp(25px,6.45vw,33px);line-height:1.10;letter-spacing:-.028em}
   .hero-description{font-size:11px;line-height:1.58}
-  .hero-visual{min-height:clamp(190px,65vw,270px);border-radius:22px}
+  .hero-visual{height:clamp(170px,48vw,205px);min-height:0;aspect-ratio:.9/1;border-radius:22px}
+  .hero-visual img{object-fit:contain;padding:4%;box-sizing:border-box}
   .service-strip{gap:7px;padding:9px;border-radius:22px}
   .service{min-height:86px;padding:10px 5px;border-radius:17px}
   .service-copy{gap:6px}
   .service-icon{width:23px;height:23px}
   .service-icon svg{width:20px;height:20px}
   .service-text strong{font-size:clamp(10px,2.8vw,11px);line-height:1.34}
+  .service-strip .service-copy{min-height:52px;padding:4px 2px}
   #order{padding-top:18px;padding-bottom:14px}
   #order .order-cta--compact #orderDetailsToggle{min-height:46px;padding:10px 16px;font-size:11px}
   .section#featured{padding-top:27px}
@@ -1533,9 +1535,10 @@ html.dark .theme-bg--dark{filter:blur(.35px) hue-rotate(0deg) saturate(.98) brig
   .hero{padding-top:18px;padding-bottom:17px;gap:7px}
   .hero h1{font-size:clamp(22px,6.5vw,24px);line-height:1.12}
   .hero-description{font-size:10px}
-  .hero-visual{min-height:clamp(185px,61vw,215px)}
+  .hero-visual{height:clamp(155px,46vw,175px);min-height:0;aspect-ratio:.9/1}
   .service-strip{gap:5px;padding:6px}
   .service{min-height:78px;padding:8px 3px}
+  .service-strip .service-copy{min-height:50px;padding:3px 2px}
   .service-text strong{font-size:9px;line-height:1.28}
   .section#featured{padding-top:22px}
 }
