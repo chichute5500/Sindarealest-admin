@@ -122,6 +122,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
           CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
           EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+          EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Probe supplied Cloudflare Preview on push (artifact only; never archives)
         if: github.event_name == 'push'
@@ -180,7 +181,8 @@ jobs:
           const verifiedDeployment = verification.passed === true
             && verification.status === 'VERIFIED_PREVIEW_DEPLOYMENT'
             && deployed.environment === 'preview'
-            && /^[a-f0-9]{7,64}$/i.test(deployed.commitHash || '')
+            && /^[a-f0-9]{40}$/i.test(deployed.commitHash || '')
+            && deployed.commitHash.toLowerCase() === String(process.env.SOURCE_SHA || '').toLowerCase()
             && Boolean(deployed.branch)
             && deployed.branch === process.env.REF_NAME
             && deployed.branchMatchesExpected === true
