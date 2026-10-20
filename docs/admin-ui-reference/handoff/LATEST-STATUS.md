@@ -123,6 +123,17 @@
 - **Giới hạn:** chỉ quan sát được ảnh đăng nhập source cục bộ. Chưa có ảnh Playwright của các màn hình sau đăng nhập để đối chiếu với 11 màn hình còn lại. Preview từ xa vẫn sai signature và không thể dùng để xác nhận source hiện tại.
 - Một lần cập nhật markup đăng nhập qua connector đã bị chặn trước khi ghi; không tuyên bố thay đổi copy này đã được áp dụng. Cần dùng một đường chỉnh sửa an toàn khác hoặc tiếp tục sau khi có môi trường checkout/patch được chấp nhận.
 
+## Cập nhật tiếp theo — 2026-10-21 (sau workflow 39473301554)
+
+- Đã thêm kiểm thử Playwright thật cho nút hiện/ẩn mật khẩu: bấm mở, xác nhận type=text và aria-pressed=true, bấm lại để che, xác nhận type=password và aria-pressed=false. Không gửi thông tin đăng nhập và không gọi API login trong bài kiểm thử local.
+- Bổ sung kiểm tra phần thẻ đăng nhập, ô mật khẩu, nút hiện/ẩn và nút submit đều nằm trọn trong viewport ở ma trận 8 kích thước × 2 theme.
+- Workflow: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39473301554
+- Kết quả trên source commit `6df3658c8971bf8f06be71dd2ee36d9dba5e29ad`: `npm run check` PASS; `npm test` PASS; Playwright local screenshot matrix PASS; 16 ảnh, 16 bộ metrics, không ghi nhận page errors, console errors, failed requests hoặc HTTP errors trong fixture local.
+- Preview từ xa vẫn FAIL do `.topbar > .brand` xuất hiện khi kiểm thử login. Không sửa điều kiện test để che lỗi; cần xác minh URL Preview/triển khai thực tế. Không in hoặc sửa secret.
+- Nhánh hiện tại có commit evidence-only `3f4af3f9c3cbedd5a43e408797d52cf4e1474f48`; đây chỉ là lưu ảnh/báo cáo, không phải source mới được chạy test. Bài test code mới nhất được xác minh là commit `6df3658c8971bf8f06be71dd2ee36d9dba5e29ad`.
+- Tiến độ tổng thể giữ ở **43%** vì các module đăng nhập thật, nghiệp vụ sau đăng nhập, so sánh đủ 12 màn hình và audit toàn bộ diff vẫn chưa đạt điều kiện nghiệm thu.
+- Không merge PR #111; không deploy Production; không thay đổi nhánh storefront/main, backend contracts, secrets hoặc dữ liệu.
+
 ## Kết quả kiểm thử tự động gần nhất
 
 - Tested commit: 2d528e1a3701c3e5309a28d1628e9b82333c33e7
