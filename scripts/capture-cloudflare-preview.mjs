@@ -381,17 +381,23 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     audit.sectionChecks.push({ selector: '#detailNext', status: 'NOT APPLICABLE', route: clicked.path, theme, viewport: viewport.name, note: 'Selected live product exposes one image or no visible next control.' });
   }
 
+  const expectedReloadUrl = new URL(clicked.path, origin).href;
+  const reloadResponseObserved = page.waitForResponse(response =>
+    response.request().isNavigationRequest() && response.url() === expectedReloadUrl,
+  { timeout: 45000 }).catch(() => null);
   const reloadResponse = await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 });
+  const observedReloadResponse = await reloadResponseObserved;
+  const reloadStatus = reloadResponse?.status() ?? observedReloadResponse?.status() ?? null;
   await waitForStorefront(page, label + '-reload');
   await waitForProductDetail(page);
   const reloadState = await page.evaluate(() => ({
     path: location.pathname, title: (document.querySelector('#detailTitle')?.textContent || '').trim(),
     modalOpen: Boolean(document.querySelector('#productOverlay.open')),
   }));
-  const reloadPassed = Boolean(reloadResponse && reloadResponse.status >= 200 && reloadResponse.status < 400
+  const reloadPassed = Boolean(reloadStatus !== null && reloadStatus >= 200 && reloadStatus < 400
     && reloadState.path === clicked.path && reloadState.title === clicked.title && reloadState.modalOpen);
   audit.routeChecks.push({
-    kind: 'product-detail-reload', path: clicked.path, status: reloadResponse?.status ?? null, finalPath: reloadState.path,
+    kind: 'product-detail-reload', path: clicked.path, status: reloadStatus, finalPath: reloadState.path,
     productTitleMatches: reloadState.title === clicked.title, detailModalOpen: reloadState.modalOpen,
     result: reloadPassed ? 'PASS' : 'FAIL', context: label,
   });
