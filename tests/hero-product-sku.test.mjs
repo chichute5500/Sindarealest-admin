@@ -29,6 +29,12 @@ assert.ok(visualAudit.includes("startup.heroImage.source === expectedHeroImage")
 const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the hero product crisp on small screens"));
 assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
   "The hero product should retain its real colors and use a natural drop shadow rather than color-altering blending.");
+assert.ok(lastHeroImageRule.includes("object-fit:contain!important;object-position:center right!important"),
+  "The product must remain fully visible without being cropped on mobile.");
+assert.ok(lastHeroImageRule.includes("rgba(237,247,255,0) 64%)"),
+  "The text-side veil must fade before covering the product side of the hero.");
+assert.ok(lastHeroImageRule.includes("rgba(4,20,34,0) 64%)"),
+  "The dark-theme veil must also preserve product visibility.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroSku(page, label)"),

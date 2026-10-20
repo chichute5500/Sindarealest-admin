@@ -2218,12 +2218,12 @@ html.dark .sd-fullscreen-share{
   .sd-fullscreen-share svg{width:18px;height:18px}
 }
 
-/* Keep the hero product crisp on small screens: do not wash it out with multiply blending. */
+/* Keep the exact product crisp and blend it into the satin-glass background without washing out its leather color. */
 @media(max-width:760px){
-  #home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow(0 12px 20px rgba(0,22,42,.20))!important}
-  #home.hero:after{background:linear-gradient(90deg,rgba(237,247,255,.98) 0%,rgba(237,247,255,.94) 28%,rgba(237,247,255,.60) 48%,rgba(237,247,255,.02) 78%,rgba(237,247,255,0) 100%)}
-  html.dark #home.hero:after{background:linear-gradient(90deg,rgba(4,20,34,.97) 0%,rgba(4,20,34,.90) 28%,rgba(4,20,34,.52) 48%,rgba(4,20,34,.02) 78%,rgba(4,20,34,0) 100%)}
-  html.dark #home .hero-visual img{opacity:.98!important;mix-blend-mode:normal!important}
+  #home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow(0 12px 20px rgba(0,22,42,.20))!important;object-fit:contain!important;object-position:center right!important;padding:4% 2% 4% 0!important}
+  #home.hero:after{background:linear-gradient(90deg,rgba(237,247,255,.96) 0%,rgba(237,247,255,.84) 25%,rgba(237,247,255,.38) 40%,rgba(237,247,255,.04) 54%,rgba(237,247,255,0) 64%)}
+  html.dark #home.hero:after{background:linear-gradient(90deg,rgba(4,20,34,.96) 0%,rgba(4,20,34,.84) 25%,rgba(4,20,34,.38) 40%,rgba(4,20,34,.06) 54%,rgba(4,20,34,0) 64%)}
+  html.dark #home .hero-visual img{opacity:1!important;mix-blend-mode:normal!important;object-fit:contain!important;object-position:center right!important}
 }
 </style>
 
