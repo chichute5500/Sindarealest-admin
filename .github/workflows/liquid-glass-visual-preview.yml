@@ -382,8 +382,8 @@ jobs:
             'This summary distinguishes local fixture tests from the protected Cloudflare Pages Preview. A green local fixture audit is not live Preview acceptance.',
             '',
           ];
+          const count = (value) => Array.isArray(value) ? value.length : Number(value || 0);
           if (local) {
-            const count = (value) => Array.isArray(value) ? value.length : Number(value || 0);
             lines.push(
               '- **Local fixture audit:** ' + (local.passed === true ? 'PASS' : 'FAIL') +
               ' — ' + count(local.screenshots) + ' screenshots, ' + Number(local.productFixtureCount || 0) +
