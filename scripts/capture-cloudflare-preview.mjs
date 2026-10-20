@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { sanitizeText, sanitizeUrl } from './sanitize-audit-value.mjs';
+import { buildCloudflareAccessHeaders } from './cloudflare-access-service-token.mjs';
 
 const requested = process.env.PREVIEW_URL || 'https://3ed49bcc.sindarealest2.pages.dev/';
 const allowedHost = /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i;
@@ -20,6 +21,13 @@ try {
   process.exit(2);
 }
 const origin = previewUrl.origin;
+let accessHeaders;
+try {
+  accessHeaders = buildCloudflareAccessHeaders();
+} catch (error) {
+  console.error(error.message || 'Invalid Cloudflare Access service-token configuration.');
+  process.exit(2);
+}
 const outputDir = path.join(process.cwd(), 'artifacts', 'liquid-glass-preview', 'live-preview');
 const viewports = [
   { name: 'mobile-320', width: 320, height: 720 },
@@ -87,6 +95,11 @@ async function makePage(browser, viewport, theme, label) {
     if (!['GET', 'HEAD'].includes(req.method().toUpperCase())) {
       audit.readOnlyViolations.push({ context: label, method: req.method(), url: sanitizeUrl(req.url()), note: 'Blocked before reaching the Preview.' });
       return route.abort();
+    }
+    // Send service-token headers only to the validated Preview origin. Cross-origin
+    // destinations are aborted above before these credentials can be attached.
+    if (Object.keys(accessHeaders).length > 0) {
+      return route.continue({ headers: { ...req.headers(), ...accessHeaders } });
     }
     return route.continue();
   });
