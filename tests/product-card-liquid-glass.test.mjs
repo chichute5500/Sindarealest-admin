@@ -42,35 +42,47 @@ assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(225,241,255,\.52
   "Light background must provide a soft frosted veil over the newly generated glacial gradient backdrop.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(3,20,36,\.68\),rgba\(7,31,51,\.63\) 52%,rgba\(3,17,30,\.72\)\)/,
   "Dark background must provide a deep navy translucent veil over the newly generated sapphire gradient backdrop.");
-assert.ok(finalBackgroundCss.includes(".theme-bg--light{filter:blur(1px) hue-rotate(0deg) saturate(.88) brightness(1.02) contrast(1.03)}"),
-  "Light backdrop should preserve the cold pearl-blue hue and keep the wave highlights visible.");
-assert.match(finalBackgroundCss, /html\.dark \.theme-bg--dark\{filter:blur\(1\.5px\) hue-rotate\(0deg\) saturate\(\.86\) brightness\(\.90\) contrast\(\.92\)\}/,
-  "Dark backdrop should preserve deep navy tone and soft sapphire highlights.");
+assert.ok(finalBackgroundCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
+  "Light theme must use the final cache-versioned pearl-glass SVG background.");
+assert.ok(finalBackgroundCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}"),
+  "Dark theme must preserve the navy-sapphire SVG backdrop without the old color cast.");
 
 
-assert.ok(finalBackgroundCss.includes("linear-gradient(145deg,transparent 16%,rgba(255,255,255,.84)"),
-  "Light background must expose broad pearl-white ribbon highlights over the blue haze.");
-assert.ok(finalBackgroundCss.includes("linear-gradient(146deg,transparent 15%,rgba(165,211,241,.56)"),
-  "Dark background must expose metallic sapphire ribbon highlights rather than a flat navy fill.");
-const ambientLight = html.split(".theme-bg--light{")[1]?.split("}")[0] || "";
-const ambientDark = html.split(".theme-bg--dark{")[1]?.split("}")[0] || "";
-assert.ok(ambientLight.includes("background-image:radial-gradient("),
+assert.ok(finalBackgroundCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261020-2')"),
+  "The light background must use the dedicated curved pearl-glass wave artwork.");
+assert.ok(finalBackgroundCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261020-2')"),
+  "The dark background must use the dedicated curved sapphire-glass wave artwork.");
+const ambientLightStart = html.lastIndexOf(".theme-bg--light{");
+const ambientLight = html.slice(ambientLightStart).split("}")[0] || "";
+const ambientDarkStart = html.lastIndexOf(".theme-bg--dark{");
+const ambientDark = html.slice(ambientDarkStart).split("}")[0] || "";
+assert.ok(ambientLight.includes("images/liquid-glass-light.svg?v=20261020-2"),
   "The light ambient background must be generated as soft glacial gradients rather than reuse a crocodile-scale product texture.");
-assert.ok(ambientDark.includes("background-image:radial-gradient("),
+assert.ok(ambientDark.includes("images/liquid-glass-dark.svg?v=20261020-2"),
   "The dark ambient background must be generated as flowing navy/sapphire gradients rather than reuse a crocodile-scale product texture.");
 assert.doesNotMatch(ambientLight, /theme-croc-/,
   "Light page ambience must not use the crocodile-scale raster texture as its background.");
 assert.doesNotMatch(ambientDark, /theme-croc-/,
   "Dark page ambience must not use the crocodile-scale raster texture as its background.");
-const welcomeLight = html.split(".welcome-texture--light{")[1]?.split("}")[0] || "";
-const welcomeDark = html.split(".welcome-texture--dark{")[1]?.split("}")[0] || "";
-assert.ok(welcomeLight.includes("radial-gradient("),
+const welcomeLightStart = html.lastIndexOf(".welcome-texture--light{");
+const welcomeLight = html.slice(welcomeLightStart).split("}")[0] || "";
+const welcomeDarkStart = html.lastIndexOf(".welcome-texture--dark{");
+const welcomeDark = html.slice(welcomeDarkStart).split("}")[0] || "";
+assert.ok(welcomeLight.includes("images/liquid-glass-light.svg?v=20261020-2"),
   "Light welcome splash must use the same pearl/glacial ambient design language.");
-assert.ok(welcomeDark.includes("radial-gradient("),
+assert.ok(welcomeDark.includes("images/liquid-glass-dark.svg?v=20261020-2"),
   "Dark welcome splash must use the same navy/sapphire ambient design language.");
 assert.doesNotMatch(welcomeLight, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in light mode.");
 assert.doesNotMatch(welcomeDark, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in dark mode.");
+
+
+const lightWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light.svg", import.meta.url), "utf8");
+const darkWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark.svg", import.meta.url), "utf8");
+assert.ok(lightWaveArtwork.includes('stroke="url(#silk)"') && lightWaveArtwork.includes('C70 20 280 70 430 280'),
+  "Light SVG must include smooth curved pearl-satin ribbons.");
+assert.ok(darkWaveArtwork.includes('stroke="url(#silk)"') && darkWaveArtwork.includes('C70 20 280 70 430 280'),
+  "Dark SVG must include smooth curved sapphire-satin ribbons.");
 
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");

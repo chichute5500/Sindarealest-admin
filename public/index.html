@@ -1694,6 +1694,15 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
   linear-gradient(128deg,#030e1a 0%,#0a2740 26%,#142e45 46%,#061725 63%,#12334b 80%,#03101c 100%);
  filter:hue-rotate(0deg) saturate(.88) brightness(.94) contrast(1.02);
 }
+
+/* Organic liquid-glass wave assets: curved satin ribbons are the primary ambient backdrop. */
+.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261020-2');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261020-2');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}
+.theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54))}
+.theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72))}
+.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261020-2');filter:none}
+.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261020-2');filter:none}
 </style>
 </body>
 </html>
