@@ -100,5 +100,7 @@ assert.ok(finalThemeCss.includes("#productOverlay{align-items:stretch;justify-co
   "Mobile product detail must use the reference full-screen gallery composition rather than a floating inset modal.");
 assert.ok(finalThemeCss.includes("#productOverlay .detail-modal{width:100%;max-width:none;height:100dvh;max-height:100dvh;border:0;border-radius:0"),
   "The mobile product detail surface must occupy the full viewport while preserving desktop modal behavior.");
+assert.ok(finalThemeCss.includes("#productOverlay .detail-favorite-btn{right:58px;top:calc(10px + env(safe-area-inset-top))}"),
+  "On mobile, the favorite button must be offset from the close button so both controls remain clickable.");
 
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
