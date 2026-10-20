@@ -381,6 +381,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const saveScreenshot = async (name, variant, extra = {}) => {
     const filename = name + '__' + variant.viewport.width + 'x' + variant.viewport.height + '__' + variant.theme + '.png';
     const filePath = join(screenshotDir, filename);
+    // Capture first, then inspect the exact rendered state after screenshot's
+    // animation suppression/render flush; this catches delayed UI artifacts.
+    await page.screenshot({ path: filePath, animations: 'disabled' });
+    await page.waitForTimeout(100);
     const measurement = await page.evaluate(() => {
       const rawClosingTagNodes = [];
       const rawClosingTagPseudoContent = [];
@@ -428,13 +432,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         }
       }
 
-      // CSS-generated content is not represented by SHOW_TEXT nodes, so inspect
-      // visible pseudo-elements separately and retain a safe diagnostic signature.
-      for (const element of document.querySelectorAll('body *')) {
-        const rect = element.getBoundingClientRect();
-        if (rect.width <= 0 || rect.height <= 0 ||
-            rect.right <= 0 || rect.left >= window.innerWidth ||
-            rect.bottom <= 0 || rect.top >= window.innerHeight) continue;
+      // CSS-generated content is not represented by SHOW_TEXT nodes. Include
+      // html/body themselves as a stray artifact may be painted by a root pseudo-element.
+      const allElements = [document.documentElement, document.body, ...document.querySelectorAll('body *')];
+      for (const element of allElements) {
+        if (!element) continue;
         let visible = true;
         for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
           const style = getComputedStyle(ancestor);
@@ -444,6 +446,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           }
         }
         if (!visible) continue;
+        const rect = element.getBoundingClientRect();
         for (const pseudo of ['::before', '::after', '::marker']) {
           const content = getComputedStyle(element, pseudo).content || '';
           if (content.includes('</div>') && content !== 'none' && content !== 'normal') {
@@ -464,6 +467,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         viewportHeight: window.innerHeight,
         documentWidth: document.documentElement.scrollWidth,
         horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+        visibleTextContainsClosingTag: (document.body.innerText || '').includes('</div>'),
+        bodyTextClosingTagContext: (() => {
+          const bodyText = document.body.innerText || '';
+          const index = bodyText.indexOf('</div>');
+          return index < 0 ? null : bodyText.slice(Math.max(0, index - 80), Math.min(bodyText.length, index + 100));
+        })(),
         theme: document.documentElement.dataset.adminTheme || null,
         lang: document.documentElement.lang,
         rawClosingTagNodes: rawClosingTagNodes.slice(0, 10),
@@ -482,7 +491,6 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     metrics.push({ screen: name, ...variant, ...measurement, ...extra });
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
     expect(measurement.horizontalOverflow, name + ' should not overflow horizontally at ' + variant.viewport.width + 'px').toBe(false);
-    await page.screenshot({ path: filePath, animations: 'disabled' });
     screenshots.push({ file: filename, screen: name, ...variant, ...extra });
   };
 
