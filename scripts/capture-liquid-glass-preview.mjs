@@ -462,10 +462,13 @@ try {
     const expectedHeroProduct = products.find((product) =>
       product && product.skuVerified !== false
       && String(product.sku || '').trim().toUpperCase() === 'SD-GL052') || null;
-    const expectedHeroImage = expectedHeroProduct
+    const expectedHeroImageValue = expectedHeroProduct
       ? String((Array.isArray(expectedHeroProduct.images) && expectedHeroProduct.images.length
-        ? expectedHeroProduct.images[0] : expectedHeroProduct.image) || '').replace(/^\\.\\//, '')
+        ? expectedHeroProduct.images[0] : expectedHeroProduct.image) || '')
       : '';
+    const expectedHeroImage = expectedHeroImageValue.startsWith('./')
+      ? expectedHeroImageValue.slice(2)
+      : expectedHeroImageValue;
     const heroImagePass = expectedHeroProduct
       ? startup.heroImage.present
         && startup.heroImage.loaded
