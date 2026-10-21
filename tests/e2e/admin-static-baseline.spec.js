@@ -663,6 +663,18 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#productPanelDetails #pTitle')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pCategory')).toBeVisible();
+    const categoryInput = page.locator('#pCategory');
+    const originalCategory = await categoryInput.inputValue();
+    const categoryOptions = page.locator('#categoryOptions option');
+    await expect(categoryInput).toHaveAttribute('list', 'categoryOptions');
+    await expect(categoryOptions).toHaveCount(8);
+    await expect(page.locator('#categoryOptions option[value="Ví da"]')).toHaveCount(1);
+    await expect(page.locator('#categoryOptions option[value="Dây đồng hồ"]')).toHaveCount(1);
+    // The editor permits a custom category value without submitting or persisting it.
+    await categoryInput.fill('Danh mục fixture tuỳ chỉnh');
+    await expect(categoryInput).toHaveValue('Danh mục fixture tuỳ chỉnh');
+    await categoryInput.fill(originalCategory);
+    await expect(categoryInput).toHaveValue(originalCategory);
     await expect(page.locator('#productPanelDetails #pSku')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pDescription')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPrice')).toBeVisible();
