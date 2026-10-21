@@ -1,3 +1,9 @@
+# HISTORICAL — DO NOT USE AS THE ACTIVE HANDOFF
+
+Use the canonical prompt instead: [PROMPT-NEXT-CHAT-2026-10-22.md](PROMPT-NEXT-CHAT-2026-10-22.md). This REV3 file predates later workflow evidence and the user’s additional Liquid Glass icon/fly-to-cart requirements; retained only as history.
+
+---
+
 # PROMPT TIẾP QUẢN MỚI — 2026-10-22 (REV3)
 
 Tiếp tục làm việc liên tục từ GitHub. Không yêu cầu người dùng kể lại, không dừng chỉ để báo cáo.
