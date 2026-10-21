@@ -1854,10 +1854,16 @@
     "pr111SemanticAudit": "PARTIAL",
     "pr111State": "OPEN_UNMERGED",
     "pr108State": "OPEN_UNMERGED",
-    "capturedAt": "2026-10-21T15:18:00Z",
+    "capturedAt": "2026-10-21T15:19:00Z",
     "head": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
     "duplicateStaticId": "resolved in source; fresh CI not yet confirmed",
-    "progressEstimatePercent": 48
+    "progressEstimatePercent": 48,
+    "headBeforeStatusRefresh": "a250be98f03e8006ce102044884f0fb2b6b2f96d",
+    "latestPassingSourceCi": {
+      "runId": 39624406745,
+      "sha": "5d0d94ea3b6677af8b9371f61bb8b3e82cab8a03",
+      "conclusion": "success"
+    }
   },
   "pr111FileInventory": {
     "retrievedPages": 12,
@@ -2108,8 +2114,8 @@
     "currentPr108State": "OPEN_UNMERGED",
     "note": "This JSON write will itself advance the ADMIN branch via a handoff-only commit; it does not change the source/test SHA listed above."
   },
-  "latestObservedAdminHead": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
-  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:18:00Z",
+  "latestObservedAdminHead": "a250be98f03e8006ce102044884f0fb2b6b2f96d",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:19:00Z",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
     "url": "https://564cd391.sindarealest2.pages.dev/admin/",
@@ -2426,8 +2432,8 @@
         "sha": "ae351fcc2790b70e198ec3db1053bef7ad46981f"
       }
     ],
-    "verification": "Earlier baseline SHA ae351fcc2790b70e198ec3db1053bef7ad46981f passed source validation and Preview diagnostic. Current descendant HEAD has not yet been validated by a fresh run.",
-    "progressEffect": "No progress increase until current descendant CI and screenshot comparison pass.",
+    "verification": "Source validation passes on SHA 5d0d94ea3b6677af8b9371f61bb8b3e82cab8a03. Handoff documentation has since advanced the branch HEAD; validate the new HEAD separately.",
+    "progressEffect": "Progress remains 48%; one UI/source-validation loop closed, but full visual parity and authenticated business QA remain outstanding.",
     "lastObservedFailure": {
       "runId": 39623834484,
       "sha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
@@ -2442,7 +2448,8 @@
       "failedRunId": 39623834484,
       "failedSha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
       "reason": "A parallel edit temporarily created two dashboard panels with the same static ID; the duplicate panel was removed.",
-      "resolutionCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6"
+      "resolutionCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6",
+      "resolutionStatus": "resolved; source validation passes on 5d0d94ea3b6677af8b9371f61bb8b3e82cab8a03"
     },
     "compactFollowUpCommit": "b82863eec7ca04094ea58d3ca0109e843fa946c8",
     "visualReview": {
@@ -2468,6 +2475,30 @@
       }
     ],
     "fixCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6",
-    "noProgressIncrease": true
+    "noProgressIncrease": true,
+    "latestSourceValidation": {
+      "runId": 39624406745,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624406745",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "5d0d94ea3b6677af8b9371f61bb8b3e82cab8a03",
+      "checks": [
+        "project integrity",
+        "full automated test suite",
+        "admin-dashboard-revenue-empty-state contract"
+      ]
+    },
+    "latestVisualReview": {
+      "runId": 39623789724,
+      "artifactId": 12355039596,
+      "artifactName": "admin-preview-evidence-170",
+      "status": "reviewed",
+      "testedUiSha": "ae351fcc2790b70e198ec3db1053bef7ad46981f",
+      "viewports": [
+        "390x844 light",
+        "1280x800 light"
+      ],
+      "notes": "Single revenue empty-state panel visible below quick actions. Mobile panel continues below fold and remains scrollable; this is fixture/diagnostic evidence, not authenticated real-backend QA."
+    }
   }
 }
