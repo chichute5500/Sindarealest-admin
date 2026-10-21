@@ -1408,3 +1408,11 @@ Next priority is the 12-screen Admin reference comparison and evidence-backed UI
 - Artifact `admin-preview-evidence-188` (ID 12357698923, 11,188,289 bytes, expiry 2026-11-04) stores 59 PNGs, 36 fixture metrics and metadata; zero recorded browser/console/network/HTTP errors or attempted fixture writes. Synthetic fixture screenshots are not real backend proof.
 - Keep overall estimate at 48%. 12-screen reference parity remains NOT ACCEPTED, authenticated backend QA NOT TESTED/BLOCKED BY ACCESS, product image-save/PRE-PRO migrations DEFERRED_BY_OWNER. PR #111 and #108 remain OPEN/unmerged, with PR #111 still mixed scope and not merge-ready.
 - Continue with the 12-screen audit and safe ADMIN-only UI work. Keep the protected static branch and `main` untouched. No merge, Production deploy, Access/secrets change or bypass, remote D1/R2/SQL/setup/migration, or TinyFish.
+
+
+## Verified continuation addendum — 2026-10-21 16:00 UTC: product editor keyboard tabs
+
+- Source/test SHA `32c1f28662e7240353b0eda2f5daeaf22359257e`: Validate Source [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) PASS and Admin Preview/Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) SUCCESS on exact SHA.
+- `tests/e2e/admin-static-baseline.spec.js` now covers ArrowLeft/ArrowRight and Home/End behavior for the product editor's ARIA tablist, with focus and `aria-selected` assertions. Existing modal focus-wrap/restoration checks remain. This commit is test-only; no application/business code changed.
+- Full static Playwright baseline: 3 passed (30.5s). Responsive/theme matrix and configured Preview login CSS signature passed. Artifact `admin-preview-evidence-189` ID `12359007200`; 59 PNGs and 36 fixture metrics. Synthetic fixtures do not establish authenticated real-backend QA.
+- Progress remains 48%; full 12-screen parity is NOT ACCEPTED; authenticated backend QA is NOT TESTED/BLOCKED_BY_ACCESS; product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER. Keep PR #111/#108 open/unmerged and all safety restrictions unchanged.
