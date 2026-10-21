@@ -624,3 +624,17 @@ Continue the SinDarealest2 static storefront from the latest GitHub state. Read 
 - Preserve the real catalog unchanged: this is a **hero presentation asset replacement**, not permission to fabricate a product, add a SKU, alter catalog/API data, or change product detail/image relationships. Keep the original official logo and brand identity intact.
 - Update or remove tests/audit assertions that incorrectly require `SD-GL052` in the public product payload for the homepage hero. Replace them with checks that the supplied hero asset is referenced, loads successfully, and is visible in Light/Dark and responsive captures. Do not merely silence the audit: deploy Preview, verify exact source SHA, capture live screenshots, and inspect the actual hero images.
 - This correction supersedes older notes in this file that say the homepage hero must remain hidden until `SD-GL052` appears in public product data, or that forbid using a replacement image. Do not repeat the long SKU search already done. Continue the rest of the storefront audit after fixing this specific issue; no Admin, Production, merge, backend, D1/R2, or catalog changes.
+
+# HIGHEST-PRIORITY USER CORRECTION — HERO IMAGE / SD-GL052 (2026-10-22)
+
+The user explicitly confirms: **the homepage hero image was personally uploaded by the user and approved by the user.** This is settled. Do not ask the user to approve it again, do not search for another hero image, and do not restart the SD-GL052 investigation.
+
+Mandatory rules for every continuation/chat:
+1. **Never delete, hide, blank out, collapse away, or replace the user-approved hero image.** If the hero is currently missing, restore its display using the already supplied/approved image and trace the current repository asset/reference. Treat a hidden hero as a regression to fix, not as a safe fallback.
+2. SD-GL052 is the user’s reference/label for this approved hero image. **Its absence from the public product/catalog payload is NOT a blocker for displaying the hero image.** Do not gate the hero image on catalog SKU lookup, public product payload, product-card existence, or a product API response.
+3. Do not substitute a different product photo and do not fabricate or modify catalog SKU/product data. Keep the approved hero presentation asset separate from catalog integrity checks; do not change real product image mappings.
+4. Do not ask the user to resend the image or re-confirm approval. Inspect existing conversation attachment/repository assets and markup first. Preserve the supplied approved image exactly; only adjust presentation/layout/CSS if needed to match the reference.
+5. Remove or revise any code, conditional, regression test, audit rule, or handoff wording that hides the hero or fails the homepage audit solely because SD-GL052 is absent from catalog data. Tests must assert that the approved hero asset is rendered and visible in Light/Dark and responsive layouts, not that the SKU exists in the catalog.
+6. After fixing, run only affected tests, deploy to the feature-branch Preview (never Production), verify the exact deployed source SHA, capture and inspect real Preview screenshots, and update the test ledger. Continue the rest of the website audit without pausing just to report progress.
+
+This user confirmation overrides every older conflicting note in this document or repository that says to hide the hero, wait for SD-GL052 to exist in the public product payload, or seek another image/approval. No Admin work, no merge, no Production/main changes, no backend/D1/R2/catalog mutation.
