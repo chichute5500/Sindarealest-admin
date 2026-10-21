@@ -818,24 +818,58 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
 });
 
 test('respects the reduced-motion preference across interactive ADMIN layers', async ({ page }) => {
-  // Read-only visual test: block every API request so no real backend call or write can occur.
+  // Read-only audit: session and GET APIs use synthetic data; every mutation is rejected.
   await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
-  await page.route('**/api/**', route => route.fulfill({
-    status: 401,
-    contentType: 'application/json',
-    body: JSON.stringify({ error: 'Read-only reduced-motion audit; API access is blocked.' })
-  }));
+  const blockedWrites = [];
+  await page.route('**/api/**', async route => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+    if (request.method() !== 'GET') {
+      blockedWrites.push({ method: request.method(), path: pathname });
+      await route.fulfill({
+        status: 405,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Reduced-motion UI test blocks all writes.' })
+      });
+      return;
+    }
+
+    const fixtures = {
+      '/api/admin/session': { authenticated: true, fixtureOnly: true },
+      '/api/admin/products': { products: [] },
+      '/api/admin/settings': {
+        showPrices: false,
+        welcomeEnabled: false,
+        watermarkEnabled: false
+      },
+      '/api/admin/payment-qr': {
+        active: false, activeImageUrl: '', pending: false, pendingImageUrl: '',
+        bankName: '', accountNumber: '', accountName: '', instructions: ''
+      },
+      '/api/admin/orders': { orders: [] },
+      '/api/admin/customers': { customers: [] },
+      '/api/admin/warranties': { claims: [], warranties: [] },
+      '/api/admin/audit-logs': { logs: [] }
+    };
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(Object.hasOwn(fixtures, pathname) ? fixtures[pathname] : {})
+    });
+  });
 
   const response = await page.goto(localAdminUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
   expect(response?.status(), 'ADMIN source should load for reduced-motion CSS verification').toBe(200);
+  await expect(page.locator('#appView')).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator('#main .dashboard-revenue')).toBeVisible();
 
   const motionStyles = await page.evaluate(() => {
     const selectors = [
       ['topbar', '.topbar'],
-      ['panel', '.panel'],
-      ['editor', '.editor'],
-      ['dashboardShortcut', '.dashboard-shortcut'],
-      ['control', '.control']
+      ['panel', '#main .dashboard-revenue'],
+      ['editor', '#backdrop .editor'],
+      ['dashboardShortcut', '#main .dashboard-shortcut'],
+      ['control', '#loginView .control']
     ];
     const seconds = value => value.split(',').map(part => {
       const time = part.trim();
@@ -866,5 +900,5 @@ test('respects the reduced-motion preference across interactive ADMIN layers', a
     ).toBe(true);
     expect(style.scrollBehavior, name + ' should not use smooth scrolling for reduced motion').toBe('auto');
   }
+  expect(blockedWrites, 'The reduced-motion audit must not issue API mutations').toEqual([]);
 });
-
