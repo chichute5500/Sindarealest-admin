@@ -49,40 +49,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: c18736b70d0035769408ce3190a6fb729ccd75fd
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109
+- Tested commit: 63960ac2bb586674e07acbff31326e382b95ad95
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39660529674
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 64 real PNGs captured in artifact admin-preview-evidence-221 (not committed to Git).
+- Local source Playwright matrix: PASS; 64 real PNGs captured in artifact admin-preview-evidence-224 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 64 real PNGs; login shell: 16; read-only fixture module screens: 48; fixture metrics: 40.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-## Verified checkpoint — 2026-10-22 01:58 +07
-
-- Exact application/test SHA: `c18736b70d0035769408ce3190a6fb729ccd75fd`. Validate Source [#39656347891](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891) and Admin Preview/Playwright [#39656348109](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109) both **SUCCESS** on that exact SHA.
-- Checks: `npm run check`, `npm test`, responsive/theme screenshot matrix and configured Preview diagnostic PASS. Evidence artifact has 64 PNGs (16 login shell + 48 synthetic/read-only fixture views) and 40 fixture metrics. This does not prove authenticated backend business flows.
-- Product-list mobile refinements: align price/stock/edit controls at top; shorten and single-line clip the unverified SKU hint without changing SKU data; give search a full mobile row; use an accessible compact clear-all icon; make empty-state tests target `#clearFilterEmpty`. Commits: `a1acd0c`, `1ae35b2`, `c18736b`.
-- Overall progress remains **50%**. Screen #3 and all-12-screen visual parity remain NOT ACCEPTED. Authenticated backend QA is NOT TESTED/BLOCKED by Access. Image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER.
-- PR #108/#111 stay open/unmerged. No Production deployment, main/static branch edits, Access/secrets changes, remote D1/R2 writes, migrations, or TinyFish.
-- Next: re-fetch HEAD and CI, inspect screenshots against the reference at 390×844 and 1280×800 in light/dark, then continue substantive screen-by-screen UI work. Do not raise progress from test success alone.
-
-
-## Live checkpoint verification — 2026-10-22
-
-- Verified live branch `feature/admin-isolated-handoff-2026-10-20`; checkpoint began at HEAD `3f50b4d14e890a4c7b1d2b679f364f322fc3933c`.
-- Exact-HEAD workflow **Validate source and tests** run [#39657885958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39657885958) completed `success`. This is CI evidence, not visual-parity acceptance.
-- PR #111 and #108 remain open and unmerged; do not merge or deploy Production.
-- Live inspection found the promised checkpoint missing from the seven handoff files. `current-status.json` and `latest-test-results.json` have now been updated to record this finding. Remaining handoff documents are being updated sequentially and must be re-read after writes before calling the handoff complete.
-- Progress remains **50%**. Do not increase without verified visual comparison and broader screen/flow acceptance.
-
-## Continuation checkpoint — 2026-10-22T02:14:21.414+07:00 (Asia/Ho_Chi_Minh)
-
-- ADMIN branch code/test tip before these documentation commits: `a33bb596a1b2cf587f4f2cfb9af84d42592f6b24`. Application change: `8a2acf322f3c785716b0c0d27947f44bf9565727`; matching Playwright assertion update: `a33bb596a1b2cf587f4f2cfb9af84d42592f6b24`.
-- Scope is ADMIN product-list presentation only: price and stock now sit inline under product identity on mobile; the mobile edit action is a compact SVG button with a product-specific accessible name. Unknown price and stock stay labelled as unknown. Product data, API, authentication, backend, and persistence are unchanged.
-- Baseline visual evidence inspected before the change: [artifact `admin-preview-evidence-221`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109/artifacts/12371792374), source SHA `c18736b70d0035769408ce3190a6fb729ccd75fd`. I opened the approved `admin-mobile-reference.png` and `products__390x844__light.png`, `products__390x844__dark.png`, `products__1280x800__light.png`. The previous mobile version put price/stock/edit in a second row, making cards taller than the reference. These are baseline screenshots, not screenshots of the new change.
-- Last successful pre-change validation: [run #39658657454](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454) checked out exact SHA `b659a19838c1276de7c4bd9ef9edab2279369651`; Validate Source and `npm test` completed successfully. It predates `8a2acf322f3c785716b0c0d27947f44bf9565727` and `a33bb596a1b2cf587f4f2cfb9af84d42592f6b24`, so it does **not** validate this iteration.
-- Current post-change result: **PENDING / NOT VERIFIED**. The available run lookup returned no workflow records for the two new SHAs. No post-change test PASS or visual acceptance is claimed. Overall progress stays **50%**; screen #3 and all-12-screen visual parity remain **NOT ACCEPTED**; authenticated backend QA remains **NOT TESTED/BLOCKED BY ACCESS**.
-- Pull requests unchanged by intent: PR #111 remains open/unmerged on the ADMIN branch; PR #108 remains open/unmerged on the static-site branch. Do not merge either.
-- Next: obtain exact-SHA validation for `a33bb596a1b2cf587f4f2cfb9af84d42592f6b24`; run the Admin Preview/Playwright matrix; inspect new screenshots at 390×844 light/dark and 1280×800 light; fix any failure, then update the screen audit and re-read all seven handoff files.
