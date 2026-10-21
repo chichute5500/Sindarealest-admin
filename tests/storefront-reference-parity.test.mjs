@@ -21,10 +21,10 @@ function assertSatinFoldScale(name, svg, maxStroke, maxBlur, expectedPaths) {
   assert.ok(blur.length > 0 && Math.max(...blur) <= maxBlur,
     name + ' must keep blur tight enough to preserve fine fabric creases.');
 }
-assertSatinFoldScale('Desktop light satin', desktopLight, 30, 9, 25);
-assertSatinFoldScale('Desktop dark satin', desktopDark, 30, 9, 25);
-assertSatinFoldScale('Mobile light satin', mobileLight, 13, 5, 25);
-assertSatinFoldScale('Mobile dark satin', mobileDark, 13, 5, 25);
+assertSatinFoldScale('Desktop light satin', desktopLight, 12, 4, 25);
+assertSatinFoldScale('Desktop dark satin', desktopDark, 12, 4, 25);
+assertSatinFoldScale('Mobile light satin', mobileLight, 5, 2, 25);
+assertSatinFoldScale('Mobile dark satin', mobileDark, 5, 2, 25);
 
 assert.match(html, /\.theme-bg--light\{background-color:#eaf3fb;background-image:url\('images\/liquid-glass-light\.svg\?v=/);
 assert.match(html, /\.theme-bg--dark\{background-color:#061522;background-image:url\('images\/liquid-glass-dark\.svg\?v=/);
@@ -98,10 +98,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-8"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-8"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-8"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-8"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-9"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-9"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-9"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-9"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1/,
   'All four satin backgrounds must use the updated cache key.');
 
