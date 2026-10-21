@@ -584,6 +584,28 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
     await expect(page.locator('#pTitle')).toBeFocused();
 
+    // Required identity stays visible while the supplementary/pricing/gallery groups change.
+    await expect(page.locator('#productEditorTabs')).toHaveAttribute('role', 'tablist');
+    await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#pTitle')).toBeVisible();
+    await expect(page.locator('#pCategory')).toBeVisible();
+    await expect(page.locator('#pSku')).toBeVisible();
+    await expect(page.locator('#pPrice')).toBeHidden();
+    await page.locator('#productTabPricing').click();
+    await expect(page.locator('#productTabPricing')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#pTitle')).toBeVisible();
+    await expect(page.locator('#pPrice')).toBeVisible();
+    await expect(page.locator('#imageDropZone')).toBeHidden();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#productTabGallery')).toBeFocused();
+    await expect(page.locator('#productTabGallery')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#imageDropZone')).toBeVisible();
+    await expect(page.locator('#pPrice')).toBeHidden();
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('#productTabPricing')).toBeFocused();
+    await page.locator('#productTabDetails').click();
+    await expect(page.locator('#pSku')).toBeVisible();
+
     // Keyboard focus is trapped in the product dialog and wraps at both ends.
     await page.locator('#editorClose').focus();
     await page.keyboard.press('Shift+Tab');
@@ -609,6 +631,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     for (const variant of variants) {
       await openEditor(variant);
       await saveScreenshot('product-editor', variant, { dialog: true });
+      await page.locator('#productTabGallery').click();
+      await expect(page.locator('#imageDropZone')).toBeVisible();
       await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
       // Exercise local object-URL thumbnails with synthetic images only; do not save the product.
       await page.locator('#imageInput').setInputFiles([
