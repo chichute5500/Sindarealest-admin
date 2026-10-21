@@ -58,3 +58,12 @@
 - Source screenshot matrix: 64 real PNGs; login shell: 16; read-only fixture module screens: 48; fixture metrics: 40.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+## Verified checkpoint — 2026-10-22 01:58 +07
+
+- Exact application/test SHA: `c18736b70d0035769408ce3190a6fb729ccd75fd`. Validate Source [#39656347891](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891) and Admin Preview/Playwright [#39656348109](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109) both **SUCCESS** on that exact SHA.
+- Checks: `npm run check`, `npm test`, responsive/theme screenshot matrix and configured Preview diagnostic PASS. Evidence artifact has 64 PNGs (16 login shell + 48 synthetic/read-only fixture views) and 40 fixture metrics. This does not prove authenticated backend business flows.
+- Product-list mobile refinements: align price/stock/edit controls at top; shorten and single-line clip the unverified SKU hint without changing SKU data; give search a full mobile row; use an accessible compact clear-all icon; make empty-state tests target `#clearFilterEmpty`. Commits: `a1acd0c`, `1ae35b2`, `c18736b`.
+- Overall progress remains **50%**. Screen #3 and all-12-screen visual parity remain NOT ACCEPTED. Authenticated backend QA is NOT TESTED/BLOCKED by Access. Image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+- PR #108/#111 stay open/unmerged. No Production deployment, main/static branch edits, Access/secrets changes, remote D1/R2 writes, migrations, or TinyFish.
+- Next: re-fetch HEAD and CI, inspect screenshots against the reference at 390×844 and 1280×800 in light/dark, then continue substantive screen-by-screen UI work. Do not raise progress from test success alone.
