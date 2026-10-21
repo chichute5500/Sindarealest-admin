@@ -269,3 +269,10 @@ Source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 395
 - These changes complement the QR activation saved-draft guard and the Admin-styled QR image picker with selected-filename status, recorded in the prior addendum.
 - Source CI [39583053755](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755) passed on the exact SHA. Local screenshot artifact [admin-preview-evidence-129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648/artifacts/12338960648) contains 59 PNGs. Preview [39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648) remains failed on the configured deployed CSS signature mismatch; the current source contains the required rule, but the served stylesheet does not.
 - Product image-save and PRE/PRO migration work stays **DEFERRED_BY_OWNER**. No remote schema check, migration, product-image backend test, R2/D1 operation or Production deploy was performed.
+
+
+## Live Admin branch/PR audit addendum — 2026-10-21
+
+- Current Admin branch at audit start: `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7`; exact-head Validate CI [39583615335](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583615335) passed. App source SHA `47a23ded111d2982383460ba7265b778e2bc6d39` remains the source SHA for the latest Preview failure [39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648). The docs-only commit did not trigger Preview due to workflow path filters.
+- PR #111 is open/unmerged against `main`, with 1,088 files changed (+37,133/−390). The diff has a broad mixture of Admin, public storefront, Functions/API, migrations, scripts, tests and a large history/screenshot evidence set. PR #108 is also open/unmerged against `main`. No merge-readiness conclusion is granted; full diff audit is still open.
+- Product image-save and PRE/PRO D1 migration work remains deferred by owner. No remote schema inspection or mutation was performed.
