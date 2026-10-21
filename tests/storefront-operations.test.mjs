@@ -53,6 +53,12 @@ assert.ok(storefrontHtml.includes('id="sd-icon-state-specificity-fix-2026-10-22"
   && storefrontHtml.includes('background:rgba(234,243,251,.48)!important')
   && storefrontHtml.includes('transform:scale(.97)!important'),
   'Favorite states and pressed Liquid Glass feedback must override later contrast-pass !important rules.');
+
+assert.ok(storefrontHtml.includes('#productOverlay #detailFavorite:not([aria-pressed="true"]):active svg')
+  && storefrontHtml.includes('#productOverlay #detailFavorite[aria-pressed="true"] svg path{')
+  && storefrontHtml.includes('fill:currentColor!important'),
+  'Accent-blue pressed tint must apply only while the heart is unselected; a favorited heart must remain red-filled.'); 
+
 assert.ok(storefrontHtml.includes('html.dark #productOverlay #detailFavorite:not([aria-pressed="true"]):active')
   && storefrontHtml.includes('background:rgba(92,145,185,.20)!important')
   && storefrontHtml.includes('html.dark #productOverlay #detailFavorite[aria-pressed="true"]'),
