@@ -188,9 +188,24 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     published: true,
     images: []
   };
+  const fixtureProducts = [
+    { ...fixtureProduct, fulfillmentType: 'unclassified' },
+    {
+      id: 'UI-ONLY-PRODUCT-BELT', slug: 'ui-only-belt', title: 'Thắt lưng thử nghiệm giao diện',
+      sku: 'UI-FIXTURE-002', skuVerified: false, category: 'belts', categoryLabel: 'Thắt lưng',
+      description: 'Fixture tổng hợp; không phải sản phẩm thật.', price: null, stock: null,
+      published: true, fulfillmentType: 'in_stock', images: []
+    },
+    {
+      id: 'UI-ONLY-PRODUCT-STRAP', slug: 'ui-only-strap', title: 'Dây đồng hồ thử nghiệm giao diện',
+      sku: 'UI-FIXTURE-003', skuVerified: false, category: 'watch-straps', categoryLabel: 'Dây đồng hồ',
+      description: 'Fixture tổng hợp; không phải sản phẩm thật.', price: null, stock: null,
+      published: true, fulfillmentType: 'made_to_order', images: []
+    }
+  ];
   const fixtureApi = {
     '/api/admin/session': { authenticated: true, fixtureOnly: true },
-    '/api/admin/products': { products: [fixtureProduct] },
+    '/api/admin/products': { products: fixtureProducts },
     '/api/admin/settings': {
       showPrices: false,
       welcomeEnabled: true,
@@ -668,6 +683,29 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
 
     await captureView('dashboard', 'dashboard', null, true);
     await captureView('products', 'products', null, true);
+
+    // Product list search includes category labels and announces result counts.
+    const productNames = page.locator('#main .product-table .prodname');
+    await expect(productNames).toHaveCount(3);
+    await expect(page.locator('#productResultSummary')).toContainText('Có 3 sản phẩm phù hợp');
+    await page.getByLabel('Tìm tên, SKU hoặc danh mục').fill('THẮT LƯNG');
+    await expect(productNames).toHaveCount(1);
+    await expect(productNames).toHaveText('Thắt lưng thử nghiệm giao diện');
+    await expect(page.locator('#productResultSummary')).toContainText('Có 1 sản phẩm phù hợp');
+    await page.locator('#searchBox').fill('khong-co-san-pham-nay');
+    await expect(page.locator('#main .product-empty-state')).toContainText('Thử từ khóa khác hoặc xóa tất cả bộ lọc.');
+    await page.getByRole('button', { name: 'Xóa tất cả bộ lọc' }).click();
+    await expect(page.locator('#searchBox')).toHaveValue('');
+    await expect(page.locator('#categoryBox')).toHaveValue('all');
+    await expect(page.locator('#fulfillmentBox')).toHaveValue('all');
+    await expect(productNames).toHaveCount(3);
+    await page.locator('#fulfillmentBox').selectOption('made_to_order');
+    await expect(productNames).toHaveCount(1);
+    await expect(productNames).toHaveText('Dây đồng hồ thử nghiệm giao diện');
+    await page.locator('#categoryBox').selectOption('wallets');
+    await expect(page.locator('#main .product-empty-state')).toBeVisible();
+    await page.getByRole('button', { name: 'Xóa tất cả bộ lọc' }).click();
+    await expect(productNames).toHaveCount(3);
 
     // Product editor and image gallery are true source components. Only their input data is fixture-only.
     for (const variant of variants) {
