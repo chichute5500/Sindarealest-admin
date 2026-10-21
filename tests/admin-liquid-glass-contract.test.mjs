@@ -180,9 +180,9 @@ has('role="tablist" aria-label="Nhóm thông tin sản phẩm"', 'named product 
 has('role="tabpanel" aria-labelledby="productTabDetails"', 'basic panel relationship');
 has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image panel');
 has('role="tabpanel" aria-labelledby="productTabPricing" hidden', 'initially hidden other panel');
-assert.ok(html.indexOf('id="pPrice"') < html.indexOf('id="productPanelGallery"'), 'price belongs to the basic info panel before the images tab');
-assert.ok(html.indexOf('id="pStock"') < html.indexOf('id="productPanelGallery"'), 'stock belongs to the basic info panel before the images tab');
-assert.ok(html.indexOf('id="productPanelGallery"') < html.indexOf('id="productPanelPricing"'), 'images tab appears before the other tab');
+assert.ok(adminHtml.indexOf('id="pPrice"') < adminHtml.indexOf('id="productPanelGallery"'), 'price belongs to the basic info panel before the images tab');
+assert.ok(adminHtml.indexOf('id="pStock"') < adminHtml.indexOf('id="productPanelGallery"'), 'stock belongs to the basic info panel before the images tab');
+assert.ok(adminHtml.indexOf('id="productPanelGallery"') < adminHtml.indexOf('id="productPanelPricing"'), 'images tab appears before the other tab');
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
 has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
