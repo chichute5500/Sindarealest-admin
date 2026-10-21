@@ -14,23 +14,15 @@
 **Chưa nghiệm thu:** visual parity đủ 12 nhóm màn hình; authenticated real-backend/business QA. **Tạm hoãn theo yêu cầu chủ sở hữu:** product image-save/actual R2 storage và PRE/PRO migration (`DEFERRED_BY_OWNER / NOT VERIFIED`).
 **Giới hạn runtime:** không có local checkout trong phiên này, nên local `git status` là **NOT VERIFIED**. GitHub branch/PR/Actions đã được kiểm tra trực tiếp.
 **Rào chắn:** chỉ ADMIN branch; không sửa `main`/website tĩnh; không merge/cherry-pick/force-push; không Production deploy; không chạy setup/migration; không sửa secrets/Cloudflare Access hoặc bypass; không thao tác D1/R2 từ xa; không dùng TinyFish.
+
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 4e660a0869dd21d4a688d72823bd08b1795cf2ff
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359
+- Tested commit: 96aba7609d2e478c5d6257f89453b20a2b97f19e
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39635212397
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-192 (not committed to Git).
+- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-193 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Latest exact-SHA browser verification — 2026-10-21 16:18 UTC
-
-- Test-only commit `4e660a0869dd21d4a688d72823bd08b1795cf2ff` adds two read-only fixture checks to `tests/e2e/admin-static-baseline.spec.js`: (1) an order with `price_confirmation_required=true` and no terms confirmation keeps QR-request and receipt-verification buttons disabled; (2) backup/restore controls expose JSON export, JSON file accept-type and confirmation disclosure without invoking either action.
-- Validate Source [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) **SUCCESS**; Admin Preview/Playwright [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) **SUCCESS** on exact SHA. Static browser suite: 3 passed (25.5s). Existing QR unsaved-draft activation guard, product-editor keyboard checks and reduced-motion tests were also rerun and passed.
-- Artifact `admin-preview-evidence-192` ID `12360132558`, 11,895,011 bytes, expires 2026-11-04: 63 PNGs (16 login + 47 synthetic/read-only fixtures), 39 metrics, zero recorded page/console/network/HTTP errors, no attempted fixture writes and no unexpected API paths. Preview login CSS signature PASS, not authenticated backend QA.
-- Handoff JSON has been updated with exact run IDs and artifact #192. Subsequent documentation commits advance branch HEAD beyond the tested source SHA; always re-fetch live refs before the next write.
-- Overall progress remains 48%. Screen #7 order/fulfillment is now **PARTIAL** on fixture safety-state coverage, not authenticated flow acceptance. Screen #8 payment QR and #12 backup/settings remain **PARTIAL**, not accepted as visually equivalent to all references. Authenticated backend QA BLOCKED / NOT TESTED; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
