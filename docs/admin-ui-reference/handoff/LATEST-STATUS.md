@@ -51,7 +51,7 @@
 
 - Prompt nguồn cập nhật: `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`, mục XXII.
 - Ảnh tham chiếu đã tải lên và xác minh tồn tại trên nhánh: `docs/icon-assets/Icon.png` (chuẩn hình dáng icon gốc) và `docs/icon-assets/Chitiet.png` (tham chiếu tương tác/hiệu ứng). Mở trực tiếp hai ảnh trước khi triển khai.
-- Palette nền tảng: `#eaf3fb`, `#142a3c`, `#5c91b9`. HEX riêng cho tim đỏ và trị số kính (opacity/blur/shadow/refraction) chưa được chốt; không xem là token đã duyệt.
+- Palette: nền `#eaf3fb`, icon/chữ `#142a3c`, accent `#5c91b9`, tim yêu thích bật `#E5484D`. Baseline kính sáng: surface `rgba(255,255,255,0.42)`, viền `1px solid rgba(255,255,255,0.72)`, blur `16px saturate(145%)`, shadow `0 8px 24px rgba(20,42,60,0.10)`, highlight `inset 0 1px 0 rgba(255,255,255,0.80)`. Nhấn: scale `0.97`, inset shadow `inset 0 2px 8px rgba(20,42,60,0.14)`, transition `140ms cubic-bezier(0.2,0.7,0.2,1)`. Đây là baseline kỹ thuật; triển khai/test vẫn chưa được xác nhận.
 - README tham chiếu: `docs/icon-assets/README.md`.
 - Inventory cập nhật: `docs/icon-system-inventory.md`.
 - Yêu cầu mới: Liquid Glass không ripple; icon lún/đổi màu khi nhấn; heart đỏ khi đã thích; cart badge và toast khớp kết quả thật; mọi điểm thêm hàng dùng chung animation bay đến icon cart trên header; clone dùng đúng ảnh đang hiển thị, product và variant; không dịch chuyển DOM gốc hoặc add trùng.
