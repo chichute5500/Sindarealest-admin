@@ -147,3 +147,10 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 ## Checkpoint note — 2026-10-22
 
 Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322fc3933c`; exact-HEAD Validate source and tests run [#39657885958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39657885958) succeeded. This does **not** establish visual acceptance. Keep screen parity incomplete until actual reference screenshots are inspected at 390x844 and 1280x800 in light and dark themes, and record only observations actually verified. Progress remains 50%; PR #111/#108 remain unmerged.
+
+## Iteration continuation — 2026-10-22T02:14:21.414+07:00
+
+- Baseline artifact `12371792374`, source SHA `c18736b70d0035769408ce3190a6fb729ccd75fd`, was opened and visually compared with `admin-mobile-reference.png` at its product screen. The before-change product screenshots inspected were 390×844 light/dark and 1280×800 light.
+- Observed gap: mobile price/stock/edit occupied a separate row below the product identity, unlike the reference's denser product card. The ADMIN-only source/test changes are `8a2acf322f3c785716b0c0d27947f44bf9565727` and `a33bb596a1b2cf587f4f2cfb9af84d42592f6b24`; product values, API and data behavior remain unchanged.
+- Screen #3 remains **PARTIAL / NOT ACCEPTED**. No post-change screenshot is available yet, so the new layout remains **PENDING / NOT VERIFIED**. Keep all 12 screen acceptance incomplete and progress at **50%**.
+- Last successful validation before the change is [run #39658657454](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454) on `b659a19838c1276de7c4bd9ef9edab2279369651`, not the edited SHA. Next: run exact-SHA validation and Preview/Playwright, inspect the new 390×844 light/dark and 1280×800 light screenshots, then update Screen #3 only if the evidence supports it.
