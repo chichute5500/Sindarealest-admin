@@ -240,3 +240,13 @@ This supersedes stale test claims in earlier appended checkpoints only for the f
 - PR #111 observed before the evidence/handoff doc refresh: HEAD `9e0434f769dedf2b20e1365aa96147336afc237c`, OPEN/unmerged, 1,096 files (+37,660/−392), mixed scope and not merge-ready. PR #108 remains OPEN/unmerged. Do not merge or modify static/main branches.
 - Overall progress remains **48%**. Product image save/upload and PRE/PRO migrations remain `DEFERRED_BY_OWNER / NOT VERIFIED`. Authenticated real-backend QA, full 12-screen parity and full semantic/security PR review remain open.
 - No local checkout; do not say tests ran locally. Current exact PASS result comes from GitHub Actions run above.
+
+
+## Latest owner-confirmed handoff override — 2026-10-21
+
+- Read the newest OVERRIDE CHECKPOINT at the end of PROMPT-NEXT-CHAT.md; it supersedes stale SHA/PR-size numbers earlier in this file.
+- Owner already supplied Preview deployment verification. Do not ask them to repeat the Preview identity check. Deployment commit 3ed2d86b8b97f04718c478979136f986b3d1b07b is older than the latest observed Admin branch HEAD 719a537f52eccf66c9642661c2758f8861beabcf; do not treat it as current HEAD.
+- Latest source/unit/local Playwright PASS evidence remains run 39592097224 on SHA ebb20fa7f2359b19ae91a9c62b3006a16b8db148. Preview diagnostic failed; current HEAD is not proven tested by that run.
+- Owner feedback: the Admin still looks approximately 80–85% like the old UI. Make a substantive redesign against the reference PNG and 12 screen families; not a color-only/appended-CSS pass.
+- Reported Cloudflare Pages redirect/rewrite loop for rules in public/_redirects remains unresolved. Investigate read-only evidence first; no Production deployment or Access bypass.
+- Progress estimate remains 48%. Owner action needed now: NO. Keep image-save and PRE/PRO migration tasks deferred.
