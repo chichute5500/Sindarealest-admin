@@ -104,6 +104,12 @@ assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
 
 /* Desktop hero fallback and mobile drawer/navigation separation are deliberate responsive contracts. */
+assert.ok(html.includes('id="sdWelcomeFirstPaintGuard"')
+  && html.indexOf('id="sdWelcomeFirstPaintGuard"') < html.indexOf('</head>')
+  && html.indexOf('body:has(#welcomeSplash) #mobileBottomNav') < html.indexOf('</head>')
+  && html.indexOf('body:has(#welcomeSplash) #accountDrawer') < html.indexOf('</head>'),
+  'Welcome splash guards must be in the document head to prevent first-paint toolbar and account/cart/checkout drawer flashes.');
+
 assert.match(desktopLight, /data-satin-style="fine-satin-creases-v11"/);
 assert.match(desktopDark, /data-satin-style="fine-satin-creases-v12"/);
 assert.match(mobileLight, /data-satin-style="fine-satin-creases-v11"/);
