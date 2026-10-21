@@ -148,3 +148,11 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - PR #111 remains OPEN/unmerged: 909 files (+30,716/-356), 407 ahead/6 behind main. PR #108 OPEN. Progress 43%.
 - Read-only review notes update-product duplicate SKU errors may fall through to generic 500 handling; DB uniqueness still protects integrity. Do not change backend/business logic without approval; add a scoped regression test only after permission and scope review.
 - Continue safe work: verify current refs/runs, review PR scope and handoff. No Access bypass, secrets, remote D1/migrations, deploy, merge or branch sync.
+
+
+## Follow-up verification — 2026-10-21 12:14 +07:00
+
+- Confirmed [source CI run 39547341928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547341928) has completed SUCCESS on `4a1b58950c0b8e9de75009d5af313dfdfbea3595`. GitHub job steps show dependency audit, project integrity and automated tests completed successfully; the temporary `Post Check out source` step also completed.
+- This validates the current pre-handoff commit, but does not address the deployed Preview failure. The latest Preview diagnostic is still run 39542387719 and still fails the deployed CSS/UI signature check. Evidence artifact `admin-preview-evidence-62` (artifact ID 12320316041, 9.17 MB, expires 2026-11-04) is available from that run; this connector exposed artifact metadata but not a direct decoded screenshot view in this pass.
+- The current authorized blocker remains the intended Preview deployment/source identity and Access path. Owner must provide/confirm the target; do not inspect or change secrets, bypass Access, or use real customer data.
+- Progress remains 43%. No source code change, deployment, merge, remote migration, or protected-branch write occurred.

@@ -4,7 +4,7 @@
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "de6114f75cba36193c50ad043175d08be092929f",
-  "testedCommitSha": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+  "testedCommitSha": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
   "capturedAt": "2026-10-20T20:50:00.385Z",
   "progressEstimatePercent": 43,
   "progressBasis": "Stage-based estimate, not code completion. Current HEAD CI passes, but configured Preview CSS signature still fails; authenticated business flows, full 12-screen comparison, full mixed-scope PR diff audit/remediation and authorized Preview identity remain open.",
@@ -749,11 +749,11 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286",
-  "branchHeadSha": "fbc783d514b194a7f922083e79b66cf333dda2ce",
-  "latestVerifiedAt": "2026-10-21T12:08:00+07:00",
-  "latestVerifiedSourceCommit": "fbc783d514b194a7f922083e79b66cf333dda2ce",
-  "currentAdminBranchHead": "fbc783d514b194a7f922083e79b66cf333dda2ce",
-  "latestVerificationSummary": "Source CI run 39547169787 SUCCESS on exact HEAD fbc783d514b194a7f922083e79b66cf333dda2ce; dependency audit, project integrity and automated tests PASS. Preview diagnostic 39542387719 still FAILS deployed CSS/UI signature on older source de6114f...; no newer Preview run found.",
+  "branchHeadSha": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
+  "latestVerifiedAt": "2026-10-21T12:14:00+07:00",
+  "latestVerifiedSourceCommit": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
+  "currentAdminBranchHead": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
+  "latestVerificationSummary": "Source CI run 39547341928 SUCCESS on 4a1b58950c0b8e9de75009d5af313dfdfbea3595. Dependency audit, project integrity, and automated tests passed. Latest deployed Preview diagnostic 39542387719 remains FAIL at CSS/UI signature check; no new Preview run was performed.",
   "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
@@ -869,8 +869,8 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-21T12:08:00+07:00",
-  "currentBranchHeadAtHandoff": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+  "updatedAt": "2026-10-21T12:14:00+07:00",
+  "currentBranchHeadAtHandoff": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -909,23 +909,20 @@
     "scope": "LOCAL SOURCE SCREENSHOTS + SYNTHETIC FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T12:08:00+07:00",
-    "type": "CURRENT_HEAD_CI_RECHECK_AND_READ_ONLY_API_REVIEW",
+    "updatedAt": "2026-10-21T12:14:00+07:00",
+    "type": "CURRENT_CI_FINAL_POLL",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceCodeChanged": false,
     "testsRunInThisUpdate": false,
     "verified": [
-      "Verified live branch ref at current HEAD before write.",
-      "Latest source CI 39547169787 succeeded on exact current HEAD.",
-      "Latest Preview diagnostic still fails separately; no newer Preview run found.",
-      "Reviewed product create/update endpoints and related SKU tests read-only; documented update duplicate conflict response gap without changing API.",
-      "Refreshed live PR metadata."
+      "Re-queried GitHub Actions after the previous in-progress state; run 39547341928 is now SUCCESS on exact commit 4a1b58950c0b8e9de75009d5af313dfdfbea3595.",
+      "Read live Preview artifact metadata for run 39542387719; artifact admin-preview-evidence-62 remains available until 2026-11-04.",
+      "Updated handoff evidence while preserving distinction between source CI and Preview diagnostic."
     ],
     "notDone": [
-      "No Preview fix or new Preview test triggered.",
-      "No authenticated backend QA or 12-screen visual parity.",
-      "No remote D1/migration/deploy or secret access.",
-      "No local checkout/git status."
+      "No direct image/screenshot rendering from artifact in this connector pass.",
+      "No new Preview diagnostic run; deployed source mismatch remains.",
+      "No authenticated backend QA, full 12-screen reference comparison, or remote D1/migration verification."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -997,17 +994,17 @@
   },
   "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
   "latestCiVerification": {
-    "runId": 39547169787,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787",
-    "sourceCommit": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+    "runId": 39547341928,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547341928",
+    "sourceCommit": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
     "workflow": "Validate source and tests",
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
     "automatedTests": "PASS",
     "dependencyAudit": "PASS",
-    "previewDiagnostics": "NOT INCLUDED",
-    "remoteD1": "NOT TESTED",
-    "note": "Exact current HEAD; this is source CI only."
+    "previewDiagnostics": "NOT_INCLUDED",
+    "remoteD1": "NOT_TESTED",
+    "note": "Current pre-handoff HEAD passed source CI; documentation handoff update itself is a subsequent commit and is not yet covered by this run."
   },
   "latestPreviewArtifactInspection": {
     "inspectedAt": "2026-10-21T11:21:00+07:00",
@@ -1160,6 +1157,12 @@
     "conclusion": "FAILURE",
     "failedStep": "Diagnose configured deployed Preview",
     "reason": "CSS/UI signature mismatch",
+    "artifact": {
+      "id": 12320316041,
+      "name": "admin-preview-evidence-62",
+      "sizeBytes": 9172652,
+      "expiresAt": "2026-11-04T04:10:05Z"
+    },
     "currentHeadRunFound": false
   },
   "apiReadOnlyAudit": {

@@ -960,3 +960,11 @@ This check is based on the current GitHub source blob `public/admin/index.html` 
 - Current PR #111 live metadata: OPEN/unmerged, 909 files (+30,716/−356), 407 commits ahead and 6 behind main. PR #108 remains OPEN/unmerged. No merge, cherry-pick, branch synchronization, deployment, secret access, or remote D1 operation was performed.
 - Additional read-only API review: `functions/api/admin/products/[id].js` updates SKU fields and relies on the database uniqueness constraint. A duplicate SKU on update is caught by the generic DB error path (likely 500) rather than the create route's explicit 409 conflict response. This does not bypass uniqueness, but update-specific duplicate-SKU error behavior lacks a dedicated regression test in the reviewed test files. **Do not change this API in this task without explicit approval**, because it is backend/business behavior outside the allowed UI-only scope; record as a future scoped test/UX item.
 - Current progress remains **43%**. Preview target identity, authenticated module QA, full 12-screen visual comparison, migration strategy and full mixed-scope PR review remain blockers.
+
+
+## Follow-up verification — 2026-10-21 12:14 +07:00
+
+- Confirmed [source CI run 39547341928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547341928) has completed SUCCESS on `4a1b58950c0b8e9de75009d5af313dfdfbea3595`. GitHub job steps show dependency audit, project integrity and automated tests completed successfully; the temporary `Post Check out source` step also completed.
+- This validates the current pre-handoff commit, but does not address the deployed Preview failure. The latest Preview diagnostic is still run 39542387719 and still fails the deployed CSS/UI signature check. Evidence artifact `admin-preview-evidence-62` (artifact ID 12320316041, 9.17 MB, expires 2026-11-04) is available from that run; this connector exposed artifact metadata but not a direct decoded screenshot view in this pass.
+- The current authorized blocker remains the intended Preview deployment/source identity and Access path. Owner must provide/confirm the target; do not inspect or change secrets, bypass Access, or use real customer data.
+- Progress remains 43%. No source code change, deployment, merge, remote migration, or protected-branch write occurred.
