@@ -221,8 +221,8 @@ assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
   'Live capture must directly open and reload a route derived from a real rendered product.');
 assert.match(live, /typeof reloadResponse\?\.status === 'function' \? reloadResponse\.status\(\) : null/,
   'A detail reload must use Playwright Response.status() and must not treat the status method as a numeric property.');
-assert.match(live, /Capture the transient welcome layer before storefront readiness[\s\S]*waitForStorefront\(page, label\)/,
-  'The transient welcome overlay must be captured before storefront readiness can auto-dismiss it.');
+assert.match(live, /await captureFirstPaintFrames\(page, page\.__sdAuditLabel[\s\S]*await waitForStorefront\(page, label\)/,
+  'The initial 0–300ms viewport frames and early DOM evidence must be captured before storefront readiness or scrolling can hide a flash.');
 assert.match(live, /Welcome splash was not visible early enough to capture on live Preview/,
   'The live audit must report a missing welcome capture explicitly instead of silently skipping required evidence.');
 assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
