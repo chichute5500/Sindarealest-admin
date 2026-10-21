@@ -38,7 +38,7 @@ Không tự đổi vai trò hai ảnh này. Khi so sánh, kiểm tra giao diện
 
 ## Quy trình thanh toán — tài liệu tham chiếu bổ sung (2026-10-21)
 
-Bộ render checkout/payment được tạo để bổ sung cho hai ảnh gốc mobile ở trên. Khi có mặt trong Git repository, file tham chiếu dự kiến sẽ là `docs/static-web-reference/checkout-payment-flow-reference.png`; **chưa được đánh dấu là đã có cho đến khi kiểm tra thấy chính xác file này trên GitHub**. Không tự tạo ảnh thay thế.
+Bộ render checkout/payment đã được người dùng tải lên GitHub và được xác minh tồn tại trên nhánh `fix/liquid-glass-audit-2026-10-19` tại `docs/static-web-reference/checkout-payment-flow-reference.png` (blob SHA `c89ff843af1c094def9233d27a148e048b191990` tại lần kiểm tra 2026-10-21). [Mở ảnh tham chiếu checkout/payment](./checkout-payment-flow-reference.png). Nếu kiểm tra ở thời điểm sau thấy SHA/path thay đổi hoặc file không mở được, xác minh lại trực tiếp trên GitHub; không quay lại trạng thái ghi “chưa có” khi file vẫn tồn tại. Ảnh này bổ sung cho hai ảnh mobile gốc, không thay thế chúng.
 
 Nội dung nghiệp vụ cần đối chiếu trong mẫu:
 - Trạng thái hàng (`made_to_order` / `in_stock` / `unclassified`) do chủ cửa hàng thiết lập ở Admin cho từng sản phẩm; khách hàng không được chọn loại hàng.
@@ -49,3 +49,11 @@ Nội dung nghiệp vụ cần đối chiếu trong mẫu:
 - QR và thông tin tài khoản lấy từ cấu hình Admin đang hoạt động; không dùng QR/chi tiết ngân hàng minh họa trong ảnh.
 
 **Đối chiếu thị giác bắt buộc khi ảnh đã được commit:** mở ảnh ở độ phân giải gốc; so sánh với cả hai ảnh tham chiếu mobile gốc và trang Preview hiện hành; chụp và đối chiếu màn hình checkout ở chế độ sáng/tối. Mẫu render chỉ bổ sung luồng checkout, không thay thế thiết kế gốc toàn website.
+
+
+## Trạng thái đồng bộ ảnh checkout/payment — 2026-10-21
+
+- File chuẩn: [`checkout-payment-flow-reference.png`](./checkout-payment-flow-reference.png).
+- URL GitHub đầy đủ: https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png
+- Tên file, đường dẫn và nhánh phải giữ thống nhất trong Master Prompt và Next Chat Prompt. Đây là ảnh storyboard tham chiếu; không sao chép dữ liệu ví dụ (giá, SKU, tài khoản ngân hàng, ngày tháng) thành dữ liệu thật.
+- Tham chiếu thị giác có 3 nguồn: ảnh gốc mobile sáng, ảnh gốc mobile tối và storyboard checkout/payment. Luôn đối chiếu Preview thực tế với cả ba; storyboard không thay thế giao diện thương hiệu đang chạy.
