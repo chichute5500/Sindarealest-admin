@@ -83,10 +83,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-5"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-5"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-5"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-5"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-6"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-6"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-6"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-6"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1/,
   'All four satin backgrounds must use the updated cache key.');
 
@@ -101,3 +101,6 @@ assert.ok(html.includes('color:#15344b!important;') && html.includes('html.dark 
   'Gallery and product-image controls must have contrast-safe light and dark states.');
 assert.ok(html.includes('.product-photo img{mix-blend-mode:multiply}') && html.includes('html.dark .product-photo img{mix-blend-mode:normal}'),
   'Product image sources remain unchanged while light-mode photo backgrounds blend into the satin surface.');
+
+assert.ok(html.includes('body:has(.sd-fullscreen-viewer.open) .sd-fullscreen-thumbs{bottom:calc(52px + env(safe-area-inset-bottom))!important}'),
+  'Fullscreen gallery thumbnails must leave room for the brand footer when mobile navigation is hidden.');
