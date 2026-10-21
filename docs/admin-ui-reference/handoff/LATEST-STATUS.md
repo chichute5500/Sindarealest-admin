@@ -1,16 +1,15 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái hiện tại:** `SOURCE CHECKS PASS; HORIZONTAL MOBILE GALLERY RAIL PASS ON SHA 78a16b6; VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA BLOCKED BY ACCESS`
+**Trạng thái hiện tại:** `SOURCE CHECKS PASS; REDUCED-MOTION PLAYWRIGHT E2E PASS ON SHA 131d6f3; PREVIEW CSS SIGNATURE PASS; 12-SCREEN VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA NOT TESTED`
 **Tiến độ tổng thể ước tính:** **48%** — ước lượng quản lý, không phải tỷ lệ test pass.
 **Repository/nhánh được phép sửa:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`.
-**Source/test SHA gần nhất đã kiểm thử đầy đủ:** `78a16b6d9fca91d7b080834f293e1690dc7c10cd`; Validate Source run [#39621065756](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756) và Admin Preview run [#39621065853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853) đều PASS. Các commit sau đó chỉ cập nhật handoff docs; kiểm tra lại PR HEAD để phân biệt docs SHA và source/test SHA; CSS UI change `1fb56f7b5773876c581847bf44abbef1c5c16a67` cũng có Run #157 PASS. Run #158 (45f630e99cfd1dd047c234f0fb42fa197d9bc978) xác nhận npm run check, npm test, local Playwright và configured Preview diagnostic PASS. [Run #157](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615192697) · [Run #158](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216).
-**Bằng chứng lịch sử run #151:** Source `cf594677550f63ddf92ebdba5aea87587dbfe029`, artifact 151; giữ lại như lịch sử, không coi là test SHA mới nhất.
-**HEAD hiện tại sẽ thay đổi bởi commit bàn giao tài liệu này**; không coi commit tài liệu mới là source-test SHA. Local checkout/Git working tree chưa xác minh được.
-**Preview diagnostic gần nhất:** PASS trong run #158 trên source/test SHA `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; chỉ xác nhận URL/configuration được workflow kiểm tra, không xác nhận mọi deployment hoặc authenticated real-backend flows.
-**PR #111:** OPEN/unmerged, mixed-scope; latest GitHub filename list returned 1,112 paths (+38,619/−392): `docs/` 1,050 paths including 913 PNG assets; 24 Functions, 2 migrations, 5 scripts, 24 tests, 2 workflows, and root/data/public/package files including unrelated `public/index.html`. Chưa merge-ready. **PR #108:** OPEN/unmerged. Không merge hai PR.
-**Chưa nghiệm thu:** visual parity đủ 12 nhóm màn hình; authenticated business-flow/backend QA; semantic/security audit toàn bộ PR #111; tương thích migration/ledger từ xa.
-**Tạm hoãn theo yêu cầu chủ sở hữu:** lỗi lưu ảnh sản phẩm và migration PRE/PRO (`DEFERRED_BY_OWNER / NOT VERIFIED`).
-**Rào chắn:** chỉ ADMIN branch; không sửa `main`/website tĩnh; không Production deploy; không chạy setup/migration; không sửa secrets/Cloudflare Access; không thao tác dữ liệu D1/R2 từ xa; không dùng TinyFish.
+**Latest source/test SHA đã kiểm thử đầy đủ:** `131d6f395a94ef82b8d1d827fb5f000ab92df60e`. [Validate Source #39629076105](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076105) **PASS**; [Admin Preview/Playwright #39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) **SUCCESS** trên SHA đó. Workflow chạy `npm run check`, `npm test`, toàn bộ `tests/e2e/admin-static-baseline.spec.js` (bao gồm reduced-motion test), responsive/theme source screenshot matrix và configured Preview CSS signature.
+**Preview signature:** `PASS_LOGIN_CSS_SIGNATURE`; inline CSS có 505 rules, `hasLoginHideRule=true`, selector dự kiến khớp, `.topbar > .brand` có `display:none !important`. Đây là kiểm tra login CSS/target, không phải nghiệm thu nghiệp vụ thật sau đăng nhập.
+**Artifact:** [admin-preview-evidence-188](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142/artifacts/12357698923), ID `12357698923`, 11,188,289 bytes, giữ đến 2026-11-04. Chứa 59 PNG (16 login shell + 43 màn hình fixture tổng hợp), 36 fixture metrics và metadata. Browser/console/request/HTTP errors = 0; attempted fixture writes = 0. Screenshot module dùng synthetic/read-only data, không xác minh dữ liệu thật/backend.
+**PR #111:** OPEN / UNMERGED, base `main`, mixed-scope gồm Admin, storefront, Functions/API, migrations, scripts, tests và evidence; chưa merge-ready. **PR #108:** OPEN / UNMERGED. Không merge.
+**Chưa nghiệm thu:** visual parity đủ 12 nhóm màn hình; authenticated real-backend/business QA. **Tạm hoãn theo yêu cầu chủ sở hữu:** product image-save/actual R2 storage và PRE/PRO migration (`DEFERRED_BY_OWNER / NOT VERIFIED`).
+**Giới hạn runtime:** không có local checkout trong phiên này, nên local `git status` là **NOT VERIFIED**. GitHub branch/PR/Actions đã được kiểm tra trực tiếp.
+**Rào chắn:** chỉ ADMIN branch; không sửa `main`/website tĩnh; không merge/cherry-pick/force-push; không Production deploy; không chạy setup/migration; không sửa secrets/Cloudflare Access hoặc bypass; không thao tác D1/R2 từ xa; không dùng TinyFish.
 
 ## Kết quả kiểm thử tự động gần nhất
 
@@ -23,3 +22,12 @@
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Latest exact-SHA reduced-motion browser pass — 2026-10-21
+
+- Test fix commits `4538efaa0a95799fea39765d4f46439e83d4ce60` and `131d6f395a94ef82b8d1d827fb5f000ab92df60e` align the reduced-motion Playwright selectors with the real dashboard DOM (components are rendered directly into `#appView`, not nested under `#main`). Application CSS/business logic was not changed for this fix.
+- Validate Source [#39629076105](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076105) and Admin Preview/Playwright [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) both succeeded on exact SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e`. Browser log: `3 passed` for the static baseline test file, including `respects the reduced-motion preference across interactive ADMIN layers`; configured Preview CSS signature also passed.
+- Evidence artifact `admin-preview-evidence-188` (ID `12357698923`) contains 59 PNGs (16 login + 43 read-only fixture module captures), 36 fixture metrics, and metadata. All recorded browser/console/request/HTTP error arrays are empty; attempted writes and unexpected API paths are empty. Do not treat fixture screenshots or login CSS signature as authenticated backend QA.
+- GitHub PR metadata before this status refresh showed PR #111 OPEN/unmerged and PR #108 OPEN/unmerged. Handoff updates add files to PR #111, so changed-file counts are point-in-time only; its mixed-scope review remains open.
+- Progress stays **48%**. Full 12-screen parity remains NOT ACCEPTED; authenticated business QA remains NOT TESTED/BLOCKED BY ACCESS; image save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
