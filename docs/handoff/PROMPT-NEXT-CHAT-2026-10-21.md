@@ -1,3 +1,33 @@
+## BÀN GIAO BỔ SUNG — 2026-10-22 (ưu tiên cao nhất; lỗi khởi tạo trang cần xác minh)
+
+### Yêu cầu người dùng mới
+1. Xác minh lỗi thanh công cụ/thanh hành động phía dưới xuất hiện ngay trên trang chào mừng (welcome splash), dù trang chào mừng phải hiển thị riêng và không bị lớp giao diện cửa hàng che/chồng lên.
+2. Xác minh hiện tượng nháy giao diện tài khoản khoảng 0,1 giây khi mở trang: giao diện tài khoản thoáng xuất hiện trước rồi mới chuyển sang trang chào mừng. Đây là nghi vấn flash-of-incorrect-content (FOUC) hoặc thứ tự khởi tạo/ẩn-hiện sai; CHƯA được ghi là đã tái hiện hoặc đã sửa cho tới khi có capture/video/DOM evidence.
+3. Người dùng yêu cầu cập nhật file và prompt bàn giao để chat mới tiếp tục đúng việc, không bắt người dùng nhắc lại.
+
+### Trạng thái source và xác minh gần nhất
+- Repo: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 vẫn open/unmerged; tuyệt đối không merge.
+- HEAD được kiểm tra khi bắt đầu lượt bàn giao này: `1b0cb09e0f417be85910bb18a8e08728080e65fc`. Luôn fetch lại branch HEAD trước khi sửa tiếp để tránh ghi đè commit mới.
+- Preview: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`; không dùng Production làm môi trường thử nghiệm.
+- Bằng chứng live audit trước đó: artifact [12367629440](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39648961942/artifacts/12367629440), workflow run [39648961942](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39648961942). Báo cáo lúc đó: 86 screenshot; 8/8 viewport-theme pairs; 12/12 product-route checks; 8/8 cart/account/checkout/gallery states; không có console/page/HTTP/request errors hoặc horizontal overflow. Chỉ áp dụng cho SHA thực sự được workflow kiểm tra; phải đối chiếu run metadata với HEAD/deployment trước khi dùng làm bằng chứng cho code mới.
+- Các sửa gần nhất có thay đổi cách hòa nền trắng ở gallery bằng SVG filter có điều kiện, giảm độ gắt nếp satin Dark, và cập nhật assertion test. Source/test và Preview được báo PASS ở lượt trước, nhưng cần fetch lại workflow status/SHA trước khi tuyên bố cho HEAD hiện tại.
+- Hero: không lặp lại tìm kiếm SD-GL052 như lý do để dừng các phần khác. Làm theo correction mới nhất trong file này: tiếp tục audit hero và xem ảnh live thực tế; không sửa catalog/backend/D1/R2 hay giả mạo dữ liệu sản phẩm. Giữ nguyên mọi mapping sản phẩm đã xác minh.
+
+### Kế hoạch xử lý lỗi welcome / bottom toolbar / account flash
+- Trước hết tìm trong `public/index.html` các phần welcome/splash, account view/panel, bottom toolbar/action bar, CSS visibility/opacity/z-index, lớp khởi tạo theme và JS chạy trước/sau DOM ready. Tìm các selector như `welcome`, `splash`, `account`, `bottom`, `toolbar`, `is-hidden`, `hidden`, `aria-hidden`, và các hàm boot/restore state; không đoán tên selector nếu chưa đọc source.
+- Tái hiện trên Preview với Playwright ở mobile 360×800 và 390×844, Light và Dark; capture ngay khi navigation bắt đầu, các frame đầu (0–300 ms), và trạng thái ổn định. Ghi nhận DOM visibility, computed display/visibility/opacity, z-index, class/style transitions, URL, console/request errors. Nếu không thể lấy video/frame 100 ms bằng harness hiện có, thêm một regression test có init script/early DOM observation và screenshot/video từ navigation; không chỉ chụp trang sau khi ổn định.
+- Kiểm tra welcome splash có cần chiếm toàn màn hình và che các phần giao diện storefront cho tới khi được dismiss hay không theo thiết kế/logic hiện có. Không tự đổi hành vi nghiệp vụ: xác định từ code/handoff trước.
+- Khả năng cần kiểm tra (không mặc định là nguyên nhân): CSS ẩn view chỉ được gán sau khi DOM đã render; account panel được restore từ localStorage/session trước khi splash state được áp dụng; CSS animation/transition tạo flash; thanh công cụ fixed/sticky không bị loại khỏi welcome state; thứ tự init theme/account/welcome không đồng bộ.
+- Sửa bằng trạng thái khởi tạo an toàn ngay trong HTML/CSS trước first paint, ví dụ trạng thái mặc định ẩn account/storefront overlays và toolbar trên welcome, rồi chỉ bật chúng sau khi xác định route/state; dùng selector/flag thực tế của source. Tránh thêm delay 100 ms kiểu chữa triệu chứng, tránh giấu lỗi bằng screenshot wait/scroll, không làm hỏng deep links hoặc account/cart khi người dùng chủ động mở chúng.
+- Thêm regression tests chứng minh: (a) welcome splash không hiện bottom toolbar; (b) không có frame account view trước welcome; (c) sau dismiss, trang/toolbar phù hợp xuất hiện đúng; (d) mở trực tiếp account/cart vẫn hoạt động; (e) Light/Dark và reduced-motion đều đúng. Nếu test hiện tại không bắt được flash, phải mở rộng test harness để ghi nhận first paint.
+- Sau sửa: `npm run check` + `npm test`; deploy riêng branch Preview exact SHA; verify Cloudflare deployment metadata; chạy live Playwright capture và mở ảnh/video/report để xác nhận. Ghi rõ PASS/FAIL/BLOCKED; không dùng local fixture làm bằng chứng live.
+- Tiếp tục các phần audit còn lại song song, không dừng sau khi báo cáo tiến độ. Không lặp lại suite PASS nếu không có thay đổi liên quan.
+
+### Handoff safety
+Không làm Admin; không merge PR #108; không chạm main/Production, cấu hình Pages, DNS, secrets, bindings, Access, D1/R2, catalog hoặc backend. Không tuyên bố lỗi đã sửa trước khi có bằng chứng live ở Preview.
+
+---
+
 ## Cập nhật xác minh mới nhất — 2026-10-21 17:18 UTC (ưu tiên hơn mốc cũ)
 
 - HEAD: `306bdc9fa3a1ca7494ed552424c3462105884f83`, nhánh `fix/liquid-glass-audit-2026-10-19`.
