@@ -163,7 +163,11 @@ jobs:
           }
           const checkState = outcome => outcome === 'success' ? 'PASS' : String(outcome || 'NOT_RUN').toUpperCase();
           data.status = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'IN_PROGRESS_BLOCKED_PREVIEW_ACCESS' :
-            (process.env.CHECK_OUTCOME === 'success' && process.env.UNIT_OUTCOME === 'success' && process.env.BASELINE_OUTCOME === 'success' ? 'SOURCE_CHECKS_PASS_PREVIEW_REQUIRES_VERIFICATION' : 'IN_PROGRESS_TEST_FAILURE');
+            (process.env.CHECK_OUTCOME !== 'success' || process.env.UNIT_OUTCOME !== 'success' || process.env.BASELINE_OUTCOME !== 'success'
+              ? 'IN_PROGRESS_TEST_FAILURE'
+              : (process.env.PREVIEW_OUTCOME !== 'success'
+                ? 'SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL'
+                : 'SOURCE_AND_PREVIEW_CHECKS_PASS'));
           data.latestCodeCommitSha = sha;
           data.testedCommitSha = process.env.BASELINE_OUTCOME === 'success' ? sha : null;
           data.capturedAt = meta.capturedAt || new Date().toISOString();
@@ -174,7 +178,9 @@ jobs:
           data.checks.localStaticPlaywrightBaseline = checkState(process.env.BASELINE_OUTCOME);
           data.checks.playwright = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'PASS_LOCAL_MATRIX_BLOCKED_PREVIEW_ACCESS' : checkState(process.env.PREVIEW_OUTCOME);
           data.checks.playwrightPreviewDiagnostics = previewState;
-          data.checks.responsiveViewports = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
+          data.checks.deployedPreview = process.env.PREVIEW_OUTCOME === 'success' ? 'PASS' :
+            (previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'BLOCKED_CLOUDFLARE_ACCESS' : 'FAIL_SIGNATURE_OR_NAVIGATION');
+          data.checks.responsiveViewports = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_SOURCE_SCREENSHOT_MATRIX' : 'FAIL_OR_NOT_RUN';
           data.checks.lightMode = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
           data.checks.darkMode = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
           data.checks.consoleErrors = meta.pageErrors?.length === 0 && meta.consoleErrors?.length === 0 ? 'PASS_LOCAL_LOGIN_ONLY' : 'ERRORS_RECORDED_OR_NOT_RUN';
@@ -182,6 +188,26 @@ jobs:
           data.checks.automatedTests = checkState(process.env.UNIT_OUTCOME);
           data.checks.build = 'NOT_CONFIGURED_IN_PACKAGE_SCRIPTS';
           data.checks.productionDeployment = 'NOT_PERFORMED';
+          const fixtureAudit = meta.uiFixtureVisualAudit || null;
+          data.latestLocalEvidence = {
+            runId: Number(process.env.GITHUB_RUN_ID),
+            url: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            sourceCommit: sha,
+            npmRunCheck: checkState(process.env.CHECK_OUTCOME),
+            npmTest: checkState(process.env.UNIT_OUTCOME),
+            localPlaywright: checkState(process.env.BASELINE_OUTCOME),
+            sourceScreenshotCount: imageFiles.length,
+            loginShellPngCount: meta.screenshots?.length || 0,
+            uiFixturePngCount: fixtureAudit?.screenshots?.length || 0,
+            uiFixtureMetricCount: fixtureAudit?.metrics?.length || 0,
+            pageErrors: meta.pageErrors || [],
+            consoleErrors: meta.consoleErrors || [],
+            failedRequests: meta.failedRequests || [],
+            httpErrors: meta.httpErrors || [],
+            attemptedWrites: fixtureAudit?.attemptedWrites || [],
+            unexpectedApiPaths: fixtureAudit?.unexpectedApiPaths || [],
+            scope: 'LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND'
+          };
           data.screenshots = imageFiles.map(file => {
             const match = file.match(/__(\\d+x\\d+)__(light|dark)\\.png$/);
             return {
@@ -231,7 +257,8 @@ jobs:
             '- npm test: ' + checkState(process.env.UNIT_OUTCOME),
             '- Local source Playwright matrix: ' + checkState(process.env.BASELINE_OUTCOME) + '; ' + imageFiles.length + ' real PNG screenshots saved under ' + dest + '/screenshots/.',
             '- Deployed Preview: ' + previewState + '.',
-            '- The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.',
+            '- Source screenshot matrix: ' + imageFiles.length + ' real PNGs; login shell: ' + (meta.screenshots?.length || 0) + '; read-only fixture module screens: ' + ((meta.uiFixtureVisualAudit?.screenshots || []).length) + '; fixture metrics: ' + ((meta.uiFixtureVisualAudit?.metrics || []).length) + '.',
+            '- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.',
             '- Production deployment: NOT PERFORMED.'
           ];
           status += statusLines.join(String.fromCharCode(10)) + String.fromCharCode(10);
