@@ -47,6 +47,21 @@ export async function onRequestGet({ request, env }) {
         createdAt:requestRow.created_at
       },200,PRIVATE_PAYMENT_HEADERS);
     }
+    const qrSettingsResult = await env.DB.prepare("SELECT key,value FROM settings WHERE key IN ('payment_qr_active','payment_qr_active_key')").all();
+    const qrSettings = Object.fromEntries((qrSettingsResult.results || []).map(row => [row.key, row.value]));
+    const qrSnapshotIsCurrent = qrSettings.payment_qr_active === "1"
+      && qrSettings.payment_qr_active_key === requestRow.qr_image_key
+      && typeof env.IMAGES?.head === "function"
+      && Boolean(await env.IMAGES.head(requestRow.qr_image_key));
+    if (!qrSnapshotIsCurrent) {
+      return json({
+        ok:true, ...base, paymentReady:false, installmentType:requestRow.installment_type,
+        shippingBenefit, freeShippingEligible, freeShipping:false,
+        amount:null, transferReference:null,
+        message:"Mã QR của yêu cầu này không còn hoạt động. Vui lòng chưa chuyển khoản; liên hệ SinDarealest để được cập nhật yêu cầu thanh toán.",
+        createdAt:requestRow.created_at
+      },200,PRIVATE_PAYMENT_HEADERS);
+    }
     return json({
       ok:true, ...base, paymentReady:true, installmentType:requestRow.installment_type,
       amount:Number(requestRow.amount), shippingBenefit, freeShippingEligible, freeShipping,

@@ -158,7 +158,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const tokenHash = await hashOrderAccessToken(token);
   const order = { ...baseOrder, order_number: "SD-TOKEN-1", public_access_token_hash: tokenHash, total: 100000, payment_terms_confirmed_at: null, price_confirmation_required: 1 };
   const db = makeDb({ publicOrder: order });
-  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-1&token=" + token), env: { DB: db } });
+  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-1&token=" + token), env: { DB: db, IMAGES: { head: async key => ({ key }) } } });
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.equal(payload.paymentReady, false, "valid order token cannot reveal a payment amount before terms confirmation");
@@ -171,10 +171,39 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
 {
   const token = createOrderAccessToken();
   const tokenHash = await hashOrderAccessToken(token);
+  const order = { ...baseOrder, order_number: "SD-TOKEN-OLD-QR", public_access_token_hash: tokenHash, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
+  const oldKey = QR_KEY;
+  const currentKey = "qr-550e8400-e29b-41d4-a716-446655440001.png";
+  const pendingRequest = { id:"request-old-qr", installment_type:"deposit", amount:30000, shipping_benefit:"standard_shipping", transfer_reference:"SDOLDQR1234", qr_image_key:oldKey, bank_name:"Old Bank", account_number:"1111222233", account_name:"NGUYEN VAN A", status:"pending", created_at:"2026-10-21T07:01:00Z" };
+  const settings = [{key:"payment_qr_active",value:"1"},{key:"payment_qr_active_key",value:currentKey}];
+  const db = makeDb({ publicOrder:{...order,order_number:"SD-TOKEN-OLD-QR"}, pendingRequest, settings });
+  const response = await getOrderPayment({ request:new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-OLD-QR&token="+token), env:{ DB:db, IMAGES:{ head:async key=>({key}) } } });
+  const payload = await response.json();
+  assert.equal(payload.paymentReady, false, "a pending request whose QR was replaced must not remain payable");
+  assert.equal(payload.amount, null, "an obsolete QR request must not expose an amount");
+  assert.equal(payload.qrImageUrl, undefined, "an obsolete QR request must not expose a dead image URL");
+  assert.equal(payload.transferReference, null, "an obsolete QR request must not invite a transfer using stale instructions");
+}
+{
+  const token = createOrderAccessToken();
+  const tokenHash = await hashOrderAccessToken(token);
+  const order = { ...baseOrder, order_number: "SD-TOKEN-MISSING-QR", public_access_token_hash: tokenHash, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
+  const pendingRequest = { id:"request-missing-qr", installment_type:"deposit", amount:30000, shipping_benefit:"standard_shipping", transfer_reference:"SDMISSQR1234", qr_image_key:QR_KEY, bank_name:"Test Bank", account_number:"1234567890", account_name:"NGUYEN VAN A", status:"pending", created_at:"2026-10-21T07:01:00Z" };
+  const settings = [{key:"payment_qr_active",value:"1"},{key:"payment_qr_active_key",value:QR_KEY}];
+  const db = makeDb({ publicOrder:{...order,order_number:"SD-TOKEN-MISSING-QR"}, pendingRequest, settings });
+  const response = await getOrderPayment({ request:new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-MISSING-QR&token="+token), env:{ DB:db, IMAGES:{ head:async()=>null } } });
+  const payload = await response.json();
+  assert.equal(payload.paymentReady, false, "active QR config with a missing bucket object must not be payable");
+  assert.equal(payload.amount, null);
+  assert.equal(payload.qrImageUrl, undefined);
+}
+{
+  const token = createOrderAccessToken();
+  const tokenHash = await hashOrderAccessToken(token);
   const order = { ...baseOrder, order_number: "SD-TOKEN-2", public_access_token_hash: tokenHash, total: 100000, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
   const pendingRequest = { id: "request-1", installment_type: "deposit", amount: 30000, shipping_benefit: "standard_shipping", transfer_reference: "SDREF123456", qr_image_key: QR_KEY, bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A", status: "pending", created_at: "2026-10-21T07:01:00Z" };
   const db = makeDb({ publicOrder: order, pendingRequest });
-  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-2&token=" + token), env: { DB: db } });
+  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-2&token=" + token), env: { DB: db, IMAGES: { head: async key => ({ key }) } } });
   const payload = await response.json();
   assert.equal(response.headers.get("Cache-Control"), "private, no-store", "ready payment instructions and amount must not be cached");
   assert.equal(payload.paymentReady, true);
@@ -250,7 +279,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const order = { ...baseOrder, order_number: "SD-TOKEN-FULL-PAID", public_access_token_hash: tokenHash, payment_status: "paid", total: 100000, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
   const paidRequest = { id: "request-paid", installment_type: "full", amount: 100000, shipping_benefit: "free_shipping", transfer_reference: "SDFULL123456", qr_image_key: QR_KEY, bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A", status: "settled", created_at: "2026-10-21T07:01:00Z" };
   const db = makeDb({ publicOrder: order, pendingRequest: paidRequest });
-  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-FULL-PAID&token=" + token), env: { DB: db } });
+  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-FULL-PAID&token=" + token), env: { DB: db, IMAGES: { head: async key => ({ key }) } } });
   const payload = await response.json();
   assert.equal(payload.paymentReady, false);
   assert.equal(payload.freeShippingEligible, true);
