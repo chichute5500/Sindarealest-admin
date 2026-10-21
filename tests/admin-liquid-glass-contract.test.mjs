@@ -73,6 +73,7 @@ assert.match(previewSpec, /splitSelectorList\(rule\.selectorText\)\.includes\(no
 assert.doesNotMatch(previewSpec, /normalizeSelector\(rule\.selectorText\)\s*===\s*normalizedHideSelector/,
   'Preview diagnostics must not compare a grouped selector list as one selector');
 
+const baselineSpec = readFileSync(new URL('./e2e/admin-static-baseline.spec.js', import.meta.url), 'utf8');
 assert.match(adminHtml, /function galleryImageSrc\(value\)\s*\{/,
   'Gallery thumbnail URLs should be normalized by the dedicated helper');
 assert.match(adminHtml, /esc\(galleryImageSrc\(g\.url\)\)/,
@@ -85,7 +86,6 @@ assert.match(baselineSpec, /fixtureImages: 2/,
   'Gallery evidence should record the two synthetic visual-only images');
 
 // Guard the visual-capture harness against flaky scrolling of hidden desktop-only table rows.
-const baselineSpec = readFileSync(new URL('./e2e/admin-static-baseline.spec.js', import.meta.url), 'utf8');
 assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
   'Visual capture should pass viewport/theme context into screen-specific setup');
 assert.match(baselineSpec, /variant\.viewport\.width < 821\) return;/,
