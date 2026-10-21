@@ -34,3 +34,18 @@ Không tự đổi vai trò hai ảnh này. Khi so sánh, kiểm tra giao diện
 - Chế độ sáng: `file_0000000017088207af45f5e6dd90cfa4.png`.
 - Chế độ tối: `file_00000000fcb48207a23aeda23caa5eeb.png`.
 - Các khu vực cần khớp: đối chiếu toàn bộ giao diện nhìn thấy trong từng ảnh; không tự ý thay đổi chức năng.
+
+
+## Quy trình thanh toán — tài liệu tham chiếu bổ sung (2026-10-21)
+
+Bộ render checkout/payment được tạo để bổ sung cho hai ảnh gốc mobile ở trên. Khi có mặt trong Git repository, file tham chiếu dự kiến sẽ là `docs/static-web-reference/checkout-payment-flow-reference.webp`; **chưa được đánh dấu là đã có cho đến khi kiểm tra thấy chính xác file này trên GitHub**. Không tự tạo ảnh thay thế.
+
+Nội dung nghiệp vụ cần đối chiếu trong mẫu:
+- Trạng thái hàng (`made_to_order` / `in_stock` / `unclassified`) do chủ cửa hàng thiết lập ở Admin cho từng sản phẩm; khách hàng không được chọn loại hàng.
+- Hàng đặt làm: cọc 30% hoặc thanh toán 100% được freeship.
+- Hàng có sẵn: cọc cố định 100.000 ₫ hoặc thanh toán 100% được freeship.
+- Giá thay đổi trong Admin thì số tiền cọc/toàn bộ phải tự tính từ giá và điều kiện đã được server xác nhận.
+- Nếu giá/loại hàng chưa được xác định, vẫn cho gửi yêu cầu tư vấn nhưng không tạo số tiền hoặc QR thanh toán giả.
+- QR và thông tin tài khoản lấy từ cấu hình Admin đang hoạt động; không dùng QR/chi tiết ngân hàng minh họa trong ảnh.
+
+**Đối chiếu thị giác bắt buộc khi ảnh đã được commit:** mở ảnh ở độ phân giải gốc; so sánh với cả hai ảnh tham chiếu mobile gốc và trang Preview hiện hành; chụp và đối chiếu màn hình checkout ở chế độ sáng/tối. Mẫu render chỉ bổ sung luồng checkout, không thay thế thiết kế gốc toàn website.
