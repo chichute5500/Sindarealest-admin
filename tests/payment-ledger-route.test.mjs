@@ -102,8 +102,8 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 409, "concurrent refunds must not exceed the net receipt ledger");
   assert.equal(db.batches.length, 1);
   const statements = db.batches[0];
-  assert.match(statements[0].sql, /INSERT INTO order_payment_transactions[\\s\\S]*SELECT[\\s\\S]*WHERE \\? != 'refunded' OR \\? <=/);
-  assert.ok(statements.slice(1).every(statement => /EXISTS \\(SELECT 1 FROM order_payment_transactions WHERE id=\\?\\)/.test(statement.sql)),
+  assert.match(statements[0].sql, /INSERT INTO order_payment_transactions[\s\S]*SELECT[\s\S]*WHERE \? != 'refunded' OR \? <=/);
+  assert.ok(statements.slice(1).every(statement => /EXISTS \(SELECT 1 FROM order_payment_transactions WHERE id=\?\)/.test(statement.sql)),
     "status updates and audit writes must be gated on successful ledger insertion");
 }
 {
