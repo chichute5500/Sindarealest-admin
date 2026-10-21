@@ -539,3 +539,11 @@ Continuation evidence — mobile cart compacting (2026-10-21)
 - Added a static regression test that requires 220ms paint-only theme transitions and disallows transition declarations containing `backdrop-filter`.
 - The branch commit requests guarded end-of-work capture. Report CI, Preview deployment, live audit and deployment-SHA verification separately; do not call screenshots accepted when the selected deployment SHA differs from the source SHA.
 - No Admin, Production, product data, D1/R2 bindings, secrets or backend contracts are changed by this CSS/test update.
+
+ 
+### Verified run results — theme-toggle + live capture (2026-10-21)
+- `e3757df8056978949b0a29c893d841c3faffb5e9`: source validation PASS (run #3842), Preview deploy PASS (run #295), guarded visual workflow #621 completed.
+- Live Preview deployment/source SHA verified exact before capture; 84 end-of-work screenshots were captured and archived. Artifact ID `12346227976`, run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39601013762.
+- Local fixture Light/Dark capture/audit PASS; do not conflate it with live capture or human visual sign-off.
+- Generated manifest status `COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW`: 36 comparable pairs; 0 identical, 36 changed; 30 dimension mismatches; 18 unmatched result images; 0 invalid PNG pairs. Baseline has 66 images while current end archive has 84. Root-cause this mismatch using the artifact comparison report and guarded workflow; do not manually edit manifest.
+- Current branch was advanced by the guarded archive commit to `643f9f59c14312cb9611e0797c8a24628c7117cc`. Verify HEAD before further writes. No Production deploy or merge.

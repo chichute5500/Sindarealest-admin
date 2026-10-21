@@ -503,3 +503,12 @@ Latest recorded working HEAD: `01191b0a49487145c9837ca9d765328255c64cbf`; PR #10
  
 ### New continuation checkpoint — 2026-10-21
 The latest code change addresses theme-toggle jank by replacing the long glass-surface transition with a 220ms paint-only transition and adding a regression test. Treat automated CI, Preview deployment, live browser audit and exact-SHA screenshot archival as separate gates. Do not claim visual parity until the matched start/end screenshots are reviewed. Keep Admin/Production/backend/data contracts out of scope and do not merge PR #108.
+
+ 
+### Latest verified checkpoint — live capture completed, parity review pending (2026-10-21)
+- Latest code source/deployed Preview SHA: `e3757df8056978949b0a29c893d841c3faffb5e9`. Source validation PASS (run #3842), Preview deploy PASS (run #295), guarded live visual workflow #621 completed successfully.
+- Workflow artifact: `sindarealest-liquid-glass-preview-621`, ID `12346227976`; run URL https://github.com/chichute5500/Sindarealest-admin/actions/runs/39601013762 . Archive commit advanced branch to `643f9f59c14312cb9611e0797c8a24628c7117cc`; verify branch HEAD before changes.
+- End-of-work archive: 84 real Preview screenshots with exact source/deployment SHA verification. Start-of-work archive has 66 older screenshots. Manifest comparison reports 36 comparable pairs, 30 dimension mismatches, 18 unmatched end images and 0 identical pairs; status `COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW`. This is not visual acceptance. Inspect artifact `comparison.json`/ `report.html` and fix baseline coverage only through the guarded workflow, never by manually editing manifest or fabricating screenshots.
+- Theme-toggle performance adjustment: paint-only 220ms transition for background/color/border/shadow; regression test excludes animated `backdrop-filter`.
+- Continue visual review against supplied mobile Light/Dark references and the full storefront across 360x800, 390x844, 768x1024, 1440x900; prioritize satin/hero blending, 6 benefit cards, order comparison, gallery controls, mobile cart/account Back behavior, checkout, footer and states. Re-test changed areas, don't repeat unchanged PASS tests.
+- Estimated completion ~70% as an engineering estimate, not pixel-parity. PR #108 stays open; never merge or touch Production/Admin/backend/catalog data.
