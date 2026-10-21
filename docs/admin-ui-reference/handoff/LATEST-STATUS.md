@@ -20,3 +20,15 @@
 **Bước kế tiếp — phải thực thi, không chỉ lập kế hoạch:** 1) kiểm tra source CI và Preview diagnostic mới nhất; 2) tiếp tục đối chiếu từng màn hình với ảnh mẫu và sửa các sai lệch có thể xác minh; 3) rà soát PR #111 theo nhóm Functions/migrations/workflows/tests và rủi ro; 4) cập nhật JSON/ảnh bàn giao sau mỗi vòng; 5) tiếp tục sau báo cáo tiến độ nếu không cần chủ sở hữu thao tác.
 
 ---
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: d408781b95af4942b36681cbe2d0334dc03c8683
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-141 (not committed to Git).
+- Deployed Preview: failure.
+- Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
