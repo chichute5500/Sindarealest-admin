@@ -67,3 +67,13 @@
 - A read-only path/source review still flags a material diff-isolation issue: PR #111 includes both `public/admin/index.html` and `public/index.html`; its public HTML differs substantially from the protected static branch. Do not merge or copy changes to the static branch from here.
 - The migration tracking risk remains only source-level: setup script lacks migration 0009 and deploy preflight checks 0007/0008 but not 0009. This does not prove the remote schema is missing it. No remote D1/R2 operations, SQL, migration/setup script, merge, secret/Access changes, bypass, or Production deployment occurred. Never use TinyFish.
 - Overall project estimate remains **48%**.
+
+
+## Visual evidence spot-check — artifact #169
+
+The artifact was downloaded and the reference PNG was opened alongside current Playwright screenshots. This is an initial spot-check, not acceptance of all 12 screens.
+
+- Reference dashboard (screen 2) includes a revenue trend chart beneath the four metric cards. Current fixture dashboard screenshot `dashboard__390x844__light.png` has four metrics, quick actions and activity, but no revenue chart. Source CSS comment says dashboard intentionally uses live counts and avoids fabricated trend data. Do not add invented revenue history; next step is to inspect whether a legitimate historical data source/API exists, otherwise show an honest empty state while preserving reference layout.
+- Reference product-image screen (screen 5) is a dedicated image-management workflow with a real large image and thumbnails. Fixture screenshot `product-gallery__390x844__light.png` uses placeholder imagery inside the product editor. This is synthetic fixture evidence and cannot establish real product gallery behavior or parity.
+- Artifact #169 contains 59 source/fixture PNGs and metadata for responsive/theme checks, but fixture modules use synthetic read-only data. No real authenticated business data was tested.
+- Visual parity remains **NOT ACCEPTED**. Next source work should prioritize a screen-by-screen reference matrix and data-backed dashboard chart/empty-state behavior, without fabricating business data or touching the public website branch.
