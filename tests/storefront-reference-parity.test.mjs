@@ -100,8 +100,12 @@ const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
 const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
-assert.ok(html.includes("const wantedSku='SD-GL052'") && html.includes("String(p&&p.sku||'').trim().toUpperCase()===wantedSku"), 'Hero image must be selected only from the exact verified SD-GL052 product payload.');
-assert.doesNotMatch(html, /hero-sd-gl052\\.png\\?v=/, 'A standalone uploaded image must not bypass verified product-to-image mapping.');
+const heroSync = html.match(/function syncHeroProductImage\\(\\)\\{([\\s\\S]*?)\\}\\s*function renderFeatured/)?.[1] || '';
+assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-supplied'")
+  && heroSync.includes("target.dataset.sourceProductImage='true'"),
+  'The hero-specific image state must remain explicit and separate from catalog product identity.');
+assert.doesNotMatch(heroSync, /products\\.find|wantedSku|catalogGrid|featuredGrid/,
+  'The hero-specific image must not select or substitute a catalog product through SKU discovery.');
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
