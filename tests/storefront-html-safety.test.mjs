@@ -61,8 +61,8 @@ for (const rows of [[], [{ sku: 'SD-GL052', skuVerified: false, images: [] }]]) 
 }
 const visibleHero = runHeroSync([]);
 visibleHero.target.onerror();
-assert.equal(visibleHero.target.hidden, true, "a missing presentation asset must fail closed instead of leaving an empty frame");
-assert.equal(visibleHero.target.src, '');
+assert.equal(visibleHero.target.hidden, false, "a failed asset request must not hide the user-approved hero");
+assert.equal(visibleHero.target.src, '/images/hero-sd-gl052.png?v=20261022-1');
 assert.equal(visibleHero.target.dataset.productImageStatus, 'hero-asset-load-failed');
 
 const helperStart = html.indexOf("const escapeHtml=");
