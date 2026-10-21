@@ -152,6 +152,11 @@ assert.ok(html.includes('.product-photo img{mix-blend-mode:multiply}') && html.i
 assert.ok(html.includes('body:has(.sd-fullscreen-viewer.open) .sd-fullscreen-thumbs{bottom:calc(52px + env(safe-area-inset-bottom))!important}'),
   'Fullscreen gallery thumbnails must leave room for the brand footer when mobile navigation is hidden.');
 
+assert.ok(html.includes('/* Keep the sticky header frosted, but prevent scrolled page imagery/text from ghosting through the official brand lockup. */')
+  && html.includes('.nav-wrap .nav{background:rgba(244,250,255,.94)!important}')
+  && html.includes('html.dark .nav-wrap .nav{background:rgba(4,20,34,.94)!important}'),
+  'Sticky header glass must retain subtle satin translucency while preventing the scrolled footer logo and copy from ghosting behind the official brand mark.');
+
 assert.ok(html.includes('.account-drawer{\n    height:auto!important;\n    bottom:auto!important;'),
   'Mobile account drawer must fit its content rather than leave a large empty panel.');
 
