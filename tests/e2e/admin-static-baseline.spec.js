@@ -804,6 +804,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('[data-warranty-filter="all"]')).toContainText('Tất cả (1)');
       await expect(page.locator('[data-warranty-filter="active"]')).toContainText('Đang xử lý (1)');
       await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
+      const orderNumber = page.locator('.issued-warranty-table .warranty-order-number');
+      await expect(orderNumber).toHaveText('UI-ONLY-ORDER');
+      const orderNumberFits = await orderNumber.evaluate(element => element.scrollWidth <= element.clientWidth);
+      expect(orderNumberFits, 'Warranty order number should remain legible without horizontal clipping').toBe(true);
       await expect(page.locator('.claim-table tbody')).toContainText('UI-ONLY-CLAIM');
 
       // Search only filters local synthetic records; no API mutation is requested.
