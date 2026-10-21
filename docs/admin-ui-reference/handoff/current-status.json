@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T21:00:00+07:00",
+  "updatedAt": "2026-10-22T02:14:21.414+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "3f50b4d14e890a4c7b1d2b679f364f322fc3933c",
+  "branchHeadAtCheckpoint": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressBasis": "Weighted management estimate; source/test SHA c18736b70d0035769408ce3190a6fb729ccd75fd passed Validate Source and Admin Preview/Playwright. Bounded product-list fixes are verified; 12-screen parity remains not accepted and authenticated backend QA is not tested.",
@@ -46,16 +46,18 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "931ec3b8f90a24d10d86137fe4355e63d804b811",
-      "agentWritesAllowed": false
+      "headSha": "913271e4941f6222568fd8726559282ded76f82b",
+      "agentWritesAllowed": false,
+      "changedFiles": 270,
+      "mergeReady": false
     },
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "7fd3976c858b8462b343d2fe53e3ccd8807b4c20",
-      "changedFiles": 1126,
+      "headSha": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+      "changedFiles": 1171,
       "mergeReady": false,
-      "reason": "Mixed scope includes Admin, storefront, Functions/API, migrations, scripts, tests and evidence."
+      "reason": "Open and unmerged; broad PR scope still requires isolation review."
     }
   },
   "currentCi": [
@@ -99,27 +101,58 @@
   ],
   "ownerActionRequiredNow": false,
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T21:00:00+07:00",
+    "checkedAt": "2026-10-22T02:14:21.414+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "checkedHead": "3f50b4d14e890a4c7b1d2b679f364f322fc3933c",
-    "handoffDocsCheckpointWritten": false,
-    "reason": "Live GitHub read confirmed the seven handoff files did not contain the promised new checkpoint. Do not claim handoff is complete until all seven files are updated and re-read.",
-    "latestHeadWorkflow": {
-      "name": "Validate source and tests",
-      "runId": 39657885958,
+    "checkedHeadBeforeDocsRefresh": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+    "currentHeadIsTested": false,
+    "latestCodeAndTest": {
+      "sourceSha": "8a2acf322f3c785716b0c0d27947f44bf9565727",
+      "testSha": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+      "validationStatus": "PENDING_NOT_VERIFIED"
+    },
+    "latestSuccessfulPreChangeValidation": {
+      "sha": "b659a19838c1276de7c4bd9ef9edab2279369651",
+      "runId": 39658657454,
       "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39657885958"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454"
     },
-    "pr108": {
-      "state": "open",
-      "merged": false,
-      "mergeable": false
-    },
-    "pr111": {
-      "state": "open",
-      "merged": false,
-      "mergeable": false
-    },
+    "handoffDocsCheckpointWritten": true,
+    "readbackRequired": true,
     "progressPercent": 50
+  },
+  "latestContinuationCycle": {
+    "checkedAt": "2026-10-22T02:14:21.414+07:00",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "branchHeadBeforeDocsRefresh": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+    "applicationSourceCommit": "8a2acf322f3c785716b0c0d27947f44bf9565727",
+    "testCommit": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+    "lastSuccessfulPreChangeValidation": {
+      "sha": "b659a19838c1276de7c4bd9ef9edab2279369651",
+      "runId": 39658657454,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454"
+    },
+    "priorVisualArtifact": {
+      "sourceSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
+      "runId": 39656348109,
+      "artifactId": 12371792374,
+      "inspectedFiles": [
+        "admin-mobile-reference.png",
+        "products__390x844__light.png",
+        "products__390x844__dark.png",
+        "products__1280x800__light.png"
+      ],
+      "scope": "pre-change baseline only; not the current edited UI"
+    },
+    "changedPaths": [
+      "public/admin/index.html",
+      "tests/e2e/admin-static-baseline.spec.js"
+    ],
+    "changeSummary": "Mobile product facts moved inline; compact accessible SVG edit action; unknown values remain truthful; no product/API/backend/data changes.",
+    "postChangeValidation": "PENDING_NOT_VERIFIED",
+    "visualAcceptance": "SCREEN_3_PARTIAL_NOT_ACCEPTED; ALL_12_NOT_ACCEPTED",
+    "authenticatedBusinessQA": "NOT_TESTED_BLOCKED_BY_ACCESS",
+    "overallProgressPercent": 50,
+    "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance."
   }
 }
