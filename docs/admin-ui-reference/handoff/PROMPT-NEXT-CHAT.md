@@ -464,3 +464,23 @@ This checkpoint supersedes older branch-head and PR-size figures above wherever 
 - No Production deployment; no secrets or Cloudflare Access changes; no migrations/setup scripts; no remote D1/R2 or real customer/order data writes/deletes.
 - Product image-save and PRE/PRO migration investigations remain DEFERRED_BY_OWNER; do not reopen.
 - Never use TinyFish.
+
+
+---
+
+## Newest verified handoff override — Preview signature passes in run #149 (2026-10-21)
+
+Read this section before relying on older checkpoints. It supersedes previous statements that the latest Preview diagnostic still fails, but only for the exact run below.
+
+- GitHub Actions: [run 39602040135](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135), job `119237893478`.
+- Tested source SHA: `3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f`.
+- Actual target recorded in job log: `feature-admin-isolated-hando.sindarealest2.pages.dev/admin/`.
+- Workflow outcome: **SUCCESS**. `npm run check`, `npm test`, local Playwright source/fixture matrix and remote Preview CSS signature all PASS.
+- Signature evidence: 423 stylesheet rules; `hasLoginHideRule=true`; expected selector matched `.topbar > .brand`; `display:none !important`. The separate computed `visibility=visible` field is not itself a failure when `display:none` applies.
+- Do not keep asking the owner to fix/recheck the old `1f1dc981` target for this run: the workflow log now confirms the intended branch alias was tested. Do not claim future deployments are verified without a fresh run.
+- **Progress remains 48%.** This resolves a diagnostic/target blocker, not the entire Admin project. Visual parity across all 12 reference screen families remains NOT ACCEPTED; authenticated real business-flow/backend QA remains NOT VERIFIED; PR #111's broad mixed scope/security review remains open. PR #111 and #108 remain OPEN/unmerged.
+- Product image-save and PRE/PRO migration investigations remain `DEFERRED_BY_OWNER`; do not reopen.
+- Next: refresh live branch HEAD, PR status and latest Actions after this docs-only commit; then continue safe Admin-only visual/component audit and PR scope/security review. Run tests against exact source SHA for each source change and update all three handoff files. Do not alter the CSS assertion, secrets, Cloudflare Access, D1/R2, schema, Production, `main`, or static branch.
+
+### Immutable safety rules
+Only write on `feature/admin-isolated-handoff-2026-10-20`; do not merge/cherry-pick/force-push; no Production deployment; no secret/Access change or bypass; no remote migration or real-data mutation; never use TinyFish.
