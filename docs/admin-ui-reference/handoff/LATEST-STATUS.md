@@ -137,47 +137,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 47a23ded111d2982383460ba7265b778e2bc6d39
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648
+- Tested commit: 3eb773dd046a0aef5054dd33c2bf7f12846a4bcd
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39586771504
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-129 (not committed to Git).
+- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-132 (not committed to Git).
 - Deployed Preview: failure.
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Latest owner-priority and Admin UX checkpoint — 2026-10-21 17:15 +07:00
-
-The newest owner instruction remains in force: **pause the product image-save error and PRE/PRO migrations until the owner asks to resume them; focus on other Admin work.** This is a priority deferral, not a fix. PRE/PRO D1 schema and migration ledgers remain NOT VERIFIED. No remote SQL, setup script, D1/R2 operation or product image-save backend retest was performed.
-
-### Source changes and evidence
-
-- Exact source/test SHA: `47a23ded111d2982383460ba7265b778e2bc6d39`.
-- `public/admin/index.html` now guards QR activation: visible normalized bank name, account number, account name and instructions must match the saved QR draft. Unsaved differences stop before the activation request and tell the admin to save the draft.
-- QR settings' file input is styled as an Admin button and shows the selected filename; the browser's untranslated native chooser text is not visible.
-- Mobile screenshot review found two truncated text controls. The product-category all-filter label was shortened to “Tất cả” without changing its filter value, and the warranty-policy placeholder was shortened to “Ví dụ: Bảo hành đường may”.
-- Regression tests added for the QR activation draft guard, QR file picker/local selected filename, and the short mobile labels in `tests/fulfillment-payment-contract.test.mjs` and `tests/admin-liquid-glass-contract.test.mjs`.
-- Source Validate CI [run 39583053755](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755) is **SUCCESS** on the exact source/test SHA `47a23ded111d2982383460ba7265b778e2bc6d39`.
-- Preview workflow [run 39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648) is **FAILURE at deployed Preview diagnosis**. Local source screenshot matrix **PASS**, 59 PNGs generated (16 login shell, 43 synthetic/read-only fixture module screens; 36 fixture metrics). Artifact [admin-preview-evidence-129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648/artifacts/12338960648) is stored in Actions, not committed as raw PNGs. The three mobile screenshots reviewed confirm the category filter and warranty placeholder fit, and QR Settings no longer shows the native English file chooser.
-- The Preview CSS result remains `PREVIEW_CSS_SIGNATURE_MISMATCH`: the served inline stylesheet reports 226 rules but lacks the expected login-hide rule; the header brand remains visible. Current source contains the rule. Stale deployment vs wrong configured target remains NOT DISTINGUISHED because the target value is masked. Do not weaken the assertion or bypass Access.
-- Synthetic fixture screenshots do not prove authenticated backend flows. Product save, actual image upload/storage, remote D1/R2 behavior, owner scan-verification of the real bank QR, full approved-reference parity and deployed cross-branch runtime remain NOT VERIFIED.
-
-### Safety / next work
-
-- Overall progress remains **46%**.
-- PR #111 and #108 remain OPEN/unmerged. The Admin branch before this handoff-only commit was `bd72cee07245b0905f396c595124b25b23764db2`.
-- No main/static website edits, merge, Production deploy, remote migration, D1/R2 operation, secret/Access change, Access bypass or TinyFish use.
-- Continue remaining Admin-only accessibility/UX/source audits and compare screenshots to the approved 12-screen reference only if its binary content becomes viewable. Keep image-save/PRE/PRO migrations DEFERRED BY OWNER.
-
-
-## Latest continuation checkpoint — 2026-10-21 (verified against live GitHub)
-
-- Current Admin branch HEAD at start of this checkpoint: `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7` (documentation-only commit following source/test SHA `47a23ded111d2982383460ba7265b778e2bc6d39`). Validate source and tests run [39583615335](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583615335) is **SUCCESS on exact current HEAD `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7`**. The prior source/UI commit `47a23ded111d2982383460ba7265b778e2bc6d39` also passed Validate run 39583053755.
-- Current Preview diagnosis remains [run 39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648), **FAIL: `PREVIEW_CSS_SIGNATURE_MISMATCH`** on source SHA `47a23ded111d2982383460ba7265b778e2bc6d39`. This workflow was not rerun on the docs-only HEAD because its push trigger excludes documentation paths; its source-under-test is unchanged. The served CSS is still missing the expected login-hide rule. Do not weaken the assertion or bypass Cloudflare Access.
-- A paginated GitHub PR files audit confirmed PR #111 has **1,088 changed files** (+37,133/−390 in PR metadata), base `main`, and remains OPEN/unmerged. Files are a broad mixed scope including storefront/public assets, Functions/API, migrations, scripts, tests, docs and a large screenshot/history set. This is not merge approval. PR #108 also remains OPEN/unmerged and targets `main`. Do not change either base or merge.
-- The PR file listing is paginated and only the first 300 + subsequent pages 4–11 (788 files) were inspected by category in this pass; the full PR metadata confirms 1,088 total. Category counts from the additional pages: docs 730, Functions 24, migrations 2, scripts 5, tests 24, public 2, other 1. The first three pages contain further files, so these category counts are partial and must not be presented as the whole PR inventory.
-- No local checkout exists through the connected GitHub tools, so local `git status`, full diff build, and clean-tree checks are not available. Do not claim those checks passed.
-- Owner's explicit priority remains: product image-save/actual product image upload and PRE/PRO D1 schema/migration-ledger work are **DEFERRED_BY_OWNER / NOT VERIFIED**. No remote schema query, SQL, setup script, D1/R2 action, product image backend retest, secret read/change, Access bypass, Production deploy, main/static branch edit, or TinyFish use occurred.
-- Continue independent Admin source/UI/a11y tests and safe documentation consistency fixes. Do not raise progress percentage until verified acceptance gates materially change. Current overall estimate remains 46%; no 100% claim while Preview, authenticated backend QA, full 12-screen reference parity, and complete PR-scope review remain open.
