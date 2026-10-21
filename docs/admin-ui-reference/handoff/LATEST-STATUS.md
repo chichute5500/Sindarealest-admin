@@ -55,6 +55,6 @@
 - Latest application source/test commit: `b3c54d55a5e21ae6377d2a6392349f2402ee333f`.
 - Đã đồng bộ nhãn tìm kiếm khách hàng với 4 trường thực sự được lọc (tên, điện thoại, email, địa chỉ); thêm test địa chỉ dùng dữ liệu tổng hợp.
 - Validate source and tests [#39639774550](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774550): **SUCCESS** trên đúng SHA.
-- Admin Preview diagnostic [#39639774520](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774520): **IN PROGRESS** tại thời điểm ghi nhận; chưa coi là đạt.
+- Admin Preview diagnostic [#39639774520](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774520): **SUCCESS** trên cùng SHA; 63 PNG được lưu trong artifact `admin-preview-evidence-200`.
 - Điểm tổng thể đã được tính lại theo 6 nhóm trọng số trong `latest-test-results.json`: **49%** (49.4% làm tròn). Chỉ tăng 1 điểm vì thay đổi tìm kiếm khách hàng là phần nhỏ; các khối lượng lớn còn mở gồm nghiệm thu 12 nhóm màn hình, QA nghiệp vụ có xác thực và kiểm toán semantic/security.
 - Không merge PR, không deploy Production, không thay đổi secrets/Access hoặc dữ liệu D1/R2.
