@@ -331,7 +331,7 @@ assert.match(live, /window\.__sdReadWelcomeFirstPaintState/,
   'The browser must expose early DOM visibility samples for Playwright at screenshot time.');
 assert.match(live, /for \(const requestedOffsetMs of \[0, 50, 100, 200, 300\]\)[\s\S]*sampleOffsetMs[\s\S]*startup-video init-script timeline/,
   'The live audit must derive 0–300ms samples from browser-side init-script timing, not delay-prone screenshot calls.');
-assert.match(live, /Math\.abs\(item\.sampleOffsetMs - requestedOffsetMs\) <= toleranceMs[\s\S]*!usedSamples\.has\(item\)[\s\S]*if \(sample\) usedSamples\.add\(sample\)/,
+assert.match(live, /Math\.abs\(item\.sampleOffsetMs - requestedOffsetMs\) <= toleranceMs[\s\S]*!usedSampleOffsets\.has\(item\.sampleOffsetMs\)[\s\S]*if \(sample\) usedSampleOffsets\.add\(sample\.sampleOffsetMs\)/,
   'Delayed browser timers must be matched to the nearest sample on either side of each target, with each sample used once only.');
 assert.match(live, /waitUntil: isHomeFirstPaintContext \? 'commit' : 'domcontentloaded'/,
   'Mobile home diagnostics must start at navigation commit rather than waiting for DOMContentLoaded.');
