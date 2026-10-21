@@ -184,3 +184,12 @@ Read the cross-branch source audit in `docs/integration/QR-PAYMENT-AND-PRODUCT-T
 Current Admin-only source/test SHA: `ad426349d765f9352ad9c1bc1460e577a102bb2f`. Source CI [39582088383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383) PASS. Preview diagnostics [39582088374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374) FAIL at `PREVIEW_CSS_SIGNATURE_MISMATCH`; local source screenshot matrix PASS with 59 PNGs in [artifact 128](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374/artifacts/12337346436). The QR activation guard and localized QR file picker are implemented with source-contract regression assertions. These tests/fixtures do not establish authenticated backend behavior.
 
 Stay on `feature/admin-isolated-handoff-2026-10-20`; keep PR #111/#108 open and unmerged. No Production deployment, main/static branch edits, secrets/Access changes, remote migrations, or TinyFish.
+
+
+## Newest verified checkpoint — 2026-10-21 17:15 +07:00
+
+The owner-directed pause on product image-save and PRE/PRO migrations remains active. Those items are DEFERRED_BY_OWNER and NOT RESOLVED. No remote SQL, setup, D1/R2 action or backend retest occurred.
+
+Source/test SHA `47a23ded111d2982383460ba7265b778e2bc6d39` passed [Source Validate CI 39583053755](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755). The latest Preview run [39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648) fails only at `PREVIEW_CSS_SIGNATURE_MISMATCH`; local source screenshot matrix passes with 59 PNGs in [artifact 129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648/artifacts/12338960648). The latest UX changes guard QR activation until visible bank details match the saved draft, localize/stylize the QR file picker and display its filename, and shorten mobile category/warranty hints. Regression tests pass on the exact SHA.
+
+Keep Preview's signature assertion, do not bypass Cloudflare Access, and keep PR #111/#108 open/unmerged. Stay on `feature/admin-isolated-handoff-2026-10-20`; no production deployment, static/main edits, secrets or remote migration. Overall progress remains 46%.

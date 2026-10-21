@@ -146,3 +146,27 @@
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Latest owner-priority and Admin UX checkpoint — 2026-10-21 17:15 +07:00
+
+The newest owner instruction remains in force: **pause the product image-save error and PRE/PRO migrations until the owner asks to resume them; focus on other Admin work.** This is a priority deferral, not a fix. PRE/PRO D1 schema and migration ledgers remain NOT VERIFIED. No remote SQL, setup script, D1/R2 operation or product image-save backend retest was performed.
+
+### Source changes and evidence
+
+- Exact source/test SHA: `47a23ded111d2982383460ba7265b778e2bc6d39`.
+- `public/admin/index.html` now guards QR activation: visible normalized bank name, account number, account name and instructions must match the saved QR draft. Unsaved differences stop before the activation request and tell the admin to save the draft.
+- QR settings' file input is styled as an Admin button and shows the selected filename; the browser's untranslated native chooser text is not visible.
+- Mobile screenshot review found two truncated text controls. The product-category all-filter label was shortened to “Tất cả” without changing its filter value, and the warranty-policy placeholder was shortened to “Ví dụ: Bảo hành đường may”.
+- Regression tests added for the QR activation draft guard, QR file picker/local selected filename, and the short mobile labels in `tests/fulfillment-payment-contract.test.mjs` and `tests/admin-liquid-glass-contract.test.mjs`.
+- Source Validate CI [run 39583053755](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755) is **SUCCESS** on the exact source/test SHA `47a23ded111d2982383460ba7265b778e2bc6d39`.
+- Preview workflow [run 39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648) is **FAILURE at deployed Preview diagnosis**. Local source screenshot matrix **PASS**, 59 PNGs generated (16 login shell, 43 synthetic/read-only fixture module screens; 36 fixture metrics). Artifact [admin-preview-evidence-129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648/artifacts/12338960648) is stored in Actions, not committed as raw PNGs. The three mobile screenshots reviewed confirm the category filter and warranty placeholder fit, and QR Settings no longer shows the native English file chooser.
+- The Preview CSS result remains `PREVIEW_CSS_SIGNATURE_MISMATCH`: the served inline stylesheet reports 226 rules but lacks the expected login-hide rule; the header brand remains visible. Current source contains the rule. Stale deployment vs wrong configured target remains NOT DISTINGUISHED because the target value is masked. Do not weaken the assertion or bypass Access.
+- Synthetic fixture screenshots do not prove authenticated backend flows. Product save, actual image upload/storage, remote D1/R2 behavior, owner scan-verification of the real bank QR, full approved-reference parity and deployed cross-branch runtime remain NOT VERIFIED.
+
+### Safety / next work
+
+- Overall progress remains **46%**.
+- PR #111 and #108 remain OPEN/unmerged. The Admin branch before this handoff-only commit was `bd72cee07245b0905f396c595124b25b23764db2`.
+- No main/static website edits, merge, Production deploy, remote migration, D1/R2 operation, secret/Access change, Access bypass or TinyFish use.
+- Continue remaining Admin-only accessibility/UX/source audits and compare screenshots to the approved 12-screen reference only if its binary content becomes viewable. Keep image-save/PRE/PRO migrations DEFERRED BY OWNER.

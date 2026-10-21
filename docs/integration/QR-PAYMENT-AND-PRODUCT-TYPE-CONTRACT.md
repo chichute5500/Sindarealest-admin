@@ -261,3 +261,11 @@ Source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 395
 - The Settings QR file picker now uses the Admin-styled button while keeping the actual file input keyboard-focusable, and shows the selected filename. Regression assertions were added to `tests/fulfillment-payment-contract.test.mjs`.
 - Source CI [39582088383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383) passed on the exact source/test SHA. Preview [39582088374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374) still fails the deployed CSS signature check; no real bank QR was uploaded, scanned or activated as part of this source change. The local fixture screenshots are not backend verification.
 - Per the owner's new priority instruction, product image-save and PRE/PRO D1 migration work is **DEFERRED_BY_OWNER**. Remote schema/ledger remain NOT VERIFIED; no remote SQL or D1/R2 operation occurred.
+
+
+## Latest mobile UX regression pass — 2026-10-21
+
+- Source/test SHA `47a23ded111d2982383460ba7265b778e2bc6d39` shortens the all-category option to “Tất cả” while preserving its value-all behavior, and shortens the warranty policy example to “Ví dụ: Bảo hành đường may”. The exact-source mobile screenshots at 390×844 show both labels fully visible.
+- These changes complement the QR activation saved-draft guard and the Admin-styled QR image picker with selected-filename status, recorded in the prior addendum.
+- Source CI [39583053755](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755) passed on the exact SHA. Local screenshot artifact [admin-preview-evidence-129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648/artifacts/12338960648) contains 59 PNGs. Preview [39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648) remains failed on the configured deployed CSS signature mismatch; the current source contains the required rule, but the served stylesheet does not.
+- Product image-save and PRE/PRO migration work stays **DEFERRED_BY_OWNER**. No remote schema check, migration, product-image backend test, R2/D1 operation or Production deploy was performed.

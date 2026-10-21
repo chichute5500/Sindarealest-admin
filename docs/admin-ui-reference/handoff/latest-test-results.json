@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
+  "status": "SOURCE_CHECKS_PASS_ADMIN_UX_POLISH_PASS_PREVIEW_CSS_SIGNATURE_FAIL_IMAGE_SAVE_MIGRATIONS_DEFERRED_BY_OWNER",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "47a23ded111d2982383460ba7265b778e2bc6d39",
   "testedCommitSha": "47a23ded111d2982383460ba7265b778e2bc6d39",
-  "capturedAt": "2026-10-21T10:15:10.739Z",
+  "capturedAt": "2026-10-21T10:15:39Z",
   "progressEstimatePercent": 46,
-  "progressBasis": "46% overall management estimate retained: exact-source Validate CI and source screenshot matrix pass on ad426349d765f9352ad9c1bc1460e577a102bb2f; deployed Preview CSS signature still fails, authenticated backend and full reference parity remain unverified. Owner has deferred image-save and PRE/PRO migration work for now.",
-  "note": "Latest exact-source CI passed on ad426349d765f9352ad9c1bc1460e577a102bb2f. QR settings now block activation if visible details/instructions differ from the saved draft; QR picker is Admin-styled and shows selected filename. Preview diagnostic remains PREVIEW_CSS_SIGNATURE_MISMATCH on the same SHA. Product image-save/PRE/PRO migration work is DEFERRED_BY_OWNER and not fixed.",
+  "progressBasis": "46% estimate retained: exact-source CI and local source screenshot matrix pass on 47a23ded111d2982383460ba7265b778e2bc6d39; deployed Preview CSS signature still fails, authenticated backend and full reference parity remain unverified. Owner deferred image-save and PRE/PRO migration work.",
+  "note": "Source/test SHA 47a23ded111d2982383460ba7265b778e2bc6d39 passed Validate CI. UI improvements include QR activation saved-draft guard, QR picker/selected filename, and two shorter mobile texts verified in latest source screenshots. Preview still fails CSS signature. Product image-save/PRE/PRO work is DEFERRED_BY_OWNER and not fixed.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -675,7 +675,7 @@
     "accessibilityAndVietnameseTypography": "NOT_TESTED_AFTER_CHANGE",
     "lint": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
     "typecheck": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
-    "automatedTests": "PASS",
+    "automatedTests": "PASS_RUN_39583053755_EXACT_SHA_47a23ded111d2982383460ba7265b778e2bc6d39",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "businessFlows": "NOT_TESTED_AUTHENTICATED",
     "sharedBackendRegression": "NOT_TESTED",
@@ -699,9 +699,9 @@
     "prFullDiffAudit": "PARTIAL_GITHUB_API_ONLY; NOT_MERGE_APPROVAL",
     "uiFixtureModules": "PASS_READ_ONLY_FIXTURE_SCREENSHOTS",
     "rawClosingTagVisibleText": "PASS_TEXT_NODE_ASSERTION_DID_NOT_REPRODUCE; CHECK_PSEUDO_ELEMENTS_AND_LATEST_CUSTOMER_SCREENSHOT",
-    "npmRunCheck": "PASS_RUN_39582088383_EXACT_SHA_ad426349d765f9352ad9c1bc1460e577a102bb2f",
-    "screenshotMatrix": "PASS_SOURCE_ONLY_59_PNG_RUN_39582088374",
-    "deployedPreview": "FAIL_SIGNATURE_OR_NAVIGATION",
+    "npmRunCheck": "PASS_RUN_39583053755_EXACT_SHA_47a23ded111d2982383460ba7265b778e2bc6d39",
+    "screenshotMatrix": "PASS_SOURCE_ONLY_59_PNG_RUN_39583053648",
+    "deployedPreview": "FAIL_PREVIEW_CSS_SIGNATURE_MISMATCH_RUN_39583053648",
     "mobileNavigationSourceAudit": "PASS_SOURCE_ONLY_5_BUTTONS_FIVE_COLUMN_RULE_MORE_MENU_CONTAINS_WARRANTY_AND_SETTINGS",
     "mobileCardsSourceAudit": "PASS_SOURCE_ONLY_MOBILECARDS_OVERRIDE_INLINE_MIN_WIDTH_AT_MAX_680PX; AUTHENTICATED_RENDER_NOT_VERIFIED",
     "loginCopySourceAudit": "PASS_SOURCE_ONLY_TAGLINE_LUXURY_IN_EVERY_DETAIL_HEADING_DANG_NHAP_QUAN_TRI",
@@ -719,7 +719,9 @@
     "productImageSave": "DEFERRED_BY_OWNER_NOT_VERIFIED",
     "actualProductImageUploadStorage": "DEFERRED_BY_OWNER_NOT_VERIFIED",
     "preD1MigrationLedger": "DEFERRED_BY_OWNER_NOT_VERIFIED",
-    "proD1MigrationLedger": "DEFERRED_BY_OWNER_NOT_VERIFIED"
+    "proD1MigrationLedger": "DEFERRED_BY_OWNER_NOT_VERIFIED",
+    "mobileCategoryLabelClipping": "PASS_SOURCE_ASSERTION_AND_SCREENSHOT",
+    "warrantyPlaceholderClipping": "PASS_SOURCE_ASSERTION_AND_SCREENSHOT"
   },
   "remainingIssues": [
     "Configured deployed Preview fails PREVIEW_CSS_SIGNATURE_MISMATCH: .topbar > .brand is visible; selector support/match true; 226-rule stylesheet lacks expected login-hide rule. Target identity cannot be inferred from masked secret.",
@@ -989,7 +991,7 @@
     "sourceCiRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358",
     "reason": "Normalized CSSOM diagnostics confirm Chromium supports and matches the selector, but the configured Preview stylesheet does not contain the required hide rule."
   },
-  "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374",
+  "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648",
   "latestCiVerification": {
     "runId": 39548605358,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358",
@@ -1150,9 +1152,9 @@
     "referenceParity": "NOT VERIFIED; full 12-screen comparison remains open."
   },
   "latestPreviewDiagnostics": {
-    "runId": 39582088374,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374",
-    "sourceCommit": "ad426349d765f9352ad9c1bc1460e577a102bb2f",
+    "runId": 39583053648,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648",
+    "sourceCommit": "47a23ded111d2982383460ba7265b778e2bc6d39",
     "exactShaMatch": true,
     "conclusion": "FAILURE",
     "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
@@ -1194,6 +1196,7 @@
     "runId": 39583053648,
     "name": "admin-preview-evidence-129",
     "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648",
+    "artifactId": 12338960648,
     "sourceCommit": "47a23ded111d2982383460ba7265b778e2bc6d39",
     "screenshotCount": 59,
     "loginShellPngCount": 16,
@@ -1417,9 +1420,9 @@
     }
   },
   "latestSourceCi": {
-    "runId": 39582088383,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383",
-    "sourceCommit": "ad426349d765f9352ad9c1bc1460e577a102bb2f",
+    "runId": 39583053755,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755",
+    "sourceCommit": "47a23ded111d2982383460ba7265b778e2bc6d39",
     "exactShaMatch": true,
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
@@ -1548,7 +1551,7 @@
       "migrations/0008_product_sku_verification.sql",
       "migrations/0009_fulfillment_and_manual_payments.sql"
     ],
-    "diagnosis": "NOT_CONFIRMED; remote schemas and migration ledgers not inspected; now explicitly deferred by owner instruction",
+    "diagnosis": "NOT_CONFIRMED; remote schemas and migration ledgers not inspected; explicitly deferred by owner instruction",
     "previewUiObservations": {
       "login": "PASS_USER_CONFIRMED",
       "productListAndDetail": "PASS_USER_CONFIRMED",
@@ -1584,39 +1587,47 @@
       "remoteD1Mutation": false
     },
     "priorityDisposition": "DEFERRED_BY_OWNER_ON_2026-10-21; DO NOT CONTINUE UNTIL OWNER REOPENS",
-    "lastWorkCycle": "Prior source-level notes were read-only; this continuation did not work on the product-image save path or remote migrations. No remote D1/R2 operation occurred."
+    "lastWorkCycle": "This continuation focused on independent Admin QR/mobile UI and source tests. No product-image save debugging or remote migration was carried out; no remote D1/R2 operation occurred."
   },
   "latestOwnerPriorityCheckpoint": {
-    "checkedAt": "2026-10-21T10:08:09Z",
+    "checkedAt": "2026-10-21T10:15:39Z",
     "ownerInstruction": "Defer product image-save error and PRE/PRO migration investigation for later; focus on remaining Admin work.",
     "deferredAreas": [
-      "product image metadata save and actual image upload/storage verification",
+      "product metadata save and actual product image upload/storage verification",
       "PRE D1 schema and migration ledger verification",
       "PRO D1 schema and migration ledger verification"
     ],
     "deferredState": "DEFERRED_BY_OWNER_NOT_RESOLVED",
-    "currentSourceTestSha": "ad426349d765f9352ad9c1bc1460e577a102bb2f",
+    "currentSourceTestSha": "47a23ded111d2982383460ba7265b778e2bc6d39",
     "sourceCi": {
-      "runId": 39582088383,
+      "runId": 39583053755,
       "conclusion": "SUCCESS",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755"
     },
     "preview": {
-      "runId": 39582088374,
+      "runId": 39583053648,
       "conclusion": "FAILURE",
       "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648"
     },
+    "uiImprovements": [
+      "QR activation blocked when visible bank details/instructions differ from saved draft",
+      "Admin-styled QR picker shows selected filename",
+      "mobile category filter label shortened to prevent clipping",
+      "warranty policy placeholder shortened for mobile"
+    ],
     "qrSettingsDraftGuard": "PASS_SOURCE_AND_CI",
     "qrFilePickerLocalization": "PASS_SOURCE_AND_CI",
+    "mobileCategoryLabelClipping": "PASS_SCREENSHOT_REVIEW",
+    "warrantyPlaceholderClipping": "PASS_SCREENSHOT_REVIEW",
     "screenshotArtifact": {
-      "name": "admin-preview-evidence-128",
-      "id": 12337346436,
+      "name": "admin-preview-evidence-129",
+      "id": 12338960648,
       "screenshotCount": 59,
       "loginShellPngCount": 16,
       "uiFixturePngCount": 43,
       "uiFixtureMetricCount": 36,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374/artifacts/12337346436"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648/artifacts/12338960648"
     },
     "safety": {
       "tinyfishUsedThisContinuation": false,
