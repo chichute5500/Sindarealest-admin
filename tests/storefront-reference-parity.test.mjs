@@ -33,15 +33,17 @@ function assertSatinFoldContrast(name, svg, maxBody, maxShadow, maxShade, maxHig
     assert.ok(values.length > 0, name + ' must keep the ' + layer + ' satin layer.');
     return Math.max(...values);
   };
+  assert.ok(maxOpacityFor('body') >= 0.13, name + ' body folds must remain visible against the satin base.');
   assert.ok(maxOpacityFor('body') <= maxBody, name + ' body folds must remain subtle, not broad ribbon bands.');
   assert.ok(maxOpacityFor('shadow') <= maxShadow, name + ' fold shadows must not form dark rings.');
   assert.ok(maxOpacityFor('inner-shade') <= maxShade, name + ' inner creases must stay quiet.');
+  assert.ok(maxOpacityFor('highlight') >= 0.23, name + ' highlights must remain perceptible in both themes.');
   assert.ok(maxOpacityFor('highlight') <= maxHighlight, name + ' highlights must read as fine satin, not bright strokes.');
 }
-assertSatinFoldContrast('Desktop light satin', desktopLight, 0.055, 0.025, 0.055, 0.11);
-assertSatinFoldContrast('Desktop dark satin', desktopDark, 0.055, 0.025, 0.055, 0.11);
-assertSatinFoldContrast('Mobile light satin', mobileLight, 0.055, 0.025, 0.055, 0.11);
-assertSatinFoldContrast('Mobile dark satin', mobileDark, 0.055, 0.025, 0.055, 0.11);
+assertSatinFoldContrast('Desktop light satin', desktopLight, 0.15, 0.05, 0.13, 0.25);
+assertSatinFoldContrast('Desktop dark satin', desktopDark, 0.15, 0.05, 0.13, 0.25);
+assertSatinFoldContrast('Mobile light satin', mobileLight, 0.15, 0.05, 0.13, 0.25);
+assertSatinFoldContrast('Mobile dark satin', mobileDark, 0.15, 0.05, 0.13, 0.25);
 
 
 assert.match(html, /\.theme-bg--light\{background-color:#eaf3fb;background-image:url\('images\/liquid-glass-light\.svg\?v=/);
@@ -126,10 +128,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-17"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-17"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-17"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-17"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-18"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-18"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-18"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-18"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 
