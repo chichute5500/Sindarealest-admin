@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CI_PASS_PREVIEW_DIAGNOSTICS_FAIL_REFERENCE_PARITY_OPEN",
+  "status": "SOURCE_CI_PASS_PREVIEW_DIAGNOSTIC_FAIL_VISUAL_PARITY_AND_AUTH_QA_OPEN",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
-  "testedCommitSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
-  "capturedAt": "2026-10-21T10:52:00Z",
+  "latestCodeCommitSha": "d553b95c3d43420f9227e9a37e6fe94b9b862b27",
+  "testedCommitSha": "16ea1581ba7cb76762169d57030456cd4c31cffd",
+  "capturedAt": "2026-10-21T11:02:00Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "Estimate increased from 46% after verified forced-colors accessibility support, Android theme-color synchronization/no-flash bootstrap, and reference-inclusive screenshot artifact. Not a test pass percentage. Preview CSS signature still fails; visual parity, authenticated backend QA, full PR scope audit and owner-deferred image-save/PRE/PRO remain open.",
-  "note": "Source CI PASS on latest source/test SHA 29621b8bacf03cc08136e08eabcc4ed8f6138db1. Recent changes: forced-colors focus/borders; pre-style theme bootstrap and Android browser theme-color synchronization; screenshot artifact includes admin-mobile-reference.png. Preview diagnostic fails because served inline CSS has 226 rules but lacks login-hide rule while source contains it. Visual comparison of dashboard screenshot against 12-screen reference shows style direction overlaps (light blue/cards) but layout and content are not yet at reference parity. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
+  "progressBasis": "Estimated total project progress. Recent source CI PASS and incremental UI/accessibility fixes are verified; visual parity, Preview target/source diagnostic, authenticated QA and semantic PR audit remain open. Not a test pass percentage.",
+  "note": "Latest handoff HEAD 16ea1581ba7cb76762169d57030456cd4c31cffd has Validate source and tests PASS (run 39588603589). Latest UI source commit identified via file history is d553b95c3d43420f9227e9a37e6fe94b9b862b27. Latest verified Preview diagnostic run 39587426878 is FAILURE. Do not claim visual parity or backend QA complete. Owner explicitly requires continuous work after progress reports. Product image-save and PRE/PRO migrations remain deferred by owner.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -16,14 +16,17 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "branchHeadSha": "b2f6d29fa288098c0c154a993db104f2898a291d",
-    "lastObservedApplicationSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
+    "branchHeadSha": "16ea1581ba7cb76762169d57030456cd4c31cffd",
+    "lastObservedApplicationSourceCommit": "d553b95c3d43420f9227e9a37e6fe94b9b862b27",
     "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
     "pr111State": "OPEN_UNMERGED",
     "pr108State": "OPEN_UNMERGED",
     "pr111ChangedFiles": 1092,
-    "pr111Additions": 37208,
-    "pr111Deletions": 392
+    "pr111Additions": 37234,
+    "pr111Deletions": 392,
+    "pr108ChangedFiles": 232,
+    "pr108Additions": 19270,
+    "pr108Deletions": 380
   },
   "changes": [
     {
@@ -744,11 +747,10 @@
     "Cross-branch integration is NOT VERIFIED until the static consumer displays freeShippingEligible/freeShipping correctly and a currently authorized Preview validates the deployed API."
   ],
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Verify the newest Preview diagnostics after any source change; investigate served-source mismatch without weakening assertions or bypassing Access.",
+    "Compare the real source screenshots with all 12 reference screens across mobile/tablet/desktop and fix verified visual gaps.",
+    "Continue semantic/security review of PR #111's Functions/API, migrations, scripts, workflows, and tests; do not merge.",
+    "After each meaningful test/fix, update handoff and continue execution rather than stopping after a progress report."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587426878",
@@ -1712,19 +1714,31 @@
   "pr111FileInventory": {
     "retrievedPages": 12,
     "totalFiles": 1092,
-    "categories": {
-      "docs": 1030,
-      "functionsApi": 24,
-      "tests": 24,
-      "scripts": 5,
-      "migrations": 2,
-      "workflows": 2,
-      "publicAdminHtml": 1,
-      "publicStorefrontHtml": 1,
-      "rootOther": 3
-    },
+    "additions": 37234,
+    "deletions": 392,
     "inventoryStatus": "COMPLETE_PAGINATED_GITHUB_API",
-    "semanticSecurityAuditStatus": "PARTIAL_NOT_ACCEPTED_FOR_MERGE",
-    "keyFinding": "PR #111 combines Admin UI, public storefront, Functions/API, migrations, scripts, tests and a very large documentation/evidence history. Keep open/unmerged pending full scoped review and owner decision."
+    "semanticSecurityAuditStatus": "PARTIAL_NOT_ACCEPTED_FOR_MERGE"
+  },
+  "latestHandoffHeadSha": "16ea1581ba7cb76762169d57030456cd4c31cffd",
+  "latestCiRuns": [
+    {
+      "runId": 39588603589,
+      "name": "Validate source and tests",
+      "sha": "16ea1581ba7cb76762169d57030456cd4c31cffd",
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39588603589"
+    },
+    {
+      "runId": 39587426878,
+      "name": "Admin Preview diagnostic smoke test",
+      "sha": "463700295675d8f83f6ede1ffd33692bb3285484",
+      "conclusion": "failure",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587426878"
+    }
+  ],
+  "ownerInstruction": {
+    "continueAfterProgressReports": true,
+    "stopOnlyWhenOwnerActionRequired": true,
+    "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
   }
 }
