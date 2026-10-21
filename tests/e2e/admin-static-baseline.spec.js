@@ -681,6 +681,27 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(chromeColors.footerColor, 'Dark editor footer text should use the light theme token').toBe('rgb(234, 243, 251)');
       }
       await page.locator('#imageGrid').scrollIntoViewIfNeeded();
+      // The scrollable content must clear the sticky actions: the last image cannot be hidden behind the save bar.
+      await page.locator('#backdrop .editor').evaluate(el => { el.scrollTop = el.scrollHeight; });
+      const galleryLayout = await page.evaluate(() => {
+        const dialog = document.querySelector('#backdrop>.editor');
+        const footer = document.querySelector('#backdrop .editorfooter');
+        const lastImage = document.querySelector('#imageGrid .imageitem:last-child');
+        if (!dialog || !footer || !lastImage) throw new Error('Product gallery dialog geometry is incomplete');
+        const dialogRect = dialog.getBoundingClientRect();
+        const footerRect = footer.getBoundingClientRect();
+        const imageRect = lastImage.getBoundingClientRect();
+        return {
+          dialogBottom: dialogRect.bottom,
+          footerBottom: footerRect.bottom,
+          footerTop: footerRect.top,
+          lastImageBottom: imageRect.bottom
+        };
+      });
+      expect(Math.abs(galleryLayout.dialogBottom - galleryLayout.footerBottom),
+        'Product editor actions must reach the bottom edge of the dialog').toBeLessThanOrEqual(1);
+      expect(galleryLayout.lastImageBottom,
+        'Last gallery image should scroll fully above the sticky action bar').toBeLessThanOrEqual(galleryLayout.footerTop + 1);
       await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 2 });
       await page.locator('#editorClose').click();
       await expect(page.locator('#backdrop')).toBeHidden();
