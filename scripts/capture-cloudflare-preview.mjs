@@ -297,24 +297,33 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
       audit.hardFailures.push('Welcome first-paint layering violation in browser timeline for ' + label
         + ' (' + probe.visibleChromeViolations.length + ' samples).');
     }
+    const usedSamples = new Set();
     for (const requestedOffsetMs of [0, 50, 100, 200, 300]) {
-      const upperBound = requestedOffsetMs === 0 ? 45 : requestedOffsetMs + 125;
+      // Startup JS/layout work can delay timers. Match the nearest actual browser-side
+      // sample on either side of each target; never reuse a sample for two target moments.
+      const toleranceMs = requestedOffsetMs === 0 ? 45 : 65;
       const matching = samples
-        .filter(item => item.sampleOffsetMs >= requestedOffsetMs && item.sampleOffsetMs <= upperBound)
-        .sort((a, b) => Math.abs(a.sampleOffsetMs - requestedOffsetMs) - Math.abs(b.sampleOffsetMs - requestedOffsetMs));
-      const sample = matching[0] || (requestedOffsetMs === 0
-        ? samples.find(item => item.splashVisible === true) || samples[0]
-        : null);
+        .filter(item => Math.abs(item.sampleOffsetMs - requestedOffsetMs) <= toleranceMs
+          && !usedSamples.has(item))
+        .sort((a, b) => {
+          if (requestedOffsetMs === 0 && a.splashVisible !== b.splashVisible) return a.splashVisible ? -1 : 1;
+          return Math.abs(a.sampleOffsetMs - requestedOffsetMs) - Math.abs(b.sampleOffsetMs - requestedOffsetMs);
+        });
+      const sample = matching[0] || null;
+      if (sample) usedSamples.add(sample);
       const check = {
         context: label, viewport: viewport.name, theme, requestedOffsetMs,
         sampleOffsetMs: sample?.sampleOffsetMs ?? null,
+        offsetDeltaMs: sample ? Number((sample.sampleOffsetMs - requestedOffsetMs).toFixed(2)) : null,
+        toleranceMs,
         status: sample ? 'CAPTURED' : 'FAILED',
         sample: sample || null,
         evidenceSource: 'startup-video init-script timeline',
       };
       audit.firstPaintChecks.push(check);
       if (!sample) {
-        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms (within 125ms tolerance) for ' + label + '.');
+        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms for ' + label
+          + ' (nearest unique sample outside ' + toleranceMs + 'ms tolerance).');
       }
     }
     return probe;
