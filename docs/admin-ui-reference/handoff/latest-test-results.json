@@ -2404,5 +2404,25 @@
     "decision": "Do not fabricate chart data or present a capped subset as complete history. Inspect schema and order/payment lifecycle semantics before choosing a data-backed aggregation; otherwise use a truthful empty state and test it.",
     "progressEffect": "No progress increase: audit identifies next work but does not close the visual or authenticated QA gaps.",
     "followUpNote": "Run #39622616336 later completed success for source SHA e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d. Subsequent documentation-only commits changed branch HEAD; current HEAD must be revalidated separately."
+  },
+  "dashboardRevenueEmptyState": {
+    "implementedAt": "2026-10-21",
+    "uiCommit": "ae351fcc2790b70e198ec3db1053bef7ad46981f",
+    "testCommit": "f7196a05e9e6c82f5f3354711538fd0268feadc5",
+    "purpose": "Truthful dashboard empty state; no invented revenue figures or trend data",
+    "ciRuns": [
+      {
+        "id": 39623789724,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623789724",
+        "status": "in_progress"
+      },
+      {
+        "id": 39623789507,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623789507",
+        "status": "in_progress"
+      }
+    ],
+    "verification": "pending",
+    "progressEffect": "No progress increase until current HEAD CI and visual evidence pass."
   }
 }
