@@ -247,7 +247,7 @@ const validRelationshipsBackup = () => ({
   backup.operations.orders[0].payment_terms_note = "Đã chốt tổng tiền và đặt cọc";
   backup.operations.orderItems[0].fulfillment_type = "made_to_order";
   backup.operations.orderPaymentRequests = [{
-    id: "request-1", order_id: "order-1", installment_type: "deposit", amount: 30000,
+    id: "request-1", order_id: "order-1", installment_type: "deposit", amount: 30000, shipping_benefit: "standard_shipping",
     transfer_reference: "SDREF123456", qr_image_key: "qr-550e8400-e29b-41d4-a716-446655440000.png",
     bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A",
     status: "settled", created_by: "admin", created_at: "2026-01-02 12:01:00", updated_at: "2026-01-02 12:02:00"
@@ -261,6 +261,9 @@ const validRelationshipsBackup = () => ({
   const response = await restoreBackup({ request: request(backup), env: { ...env, DB: db } });
   assert.equal(response.status, 200, "v2 backups with verified payment ledger and fulfillment snapshots should restore");
   assert.ok(db.statements.some(statement => statement.sql.startsWith("INSERT INTO order_payment_requests")), "payment requests must be restored");
+  const requestInsert = db.statements.find(statement => statement.sql.startsWith("INSERT INTO order_payment_requests"));
+  assert.ok(requestInsert.sql.includes("shipping_benefit"), "shipping benefit must survive backup/restore");
+  assert.equal(requestInsert.values[4], "standard_shipping");
   assert.ok(db.statements.some(statement => statement.sql.startsWith("INSERT INTO order_payment_transactions")), "verified payment transactions must be restored");
   const itemInsert = db.statements.find(statement => statement.sql.startsWith("INSERT INTO order_items"));
   assert.ok(itemInsert.sql.includes("fulfillment_type"), "order-item fulfillment snapshots must be restored");
