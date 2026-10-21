@@ -414,3 +414,20 @@ Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENC
 - Fixture tests now assert the unconfirmed-price/terms order cannot create a QR request or record a receipt. They also assert backup/restore UI exposes JSON export, JSON input and required-confirmation copy without invoking export or restore. Previously added QR unsaved-draft guard, reduced motion, editor Home/End keys and dialog focus tests all reran.
 - Artifact `admin-preview-evidence-192` ID `12360132558`: 63 PNGs (16 login + 47 synthetic UI fixture screens), 39 metrics, no recorded errors/writes. Fixture only; no authenticated real backend QA.
 - Status: Orders #7 PARTIAL; QR/payment #8 PARTIAL; Backup/settings #12 PARTIAL; full 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS. Progress 48%. Product image-save and PRE/PRO migrations remain deferred by owner.
+
+
+## HANDOFF UPDATE — 2026-10-21 — latest verified source/test cycle
+
+**Continue from this branch only:** `feature/admin-isolated-handoff-2026-10-20` in `chichute5500/Sindarealest-admin`. This is an active handoff, not a completion notice.
+
+- Latest verified application/test SHA: `4e660a0869dd21d4a688d72823bd08b1795cf2ff`.
+- Source validation: [Run #39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) — SUCCESS.
+- Preview/Playwright: [Run #39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) — SUCCESS on exact same SHA.
+- Checks: `npm run check`, `npm test`, responsive/theme screenshot matrix and Preview CSS signature PASS; browser static baseline 3 passed (25.5s).
+- Latest evidence: [admin-preview-evidence-192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558), artifact ID `12360132558`, 63 PNGs (16 login shell + 47 synthetic fixture captures), 39 metrics; zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths.
+- Added read-only fixture checks: (1) QR activation is blocked with an unsaved bank-detail draft; (2) payment-request and record-payment buttons remain disabled until price/terms are confirmed; (3) backup/restore controls expose JSON export, JSON input and confirmation disclosure without invoking export/restore. Synthetic fixture evidence only, not live backend QA.
+- Overall progress remains **48%**. Screens #7/#8/#12 remain PARTIAL. 12-screen visual parity is NOT ACCEPTED. Authenticated backend/business QA is NOT TESTED/BLOCKED BY ACCESS. Product image-save/R2 and PRE/PRO migration work remains DEFERRED_BY_OWNER.
+- PR #111 and PR #108 remain OPEN/unmerged. PR #111 is mixed-scope and not merge-ready. Do not merge, deploy Production, edit `main`/static site, change/bypass Access or secrets, run SQL/migrations, touch remote D1/R2, or use TinyFish.
+
+**Next work:** re-fetch live branch head, PR state, workflow runs and current file versions; read this file, `LATEST-STATUS.md`, `latest-test-results.json`, `12-SCREEN-REFERENCE-AUDIT.md`, and the master prompt. Continue with static/reference-based visual parity and safe read-only E2E coverage on the Admin branch. Inspect existing code/tests before editing; run both validation and Preview workflows on every test change; update the handoff files after verified results. Do not claim real authenticated acceptance from fixture tests. Stop only if a user action is truly required.
+
