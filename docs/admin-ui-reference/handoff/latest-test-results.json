@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_QR_UNSAVED_GUARD_E2E_PASS_VISUAL_PARITY_NOT_ACCEPTED_AUTHENTICATED_QA_NOT_TESTED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
   "testedCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
-  "capturedAt": "2026-10-21T16:11:08.711Z",
+  "capturedAt": "2026-10-21T16:11:39Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% management estimate. Exact source/test SHA 32c1f28662e7240353b0eda2f5daeaf22359257e passed Validate Source run 39630533326 and Admin Preview/Playwright run 39630533169. This test-only change adds browser assertions for Home/End keyboard navigation and aria-selected state on the product editor tablist. npm run check, npm test, 3-test Playwright source baseline, responsive/theme screenshot matrix, and configured Preview login CSS signature passed. Artifact 189 contains 59 PNGs (16 login + 43 synthetic fixtures) and 36 fixture metrics, with zero recorded browser/console/network/HTTP errors and no fixture writes. Full 12-screen visual parity and authenticated backend QA remain incomplete; image save and PRE/PRO migrations are deferred by owner.",
-  "note": "Latest exact source/test SHA 32c1f28662e7240353b0eda2f5daeaf22359257e: Validate Source [#39630533326] PASS; Admin Preview/Playwright [#39630533169] SUCCESS. Added Home/End keyboard navigation assertions for the product editor tabs; test run passed, including `tests/e2e/admin-static-baseline.spec.js`, 3 tests/30.5s. The full responsive/theme source screenshot matrix and deployed Preview login CSS signature also passed. Artifact admin-preview-evidence-189 (ID 12359007200, 11,188,262 bytes, expires 2026-11-04) contains 59 PNGs, 36 fixture metrics, and metadata. Error arrays are empty, attempted writes and unexpected API paths are empty. Synthetic fixtures do not establish authenticated backend workflows. Visual parity for all 12 screen families remains NOT ACCEPTED; authenticated business QA NOT TESTED/BLOCKED_BY_ACCESS. PR #111/#108 remain OPEN and unmerged; PR #111 mixed-scope review remains open. Product image save/PRE-PRO migration remain DEFERRED_BY_OWNER. Progress stays 48%.",
+  "progressBasis": "48% management estimate. Exact source/test SHA 0b9e8a2f6a734ef328726c9c80e8e0e56328ce55 passed Validate Source #39632306385 and Admin Preview/Playwright #39632306588. The read-only fixture tests the Settings/QR UI fields and client-side guard: when a bank field is changed while QR verification is checked, activation is refused with a save-draft warning before confirmation or any non-GET request. The test refreshes settings by navigating away/back between viewport/theme variants. npm run check, npm test, 3-test static Playwright suite (3 passed, 25.9s), responsive/theme source screenshot matrix, and Preview login CSS signature passed. Artifact #191 has 63 PNGs (16 login + 47 synthetic fixtures) and 39 fixture metrics; error arrays and attempted writes are empty. Authenticated real backend QA and all-12-screen acceptance remain incomplete. Product image-save/PRE-PRO migrations are owner-deferred.",
+  "note": "Exact source/test SHA 0b9e8a2f6a734ef328726c9c80e8e0e56328ce55: Validate Source [#39632306385] PASS; Admin Preview/Playwright [#39632306588] SUCCESS. Test addition validates QR settings fields and guards activation when bank details are unsaved: warning is visible and the guard returns before confirmation or API mutation. One prior browser run (#39631879451 on 446a75a...) exposed test-state leakage across viewport variants; fixed by navigating away/back to re-render Settings before each variant. Retest on 0b9e8a2 passed. Browser baseline reported 3 passed (25.9s), CSS signature PASS. Artifact admin-preview-evidence-191 (ID 12360041542, 11,894,748 bytes, expires 2026-11-04) has 63 PNGs (16 login + 47 synthetic/read-only fixtures), 39 fixture metrics, zero browser/console/network/HTTP errors, attempted writes=0, unexpected API paths=0. Synthetic fixture proof only; no authenticated backend QA. 12-screen parity NOT ACCEPTED. PR #111/#108 OPEN/unmerged; PR #111 remains mixed-scope/not merge-ready. Progress stays 48%; product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -17,17 +17,17 @@
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_READ_ONLY_PATH_CENSUS_AND_SCRIPT_REVIEW; SEMANTIC/SECURITY AUDIT STILL OPEN",
     "lastObservedApplicationSourceCommit": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
-    "lastObservedEvidenceOnlyHead": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+    "lastObservedEvidenceOnlyHead": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
     "pr111State": "OPEN_UNMERGED_MIXED_SCOPE",
     "pr108State": "OPEN_UNMERGED",
-    "pr111ChangedFiles": 1120,
+    "pr111ChangedFiles": 1124,
     "pr108ChangedFiles": 269,
     "pr108Additions": 19270,
     "pr108Deletions": 380,
     "protectedStaticWebsiteBranchMustNotBeModified": true,
     "pr111PngFiles": 913,
     "pr111NonImageDocsAndCodeFiles": 199,
-    "latestTestedCommitSha": "32c1f28662e7240353b0eda2f5daeaf22359257e",
+    "latestTestedCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
     "pr111DiffStatsNote": "Do not treat additions/deletions as a stable project metric: handoff docs are appended within this same PR and change the diff stat. Re-query live PR when needed; the path count observed here is 1,112.",
     "pr111DiffStatsAtInitialScopeAudit": {
       "additions": 38619,
@@ -36,7 +36,7 @@
       "note": "Point-in-time before this round of handoff updates."
     },
     "latestApplicationSourceCommit": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
-    "latestTestedSourceCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e"
+    "latestTestedSourceCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55"
   },
   "changes": [
     {
@@ -886,12 +886,12 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
-  "branchHeadSha": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "branchHeadSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "latestVerifiedAt": "2026-10-21T16:00:21Z",
   "latestVerifiedSourceCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
-  "currentAdminBranchHead": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "currentAdminBranchHead": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "latestVerificationSummary": "Source CI run 39547341928 SUCCESS on 4a1b58950c0b8e9de75009d5af313dfdfbea3595. Dependency audit, project integrity, and automated tests passed. Latest deployed Preview diagnostic 39542387719 remains FAIL at CSS/UI signature check; no new Preview run was performed.",
-  "branchHeadBeforeHandoffUpdate": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "branchHeadBeforeHandoffUpdate": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -1011,7 +1011,7 @@
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
   "updatedAt": "2026-10-21",
-  "currentBranchHeadAtHandoff": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "currentBranchHeadAtHandoff": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -1329,7 +1329,7 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "currentAdminBranchHeadBeforeHandoffUpdate": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "latestScreenshotArtifact": {
     "runId": 39632306588,
     "name": "admin-preview-evidence-191",
@@ -1339,6 +1339,9 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 47,
     "uiFixtureMetricCount": 39,
+    "artifactId": 12360041542,
+    "sizeBytes": 11894748,
+    "expiresAt": "2026-11-04T16:11:34Z",
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
@@ -1419,7 +1422,7 @@
       "migrationsRun": false
     }
   },
-  "latestObservedBranchHeadSha": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "latestObservedBranchHeadSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "latestVerifiedSourceCi": {
     "runId": 39565547871,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871",
@@ -1431,9 +1434,9 @@
     "automatedTests": "PASS"
   },
   "latestPreviewDiagnostic": {
-    "runId": 39630533169,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169",
-    "sourceCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
+    "runId": 39632306588,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
+    "sourceCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
     "exactShaMatch": true,
     "conclusion": "success",
     "status": "PASS_LOGIN_CSS_SIGNATURE",
@@ -1454,9 +1457,9 @@
   "pr111": {
     "state": "OPEN",
     "base": "main",
-    "headSha": "67ea380cd87dde5c31e478da862cad3b2387a66c",
-    "changedFiles": 1120,
-    "additions": 40220,
+    "headSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+    "changedFiles": 1124,
+    "additions": 40414,
     "deletions": 392,
     "merged": false,
     "mergeReady": false,
@@ -1464,11 +1467,12 @@
   },
   "pr108": {
     "state": "OPEN",
-    "merged": false,
     "base": "main",
-    "headSha": "d11f4077cfafc4076c68e91eb479f964d2d759a0",
+    "headSha": "00c0c9eb127c892b3807add3070d0926d3739bdd",
     "changedFiles": 269,
-    "latestObservedHead": "d11f4077cfafc4076c68e91eb479f964d2d759a0",
+    "additions": 20972,
+    "deletions": 380,
+    "merged": false,
     "writeScope": "NO_EDITS_FROM_ADMIN_AGENT"
   },
   "integrationProgressEstimatePercent": 70,
@@ -1561,22 +1565,24 @@
     "automatedTests": "PASS"
   },
   "latestSourcePlaywright": {
-    "runId": 39630533169,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169",
-    "sourceCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
+    "runId": 39632306588,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
+    "sourceCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
     "exactShaMatch": true,
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
     "automatedTests": "PASS",
     "localScreenshotMatrix": "PASS",
+    "qrSettingsAccessibleFieldsE2E": "PASS",
+    "qrUnsavedBankDetailsActivationGuardE2E": "PASS",
     "keyboardTabHomeEndE2E": "PASS",
     "reducedMotionE2E": "PASS",
     "configuredPreviewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
-    "playwrightStaticBaseline": "3 passed (30.5s)",
-    "screenshotCount": 59,
+    "playwrightStaticBaseline": "3 passed (25.9s)",
+    "screenshotCount": 63,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 43,
-    "uiFixtureMetricCount": 36,
+    "uiFixturePngCount": 47,
+    "uiFixtureMetricCount": 39,
     "pageErrors": 0,
     "consoleErrors": 0,
     "failedRequests": 0,
@@ -1584,11 +1590,11 @@
     "attemptedWrites": 0,
     "unexpectedApiPaths": 0,
     "artifact": {
-      "name": "admin-preview-evidence-189",
-      "id": 12359007200,
-      "sizeBytes": 11188262,
-      "expiresAt": "2026-11-04T16:00:14Z",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169/artifacts/12359007200"
+      "name": "admin-preview-evidence-191",
+      "id": 12360041542,
+      "sizeBytes": 11894748,
+      "expiresAt": "2026-11-04T16:11:34Z",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588/artifacts/12360041542"
     },
     "fixturePolicy": "Synthetic/read-only; does not establish authenticated real-backend workflows."
   },
@@ -2016,15 +2022,15 @@
     }
   ],
   "latestSourceTestRun": {
-    "testedCommitSha": "32c1f28662e7240353b0eda2f5daeaf22359257e",
-    "validationRunId": 39630533326,
+    "testedCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "validationRunId": 39632306385,
     "validationConclusion": "success",
-    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326",
-    "previewRunId": 39630533169,
+    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385",
+    "previewRunId": 39632306588,
     "previewRunConclusion": "success",
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169",
-    "keyboardHomeEndTabNavigationE2E": "PASS",
-    "checkedAt": "2026-10-21T16:00:21Z"
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
+    "qrUnsavedBankDetailsGuardE2E": "PASS",
+    "checkedAt": "2026-10-21T16:11:39Z"
   },
   "latestCurrentPreviewDiagnostic": {
     "runId": 39602040135,
@@ -2107,17 +2113,17 @@
   },
   "currentAdminBranchHeadIsBeforeJsonRefresh": true,
   "latestHandoffWriteCheckpoint": {
-    "checkedAt": "2026-10-21T16:00:21Z",
-    "preWriteHead": "67ea380cd87dde5c31e478da862cad3b2387a66c",
-    "testedSha": "32c1f28662e7240353b0eda2f5daeaf22359257e",
-    "validationRunId": 39630533326,
-    "previewRunId": 39630533169,
-    "artifactId": 12359007200,
+    "checkedAt": "2026-10-21T16:11:39Z",
+    "preWriteHead": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+    "testedSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "validationRunId": 39632306385,
+    "previewRunId": 39632306588,
+    "artifactId": 12360041542,
     "ownerActionNeededNow": false,
     "progressPercent": 48
   },
   "latestObservedAdminHead": "67ea380cd87dde5c31e478da862cad3b2387a66c",
-  "latestObservedAdminHeadVerifiedAt": "2026-10-21T16:00:21Z",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T16:11:39Z",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
     "url": "https://564cd391.sindarealest2.pages.dev/admin/",
@@ -2203,19 +2209,19 @@
     "note": "Exact SHA passed keyboard tab navigation regression and full Preview browser diagnostic; later docs-only commits advance branch HEAD."
   },
   "latestRun": {
-    "runId": 39630533169,
+    "runId": 39632306588,
     "conclusion": "success",
-    "testedCommitSha": "32c1f28662e7240353b0eda2f5daeaf22359257e",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169",
-    "validationRunId": 39630533326,
+    "testedCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
+    "validationRunId": 39632306385,
     "validationConclusion": "success",
-    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326",
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385",
     "artifact": {
-      "name": "admin-preview-evidence-189",
-      "id": 12359007200,
-      "sizeBytes": 11188262,
-      "expiresAt": "2026-11-04T16:00:14Z",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169/artifacts/12359007200"
+      "name": "admin-preview-evidence-191",
+      "id": 12360041542,
+      "sizeBytes": 11894748,
+      "expiresAt": "2026-11-04T16:11:34Z",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588/artifacts/12360041542"
     },
     "checks": {
       "npmRunCheck": "PASS",
@@ -2224,14 +2230,16 @@
       "productEditorTabArrowNavigation": "PASS",
       "productEditorTabHomeEndNavigation": "PASS",
       "reducedMotionBrowserE2E": "PASS",
+      "qrSettingsAccessibleFields": "PASS",
+      "qrUnsavedBankDetailsGuardE2E": "PASS",
       "configuredPreviewDiagnostic": "PASS",
       "galleryVisualParity": "PARTIAL_ONLY"
     },
     "screenshotEvidence": {
-      "sourceFixturePngs": 59,
+      "sourceFixturePngs": 63,
       "loginShell": 16,
-      "syntheticReadOnlyModuleViews": 43,
-      "fixtureMetrics": 36,
+      "syntheticReadOnlyModuleViews": 47,
+      "fixtureMetrics": 39,
       "authenticatedBackendQA": "NOT_TESTED"
     },
     "productionDeployment": "NOT_PERFORMED"
@@ -2639,9 +2647,9 @@
     ],
     "lastValidatedWithCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e"
   },
-  "currentBranchHeadBeforeHandoffUpdate": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "currentBranchHeadBeforeHandoffUpdate": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "currentAdminBranchHeadIsBeforeHandoffUpdate": true,
-  "latestObservedAdminHeadSha": "67ea380cd87dde5c31e478da862cad3b2387a66c",
+  "latestObservedAdminHeadSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
   "latestKeyboardTabNavigationAudit": {
     "implementedInCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
     "changedPath": "tests/e2e/admin-static-baseline.spec.js",
@@ -2664,5 +2672,34 @@
     },
     "scope": "test-only; no application code or business logic changed",
     "artifactId": 12359007200
+  },
+  "qrUnsavedActivationGuard20261021": {
+    "implementedInCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "changedPath": "tests/e2e/admin-static-baseline.spec.js",
+    "coverage": [
+      "Settings page QR bank fields are visible in the real source DOM with synthetic data",
+      "Manual QR scan-verification checkbox has its expected accessible name",
+      "Deactivation is disabled while no QR is active",
+      "Changing bank name while verification checkbox is checked triggers the unsaved-draft warning",
+      "Activation guard returns before confirmation and before non-GET API requests"
+    ],
+    "previousRun": {
+      "id": 39631879451,
+      "sourceSha": "446a75a4100b03278a92f7e4f34be40004a5c55d",
+      "conclusion": "failure",
+      "reason": "The warning message persisted across responsive/theme iterations; the test incorrectly expected the message to be empty at the start of each iteration."
+    },
+    "fixCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "fix": "Fixture test navigates away to Products and back to Settings before each viewport to reset rendered form state. The UI logic was not changed.",
+    "validation": {
+      "sourceRunId": 39632306385,
+      "sourceConclusion": "success",
+      "previewRunId": 39632306588,
+      "previewConclusion": "success",
+      "testedSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+      "staticPlaywrightResult": "3 passed (25.9s)",
+      "artifactId": 12360041542
+    },
+    "scope": "Read-only fixture; non-GET API requests are blocked and no backend/D1/R2 is written."
   }
 }
