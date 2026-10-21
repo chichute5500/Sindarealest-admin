@@ -194,7 +194,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       id: 'UI-ONLY-PRODUCT-BELT', slug: 'ui-only-belt', title: 'Thắt lưng thử nghiệm giao diện',
       sku: 'UI-FIXTURE-002', skuVerified: false, category: 'belts', categoryLabel: 'Thắt lưng',
       description: 'Fixture tổng hợp; không phải sản phẩm thật.', price: null, stock: null,
-      published: true, fulfillmentType: 'in_stock', images: []
+      published: false, fulfillmentType: 'in_stock', images: []
     },
     {
       id: 'UI-ONLY-PRODUCT-STRAP', slug: 'ui-only-strap', title: 'Dây đồng hồ thử nghiệm giao diện',
@@ -688,6 +688,20 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     const productNames = page.locator('#main .product-table .prodname');
     await expect(productNames).toHaveCount(3);
     await expect(page.locator('#productResultSummary')).toContainText('Có 3 sản phẩm phù hợp');
+    await expect(page.locator('#productPublishFilters')).toHaveAttribute('aria-label', 'Lọc trạng thái hiển thị');
+    await expect(page.locator('[data-published-filter="all"]')).toContainText('Tất cả (3)');
+    await expect(page.locator('[data-published-filter="published"]')).toContainText('Đang hiển thị (2)');
+    await expect(page.locator('[data-published-filter="hidden"]')).toContainText('Đã ẩn (1)');
+    await expect(page.locator('[data-published-filter="all"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('[data-published-filter="hidden"]').click();
+    await expect(productNames).toHaveCount(1);
+    await expect(productNames).toHaveText('Thắt lưng thử nghiệm giao diện');
+    await expect(page.locator('[data-published-filter="hidden"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('[data-published-filter="published"]').click();
+    await expect(productNames).toHaveCount(2);
+    await expect(page.locator('[data-published-filter="published"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('[data-published-filter="all"]').click();
+    await expect(productNames).toHaveCount(3);
     await page.getByLabel('Tìm tên, SKU hoặc danh mục').fill('THẮT LƯNG');
     await expect(productNames).toHaveCount(1);
     await expect(productNames).toHaveText('Thắt lưng thử nghiệm giao diện');
