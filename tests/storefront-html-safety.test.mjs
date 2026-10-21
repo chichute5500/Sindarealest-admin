@@ -4,8 +4,8 @@ import vm from "node:vm";
 import { parseImages } from "../functions/_lib.js";
 
 const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
-// The Hero is deliberately populated from rendered product data. Guard the
-// dynamic source so visual tweaks do not pin it to a placeholder image.
+// The homepage hero uses a dedicated presentation asset. It is not a catalog
+// product card and must not disappear just because a public SKU is unavailable.
 const heroSectionStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroSectionEnd = html.indexOf("</section>", heroSectionStart);
 assert.ok(heroSectionStart >= 0 && heroSectionEnd > heroSectionStart,
@@ -14,32 +14,28 @@ const heroSection = html.slice(heroSectionStart, heroSectionEnd);
 assert.match(heroSection, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   "the Hero must keep the confirmed three-line brand headline hierarchy");
 assert.match(heroSection, /<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">/,
-  "the Hero image must start hidden and remain decorative until a verified public SKU is mapped");
-assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\bsrc=/,
-  "do not hardcode a Hero image source in HTML; its source is selected dynamically");
+  "the hero image element must remain available for responsive styling without hardcoding an HTML source");
+assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\\bsrc=/,
+  "the hero image source must be assigned by the runtime synchronizer");
 
 const heroSyncStart = html.indexOf("function syncHeroProductImage()");
 const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "function syncHeroProductImage()".length);
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
-  "the dynamic Hero image synchronization function must remain present");
+  "the Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSection.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
-  "the Hero image must stay hidden until a verified matching public SKU is available");
-assert.ok(heroSync.includes("target.hidden=true") && heroSync.includes("target.removeAttribute('src')"),
-  "the hero must start fail-closed and clear any previous image when its SKU cannot be verified");
-assert.ok(heroSync.includes("const product=products.find(p=>String(p?.sku??'').trim().toUpperCase()==='SD-GL052'&&p?.skuVerified===true);"),
-  "the hero may only select the exact SKU when the public product payload marks that SKU as verified");
-assert.ok(heroSync.includes("Array.isArray(product.images)") && heroSync.includes("target.src=url"),
-  "the hero image must come from the matching verified product's public image mapping");
-assert.ok(heroSync.includes("target.dataset.productImageStatus='verified-public-catalog'"),
-  "the hero image state must identify a verified catalog source");
-assert.doesNotMatch(heroSync, /hero-sd-gl052\.png|owner-supplied-hero-image|productImageStatus='owner-supplied'/,
-  "the hero must not label an unverified local image as the missing SD-GL052 product");
+assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'"),
+  "the Hero must use the supplied presentation asset independently of catalog availability");
+assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
+  && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
+  "the Hero must display the presentation asset and label it separately from a catalog image");
+assert.doesNotMatch(heroSync, /products\\.find|skuVerified/,
+  "the Hero presentation image must not be gated by the public product SKU payload");
 
 function makeHeroTarget() {
   const attributes = {};
   return {
-    hidden: false,
+    hidden: true,
+    alt: "",
     dataset: {},
     onerror: null,
     getAttribute(name) { return Object.hasOwn(attributes, name) ? attributes[name] : null; },
@@ -50,33 +46,24 @@ function makeHeroTarget() {
 }
 function runHeroSync(rows) {
   const target = makeHeroTarget();
-  const result = vm.runInNewContext(`${heroSync}\nsyncHeroProductImage();`, {
+  const result = vm.runInNewContext(`${heroSync}\\nsyncHeroProductImage();`, {
     products: rows,
     $: selector => selector === '#heroProductImage' ? target : null,
   });
   return { result, target };
 }
-const missingHero = runHeroSync([]);
-assert.equal(missingHero.result, false);
-assert.equal(missingHero.target.hidden, true);
-assert.equal(missingHero.target.src, '');
-assert.equal(missingHero.target.dataset.productImageStatus, 'sku-unavailable');
-const unverifiedHero = runHeroSync([{ sku: 'SD-GL052', skuVerified: false, images: ['/media/123e4567-e89b-12d3-a456-426614174000.webp'] }]);
-assert.equal(unverifiedHero.result, false, 'an unverified matching SKU must not unlock the hero image');
-assert.equal(unverifiedHero.target.hidden, true);
-const noImageHero = runHeroSync([{ sku: 'SD-GL052', skuVerified: true, images: [] }]);
-assert.equal(noImageHero.result, false, 'the exact verified SKU without a mapped image must still fail closed');
-assert.equal(noImageHero.target.hidden, true);
-const verifiedHero = runHeroSync([{ sku: 'SD-GL052', skuVerified: true, images: ['/media/123e4567-e89b-12d3-a456-426614174000.webp'] }]);
-assert.equal(verifiedHero.result, true);
-assert.equal(verifiedHero.target.hidden, false);
-assert.equal(verifiedHero.target.src, '/media/123e4567-e89b-12d3-a456-426614174000.webp');
-assert.equal(verifiedHero.target.dataset.productSku, 'SD-GL052');
-assert.equal(verifiedHero.target.dataset.productImageStatus, 'verified-public-catalog');
-verifiedHero.target.onerror();
-assert.equal(verifiedHero.target.hidden, true, 'a broken verified image must collapse instead of leaving an empty frame');
-assert.equal(verifiedHero.target.src, '');
-assert.equal(verifiedHero.target.dataset.productImageStatus, 'image-load-failed');
+for (const rows of [[], [{ sku: 'SD-GL052', skuVerified: false, images: [] }]]) {
+  const hero = runHeroSync(rows);
+  assert.equal(hero.result, true, "the hero presentation asset must render regardless of catalog SKU state");
+  assert.equal(hero.target.hidden, false);
+  assert.equal(hero.target.src, '/images/hero-sd-gl052.png?v=20261022-1');
+  assert.equal(hero.target.dataset.productImageStatus, 'hero-presentation-asset');
+}
+const visibleHero = runHeroSync([]);
+visibleHero.target.onerror();
+assert.equal(visibleHero.target.hidden, true, "a missing presentation asset must fail closed instead of leaving an empty frame");
+assert.equal(visibleHero.target.src, '');
+assert.equal(visibleHero.target.dataset.productImageStatus, 'hero-asset-load-failed');
 
 const helperStart = html.indexOf("const escapeHtml=");
 const helperEnd = html.indexOf("function showToast(", helperStart);
