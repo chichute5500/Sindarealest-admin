@@ -173,8 +173,8 @@ Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322
 
 - Code/test SHA validated: `214dd104c17e3837166fac77f8f2106d1a25ffeb`; Validate Source [#39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) and Preview/Playwright [#39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) both SUCCESS.
 - Improvement: mobile order card keeps the primary summary compact; per-item price inputs and management/payment actions are inside a labelled disclosure that starts collapsed at ≤680px. Desktop hides the disclosure label and leaves controls expanded. Regression tests check toggle behavior, price visibility and payment safety guards.
-- **Acceptance status: PARTIAL / VISUAL REVIEW PENDING.** The latest workflow artifact has not yet been retrieved and opened; no screenshot parity claim is made. Do not mark screen #6 accepted based on CI alone.
-- Overall project progress remains 50%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED. Next: inspect real workflow screenshots at 390×844 light/dark and 1280×800, then update this row only with actual visual evidence.
+- This acceptance note is historical and is superseded by the verified Orders/Fulfillment screen #7 visual review below (artifact `admin-preview-evidence-240`). Do not infer acceptance for screen #6 / Category and product classification, which remains NOT TESTED.
+- Overall project progress remains 50%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED.
 
 ## Latest verified Orders/Fulfillment visual review — 2026-10-22T02:53:48.575+07:00
 
