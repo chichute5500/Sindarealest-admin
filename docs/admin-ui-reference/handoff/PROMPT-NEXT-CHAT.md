@@ -187,3 +187,26 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - Latest source checks remain PASS on exact source/test commit `6935eefa3473f1c6a15da08a34389d7223cbd0ea`; deployed Preview check remains FAIL on run `39548605474` because `hasLoginHideRule=false` while selector support/match are true.
 - Handoff files latest versions: `LATEST-STATUS.md`, `latest-test-results.json`, `PROMPT-NEXT-CHAT.md`; verify current branch HEAD/PR state before changing these because every handoff commit advances HEAD.
 - Progress estimate remains **45%**, not completion. Safe next work: continue review of source/reference and public/backend diff risk, keeping all writes on this ADMIN branch only. User/owner action is still needed to provide a valid current-source Admin Preview URL (or authorize a verified preview-only deployment), and to decide how to safely resolve PR #111 scope contamination before merging.
+
+## Bàn giao mới nhất — 2026-10-21 12:43 +07
+
+### Trạng thái có bằng chứng
+- Source CI run [39550214045](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214045) SUCCESS trên commit `8fd8aa96a9f80ae7a18fd598b44cc459dd303bca`.
+- Preview diagnostics run [39550214050](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214050) FAILURE trên cùng commit. CSS signature: `browserSupportsHideSelector=true`, `hideSelectorMatchesBrand=true`, `ruleCount=226`, `hasLoginHideRule=false`. Hai test qua, một assertion Preview vẫn đỏ. Không xóa/giảm assertion để che lỗi; URL `ADMIN_TEST_URL` bị GitHub che và không được in/đọc/đổi secret.
+- Tiến độ ước tính hiện tại: **45%**; đây là ước lượng theo giai đoạn, không phải nghiệm thu. Authenticated QA backend thật, đối chiếu đủ 12 màn hình, kiểm tra scope/migration vẫn chưa hoàn tất.
+- PR #111 OPEN/unmerged; API khi cập nhật ghi nhận 1.033 file (+33.892/−357; 424 commits). Diff chứa file ngoài Admin; không merge, không đổi base, không force-push, không xóa lịch sử.
+
+### Thay đổi mới nhất cần giữ
+- `public/admin/index.html`: bổ sung tên trợ năng theo bản ghi cho điều khiển trạng thái/thanh toán đơn hàng, lưu đơn hàng, trạng thái/ghi chú/lưu yêu cầu bảo hành, thao tác sắp xếp/xóa ảnh và công tắc cấu hình.
+- `tests/admin-liquid-glass-contract.test.mjs`: contract checks cho các tên trợ năng.
+- `.github/workflows/admin-preview-diagnostics.yml`: ảnh PNG và metadata đầy đủ được giữ trong GitHub Actions artifact 14 ngày; chỉ báo cáo ngắn/chẩn đoán được lưu trong Git. Không được quay lại copy cả thư mục screenshots vào branch.
+- `tests/admin-upgrade.test.mjs`: kiểm tra chống hồi quy cho artifact-only storage.
+- Artifact run #39550214050: `admin-preview-evidence-68`. Artifact run #39550195026: `admin-preview-evidence-67` (ID 12322959928, ~9,16 MB). Đây là bằng chứng source/fixture, không chứng minh workflow backend thật.
+
+### Bắt buộc trước khi làm tiếp
+1. Đọc lại MASTER PROMPT, START-HERE, LATEST-STATUS, JSON, PROMPT-COMPLETENESS-AUDIT và reference instructions trên nhánh ADMIN; không dựa vào phần tóm tắt này nếu file nguồn mới hơn.
+2. Xác minh HEAD/PR/CI/workflow mới nhất vì commit bàn giao tiếp tục làm HEAD tiến lên. Tìm run được kích hoạt sau commit workflow artifact-only và kiểm tra PR changed-files count; xác nhận không thêm hàng chục PNG vào Git.
+3. Nếu workflow vừa commit một báo cáo mới và HEAD lại di chuyển, fetch lại status/JSON/prompt trước khi ghi; không ghi đè các thay đổi mới bằng bản cũ.
+4. Tiếp tục audit source-only accessibility/responsive và so sánh ảnh với reference. Ghi rõ SOURCE/fixture vs Preview thật; không tuyên bố authenticated QA đã PASS.
+5. Chỉ xử lý Preview bằng đường hợp lệ: cần Preview URL được ủy quyền, build từ source ADMIN hiện tại và quyền truy cập hợp lệ. Không bypass Access, không thao tác secret, không chạy workflow deploy đang đặt `CLOUDFLARE_PAGES_BRANCH=main`.
+6. Giữ nguyên các hàng rào: chỉ branch `feature/admin-isolated-handoff-2026-10-20`; không sửa `main`/website tĩnh; không merge PR #111/#108; không Production deploy; không migration/setup, không remote D1/R2/data write.
