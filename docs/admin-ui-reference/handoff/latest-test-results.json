@@ -1750,15 +1750,12 @@
     },
     {
       "path": "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
-      "commitSha": "a35ca6e6a3f8e6422868d9feaaa7e978fe261677"
-    },
-    {
-      "path": "docs/admin-ui-reference/handoff/latest-test-results.json",
-      "commitSha": "bea1903e2756f4a20efd9b9f4803e5e7e0dc3070"
+      "commitSha": "01810a35693cdead80c0f9692c3608e28392e0d5"
     },
     {
       "path": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
       "commitSha": "3d42e686ec30f366ad9e828942e9563d8e641e9b"
     }
-  ]
+  ],
+  "handoffJsonSelfUpdateNote": "This JSON file is itself updated alongside the other handoff files; consult branch commit history for its own latest commit to avoid a self-referential SHA."
 }
