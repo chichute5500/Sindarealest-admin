@@ -14,6 +14,11 @@ export async function onRequestPost(context) {
     if(!order)return fail("Không tìm thấy đơn hàng.",404);
     if(direction==="received"&&order.status==="cancelled")return fail("Không thể ghi nhận khoản nhận mới cho đơn đã hủy.",409);
     if(direction==="received"&&(Number(order.price_confirmation_required)!==0||order.total===null||!order.payment_terms_confirmed_at))return fail("Chưa xác nhận giá và điều kiện đơn; không thể ghi nhận thanh toán.",409);
+    if(direction==="refunded"){
+      const existingLedger=await db.prepare("SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) AS net_received FROM order_payment_transactions WHERE order_id=?").bind(orderId).first();
+      const netReceived=Number(existingLedger?.net_received);
+      if(!Number.isSafeInteger(netReceived)||netReceived<=0||amount>netReceived)return fail("Số tiền hoàn không thể vượt tổng tiền đã nhận và xác minh thực tế.",409);
+    }
     if(requestId){
       const pr=await db.prepare("SELECT id,order_id,status FROM order_payment_requests WHERE id=? LIMIT 1").bind(requestId).first();
       if(!pr||pr.order_id!==orderId)return fail("Yêu cầu thanh toán không thuộc đơn này.",400);

@@ -25,6 +25,8 @@ assert.doesNotMatch(adminOrders, /SET status=\?,payment_status=COALESCE/, "order
 const transactionApi = read("../functions/api/admin/payment-transactions.js");
 assert.match(transactionApi, /payment_received_verified/, "verified receipts need an audit action");
 assert.match(transactionApi, /UNIQUE constraint/i, "duplicate bank references must map to a conflict response");
+assert.match(transactionApi, /amount>netReceived/, "refunds must not exceed previously verified net receipts");
+assert.match(orderPaymentApi, /Referrer-Policy/, "capability-token payment details must disable referrer leakage");
 const orderPaymentApi = read("../functions/api/order-payment.js");
 assert.match(orderPaymentApi, /public_access_token_hash/, "public order payment must be capability-token scoped");
 assert.match(orderPaymentApi, /payment_terms_confirmed_at/, "payment details must wait for server-side price and terms confirmation");
