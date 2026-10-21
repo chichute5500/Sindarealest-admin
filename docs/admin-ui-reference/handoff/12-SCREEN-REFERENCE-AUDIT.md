@@ -24,20 +24,20 @@ Overall Admin progress: **48%** — unchanged until evidence supports a meaningf
 | 5 | Product image gallery / image manager | PARTIAL | Horizontal thumbnail rail, prominent cover, responsive/light-dark fixture captures and last-thumbnail clearance passed on prior exact test tree `78a16b6d9fca91d7b080834f293e1690dc7c10cd`; synthetic images only, not real R2 photos or image-save proof. |
 | 6 | Category / product classification | NOT TESTED | Need screen-level reference and safe fixture coverage. |
 | 7 | Orders / fulfillment | NOT TESTED | Source-contract tests exist; authenticated end-to-end business flow not tested. |
-| 8 | Payment QR / payment requests / ledger | PARTIAL | Read-only source audit and mocked-D1 contract tests only; no live backend proof. |
+| 8 | Payment QR / payment requests / ledger | PARTIAL | Latest fixture Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) on SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55` now verifies QR settings fields, accessible manual scan-verification checkbox, inactive-state disablement, and that changing bank details without saving shows a guard warning before confirmation/API write. Synthetic/read-only; mocked-D1 contract tests only, no live backend proof. |
 | 9 | Customers / customer details | NOT TESTED | Need approved-reference comparison and safe fixture evidence. |
 | 10 | Warranty / after-sales | NOT TESTED | Need approved-reference comparison and safe fixture evidence. |
 | 11 | AI image review / grouping | NOT TESTED | Do not infer live model success from mocked tests; previous live AI test was blocked by provider daily quota. |
-| 12 | Backup / restore / settings / responsive navigation | NOT TESTED | Need screen-by-screen evidence; no remote restore or data mutation during audit. |
+| 12 | Backup / restore / settings / responsive navigation | PARTIAL | Artifact `admin-preview-evidence-191` includes Settings/QR guard and backup/restore fixture captures across mobile light/dark and desktop light; Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) passed 63 PNGs / 39 metrics. No live restore, mutation or approved-reference parity acceptance. |
 
 ## Cross-cutting checks
 
 | Check | Status | Notes |
 |---|---|---|
 | Light/dark themes | PARTIAL | Fixture/screenshot checks exist; complete reference parity is not accepted. |
-| Narrow Android viewport / horizontal overflow | PARTIAL | Prior screenshot matrix included 390px width; repeat on current code SHA before accepting. |
-| Keyboard / focus / accessible names | PARTIAL | Exact-SHA Playwright run [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) passed fixture checks for product-editor tab ArrowLeft/ArrowRight/Home/End navigation, `aria-selected` state, dialog focus trap/restoration and order-details focus. Other screens still need per-module acceptance. |
-| `prefers-reduced-motion` | PASS — BROWSER E2E ON SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e` | Admin Preview Playwright run [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) executed `tests/e2e/admin-static-baseline.spec.js`; the reduced-motion test passed in the 3-test browser suite. It uses synthetic GET fixtures and blocks mutations; it is not authenticated backend QA. |
+| Narrow Android viewport / horizontal overflow | PARTIAL | Exact-SHA Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) reran the responsive/theme matrix on `0b9e8a2...`; 320–412px and tablet/desktop viewports are included, with no horizontal overflow assertions failing. Visual parity is still not accepted. |
+| Keyboard / focus / accessible names | PARTIAL | The latest descendant run [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) on SHA `0b9e8a2...` reran product-editor ArrowLeft/ArrowRight/Home/End tab focus and `aria-selected`, dialog focus trapping/restoration, order-detail focus, and QR verification checkbox naming. Other screens still need per-module acceptance. |
+| `prefers-reduced-motion` | PASS — BROWSER E2E ON SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55` | Admin Preview Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) reran the 3-test static browser suite successfully; reduced-motion emulation passed. Synthetic GET fixtures reject non-GET API calls; not authenticated backend QA. |
 | Authenticated real backend | BLOCKED / NOT TESTED | Do not change Access or secrets to work around this. |
 | Product image upload/save | DEFERRED_BY_OWNER | Do not resume without explicit owner authorization. |
 | PRE/PRO migration | DEFERRED_BY_OWNER | Do not inspect remote schema through writes or execute migration/setup scripts. |
@@ -77,3 +77,12 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 - Exact source validation [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) both SUCCESS. Static baseline suite: 3 passed (30.5s); responsive/theme matrix and Preview CSS signature PASS. Artifact `admin-preview-evidence-189`, ID `12359007200`, has 59 PNGs and 36 synthetic fixture metrics.
 - Keyboard/focus is now **PARTIAL**, not globally PASS: these checks cover selected editor and order-detail dialog behavior using synthetic fixtures. Full screen-by-screen keyboard/a11y review and all-12-screen visual parity remain NOT ACCEPTED.
 - Overall progress remains 48%; authenticated real-backend QA is still BLOCKED / NOT TESTED. Image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
+
+
+## QR Settings client-side guard — 2026-10-21 16:11 UTC
+
+- Exact test/source SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55`: Validate Source [#39632306385](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385) and Admin Preview/Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) both SUCCESS.
+- Added `settings-qr-unsaved-guard` fixture coverage for the Settings screen. It verifies the QR bank fields are available and the verification checkbox has an accessible name; with active QR false, deactivate remains disabled. Changing the bank name and ticking the manual verification checkbox must still show “Hãy lưu thông tin nháp trước khi kích hoạt QR.” and return before confirmation or API mutation.
+- First attempt [#39631879451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39631879451) failed because the test expected a blank status message after the previous viewport had already produced the warning. Test-only fix in `0b9e8a2...` navigates Products → Settings to create a fresh form per viewport. The retry passed; source logic was not changed.
+- Artifact `admin-preview-evidence-191` ID `12360041542`: 63 PNGs, 47 fixture module images, 39 fixture metrics; 16 login-shell captures; no recorded browser/console/network/HTTP errors and no attempted writes. This confirms UI guard behavior under fixture-only input, not actual remote D1/R2 or authenticated business-flow behavior.
+- QR screen status stays PARTIAL; screen #12 settings/backup status stays PARTIAL. The overall 12-screen visual parity remains NOT ACCEPTED and project progress remains 48%.
