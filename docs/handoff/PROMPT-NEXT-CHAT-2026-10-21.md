@@ -1,3 +1,20 @@
+## Cập nhật xác minh mới nhất — 2026-10-21 17:18 UTC (ưu tiên hơn mốc cũ)
+
+- HEAD: `306bdc9fa3a1ca7494ed552424c3462105884f83`, nhánh `fix/liquid-glass-audit-2026-10-19`.
+- Source/tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949642
+- Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949582
+- Live visual workflow completed: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949358
+- Artifact 685: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949358/artifacts/12366231369
+- Deployment API xác minh Preview exact SHA: deployment `9e0b9b2d-03d2-4b93-b650-0d4073a11513`, URL `https://9e0b9b2d.sindarealest2.pages.dev`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, branch và SHA khớp.
+- Local fixture audit PASS, 54 screenshot, không có hard failure. **Không dùng kết quả fixture thay cho live.**
+- Live audit: capture hoàn tất, 86 screenshot; 8/8 viewport-theme checks, 12/12 product route/direct-open/reload checks, 8/8 cart/account/checkout/gallery states; 0 console errors, 0 page errors, 0 same-origin HTTP errors, 0 failed requests, không bị Access chặn. Welcome splash Light/Dark đã được chụp thành công.
+- Live audit tổng thể vẫn `passed=false` vì đúng một blocker: `SD-GL052` không tồn tại trong public verified product payload. Hero fallback đóng an toàn, không ảnh giả, không sửa SKU/dữ liệu để ép test PASS.
+- Đã làm mềm nếp satin Light/Dark desktop/mobile, cập nhật cache-buster `20261021-21`; ảnh live cho thấy nền sáng bớt dải chéo nổi, Dark vẫn còn nếp lớn dễ thấy hơn Light. Không tuyên bố hoàn tất giao diện.
+- Đã sửa live screenshot harness để chụp welcome splash trước khi reduced-motion auto-dismiss, không dùng scroll/settle delay.
+- Tiếp tục từ HEAD này. Không đụng Admin/Production, không merge PR, không lặp lại test PASS nếu không có regression. Bước kế: kiểm tra ảnh gallery còn nền trắng dạng khung; tiếp tục so sánh các section/state và xử lý các lỗi không phụ thuộc SD-GL052. Nếu thay đổi storefront, bắt buộc source/tests → deploy Preview exact SHA → live capture → mở ảnh/artifact → ghi ledger.
+ 
+---
+
 # PROMPT BÀN GIAO CHAT MỚI — SINDAREALEST2 WEB TĨNH
 
 Bạn tiếp quản công việc trực tiếp từ GitHub, không yêu cầu người dùng nhắc lại bối cảnh. Đọc file này trước, sau đó đọc `docs/prompts/MASTER-PROMPT-SINDAREALEST2-PARALLEL.md`, `docs/prompts/NEXT-CHAT-PROMPT.md`, `docs/handoff/HANDOFF.md` và `docs/handoff/TEST-RESULTS.md`.
