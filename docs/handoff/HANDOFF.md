@@ -537,3 +537,10 @@ Verified continuation update — 2026-10-21 (mobile cart compaction)
 - Added regression cases for matching names, one extra live filename and one missing baseline filename. Corrected regular-expression escaping in these assertions so they test the intended filenames rather than literal backslashes.
 - Guarded baseline refresh is still required because the current 66-image baseline and 84-image end archive do not match. Do not claim this guard has passed CI until a workflow run confirms it. No manifest was edited by hand.
 - Current branch commit at time of note: `49d7a68701b507dc0d2485674596a5b694218f6a`. Verify HEAD before next write; no Production deployment or PR merge.
+
+## Checkpoint ưu tiên mới nhất — 2026-10-21 (84-pair guarded capture)
+
+- Capture workflow [39610598201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598201), artifact [12350401549](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598201/artifacts/12350401549); exact captured source/deployment SHA: `a56c12de32d3aa08b84f027217b90af8b7e5e36d`.
+- Fresh comparison: 84 pairs, 71 identical, 13 changed, 0 dimension mismatches, 0 invalid PNG, 0 unmatched baseline/result. Live audit: 12 route checks, 0 overflow, 0 page errors, 0 console errors. Validation [39610598095](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598095) PASS; Preview deploy [39610598134](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598134) PASS.
+- Technical capture PASS is not visual acceptance. Actual artifact/reference PNG review remains pending. Manifest has stale wording “Nine screenshot pairs” while current result has 13 changed pairs; do not hand-forge workflow-managed counters.
+- Verify current branch HEAD before source edits; capture SHA is not automatically branch HEAD. Keep PR #108 open/unmerged, Preview only; no Admin, Production/main, backend/API, D1/R2, secrets/bindings/DNS or catalog changes; never fabricate `SD-GL052`.
