@@ -196,6 +196,10 @@ has('aria-label="Ghi chú điều kiện đơn hàng ${esc(o.order_number)}"', '
 // Mobile gallery layout must give the primary cover priority without hiding controls or losing narrow-screen support.
 has('@media(max-width:480px){\n  #imageGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}\n  #imageGrid .imageitem:first-child{grid-column:1/-1}', 'featured mobile cover spanning the row');
 has('#imageGrid .imageitem:first-child img{aspect-ratio:1.55/1;object-fit:contain;background:rgba(218,235,247,.40)}', 'cover image keeps its full composition visible on mobile');
+
+has('#backdrop>.editor{padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
+has('#backdrop .editorcontent{padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
+
 has('@media(max-width:360px){#imageGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}', 'two-column gallery fallback for narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .imageitem:first-child img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
 has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder controls remain present');
