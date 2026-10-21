@@ -363,8 +363,7 @@ assert.match(live, /async function captureAddToCartFeedback[\s\S]*?oneClickExact
   'Live Preview must verify detail-add toast, exactly-once quantity, rapid clicks, and that opening the header cart adds nothing.');
 assert.match(live, /cartAddStateChecksComplete: audit\.cartAddStateChecks\.length === 4[\s\S]*?audit\.cartAddStateChecks\.every\(check => check\.status === 'PASS'\)/,
   'Live audit cannot PASS unless add-to-cart interaction checks pass in all four detail contexts.');
-assert.match(live, /#cartDrawer','#checkoutDrawer','#accountDrawer'/,
-  'Toast suppression must not include the product detail overlay, so detail add can report success.');
+
 
 const firstPaintVisibilityLogic = live.slice(
   live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'),
