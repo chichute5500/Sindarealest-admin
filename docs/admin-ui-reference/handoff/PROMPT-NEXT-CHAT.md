@@ -871,3 +871,21 @@ Continue real work autonomously on `chichute5500/Sindarealest-admin`, only write
 - Screen #10 Warranty is list-first with local search/filter, a collapsed accessible issuance form and a one-line mobile order number. Exact-SHA UI tests pass. Visual status PARTIAL: reference card thumbnails/customer/date details remain missing. Full 12-screen parity NOT ACCEPTED; authenticated live business QA NOT TESTED/BLOCKED BY ACCESS.
 - Next safe priority: screen #8 Customers, whose current source lacks the reference search field. Inspect existing API fields and implement local filter-only search with synthetic/read-only Playwright checks; do not write data or invent customer fields. Re-check screenshots and CI against exact SHA.
 - Overall progress 48%. Product image-save and PRE/PRO migration remain DEFERRED_BY_OWNER. Keep PR #111/#108 open/unmerged. No merge/cherry-pick/force-push, Production deploy, main/static branch edits, Access/secrets changes or bypass, remote D1/R2, SQL/setup/migration, or TinyFish. Continue after reports while safe work remains.
+
+
+## Anti-repeat checkpoint — 2026-10-21 17:10 UTC
+
+**Do not repeat completed work without a concrete failure or changed source:**
+- Customer search label/placeholder covers name, phone, email and address; address-search Playwright assertion exists. Source commit: `b3c54d55a5e21ae6377d2a6392349f2402ee333f`; validation passed on that SHA.
+- Warranty search accessibility/result summary and no-match empty states for both warranty and support-claim tables have Playwright assertions. Test commit: `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`.
+- Validate Source [run #39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) and Admin Preview/Playwright [run #39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) both SUCCESS on exact test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`. Artifact [admin-preview-evidence-201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710) contains 63 PNGs. These are responsive/theme and synthetic/read-only fixture evidence, not authenticated real-business QA.
+- Handoff docs were subsequently updated and latest docs-only commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` Validate Source run [#39641183495](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641183495) SUCCESS. This is a docs-only SHA; it does not mean a new UI test suite ran against new application code.
+- Latest weighted management estimate remains 50%, not test pass rate. 12-screen visual parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED; product image-save/R2 and PRE/PRO migration work DEFERRED_BY_OWNER.
+
+### Required next actions (continue, don't ask user unless blocked)
+1. Fetch current branch HEAD, PR #111/#108 states and newest workflow runs; never assume this checkpoint is still HEAD.
+2. Read `12-SCREEN-REFERENCE-AUDIT.md` and the reference image/HTML instructions, then choose the next uncompleted screen or concrete parity gap. Do not redo customer/warranty search work above.
+3. Make one meaningful, bounded UI/source improvement on this ADMIN branch only, preserving API/data behavior; add regression coverage and run source checks. Do not weaken tests.
+4. Capture and inspect real-source screenshots or available fixture evidence and compare against the relevant reference; do not claim parity without evidence.
+5. Update status, scorecard and this prompt only when evidence/progress materially changes. Avoid repeated documentation-only commits that retrigger CI without advancing implementation.
+6. Keep PRs open; no merge/production deploy, no Access/secrets edits, no remote D1/R2/schema/data changes, no TinyFish.
