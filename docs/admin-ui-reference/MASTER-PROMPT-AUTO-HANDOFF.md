@@ -1201,3 +1201,14 @@ The newest owner instruction remains in force: **pause the product image-save er
 - No local checkout exists through the connected GitHub tools, so local `git status`, full diff build, and clean-tree checks are not available. Do not claim those checks passed.
 - Owner's explicit priority remains: product image-save/actual product image upload and PRE/PRO D1 schema/migration-ledger work are **DEFERRED_BY_OWNER / NOT VERIFIED**. No remote schema query, SQL, setup script, D1/R2 action, product image backend retest, secret read/change, Access bypass, Production deploy, main/static branch edit, or TinyFish use occurred.
 - Continue independent Admin source/UI/a11y tests and safe documentation consistency fixes. Do not raise progress percentage until verified acceptance gates materially change. Current overall estimate remains 46%; no 100% claim while Preview, authenticated backend QA, full 12-screen reference parity, and complete PR-scope review remain open.
+
+
+## BẮT BUỘC — TIẾP TỤC THỰC THI SAU MỖI BÁO CÁO TIẾN ĐỘ (2026-10-21)
+
+Chủ sở hữu đã nhắc rõ: “tiếp tục làm việc không dừng, chỉ dừng khi cần tôi thao tác”. Vì vậy:
+- Báo cáo phần trăm chỉ là checkpoint, **không phải điểm kết thúc**. Sau khi gửi báo cáo, phải tiếp tục ngay công việc an toàn tiếp theo trong cùng lượt khi còn khả năng thực thi.
+- Không chỉ đưa kế hoạch hoặc nói “đang làm”; hãy kiểm tra repository/branch/HEAD/Actions, sửa phần có thể sửa, chạy kiểm thử, xác minh kết quả, cập nhật bàn giao rồi tiếp tục vòng tiếp theo.
+- Chỉ yêu cầu chủ sở hữu thao tác khi có bước thực sự cần quyền/thiết bị/xác nhận của họ; nêu chính xác thao tác cần thiết và lý do. Không dùng việc thiếu thao tác để dừng các phần độc lập vẫn có thể làm.
+- Không tự tuyên bố 100%. Phải tách biệt code đã sửa, CI PASS, Preview PASS, parity ảnh mẫu, backend/authenticated QA và nghiệm thu cuối cùng.
+- Ràng buộc hiện hành: chỉ commit nhánh `feature/admin-isolated-handoff-2026-10-20`; PR #111 và #108 để OPEN/unmerged; không sửa `main`/nhánh web tĩnh, không deploy Production, không thao tác Cloudflare secrets/D1/R2/migration từ xa.
+- Theo chỉ thị trước đó, lỗi lưu ảnh sản phẩm và migrations PRE/PRO vẫn là `DEFERRED_BY_OWNER`; không tự mở lại nếu chủ sở hữu chưa yêu cầu.
