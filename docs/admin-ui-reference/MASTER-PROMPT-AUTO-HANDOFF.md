@@ -1212,3 +1212,22 @@ Chủ sở hữu đã nhắc rõ: “tiếp tục làm việc không dừng, ch�
 - Không tự tuyên bố 100%. Phải tách biệt code đã sửa, CI PASS, Preview PASS, parity ảnh mẫu, backend/authenticated QA và nghiệm thu cuối cùng.
 - Ràng buộc hiện hành: chỉ commit nhánh `feature/admin-isolated-handoff-2026-10-20`; PR #111 và #108 để OPEN/unmerged; không sửa `main`/nhánh web tĩnh, không deploy Production, không thao tác Cloudflare secrets/D1/R2/migration từ xa.
 - Theo chỉ thị trước đó, lỗi lưu ảnh sản phẩm và migrations PRE/PRO vẫn là `DEFERRED_BY_OWNER`; không tự mở lại nếu chủ sở hữu chưa yêu cầu.
+
+
+---
+
+## Newest evidence-backed execution checkpoint — 2026-10-21 (modal accessibility)
+
+This addendum supersedes older run references for the modal-focus change. Re-fetch branch/PR refs before the next cycle.
+
+- Current functional source commit: `3fe44a2304f083e6f943c931d43b74039900ace3`.
+- Tested source + regression-test SHA: `d408781b95af4942b36681cbe2d0334dc03c8683`.
+- Exact-source Actions run [39590491689](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689): `npm run check` PASS, `npm test` PASS, local source/fixture Playwright PASS. Overall workflow remains FAILURE solely at configured remote Preview diagnosis.
+- Accessibility correction: two modal dialogs now use shared focus entry/restoration, Tab/Shift+Tab trapping, Escape closing the active dialog, consistent `aria-hidden` and body scroll state. Playwright assertions cover initial focus, focus wrapping, Escape, closure, and return to opener.
+- Screenshot artifact [admin-preview-evidence-141](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689/artifacts/12342530827), ID 12342530827, includes 59 source/fixture PNGs, 36 fixture metrics, metadata and reference image; 16 login-only + 43 synthetic read-only module views. Zero browser/console/request/HTTP errors and no fixture writes. Raw per-run PNGs remain in Actions artifacts, not Git.
+- Remote Preview diagnosis is still **FAIL**: `PREVIEW_CSS_SIGNATURE_MISMATCH`; the served inline CSS has 226 rules but `hasLoginHideRule=false`, so `.topbar > .brand` remains visible. Do not weaken the assertion or manipulate the masked `ADMIN_TEST_URL` / Access secrets; do not bypass Cloudflare Access.
+- Opened the approved 12-screen reference PNG and compared it with the current tested source screenshot board at 390×844 light. **Full visual parity is NOT ACCEPTED.** Major composition differences remain: dashboard has no source-confirmed time-series for the reference chart, product editor layout differs from the tabbed reference, and gallery/order details/warranty/backup/activity screens need further review. Never invent KPI data to imitate the chart.
+- PR #111 remains OPEN/unmerged and is now 1,094 changed files (+37,393/−392); its scope is mixed and not merge-ready. PR #108 remains OPEN/unmerged at 250 changed files. Keep both open.
+- Overall progress remains **48%**. Authenticated real-backend flows and all-viewport/12-screen acceptance remain open. Product image save/storage and PRE/PRO migration ledger remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
+- Local checkout / working-tree status is not available to this session. No local npm command was run; the evidence is from the exact GitHub Actions run above.
+- Next work: continue safe ADMIN-only source/accessibility and PR semantic review. Confirm a currently deployed Preview/source and authorized Access path with the owner before trying authenticated QA. Do not touch `main`, static branch, secrets, Access, D1/R2, production deploy or migration commands.
