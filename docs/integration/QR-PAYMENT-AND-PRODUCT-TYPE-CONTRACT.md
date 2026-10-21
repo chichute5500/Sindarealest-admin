@@ -215,3 +215,14 @@ Implementation files are developed only on `feature/admin-isolated-handoff-2026-
 - If implementation differs from this document, do not independently make incompatible changes in either branch. Record the mismatch here, choose a backward-compatible resolution, update contract tests and both handoff prompts, then implement each side only on its own branch.
 - Any API field/enum/path change must be reviewed for both Admin and static consumers before implementation. Prefer additive, backward-compatible changes; document deprecation/removal separately.
 - Do not mark cross-branch integration complete from matching documentation alone. Completion requires evidence from the actual source SHA, passing contract tests, and a verified compatible Preview; Preview is currently not verified by this addendum.
+
+## Admin source hardening verified by tests — 2026-10-21
+
+Source commit `cedebd78b2056ae4d0e6f6982793106b586d99b2` passed [source CI 39565547871](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871). Implemented safeguards (source/test evidence only, not deployment evidence):
+- The Admin payment-request endpoint requires all order-item line totals to be present, non-empty, valid non-negative safe integers. Missing prices fail closed; they cannot be coerced into zero.
+- Payment-request creation requires the active QR object to exist in the configured `IMAGES` binding; missing binding/object prevents creation.
+- Public `GET /api/payment-settings` only exposes the QR URL/account details when the active QR object is present; otherwise it returns `configured: false` and suppresses those fields.
+- Token-scoped `GET /api/order-payment` sets `Cache-Control: private, no-store` and `Referrer-Policy: no-referrer`; pending installments take precedence over historical settled/cancelled requests.
+- Regression coverage verifies those conditions. The current remote Preview [diagnostic run 39565547828](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828) still FAILS the CSS signature; deployed behavior and cross-branch consumer compatibility remain NOT VERIFIED.
+- Keep all static-website changes on the protected website branch only; do not modify or merge that branch from Admin work.
+

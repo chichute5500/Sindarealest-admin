@@ -137,3 +137,18 @@ Keep ownership strict: Admin owns product type, payment rules/configuration, QR 
 ## Handoff refresh — 2026-10-21 14:42 ICT
 
 Read the integration contract and current HEAD before code edits. Observed HEAD: `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`. Latest source CI: run 39563376269 (success, SHA 8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e). Latest Preview diagnostic: run 39562983543 (failure, SHA da66197b372cbabc4c31bb1f1427fe8b8bfe5532); this is not current-HEAD Preview evidence. Overall Admin estimate 46%; QR/fulfillment estimate 70%; integration is NOT VERIFIED. See `LATEST-STATUS.md` and `PROMPT-NEXT-CHAT.md` for details and strict branch/production guardrails.
+
+## Current verified checkpoint — 2026-10-21 — Admin payment/QR source hardening
+
+- Repository/branch: `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`. HEAD before this documentation commit: `69cd0b07c97b8087bfcfaa2b7fb6bf835d584440`; code/test SHA checked by CI: `cedebd78b2056ae4d0e6f6982793106b586d99b2`.
+- Source CI [39565547871](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871) **PASS** on exact `cedebd78b2056ae4d0e6f6982793106b586d99b2` (dependency audit, project integrity and tests). Preview diagnostic [39565547828](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828) **FAIL** on the same code SHA: `PREVIEW_CSS_SIGNATURE_MISMATCH`; `.topbar > .brand` is visible, selector is supported/matches, but `hasLoginHideRule=false` among 226 parsed CSS rules.
+- Targeted safeguards in the source commit: token-scoped payment responses use private/no-store/no-referrer; a pending payment request is selected before historical completed/cancelled requests; payment request creation fails closed if the active QR storage binding/object is missing; null/undefined/empty/invalid item `line_total` is rejected; public QR settings hide account fields and URL while its active object is missing.
+- Regression tests for these cases are included in the CI-tested source. Playwright source/fixture matrix: PASS, 58 PNGs (16 login shell + 42 synthetic/read-only module fixture screens), 36 metrics; artifact `admin-preview-evidence-116` (ID 12329841294, around 9.3 MB, expires 2026-11-04). Zero recorded page/console/network/HTTP errors or attempted writes. These fixtures do not prove live authenticated business flows.
+- Overall progress remains **46%**; QR/fulfillment estimate remains **70%**. All-12-screen parity and authorized current-source Preview identity are still NOT VERIFIED. Authenticated real backend QA and remote migration state remain NOT VERIFIED.
+- PR #111 OPEN/unmerged with **1,072 files (+36,072/−389)** and mixed storefront/backend/migration/script/evidence scope; PR #108 OPEN/unmerged. Do not merge either.
+- No local checkout is available to report `git status`. No static branch/main edit, merge, Production deployment, remote migration, D1/R2 mutation, secret change or Access bypass was performed.
+- Owner action needed for remote verification: confirm the authorized Preview deployment URL/identity for current Admin source and the approved Cloudflare Access path. Do not paste secret values into chat; do not bypass Access.
+
+## Next action
+Continue from the live `LATEST-STATUS.md` and `latest-test-results.json`. Re-fetch HEAD/PR/Actions before modifying code. Do not treat the current Preview as passing. Work only on the Admin branch and do not merge or deploy Production.
+
