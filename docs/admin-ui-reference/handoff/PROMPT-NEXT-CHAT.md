@@ -1,3 +1,17 @@
+## PROMPT TIẾP TỤC — 2026-10-22T03:25:42.193+07:00
+
+Tiếp tục sửa/test thực tế trên GitHub, không dừng ở kế hoạch. Repo `chichute5500/Sindarealest-admin`, chỉ làm code trên `feature/admin-isolated-handoff-2026-10-20`. HEAD trước handoff update: `596ea3d7d6da524c6993ce37ccc41579c785929d`; exact tested SHA: `44778d91ff5f084a5bb89a166e97536bd4f42b9d`.
+
+**Bằng chứng gần nhất:** Validate Source [#39669112058](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058) SUCCESS; Admin Preview/Playwright [#39669112068](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068) SUCCESS trên cùng SHA. [Artifact admin-preview-evidence-254](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004) 64 PNG/40 metrics đã được mở/soát trực tiếp. Không có lỗi trang, console, request hoặc HTTP trong fixture run.
+
+**Đã kiểm chứng:** Product editor #4 PARTIAL (Giá/Tồn kho nằm ngang trên mobile, placeholder ngắn vừa ô và title còn hướng dẫn đầy đủ). Orders #7 PARTIAL (search/status/payment filter/result count/reset/no-result, mobile summary compact, disclosure thu gọn). Không lưu sản phẩm/đơn hàng thật, không fake thumbnail.
+
+**Việc kế tiếp:** Category/product classification #6 đang NOT TESTED cấp screen-family. Không có page riêng; phần hiện hữu là `#pCategory` + datalist và `#categoryBox`. Hãy thêm E2E read-only với fixture để test options, nhập category tuỳ chỉnh, category filter match/no-result/clear, xác nhận không có non-GET writes. Không click Save, không tạo route/API mới. Chụp và xem 390×844 light/dark + 1280×800, chạy exact-SHA Validate + Preview/Playwright, mở artifact, rồi update/read-back bảy tệp handoff.
+
+Trước mỗi sửa đổi fetch HEAD/PR/Actions mới nhất; dùng expected SHA/CAS. Nếu nhánh đã dịch chuyển, đọc/ghép commit mới, không ghi đè. PR #111/#108 OPEN/UNMERGED; không sửa `main`/static, không Production/Access/secrets/D1/R2/schema/migration/infra, không TinyFish.
+
+---
+
 ## Newest verified cycle — custom publication switch test fix (2026-10-21 17:47 UTC)
 
 - Exact source/test SHA `04889b6c6bc946483ea683e8345bac3b7cbf3838`; Validate Source #39646606076 PASS; Admin Preview/Playwright #39646606242 SUCCESS.

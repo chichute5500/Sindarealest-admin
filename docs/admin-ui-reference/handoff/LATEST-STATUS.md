@@ -1,3 +1,16 @@
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T03:25:42.193+07:00
+
+- Branch ADMIN duy nhất: `feature/admin-isolated-handoff-2026-10-20`. HEAD trước cập nhật handoff: `596ea3d7d6da524c6993ce37ccc41579c785929d` (commit lưu bằng chứng). Code/test SHA đã chạy: `44778d91ff5f084a5bb89a166e97536bd4f42b9d`.
+- Validate Source [#39669112058](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058) **SUCCESS** và Preview/Playwright [#39669112068](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068) **SUCCESS**, cả hai trên đúng SHA `44778d91ff5f084a5bb89a166e97536bd4f42b9d`.
+- Artifact [`admin-preview-evidence-254`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004), ID 12378134004, chứa 64 PNG/40 metrics. Metadata: completed=true, không có page errors, console errors, failed requests hoặc HTTP errors. Đã mở ảnh Product editor (390×844 light/dark, 1280×800 light) và Orders (390×844 light/dark, 1280×800 light).
+- #4 Product editor = **PARTIAL**: trường Giá/Tồn kho cùng hàng trên mobile; placeholder ngắn vừa ô, hướng dẫn dài giữ trong title; tests dùng fixture và không lưu dữ liệu thật.
+- #7 Orders = **PARTIAL**: search/status/payment filters, số kết quả, reset/no-result, mobile summary compact, vùng quản lý thu gọn. Không thêm thumbnail giả vì API không trả image snapshot; bảng desktop vẫn có cuộn ngang.
+- #6 Category/product classification = **NOT TESTED** ở cấp screen-family. Luồng hiện có là `#pCategory` + datalist trong editor và bộ lọc `#categoryBox`; không có route/page quản lý categories độc lập.
+- Progress giữ **50%**; full 12-screen visual parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. Preview diagnosis `PASS_LOGIN_CSS_SIGNATURE` chỉ kiểm tra shell/CSS, không chứng minh đã đăng nhập/nghiệp vụ thật.
+- PR #111/#108 giữ OPEN/UNMERGED. Không sửa `main`/nhánh static, không Production deploy, không Access/secrets, D1/R2, schema/migration/infra hay TinyFish.
+
+---
+
 ## Checkpoint mới nhất — 2026-10-21 17:47 UTC
 
 - Exact source/test SHA: `04889b6c6bc946483ea683e8345bac3b7cbf3838`; branch hiện có commit evidence tự động `d90a18db3961958b0928f1fabc598f2d77cedea3` do workflow lưu báo cáo/diagnostics, không phải thay đổi ứng dụng.

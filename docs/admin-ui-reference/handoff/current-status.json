@@ -1,38 +1,54 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T02:53:48.575+07:00",
+  "updatedAt": "2026-10-22T03:25:42.193+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "1814260ee238d194ca5d749954439b15bb8c055a",
+  "branchHeadAtCheckpoint": "596ea3d7d6da524c6993ce37ccc41579c785929d",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "The weighted scorecard totals 49.6 points, rounded to 50%. Exact-SHA checks pass and the Orders/Fulfillment UI has verified visual improvement, but screen #7 remains PARTIAL, screen #3 remains PARTIAL, the all-12-screen matrix is NOT ACCEPTED, and authenticated backend QA is NOT TESTED.",
+  "progressBasis": "Overall progress remains 50%: product editor and Orders have fixture UI evidence but remain PARTIAL; Category/product classification is NOT TESTED; full 12-screen parity and authenticated backend/business QA remain unaccepted.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+    "testedCommitSha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
     "conclusion": "success",
     "validateRun": {
-      "runId": 39664727740,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112058,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39664727558,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112068,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-240",
-      "id": 12377312578,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578",
-      "sizeBytes": 12187488,
+      "name": "admin-preview-evidence-254",
+      "id": 12378134004,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004",
+      "sizeBytes": 12498570,
       "screenshotCount": 64,
       "loginShellPngCount": 16,
       "fixtureModulePngCount": 48,
       "fixtureMetricCount": 40,
       "rawPngsCommittedToGit": false
-    }
+    },
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS",
+    "projectIntegrity": "PASS",
+    "dependencyAudit": "PASS",
+    "localPlaywrightResponsiveThemeMatrix": "PASS",
+    "sourceScreenshotMatrix": "PASS",
+    "configuredPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "failedRequests": 0,
+    "httpErrors": 0,
+    "fixtureOnly": true,
+    "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
+    "productEditorScreen4": "PARTIAL_NOT_ACCEPTED",
+    "ordersScreen7": "PARTIAL_NOT_ACCEPTED",
+    "categoryClassificationScreen6": "NOT_TESTED"
   },
   "acceptance": {
     "twelveScreenVisualParity": "NOT_ACCEPTED",
@@ -43,59 +59,65 @@
     "productImageSaveAndActualR2Storage": "DEFERRED_BY_OWNER_NOT_VERIFIED",
     "preProMigrations": "DEFERRED_BY_OWNER_NOT_VERIFIED",
     "productListScreen3": "PARTIAL_NOT_ACCEPTED",
-    "ordersFulfillmentScreen7": "PARTIAL_NOT_ACCEPTED"
+    "ordersFulfillmentScreen7": "PARTIAL_NOT_ACCEPTED",
+    "productEditorScreen4": "PARTIAL_NOT_ACCEPTED",
+    "categoryProductClassificationScreen6": "NOT_TESTED"
   },
   "pullRequests": {
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "913271e4941f6222568fd8726559282ded76f82b",
+      "headSha": "064a19ae50bc0c7b24e3661f3f999b4879753cb2",
       "agentWritesAllowed": false,
-      "changedFiles": 270,
+      "changedFiles": 271,
       "mergeReady": false,
-      "headShaObservedBeforeHandoffRefresh": "39d0dc85bb3af8c8c7d8f5362290a9fbefc65f2b"
+      "headShaObservedBeforeHandoffRefresh": "39d0dc85bb3af8c8c7d8f5362290a9fbefc65f2b",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "reason": "Protected static website branch/PR; leave open/unmerged and do not modify from ADMIN task."
     },
     "111": {
       "state": "OPEN",
       "merged": false,
       "headSha": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
-      "changedFiles": 1181,
+      "changedFiles": 1193,
       "mergeReady": false,
-      "reason": "Open/unmerged; broad scope requires isolation review.",
-      "headShaObservedBeforeHandoffRefresh": "1814260ee238d194ca5d749954439b15bb8c055a"
+      "reason": "Open/unmerged; broad mixed scope needs a full scope/isolation audit before any merge.",
+      "headShaObservedBeforeHandoffRefresh": "1814260ee238d194ca5d749954439b15bb8c055a",
+      "headShaBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
+      "mergeable": false,
+      "mergeable_state": "dirty"
     }
   },
   "currentCi": [
     {
-      "runId": 39664727740,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112058,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "status": "completed",
       "conclusion": "success"
     },
     {
-      "runId": 39664727558,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112068,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "status": "completed",
       "conclusion": "success"
     }
   ],
   "updatedHandoffFiles": [
-    "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
     "docs/admin-ui-reference/handoff/START-HERE.md",
+    "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
     "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
-    "docs/admin-ui-reference/handoff/current-status.json",
-    "docs/admin-ui-reference/handoff/latest-test-results.json",
     "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
-    "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
+    "docs/admin-ui-reference/handoff/latest-test-results.json",
+    "docs/admin-ui-reference/handoff/current-status.json"
   ],
   "nextActions": [
-    "Use 12-SCREEN-REFERENCE-AUDIT.md to identify the next unaudited module; Category/product classification is currently NOT TESTED.",
-    "Inspect the approved reference and matching fixture screenshots at 390x844 light/dark and 1280x800; record objective layout gaps before editing.",
-    "Make only evidence-backed changes on feature/admin-isolated-handoff-2026-10-20; preserve API/data/auth and add regression tests.",
-    "Run exact-SHA Validate Source and Admin Preview/Playwright, open the new artifact, then refresh and read back all seven handoff files.",
-    "Keep PR #111/#108 open/unmerged. No Production, Access/secrets, remote D1/R2/SQL/migrations, infrastructure changes, or TinyFish."
+    "Test existing Category/product classification using synthetic/read-only E2E: #pCategory datalist/manual entry, and #categoryBox matching/no-result/reset. Do not Save or create a route.",
+    "Run exact-SHA Validate Source + Preview/Playwright, inspect artifact, and read back all seven handoff files.",
+    "PR #111/#108 OPEN/UNMERGED; no main/static/Production/Access/secrets/D1/R2/schema/migration/infra edits; no TinyFish."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -105,31 +127,28 @@
     "No SQL/setup/migration execution or remote D1/R2 mutations.",
     "Do not use TinyFish."
   ],
-  "ownerActionRequiredNow": false,
+  "ownerActionRequiredNow": "No owner action needed for this fixture-only UI pass; authenticated backend/business QA remains untested pending authorized access and a separate test plan.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T02:53:48.575+07:00",
+    "checkedAt": "2026-10-22T03:25:42.193+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedApplicationSha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
-    "sourceChangeCommit": "eb27fee7a196ddf0d59689c0d90cf47270c0f45f",
-    "e2eTestCommit": "34d1b0a6ded6be0dbb64df6669e7c5347fe08103",
-    "regressionContractCommit": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+    "testedApplicationSha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
     "validateRun": {
-      "runId": 39664727740,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112058,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39664727558,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112068,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-240",
-      "id": 12377312578,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578",
-      "sizeBytes": 12187488,
+      "name": "admin-preview-evidence-254",
+      "id": 12378134004,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004",
+      "sizeBytes": 12498570,
       "screenshotCount": 64,
       "loginShellPngCount": 16,
       "fixtureModulePngCount": 48,
@@ -137,86 +156,68 @@
       "rawPngsCommittedToGit": false
     },
     "screenshotReview": {
-      "files": [
+      "productEditor": [
+        "product-editor__390x844__light.png",
+        "product-editor__390x844__dark.png",
+        "product-editor__1280x800__light.png"
+      ],
+      "orders": [
         "orders__390x844__light.png",
         "orders__390x844__dark.png",
         "orders__1280x800__light.png"
       ],
-      "screen7": "PARTIAL_NOT_ACCEPTED"
+      "productEditorStatus": "PARTIAL_NOT_ACCEPTED",
+      "ordersStatus": "PARTIAL_NOT_ACCEPTED",
+      "categoryClassificationStatus": "NOT_TESTED",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "httpErrors": 0
     },
-    "latestBranchHeadObservedBeforeThisHandoffRefresh": "1c6114dc0ee16a0dfb3a3569b425a6b86bce0987",
-    "currentHeadIsTestedSourceTree": true,
+    "branchHeadBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
+    "currentHeadIsTestedSource": false,
+    "currentHeadIncludesEvidenceDescendant": true,
     "handoffRefreshWritten": true,
-    "finalSevenFileReadback": "TO_BE_VERIFIED_AFTER_LAST_WRITE",
-    "progressPercent": 50,
-    "branchHeadObservedBeforeHandoffRefresh": "1814260ee238d194ca5d749954439b15bb8c055a",
-    "currentHeadIncludesDocsOnlyDescendants": true,
-    "postWriteReadback": "Perform and verify all-seven-file readback after this sequential handoff refresh."
+    "finalSevenFileReadback": "PENDING_AFTER_THIS_DOCS_COMMIT",
+    "progressPercent": 50
   },
   "latestContinuationCycle": {
-    "checkedAt": "2026-10-22T02:53:48.575+07:00",
+    "updatedAt": "2026-10-22T03:25:42.193+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadAtStartOfHandoffRefresh": "1814260ee238d194ca5d749954439b15bb8c055a",
-    "testedApplicationSha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
-    "sourceChangeSha": "eb27fee7a196ddf0d59689c0d90cf47270c0f45f",
-    "e2eUpdateSha": "34d1b0a6ded6be0dbb64df6669e7c5347fe08103",
-    "contractAndFinalTestSha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+    "testedSha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
+    "branchHeadBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
     "validateSource": {
-      "runId": 39664727740,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112058,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "adminPreviewPlaywright": {
-      "runId": 39664727558,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558",
-      "sha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+      "runId": 39669112068,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-240",
-      "id": 12377312578,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578",
-      "sizeBytes": 12187488,
+      "name": "admin-preview-evidence-254",
+      "id": 12378134004,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004",
+      "sizeBytes": 12498570,
       "screenshotCount": 64,
       "loginShellPngCount": 16,
       "fixtureModulePngCount": 48,
       "fixtureMetricCount": 40,
       "rawPngsCommittedToGit": false
     },
-    "checks": {
-      "npmRunCheck": "PASS",
-      "npmTest": "PASS",
-      "repositoryIntegrity": "PASS",
-      "chromiumInstall": "PASS",
-      "localSourceScreenshotMatrix": "PASS",
-      "configuredPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-      "pageErrors": 0,
-      "consoleErrors": 0,
-      "failedRequests": 0,
-      "httpErrors": 0,
-      "nonGetWriteAttempts": 0,
-      "unexpectedApiPaths": 0
-    },
-    "visualReview": {
-      "referenceAsset": "docs/admin-ui-reference/admin-mobile-reference.png",
-      "openedScreenshots": [
-        "orders__390x844__light.png",
-        "orders__390x844__dark.png",
-        "orders__1280x800__light.png"
-      ],
-      "screen7": "PARTIAL_NOT_ACCEPTED",
-      "notes": "At 390x844 light/dark, order row is summary-first with order/customer/product/total/status/payment visible; management controls are collapsed behind a labeled summary, no horizontal overflow was visible, and existing price input is revealed when mobile management opens. At 1280x800, the table row remains compact, the single price input stays in the product column, and management uses a matching ice-glass disclosure control; operations expand on demand. E2E asserts toggle behavior and that QR/payment receipt actions stay disabled until conditions are met.",
-      "dataScope": "Synthetic UI-ONLY fixtures; all non-GET API requests blocked. No authenticated business/API data was tested."
+    "latestScreenStatuses": {
+      "productEditor4": "PARTIAL_NOT_ACCEPTED",
+      "categoryClassification6": "NOT_TESTED",
+      "orders7": "PARTIAL_NOT_ACCEPTED",
+      "twelveScreenVisualParity": "NOT_ACCEPTED",
+      "authenticatedBackendQA": "NOT_TESTED_FIXTURE_ONLY"
     },
     "progressPercent": 50,
-    "remaining": [
-      "Screen #7 remains PARTIAL pending full-reference and real authenticated acceptance.",
-      "Screen #3 remains PARTIAL; other screen families still require per-screen visual review.",
-      "Authenticated business/backend QA is NOT TESTED; do not bypass Access.",
-      "PR #111 and #108 remain OPEN/UNMERGED; no Production deployment."
-    ],
-    "nextAction": "Continue with the next unaudited screen family shown in 12-SCREEN-REFERENCE-AUDIT.md (Category/product classification is currently NOT TESTED); inspect the matching fixture screenshot at 390x844 light/dark and 1280x800, then make only evidence-backed changes with exact-SHA regression coverage."
+    "nextAction": "Test existing Category/product classification using synthetic/read-only E2E: #pCategory datalist/manual entry, and #categoryBox matching/no-result/reset. Do not Save or create a route."
   },
   "continuationHistory": [
     {
@@ -314,26 +315,82 @@
       },
       "overallProgressPercent": 50,
       "nextAction": "Inspect the orders list/mobile screen (#6 reference) and implement a focused mobile card layout only if justified by source/reference evidence."
+    },
+    {
+      "updatedAt": "2026-10-22T03:25:42.193+07:00",
+      "branch": "feature/admin-isolated-handoff-2026-10-20",
+      "testedSha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
+      "branchHeadBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
+      "validateSource": {
+        "runId": 39669112058,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058",
+        "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
+        "conclusion": "success"
+      },
+      "adminPreviewPlaywright": {
+        "runId": 39669112068,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068",
+        "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
+        "conclusion": "success"
+      },
+      "artifact": {
+        "name": "admin-preview-evidence-254",
+        "id": 12378134004,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004",
+        "sizeBytes": 12498570,
+        "screenshotCount": 64,
+        "loginShellPngCount": 16,
+        "fixtureModulePngCount": 48,
+        "fixtureMetricCount": 40,
+        "rawPngsCommittedToGit": false
+      },
+      "latestScreenStatuses": {
+        "productEditor4": "PARTIAL_NOT_ACCEPTED",
+        "categoryClassification6": "NOT_TESTED",
+        "orders7": "PARTIAL_NOT_ACCEPTED",
+        "twelveScreenVisualParity": "NOT_ACCEPTED",
+        "authenticatedBackendQA": "NOT_TESTED_FIXTURE_ONLY"
+      },
+      "progressPercent": 50,
+      "nextAction": "Test existing Category/product classification using synthetic/read-only E2E: #pCategory datalist/manual entry, and #categoryBox matching/no-result/reset. Do not Save or create a route."
     }
   ],
   "latestHandoffCheckpoint": {
-    "branchHeadObservedBeforeHandoffRefresh": "db6b8784a3704b6cce980cc4b9a09530cf60ef3b",
-    "latestVerifiedTestSha": "214dd104c17e3837166fac77f8f2106d1a25ffeb",
+    "updatedAt": "2026-10-22T03:25:42.193+07:00",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "testedSha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
+    "branchHeadBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
     "validateSource": {
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446",
+      "runId": 39669112058,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
     "adminPreviewPlaywright": {
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425",
+      "runId": 39669112068,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068",
+      "sha": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
       "conclusion": "success"
     },
-    "screenshotArtifactVisualReview": "PENDING_NOT_OPENED",
-    "ordersScreen6": "CODE_AND_E2E_PASS_VISUAL_REVIEW_PENDING",
-    "productScreen3": "PARTIAL_NOT_ACCEPTED",
-    "twelveScreenParity": "NOT_ACCEPTED",
-    "authenticatedBackendQA": "NOT_TESTED",
-    "pr111": "OPEN_UNMERGED",
-    "pr108": "OPEN_UNMERGED",
-    "nextAction": "Retrieve and inspect the screenshot artifact for run 39662986425; review orders screen at mobile light/dark and desktop."
+    "artifact": {
+      "name": "admin-preview-evidence-254",
+      "id": 12378134004,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004",
+      "sizeBytes": 12498570,
+      "screenshotCount": 64,
+      "loginShellPngCount": 16,
+      "fixtureModulePngCount": 48,
+      "fixtureMetricCount": 40,
+      "rawPngsCommittedToGit": false
+    },
+    "latestScreenStatuses": {
+      "productEditor4": "PARTIAL_NOT_ACCEPTED",
+      "categoryClassification6": "NOT_TESTED",
+      "orders7": "PARTIAL_NOT_ACCEPTED",
+      "twelveScreenVisualParity": "NOT_ACCEPTED",
+      "authenticatedBackendQA": "NOT_TESTED_FIXTURE_ONLY"
+    },
+    "progressPercent": 50,
+    "nextAction": "Test existing Category/product classification using synthetic/read-only E2E: #pCategory datalist/manual entry, and #categoryBox matching/no-result/reset. Do not Save or create a route."
   }
 }
