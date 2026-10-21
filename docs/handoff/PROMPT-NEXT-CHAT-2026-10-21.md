@@ -483,3 +483,16 @@ The user explicitly requires: **do not stop working unless the user's action or 
 - Do not claim completion from CI green alone. Compare live Preview screenshots to the original reference images and inspect the full set of required routes, states, themes, and viewports.
 - Never touch Production, Admin, `main`, backend/API, D1/R2, secrets, bindings, DNS, or product/catalog data. Keep PR #108 open/unmerged unless the user explicitly authorizes otherwise.
 - Keep handoff files and `docs/website-screenshots/manifest.json` synchronized with verified evidence. No fabricated screenshots, commit hashes, test results, or completion percentages.
+
+
+---
+
+## BỔ SUNG BẮT BUỘC — TIẾP QUẢN 2026-10-22, KHÔNG LẶP LẠI
+
+Trước tiên đọc phần “Cập nhật bàn giao — 2026-10-22” trong `docs/handoff/HANDOFF.md` và các bản ghi mới nhất của `docs/handoff/TEST-RESULTS.md`. HEAD GitHub gần nhất đã xác minh: `b2cb59f02bb19783e1e395adefd9d9b0597ce52a`; PR #108 đang mở, chưa merge. Workflow run `39640261310` success và artifact mới nhất là `sindarealest-liquid-glass-preview-683` (ID `12365600187`). Đây chỉ là thành công của workflow/artifact, KHÔNG phải bằng chứng toàn bộ UI PASS.
+
+**Chống lặp:** kiểm tra artifact 683 trước, lấy manifest/report và lập bảng coverage. Không tải lại/đánh giá artifact 681 nếu artifact 683 đã thay thế được. Không chạy lại test đã PASS trong ledger trừ khi có thay đổi liên quan hoặc cần regression test. Không nói Preview exact-SHA verified nếu chưa xác minh metadata deploy Cloudflare khớp HEAD. Phân biệt workflow success, deploy verification, functional tests và visual match.
+
+**Tiếp tục ngay:** xác minh artifact 683 và Preview exact-SHA; mở ảnh thực tế, so sánh với hai reference gốc; chỉ kiểm thử/chụp bổ sung những viewport/theme/route còn thiếu hoặc bị ảnh hưởng. Tiếp tục sửa toàn website công khai, không chỉ homepage. Sau mỗi fix: test phù hợp → Preview deploy → ảnh thực tế → so sánh → sửa tiếp. Báo cáo xong phải tiếp tục làm, không kết thúc lượt chỉ vì đã báo cáo. Chỉ dừng khi cần người dùng thao tác hoặc quyết định thật sự.
+
+Giữ nguyên các giới hạn trong prompt gốc: không đụng Admin, không merge PR, không sửa Production, không thay đổi logo chính thức/thương hiệu/dữ liệu và quan hệ ảnh sản phẩm; không thay sản phẩm chỉ để làm đẹp. Không đổi backend contracts, D1/R2 bindings/secrets/migrations/data hoặc kiến trúc sang React/Vite. 
