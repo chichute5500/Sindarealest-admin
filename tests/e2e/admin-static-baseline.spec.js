@@ -644,19 +644,42 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#imageDropZone')).toBeVisible();
       await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
       // Exercise local object-URL thumbnails with synthetic images only; do not save the product.
-      await page.locator('#imageInput').setInputFiles([
-        {
-          name: 'ui-fixture-front.svg',
-          mimeType: 'image/svg+xml',
-          buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="12" fill="#eaf3fb"/><path d="M24 112L64 50l26 33 18-20 28 49" fill="none" stroke="#5c91b9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>')
-        },
-        {
-          name: 'ui-fixture-side.svg',
-          mimeType: 'image/svg+xml',
-          buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="12" fill="#09131d"/><circle cx="80" cy="80" r="42" fill="none" stroke="#8ebce0" stroke-width="5"/><path d="M48 90l21-28 17 20 12-13 17 29" fill="none" stroke="#8ebce0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>')
-        }
-      ]);
-      await expect(page.locator('#imageGrid .imageitem')).toHaveCount(2);
+      const galleryFixtures = [
+        { name: 'ui-fixture-front.svg', background: '#eaf3fb', stroke: '#5c91b9', path: 'M24 112L64 50l26 33 18-20 28 49' },
+        { name: 'ui-fixture-side.svg', background: '#09131d', stroke: '#8ebce0', path: 'M48 90l21-28 17 20 12-13 17 29' },
+        { name: 'ui-fixture-rear.svg', background: '#dcecf8', stroke: '#3f7296', path: 'M28 42h104v76H28zM43 57h74v46H43z' },
+        { name: 'ui-fixture-detail.svg', background: '#132b3c', stroke: '#b9dbf0', path: 'M32 42c16-18 32 18 48 0s32 18 48 0M32 80c16-18 32 18 48 0s32 18 48 0M32 118c16-18 32 18 48 0s32 18 48 0' },
+        { name: 'ui-fixture-sole.svg', background: '#eaf3fb', stroke: '#5c91b9', path: 'M56 24c-8 28-20 42-18 72 2 26 18 38 42 38s40-12 42-38c2-30-10-44-18-72M60 54h40M52 76h56M50 98h60M62 120h36' },
+        { name: 'ui-fixture-hardware.svg', background: '#0e1e2b', stroke: '#a8cde8', path: 'M42 42h76v76H42zM58 58h44v44H58zM70 24v18M90 118v18M24 70h18M118 90h18' }
+      ];
+      await page.locator('#imageInput').setInputFiles(galleryFixtures.map(fixture => ({
+        name: fixture.name,
+        mimeType: 'image/svg+xml',
+        buffer: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="12" fill="${fixture.background}"/><path d="${fixture.path}" fill="none" stroke="${fixture.stroke}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`)
+      })));
+      await expect(page.locator('#imageGrid .imageitem')).toHaveCount(6);
+      await expect(page.locator('#imageGrid .image-cover-slot .imageitem-cover')).toBeVisible();
+      await expect(page.locator('#imageGrid .image-rail')).toBeVisible();
+      await expect(page.locator('#imageGrid .image-rail')).toHaveAttribute('aria-label', 'Dải ảnh thu nhỏ, vuốt ngang để xem thêm');
+      await expect.poll(async () => page.locator('#imageGrid img').evaluateAll(images =>
+        images.length === 6 && images.every(image => image.complete && image.naturalWidth > 0)
+      ), { timeout: 5000 }).toBe(true);
+      await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(18);
+      if (variant.viewport.width <= 480) {
+        const railMetrics = await page.locator('#imageGrid .image-rail').evaluate(el => ({
+          clientWidth: el.clientWidth,
+          scrollWidth: el.scrollWidth,
+          overflowX: getComputedStyle(el).overflowX
+        }));
+        expect(railMetrics.overflowX, 'Mobile thumbnails should scroll horizontally rather than widen the page').toBe('auto');
+        expect(railMetrics.scrollWidth, 'Five thumbnails should exceed the visible rail width').toBeGreaterThan(railMetrics.clientWidth + 20);
+        const scrolledRail = await page.locator('#imageGrid .image-rail').evaluate(el => {
+          el.scrollLeft = el.scrollWidth;
+          return el.scrollLeft;
+        });
+        expect(scrolledRail, 'Thumbnail rail should be horizontally scrollable').toBeGreaterThan(0);
+        await page.locator('#imageGrid .image-rail').evaluate(el => { el.scrollLeft = 0; });
+      }
       await expect.poll(async () => page.locator('#imageGrid img').evaluateAll(images =>
         images.every(image => image.complete && image.naturalWidth > 0)
       ), { timeout: 5000 }).toBe(true);
@@ -686,7 +709,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const galleryLayout = await page.evaluate(() => {
         const dialog = document.querySelector('#backdrop>.editor');
         const footer = document.querySelector('#backdrop .editorfooter');
-        const lastImage = document.querySelector('#imageGrid .imageitem:last-child');
+        const lastImage = document.querySelector('#imageGrid .image-rail .imageitem:last-child');
         if (!dialog || !footer || !lastImage) throw new Error('Product gallery dialog geometry is incomplete');
         const dialogRect = dialog.getBoundingClientRect();
         const footerRect = footer.getBoundingClientRect();
@@ -702,7 +725,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         'Product editor actions must reach the bottom edge of the dialog').toBeLessThanOrEqual(1);
       expect(galleryLayout.lastImageBottom,
         'Last gallery image should scroll fully above the sticky action bar').toBeLessThanOrEqual(galleryLayout.footerTop + 1);
-      await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 2 });
+      await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 6, horizontalThumbnailRail: true });
       await page.locator('#editorClose').click();
       await expect(page.locator('#backdrop')).toBeHidden();
       await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'true');
