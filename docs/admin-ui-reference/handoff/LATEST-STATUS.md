@@ -49,36 +49,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 214dd104c17e3837166fac77f8f2106d1a25ffeb
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425
+- Tested commit: 63d198f59b72b53fb0e54711a6ebee76c9ddac37
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664245773
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 64 real PNGs captured in artifact admin-preview-evidence-231 (not committed to Git).
+- Local source Playwright matrix: PASS; 64 real PNGs captured in artifact admin-preview-evidence-238 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 64 real PNGs; login shell: 16; read-only fixture module screens: 48; fixture metrics: 40.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Verified continuation checkpoint — 2026-10-22 — mobile orders disclosure
-
-- **Current branch HEAD observed before this handoff refresh:** `db6b8784a3704b6cce980cc4b9a09530cf60ef3b`. Work is restricted to `feature/admin-isolated-handoff-2026-10-20`.
-- **Latest verified application/test SHA:** `214dd104c17e3837166fac77f8f2106d1a25ffeb`. Validate Source [run #39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) **SUCCESS**; Admin Preview diagnostic + Playwright [run #39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) **SUCCESS**. Both runs checked out the same SHA, but the current branch HEAD is newer because subsequent handoff documentation commits were made. Do not describe the docs HEAD as the exact tested source SHA.
-- **Source change:** `public/admin/index.html` now places per-item price inputs and order-management actions in a labelled disclosure panel. On mobile (≤680px) the panel starts collapsed; on desktop the summary is hidden and the controls stay expanded. The order list's customer summary is shortened; full details remain available in the order detail dialog. Existing data-action hooks, status controls, terms confirmation, QR/payment guards and API flow were intentionally preserved.
-- **Regression tests:** `tests/e2e/admin-static-baseline.spec.js` checks mobile disclosure open/close, hidden/revealed price entry, compact card height, desktop expanded baseline and payment buttons remaining disabled until required confirmations. `tests/admin-liquid-glass-contract.test.mjs` locks the source contract. Validate Source and Preview/Playwright passed on exact SHA `214dd104c17e3837166fac77f8f2106d1a25ffeb`.
-- **Screenshot evidence:** the workflow completed successfully, but the artifact list was not yet successfully retrieved/opened in this checkpoint. Do **not** claim new orders screenshots were visually inspected. Prior product-screen screenshot evidence remains the separate artifact `admin-preview-evidence-227` from SHA `d7488c845202a695b18ea01ec5d87906b6e9bffa`; product screen #3 remains PARTIAL/NOT ACCEPTED.
-- **PR state:** PR #111 is OPEN and UNMERGED; PR #108 is OPEN and UNMERGED. Both were reported as non-mergeable at the time of check. Do not merge either.
-- **Progress stays 50%.** This is a weighted project estimate, not the CI pass percentage. Screen #6 has a code/test improvement but is not visually accepted until screenshots are actually opened and reviewed. Twelve-screen parity remains NOT ACCEPTED; authenticated business/backend QA remains NOT TESTED. Product image-save/R2 and PRE/PRO migration work remains DEFERRED_BY_OWNER.
-- **Safety:** no Production deploy, no main/static-site edits, no Access/secrets changes or bypass, no remote D1/R2 mutation, no SQL/migration, and no TinyFish.
-- **Next steps:** (1) fetch the live branch HEAD and latest exact-SHA workflow runs; (2) retrieve and open the new Preview artifact, review orders at 390×844 light/dark and 1280×800; (3) repair any real layout or E2E issue without weakening assertions; (4) continue the next unaccepted screen family; (5) update these files sequentially with fresh blob SHAs and read back all seven. Keep the overall estimate at 50% until visual acceptance/backend evidence justifies change.
-
-
-## Continuation handoff — 2026-10-22 — mobile orders UI
-
-- Branch HEAD observed before handoff refresh: `db6b8784a3704b6cce980cc4b9a09530cf60ef3b`; re-fetch live HEAD before any further code changes.
-- Latest verified source/test SHA: `214dd104c17e3837166fac77f8f2106d1a25ffeb`. Validate Source [#39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) SUCCESS; Admin Preview/Playwright [#39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) SUCCESS on that same SHA. The branch HEAD advanced later through handoff documentation commits; do not claim the later HEAD has been tested unless a new run confirms it.
-- `public/admin/index.html`: per-item price inputs and order-management actions are grouped in a labelled disclosure. It collapses on mobile (≤680px), while desktop controls remain expanded; customer summary is shorter and full details remain in the detail dialog. Existing action hooks, terms confirmation and QR/payment guards were preserved.
-- Regression coverage in `tests/e2e/admin-static-baseline.spec.js` and `tests/admin-liquid-glass-contract.test.mjs` covers disclosure state, price input visibility, compact mobile card and payment buttons remaining disabled until confirmations. Exact-SHA CI passed.
-- New screenshot artifact has **not yet been retrieved/opened for visual review**; do not claim visual acceptance of screen #6. Product screen #3 remains PARTIAL/NOT ACCEPTED; all-12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED.
-- Progress remains **50%**. PR #111 and #108 stay OPEN/UNMERGED. No Production deployment, Access/secrets changes, remote D1/R2 mutation, SQL/migration, main/static-site edits or TinyFish.
-- Next: fetch live HEAD and latest Actions; retrieve/open the artifact from run #39662986425 and inspect orders at 390×844 light/dark and 1280×800; fix any evidence-backed issue, rerun exact-SHA CI, then continue the next unaccepted screen. Update all seven handoff files sequentially with fresh blob SHAs and read them all back.
