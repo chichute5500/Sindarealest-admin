@@ -73,7 +73,7 @@ function makeDb(options = {}) {
     },
   };
 }
-function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PASSWORD, SESSION_SECRET } }; }
+function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PASSWORD, SESSION_SECRET, IMAGES: { head: async key => ({ key }) } } }; }
 
 {
   const db = makeDb({ netReceived: 50000 });
@@ -115,6 +115,16 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 409, "installment request must wait for confirmed order price and terms");
   assert.equal(db.batches.length, 0, "unconfirmed order cannot create a pending transfer request");
+}
+{
+  const db = makeDb({ order: baseOrder });
+  const ctx = adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit"
+  }));
+  ctx.env.IMAGES.head = async () => null;
+  const response = await createPaymentRequest(ctx, ctx.request);
+  assert.equal(response.status, 409, "payment request must fail closed when active QR object is missing");
+  assert.equal(db.batches.length, 0, "missing QR object must not create a payable request");
 }
 {
   const db = makeDb({ order: baseOrder });
