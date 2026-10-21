@@ -361,6 +361,19 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 @media(prefers-reduced-motion:reduce){.welcome-content>*{animation:none!important}}
 /* Keep the mobile three-line menu on the left, beside the brand. */
 @media(max-width:760px){.nav{position:relative;padding-left:48px!important}.menu-btn{position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}.nav-actions{margin-left:auto}}
+
+/* sd-hero-desktop-floor-blend-2026-10-22: soften the supplied photo's tabletop edge into the satin canvas without changing the image asset. */
+@media(min-width:761px){
+  #home .hero-visual{isolation:isolate}
+  #home .hero-visual::after{
+    content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(237,247,255,0) 48%,rgba(237,247,255,.04) 56%,rgba(237,247,255,.16) 64%,rgba(237,247,255,.34) 74%,rgba(237,247,255,.58) 88%,rgba(237,247,255,.76) 100%);
+  }
+  html.dark #home .hero-visual::after{
+    background:linear-gradient(180deg,rgba(4,20,34,0) 48%,rgba(4,20,34,.05) 56%,rgba(4,20,34,.18) 64%,rgba(4,20,34,.40) 74%,rgba(4,20,34,.68) 88%,rgba(4,20,34,.84) 100%);
+  }
+  #home .hero-visual-caption{position:absolute;z-index:3}
+}
 </style>
 
 
