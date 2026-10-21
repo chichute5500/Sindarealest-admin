@@ -642,7 +642,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productTabPricing')).toHaveText('Khác');
     await expect(page.locator('#productTabPricing')).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#pFulfillmentType')).toBeVisible();
-    await expect(page.locator('#pPublished')).toBeVisible();
+    await expect(page.locator('label.switch:has(#pPublished)')).toBeVisible();
+    await expect(page.locator('#pPublished')).toBeChecked();
     await expect(page.locator('#imageDropZone')).toBeHidden();
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#productTabGallery')).toBeFocused();
