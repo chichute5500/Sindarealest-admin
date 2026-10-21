@@ -772,8 +772,26 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await page.locator('#saveProduct').click();
         await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
         await expect(page.locator('#pTitle')).toBeFocused();
-        await expect(page.locator('#saveError')).toContainText('Vui lòng nhập tên và chọn danh mục.');
+        await expect(page.locator('#saveError')).toContainText('Vui lòng nhập tên sản phẩm.');
         expect(attemptedWrites, 'Missing required product identity must never reach the API').toEqual([]);
+
+        // Whitespace-only values look filled to the browser's required attribute but must not be saved.
+        await page.locator('#pTitle').fill('   ');
+        await page.locator('#productTabGallery').click();
+        await page.locator('#saveProduct').click();
+        await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
+        await expect(page.locator('#pTitle')).toBeFocused();
+        await expect(page.locator('#saveError')).toContainText('Vui lòng nhập tên sản phẩm.');
+        expect(attemptedWrites, 'Whitespace-only product title must never reach the API').toEqual([]);
+
+        await page.locator('#pTitle').fill('Sản phẩm thử nghiệm giao diện');
+        await page.locator('#pCategory').fill('   ');
+        await page.locator('#productTabPricing').click();
+        await page.locator('#saveProduct').click();
+        await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
+        await expect(page.locator('#pCategory')).toBeFocused();
+        await expect(page.locator('#saveError')).toContainText('Vui lòng chọn hoặc nhập danh mục.');
+        expect(attemptedWrites, 'Whitespace-only category must never reach the API').toEqual([]);
         await page.locator('#editorCancel').click();
         await expect(page.locator('#backdrop')).toBeHidden();
         await openEditor(variant);

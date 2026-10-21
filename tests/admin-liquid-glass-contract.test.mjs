@@ -187,6 +187,9 @@ has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab sta
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
 has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
 has('<form id="productForm" novalidate>', 'custom product validation can reveal invalid controls hidden in another tab');
+has('function syncProductIdentityValidity()', 'product editor rejects whitespace-only identity fields');
+has("title.setCustomValidity(title.value.trim()?'':'Vui lòng nhập tên sản phẩm.')", 'title validation is based on trimmed content');
+has("category.setCustomValidity(category.value.trim()?'':'Vui lòng chọn hoặc nhập danh mục.')", 'category validation is based on trimmed content');
 has("const invalidInput=$('#productForm').querySelector(':invalid')", 'product editor preserves native required/min/step validity checks');
 has('setProductEditorTab(panel.dataset.productPanel)', 'invalid form fields reveal their owning tab before focus moves');
 has('invalidInput.focus()', 'product form focuses the invalid control after opening its tab');
