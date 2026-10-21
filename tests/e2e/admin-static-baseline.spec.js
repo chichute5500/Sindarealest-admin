@@ -735,18 +735,24 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         viewportWidth: document.documentElement.clientWidth,
         pageWidth: document.documentElement.scrollWidth,
         identity: rect('.rowprod'),
-        price: rect('.product-mobile-metric:first-child'),
-        stock: rect('.product-mobile-metric:nth-child(2)'),
-        action: rect('.product-mobile-meta>.btn'),
-        visibleMetrics: getComputedStyle(row.querySelector('.product-mobile-meta')).display,
+        price: rect('.product-mobile-inline-metric:first-child'),
+        stock: rect('.product-mobile-inline-metric:nth-child(2)'),
+        action: rect('.product-mobile-edit'),
+        visibleMetrics: getComputedStyle(row.querySelector('.product-mobile-inline-meta')).display,
+        priceText: row.querySelector('.product-mobile-inline-metric:first-child').innerText,
+        stockText: row.querySelector('.product-mobile-inline-metric:nth-child(2)').innerText,
+        actionAccessibleName: row.querySelector('.product-mobile-edit').getAttribute('aria-label'),
         published: rect('.product-mobile-status')
       };
     });
-    expect(mobileCardLayout.visibleMetrics, 'Mobile product card metrics must be visible').toBe('grid');
+    expect(mobileCardLayout.visibleMetrics, 'Inline product price/stock must be visible on mobile').toBe('grid');
     expect(Math.abs(mobileCardLayout.price.top - mobileCardLayout.stock.top),
-      'Price and stock should share a row: ' + JSON.stringify(mobileCardLayout)).toBeLessThanOrEqual(2);
-    expect(mobileCardLayout.action.bottom, 'Edit action should finish within the card').toBeLessThanOrEqual(mobileCardLayout.rowHeight + mobileCardLayout.identity.top);
-    expect(mobileCardLayout.rowHeight, 'Mobile product cards should compact identity + price + stock + action').toBeLessThan(175);
+      'Price and stock should share a compact row: ' + JSON.stringify(mobileCardLayout)).toBeLessThanOrEqual(2);
+    expect(mobileCardLayout.priceText).toContain('Chưa nhập');
+    expect(mobileCardLayout.stockText).toContain('Chưa kiểm kê');
+    expect(mobileCardLayout.actionAccessibleName).toContain('Sửa sản phẩm');
+    expect(mobileCardLayout.action.bottom, 'Accessible edit action must finish within the card').toBeLessThanOrEqual(mobileCardLayout.rowHeight + mobileCardLayout.identity.top);
+    expect(mobileCardLayout.rowHeight, 'Reference-led mobile product cards should keep facts in a compact row').toBeLessThan(145);
     expect(mobileCardLayout.pageWidth, 'Mobile product list must not overflow horizontally').toBeLessThanOrEqual(mobileCardLayout.viewportWidth + 1);
     await saveScreenshot('products-compact-mobile-check', { viewport: mobile, theme: 'light' });
 
