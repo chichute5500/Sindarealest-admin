@@ -137,24 +137,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: cedebd78b2056ae4d0e6f6982793106b586d99b2
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828
+- Tested commit: 4871616404f78c6c52ec8a7923631f18c86a630e
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39566989953
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 58 real PNGs captured in artifact admin-preview-evidence-116 (not committed to Git).
+- Local source Playwright matrix: PASS; 58 real PNGs captured in artifact admin-preview-evidence-117 (not committed to Git).
 - Deployed Preview: failure.
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-## Checkpoint đã xác minh mới nhất — 2026-10-21
-
-- Source/test commit: `cedebd78b2056ae4d0e6f6982793106b586d99b2`. Source CI [39565547871](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871) **PASS** (dependency audit, integrity validation, automated tests).
-- Preview diagnostics [39565547828](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828) **FAIL** trên đúng source SHA: `PREVIEW_CSS_SIGNATURE_MISMATCH`; `.topbar > .brand` visible (`display:flex`, `visibility:visible`, opacity 1), selector support/match true, stylesheet có 226 rules nhưng `hasLoginHideRule=false`. Không hạ assertion và không đọc/đổi secret.
-- Artifact [admin-preview-evidence-116](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828/artifacts/12329841294) (ID 12329841294, khoảng 9,3 MB; giữ đến 2026-11-04) chứa 58 PNG: 16 login-shell + 42 fixture module, 36 metrics. Metadata: zero page/console/network/HTTP errors, zero attempted writes. Fixture/source only; không phải authenticated backend QA.
-- Code hardening trong source SHA: `order-payment.js` thêm private/no-store; pending request được ưu tiên; `payment-requests.js` fail-closed khi QR storage/object thiếu và từ chối line_total null/empty/invalid; `payment-settings.js` không công khai URL/tài khoản nếu object QR active mất. Regression tests đã được CI chạy PASS.
-- Đã xem một phần screenshot nguồn/fixture (login, dashboard, products, orders tại 390×844 light) để rà bố cục; đối chiếu đủ 12 màn hình với PNG chuẩn vẫn **NOT VERIFIED** trong lượt này.
-- Tiến độ 46% tổng thể / 70% QR stage (ước lượng theo giai đoạn). Authenticated backend, Preview identity, 12-screen parity, migration ledger và full PR #111 review vẫn OPEN.
-- PR #111 OPEN/unmerged: 1.072 file (+36.072/−389), mixed scope. PR #108 OPEN/unmerged. Không merge, không deploy Production, không sửa static/main, không thao tác D1/R2/secret/migration từ xa.
-- Working tree Git cục bộ: NOT VERIFIED vì runtime hiện tại không có checkout local; xác minh thông qua GitHub API.
-
