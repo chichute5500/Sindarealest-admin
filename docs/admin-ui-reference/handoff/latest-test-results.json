@@ -1826,11 +1826,7 @@
   },
   "currentVerification": {
     "latestSourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
-    "sourceCi": {
-      "runId": 39587110885,
-      "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587110885"
-    },
+    "sourceCi": "pending fresh run",
     "previewDiagnostic": {
       "runId": 39587110831,
       "conclusion": "failure",
@@ -1857,7 +1853,11 @@
     "pr111FileInventory": "COMPLETE_1092_FILES",
     "pr111SemanticAudit": "PARTIAL",
     "pr111State": "OPEN_UNMERGED",
-    "pr108State": "OPEN_UNMERGED"
+    "pr108State": "OPEN_UNMERGED",
+    "capturedAt": "2026-10-21T15:18:00Z",
+    "head": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
+    "duplicateStaticId": "resolved in source; fresh CI not yet confirmed",
+    "progressEstimatePercent": 48
   },
   "pr111FileInventory": {
     "retrievedPages": 12,
@@ -2108,8 +2108,8 @@
     "currentPr108State": "OPEN_UNMERGED",
     "note": "This JSON write will itself advance the ADMIN branch via a handoff-only commit; it does not change the source/test SHA listed above."
   },
-  "latestObservedAdminHead": "719a537f52eccf66c9642661c2758f8861beabcf",
-  "latestObservedAdminHeadVerifiedAt": "2026-10-21T11:35:49Z",
+  "latestObservedAdminHead": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:18:00Z",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
     "url": "https://564cd391.sindarealest2.pages.dev/admin/",
@@ -2426,14 +2426,23 @@
         "sha": "ae351fcc2790b70e198ec3db1053bef7ad46981f"
       }
     ],
-    "verification": "UI commit CI passes; current HEAD after subsequent commits pending fresh CI.",
-    "progressEffect": "No progress increase until current HEAD validation and visual evidence pass.",
+    "verification": "Earlier baseline SHA ae351fcc2790b70e198ec3db1053bef7ad46981f passed source validation and Preview diagnostic. Current descendant HEAD has not yet been validated by a fresh run.",
+    "progressEffect": "No progress increase until current descendant CI and screenshot comparison pass.",
     "lastObservedFailure": {
       "runId": 39623834484,
       "sha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
       "failedCheck": "npm run check",
       "reason": "duplicate static HTML id assertion failed (108 unique ids vs 109 occurrences) on that run's source snapshot",
       "resolutionStatus": "Current fetched public/admin/index.html no longer contains duplicate static ids; latest HEAD requires fresh validation."
+    },
+    "retainedPanelCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6",
+    "focusedGuardTest": "tests/admin-dashboard-revenue-empty-state.test.mjs",
+    "focusedGuardTestCommit": "e0cea90c593aff479645ee11ff521cfe34e2732a",
+    "duplicateIdRegression": {
+      "failedRunId": 39623834484,
+      "failedSha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
+      "reason": "A parallel edit temporarily created two dashboard panels with the same static ID; the duplicate panel was removed.",
+      "resolutionCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6"
     }
   }
 }
