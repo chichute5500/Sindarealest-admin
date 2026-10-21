@@ -128,6 +128,14 @@ assert.ok(finalCss.includes('@media(max-width:760px){')
   && finalCss.includes('top:calc(7px + env(safe-area-inset-top))!important;')
   && finalCss.includes('bottom:auto!important;'),
   'Mobile drawers must use an explicit viewport height and remain sized independently of the bottom navigation.');
+assert.ok(html.includes('<body class="welcome-active">'),
+  'The welcome lifecycle guard must be present in the initial body markup before first paint.');
+assert.ok(html.includes("document.body.classList.remove('welcome-active')")
+  && html.includes("s.parentNode.removeChild(s);document.body.classList.remove('welcome-active')"),
+  'The mobile toolbar and drawers remain hidden through the splash fade and are released only when the splash node is removed.');
+assert.ok(html.includes('body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}')
+  && html.includes('body.welcome-active #accountDrawer,body.welcome-active #cartDrawer,body.welcome-active #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}'),
+  'The first-paint welcome class must hide the bottom toolbar and commerce drawers without depending solely on :has().');
 assert.ok(html.includes('/* sd-welcome-layering-fix-2026-10-22 */')
   && html.includes('.welcome-splash{z-index:2147483000!important}')
   && html.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}'),
