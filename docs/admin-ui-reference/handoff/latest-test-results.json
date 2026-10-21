@@ -2414,15 +2414,26 @@
       {
         "id": 39623789724,
         "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623789724",
-        "status": "in_progress"
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "ae351fcc2790b70e198ec3db1053bef7ad46981f"
       },
       {
         "id": 39623789507,
         "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623789507",
-        "status": "in_progress"
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "ae351fcc2790b70e198ec3db1053bef7ad46981f"
       }
     ],
-    "verification": "pending",
-    "progressEffect": "No progress increase until current HEAD CI and visual evidence pass."
+    "verification": "UI commit CI passes; current HEAD after subsequent commits pending fresh CI.",
+    "progressEffect": "No progress increase until current HEAD validation and visual evidence pass.",
+    "lastObservedFailure": {
+      "runId": 39623834484,
+      "sha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
+      "failedCheck": "npm run check",
+      "reason": "duplicate static HTML id assertion failed (108 unique ids vs 109 occurrences) on that run's source snapshot",
+      "resolutionStatus": "Current fetched public/admin/index.html no longer contains duplicate static ids; latest HEAD requires fresh validation."
+    }
   }
 }
