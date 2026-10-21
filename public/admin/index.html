@@ -519,15 +519,23 @@ body:has(#loginView:not(.hidden)) .loginwrap{
  .dashboard-activity-table td[colspan]::before{content:none}
 }
  
-/* Mobile gallery: give the cover image the visual priority used by the approved reference. */
+/* Reference-aligned mobile product gallery: one featured cover and a horizontally scrollable thumbnail rail. */
+.image-cover-slot,.image-rail{display:contents}
 @media(max-width:480px){
-  #imageGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  #imageGrid .imageitem:first-child{grid-column:1/-1}
-  #imageGrid .imageitem:first-child img{aspect-ratio:1.55/1;object-fit:contain;background:rgba(218,235,247,.40)}
+  #imageGrid{grid-template-columns:minmax(0,1fr);gap:8px;align-items:start}
+  #imageGrid .image-cover-slot{display:block;grid-column:1/-1;min-width:0}
+  #imageGrid .image-cover-slot .imageitem{width:100%}
+  #imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.55/1;object-fit:contain;background:rgba(218,235,247,.40)}
+  #imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  #imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-align:start}
+  #imageGrid .image-rail .imageitem img{aspect-ratio:1;object-fit:cover}
+  #imageGrid .image-rail .imagebuttons{gap:2px;padding:4px 0;justify-content:flex-start}
+  #imageGrid .image-rail .imagebuttons button{width:22px;height:22px;border-radius:7px}
+  #imageGrid .image-rail .imagebuttons button svg{width:12px;height:12px}
   #imageGrid .imagebuttons{gap:3px}
 }
-@media(max-width:360px){#imageGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-:root[data-admin-theme="dark"] #imageGrid .imageitem:first-child img{background:rgba(5,14,23,.62)}
+@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:68px;width:68px}}
+:root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}
 
 /* Keep the product editor's sticky actions flush with the dialog edge on phones.
    Put scroll clearance before the footer, not after it on the scrolling dialog. */
@@ -626,7 +634,8 @@ function galleryImageSrc(value){
  if(/^(?:blob:|data:image\/|https?:\/\/)/i.test(src))return src;
  return src.startsWith('/')?src:'/'+src;
 }
-function renderGallery(){const grid=$('#imageGrid');if(!gallery.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px">Chưa có ảnh. Chọn ảnh từ điện thoại để tạo bộ ảnh cùng SKU.</div>';return}grid.innerHTML=gallery.map((g,i)=>`<div class="imageitem" draggable="true" data-image-index="${i}">${i===0?'<span class="covertag">ẢNH ĐẠI DIỆN</span>':''}<img src="${esc(galleryImageSrc(g.url))}" alt="Ảnh ${i+1}"><div class="imagebuttons"><button type="button" data-gallery="up" data-index="${i}" aria-label="Chuyển ảnh ${i+1} lên" ${i===0?"disabled":""}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg></button><button type="button" data-gallery="down" data-index="${i}" aria-label="Chuyển ảnh ${i+1} xuống" ${i===gallery.length-1?"disabled":""}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></button><button type="button" data-gallery="remove" data-index="${i}" aria-label="Xóa ảnh ${i+1}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg></button></div></div>`).join('')}
+function renderGalleryItem(g,i){return `<div class="imageitem ${i===0?'imageitem-cover':''}" draggable="true" data-image-index="${i}">${i===0?'<span class="covertag">ẢNH ĐẠI DIỆN</span>':''}<img src="${esc(galleryImageSrc(g.url))}" alt="Ảnh ${i+1}"><div class="imagebuttons"><button type="button" data-gallery="up" data-index="${i}" aria-label="Chuyển ảnh ${i+1} lên" ${i===0?"disabled":""}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg></button><button type="button" data-gallery="down" data-index="${i}" aria-label="Chuyển ảnh ${i+1} xuống" ${i===gallery.length-1?"disabled":""}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></button><button type="button" data-gallery="remove" data-index="${i}" aria-label="Xóa ảnh ${i+1}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg></button></div></div>`}
+function renderGallery(){const grid=$('#imageGrid');if(!gallery.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px">Chưa có ảnh. Chọn ảnh từ điện thoại để tạo bộ ảnh cùng SKU.</div>';return}const cover=renderGalleryItem(gallery[0],0),thumbnails=gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('');grid.innerHTML=`<div class="image-cover-slot">${cover}</div>${thumbnails?'<div class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ, vuốt ngang để xem thêm">'+thumbnails+'</div>':''}`}
 $('#imageGrid').addEventListener('click',e=>{const b=e.target.closest('[data-gallery]');if(!b)return;const i=+b.dataset.index;if(b.dataset.gallery==='up'&&i>0)[gallery[i-1],gallery[i]]=[gallery[i],gallery[i-1]];else if(b.dataset.gallery==='down'&&i<gallery.length-1)[gallery[i+1],gallery[i]]=[gallery[i],gallery[i+1]];else if(b.dataset.gallery==='remove'){if(gallery[i].temporary)URL.revokeObjectURL(gallery[i].url);gallery.splice(i,1)}renderGallery()});
 function addImageFiles(files){for(const file of [...files||[]]){if(!file.type.startsWith('image/'))continue;if(gallery.length>=30){toast('Mỗi sản phẩm tối đa 30 ảnh.');break}if(file.size>20*1024*1024){toast(`Bỏ qua ${file.name}: ảnh gốc vượt 20 MB.`);continue}gallery.push({url:URL.createObjectURL(file),file,temporary:true})}renderGallery()}
 $('#imageInput').addEventListener('change',e=>{addImageFiles(e.target.files);e.target.value=''});
