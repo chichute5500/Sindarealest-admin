@@ -866,9 +866,9 @@ test('respects the reduced-motion preference across interactive ADMIN layers', a
   const motionStyles = await page.evaluate(() => {
     const selectors = [
       ['topbar', '.topbar'],
-      ['panel', '#main .dashboard-revenue'],
+      ['panel', '.dashboard-revenue'],
       ['editor', '#backdrop .editor'],
-      ['dashboardShortcut', '#main .dashboard-shortcut'],
+      ['dashboardShortcut', '.dashboard-shortcut'],
       ['control', '#loginView .control']
     ];
     const seconds = value => value.split(',').map(part => {
