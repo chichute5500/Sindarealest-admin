@@ -780,6 +780,27 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', null, true);
     await captureView('settings', 'settings', null, true);
+    await captureView('settings-qr-unsaved-guard', 'settings', async () => {
+      await expect(page.locator('#paymentQrBankName')).toBeVisible();
+      await expect(page.locator('#paymentQrAccountNumber')).toBeVisible();
+      await expect(page.locator('#paymentQrAccountName')).toBeVisible();
+      await expect(page.locator('#paymentQrInstructions')).toBeVisible();
+      await expect(page.getByLabel('Tôi đã tự quét kiểm tra ảnh, xác nhận đúng tài khoản nhận và QR không chứa số tiền cố định.')).toBeVisible();
+      await expect(page.locator('#activatePaymentQr')).toBeVisible();
+      await expect(page.locator('#deactivatePaymentQr')).toBeDisabled();
+      await expect(page.locator('#paymentQrMessage')).toBeEmpty();
+
+      // Exercise the real client-side safety guard only: change one bank field,
+      // confirm the explicit scan checkbox, then verify activation is refused
+      // before any confirmation dialog or non-GET API request is attempted.
+      await page.locator('#paymentQrBankName').fill('Fixture bank changed');
+      await page.locator('#paymentQrVerified').check();
+      await page.locator('#activatePaymentQr').click();
+      await expect(page.locator('#paymentQrMessage')).toContainText(
+        'Thông tin ngân hàng đã thay đổi. Hãy lưu thông tin nháp trước khi kích hoạt QR.'
+      );
+      await expect(page.locator('#activatePaymentQr')).toBeEnabled();
+    }, true);
     await captureView('backup-restore', 'settings', async () => {
       await page.locator('#main .setting').filter({ hasText: 'Sao lưu & khôi phục' }).scrollIntoViewIfNeeded();
     });
