@@ -72,9 +72,12 @@ assert.ok(html.includes('id="mobileBottomNav"'), 'The mobile app-style bottom na
 assert.match(finalCss, /@media\(max-width:760px\)\{[\s\S]*?\.nav-wrap \.nav \.brand\{[\s\S]*?position:static!important;[\s\S]*?left:auto!important;[\s\S]*?transform:none!important/,
   'The mobile brand lockup must sit beside the menu, matching the supplied reference rather than being centered.');
 for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobileDark], ['desktop light', desktopLight], ['desktop dark', desktopDark]]) {
-  assert.match(svg, /id="satin-crease-detail"/, name + ' background must retain layered satin crease highlights.');
-  assert.doesNotMatch(svg, /stroke-width="(?:1[0-9]{2,}|[2-9][0-9]{2,})"/,
-    name + ' background must avoid oversized ribbon bands and retain fine folds.');
+  assert.match(svg, /id="base"/, name + ' background must define its satin base.');
+  assert.match(svg, /id="glow"/, name + ' background must include a soft light bloom.');
+  assert.match(svg, /id="blur"/, name + ' background must use diffuse folds rather than sharp geometric stripes.');
+  assert.match(svg, /stroke-linecap="round"/, name + ' background folds must flow organically.');
+  const ids = [...svg.matchAll(/id="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length, name + ' background must not contain duplicate SVG ids.');
 }
 
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
