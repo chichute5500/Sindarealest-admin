@@ -38,10 +38,10 @@ function assertSatinFoldContrast(name, svg, maxBody, maxShadow, maxShade, maxHig
   assert.ok(maxOpacityFor('inner-shade') <= maxShade, name + ' inner creases must stay quiet.');
   assert.ok(maxOpacityFor('highlight') <= maxHighlight, name + ' highlights must read as fine satin, not bright strokes.');
 }
-assertSatinFoldContrast('Desktop light satin', desktopLight, 0.045, 0.02, 0.045, 0.08);
-assertSatinFoldContrast('Desktop dark satin', desktopDark, 0.045, 0.02, 0.045, 0.08);
-assertSatinFoldContrast('Mobile light satin', mobileLight, 0.045, 0.02, 0.045, 0.08);
-assertSatinFoldContrast('Mobile dark satin', mobileDark, 0.045, 0.02, 0.045, 0.08);
+assertSatinFoldContrast('Desktop light satin', desktopLight, 0.055, 0.025, 0.055, 0.11);
+assertSatinFoldContrast('Desktop dark satin', desktopDark, 0.055, 0.025, 0.055, 0.11);
+assertSatinFoldContrast('Mobile light satin', mobileLight, 0.055, 0.025, 0.055, 0.11);
+assertSatinFoldContrast('Mobile dark satin', mobileDark, 0.055, 0.025, 0.055, 0.11);
 
 
 assert.match(html, /\.theme-bg--light\{background-color:#eaf3fb;background-image:url\('images\/liquid-glass-light\.svg\?v=/);
@@ -126,10 +126,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-16"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-16"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-16"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-16"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-17"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-17"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-17"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-17"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 

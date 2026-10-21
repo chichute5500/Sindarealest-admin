@@ -2,67 +2,67 @@
 <defs>
 <linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f5faff"/><stop offset=".24" stop-color="#dfeefa"/><stop offset=".48" stop-color="#fbfdff"/><stop offset=".72" stop-color="#d9eaf7"/><stop offset="1" stop-color="#f7fbff"/></linearGradient>
 <radialGradient id="glow" cx="18%" cy="12%" r="90%"><stop offset="0" stop-color="#ffffff" stop-opacity=".92"/><stop offset=".42" stop-color="#c7e1f5" stop-opacity=".32"/><stop offset="1" stop-color="#eaf5fe" stop-opacity="0"/></radialGradient>
-<linearGradient id="fold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7896b2" stop-opacity=".26"/><stop offset=".18" stop-color="#ffffff" stop-opacity=".98"/><stop offset=".42" stop-color="#88a8c4" stop-opacity=".52"/><stop offset=".66" stop-color="#ffffff" stop-opacity=".98"/><stop offset=".84" stop-color="#86a7c2" stop-opacity=".28"/><stop offset="1" stop-color="#86a7c2" stop-opacity=".06"/></linearGradient>
+<linearGradient id="fold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7896b2" stop-opacity=".26"/><stop offset=".18" stop-color="#ffffff" stop-opacity=".98"/><stop offset=".42" stop-color="#88a8c4" stop-opacity=".52"/><stop offset=".66" stop-color="#ffffff" stop-opacity=".98"/><stop offset=".84" stop-color="#86a7c2" stop-opacity=".28"/><stop offset="1" stop-color="#86a7c2" stop-opacity=".075"/></linearGradient>
 <filter id="blur" x="-18%" y="-18%" width="136%" height="136%"><feGaussianBlur stdDeviation="4"/></filter>
 <filter id="soft" x="-12%" y="-12%" width="124%" height="124%"><feGaussianBlur stdDeviation="0.5"/></filter>
 </defs>
 <rect width="100%" height="100%" fill="url(#base)"/>
 <rect width="100%" height="100%" fill="url(#glow)"/>
 <g data-fold-index="1">
-<path data-fold-layer="shadow" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M -240 110 C 18 178 280 240 660 430" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M -240 110 C 18 178 280 240 660 430" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M -240 110 C 18 178 280 240 660 430" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="2">
-<path data-fold-layer="shadow" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M -245 335 C 58 400 302 484 704 686" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M -245 335 C 58 400 302 484 704 686" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M -245 335 C 58 400 302 484 704 686" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="3">
-<path data-fold-layer="shadow" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M -240 620 C 64 694 344 787 780 1004" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M -240 620 C 64 694 344 787 780 1004" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M -240 620 C 64 694 344 787 780 1004" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="4">
-<path data-fold-layer="shadow" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M 185 -160 C 335 -52 518 12 820 125" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M 185 -160 C 335 -52 518 12 820 125" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M 185 -160 C 335 -52 518 12 820 125" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="5">
-<path data-fold-layer="shadow" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M 560 -120 C 728 -18 917 58 1240 168" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M 560 -120 C 728 -18 917 58 1240 168" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M 560 -120 C 728 -18 917 58 1240 168" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="6">
-<path data-fold-layer="shadow" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M 430 365 C 670 450 890 536 1210 700" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M 430 365 C 670 450 890 536 1210 700" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M 430 365 C 670 450 890 536 1210 700" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="7">
-<path data-fold-layer="shadow" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M 740 572 C 942 642 1164 725 1510 900" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M 740 572 C 942 642 1164 725 1510 900" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M 740 572 C 942 642 1164 725 1510 900" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <g data-fold-index="8">
-<path data-fold-layer="shadow" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".02" filter="url(#blur)"/>
-<path data-fold-layer="body" d="M -110 855 C 125 910 350 970 570 1070" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".045" filter="url(#soft)"/>
-<path data-fold-layer="inner-shade" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".045"/>
-<path data-fold-layer="highlight" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".08" filter="url(#soft)"/>
-<path data-fold-layer="fine" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".06"/>
+<path data-fold-layer="shadow" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,10)" fill="none" stroke="#010912" stroke-width="18" stroke-linecap="round" opacity=".025" filter="url(#blur)"/>
+<path data-fold-layer="body" d="M -110 855 C 125 910 350 970 570 1070" fill="none" stroke="url(#fold)" stroke-width="11" stroke-linecap="round" opacity=".055" filter="url(#soft)"/>
+<path data-fold-layer="inner-shade" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,5)" fill="none" stroke="url(#fold)" stroke-width="2" stroke-linecap="round" opacity=".055"/>
+<path data-fold-layer="highlight" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,-5)" fill="none" stroke="url(#fold)" stroke-width="1.1" stroke-linecap="round" opacity=".11" filter="url(#soft)"/>
+<path data-fold-layer="fine" d="M -110 855 C 125 910 350 970 570 1070" transform="translate(0,-2)" fill="none" stroke="#e8f7ff" stroke-width="0.45" stroke-linecap="round" opacity=".075"/>
 </g>
 <path data-fabric-sheen="micro" d="M 0 1 L 0 0 L 100% 0" fill="none" stroke="white" stroke-width=".35" opacity=".1"/>
 </svg>
