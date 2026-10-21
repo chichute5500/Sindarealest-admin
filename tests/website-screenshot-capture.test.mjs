@@ -351,8 +351,8 @@ assert.doesNotMatch(requiredViewportThemeHeroAudit, /if \(viewport\.name === 'mo
   'Hero asset acceptance must not be limited to a single mobile Light context.');
 
 
-assert.match(live, /await page\.mouse\.down\(\);[\s\S]*?await page\.waitForTimeout\(165\);[\s\S]*?overlayOpacity: Number\.parseFloat\(pseudo\.opacity/ ,
-  'Pressed icon state must be sampled after the 140ms transition has settled while the pointer is still held.');
+assert.match(live, /await page\.mouse\.down\(\);[\s\S]*?await page\.waitForTimeout\(165\);[\s\S]*?backgroundColor: style\.backgroundColor[\s\S]*?insetShadow: style\.boxShadow/,
+  'Pressed icon state must be sampled after the transition settles, reading the actual button tint and inset shadow while the pointer is held.');
 assert.match(live, /iconStateChecksComplete[\s\S]*?audit\.iconStateChecks\.length === 4[\s\S]*?check\.status === 'PASS'/,
   'Live audit acceptance must require real pressed/selected/unselected favorite state checks in all four product-detail contexts.');
 assert.match(live, /selected\.buttonColor === 'rgb\(229, 72, 77\)'[\s\S]*?restored\.buttonColor === expectedRestoredColor/,

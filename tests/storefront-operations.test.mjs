@@ -44,6 +44,20 @@ assert.ok(storefrontHtml.includes('.detail-favorite-btn[aria-pressed="true"]{bac
   && storefrontHtml.includes('.detail-favorite-btn[aria-pressed="true"] svg path{fill:currentColor;stroke:currentColor}')
   && storefrontHtml.includes('html.dark .icon-btn,html.dark .mini-add,html.dark .detail-favorite-btn'),
   'The favorite heart must be filled red only while selected, with an adaptive dark-mode glass surface.');
+
+assert.ok(storefrontHtml.includes('id="sd-icon-state-specificity-fix-2026-10-22"')
+  && storefrontHtml.includes('#productOverlay #detailFavorite[aria-pressed="true"]{')
+  && storefrontHtml.includes('color:#E5484D!important')
+  && storefrontHtml.includes('fill:currentColor!important')
+  && storefrontHtml.includes('#productOverlay #detailFavorite:not([aria-pressed="true"]):active{')
+  && storefrontHtml.includes('background:rgba(234,243,251,.48)!important')
+  && storefrontHtml.includes('transform:scale(.97)!important'),
+  'Favorite states and pressed Liquid Glass feedback must override later contrast-pass !important rules.');
+assert.ok(storefrontHtml.includes('html.dark #productOverlay #detailFavorite:not([aria-pressed="true"]):active')
+  && storefrontHtml.includes('background:rgba(92,145,185,.20)!important')
+  && storefrontHtml.includes('html.dark #productOverlay #detailFavorite[aria-pressed="true"]'),
+  'Dark mode must retain a distinct pressed glass tint and red selected heart under cascade overrides.');
+
 assert.ok(storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
   'Control feedback must remain covered by the storefront reduced-motion policy.');
 

@@ -2760,5 +2760,75 @@ html.dark .sd-fullscreen-viewer.open{
 }
 </style>
 
+
+<style id="sd-icon-state-specificity-fix-2026-10-22">
+/* The later gallery-contrast pass uses !important. Keep favorite and pressed glass states explicit above that cascade. */
+#productOverlay #detailFavorite{
+  color:#142a3c!important;
+  background:rgba(255,255,255,.42)!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80)!important;
+}
+html.dark #productOverlay #detailFavorite{
+  color:#eaf3fb!important;
+  background:rgba(13,38,59,.58)!important;
+  border-color:rgba(234,243,251,.28)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17)!important;
+}
+#productOverlay #detailFavorite[aria-pressed="true"]{
+  color:#E5484D!important;
+  background:rgba(255,255,255,.42)!important;
+  border-color:rgba(255,255,255,.72)!important;
+}
+html.dark #productOverlay #detailFavorite[aria-pressed="true"]{
+  color:#E5484D!important;
+  background:rgba(13,38,59,.58)!important;
+  border-color:rgba(234,243,251,.28)!important;
+}
+#productOverlay #detailFavorite[aria-pressed="true"] svg path{
+  fill:currentColor!important;
+  stroke:currentColor!important;
+}
+#productOverlay #detailFavorite:not([aria-pressed="true"]):active{
+  color:#5c91b9!important;
+  background:rgba(234,243,251,.48)!important;
+  box-shadow:inset 0 2px 8px rgba(20,42,60,.14),inset 0 0 0 1px rgba(92,145,185,.35)!important;
+  transform:scale(.97)!important;
+}
+html.dark #productOverlay #detailFavorite:not([aria-pressed="true"]):active{
+  color:#5c91b9!important;
+  background:rgba(92,145,185,.20)!important;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.22),inset 0 0 0 1px rgba(92,145,185,.35)!important;
+}
+#productOverlay #detailFavorite:active svg,
+.icon-btn:active svg,.mini-add:active svg,.detail-zoom-btn:active svg,
+.detail-gallery-arrow:active svg,.featured-arrow:active svg,.slide-controls button:active svg,
+.page-btn.page-arrow:active svg,.sd-fullscreen-close:active svg,.sd-fullscreen-arrow:active svg,
+#mobileBottomNav .tap-target:active svg{
+  color:#5c91b9!important;
+}
+#productOverlay #detailFavorite svg{position:relative;z-index:2}
+.icon-btn:active,.mini-add:active,.detail-zoom-btn:active,.detail-gallery-arrow:active,
+.featured-arrow:active,.slide-controls button:active,.page-btn.page-arrow:active,
+.sd-fullscreen-close:active,.sd-fullscreen-arrow:active,#mobileBottomNav .tap-target:active{
+  background:rgba(234,243,251,.48)!important;
+  box-shadow:inset 0 2px 8px rgba(20,42,60,.14),inset 0 0 0 1px rgba(92,145,185,.24)!important;
+  transform:scale(.97)!important;
+}
+html.dark .icon-btn:active,html.dark .mini-add:active,html.dark .detail-zoom-btn:active,
+html.dark .detail-gallery-arrow:active,html.dark .featured-arrow:active,html.dark .slide-controls button:active,
+html.dark .page-btn.page-arrow:active,html.dark .sd-fullscreen-close:active,
+html.dark .sd-fullscreen-arrow:active,html.dark #mobileBottomNav .tap-target:active{
+  background:rgba(92,145,185,.20)!important;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.22),inset 0 0 0 1px rgba(92,145,185,.35)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  #productOverlay #detailFavorite,.icon-btn,.mini-add,.detail-zoom-btn,.detail-gallery-arrow,.featured-arrow,
+  .slide-controls button,.page-btn.page-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow{
+    transition:none!important;
+  }
+}
+</style>
+
 </body>
 </html>

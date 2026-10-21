@@ -730,16 +730,16 @@ async function captureIconFeedback(page, viewport, theme, label, route) {
   await page.mouse.down();
   await page.waitForTimeout(165);
   const pressed = await button.evaluate((node) => {
-    const pseudo = getComputedStyle(node, '::before');
+    const style = getComputedStyle(node);
     const icon = node.querySelector('svg');
-    const transform = getComputedStyle(node).transform;
+    const transform = style.transform;
     const scale = transform === 'none' ? 1 : Number.parseFloat(transform.slice(transform.indexOf('(') + 1).split(',')[0]);
     return {
       active: node.matches(':active'),
-      overlayOpacity: Number.parseFloat(pseudo.opacity || '0'),
-      overlayTransform: pseudo.transform,
-      insetShadow: pseudo.boxShadow,
+      backgroundColor: style.backgroundColor,
+      insetShadow: style.boxShadow,
       controlScale: scale,
+      buttonColor: style.color,
       iconColor: icon ? getComputedStyle(icon).color : '',
     };
   });
@@ -782,10 +782,12 @@ async function captureIconFeedback(page, viewport, theme, label, route) {
     ...captureMeta(viewport, theme, route), captureType: 'icon-interaction', state: 'favorite-unselected', productTitle: original.id,
   });
   const expectedRestoredColor = theme === 'dark' ? 'rgb(234, 243, 251)' : 'rgb(20, 42, 60)';
+  const expectedPressedTint = theme === 'dark' ? '92, 145, 185' : '234, 243, 251';
   const pass = original.pressed === 'false' && pressed.active
-    && pressed.overlayOpacity >= 0.99 && pressed.controlScale <= 0.971 && pressed.controlScale >= 0.969
+    && pressed.controlScale <= 0.971 && pressed.controlScale >= 0.969
+    && pressed.backgroundColor.includes(expectedPressedTint)
     && pressed.iconColor === 'rgb(92, 145, 185)'
-    && pressed.insetShadow.includes('20, 42, 60')
+    && pressed.insetShadow.includes('inset') && pressed.insetShadow.includes('92, 145, 185')
     && selected.pressed === 'true' && selected.stored
     && selected.buttonColor === 'rgb(229, 72, 77)' && selected.fill === 'rgb(229, 72, 77)'
     && !selected.toastVisible
