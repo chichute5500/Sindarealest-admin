@@ -2696,7 +2696,13 @@ html.dark .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!import
 .sd-fullscreen-frame{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .sd-fullscreen-image.sd-white-background-keyed{filter:url(#sdGalleryWhiteBackgroundKey)}
 /* Main detail image: reuse the existing corner-verified white-canvas key; never alter source URLs. */
-#detailMainImage.sd-white-background-keyed{filter:url(#sdGalleryWhiteBackgroundKey)!important}
+#detailMainImage.sd-white-background-keyed{
+  filter:url(#sdGalleryWhiteBackgroundKey)!important;
+  /* The keyed source photo has dark pillar bars at its outermost edges. Feather only
+     those edges after the existing corner sampler verifies a near-white canvas. */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 5.5%,#000 94.5%,transparent 100%)!important;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 5.5%,#000 94.5%,transparent 100%)!important;
+}
 </style>
 
 
