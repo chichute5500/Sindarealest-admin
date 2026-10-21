@@ -102,12 +102,14 @@ const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
 const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
+assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
+  'The hero image must remain hidden until the exact verified SKU is present.');
 const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
-assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-supplied'")
-  && heroSync.includes("target.dataset.sourceProductImage='true'"),
-  'The hero-specific image state must remain explicit and separate from catalog product identity.');
-assert.doesNotMatch(heroSync, /products\.find|wantedSku|catalogGrid|featuredGrid/,
-  'The hero-specific image must not select or substitute a catalog product through SKU discovery.');
+assert.ok(heroSync.includes("products.find(p=>String(p?.sku??'').trim().toUpperCase()==='SD-GL052'&&p?.skuVerified===true)")
+  && heroSync.includes("target.dataset.productImageStatus='verified-public-catalog'"),
+  'The hero must use the exact verified public catalog record and its real image relationship.');
+assert.doesNotMatch(heroSync, /hero-sd-gl052\.png|owner-supplied-hero-image|productImageStatus='owner-supplied'/,
+  'A local static image must not be represented as the missing SD-GL052 product.');
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
