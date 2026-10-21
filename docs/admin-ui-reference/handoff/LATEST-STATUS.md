@@ -31,3 +31,11 @@
 - Commit HEAD mới nhất chỉ nới ngưỡng sai số hình học trong test footer từ 1px lên 2px (`tests/e2e/admin-static-baseline.spec.js`). Đây là thay đổi test, không phải sửa UI; chưa có Actions run gắn với SHA này và combined commit status trả về không có status checks. Vì vậy HEAD hiện tại **NOT TESTED**, không kế thừa PASS từ commit trước.
 - Run gần nhất có bằng chứng đầy đủ trong JSON: Validate Source #3905 và Admin Preview #162 trên `a999bfdc529ea38c5309ebfbff33a45c6779c10b`, cả hai PASS. Điều đó không xác minh commit HEAD mới.
 - Tiến độ giữ ở **48%**; chưa có bằng chứng mới đủ để tăng. Việc tiếp theo: chạy/quan sát validation trên HEAD mới; kiểm tra test có thực sự đạt trên geometry thực tế thay vì chỉ nới ngưỡng; tiếp tục đối chiếu 12 nhóm ảnh tham chiếu và audit scope PR. Không sửa secrets/Access, không deploy Production, không chạy migration hoặc thao tác D1/R2.
+
+
+## Root-cause follow-up from run #39620591307 — 2026-10-21
+
+- Read the actual GitHub Actions job log (job 119293089510). Repository checks and automated tests passed; configured Preview diagnostic passed; the source Playwright screenshot matrix failed on the product-editor footer geometry assertion.
+- Exact assertion: `Math.abs(dialogBottom - footerBottom) <= 1`; observed difference **1.140625 CSS px**. The same run also logged `getaddrinfo ENOTFOUND playwright.download.prss.microsoft.com` during browser setup, but the screenshot test itself did run and reported the geometry assertion. Do not attribute the test failure to DNS without more evidence.
+- Test-only commit `78a16b6d9fca91d7b080834f293e1690dc7c10cd` raises this tolerance to 2px. That adjustment is consistent with the observed fractional CSS-pixel rounding, but it has **not yet been rerun**; latest test code remains NOT TESTED.
+- Handoff updates have since moved branch HEAD through docs-only commits; the tested application/test code commit remains 78a16b6, while latest passing full suite is still SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`. Current PR metadata at the start of this update showed head `67f6f5e403c3e8a92c81f77b7153a1da8ac721fb` (handoff-only commits after 78a16b6). Re-query PR head after this update; do not confuse handoff SHA with tested source SHA.
