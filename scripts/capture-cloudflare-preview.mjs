@@ -149,10 +149,15 @@ async function makePage(browser, viewport, theme, label, options = {}) {
     [0, 16, 50, 100, 200, 300, 450].forEach((offset) => setTimeout(() => sample('timer-' + offset), offset));
     document.addEventListener('DOMContentLoaded', () => sample('DOMContentLoaded'), { once: true });
     window.addEventListener('pageshow', () => sample('pageshow'), { once: true });
+    const frameStartMs = performance.now();
     let frame = 0;
     const sampleFrame = () => {
       sample('raf-' + frame);
-      if (++frame < 6) requestAnimationFrame(sampleFrame);
+      frame += 1;
+      // Keep sampling through the whole 0–450ms startup window using RAF, not only six
+      // frames. App code may delay/cancel page timers; frame timestamps remain evidence,
+      // and the matcher still enforces target tolerances and unique samples.
+      if (performance.now() - frameStartMs < 460 && frame < 40) requestAnimationFrame(sampleFrame);
     };
     requestAnimationFrame(sampleFrame);
   }, theme);

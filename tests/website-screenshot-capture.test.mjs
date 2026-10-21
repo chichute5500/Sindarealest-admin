@@ -327,6 +327,8 @@ try {
 
 assert.match(live, /__sdWelcomeFirstPaintTimeline/,
   'The live capture must record an init-script timeline before the app JavaScript runs.');
+assert.match(live, /const frameStartMs = performance\.now\(\)[\s\S]*performance\.now\(\) - frameStartMs < 460 && frame < 40[\s\S]*requestAnimationFrame\(sampleFrame\)/,
+  'First-paint sampling must keep observing actual animation frames throughout the 0–450ms window even when application timers are delayed or cancelled.');
 assert.match(live, /window\.__sdReadWelcomeFirstPaintState/,
   'The browser must expose early DOM visibility samples for Playwright at screenshot time.');
 assert.match(live, /for \(const requestedOffsetMs of \[0, 50, 100, 200, 300\]\)[\s\S]*sampleOffsetMs[\s\S]*startup-video init-script timeline/,
