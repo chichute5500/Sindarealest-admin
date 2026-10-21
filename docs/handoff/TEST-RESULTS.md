@@ -387,3 +387,12 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 5. Run relevant tests, deploy only Preview through GitHub Actions, verify deployment SHA, capture real screenshots and update `docs/website-screenshots/manifest.json` only after evidence exists. Update this handoff with exact commit, run/artifact URLs, outcomes and remaining blockers.
 
 **Status honesty:** this handoff addendum records the contract and next implementation requirements; it does not claim the storefront QR/payment/product-type feature is complete. Keep the satin/reference audit separate; its known `SD-GL052` blocker remains unresolved and must not be “fixed” by fabricating product data.
+
+
+## 2026-10-21 — QR/fulfillment and latest visual gate status
+
+- Source validation run 39559590352 PASS, Preview deploy run 39559590384 PASS, Admin Preview Playwright run 39559590377 PASS on source SHA `ed454231a6a9cd9b9605f3581f4a5a79497462bb`. Visual audit run 39559590354 was still running at checkpoint; check its conclusion and artifact before calling visual acceptance.
+- Storefront order-create currently returns `pending_confirmation`; no verified public order-status lookup or active receiver QR configuration. Checkout must fail closed: “Chờ cửa hàng xác nhận” / “Vui lòng chưa chuyển tiền”, no QR/no amount. Only show QR from a complete confirmed API payload with no preset amount; frontend must never set payment status.
+- Product type is owner-managed: only explicit `in_stock`, `made_to_order`, `unclassified`; unknown stays unclassified. Never infer from category, stock, SKU or images. Payment options: made-to-order 30% deposit or 100%; in-stock 100,000 VND deposit or 100%; full payment freeship applies to both.
+- Known live audit blocker remains missing verified SKU `SD-GL052`; do not fabricate/substitute. The audit is read-only and does not prove order submission or payment.
+- Continue storefront-only work and re-run current SHA source tests, Preview deployment verification and live screenshot audit after code changes. No merge or Production changes.
