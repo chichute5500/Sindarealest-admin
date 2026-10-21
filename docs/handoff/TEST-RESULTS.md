@@ -358,3 +358,32 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - **Audit did not pass:** one hard failure remains: `SD-GL052` is absent from the verified public product payload at `mobile-390-light`. Do not invent or substitute it. `commerceStatesComplete` is not evidence of a completed order: the audit was read-only, checkout was opened but not submitted, and no payment was attempted.
 - Manifest `docs/website-screenshots/manifest.json` now records this exact audit, artifact, verified deployment SHA and blocker. The capture artifact is evidence for SHA `0153bbf…`, not a claim that a later documentation-only commit is already deployed.
 - At this follow-up, branch HEAD was `c9b52c6a37e91416aab35c3def40d85abe0e6d33` (handoff-only commit); source validation, Preview deploy, Admin Preview smoke and visual workflow were newly queued/running on that SHA. Recheck those runs and deployment verification before calling the newest HEAD validated. Keep Production untouched and PR #108 unmerged.
+
+
+## 2026-10-21 — QR payment / fulfillment-type integration handoff (storefront branch)
+
+**Scope and safety boundary**
+- Current branch: `fix/liquid-glass-audit-2026-10-19`. Current pre-handoff-docs HEAD at time of inspection: `ed454231a6a9cd9b9605f3581f4a5a79497462bb` (message: `docs(contract): define owner-managed fulfillment and payment options`). Do not merge PR #108, deploy Production, run Production D1 migrations, or edit Admin-only UI/backend implementation from this branch.
+- Contract source of truth: `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`. Read it in full before code changes and re-read the latest handoff/test-results on the actual branch HEAD.
+- Storefront owns customer-facing product type/payment-option presentation and API consumption only. Admin/backend owns product classification, persistence/schema, public-safe active QR configuration, authoritative payable amounts, payment ledger and manual verification. Coordinate by contract; do not cherry-pick/edit the other AI's branch files.
+
+**Contract rules to implement/verify**
+- Product type values: `in_stock`, `made_to_order`, `unclassified`. Unknown/missing values must remain unclassified. Never infer from category, SKU, stock count, photos or old labels. Customer must not choose the fulfillment type.
+- `made_to_order`: offer server-confirmed 30% deposit to begin production OR server-confirmed 100% full payment. Full payment qualifies for freeship.
+- `in_stock`: offer fixed 100,000 VND deposit OR server-confirmed 100% full payment. Dispatch follows store verification of deposit and order confirmation. Full payment qualifies for freeship.
+- Deposit-only options do not automatically promise freeship. Missing/unconfirmed price/type/terms may create a consultation/order request, but must not calculate or request a fabricated amount or show payment-ready QR.
+- QR and receiving details may only come from an active, verified, public-safe Admin/API configuration with no embedded fixed amount. Scanning QR, uploading a receipt, clicking “I transferred”, or a customer claim must never mark payment paid. Only trusted backend/Admin verification can do so.
+
+**Evidence at handoff**
+- Contract exists on this branch and documents the separation/rules. This is not evidence that runtime integration exists.
+- Previous live storefront audit: [run 39558222013](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39558222013), artifact 12327195638, 84 screenshots; exact Preview deployment SHA `0153bbfdc4ad66850ac9a9ab0ca3950811330f84`. Capture was read-only and did not submit an order or attempt payment. Audit failed because `SD-GL052` is absent from verified public product data; do not invent/substitute it.
+- Prior evidence does not establish QR/payment API availability. Inspect the live code and latest workflow runs on the current HEAD before claiming anything is implemented or deployed.
+
+**Next actions — code required, not documentation-only**
+1. Inspect storefront product API, order creation/response, existing checkout UI, and contract tests; identify actual fields/routes from source and runtime responses. Do not invent endpoint names or fields.
+2. Check current API support for product type, payment options, server-calculated amounts, active QR config, order/payment status. If fields/routes are absent, fail closed and document the exact dependency for the Admin AI; do not simulate a working payment flow.
+3. Implement storefront display for all four confirmed payment branches and safe consultation fallback for unclassified/missing price/missing QR/invalid response. Only show QR when all required server data validates; pending order remains pending until verified server status says paid.
+4. Add tests for every branch, malformed/unknown response, pending status, invalid/inactive/fixed-amount QR rejection, and prevention of client-side “paid” transitions. Never submit a real order/payment in audit tests.
+5. Run relevant tests, deploy only Preview through GitHub Actions, verify deployment SHA, capture real screenshots and update `docs/website-screenshots/manifest.json` only after evidence exists. Update this handoff with exact commit, run/artifact URLs, outcomes and remaining blockers.
+
+**Status honesty:** this handoff addendum records the contract and next implementation requirements; it does not claim the storefront QR/payment/product-type feature is complete. Keep the satin/reference audit separate; its known `SD-GL052` blocker remains unresolved and must not be “fixed” by fabricating product data.
