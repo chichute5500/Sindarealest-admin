@@ -741,3 +741,37 @@ Current HEAD at this update: `9c1046ca184ec7bf1cd53ebcf53173167a6925de` (handoff
 - Application source and focused revenue test were already verified by [source validation #39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256), and the fresh mobile/desktop screenshot + Preview diagnostic passed in [#39624818216](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216). Artifact `admin-preview-evidence-173` (ID `12356875897`) reviewed: dashboard empty state is compact and readable in 390×844 light/dark and 1280×800 light captures.
 - Branch is receiving parallel handoff-only commits. Latest observed HEAD at this refresh is recorded in `latest-test-results.json`; re-fetch the actual branch HEAD and confirm its CI after any further concurrent commits before calling the branch fully green.
 - Progress remains **48%**; all-12-screen visual acceptance, authenticated real-backend QA, and deferred image-save/PRE/PRO verification remain open. Keep PR #111/#108 unmerged and preserve all Production/Access/secrets/D1/R2/migration restrictions.
+
+
+## READY-TO-PASTE HANDOFF PROMPT — latest checkpoint 2026-10-21 15:27 UTC
+
+Continue real work on SinDarealest Admin. Do not stop at planning or a progress report; keep working until an actual owner action is required.
+
+**Repository:** `chichute5500/Sindarealest-admin`  
+**Only permitted branch:** `feature/admin-isolated-handoff-2026-10-20`
+
+### Mandatory first steps
+1. Re-fetch live branch HEAD and recent Actions; docs may be committed concurrently. Confirm CI for the exact latest HEAD or descendant before saying the current branch is green.
+2. Read these files from the branch before editing: `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`, `docs/admin-ui-reference/handoff/START-HERE.md`, `docs/admin-ui-reference/handoff/LATEST-STATUS.md`, `docs/admin-ui-reference/handoff/latest-test-results.json`, `docs/admin-ui-reference/reference-instructions.md`, and this file.
+3. Review the 12-screen approved reference using `admin-mobile-reference.html` as an alternate viewer if the PNG cannot be retrieved through the available connector. Do not claim to have visually inspected a reference image unless it was actually available.
+4. Re-fetch PR #111/#108 metadata and keep both open/unmerged. Do not deploy Production.
+
+### Latest verified implementation
+- Dashboard contains one responsive “Doanh thu theo thời gian” panel with an honest no-data state; it does not fabricate figures or draw a trend from a capped order list. A complete verified all-history revenue aggregation is not implemented.
+- Focused regression guard: `tests/admin-dashboard-revenue-empty-state.test.mjs`, included in `npm test`. A temporary duplicate panel/static ID was removed; later validation passed.
+- Source validation [#39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256) passed on exact code/test SHA `06d689b6a97fa7bdb05258acb8435a6954d67309`. Preview diagnostic [#39624818216](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216) passed on the same SHA. Artifact `admin-preview-evidence-173` (ID `12356875897`) was reviewed at 390×844 and 1280×800. This is fixture/diagnostic screenshot evidence, not authenticated real-backend QA.
+- Handoff/source validation [#39625390469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39625390469) passed on `c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf`. Later handoff commits have advanced branch HEAD; fetch current HEAD and confirm its own run before relying on this result.
+- Overall progress stays **48%**; do not increase it for a single panel. 12-screen parity is not accepted; authenticated business/backend QA is not tested. Image-save and PRE/PRO migration work remain explicitly deferred by owner. Revenue aggregation remains pending a trustworthy complete-history source.
+
+### Next work — execute, do not just report
+1. Build/update a 12-screen comparison matrix, one screen family at a time, with PASS/FAIL/BLOCKED/NOT TESTED and evidence paths. Start with product editor/gallery and image-management controls, accessibility, focus/keyboard, reduced motion, narrow Android viewport and both themes.
+2. Compare the running/fixture screenshots to the approved reference; fix only clear ADMIN-scoped UI gaps, preserve business logic/API/auth. Do not add a second revenue panel or fabricate data.
+3. Run automated checks for each code SHA and inspect the exact logs/screenshots. Never call an older commit's green run proof for a newer untested HEAD.
+4. After a complete edit-test-review loop, update `LATEST-STATUS.md`, `latest-test-results.json`, `PROMPT-NEXT-CHAT.md`, and when materially needed `START-HERE.md` and `MASTER-PROMPT-AUTO-HANDOFF.md`. Re-fetch file SHA before each write to avoid overwriting concurrent edits.
+5. Report progress percentage and evidence, then continue. Stop only when a specific owner action is truly required.
+
+### Non-negotiable safety
+- Only the Admin branch. Never edit `main` or static website branch; no merge, cherry-pick, force-push or deploy.
+- No Cloudflare Access/secrets changes or bypass; no remote D1/R2 operations; do not execute SQL, setup scripts or migrations; no TinyFish.
+- Do not resume product image-save or PRE/PRO migration work unless the owner explicitly reauthorizes it.
+- Before final reporting inspect the diff and confirm no unrelated public storefront changes were introduced. Do not claim a file/screenshot was inspected if the content was not actually accessible.
