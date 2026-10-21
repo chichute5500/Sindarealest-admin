@@ -153,11 +153,11 @@ assert.ok(html.includes('body:has(.sd-fullscreen-viewer.open) .sd-fullscreen-thu
 assert.ok(html.includes('.account-drawer{\n    height:auto!important;\n    bottom:auto!important;'),
   'Mobile account drawer must fit its content rather than leave a large empty panel.');
 
-// A populated mobile cart should fit its content instead of stretching one item across the full screen.
-assert.match(html, /@media\(max-width:760px\)\{\s*\.cart-drawer:has\(\.cart-row\)\{\s*height:auto!important;\s*bottom:auto!important;\s*min-height:0!important;\s*max-height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important;/,
-  'A mobile cart containing items must size to content while respecting the viewport maximum.');
-assert.match(html, /\.cart-drawer:has\(\.cart-row\) \.cart-list\{\s*flex:0 1 auto!important;\s*max-height:40dvh;\s*min-height:0!important;\s*overflow-y:auto!important;/,
-  'A populated cart list must not absorb all free vertical space and must remain scrollable for multiple items.');
+// A populated mobile cart fills the available panel above persistent mobile navigation.
+assert.match(html, /@media\(max-width:760px\)\{\s*\.cart-drawer:has\(\.cart-row\)\{\s*height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important;\s*bottom:auto!important;\s*min-height:0!important;\s*max-height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important;/,
+  'A populated mobile cart must fill the available panel while respecting the viewport and safe-area maximum.');
+assert.match(html, /\.cart-drawer:has\(\.cart-row\) \.cart-list\{\s*flex:1 1 auto!important;\s*max-height:none;\s*min-height:0!important;\s*overflow-y:auto!important;/,
+  'The populated cart list must expand and remain independently scrollable so the summary stays at the bottom.');
 
  
 // Theme toggles must avoid long backdrop-filter interpolation that causes mobile jank.
