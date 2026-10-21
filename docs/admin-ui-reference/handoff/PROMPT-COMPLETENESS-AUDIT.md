@@ -81,3 +81,9 @@ Phần bảng trên ghi trạng thái lúc audit ban đầu; nội dung dưới 
 - **Đã bổ sung regression cho refund race:** functions/api/admin/payment-transactions.js commit d3fa9b85be20d832cbf24678dd7f3c7d862c1e64; test commit ebb20fa7f2359b19ae91a9c62b3006a16b8db148. CI npm run check và npm test PASS trên exact SHA ebb20fa7... Test mới mô phỏng DB bằng mock, do đó D1 remote/runtime concurrency vẫn NOT VERIFIED.
 - **Các giới hạn bảo vệ vẫn được tuân thủ:** chỉ nhánh ADMIN; PR #111/#108 OPEN/unmerged; không Production deploy, migration, remote D1/R2 thao tác, đổi secrets/Access hay dùng TinyFish. Product image-save/actual upload và PRE/PRO migration vẫn DEFERRED_BY_OWNER / NOT VERIFIED.
 - **Tiến độ:** 48%, không 100%; Preview, full 12-screen parity, authenticated QA, full semantic/security review PR #111 còn mở.
+
+
+## Latest completeness checkpoint — 2026-10-21 20:30 ICT
+- Verified branch HEAD: `fb73d9237bfd15901b4a23ab47db1c9ce29130e5`; source validation run 39607800912 PASS on that exact SHA.
+- Functional accessibility fix and regression test: `cf594677550f63ddf92ebdba5aea87587dbfe029`; source run 39607193503 PASS and Preview/Playwright run 39607193461 SUCCESS on that exact SHA. Artifact 151 is source/fixture evidence only.
+- Do not mark project complete: overall 48%; 12-screen visual parity NOT ACCEPTED; authenticated business flows NOT TESTED; PR #111 mixed-scope audit unresolved; PR #111/#108 remain OPEN/unmerged. Image-save and PRE/PRO migration remain DEFERRED_BY_OWNER / NOT VERIFIED.
