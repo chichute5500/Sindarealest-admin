@@ -141,6 +141,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const payload = await response.json();
   assert.equal(payload.paymentReady, false, "valid order token cannot reveal a payment amount before terms confirmation");
   assert.equal(Object.hasOwn(payload, "amount"), false);
+  assert.equal(response.headers.get("Cache-Control"), "private, no-store", "token-scoped payment response must not be cached");
   assert.equal(response.headers.get("Referrer-Policy"), "no-referrer");
   assert.equal(response.headers.get("X-Robots-Tag"), "noindex, nofollow");
 }
@@ -152,7 +153,10 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const db = makeDb({ publicOrder: order, pendingRequest });
   const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-2&token=" + token), env: { DB: db } });
   const payload = await response.json();
+  assert.equal(response.headers.get("Cache-Control"), "private, no-store", "ready payment instructions and amount must not be cached");
   assert.equal(payload.paymentReady, true);
+  const selectedRequest = db.calls.find(call => call.sql.includes("FROM order_payment_requests WHERE order_id=?"));
+  assert.match(selectedRequest.sql, /ORDER BY CASE WHEN status=\x27pending\x27 THEN 0 ELSE 1 END/, "the pending request should be selected even when timestamps tie");
   assert.equal(payload.amount, 30000, "amount becomes visible only from a server-created pending installment");
   assert.equal(payload.qrImageUrl, "/payment-qr/" + QR_KEY);
 }

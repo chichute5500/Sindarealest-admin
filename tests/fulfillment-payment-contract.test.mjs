@@ -36,6 +36,8 @@ assert.match(transactionApi, /payment_received_verified/, "verified receipts nee
 assert.match(transactionApi, /UNIQUE constraint/i, "duplicate bank references must map to a conflict response");
 assert.match(transactionApi, /amount>netReceived/, "refunds must not exceed previously verified net receipts");
 const orderPaymentApi = read("../functions/api/order-payment.js");
+assert.match(orderPaymentApi, /Cache-Control.*private, no-store/, "capability-token payment responses must not be cached");
+assert.match(orderPaymentApi, /ORDER BY CASE WHEN status=\x27pending\x27 THEN 0 ELSE 1 END, created_at DESC, id DESC LIMIT 1/, "current pending installment must win timestamp ties");
 assert.match(orderPaymentApi, /const freeShipping = order\.payment_status === "paid" && freeShippingEligible/, "freeship is applied only after verified total is paid");
 assert.match(orderPaymentApi, /Referrer-Policy/, "capability-token payment details must disable referrer leakage");
 assert.match(orderPaymentApi, /public_access_token_hash/, "public order payment must be capability-token scoped");
