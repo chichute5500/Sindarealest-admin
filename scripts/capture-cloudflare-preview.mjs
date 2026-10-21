@@ -641,13 +641,21 @@ async function main() {
           if (viewport.name === 'mobile-390') {
             const splash = page.locator('#welcomeSplash');
             await splash.waitFor({ state: 'visible', timeout: 900 }).catch(() => {});
+            const splashFilename = screenshotStem('state-welcome-splash', viewport, theme) + '.png';
             if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
-              await captureLocator(page, '#welcomeSplash', screenshotStem('state-welcome-splash', viewport, theme) + '.png', {
-                ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay',
-              });
+              try {
+                // Do not call captureLocator here: its scroll + settle delay can outlive this transient overlay.
+                await splash.screenshot({ path: path.join(outputDir, splashFilename), type: 'png', animations: 'disabled', timeout: 30000 });
+                const meta = { ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay' };
+                audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'CAPTURED', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
+                audit.screenshots.push({ filename: splashFilename, fullPage: false, ...meta });
+              } catch (error) {
+                audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
+                audit.hardFailures.push('Welcome splash detached before live screenshot capture: ' + label + ' (' + sanitizeText(String(error?.message || error).slice(0, 140)) + ')');
+              }
             } else {
               audit.sectionChecks.push({
-                selector: '#welcomeSplash', filename: screenshotStem('state-welcome-splash', viewport, theme) + '.png',
+                selector: '#welcomeSplash', filename: splashFilename,
                 status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name,
               });
               audit.hardFailures.push('Welcome splash was not visible early enough to capture on live Preview: ' + label);
