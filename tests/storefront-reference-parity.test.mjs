@@ -131,11 +131,14 @@ assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image r
 assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
   'The hero image must remain hidden until the exact verified SKU is present.');
 const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
-assert.ok(heroSync.includes("products.find(p=>String(p?.sku??'').trim().toUpperCase()==='SD-GL052'&&p?.skuVerified===true)")
-  && heroSync.includes("target.dataset.productImageStatus='verified-public-catalog'"),
-  'The hero must use the exact verified public catalog record and its real image relationship.');
-assert.doesNotMatch(heroSync, /hero-sd-gl052\.png|owner-supplied-hero-image|productImageStatus='owner-supplied'/,
-  'A local static image must not be represented as the missing SD-GL052 product.');
+assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'")
+  && heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
+  && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
+  'The homepage hero must load the dedicated presentation asset independently of public catalog SKU availability.');
+assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
+  'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
+assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-failed\''),
+  'If the presentation image fails to load, the empty hero image frame must fail closed.');
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
