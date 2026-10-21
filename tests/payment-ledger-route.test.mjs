@@ -45,7 +45,7 @@ function makeDb(options = {}) {
             if (options.publicOrder && values[0] === options.publicOrder.order_number && values[1] === options.publicOrder.public_access_token_hash) return options.publicOrder;
             return null;
           }
-          if (sql.includes("FROM order_payment_requests WHERE order_id=? AND status='pending'")) return options.pendingRequest ?? null;
+          if (sql.includes("FROM order_payment_requests WHERE order_id=?")) return options.pendingRequest ?? null;
           if (sql.includes("SELECT total FROM orders")) return { total: (options.order ?? baseOrder).total };
           return null;
         },
