@@ -50,7 +50,9 @@ assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese
 
 // Accessible names for repeated controls must identify the affected record, not just say "Save".
 has('data-order-status="${esc(o.id)}" aria-label="Trạng thái đơn hàng ${esc(o.order_number)}"', 'accessible per-order status select');
-has('data-payment-status="${esc(o.id)}" aria-label="Trạng thái thanh toán đơn hàng ${esc(o.order_number)}"', 'accessible per-order payment status select');
+has('Đã thanh toán (đã xác minh)', 'payment status must be presented as a ledger-derived, read-only label');
+has('data-action="record-payment"', 'admin must have an explicit manual verification action for real bank receipts');
+assert.doesNotMatch(adminHtml, /data-payment-status=/, 'payment status must not be directly editable in the order UI');
 has('data-action="save-order" data-id="${esc(o.id)}" aria-label="Lưu đơn hàng ${esc(o.order_number)}"', 'accessible per-order save action');
 has('data-claim-status="${esc(c.id)}" aria-label="Trạng thái yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim status');
 has('data-claim-note="${esc(c.id)}" aria-label="Ghi chú quản trị cho yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty admin note');
