@@ -600,3 +600,7 @@ This was a read-only source review of the existing payment contract and route co
 - No merge/cherry-pick/force-push; no Production deploy.
 - No secrets/Cloudflare Access changes or bypass; no remote D1/R2 operations; do not execute setup/migration scripts; do not use TinyFish.
 - Do not resume product image-save or PRE/PRO migration work unless the owner explicitly reauthorizes it.
+
+
+## Latest progress-accounting correction — 2026-10-21
+Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run #162 and paired validation both PASS. Overall progress remains 48% until a task-weighted checklist is recalculated; do not raise it just because CI passes. The 390×844 gallery screenshot shows cover, supporting thumbnail, helper and fixed footer visible together. Full 12-screen visual parity and authenticated backend QA remain incomplete; image-save and PRE/PRO migrations remain owner-deferred. PR #111/#108 remain open and unmerged.
