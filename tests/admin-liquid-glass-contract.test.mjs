@@ -205,17 +205,18 @@ has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:8px
 has('#imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-align:start}', 'thumbnail rail uses fixed mobile targets and snap points');
 
 
-has('#backdrop>.editor{padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
-has('#backdrop .editorcontent{padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
+has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
+has('#backdrop>.editor>form{display:flex;flex:1 0 auto;flex-direction:column;min-height:0}', 'short editor tabs stretch to reserve space for sticky actions');
+has('#backdrop>.editor>form>.editorcontent{flex:1 0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
 has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:68px;width:68px}}', 'thumbnail rail remains touchable on narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
 has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder controls remain present');
 has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
 
-has('#backdrop>.editor{padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
-has('#backdrop .editorcontent{padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
-has('#backdrop .editorfooter{flex-shrink:0}', 'mobile editor action footer does not shrink');
+has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
+has('#backdrop>.editor>form>.editorcontent{flex:1 0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
+has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobile editor action footer does not shrink');
 
 
 
