@@ -145,11 +145,11 @@ assert.equal(fromRow(priceRow, { publicView: false, showPrices: false }).price, 
 console.log('PASS: separate cart/checkout, public price API gating, safe price formatting, address mock, toast handling and accessible cart/checkout/account behavior.');
 
 
-const populatedCartRules = html.match(/\\.cart-drawer:has\\(\\.cart-row\\)\\{([^}]+)\\}/)?.[1];
+const populatedCartRules = html.match(/\.cart-drawer:has\(\.cart-row\)\{([^}]+)\}/)?.[1];
 assert.ok(populatedCartRules, 'A populated mobile cart needs its own responsive layout rule.');
 assert.match(populatedCartRules, /height:auto!important/,
   'A short populated mobile cart should fit its content instead of reserving a mostly empty viewport-sized panel.');
-assert.match(populatedCartRules, /max-height:calc\\(100dvh - 96px - env\\(safe-area-inset-top\\) - env\\(safe-area-inset-bottom\\)\\)!important/,
+assert.match(populatedCartRules, /max-height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important/,
   'A populated mobile cart must remain bounded by viewport and safe-area limits when it contains many items.');
 assert.match(populatedCartRules, /bottom:auto!important/,
   'The content-sized populated cart must anchor from its top edge without stretching to the viewport bottom.');
