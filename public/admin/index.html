@@ -639,7 +639,11 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 }
 @media(min-width:681px){
 #main .order-table .order-management-details{min-width:210px}
-#main .order-table .order-management-summary{padding:8px 10px;font-size:10px}
+#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(92,145,185,.08);color:var(--ink);font-size:10px;font-weight:750;cursor:pointer}
+#main .order-table .order-management-summary::-webkit-details-marker{display:none}
+#main .order-table .order-management-summary::marker{content:"";display:none}
+#main .order-table .order-management-summary::after{content:"+";flex:0 0 auto;font-size:17px;line-height:1}
+#main .order-table .order-management-details[open]>.order-management-summary::after{content:"−"}
 #main .order-table .order-management-content{padding-top:10px}
 }
 </style></head>
