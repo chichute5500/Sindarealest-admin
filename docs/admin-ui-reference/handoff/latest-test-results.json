@@ -2443,6 +2443,31 @@
       "failedSha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
       "reason": "A parallel edit temporarily created two dashboard panels with the same static ID; the duplicate panel was removed.",
       "resolutionCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6"
-    }
+    },
+    "compactFollowUpCommit": "b82863eec7ca04094ea58d3ca0109e843fa946c8",
+    "visualReview": {
+      "artifactRun": 39623789724,
+      "artifactId": 12355039596,
+      "reviewedViewports": [
+        "390x844",
+        "1280x800"
+      ],
+      "finding": "Initial empty state was too tall on mobile and desktop; compacted spacing and copy. No fresh screenshot yet for compact follow-up."
+    },
+    "currentValidation": "pending",
+    "historicalFailures": [
+      {
+        "runId": 39623834484,
+        "sha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
+        "reason": "Duplicate static HTML ID assertion (108 unique IDs vs 109 occurrences)."
+      },
+      {
+        "runId": 39623925924,
+        "sha": "fa2be5254709615810718375a44ff66b3e32a74f",
+        "reason": "Same duplicate static HTML ID assertion on historical snapshot."
+      }
+    ],
+    "fixCommit": "5b66b589b9f08bb91fddf3a2d8de07b51313bbf6",
+    "noProgressIncrease": true
   }
 }
