@@ -785,7 +785,28 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderDetailClose')).toBeFocused();
     }, true);
     await captureView('customers', 'customers', null, true);
-    await captureView('warranties', 'warranties', null, true);
+    await captureView('warranties', 'warranties', async () => {
+      // Synthetic, read-only coverage for warranty screen #10. Do not issue a warranty,
+      // change a claim, or submit any non-GET request from this fixture.
+      await expect(page.locator('#warrantyIssueForm')).toBeVisible();
+      await expect(page.getByLabel('Mã đơn hàng *')).toBeVisible();
+      await expect(page.getByLabel('Mã sản phẩm trong đơn (SKU nếu đã xác minh) *')).toBeVisible();
+      await expect(page.getByLabel('Tên chính sách đã xác nhận *')).toBeVisible();
+      await expect(page.getByLabel('Thời hạn (tháng) *')).toHaveAttribute('min', '1');
+      await expect(page.locator('#wMonths')).toHaveAttribute('max', '120');
+      await expect(page.locator('#wMonths')).toHaveValue('');
+      await expect(page.getByLabel('Ngày bắt đầu *')).toHaveAttribute('type', 'date');
+      await expect(page.locator('#issueWarrantyBtn')).toContainText('Phát hành mã bảo hành');
+      await expect(page.locator('#warrantyIssueMessage')).toHaveAttribute('aria-live', 'polite');
+
+      const status = page.locator('[data-claim-status="UI-ONLY-CLAIM"]');
+      const note = page.locator('[data-claim-note="UI-ONLY-CLAIM"]');
+      await expect(status).toBeVisible();
+      await expect(status).toHaveAttribute('aria-label', 'Trạng thái yêu cầu bảo hành UI-ONLY-CLAIM');
+      await expect(note).toBeVisible();
+      await expect(note).toHaveAttribute('aria-label', 'Ghi chú quản trị cho yêu cầu bảo hành UI-ONLY-CLAIM');
+      await expect(page.getByRole('button', { name: 'Lưu yêu cầu bảo hành UI-ONLY-CLAIM' })).toBeVisible();
+    }, true);
     await captureView('settings', 'settings', null, true);
     await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
       // Previous viewport iteration leaves the guard message in the live DOM;
