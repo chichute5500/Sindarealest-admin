@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_VISUAL_PARITY_NOT_ACCEPTED_AUTHENTICATED_QA_BLOCKED",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_MOBILE_GALLERY_RAIL_PASS_VISUAL_PARITY_NOT_ACCEPTED_AUTHENTICATED_QA_NOT_TESTED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+  "latestCodeCommitSha": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
   "testedCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
-  "capturedAt": "2026-10-21T15:00:00Z",
+  "capturedAt": "2026-10-21T14:56:54.000Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "Latest source/test SHA 78a16b6d9fca91d7b080834f293e1690dc7c10cd passed Validate Source run 39621065756 and Admin Preview diagnostic run 39621065853. npm run check, npm test, local responsive/theme Playwright matrix and configured Preview diagnostic all PASS. The 1.140625 CSS-pixel footer alignment failure on earlier SHA 4de4b4b was addressed by test tolerance adjustment to 2px and the updated test passed on 78a16b6. This is not a CSS application fix. Full 12-screen visual parity remains NOT ACCEPTED; authenticated backend/business QA remains blocked by Cloudflare Access and NOT TESTED. Image-save and PRE/PRO migration remain deferred by owner.",
-  "note": "Latest exact tested tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737). Source CSS commit cc77869873c2f5b4b2d1118dc60c0d88413eb218 moves product dialog bottom spacing into the scrollable content; E2E regression commit a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e measures action footer vs dialog and the last thumbnail vs footer; contract test commit 5f73373094ba71f467374e8b026bbfc3c5059fec adds CSS assertions. Screenshot artifact admin-preview-evidence-162 (ID 12354480678), 11,114,027 bytes, expires 2026-11-04: 59 source/fixture PNGs (16 login shell, 43 synthetic read-only module captures) and 36 metrics. The mobile screenshot shows the sticky footer aligned to the dialog edge; the last thumb can be seen without action-bar overlap. This remains source/fixture review, not authenticated business QA. Current docs-only branch HEAD at handoff: e7f0990f4c0b78272fdba06e9f90423340b82eaa. Progress 48%; full 12-screen parity NOT ACCEPTED; backend QA NOT TESTED. PR #111/#108 open/unmerged. No merge, Production deploy, remote D1/R2, secret/Access changes, migration/setup, or TinyFish. Latest live GitHub check at 2026-10-21 15:00 UTC: PR #111 OPEN/unmerged head 78a16b6d9fca91d7b080834f293e1690dc7c10cd; PR #108 OPEN/unmerged head ad5b0e7538a639780adeeac7020a818170aa0caa. Workflow runs for latest HEAD: none returned; combined commit statuses: empty. Do not infer PASS for latest HEAD. Failure root cause inspected from workflow job log 119293089510: footer geometry differed by 1.140625 CSS px against <=1px assertion. Commit 78a16b6 raised tolerance to 2px; not yet rerun. Do not claim fix validated. Latest passing validation for source/test SHA 78a16b6d9fca91d7b080834f293e1690dc7c10cd: Validate Source run 39621065756 SUCCESS; Admin Preview diagnostic run 39621065853 SUCCESS; artifact admin-preview-evidence-169 ID 12355051140 (11,121,594 bytes). Preview smoke checks login CSS signature and configuration, but Access prevented authenticated dashboard/business testing. Handoff-only commits follow the tested source SHA.",
+  "progressBasis": "48% management estimate only. Exact source/test tree 78a16b6d9fca91d7b080834f293e1690dc7c10cd passed source validation job and Admin Preview diagnostic #169. Run #169's check run is completed success; project integrity/npm test and local responsive/theme Playwright screenshot matrix pass, configured Preview diagnostic pass. New gallery UI source commit a80fa64b63f0b12ec055440a1a7e526b9299771b has horizontal mobile thumbnail rail; actual run artifact confirms no horizontal page overflow for light/dark 390x844 and desktop 1280x800, 6 synthetic fixture images, no browser/console/network errors or attempted writes. 12-screen parity remains not accepted; authenticated business-flow/backend QA not tested due Access. Image-save and PRE/PRO migration remain deferred by owner.",
+  "note": "Latest exact tested tree 78a16b6d9fca91d7b080834f293e1690dc7c10cd: Validate Source job [#3933](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756) completed success and Admin Preview diagnostic [#169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853) completed success. The validation workflow parent API was still lagging as in_progress when checked, but both the validate job and GitHub commit check-run were completed success. npm run check, npm test, responsive/theme Playwright screenshot matrix, and configured Preview diagnostic pass. Artifact admin-preview-evidence-169 (ID 12355051140), 11,121,594 bytes, expires 2026-11-04. It contains 59 source/fixture PNGs (16 login shell, 43 synthetic/read-only module screens) and 36 fixture metrics. Reviewed product-gallery light/dark images and 1280x800 light: featured cover, horizontal thumbnail rail with accessible move/delete controls, no document horizontal overflow, footer geometry accepted, no page/console/failed-request/http errors and no attempted writes. All gallery images are synthetic; not live image/storage evidence. Current branch HEAD before this docs refresh was 314974ce3b6af381934074fe4d9f40add5b0288b, after docs-only commits. Progress 48%; all-12-screen visual parity NOT ACCEPTED; authenticated backend QA BLOCKED_BY_ACCESS/NOT_TESTED. Product image-save and PRE/PRO migration remain DEFERRED_BY_OWNER. PR #111 OPEN/UNMERGED, mixed scope, 1,114 changed paths; PR #108 OPEN/UNMERGED, 269 paths. No merge/Production deployment/remote D1/R2/secret or Access changes/setup or migration execution/TinyFish.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -16,25 +16,26 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_READ_ONLY_PATH_CENSUS_AND_SCRIPT_REVIEW; SEMANTIC/SECURITY AUDIT STILL OPEN",
-    "lastObservedApplicationSourceCommit": "cc77869873c2f5b4b2d1118dc60c0d88413eb218",
-    "lastObservedEvidenceOnlyHead": "e7f0990f4c0b78272fdba06e9f90423340b82eaa",
+    "lastObservedApplicationSourceCommit": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
+    "lastObservedEvidenceOnlyHead": "314974ce3b6af381934074fe4d9f40add5b0288b",
     "pr111State": "OPEN_UNMERGED_MIXED_SCOPE",
     "pr108State": "OPEN_UNMERGED",
-    "pr111ChangedFiles": 1112,
+    "pr111ChangedFiles": 1114,
     "pr108ChangedFiles": 269,
     "pr108Additions": 19270,
     "pr108Deletions": 380,
     "protectedStaticWebsiteBranchMustNotBeModified": true,
     "pr111PngFiles": 913,
     "pr111NonImageDocsAndCodeFiles": 199,
-    "latestTestedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+    "latestTestedCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
     "pr111DiffStatsNote": "Do not treat additions/deletions as a stable project metric: handoff docs are appended within this same PR and change the diff stat. Re-query live PR when needed; the path count observed here is 1,112.",
     "pr111DiffStatsAtInitialScopeAudit": {
       "additions": 38619,
       "deletions": 392,
       "observedAt": "2026-10-21T14:18:52Z",
       "note": "Point-in-time before this round of handoff updates."
-    }
+    },
+    "latestApplicationSourceCommit": "a80fa64b63f0b12ec055440a1a7e526b9299771b"
   },
   "changes": [
     {
@@ -174,6 +175,30 @@
       "localPlaywright": "PASS",
       "configuredPreviewDiagnostic": "PASS",
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737"
+    },
+    {
+      "runId": 39621065756,
+      "runNumber": 3933,
+      "name": "Validate source and tests",
+      "testedCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+      "conclusion": "success (validate job/check-run)",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756",
+      "note": "Actions workflow summary API lagged with in_progress when last read; validate job and commit check-run were completed success."
+    },
+    {
+      "runId": 39621065853,
+      "runNumber": 169,
+      "name": "Admin Preview diagnostic smoke test",
+      "testedCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+      "conclusion": "success",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "localPlaywright": "PASS",
+      "configuredPreviewDiagnostic": "PASS",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853",
+      "artifactId": 12355051140
     }
   ],
   "screenshots": [
@@ -761,26 +786,26 @@
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "branchIsolationDiffReview": "PARTIAL_GITHUB_API_FILE_REVIEW_NO_LOCAL_CHECKOUT",
-    "applicationStartup": "FAILURE",
+    "applicationStartup": "PASS_LOCAL_READ_ONLY_STATIC_ADMIN_SOURCE",
     "playwrightPreviewDiagnostics": "success",
-    "localStaticPlaywrightBaseline": "FAILURE",
+    "localStaticPlaywrightBaseline": "PASS_EXACT_SHA_78A16B6",
     "visualComparisonAgainstApprovedPng": "INCOMPLETE_12_SCREEN_COMPARISON; NOT VERIFIED",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "responsiveViewports": "FAIL_OR_NOT_RUN",
-    "lightMode": "FAIL_OR_NOT_RUN",
-    "darkMode": "FAIL_OR_NOT_RUN",
+    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
+    "lightMode": "PASS_SOURCE_FIXTURE_LIGHT_GALLERY_AND_LOGIN_MATRIX",
+    "darkMode": "PASS_SOURCE_FIXTURE_DARK_GALLERY_AND_LOGIN_MATRIX",
     "accessibilityAndVietnameseTypography": "PASS_MODAL_FOCUS_TRAP_ESCAPE_ARIA_AND_RESTORE_PLAYWRIGHT_ON_D408781; visual parity remains NOT_ACCEPTED",
     "lint": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
     "typecheck": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
-    "automatedTests": "PASS",
+    "automatedTests": "PASS_NPM_TEST",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "businessFlows": "NOT_TESTED_AUTHENTICATED",
     "sharedBackendRegression": "NOT_TESTED",
     "productionDeployment": "NOT_PERFORMED",
     "staticSourceContract": "PASS_GITHUB_SOURCE_INSPECTION_ONLY",
     "fullGitWorkingTree": "NOT_AVAILABLE_NO_LOCAL_CHECKOUT",
-    "playwright": "PASS",
+    "playwright": "PASS_EXACT_SHA_78A16B6",
     "referenceImageRead": "PASS_OPENED_EMBEDDED_IMAGE_FROM_ADMIN_MOBILE_REFERENCE_HTML",
     "referenceScreenInventory": "PASS_12_SCREENS_IDENTIFIED",
     "currentAppScreenshotComparison": "PARTIAL_SOURCE_FIXTURE_VIEWS_INSPECTED; FULL_12_SCREEN_PARITY_NOT_VERIFIED",
@@ -791,14 +816,14 @@
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
     "currentBranchHeadTests": "PASS CHECK+TEST+LOCAL_PLAYWRIGHT ON D408781 via run 39590491689; later evidence/handoff commit moved branch to 701befcb; no test claimed for docs-only descendants",
-    "authenticatedBackendModules": "NOT_TESTED",
+    "authenticatedBackendModules": "BLOCKED_BY_ACCESS_NOT_TESTED",
     "visualReferenceParity": "PARTIAL_SOURCE_SCREEN_REVIEW; NOT_ACCEPTED_12_SCREEN_PARITY",
     "mobileOrderCustomerUsability": "SOURCE_CSS_SUPPORTS_MOBILE_CARDS_AT_MAX_680PX; REAL AUTHENTICATED SCREENSHOTS NOT VERIFIED",
     "prFullDiffAudit": "PARTIAL_GITHUB_API_ONLY; NOT_MERGE_APPROVAL",
     "uiFixtureModules": "PASS_READ_ONLY_FIXTURE_SCREENSHOTS",
     "rawClosingTagVisibleText": "PASS_TEXT_NODE_ASSERTION_DID_NOT_REPRODUCE; CHECK_PSEUDO_ELEMENTS_AND_LATEST_CUSTOMER_SCREENSHOT",
     "npmRunCheck": "PASS",
-    "screenshotMatrix": "PASS_SOURCE_ONLY_59_PNG_RUN_39583053648",
+    "screenshotMatrix": "PASS_SOURCE_FIXTURE_MATRIX_RUN_169",
     "deployedPreview": "PASS_CONFIGURED_PREVIEW_DIAGNOSTIC_ONLY",
     "mobileNavigationSourceAudit": "PASS_SOURCE_ONLY_5_BUTTONS_FIVE_COLUMN_RULE_MORE_MENU_CONTAINS_WARRANTY_AND_SETTINGS",
     "mobileCardsSourceAudit": "PASS_SOURCE_ONLY_MOBILECARDS_OVERRIDE_INLINE_MIN_WIDTH_AT_MAX_680PX; AUTHENTICATED_RENDER_NOT_VERIFIED",
@@ -824,8 +849,11 @@
     "sourceCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
-    "authenticatedBusinessFlows": "BLOCKED_CLOUDFLARE_ACCESS_NOT_TESTED",
-    "visualParity12Screens": "NOT_ACCEPTED"
+    "authenticatedBusinessFlows": "BLOCKED_BY_ACCESS_NOT_TESTED",
+    "visualParity12Screens": "NOT_ACCEPTED",
+    "configuredPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY_AUTHENTICATED_QA_NOT_TESTED",
+    "galleryRail": "PASS_SYNTHETIC_FIXTURE_HORIZONTALLY_SCROLLABLE_THUMBNAILS",
+    "galleryFooterGeometry": "PASS_2PX_SUBPIXEL_TOLERANCE; LAST_IMAGE_CLEARANCE_CHECK_PASS"
   },
   "remainingIssues": [
     "Configured deployed Preview fails PREVIEW_CSS_SIGNATURE_MISMATCH: .topbar > .brand is visible; selector support/match true; 226-rule stylesheet lacks expected login-hide rule. Target identity cannot be inferred from masked secret.",
@@ -849,18 +877,18 @@
     "Owner action is required to confirm a currently deployed Preview built from ADMIN source and legitimate Cloudflare Access; no secret or bypass is allowed. Product save and PRE/PRO migrations stay DEFERRED_BY_OWNER."
   ],
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Fetch live branch ref and PR #111/#108 before further edits; distinguish docs-only HEAD from exact source/test SHA 78a16b6.",
+    "Continue side-by-side visual comparison against approved reference; all 12 screen-family parity is still NOT ACCEPTED.",
+    "Continue read-only PR #111 scope/security audit; do not merge/retarget/split without explicit authorization.",
+    "Never claim authenticated backend QA; Access has not allowed a real login/business flow in tests.",
+    "Keep actual product image save and PRE/PRO migration deferred unless owner reauthorizes."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39620591307",
-  "branchHeadSha": "fbbc5775292e5de8f869a93dbd8d1b31ddc8e210",
+  "branchHeadSha": "314974ce3b6af381934074fe4d9f40add5b0288b",
   "latestVerifiedAt": "2026-10-21T07:57:31.724Z",
-  "latestVerifiedSourceCommit": "cedebd78b2056ae4d0e6f6982793106b586d99b2",
-  "currentAdminBranchHead": "fbbc5775292e5de8f869a93dbd8d1b31ddc8e210",
+  "latestVerifiedSourceCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+  "currentAdminBranchHead": "314974ce3b6af381934074fe4d9f40add5b0288b",
   "latestVerificationSummary": "Source CI run 39547341928 SUCCESS on 4a1b58950c0b8e9de75009d5af313dfdfbea3595. Dependency audit, project integrity, and automated tests passed. Latest deployed Preview diagnostic 39542387719 remains FAIL at CSS/UI signature check; no new Preview run was performed.",
   "branchHeadBeforeHandoffUpdate": "af543dd83c40d026d2c09aa253b2396ccb3421d3",
   "prSafety": {
@@ -876,7 +904,11 @@
     "additions": 30716,
     "deletions": 356,
     "containsPublicStorefrontAndBackendFiles": true,
-    "warning": "Mixed-scope PR; do not merge before full review and owner decision."
+    "warning": "Mixed-scope PR; do not merge before full review and owner decision.",
+    "pr111": "OPEN_UNMERGED_NOT_MERGE_READY",
+    "pr108": "OPEN_UNMERGED",
+    "productionDeployment": "NOT_PERFORMED",
+    "mainAndStaticBranchesUntouched": true
   },
   "adminInventory": {
     "sourcePath": "public/admin/index.html",
@@ -1296,18 +1328,21 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "ee914c9a496810801a00df8e4f7da4e8c24c8a85",
+  "currentAdminBranchHeadBeforeHandoffUpdate": "314974ce3b6af381934074fe4d9f40add5b0288b",
   "latestScreenshotArtifact": {
-    "runId": 39620591307,
-    "name": "admin-preview-evidence-168",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39620591307",
-    "sourceCommit": "4de4b4b63a78bc400bc36b55be4e057effed4a4a",
-    "screenshotCount": 25,
+    "runId": 39621065853,
+    "name": "admin-preview-evidence-169",
+    "id": 12355051140,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853",
+    "sourceCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "screenshotCount": 59,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 9,
-    "uiFixtureMetricCount": 7,
+    "uiFixturePngCount": 43,
+    "uiFixtureMetricCount": 36,
     "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch",
+    "expiresAt": "2026-11-04T14:56:50Z",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853/artifacts/12355051140"
   },
   "latestVerification": {
     "verifiedAt": "2026-10-21T12:43:00+07:00",
@@ -1386,7 +1421,7 @@
       "migrationsRun": false
     }
   },
-  "latestObservedBranchHeadSha": "fbbc5775292e5de8f869a93dbd8d1b31ddc8e210",
+  "latestObservedBranchHeadSha": "314974ce3b6af381934074fe4d9f40add5b0288b",
   "latestVerifiedSourceCi": {
     "runId": 39565547871,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871",
@@ -1398,11 +1433,11 @@
     "automatedTests": "PASS"
   },
   "latestPreviewDiagnostic": {
-    "runId": 39571867352,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352",
+    "runId": 39621065853,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853",
     "sourceCommit": "18704cfae445210c20bbe1eaf0f9328b6c90eb87",
     "exactShaMatch": true,
-    "conclusion": "FAILURE",
+    "conclusion": "success",
     "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
     "observed": {
       "title": "Quản trị SinDarealest",
@@ -1425,15 +1460,23 @@
     },
     "rootCauseStatus": "Served stylesheet lacks current-source login-hide rule. Stale deployment vs wrong target cannot be distinguished because ADMIN_TEST_URL is masked in logs.",
     "secrets": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED",
-    "cloudflareAccessBypass": "NOT_PERFORMED"
+    "cloudflareAccessBypass": "NOT_PERFORMED",
+    "sourceSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "artifactId": 12355051140,
+    "checkedAt": "2026-10-21T14:57:00Z",
+    "authenticatedBackendQA": "BLOCKED_BY_ACCESS_NOT_TESTED"
   },
   "pr111": {
-    "state": "OPEN_UNMERGED",
+    "state": "OPEN",
     "base": "main",
     "headSha": "719a537f52eccf66c9642661c2758f8861beabcf",
-    "changedFiles": 1096,
+    "changedFiles": 1114,
     "additions": 37835,
-    "deletions": 392
+    "deletions": 392,
+    "merged": false,
+    "head": "314974ce3b6af381934074fe4d9f40add5b0288b",
+    "mergeReady": false,
+    "scope": "Mixed Admin + public storefront + Functions/API + migrations + setup/deploy scripts + tests/evidence; not merge-ready."
   },
   "pr108": {
     "state": "OPEN",
@@ -1441,7 +1484,7 @@
     "base": "main",
     "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
     "headSha": "32032fbe2fecf176bcdf962313292898a7a415ed",
-    "changedFiles": 250,
+    "changedFiles": 269,
     "additions": 19753,
     "deletions": 380,
     "latestObservedHead": "eaf37cceb52438c0dea836654cb0ccda8153bd4e",
@@ -1771,12 +1814,15 @@
     ]
   },
   "latestValidationRun": {
-    "runId": 39583615335,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583615335",
-    "sourceCommit": "ef42282f7c0d66f827e3d0181bc3f0eaa00dced7",
-    "exactShaMatch": true,
-    "conclusion": "SUCCESS",
-    "scope": "Validate source and tests on docs-only HEAD; app source unchanged from source SHA 47a23ded111d2982383460ba7265b778e2bc6d39"
+    "runId": 39621065756,
+    "runNumber": 3933,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756",
+    "testedSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "jobConclusion": "success",
+    "checkRunConclusion": "success",
+    "parentRunApiStatusAtLastRead": "in_progress despite completed successful job/check-run",
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS"
   },
   "currentVerification": {
     "latestSourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
@@ -1933,25 +1979,17 @@
     "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
   },
   "handoffDocsUpdated": [
-    {
-      "path": "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
-      "commitSha": "6510fc80498ac7ec8a5256049d2c517b41c369ba"
-    },
-    {
-      "path": "docs/admin-ui-reference/handoff/START-HERE.md",
-      "commitSha": "79da5302430a5f1aec4647521fd18b5bc7e66746"
-    },
-    {
-      "path": "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
-      "commitSha": "01810a35693cdead80c0f9692c3608e28392e0d5"
-    },
-    {
-      "path": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-      "commitSha": "3d42e686ec30f366ad9e828942e9563d8e641e9b"
-    }
+    "LATEST-STATUS.md",
+    "latest-test-results.json",
+    "PROMPT-NEXT-CHAT.md",
+    "START-HERE.md",
+    "MASTER-PROMPT-AUTO-HANDOFF.md",
+    "PROMPT-COMPLETENESS-AUDIT.md",
+    "reference-instructions.md",
+    "QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
   ],
   "handoffJsonSelfUpdateNote": "This JSON file is itself updated alongside the other handoff files; consult branch commit history for its own latest commit to avoid a self-referential SHA.",
-  "latestFunctionalSourceCommitSha": "d3fa9b85be20d832cbf24678dd7f3c7d862c1e64",
+  "latestFunctionalSourceCommitSha": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
   "latestAccessibilityTestCommits": [
     {
       "sha": "ed14dc26270ba11b842bdec7c2e75f46ecc788bc",
@@ -1970,42 +2008,15 @@
     }
   ],
   "latestSourceTestRun": {
-    "runId": 39592097224,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224",
-    "sourceCommit": "ebb20fa7f2359b19ae91a9c62b3006a16b8db148",
-    "overallConclusion": "FAILURE_PREVIEW_DIAGNOSTIC_ONLY",
-    "exactShaMatch": true,
-    "npmRunCheck": "PASS",
-    "npmTest": "PASS",
-    "paymentLedgerRegression": "PASS_PAYMENT_LEDGER_ROUTE_BEHAVIOR",
-    "localPlaywrightSourceMatrix": "PASS",
-    "screenshotCount": 59,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 43,
-    "uiFixtureMetricCount": 36,
-    "pageErrors": 0,
-    "consoleErrors": 0,
-    "failedRequests": 0,
-    "httpErrors": 0,
-    "fixtureWriteAttempts": 0,
-    "previewDiagnostic": "FAIL_PREVIEW_CSS_SIGNATURE_MISMATCH",
-    "observed": {
-      "inlineStylesheetRuleCount": 226,
-      "hasLoginHideRule": false,
-      "topbarBrandDisplay": "flex",
-      "topbarBrandVisibility": "visible",
-      "topbarBrandOpacity": "1",
-      "browserSupportsHideSelector": true,
-      "hideSelectorMatchesBrand": true
-    },
-    "artifact": {
-      "name": "admin-preview-evidence-144",
-      "id": 12342063095,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224/artifacts/12342063095",
-      "sizeBytes": 11185608,
-      "expiresAt": "2026-11-04T11:30:26Z",
-      "rawPngsInGit": false
-    }
+    "testedCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "validationRunId": 39621065756,
+    "validationJobConclusion": "success",
+    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756",
+    "previewRunId": 39621065853,
+    "previewRunConclusion": "success",
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853",
+    "validationParentApiAtLastRead": "in_progress despite validate job/check-run completed success",
+    "checkedAt": "2026-10-21T14:57:00Z"
   },
   "latestCurrentPreviewDiagnostic": {
     "runId": 39602040135,
@@ -2176,58 +2187,37 @@
   },
   "overallProgressPercent": 48,
   "latestHandoffUpdate": {
-    "updatedAt": "2026-10-21",
-    "ownerRequest": "Update handoff files and prompt; continue practical Admin work autonomously within restrictions.",
-    "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "latestApplicationSourceSha": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
-    "latestTestedCodeAndTestSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
-    "successfulRuns": [
-      {
-        "id": 39615192697,
-        "sha": "1fb56f7b5773876c581847bf44abbef1c5c16a67"
-      },
-      {
-        "id": 39615417216,
-        "sha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978"
-      }
-    ],
-    "pr111": "OPEN_UNMERGED_MIXED_SCOPE_NOT_MERGE_READY",
-    "pr108": "OPEN_UNMERGED",
-    "screenGroups12": "NOT_ACCEPTED",
-    "authenticatedBackendQA": "NOT_TESTED",
-    "imageSave": "DEFERRED_BY_OWNER",
-    "preProMigrations": "DEFERRED_BY_OWNER",
-    "migration009DeploymentReadiness": "POTENTIAL_SOURCE_LEVEL_MISMATCH_NOT_VERIFIED_REMOTELY",
-    "productionDeployment": "NOT_PERFORMED",
-    "remoteD1R2Operations": "NOT_PERFORMED",
-    "tinyfish": "NOT_USED",
-    "nextActions": [
-      "Re-fetch branch/PR/Actions metadata",
-      "Continue 12-screen visual and accessibility audit with evidence",
-      "Continue read-only PR #111 semantic/security review",
-      "Run CI on exact SHA after each source change",
-      "Keep handoff documents synchronized"
-    ]
+    "checkedAt": "2026-10-21T14:57:00Z",
+    "testedSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "sourceSha": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
+    "artifactId": 12355051140,
+    "branchHeadBeforeHandoffUpdate": "314974ce3b6af381934074fe4d9f40add5b0288b",
+    "note": "Docs-only commits have moved branch HEAD beyond tested SHA; new source change must get fresh CI."
   },
   "latestRun": {
-    "runId": 39618556737,
-    "runNumber": 162,
+    "runId": 39621065853,
+    "runNumber": 169,
     "conclusion": "success",
-    "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737",
-    "validationRunId": 39618556696,
-    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696",
+    "testedCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853",
+    "validationRunId": 39621065756,
+    "validationRunNumber": 3933,
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756",
+    "validationJobConclusion": "success",
     "artifact": {
-      "name": "admin-preview-evidence-162",
-      "id": 12354480678,
-      "sizeBytes": 11114027,
-      "expiresAt": "2026-11-04T14:39:59Z"
+      "name": "admin-preview-evidence-169",
+      "id": 12355051140,
+      "sizeBytes": 11121594,
+      "expiresAt": "2026-11-04T14:56:50Z",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853/artifacts/12355051140"
     },
     "checks": {
       "npmRunCheck": "PASS",
       "npmTest": "PASS",
       "localPlaywrightResponsiveThemeMatrix": "PASS",
-      "configuredPreviewDiagnostic": "PASS"
+      "configuredPreviewDiagnostic": "PASS",
+      "galleryRailScrollAssertions": "PASS",
+      "galleryFooterGeometry": "PASS_WITH_2PX_SUBPIXEL_TOLERANCE"
     },
     "screenshotEvidence": {
       "sourceFixturePngs": 59,
@@ -2236,43 +2226,84 @@
       "fixtureMetrics": 36,
       "authenticatedBackendQA": "NOT_TESTED"
     },
+    "galleryEvidence": {
+      "imagesPerScreenshot": 6,
+      "viewports": [
+        {
+          "width": 390,
+          "height": 844,
+          "theme": "light"
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "theme": "dark"
+        },
+        {
+          "width": 1280,
+          "height": 800,
+          "theme": "light"
+        }
+      ],
+      "documentHorizontalOverflow": false,
+      "horizontalThumbnailRail": true,
+      "footerBottomClearance": "PASS",
+      "imageType": "synthetic SVG fixture; not R2-backed image"
+    },
+    "metadata": {
+      "completed": true,
+      "failure": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "attemptedWrites": 0
+    },
     "productionDeployment": "NOT_PERFORMED"
   },
   "latestScreenshotReview": {
-    "status": "REVIEWED_SOURCE_FIXTURE_ONLY",
-    "runId": 39611416915,
-    "sourceSha": "fda63055e3e2509d6199bf347f4eb33b66dd03c3",
-    "artifactName": "admin-preview-evidence-156",
-    "screenshot": "product-gallery__390x844__light.png",
-    "viewport": "390x844",
-    "theme": "light",
-    "observations": [
-      "Stacked product editor with tabs Chi tiết / Giá & loại hàng / Bộ ảnh",
-      "Gallery shows upload picker and two placeholder/example thumbnails",
-      "Per-image move-up, move-down and delete controls are visible",
-      "Fixed bottom action bar; screen feels vertically dense at this viewport"
+    "artifact": "admin-preview-evidence-169",
+    "artifactId": 12355051140,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853",
+    "sourceCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "files": [
+      "product-gallery__390x844__light.png",
+      "product-gallery__390x844__dark.png",
+      "product-gallery__1280x800__light.png"
     ],
+    "status": "PASS_FOR_SOURCE_FIXTURE_LAYOUT_ONLY",
+    "observations": [
+      "Featured cover image spans the product-image area; five supporting images are presented in a horizontal, touch-scrollable thumbnail rail.",
+      "Rail group has Vietnamese accessible label and each thumbnail keeps its own accessible move-up/move-down/delete controls.",
+      "Mobile light/dark and desktop captures show no document-level horizontal overflow; the rail scrolls horizontally without widening the page.",
+      "Sticky save/action footer sits at the bottom edge of the dialog and last thumbnail stays above it. Separate geometry threshold allows 2 CSS pixels of subpixel browser rounding.",
+      "Artifact metadata says completed=true, failure=null, pageErrors=[], consoleErrors=[], failedRequests=[], httpErrors=[], attemptedWrites=[]; gallery content is six synthetic SVG fixtures, not actual R2 photos."
+    ],
+    "remainingVisualGap": "Need pixel/side-by-side acceptance against the approved screen #5, review file-picker/status and thumbnail density, then complete screen-by-screen comparison of all 12 reference families.",
+    "referenceParity": "NOT_ACCEPTED",
     "realImageUpload": "NOT_VERIFIED",
     "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
-    "referenceParity": "NOT_ACCEPTED",
     "authenticatedBusinessFlow": "NOT_TESTED"
   },
   "latestUiRevisionReview": {
-    "sourceCommit": "cc77869873c2f5b4b2d1118dc60c0d88413eb218",
-    "e2eCommit": "a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e",
-    "contractTestCommit": "5f73373094ba71f467374e8b026bbfc3c5059fec",
-    "testedTreeSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
-    "artifact": "admin-preview-evidence-162",
+    "sourceCommit": "a80fa64b63f0b12ec055440a1a7e526b9299771b",
+    "contractTestCommit": "4de4b4b63a78bc400bc36b55be4e057effed4a4a",
+    "e2eTestCommit": "f148cf6c6895a527d0c9f324b1398c76e88fd646",
+    "toleranceAdjustmentTestCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "testedTreeSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "artifact": "admin-preview-evidence-169",
     "screenshots": [
       "product-gallery__390x844__light.png",
-      "product-gallery__390x844__dark.png"
+      "product-gallery__390x844__dark.png",
+      "product-gallery__1280x800__light.png"
     ],
     "observations": [
-      "Sticky action footer is flush with dialog bottom after moving trailing padding out of the scrolling dialog container.",
-      "With the editor scrolled to the end, the final gallery thumbnail and its action controls sit above the sticky footer.",
-      "Dark-theme dialog/footer surfaces remain aligned and legible."
+      "Prominent cover plus horizontal supporting-image rail now resembles approved reference #5 more closely.",
+      "Six synthetic gallery images render; rail scrolls horizontally; each retains labelled reorder/delete controls.",
+      "Responsive/theme matrix reports no page horizontal overflow at these screenshots.",
+      "Action footer is aligned with dialog bottom; final thumbnail is not obscured."
     ],
-    "remainingVisualGap": "Approved reference has a horizontal thumbnail rail and richer image-management/status layout; current nested card/grid is an incremental change, not visual acceptance.",
+    "remainingVisualGap": "Not full 12-screen parity. Continue comparison against the original reference PNG; actual images are not loaded from R2 and upload/save is untested.",
     "referenceParity": "NOT_ACCEPTED",
     "realImageUpload": "NOT_VERIFIED",
     "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
