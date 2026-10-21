@@ -118,11 +118,18 @@ assert.ok(finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-cop
   && finalCss.includes('font-size:clamp(42px,5.2vw,72px)!important;'),
   'Desktop fallback headline must keep the reference three-line hierarchy rather than break each phrase into narrow columns.');
 assert.ok(finalCss.includes('@media(max-width:760px){')
-  && finalCss.includes('#mobileBottomNav{z-index:1300!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}')
   && finalCss.includes('height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;')
   && finalCss.includes('top:calc(7px + env(safe-area-inset-top))!important;')
   && finalCss.includes('bottom:auto!important;'),
-  'Mobile drawers must use an explicit viewport height and allow the fixed bottom navigation to remain visible.');
+  'Mobile drawers must use an explicit viewport height and remain sized independently of the bottom navigation.');
+assert.ok(html.includes('/* sd-welcome-layering-fix-2026-10-22 */')
+  && html.includes('.welcome-splash{z-index:2147483000!important}')
+  && html.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}'),
+  'The welcome splash must sit above the mobile toolbar and hide it for the full welcome lifecycle.');
+assert.ok(html.includes('body:has(#welcomeSplash) #accountDrawer,')
+  && html.includes('body:has(#welcomeSplash) #cartDrawer,')
+  && html.includes('body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}'),
+  'Account/cart/checkout drawers must not flash above the welcome screen before the splash is dismissed.');
 
 const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
