@@ -48,4 +48,19 @@ for (const route of [
 assert.equal(adminHtml.split('</style>').length - 1, 1, 'ADMIN must retain one complete style block');
 assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese document language');
 
+// Accessible names for repeated controls must identify the affected record, not just say "Save".
+has('data-order-status="${esc(o.id)}" aria-label="Trạng thái đơn hàng ${esc(o.order_number)}"', 'accessible per-order status select');
+has('data-payment-status="${esc(o.id)}" aria-label="Trạng thái thanh toán đơn hàng ${esc(o.order_number)}"', 'accessible per-order payment status select');
+has('data-action="save-order" data-id="${esc(o.id)}" aria-label="Lưu đơn hàng ${esc(o.order_number)}"', 'accessible per-order save action');
+has('data-claim-status="${esc(c.id)}" aria-label="Trạng thái yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim status');
+has('data-claim-note="${esc(c.id)}" aria-label="Ghi chú quản trị cho yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty admin note');
+has('data-action="save-claim" data-id="${esc(c.id)}" aria-label="Lưu yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim save action');
+has('aria-label="Chuyển ảnh ${i+1} lên"', 'gallery reorder-up accessible name');
+has('aria-label="Chuyển ảnh ${i+1} xuống"', 'gallery reorder-down accessible name');
+has('aria-label="Xóa ảnh ${i+1}"', 'gallery remove accessible name');
+has('id="pPublished" type="checkbox" aria-label="Hiển thị sản phẩm"', 'published toggle accessible name');
+has('id="showPrices" type="checkbox" aria-label="Hiển thị giá cho khách hàng"', 'public price toggle accessible name');
+has('id="welcomeEnabled" type="checkbox" aria-label="Hiển thị trang chào mừng"', 'welcome page toggle accessible name');
+has('id="watermarkEnabled" type="checkbox" aria-label="Bật watermark khi xem chi tiết"', 'watermark toggle accessible name');
+
 console.log('PASS ADMIN ice-glass visual tokens, login contract, and required API route strings');
