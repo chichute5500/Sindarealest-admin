@@ -898,7 +898,7 @@
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
-  "updatedAt": "2026-10-21T04:13:24.949Z",
+  "updatedAt": "2026-10-21T04:15:00.172Z",
   "currentBranchHeadAtHandoff": "cdec188efa2198caaf0ac65cd294b682d1088fc9",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": true,
@@ -992,7 +992,14 @@
       "migrations/0008_product_sku_verification.sql",
       "scripts/"
     ],
-    "caution": "Do not mass-revert; map commit ancestry and preserve user work before any scope remediation."
+    "caution": "Do not mass-revert; map commit ancestry and preserve user work before any scope remediation.",
+    "headShaBeforeHandoffDocs": "158478407b24eea2f507b5013af8621d0f48a743",
+    "lastAuditCommit": "6ce10a0f6b2e874cbcbdbae36d3411afa1af5d77",
+    "highRiskFinding": "scripts/setup-cloudflare.mjs now contains remote D1 migration execution and direct ALTER TABLE for sku_verified columns; NOT EXECUTED; treat as blocker under no-schema-change constraint.",
+    "largePatchUnavailable": [
+      "public/index.html",
+      "data/legacy-products.json"
+    ]
   },
   "latestWorkflowFixValidation": {
     "workflowBlob": "3f04b295dc1cf212be4ace76293228c69fd5860e",
