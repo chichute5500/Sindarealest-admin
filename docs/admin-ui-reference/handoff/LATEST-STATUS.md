@@ -36,3 +36,15 @@
 - Keep PR #111 and #108 OPEN/unmerged. No merge, cherry-pick, force-push, branch sync or Production deployment.
 - No secrets/Cloudflare Access changes or bypass; no remote D1/R2 operations, SQL, migrations or setup/deploy scripts. Never use TinyFish.
 - After every meaningful source/test change, validate the exact SHA, inspect the actual screenshots and update evidence. Do not stop after a report if safe work remains.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: add5b8709e061f0190f0ab0e2637baa4d03f2e67
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639267765
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-198 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
