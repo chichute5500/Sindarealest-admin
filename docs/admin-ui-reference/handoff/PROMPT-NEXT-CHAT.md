@@ -833,3 +833,31 @@ Continue real work on SinDarealest Admin. Do not stop at planning or a progress 
 - Evidence artifact [admin-preview-evidence-192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558), ID `12360132558`, 11,895,011 bytes, expires 2026-11-04. It contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture views), 39 metrics, zero recorded page/console/request/HTTP errors, no attempted writes and no unexpected API paths. Not authenticated backend QA.
 - The 12-screen audit marks #7 Orders and #12 Backup/Settings PARTIAL for narrow safety/control evidence; #8 QR/payment remains PARTIAL. Full visual parity is still NOT ACCEPTED and authenticated real backend remains BLOCKED / NOT TESTED. Overall progress remains 48%. Product image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
 - Re-fetch branch HEAD and exact Actions after docs commits; latest code/test SHA is `4e660a0...`, later branch HEAD may consist of docs/evidence. PR #111/#108 must remain OPEN/unmerged. Only ADMIN branch; no Production deploy, main/static changes, Access/secrets edits/bypass, remote D1/R2, SQL/setup/migrations or TinyFish.
+
+
+## NEXT CHAT — AUTHORITATIVE CONTINUATION ADDENDUM (2026-10-21)
+
+Do real work autonomously; do not stop after a status report or a plan. First read the master prompt, START-HERE, LATEST-STATUS, latest-test-results.json and 12-SCREEN-REFERENCE-AUDIT from the exact branch below. Re-fetch current branch head and PR/workflow status before edits because documentation commits have advanced the branch beyond the tested source SHA.
+
+**Repo:** `chichute5500/Sindarealest-admin`  
+**Only writable branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Last verified application/test SHA:** `4e660a0869dd21d4a688d72823bd08b1795cf2ff`  
+**Validate Source:** [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) SUCCESS.  
+**Admin Preview/Playwright:** [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) SUCCESS on the same SHA.  
+**Artifact:** [admin-preview-evidence-192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558), ID `12360132558`, 63 PNGs, 39 fixture metrics.
+
+### Newly verified fixture coverage
+- QR settings: accessible fields and manual verification checkbox; when bank details are changed but not saved, activation must show the guard warning before confirmation or API write.
+- Order safety: while price confirmation/terms confirmation is incomplete, `create-payment-request` and `record-payment` remain disabled.
+- Backup/restore: JSON export control, JSON restore input and confirmation disclosure are present. The test does not invoke export or restore.
+- The static browser baseline has 3 passing tests (25.5s), with responsive/theme screenshot matrix, `npm run check`, `npm test`, and Preview login CSS signature passing. Artifact records 63 PNGs/39 metrics and zero browser/console/request/HTTP errors, attempted writes or unexpected API paths.
+- These are synthetic/read-only fixture checks. They do NOT establish authenticated backend, payment ledger, real QR operation, backup/restore runtime or full visual-reference parity.
+
+### Mandatory next actions
+1. Re-fetch latest branch SHA, PR #111/#108 state, and latest workflow runs. Docs commits may mean current branch HEAD is later than tested SHA.
+2. Compare each of the 12 approved admin reference screen families against the current implementation; do not mark a screen accepted solely because fixture screenshots exist. Use the image/reference files and current code.
+3. Continue one bounded improvement at a time, preferably static visual parity/accessibility or deterministic read-only E2E. Avoid broad mixed-scope rewrites. Run source validation and Preview/Playwright for every test/code change and diagnose failures rather than weakening/removing tests.
+4. Update `LATEST-STATUS.md`, `latest-test-results.json`, `12-SCREEN-REFERENCE-AUDIT.md`, `START-HERE.md`, this prompt and master prompt only with evidence verified on the current exact SHA.
+5. Progress remains **48%** until meaningful acceptance evidence advances it. Screen #7 order, #8 payment/QR and #12 settings/backup remain PARTIAL. Full 12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED/BLOCKED BY ACCESS; image-save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
+6. Keep PR #111/#108 OPEN/unmerged. Never deploy Production, change main/static website, alter/bypass Cloudflare Access or secrets, execute setup/migration SQL, operate on remote D1/R2, or use TinyFish. Do not ask the user to perform an action unless the next required step genuinely needs their access/approval.
+
