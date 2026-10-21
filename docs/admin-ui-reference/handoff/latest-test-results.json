@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
+  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL_ARTIFACT_ONLY_SCREENSHOTS_ENABLED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
   "testedCommitSha": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
-  "capturedAt": "2026-10-21T05:36:01.307Z",
+  "capturedAt": "2026-10-21T05:36:29Z",
   "progressEstimatePercent": 45,
-  "progressBasis": "Stage estimate: current-source npm checks/tests and local responsive/theme/fixture Playwright evidence pass, and CSS diagnostics now isolate the deployed Preview mismatch. Still blocked on an authorized Preview built from current ADMIN source, authenticated real backend QA, full 12-screen comparison, broad PR #111 scope/migration review.",
-  "note": "Validated source commit 6935eefa3473f1c6a15da08a34389d7223cbd0ea: source CI run 39548605358 SUCCESS. Playwright diagnostic run 39548605474 failed only at the configured deployed Preview assertion after local screenshot/fixture suites passed. Runtime CSS signature: browserSupportsHideSelector=true, hideSelectorMatchesBrand=true, topbarBrandDisplay=flex, hasLoginHideRule=false, ruleCount=226. Preview response is missing the expected login-shell CSS rule. GitHub masks ADMIN_TEST_URL, so the exact target remains unidentifiable from logs.",
+  "progressBasis": "Source CI passed on latest tested code commit; local source/fixture Playwright evidence passed. Configured deployed Preview still fails the expected login-shell CSS signature. Screenshot workflow now stores full PNG/metadata in Actions artifacts and keeps compact summaries in Git; confirm subsequent run and PR scope reduction. Authenticated real-backend QA, 12-screen visual parity, full PR scope/migration review remain open.",
+  "note": "Latest verified source CI run 39550214045 SUCCESS on 8fd8aa96a9f80ae7a18fd598b44cc459dd303bca. Preview diagnostic run 39550214050 FAILURE on same commit: 2 tests passed and 1 failed at the configured Preview login-header assertion. Browser supports :has and selector matches .topbar > .brand, but loaded inline stylesheet has 226 rules and hasLoginHideRule=false. ADMIN_TEST_URL is redacted; do not infer target identity or touch secrets. Workflow changed to artifact-only full screenshots/full metadata (14-day retention) with compact Git summaries; follow-up run needs to confirm no per-run PNG commit. PR #111 remains OPEN/unmerged and has a broad non-ADMIN diff.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -1214,5 +1214,82 @@
     "uiFixtureMetricCount": 36,
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+  },
+  "latestVerification": {
+    "verifiedAt": "2026-10-21T12:43:00+07:00",
+    "branchHeadAtStart": "71be37cbe6df5999f165fd102895ca229cfa4237",
+    "branchHeadAfterHandoffCommit": "998330def726888bc401c4b8c91571cee3015aa2",
+    "sourceCi": {
+      "runId": 39550214045,
+      "conclusion": "success",
+      "commit": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214045"
+    },
+    "previewDiagnostics": {
+      "runId": 39550214050,
+      "conclusion": "failure",
+      "commit": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214050",
+      "signature": {
+        "browserSupportsHideSelector": true,
+        "hideSelectorMatchesBrand": true,
+        "ruleCount": 226,
+        "hasLoginHideRule": false
+      },
+      "passedTests": 2,
+      "failedTests": 1
+    },
+    "artifacts": [
+      {
+        "name": "admin-preview-evidence-68",
+        "runId": 39550214050,
+        "fullPngAndMetadata": true,
+        "gitCommittedPngsExpected": false,
+        "retentionDays": 14
+      },
+      {
+        "name": "admin-preview-evidence-67",
+        "runId": 39550195026,
+        "artifactId": 12322959928,
+        "sizeBytes": 9164859,
+        "fullPngAndMetadata": true
+      }
+    ],
+    "changesSincePreviousHandoff": [
+      {
+        "path": "public/admin/index.html",
+        "purpose": "Add contextual aria-labels to repeated order, payment, warranty, gallery and settings controls."
+      },
+      {
+        "path": "tests/admin-liquid-glass-contract.test.mjs",
+        "purpose": "Assert contextual accessible names for those controls."
+      },
+      {
+        "path": ".github/workflows/admin-preview-diagnostics.yml",
+        "purpose": "Keep full screenshot/metadata files in Actions artifacts and commit only compact summaries."
+      },
+      {
+        "path": "tests/admin-upgrade.test.mjs",
+        "purpose": "Prevent regression to committing every per-run PNG matrix."
+      }
+    ],
+    "pr111": {
+      "state": "open",
+      "merged": false,
+      "changedFiles": 1033,
+      "additions": 33892,
+      "deletions": 357,
+      "commits": 424
+    },
+    "guardrails": {
+      "productionDeploy": false,
+      "mergePr111": false,
+      "mergePr108": false,
+      "mainModified": false,
+      "staticWebsiteBranchModified": false,
+      "secretsChanged": false,
+      "remoteD1R2Modified": false,
+      "migrationsRun": false
+    }
   }
 }
