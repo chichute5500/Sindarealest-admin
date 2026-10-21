@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_ORDER_PAYMENT_READINESS_AND_BACKUP_UI_E2E_PASS_VISUAL_PARITY_NOT_ACCEPTED_AUTHENTICATED_QA_NOT_TESTED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
   "testedCommitSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
-  "capturedAt": "2026-10-21T16:17:37.424Z",
+  "capturedAt": "2026-10-21T16:18:07Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% management estimate. Exact source/test SHA 0b9e8a2f6a734ef328726c9c80e8e0e56328ce55 passed Validate Source #39632306385 and Admin Preview/Playwright #39632306588. The read-only fixture tests the Settings/QR UI fields and client-side guard: when a bank field is changed while QR verification is checked, activation is refused with a save-draft warning before confirmation or any non-GET request. The test refreshes settings by navigating away/back between viewport/theme variants. npm run check, npm test, 3-test static Playwright suite (3 passed, 25.9s), responsive/theme source screenshot matrix, and Preview login CSS signature passed. Artifact #191 has 63 PNGs (16 login + 47 synthetic fixtures) and 39 fixture metrics; error arrays and attempted writes are empty. Authenticated real backend QA and all-12-screen acceptance remain incomplete. Product image-save/PRE-PRO migrations are owner-deferred.",
-  "note": "Exact source/test SHA 0b9e8a2f6a734ef328726c9c80e8e0e56328ce55: Validate Source [#39632306385] PASS; Admin Preview/Playwright [#39632306588] SUCCESS. Test addition validates QR settings fields and guards activation when bank details are unsaved: warning is visible and the guard returns before confirmation or API mutation. One prior browser run (#39631879451 on 446a75a...) exposed test-state leakage across viewport variants; fixed by navigating away/back to re-render Settings before each variant. Retest on 0b9e8a2 passed. Browser baseline reported 3 passed (25.9s), CSS signature PASS. Artifact admin-preview-evidence-191 (ID 12360041542, 11,894,748 bytes, expires 2026-11-04) has 63 PNGs (16 login + 47 synthetic/read-only fixtures), 39 fixture metrics, zero browser/console/network/HTTP errors, attempted writes=0, unexpected API paths=0. Synthetic fixture proof only; no authenticated backend QA. 12-screen parity NOT ACCEPTED. PR #111/#108 OPEN/unmerged; PR #111 remains mixed-scope/not merge-ready. Progress stays 48%; product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
+  "progressBasis": "48% management estimate. Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff passed Validate Source #39633278598 and Admin Preview/Playwright #39633278359. Added read-only fixture assertions that an order requiring price/terms confirmation cannot create a payment request or record a receipt, and that Backup/Restore UI shows the JSON export, JSON restore input and confirmation disclosure without invoking either action. Previously added QR unsaved-draft activation guard remains passing. npm run check, npm test, 3-test static Playwright suite (3 passed, 25.5s), responsive/theme screenshot matrix and Preview login CSS signature passed. Artifact #192 includes 63 PNGs (16 login + 47 synthetic fixtures) and 39 metrics; errors and attempted writes are empty. Visual parity across all 12 screen families and authenticated backend QA remain incomplete; product image-save/PRE-PRO migrations remain owner-deferred.",
+  "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -886,12 +886,12 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359",
-  "branchHeadSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "branchHeadSha": "f9a06232377c75352aceea17a27bce88ec05556f",
   "latestVerifiedAt": "2026-10-21T16:00:21Z",
   "latestVerifiedSourceCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
-  "currentAdminBranchHead": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "currentAdminBranchHead": "f9a06232377c75352aceea17a27bce88ec05556f",
   "latestVerificationSummary": "Source CI run 39547341928 SUCCESS on 4a1b58950c0b8e9de75009d5af313dfdfbea3595. Dependency audit, project integrity, and automated tests passed. Latest deployed Preview diagnostic 39542387719 remains FAIL at CSS/UI signature check; no new Preview run was performed.",
-  "branchHeadBeforeHandoffUpdate": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "branchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -1011,7 +1011,7 @@
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
   "updatedAt": "2026-10-21",
-  "currentBranchHeadAtHandoff": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "currentBranchHeadAtHandoff": "f9a06232377c75352aceea17a27bce88ec05556f",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -1329,7 +1329,7 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "currentAdminBranchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "latestScreenshotArtifact": {
     "runId": 39633278359,
     "name": "admin-preview-evidence-192",
@@ -1339,6 +1339,9 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 47,
     "uiFixtureMetricCount": 39,
+    "artifactId": 12360132558,
+    "sizeBytes": 11895011,
+    "expiresAt": "2026-11-04T16:18:03Z",
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
@@ -1419,7 +1422,7 @@
       "migrationsRun": false
     }
   },
-  "latestObservedBranchHeadSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "latestObservedBranchHeadSha": "f9a06232377c75352aceea17a27bce88ec05556f",
   "latestVerifiedSourceCi": {
     "runId": 39565547871,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871",
@@ -1431,9 +1434,9 @@
     "automatedTests": "PASS"
   },
   "latestPreviewDiagnostic": {
-    "runId": 39632306588,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
-    "sourceCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "runId": 39633278359,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359",
+    "sourceCommit": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
     "exactShaMatch": true,
     "conclusion": "success",
     "status": "PASS_LOGIN_CSS_SIGNATURE",
@@ -1454,9 +1457,9 @@
   "pr111": {
     "state": "OPEN",
     "base": "main",
-    "headSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
-    "changedFiles": 1124,
-    "additions": 40414,
+    "headSha": "f9a06232377c75352aceea17a27bce88ec05556f",
+    "changedFiles": 1126,
+    "additions": 40556,
     "deletions": 392,
     "merged": false,
     "mergeReady": false,
@@ -1562,20 +1565,23 @@
     "automatedTests": "PASS"
   },
   "latestSourcePlaywright": {
-    "runId": 39632306588,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
-    "sourceCommit": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
+    "runId": 39633278359,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359",
+    "sourceCommit": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
     "exactShaMatch": true,
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
     "automatedTests": "PASS",
     "localScreenshotMatrix": "PASS",
+    "orderPaymentReadinessE2E": "PASS",
+    "backupRestoreControlsE2E": "PASS",
     "qrSettingsAccessibleFieldsE2E": "PASS",
     "qrUnsavedBankDetailsActivationGuardE2E": "PASS",
-    "keyboardTabHomeEndE2E": "PASS",
-    "reducedMotionE2E": "PASS",
+    "productEditorTabArrowNavigation": "PASS",
+    "productEditorTabHomeEndNavigation": "PASS",
+    "reducedMotionBrowserE2E": "PASS",
     "configuredPreviewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
-    "playwrightStaticBaseline": "3 passed (25.9s)",
+    "playwrightStaticBaseline": "3 passed (25.5s)",
     "screenshotCount": 63,
     "loginShellPngCount": 16,
     "uiFixturePngCount": 47,
@@ -1587,11 +1593,11 @@
     "attemptedWrites": 0,
     "unexpectedApiPaths": 0,
     "artifact": {
-      "name": "admin-preview-evidence-191",
-      "id": 12360041542,
-      "sizeBytes": 11894748,
-      "expiresAt": "2026-11-04T16:11:34Z",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588/artifacts/12360041542"
+      "name": "admin-preview-evidence-192",
+      "id": 12360132558,
+      "sizeBytes": 11895011,
+      "expiresAt": "2026-11-04T16:18:03Z",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558"
     },
     "fixturePolicy": "Synthetic/read-only; does not establish authenticated real-backend workflows."
   },
@@ -2019,15 +2025,17 @@
     }
   ],
   "latestSourceTestRun": {
-    "testedCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
-    "validationRunId": 39632306385,
+    "testedCommitSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "validationRunId": 39633278598,
     "validationConclusion": "success",
-    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385",
-    "previewRunId": 39632306588,
+    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598",
+    "previewRunId": 39633278359,
     "previewRunConclusion": "success",
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359",
+    "orderPaymentReadinessE2E": "PASS",
+    "backupRestoreControlsE2E": "PASS",
     "qrUnsavedBankDetailsGuardE2E": "PASS",
-    "checkedAt": "2026-10-21T16:11:39Z"
+    "checkedAt": "2026-10-21T16:18:07Z"
   },
   "latestCurrentPreviewDiagnostic": {
     "runId": 39602040135,
@@ -2110,17 +2118,17 @@
   },
   "currentAdminBranchHeadIsBeforeJsonRefresh": true,
   "latestHandoffWriteCheckpoint": {
-    "checkedAt": "2026-10-21T16:11:39Z",
-    "preWriteHead": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
-    "testedSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
-    "validationRunId": 39632306385,
-    "previewRunId": 39632306588,
-    "artifactId": 12360041542,
+    "checkedAt": "2026-10-21T16:18:07Z",
+    "preWriteHead": "f9a06232377c75352aceea17a27bce88ec05556f",
+    "testedSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "validationRunId": 39633278598,
+    "previewRunId": 39633278359,
+    "artifactId": 12360132558,
     "ownerActionNeededNow": false,
     "progressPercent": 48
   },
   "latestObservedAdminHead": "67ea380cd87dde5c31e478da862cad3b2387a66c",
-  "latestObservedAdminHeadVerifiedAt": "2026-10-21T16:11:39Z",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T16:18:07Z",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
     "url": "https://564cd391.sindarealest2.pages.dev/admin/",
@@ -2206,19 +2214,19 @@
     "note": "Exact SHA passed keyboard tab navigation regression and full Preview browser diagnostic; later docs-only commits advance branch HEAD."
   },
   "latestRun": {
-    "runId": 39632306588,
+    "runId": 39633278359,
     "conclusion": "success",
-    "testedCommitSha": "0b9e8a2f6a734ef328726c9c80e8e0e56328ce55",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588",
-    "validationRunId": 39632306385,
+    "testedCommitSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359",
+    "validationRunId": 39633278598,
     "validationConclusion": "success",
-    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385",
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598",
     "artifact": {
-      "name": "admin-preview-evidence-191",
-      "id": 12360041542,
-      "sizeBytes": 11894748,
-      "expiresAt": "2026-11-04T16:11:34Z",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588/artifacts/12360041542"
+      "name": "admin-preview-evidence-192",
+      "id": 12360132558,
+      "sizeBytes": 11895011,
+      "expiresAt": "2026-11-04T16:18:03Z",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558"
     },
     "checks": {
       "npmRunCheck": "PASS",
@@ -2229,6 +2237,8 @@
       "reducedMotionBrowserE2E": "PASS",
       "qrSettingsAccessibleFields": "PASS",
       "qrUnsavedBankDetailsGuardE2E": "PASS",
+      "orderPaymentReadinessE2E": "PASS",
+      "backupRestoreControlsE2E": "PASS",
       "configuredPreviewDiagnostic": "PASS",
       "galleryVisualParity": "PARTIAL_ONLY"
     },
@@ -2644,9 +2654,9 @@
     ],
     "lastValidatedWithCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e"
   },
-  "currentBranchHeadBeforeHandoffUpdate": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "currentBranchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "currentAdminBranchHeadIsBeforeHandoffUpdate": true,
-  "latestObservedAdminHeadSha": "62b4198fef1b6bafcafb4b30ab6f16bf44f6866f",
+  "latestObservedAdminHeadSha": "f9a06232377c75352aceea17a27bce88ec05556f",
   "latestKeyboardTabNavigationAudit": {
     "implementedInCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
     "changedPath": "tests/e2e/admin-static-baseline.spec.js",
@@ -2698,5 +2708,45 @@
       "artifactId": 12360041542
     },
     "scope": "Read-only fixture; non-GET API requests are blocked and no backend/D1/R2 is written."
+  },
+  "latestOrderPaymentReadinessAudit20261021": {
+    "implementedInCommit": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "changedPath": "tests/e2e/admin-static-baseline.spec.js",
+    "fixtureOrderId": "UI-ONLY-ORDER",
+    "conditions": [
+      "price_confirmation_required=true",
+      "payment_terms_confirmed_at unset",
+      "payment status unpaid"
+    ],
+    "assertions": [
+      "row shows waiting-for-price-confirmation status",
+      "create-payment-request is disabled",
+      "record-payment is disabled",
+      "unpaid display remains visible"
+    ],
+    "validation": {
+      "sourceRunId": 39633278598,
+      "previewRunId": 39633278359,
+      "conclusion": "PASS",
+      "testedSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff"
+    },
+    "scope": "Synthetic read-only fixture, no live order or payment operation."
+  },
+  "latestBackupRestoreControlsAudit20261021": {
+    "implementedInCommit": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "changedPath": "tests/e2e/admin-static-baseline.spec.js",
+    "assertions": [
+      "backup JSON export button exists",
+      "restore file input accepts application/json and .json",
+      "confirmation disclosure is present"
+    ],
+    "actionsTriggered": [],
+    "validation": {
+      "sourceRunId": 39633278598,
+      "previewRunId": 39633278359,
+      "conclusion": "PASS",
+      "testedSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff"
+    },
+    "scope": "UI-only checks; backup/export/restore were not invoked and no data was read or mutated."
   }
 }
