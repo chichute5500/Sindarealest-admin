@@ -601,6 +601,25 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         images.every(image => image.complete && image.naturalWidth > 0)
       ), { timeout: 5000 }).toBe(true);
       await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(6);
+      if (variant.theme === 'dark') {
+        const chromeColors = await page.evaluate(() => {
+          const header = document.querySelector('.editorhead');
+          const footer = document.querySelector('.editorfooter');
+          if (!header || !footer) throw new Error('Editor header/footer should exist for dark-theme contrast audit');
+          const headerStyle = getComputedStyle(header);
+          const footerStyle = getComputedStyle(footer);
+          return {
+            headerBg: headerStyle.backgroundColor,
+            footerBg: footerStyle.backgroundColor,
+            headerColor: headerStyle.color,
+            footerColor: footerStyle.color
+          };
+        });
+        expect(chromeColors.headerBg, 'Dark editor header should use the navy glass surface').toContain('17, 34, 49');
+        expect(chromeColors.footerBg, 'Dark editor footer should use the navy glass surface').toContain('17, 34, 49');
+        expect(chromeColors.headerColor, 'Dark editor header text should use the light theme token').toBe('rgb(234, 243, 251)');
+        expect(chromeColors.footerColor, 'Dark editor footer text should use the light theme token').toBe('rgb(234, 243, 251)');
+      }
       await page.locator('#imageGrid').scrollIntoViewIfNeeded();
       await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 2 });
       await page.locator('#editorClose').click();

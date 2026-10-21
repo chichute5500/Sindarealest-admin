@@ -74,6 +74,17 @@ assert.doesNotMatch(previewSpec, /normalizeSelector\(rule\.selectorText\)\s*===\
   'Preview diagnostics must not compare a grouped selector list as one selector');
 
 const baselineSpec = readFileSync(new URL('./e2e/admin-static-baseline.spec.js', import.meta.url), 'utf8');
+assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
+  'Editor header must follow the active theme surface/text tokens');
+assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
+  'Editor footer must follow the active theme surface/text tokens');
+assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Đóng cửa sổ chỉnh sửa"[^>]*><svg[^>]*aria-hidden="true"/,
+  'Editor close control should use an accessible SVG icon');
+assert.match(adminHtml, /:root\[data-admin-theme="dark"\] \.btn\.danger\{[^}]*background:rgba\(165,67,67,\.18\)/,
+  'Destructive controls should maintain readable dark-theme contrast');
+assert.match(baselineSpec, /chromeColors\.headerBg, 'Dark editor header should use the navy glass surface'\)\.toContain\('17, 34, 49'\)/,
+  'The screenshot matrix should assert dark editor header contrast');
+
 assert.match(adminHtml, /function galleryImageSrc\(value\)\s*\{/,
   'Gallery thumbnail URLs should be normalized by the dedicated helper');
 assert.match(adminHtml, /esc\(galleryImageSrc\(g\.url\)\)/,
