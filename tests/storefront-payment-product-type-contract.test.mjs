@@ -13,6 +13,11 @@ for(const id of ['fulfillmentFilters','detailFulfillment','paymentInstructions']
 assert.ok(html.includes("data-fulfillment-type=\"'+type+'\""), 'Filter uses the explicit fulfillment enum.');
 assert.match(html,/selectedFulfillment==='all'\|\|productFulfillmentType\(p\)===selectedFulfillment/);
 assert.match(html,/result\?\.status==='confirmed'/);
+assert.match(html,/result\?\.paymentReady===true/,'QR display must require an explicit server paymentReady flag.');
+assert.match(html,/fetch\(url,\{method:'GET',cache:'no-store'/,'Payment status refresh must call the order-payment API without cache.');
+assert.match(html,/data\.paymentReady===true\?\{status:'ready'/,'Server payment fields must be mapped only when paymentReady is true.');
+assert.match(html,/data\.paymentTermsConfirmed!==true/,'Payment instructions must require server-confirmed terms.');
+assert.match(html,/data-order-payment-check/,'Saved local order history must allow checking payment updates without exposing a paid toggle.');
 assert.match(html,/payment\?\.qrIncludesAmount===false/);
 assert.match(html,/result\?\.priceConfirmationRequired===false/);
 assert.match(html,/Quét QR hoặc gửi biên lai không đồng nghĩa với đã thanh toán/);
@@ -44,6 +49,7 @@ const readyFor=(result)=>{
 };
 const validPayment={
   status:'confirmed',
+  paymentReady:true,
   priceConfirmationRequired:false,
   paymentInstructions:{
     status:'ready',qrImageUrl:'/public/bank-qr.webp',qrIncludesAmount:false,
@@ -53,6 +59,7 @@ const validPayment={
 };
 assert.equal(readyFor(validPayment),true,'A complete server-confirmed payment instruction may render.');
 assert.equal(readyFor({...validPayment,status:'pending_confirmation'}),false,'A pending order must never render QR.');
+assert.equal(readyFor({...validPayment,paymentReady:false}),false,'A server response without paymentReady must never render QR.');
 assert.equal(readyFor({...validPayment,priceConfirmationRequired:true}),false,'Unconfirmed pricing must fail closed.');
 assert.equal(readyFor({...validPayment,paymentInstructions:{...validPayment.paymentInstructions,qrIncludesAmount:true}}),false,'QR containing an amount must be rejected.');
 assert.equal(readyFor({...validPayment,paymentInstructions:{...validPayment.paymentInstructions,qrImageUrl:'http://untrusted.example/qr.webp'}}),false,'An untrusted external HTTP QR must be rejected.');
