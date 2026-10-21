@@ -100,11 +100,11 @@ const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
 const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
-const heroSync = html.match(/function syncHeroProductImage\\(\\)\\{([\\s\\S]*?)\\}\\s*function renderFeatured/)?.[1] || '';
+const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
 assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-supplied'")
   && heroSync.includes("target.dataset.sourceProductImage='true'"),
   'The hero-specific image state must remain explicit and separate from catalog product identity.');
-assert.doesNotMatch(heroSync, /products\\.find|wantedSku|catalogGrid|featuredGrid/,
+assert.doesNotMatch(heroSync, /products\.find|wantedSku|catalogGrid|featuredGrid/,
   'The hero-specific image must not select or substitute a catalog product through SKU discovery.');
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
