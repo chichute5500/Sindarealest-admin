@@ -33,3 +33,11 @@
 
 ## Nhật ký cập nhật
 - Khởi tạo bộ bàn giao tài liệu. Chưa khẳng định source code, giao diện hoặc kiểm thử đã được sửa/chạy.
+
+
+## Bổ sung bàn giao — icon website tĩnh Liquid Glass (2026-10-22)
+- Danh mục và quy chuẩn: `docs/icon-system-inventory.md` (đã commit trên nhánh fix; commit tạo tài liệu `0d6119e1adbc815771a7eede3b22a40fb1ff8b5f`).
+- Quy chuẩn người dùng chốt: Liquid Glass kính trong + viền sáng + khúc xạ nhẹ; nét mảnh; trạng thái nhấn lún kính và đổi màu; không ripple.
+- Phạm vi bảo vệ: chỉ làm trên `fix/liquid-glass-audit-2026-10-19`; không merge main, không deploy Production, không thay backend/API/schema/bindings/secret/dữ liệu.
+- Tình trạng đã xác minh: tài liệu kiểm kê được tạo và đọc lại từ GitHub. Đây chỉ là kiểm kê ban đầu; chưa sửa icon giao diện, chưa có kiểm thử runtime/ảnh so sánh. Các mục đó vẫn NOT TESTED.
+- Việc kế tiếp: đọc `docs/icon-system-inventory.md`, xác minh lại branch HEAD/source SHA, kiểm kê các icon sinh động khi chạy, triển khai từng nhóm và cập nhật kết quả/ảnh theo SHA thực tế.
