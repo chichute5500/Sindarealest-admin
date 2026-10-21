@@ -173,3 +173,23 @@ Current `POST /api/orders` returns `pending_confirmation`; no public order-statu
 At recorded HEAD, source validation run 39559590352, Preview deploy 39559590384, and Admin Preview Playwright 39559590377 passed. Visual workflow 39559590354 was still running; inspect its final result and artifact before visual acceptance. Last completed live audit has one blocker: SKU `SD-GL052` is absent from verified public product data. Do not fabricate or substitute it; the audit was read-only and did not submit an order or verify payment.
 
 Next: inspect run 39559590354 and its screenshots; verify runtime fail-closed QR tests and latest mobile product-card height; continue real visual fixes and re-run source tests, Preview deploy and live audit. Keep PR #108 open; no merge, Production deploy, Production migration, secret/binding/DNS change, Admin change or catalog edits.
+
+
+## 2026-10-21 — Handoff checkpoint after QR/payment storefront implementation (source SHA 12f9276e7522ad69ae22ad90dda0c36d65700e3b)
+
+- Current source checkpoint: `12f9276e7522ad69ae22ad90dda0c36d65700e3b` (`feat(storefront): refresh confirmed order payment instructions`). Branch: `fix/liquid-glass-audit-2026-10-19`. Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . PR #108 remains open; do not merge.
+- Verified workflows for this source SHA: source validation `39560408934` PASS; Cloudflare Pages Preview deployment `39560409116` PASS; read-only Admin Preview Playwright smoke `39560408958` PASS. The isolated Liquid Glass visual workflow `39560408894` was still pending at the time of this checkpoint. Recheck it and capture artifacts before claiming visual acceptance.
+- Storefront implementation: public UI now has explicit fulfillment filters/labels and a fail-closed payment-instructions renderer. QR only renders when the response is confirmed and includes `paymentReady: true`, `priceConfirmationRequired: false`, ready payment instructions, a safe QR URL, `qrIncludesAmount: false`, positive safe-integer amount and non-empty bank/account/transfer fields. Pending or incomplete responses show “Chờ cửa hàng xác nhận” / “Vui lòng chưa chuyển tiền”; QR display/scan/receipt/customer claim is not payment verification. Browser never sets payment status.
+- Test coverage: `tests/storefront-payment-product-type-contract.test.mjs` exercises explicit fulfillment enums, unknown-as-unclassified, trusted QR URL validation, readiness gates, pending order rejection, missing fields, unsafe amounts, and no browser payment-status writes. Source validation passed on this SHA.
+- Integration limitation: this storefront branch consumes server-provided payment instructions; it must not invent QR/account details or treat documentation as proof that the Admin/backend endpoint is live. Confirm the shared API contract and actual Preview response with the Admin owner before claiming end-to-end QR integration. Do not change Admin files/schema/migrations in this branch.
+- Existing live audit remains a historical result from SHA `0153bbfdc4ad66850ac9a9ab0ca3950811330f84`, not proof for this source SHA: it captured 84 screenshots, 8 viewport/theme pairs, 0 overflow/console/page/http/failed-request/broken-image/read-only violations, but failed because verified public product payload did not contain `SD-GL052`. Keep this SKU fail-closed; do not fabricate or substitute it. Re-run live screenshot audit against the current deployed SHA after the visual workflow finishes.
+- Scope guardrails: do not touch Admin UI/backend-owned code, product catalog/data, D1/R2, secrets/bindings/DNS, or Production; no migrations on Production. Keep screenshots only in the two existing start/end folders and update this manifest with actual run/artifact evidence.
+
+
+## Next-chat startup instructions — current checkpoint
+
+1. Re-read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`, then this file, `docs/handoff/HANDOFF.md`, and `docs/handoff/TEST-RESULTS.md`.
+2. Fetch branch HEAD and recheck workflow `39560408894` plus its artifact. Re-verify the deployment SHA before using Preview screenshots.
+3. Re-run the live audit on the current Preview SHA; the old missing-SKU result is historical but still unresolved until public payload evidence changes. Do not invent `SD-GL052`.
+4. Confirm the real Admin/backend API fields with the other branch owner; no QR should display until the actual response meets the readiness gate. Do not create mock API success, submit a live order, or mark a payment paid.
+5. Continue storefront-only visual fixes and tests; do not merge, deploy Production, run Production migrations, or edit Admin/backend code.

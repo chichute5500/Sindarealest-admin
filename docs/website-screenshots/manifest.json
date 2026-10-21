@@ -3451,5 +3451,65 @@
       "verifiedAtUtc": "2026-10-21T06:55:04.894Z"
     },
     "note": "Real Preview capture only. Audit is not a full pass because SD-GL052 is absent from verified public product data. Do not invent or substitute the SKU. This artifact does not submit a real order. Current branch head advanced afterward with documentation-only commit c9b52c6a37e91416aab35c3def40d85abe0e6d33; its deployment and workflows must be rechecked separately."
+  },
+  "latestStorefrontHandoffCheckpoint": {
+    "timestampLocal": "2026-10-21",
+    "branch": "fix/liquid-glass-audit-2026-10-19",
+    "sourceCommit": "12f9276e7522ad69ae22ad90dda0c36d65700e3b",
+    "sourceCommitMessage": "feat(storefront): refresh confirmed order payment instructions",
+    "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
+    "workflows": [
+      {
+        "id": 39560408934,
+        "name": "Validate source and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39560408934"
+      },
+      {
+        "id": 39560409116,
+        "name": "Deploy storefront fix branch to Cloudflare Pages Preview",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39560409116"
+      },
+      {
+        "id": 39560408958,
+        "name": "Admin Preview Playwright (read-only smoke checks)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39560408958"
+      },
+      {
+        "id": 39560408894,
+        "name": "Liquid Glass isolated visual preview",
+        "status": "pending",
+        "conclusion": null,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39560408894"
+      }
+    ],
+    "storefrontQRAndFulfillment": {
+      "uiImplemented": true,
+      "contractTestsPass": true,
+      "qrReadinessRequiresServerConfirmedPayload": true,
+      "browserCanMarkPaymentVerified": false,
+      "endToEndAdminApiIntegrationVerified": false,
+      "note": "No fabricated QR/account data. Do not claim full integration until the real Admin/backend API response is verified on Preview."
+    },
+    "lastCompletedLiveAudit": {
+      "sourceCommit": "0153bbfdc4ad66850ac9a9ab0ca3950811330f84",
+      "passed": false,
+      "hardFailures": [
+        "SD-GL052 is not present in the public verified product payload at mobile-390-light."
+      ],
+      "note": "Historical audit only; rerun against the current deployed SHA. Do not invent or substitute SD-GL052."
+    },
+    "restrictions": [
+      "No merge",
+      "No Production deploy",
+      "No Production migration",
+      "No Admin/backend edits in storefront branch",
+      "No D1/R2/secrets/bindings/DNS/catalog edits"
+    ]
   }
 }
