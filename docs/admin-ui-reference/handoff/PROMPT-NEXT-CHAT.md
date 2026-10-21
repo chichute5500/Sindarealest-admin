@@ -1,16 +1,18 @@
-## PROMPT TIẾP TỤC — 2026-10-22T04:01:16.012+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T04:17:49+07:00
 
-Tiếp tục công việc thực tế. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. HEAD trước handoff update `1e86985ef9fa0236c12bc43a6d3fde504ff4f504`; exact source/test SHA vừa xác minh `08f2525daf8eedae5d898339e8e2655dc07ca72d`.
+Tiếp tục công việc thực tế, không chỉ báo cáo. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA vừa PASS `94c9fb6ebf7d413c367d7ee163616d7d5b161bad`; branch HEAD khi bắt đầu cập nhật handoff `e93a929b92ff4562174fb75f0daae9421b1e580a`.
 
-**Kết quả:** Validate Source [#39675095354](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095354) SUCCESS; Admin Preview/Playwright [#39675095248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248) SUCCESS trên cùng SHA. Artifact [admin-preview-evidence-260](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248/artifacts/12381785861) có 64 PNG/40 metrics; metadata hoàn tất, không có browser/console/network/HTTP errors, fixture writes hay unexpected API paths. Preview CSS signature không phải backend QA.
+**Exact-SHA CI:** Validate Source [#39677162462](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162462) SUCCESS; Admin Preview/Playwright [#39677162289](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162289) SUCCESS. Artifact [admin-preview-evidence-263](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162289/artifacts/12382787223) ID `12382787223`: 65 PNG tổng, 48 fixture screenshots, 40 metrics; metadata completed=true; zero page/console/network/HTTP errors, attempted writes or unexpected API paths.
 
-**Đã làm:** warranty filter tabs được co gọn để ở một hàng trên 390px; E2E kiểm tra alignment và label fit. Screenshot warranties 390×844 light/dark đã mở và xác nhận 3 nút nằm cùng hàng. Existing fixture search/no-result/status/disclosure tests pass. Customer initials/search fixture và category filter tests ở các vòng trước vẫn được giữ; không fake ảnh, không dùng dữ liệu thật.
+**Đã hoàn tất ở Settings/Backup-Restore (#12):** nút backup/restore toàn chiều rộng, text wrap an toàn và note cảnh báo dễ đọc; E2E kiểm tra viewport bounds, không cắt chữ, note không tràn và file input ẩn. Screenshot helper được sửa để capture đúng panel thay vì reset về đầu Settings; đã xem ảnh 390×844 light, và artifact có ảnh dark + 1280×800. Không thực hiện export/restore thật, không mutation. Một lỗi assertion test dùng biến ngoài scope đã được sửa; lần chạy sau pass.
 
-**Trạng thái:** warranty screen PARTIAL, customer screen PARTIAL, category controls PARTIAL; 12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED; progress 50%. PR #111/#108 OPEN/UNMERGED.
+**Trạng thái:** backup/settings PARTIAL fixture-only; customer/warranty/category/product/order screens vẫn PARTIAL theo checkpoint trước; 12-screen parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED; tiến độ 50%. PR #111/#108 OPEN/UNMERGED.
 
-**Việc tiếp theo:** rà soát Settings/Backup-Restore screen: so sánh ảnh fixture với reference đã có trong artifact; tìm khác biệt giao diện hoặc accessibility có thể sửa an toàn, không kích hoạt QR thật, không export/restore dữ liệu thật, không thực hiện backend write. Sau đó exact-SHA Validate + Preview/Playwright, xem artifact và cập nhật/đọc lại đủ 7 tệp bàn giao.
+**Việc tiếp theo:** tiếp tục rà soát screen #11 AI image review/grouping trong fixture-only mode. Xác minh controls, trạng thái tải/preview/error/empty và responsive clipping từ source/test hiện có; không gọi provider thật hoặc dùng quota, không tạo kết quả AI giả thành thành công. Nếu có gap có thể xác minh bằng fixture, sửa và thêm E2E. Sau đó exact-SHA Validate + Preview, inspect artifact/screenshot, cập nhật và đọc lại đủ 7 handoff files.
 
-Trước sửa đổi fetch HEAD mới và dùng expected SHA/CAS. Chỉ nhánh ADMIN; không merge PR, không sửa `main`/static, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+Trước mỗi commit fetch HEAD và dùng expected SHA/CAS. Chỉ nhánh ADMIN; không merge PR, không sửa `main`/static, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 

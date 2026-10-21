@@ -1,13 +1,15 @@
 # Admin 12-screen reference audit matrix
 
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:01:16.012+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:17:49+07:00
 
-- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước cập nhật handoff `1e86985ef9fa0236c12bc43a6d3fde504ff4f504`; exact source/test SHA `08f2525daf8eedae5d898339e8e2655dc07ca72d`.
-- Validate Source [#39675095354](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095354) **SUCCESS** và Admin Preview/Playwright [#39675095248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248) **SUCCESS**, cùng exact SHA.
-- Artifact [`admin-preview-evidence-260`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248/artifacts/12381785861), ID `12381785861`: 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata được đọc từ ZIP: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview `PASS_LOGIN_CSS_SIGNATURE` không chứng minh authenticated backend QA.
-- Warranty/after-sales: giảm padding/font/gap của các filter và giữ 3 nút `Tất cả / Đang xử lý / Đã kết thúc` trên cùng hàng ở 390px; E2E kiểm tra cùng dòng và không cắt chữ. Đã mở ảnh 390×844 light/dark; hiển thị đúng một hàng. E2E tìm kiếm/no-result, trạng thái filter và form phát hành vẫn dùng fixture, không lưu dữ liệu.
-- Customer screen vẫn PARTIAL: initials suy ra từ tên (không ảnh giả), tìm kiếm fixture pass; reference ảnh đại diện/tab phân nhóm chưa thể sao chép an toàn do thiếu ảnh và quy tắc nhóm xác nhận. Category controls #6 PARTIAL existing controls only.
-- Tổng tiến độ giữ **50%**; 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111/#108 OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+- Repo `chichute5500/Sindarealest-admin`; chỉ nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `94c9fb6ebf7d413c367d7ee163616d7d5b161bad`; branch HEAD tại lúc ghi handoff `e93a929b92ff4562174fb75f0daae9421b1e580a` (evidence-only descendant của tested SHA).
+- Validate Source [#39677162462](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162462) **SUCCESS** và Admin Preview/Playwright [#39677162289](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162289) **SUCCESS**, cùng exact SHA `94c9fb6ebf7d413c367d7ee163616d7d5b161bad`.
+- Artifact [`admin-preview-evidence-263`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162289/artifacts/12382787223), ID `12382787223`, 12,486,231 bytes: 65 PNG tổng cộng, gồm 16 login shell + 48 fixture module screenshots và 40 fixture metrics (còn 1 PNG hỗ trợ). ZIP metadata đã đọc trực tiếp: completed=true; 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Settings/Backup-Restore (#12): cải thiện panel “Sao lưu & khôi phục” bằng nút toàn chiều rộng có wrap, note cảnh báo dễ đọc và giới hạn tràn nội dung. E2E kiểm tra panel không vượt viewport, nút không cắt chữ, note không tràn và input file JSON vẫn ẩn sau label. Sửa helper screenshot để backup screenshots cuộn tới đúng panel thay vì bị reset về đầu Settings; ảnh 390×844 light/dark và 1280×800 được capture, ảnh mobile light đã xem trực tiếp. **Không nhấn Export/Restore**, không gọi API ghi, không động dữ liệu thật.
+- Trong lần chạy trước, một assertion mới lỗi do dùng biến `variant` ngoài scope; đã sửa thành `page.viewportSize()`. Sau đó source validation và preview fixture suite đều SUCCESS trên SHA nêu trên.
+- Tổng tiến độ giữ **50%** (không tăng chỉ vì CI xanh); 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111 và #108 vẫn OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 
@@ -68,7 +70,7 @@ Overall Admin progress: **50%** — weighted management estimate; unchanged afte
 | 9 | Customers / customer details | PARTIAL — fixture only | Exact-SHA Playwright on `e3e46b6`: search by name/phone/email/address, no-result/reset, derived initials avatar and `aria-hidden` checked. Artifact `admin-preview-evidence-259` inspected at 390×844 light/dark and 1280×800 light. Reference has photo avatars and customer-segmentation tabs; API has no avatar image and no confirmed rule for “Mới/Thân thiết”, so do not fake either. Reference parity and authenticated customer data remain NOT ACCEPTED/NOT TESTED. |
 | 10 | Warranty / after-sales | PARTIAL | Exact-SHA E2E on `08f2525`: read-only search/no-result, filter state, issue-form disclosure and field constraints. Artifact `admin-preview-evidence-260` reviewed at 390×844 light/dark; the three filter tabs now fit on one row without clipped labels. Reference product thumbnails are not fabricated because the source API lacks matching image data; full reference parity/authenticated QA NOT ACCEPTED. |
 | 11 | AI image review / grouping | NOT TESTED | Do not infer live model success from mocked tests; previous live AI test was blocked by provider daily quota. |
-| 12 | Backup / restore / settings / responsive navigation | PARTIAL | Artifact `admin-preview-evidence-192` from [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) includes backup/settings fixture captures and a test asserting JSON export, JSON restore input and confirmation disclosure. 63 PNGs / 39 metrics; no export/restore action invoked, no live data or approved-reference parity acceptance. |
+| 12 | Backup / restore / settings / responsive navigation | PARTIAL | Exact-SHA E2E on `94c9fb6`: mobile/desktop panel bounds, no clipped action text, safety-note overflow, JSON file input remains visually hidden; backup panel screenshots now actually scroll to the target panel. Artifact `admin-preview-evidence-263` includes 390×844 light/dark and 1280×800 captures; no export/restore actions or API writes. Reference parity and real-data workflow NOT ACCEPTED/NOT TESTED. |
 
 ## Cross-cutting checks
 

@@ -1,11 +1,13 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:01:16.012+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:17:49+07:00
 
-- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước cập nhật handoff `1e86985ef9fa0236c12bc43a6d3fde504ff4f504`; exact source/test SHA `08f2525daf8eedae5d898339e8e2655dc07ca72d`.
-- Validate Source [#39675095354](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095354) **SUCCESS** và Admin Preview/Playwright [#39675095248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248) **SUCCESS**, cùng exact SHA.
-- Artifact [`admin-preview-evidence-260`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248/artifacts/12381785861), ID `12381785861`: 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata được đọc từ ZIP: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview `PASS_LOGIN_CSS_SIGNATURE` không chứng minh authenticated backend QA.
-- Warranty/after-sales: giảm padding/font/gap của các filter và giữ 3 nút `Tất cả / Đang xử lý / Đã kết thúc` trên cùng hàng ở 390px; E2E kiểm tra cùng dòng và không cắt chữ. Đã mở ảnh 390×844 light/dark; hiển thị đúng một hàng. E2E tìm kiếm/no-result, trạng thái filter và form phát hành vẫn dùng fixture, không lưu dữ liệu.
-- Customer screen vẫn PARTIAL: initials suy ra từ tên (không ảnh giả), tìm kiếm fixture pass; reference ảnh đại diện/tab phân nhóm chưa thể sao chép an toàn do thiếu ảnh và quy tắc nhóm xác nhận. Category controls #6 PARTIAL existing controls only.
-- Tổng tiến độ giữ **50%**; 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111/#108 OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+- Repo `chichute5500/Sindarealest-admin`; chỉ nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `94c9fb6ebf7d413c367d7ee163616d7d5b161bad`; branch HEAD tại lúc ghi handoff `e93a929b92ff4562174fb75f0daae9421b1e580a` (evidence-only descendant của tested SHA).
+- Validate Source [#39677162462](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162462) **SUCCESS** và Admin Preview/Playwright [#39677162289](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162289) **SUCCESS**, cùng exact SHA `94c9fb6ebf7d413c367d7ee163616d7d5b161bad`.
+- Artifact [`admin-preview-evidence-263`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39677162289/artifacts/12382787223), ID `12382787223`, 12,486,231 bytes: 65 PNG tổng cộng, gồm 16 login shell + 48 fixture module screenshots và 40 fixture metrics (còn 1 PNG hỗ trợ). ZIP metadata đã đọc trực tiếp: completed=true; 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Settings/Backup-Restore (#12): cải thiện panel “Sao lưu & khôi phục” bằng nút toàn chiều rộng có wrap, note cảnh báo dễ đọc và giới hạn tràn nội dung. E2E kiểm tra panel không vượt viewport, nút không cắt chữ, note không tràn và input file JSON vẫn ẩn sau label. Sửa helper screenshot để backup screenshots cuộn tới đúng panel thay vì bị reset về đầu Settings; ảnh 390×844 light/dark và 1280×800 được capture, ảnh mobile light đã xem trực tiếp. **Không nhấn Export/Restore**, không gọi API ghi, không động dữ liệu thật.
+- Trong lần chạy trước, một assertion mới lỗi do dùng biến `variant` ngoài scope; đã sửa thành `page.viewportSize()`. Sau đó source validation và preview fixture suite đều SUCCESS trên SHA nêu trên.
+- Tổng tiến độ giữ **50%** (không tăng chỉ vì CI xanh); 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111 và #108 vẫn OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 
