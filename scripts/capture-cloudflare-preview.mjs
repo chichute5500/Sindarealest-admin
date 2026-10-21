@@ -831,7 +831,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
     const productId = document.querySelector('#detailAdd')?.dataset.add || '';
     const title = (document.querySelector('#detailTitle')?.textContent || '').trim();
-    const skuText = (document.querySelector('#detailSku')?.textContent || '').replace(/^Mã SKU:\\s*/i, '').trim();
+    const skuText = (document.querySelector('#detailSku')?.textContent || '').replace(/^Mã SKU:\s*/i, '').trim();
     const image = document.querySelector('#detailImageStage');
     const r = image?.getBoundingClientRect();
     return {
