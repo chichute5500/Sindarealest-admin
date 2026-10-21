@@ -23,44 +23,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: ebb20fa7f2359b19ae91a9c62b3006a16b8db148
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224
+- Tested commit: 0668dd5bd54d26634a3533013dbe3633e102cf5d
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39597206445
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-144 (not committed to Git).
+- Local source Playwright matrix: FAILURE; 24 real PNGs captured in artifact admin-preview-evidence-147 (not committed to Git).
 - Deployed Preview: failure.
-- Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
+- Source screenshot matrix: 24 real PNGs; login shell: 16; read-only fixture module screens: 8; fixture metrics: 6.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Latest source cycle — concurrent refund guard (2026-10-21)
-
-- **Functional source:** `functions/api/admin/payment-transactions.js`, commit `d3fa9b85be20d832cbf24678dd7f3c7d862c1e64`. The batch insert now rechecks the net received-minus-refunded ledger inside a conditional `INSERT … SELECT … WHERE`; order/payment-request status changes and the audit entry are gated on the ledger row existing. If a refund loses the balance recheck, it returns HTTP 409 rather than writing a ledger record.
-- **Regression test:** `tests/payment-ledger-route.test.mjs`, commits `bd1501034f47260472b593334ac807ba362a58ee` and `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`, covers a mocked concurrent-refund rejection and asserts the SQL guard/follow-on gates. This is source/unit-test evidence, not proof of remote D1 concurrency behavior.
-- **Exact source/test CI:** [run 39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224) ran on exact SHA `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`. `npm run check` PASS; `npm test` PASS, including `PASS payment ledger route behavior`; the local read-only Playwright matrix PASS. The workflow is overall FAILURE only at the deployed Preview signature test.
-- **Evidence artifact:** [admin-preview-evidence-144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224/artifacts/12342063095), artifact ID 12342063095, size 11,185,608 bytes, expires 2026-11-04 11:30:26 UTC. Includes 59 PNGs (16 login shell + 43 synthetic/read-only fixture module views), 36 fixture metrics, metadata and reference; no browser/console/network/HTTP errors or fixture writes. PNGs remain in Actions artifact, not per-run Git commits.
-- **Preview FAIL:** same run returns `PREVIEW_CSS_SIGNATURE_MISMATCH`: 226 inline stylesheet rules, `hasLoginHideRule=false`, topbar brand visible. No weakening the assertion; no secrets or Access bypass.
-- **Latest observed PR #111 before this handoff refresh:** HEAD `9e0434f769dedf2b20e1365aa96147336afc237c` (evidence/report-only commit after the tested source), OPEN/unmerged, 1,096 files (+37,660/−392). PR #108 remains OPEN/unmerged, no writes to the website branch. Both PRs stay open.
-- **Risk boundaries:** no live D1/R2, migration, setup script, customer/business data, secrets, Access or Production action was performed. The refund test uses the in-memory mock only; runtime database concurrency remains NOT VERIFIED.
-- **Progress stays 48%**. Preview identity, 12-screen parity, authenticated live-backend QA and full semantic/security review of PR #111 remain open. Product image save/upload and PRE/PRO migrations remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
-
-
-## Kiểm tra refs sau cập nhật handoff — 2026-10-21
-
-- HEAD ADMIN được GitHub xác nhận trước lần cập nhật JSON kế tiếp: `86508454e98fe5cb167113e06011ca1e0efe310c`; đây là commit tài liệu, không phải SHA đã test.
-- PR #111: OPEN/unmerged, base `main`, 1.096 files (+37.813/−392). Source/test SHA mới nhất được CI xác minh vẫn là `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`, run #39592097224.
-- PR #108: OPEN/unmerged, base `main`, HEAD hiện thấy `32032fbe2fecf176bcdf962313292898a7a415ed`, 250 files (+19.753/−380). Không sửa hoặc đồng bộ nhánh đó.
-- Toàn bộ bằng chứng test mới nhất nằm ở run #39592097224 và artifact #12342063095; Preview vẫn FAIL. Handoff metadata được cập nhật tách biệt, không coi commit docs mới là source/test PASS.
-
-
-## Checkpoint bàn giao bổ sung — 2026-10-21 (sau xác minh mới nhất)
-
-- **HEAD nhánh ADMIN/PR #111 đã được GitHub xác minh:** `719a537f52eccf66c9642661c2758f8861beabcf`. PR #111 vẫn **OPEN, chưa merge**, base `main`; 1.096 files changed (+37.835/−392). Đây là HEAD mới hơn các source/test SHA ghi trong bằng chứng CI cũ.
-- **Không đánh đồng HEAD với commit đã test:** bằng chứng source/unit/Playwright gần nhất trong handoff hiện có là run #39592097224 trên SHA `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`; các kết quả PASS đó không tự chứng minh HEAD hiện tại đã PASS. Preview diagnostic của run đó vẫn FAIL (`PREVIEW_CSS_SIGNATURE_MISMATCH`).
-- **Preview đã được người dùng xác minh trước đó; không yêu cầu họ lặp lại phần này:** deployment `https://564cd391.sindarealest2.pages.dev/admin/`, alias `https://feature-admin-isolated-hando.sindarealest2.pages.dev`, deployment ID `564cd391-87d3-4f98-8a68-c81e935a452b`, build commit `3ed2d86b8b97f04718c478979136f986b3d1b07b`, build thành công 2026-10-21 08:25 UTC. Đây là deployment commit cũ hơn HEAD hiện tại. Policy Access được báo cáo đã cho phép email người dùng, nhưng chưa có bằng chứng đăng nhập thực tế thành công; không đọc credentials, không bypass Access.
-- **Routing:** `public/_redirects` trên HEAD `719a537...` có `/admin /admin/ 301`, `/admin/ /admin/index.html 200`, `/* /index.html 200`. Báo cáo Cloudflare đã ghi nhận bỏ qua dòng 2 và 3 do phát hiện vòng lặp. Chưa được coi là đã sửa; cần xác định nguyên nhân từ quy tắc Pages và đường dẫn/build thực tế trước khi thay đổi, không tạo deployment Production.
-- **Vấn đề thiết kế cốt lõi:** người dùng phản ánh Admin vẫn giống giao diện cũ khoảng 80–85%, phần lớn chỉ đổi màu và một số chi tiết. Đích đến là tái thiết kế thực sự theo ảnh chuẩn 12 màn hình `docs/admin-ui-reference/admin-mobile-reference.png`, không chỉ chồng thêm CSS. Có thể tái cấu trúc DOM/layout/components Admin khi cần, nhưng phải bảo toàn API, auth, dữ liệu và nghiệp vụ.
-- **Tiến độ giữ ở 48%** (ước lượng công việc, không phải tỷ lệ test). Không tăng % chỉ vì cập nhật tài liệu. Chưa nghiệm thu parity 12 màn hình, Preview route/target, đăng nhập và workflow backend thật, hoặc full semantic/security audit PR #111.
-- **Không cần người dùng thao tác thêm ở thời điểm bàn giao.** Họ đã cung cấp kết quả xác minh Preview trước đó; đừng hỏi lại câu hỏi đó. Tiếp tục các bước có thể làm an toàn và ghi BLOCKED/NOT TESTED cho phần thiếu bằng chứng.
-- **Giới hạn bắt buộc:** chỉ ghi/commit trên `feature/admin-isolated-handoff-2026-10-20`; không sửa `main` hoặc `fix/liquid-glass-audit-2026-10-19`; không merge PR #111/#108, không deploy Production, không sửa secrets/Access, không chạy migrations/setup hoặc ghi/xóa D1/R2/dữ liệu thật. Lỗi lưu ảnh sản phẩm và migrations PRE/PRO vẫn `DEFERRED_BY_OWNER`; không mở lại.
