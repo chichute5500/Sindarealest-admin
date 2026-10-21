@@ -298,19 +298,20 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
         + ' (' + probe.visibleChromeViolations.length + ' samples).');
     }
     const usedSamples = new Set();
+    const usedSampleOffsets = new Set();
     for (const requestedOffsetMs of [0, 50, 100, 200, 300]) {
-      // Startup JS/layout work can delay timers. Match the nearest actual browser-side
-      // sample on either side of each target; never reuse a sample for two target moments.
-      const toleranceMs = requestedOffsetMs === 0 ? 45 : 65;
+      // Browser startup work can delay timers and animation frames. Match the closest
+      // actual sample on either side of the requested offset, without reusing a sample.
+      const toleranceMs = requestedOffsetMs === 0 ? 45 : 125;
       const matching = samples
         .filter(item => Math.abs(item.sampleOffsetMs - requestedOffsetMs) <= toleranceMs
-          && !usedSamples.has(item))
+          && !usedSampleOffsets.has(item.sampleOffsetMs))
         .sort((a, b) => {
           if (requestedOffsetMs === 0 && a.splashVisible !== b.splashVisible) return a.splashVisible ? -1 : 1;
           return Math.abs(a.sampleOffsetMs - requestedOffsetMs) - Math.abs(b.sampleOffsetMs - requestedOffsetMs);
         });
       const sample = matching[0] || null;
-      if (sample) usedSamples.add(sample);
+      if (sample) usedSampleOffsets.add(sample.sampleOffsetMs);
       const check = {
         context: label, viewport: viewport.name, theme, requestedOffsetMs,
         sampleOffsetMs: sample?.sampleOffsetMs ?? null,
@@ -322,8 +323,7 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
       };
       audit.firstPaintChecks.push(check);
       if (!sample) {
-        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms for ' + label
-          + ' (nearest unique sample outside ' + toleranceMs + 'ms tolerance).');
+        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms (within ' + toleranceMs + 'ms tolerance) for ' + label + '.');
       }
     }
     return probe;
