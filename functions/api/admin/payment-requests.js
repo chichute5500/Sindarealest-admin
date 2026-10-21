@@ -48,6 +48,9 @@ export async function onRequestPost(context) {
     const settings = await db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?)").bind("payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name").all();
     const cfg = Object.fromEntries((settings.results || []).map(row => [row.key, row.value]));
     if (cfg.payment_qr_active !== "1" || !validPublicQrImageKey(cfg.payment_qr_active_key) || !cfg.payment_qr_bank_name || !cfg.payment_qr_account_number || !cfg.payment_qr_account_name) return fail("Chưa kích hoạt cấu hình QR ngân hàng hợp lệ.", 409);
+    if (!context.env.IMAGES?.head) return fail("Dịch vụ ảnh QR chưa sẵn sàng; chưa thể tạo yêu cầu chuyển khoản.", 503);
+    const activeQrObject = await context.env.IMAGES.head(cfg.payment_qr_active_key);
+    if (!activeQrObject) return fail("Ảnh QR đang kích hoạt không còn truy cập được; chưa thể tạo yêu cầu chuyển khoản.", 409);
 
     const transactionRows = await db.prepare("SELECT direction,amount FROM order_payment_transactions WHERE order_id=?").bind(orderId).all();
     const transactions = transactionRows.results || [];
