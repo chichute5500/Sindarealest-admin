@@ -190,6 +190,7 @@ async function makePage(browser, viewport, theme, label) {
     return route.continue();
   });
   const page = await context.newPage();
+  page.__sdAuditLabel = label;
   page.setDefaultTimeout(12000);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
@@ -275,8 +276,7 @@ async function navigate(page, url) {
   if (!response) return { response: null, blocked: audit.accessBlocked, status: null, title: '', url: page.url(), bodyText: '' };
   if (isHomeFirstPaintContext) {
     try {
-      await captureFirstPaintFrames(page, (viewportSize.width === 360 ? 'mobile-360' : 'mobile-390')
-        + (labelSuffixForTheme(page) ? '-' + labelSuffixForTheme(page) : ''));
+      await captureFirstPaintFrames(page, page.__sdAuditLabel || (viewportSize.width === 360 ? 'mobile-360-light' : 'mobile-390-light'));
     } catch (error) {
       audit.hardFailures.push(sanitizeText('First-paint viewport capture failed: ' + String(error.message || error)));
     }
@@ -295,10 +295,6 @@ async function navigate(page, url) {
     audit.hardFailures.push('Access gate detected at ' + sanitizeUrl(info.url));
   }
   return { response, blocked, status: response.status(), ...info, url: sanitizeUrl(info.url) };
-}
-function labelSuffixForTheme(page) {
-  // Playwright emulates the requested color scheme for this isolated browser context.
-  return page.evaluate(() => document.documentElement.classList.contains('dark') ? 'dark' : 'light').catch(() => 'light');
 }
 async function settle(page) {
   await page.evaluate(async () => {
