@@ -125,7 +125,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const payload = await response.json();
   assert.equal(payload.amount, 30000, "made-to-order deposit is server-derived as 30% of the confirmed total");
   assert.equal(payload.shippingBenefit, "standard_shipping");
-  assert.equal(payload.freeShipping, false);
+  assert.equal(payload.freeShippingApplied, false);
   assert.match(payload.transferReference, /^SD[A-Z0-9]+$/);
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_requests")));
   assert.ok(db.batches[0].some(s => s.sql.includes("payment_request_created")));
@@ -174,7 +174,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 201);
   assert.equal(payload.amount, 100000, "in-stock deposit must be the fixed 100,000 VND");
   assert.equal(payload.shippingBenefit, "standard_shipping");
-  assert.equal(payload.freeShipping, false);
+  assert.equal(payload.freeShippingApplied, false);
 }
 {
   const db = makeDb();
@@ -193,7 +193,8 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 201);
   assert.equal(payload.amount, 100000);
   assert.equal(payload.shippingBenefit, "free_shipping");
-  assert.equal(payload.freeShipping, true, "full payment qualifies for freeship");
+  assert.equal(payload.freeShippingEligible, true, "full payment request is eligible for freeship");
+  assert.equal(payload.freeShippingApplied, false, "pending full payment is not yet an applied delivery benefit");
 }
 {
   const db = makeDb({ orderItems: [

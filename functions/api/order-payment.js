@@ -27,10 +27,10 @@ export async function onRequestGet({ request, env }) {
     }
     return json({
       ok:true, ...base, paymentReady:true, installmentType:requestRow.installment_type,
-      amount:Number(requestRow.amount), shippingBenefit:requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping'), freeShipping:(requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping')) === 'free_shipping', transferReference:requestRow.transfer_reference,
+      amount:Number(requestRow.amount), shippingBenefit:requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping'), freeShippingEligible:(requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping')) === 'free_shipping', freeShipping:Boolean(order.payment_status === "paid" && (requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping')) === 'free_shipping'), transferReference:requestRow.transfer_reference,
       qrImageUrl:"/payment-qr/"+requestRow.qr_image_key, bankName:requestRow.bank_name,
       accountNumber:requestRow.account_number, accountName:requestRow.account_name,
-      instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi nội dung chuyển khoản chính xác như bên dưới. Mở/quét QR không xác nhận đã thanh toán.",
+      instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi đúng nội dung chuyển khoản. Mở/quét QR không xác nhận đã thanh toán. Freeship chỉ được áp dụng sau khi Admin xác minh đã nhận đủ toàn bộ số tiền.",
       createdAt:requestRow.created_at
     },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
   } catch { return fail("Không đọc được hướng dẫn thanh toán.",503); }

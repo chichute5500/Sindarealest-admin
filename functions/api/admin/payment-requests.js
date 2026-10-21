@@ -74,7 +74,7 @@ export async function onRequestPost(context) {
       db.prepare("INSERT INTO order_payment_requests(id,order_id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by) VALUES(?,?,?,?,?,?,?,?,?,?, 'pending','admin')").bind(id,orderId,installmentType,amount,shippingBenefit,reference,cfg.payment_qr_active_key,cfg.payment_qr_bank_name,cfg.payment_qr_account_number,cfg.payment_qr_account_name),
       db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,'admin','payment_request_created','order',?,?)").bind(crypto.randomUUID(),orderId,JSON.stringify({requestId:id,installmentType,fulfillmentType,amount,shippingBenefit,reference}))
     ]);
-    return json({ok:true,id,installmentType,fulfillmentType,amount,shippingBenefit,freeShipping:shippingBenefit==="free_shipping",transferReference:reference,message:shippingBenefit==="free_shipping"?"Đã tạo yêu cầu thanh toán đủ; miễn phí giao hàng theo chính sách.":"Đã tạo yêu cầu thanh toán theo loại hàng và giá đã xác nhận."},201);
+    return json({ok:true,id,installmentType,fulfillmentType,amount,shippingBenefit,freeShippingEligible:shippingBenefit==="free_shipping",freeShippingApplied:false,transferReference:reference,message:shippingBenefit==="free_shipping"?"Đã tạo yêu cầu thanh toán đủ; miễn phí giao hàng theo chính sách.":"Đã tạo yêu cầu thanh toán theo loại hàng và giá đã xác nhận."},201);
   } catch(error) {
     if (/UNIQUE constraint|idx_order_payment_requests_one_pending/i.test(String(error?.message || ""))) return fail("Đơn đang có yêu cầu thanh toán chờ xử lý. Hãy hủy yêu cầu cũ trước.", 409);
     return fail("Không tạo được yêu cầu thanh toán.", 503);
