@@ -39,23 +39,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736
+- Tested commit: 9d2d453a77c5d93bdccb77907f232e5fb8653e74
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646221204
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-204 (not committed to Git).
+- Local source Playwright matrix: FAILURE; 24 real PNGs captured in artifact admin-preview-evidence-206 (not committed to Git).
 - Deployed Preview: success.
-- Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
+- Source screenshot matrix: 24 real PNGs; login shell: 16; read-only fixture module screens: 8; fixture metrics: 6.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Product publication-status filters — exact-SHA verification (2026-10-21 17:34 UTC)
-
-- Source/test SHA `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`; Validate Source [#39644786469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786469) **SUCCESS** and Admin Preview/Playwright [#39644786736](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736) **SUCCESS** on the exact same SHA.
-- Playwright browser suite: **3 passed (31.3s)**; configured Preview login/dashboard smoke: **2 passed (3.3s)**; Preview CSS signature **PASS_LOGIN_CSS_SIGNATURE** with the login-hide rule present in 537 inline CSS rules.
-- Artifact [admin-preview-evidence-204](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736/artifacts/12366373584), ID `12366373584`, 12,214,479 bytes, expires 2026-11-04. 63 PNGs (16 login-shell, 47 synthetic/read-only fixture module views), 39 fixture metrics, zero page/console/request/HTTP errors, zero attempted writes and zero unexpected API paths.
-- Added an accessible published-status filter group for `Tất cả`, `Đang hiển thị`, and `Đã ẩn`, with counts and `aria-pressed`. It filters only explicit `published===true/false` flags; it does **not** infer stock status from inventory. Clear-all reset includes this filter. E2E fixture verifies 3 total / 2 visible / 1 hidden and toggling between states.
-- Inspected current product list screenshots at 390×844 light and 1280×800 light. Status chips fit on both, with no horizontal overflow reported in corresponding fixture metrics. The screen remains **PARTIAL**, not accepted visual parity: card hierarchy/content is still not identical to reference; empty fixture price/stock remains intentionally undisclosed.
-- Overall project estimate stays **50%**. Full 12-screen parity NOT ACCEPTED; real business module transactions NOT TESTED; image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER / NOT VERIFIED.
-- Current branch HEAD observed before handoff refresh: `30c8cc7f87000813b5b50cc8162ca87a06dd1414` (documentation/evidence descendant of the tested source SHA). Re-fetch live refs before next change; this note does not claim the subsequent docs commit was a new source/test run.
