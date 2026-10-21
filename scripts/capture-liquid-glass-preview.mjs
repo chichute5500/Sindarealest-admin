@@ -459,21 +459,22 @@ try {
       mobileNav: (() => { const nav = document.querySelector('#mobileBottomNav'); return { present: !!nav, visible: !!nav && getComputedStyle(nav).display !== 'none', tabs: nav?.querySelectorAll('[data-mobile-tab]').length || 0 }; })(),
       title: document.title,
     }));
-    // This isolated fixture contains no verified SD-GL052 record. The correct
-    // behavior is to collapse the hero image frame, not to borrow a fixture image.
+    // The homepage hero uses a dedicated presentation asset and is independent
+    // of whether SD-GL052 exists in the public catalog payload.
     const heroImagePass = startup.heroImage.present
-      && startup.heroImage.hidden
-      && !startup.heroImage.source
-      && startup.heroImage.status === 'sku-unavailable';
+      && startup.heroImage.loaded
+      && !startup.heroImage.hidden
+      && startup.heroImage.source.includes('/images/hero-sd-gl052.png')
+      && startup.heroImage.status === 'hero-presentation-asset';
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
     audit.interactions.push({
       theme,
-      check: 'hero-fails-closed-with-unverified-fixture',
+      check: 'hero-presentation-asset-visible-with-unverified-fixture',
       pass: heroImagePass,
-      result: { ...startup.heroImage, expectedState: 'hidden-without-source-until-verified-SD-GL052' },
+      result: { ...startup.heroImage, expectedState: 'visible-loaded-presentation-asset-independent-of-catalog-SKU' },
     });
-    if (!heroImagePass) hardFailures.push('Hero must remain hidden and remove its source when SD-GL052 is unavailable in the unverified fixture: ' + theme);
+    if (!heroImagePass) hardFailures.push('Hero presentation asset must remain visible and loaded independently of SD-GL052 catalog availability: ' + theme);
     audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
     if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
