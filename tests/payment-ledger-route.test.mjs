@@ -4,6 +4,7 @@ import { createOrderAccessToken, hashOrderAccessToken } from "../functions/_paym
 import { onRequestPost as postVerifiedTransaction } from "../functions/api/admin/payment-transactions.js";
 import { onRequestPost as createPaymentRequest } from "../functions/api/admin/payment-requests.js";
 import { onRequestGet as getOrderPayment } from "../functions/api/order-payment.js";
+import { onRequestGet as getPaymentSettings } from "../functions/api/payment-settings.js";
 
 const ADMIN_PASSWORD = "payment-ledger-test-password-long";
 const SESSION_SECRET = "payment-ledger-test-session-secret-long-enough";
@@ -257,4 +258,31 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(payload.amount, null, "paid order must not request another transfer");
 }
 
+{
+  const settings = {
+    payment_qr_active: "1", payment_qr_active_key: QR_KEY,
+    payment_qr_bank_name: "Ngân hàng thử", payment_qr_account_number: "1234567890",
+    payment_qr_account_name: "NGUYEN VAN A", payment_qr_instructions: "Ghi đúng nội dung chuyển khoản"
+  };
+  const db = { prepare() { let key; return { bind(value) { key = value; return this; }, async first() { return Object.hasOwn(settings, key) ? { value: settings[key] } : null; } }; } };
+  const response = await getPaymentSettings({ env: { DB: db, IMAGES: { head: async key => ({ key }) } } });
+  const payload = await response.json();
+  assert.equal(payload.configured, true, "public payment settings only advertise a verified active configuration when its QR object exists");
+  assert.equal(payload.qrImageUrl, "/payment-qr/" + QR_KEY);
+}
+{
+  const settings = {
+    payment_qr_active: "1", payment_qr_active_key: QR_KEY,
+    payment_qr_bank_name: "Ngân hàng thử", payment_qr_account_number: "1234567890",
+    payment_qr_account_name: "NGUYEN VAN A", payment_qr_instructions: "Ghi đúng nội dung chuyển khoản"
+  };
+  const db = { prepare() { let key; return { bind(value) { key = value; return this; }, async first() { return Object.hasOwn(settings, key) ? { value: settings[key] } : null; } }; } };
+  const response = await getPaymentSettings({ env: { DB: db, IMAGES: { head: async () => null } } });
+  const payload = await response.json();
+  assert.equal(payload.configured, false, "missing QR storage asset must fail closed on the public config endpoint");
+  assert.equal(payload.qrImageUrl, "");
+  assert.equal(payload.bankName, "");
+  assert.equal(payload.accountNumber, "");
+  assert.equal(payload.accountName, "");
+}
 console.log("PASS payment ledger route behavior: owner-derived deposit amounts, client amount rejection, mixed/unclassified cart gates, freeship and verified ledger.");

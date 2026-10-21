@@ -8,7 +8,9 @@ export async function onRequestGet({ env }) {
       getSetting(env.DB,"payment_qr_bank_name",""), getSetting(env.DB,"payment_qr_account_number",""),
       getSetting(env.DB,"payment_qr_account_name",""), getSetting(env.DB,"payment_qr_instructions","")
     ]);
-    const configured = activeFlag === "1" && validPublicQrImageKey(key) && bankName && accountNumber && accountName;
+    const activeConfig = activeFlag === "1" && validPublicQrImageKey(key) && bankName && accountNumber && accountName;
+    const imageAvailable = Boolean(activeConfig && typeof env.IMAGES?.head === "function" && await env.IMAGES.head(key));
+    const configured = Boolean(activeConfig && imageAvailable);
     return json({
       configured:Boolean(configured), qrImageUrl:configured?"/payment-qr/"+key:"",
       bankName:configured?bankName:"", accountNumber:configured?accountNumber:"",
