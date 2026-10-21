@@ -643,3 +643,13 @@ Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run
 - Commit `78a16b6d9fca91d7b080834f293e1690dc7c10cd` increases the test tolerance to 2px. This is a plausible correction for fractional CSS-pixel rounding, but **no run on that commit was found**, so it is not validated. Do not claim the latest code is green.
 - Handoff evidence files now record this measured failure and the current limitation. Latest full validation PASS remains source SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; latest source/test adjustment remains NOT TESTED.
 - Next: find a permitted way to run validation against the current branch HEAD (not rerunning an old SHA and calling it current); if unavailable, continue read-only review and leave validation NOT TESTED. Then assess whether 2px tolerance is acceptable at 390x844 and desktop viewports, and resume 12-screen visual comparison and PR scope audit.
+
+
+### Validation result superseding the previous NOT TESTED note — 2026-10-21
+
+- Correction: the prior workflow lookup was incomplete because the commit-specific helper only returned PR-triggered runs. Direct GitHub Actions run-list evidence found and verified push-triggered workflows for source/test SHA `78a16b6d9fca91d7b080834f293e1690dc7c10cd`.
+- Validate Source [run #39621065756](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756): SUCCESS; dependency audit, project integrity and automated tests PASS.
+- Admin Preview diagnostic [run #39621065853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853): SUCCESS; repository checks, automated tests, local Playwright matrix and configured Preview diagnostic PASS. Artifact `admin-preview-evidence-169`, ID `12355051140`, 11,121,594 bytes.
+- Therefore the 2px test tolerance adjustment on SHA 78a16b6 **has been validated**. The earlier measured 1.140625px assertion failure is resolved at the test level. No application CSS was changed in that commit.
+- Do not confuse the later docs-only handoff commits with the source/test SHA. Query live PR HEAD and workflow runs before the next code change.
+- Progress remains **48%**. All 12 reference screen families have not been accepted; authenticated business QA is still blocked/not tested because Cloudflare Access prevented reaching the dashboard. No Access bypass, secret edits, production deployment, merge, or remote database operation.
