@@ -3,11 +3,11 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "b3c54d55a5e21ae6377d2a6392349f2402ee333f",
-  "testedCommitSha": "b3c54d55a5e21ae6377d2a6392349f2402ee333f",
-  "capturedAt": "2026-10-21T17:02:00Z",
-  "progressEstimatePercent": 49,
-  "progressBasis": "Recalculated weighted management estimate, not test-pass rate: project scope/guardrails 15% weight × 100% = 15; source integrity and automated tests 20% × 85% = 17; implemented Admin UI behaviors 20% × 47% = 9.4; reference-screen visual parity 20% × 25% = 5; authenticated business QA 15% × 0% = 0; semantic/security/release audit 10% × 30% = 3. Total 49.4%, rounded to 49%. Latest incremental work clarified all four customer search fields and added address-search E2E coverage; source/test workflow passed on exact SHA b3c54d55a5e21ae6377d2a6392349f2402ee333f. Preview screenshot-matrix workflow was still running at capture time; do not call it passed yet. All 12 screen families are not accepted; authenticated business QA remains not tested; product image-save and PRE/PRO migrations remain owner-deferred.",
+  "latestCodeCommitSha": "60e63acb67e1c62a0d6390cd8e80ce65b8bcd885",
+  "testedCommitSha": "60e63acb67e1c62a0d6390cd8e80ce65b8bcd885",
+  "capturedAt": "2026-10-21T17:06:30Z",
+  "progressEstimatePercent": 50,
+  "progressBasis": "Recalculated weighted management estimate, not test-pass rate. Scope/guardrails 15% weight × 100% = 15; source integrity and automated tests 20% × 86% = 17.2; Admin UI implementation and behavior coverage 20% × 47% = 9.4; 12-screen visual parity 20% × 25% = 5; authenticated business QA 15% × 0% = 0; semantic/security/release audit 10% × 30% = 3. Total 49.6%, rounded to 50%. This small increase reflects added synthetic Playwright assertions for warranty search status announcement and empty results; code validation and Preview matrix for this exact SHA are pending at capture time, so do not describe this change as passing until both workflows finish.",
   "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -2856,8 +2856,8 @@
     {
       "area": "Source integrity and automated tests",
       "weight": 20,
-      "completion": 85,
-      "weightedPoints": 17
+      "completion": 86,
+      "weightedPoints": 17.2
     },
     {
       "area": "Admin UI implementation and behavior coverage",
@@ -2898,6 +2898,13 @@
       "commitSha": "b3c54d55a5e21ae6377d2a6392349f2402ee333f",
       "verifiedOnGitHub": true,
       "executed": true
+    },
+    {
+      "path": "tests/e2e/admin-static-baseline.spec.js",
+      "purpose": "Adds assertions that warranty search updates the aria-live result summary and both warranty/claim tables show honest empty states when no fixture matches.",
+      "commitSha": "60e63acb67e1c62a0d6390cd8e80ce65b8bcd885",
+      "verifiedOnGitHub": true,
+      "executed": false
     }
   ]
 }
