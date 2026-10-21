@@ -105,3 +105,29 @@ Tên trường API/DB đề xuất thống nhất: `fulfillment_type`. Trước 
 ## 7. Lưu ý khi tiếp tục
 
 Tài liệu này phê duyệt **phạm vi chức năng và nguyên tắc tích hợp**, không tự động phê duyệt thay đổi Production, migration dữ liệu thật, cấu hình/tài khoản ngân hàng, giao dịch tiền thật hoặc merge PR. Hãy kiểm tra lại branch HEAD/API/migrations ngay trước khi sửa và cập nhật tài liệu bàn giao bằng bằng chứng mới nhất.
+
+
+## Addendum — user-provided fixed bank receiving QR image
+
+The project owner already has an image of the bank-account receiving QR. Treat it as an asset that the owner will upload through the Admin UI when the feature is ready; do not require the owner to commit the image into source code or upload it into this chat as a prerequisite.
+
+### Admin upload/configuration
+- Add an authenticated Admin screen/section such as **Cài đặt thanh toán → QR chuyển khoản** with image upload/replace, preview, active/inactive control, and explicit save/publish action.
+- Collect only the public receiving details needed by customers (for example bank display name, account holder, account number, transfer instructions/reference policy) and validate them before activation. Never expose API secrets, storage credentials, or private operational configuration to the storefront.
+- Inspect the existing storage bindings/routes first and reuse the appropriate configured image storage. Do not assume a bucket name or create/change Cloudflare resources/secrets. Store the asset and persist a stable asset key/URL through the existing backend pattern; do not embed image bytes/base64 in application source or database rows unless the existing architecture explicitly requires it.
+- Validate allowed image MIME type and file size, reject invalid uploads, show a preview, and require an explicit Admin save/activation step. Replacing the QR must not silently activate an unverified image.
+- Before activation, the owner/Admin must verify the uploaded image scans correctly and points to the intended receiving account. The QR payload/image must not specify a fixed transaction amount. If the image itself embeds an amount or incorrect account, fail closed and request a correct image rather than modifying pixels or claiming it is safe.
+- Keep the existing QR available until a replacement is verified and activated; define a safe empty/unconfigured state.
+
+### Storefront consumption
+- Web tĩnh reads only the active, public-safe QR configuration through the agreed backend/API and renders the QR image, bank/account details and transfer instructions. Do not hardcode the image path or copy the image into the static branch.
+- Display the confirmed amount separately from the QR. Customer manually enters the amount in their banking app. Do not display a final payment amount until the order price and payment installment/terms have been confirmed.
+- The public API must never expose Admin-only controls, secrets, storage credentials or private review metadata. If no active valid QR is configured, show a clear unavailable/contact-consultant state and never show a fabricated placeholder as the real QR.
+- Uploading, previewing, activating or scanning the QR does not mark any order as paid. Payment confirmation remains a separately authorized, auditable Admin action after checking the actual bank transaction.
+
+### Acceptance tests
+- Authenticated Admin can upload, preview, replace, deactivate and activate an image; unauthorized users cannot mutate configuration.
+- Invalid type/oversized file is rejected; failed replacement leaves the last verified active QR intact.
+- Public API exposes only active customer-safe fields and the correct asset URL; no secrets/private fields leak.
+- Storefront renders the active image and handles missing/inactive/broken image gracefully.
+- Test that the QR does not encode a fixed amount, and that displayed order/installment amount comes from the confirmed server-side order state, not from the QR image or client-supplied amount.
