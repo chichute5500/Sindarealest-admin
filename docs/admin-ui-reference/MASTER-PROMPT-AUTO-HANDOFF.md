@@ -1425,3 +1425,11 @@ Next priority is the 12-screen Admin reference comparison and evidence-backed UI
 - Previous run [#39631879451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39631879451) failed because warning text persisted between viewport variants. The test was corrected to navigate away/back and re-render Settings per variant; exact-SHA retry passed. Application/backend source was not modified.
 - Artifact `admin-preview-evidence-191` ID `12360041542`: 63 PNGs, 39 fixture metrics, 16 login-shell captures + 47 synthetic read-only module captures; no page/console/request/HTTP errors, attempted writes or unexpected API paths. Preview login CSS signature PASS; authenticated business flows remain inaccessible/not tested.
 - Progress stays 48%; 12-screen reference parity NOT ACCEPTED; authenticated backend QA BLOCKED / NOT TESTED; product image-save and PRE/PRO migrations DEFERRED_BY_OWNER. Keep PR #111/#108 unmerged and preserve all branch/deployment/access/data safety constraints.
+
+
+## Verified continuation addendum — 2026-10-21 16:18 UTC: order-payment readiness and backup controls
+
+- Exact tested SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff`: Validate Source [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) and Admin Preview/Playwright [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) both SUCCESS.
+- The read-only fixture test verifies that price/terms-unconfirmed orders cannot create payment requests or record received payments, and that Settings has JSON export, JSON restore input and confirmation disclosure. It does not perform payments, export, restore or any API write. QR unsaved-draft guard and accessibility/reduced-motion checks are included in the same passing browser suite.
+- Artifact `admin-preview-evidence-192` ID `12360132558` contains 63 PNGs (16 login + 47 synthetic fixture views) and 39 metrics. No browser/console/network/HTTP errors or attempted fixture writes were recorded. This does not establish authenticated backend behavior.
+- Overall progress stays 48%; screen #7 Orders and #12 Backup/Settings are PARTIAL, screen #8 QR/payment PARTIAL, and full 12-screen visual acceptance remains NOT ACCEPTED. Keep image-save and PRE/PRO migrations deferred. PR #111/#108 remain OPEN/unmerged; preserve all safety boundaries.
