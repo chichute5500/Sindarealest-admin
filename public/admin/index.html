@@ -555,7 +555,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 /* Keep warranty identifiers together in the compact mobile card layout. */
 .warranty-order-number{font-weight:750;color:var(--ink);overflow-wrap:anywhere;word-break:normal}
 @media(max-width:680px){
- #main .issued-warranty-table tbody tr td:nth-child(2) .warranty-order-number{display:block;max-width:100%;overflow-wrap:normal;word-break:normal;font-size:11px}
+ #main .issued-warranty-table tbody tr td:nth-child(2){display:block} #main .issued-warranty-table tbody tr td:nth-child(2) .warranty-order-number{display:block;max-width:100%;overflow-wrap:normal;word-break:normal;white-space:nowrap;font-size:11px}
  #main .issued-warranty-table tbody tr td:nth-child(2) .sku{overflow-wrap:anywhere;word-break:normal}
 }
 #backdrop>.editor{padding-bottom:0}

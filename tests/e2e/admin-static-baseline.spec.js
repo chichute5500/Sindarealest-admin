@@ -796,7 +796,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderDetailClose')).toBeFocused();
     }, true);
     await captureView('customers', 'customers', null, true);
-    await captureView('warranties', 'warranties', async () => {
+    await captureView('warranties', 'warranties', async variant => {
       // Screen #10: synthetic, read-only warranty list/filter and accessible issue disclosure.
       await expect(page.locator('.warranty-toolbar')).toBeVisible();
       await expect(page.getByLabel('Tìm mã bảo hành, mã đơn, SKU hoặc sản phẩm')).toBeVisible();
@@ -808,6 +808,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(orderNumber).toHaveText('UI-ONLY-ORDER');
       const orderNumberFits = await orderNumber.evaluate(element => element.scrollWidth <= element.clientWidth);
       expect(orderNumberFits, 'Warranty order number should remain legible without horizontal clipping').toBe(true);
+      const orderNumberHeight = await orderNumber.evaluate(element => element.getBoundingClientRect().height);
+      expect(orderNumberHeight, 'Warranty order number should remain on one line').toBeLessThan(22);
+      if (variant.viewport.width <= 680) {
+        await expect(page.locator('.issued-warranty-table tbody tr td:nth-child(2)')).toHaveCSS('display', 'block');
+      }
       await expect(page.locator('.claim-table tbody')).toContainText('UI-ONLY-CLAIM');
 
       // Search only filters local synthetic records; no API mutation is requested.
