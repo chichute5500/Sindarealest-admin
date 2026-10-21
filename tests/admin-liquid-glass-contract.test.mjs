@@ -204,5 +204,10 @@ has('@media(max-width:360px){#imageGrid{grid-template-columns:repeat(2,minmax(0,
 has(':root[data-admin-theme="dark"] #imageGrid .imageitem:first-child img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
 has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder controls remain present');
 
+has('#backdrop>.editor{padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
+has('#backdrop .editorcontent{padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
+has('#backdrop .editorfooter{flex-shrink:0}', 'mobile editor action footer does not shrink');
+
+
 
 console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
