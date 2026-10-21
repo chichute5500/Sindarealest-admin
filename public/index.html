@@ -2317,6 +2317,35 @@ html.dark .sd-fullscreen-share{
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
 }
+
+
+/* No substitute hero product when SD-GL052 is absent: collapse the empty image frame. */
+#home.hero:has(#heroProductImage[hidden]){
+  min-height:0!important;
+  height:auto!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  align-items:center!important;
+  padding:clamp(28px,5vw,64px) clamp(20px,4vw,56px)!important;
+  margin-top:clamp(14px,3vw,28px)!important;
+  margin-bottom:clamp(12px,2vw,22px)!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+#home.hero:has(#heroProductImage[hidden]) .hero-copy{
+  width:100%!important;
+  max-width:760px!important;
+  margin:0!important;
+}
+@media(max-width:760px){
+  #home.hero:has(#heroProductImage[hidden]){
+    padding:24px 12px 20px!important;
+    margin-top:8px!important;
+    margin-bottom:8px!important;
+  }
+  #home.hero:has(#heroProductImage[hidden]) .hero-copy{max-width:100%!important}
+}
 </style>
 
 </body>
