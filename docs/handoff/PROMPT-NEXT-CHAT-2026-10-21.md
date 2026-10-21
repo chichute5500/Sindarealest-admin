@@ -1,3 +1,13 @@
+## 2026-10-22 — CURRENT SESSION UPDATE (read before historical notes)
+
+- Current project remains storefront-only in `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108 open/unmerged. Never merge; no Production, `main`, Admin branch, backend/data/config/secrets work.
+- Latest observed PR head during the session: `6d68a2580bc8c0d762dbaa4aeb1f00760344de2f`. A first-paint instrumentation edit created commit `c70cfd7767c94bad365f3d969664313a5e985c6b`; because concurrent commits may have occurred, the next chat MUST re-fetch the branch head and inspect the file before making any changes.
+- Reviewed live Preview artifact run `39655449912`, artifact `12370932919`. Frames at ~200–300 ms show welcome splash fullscreen and bottom nav/account drawer hidden. The reported ~100 ms account UI flash is **not confirmed or disproven** by these still frames; inspect full startup videos and DOM timeline.
+- Audit sampler was adjusted to choose the nearest actual sample before or after requested offsets, never reuse one sample for multiple timestamps, and report offset delta/tolerance. This fixes possible sampling brittleness only; rerun tests and exact-SHA Preview audit before treating it as valid.
+- User-uploaded Hero image `public/images/hero-sd-gl052.png` is a fixed presentation asset; do not gate it on catalog SKU SD-GL052, hide it, or substitute another image. Verify actual live load, crop, satin blend, Light/Dark at mobile and desktop.
+- Working completion estimate: **70%** (provisional). Still open: source test for sampler change, exact-SHA Preview run, review all welcome startup videos/DOM evidence, resolve genuine first-paint violations if found, live Hero visual verification, remaining reference visual differences. No 100% claim until hard audit failures are gone.
+- Keep working after reporting; stop only for a real user action/permission/missing input. Avoid rerunning known PASS suites unless code changes or coverage gaps justify it.
+
 ## 2026-10-22 — USER CONFIRMATION: HERO IMAGE IS A FIXED PRESENTATION ASSET (HIGHEST PRIORITY)
 
 - The user explicitly clarified that they personally uploaded the image to be used as the Hero after several chats failed to locate the product image. This is no longer a task to search for SKU SD-GL052 in the catalog. Use the uploaded file `public/images/hero-sd-gl052.png` directly as the Hero presentation image.
