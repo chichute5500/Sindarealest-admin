@@ -13,6 +13,7 @@ CREATE TABLE order_payment_requests (
   order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   installment_type TEXT NOT NULL CHECK (installment_type IN ('deposit','balance','full')),
   amount INTEGER NOT NULL CHECK (amount > 0),
+  shipping_benefit TEXT NOT NULL DEFAULT 'standard_shipping' CHECK (shipping_benefit IN ('standard_shipping','free_shipping')),
   transfer_reference TEXT NOT NULL UNIQUE,
   qr_image_key TEXT NOT NULL,
   bank_name TEXT NOT NULL,
