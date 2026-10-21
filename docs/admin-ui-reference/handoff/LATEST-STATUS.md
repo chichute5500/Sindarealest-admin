@@ -1,13 +1,13 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — CURRENT SOURCE CI PASS; DEPLOYED PREVIEW MISMATCH; MIGRATION REVIEW REQUIRED; AUTHENTICATED QA AND 12-SCREEN PARITY OPEN`
-**Tiến độ ước tính:** 43%; chưa nghiệm thu hoàn tất.
-**Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`
-**HEAD hiện tại đã xác minh:** `fbc783d514b194a7f922083e79b66cf333dda2ce`.
-**CI source:** [run 39547169787](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787) SUCCESS trên đúng HEAD; dependency audit, integrity check và automated tests PASS.
-**Preview deployed:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILURE tại CSS/UI signature mismatch, source được kiểm tra là `de6114f...`; chưa có run Preview mới hơn trong lịch sử hiện có.
-**PR #111:** OPEN/unmerged, 909 files (+30,716/−356), 407 ahead / 6 behind main. **PR #108:** OPEN/unmerged.
-**Backend/migration:** remote D1 state NOT VERIFIED; không chạy setup/migration/deploy. Duplicate SKU khi sửa sản phẩm có thể trả lỗi chung 500 thay vì 409; ghi nhận để review riêng, chưa sửa API.
+**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CHECKS AND LOCAL PLAYWRIGHT PASS; CONFIGURED PREVIEW IS MISSING THE EXPECTED CSS RULE; AUTHENTICATED QA, 12-SCREEN PARITY AND MIGRATION/SCOPE REVIEW OPEN`
+**Tiến độ ước tính:** 45%; tăng nhẹ nhờ kiểm thử nguồn mới nhất và chẩn đoán CSS chính xác hơn. Đây vẫn là ước lượng theo giai đoạn, chưa nghiệm thu.
+**Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`.
+**HEAD quan sát trước cập nhật bàn giao:** `eff59ab78cfe11b091dfb64df3cc281a3572b343` (commit bằng chứng do workflow sinh); commit source/test gần nhất đã xác minh: `6935eefa3473f1c6a15da08a34389d7223cbd0ea`.
+**CI source:** [run 39548605358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358) SUCCESS trên `6935eefa`; kiểm tra repository và automated tests PASS.
+**Preview deployed:** [run 39548605474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474) FAILURE tại CSS signature. Log xác nhận browser hỗ trợ selector và selector khớp `.topbar > .brand`, nhưng stylesheet Preview không chứa quy tắc ẩn tương ứng (`ruleCount: 226`, `hasLoginHideRule: false`). `ADMIN_TEST_URL` bị GitHub che trong log; chưa thể nhận diện URL/triển khai cụ thể.
+**PR #111:** OPEN/unmerged; scope được GitHub báo 909 files, gồm docs/evidence cùng storefront/backend/scripts/migration; chưa đủ điều kiện merge. **PR #108:** OPEN/unmerged.
+**Backend / Production:** remote D1 và migration ledger NOT VERIFIED. Không chạy setup/migration/deploy; không merge PR #111/#108; không sửa `main` hoặc nhánh website tĩnh.
 **Production deploy / merge / đồng bộ nhánh:** NOT PERFORMED.
 
 
@@ -146,3 +146,21 @@
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Latest verified continuation — 2026-10-21 12:19 +07
+
+### Source/test commits and evidence
+- CSS signature diagnostics were changed to inspect parsed CSSOM selectors and normalize combinator whitespace, rather than rely on raw `cssText` substring matching.
+- Diagnostic commit: `6935eefa3473f1c6a15da08a34389d7223cbd0ea`; source CI [39548605358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358) is SUCCESS.
+- Preview workflow [39548605474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474) is FAILURE at the actual deployed Preview assertion; no assertion was weakened.
+- Browser-side evidence: `browserSupportsHideSelector=true`, `hideSelectorMatchesBrand=true`, `topbarBrandDisplay=flex`, `hasLoginHideRule=false`, `ruleCount=226`. This demonstrates the configured response lacks the expected login-shell CSS rule; this is not a browser support or CSS selector normalization issue.
+- Local read-only Playwright evidence on source commit `6935eefa`: 58 PNGs total, 16 login-shell images + 42 fixture module images and 36 fixture metrics; 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors. These prove local source/fixture UI coverage only, not authenticated live backend workflows.
+- The workflow's evidence-only HEAD moved to `eff59ab78cfe11b091dfb64df3cc281a3572b343`; source checks are tied to `6935eefa`, not the later artifact/handoff commit.
+
+### Remaining blocker and safe next step
+- Root cause is now localized to the configured Preview response missing the expected CSS rule. The exact `ADMIN_TEST_URL` secret value was not read, displayed or changed.
+- The checked-in production deployment workflow hard-pins deployment to `main`; it must not be run to solve this Preview problem. No dedicated, verified Admin-preview deployment path was found in the inspected workflow set.
+- To make the remote Preview test pass, an authorized owner must provide/update `ADMIN_TEST_URL` to a Preview deployment built from the current ADMIN branch, or explicitly authorize a preview-only deployment after Preview bindings are confirmed isolated. Do not use Production URL, expose secrets, bypass Cloudflare Access, or touch D1/R2.
+- Continue other safe work while this external Preview identity is unresolved: full 12-screen reference comparison, deeper source/accessibility audits and PR #111 mixed-scope inventory. Keep authenticated real-backend workflows marked NOT TESTED until a valid authorized Preview and safe test data are available.
+- Progress estimate: **45%**. Source checks and local screenshots now have current evidence; deployed Preview identity, all 12-screen parity, authenticated live module flows, full diff review, and migration compatibility remain open.
