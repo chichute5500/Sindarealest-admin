@@ -565,6 +565,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const panel = page.locator('#notificationPanel');
         if (await panel.isVisible()) await page.locator('#notificationToggle').click();
       }
+      if (name === 'order-row-details' && await page.locator('#orderDetailBackdrop').isVisible()) {
+        await page.locator('#orderDetailClose').click();
+        await expect(page.locator('#orderDetailBackdrop')).toBeHidden();
+      }
     }
   };
 
@@ -637,19 +641,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     }
 
     await captureView('orders', 'orders', null, true);
-    await captureView('order-row-details', 'orders', async variant => {
-      // Desktop uses a table; mobile renders the responsive card layout. Do not
-      // target hidden desktop rows on mobile, where route/theme updates can detach them.
-      if (variant.viewport.width < 821) return;
-      // Wait for fixture-backed rows and scroll atomically in the page so a DOM
-      // replacement cannot detach a Playwright locator between resolution and scroll.
-      await expect.poll(async () => page.evaluate(() => {
-        const row = document.querySelector('#main .order-table tbody tr');
-        if (!row) return false;
-        row.scrollIntoView({ block: 'nearest' });
-        return true;
-      }), { timeout: 5000 }).toBe(true);
-    });
+    await captureView('order-row-details', 'orders', async () => {
+      await page.locator('[data-action="view-order-details"]:visible').first().click();
+      await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
+      await expect(page.locator('#orderDetailTitle')).toHaveText('Chi tiết đơn hàng');
+      await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
+      await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
+    }, true);
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', null, true);
     await captureView('settings', 'settings', null, true);
