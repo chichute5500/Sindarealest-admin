@@ -656,3 +656,9 @@ Continue the SinDarealest2 static storefront from the latest GitHub state. Read 
 - No visual code change is marked as fixed in this pass: a source edit without a successful Preview deploy, exact SHA verification, guarded capture, and screenshot review would not meet the project acceptance rule. Human visual acceptance remains PENDING; estimated completion remains ~72%.
 - Next action: make a targeted satin-fold adjustment with a cache-busted asset version, run affected source validation, deploy Preview, verify deployed SHA, capture all required viewport/theme combinations, and inspect against both original reference PNGs. Keep all work on this branch and PR #108; no Production/main/Admin/backend/catalog changes.
 
+### Follow-up implementation update
+- Satin SVG adjustments are now present in all four assets: desktop primary fold strokes were reduced from 11 to 6, shadow strokes from 18 to 10, and fold/shadow/highlight opacity was reduced. Mobile fold strokes and shadow were also softened. All four assets carry `fine-satin-drape-v8`.
+- Updated `public/index.html` to bump one cache token from `20261021-18` to `20261021-19` (commit `04cd7f713b487b92bafdffbd0b5d3e7b66728769`). The file has seven remaining `20261021-18` references, so this cache bump is partial and still needs correction before considering cache invalidation complete.
+- Current branch source checks confirm the updated SVG blob SHAs: dark desktop `5a9ad33e474e5dc51da5807a0ea2fd6757257cd3`, light desktop `daf89c145306ea61fbb903c93cd00a76d8c3d24d`, dark mobile `0a6f3aab0723d518944ee609eff01c2264f772e3`, light mobile `2d42b8707cc17cb15efdd51bf6ebff7d2bc0756e`.
+- The workflow-run lookup for commit `04cd7f7...` returned no PR-triggered runs; deployment status therefore remains unverified. Do not claim Preview deploy or visual pass. PR #108 remains open/unmerged; visual acceptance pending.
+
