@@ -69,5 +69,8 @@ assert.match(read("../functions/api/orders.js"), /fulfillment_type\) VALUES/, "o
 assert.match(read("../public/admin/index.html"), /id="pFulfillmentType"/, "Admin can set fulfillment type explicitly");
 assert.match(read("../public/admin/index.html"), /id="fulfillmentBox"/, "Admin can filter all, unclassified, in-stock, and made-to-order");
 assert.match(read("../public/admin/index.html"), /id="paymentQrVerified"/, "QR activation requires explicit human verification");
+const qrAdminHtml = read("../public/admin/index.html");
+assert.match(qrAdminHtml, /Object\\.keys\\(normalizedDraft\\)\\.some\\(key=>normalizedDraft\\[key\\]!==normalizedSaved\\[key\\]\\)/, "QR activation must reject unsaved bank-detail edits");
+assert.ok(qrAdminHtml.indexOf("Thông tin ngân hàng đã thay đổi. Hãy lưu thông tin nháp trước khi kích hoạt QR.") < qrAdminHtml.indexOf("action:'activate',verified:true"), "QR activation must show the unsaved-draft guard before issuing the activation request");
 assert.doesNotMatch(read("../public/admin/index.html"), /data-payment-status=/, "payment status must be read-only in the order form");
 console.log("PASS fulfillment/payment contract: explicit classification, token scoping, QR allowlist, verified-only payment ledger and Admin UI regression guards.");
