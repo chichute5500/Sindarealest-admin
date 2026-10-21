@@ -276,3 +276,6 @@ This section exists so work survives long conversations and context/memory limit
 3. Duy trì kiểm tra sáu ô Liquid Glass, phần “Phong cách đẳng cấp từ da cá sấu”, nền satin, gallery controls, drawer cart/account/checkout, mobile Back, footer/Zalo và route sản phẩm; không coi kiểm thử tĩnh là visual acceptance.
 4. Audit toàn thể vẫn bị khóa nếu public verified product payload không có đúng SKU `SD-GL052`. Không fake SKU, không thay ảnh khác, không đụng catalog/D1/R2/Admin để làm xanh audit. Giữ fail-closed và ghi blocker cụ thể.
 5. Sau khi có kết quả visual cuối, cập nhật handoff, test results, master prompt, next-chat prompt; chỉ workflow guarded được phép lưu canonical screenshots/manifest khi các điều kiện acceptance đạt. Tiếp tục làm sau khi báo cáo, không tự dừng để hỏi cập nhật tiến độ.
+
+## Handoff pointer update — 2026-10-21
+Use the dedicated copy-ready continuation prompt at `docs/prompts/NEXT-CHAT-PROMPT-2026-10-21-STATIC-WEB.md`. Continue only the static storefront work. The user explicitly asked to set aside the prior image/folder topic; it is not part of this handoff and must not be investigated or treated as a blocker.
