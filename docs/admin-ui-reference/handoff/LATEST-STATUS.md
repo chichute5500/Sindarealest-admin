@@ -67,3 +67,12 @@
 - Overall progress remains **50%**. Screen #3 and all-12-screen visual parity remain NOT ACCEPTED. Authenticated backend QA is NOT TESTED/BLOCKED by Access. Image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER.
 - PR #108/#111 stay open/unmerged. No Production deployment, main/static branch edits, Access/secrets changes, remote D1/R2 writes, migrations, or TinyFish.
 - Next: re-fetch HEAD and CI, inspect screenshots against the reference at 390×844 and 1280×800 in light/dark, then continue substantive screen-by-screen UI work. Do not raise progress from test success alone.
+
+
+## Live checkpoint verification — 2026-10-22
+
+- Verified live branch `feature/admin-isolated-handoff-2026-10-20`; checkpoint began at HEAD `3f50b4d14e890a4c7b1d2b679f364f322fc3933c`.
+- Exact-HEAD workflow **Validate source and tests** run [#39657885958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39657885958) completed `success`. This is CI evidence, not visual-parity acceptance.
+- PR #111 and #108 remain open and unmerged; do not merge or deploy Production.
+- Live inspection found the promised checkpoint missing from the seven handoff files. `current-status.json` and `latest-test-results.json` have now been updated to record this finding. Remaining handoff documents are being updated sequentially and must be re-read after writes before calling the handoff complete.
+- Progress remains **50%**. Do not increase without verified visual comparison and broader screen/flow acceptance.
