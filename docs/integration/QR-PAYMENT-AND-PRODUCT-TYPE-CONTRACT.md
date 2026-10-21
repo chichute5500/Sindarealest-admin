@@ -144,10 +144,21 @@ Implementation files are developed only on `feature/admin-isolated-handoff-2026-
 | Read/update QR configuration | `GET/PUT /api/admin/payment-qr` | `PUT` action `save-draft` with bank/account/instructions; `activate` with `verified:true`; or `deactivate`. Activation needs a pending object, valid account details and explicit human confirmation; changes are audited. |
 | Create order | `POST /api/orders` | Response adds one-time `orderAccessToken`; D1 stores only its SHA-256 in `orders.public_access_token_hash`. Treat the token as a bearer capability; do not log it. |
 | Read payment details | `GET /api/order-payment?orderNumber=…&token=…` | Token must hash-match the order. Amount is exposed only after server-side price and terms confirmation and when a pending payment request exists; otherwise returns `paymentReady:false`. Response disables referrer leakage and search indexing. |
-| Create/cancel installment | `POST/PATCH /api/admin/payment-requests` | POST `{ orderId, installmentType:'deposit'|'balance'|'full', amount }`; amount checked against server-side confirmed total and remaining balance. PATCH cancels only a pending request. Unique transfer reference and receiver/QR snapshot are stored. |
+| Create/cancel installment | `POST/PATCH /api/admin/payment-requests` | POST `{ orderId, paymentOption:'deposit'|'balance'|'full' }`—the client must not send `amount`. Server verifies confirmed total against order-item line totals and derives: `made_to_order` deposit = `ceil(total × 30%)`; `in_stock` deposit = fixed 100,000 VND; `balance` = confirmed remaining balance only after a verified receipt; `full` = full confirmed total. Full payment sets `shippingBenefit:'free_shipping'`; deposit/balance use `standard_shipping`. Mixed or `unclassified` order items are blocked for manual consultation. PATCH cancels only a pending request. Unique transfer reference and receiver/QR snapshot are stored. |
 | Read ledger/history | `GET /api/admin/payment-requests?orderId=…` | Returns payment requests, verified transactions, received/refunded sums, remaining balance and overpayment summary. |
 | Verify bank transaction | `POST /api/admin/payment-transactions` | Authenticated `{ orderId, paymentRequestId?, direction:'received'|'refunded', amount, transactionReference, note? }`. Duplicate bank references conflict; refunds cannot exceed previously verified net receipts. This is the only new API that derives `orders.payment_status` from ledger records. |
 | Product fulfillment | Admin product API uses `fulfillmentType`; DB column is `fulfillment_type`. Public catalog supports `GET /api/products?fulfillmentType=in_stock|made_to_order|unclassified`. New order items snapshot the type at checkout. |
+
+
+### Authoritative amount and shipping rules — implemented server-side, test-required
+
+- The amount is computed from the confirmed order and item snapshots, never accepted as an authoritative browser input.
+- A single-type `made_to_order` order may request a deposit of 30% of confirmed total (rounded up to the next whole VND), or full payment.
+- A single-type `in_stock` order may request a fixed 100,000 VND deposit, or full payment.
+- Only `full` payment is assigned `free_shipping`. Deposit and balance requests remain `standard_shipping`; do not grant free shipping just because a deposit or later balance installment was requested.
+- If any order item is `unclassified`, item types are mixed, item line totals do not add up exactly to the server-confirmed total, or the fixed deposit exceeds the total, automated payment request creation fails closed and customer must be consulted manually.
+- A full/deposit request cannot be duplicated after a transaction exists. A balance request requires previously verified net receipts and uses the server-calculated remaining balance.
+- Migration `0009_fulfillment_and_manual_payments.sql` stores `shipping_benefit` on each request so the selected delivery benefit is auditable and survives backups.
 
 ### Rollout state
 
