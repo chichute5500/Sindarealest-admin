@@ -1000,3 +1000,9 @@ Tiếp tục làm việc thực tế, tự chủ trên GitHub. Repository `chich
 
 ## Giới hạn bắt buộc
 PR #111 và #108 giữ OPEN/UNMERGED. Không merge, không Production deploy, không sửa main/website tĩnh, không chỉnh hoặc bypass Access/secrets, không migration/SQL hoặc thay đổi D1/R2 từ xa, không thay đổi hạ tầng, không dùng TinyFish. Chỉ cần người dùng thao tác nếu thực sự bị chặn quyền hoặc cần phê duyệt.
+
+# Current continuation instructions — 2026-10-22T02:53:48.575+07:00
+
+Work on `feature/admin-isolated-handoff-2026-10-20` in `chichute5500/Sindarealest-admin` only. The latest tested source/test tree is `8d4009f785cc89ff0ff5575460aacac8d2119746`; Validate Source run [#39664727740](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740) and Admin Preview/Playwright [#39664727558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558) both SUCCESS on that exact SHA. Evidence artifact: [admin-preview-evidence-240](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578). The artifact was downloaded; orders light/dark 390x844 and desktop 1280x800 were opened and reviewed. Screen #7 is PARTIAL, screen #3 is PARTIAL, 12-screen parity remains NOT ACCEPTED, authenticated backend QA NOT TESTED. Overall progress remains 50%.
+
+Before new edits, re-read the seven handoff files at current HEAD and verify the new checkpoint. Continue to the next unaudited screen family from `12-SCREEN-REFERENCE-AUDIT.md` (Category/product classification is currently NOT TESTED). Inspect evidence first; change only genuine gaps, preserve API/data/auth behavior, run exact-SHA Validate Source and Preview/Playwright, inspect the new artifact, and update/read back all seven files. Keep PR #111/#108 OPEN/UNMERGED. No main/static-site edits, Production deployment, Access/secrets changes or bypass, remote D1/R2, SQL/migrations, infrastructure changes, or TinyFish.
