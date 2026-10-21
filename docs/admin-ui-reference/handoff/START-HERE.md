@@ -198,3 +198,10 @@ Keep Preview's signature assertion, do not bypass Cloudflare Access, and keep PR
 ## Live GitHub re-check — 2026-10-21
 
 Current branch HEAD at check start: `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7`. Validate source and tests [39583615335](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583615335) is SUCCESS on that exact SHA. Source SHA `47a23ded111d2982383460ba7265b778e2bc6d39` has a separate passing source run and the Preview workflow [39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648) still fails the deployed CSS signature check; the docs-only commit did not trigger a new Preview run. PR #111 has 1,088 changed files and remains open/unmerged with base `main`; PR #108 also remains open/unmerged with base `main`. This is a broad mixed-scope PR, not merge-ready. Image-save and PRE/PRO migrations remain deferred by owner. Continue safe Admin-only work; no production/deployment/remote database operations.
+
+
+## Chỉ thị làm việc liên tục của chủ sở hữu (2026-10-21)
+
+- Chủ sở hữu yêu cầu: **tiếp tục làm việc, không dừng sau khi báo cáo; chỉ dừng khi thực sự cần thao tác/xác nhận từ chủ sở hữu**.
+- Báo cáo tiến độ không thay thế việc thực thi. Sau mỗi báo cáo, phải tiếp tục ngay với bước kiểm tra/sửa tiếp theo khi còn công việc an toàn có thể làm.
+- Không tuyên bố hoàn tất 100% nếu chưa đạt nghiệm thu. Giữ lỗi lưu ảnh và migration PRE/PRO ở trạng thái tạm hoãn theo yêu cầu.
