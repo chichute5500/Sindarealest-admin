@@ -1186,6 +1186,20 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('[data-warranty-filter="all"]')).toHaveAttribute('aria-pressed', 'true');
       await expect(page.locator('[data-warranty-filter="all"]')).toContainText('Tất cả (1)');
       await expect(page.locator('[data-warranty-filter="active"]')).toContainText('Đang xử lý (1)');
+      if (variant.viewport.width >= 375 && variant.viewport.width <= 680) {
+        const filterLayout = await page.locator('.warranty-toolbar .warranty-filter-button').evaluateAll(nodes =>
+          nodes.map(node => ({
+            label: node.textContent?.trim(),
+            top: Math.round(node.getBoundingClientRect().top),
+            clientWidth: node.clientWidth,
+            scrollWidth: node.scrollWidth
+          }))
+        );
+        expect(Math.max(...filterLayout.map(item => item.top)) - Math.min(...filterLayout.map(item => item.top)),
+          'Warranty status filters should stay in one row on common-width mobile screens: ' + JSON.stringify(filterLayout)).toBeLessThanOrEqual(1);
+        expect(filterLayout.every(item => item.scrollWidth <= item.clientWidth + 1),
+          'Warranty filter labels should not clip on common-width mobile screens: ' + JSON.stringify(filterLayout)).toBe(true);
+      }
       await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
       const orderNumber = page.locator('.issued-warranty-table .warranty-order-number');
       await expect(orderNumber).toHaveText('UI-ONLY-ORDER');
