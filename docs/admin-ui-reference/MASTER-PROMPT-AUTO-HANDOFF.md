@@ -1462,3 +1462,12 @@ The next agent must continue the actual audit and safe implementation/test loop,
 - UI fixture tests use `UI-ONLY-*` synthetic records and never submit a warranty/claim or any mutation. Preview only verifies the configured login/CSS signature, not authenticated backend workflows.
 - Progress remains 48%. Authenticated business/backend QA NOT TESTED/BLOCKED BY ACCESS. Product image-save and PRE/PRO migration ledger remain DEFERRED_BY_OWNER / NOT VERIFIED. PR #111 and #108 stay OPEN/unmerged; PR #111 remains mixed-scope/not merge-ready.
 - Before further changes, refetch HEAD, PR metadata, workflow runs and required handoff/reference files. Preserve all constraints: only Admin branch; no merge/cherry-pick/force-push; no Production deployment; no main/static branch writes; no Access/secrets changes or bypass; no remote D1/R2, SQL/setup/migration scripts, or TinyFish.
+
+
+## ANTI-REPEAT / LATEST HANDOFF CHECKPOINT — 2026-10-21 17:10 UTC
+
+Only writable branch remains `feature/admin-isolated-handoff-2026-10-20`. The last confirmed application/test SHA is `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; Validate Source #39640751340 and Admin Preview/Playwright #39640751300 both SUCCESS on that SHA. Artifact #201 contains 63 PNGs (responsive/theme and synthetic/read-only fixture evidence). Customer address search and warranty search result/empty-state assertions are already implemented and must not be repeated unless regression is proven.
+
+Docs-only handoff commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` also passed Validate Source #39641183495; this does not imply application tests were rerun against a different application SHA. Verify current HEAD and latest Actions before further edits.
+
+Progress estimate remains 50% weighted management estimate, not pass rate. Remaining major work: compare the 12 reference screen families and fix the next concrete visual/behavior gap; authenticated real backend QA is not tested; image-save/R2 and PRE/PRO migration tasks remain DEFERRED_BY_OWNER. Read `handoff/PROMPT-NEXT-CHAT.md` for the anti-repeat checklist. Avoid docs-only commits unless evidence materially changes. Do not merge/deploy or modify Access/secrets/remote data.
