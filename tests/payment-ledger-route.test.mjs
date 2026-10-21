@@ -70,7 +70,14 @@ function makeDb(options = {}) {
     async batch(statements) {
       batches.push(statements.map(s => ({ sql: s.sql, values: s.values })));
       if (options.failUnique) throw new Error("UNIQUE constraint failed: order_payment_transactions.transaction_reference");
-      return statements.map(() => ({ success: true, meta: { changes: 1 } }));
+      const atomicRefundRejected = Boolean(options.atomicRefundGuardReject
+        && statements[0]?.sql.includes("WHERE ? != 'refunded' OR ? <="));
+      return statements.map(() => ({
+        success: true,
+        // Simulate a concurrent refund consuming the remaining net receipt before
+        // the conditional INSERT executes; follow-on statements must then be no-ops.
+        meta: { changes: atomicRefundRejected ? 0 : 1 }
+      }));
     },
   };
 }
@@ -83,6 +90,21 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 409, "refund may not exceed verified net receipts");
   assert.equal(db.batches.length, 0, "invalid over-refund must not insert a ledger row or update payment status");
+}
+
+{
+  // A pre-check may pass while another refund commits concurrently. The SQL guard
+  // must recheck net receipts at insert time and suppress every follow-on mutation.
+  const db = makeDb({ netReceived: 100000, atomicRefundGuardReject: true });
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", direction: "refunded", amount: 70000, transactionReference: "BANKREF-RACE-1"
+  })));
+  assert.equal(response.status, 409, "concurrent refunds must not exceed the net receipt ledger");
+  assert.equal(db.batches.length, 1);
+  const statements = db.batches[0];
+  assert.match(statements[0].sql, /INSERT INTO order_payment_transactions[\\s\\S]*SELECT[\\s\\S]*WHERE \\? != 'refunded' OR \\? <=/);
+  assert.ok(statements.slice(1).every(statement => /EXISTS \\(SELECT 1 FROM order_payment_transactions WHERE id=\\?\\)/.test(statement.sql)),
+    "status updates and audit writes must be gated on successful ledger insertion");
 }
 {
   const db = makeDb({ order: { ...baseOrder, payment_terms_confirmed_at: null } });
