@@ -39,47 +39,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: b3c54d55a5e21ae6377d2a6392349f2402ee333f
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774520
+- Tested commit: da808593785de5924ac1540e1522421ae5cb5bcd
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643122228
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-200 (not committed to Git).
+- Local source Playwright matrix: FAILURE; 20 real PNGs captured in artifact admin-preview-evidence-202 (not committed to Git).
 - Deployed Preview: success.
-- Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
+- Source screenshot matrix: 20 real PNGs; login shell: 16; read-only fixture module screens: 4; fixture metrics: 3.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Cập nhật tiến độ và mã nguồn — 2026-10-21 17:02 UTC
-
-- Latest application source/test commit: `b3c54d55a5e21ae6377d2a6392349f2402ee333f`.
-- Đã đồng bộ nhãn tìm kiếm khách hàng với 4 trường thực sự được lọc (tên, điện thoại, email, địa chỉ); thêm test địa chỉ dùng dữ liệu tổng hợp.
-- Validate source and tests [#39639774550](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774550): **SUCCESS** trên đúng SHA.
-- Admin Preview diagnostic [#39639774520](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774520): **SUCCESS** trên cùng SHA; 63 PNG được lưu trong artifact `admin-preview-evidence-200`.
-- Điểm tổng thể đã được tính lại theo 6 nhóm trọng số trong `latest-test-results.json`: **49%** (49.4% làm tròn). Chỉ tăng 1 điểm vì thay đổi tìm kiếm khách hàng là phần nhỏ; các khối lượng lớn còn mở gồm nghiệm thu 12 nhóm màn hình, QA nghiệp vụ có xác thực và kiểm toán semantic/security.
-- Không merge PR, không deploy Production, không thay đổi secrets/Access hoặc dữ liệu D1/R2.
-
-
-## Vòng tiếp tục — 2026-10-21 17:06 UTC
-
-- Thêm Playwright assertions cho màn hình Bảo hành/Yêu cầu hỗ trợ: kiểm tra nội dung thông báo `aria-live` cập nhật sau tìm kiếm, và cả hai bảng hiển thị trạng thái rỗng khi không có dữ liệu khớp. Dữ liệu test hoàn toàn tổng hợp; không gửi yêu cầu ghi API.
-- Commit test: `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`.
-- Workflow Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) và Admin Preview [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) đang chạy trên SHA đó tại thời điểm cập nhật; chưa công nhận pass.
-- Điểm ước lượng có trọng số cập nhật từ 49% lên 50% (49.6% làm tròn) do tăng độ bao phủ kiểm thử; đây không phải mức tăng tương đương về giao diện hoặc nghiệp vụ hoàn chỉnh.
-
-
-## Kết quả xác minh sau khi chạy test — 2026-10-21 17:08 UTC
-
-- Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340): **SUCCESS** trên đúng source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; các assertion mới về trạng thái `aria-live` và empty-state của bảo hành/yêu cầu hỗ trợ đã qua.
-- Admin Preview diagnostic [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300): **SUCCESS** trên đúng SHA; artifact [admin-preview-evidence-201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710) lưu 63 ảnh bằng chứng.
-- Bảng `latest-test-results.json` đã đánh dấu test mới `executed: true`; điểm quản lý giữ 50% vì thay đổi này tăng kiểm thử, chưa giải quyết các khối lượng lớn về parity/nghiệp vụ.
-
-- Kết quả cuối sau cập nhật: Validate Source và Admin Preview/Playwright đều **SUCCESS** trên `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`. Artifact 201 gồm 63 PNG; ảnh dùng nguồn thật của giao diện nhưng các module nghiệp vụ dùng fixture tổng hợp/read-only, nên không thay thế QA nghiệp vụ có xác thực.
-
-
-## Anti-repeat / next-chat handoff — 2026-10-21 17:10 UTC
-
-- Customer search across name/phone/email/address and its synthetic address-search Playwright coverage are complete; do not repeat without a demonstrated regression.
-- Warranty search result summary (`aria-live`) and no-match empty states for issued-warranty and support-claim tables are complete. Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) and Preview/Playwright [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) passed on exact source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; artifact [#201, 63 PNGs](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710). Evidence uses synthetic/read-only business fixtures.
-- Latest docs-only commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` passed Validate Source [#39641183495](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641183495). Later handoff edits trigger new CI; always verify the current HEAD and run before claiming the latest branch passed.
-- Progress remains 50% weighted management estimate. Full 12-screen parity NOT ACCEPTED; authenticated real-business QA NOT TESTED; image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER. Next work must be a concrete unresolved visual/behavior gap from `12-SCREEN-REFERENCE-AUDIT.md` (prioritize Product list or Product editor), not another documentation-only iteration.
