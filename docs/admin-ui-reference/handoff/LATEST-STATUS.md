@@ -1,6 +1,6 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI AND LOCAL PLAYWRIGHT PASS ON 18704cfae445210c20bbe1eaf0f9328b6c90eb87; PREVIEW CSS SIGNATURE FAIL; AUTHENTICATED QA, 12-SCREEN PARITY, MIGRATION AND PR SCOPE REVIEW OPEN`
+**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI/LOCAL PLAYWRIGHT PASS; PREVIEW CSS SIGNATURE FAIL; CROSS-BRANCH FREESHIP DISPLAY GAP FOUND; AUTHENTICATED QA, 12-SCREEN PARITY, MIGRATION AND PR SCOPE REVIEW OPEN`
 **Tiến độ ước tính:** 46% tổng thể; 70% giai đoạn QR/fulfillment (ước lượng quản lý, không phải tiêu chí nghiệm thu). Source CI và fixture matrix PASS trên SHA được nêu; Preview, backend thật, visual parity và PR scope vẫn mở.
 **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`.
 **HEAD quan sát trước cập nhật bàn giao:** `ee914c9a496810801a00df8e4f7da4e8c24c8a85` (evidence-only); **source/test SHA mới nhất đã xác minh:** `18704cfae445210c20bbe1eaf0f9328b6c90eb87`.
@@ -169,3 +169,19 @@
 3. Resolve the Preview CSS/source identity with owner-confirmed current-source deployment and legitimate Cloudflare Access; keep signature assertions intact.
 4. Keep authenticated backend workflows NOT TESTED until authorized Preview/login and safe synthetic test data are available. Separately verify product save and actual image upload/storage.
 5. Continue migration compatibility and mixed-scope PR #111 review; no remote D1, Production deploy or merge.
+
+
+
+## Source-level cross-branch contract audit — 2026-10-21 15:52 +07:00
+
+**Review type:** read-only GitHub source comparison; no static branch file was written.
+
+- Protected static consumer file: `public/index.html` at static branch ref `fix/liquid-glass-audit-2026-10-19`, blob `e54110861e273fd7509efb1e3fea06bc658ff48c`.
+- Admin order API: `functions/api/orders.js`, blob `7a9a8a77211efb6eb269814c5f9bdcdd89f140b9`. Static checkout sends `items: [{id, quantity}]`; Admin route reads those fields and derives product price/fulfillment on the server, snapshots `fulfillment_type` into order items, and returns `orderNumber`, `orderAccessToken`, `priceConfirmationRequired`, and a pending-confirmation status.
+- Admin product API: `functions/api/products.js`, blob `416e2802c439829e79a74c3a9c10025fb5a1facb`. Its `fulfillmentType` query and product field use the same three enum values that the static page consumes. Static page maps unknown/missing values to `unclassified`/“Cần xác nhận”, not from stock count. **Source-shape compatibility for fulfillment enum and order-create payload: PASS (source-only).**
+- Admin read-payment API: `functions/api/order-payment.js`, blob `0281ead2d5070c1419b8952b01f8f7fc3b92d5d8`. Its top-level `paymentReady`, `paymentTermsConfirmed`, `priceConfirmationRequired`, `amount`, `qrImageUrl`, bank/account fields and `transferReference` are consumed by the static `refreshOrderPayment()`, which adapts them into the existing nested `paymentInstructions` shape and checks payment terms before showing a ready QR. This is source shape only; there was no deployed cross-branch/API test.
+- **Confirmed source-consumer gap — FAIL:** Admin response includes `freeShippingEligible` and `freeShipping`, where `freeShipping` becomes true only when the ledger-derived order status is paid and the request is full-payment eligible. The static wrapper at `public/index.html` around `refreshOrderPayment()` currently does not copy either field into its mapped client state, and the payment renderer does not display the eligible/applied distinction. Therefore the customer-facing UI can omit this payment/shipping status even if the Admin API sends it. This belongs to the static website branch owner/agent to fix on its own branch; ADMIN work must not patch or sync that branch.
+- **Required next step:** static-site agent should add a backwards-compatible mapping/display for eligibility vs actually applied freeship and a consumer contract test, on `fix/liquid-glass-audit-2026-10-19` only. Then test against the documented response fixtures. Do not claim runtime integration complete until a real authorized Preview proves the deployed source and API response shape.
+- Evidence boundary: Admin source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003); Preview [39571867352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352) still fails CSS signature. No real authenticated backend QA, remote D1/R2 read/write, migration, secrets, Access bypass or Production deployment occurred.
+- Overall integration status: **PARTIAL SOURCE COMPATIBILITY; FAIL for missing freeship display mapping; runtime integration NOT VERIFIED.**
+

@@ -170,3 +170,8 @@ The earlier note saying the latest automated-test failure was not root-caused is
 - PR #111/#108 remain OPEN/unmerged. No Production deploy, remote D1/R2 action, migration, main/static branch edit or Access bypass. Local git status remains NOT VERIFIED (no local checkout).
 
 Continue only on `feature/admin-isolated-handoff-2026-10-20`, rechecking refs and Actions before each further change.
+
+
+## Continuation addendum — 2026-10-21 15:52 +07:00: cross-branch payment display gap
+
+Read the cross-branch source audit in `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and `LATEST-STATUS.md`. Static-site source consumes the Admin order/payment endpoints and fulfillment enums at the code-shape level, but it discards `freeShippingEligible` and `freeShipping` in its mapped payment state and the renderer does not show eligibility versus applied freeship. This is a static-branch issue. Do not fix it in ADMIN or synchronize branches; send the exact finding to the website agent and require a separate source/test commit there. Actual deployed integration remains NOT VERIFIED.

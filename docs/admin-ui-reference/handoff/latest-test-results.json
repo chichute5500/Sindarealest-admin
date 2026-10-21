@@ -5,7 +5,7 @@
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "18704cfae445210c20bbe1eaf0f9328b6c90eb87",
   "testedCommitSha": "18704cfae445210c20bbe1eaf0f9328b6c90eb87",
-  "capturedAt": "2026-10-21T08:48:20Z",
+  "capturedAt": "2026-10-21T08:52:00Z",
   "progressEstimatePercent": 46,
   "progressBasis": "46% overall management estimate; exact-source CI and local Playwright matrix pass on 18704cfa..., but deployed Preview CSS signature, authenticated real-backend workflows, 12-screen parity, migration ledger and mixed-scope PR review remain open.",
   "note": "Latest verified source CI run 39550214045 SUCCESS on 8fd8aa96a9f80ae7a18fd598b44cc459dd303bca. Preview diagnostic run 39550214050 FAILURE on same commit: 2 tests passed and 1 failed at the configured Preview login-header assertion. Browser supports :has and selector matches .topbar > .brand, but loaded inline stylesheet has 226 rules and hasLoginHideRule=false. ADMIN_TEST_URL is redacted; do not infer target identity or touch secrets. Workflow changed to artifact-only full screenshots/full metadata (14-day retention) with compact Git summaries; follow-up run needs to confirm no per-run PNG commit. PR #111 remains OPEN/unmerged and has a broad non-ADMIN diff.",
@@ -722,15 +722,18 @@
     "QR/payment source/tests pass CI, but actual bank QR owner scan-verification, authenticated backend runtime, and static branch API consumption remain NOT VERIFIED.",
     "Migration 0008/0009 remote schema and applied-migration ledger remain NOT VERIFIED; no remote setup or migration was run.",
     "PR #111 has 1,082 changed files including 913 PNGs and 61 non-documentation/code files; mixed storefront/backend/migration/scripts scope is not merge-ready.",
-    "No local checkout is available; local git status/full working-tree diff NOT VERIFIED."
+    "No local checkout is available; local git status/full working-tree diff NOT VERIFIED.",
+    "Source-level cross-branch gap: static public/index.html does not map/display Admin response freeShippingEligible/freeShipping; website agent must fix and test only on static branch. No branch change made here."
   ],
   "blockedItems": [
     "Current deployed Preview target/build identity is unresolved because ADMIN_TEST_URL is masked; owner must confirm authorized current-source deployment and legitimate access path.",
     "Authenticated backend QA requires authorized Preview/login and synthetic test data/PII masking.",
     "Full 12-screen parity, remote migration ledger, cross-branch runtime compatibility and PR #111 scope isolation remain open.",
-    "No force-push, history rewrite, merge, cross-branch sync, Production deploy, secret change or remote D1/R2 action is allowed."
+    "No force-push, history rewrite, merge, cross-branch sync, Production deploy, secret change or remote D1/R2 action is allowed.",
+    "Cross-branch integration is NOT VERIFIED until the static consumer displays freeShippingEligible/freeShipping correctly and a currently authorized Preview validates the deployed API."
   ],
   "nextActions": [
+    "Notify the static website agent of the source-level free-shipping mapping gap; map eligibility vs applied freeship and add a contract test on the static branch only, without branch sync.",
     "Re-fetch live branch HEAD, PR #111/#108 and latest Actions before another source change; current handoff commit itself is not the tested source SHA.",
     "Review artifact admin-preview-evidence-123 and directly compare all 12 Admin reference screens; do not infer parity from fixture captures alone.",
     "Resolve Preview source/CSS mismatch using owner-confirmed authorized current-source deployment and legitimate Access path; keep assertion intact and never reveal/change secrets.",
@@ -1332,7 +1335,7 @@
     "changedFiles": 230
   },
   "integrationProgressEstimatePercent": 70,
-  "integrationStatus": "NOT_VERIFIED",
+  "integrationStatus": "PARTIAL_SOURCE_COMPATIBILITY_WITH_CONFIRMED_STATIC_FREESHIP_DISPLAY_GAP; RUNTIME_NOT_VERIFIED",
   "guardrails": {
     "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
     "staticBranchUntouched": true,
@@ -1446,10 +1449,10 @@
   "uiFixturePngCount": 43,
   "uiFixtureMetricCount": 36,
   "latestExecutionCheckpoint": {
-    "checkedAt": "2026-10-21 15:50 +07:00",
+    "checkedAt": "2026-10-21 15:52 +07:00",
     "repository": "chichute5500/Sindarealest-admin",
     "allowedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeHandoffCommit": "ee914c9a496810801a00df8e4f7da4e8c24c8a85",
+    "branchHeadBeforeHandoffCommit": "c658420d3c52a5548aba3f36b4ffc039f8932284",
     "sourceTestSha": "18704cfae445210c20bbe1eaf0f9328b6c90eb87",
     "testFixes": [
       {
@@ -1497,6 +1500,37 @@
       "overallPercent": 46,
       "qrFulfillmentPercent": 70,
       "acceptanceStatus": "IN_PROGRESS"
+    },
+    "crossBranchFinding": "Static source shape uses fulfillment enums and order-create payload compatibly, but discards Admin freeShippingEligible/freeShipping fields. Static-branch change required; no static branch write.",
+    "safety": "PR #111/#108 open/unmerged; no Production deploy, remote D1/R2, migration, secret change or Access bypass."
+  },
+  "sourceLevelCrossBranchAudit": {
+    "checkedAt": "2026-10-21 15:52 +07:00",
+    "mode": "READ_ONLY_GITHUB_SOURCE_COMPARISON",
+    "staticBranch": "fix/liquid-glass-audit-2026-10-19",
+    "staticPublicIndexBlobSha": "e54110861e273fd7509efb1e3fea06bc658ff48c",
+    "adminSourceShaReviewed": "18704cfae445210c20bbe1eaf0f9328b6c90eb87",
+    "files": {
+      "adminOrdersRouteBlobSha": "7a9a8a77211efb6eb269814c5f9bdcdd89f140b9",
+      "adminProductsRouteBlobSha": "416e2802c439829e79a74c3a9c10025fb5a1facb",
+      "adminOrderPaymentRouteBlobSha": "0281ead2d5070c1419b8952b01f8f7fc3b92d5d8"
+    },
+    "checks": {
+      "fulfillmentEnumAndUnknownFallback": "PASS_SOURCE_ONLY",
+      "orderCreateItemsIdQuantityShape": "PASS_SOURCE_ONLY",
+      "orderPaymentTopLevelShapeAdaptedToNestedPaymentInstructions": "PASS_SOURCE_ONLY",
+      "customerFreeshipDisplayMapping": "FAIL_SOURCE_CONSUMER_GAP"
+    },
+    "finding": "Static public/index.html receives freeShippingEligible/freeShipping from the Admin order-payment response but refreshOrderPayment does not map those fields into client state and renderPaymentInstructions does not show eligibility vs applied freeship.",
+    "requiredOwnerAction": "Static website owner/agent to add backwards-compatible mapping, explicit eligibility/applied display and a consumer contract test on the protected static branch only.",
+    "runtimeIntegration": "NOT_VERIFIED_NO_DEPLOYED_CROSS_BRANCH_API_TEST",
+    "safety": {
+      "staticBranchModified": false,
+      "mainModified": false,
+      "productionDeployment": false,
+      "remoteD1R2Mutations": false,
+      "secretsChanged": false,
+      "cloudflareAccessBypassed": false
     }
   }
 }

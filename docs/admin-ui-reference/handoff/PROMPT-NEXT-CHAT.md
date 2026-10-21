@@ -317,3 +317,9 @@ Safety: PR #111 and PR #108 remain open/unmerged; no Production deploy; no edit 
 3. Resolve the Preview CSS/source identity with owner-confirmed current-source deployment and legitimate Cloudflare Access; keep signature assertions intact.
 4. Keep authenticated backend workflows NOT TESTED until authorized Preview/login and safe synthetic test data are available. Separately verify product save and actual image upload/storage.
 5. Continue migration compatibility and mixed-scope PR #111 review; no remote D1, Production deploy or merge.
+
+
+
+## Continuation addendum — 2026-10-21 15:52 +07:00: cross-branch payment display gap
+
+Read the cross-branch source audit in `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and `LATEST-STATUS.md`. Static-site source consumes the Admin order/payment endpoints and fulfillment enums at the code-shape level, but it discards `freeShippingEligible` and `freeShipping` in its mapped payment state and the renderer does not show eligibility versus applied freeship. This is a static-branch issue. Do not fix it in ADMIN or synchronize branches; send the exact finding to the website agent and require a separate source/test commit there. Actual deployed integration remains NOT VERIFIED.
