@@ -32,8 +32,8 @@ Các file `latest-*.png` chỉ được coi là ảnh chụp thực tế sau khi
 
 
 ## Handoff bổ sung — bộ icon website tĩnh Liquid Glass (2026-10-22)
-- BẮT BUỘC đọc `../../../../docs/icon-system-inventory.md` trước khi tiếp tục bất kỳ công việc icon nào trên website tĩnh.
-- Tài liệu kiểm kê: [docs/icon-system-inventory.md](../../../../docs/icon-system-inventory.md); nhánh `fix/liquid-glass-audit-2026-10-19`; commit tạo tài liệu `0d6119e1adbc815771a7eede3b22a40fb1ff8b5f`.
+- BẮT BUỘC đọc `../../../docs/icon-system-inventory.md` trước khi tiếp tục bất kỳ công việc icon nào trên website tĩnh.
+- Tài liệu kiểm kê: [docs/icon-system-inventory.md](../../../docs/icon-system-inventory.md); nhánh `fix/liquid-glass-audit-2026-10-19`; commit tạo tài liệu `0d6119e1adbc815771a7eede3b22a40fb1ff8b5f`.
 - Quy chuẩn đã được người dùng chốt: Liquid Glass trong suốt, viền sáng, khúc xạ nhẹ; nét mảnh; khi nhấn lún kính + đổi màu; KHÔNG ripple.
 - Màu nền/ink/accent mục tiêu: `#eaf3fb`, `#142a3c`, `#5c91b9`.
 - Phạm vi cho công việc icon website tĩnh: chỉ nhánh `fix/liquid-glass-audit-2026-10-19`; không merge main, không deploy Production, không sửa backend/API/schema/bindings/secret/dữ liệu.
