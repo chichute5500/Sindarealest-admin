@@ -244,3 +244,8 @@ The GitHub handoff is the authoritative project record; Memory and chat history 
 3. Duy trì kiểm tra sáu ô Liquid Glass, phần “Phong cách đẳng cấp từ da cá sấu”, nền satin, gallery controls, drawer cart/account/checkout, mobile Back, footer/Zalo và route sản phẩm; không coi kiểm thử tĩnh là visual acceptance.
 4. Audit toàn thể vẫn bị khóa nếu public verified product payload không có đúng SKU `SD-GL052`. Không fake SKU, không thay ảnh khác, không đụng catalog/D1/R2/Admin để làm xanh audit. Giữ fail-closed và ghi blocker cụ thể.
 5. Sau khi có kết quả visual cuối, cập nhật handoff, test results, master prompt, next-chat prompt; chỉ workflow guarded được phép lưu canonical screenshots/manifest khi các điều kiện acceptance đạt. Tiếp tục làm sau khi báo cáo, không tự dừng để hỏi cập nhật tiến độ.
+
+
+## PRIORITY OVERRIDE — uploaded image incident (2026-10-21)
+
+Before continuing old tasks, follow [the image recovery incident handoff](../handoff/INCIDENT-IMAGE-RECOVERY-2026-10-21.md) and [the dedicated next-chat prompt](NEXT-CHAT-PROMPT-IMAGE-RECOVERY-2026-10-21.md). The user says `tb_image_share_1792519964514.png` was uploaded into a folder created for them, then the assistant was told to retrieve the image and delete the folder. Current listings did not surface it, but this does not prove it was deleted or lost. Verify all accessible file sources and operation history; do not ask for re-upload before exhausting recovery paths. Do not claim folder deletion or image retrieval without evidence. The user says this image replaced GL052 for the hero; check the real image and current code instead of continuing to treat missing SKU SD-GL052 as the central task. Keep all existing Production/Admin protections.
