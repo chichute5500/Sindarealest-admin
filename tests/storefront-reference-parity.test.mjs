@@ -57,6 +57,19 @@ assertOrganicSatinGeometry('Desktop dark satin', desktopDark);
 assertOrganicSatinGeometry('Mobile light satin', mobileLight);
 assertOrganicSatinGeometry('Mobile dark satin', mobileDark);
 
+function assertFineSatinMicroCreases(name, svg, minimumPaths) {
+  const micro = [...svg.matchAll(/<path data-fold-layer="micro" d="([^"]+)" stroke-width="([\d.]+)" opacity="([\d.]+)"\/>/g)];
+  assert.ok(micro.length >= minimumPaths, name + ' must retain several fine secondary satin creases.');
+  assert.ok(micro.every(path => Number(path[2]) <= 0.75 && Number(path[3]) <= 0.26),
+    name + ' secondary creases must remain fine and low-contrast, not form broad ribbons.');
+  assert.ok(micro.every(path => (path[1].match(/ C /g) || []).length >= 2),
+    name + ' secondary creases must be subtly irregular curves rather than straight decorative stripes.');
+}
+assertFineSatinMicroCreases('Desktop light satin', desktopLight, 10);
+assertFineSatinMicroCreases('Desktop dark satin', desktopDark, 10);
+assertFineSatinMicroCreases('Mobile light satin', mobileLight, 8);
+assertFineSatinMicroCreases('Mobile dark satin', mobileDark, 8);
+
 
 
 assert.match(html, /\.theme-bg--light\{background-color:#eaf3fb;background-image:url\('images\/liquid-glass-light\.svg\?v=/);
@@ -91,10 +104,10 @@ assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
 
 /* Desktop hero fallback and mobile drawer/navigation separation are deliberate responsive contracts. */
-assert.match(desktopLight, /data-satin-style="organic-satin-creases-v10"/);
-assert.match(desktopDark, /data-satin-style="organic-satin-creases-v10"/);
-assert.match(mobileLight, /data-satin-style="organic-satin-creases-v10"/);
-assert.match(mobileDark, /data-satin-style="organic-satin-creases-v10"/);
+assert.match(desktopLight, /data-satin-style="fine-satin-creases-v11"/);
+assert.match(desktopDark, /data-satin-style="fine-satin-creases-v11"/);
+assert.match(mobileLight, /data-satin-style="fine-satin-creases-v11"/);
+assert.match(mobileDark, /data-satin-style="fine-satin-creases-v11"/);
 
 assert.ok(finalCss.includes('@media(min-width:761px){')
   && finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy{')
@@ -143,10 +156,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-21"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-21"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-21"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-21"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261022-1"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261022-1"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261022-1"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261022-1"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 
