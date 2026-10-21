@@ -389,3 +389,11 @@ Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENC
 - Artifact `admin-preview-evidence-188` ID `12357698923`: 59 PNGs (16 login + 43 synthetic fixture screens), 36 fixture metrics, zero recorded browser/console/network/HTTP errors and zero attempted fixture writes. Raw PNGs remain in Actions artifacts, not per-run Git commits. This evidence is not authenticated backend QA.
 - Latest verified source/test SHA remains `131d6f3...`; handoff-only commits subsequently advance branch HEAD. Re-fetch live PR HEAD before further work. Overall progress 48%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS. Image-save and PRE/PRO migration remain DEFERRED_BY_OWNER.
 - Both PR #111 and PR #108 stay OPEN/unmerged. Only ADMIN branch; no main/static branch edits, no production deploy, secret/Access change or bypass, remote D1/R2, SQL/setup/migration execution, or TinyFish.
+
+
+## Latest keyboard navigation verification — 2026-10-21 16:00 UTC
+
+- Exact tested SHA `32c1f28662e7240353b0eda2f5daeaf22359257e`: [Validate Source #39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) PASS and [Admin Preview/Playwright #39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) SUCCESS.
+- Playwright static baseline: 3 passed (30.5s). Added Home/End key tests for product-editor tabs, asserting focus and `aria-selected`; Arrow navigation, focus trap, Escape close and focus restoration tests remain.
+- Artifact `admin-preview-evidence-189` ID `12359007200`: 59 PNGs (16 login-shell + 43 synthetic fixture screens), 36 fixture metrics, no recorded browser/console/network/HTTP errors or attempted writes. This is fixture/source UI evidence, not authenticated real-backend QA.
+- Live branch HEAD advanced to documentation/evidence commits after the tested SHA. Re-fetch HEAD before source edits; do not claim later HEAD is source-tested unless exact-source CI supports it. Overall progress 48%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
