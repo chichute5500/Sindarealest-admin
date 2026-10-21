@@ -1,13 +1,13 @@
 {
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_VISUAL_PARITY_PARTIAL",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
   "testedCommitSha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
-  "capturedAt": "2026-10-21T19:25:46.936Z",
+  "capturedAt": "2026-10-22T02:30:43.029+07:00",
   "progressEstimatePercent": 50,
-  "progressBasis": "Weighted scorecard totals 49.6 points, rounded to 50%. This is a management estimate, not a test-pass percentage. New mobile product-card source/test changes are pending exact-SHA validation; screen #3 and all-12-screen parity remain not accepted, and authenticated backend QA is not tested.",
+  "progressBasis": "Weighted scorecard totals 49.6 points, rounded to 50%. This is a project management estimate, not a test pass rate. Exact-SHA Validate Source and Admin Preview/Playwright pass; the product-list mobile iteration is only PARTIAL reference parity; all 12 screens and authenticated backend QA remain unaccepted/untested.",
   "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.\n\nCheckpoint 2026-10-21 17:47 UTC: exact source/test SHA 04889b6c6bc946483ea683e8345bac3b7cbf3838; Validate Source #39646606076 and Admin Preview #39646606242 both SUCCESS. Corrected false-negative custom switch visibility assertion; prior Preview run #39646221204 failed only at screenshot matrix step 9; rerun passed. Evidence workflow wrote docs/evidence-only HEAD d90a18db3961958b0928f1fabc598f2d77cedea3. Progress remains 50%; 12-screen parity NOT ACCEPTED, authenticated business QA NOT TESTED, image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER; PR #111 OPEN/UNMERGED.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -202,8 +202,8 @@
       "artifactId": 12355051140
     }
   ],
-  "screenshots": [
-    {
+  "screenshots": {
+    "0": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__1280x800__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -213,7 +213,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "1": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -223,7 +223,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "2": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__1440x900__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -233,7 +233,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "3": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__1440x900__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -243,7 +243,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "4": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__320x640__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -253,7 +253,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "5": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__320x640__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -263,7 +263,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "6": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__360x800__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -273,7 +273,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "7": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__360x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -283,7 +283,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "8": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__375x812__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -293,7 +293,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "9": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__375x812__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -303,7 +303,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "10": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -313,7 +313,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "11": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -323,7 +323,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "12": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__412x915__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -333,7 +333,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "13": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__412x915__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -343,7 +343,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "14": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__768x1024__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -353,7 +353,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "15": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/admin-login__768x1024__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -363,7 +363,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "16": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/backup-restore__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -373,7 +373,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "17": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/backup-restore__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -383,7 +383,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "18": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/backup-restore__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -393,7 +393,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "19": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/customers__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -403,7 +403,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "20": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/customers__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -413,7 +413,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "21": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/customers__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -423,7 +423,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "22": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/customers__390x844__light__full.png",
       "route": "/admin/",
       "viewport": null,
@@ -433,7 +433,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "23": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard-activity__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -443,7 +443,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "24": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard-activity__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -453,7 +453,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "25": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard-activity__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -463,7 +463,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "26": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -473,7 +473,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "27": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -483,7 +483,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "28": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -493,7 +493,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "29": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/dashboard__390x844__light__full.png",
       "route": "/admin/",
       "viewport": null,
@@ -503,7 +503,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "30": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/notifications__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -513,7 +513,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "31": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/notifications__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -523,7 +523,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "32": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/notifications__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -533,7 +533,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "33": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/order-row-details__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -543,7 +543,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "34": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/order-row-details__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -553,7 +553,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "35": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/order-row-details__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -563,7 +563,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "36": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/orders__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -573,7 +573,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "37": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/orders__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -583,7 +583,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "38": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/orders__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -593,7 +593,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "39": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/orders__390x844__light__full.png",
       "route": "/admin/",
       "viewport": null,
@@ -603,7 +603,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "40": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/product-editor__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -613,7 +613,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "41": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/product-editor__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -623,7 +623,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "42": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/product-editor__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -633,7 +633,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "43": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/product-gallery__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -643,7 +643,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "44": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/product-gallery__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -653,7 +653,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "45": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/product-gallery__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -663,7 +663,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "46": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/products__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -673,7 +673,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "47": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/products__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -683,7 +683,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "48": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/products__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -693,7 +693,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "49": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/products__390x844__light__full.png",
       "route": "/admin/",
       "viewport": null,
@@ -703,7 +703,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "50": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/settings__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -713,7 +713,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "51": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/settings__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -723,7 +723,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "52": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/settings__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -733,7 +733,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "53": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/settings__390x844__light__full.png",
       "route": "/admin/",
       "viewport": null,
@@ -743,7 +743,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "54": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/warranties__1280x800__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -753,7 +753,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "55": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/warranties__390x844__dark.png",
       "route": "/admin/",
       "viewport": null,
@@ -763,7 +763,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "56": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/warranties__390x844__light.png",
       "route": "/admin/",
       "viewport": null,
@@ -773,7 +773,7 @@
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
     },
-    {
+    "57": {
       "path": "docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/warranties__390x844__light__full.png",
       "route": "/admin/",
       "viewport": null,
@@ -782,20 +782,39 @@
       "capturedAt": "2026-10-21T05:29:49.085Z",
       "evidence": "REAL_PLAYWRIGHT_SOURCE_SCREENSHOT",
       "scope": "UNAUTHENTICATED_LOCAL_SOURCE_ONLY"
-    }
-  ],
+    },
+    "latestArtifact": {
+      "name": "admin-preview-evidence-227",
+      "id": 12373068383,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345/artifacts/12373068383",
+      "screenshots": 64,
+      "loginShellPngs": 16,
+      "fixtureModulePngs": 48,
+      "fixtureMetrics": 40,
+      "rawPngsCommittedToGit": false
+    },
+    "reviewedFiles": [
+      "products__390x844__light.png",
+      "products__390x844__dark.png",
+      "products__1280x800__light.png",
+      "orders__390x844__light.png"
+    ],
+    "approvedReferenceOpened": true,
+    "screen3Acceptance": "PARTIAL_NOT_ACCEPTED",
+    "overall12ScreenAcceptance": "NOT_ACCEPTED"
+  },
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "branchIsolationDiffReview": "PARTIAL_GITHUB_API_FILE_REVIEW_NO_LOCAL_CHECKOUT",
     "applicationStartup": "PASS",
     "playwrightPreviewDiagnostics": "success",
     "localStaticPlaywrightBaseline": "PASS",
-    "visualComparisonAgainstApprovedPng": "PARTIAL_SCREEN_3_REVIEWED_AT_390_AND_1280; ALL_12_SCREEN_PARITY_NOT_ACCEPTED",
-    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
-    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
+    "visualComparisonAgainstApprovedPng": "PARTIAL_SCREEN_3_REVIEWED_AT_390_LIGHT_DARK_AND_1280_LIGHT; ALL_12_SCREEN_PARITY_NOT_ACCEPTED",
+    "consoleErrors": "PASS_0_ERRORS_IN_SOURCE_FIXTURE_MATRIX",
+    "networkErrors": "PASS_0_FAILED_REQUESTS_OR_HTTP_ERRORS_IN_FIXTURE_MATRIX",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
-    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "lightMode": "PASS_SCREENSHOT_MATRIX",
+    "darkMode": "PASS_SCREENSHOT_MATRIX",
     "accessibilityAndVietnameseTypography": "PASS_MODAL_FOCUS_TRAP_ESCAPE_ARIA_AND_RESTORE_PLAYWRIGHT_ON_D408781; visual parity remains NOT_ACCEPTED",
     "lint": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
     "typecheck": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
@@ -809,21 +828,21 @@
     "playwright": "PASS",
     "referenceImageRead": "PASS_OPENED_APPROVED_ADMIN_MOBILE_REFERENCE_PNG_FROM_ARTIFACT",
     "referenceScreenInventory": "PASS_12_SCREENS_IDENTIFIED",
-    "currentAppScreenshotComparison": "PARTIAL_SOURCE_FIXTURE_VIEWS_INSPECTED; FULL_12_SCREEN_PARITY_NOT_VERIFIED",
+    "currentAppScreenshotComparison": "PARTIAL_PRODUCT_LIST_COMPACTED_AND_VISUALLY_REVIEWED; ORDERS_LIST_SCREEN_GAP_RECORDED",
     "sourceRouteInventory": "PASS_STATIC_GITHUB_SOURCE_INSPECTION",
     "apiEndpointExistence": "PASS_STATIC_FILE_EXISTENCE_CHECK_ONLY",
-    "authenticatedFlows": "NOT_VERIFIED",
+    "authenticatedFlows": "NOT_TESTED_FIXTURE_ONLY",
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
     "currentBranchHeadTests": "PASS_SOURCE_AND_PLAYWRIGHT_ON_EXACT_SHA_b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb; docs/evidence descendant observed at 30c8cc7f87000813b5b50cc8162ca87a06dd1414; re-fetch after this handoff commit",
-    "authenticatedBackendModules": "PREVIEW_LOGIN_DASHBOARD_SMOKE_PASS; REAL_BUSINESS_MODULE_FLOWS_NOT_TESTED",
+    "authenticatedBackendModules": "NOT_TESTED",
     "visualReferenceParity": "PARTIAL_SOURCE_SCREEN_REVIEW; NOT_ACCEPTED_12_SCREEN_PARITY",
     "mobileOrderCustomerUsability": "SOURCE_CSS_SUPPORTS_MOBILE_CARDS_AT_MAX_680PX; REAL AUTHENTICATED SCREENSHOTS NOT VERIFIED",
     "prFullDiffAudit": "PARTIAL_GITHUB_API_ONLY; NOT_MERGE_APPROVAL",
     "uiFixtureModules": "PASS_READ_ONLY_FIXTURE_SCREENSHOTS",
     "rawClosingTagVisibleText": "PASS_TEXT_NODE_ASSERTION_DID_NOT_REPRODUCE; CHECK_PSEUDO_ELEMENTS_AND_LATEST_CUSTOMER_SCREENSHOT",
-    "npmRunCheck": "PASS",
+    "npmRunCheck": "PASS_EXACT_SHA_d7488c845202a695b18ea01ec5d87906b6e9bffa",
     "screenshotMatrix": "PASS_SOURCE_FIXTURE_MATRIX_RUN_169",
     "deployedPreview": "PASS",
     "mobileNavigationSourceAudit": "PASS_SOURCE_ONLY_5_BUTTONS_FIVE_COLUMN_RULE_MORE_MENU_CONTAINS_WARRANTY_AND_SETTINGS",
@@ -848,7 +867,7 @@
     "warrantyPlaceholderClipping": "PASS_SOURCE_ASSERTION_AND_SCREENSHOT",
     "paymentLedgerConcurrencyGuard": "PASS_SOURCE_CONTRACT_AND_MOCK_REGRESSION; LIVE_D1_CONCURRENCY_NOT_VERIFIED",
     "sourceCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
-    "npmTest": "PASS",
+    "npmTest": "PASS_EXACT_SHA_d7488c845202a695b18ea01ec5d87906b6e9bffa",
     "localPlaywright": "PASS",
     "authenticatedBusinessFlows": "BLOCKED_BY_ACCESS_NOT_TESTED",
     "visualParity12Screens": "NOT_ACCEPTED",
@@ -860,7 +879,8 @@
     "productListEmptyStateRecovery": "PASS_RESET_SEARCH_CATEGORY_FULFILLMENT_AND_RESTORE_FOCUS",
     "productListPublishedStatusFilter": "PASS_EXPLICIT_PUBLISHED_BOOLEAN_FIXTURE",
     "productListStatusCounts": "PASS_COUNTS_UPDATE_WITH_CURRENT_SEARCH_CATEGORY_FULFILLMENT_FILTER",
-    "productListStatusChipAccessibility": "PASS_GROUP_LABEL_AND_ARIA_PRESSED"
+    "productListStatusChipAccessibility": "PASS_GROUP_LABEL_AND_ARIA_PRESSED",
+    "previewDiagnostics": "PASS"
   },
   "remainingIssues": [
     "Configured deployed Preview fails PREVIEW_CSS_SIGNATURE_MISMATCH: .topbar > .brand is visible; selector support/match true; 226-rule stylesheet lacks expected login-hide rule. Target identity cannot be inferred from masked secret.",
@@ -895,7 +915,7 @@
   "branchHeadSha": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
   "latestVerifiedAt": "2026-10-22T01:58:00+07:00",
   "latestVerifiedSourceCommit": "f2df0a923080135c5fe92ee2021c76137305699c",
-  "currentAdminBranchHead": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
+  "currentAdminBranchHead": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
   "latestVerificationSummary": "Validate Source #39656347891 and Admin Preview/Playwright #39656348109 both SUCCESS on exact SHA c18736b70d0035769408ce3190a6fb729ccd75fd. npm run check, npm test, responsive/theme screenshot matrix and configured Preview diagnostic PASS. 64 PNGs and 40 synthetic/read-only fixture metrics; authenticated backend QA NOT TESTED.",
   "branchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "prSafety": {
@@ -1016,7 +1036,7 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-22T02:14:21.414+07:00",
+  "updatedAt": "2026-10-22T02:30:43.029+07:00",
   "currentBranchHeadAtHandoff": "09be7bf2b42c4f074e097464b715f0fe27383c7f",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
@@ -1355,7 +1375,7 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "0e9e6560a968f7ca9754c91fda6f8af89c0ae41b",
+  "currentAdminBranchHeadBeforeHandoffUpdate": "1c6114dc0ee16a0dfb3a3569b425a6b86bce0987",
   "latestScreenshotArtifact": {
     "runId": 39661154345,
     "name": "admin-preview-evidence-227",
@@ -1533,9 +1553,9 @@
     "automatedTests": "PASS"
   },
   "latestSourcePlaywright": {
-    "runId": 39637611768,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768",
-    "sourceCommit": "f2df0a923080135c5fe92ee2021c76137305699c",
+    "runId": 39661154345,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345",
+    "sourceCommit": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
     "exactShaMatch": true,
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
@@ -1549,10 +1569,10 @@
     "inlineStylesheetRuleCount": 507,
     "hasLoginHideRule": true,
     "playwrightStaticBaseline": "3 passed (34.8s)",
-    "screenshotCount": 63,
+    "screenshotCount": 64,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 47,
-    "uiFixtureMetricCount": 39,
+    "uiFixturePngCount": 48,
+    "uiFixtureMetricCount": 40,
     "pageErrors": 0,
     "consoleErrors": 0,
     "failedRequests": 0,
@@ -1560,7 +1580,12 @@
     "attemptedWrites": 0,
     "unexpectedApiPaths": 0,
     "fixtureOnly": true,
-    "authenticatedBackendQA": "NOT_TESTED / BLOCKED BY ACCESS"
+    "authenticatedBackendQA": "NOT_TESTED_FIXTURE_ONLY",
+    "artifact": {
+      "name": "admin-preview-evidence-227",
+      "id": 12373068383,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345/artifacts/12373068383"
+    }
   },
   "sourceScreenshotCount": 59,
   "loginShellPngCount": 16,
@@ -1776,15 +1801,10 @@
     ]
   },
   "latestValidationRun": {
-    "runId": 39621065756,
-    "runNumber": 3933,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756",
-    "testedSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
-    "jobConclusion": "success",
-    "checkRunConclusion": "success",
-    "parentRunApiStatusAtLastRead": "in_progress despite completed successful job/check-run",
-    "npmRunCheck": "PASS",
-    "npmTest": "PASS"
+    "runId": 39661154355,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154355",
+    "sha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
+    "conclusion": "success"
   },
   "currentVerification": {
     "latestSourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
@@ -1965,7 +1985,7 @@
     "docs/admin-ui-reference/handoff/latest-test-results.json"
   ],
   "handoffJsonSelfUpdateNote": "This JSON file is itself updated alongside the other handoff files; consult branch commit history for its own latest commit to avoid a self-referential SHA.",
-  "latestFunctionalSourceCommitSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+  "latestFunctionalSourceCommitSha": "30608b533014f2b5c2eb48110d29c8731b8bbe4c",
   "latestAccessibilityTestCommits": [
     {
       "sha": "ed14dc26270ba11b842bdec7c2e75f46ecc788bc",
@@ -2182,49 +2202,42 @@
     "note": "Exact SHA passed keyboard tab navigation regression and full Preview browser diagnostic; later docs-only commits advance branch HEAD."
   },
   "latestRun": {
-    "runId": 39637611768,
+    "runId": 39661154345,
     "conclusion": "success",
-    "testedCommitSha": "f2df0a923080135c5fe92ee2021c76137305699c",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768",
-    "validationRunId": 39637611840,
+    "testedCommitSha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345",
+    "validationRunId": 39661154355,
     "validationConclusion": "success",
-    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611840",
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154355",
     "artifact": {
-      "name": "admin-preview-evidence-197",
-      "id": 12362111591,
-      "sizeBytes": 11920080,
-      "expiresAt": "2026-11-04T16:43:47Z",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768/artifacts/12362111591"
+      "name": "admin-preview-evidence-227",
+      "id": 12373068383,
+      "sizeBytes": 12286169,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345/artifacts/12373068383"
     },
     "checks": {
       "npmRunCheck": "PASS",
       "npmTest": "PASS",
-      "dependencyAudit": "PASS",
-      "projectIntegrity": "PASS",
       "localPlaywrightResponsiveThemeMatrix": "PASS",
-      "warrantyListFirstFixtureE2E": "PASS",
-      "warrantySearchAndStatusFilters": "PASS",
-      "warrantyIssueDisclosureAccessibleFields": "PASS",
-      "warrantyOrderNumberOneLineAtMobile": "PASS",
+      "sourceScreenshotMatrix": "PASS",
       "configuredPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-      "warrantyVisualParity": "PARTIAL_ONLY",
-      "authenticatedBackendQA": "NOT_TESTED"
+      "authenticatedBackendQA": "NOT_TESTED",
+      "visualParity12Screens": "NOT_ACCEPTED"
     },
     "screenshotEvidence": {
-      "sourceFixturePngs": 63,
-      "loginShell": 16,
-      "syntheticReadOnlyModuleViews": 47,
-      "fixtureMetrics": 39,
+      "sourceFixturePngs": 64,
+      "loginShellPngs": 16,
+      "uiFixturePngs": 48,
+      "uiFixtureMetrics": 40,
       "pageErrors": 0,
       "consoleErrors": 0,
       "failedRequests": 0,
       "httpErrors": 0,
       "attemptedWrites": 0,
       "unexpectedApiPaths": 0,
-      "storage": "Actions artifact only",
-      "authenticatedBackendQA": "NOT_TESTED"
-    },
-    "productionDeployment": "NOT_PERFORMED"
+      "storage": "GitHub Actions artifact only; raw PNGs not in Git",
+      "fixtureOnly": true
+    }
   },
   "latestScreenshotReview": {
     "artifact": "admin-preview-evidence-169",
@@ -2983,44 +2996,105 @@
     "progressPercent": 50
   },
   "latestContinuationCycle": {
-    "checkedAt": "2026-10-22T02:14:21.414+07:00",
+    "checkedAt": "2026-10-22T02:30:43.029+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeDocsRefresh": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
-    "applicationSourceCommit": "8a2acf322f3c785716b0c0d27947f44bf9565727",
-    "testCommit": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
-    "lastSuccessfulPreChangeValidation": {
-      "sha": "b659a19838c1276de7c4bd9ef9edab2279369651",
-      "runId": 39658657454,
-      "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454"
+    "branchHeadBeforeHandoffRefresh": "1c6114dc0ee16a0dfb3a3569b425a6b86bce0987",
+    "testedCommitSha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
+    "sourceCommitSha": "30608b533014f2b5c2eb48110d29c8731b8bbe4c",
+    "e2eTestCommitSha": "339bddc64618058a72626091569e72f6fb7c5806",
+    "regressionContractCommitSha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
+    "validateSource": {
+      "runId": 39661154355,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154355",
+      "sha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
+      "conclusion": "success"
     },
-    "priorVisualArtifact": {
-      "sourceSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
-      "runId": 39656348109,
-      "artifactId": 12371792374,
-      "inspectedFiles": [
-        "admin-mobile-reference.png",
+    "adminPreviewPlaywright": {
+      "runId": 39661154345,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345",
+      "sha": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
+      "conclusion": "success"
+    },
+    "artifact": {
+      "name": "admin-preview-evidence-227",
+      "id": 12373068383,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345/artifacts/12373068383",
+      "screenshots": 64,
+      "loginShellPngs": 16,
+      "fixtureModulePngs": 48,
+      "fixtureMetrics": 40,
+      "rawPngsCommittedToGit": false
+    },
+    "checks": {
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "chromiumInstall": "PASS",
+      "localSourceScreenshotMatrix": "PASS",
+      "previewCssSignatureDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "httpErrors": 0,
+      "attemptedWrites": 0,
+      "unexpectedApiPaths": 0,
+      "horizontalOverflowAtReviewedProductViewports": false
+    },
+    "visualReview": {
+      "referenceImageOpened": "docs/admin-ui-reference/admin-mobile-reference.png",
+      "screenshotsOpened": [
         "products__390x844__light.png",
         "products__390x844__dark.png",
-        "products__1280x800__light.png"
+        "products__1280x800__light.png",
+        "orders__390x844__light.png"
       ],
-      "scope": "pre-change baseline only; not the current edited UI"
+      "productScreen3": "PARTIAL_NOT_ACCEPTED",
+      "notes": "The mobile product list shows all 3 fixture rows and pagination within 390x844, has one-line product titles with title attributes, inline price/stock facts and SVG edit controls; desktop retains the normal table with price/stock/status/edit columns. No horizontal overflow in reviewed products view. Overall reference parity is still not accepted.",
+      "authenticatedBusinessQa": "NOT_TESTED_FIXTURE_ONLY"
     },
-    "changedPaths": [
-      "public/admin/index.html",
-      "tests/e2e/admin-static-baseline.spec.js"
-    ],
-    "changeSummary": "Mobile product facts moved inline; compact accessible SVG edit action; unknown values remain truthful; no product/API/backend/data changes.",
-    "postChangeValidation": "PENDING_NOT_VERIFIED",
-    "visualAcceptance": "SCREEN_3_PARTIAL_NOT_ACCEPTED; ALL_12_NOT_ACCEPTED",
-    "authenticatedBusinessQA": "NOT_TESTED_BLOCKED_BY_ACCESS",
     "overallProgressPercent": 50,
-    "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance."
+    "nextAction": "Continue visual parity work on the orders list/mobile screen (#6 reference), after source inspection and a separate exact-SHA screenshot/Playwright cycle."
   },
-  "nextAction": "Validate exact source/test SHA a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Admin Preview/Playwright screenshots; do not mark the new mobile layout PASS until real post-change screenshots and CI are inspected.",
+  "nextAction": "Inspect and redesign the mobile orders list against reference screen #6; add exact-SHA regression tests and visual evidence; keep overall progress at 50% until the 12-screen parity and authenticated workflow acceptance gates are met.",
   "progressRoundingNote": {
     "weightedPoints": 49.6,
     "roundedPercent": 50,
     "note": "Progress remains 50% as required by the current acceptance checkpoint; do not raise it from commit count or pre-change CI."
-  }
+  },
+  "continuationHistory": [
+    {
+      "checkedAt": "2026-10-22T02:14:21.414+07:00",
+      "branch": "feature/admin-isolated-handoff-2026-10-20",
+      "branchHeadBeforeDocsRefresh": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+      "applicationSourceCommit": "8a2acf322f3c785716b0c0d27947f44bf9565727",
+      "testCommit": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+      "lastSuccessfulPreChangeValidation": {
+        "sha": "b659a19838c1276de7c4bd9ef9edab2279369651",
+        "runId": 39658657454,
+        "conclusion": "success",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454"
+      },
+      "priorVisualArtifact": {
+        "sourceSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
+        "runId": 39656348109,
+        "artifactId": 12371792374,
+        "inspectedFiles": [
+          "admin-mobile-reference.png",
+          "products__390x844__light.png",
+          "products__390x844__dark.png",
+          "products__1280x800__light.png"
+        ],
+        "scope": "pre-change baseline only; not the current edited UI"
+      },
+      "changedPaths": [
+        "public/admin/index.html",
+        "tests/e2e/admin-static-baseline.spec.js"
+      ],
+      "changeSummary": "Mobile product facts moved inline; compact accessible SVG edit action; unknown values remain truthful; no product/API/backend/data changes.",
+      "postChangeValidation": "PENDING_NOT_VERIFIED",
+      "visualAcceptance": "SCREEN_3_PARTIAL_NOT_ACCEPTED; ALL_12_NOT_ACCEPTED",
+      "authenticatedBusinessQA": "NOT_TESTED_BLOCKED_BY_ACCESS",
+      "overallProgressPercent": 50,
+      "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance."
+    }
+  ]
 }
