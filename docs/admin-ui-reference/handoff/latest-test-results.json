@@ -7,7 +7,7 @@
   "testedCommitSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
   "capturedAt": "2026-10-22T01:58:00+07:00",
   "progressEstimatePercent": 50,
-  "progressBasis": "Weighted management estimate, not a test pass percentage. Exact source/test SHA passed Validate Source and Admin Preview/Playwright. Screen #3/12-screen parity not accepted; authenticated backend QA not tested.",
+  "progressBasis": "Weighted scorecard totals 49.6 points, rounded to 50%. This is a management estimate, not a test-pass percentage. New mobile product-card source/test changes are pending exact-SHA validation; screen #3 and all-12-screen parity remain not accepted, and authenticated backend QA is not tested.",
   "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.\n\nCheckpoint 2026-10-21 17:47 UTC: exact source/test SHA 04889b6c6bc946483ea683e8345bac3b7cbf3838; Validate Source #39646606076 and Admin Preview #39646606242 both SUCCESS. Corrected false-negative custom switch visibility assertion; prior Preview run #39646221204 failed only at screenshot matrix step 9; rerun passed. Evidence workflow wrote docs/evidence-only HEAD d90a18db3961958b0928f1fabc598f2d77cedea3. Progress remains 50%; 12-screen parity NOT ACCEPTED, authenticated business QA NOT TESTED, image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER; PR #111 OPEN/UNMERGED.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -1102,7 +1102,7 @@
     "currentStatusJsonPlannedToCreate": true,
     "note": "The test SHA is older than current branch HEAD because the changes after it are handoff-documentation-only commits. Re-check Actions on the latest documentation commit before any code change."
   },
-  "progressPercent": 48,
+  "progressPercent": 50,
   "prScopeAudit": {
     "checkedAt": "2026-10-21T05:21:30Z",
     "prNumber": 111,
@@ -2172,7 +2172,7 @@
     "secretsOrAccessChanged": false,
     "accessBypass": false
   },
-  "overallProgressPercent": 48,
+  "overallProgressPercent": 50,
   "latestHandoffUpdate": {
     "checkedAt": "2026-10-21T16:00:21Z",
     "testedSha": "32c1f28662e7240353b0eda2f5daeaf22359257e",
@@ -3017,5 +3017,10 @@
     "overallProgressPercent": 50,
     "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance."
   },
-  "nextAction": "Validate exact source/test SHA a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Admin Preview/Playwright screenshots; do not mark the new mobile layout PASS until real post-change screenshots and CI are inspected."
+  "nextAction": "Validate exact source/test SHA a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Admin Preview/Playwright screenshots; do not mark the new mobile layout PASS until real post-change screenshots and CI are inspected.",
+  "progressRoundingNote": {
+    "weightedPoints": 49.6,
+    "roundedPercent": 50,
+    "note": "Progress remains 50% as required by the current acceptance checkpoint; do not raise it from commit count or pre-change CI."
+  }
 }
