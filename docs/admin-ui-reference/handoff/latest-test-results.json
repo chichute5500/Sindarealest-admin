@@ -1,14 +1,14 @@
 {
-  "status": "IN_PROGRESS_TEST_FAILURE",
+  "status": "LATEST_HEAD_NOT_TESTED_PRIOR_VALIDATION_PASS",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "4de4b4b63a78bc400bc36b55be4e057effed4a4a",
-  "testedCommitSha": null,
-  "capturedAt": "2026-10-21T14:53:56.027Z",
+  "latestCodeCommitSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+  "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+  "capturedAt": "2026-10-21T15:00:00Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% management estimate. Exact tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed Validate Source run 39618556696 (#3905) and Admin Preview diagnostic run 39618556737 (#162): npm run check, npm test, local responsive/theme Playwright matrix and configured Preview diagnostic all PASS. The new fixture test measures gallery footer alignment and checks that the final image clears the sticky actions. Visual parity for all 12 reference screen families remains not accepted; authenticated business backend QA remains not tested. Image-save and PRE/PRO migration remain deferred by owner.",
-  "note": "Latest exact tested tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737). Source CSS commit cc77869873c2f5b4b2d1118dc60c0d88413eb218 moves product dialog bottom spacing into the scrollable content; E2E regression commit a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e measures action footer vs dialog and the last thumbnail vs footer; contract test commit 5f73373094ba71f467374e8b026bbfc3c5059fec adds CSS assertions. Screenshot artifact admin-preview-evidence-162 (ID 12354480678), 11,114,027 bytes, expires 2026-11-04: 59 source/fixture PNGs (16 login shell, 43 synthetic read-only module captures) and 36 metrics. The mobile screenshot shows the sticky footer aligned to the dialog edge; the last thumb can be seen without action-bar overlap. This remains source/fixture review, not authenticated business QA. Current docs-only branch HEAD at handoff: e7f0990f4c0b78272fdba06e9f90423340b82eaa. Progress 48%; full 12-screen parity NOT ACCEPTED; backend QA NOT TESTED. PR #111/#108 open/unmerged. No merge, Production deploy, remote D1/R2, secret/Access changes, migration/setup, or TinyFish.",
+  "progressBasis": "Progress remains 48% management estimate. Latest PR #111 HEAD 78a16b6d9fca91d7b080834f293e1690dc7c10cd changes only tests/e2e/admin-static-baseline.spec.js, relaxing footer geometry tolerance from 1px to 2px. No Actions run or combined status checks were found for this HEAD, so it is NOT TESTED. Last verified full pass remains Validate Source #3905 and Admin Preview #162 on a999bfdc529ea38c5309ebfbff33a45c6779c10b. Full 12-screen reference parity and authenticated backend QA are not accepted/tested; product image-save and PRE/PRO migration remain deferred by owner.",
+  "note": "Latest exact tested tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737). Source CSS commit cc77869873c2f5b4b2d1118dc60c0d88413eb218 moves product dialog bottom spacing into the scrollable content; E2E regression commit a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e measures action footer vs dialog and the last thumbnail vs footer; contract test commit 5f73373094ba71f467374e8b026bbfc3c5059fec adds CSS assertions. Screenshot artifact admin-preview-evidence-162 (ID 12354480678), 11,114,027 bytes, expires 2026-11-04: 59 source/fixture PNGs (16 login shell, 43 synthetic read-only module captures) and 36 metrics. The mobile screenshot shows the sticky footer aligned to the dialog edge; the last thumb can be seen without action-bar overlap. This remains source/fixture review, not authenticated business QA. Current docs-only branch HEAD at handoff: e7f0990f4c0b78272fdba06e9f90423340b82eaa. Progress 48%; full 12-screen parity NOT ACCEPTED; backend QA NOT TESTED. PR #111/#108 open/unmerged. No merge, Production deploy, remote D1/R2, secret/Access changes, migration/setup, or TinyFish. Latest live GitHub check at 2026-10-21 15:00 UTC: PR #111 OPEN/unmerged head 78a16b6d9fca91d7b080834f293e1690dc7c10cd; PR #108 OPEN/unmerged head ad5b0e7538a639780adeeac7020a818170aa0caa. Workflow runs for latest HEAD: none returned; combined commit statuses: empty. Do not infer PASS for latest HEAD.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -2293,5 +2293,20 @@
       "evidenceBoundary": "Source inspection only; remote schema may or may not have 0009. No remote D1 read/write, SQL, migration, setup script or deployment was run.",
       "ownerAction": "Any correction/execution of migration/setup/deploy paths needs explicit owner authorization under current safety constraints."
     }
+  },
+  "latestHeadVerification": {
+    "headSha": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+    "commitMessage": "test(admin): allow subpixel footer geometry rounding",
+    "changedPath": "tests/e2e/admin-static-baseline.spec.js",
+    "change": "Raises product editor footer alignment tolerance from 1px to 2px; test harness only, no application source change.",
+    "actionsRunsFound": 0,
+    "combinedStatuses": [],
+    "result": "NOT_TESTED",
+    "lastVerifiedPassingSourceSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+    "lastVerifiedRuns": [
+      39618556696,
+      39618556737
+    ],
+    "progressRemainsPercent": 48
   }
 }
