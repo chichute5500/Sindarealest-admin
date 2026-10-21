@@ -169,7 +169,7 @@ for (const [name, svg] of [
   ['light desktop', lightWaveArtwork], ['dark desktop', darkWaveArtwork],
   ['light mobile', lightMobileWaveArtwork], ['dark mobile', darkMobileWaveArtwork]
 ]) {
-  assert.match(svg, /data-satin-style="organic-satin-creases-v9"/,
+  assert.match(svg, /data-satin-style="organic-satin-creases-v10"/,
     name + ' must use the organic satin composition rather than the legacy parallel ribbons.');
   assert.ok((svg.match(/data-fold-layer="body"/g) || []).length >= 6,
     name + ' must keep multiple independent folded fabric ridges.');
@@ -183,9 +183,9 @@ for (const [name, svg] of [
   assert.ok(bodyPaths.every(path => path.split(' C ').length - 1 >= 2),
     name + ' must use multi-stage gathered curves, not single-segment diagonal stripes.');
 }
-assert.ok(lightWaveArtwork.includes('stroke-width="6"') && lightWaveArtwork.includes('stroke-width="10"') && lightWaveArtwork.includes('stroke-width="2"'),
+assert.ok(lightWaveArtwork.includes('stroke-width="4"') && lightWaveArtwork.includes('stroke-width="10"') && lightWaveArtwork.includes('stroke-width="2"'),
   'Light desktop satin must retain layered satin body and shadow folds within the desktop stroke budget.');
-assert.ok(darkWaveArtwork.includes('stroke-width="6"') && darkWaveArtwork.includes('stroke-width="10"') && darkWaveArtwork.includes('stroke-width="2"'),
+assert.ok(darkWaveArtwork.includes('stroke-width="4"') && darkWaveArtwork.includes('stroke-width="10"') && darkWaveArtwork.includes('stroke-width="2"'),
   'Dark desktop satin must retain layered satin body and shadow folds within the desktop stroke budget.');
 assert.ok(lightMobileWaveArtwork.includes('stroke-width="12"') && lightMobileWaveArtwork.includes('stroke-width="1.6"'),
   'Light mobile satin must show crease details while respecting the mobile stroke budget.');
