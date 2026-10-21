@@ -192,3 +192,9 @@ Không thay thế hay xóa file nguồn đó; file master tổng hợp này kế
 - Actual artifact images were opened. Mobile account/cart/checkout drawers cover the bottom navigation; do not claim overlap absent new evidence. Checkout content is readable. Cart has a large empty middle area. Dark mobile satin still shows sweeping curves that differ from the reference.
 - Four satin SVGs have just been softened (narrower fold strokes/highlights); cache key is now `20261021-3` in `public/index.html` and `tests/storefront-reference-parity.test.mjs`. These newest changes are not yet visually verified. Wait for the latest Actions run, open its live screenshot artifact, compare with original reference PNGs, and continue fixing confirmed differences.
 - Update handoff and test results after each verified iteration. Never claim 100% while live audit fails or visual comparison remains incomplete. Do not replace SD-GL052 with another product or fabricate catalog data.
+
+
+## 2026-10-21 — Preview target correction
+- Live capture run #454 passed `npm test`, `npm run check`, local fixture audit, and deployment metadata diagnostics but stalled during the push-triggered live probe at step 14. Inspection found the workflow was probing the generic alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/` rather than the exact branch Preview documented for this work.
+- Corrected all seven Preview URL references in `.github/workflows/liquid-glass-visual-preview.yml` to the known branch Preview `https://3ed49bcc.sindarealest2.pages.dev/` (commit `1d47c0b58e2e0f2ec51eeab127004f8671b4e010`). This only changes the non-production Preview target; it does not touch Production, `main`, or data/config.
+- Next: verify the new Actions run against this exact URL, confirm its deployment metadata, inspect the new live screenshots and pixel diff, and continue visual fixes. Do not count the most recent SVG refinements as visually validated until this run completes.
