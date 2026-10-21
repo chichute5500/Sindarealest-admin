@@ -83,7 +83,7 @@ const finalCss = html.slice(end, html.indexOf('</style>', end));
 assert.match(finalCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/);
 assert.match(finalCss, /\.theme-bg--dark::after\{background:linear-gradient\(118deg,rgba\(3,20,36,\.10\),rgba\(7,31,51,\.06\) 52%,rgba\(3,17,30,\.12\)\)\}/);
 assert.match(finalCss, /#home\.hero:has\(#heroProductImage\[hidden\]\)::before,[\s\S]*?content:none!important;display:none!important;background:none!important/,
-  'The hero must disable its empty pseudo-card layers when SD-GL052 is unavailable.');
+  'The hero must disable empty pseudo-card layers only while the approved presentation image is actually unavailable.');
 assert.match(finalCss, /\.hero-copy\{display:flex!important;min-height:0!important;height:auto!important;width:100%!important;/,
   'The hero copy must determine its own height without a hidden image keeping a tall blank frame.');
 assert.match(finalCss, /\.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important;visibility:hidden!important;min-height:0!important;height:0!important;/,
@@ -94,20 +94,20 @@ assert.match(finalCss, /#home \.hero h1 span:first-child\{max-width:6em\}/);
 assert.match(finalCss, /#home \.hero h1 span:last-child\{max-width:7em\}/);
 assert.match(finalCss, /#home \.hero-visual img\[hidden\]\{display:none!important\}/);
 assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\)\{grid-template-columns:minmax\(0,1fr\)!important\}/,
-  'When the exact SKU is unavailable, the hero must not retain an empty second column.');
+  'The hero must not retain an empty second column if the approved presentation asset fails to load.');
 assert.match(html, /#home \.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important\}/,
-  'A hidden exact-SKU image must hide its empty image frame.');
+  'An unloaded presentation asset must not leave an empty image frame.');
 assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\) \.hero-copy\{width:100%;max-width:100%\}/,
-  'The hero copy must use the available width when no verified product image can be shown.');
+  'The hero copy must use the available width when no presentation image can be shown.');
 assert.match(finalCss, /\.welcome-content\{[\s\S]*?background:transparent!important;[\s\S]*?box-shadow:none!important/);
 assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
 
 /* Desktop hero fallback and mobile drawer/navigation separation are deliberate responsive contracts. */
 assert.match(desktopLight, /data-satin-style="fine-satin-creases-v11"/);
-assert.match(desktopDark, /data-satin-style="fine-satin-creases-v11"/);
+assert.match(desktopDark, /data-satin-style="fine-satin-creases-v12"/);
 assert.match(mobileLight, /data-satin-style="fine-satin-creases-v11"/);
-assert.match(mobileDark, /data-satin-style="fine-satin-creases-v11"/);
+assert.match(mobileDark, /data-satin-style="fine-satin-creases-v12"/);
 
 assert.ok(finalCss.includes('@media(min-width:761px){')
   && finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy{')
@@ -129,7 +129,7 @@ const heroEnd = html.indexOf('</section>', heroStart);
 const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
 assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
-  'The hero image must remain hidden until the exact verified SKU is present.');
+  'The hero starts hidden in static markup so the approved presentation asset can be assigned by runtime; catalog SKU availability is not a gate.');
 const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
 assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'")
   && heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
@@ -139,6 +139,13 @@ assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
 assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-failed\''),
   'If the presentation image fails to load, the empty hero image frame must fail closed.');
+assert.ok(html.includes('id="sdGalleryWhiteBackgroundKey"'), 'A browser-only SVG filter is available for photos with a near-white canvas.');
+assert.match(html, /function syncFullscreenBackgroundKey\(img\)[\s\S]*?votes>=6[\s\S]*?sd-white-background-keyed/,
+  'Only gallery photos whose corner samples confirm a near-white canvas may use background removal.');
+assert.match(finalCss, /\.sd-fullscreen-frame\{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;/,
+  'The full-screen gallery must not add a separate bordered or shadowed image card.');
+assert.match(finalCss, /\.sd-fullscreen-image\.sd-white-background-keyed\{filter:url\(#sdGalleryWhiteBackgroundKey\)\}/,
+  'Gallery background blending must be display-only and applied only after a white-canvas check.');
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
