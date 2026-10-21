@@ -968,3 +968,11 @@ This check is based on the current GitHub source blob `public/admin/index.html` 
 - This validates the current pre-handoff commit, but does not address the deployed Preview failure. The latest Preview diagnostic is still run 39542387719 and still fails the deployed CSS/UI signature check. Evidence artifact `admin-preview-evidence-62` (artifact ID 12320316041, 9.17 MB, expires 2026-11-04) is available from that run; this connector exposed artifact metadata but not a direct decoded screenshot view in this pass.
 - The current authorized blocker remains the intended Preview deployment/source identity and Access path. Owner must provide/confirm the target; do not inspect or change secrets, bypass Access, or use real customer data.
 - Progress remains 43%. No source code change, deployment, merge, remote migration, or protected-branch write occurred.
+
+## Addendum kiểm soát bàn giao — 2026-10-21 12:43 +07
+
+Trước mọi lượt tiếp tục, lấy trạng thái mới nhất từ `LATEST-STATUS.md` và `latest-test-results.json`; không dùng số liệu cũ hơn khi có mâu thuẫn. Bằng chứng mới nhất tại thời điểm addendum: source CI run 39550214045 PASS trên commit `8fd8aa96a9f80ae7a18fd598b44cc459dd303bca`; Preview diagnostic run 39550214050 FAIL vì Preview stylesheet không có quy tắc login-shell mong đợi (`hasLoginHideRule=false`, 226 rules, selector được hỗ trợ và khớp brand). Tiến độ 45% là ước lượng, không phải hoàn tất.
+
+Quy tắc workflow bằng chứng: full-resolution PNG và metadata phải nằm trong GitHub Actions Artifact với retention 14 ngày; nhánh chỉ giữ báo cáo tóm tắt/chẩn đoán. Không commit nguyên ma trận screenshot mỗi lượt. Giữ assertion Preview nguyên vẹn; không đổi secret, không bypass Cloudflare Access.
+
+Bản sửa trợ năng mới thêm `aria-label` theo bản ghi cho các control đơn hàng/thanh toán/bảo hành, gallery và cài đặt, kèm contract tests. PR #111 vẫn OPEN/unmerged và diff rất rộng (1.033 file theo lần kiểm tra 2026-10-21); không merge, force-push, đổi base hoặc xóa lịch sử. Không sửa `main`/nhánh website tĩnh, không Production deploy, không chạy migration/setup, không remote D1/R2 writes.
