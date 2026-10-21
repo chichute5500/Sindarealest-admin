@@ -56,3 +56,16 @@
 - Hành động an toàn tiếp theo cần chủ sở hữu cập nhật secret `ADMIN_TEST_URL` trong GitHub repo Settings → Secrets and variables → Actions để trỏ tới deployment/alias Preview thuộc đúng branch Admin. Không ghi URL này trực tiếp vào log và không cần gửi giá trị secret trong chat. Trước khi đổi, cần chọn hostname Preview Admin đúng; không dùng deployment thuộc nhánh fix D1.
 - Giữ nguyên CSS assertion `hasLoginHideRule`, `topbarBrandVisibility` và kiểm tra stylesheet/rules. Không chỉnh test để che mismatch.
 - Rào chắn vẫn giữ: không sửa `main` hoặc nhánh storefront `fix/liquid-glass-audit-2026-10-19`; không merge PR, không deploy Production, không sửa Access/token, không thao tác D1/R2.
+
+
+---
+
+## Latest verified Preview unblock — 2026-10-21, Actions run #149
+
+- **Preview CSS-signature blocker: RESOLVED for this exact run/target.** Workflow: [run 39602040135](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135); job log verified the configured target as `feature-admin-isolated-hando.sindarealest2.pages.dev`, path `/admin/`.
+- Run tested source commit: `3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f`. Workflow outcome: **SUCCESS**. `npm run check`: PASS; `npm test`: PASS; local Playwright source/fixture matrix: PASS.
+- Remote Preview signature: `PASS_LOGIN_CSS_SIGNATURE`; 423 CSS rules; `hasLoginHideRule=true`; the expected selector matched `.topbar > .brand` and computed `display:none !important`. Diagnostic also reported `visibility=visible`; that property alone does not override `display:none`, and the actual signature assertion passed.
+- This supersedes the earlier Preview-failure notes above **for run #149 only**. Do not treat older run #39592097224's failure as the latest Preview result. Do not generalize this pass to future deployments or to all authenticated business flows.
+- **Still open:** tested commit is the run's exact source SHA; current branch HEAD must be refreshed before any new source change. Full 12-screen visual parity remains NOT ACCEPTED; authenticated backend/business-flow QA remains NOT VERIFIED; PR #111 scope/security audit remains open and PR #111/#108 stay OPEN/unmerged.
+- Overall project progress remains **48%** (estimate, not test pass rate). Product image-save and PRE/PRO migration work remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
+- Guardrails unchanged: ADMIN branch only; no Production deployment, no merge, no secrets/Access changes, no migrations or remote D1/R2 mutations, no edits to `main` or `fix/liquid-glass-audit-2026-10-19`.
