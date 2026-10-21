@@ -1,7 +1,7 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
 **Trạng thái:** SOURCE CHECKS PASS; WARRANTY LIST-FIRST FIXTURE E2E PASS; PREVIEW LOGIN CSS SIGNATURE PASS; 12-SCREEN VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA NOT TESTED.
-**Tiến độ tổng thể:** **49%** — điểm ước lượng có trọng số, không phải tỷ lệ test pass. Bảng trọng số và cách tính được lưu trong `latest-test-results.json`.
+**Tiến độ tổng thể:** **50%** — điểm ước lượng có trọng số, không phải tỷ lệ test pass. Bảng trọng số và cách tính được lưu trong `latest-test-results.json`.
 **Nhánh duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20` trong `chichute5500/Sindarealest-admin`.
 **HEAD đã đọc trước lần ghi handoff:** `0e9e6560a968f7ca9754c91fda6f8af89c0ae41b`. Commit ghi handoff sẽ làm HEAD tiến lên; đọc lại ref trước khi sửa tiếp. Không có local checkout nên local Git status là NOT VERIFIED.
 
@@ -58,3 +58,11 @@
 - Admin Preview diagnostic [#39639774520](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774520): **SUCCESS** trên cùng SHA; 63 PNG được lưu trong artifact `admin-preview-evidence-200`.
 - Điểm tổng thể đã được tính lại theo 6 nhóm trọng số trong `latest-test-results.json`: **49%** (49.4% làm tròn). Chỉ tăng 1 điểm vì thay đổi tìm kiếm khách hàng là phần nhỏ; các khối lượng lớn còn mở gồm nghiệm thu 12 nhóm màn hình, QA nghiệp vụ có xác thực và kiểm toán semantic/security.
 - Không merge PR, không deploy Production, không thay đổi secrets/Access hoặc dữ liệu D1/R2.
+
+
+## Vòng tiếp tục — 2026-10-21 17:06 UTC
+
+- Thêm Playwright assertions cho màn hình Bảo hành/Yêu cầu hỗ trợ: kiểm tra nội dung thông báo `aria-live` cập nhật sau tìm kiếm, và cả hai bảng hiển thị trạng thái rỗng khi không có dữ liệu khớp. Dữ liệu test hoàn toàn tổng hợp; không gửi yêu cầu ghi API.
+- Commit test: `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`.
+- Workflow Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) và Admin Preview [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) đang chạy trên SHA đó tại thời điểm cập nhật; chưa công nhận pass.
+- Điểm ước lượng có trọng số cập nhật từ 49% lên 50% (49.6% làm tròn) do tăng độ bao phủ kiểm thử; đây không phải mức tăng tương đương về giao diện hoặc nghiệp vụ hoàn chỉnh.
