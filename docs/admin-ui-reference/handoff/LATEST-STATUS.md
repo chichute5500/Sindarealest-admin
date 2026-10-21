@@ -167,3 +167,13 @@
 - Updated `.github/workflows/admin-preview-diagnostics.yml` in commit `de6114f75cba36193c50ad043175d08be092929f` to distinguish `SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL` from a fully passing run, refresh `latestLocalEvidence` from current run metadata, and report source/login/fixture screenshot counts separately. This workflow-only change has been read back from GitHub but **has not yet been tested by a subsequent Actions run**.
 - The current `latest-test-results.json` still documents the last completed run (tested source `d74de3c6adbb6be6b0a59ac4d45e869738a016e4`, run #39495162150); do not treat the workflow edit commit as application code tested by that run.
 - Current branch head at this note: `de6114f75cba36193c50ad043175d08be092929f`. PR #111 remains OPEN/unmerged. Progress remains **43%**.
+
+
+## PR scope audit — 2026-10-21
+
+- Queried GitHub's paginated PR changed-file list and compare endpoint. PR #111 is OPEN/unmerged, base `main` at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, current head `bb320c7f928fbee888df5f641e3f27fe27ca3253`.
+- GitHub reports **909 changed files, +30,195 / -356 lines**. Compare endpoint reports the branch is diverged: 393 commits ahead and 6 behind `main`; compare file stats are capped at 300, so use the paginated PR file list (909) for the complete path inventory.
+- Inventory: 862 files under `docs/` (mostly reference/handoff/history/evidence assets); 1 `public/admin/index.html`; 1 storefront file `public/index.html`; 14 `functions/` backend files; 1 migration (`migrations/0008_product_sku_verification.sql`); 1 data file (`data/legacy-products.json`); 2 workflows; 5 scripts; 20 tests; and `package.json`/deployment README. This confirms the PR is not a narrowly scoped ADMIN-only diff, even though most files are documentation evidence.
+- Do **not** attempt a mass revert or rewrite of the PR without mapping commit ancestry and protecting valid user work. Keep PR #111 unmerged. Next safe audit: inspect exact patches for `public/index.html`, `data/legacy-products.json`, all 14 `functions/` files, the migration, and scripts; classify each as required/shared backend dependency vs unrelated storefront scope; propose minimal safe isolation before any merge.
+- Latest workflow fix commit is present in source, but no Actions run is associated with current HEAD `bb320c7f928fbee888df5f641e3f27fe27ca3253` in the PR-run query. Do not claim the updated workflow is tested. Workflow listens to push on the ADMIN branch and supports manual dispatch; a manual run is the next verification path if authorized tooling is available.
+- Progress remains **43%**. Preview mismatch, authenticated module tests, complete reference comparison, and merge-scope remediation remain open.
