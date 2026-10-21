@@ -358,3 +358,41 @@ Current branch HEAD was verified as `01191b0a49487145c9837ca9d765328255c64cbf` a
 
 ### PROMPT COPY SANG CHAT MỚI
 Tiếp tục hoàn thiện website tĩnh SinDarealest2 trực tiếp từ GitHub, không bắt người dùng nhắc lại bối cảnh. Đọc trước `docs/handoff/PROMPT-NEXT-CHAT-2026-10-21.md`, rồi đọc master prompt, `docs/prompts/NEXT-CHAT-PROMPT.md`, `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md` và `docs/visual-audit-progress-2026-10-19.md`. Repo `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108 phải giữ mở/chưa merge, chỉ dùng Preview `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`; tuyệt đối không chạm Production, main, Admin UI, backend/API, D1/R2, secrets/bindings/DNS, catalog hay dữ liệu thật. Không giả lập/thay thế SKU `SD-GL052`. Checkpoint capture mới nhất: run 39610598201/artifact 12350401549, source/deployment SHA `a56c12de32d3aa08b84f027217b90af8b7e5e36d`, 84 cặp = 71 giống/13 khác, không mismatch/missing, 12 route checks, không overflow/page/console errors; source PASS run 39610598095, Preview deploy PASS run 39610598134. Các số này không chứng minh visual parity. Mở artifact và hai ảnh tham chiếu gốc, kiểm tra toàn bộ storefront trên 360×800, 390×844, 768×1024, 1440×900 ở Light/Dark; ưu tiên satin, hero, “Phong cách đẳng cấp từ da cá sấu”, 6 ô Liquid Glass, “Đặt hàng an tâm”, product grid/detail/gallery, cart/account/checkout, mobile Back, Zalo/footer, route lỗi/404. Sửa các lệch đã xác nhận, test phần bị ảnh hưởng, deploy Preview, xác minh exact SHA, capture guarded và xem ảnh sau mỗi vòng. Cập nhật file handoff/test ledger/progress sau bằng chứng mới. Không lặp test PASS không liên quan, không dừng chỉ để báo cáo; chỉ dừng nếu thật sự cần người dùng cung cấp dữ liệu SKU thật hoặc quyền không thể tự lấy. Không tuyên bố 100% khi chưa được đối chiếu trực quan và nghiệm thu.
+
+
+## HANDOFF UPDATE — 2026-10-21 (latest verified checkpoint)
+
+### GitHub state and evidence
+- Repo: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and NOT MERGED. Preview only: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- HEAD at the start of this documentation update: `767cdf505c0faa82140e1f09a4c9e3e37e1b79ca`, commit message: `docs: record end-of-work pixel comparison (run 39618239674)`. Recheck HEAD before further work.
+- Latest guarded capture workflow: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618239674 ; artifact ID `12354336391`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618239674/artifacts/12354336391 . Source/deployment SHA for that capture: `696a163911f2d7a30f518a29bc9430ce3b88853a` (not necessarily current branch HEAD).
+- Source validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618239839 . Preview deployment PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618239453 . The guarded capture workflow passed and archived the 84-image capture set. Technical PASS is not visual design acceptance.
+- Earlier capture workflow `39610598201` / artifact `12350401549` reported 84 pairs, 71 pixel-identical and 13 changed, no size/invalid/missing/extra-image errors, and 12 route checks with no horizontal overflow/page/console errors. Those are historical metrics only; use the newest artifact/report for latest numbers and never manually edit workflow-managed metrics.
+
+### Latest changes
+- Adjusted four satin SVG assets (Light/Dark, desktop/mobile) to make fine folds more visible; kept the fine-line treatment and updated cache key to `20261021-18`.
+- Initial regression test exposed stale `20261021-17` expectations. Assertions were aligned, and subsequent source validation, Preview deploy, and guarded capture passed on source SHA `696a163911f2d7a30f518a29bc9430ce3b88853a`.
+- These changes are not proof that the satin matches the reference. The newest artifact must be opened and visually reviewed against both original reference PNGs: `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` (mobile Light) and `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png` (mobile Dark).
+
+### Progress / acceptance
+- Estimated overall engineering completion: **72%**. This is a qualitative estimate, not a pixel similarity score.
+- Human visual acceptance: **PENDING**. Inspect the actual latest artifact, not just green workflow badges or aggregate counts.
+- Full audit required at 360×800, 390×844, 768×1024, 1440×900 in both Light and Dark. Cover satin and hero blending; “Phong cách đẳng cấp từ da cá sấu”; six Liquid Glass tiles; “Đặt hàng an tâm”; categories/search/product cards/detail/gallery; cart/account/checkout and mobile Back/Forward; theme toggle; Zalo CTA/footer; direct product URL, invalid URL and 404.
+- The optional interactive browser run could not start because the TinyFish wallet balance was insufficient. This is not a product test failure or PASS. Prefer existing guarded Playwright/Cloudflare workflows; don't ask for payment unless that separate browser path becomes essential.
+
+### Required next steps
+1. Verify current branch HEAD, PR #108 state, and latest workflow/artifact before editing.
+2. Open artifact `12354336391` and visually compare the real images with both original reference PNGs. Record concrete mismatches by section, viewport, and theme.
+3. Fix one confirmed mismatch group at a time. Run only affected tests; deploy Preview; verify exact source/deployment SHA; run guarded live capture; open the images/diff; then continue.
+4. If a required route/state isn't actually covered by the capture, improve the existing guarded test workflow instead of claiming it passed.
+5. Update this handoff and progress docs with fresh evidence. Do not claim 100% until visual acceptance is complete.
+
+### Hard boundaries
+- Do not merge PR #108, change `main`, or deploy/touch Production.
+- Do not work on Admin UI; do not change backend/API, D1/R2, secrets, bindings, DNS, catalog data or product-image relationships.
+- Do not invent or substitute `SD-GL052`; it is not verified in public product data.
+- Do not hand-edit workflow-managed screenshot counts or pixel-diff metrics.
+- After reporting progress, continue working; stop only when genuinely blocked by user data or authorization that cannot be handled safely.
+
+### COPY-PASTE PROMPT FOR A NEW CHAT
+Continue the SinDarealest2 static storefront from the latest GitHub state. Read the latest update in this file first, then read `docs/prompts/MASTER-PROMPT-SINDAREALEST2-PARALLEL.md`, `docs/prompts/NEXT-CHAT-PROMPT.md`, `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, and `docs/visual-audit-progress-2026-10-19.md`. Repo `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108 must stay open/unmerged; Preview only at https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Recheck HEAD. Latest guarded capture is run 39618239674, artifact 12354336391; capture source/deployment SHA is 696a163911f2d7a30f518a29bc9430ce3b88853a, not necessarily branch HEAD. Source validation 39618239839 and Preview deploy 39618239453 passed. Open and inspect the actual artifact and compare against both original reference PNGs. Human visual acceptance is PENDING; current estimated completion is ~72%, not 100%. Audit 360×800, 390×844, 768×1024, 1440×900 in Light/Dark across the full storefront, including satin/hero blend, crocodile-leather section, six Liquid Glass tiles, order-trust section, catalog/search/cards/detail/gallery, cart/account/checkout and mobile Back/Forward, theme toggle, Zalo/footer, direct/invalid product routes and 404. Fix confirmed mismatches one group at a time, test affected paths only, deploy Preview, verify exact SHA, run guarded capture, inspect screenshots/diff, update handoff and continue. Do not touch Production/main/Admin/backend/API/D1/R2/secrets/bindings/DNS/catalog; do not invent SD-GL052; never manually alter workflow metrics or claim visual acceptance from CI alone. Continue after reporting unless user action is genuinely essential.
