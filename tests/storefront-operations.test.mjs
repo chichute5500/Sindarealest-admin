@@ -64,6 +64,8 @@ const heroStart = storefrontHtml.indexOf('<section class="hero wrap" id="home">'
 const heroEnd = storefrontHtml.indexOf('<section class="wrap" aria-label="Quyền lợi thương hiệu"', heroStart);
 const heroMarkup = storefrontHtml.slice(heroStart, heroEnd);
 assert.ok(heroMarkup.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.') && heroMarkup.includes('Khám phá ngay') && !heroMarkup.includes('Khám phá bộ sưu tập') && !heroMarkup.includes('Khám phá sản phẩm'), 'Hero copy and its single reference CTA must remain concise after removing product imagery');
+assert.ok(storefrontHtml.includes('#home.hero:has(#heroProductImage[hidden]){\n  min-height:0!important;') && storefrontHtml.includes('background:transparent!important;') && storefrontHtml.includes('collapse empty hero frame without substituting missing SD-GL052') === false,
+  'When the verified SD-GL052 image is unavailable, the hero must collapse its empty frame rather than use a substitute product.');
 assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
 const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');
