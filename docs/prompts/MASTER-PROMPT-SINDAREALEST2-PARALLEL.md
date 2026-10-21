@@ -309,3 +309,26 @@ Không thay thế hay xóa file nguồn đó; file master tổng hợp này kế
 - **Audit did not pass:** one hard failure remains: `SD-GL052` is absent from the verified public product payload at `mobile-390-light`. Do not invent or substitute it. `commerceStatesComplete` is not evidence of a completed order: the audit was read-only, checkout was opened but not submitted, and no payment was attempted.
 - Manifest `docs/website-screenshots/manifest.json` now records this exact audit, artifact, verified deployment SHA and blocker. The capture artifact is evidence for SHA `0153bbf…`, not a claim that a later documentation-only commit is already deployed.
 - At this follow-up, branch HEAD was `c9b52c6a37e91416aab35c3def40d85abe0e6d33` (handoff-only commit); source validation, Preview deploy, Admin Preview smoke and visual workflow were newly queued/running on that SHA. Recheck those runs and deployment verification before calling the newest HEAD validated. Keep Production untouched and PR #108 unmerged.
+
+
+## AUTHORITATIVE ADDENDUM — PRODUCT FULFILLMENT & CHECKOUT RULES (2026-10-21)
+
+This section clarifies storefront behavior and does not authorize work on Admin code. Keep this branch exclusively for the public static website, customer-facing UI, storefront integration, and its tests. Do not edit Admin UI/backend/schema/migrations or implement Admin-only endpoints here. Read the shared contract at `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` before touching checkout.
+
+### Product type is owner-managed, never customer-selected
+- The product's fulfillment type is a product field set/controlled by the owner in Admin and returned by the API: `made_to_order`, `in_stock`, or `unclassified`.
+- The customer must NOT choose whether a product is made-to-order or in-stock at checkout. The storefront reads the authoritative product field and displays the matching payment options automatically.
+- Do not infer the type from category (e.g. shoes/footwear), SKU, stock quantity, old labels, photos, or guesswork. The owner may classify footwear as made-to-order and can classify individual products as in-stock in Admin. If the API field is missing/unknown, treat it as `unclassified` and offer contact/consultation without exposing an incorrect payment choice.
+
+### Payment options to render
+- `made_to_order`: (A) deposit = 30% of the server-confirmed product/order value to begin production; or (B) full payment = 100%, eligible for freeship.
+- `in_stock`: (A) fixed deposit = 100,000 VND, then dispatch after the store verifies the deposit and confirms the order; or (B) full payment = 100%, eligible for freeship and dispatch after verification.
+- Full-payment freeship applies to BOTH fulfillment types. Do not imply that the deposit options are automatically freeship.
+- The storefront must show the amount calculated/confirmed by the server for the chosen option, not a browser-invented amount. If price or type is unclassified/unconfirmed, allow the customer to submit a consultation/order request but do not calculate a fake deposit, request transfer, or show a payment-ready QR.
+- QR image and receiving details must come from the active public-safe Admin/API configuration. Never hardcode or fabricate a QR. Do not treat opening/scanning QR, clicking “I transferred”, or uploading a receipt as proof of payment. Only show verified-paid status returned by trusted backend/Admin workflow.
+
+### UX acceptance checks
+- No customer-facing selector for fulfillment type.
+- Verify all four exact branches: made-to-order 30% deposit; made-to-order 100% + freeship; in-stock 100,000 VND deposit; in-stock 100% + freeship.
+- Verify unclassified product, missing price, unavailable QR, invalid payment response, and mobile light/dark states fail safely and offer consultation.
+- Do not state that backend support exists unless verified against actual API and deployed Preview. Keep this work on the static branch; no merges or Production deploys.
