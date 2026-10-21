@@ -131,3 +131,14 @@ The project owner already has an image of the bank-account receiving QR. Treat i
 - Public API exposes only active customer-safe fields and the correct asset URL; no secrets/private fields leak.
 - Storefront renders the active image and handles missing/inactive/broken image gracefully.
 - Test that the QR does not encode a fixed amount, and that displayed order/installment amount comes from the confirmed server-side order state, not from the QR image or client-supplied amount.
+
+
+## 8. Storefront API payload contract — added 2026-10-21
+
+The public GET /api/products response exposes `fulfillmentType` with exactly one of `in_stock`, `made_to_order`, or `unclassified`. Missing, unknown, or invalid values are treated as `unclassified`; stock is never used to infer the type. The serializer now exposes a conservative default, but the current schema has no `fulfillment_type` column, so existing rows remain unclassified until an approved Admin/backend change adds the field and a human classifies products. Do not bulk-backfill from stock.
+
+The storefront renders an actual QR only when the server returns `status: confirmed`, `priceConfirmationRequired: false`, and `paymentInstructions` with `status: ready`, a trusted same-origin or HTTPS `qrImageUrl`, `qrIncludesAmount: false`, non-empty `bankName`, `accountName`, `accountNumber`, `transferContent`, and a positive safe-integer VND `amount`. The amount is displayed outside the QR.
+
+This is a presentation contract, not a claim that the current API supports payment instructions. Current POST /api/orders creates an order in `pending_confirmation`; no public order-status lookup or QR/receiver configuration exists. The storefront therefore shows “Chờ cửa hàng xác nhận” and does not show an invented QR, ask for money, or claim payment success. Backend/Admin work must design a safe post-confirmation delivery path (such as an order-specific access token or other verified customer authorization); never expose order/customer details using order number alone.
+
+The storefront never sets payment_status, never interprets QR display/scan/upload as payment, and does not trust a browser-supplied amount. A server-confirmed QR must have no preset amount; the amount is presented outside the QR for the customer to enter manually.

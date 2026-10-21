@@ -302,6 +302,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     title: row.title,
     category: row.category,
     categoryLabel: row.category_label || row.category,
+    fulfillmentType: ["in_stock", "made_to_order", "unclassified"].includes(String(row.fulfillment_type || "")) ? String(row.fulfillment_type) : "unclassified",
     description: row.description || "",
     price: !publicView ? price : (showPrices && sourcePriceConfirmed && publicPriceIsValid ? price : null),
     stock: publicView || row.stock === null || row.stock === undefined ? null : Number(row.stock),
