@@ -30,21 +30,21 @@
   <ellipse cx="356" cy="460" rx="130" ry="235" fill="#bad8ed" opacity=".25" filter="url(#haze)"/>
   <ellipse cx="124" cy="870" rx="230" ry="130" fill="#fff" opacity=".24" filter="url(#haze)"/>
   <g id="satin-crease-detail" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M-44 104 C26 40 76 78 130 126 S260 181 432 93" stroke="#9abfdd" stroke-opacity=".12" stroke-width="22" filter="url(#soft)"/>
+    <path d="M-44 104 C26 40 76 78 130 126 S260 181 432 93" stroke="#9abfdd" stroke-opacity=".12" stroke-width="12" filter="url(#soft)"/>
     <path d="M-44 104 C26 40 76 78 130 126 S260 181 432 93" stroke="url(#fold)" stroke-width="10" opacity=".54"/>
     <path d="M-39 97 C32 33 81 71 135 119 S264 174 438 86" stroke="url(#shine)" stroke-width="1.8" opacity=".78"/>
-    <path d="M-52 265 C24 196 87 236 145 287 S276 339 432 252" stroke="#9fc4df" stroke-opacity=".10" stroke-width="20" filter="url(#soft)"/>
-    <path d="M-52 265 C24 196 87 236 145 287 S276 339 432 252" stroke="url(#fold)" stroke-width="9" opacity=".44"/>
-    <path d="M-47 258 C29 189 92 229 150 280 S280 332 438 245" stroke="url(#shine)" stroke-width="1.5" opacity=".70"/>
-    <path d="M-48 440 C24 371 91 413 153 463 S282 517 435 430" stroke="#9bbfdd" stroke-opacity=".12" stroke-width="22" filter="url(#soft)"/>
+    <path d="M-52 265 C24 196 87 236 145 287 S276 339 432 252" stroke="#9fc4df" stroke-opacity=".10" stroke-width="12" filter="url(#soft)"/>
+    <path d="M-52 265 C24 196 87 236 145 287 S276 339 432 252" stroke="url(#fold)" stroke-width="5" opacity=".32"/>
+    <path d="M-47 258 C29 189 92 229 150 280 S280 332 438 245" stroke="url(#shine)" stroke-width="1.05" opacity=".70"/>
+    <path d="M-48 440 C24 371 91 413 153 463 S282 517 435 430" stroke="#9bbfdd" stroke-opacity=".12" stroke-width="12" filter="url(#soft)"/>
     <path d="M-48 440 C24 371 91 413 153 463 S282 517 435 430" stroke="url(#fold)" stroke-width="10" opacity=".48"/>
     <path d="M-43 433 C29 364 96 406 158 456 S286 510 441 423" stroke="url(#shine)" stroke-width="1.8" opacity=".74"/>
-    <path d="M-56 620 C20 552 89 589 151 642 S284 696 438 610" stroke="#9dc3df" stroke-opacity=".10" stroke-width="21" filter="url(#soft)"/>
-    <path d="M-56 620 C20 552 89 589 151 642 S284 696 438 610" stroke="url(#fold)" stroke-width="9" opacity=".42"/>
-    <path d="M-51 613 C25 545 94 582 156 635 S288 689 444 603" stroke="url(#shine)" stroke-width="1.6" opacity=".68"/>
-    <path d="M78 -60 C126 64 91 152 119 252 S171 426 138 527 S100 735 160 905" stroke="#a7cce5" stroke-opacity=".11" stroke-width="20" filter="url(#soft)"/>
-    <path d="M78 -60 C126 64 91 152 119 252 S171 426 138 527 S100 735 160 905" stroke="url(#fold)" stroke-width="8" opacity=".32"/>
-    <path d="M324 -50 C281 76 326 171 294 279 S263 474 306 580 S344 746 304 900" stroke="#b2d3e9" stroke-opacity=".10" stroke-width="18" filter="url(#soft)"/>
-    <path d="M324 -50 C281 76 326 171 294 279 S263 474 306 580 S344 746 304 900" stroke="url(#shine)" stroke-width="1.5" opacity=".48"/>
+    <path d="M-56 620 C20 552 89 589 151 642 S284 696 438 610" stroke="#9dc3df" stroke-opacity=".10" stroke-width="12" filter="url(#soft)"/>
+    <path d="M-56 620 C20 552 89 589 151 642 S284 696 438 610" stroke="url(#fold)" stroke-width="5" opacity=".30"/>
+    <path d="M-51 613 C25 545 94 582 156 635 S288 689 444 603" stroke="url(#shine)" stroke-width="1.1" opacity=".68"/>
+    <path d="M78 -60 C126 64 91 152 119 252 S171 426 138 527 S100 735 160 905" stroke="#a7cce5" stroke-opacity=".11" stroke-width="12" filter="url(#soft)"/>
+    <path d="M78 -60 C126 64 91 152 119 252 S171 426 138 527 S100 735 160 905" stroke="url(#fold)" stroke-width="5" opacity=".23"/>
+    <path d="M324 -50 C281 76 326 171 294 279 S263 474 306 580 S344 746 304 900" stroke="#b2d3e9" stroke-opacity=".10" stroke-width="12" filter="url(#soft)"/>
+    <path d="M324 -50 C281 76 326 171 294 279 S263 474 306 580 S344 746 304 900" stroke="url(#shine)" stroke-width="1.05" opacity=".48"/>
   </g>
 </svg>
