@@ -21,15 +21,20 @@
     "pr111State": "OPEN_UNMERGED_MIXED_SCOPE",
     "pr108State": "OPEN_UNMERGED",
     "pr111ChangedFiles": 1112,
-    "pr111Additions": 38619,
-    "pr111Deletions": 392,
     "pr108ChangedFiles": 269,
     "pr108Additions": 19270,
     "pr108Deletions": 380,
     "protectedStaticWebsiteBranchMustNotBeModified": true,
     "pr111PngFiles": 913,
     "pr111NonImageDocsAndCodeFiles": 199,
-    "latestTestedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978"
+    "latestTestedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+    "pr111DiffStatsNote": "Do not treat additions/deletions as a stable project metric: handoff docs are appended within this same PR and change the diff stat. Re-query live PR when needed; the path count observed here is 1,112.",
+    "pr111DiffStatsAtInitialScopeAudit": {
+      "additions": 38619,
+      "deletions": 392,
+      "observedAt": "2026-10-21T14:18:52Z",
+      "note": "Point-in-time before this round of handoff updates."
+    }
   },
   "changes": [
     {
@@ -2185,5 +2190,26 @@
     "realImageUpload": "NOT_VERIFIED",
     "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
     "authenticatedBusinessFlow": "NOT_TESTED"
+  },
+  "paymentIntegrationSourceAudit": {
+    "inspectedAt": "2026-10-21T14:28:00Z",
+    "findings": {
+      "adminQrUpload": "SOURCE_CONTRACT_PRESENT: requireAdmin, upload size limit, pending-only upload and authenticated preview; live upload not tested",
+      "manualQrActivation": "SOURCE_CONTRACT_PRESENT: valid pending key and explicit activate/deactivate with audit log",
+      "paymentRequest": "SOURCE_CONTRACT_PRESENT: rejects client amount; requires confirmed price/terms and active QR; server-derived installment amount",
+      "verifiedLedger": "SOURCE_CONTRACT_PRESENT: reference validation, duplicate conflicts, refund ceiling and conditional follow-on writes",
+      "publicOrderPayment": "SOURCE_CONTRACT_PRESENT: order token hash, private/no-store/referrer controls, fail-closed before terms confirmation",
+      "staticConsumerGap": "KNOWN_GAP_OTHER_BRANCH: public/index.html does not map/display both freeShippingEligible and freeShipping; do not patch static branch here"
+    },
+    "deployReadinessRisk": {
+      "status": "POTENTIAL_BLOCKER_NOT_VERIFIED",
+      "setupScriptSha": "2fd36a7a6b9d247f1c014e211e8033cfe8ce8fd7",
+      "deployScriptSha": "20c7a7289ef9a25bd43ce2b02de69d4205258403",
+      "checkMigrationsSha": "242ce439d9de903d3949f1a55baf69fe9a8e1f29",
+      "migration009Sha": "dbb64910bedd3e0ee8badf2e9870d5b1d9397b15",
+      "issue": "setup-cloudflare.mjs does not reference migration 0009; deploy-cloudflare.mjs preflights 0007 order snapshots and 0008 SKU columns, not 0009 payment fields/tables. check-migrations.mjs validates 0009 only in temporary local D1.",
+      "evidenceBoundary": "Source inspection only; remote schema may or may not have 0009. No remote D1 read/write, SQL, migration, setup script or deployment was run.",
+      "ownerAction": "Any correction/execution of migration/setup/deploy paths needs explicit owner authorization under current safety constraints."
+    }
   }
 }
