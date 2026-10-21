@@ -228,3 +228,28 @@ Không thay thế hay xóa file nguồn đó; file master tổng hợp này kế
 - Run #500 passed source tests/checks and captured 84 live Preview screenshots. Artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550753725/artifacts/12324121132. Cloudflare deployment metadata confirms the captured branch and source SHA match exactly (deployment `b6a52c8b-a88d-482a-a550-92ab195d2438`). The updated account panel was visually inspected in Light mode and the oversized blank area is reduced.
 - Live audit still has one hard failure only: `SD-GL052` is absent from verified public product data. Other audited route checks, 8 viewport/theme checks, and account/gallery/cart/checkout capture states passed. Keep the SKU fail-closed and continue other sections before revisiting the hero.
 - Continue next with the remaining non-hero visual comparisons and fixes: six Liquid Glass tiles, order-assurance area, featured/product cards, product detail/gallery controls, cart and checkout spacing/readability, Zalo CTA, footer, and the full-page section flow. Each coherent fix must pass tests and be checked against a new exact-SHA Preview capture. Do not change the official logo, brand identity, real product identity/data/image relationships; do not work on Admin UI, merge PR #108, modify `main`, or touch Production/D1/R2 config/data.
+
+
+---
+
+## BỔ SUNG VÀO PHẠM VI CÔNG VIỆC DÀI HẠN — ĐỒNG BỘ WEB TĨNH / ADMIN, KHÔNG NGẮT VIỆC ĐANG LÀM
+
+Đây là một phần chính thức của công việc SinDarealest, không phải lệnh đổi ưu tiên tức thời.
+
+### Quy tắc ưu tiên và tiếp tục công việc
+- Tiếp tục hoàn thành các hạng mục hiện tại của Web tĩnh theo thứ tự ưu tiên và checkpoint đã ghi trong file bàn giao mới nhất. Không bỏ dở, không tự chuyển toàn bộ phiên sang QR/Admin integration chỉ vì phụ lục này được thêm.
+- Chỉ xử lý phần tích hợp QR/phân loại trong lượt hiện tại nếu nó độc lập, cần thiết cho công việc đang làm và không làm trễ hoặc phá vỡ mục tiêu hiện tại. Nếu sẽ đổi phạm vi hoặc gây gián đoạn, ghi nhận dependency/việc cần làm tiếp theo vào handoff rồi tiếp tục nhiệm vụ hiện tại.
+- Sau khi đạt checkpoint công việc hiện tại hoặc khi có khoảng làm việc an toàn, tiến hành phần thuộc Web tĩnh của hợp đồng tích hợp chung. Không chờ người dùng nhắc lại, nhưng cũng không được ưu tiên việc mới cao hơn các blocker/hạng mục hiện tại một cách tự ý.
+- Luôn đọc bản mới nhất của `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` và xác minh API/schema ở HEAD hiện hành trước khi tích hợp; tài liệu không phải bằng chứng API đã tồn tại.
+
+### Phạm vi Web tĩnh
+- Hiển thị `fulfillment_type` theo dữ liệu API: `in_stock`, `made_to_order`, `unclassified`; không suy luận loại hàng từ `stock`, không tự phân loại dữ liệu cũ.
+- QR chuyển khoản không nhúng/điền sẵn số tiền. Chỉ hiển thị số tiền bên ngoài QR sau khi giá và điều kiện/đợt thanh toán được xác nhận; khách tự nhập số tiền trong ứng dụng ngân hàng.
+- Không tự tạo API giả, không tự đánh dấu đơn `paid`, không coi việc mở/quét QR hoặc gửi biên lai là bằng chứng tiền đã nhận.
+- Dùng API/backend có thẩm quyền theo hợp đồng. Nếu API còn thiếu, ghi BLOCKED/contract dependency với endpoint, trường dữ liệu và response còn thiếu; tiếp tục các hạng mục giao diện độc lập khác.
+- Không sửa code Admin hoặc nhánh Admin. Không merge/cherry-pick/sync hai nhánh để giải quyết khác biệt.
+
+### Bàn giao và kiểm chứng
+- Cập nhật handoff hiện hành: trạng thái tích hợp (NOT STARTED / IN PROGRESS / BLOCKED / VERIFIED), dependency API, file/commit SHA, test đã chạy và kết quả thực tế.
+- Chỉ báo VERIFIED khi đã kiểm tra trên đúng SHA và có test/bằng chứng. Tài liệu chung hoặc giao diện tĩnh đơn thuần không chứng minh backend đã đồng bộ.
+- Giữ nguyên hàng rào hiện có: không merge PR #108/#111, không sửa main, không deploy Production, không thao tác dữ liệu/config D1/R2/secret thật.
