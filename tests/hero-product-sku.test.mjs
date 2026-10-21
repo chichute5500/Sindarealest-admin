@@ -18,12 +18,13 @@ assert.ok(html.includes('id="heroProductImage"'),
   "The existing hero image element must remain available for responsive styling.");
 
 const visualAudit = readFileSync(new URL("../scripts/capture-liquid-glass-preview.mjs", import.meta.url), "utf8");
-assert.ok(visualAudit.includes("hero-fails-closed-with-unverified-fixture"),
-  "The local fixture audit must confirm the hero remains hidden without the verified SKU.");
-assert.ok(visualAudit.includes("startup.heroImage.status === 'sku-unavailable'")
-  && visualAudit.includes("startup.heroImage.hidden")
-  && visualAudit.includes("!startup.heroImage.source"),
-  "The local audit must require an empty, hidden hero image while SKU verification is unavailable.");
+assert.ok(visualAudit.includes("hero-presentation-asset-visible-with-unverified-fixture"),
+  "The local fixture audit must confirm the hero presentation asset remains visible without a verified SKU.");
+assert.ok(visualAudit.includes("startup.heroImage.status === 'hero-presentation-asset'")
+  && visualAudit.includes("startup.heroImage.loaded")
+  && visualAudit.includes("!startup.heroImage.hidden")
+  && visualAudit.includes("startup.heroImage.source.includes('/images/hero-sd-gl052.png')"),
+  "The local audit must require the presentation asset to load and remain visible independent of SKU verification.");
 
 const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the exact product crisp and blend it into the satin-glass background"));
 assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
@@ -44,4 +45,4 @@ assert.ok(liveCapture.includes("path.endsWith('/images/hero-sd-gl052.png')")
   && liveCapture.includes("!frameCollapsed"),
   "The live audit must check the exact hero asset, visible image state, and non-collapsed frame.");
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
-console.log("PASS: hero image is tied to verified public SKU/image mapping; missing SKU fails closed and remains an explicit visual blocker.");
+console.log("PASS: hero presentation image remains visible independently of catalog SKU verification.");
