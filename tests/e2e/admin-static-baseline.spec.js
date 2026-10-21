@@ -603,6 +603,16 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#pPrice')).toBeHidden();
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#productTabPricing')).toBeFocused();
+    await expect(page.locator('#productTabPricing')).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('Home');
+    await expect(page.locator('#productTabDetails')).toBeFocused();
+    await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('End');
+    await expect(page.locator('#productTabGallery')).toBeFocused();
+    await expect(page.locator('#productTabGallery')).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('Home');
+    await expect(page.locator('#productTabDetails')).toBeFocused();
+    await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
     await page.locator('#productTabDetails').click();
     await expect(page.locator('#pSku')).toBeVisible();
 
