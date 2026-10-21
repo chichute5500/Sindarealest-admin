@@ -2568,6 +2568,20 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
   .service-strip .service-copy{min-height:72px;padding:7px 3px}
   .service-strip .service-text strong{font-size:10px}
 }
+
+/* Live Preview visual fix: fade the supplied hero photograph into the satin canvas instead of exposing its rectangular studio backdrop. */
+#home .hero-visual{background:transparent!important;border:0!important;box-shadow:none!important}
+#home .hero-visual img{
+  -webkit-mask-image:radial-gradient(ellipse 78% 74% at 64% 53%,#000 45%,rgba(0,0,0,.94) 59%,rgba(0,0,0,.58) 75%,transparent 100%);
+  mask-image:radial-gradient(ellipse 78% 74% at 64% 53%,#000 45%,rgba(0,0,0,.94) 59%,rgba(0,0,0,.58) 75%,transparent 100%);
+}
+@media(max-width:760px){
+  #home .hero-visual img{
+    -webkit-mask-image:radial-gradient(ellipse 88% 78% at 68% 52%,#000 48%,rgba(0,0,0,.94) 64%,rgba(0,0,0,.58) 82%,transparent 100%);
+    mask-image:radial-gradient(ellipse 88% 78% at 68% 52%,#000 48%,rgba(0,0,0,.94) 64%,rgba(0,0,0,.58) 82%,transparent 100%);
+  }
+}
+
 </style>
 
 </body>
