@@ -119,3 +119,16 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 Đọc `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` trước khi thực hiện hai tính năng đã được chủ dự án duyệt: phân loại Hàng có sẵn/Hàng đặt riêng và QR chuyển khoản theo đơn (không tích hợp cổng thanh toán). Đây là phạm vi bổ sung; tiếp tục công việc Admin đang dang dở.
 
 Không đoán loại sản phẩm từ tồn kho; dữ liệu cũ chưa rõ cần rà soát. QR không chứng minh tiền đã về; chỉ xác nhận thủ công sau khi kiểm tra giao dịch. Không yêu cầu thanh toán trước khi giá/điều kiện đơn được xác nhận. Nếu cần schema/API/migration, phân tích compat/rollback/test và chỉ sửa code trên nhánh Admin; không chạy migration Production hoặc ghi dữ liệu thật. Bảo vệ nhánh website tĩnh và main. PR #111 giữ mở và cần audit scope rộng trước nghiệm thu.
+
+
+## Cross-branch checkout/payment synchronization — 2026-10-21
+
+For checkout, fulfillment-type, QR, or payment-ledger work, read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and the cross-branch section in `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`.
+
+Static checkout visual reference (customer-facing UI only; not an Admin screen):
+https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png
+Recorded image blob SHA: `c89ff843af1c094def9233d27a148e048b191990`.
+
+Admin branch remains `feature/admin-isolated-handoff-2026-10-20`; static branch remains `fix/liquid-glass-audit-2026-10-19`. Never merge/cherry-pick or edit across these branches as part of the synchronization. PR #111 stays open/unmerged; no Production deployment, remote migration, real D1/R2 mutation, or secret/binding changes.
+
+Keep ownership strict: Admin owns product type, payment rules/configuration, QR verification, and the transaction ledger; static website owns customer-facing presentation and consumption of public-safe API only. The contract is not proof that the live API or Preview is compatible. Verify source SHA, tests, response shape, and Preview separately before reporting integration complete.
