@@ -11,7 +11,7 @@ assert.match(dashboard, /id="dashboardRevenueTitle"/, 'dashboard must include th
 assert.match(dashboard, /Doanh thu theo thời gian/, 'revenue panel should match the reference screen concept');
 assert.match(dashboard, /Chưa có chuỗi dữ liệu đầy đủ/, 'panel must clearly disclose its unverified-data state');
 assert.match(dashboard, /Chưa thể hiển thị biểu đồ doanh thu/, 'panel must explain why no chart is drawn');
-assert.match(dashboard, /Không dùng số đơn gần nhất hoặc dữ liệu chưa xác minh để suy diễn doanh thu/, 'panel must not misrepresent capped order data as complete history');
+assert.match(dashboard, /Không dùng số đơn gần nhất hoặc dữ liệu chưa xác minh để ước đoán doanh thu/, 'panel must not misrepresent capped order data as complete history');
 assert.match(dashboard, /role="status"/, 'empty state must be announced accessibly');
 assert.match(html, /\.dashboard-revenue-empty/, 'revenue empty state must have dedicated styling');
 assert.doesNotMatch(dashboard, /\$\s?[0-9][0-9,.]*|₫\s?[0-9][0-9,.]*/, 'no fabricated revenue amount should appear in the dashboard panel');
