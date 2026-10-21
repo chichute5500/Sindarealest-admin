@@ -169,7 +169,7 @@ for (const [name, svg] of [
   ['light desktop', lightWaveArtwork], ['dark desktop', darkWaveArtwork],
   ['light mobile', lightMobileWaveArtwork], ['dark mobile', darkMobileWaveArtwork]
 ]) {
-  assert.match(svg, /data-satin-style="fine-satin-drape-v6"/,
+  assert.match(svg, /data-satin-style="fine-satin-drape-v7"/,
     name + ' must use the organic satin composition rather than the legacy parallel ribbons.');
   assert.ok((svg.match(/data-fold-layer="body"/g) || []).length >= 6,
     name + ' must keep multiple independent folded fabric ridges.');
@@ -181,11 +181,11 @@ for (const [name, svg] of [
   assert.ok(new Set(bodyPaths).size >= 5 && bodyPaths.every(path => /C/.test(path)),
     name + ' must use varied organic curves, not duplicate straight stripe paths.');
 }
-assert.ok(lightWaveArtwork.includes('stroke-width="28"') && lightWaveArtwork.includes('stroke-width="3.2"'),
+assert.ok(lightWaveArtwork.includes('stroke-width="18"') && lightWaveArtwork.includes('stroke-width="2"'),
   'Light desktop satin must have visible ridge and fine highlight layers within the desktop stroke budget.');
-assert.ok(darkWaveArtwork.includes('stroke-width="28"') && darkWaveArtwork.includes('stroke-width="3.2"'),
+assert.ok(darkWaveArtwork.includes('stroke-width="18"') && darkWaveArtwork.includes('stroke-width="2"'),
   'Dark desktop satin must have visible ridge and fine highlight layers within the desktop stroke budget.');
-assert.ok(lightMobileWaveArtwork.includes('stroke-width="18"') && lightMobileWaveArtwork.includes('stroke-width="2.5"'),
+assert.ok(lightMobileWaveArtwork.includes('stroke-width="12"') && lightMobileWaveArtwork.includes('stroke-width="1.6"'),
   'Light mobile satin must show crease details while respecting the mobile stroke budget.');
-assert.ok(darkMobileWaveArtwork.includes('stroke-width="18"') && darkMobileWaveArtwork.includes('stroke-width="2.5"'),
+assert.ok(darkMobileWaveArtwork.includes('stroke-width="12"') && darkMobileWaveArtwork.includes('stroke-width="1.6"'),
   'Dark mobile satin must show crease details while respecting the mobile stroke budget.');
