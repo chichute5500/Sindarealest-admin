@@ -171,4 +171,6 @@ assert.match(baselineSpec, /await page\.keyboard\.press\('ArrowRight'\);[\s\S]*p
 assert.match(baselineSpec, /await page\.locator\('#productTabGallery'\)\.click\(\);[\s\S]*setInputFiles\(/,
   'Synthetic image fixture should switch to the visible gallery tab before interacting');
 
+has('aria-label="Ghi chú điều kiện đơn hàng ${esc(o.order_number)}"', 'accessible order payment terms note');
+
 console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
