@@ -864,3 +864,37 @@ Khi người dùng mở một chat mới để tiếp tục ADMIN, hướng dẫ
 5. Chỉ làm việc trên `feature/admin-isolated-handoff-2026-10-20`. Bảo vệ `fix/liquid-glass-audit-2026-10-19` và `main`; giữ PR #111 và PR #108 chưa merge; không force-push, tự merge/cherry-pick, đổi secrets/backend/data hoặc deploy Production.
 6. Sau mỗi vòng công việc có bằng chứng, cập nhật LATEST-STATUS.md, latest-test-results.json và PROMPT-NEXT-CHAT.md nếu cần; ghi kết quả PASS/FAIL/BLOCKED/SKIPPED/NOT VERIFIED theo bằng chứng. Đọc lại file từ GitHub để xác minh sau khi commit.
 7. Không lặp lại công việc đã PASS trên cùng source commit trừ khi code phụ thuộc thay đổi. Ưu tiên bước tiếp theo có thể thực hiện ngay, không dừng ở kế hoạch nếu có công việc an toàn thực sự có thể tiến hành.
+
+
+
+## 18.10. Current verified continuation — 2026-10-21 (supersedes older handoff snapshots)
+
+**Verified repository/branch state**
+- Repository: `chichute5500/Sindarealest-admin`.
+- ADMIN branch HEAD at this checkpoint: `9c94c106fec99aa5920685da4d4af32b53e680ad`; PR #111 remains OPEN/unmerged against `main` (`28c768ba26b1d9f7d40e14efac5112526ed1c8b3`).
+- Protected static branch HEAD: `9d5549cf662c63f55d3df591c1321248276a5a22`; PR #108 remains OPEN/unmerged. Do not modify either PR state.
+- No local Git checkout exists in the current tool runtime, so a local `git status`/working-tree claim is NOT VERIFIED. GitHub refs and source files were checked directly.
+
+**Latest CI and browser evidence**
+- CI run [39543407286](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286) on HEAD `9c94c106fec99aa5920685da4d4af32b53e680ad`: PASS for repository check, automated tests and dependency audit. This CI run did not run the Playwright Preview diagnostics.
+- Latest diagnostic workflow run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) tested `de6114f75cba36193c50ad043175d08be092929f`; source checks and local Playwright capture passed, while the deployed Preview check failed.
+- Artifact `admin-preview-evidence-62 (ID 12320316041)`: 58 PNGs total — 16 login-shell viewport/theme captures and 42 module fixture captures; 36 metrics recorded. Local fixture uses synthetic data, stubs local session to enter the app shell, blocks non-GET calls, and is NOT authenticated real-backend evidence.
+- Preview result is `PREVIEW_CSS_SIGNATURE_MISMATCH`: remote `.topbar > .brand` had `display:flex`, `visibility:visible`, opacity `1`; the expected inline login-hide rule was absent. The correct Preview deployment/source has not been identified. Keep the test assertion strict and do not inspect/change secrets or bypass Cloudflare Access.
+- The current HEAD after this checkpoint's earlier commits contains documentation changes after the last diagnostic run; do not label Preview PASS without a new valid diagnostic run on a verified target.
+
+**Scope and migration safety**
+- PR #111 is 909 files: 862 docs/evidence + 47 non-doc files; compare says 402 commits ahead and 6 behind main (compare file endpoint capped at 300; paginated PR filename list is the 909-file count).
+- The non-doc diff includes ADMIN HTML, public storefront `public/index.html`, `data/legacy-products.json`, 14 Functions files, migration 0008, 5 scripts, 2 workflows, package config and 20 tests. It is NOT an isolated ADMIN UI-only PR.
+- Additional patch inspection confirmed public middleware, sitemap, order creation, warranty lookup and Admin product/order/backup/restore/settings/warranty handlers consume the new `sku_verified` columns; migration `0008_product_sku_verification.sql` adds them. `scripts/setup-cloudflare.mjs` can execute remote D1 migrations and direct `ALTER TABLE`; it has NOT been run. Never run setup/deploy or modify real schema/data under current constraints.
+- `scripts/capture-liquid-glass-preview.mjs`, workflow `liquid-glass-visual-preview.yml` and public-site tests are included in PR #111, further confirming mixed scope. GitHub's PR patch endpoint returned `patch=null` for the large `public/index.html` and `data/legacy-products.json` files; their exact diffs remain UNREVIEWED, not assumed safe.
+- The approved reference asset exists in the repository, but its PNG bytes could not be rendered through the current connector path during this pass. The artifact contact sheet was inspected; full 12-screen parity remains NOT VERIFIED.
+
+**Progress: 43%**
+This stage-based estimate stays at 43% until the actual Preview target is verified, all 12 reference screens are compared, authenticated module workflows are safely tested, and the full mixed-scope PR is reviewed/remediated.
+
+**Next safe actions**
+1. Continue read-only audit of remaining patches and test/source contracts. Do not mass-revert or rewrite the 909-file PR without mapping ancestry and protecting existing work.
+2. The owner must identify/confirm the authorized intended Preview URL/deployment for `ADMIN_TEST_URL`; do not reveal or alter its secret value and do not bypass Access.
+3. Obtain an explicit owner decision on whether the storefront/data/migration/backend changes intentionally belong in PR #111; keep it unmerged pending review.
+4. After any meaningful safe source cycle: test exact source SHA, inspect screenshots/metadata, update handoff and read it back. No Production deployment, merge, secret edit, D1/R2 mutation or migration execution was performed.
+

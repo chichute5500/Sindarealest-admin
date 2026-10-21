@@ -1,15 +1,18 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — LOCAL CHECKS PASS; PREVIEW SOURCE MISMATCH; VISUAL AUDIT AND FULL MODULE QA OPEN`
-**Ước tính tiến độ:** 42% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
-**Repository:** `chichute5500/Sindarealest-admin`  
-**Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`  
-**Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`  
-**HEAD đã xác minh trước các cập nhật handoff mới nhất:** `ed27fc5c67152ba900c8b10f5acd358dae8e8096` (các commit sau chỉ cập nhật tài liệu handoff; xác minh lại HEAD khi bắt đầu phiên mới).
-**Source UI gần nhất được ghi nhận:** `012dc6d1f79dd31518d2d2bcbe9183af24b643a6`; **commit test harness:** `de8b7770ac2e077ad9ef0926f5e9053b400a9993`.
-**Kết quả gần nhất:** workflow source checks PASS trên HEAD trước handoff; local Playwright 16 ảnh login-shell PASS; diagnostic Preview FAIL ở CSS signature của URL đã cấu hình. Module nghiệp vụ đã đăng nhập chưa được kiểm thử.
-**PR #111:** OPEN, chưa merge; base `main`, có phạm vi storefront/backend ngoài ADMIN — KHÔNG MERGE.
+**Trạng thái tổng thể:** `IN PROGRESS — CURRENT-HEAD CI PASS; PREVIEW SOURCE MISMATCH; AUTHENTICATED MODULE QA, 12-SCREEN VISUAL AUDIT AND FULL PR-SCOPE REVIEW OPEN`
+**Ước tính tiến độ:** 43% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
+**Repository:** `chichute5500/Sindarealest-admin`
+**Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`
+**Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`
+**HEAD ADMIN đã xác minh trước cập nhật handoff này:** `9c94c106fec99aa5920685da4d4af32b53e680ad` (commit documentation-only `docs(admin): refresh start-here checkpoint`; CI `39543407286` trên SHA này PASS).
+**Source commit có kiểm thử Playwright gần nhất:** `de6114f75cba36193c50ad043175d08be092929f`; run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) chụp 58 PNG, nhưng Preview từ xa FAIL vì CSS signature không khớp.
+**PR #111:** OPEN, chưa merge; 909 file thay đổi, phạm vi chứa storefront/backend/migration/scripts ngoài UI ADMIN — KHÔNG MERGE.
+**PR #108:** OPEN, chưa merge; nhánh website tĩnh được bảo vệ, HEAD `9d5549cf662c63f55d3df591c1321248276a5a22`.
+**main:** `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
 **Cloudflare Production deployment:** `NOT PERFORMED`
+
+
 
 > **Ưu tiên trạng thái:** phần “Handoff mới nhất” ở cuối file và `latest-test-results.json` là bản cập nhật có thẩm quyền hơn các mục lịch sử cũ phía dưới. Những ghi chú cũ về test chưa chạy được giữ để lưu lịch sử, không thay thế bằng chứng mới.
 
@@ -196,3 +199,24 @@
 - The patch review already identified `scripts/setup-cloudflare.mjs` as high risk because it can run remote D1 migrations and direct `ALTER TABLE` operations for SKU verification columns. It was NOT executed. Do not run setup/deploy scripts or modify production schema/data under current constraints.
 - PR comparison metadata currently reports divergence from main: 398 commits ahead, 6 behind (compare endpoint file listing is capped at 300, so use the paginated PR changed-file list for the 909 count). Earlier recorded numbers are historical snapshots; prefer this checkpoint for current scope.
 - No new source or workflow validation was established in this checkpoint. Progress remains 43%; Preview URL/CSS signature mismatch, authenticated module tests, 12-screen visual comparison and full merge-scope review remain blockers. No merge, deploy, secret change, migration execution or production data operation was performed.
+
+
+
+## Latest verified continuation and artifact review — 2026-10-21
+
+- **Current HEAD when starting this evidence cycle:** `9c94c106fec99aa5920685da4d4af32b53e680ad`. Repository refs and both PR states were checked through GitHub. The runtime has no local Git checkout, so local `git status` and working tree remain NOT VERIFIED.
+- **Current-HEAD CI:** [run 39543407286](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286) completed SUCCESS on `9c94c106fec99aa5920685da4d4af32b53e680ad`; repository checks, automated tests and dependency audit passed. The workflow is the standard source CI and does not include remote Preview diagnostics.
+- **Latest Preview diagnostic:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) completed FAILURE against source commit `de6114f75cba36193c50ad043175d08be092929f`. All local source checks and screenshot capture steps passed; only the configured deployed Preview diagnostic failed. Artifact `admin-preview-evidence-62 (ID 12320316041)` was downloaded and inspected.
+- Artifact metadata records 58 PNGs: 16 login-shell captures across 8 viewports × light/dark, plus 42 module captures from synthetic fixture data; 36 fixture metrics. The fixture stubs local session to show appView, blocks all non-GET requests and uses no live database/customer data. These images prove source/fixture layout coverage only, not real authenticated business flows.
+- Remote Preview signature: `PREVIEW_CSS_SIGNATURE_MISMATCH`; `.topbar > .brand` computed as `display:flex`, `visibility:visible`, opacity `1`; expected login-hide CSS rule was absent. Root cause remains the configured URL/deployed source identity, not conclusively established. Keep assertions strict and do not bypass Access or reveal/change secrets.
+- **Patch audit expanded:** changes in `functions/_middleware.js`, `functions/api/orders.js`, `functions/api/warranty-lookup.js`, `functions/sitemap.xml.js`, Admin product/order/warranty/settings/backup/restore handlers use `sku_verified`; migration 0008 adds columns to `products` and `order_items`. Watermark logo URL handling also changed. These are backend/data-contract changes and need migration-order plus backward-compatibility review before any merge.
+- Scope remains unsafe for merge: 909 files total; 862 docs/evidence, 47 non-doc. Includes public `public/index.html`, `data/legacy-products.json`, 14 Functions, migration 0008, five scripts, two workflows, package configuration and 20 tests. `scripts/capture-liquid-glass-preview.mjs` and `liquid-glass-visual-preview.yml` are public-site-related additions inside PR #111.
+- `scripts/setup-cloudflare.mjs` contains remote D1 migration execution and direct `ALTER TABLE` for SKU-verification columns; not executed. Do not run setup/deploy scripts or migrate real schema. GitHub's patch endpoint returned `patch=null` for the large storefront/data files, so those exact diffs are still UNREVIEWED.
+- The approved reference PNG is present in the repo listing but could not be rendered via the current connector path during this cycle. The local artifact contact sheet was inspected. Full comparison of all 12 reference screens remains NOT VERIFIED.
+- **Progress remains 43%.** No source code, secrets, bindings, schema or real data changed in this evidence cycle. PR #111/#108 remain OPEN; no merge or Production deploy.
+
+### Next actions
+1. Continue read-only source/test audit; do not mass-revert mixed-scope changes or overwrite user work.
+2. Have the owner confirm the authorized Preview deployment/URL expected by `ADMIN_TEST_URL` without exposing or changing the secret value.
+3. Obtain explicit direction on whether the storefront/data/migration/backend work intentionally belongs in PR #111; do not merge before full scope and migration review.
+4. Only count authenticated modules as PASS after an authorized path and safe test data are available. Fixture images do not qualify.

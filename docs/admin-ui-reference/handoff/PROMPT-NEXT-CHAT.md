@@ -93,3 +93,15 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - High-risk blocker: `scripts/setup-cloudflare.mjs` contains remote D1 migration and direct ALTER TABLE behavior for SKU verification columns. It was not executed. Do not run setup/deploy scripts or touch production schema/data.
 - Latest evidence still points to run #39495162150 (tested source `d74de3c6...`): source checks/screenshot capture passed; deployed Preview diagnostics failed CSS signature mismatch. This is stale evidence for the current head, not a current green CI result.
 - Progress remains 43%. Next: inspect setup script call sites/tests without executing; review remaining API patches and unreviewed large storefront/data files; establish authorized Preview target/access; obtain fresh CI evidence; update status/result files. Never merge PR #111, PR #108, deploy Production, change secrets, bypass Access, or run migrations without explicit authorization.
+
+
+
+## Newest verified checkpoint — 2026-10-21 (supersedes prior older run references)
+
+- Current HEAD at the last GitHub read: `9c94c106fec99aa5920685da4d4af32b53e680ad`; PR #111 OPEN/unmerged. Static branch HEAD at the last read: `9d5549cf662c63f55d3df591c1321248276a5a22`; PR #108 OPEN/unmerged. Main SHA is `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- Current HEAD source CI [39543407286](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286) is PASS for check/test/dependency-audit. It is not Preview evidence.
+- Latest diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) ran on `de6114f75cba36193c50ad043175d08be092929f`, generated artifact `admin-preview-evidence-62 (ID 12320316041)`, and fails only at the configured Preview CSS signature. Remote computed signature: topbar brand display=flex/visible/opacity=1; expected login-hide rule absent.
+- Artifact set: 16 login-shell images plus 42 module fixture images, 36 fixture metrics. Fixture session is stubbed locally and non-GET calls are blocked. No real authenticated backend QA was performed.
+- PR #111 is 909 files: 862 docs/evidence and 47 non-doc across storefront, data, Functions, migration, scripts, workflows, config and tests. The exact large patches for `public/index.html` and `data/legacy-products.json` remain unreviewed because GitHub patch retrieval returned null.
+- `scripts/setup-cloudflare.mjs` was inspected read-only; it can run remote D1 migrations and direct ALTER TABLE for `sku_verified`. It was NOT run. No schema/data/secrets/Production actions.
+- Progress stays 43%. Continue safe read-only audit. Need authorized owner confirmation of the intended Preview deployment/URL and direction on mixed-scope PR; do not bypass Access, merge, deploy, or run migration commands.

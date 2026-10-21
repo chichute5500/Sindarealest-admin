@@ -60,3 +60,15 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 - No PR-triggered Actions run was returned for the latest observed head. The most recent known evidence run is old and has Preview diagnostics FAIL. Do not claim current CI green.
 - Important safety blocker: setup script contains remote D1 migration/direct ALTER TABLE logic; it has not been executed. No schema/data/Production operations were performed.
 - Continue from `LATEST-STATUS.md`, `latest-test-results.json` and `PROMPT-NEXT-CHAT.md`; do not merge PR #111 or #108, deploy Production, modify secrets, or bypass Cloudflare Access.
+
+
+
+## Current checkpoint — verified 2026-10-21
+
+- Current ADMIN branch HEAD at the latest read: `9c94c106fec99aa5920685da4d4af32b53e680ad`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged.
+- Latest source CI run [39543407286](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286) is PASS on `9c94c106fec99aa5920685da4d4af32b53e680ad` for project checks, automated tests and dependency audit.
+- Latest Preview diagnostic run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) tested `de6114f75cba36193c50ad043175d08be092929f` and FAILed on `PREVIEW_CSS_SIGNATURE_MISMATCH`; inspect artifact `admin-preview-evidence-62 (ID 12320316041)` for metadata/screenshots.
+- Evidence sets: 16 login-shell images + 42 synthetic-fixture module images; none is authenticated real backend QA. Progress stays 43%.
+- PR #111 has 909 changed files (862 docs/evidence, 47 non-doc) including public storefront, Functions/API, migration 0008, deploy/setup scripts and public-site tests. Keep PR unmerged; do not execute setup/deploy or migrations.
+- No local checkout exists in this runtime; local `git status` is NOT VERIFIED. Do not pretend otherwise.
+- Next: confirm authorized intended Preview target, complete visual comparison against all 12 approved screens, safely test authenticated read-only module flows, and finish mixed-scope PR audit. Never bypass Cloudflare Access, touch secrets/real data, or deploy Production.
