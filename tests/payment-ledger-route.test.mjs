@@ -157,7 +157,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const db = makeDb();
   const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
     orderId: "order-1", direction: "received", amount: 30000, transactionReference: "BANKREF-NOAUTH"
-  }, "POST", false));
+  }, "POST", false)));
   assert.equal(response.status, 401, "unauthenticated callers cannot mutate the verified payment ledger");
   assert.equal(db.batches.length, 0);
 }
