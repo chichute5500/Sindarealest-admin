@@ -861,9 +861,8 @@ async function main() {
           });
           await dismissWelcomeSplash(page);
           await settle(page);
-          if (viewport.name === 'mobile-390' && theme === 'light') {
-            await auditHeroImage(page, label);
-          }
+          // Validate the owner-supplied Hero presentation asset in every required viewport/theme, not only mobile Light.
+          await auditHeroImage(page, label);
           await auditImageElements(page, label);
           await capture(page, screenshotStem('home', viewport, theme) + '-viewport.png', false, {
             ...captureMeta(viewport, theme), captureType: 'viewport', state: 'default-home',
