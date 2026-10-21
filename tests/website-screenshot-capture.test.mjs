@@ -223,8 +223,8 @@ assert.match(live, /typeof reloadResponse\?\.status === 'function' \? reloadResp
   'A detail reload must use Playwright Response.status() and must not treat the status method as a numeric property.');
 assert.match(live, /await captureFirstPaintFrames\(page, page\.__sdAuditLabel[\s\S]*await waitForStorefront\(page, label\)/,
   'The initial 0–300ms viewport frames and early DOM evidence must be captured before storefront readiness or scrolling can hide a flash.');
-assert.match(live, /Welcome splash was not visible during early live Preview capture|First-paint DOM sample failed at|First-paint viewport capture failed/,
-  'The live audit must report missing welcome or first-paint evidence explicitly instead of silently skipping it.');
+assert.match(live, /Welcome splash was not visible in the startup video \/ DOM timeline|First-paint DOM timeline missed \+/,
+  'The live audit must report missing welcome or early DOM timeline evidence instead of silently skipping it.');
 assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
   'Gallery-next interaction must only be required when the live product actually has multiple gallery images.');
 assert.match(live, /Path derived from an actual rendered Preview product card/i,
@@ -329,14 +329,22 @@ assert.match(live, /__sdWelcomeFirstPaintTimeline/,
   'The live capture must record an init-script timeline before the app JavaScript runs.');
 assert.match(live, /window\.__sdReadWelcomeFirstPaintState/,
   'The browser must expose early DOM visibility samples for Playwright at screenshot time.');
-assert.match(live, /const firstPaintOffsets = \[0, 50, 100, 200, 300\]/,
-  'The live audit must request screenshot samples from the first 300ms of mobile navigation.');
+assert.match(live, /for \(const requestedOffsetMs of \[0, 50, 100, 200, 300\]\)[\s\S]*sampleOffsetMs[\s\S]*startup-video init-script timeline/,
+  'The live audit must derive 0–300ms samples from browser-side init-script timing, not delay-prone screenshot calls.');
 assert.match(live, /waitUntil: isHomeFirstPaintContext \? 'commit' : 'domcontentloaded'/,
   'Mobile home diagnostics must start at navigation commit rather than waiting for DOMContentLoaded.');
-assert.match(live, /firstPaintCoverageComplete && firstPaintViolationCount === 0/,
-  'Live audit acceptance must fail when first-paint evidence is incomplete or storefront chrome flashes during welcome.');
+assert.match(live, /firstPaintCoverageComplete && firstPaintVideoCoverageComplete[\s\S]*firstPaintViolationCount === 0/,
+  'Live audit acceptance must require all timed DOM samples and short startup videos, with no chrome flash during welcome.');
 assert.match(live, /captureType: 'first-paint-frame'/,
   'The audit artifact must include real full-viewport screenshots taken during the initial navigation window.');
+assert.match(live, /recordVideo: \{ dir: firstPaintVideoDir[\s\S]*async function captureWelcomeStartupVideo[\s\S]*await video\.path\(\)/,
+  'A separate short browser video must record the welcome first-paint window without being blocked by still-screenshot calls.');
+assert.match(live, /firstPaintVideoCoverageComplete/,
+  'Video evidence coverage must be part of live audit acceptance.');
+assert.doesNotMatch(live.slice(live.indexOf('async function captureFirstPaintFrames'), live.indexOf('async function captureWelcomeStartupVideo')),
+  /locator\.screenshot/,
+  'The first-frame helper must not block the startup timeline by waiting on an element screenshot.');
+
 assert.match(storefrontHtml, /body\.welcome-active #mobileBottomNav/,
   'The storefront early guard must use the initial body flag and not rely only on :has().');
 
