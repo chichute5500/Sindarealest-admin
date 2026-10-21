@@ -1,5 +1,19 @@
 # MASTER PROMPT
 
+## Bằng chứng mới nhất — 2026-10-21 17:18 UTC
+
+- Current tested source HEAD: `306bdc9fa3a1ca7494ed552424c3462105884f83` on `fix/liquid-glass-audit-2026-10-19`.
+- Source/tests PASS: [39641949642](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949642). Preview deploy PASS: [39641949582](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949582).
+- Live visual run: [39641949358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949358); artifact [12366231369](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949358/artifacts/12366231369).
+- Exact Preview deployment verified: `9e0b9b2d-03d2-4b93-b650-0d4073a11513`, commit SHA matches HEAD, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Local fixture audit PASS (54 screenshots; fixture only). Live audit captured 86 screenshots; 8/8 viewport-theme checks, 12/12 product route checks, 8/8 commerce/gallery states, zero console/page/same-origin HTTP errors, zero failed requests. Welcome splash screenshots are now captured for Light and Dark.
+- Live audit remains FAIL only because verified public catalog does not contain `SD-GL052`. Hero remains safely collapsed; do not invent SKU/image/data.
+- Satin assets softened and cache-busted to `20261021-21`; light screenshot is visibly softer, dark still has stronger folds. Next inspect gallery image frame/background and continue non-blocked UI work. After any storefront change, rerun tests → exact-SHA Preview deploy → live capture → inspect screenshots/artifact.
+- Never touch Production, Admin UI/backend, secrets, D1/R2 or merge PR. Do not repeat PASS suites without a relevant change.
+
+---
+
+
 ## Cập nhật bắt buộc — bàn giao phiên 2026-10-21 (ưu tiên hơn các mốc cũ)
 
 - Nhánh web tĩnh: `fix/liquid-glass-audit-2026-10-19`; HEAD đã xác minh tại thời điểm bàn giao: `170304495869886a344b6fa02bdbaf6148d75100` — commit `improve readability of glass commerce drawers`.
