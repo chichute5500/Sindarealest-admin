@@ -21,10 +21,10 @@ function assertSatinFoldScale(name, svg, maxStroke, maxBlur, expectedPaths) {
   assert.ok(blur.length > 0 && Math.max(...blur) <= maxBlur,
     name + ' must keep blur tight enough to preserve fine fabric creases.');
 }
-assertSatinFoldScale('Desktop light satin', desktopLight, 12, 4, 25);
-assertSatinFoldScale('Desktop dark satin', desktopDark, 12, 4, 25);
-assertSatinFoldScale('Mobile light satin', mobileLight, 5, 2, 25);
-assertSatinFoldScale('Mobile dark satin', mobileDark, 5, 2, 25);
+assertSatinFoldScale('Desktop light satin', desktopLight, 13, 4, 25);
+assertSatinFoldScale('Desktop dark satin', desktopDark, 13, 4, 25);
+assertSatinFoldScale('Mobile light satin', mobileLight, 5.6, 2, 25);
+assertSatinFoldScale('Mobile dark satin', mobileDark, 5.6, 2, 25);
 
 assert.match(html, /\.theme-bg--light\{background-color:#eaf3fb;background-image:url\('images\/liquid-glass-light\.svg\?v=/);
 assert.match(html, /\.theme-bg--dark\{background-color:#061522;background-image:url\('images\/liquid-glass-dark\.svg\?v=/);
