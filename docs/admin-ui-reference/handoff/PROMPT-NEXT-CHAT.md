@@ -323,3 +323,29 @@ Safety: PR #111 and PR #108 remain open/unmerged; no Production deploy; no edit 
 ## Continuation addendum — 2026-10-21 15:52 +07:00: cross-branch payment display gap
 
 Read the cross-branch source audit in `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and `LATEST-STATUS.md`. Static-site source consumes the Admin order/payment endpoints and fulfillment enums at the code-shape level, but it discards `freeShippingEligible` and `freeShipping` in its mapped payment state and the renderer does not show eligibility versus applied freeship. This is a static-branch issue. Do not fix it in ADMIN or synchronize branches; send the exact finding to the website agent and require a separate source/test commit there. Actual deployed integration remains NOT VERIFIED.
+
+
+
+## Continue task — 2026-10-21: PRE/PRO migration and image-save error
+
+You are continuing the SinDarealest Admin work. First read `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`, `handoff/LATEST-STATUS.md`, `handoff/latest-test-results.json`, and `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`.
+
+**User-reported blocker:** Preview Admin shows “Cơ sở dữ liệu chưa khởi tạo đúng. Hãy chạy hai tệp SQL trong thư mục migrations/.” after image selection/upload and pressing save. User confirmed scope includes both PRE and PRO. User explicitly said **“Bỏ qua tinyfish”**: do not call TinyFish, do not ask for wallet top-up.
+
+**Likely migration files to inspect, not blindly execute:**
+- `migrations/0008_product_sku_verification.sql`
+- `migrations/0009_fulfillment_and_manual_payments.sql`
+
+Migration 0008 adds `sku_verified` to `products` and `order_items`. Migration 0009 adds `fulfillment_type`, payment-terms confirmation fields, payment request/transaction tables and indexes. They depend on prior schema migrations and are not safely repeatable when their columns/indexes already exist. Product update API writes `sku_verified` and `fulfillment_type`, so missing columns are a plausible cause, not a proven diagnosis. Separate R2 image upload from D1 product-metadata save.
+
+**Truthful state at handoff:** no SQL was run on either remote database; PRE/PRO schema and migration ledger are NOT VERIFIED. User authorized checking both environments and applying only missing migrations, but the attempted browser route could not run because of insufficient TinyFish wallet balance; user then prohibited TinyFish. No alternative authenticated Cloudflare/D1 tool has been confirmed available. Do not claim migrations were applied or that the error is fixed.
+
+**Next actions:**
+1. Re-fetch branch HEAD, PR state and CI before edits. Work only on `feature/admin-isolated-handoff-2026-10-20`.
+2. Discover a non-TinyFish, authenticated way to inspect Cloudflare D1, or clearly report that remote access is blocked. Do not ask for passwords in chat.
+3. Identify exact Preview and Production D1 database names/IDs/bindings independently; inspect schema and `d1_migrations`/migration history in each. Compare migration 0001–0009 and detect partial application before any write.
+4. If no authenticated remote inspection/execution path is available, STOP before SQL. Never infer the target DB or run migrations blindly.
+5. Only after independently verifying PRE and PRO state, apply only missing migrations in dependency order, with explicit per-environment result evidence. Keep PRE/PRO outcomes separate. No setup script, no blind/manual ALTER, no duplicate migration.
+6. Re-test save-product metadata and actual image upload/storage after schema correction. Distinguish UI error, D1 failure, and R2 upload failure.
+
+**Hard safety constraints:** no TinyFish; no Production deploy; no merge PR #111 or #108; no edits to `main` or `fix/liquid-glass-audit-2026-10-19`; no secrets/binding changes, no Cloudflare Access bypass, no customer/order/product data writes except an explicitly approved and necessary migration; no migration until correct target and current schema/ledger are verified. Keep both PRs OPEN/unmerged. Report evidence, not assumptions.
