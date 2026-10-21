@@ -1151,6 +1151,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.getByLabel('Tìm tên, số điện thoại, email hoặc địa chỉ')).toBeVisible();
       await expect(page.locator('#customerSearchStatus')).toHaveAttribute('aria-live', 'polite');
       await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
+      await expect(page.locator('.customer-avatar')).toHaveCount(2);
+      await expect(page.locator('.customer-avatar').nth(0)).toHaveText('KD');
+      await expect(page.locator('.customer-avatar').nth(1)).toHaveText('K2');
+      await expect(page.locator('.customer-avatar')).toHaveAttribute('aria-hidden', 'true');
       await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
 
       await page.locator('#customerSearch').fill('Khách UI Fixture 2');

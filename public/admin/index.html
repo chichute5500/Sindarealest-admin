@@ -398,6 +398,10 @@ body:has(#loginView:not(.hidden)) .logincard>p:not(.tiny){line-height:1.65}
 #main .order-table .order-management-content>div{width:100%;min-width:0!important}
 #main .order-table .order-management-content button,#main .order-table .order-management-content select,#main .order-table .order-management-content input,#main .order-table .order-management-content textarea{min-width:0;max-width:100%}
 
+#main .customer-table .customer-identity{display:flex;align-items:center;gap:10px;min-width:0}
+#main .customer-table .customer-avatar{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:rgba(92,145,185,.14);color:var(--ink);font-size:12px;font-weight:800;letter-spacing:.02em}
+#main .customer-table .customer-identity-copy{display:grid;gap:3px;min-width:0}
+#main .customer-table .customer-identity-copy>b{overflow-wrap:anywhere}
 #main .customer-table tbody tr td:nth-child(1){display:block;padding:12px 0 10px}
 #main .customer-table tbody tr td:nth-child(1)::before{display:block;max-width:none;content:"Khách hàng";margin-bottom:5px}
 #main .customer-table tbody tr td:nth-child(2)::before{content:"Liên hệ"}
@@ -796,10 +800,15 @@ function showOrderDetails(id){
  const backdrop=$('#orderDetailBackdrop');activateAdminModal(backdrop,'#orderDetailClose');
 }
 function closeOrderDetails(){deactivateAdminModal($('#orderDetailBackdrop'))}
+function customerInitials(value){
+const words=String(value||'').trim().split(/\\s+/).filter(Boolean);
+if(!words.length)return '?';
+return (words.length===1?words[0].slice(0,2):words[0][0]+words[words.length-1][0]).toLocaleUpperCase('vi');
+}
 function customersPage(){
 const query=String(customerSearch||'').trim().toLocaleLowerCase('vi');
 const filteredCustomers=customers.filter(c=>!query||[c.fullName,c.phone,c.email,c.address].some(v=>String(v??'').toLocaleLowerCase('vi').includes(query)));
-return `${head('Khách hàng','Danh sách khách hàng','Hồ sơ được tạo khi khách gửi yêu cầu đặt hàng; dữ liệu dùng để hỗ trợ đơn hàng.')}<section class='panel customer-toolbar' role='search' aria-label='Tìm khách hàng'><div class='field'><label for='customerSearch'>Tìm tên, số điện thoại, email hoặc địa chỉ</label><input class='control' id='customerSearch' type='search' value='${esc(customerSearch)}' placeholder='Tìm tên, điện thoại, email hoặc địa chỉ…'></div><p class='tiny muted customer-search-status' id='customerSearchStatus' role='status' aria-live='polite'>Hiển thị ${filteredCustomers.length} / ${customers.length} hồ sơ đang tải (tối đa 2.000).</p></section><section class='panel'><div class='tablewrap'><table class='mobilecards customer-table' style='min-width:720px'><thead><tr><th>Khách hàng</th><th>Liên hệ</th><th>Địa chỉ</th><th>Số đơn</th><th>Đơn gần nhất</th></tr></thead><tbody>${filteredCustomers.length?filteredCustomers.map(c=>`<tr><td><b>${esc(c.fullName)}</b><div class='sku'>Tạo lúc ${esc(c.createdAt)}</div></td><td>${esc(c.phone)}<div class='sku'>${esc(c.email||'Chưa cung cấp')}</div></td><td>${esc(c.address||'Chưa cung cấp')}</td><td>${esc(c.orderCount)}</td><td>${esc(c.lastOrderAt||'—')}</td></tr>`).join(''):`<tr><td colspan='5'><div class='empty'>${query?'Không tìm thấy khách hàng phù hợp.':'Chưa có hồ sơ khách hàng.'}</div></td></tr>`}</tbody></table></div></section><div class='callout' style='margin-top:14px'>Tìm kiếm chỉ lọc trong danh sách hiện đã tải từ máy chủ (tối đa 2.000 hồ sơ). Hồ sơ khách hàng được gắn với số điện thoại và phát sinh từ đơn hàng. Đăng nhập tài khoản khách hàng, xác minh email và đặt lại mật khẩu chưa được bật.</div>`;
+return `${head('Khách hàng','Danh sách khách hàng','Hồ sơ được tạo khi khách gửi yêu cầu đặt hàng; dữ liệu dùng để hỗ trợ đơn hàng.')}<section class='panel customer-toolbar' role='search' aria-label='Tìm khách hàng'><div class='field'><label for='customerSearch'>Tìm tên, số điện thoại, email hoặc địa chỉ</label><input class='control' id='customerSearch' type='search' value='${esc(customerSearch)}' placeholder='Tìm tên, điện thoại, email hoặc địa chỉ…'></div><p class='tiny muted customer-search-status' id='customerSearchStatus' role='status' aria-live='polite'>Hiển thị ${filteredCustomers.length} / ${customers.length} hồ sơ đang tải (tối đa 2.000).</p></section><section class='panel'><div class='tablewrap'><table class='mobilecards customer-table' style='min-width:720px'><thead><tr><th>Khách hàng</th><th>Liên hệ</th><th>Địa chỉ</th><th>Số đơn</th><th>Đơn gần nhất</th></tr></thead><tbody>${filteredCustomers.length?filteredCustomers.map(c=>`<tr><td><div class='customer-identity'><span class='customer-avatar' aria-hidden='true'>${esc(customerInitials(c.fullName))}</span><div class='customer-identity-copy'><b>${esc(c.fullName)}</b><div class='sku'>Tạo lúc ${esc(c.createdAt)}</div></div></div></td><td>${esc(c.phone)}<div class='sku'>${esc(c.email||'Chưa cung cấp')}</div></td><td>${esc(c.address||'Chưa cung cấp')}</td><td>${esc(c.orderCount)}</td><td>${esc(c.lastOrderAt||'—')}</td></tr>`).join(''):`<tr><td colspan='5'><div class='empty'>${query?'Không tìm thấy khách hàng phù hợp.':'Chưa có hồ sơ khách hàng.'}</div></td></tr>`}</tbody></table></div></section><div class='callout' style='margin-top:14px'>Tìm kiếm chỉ lọc trong danh sách hiện đã tải từ máy chủ (tối đa 2.000 hồ sơ). Hồ sơ khách hàng được gắn với số điện thoại và phát sinh từ đơn hàng. Đăng nhập tài khoản khách hàng, xác minh email và đặt lại mật khẩu chưa được bật.</div>`;
 }
 function warrantiesPage(){
 const query=String(warrantySearch||'').trim().toLocaleLowerCase('vi');
