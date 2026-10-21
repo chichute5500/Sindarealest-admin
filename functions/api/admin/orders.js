@@ -19,6 +19,7 @@ export async function onRequestGet(context) {
       " ,(SELECT amount FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_amount" +
       " ,(SELECT installment_type FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_type" +
       " ,(SELECT transfer_reference FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_reference" +
+      " ,(SELECT shipping_benefit FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_shipping_benefit" +
       " FROM orders o JOIN customers c ON c.id=o.customer_id" +
       " LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id" +
       " LEFT JOIN order_contact_details oc ON oc.order_id=o.id" +
