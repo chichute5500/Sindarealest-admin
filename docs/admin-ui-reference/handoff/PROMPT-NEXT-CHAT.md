@@ -279,3 +279,18 @@ Overall Admin estimate: **46%**. QR/fulfillment estimate: **70%**. These are man
 5. PR #111 (1.072 file mixed-scope) và PR #108 phải OPEN/unmerged. Không cherry-pick, force-push, đổi base, merge hoặc viết lại lịch sử.
 6. Không deploy Production, không chạy remote D1/R2/migration/setup, không sửa dữ liệu thật, main hay nhánh website tĩnh.
 
+
+
+## Handoff checkpoint — 2026-10-21 15:39 +07:00 (newest; re-verify live refs)
+
+Owner-tested Preview deployment: https://564cd391.sindarealest2.pages.dev (reported deployment ID `564cd391-87d3-4f98-8a68-c81e935a452b`, Admin branch `feature/admin-isolated-handoff-2026-10-20`, source SHA `3ed2d86b8b97f04718c478979136f986b3d1b07b`). Owner confirmed: login works; product list/detail opens; image-selection UI opens. Do not infer save or upload succeeded.
+
+Latest CI evidence for source SHA `3ed2d86b8b97f04718c478979136f986b3d1b07b`:
+- Source CI [39569134111](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39569134111): FAILURE at automated tests.
+- Preview diagnostic [39569133914](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39569133914): FAILURE at automated tests; Playwright/browser diagnostics and configured Preview check were skipped.
+- Do not rely on prior source PASS on older SHAs. Inspect full failing test output/stack trace before deciding whether the test expectation is stale or runtime code is wrong.
+- Cloudflare build reports skipped infinite-loop redirect rules `/admin/ /admin/index.html 200` and `/* /index.html 200`; treat as a warning to investigate, not proven cause. Do not edit redirects without source-level review and regression tests.
+
+Next steps: re-fetch current branch HEAD, PRs and Actions; inspect the exact failing automated-test logs; make a minimal safe fix only on the Admin branch if root cause is proven; rerun tests and require exact SHA match; then rerun Playwright/Preview diagnostic. Keep real product save/image upload untested until safely verified. Keep all 12-screen parity, authenticated business-flow coverage, migration ledger and PR #111 scope review NOT VERIFIED/open.
+
+Safety: PR #111 and PR #108 remain open/unmerged; no Production deploy; no edit to `main` or static branch; no secrets/Access changes, no bypass, no remote D1/R2 writes, no migrations/setup scripts.
