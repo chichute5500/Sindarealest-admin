@@ -1566,3 +1566,14 @@ Mandatory live verification: repository `chichute5500/Sindarealest-admin`, branc
 - **Progress stays 50%.** This is a weighted project estimate, not the CI pass percentage. Screen #6 has a code/test improvement but is not visually accepted until screenshots are actually opened and reviewed. Twelve-screen parity remains NOT ACCEPTED; authenticated business/backend QA remains NOT TESTED. Product image-save/R2 and PRE/PRO migration work remains DEFERRED_BY_OWNER.
 - **Safety:** no Production deploy, no main/static-site edits, no Access/secrets changes or bypass, no remote D1/R2 mutation, no SQL/migration, and no TinyFish.
 - **Next steps:** (1) fetch the live branch HEAD and latest exact-SHA workflow runs; (2) retrieve and open the new Preview artifact, review orders at 390×844 light/dark and 1280×800; (3) repair any real layout or E2E issue without weakening assertions; (4) continue the next unaccepted screen family; (5) update these files sequentially with fresh blob SHAs and read back all seven. Keep the overall estimate at 50% until visual acceptance/backend evidence justifies change.
+
+
+## Latest mandatory handoff checkpoint — 2026-10-22
+
+The next chat must first fetch live HEAD, current PR states and workflow runs. Work only on `feature/admin-isolated-handoff-2026-10-20` in `chichute5500/Sindarealest-admin`.
+
+Latest verified application/test SHA: `214dd104c17e3837166fac77f8f2106d1a25ffeb`. Validate Source [#39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) and Admin Preview/Playwright [#39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) both SUCCESS on that exact SHA. Later documentation commits advanced branch HEAD, so do not claim the new HEAD is tested until exact-SHA Actions prove it.
+
+Orders UI changed: price inputs and management/payment controls are grouped in a labelled disclosure, collapsed on mobile and expanded on desktop. E2E and source contract tests cover toggle behavior, price visibility and payment safety guards. The workflow artifact for the latest orders UI has not yet been retrieved/opened for visual review; screen #6 remains PARTIAL pending visual evidence. Product screen #3 and overall 12-screen parity remain NOT ACCEPTED. Authenticated backend/business QA remains NOT TESTED. Overall progress stays 50%.
+
+Required next: retrieve/open the artifact from run #39662986425; inspect orders at 390×844 light/dark and 1280×800; fix evidence-backed gaps; rerun exact-SHA source validation and Preview/Playwright; continue remaining screen families; then update and read back all seven handoff files sequentially. Keep PR #111 and #108 OPEN/UNMERGED. Never merge/deploy Production, edit main/static site, change/bypass Access/secrets, mutate remote D1/R2, run SQL/migrations, alter infrastructure or use TinyFish.
