@@ -466,3 +466,20 @@ The satin cache-bust correction is complete in source: commit `297c2278bf582144c
 
 ### User action
 - No user action is required right now. Continue the read-only visual comparison and subsequent storefront fixes. Ask the user only if an actual permission/decision is needed.
+
+
+## NON-STOP EXECUTION RULE — MANDATORY
+
+The user explicitly requires: **do not stop working unless the user's action or decision is genuinely required.**
+
+- A progress report is not a stopping point. After reporting progress, immediately continue the next useful task in the same work session.
+- Do not stop because one fix, test, CI run, Preview deployment, screenshot batch, or handoff update is complete.
+- Do not ask “should I continue?” or ask for permission to do tasks already authorized by this prompt.
+- If a workflow is running, continue independent read-only work: inspect source/tests, review existing evidence, compare references, inspect other UI states, and prepare the next verification. Re-check the workflow later.
+- If a workflow fails, inspect the exact failing step/log, fix the root cause on the authorized storefront branch, run the relevant test, then repeat CI → Preview deployment → live capture/visual comparison. Do not merely report the failure and stop.
+- After each material milestone, give a concise, evidence-based progress report and **continue working immediately**.
+- Stop and ask the user only when a specific user-side action is truly unavoidable (e.g. a permission, credential, protected approval, unavailable device interaction, or a product/design choice that cannot be resolved from the references). Explain exactly what action is needed and why. Otherwise proceed autonomously.
+- Do not pretend background work continues after a response if no tool/workflow is actually running. Within the active session, keep using available tools until a genuine blocker or the session limit.
+- Do not claim completion from CI green alone. Compare live Preview screenshots to the original reference images and inspect the full set of required routes, states, themes, and viewports.
+- Never touch Production, Admin, `main`, backend/API, D1/R2, secrets, bindings, DNS, or product/catalog data. Keep PR #108 open/unmerged unless the user explicitly authorizes otherwise.
+- Keep handoff files and `docs/website-screenshots/manifest.json` synchronized with verified evidence. No fabricated screenshots, commit hashes, test results, or completion percentages.
