@@ -397,10 +397,7 @@ body:has(#loginView:not(.hidden)) .logincard>p:not(.tiny){line-height:1.65}
 #main .order-table .order-price-fields input{width:100%;min-width:0!important}
 #main .order-table .order-management-content>div{width:100%;min-width:0!important}
 #main .order-table .order-management-content button,#main .order-table .order-management-content select,#main .order-table .order-management-content input,#main .order-table .order-management-content textarea{min-width:0;max-width:100%}
-@media(min-width:681px){
-#main .order-table .order-management-summary{display:none}
-#main .order-table .order-management-content{padding-top:0}
-}
+
 #main .customer-table tbody tr td:nth-child(1){display:block;padding:12px 0 10px}
 #main .customer-table tbody tr td:nth-child(1)::before{display:block;max-width:none;content:"Khách hàng";margin-bottom:5px}
 #main .customer-table tbody tr td:nth-child(2)::before{content:"Liên hệ"}
@@ -639,6 +636,10 @@ body:has(#loginView:not(.hidden)) .loginwrap{
  #main .product-table .product-mobile-inline-metric>b{font-size:8px}
  #main:has(#searchBox) .toolbar{gap:6px;padding:8px}
  #main:has(#searchBox) .toolbar>.btn{padding:7px 8px;font-size:10px}
+}
+@media(min-width:681px){
+#main .order-table .order-management-summary{display:none}
+#main .order-table .order-management-content{padding-top:0}
 }
 </style></head>
 <body>
