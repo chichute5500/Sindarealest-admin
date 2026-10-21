@@ -119,7 +119,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
 {
   const db = makeDb({ order: baseOrder });
   const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
-    orderId: "order-1", installmentType: "deposit", amount: 30000
+    orderId: "order-1", paymentOption: "deposit"
   })));
   assert.equal(response.status, 201, "confirmed order can create deposit request with active QR config");
   const payload = await response.json();
