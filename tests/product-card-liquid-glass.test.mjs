@@ -151,10 +151,14 @@ const sixTileRefinementEnd = html.indexOf("</style>", sixTileRefinementStart);
 assert.ok(sixTileRefinementStart >= 0 && sixTileRefinementEnd > sixTileRefinementStart,
   "The six-tile satin refinement must be present in the final style block.");
 const sixTileRefinementCss = html.slice(sixTileRefinementStart, sixTileRefinementEnd);
-assert.ok(sixTileRefinementCss.includes(".service-strip .service-copy{")
+assert.ok(sixTileRefinementCss.includes(".service-strip.glass{")
+  && sixTileRefinementCss.includes("background:rgba(244,250,255,.24)")
+  && sixTileRefinementCss.includes(".service-strip .service-copy{")
   && sixTileRefinementCss.includes(".service-strip .service-text strong{font-size:12px")
+  && sixTileRefinementCss.includes("html.dark .service-strip.glass{")
   && sixTileRefinementCss.includes("html.dark .service-strip .service-copy{")
-  && sixTileRefinementCss.includes(".service-strip{gap:7px;padding:7px}"),
-  "The six-tile refinement must target the real service strip, set legible content sizing, and provide light/dark and mobile styles.");
+  && sixTileRefinementCss.includes(".service-strip{gap:7px;padding:7px}")
+  && sixTileRefinementCss.includes(".service-strip .service-text strong{font-size:11px"),
+  "The six-tile refinement must show the satin through a translucent container and tiles while keeping legible light/dark and mobile content.");
 assert.doesNotMatch(sixTileRefinementCss, /#benefits/,
   "The six-tile refinement must not depend on a nonexistent benefits section ID.");
