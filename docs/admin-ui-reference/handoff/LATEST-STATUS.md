@@ -146,3 +146,13 @@
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Cross-branch checkout/payment synchronization — 2026-10-21
+
+- Added a coordination note for the static branch's checkout/payment reference image: [`checkout-payment-flow-reference.png`](https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png), recorded blob SHA `c89ff843af1c094def9233d27a148e048b191990`.
+- This image is a storefront checkout/payment reference only. Admin keeps its own 12-screen Admin design reference and must not copy storefront UI/assets or commit to the static branch.
+- Synchronized the written ownership boundary and business rules: Admin owns fulfillment type, payment settings/QR, authoritative server amounts and manual bank-transaction verification; static owns customer-facing UI and public-safe API consumption.
+- Reaffirmed payment rules: made-to-order deposit 30%; in-stock deposit 100,000 VND; full payment for either type qualifies for freeship; QR has no fixed amount; unconfirmed data blocks payment-ready instructions; QR/receipt/customer claim never proves payment.
+- API contract paths/shapes remain coordination documentation, not proof of live implementation or Preview compatibility. Integration status remains **NOT VERIFIED** until source commit, contract tests, and compatible Preview are independently evidenced.
+- Branch isolation preserved: changes in this update are documentation-only on `feature/admin-isolated-handoff-2026-10-20`; PR #111 remains unmerged. No Production deploy, remote migration, or real D1/R2 data change was performed.
