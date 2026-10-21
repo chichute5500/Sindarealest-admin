@@ -1854,7 +1854,7 @@
     }
   ],
   "handoffJsonSelfUpdateNote": "This JSON file is itself updated alongside the other handoff files; consult branch commit history for its own latest commit to avoid a self-referential SHA.",
-  "latestFunctionalSourceCommitSha": "3fa9b85be20d832cbf24678dd7f3c7d862c1e64",
+  "latestFunctionalSourceCommitSha": "d3fa9b85be20d832cbf24678dd7f3c7d862c1e64",
   "latestAccessibilityTestCommits": [
     {
       "sha": "ed14dc26270ba11b842bdec7c2e75f46ecc788bc",
