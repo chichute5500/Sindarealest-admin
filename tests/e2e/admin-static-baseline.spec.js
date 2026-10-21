@@ -741,6 +741,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         visibleMetrics: getComputedStyle(row.querySelector('.product-mobile-inline-meta')).display,
         priceText: row.querySelector('.product-mobile-inline-metric:first-child').innerText,
         stockText: row.querySelector('.product-mobile-inline-metric:nth-child(2)').innerText,
+        productTitle: row.querySelector('.prodname').getAttribute('title'),
         actionAccessibleName: row.querySelector('.product-mobile-edit').getAttribute('aria-label'),
         published: rect('.product-mobile-status')
       };
@@ -750,9 +751,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       'Price and stock should share a compact row: ' + JSON.stringify(mobileCardLayout)).toBeLessThanOrEqual(2);
     expect(mobileCardLayout.priceText).toContain('Chưa nhập');
     expect(mobileCardLayout.stockText).toContain('Chưa kiểm kê');
+    expect(mobileCardLayout.productTitle).toBe('Sản phẩm thử nghiệm giao diện');
     expect(mobileCardLayout.actionAccessibleName).toContain('Sửa sản phẩm');
     expect(mobileCardLayout.action.bottom, 'Accessible edit action must finish within the card').toBeLessThanOrEqual(mobileCardLayout.rowHeight + mobileCardLayout.identity.top);
-    expect(mobileCardLayout.rowHeight, 'Reference-led mobile product cards should keep facts in a compact row').toBeLessThan(145);
+    expect(mobileCardLayout.rowHeight, 'Mobile product card should keep title, status, facts and actions in a compact reference-led row').toBeLessThan(115);
     expect(mobileCardLayout.pageWidth, 'Mobile product list must not overflow horizontally').toBeLessThanOrEqual(mobileCardLayout.viewportWidth + 1);
     await saveScreenshot('products-compact-mobile-check', { viewport: mobile, theme: 'light' });
 
