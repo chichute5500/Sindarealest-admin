@@ -990,3 +990,29 @@ Bản sửa trợ năng mới thêm `aria-label` theo bản ghi cho các control
 - Chỉ làm trên `feature/admin-isolated-handoff-2026-10-20`; bảo vệ nhánh website `fix/liquid-glass-audit-2026-10-19` và `main`; không merge PR #108/#111, không Production deploy.
 - PR #111 đang có scope rộng hơn Admin thuần; audit changed files và đề xuất tách/giới hạn ngoài phạm vi trước nghiệm thu.
 - Test tối thiểu: giá trị phân loại và dữ liệu cũ; order-item snapshot; quyền Admin; số tiền lấy từ nguồn có thẩm quyền phía server; QR thiếu/sai cấu hình; xác nhận trùng; chuyển thiếu/thừa/nhiều lần; hủy đơn; audit log; regression API/fixture; không rò rỉ secret.
+
+
+---
+
+## BỔ SUNG VÀO PHẠM VI CÔNG VIỆC DÀI HẠN — ĐỒNG BỘ ADMIN / WEB TĨNH, KHÔNG NGẮT VIỆC ĐANG LÀM
+
+Đây là một phần chính thức của công việc SinDarealest, không phải lệnh đổi ưu tiên tức thời.
+
+### Quy tắc ưu tiên và tiếp tục công việc
+- Tiếp tục hoàn thành các hạng mục Admin đang làm theo thứ tự ưu tiên và checkpoint trong `docs/admin-ui-reference/handoff/LATEST-STATUS.md` và `START-HERE.md`. Không bỏ dở, không tự chuyển toàn bộ phiên sang QR integration chỉ vì phụ lục này được thêm.
+- Chỉ xử lý phần QR/phân loại trong lượt hiện tại nếu nó độc lập, cần thiết cho công việc đang làm và không làm trễ hoặc phá vỡ mục tiêu hiện tại. Nếu sẽ đổi phạm vi hoặc gây gián đoạn, ghi dependency/việc cần làm vào handoff rồi tiếp tục nhiệm vụ hiện tại.
+- Sau khi đạt checkpoint công việc hiện tại hoặc khi có khoảng làm việc an toàn, tiến hành phần Admin của hợp đồng tích hợp chung. Không chờ người dùng nhắc lại, nhưng không tự ý nâng việc mới lên trước blocker/hạng mục hiện tại.
+- Trước khi sửa, đọc lại hợp đồng `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`, trạng thái/handoff mới nhất, HEAD và schema/API thực tế. Không coi tài liệu là bằng chứng tính năng đã triển khai.
+
+### Phạm vi Admin/backend
+- Quản lý `fulfillment_type`: `in_stock`, `made_to_order`, `unclassified`; không suy luận từ `stock`. Bảo toàn dữ liệu cũ và snapshot loại hàng ở dòng đơn khi phù hợp.
+- Audit API/schema trước khi code; tái sử dụng trường/endpoint tương đương nếu đã có, không tạo logic hoặc endpoint trùng. Nếu cần thay đổi schema/API, ghi tác động tương thích, migration/rollback và test; chỉ chạy test/local migration trong môi trường an toàn.
+- Hỗ trợ cấu hình QR và ghi nhận nhiều khoản thanh toán/đặt cọc, số tiền thực nhận đã xác minh, số dư và audit log theo hợp đồng. QR không chứa số tiền; số tiền hiển thị riêng chỉ sau khi xác nhận giá/điều kiện/đợt thanh toán.
+- Không tự đánh dấu `paid` do mở/quét QR hoặc tải biên lai; xác nhận nhận tiền phải do người có quyền sau khi đối chiếu giao dịch. Không để lộ secret/config nhạy cảm ra frontend.
+- Nếu Web tĩnh đang cần một API chưa có, ghi rõ endpoint, request/response, enum, lỗi và quyền; cập nhật hợp đồng chung trước khi coi hai bên đã tích hợp. Không sửa code thuộc nhánh Web tĩnh.
+
+### Bàn giao và kiểm chứng
+- Cập nhật handoff hiện hành: trạng thái tích hợp (NOT STARTED / IN PROGRESS / BLOCKED / VERIFIED), API đã có/còn thiếu, schema/migration đề xuất, file/commit SHA, test đã chạy và kết quả.
+- Test tối thiểu gồm dữ liệu cũ/unclassified, phân quyền, snapshot đơn, QR sai/thiếu cấu hình, số tiền lấy từ nguồn server đáng tin cậy, xác nhận trùng, thanh toán thiếu/thừa/nhiều đợt, hủy đơn, audit log, regression API và không rò rỉ secret.
+- Chỉ báo VERIFIED khi có kiểm thử thực tế trên đúng SHA. Không tuyên bố hai hệ thống đồng bộ chỉ vì hợp đồng đã được ghi ở cả hai nhánh.
+- Giữ nguyên hàng rào hiện có: chỉ làm trên nhánh Admin; không sửa nhánh Web tĩnh/main, không merge PR #108/#111, không deploy Production, không chạy migration D1 Production, không ghi dữ liệu thật hoặc thay đổi secrets/Cloudflare config thật.
