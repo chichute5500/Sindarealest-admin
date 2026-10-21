@@ -2391,8 +2391,10 @@
     "sourceHeadAtAuditStart": "e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d",
     "validationRunAtAuditStart": {
       "id": 39622616336,
-      "status": "queued",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336"
+      "status": "completed",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336",
+      "conclusion": "success",
+      "completedAgainstSourceSha": "e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d"
     },
     "sourceFile": "public/admin/index.html",
     "currentDashboard": "product counts, quick actions, recent audit logs",
@@ -2400,6 +2402,7 @@
     "dedicatedAdminRevenueRouteFound": false,
     "orderEndpointLimitation": "/api/admin/orders returns only the latest 1000 parent orders; not sufficient evidence for complete all-history revenue trend",
     "decision": "Do not fabricate chart data or present a capped subset as complete history. Inspect schema and order/payment lifecycle semantics before choosing a data-backed aggregation; otherwise use a truthful empty state and test it.",
-    "progressEffect": "No progress increase: audit identifies next work but does not close the visual or authenticated QA gaps."
+    "progressEffect": "No progress increase: audit identifies next work but does not close the visual or authenticated QA gaps.",
+    "followUpNote": "Run #39622616336 later completed success for source SHA e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d. Subsequent documentation-only commits changed branch HEAD; current HEAD must be revalidated separately."
   }
 }
