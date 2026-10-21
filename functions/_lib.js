@@ -2,6 +2,11 @@ const encoder = new TextEncoder();
 const SESSION_COOKIE = "sd_admin_session";
 const SESSION_SECONDS = 10 * 60;
 
+export const FULFILLMENT_TYPES = Object.freeze(["in_stock", "made_to_order", "unclassified"]);
+export function normalizeFulfillmentType(value) {
+  return FULFILLMENT_TYPES.includes(value) ? value : "unclassified";
+}
+
 export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
     status,
@@ -299,6 +304,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     slug: row.slug,
     sku: publicView && !skuVerified ? null : row.sku,
     skuVerified,
+    fulfillmentType: normalizeFulfillmentType(row.fulfillment_type ?? row.fulfillmentType),
     title: row.title,
     category: row.category,
     categoryLabel: row.category_label || row.category,
@@ -351,6 +357,11 @@ export function validateProduct(input, existing = null) {
   if (price.error) return { error: price.error };
   const stock = optionalInteger(input.stock, "Tồn kho", 1_000_000);
   if (stock.error) return { error: stock.error };
+  const rawFulfillmentType = input.fulfillmentType ?? input.fulfillment_type ?? existing?.fulfillmentType ?? "unclassified";
+  if (typeof rawFulfillmentType !== "string" || !FULFILLMENT_TYPES.includes(rawFulfillmentType)) {
+    return { error: "Loại hàng không hợp lệ. Chọn Hàng có sẵn, Hàng đặt riêng hoặc Chưa phân loại." };
+  }
+  const fulfillmentType = rawFulfillmentType;
   const images = input.images === undefined ? (existing?.images || []) : input.images;
   if (!Array.isArray(images) || images.length > 30 || images.some((x) => typeof x !== "string" || x.length > 240 || (!/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) && !/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x)))) {
     return { error: "Bộ ảnh không hợp lệ. Chỉ dùng ảnh WebP có sẵn trong images/ hoặc ảnh tải lên qua trang quản trị." };
@@ -369,6 +380,7 @@ export function validateProduct(input, existing = null) {
       description,
       price: price.value,
       stock: stock.value,
+      fulfillmentType,
       published: input.published === false || input.published === 0 || input.published === "0" ? 0 : 1,
       images,
       sourcePriceConfirmed: price.value !== null,
@@ -379,14 +391,15 @@ export function validateProduct(input, existing = null) {
 
 export function productInsertStatement(db, p, ignore = false) {
   const verb = ignore ? "INSERT OR IGNORE" : "INSERT";
-  return db.prepare(`${verb} INTO products (id,slug,sku,sku_verified,title,category,category_label,description,price,stock,published,images_json,source_price_confirmed,sort_order,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
-    .bind(p.id, p.slug, p.sku, p.skuVerified ? 1 : 0, p.title, p.category, p.categoryLabel, p.description, p.price, p.stock, p.published, JSON.stringify(p.images), p.sourcePriceConfirmed ? 1 : 0, p.sortOrder);
+  return db.prepare(`${verb} INTO products (id,slug,sku,sku_verified,title,category,category_label,description,price,stock,published,images_json,source_price_confirmed,sort_order,fulfillment_type,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
+    .bind(p.id, p.slug, p.sku, p.skuVerified ? 1 : 0, p.title, p.category, p.categoryLabel, p.description, p.price, p.stock, p.published, JSON.stringify(p.images), p.sourcePriceConfirmed ? 1 : 0, p.sortOrder, p.fulfillmentType);
 }
 
 export function toAdminProduct(p) {
   return {
     id: p.id, slug: p.slug, sku: p.sku, skuVerified: Boolean(p.skuVerified), title: p.title,
     category: p.category, categoryLabel: p.categoryLabel,
+    fulfillmentType: normalizeFulfillmentType(p.fulfillmentType),
     description: p.description, price: p.price, stock: p.stock,
     published: Boolean(p.published), images: p.images,
     sourcePriceConfirmed: Boolean(p.sourcePriceConfirmed), sortOrder: p.sortOrder,
