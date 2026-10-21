@@ -816,3 +816,55 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     writeFileSync(metadataPath, JSON.stringify(existing, null, 2) + '\n');
   }
 });
+
+test('respects the reduced-motion preference across interactive ADMIN layers', async ({ page }) => {
+  // Read-only visual test: block every API request so no real backend call or write can occur.
+  await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
+  await page.route('**/api/**', route => route.fulfill({
+    status: 401,
+    contentType: 'application/json',
+    body: JSON.stringify({ error: 'Read-only reduced-motion audit; API access is blocked.' })
+  }));
+
+  const response = await page.goto(localAdminUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
+  expect(response?.status(), 'ADMIN source should load for reduced-motion CSS verification').toBe(200);
+
+  const motionStyles = await page.evaluate(() => {
+    const selectors = [
+      ['topbar', '.topbar'],
+      ['panel', '.panel'],
+      ['editor', '.editor'],
+      ['dashboardShortcut', '.dashboard-shortcut'],
+      ['control', '.control']
+    ];
+    const seconds = value => value.split(',').map(part => {
+      const time = part.trim();
+      const amount = Number.parseFloat(time);
+      return time.endsWith('ms') ? amount / 1000 : amount;
+    });
+    return Object.fromEntries(selectors.map(([name, selector]) => {
+      const element = document.querySelector(selector);
+      if (!element) return [name, { missing: true }];
+      const style = getComputedStyle(element);
+      return [name, {
+        transitionDurations: seconds(style.transitionDuration),
+        animationDurations: seconds(style.animationDuration),
+        scrollBehavior: style.scrollBehavior
+      }];
+    }));
+  });
+
+  for (const [name, style] of Object.entries(motionStyles)) {
+    expect(style.missing, name + ' should exist in the ADMIN source DOM').not.toBe(true);
+    expect(
+      style.transitionDurations.every(seconds => Number.isFinite(seconds) && seconds <= 0.001),
+      name + ' transitions should be effectively disabled when reduced motion is requested'
+    ).toBe(true);
+    expect(
+      style.animationDurations.every(seconds => Number.isFinite(seconds) && seconds <= 0.001),
+      name + ' animations should be effectively disabled when reduced motion is requested'
+    ).toBe(true);
+    expect(style.scrollBehavior, name + ' should not use smooth scrolling for reduced motion').toBe('auto');
+  }
+});
+
