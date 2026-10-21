@@ -63,4 +63,14 @@ has('id="showPrices" type="checkbox" aria-label="Hiển thị giá cho khách h�
 has('id="welcomeEnabled" type="checkbox" aria-label="Hiển thị trang chào mừng"', 'welcome page toggle accessible name');
 has('id="watermarkEnabled" type="checkbox" aria-label="Bật watermark khi xem chi tiết"', 'watermark toggle accessible name');
 
-console.log('PASS ADMIN ice-glass visual tokens, login contract, and required API route strings');
+// Preview CSSOM rules can group multiple selectors. Guard against regressions that
+// compare the complete selectorText string to just one member of that list.
+const previewSpec = readFileSync(new URL('./e2e/admin-preview.spec.js', import.meta.url), 'utf8');
+has('body:has(#loginView:not(.hidden)) .topbar>.brand,', 'grouped login-shell CSS selector list');
+assert.match(previewSpec, /const splitSelectorList = value => \{/, 'Preview diagnostics should parse CSS selector lists');
+assert.match(previewSpec, /splitSelectorList\(rule\.selectorText\)\.includes\(normalizedHideSelector\)/,
+  'Preview diagnostics should match an individual selector inside a CSS rule list');
+assert.doesNotMatch(previewSpec, /normalizeSelector\(rule\.selectorText\)\s*===\s*normalizedHideSelector/,
+  'Preview diagnostics must not compare a grouped selector list as one selector');
+
+console.log('PASS ADMIN ice-glass visual tokens, login contract, grouped Preview CSS selector matching, and required API route strings');
