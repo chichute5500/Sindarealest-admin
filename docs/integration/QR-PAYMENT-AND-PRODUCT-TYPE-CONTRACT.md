@@ -276,3 +276,23 @@ Source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 395
 - Current Admin branch at audit start: `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7`; exact-head Validate CI [39583615335](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583615335) passed. App source SHA `47a23ded111d2982383460ba7265b778e2bc6d39` remains the source SHA for the latest Preview failure [39583053648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648). The docs-only commit did not trigger Preview due to workflow path filters.
 - PR #111 is open/unmerged against `main`, with 1,088 files changed (+37,133/−390). The diff has a broad mixture of Admin, public storefront, Functions/API, migrations, scripts, tests and a large history/screenshot evidence set. PR #108 is also open/unmerged against `main`. No merge-readiness conclusion is granted; full diff audit is still open.
 - Product image-save and PRE/PRO D1 migration work remains deferred by owner. No remote schema inspection or mutation was performed.
+
+
+## Latest source-only payment/QR and deployment-readiness audit — 2026-10-21 21:28 ICT
+
+This was a read-only source review of the existing payment contract and route code; nothing was executed against remote services.
+
+### Source-contract observations (not live-backend proof)
+- `functions/api/admin/payment-qr-upload.js` (`7a133a490488cf0593ae7cf1165acbc0307fcaa5`) uses `requireAdmin`, a 5 MiB upload limit, generates a pending QR image key, returns an authenticated preview URL, and does not activate the image at upload time.
+- `functions/api/admin/payment-qr.js` (`6408ef720dc2b2e518ee7b9ef67e935d5581620b`) preserves draft/activate/deactivate states and emits audit-log rows; activation requires a valid pending image key and an explicit Admin action.
+- `functions/api/admin/payment-requests.js` (`66620cb07d9c9d96446576bdbab853f8aa218392`) rejects a client-provided amount, requires server-side price/terms confirmation and a valid active QR, derives deposit/full/balance from fulfillment and ledger state, and exposes shipping eligibility separately from applied free shipping.
+- `functions/api/admin/payment-transactions.js` (`bd3fae18ea201bf2676ffa7097f14d2049d5449b`) requires Admin auth, validates transaction references and amounts, records only explicitly verified receipts/refunds, prevents over-refunds in the insertion guard, and gates follow-on status/audit updates on a successful ledger insert.
+- `functions/api/order-payment.js` (`0281ead2d5070c1419b8952b01f8f7fc3b92d5d8`) scopes public order payment to a token hash, uses private/no-store and referrer-protection headers, withholds payment amount/QR before price and terms are confirmed, and applies free shipping only once the order is fully paid and eligible.
+- Tests `tests/fulfillment-payment-contract.test.mjs` and `tests/payment-ledger-route.test.mjs` passed as part of [Run #158](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216) on exact test SHA `45f630e99cfd1dd047c234f0fb42fa197d9bc978`. They use source assertions/mocked D1; they are not remote D1 or authenticated-production proof.
+- Existing integration gap for the protected static branch remains: `public/index.html` does not yet map/display both `freeShippingEligible` and `freeShipping` in its adapted state. Do not patch the website branch from the Admin branch.
+
+### Potential deployment-readiness blocker — NOT EXECUTED
+- `migrations/0009_fulfillment_and_manual_payments.sql` adds `fulfillment_type`, payment-terms/access-token fields and the `order_payment_requests` / `order_payment_transactions` tables used by payment routes.
+- Read-only inspection found that `scripts/setup-cloudflare.mjs` lists migrations 0001 and 0003–0008 (with conditional SKU-column ALTERs) but does not reference migration 0009. `scripts/deploy-cloudflare.mjs` preflights migration 0007's order-contact snapshot and the two 0008 SKU columns, but does not check the 0009 payment fields/tables. `scripts/check-migrations.mjs` validates 0009 against a temporary local D1, which does not prove any remote deployment has applied it.
+- This is a source-level mismatch/risk, **not a claim that the remote schema is missing**. No remote D1 schema/ledger read, SQL, migration, setup script, R2 action or deployment was performed. Current owner restrictions remain in force. Do not execute or change migration/setup/deploy behavior without explicit authorization.
+- Current Admin branch at audit start was `cf3dd4f75a37806316970041a00f1b3b6a16b1df`; further handoff-only commits can advance the branch. Latest application/test SHA remains `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; no app/API/migration source changes occurred after that tested SHA.
