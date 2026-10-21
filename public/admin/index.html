@@ -801,7 +801,7 @@ function showOrderDetails(id){
 }
 function closeOrderDetails(){deactivateAdminModal($('#orderDetailBackdrop'))}
 function customerInitials(value){
-const words=String(value||'').trim().split(/\\s+/).filter(Boolean);
+const words=String(value||'').trim().split(/\s+/).filter(Boolean);
 if(!words.length)return '?';
 return (words.length===1?words[0].slice(0,2):words[0][0]+words[words.length-1][0]).toLocaleUpperCase('vi');
 }
