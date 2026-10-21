@@ -13,21 +13,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 131d6f395a94ef82b8d1d827fb5f000ab92df60e
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142
+- Tested commit: 32c1f28662e7240353b0eda2f5daeaf22359257e
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-188 (not committed to Git).
+- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-189 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Latest exact-SHA reduced-motion browser pass — 2026-10-21
-
-- Test fix commits `4538efaa0a95799fea39765d4f46439e83d4ce60` and `131d6f395a94ef82b8d1d827fb5f000ab92df60e` align the reduced-motion Playwright selectors with the real dashboard DOM (components are rendered directly into `#appView`, not nested under `#main`). Application CSS/business logic was not changed for this fix.
-- Validate Source [#39629076105](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076105) and Admin Preview/Playwright [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) both succeeded on exact SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e`. Browser log: `3 passed` for the static baseline test file, including `respects the reduced-motion preference across interactive ADMIN layers`; configured Preview CSS signature also passed.
-- Evidence artifact `admin-preview-evidence-188` (ID `12357698923`) contains 59 PNGs (16 login + 43 read-only fixture module captures), 36 fixture metrics, and metadata. All recorded browser/console/request/HTTP error arrays are empty; attempted writes and unexpected API paths are empty. Do not treat fixture screenshots or login CSS signature as authenticated backend QA.
-- GitHub PR metadata before this status refresh showed PR #111 OPEN/unmerged and PR #108 OPEN/unmerged. Handoff updates add files to PR #111, so changed-file counts are point-in-time only; its mixed-scope review remains open.
-- Progress stays **48%**. Full 12-screen parity remains NOT ACCEPTED; authenticated business QA remains NOT TESTED/BLOCKED BY ACCESS; image save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
