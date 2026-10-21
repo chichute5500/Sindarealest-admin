@@ -14,7 +14,9 @@ assert.match(html,/selectedFulfillment==='all'\|\|productFulfillmentType\(p\)===
 assert.match(html,/result\?\.status==='confirmed'/);
 assert.match(html,/payment\?\.qrIncludesAmount===false/);
 assert.match(html,/result\?\.priceConfirmationRequired===false/);
-assert.match(html,/Quét QR hoặc gửi biên lai không đồng nghĩa với đã thanh toán/);\nassert.match(html,/img\\.onerror=/, 'A broken QR image must switch to a safe no-transfer fallback.');\nassert.match(html,/Không tải được mã QR/, 'A broken QR must not leave an empty payment panel.');
+assert.match(html,/Quét QR hoặc gửi biên lai không đồng nghĩa với đã thanh toán/);
+assert.match(html,/img\.onerror=/, 'A broken QR image must switch to a safe no-transfer fallback.');
+assert.match(html,/Không tải được mã QR/, 'A broken QR must not leave an empty payment panel.');
 assert.match(html,/Chờ cửa hàng xác nhận/);
 assert.match(pkg.scripts.test,/storefront-payment-product-type-contract\.test\.mjs/);
 console.log('Storefront payment/product-type contract checks passed.');
