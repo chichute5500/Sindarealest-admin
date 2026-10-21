@@ -2638,7 +2638,7 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
 /* Compact populated carts on phones; preserve the empty-cart state and checkout scrolling. */
 @media(max-width:760px){
   .cart-drawer:has(.cart-row){
-    height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    height:auto!important;
     bottom:auto!important;
     min-height:0!important;
     max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
@@ -2722,10 +2722,10 @@ body:has(#welcomeSplash) #accountDrawer,body:has(#welcomeSplash) #cartDrawer,bod
   #home .hero-visual{isolation:isolate}
   #home .hero-visual::after{
     content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(180deg,rgba(237,247,255,0) 48%,rgba(237,247,255,.04) 56%,rgba(237,247,255,.16) 64%,rgba(237,247,255,.34) 74%,rgba(237,247,255,.58) 88%,rgba(237,247,255,.76) 100%);
+    background:linear-gradient(180deg,rgba(237,247,255,0) 52%,rgba(237,247,255,.02) 58%,rgba(237,247,255,.08) 64%,rgba(237,247,255,.14) 72%,rgba(237,247,255,.24) 84%,rgba(237,247,255,.36) 100%);
   }
   html.dark #home .hero-visual::after{
-    background:linear-gradient(180deg,rgba(4,20,34,0) 48%,rgba(4,20,34,.05) 56%,rgba(4,20,34,.18) 64%,rgba(4,20,34,.40) 74%,rgba(4,20,34,.68) 88%,rgba(4,20,34,.84) 100%);
+    background:linear-gradient(180deg,rgba(4,20,34,0) 52%,rgba(4,20,34,.02) 58%,rgba(4,20,34,.07) 64%,rgba(4,20,34,.13) 72%,rgba(4,20,34,.24) 84%,rgba(4,20,34,.36) 100%);
   }
   #home .hero-visual-caption{position:absolute;z-index:3}
 }

@@ -121,7 +121,9 @@ async function makePage(browser, viewport, theme, label, options = {}) {
       const record = {
         stage, atMs: Number(performance.now().toFixed(2)), readyState: document.readyState,
         bodyClassName: body?.className || '', welcomeActive, welcomeOwnsScreen,
-        splashVisible: nodes.splash.visible, nodes, violation: welcomeOwnsScreen && visibleChrome,
+        splashVisible: nodes.splash.visible, nodes,
+        // On the homepage startup probe, visible storefront chrome before the splash node exists is also a flash violation.
+        violation: visibleChrome && (welcomeOwnsScreen || !nodes.splash.visible),
       };
       const fingerprint = JSON.stringify({
         readyState: record.readyState, bodyClassName: record.bodyClassName, welcomeActive,

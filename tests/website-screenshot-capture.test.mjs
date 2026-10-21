@@ -348,6 +348,14 @@ assert.match(requiredViewportThemeHeroAudit, /await auditHeroImage\(page, label\
 assert.doesNotMatch(requiredViewportThemeHeroAudit, /if \(viewport\.name === 'mobile-390' && theme === 'light'\)/,
   'Hero asset acceptance must not be limited to a single mobile Light context.');
 
+const firstPaintVisibilityLogic = live.slice(
+  live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'),
+  live.indexOf('const fingerprint', live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'))
+);
+assert.match(firstPaintVisibilityLogic, /violation: visibleChrome && \(welcomeOwnsScreen \|\| !nodes\.splash\.visible\)/,
+  'The first-paint audit must fail if account/cart/toolbar chrome appears before the welcome splash node exists, not only while welcome is visible.');
+
+
 assert.match(live, /recordVideo: \{ dir: firstPaintVideoDir[\s\S]*async function captureWelcomeStartupVideo[\s\S]*await video\.path\(\)/,
   'A separate short browser video must record the welcome first-paint window without being blocked by still-screenshot calls.');
 assert.match(live, /firstPaintVideoCoverageComplete/,

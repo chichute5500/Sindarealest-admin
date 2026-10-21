@@ -232,10 +232,10 @@ assert.ok(html.includes('.account-drawer{\n    height:auto!important;\n    botto
   'Mobile account drawer must fit its content rather than leave a large empty panel.');
 
 // A populated mobile cart fills the available panel above persistent mobile navigation.
-assert.match(html, /@media\(max-width:760px\)\{\s*\.cart-drawer:has\(\.cart-row\)\{\s*height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important;\s*bottom:auto!important;\s*min-height:0!important;\s*max-height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important;/,
-  'A populated mobile cart must fill the available panel while respecting the viewport and safe-area maximum.');
+assert.match(html, /@media\(max-width:760px\)\{\s*\.cart-drawer:has\(\.cart-row\)\{\s*height:auto!important;\s*bottom:auto!important;\s*min-height:0!important;\s*max-height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important;/,
+  'A populated mobile cart must fit its content when short and stay within the viewport/safe-area maximum when long.');
 assert.match(html, /\.cart-drawer:has\(\.cart-row\) \.cart-list\{\s*flex:1 1 auto!important;\s*max-height:none;\s*min-height:0!important;\s*overflow-y:auto!important;/,
-  'The populated cart list must expand and remain independently scrollable so the summary stays at the bottom.');
+  'The populated cart list must keep its content height for short carts and scroll independently when a long cart reaches the maximum height.');
 
  
 // Theme toggles must avoid long backdrop-filter interpolation that causes mobile jank.
@@ -261,9 +261,9 @@ assert.match(satinHeroVisibility, /rgba\(4,20,34,\.80\) 0%,rgba\(4,20,34,\.70\) 
 const desktopHeroEdgeBlend = html.slice(html.indexOf('/* sd-hero-desktop-floor-blend-2026-10-22:'));
 assert.ok(desktopHeroEdgeBlend.includes('@media(min-width:761px)'), 'The photo-edge fade must be restricted to desktop.');
 assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual::after'), 'The photo-edge fade must not replace or mutate the supplied image asset.');
-assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(237,247,255,0) 48%,rgba(237,247,255,.04) 56%,rgba(237,247,255,.16) 64%,rgba(237,247,255,.34) 74%,rgba(237,247,255,.58) 88%,rgba(237,247,255,.76) 100%)'),
+assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(237,247,255,0) 52%,rgba(237,247,255,.02) 58%,rgba(237,247,255,.08) 64%,rgba(237,247,255,.14) 72%,rgba(237,247,255,.24) 84%,rgba(237,247,255,.36) 100%)'),
   'Light desktop hero must fade the source photo tabletop into satin without replacing the owner-supplied image.');
-assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(4,20,34,0) 48%,rgba(4,20,34,.05) 56%,rgba(4,20,34,.18) 64%,rgba(4,20,34,.40) 74%,rgba(4,20,34,.68) 88%,rgba(4,20,34,.84) 100%)'),
+assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(4,20,34,0) 52%,rgba(4,20,34,.02) 58%,rgba(4,20,34,.07) 64%,rgba(4,20,34,.13) 72%,rgba(4,20,34,.24) 84%,rgba(4,20,34,.36) 100%)'),
   'Dark desktop hero must fade the source photo tabletop into the navy satin canvas.');
 assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual-caption{position:absolute;z-index:3}'),
   'The hero caption must remain above the photo edge blend.');
