@@ -1,3 +1,38 @@
+## CHECKPOINT CHỐNG LÀM LẠI — 2026-10-22 (đọc đầu tiên, thay cho mọi trạng thái cũ mâu thuẫn)
+
+### Source of truth tại checkpoint
+- Repo: `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 vẫn mở, KHÔNG merge.
+- Commit mới nhất đã được xác minh trong phiên này: `fd426e9a5c93b7d4987ff55a653ec5a9ffe37c85` — chỉ cập nhật assertion trong `tests/storefront-html-safety.test.mjs` để khớp yêu cầu ảnh Hero do người dùng tải lên. Trước khi sửa tiếp, fetch branch HEAD/PR HEAD vì có thể đã có commit đồng thời sau checkpoint này.
+- Source validation run [#39662882522](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662882522): **PASS** cho commit `fd426e9...`.
+- Admin Preview read-only smoke run [#39662882515](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662882515): **PASS**. Đây chỉ là smoke read-only; không cho phép sửa Admin.
+- Storefront Preview deploy run [#39662882427](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662882427): **PASS** cho commit `fd426e9...`. Phải kiểm tra deployment SHA thực tế trước khi coi live audit đã xác nhận đúng SHA.
+- Liquid Glass visual-preview run [#39662882416](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662882416): còn đang chạy ở lần kiểm tra gần nhất, tại bước probe Preview. Chưa có kết luận/audit artifact mới được xác minh; kiểm tra lại run này trước khi khởi chạy workflow tương đương.
+- Các run trước có trạng thái PASS chỉ chứng minh SHA mà chính run đó kiểm tra; không chuyển kết quả sang commit mới theo suy đoán.
+
+### Việc đã làm ở lượt gần nhất
+- Sửa kiểm thử cũ vốn yêu cầu ẩn ảnh Hero khi lỗi tải: giờ kiểm thử yêu cầu giữ Hero visible và giữ src `/images/hero-sd-gl052.png?v=20261022-1` ngay cả khi `onerror` chạy. Commit: `fd426e9...`.
+- Các commit gần đó đã được nhìn thấy trong Actions: `626da801...`, `69c6061...`, `fd426e9...`; không giả định nội dung của chúng đã được triển khai/kiểm chứng chỉ vì workflow xuất hiện.
+- Ảnh Hero `public/images/hero-sd-gl052.png` là **presentation asset do người dùng tải lên**. Không tìm SKU trong catalog, không gate ảnh theo SKU/API, không ẩn/thay/xóa ảnh. Khi ảnh request lỗi, không được chủ động ẩn Hero; phải xác minh nguyên nhân tải ảnh và tránh để UI trống.
+- Ảnh tĩnh từ artifact cũ run `39655449912`, artifact `12370932919`, ở khoảng 200–300 ms cho thấy welcome splash phủ màn hình, bottom nav/account drawer ẩn. Điều này KHÔNG đủ kết luận lỗi flash tài khoản khoảng 100 ms đã hết hay đã được tái hiện.
+
+### Checklist tiếp theo — tiếp tục, không dừng sau báo cáo
+1. Fetch branch HEAD + PR #108 HEAD; nếu SHA khác `fd426e9...`, xem commit/diff trước khi sửa. Không ghi đè commit mới.
+2. Kiểm tra lại run #39662882522, #39662882515, #39662882427, #39662882416 và artifact của visual-preview. Không rerun các run PASS nếu source/điều kiện không đổi; chỉ chạy lại khi cần xác minh SHA mới hoặc khi có thay đổi liên quan.
+3. Xem toàn bộ `first-paint-videos/welcome-startup-*.webm` và `firstPaintTimelines` của mobile 360×800, 390×844 Light/Dark. Xác minh bằng video/DOM evidence: (a) bottom toolbar không hiện trên welcome; (b) account UI không lóe trước welcome; (c) sau dismiss các view/toolbar đúng; (d) direct account/cart/deep links không hỏng. Không kết luận từ ảnh tĩnh đơn lẻ.
+4. Kiểm tra Hero trực tiếp trên Preview đúng deployment SHA: request HTTP/ảnh tải thành công, crop, kích thước, satin blend, Light/Dark, 360×800/390×844 và desktop. Không coi “asset có trong repo” là bằng chứng nó hiển thị đúng trên live.
+5. Tiếp tục so sánh với reference và các mục còn mở. Giữ PASS cũ làm checkpoint; chỉ chạy test liên quan đến code đã đổi, regression có lý do, hoặc coverage còn thiếu. Ghi rõ test nào chạy lại và vì sao.
+6. Sau khi có bằng chứng mới, cập nhật HANDOFF/TEST-RESULTS/prompt bằng SHA + run URL + artifact ID + trạng thái cụ thể; prompt chat mới phải mở bằng checkpoint mới nhất và danh sách “đã PASS — KHÔNG LÀM LẠI”.
+- Tiến độ ước lượng trước đó khoảng 70%, chỉ là ước lượng làm việc. Không tăng % hoặc tuyên bố 100% nếu visual audit/first-paint/Hero chưa có bằng chứng trực tiếp cùng SHA.
+
+### Phạm vi cấm / quy tắc vận hành
+- Chỉ storefront branch này và Preview alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Không merge PR #108; không đụng `main`, Production, DNS, Admin branch, backend/API nghiệp vụ, D1/R2 data, bindings, secrets, Access policy.
+- Giữ logo chính thức, dữ liệu/mapping sản phẩm thật, routes và chức năng. Không dùng fixture làm bằng chứng live; không submit checkout thật.
+- Người dùng yêu cầu làm liên tục: sau mỗi báo cáo tiếp tục công việc; chỉ dừng khi thật sự cần thao tác/quyền/quyết định/dữ liệu từ người dùng.
+- **Checkpoint chống lặp:** đọc trạng thái workflow và artifact hiện có trước khi chạy lại; không chạy lại suite đã PASS chỉ để “kiểm tra cho chắc” nếu không có thay đổi liên quan. Ghi nhận SHA/phạm vi từng PASS.
+
+---
+
 ## 2026-10-22 — CURRENT SESSION UPDATE (read before historical notes)
 
 - Current project remains storefront-only in `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108 open/unmerged. Never merge; no Production, `main`, Admin branch, backend/data/config/secrets work.
