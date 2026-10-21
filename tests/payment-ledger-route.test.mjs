@@ -164,4 +164,55 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 401, "unauthenticated callers cannot mutate the verified payment ledger");
   assert.equal(db.batches.length, 0);
 }
-console.log("PASS payment ledger route behavior: terms gates, refund cap, duplicate refs, authenticated verification, installment creation and token-scoped customer payment details.");
+
+{
+  const db = makeDb({ orderItems: [{ fulfillment_type: "in_stock", quantity: 1, line_total: 500000 }], order: { ...baseOrder, total: 500000 } });
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit"
+  })));
+  const payload = await response.json();
+  assert.equal(response.status, 201);
+  assert.equal(payload.amount, 100000, "in-stock deposit must be the fixed 100,000 VND");
+  assert.equal(payload.shippingBenefit, "standard_shipping");
+  assert.equal(payload.freeShipping, false);
+}
+{
+  const db = makeDb();
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit", amount: 1
+  })));
+  assert.equal(response.status, 400, "browser-supplied payment amounts must be rejected");
+  assert.equal(db.batches.length, 0);
+}
+{
+  const db = makeDb();
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "full"
+  })));
+  const payload = await response.json();
+  assert.equal(response.status, 201);
+  assert.equal(payload.amount, 100000);
+  assert.equal(payload.shippingBenefit, "free_shipping");
+  assert.equal(payload.freeShipping, true, "full payment qualifies for freeship");
+}
+{
+  const db = makeDb({ orderItems: [
+    { fulfillment_type: "in_stock", quantity: 1, line_total: 50000 },
+    { fulfillment_type: "made_to_order", quantity: 1, line_total: 50000 }
+  ] });
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "full"
+  })));
+  assert.equal(response.status, 409, "mixed fulfillment types require manual consultation");
+  assert.equal(db.batches.length, 0);
+}
+{
+  const db = makeDb({ orderItems: [{ fulfillment_type: "unclassified", quantity: 1, line_total: 100000 }] });
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit"
+  })));
+  assert.equal(response.status, 409, "unclassified products must not receive automatic payment requests");
+  assert.equal(db.batches.length, 0);
+}
+
+console.log("PASS payment ledger route behavior: owner-derived deposit amounts, client amount rejection, mixed/unclassified cart gates, freeship and verified ledger.");
