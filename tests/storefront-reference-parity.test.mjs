@@ -173,7 +173,7 @@ assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'"
 assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
 assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-failed\''),
-  'If the presentation image fails to load, the empty hero image frame must fail closed.');
+  'A failed image request must be diagnosable without hiding the user-approved hero presentation asset.');
 assert.ok(html.includes('id="sdGalleryWhiteBackgroundKey"'), 'A browser-only SVG filter is available for photos with a near-white canvas.');
 assert.match(html, /function syncFullscreenBackgroundKey\(img\)[\s\S]*?votes>=6[\s\S]*?sd-white-background-keyed/,
   'Only gallery photos whose corner samples confirm a near-white canvas may use background removal.');
