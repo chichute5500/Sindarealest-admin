@@ -10,41 +10,74 @@ export async function onRequestGet(context) {
   if (!orderId) return fail("Thiếu mã đơn.");
   try {
     const db=context.env.DB;
-    const requests=await db.prepare("SELECT id,installment_type,amount,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by,created_at,updated_at FROM order_payment_requests WHERE order_id=? ORDER BY created_at DESC LIMIT 50").bind(orderId).all();
+    const requests=await db.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by,created_at,updated_at FROM order_payment_requests WHERE order_id=? ORDER BY created_at DESC LIMIT 50").bind(orderId).all();
     const transactions=await db.prepare("SELECT id,payment_request_id,direction,amount,transaction_reference,note,actor,verified_at,created_at FROM order_payment_transactions WHERE order_id=? ORDER BY created_at DESC LIMIT 100").bind(orderId).all();
     const order=await db.prepare("SELECT total FROM orders WHERE id=? LIMIT 1").bind(orderId).first();
     return json({requests:requests.results||[],transactions:transactions.results||[],summary:summarizePaymentRows(transactions.results||[],order?.total)});
   } catch { return fail("Không đọc được lịch sử thanh toán.",503); }
 }
 export async function onRequestPost(context) {
-  const auth = await requireAdmin(context); if (auth.response) return auth.response;
-  const parsed=await readJsonBodyLimited(context.request,8*1024);
-  if(parsed.error) return fail(parsed.error==="too_large"?"Yêu cầu thanh toán vượt giới hạn.":"Dữ liệu yêu cầu thanh toán không hợp lệ.",parsed.error==="too_large"?413:400);
-  const body=parsed.value||{},orderId=String(body.orderId||""),type=String(body.installmentType||""),amount=Number(body.amount);
-  if(!orderId||!["deposit","balance","full"].includes(type)||!Number.isSafeInteger(amount)||amount<=0||amount>2_000_000_000)return fail("Đợt thanh toán hoặc số tiền không hợp lệ.");
+  const auth = await requireAdmin(context);
+  if (auth.response) return auth.response;
+  const parsed = await readJsonBodyLimited(context.request, 8 * 1024);
+  if (parsed.error) return fail(parsed.error === "too_large" ? "Yêu cầu thanh toán vượt giới hạn." : "Dữ liệu yêu cầu thanh toán không hợp lệ.", parsed.error === "too_large" ? 413 : 400);
+  const body = parsed.value || {};
+  const orderId = String(body.orderId || "");
+  const paymentOption = String(body.paymentOption || "");
+  if (Object.hasOwn(body, "amount")) return fail("Số tiền do máy chủ tự tính; không gửi amount từ trình duyệt.");
+  if (!orderId || !["deposit", "balance", "full"].includes(paymentOption)) return fail("Lựa chọn thanh toán không hợp lệ.");
   try {
-    const db=context.env.DB;
-    const order=await db.prepare("SELECT id,order_number,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders WHERE id=? LIMIT 1").bind(orderId).first();
-    if(!order)return fail("Không tìm thấy đơn hàng.",404);
-    if(order.status==="cancelled")return fail("Đơn đã hủy không thể tạo yêu cầu thanh toán.",409);
-    if(Number(order.price_confirmation_required)!==0||order.total===null||!order.payment_terms_confirmed_at)return fail("Cần xác nhận giá và điều kiện đơn trước khi yêu cầu chuyển khoản.",409);
-    const rows=await db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?)").bind("payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name").all();
-    const cfg=Object.fromEntries((rows.results||[]).map(r=>[r.key,r.value]));
-    if(cfg.payment_qr_active!=="1"||!validPublicQrImageKey(cfg.payment_qr_active_key)||!cfg.payment_qr_bank_name||!cfg.payment_qr_account_number||!cfg.payment_qr_account_name)return fail("Chưa kích hoạt cấu hình QR ngân hàng hợp lệ.",409);
-    const tx=await db.prepare("SELECT direction,amount FROM order_payment_transactions WHERE order_id=?").bind(orderId).all();
-    const summary=summarizePaymentRows(tx.results||[],order.total),remaining=summary.remainingBalance;
-    if(remaining===null||remaining<=0)return fail("Đơn không còn số dư phải thu.",409);
-    if(amount>remaining)return fail("Số tiền yêu cầu vượt số dư còn lại.",409);
-    if(type!=="deposit"&&amount!==remaining)return fail("Đợt thanh toán số dư/toàn bộ phải bằng đúng số dư còn lại.",409);
-    const id=crypto.randomUUID(),reference=referenceCode();
+    const db = context.env.DB;
+    const order = await db.prepare("SELECT id,order_number,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders WHERE id=? LIMIT 1").bind(orderId).first();
+    if (!order) return fail("Không tìm thấy đơn hàng.", 404);
+    if (order.status === "cancelled") return fail("Đơn đã hủy không thể tạo yêu cầu thanh toán.", 409);
+    if (Number(order.price_confirmation_required) !== 0 || order.total === null || !order.payment_terms_confirmed_at) return fail("Cần xác nhận giá và điều kiện đơn trước khi yêu cầu chuyển khoản.", 409);
+    const total = Number(order.total);
+    if (!Number.isSafeInteger(total) || total <= 0 || total > 2000000000) return fail("Tổng tiền đã xác nhận không hợp lệ.", 409);
+
+    const itemRows = await db.prepare("SELECT fulfillment_type,quantity,line_total FROM order_items WHERE order_id=?").bind(orderId).all();
+    const items = itemRows.results || [];
+    if (!items.length || items.some(item => !Number.isSafeInteger(Number(item.line_total)) || Number(item.line_total) < 0)) return fail("Một hoặc nhiều dòng hàng chưa có giá được xác nhận.", 409);
+    const itemTotal = items.reduce((sum, item) => sum + Number(item.line_total), 0);
+    if (!Number.isSafeInteger(itemTotal) || itemTotal !== total) return fail("Tổng đơn chưa khớp tổng các dòng hàng đã xác nhận; cần kiểm tra thủ công.", 409);
+    const fulfillmentTypes = new Set(items.map(item => ["in_stock", "made_to_order", "unclassified"].includes(item.fulfillment_type) ? item.fulfillment_type : "unclassified"));
+    if (fulfillmentTypes.size !== 1) return fail("Giỏ có nhiều loại hàng; vui lòng tư vấn thủ công thay vì tự động yêu cầu thanh toán.", 409);
+    const fulfillmentType = [...fulfillmentTypes][0];
+    if (fulfillmentType === "unclassified") return fail("Loại hàng chưa được Admin xác nhận; chưa thể tạo yêu cầu thanh toán tự động.", 409);
+
+    const settings = await db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?)").bind("payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name").all();
+    const cfg = Object.fromEntries((settings.results || []).map(row => [row.key, row.value]));
+    if (cfg.payment_qr_active !== "1" || !validPublicQrImageKey(cfg.payment_qr_active_key) || !cfg.payment_qr_bank_name || !cfg.payment_qr_account_number || !cfg.payment_qr_account_name) return fail("Chưa kích hoạt cấu hình QR ngân hàng hợp lệ.", 409);
+
+    const transactionRows = await db.prepare("SELECT direction,amount FROM order_payment_transactions WHERE order_id=?").bind(orderId).all();
+    const transactions = transactionRows.results || [];
+    const summary = summarizePaymentRows(transactions, total);
+    let amount;
+    const installmentType = paymentOption;
+    let shippingBenefit = "standard_shipping";
+    if (paymentOption === "deposit") {
+      if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; hãy chọn thanh toán số dư sau khi Admin đối chiếu.", 409);
+      amount = fulfillmentType === "made_to_order" ? Math.ceil(total * 0.3) : 100000;
+      if (!Number.isSafeInteger(amount) || amount <= 0 || amount > total) return fail("Khoản đặt cọc theo quy định lớn hơn tổng tiền đơn; cần tư vấn thủ công.", 409);
+    } else if (paymentOption === "full") {
+      if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; không tạo lại yêu cầu thanh toán đủ. Hãy chọn thanh toán số dư.", 409);
+      amount = total;
+      shippingBenefit = "free_shipping";
+    } else {
+      if (summary.netReceivedAmount <= 0 || summary.remainingBalance === null || summary.remainingBalance <= 0) return fail("Thanh toán số dư chỉ được tạo sau khi đã xác minh khoản nhận và còn dư phải thu.", 409);
+      amount = summary.remainingBalance;
+    }
+
+    const id = crypto.randomUUID();
+    const reference = referenceCode();
     await db.batch([
-      db.prepare("INSERT INTO order_payment_requests(id,order_id,installment_type,amount,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by) VALUES(?,?,?,?,?,?,?,?,?,'pending','admin')").bind(id,orderId,type,amount,reference,cfg.payment_qr_active_key,cfg.payment_qr_bank_name,cfg.payment_qr_account_number,cfg.payment_qr_account_name),
-      db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,'admin','payment_request_created','order',?,?)").bind(crypto.randomUUID(),orderId,JSON.stringify({requestId:id,installmentType:type,amount,reference}))
+      db.prepare("INSERT INTO order_payment_requests(id,order_id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by) VALUES(?,?,?,?,?,?,?,?,?,?, 'pending','admin')").bind(id,orderId,installmentType,amount,shippingBenefit,reference,cfg.payment_qr_active_key,cfg.payment_qr_bank_name,cfg.payment_qr_account_number,cfg.payment_qr_account_name),
+      db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,'admin','payment_request_created','order',?,?)").bind(crypto.randomUUID(),orderId,JSON.stringify({requestId:id,installmentType,fulfillmentType,amount,shippingBenefit,reference}))
     ]);
-    return json({ok:true,id,installmentType:type,amount,transferReference:reference,message:"Đã tạo yêu cầu thanh toán. QR không chứa số tiền; khách tự nhập số tiền hiển thị."},201);
+    return json({ok:true,id,installmentType,fulfillmentType,amount,shippingBenefit,freeShipping:shippingBenefit==="free_shipping",transferReference:reference,message:shippingBenefit==="free_shipping"?"Đã tạo yêu cầu thanh toán đủ; miễn phí giao hàng theo chính sách.":"Đã tạo yêu cầu thanh toán theo loại hàng và giá đã xác nhận."},201);
   } catch(error) {
-    if(/UNIQUE constraint|idx_order_payment_requests_one_pending/i.test(String(error?.message||"")))return fail("Đơn đang có yêu cầu thanh toán chờ xử lý. Hãy hủy yêu cầu cũ trước.",409);
-    return fail("Không tạo được yêu cầu thanh toán.",503);
+    if (/UNIQUE constraint|idx_order_payment_requests_one_pending/i.test(String(error?.message || ""))) return fail("Đơn đang có yêu cầu thanh toán chờ xử lý. Hãy hủy yêu cầu cũ trước.", 409);
+    return fail("Không tạo được yêu cầu thanh toán.", 503);
   }
 }
 export async function onRequestPatch(context) {
