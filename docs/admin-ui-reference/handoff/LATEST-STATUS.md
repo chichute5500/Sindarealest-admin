@@ -71,5 +71,7 @@
 ## Kết quả xác minh sau khi chạy test — 2026-10-21 17:08 UTC
 
 - Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340): **SUCCESS** trên đúng source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; các assertion mới về trạng thái `aria-live` và empty-state của bảo hành/yêu cầu hỗ trợ đã qua.
-- Admin Preview diagnostic [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300): vẫn đang chụp ma trận ảnh ở thời điểm kiểm tra; kết quả cuối chưa xác nhận.
+- Admin Preview diagnostic [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300): **SUCCESS** trên đúng SHA; artifact [admin-preview-evidence-201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710) lưu 63 ảnh bằng chứng.
 - Bảng `latest-test-results.json` đã đánh dấu test mới `executed: true`; điểm quản lý giữ 50% vì thay đổi này tăng kiểm thử, chưa giải quyết các khối lượng lớn về parity/nghiệp vụ.
+
+- Kết quả cuối sau cập nhật: Validate Source và Admin Preview/Playwright đều **SUCCESS** trên `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`. Artifact 201 gồm 63 PNG; ảnh dùng nguồn thật của giao diện nhưng các module nghiệp vụ dùng fixture tổng hợp/read-only, nên không thay thế QA nghiệp vụ có xác thực.
