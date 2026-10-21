@@ -5,30 +5,31 @@
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
   "testedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
-  "capturedAt": "2026-10-21T14:18:21.803Z",
+  "capturedAt": "2026-10-21T14:18:48.000Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% management estimate only. Source Validate run 39607193503 and Preview/Playwright run 39607193461 both validate source SHA cf594677550f63ddf92ebdba5aea87587dbfe029. npm run check, npm test, local source/fixture Playwright and configured Preview diagnostic passed. All-12-screen visual parity and authenticated real-backend QA remain unaccepted/not tested. Handoff-only commits are not source-test runs.",
-  "note": "Latest verified run #151: source SHA cf594677550f63ddf92ebdba5aea87587dbfe029 passed npm run check, npm test, local source/fixture Playwright, and configured Preview CSS signature. Target logged as feature-admin-isolated-hando.sindarealest2.pages.dev/admin/; signature hasLoginHideRule=true, topbarBrandDisplay=none, selector matched, 431 stylesheet rules. Artifact admin-preview-evidence-151 (ID 12349405826), 11,126,777 bytes, expires 2026-11-04. 59 PNGs are split into 16 login shell and 43 synthetic read-only module fixture captures, plus 36 fixture metrics; no authenticated backend QA. Branch HEAD before this documentation refresh was 6c071201b397dc8bc2d753cf4575d9c177afa4e4 (evidence-only commit after tested SHA). PR #111 OPEN/unmerged, mixed scope, 1,106 changed paths; PR #108 OPEN/unmerged, 269 changed files. Progress 48%. Visual parity for all 12 screen families is not accepted. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER. No local checkout status verified; no Production deploy, merge, remote DB writes, secret/access changes, or TinyFish.",
+  "progressBasis": "48% management estimate only. Admin gallery CSS source commit 1fb56f7b5773876c581847bf44abbef1c5c16a67 passed run 39615192697 (npm run check, npm test, local Playwright, configured Preview diagnostic). Regression test commit 45f630e99cfd1dd047c234f0fb42fa197d9bc978 passed the same set in run 39615417216. The workflow artifact contains 59 source/fixture screenshots (16 login and 43 synthetic read-only module views) and 36 fixture metrics. All-12-screen visual parity is not accepted; authenticated real-backend QA not tested. Product image-save and PRE/PRO migration remain deferred by owner. PR #111 remains open/unmerged and mixed-scope (1,112 paths); PR #108 remains open/unmerged (269 paths).",
+  "note": "Latest verified run #158: exact tested SHA 45f630e99cfd1dd047c234f0fb42fa197d9bc978, link https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216; npm run check, npm test, local responsive/theme Playwright baseline and configured Preview diagnostic all PASS. Run #157 separately passed exact source UI commit 1fb56f7b5773876c581847bf44abbef1c5c16a67. Artifact admin-preview-evidence-158 (ID 12351884437), 11,120,485 bytes, expires 2026-11-04. The artifact has 59 source/fixture PNG screenshots (16 login shell, 43 synthetic read-only module screens) and 36 fixture metrics; it is not authenticated business-backend QA. UI change is CSS-only on public/admin/index.html with contract assertions on the next tested SHA. Current evidence-only branch commit at this checkpoint: 068520e4ac62adc32ce5f15226e666479770af91; handoff commits may advance branch without changing app source. PR #111 OPEN/unmerged, 1,112 changed paths (+38,619/-392) and mixed scope, including public storefront, APIs, migrations and setup/deploy scripts; not merge-ready. PR #108 OPEN/unmerged, 269 changed paths. Progress 48%. 12-screen visual parity NOT ACCEPTED; authenticated backend QA NOT TESTED; image-save and PRE/PRO migrations DEFERRED_BY_OWNER. No merge, Production deploy, remote D1/R2 write, secret/Access changes, setup/migration execution, or TinyFish.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
     "autoMergeOrCherryPick": false,
     "mainMerge": false,
     "productionDeployment": false,
-    "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "lastObservedApplicationSourceCommit": "d553b95c3d43420f9227e9a37e6fe94b9b862b27",
-    "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
-    "pr111State": "OPEN_UNMERGED",
+    "fullDiffIsolationReview": "PARTIAL_READ_ONLY_PATH_CENSUS_AND_SCRIPT_REVIEW; SEMANTIC/SECURITY AUDIT STILL OPEN",
+    "lastObservedApplicationSourceCommit": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
+    "lastObservedEvidenceOnlyHead": "068520e4ac62adc32ce5f15226e666479770af91",
+    "pr111State": "OPEN_UNMERGED_MIXED_SCOPE",
     "pr108State": "OPEN_UNMERGED",
-    "pr111ChangedFiles": 1106,
-    "pr111Additions": 37234,
+    "pr111ChangedFiles": 1112,
+    "pr111Additions": 38619,
     "pr111Deletions": 392,
     "pr108ChangedFiles": 269,
     "pr108Additions": 19270,
     "pr108Deletions": 380,
     "protectedStaticWebsiteBranchMustNotBeModified": true,
     "pr111PngFiles": 913,
-    "pr111NonImageDocsAndCodeFiles": 193
+    "pr111NonImageDocsAndCodeFiles": 199,
+    "latestTestedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978"
   },
   "changes": [
     {
@@ -65,6 +66,22 @@
       "commitSha": "d0f5b52d9bef9b903ed58ecc2d4bb2b9a5fb46f6",
       "verifiedOnGitHub": true,
       "executed": false
+    },
+    {
+      "path": "public/admin/index.html",
+      "purpose": "Adds responsive mobile gallery rules so the first product image is a prominent full-row cover, with narrow-screen fallback and dark-theme surface.",
+      "commitSha": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
+      "verifiedOnGitHub": true,
+      "executed": true,
+      "runId": 39615192697
+    },
+    {
+      "path": "tests/admin-liquid-glass-contract.test.mjs",
+      "purpose": "Adds CSS regression contracts for mobile cover emphasis, image composition, narrow-phone layout, dark theme and accessible reorder controls.",
+      "commitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+      "verifiedOnGitHub": true,
+      "executed": true,
+      "runId": 39615417216
     }
   ],
   "priorCiRuns": [
@@ -84,6 +101,28 @@
       ],
       "rootCause": "NOT_CONFIRMED",
       "note": "The deployed URL/actual response was not exposed in the sanitized workflow log. HTML source on the ADMIN branch contains these IDs. New safe diagnostic test is committed but not yet run."
+    },
+    {
+      "runId": 39615192697,
+      "name": "Admin Preview diagnostic smoke test",
+      "conclusion": "success",
+      "testedCommitSha": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "localPlaywright": "PASS",
+      "configuredPreviewDiagnostic": "PASS",
+      "note": "Exact source UI SHA; 59 screenshot suite / fixture-only data; does not verify authenticated business workflows."
+    },
+    {
+      "runId": 39615417216,
+      "name": "Admin Preview diagnostic smoke test",
+      "conclusion": "success",
+      "testedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "localPlaywright": "PASS",
+      "configuredPreviewDiagnostic": "PASS",
+      "note": "Exact code+regression-test SHA; artifact 158; no authenticated backend QA."
     }
   ],
   "screenshots": [
@@ -2087,20 +2126,31 @@
     "note": "Screenshot reviewed from run 39611416915 / artifact admin-preview-evidence-156. Product editor is stacked with three tabs, upload picker, two placeholder/example thumbnails and move/delete controls plus fixed action bar. This is source/fixture evidence only; real image storage/save is not verified. Visual parity remains NOT_ACCEPTED, authenticated business flows NOT_TESTED. No source change; overall progress stays 48%. PR #111/#108 remain open/unmerged."
   },
   "latestRun": {
-    "sourceCi": 39607800912,
-    "previewAndPlaywright": 39607193461,
-    "previewTestedSourceSha": "cf594677550f63ddf92ebdba5aea87587dbfe029",
-    "artifactName": "admin-preview-evidence-151",
-    "artifactId": 12349405826,
-    "artifactSizeBytes": 11126777,
-    "artifactExpiresAt": "2026-11-04T13:22:55Z",
-    "sourceSha": "fb73d9237bfd15901b4a23ab47db1c9ce29130e5",
-    "sourceChecks": "PASS",
-    "unitTests": "PASS",
-    "localPlaywright": "PASS",
-    "configuredPreviewDiagnostic": "PASS_ON_SOURCE_SHA_cf594677550f63ddf92ebdba5aea87587dbfe029",
-    "authenticatedBusinessFlows": "NOT_TESTED",
-    "visualParity12Screens": "NOT_ACCEPTED"
+    "runId": 39615417216,
+    "runNumber": 158,
+    "conclusion": "success",
+    "testedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216",
+    "artifact": {
+      "name": "admin-preview-evidence-158",
+      "id": 12351884437,
+      "sizeBytes": 11120485,
+      "expiresAt": "2026-11-04T14:18:51Z"
+    },
+    "checks": {
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "localPlaywrightResponsiveThemeMatrix": "PASS",
+      "configuredPreviewDiagnostic": "PASS"
+    },
+    "screenshotEvidence": {
+      "sourceFixturePngs": 59,
+      "loginShell": 16,
+      "syntheticReadOnlyModuleViews": 43,
+      "fixtureMetrics": 36,
+      "authenticatedBackendQA": "NOT_TESTED"
+    },
+    "productionDeployment": "NOT_PERFORMED"
   },
   "latestScreenshotReview": {
     "status": "REVIEWED_SOURCE_FIXTURE_ONLY",
@@ -2119,6 +2169,21 @@
     "realImageUpload": "NOT_VERIFIED",
     "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
     "referenceParity": "NOT_ACCEPTED",
+    "authenticatedBusinessFlow": "NOT_TESTED"
+  },
+  "latestUiRevisionReview": {
+    "sourceCommit": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
+    "testCommit": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+    "reviewedArtifact": "admin-preview-evidence-158",
+    "screenshotPath": "artifacts/admin-preview-evidence/45f630e99cfd/screenshots/product-gallery__390x844__light.png",
+    "observations": [
+      "First gallery image spans the mobile row as the prominent cover; fit uses contain to preserve image composition.",
+      "Supporting images and accessible reorder/delete controls remain present.",
+      "At 390x844 the gallery remains vertically dense, and the next thumbnail continues below the fixed action bar in the captured scroll state."
+    ],
+    "referenceParity": "NOT_ACCEPTED",
+    "realImageUpload": "NOT_VERIFIED",
+    "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
     "authenticatedBusinessFlow": "NOT_TESTED"
   }
 }
