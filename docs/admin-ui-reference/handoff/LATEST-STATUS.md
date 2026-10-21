@@ -130,3 +130,12 @@ The artifact was downloaded and the reference PNG was opened alongside current P
 - The focused revenue guard test now matches the UI's exact copy. The duplicate panel was removed and the duplicate static ID integrity check passes on this tested SHA.
 - Current verified source commit: `06d689b6a97fa7bdb05258acb8435a6954d67309`. The next handoff documentation commit will move HEAD; re-check the newest run before claiming the latest branch is green.
 - Progress remains **48%**. One dashboard gap has a tested, visually reviewed honest empty state; full 12-screen visual acceptance, authenticated backend QA, actual image upload/save, and PRE/PRO migration checks remain open.
+
+
+## Dashboard revenue panel — validation completed 2026-10-21 15:22 UTC
+
+- Exact source/test commit `06d689b6a97fa7bdb05258acb8435a6954d67309`: Validate Source [#39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256) **PASS**; Admin Preview diagnostic and responsive/theme screenshot workflow [#39624818216](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216) **PASS**.
+- The focused guard test initially failed on older commit #39624723690 because the copy had changed from “suy diễn doanh thu” to “ước đoán doanh thu”. Fixed the test wording in `tests/admin-dashboard-revenue-empty-state.test.mjs` commit `06d689b6a97fa7bdb05258acb8435a6954d67309`; the new full validation passed and logs include `admin-dashboard-revenue-empty-state: PASS`.
+- Fresh screenshot artifact: `admin-preview-evidence-173`, artifact ID `12356875897`. Reviewed dashboard captures at 390×844 and 1280×800. The compact panel keeps the no-data explanation beside a small icon on mobile, and reduces excess whitespace on desktop. Preview diagnostic reports `PASS_LOGIN_CSS_SIGNATURE`; this is configuration/CSS diagnostic plus source screenshots, not authenticated production/backend QA.
+- Revenue data remains intentionally unavailable until a trustworthy full-history aggregation exists; do not fabricate figures or use the latest 1,000 orders as complete history.
+- Progress remains **48%**: one dashboard subtask now has successful source validation and fresh visual evidence, but the 12-screen parity, authenticated backend QA, and deferred image-save/migration items remain open. No merge or deployment performed.
