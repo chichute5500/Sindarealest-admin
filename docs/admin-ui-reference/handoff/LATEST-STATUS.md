@@ -137,34 +137,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: da66197b372cbabc4c31bb1f1427fe8b8bfe5532
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39562983543
+- Tested commit: 1c943c314a8ed8b1ff37554f3721e27f44f0606f
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39564837579
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 58 real PNGs captured in artifact admin-preview-evidence-110 (not committed to Git).
+- Local source Playwright matrix: PASS; 58 real PNGs captured in artifact admin-preview-evidence-114 (not committed to Git).
 - Deployed Preview: failure.
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Cross-branch checkout/payment synchronization — 2026-10-21
-
-- Added a coordination note for the static branch's checkout/payment reference image: [`checkout-payment-flow-reference.png`](https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png), recorded blob SHA `c89ff843af1c094def9233d27a148e048b191990`.
-- This image is a storefront checkout/payment reference only. Admin keeps its own 12-screen Admin design reference and must not copy storefront UI/assets or commit to the static branch.
-- Synchronized the written ownership boundary and business rules: Admin owns fulfillment type, payment settings/QR, authoritative server amounts and manual bank-transaction verification; static owns customer-facing UI and public-safe API consumption.
-- Reaffirmed payment rules: made-to-order deposit 30%; in-stock deposit 100,000 VND; full payment for either type qualifies for freeship; QR has no fixed amount; unconfirmed data blocks payment-ready instructions; QR/receipt/customer claim never proves payment.
-- API contract paths/shapes remain coordination documentation, not proof of live implementation or Preview compatibility. Integration status remains **NOT VERIFIED** until source commit, contract tests, and compatible Preview are independently evidenced.
-- Branch isolation preserved: changes in this update are documentation-only on `feature/admin-isolated-handoff-2026-10-20`; PR #111 remains unmerged. No Production deploy, remote migration, or real D1/R2 data change was performed.
-
-
-## Handoff refresh — 2026-10-21 14:42 ICT
-
-- Branch checked: `feature/admin-isolated-handoff-2026-10-20`; HEAD at start of this refresh: `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`.
-- Latest source workflow observed: run [39563376269](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39563376269), conclusion **success**, tested SHA `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`, exact HEAD match: **true**. This is source CI evidence only, not Preview/backend acceptance.
-- Latest Preview diagnostic observed: run [39562983543](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39562983543), conclusion **failure**, tested SHA `da66197b372cbabc4c31bb1f1427fe8b8bfe5532`, exact HEAD match: **false**. It is stale relative to current HEAD and cannot be used to claim current Preview status. Prior failure was the login-header CSS signature; keep assertion and investigate the authorized target/build.
-- PR #111: OPEN, merged=false, 1066 changed files (+35805/-389); scope audit remains a blocker. PR #108: OPEN, merged=false. Do not merge either.
-- QR/payment contract is present at `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`. Treat it as shared coordination, not proof of cross-branch runtime compatibility.
-- Business safety rules: made-to-order deposit = ceil(30% of confirmed total); in-stock deposit = 100,000 VND; full payment is eligible for freeship, but freeship is applied only after Admin verifies receipt of the full total in the transaction ledger. Never accept client-supplied amount. Mixed/unclassified items require manual consultation. QR scan/upload/customer claim is not payment confirmation.
-- No Production deploy, no Production D1 migration, no merge, no secrets read/change, no remote D1/R2 mutation, and no static website branch edit was performed in this refresh.
-- Overall Admin project progress estimate: **46%** (management estimate, not test coverage). QR/fulfillment implementation estimate: **70%**; integration remains NOT VERIFIED pending current Preview, actual bank QR owner scan verification, visual/accessibility QA and static-branch contract-consumer verification.
