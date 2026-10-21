@@ -255,3 +255,7 @@ This supersedes stale test claims in earlier appended checkpoints only for the f
 ## Checkpoint update — 2026-10-21
 
 Latest verified source/test SHA is `77905c14613321f1f498fd1e2a187d3cd82f44c1`: source Validate run 39606174329 and Preview/Playwright run 39606174361 both SUCCESS. Artifact: admin-preview-evidence-150 (ID 12348570376). This proves configured Preview signature for that run only; not authenticated business QA or 12-screen parity. Latest handoff HEAD is expected to advance due to documentation updates; re-fetch branch HEAD before any further source edits. PR #111/#108 remain OPEN/unmerged. Progress 48%.
+
+## Latest verified source checkpoint — 2026-10-21
+
+Source/test SHA `cf594677550f63ddf92ebdba5aea87587dbfe029` passed source CI [39607193503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39607193503) and Preview/Playwright [39607193461](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39607193461). The payment-terms note textarea now has a contextual accessible name and a regression assertion. Artifact 151 contains 59 source/fixture PNGs and is not authenticated backend evidence. Redirect loop warning and mixed-scope PR #111 remain unresolved; PR #111/#108 remain OPEN/unmerged. Overall estimate 48%. Product image-save/PRE-PRO migration work remains deferred by owner.

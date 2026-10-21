@@ -495,3 +495,16 @@ Only write on `feature/admin-isolated-handoff-2026-10-20`; do not merge/cherry-p
 - PR #111 remains OPEN/unmerged and mixed scope; latest filename listing returned 1,104 paths (913 PNG, 129 docs, 24 Functions, 2 migrations, 5 scripts, 24 tests, 2 public files, 5 other). PR #108 remains OPEN/unmerged. No merge or deployment.
 - Progress remains 48%. Visual parity across 12 screen families NOT ACCEPTED; authenticated backend QA NOT TESTED; migration/ledger remote state NOT VERIFIED. Product image-save and PRE/PRO migration tasks remain DEFERRED_BY_OWNER.
 - Continue with source-only UI/reference/accessibility work and review PR scope. No Production, secrets/Access changes, bypass, D1/R2 writes, setup/migration scripts, edits to main/static branch, or TinyFish.
+
+
+## Newest verified checkpoint — accessibility fix and run #151 (2026-10-21 13:22 UTC)
+
+- Functional source/test commit: `cf594677550f63ddf92ebdba5aea87587dbfe029`. Added a contextual `aria-label` to the order payment-terms note textarea and a source-contract regression assertion. No API/business logic/backend changes.
+- Source Validate [39607193503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39607193503): PASS on exact source/test SHA.
+- Preview/Playwright [39607193461](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39607193461): SUCCESS on the same SHA. Logged target `feature-admin-isolated-hando.sindarealest2.pages.dev/admin/`; CSS signature PASS, `hasLoginHideRule=true`, `topbarBrandDisplay=none`, selector matched, 431 stylesheet rules.
+- Artifact [admin-preview-evidence-151](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39607193461/artifacts/12349405826), 11,126,777 bytes, expires 2026-11-04. 59 PNGs: 16 login shell + 43 synthetic read-only module fixtures, plus 36 fixture metrics. Not authenticated real-backend QA and not proof of 12-screen parity.
+- Evidence-only workflow commit advanced branch HEAD to `6c071201b397dc8bc2d753cf4575d9c177afa4e4` before this documentation refresh; do not confuse it with tested source SHA. Local checkout/status remains NOT VERIFIED.
+- PR #111 OPEN/unmerged, 1,106 changed paths and mixed storefront/Functions/migration/scripts/tests/evidence scope; not merge-ready. PR #108 OPEN/unmerged (269 changed files). Progress remains 48%.
+- A source audit found seven form controls without explicit `aria-label`/id; six were already named by wrapping `label` elements. The standalone payment-terms textarea was the actionable gap and is now fixed with regression coverage.
+- Redirect audit: `public/_redirects` still contains `/admin /admin/ 301`, `/admin/ /admin/index.html 200`, and `/* /index.html 200`. Previous Cloudflare warning about skipped rules/possible rewrite loops remains unresolved. Do not edit shared public routing under Admin-only scope; requires separate routing review.
+- Migration/setup audit remains read-only: `scripts/setup-cloudflare.mjs` contains remote D1 execution and direct ALTER TABLE operations; do not execute. PRE/PRO schema/ledger and product image-save remain DEFERRED_BY_OWNER / NOT VERIFIED.

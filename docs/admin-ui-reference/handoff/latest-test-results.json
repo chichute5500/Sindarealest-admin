@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_VISUAL_PARITY_AND_AUTHENTICATED_QA_OPEN",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "cf594677550f63ddf92ebdba5aea87587dbfe029",
   "testedCommitSha": "cf594677550f63ddf92ebdba5aea87587dbfe029",
-  "capturedAt": "2026-10-21T13:22:25.994Z",
+  "capturedAt": "2026-10-21T13:22:51.861Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% management estimate only. Run 39606174329 validates source checks on 77905c14613321f1f498fd1e2a187d3cd82f44c1; run 39606174361 validates npm checks, local source/fixture Playwright, and the configured Preview diagnostic on the same source SHA. Visual parity across all 12 screen families and authenticated real-backend QA remain unaccepted/not tested. Handoff-only commits are not source test runs.",
-  "note": "Current verified run #150: source SHA 77905c14613321f1f498fd1e2a187d3cd82f44c1 passed npm run check, npm test, local source/fixture Playwright, and configured Preview diagnostic. Artifact admin-preview-evidence-150 (ID 12348570376) is 11,126,750 bytes and expires 2026-11-04. This is not authenticated real-backend QA or acceptance of all 12 reference screen families. Current branch HEAD before this handoff refresh was 028f154e934f75db9bcd05adb7d837e982581f62 (evidence-only commit after tested source SHA). PR #111 is OPEN/unmerged and mixed-scope; latest filename listing returned 1,104 paths including 913 PNGs and code across storefront, Functions, migrations, scripts and tests. PR #108 remains OPEN/unmerged. Progress stays 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER. No local checkout status verified; no production deploy, merge, remote database writes, secret/access changes, or TinyFish.",
+  "progressBasis": "48% management estimate only. Source Validate run 39607193503 and Preview/Playwright run 39607193461 both validate source SHA cf594677550f63ddf92ebdba5aea87587dbfe029. npm run check, npm test, local source/fixture Playwright and configured Preview diagnostic passed. All-12-screen visual parity and authenticated real-backend QA remain unaccepted/not tested. Handoff-only commits are not source-test runs.",
+  "note": "Latest verified run #151: source SHA cf594677550f63ddf92ebdba5aea87587dbfe029 passed npm run check, npm test, local source/fixture Playwright, and configured Preview CSS signature. Target logged as feature-admin-isolated-hando.sindarealest2.pages.dev/admin/; signature hasLoginHideRule=true, topbarBrandDisplay=none, selector matched, 431 stylesheet rules. Artifact admin-preview-evidence-151 (ID 12349405826), 11,126,777 bytes, expires 2026-11-04. 59 PNGs are split into 16 login shell and 43 synthetic read-only module fixture captures, plus 36 fixture metrics; no authenticated backend QA. Branch HEAD before this documentation refresh was 6c071201b397dc8bc2d753cf4575d9c177afa4e4 (evidence-only commit after tested SHA). PR #111 OPEN/unmerged, mixed scope, 1,106 changed paths; PR #108 OPEN/unmerged, 269 changed files. Progress 48%. Visual parity for all 12 screen families is not accepted. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER. No local checkout status verified; no Production deploy, merge, remote DB writes, secret/access changes, or TinyFish.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -20,15 +20,15 @@
     "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
     "pr111State": "OPEN_UNMERGED",
     "pr108State": "OPEN_UNMERGED",
-    "pr111ChangedFiles": 1104,
+    "pr111ChangedFiles": 1106,
     "pr111Additions": 37234,
     "pr111Deletions": 392,
-    "pr108ChangedFiles": 232,
+    "pr108ChangedFiles": 269,
     "pr108Additions": 19270,
     "pr108Deletions": 380,
     "protectedStaticWebsiteBranchMustNotBeModified": true,
     "pr111PngFiles": 913,
-    "pr111NonImageDocsAndCodeFiles": 191
+    "pr111NonImageDocsAndCodeFiles": 193
   },
   "changes": [
     {
@@ -2087,13 +2087,13 @@
     "note": "Documentation-only update; no source changes, no new tests, and no progress increase."
   },
   "latestRun": {
-    "sourceCi": 39606174329,
-    "previewAndPlaywright": 39606174361,
-    "artifactName": "admin-preview-evidence-150",
-    "artifactId": 12348570376,
-    "artifactSizeBytes": 11126750,
-    "artifactExpiresAt": "2026-11-04T13:15:48Z",
-    "sourceSha": "77905c14613321f1f498fd1e2a187d3cd82f44c1",
+    "sourceCi": 39607193503,
+    "previewAndPlaywright": 39607193461,
+    "artifactName": "admin-preview-evidence-151",
+    "artifactId": 12349405826,
+    "artifactSizeBytes": 11126777,
+    "artifactExpiresAt": "2026-11-04T13:22:55Z",
+    "sourceSha": "cf594677550f63ddf92ebdba5aea87587dbfe029",
     "sourceChecks": "PASS",
     "unitTests": "PASS",
     "localPlaywright": "PASS",
