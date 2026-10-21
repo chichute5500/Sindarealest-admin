@@ -967,7 +967,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (variant.viewport.width <= 680) {
         await expect(summary, 'Mobile order operations use a visible disclosure summary').toBeVisible();
         await expect(management, 'Mobile order tools start collapsed to preserve the order-list summary').not.toHaveAttribute('open', '');
-        await expect(unitPrice, 'Per-item price entry stays available inside the collapsed order tools').toBeHidden();
+        await expect(unitPrice, 'Per-item price entry is hidden on mobile until the order tools are expanded').toBeHidden();
         const compactOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
         expect(compactOrderCardHeight, 'Collapsed mobile order card should keep the first-screen summary compact').toBeLessThan(560);
         await summary.click();
