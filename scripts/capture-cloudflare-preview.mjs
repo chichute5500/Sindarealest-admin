@@ -636,6 +636,23 @@ async function main() {
           if (result.blocked) break;
           if (!result.response) continue;
           if (result.status < 200 || result.status >= 300) throw new Error('Homepage returned HTTP ' + result.status + '.');
+          // Capture the transient welcome layer before storefront readiness/scroll settling can auto-dismiss it.
+          // This is a real live Preview screenshot, not a local fixture or a reconstructed state.
+          if (viewport.name === 'mobile-390') {
+            const splash = page.locator('#welcomeSplash');
+            await splash.waitFor({ state: 'visible', timeout: 900 }).catch(() => {});
+            if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
+              await captureLocator(page, '#welcomeSplash', screenshotStem('state-welcome-splash', viewport, theme) + '.png', {
+                ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay',
+              });
+            } else {
+              audit.sectionChecks.push({
+                selector: '#welcomeSplash', filename: screenshotStem('state-welcome-splash', viewport, theme) + '.png',
+                status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name,
+              });
+              audit.hardFailures.push('Welcome splash was not visible early enough to capture on live Preview: ' + label);
+            }
+          }
           await waitForStorefront(page, label);
           const metrics = await page.evaluate(() => ({
             viewportWidth: window.innerWidth,
@@ -651,25 +668,6 @@ async function main() {
             context: label, requestedTheme: theme, savedThemeMode: metrics.savedThemeMode, rootDark: metrics.rootDark,
             themeMatches: theme === 'dark' ? metrics.rootDark : !metrics.rootDark,
           });
-          if (viewport.name === 'mobile-390') {
-            const splash = page.locator('#welcomeSplash');
-            if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
-              try {
-                await captureLocator(page, '#welcomeSplash', screenshotStem('state-welcome-splash', viewport, theme) + '.png', {
-                  ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay',
-                });
-              } catch (error) {
-                // The welcome overlay is intentionally transient. A CSS exit
-                // transition may detach it between visibility check and capture;
-                // record the optional miss and continue the required storefront audit.
-                audit.sectionChecks.push({
-                  selector: '#welcomeSplash', status: 'OPTIONAL_TRANSIENT_SKIPPED',
-                  route: new URL(page.url()).pathname, theme, viewport: viewport.name,
-                  note: sanitizeText(String(error?.message || error).slice(0, 180)),
-                });
-              }
-            }
-          }
           await dismissWelcomeSplash(page);
           await settle(page);
           if (viewport.name === 'mobile-390' && theme === 'light') {
