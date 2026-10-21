@@ -688,3 +688,8 @@ Latest status was updated in commit `3cc106a78e6cfc6afdb08622c7882b9c88138b21` (
 ### Validation follow-up — 2026-10-21 15:12 UTC
 
 The exact-source workflow mentioned above has now completed successfully: [Validate Source run #39622616336](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336), source SHA `e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d`, job `validate` success. This is not a pass for the later docs-only branch HEAD. The latest handoff JSON/status files were updated to record this distinction; re-check current HEAD's workflow before further claims.
+
+
+### Next task — verify new dashboard revenue empty state
+
+A responsive “Doanh thu theo thời gian” empty-state panel has been added to `public/admin/index.html` (UI commit `ae351fcc2790b70e198ec3db1053bef7ad46981f`) and fixture assertions added to `tests/e2e/admin-static-baseline.spec.js` (test commit `f7196a05e9e6c82f5f3354711538fd0268feadc5`). It intentionally avoids fabricated revenue because `/api/admin/orders` caps parent orders at 1,000 and there is no dedicated full-history revenue endpoint. First inspect CI runs #39623789724 and #39623789507, then validate current HEAD; capture/review mobile and desktop fixture screenshots if available. Do not increase progress until checks and visual evidence pass. Do not alter DB/migrations, payment API, secrets, Access, deployments, or remote data without explicit authorization.
