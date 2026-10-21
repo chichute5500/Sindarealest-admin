@@ -2636,5 +2636,19 @@ html.dark .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!import
 
 </style>
 
+
+<style id="sd-satin-gallery-blend-2026-10-21">
+/* Product-detail photos should sit on the satin surface rather than a second boxed panel.
+   Preserve the original image URLs and keep dark-mode product colours unmodified. */
+.sd-fullscreen-frame{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-radius:0!important;
+}
+html:not(.dark) .detail-main-image{
+  mix-blend-mode:multiply!important;background:transparent!important;border-color:transparent!important;
+}
+html.dark .detail-main-image{mix-blend-mode:normal!important}
+</style>
+
 </body>
 </html>
