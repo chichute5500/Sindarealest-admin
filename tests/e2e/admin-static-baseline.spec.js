@@ -953,13 +953,34 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
     }
 
-    await captureView('orders', 'orders', async () => {
+    await captureView('orders', 'orders', async variant => {
       const row = page.locator('[data-order-row="UI-ONLY-ORDER"]');
+      const management = row.locator('details.order-management-details');
+      const summary = management.locator('summary.order-management-summary');
+      const unitPrice = row.locator('[data-order-item-price]');
       await expect(row).toBeVisible();
       await expect(row).toContainText('Chờ xác nhận giá');
       await expect(row).toContainText('Chưa hoàn tất thanh toán');
       await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
       await expect(row.locator('[data-action="record-payment"]')).toBeDisabled();
+
+      if (variant.viewport.width <= 680) {
+        await expect(summary, 'Mobile order operations use a visible disclosure summary').toBeVisible();
+        await expect(management, 'Mobile order tools start collapsed to preserve the order-list summary').not.toHaveAttribute('open', '');
+        await expect(unitPrice, 'Per-item price entry stays available inside the collapsed order tools').toBeHidden();
+        const compactOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
+        expect(compactOrderCardHeight, 'Collapsed mobile order card should keep the first-screen summary compact').toBeLessThan(560);
+        await summary.click();
+        await expect(management).toHaveAttribute('open', '');
+        await expect(unitPrice).toBeVisible();
+        await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
+        await expect(row.locator('[data-action="record-payment"]')).toBeDisabled();
+        await summary.click();
+        await expect(unitPrice).toBeHidden();
+      } else {
+        await expect(management, 'Desktop order management remains expanded by default').toHaveAttribute('open', '');
+        await expect(unitPrice).toBeVisible();
+      }
     }, true);
     await captureView('order-row-details', 'orders', async () => {
       await page.locator('[data-action="view-order-details"]:visible').first().click();
