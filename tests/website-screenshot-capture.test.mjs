@@ -181,13 +181,13 @@ assert.match(live, /commerceStatesComplete[\s\S]*fullscreenGalleryCount === 2[\s
 
 // Count the canonical state screenshot only; the separate state-viewport image
 // is a second framing of the same interaction, not another interaction test.
-assert.match(live, /const accountMenuCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'account-menu-open'\\)\\.length;/,
+assert.ok(live.includes("const accountMenuCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'account-menu-open').length;"),
   'Account-menu coverage must not double-count its state-viewport screenshot.');
-assert.match(live, /const fullscreenGalleryCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'fullscreen-gallery'\\)\\.length;/,
+assert.ok(live.includes("const fullscreenGalleryCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'fullscreen-gallery').length;"),
   'Fullscreen-gallery coverage must count canonical state screenshots.');
-assert.match(live, /const cartWithItemCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'cart-with-item'\\)\\.length;/,
+assert.ok(live.includes("const cartWithItemCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'cart-with-item').length;"),
   'Cart coverage must not double-count its state-viewport screenshot.');
-assert.match(live, /const checkoutFormCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'checkout-form-open'\\)\\.length;/,
+assert.ok(live.includes("const checkoutFormCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'checkout-form-open').length;"),
   'Checkout coverage must not double-count its state-viewport screenshot.');
 
 assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
