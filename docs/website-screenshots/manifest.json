@@ -4202,5 +4202,49 @@
       "No Admin/backend edits in storefront branch",
       "No D1/R2/secrets/bindings/DNS/catalog edits"
     ]
+  },
+  "latestVerifiedCheckpoint": {
+    "recordedAtUtc": "2026-10-21T16:13:10Z",
+    "sourceCommit": "00c0c9eb127c892b3807add3070d0926d3739bdd",
+    "branch": "fix/liquid-glass-audit-2026-10-19",
+    "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
+    "previewDeployment": {
+      "id": "81fe74d5-a0a6-4734-889b-adf79655d823",
+      "status": "success",
+      "environment": "preview",
+      "commitMatchesExpected": true,
+      "branchMatchesExpected": true
+    },
+    "validation": {
+      "validateSourceAndTests": "PASS",
+      "previewDeployment": "PASS",
+      "guardedVisualWorkflow": "PASS"
+    },
+    "audit": {
+      "runId": 39632225216,
+      "artifactId": 12360666088,
+      "artifactName": "sindarealest-liquid-glass-preview-658",
+      "screenshotCount": 84,
+      "requiredViewportThemePairs": 8,
+      "completedViewportThemePairs": 8,
+      "productRouteChecks": 12,
+      "horizontalOverflowCount": 0,
+      "consoleErrorCount": 0,
+      "pageErrorCount": 0,
+      "httpErrorCount": 0,
+      "failedRequestCount": 0,
+      "brokenImageContextCount": 0,
+      "readOnlyViolationCount": 0,
+      "blockedExternalRequestCount": 32,
+      "liveCapture": true,
+      "comparisonToReference": "PENDING manual visual review",
+      "startEndPixelDiff": "NOT CLAIMED"
+    },
+    "notes": [
+      "Cloudflare Pages deployment ID 81fe74d5-a0a6-4734-889b-adf79655d823 matches expected branch and exact commit.",
+      "Blocked external requests were primarily province API and Cloudflare Insights beacon under guarded capture policy; do not claim all requests were unblocked.",
+      "Product detail route tested was derived from a real rendered card; no evidence that SD-GL052 exists.",
+      "PR #108 remains open and unmerged; Production/Admin/backend untouched."
+    ]
   }
 }

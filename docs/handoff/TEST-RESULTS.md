@@ -626,3 +626,37 @@ Continue the SinDarealest2 static storefront from the latest GitHub state. Read 
 - The corrected test assertions and mobile-cart CSS are present in the branch's visible source, but they still require a fresh CI run. After that, require a successful Preview deploy with exact SHA verification and a fresh guarded live capture before visual claims. Historical screenshot results from SHA `696a163911f2d7a30f518a29bc9430ce3b88853a` are not current-deployment proof.
 - Progress stays approximately **72%**, with human visual acceptance still **PENDING**. Outstanding: hero/reference composition, satin fidelity, six Liquid Glass tiles, “Phong cách đẳng cấp từ da cá sấu”, “Đặt hàng an tâm”, gallery-control contrast, mobile navigation/back behavior, theme responsiveness, cart/account/checkout layering, footer/Zalo, and route/404 comparisons at all required Light/Dark viewports.
 - Guardrails: keep PR #108 open and unmerged; do not touch Admin, Production/main, APIs/backend, D1/R2, secrets, bindings, DNS, or product data; do not invent/substitute SD-GL052; do not treat a code assertion, old artifact, or failed pre-deploy run as proof of success.
+
+
+## Fresh handoff checkpoint — 2026-10-21 16:13 UTC (supersedes older status notes above)
+
+### Current source and scope
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Current source commit verified by GitHub and Cloudflare Pages: `00c0c9eb127c892b3807add3070d0926d3739bdd` (`test: expect readable satin hero veil in both themes`).
+- Preview only: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- PR #108 remains open/unmerged. Do not merge or touch Production, Admin, `main`, backend/API, D1/R2, secrets, bindings, DNS, or product/catalog data.
+
+### Changes in this checkpoint
+- Mobile populated cart CSS now fills the available panel height, preserves safe-area viewport limits, gives the cart list independent scrolling, and keeps the bottom summary in place; the matching parity assertion was updated.
+- Mobile hero text veil was strengthened in Light and Dark themes so text has more contrast where it overlaps the hero while the gradient fades toward the product image. Matching exact-gradient assertions were updated in `tests/storefront-reference-parity.test.mjs`.
+- Do not infer that a visual tweak is accepted solely because its code assertion passes; compare fresh live captures against both reference images.
+
+### Verified evidence on the exact source commit
+- Validate source/tests: PASS.
+- Preview deployment: PASS; Cloudflare Pages read-only metadata confirmed environment `preview`, expected branch match, and exact commit match for `00c0c9eb127c892b3807add3070d0926d3739bdd`.
+- Guarded visual workflow: [run 39632225216](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632225216) completed successfully; artifact `sindarealest-liquid-glass-preview-658` (artifact ID `12360666088`).
+- The live Preview capture reports 84 screenshots; all 8 required viewport/theme pairs are covered (360×800, 390×844, 768×1024, 1440×900 × Light/Dark); 8/8 home viewport captures; 4 full-page captures; required section captures complete for hero, benefits, order, featured, collections, products, contact, footer; menu/account/gallery/cart/checkout states covered; 12 product navigation/direct-open/reload checks pass; no horizontal overflow, console/page/HTTP errors, failed requests, broken images, or read-only violations reported.
+- Exact-deployment verification: Cloudflare Pages deployment ID `81fe74d5-a0a6-4734-889b-adf79655d823`, URL https://81fe74d5.sindarealest2.pages.dev/ with alias to the Preview URL above, environment `preview`, branch and SHA both match expected.
+- Important caveat: the audit log reports 32 blocked external requests, mainly `https://provinces.open-api.vn/api/v2/p/` and Cloudflare Insights beacon, due to guarded/read-only capture policy. Do not describe all network requests as unblocked; the audit’s failed-request count is zero. Address-province selector integration still needs separate functional verification if that feature is in scope.
+- Product detail path tested from an actual rendered product card: `/sanpham/sneaker/sneakers-26-41-a`; direct open/reload passed. This is not evidence that SD-GL052 exists; do not fabricate or substitute that SKU.
+
+### Next actions — continue without waiting for user
+1. Inspect artifact `sindarealest-liquid-glass-preview-658` and compare the *live* mobile hero Light/Dark captures to the two source references. Confirm whether the stronger veil improves readability without flattening satin or hiding the product. Review section captures and cart/account/checkout/gallery states.
+2. Continue fixing the largest visible reference mismatches on the storefront branch only. After each meaningful fix, run the relevant test, validate source/tests, verify the Preview deploy exact SHA, and capture the live Preview again. Do not archive local fixture captures as live evidence.
+3. If a change is only a test expectation update, do not count it as visual progress.
+4. Keep screenshot archive requirements intact: only `docs/website-screenshots/start-of-work/`, `docs/website-screenshots/end-of-work/`, stable matching filenames, and `docs/website-screenshots/manifest.json`; prior end becomes next start. Do not claim start/end pixel comparison unless it actually ran and is recorded.
+5. Update this handoff, `HANDOFF.md`, `TEST-RESULTS.md`, visual progress, master prompt, next-chat prompt, and manifest when evidence/status changes. Report progress honestly; previous ~72% estimate is stale and should be recalculated after visual comparison, not automatically treated as complete.
+
+### User action
+- No user action is required right now. Continue the read-only visual comparison and subsequent storefront fixes. Ask the user only if an actual permission/decision is needed.
