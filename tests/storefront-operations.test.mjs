@@ -69,6 +69,9 @@ assert.ok(storefrontHtml.includes('html.dark #productOverlay #detailFavorite:not
 
 assert.ok(storefrontHtml.includes("function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDrawer','#checkoutDrawer','#accountDrawer'].some(selector=>$(selector)?.classList.contains('open'))"),
   'A successful detail add must show its success toast while the product overlay is open.');
+assert.ok(storefrontHtml.includes('.toast{position:fixed;z-index:1400;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));')
+  && storefrontHtml.includes('@media(max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom));}}'),
+  'Toast must be positioned above the mobile bottom navigation instead of being hidden beneath it.');
 assert.ok(storefrontHtml.includes("function addToCart(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id);if(!p)return false;const key=p.id||p.slug;if(!key)return false;cart[key]=(cart[key]||0)+1;saveCart();showToast(`Đã thêm ${visibleSku(p)||p.title||'sản phẩm'} vào giỏ chọn`);return true}"),
   'The one existing addToCart function must report invalid identities and only report success after the single cart mutation and badge save.');
 

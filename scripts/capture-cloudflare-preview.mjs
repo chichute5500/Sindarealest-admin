@@ -815,13 +815,30 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     const quantities = stored && typeof stored === 'object' ? stored : {};
     const total = Object.values(quantities).reduce((sum, value) => sum + Number(value || 0), 0);
     const toast = document.querySelector('#toast');
+    const toastStyle = toast ? getComputedStyle(toast) : null;
+    const toastRect = toast?.getBoundingClientRect();
+    const nav = document.querySelector('#mobileBottomNav');
+    const navStyle = nav ? getComputedStyle(nav) : null;
+    const navRect = nav?.getBoundingClientRect();
+    const navVisible = Boolean(nav && navStyle?.display !== 'none' && navStyle?.visibility !== 'hidden'
+      && Number.parseFloat(navStyle?.opacity || '0') > 0 && navRect && navRect.width > 0 && navRect.height > 0);
+    const toastShown = Boolean(toast?.classList.contains('show'));
+    const toastOpacity = Number.parseFloat(toastStyle?.opacity || '0');
+    const toastOnScreen = Boolean(toastRect && toastRect.width > 0 && toastRect.height > 0
+      && toastRect.left >= 0 && toastRect.right <= window.innerWidth
+      && toastRect.top >= 0 && toastRect.bottom <= window.innerHeight);
+    const toastAboveMobileNav = !navVisible || Boolean(toastRect && navRect && toastRect.bottom <= navRect.top
+      && Number.parseInt(toastStyle?.zIndex || '0', 10) > Number.parseInt(navStyle?.zIndex || '0', 10));
     const image = document.querySelector('#detailImageStage');
     const r = image?.getBoundingClientRect();
     return {
       quantity: Number(quantities[id] || 0), total,
       expectedBadge: total > 99 ? '99+' : String(total),
       badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
-      toastVisible: Boolean(toast?.classList.contains('show')),
+      toastVisible: toastShown,
+      toastVisuallyVisible: toastShown && toastOpacity >= 0.95 && toastOnScreen && toastAboveMobileNav,
+      toastOpacity, toastRect: toastRect ? { x:toastRect.x, y:toastRect.y, width:toastRect.width, height:toastRect.height, bottom:toastRect.bottom } : null,
+      mobileNavRect: navVisible && navRect ? { top:navRect.top, bottom:navRect.bottom, zIndex:navStyle.zIndex } : null,
       toastText: (toast?.textContent || '').trim(),
       imageRect: r ? { x:r.x, y:r.y, width:r.width, height:r.height } : null,
     };
@@ -890,13 +907,25 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     }, { id: before.productId, quantity: before.quantity + 1 }, { timeout: 6000 });
     await page.waitForFunction(labelText => {
       const toast = document.querySelector('#toast');
-      return Boolean(toast?.classList.contains('show') && (toast.textContent || '').includes(labelText));
-    }, expectedLabel, { timeout: 5000 });
+      if (!toast?.classList.contains('show') || !(toast.textContent || '').includes(labelText)) return false;
+      const style = getComputedStyle(toast);
+      const rect = toast.getBoundingClientRect();
+      const nav = document.querySelector('#mobileBottomNav');
+      const navStyle = nav ? getComputedStyle(nav) : null;
+      const navRect = nav?.getBoundingClientRect();
+      const navVisible = Boolean(nav && navStyle?.display !== 'none' && navStyle?.visibility !== 'hidden'
+        && Number.parseFloat(navStyle?.opacity || '0') > 0 && navRect && navRect.width > 0 && navRect.height > 0);
+      const visible = Number.parseFloat(style.opacity || '0') >= 0.95 && rect.width > 0 && rect.height > 0
+        && rect.left >= 0 && rect.right <= window.innerWidth && rect.top >= 0 && rect.bottom <= window.innerHeight;
+      const aboveNav = !navVisible || Boolean(navRect && rect.bottom <= navRect.top
+        && Number.parseInt(style.zIndex || '0', 10) > Number.parseInt(navStyle?.zIndex || '0', 10));
+      return visible && aboveNav;
+    }, expectedLabel, { timeout: 6000 });
     const afterOne = await readCartState(before.productId);
     const onePass = afterOne.quantity === before.quantity + 1
       && afterOne.total === before.total + 1
       && afterOne.badge === afterOne.expectedBadge
-      && afterOne.toastVisible && afterOne.toastText.includes(expectedLabel)
+      && afterOne.toastVisible && afterOne.toastVisuallyVisible && afterOne.toastText.includes(expectedLabel)
       && rectUnchanged(before.imageRect, afterOne.imageRect);
     await capture(page, screenshotStem('cart-add-success-detail-open', viewport, theme) + '.png', false, {
       ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'one-successful-add-with-detail-toast',
@@ -914,7 +943,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     const rapidPass = afterRapid.quantity === before.quantity + 3
       && afterRapid.total === before.total + 3
       && afterRapid.badge === afterRapid.expectedBadge
-      && afterRapid.toastVisible && afterRapid.toastText.includes(expectedLabel)
+      && afterRapid.toastVisible && afterRapid.toastVisuallyVisible && afterRapid.toastText.includes(expectedLabel)
       && rectUnchanged(before.imageRect, afterRapid.imageRect);
     await capture(page, screenshotStem('cart-add-rapid-clicks-detail-open', viewport, theme) + '.png', false, {
       ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'rapid-two-clicks-exactly-two-adds',
