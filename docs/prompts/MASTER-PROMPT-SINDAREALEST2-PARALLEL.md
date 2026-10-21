@@ -253,3 +253,11 @@ Không thay thế hay xóa file nguồn đó; file master tổng hợp này kế
 - Cập nhật handoff hiện hành: trạng thái tích hợp (NOT STARTED / IN PROGRESS / BLOCKED / VERIFIED), dependency API, file/commit SHA, test đã chạy và kết quả thực tế.
 - Chỉ báo VERIFIED khi đã kiểm tra trên đúng SHA và có test/bằng chứng. Tài liệu chung hoặc giao diện tĩnh đơn thuần không chứng minh backend đã đồng bộ.
 - Giữ nguyên hàng rào hiện có: không merge PR #108/#111, không sửa main, không deploy Production, không thao tác dữ liệu/config D1/R2/secret thật.
+
+
+### Asset QR ngân hàng đã có sẵn — cách tích hợp bắt buộc
+- Chủ dự án đã có ảnh QR nhận tiền tài khoản ngân hàng. Không yêu cầu chủ dự án commit ảnh vào source, gửi lại ảnh trong chat hoặc tự chèn ảnh vào nhánh Web tĩnh để bắt đầu.
+- Trong phạm vi Web tĩnh, chỉ tích hợp phần hiển thị ảnh QR đang active cùng thông tin nhận tiền từ public-safe API đã thống nhất với Admin. Không hardcode URL/file path, không tạo QR giả/placeholder và không dùng dữ liệu giả.
+- Hiển thị số tiền cần chuyển riêng ngoài QR, chỉ khi giá và đợt thanh toán đã được xác nhận; khách tự nhập số tiền trong app ngân hàng.
+- Nếu API upload/cấu hình QR chưa sẵn sàng, ghi dependency cụ thể vào handoff và tiếp tục công việc Web tĩnh độc lập; không chuyển ưu tiên hoặc dừng các hạng mục đang làm.
+- Không tuyên bố QR đã tích hợp hoàn chỉnh cho đến khi kiểm thử trên Preview đúng SHA, xác minh API trả ảnh active và có trạng thái fallback khi chưa cấu hình.
