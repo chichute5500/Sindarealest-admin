@@ -325,4 +325,19 @@ try {
   rmSync(coverageTempRoot, { recursive: true, force: true });
 }
 
+assert.match(live, /__sdWelcomeFirstPaintTimeline/,
+  'The live capture must record an init-script timeline before the app JavaScript runs.');
+assert.match(live, /window\.__sdReadWelcomeFirstPaintState/,
+  'The browser must expose early DOM visibility samples for Playwright at screenshot time.');
+assert.match(live, /const firstPaintOffsets = \[0, 50, 100, 200, 300\]/,
+  'The live audit must request screenshot samples from the first 300ms of mobile navigation.');
+assert.match(live, /waitUntil: isHomeFirstPaintContext \? 'commit' : 'domcontentloaded'/,
+  'Mobile home diagnostics must start at navigation commit rather than waiting for DOMContentLoaded.');
+assert.match(live, /firstPaintCoverageComplete && firstPaintViolationCount === 0/,
+  'Live audit acceptance must fail when first-paint evidence is incomplete or storefront chrome flashes during welcome.');
+assert.match(live, /captureType: 'first-paint-frame'/,
+  'The audit artifact must include real full-viewport screenshots taken during the initial navigation window.');
+assert.match(live, /body\.welcome-active #mobileBottomNav/,
+  'The storefront early guard must use the initial body flag and not rely only on :has().');
+
 console.log('PASS: Preview capture is source-restricted/read-only, optional Access service-token credentials are paired, isolated to the Preview origin, and never logged; Production URLs are rejected and secrets are redacted.');

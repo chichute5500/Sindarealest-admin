@@ -535,8 +535,14 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 
 <!-- sd-welcome-first-paint-guard-2026-10-22 -->
 <style id="sdWelcomeFirstPaintGuard">
-/* Parsed in <head>: no bottom navigation or commerce drawer may paint over the welcome splash. */
+/* Parsed in <head>: the initial body flag must gate storefront chrome before first paint; :has() remains a secondary safeguard. */
 .welcome-splash{z-index:2147483000!important}
+body.welcome-active .welcome-splash{z-index:2147483000!important}
+body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+body.welcome-active #accountDrawer,
+body.welcome-active #cartDrawer,
+body.welcome-active #checkoutDrawer,
+body.welcome-active #checkoutBackdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX(105%)!important}
 body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 body:has(#welcomeSplash) #accountDrawer,
 body:has(#welcomeSplash) #cartDrawer,

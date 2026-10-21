@@ -46,6 +46,8 @@ const audit = {
   accessBlockReason: null,
   passed: false,
   screenshots: [],
+  firstPaintChecks: [],
+  firstPaintTimelines: [],
   viewportAudits: [],
   themeChecks: [],
   routeChecks: [],
@@ -80,6 +82,74 @@ async function makePage(browser, viewport, theme, label) {
   });
   await context.addInitScript((mode) => {
     try { localStorage.setItem('sd-theme-mode', mode); } catch {}
+    const timeline = window.__sdWelcomeFirstPaintTimeline = [];
+    let lastFingerprint = '';
+    const inspect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return { present: false, visible: false };
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      const onScreen = rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0
+        && rect.left < innerWidth && rect.top < innerHeight;
+      const visible = style.display !== 'none' && style.visibility !== 'hidden'
+        && Number.parseFloat(style.opacity || '1') > 0.01 && onScreen;
+      return {
+        present: true, visible, display: style.display, visibility: style.visibility,
+        opacity: style.opacity, zIndex: style.zIndex, position: style.position,
+        transform: style.transform, className: typeof element.className === 'string' ? element.className : '',
+        ariaHidden: element.getAttribute('aria-hidden'), inert: element.hasAttribute('inert'),
+        rect: { x: Math.round(rect.x), y: Math.round(rect.y), width: Math.round(rect.width), height: Math.round(rect.height) },
+      };
+    };
+    const sample = (stage) => {
+      const body = document.body;
+      const nodes = {
+        splash: inspect('#welcomeSplash'),
+        bottomNav: inspect('#mobileBottomNav'),
+        account: inspect('#accountDrawer'),
+        cart: inspect('#cartDrawer'),
+        checkout: inspect('#checkoutDrawer'),
+        checkoutBackdrop: inspect('#checkoutBackdrop'),
+      };
+      const welcomeActive = Boolean(body?.classList.contains('welcome-active'));
+      const welcomeOwnsScreen = welcomeActive || nodes.splash.visible;
+      const visibleChrome = nodes.bottomNav.visible || nodes.account.visible || nodes.cart.visible
+        || nodes.checkout.visible || nodes.checkoutBackdrop.visible;
+      const record = {
+        stage, atMs: Number(performance.now().toFixed(2)), readyState: document.readyState,
+        bodyClassName: body?.className || '', welcomeActive, welcomeOwnsScreen,
+        splashVisible: nodes.splash.visible, nodes, violation: welcomeOwnsScreen && visibleChrome,
+      };
+      const fingerprint = JSON.stringify({
+        readyState: record.readyState, bodyClassName: record.bodyClassName, welcomeActive,
+        nodes: Object.fromEntries(Object.entries(nodes).map(([key, value]) => [key, {
+          present: value.present, visible: value.visible, display: value.display,
+          visibility: value.visibility, opacity: value.opacity, transform: value.transform,
+          className: value.className, ariaHidden: value.ariaHidden, inert: value.inert,
+        }])),
+      });
+      if (stage !== 'mutation' || fingerprint !== lastFingerprint) {
+        if (timeline.length < 240) timeline.push(record);
+      }
+      lastFingerprint = fingerprint;
+      return record;
+    };
+    window.__sdReadWelcomeFirstPaintState = sample;
+    sample('init-script');
+    const observer = new MutationObserver(() => sample('mutation'));
+    observer.observe(document, {
+      subtree: true, childList: true, attributes: true,
+      attributeFilter: ['class', 'style', 'hidden', 'aria-hidden', 'inert'],
+    });
+    [0, 16, 50, 100, 200, 300, 450].forEach((offset) => setTimeout(() => sample('timer-' + offset), offset));
+    document.addEventListener('DOMContentLoaded', () => sample('DOMContentLoaded'), { once: true });
+    window.addEventListener('pageshow', () => sample('pageshow'), { once: true });
+    let frame = 0;
+    const sampleFrame = () => {
+      sample('raf-' + frame);
+      if (++frame < 6) requestAnimationFrame(sampleFrame);
+    };
+    requestAnimationFrame(sampleFrame);
   }, theme);
   await context.route('**/*', async (route) => {
     const req = route.request();
@@ -142,17 +212,80 @@ async function makePage(browser, viewport, theme, label) {
   });
   return { context, page };
 }
+async function captureFirstPaintFrames(page, label) {
+  const size = page.viewportSize() || {};
+  const viewport = viewports.find(item => item.width === size.width && item.height === size.height);
+  if (!viewport) return;
+  const theme = label.endsWith('-dark') ? 'dark' : 'light';
+  const firstPaintOffsets = [0, 50, 100, 200, 300];
+  const startedAt = Date.now();
+  const capturedWelcomeSplash = new Set();
+  for (const requestedOffsetMs of firstPaintOffsets) {
+    await page.waitForTimeout(Math.max(0, requestedOffsetMs - (Date.now() - startedAt)));
+    const state = await page.evaluate(() => window.__sdReadWelcomeFirstPaintState?.('playwright-frame') || null)
+      .catch(error => ({ stage: 'playwright-frame', error: sanitizeText(String(error?.message || error)) }));
+    const actualElapsedMs = Date.now() - startedAt;
+    const filename = 'first-paint-' + viewport.name + '-' + theme + '-' + String(requestedOffsetMs).padStart(3, '0') + 'ms.png';
+    await page.screenshot({ path: path.join(outputDir, filename), type: 'png', fullPage: false, animations: 'disabled', timeout: 30000 });
+    audit.screenshots.push({
+      filename, fullPage: false, ...captureMeta(viewport, theme),
+      captureType: 'first-paint-frame', state: 'welcome-first-paint',
+      requestedOffsetMs, actualElapsedMs,
+    });
+    const check = {
+      context: label, viewport: viewport.name, theme, requestedOffsetMs, actualElapsedMs,
+      status: state && !state.error ? 'CAPTURED' : 'FAILED', sample: state,
+    };
+    audit.firstPaintChecks.push(check);
+    if (check.status !== 'CAPTURED') {
+      audit.hardFailures.push('First-paint DOM sample failed at ' + label + ' +' + requestedOffsetMs + 'ms.');
+    } else if (state.violation === true) {
+      const failure = 'Welcome first-paint layering violation at ' + label + ' +' + requestedOffsetMs
+        + 'ms: bottom navigation or a commerce overlay was visible while welcome owned the screen.';
+      if (!audit.hardFailures.includes(failure)) audit.hardFailures.push(failure);
+    }
+    if (state?.nodes?.splash?.visible && !capturedWelcomeSplash.has(label)) {
+      try {
+        const splash = page.locator('#welcomeSplash');
+        const splashFilename = screenshotStem('state-welcome-splash', viewport, theme) + '.png';
+        await splash.screenshot({ path: path.join(outputDir, splashFilename), type: 'png', animations: 'disabled', timeout: 10000 });
+        const meta = { ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay' };
+        audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'CAPTURED', route: '/', theme, viewport: viewport.name });
+        audit.screenshots.push({ filename: splashFilename, fullPage: false, ...meta });
+        capturedWelcomeSplash.add(label);
+      } catch (error) {
+        audit.sectionChecks.push({ selector: '#welcomeSplash', filename: screenshotStem('state-welcome-splash', viewport, theme) + '.png', status: 'FAILED', route: '/', theme, viewport: viewport.name });
+        audit.hardFailures.push('Welcome splash first-paint element capture failed for ' + label + ': ' + sanitizeText(String(error?.message || error).slice(0, 140)));
+      }
+    }
+  }
+  const timeline = await page.evaluate(() => window.__sdWelcomeFirstPaintTimeline || []).catch(() => []);
+  audit.firstPaintTimelines.push({ context: label, viewport: viewport.name, theme, samples: timeline });
+}
 async function navigate(page, url) {
   let response = null;
-  try { response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 }); }
-  catch (error) { audit.hardFailures.push(sanitizeText('Navigation failed for ' + url + ': ' + String(error.message || error))); }
+  const viewportSize = page.viewportSize();
+  const isHomeFirstPaintContext = new URL(url).pathname === '/'
+    && [360, 390].includes(viewportSize?.width);
+  try {
+    response = await page.goto(url, { waitUntil: isHomeFirstPaintContext ? 'commit' : 'domcontentloaded', timeout: 45000 });
+  } catch (error) {
+    audit.hardFailures.push(sanitizeText('Navigation failed for ' + url + ': ' + String(error.message || error)));
+  }
   if (!response) return { response: null, blocked: audit.accessBlocked, status: null, title: '', url: page.url(), bodyText: '' };
-  // The live audit uses reducedMotion='reduce', which auto-dismisses the intro after 500ms.
-  // Keep the initial homepage navigation delay-free on the 390px viewport so the welcome
-  // overlay can be captured before the page's transient dismissal timer starts.
-  const viewport = page.viewportSize();
-  const captureWelcomeImmediately = viewport?.width === 390 && new URL(url).pathname === '/';
-  if (!captureWelcomeImmediately) await page.waitForTimeout(400);
+  if (isHomeFirstPaintContext) {
+    try {
+      await captureFirstPaintFrames(page, (viewportSize.width === 360 ? 'mobile-360' : 'mobile-390')
+        + (labelSuffixForTheme(page) ? '-' + labelSuffixForTheme(page) : ''));
+    } catch (error) {
+      audit.hardFailures.push(sanitizeText('First-paint viewport capture failed: ' + String(error.message || error)));
+    }
+    await page.waitForLoadState('domcontentloaded', { timeout: 45000 }).catch(error => {
+      audit.hardFailures.push(sanitizeText('DOMContentLoaded did not complete for first-paint capture: ' + String(error.message || error)));
+    });
+  } else {
+    await page.waitForTimeout(400);
+  }
   const info = await page.evaluate(() => ({ title: document.title || '', url: location.href, bodyText: (document.body?.innerText || '').slice(0, 12000) }))
     .catch(() => ({ title: '', url: page.url(), bodyText: '' }));
   const blocked = accessGate(info.url, response.status(), info.title, info.bodyText);
@@ -162,6 +295,10 @@ async function navigate(page, url) {
     audit.hardFailures.push('Access gate detected at ' + sanitizeUrl(info.url));
   }
   return { response, blocked, status: response.status(), ...info, url: sanitizeUrl(info.url) };
+}
+function labelSuffixForTheme(page) {
+  // Playwright emulates the requested color scheme for this isolated browser context.
+  return page.evaluate(() => document.documentElement.classList.contains('dark') ? 'dark' : 'light').catch(() => 'light');
 }
 async function settle(page) {
   await page.evaluate(async () => {
@@ -593,29 +730,25 @@ async function main() {
           if (result.blocked) break;
           if (!result.response) continue;
           if (result.status < 200 || result.status >= 300) throw new Error('Homepage returned HTTP ' + result.status + '.');
-          // Capture the transient welcome layer before storefront readiness/scroll settling can auto-dismiss it.
-          // This is a real live Preview screenshot, not a local fixture or a reconstructed state.
-          if (viewport.name === 'mobile-390') {
+          // First-paint helper already records full viewport frames and captures the welcome element on mobile.
+          // Keep a guarded fallback for 390px in case the early element snapshot could not be saved.
+          if (viewport.name === 'mobile-390'
+              && !audit.screenshots.some(shot => shot.captureType === 'welcome-splash' && shot.viewport === viewport.name && shot.theme === theme)) {
             const splash = page.locator('#welcomeSplash');
-            await splash.waitFor({ state: 'visible', timeout: 900 }).catch(() => {});
             const splashFilename = screenshotStem('state-welcome-splash', viewport, theme) + '.png';
             if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
               try {
-                // Do not call captureLocator here: its scroll + settle delay can outlive this transient overlay.
-                await splash.screenshot({ path: path.join(outputDir, splashFilename), type: 'png', animations: 'disabled', timeout: 30000 });
+                await splash.screenshot({ path: path.join(outputDir, splashFilename), type: 'png', animations: 'disabled', timeout: 10000 });
                 const meta = { ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay' };
                 audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'CAPTURED', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
                 audit.screenshots.push({ filename: splashFilename, fullPage: false, ...meta });
               } catch (error) {
-                audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
-                audit.hardFailures.push('Welcome splash detached before live screenshot capture: ' + label + ' (' + sanitizeText(String(error?.message || error).slice(0, 140)) + ')');
+                audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'FAILED', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
+                audit.hardFailures.push('Welcome splash detached before fallback capture: ' + label + ' (' + sanitizeText(String(error?.message || error).slice(0, 140)) + ')');
               }
             } else {
-              audit.sectionChecks.push({
-                selector: '#welcomeSplash', filename: splashFilename,
-                status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name,
-              });
-              audit.hardFailures.push('Welcome splash was not visible early enough to capture on live Preview: ' + label);
+              audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
+              audit.hardFailures.push('Welcome splash was not visible during early live Preview capture: ' + label);
             }
           }
           await waitForStorefront(page, label);
@@ -674,6 +807,14 @@ async function main() {
   const completedViewportThemePairs = audit.viewportAudits.length;
   const productDetailContextsComplete = audit.productDetailChecks.length === 4
     && audit.productDetailChecks.every(check => check.status === 'PASS' && check.directOpenPassed && check.reloadPassed);
+  const firstPaintContextCount = viewports.filter(viewport => [360, 390].includes(viewport.width)).length * 2;
+  const requiredFirstPaintFrameCount = firstPaintContextCount * 5;
+  const firstPaintFrameCounts = Object.fromEntries(viewports.filter(viewport => [360, 390].includes(viewport.width)).flatMap(viewport =>
+    ['light', 'dark'].map(theme => [viewport.name + '-' + theme,
+      audit.firstPaintChecks.filter(check => check.viewport === viewport.name && check.theme === theme && check.status === 'CAPTURED').length])));
+  const firstPaintCoverageComplete = audit.firstPaintChecks.length === requiredFirstPaintFrameCount
+    && Object.values(firstPaintFrameCounts).every(count => count === 5);
+  const firstPaintViolationCount = audit.firstPaintChecks.filter(check => check.sample?.violation === true).length;
   const homeFullPageCount = audit.screenshots.filter(shot => shot.captureType === 'full-page').length;
   const menuOpenCount = audit.screenshots.filter(shot => shot.state === 'menu-open').length;
   const orderExpandedCount = audit.screenshots.filter(shot => shot.state === 'order-details-expanded').length;
@@ -690,6 +831,8 @@ async function main() {
     sectionScreenshotCounts, requiredSectionScreenshotsComplete, menuOpenCount, orderExpandedCount,
     accountMenuCount, fullscreenGalleryCount, cartWithItemCount, checkoutFormCount, commerceStatesComplete,
     productDetailContextsComplete, totalScreenshotCount: audit.screenshots.length,
+    firstPaintContextCount, requiredFirstPaintFrameCount, firstPaintFrameCounts,
+    firstPaintCoverageComplete, firstPaintViolationCount,
   };
   audit.passed = audit.captureCompleted
     && completedViewportThemePairs === requiredViewportThemePairs
@@ -699,7 +842,8 @@ async function main() {
     && homeFullPageCount === 4 && requiredSectionScreenshotsComplete && menuOpenCount === 2 && orderExpandedCount === 4
     && commerceStatesComplete && productDetailContextsComplete && audit.brokenImages.length === 0
     && audit.pageErrors.length === 0 && audit.consoleErrors.length === 0 && audit.httpErrors.length === 0
-    && audit.failedRequests.length === 0 && audit.readOnlyViolations.length === 0 && audit.hardFailures.length === 0;
+    && audit.failedRequests.length === 0 && audit.readOnlyViolations.length === 0
+    && firstPaintCoverageComplete && firstPaintViolationCount === 0 && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
   audit.summary = {
     screenshotCount: audit.screenshots.length, viewportCount: audit.viewportAudits.length, routeCheckCount: audit.routeChecks.length,
@@ -707,6 +851,7 @@ async function main() {
     pageErrorCount: audit.pageErrors.length, httpErrorCount: audit.httpErrors.length, failedRequestCount: audit.failedRequests.length,
     brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
     productDetailContextCount: audit.productDetailChecks.length, commerceStateCheckCount: audit.commerceStateChecks.length,
+    firstPaintFrameCount: audit.firstPaintChecks.length, firstPaintViolationCount, firstPaintCoverageComplete,
     blockedExternalRequestCount: audit.blockedExternalRequests.length,
     allowedExternalReadRequestCount: audit.allowedExternalReadRequests.length,
     readOnlyViolationCount: audit.readOnlyViolations.length, hardFailureCount: audit.hardFailures.length,
