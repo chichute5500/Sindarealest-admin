@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import os from 'node:os';
+import path from 'node:path';
 import { sanitizeText, sanitizeUrl } from '../scripts/sanitize-audit-value.mjs';
 import { buildCloudflareAccessHeaders } from '../scripts/cloudflare-access-service-token.mjs';
 import { validatePreviewUrl, matchesPreviewDeployment, inspectPreviewDeployment } from '../scripts/verify-cloudflare-preview-deployment.mjs';
@@ -257,5 +259,42 @@ assert.match(workflow, /CF_ACCESS_CLIENT_ID:\s*\$\{\{\s*secrets\.CF_ACCESS_CLIEN
   'The live capture workflow must read its client ID from GitHub Actions secrets, never literals.');
 assert.match(workflow, /CF_ACCESS_CLIENT_SECRET:\s*\$\{\{\s*secrets\.CF_ACCESS_CLIENT_SECRET\s*\}\}/,
   'The live capture workflow must read its client secret from GitHub Actions secrets, never literals.');
+
+
+const coverageVerifierPath = fileURLToPath(new URL('../scripts/verify-screenshot-archive-coverage.mjs', import.meta.url));
+assert.equal(spawnSync(process.execPath, ['--check', coverageVerifierPath], { encoding: 'utf8' }).status, 0,
+  'The screenshot filename coverage verifier must pass Node syntax checking.');
+assert.match(workflow, /name: Require exact live screenshot filename coverage before end archive[\\s\\S]*?verify-screenshot-archive-coverage\\.mjs/,
+  'A guarded end-of-work archive must compare exact live screenshot filenames against the verified baseline before replacing the archive.');
+
+const coverageTempRoot = mkdtempSync(path.join(os.tmpdir(), 'sindarealest-screenshot-coverage-'));
+try {
+  const baselineTempDir = path.join(coverageTempRoot, 'baseline');
+  const liveTempDir = path.join(coverageTempRoot, 'live');
+  mkdirSync(baselineTempDir);
+  mkdirSync(liveTempDir);
+  const stableNames = Array.from({ length: 50 }, (_, index) => 'capture-' + String(index).padStart(2, '0') + '.png');
+  for (const name of stableNames) {
+    writeFileSync(path.join(baselineTempDir, name), '');
+    writeFileSync(path.join(liveTempDir, name), '');
+  }
+  const runCoverageCheck = () => spawnSync(process.execPath, [coverageVerifierPath, baselineTempDir, liveTempDir], { encoding: 'utf8' });
+  const identicalCoverage = runCoverageCheck();
+  assert.equal(identicalCoverage.status, 0,
+    'Exact matching screenshot filename sets with full coverage must pass: ' + (identicalCoverage.stderr || identicalCoverage.stdout));
+  writeFileSync(path.join(liveTempDir, 'new-state.png'), '');
+  const extraCapture = runCoverageCheck();
+  assert.equal(extraCapture.status, 1,
+    'End archive must fail closed when a live capture adds a filename not represented in the baseline.');
+  assert.match(extraCapture.stderr, /new-state\\.png/);
+  rmSync(path.join(liveTempDir, 'new-state.png'));
+  rmSync(path.join(baselineTempDir, stableNames[0]));
+  const missingCapture = runCoverageCheck();
+  assert.equal(missingCapture.status, 1,
+    'End archive must fail closed when a baseline filename is missing from the live capture.');
+  assert.match(missingCapture.stderr, /capture-00\\.png/);
+} finally {
+  rmSync(coverageTempRoot, { recursive: true, force: true });
+}
 
 console.log('PASS: Preview capture is source-restricted/read-only, optional Access service-token credentials are paired, isolated to the Preview origin, and never logged; Production URLs are rejected and secrets are redacted.');
