@@ -46,6 +46,8 @@ Các file `latest-*.png` chỉ được coi là ảnh chụp thực tế sau khi
 Nguồn chỉ dẫn chính đã được cập nhật trong [MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md), mục XXII. Đọc mục đó trước khi triển khai.
 
 - Đặc tả inventory: [docs/icon-system-inventory.md](../../../docs/icon-system-inventory.md).
+- **Ảnh tham chiếu phải đọc trực tiếp:** [Icon.png](../../../docs/icon-assets/Icon.png) (chuẩn hình dáng icon gốc) và [Chitiet.png](../../../docs/icon-assets/Chitiet.png) (trạng thái/hiệu ứng chi tiết). Mở ảnh thực tế trước khi code; không dùng ảnh thứ hai để vẽ lại icon gốc.
+- Palette xác nhận: nền `#eaf3fb`, icon/chữ `#142a3c`, accent `#5c91b9`. HEX đỏ của favorite và trị số opacity/blur/shadow chưa được chốt; không tự ghi thành token thương hiệu đã duyệt.
 - Phạm vi: chỉ website tĩnh trên `fix/liquid-glass-audit-2026-10-19`; không merge PR/main, không deploy Production, không sửa backend/API/database/schema/secrets/bindings/dữ liệu.
 - Yêu cầu quan trọng: heart đỏ khi thích; cart badge/toast phản ánh thao tác thật; mọi điểm add hàng dùng chung fly-to-cart đến icon header; clone phải dùng đúng ảnh đang hiển thị, đúng sản phẩm và variant; không di chuyển trang gốc hoặc add trùng.
 - Quy trình bắt buộc: xác minh HEAD/Preview/baseline → audit source/runtime + test hiện hữu → chia lát thay đổi nhỏ → Playwright/ảnh Preview mỗi lát → cập nhật bằng chứng/handoff.
