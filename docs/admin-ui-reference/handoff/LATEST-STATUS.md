@@ -45,3 +45,14 @@
 - Thay đổi chẩn đoán an toàn duy nhất trong commit `3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f`: log hostname + pathname đã chuẩn hóa, không log query/token. Không thay assertion CSS, không đọc/đổi secrets, không đổi Access policy, không deploy Production.
 - Artifact bằng chứng: [admin-preview-evidence-149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135/artifacts/12346980569).
 - **Bước tiếp theo:** xác minh trong Cloudflare Pages deployment list commit/branch của `1f1dc981.sindarealest2.pages.dev`; sau đó sửa giá trị `ADMIN_TEST_URL` qua GitHub Settings để trỏ tới Preview deployment/alias được chủ sở hữu chọn. Không in giá trị secret trong log. Nếu deployment đúng vẫn thiếu CSS, mới điều tra build/output/cache. Không tạo token Access mới.
+
+
+## Xác minh deployment đích sai nhánh — 2026-10-21
+
+- Đối chiếu Cloudflare Pages deployment list do chủ sở hữu cung cấp với log của Actions run `39602040135`: workflow thực sự đã kiểm tra `https://1f1dc981.sindarealest2.pages.dev/admin/`.
+- Cloudflare Pages ghi nhận `1f1dc981` thuộc branch `fix/product-update-d1-diagnostics-2026-10-19`, commit `cf6a30058a6a64e82d639afbae75643a28a09b52`, message `fix: lock gallery controls during save and verify preview recovery`; deployment status `success`, không có alias.
+- Vì vậy đây không phải nhánh Admin được phép làm việc `feature/admin-isolated-handoff-2026-10-20`. Lỗi `PREVIEW_CSS_SIGNATURE_MISMATCH` ở URL đó không chứng minh source của nhánh Admin hiện tại sai.
+- Workflow `.github/workflows/admin-preview-diagnostics.yml` đọc `ADMIN_TEST_URL` từ GitHub Actions Secret và đưa vào `ADMIN_TEST_URL` env; step deployed Preview chạy `tests/e2e/admin-preview.spec.js`. Nó cũng khai báo `CF_ACCESS_CLIENT_ID` và `CF_ACCESS_CLIENT_SECRET` trong job env. Không có thay đổi secret hoặc Access policy được thực hiện.
+- Hành động an toàn tiếp theo cần chủ sở hữu cập nhật secret `ADMIN_TEST_URL` trong GitHub repo Settings → Secrets and variables → Actions để trỏ tới deployment/alias Preview thuộc đúng branch Admin. Không ghi URL này trực tiếp vào log và không cần gửi giá trị secret trong chat. Trước khi đổi, cần chọn hostname Preview Admin đúng; không dùng deployment thuộc nhánh fix D1.
+- Giữ nguyên CSS assertion `hasLoginHideRule`, `topbarBrandVisibility` và kiểm tra stylesheet/rules. Không chỉnh test để che mismatch.
+- Rào chắn vẫn giữ: không sửa `main` hoặc nhánh storefront `fix/liquid-glass-audit-2026-10-19`; không merge PR, không deploy Production, không sửa Access/token, không thao tác D1/R2.
