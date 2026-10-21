@@ -1,11 +1,11 @@
 {
-  "status": "SOURCE_AND_PREVIEW_PASS_ORDERS_VISUAL_REVIEW_PARTIAL",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
-  "testedCommitSha": "8d4009f785cc89ff0ff5575460aacac8d2119746",
-  "capturedAt": "2026-10-21T19:49:32.830Z",
+  "latestCodeCommitSha": "6b86aa8ae01754bb7d65d32f8ca76bd930c250fb",
+  "testedCommitSha": "6b86aa8ae01754bb7d65d32f8ca76bd930c250fb",
+  "capturedAt": "2026-10-21T19:57:52.992Z",
   "progressEstimatePercent": 50,
   "progressBasis": "Weighted scorecard 49.6 points, rounded to 50%. Orders/Fulfillment #7 is PARTIAL; Product list #3 is PARTIAL; other screen families remain unaudited and authenticated business QA is NOT TESTED.",
   "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.\n\nCheckpoint 2026-10-21 17:47 UTC: exact source/test SHA 04889b6c6bc946483ea683e8345bac3b7cbf3838; Validate Source #39646606076 and Admin Preview #39646606242 both SUCCESS. Corrected false-negative custom switch visibility assertion; prior Preview run #39646221204 failed only at screenshot matrix step 9; rerun passed. Evidence workflow wrote docs/evidence-only HEAD d90a18db3961958b0928f1fabc598f2d77cedea3. Progress remains 50%; 12-screen parity NOT ACCEPTED, authenticated business QA NOT TESTED, image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER; PR #111 OPEN/UNMERGED.",
@@ -904,13 +904,14 @@
     "Owner action is required to confirm a currently deployed Preview built from ADMIN source and legitimate Cloudflare Access; no secret or bypass is allowed. Product save and PRE/PRO migrations stay DEFERRED_BY_OWNER."
   ],
   "nextActions": [
-    "Review 12-SCREEN-REFERENCE-AUDIT.md and select the next unaudited screen; Category/product classification is currently NOT TESTED.",
-    "Compare current screenshots against the approved reference at 390x844 light/dark and 1280x800; only fix evidenced gaps.",
-    "Add source-grounded Playwright/contract checks, then run Validate Source and Preview/Playwright on an exact SHA.",
-    "Open fresh screenshots and update/read back all seven handoff files; progress remains 50% until evidence warrants a change."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39665960957",
   "branchHeadSha": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
   "latestVerifiedAt": "2026-10-22T01:58:00+07:00",
   "latestVerifiedSourceCommit": "f2df0a923080135c5fe92ee2021c76137305699c",
@@ -1432,9 +1433,9 @@
     "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED"
   },
   "latestLocalEvidence": {
-    "runId": 39664727558,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558",
-    "sourceCommit": "8d4009f785cc89ff0ff5575460aacac8d2119746",
+    "runId": 39665960957,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39665960957",
+    "sourceCommit": "6b86aa8ae01754bb7d65d32f8ca76bd930c250fb",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -1442,7 +1443,7 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 48,
     "uiFixtureMetricCount": 40,
-    "screenshotArtifact": "admin-preview-evidence-240",
+    "screenshotArtifact": "admin-preview-evidence-242",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
@@ -1745,15 +1746,16 @@
   },
   "currentAdminBranchHeadBeforeHandoffUpdate": "1814260ee238d194ca5d749954439b15bb8c055a",
   "latestScreenshotArtifact": {
-    "name": "admin-preview-evidence-240",
-    "id": 12377312578,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578",
-    "sizeBytes": 12187488,
+    "runId": 39665960957,
+    "name": "admin-preview-evidence-242",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39665960957",
+    "sourceCommit": "6b86aa8ae01754bb7d65d32f8ca76bd930c250fb",
     "screenshotCount": 64,
     "loginShellPngCount": 16,
-    "fixtureModulePngCount": 48,
-    "fixtureMetricCount": 40,
-    "rawPngsCommittedToGit": false
+    "uiFixturePngCount": 48,
+    "uiFixtureMetricCount": 40,
+    "retentionDays": 14,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "latestVerification": {
     "exactSha": "04889b6c6bc946483ea683e8345bac3b7cbf3838",
