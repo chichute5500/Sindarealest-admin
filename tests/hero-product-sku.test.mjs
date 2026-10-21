@@ -6,22 +6,24 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("/images/hero-sd-gl052.png?v=20261021-hero-upload"),
-  "The hero must use the owner-uploaded static image asset.");
-assert.ok(heroSync.includes("owner-supplied"),
-  "The hero must identify its source as the owner-supplied image.");
-assert.doesNotMatch(heroSync, /products\.find|wantedSku|sku-not-found|catalogGrid|featuredGrid/,
-  "The hero must not depend on a missing API SKU or silently substitute an unrelated product.");
+assert.ok(heroSync.includes("products.find(p=>String(p?.sku??'').trim().toUpperCase()==='SD-GL052'&&p?.skuVerified===true)"),
+  "The hero must require the exact verified public SKU before showing an image.");
+assert.ok(heroSync.includes("Array.isArray(product.images)") && heroSync.includes("target.dataset.productImageStatus='verified-public-catalog'"),
+  "The hero image must come from the matched product's mapped public images.");
+assert.ok(heroSync.includes("target.hidden=true") && heroSync.includes("target.removeAttribute('src')"),
+  "The hero must clear and hide the image until its public SKU is verified.");
+assert.doesNotMatch(heroSync, /hero-sd-gl052\.png|owner-supplied-hero-image|productImageStatus='owner-supplied'/,
+  "The hero must not portray a local static image as the absent commercial SKU.");
 assert.ok(html.includes('id="heroProductImage"'),
   "The existing hero image element must remain available for responsive styling.");
 
 const visualAudit = readFileSync(new URL("../scripts/capture-liquid-glass-preview.mjs", import.meta.url), "utf8");
-assert.ok(visualAudit.includes("hero-uses-owner-uploaded-image"),
-  "The read-only visual audit must check the uploaded hero image.");
-assert.ok(visualAudit.includes("startup.heroImage.source.split('?')[0] === expectedHeroImage"),
-  "The local audit must verify the exact uploaded asset path.");
-assert.ok(visualAudit.includes("startup.heroImage.status === 'owner-supplied'"),
-  "The local audit must verify the owner-supplied image state.");
+assert.ok(visualAudit.includes("hero-fails-closed-with-unverified-fixture"),
+  "The local fixture audit must confirm the hero remains hidden without the verified SKU.");
+assert.ok(visualAudit.includes("startup.heroImage.status === 'sku-unavailable'")
+  && visualAudit.includes("startup.heroImage.hidden")
+  && visualAudit.includes("!startup.heroImage.source"),
+  "The local audit must require an empty, hidden hero image while SKU verification is unavailable.");
 
 const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the exact product crisp and blend it into the satin-glass background"));
 assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
@@ -34,12 +36,15 @@ assert.ok(lastHeroImageRule.includes("rgba(4,20,34,0) 64%)"),
   "The dark-theme veil must also preserve product visibility.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
-assert.ok(liveCapture.includes("async function auditHeroImage(page, label)"),
-  "The live Preview capture must verify the uploaded hero image.");
-assert.ok(liveCapture.includes("path === '/images/hero-sd-gl052.png'"),
-  "The live audit must confirm the exact uploaded asset path.");
-assert.ok(liveCapture.includes("status === 'owner-supplied'"),
-  "The live audit must require the owner-supplied image state.");
-assert.ok(!liveCapture.includes("SD-GL052 is not present in the public verified product payload"),
-  "The live audit must no longer block on API SKU discovery after the owner supplies the image.");
-console.log("PASS: storefront hero uses the owner-uploaded image without requiring API SKU discovery.");
+assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
+  && liveCapture.includes("fetch('/api/products'")
+  && liveCapture.includes("item?.skuVerified === true"),
+  "The live audit must inspect the actual public product payload before deciding whether a hero image is allowed.");
+assert.ok(liveCapture.includes("mappedImages.includes(path)")
+  && liveCapture.includes("status === 'verified-public-catalog'"),
+  "The live audit must require the rendered hero image to belong to the exact verified catalog record.");
+assert.ok(liveCapture.includes("skuUnavailableFallback")
+  && liveCapture.includes("SD-GL052 is not present in the public verified product payload"),
+  "The audit may accept a safe empty hero fallback but must keep the full visual audit blocked when the exact SKU is absent.");
+assert.doesNotMatch(liveCapture, /hero-sd-gl052\.png|owner-supplied/);
+console.log("PASS: hero image is tied to verified public SKU/image mapping; missing SKU fails closed and remains an explicit visual blocker.");
