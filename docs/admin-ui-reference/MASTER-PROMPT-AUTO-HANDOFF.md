@@ -1363,3 +1363,16 @@ This was a read-only source review of the existing payment contract and route co
 - No merge/cherry-pick/force-push; no Production deploy.
 - No secrets/Cloudflare Access changes or bypass; no remote D1/R2 operations; do not execute setup/migration scripts; do not use TinyFish.
 - Do not resume product image-save or PRE/PRO migration work unless the owner explicitly reauthorizes it.
+
+
+## Latest verified continuation checkpoint — 2026-10-21 21:45 ICT
+
+- Product editor footer fix source commit: `cc77869873c2f5b4b2d1118dc60c0d88413eb218`. It removes bottom padding after the sticky action bar and preserves clearance inside the scrollable product content.
+- E2E geometry assertion: `a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e`; CSS contract assertion: `5f73373094ba71f467374e8b026bbfc3c5059fec`.
+- Exact latest tested tree `a999bfdc529ea38c5309ebfbff33a45c6779c10b`: [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) PASS and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737) PASS. `npm run check`, `npm test`, local responsive/theme Playwright matrix, configured Preview diagnostic and gallery/footer geometry test all passed.
+- Artifact `admin-preview-evidence-162` (ID `12354480678`, 11,114,027 bytes, expires 2026-11-04) contains 59 source/fixture PNGs (16 login, 43 synthetic/read-only screens) and 36 fixture metrics. Gallery light/dark images now show the footer at the dialog's bottom edge and the last thumbnail above the footer. Not authenticated backend QA.
+- Remaining visual gap: approved gallery reference #5 uses a horizontal thumbnail rail and richer image-management/status composition; parity for all 12 screen families remains NOT ACCEPTED. Authenticated business/backend QA NOT TESTED; image save and PRE/PRO migrations DEFERRED_BY_OWNER / NOT VERIFIED.
+- Latest branch HEAD was `e7f0990f4c0b78272fdba06e9f90423340b82eaa`; commits since tested tree `a999bfd...` were docs-only. Re-check refs before further writes.
+- PR #111 OPEN/UNMERGED, base main, 1,112 paths and mixed Admin/storefront/Functions/migrations/scripts/tests/evidence scope. PR #108 OPEN/UNMERGED (269 paths). Neither is merge-ready.
+- Read-only review found `setup-cloudflare.mjs` omits migration 0009 and `deploy-cloudflare.mjs` preflights 0007/0008 but not 0009. This is a source mismatch, not evidence of a missing remote schema. No remote D1/R2 action, SQL, migration/setup script, or deploy was performed.
+- Only ADMIN branch. No main/static branch edits, merge/cherry-pick/force-push, Production deploy, secrets/Access changes/bypass, remote D1/R2, setup/migration script, or TinyFish. Overall progress remains 48%.
