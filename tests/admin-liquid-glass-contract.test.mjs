@@ -196,6 +196,8 @@ for (const [id, label] of [
 has('#productPanelDetails>.formgrid:has(#pPrice):has(#pStock){grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}', 'mobile product price and stock share one compact row');
 has('#productPanelDetails>.formgrid:has(#pPrice):has(#pStock)>.field.span2{grid-column:1/-1}', 'mobile SKU and description fields remain full width above price and stock');
 has('#productPanelDetails #pPrice,#productPanelDetails #pStock{width:100%;min-width:0!important;max-width:100%;font-size:11px}', 'price and stock inputs stay within their mobile grid columns with compact readable placeholders');
+has('id="pPrice" class="control" type="number" min="0" step="1" inputmode="numeric" placeholder="Chưa có giá" title="Để trống nếu chưa có giá"', 'concise price placeholder preserves the full price-entry instruction in its title');
+has('id="pStock" class="control" type="number" min="0" step="1" inputmode="numeric" placeholder="Chưa kiểm kê" title="Để trống nếu chưa kiểm kê"', 'concise stock placeholder preserves the full stock-entry instruction in its title');
 has('role="tablist" aria-label="Nhóm thông tin sản phẩm"', 'named product tablist');
 has('role="tabpanel" aria-labelledby="productTabDetails"', 'basic panel relationship');
 has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image panel');
