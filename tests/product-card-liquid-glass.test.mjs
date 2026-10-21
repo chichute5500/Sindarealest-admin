@@ -144,3 +144,17 @@ assert.ok(finalThemeCss.includes('body:has(.sd-fullscreen-viewer.open) .mobile-b
 assert.ok(finalThemeCss.includes('background:rgba(247,252,255,.995)!important;')
   && finalThemeCss.includes('background:rgba(4,20,34,.995)!important;'),
   "Persistent mobile navigation must keep sufficient contrast over scrolling content in both themes.");
+
+
+const sixTileRefinementStart = html.lastIndexOf("/* 2026-10-21 visual refinement: six benefit tiles");
+const sixTileRefinementEnd = html.indexOf("</style>", sixTileRefinementStart);
+assert.ok(sixTileRefinementStart >= 0 && sixTileRefinementEnd > sixTileRefinementStart,
+  "The six-tile satin refinement must be present in the final style block.");
+const sixTileRefinementCss = html.slice(sixTileRefinementStart, sixTileRefinementEnd);
+assert.ok(sixTileRefinementCss.includes(".service-strip .service-copy{")
+  && sixTileRefinementCss.includes(".service-strip .service-text strong{font-size:12px")
+  && sixTileRefinementCss.includes("html.dark .service-strip .service-copy{")
+  && sixTileRefinementCss.includes(".service-strip{gap:7px;padding:7px}"),
+  "The six-tile refinement must target the real service strip, set legible content sizing, and provide light/dark and mobile styles.");
+assert.doesNotMatch(sixTileRefinementCss, /#benefits/,
+  "The six-tile refinement must not depend on a nonexistent benefits section ID.");
