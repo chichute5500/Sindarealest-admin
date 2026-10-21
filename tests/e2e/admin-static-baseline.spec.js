@@ -780,7 +780,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productResultSummary')).toContainText('Có 1 sản phẩm phù hợp');
     await page.locator('#searchBox').fill('khong-co-san-pham-nay');
     await expect(page.locator('#main .product-empty-state')).toContainText('Thử từ khóa khác hoặc xóa tất cả bộ lọc.');
-    await page.getByRole('button', { name: 'Xóa tất cả bộ lọc' }).click();
+    await page.locator('#clearFilterEmpty').click();
     await expect(page.locator('#searchBox')).toHaveValue('');
     await expect(page.locator('#categoryBox')).toHaveValue('all');
     await expect(page.locator('#fulfillmentBox')).toHaveValue('all');
@@ -790,7 +790,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(productNames).toHaveText('Dây đồng hồ thử nghiệm giao diện');
     await page.locator('#categoryBox').selectOption('wallets');
     await expect(page.locator('#main .product-empty-state')).toBeVisible();
-    await page.getByRole('button', { name: 'Xóa tất cả bộ lọc' }).click();
+    await page.locator('#clearFilterEmpty').click();
     await expect(productNames).toHaveCount(3);
 
     // Product editor and image gallery are true source components. Only their input data is fixture-only.
