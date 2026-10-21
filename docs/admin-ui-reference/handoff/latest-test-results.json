@@ -2385,5 +2385,21 @@
     ],
     "full12ScreenParity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "BLOCKED_BY_CLOUDFLARE_ACCESS_NOT_TESTED"
+  },
+  "dashboardDataSourceAudit": {
+    "capturedAt": "2026-10-21T15:10:00Z",
+    "sourceHeadAtAuditStart": "e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d",
+    "validationRunAtAuditStart": {
+      "id": 39622616336,
+      "status": "queued",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336"
+    },
+    "sourceFile": "public/admin/index.html",
+    "currentDashboard": "product counts, quick actions, recent audit logs",
+    "referenceGap": "reference dashboard includes revenue trend chart",
+    "dedicatedAdminRevenueRouteFound": false,
+    "orderEndpointLimitation": "/api/admin/orders returns only the latest 1000 parent orders; not sufficient evidence for complete all-history revenue trend",
+    "decision": "Do not fabricate chart data or present a capped subset as complete history. Inspect schema and order/payment lifecycle semantics before choosing a data-backed aggregation; otherwise use a truthful empty state and test it.",
+    "progressEffect": "No progress increase: audit identifies next work but does not close the visual or authenticated QA gaps."
   }
 }
