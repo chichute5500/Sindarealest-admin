@@ -618,6 +618,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
     await expect(page.locator('#pTitle')).toBeFocused();
+    await expect(page.locator('#productEditorTabs .editor-tab').evaluateAll(tabs =>
+      tabs.every(tab => getComputedStyle(tab).whiteSpace === 'nowrap' && tab.scrollWidth <= tab.clientWidth + 1)
+    )).resolves.toBe(true);
+    if (variant.viewport.width === mobile.width && variant.theme === 'light') {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await expect(page.locator('#productEditorTabs .editor-tab').evaluateAll(tabs =>
+        tabs.every(tab => getComputedStyle(tab).whiteSpace === 'nowrap' && tab.scrollWidth <= tab.clientWidth + 1)
+      )).resolves.toBe(true);
+      await expect(page.locator('#backdrop .editor').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
+      await page.setViewportSize(variant.viewport);
+    }
 
     // Reference-aligned editor grouping: core fields, images, then extra settings.
     await expect(page.locator('#productEditorTabs')).toHaveAttribute('role', 'tablist');
@@ -745,6 +756,19 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     for (const variant of variants) {
       await openEditor(variant);
       await saveScreenshot('product-editor', variant, { dialog: true });
+      if (variant.viewport.width === mobile.width && variant.theme === 'light') {
+        // Empty required field, then submit from another tab: validation must reveal the correct panel and block every API write.
+        await page.locator('#pTitle').fill('');
+        await page.locator('#productTabGallery').click();
+        await page.locator('#saveProduct').click();
+        await expect(page.locator('#productTabDetails')).toHaveAttribute('aria-selected', 'true');
+        await expect(page.locator('#pTitle')).toBeFocused();
+        await expect(page.locator('#saveError')).toContainText('Vui lòng nhập tên và chọn danh mục.');
+        expect(attemptedWrites, 'Missing required product identity must never reach the API').toEqual([]);
+        await page.locator('#editorCancel').click();
+        await expect(page.locator('#backdrop')).toBeHidden();
+        await openEditor(variant);
+      }
       await page.locator('#productTabGallery').click();
       await expect(page.locator('#imageDropZone')).toBeVisible();
       await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });

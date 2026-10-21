@@ -186,6 +186,11 @@ assert.ok(adminHtml.indexOf('id="productPanelGallery"') < adminHtml.indexOf('id=
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
 has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
+has('<form id="productForm" novalidate>', 'custom product validation can reveal invalid controls hidden in another tab');
+has("const invalidInput=$('#productForm').querySelector(':invalid')", 'product editor preserves native required/min/step validity checks');
+has('setProductEditorTab(panel.dataset.productPanel)', 'invalid form fields reveal their owning tab before focus moves');
+has('invalidInput.focus()', 'product form focuses the invalid control after opening its tab');
+has('white-space:nowrap;overflow-wrap:normal;letter-spacing:-.02em', 'product editor tabs keep Vietnamese labels on a single line');
 has("el.tabIndex>=0&&el.getClientRects().length>0", 'modal focus trap excludes inactive tabs');
 assert.match(baselineSpec, /await expect\(page\.locator\('#productTabDetails'\)\)\.toHaveAttribute\('aria-selected', 'true'\);/,
   'Playwright should verify the product editor defaults to its details tab');
