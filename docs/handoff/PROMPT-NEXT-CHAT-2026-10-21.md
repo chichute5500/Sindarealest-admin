@@ -158,3 +158,18 @@ Checkout only renders transfer QR instructions when the response is server-confi
 5. Run relevant tests, deploy only Preview through GitHub Actions, verify deployment SHA, capture real screenshots and update `docs/website-screenshots/manifest.json` only after evidence exists. Update this handoff with exact commit, run/artifact URLs, outcomes and remaining blockers.
 
 **Status honesty:** this handoff addendum records the contract and next implementation requirements; it does not claim the storefront QR/payment/product-type feature is complete. Keep the satin/reference audit separate; its known `SD-GL052` blocker remains unresolved and must not be “fixed” by fabricating product data.
+
+
+## Latest checkpoint — 2026-10-21
+
+Recorded branch HEAD before this handoff note: `efa594969b2690a2c3590b2dda5a3acd5d8325c9`. Re-fetch HEAD and workflow results before continuing. Read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` first, then this prompt, `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, `docs/prompts/MASTER-PROMPT-SINDAREALEST2-PARALLEL.md`, and `docs/prompts/NEXT-CHAT-PROMPT.md`.
+
+Scope: storefront public UI/API consumption and tests only. Admin AI owns Admin UI, schema/migrations, owner-managed product classification, QR upload/configuration, and payment verification on its own branch. Coordinate through the shared contract; do not edit the other branch.
+
+Fulfillment accepts only explicit `in_stock`, `made_to_order`, `unclassified`; missing/unknown remains unclassified. Never infer from category, SKU, stock quantity or image. Customer cannot select type. Made-to-order: 30% deposit or 100%; in-stock: 100,000 VND deposit or 100%; full payment qualifies for freeship for both. Use server-confirmed amounts only.
+
+Current `POST /api/orders` returns `pending_confirmation`; no public order-status lookup or active receiver QR config has been verified. Expected checkout says “Chờ cửa hàng xác nhận” / “Vui lòng chưa chuyển tiền”, with no QR and no amount. Render a QR only from complete server-confirmed payload with `qrIncludesAmount:false`; never mark payment successful from QR display/scan, receipt or customer claim.
+
+At recorded HEAD, source validation run 39559590352, Preview deploy 39559590384, and Admin Preview Playwright 39559590377 passed. Visual workflow 39559590354 was still running; inspect its final result and artifact before visual acceptance. Last completed live audit has one blocker: SKU `SD-GL052` is absent from verified public product data. Do not fabricate or substitute it; the audit was read-only and did not submit an order or verify payment.
+
+Next: inspect run 39559590354 and its screenshots; verify runtime fail-closed QR tests and latest mobile product-card height; continue real visual fixes and re-run source tests, Preview deploy and live audit. Keep PR #108 open; no merge, Production deploy, Production migration, secret/binding/DNS change, Admin change or catalog edits.
