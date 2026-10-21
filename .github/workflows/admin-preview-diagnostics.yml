@@ -111,10 +111,10 @@ jobs:
           fi
 
           DEST="docs/admin-ui-reference/handoff/history/$SHA_SHORT"
-          export DEST
-          mkdir -p "$DEST/screenshots"
-          cp "$SOURCE_DIR"/screenshots/*.png "$DEST/screenshots/"
-          cp "$SOURCE_DIR/metadata.json" "$DEST/metadata.json"
+          export DEST SOURCE_DIR
+          # Keep compact summaries in Git. Full PNGs and metadata are uploaded
+          # through the Actions artifact step below, not committed per run.
+          mkdir -p "$DEST"
           if [[ -f "$SOURCE_DIR/preview-diagnostics.json" ]]; then
             cp "$SOURCE_DIR/preview-diagnostics.json" "$DEST/preview-diagnostics.json"
           fi
@@ -133,6 +133,7 @@ jobs:
             printf -- '- Automated tests: `%s`\n' "$UNIT_OUTCOME"
             printf -- '- Local source screenshots: `%s`\n' "$BASELINE_OUTCOME"
             printf -- '- Deployed Preview check: `%s`\n' "$PREVIEW_REPORT_STATE"
+            printf -- '- Full screenshot/metadata artifact: `admin-preview-evidence-%s` (raw PNGs are not committed to Git).\n' "$GITHUB_RUN_NUMBER"
             printf -- '- Route: `/admin/`\n'
             printf '%s\n' '- Local screenshots only exercise the real source HTML/CSS with a mocked unauthenticated session response; they do not write or read business data.'
             printf '%s\n' '- Screenshots are captured in light and dark themes for 320x640, 360x800, 375x812, 390x844, 412x915, 768x1024, 1280x800 and 1440x900.'
@@ -146,13 +147,12 @@ jobs:
 
           const jsonPath = 'docs/admin-ui-reference/handoff/latest-test-results.json';
           const statusPath = 'docs/admin-ui-reference/handoff/LATEST-STATUS.md';
-          const metadataPath = join(process.env.DEST, 'metadata.json');
+          const metadataPath = join(process.env.SOURCE_DIR, 'metadata.json');
           const previewPath = join(process.env.DEST, 'preview-diagnostics.json');
           const data = JSON.parse(readFileSync(jsonPath, 'utf8'));
           const meta = JSON.parse(readFileSync(metadataPath, 'utf8'));
           const sha = process.env.GITHUB_SHA;
-          const dest = process.env.DEST;
-          const imageFiles = readdirSync(join(dest, 'screenshots')).filter(name => name.endsWith('.png')).sort();
+          const imageFiles = readdirSync(join(process.env.SOURCE_DIR, 'screenshots')).filter(name => name.endsWith('.png')).sort();
           let previewState = process.env.PREVIEW_OUTCOME || 'not-run';
           let previewGate = null;
           if (existsSync(previewPath)) {
@@ -200,6 +200,7 @@ jobs:
             loginShellPngCount: meta.screenshots?.length || 0,
             uiFixturePngCount: fixtureAudit?.screenshots?.length || 0,
             uiFixtureMetricCount: fixtureAudit?.metrics?.length || 0,
+            screenshotArtifact: 'admin-preview-evidence-' + process.env.GITHUB_RUN_NUMBER,
             pageErrors: meta.pageErrors || [],
             consoleErrors: meta.consoleErrors || [],
             failedRequests: meta.failedRequests || [],
@@ -208,19 +209,20 @@ jobs:
             unexpectedApiPaths: fixtureAudit?.unexpectedApiPaths || [],
             scope: 'LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND'
           };
-          data.screenshots = imageFiles.map(file => {
-            const match = file.match(/__(\\d+x\\d+)__(light|dark)\\.png$/);
-            return {
-              path: `${dest}/screenshots/${file}`,
-              route: meta.route || '/admin/',
-              viewport: match?.[1] || null,
-              theme: match?.[2] || null,
-              commitSha: sha,
-              capturedAt: meta.capturedAt || null,
-              evidence: 'REAL_PLAYWRIGHT_SOURCE_SCREENSHOT',
-              scope: 'UNAUTHENTICATED_LOCAL_SOURCE_ONLY'
-            };
-          });
+          // Keep existing historical screenshot references untouched. The current
+          // full-resolution files and per-test metadata stay in the Actions artifact.
+          data.latestScreenshotArtifact = {
+            runId: Number(process.env.GITHUB_RUN_ID),
+            name: 'admin-preview-evidence-' + process.env.GITHUB_RUN_NUMBER,
+            runUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            sourceCommit: sha,
+            screenshotCount: imageFiles.length,
+            loginShellPngCount: meta.screenshots?.length || 0,
+            uiFixturePngCount: fixtureAudit?.screenshots?.length || 0,
+            uiFixtureMetricCount: fixtureAudit?.metrics?.length || 0,
+            retentionDays: 14,
+            storage: 'GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch'
+          };
           const issues = Array.isArray(data.remainingIssues) ? data.remainingIssues : [];
           data.remainingIssues = issues.filter(item => !String(item).includes('Cloudflare Access') && !String(item).includes('screenshots have not been produced'));
           if (previewState === 'BLOCKED_CLOUDFLARE_ACCESS') {
@@ -230,7 +232,7 @@ jobs:
             data.remainingIssues.push('Local baseline metadata records browser or network errors; inspect history evidence before accepting the UI.');
           }
           data.nextActions = [
-            'Review the latest real screenshots and metadata under the recorded history path.',
+            'Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.',
             'Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.',
             'Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.',
             'Run the source checks and Playwright matrix again after every meaningful UI iteration.',
@@ -255,7 +257,7 @@ jobs:
             '- Run: https://github.com/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID,
             '- npm run check: ' + checkState(process.env.CHECK_OUTCOME),
             '- npm test: ' + checkState(process.env.UNIT_OUTCOME),
-            '- Local source Playwright matrix: ' + checkState(process.env.BASELINE_OUTCOME) + '; ' + imageFiles.length + ' real PNG screenshots saved under ' + dest + '/screenshots/.',
+            '- Local source Playwright matrix: ' + checkState(process.env.BASELINE_OUTCOME) + '; ' + imageFiles.length + ' real PNGs captured in artifact admin-preview-evidence-' + process.env.GITHUB_RUN_NUMBER + ' (not committed to Git).',
             '- Deployed Preview: ' + previewState + '.',
             '- Source screenshot matrix: ' + imageFiles.length + ' real PNGs; login shell: ' + (meta.screenshots?.length || 0) + '; read-only fixture module screens: ' + ((meta.uiFixtureVisualAudit?.screenshots || []).length) + '; fixture metrics: ' + ((meta.uiFixtureVisualAudit?.metrics || []).length) + '.',
             '- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.',
