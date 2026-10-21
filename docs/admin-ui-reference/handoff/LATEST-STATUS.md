@@ -187,3 +187,12 @@
 - `scripts/deploy-cloudflare.mjs` adds remote schema checks and blocks deployment when migration 0008 is absent; this is a safety gate but still needs migration-order review. Migration 0008 itself adds columns to both `products` and `order_items`.
 - The PR diff includes `public/index.html`, `data/legacy-products.json`, 14 `functions/` files, migration 0008, 5 scripts and 20 tests. Patch endpoint returned no patch for the large storefront/data files; those exact contents remain unreviewed rather than assumed safe.
 - Next safe work: inspect `scripts/setup-cloudflare.mjs` call sites and tests without executing it; review all available product/order/backup/restore patches for backward compatibility; obtain an authorized decision on whether migration-related backend work belongs in this ADMIN PR or must be isolated. No code outside allowed scope was changed in this audit.
+
+
+## Handoff checkpoint — 2026-10-21 (latest verified repository audit)
+
+- Current PR #111 head observed during this check: `eee7dcedb71a42516822a9f46384ddacc107eb4e`; PR remains OPEN and unmerged against `main`. No PR-triggered workflow run was returned for this head. Do not treat the prior workflow run as validation of the latest workflow changes.
+- Rechecked the full paginated changed-file list: 909 files total. Categorization: 862 docs/evidence files and 47 non-doc files. The 47 include 14 `functions/` files, `public/admin/index.html`, `public/index.html`, `data/legacy-products.json`, migration `0008_product_sku_verification.sql`, 5 scripts, 2 workflows, package config and 20 test files. This is not a UI-only PR.
+- The patch review already identified `scripts/setup-cloudflare.mjs` as high risk because it can run remote D1 migrations and direct `ALTER TABLE` operations for SKU verification columns. It was NOT executed. Do not run setup/deploy scripts or modify production schema/data under current constraints.
+- PR comparison metadata currently reports divergence from main: 398 commits ahead, 6 behind (compare endpoint file listing is capped at 300, so use the paginated PR changed-file list for the 909 count). Earlier recorded numbers are historical snapshots; prefer this checkpoint for current scope.
+- No new source or workflow validation was established in this checkpoint. Progress remains 43%; Preview URL/CSS signature mismatch, authenticated module tests, 12-screen visual comparison and full merge-scope review remain blockers. No merge, deploy, secret change, migration execution or production data operation was performed.
