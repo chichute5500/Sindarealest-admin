@@ -144,6 +144,22 @@ assert.ok(topbarStart >= 0 && topbarEnd > topbarStart
   'Admin chrome should use the approved brand tagline');
 assert.ok(adminHtml.includes("head('Tổng quan','Tổng quan','Chào mừng, quản trị viên.'"),
   'Dashboard heading should match the approved reference rather than a marketing-style label');
+const dashboardStart = adminHtml.indexOf('function dashboard(){');
+const dashboardEnd = adminHtml.indexOf('\\nfunction ', dashboardStart + 20);
+const dashboardSource = adminHtml.slice(dashboardStart, dashboardEnd > dashboardStart ? dashboardEnd : undefined);
+assert.ok(dashboardStart >= 0 && dashboardEnd > dashboardStart, 'Dashboard source should remain a discrete render function');
+assert.match(dashboardSource, /products\\.length/, 'Dashboard product count must come from loaded product data');
+assert.match(dashboardSource, /class="stat-icon" aria-hidden="true"/, 'Dashboard metric icons should be decorative for assistive technology');
+assert.ok(dashboardSource.includes('class="dashboard-shortcuts"'), 'Dashboard should use the compact primary-action layout');
+assert.equal((dashboardSource.match(/class="shortcut dashboard-shortcut"/g) || []).length, 4, 'Dashboard should prioritize exactly four compact shortcuts');
+for (const [marker, label] of [
+  ['data-action="add"', 'create product action'],
+  ['data-view="orders"', 'orders navigation'],
+  ['data-view="customers"', 'customers navigation'],
+  ['data-action="backup"', 'backup action']
+]) assert.ok(dashboardSource.includes(marker), 'Dashboard shortcut must preserve ' + label);
+has('.dashboard-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))', 'four-column compact dashboard action layout');
+
 
 
 // Product editor uses accessible tabbed groups while keeping required identity fields visible.

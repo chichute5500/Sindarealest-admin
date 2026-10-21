@@ -623,6 +623,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     expect(response?.status(), 'Local source ADMIN should load for fixture-only visual review').toBe(200);
     await expect(page.locator('#appView')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('#main .statgrid')).toBeVisible();
+    await expect(page.locator('#main .statgrid .stat')).toHaveCount(4);
+    await expect(page.locator('#main .dashboard-shortcuts .dashboard-shortcut')).toHaveCount(4);
+    await expect(page.locator('#main .dashboard-shortcuts [data-action="add"]')).toContainText('Thêm sản phẩm');
+    await expect(page.locator('#main .dashboard-shortcuts [data-view="orders"]')).toContainText('Đơn hàng');
+    await expect(page.locator('#main .dashboard-shortcuts [data-view="customers"]')).toContainText('Khách hàng');
+    await expect(page.locator('#main .dashboard-shortcuts [data-action="backup"]')).toContainText('Sao lưu');
 
     await captureView('dashboard', 'dashboard', null, true);
     await captureView('products', 'products', null, true);
