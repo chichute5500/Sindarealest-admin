@@ -995,3 +995,59 @@ MỆNH LỆNH TIẾP QUẢN: KHÔNG LẶP LẠI CÁC BƯỚC ĐÃ PASS NẾU KH�
 - Người dùng đã yêu cầu: tiếp tục làm và chỉ báo cáo tiến độ, không dừng giữa chừng; chỉ dừng để hỏi khi cần người dùng thao tác hoặc cần ý kiến về thay đổi thiết kế/phạm vi. Khi gửi báo cáo, nếu vẫn còn bước tự thực hiện được thì tiếp tục ngay sau đó.
 
 **MỆNH LỆNH TIẾP QUẢN:** Bắt đầu từ mục 5. Không quay lại kiểm tra CRUD Admin, không sửa Admin, không merge PR và không đụng Production. Chỉ tiếp tục frontend website tĩnh, bằng chứng live Preview và đối chiếu ảnh mẫu.
+
+
+---
+
+## XXII. YÊU CẦU BỔ SUNG — ICON ĐỘNG VÀ HIỆU ỨNG GIỎ HÀNG LIQUID GLASS (2026-10-22)
+
+Phần này bổ sung yêu cầu tương tác mới cho WEBSITE TĨNH. Không thay thế các ranh giới an toàn, tiêu chí ảnh mẫu, quy trình Preview/Playwright hay nhiệm vụ còn dang dở ở các phần trước. Khi có mâu thuẫn, giữ nguyên giới hạn bảo vệ dữ liệu/Production và xác minh trạng thái thực tế trước khi sửa.
+
+### 1. Quy chuẩn hình ảnh
+- Ngôn ngữ thiết kế: Luxury Minimalism + Apple Liquid Glass; icon nét mảnh, nhất quán; bề mặt kính trong/mờ vừa phải, viền sáng và chiều sâu/khúc xạ tiết chế.
+- Màu đã chốt: nền kính sáng `#eaf3fb`, icon/chữ chính `#142a3c`, màu nhấn `#5c91b9`; trái tim màu đỏ khi sản phẩm đã được yêu thích.
+- Không dùng ripple. Phản hồi nhấn ưu tiên kính lún nhẹ + chuyển màu; khi thả, hiệu ứng nhấn trở về trạng thái bình thường.
+- Không để icon chạy liên tục nếu không có lý do chức năng. Ưu tiên animation ngắn, mượt, hiệu năng tốt và tôn trọng `prefers-reduced-motion`.
+
+### 2. Quy tắc trạng thái
+- Icon điều hướng trái/phải: nhấn thì đổi sắc/lún nhẹ, thả thì hiệu ứng trở về; ảnh/nội dung đã chuyển không được tự quay lại.
+- Yêu thích: trái tim màu mặc định khi chưa thích; chuyển đỏ khi đã thích; trở về mặc định khi bỏ thích. Trạng thái phải khớp chức năng/dữ liệu thực tế.
+- Giỏ hàng: huy hiệu số lượng phải phản ánh giỏ hàng thật và cập nhật khi thêm/xóa/thay đổi số lượng. Chỉ báo thêm thành công khi thao tác thực sự thành công; thất bại phải có phản hồi phù hợp.
+- Các icon khác (tìm kiếm, menu, tài khoản, lọc, đóng, xem ảnh, tăng/giảm số lượng...) dùng animation tương ứng chức năng; không tạo hành động giả hoặc trạng thái chỉ tồn tại ở lớp hình ảnh.
+
+### 3. Hiệu ứng dùng chung “sản phẩm bay vào giỏ hàng”
+- Mọi điểm vào thao tác thêm giỏ hàng trên website (thẻ sản phẩm/listing, trang chi tiết, gallery hoặc khu vực khác có chức năng thêm) phải dùng chung một cơ chế animation, hướng đến icon giỏ hàng trên header.
+- Điểm xuất phát là vị trí sản phẩm/ảnh mà người dùng vừa thao tác; điểm đích là vị trí thực tế của icon giỏ hàng trên header ở viewport hiện hành.
+- Tạo bản sao trực quan (clone/overlay) để animation; không thu nhỏ, di chuyển hoặc làm nhảy bố cục của thẻ/trang chi tiết gốc.
+- Bản sao bắt buộc dùng ĐÚNG ảnh đang hiển thị tại thời điểm nhấn, kể cả ảnh thứ hai/mặt sau trong gallery; phải gắn với đúng product ID/SKU và đúng biến thể đã chọn nếu hệ thống hỗ trợ. Không dùng ảnh mặc định hoặc ảnh của sản phẩm khác.
+- Chuyển động theo đường cong mượt, thu nhỏ dần; thời lượng mục tiêu ban đầu 0,6–0,9 giây, chỉ tinh chỉnh sau khi đo trên Preview. Khi đến nơi, icon giỏ hàng nảy nhẹ, huy hiệu cập nhật và thông báo xác nhận chỉ hiện sau khi add thành công.
+- Animation không được tự gọi thao tác thêm lần thứ hai, làm nhân đôi sản phẩm, tạo sai quantity hoặc phụ thuộc vào animation để hoàn tất nghiệp vụ. Nếu animation bị lỗi/không thể chạy, thao tác giỏ hàng vẫn phải đúng.
+- Xử lý nhiều lần nhấn nhanh, ảnh chưa tải xong, ảnh lỗi, scroll, resize, mobile/desktop, header sticky/di động và reduced-motion một cách an toàn. Với reduced-motion, dùng phản hồi tĩnh/nhẹ thay vì bắt buộc chuyển động bay.
+- Phân biệt rõ thao tác “thêm vào giỏ” với thao tác “mở giỏ”: chỉ hành động thêm hàng mới chạy hiệu ứng bay vào; nhấn icon giỏ hàng chỉ mở giỏ, không được tự thêm hàng.
+
+### 4. Trình tự khoa học bắt buộc — không phá vỡ công việc hiện tại
+Không sửa ngay chỉ vì đã có đặc tả. Thực hiện tuần tự, mỗi giai đoạn có bằng chứng và điểm kiểm tra:
+1. **Xác minh phạm vi:** kiểm tra repository, branch HEAD, PR, source commit/working tree, Preview URL/deployment identity, workflow mới nhất và thay đổi đang dang dở. Chỉ làm trên `fix/liquid-glass-audit-2026-10-19`; nếu trạng thái không khớp, điều tra trước, không chuyển nhánh/đè thay đổi.
+2. **Đọc và bảo toàn baseline:** đọc prompt này, `docs/icon-system-inventory.md`, handoff và manifest; kiểm tra `public/index.html` cùng CSS/JS liên quan. Chụp/đọc giao diện Preview hiện tại trước khi sửa. Không coi inventory cũ là danh mục runtime hoàn chỉnh nếu chưa xác minh.
+3. **Lập bản đồ tương tác:** liệt kê mọi điểm thêm giỏ hàng, cách xác định product/image/variant, header cart target, trạng thái yêu thích, badge, toast và các test hiện có. Xác định logic hiện tại để tái sử dụng; không tạo cơ chế thứ hai nếu đã có.
+4. **Chia nhỏ và đánh giá rủi ro:** đề xuất diff tối thiểu theo nhóm độc lập; xác định hồi quy có thể xảy ra. Không thay đổi business logic/API, schema, backend, dữ liệu sản phẩm, URL/SKU/ảnh nguồn, cấu hình hạ tầng hoặc Admin.
+5. **Kiểm thử trước/đặt tiêu chí:** bổ sung hoặc cập nhật test cho trạng thái icon, mọi điểm thêm hàng, ảnh gallery đang chọn, đúng biến thể, quantity không nhân đôi, add lỗi, click liên tiếp, responsive và reduced-motion. Không bỏ qua test sẵn có.
+6. **Triển khai từng lát nhỏ:** trước hết trạng thái icon cơ bản; tiếp theo heart/cart badge/toast; sau đó cơ chế fly-to-cart dùng chung. Chỉ bắt đầu lát tiếp theo khi lát trước không gây regression. Giữ diff hẹp, không viết lại toàn bộ file, không xóa code/feature không liên quan.
+7. **Xác minh mỗi lát:** chạy source validation/tests và Playwright trên Preview đúng branch; kiểm tra console/page errors, layout overflow, chức năng giỏ hàng và ảnh chụp trước/sau. Đối chiếu mobile/desktop và Light/Dark nếu giao diện hỗ trợ. Nếu test fail, sửa nguyên nhân và chạy lại.
+8. **Nghiệm thu hình ảnh:** chứng minh clone dùng đúng ảnh đang hiển thị và bay tới đúng header cart; xác minh trang gốc không di chuyển, quantity chỉ đổi đúng một lần, thông báo đúng kết quả. Ghi link workflow/artifact và SHA thực tế.
+9. **Cập nhật bàn giao:** cập nhật prompt này, `docs/icon-system-inventory.md`, `START-HERE.md`, `LATEST-STATUS.md` và kết quả test/manifest liên quan theo mức cần thiết; ghi rõ đã làm/chưa làm, PASS/FAIL/BLOCKED, commit SHA, run/artifact và việc tiếp theo. Đọc lại các file sau khi ghi để xác minh.
+10. **Không tự tuyên bố hoàn thành:** nếu thiếu quyền Preview, ảnh/artifact, test hoặc cần thao tác người dùng, ghi BLOCKED/NOT VERIFIED kèm bằng chứng cụ thể. Không merge PR, không đẩy sang main, không deploy Production.
+
+### 5. Điều kiện nghiệm thu
+- [ ] Không mất hoặc phá vỡ chức năng đang tồn tại; thay đổi nhỏ, có lý do và có thể kiểm tra.
+- [ ] Icon nhấn có phản hồi kính lún/đổi màu, không ripple; trạng thái chức năng được giữ chính xác.
+- [ ] Heart đỏ khi yêu thích và trở về màu mặc định khi bỏ thích.
+- [ ] Badge và toast khớp kết quả giỏ hàng thực tế.
+- [ ] Tất cả điểm thêm hàng dùng chung hiệu ứng và bay đến đúng icon header.
+- [ ] Clone dùng đúng ảnh đang hiển thị, đúng sản phẩm và biến thể được chọn.
+- [ ] Trang gốc không dịch chuyển; không add trùng; animation fail không làm fail thao tác mua hàng.
+- [ ] Nhiều thao tác nhanh, mobile/desktop, ảnh lỗi/chưa tải và reduced-motion được xử lý.
+- [ ] Có bằng chứng Playwright/Preview và ảnh chụp phù hợp; không chỉ dựa vào source review.
+- [ ] Mọi giới hạn branch/Production/backend/data vẫn được giữ nguyên.
+
+**Trạng thái lúc ghi yêu cầu:** đây là đặc tả/hướng dẫn triển khai; KHÔNG phải bằng chứng tính năng đã được code hoặc kiểm thử. AI tiếp quản phải xác minh source hiện hành trước khi thay đổi.
