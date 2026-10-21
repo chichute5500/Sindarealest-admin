@@ -55,6 +55,10 @@ assert.match(html, /function activeFullscreenImage\(\)/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /active\.classList\.remove\('is-active'\);incoming\.classList\.add\('is-active'\)/);
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:rgba\(205,230,249,\.055\)/);
+assert.match(html, /html:not\(\.dark\) \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:multiply!important\}/,
+  'Light fullscreen product photos must blend the source white backdrop into the satin background instead of appearing as a detached white square.');
+assert.match(html, /html\.dark \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/,
+  'Dark fullscreen product photos must preserve their real source colours without light-mode blending.');
 assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_MS=300/);
 assert.match(fullscreenTransition, /incoming\.onload=finishLoad/);
 assert.match(fullscreenTransition, /fullscreenAnimationTimer=setTimeout/);
