@@ -167,3 +167,11 @@ Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322
 - No product data, API semantics, authentication, real business records, D1/R2, Access, secrets, Production deployment, or PR merge was changed. Authenticated business/backend QA remains **NOT TESTED**. PR #111 and #108 remain OPEN/UNMERGED.
 - Overall progress remains **50%**: automation and one screen-family iteration improved, but 12-screen visual acceptance, several screen families, and authorized real backend QA remain incomplete.
 - Next safe task: inspect the orders list at 390×844 against reference screen #6, implement a focused ADMIN-only mobile card layout if justified, add E2E regression checks, run exact-SHA Validate Source + Preview/Playwright, open the new screenshot artifact, then update and re-read all seven handoff files.
+
+
+## Screen #6 — orders list continuation (2026-10-22)
+
+- Code/test SHA validated: `214dd104c17e3837166fac77f8f2106d1a25ffeb`; Validate Source [#39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) and Preview/Playwright [#39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) both SUCCESS.
+- Improvement: mobile order card keeps the primary summary compact; per-item price inputs and management/payment actions are inside a labelled disclosure that starts collapsed at ≤680px. Desktop hides the disclosure label and leaves controls expanded. Regression tests check toggle behavior, price visibility and payment safety guards.
+- **Acceptance status: PARTIAL / VISUAL REVIEW PENDING.** The latest workflow artifact has not yet been retrieved and opened; no screenshot parity claim is made. Do not mark screen #6 accepted based on CI alone.
+- Overall project progress remains 50%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED. Next: inspect real workflow screenshots at 390×844 light/dark and 1280×800, then update this row only with actual visual evidence.
