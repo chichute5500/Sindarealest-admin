@@ -2437,7 +2437,7 @@
       }
     ],
     "verification": "Both source validation and Preview diagnostic pass on 06d689b6a97fa7bdb05258acb8435a6954d67309. Handoff docs are being updated after this code/test SHA; check the latest descendant CI separately.",
-    "progressEffect": "Progress remains 48%; visual parity and authenticated backend QA remain incomplete.",
+    "progressEffect": "No overall progress increase; one dashboard subtask verified, broader acceptance criteria remain open.",
     "lastObservedFailure": {
       "runId": 39623834484,
       "sha": "d3835e859c7191da402f45a6f1231e7b6cd1d110",
@@ -2517,6 +2517,33 @@
         "1280x800 light"
       ],
       "notes": "Single dashboard revenue empty-state panel visually reviewed; responsive, no horizontal overflow observed. Fixture/diagnostic evidence only, not authenticated backend QA."
-    }
+    },
+    "sourceTestCommit": "06d689b6a97fa7bdb05258acb8435a6954d67309",
+    "validation": {
+      "runId": 39624818256,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256",
+      "conclusion": "success",
+      "focusedTest": "admin-dashboard-revenue-empty-state: PASS"
+    },
+    "previewEvidence": {
+      "runId": 39624818216,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216",
+      "conclusion": "success",
+      "artifactId": 12356875897,
+      "artifactName": "admin-preview-evidence-173",
+      "reviewedViewports": [
+        "390x844",
+        "1280x800"
+      ],
+      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE"
+    },
+    "copyRegression": {
+      "failedRunId": 39624723690,
+      "failedSha": "a250be98f03e8006ce102044884f0fb2b6b2f96d",
+      "cause": "Focused assertion still expected old phrase 'suy diễn doanh thu' after copy changed to 'ước đoán doanh thu'.",
+      "fixedIn": "06d689b6a97fa7bdb05258acb8435a6954d67309",
+      "resolution": "Full validation and focused test passed on fixed commit."
+    },
+    "currentSourceValidation": "PASS on source/test commit 06d689b6a97fa7bdb05258acb8435a6954d67309; later commits are handoff documentation only."
   }
 }
