@@ -1025,3 +1025,29 @@ Bản sửa trợ năng mới thêm `aria-label` theo bản ghi cho các control
 - Trước khi kích hoạt, phải xác minh ảnh quét được và đúng tài khoản nhận tiền, đồng thời không nhúng số tiền cố định. Nếu QR sai tài khoản hoặc có số tiền cố định, không tự chỉnh ảnh hay tuyên bố an toàn; yêu cầu ảnh đúng.
 - Public API chỉ trả về URL ảnh QR đang active và các thông tin nhận tiền công khai cần thiết. Không trả secrets, thông tin review riêng hoặc quyền Admin. Web tĩnh lấy ảnh qua API, không hardcode file.
 - Nếu chưa đến checkpoint phù hợp, ghi nhận việc này trong handoff rồi tiếp tục các hạng mục Admin hiện tại; không tự đổi ưu tiên sang QR.
+
+
+## AUTHORITATIVE ADDENDUM — OWNER-CONTROLLED FULFILLMENT & PAYMENT RULES (2026-10-21)
+
+This section is Admin-only. Keep all Admin UI, API, schema/migration, payment settings, and product-management changes on `feature/admin-isolated-handoff-2026-10-20`. Do not modify static storefront files or implement the customer-facing checkout here. Coordinate only through the shared contract `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`.
+
+### Fulfillment type belongs to the owner/Admin
+- Add/maintain a clear product-management field for fulfillment type, persisted as `fulfillment_type` and exposed as `fulfillmentType`: `made_to_order`, `in_stock`, `unclassified`.
+- The owner sets each product's type in Admin. Example: footwear may be classified as made-to-order by the owner; individual items can be changed to in-stock when actually available. Do not hardcode all shoes or any category to one type. Do not infer from stock count, category, SKU, old labels, images, or legacy data.
+- Use a safe explicit default only for newly created products if the existing product-creation UX/owner-approved configuration defines it. Otherwise require an explicit choice or use `unclassified`. Historical/unknown products remain `unclassified` until a human classifies them; do not bulk-backfill guesses. The customer never selects or edits fulfillment type at checkout.
+- Preserve API compatibility, audit existing schema and migration state before changing anything, and snapshot the authoritative type onto order items when an order is created.
+
+### Business rules that Admin/backend must enforce
+- `made_to_order`: allow a 30% deposit based on the server-confirmed order value to begin production, OR full payment of 100%; full payment qualifies for freeship.
+- `in_stock`: allow a fixed 100,000 VND deposit, with dispatch only after the store verifies receipt and confirms the order, OR full payment of 100%; full payment qualifies for freeship.
+- Full-payment freeship applies to both types. Do not automatically extend the promise to deposit-only options. Represent the selected installment type and shipping benefit clearly in server-authoritative order/payment records or responses.
+- Never calculate authoritative amount from client-supplied prices. If price/type/order terms are unconfirmed, do not issue a payment-ready request or expose an amount/QR as payable; support pending consultation/confirmation instead.
+- Payment QR is uploaded/configured by an authorized Admin, validated, previewed, explicitly verified and activated. QR must not encode a fixed amount. Failed replacement must not destroy the active verified QR.
+- Payment is recorded only after an authorized person verifies the real bank transaction. QR scan, customer click/claim, or receipt upload is not payment verification. Maintain idempotency, ledger/balance, duplicate-reference protection and audit log.
+
+### Admin acceptance checks
+- Authorized owner can set/edit type per product; public API exposes the enum; unknown/historical rows remain unclassified without guesses.
+- Server validates the four payment options and exact deposit amounts/rules; full-payment freeship is true for both fulfillment types only.
+- Customer cannot set fulfillment type or amount through the storefront payload; server derives both from persisted product/order values and stores an order-item snapshot.
+- Test missing price/type, mixed-type carts, QR unavailable, duplicate transaction, under/overpayment, authorization, audit logging, and API secret safety.
+- Keep the static AI unblocked by documenting endpoint/request/response/error/authorization requirements in the shared contract. Do not commit static-site code here, merge PR #111, deploy Production, or run Production migrations.
