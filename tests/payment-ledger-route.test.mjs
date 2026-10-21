@@ -99,7 +99,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 201, "admin-confirmed real receipt should write the verified ledger");
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_transactions")));
   assert.ok(db.batches[0].some(s => s.sql.includes("UPDATE orders SET payment_status=CASE")));
-  assert.ok(db.batches[0].some(s => s.sql.includes("payment_received_verified")));
+  assert.ok(db.batches[0].some(s => s.values?.includes("payment_received_verified")), "audit action is passed as a bound value in the batched statement");
 }
 {
   const db = makeDb({ failUnique: true });
