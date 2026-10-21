@@ -644,3 +644,28 @@ Continue the SinDarealest2 static storefront from the latest GitHub state. Read 
 
 ### User action
 - No user action is required right now. Continue the read-only visual comparison and subsequent storefront fixes. Ask the user only if an actual permission/decision is needed.
+
+
+## Cập nhật bàn giao — 2026-10-22 (UTC)
+
+### Trạng thái mới nhất đã xác minh
+- Repo: `chichute5500/Sindarealest-admin`; nhánh làm việc: `fix/liquid-glass-audit-2026-10-19`.
+- HEAD đã kiểm tra trên GitHub: `b2cb59f02bb19783e1e395adefd9d9b0597ce52a`.
+- GitHub Actions workflow run `39640261310` hoàn tất `success`; job `119362894656` completed/success. Đây là lượt tạo artifact audit/screenshot, **không tự động chứng minh mọi tiêu chí giao diện đã PASS**.
+- Artifact mới nhất: `sindarealest-liquid-glass-preview-683`, artifact ID `12365600187` (khoảng 41.7 MB). Artifact cũ `sindarealest-liquid-glass-preview-681`, ID `12363464318`. Hãy kiểm tra artifact 683 trước khi dùng; không cần tải lại/đánh giá artifact 681 nếu 683 đã bao gồm bằng chứng mới.
+- PR #108 đang mở, chưa merge; head SHA khớp `b2cb59f02bb19783e1e395adefd9d9b0597ce52a`. Không merge, không tác động Production.
+- Có bằng chứng ảnh Preview đã được xuất ở các lượt gần nhất (mobile light/dark 390×844 và desktop dark 1440×900 trong artifact 681). Không xem việc có ảnh là bằng chứng giao diện khớp reference; phải mở ảnh thực tế và so sánh.
+- Preview alias được dùng trong chu kỳ này: `https://3ed49bcc.sindarealest2.pages.dev/`. Trước khi khẳng định deploy hiện tại khớp HEAD, xác minh metadata Cloudflare/Preview cho đúng SHA mới nhất; nếu không có bằng chứng, ghi BLOCKED/UNVERIFIED, không suy đoán.
+
+### Quy tắc chống lặp việc
+- Đọc file bàn giao mới nhất, HEAD, PR, workflow runs và artifact mới nhất trước khi làm.
+- Không chạy lại bài test đã ghi PASS nếu không có thay đổi liên quan hoặc nguy cơ regression cụ thể. Dùng ledger để chọn test còn thiếu.
+- Tách rõ: (1) GitHub Actions thành công, (2) Preview deployment exact-SHA verified, (3) test chức năng PASS, (4) visual comparison PASS. Không gộp thành một kết luận.
+- Artifact 681/683 là bằng chứng cần đọc; không coi việc workflow upload thành công là kết quả audit giao diện PASS.
+
+### Việc tiếp theo — làm ngay, không dừng chỉ để báo cáo
+1. Mở/kiểm tra artifact 683 và manifest/report; lập danh sách viewport/theme/route thật sự có bằng chứng, ghi rõ thiếu gì. Không lặp lại những ảnh/test đã có bằng chứng đủ.
+2. Xác minh Cloudflare Preview deployment có exact commit SHA `b2cb59f02bb19783e1e395adefd9d9b0597ce52a`; kiểm tra live Preview bằng ảnh thực tế trước khi chỉnh sửa tiếp.
+3. So sánh mobile light/dark và desktop light/dark với đúng hai reference gốc: `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` và `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`. Bổ sung viewport còn thiếu: 360×800, 390×844, 768×1024, 1440×900; không cần chụp lại trạng thái đã có bằng chứng hợp lệ trừ khi commit/deploy thay đổi.
+4. Tiếp tục sửa toàn bộ website công khai theo reference, không chỉ homepage: satin background, hero, “Phong cách đẳng cấp từ da cá sấu”, vùng 6 ô Liquid Glass, “Đặt hàng an tâm”, category/product grid/search, product detail/gallery, cart/account/checkout, Zalo CTA, footer, 404 và các trạng thái Light/Dark/System. Sửa từng nguyên nhân cụ thể, rồi chỉ chạy test bị ảnh hưởng và visual regression liên quan.
+5. Cập nhật ledger, manifest và handoff sau mỗi chu kỳ có thay đổi; báo cáo ngắn rồi tự tiếp tục công việc. Chỉ dừng khi thật sự cần thao tác/ý kiến của người dùng hoặc có blocker ngoài quyền xử lý.
