@@ -587,7 +587,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     screenshots.push({ file: filename, screen: name, ...variant, ...extra });
   };
 
-  const captureView = async (name, view, prepare, fullPageAtMobileLight = false) => {
+  const captureView = async (name, view, prepare, fullPageAtMobileLight = false, scrollSelector = null) => {
     await navigateTo(view);
     for (const variant of variants) {
       await page.setViewportSize(variant.viewport);
@@ -602,6 +602,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         document.querySelectorAll('.tablewrap').forEach(element => { element.scrollLeft = 0; });
         window.scrollTo(0, 0);
       });
+      if (scrollSelector) await page.locator(scrollSelector).scrollIntoViewIfNeeded();
       await saveScreenshot(name, variant);
       if (name === 'orders' && variant.viewport.width > 680) {
         const orderMetric = metrics[metrics.length - 1];
@@ -1310,7 +1311,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         'Backup/restore actions should remain visible without clipped text: ' + JSON.stringify(backupLayout)).toBe(true);
       expect(backupLayout.noteScrollWidth, 'Backup safety note should not overflow its own content box').toBeLessThanOrEqual(backupLayout.noteClientWidth + 1);
       expect(await section.locator('#restoreFile').isVisible(), 'The JSON file input must remain visually hidden behind its label').toBe(false);
-    });
+    }, false, '.backup-actions');
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
     });
