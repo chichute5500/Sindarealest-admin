@@ -2690,6 +2690,15 @@ html:not(.dark) .detail-main-image{
   mix-blend-mode:multiply!important;background:transparent!important;border-color:transparent!important;
 }
 html.dark .detail-main-image{mix-blend-mode:normal!important}
+
+/* sd-welcome-layering-fix-2026-10-22 */
+
+/* Welcome splash must be the topmost storefront layer; prevent mobile nav and drawers bleeding through it. */
+.welcome-splash{z-index:2147483000!important}
+body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+body:has(#welcomeSplash) #accountDrawer,
+body:has(#welcomeSplash) #cartDrawer,
+body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}
 </style>
 
 </body>
