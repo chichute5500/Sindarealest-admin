@@ -90,3 +90,10 @@ For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file 
 - Browser test [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) on exact source/test SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55` passed a synthetic/read-only Settings QR check. It verifies bank controls, accessible scan-verification checkbox, inactive-state deactivate disablement, and the unsaved bank details guard. No non-GET API call is allowed by the fixture router.
 - The first attempt failed only because the test reused a warning message between responsive variants. The test now navigates away and returns to Settings before each variant; retry passed without application source changes.
 - This adds partial evidence for QR settings UI and guard behavior only. Do not claim real QR upload, bank-account validation, payment ledger, authenticated backend, or cross-branch runtime acceptance from these fixture screenshots. Overall progress remains 48%; full 12-screen parity remains NOT ACCEPTED.
+
+
+## Order payment readiness and backup controls — 2026-10-21
+
+- Exact Playwright source/test SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff` passed in [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359); source CI [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) also passed.
+- Order fixture confirms payment request and receipt controls stay disabled while price/terms are unconfirmed. Backup/restore fixture checks the export button, JSON restore input and confirmation disclosure without invoking an operation. All API mutation requests are blocked by fixture route.
+- Artifact #192 ID `12360132558`: 63 source/fixture PNGs, 39 metrics, no errors or attempted writes. This is a targeted UI safety check; do not treat it as authenticated business-flow QA or visual acceptance of the whole 12-screen reference.
