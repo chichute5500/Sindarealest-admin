@@ -16,4 +16,37 @@ for (const id of ['home','order','featured','promise','collections','siteFooter'
 assert.match(setup, /const activate=key=>tabs\.forEach\(tab=>\{const active=tab\.dataset\.mobileTab===key/ , 'Active tabs must be updated via their actual semantic key.');
 assert.match(setup, /if\(tab\.dataset\.mobileTab==='cart'\).*openCart\(\)/, 'Cart tab must open the real cart drawer.');
 assert.match(setup, /else if\(tab\.dataset\.mobileTab==='account'\).*openAccount\(\)/, 'Account tab must open the real account drawer.');
-console.log('PASS: mobile nav active state follows home/catalog content; contact scrolling no longer impersonates the account route.');
+
+const modalHistoryStart = html.indexOf("const SD_MODAL_HISTORY_KEY='__sdStorefrontModal';");
+const modalHistoryEnd = html.indexOf('function openFullscreenImage(fromHistory=false)', modalHistoryStart);
+assert.ok(modalHistoryStart >= 0 && modalHistoryEnd > modalHistoryStart,
+  'Storefront modal history helpers must exist before the gallery opener.');
+const modalHistory = html.slice(modalHistoryStart, modalHistoryEnd);
+assert.match(modalHistory,
+  /function pushStorefrontModalHistory\(type\)[\s\S]*?history\.pushState\(\{\.\.\.current,\[SD_MODAL_HISTORY_KEY\]:type\},'',location\.href\)/,
+  'Opening a storefront modal must create a history entry without changing the URL.');
+assert.match(modalHistory, /function requestStorefrontModalClose\(type,fallback\)[\s\S]*?history\.back\(\)/,
+  'Closing a modal must consume its history entry when present.');
+assert.match(modalHistory,
+  /function activeStorefrontModal\(\)[\s\S]*?return 'gallery'[\s\S]*?return 'checkout'[\s\S]*?return 'cart'[\s\S]*?return 'account'/,
+  'History navigation must identify gallery, checkout, cart and account states.');
+for (const opener of [
+  /function openCart\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('cart'\)/,
+  /function openCheckout\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('checkout'\)/,
+  /function openAccount\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('account'\)/,
+  /function openFullscreenImage\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('gallery'\)/
+]) assert.match(html, opener, 'Each relevant modal opener must add a browser history state.');
+assert.match(html,
+  /window\.addEventListener\('popstate',event=>\{const currentModal=activeStorefrontModal\(\),targetModal=storefrontModalHistoryType\(event\.state\)/,
+  'Back/Forward navigation must resolve modal state before product routing.');
+for (const closeBinding of [
+  "$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart))",
+  "$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout))",
+  "$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount))",
+  "$('#sdFullscreenClose').addEventListener('click',()=>requestStorefrontModalClose('gallery',closeFullscreenImage))"
+]) assert.ok(html.includes(closeBinding), 'Modal close controls must use the history-aware close path.');
+assert.match(html,
+  /if\(e\.key==='Escape'\)\{e\.preventDefault\(\);e\.stopPropagation\(\);requestStorefrontModalClose\('gallery',closeFullscreenImage\)\}/,
+  'Escape must close fullscreen gallery through the history-aware path.');
+
+console.log('PASS: mobile navigation and browser Back/Forward dismiss account, cart, checkout and gallery states.');
