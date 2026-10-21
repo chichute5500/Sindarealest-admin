@@ -334,7 +334,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   ];
   const viewLabels = {
     dashboard: 'Thao tác nhanh',
-    products: 'Tìm sản phẩm',
+    products: 'Tìm tên, SKU hoặc danh mục',
     orders: 'Mã đơn / thời gian',
     customers: 'Số đơn',
     warranties: 'Mã bảo hành đã phát hành',
