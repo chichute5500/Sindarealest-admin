@@ -131,3 +131,29 @@ The project owner already has an image of the bank-account receiving QR. Treat i
 - Public API exposes only active customer-safe fields and the correct asset URL; no secrets/private fields leak.
 - Storefront renders the active image and handles missing/inactive/broken image gracefully.
 - Test that the QR does not encode a fixed amount, and that displayed order/installment amount comes from the confirmed server-side order state, not from the QR image or client-supplied amount.
+
+## Admin API contract — endpoint shapes and rollout state (2026-10-21)
+
+Implementation files are developed only on `feature/admin-isolated-handoff-2026-10-20`; the static-site branch has not been modified by this work.
+
+| Purpose | Method and path | Contract |
+|---|---|---|
+| Public QR configuration | `GET /api/payment-settings` | `{ configured, qrImageUrl, bankName, accountNumber, accountName, instructions }`. Returns `configured:false` and empty public values until a verified QR is active. |
+| Public QR image | `GET /payment-qr/:key` | Serves only the currently active key. Pending, inactive, replaced or unconfigured keys return 404. |
+| Upload bank QR | `POST /api/admin/payment-qr-upload` | Authenticated multipart `file`, PNG/JPEG/WebP, max 5 MiB with signature validation. Stores a pending object using the existing `IMAGES` binding, preserves original pixels and never activates automatically. |
+| Read/update QR configuration | `GET/PUT /api/admin/payment-qr` | `PUT` action `save-draft` with bank/account/instructions; `activate` with `verified:true`; or `deactivate`. Activation needs a pending object, valid account details and explicit human confirmation; changes are audited. |
+| Create order | `POST /api/orders` | Response adds one-time `orderAccessToken`; D1 stores only its SHA-256 in `orders.public_access_token_hash`. Treat the token as a bearer capability; do not log it. |
+| Read payment details | `GET /api/order-payment?orderNumber=…&token=…` | Token must hash-match the order. Amount is exposed only after server-side price and terms confirmation and when a pending payment request exists; otherwise returns `paymentReady:false`. Response disables referrer leakage and search indexing. |
+| Create/cancel installment | `POST/PATCH /api/admin/payment-requests` | POST `{ orderId, installmentType:'deposit'|'balance'|'full', amount }`; amount checked against server-side confirmed total and remaining balance. PATCH cancels only a pending request. Unique transfer reference and receiver/QR snapshot are stored. |
+| Read ledger/history | `GET /api/admin/payment-requests?orderId=…` | Returns payment requests, verified transactions, received/refunded sums, remaining balance and overpayment summary. |
+| Verify bank transaction | `POST /api/admin/payment-transactions` | Authenticated `{ orderId, paymentRequestId?, direction:'received'|'refunded', amount, transactionReference, note? }`. Duplicate bank references conflict; refunds cannot exceed previously verified net receipts. This is the only new API that derives `orders.payment_status` from ledger records. |
+| Product fulfillment | Admin product API uses `fulfillmentType`; DB column is `fulfillment_type`. Public catalog supports `GET /api/products?fulfillmentType=in_stock|made_to_order|unclassified`. New order items snapshot the type at checkout. |
+
+### Rollout state
+
+- Admin source/API/schema work: **IN PROGRESS**. This addendum is not proof that the separate static-site branch already consumes the endpoints.
+- Migration `0009_fulfillment_and_manual_payments.sql` is authored and tested only through CI's temporary local D1 workflow. It has not been run against D1 Production.
+- Historical products/order items default to `unclassified`. Type is never inferred from stock or legacy labels.
+- Uploading a QR only creates a pending asset. A human must scan and confirm the receiving account and ensure no fixed amount is embedded before activation.
+- An Admin source-CI PASS does not mean the configured live Preview or real D1/R2 has been verified. Track the Preview diagnostic independently.
+- Rollback: keep PR #111 open and do not merge/deploy. Any source rollback requires a reviewed forward commit; do not rewrite history. Never run this migration on Production as part of this task.
