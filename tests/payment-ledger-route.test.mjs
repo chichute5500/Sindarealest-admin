@@ -45,12 +45,13 @@ function makeDb(options = {}) {
             if (options.publicOrder && values[0] === options.publicOrder.order_number && values[1] === options.publicOrder.public_access_token_hash) return options.publicOrder;
             return null;
           }
-          if (sql.includes("SELECT id,installment_type,amount,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests")) return options.pendingRequest ?? null;
+          if (sql.includes("FROM order_payment_requests WHERE order_id=? AND status='pending'")) return options.pendingRequest ?? null;
           if (sql.includes("SELECT total FROM orders")) return { total: (options.order ?? baseOrder).total };
           return null;
         },
         async all() {
           calls.push({ sql, values });
+          if (sql.includes("FROM order_items WHERE order_id=?")) return { results: options.orderItems ?? [{ fulfillment_type: "made_to_order", quantity: 1, line_total: 100000 }] };
           if (sql.includes("FROM settings")) return { results: options.settings ?? [
             { key: "payment_qr_active", value: "1" },
             { key: "payment_qr_active_key", value: QR_KEY },
@@ -110,7 +111,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
 {
   const db = makeDb({ order: { ...baseOrder, payment_terms_confirmed_at: null } });
   const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
-    orderId: "order-1", installmentType: "deposit", amount: 30000
+    orderId: "order-1", paymentOption: "deposit"
   })));
   assert.equal(response.status, 409, "installment request must wait for confirmed order price and terms");
   assert.equal(db.batches.length, 0, "unconfirmed order cannot create a pending transfer request");
@@ -122,7 +123,9 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 201, "confirmed order can create deposit request with active QR config");
   const payload = await response.json();
-  assert.equal(payload.amount, 30000);
+  assert.equal(payload.amount, 30000, "made-to-order deposit is server-derived as 30% of the confirmed total");
+  assert.equal(payload.shippingBenefit, "standard_shipping");
+  assert.equal(payload.freeShipping, false);
   assert.match(payload.transferReference, /^SD[A-Z0-9]+$/);
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_requests")));
   assert.ok(db.batches[0].some(s => s.sql.includes("payment_request_created")));
@@ -145,7 +148,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const token = createOrderAccessToken();
   const tokenHash = await hashOrderAccessToken(token);
   const order = { ...baseOrder, order_number: "SD-TOKEN-2", public_access_token_hash: tokenHash, total: 100000, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
-  const pendingRequest = { id: "request-1", installment_type: "deposit", amount: 30000, transfer_reference: "SDREF123456", qr_image_key: QR_KEY, bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A", status: "pending", created_at: "2026-10-21T07:01:00Z" };
+  const pendingRequest = { id: "request-1", installment_type: "deposit", amount: 30000, shipping_benefit: "standard_shipping", transfer_reference: "SDREF123456", qr_image_key: QR_KEY, bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A", status: "pending", created_at: "2026-10-21T07:01:00Z" };
   const db = makeDb({ publicOrder: order, pendingRequest });
   const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-2&token=" + token), env: { DB: db } });
   const payload = await response.json();
