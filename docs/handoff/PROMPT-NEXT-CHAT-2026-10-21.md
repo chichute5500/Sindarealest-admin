@@ -279,3 +279,13 @@ This section exists so work survives long conversations and context/memory limit
 
 ## Handoff pointer update — 2026-10-21
 Use the dedicated copy-ready continuation prompt at `docs/prompts/NEXT-CHAT-PROMPT-2026-10-21-STATIC-WEB.md`. Continue only the static storefront work. The user explicitly asked to set aside the prior image/folder topic; it is not part of this handoff and must not be investigated or treated as a blocker.
+
+
+## Latest verified visual cycle — 2026-10-21 (hero mask v2, workflow 39592175072)
+
+- Exact tested/deployed SHA: c32874137c6657bbe78a5259a441bffe8f50c43a. Source validation [39592174938](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592174938), Preview deploy [39592175082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592175082), and guarded live audit [39592175072](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592175072) all PASS.
+- Cloudflare verified exact Preview deployment edb66da0-a965-41bc-a28d-6614a9ca49ea, environment preview, branch fix/liquid-glass-audit-2026-10-19, exact source SHA c32874137c6657bbe78a5259a441bffe8f50c43a. Artifact sindarealest-liquid-glass-preview-612, ID 12341743493, contains 84 live screenshots.
+- Live functional/capture checks: 8/8 viewport-theme pairs, 12 product direct-open/reload/navigation checks, all required section and commerce-state captures, zero horizontal overflow, zero page/console/HTTP/request errors, zero read-only violations and zero hard failures.
+- Manual inspection of the v2 hero screenshots shows the backdrop still reads as a rectangle. The unmasked .hero-visual::before light-glass sheen was identified as a second layer covering the photo rectangle; CSS v3 removes that sheen and centers the mask. The owner-supplied image itself remains unchanged.
+- Pixel comparison remains COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW: 66 baseline PNGs, 84 result PNGs, 36 comparable changed pairs, 30 dimension mismatches and 18 result-only filenames. Manifest remains AWAITING_HUMAN_VISUAL_REVIEW; no manual archive/manifest edit is permitted.
+- CSS v3 is now committed separately and must be validated/deployed/captured on its own exact SHA before assessing whether the photo rectangle is gone. Do not say visual parity is complete. Continue the broader satin, six-tile, order-assurance, product, gallery/detail, cart/account/checkout, Zalo/footer, mobile Back, direct-route/invalid-route audit after reviewing the v3 result.
