@@ -169,7 +169,7 @@ for (const [name, svg] of [
   ['light desktop', lightWaveArtwork], ['dark desktop', darkWaveArtwork],
   ['light mobile', lightMobileWaveArtwork], ['dark mobile', darkMobileWaveArtwork]
 ]) {
-  assert.match(svg, /data-satin-style="fine-satin-drape-v7"/,
+  assert.match(svg, /data-satin-style="fine-satin-drape-v8"/,
     name + ' must use the organic satin composition rather than the legacy parallel ribbons.');
   assert.ok((svg.match(/data-fold-layer="body"/g) || []).length >= 6,
     name + ' must keep multiple independent folded fabric ridges.');
