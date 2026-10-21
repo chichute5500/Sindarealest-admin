@@ -851,6 +851,7 @@ function renderFullscreenThumbs(){
  const active=tray.querySelector('.active');if(active)active.scrollIntoView({block:'nearest',inline:'center'});
 }
 const SD_MODAL_HISTORY_KEY='__sdStorefrontModal';
+let restoringStorefrontModalHistory=false;
 function storefrontModalHistoryType(state=history.state){
  const type=state&&typeof state==='object'?state[SD_MODAL_HISTORY_KEY]:null;
  return ['cart','checkout','account','gallery'].includes(type)?type:null;
@@ -874,19 +875,22 @@ function closeStorefrontModal(type){
  else if(type==='account')closeAccount(false);
 }
 function openStorefrontModal(type){
- if(type==='gallery')openFullscreenImage(true);
- else if(type==='checkout')openCheckout(true);
- else if(type==='cart')openCart(true);
- else if(type==='account')openAccount(true);
+ restoringStorefrontModalHistory=true;
+ try{
+  if(type==='gallery')openFullscreenImage();
+  else if(type==='checkout')openCheckout();
+  else if(type==='cart')openCart();
+  else if(type==='account')openAccount();
+ }finally{restoringStorefrontModalHistory=false}
 }
 function requestStorefrontModalClose(type,fallback){
  if(storefrontModalHistoryType()===type){history.back();return}
  if(typeof fallback==='function'){fallback();return}
  closeStorefrontModal(type);
 }
-function openFullscreenImage(fromHistory=false){
+function openFullscreenImage(){
  if(!currentProduct||!detailImages.length||!$('#productOverlay').classList.contains('open'))return;
- if(fromHistory!==true)pushStorefrontModalHistory('gallery');
+ if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('gallery');
  clearTimeout(detailTimer);
  const viewer=$('#sdFullscreenViewer');
  $('#sdFullscreenTitle').textContent=(currentProduct.title||'Sản phẩm SinDarealest')+(visibleSku(currentProduct)?' · SKU '+visibleSku(currentProduct):'');
@@ -1023,13 +1027,13 @@ function renderCart(){
   return `<div class="cart-row"><img src="${escapeHtml(allImages(p)[0])}" alt="${escapeHtml(p.title)}"><div class="cart-row-copy"><strong>${escapeHtml(p.title)}</strong><small>Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}</small><small class="cart-row-price">${priceText}</small><div class="qty-controls"><button class="tap-target" data-qty="-1" data-id="${escapeHtml(id)}" aria-label="Giảm số lượng">−</button><span>${q}</span><button class="tap-target" data-qty="1" data-id="${escapeHtml(id)}" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item tap-target" data-remove="${escapeHtml(id)}" aria-label="Xóa sản phẩm">×</button></div>`;
  }).join('');
 }
-function openCart(fromHistory=false){dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(fromHistory!==true)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart()}
+function openCart(){dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart()}
 function closeCart(){const panel=$('#cartDrawer');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow=''}
-function openCheckout(fromHistory=false){
+function openCheckout(){
  dismissToast();
  renderCart();
  if(!Object.values(cart).some(q=>Number(q)>0)){showToast('Hãy thêm sản phẩm vào giỏ trước khi đặt hàng.');return}
- if(fromHistory!==true)pushStorefrontModalHistory('checkout');
+ if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('checkout');
  checkoutReturnFocus=document.activeElement;
  closeCart();$('#cartDrawer').setAttribute('inert','');
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
@@ -1056,9 +1060,9 @@ function closeCheckout(restoreFocus=true){
   },0);
  }
 }
-function openAccount(fromHistory=false){dismissToast();accountReturnFocus=document.activeElement;
+function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
  closeCheckout(false);closeCart();closeDetail(false,false);
- if(fromHistory!==true)pushStorefrontModalHistory('account');
+ if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('account');
  const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
  const close=$('#accountClose');
  const focusClose=()=>{if(!close||!panel.classList.contains('open')||panel.hasAttribute('inert'))return;close.focus({preventScroll:true})};

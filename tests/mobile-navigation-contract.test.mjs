@@ -18,7 +18,7 @@ assert.match(setup, /if\(tab\.dataset\.mobileTab==='cart'\).*openCart\(\)/, 'Car
 assert.match(setup, /else if\(tab\.dataset\.mobileTab==='account'\).*openAccount\(\)/, 'Account tab must open the real account drawer.');
 
 const modalHistoryStart = html.indexOf("const SD_MODAL_HISTORY_KEY='__sdStorefrontModal';");
-const modalHistoryEnd = html.indexOf('function openFullscreenImage(fromHistory=false)', modalHistoryStart);
+const modalHistoryEnd = html.indexOf('function openFullscreenImage()', modalHistoryStart);
 assert.ok(modalHistoryStart >= 0 && modalHistoryEnd > modalHistoryStart,
   'Storefront modal history helpers must exist before the gallery opener.');
 const modalHistory = html.slice(modalHistoryStart, modalHistoryEnd);
@@ -31,10 +31,10 @@ assert.match(modalHistory,
   /function activeStorefrontModal\(\)[\s\S]*?return 'gallery'[\s\S]*?return 'checkout'[\s\S]*?return 'cart'[\s\S]*?return 'account'/,
   'History navigation must identify gallery, checkout, cart and account states.');
 for (const opener of [
-  /function openCart\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('cart'\)/,
-  /function openCheckout\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('checkout'\)/,
-  /function openAccount\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('account'\)/,
-  /function openFullscreenImage\(fromHistory=false\)[\s\S]*?pushStorefrontModalHistory\('gallery'\)/
+  /function openCart\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('cart'\)/,
+  /function openCheckout\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('checkout'\)/,
+  /function openAccount\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('account'\)/,
+  /function openFullscreenImage\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('gallery'\)/
 ]) assert.match(html, opener, 'Each relevant modal opener must add a browser history state.');
 assert.match(html,
   /window\.addEventListener\('popstate',event=>\{const currentModal=activeStorefrontModal\(\),targetModal=storefrontModalHistoryType\(event\.state\)/,
