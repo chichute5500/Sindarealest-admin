@@ -152,3 +152,8 @@ Read the integration contract and current HEAD before code edits. Observed HEAD:
 ## Next action
 Continue from the live `LATEST-STATUS.md` and `latest-test-results.json`. Re-fetch HEAD/PR/Actions before modifying code. Do not treat the current Preview as passing. Work only on the Admin branch and do not merge or deploy Production.
 
+
+
+## Latest owner Preview check — 2026-10-21 15:39 +07:00
+
+Owner confirmed login, opening product list/detail, and opening image-selection UI on Preview. These are basic UI observations only; save/upload and full backend flows are not confirmed. Latest source CI run #39569134111 and Preview diagnostic run #39569133914 failed at automated tests on source `3ed2d86b8b97f04718c478979136f986b3d1b07b`; the diagnostic skipped browser and deployed Preview checks. Read the newest section in `LATEST-STATUS.md` and JSON before continuing. Inspect detailed failure output; do not guess root cause. Keep both PRs open and do not deploy Production or mutate Cloudflare/D1/R2.
