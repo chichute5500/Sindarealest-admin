@@ -8,7 +8,7 @@
   "capturedAt": "2026-10-21T14:56:54.000Z",
   "progressEstimatePercent": 48,
   "progressBasis": "48% management estimate only. Exact source/test tree 78a16b6d9fca91d7b080834f293e1690dc7c10cd passed source validation job and Admin Preview diagnostic #169. Run #169's check run is completed success; project integrity/npm test and local responsive/theme Playwright screenshot matrix pass, configured Preview diagnostic pass. New gallery UI source commit a80fa64b63f0b12ec055440a1a7e526b9299771b has horizontal mobile thumbnail rail; actual run artifact confirms no horizontal page overflow for light/dark 390x844 and desktop 1280x800, 6 synthetic fixture images, no browser/console/network errors or attempted writes. 12-screen parity remains not accepted; authenticated business-flow/backend QA not tested due Access. Image-save and PRE/PRO migration remain deferred by owner.",
-  "note": "Latest exact tested tree 78a16b6d9fca91d7b080834f293e1690dc7c10cd: Validate Source job [#3933](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756) completed success and Admin Preview diagnostic [#169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853) completed success. The validation workflow parent API was still lagging as in_progress when checked, but both the validate job and GitHub commit check-run were completed success. npm run check, npm test, responsive/theme Playwright screenshot matrix, and configured Preview diagnostic pass. Artifact admin-preview-evidence-169 (ID 12355051140), 11,121,594 bytes, expires 2026-11-04. It contains 59 source/fixture PNGs (16 login shell, 43 synthetic/read-only module screens) and 36 fixture metrics. Reviewed product-gallery light/dark images and 1280x800 light: featured cover, horizontal thumbnail rail with accessible move/delete controls, no document horizontal overflow, footer geometry accepted, no page/console/failed-request/http errors and no attempted writes. All gallery images are synthetic; not live image/storage evidence. Current branch HEAD before this docs refresh was 314974ce3b6af381934074fe4d9f40add5b0288b, after docs-only commits. Progress 48%; all-12-screen visual parity NOT ACCEPTED; authenticated backend QA BLOCKED_BY_ACCESS/NOT_TESTED. Product image-save and PRE/PRO migration remain DEFERRED_BY_OWNER. PR #111 OPEN/UNMERGED, mixed scope, 1,114 changed paths; PR #108 OPEN/UNMERGED, 269 paths. No merge/Production deployment/remote D1/R2/secret or Access changes/setup or migration execution/TinyFish.",
+  "note": "Latest exact tested tree 78a16b6d9fca91d7b080834f293e1690dc7c10cd: Validate Source job [#3933](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756) completed success and Admin Preview diagnostic [#169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853) completed success. The validation workflow parent API was still lagging as in_progress when checked, but both the validate job and GitHub commit check-run were completed success. npm run check, npm test, responsive/theme Playwright screenshot matrix, and configured Preview diagnostic pass. Artifact admin-preview-evidence-169 (ID 12355051140), 11,121,594 bytes, expires 2026-11-04. It contains 59 source/fixture PNGs (16 login shell, 43 synthetic/read-only module screens) and 36 fixture metrics. Reviewed product-gallery light/dark images and 1280x800 light: featured cover, horizontal thumbnail rail with accessible move/delete controls, no document horizontal overflow, footer geometry accepted, no page/console/failed-request/http errors and no attempted writes. All gallery images are synthetic; not live image/storage evidence. Current branch HEAD before this docs refresh was 314974ce3b6af381934074fe4d9f40add5b0288b, after docs-only commits. Progress 48%; all-12-screen visual parity NOT ACCEPTED; authenticated backend QA BLOCKED_BY_ACCESS/NOT_TESTED. Product image-save and PRE/PRO migration remain DEFERRED_BY_OWNER. PR #111 OPEN/UNMERGED, mixed scope, 1,114 changed paths; PR #108 OPEN/UNMERGED, 269 paths. No merge/Production deployment/remote D1/R2/secret or Access changes/setup or migration execution/TinyFish. Artifact #169 was downloaded and visually inspected alongside the embedded reference PNG. Initial gaps: reference dashboard includes a revenue trend chart, while current fixture screenshot has no chart; do not fabricate trend data. Product-gallery fixture uses placeholder imagery and does not prove the dedicated real image-management screen. Full 12-screen visual parity remains NOT ACCEPTED.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -2358,5 +2358,32 @@
     "visualParity12ScreenFamilies": "NOT_ACCEPTED",
     "result": "PASS_FOR_SOURCE_AND_PREVIEW_DIAGNOSTICS_ONLY",
     "progressRemainsPercent": 48
+  },
+  "visualEvidenceSpotCheck": {
+    "artifact": "admin-preview-evidence-169",
+    "artifactId": 12355051140,
+    "artifactBytes": 11121594,
+    "imageCount": 59,
+    "evidenceType": "SOURCE_AND_SYNTHETIC_READ_ONLY_FIXTURE_SCREENSHOTS",
+    "referenceComparison": "INITIAL_SPOT_CHECK_ONLY_NOT_FULL_12_SCREEN_ACCEPTANCE",
+    "findings": [
+      {
+        "screenFamily": "dashboard",
+        "reference": "Screen 2 shows four metric cards and a revenue trend chart",
+        "currentScreenshot": "dashboard__390x844__light.png",
+        "observedGap": "Four metrics, quick actions and activity are present; revenue chart absent.",
+        "sourceConstraint": "Source comment says dashboard intentionally avoids fabricated trend data.",
+        "nextStep": "Inspect for a legitimate historical revenue source/API; if absent, preserve truthful data behavior and use a clear empty state rather than inventing chart values."
+      },
+      {
+        "screenFamily": "product image management",
+        "reference": "Screen 5 is a dedicated image-management screen with a prominent product image and thumbnail rail",
+        "currentScreenshot": "product-gallery__390x844__light.png",
+        "observedGap": "Screenshot is a product-editor fixture with placeholder imagery; does not establish real gallery behavior or visual parity.",
+        "nextStep": "Review the actual authenticated image-management route with authorized test access and real approved test images; do not substitute fixture screenshots for acceptance."
+      }
+    ],
+    "full12ScreenParity": "NOT_ACCEPTED",
+    "authenticatedBusinessQA": "BLOCKED_BY_CLOUDFLARE_ACCESS_NOT_TESTED"
   }
 }
