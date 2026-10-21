@@ -653,6 +653,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#backdrop')).toBeHidden();
       await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'true');
       await expect(page.locator('[data-action="edit"]:visible').first()).toBeFocused();
+
+      if (variant.theme === 'light') {
+        await openEditor(variant);
+        await page.keyboard.press('Escape');
+        await expect(page.locator('#backdrop')).toBeHidden();
+        await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'true');
+        await expect(page.locator('[data-action="edit"]:visible').first()).toBeFocused();
+      }
     }
 
     await captureView('orders', 'orders', null, true);
@@ -677,6 +685,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       expect(orderDialogFocus.count, 'Order dialog should contain keyboard-focusable controls').toBeGreaterThan(0);
       expect(orderDialogFocus.activeIndex, 'Shift+Tab from first control should wrap to last').toBe(orderDialogFocus.count - 1);
       await page.keyboard.press('Tab');
+      await expect(page.locator('#orderDetailClose')).toBeFocused();
+
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#orderDetailBackdrop')).toBeHidden();
+      await expect(page.locator('#orderDetailBackdrop')).toHaveAttribute('aria-hidden', 'true');
+      await expect(page.locator('[data-action="view-order-details"]:visible').first()).toBeFocused();
+      await page.locator('[data-action="view-order-details"]:visible').first().click();
+      await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
       await expect(page.locator('#orderDetailClose')).toBeFocused();
     }, true);
     await captureView('customers', 'customers', null, true);
