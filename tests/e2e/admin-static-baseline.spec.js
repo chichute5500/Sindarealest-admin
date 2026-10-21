@@ -1305,7 +1305,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           noteClientWidth: note.clientWidth
         };
       });
-      expect(backupLayout.panelRight, 'Backup panel should not extend beyond the viewport').toBeLessThanOrEqual(variant.viewport.width + 1);
+      expect(backupLayout.panelRight, 'Backup panel should not extend beyond the viewport').toBeLessThanOrEqual((page.viewportSize()?.width ?? 390) + 1);
       expect(backupLayout.controls.every(control => control.width > 0 && control.scrollWidth <= control.clientWidth + 1),
         'Backup/restore actions should remain visible without clipped text: ' + JSON.stringify(backupLayout)).toBe(true);
       expect(backupLayout.noteScrollWidth, 'Backup safety note should not overflow its own content box').toBeLessThanOrEqual(backupLayout.noteClientWidth + 1);
