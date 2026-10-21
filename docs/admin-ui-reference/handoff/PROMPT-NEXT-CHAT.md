@@ -40,3 +40,33 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - Không tuyên bố hoàn tất 100% cho đến khi từng tiêu chí nghiệm thu có bằng chứng phù hợp.
 
 **Bắt đầu ngay bằng việc xác minh GitHub và đọc các file bàn giao trên; sau đó thực hiện bước tiếp theo an toàn có thể làm, cập nhật file và tiếp tục.**
+
+
+## Continuation update — 2026-10-21
+
+**Verified branch:** `feature/admin-isolated-handoff-2026-10-20` only. **Current reported progress: 43%.** PR #111 remains OPEN/unmerged. Never merge PR #111/#108 or deploy Production.
+
+### Latest verified run
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39495162150
+- Tested source commit: `d74de3c6adbb6be6b0a59ac4d45e869738a016e4`.
+- `npm run check`: PASS; `npm test`: PASS; local screenshot/source matrix: PASS.
+- Workflow overall: FAILURE only at `Diagnose configured deployed Preview`; Preview CSS/UI signature does not match the source tested. Artifact `admin-preview-evidence-61`, ID `12296849221`.
+- The 58-PNG source screenshot set, 16 login-shell images and 42 fixture module images are different evidence sets; 42 fixture images plus 36 metrics are read-only fixture evidence, not real authenticated backend testing.
+- A verified source fix changed the malformed shell tail from `</nav>/div>` to `</nav></div>`. Inspect current screenshot evidence before claiming the deployed site is fixed.
+- Updated `LATEST-STATUS.md` and `latest-test-results.json` to the latest run. Latest test status is `SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL`.
+
+### Continue immediately
+1. Re-read this prompt, `MASTER-PROMPT-AUTO-HANDOFF.md`, `START-HERE.md`, `LATEST-STATUS.md`, `latest-test-results.json`, and `PROMPT-COMPLETENESS-AUDIT.md`; do not assume old SHA/status is current.
+2. Verify current PR #111 head SHA and workflow run. Check whether the branch has moved after the evidence updates.
+3. Download/inspect artifact `admin-preview-evidence-61` and its screenshots/metadata; compare against the approved reference screens. Do not report visual parity without a screen-by-screen comparison.
+4. Continue safe source and test improvements. Investigate why `ADMIN_TEST_URL` reaches a UI/CSS signature that differs from tested source, but do not expose, edit, or replace secrets and do not bypass Cloudflare Access. Record BLOCKED if owner action is needed.
+5. Audit PR #111's full changed-file scope. Its last reported diff was very broad (909 files against `main`); do not merge until ADMIN isolation is proven and the scope is safe.
+6. Only run authenticated read-only module tests when a legitimate authorized Preview/login path and safe test data/PII masking are available. Fixture screenshots never count as authenticated business-flow PASS.
+7. After each meaningful verified cycle, update `LATEST-STATUS.md`, `latest-test-results.json`, and this prompt, then read them back from GitHub to verify saved content.
+
+### Immutable safety constraints
+- Work only on `feature/admin-isolated-handoff-2026-10-20`.
+- Never modify `fix/liquid-glass-audit-2026-10-19` or `main`; no merge/cherry-pick/force-push/synchronization.
+- Keep PR #111 (ADMIN) and #108 (static website) unmerged.
+- No Production deployment; no secrets, real data, D1/R2, schema, or out-of-scope backend changes.
+- Report the percentage honestly. 43% remains appropriate until Preview, authenticated modules, all 12 reference comparisons, and full PR diff audit have evidence.
