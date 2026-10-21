@@ -3,9 +3,9 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "6fda1ef452ec9b7d490ba1fca4289053c5ee38d5",
-  "testedCommitSha": "6fda1ef452ec9b7d490ba1fca4289053c5ee38d5",
-  "capturedAt": "2026-10-21T05:29:49.085Z",
+  "latestCodeCommitSha": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
+  "testedCommitSha": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
+  "capturedAt": "2026-10-21T05:36:01.307Z",
   "progressEstimatePercent": 45,
   "progressBasis": "Stage estimate: current-source npm checks/tests and local responsive/theme/fixture Playwright evidence pass, and CSS diagnostics now isolate the deployed Preview mismatch. Still blocked on an authorized Preview built from current ADMIN source, authenticated real backend QA, full 12-screen comparison, broad PR #111 scope/migration review.",
   "note": "Validated source commit 6935eefa3473f1c6a15da08a34389d7223cbd0ea: source CI run 39548605358 SUCCESS. Playwright diagnostic run 39548605474 failed only at the configured deployed Preview assertion after local screenshot/fixture suites passed. Runtime CSS signature: browserSupportsHideSelector=true, hideSelectorMatchesBrand=true, topbarBrandDisplay=flex, hasLoginHideRule=false, ruleCount=226. Preview response is missing the expected login-shell CSS rule. GitHub masks ADMIN_TEST_URL, so the exact target remains unidentifiable from logs.",
@@ -728,14 +728,14 @@
     "Reference parity and migration compatibility remain open."
   ],
   "nextActions": [
-    "Review the latest real screenshots and metadata under the recorded history path.",
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
     "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
     "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
     "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
     "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39549636754",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214050",
   "branchHeadSha": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
   "latestVerifiedAt": "2026-10-21T05:21:30Z",
   "latestVerifiedSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
@@ -896,9 +896,9 @@
     "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED"
   },
   "latestLocalEvidence": {
-    "runId": 39549636754,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39549636754",
-    "sourceCommit": "6fda1ef452ec9b7d490ba1fca4289053c5ee38d5",
+    "runId": 39550214050,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214050",
+    "sourceCommit": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -906,6 +906,7 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 42,
     "uiFixtureMetricCount": 36,
+    "screenshotArtifact": "admin-preview-evidence-68",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
@@ -1201,5 +1202,17 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "eff59ab78cfe11b091dfb64df3cc281a3572b343"
+  "currentAdminBranchHeadBeforeHandoffUpdate": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
+  "latestScreenshotArtifact": {
+    "runId": 39550214050,
+    "name": "admin-preview-evidence-68",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214050",
+    "sourceCommit": "8fd8aa96a9f80ae7a18fd598b44cc459dd303bca",
+    "screenshotCount": 58,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 42,
+    "uiFixtureMetricCount": 36,
+    "retentionDays": 14,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+  }
 }
