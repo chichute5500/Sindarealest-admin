@@ -376,3 +376,8 @@ This was a read-only source review of the existing payment contract and route co
 - **Last known passing source/test SHA:** `06d689b6a97fa7bdb05258acb8435a6954d67309`, source run [#39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256). Last known passing handoff validation SHA: `c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf`, run [#39625390469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39625390469). Subsequent docs commits moved HEAD; verify latest live SHA and its CI before claiming current HEAD is green.
 - **Next priority:** execute the 12-screen Admin reference comparison with explicit PASS/FAIL/BLOCKED/NOT TESTED and screenshot evidence; no additional revenue panel. Authenticated real-backend QA is not yet proven. Product image-save and PRE/PRO migration remain deferred by owner.
 - **Safety:** work only on `feature/admin-isolated-handoff-2026-10-20`; do not merge PR #111/#108 or deploy Production; no Access/secrets changes, D1/R2 operations, SQL/migration execution, or TinyFish.
+
+
+## New audit matrix pointer — 2026-10-21
+
+Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENCE-AUDIT.md`. It records PASS/PARTIAL/BLOCKED/NOT TESTED states and keeps overall progress at 48%. The reduced-motion Playwright test is not considered browser-verified until an exact-SHA Actions run executes that E2E suite. Latest handoff updates: matrix `04ec0f59305ceed927348fdf39cc220fd9ad6082`, status `26a1294f98d7ea0273bdca599f2f6a42f5951a6f`, prompt `2b59df3bf886c66b06a90966e8c942e9b6f25676`. Re-fetch live refs and exact-SHA Actions before claiming current code is green.
