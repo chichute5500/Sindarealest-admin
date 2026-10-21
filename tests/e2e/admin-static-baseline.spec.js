@@ -696,6 +696,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     // Product list search includes category labels and announces result counts.
     const productNames = page.locator('#main .product-table .prodname');
     await expect(productNames).toHaveCount(3);
+    const fulfillmentChips = page.locator('#main .product-table .product-fulfillment-chip');
+    await expect(fulfillmentChips).toHaveCount(3);
+    await expect(page.locator('[data-fulfillment-type="unclassified"]')).toHaveText('Chưa phân loại');
+    await expect(page.locator('[data-fulfillment-type="in_stock"]')).toHaveText('Hàng có sẵn');
+    await expect(page.locator('[data-fulfillment-type="made_to_order"]')).toHaveText('Hàng đặt riêng');
     await expect(page.locator('#productResultSummary')).toContainText('Có 3 sản phẩm phù hợp');
     await expect(page.locator('#productPublishFilters')).toHaveAttribute('aria-label', 'Lọc trạng thái hiển thị');
     await expect(page.locator('[data-published-filter="all"]')).toContainText('Tất cả (3)');
