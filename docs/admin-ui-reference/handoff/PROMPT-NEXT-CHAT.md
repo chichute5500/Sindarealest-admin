@@ -625,3 +625,13 @@ Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run
 - QR/payment route source was inspected read-only; contract/unit/mocked-D1 tests PASS on the tested tree. That is not live backend proof. The known public static consumer gap for `freeShippingEligible` / `freeShipping` stays assigned to the static website branch and must not be patched here.
 - Overall progress stays **48%**. Authenticated backend QA: **NOT TESTED**. Product image upload/save and PRE/PRO migration: **DEFERRED_BY_OWNER / NOT VERIFIED**.
 - Only work on `feature/admin-isolated-handoff-2026-10-20`; no main/static-website edits, merge, cherry-pick, force-push, Production deployment, secrets/Cloudflare Access changes/bypass, remote D1/R2, setup/migration script execution, or TinyFish.
+
+
+## Latest continuation checkpoint — 2026-10-21 15:00 UTC
+
+- Live PR metadata verified: PR #111 OPEN/unmerged, HEAD `78a16b6d9fca91d7b080834f293e1690dc7c10cd`; PR #108 OPEN/unmerged, HEAD `ad5b0e7538a639780adeeac7020a818170aa0caa`. No merge or deploy.
+- HEAD #111 commit changes only `tests/e2e/admin-static-baseline.spec.js`, raising footer alignment tolerance from 1px to 2px. No workflow run was returned for this SHA and combined status list was empty. Treat latest HEAD as **NOT TESTED**.
+- Latest previously verified full pass remains Validate Source #3905 and Admin Preview #162 on `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; those PASS results do not transfer to HEAD 78a16b6.
+- Handoff files were updated in commits `9af0da32cf953e71add8a8786c383199ac95d716` (LATEST-STATUS) and `8665b530ceb844b0e3c069acb1f7f186a2545849` (JSON). Re-read from branch to verify before claiming saved.
+- Progress remains **48%**. Next actions: validate current HEAD via available GitHub Actions path; scrutinize whether the 2px tolerance is evidence-based; inspect the source/reference mismatch and compare the 12 reference screen families; continue semantic/security audit of PR #111 mixed scope. If Actions cannot be dispatched from available integration, do not claim a run; make further safe read-only source/test improvements and keep evidence accurate.
+- Safety constraints unchanged: only `feature/admin-isolated-handoff-2026-10-20`; no `main`/static branch edits, no merge/cherry-pick/force-push, no Production deployment, no secrets/Access changes or bypass, no remote D1/R2 or migrations/setup, no TinyFish.
