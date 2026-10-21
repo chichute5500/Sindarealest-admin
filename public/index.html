@@ -678,6 +678,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 </footer>
 
 <div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><button class="close-btn tap-target" id="detailClose" aria-label="Đóng">×</button><div class="detail-layout"><div class="detail-gallery"><div class="detail-image-stage" id="detailImageStage"><img class="detail-main-image" id="detailMainImage" alt="" decoding="async"><button type="button" class="detail-favorite-btn tap-target" id="detailFavorite" aria-pressed="false" aria-label="Thêm sản phẩm vào yêu thích" title="Thêm sản phẩm vào yêu thích"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 11.1-8.8 11.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-zoom-btn tap-target" id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình" title="Xem toàn ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4H4v4M4 4l6 6M16 4h4v4m0-4-6 6M8 20H4v-4m0 4 6-6m10 6h-4m4 0v-4m0 4-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-prev tap-target" id="detailPrev" aria-label="Ảnh sản phẩm trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-next tap-target" id="detailNext" aria-label="Ảnh sản phẩm tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="detail-image-count" id="detailImageCount" aria-live="polite">01 / 01</span></div><div class="detail-thumbs" id="detailThumbs" aria-label="Các ảnh sản phẩm"></div></div><div class="detail-copy"><div class="eyebrow" id="detailCategory">Selected piece</div><div class="fulfillment-detail" id="detailFulfillment"></div><div class="product-sku" id="detailSku"></div><h2 id="detailTitle"></h2><div class="detail-price" id="detailPrice" hidden></div><p class="detail-desc" id="detailDescription"></p><div class="promise-tags"><div class="promise-tag"><i>✦</i>Da cá sấu tuyển chọn</div><div class="promise-tag"><i>◇</i>Hoàn thiện tỉ mỉ</div><div class="promise-tag"><i>✓</i>Hỗ trợ tận tâm</div><div class="promise-tag"><i>↗</i>Tư vấn trực tiếp</div></div><div class="detail-actions"><button class="pill-btn primary tap-target" id="detailAdd">Thêm vào giỏ chọn</button><button class="pill-btn tap-target" id="detailZalo">Tư vấn / Đặt hàng qua Zalo ↗</button></div><a href="#order" class="detail-order-link" id="detailOrderLink">Xem quy trình đặt hàng & thời gian dự kiến →</a></div></div></div></div>
+<svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden"><defs><filter id="sdGalleryWhiteBackgroundKey" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -.333 -.333 -.333 0 1" result="background-key-alpha"/><feComponentTransfer in="background-key-alpha"><feFuncA type="gamma" amplitude="1.25" exponent=".78" offset="-.015"/></feComponentTransfer></filter></defs></svg>
 <div class="sd-fullscreen-viewer" id="sdFullscreenViewer" role="dialog" aria-modal="true" aria-label="Xem toàn ảnh sản phẩm" aria-hidden="true" tabindex="-1" inert>
   <div class="sd-fullscreen-header" aria-hidden="true">
     <span class="sd-fullscreen-brand-mark"><img src="images/brand-emblem.png" alt=""></span>
@@ -815,6 +816,38 @@ function sizeFullscreenFrame(imageOverride){
  frame.style.width=Math.max(1,Math.round(nw*scale))+'px';
  frame.style.height=Math.max(1,Math.round(nh*scale))+'px';
 }
+const fullscreenWhiteBackgroundCache=new Map();
+function syncFullscreenBackgroundKey(img){
+ if(!img||!img.complete||!img.naturalWidth){if(img)img.classList.remove('sd-white-background-keyed');return false}
+ const src=img.currentSrc||img.src||'';
+ if(!src){img.classList.remove('sd-white-background-keyed');return false}
+ if(fullscreenWhiteBackgroundCache.has(src)){
+  const keyed=fullscreenWhiteBackgroundCache.get(src);
+  img.classList.toggle('sd-white-background-keyed',keyed);
+  return keyed;
+ }
+ let keyed=false;
+ try{
+  const canvas=document.createElement('canvas');canvas.width=24;canvas.height=24;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  if(!ctx)throw new Error('canvas unavailable');
+  ctx.drawImage(img,0,0,24,24);
+  const pixels=ctx.getImageData(0,0,24,24).data;
+  const points=[[1,1],[22,1],[1,22],[22,22],[12,1],[1,12],[22,12],[12,22]];
+  let votes=0;
+  for(const [x,y] of points){
+   const i=(y*24+x)*4,r=pixels[i],g=pixels[i+1],b=pixels[i+2];
+   if(r>=218&&g>=218&&b>=218&&Math.max(r,g,b)-Math.min(r,g,b)<=34)votes++;
+  }
+  keyed=votes>=6;
+ }catch(_error){
+  // Cross-origin images without CORS permission remain untouched; never block gallery rendering.
+  keyed=false;
+ }
+ fullscreenWhiteBackgroundCache.set(src,keyed);
+ img.classList.toggle('sd-white-background-keyed',keyed);
+ return keyed;
+}
 const FULLSCREEN_SLIDE_MS=300;
 function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing')}
 function setFullscreenPhoto(src,direction='left',instant=false){
@@ -824,12 +857,13 @@ function setFullscreenPhoto(src,direction='left',instant=false){
  images.forEach(clearFullscreenSlideClasses);
  const activeSrc=active.getAttribute('src')||'';
  if(activeSrc===next&&active.complete&&active.naturalWidth){
-  active.classList.add('is-active');incoming.classList.remove('is-active');sizeFullscreenFrame(active);window.__sdUpdateDetailWatermark?.();return;
+  active.classList.add('is-active');incoming.classList.remove('is-active');syncFullscreenBackgroundKey(active);sizeFullscreenFrame(active);window.__sdUpdateDetailWatermark?.();return;
  }
  const finishLoad=()=>{
   if(transitionId!==fullscreenTransitionId)return;
   incoming.onload=null;incoming.onerror=null;
   if(!incoming.naturalWidth){clearFullscreenSlideClasses(incoming);return}
+  syncFullscreenBackgroundKey(incoming);
   sizeFullscreenFrame(incoming);
   if(instant||!active.complete||!active.naturalWidth){
    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
@@ -2634,6 +2668,14 @@ html.dark .nav-wrap .nav{background:rgba(4,20,34,.94)!important}
 html:not(.dark) .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:multiply!important}
 html.dark .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!important}
 
+
+/* sd-gallery-satin-blend-2026-10-22 */
+
+/* Full-screen gallery: key only images with a verified near-white canvas so they sit in the satin scene.
+   The product source URL and catalog mapping are unchanged; non-white images keep their original pixels. */
+.sd-fullscreen-viewer:before{background:radial-gradient(ellipse 72% 60% at 50% 46%,rgba(92,143,177,.15) 0%,rgba(31,68,95,.08) 48%,rgba(4,16,28,0) 82%),linear-gradient(145deg,rgba(205,230,249,.035),rgba(4,16,28,.12))}
+.sd-fullscreen-frame{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.sd-fullscreen-image.sd-white-background-keyed{filter:url(#sdGalleryWhiteBackgroundKey)}
 </style>
 
 
