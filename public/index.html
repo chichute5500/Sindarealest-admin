@@ -2391,15 +2391,20 @@ html.dark .sd-fullscreen-share{
   #home.hero:has(#heroProductImage[hidden]) .hero-copy h1{font-size:clamp(38px,5vw,50px)!important}
 }
 
-/* Keep mobile account/cart/checkout sheets above, not on top of, the fixed bottom navigation. */
+/* Explicitly size mobile drawers so the persistent bottom navigation stays visible. */
 @media(max-width:760px){
-  #mobileBottomNav{z-index:1300!important}
+  #mobileBottomNav{z-index:1300!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
   .account-drawer,.cart-drawer,.checkout-drawer{
-    bottom:calc(76px + env(safe-area-inset-bottom))!important;
+    top:calc(7px + env(safe-area-inset-top))!important;
+    bottom:auto!important;
+    height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    min-height:0!important;
     max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    overflow-x:hidden!important;
   }
   .account-drawer,.cart-drawer{overflow-y:auto!important;overscroll-behavior:contain}
-  .cart-drawer{min-height:0}
+  .cart-drawer{display:flex!important;flex-direction:column!important}
+  .cart-list{flex:1 1 auto;min-height:0;overflow-y:auto!important;overscroll-behavior:contain}
   .checkout-drawer{overflow:hidden!important}
 }
 </style>

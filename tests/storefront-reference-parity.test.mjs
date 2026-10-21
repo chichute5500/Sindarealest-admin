@@ -52,9 +52,11 @@ assert.ok(finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-cop
   && finalCss.includes('font-size:clamp(42px,5.2vw,72px)!important;'),
   'Desktop fallback headline must keep the reference three-line hierarchy rather than break each phrase into narrow columns.');
 assert.ok(finalCss.includes('@media(max-width:760px){')
-  && finalCss.includes('#mobileBottomNav{z-index:1300!important}')
-  && finalCss.includes('bottom:calc(76px + env(safe-area-inset-bottom))!important;'),
-  'Mobile account/cart/checkout panels must end above the persistent bottom navigation.');
+  && finalCss.includes('#mobileBottomNav{z-index:1300!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}')
+  && finalCss.includes('height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;')
+  && finalCss.includes('top:calc(7px + env(safe-area-inset-top))!important;')
+  && finalCss.includes('bottom:auto!important;'),
+  'Mobile drawers must use an explicit viewport height and allow the fixed bottom navigation to remain visible.');
 
 const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
