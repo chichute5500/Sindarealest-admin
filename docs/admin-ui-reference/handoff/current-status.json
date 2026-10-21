@@ -1,32 +1,32 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T04:30:43+07:00",
+  "updatedAt": "2026-10-22T04:35:36+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "1edf32dd74ce94f684e4b4b2c3a017592011b9e9",
+  "branchHeadAtCheckpoint": "76769e55ac40d8cb8eff8ee099de15eebab30970",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Progress remains 50%: mobile More/Khác navigation and notification Escape/focus behaviors have responsive fixture E2E coverage, but AI image grouping lacks a defined route/contract and full 12-screen parity/authenticated QA remain unaccepted.",
+  "progressBasis": "Progress remains 50%: mobile More menu keyboard/focus and real Settings navigation now pass fixture E2E; full 12-screen parity, defined AI image grouping contract and authenticated backend QA remain unaccepted.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+    "testedCommitSha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
     "conclusion": "success",
     "validateRun": {
-      "runId": 39679023176,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652666,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39679023162,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652720,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-266",
-      "id": 12383113090,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162/artifacts/12383113090",
-      "sizeBytes": 13048069,
+      "name": "admin-preview-evidence-267",
+      "id": 12382874321,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720/artifacts/12382874321",
+      "sizeBytes": 13069621,
       "pngCount": 68,
       "fixtureModulePngCount": 51,
       "fixtureMetricCount": 43,
@@ -48,8 +48,8 @@
     "fixtureOnly": true,
     "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
     "mobileMoreMenuEscapeFocus": "PASS_EXACT_SHA_FIXTURE_E2E",
+    "mobileMoreMenuClickToNavigate": "PASS_SETTINGS_PAGE_AND_FOCUS_RESTORE_FIXTURE_E2E",
     "notificationPanelEscapeFocus": "PASS_EXACT_SHA_FIXTURE_E2E",
-    "backupRestoreSettings12": "PARTIAL_FIXTURE_ONLY_SCREENSHOT_TARGET_FIXED_REFERENCE_PARITY_NOT_ACCEPTED",
     "aiImageReviewGrouping11": "BLOCKED_NO_DEFINED_ROUTE_CONTROLS_API_OR_APPROVED_FEATURE_CONTRACT"
   },
   "acceptance": {
@@ -69,7 +69,7 @@
     "backupRestoreSettings12": "PARTIAL_FIXTURE_ONLY_SCREENSHOT_TARGET_FIXED_REFERENCE_PARITY_NOT_ACCEPTED",
     "aiImageReviewGrouping11": "BLOCKED_NO_DEFINED_ROUTE_CONTROLS_API_OR_APPROVED_FEATURE_CONTRACT",
     "notificationPanel": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
-    "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED"
+    "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_CLICK_TO_NAVIGATE_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED"
   },
   "pullRequests": {
     "108": {
@@ -99,16 +99,16 @@
   },
   "currentCi": [
     {
-      "runId": 39679023176,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652666,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "status": "completed",
       "conclusion": "success"
     },
     {
-      "runId": 39679023162,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652720,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "status": "completed",
       "conclusion": "success"
     }
@@ -123,8 +123,8 @@
     "docs/admin-ui-reference/handoff/current-status.json"
   ],
   "nextActions": [
-    "Run cross-cutting keyboard/accessibility checks for mobile navigation and notification popovers: Escape priority with active dialogs, focus return, aria states and click-to-navigate.",
-    "Fix only reproducible defects and add fixture E2E.",
+    "Audit product-editor gallery accessibility/responsive behavior with synthetic fixture images only: alt text, cover designation, reorder/delete controls and accessible names.",
+    "Fix only reproducible gaps and add fixture E2E; do not save/upload real images.",
     "Run exact-SHA Validate + Preview/Playwright, inspect artifact and read back all seven handoff files.",
     "AI image review/grouping remains blocked pending approved contract/reference; no live provider/quota.",
     "PR #111/#108 OPEN/UNMERGED; no main/static/Production/Access/secrets/D1/R2/schema/migration/infra edits; no TinyFish."
@@ -139,26 +139,26 @@
   ],
   "ownerActionRequiredNow": "No owner action needed for fixture-only work. AI image review/grouping requires an approved feature contract/reference before implementation; authenticated backend/business QA remains untested.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T04:30:43+07:00",
+    "checkedAt": "2026-10-22T04:35:36+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedApplicationSha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+    "testedApplicationSha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
     "validateRun": {
-      "runId": 39679023176,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652666,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39679023162,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652720,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-266",
-      "id": 12383113090,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162/artifacts/12383113090",
-      "sizeBytes": 13048069,
+      "name": "admin-preview-evidence-267",
+      "id": 12382874321,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720/artifacts/12382874321",
+      "sizeBytes": 13069621,
       "pngCount": 68,
       "fixtureModulePngCount": 51,
       "fixtureMetricCount": 43
@@ -168,11 +168,7 @@
         "mobile-more-menu__390x844__light.png",
         "mobile-more-menu__390x844__dark.png"
       ],
-      "mobileMoreMenuStatus": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS",
-      "notifications": [
-        "notifications__390x844__light.png",
-        "notifications__390x844__dark.png"
-      ],
+      "mobileMoreMenuStatus": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_CLICK_TO_NAVIGATE_AND_VIEWPORT_TESTS_PASS",
       "notificationStatus": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS",
       "pageErrors": 0,
       "consoleErrors": 0,
@@ -181,7 +177,7 @@
       "attemptedWrites": 0,
       "unexpectedApiPaths": 0
     },
-    "branchHeadBeforeHandoffRefresh": "1edf32dd74ce94f684e4b4b2c3a017592011b9e9",
+    "branchHeadBeforeHandoffRefresh": "76769e55ac40d8cb8eff8ee099de15eebab30970",
     "currentHeadIsTestedSource": false,
     "currentHeadIncludesEvidenceDescendant": true,
     "handoffRefreshWritten": true,
@@ -189,33 +185,33 @@
     "progressPercent": 50
   },
   "latestContinuationCycle": {
-    "updatedAt": "2026-10-22T04:30:43+07:00",
+    "updatedAt": "2026-10-22T04:35:36+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedSha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
-    "branchHeadBeforeHandoffRefresh": "1edf32dd74ce94f684e4b4b2c3a017592011b9e9",
+    "testedSha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
+    "branchHeadBeforeHandoffRefresh": "76769e55ac40d8cb8eff8ee099de15eebab30970",
     "validateSource": {
-      "runId": 39679023176,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652666,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "adminPreviewPlaywright": {
-      "runId": 39679023162,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652720,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-266",
-      "id": 12383113090,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162/artifacts/12383113090",
-      "sizeBytes": 13048069,
+      "name": "admin-preview-evidence-267",
+      "id": 12382874321,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720/artifacts/12382874321",
+      "sizeBytes": 13069621,
       "pngCount": 68,
       "fixtureModulePngCount": 51,
       "fixtureMetricCount": 43
     },
     "latestScreenStatuses": {
-      "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
+      "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_CLICK_TO_NAVIGATE_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
       "notificationPanel": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
       "backupRestoreSettings12": "PARTIAL_FIXTURE_ONLY_SCREENSHOT_TARGET_FIXED_REFERENCE_PARITY_NOT_ACCEPTED",
       "aiImageReviewGrouping11": "BLOCKED_NO_DEFINED_ROUTE_CONTROLS_API_OR_APPROVED_FEATURE_CONTRACT",
@@ -227,7 +223,7 @@
       "authenticatedBackendQA": "NOT_TESTED_FIXTURE_ONLY"
     },
     "progressPercent": 50,
-    "nextAction": "Continue cross-cutting keyboard/accessibility pass for navigation and notifications."
+    "nextAction": "Audit product-editor gallery accessibility and responsive behavior using synthetic fixture images only."
   },
   "continuationHistory": [
     {
@@ -366,33 +362,33 @@
     }
   ],
   "latestHandoffCheckpoint": {
-    "updatedAt": "2026-10-22T04:30:43+07:00",
+    "updatedAt": "2026-10-22T04:35:36+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedSha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
-    "branchHeadBeforeHandoffRefresh": "1edf32dd74ce94f684e4b4b2c3a017592011b9e9",
+    "testedSha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
+    "branchHeadBeforeHandoffRefresh": "76769e55ac40d8cb8eff8ee099de15eebab30970",
     "validateSource": {
-      "runId": 39679023176,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652666,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "adminPreviewPlaywright": {
-      "runId": 39679023162,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162",
-      "sha": "54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17",
+      "runId": 39679652720,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720",
+      "sha": "6dcbcdccb45d824095f5dd50f5f7c919ae72e77a",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-266",
-      "id": 12383113090,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162/artifacts/12383113090",
-      "sizeBytes": 13048069,
+      "name": "admin-preview-evidence-267",
+      "id": 12382874321,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720/artifacts/12382874321",
+      "sizeBytes": 13069621,
       "pngCount": 68,
       "fixtureModulePngCount": 51,
       "fixtureMetricCount": 43
     },
     "latestScreenStatuses": {
-      "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
+      "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_CLICK_TO_NAVIGATE_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
       "notificationPanel": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
       "backupRestoreSettings12": "PARTIAL_FIXTURE_ONLY_SCREENSHOT_TARGET_FIXED_REFERENCE_PARITY_NOT_ACCEPTED",
       "aiImageReviewGrouping11": "BLOCKED_NO_DEFINED_ROUTE_CONTROLS_API_OR_APPROVED_FEATURE_CONTRACT",
@@ -404,6 +400,6 @@
       "authenticatedBackendQA": "NOT_TESTED_FIXTURE_ONLY"
     },
     "progressPercent": 50,
-    "nextAction": "Continue cross-cutting keyboard/accessibility pass for navigation and notifications."
+    "nextAction": "Audit product-editor gallery accessibility and responsive behavior using synthetic fixture images only."
   }
 }
