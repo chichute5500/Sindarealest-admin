@@ -75,3 +75,11 @@
 - Bảng `latest-test-results.json` đã đánh dấu test mới `executed: true`; điểm quản lý giữ 50% vì thay đổi này tăng kiểm thử, chưa giải quyết các khối lượng lớn về parity/nghiệp vụ.
 
 - Kết quả cuối sau cập nhật: Validate Source và Admin Preview/Playwright đều **SUCCESS** trên `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`. Artifact 201 gồm 63 PNG; ảnh dùng nguồn thật của giao diện nhưng các module nghiệp vụ dùng fixture tổng hợp/read-only, nên không thay thế QA nghiệp vụ có xác thực.
+
+
+## Anti-repeat / next-chat handoff — 2026-10-21 17:10 UTC
+
+- Customer search across name/phone/email/address and its synthetic address-search Playwright coverage are complete; do not repeat without a demonstrated regression.
+- Warranty search result summary (`aria-live`) and no-match empty states for issued-warranty and support-claim tables are complete. Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) and Preview/Playwright [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) passed on exact source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; artifact [#201, 63 PNGs](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710). Evidence uses synthetic/read-only business fixtures.
+- Latest docs-only commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` passed Validate Source [#39641183495](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641183495). Later handoff edits trigger new CI; always verify the current HEAD and run before claiming the latest branch passed.
+- Progress remains 50% weighted management estimate. Full 12-screen parity NOT ACCEPTED; authenticated real-business QA NOT TESTED; image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER. Next work must be a concrete unresolved visual/behavior gap from `12-SCREEN-REFERENCE-AUDIT.md` (prioritize Product list or Product editor), not another documentation-only iteration.
