@@ -1016,3 +1016,12 @@ Bản sửa trợ năng mới thêm `aria-label` theo bản ghi cho các control
 - Test tối thiểu gồm dữ liệu cũ/unclassified, phân quyền, snapshot đơn, QR sai/thiếu cấu hình, số tiền lấy từ nguồn server đáng tin cậy, xác nhận trùng, thanh toán thiếu/thừa/nhiều đợt, hủy đơn, audit log, regression API và không rò rỉ secret.
 - Chỉ báo VERIFIED khi có kiểm thử thực tế trên đúng SHA. Không tuyên bố hai hệ thống đồng bộ chỉ vì hợp đồng đã được ghi ở cả hai nhánh.
 - Giữ nguyên hàng rào hiện có: chỉ làm trên nhánh Admin; không sửa nhánh Web tĩnh/main, không merge PR #108/#111, không deploy Production, không chạy migration D1 Production, không ghi dữ liệu thật hoặc thay đổi secrets/Cloudflare config thật.
+
+
+### Ảnh QR ngân hàng của chủ dự án — upload qua Admin, không làm gián đoạn việc hiện tại
+- Chủ dự án đã có ảnh QR nhận tiền tài khoản ngân hàng. Thiết kế luồng để chủ dự án tự tải ảnh lên từ giao diện Admin khi chức năng sẵn sàng; không yêu cầu commit ảnh vào source code, không yêu cầu gửi ảnh trong chat làm điều kiện bắt đầu.
+- Bổ sung mục Cài đặt thanh toán → QR chuyển khoản với upload/replace, preview, active/inactive và nút lưu/kích hoạt rõ ràng. Chỉ Admin được phép thay đổi cấu hình.
+- Audit storage binding và API hiện hữu trước; tái sử dụng cơ chế đang cấu hình, không đoán tên bucket hoặc tạo/sửa Cloudflare resources/secrets. Không lưu base64/bytes trong source. Validate MIME type/size và giữ QR active đã xác minh nếu ảnh thay thế lỗi.
+- Trước khi kích hoạt, phải xác minh ảnh quét được và đúng tài khoản nhận tiền, đồng thời không nhúng số tiền cố định. Nếu QR sai tài khoản hoặc có số tiền cố định, không tự chỉnh ảnh hay tuyên bố an toàn; yêu cầu ảnh đúng.
+- Public API chỉ trả về URL ảnh QR đang active và các thông tin nhận tiền công khai cần thiết. Không trả secrets, thông tin review riêng hoặc quyền Admin. Web tĩnh lấy ảnh qua API, không hardcode file.
+- Nếu chưa đến checkpoint phù hợp, ghi nhận việc này trong handoff rồi tiếp tục các hạng mục Admin hiện tại; không tự đổi ưu tiên sang QR.
