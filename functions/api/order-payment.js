@@ -21,13 +21,13 @@ export async function onRequestGet({ request, env }) {
         !order.payment_terms_confirmed_at || order.total===null || !Number.isSafeInteger(Number(order.total))) {
       return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
     }
-    const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? AND status='pending' ORDER BY created_at DESC LIMIT 1").bind(order.id).first();
+    const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? AND status='pending' ORDER BY created_at DESC LIMIT 1").bind(order.id).first();
     if (!requestRow || !validPublicQrImageKey(requestRow.qr_image_key)) {
       return json({ ok:true, ...base, paymentReady:false, message:"Chưa có yêu cầu thanh toán được SinDarealest tạo. Vui lòng liên hệ tư vấn." },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
     }
     return json({
       ok:true, ...base, paymentReady:true, installmentType:requestRow.installment_type,
-      amount:Number(requestRow.amount), transferReference:requestRow.transfer_reference,
+      amount:Number(requestRow.amount), shippingBenefit:requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping'), freeShipping:(requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping')) === 'free_shipping', transferReference:requestRow.transfer_reference,
       qrImageUrl:"/payment-qr/"+requestRow.qr_image_key, bankName:requestRow.bank_name,
       accountNumber:requestRow.account_number, accountName:requestRow.account_name,
       instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi nội dung chuyển khoản chính xác như bên dưới. Mở/quét QR không xác nhận đã thanh toán.",
