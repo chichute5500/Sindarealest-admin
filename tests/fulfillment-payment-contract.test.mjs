@@ -34,6 +34,11 @@ assert.doesNotMatch(read("../functions/api/payment-settings.js"), /ADMIN_PASSWOR
 assert.match(read("../functions/payment-qr/[key].js"), /activeKey !== key/, "pending QR assets must not be publicly served");
 assert.match(read("../functions/api/admin/payment-qr-upload.js"), /payment_qr_pending_key/, "new QR upload must stay pending until manual verification/activation");
 assert.match(read("../functions/api/admin/payment-qr-upload.js"), /MAX_BYTES = 5 \* 1024 \* 1024/, "QR upload size limit must be explicit");
+assert.match(read("../functions/api/admin/payment-qr-preview.js"), /requireAdmin/, "pending QR preview is Admin-authenticated");
+assert.match(read("../functions/api/admin/payment-qr-preview.js"), /pendingKey !== key/, "pending QR preview only serves the current pending image");
+assert.match(read("../functions/api/admin/payment-qr-preview.js"), /private, no-store/, "pending QR preview must not be publicly cached");
+assert.ok(read("../functions/api/admin/payment-qr.js").includes("/api/admin/payment-qr-preview?key="), "Admin settings must return the authenticated pending QR preview URL");
+assert.ok(read("../functions/api/admin/payment-qr-upload.js").includes("/api/admin/payment-qr-preview?key="), "Upload must return the authenticated pending QR preview URL");
 assert.match(read("../functions/api/orders.js"), /public_access_token_hash/, "only a hash of the one-time order token is stored");
 assert.match(read("../functions/api/orders.js"), /orderAccessToken,/, "checkout returns the one-time order access token");
 assert.match(read("../functions/api/orders.js"), /fulfillment_type\) VALUES/, "order item snapshots fulfillment type");
