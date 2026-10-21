@@ -1284,3 +1284,12 @@ This addendum records the latest source cycle and must be read with the previous
 - Product image-save/actual image storage and PRE/PRO D1 schema/migration-ledger work remain `DEFERRED_BY_OWNER / NOT VERIFIED`. Do not reopen unless owner explicitly changes priority.
 - Safety unchanged: only ADMIN branch; do not modify `main` or `fix/liquid-glass-audit-2026-10-19`; no merge/cherry-pick/force-push; no Production deploy; no secret/Cloudflare Access change or bypass; no remote D1/R2/schema/data writes; no setup/migration scripts; never use TinyFish.
 - Next: continue safe source-only accessibility/responsive checks and reference-screen comparison; continue read-only PR scope/security audit; preserve artifact-only screenshots; rerun checks on the exact SHA for each source change. Do not stop at a status report if independent safe work remains.
+
+
+## Latest screenshot review — 2026-10-21 (artifact 156)
+
+- Reviewed screenshot `product-gallery__390x844__light.png` from [run 39611416915](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39611416915), artifact `admin-preview-evidence-156`; tested source SHA `fda63055e3e2509d6199bf347f4eb33b66dd03c3`.
+- Findings: stacked mobile product editor; tabs for details, price/fulfillment type, and gallery; upload picker; two placeholder/example thumbnails; per-image reorder/delete controls; fixed bottom action bar. Generally legible, but vertically dense at 390×844. Screenshot is source/fixture evidence, not real upload/save proof or authenticated backend QA.
+- Visual comparison against the approved reference was not completed in this review. All-12-screen parity remains NOT ACCEPTED. Authenticated business flows remain NOT TESTED. Product image-save and PRE/PRO migration work remains DEFERRED_BY_OWNER / NOT VERIFIED.
+- Handoff documents record overall progress 48%; this screenshot review alone does not increase it. PR #111 and #108 remain OPEN/unmerged; PR #111 remains mixed-scope. Re-fetch HEAD and latest CI before relying on this checkpoint.
+- Preserve all safety constraints: only ADMIN branch, no main/static branch edits, no merge, no Production deployment, no secret/Access changes or bypass, no remote D1/R2/schema/data writes, no setup/migration scripts, and never TinyFish.
