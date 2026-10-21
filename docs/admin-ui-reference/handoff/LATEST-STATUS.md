@@ -1,3 +1,13 @@
+## Checkpoint mới nhất — 2026-10-21 17:47 UTC
+
+- Exact source/test SHA: `04889b6c6bc946483ea683e8345bac3b7cbf3838`; branch hiện có commit evidence tự động `d90a18db3961958b0928f1fabc598f2d77cedea3` do workflow lưu báo cáo/diagnostics, không phải thay đổi ứng dụng.
+- Validate Source [#39646606076](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606076) **SUCCESS**; Admin Preview diagnostic [#39646606242](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606242) **SUCCESS** trên exact source/test SHA.
+- Fixed false-negative Playwright assertion for custom “Hiển thị sản phẩm” switch: assert visible `label.switch:has(#pPublished)` wrapper and checked state of `#pPublished`, not visibility of the custom-styled native checkbox. Previous run [#39646221204](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646221204) failed at screenshot-matrix step 9; repository checks, automated tests and Preview diagnostic succeeded. The next run passed the full matrix.
+- Overall progress remains **50%**; test correction does not count as acceptance of more screens. 12-screen visual parity NOT ACCEPTED; authenticated business QA NOT TESTED; image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- PR #111 remains OPEN/UNMERGED. No Production deployment, secrets/Access changes, or remote D1/R2/migration operations.
+
+---
+
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
 **Trạng thái:** SOURCE CHECKS PASS; WARRANTY LIST-FIRST FIXTURE E2E PASS; PREVIEW LOGIN CSS SIGNATURE PASS; 12-SCREEN VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA NOT TESTED.

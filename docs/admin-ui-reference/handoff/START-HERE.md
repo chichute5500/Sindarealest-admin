@@ -1,3 +1,12 @@
+## Newest verified checkpoint — 2026-10-21 17:47 UTC
+
+- Exact source/test SHA: `04889b6c6bc946483ea683e8345bac3b7cbf3838`; Validate Source [#39646606076](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606076) PASS; Admin Preview/Playwright [#39646606242](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606242) SUCCESS.
+- Corrected the custom publication-switch test to assert visible wrapper + checked checkbox. Prior run [#39646221204](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646221204) failed at screenshot-matrix step 9; rerun passed. No application UI source changed in this correction.
+- Evidence-saving workflow created docs/evidence-only commit `d90a18db3961958b0928f1fabc598f2d77cedea3` after tests; re-read live branch HEAD before further edits.
+- Progress remains **50%**. All 12 reference screen families not yet accepted; authenticated business QA not tested; image-save/R2 and PRE/PRO migrations remain deferred by owner. PR #111 remains OPEN/UNMERGED.
+
+---
+
 # SinDarealest ADMIN — điểm bắt đầu bàn giao cho AI
 
 ## Newest verified checkpoint — 2026-10-21 17:34 UTC
