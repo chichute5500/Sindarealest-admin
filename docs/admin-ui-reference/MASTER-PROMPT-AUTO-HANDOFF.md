@@ -1231,3 +1231,19 @@ This addendum supersedes older run references for the modal-focus change. Re-fet
 - Overall progress remains **48%**. Authenticated real-backend flows and all-viewport/12-screen acceptance remain open. Product image save/storage and PRE/PRO migration ledger remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
 - Local checkout / working-tree status is not available to this session. No local npm command was run; the evidence is from the exact GitHub Actions run above.
 - Next work: continue safe ADMIN-only source/accessibility and PR semantic review. Confirm a currently deployed Preview/source and authorized Access path with the owner before trying authenticated QA. Do not touch `main`, static branch, secrets, Access, D1/R2, production deploy or migration commands.
+
+
+---
+
+## Newest tested-source addendum — concurrent refund safety (2026-10-21)
+
+This addendum records the latest source cycle and must be read with the previous modal accessibility checkpoint.
+
+- **Functional source change:** `functions/api/admin/payment-transactions.js`, commit `d3fa9b85be20d832cbf24678dd7f3c7d862c1e64`. The refund ledger row is inserted by a guarded `INSERT ... SELECT` that recalculates net verified receipts at statement time. Follow-on payment-request/order status updates and audit logging only occur when that ledger row exists. A refund rejected by the guard returns 409.
+- **Regression test:** `tests/payment-ledger-route.test.mjs`, final test commit `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`. The added in-memory mock scenario simulates a competing refund taking the balance between the pre-check and insert; it checks the conditional SQL and that subsequent mutations are gated.
+- **Exact-source GitHub Actions run:** [39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224) tested `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`. `npm run check`: PASS; `npm test`: PASS, including `PASS payment ledger route behavior`; local read-only Playwright source/fixture matrix: PASS. The overall workflow stays FAILURE due to Preview only.
+- **Evidence artifact:** [admin-preview-evidence-144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224/artifacts/12342063095), ID 12342063095, expires 2026-11-04. It contains 59 PNGs (16 login shell, 43 synthetic fixture views), 36 fixture metrics, metadata and reference; no browser/console/network/HTTP errors and no attempted writes. Raw PNGs are kept in Actions Artifacts, not per-run Git commits.
+- **Live Preview remains FAIL:** `PREVIEW_CSS_SIGNATURE_MISMATCH`, 226 rules in served inline stylesheet but `hasLoginHideRule=false`; `.topbar > .brand` remains visible. Preserve the diagnostic assertion; do not read/change `ADMIN_TEST_URL` or Cloudflare Access secrets and do not bypass Access. Authenticated live-business QA remains NOT TESTED.
+- **Important evidence boundary:** this regression is tested against a mock database. No remote D1 access/query/write or migration was performed; actual D1 runtime concurrency behavior remains NOT VERIFIED. Migration 0008/0009 and `scripts/setup-cloudflare.mjs` / `scripts/deploy-cloudflare.mjs` must not be executed without a separate authorized migration/deploy review. PRE/PRO migration and product image-save/upload work remain `DEFERRED_BY_OWNER`.
+- **Latest observed PR before this addendum:** #111 OPEN/unmerged, HEAD `9e0434f769dedf2b20e1365aa96147336afc237c`, 1,096 files (+37,660/−392), mixed storefront, Admin UI, Functions, migration, scripts, tests and evidence scope; not merge-ready. PR #108 is also OPEN/unmerged. Do not modify `main` or `fix/liquid-glass-audit-2026-10-19`, do not merge, and do not deploy Production.
+- Overall progress stays **48%**, not completion. Preview identity, 12-screen visual parity, authenticated backend flows and full PR semantic/security audit remain open.
