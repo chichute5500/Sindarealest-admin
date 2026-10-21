@@ -1910,23 +1910,24 @@
     }
   },
   "latestCurrentPreviewDiagnostic": {
-    "runId": 39592097224,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224",
-    "testedSourceCommit": "ebb20fa7f2359b19ae91a9c62b3006a16b8db148",
-    "result": "FAIL",
-    "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
+    "runId": 39602040135,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135",
+    "testedSourceCommit": "3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f",
+    "result": "PASS",
+    "status": "PASS_LOGIN_CSS_SIGNATURE",
     "signature": {
-      "inlineStylesheetRuleCount": 226,
-      "hasLoginHideRule": false,
-      "topbarBrandDisplay": "flex",
+      "inlineStylesheetRuleCount": 423,
+      "hasLoginHideRule": true,
+      "topbarBrandDisplay": "none",
+      "topbarBrandDisplayPriority": "important",
       "topbarBrandVisibility": "visible",
       "topbarBrandOpacity": "1",
       "browserSupportsHideSelector": true,
       "hideSelectorMatchesBrand": true
     },
-    "diagnostic": "The configured Preview response lacks the current-source login-hide CSS rule; stale deployment vs wrong target cannot be distinguished from the masked URL.",
-    "secrets": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED",
-    "accessBypass": "NOT_PERFORMED"
+    "targetHost": "feature-admin-isolated-hando.sindarealest2.pages.dev",
+    "targetPath": "/admin/",
+    "note": "Supersedes the earlier Preview failure for this run only; recheck current branch HEAD and later deployments before relying on it."
   },
   "latestModalAccessibilityCycle": {
     "result": "SOURCE_IMPLEMENTED_AND_PLAYWRIGHT_VERIFIED",
@@ -2045,5 +2046,41 @@
     "Do not merge PR #111 or #108, deploy Production, or force-push.",
     "Do not change secrets/Cloudflare Access, run migrations/setup, or write/delete real D1/R2/business data.",
     "Product image-save and PRE/PRO migration investigations remain DEFERRED_BY_OWNER."
-  ]
+  ],
+  "latestPreviewUnblockRun": {
+    "runId": 39602040135,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135",
+    "jobId": 119237893478,
+    "testedSourceCommit": "3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f",
+    "targetHost": "feature-admin-isolated-hando.sindarealest2.pages.dev",
+    "targetPath": "/admin/",
+    "overallConclusion": "SUCCESS",
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS",
+    "localPlaywrightSourceMatrix": "PASS",
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+    "observed": {
+      "inlineStylesheetRuleCount": 423,
+      "hasLoginHideRule": true,
+      "matchingSelector": ".topbar>.brand",
+      "topbarBrandDisplay": "none",
+      "displayPriority": "important",
+      "topbarBrandVisibility": "visible",
+      "topbarBrandOpacity": "1",
+      "browserSupportsHideSelector": true,
+      "hideSelectorMatchesBrand": true
+    },
+    "interpretation": "The expected CSS signature assertion passed. visibility=visible is reported separately but display:none!important means the brand is not displayed.",
+    "scopeLimit": "This proves the workflow test on this target at this run only; not authenticated business-flow QA, complete visual parity, or future deployment correctness.",
+    "productionDeployment": "NOT_PERFORMED",
+    "secretsOrAccessChanged": false,
+    "accessBypass": false
+  },
+  "overallProgressPercent": 48,
+  "latestHandoffUpdate": {
+    "updatedAt": "2026-10-21",
+    "purpose": "Record verified successful Preview CSS-signature test run #149",
+    "statusFileCommit": "db6488cc326f22d22eeb25f556fc718ffc5f5e05",
+    "note": "Documentation-only update; no source changes, no new tests, and no progress increase."
+  }
 }
