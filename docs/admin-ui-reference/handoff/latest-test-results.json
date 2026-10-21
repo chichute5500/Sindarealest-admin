@@ -928,10 +928,12 @@
   "handoffUpdate": {
     "baseHeadBeforeDocsCommit": "0a76ed5625ea77aea10d5018144f149025595ae0",
     "sourceCommitValidated": "cedebd78b2056ae4d0e6f6982793106b586d99b2",
-    "sourceCiRun": 39565547871,
-    "previewDiagnosticRun": 39565547828,
-    "updateKind": "documentation/evidence checkpoint only; no source change",
-    "productionDeployment": "NOT_PERFORMED"
+    "sourceCiRun": 39569134111,
+    "previewDiagnosticRun": 39569133914,
+    "updateKind": "documentation/handoff update only; no source changes or deployment",
+    "productionDeployment": "NOT_PERFORMED",
+    "updatedAt": "2026-10-21 15:39 +07:00",
+    "sourceCommitReviewed": "3ed2d86b8b97f04718c478979136f986b3d1b07b"
   },
   "progressPercent": 46,
   "prScopeAudit": {
@@ -1360,5 +1362,50 @@
     "previewRun": 39565547828,
     "previewConclusion": "FAIL_PREVIEW_CSS_SIGNATURE_MISMATCH",
     "crossBranchIntegration": "NOT_VERIFIED"
+  },
+  "latestOwnerPreviewCheck": {
+    "checkedAt": "2026-10-21 15:39 +07:00",
+    "previewUrl": "https://564cd391.sindarealest2.pages.dev",
+    "deploymentId": "564cd391-87d3-4f98-8a68-c81e935a452b",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "sourceCommit": "3ed2d86b8b97f04718c478979136f986b3d1b07b",
+    "ownerObserved": {
+      "login": "PASS_USER_CONFIRMED",
+      "productListAndDetail": "PASS_USER_CONFIRMED",
+      "imageSelectionUi": "PASS_USER_CONFIRMED"
+    },
+    "notConfirmed": [
+      "product save",
+      "actual image upload/storage",
+      "full authenticated business flows",
+      "12-screen visual parity"
+    ],
+    "sourceCi": {
+      "runId": 39569134111,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39569134111",
+      "conclusion": "FAILURE",
+      "failedStep": "Run automated tests"
+    },
+    "previewDiagnostic": {
+      "runId": 39569133914,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39569133914",
+      "conclusion": "FAILURE",
+      "failedStep": "Run automated tests",
+      "browserAndDeployedPreviewChecks": "SKIPPED"
+    },
+    "cloudflareBuildWarnings": [
+      "Redirect rule /admin/ /admin/index.html 200 skipped as infinite loop",
+      "Redirect rule /* /index.html 200 skipped as infinite loop"
+    ],
+    "rootCause": "NOT_VERIFIED; inspect detailed failing test output before concluding stale test contract or code defect",
+    "progressPercent": 46,
+    "safety": {
+      "pr111Merged": false,
+      "pr108Merged": false,
+      "productionDeploy": false,
+      "remoteD1R2Mutation": false,
+      "secretsOrAccessChanged": false,
+      "staticBranchModified": false
+    }
   }
 }
