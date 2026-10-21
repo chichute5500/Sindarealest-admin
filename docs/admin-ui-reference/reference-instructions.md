@@ -76,3 +76,10 @@ For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file 
 - A prior failure was traced to Playwright selectors that incorrectly assumed dashboard elements were nested under `#main`; the rendered source injects these elements into `#appView`. Test selectors were corrected and the exact-SHA browser suite passed. No app CSS/business code was changed for that fix.
 - This is a focused accessibility audit, not full visual acceptance. Continue measuring keyboard/focus behavior, target sizes, theme contrast, reduced-motion across additional modules, and reference parity separately. Do not label all 12 screen families PASS based on this one E2E test.
 - Current acceptance remains: 12-screen parity NOT ACCEPTED; authenticated real backend NOT TESTED/BLOCKED BY ACCESS; image-save and PRE/PRO migration DEFERRED_BY_OWNER. Overall progress remains 48%.
+
+
+## Product editor keyboard verification — 2026-10-21
+
+- Exact-SHA Playwright run [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) on source/test SHA `32c1f28662e7240353b0eda2f5daeaf22359257e` passed. The product-editor tablist test covers ArrowLeft/ArrowRight and Home/End, asserting focus placement and `aria-selected` state.
+- The same 3-test static baseline passed dialog focus trapping/restoration, reduced-motion checks, source screenshot matrix and configured Preview login CSS signature. Fixture/API data is synthetic/read-only.
+- This remains PARTIAL accessibility evidence, not global acceptance: continue testing focus/name/target sizing screen-by-screen and keep all-12-screen visual parity NOT ACCEPTED until direct reference comparisons pass.
