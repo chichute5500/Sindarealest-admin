@@ -156,3 +156,23 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - This validates the current pre-handoff commit, but does not address the deployed Preview failure. The latest Preview diagnostic is still run 39542387719 and still fails the deployed CSS/UI signature check. Evidence artifact `admin-preview-evidence-62` (artifact ID 12320316041, 9.17 MB, expires 2026-11-04) is available from that run; this connector exposed artifact metadata but not a direct decoded screenshot view in this pass.
 - The current authorized blocker remains the intended Preview deployment/source identity and Access path. Owner must provide/confirm the target; do not inspect or change secrets, bypass Access, or use real customer data.
 - Progress remains 43%. No source code change, deployment, merge, remote migration, or protected-branch write occurred.
+
+
+## Latest continuation update — 2026-10-21 12:19 +07 (authoritative)
+
+### Verified source and test status
+- Application/test source commit: `6935eefa3473f1c6a15da08a34389d7223cbd0ea`.
+- Source CI: [run 39548605358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358) SUCCESS on that exact commit.
+- Preview diagnostic: [run 39548605474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474) FAILURE only at the configured deployed Preview assertion; do not weaken the assertion to obtain green CI.
+- The CSS diagnostic was improved to normalize CSSOM selector whitespace and inspect parsed `CSSStyleRule.selectorText`. Corrected regex is verified in commit `6935eefa`.
+- Preview evidence is definitive on the immediate CSS issue: `browserSupportsHideSelector=true`, `hideSelectorMatchesBrand=true`, `topbarBrandDisplay=flex`, and the only inline stylesheet reports `ruleCount=226`, `hasLoginHideRule=false`. The configured Preview response is missing the hide rule present in current source. It is therefore a stale/wrong Preview build or target mismatch; the exact URL identity cannot be inferred because GitHub masks `ADMIN_TEST_URL` in logs.
+- Local Playwright evidence on source commit `6935eefa`: 58 PNGs (16 login shell + 42 read-only synthetic module fixtures), 36 fixture metrics, zero browser/console/network/HTTP errors and no attempted writes. This is not authenticated live-backend QA and does not prove all 12 reference screens visually match.
+- Latest artifact: [admin-preview-evidence-64](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474), artifact ID `12322384265`, expires 2026-11-04 05:19:09Z. Evidence/handoff commit after the source test does not change which source SHA was tested.
+- Current progress estimate recorded as **45%**. The main remaining gates are Preview identity, 12-screen visual parity, authenticated live module tests, migration compatibility and full PR #111 scope review.
+
+### Next actions
+1. Continue safe work without waiting for user: review available local source screenshot evidence and HTML reference, run source-only accessibility/responsive checks as feasible, and continue the GitHub PR #111 file-scope audit. Update the handoff after each evidence cycle.
+2. For the Preview issue, inspect only permitted public/workflow evidence; do not print, retrieve, edit or replace `ADMIN_TEST_URL` or Access secrets. Current browser reached the Admin login; do not bypass Cloudflare Access.
+3. To make the remote Preview test pass, the owner must eventually provide an authorized Preview URL built from the current ADMIN branch, or explicitly authorize a dedicated preview-only deployment after confirming Preview D1/R2 bindings are isolated. This repository's checked-in `deploy.yml` sets `CLOUDFLARE_PAGES_BRANCH=main` and its deploy path must not be run to fix Preview.
+4. Keep authenticated live backend workflows as NOT TESTED until current-source Preview access and a safe synthetic-data/PII-masking strategy exist. Do not access or modify real business data.
+5. Keep PR #111 and #108 OPEN/unmerged; do not edit `main` or `fix/liquid-glass-audit-2026-10-19`; no Production deploy, migration, D1/R2 action, or secret change.
