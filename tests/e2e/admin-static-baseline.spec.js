@@ -1019,6 +1019,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await summary.click();
         await expect(management).not.toHaveAttribute('open', '');
       }
+      // Locator assertions can scroll the page and nested table horizontally; return to the reference's initial list position before taking screenshots.
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        document.scrollingElement?.scrollTo(0, 0);
+        document.querySelectorAll('#main .tablewrap').forEach(wrapper => { wrapper.scrollLeft = 0; });
+      });
     }, true);
     await captureView('order-row-details', 'orders', async () => {
       await page.locator('[data-action="view-order-details"]:visible').first().click();
