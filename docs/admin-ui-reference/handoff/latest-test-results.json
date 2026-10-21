@@ -2961,5 +2961,36 @@
     },
     "authenticatedBusinessFlows": "NOT_TESTED",
     "overallProgressEstimatePercent": 50
+  },
+  "continuationCheckpoint20261022_productFulfillmentChips": {
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "sourceCommit": "330f4bbaae11c0dd3bdbb61a01b75d5462d3201b",
+    "testCommit": "7948a320c3fd38a7f73d061de6ca6e3251b72789",
+    "changedPaths": [
+      "public/admin/index.html",
+      "tests/e2e/admin-static-baseline.spec.js"
+    ],
+    "change": "Product list fulfillment classification uses a compact chip for in_stock, made_to_order, and unclassified; no business data/API changes.",
+    "testsAdded": [
+      "three explicit read-only fixture assertions for the three fulfillment states"
+    ],
+    "validationStatus": "PENDING_NOT_VERIFIED",
+    "validationNote": "No passing Actions run on the exact current source/test SHA was observed when this checkpoint was recorded. Do not claim PASS until exact SHA is confirmed.",
+    "overallProgressPercent": 50,
+    "visualAcceptance": "SCREEN_3_PARTIAL_NOT_ACCEPTED; ALL_12_NOT_ACCEPTED",
+    "authenticatedBusinessQA": "NOT_TESTED_BLOCKED",
+    "deferredByOwner": [
+      "product image save/R2",
+      "PRE/PRO migration"
+    ],
+    "safety": [
+      "PR #111/#108 open/unmerged",
+      "no Production deployment",
+      "no main/static branch edits",
+      "no Access/secrets changes",
+      "no remote D1/R2 or migrations",
+      "no TinyFish"
+    ],
+    "nextAction": "Re-fetch current head and PR/Actions; validate exact source/test SHA; inspect product screenshots at 390x844 and 1280x800 light/dark; update progress only with acceptance evidence."
   }
 }
