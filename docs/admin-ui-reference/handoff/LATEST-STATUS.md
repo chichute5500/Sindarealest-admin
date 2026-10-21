@@ -23,26 +23,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: d408781b95af4942b36681cbe2d0334dc03c8683
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689
+- Tested commit: ebb20fa7f2359b19ae91a9c62b3006a16b8db148
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-141 (not committed to Git).
+- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-144 (not committed to Git).
 - Deployed Preview: failure.
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Vòng xác minh mới nhất — 2026-10-21 — modal accessibility + Preview diagnostics
-
-- **Nhánh/PR:** chỉ làm việc trên `feature/admin-isolated-handoff-2026-10-20`. PR #111 vẫn OPEN/unmerged; HEAD tại lúc ghi handoff là `701befcb6d7072646fa3934cbe19315fa7a2d378`. PR #108 vẫn OPEN/unmerged; không sửa nhánh static hay `main`.
-- **Thay đổi source:** commit `3fe44a2304f083e6f943c931d43b74039900ace3`, `public/admin/index.html`. Đưa modal sản phẩm và chi tiết đơn hàng vào cơ chế dùng chung: focus ban đầu, giữ Tab/Shift+Tab trong dialog, Escape đóng dialog đang mở, cập nhật `aria-hidden` và trả focus về nút đã mở dialog nếu vẫn còn hợp lệ.
-- **Hồi quy:** `tests/e2e/admin-static-baseline.spec.js` đã thêm Playwright assertions cho focus ban đầu, wrap phím Tab hai chiều, Escape, aria-hidden và focus restoration trên cả hai dialog (test commits `ed14dc26270ba11b842bdec7c2e75f46ecc788bc`, `d408781b95af4942b36681cbe2d0334dc03c8683`). `tests/admin-liquid-glass-contract.test.mjs` thêm contract guard (commit `f480e2cad1542cb0c22757e9c2b0b691e32af918`).
-- **PASS có bằng chứng trên đúng tested SHA `d408781b95af4942b36681cbe2d0334dc03c8683`:** [Actions run #39590491689](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689) — `npm run check` PASS, `npm test` PASS, Playwright local source/fixture matrix PASS. Các assertion focus mới nằm trong bài test và run này hoàn tất thành công. Không có browser/console/network/HTTP errors; fixture không thử ghi dữ liệu.
-- **Evidence artifact:** [admin-preview-evidence-141](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689/artifacts/12342530827), 59 screenshot PNG mới + metadata + ảnh tham chiếu, lưu trong GitHub Actions artifact 14 ngày. Các ảnh PNG mới không được commit vào Git; commit evidence `701befcb6d7072646fa3934cbe19315fa7a2d378` chỉ thêm report/diagnostics và cập nhật handoff, theo log ghi 4 files changed.
-- **FAIL Preview vẫn còn:** cùng run #39590491689, `PREVIEW_CSS_SIGNATURE_MISMATCH`: inline stylesheet 226 rules nhưng `hasLoginHideRule=false`, `.topbar > .brand` còn visible (`display:flex`, opacity 1). Không sửa giảm assertion, không đọc/đổi `ADMIN_TEST_URL`/secrets, không bypass Cloudflare Access. Vì vậy run tổng thể FAILURE dù source checks/test/matrix PASS.
-- **So sánh tham chiếu:** đã mở PNG tham chiếu duyệt và montage ảnh source 390×844 light của commit `d408781...`. Đã rà bố cục tổng thể của 12 nhóm màn hình; **visual parity vẫn NOT ACCEPTED**. Các khoảng cách lớn còn lại gồm dashboard thiếu biểu đồ xu hướng trong khi không có chuỗi dữ liệu đã xác nhận để dựng; product editor dùng biểu mẫu dọc thay vì các tab/nhóm gọn trong mẫu; gallery, order details, warranty, backup/restore và activity presentation có bố cục khác; màn hình dữ liệu synthetic không đại diện ảnh sản phẩm/khách hàng thật. Không tự bịa dữ liệu KPI và không coi fixture là dữ liệu nghiệp vụ thật.
-- **Tiến độ:** 48% tổng thể vẫn giữ nguyên (ước lượng quản lý, không phải tỷ lệ test pass). Còn Preview source identity, đối chiếu đủ 12 màn hình ở nhiều viewport/theme, authenticated backend QA, và full semantic/security audit PR #111.
-- **Tạm hoãn theo yêu cầu chủ sở hữu:** lỗi lưu ảnh sản phẩm/upload R2 và migration ledger PRE/PRO vẫn `DEFERRED_BY_OWNER / NOT VERIFIED`; không mở lại trong vòng này. Không Production deploy, không remote D1/R2, không secret/access changes, không merge.
-- **Giới hạn phiên:** không có local checkout; không tuyên bố đã chạy Git status/test thủ công cục bộ. Bằng chứng test là GitHub Actions run nêu trên.
