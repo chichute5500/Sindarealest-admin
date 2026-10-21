@@ -203,6 +203,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       watermarkSize: 16,
       watermarkOpacity: 68
     },
+    '/api/admin/payment-qr': {
+      active: false,
+      activeImageUrl: '',
+      pending: false,
+      pendingImageUrl: '',
+      bankName: '',
+      accountNumber: '',
+      accountName: '',
+      instructions: '',
+      draftSaved: false
+    },
     '/api/admin/orders': {
       orders: [{
         id: 'UI-ONLY-ORDER',
