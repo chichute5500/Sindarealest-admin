@@ -137,51 +137,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 6935eefa3473f1c6a15da08a34389d7223cbd0ea
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474
+- Tested commit: 6fda1ef452ec9b7d490ba1fca4289053c5ee38d5
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39549636754
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 58 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/6935eefa3473/screenshots/.
+- Local source Playwright matrix: PASS; 58 real PNG screenshots saved under docs/admin-ui-reference/handoff/history/6fda1ef452ec/screenshots/.
 - Deployed Preview: failure.
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Latest verified continuation — 2026-10-21 12:19 +07
-
-### Source/test commits and evidence
-- CSS signature diagnostics were changed to inspect parsed CSSOM selectors and normalize combinator whitespace, rather than rely on raw `cssText` substring matching.
-- Diagnostic commit: `6935eefa3473f1c6a15da08a34389d7223cbd0ea`; source CI [39548605358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358) is SUCCESS.
-- Preview workflow [39548605474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474) is FAILURE at the actual deployed Preview assertion; no assertion was weakened.
-- Browser-side evidence: `browserSupportsHideSelector=true`, `hideSelectorMatchesBrand=true`, `topbarBrandDisplay=flex`, `hasLoginHideRule=false`, `ruleCount=226`. This demonstrates the configured response lacks the expected login-shell CSS rule; this is not a browser support or CSS selector normalization issue.
-- Local read-only Playwright evidence on source commit `6935eefa`: 58 PNGs total, 16 login-shell images + 42 fixture module images and 36 fixture metrics; 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors. These prove local source/fixture UI coverage only, not authenticated live backend workflows.
-- The workflow's evidence-only HEAD moved to `eff59ab78cfe11b091dfb64df3cc281a3572b343`; source checks are tied to `6935eefa`, not the later artifact/handoff commit.
-
-### Remaining blocker and safe next step
-- Root cause is now localized to the configured Preview response missing the expected CSS rule. The exact `ADMIN_TEST_URL` secret value was not read, displayed or changed.
-- The checked-in production deployment workflow hard-pins deployment to `main`; it must not be run to solve this Preview problem. No dedicated, verified Admin-preview deployment path was found in the inspected workflow set.
-- To make the remote Preview test pass, an authorized owner must provide/update `ADMIN_TEST_URL` to a Preview deployment built from the current ADMIN branch, or explicitly authorize a preview-only deployment after Preview bindings are confirmed isolated. Do not use Production URL, expose secrets, bypass Cloudflare Access, or touch D1/R2.
-- Continue other safe work while this external Preview identity is unresolved: full 12-screen reference comparison, deeper source/accessibility audits and PR #111 mixed-scope inventory. Keep authenticated real-backend workflows marked NOT TESTED until a valid authorized Preview and safe test data are available.
-- Progress estimate: **45%**. Source checks and local screenshots now have current evidence; deployed Preview identity, all 12-screen parity, authenticated live module flows, full diff review, and migration compatibility remain open.
-
-
-## Latest PR file-scope audit — 2026-10-21 12:21 +07
-
-The GitHub Pull Request Files API was paged through all 970 changed entries for PR #111. Category totals:
-
-| File group | Count | Finding |
-|---|---:|---|
-| Handoff/history PNG screenshots | 854 | Binary UI evidence; greatly increases review size but contains no line-level diff |
-| Other docs/notes | 70 | Prompts, instructions, reports and handoff records |
-| Tests | 20 | Includes ADMIN and public-storefront regressions |
-| Backend Functions | 14 | Admin APIs, shared middleware and helpers changed |
-| Scripts | 5 | Includes Cloudflare setup/deploy and migration checking |
-| GitHub workflows | 2 | Includes Preview diagnostics and storefront visual preview |
-| Migration | 1 | `migrations/0008_product_sku_verification.sql` |
-| ADMIN HTML | 1 | `public/admin/index.html` |
-| Public storefront HTML | 1 | `public/index.html` changes outside the ADMIN page |
-| Data fixture | 1 | `data/legacy-products.json` (235 seed SKU verification changes previously identified) |
-| Package file | 1 | `package.json` modified |
-
-Current PR metadata: **970 changed files, +32,282/−356, 415 commits, base `main`, OPEN/unmerged**. The changed-file list confirms scope contamination with public storefront/data/backend/scripts; do not merge PR #111 as-is. Do not try to clean/rewrite history, force-push, cherry-pick, change the PR base or remove evidence screenshots without explicit owner approval. Continue with read-only review and document the scope risk.
