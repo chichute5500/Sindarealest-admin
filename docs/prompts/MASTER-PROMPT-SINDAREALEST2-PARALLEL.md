@@ -440,3 +440,6 @@ Nguồn sự thật của dự án là GitHub: đọc docs/handoff/PROMPT-NEXT-C
 3. Duy trì kiểm tra sáu ô Liquid Glass, phần “Phong cách đẳng cấp từ da cá sấu”, nền satin, gallery controls, drawer cart/account/checkout, mobile Back, footer/Zalo và route sản phẩm; không coi kiểm thử tĩnh là visual acceptance.
 4. Audit toàn thể vẫn bị khóa nếu public verified product payload không có đúng SKU `SD-GL052`. Không fake SKU, không thay ảnh khác, không đụng catalog/D1/R2/Admin để làm xanh audit. Giữ fail-closed và ghi blocker cụ thể.
 5. Sau khi có kết quả visual cuối, cập nhật handoff, test results, master prompt, next-chat prompt; chỉ workflow guarded được phép lưu canonical screenshots/manifest khi các điều kiện acceptance đạt. Tiếp tục làm sau khi báo cáo, không tự dừng để hỏi cập nhật tiến độ.
+
+## Current-chat handoff clarification (2026-10-21)
+Continue the static storefront redesign from the current branch and the latest verified repository/CI state. Do not investigate or discuss the user's previously mentioned uploaded image or folder; the user explicitly chose to leave that topic aside and handle it afresh in a new conversation. Do not let it block unrelated website work. All existing restrictions on Production, Admin, merge, backend and product data remain in force.
