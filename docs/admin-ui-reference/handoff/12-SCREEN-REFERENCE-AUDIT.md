@@ -69,3 +69,11 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 - Exact source validation [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) both SUCCESS. Static baseline suite: 3 passed (30.5s); responsive/theme matrix and Preview CSS signature PASS. Artifact `admin-preview-evidence-189`, ID `12359007200`, has 59 PNGs and 36 synthetic fixture metrics.
 - Keyboard/focus is now **PARTIAL**, not globally PASS: these checks cover selected editor and order-detail dialog behavior using synthetic fixtures. Full screen-by-screen keyboard/a11y review and all-12-screen visual parity remain NOT ACCEPTED.
 - Overall progress remains 48%; authenticated real-backend QA is still BLOCKED / NOT TESTED. Image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
+
+
+## Keyboard-navigation follow-up — 2026-10-21 16:00 UTC
+
+- Test-only commit `32c1f28662e7240353b0eda2f5daeaf22359257e` adds Home/End navigation assertions to the product editor tabs, including focus target and `aria-selected` state. Existing ArrowLeft/ArrowRight, dialog focus trapping, Escape close, and focus restoration checks remain.
+- Exact source validation [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) both SUCCESS. Static baseline suite: 3 passed (30.5s); responsive/theme matrix and Preview CSS signature PASS. Artifact `admin-preview-evidence-189`, ID `12359007200`, has 59 PNGs and 36 synthetic fixture metrics.
+- Keyboard/focus is now **PARTIAL**, not globally PASS: these checks cover selected editor and order-detail dialog behavior using synthetic fixtures. Full screen-by-screen keyboard/a11y review and all-12-screen visual parity remain NOT ACCEPTED.
+- Overall progress remains 48%; authenticated real-backend QA is still BLOCKED / NOT TESTED. Image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
