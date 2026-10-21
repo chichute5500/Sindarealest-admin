@@ -82,4 +82,13 @@ assert.match(baselineSpec, /variant\.viewport\.width < 821\) return;/,
 assert.match(baselineSpec, /expect\.poll\(async \(\) => page\.evaluate\(\(\) => \{/,
   'Order row scrolling should wait for an attached DOM node');
 
-console.log('PASS ADMIN ice-glass visual tokens, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
+// The reorder/remove gallery controls use SVG artwork, not Unicode text glyphs, while
+// retaining record-specific accessible names and remaining legible in both themes.
+for (const action of ['up', 'down', 'remove']) {
+  assert.match(adminHtml, new RegExp('data-gallery="' + action + '"[^>]*><svg[^>]*aria-hidden="true"'),
+    'Gallery action ' + action + ' should render an aria-hidden inline SVG icon');
+}
+assert.doesNotMatch(adminHtml, /data-gallery="(?:up|down|remove)"[^>]*>(?:←|→|×)<\/button>/,
+  'Gallery controls must not fall back to Unicode arrow/delete glyphs');
+
+console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
