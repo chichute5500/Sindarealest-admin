@@ -764,6 +764,31 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     // Product editor and image gallery are true source components. Only their input data is fixture-only.
     for (const variant of variants) {
       await openEditor(variant);
+      if (variant.viewport.width <= 680) {
+        const surface = await page.locator('#backdrop>.editor').evaluate(el => {
+          const rect = el.getBoundingClientRect();
+          const probe = document.createElement('div');
+          probe.style.background = 'var(--bg)';
+          document.body.append(probe);
+          const expectedBackground = getComputedStyle(probe).backgroundColor;
+          probe.remove();
+          return {
+            left: Math.round(rect.left), top: Math.round(rect.top),
+            width: Math.round(rect.width), height: Math.round(rect.height),
+            radius: getComputedStyle(el).borderRadius,
+            shadow: getComputedStyle(el).boxShadow,
+            background: getComputedStyle(el).backgroundColor,
+            expectedBackground
+          };
+        });
+        expect(surface.left, 'Mobile product editor should align with the viewport edge').toBe(0);
+        expect(surface.top, 'Mobile product editor should start at the top edge').toBe(0);
+        expect(surface.width, 'Mobile product editor should fill the viewport width').toBe(variant.viewport.width);
+        expect(surface.height, 'Mobile product editor should fill the viewport height').toBe(variant.viewport.height);
+        expect(surface.radius, 'Mobile product editor should not retain a floating-card radius').toBe('0px');
+        expect(surface.shadow, 'Mobile product editor should not cast a desktop drawer shadow').toBe('none');
+        expect(surface.background, 'Mobile product editor should use an opaque theme surface').toBe(surface.expectedBackground);
+      }
       await saveScreenshot('product-editor', variant, { dialog: true });
       if (variant.viewport.width === mobile.width && variant.theme === 'light') {
         // Empty required field, then submit from another tab: validation must reveal the correct panel and block every API write.
