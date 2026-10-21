@@ -367,3 +367,12 @@ This was a read-only source review of the existing payment contract and route co
 - PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) remains OPEN/UNMERGED, base `main`, currently 1,114 changed paths and mixed Admin/storefront/Functions/migration/setup-deploy/test/evidence scope: **not merge-ready**. PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108) remains OPEN/UNMERGED (269 paths).
 - Source-only migration tracking risk remains: `setup-cloudflare.mjs` omits 0009 and `deploy-cloudflare.mjs` preflights 0007/0008 but not 0009. This does not prove remote D1 lacks that schema. No remote D1/R2, SQL, migration/setup script, merge, Production deployment, secret/Access change/bypass, or TinyFish occurred.
 - Overall progress remains **48%**. Before further edits, re-fetch live branch/PR refs; current HEAD after documentation updates differs from tested source/test SHA.
+
+
+## Latest handoff pointer — 2026-10-21 15:28 UTC
+
+- **Continue from:** `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`, section “READY-TO-PASTE HANDOFF PROMPT — latest checkpoint 2026-10-21 15:27 UTC”. It contains the full paste-ready instructions for the next chat.
+- **Status/results:** `LATEST-STATUS.md` and `latest-test-results.json` have the dashboard revenue empty-state validation and known remaining gaps. Current overall progress remains **48%**.
+- **Last known passing source/test SHA:** `06d689b6a97fa7bdb05258acb8435a6954d67309`, source run [#39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256). Last known passing handoff validation SHA: `c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf`, run [#39625390469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39625390469). Subsequent docs commits moved HEAD; verify latest live SHA and its CI before claiming current HEAD is green.
+- **Next priority:** execute the 12-screen Admin reference comparison with explicit PASS/FAIL/BLOCKED/NOT TESTED and screenshot evidence; no additional revenue panel. Authenticated real-backend QA is not yet proven. Product image-save and PRE/PRO migration remain deferred by owner.
+- **Safety:** work only on `feature/admin-isolated-handoff-2026-10-20`; do not merge PR #111/#108 or deploy Production; no Access/secrets changes, D1/R2 operations, SQL/migration execution, or TinyFish.
