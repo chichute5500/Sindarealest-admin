@@ -365,3 +365,13 @@ Nếu không có quyền tạo service token/Secrets, không thể chụp baseli
 5. Run relevant tests, deploy only Preview through GitHub Actions, verify deployment SHA, capture real screenshots and update `docs/website-screenshots/manifest.json` only after evidence exists. Update this handoff with exact commit, run/artifact URLs, outcomes and remaining blockers.
 
 **Status honesty:** this handoff addendum records the contract and next implementation requirements; it does not claim the storefront QR/payment/product-type feature is complete. Keep the satin/reference audit separate; its known `SD-GL052` blocker remains unresolved and must not be “fixed” by fabricating product data.
+
+
+## 2026-10-21 — Current QR/fulfillment handoff checkpoint
+
+- Scope: public storefront UI/API consumption and storefront tests only. Admin AI owns Admin UI, product-type persistence/schema, QR upload/configuration, payment ledger and verification on its own branch. Coordinate through `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`; do not edit the other branch.
+- Product type accepts only explicit `in_stock`, `made_to_order`, `unclassified`; missing/unknown stays unclassified. Never infer from category, SKU, stock or image. Customer cannot choose type. Payment options use server-confirmed values: made-to-order 30% deposit or 100%; in-stock 100,000 VND deposit or 100%; full payment qualifies for freeship for both.
+- Current `POST /api/orders` returns `pending_confirmation`; no public order-status lookup or active receiver QR config was verified. Checkout must show “Chờ cửa hàng xác nhận” and “Vui lòng chưa chuyển tiền”, with no QR/amount. Only render a QR from complete confirmed API data with `qrIncludesAmount:false`; browser never sets payment status and QR scan/display/receipt/customer claim never confirms payment.
+- At source SHA `ed454231a6a9cd9b9605f3581f4a5a79497462bb`, source validation run 39559590352, Preview deploy run 39559590384, and Admin Preview Playwright run 39559590377 passed. Visual workflow 39559590354 was still running when checked; inspect result and artifact before visual acceptance. Recheck workflows against current HEAD because this note itself is documentation-only.
+- Known blocker: last completed live audit failed because `SD-GL052` is absent from verified public product data. Do not fabricate/substitute it. Audit was read-only and did not submit an order or verify payment.
+- Next: inspect visual run 39559590354, verify latest runtime fail-closed QR tests and mobile card-height audit, continue real storefront visual fixes, then source tests + Preview deploy + live screenshot audit. Keep PR #108 open; no merge, Production deploy/migration, Admin changes, secrets/bindings/DNS changes, or catalog edits.
