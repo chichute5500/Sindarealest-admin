@@ -32,3 +32,16 @@
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Cập nhật điều tra Preview Access/CSS — 2026-10-21 12:46 UTC
+
+- Diagnostic run mới nhất: [Actions run 39602040135](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135), tested commit `3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f`.
+- `npm run check`: PASS; `npm test`: PASS; local source Playwright matrix: PASS.
+- **Target thực tế được workflow ghi log:** `host=1f1dc981.sindarealest2.pages.dev path=/admin/`. Đây KHÔNG phải deployment URL `564cd391.sindarealest2.pages.dev` cũng không phải alias `feature-admin-isolated-hando.sindarealest2.pages.dev` đã được báo cáo trước đó. Do đó, URL lưu trong `ADMIN_TEST_URL` hiện đang trỏ đến hostname thứ ba; cần xác minh deployment/commit của hostname này trước khi kết luận source cần sửa.
+- Preview đã trả HTML của Admin (title `Quản trị SinDarealest`, lang `vi`, login view class `loginwrap`), nên lượt này không bị dừng ở Access challenge.
+- CSS diagnostic: `PREVIEW_CSS_SIGNATURE_MISMATCH`; brand topbar `display:flex`, `visibility:visible`, `opacity:1`; inline stylesheet có 226 rules nhưng `hasLoginHideRule=false`, `matchingRules=[]`.
+- Source file `public/admin/index.html` ở commit `3ed2d86b8b97f04718c478979136f986b3d1b07b` và `5493f61d69f89e21d0f5023878bb997dae112924` đều chứa login-hide CSS. Chưa có bằng chứng rằng HTML được phục vụ tại hostname `1f1dc981` khớp file source của các commit đó.
+- Thay đổi chẩn đoán an toàn duy nhất trong commit `3dfe0ed4b4fe0e31622e469f0b0c71110f53c59f`: log hostname + pathname đã chuẩn hóa, không log query/token. Không thay assertion CSS, không đọc/đổi secrets, không đổi Access policy, không deploy Production.
+- Artifact bằng chứng: [admin-preview-evidence-149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39602040135/artifacts/12346980569).
+- **Bước tiếp theo:** xác minh trong Cloudflare Pages deployment list commit/branch của `1f1dc981.sindarealest2.pages.dev`; sau đó sửa giá trị `ADMIN_TEST_URL` qua GitHub Settings để trỏ tới Preview deployment/alias được chủ sở hữu chọn. Không in giá trị secret trong log. Nếu deployment đúng vẫn thiếu CSS, mới điều tra build/output/cache. Không tạo token Access mới.
