@@ -16,11 +16,14 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "branchHeadSha": "af543dd83c40d026d2c09aa253b2396ccb3421d3",
+    "branchHeadSha": "b2f6d29fa288098c0c154a993db104f2898a291d",
     "lastObservedApplicationSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
     "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
     "pr111State": "OPEN_UNMERGED",
-    "pr108State": "OPEN_UNMERGED"
+    "pr108State": "OPEN_UNMERGED",
+    "pr111ChangedFiles": 1092,
+    "pr111Additions": 37208,
+    "pr111Deletions": 392
   },
   "changes": [
     {
@@ -1699,6 +1702,29 @@
       "continueAfterProgressReports": true,
       "stopOnlyWhenOwnerActionRequired": true,
       "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
-    }
+    },
+    "latestHandoffHeadSha": "b2f6d29fa288098c0c154a993db104f2898a291d",
+    "pr111FileInventory": "COMPLETE_1092_FILES",
+    "pr111SemanticAudit": "PARTIAL",
+    "pr111State": "OPEN_UNMERGED",
+    "pr108State": "OPEN_UNMERGED"
+  },
+  "pr111FileInventory": {
+    "retrievedPages": 12,
+    "totalFiles": 1092,
+    "categories": {
+      "docs": 1030,
+      "functionsApi": 24,
+      "tests": 24,
+      "scripts": 5,
+      "migrations": 2,
+      "workflows": 2,
+      "publicAdminHtml": 1,
+      "publicStorefrontHtml": 1,
+      "rootOther": 3
+    },
+    "inventoryStatus": "COMPLETE_PAGINATED_GITHUB_API",
+    "semanticSecurityAuditStatus": "PARTIAL_NOT_ACCEPTED_FOR_MERGE",
+    "keyFinding": "PR #111 combines Admin UI, public storefront, Functions/API, migrations, scripts, tests and a very large documentation/evidence history. Keep open/unmerged pending full scoped review and owner decision."
   }
 }
