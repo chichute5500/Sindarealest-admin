@@ -144,3 +144,18 @@
 - Deployed Preview: failure.
 - The screenshot matrix covers the login shell only; authenticated data modules were not exercised by this local source test.
 - Production deployment: NOT PERFORMED.
+
+
+## 2026-10-21 — Latest verified continuation
+
+- Scope guard: repository `chichute5500/Sindarealest-admin`; work branch `feature/admin-isolated-handoff-2026-10-20`; PR #111 remains OPEN and unmerged. PR #108 and the production website branch were not modified by this task.
+- Latest verified source-test run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39495162150
+- Tested source commit: `d74de3c6adbb6be6b0a59ac4d45e869738a016e4`.
+- GitHub Actions jobs verified through GitHub API: repository checks PASS; automated tests PASS; local read-only static ADMIN preview startup PASS; screenshot/test-state persistence PASS. The workflow is overall FAILURE only because **Diagnose configured deployed Preview** failed.
+- Evidence artifact: `admin-preview-evidence-61` (artifact id `12296849221`, about 9.2 MB; retained by GitHub Actions). The recorded local screenshot matrix contains 58 real PNG files for the tested source; this is not authenticated backend evidence.
+- Previously inspected fixture audit: 42 module screenshots, 36 metrics, no page/console errors, no failed requests, no attempted writes and no unexpected API paths in the read-only fixture. The separate login shell matrix contains 16 images. These counts describe separate suites and must not be conflated.
+- Verified ADMIN markup correction: `public/admin/index.html` changed `</nav>/div>` to `</nav></div>`. The next screenshot/evidence must still be checked before claiming the visual defect is permanently resolved in deployed Preview.
+- Preview blocker remains: remote CSS/UI signature does not match the tested source. Root URL/deployment identity has not been established. Do not bypass Cloudflare Access, print or modify secrets, or change Access configuration without authorization.
+- Full progress remains **43%**: source-level checks and fixture evidence are meaningful, but authenticated modules, all 12 reference-screen comparisons, current full PR diff/scope audit, and deployed Preview verification are not complete. Do not inflate progress based on fixture-only screenshots.
+- Current PR #111 is still open against `main` and the reported diff is broad (909 files at the last PR read); this is a merge blocker until a complete scope audit is performed. No merge, cherry-pick, force-push, Production deployment, schema/data/secrets change was performed.
+- Next: correct the Preview target only through an authorized owner action; inspect the latest artifact and compare all available screenshots with the approved reference; run post-login read-only tests only after valid authorized access and safe test-data/PII masking are available; continue auditing the PR diff using GitHub source evidence or a verified checkout.
