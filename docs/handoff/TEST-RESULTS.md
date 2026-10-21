@@ -670,3 +670,17 @@ Continue the SinDarealest2 static storefront from the latest GitHub state. Read 
 - Kết quả: **PASS — workflow/job tạo và upload artifact thành công.** Chưa đủ căn cứ kết luận toàn bộ UI PASS, visual match PASS hoặc Preview deployment exact-SHA PASS. Các mục này cần kiểm tra riêng trong artifact/Cloudflare.
 - Artifact trước đó: `sindarealest-liquid-glass-preview-681`, ID `12363464318`; không lặp lại review artifact cũ nếu artifact 683 có bằng chứng tương đương/mới hơn.
 - Next: inspect artifact 683 manifest/report; verify Preview deploy SHA; chỉ bổ sung coverage thiếu và ghi test theo tiêu chí riêng.
+
+
+## 2026-10-21 17:18 UTC — Satin refinement + live Preview capture
+
+- Branch: `fix/liquid-glass-audit-2026-10-19`; HEAD tested: `306bdc9fa3a1ca7494ed552424c3462105884f83`.
+- Environment: Cloudflare Pages Preview alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`; deployment API verified exact SHA `306bdc9fa3a1ca7494ed552424c3462105884f83`, deployment ID `9e0b9b2d-03d2-4b93-b650-0d4073a11513`.
+- Source/tests: PASS — [run 39641949642](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949642).
+- Preview deploy: PASS — [run 39641949582](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949582).
+- Live visual workflow: completed — [run 39641949358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949358); [artifact 12366231369](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641949358/artifacts/12366231369).
+- Local fixture audit: PASS, 54 screenshots, zero hard failures (fixture-only; not live proof).
+- Live audit: captureCompleted=true, 86 screenshots, 8/8 viewport-theme, 12/12 product route/direct-open/reload, 8/8 commerce/gallery states; zero console/page/same-origin HTTP errors and zero failed requests. Welcome splash Light/Dark now CAPTURED.
+- Live audit result: FAIL only because `SD-GL052` is absent from the verified public catalog payload; fail-closed hero fallback is correct. Do not invent product data or use a substitute image.
+- Change: refined four satin SVG assets (v10) and bumped CSS asset URLs to `v=20261021-21`; screenshot comparison confirms Light satin bands are softer. Fixed audit capture timing for the reduced-motion welcome splash.
+- Next: visually inspect gallery image frame/background and continue other UI refinements; after each storefront change rerun tests, deploy Preview, capture live screenshots, inspect artifact, and update this ledger.
