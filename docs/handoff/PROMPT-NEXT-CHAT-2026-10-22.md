@@ -78,3 +78,10 @@ Artifact cũ không PASS do `firstPaintCoverageComplete=false`: có 18/20 frame;
 - Không Admin branch, không merge PR, không Production/main, DNS, D1/R2, bindings, secrets, Access, backend/catalog mutation.
 - Không thay logo chính thức, không sửa dữ liệu/quan hệ ảnh sản phẩm thật.
 - Không dừng chỉ để báo cáo. Nếu một workflow đang chạy, tiếp tục kiểm tra phần khác an toàn trong lúc chờ.
+
+
+## Icon reference assets — mandatory before implementation (2026-10-22)
+- Before changing icon source/CSS/interaction, open and visually inspect these repository reference images: `docs/icon-assets/Icon.png` (icon shape/stroke/proportion reference) and `docs/icon-assets/Chitiet.png` (Liquid Glass/interactions/fly-to-cart storyboard reference). Read `docs/icon-assets/README.md`, `docs/icon-system-inventory.md`, `docs/admin-ui-reference/handoff/START-HERE.md`, and `docs/admin-ui-reference/handoff/LATEST-STATUS.md` in the documented handoff order as well as master prompt §XXII.
+- These are design reference images; do not assume they are runtime assets loaded by the storefront. Do not invent another icon pack or mark the exact asset set as fully implemented until the images and current runtime asset inventory have been inspected.
+- The current documentation now identifies these two reference paths, but the image contents have not yet been visually verified in this handoff update. Treat unresolved values (including exact favorite-red token and detailed glass opacity/blur/shadow) as unspecified unless the reference image or existing source clearly establishes them; do not silently invent approved design tokens.
+- State remains **SPECIFIED / NOT IMPLEMENTED-VERIFIED** until source inspection, focused tests, exact-SHA Preview deployment, and real Preview evidence establish acceptance.
