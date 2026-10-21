@@ -381,3 +381,11 @@ This was a read-only source review of the existing payment contract and route co
 ## New audit matrix pointer — 2026-10-21
 
 Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENCE-AUDIT.md`. It records PASS/PARTIAL/BLOCKED/NOT TESTED states and keeps overall progress at 48%. The reduced-motion Playwright test is not considered browser-verified until an exact-SHA Actions run executes that E2E suite. Latest handoff updates: matrix `04ec0f59305ceed927348fdf39cc220fd9ad6082`, status `26a1294f98d7ea0273bdca599f2f6a42f5951a6f`, prompt `2b59df3bf886c66b06a90966e8c942e9b6f25676`. Re-fetch live refs and exact-SHA Actions before claiming current code is green.
+
+## Latest verified browser checkpoint — 2026-10-21 15:54 UTC
+
+- Exact source/test SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e`: Validate Source [#39629076105](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076105) PASS; Admin Preview/Playwright [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) SUCCESS. Browser static baseline: 3 passed, including reduced-motion audit. Preview login CSS signature: PASS.
+- Prior reduced-motion E2E failure was a bad test locator (`#main .dashboard-revenue`, `#main .dashboard-shortcut`), not a source CSS failure. The dashboard renderer injects these elements at `#appView`; locators were aligned to the actual DOM. No application/business behavior changed.
+- Artifact `admin-preview-evidence-188` ID `12357698923`: 59 PNGs (16 login + 43 synthetic fixture screens), 36 fixture metrics, zero recorded browser/console/network/HTTP errors and zero attempted fixture writes. Raw PNGs remain in Actions artifacts, not per-run Git commits. This evidence is not authenticated backend QA.
+- Latest verified source/test SHA remains `131d6f3...`; handoff-only commits subsequently advance branch HEAD. Re-fetch live PR HEAD before further work. Overall progress 48%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS. Image-save and PRE/PRO migration remain DEFERRED_BY_OWNER.
+- Both PR #111 and PR #108 stay OPEN/unmerged. Only ADMIN branch; no main/static branch edits, no production deploy, secret/Access change or bypass, remote D1/R2, SQL/setup/migration execution, or TinyFish.
