@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-21T16:25:00Z",
+  "repository": "chichute5500/Sindarealest-admin",
+  "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
+  "branchHeadAtCheckpoint": "7fd3976c858b8462b343d2fe53e3ccd8807b4c20",
+  "branchHeadIsTestedSource": false,
+  "progressPercent": 48,
+  "progressBasis": "Management estimate only; full 12-screen reference parity and authenticated backend acceptance are incomplete.",
+  "latestVerifiedApplicationTest": {
+    "sourceSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "validationRun": {
+      "id": 39633278598,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598"
+    },
+    "previewPlaywrightRun": {
+      "id": 39633278359,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359"
+    },
+    "browserSuite": "3 passed (25.5s)",
+    "checks": {
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "responsiveThemeMatrix": "PASS",
+      "previewLoginCssSignature": "PASS"
+    },
+    "artifact": {
+      "name": "admin-preview-evidence-192",
+      "id": 12360132558,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558",
+      "pngCount": 63,
+      "loginShellPngCount": 16,
+      "syntheticFixturePngCount": 47,
+      "metricsCount": 39,
+      "recordedBrowserConsoleNetworkHttpErrors": 0,
+      "attemptedWrites": 0,
+      "unexpectedApiPaths": 0
+    },
+    "fixtureChecks": {
+      "qrUnsavedDraftActivationGuard": "PASS",
+      "orderPaymentRequestDisabledUntilPriceAndTermsConfirmed": "PASS",
+      "recordPaymentDisabledUntilPriceAndTermsConfirmed": "PASS",
+      "backupJsonExportAndRestoreControlsVisible": "PASS",
+      "backupRestoreActionsInvoked": false
+    },
+    "scope": "Synthetic/read-only fixture evidence only; no authenticated real backend or payment/backup/restore operation."
+  },
+  "acceptance": {
+    "twelveScreenVisualParity": "NOT_ACCEPTED",
+    "authenticatedBusinessBackendQA": "NOT_TESTED_BLOCKED_BY_ACCESS",
+    "orderFulfillmentScreen": "PARTIAL",
+    "paymentQrLedgerScreen": "PARTIAL",
+    "backupRestoreSettingsScreen": "PARTIAL",
+    "productImageSaveAndActualR2Storage": "DEFERRED_BY_OWNER_NOT_VERIFIED",
+    "preProMigrations": "DEFERRED_BY_OWNER_NOT_VERIFIED"
+  },
+  "pullRequests": {
+    "108": {
+      "state": "OPEN",
+      "merged": false,
+      "headSha": "931ec3b8f90a24d10d86137fe4355e63d804b811",
+      "agentWritesAllowed": false
+    },
+    "111": {
+      "state": "OPEN",
+      "merged": false,
+      "headSha": "7fd3976c858b8462b343d2fe53e3ccd8807b4c20",
+      "changedFiles": 1126,
+      "mergeReady": false,
+      "reason": "Mixed scope includes Admin, storefront, Functions/API, migrations, scripts, tests and evidence."
+    }
+  },
+  "currentCi": [
+    {
+      "id": 39634631503,
+      "sha": "7fd3976c858b8462b343d2fe53e3ccd8807b4c20",
+      "status": "in_progress",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39634631503"
+    },
+    {
+      "id": 39634539722,
+      "sha": "09be7bf2b42c4f074e097464b715f0fe27383c7f",
+      "status": "in_progress",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39634539722"
+    },
+    {
+      "id": 39634523483,
+      "sha": "7473f9629ae7d14f65e6bd870b251b7e6494b6e4",
+      "status": "in_progress",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39634523483"
+    }
+  ],
+  "updatedHandoffFiles": [
+    "docs/admin-ui-reference/handoff/START-HERE.md",
+    "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
+    "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+    "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+    "docs/admin-ui-reference/handoff/latest-test-results.json",
+    "docs/admin-ui-reference/handoff/current-status.json"
+  ],
+  "nextActions": [
+    "Poll Validate Source for the latest handoff commit and verify no documentation JSON/Markdown regression.",
+    "Re-fetch branch head and PR/workflow state before the next code edit.",
+    "Continue actual 12-screen reference comparison and bounded read-only E2E work; do not claim acceptance from fixture screenshots alone.",
+    "Update handoff docs and progress only after evidence is verified."
+  ],
+  "guardrails": [
+    "Only write to feature/admin-isolated-handoff-2026-10-20.",
+    "Do not merge PR #111 or #108.",
+    "No Production deploy or changes to main/static site.",
+    "No Cloudflare Access/secrets changes or bypass.",
+    "No SQL/setup/migration execution or remote D1/R2 mutations.",
+    "Do not use TinyFish."
+  ],
+  "ownerActionRequiredNow": false
+}
