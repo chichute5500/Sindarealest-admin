@@ -2569,16 +2569,17 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
   .service-strip .service-text strong{font-size:10px}
 }
 
-/* Live Preview visual fix v2: stronger edge fade so the supplied hero photo blends into the satin canvas without replacing the real image. */
+/* Live Preview visual fix v3: remove the unmasked glass sheen that filled the photo rectangle, then fade all image edges into satin. */
 #home .hero-visual{background:transparent!important;border:0!important;box-shadow:none!important}
+#home .hero-visual::before{content:none!important;display:none!important;background:none!important}
 #home .hero-visual img{
-  -webkit-mask-image:radial-gradient(ellipse 68% 73% at 61% 52%,#000 34%,rgba(0,0,0,.86) 42%,rgba(0,0,0,.55) 54%,rgba(0,0,0,.18) 70%,transparent 84%);
-  mask-image:radial-gradient(ellipse 68% 73% at 61% 52%,#000 34%,rgba(0,0,0,.86) 42%,rgba(0,0,0,.55) 54%,rgba(0,0,0,.18) 70%,transparent 84%);
+  -webkit-mask-image:radial-gradient(ellipse 56% 56% at 52% 51%,#000 36%,rgba(0,0,0,.84) 49%,rgba(0,0,0,.48) 63%,rgba(0,0,0,.12) 77%,transparent 88%);
+  mask-image:radial-gradient(ellipse 56% 56% at 52% 51%,#000 36%,rgba(0,0,0,.84) 49%,rgba(0,0,0,.48) 63%,rgba(0,0,0,.12) 77%,transparent 88%);
 }
 @media(max-width:760px){
   #home .hero-visual img{
-    -webkit-mask-image:radial-gradient(ellipse 74% 78% at 63% 52%,#000 34%,rgba(0,0,0,.86) 43%,rgba(0,0,0,.52) 57%,rgba(0,0,0,.18) 72%,transparent 85%);
-    mask-image:radial-gradient(ellipse 74% 78% at 63% 52%,#000 34%,rgba(0,0,0,.86) 43%,rgba(0,0,0,.52) 57%,rgba(0,0,0,.18) 72%,transparent 85%);
+    -webkit-mask-image:radial-gradient(ellipse 58% 58% at 52% 51%,#000 36%,rgba(0,0,0,.84) 50%,rgba(0,0,0,.46) 64%,rgba(0,0,0,.10) 78%,transparent 89%);
+    mask-image:radial-gradient(ellipse 58% 58% at 52% 51%,#000 36%,rgba(0,0,0,.84) 50%,rgba(0,0,0,.46) 64%,rgba(0,0,0,.10) 78%,transparent 89%);
   }
 }
 
