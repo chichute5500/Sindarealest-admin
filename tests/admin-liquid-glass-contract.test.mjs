@@ -145,4 +145,30 @@ assert.ok(topbarStart >= 0 && topbarEnd > topbarStart
 assert.ok(adminHtml.includes("head('Tổng quan','Tổng quan','Chào mừng, quản trị viên.'"),
   'Dashboard heading should match the approved reference rather than a marketing-style label');
 
+
+// Product editor uses accessible tabbed groups while keeping required identity fields visible.
+for (const [id, label] of [
+  ['productEditorTabs', 'product editor tablist'],
+  ['productTabDetails', 'details tab'],
+  ['productTabPricing', 'pricing/fulfillment tab'],
+  ['productTabGallery', 'gallery tab'],
+  ['productPanelDetails', 'details tab panel'],
+  ['productPanelPricing', 'pricing tab panel'],
+  ['productPanelGallery', 'gallery tab panel']
+]) has('id="' + id + '"', label);
+has('role="tablist" aria-label="Nhóm thông tin sản phẩm"', 'named product tablist');
+has('role="tabpanel" aria-labelledby="productTabDetails"', 'details panel relationship');
+has('role="tabpanel" aria-labelledby="productTabPricing" hidden', 'initially hidden pricing panel');
+has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image gallery panel');
+has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
+has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
+has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
+has("el.tabIndex>=0&&el.getClientRects().length>0", 'modal focus trap excludes inactive tabs');
+assert.match(baselineSpec, /await expect\(page\.locator\('#productTabDetails'\)\)\.toHaveAttribute\('aria-selected', 'true'\);/,
+  'Playwright should verify the product editor defaults to its details tab');
+assert.match(baselineSpec, /await page\.keyboard\.press\('ArrowRight'\);[\s\S]*productTabGallery/,
+  'Playwright should exercise keyboard navigation to the gallery tab');
+assert.match(baselineSpec, /await page\.locator\('#productTabGallery'\)\.click\(\);[\s\S]*setInputFiles\(/,
+  'Synthetic image fixture should switch to the visible gallery tab before interacting');
+
 console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
