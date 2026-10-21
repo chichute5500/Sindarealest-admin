@@ -1,7 +1,7 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
 **Trạng thái:** SOURCE CHECKS PASS; WARRANTY LIST-FIRST FIXTURE E2E PASS; PREVIEW LOGIN CSS SIGNATURE PASS; 12-SCREEN VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA NOT TESTED.
-**Tiến độ tổng thể:** **48%** — ước lượng quản lý, không phải tỷ lệ test pass.
+**Tiến độ tổng thể:** **49%** — điểm ước lượng có trọng số, không phải tỷ lệ test pass. Bảng trọng số và cách tính được lưu trong `latest-test-results.json`.
 **Nhánh duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20` trong `chichute5500/Sindarealest-admin`.
 **HEAD đã đọc trước lần ghi handoff:** `0e9e6560a968f7ca9754c91fda6f8af89c0ae41b`. Commit ghi handoff sẽ làm HEAD tiến lên; đọc lại ref trước khi sửa tiếp. Không có local checkout nên local Git status là NOT VERIFIED.
 
@@ -48,3 +48,13 @@
 - Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Cập nhật tiến độ và mã nguồn — 2026-10-21 17:02 UTC
+
+- Latest application source/test commit: `b3c54d55a5e21ae6377d2a6392349f2402ee333f`.
+- Đã đồng bộ nhãn tìm kiếm khách hàng với 4 trường thực sự được lọc (tên, điện thoại, email, địa chỉ); thêm test địa chỉ dùng dữ liệu tổng hợp.
+- Validate source and tests [#39639774550](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774550): **SUCCESS** trên đúng SHA.
+- Admin Preview diagnostic [#39639774520](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39639774520): **IN PROGRESS** tại thời điểm ghi nhận; chưa coi là đạt.
+- Điểm tổng thể đã được tính lại theo 6 nhóm trọng số trong `latest-test-results.json`: **49%** (49.4% làm tròn). Chỉ tăng 1 điểm vì thay đổi tìm kiếm khách hàng là phần nhỏ; các khối lượng lớn còn mở gồm nghiệm thu 12 nhóm màn hình, QA nghiệp vụ có xác thực và kiểm toán semantic/security.
+- Không merge PR, không deploy Production, không thay đổi secrets/Access hoặc dữ liệu D1/R2.
