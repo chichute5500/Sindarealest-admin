@@ -969,6 +969,30 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         images.length === 6 && images.every(image => image.complete && image.naturalWidth > 0)
       ), { timeout: 5000 }).toBe(true);
       await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(18);
+      await expect(page.locator('#chooseImages')).toBeVisible();
+      await expect(page.locator('#galleryStatus')).toHaveAttribute('role', 'status');
+      await expect(page.locator('#galleryStatus')).toHaveAttribute('aria-live', 'polite');
+      await expect(page.locator('#imageGrid .imageitem-cover img')).toHaveAttribute('alt', 'Ảnh đại diện sản phẩm');
+      await expect(page.locator('#imageGrid .image-rail .imageitem img').first()).toHaveAttribute('alt', 'Ảnh sản phẩm 2');
+      await expect(page.locator('#imageGrid .imageitem-cover')).toHaveAttribute('aria-label', 'Ảnh đại diện sản phẩm');
+      await expect(page.locator('#imageGrid [data-gallery="up"][data-index="0"]')).toBeDisabled();
+      await expect(page.locator('#imageGrid [data-gallery="down"][data-index="5"]')).toBeDisabled();
+      if (variant.viewport.width === mobile.width && variant.theme === 'light') {
+        const originalFirstSrc = await page.locator('#imageGrid img').nth(0).getAttribute('src');
+        const originalSecondSrc = await page.locator('#imageGrid img').nth(1).getAttribute('src');
+        await page.locator('#imageGrid [data-gallery="up"][data-index="1"]').click();
+        await expect(page.locator('#imageGrid img').nth(0)).toHaveAttribute('src', originalSecondSrc);
+        await expect(page.locator('#imageGrid img').nth(1)).toHaveAttribute('src', originalFirstSrc);
+        await expect(page.locator('#galleryStatus')).toContainText('Đã chuyển ảnh lên vị trí ảnh đại diện');
+        await expect(page.locator('#imageGrid [data-gallery="down"][data-index="0"]')).toBeFocused();
+        await expect(page.locator('#imageGrid .imageitem-cover img')).toHaveAttribute('alt', 'Ảnh đại diện sản phẩm');
+        await page.locator('#imageGrid [data-gallery="remove"][data-index="2"]').click();
+        await expect(page.locator('#imageGrid .imageitem')).toHaveCount(5);
+        await expect(page.locator('#galleryStatus')).toContainText('Đã xóa ảnh 3. Còn 5 ảnh.');
+        await expect(page.locator('#imageGrid [data-gallery="remove"][data-index="2"]')).toBeFocused();
+        await expect(page.locator('#imageGrid [data-gallery="down"][data-index="4"]')).toBeDisabled();
+        expect(attemptedWrites, 'Gallery reorder/delete must remain local until the explicit product save action').toEqual([]);
+      }
       if (variant.viewport.width <= 480) {
         const railMetrics = await page.locator('#imageGrid .image-rail').evaluate(el => ({
           clientWidth: el.clientWidth,
