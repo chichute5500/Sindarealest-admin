@@ -142,3 +142,4 @@ The storefront renders an actual QR only when the server returns `status: confir
 This is a presentation contract, not a claim that the current API supports payment instructions. Current POST /api/orders creates an order in `pending_confirmation`; no public order-status lookup or QR/receiver configuration exists. The storefront therefore shows “Chờ cửa hàng xác nhận” and does not show an invented QR, ask for money, or claim payment success. Backend/Admin work must design a safe post-confirmation delivery path (such as an order-specific access token or other verified customer authorization); never expose order/customer details using order number alone.
 
 The storefront never sets payment_status, never interprets QR display/scan/upload as payment, and does not trust a browser-supplied amount. A server-confirmed QR must have no preset amount; the amount is presented outside the QR for the customer to enter manually.
+undefined
