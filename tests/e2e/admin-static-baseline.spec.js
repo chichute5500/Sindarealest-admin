@@ -619,6 +619,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const panel = page.locator('#notificationPanel');
         if (await panel.isVisible()) await page.locator('#notificationToggle').click();
       }
+      if (name === 'mobile-more-menu') {
+        const menu = page.locator('#mobileMorePanel');
+        if (await menu.isVisible()) await page.locator('#mobileMoreTrigger').click();
+      }
       if (name === 'order-row-details' && await page.locator('#orderDetailBackdrop').isVisible()) {
         await page.locator('#orderDetailClose').click();
         await expect(page.locator('#orderDetailBackdrop')).toBeHidden();
@@ -1312,6 +1316,31 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       expect(backupLayout.noteScrollWidth, 'Backup safety note should not overflow its own content box').toBeLessThanOrEqual(backupLayout.noteClientWidth + 1);
       expect(await section.locator('#restoreFile').isVisible(), 'The JSON file input must remain visually hidden behind its label').toBe(false);
     }, false, '.backup-actions');
+    await captureView('mobile-more-menu', 'dashboard', async variant => {
+      if (variant.viewport.width > 680) return;
+      const trigger = page.locator('#mobileMoreTrigger');
+      const menu = page.locator('#mobileMorePanel');
+      await trigger.click();
+      await expect(menu).toBeVisible();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      await expect(trigger).toHaveAttribute('aria-controls', 'mobileMorePanel');
+      await expect(menu.locator('[role="menuitem"][data-view="warranties"]')).toContainText('Bảo hành / hỗ trợ');
+      await expect(menu.locator('[role="menuitem"][data-view="settings"]')).toContainText('Cài đặt & sao lưu');
+      const layout = await menu.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        return { left: box.left, right: box.right, width: box.width, viewportWidth: document.documentElement.clientWidth, scrollWidth: element.scrollWidth, clientWidth: element.clientWidth };
+      });
+      expect(layout.left, 'Mobile More menu should not extend beyond the left viewport edge: ' + JSON.stringify(layout)).toBeGreaterThanOrEqual(-1);
+      expect(layout.right, 'Mobile More menu should not extend beyond the right viewport edge: ' + JSON.stringify(layout)).toBeLessThanOrEqual(variant.viewport.width + 1);
+      expect(layout.scrollWidth, 'Mobile More menu should not clip its contents').toBeLessThanOrEqual(layout.clientWidth + 1);
+      await page.keyboard.press('Escape');
+      await expect(menu, 'Escape should close the mobile More menu').toBeHidden();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await expect(trigger, 'Closing More menu should restore focus to the trigger').toBeFocused();
+      await trigger.click();
+      await expect(menu).toBeVisible();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    });
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
     });
