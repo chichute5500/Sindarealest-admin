@@ -1,18 +1,19 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái hiện tại:** `SOURCE CHECKS PASS; QR UNSAVED-DRAFT ACTIVATION-GUARD PLAYWRIGHT PASS ON SHA 0b9e8a2; PREVIEW CSS SIGNATURE PASS; 12-SCREEN VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA NOT TESTED`
+**Trạng thái hiện tại:** `SOURCE CHECKS PASS; QR ACTIVATION GUARD + ORDER PAYMENT READINESS + BACKUP/RESTORE UI PLAYWRIGHT PASS ON SHA 4e660a0; PREVIEW CSS SIGNATURE PASS; 12-SCREEN VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA NOT TESTED`
 **Tiến độ tổng thể ước tính:** **48%** — ước lượng quản lý, không phải tỷ lệ test pass.
 **Repository/nhánh được phép sửa:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`.
-**Latest source/test SHA đã kiểm thử đầy đủ:** `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55`. [Validate Source #39632306385](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385) **PASS** và [Admin Preview/Playwright #39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) **SUCCESS**, cùng SHA. `npm run check`, `npm test`, Playwright static baseline **3 passed (25.9s)**, responsive/theme matrix và Preview CSS signature đều PASS.
-**Cải thiện test QR mới:** fixture dùng dữ liệu tổng hợp trên giao diện Settings, kiểm tra tên trợ năng cho trường ngân hàng và checkbox xác minh, trạng thái tắt QR khi chưa active, và guard khi đổi thông tin ngân hàng mà chưa lưu nháp. Guard phải hiển thị cảnh báo trước confirm và không tạo yêu cầu ghi API; metadata ghi nhận `attemptedWrites=0`.
-**Lần thử trước đó:** Preview run #39631879451 trên `446a75a...` thất bại do test giữ thông báo từ viewport trước trong khi vẫn đòi thông báo trống. Test đã được sửa để điều hướng khỏi Settings rồi quay lại trước mỗi biến thể viewport/theme; run #39632306588 sau sửa PASS. Không thay đổi logic ứng dụng.
-**Preview signature:** `PASS_LOGIN_CSS_SIGNATURE`; inline CSS có 505 rules, `hasLoginHideRule=true`, selector được match, `.topbar > .brand` dùng `display:none !important`. Chỉ xác minh login/CSS source signature, không phải nghiệm thu nghiệp vụ thật sau đăng nhập.
-**Artifact:** [admin-preview-evidence-191](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588/artifacts/12360041542), ID `12360041542`, 11,894,748 bytes, giữ đến 2026-11-04. Có **63 PNG** (16 login shell + 47 fixture tổng hợp) và **39 fixture metrics**; browser/console/request/HTTP errors = 0; attempted fixture writes = 0; unexpected API paths = 0. Đây là source/fixture evidence, không phải QA backend thật.
-**PR #111:** OPEN / UNMERGED, base `main`, 1.124 changed paths tại lần đọc cuối; diff mixed-scope gồm Admin, storefront, Functions/API, migrations, scripts, tests và evidence, chưa merge-ready. **PR #108:** OPEN / UNMERGED. Không merge.
-**Chưa nghiệm thu:** full visual parity đủ 12 nhóm màn hình; authenticated real-backend/business QA. **Tạm hoãn theo yêu cầu chủ sở hữu:** product image-save/actual R2 storage và PRE/PRO migration (`DEFERRED_BY_OWNER / NOT VERIFIED`).
+**Latest source/test SHA đã kiểm thử đầy đủ:** `4e660a0869dd21d4a688d72823bd08b1795cf2ff`. [Validate Source #39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) **PASS** và [Admin Preview/Playwright #39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) **SUCCESS**, cùng SHA. `npm run check`, `npm test`, Playwright static baseline **3 passed (25.5s)**, responsive/theme screenshot matrix và Preview CSS signature đều PASS.
+**Kiểm thử mới (fixture/read-only):**
+- QR settings: thay đổi thông tin ngân hàng nhưng chưa lưu nháp phải tạo cảnh báo và chặn kích hoạt trước khi gọi API.
+- Đơn hàng: khi còn yêu cầu xác nhận giá/điều kiện, `create-payment-request` và `record-payment` phải disabled.
+- Sao lưu/khôi phục: nút tải JSON, input nhận JSON và thông báo cần xác nhận hiện diện; test không bấm export/restore.
+**Preview signature:** `PASS_LOGIN_CSS_SIGNATURE`; inline CSS có 505 rules, `hasLoginHideRule=true`, selector được match và `.topbar > .brand` có `display:none !important`. Đây chỉ là kiểm tra login/CSS target, không phải nghiệm thu nghiệp vụ sau đăng nhập.
+**Artifact:** [admin-preview-evidence-192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558), ID `12360132558`, 11,895,011 bytes, giữ đến 2026-11-04. Có **63 PNG** (16 login shell + 47 fixture tổng hợp) và **39 metrics**; browser/console/request/HTTP errors = 0; attempted fixture writes = 0; unexpected API paths = 0. Đây là source/fixture evidence, không phải QA backend thật.
+**PR #111:** OPEN / UNMERGED, base `main`, 1.126 changed paths tại lần đọc cuối; mixed-scope gồm Admin, storefront, Functions/API, migrations, scripts, tests và evidence, chưa merge-ready. **PR #108:** OPEN / UNMERGED. Không merge.
+**Chưa nghiệm thu:** visual parity đủ 12 nhóm màn hình; authenticated real-backend/business QA. **Tạm hoãn theo yêu cầu chủ sở hữu:** product image-save/actual R2 storage và PRE/PRO migration (`DEFERRED_BY_OWNER / NOT VERIFIED`).
 **Giới hạn runtime:** không có local checkout trong phiên này, nên local `git status` là **NOT VERIFIED**. GitHub branch/PR/Actions đã được kiểm tra trực tiếp.
 **Rào chắn:** chỉ ADMIN branch; không sửa `main`/website tĩnh; không merge/cherry-pick/force-push; không Production deploy; không chạy setup/migration; không sửa secrets/Cloudflare Access hoặc bypass; không thao tác D1/R2 từ xa; không dùng TinyFish.
-
 ## Kết quả kiểm thử tự động gần nhất
 
 - Tested commit: 4e660a0869dd21d4a688d72823bd08b1795cf2ff
@@ -24,3 +25,12 @@
 - Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Latest exact-SHA browser verification — 2026-10-21 16:18 UTC
+
+- Test-only commit `4e660a0869dd21d4a688d72823bd08b1795cf2ff` adds two read-only fixture checks to `tests/e2e/admin-static-baseline.spec.js`: (1) an order with `price_confirmation_required=true` and no terms confirmation keeps QR-request and receipt-verification buttons disabled; (2) backup/restore controls expose JSON export, JSON file accept-type and confirmation disclosure without invoking either action.
+- Validate Source [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) **SUCCESS**; Admin Preview/Playwright [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) **SUCCESS** on exact SHA. Static browser suite: 3 passed (25.5s). Existing QR unsaved-draft activation guard, product-editor keyboard checks and reduced-motion tests were also rerun and passed.
+- Artifact `admin-preview-evidence-192` ID `12360132558`, 11,895,011 bytes, expires 2026-11-04: 63 PNGs (16 login + 47 synthetic/read-only fixtures), 39 metrics, zero recorded page/console/network/HTTP errors, no attempted fixture writes and no unexpected API paths. Preview login CSS signature PASS, not authenticated backend QA.
+- Handoff JSON has been updated with exact run IDs and artifact #192. Subsequent documentation commits advance branch HEAD beyond the tested source SHA; always re-fetch live refs before the next write.
+- Overall progress remains 48%. Screen #7 order/fulfillment is now **PARTIAL** on fixture safety-state coverage, not authenticated flow acceptance. Screen #8 payment QR and #12 backup/settings remain **PARTIAL**, not accepted as visually equivalent to all references. Authenticated backend QA BLOCKED / NOT TESTED; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
