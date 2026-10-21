@@ -59,3 +59,12 @@ For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file 
 - No merge/cherry-pick/force-push; no Production deploy.
 - No secrets/Cloudflare Access changes or bypass; no remote D1/R2 operations; do not execute setup/migration scripts; do not use TinyFish.
 - Do not resume product image-save or PRE/PRO migration work unless the owner explicitly reauthorizes it.
+
+
+## Latest verified checkpoint — 2026-10-21 21:45 ICT
+
+- Mobile product gallery footer alignment was fixed in `public/admin/index.html` (source commit `cc77869873c2f5b4b2d1118dc60c0d88413eb218`), with a Playwright geometry regression test (`a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e`) and CSS contract assertions (`5f73373094ba71f467374e8b026bbfc3c5059fec`).
+- Exact tested tree `a999bfdc529ea38c5309ebfbff33a45c6779c10b`: [Validate #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Preview diagnostics #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737) both PASS. Run #162's evidence artifact is `admin-preview-evidence-162` (ID `12354480678`); review `product-gallery__390x844__light.png` and dark counterpart. Footer now reaches the dialog edge; the final gallery image sits above it.
+- Still not accepted: all-12-screen visual parity. The approved product-image screen has a horizontal thumbnail rail and richer image-status controls that the current grid/card layout does not yet match. Continue this comparison rather than marking visual completion from passing CSS tests.
+- Authenticated backend QA remains NOT TESTED. Real product image upload/save and PRE/PRO migrations remain DEFERRED_BY_OWNER / NOT VERIFIED. QR/payment source audit is source-only; the public static consumer gap remains the static branch's responsibility. Deployment scripts' migration-0009 coverage risk is documented; do not execute setup/deploy/migration scripts or perform remote D1/R2 operations.
+- PR #111 remains OPEN/UNMERGED and mixed-scope (1,112 changed paths); PR #108 remains OPEN/UNMERGED (269). Progress remains 48%. Only ADMIN branch; no merge, Production deploy, main/static branch edits, secrets/Access changes/bypass, remote D1/R2 operations, or TinyFish.
