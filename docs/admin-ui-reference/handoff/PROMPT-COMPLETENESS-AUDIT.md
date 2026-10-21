@@ -199,3 +199,10 @@ This was a read-only source review of the existing payment contract and route co
 - Fixture test status: **PASS** for Settings QR field visibility/accessibility and the client-side unsaved-bank-details activation guard. It asserts the guard warning and requires zero non-GET API calls; synthetic/read-only data only.
 - Prior attempt #39631879451 failed because the message persisted between viewport variants; the test now navigates to another module and back so every viewport starts with a newly rendered form. No application logic changed; rerun on exact SHA passed.
 - Artifact #191 ID `12360041542`: 63 PNGs, 39 metrics; zero recorded browser/console/network/HTTP errors and zero attempted writes. Authenticated backend behavior remains NOT TESTED; QR/payment module status is PARTIAL; full 12-screen visual parity is NOT ACCEPTED; overall progress stays 48%.
+
+
+## Order and backup UI guard coverage — 2026-10-21 16:18 UTC
+
+- Exact SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff` passed source validation [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) and browser workflow [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359).
+- PASS for fixture-only regression assertions: disabled QR request/receipt controls while price and terms are unconfirmed; backup JSON export control present; JSON restore input has the expected accept type; confirmation disclosure visible. No action triggered. QR unsaved-draft activation guard, keyboard and reduced-motion tests also passed.
+- Acceptance labels remain limited: Orders #7 PARTIAL; QR/payment #8 PARTIAL; backup/settings #12 PARTIAL; authenticated backend NOT TESTED; full reference parity NOT ACCEPTED; progress 48%.
