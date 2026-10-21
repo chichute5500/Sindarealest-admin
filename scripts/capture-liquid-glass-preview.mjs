@@ -459,35 +459,21 @@ try {
       mobileNav: (() => { const nav = document.querySelector('#mobileBottomNav'); return { present: !!nav, visible: !!nav && getComputedStyle(nav).display !== 'none', tabs: nav?.querySelectorAll('[data-mobile-tab]').length || 0 }; })(),
       title: document.title,
     }));
-    const expectedHeroProduct = products.find((product) =>
-      product && product.skuVerified !== false
-      && String(product.sku || '').trim().toUpperCase() === 'SD-GL052') || null;
-    const expectedHeroImageValue = expectedHeroProduct
-      ? String((Array.isArray(expectedHeroProduct.images) && expectedHeroProduct.images.length
-        ? expectedHeroProduct.images[0] : expectedHeroProduct.image) || '')
-      : '';
-    const expectedHeroImage = expectedHeroImageValue.startsWith('./')
-      ? expectedHeroImageValue.slice(2)
-      : expectedHeroImageValue;
-    const heroImagePass = expectedHeroProduct
-      ? startup.heroImage.present
-        && startup.heroImage.loaded
-        && startup.heroImage.source === expectedHeroImage
-        && startup.heroImage.sku === 'SD-GL052'
-        && startup.heroImage.status === 'ready'
-      : startup.heroImage.present
-        && startup.heroImage.hidden
-        && startup.heroImage.status === 'sku-not-found'
-        && !startup.heroImage.source;
+    const expectedHeroImage = '/images/hero-sd-gl052.png';
+    const heroImagePass = startup.heroImage.present
+      && startup.heroImage.loaded
+      && startup.heroImage.source.split('?')[0] === expectedHeroImage
+      && startup.heroImage.status === 'owner-supplied'
+      && !startup.heroImage.hidden;
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
     audit.interactions.push({
       theme,
-      check: 'hero-selects-exact-sd-gl052-or-fails-closed',
+      check: 'hero-uses-owner-uploaded-image',
       pass: heroImagePass,
-      result: { ...startup.heroImage, expectedProductAvailableInReadOnlyFixture: !!expectedHeroProduct, expectedImage: expectedHeroImage },
+      result: { ...startup.heroImage, expectedImage: expectedHeroImage },
     });
-    if (!heroImagePass) hardFailures.push('Hero image did not use exact SD-GL052 data or fail closed when the read-only fixture lacks that SKU: ' + theme);
+    if (!heroImagePass) hardFailures.push('Hero image did not load the owner-uploaded static asset in ' + theme);
     audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
     if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
