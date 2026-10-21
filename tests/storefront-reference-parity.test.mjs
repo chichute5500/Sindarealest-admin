@@ -166,3 +166,15 @@ assert.match(performantThemeTransition, /transition:background-color \.22s ease,
   'Theme switching should use a short 220ms paint-only transition.');
 assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/,
   'Theme switching must not animate expensive backdrop-filter changes across glass surfaces.');
+
+ 
+// The hero must reveal the satin texture beneath a readable, non-opaque text veil.
+const satinHeroVisibility = html.slice(html.lastIndexOf('/* Satin visibility correction:'));
+assert.match(satinHeroVisibility, /#home\.hero\.wrap\{\s*background:rgba\(246,251,255,\.20\)!important;/,
+  'Light hero surface must be transparent enough to reveal satin folds.');
+assert.match(satinHeroVisibility, /html\.dark #home\.hero\.wrap\{\s*background:rgba\(7,27,45,\.22\)!important;/,
+  'Dark hero surface must reveal the navy satin texture.');
+assert.match(satinHeroVisibility, /rgba\(237,247,255,\.72\) 0%,rgba\(237,247,255,\.54\) 30%,rgba\(237,247,255,\.24\) 52%/,
+  'Light mobile hero veil must not wash satin out with nearly opaque white.');
+assert.match(satinHeroVisibility, /rgba\(4,20,34,\.62\) 0%,rgba\(4,20,34,\.43\) 32%,rgba\(4,20,34,\.19\) 55%/,
+  'Dark mobile hero veil must preserve the satin behind the text.');

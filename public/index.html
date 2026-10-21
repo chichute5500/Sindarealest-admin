@@ -2604,6 +2604,27 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
 /* Keep theme toggles responsive on phones: avoid repaint-heavy backdrop-filter transitions. */
 html.theme-transitioning .nav,html.theme-transitioning .glass,html.theme-transitioning .glass-soft,html.theme-transitioning .product-card,html.theme-transitioning .promise,html.theme-transitioning .mosaic-card,html.theme-transitioning .custom-text,html.theme-transitioning .footer,html.theme-transitioning .contact-link{transition:background-color .22s ease,border-color .22s ease,box-shadow .22s ease,color .22s ease!important}
 
+
+/* Satin visibility correction: avoid washing out the fabric under the hero while keeping the text layer legible. */
+#home.hero.wrap{
+  background:rgba(246,251,255,.20)!important;
+  border-color:rgba(255,255,255,.46)!important;
+  box-shadow:0 12px 34px rgba(38,82,116,.06),inset 0 1px 0 rgba(255,255,255,.28)!important;
+}
+html.dark #home.hero.wrap{
+  background:rgba(7,27,45,.22)!important;
+  border-color:rgba(155,198,229,.28)!important;
+  box-shadow:0 14px 36px rgba(0,5,15,.14),inset 0 1px 0 rgba(219,241,255,.07)!important;
+}
+@media(max-width:760px){
+  #home.hero:after{
+    background:linear-gradient(90deg,rgba(237,247,255,.72) 0%,rgba(237,247,255,.54) 30%,rgba(237,247,255,.24) 52%,rgba(237,247,255,.02) 100%)!important;
+  }
+  html.dark #home.hero:after{
+    background:linear-gradient(90deg,rgba(4,20,34,.62) 0%,rgba(4,20,34,.43) 32%,rgba(4,20,34,.19) 55%,rgba(4,20,34,.02) 100%)!important;
+  }
+}
+
 </style>
 
 </body>
