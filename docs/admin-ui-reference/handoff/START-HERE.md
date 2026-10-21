@@ -132,3 +132,8 @@ Recorded image blob SHA: `c89ff843af1c094def9233d27a148e048b191990`.
 Admin branch remains `feature/admin-isolated-handoff-2026-10-20`; static branch remains `fix/liquid-glass-audit-2026-10-19`. Never merge/cherry-pick or edit across these branches as part of the synchronization. PR #111 stays open/unmerged; no Production deployment, remote migration, real D1/R2 mutation, or secret/binding changes.
 
 Keep ownership strict: Admin owns product type, payment rules/configuration, QR verification, and the transaction ledger; static website owns customer-facing presentation and consumption of public-safe API only. The contract is not proof that the live API or Preview is compatible. Verify source SHA, tests, response shape, and Preview separately before reporting integration complete.
+
+
+## Handoff refresh — 2026-10-21 14:42 ICT
+
+Read the integration contract and current HEAD before code edits. Observed HEAD: `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`. Latest source CI: run 39563376269 (success, SHA 8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e). Latest Preview diagnostic: run 39562983543 (failure, SHA da66197b372cbabc4c31bb1f1427fe8b8bfe5532); this is not current-HEAD Preview evidence. Overall Admin estimate 46%; QR/fulfillment estimate 70%; integration is NOT VERIFIED. See `LATEST-STATUS.md` and `PROMPT-NEXT-CHAT.md` for details and strict branch/production guardrails.

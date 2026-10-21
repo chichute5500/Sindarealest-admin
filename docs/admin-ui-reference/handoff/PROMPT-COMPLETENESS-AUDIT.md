@@ -31,3 +31,16 @@
 Prompt và handoff được điều chỉnh để ADMIN có nhánh riêng, trong khi nhánh `fix/liquid-glass-audit-2026-10-19` tiếp tục thuộc luồng website tĩnh. Việc tách nhánh/tài liệu không đồng nghĩa code ADMIN đã được sửa hoặc kiểm thử. Trước khi làm code, AI phải xác minh branch, HEAD SHA, working tree và diff thực tế.
 
 Không kết luận “100% hoàn thành” khi chưa có bằng chứng cho các kiểm thử và khi chưa thể đối chiếu nguyên văn với prompt đầu tiên đầy đủ.
+
+
+## Evidence refresh — 2026-10-21 14:42 ICT
+
+- [x] Rechecked current ADMIN branch HEAD: `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`.
+- [x] Rechecked newest source CI: run 39563376269, success, SHA `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`, current-HEAD match=true.
+- [x] Rechecked newest Preview diagnostic: run 39562983543, failure, SHA `da66197b372cbabc4c31bb1f1427fe8b8bfe5532`, current-HEAD match=false; cannot claim current Preview success.
+- [x] Rechecked PR #111 and #108: both open/unmerged; PR #111 has 1066 files and requires scope audit.
+- [ ] Authorized current-HEAD Preview smoke test PASS.
+- [ ] Owner scan-verifies real bank QR/account before activation.
+- [ ] Website branch independently consumes/tests shared contract.
+- [ ] Full Admin visual/accessibility/reference parity and migration/PR scope review.
+- Status: IN PROGRESS; overall estimate 46%, QR/fulfillment estimate 70%; no completion claim.

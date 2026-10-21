@@ -226,3 +226,35 @@ Yêu cầu mới được theo dõi tách biệt với tiến độ Admin nền:
 5. Giữ PR #111 mở; không merge #108/#111, không sửa main/nhánh website tĩnh và không Production deploy. Vì #111 có phạm vi rộng, audit/tách scope trước nghiệm thu.
 
 Báo PASS/FAIL/BLOCKED/SKIPPED theo bằng chứng và commit SHA. Không tính các yêu cầu mới là hoàn thành khi mới chỉ cập nhật tài liệu.
+
+
+# CONTINUE FROM VERIFIED CHECKPOINT — 2026-10-21 14:42 ICT
+
+Repository: `chichute5500/Sindarealest-admin`
+Allowed branch only: `feature/admin-isolated-handoff-2026-10-20`
+HEAD observed before handoff docs refresh: `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`.
+
+## First actions
+1. Read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and all seven required handoff/reference files listed in the user's master instruction. Re-fetch current branch HEAD and latest Actions runs before trusting this snapshot.
+2. Source CI latest observed: [run 39563376269](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39563376269), success, SHA `8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e`, exact match to observed HEAD: true. Do not treat it as a pass for any later code commit.
+3. Preview diagnostic latest observed: [run 39562983543](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39562983543), failure, SHA `da66197b372cbabc4c31bb1f1427fe8b8bfe5532`, exact match to observed HEAD: false. This run is not evidence of Preview success for current HEAD. Keep CSS signature assertion intact; diagnose configured authorized Preview target/build without secrets or Access bypass.
+4. PR #111 remains OPEN, merged=false, 1066 files changed (+35805/-389); review diff and reduce/contain unrelated scope only via safe normal commits, no history rewrite. PR #108 remains OPEN, merged=false.
+
+## Required business rules
+- Product fulfillment values: `in_stock`, `made_to_order`, `unclassified`. Never infer from stock counts or legacy fields; unknown/mixed cart requires manual consultation.
+- Made-to-order deposit = ceil(30% of server-confirmed order total); in-stock deposit = 100,000 VND; full-payment amount = confirmed total.
+- Browser cannot provide authoritative amount. Price and terms must be confirmed before payment request.
+- Full payment is only **eligible** for freeship at request creation. Freeship becomes **applied** only after Admin verifies the full net amount received in the ledger. QR scan, QR image upload, receipt upload or customer claim never marks payment paid.
+- QR image/config must stay pending/private until Admin manually verifies correct account and scans it. Public API exposes active safe config only.
+
+## Keep working, don't just plan
+- Run/inspect source tests after code changes and verify the tested SHA equals the code SHA. Keep synthetic fixtures, temporary local D1 tests, Preview and real backend QA explicitly separate.
+- Inspect artifact-only screenshot workflow: ensure PNG + metadata are retained in Actions Artifacts and no large image bundle is committed per run.
+- Continue accessibility/responsive/reference-image checks and inspect PR #111 changed paths for non-Admin scope.
+- Update `LATEST-STATUS.md`, `latest-test-results.json`, this prompt, and Master Prompt after meaningful progress; read back and validate JSON after writing.
+
+## Non-negotiable guardrails
+Only `feature/admin-isolated-handoff-2026-10-20`. Never edit `main` or `fix/liquid-glass-audit-2026-10-19`; no merge PR #111/#108; no force-push or base change; no Production deploy; no secret access/change; no Cloudflare Access bypass; no remote D1/R2/data writes; no migration/setup scripts. If authorized Preview URL/access is required, state the exact owner action and continue independent safe work while waiting.
+
+## Progress
+Overall Admin estimate: **46%**. QR/fulfillment estimate: **70%**. These are management estimates, not acceptance scores. Current integration acceptance remains **NOT VERIFIED** until current authorized Preview and cross-branch contract compatibility are evidenced.

@@ -1,13 +1,13 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
+  "status": "SOURCE_CI_PASS_CURRENT_HEAD_PREVIEW_STALE_INTEGRATION_NOT_VERIFIED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "da66197b372cbabc4c31bb1f1427fe8b8bfe5532",
-  "testedCommitSha": "da66197b372cbabc4c31bb1f1427fe8b8bfe5532",
-  "capturedAt": "2026-10-21T07:36:45.804Z",
-  "progressEstimatePercent": 45,
-  "progressBasis": "Source CI passed on latest tested code commit; local source/fixture Playwright evidence passed. Configured deployed Preview still fails the expected login-shell CSS signature. Screenshot workflow now stores full PNG/metadata in Actions artifacts and keeps compact summaries in Git; confirm subsequent run and PR scope reduction. Authenticated real-backend QA, 12-screen visual parity, full PR scope/migration review remain open.",
+  "latestCodeCommitSha": "8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e",
+  "testedCommitSha": "8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e",
+  "capturedAt": "2026-10-21T14:42:00+07:00",
+  "progressEstimatePercent": 46,
+  "progressBasis": "Latest source CI run 39563376269 passed on exact observed HEAD 8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e. Latest Preview run 39562983543 failure tested older SHA da66197b372cbabc4c31bb1f1427fe8b8bfe5532; it is not current-HEAD evidence. Integration acceptance still requires authorized current Preview, real bank QR owner verification, cross-branch contract consumer tests, visual/accessibility parity, and PR scope review.",
   "note": "Latest verified source CI run 39550214045 SUCCESS on 8fd8aa96a9f80ae7a18fd598b44cc459dd303bca. Preview diagnostic run 39550214050 FAILURE on same commit: 2 tests passed and 1 failed at the configured Preview login-header assertion. Browser supports :has and selector matches .topbar > .brand, but loaded inline stylesheet has 226 rules and hasLoginHideRule=false. ADMIN_TEST_URL is redacted; do not infer target identity or touch secrets. Workflow changed to artifact-only full screenshots/full metadata (14-day retention) with compact Git summaries; follow-up run needs to confirm no per-run PNG commit. PR #111 remains OPEN/unmerged and has a broad non-ADMIN diff.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -1291,5 +1291,46 @@
       "remoteD1R2Modified": false,
       "migrationsRun": false
     }
+  },
+  "latestObservedBranchHeadSha": "8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e",
+  "latestVerifiedSourceCi": {
+    "runId": 39563376269,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39563376269",
+    "status": "completed",
+    "conclusion": "success",
+    "headSha": "8b1a9fe4b8b87b9c2cf498bb73d50b5d646e471e",
+    "headMatches": true
+  },
+  "latestPreviewDiagnostic": {
+    "runId": 39562983543,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39562983543",
+    "status": "completed",
+    "conclusion": "failure",
+    "headSha": "da66197b372cbabc4c31bb1f1427fe8b8bfe5532",
+    "headMatches": false
+  },
+  "pr111": {
+    "state": "open",
+    "merged": false,
+    "changedFiles": 1066,
+    "additions": 35805,
+    "deletions": 389,
+    "base": "main"
+  },
+  "pr108": {
+    "state": "open",
+    "merged": false,
+    "base": "main"
+  },
+  "integrationProgressEstimatePercent": 70,
+  "integrationStatus": "NOT_VERIFIED",
+  "guardrails": {
+    "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
+    "staticBranchUntouched": true,
+    "noMerge": true,
+    "noProductionDeploy": true,
+    "noProductionMigration": true,
+    "noSecretsAccess": true,
+    "noRemoteD1R2Mutation": true
   }
 }
