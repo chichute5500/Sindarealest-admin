@@ -2731,5 +2731,20 @@ body:has(#welcomeSplash) #accountDrawer,body:has(#welcomeSplash) #cartDrawer,bod
 }
 </style>
 
+
+<style id="sd-gallery-opaque-satin-surface-2026-10-22">
+/* Keep the full-screen product viewer atmospheric, but stop storefront copy beneath it from ghosting through. */
+.sd-fullscreen-viewer.open{
+  background:rgba(231,244,253,.95)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(145%)!important;
+  backdrop-filter:blur(30px) saturate(145%)!important;
+}
+html.dark .sd-fullscreen-viewer.open{
+  background:rgba(3,18,32,.96)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(140%)!important;
+  backdrop-filter:blur(30px) saturate(140%)!important;
+}
+</style>
+
 </body>
 </html>
