@@ -163,6 +163,9 @@ jobs:
       - name: Explain local fixture captures are artifact-only
         if: github.event_name == 'workflow_dispatch' && inputs.capture_source == 'local-static-fixture'
         run: echo "Local fixture screenshots are uploaded for review only; canonical start/end folders are unchanged."
+      - name: Require exact live screenshot filename coverage before end archive
+        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview' && inputs.capture_stage == 'end-of-work') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-end-of-work]'))
+        run: node scripts/verify-screenshot-archive-coverage.mjs docs/website-screenshots/start-of-work artifacts/liquid-glass-preview/live-preview
       - name: Save live Preview images into selected repository archive
         if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')))
         env:
