@@ -1,13 +1,13 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T03:25:42.193+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T03:43:17.921+07:00
 
-- Branch ADMIN duy nhất: `feature/admin-isolated-handoff-2026-10-20`. HEAD trước cập nhật handoff: `596ea3d7d6da524c6993ce37ccc41579c785929d` (commit lưu bằng chứng). Code/test SHA đã chạy: `44778d91ff5f084a5bb89a166e97536bd4f42b9d`.
-- Validate Source [#39669112058](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058) **SUCCESS** và Preview/Playwright [#39669112068](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068) **SUCCESS**, cả hai trên đúng SHA `44778d91ff5f084a5bb89a166e97536bd4f42b9d`.
-- Artifact [`admin-preview-evidence-254`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068/artifacts/12378134004), ID 12378134004, chứa 64 PNG/40 metrics. Metadata: completed=true, không có page errors, console errors, failed requests hoặc HTTP errors. Đã mở ảnh Product editor (390×844 light/dark, 1280×800 light) và Orders (390×844 light/dark, 1280×800 light).
-- #4 Product editor = **PARTIAL**: trường Giá/Tồn kho cùng hàng trên mobile; placeholder ngắn vừa ô, hướng dẫn dài giữ trong title; tests dùng fixture và không lưu dữ liệu thật.
-- #7 Orders = **PARTIAL**: search/status/payment filters, số kết quả, reset/no-result, mobile summary compact, vùng quản lý thu gọn. Không thêm thumbnail giả vì API không trả image snapshot; bảng desktop vẫn có cuộn ngang.
-- #6 Category/product classification = **NOT TESTED** ở cấp screen-family. Luồng hiện có là `#pCategory` + datalist trong editor và bộ lọc `#categoryBox`; không có route/page quản lý categories độc lập.
-- Progress giữ **50%**; full 12-screen visual parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. Preview diagnosis `PASS_LOGIN_CSS_SIGNATURE` chỉ kiểm tra shell/CSS, không chứng minh đã đăng nhập/nghiệp vụ thật.
-- PR #111/#108 giữ OPEN/UNMERGED. Không sửa `main`/nhánh static, không Production deploy, không Access/secrets, D1/R2, schema/migration/infra hay TinyFish.
+- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước handoff update `d7c65c125685bab5c2e974ffcdb7b8cfb896d2db`, source/test SHA đã kiểm tra `e91b933f40aba30814b2b50590893c95ed5de1a5`.
+- Validate Source [#39672585196](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585196) **SUCCESS** và Admin Preview/Playwright [#39672585229](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585229) **SUCCESS**, cùng exact SHA.
+- Artifact [`admin-preview-evidence-256`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585229/artifacts/12379888318), ID `12379888318`, có 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata được tải/kiểm tra: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview diagnostic `PASS_LOGIN_CSS_SIGNATURE` chỉ xác nhận shell/CSS, không phải authenticated backend QA.
+- E2E fixture/read-only mới: `#pCategory` datalist 8 options, manual custom category entry/restore; `#categoryBox` match Ví da/Thắt lưng, count, no-result và clear/reset. Không nhấn Save; không có non-GET API requests. CSS đã thêm khoảng cách 10px sau nhóm trường chính; ảnh Product editor 390×844 light/dark và Products 390×844/1280×800 đã được mở/kiểm tra.
+- #6 Category/classification **PARTIAL — existing controls only**; không có trang quản lý danh mục riêng nên reference parity cho screen-family chưa được chấp nhận. Progress giữ **50%**; full 12-screen parity **NOT ACCEPTED**; authenticated business/backend QA **NOT TESTED**.
+- PR #111/#108 vẫn OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 
