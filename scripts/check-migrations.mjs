@@ -105,6 +105,9 @@ try {
   run(["d1", "execute", databaseName, "--local", "--config", configPath,
     "--command", "SELECT payment_terms_confirmed_at, public_access_token_hash FROM orders LIMIT 0;"],
     "Verify order payment confirmation and scoped access fields");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT shipping_benefit FROM order_payment_requests LIMIT 0;"],
+    "Verify payment shipping benefit field");
   const fulfillmentCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
     "--command", "SELECT COUNT(*) AS unclassified_seed_count FROM products WHERE fulfillment_type='unclassified';"],
     "Verify historical product types remain unclassified");
