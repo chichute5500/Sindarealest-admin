@@ -165,3 +165,14 @@ Bạn tiếp nhận công việc SinDarealest2. Đừng bắt người dùng k�
 5. Run relevant tests, deploy only Preview through GitHub Actions, verify deployment SHA, capture real screenshots and update `docs/website-screenshots/manifest.json` only after evidence exists. Update this handoff with exact commit, run/artifact URLs, outcomes and remaining blockers.
 
 **Status honesty:** this handoff addendum records the contract and next implementation requirements; it does not claim the storefront QR/payment/product-type feature is complete. Keep the satin/reference audit separate; its known `SD-GL052` blocker remains unresolved and must not be “fixed” by fabricating product data.
+
+
+## 2026-10-21 — Current handoff checkpoint
+
+Re-fetch the current branch HEAD before work. Read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`, then `docs/handoff/PROMPT-NEXT-CHAT-2026-10-21.md`, `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, and this prompt. Storefront branch scope is public UI/API consumption and tests only; Admin AI owns Admin implementation/persistence/QR configuration/payment verification on the other branch.
+
+Fulfillment must be explicit `in_stock`, `made_to_order`, or `unclassified`; unknown/missing remains unclassified. Never infer from stock/category/SKU/images and never let the customer choose type. Made-to-order: 30% deposit or 100%; in-stock: 100,000 VND deposit or 100%; full payment freeship applies to both. Use server-confirmed values only.
+
+Current order-create is `pending_confirmation`; no public order-status lookup or active receiver QR is verified. Checkout must show “Chờ cửa hàng xác nhận” / “Vui lòng chưa chuyển tiền”, no QR/no amount. QR scan/display/receipt/customer claim never marks payment as paid.
+
+At source SHA `ed454231a6a9cd9b9605f3581f4a5a79497462bb`, source validation 39559590352, Preview deploy 39559590384 and Admin Preview Playwright 39559590377 passed. Visual audit 39559590354 was still running at checkpoint; inspect its result/artifact. Last completed live audit blocker: verified public data lacks `SD-GL052`; do not fabricate/substitute. Continue actual storefront fixes, test and verify Preview; keep PR #108 open and Production untouched.
