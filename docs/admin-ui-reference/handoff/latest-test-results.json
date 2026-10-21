@@ -2535,7 +2535,27 @@
         "390x844",
         "1280x800"
       ],
-      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE"
+      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+      "sourceTestSha": "06d689b6a97fa7bdb05258acb8435a6954d67309",
+      "viewportMatrix": [
+        "320x640",
+        "360x800",
+        "375x812",
+        "390x844",
+        "412x915",
+        "768x1024",
+        "1280x800",
+        "1440x900"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "completed": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "httpErrors": 0
     },
     "copyRegression": {
       "failedRunId": 39624723690,
