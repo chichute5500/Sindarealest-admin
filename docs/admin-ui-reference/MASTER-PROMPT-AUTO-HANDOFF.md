@@ -1,12 +1,13 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T03:55:41.155+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:01:16.012+07:00
 
-- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước lần cập nhật handoff này `80fd27310aacb221894eb382efbbf3ef8cc82c07`; exact source/test SHA `e3e46b649c86346d2c014d12002b2b0c6b012020`.
-- Validate Source [#39674335114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335114) **SUCCESS** và Admin Preview/Playwright [#39674335123](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335123) **SUCCESS**, cùng SHA.
-- Artifact [`admin-preview-evidence-259`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335123/artifacts/12381230471), ID `12381230471`: 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata đọc từ ZIP: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview `PASS_LOGIN_CSS_SIGNATURE` chỉ kiểm tra shell/CSS, không phải authenticated backend QA.
-- Customer screen: thêm avatar chữ cái đầu được suy ra từ tên khách hàng có sẵn (không giả lập ảnh đại diện/không thêm dữ liệu), và E2E xác nhận initials + aria-hidden từng avatar; customer search theo tên/điện thoại/email/địa chỉ, no-result/reset đã có fixture coverage. Đã xem trực tiếp screenshot 390×844 light/dark và 1280×800 light. Reference yêu cầu ảnh đại diện và tab phân nhóm; API hiện không có ảnh, quy tắc “Mới/Thân thiết” chưa được xác nhận nên không bịa ảnh hay phân loại. Screen customer **PARTIAL**, reference parity chưa được chấp nhận.
-- Hai lần E2E trước đó thất bại do assertion test mới: (1) regex split tên bị escape sai, (2) locator aria-hidden strict-mode áp vào 2 avatar; đã sửa cả hai và rerun thành công trên SHA `e3e46b649c86346d2c014d12002b2b0c6b012020`. Không phải lỗi dữ liệu/backend.
-- Category controls #6 **PARTIAL — existing controls only**; không có trang quản lý danh mục riêng. Tổng tiến độ giữ **50%**; full 12-screen parity **NOT ACCEPTED**; authenticated business/backend QA **NOT TESTED**.
-- PR #111/#108 vẫn OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước cập nhật handoff `1e86985ef9fa0236c12bc43a6d3fde504ff4f504`; exact source/test SHA `08f2525daf8eedae5d898339e8e2655dc07ca72d`.
+- Validate Source [#39675095354](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095354) **SUCCESS** và Admin Preview/Playwright [#39675095248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248) **SUCCESS**, cùng exact SHA.
+- Artifact [`admin-preview-evidence-260`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39675095248/artifacts/12381785861), ID `12381785861`: 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata được đọc từ ZIP: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview `PASS_LOGIN_CSS_SIGNATURE` không chứng minh authenticated backend QA.
+- Warranty/after-sales: giảm padding/font/gap của các filter và giữ 3 nút `Tất cả / Đang xử lý / Đã kết thúc` trên cùng hàng ở 390px; E2E kiểm tra cùng dòng và không cắt chữ. Đã mở ảnh 390×844 light/dark; hiển thị đúng một hàng. E2E tìm kiếm/no-result, trạng thái filter và form phát hành vẫn dùng fixture, không lưu dữ liệu.
+- Customer screen vẫn PARTIAL: initials suy ra từ tên (không ảnh giả), tìm kiếm fixture pass; reference ảnh đại diện/tab phân nhóm chưa thể sao chép an toàn do thiếu ảnh và quy tắc nhóm xác nhận. Category controls #6 PARTIAL existing controls only.
+- Tổng tiến độ giữ **50%**; 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111/#108 OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 
