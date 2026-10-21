@@ -696,10 +696,10 @@ async function main() {
   const homeFullPageCount = audit.screenshots.filter(shot => shot.captureType === 'full-page').length;
   const menuOpenCount = audit.screenshots.filter(shot => shot.state === 'menu-open').length;
   const orderExpandedCount = audit.screenshots.filter(shot => shot.state === 'order-details-expanded').length;
-  const accountMenuCount = audit.screenshots.filter(shot => shot.state === 'account-menu-open').length;
-  const fullscreenGalleryCount = audit.screenshots.filter(shot => shot.state === 'fullscreen-gallery').length;
-  const cartWithItemCount = audit.screenshots.filter(shot => shot.state === 'cart-with-item').length;
-  const checkoutFormCount = audit.screenshots.filter(shot => shot.state === 'checkout-form-open').length;
+  const accountMenuCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'account-menu-open').length;
+  const fullscreenGalleryCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'fullscreen-gallery').length;
+  const cartWithItemCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'cart-with-item').length;
+  const checkoutFormCount = audit.screenshots.filter(shot => shot.captureType === 'state' && shot.state === 'checkout-form-open').length;
   const commerceStatesComplete = accountMenuCount === 2 && fullscreenGalleryCount === 2 && cartWithItemCount === 2 && checkoutFormCount === 2
     && audit.commerceStateChecks.filter(check => check.status === 'PASS').length >= 8;
   audit.coverage = {
