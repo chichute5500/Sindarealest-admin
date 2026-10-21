@@ -185,3 +185,17 @@
 - Evidence boundary: Admin source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003); Preview [39571867352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352) still fails CSS signature. No real authenticated backend QA, remote D1/R2 read/write, migration, secrets, Access bypass or Production deployment occurred.
 - Overall integration status: **PARTIAL SOURCE COMPATIBILITY; FAIL for missing freeship display mapping; runtime integration NOT VERIFIED.**
 
+
+
+
+## Handoff bổ sung — 2026-10-21: lỗi lưu ảnh và migration PRE/PRO
+
+- **Báo cáo từ chủ dự án:** Trong Preview Admin, sau khi tải/chọn ảnh và nhấn “Lưu ảnh”, giao diện báo: **“Cơ sở dữ liệu chưa khởi tạo đúng. Hãy chạy hai tệp SQL trong thư mục migrations/.”** Chủ dự án xác nhận muốn xử lý cả **PRE (Preview) và PRO (Production)**.
+- **Hai migration cần điều tra trước:** `migrations/0008_product_sku_verification.sql` và `migrations/0009_fulfillment_and_manual_payments.sql`. Đây là giả thuyết cần xác minh, chưa phải kết luận rằng hai tệp này chắc chắn đang thiếu ở cả hai DB.
+- Migration 0008 thêm `products.sku_verified` và `order_items.sku_verified`. Migration 0009 thêm `fulfillment_type` cho products/order_items, các cột xác nhận điều khoản thanh toán cho orders và bảng/index payment request/transaction. Các tệp dựa vào bảng đã được tạo bởi migration trước đó và không an toàn để chạy lặp sau khi cột/index đã tồn tại.
+- Source route `functions/api/admin/products/[id].js` cập nhật các cột `sku_verified` và `fulfillment_type`; vì vậy schema thiếu cột có thể làm thao tác lưu sản phẩm thất bại. Tuy nhiên thông báo UI chưa đủ để chứng minh chính xác migration nào thiếu. Endpoint upload ảnh riêng dùng R2 bindings `IMAGES`/`ORIGINALS`; cần phân biệt lỗi tải tệp lên R2 với lỗi lưu metadata sản phẩm vào D1.
+- **Trạng thái thao tác từ xa:** không có SQL nào được chạy trên PRE hoặc PRO; không đọc được migration ledger/schema của hai DB. Chủ dự án đã đồng ý kiểm tra cả hai môi trường qua trình duyệt, nhưng sau đó yêu cầu **bỏ qua TinyFish**. Không có công cụ Cloudflare/D1 thay thế được xác nhận trong phiên này; do đó chưa thể kiểm tra hay thực thi remote migration. Không được ghi là đã sửa.
+- **Bước tiếp theo bắt buộc:** tìm một phương thức không dùng TinyFish có quyền Cloudflare/D1 được xác thực; xác định chính xác database binding/name/ID cho PRE và PRO; đọc schema hiện tại và `d1_migrations`/migration ledger của từng DB; đối chiếu với migration 0001–0009. Chỉ áp dụng các migration còn thiếu sau khi đã xác nhận target, thứ tự, khả năng tương thích và trạng thái cột/bảng. Nếu không có phương thức xác thực/đọc trạng thái, dừng trước khi ghi SQL và báo rõ blocker.
+- **An toàn:** không chạy `scripts/setup-cloudflare.mjs` vì script có thể thực hiện nhiều thay đổi schema từ xa; không chạy `ALTER TABLE` thủ công theo phỏng đoán; không chạy lặp migration; không ghi dữ liệu sản phẩm/đơn hàng; không thay secrets/bindings, không bypass Cloudflare Access; không deploy Production, không merge PR #111/#108; không sửa `main` hoặc `fix/liquid-glass-audit-2026-10-19`.
+- **TinyFish:** người dùng yêu cầu bỏ qua hoàn toàn. Không gọi TinyFish, không yêu cầu nạp tiền và không tiếp tục bằng trình duyệt TinyFish.
+- Kết quả người dùng xác nhận trên Preview chỉ gồm đăng nhập, mở danh sách/chi tiết sản phẩm và mở UI chọn ảnh. **Lưu sản phẩm, upload thật và ghi metadata vẫn CHƯA XÁC MINH.**
