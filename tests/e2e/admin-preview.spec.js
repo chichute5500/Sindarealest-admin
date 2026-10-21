@@ -142,17 +142,48 @@ test.describe('SinDarealest2 Admin Preview', () => {
     const loginCssSignature = await page.evaluate(() => {
       const brand = document.querySelector('.topbar > .brand');
       const login = document.querySelector('#loginView');
-      const styleText = [...document.querySelectorAll('style')].map(style => style.textContent || '').join('\n');
       const hideSelector = 'body:has(#loginView:not(.hidden)) .topbar>.brand';
+      // CSSOM normalizes whitespace around combinators, so compare parsed selectors
+      // rather than raw cssText substrings. This avoids misclassifying a valid rule
+      // as absent merely because the browser serializes ".topbar > .brand".
+      const normalizeSelector = value => String(value || '')
+        .replace(/\\s*([>+~])\\s*/g, '$1')
+        .replace(/\\s+/g, ' ')
+        .trim();
+      const normalizedHideSelector = normalizeSelector(hideSelector);
       const stylesheetSources = [...document.styleSheets].map(sheet => {
-        let readableRules = [];
-        try { readableRules = [...sheet.cssRules].slice(0, 500).map(rule => rule.cssText || ''); } catch {}
+        let ruleCount = 0;
+        const matchingRules = [];
+        try {
+          const visit = rules => {
+            for (const rule of rules) {
+              ruleCount += 1;
+              if (typeof rule.selectorText === 'string'
+                && normalizeSelector(rule.selectorText) === normalizedHideSelector) {
+                matchingRules.push({
+                  selector: rule.selectorText,
+                  display: rule.style?.getPropertyValue('display') || null,
+                  displayPriority: rule.style?.getPropertyPriority('display') || null
+                });
+              }
+              if (rule.cssRules) visit(rule.cssRules);
+            }
+          };
+          visit(sheet.cssRules);
+        } catch {}
         return {
           href: sheet.href ? (() => { try { const u = new URL(sheet.href); return u.origin + u.pathname; } catch { return '[unparseable stylesheet]'; } })() : '[inline stylesheet]',
-          ruleCount: readableRules.length,
-          hasLoginHideRule: readableRules.some(rule => rule.includes(hideSelector))
+          ruleCount,
+          hasLoginHideRule: matchingRules.length > 0,
+          matchingRules
         };
       });
+      let hideSelectorMatchesBrand = false;
+      let browserSupportsHideSelector = false;
+      try {
+        hideSelectorMatchesBrand = Boolean(brand && brand.matches(hideSelector));
+        browserSupportsHideSelector = CSS.supports('selector(' + hideSelector + ')');
+      } catch {}
       return {
         title: document.title,
         lang: document.documentElement.lang || null,
@@ -160,7 +191,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
         topbarBrandDisplay: brand ? getComputedStyle(brand).display : 'missing',
         topbarBrandVisibility: brand ? getComputedStyle(brand).visibility : 'missing',
         topbarBrandOpacity: brand ? getComputedStyle(brand).opacity : 'missing',
-        inlineHideRulePresent: styleText.includes(hideSelector),
+        browserSupportsHideSelector,
+        hideSelectorMatchesBrand,
         stylesheetSources
       };
     });
