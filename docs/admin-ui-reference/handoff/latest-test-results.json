@@ -3,12 +3,12 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+  "latestCodeCommitSha": "cc77869873c2f5b4b2d1118dc60c0d88413eb218",
   "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
-  "capturedAt": "2026-10-21T14:40:04.000Z",
+  "capturedAt": "2026-10-21T14:39:48.000Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% management estimate only. Admin gallery CSS source commit 1fb56f7b5773876c581847bf44abbef1c5c16a67 passed run 39615192697 (npm run check, npm test, local Playwright, configured Preview diagnostic). Regression test commit 45f630e99cfd1dd047c234f0fb42fa197d9bc978 passed the same set in run 39615417216. The workflow artifact contains 59 source/fixture screenshots (16 login and 43 synthetic read-only module views) and 36 fixture metrics. All-12-screen visual parity is not accepted; authenticated real-backend QA not tested. Product image-save and PRE/PRO migration remain deferred by owner. PR #111 remains open/unmerged and mixed-scope (1,112 paths); PR #108 remains open/unmerged (269 paths).",
-  "note": "Latest verified source/test SHA a999bfdc529ea38c5309ebfbff33a45c6779c10b. Run #162 (39618556737) and paired validation run (39618556696) both PASS on this exact SHA. Screenshot artifact 162 confirms the mobile gallery cover, second thumbnail, helper text and fixed action bar are all visible without the last image being covered at 390x844; this is still one fixture screenshot and does not establish 12-screen visual acceptance or authenticated backend QA. Product image-save and PRE/PRO migrations remain deferred by owner. PR #111 remains OPEN/unmerged and mixed-scope (1,112 paths); PR #108 OPEN/unmerged (269 paths). Overall progress estimate remains 48% pending a task-weighted re-estimate; do not inflate it based on repeated CI runs.",
+  "progressBasis": "48% management estimate. Exact tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed Validate Source run 39618556696 (#3905) and Admin Preview diagnostic run 39618556737 (#162): npm run check, npm test, local responsive/theme Playwright matrix and configured Preview diagnostic all PASS. The new fixture test measures gallery footer alignment and checks that the final image clears the sticky actions. Visual parity for all 12 reference screen families remains not accepted; authenticated business backend QA remains not tested. Image-save and PRE/PRO migration remain deferred by owner.",
+  "note": "Latest exact tested tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737). Source CSS commit cc77869873c2f5b4b2d1118dc60c0d88413eb218 moves product dialog bottom spacing into the scrollable content; E2E regression commit a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e measures action footer vs dialog and the last thumbnail vs footer; contract test commit 5f73373094ba71f467374e8b026bbfc3c5059fec adds CSS assertions. Screenshot artifact admin-preview-evidence-162 (ID 12354480678), 11,114,027 bytes, expires 2026-11-04: 59 source/fixture PNGs (16 login shell, 43 synthetic read-only module captures) and 36 metrics. The mobile screenshot shows the sticky footer aligned to the dialog edge; the last thumb can be seen without action-bar overlap. This remains source/fixture review, not authenticated business QA. Current docs-only branch HEAD at handoff: e7f0990f4c0b78272fdba06e9f90423340b82eaa. Progress 48%; full 12-screen parity NOT ACCEPTED; backend QA NOT TESTED. PR #111/#108 open/unmerged. No merge, Production deploy, remote D1/R2, secret/Access changes, migration/setup, or TinyFish.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -16,8 +16,8 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_READ_ONLY_PATH_CENSUS_AND_SCRIPT_REVIEW; SEMANTIC/SECURITY AUDIT STILL OPEN",
-    "lastObservedApplicationSourceCommit": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
-    "lastObservedEvidenceOnlyHead": "068520e4ac62adc32ce5f15226e666479770af91",
+    "lastObservedApplicationSourceCommit": "cc77869873c2f5b4b2d1118dc60c0d88413eb218",
+    "lastObservedEvidenceOnlyHead": "e7f0990f4c0b78272fdba06e9f90423340b82eaa",
     "pr111State": "OPEN_UNMERGED_MIXED_SCOPE",
     "pr108State": "OPEN_UNMERGED",
     "pr111ChangedFiles": 1112,
@@ -27,7 +27,7 @@
     "protectedStaticWebsiteBranchMustNotBeModified": true,
     "pr111PngFiles": 913,
     "pr111NonImageDocsAndCodeFiles": 199,
-    "latestTestedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+    "latestTestedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
     "pr111DiffStatsNote": "Do not treat additions/deletions as a stable project metric: handoff docs are appended within this same PR and change the diff stat. Re-query live PR when needed; the path count observed here is 1,112.",
     "pr111DiffStatsAtInitialScopeAudit": {
       "additions": 38619,
@@ -87,6 +87,30 @@
       "verifiedOnGitHub": true,
       "executed": true,
       "runId": 39615417216
+    },
+    {
+      "path": "public/admin/index.html",
+      "purpose": "Removes post-footer padding from the product editor scroll container and applies scroll/safe-area clearance within its content so sticky actions align with the bottom edge.",
+      "commitSha": "cc77869873c2f5b4b2d1118dc60c0d88413eb218",
+      "verifiedOnGitHub": true,
+      "executed": true,
+      "runId": 39618556737
+    },
+    {
+      "path": "tests/e2e/admin-static-baseline.spec.js",
+      "purpose": "Playwright scrolls to the end of the product gallery and asserts footer bottom alignment plus final image clearance.",
+      "commitSha": "a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e",
+      "verifiedOnGitHub": true,
+      "executed": true,
+      "runId": 39618556737
+    },
+    {
+      "path": "tests/admin-liquid-glass-contract.test.mjs",
+      "purpose": "Regression assertions protect mobile gallery cover and product dialog footer/safe-area padding rules.",
+      "commitSha": "5f73373094ba71f467374e8b026bbfc3c5059fec",
+      "verifiedOnGitHub": true,
+      "executed": true,
+      "runId": 39618556737
     }
   ],
   "priorCiRuns": [
@@ -128,6 +152,28 @@
       "localPlaywright": "PASS",
       "configuredPreviewDiagnostic": "PASS",
       "note": "Exact code+regression-test SHA; artifact 158; no authenticated backend QA."
+    },
+    {
+      "runId": 39618556696,
+      "runNumber": 3905,
+      "name": "Validate source and tests",
+      "conclusion": "success",
+      "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696"
+    },
+    {
+      "runId": 39618556737,
+      "runNumber": 162,
+      "name": "Admin Preview diagnostic smoke test",
+      "conclusion": "success",
+      "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS",
+      "localPlaywright": "PASS",
+      "configuredPreviewDiagnostic": "PASS",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737"
     }
   ],
   "screenshots": [
@@ -2164,12 +2210,8 @@
     "conclusion": "success",
     "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737",
-    "pairedValidationRun": {
-      "runId": 39618556696,
-      "conclusion": "success",
-      "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696"
-    },
+    "validationRunId": 39618556696,
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696",
     "artifact": {
       "name": "admin-preview-evidence-162",
       "id": 12354480678,
@@ -2211,26 +2253,25 @@
     "authenticatedBusinessFlow": "NOT_TESTED"
   },
   "latestUiRevisionReview": {
-    "sourceCommit": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
-    "testCommit": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
-    "reviewedArtifact": "admin-preview-evidence-158",
-    "screenshotPath": "artifacts/admin-preview-evidence/45f630e99cfd/screenshots/product-gallery__390x844__light.png",
-    "observations": [
-      "First gallery image spans the mobile row as the prominent cover; fit uses contain to preserve image composition.",
-      "Supporting images and accessible reorder/delete controls remain present.",
-      "At 390x844 the gallery remains vertically dense, and the next thumbnail continues below the fixed action bar in the captured scroll state."
+    "sourceCommit": "cc77869873c2f5b4b2d1118dc60c0d88413eb218",
+    "e2eCommit": "a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e",
+    "contractTestCommit": "5f73373094ba71f467374e8b026bbfc3c5059fec",
+    "testedTreeSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+    "artifact": "admin-preview-evidence-162",
+    "screenshots": [
+      "product-gallery__390x844__light.png",
+      "product-gallery__390x844__dark.png"
     ],
+    "observations": [
+      "Sticky action footer is flush with dialog bottom after moving trailing padding out of the scrolling dialog container.",
+      "With the editor scrolled to the end, the final gallery thumbnail and its action controls sit above the sticky footer.",
+      "Dark-theme dialog/footer surfaces remain aligned and legible."
+    ],
+    "remainingVisualGap": "Approved reference has a horizontal thumbnail rail and richer image-management/status layout; current nested card/grid is an incremental change, not visual acceptance.",
     "referenceParity": "NOT_ACCEPTED",
     "realImageUpload": "NOT_VERIFIED",
     "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
-    "authenticatedBusinessFlow": "NOT_TESTED",
-    "latestScreenshot": {
-      "artifact": "admin-preview-evidence-162",
-      "runId": 39618556737,
-      "screenshotPath": "artifacts/admin-preview-evidence/a999bfdc529e/screenshots/product-gallery__390x844__light.png",
-      "observation": "At 390x844, the primary cover, supporting thumbnail, helper text and fixed footer are all visible; screenshot does not show the last thumbnail covered by the action bar.",
-      "limitation": "Single fixture screenshot, not a full cross-screen or real image upload/save acceptance."
-    }
+    "authenticatedBusinessFlow": "NOT_TESTED"
   },
   "paymentIntegrationSourceAudit": {
     "inspectedAt": "2026-10-21T14:28:00Z",
