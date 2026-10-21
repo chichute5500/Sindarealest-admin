@@ -543,7 +543,7 @@ body:has(#welcomeSplash) #cartDrawer,
 body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}
 </style>
 </head>
-<body>
+<body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
 <div class="welcome-splash" id="welcomeSplash" role="dialog" aria-modal="true" aria-label="Chào mừng đến với SinDarealest">
   <div class="welcome-texture welcome-texture--dark" aria-hidden="true"></div><div class="welcome-texture welcome-texture--light" aria-hidden="true"></div>
@@ -561,7 +561,7 @@ body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-eve
     <button class="welcome-skip tap-target" id="skipIntro" type="button">Vào cửa hàng <span>→</span></button>
   </div>
 </div>
-<script>(function(){var s=document.getElementById('welcomeSplash');if(!s)return;var closed=false;function dismiss(){if(closed)return;closed=true;s.classList.add('is-leaving');window.setTimeout(function(){if(s&&s.parentNode)s.parentNode.removeChild(s)},900)}window.__sdDismissWelcome=dismiss;var skip=document.getElementById('skipIntro');if(skip)skip.addEventListener('click',dismiss);var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.setTimeout(dismiss,reduced?500:2500);fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){if(!c)return;if(c.welcomeEnabled===false)dismiss();var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');if(a&&typeof c.welcomeTitleLine1==='string')a.textContent=c.welcomeTitleLine1;if(b&&typeof c.welcomeTitleLine2==='string')b.textContent=c.welcomeTitleLine2;if(p&&typeof c.welcomeText==='string')p.textContent=c.welcomeText}).catch(function(){})})();</script>
+<script>(function(){var s=document.getElementById('welcomeSplash');if(!s)return;var closed=false;function dismiss(){if(closed)return;closed=true;s.classList.add('is-leaving');window.setTimeout(function(){if(s&&s.parentNode)s.parentNode.removeChild(s);document.body.classList.remove('welcome-active')},900)}window.__sdDismissWelcome=dismiss;var skip=document.getElementById('skipIntro');if(skip)skip.addEventListener('click',dismiss);var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.setTimeout(dismiss,reduced?500:2500);fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){if(!c)return;if(c.welcomeEnabled===false)dismiss();var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');if(a&&typeof c.welcomeTitleLine1==='string')a.textContent=c.welcomeTitleLine1;if(b&&typeof c.welcomeTitleLine2==='string')b.textContent=c.welcomeTitleLine2;if(p&&typeof c.welcomeText==='string')p.textContent=c.welcomeText}).catch(function(){})})();</script>
 <div class="theme-bg theme-bg--dark" aria-hidden="true"></div><div class="theme-bg theme-bg--light" aria-hidden="true"></div>
 <header class="nav-wrap">
   <nav class="nav tap-target" aria-label="Điều hướng chính">
@@ -2702,12 +2702,12 @@ html.dark .detail-main-image{mix-blend-mode:normal!important}
 
 /* sd-welcome-layering-fix-2026-10-22 */
 
-/* Welcome splash must be the topmost storefront layer; prevent mobile nav and drawers bleeding through it. */
+/* Welcome splash lifecycle guard: class is present in initial HTML, before any drawer/nav can paint. */
+body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+body.welcome-active #accountDrawer,body.welcome-active #cartDrawer,body.welcome-active #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}
 .welcome-splash{z-index:2147483000!important}
 body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
-body:has(#welcomeSplash) #accountDrawer,
-body:has(#welcomeSplash) #cartDrawer,
-body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}
+body:has(#welcomeSplash) #accountDrawer,body:has(#welcomeSplash) #cartDrawer,body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}
 </style>
 
 </body>
