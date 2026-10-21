@@ -381,3 +381,8 @@ Continue safe Admin-only work and handoff consistency checks. Keep product image
 ## Bắt buộc tiếp tục sau mỗi báo cáo tiến độ
 
 Chủ sở hữu đã chỉ thị: tiếp tục làm việc, không dừng giữa chừng; chỉ dừng khi thực sự cần thao tác/xác nhận của chủ sở hữu. Sau khi gửi bất kỳ báo cáo tiến độ nào, phải tiếp tục ngay vòng kiểm tra/sửa tiếp theo nếu còn việc an toàn có thể tự làm. Không thay việc bằng báo cáo hoặc kế hoạch. Giữ trạng thái lỗi lưu ảnh và migrations PRE/PRO là tạm hoãn theo yêu cầu hiện tại.
+
+
+## Mệnh lệnh bắt buộc: báo cáo xong phải tiếp tục
+
+Chủ sở hữu đã yêu cầu rõ: “Báo cáo % hoàn thành công việc, báo cáo xong tiếp tục chạy” và “chỉ dừng khi cần tôi thao tác”. Không dừng sau khi trả lời hoặc đưa kế hoạch. Sau mỗi checkpoint, tự tiếp tục bước kiểm tra/sửa tiếp theo an toàn; chỉ hỏi chủ sở hữu khi thực sự cần quyền, xác nhận hoặc thao tác không thể thay thế. Không báo 100% nếu Preview, parity 12 màn hình, authenticated QA và nghiệm thu chưa đạt. Giữ PR #111/#108 OPEN/unmerged, chỉ làm trên nhánh ADMIN; không Production deploy; không đụng D1/R2/secrets/Access; lỗi lưu ảnh sản phẩm và migration PRE/PRO vẫn `DEFERRED_BY_OWNER`.
