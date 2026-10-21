@@ -1,3 +1,11 @@
+## 2026-10-22 — USER CONFIRMATION: HERO IMAGE IS A FIXED PRESENTATION ASSET (HIGHEST PRIORITY)
+
+- The user explicitly clarified that they personally uploaded the image to be used as the Hero after several chats failed to locate the product image. This is no longer a task to search for SKU SD-GL052 in the catalog. Use the uploaded file `public/images/hero-sd-gl052.png` directly as the Hero presentation image.
+- Current source in `public/index.html` calls `syncHeroProductImage()`, sets `src='/images/hero-sd-gl052.png?v=20261022-1'`, and unhides `#heroProductImage`. Preserve this behavior and asset. Do not delete it, hide it because the catalog lacks the SKU, replace it with another product photo, or gate its visibility on API/catalog data.
+- The asset's filename is only the user's chosen presentation-asset label; do not infer or create any catalog mapping. Catalog SKU availability is separate and irrelevant to showing this uploaded Hero image.
+- Hero visual status: source path/loader are present in branch; visual verification of the deployed first paint, image loading, crop, satin blend, Light/Dark and required viewports is STILL PENDING. Verify those items directly and fix display/design issues without reverting to catalog lookup.
+- This correction supersedes ALL older notes below that say the Hero image must be hidden/fail-closed because SKU SD-GL052 is missing, that the hero frame should collapse for that reason, or that Hero work should wait until other sections are finished. Treat those old notes as historical only.
+
 ## 2026-10-22 — HERO STATUS OVERRIDE (read this before older notes)
 
 - **Do not delete, hide, replace, or roll back the current hero presentation image as a routine cleanup.** The current `public/index.html` has `syncHeroProductImage()` loading `/images/hero-sd-gl052.png?v=20261022-1` into `#heroProductImage`; the hero image is deliberately treated as a presentation asset (`data-product-image-status="hero-presentation-asset"`), not as proof that SKU SD-GL052 exists in the public catalog.
