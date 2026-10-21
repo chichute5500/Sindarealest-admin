@@ -45,3 +45,10 @@ Bạn tiếp nhận công việc SinDarealest2. Đừng bắt người dùng k�
 6. Báo cáo ngắn gọn bằng tiếng Việt: branch/SHA, việc đã làm, bằng chứng test/ảnh, lỗi còn lại, blocker và bước tiếp theo. Không tuyên bố hoàn thành 100% nếu chưa đủ bằng chứng.
 
 **Lệnh người dùng có thể gửi:** “Tiếp tục theo file NEXT-CHAT-PROMPT.md. Đọc master prompt và handoff, xác minh trạng thái GitHub thực tế, rồi tiếp tục công việc. Nếu tôi bổ sung ý nào, ghi vào cả hai file prompt để không bị quên. Không đụng Production.”
+
+## Latest execution note — 2026-10-21 11:06 ICT
+- Current storefront work is limited to branch `fix/liquid-glass-audit-2026-10-19`; never merge PR #108, change `main`, deploy Production, or mutate Production data/config.
+- Latest completed live capture before the newest satin edit was Actions run #453: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39489628054 (artifact 12296050211). Tests/checks/deployment metadata and capture passed; overall product audit still fails closed for missing verified public SKU SD-GL052.
+- Actual artifact images were opened. Mobile account/cart/checkout drawers cover the bottom navigation; do not claim overlap absent new evidence. Checkout content is readable. Cart has a large empty middle area. Dark mobile satin still shows sweeping curves that differ from the reference.
+- Four satin SVGs have just been softened (narrower fold strokes/highlights); cache key is now `20261021-3` in `public/index.html` and `tests/storefront-reference-parity.test.mjs`. These newest changes are not yet visually verified. Wait for the latest Actions run, open its live screenshot artifact, compare with original reference PNGs, and continue fixing confirmed differences.
+- Update handoff and test results after each verified iteration. Never claim 100% while live audit fails or visual comparison remains incomplete. Do not replace SD-GL052 with another product or fabricate catalog data.
