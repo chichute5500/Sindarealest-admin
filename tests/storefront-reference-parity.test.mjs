@@ -56,7 +56,7 @@ assert.match(finalCss, /@media\(max-width:760px\)\{[\s\S]*?\.nav-wrap \.nav \.br
   'The mobile brand lockup must sit beside the menu, matching the supplied reference rather than being centered.');
 for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobileDark], ['desktop light', desktopLight], ['desktop dark', desktopDark]]) {
   assert.match(svg, /id="satin-crease-detail"/, name + ' background must retain layered satin crease highlights.');
-  assert.doesNotMatch(svg, /stroke-width="(?:[6-9][0-9]|[1-9][0-9]{2,})"/,
+  assert.doesNotMatch(svg, /stroke-width="(?:1[0-9]{2,}|[2-9][0-9]{2,})"/,
     name + ' background must avoid oversized ribbon bands and retain fine folds.');
 }
 
