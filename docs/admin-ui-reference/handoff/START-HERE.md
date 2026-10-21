@@ -51,3 +51,12 @@ Các file này lưu trạng thái bền vững nhưng không tự khởi động
 ## Ảnh tham chiếu
 
 Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải screenshot ứng dụng chạy thật. Chỉ ảnh do Playwright chụp từ app đang chạy mới được coi là bằng chứng thực tế.
+
+
+## Current checkpoint — 2026-10-21
+
+- Progress estimate: **43%**. Latest PR #111 head observed: `eee7dcedb71a42516822a9f46384ddacc107eb4e`; still OPEN/unmerged.
+- Latest scope audit: 909 changed files (862 docs/evidence + 47 non-doc). PR includes storefront, backend/functions, migration 0008, setup/deploy scripts and tests; it is not Admin-UI-only.
+- No PR-triggered Actions run was returned for the latest observed head. The most recent known evidence run is old and has Preview diagnostics FAIL. Do not claim current CI green.
+- Important safety blocker: setup script contains remote D1 migration/direct ALTER TABLE logic; it has not been executed. No schema/data/Production operations were performed.
+- Continue from `LATEST-STATUS.md`, `latest-test-results.json` and `PROMPT-NEXT-CHAT.md`; do not merge PR #111 or #108, deploy Production, modify secrets, or bypass Cloudflare Access.
