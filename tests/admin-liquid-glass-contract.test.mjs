@@ -54,6 +54,13 @@ for (const route of [
 assert.equal(adminHtml.split('</style>').length - 1, 1, 'ADMIN must retain one complete style block');
 assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese document language');
 
+// Product and order dialogs share keyboard focus management, Escape handling, and focus restoration.
+has('function activateAdminModal(backdrop,initialFocusSelector)', 'modal initial focus setup');
+has('function deactivateAdminModal(backdrop)', 'modal aria-hidden and focus restoration');
+has('function trapAdminModalFocus(e)', 'modal keyboard focus trap');
+has("document.addEventListener('keydown',trapAdminModalFocus)", 'shared keyboard handler for both modal dialogs');
+has("if(backdrop.id==='orderDetailBackdrop')closeOrderDetails();else closeEditor();", 'Escape closes the currently open Admin modal');
+
 // Accessible names for repeated controls must identify the affected record, not just say "Save".
 has('data-order-status="${esc(o.id)}" aria-label="Trạng thái đơn hàng ${esc(o.order_number)}"', 'accessible per-order status select');
 has('Đã thanh toán (đã xác minh)', 'payment status must be presented as a ledger-derived, read-only label');
