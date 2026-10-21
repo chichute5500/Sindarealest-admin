@@ -129,4 +129,10 @@ assert.match(adminHtml, /<option value="all">Tất cả<\/option>/, 'Mobile cate
 assert.match(adminHtml, /placeholder="Ví dụ: Bảo hành đường may"/, 'Warranty-policy placeholder should fit small phone widths');
 assert.doesNotMatch(adminHtml, /placeholder="Ví dụ: Bảo hành đường may — theo chính sách đã duyệt"/, 'Warranty-policy placeholder must not regress to long clipped help text');
 
+// Reference copy: keep the Admin header and dashboard titles aligned with the approved mobile UI.
+assert.match(adminHtml, /<header class="topbar">[\\s\\S]{0,320}<p>Luxury in Every Detail<\\/p>/,
+  'Admin chrome should use the approved brand tagline');
+assert.match(adminHtml, /function dashboard\\(\\)[\\s\\S]{0,500}head\\('Tổng quan','Tổng quan','Chào mừng, quản trị viên\\.'/,
+  'Dashboard heading should match the approved reference rather than a marketing-style label');
+
 console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
