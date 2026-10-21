@@ -459,21 +459,21 @@ try {
       mobileNav: (() => { const nav = document.querySelector('#mobileBottomNav'); return { present: !!nav, visible: !!nav && getComputedStyle(nav).display !== 'none', tabs: nav?.querySelectorAll('[data-mobile-tab]').length || 0 }; })(),
       title: document.title,
     }));
-    const expectedHeroImage = '/images/hero-sd-gl052.png';
+    // This isolated fixture contains no verified SD-GL052 record. The correct
+    // behavior is to collapse the hero image frame, not to borrow a fixture image.
     const heroImagePass = startup.heroImage.present
-      && startup.heroImage.loaded
-      && startup.heroImage.source.split('?')[0] === expectedHeroImage
-      && startup.heroImage.status === 'owner-supplied'
-      && !startup.heroImage.hidden;
+      && startup.heroImage.hidden
+      && !startup.heroImage.source
+      && startup.heroImage.status === 'sku-unavailable';
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
     audit.interactions.push({
       theme,
-      check: 'hero-uses-owner-uploaded-image',
+      check: 'hero-fails-closed-with-unverified-fixture',
       pass: heroImagePass,
-      result: { ...startup.heroImage, expectedImage: expectedHeroImage },
+      result: { ...startup.heroImage, expectedState: 'hidden-without-source-until-verified-SD-GL052' },
     });
-    if (!heroImagePass) hardFailures.push('Hero image did not load the owner-uploaded static asset in ' + theme);
+    if (!heroImagePass) hardFailures.push('Hero must remain hidden and remove its source when SD-GL052 is unavailable in the unverified fixture: ' + theme);
     audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
     if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
