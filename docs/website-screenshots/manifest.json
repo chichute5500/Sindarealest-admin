@@ -4,21 +4,21 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-21T12:41:52.158Z",
-  "status": "AWAITING_HUMAN_VISUAL_REVIEW",
+  "updatedAtUtc": "2026-10-21T13:14:05Z",
+  "status": "IN PROGRESS",
   "note": "End-of-work live Cloudflare Pages Preview capture and pixel comparison completed successfully in workflow 39425677039 against verified Preview deployment 1ab8617f-aac1-42f2-9112-4acc6b0d007a, branch fix/liquid-glass-audit-2026-10-19, source commit 37163dc3c17af332f948311bc395c9839a10e345. Start and end archives each contain 66 screenshots. Comparison: 57 pixel-identical pairs, 9 changed pairs, zero dimension mismatches, zero unmatched/invalid pairs. The changed pairs are the four full-page home captures and the four 'The art of…' collection captures where the autoplay carousel shows a different product image, plus one subtle product-detail desktop-light difference; the collection layout and image dimensions remain stable. Live audit passed 8/8 viewport/theme pairs, canonical product-detail click/direct-open/reload checks, and recorded zero overflow, page/console errors, or read-only violations. Human review of visual parity against the supplied app-like reference collage remains pending; automated capture success does not establish 100% design parity. Production remains untouched.",
   "stages": {
     "start-of-work": {
       "status": "CAPTURED_PASS",
-      "capturedAtUtc": "2026-10-20T12:41:14Z",
-      "runId": "39423635778",
-      "sourceCommit": "853e40f661d1d2718ab8d4f1dec9a33b81dacaae",
-      "previewDeploymentCommit": "853e40f661d1d2718ab8d4f1dec9a33b81dacaae",
+      "capturedAtUtc": "2026-10-21T13:14:05Z",
+      "runId": "39605456323",
+      "sourceCommit": "d5b3a8f5e4a4fd3ca8c510509d019829645c9145",
+      "previewDeploymentCommit": "d5b3a8f5e4a4fd3ca8c510509d019829645c9145",
       "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
-      "previewDeploymentId": "131cfcce-4174-4541-9f23-b99bc2cbfd6c",
-      "previewDeploymentCreatedOn": "2026-10-20T12:36:57.816Z",
+      "previewDeploymentId": "f96bd5df-6b48-42cf-8c5e-7f3ef56f45ed",
+      "previewDeploymentCreatedOn": "2026-10-21T13:09:51.494Z",
       "previewDeploymentVerified": true,
-      "imageCount": 66,
+      "imageCount": 84,
       "directory": "docs/website-screenshots/start-of-work/",
       "sourceKind": "cloudflare-pages-preview-live-read-only",
       "auditPassed": true,
@@ -162,7 +162,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-dark-1440x900-full-page.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-desktop-dark-1440x900-full-page.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -181,7 +181,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-dark-1440x900-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-desktop-dark-1440x900-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -200,7 +200,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-light-1440x900-full-page.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-desktop-light-1440x900-full-page.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -219,7 +219,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-desktop-light-1440x900-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-desktop-light-1440x900-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -238,7 +238,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-dark-360x800-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-mobile-dark-360x800-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -257,7 +257,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-dark-390x844-full-page.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-mobile-dark-390x844-full-page.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -276,7 +276,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-dark-390x844-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-mobile-dark-390x844-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -295,7 +295,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-light-360x800-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-mobile-light-360x800-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -314,7 +314,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-light-390x844-full-page.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-mobile-light-390x844-full-page.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -333,7 +333,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-mobile-light-390x844-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-mobile-light-390x844-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -352,7 +352,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-tablet-dark-768x1024-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-tablet-dark-768x1024-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -371,7 +371,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/home-tablet-light-768x1024-viewport.png",
           "resultPath": "docs/website-screenshots/end-of-work/home-tablet-light-768x1024-viewport.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -390,7 +390,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -409,7 +409,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -428,7 +428,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -447,7 +447,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-direct-open-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-direct-open-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -466,7 +466,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -485,7 +485,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -504,7 +504,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -523,7 +523,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-from-grid-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-from-grid-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -542,7 +542,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -561,7 +561,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -580,7 +580,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -599,7 +599,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-after-reload-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-after-reload-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -618,7 +618,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -637,7 +637,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -656,7 +656,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -675,7 +675,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-modal-direct-open-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-modal-direct-open-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -694,7 +694,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -713,7 +713,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -732,7 +732,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -751,7 +751,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/product-detail-reload-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/product-detail-reload-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -770,7 +770,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-benefits-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -789,7 +789,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-benefits-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -808,7 +808,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-benefits-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -827,7 +827,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-benefits-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-benefits-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -846,7 +846,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-collections-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-collections-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -865,7 +865,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-collections-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-collections-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -884,7 +884,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-collections-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-collections-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -903,7 +903,83 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-collections-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-collections-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-contact-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-desktop-dark-1440x900.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-contact-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-desktop-light-1440x900.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-contact-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/section-contact-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-mobile-light-390x844.png",
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -922,7 +998,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-featured-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-featured-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -941,7 +1017,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-featured-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-featured-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -960,7 +1036,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-featured-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-featured-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -979,7 +1055,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-featured-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-featured-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -998,7 +1074,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-footer-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-footer-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1017,7 +1093,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-footer-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-footer-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1036,7 +1112,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-footer-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-footer-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1055,7 +1131,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-footer-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-footer-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1074,7 +1150,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-hero-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-hero-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1093,7 +1169,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-hero-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-hero-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1112,7 +1188,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-hero-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-hero-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1131,7 +1207,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-hero-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-hero-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1150,7 +1226,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-order-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-order-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1169,7 +1245,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-order-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-order-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1188,7 +1264,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-order-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-order-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1207,7 +1283,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-order-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-order-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1226,7 +1302,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-products-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-products-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1245,7 +1321,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-products-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-products-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1264,7 +1340,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-products-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-products-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1283,7 +1359,273 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-products-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-products-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-account-menu-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": "#accountDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-account-menu-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": "#accountDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-mobile-light-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-light-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": "#cartDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": "#cartDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-light-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": "#checkoutDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": "#checkoutDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-light-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "fullscreen-gallery",
+          "sectionKey": null,
+          "elementSelector": "#sdFullscreenViewer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
+          "counterpartExists": true,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "fullscreen-gallery",
+          "sectionKey": null,
+          "elementSelector": "#sdFullscreenViewer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1302,7 +1644,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-menu-open-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-menu-open-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1321,7 +1663,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-menu-open-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-menu-open-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1340,7 +1682,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1359,7 +1701,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1378,7 +1720,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -1397,7 +1739,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-order-expanded-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-order-expanded-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         }
       ]
@@ -3685,11 +4027,11 @@
     "noProductionDeployOrMerge": true,
     "nextStep": "Finish visual acceptance review of the 9 changed screenshot pairs and clarify the boundary between Admin Preview audit and the separate supplied public-storefront reference design. Do not merge or deploy Production."
   },
-  "sourceCommit": "e3757df8056978949b0a29c893d841c3faffb5e9",
-  "previewDeploymentCommit": "e3757df8056978949b0a29c893d841c3faffb5e9",
+  "sourceCommit": "d5b3a8f5e4a4fd3ca8c510509d019829645c9145",
+  "previewDeploymentCommit": "d5b3a8f5e4a4fd3ca8c510509d019829645c9145",
   "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
-  "previewDeploymentId": "eb5a9529-fd40-4d59-abf9-344fc271a3a6",
-  "previewDeploymentCreatedOn": "2026-10-21T12:37:40.012Z",
+  "previewDeploymentId": "f96bd5df-6b48-42cf-8c5e-7f3ef56f45ed",
+  "previewDeploymentCreatedOn": "2026-10-21T13:09:51.494Z",
   "previewCommitVerification": "VERIFIED via Cloudflare Pages API read-only deployment metadata; target alias matched an environment=preview deployment with successful stage status.",
   "captureSource": "Direct Cloudflare Pages Preview capture, read-only; no fixture API",
   "captureCoverage": {
