@@ -105,12 +105,31 @@
 
 ## Ảnh tham chiếu chính thức của bộ icon — 2026-10-22
 
+## Token màu và thông số Liquid Glass — giá trị triển khai đề xuất
+
+Các giá trị dưới đây được chốt làm **baseline triển khai để AI dùng nhất quán**; chúng là thông số kỹ thuật đề xuất, không phải tuyên bố đã đo chính xác pixel từ ảnh tham chiếu. Sau khi dựng trên Preview, chỉ tinh chỉnh nếu có đối chiếu ảnh/bằng chứng.
+
+- Tim yêu thích đang bật: `#E5484D` (đỏ ấm, đủ tương phản trên kính sáng). Chưa thích: `#142a3c`; trạng thái nhấn chưa chọn vẫn dùng accent `#5c91b9`.
+- Bề mặt kính sáng: `rgba(255, 255, 255, 0.42)`.
+- Viền kính: `1px solid rgba(255, 255, 255, 0.72)`.
+- Nền kính có sắc xanh nhẹ khi cần: `rgba(234, 243, 251, 0.48)`.
+- Blur nền: `backdrop-filter: blur(16px) saturate(145%)`; fallback khi không hỗ trợ backdrop-filter là nền `#eaf3fb` bán đặc, bảo đảm độ đọc.
+- Bóng ngoài mặc định: `0 8px 24px rgba(20, 42, 60, 0.10)`.
+- Highlight mép trong: `inset 0 1px 0 rgba(255, 255, 255, 0.80)`.
+- Trạng thái nhấn: `transform: scale(0.97)`; bóng lún `inset 0 2px 8px rgba(20, 42, 60, 0.14)`; chuyển màu icon sang `#5c91b9`; không ripple. Thời gian chuyển trạng thái khoảng `140ms` với easing `cubic-bezier(0.2, 0.7, 0.2, 1)`.
+- Nét icon SVG: stroke `1.6–1.8` trên viewBox `24×24`, linecap/linejoin `round` khi phù hợp hình gốc.
+- Dark mode không dùng nguyên xi mặt kính trắng; dùng bề mặt tối trong mờ, viền trắng mờ và bóng nhẹ nhưng giữ cùng geometry/độ tương phản. Không thay đổi token sáng gốc đã chốt.
+- Tôn trọng `prefers-reduced-motion`: bỏ scale/di chuyển lớn, giữ phản hồi màu/độ tương phản ngắn.
+- Các trị số này là baseline thống nhất cho implementation; không được mô tả là đã triển khai hoặc test PASS trước khi có kết quả Preview/Playwright.
+
+
+
 - `docs/icon-assets/Icon.png`: ảnh icon gốc người dùng tải lên. Đây là nguồn ưu tiên cho hình dáng, nét vẽ, tỷ lệ, màu sắc và các trạng thái gốc.
 - `docs/icon-assets/Chitiet.png`: bảng tham chiếu chi tiết cho phong cách Liquid Glass, trạng thái nhấn/yêu thích/giỏ hàng và storyboard fly-to-cart.
 - Phải mở và xem cả hai ảnh thực tế trước khi triển khai; không suy đoán chỉ từ tên file hoặc README.
 - Khi có khác biệt: `Icon.png` quyết định hình học icon; `Chitiet.png` bổ sung hành vi/hiệu ứng. Ảnh chi tiết không cấp phép tự ý thay thiết kế gốc.
 - Palette đã xác nhận: nền sáng `#eaf3fb`, nét/chữ chính `#142a3c`, màu nhấn `#5c91b9`.
-- Trái tim khi thích phải chuyển đỏ, nhưng mã HEX đỏ riêng chưa được chốt. Opacity, blur, refraction, viền sáng và shadow cũng chưa khóa bằng trị số; không trình bày chúng như token đã được người dùng duyệt.
+- Tim yêu thích bật dùng `#E5484D`; chưa thích dùng `#142a3c`; accent khi nhấn `#5c91b9`. Baseline kính: surface `rgba(255,255,255,0.42)`, border `rgba(255,255,255,0.72)` 1px, blur `16px saturate(145%)`, shadow `0 8px 24px rgba(20,42,60,0.10)`, highlight `inset 0 1px 0 rgba(255,255,255,0.80)`. Nhấn: scale `0.97`, inset shadow `inset 0 2px 8px rgba(20,42,60,0.14)`, transition `140ms cubic-bezier(0.2,0.7,0.2,1)`, không ripple. Đây là baseline triển khai đề xuất, cần kiểm chứng trên Preview; không khẳng định đã test PASS.
 - Các ảnh là tài liệu thiết kế, không tự động là asset được website tải/runtime sử dụng. Đặc tả không đồng nghĩa đã triển khai hoặc test PASS.
 
 ## Bổ sung yêu cầu tương tác đã chốt — 2026-10-22
