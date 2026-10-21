@@ -1008,7 +1008,7 @@ Phần này bổ sung yêu cầu tương tác mới cho WEBSITE TĨNH. Không th
 - Màu đã chốt: nền sáng `#eaf3fb`, icon/chữ chính `#142a3c`, màu nhấn `#5c91b9`; trái tim chuyển đỏ khi sản phẩm đã được yêu thích. Ba mã HEX này là palette nền tảng đã xác nhận.
 - **Ảnh tham chiếu chính thức bắt buộc phải mở và đối chiếu trước khi sửa icon:** `docs/icon-assets/Icon.png` là chuẩn ưu tiên về hình dáng, nét vẽ, tỷ lệ và trạng thái icon gốc; `docs/icon-assets/Chitiet.png` là tài liệu bổ sung để hiểu trạng thái, cách trình bày Liquid Glass và hành vi tương tác. Không chỉ đọc tên file hoặc mô tả — hãy xem ảnh thực tế.
 - Nếu hai ảnh có khác biệt, dùng `Icon.png` để quyết định hình học/ngoại hình icon; dùng `Chitiet.png` để tham khảo hiệu ứng và storyboard. Không tự vẽ lại icon hoặc thay đổi tỷ lệ để làm infographic khớp hơn.
-- **Không tự bịa token màu chưa được duyệt:** HEX riêng của trái tim đỏ chưa được chốt; opacity/blur/refraction/viền/bóng đổ cũng chưa khóa bằng trị số. Đối chiếu trực tiếp mẫu hình ảnh và ghi rõ khi là lựa chọn triển khai mới; không gọi đó là màu thương hiệu đã duyệt.
+- **Token triển khai cụ thể:** tim yêu thích bật `#E5484D`; surface kính sáng `rgba(255,255,255,0.42)`; viền `1px solid rgba(255,255,255,0.72)`; blur `16px saturate(145%)`; shadow `0 8px 24px rgba(20,42,60,0.10)`; highlight `inset 0 1px 0 rgba(255,255,255,0.80)`; pressed scale `0.97`, inset shadow `inset 0 2px 8px rgba(20,42,60,0.14)`, transition `140ms cubic-bezier(0.2,0.7,0.2,1)`. Dùng các giá trị này làm baseline triển khai; đối chiếu Preview rồi mới tinh chỉnh. Đây là thông số chỉ dẫn, không phải bằng chứng đã triển khai.
 - Không dùng ripple. Phản hồi nhấn ưu tiên kính lún nhẹ + chuyển màu; khi thả, hiệu ứng nhấn trở về trạng thái bình thường.
 - Không để icon chạy liên tục nếu không có lý do chức năng. Ưu tiên animation ngắn, mượt, hiệu năng tốt và tôn trọng `prefers-reduced-motion`.
 
@@ -1044,7 +1044,7 @@ Không sửa ngay chỉ vì đã có đặc tả. Thực hiện tuần tự, m�
 ### 5. Điều kiện nghiệm thu
 - [ ] Không mất hoặc phá vỡ chức năng đang tồn tại; thay đổi nhỏ, có lý do và có thể kiểm tra.
 - [ ] Icon nhấn có phản hồi kính lún/đổi màu, không ripple; trạng thái chức năng được giữ chính xác.
-- [ ] Đã xem trực tiếp `docs/icon-assets/Icon.png` và `docs/icon-assets/Chitiet.png`; giữ hình dáng theo ảnh gốc và không tự chốt HEX đỏ/opacity/blur/shadow chưa được phê duyệt.
+- [ ] Đã xem trực tiếp `docs/icon-assets/Icon.png` và `docs/icon-assets/Chitiet.png`; giữ hình dáng theo ảnh gốc và dùng baseline cụ thể trong mục XXII; kiểm chứng Preview trước khi tinh chỉnh.
 - [ ] Heart đỏ khi yêu thích và trở về màu mặc định khi bỏ thích.
 - [ ] Badge và toast khớp kết quả giỏ hàng thực tế.
 - [ ] Tất cả điểm thêm hàng dùng chung hiệu ứng và bay đến đúng icon header.
