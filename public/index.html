@@ -2467,6 +2467,16 @@ html.dark .product-photo img{mix-blend-mode:normal}
  body:has(.sd-fullscreen-viewer.open) .sd-fullscreen-thumbs{bottom:calc(52px + env(safe-area-inset-bottom))!important}
 }
 
+
+/* Let the account panel fit its content instead of leaving a large empty drawer below the menu. */
+@media(max-width:760px){
+  .account-drawer{
+    height:auto!important;
+    bottom:auto!important;
+    max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  }
+}
+
 </style>
 
 </body>
