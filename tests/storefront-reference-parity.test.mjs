@@ -100,7 +100,7 @@ const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
 const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
-assert.ok(html.includes("const wantedSku='SD-GL052'"), 'Hero selection must preserve exact SKU matching.');
+assert.ok(html.includes("/images/hero-sd-gl052.png?v=20261021-hero-upload"), 'Hero must use the owner-uploaded image asset without requiring API SKU discovery.');
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
