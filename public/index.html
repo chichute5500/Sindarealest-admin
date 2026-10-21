@@ -1708,20 +1708,20 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
 }
 
 /* Organic liquid-glass wave assets: curved satin ribbons are the primary ambient backdrop. */
-.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-3');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
-.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-3');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-4');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-4');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
 html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54))}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72))}
-.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-3');filter:none}
-.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-3');filter:none}
+.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-4');filter:none}
+.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-4');filter:none}
 
 /* Portrait screens use a dedicated tall composition so the curved satin ribbons remain visible instead of cropping into diagonal bands. */
 @media(max-width:760px){
- .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-3')}
- .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-3')}
- .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-3')}
- .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-3')}
+ .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-4')}
+ .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-4')}
+ .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-4')}
+ .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-4')}
 }
 
 /* Mobile product detail follows the full-screen gallery layout in the supplied app reference. */
@@ -2228,20 +2228,8 @@ html.dark .sd-fullscreen-share{
 
 /* Full storefront visual pass: restore satin depth and match the mobile reference rhythm. */
 /* sd-static-reference-final-pass-2026-10-21 */
-.theme-bg--light::after{
-  background:
-    linear-gradient(145deg,transparent 14%,rgba(255,255,255,.72) 22%,rgba(255,255,255,.16) 28%,transparent 38%),
-    linear-gradient(31deg,transparent 20%,rgba(128,183,220,.20) 31%,rgba(255,255,255,.62) 36%,transparent 48%),
-    linear-gradient(157deg,transparent 48%,rgba(255,255,255,.68) 54%,rgba(150,202,234,.22) 60%,transparent 70%),
-    linear-gradient(118deg,rgba(225,241,255,.20),rgba(211,231,249,.14) 52%,rgba(237,247,255,.22));
-}
-.theme-bg--dark::after{
-  background:
-    linear-gradient(145deg,transparent 14%,rgba(188,222,245,.18) 22%,rgba(255,255,255,.04) 28%,transparent 38%),
-    linear-gradient(31deg,transparent 20%,rgba(56,121,164,.25) 31%,rgba(218,240,255,.22) 36%,transparent 48%),
-    linear-gradient(157deg,transparent 48%,rgba(183,220,245,.22) 54%,rgba(38,91,127,.22) 60%,transparent 70%),
-    linear-gradient(118deg,rgba(3,20,36,.38),rgba(7,31,51,.27) 52%,rgba(3,17,30,.40));
-}
+.theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.07),rgba(211,231,249,.03) 52%,rgba(237,247,255,.07))}
+.theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.10),rgba(7,31,51,.06) 52%,rgba(3,17,30,.12))}
 /* The reference headline breaks after “Phong cách”, not after “đẳng”. */
 @media(max-width:760px){
   #home .hero h1{
@@ -2346,6 +2334,14 @@ html.dark .sd-fullscreen-share{
   }
   #home.hero:has(#heroProductImage[hidden]) .hero-copy{max-width:100%!important}
 }
+
+
+/* Suppress the empty hero pseudo-card only when the required verified SKU is absent. */
+#home.hero:has(#heroProductImage[hidden])::before,
+#home.hero:has(#heroProductImage[hidden])::after{content:none!important;display:none!important;background:none!important;box-shadow:none!important;border:0!important}
+#home.hero:has(#heroProductImage[hidden]){display:block!important;min-height:0!important;height:auto!important;border:0!important;outline:0!important;border-radius:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important}
+#home.hero:has(#heroProductImage[hidden]) .hero-copy{display:flex!important;min-height:0!important;height:auto!important;width:100%!important;max-width:760px!important;padding:0!important;margin:0!important}
+#home .hero-visual:has(#heroProductImage[hidden]){display:none!important;visibility:hidden!important;min-height:0!important;height:0!important;width:0!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important}
 </style>
 
 </body>

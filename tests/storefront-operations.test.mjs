@@ -66,6 +66,10 @@ const heroMarkup = storefrontHtml.slice(heroStart, heroEnd);
 assert.ok(heroMarkup.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.') && heroMarkup.includes('Khám phá ngay') && !heroMarkup.includes('Khám phá bộ sưu tập') && !heroMarkup.includes('Khám phá sản phẩm'), 'Hero copy and its single reference CTA must remain concise after removing product imagery');
 assert.ok(storefrontHtml.includes('#home.hero:has(#heroProductImage[hidden]){\n  min-height:0!important;') && storefrontHtml.includes('background:transparent!important;'),
   'When the verified SD-GL052 image is unavailable, the hero must collapse its empty frame rather than use a substitute product.');
+
+/* Missing verified hero SKU must never leave a blank glass card or borrow another product image. */
+assert.ok(storefrontHtml.includes('#home.hero:has(#heroProductImage[hidden])::before,') && storefrontHtml.includes('content:none!important;display:none!important;background:none!important') && storefrontHtml.includes('.hero-copy{display:flex!important;min-height:0!important;') && storefrontHtml.includes('.hero-visual:has(#heroProductImage[hidden]){display:none!important;visibility:hidden!important;'),
+  'When SD-GL052 is unavailable, pseudo-card, visual frame, and fixed hero min-height must all collapse without substituting a different product.');
 assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
 const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');
@@ -73,11 +77,11 @@ assert.ok(storefrontHtml.includes('theme-croc-albino.webp?v='), 'Light crocodile
 assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(storefrontHtml), 'Every dark theme image reference must include a cache-busting version');
 assert.ok(!/theme-croc-albino\.webp(?!\?v=)/.test(storefrontHtml), 'Every light theme image reference must include a cache-busting version');
 
-assert.ok(storefrontHtml.includes(".theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-3')"),
+assert.ok(storefrontHtml.includes(".theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-4')"),
   'Dark ambient mode must use the current navy-satin crease SVG asset.');
-assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-3')"),
+assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-4')"),
   'Light ambient mode must use the current pearl-blue satin crease SVG asset.');
-assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-3');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}"),
+assert.ok(storefrontHtml.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-4');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}"),
   'The final light ambient rule must keep the reference blue hue without the old color-cast filter.');
 assert.match(storefrontHtml, /\.mobile-bottom-nav\{background:rgba\(244,250,255,\.78\)\}/,
   'Mobile bottom navigation must balance visible Liquid Glass translucency with label readability.');
@@ -98,9 +102,9 @@ assert.ok(storefrontHtml.includes('.theme-watermark{opacity:.035}') &&
   'The background brand watermark must stay subtle and not compete with content.');
 assert.match(storefrontHtml, /@media\(max-width:850px\) and \(min-width:761px\)\{\s*\.navlinks\{display:none\}/,
   'Compact tablet navigation must prevent the full desktop navbar from clipping at 768 CSS pixels.');
-assert.ok(storefrontHtml.includes(".welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-3');filter:none}"),
+assert.ok(storefrontHtml.includes(".welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-4');filter:none}"),
   'The dark welcome screen must share the current cache-versioned sapphire satin artwork.');
-assert.ok(storefrontHtml.includes(".welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-3');filter:none}"),
+assert.ok(storefrontHtml.includes(".welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-4');filter:none}"),
   'The light welcome screen must share the curated pearl wave artwork.');
 assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo--dark" src="images\/theme-croc-dark\.webp\?v=20261017-1"/,
   'The editorial material sample image must keep its black-material identity.');
