@@ -78,11 +78,11 @@ jobs:
 
       - name: Diagnose configured deployed Preview
         id: preview
-        if: ${{ env.ADMIN_TEST_URL != '' }}
+        if: ${{ !cancelled() && steps.project-check.outcome == 'success' && steps.unit-tests.outcome == 'success' && env.ADMIN_TEST_URL != '' }}
         run: npx playwright test tests/e2e/admin-preview.spec.js --reporter=line,html
 
       - name: Report missing Preview configuration
-        if: ${{ env.ADMIN_TEST_URL == '' }}
+        if: ${{ !cancelled() && steps.project-check.outcome == 'success' && steps.unit-tests.outcome == 'success' && env.ADMIN_TEST_URL == '' }}
         run: echo "ADMIN_TEST_URL is not configured; deployed-preview checks were skipped. Local static source checks still ran."
 
       - name: Persist screenshots and test state on the ADMIN branch

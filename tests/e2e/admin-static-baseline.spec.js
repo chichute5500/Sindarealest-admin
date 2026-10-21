@@ -543,7 +543,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.evaluate(() => window.scrollTo(0, 0));
       await chooseTheme(variant.theme);
       await page.evaluate(() => window.scrollTo(0, 0));
-      if (prepare) await prepare();
+      if (prepare) await prepare(variant);
       await saveScreenshot(name, variant);
       if (fullPageAtMobileLight && variant.theme === 'light' && variant.viewport.width === mobile.width) {
         const filename = name + '__' + variant.viewport.width + 'x' + variant.viewport.height + '__light__full.png';
@@ -589,8 +589,18 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     }
 
     await captureView('orders', 'orders', null, true);
-    await captureView('order-row-details', 'orders', async () => {
-      await page.locator('#main .order-table tbody tr').first().scrollIntoViewIfNeeded();
+    await captureView('order-row-details', 'orders', async variant => {
+      // Desktop uses a table; mobile renders the responsive card layout. Do not
+      // target hidden desktop rows on mobile, where route/theme updates can detach them.
+      if (variant.viewport.width < 821) return;
+      // Wait for fixture-backed rows and scroll atomically in the page so a DOM
+      // replacement cannot detach a Playwright locator between resolution and scroll.
+      await expect.poll(async () => page.evaluate(() => {
+        const row = document.querySelector('#main .order-table tbody tr');
+        if (!row) return false;
+        row.scrollIntoView({ block: 'nearest' });
+        return true;
+      }), { timeout: 5000 }).toBe(true);
     });
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', null, true);

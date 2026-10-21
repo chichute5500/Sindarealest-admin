@@ -73,4 +73,13 @@ assert.match(previewSpec, /splitSelectorList\(rule\.selectorText\)\.includes\(no
 assert.doesNotMatch(previewSpec, /normalizeSelector\(rule\.selectorText\)\s*===\s*normalizedHideSelector/,
   'Preview diagnostics must not compare a grouped selector list as one selector');
 
-console.log('PASS ADMIN ice-glass visual tokens, login contract, grouped Preview CSS selector matching, and required API route strings');
+// Guard the visual-capture harness against flaky scrolling of hidden desktop-only table rows.
+const baselineSpec = readFileSync(new URL('./e2e/admin-static-baseline.spec.js', import.meta.url), 'utf8');
+assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
+  'Visual capture should pass viewport/theme context into screen-specific setup');
+assert.match(baselineSpec, /variant\.viewport\.width < 821\) return;/,
+  'Order table scrolling must be skipped in the responsive mobile-card layout');
+assert.match(baselineSpec, /expect\.poll\(async \(\) => page\.evaluate\(\(\) => \{/,
+  'Order row scrolling should wait for an attached DOM node');
+
+console.log('PASS ADMIN ice-glass visual tokens, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
