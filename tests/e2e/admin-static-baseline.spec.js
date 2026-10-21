@@ -719,31 +719,34 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard', 'dashboard', null, true);
     await captureView('products', 'products', null, true);
 
-    // Mobile product cards keep price and stock in one compact detail row without horizontal overflow.
+    // Compact mobile cards keep all product facts in one card and the price/stock metrics side-by-side.
     await page.setViewportSize(mobile);
     await chooseTheme('light');
     await page.evaluate(() => window.scrollTo(0, 0));
     const mobileProductRows = page.locator('#main .product-table tbody tr');
     await expect(mobileProductRows).toHaveCount(3);
     const mobileCardLayout = await mobileProductRows.first().evaluate(row => {
-      const cells = Array.from(row.cells);
-      const rects = cells.map(cell => {
-        const rect = cell.getBoundingClientRect();
-        return { top: rect.top, right: rect.right, bottom: rect.bottom, height: rect.height };
-      });
+      const rect = selector => {
+        const box = row.querySelector(selector).getBoundingClientRect();
+        return { top: box.top, right: box.right, bottom: box.bottom, height: box.height, width: box.width };
+      };
       return {
-        rects,
         rowHeight: row.getBoundingClientRect().height,
         viewportWidth: document.documentElement.clientWidth,
-        pageWidth: document.documentElement.scrollWidth
+        pageWidth: document.documentElement.scrollWidth,
+        identity: rect('.rowprod'),
+        price: rect('.product-mobile-metric:first-child'),
+        stock: rect('.product-mobile-metric:nth-child(2)'),
+        action: rect('.product-mobile-meta>.btn'),
+        visibleMetrics: getComputedStyle(row.querySelector('.product-mobile-meta')).display,
+        published: rect('.product-mobile-status')
       };
     });
-    expect(Math.abs(mobileCardLayout.rects[1].top - mobileCardLayout.rects[2].top),
-      'Price and stock should share a compact row on mobile: ' + JSON.stringify(mobileCardLayout)).toBeLessThanOrEqual(2);
-    expect(mobileCardLayout.rects[4].bottom, 'Edit action should remain inside the product card').toBeLessThanOrEqual(
-      mobileCardLayout.rects[0].bottom + mobileCardLayout.rowHeight
-    );
-    expect(mobileCardLayout.rowHeight, 'Mobile product cards should not stack every detail into tall rows').toBeLessThan(250);
+    expect(mobileCardLayout.visibleMetrics, 'Mobile product card metrics must be visible').toBe('grid');
+    expect(Math.abs(mobileCardLayout.price.top - mobileCardLayout.stock.top),
+      'Price and stock should share a row: ' + JSON.stringify(mobileCardLayout)).toBeLessThanOrEqual(2);
+    expect(mobileCardLayout.action.bottom, 'Edit action should finish within the card').toBeLessThanOrEqual(mobileCardLayout.rowHeight + mobileCardLayout.identity.top);
+    expect(mobileCardLayout.rowHeight, 'Mobile product cards should compact identity + price + stock + action').toBeLessThan(175);
     expect(mobileCardLayout.pageWidth, 'Mobile product list must not overflow horizontally').toBeLessThanOrEqual(mobileCardLayout.viewportWidth + 1);
     await saveScreenshot('products-compact-mobile-check', { viewport: mobile, theme: 'light' });
 

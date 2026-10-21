@@ -217,9 +217,11 @@ has('#imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-alig
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
 has('#backdrop{align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor removes the dimmed modal backdrop');
 has('#backdrop>.editor{width:100%;max-width:none;height:100vh;height:100dvh;max-height:100dvh;border-radius:0;box-shadow:none;background:var(--bg)}', 'mobile product editor uses a full-screen opaque surface');
-has('#main .product-table tbody tr{position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:14px;align-items:start}', 'mobile product cards use a compact two-column details grid');
-has('#main .product-table tbody tr td:nth-child(2),\n #main .product-table tbody tr td:nth-child(3){display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px;width:100%;padding:7px 0 5px;border-bottom:0}', 'mobile product price and stock occupy compact detail cells');
-has('#main .product-table tbody tr td:nth-child(4){position:absolute;top:12px;right:12px;display:block;width:auto;max-width:84px;padding:0;border:0}', 'mobile publication status stays at the identity corner');
+has('.product-mobile-status,.product-mobile-meta{display:none}', 'mobile-only product facts do not alter desktop table layout');
+has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
+has('#main .product-table .product-mobile-meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:7px;align-items:end;margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}', 'mobile product price, stock and edit action share one compact row');
+has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"search clear" "category fulfillment";gap:7px;padding:10px}', 'product filters use a compact phone toolbar');
+has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
 has('#backdrop>.editor>form{display:flex;flex:1 0 auto;flex-direction:column;min-height:0}', 'short editor tabs stretch to reserve space for sticky actions');
 has('#backdrop>.editor>form>.editorcontent{flex:1 0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
