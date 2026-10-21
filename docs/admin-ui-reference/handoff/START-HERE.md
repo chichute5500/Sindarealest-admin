@@ -175,3 +175,12 @@ Continue only on `feature/admin-isolated-handoff-2026-10-20`, rechecking refs an
 ## Continuation addendum — 2026-10-21 15:52 +07:00: cross-branch payment display gap
 
 Read the cross-branch source audit in `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and `LATEST-STATUS.md`. Static-site source consumes the Admin order/payment endpoints and fulfillment enums at the code-shape level, but it discards `freeShippingEligible` and `freeShipping` in its mapped payment state and the renderer does not show eligibility versus applied freeship. This is a static-branch issue. Do not fix it in ADMIN or synchronize branches; send the exact finding to the website agent and require a separate source/test commit there. Actual deployed integration remains NOT VERIFIED.
+
+
+## Newest owner instruction and checkpoint — 2026-10-21
+
+**Priority override:** pause the product image-save bug and PRE/PRO migration investigation for later; focus on remaining Admin work. PRE and PRO schema/ledger are still NOT VERIFIED. No remote SQL/setup/D1/R2 action or product-image backend retest occurred in this continuation. Do not resume that task unless the owner reopens it.
+
+Current Admin-only source/test SHA: `ad426349d765f9352ad9c1bc1460e577a102bb2f`. Source CI [39582088383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383) PASS. Preview diagnostics [39582088374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374) FAIL at `PREVIEW_CSS_SIGNATURE_MISMATCH`; local source screenshot matrix PASS with 59 PNGs in [artifact 128](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374/artifacts/12337346436). The QR activation guard and localized QR file picker are implemented with source-contract regression assertions. These tests/fixtures do not establish authenticated backend behavior.
+
+Stay on `feature/admin-isolated-handoff-2026-10-20`; keep PR #111/#108 open and unmerged. No Production deployment, main/static branch edits, secrets/Access changes, remote migrations, or TinyFish.

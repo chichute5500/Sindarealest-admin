@@ -146,3 +146,28 @@
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Latest owner-priority checkpoint — 2026-10-21 17:08 +07:00
+
+**Owner instruction:** pause work on the product image-save error and PRE/PRO migrations for now; focus on remaining Admin tasks. This is a deliberate priority change, not a claim the error is fixed. PRE/PRO schema and migration ledgers remain NOT VERIFIED; no remote SQL, setup script, D1/R2 write, or product image-save backend retest was performed in this cycle.
+
+### Verified source improvement
+
+- Source/test SHA: `ad426349d765f9352ad9c1bc1460e577a102bb2f`.
+- `public/admin/index.html`: QR activation compares normalized visible bank name, account number, account name and instructions against the saved QR draft. If any differ, activation stops with the message “Thông tin ngân hàng đã thay đổi. Hãy lưu thông tin nháp trước khi kích hoạt QR.”; no activate request is sent from that path.
+- QR image file selection in Settings now hides the browser's untranslated native file-control text behind an Admin-styled button and shows the chosen filename. Regression assertions are in `tests/fulfillment-payment-contract.test.mjs`.
+- Source Validate CI [39582088383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383): **SUCCESS** on exact SHA `ad426349d765f9352ad9c1bc1460e577a102bb2f` (project integrity and automated tests pass).
+- Admin Preview workflow [39582088374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374): **FAILURE at deployed Preview diagnosis only**. Local source screenshot matrix PASS, 59 PNGs captured (16 login shell, 43 synthetic/read-only module fixtures; 36 fixture metrics). [Artifact admin-preview-evidence-128](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374/artifacts/12337346436) is stored in GitHub Actions.
+- Preview failure signature: `PREVIEW_CSS_SIGNATURE_MISMATCH`; title `Quản trị SinDarealest`, login view class `loginwrap`, topbar brand remains visible, selector support/match are true, stylesheet contains 226 rules but lacks expected login-hide rule. Current source contains the rule; stale deployment vs wrong target cannot be distinguished because the configured target value is masked. **Do not weaken the assertion or bypass Cloudflare Access.**
+- Screenshot/fixture evidence is not authenticated backend evidence. Product save, actual product-image upload/storage, authenticated business flows, real QR scan/account verification, full 12-screen parity and deployed cross-branch runtime remain NOT VERIFIED.
+
+### State and safety
+
+- Overall estimate remains **46%**.
+- PR #111 OPEN/unmerged; PR #108 OPEN/unmerged. Branch before this documentation-only update: `e9e7b62fd6ae73986583d860eb020712aaba7bc5`.
+- No main or static branch edits, merge, Production deployment, remote migration, D1/R2 operation, secret/Access modification, Access bypass or TinyFish use in this continuation.
+
+### Next work
+
+Continue remaining Admin-only UI/accessibility/source audit and evidence review. Keep product image-save and PRE/PRO migrations **DEFERRED BY OWNER** until asked to resume. Resolve Preview only with owner-confirmed target and legitimate Access. Do not treat local fixture screenshots as backend QA.

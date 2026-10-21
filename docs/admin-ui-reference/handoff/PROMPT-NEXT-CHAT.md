@@ -349,3 +349,12 @@ Migration 0008 adds `sku_verified` to `products` and `order_items`. Migration 00
 6. Re-test save-product metadata and actual image upload/storage after schema correction. Distinguish UI error, D1 failure, and R2 upload failure.
 
 **Hard safety constraints:** no TinyFish; no Production deploy; no merge PR #111 or #108; no edits to `main` or `fix/liquid-glass-audit-2026-10-19`; no secrets/binding changes, no Cloudflare Access bypass, no customer/order/product data writes except an explicitly approved and necessary migration; no migration until correct target and current schema/ledger are verified. Keep both PRs OPEN/unmerged. Report evidence, not assumptions.
+
+
+## Newest owner-priority override — 2026-10-21
+
+The owner explicitly directed this continuation to **pause the product image-save error and PRE/PRO migrations and focus on the remaining Admin work**. This supersedes the earlier “Continue task — PRE/PRO migration and image-save error” block above until the owner reopens it. Do not continue image-save debugging or remote migration now.
+
+Current source/test SHA: `ad426349d765f9352ad9c1bc1460e577a102bb2f`. Source Validate CI [39582088383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088383) PASS. Admin Preview run [39582088374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374) fails only at the configured deployed Preview CSS signature check; the local source screenshot matrix passes with 59 PNGs in [artifact 128](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39582088374/artifacts/12337346436). The QR settings activation guard and localized QR file picker are implemented with source-contract regression assertions. None of these source/fixture checks validates authenticated real backend behavior.
+
+Next: continue remaining Admin-only UI/accessibility/source checks. Keep the Preview signature assertion intact and resolve target/build identity only through the owner-confirmed URL and legitimate Cloudflare Access. Product save, actual product-image upload/storage, and PRE/PRO migration ledger are **DEFERRED_BY_OWNER / NOT VERIFIED**, not resolved. PR #111/#108 remain open/unmerged; no Production deploy, no main/static branch write, no secret change or Access bypass, no remote D1/R2 mutation, and no TinyFish.
