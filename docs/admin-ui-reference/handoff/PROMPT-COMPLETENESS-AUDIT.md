@@ -191,3 +191,11 @@ This was a read-only source review of the existing payment contract and route co
 - Exact SHA `32c1f28662e7240353b0eda2f5daeaf22359257e` passed Validate Source [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Admin Preview/Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169). Browser suite reported 3 passed (30.5s).
 - Added Home/End keyboard navigation assertions for the product editor tablist, verifying active focus and `aria-selected`. Existing ArrowLeft/ArrowRight and modal focus behavior assertions remain. Test-only scope.
 - Requirement status: editor tab keyboard behavior = PASS for the tested fixture; cross-module keyboard/accessibility = PARTIAL; visual parity across 12 screen families = NOT ACCEPTED; authenticated backend QA = BLOCKED / NOT TESTED; product image-save and PRE/PRO migrations = DEFERRED_BY_OWNER. Overall estimate stays 48%.
+
+
+## QR-settings fixture verification — 2026-10-21 16:11 UTC
+
+- Exact SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55` passed [Validate Source #39632306385](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385) and [Admin Preview/Playwright #39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588).
+- Fixture test status: **PASS** for Settings QR field visibility/accessibility and the client-side unsaved-bank-details activation guard. It asserts the guard warning and requires zero non-GET API calls; synthetic/read-only data only.
+- Prior attempt #39631879451 failed because the message persisted between viewport variants; the test now navigates to another module and back so every viewport starts with a newly rendered form. No application logic changed; rerun on exact SHA passed.
+- Artifact #191 ID `12360041542`: 63 PNGs, 39 metrics; zero recorded browser/console/network/HTTP errors and zero attempted writes. Authenticated backend behavior remains NOT TESTED; QR/payment module status is PARTIAL; full 12-screen visual parity is NOT ACCEPTED; overall progress stays 48%.
