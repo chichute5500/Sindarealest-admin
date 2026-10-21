@@ -21,10 +21,10 @@ function assertSatinFoldScale(name, svg, maxStroke, maxBlur, expectedPaths) {
   assert.ok(blur.length > 0 && Math.max(...blur) <= maxBlur,
     name + ' must keep blur tight enough to preserve fine fabric creases.');
 }
-assertSatinFoldScale('Desktop light satin', desktopLight, 7.2, 2, 25);
-assertSatinFoldScale('Desktop dark satin', desktopDark, 7.2, 2, 25);
-assertSatinFoldScale('Mobile light satin', mobileLight, 3.5, 0.9, 25);
-assertSatinFoldScale('Mobile dark satin', mobileDark, 3.5, 0.9, 25);
+assertSatinFoldScale('Desktop light satin', desktopLight, 48, 12, 25);
+assertSatinFoldScale('Desktop dark satin', desktopDark, 48, 12, 25);
+assertSatinFoldScale('Mobile light satin', mobileLight, 32, 8, 25);
+assertSatinFoldScale('Mobile dark satin', mobileDark, 32, 8, 25);
 
 function assertSatinFoldContrast(name, svg, maxBody, maxShadow, maxShade, maxHighlight) {
   const maxOpacityFor = layer => {
@@ -76,6 +76,11 @@ assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
 
 /* Desktop hero fallback and mobile drawer/navigation separation are deliberate responsive contracts. */
+assert.match(desktopLight, /data-satin-style="organic-diagonal-folds-v5"/);
+assert.match(desktopDark, /data-satin-style="organic-diagonal-folds-v5"/);
+assert.match(mobileLight, /data-satin-style="organic-diagonal-folds-v5"/);
+assert.match(mobileDark, /data-satin-style="organic-diagonal-folds-v5"/);
+
 assert.ok(finalCss.includes('@media(min-width:761px){')
   && finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy{')
   && finalCss.includes('flex-direction:column!important;')
@@ -107,7 +112,7 @@ assert.match(finalCss, /@media\(max-width:760px\)\{[\s\S]*?\.nav-wrap \.nav \.br
 for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobileDark], ['desktop light', desktopLight], ['desktop dark', desktopDark]]) {
   assert.match(svg, /id="base"/, name + ' background must define its satin base.');
   assert.match(svg, /id="glow"/, name + ' background must include a soft light bloom.');
-  assert.match(svg, /id="blur"/, name + ' background must use diffuse folds rather than sharp geometric stripes.');
+  assert.match(svg, /id="blur"/, name + ' background must use softly layered satin fold strokes rather than broad looped ribbons.');
   assert.match(svg, /stroke-linecap="round"/, name + ' background folds must flow organically.');
   const ids = [...svg.matchAll(/id="([^"]+)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length, name + ' background must not contain duplicate SVG ids.');
@@ -116,10 +121,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-13"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-13"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-13"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-13"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-14"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-14"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-14"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-14"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 
