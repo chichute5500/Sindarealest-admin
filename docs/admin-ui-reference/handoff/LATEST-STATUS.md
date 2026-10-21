@@ -159,3 +159,11 @@
 - Full progress remains **43%**: source-level checks and fixture evidence are meaningful, but authenticated modules, all 12 reference-screen comparisons, current full PR diff/scope audit, and deployed Preview verification are not complete. Do not inflate progress based on fixture-only screenshots.
 - Current PR #111 is still open against `main` and the reported diff is broad (909 files at the last PR read); this is a merge blocker until a complete scope audit is performed. No merge, cherry-pick, force-push, Production deployment, schema/data/secrets change was performed.
 - Next: correct the Preview target only through an authorized owner action; inspect the latest artifact and compare all available screenshots with the approved reference; run post-login read-only tests only after valid authorized access and safe test-data/PII masking are available; continue auditing the PR diff using GitHub source evidence or a verified checkout.
+
+
+## Workflow reporting correction — 2026-10-21
+
+- Reviewed logs for run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39495162150. Repository checks, automated tests, and local source screenshot capture succeeded; the remote Preview test failed because `.topbar > .brand` is visible while the test expects it hidden. The diagnostic signature reports `PREVIEW_CSS_SIGNATURE_MISMATCH`; it does not establish which Preview deployment/URL is intended.
+- Updated `.github/workflows/admin-preview-diagnostics.yml` in commit `de6114f75cba36193c50ad043175d08be092929f` to distinguish `SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL` from a fully passing run, refresh `latestLocalEvidence` from current run metadata, and report source/login/fixture screenshot counts separately. This workflow-only change has been read back from GitHub but **has not yet been tested by a subsequent Actions run**.
+- The current `latest-test-results.json` still documents the last completed run (tested source `d74de3c6adbb6be6b0a59ac4d45e869738a016e4`, run #39495162150); do not treat the workflow edit commit as application code tested by that run.
+- Current branch head at this note: `de6114f75cba36193c50ad043175d08be092929f`. PR #111 remains OPEN/unmerged. Progress remains **43%**.
