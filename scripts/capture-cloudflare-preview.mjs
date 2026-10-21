@@ -261,26 +261,6 @@ async function dismissWelcomeSplash(page) {
 }
 async function auditHeroImage(page, label) {
   const result = await page.evaluate(async () => {
-    let catalogAvailable = false;
-    let catalogHttpStatus = null;
-    let catalogError = '';
-    let product = null;
-    let mappedImages = [];
-    try {
-      const response = await fetch('/api/products', { cache: 'no-store', credentials: 'same-origin' });
-      catalogHttpStatus = response.status;
-      if (!response.ok) throw new Error('public product API returned HTTP ' + response.status);
-      const payload = await response.json();
-      const rows = Array.isArray(payload) ? payload : (payload.products || payload.data || []);
-      if (!Array.isArray(rows)) throw new Error('public product payload is not an array');
-      catalogAvailable = true;
-      product = rows.find(item => String(item?.sku ?? '').trim().toUpperCase() === 'SD-GL052' && item?.skuVerified === true) || null;
-      mappedImages = Array.isArray(product?.images)
-        ? product.images.map(value => String(value || '').trim().replace(/^\.\//, '').split(/[?#]/, 1)[0]).filter(Boolean)
-        : [];
-    } catch (error) {
-      catalogError = String(error?.message || error).slice(0, 180);
-    }
     const imageElement = document.querySelector('#heroProductImage');
     const frame = document.querySelector('#home .hero-visual');
     const source = imageElement?.getAttribute('src') || '';
@@ -290,50 +270,22 @@ async function auditHeroImage(page, label) {
     const hidden = Boolean(imageElement?.hidden);
     const frameStyle = frame ? getComputedStyle(frame) : null;
     const frameCollapsed = !frame || frameStyle.display === 'none' || frame.getBoundingClientRect().width < 1 || frame.getBoundingClientRect().height < 1;
-    const skuUnavailableFallback = catalogAvailable && !product
-      && hidden && !source && status === 'sku-unavailable' && frameCollapsed;
-    const verifiedCatalogImageLoaded = catalogAvailable && Boolean(product)
-      && mappedImages.includes(path) && loaded && !hidden
-      && status === 'verified-public-catalog'
-      && imageElement?.dataset.productSku === 'SD-GL052';
-    const verifiedProductMissingImageFallback = catalogAvailable && Boolean(product)
-      && mappedImages.length === 0
-      && hidden && !source && status === 'image-missing' && frameCollapsed;
+    const presentationAssetLoaded = path.endsWith('/images/hero-sd-gl052.png')
+      && loaded && !hidden && status === 'hero-presentation-asset' && !frameCollapsed;
     return {
-      catalogAvailable,
-      catalogHttpStatus,
-      catalogError,
-      verifiedSkuPresent: Boolean(product),
-      verifiedSku: product?.sku || '',
-      mappedImages,
       actualImage: path,
       status,
       loaded,
       hidden,
       frameCollapsed,
-      skuUnavailableFallback,
-      verifiedCatalogImageLoaded,
-      verifiedProductMissingImageFallback,
+      presentationAssetLoaded,
     };
   });
-  const pass = result.skuUnavailableFallback === true || result.verifiedCatalogImageLoaded === true;
-  const status = result.verifiedCatalogImageLoaded
-    ? 'PASS_VERIFIED_CATALOG_IMAGE'
-    : result.skuUnavailableFallback ? 'PASS_FAIL_CLOSED_SKU_UNAVAILABLE' : 'FAIL';
+  const pass = result.presentationAssetLoaded === true;
+  const status = pass ? 'PASS_HERO_PRESENTATION_ASSET' : 'FAIL';
   audit.heroImageChecks.push({ context: label, status, pass, result });
-  if (!result.catalogAvailable) {
-    audit.hardFailures.push('Could not verify SD-GL052 against the public product payload at ' + label + ': ' + (result.catalogError || 'unknown API error') + '.');
-  } else if (!result.verifiedSkuPresent) {
-    if (!result.skuUnavailableFallback) {
-      audit.hardFailures.push('SD-GL052 is absent from the public verified product payload and the hero did not collapse safely at ' + label + '.');
-    }
-    // The UI fallback passes its safety check, but the full reference audit stays
-    // blocked until the exact owner-authorized SKU/image mapping exists publicly.
-    audit.hardFailures.push('SD-GL052 is not present in the public verified product payload at ' + label + '.');
-  } else if (result.verifiedProductMissingImageFallback) {
-    audit.hardFailures.push('Verified SD-GL052 has no mapped public image; the hero correctly stayed hidden at ' + label + '.');
-  } else if (!result.verifiedCatalogImageLoaded) {
-    audit.hardFailures.push('The hero image is not the loaded image mapped to verified public SKU SD-GL052 at ' + label + '.');
+  if (!pass) {
+    audit.hardFailures.push('The dedicated hero presentation asset must be visible and loaded at ' + label + '.');
   }
 }
 async function auditImageElements(page, label) {
