@@ -979,3 +979,24 @@ Work only on `feature/admin-isolated-handoff-2026-10-20`. Re-check live HEAD and
 - No product data, API semantics, authentication, real business records, D1/R2, Access, secrets, Production deployment, or PR merge was changed. Authenticated business/backend QA remains **NOT TESTED**. PR #111 and #108 remain OPEN/UNMERGED.
 - Overall progress remains **50%**: automation and one screen-family iteration improved, but 12-screen visual acceptance, several screen families, and authorized real backend QA remain incomplete.
 - Next safe task: inspect the orders list at 390×844 against reference screen #6, implement a focused ADMIN-only mobile card layout if justified, add E2E regression checks, run exact-SHA Validate Source + Preview/Playwright, open the new screenshot artifact, then update and re-read all seven handoff files.
+
+
+# PROMPT BÀN GIAO MỚI — 2026-10-22
+
+Tiếp tục làm việc thực tế, tự chủ trên GitHub. Repository `chichute5500/Sindarealest-admin`; chỉ sửa nhánh `feature/admin-isolated-handoff-2026-10-20`. Đầu tiên lấy HEAD/Actions/PR mới nhất, không giả định checkpoint còn là HEAD.
+
+- SHA source/test đã xác minh gần nhất: `214dd104c17e3837166fac77f8f2106d1a25ffeb`.
+- Validate Source [#39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) SUCCESS; Preview/Playwright [#39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) SUCCESS trên cùng SHA. Handoff commits sau đó đã làm branch HEAD tiến lên; chỉ coi HEAD mới đã test nếu có workflow khớp SHA.
+- Màn hình đơn: giá từng sản phẩm và công cụ quản lý chuyển vào disclosure có nhãn; mobile thu gọn, desktop mở sẵn. Regression tests kiểm tra toggle, input giá và khóa thanh toán. **Ảnh của run #39662986425 chưa được mở để nghiệm thu trực quan.**
+- Tiến độ giữ 50%; screen #3 PARTIAL/NOT ACCEPTED; screen #6 code/test cải thiện nhưng visual review pending; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED.
+
+## Việc tiếp theo
+1. Fetch live branch HEAD, PR #111/#108 và workflow runs mới nhất.
+2. Tải/xem artifact của [Preview run #39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425/artifacts); mở screenshot orders 390×844 light/dark và 1280×800. Không tuyên bố đã xem nếu chưa mở được artifact.
+3. Sửa lỗi có bằng chứng, thêm regression test, chạy Validate Source và Preview/Playwright trên exact SHA.
+4. Tiếp tục nhóm màn hình chưa nghiệm thu; không lặp việc đã xong khi không có bằng chứng lỗi.
+5. Cập nhật đủ 7 file handoff tuần tự bằng SHA mới nhất của từng file; đọc lại cả 7 file từ HEAD cuối cùng và xác minh đồng nhất.
+6. Báo cáo HEAD, SHA test, workflow URLs, thay đổi, test/ảnh, tiến độ/cơ sở và bước kế tiếp; sau báo cáo tiếp tục làm khi còn bước an toàn.
+
+## Giới hạn bắt buộc
+PR #111 và #108 giữ OPEN/UNMERGED. Không merge, không Production deploy, không sửa main/website tĩnh, không chỉnh hoặc bypass Access/secrets, không migration/SQL hoặc thay đổi D1/R2 từ xa, không thay đổi hạ tầng, không dùng TinyFish. Chỉ cần người dùng thao tác nếu thực sự bị chặn quyền hoặc cần phê duyệt.
