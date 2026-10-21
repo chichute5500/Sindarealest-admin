@@ -1248,6 +1248,22 @@ try {
       && !localOrderRecord.storesAddress;
     audit.interactions.push({ theme, check: 'accepted-order-request-saved-locally-without-pii', pass: localOrderSavePass, result: localOrderRecord });
     if (!localOrderSavePass) hardFailures.push('Order history did not store the accepted request safely: ' + theme);
+    const paymentPendingState = await page.evaluate(() => {
+      const panel = document.querySelector('#paymentInstructions');
+      return {
+        visible: !!panel && !panel.hidden,
+        heading: panel?.querySelector('h3')?.textContent.trim() || '',
+        text: panel?.textContent || '',
+        qrCount: panel?.querySelectorAll('img').length || 0,
+      };
+    });
+    const paymentPendingPass = paymentPendingState.visible
+      && paymentPendingState.heading === 'Chờ cửa hàng xác nhận'
+      && paymentPendingState.text.includes('Vui lòng chưa chuyển tiền')
+      && paymentPendingState.qrCount === 0
+      && !paymentPendingState.text.includes('Số tiền cần chuyển');
+    audit.interactions.push({ theme, check: 'pending-order-does-not-show-qr-or-request-transfer', pass: paymentPendingPass, result: paymentPendingState });
+    if (!paymentPendingPass) hardFailures.push('Pending order exposed QR/payment request before server confirmation: ' + theme);
     await page.locator('#checkoutClose').click();
     await page.locator('#checkoutDrawer.open').waitFor({ state: 'hidden' });
     await page.locator('#mobileAccountNav').click();
