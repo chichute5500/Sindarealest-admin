@@ -174,7 +174,7 @@ assert.match(satinHeroVisibility, /#home\.hero\.wrap\{\s*background:rgba\(246,25
   'Light hero surface must be transparent enough to reveal satin folds.');
 assert.match(satinHeroVisibility, /html\.dark #home\.hero\.wrap\{\s*background:rgba\(7,27,45,\.22\)!important;/,
   'Dark hero surface must reveal the navy satin texture.');
-assert.match(satinHeroVisibility, /rgba\(237,247,255,\.72\) 0%,rgba\(237,247,255,\.54\) 30%,rgba\(237,247,255,\.24\) 52%/,
-  'Light mobile hero veil must not wash satin out with nearly opaque white.');
-assert.match(satinHeroVisibility, /rgba\(4,20,34,\.62\) 0%,rgba\(4,20,34,\.43\) 32%,rgba\(4,20,34,\.19\) 55%/,
-  'Dark mobile hero veil must preserve the satin behind the text.');
+assert.match(satinHeroVisibility, /rgba\(237,247,255,\.90\) 0%,rgba\(237,247,255,\.82\) 28%,rgba\(237,247,255,\.64\) 48%,rgba\(237,247,255,\.42\) 66%,rgba\(237,247,255,\.18\) 84%/,
+  'Light mobile hero veil must keep copy readable where the product image overlaps while revealing satin and the full product toward the right.');
+assert.match(satinHeroVisibility, /rgba\(4,20,34,\.80\) 0%,rgba\(4,20,34,\.70\) 28%,rgba\(4,20,34,\.52\) 48%,rgba\(4,20,34,\.34\) 66%,rgba\(4,20,34,\.14\) 84%/,
+  'Dark mobile hero veil must keep copy readable where the product image overlaps while revealing satin and the full product toward the right.');
