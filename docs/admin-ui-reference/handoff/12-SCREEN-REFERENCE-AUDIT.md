@@ -142,3 +142,8 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 - Mobile product-list fixes and matching tests are green. Evidence: 64 responsive/theme screenshots and 40 synthetic/read-only fixture metrics. Authenticated business/backend QA remains NOT TESTED/BLOCKED by Access; no production deployment.
 - Overall progress remains **50%**. Screen #3 and 12-screen visual parity are NOT ACCEPTED; image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER.
 - Next: re-fetch branch HEAD and CI, inspect reference-vs-actual screenshots at 390×844 and 1280×800 in light/dark, continue substantive UI parity work and update handoff docs after verified cycles. Keep PR #108/#111 open; no Production, Access/secrets, D1/R2, migrations, main/static branch edits, or TinyFish.
+
+
+## Checkpoint note — 2026-10-22
+
+Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322fc3933c`; exact-HEAD Validate source and tests run [#39657885958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39657885958) succeeded. This does **not** establish visual acceptance. Keep screen parity incomplete until actual reference screenshots are inspected at 390x844 and 1280x800 in light and dark themes, and record only observations actually verified. Progress remains 50%; PR #111/#108 remain unmerged.
