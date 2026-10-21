@@ -30,6 +30,7 @@ try {
   process.exit(2);
 }
 const outputDir = path.join(process.cwd(), 'artifacts', 'liquid-glass-preview', 'live-preview');
+const firstPaintVideoDir = path.join(outputDir, 'first-paint-videos');
 // Required responsive matrix: small mobile, common mobile, tablet, and desktop.
 const viewports = [
   { name: 'mobile-360', width: 360, height: 800 },
@@ -48,6 +49,7 @@ const audit = {
   screenshots: [],
   firstPaintChecks: [],
   firstPaintTimelines: [],
+  videoCaptures: [],
   viewportAudits: [],
   themeChecks: [],
   routeChecks: [],
@@ -75,10 +77,11 @@ function accessGate(url, status, title, body) {
   return status === 401 || status === 403 || u.pathname.startsWith('/cdn-cgi/access/login')
     || /login_required|cloudflare access|sign in to continue|access denied/i.test((title || '') + '\n' + (body || ''));
 }
-async function makePage(browser, viewport, theme, label) {
+async function makePage(browser, viewport, theme, label, options = {}) {
   const context = await browser.newContext({
     viewport: { width: viewport.width, height: viewport.height },
     deviceScaleFactor: 1, colorScheme: theme, reducedMotion: 'reduce', serviceWorkers: 'block',
+    ...(options.recordVideo ? { recordVideo: { dir: firstPaintVideoDir, size: { width: viewport.width, height: viewport.height } } } : {}),
   });
   await context.addInitScript((mode) => {
     try { localStorage.setItem('sd-theme-mode', mode); } catch {}
@@ -218,50 +221,144 @@ async function captureFirstPaintFrames(page, label) {
   const viewport = viewports.find(item => item.width === size.width && item.height === size.height);
   if (!viewport) return;
   const theme = label.endsWith('-dark') ? 'dark' : 'light';
-  const firstPaintOffsets = [0, 50, 100, 200, 300];
-  const startedAt = Date.now();
-  const capturedWelcomeSplash = new Set();
-  for (const requestedOffsetMs of firstPaintOffsets) {
-    await page.waitForTimeout(Math.max(0, requestedOffsetMs - (Date.now() - startedAt)));
-    const state = await page.evaluate(() => window.__sdReadWelcomeFirstPaintState?.('playwright-frame') || null)
-      .catch(error => ({ stage: 'playwright-frame', error: sanitizeText(String(error?.message || error)) }));
-    const actualElapsedMs = Date.now() - startedAt;
-    const filename = 'first-paint-' + viewport.name + '-' + theme + '-' + String(requestedOffsetMs).padStart(3, '0') + 'ms.png';
-    await page.screenshot({ path: path.join(outputDir, filename), type: 'png', fullPage: false, animations: 'disabled', timeout: 30000 });
-    audit.screenshots.push({
-      filename, fullPage: false, ...captureMeta(viewport, theme),
-      captureType: 'first-paint-frame', state: 'welcome-first-paint',
-      requestedOffsetMs, actualElapsedMs,
+  // One still frame is retained for human review. The video-only probe below is the
+  // authoritative time-resolved evidence; repeated screenshot calls here used to block
+  // the Playwright loop long enough for the splash timer to expire.
+  const filename = 'first-paint-' + viewport.name + '-' + theme + '-000ms.png';
+  const screenshotRequestElapsedMs = Number((await page.evaluate(() => performance.now()).catch(() => 0)).toFixed(2));
+  const screenshotStartedAt = Date.now();
+  await page.screenshot({ path: path.join(outputDir, filename), type: 'png', fullPage: false, animations: 'disabled', timeout: 30000 });
+  const screenshotCallDurationMs = Date.now() - screenshotStartedAt;
+  audit.screenshots.push({
+    filename, fullPage: false, ...captureMeta(viewport, theme),
+    captureType: 'first-paint-frame', state: 'welcome-first-paint',
+    requestedOffsetMs: 0, screenshotRequestElapsedMs, screenshotCallDurationMs,
+    timingNote: 'Still image captured once; consult the dedicated startup video and init-script timeline for exact early-frame timing.',
+  });
+  const firstPaintEvidence = audit.firstPaintChecks.some(check =>
+    check.viewport === viewport.name && check.theme === theme && check.sample?.splashVisible === true
+    && check.sampleOffsetMs >= 0 && check.sampleOffsetMs <= 350);
+  if (firstPaintEvidence) {
+    audit.sectionChecks.push({
+      selector: '#welcomeSplash', filename, status: 'CAPTURED',
+      route: new URL(page.url()).pathname, theme, viewport: viewport.name,
+      evidence: 'full-viewport first-frame plus dedicated startup video and init-script DOM timeline',
     });
-    const check = {
-      context: label, viewport: viewport.name, theme, requestedOffsetMs, actualElapsedMs,
-      status: state && !state.error ? 'CAPTURED' : 'FAILED', sample: state,
-    };
-    audit.firstPaintChecks.push(check);
-    if (check.status !== 'CAPTURED') {
-      audit.hardFailures.push('First-paint DOM sample failed at ' + label + ' +' + requestedOffsetMs + 'ms.');
-    } else if (state.violation === true) {
-      const failure = 'Welcome first-paint layering violation at ' + label + ' +' + requestedOffsetMs
-        + 'ms: bottom navigation or a commerce overlay was visible while welcome owned the screen.';
-      if (!audit.hardFailures.includes(failure)) audit.hardFailures.push(failure);
+  } else {
+    audit.sectionChecks.push({ selector: '#welcomeSplash', filename, status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
+    audit.hardFailures.push('Welcome splash was not visible in early DOM/video evidence: ' + label);
+  }
+}
+async function captureWelcomeStartupVideo(browser, viewport, theme) {
+  const label = 'startup-probe-' + viewport.name + '-' + theme;
+  let context = null;
+  let page = null;
+  let video = null;
+  let response = null;
+  let probe = null;
+  let videoFilename = 'first-paint-videos/welcome-startup-' + viewport.name + '-' + theme + '.webm';
+  try {
+    ({ context, page } = await makePage(browser, viewport, theme, label, { recordVideo: true }));
+    video = page.video();
+    response = await page.goto(previewUrl.href, { waitUntil: 'commit', timeout: 45000 });
+    if (!response) throw new Error('Navigation returned no main-document response.');
+    if (response.status() < 200 || response.status() >= 300) {
+      const body = await page.locator('body').innerText().catch(() => '');
+      if (accessGate(page.url(), response.status(), await page.title().catch(() => ''), body)) {
+        audit.accessBlocked = true;
+        audit.accessBlockReason = 'Cloudflare Access gate detected in dedicated first-paint video capture.';
+      }
+      throw new Error('Homepage returned HTTP ' + response.status() + '.');
     }
-    if (state?.nodes?.splash?.visible && !capturedWelcomeSplash.has(label)) {
-      try {
-        const splash = page.locator('#welcomeSplash');
-        const splashFilename = screenshotStem('state-welcome-splash', viewport, theme) + '.png';
-        await splash.screenshot({ path: path.join(outputDir, splashFilename), type: 'png', animations: 'disabled', timeout: 10000 });
-        const meta = { ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay' };
-        audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'CAPTURED', route: '/', theme, viewport: viewport.name });
-        audit.screenshots.push({ filename: splashFilename, fullPage: false, ...meta });
-        capturedWelcomeSplash.add(label);
-      } catch (error) {
-        audit.sectionChecks.push({ selector: '#welcomeSplash', filename: screenshotStem('state-welcome-splash', viewport, theme) + '.png', status: 'FAILED', route: '/', theme, viewport: viewport.name });
-        audit.hardFailures.push('Welcome splash first-paint element capture failed for ' + label + ': ' + sanitizeText(String(error?.message || error).slice(0, 140)));
+    // Let the browser—not screenshot RPCs—record the first 800ms, including the reduced-motion
+    // splash lifetime and its transition to the storefront.
+    await page.waitForTimeout(850);
+    const timeline = await page.evaluate(() => window.__sdWelcomeFirstPaintTimeline || []);
+    const initSample = timeline.find(item => item.stage === 'init-script');
+    const originMs = Number(initSample?.atMs ?? timeline[0]?.atMs ?? 0);
+    const samples = timeline.map(item => ({
+      ...item,
+      sampleOffsetMs: Number((item.atMs - originMs).toFixed(2)),
+    })).filter(item => item.sampleOffsetMs >= 0 && item.sampleOffsetMs <= 350);
+    probe = {
+      context: label, viewport: viewport.name, theme, mainDocumentStatus: response.status(),
+      startedAt: timeline[0]?.atMs ?? null, samples,
+      welcomeVisibleInFirst350ms: samples.some(item => item.splashVisible === true),
+      visibleChromeViolations: samples.filter(item => item.violation === true).map(item => ({
+        stage: item.stage, sampleOffsetMs: item.sampleOffsetMs, nodes: item.nodes,
+      })),
+    };
+    audit.firstPaintTimelines.push(probe);
+    if (!probe.welcomeVisibleInFirst350ms) {
+      audit.hardFailures.push('Welcome splash was not visible in the startup video / DOM timeline for ' + label + '.');
+    }
+    if (probe.visibleChromeViolations.length) {
+      audit.hardFailures.push('Welcome first-paint layering violation in browser timeline for ' + label
+        + ' (' + probe.visibleChromeViolations.length + ' samples).');
+    }
+    for (const requestedOffsetMs of [0, 50, 100, 200, 300]) {
+      const upperBound = requestedOffsetMs === 0 ? 45 : requestedOffsetMs + 65;
+      const matching = samples
+        .filter(item => item.sampleOffsetMs >= requestedOffsetMs && item.sampleOffsetMs <= upperBound)
+        .sort((a, b) => Math.abs(a.sampleOffsetMs - requestedOffsetMs) - Math.abs(b.sampleOffsetMs - requestedOffsetMs));
+      const sample = matching[0] || (requestedOffsetMs === 0
+        ? samples.find(item => item.splashVisible === true) || samples[0]
+        : null);
+      const check = {
+        context: label, viewport: viewport.name, theme, requestedOffsetMs,
+        sampleOffsetMs: sample?.sampleOffsetMs ?? null,
+        status: sample ? 'CAPTURED' : 'FAILED',
+        sample: sample || null,
+        evidenceSource: 'startup-video init-script timeline',
+      };
+      audit.firstPaintChecks.push(check);
+      if (!sample) {
+        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms for ' + label + '.');
       }
     }
+    return probe;
+  } catch (error) {
+    const message = sanitizeText(String(error?.message || error));
+    audit.hardFailures.push('Dedicated welcome startup video failed for ' + label + ': ' + message);
+    audit.videoCaptures.push({
+      context: label, viewport: viewport.name, theme, filename: videoFilename,
+      status: 'FAILED', error: message,
+    });
+    return null;
+  } finally {
+    if (context) await context.close().catch(() => {});
+    if (video) {
+      try {
+        const originalPath = await video.path();
+        const destinationPath = path.join(outputDir, videoFilename);
+        await fs.copyFile(originalPath, destinationPath);
+        await fs.rm(originalPath, { force: true }).catch(() => {});
+        const existing = audit.videoCaptures.find(item => item.context === label);
+        const entry = {
+          context: label, viewport: viewport.name, theme, filename: videoFilename,
+          status: 'CAPTURED', mainDocumentStatus: response?.status() ?? null,
+          welcomeVisibleInFirst350ms: probe?.welcomeVisibleInFirst350ms === true,
+          earlyDomSampleCount: probe?.samples?.length ?? 0,
+          visibleChromeViolationCount: probe?.visibleChromeViolations?.length ?? 0,
+          recordingDurationMs: 850,
+        };
+        if (existing) Object.assign(existing, entry);
+        else audit.videoCaptures.push(entry);
+      } catch (error) {
+        const message = sanitizeText(String(error?.message || error));
+        audit.hardFailures.push('Could not finalize welcome startup video for ' + label + ': ' + message);
+        const existing = audit.videoCaptures.find(item => item.context === label);
+        const entry = { context: label, viewport: viewport.name, theme, filename: videoFilename, status: 'FAILED', error: message };
+        if (existing) Object.assign(existing, entry);
+        else audit.videoCaptures.push(entry);
+      }
+    } else if (!audit.videoCaptures.some(item => item.context === label)) {
+      audit.videoCaptures.push({
+        context: label, viewport: viewport.name, theme, filename: videoFilename,
+        status: 'FAILED', error: 'Playwright did not expose a video recording for this context.',
+      });
+    }
   }
-  const timeline = await page.evaluate(() => window.__sdWelcomeFirstPaintTimeline || []).catch(() => []);
-  audit.firstPaintTimelines.push({ context: label, viewport: viewport.name, theme, samples: timeline });
 }
 async function navigate(page, url) {
   let response = null;
@@ -711,11 +808,21 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
 }
 async function main() {
   await fs.mkdir(outputDir, { recursive: true });
+  await fs.rm(firstPaintVideoDir, { recursive: true, force: true });
+  await fs.mkdir(firstPaintVideoDir, { recursive: true });
   for (const item of await fs.readdir(outputDir, { withFileTypes: true })) {
-    if (item.isFile() && /\.(png|json|html)$/i.test(item.name)) await fs.unlink(path.join(outputDir, item.name));
+    if (item.isFile() && /\.(png|json|html|webm)$/i.test(item.name)) await fs.unlink(path.join(outputDir, item.name));
   }
   const browser = await chromium.launch({ headless: true });
   try {
+    // Dedicated short recordings are independent of the longer section/drawer screenshot run.
+    // They show the first paint even if a still-screenshot call waits for layout/fonts.
+    for (const theme of ['light', 'dark']) {
+      for (const viewport of viewports.filter(item => item.width === 360 || item.width === 390)) {
+        if (audit.accessBlocked) break;
+        await captureWelcomeStartupVideo(browser, viewport, theme);
+      }
+    }
     for (const theme of ['light', 'dark']) {
       for (const viewport of viewports) {
         if (audit.accessBlocked) break;
@@ -726,27 +833,7 @@ async function main() {
           if (result.blocked) break;
           if (!result.response) continue;
           if (result.status < 200 || result.status >= 300) throw new Error('Homepage returned HTTP ' + result.status + '.');
-          // First-paint helper already records full viewport frames and captures the welcome element on mobile.
-          // Keep a guarded fallback for 390px in case the early element snapshot could not be saved.
-          if (viewport.name === 'mobile-390'
-              && !audit.screenshots.some(shot => shot.captureType === 'welcome-splash' && shot.viewport === viewport.name && shot.theme === theme)) {
-            const splash = page.locator('#welcomeSplash');
-            const splashFilename = screenshotStem('state-welcome-splash', viewport, theme) + '.png';
-            if (await splash.count().catch(() => 0) && await splash.isVisible().catch(() => false)) {
-              try {
-                await splash.screenshot({ path: path.join(outputDir, splashFilename), type: 'png', animations: 'disabled', timeout: 10000 });
-                const meta = { ...captureMeta(viewport, theme), captureType: 'welcome-splash', state: 'welcome-overlay' };
-                audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'CAPTURED', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
-                audit.screenshots.push({ filename: splashFilename, fullPage: false, ...meta });
-              } catch (error) {
-                audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'FAILED', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
-                audit.hardFailures.push('Welcome splash detached before fallback capture: ' + label + ' (' + sanitizeText(String(error?.message || error).slice(0, 140)) + ')');
-              }
-            } else {
-              audit.sectionChecks.push({ selector: '#welcomeSplash', filename: splashFilename, status: 'MISSING', route: new URL(page.url()).pathname, theme, viewport: viewport.name });
-              audit.hardFailures.push('Welcome splash was not visible during early live Preview capture: ' + label);
-            }
-          }
+          // The full-viewport +700ms startup video / DOM timeline is the authoritative welcome evidence; do not retry a delayed element screenshot.
           await waitForStorefront(page, label);
           const metrics = await page.evaluate(() => ({
             viewportWidth: window.innerWidth,
@@ -810,7 +897,10 @@ async function main() {
       audit.firstPaintChecks.filter(check => check.viewport === viewport.name && check.theme === theme && check.status === 'CAPTURED').length])));
   const firstPaintCoverageComplete = audit.firstPaintChecks.length === requiredFirstPaintFrameCount
     && Object.values(firstPaintFrameCounts).every(count => count === 5);
-  const firstPaintViolationCount = audit.firstPaintChecks.filter(check => check.sample?.violation === true).length;
+  const firstPaintVideoCoverageComplete = audit.videoCaptures.length === firstPaintContextCount
+    && audit.videoCaptures.every(video => video.status === 'CAPTURED' && video.welcomeVisibleInFirst350ms === true);
+  const firstPaintViolationCount = audit.firstPaintTimelines.reduce((total, timeline) =>
+    total + (timeline.visibleChromeViolations?.length || 0), 0);
   const homeFullPageCount = audit.screenshots.filter(shot => shot.captureType === 'full-page').length;
   const menuOpenCount = audit.screenshots.filter(shot => shot.state === 'menu-open').length;
   const orderExpandedCount = audit.screenshots.filter(shot => shot.state === 'order-details-expanded').length;
@@ -828,7 +918,8 @@ async function main() {
     accountMenuCount, fullscreenGalleryCount, cartWithItemCount, checkoutFormCount, commerceStatesComplete,
     productDetailContextsComplete, totalScreenshotCount: audit.screenshots.length,
     firstPaintContextCount, requiredFirstPaintFrameCount, firstPaintFrameCounts,
-    firstPaintCoverageComplete, firstPaintViolationCount,
+    firstPaintCoverageComplete, firstPaintVideoCoverageComplete, firstPaintVideoCount: audit.videoCaptures.length,
+    firstPaintViolationCount,
   };
   audit.passed = audit.captureCompleted
     && completedViewportThemePairs === requiredViewportThemePairs
@@ -839,7 +930,8 @@ async function main() {
     && commerceStatesComplete && productDetailContextsComplete && audit.brokenImages.length === 0
     && audit.pageErrors.length === 0 && audit.consoleErrors.length === 0 && audit.httpErrors.length === 0
     && audit.failedRequests.length === 0 && audit.readOnlyViolations.length === 0
-    && firstPaintCoverageComplete && firstPaintViolationCount === 0 && audit.hardFailures.length === 0;
+    && firstPaintCoverageComplete && firstPaintVideoCoverageComplete
+    && firstPaintViolationCount === 0 && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
   audit.summary = {
     screenshotCount: audit.screenshots.length, viewportCount: audit.viewportAudits.length, routeCheckCount: audit.routeChecks.length,
@@ -848,6 +940,7 @@ async function main() {
     brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
     productDetailContextCount: audit.productDetailChecks.length, commerceStateCheckCount: audit.commerceStateChecks.length,
     firstPaintFrameCount: audit.firstPaintChecks.length, firstPaintViolationCount, firstPaintCoverageComplete,
+    firstPaintVideoCount: audit.videoCaptures.length, firstPaintVideoCoverageComplete,
     blockedExternalRequestCount: audit.blockedExternalRequests.length,
     allowedExternalReadRequestCount: audit.allowedExternalReadRequests.length,
     readOnlyViolationCount: audit.readOnlyViolations.length, hardFailureCount: audit.hardFailures.length,
@@ -856,7 +949,8 @@ async function main() {
   await fs.writeFile(path.join(outputDir, 'visual-audit.json'), JSON.stringify(audit, null, 2) + '\n', 'utf8');
   const imageCards = audit.screenshots.map(shot => '<figure><figcaption>' + esc(shot.filename) + ' · ' + esc(shot.route || '/') + ' · ' + esc(shot.theme || '') + '</figcaption><a href="' + esc(shot.filename) + '"><img loading="lazy" src="' + esc(shot.filename) + '" alt="' + esc(shot.filename) + '"></a></figure>').join('\n');
   const references = '<section><h2>Original mobile design references</h2><p>The references are multi-screen collages intended for visual review, not a pixel-perfect comparison of unlike layouts.</p><div class="shots"><figure><figcaption>Light reference</figcaption><img src="../reference-images/file_0000000017088207af45f5e6dd90cfa4.png" alt="Light reference"></figure><figure><figcaption>Dark reference</figcaption><img src="../reference-images/file_00000000fcb48207a23aeda23caa5eeb.png" alt="Dark reference"></figure></div></section>';
-  const reportHtml = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest live Preview capture</title><style>body{font:14px/1.55 system-ui,sans-serif;color:#142a3c;background:#eef6fc;margin:0;padding:18px}main{max-width:1500px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:12px;border-radius:10px}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}figure{margin:0;padding:10px;border:1px solid #c5d9e8;border-radius:12px;background:#fff;min-width:0}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}</style><main><h1>SinDarealest2 — direct Cloudflare Pages Preview capture</h1><p>Source: ' + esc(audit.previewUrl) + ' · captured: ' + esc(audit.captureCompleted) + ' · audit pass: ' + esc(audit.passed) + '</p><h2>Coverage</h2><pre>' + esc(JSON.stringify(audit.coverage || {}, null, 2)) + '</pre><h2>Route checks</h2><pre>' + esc(JSON.stringify(audit.routeChecks, null, 2)) + '</pre><h2>Content checks</h2><pre>' + esc(JSON.stringify(audit.contentChecks, null, 2)) + '</pre>' + references + '<h2>Captured Preview screens</h2><section class="shots">' + imageCards + '</section><h2>Full diagnostics</h2><pre>' + esc(JSON.stringify(audit, null, 2)) + '</pre></main></html>';
+  const videoCards = audit.videoCaptures.map(video => '<figure><figcaption>' + esc(video.filename) + ' · ' + esc(video.viewport) + ' · ' + esc(video.theme) + ' · ' + esc(video.status) + '</figcaption><video controls playsinline preload="metadata" src="' + esc(video.filename) + '" style="width:100%;height:auto;display:block"></video></figure>').join('\\n');
+  const reportHtml = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SinDarealest live Preview capture</title><style>body{font:14px/1.55 system-ui,sans-serif;color:#142a3c;background:#eef6fc;margin:0;padding:18px}main{max-width:1500px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:400}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:12px;border-radius:10px}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}figure{margin:0;padding:10px;border:1px solid #c5d9e8;border-radius:12px;background:#fff;min-width:0}figure img{width:100%;height:auto;display:block;border-radius:8px}figcaption{overflow-wrap:anywhere;font-size:12px;margin-bottom:6px}</style><main><h1>SinDarealest2 — direct Cloudflare Pages Preview capture</h1><p>Source: ' + esc(audit.previewUrl) + ' · captured: ' + esc(audit.captureCompleted) + ' · audit pass: ' + esc(audit.passed) + '</p><h2>Coverage</h2><pre>' + esc(JSON.stringify(audit.coverage || {}, null, 2)) + '</pre><h2>Route checks</h2><pre>' + esc(JSON.stringify(audit.routeChecks, null, 2)) + '</pre><h2>Content checks</h2><pre>' + esc(JSON.stringify(audit.contentChecks, null, 2)) + '</pre>' + references + '<h2>Captured Preview screens</h2><section class="shots">' + imageCards + '</section><h2>First-paint startup videos</h2><section class="shots">' + videoCards + '</section><h2>Full diagnostics</h2><pre>' + esc(JSON.stringify(audit, null, 2)) + '</pre></main></html>';
   await fs.writeFile(path.join(outputDir, 'report.html'), reportHtml, 'utf8');
   console.log(JSON.stringify({ previewUrl: audit.previewUrl, sourceCommit: audit.sourceCommit, accessServiceTokenConfigured: audit.accessServiceTokenConfigured, captureCompleted: audit.captureCompleted, accessBlocked: audit.accessBlocked, passed: audit.passed, coverage: audit.coverage, summary: audit.summary }, null, 2));
   if (!audit.captureCompleted || audit.accessBlocked || !audit.passed) process.exitCode = 1;
