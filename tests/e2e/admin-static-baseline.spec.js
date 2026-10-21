@@ -618,14 +618,23 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
     await expect(page.locator('#pTitle')).toBeFocused();
-    await expect(page.locator('#productEditorTabs .editor-tab').evaluateAll(tabs =>
-      tabs.every(tab => getComputedStyle(tab).whiteSpace === 'nowrap' && tab.scrollWidth <= tab.clientWidth + 1)
-    )).resolves.toBe(true);
+    const assertProductTabsFit = async viewportWidth => {
+      const layout = await page.locator('#productEditorTabs .editor-tab').evaluateAll(tabs =>
+        tabs.map(tab => ({
+          label: tab.textContent?.trim(),
+          whiteSpace: getComputedStyle(tab).whiteSpace,
+          fontSize: getComputedStyle(tab).fontSize,
+          clientWidth: tab.clientWidth,
+          scrollWidth: tab.scrollWidth
+        }))
+      );
+      expect(layout.every(tab => tab.whiteSpace === 'nowrap' && tab.scrollWidth <= tab.clientWidth + 1),
+        'Product tab labels must remain on one line at ' + viewportWidth + 'px: ' + JSON.stringify(layout)).toBe(true);
+    };
+    await assertProductTabsFit(variant.viewport.width);
     if (variant.viewport.width === mobile.width && variant.theme === 'light') {
       await page.setViewportSize({ width: 320, height: 640 });
-      await expect(page.locator('#productEditorTabs .editor-tab').evaluateAll(tabs =>
-        tabs.every(tab => getComputedStyle(tab).whiteSpace === 'nowrap' && tab.scrollWidth <= tab.clientWidth + 1)
-      )).resolves.toBe(true);
+      await assertProductTabsFit(320);
       await expect(page.locator('#backdrop .editor').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
       await page.setViewportSize(variant.viewport);
     }
