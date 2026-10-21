@@ -339,6 +339,15 @@ assert.match(live, /firstPaintCoverageComplete && firstPaintVideoCoverageComplet
   'Live audit acceptance must require all timed DOM samples and short startup videos, with no chrome flash during welcome.');
 assert.match(live, /captureType: 'first-paint-frame'/,
   'The audit artifact must include real full-viewport screenshots taken during the initial navigation window.');
+const requiredViewportThemeHeroAudit = live.slice(
+  live.indexOf("for (const viewport of viewports) {", live.indexOf("async function main()")),
+  live.indexOf("await auditImageElements(page, label);", live.indexOf("async function main()"))
+);
+assert.match(requiredViewportThemeHeroAudit, /await auditHeroImage\\(page, label\\);/,
+  'The dedicated owner-supplied Hero asset must be verified as loaded and visible in every required viewport/theme.');
+assert.doesNotMatch(requiredViewportThemeHeroAudit, /if \\(viewport\\.name === 'mobile-390' && theme === 'light'\\)/,
+  'Hero asset acceptance must not be limited to a single mobile Light context.');
+
 assert.match(live, /recordVideo: \{ dir: firstPaintVideoDir[\s\S]*async function captureWelcomeStartupVideo[\s\S]*await video\.path\(\)/,
   'A separate short browser video must record the welcome first-paint window without being blocked by still-screenshot calls.');
 assert.match(live, /firstPaintVideoCoverageComplete/,
