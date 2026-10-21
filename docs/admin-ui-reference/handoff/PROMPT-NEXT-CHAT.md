@@ -430,3 +430,37 @@ Re-fetch current PR/HEAD and handoff blobs before further writes. This supplemen
 - PR #111 HEAD before current handoff-document commits: `9e0434f769dedf2b20e1365aa96147336afc237c`, OPEN/unmerged, 1,096 files (+37,660/−392) with mixed storefront/backend/migration/script/test/evidence scope. PR #108 remains OPEN/unmerged. No merge.
 - Progress remains **48%**; UI parity remains NOT ACCEPTED; authenticated backend flows NOT TESTED; image-save and PRE/PRO migration tasks remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
 - Next: verify handoff JSON/status updated and valid, re-fetch branch HEAD after doc commits, continue safe source-only audit. No Production deploy, remote D1/R2/SQL, migration/setup, secret/access change, TinyFish, or edits to main/static branch.
+
+
+---
+
+## OVERRIDE CHECKPOINT — 2026-10-21 (newest verified state; read first)
+
+This checkpoint supersedes older branch-head and PR-size figures above wherever they conflict. Documentation-only commits do not count as source/test PASS.
+
+### Verified repository / Preview
+- Repository: chichute5500/Sindarealest-admin.
+- Only allowed write branch: feature/admin-isolated-handoff-2026-10-20.
+- GitHub-confirmed PR #111 HEAD at the latest check: 719a537f52eccf66c9642661c2758f8861beabcf. PR #111 is **OPEN / UNMERGED**, base main, 1,096 changed files (+37,835/−392); broad mixed scope, not merge-ready. PR #108 is also OPEN/unmerged. Do not merge either.
+- Existing automated source/unit/local Playwright PASS evidence is Actions run [39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224) on exact SHA ebb20fa7f2359b19ae91a9c62b3006a16b8db148. This is older than current HEAD; do not claim current HEAD passed those tests without a new run.
+- That run's remote Preview diagnostic is **FAIL**: PREVIEW_CSS_SIGNATURE_MISMATCH; 226 inline CSS rules but hasLoginHideRule=false, and the brand header remains visible. Do not weaken the assertion, access/change secrets, or bypass Cloudflare Access.
+- Owner already provided a prior Preview check; **do not ask them to repeat it**: deployment URL https://564cd391.sindarealest2.pages.dev/admin/, alias https://feature-admin-isolated-hando.sindarealest2.pages.dev, deployment ID 564cd391-87d3-4f98-8a68-c81e935a452b, deployed commit 3ed2d86b8b97f04718c478979136f986b3d1b07b, successful build reported 2026-10-21 08:25 UTC. The deployed commit is behind the current branch HEAD. Access policy was reported as allowing the owner's email, but actual authenticated login/business-flow success remains NOT VERIFIED.
+- Current public/_redirects at HEAD 719a537... has /admin /admin/ 301, /admin/ /admin/index.html 200, and /* /index.html 200. Cloudflare reportedly skipped rules 2 and 3 due to possible redirect/rewrite loops. This remains **UNRESOLVED / NOT FIXED**. Inspect Pages routing and output layout before any edit; do not deploy Production.
+- Owner's visual feedback: Admin still resembles the old UI by about **80–85%**, with mostly color/small-detail changes. The goal is a substantial redesign to the authoritative reference docs/admin-ui-reference/admin-mobile-reference.png and all 12 reference screen families, not another appended CSS-only skin. DOM/layout/components may be restructured where needed, while preserving real data, logo/brand identity, authentication, permissions, API contracts and business behavior.
+- Overall progress stays **48%** as a project estimate. This handoff/document update does not increase progress and is not a source-code test result.
+- Owner does not need to perform another action right now. Continue autonomous safe work and don't repeat questions already answered.
+
+### Required next actions
+1. Re-fetch live branch HEAD, PR #111/#108 status, workflow runs, and current handoff files before the next change. Clearly separate latest HEAD from latest tested SHA.
+2. Investigate the /admin/ redirect/rewrite loop and stale Preview deployment identity using non-secret, read-only evidence. Do not bypass Access.
+3. Continue screen-by-screen comparison with the reference and make substantive ADMIN layout/component improvements on the ADMIN branch only. Preserve auth/API/data/business logic; add regression coverage for any changed selectors or DOM.
+4. Run checks against the exact new source SHA, capture real Playwright screenshots/artifacts and update status/JSON with exact run/SHA. Fixture screenshots are not authenticated backend QA.
+5. Continue semantic/security review of PR #111's mixed storefront/backend/migration/script/test scope; mark uncertain items BLOCKED/NOT TESTED rather than assuming safe.
+6. After meaningful verified changes, update LATEST-STATUS.md, latest-test-results.json, and this prompt; read back the saved GitHub blobs and confirm commit SHAs.
+
+### Non-negotiable guardrails
+- Only write/commit on feature/admin-isolated-handoff-2026-10-20.
+- Do not edit main or fix/liquid-glass-audit-2026-10-19; no merge/cherry-pick/force-push; keep PR #111 and #108 open.
+- No Production deployment; no secrets or Cloudflare Access changes; no migrations/setup scripts; no remote D1/R2 or real customer/order data writes/deletes.
+- Product image-save and PRE/PRO migration investigations remain DEFERRED_BY_OWNER; do not reopen.
+- Never use TinyFish.
