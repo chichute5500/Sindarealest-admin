@@ -235,21 +235,20 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         order_number: 'UI-ONLY-ORDER',
         created_at: 'DỮ LIỆU TEST',
         full_name: 'Khách thử nghiệm giao diện',
-        phone: '—',
-        email: '',
-        address: '',
-        items: [{
-          id: 'UI-ONLY-ITEM',
-          title: 'Sản phẩm thử nghiệm giao diện',
-          quantity: 1,
-          sku: 'UI-FIXTURE-001',
-          skuVerified: false,
-          unitPrice: null
-        }],
-        total: null,
-        status: 'pending_confirmation',
-        payment_status: 'unpaid',
-        price_confirmation_required: true
+        phone: '—', email: '', address: '',
+        items: [{ id: 'UI-ONLY-ITEM', title: 'Sản phẩm thử nghiệm giao diện', quantity: 1, sku: 'UI-FIXTURE-001', skuVerified: false, unitPrice: null }],
+        total: null, status: 'pending_confirmation', payment_status: 'unpaid', price_confirmation_required: true
+      }, {
+        id: 'UI-ONLY-ORDER-2', order_number: 'UI-ONLY-ORDER-2', created_at: 'DỮ LIỆU TEST',
+        full_name: 'Khách UI Fixture 2', phone: '0000000002', email: '', address: '',
+        items: [{ id: 'UI-ONLY-ITEM-2', title: 'Sản phẩm UI fixture 2', quantity: 1, sku: 'UI-FIXTURE-002', skuVerified: false, unitPrice: 3200000, fulfillmentType: 'in_stock' }],
+        total: 3200000, status: 'processing', payment_status: 'unpaid', price_confirmation_required: false
+      }, {
+        id: 'UI-ONLY-ORDER-3', order_number: 'UI-ONLY-ORDER-3', created_at: 'DỮ LIỆU TEST',
+        full_name: 'Khách UI Fixture 3', phone: '0000000003', email: '', address: '',
+        items: [{ id: 'UI-ONLY-ITEM-3', title: 'Sản phẩm UI fixture 3', quantity: 1, sku: 'UI-FIXTURE-003', skuVerified: false, unitPrice: 7800000, fulfillmentType: 'made_to_order' }],
+        total: 7800000, received_amount: 7800000, status: 'completed', payment_status: 'paid',
+        payment_terms_confirmed_at: '2026-10-21T00:00:00.000Z', price_confirmation_required: false
       }]
     },
     '/api/admin/customers': {
@@ -959,6 +958,32 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const summary = management.locator('summary.order-management-summary');
       const unitPrice = row.locator('[data-order-item-price]');
       await expect(row).toBeVisible();
+      const orderSearch = page.locator('#orderSearchBox');
+      const orderRows = page.locator('[data-order-row]');
+      await expect(orderSearch, 'Orders list provides a labeled local search field').toBeVisible();
+      await expect(page.locator('#orderStatusFilter')).toBeVisible();
+      await expect(page.locator('#orderPaymentFilter')).toBeVisible();
+      await expect(orderRows).toHaveCount(3);
+      await expect(page.locator('#orderResultSummary')).toHaveText('Hiển thị 3 / 3 đơn hàng');
+      await orderSearch.fill('Khách UI Fixture 2');
+      await expect(orderRows).toHaveCount(1);
+      await expect(page.locator('[data-order-row="UI-ONLY-ORDER-2"]')).toBeVisible();
+      await orderSearch.fill('khong-co-don-hang-nay');
+      await expect(orderRows).toHaveCount(0);
+      await expect(page.locator('#orderEmptyState')).toContainText('Không tìm thấy đơn hàng phù hợp');
+      await page.locator('#clearOrderFilters').click();
+      await expect(orderRows).toHaveCount(3);
+      await page.locator('#orderStatusFilter').selectOption('completed');
+      await expect(orderRows).toHaveCount(1);
+      await expect(page.locator('[data-order-row="UI-ONLY-ORDER-3"]')).toBeVisible();
+      await page.locator('#orderStatusFilter').selectOption('all');
+      await expect(orderRows).toHaveCount(3);
+      await page.locator('#orderPaymentFilter').selectOption('paid');
+      await expect(orderRows).toHaveCount(1);
+      await expect(page.locator('[data-order-row="UI-ONLY-ORDER-3"]')).toBeVisible();
+      await page.locator('#clearOrderFilters').click();
+      await expect(orderRows).toHaveCount(3);
+      await expect(page.locator('#orderResultSummary')).toHaveText('Hiển thị 3 / 3 đơn hàng');
       await expect(row).toContainText('Chờ xác nhận giá');
       await expect(row).toContainText('Chưa hoàn tất thanh toán');
       await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
@@ -967,11 +992,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (variant.viewport.width <= 680) {
         await expect(summary, 'Mobile order operations use a visible disclosure summary').toBeVisible();
         await expect(management, 'Mobile order tools start collapsed to preserve the order-list summary').not.toHaveAttribute('open', '');
+        await expect(management.locator('.order-management-content'), 'Closed mobile disclosure hides the management control panel').toBeHidden();
         await expect(unitPrice, 'Per-item price entry is hidden on mobile until the order tools are expanded').toBeHidden();
         const compactOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
         expect(compactOrderCardHeight, 'Collapsed mobile order card should keep the first-screen summary compact').toBeLessThan(560);
         await summary.click();
         await expect(management).toHaveAttribute('open', '');
+        await expect(management.locator('.order-management-content'), 'Opening mobile disclosure reveals management controls').toBeVisible();
         await expect(unitPrice).toBeVisible();
         await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
         await expect(row.locator('[data-action="record-payment"]')).toBeDisabled();
@@ -980,11 +1007,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       } else {
         await expect(summary, 'Desktop order management keeps a compact visible disclosure control').toBeVisible();
         await expect(management, 'Desktop order management starts collapsed to avoid an oversized table row').not.toHaveAttribute('open', '');
+        await expect(management.locator('.order-management-content'), 'Closed desktop disclosure hides the management control panel').toBeHidden();
         await expect(unitPrice, 'The existing single price input stays visible in the desktop product cell').toBeVisible();
         const compactDesktopOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
         expect(compactDesktopOrderCardHeight, 'Collapsed desktop order row should not inherit the full payment form height').toBeLessThan(250);
         await summary.click();
         await expect(management).toHaveAttribute('open', '');
+        await expect(management.locator('.order-management-content'), 'Opening desktop disclosure reveals management controls').toBeVisible();
         await expect(row.locator('[data-action="save-order"]')).toBeVisible();
         await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
         await summary.click();

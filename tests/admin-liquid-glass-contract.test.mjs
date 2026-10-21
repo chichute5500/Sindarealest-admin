@@ -54,13 +54,19 @@ for (const route of [
 assert.equal(adminHtml.split('</style>').length - 1, 1, 'ADMIN must retain one complete style block');
 assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese document language');
 
-// Orders stay summary-first on mobile while retaining every price/terms/payment control in an accessible disclosure.
+// Orders stay summary-first and use local search/status/payment filters on already-loaded orders.
+has('const filteredOrders=orders.filter', 'orders filters operate only on the currently loaded orders array');
+has('id="orderSearchBox"', 'orders list exposes a labeled search field');
+has('id="orderStatusFilter"', 'orders list exposes an order-status filter');
+has('id="orderPaymentFilter"', 'orders list exposes a payment-status filter');
+has('id="orderResultSummary"', 'orders result count is announced accessibly');
 has('<details class="order-management-details"><summary class="order-management-summary">Quản lý giá, trạng thái & thanh toán</summary>', 'per-order management disclosure starts compact and opens on demand');
 has('<label class="tiny muted order-price-entry">Giá/đơn vị (VNĐ)<input class="control"', 'one per-item price control is kept in the product cell to avoid duplicate API values');
 has('#main .order-table .order-price-entry{display:none}', 'mobile price entry stays hidden while order tools are collapsed');
 has('#main .order-table tbody tr:has(.order-management-details[open]) .order-price-entry{display:grid;gap:4px;width:100%;margin-top:8px}', 'expanding mobile order tools reveals the existing single price entry');
 has("const orderToolsMedia=window.matchMedia('(max-width:680px)');const syncOrderToolsDisclosure=()=>main.querySelectorAll('.order-management-details').forEach(details=>{details.open=false})", 'order management starts collapsed on every viewport');
 has('#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(92,145,185,.08);color:var(--ink);font-size:11px;font-weight:750;cursor:pointer}', 'touch-friendly order-management disclosure summary');
+has('#main .order-table .order-management-details:not([open])>.order-management-content{display:none!important}', 'closed order disclosures explicitly hide management content');
 has('@media(min-width:681px){\n#main .order-table .order-management-details{min-width:210px}\n#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(92,145,185,.08);color:var(--ink);font-size:10px;font-weight:750;cursor:pointer}\n#main .order-table .order-management-summary::-webkit-details-marker{display:none}\n#main .order-table .order-management-summary::marker{content:"";display:none}\n#main .order-table .order-management-summary::after{content:"+";flex:0 0 auto;font-size:17px;line-height:1}\n#main .order-table .order-management-details[open]>.order-management-summary::after{content:"−"}\n#main .order-table .order-management-content{padding-top:10px}\n}', 'desktop order controls use the same compact liquid-glass disclosure style');
 
 // Product and order dialogs share keyboard focus management, Escape handling, and focus restoration.
