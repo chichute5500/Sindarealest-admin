@@ -1,6 +1,6 @@
 name: Liquid Glass isolated visual preview
 # Guarded capture: explicit start/end capture commits on the fix branch may archive only verified live Cloudflare Preview screenshots.
-# Note: paths-ignore excludes docs/handoff/**, so a handoff-only commit cannot trigger capture; keep the guarded capture marker on a workflow/source commit.
+# Note: paths-ignore excludes docs/handoff/**, so a handoff-only commit cannot trigger capture; keep the guarded capture marker on a workflow/source commit. End-of-work archive for satin v7.
 
 on:
   push:
