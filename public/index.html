@@ -2342,6 +2342,66 @@ html.dark .sd-fullscreen-share{
 #home.hero:has(#heroProductImage[hidden]){display:block!important;min-height:0!important;height:auto!important;border:0!important;outline:0!important;border-radius:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important}
 #home.hero:has(#heroProductImage[hidden]) .hero-copy{display:flex!important;min-height:0!important;height:auto!important;width:100%!important;max-width:760px!important;padding:0!important;margin:0!important}
 #home .hero-visual:has(#heroProductImage[hidden]){display:none!important;visibility:hidden!important;min-height:0!important;height:0!important;width:0!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important}
+
+
+
+/* Desktop fallback hero: keep the headline, description and CTA in a deliberate editorial stack when the exact SKU is absent. */
+@media(min-width:761px){
+  #home.hero:has(#heroProductImage[hidden]){
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    min-height:clamp(260px,24vw,340px)!important;
+    padding:clamp(32px,4vw,58px) clamp(32px,5.2vw,78px)!important;
+    margin:18px auto 12px!important;
+  }
+  #home.hero:has(#heroProductImage[hidden]) .hero-copy{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    gap:0!important;
+    width:100%!important;
+    max-width:980px!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  #home.hero:has(#heroProductImage[hidden]) .hero-copy h1{
+    width:100%!important;
+    max-width:none!important;
+    font-size:clamp(42px,5.2vw,72px)!important;
+    line-height:1.04!important;
+    letter-spacing:-.045em!important;
+    margin:0!important;
+  }
+  #home.hero:has(#heroProductImage[hidden]) .hero-copy h1 span:first-child,
+  #home.hero:has(#heroProductImage[hidden]) .hero-copy h1 span:last-child{
+    max-width:none!important;
+  }
+  #home.hero:has(#heroProductImage[hidden]) .hero-description{
+    max-width:560px!important;
+    margin-top:15px!important;
+    font-size:clamp(13px,1.05vw,15px)!important;
+    line-height:1.65!important;
+  }
+  #home.hero:has(#heroProductImage[hidden]) .hero-actions{margin-top:19px!important}
+}
+@media(min-width:761px) and (max-width:1000px){
+  #home.hero:has(#heroProductImage[hidden]){min-height:245px!important;padding:30px 34px!important}
+  #home.hero:has(#heroProductImage[hidden]) .hero-copy h1{font-size:clamp(38px,5vw,50px)!important}
+}
+
+/* Keep mobile account/cart/checkout sheets above, not on top of, the fixed bottom navigation. */
+@media(max-width:760px){
+  #mobileBottomNav{z-index:1300!important}
+  .account-drawer,.cart-drawer,.checkout-drawer{
+    bottom:calc(76px + env(safe-area-inset-bottom))!important;
+    max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  }
+  .account-drawer,.cart-drawer{overflow-y:auto!important;overscroll-behavior:contain}
+  .cart-drawer{min-height:0}
+  .checkout-drawer{overflow:hidden!important}
+}
 </style>
 
 </body>

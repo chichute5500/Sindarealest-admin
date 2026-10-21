@@ -41,6 +41,15 @@ assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\) \.hero-copy\{
 assert.match(finalCss, /\.welcome-content\{[\s\S]*?background:transparent!important;[\s\S]*?box-shadow:none!important/);
 assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
+
+/* Desktop hero fallback and mobile drawer/navigation separation are deliberate responsive contracts. */
+assert.match(finalCss, /@media\\(min-width:761px\\)\\{[\\s\\S]*?#home\\.hero:has\\(#heroProductImage\\[hidden\\]\\) \\.hero-copy\\{display:flex!important;[\\s\\S]*?flex-direction:column!important;[\\s\\S]*?max-width:980px!important;/,
+  'Desktop hero copy must stack vertically and use a generous editorial width when no verified image is available.');
+assert.match(finalCss, /#home\\.hero:has\\(#heroProductImage\\[hidden\\]\\) \\.hero-copy h1\\{[\\s\\S]*?font-size:clamp\\(42px,5\\.2vw,72px\\)!important;/,
+  'Desktop fallback headline must keep the reference three-line hierarchy rather than break each phrase into narrow columns.');
+assert.match(finalCss, /@media\\(max-width:760px\\)\\{[\\s\\S]*?#mobileBottomNav\\{z-index:1300!important\\}[\\s\\S]*?bottom:calc\\(76px \\+ env\\(safe-area-inset-bottom\\)\\)!important;/,
+  'Mobile account/cart/checkout panels must end above the persistent bottom navigation.');
+
 const heroStart = html.indexOf('<section class="hero wrap" id="home">');
 const heroEnd = html.indexOf('</section>', heroStart);
 const hero = html.slice(heroStart, heroEnd);
