@@ -331,3 +331,15 @@ This was a read-only source review of the existing payment contract and route co
 - Still not accepted: all-12-screen visual parity. The approved product-image screen has a horizontal thumbnail rail and richer image-status controls that the current grid/card layout does not yet match. Continue this comparison rather than marking visual completion from passing CSS tests.
 - Authenticated backend QA remains NOT TESTED. Real product image upload/save and PRE/PRO migrations remain DEFERRED_BY_OWNER / NOT VERIFIED. QR/payment source audit is source-only; the public static consumer gap remains the static branch's responsibility. Deployment scripts' migration-0009 coverage risk is documented; do not execute setup/deploy/migration scripts or perform remote D1/R2 operations.
 - PR #111 remains OPEN/UNMERGED and mixed-scope (1,112 changed paths); PR #108 remains OPEN/UNMERGED (269). Progress remains 48%. Only ADMIN branch; no merge, Production deploy, main/static branch edits, secrets/Access changes/bypass, remote D1/R2 operations, or TinyFish.
+
+
+## ADMIN UI guard verification — 2026-10-21 16:18 UTC
+
+This section records browser fixture evidence only; it does not alter the normative payment/fulfillment contract or establish live backend acceptance.
+
+- Exact source/test SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff`: [Validate Source #39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) PASS; [Admin Preview/Playwright #39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) SUCCESS.
+- QR Settings guard: changed bank fields cannot activate until the draft is saved, even when the manual verification checkbox is checked. The client UI shows a warning before confirmation/API writes.
+- Order readiness: an order whose price requires confirmation and whose terms are unconfirmed has QR request and receipt-recording buttons disabled in the UI fixture.
+- Backup/restore view: JSON export control, JSON restore file input and confirmation disclosure are present; tests do not invoke either action.
+- Tests use explicit synthetic IDs/data and reject all non-GET API requests. Artifact `admin-preview-evidence-192` ID `12360132558` has 63 PNGs and 39 fixture metrics; no attempted writes or unexpected API paths. Authenticated backend QA and live D1/R2 semantics remain NOT VERIFIED.
+- Integration acceptance stays OPEN: static consumer still requires separate verification of `freeShippingEligible` vs `freeShipping`, and no changes are made to the protected static website branch from this ADMIN branch.
