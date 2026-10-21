@@ -44,7 +44,7 @@ export async function onRequestPost(context) {
     await setting(context.env.DB, "payment_qr_pending_key", key);
     await context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,'admin','payment_qr_uploaded','payment_qr',?,?)")
       .bind(crypto.randomUUID(), key, JSON.stringify({ mimeType: file.type, size: bytes.byteLength, activation: "pending_review" })).run();
-    return json({ ok: true, pendingImageUrl: "/payment-qr/" + key, pendingKey: key, active: false, requiresManualVerification: true,
+    return json({ ok: true, pendingImageUrl: "/api/admin/payment-qr-preview?key=" + encodeURIComponent(key), pendingKey: key, active: false, requiresManualVerification: true,
       message: "Ảnh QR đã tải lên nhưng CHƯA kích hoạt. Hãy kiểm tra đúng tài khoản và không có số tiền cố định trước khi xác nhận." }, 201);
   } catch {
     return fail("Không lưu được ảnh QR. QR đang hoạt động hiện tại không bị thay đổi.", 503);

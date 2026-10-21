@@ -32,7 +32,7 @@ export async function onRequestGet(context) {
     const pending = validPublicQrImageKey(v.payment_qr_pending_key);
     return json({
       active, activeImageUrl: active ? "/payment-qr/" + v.payment_qr_active_key : "",
-      pending, pendingImageUrl: pending ? "/payment-qr/" + v.payment_qr_pending_key : "",
+      pending, pendingImageUrl: pending ? "/api/admin/payment-qr-preview?key=" + encodeURIComponent(v.payment_qr_pending_key) : "",
       bankName: v.payment_qr_draft_bank_name || v.payment_qr_bank_name || "",
       accountNumber: v.payment_qr_draft_account_number || v.payment_qr_account_number || "",
       accountName: v.payment_qr_draft_account_name || v.payment_qr_account_name || "",
