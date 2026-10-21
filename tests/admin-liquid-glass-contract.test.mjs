@@ -169,17 +169,20 @@ has('.dashboard-activity-table td::before{content:attr(data-label)', 'mobile aud
 // Product editor uses accessible tabbed groups while keeping required identity fields visible.
 for (const [id, label] of [
   ['productEditorTabs', 'product editor tablist'],
-  ['productTabDetails', 'details tab'],
-  ['productTabPricing', 'pricing/fulfillment tab'],
-  ['productTabGallery', 'gallery tab'],
-  ['productPanelDetails', 'details tab panel'],
-  ['productPanelPricing', 'pricing tab panel'],
-  ['productPanelGallery', 'gallery tab panel']
+  ['productTabDetails', 'basic information tab'],
+  ['productTabGallery', 'image tab'],
+  ['productTabPricing', 'other/fulfillment tab'],
+  ['productPanelDetails', 'basic information tab panel'],
+  ['productPanelGallery', 'image tab panel'],
+  ['productPanelPricing', 'other tab panel']
 ]) has('id="' + id + '"', label);
 has('role="tablist" aria-label="Nhóm thông tin sản phẩm"', 'named product tablist');
-has('role="tabpanel" aria-labelledby="productTabDetails"', 'details panel relationship');
-has('role="tabpanel" aria-labelledby="productTabPricing" hidden', 'initially hidden pricing panel');
-has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image gallery panel');
+has('role="tabpanel" aria-labelledby="productTabDetails"', 'basic panel relationship');
+has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image panel');
+has('role="tabpanel" aria-labelledby="productTabPricing" hidden', 'initially hidden other panel');
+assert.ok(html.indexOf('id="pPrice"') < html.indexOf('id="productPanelGallery"'), 'price belongs to the basic info panel before the images tab');
+assert.ok(html.indexOf('id="pStock"') < html.indexOf('id="productPanelGallery"'), 'stock belongs to the basic info panel before the images tab');
+assert.ok(html.indexOf('id="productPanelGallery"') < html.indexOf('id="productPanelPricing"'), 'images tab appears before the other tab');
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
 has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
