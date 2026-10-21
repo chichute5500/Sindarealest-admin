@@ -635,3 +635,11 @@ Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run
 - Handoff files were updated in commits `9af0da32cf953e71add8a8786c383199ac95d716` (LATEST-STATUS) and `8665b530ceb844b0e3c069acb1f7f186a2545849` (JSON). Re-read from branch to verify before claiming saved.
 - Progress remains **48%**. Next actions: validate current HEAD via available GitHub Actions path; scrutinize whether the 2px tolerance is evidence-based; inspect the source/reference mismatch and compare the 12 reference screen families; continue semantic/security audit of PR #111 mixed scope. If Actions cannot be dispatched from available integration, do not claim a run; make further safe read-only source/test improvements and keep evidence accurate.
 - Safety constraints unchanged: only `feature/admin-isolated-handoff-2026-10-20`; no `main`/static branch edits, no merge/cherry-pick/force-push, no Production deployment, no secrets/Access changes or bypass, no remote D1/R2 or migrations/setup, no TinyFish.
+
+
+### Follow-up after inspecting full run #39620591307 job logs — 2026-10-21
+
+- The Playwright failure is now understood more precisely: the test measured `Math.abs(dialogBottom - footerBottom) = 1.140625 CSS px` against a <=1px threshold. Browser setup also logged DNS lookup failures for `playwright.download.prss.microsoft.com`, but that is not established as the cause of the geometry assertion.
+- Commit `78a16b6d9fca91d7b080834f293e1690dc7c10cd` increases the test tolerance to 2px. This is a plausible correction for fractional CSS-pixel rounding, but **no run on that commit was found**, so it is not validated. Do not claim the latest code is green.
+- Handoff evidence files now record this measured failure and the current limitation. Latest full validation PASS remains source SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; latest source/test adjustment remains NOT TESTED.
+- Next: find a permitted way to run validation against the current branch HEAD (not rerunning an old SHA and calling it current); if unavailable, continue read-only review and leave validation NOT TESTED. Then assess whether 2px tolerance is acceptable at 390x844 and desktop viewports, and resume 12-screen visual comparison and PR scope audit.
