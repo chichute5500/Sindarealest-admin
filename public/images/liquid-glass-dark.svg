@@ -36,16 +36,16 @@
     <path d="M-82 146 C152 67 300 193 496 152 S843 65 1054 136 S1378 190 1538 101" stroke="url(#glint)" stroke-width="1.8" opacity=".74"/>
     <path d="M-80 348 C168 265 321 397 548 350 S883 263 1086 332 S1379 390 1525 299" stroke="#3a7598" stroke-opacity=".16" stroke-width="25" filter="url(#soft)"/>
     <path d="M-80 348 C168 265 321 397 548 350 S883 263 1086 332 S1379 390 1525 299" stroke="url(#fold)" stroke-width="10" opacity=".48"/>
-    <path d="M-73 341 C174 258 326 389 552 343 S884 256 1090 325 S1380 382 1530 291" stroke="url(#glint)" stroke-width="1.5" opacity=".66"/>
+    <path d="M-73 341 C174 258 326 389 552 343 S884 256 1090 325 S1380 382 1530 291" stroke="url(#glint)" stroke-width="1.05" opacity=".66"/>
     <path d="M-94 585 C155 499 341 633 565 587 S883 496 1082 566 S1378 627 1534 536" stroke="#3a7598" stroke-opacity=".16" stroke-width="28" filter="url(#soft)"/>
     <path d="M-94 585 C155 499 341 633 565 587 S883 496 1082 566 S1378 627 1534 536" stroke="url(#fold)" stroke-width="12" opacity=".54"/>
     <path d="M-85 576 C162 491 345 624 569 579 S886 488 1086 558 S1380 619 1540 528" stroke="url(#glint)" stroke-width="1.8" opacity=".72"/>
-    <path d="M-92 828 C160 741 346 866 567 830 S892 736 1101 808 S1380 868 1530 778" stroke="#3b7599" stroke-opacity=".17" stroke-width="24" filter="url(#soft)"/>
-    <path d="M-92 828 C160 741 346 866 567 830 S892 736 1101 808 S1380 868 1530 778" stroke="url(#fold)" stroke-width="11" opacity=".43"/>
-    <path d="M-85 820 C166 734 351 858 571 822 S895 728 1105 800 S1383 860 1536 770" stroke="url(#glint)" stroke-width="1.6" opacity=".65"/>
-    <path d="M160 -80 C245 114 204 234 260 360 S338 568 289 735 S274 924 337 1080" stroke="#4b86aa" stroke-opacity=".14" stroke-width="24" filter="url(#soft)"/>
-    <path d="M160 -80 C245 114 204 234 260 360 S338 568 289 735 S274 924 337 1080" stroke="url(#fold)" stroke-width="9" opacity=".36"/>
-    <path d="M1160 -90 C1096 95 1174 240 1123 380 S1060 612 1135 762 S1195 936 1145 1080" stroke="#4b86aa" stroke-opacity=".14" stroke-width="22" filter="url(#soft)"/>
-    <path d="M1160 -90 C1096 95 1174 240 1123 380 S1060 612 1135 762 S1195 936 1145 1080" stroke="url(#glint)" stroke-width="1.6" opacity=".48"/>
+    <path d="M-92 828 C160 741 346 866 567 830 S892 736 1101 808 S1380 868 1530 778" stroke="#3b7599" stroke-opacity=".17" stroke-width="12" filter="url(#soft)"/>
+    <path d="M-92 828 C160 741 346 866 567 830 S892 736 1101 808 S1380 868 1530 778" stroke="url(#fold)" stroke-width="5" opacity=".31"/>
+    <path d="M-85 820 C166 734 351 858 571 822 S895 728 1105 800 S1383 860 1536 770" stroke="url(#glint)" stroke-width="1.1" opacity=".65"/>
+    <path d="M160 -80 C245 114 204 234 260 360 S338 568 289 735 S274 924 337 1080" stroke="#4b86aa" stroke-opacity=".14" stroke-width="12" filter="url(#soft)"/>
+    <path d="M160 -80 C245 114 204 234 260 360 S338 568 289 735 S274 924 337 1080" stroke="url(#fold)" stroke-width="5" opacity=".26"/>
+    <path d="M1160 -90 C1096 95 1174 240 1123 380 S1060 612 1135 762 S1195 936 1145 1080" stroke="#4b86aa" stroke-opacity=".14" stroke-width="12" filter="url(#soft)"/>
+    <path d="M1160 -90 C1096 95 1174 240 1123 380 S1060 612 1135 762 S1195 936 1145 1080" stroke="url(#glint)" stroke-width="1.1" opacity=".48"/>
   </g>
 </svg>
