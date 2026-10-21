@@ -1,6 +1,12 @@
 import { dbOrFail, fail, json } from "../_lib.js";
 import { hashOrderAccessToken, validPublicQrImageKey } from "../_payments.js";
 
+const PRIVATE_PAYMENT_HEADERS = Object.freeze({
+  "Cache-Control": "private, no-store",
+  "Referrer-Policy": "no-referrer",
+  "X-Robots-Tag": "noindex, nofollow"
+});
+
 export async function onRequestGet({ request, env }) {
   const unavailable = dbOrFail(env); if (unavailable) return unavailable;
   const url = new URL(request.url);
@@ -19,11 +25,11 @@ export async function onRequestGet({ request, env }) {
     };
     if (order.status === "cancelled" || Number(order.price_confirmation_required)===1 ||
         !order.payment_terms_confirmed_at || order.total===null || !Number.isSafeInteger(Number(order.total))) {
-      return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
+      return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,PRIVATE_PAYMENT_HEADERS);
     }
-    const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? ORDER BY created_at DESC LIMIT 1").bind(order.id).first();
+    const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? ORDER BY CASE WHEN status='pending' THEN 0 ELSE 1 END, created_at DESC, id DESC LIMIT 1").bind(order.id).first();
     if (!requestRow || !validPublicQrImageKey(requestRow.qr_image_key)) {
-      return json({ ok:true, ...base, paymentReady:false, message:"Chưa có yêu cầu thanh toán được SinDarealest tạo. Vui lòng liên hệ tư vấn." },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
+      return json({ ok:true, ...base, paymentReady:false, message:"Chưa có yêu cầu thanh toán được SinDarealest tạo. Vui lòng liên hệ tư vấn." },200,PRIVATE_PAYMENT_HEADERS);
     }
     const shippingBenefit = requestRow.shipping_benefit || (requestRow.installment_type === "full" ? "free_shipping" : "standard_shipping");
     const freeShippingEligible = shippingBenefit === "free_shipping";
@@ -36,7 +42,7 @@ export async function onRequestGet({ request, env }) {
         message:freeShipping ? "Đã xác minh thanh toán đủ. Đơn đủ điều kiện miễn phí giao hàng." :
           (order.payment_status === "paid" ? "Admin đã xác minh đơn được thanh toán đủ." : "Yêu cầu thanh toán trước đã kết thúc; hãy chờ SinDarealest tạo đợt tiếp theo."),
         createdAt:requestRow.created_at
-      },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
+      },200,PRIVATE_PAYMENT_HEADERS);
     }
     return json({
       ok:true, ...base, paymentReady:true, installmentType:requestRow.installment_type,
@@ -46,6 +52,6 @@ export async function onRequestGet({ request, env }) {
       accountNumber:requestRow.account_number, accountName:requestRow.account_name,
       instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi đúng nội dung chuyển khoản. Mở/quét QR không xác nhận đã thanh toán. Freeship chỉ được áp dụng sau khi Admin xác minh đã nhận đủ toàn bộ số tiền.",
       createdAt:requestRow.created_at
-    },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
+    },200,PRIVATE_PAYMENT_HEADERS);
   } catch { return fail("Không đọc được hướng dẫn thanh toán.",503); }
 }
