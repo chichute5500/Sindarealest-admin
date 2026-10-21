@@ -93,3 +93,10 @@ This was a read-only source review of the existing payment contract and route co
 - No merge/cherry-pick/force-push; no Production deploy.
 - No secrets/Cloudflare Access changes or bypass; no remote D1/R2 operations; do not execute setup/migration scripts; do not use TinyFish.
 - Do not resume product image-save or PRE/PRO migration work unless the owner explicitly reauthorizes it.
+
+
+## Progress-accounting correction — 2026-10-21
+- Latest exact-source evidence is now Run #162 and validation Run #3905/paired CI on `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; both passed. [Preview evidence](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737) · [source/test validation](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696).
+- Screenshot artifact 162 shows the product cover, supporting thumbnail, helper copy and sticky actions visible together at 390×844. This resolves the specific occlusion concern for this fixture; it does not equal acceptance of all 12 screen groups or real upload/save.
+- Overall progress remains **48%** because the overall denominator has not yet been recalculated from a verified task-weighted checklist. Repeated CI runs and handoff-document commits do not independently increase completion. The next progress change must cite completed acceptance criteria, not activity count.
+- PR #111 and #108 remain open/unmerged. No Production deployment, remote D1/R2 mutation, secrets/Access changes, or migration execution.
