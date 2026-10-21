@@ -58,3 +58,17 @@
 - Source screenshot matrix: 64 real PNGs; login shell: 16; read-only fixture module screens: 48; fixture metrics: 40.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+## Latest verified Orders/Fulfillment checkpoint — 2026-10-22T02:53:48.575+07:00
+
+## Verified continuation checkpoint — 2026-10-22T02:53:48.575+07:00 (Asia/Ho_Chi_Minh)
+
+- **Branch / code tested:** `feature/admin-isolated-handoff-2026-10-20`; exact tested app/test tree `8d4009f785cc89ff0ff5575460aacac8d2119746`. The current branch head observed before this handoff refresh was `1814260ee238d194ca5d749954439b15bb8c055a`, a later documentation/evidence commit from the Preview workflow; the app source tested by CI is still the tree at `8d4009f785cc89ff0ff5575460aacac8d2119746`.
+- **Validate Source:** [run #39664727740](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740) — **SUCCESS** on exact SHA `8d4009f785cc89ff0ff5575460aacac8d2119746`.
+- **Admin Preview + Playwright:** [run #39664727558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558) — **SUCCESS** on the same exact SHA. Repository integrity checks and `npm run check`, `npm test`, Chromium installation, source screenshot matrix, and configured Preview CSS signature passed.
+- **Evidence artifact:** [`admin-preview-evidence-240`]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578 ) (ID `12377312578`, 12,187,488 bytes). It contains 64 PNGs (16 login-shell captures and 48 synthetic/read-only fixture-module captures) plus 40 fixture metrics. Raw PNGs are in the Actions artifact, not committed to Git.
+- **Actual screenshot review:** I opened `orders__390x844__light.png`, `orders__390x844__dark.png`, and `orders__1280x800__light.png` from the exact-SHA artifact. On mobile, the order summary stays compact and there is no visible horizontal overflow; the management panel starts collapsed and opens on demand. On desktop the table row is now compact, the single price-entry control stays in the product column, and the operations panel uses a styled ice-glass disclosure. E2E covers the open/close behavior and keeps QR-request/receipt-recording actions disabled until pricing/terms conditions are satisfied.
+- **Scope and limitations:** Screen #7 Orders/Fulfillment is **PARTIAL / NOT ACCEPTED**, not full reference acceptance. Screen #3 Product list remains PARTIAL, the 12-screen matrix is NOT ACCEPTED, and authenticated backend/business QA is NOT TESTED. Local screenshot data uses synthetic `UI-ONLY` fixtures and blocks non-GET writes; this does not prove live data or authenticated workflows.
+- **Progress remains 50%** (weighted scorecard 49.6 rounded to 50%; not a test pass-rate). Do not increase it based on a single screen or green CI.
+- PR #111 and #108 were rechecked OPEN/UNMERGED; do not merge or deploy. No Access/secrets changes, no remote D1/R2/SQL/migrations, no Production deployment, and no TinyFish.
+- **Next:** use `12-SCREEN-REFERENCE-AUDIT.md` to select the next unaudited screen (Category/product classification is currently NOT TESTED), inspect exact-viewport fixtures/reference, make only evidence-backed ADMIN-branch changes, add regression coverage, and rerun exact-SHA checks + screenshots.
