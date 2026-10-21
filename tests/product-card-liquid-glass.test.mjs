@@ -40,9 +40,9 @@ const finalThemeCss = html.slice(html.lastIndexOf("/* Organic liquid-glass wave 
 assert.ok(finalBackgroundStart > html.indexOf("/* Reference-match finishing pass"),
   "The softened background calibration must be the final authoritative rule, not an unused earlier selector.");
 assert.match(finalBackgroundCss, /linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)/,
-  "Light overlay must stay subtle so the diagonal satin folds come from the dedicated SVG, not opaque CSS ribbons.");
+  "Light overlay must stay subtle so the organic satin folds come from the dedicated SVG, not opaque CSS ribbons.");
 assert.match(finalBackgroundCss, /\.theme-bg--dark::after\{background:linear-gradient\(118deg,rgba\(3,20,36,\.10\),rgba\(7,31,51,\.06\) 52%,rgba\(3,17,30,\.12\)\)\}/,
-  "Dark overlay must remain a subtle tint over the diagonal satin art instead of recreating broad wave bands.");
+  "Dark overlay must remain a subtle tint over the organic satin art instead of recreating broad wave bands.");
 
 
 assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-20')"),
@@ -52,9 +52,9 @@ assert.ok(finalThemeCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blu
 
 
 assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261021-20')"),
-  "The light background must use the dedicated diagonal pearl-blue satin fold artwork.");
+  "The light background must use the dedicated organic pearl-blue satin fold artwork.");
 assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261021-20')"),
-  "The dark background must use the dedicated diagonal navy-sapphire satin fold artwork.");
+  "The dark background must use the dedicated organic navy-sapphire satin fold artwork.");
 const ambientLightStart = finalThemeCss.indexOf(".theme-bg--light{");
 const ambientLight = finalThemeCss.slice(ambientLightStart).split("}")[0] || "";
 const ambientDarkStart = finalThemeCss.indexOf(".theme-bg--dark{");
@@ -83,7 +83,7 @@ assert.doesNotMatch(welcomeDark, /theme-croc-/,
 
 assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-20')}")
   && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-20')}"),
-  "Portrait viewports must use dedicated vertical wave compositions so the curved ribbons remain visible.");
+  "Portrait viewports must use dedicated vertical wave compositions so the irregular gathered folds remain visible.");
 assert.match(finalBackgroundCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/,
   "The last Light overlay must preserve the base SVG and avoid broad overlay ribbons.");
 assert.match(finalBackgroundCss, /\.theme-bg--dark::after\{background:linear-gradient\(118deg,rgba\(3,20,36,\.10\),rgba\(7,31,51,\.06\) 52%,rgba\(3,17,30,\.12\)\)\}/,
@@ -178,8 +178,10 @@ for (const [name, svg] of [
   assert.ok((svg.match(/data-fold-layer="fine"/g) || []).length >= 6,
     name + ' must retain additional micro-creases that keep the fabric from reading as plain diagonal stripes.');
   const bodyPaths = [...svg.matchAll(/<path data-fold-layer="body" d="([^"]+)"/g)].map(match => match[1]);
-  assert.ok(new Set(bodyPaths).size >= 5 && bodyPaths.every(path => /C/.test(path)),
-    name + ' must use varied organic curves, not duplicate straight stripe paths.');
+  assert.equal(bodyPaths.length, 8, name + ' must keep eight separate satin creases.');
+  assert.equal(new Set(bodyPaths).size, 8, name + ' must not reuse uniform diagonal paths.');
+  assert.ok(bodyPaths.every(path => path.split(' C ').length - 1 >= 2),
+    name + ' must use multi-stage gathered curves, not single-segment diagonal stripes.');
 }
 assert.ok(lightWaveArtwork.includes('stroke-width="6"') && lightWaveArtwork.includes('stroke-width="10"') && lightWaveArtwork.includes('stroke-width="2"'),
   'Light desktop satin must retain layered satin body and shadow folds within the desktop stroke budget.');
