@@ -157,3 +157,4 @@ Implementation files are developed only on `feature/admin-isolated-handoff-2026-
 - Uploading a QR only creates a pending asset. A human must scan and confirm the receiving account and ensure no fixed amount is embedded before activation.
 - An Admin source-CI PASS does not mean the configured live Preview or real D1/R2 has been verified. Track the Preview diagnostic independently.
 - Rollback: keep PR #111 open and do not merge/deploy. Any source rollback requires a reviewed forward commit; do not rewrite history. Never run this migration on Production as part of this task.
+undefined
