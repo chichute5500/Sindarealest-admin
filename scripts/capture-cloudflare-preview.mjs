@@ -853,19 +853,33 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
 
   try {
     await page.evaluate(() => document.querySelector('#toast')?.classList.remove('show'));
+    await page.evaluate(() => {
+      const probe = document.createElement('button');
+      probe.type = 'button';
+      probe.id = '__invalidAddPreviewProbe';
+      probe.dataset.add = '__invalid-preview-product__';
+      probe.setAttribute('aria-label', 'Preview invalid-add regression probe');
+      probe.style.cssText = 'position:fixed;right:8px;bottom:8px;width:16px;height:16px;opacity:0.01;z-index:99999;';
+      probe.dataset.clickObserved = 'false';
+      probe.addEventListener('click', () => { probe.dataset.clickObserved = 'true'; });
+      document.querySelector('#productOverlay')?.appendChild(probe);
+    });
+    await page.locator('#__invalidAddPreviewProbe').click();
     const invalid = await page.evaluate(() => {
-      const result = typeof window.addToCart === 'function' ? window.addToCart('__invalid-preview-product__') : 'unavailable';
+      const probe = document.querySelector('#__invalidAddPreviewProbe');
+      const clickDispatched = probe?.dataset.clickObserved === 'true';
+      probe?.remove();
       let stored = {};
       try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
       return {
-        result,
+        clickDispatched,
         quantity: Number(stored[document.querySelector('#detailAdd')?.dataset.add || ''] || 0),
         total: Object.values(stored).reduce((sum, value) => sum + Number(value || 0), 0),
         badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
         toastVisible: Boolean(document.querySelector('#toast.show')),
       };
     });
-    const invalidPass = invalid.result === false && invalid.quantity === before.quantity
+    const invalidPass = invalid.clickDispatched === true && invalid.quantity === before.quantity
       && invalid.total === before.total && invalid.badge === before.badge && !invalid.toastVisible;
 
     await addButton.click();
