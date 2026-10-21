@@ -70,3 +70,10 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - Keep PR #111 (ADMIN) and #108 (static website) unmerged.
 - No Production deployment; no secrets, real data, D1/R2, schema, or out-of-scope backend changes.
 - Report the percentage honestly. 43% remains appropriate until Preview, authenticated modules, all 12 reference comparisons, and full PR diff audit have evidence.
+
+
+### Newest change after run #39495162150 — workflow fix awaiting CI
+- Updated .github/workflows/admin-preview-diagnostics.yml at commit de6114f75cba36193c50ad043175d08be092929f: the run summary now differentiates source PASS from remote Preview failure, refreshes the latest evidence object from current metadata, and keeps screenshot counts separated by suite.
+- Appended the verified run/log findings to LATEST-STATUS.md in commit 250653fad7440eea42a532ccbd42291747ad8a94.
+- IMPORTANT: these workflow/documentation commits happened after run #39495162150 and have not themselves been validated by a subsequent Actions run. Do not label the latest workflow version PASS until new CI evidence exists.
+- The remote failure remains a real failure: CSS signature PREVIEW_CSS_SIGNATURE_MISMATCH, .topbar > .brand visible when hidden was expected. Do not weaken the assertion just to turn CI green; establish the correct Preview target with authorized owner input.
