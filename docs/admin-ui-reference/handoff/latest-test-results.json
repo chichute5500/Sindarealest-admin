@@ -7,7 +7,7 @@
   "testedCommitSha": "60e63acb67e1c62a0d6390cd8e80ce65b8bcd885",
   "capturedAt": "2026-10-21T17:10:00Z",
   "progressEstimatePercent": 50,
-  "progressBasis": "Weighted management estimate, not test-pass rate: project scope/guardrails 15% × 100% = 15; source integrity and automated tests 20% × 86% = 17.2; Admin UI implementation/behavior coverage 20% × 47% = 9.4; 12-screen visual parity 20% × 25% = 5; authenticated business QA 15% × 0% = 0; semantic/security/release audit 10% × 30% = 3. Total 49.6%, rounded to 50%. The warranty search status/empty-state Playwright assertions passed in Validate Source run #39640751340 on exact source/test SHA 60e63acb67e1c62a0d6390cd8e80ce65b8bcd885. Preview screenshot matrix run #39640751300 remained in progress at this timestamp; verify final result before calling Preview complete. Anti-repeat note added 2026-10-21 17:10 UTC: do not repeat customer address search or warranty search accessibility/empty-state work; next task should target an unresolved screen parity gap. Latest docs-only SHA 71187e9... passed Validate Source #39641183495, but is not a new application test run.",
+  "progressBasis": "Weighted management estimate, not test-pass rate: project scope/guardrails 15% × 100% = 15; source integrity and automated tests 20% × 86% = 17.2; Admin UI implementation/behavior coverage 20% × 47% = 9.4; 12-screen visual parity 20% × 25% = 5; authenticated business QA 15% × 0% = 0; semantic/security/release audit 10% × 30% = 3. Total 49.6%, rounded to 50%. The warranty search status/empty-state Playwright assertions passed in Validate Source run #39640751340 on exact source/test SHA 60e63acb67e1c62a0d6390cd8e80ce65b8bcd885. Preview screenshot matrix run #39640751300 remained in progress at this timestamp; verify final result before calling Preview complete. Anti-repeat note added 2026-10-21 17:10 UTC: do not repeat customer address search or warranty search accessibility/empty-state work; next task should target an unresolved screen parity gap. Latest docs-only SHA 71187e9... passed Validate Source #39641183495, but is not a new application test run. Anti-repeat checkpoint: customer address search and warranty search accessibility/empty-state coverage are completed; next work should target an unresolved reference-screen parity gap.",
   "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -2913,5 +2913,26 @@
       "verifiedOnGitHub": true,
       "executed": false
     }
-  ]
+  ],
+  "antiRepeatCheckpoint": {
+    "capturedAt": "2026-10-21T17:10:00Z",
+    "completedDoNotRepeat": [
+      "Customer search label/placeholder and synthetic Playwright coverage for name, phone, email, and address.",
+      "Warranty search aria-live result summary and no-match empty states for both issued-warranty and support-claim tables."
+    ],
+    "passingEvidence": {
+      "sourceTestSha": "60e63acb67e1c62a0d6390cd8e80ce65b8bcd885",
+      "validateSourceRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340",
+      "previewPlaywrightRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300",
+      "artifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710",
+      "screenshotCount": 63,
+      "caveat": "Business modules use synthetic/read-only fixtures; not authenticated real-business QA."
+    },
+    "latestDocsOnlyPass": {
+      "sha": "71187e9afe7359a6a8a0f5f7c14b03a9520cff3b",
+      "validateSourceRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39641183495",
+      "caveat": "Docs-only validation, not a fresh application UI test run."
+    },
+    "nextAction": "Read 12-SCREEN-REFERENCE-AUDIT.md and implement/test the next unresolved reference parity gap, prioritizing Product list/search/filters or Product editor. Avoid repeating completed search tasks and avoid documentation-only commits unless evidence materially changes."
+  }
 }
