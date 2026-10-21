@@ -205,3 +205,8 @@ Current branch HEAD at check start: `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7`. 
 - Chủ sở hữu yêu cầu: **tiếp tục làm việc, không dừng sau khi báo cáo; chỉ dừng khi thực sự cần thao tác/xác nhận từ chủ sở hữu**.
 - Báo cáo tiến độ không thay thế việc thực thi. Sau mỗi báo cáo, phải tiếp tục ngay với bước kiểm tra/sửa tiếp theo khi còn công việc an toàn có thể làm.
 - Không tuyên bố hoàn tất 100% nếu chưa đạt nghiệm thu. Giữ lỗi lưu ảnh và migration PRE/PRO ở trạng thái tạm hoãn theo yêu cầu.
+
+
+## Lệnh liên tục của chủ sở hữu (2026-10-21)
+
+Chủ sở hữu yêu cầu không dừng sau báo cáo; chỉ dừng khi thật sự cần họ thao tác. Báo cáo tiến độ xong phải tiếp tục ngay việc an toàn tiếp theo. Không coi kế hoạch là hoàn thành. Luôn kiểm tra CI/Preview và ghi đúng bằng chứng; lỗi lưu ảnh sản phẩm cùng migration PRE/PRO vẫn tạm hoãn theo yêu cầu. Xem `LATEST-STATUS.md` và `latest-test-results.json` để biết trạng thái mới nhất.
