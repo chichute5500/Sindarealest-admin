@@ -42,3 +42,9 @@ Báo cáo ngắn bằng tiếng Việt: SHA mới, file đã đổi, workflow li
 - New workflow for the updated HEAD must be checked before treating the changes as deployed or visually improved. Re-run source tests, deploy verifier, live screenshot capture, then open the resulting images and compare to original reference PNGs.
 - Overall visual audit remains FAIL until exact SKU `SD-GL052` is present in verified public product data; do not substitute a different product image or mutate catalog data. No Production/main change, merge, DB/R2 write, or secret/policy change.
 - Current rough project completion estimate: 55% (visual coverage + verification estimate, not code volume). Remaining: validate new satin pass in live Preview, inspect 360/390/768/1440 in Light/Dark, refine other confirmed visual differences, check account/cart/checkout interactions and mobile back behavior, and update this file, TEST-RESULTS.md, and next-chat prompt after each verified pass.
+
+
+## 2026-10-21 — Preview target correction
+- Live capture run #454 passed `npm test`, `npm run check`, local fixture audit, and deployment metadata diagnostics but stalled during the push-triggered live probe at step 14. Inspection found the workflow was probing the generic alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/` rather than the exact branch Preview documented for this work.
+- Corrected all seven Preview URL references in `.github/workflows/liquid-glass-visual-preview.yml` to the known branch Preview `https://3ed49bcc.sindarealest2.pages.dev/` (commit `1d47c0b58e2e0f2ec51eeab127004f8671b4e010`). This only changes the non-production Preview target; it does not touch Production, `main`, or data/config.
+- Next: verify the new Actions run against this exact URL, confirm its deployment metadata, inspect the new live screenshots and pixel diff, and continue visual fixes. Do not count the most recent SVG refinements as visually validated until this run completes.
