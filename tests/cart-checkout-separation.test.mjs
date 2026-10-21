@@ -143,3 +143,19 @@ assert.equal(fromRow(priceRow, { publicView: false, showPrices: false }).price, 
   'admin/internal serialization retains stored price data irrespective of public toggle');
 
 console.log('PASS: separate cart/checkout, public price API gating, safe price formatting, address mock, toast handling and accessible cart/checkout/account behavior.');
+
+
+const populatedCartRules = html.match(/\.cart-drawer:has\(\.cart-row\)\{([^}]+)\}/)?.[1];
+assert.ok(populatedCartRules, 'A populated mobile cart needs its own responsive layout rule.');
+assert.match(populatedCartRules, /height:calc\(100dvh - 96px - env\(safe-area-inset-top\) - env\(safe-area-inset-bottom\)\)!important/,
+  'A populated mobile cart must fill the available panel height instead of shrinking to its rows.');
+assert.doesNotMatch(populatedCartRules, /height:auto!important/,
+  'A populated mobile cart must not collapse to a short content-sized sheet.');
+const populatedCartListRules = html.match(/\.cart-drawer:has\(\.cart-row\) \.cart-list\{([^}]+)\}/)?.[1];
+assert.ok(populatedCartListRules, 'A populated mobile cart needs an independently scrollable item list.');
+assert.match(populatedCartListRules, /flex:1 1 auto!important/,
+  'The cart item list must expand so the summary sits toward the bottom of the full sheet.');
+assert.doesNotMatch(populatedCartListRules, /max-height:40dvh/,
+  'The populated cart item list must not be capped to a small fraction of the screen.');
+assert.match(html, /\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{margin-top:auto\}/,
+  'The cart subtotal and actions must be anchored below the expandable item list.');
