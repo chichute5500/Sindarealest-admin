@@ -17,14 +17,17 @@ export async function onRequestGet({ request, env }) {
     const tokenHash = await hashOrderAccessToken(token);
     const order = await env.DB.prepare("SELECT id,order_number,status,payment_status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders WHERE order_number=? AND public_access_token_hash=? LIMIT 1").bind(orderNumber,tokenHash).first();
     if (!order) return fail("Không tìm thấy đơn hàng hoặc mã truy cập không hợp lệ.",404);
+    const rawOrderTotal = order.total === null || order.total === undefined || (typeof order.total === "string" && !order.total.trim()) ? null : Number(order.total);
+    const payableOrderTotalReady = Number(order.price_confirmation_required) === 0
+      && Boolean(order.payment_terms_confirmed_at)
+      && Number.isSafeInteger(rawOrderTotal) && rawOrderTotal > 0 && rawOrderTotal <= 2_000_000_000;
     const base = {
       orderNumber:order.order_number, orderStatus:order.status, paymentStatus:order.payment_status,
       paymentTermsConfirmed:Boolean(order.payment_terms_confirmed_at),
       priceConfirmationRequired:Number(order.price_confirmation_required)===1,
-      total:order.total===null?null:Number(order.total)
+      total:payableOrderTotalReady ? rawOrderTotal : null
     };
-    if (order.status === "cancelled" || Number(order.price_confirmation_required)===1 ||
-        !order.payment_terms_confirmed_at || order.total===null || !Number.isSafeInteger(Number(order.total))) {
+    if (order.status === "cancelled" || !payableOrderTotalReady) {
       return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,PRIVATE_PAYMENT_HEADERS);
     }
     const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? ORDER BY CASE WHEN status='pending' THEN 0 ELSE 1 END, created_at DESC, id DESC LIMIT 1").bind(order.id).first();

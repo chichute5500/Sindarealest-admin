@@ -162,6 +162,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.equal(payload.paymentReady, false, "valid order token cannot reveal a payment amount before terms confirmation");
+  assert.equal(payload.total, null, "unconfirmed order price/terms must not expose a total even when a stale total exists in storage");
   assert.equal(Object.hasOwn(payload, "amount"), false);
   assert.equal(response.headers.get("Cache-Control"), "private, no-store", "token-scoped payment response must not be cached");
   assert.equal(response.headers.get("Referrer-Policy"), "no-referrer");
