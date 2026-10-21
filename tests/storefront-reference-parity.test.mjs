@@ -13,8 +13,8 @@ assert.match(mobileLight, /viewBox="0 0 390 844"/);
 assert.match(mobileDark, /viewBox="0 0 390 844"/);
 
 function assertSatinFoldScale(name, svg, maxStroke, maxBlur, expectedPaths) {
-  const widths = [...svg.matchAll(/stroke-width="([\\d.]+)"/g)].map(match => Number(match[1]));
-  const blur = [...svg.matchAll(/<feGaussianBlur stdDeviation="([\\d.]+)"\\/>/g)].map(match => Number(match[1]));
+  const widths = [...svg.matchAll(/stroke-width="([\d.]+)"/g)].map(match => Number(match[1]));
+  const blur = [...svg.matchAll(/<feGaussianBlur stdDeviation="([\d.]+)"\/>/g)].map(match => Number(match[1]));
   assert.ok(widths.length >= expectedPaths, name + ' must retain multiple narrow satin fold and highlight strokes.');
   assert.ok(Math.max(...widths) <= maxStroke,
     name + ' must not use oversized brush strokes that create broad ring-like bands.');
