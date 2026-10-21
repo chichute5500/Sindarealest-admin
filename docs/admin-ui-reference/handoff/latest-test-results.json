@@ -2124,8 +2124,8 @@
     "currentPr108State": "OPEN_UNMERGED",
     "note": "This JSON write will itself advance the ADMIN branch via a handoff-only commit; it does not change the source/test SHA listed above."
   },
-  "latestObservedAdminHead": "c63ac375dd3d3ad89345ca8a4dee880e7ec4acd1",
-  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:24:45Z",
+  "latestObservedAdminHead": "81c8ee7b9fcdfaa7cd6aa72ca793ecc1a820af48",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:27:00Z",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
     "url": "https://564cd391.sindarealest2.pages.dev/admin/",
@@ -2579,5 +2579,63 @@
       "testedSha": "c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf",
       "scope": "handoff documentation commit; application source/test validation"
     }
+  },
+  "handoffCheckpoint20261021_1527": {
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "headAtCheckpointStart": "81c8ee7b9fcdfaa7cd6aa72ca793ecc1a820af48",
+    "latestObservedPassingRun": {
+      "id": 39625390469,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39625390469",
+      "sha": "c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf",
+      "conclusion": "success"
+    },
+    "revenueSourceValidation": {
+      "id": 39624818256,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256",
+      "sha": "06d689b6a97fa7bdb05258acb8435a6954d67309",
+      "conclusion": "success"
+    },
+    "previewDiagnostic": {
+      "id": 39624818216,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216",
+      "sha": "06d689b6a97fa7bdb05258acb8435a6954d67309",
+      "conclusion": "success",
+      "artifactId": 12356875897,
+      "artifactName": "admin-preview-evidence-173",
+      "reviewedViewports": [
+        "390x844",
+        "1280x800"
+      ],
+      "evidenceKind": "fixture/diagnostic screenshots; not authenticated real-data QA"
+    },
+    "revenuePanel": {
+      "status": "implemented-and-tested",
+      "label": "Doanh thu theo thời gian",
+      "noDataState": true,
+      "fabricatedValues": false,
+      "focusedTest": "tests/admin-dashboard-revenue-empty-state.test.mjs",
+      "includedInNpmTest": true,
+      "fullHistoryAggregation": "not implemented; do not treat latest 1000 orders as complete history"
+    },
+    "regression": {
+      "status": "resolved",
+      "issue": "temporary duplicate dashboard panel/static ID",
+      "resolution": "duplicate panel removed; subsequent source validation passed"
+    },
+    "overallProgressPercent": 48,
+    "outstanding": [
+      "12-screen visual comparison/acceptance",
+      "authenticated business-flow/backend QA",
+      "image-save and PRE/PRO migration checks deferred by owner",
+      "complete verified revenue-history aggregation"
+    ],
+    "safety": [
+      "PR #111/#108 remain unmerged",
+      "no Production deploy",
+      "no Access/secrets changes or bypass",
+      "no remote D1/R2 or migration execution",
+      "no TinyFish"
+    ],
+    "nextChatAction": "Fetch current live branch HEAD, PR #111/#108 metadata, and CI for exact current HEAD before editing; continue 12-screen visual matrix with evidence and update handoff files after each iteration."
   }
 }
