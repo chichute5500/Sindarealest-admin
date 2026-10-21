@@ -496,3 +496,6 @@ Trước tiên đọc phần “Cập nhật bàn giao — 2026-10-22” trong `
 **Tiếp tục ngay:** xác minh artifact 683 và Preview exact-SHA; mở ảnh thực tế, so sánh với hai reference gốc; chỉ kiểm thử/chụp bổ sung những viewport/theme/route còn thiếu hoặc bị ảnh hưởng. Tiếp tục sửa toàn website công khai, không chỉ homepage. Sau mỗi fix: test phù hợp → Preview deploy → ảnh thực tế → so sánh → sửa tiếp. Báo cáo xong phải tiếp tục làm, không kết thúc lượt chỉ vì đã báo cáo. Chỉ dừng khi cần người dùng thao tác hoặc quyết định thật sự.
 
 Giữ nguyên các giới hạn trong prompt gốc: không đụng Admin, không merge PR, không sửa Production, không thay đổi logo chính thức/thương hiệu/dữ liệu và quan hệ ảnh sản phẩm; không thay sản phẩm chỉ để làm đẹp. Không đổi backend contracts, D1/R2 bindings/secrets/migrations/data hoặc kiến trúc sang React/Vite. 
+
+
+**SHA cần phân biệt:** code/audit trước khi cập nhật tài liệu là `b2cb59f02bb19783e1e395adefd9d9b0597ce52a`; các commit `68ededda...`, `dfce806c...`, `90f1388e...` chỉ cập nhật handoff/ledger/prompt. HEAD sau cập nhật tài liệu là `90f1388ea9be6282c7f23da8a61096a509c05799`. Đầu phiên mới phải xác minh lại HEAD, kiểm tra có commit code mới hơn hay không và không coi các commit docs-only là bản UI mới.
