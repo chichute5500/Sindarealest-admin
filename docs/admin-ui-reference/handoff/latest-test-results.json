@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
+  "status": "SOURCE_CI_PASS_PREVIEW_DIAGNOSTICS_FAIL_REFERENCE_PARITY_OPEN",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "463700295675d8f83f6ede1ffd33692bb3285484",
-  "testedCommitSha": "463700295675d8f83f6ede1ffd33692bb3285484",
-  "capturedAt": "2026-10-21T10:51:51.980Z",
-  "progressEstimatePercent": 46,
-  "progressBasis": "No verified acceptance-gate closure since prior estimate. Current docs HEAD passes source CI, but Preview identity/CSS, authenticated backend QA, complete 12-screen parity, full PR scope and owner-deferred image-save/migrations remain open.",
-  "note": "Source/test SHA 47a23ded111d2982383460ba7265b778e2bc6d39 passed Validate CI. UI improvements include QR activation saved-draft guard, QR picker/selected filename, and two shorter mobile texts verified in latest source screenshots. Preview still fails CSS signature. Product image-save/PRE/PRO work is DEFERRED_BY_OWNER and not fixed.",
+  "latestCodeCommitSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
+  "testedCommitSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
+  "capturedAt": "2026-10-21T10:52:00Z",
+  "progressEstimatePercent": 48,
+  "progressBasis": "Estimate increased from 46% after verified forced-colors accessibility support, Android theme-color synchronization/no-flash bootstrap, and reference-inclusive screenshot artifact. Not a test pass percentage. Preview CSS signature still fails; visual parity, authenticated backend QA, full PR scope audit and owner-deferred image-save/PRE/PRO remain open.",
+  "note": "Source CI PASS on latest source/test SHA 29621b8bacf03cc08136e08eabcc4ed8f6138db1. Recent changes: forced-colors focus/borders; pre-style theme bootstrap and Android browser theme-color synchronization; screenshot artifact includes admin-mobile-reference.png. Preview diagnostic fails because served inline CSS has 226 rules but lacks login-hide rule while source contains it. Visual comparison of dashboard screenshot against 12-screen reference shows style direction overlaps (light blue/cards) but layout and content are not yet at reference parity. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -1643,91 +1643,24 @@
     "progressEstimatePercent": 46
   },
   "latestContinuationAudit": {
-    "checkedAt": "2026-10-21",
+    "at": "2026-10-21T10:52:00Z",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadAtAuditStart": "ef42282f7c0d66f827e3d0181bc3f0eaa00dced7",
-    "exactHeadValidation": {
-      "runId": 39583615335,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583615335",
-      "headSha": "ef42282f7c0d66f827e3d0181bc3f0eaa00dced7",
-      "conclusion": "SUCCESS",
-      "exactShaMatch": true
-    },
-    "sourceUiValidation": {
-      "runId": 39583053755,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053755",
-      "headSha": "47a23ded111d2982383460ba7265b778e2bc6d39",
-      "conclusion": "SUCCESS"
-    },
-    "preview": {
-      "runId": 39583053648,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39583053648",
-      "headSha": "47a23ded111d2982383460ba7265b778e2bc6d39",
-      "conclusion": "FAILURE",
-      "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
-      "rerunOnDocumentationOnlyHead": false,
-      "reason": "workflow push paths exclude documentation-only changes; application source is unchanged"
-    },
-    "prAudit": {
-      "pr111": {
-        "state": "OPEN",
-        "merged": false,
-        "base": "main",
-        "headSha": "ef42282f7c0d66f827e3d0181bc3f0eaa00dced7",
-        "changedFiles": 1088,
-        "additions": 37133,
-        "deletions": 390,
-        "mergeReady": false
-      },
-      "pr108": {
-        "state": "OPEN",
-        "merged": false,
-        "base": "main",
-        "mergeReady": false
-      },
-      "fileListingPagesInspected": "pages 1-11; page 12 empty",
-      "firstThreePagesFiles": 300,
-      "additionalPagesFiles": 788,
-      "additionalPageCategories": {
-        "docs": 730,
-        "functions": 24,
-        "migrations": 2,
-        "scripts": 5,
-        "tests": 24,
-        "public": 2,
-        "other": 1
-      },
-      "categoryCountsArePartial": true,
-      "reason": "first three pages contain additional files; broad mixed-scope PR requires full audit and is not approved to merge"
-    },
-    "localCheckout": {
-      "available": false,
-      "gitStatus": "NOT_AVAILABLE_THROUGH_CONNECTED_GITHUB_TOOLS",
-      "fullWorkingTreeDiff": "NOT_VERIFIED"
-    },
-    "ownerPriority": {
-      "productImageSave": "DEFERRED_BY_OWNER_NOT_VERIFIED",
-      "preD1MigrationLedger": "DEFERRED_BY_OWNER_NOT_VERIFIED",
-      "proD1MigrationLedger": "DEFERRED_BY_OWNER_NOT_VERIFIED"
-    },
-    "safety": {
-      "tinyfishUsed": false,
-      "productionDeploy": false,
-      "remoteSql": false,
-      "setupScript": false,
-      "d1R2Mutation": false,
-      "secretsReadOrChanged": false,
-      "accessBypass": false,
-      "mainOrStaticBranchModified": false,
-      "pr108Or111Merged": false
-    },
-    "progressPercent": 46,
-    "openAcceptanceGates": [
-      "deployed Preview source identity/CSS signature",
-      "authenticated backend/business-flow QA",
-      "full 12-screen approved-reference parity",
-      "full PR #111 scope and merge-readiness review",
-      "owner-deferred product image save and PRE/PRO migration verification remain excluded until reopened"
+    "sourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
+    "actions": [
+      "Forced-colors accessibility CSS + regression assertions; CI PASS",
+      "Added approved reference PNG to visual evidence artifact",
+      "Theme-color meta synced with light/dark palette and pre-style theme bootstrap; regression assertions; CI PASS"
+    ],
+    "openBlockers": [
+      "Preview served CSS mismatch; exact deployment target cannot be confirmed from redacted logs",
+      "Reference parity not accepted",
+      "Authenticated backend tests and full PR #111 changed-file audit not complete"
+    ],
+    "safety": [
+      "No production deployment",
+      "PR #108 and #111 remain open/unmerged",
+      "No static website branch or main edits",
+      "Image-save and PRE/PRO migration work deferred"
     ]
   },
   "latestValidationRun": {
@@ -1737,5 +1670,35 @@
     "exactShaMatch": true,
     "conclusion": "SUCCESS",
     "scope": "Validate source and tests on docs-only HEAD; app source unchanged from source SHA 47a23ded111d2982383460ba7265b778e2bc6d39"
+  },
+  "currentVerification": {
+    "latestSourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
+    "sourceCi": {
+      "runId": 39587110885,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587110885"
+    },
+    "previewDiagnostic": {
+      "runId": 39587110831,
+      "conclusion": "failure",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587110831",
+      "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
+      "observedInlineRuleCount": 226,
+      "loginHideRuleInServedCss": false,
+      "loginMarkupPresent": true
+    },
+    "referenceComparison": {
+      "artifactId": 12340845895,
+      "runId": 39586771504,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39586771504/artifacts/12340845895",
+      "referenceImageIncluded": true,
+      "visualParity": "NOT_ACCEPTED",
+      "notes": "Initial visual inspection of 390x844 dashboard screenshot: pale blue rounded cards are present, but overall screen structure/content differs from reference. Need continue per-screen comparison."
+    },
+    "ownerInstruction": {
+      "continueAfterProgressReports": true,
+      "stopOnlyWhenOwnerActionRequired": true,
+      "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
+    }
   }
 }
