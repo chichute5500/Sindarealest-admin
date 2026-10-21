@@ -17,6 +17,9 @@ has('backdrop-filter:blur(22px)', 'liquid-glass blur layer');
 has('data-admin-theme="dark"', 'dark-theme rules');
 has("$('#backdrop').classList.add('hidden')", 'editor overlay reset before login session check');
 has('prefers-reduced-motion:reduce', 'reduced-motion support');
+has('@media (forced-colors: active)', 'Windows High Contrast / forced-colors support');
+has('outline: 2px solid Highlight;', 'system-color keyboard focus indicator in forced-colors mode');
+has('border-color: CanvasText;', 'control boundaries in forced-colors mode');
 
 // System theme is the default until the administrator explicitly chooses light/dark.
 has("let adminThemeMode='auto';", 'system theme default');
