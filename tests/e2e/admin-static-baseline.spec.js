@@ -759,7 +759,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('[data-fulfillment-type="in_stock"]')).toHaveText('Hàng có sẵn');
     await expect(page.locator('[data-fulfillment-type="made_to_order"]')).toHaveText('Hàng đặt riêng');
     await expect(page.locator('#productResultSummary')).toContainText('Có 3 sản phẩm phù hợp');
-    await expect(page.locator('#productPublishFilters')).toHaveAttribute('aria-label', 'Lọc trạng thái hiển thị');
+    await expect(page.locator('#productPublishFilters')).toHaveAttribute('aria-label', 'Lọc trạng thái hiển thị và xóa bộ lọc');
+    await expect(page.locator('#clearFilter')).toHaveAttribute('aria-label', 'Xóa tất cả bộ lọc');
     await expect(page.locator('[data-published-filter="all"]')).toContainText('Tất cả (3)');
     await expect(page.locator('[data-published-filter="published"]')).toContainText('Đang hiển thị (2)');
     await expect(page.locator('[data-published-filter="hidden"]')).toContainText('Đã ẩn (1)');
