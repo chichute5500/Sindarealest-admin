@@ -250,3 +250,8 @@ This supersedes stale test claims in earlier appended checkpoints only for the f
 - Owner feedback: the Admin still looks approximately 80–85% like the old UI. Make a substantive redesign against the reference PNG and 12 screen families; not a color-only/appended-CSS pass.
 - Reported Cloudflare Pages redirect/rewrite loop for rules in public/_redirects remains unresolved. Investigate read-only evidence first; no Production deployment or Access bypass.
 - Progress estimate remains 48%. Owner action needed now: NO. Keep image-save and PRE/PRO migration tasks deferred.
+
+
+## Checkpoint update — 2026-10-21
+
+Latest verified source/test SHA is `77905c14613321f1f498fd1e2a187d3cd82f44c1`: source Validate run 39606174329 and Preview/Playwright run 39606174361 both SUCCESS. Artifact: admin-preview-evidence-150 (ID 12348570376). This proves configured Preview signature for that run only; not authenticated business QA or 12-screen parity. Latest handoff HEAD is expected to advance due to documentation updates; re-fetch branch HEAD before any further source edits. PR #111/#108 remain OPEN/unmerged. Progress 48%.

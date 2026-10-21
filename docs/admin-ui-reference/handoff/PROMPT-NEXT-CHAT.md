@@ -484,3 +484,14 @@ Read this section before relying on older checkpoints. It supersedes previous st
 
 ### Immutable safety rules
 Only write on `feature/admin-isolated-handoff-2026-10-20`; do not merge/cherry-pick/force-push; no Production deployment; no secret/Access change or bypass; no remote migration or real-data mutation; never use TinyFish.
+
+
+## Newest verified checkpoint — run #150 (2026-10-21 13:15 UTC)
+
+- Tested source SHA: `77905c14613321f1f498fd1e2a187d3cd82f44c1`.
+- Source Validate [39606174329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39606174329): PASS. Preview/Playwright [39606174361](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39606174361): SUCCESS; `npm run check`, `npm test`, local source/fixture screenshot matrix, and configured Preview diagnostic all passed for that SHA.
+- Artifact [admin-preview-evidence-150](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39606174361/artifacts/12348570376), 11,126,750 bytes, expires 2026-11-04. The 59 source/fixture screenshot set described in the run report is split into 16 login-shell and 43 synthetic read-only module captures, with 36 fixture metrics; the artifact upload contains 63 files including metadata/report/reference. This does NOT prove authenticated backend workflows or 12-screen visual acceptance.
+- Branch HEAD before this documentation refresh: `028f154e934f75db9bcd05adb7d837e982581f62`, an evidence-only commit after tested source SHA. Local checkout/status remains NOT VERIFIED.
+- PR #111 remains OPEN/unmerged and mixed scope; latest filename listing returned 1,104 paths (913 PNG, 129 docs, 24 Functions, 2 migrations, 5 scripts, 24 tests, 2 public files, 5 other). PR #108 remains OPEN/unmerged. No merge or deployment.
+- Progress remains 48%. Visual parity across 12 screen families NOT ACCEPTED; authenticated backend QA NOT TESTED; migration/ledger remote state NOT VERIFIED. Product image-save and PRE/PRO migration tasks remain DEFERRED_BY_OWNER.
+- Continue with source-only UI/reference/accessibility work and review PR scope. No Production, secrets/Access changes, bypass, D1/R2 writes, setup/migration scripts, edits to main/static branch, or TinyFish.

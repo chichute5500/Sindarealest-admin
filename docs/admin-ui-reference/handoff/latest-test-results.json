@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_VISUAL_PARITY_AND_AUTHENTICATED_QA_OPEN",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "77905c14613321f1f498fd1e2a187d3cd82f44c1",
   "testedCommitSha": "77905c14613321f1f498fd1e2a187d3cd82f44c1",
-  "capturedAt": "2026-10-21T13:15:20.062Z",
+  "capturedAt": "2026-10-21T13:15:50.432Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% estimate only; unchanged because this checkpoint updates evidence/handoff, not implementation. Existing source/unit/local Playwright PASS applies to tested SHA ebb20fa7f2359b19ae91a9c62b3006a16b8db148 (run 39592097224); remote Preview diagnostic remains FAIL, 12-screen visual parity is not accepted, authenticated real-backend QA is not verified, and PR #111 mixed-scope semantic/security review is incomplete.",
-  "note": "Latest handoff HEAD 16ea1581ba7cb76762169d57030456cd4c31cffd has Validate source and tests PASS (run 39588603589). Latest UI source commit identified via file history is d553b95c3d43420f9227e9a37e6fe94b9b862b27. Latest verified Preview diagnostic run 39587426878 is FAILURE. Do not claim visual parity or backend QA complete. Owner explicitly requires continuous work after progress reports. Product image-save and PRE/PRO migrations remain deferred by owner. Handoff files and master/next-chat prompts were updated in a docs-only commit series; docs-only commits do not claim source CI was rerun. Latest handoff checkpoint (2026-10-21): GitHub confirms PR #111 HEAD 719a537f52eccf66c9642661c2758f8861beabcf, OPEN/unmerged, 1,096 files (+37,835/-392); it is newer than the tested SHA ebb20fa7. User already supplied Preview verification: deployment 564cd391..., commit 3ed2d86b..., successful build, but deployment is behind current HEAD and authenticated access is not proven. User should not be asked to repeat the Preview identity check. Cloudflare reportedly skipped /admin redirect rules due to loop detection; unresolved. Owner says UI still resembles old design 80–85%; real redesign and 12-screen parity remain unaccepted. Documentation checkpoint does not imply source changes or new CI pass.",
+  "progressBasis": "48% management estimate only. Run 39606174329 validates source checks on 77905c14613321f1f498fd1e2a187d3cd82f44c1; run 39606174361 validates npm checks, local source/fixture Playwright, and the configured Preview diagnostic on the same source SHA. Visual parity across all 12 screen families and authenticated real-backend QA remain unaccepted/not tested. Handoff-only commits are not source test runs.",
+  "note": "Current verified run #150: source SHA 77905c14613321f1f498fd1e2a187d3cd82f44c1 passed npm run check, npm test, local source/fixture Playwright, and configured Preview diagnostic. Artifact admin-preview-evidence-150 (ID 12348570376) is 11,126,750 bytes and expires 2026-11-04. This is not authenticated real-backend QA or acceptance of all 12 reference screen families. Current branch HEAD before this handoff refresh was 028f154e934f75db9bcd05adb7d837e982581f62 (evidence-only commit after tested source SHA). PR #111 is OPEN/unmerged and mixed-scope; latest filename listing returned 1,104 paths including 913 PNGs and code across storefront, Functions, migrations, scripts and tests. PR #108 remains OPEN/unmerged. Progress stays 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER. No local checkout status verified; no production deploy, merge, remote database writes, secret/access changes, or TinyFish.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -20,12 +20,15 @@
     "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
     "pr111State": "OPEN_UNMERGED",
     "pr108State": "OPEN_UNMERGED",
-    "pr111ChangedFiles": 1092,
+    "pr111ChangedFiles": 1104,
     "pr111Additions": 37234,
     "pr111Deletions": 392,
     "pr108ChangedFiles": 232,
     "pr108Additions": 19270,
-    "pr108Deletions": 380
+    "pr108Deletions": 380,
+    "protectedStaticWebsiteBranchMustNotBeModified": true,
+    "pr111PngFiles": 913,
+    "pr111NonImageDocsAndCodeFiles": 191
   },
   "changes": [
     {
@@ -2082,5 +2085,20 @@
     "purpose": "Record verified successful Preview CSS-signature test run #149",
     "statusFileCommit": "db6488cc326f22d22eeb25f556fc718ffc5f5e05",
     "note": "Documentation-only update; no source changes, no new tests, and no progress increase."
+  },
+  "latestRun": {
+    "sourceCi": 39606174329,
+    "previewAndPlaywright": 39606174361,
+    "artifactName": "admin-preview-evidence-150",
+    "artifactId": 12348570376,
+    "artifactSizeBytes": 11126750,
+    "artifactExpiresAt": "2026-11-04T13:15:48Z",
+    "sourceSha": "77905c14613321f1f498fd1e2a187d3cd82f44c1",
+    "sourceChecks": "PASS",
+    "unitTests": "PASS",
+    "localPlaywright": "PASS",
+    "configuredPreviewDiagnostic": "PASS",
+    "authenticatedBusinessFlows": "NOT_TESTED",
+    "visualParity12Screens": "NOT_ACCEPTED"
   }
 }

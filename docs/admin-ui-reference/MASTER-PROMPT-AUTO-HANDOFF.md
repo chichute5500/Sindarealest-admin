@@ -1247,3 +1247,14 @@ This addendum records the latest source cycle and must be read with the previous
 - **Important evidence boundary:** this regression is tested against a mock database. No remote D1 access/query/write or migration was performed; actual D1 runtime concurrency behavior remains NOT VERIFIED. Migration 0008/0009 and `scripts/setup-cloudflare.mjs` / `scripts/deploy-cloudflare.mjs` must not be executed without a separate authorized migration/deploy review. PRE/PRO migration and product image-save/upload work remain `DEFERRED_BY_OWNER`.
 - **Latest observed PR before this addendum:** #111 OPEN/unmerged, HEAD `9e0434f769dedf2b20e1365aa96147336afc237c`, 1,096 files (+37,660/−392), mixed storefront, Admin UI, Functions, migration, scripts, tests and evidence scope; not merge-ready. PR #108 is also OPEN/unmerged. Do not modify `main` or `fix/liquid-glass-audit-2026-10-19`, do not merge, and do not deploy Production.
 - Overall progress stays **48%**, not completion. Preview identity, 12-screen visual parity, authenticated backend flows and full PR semantic/security audit remain open.
+
+
+## Newest verified checkpoint — run #150 (2026-10-21 13:15 UTC)
+
+- Tested source SHA: `77905c14613321f1f498fd1e2a187d3cd82f44c1`.
+- Source Validate [39606174329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39606174329): PASS. Preview/Playwright [39606174361](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39606174361): SUCCESS; `npm run check`, `npm test`, local source/fixture screenshot matrix, and configured Preview diagnostic all passed for that SHA.
+- Artifact [admin-preview-evidence-150](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39606174361/artifacts/12348570376), 11,126,750 bytes, expires 2026-11-04. The 59 source/fixture screenshot set described in the run report is split into 16 login-shell and 43 synthetic read-only module captures, with 36 fixture metrics; the artifact upload contains 63 files including metadata/report/reference. This does NOT prove authenticated backend workflows or 12-screen visual acceptance.
+- Branch HEAD before this documentation refresh: `028f154e934f75db9bcd05adb7d837e982581f62`, an evidence-only commit after tested source SHA. Local checkout/status remains NOT VERIFIED.
+- PR #111 remains OPEN/unmerged and mixed scope; latest filename listing returned 1,104 paths (913 PNG, 129 docs, 24 Functions, 2 migrations, 5 scripts, 24 tests, 2 public files, 5 other). PR #108 remains OPEN/unmerged. No merge or deployment.
+- Progress remains 48%. Visual parity across 12 screen families NOT ACCEPTED; authenticated backend QA NOT TESTED; migration/ledger remote state NOT VERIFIED. Product image-save and PRE/PRO migration tasks remain DEFERRED_BY_OWNER.
+- Continue with source-only UI/reference/accessibility work and review PR scope. No Production, secrets/Access changes, bypass, D1/R2 writes, setup/migration scripts, edits to main/static branch, or TinyFish.
