@@ -1,14 +1,14 @@
 {
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
+  "status": "SOURCE_CHECKS_PASS_LOCAL_PLAYWRIGHT_PASS_PREVIEW_CSS_RULE_MISSING_OWNER_ACTION_REQUIRED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
   "testedCommitSha": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
-  "capturedAt": "2026-10-21T05:18:43.504Z",
-  "progressEstimatePercent": 43,
-  "progressBasis": "Stage-based estimate, not code completion. Current HEAD CI passes, but configured Preview CSS signature still fails; authenticated business flows, full 12-screen comparison, full mixed-scope PR diff audit/remediation and authorized Preview identity remain open.",
-  "note": "Current HEAD 9c94c106fec99aa5920685da4d4af32b53e680ad has a successful source CI run 39543407286 (check/tests/dependency audit). Latest Playwright/Preview run 39542387719 tested source de6114f75cba36193c50ad043175d08be092929f; local screenshots and synthetic fixture checks pass, but deployed Preview diagnostics fail PREVIEW_CSS_SIGNATURE_MISMATCH.",
+  "capturedAt": "2026-10-21T05:19:10Z",
+  "progressEstimatePercent": 45,
+  "progressBasis": "Stage estimate: current-source npm checks/tests and local responsive/theme/fixture Playwright evidence pass, and CSS diagnostics now isolate the deployed Preview mismatch. Still blocked on an authorized Preview built from current ADMIN source, authenticated real backend QA, full 12-screen comparison, broad PR #111 scope/migration review.",
+  "note": "Validated source commit 6935eefa3473f1c6a15da08a34389d7223cbd0ea: source CI run 39548605358 SUCCESS. Playwright diagnostic run 39548605474 failed only at the configured deployed Preview assertion after local screenshot/fixture suites passed. Runtime CSS signature: browserSupportsHideSelector=true, hideSelectorMatchesBrand=true, topbarBrandDisplay=flex, hasLoginHideRule=false, ruleCount=226. Preview response is missing the expected login-shell CSS rule. GitHub masks ADMIN_TEST_URL, so the exact target remains unidentifiable from logs.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -16,7 +16,11 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "branchHeadSha": "21a7e039749e484e42b68ec322481df6a2a797af"
+    "branchHeadSha": "21a7e039749e484e42b68ec322481df6a2a797af",
+    "lastObservedApplicationSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
+    "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
+    "pr111State": "OPEN_UNMERGED",
+    "pr108State": "OPEN_UNMERGED"
   },
   "changes": [
     {
@@ -660,18 +664,18 @@
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "branchIsolationDiffReview": "PARTIAL_GITHUB_API_FILE_REVIEW_NO_LOCAL_CHECKOUT",
     "applicationStartup": "PASS",
-    "playwrightPreviewDiagnostics": "failure",
-    "localStaticPlaywrightBaseline": "PASS",
+    "playwrightPreviewDiagnostics": "FAIL_EXPECTED_CSS_RULE_MISSING_ON_CONFIGURED_PREVIEW",
+    "localStaticPlaywrightBaseline": "PASS_RUN_39548605474",
     "visualComparisonAgainstApprovedPng": "INCOMPLETE_12_SCREEN_COMPARISON; DO NOT CLAIM PARITY",
-    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
-    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
+    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY_ZERO_ERRORS",
+    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY_ZERO_FAILED_OR_HTTP_ERRORS",
+    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX_8_VIEWPORTS_X_LIGHT_DARK",
     "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
     "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "accessibilityAndVietnameseTypography": "NOT_TESTED_AFTER_CHANGE",
     "lint": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
     "typecheck": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
-    "automatedTests": "PASS",
+    "automatedTests": "PASS_RUN_39548605358",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "businessFlows": "NOT_TESTED_AUTHENTICATED",
     "sharedBackendRegression": "NOT_TESTED",
@@ -688,57 +692,39 @@
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
-    "currentBranchHeadTests": "EVIDENCE_ONLY_HEAD_AFTER_TESTED_COMMIT",
+    "currentBranchHeadTests": "SOURCE_TESTED_AT_6935eefa3473f1c6a15da08a34389d7223cbd0ea; evidence and handoff commits after source test are not themselves source-test commits",
     "authenticatedBackendModules": "NOT_TESTED",
     "visualReferenceParity": "INCOMPLETE_12_SCREEN_COMPARISON",
     "mobileOrderCustomerUsability": "SOURCE_CSS_SUPPORTS_MOBILE_CARDS_AT_MAX_680PX; REAL AUTHENTICATED SCREENSHOTS NOT VERIFIED",
-    "prFullDiffAudit": "PARTIAL_GITHUB_API_AND_SOURCE_SNAPSHOT_REVIEW; NO_LOCAL_CHECKOUT; NOT_MERGE_APPROVAL",
+    "prFullDiffAudit": "PARTIAL_GITHUB_API_ONLY; NO_LOCAL_CHECKOUT; NOT_MERGE_APPROVAL",
     "uiFixtureModules": "PASS_READ_ONLY_FIXTURE_SCREENSHOTS",
     "rawClosingTagVisibleText": "PASS_TEXT_NODE_ASSERTION_DID_NOT_REPRODUCE; CHECK_PSEUDO_ELEMENTS_AND_LATEST_CUSTOMER_SCREENSHOT",
-    "npmRunCheck": "PASS",
+    "npmRunCheck": "PASS_RUN_39548605358",
     "screenshotMatrix": "PASS_SOURCE_ONLY_58_PNG",
-    "deployedPreview": "FAIL_SIGNATURE_OR_NAVIGATION",
+    "deployedPreview": "FAIL_EXPECTED_CSS_RULE_MISSING_ON_CONFIGURED_PREVIEW",
     "mobileNavigationSourceAudit": "PASS_SOURCE_ONLY_5_BUTTONS_FIVE_COLUMN_RULE_MORE_MENU_CONTAINS_WARRANTY_AND_SETTINGS",
     "mobileCardsSourceAudit": "PASS_SOURCE_ONLY_MOBILECARDS_OVERRIDE_INLINE_MIN_WIDTH_AT_MAX_680PX; AUTHENTICATED_RENDER_NOT_VERIFIED",
-    "loginCopySourceAudit": "PASS_SOURCE_ONLY_TAGLINE_LUXURY_IN_EVERY_DETAIL_HEADING_DANG_NHAP_QUAN_TRI"
+    "loginCopySourceAudit": "PASS_SOURCE_ONLY_TAGLINE_LUXURY_IN_EVERY_DETAIL_HEADING_DANG_NHAP_QUAN_TRI",
+    "sourceScreenshotCount": 58,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 42,
+    "uiFixtureMetricCount": 36,
+    "browserSupportsHideSelector": "TRUE_ON_CONFIGURED_PREVIEW",
+    "hideSelectorMatchesBrand": "TRUE_ON_CONFIGURED_PREVIEW",
+    "expectedLoginHideRuleInPreview": "MISSING"
   },
   "remainingIssues": [
-    "Configured ADMIN_TEST_URL serves a UI signature that differs from the tested ADMIN source; exact secret value remains masked. Repository owner must correct the secret to the intended Admin Preview URL.",
-    "Only the unauthenticated login shell is covered by the 16-image local Playwright matrix. Dashboard and authenticated business modules are not verified end-to-end.",
-    "Need safe, read-only screenshots and functional checks for products, orders, customers, warranties, settings, gallery, uploads, backup/restore and audit logs without exposing PII.",
-    "Full screen-by-screen visual comparison against admin-mobile-reference.png is incomplete; login-only screenshots cannot establish visual parity.",
-    "Complete local git status and full branch diff review remain unavailable; GitHub API file review is partial.",
-    "PR #111 has broad storefront/backend scope and remains OPEN/unmerged; full diff audit is blocked without local checkout.",
-    "Reference PNG was not directly decoded in this session; use the existing HTML viewer but verify original image before visual parity claims.",
-    "Authenticated modules and real business-data workflows remain NOT TESTED.",
-    "Evidence workflow commit 3f4af3f9c3cbedd5a43e408797d52cf4e1474f48 only adds test evidence/handoff artifacts; source tests ran on 6df3658c8971bf8f06be71dd2ee36d9dba5e29ad. Do not treat the evidence-only HEAD as a new application-source test.",
-    "Configured ADMIN_TEST_URL serves a UI/CSS signature different from the tested ADMIN source; intended Preview URL/deployment identity remains unconfirmed.",
-    "Complete visual comparison against all 12 approved reference screens remains incomplete.",
-    "Full PR #111 diff/scope audit remains incomplete; latest PR metadata reported a broad 909-file diff against main.",
-    "Local screenshot/fixture evidence is not proof that real authenticated backend modules work.",
-    "PR #111 is 909 files (+30195/-356), diverged 393 commits ahead and 6 behind main; includes storefront, backend, migration, data and scripts. Keep unmerged pending complete scope/ancestry audit.",
-    "Workflow reporting changes after run #39495162150 have not been tested on the current HEAD.",
-    "Remote Preview CSS signature mismatch and intended deployment identity remain unresolved.",
-    "Preview deployment/source identity unresolved; latest remote CSS signature fails.",
-    "Authenticated real-backend module flows remain NOT VERIFIED; fixture screenshots are not business-flow PASS.",
-    "Full 12-screen visual parity remains NOT VERIFIED.",
-    "PR #111 is mixed-scope with 909 files; large public/index.html and data/legacy-products.json diffs remain unreviewed.",
-    "Migration 0008 and scripts/setup-cloudflare.mjs remote D1 behavior require explicit migration/backward-compatibility review before merge/deploy.",
-    "No local checkout is available in the runtime; local git status is NOT VERIFIED.",
-    "Migration procedure mismatch risk: setup uses raw remote d1 execute/direct ALTER for 0008 while deploy gate checks columns only; remote D1 migration ledger is NOT VERIFIED.",
-    "Configured ADMIN_TEST_URL serves a different CSS/UI signature; owner must identify the authorized intended Preview target without revealing/changing secrets or bypassing Access.",
-    "Authenticated real-backend module workflows remain NOT VERIFIED; fixture screenshots are not authenticated QA.",
-    "Full 12-screen visual comparison against approved PNG remains NOT VERIFIED.",
-    "PR #111 remains mixed-scope (909 files, +30553/-356, 405 ahead/6 behind); public storefront, functions/backend, migration, scripts and tests require scope review before merge.",
-    "Remote D1 migration ledger is NOT VERIFIED; setup uses remote d1 execute/direct ALTER while deploy gate only checks schema columns. Migration procedure needs owner-reviewed reconciliation.",
-    "No local Git checkout was available; local git status/working tree remain NOT VERIFIED."
+    "Configured ADMIN_TEST_URL reaches a page whose stylesheet is missing the current ADMIN login-shell hide rule. Owner must identify/point it to an authorized Preview built from the current ADMIN source; secret itself must not be printed.",
+    "Only local unauthenticated login and synthetic/read-only fixture screens have evidence. Authenticated real backend workflows remain NOT TESTED.",
+    "Full visual comparison against all 12 approved reference screens remains incomplete.",
+    "PR #111 is broad/mixed-scope (reported 909 files including public storefront, Functions/backend, migrations, scripts and data fixtures); full diff/scope audit is incomplete and PR must remain unmerged.",
+    "Migration 0008 and scripts/setup-cloudflare.mjs remote D1 behavior/ledger remain NOT VERIFIED; no schema/data or deployment operations were performed.",
+    "No local checkout is available in this runtime; Git working tree and full local diff are NOT VERIFIED."
   ],
   "blockedItems": [
-    "Remote authenticated Playwright testing is blocked by ADMIN_TEST_URL pointing to a source/layout that does not match the tested Admin source; update secret to a valid Admin Preview URL and provide valid access if Cloudflare Access protects it.",
-    "Authenticated module screenshot tests need a current-source Preview plus a safe test-data/PII masking strategy.",
-    "No local checkout is available to verify git status and complete local branch diff.",
-    "Preview source identity cannot be corrected from this session without an authorized owner-provided URL/configuration action; do not modify secrets or bypass Cloudflare Access.",
-    "Real authenticated module testing requires authorized Preview access and a safe test-data/PII masking strategy."
+    "To clear the remote Preview check, owner action is required: supply an authorized current-source ADMIN Preview URL or authorize a preview-only deployment after verifying Preview bindings are isolated. Do not change secrets from this session or run the main-pinned Production deployment.",
+    "Authenticated live module tests need authorized Preview access and safe synthetic/test data with PII masking.",
+    "Reference 12-screen parity and complete PR #111 scope/migration review remain open."
   ],
   "nextActions": [
     "Review the latest real screenshots and metadata under the recorded history path.",
@@ -750,11 +736,11 @@
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
   "branchHeadSha": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
-  "latestVerifiedAt": "2026-10-21T12:14:00+07:00",
-  "latestVerifiedSourceCommit": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
+  "latestVerifiedAt": "2026-10-21T05:19:10Z",
+  "latestVerifiedSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
   "currentAdminBranchHead": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
   "latestVerificationSummary": "Source CI run 39547341928 SUCCESS on 4a1b58950c0b8e9de75009d5af313dfdfbea3595. Dependency audit, project integrity, and automated tests passed. Latest deployed Preview diagnostic 39542387719 remains FAIL at CSS/UI signature check; no new Preview run was performed.",
-  "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
+  "branchHeadBeforeHandoffUpdate": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -870,26 +856,43 @@
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
   "updatedAt": "2026-10-21T12:14:00+07:00",
-  "currentBranchHeadAtHandoff": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
+  "currentBranchHeadAtHandoff": "1677ea93e3b6220bcd9612d9085da5c512300685",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
-    "runId": 39542387719,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
-    "sourceCommit": "de6114f75cba36193c50ad043175d08be092929f",
-    "conclusion": "FAIL",
+    "runId": 39548605474,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
+    "sourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
+    "conclusion": "FAILURE",
+    "failedStep": "Diagnose configured deployed Preview",
     "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
     "observed": {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "loginViewClass": "loginwrap",
       "topbarBrandDisplay": "flex",
       "topbarBrandVisibility": "visible",
       "topbarBrandOpacity": "1",
-      "expectedInlineHideRulePresent": false
+      "browserSupportsHideSelector": true,
+      "hideSelectorMatchesBrand": true,
+      "stylesheetSources": [
+        {
+          "href": "[inline stylesheet]",
+          "ruleCount": 226,
+          "hasLoginHideRule": false,
+          "matchingRules": []
+        }
+      ]
     },
-    "artifact": "admin-preview-evidence-62",
-    "artifactId": 12320316041,
-    "rootCauseStatus": "CONFIGURED_PREVIEW_SOURCE_OR_DEPLOYMENT_IDENTITY_NOT_YET_IDENTIFIED",
-    "cloudflareAccess": "DO NOT BYPASS; no access-control changes attempted",
-    "exactSecretValues": "NOT_READ_OR_REPORTED"
+    "artifact": {
+      "name": "admin-preview-evidence-64",
+      "id": 12322384265,
+      "sizeBytes": 9175416,
+      "expiresAt": "2026-11-04T05:19:09Z"
+    },
+    "rootCauseStatus": "CONFIGURED_PREVIEW_RESPONSE_MISSING_EXPECTED_ADMIN_LOGIN_SHELL_CSS; whether stale deployment or wrong target cannot be distinguished while ADMIN_TEST_URL is masked",
+    "cloudflareAccess": "Test reached ADMIN login; do not bypass or change Access",
+    "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED"
   },
   "latestLocalEvidence": {
     "runId": 39548605474,
@@ -911,20 +914,23 @@
     "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T12:14:00+07:00",
-    "type": "CURRENT_CI_FINAL_POLL",
+    "updatedAt": "2026-10-21T05:19:10Z",
+    "type": "CSSOM_DIAGNOSTIC_AND_CURRENT_PREVIEW_VERIFICATION",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "sourceCodeChanged": false,
-    "testsRunInThisUpdate": false,
+    "sourceCodeChanged": true,
+    "testsRunInThisUpdate": true,
     "verified": [
-      "Re-queried GitHub Actions after the previous in-progress state; run 39547341928 is now SUCCESS on exact commit 4a1b58950c0b8e9de75009d5af313dfdfbea3595.",
-      "Read live Preview artifact metadata for run 39542387719; artifact admin-preview-evidence-62 remains available until 2026-11-04.",
-      "Updated handoff evidence while preserving distinction between source CI and Preview diagnostic."
+      "Corrected the Playwright CSS selector normalization regex and verified the saved source.",
+      "Current source CI run 39548605358 PASS on exact source commit 6935eefa.",
+      "Current Preview diagnostic run 39548605474 FAILED on exact source commit 6935eefa at the deployed CSS assertion.",
+      "Live Preview signature confirms browserSupportsHideSelector=true, hideSelectorMatchesBrand=true, topbarBrandDisplay=flex, hasLoginHideRule=false; configured Preview response lacks expected rule.",
+      "Local Playwright screenshot/fixture suites PASS with 58 PNGs, zero recorded page/console/network/HTTP errors and no attempted writes.",
+      "Evidence artifact admin-preview-evidence-64 (ID 12322384265) stored until 2026-11-04."
     ],
     "notDone": [
-      "No direct image/screenshot rendering from artifact in this connector pass.",
-      "No new Preview diagnostic run; deployed source mismatch remains.",
-      "No authenticated backend QA, full 12-screen reference comparison, or remote D1/migration verification."
+      "ADMIN_TEST_URL exact value remains masked and has not been read, exposed or changed.",
+      "No Admin-branch Preview deployment was performed; Production deployment workflow was not run.",
+      "No authenticated live backend QA, full 12-screen visual parity, full PR #111 diff audit or remote D1/migration review."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -936,10 +942,13 @@
         111,
         108
       ],
-      "productionDeployment": "NOT_PERFORMED"
+      "productionDeployment": "NOT_PERFORMED",
+      "secretsReadOrChanged": false,
+      "cloudflareAccessBypassed": false,
+      "remoteD1R2Operations": false
     }
   },
-  "progressPercent": 43,
+  "progressPercent": 45,
   "prScopeAudit": {
     "checkedAt": "2026-10-21",
     "prNumber": 111,
@@ -983,37 +992,36 @@
     "safety": "No merge/deploy/secret/schema/production-data operation performed; keep PR #111 open until scope and migration review."
   },
   "latestWorkflowFixValidation": {
-    "status": "VALIDATED_ON_DIAGNOSTIC_RUN_BUT_PREVIEW_FAILS",
-    "workflowHeadSha": "de6114f75cba36193c50ad043175d08be092929f",
-    "observedAdminHeadSha": "9c94c106fec99aa5920685da4d4af32b53e680ad",
-    "diagnosticRunId": 39542387719,
-    "diagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
-    "workflowRunsOnCurrentHead": {
-      "sourceCi": 39543407286,
-      "previewDiagnostics": "NOT RUN ON DOCS-ONLY HEAD"
-    },
-    "reason": "The updated diagnostic workflow was executed on de6114f and correctly persisted safe signature evidence, but the real Preview assertion failed. Current HEAD CI is green only for repository checks/tests, not remote Preview."
+    "status": "VALIDATED_SOURCE_CI_PASS_PREVIEW_CSS_MISMATCH_REPRODUCED",
+    "workflowHeadSha": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
+    "diagnosticRunId": 39548605474,
+    "diagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
+    "sourceCiRunId": 39548605358,
+    "sourceCiRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358",
+    "reason": "Normalized CSSOM diagnostics confirm Chromium supports and matches the selector, but the configured Preview stylesheet does not contain the required hide rule."
   },
-  "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
+  "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
   "latestCiVerification": {
-    "runId": 39547341928,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547341928",
-    "sourceCommit": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
+    "runId": 39548605358,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358",
+    "sourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
     "workflow": "Validate source and tests",
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
     "automatedTests": "PASS",
     "dependencyAudit": "PASS",
-    "previewDiagnostics": "NOT_INCLUDED",
+    "previewDiagnostics": "NOT_INCLUDED_IN_THIS_WORKFLOW",
     "remoteD1": "NOT_TESTED",
-    "note": "Current pre-handoff HEAD passed source CI; documentation handoff update itself is a subsequent commit and is not yet covered by this run."
+    "note": "Results validate source commit 6935eefa; later evidence/handoff-only commits must not be described as the source-tested commit."
   },
   "latestPreviewArtifactInspection": {
-    "inspectedAt": "2026-10-21T11:21:00+07:00",
-    "runId": 39542387719,
-    "sourceCommit": "de6114f75cba36193c50ad043175d08be092929f",
-    "artifactName": "admin-preview-evidence-62",
-    "artifactId": 12320316041,
+    "inspectedAt": "2026-10-21T05:19:10Z",
+    "runId": 39548605474,
+    "sourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
+    "artifactName": "admin-preview-evidence-64",
+    "artifactId": 12322384265,
+    "sizeBytes": 9175416,
+    "expiresAt": "2026-11-04T05:19:09Z",
     "totalPngCount": 58,
     "loginShellPngCount": 16,
     "moduleFixturePngCount": 42,
@@ -1032,14 +1040,14 @@
       "light",
       "dark"
     ],
-    "fixturePolicy": "Synthetic UI-only data; local session API stubbed for screenshots; non-GET writes blocked; no live DB/customer data.",
+    "fixturePolicy": "Synthetic/read-only UI fixtures; session unauthenticated; no real business-data mutations",
     "screenshotErrors": {
       "pageErrors": 0,
       "consoleErrors": 0,
       "failedRequests": 0,
       "httpErrors": 0
     },
-    "note": "Counts are separate screenshot suites and must not be represented as authenticated backend test coverage."
+    "note": "Screenshot counts are distinct suite sets. These do not establish authenticated real-backend workflow success."
   },
   "latestReadOnlyPublicFileAudit": {
     "checkedAt": "2026-10-21T11:42:00+07:00",
@@ -1153,19 +1161,39 @@
     "referenceParity": "NOT VERIFIED; full 12-screen comparison remains open."
   },
   "latestPreviewDiagnostics": {
-    "runId": 39542387719,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
-    "sourceCommit": "de6114f75cba36193c50ad043175d08be092929f",
+    "runId": 39548605474,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
+    "sourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
     "conclusion": "FAILURE",
     "failedStep": "Diagnose configured deployed Preview",
-    "reason": "CSS/UI signature mismatch",
-    "artifact": {
-      "id": 12320316041,
-      "name": "admin-preview-evidence-62",
-      "sizeBytes": 9172652,
-      "expiresAt": "2026-11-04T04:10:05Z"
+    "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
+    "observed": {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "loginViewClass": "loginwrap",
+      "topbarBrandDisplay": "flex",
+      "topbarBrandVisibility": "visible",
+      "topbarBrandOpacity": "1",
+      "browserSupportsHideSelector": true,
+      "hideSelectorMatchesBrand": true,
+      "stylesheetSources": [
+        {
+          "href": "[inline stylesheet]",
+          "ruleCount": 226,
+          "hasLoginHideRule": false,
+          "matchingRules": []
+        }
+      ]
     },
-    "currentHeadRunFound": false
+    "artifact": {
+      "name": "admin-preview-evidence-64",
+      "id": 12322384265,
+      "sizeBytes": 9175416,
+      "expiresAt": "2026-11-04T05:19:09Z"
+    },
+    "rootCauseStatus": "CONFIGURED_PREVIEW_RESPONSE_MISSING_EXPECTED_ADMIN_LOGIN_SHELL_CSS; whether stale deployment or wrong target cannot be distinguished while ADMIN_TEST_URL is masked",
+    "cloudflareAccess": "Test reached ADMIN login; do not bypass or change Access",
+    "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED"
   },
   "apiReadOnlyAudit": {
     "checkedAt": "2026-10-21T12:08:00+07:00",
@@ -1175,5 +1203,6 @@
     "severity": "LOW_TO_MEDIUM_UX_ERROR_MAPPING",
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
-  }
+  },
+  "currentAdminBranchHeadBeforeHandoffUpdate": "eff59ab78cfe11b091dfb64df3cc281a3572b343"
 }
