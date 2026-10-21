@@ -46,7 +46,7 @@ function makeHeroTarget() {
 }
 function runHeroSync(rows) {
   const target = makeHeroTarget();
-  const result = vm.runInNewContext(`${heroSync}\nsyncHeroProductImage();`, {
+  const result = vm.runInNewContext(heroSync + String.fromCharCode(10) + "syncHeroProductImage();", {
     products: rows,
     $: selector => selector === '#heroProductImage' ? target : null,
   });
