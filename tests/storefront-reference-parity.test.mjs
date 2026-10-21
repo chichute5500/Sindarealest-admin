@@ -21,7 +21,12 @@ assert.ok(end >= 0, 'The final storefront visual-pass stylesheet must remain ide
 const finalCss = html.slice(end, html.indexOf('</style>', end));
 assert.match(finalCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/);
 assert.match(finalCss, /\.theme-bg--dark::after\{background:linear-gradient\(118deg,rgba\(3,20,36,\.10\),rgba\(7,31,51,\.06\) 52%,rgba\(3,17,30,\.12\)\)\}/);
-assert.match(finalCss, /\.theme-bg--dark::after\{[\s\S]*?rgba\(183,220,245,\.22\)/);
+assert.match(finalCss, /#home\.hero:has\(#heroProductImage\[hidden\]\)::before,[\s\S]*?content:none!important;display:none!important;background:none!important/,
+  'The hero must disable its empty pseudo-card layers when SD-GL052 is unavailable.');
+assert.match(finalCss, /\.hero-copy\{display:flex!important;min-height:0!important;height:auto!important;width:100%!important;/,
+  'The hero copy must determine its own height without a hidden image keeping a tall blank frame.');
+assert.match(finalCss, /\.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important;visibility:hidden!important;min-height:0!important;height:0!important;/,
+  'The unavailable product image frame must collapse completely.');
 assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   'The hero headline must keep the exact three-line hierarchy from the supplied mobile reference.');
 assert.match(finalCss, /#home \.hero h1 span:first-child\{max-width:6em\}/);
