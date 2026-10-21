@@ -45,23 +45,23 @@ assert.match(finalBackgroundCss, /\.theme-bg--dark::after\{background:linear-gra
   "Dark overlay must remain a subtle tint over the diagonal satin art instead of recreating broad wave bands.");
 
 
-assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-10')"),
+assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-11')"),
   "Light theme must use the final cache-versioned pearl-glass SVG background.");
 assert.ok(finalThemeCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}"),
   "Dark theme must preserve the navy-sapphire SVG backdrop without the old color cast.");
 
 
-assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261021-10')"),
+assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261021-11')"),
   "The light background must use the dedicated curved pearl-glass wave artwork.");
-assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261021-10')"),
+assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-dark.svg?v=20261021-11')"),
   "The dark background must use the dedicated curved sapphire-glass wave artwork.");
 const ambientLightStart = finalThemeCss.indexOf(".theme-bg--light{");
 const ambientLight = finalThemeCss.slice(ambientLightStart).split("}")[0] || "";
 const ambientDarkStart = finalThemeCss.indexOf(".theme-bg--dark{");
 const ambientDark = finalThemeCss.slice(ambientDarkStart).split("}")[0] || "";
-assert.ok(ambientLight.includes("images/liquid-glass-light.svg?v=20261021-10"),
+assert.ok(ambientLight.includes("images/liquid-glass-light.svg?v=20261021-11"),
   "The light ambient background must be generated as soft glacial gradients rather than reuse a crocodile-scale product texture.");
-assert.ok(ambientDark.includes("images/liquid-glass-dark.svg?v=20261021-10"),
+assert.ok(ambientDark.includes("images/liquid-glass-dark.svg?v=20261021-11"),
   "The dark ambient background must be generated as flowing navy/sapphire gradients rather than reuse a crocodile-scale product texture.");
 assert.doesNotMatch(ambientLight, /theme-croc-/,
   "Light page ambience must not use the crocodile-scale raster texture as its background.");
@@ -71,9 +71,9 @@ const welcomeLightStart = finalThemeCss.indexOf(".welcome-texture--light{");
 const welcomeLight = finalThemeCss.slice(welcomeLightStart).split("}")[0] || "";
 const welcomeDarkStart = finalThemeCss.indexOf(".welcome-texture--dark{");
 const welcomeDark = finalThemeCss.slice(welcomeDarkStart).split("}")[0] || "";
-assert.ok(welcomeLight.includes("images/liquid-glass-light.svg?v=20261021-10"),
+assert.ok(welcomeLight.includes("images/liquid-glass-light.svg?v=20261021-11"),
   "Light welcome splash must use the same pearl/glacial ambient design language.");
-assert.ok(welcomeDark.includes("images/liquid-glass-dark.svg?v=20261021-10"),
+assert.ok(welcomeDark.includes("images/liquid-glass-dark.svg?v=20261021-11"),
   "Dark welcome splash must use the same navy/sapphire ambient design language.");
 assert.doesNotMatch(welcomeLight, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in light mode.");
@@ -81,8 +81,8 @@ assert.doesNotMatch(welcomeDark, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in dark mode.");
 
 
-assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-10')}")
-  && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-10')}"),
+assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-11')}")
+  && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-11')}"),
   "Portrait viewports must use dedicated vertical wave compositions so the curved ribbons remain visible.");
 assert.match(finalBackgroundCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/,
   "The last Light overlay must preserve the base SVG and avoid broad overlay ribbons.");
@@ -162,3 +162,18 @@ assert.ok(sixTileRefinementCss.includes(".service-strip.glass{")
   "The six-tile refinement must show the satin through a translucent container and tiles while keeping legible light/dark and mobile content.");
 assert.doesNotMatch(sixTileRefinementCss, /#benefits/,
   "The six-tile refinement must not depend on a nonexistent benefits section ID.");
+
+
+/* Regression guard: satin folds must remain visibly layered rather than disappearing into a flat page tint. */
+assert.ok(lightWaveArtwork.includes('stroke-width="6.4" stroke-linecap="round" opacity=".29"')
+  && lightWaveArtwork.includes('stroke-width="1.25" stroke-linecap="round" opacity=".54"'),
+  "Light desktop satin artwork must retain visible but softened fold and highlight layers.");
+assert.ok(darkWaveArtwork.includes('stroke-width="6.4" stroke-linecap="round" opacity=".30"')
+  && darkWaveArtwork.includes('stroke-width="1.25" stroke-linecap="round" opacity=".54"'),
+  "Dark desktop satin artwork must retain visible but softened fold and highlight layers.");
+assert.ok(lightMobileWaveArtwork.includes('stroke-width="2.8" stroke-linecap="round" opacity=".29"')
+  && lightMobileWaveArtwork.includes('stroke-width="0.82" stroke-linecap="round" opacity=".54"'),
+  "Light mobile satin artwork must visibly render the folded silk on portrait viewports.");
+assert.ok(darkMobileWaveArtwork.includes('stroke-width="2.8" stroke-linecap="round" opacity=".31"')
+  && darkMobileWaveArtwork.includes('stroke-width="0.82" stroke-linecap="round" opacity=".54"'),
+  "Dark mobile satin artwork must visibly render the folded silk on portrait viewports.");
