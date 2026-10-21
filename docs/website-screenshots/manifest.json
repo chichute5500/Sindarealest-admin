@@ -4,8 +4,8 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-21T11:20:10Z",
-  "status": "IN PROGRESS",
+  "updatedAtUtc": "2026-10-21T11:20:21.860Z",
+  "status": "AWAITING_HUMAN_VISUAL_REVIEW",
   "note": "End-of-work live Cloudflare Pages Preview capture and pixel comparison completed successfully in workflow 39425677039 against verified Preview deployment 1ab8617f-aac1-42f2-9112-4acc6b0d007a, branch fix/liquid-glass-audit-2026-10-19, source commit 37163dc3c17af332f948311bc395c9839a10e345. Start and end archives each contain 66 screenshots. Comparison: 57 pixel-identical pairs, 9 changed pairs, zero dimension mismatches, zero unmatched/invalid pairs. The changed pairs are the four full-page home captures and the four 'The art of…' collection captures where the autoplay carousel shows a different product image, plus one subtle product-detail desktop-light difference; the collection layout and image dimensions remain stable. Live audit passed 8/8 viewport/theme pairs, canonical product-detail click/direct-open/reload checks, and recorded zero overflow, page/console errors, or read-only violations. Human review of visual parity against the supplied app-like reference collage remains pending; automated capture success does not establish 100% design parity. Production remains untouched.",
   "stages": {
     "start-of-work": {
@@ -1416,7 +1416,7 @@
       "directory": "docs/website-screenshots/end-of-work/",
       "sourceKind": "cloudflare-pages-preview-live-read-only",
       "auditPassed": true,
-      "overallVisualComparison": "UNVERIFIED",
+      "overallVisualComparison": "COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW",
       "responsiveOverflowCount": 0,
       "pageErrorCount": 0,
       "consoleErrorCount": 0,
@@ -3136,7 +3136,17 @@
           "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         }
-      ]
+      ],
+      "pixelComparisonSummary": {
+        "comparablePairs": 36,
+        "identicalPairs": 0,
+        "changedPairs": 36,
+        "dimensionMismatches": 30,
+        "invalidPngPairs": 0,
+        "unmatchedBaselineImages": 0,
+        "unmatchedResultImages": 18
+      },
+      "humanVisualReviewStatus": "PENDING"
     }
   },
   "referenceImages": {
@@ -3169,7 +3179,7 @@
       "result": "The latest verified capture used the canonical /sanpham/sneaker/sneakers-26-41-a route. Earlier diagnostic findings for the legacy route are historical and must not override the latest verified run."
     }
   ],
-  "comparisonStatus": "COMPLETE_NEEDS_VISUAL_REVIEW",
+  "comparisonStatus": "COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW",
   "remainingBlockers": [
     "Human visual acceptance against the supplied Light/Dark reference collage remains pending. The reference depicts an app-like mobile layout and handbags/wallets/belts, while the verified live Preview contains the existing shoe-focused storefront; do not invent product data or alter the public storefront during this Admin Preview audit without explicit scope approval.",
     "Nine screenshot pairs differ at pixel level. The comparison report indicates the changed pairs are primarily time-varying full-page captures and the autoplay 'The art of…' carousel; inspect the attached before/after images if deciding whether any visual change is unintended.",
@@ -3723,24 +3733,24 @@
   "humanVisualReview": {
     "required": true,
     "status": "PENDING",
-    "note": "Automated before/after diff has been inspected for the changed collection captures: the visible change is the rotating product image in the autoplay 'The art of…' carousel. The remaining acceptance question is parity with the supplied app-like Light/Dark reference, which differs materially in layout and product mix from the existing storefront; do not treat the pixel-diff pass as a design-parity pass."
+    "note": "Pixel diff is a review aid; a person must inspect matched screenshots and the report before visual acceptance."
   },
   "pixelComparison": {
-    "runId": "39425677039",
+    "runId": "39590475267",
     "report": "comparison.json and report.html in the GitHub Actions artifact",
-    "status": "COMPLETE_NEEDS_VISUAL_REVIEW",
+    "status": "COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW",
     "summary": {
-      "comparablePairs": 66,
-      "identicalPairs": 57,
-      "changedPairs": 9,
-      "dimensionMismatches": 0,
+      "comparablePairs": 36,
+      "identicalPairs": 0,
+      "changedPairs": 36,
+      "dimensionMismatches": 30,
       "invalidPngPairs": 0,
       "unmatchedBaselineImages": 0,
-      "unmatchedResultImages": 0
+      "unmatchedResultImages": 18
     },
     "matchingFilenameCount": 66,
     "baselineImageCount": 66,
-    "resultImageCount": 66,
+    "resultImageCount": 84,
     "note": "Pixel differences are a review aid, not an aesthetic score. Human visual review remains required."
   },
   "latestStorefrontIntegrationAudit": {
