@@ -629,7 +629,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#main .dashboard-shortcuts [data-view="orders"]')).toContainText('Đơn hàng');
     await expect(page.locator('#main .dashboard-shortcuts [data-view="customers"]')).toContainText('Khách hàng');
     await expect(page.locator('#main .dashboard-shortcuts [data-action="backup"]')).toContainText('Sao lưu');
-    await expect(page.locator('#main .dashboard-revenue')).toBeVisible();
+    await expect(page.locator('.dashboard-revenue')).toBeVisible();
     await expect(page.locator('#main .dashboard-revenue')).toContainText('Chưa thể hiển thị biểu đồ doanh thu');
     await expect(page.locator('#main .dashboard-revenue')).toContainText('Không dùng số đơn gần nhất hoặc dữ liệu chưa xác minh');
     await expect(page.locator('#main .dashboard-activity-table')).toBeVisible();
