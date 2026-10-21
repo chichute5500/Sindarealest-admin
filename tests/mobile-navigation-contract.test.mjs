@@ -39,6 +39,10 @@ for (const opener of [
 assert.match(html,
   /window\.addEventListener\('popstate',event=>\{const currentModal=activeStorefrontModal\(\),targetModal=storefrontModalHistoryType\(event\.state\)/,
   'Back/Forward navigation must resolve modal state before product routing.');
+assert.match(modalHistory, /function closeStorefrontModal\(type,restoreFocus=true\)[\s\S]*?closeAccount\(restoreFocus\)/,
+  'Closing Account and Checkout from browser history must restore focus when appropriate.');
+assert.ok(html.includes("closeStorefrontModal(currentModal,targetModal!=='cart')"),
+  'Checkout-to-cart Back navigation must defer focus restoration until the cart is reopened.');
 for (const closeBinding of [
   "$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart))",
   "$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout))",
