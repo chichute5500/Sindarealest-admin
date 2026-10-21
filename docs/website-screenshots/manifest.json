@@ -4,8 +4,8 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-21T06:56:33Z",
-  "status": "AWAITING_HUMAN_VISUAL_REVIEW",
+  "updatedAtUtc": "2026-10-21T11:20:10Z",
+  "status": "IN PROGRESS",
   "note": "End-of-work live Cloudflare Pages Preview capture and pixel comparison completed successfully in workflow 39425677039 against verified Preview deployment 1ab8617f-aac1-42f2-9112-4acc6b0d007a, branch fix/liquid-glass-audit-2026-10-19, source commit 37163dc3c17af332f948311bc395c9839a10e345. Start and end archives each contain 66 screenshots. Comparison: 57 pixel-identical pairs, 9 changed pairs, zero dimension mismatches, zero unmatched/invalid pairs. The changed pairs are the four full-page home captures and the four 'The art of…' collection captures where the autoplay carousel shows a different product image, plus one subtle product-detail desktop-light difference; the collection layout and image dimensions remain stable. Live audit passed 8/8 viewport/theme pairs, canonical product-detail click/direct-open/reload checks, and recorded zero overflow, page/console errors, or read-only violations. Human review of visual parity against the supplied app-like reference collage remains pending; automated capture success does not establish 100% design parity. Production remains untouched.",
   "stages": {
     "start-of-work": {
@@ -1404,19 +1404,19 @@
     },
     "end-of-work": {
       "status": "CAPTURED_PASS",
-      "capturedAtUtc": "2026-10-20T13:00:28Z",
-      "runId": "39425677039",
-      "sourceCommit": "37163dc3c17af332f948311bc395c9839a10e345",
-      "previewDeploymentCommit": "37163dc3c17af332f948311bc395c9839a10e345",
+      "capturedAtUtc": "2026-10-21T11:20:10Z",
+      "runId": "39590475267",
+      "sourceCommit": "ee874c63622c5713c018a01b19a83fc0595c1c07",
+      "previewDeploymentCommit": "ee874c63622c5713c018a01b19a83fc0595c1c07",
       "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
-      "previewDeploymentId": "1ab8617f-aac1-42f2-9112-4acc6b0d007a",
-      "previewDeploymentCreatedOn": "2026-10-20T12:52:23.139Z",
+      "previewDeploymentId": "820c6255-1b4a-4546-a911-261459aadeff",
+      "previewDeploymentCreatedOn": "2026-10-21T11:15:20.099Z",
       "previewDeploymentVerified": true,
-      "imageCount": 66,
+      "imageCount": 84,
       "directory": "docs/website-screenshots/end-of-work/",
       "sourceKind": "cloudflare-pages-preview-live-read-only",
       "auditPassed": true,
-      "overallVisualComparison": "COMPLETE_NEEDS_VISUAL_REVIEW",
+      "overallVisualComparison": "UNVERIFIED",
       "responsiveOverflowCount": 0,
       "pageErrorCount": 0,
       "consoleErrorCount": 0,
@@ -2301,6 +2301,82 @@
           "comparisonStatus": "UNVERIFIED"
         },
         {
+          "path": "docs/website-screenshots/end-of-work/section-contact-desktop-dark-1440x900.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-desktop-dark-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-desktop-dark-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/section-contact-desktop-light-1440x900.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "desktop-1440",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-desktop-light-1440x900.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-desktop-light-1440x900.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/section-contact-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/section-contact-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "section",
+          "state": "default",
+          "sectionKey": "contact",
+          "elementSelector": "#contact",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/section-contact-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/section-contact-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
           "path": "docs/website-screenshots/end-of-work/section-featured-desktop-dark-1440x900.png",
           "route": "/",
           "theme": "dark",
@@ -2681,6 +2757,272 @@
           "comparisonStatus": "UNVERIFIED"
         },
         {
+          "path": "docs/website-screenshots/end-of-work/state-account-menu-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": "#accountDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-account-menu-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": "#accountDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
+          "route": "/",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-light-390x844.png",
+          "route": "/",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "account-menu-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": "#cartDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": "#cartDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "cart-with-item",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": "#checkoutDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": "#checkoutDrawer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state-viewport",
+          "state": "checkout-form-open",
+          "sectionKey": null,
+          "elementSelector": null,
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "dark",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "fullscreen-gallery",
+          "sectionKey": null,
+          "elementSelector": "#sdFullscreenViewer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
+          "path": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
+          "route": "/sanpham/sneaker/sneakers-26-41-a",
+          "theme": "light",
+          "viewportName": "mobile-390",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "captureType": "state",
+          "state": "fullscreen-gallery",
+          "sectionKey": null,
+          "elementSelector": "#sdFullscreenViewer",
+          "status": "captured-live-preview",
+          "baselinePath": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
+          "resultPath": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
+          "counterpartExists": false,
+          "comparisonStatus": "UNVERIFIED"
+        },
+        {
           "path": "docs/website-screenshots/end-of-work/state-menu-open-mobile-dark-390x844.png",
           "route": "/",
           "theme": "dark",
@@ -2794,17 +3136,7 @@
           "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         }
-      ],
-      "pixelComparisonSummary": {
-        "comparablePairs": 66,
-        "identicalPairs": 57,
-        "changedPairs": 9,
-        "dimensionMismatches": 0,
-        "invalidPngPairs": 0,
-        "unmatchedBaselineImages": 0,
-        "unmatchedResultImages": 0
-      },
-      "humanVisualReviewStatus": "PENDING"
+      ]
     }
   },
   "referenceImages": {
@@ -3343,11 +3675,11 @@
     "noProductionDeployOrMerge": true,
     "nextStep": "Finish visual acceptance review of the 9 changed screenshot pairs and clarify the boundary between Admin Preview audit and the separate supplied public-storefront reference design. Do not merge or deploy Production."
   },
-  "sourceCommit": "37163dc3c17af332f948311bc395c9839a10e345",
-  "previewDeploymentCommit": "37163dc3c17af332f948311bc395c9839a10e345",
+  "sourceCommit": "ee874c63622c5713c018a01b19a83fc0595c1c07",
+  "previewDeploymentCommit": "ee874c63622c5713c018a01b19a83fc0595c1c07",
   "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
-  "previewDeploymentId": "1ab8617f-aac1-42f2-9112-4acc6b0d007a",
-  "previewDeploymentCreatedOn": "2026-10-20T12:52:23.139Z",
+  "previewDeploymentId": "820c6255-1b4a-4546-a911-261459aadeff",
+  "previewDeploymentCreatedOn": "2026-10-21T11:15:20.099Z",
   "previewCommitVerification": "VERIFIED via Cloudflare Pages API read-only deployment metadata; target alias matched an environment=preview deployment with successful stage status.",
   "captureSource": "Direct Cloudflare Pages Preview capture, read-only; no fixture API",
   "captureCoverage": {
@@ -3362,6 +3694,7 @@
       "featured",
       "collections",
       "products",
+      "contact",
       "footer"
     ],
     "sectionScreenshotCounts": {
@@ -3371,13 +3704,19 @@
       "featured": 4,
       "collections": 4,
       "products": 4,
+      "contact": 4,
       "footer": 4
     },
     "requiredSectionScreenshotsComplete": true,
     "menuOpenCount": 2,
     "orderExpandedCount": 4,
+    "accountMenuCount": 2,
+    "fullscreenGalleryCount": 2,
+    "cartWithItemCount": 2,
+    "checkoutFormCount": 2,
+    "commerceStatesComplete": true,
     "productDetailContextsComplete": true,
-    "totalScreenshotCount": 66
+    "totalScreenshotCount": 84
   },
   "liveAuditPassed": true,
   "accessServiceTokenConfigured": true,
