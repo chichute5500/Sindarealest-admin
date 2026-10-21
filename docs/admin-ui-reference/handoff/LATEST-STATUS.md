@@ -41,3 +41,17 @@
 - Phạm vi bảo vệ: chỉ làm trên `fix/liquid-glass-audit-2026-10-19`; không merge main, không deploy Production, không thay backend/API/schema/bindings/secret/dữ liệu.
 - Tình trạng đã xác minh: tài liệu kiểm kê được tạo và đọc lại từ GitHub. Đây chỉ là kiểm kê ban đầu; chưa sửa icon giao diện, chưa có kiểm thử runtime/ảnh so sánh. Các mục đó vẫn NOT TESTED.
 - Việc kế tiếp: đọc `docs/icon-system-inventory.md`, xác minh lại branch HEAD/source SHA, kiểm kê các icon sinh động khi chạy, triển khai từng nhóm và cập nhật kết quả/ảnh theo SHA thực tế.
+
+
+---
+
+## Bổ sung trạng thái — yêu cầu icon động/fly-to-cart (2026-10-22)
+
+**Loại cập nhật:** đặc tả + trình tự triển khai an toàn; không phải báo cáo hoàn thành code.
+
+- Prompt nguồn cập nhật: `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`, mục XXII.
+- Inventory cập nhật: `docs/icon-system-inventory.md`.
+- Yêu cầu mới: Liquid Glass không ripple; icon lún/đổi màu khi nhấn; heart đỏ khi đã thích; cart badge và toast khớp kết quả thật; mọi điểm thêm hàng dùng chung animation bay đến icon cart trên header; clone dùng đúng ảnh đang hiển thị, product và variant; không dịch chuyển DOM gốc hoặc add trùng.
+- Trình tự: xác minh branch/HEAD/Preview trước; đọc source và baseline; audit mọi điểm add/cart/heart; chia thay đổi nhỏ; test/Playwright và ảnh Preview mỗi lát; kiểm tra đúng ảnh, đúng quantity, responsive và reduced-motion; cập nhật bằng chứng sau cùng.
+- Ranh giới không đổi: chỉ branch `fix/liquid-glass-audit-2026-10-19`; không merge/main/Production; không sửa backend, API, schema, database, secrets, bindings hoặc dữ liệu.
+- **Trạng thái kiểm chứng:** prompt/inventory/handoff là tài liệu yêu cầu. Chưa có bằng chứng cho thấy animation đã được code hoặc Playwright đã xác nhận; ghi nhận là `SPECIFIED / NOT IMPLEMENTED-VERIFIED` cho đến khi có test thực tế.
