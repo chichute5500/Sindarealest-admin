@@ -361,3 +361,8 @@ This section clarifies storefront behavior and does not authorize work on Admin 
 5. Run relevant tests, deploy only Preview through GitHub Actions, verify deployment SHA, capture real screenshots and update `docs/website-screenshots/manifest.json` only after evidence exists. Update this handoff with exact commit, run/artifact URLs, outcomes and remaining blockers.
 
 **Status honesty:** this handoff addendum records the contract and next implementation requirements; it does not claim the storefront QR/payment/product-type feature is complete. Keep the satin/reference audit separate; its known `SD-GL052` blocker remains unresolved and must not be “fixed” by fabricating product data.
+
+
+## Current handoff pointer — 2026-10-21
+
+Before work, read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and `docs/handoff/PROMPT-NEXT-CHAT-2026-10-21.md`. The storefront branch must only consume public API and implement customer UI/tests. Admin AI owns Admin UI, schema, product classification persistence, QR setup and payment verification on its own branch. Current API creates orders as `pending_confirmation`; no verified active public QR or public order-status lookup exists, so checkout must not show QR/amount and must say “Chờ cửa hàng xác nhận” / “Vui lòng chưa chuyển tiền”. Never infer product type or mark payment paid from QR scan/receipt/customer claim. Keep PR #108 open; no Production changes.
