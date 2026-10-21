@@ -184,3 +184,10 @@ This was a read-only source review of the existing payment contract and route co
 - Local source screenshot matrix and deployed Preview login CSS signature both passed; artifact `admin-preview-evidence-188` ID `12357698923` includes 59 PNGs and 36 fixture metrics. Fixture/API access is synthetic/read-only; it is not authenticated real-backend QA.
 - Requirement status: `prefers-reduced-motion` smoke audit = PASS on the exact tested SHA; full 12-screen visual parity = NOT ACCEPTED; authenticated business QA = BLOCKED / NOT TESTED; product image save and PRE/PRO migration = DEFERRED_BY_OWNER.
 - Overall progress remains 48%. No PR merge, Production deployment, secret/Access changes, remote D1/R2 operation, migration/setup execution, or static-branch/main writes.
+
+
+## Keyboard test follow-up — exact-SHA evidence
+
+- Exact SHA `32c1f28662e7240353b0eda2f5daeaf22359257e` passed Validate Source [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Admin Preview/Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169). Browser suite reported 3 passed (30.5s).
+- Added Home/End keyboard navigation assertions for the product editor tablist, verifying active focus and `aria-selected`. Existing ArrowLeft/ArrowRight and modal focus behavior assertions remain. Test-only scope.
+- Requirement status: editor tab keyboard behavior = PASS for the tested fixture; cross-module keyboard/accessibility = PARTIAL; visual parity across 12 screen families = NOT ACCEPTED; authenticated backend QA = BLOCKED / NOT TESTED; product image-save and PRE/PRO migrations = DEFERRED_BY_OWNER. Overall estimate stays 48%.
