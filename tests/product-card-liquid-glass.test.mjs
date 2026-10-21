@@ -141,6 +141,6 @@ console.log("PASS: storefront product cards use reference ice-blue/navy Liquid G
 
 assert.ok(finalThemeCss.includes('body:has(.sd-fullscreen-viewer.open) .mobile-bottom-nav{display:none!important}'),
   "Immersive fullscreen gallery must not be obscured by the persistent app navigation.");
-assert.ok(finalThemeCss.includes('background:rgba(247,252,255,.96)!important;')
-  && finalThemeCss.includes('background:rgba(4,20,34,.96)!important;'),
+assert.ok(finalThemeCss.includes('background:rgba(247,252,255,.995)!important;')
+  && finalThemeCss.includes('background:rgba(4,20,34,.995)!important;'),
   "Persistent mobile navigation must keep sufficient contrast over scrolling content in both themes.");
