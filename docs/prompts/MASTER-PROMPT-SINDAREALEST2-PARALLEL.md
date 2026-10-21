@@ -499,3 +499,7 @@ Verified continuation note — 2026-10-21
 ## Verified continuation note — 2026-10-21
 
 Latest recorded working HEAD: `01191b0a49487145c9837ca9d765328255c64cbf`; PR #108 remains open and unmerged. Mobile populated-cart drawer compaction and two regression assertions are committed. Diagnostic screenshot artifact 12344517302 is useful for visual inspection, but its guarded live capture/archive and pixel-diff steps were skipped due to exact deployment SHA verification; it does not prove exact-SHA live PASS. Before further visual acceptance, verify current validation and Cloudflare Preview deployment SHA, then use the guarded capture workflow. Do not touch Admin/Production or manually edit screenshot manifest. Visual parity remains pending human review.
+
+ 
+### New continuation checkpoint — 2026-10-21
+The latest code change addresses theme-toggle jank by replacing the long glass-surface transition with a 220ms paint-only transition and adding a regression test. Treat automated CI, Preview deployment, live browser audit and exact-SHA screenshot archival as separate gates. Do not claim visual parity until the matched start/end screenshots are reviewed. Keep Admin/Production/backend/data contracts out of scope and do not merge PR #108.

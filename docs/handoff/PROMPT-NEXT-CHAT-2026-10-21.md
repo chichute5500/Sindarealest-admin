@@ -305,3 +305,9 @@ Latest verified continuation — cart drawer
 ## Latest verified continuation — mobile cart drawer (2026-10-21)
 
 Current branch HEAD was verified as `01191b0a49487145c9837ca9d765328255c64cbf` and PR #108 remains open/unmerged. Commits `31ceacf` and `01191b0` add compact populated-cart mobile CSS and two static regression assertions. Diagnostic artifact 12344517302 shows the cart-with-item mobile Dark drawer is more compact, but guarded canonical live capture/archive steps were skipped due to a deployment/source SHA verification mismatch. Treat visual result as diagnostic only, not a live exact-SHA PASS. Re-verify latest validation/deployment and run guarded capture for the exact current SHA; never hand-edit the screenshot manifest. Continue mobile Back/Forward, theme toggle, satin/hero, six glass tiles, crocodile-leather and order-assurance sections, product/detail/gallery, cart/account/checkout, Zalo/footer, direct/invalid routes and 404. Keep Admin, Production, backend data/contracts and PR merge out of scope.
+
+ 
+### Latest continuation — theme-toggle jank and guarded capture (2026-10-21)
+- The current change reduces theme transition cost: 220ms for background/color/border/shadow, no animated `backdrop-filter`; a regression check was added.
+- First verify this commit's CI, Preview deploy and guarded `end-of-work` workflow. Exact Preview deployment SHA must match the workflow source SHA before canonical screenshots can be updated. If the guarded stage fails, inspect its artifact/logs and keep manifest truth intact.
+- Next continue full live Light/Dark and responsive comparison, especially satin backgrounds, hero image treatment, 6 benefit cards, order panel, gallery controls, account/cart/checkout, footer and navigation. Do not repeat previously PASS tests unless changed code touches them; no Admin, Production or merge.

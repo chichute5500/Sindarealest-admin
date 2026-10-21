@@ -512,3 +512,9 @@ Verified continuation update — 2026-10-21 (mobile cart compaction)
 - Earlier source validation and Preview deployment runs for this change were reported successful; verify the latest checks again before final acceptance. Stable Preview URL remains https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ and requires Cloudflare Access in a normal unauthenticated browser.
 - Next actions: inspect exact current workflow run and deployment verification JSON; get a guarded live capture for exact SHA; review the cart capture and other storefront states; then continue mobile Back/Forward and theme-toggle regression checks, satin/hero and required sections visual review. Keep pixel parity as awaiting human review until actual matched reference screenshots are reviewed.
 - Estimated overall storefront completion: approximately 70%, an engineering estimate only, not a visual parity score. PR #108 remains open; do not merge.
+
+ 
+### Continuation update — theme-toggle responsiveness (2026-10-21)
+- Source review found the glass-surface theme transition included `backdrop-filter` at 1.15s while JavaScript removed `.theme-transitioning` after 320ms. The final CSS override now uses 220ms transitions for color, background, border and shadow only; a regression assertion was added.
+- This commit requests a guarded `end-of-work` Preview capture. Only trust the capture/archive if the workflow verifies the exact deployment branch, environment, alias and commit SHA. A passing live page audit alone does not authorize canonical archiving.
+- Existing baseline and prior end capture remain evidence, not visual sign-off. Keep overall completion as an estimate, not a parity score; human review of matched screenshots remains required.

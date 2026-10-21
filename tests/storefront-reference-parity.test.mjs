@@ -156,3 +156,11 @@ assert.match(html, /@media\(max-width:760px\)\{\s*\.cart-drawer:has\(\.cart-row\
   'A mobile cart containing items must size to content while respecting the viewport maximum.');
 assert.match(html, /\.cart-drawer:has\(\.cart-row\) \.cart-list\{\s*flex:0 1 auto!important;\s*max-height:40dvh;\s*min-height:0!important;\s*overflow-y:auto!important;/,
   'A populated cart list must not absorb all free vertical space and must remain scrollable for multiple items.');
+
+ 
+// Theme toggles must avoid long backdrop-filter interpolation that causes mobile jank.
+const performantThemeTransition = html.slice(html.lastIndexOf('/* Keep theme toggles responsive on phones:'));
+assert.match(performantThemeTransition, /transition:background-color \.22s ease,border-color \.22s ease,box-shadow \.22s ease,color \.22s ease!important/,
+  'Theme switching should use a short 220ms paint-only transition.');
+assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/,
+  'Theme switching must not animate expensive backdrop-filter changes across glass surfaces.');

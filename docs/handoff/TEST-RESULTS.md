@@ -533,3 +533,9 @@ Continuation evidence — mobile cart compacting (2026-10-21)
 - Capture status: NOT PASS for canonical exact-SHA live capture. The diagnostic run's steps `Verify actual Cloudflare Pages deployment before manual capture`, `Capture live Cloudflare Pages Preview`, `Save live Preview images into selected repository archive`, and pixel comparison were skipped. No screenshot archive/manifest was changed by this run.
 - Do not reuse prior 84-screenshot or 8/8 viewport-theme results as proof for HEAD `01191b0`; those belong to earlier captured SHAs. Require a successful exact-SHA deployment verification and guarded live capture.
 - Outstanding: verify current validation/deploy runs, confirm exact deployed source SHA, rerun guarded capture, review hero Light/Dark mobile/desktop and broader required storefront sections. Canonical visual acceptance remains pending human review.
+
+ 
+### Continuation test guard — theme-toggle responsiveness (2026-10-21)
+- Added a static regression test that requires 220ms paint-only theme transitions and disallows transition declarations containing `backdrop-filter`.
+- The branch commit requests guarded end-of-work capture. Report CI, Preview deployment, live audit and deployment-SHA verification separately; do not call screenshots accepted when the selected deployment SHA differs from the source SHA.
+- No Admin, Production, product data, D1/R2 bindings, secrets or backend contracts are changed by this CSS/test update.

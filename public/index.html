@@ -2600,6 +2600,10 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
   }
 }
 
+
+/* Keep theme toggles responsive on phones: avoid repaint-heavy backdrop-filter transitions. */
+html.theme-transitioning .nav,html.theme-transitioning .glass,html.theme-transitioning .glass-soft,html.theme-transitioning .product-card,html.theme-transitioning .promise,html.theme-transitioning .mosaic-card,html.theme-transitioning .custom-text,html.theme-transitioning .footer,html.theme-transitioning .contact-link{transition:background-color .22s ease,border-color .22s ease,box-shadow .22s ease,color .22s ease!important}
+
 </style>
 
 </body>

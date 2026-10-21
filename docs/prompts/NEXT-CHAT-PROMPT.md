@@ -300,3 +300,7 @@ Continuation update — 2026-10-21
 ## Continuation update — 2026-10-21
 
 Start from branch `fix/liquid-glass-audit-2026-10-19`, HEAD `01191b0a49487145c9837ca9d765328255c64cbf` (verify again), PR #108 open/unmerged. Recent commits compact the populated mobile cart drawer and add two regression assertions. Artifact 12344517302 contains diagnostic screenshots but is not a canonical live capture: exact deployment SHA verification failed and guarded live archive/pixel-diff steps were skipped. First re-check current validation, Preview deploy SHA and workflow statuses, then guarded exact-SHA live capture. Continue full storefront visual/functional audit; no Admin, Production, backend/data/config changes, no merge, no manual screenshot/manifest edits.
+
+ 
+### Latest implementation checkpoint — 2026-10-21
+Theme-toggle transition performance is being corrected and guarded by a static regression test. Verify the associated CI/Preview and guarded end-of-work capture by exact SHA; inspect workflow artifacts if archive is blocked. Continue the full storefront visual audit and human comparison without re-running unchanged PASS tests. Do not modify Admin, Production, backend contracts, product data or merge the PR.
