@@ -101,8 +101,10 @@ assert.match(baselineSpec, /fixtureImages: 2/,
 // Guard the visual-capture harness against flaky scrolling of hidden desktop-only table rows.
 assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
   'Visual capture should pass viewport/theme context into screen-specific setup');
-assert.match(baselineSpec, /variant\.viewport\.width < 821\) return;/,
-  'Order table scrolling must be skipped in the responsive mobile-card layout');
+assert.match(adminHtml, /mobilecards/,
+  'Responsive order tables should provide the mobile-card layout checked by the visual matrix');
+assert.match(baselineSpec, /captureView\('order-row-details'/,
+  'The visual matrix should exercise order details without relying on a hidden desktop-table scroll path');
 assert.match(baselineSpec, /expect\.poll\(async \(\) => page\.evaluate\(\(\) => \{/,
   'Order row scrolling should wait for an attached DOM node');
 
