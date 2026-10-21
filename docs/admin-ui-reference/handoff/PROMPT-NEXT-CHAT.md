@@ -258,3 +258,24 @@ Only `feature/admin-isolated-handoff-2026-10-20`. Never edit `main` or `fix/liqu
 
 ## Progress
 Overall Admin estimate: **46%**. QR/fulfillment estimate: **70%**. These are management estimates, not acceptance scores. Current integration acceptance remains **NOT VERIFIED** until current authorized Preview and cross-branch contract compatibility are evidenced.
+
+## Checkpoint đã xác minh mới nhất — 2026-10-21
+
+- Source/test commit: `cedebd78b2056ae4d0e6f6982793106b586d99b2`. Source CI [39565547871](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547871) **PASS** (dependency audit, integrity validation, automated tests).
+- Preview diagnostics [39565547828](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828) **FAIL** trên đúng source SHA: `PREVIEW_CSS_SIGNATURE_MISMATCH`; `.topbar > .brand` visible (`display:flex`, `visibility:visible`, opacity 1), selector support/match true, stylesheet có 226 rules nhưng `hasLoginHideRule=false`. Không hạ assertion và không đọc/đổi secret.
+- Artifact [admin-preview-evidence-116](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828/artifacts/12329841294) (ID 12329841294, khoảng 9,3 MB; giữ đến 2026-11-04) chứa 58 PNG: 16 login-shell + 42 fixture module, 36 metrics. Metadata: zero page/console/network/HTTP errors, zero attempted writes. Fixture/source only; không phải authenticated backend QA.
+- Code hardening trong source SHA: `order-payment.js` thêm private/no-store; pending request được ưu tiên; `payment-requests.js` fail-closed khi QR storage/object thiếu và từ chối line_total null/empty/invalid; `payment-settings.js` không công khai URL/tài khoản nếu object QR active mất. Regression tests đã được CI chạy PASS.
+- Đã xem một phần screenshot nguồn/fixture (login, dashboard, products, orders tại 390×844 light) để rà bố cục; đối chiếu đủ 12 màn hình với PNG chuẩn vẫn **NOT VERIFIED** trong lượt này.
+- Tiến độ 46% tổng thể / 70% QR stage (ước lượng theo giai đoạn). Authenticated backend, Preview identity, 12-screen parity, migration ledger và full PR #111 review vẫn OPEN.
+- PR #111 OPEN/unmerged: 1.072 file (+36.072/−389), mixed scope. PR #108 OPEN/unmerged. Không merge, không deploy Production, không sửa static/main, không thao tác D1/R2/secret/migration từ xa.
+- Working tree Git cục bộ: NOT VERIFIED vì runtime hiện tại không có checkout local; xác minh thông qua GitHub API.
+
+
+## Tiếp tục từ checkpoint mới nhất
+1. Đọc Master Prompt, START-HERE, LATEST-STATUS, JSON, PROMPT-COMPLETENESS-AUDIT, reference instructions và QR/payment contract trực tiếp từ nhánh ADMIN; xác minh HEAD/PR/Actions trước khi sửa.
+2. Code/test SHA mới nhất được xác minh ở checkpoint này là `cedebd78b2056ae4d0e6f6982793106b586d99b2`: source CI PASS; Preview remote FAIL. Không tái dùng PASS cũ cho code mới.
+3. Tiếp tục audit source/API/accessibility/responsive; giữ riêng evidence source fixture, Preview từ xa và authenticated backend QA.
+4. Cần chủ dự án xác nhận Preview URL/deployment hợp lệ trỏ đến source ADMIN mới nhất và cách truy cập Cloudflare Access được ủy quyền. Không gửi hoặc chỉnh secrets, không bypass Access.
+5. PR #111 (1.072 file mixed-scope) và PR #108 phải OPEN/unmerged. Không cherry-pick, force-push, đổi base, merge hoặc viết lại lịch sử.
+6. Không deploy Production, không chạy remote D1/R2/migration/setup, không sửa dữ liệu thật, main hay nhánh website tĩnh.
+
