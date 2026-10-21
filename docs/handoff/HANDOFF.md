@@ -669,3 +669,8 @@ Continue the SinDarealest2 static storefront from the latest GitHub state. Read 
 3. So sánh mobile light/dark và desktop light/dark với đúng hai reference gốc: `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` và `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`. Bổ sung viewport còn thiếu: 360×800, 390×844, 768×1024, 1440×900; không cần chụp lại trạng thái đã có bằng chứng hợp lệ trừ khi commit/deploy thay đổi.
 4. Tiếp tục sửa toàn bộ website công khai theo reference, không chỉ homepage: satin background, hero, “Phong cách đẳng cấp từ da cá sấu”, vùng 6 ô Liquid Glass, “Đặt hàng an tâm”, category/product grid/search, product detail/gallery, cart/account/checkout, Zalo CTA, footer, 404 và các trạng thái Light/Dark/System. Sửa từng nguyên nhân cụ thể, rồi chỉ chạy test bị ảnh hưởng và visual regression liên quan.
 5. Cập nhật ledger, manifest và handoff sau mỗi chu kỳ có thay đổi; báo cáo ngắn rồi tự tiếp tục công việc. Chỉ dừng khi thật sự cần thao tác/ý kiến của người dùng hoặc có blocker ngoài quyền xử lý.
+
+
+### Phân biệt SHA code và SHA cập nhật tài liệu
+- SHA code/audit được kiểm tra trước khi cập nhật handoff: `b2cb59f02bb19783e1e395adefd9d9b0597ce52a`.
+- Các commit cập nhật tài liệu tiếp theo: handoff `68ededda588e92d7287db151e47f07e48a1b66ee`, test ledger `dfce806cb4e42867066145d691b32b1e7c405288`, prompt `90f1388ea9be6282c7f23da8a61096a509c05799`. HEAD hiện tại sau cập nhật tài liệu là `90f1388ea9be6282c7f23da8a61096a509c05799`; các commit này chỉ cập nhật tài liệu, không phải thay đổi giao diện. Khi tiếp tục, xác minh lại HEAD mới nhất trước khi thao tác và kiểm tra xem có commit code nào mới hơn không.
