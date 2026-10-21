@@ -806,7 +806,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     }, true);
     await captureView('customers', 'customers', async variant => {
       // Reference screen #8: synthetic, client-side search only; mutation endpoints remain blocked.
-      await expect(page.getByLabel('Tìm tên, số điện thoại hoặc email')).toBeVisible();
+      await expect(page.getByLabel('Tìm tên, số điện thoại, email hoặc địa chỉ')).toBeVisible();
       await expect(page.locator('#customerSearchStatus')).toHaveAttribute('aria-live', 'polite');
       await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
       await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
@@ -817,6 +817,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('#customerSearch').fill('0000000002');
       await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
       await page.locator('#customerSearch').fill('fixture-two@example.test');
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
+      await page.locator('#customerSearch').fill('ĐỊA CHỈ TEST');
       await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
       await page.locator('#customerSearch').fill('no-match-ui-query');
       await expect(page.locator('.customer-table tbody')).toContainText('Không tìm thấy khách hàng phù hợp.');
