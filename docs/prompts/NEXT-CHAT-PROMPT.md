@@ -1,3 +1,26 @@
+## BÀN GIAO MỚI — 2026-10-22 (trạng thái sau khi xem artifact first-paint)
+
+### Tiến độ ước tính
+- **Khoảng 70% hoàn thành (ước lượng làm việc, chưa phải kết quả audit cuối).** Nhiều kiểm tra viewport/route/state đã PASS ở các SHA trước; vẫn chưa đủ bằng chứng để đóng toàn bộ audit thị giác và khởi tạo trang.
+- Không ghi 100% khi audit còn hard failure hoặc chưa có xác minh trực tiếp trên Preview cùng SHA với source.
+
+### SHA / PR / thay đổi gần nhất
+- Repo `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 vẫn open/unmerged. Không merge.
+- PR HEAD quan sát được trong phiên: `6d68a2580bc8c0d762dbaa4aeb1f00760344de2f`.
+- Sửa instrumentation tại `scripts/capture-cloudflare-preview.mjs`: chọn mẫu timeline gần nhất ở hai phía offset yêu cầu, không dùng một mẫu cho nhiều offset, ghi `offsetDeltaMs` và `toleranceMs`. Commit được tạo: `c70cfd7767c94bad365f3d969664313a5e985c6b`. Do có commit đồng thời, bước đầu tiên của chat mới là fetch HEAD và kiểm tra xem commit này đã nằm trong nhánh hay bị commit mới hơn ghi đè/cherry-pick.
+- Artifact đã xem: run `39655449912`, artifact `12370932919`. Frame ~200–300 ms cho thấy welcome splash phủ toàn màn hình, bottom nav/account drawer đang ẩn. Đây chỉ là ảnh tĩnh: chưa thể kết luận hiện tượng flash UI tài khoản ~100 ms đã hết hoặc chưa từng xảy ra.
+
+### Việc phải làm tiếp (không dừng sau báo cáo)
+1. Fetch branch HEAD + PR metadata mới nhất; kiểm tra diff của `scripts/capture-cloudflare-preview.mjs`, không ghi đè commit mới.
+2. Chạy source tests liên quan và workflow Preview trên đúng SHA mới nhất; lưu run URL/artifact ID/SHA.
+3. Đọc toàn bộ startup videos `first-paint-videos/welcome-startup-*.webm` và `firstPaintTimelines` cho mobile 360/390 Light/Dark. Xác định có sample nào `violation=true` (welcome-active đồng thời có bottom nav/account/cart/checkout/backdrop hiển thị). Nếu còn flash, sửa nguyên nhân khởi tạo/ẩn-hiện; không nới điều kiện để che lỗi.
+4. Xác minh ảnh Hero trực tiếp trên Preview: giữ `public/images/hero-sd-gl052.png` như ảnh trình bày do người dùng tải lên; không tìm SKU trong catalog, không ẩn/thay ảnh vì thiếu SKU. Kiểm tra HTTP/load, crop, blend satin, Light/Dark và viewport.
+5. Tiếp tục audit các sai khác còn lại so với reference; chỉ chạy lại test PASS khi source thay đổi hoặc cần xác minh tương quan SHA.
+6. Cập nhật handoff/prompt sau khi có kết quả mới. Báo cáo ngắn gọn rồi tiếp tục tự động; chỉ dừng khi cần người dùng thao tác/cho phép hoặc thiếu dữ liệu/quyền thật sự.
+
+### Ranh giới không thay đổi
+Không làm Admin branch, không đụng Production/main/DNS/D1/R2/bindings/secrets/Access policy, không merge PR. Giữ logo chính thức và dữ liệu thật; không dùng fixture như bằng chứng live. Checkout QR vẫn fail-closed nếu backend chưa cung cấp xác nhận tin cậy.
+
 ## BÀN GIAO BỔ SUNG — 2026-10-22 (ưu tiên cao nhất; lỗi khởi tạo trang cần xác minh)
 
 ### Yêu cầu người dùng mới
