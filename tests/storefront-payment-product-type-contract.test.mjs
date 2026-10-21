@@ -9,7 +9,7 @@ assert.equal(fromRow({id:'p3',slug:'p3',sku:'SD-P3',title:'P3',category:'sneaker
 assert.equal(fromRow({id:'p4',slug:'p4',sku:'SD-P4',title:'P4',category:'sneakers',stock:5,fulfillment_type:'made_to_order',published:1}).fulfillmentType,'made_to_order');
 assert.equal(fromRow({id:'p5',slug:'p5',sku:'SD-P5',title:'P5',category:'sneakers',fulfillment_type:'guess',published:1}).fulfillmentType,'unclassified');
 for(const id of ['fulfillmentFilters','detailFulfillment','paymentInstructions'])assert.match(html,new RegExp('id="'+id+'"'));
-assert.match(html,/data-fulfillment="\'+type\'/);
+assert.ok(html.includes("data-fulfillment=\"'+type+'\""), 'Filter uses the explicit fulfillment enum.');
 assert.match(html,/selectedFulfillment==='all'\|\|productFulfillmentType\(p\)===selectedFulfillment/);
 assert.match(html,/result\?\.status==='confirmed'/);
 assert.match(html,/payment\?\.qrIncludesAmount===false/);
