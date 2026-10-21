@@ -13,8 +13,8 @@ assert.ok(heroSectionStart >= 0 && heroSectionEnd > heroSectionStart,
 const heroSection = html.slice(heroSectionStart, heroSectionEnd);
 assert.match(heroSection, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   "the Hero must keep the confirmed three-line brand headline hierarchy");
-assert.match(heroSection, /<img id="heroProductImage" alt="" decoding="async" fetchpriority="high">/,
-  "the Hero image must remain a decorative image with no hardcoded source");
+assert.match(heroSection, /<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">/,
+  "the Hero image must start hidden and remain decorative until a verified public SKU is mapped");
 assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\bsrc=/,
   "do not hardcode a Hero image source in HTML; its source is selected dynamically");
 
