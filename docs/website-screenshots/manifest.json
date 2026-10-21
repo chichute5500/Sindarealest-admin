@@ -4,7 +4,7 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-20T13:32:00Z",
+  "updatedAtUtc": "2026-10-21T06:56:33Z",
   "status": "AWAITING_HUMAN_VISUAL_REVIEW",
   "note": "End-of-work live Cloudflare Pages Preview capture and pixel comparison completed successfully in workflow 39425677039 against verified Preview deployment 1ab8617f-aac1-42f2-9112-4acc6b0d007a, branch fix/liquid-glass-audit-2026-10-19, source commit 37163dc3c17af332f948311bc395c9839a10e345. Start and end archives each contain 66 screenshots. Comparison: 57 pixel-identical pairs, 9 changed pairs, zero dimension mismatches, zero unmatched/invalid pairs. The changed pairs are the four full-page home captures and the four 'The art of…' collection captures where the autoplay carousel shows a different product image, plus one subtle product-detail desktop-light difference; the collection layout and image dimensions remain stable. Live audit passed 8/8 viewport/theme pairs, canonical product-detail click/direct-open/reload checks, and recorded zero overflow, page/console errors, or read-only violations. Human review of visual parity against the supplied app-like reference collage remains pending; automated capture success does not establish 100% design parity. Production remains untouched.",
   "stages": {
@@ -3403,5 +3403,53 @@
     "baselineImageCount": 66,
     "resultImageCount": 66,
     "note": "Pixel differences are a review aid, not an aesthetic score. Human visual review remains required."
+  },
+  "latestStorefrontIntegrationAudit": {
+    "workflowRun": 39558222013,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39558222013",
+    "artifactId": 12327195638,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39558222013/artifacts/12327195638",
+    "sourceCommit": "0153bbfdc4ad66850ac9a9ab0ca3950811330f84",
+    "sourceKind": "cloudflare-pages-preview-live-read-only",
+    "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
+    "captureCompleted": true,
+    "passed": false,
+    "hardFailures": [
+      "SD-GL052 is not present in the public verified product payload at mobile-390-light."
+    ],
+    "summary": {
+      "screenshotCount": 84,
+      "viewportCount": 8,
+      "routeCheckCount": 12,
+      "responsiveOverflowCount": 0,
+      "consoleErrorCount": 0,
+      "pageErrorCount": 0,
+      "httpErrorCount": 0,
+      "failedRequestCount": 0,
+      "brokenImageContextCount": 0,
+      "sectionTargetCheckCount": 60,
+      "productDetailContextCount": 4,
+      "commerceStateCheckCount": 8,
+      "blockedExternalRequestCount": 32,
+      "readOnlyViolationCount": 0,
+      "hardFailureCount": 1,
+      "requiredSectionScreenshotsComplete": true,
+      "productDetailContextsComplete": true
+    },
+    "commerceStates": [
+      "account-menu-open",
+      "fullscreen-gallery",
+      "cart-with-item",
+      "checkout-form-open"
+    ],
+    "commerceStatesSubmittedOrder": false,
+    "deploymentVerification": {
+      "status": "VERIFIED_PREVIEW_DEPLOYMENT",
+      "branch": "fix/liquid-glass-audit-2026-10-19",
+      "commitSha": "0153bbfdc4ad66850ac9a9ab0ca3950811330f84",
+      "deploymentId": "e64ac4f9-412a-49ec-8675-d9c23d6f0ba1",
+      "verifiedAtUtc": "2026-10-21T06:55:04.894Z"
+    },
+    "note": "Real Preview capture only. Audit is not a full pass because SD-GL052 is absent from verified public product data. Do not invent or substitute the SKU. This artifact does not submit a real order. Current branch head advanced afterward with documentation-only commit c9b52c6a37e91416aab35c3def40d85abe0e6d33; its deployment and workflows must be rechecked separately."
   }
 }
