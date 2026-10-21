@@ -53,3 +53,13 @@ assert.ok(admin.includes("f.size>20*1024*1024") && admin.includes("Tệp sao lư
   "Admin restore picker must enforce the same 20 MB file limit as the API");
 assert.ok(restoreApi.includes("const MAX_BACKUP_BYTES = 20 * 1024 * 1024"),
   "Restore API must retain its 20 MB hard limit");
+
+const previewWorkflow = read("../.github/workflows/admin-preview-diagnostics.yml");
+assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v4"),
+  "Full ADMIN Playwright screenshots must remain available as a run artifact");
+assert.ok(previewWorkflow.includes("data.latestScreenshotArtifact = {"),
+  "The handoff must point to the latest screenshot artifact instead of committing every PNG");
+assert.ok(!previewWorkflow.includes('cp "$SOURCE_DIR"/screenshots/*.png "$DEST/screenshots/"'),
+  "The workflow must not commit each Playwright screenshot matrix to the ADMIN branch");
+assert.ok(previewWorkflow.includes("retention-days: 14"),
+  "The screenshot artifact retention window must remain explicit");
