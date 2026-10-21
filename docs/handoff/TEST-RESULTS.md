@@ -547,3 +547,9 @@ Continuation evidence — mobile cart compacting (2026-10-21)
 - Local fixture Light/Dark capture/audit PASS; do not conflate it with live capture or human visual sign-off.
 - Generated manifest status `COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW`: 36 comparable pairs; 0 identical, 36 changed; 30 dimension mismatches; 18 unmatched result images; 0 invalid PNG pairs. Baseline has 66 images while current end archive has 84. Root-cause this mismatch using the artifact comparison report and guarded workflow; do not manually edit manifest.
 - Current branch was advanced by the guarded archive commit to `643f9f59c14312cb9611e0797c8a24628c7117cc`. Verify HEAD before further writes. No Production deploy or merge.
+
+
+### Screenshot archive coverage guard — pending CI verification (2026-10-21)
+- Added a script to compare exact PNG filename sets before a guarded end-of-work archive can replace canonical screenshots; tests cover equal, extra and missing filenames.
+- The baseline (66 PNGs) and prior live end archive (84 PNGs) still differ. The guard intentionally blocks a new end archive until the baseline is refreshed using a verified live Preview capture via the protected workflow.
+- The guard commit is not considered PASS until source tests and workflow run confirm it. Manifest remains workflow-managed and was not edited manually.

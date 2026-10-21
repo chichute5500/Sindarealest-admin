@@ -264,7 +264,7 @@ assert.match(workflow, /CF_ACCESS_CLIENT_SECRET:\s*\$\{\{\s*secrets\.CF_ACCESS_C
 const coverageVerifierPath = fileURLToPath(new URL('../scripts/verify-screenshot-archive-coverage.mjs', import.meta.url));
 assert.equal(spawnSync(process.execPath, ['--check', coverageVerifierPath], { encoding: 'utf8' }).status, 0,
   'The screenshot filename coverage verifier must pass Node syntax checking.');
-assert.match(workflow, /name: Require exact live screenshot filename coverage before end archive[\\s\\S]*?verify-screenshot-archive-coverage\\.mjs/,
+assert.match(workflow, /name: Require exact live screenshot filename coverage before end archive[\s\S]*?verify-screenshot-archive-coverage\.mjs/,
   'A guarded end-of-work archive must compare exact live screenshot filenames against the verified baseline before replacing the archive.');
 
 const coverageTempRoot = mkdtempSync(path.join(os.tmpdir(), 'sindarealest-screenshot-coverage-'));
@@ -286,13 +286,13 @@ try {
   const extraCapture = runCoverageCheck();
   assert.equal(extraCapture.status, 1,
     'End archive must fail closed when a live capture adds a filename not represented in the baseline.');
-  assert.match(extraCapture.stderr, /new-state\\.png/);
+  assert.match(extraCapture.stderr, /new-state\.png/);
   rmSync(path.join(liveTempDir, 'new-state.png'));
   rmSync(path.join(baselineTempDir, stableNames[0]));
   const missingCapture = runCoverageCheck();
   assert.equal(missingCapture.status, 1,
     'End archive must fail closed when a baseline filename is missing from the live capture.');
-  assert.match(missingCapture.stderr, /capture-00\\.png/);
+  assert.match(missingCapture.stderr, /capture-00\.png/);
 } finally {
   rmSync(coverageTempRoot, { recursive: true, force: true });
 }

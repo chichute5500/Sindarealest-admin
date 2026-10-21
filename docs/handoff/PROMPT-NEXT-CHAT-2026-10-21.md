@@ -320,3 +320,8 @@ Current branch HEAD was verified as `01191b0a49487145c9837ca9d765328255c64cbf` a
 - Theme-toggle performance adjustment: paint-only 220ms transition for background/color/border/shadow; regression test excludes animated `backdrop-filter`.
 - Continue visual review against supplied mobile Light/Dark references and the full storefront across 360x800, 390x844, 768x1024, 1440x900; prioritize satin/hero blending, 6 benefit cards, order comparison, gallery controls, mobile cart/account Back behavior, checkout, footer and states. Re-test changed areas, don't repeat unchanged PASS tests.
 - Estimated completion ~70% as an engineering estimate, not pixel-parity. PR #108 stays open; never merge or touch Production/Admin/backend/catalog data.
+
+
+## 2026-10-21 follow-up — screenshot filename coverage
+- Commit `49d7a68701b507dc0d2485674596a5b694218f6a` adds an exact screenshot filename coverage guard before end archive replacement and tests for equal/extra/missing filename cases. A subsequent test correction fixes regex escaping in the assertions; verify the actual latest branch HEAD and CI before trusting it.
+- Do not manually edit manifest. Refresh start baseline only with the protected workflow against the verified Cloudflare Preview; then run end capture and compare. Keep PR #108 open, no Production or Admin changes.

@@ -529,3 +529,11 @@ Verified continuation update — 2026-10-21 (mobile cart compaction)
 - The workflow also passed local Light/Dark fixture audit and read-only Preview checks. These are separate from human visual acceptance. Review the uploaded artifact's `comparison.json`, `report.html`, end-of-work screenshots and original mobile Light/Dark references.
 - Estimated storefront completion remains about 70% (engineering estimate only), not a parity score. PR #108 remains open/unmerged. No Production deploy, Admin edit, backend/data change or catalog substitution.
 - Next: inspect current manifest + artifact report; resolve the 66-vs-84 baseline mismatch through the guarded screenshot workflow (do not hand-edit the manifest); review hero/satin, 6 benefit cards, order comparison, product grid/detail/gallery, cart/account/checkout, footer and Light/Dark across 360x800, 390x844, 768x1024 and 1440x900. Continue only with evidenced storefront defects.
+
+
+## 2026-10-21 — exact screenshot coverage guard
+
+- Added `scripts/verify-screenshot-archive-coverage.mjs` and wired it before guarded `end-of-work` archive replacement. It fails closed unless both archives contain at least 50 PNGs and the filename sets match exactly.
+- Added regression cases for matching names, one extra live filename and one missing baseline filename. Corrected regular-expression escaping in these assertions so they test the intended filenames rather than literal backslashes.
+- Guarded baseline refresh is still required because the current 66-image baseline and 84-image end archive do not match. Do not claim this guard has passed CI until a workflow run confirms it. No manifest was edited by hand.
+- Current branch commit at time of note: `49d7a68701b507dc0d2485674596a5b694218f6a`. Verify HEAD before next write; no Production deployment or PR merge.
