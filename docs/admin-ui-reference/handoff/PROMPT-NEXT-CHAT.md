@@ -861,3 +861,13 @@ Do real work autonomously; do not stop after a status report or a plan. First re
 5. Progress remains **48%** until meaningful acceptance evidence advances it. Screen #7 order, #8 payment/QR and #12 settings/backup remain PARTIAL. Full 12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED/BLOCKED BY ACCESS; image-save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
 6. Keep PR #111/#108 OPEN/unmerged. Never deploy Production, change main/static website, alter/bypass Cloudflare Access or secrets, execute setup/migration SQL, operate on remote D1/R2, or use TinyFish. Do not ask the user to perform an action unless the next required step genuinely needs their access/approval.
 
+
+
+## READY-TO-PASTE CONTINUATION — 2026-10-21 16:47 UTC
+
+Continue real work autonomously on `chichute5500/Sindarealest-admin`, only write to `feature/admin-isolated-handoff-2026-10-20`. Re-fetch live HEAD/PRs/Actions first.
+
+- Last exact source/test SHA `f2df0a923080135c5fe92ee2021c76137305699c`. Validate Source [#39637611840](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611840) PASS; Admin Preview/Playwright [#39637611768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768) SUCCESS. Artifact [admin-preview-evidence-197](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768/artifacts/12362111591): 63 PNGs, 39 metrics, no recorded errors/writes. Fixture/source only.
+- Screen #10 Warranty is list-first with local search/filter, a collapsed accessible issuance form and a one-line mobile order number. Exact-SHA UI tests pass. Visual status PARTIAL: reference card thumbnails/customer/date details remain missing. Full 12-screen parity NOT ACCEPTED; authenticated live business QA NOT TESTED/BLOCKED BY ACCESS.
+- Next safe priority: screen #8 Customers, whose current source lacks the reference search field. Inspect existing API fields and implement local filter-only search with synthetic/read-only Playwright checks; do not write data or invent customer fields. Re-check screenshots and CI against exact SHA.
+- Overall progress 48%. Product image-save and PRE/PRO migration remain DEFERRED_BY_OWNER. Keep PR #111/#108 open/unmerged. No merge/cherry-pick/force-push, Production deploy, main/static branch edits, Access/secrets changes or bypass, remote D1/R2, SQL/setup/migration, or TinyFish. Continue after reports while safe work remains.

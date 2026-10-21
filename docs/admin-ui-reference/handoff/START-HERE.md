@@ -2,6 +2,13 @@
 
 > Đây là điểm bắt đầu bắt buộc cho mọi phiên AI/agent tiếp tục công việc ADMIN. Nội dung chỉ phản ánh trạng thái đã ghi và kiểm chứng; luôn xác minh Git thực tế trước khi sửa.
 
+## Latest checkpoint — 2026-10-21 16:47 UTC
+
+- Exact tested SHA `f2df0a923080135c5fe92ee2021c76137305699c`; Validate Source #39637611840 PASS; Admin Preview/Playwright #39637611768 SUCCESS.
+- Screen #10 warranty UI now has list-first search/filter and a collapsed accessible issue form; one-line mobile order ID E2E assertion passes. Artifact #197 (ID 12362111591): 63 PNGs / 39 metrics, no errors or fixture writes. Fixture/source evidence only.
+- Overall progress 48%; full 12-screen parity NOT ACCEPTED; authenticated real backend QA NOT TESTED/BLOCKED BY ACCESS. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+- Branch HEAD before this status refresh: `0e9e6560a968f7ca9754c91fda6f8af89c0ae41b`; fetch current HEAD after docs commit.
+
 ## Phân chia nhánh — bắt buộc
 
 - Repository: `chichute5500/Sindarealest-admin`

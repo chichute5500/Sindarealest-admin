@@ -97,3 +97,10 @@ For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file 
 - Exact Playwright source/test SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff` passed in [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359); source CI [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) also passed.
 - Order fixture confirms payment request and receipt controls stay disabled while price/terms are unconfirmed. Backup/restore fixture checks the export button, JSON restore input and confirmation disclosure without invoking an operation. All API mutation requests are blocked by fixture route.
 - Artifact #192 ID `12360132558`: 63 source/fixture PNGs, 39 metrics, no errors or attempted writes. This is a targeted UI safety check; do not treat it as authenticated business-flow QA or visual acceptance of the whole 12-screen reference.
+
+
+## Warranty screen reference follow-up — 2026-10-21 16:47 UTC
+
+- Tested source/test SHA `f2df0a923080135c5fe92ee2021c76137305699c`: Validate Source #39637611840 PASS; Admin Preview/Playwright #39637611768 SUCCESS. Artifact #197 (ID 12362111591) includes 63 source/fixture PNGs and 39 metrics, with no recorded browser/console/request/HTTP errors or attempted writes.
+- Reference screen #9 was actually viewed alongside 390×844 light/dark and 1280×800 light captures. The warranty screen now has list-first search/filter, accessible issue disclosure and a one-line mobile order ID. Reference-card thumbnails and customer/date detail composition remain a visual gap; status PARTIAL only.
+- Synthetic source fixture, not authenticated backend QA. Do not fabricate thumbnails. All-12-screen parity remains NOT ACCEPTED; product-image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.

@@ -206,3 +206,10 @@ This was a read-only source review of the existing payment contract and route co
 - Exact SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff` passed source validation [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) and browser workflow [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359).
 - PASS for fixture-only regression assertions: disabled QR request/receipt controls while price and terms are unconfirmed; backup JSON export control present; JSON restore input has the expected accept type; confirmation disclosure visible. No action triggered. QR unsaved-draft activation guard, keyboard and reduced-motion tests also passed.
 - Acceptance labels remain limited: Orders #7 PARTIAL; QR/payment #8 PARTIAL; backup/settings #12 PARTIAL; authenticated backend NOT TESTED; full reference parity NOT ACCEPTED; progress 48%.
+
+
+## Warranty list-first fixture verification — 2026-10-21 16:47 UTC
+
+- Exact source/test SHA `f2df0a923080135c5fe92ee2021c76137305699c`; Validate Source #39637611840 PASS and Preview/Playwright #39637611768 SUCCESS.
+- Search/status filter behavior, accessible collapsed issue form, no default warranty duration, and one-line mobile order ID assertions pass. Browser baseline 3 passed (34.8s); configured Preview CSS signature PASS.
+- Artifact #197 (ID 12362111591) contains 63 PNGs and 39 metrics; zero recorded errors or fixture writes. Screen #10 PARTIAL only; all-12 parity NOT ACCEPTED, authenticated business QA NOT TESTED/BLOCKED BY ACCESS, project progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
