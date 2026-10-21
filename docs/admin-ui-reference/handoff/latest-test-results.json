@@ -8,7 +8,7 @@
   "capturedAt": "2026-10-21T15:00:00Z",
   "progressEstimatePercent": 48,
   "progressBasis": "Progress remains 48% management estimate. Latest PR #111 HEAD 78a16b6d9fca91d7b080834f293e1690dc7c10cd changes only tests/e2e/admin-static-baseline.spec.js, relaxing footer geometry tolerance from 1px to 2px. No Actions run or combined status checks were found for this HEAD, so it is NOT TESTED. Last verified full pass remains Validate Source #3905 and Admin Preview #162 on a999bfdc529ea38c5309ebfbff33a45c6779c10b. Full 12-screen reference parity and authenticated backend QA are not accepted/tested; product image-save and PRE/PRO migration remain deferred by owner.",
-  "note": "Latest exact tested tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737). Source CSS commit cc77869873c2f5b4b2d1118dc60c0d88413eb218 moves product dialog bottom spacing into the scrollable content; E2E regression commit a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e measures action footer vs dialog and the last thumbnail vs footer; contract test commit 5f73373094ba71f467374e8b026bbfc3c5059fec adds CSS assertions. Screenshot artifact admin-preview-evidence-162 (ID 12354480678), 11,114,027 bytes, expires 2026-11-04: 59 source/fixture PNGs (16 login shell, 43 synthetic read-only module captures) and 36 metrics. The mobile screenshot shows the sticky footer aligned to the dialog edge; the last thumb can be seen without action-bar overlap. This remains source/fixture review, not authenticated business QA. Current docs-only branch HEAD at handoff: e7f0990f4c0b78272fdba06e9f90423340b82eaa. Progress 48%; full 12-screen parity NOT ACCEPTED; backend QA NOT TESTED. PR #111/#108 open/unmerged. No merge, Production deploy, remote D1/R2, secret/Access changes, migration/setup, or TinyFish. Latest live GitHub check at 2026-10-21 15:00 UTC: PR #111 OPEN/unmerged head 78a16b6d9fca91d7b080834f293e1690dc7c10cd; PR #108 OPEN/unmerged head ad5b0e7538a639780adeeac7020a818170aa0caa. Workflow runs for latest HEAD: none returned; combined commit statuses: empty. Do not infer PASS for latest HEAD.",
+  "note": "Latest exact tested tree a999bfdc529ea38c5309ebfbff33a45c6779c10b passed [Validate Source #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) and [Admin Preview #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737). Source CSS commit cc77869873c2f5b4b2d1118dc60c0d88413eb218 moves product dialog bottom spacing into the scrollable content; E2E regression commit a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e measures action footer vs dialog and the last thumbnail vs footer; contract test commit 5f73373094ba71f467374e8b026bbfc3c5059fec adds CSS assertions. Screenshot artifact admin-preview-evidence-162 (ID 12354480678), 11,114,027 bytes, expires 2026-11-04: 59 source/fixture PNGs (16 login shell, 43 synthetic read-only module captures) and 36 metrics. The mobile screenshot shows the sticky footer aligned to the dialog edge; the last thumb can be seen without action-bar overlap. This remains source/fixture review, not authenticated business QA. Current docs-only branch HEAD at handoff: e7f0990f4c0b78272fdba06e9f90423340b82eaa. Progress 48%; full 12-screen parity NOT ACCEPTED; backend QA NOT TESTED. PR #111/#108 open/unmerged. No merge, Production deploy, remote D1/R2, secret/Access changes, migration/setup, or TinyFish. Latest live GitHub check at 2026-10-21 15:00 UTC: PR #111 OPEN/unmerged head 78a16b6d9fca91d7b080834f293e1690dc7c10cd; PR #108 OPEN/unmerged head ad5b0e7538a639780adeeac7020a818170aa0caa. Workflow runs for latest HEAD: none returned; combined commit statuses: empty. Do not infer PASS for latest HEAD. Failure root cause inspected from workflow job log 119293089510: footer geometry differed by 1.140625 CSS px against <=1px assertion. Commit 78a16b6 raised tolerance to 2px; not yet rerun. Do not claim fix validated.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -2307,6 +2307,21 @@
       39618556696,
       39618556737
     ],
-    "progressRemainsPercent": 48
+    "progressRemainsPercent": 48,
+    "previousObservedBranchHead": "67f6f5e403c3e8a92c81f77b7153a1da8ac721fb",
+    "failureDiagnosis": {
+      "runId": 39620591307,
+      "jobId": 119293089510,
+      "repositoryChecks": "PASS",
+      "automatedTests": "PASS",
+      "configuredPreviewDiagnostic": "PASS",
+      "localPlaywrightMatrix": "FAIL",
+      "failedAssertion": "Math.abs(dialogBottom - footerBottom) <= 1",
+      "measuredDifferenceCssPixels": 1.140625,
+      "testOnlyAdjustmentCommit": "78a16b6d9fca91d7b080834f293e1690dc7c10cd",
+      "newToleranceCssPixels": 2,
+      "rerunForAdjustment": "NOT FOUND / NOT VERIFIED",
+      "browserSetupLog": "getaddrinfo ENOTFOUND playwright.download.prss.microsoft.com also appeared; causality for geometry assertion is not established."
+    }
   }
 }
