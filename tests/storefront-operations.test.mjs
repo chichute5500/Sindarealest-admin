@@ -57,7 +57,8 @@ assert.ok(storefrontHtml.includes('id="sd-icon-state-specificity-fix-2026-10-22"
 
 assert.ok(storefrontHtml.includes('#productOverlay #detailFavorite:not([aria-pressed="true"]):active svg')
   && storefrontHtml.includes('#productOverlay #detailFavorite[aria-pressed="true"] svg path{')
-  && storefrontHtml.includes('fill:currentColor!important'),
+  && storefrontHtml.includes('fill:#E5484D!important')
+  && storefrontHtml.includes('stroke:#E5484D!important'),
   'Accent-blue pressed tint must apply only while the heart is unselected; a favorited heart must remain red-filled.'); 
 
 assert.ok(storefrontHtml.includes('html.dark #productOverlay #detailFavorite:not([aria-pressed="true"]):active')
