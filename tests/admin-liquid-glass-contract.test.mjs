@@ -60,6 +60,8 @@ has('id="orderSearchBox"', 'orders list exposes a labeled search field');
 has('id="orderStatusFilter"', 'orders list exposes an order-status filter');
 has('id="orderPaymentFilter"', 'orders list exposes a payment-status filter');
 has('id="orderResultSummary"', 'orders result count is announced accessibly');
+has('class="order-mobile-summary"', 'mobile order cards expose a compact summary using existing order fields');
+has('#main .order-table tbody tr td:nth-child(-n+6){display:none!important}', 'mobile order card hides secondary table cells until editing is opened');
 has('<details class="order-management-details"><summary class="order-management-summary">Quản lý giá, trạng thái & thanh toán</summary>', 'per-order management disclosure starts compact and opens on demand');
 has('<label class="tiny muted order-price-entry">Giá/đơn vị (VNĐ)<input class="control"', 'one per-item price control is kept in the product cell to avoid duplicate API values');
 has('#main .order-table .order-price-entry{display:none}', 'mobile price entry stays hidden while order tools are collapsed');

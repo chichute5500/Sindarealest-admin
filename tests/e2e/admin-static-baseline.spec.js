@@ -983,6 +983,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderStatusFilter')).toBeVisible();
       await expect(page.locator('#orderPaymentFilter')).toBeVisible();
       await expect(orderRows).toHaveCount(3);
+      if (variant.viewport.width <= 680) {
+        const mobileSummary = row.locator('.order-mobile-summary');
+        await expect(mobileSummary, 'Mobile order list uses a compact summary without invented thumbnail data').toBeVisible();
+        await expect(mobileSummary).toContainText('Khách thử nghiệm giao diện');
+        await expect(mobileSummary).toContainText('Sản phẩm thử nghiệm giao diện');
+      }
       await expect(page.locator('#orderResultSummary')).toHaveText('Hiển thị 3 / 3 đơn hàng');
       await orderSearch.fill('Khách UI Fixture 2');
       await expect(orderRows).toHaveCount(1);
