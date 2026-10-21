@@ -4,10 +4,10 @@
 **Tiến độ tổng thể ước tính:** **48%**. Đây là ước lượng tiến độ dự án, không phải tỷ lệ test pass. Chưa đạt nghiệm thu giao diện giống mẫu.
 **Repository/nhánh được phép sửa:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`.
 **Source/test SHA đã xác minh gần nhất:** `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`; [Actions run 39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224) đã xác nhận `npm run check`, `npm test`, và local Playwright source/fixture matrix đều PASS trên đúng SHA này. Workflow tổng thể vẫn FAILURE do Preview từ xa.
-**Source UI gần nhất:** `d553b95c3d43420f9227e9a37e6fe94b9b862b27` — “fix(admin): align dashboard and brand copy with reference”. Các commit UI trước đó gồm QR validation/localized file picker, mobile filter/warranty text, forced-colors accessibility và theme-color/no-flash. Xác nhận source CI hiện hành qua [run 39588603589](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39588603589); CI PASS không đồng nghĩa Preview/parity đã đạt.
+**Source code mới nhất đã kiểm thử:** `functions/api/admin/payment-transactions.js`, commit `d3fa9b85be20d832cbf24678dd7f3c7d862c1e64` (refund balance guard). Test trên exact SHA `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`, [run 39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224); check/unit tests/local Playwright đều PASS.
 **Preview diagnostic mới nhất đã xác minh:** [run 39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224) — FAILURE: `PREVIEW_CSS_SIGNATURE_MISMATCH`; inline stylesheet 226 rules nhưng thiếu login-hide rule (`hasLoginHideRule=false`), brand header vẫn visible. URL target vẫn bị secret masking nên chưa phân biệt được build cũ với target sai. Giữ nguyên assertion; không bypass Access hoặc đọc/đổi secrets.
 **Ảnh mẫu:** `docs/admin-ui-reference/admin-mobile-reference.png`; workflow artifact mới đã được cấu hình để đính kèm ảnh mẫu vào artifact Playwright. Ảnh source/fixture không phải bằng chứng backend đã đăng nhập. Kết quả so sánh ban đầu: có tông xanh nhạt/card bo tròn nhưng bố cục và nội dung chưa được xác nhận giống đủ 12 màn hình.
-**PR #111:** OPEN/unmerged, base `main`, hiện 1.096 file thay đổi (+37.660/−392) theo GitHub API. Danh sách đường dẫn đầy đủ đã kiểm kê; PR vẫn trộn storefront, Admin, Functions/API, migrations, scripts, tests và hơn 900 PNG; semantic/security review còn một phần và PR chưa merge-ready. **PR #108:** OPEN/unmerged, base `main`, 232 file (+19.270/−380). Không merge hai PR.
+**PR #111:** OPEN/unmerged, base `main`, hiện 1.096 file thay đổi (+37.813/−392) theo GitHub API sau lần cập nhật handoff mới nhất. Danh sách đường dẫn đầy đủ đã kiểm kê; PR vẫn trộn storefront, Admin, Functions/API, migrations, scripts, tests và hơn 900 PNG; semantic/security review còn một phần và PR chưa merge-ready. **PR #108:** OPEN/unmerged, base `main`, 232 file (+19.270/−380). Không merge hai PR.
 **Đã xác minh trên source gần nhất:**
 - Bổ sung hỗ trợ forced-colors/focus-visible và test hợp đồng.
 - Đồng bộ meta theme-color Android với theme sáng/tối; thêm bootstrap trước CSS nhằm giảm flash.
@@ -44,3 +44,11 @@
 - **Latest observed PR #111 before this handoff refresh:** HEAD `9e0434f769dedf2b20e1365aa96147336afc237c` (evidence/report-only commit after the tested source), OPEN/unmerged, 1,096 files (+37,660/−392). PR #108 remains OPEN/unmerged, no writes to the website branch. Both PRs stay open.
 - **Risk boundaries:** no live D1/R2, migration, setup script, customer/business data, secrets, Access or Production action was performed. The refund test uses the in-memory mock only; runtime database concurrency remains NOT VERIFIED.
 - **Progress stays 48%**. Preview identity, 12-screen parity, authenticated live-backend QA and full semantic/security review of PR #111 remain open. Product image save/upload and PRE/PRO migrations remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
+
+
+## Kiểm tra refs sau cập nhật handoff — 2026-10-21
+
+- HEAD ADMIN được GitHub xác nhận trước lần cập nhật JSON kế tiếp: `86508454e98fe5cb167113e06011ca1e0efe310c`; đây là commit tài liệu, không phải SHA đã test.
+- PR #111: OPEN/unmerged, base `main`, 1.096 files (+37.813/−392). Source/test SHA mới nhất được CI xác minh vẫn là `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`, run #39592097224.
+- PR #108: OPEN/unmerged, base `main`, HEAD hiện thấy `32032fbe2fecf176bcdf962313292898a7a415ed`, 250 files (+19.753/−380). Không sửa hoặc đồng bộ nhánh đó.
+- Toàn bộ bằng chứng test mới nhất nằm ở run #39592097224 và artifact #12342063095; Preview vẫn FAIL. Handoff metadata được cập nhật tách biệt, không coi commit docs mới là source/test PASS.
