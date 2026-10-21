@@ -674,3 +674,12 @@ Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run
 - Reference image management (screen 5) is a dedicated full-screen workflow with a large image and thumbnails. `product-gallery__390x844__light.png` is a synthetic product-editor fixture with placeholder images, so it is not proof of real gallery behavior or visual parity.
 - Artifact #169 contains 59 source/fixture PNGs, but module screens use synthetic read-only data. Keep 12-screen visual parity NOT ACCEPTED and authenticated backend QA NOT TESTED until evidence supports acceptance.
 - The artifact and visual gap findings are documented in `LATEST-STATUS.md` and `latest-test-results.json`. Continue with a 12-family comparison matrix, then data-backed dashboard behavior and authorized real gallery QA; do not modify the static website branch or fabricate business data.
+
+
+## Continuation update — 2026-10-21 15:10 UTC
+
+The current session re-read the required handoff files and audited `public/admin/index.html` plus all `functions/api/admin/*` route names on the authorized branch. Source HEAD at audit start was `e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d`; validation run [#39622616336](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336) was queued at inspection time. Do not claim exact-HEAD checks passed until that run completes.
+
+Dashboard data-integrity finding: current dashboard shows product counts, quick actions and recent audit logs, while the reference has a revenue trend chart. No dedicated admin analytics/revenue route was found. `/api/admin/orders` is capped at 1,000 recent orders, so a chart derived from that response could silently omit older revenue. Do not fabricate revenue data or present a capped subset as all-time history. Next inspect migrations/schema and order/payment state semantics to determine whether a complete authoritative aggregation is feasible; otherwise retain truthful data and design a tested empty-state within the reference layout.
+
+Latest status was updated in commit `3cc106a78e6cfc6afdb08622c7882b9c88138b21` (docs only). Overall progress remains 48%. Keep visual parity for all 12 screen families NOT ACCEPTED, authenticated business QA NOT TESTED/BLOCKED BY ACCESS, and real image upload/save plus PRE/PRO migration DEFERRED_BY_OWNER/NOT VERIFIED. Only work on `feature/admin-isolated-handoff-2026-10-20`; do not merge PR #111/#108, touch static branch/main, deploy Production, alter Access/secrets, run migration/setup/deploy scripts, or perform remote D1/R2 operations. No TinyFish.
