@@ -37,7 +37,7 @@ Overall Admin progress: **48%** — unchanged until evidence supports a meaningf
 | Light/dark themes | PARTIAL | Fixture/screenshot checks exist; complete reference parity is not accepted. |
 | Narrow Android viewport / horizontal overflow | PARTIAL | Prior screenshot matrix included 390px width; repeat on current code SHA before accepting. |
 | Keyboard / focus / accessible names | NOT TESTED | Inspect and test controls screen-by-screen. |
-| `prefers-reduced-motion` | IMPLEMENTED; BROWSER E2E NOT VERIFIED | Test added in `tests/e2e/admin-static-baseline.spec.js`; recorded source validation did not run this Playwright browser suite. Require an exact-SHA run that executes the E2E suite. |
+| `prefers-reduced-motion` | PASS — BROWSER E2E ON SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e` | Admin Preview Playwright run [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) executed `tests/e2e/admin-static-baseline.spec.js`; the reduced-motion test passed in the 3-test browser suite. It uses synthetic GET fixtures and blocks mutations; it is not authenticated backend QA. |
 | Authenticated real backend | BLOCKED / NOT TESTED | Do not change Access or secrets to work around this. |
 | Product image upload/save | DEFERRED_BY_OWNER | Do not resume without explicit owner authorization. |
 | PRE/PRO migration | DEFERRED_BY_OWNER | Do not inspect remote schema through writes or execute migration/setup scripts. |
@@ -53,3 +53,11 @@ Overall Admin progress: **48%** — unchanged until evidence supports a meaningf
 ## Safety boundaries
 
 Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108 open/unmerged. No edits to `main` or the static website branch; no merge/cherry-pick/force-push; no Production deploy; no secrets/Cloudflare Access changes or bypass; no remote D1/R2 writes; no SQL/migration/setup script execution; no TinyFish.
+
+
+## Browser verification follow-up — 2026-10-21
+
+- Playwright E2E on exact source/test SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e` passed in Admin Preview workflow [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142). The `respects the reduced-motion preference across interactive ADMIN layers` test ran and passed; it uses only synthetic GET fixtures and rejects non-GET API calls.
+- Root cause of the prior E2E failure on `979fa3500775c2b48af4db4f49e973b9c71eeda4`: test selectors incorrectly assumed `.dashboard-revenue` and `.dashboard-shortcut` lived under `#main`. In the actual rendered source those elements are inserted directly into `#appView`; the test now queries the actual classes and the dashboard assertion was aligned to `.dashboard-revenue`. No app business logic or CSS behavior was changed by this fix.
+- The same run passed project check, automated tests, responsive/theme source Playwright matrix, and Preview login CSS signature. Artifact `admin-preview-evidence-188` (ID `12357698923`, 11,188,289 bytes, retained until 2026-11-04) contains 59 PNGs (16 login shell + 43 synthetic fixture screens), 36 fixture metrics and metadata. Metadata shows zero browser/console/request/HTTP errors and no attempted fixture writes. These are source/fixture captures, not authenticated business-flow evidence.
+- Full 12-screen parity remains NOT ACCEPTED; authenticated backend QA remains BLOCKED / NOT TESTED. Overall estimate stays 48%.
