@@ -1,15 +1,14 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — CURRENT-HEAD CI PASS; PREVIEW SOURCE MISMATCH; AUTHENTICATED MODULE QA, 12-SCREEN VISUAL AUDIT AND FULL PR-SCOPE REVIEW OPEN`
-**Ước tính tiến độ:** 43% theo các giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
+**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI PASS; DEPLOYED PREVIEW SOURCE MISMATCH; AUTHENTICATED MODULE QA, 12-SCREEN VISUAL AUDIT AND FULL PR-SCOPE REVIEW OPEN`
+**Ước tính tiến độ:** 43% theo giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
 **Repository:** `chichute5500/Sindarealest-admin`
 **Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`
-**HEAD ADMIN đã xác minh trước cập nhật handoff này:** `9c94c106fec99aa5920685da4d4af32b53e680ad` (commit documentation-only `docs(admin): refresh start-here checkpoint`; CI `39543407286` trên SHA này PASS).
-**Source commit có kiểm thử Playwright gần nhất:** `de6114f75cba36193c50ad043175d08be092929f`; run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) chụp 58 PNG, nhưng Preview từ xa FAIL vì CSS signature không khớp.
-**PR #111:** OPEN, chưa merge; 909 file thay đổi, phạm vi chứa storefront/backend/migration/scripts ngoài UI ADMIN — KHÔNG MERGE.
-**PR #108:** OPEN, chưa merge; nhánh website tĩnh được bảo vệ, HEAD `9d5549cf662c63f55d3df591c1321248276a5a22`.
-**main:** `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+**HEAD tại đầu vòng kiểm toán nội dung mới:** `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa` (commit handoff tài liệu; CI source checks/tests/dependency audit PASS trong run 39545082149).
+**Bằng chứng Playwright/Preview gần nhất:** source `de6114f75cba36193c50ad043175d08be092929f`, run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719): local screenshots/fixture PASS; deployed Preview diagnostic FAIL.
+**PR #111:** OPEN, chưa merge; 909 file thay đổi, bao gồm storefront/backend/migration/scripts ngoài giao diện ADMIN — không merge trước khi review/giải quyết scope.
+**PR #108:** OPEN, chưa merge; nhánh website tĩnh vẫn được bảo vệ.
 **Cloudflare Production deployment:** `NOT PERFORMED`
 
 
@@ -220,3 +219,16 @@
 2. Have the owner confirm the authorized Preview deployment/URL expected by `ADMIN_TEST_URL` without exposing or changing the secret value.
 3. Obtain explicit direction on whether the storefront/data/migration/backend work intentionally belongs in PR #111; do not merge before full scope and migration review.
 4. Only count authenticated modules as PASS after an authorized path and safe test data are available. Fixture images do not qualify.
+
+
+## 18.11. Read-only audit of large public files — 2026-10-21
+
+This was performed by reading current branch files and comparing them with `main` and the protected static branch; it did not change those files.
+
+- **Branch snapshot at the start of this audit:** ADMIN branch `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`; protected static branch `e63b7c651fb7615bf2569b60f3c8dad53956e2bd`; main `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. The refs may move later; re-read them at the start of a subsequent task.
+- **`public/index.html` is not isolated:** ADMIN branch blob `bb0ae30ecb06319eb87e5725ad47fda82595eeb8` (235,860 characters) differs from the protected static branch blob `eca254f3ff5621362d85077152208cd81f57a64e` (276,036 characters) and main blob `1e9362341a6c30976dfb9e86886c38e0ff3e5fd4` (163,201 characters). This read-only snapshot comparison found extensive storefront styling/theme differences, along with public UI code for watermark-logo configuration, price-confirmation display and favourites. A simple line-multiset comparison found 728 added and 148 removed line occurrences relative to main; that count is diagnostic only, not a replacement for a canonical full patch review. **Do not merge PR #111** or attempt a mass revert to clean it up blindly.
+- **`public/admin/index.html` also differs by branch:** ADMIN blob `a297b8298ff30c5e713896fed1c21d0f8ca3e899` versus static branch blob `5b4cf7d93a22bdcbdef06972cf26a68ec8f91172`. This confirms branch contents must not be synchronized automatically.
+- **`data/legacy-products.json`:** ADMIN and current protected static branch returned the exact same blob SHA `99080accf6dd155d24f899231f0b9ffe26bf9b0b`; both contain 235 records. Main contains 235 matching records with auto-pattern IDs `SD001`…`SD235`. Field-by-field JSON comparison found only two field changes across all 235 records: `sku` changed to `null`, and `skuVerified` added/set to `false`. Product IDs/slugs, names, categories, descriptions, image paths, prices, stock/price-confirmation attributes and all other JSON fields are unchanged. This keeps unverified generated SKUs from being presented as confirmed commercial SKUs; however, it remains a public legacy/fixture data change inside PR #111 and should be reviewed in the overall branch scope.
+- GitHub's PR patch endpoint still returns `patch=null` for the large public/data files. The snapshot comparisons above reduce ambiguity about the changed fields but **do not** clear PR #111 for merge; review of public behavior, migration order and isolation is still open.
+- **Current-HEAD CI before this documentation update:** [run 39545082149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149) PASS on `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`. This is source repository check/test/dependency-audit evidence only. The latest deployed Preview diagnostic is still [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719), which fails the Preview CSS signature check on source `de6114f75cba36193c50ad043175d08be092929f`.
+- No source changes, branch synchronization, merge, deployment, secret edit, schema/data write or migration execution occurred during this audit.

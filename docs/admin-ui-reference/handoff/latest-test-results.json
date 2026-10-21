@@ -4,7 +4,7 @@
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "de6114f75cba36193c50ad043175d08be092929f",
-  "testedCommitSha": "9c94c106fec99aa5920685da4d4af32b53e680ad",
+  "testedCommitSha": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
   "capturedAt": "2026-10-20T20:50:00.385Z",
   "progressEstimatePercent": 43,
   "progressBasis": "Stage-based estimate, not code completion. Current HEAD CI passes, but configured Preview CSS signature still fails; authenticated business flows, full 12-screen comparison, full mixed-scope PR diff audit/remediation and authorized Preview identity remain open.",
@@ -741,11 +741,11 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286",
-  "branchHeadSha": "9c94c106fec99aa5920685da4d4af32b53e680ad",
-  "latestVerifiedAt": "2026-10-21T04:20:14Z",
-  "latestVerifiedSourceCommit": "9c94c106fec99aa5920685da4d4af32b53e680ad",
-  "currentAdminBranchHead": "9c94c106fec99aa5920685da4d4af32b53e680ad",
-  "latestVerificationSummary": "CI run 39543407286 PASS on 9c94c106fec99aa5920685da4d4af32b53e680ad. Latest diagnostic run 39542387719 against de6114f75cba36193c50ad043175d08be092929f: source/local screenshot/fixture checks PASS; configured deployed Preview signature FAIL. No authenticated real-backend module QA; do not infer all 12-screen parity.",
+  "branchHeadSha": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+  "latestVerifiedAt": "2026-10-21T11:42:00+07:00",
+  "latestVerifiedSourceCommit": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+  "currentAdminBranchHead": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+  "latestVerificationSummary": "Standard CI run 39545082149 PASS on 179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa for project checks/tests/dependency audit. Latest Preview diagnostic run 39542387719 remains FAIL on source de6114f75cba36193c50ad043175d08be092929f; fixture/screenshots are not authenticated real-backend evidence. Read-only comparison of public files confirms PR #111 is mixed-scope; progress remains 43%.",
   "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
@@ -861,8 +861,8 @@
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
-  "updatedAt": "2026-10-21T11:21:00+07:00",
-  "currentBranchHeadAtHandoff": "9c94c106fec99aa5920685da4d4af32b53e680ad",
+  "updatedAt": "2026-10-21T11:42:00+07:00",
+  "currentBranchHeadAtHandoff": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -901,24 +901,24 @@
     "scope": "LOCAL SOURCE SCREENSHOTS + SYNTHETIC FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T11:21:00+07:00",
-    "type": "EVIDENCE_AND_HANDOFF_UPDATE",
+    "updatedAt": "2026-10-21T11:42:00+07:00",
+    "type": "READ_ONLY_CONTENT_SCOPE_AUDIT_AND_HANDOFF",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceCodeChanged": false,
-    "testsRunInThisDocumentationUpdate": false,
+    "testsRunInThisUpdate": false,
     "verified": [
-      "Current branch/PR state; source CI run 39543407286 on 9c94c106fec99aa5920685da4d4af32b53e680ad; Preview artifact/run 39542387719 on de6114f75cba36193c50ad043175d08be092929f.",
-      "Downloaded and inspected admin-preview-evidence-62 and its metadata/Preview CSS signature.",
-      "Expanded read-only PR patch audit to public middleware, order/warranty lookup, sitemap, product/order/backup/restore/settings handlers, migration and scripts.",
-      "Confirmed broad PR scope and remote D1 migration risk without executing setup/deploy scripts."
+      "Read public/index.html and data/legacy-products.json from ADMIN, main and protected static branch snapshots; compared content without writing those files.",
+      "Field-by-field parsed JSON comparison: 235 product records, only sku and skuVerified differ from main.",
+      "Confirmed public/index.html and public/admin/index.html content is not identical between ADMIN and the protected static branch.",
+      "Confirmed CI run 39545082149 SUCCESS on the prior handoff commit 179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa.",
+      "Retained latest Playwright Preview failure as separate evidence; no authenticated real-backend PASS claimed."
     ],
     "notDone": [
-      "No local checkout/git status available.",
-      "No new Playwright run on the latest documentation head.",
-      "No authorized Preview target identity confirmed.",
-      "No authenticated real-backend module tests.",
-      "No full comparison of all 12 approved reference screens.",
-      "No complete diff review for public/index.html and data/legacy-products.json because GitHub returned null patches."
+      "No local Git checkout, so local git status remains NOT VERIFIED.",
+      "No deployed Preview target identity confirmed; no secrets read or changed.",
+      "No authenticated real backend tests or full 12-screen reference comparison.",
+      "No canonical full unified patch for very large public file; snapshot comparison is read-only and not full merge approval.",
+      "No branch sync, source code edit, D1/R2/schema/data write, migration, deploy, merge or cherry-pick."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -930,8 +930,7 @@
         111,
         108
       ],
-      "productionDeployment": "NOT_PERFORMED",
-      "schemaOrDataActions": "NOT PERFORMED"
+      "productionDeployment": "NOT_PERFORMED"
     }
   },
   "progressPercent": 43,
@@ -968,7 +967,9 @@
       "The available exact PR patches for public/index.html and data/legacy-products.json returned null; these diffs remain UNREVIEWED, not assumed safe.",
       "SKU verification migration 0008 adds products.sku_verified and order_items.sku_verified; multiple public/ADMIN handlers query/write these columns and require explicit migration-order/backward-compatibility review.",
       "scripts/setup-cloudflare.mjs can run remote D1 migrations and direct ALTER TABLE; it was not executed.",
-      "scripts/capture-liquid-glass-preview.mjs and liquid-glass-visual-preview.yml are public-site-oriented content present in PR #111."
+      "scripts/capture-liquid-glass-preview.mjs and liquid-glass-visual-preview.yml are public-site-oriented content present in PR #111.",
+      "Snapshot comparison of public/index.html confirms it differs from protected static branch: ADMIN branch 235,860 chars vs static 276,036 chars; broad public design/theme/favourites/watermark/price UI changes are in the PR diff.",
+      "Snapshot comparison of data/legacy-products.json vs main finds 235 records whose only field deltas are sku -> null and skuVerified -> false; all other product fields are unchanged. File is identical in the ADMIN and protected static branch snapshots."
     ],
     "safety": "No merge/deploy/secret/schema/production-data operation performed; keep PR #111 open until scope and migration review."
   },
@@ -986,16 +987,16 @@
   },
   "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
   "latestCiVerification": {
-    "runId": 39543407286,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286",
-    "sourceCommit": "9c94c106fec99aa5920685da4d4af32b53e680ad",
+    "runId": 39545082149,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149",
+    "sourceCommit": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
     "workflow": "Validate source and tests",
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
     "automatedTests": "PASS",
     "dependencyAudit": "PASS",
-    "playrightPreviewDiagnostics": "NOT RUN IN THIS WORKFLOW",
-    "note": "This CI run verifies the current source commit but is not evidence that the deployed Preview serves this source."
+    "previewDiagnostics": "NOT INCLUDED",
+    "note": "Documentation-only handoff commit on the ADMIN branch. This run does not verify the deployed Preview's served source."
   },
   "latestPreviewArtifactInspection": {
     "inspectedAt": "2026-10-21T11:21:00+07:00",
@@ -1029,5 +1030,42 @@
       "httpErrors": 0
     },
     "note": "Counts are separate screenshot suites and must not be represented as authenticated backend test coverage."
+  },
+  "latestReadOnlyPublicFileAudit": {
+    "checkedAt": "2026-10-21T11:42:00+07:00",
+    "branchHead": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+    "protectedStaticBranchHeadAtComparison": "e63b7c651fb7615bf2569b60f3c8dad53956e2bd",
+    "mainHead": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "publicIndexHtml": {
+      "adminBlob": "bb0ae30ecb06319eb87e5725ad47fda82595eeb8",
+      "adminChars": 235860,
+      "staticBranchBlob": "eca254f3ff5621362d85077152208cd81f57a64e",
+      "staticBranchChars": 276036,
+      "mainBlob": "1e9362341a6c30976dfb9e86886c38e0ff3e5fd4",
+      "mainChars": 163201,
+      "identicalToStaticBranch": false,
+      "observations": "Extensive public storefront styling/theme changes and public price-confirmation/watermark/favourites presentation. Line-multiset comparison found 728 added and 148 removed line occurrences versus main; diagnostic count only, not canonical unified diff."
+    },
+    "publicAdminIndexHtml": {
+      "adminBlob": "a297b8298ff30c5e713896fed1c21d0f8ca3e899",
+      "staticBranchBlob": "5b4cf7d93a22bdcbdef06972cf26a68ec8f91172",
+      "identicalToStaticBranch": false
+    },
+    "legacyProducts": {
+      "adminBlob": "99080accf6dd155d24f899231f0b9ffe26bf9b0b",
+      "staticBranchBlob": "99080accf6dd155d24f899231f0b9ffe26bf9b0b",
+      "identicalToStaticBranch": true,
+      "recordCountMain": 235,
+      "recordCountAdmin": 235,
+      "recordsWithSkuNullAndUnverified": 235,
+      "changedFieldsComparedToMain": [
+        "sku",
+        "skuVerified"
+      ],
+      "allOtherFieldsUnchanged": true,
+      "oldGeneratedSkuPattern": "SD001 through SD235",
+      "mainBlob": "adad7344659f01358bec7466c8a5c5f752d70d35"
+    },
+    "scopeStatus": "PR #111 remains mixed-scope and not merge-ready; no file/branch was modified by this read-only comparison."
   }
 }

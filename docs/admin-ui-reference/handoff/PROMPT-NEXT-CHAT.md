@@ -105,3 +105,12 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - PR #111 is 909 files: 862 docs/evidence and 47 non-doc across storefront, data, Functions, migration, scripts, workflows, config and tests. The exact large patches for `public/index.html` and `data/legacy-products.json` remain unreviewed because GitHub patch retrieval returned null.
 - `scripts/setup-cloudflare.mjs` was inspected read-only; it can run remote D1 migrations and direct ALTER TABLE for `sku_verified`. It was NOT run. No schema/data/secrets/Production actions.
 - Progress stays 43%. Continue safe read-only audit. Need authorized owner confirmation of the intended Preview deployment/URL and direction on mixed-scope PR; do not bypass Access, merge, deploy, or run migration commands.
+
+
+## Latest audit addendum — 2026-10-21
+
+- Latest verified branch HEAD before this doc update: `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`; standard source CI [39545082149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149) PASS. Do not confuse this CI with Preview/browser evidence.
+- Read-only comparison of large public files confirms PR #111 is mixed-scope: ADMIN `public/index.html` differs from the protected static branch and contains broad public theme/layout/favourites/watermark/price presentation. ADMIN `public/admin/index.html` also differs from the static branch. No branch sync was performed.
+- `data/legacy-products.json` is identical between ADMIN and the static branch. Compared with main, the 235 records differ only by `sku:null` and `skuVerified:false`; titles, categories, descriptions, prices and images are unchanged.
+- Latest Preview diagnostic remains FAIL on source `de6114f...` because the served CSS signature does not match. Artifact has 16 login-shell images + 42 fixture module images; this is not authenticated real-backend QA.
+- PR #111 remains OPEN/unmerged with 909 changed files; review of public storefront effects and migration/backward compatibility is still mandatory. No migration/setup/deploy scripts were executed.

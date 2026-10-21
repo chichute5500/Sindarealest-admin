@@ -72,3 +72,11 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 - PR #111 has 909 changed files (862 docs/evidence, 47 non-doc) including public storefront, Functions/API, migration 0008, deploy/setup scripts and public-site tests. Keep PR unmerged; do not execute setup/deploy or migrations.
 - No local checkout exists in this runtime; local `git status` is NOT VERIFIED. Do not pretend otherwise.
 - Next: confirm authorized intended Preview target, complete visual comparison against all 12 approved screens, safely test authenticated read-only module flows, and finish mixed-scope PR audit. Never bypass Cloudflare Access, touch secrets/real data, or deploy Production.
+
+
+## Latest content-scope audit — 2026-10-21
+
+- At start of the audit, ADMIN branch HEAD was `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`; protected static branch snapshot was `e63b7c651fb7615bf2569b60f3c8dad53956e2bd`. Recheck live refs later.
+- `public/index.html` differs between ADMIN and static branches (blob SHA `bb0ae30...` vs `eca254f...`) and contains extensive public storefront styling plus public price/watermark/favourites presentation. `public/admin/index.html` also differs by branch. Do not sync branches or merge PR #111.
+- `data/legacy-products.json` is byte-identical between ADMIN and static branch; field-level JSON compare vs main found all 235 product records keep other fields unchanged while `sku` became null and `skuVerified=false`. This is not live D1 data, but it is still a public/fixture file in the mixed-scope PR.
+- Current source CI [39545082149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149) PASS on `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`; Preview diagnostic run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILS on source-signature mismatch. Progress stays 43%.
