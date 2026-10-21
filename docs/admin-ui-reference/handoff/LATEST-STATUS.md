@@ -13,7 +13,7 @@
 - `3eb773dd046a0aef5054dd33c2bf7f12846a4bcd`: thêm ảnh mẫu vào artifact workflow; source CI PASS; diagnostic vẫn fail.
 - `5c129a4fc4f5539f83f063c6a55a4bada052d26d`: đồng bộ theme-color Android với theme sáng/tối, thêm bootstrap trước CSS; source CI PASS.
 - `29621b8bacf03cc08136e08eabcc4ed8f6138db1`: regression tests cho theme-color/no-flash; source CI PASS.
-**PR #111:** OPEN/unmerged; PR #108 OPEN/unmerged. Chưa hoàn thành full audit 1,000+ file; không merge.
+**PR #111:** OPEN/unmerged; GitHub API phân trang đã liệt kê đủ **1.092/1.092 file** (+37.208/−392). Nhóm lớn nhất là docs 1.030 file; còn 24 Functions/API, 24 tests, 5 scripts, 2 migrations, 2 workflows, 1 admin HTML và 1 storefront HTML cùng các file gốc khác. Danh sách file đã đủ; semantic/security audit toàn bộ nội dung vẫn chưa hoàn tất, vì vậy không merge. PR #108 OPEN/unmerged.
 **Backend / Production:** D1 schema/migration ledger từ xa NOT VERIFIED. Không chạy setup/migration/deploy; không merge PR #111/#108; không sửa `main` hay nhánh website tĩnh.
 **Công việc tạm hoãn theo yêu cầu chủ sở hữu:** lỗi lưu ảnh sản phẩm và migrations PRE/PRO. Không tự mở lại.
 **Bước kế tiếp:** tiếp tục so sánh ảnh mẫu với từng nhóm màn hình, ưu tiên login/dashboard/products/editor/orders; xem CSS/theme responsive và chức năng chỉ bằng source/fixture hiện có; tiếp tục truy tìm nguyên nhân Preview target mismatch an toàn; hoàn thiện PR changed-file audit và cập nhật toàn bộ handoff sau khi có bằng chứng mới.
