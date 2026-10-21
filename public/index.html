@@ -1227,6 +1227,7 @@ let detailSwipeStart=0;let ignoreDetailClick=false;
 $('#detailMainImage').addEventListener('pointerdown',e=>{detailSwipeStart=e.clientX;ignoreDetailClick=false},{passive:true});
 $('#detailMainImage').addEventListener('pointerup',e=>{const dx=e.clientX-detailSwipeStart;if(Math.abs(dx)>46&&detailImages.length>1){ignoreDetailClick=true;changeDetailImage(detailIndex+(dx<0?1:-1),true);window.setTimeout(()=>{ignoreDetailClick=false},220)}},{passive:true});
 $('#detailMainImage').addEventListener('click',e=>{if(ignoreDetailClick){e.preventDefault();ignoreDetailClick=false;return}openFullscreenImage()});
+$('#detailMainImage').addEventListener('load',()=>syncFullscreenBackgroundKey($('#detailMainImage')));
 let fullSwipeStart=0;
 $('#sdFullscreenFrame').addEventListener('pointerdown',e=>{fullSwipeStart=e.clientX},{passive:true});
 $('#sdFullscreenFrame').addEventListener('pointerup',e=>{const dx=e.clientX-fullSwipeStart;if(Math.abs(dx)>46&&detailImages.length>1)changeDetailImage(detailIndex+(dx<0?1:-1),true)},{passive:true});
@@ -2694,6 +2695,8 @@ html.dark .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!import
 .sd-fullscreen-viewer:before{background:radial-gradient(ellipse 72% 60% at 50% 46%,rgba(92,143,177,.15) 0%,rgba(31,68,95,.08) 48%,rgba(4,16,28,0) 82%),linear-gradient(145deg,rgba(205,230,249,.035),rgba(4,16,28,.12))}
 .sd-fullscreen-frame{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .sd-fullscreen-image.sd-white-background-keyed{filter:url(#sdGalleryWhiteBackgroundKey)}
+/* Main detail image: reuse the existing corner-verified white-canvas key; never alter source URLs. */
+#detailMainImage.sd-white-background-keyed{filter:url(#sdGalleryWhiteBackgroundKey) drop-shadow(0 12px 20px rgba(0,22,42,.16))!important}
 </style>
 
 
