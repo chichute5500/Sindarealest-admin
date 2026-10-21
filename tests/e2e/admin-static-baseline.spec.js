@@ -978,8 +978,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await summary.click();
         await expect(unitPrice).toBeHidden();
       } else {
-        await expect(management, 'Desktop order management remains expanded by default').toHaveAttribute('open', '');
-        await expect(unitPrice).toBeVisible();
+        await expect(summary, 'Desktop order management keeps a compact visible disclosure control').toBeVisible();
+        await expect(management, 'Desktop order management starts collapsed to avoid an oversized table row').not.toHaveAttribute('open', '');
+        await expect(unitPrice, 'The existing single price input stays visible in the desktop product cell').toBeVisible();
+        const compactDesktopOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
+        expect(compactDesktopOrderCardHeight, 'Collapsed desktop order row should not inherit the full payment form height').toBeLessThan(250);
+        await summary.click();
+        await expect(management).toHaveAttribute('open', '');
+        await expect(row.locator('[data-action="save-order"]')).toBeVisible();
+        await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
+        await summary.click();
+        await expect(management).not.toHaveAttribute('open', '');
       }
     }, true);
     await captureView('order-row-details', 'orders', async () => {
