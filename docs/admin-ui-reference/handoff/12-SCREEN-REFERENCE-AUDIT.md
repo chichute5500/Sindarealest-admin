@@ -36,7 +36,7 @@ Overall Admin progress: **48%** — unchanged until evidence supports a meaningf
 |---|---|---|
 | Light/dark themes | PARTIAL | Fixture/screenshot checks exist; complete reference parity is not accepted. |
 | Narrow Android viewport / horizontal overflow | PARTIAL | Prior screenshot matrix included 390px width; repeat on current code SHA before accepting. |
-| Keyboard / focus / accessible names | NOT TESTED | Inspect and test controls screen-by-screen. |
+| Keyboard / focus / accessible names | PARTIAL | Exact-SHA Playwright run [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) passed fixture checks for product-editor tab ArrowLeft/ArrowRight/Home/End navigation, `aria-selected` state, dialog focus trap/restoration and order-details focus. Other screens still need per-module acceptance. |
 | `prefers-reduced-motion` | PASS — BROWSER E2E ON SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e` | Admin Preview Playwright run [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) executed `tests/e2e/admin-static-baseline.spec.js`; the reduced-motion test passed in the 3-test browser suite. It uses synthetic GET fixtures and blocks mutations; it is not authenticated backend QA. |
 | Authenticated real backend | BLOCKED / NOT TESTED | Do not change Access or secrets to work around this. |
 | Product image upload/save | DEFERRED_BY_OWNER | Do not resume without explicit owner authorization. |
@@ -61,3 +61,11 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 - Root cause of the prior E2E failure on `979fa3500775c2b48af4db4f49e973b9c71eeda4`: test selectors incorrectly assumed `.dashboard-revenue` and `.dashboard-shortcut` lived under `#main`. In the actual rendered source those elements are inserted directly into `#appView`; the test now queries the actual classes and the dashboard assertion was aligned to `.dashboard-revenue`. No app business logic or CSS behavior was changed by this fix.
 - The same run passed project check, automated tests, responsive/theme source Playwright matrix, and Preview login CSS signature. Artifact `admin-preview-evidence-188` (ID `12357698923`, 11,188,289 bytes, retained until 2026-11-04) contains 59 PNGs (16 login shell + 43 synthetic fixture screens), 36 fixture metrics and metadata. Metadata shows zero browser/console/request/HTTP errors and no attempted fixture writes. These are source/fixture captures, not authenticated business-flow evidence.
 - Full 12-screen parity remains NOT ACCEPTED; authenticated backend QA remains BLOCKED / NOT TESTED. Overall estimate stays 48%.
+
+
+## Keyboard-navigation follow-up — 2026-10-21 16:00 UTC
+
+- Test-only commit `32c1f28662e7240353b0eda2f5daeaf22359257e` adds Home/End navigation assertions to the product editor tabs, including focus target and `aria-selected` state. Existing ArrowLeft/ArrowRight, dialog focus trapping, Escape close, and focus restoration checks remain.
+- Exact source validation [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) both SUCCESS. Static baseline suite: 3 passed (30.5s); responsive/theme matrix and Preview CSS signature PASS. Artifact `admin-preview-evidence-189`, ID `12359007200`, has 59 PNGs and 36 synthetic fixture metrics.
+- Keyboard/focus is now **PARTIAL**, not globally PASS: these checks cover selected editor and order-detail dialog behavior using synthetic fixtures. Full screen-by-screen keyboard/a11y review and all-12-screen visual parity remain NOT ACCEPTED.
+- Overall progress remains 48%; authenticated real-backend QA is still BLOCKED / NOT TESTED. Image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
