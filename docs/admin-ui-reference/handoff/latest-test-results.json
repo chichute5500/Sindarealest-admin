@@ -1854,7 +1854,7 @@
     "pr111SemanticAudit": "PARTIAL",
     "pr111State": "OPEN_UNMERGED",
     "pr108State": "OPEN_UNMERGED",
-    "capturedAt": "2026-10-21T15:22:00Z",
+    "capturedAt": "2026-10-21T15:24:45Z",
     "head": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
     "duplicateStaticId": "resolved in source; fresh CI not yet confirmed",
     "progressEstimatePercent": 48,
@@ -1867,7 +1867,13 @@
     "testedSourceSha": "06d689b6a97fa7bdb05258acb8435a6954d67309",
     "sourceRun": 39624818256,
     "previewRun": 39624818216,
-    "headBeforeHandoffRefresh": "4ef712beda3bb62591e6bac2445f84aaa87908df"
+    "headBeforeHandoffRefresh": "4ef712beda3bb62591e6bac2445f84aaa87908df",
+    "headBeforeJsonRefresh": "c63ac375dd3d3ad89345ca8a4dee880e7ec4acd1",
+    "latestHandoffCi": {
+      "runId": 39625390469,
+      "sha": "c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf",
+      "conclusion": "success"
+    }
   },
   "pr111FileInventory": {
     "retrievedPages": 12,
@@ -2118,8 +2124,8 @@
     "currentPr108State": "OPEN_UNMERGED",
     "note": "This JSON write will itself advance the ADMIN branch via a handoff-only commit; it does not change the source/test SHA listed above."
   },
-  "latestObservedAdminHead": "4ef712beda3bb62591e6bac2445f84aaa87908df",
-  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:22:00Z",
+  "latestObservedAdminHead": "c63ac375dd3d3ad89345ca8a4dee880e7ec4acd1",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T15:24:45Z",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
     "url": "https://564cd391.sindarealest2.pages.dev/admin/",
@@ -2564,6 +2570,14 @@
       "fixedIn": "06d689b6a97fa7bdb05258acb8435a6954d67309",
       "resolution": "Full validation and focused test passed on fixed commit."
     },
-    "currentSourceValidation": "PASS on source/test commit 06d689b6a97fa7bdb05258acb8435a6954d67309; later commits are handoff documentation only."
+    "currentSourceValidation": "PASS on source/test commit 06d689b6a97fa7bdb05258acb8435a6954d67309; later commits are handoff documentation only.",
+    "latestHandoffValidation": {
+      "runId": 39625390469,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39625390469",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf",
+      "scope": "handoff documentation commit; application source/test validation"
+    }
   }
 }
