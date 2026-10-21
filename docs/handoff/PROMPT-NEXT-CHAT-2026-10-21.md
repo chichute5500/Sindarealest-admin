@@ -1,3 +1,11 @@
+## 2026-10-22 — HERO STATUS OVERRIDE (read this before older notes)
+
+- **Do not delete, hide, replace, or roll back the current hero presentation image as a routine cleanup.** The current `public/index.html` has `syncHeroProductImage()` loading `/images/hero-sd-gl052.png?v=20261022-1` into `#heroProductImage`; the hero image is deliberately treated as a presentation asset (`data-product-image-status="hero-presentation-asset"`), not as proof that SKU SD-GL052 exists in the public catalog.
+- The file path `public/images/hero-sd-gl052.png` is present in the current branch tree (GitHub reports blob SHA `24038214abefdac9ff2451def39f3e5bd9255462`). Preserve it and its relationship to the hero. Do not substitute another catalog product, modify product data, or infer a product mapping from the filename.
+- **Hero is NOT yet fully visually verified.** Source logic and asset presence are confirmed, but current Preview first-load screenshot / Light-Dark at 360×800, 390×844, 768×1024 and 1440×900 still need direct inspection against the reference. Verify actual image load, visibility, cropping, satin blending, empty-frame behavior, and any load error before calling this complete. Do not report visual verification from source/test PASS alone.
+- Keep `SD-GL052` catalog availability as a separate data blocker: its absence from the verified public product payload must not be “fixed” by removing the hero presentation asset or fabricating catalog data. If asset loading fails, diagnose URL/cache/deployment/CSS before changing the design.
+- For a new chat, this dated override takes precedence over older entries below that say the hero image is intentionally hidden or that the hero should be revisited only after all other sections. Preserve the image and continue the visual audit.
+- Browser-level verification of the welcome toolbar/account flash is also still pending: source/test and Preview deploy passed, but the interaction browser run could not start because its wallet was out of credit; do not claim the first-paint flash is resolved until captured.
 ## BÀN GIAO BỔ SUNG — 2026-10-22 (ưu tiên cao nhất; lỗi khởi tạo trang cần xác minh)
 
 ### Yêu cầu người dùng mới
