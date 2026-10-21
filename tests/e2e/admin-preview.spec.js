@@ -147,8 +147,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
       // rather than raw cssText substrings. This avoids misclassifying a valid rule
       // as absent merely because the browser serializes ".topbar > .brand".
       const normalizeSelector = value => String(value || '')
-        .replace(/\\s*([>+~])\\s*/g, '$1')
-        .replace(/\\s+/g, ' ')
+        .replace(/\s*([>+~])\s*/g, '$1')
+        .replace(/\s+/g, ' ')
         .trim();
       const normalizedHideSelector = normalizeSelector(hideSelector);
       const stylesheetSources = [...document.styleSheets].map(sheet => {
