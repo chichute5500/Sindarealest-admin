@@ -86,7 +86,8 @@ assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.checkout-backdrop
 assert.match(html, /\.cart-drawer\{width:min\(460px,100%\);background:var\(--glass\);/, 'The cart drawer must retain the page texture through a translucent glass surface.');
 assert.match(html, /\.checkout-drawer\{position:fixed;z-index:186;[^}]*background:var\(--glass\);/, 'The checkout drawer must retain the page texture through a translucent glass surface.');
 assert.match(html, /function dismissToast\(\)/, 'Drawers must be able to dismiss a toast before it overlaps their action area.');
-assert.match(html, /function showToast\(msg,link=null\)\{const t=\$\('#toast'\);const panelOpen=\['#cartDrawer','#checkoutDrawer','#accountDrawer','#productOverlay'\]/, 'Toast display must be suppressed while a blocking panel is open.');
+assert.match(html, /function showToast\(msg,link=null\)\{const t=\$\('#toast'\);const panelOpen=\['#cartDrawer','#checkoutDrawer','#accountDrawer'\]/, 'Toast display must be suppressed while blocking cart, checkout, or account panels are open, but a successful add can announce itself above the product detail overlay.');
+assert.doesNotMatch(html.match(/function showToast\(msg,link=null\)[^\n]*/)?.[0] || '', /#productOverlay/, 'The product detail overlay must not suppress a truthful add-to-cart success toast.');
 assert.match(html, /function openCart\(\)\{dismissToast\(\)/, 'Opening the cart must clear a previously displayed toast.');
 assert.match(html, /function openCheckout\(\)\{\s*dismissToast\(\)/, 'Opening checkout must clear a previously displayed toast.');
 assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'Checkout must be reachable from the cart CTA.');
