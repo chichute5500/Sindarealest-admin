@@ -727,11 +727,11 @@
     "Real authenticated module testing requires authorized Preview access and a safe test-data/PII masking strategy."
   ],
   "nextActions": [
-    "Inspect admin-preview-evidence-61 and latest screenshots/metadata; compare against the approved reference without treating fixture screens as backend proof.",
-    "Ask the repository owner to confirm the intended ADMIN Preview URL through authorized configuration; never print or edit secret values in the workflow.",
-    "Run authenticated read-only Playwright tests only after Cloudflare Access and application authentication are legitimately satisfied.",
-    "Audit the full PR #111 diff and narrow ADMIN-only scope before any merge consideration.",
-    "Keep PR #111 and PR #108 unmerged; do not deploy Production or modify the storefront branch, main, secrets, database schema, D1/R2, or real data."
+    "Inspect scripts/setup-cloudflare.mjs call sites and tests as source only; never execute it.",
+    "Review all available product/order/backup/restore API patches and tests for backwards compatibility.",
+    "Request authorized owner decision on migration/backend scope and intended ADMIN Preview URL; do not alter secrets or bypass Cloudflare Access.",
+    "Get a fresh CI run for the current workflow commit using authorized GitHub Actions UI if push trigger did not create one; record step-level evidence.",
+    "Continue full diff audit, especially public/index.html and data/legacy-products.json; keep PR #111 open/unmerged."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39495162150",
@@ -739,50 +739,7 @@
   "latestVerifiedAt": "2026-10-20T15:20:00Z",
   "latestVerifiedSourceCommit": "7c742407530dbcf2f9407d6a82c48c70620b98a7",
   "currentAdminBranchHead": "fbf2955fc0983137cb882f683ec3a17c6695db17",
-  "latestVerificationSummary": {
-    "latestSourceChecksRunId": 39447109288,
-    "latestSourceChecksRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39447109288",
-    "latestSourceChecksCommit": "ed27fc5c67152ba900c8b10f5acd358dae8e8096",
-    "latestSourceChecks": "PASS",
-    "previewDiagnosticRunId": 39470193389,
-    "previewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39470193389",
-    "previewDiagnosticConclusion": "FAIL_PREVIEW_SOURCE_OR_ACCESS_MISMATCH",
-    "sourceChecksInDiagnostic": "PASS",
-    "npmRunCheck": "PASS_ON_TESTED_COMMIT_F75CB4D",
-    "npmTest": "PASS_ON_TESTED_COMMIT_F75CB4D",
-    "localPlaywrightMatrix": "PASS_16_REAL_PNG_LOGIN_ONLY_ON_TESTED_COMMIT_F75CB4D",
-    "screenshotPath": "docs/admin-ui-reference/handoff/history/b5ce11f92995/screenshots/",
-    "localPageErrors": 0,
-    "localConsoleErrors": 0,
-    "localFailedRequests": 0,
-    "localHttpErrors": 0,
-    "localHorizontalOverflow": false,
-    "remotePreviewLoginDashboard": "FAIL_CURRENT_SOURCE_SIGNATURE_MISMATCH",
-    "remotePreviewFailure": "Configured ADMIN_TEST_URL serves a page where .topbar > .brand remains visible on login, unlike current ADMIN source.",
-    "priorDiagnosticRunId": 39446212149,
-    "priorDiagnosticConclusion": "SUCCESS_ON_OLDER_COMMIT_NOT_CURRENT_PREVIEW_PROOF",
-    "referenceImage": "HTML_VIEWER_EMBEDDED_REFERENCE_REPORTED_12_SCREENS; ORIGINAL_PNG_NOT_DIRECTLY_READ_IN_THIS_SESSION",
-    "visualReview": "QUALITATIVE_LOGIN_SHELL_390X844_LIGHT_DARK_ONLY; NO_FULL_PIXEL_DIFF",
-    "authenticatedModules": "NOT_TESTED",
-    "localCheckoutFullDiff": "BLOCKED",
-    "pr111": {
-      "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
-      "state": "OPEN",
-      "merged": false,
-      "base": "main",
-      "head": "feature/admin-isolated-handoff-2026-10-20",
-      "changedFiles": 278,
-      "additions": 12794,
-      "deletions": 356,
-      "warning": "PR includes storefront/backend files; do not merge."
-    },
-    "productionDeployment": "NOT_PERFORMED",
-    "liveHeadVerifiedAt": "2026-10-21",
-    "liveHeadCommit": "e7a1510a8936f20fabed7fb9da71d044fdd7613f",
-    "currentHeadTests": "NOT_RUN_ON_CURRENT_HEAD",
-    "currentHeadNote": "The current branch HEAD contains documentation-only commit e7a1510a8936f20fabed7fb9da71d044fdd7613f. The latest successful npm run check, npm test, and 16-image local Playwright matrix are from f75cb4d38980af17781c1428133d6e27417865b2; do not attribute those test results to the current HEAD without rerunning.",
-    "sourceChecksOnLastRun": "PASS"
-  },
+  "latestVerificationSummary": "Current audit reconfirmed PR #111 is 909 files and spans docs plus storefront/backend/migration/scripts; migration/setup risk remains unresolved. No workflow run exists in the queried PR-triggered runs for the current head, so do not mark the latest workflow fix validated.",
   "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
@@ -898,8 +855,8 @@
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
-  "updatedAt": "2026-10-21T04:15:00.172Z",
-  "currentBranchHeadAtHandoff": "cdec188efa2198caaf0ac65cd294b682d1088fc9",
+  "updatedAt": "2026-10-21T04:45:00Z",
+  "currentBranchHeadAtHandoff": "eee7dcedb71a42516822a9f46384ddacc107eb4e",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": true,
   "previewDiagnostics": {
@@ -957,54 +914,46 @@
   },
   "progressPercent": 43,
   "prScopeAudit": {
-    "auditedAt": "2026-10-21",
+    "checkedAt": "2026-10-21",
     "prNumber": 111,
-    "state": "OPEN_UNMERGED",
+    "state": "OPEN",
+    "merged": false,
     "base": "main",
-    "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-    "headSha": "bb320c7f928fbee888df5f641e3f27fe27ca3253",
-    "changedFiles": 909,
-    "additions": 30195,
-    "deletions": 356,
-    "compare": {
-      "status": "diverged",
-      "aheadBy": 393,
-      "behindBy": 6,
-      "comparedFileStats": 300
-    },
-    "inventory": {
-      "docs": 862,
-      "adminEntry": "public/admin/index.html",
-      "storefront": "public/index.html",
-      "functions": 14,
-      "migrations": 1,
-      "dataFiles": 1,
-      "workflows": 2,
+    "headSha": "eee7dcedb71a42516822a9f46384ddacc107eb4e",
+    "changedFileCount": 909,
+    "docsEvidenceFiles": 862,
+    "nonDocumentationFiles": 47,
+    "nonDocumentationSummary": {
+      "adminUi": 1,
+      "storefrontPublic": 2,
+      "data": 1,
+      "functionsApi": 14,
+      "migrationSql": 1,
       "scripts": 5,
-      "tests": 20,
-      "packageJson": 1
+      "workflows": 2,
+      "packageConfig": 1,
+      "tests": 20
     },
-    "conclusion": "NOT_ADMIN_ONLY_DIFF; DO_NOT_MERGE",
-    "nextAudit": [
-      "public/index.html",
-      "data/legacy-products.json",
-      "functions/",
-      "migrations/0008_product_sku_verification.sql",
-      "scripts/"
+    "comparison": {
+      "status": "diverged",
+      "aheadBy": 398,
+      "behindBy": 6,
+      "compareEndpointFilesReported": 300
+    },
+    "findings": [
+      "PR is not UI-only; it includes storefront, backend API, data, migration, scripts and test changes.",
+      "scripts/setup-cloudflare.mjs contains remote D1 migration/direct ALTER TABLE behavior; not executed and is a merge/deploy blocker pending explicit migration strategy review.",
+      "Large public/index.html and data/legacy-products.json patches remain unreviewed because the patch endpoint did not return those contents.",
+      "No PR-triggered workflow run was returned for the latest observed head; workflow reporting fix is not validated on that head."
     ],
-    "caution": "Do not mass-revert; map commit ancestry and preserve user work before any scope remediation.",
-    "headShaBeforeHandoffDocs": "158478407b24eea2f507b5013af8621d0f48a743",
-    "lastAuditCommit": "6ce10a0f6b2e874cbcbdbae36d3411afa1af5d77",
-    "highRiskFinding": "scripts/setup-cloudflare.mjs now contains remote D1 migration execution and direct ALTER TABLE for sku_verified columns; NOT EXECUTED; treat as blocker under no-schema-change constraint.",
-    "largePatchUnavailable": [
-      "public/index.html",
-      "data/legacy-products.json"
-    ]
+    "safety": "No merge/deploy/secret change/schema migration/production data action performed."
   },
   "latestWorkflowFixValidation": {
-    "workflowBlob": "3f04b295dc1cf212be4ace76293228c69fd5860e",
-    "currentHead": "bb320c7f928fbee888df5f641e3f27fe27ca3253",
-    "validation": "NOT_YET_RUN",
-    "reason": "No PR-triggered workflow run found for current HEAD; do not infer pass from older run."
+    "status": "NOT_VALIDATED_ON_CURRENT_HEAD",
+    "observedHeadSha": "eee7dcedb71a42516822a9f46384ddacc107eb4e",
+    "workflowRunsFoundForHead": 0,
+    "lastKnownEvidenceRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39495162150",
+    "lastKnownEvidenceRunTestedSourceSha": "d74de3c6adbb6be6b0a59ac4d45e869738a016e4",
+    "reason": "No PR-triggered run returned for the current head; the older run still reports source checks PASS and Preview diagnostics FAIL."
   }
 }
