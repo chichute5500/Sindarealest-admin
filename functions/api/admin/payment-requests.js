@@ -37,7 +37,7 @@ export async function onRequestPost(context) {
 
     const itemRows = await db.prepare("SELECT fulfillment_type,quantity,line_total FROM order_items WHERE order_id=?").bind(orderId).all();
     const items = itemRows.results || [];
-    if (!items.length || items.some(item => !Number.isSafeInteger(Number(item.line_total)) || Number(item.line_total) < 0)) return fail("Một hoặc nhiều dòng hàng chưa có giá được xác nhận.", 409);
+    if (!items.length || items.some(item => item.line_total === null || item.line_total === undefined || (typeof item.line_total === "string" && !item.line_total.trim()) || !Number.isSafeInteger(Number(item.line_total)) || Number(item.line_total) < 0)) return fail("Một hoặc nhiều dòng hàng chưa có giá được xác nhận.", 409);
     const itemTotal = items.reduce((sum, item) => sum + Number(item.line_total), 0);
     if (!Number.isSafeInteger(itemTotal) || itemTotal !== total) return fail("Tổng đơn chưa khớp tổng các dòng hàng đã xác nhận; cần kiểm tra thủ công.", 409);
     const fulfillmentTypes = new Set(items.map(item => ["in_stock", "made_to_order", "unclassified"].includes(item.fulfillment_type) ? item.fulfillment_type : "unclassified"));

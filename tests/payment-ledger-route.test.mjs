@@ -127,6 +127,17 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(db.batches.length, 0, "missing QR object must not create a payable request");
 }
 {
+  const db = makeDb({ orderItems: [
+    { fulfillment_type: "made_to_order", quantity: 1, line_total: null },
+    { fulfillment_type: "made_to_order", quantity: 1, line_total: 100000 }
+  ] });
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit"
+  })));
+  assert.equal(response.status, 409, "an unpriced order item must fail closed even when other lines add up to the confirmed total");
+  assert.equal(db.batches.length, 0, "an order with any unpriced item must not create a payment request");
+}
+{
   const db = makeDb({ order: baseOrder });
   const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
     orderId: "order-1", paymentOption: "deposit"
