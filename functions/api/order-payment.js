@@ -21,13 +21,27 @@ export async function onRequestGet({ request, env }) {
         !order.payment_terms_confirmed_at || order.total===null || !Number.isSafeInteger(Number(order.total))) {
       return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
     }
-    const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? AND status='pending' ORDER BY created_at DESC LIMIT 1").bind(order.id).first();
+    const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? ORDER BY created_at DESC LIMIT 1").bind(order.id).first();
     if (!requestRow || !validPublicQrImageKey(requestRow.qr_image_key)) {
       return json({ ok:true, ...base, paymentReady:false, message:"Chưa có yêu cầu thanh toán được SinDarealest tạo. Vui lòng liên hệ tư vấn." },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
     }
+    const shippingBenefit = requestRow.shipping_benefit || (requestRow.installment_type === "full" ? "free_shipping" : "standard_shipping");
+    const freeShippingEligible = shippingBenefit === "free_shipping";
+    const freeShipping = order.payment_status === "paid" && freeShippingEligible;
+    if (order.payment_status === "paid" || requestRow.status !== "pending") {
+      return json({
+        ok:true, ...base, paymentReady:false, installmentType:requestRow.installment_type,
+        shippingBenefit, freeShippingEligible, freeShipping,
+        amount:null, transferReference:requestRow.transfer_reference,
+        message:freeShipping ? "Đã xác minh thanh toán đủ. Đơn đủ điều kiện miễn phí giao hàng." :
+          (order.payment_status === "paid" ? "Admin đã xác minh đơn được thanh toán đủ." : "Yêu cầu thanh toán trước đã kết thúc; hãy chờ SinDarealest tạo đợt tiếp theo."),
+        createdAt:requestRow.created_at
+      },200,{"Referrer-Policy":"no-referrer","X-Robots-Tag":"noindex, nofollow"});
+    }
     return json({
       ok:true, ...base, paymentReady:true, installmentType:requestRow.installment_type,
-      amount:Number(requestRow.amount), shippingBenefit:requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping'), freeShippingEligible:(requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping')) === 'free_shipping', freeShipping:Boolean(order.payment_status === "paid" && (requestRow.shipping_benefit || (requestRow.installment_type === 'full' ? 'free_shipping' : 'standard_shipping')) === 'free_shipping'), transferReference:requestRow.transfer_reference,
+      amount:Number(requestRow.amount), shippingBenefit, freeShippingEligible, freeShipping,
+      transferReference:requestRow.transfer_reference,
       qrImageUrl:"/payment-qr/"+requestRow.qr_image_key, bankName:requestRow.bank_name,
       accountNumber:requestRow.account_number, accountName:requestRow.account_name,
       instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi đúng nội dung chuyển khoản. Mở/quét QR không xác nhận đã thanh toán. Freeship chỉ được áp dụng sau khi Admin xác minh đã nhận đủ toàn bộ số tiền.",

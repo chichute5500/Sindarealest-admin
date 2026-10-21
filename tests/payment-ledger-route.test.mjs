@@ -216,4 +216,20 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(db.batches.length, 0);
 }
 
+
+{
+  const token = createOrderAccessToken();
+  const tokenHash = await hashOrderAccessToken(token);
+  const order = { ...baseOrder, order_number: "SD-TOKEN-FULL-PAID", public_access_token_hash: tokenHash, payment_status: "paid", total: 100000, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
+  const paidRequest = { id: "request-paid", installment_type: "full", amount: 100000, shipping_benefit: "free_shipping", transfer_reference: "SDFULL123456", qr_image_key: QR_KEY, bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A", status: "settled", created_at: "2026-10-21T07:01:00Z" };
+  const db = makeDb({ publicOrder: order, pendingRequest: paidRequest });
+  const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-FULL-PAID&token=" + token), env: { DB: db } });
+  const payload = await response.json();
+  assert.equal(payload.paymentReady, false);
+  assert.equal(payload.freeShippingEligible, true);
+  assert.equal(payload.freeShipping, true, "freeship becomes applied only after server payment status is paid");
+  assert.equal(Object.hasOwn(payload, "amount"), true);
+  assert.equal(payload.amount, null, "paid order must not request another transfer");
+}
+
 console.log("PASS payment ledger route behavior: owner-derived deposit amounts, client amount rejection, mixed/unclassified cart gates, freeship and verified ledger.");
