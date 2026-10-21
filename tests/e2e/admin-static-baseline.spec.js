@@ -1286,6 +1286,30 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(section.locator('#backupBtn')).toContainText('Tải bản sao lưu JSON');
       await expect(section.locator('#restoreFile')).toHaveAttribute('accept', 'application/json,.json');
       await expect(section).toContainText('có bước xác nhận trước khi thực hiện');
+      const backupLayout = await section.evaluate(element => {
+        const panel = element.getBoundingClientRect();
+        const actions = element.querySelector('.backup-actions').getBoundingClientRect();
+        const controls = [...element.querySelectorAll('.backup-actions > .btn')].map(node => {
+          const box = node.getBoundingClientRect();
+          return { width: box.width, right: box.right, left: box.left, height: box.height, scrollWidth: node.scrollWidth, clientWidth: node.clientWidth };
+        });
+        const note = element.querySelector('.backup-note');
+        const noteBox = note.getBoundingClientRect();
+        return {
+          panelWidth: panel.width,
+          panelRight: panel.right,
+          actionsWidth: actions.width,
+          controls,
+          noteWidth: noteBox.width,
+          noteScrollWidth: note.scrollWidth,
+          noteClientWidth: note.clientWidth
+        };
+      });
+      expect(backupLayout.panelRight, 'Backup panel should not extend beyond the viewport').toBeLessThanOrEqual(variant.viewport.width + 1);
+      expect(backupLayout.controls.every(control => control.width > 0 && control.scrollWidth <= control.clientWidth + 1),
+        'Backup/restore actions should remain visible without clipped text: ' + JSON.stringify(backupLayout)).toBe(true);
+      expect(backupLayout.noteScrollWidth, 'Backup safety note should not overflow its own content box').toBeLessThanOrEqual(backupLayout.noteClientWidth + 1);
+      expect(await section.locator('#restoreFile').isVisible(), 'The JSON file input must remain visually hidden behind its label').toBe(false);
     });
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
