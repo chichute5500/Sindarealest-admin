@@ -2125,10 +2125,38 @@
   },
   "overallProgressPercent": 48,
   "latestHandoffUpdate": {
-    "updatedAt": "2026-10-21T20:45:00+07:00",
-    "purpose": "Record direct review of product-gallery 390x844 light screenshot from artifact 156",
-    "priorRecordedHead": "1ffdef972a65d1a13490429a6c9d719cf4153cbe",
-    "note": "Screenshot reviewed from run 39611416915 / artifact admin-preview-evidence-156. Product editor is stacked with three tabs, upload picker, two placeholder/example thumbnails and move/delete controls plus fixed action bar. This is source/fixture evidence only; real image storage/save is not verified. Visual parity remains NOT_ACCEPTED, authenticated business flows NOT_TESTED. No source change; overall progress stays 48%. PR #111/#108 remain open/unmerged."
+    "updatedAt": "2026-10-21",
+    "ownerRequest": "Update handoff files and prompt; continue practical Admin work autonomously within restrictions.",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "latestApplicationSourceSha": "1fb56f7b5773876c581847bf44abbef1c5c16a67",
+    "latestTestedCodeAndTestSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
+    "successfulRuns": [
+      {
+        "id": 39615192697,
+        "sha": "1fb56f7b5773876c581847bf44abbef1c5c16a67"
+      },
+      {
+        "id": 39615417216,
+        "sha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978"
+      }
+    ],
+    "pr111": "OPEN_UNMERGED_MIXED_SCOPE_NOT_MERGE_READY",
+    "pr108": "OPEN_UNMERGED",
+    "screenGroups12": "NOT_ACCEPTED",
+    "authenticatedBackendQA": "NOT_TESTED",
+    "imageSave": "DEFERRED_BY_OWNER",
+    "preProMigrations": "DEFERRED_BY_OWNER",
+    "migration009DeploymentReadiness": "POTENTIAL_SOURCE_LEVEL_MISMATCH_NOT_VERIFIED_REMOTELY",
+    "productionDeployment": "NOT_PERFORMED",
+    "remoteD1R2Operations": "NOT_PERFORMED",
+    "tinyfish": "NOT_USED",
+    "nextActions": [
+      "Re-fetch branch/PR/Actions metadata",
+      "Continue 12-screen visual and accessibility audit with evidence",
+      "Continue read-only PR #111 semantic/security review",
+      "Run CI on exact SHA after each source change",
+      "Keep handoff documents synchronized"
+    ]
   },
   "latestRun": {
     "runId": 39615417216,
