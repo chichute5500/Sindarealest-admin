@@ -665,3 +665,12 @@ Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run
 - PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) remains OPEN/UNMERGED, base `main`, currently 1,114 changed paths and mixed Admin/storefront/Functions/migration/setup-deploy/test/evidence scope: **not merge-ready**. PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108) remains OPEN/UNMERGED (269 paths).
 - Source-only migration tracking risk remains: `setup-cloudflare.mjs` omits 0009 and `deploy-cloudflare.mjs` preflights 0007/0008 but not 0009. This does not prove remote D1 lacks that schema. No remote D1/R2, SQL, migration/setup script, merge, Production deployment, secret/Access change/bypass, or TinyFish occurred.
 - Overall progress remains **48%**. Before further edits, re-fetch live branch/PR refs; current HEAD after documentation updates differs from tested source/test SHA.
+
+
+### Visual spot-check from downloaded artifact #169
+
+- Opened the approved reference PNG and current Playwright screenshots. This is only an initial spot-check, not 12-screen acceptance.
+- Reference dashboard (screen 2) has a revenue trend chart; `dashboard__390x844__light.png` has metric cards, shortcuts and activity but no chart. The source explicitly avoids fabricated trend data. Next inspect whether real historical revenue data/API is available; if not, use an honest no-data state and do not invent values.
+- Reference image management (screen 5) is a dedicated full-screen workflow with a large image and thumbnails. `product-gallery__390x844__light.png` is a synthetic product-editor fixture with placeholder images, so it is not proof of real gallery behavior or visual parity.
+- Artifact #169 contains 59 source/fixture PNGs, but module screens use synthetic read-only data. Keep 12-screen visual parity NOT ACCEPTED and authenticated backend QA NOT TESTED until evidence supports acceptance.
+- The artifact and visual gap findings are documented in `LATEST-STATUS.md` and `latest-test-results.json`. Continue with a 12-family comparison matrix, then data-backed dashboard behavior and authorized real gallery QA; do not modify the static website branch or fabricate business data.
