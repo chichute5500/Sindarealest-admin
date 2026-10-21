@@ -1532,5 +1532,53 @@
       "secretsChanged": false,
       "cloudflareAccessBypassed": false
     }
+  },
+  "latestImageSaveAndRemoteMigrationBlocker": {
+    "checkedAt": "2026-10-21",
+    "userReportedError": "Cơ sở dữ liệu chưa khởi tạo đúng. Hãy chạy hai tệp SQL trong thư mục migrations/.",
+    "requestedEnvironments": [
+      "PRE",
+      "PRO"
+    ],
+    "suspectedMigrations": [
+      "migrations/0008_product_sku_verification.sql",
+      "migrations/0009_fulfillment_and_manual_payments.sql"
+    ],
+    "diagnosis": "NOT_CONFIRMED; schema/ledger of remote databases not inspected",
+    "previewUiObservations": {
+      "login": "PASS_USER_CONFIRMED",
+      "productListAndDetail": "PASS_USER_CONFIRMED",
+      "imageSelectionUi": "PASS_USER_CONFIRMED",
+      "saveProduct": "FAIL_USER_REPORTED_DATABASE_INITIALIZATION_MESSAGE",
+      "actualImageUploadAndStorage": "NOT_VERIFIED"
+    },
+    "remoteMigrationStatus": {
+      "preview": "NOT_RUN_SCHEMA_AND_LEDGER_NOT_VERIFIED",
+      "production": "NOT_RUN_SCHEMA_AND_LEDGER_NOT_VERIFIED",
+      "sqlExecuted": false,
+      "setupScriptExecuted": false
+    },
+    "accessAttempt": {
+      "browserRoute": "TinyFish attempted but run did not start due insufficient wallet balance",
+      "userInstruction": "Bỏ qua tinyfish",
+      "tinyfishAllowed": false,
+      "alternativeAuthenticatedCloudflareD1Tool": "NOT_CONFIRMED_AVAILABLE"
+    },
+    "nextRequiredSteps": [
+      "Use a non-TinyFish authenticated method to identify PRE and PRO D1 database names/IDs independently",
+      "Read schema and migration ledger for each database and compare migrations 0001-0009",
+      "Apply only verified-missing migrations in dependency order; never blindly rerun ALTER TABLE migrations",
+      "After any approved schema correction, separately test product metadata save and actual R2 image upload/storage"
+    ],
+    "safety": {
+      "noProductionDeploy": true,
+      "pr111OpenUnmerged": true,
+      "pr108OpenUnmerged": true,
+      "mainModified": false,
+      "staticBranchModified": false,
+      "secretsChanged": false,
+      "accessBypassed": false,
+      "remoteD1Mutation": false
+    }
   }
 }
