@@ -39,3 +39,14 @@ Các file `latest-*.png` chỉ được coi là ảnh chụp thực tế sau khi
 - Phạm vi cho công việc icon website tĩnh: chỉ nhánh `fix/liquid-glass-audit-2026-10-19`; không merge main, không deploy Production, không sửa backend/API/schema/bindings/secret/dữ liệu.
 - Trạng thái: đã tạo tài liệu kiểm kê ban đầu từ `public/index.html`; CHƯA triển khai icon vào giao diện; CHƯA có kiểm thử/ảnh trước-sau. Không ghi PASS cho các mục này.
 - Trước triển khai: xác minh lại HEAD và nội dung source hiện tại, kiểm kê cả các control sinh động khi chạy, sau đó thực hiện từng nhóm icon và chạy kiểm thử/ảnh cùng SHA.
+
+
+## Bổ sung bàn giao — icon động và hiệu ứng fly-to-cart (2026-10-22)
+
+Nguồn chỉ dẫn chính đã được cập nhật trong [MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md), mục XXII. Đọc mục đó trước khi triển khai.
+
+- Đặc tả inventory: [docs/icon-system-inventory.md](../../../docs/icon-system-inventory.md).
+- Phạm vi: chỉ website tĩnh trên `fix/liquid-glass-audit-2026-10-19`; không merge PR/main, không deploy Production, không sửa backend/API/database/schema/secrets/bindings/dữ liệu.
+- Yêu cầu quan trọng: heart đỏ khi thích; cart badge/toast phản ánh thao tác thật; mọi điểm add hàng dùng chung fly-to-cart đến icon header; clone phải dùng đúng ảnh đang hiển thị, đúng sản phẩm và variant; không di chuyển trang gốc hoặc add trùng.
+- Quy trình bắt buộc: xác minh HEAD/Preview/baseline → audit source/runtime + test hiện hữu → chia lát thay đổi nhỏ → Playwright/ảnh Preview mỗi lát → cập nhật bằng chứng/handoff.
+- Trạng thái: đặc tả và quy trình đã được ghi; chưa xác nhận tính năng được triển khai hay test PASS. Không suy diễn từ việc cập nhật tài liệu.
