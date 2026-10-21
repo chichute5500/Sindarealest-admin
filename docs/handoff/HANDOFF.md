@@ -1,3 +1,12 @@
+## CANONICAL HANDOFF ROUTING — 2026-10-22
+
+- **Active prompt:** [`docs/handoff/PROMPT-NEXT-CHAT-2026-10-22.md`](PROMPT-NEXT-CHAT-2026-10-22.md). It consolidates the latest known workflow evidence and the newly added icon/fly-to-cart requirements from `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md` §XXII and `docs/icon-system-inventory.md`.
+- `PROMPT-NEXT-CHAT-2026-10-22-REV2.md` and `REV3.md` are historical snapshots only; do not use either as the current task list.
+- New icon/fly-to-cart features are **specified but not yet implementation-verified**. Keep them in the active plan; do not mark PASS until source, Playwright, and Preview visual evidence confirm them.
+- Do not overwrite or ignore newer user requirements while reconciling older audit notes. Fetch the current branch HEAD and review commits before any source edit.
+
+---
+
 ## CHECKPOINT CHỐNG LÀM LẠI — 2026-10-22 (đọc đầu tiên, thay cho mọi trạng thái cũ mâu thuẫn)
 
 ### Source of truth tại checkpoint
