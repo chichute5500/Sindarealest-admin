@@ -667,6 +667,36 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productPanelDetails #pDescription')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPrice')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pStock')).toBeVisible();
+    if (variant.viewport.width <= 390) {
+      const mobilePriceStockLayout = await page.evaluate(() => {
+        const fieldRect = id => {
+          const field = document.querySelector('#' + id)?.closest('.field');
+          if (!field) return null;
+          const rect = field.getBoundingClientRect();
+          return { top: rect.top, bottom: rect.bottom, width: rect.width };
+        };
+        const footer = document.querySelector('#backdrop .editorfooter')?.getBoundingClientRect();
+        return {
+          price: fieldRect('pPrice'),
+          stock: fieldRect('pStock'),
+          footerTop: footer?.top
+        };
+      });
+      expect(mobilePriceStockLayout.price, 'Mobile product price field must exist').not.toBeNull();
+      expect(mobilePriceStockLayout.stock, 'Mobile product stock field must exist').not.toBeNull();
+      expect(
+        Math.abs(mobilePriceStockLayout.price.top - mobilePriceStockLayout.stock.top),
+        'Product price and stock should share one row on mobile: ' + JSON.stringify(mobilePriceStockLayout)
+      ).toBeLessThanOrEqual(2);
+      expect(mobilePriceStockLayout.price.width, 'Price field must retain usable width').toBeGreaterThan(0);
+      expect(mobilePriceStockLayout.stock.width, 'Stock field must retain usable width').toBeGreaterThan(0);
+      if (variant.viewport.width >= 380 && mobilePriceStockLayout.footerTop !== undefined) {
+        expect(
+          mobilePriceStockLayout.stock.bottom,
+          'At 390x844 the stock field should stay above the fixed editor action footer: ' + JSON.stringify(mobilePriceStockLayout)
+        ).toBeLessThan(mobilePriceStockLayout.footerTop - 4);
+      }
+    }
     await expect(page.locator('#productPanelDetails .product-visibility-row')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPublished')).toBeChecked();
     await expect(page.locator('#productPanelDetails #pFulfillmentType')).toHaveCount(0);
