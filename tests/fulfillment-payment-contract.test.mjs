@@ -1,12 +1,24 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { normalizeFulfillmentType, summarizePaymentRows, validPublicQrImageKey, createOrderAccessToken, hashOrderAccessToken } from "../functions/_payments.js";
+import { fromRow, validateProduct } from "../functions/_lib.js";
 const read = path => readFileSync(new URL(path, import.meta.url), "utf8");
 assert.equal(normalizeFulfillmentType("in_stock"), "in_stock");
 assert.equal(normalizeFulfillmentType("made_to_order"), "made_to_order");
 assert.equal(normalizeFulfillmentType("unclassified"), "unclassified");
 assert.equal(normalizeFulfillmentType(undefined), "unclassified", "historical records must never be inferred from stock or name");
 assert.equal(normalizeFulfillmentType("stock-positive"), "unclassified", "unknown fulfillment type fails closed");
+
+const baseProduct = { title:"Sản phẩm kiểm thử", sku:"SD-TEST001", category:"wallets", description:"", price:100000, stock:0, published:true, images:[] };
+assert.equal(validateProduct({ ...baseProduct, fulfillmentType:"in_stock" }).value.fulfillmentType, "in_stock", "Admin can explicitly classify a product as in stock");
+assert.equal(validateProduct({ ...baseProduct, fulfillmentType:"made_to_order" }).value.fulfillmentType, "made_to_order", "Admin can explicitly classify a product as made to order");
+assert.equal(validateProduct({ ...baseProduct }).value.fulfillmentType, "unclassified", "new product without an explicit owner choice remains unclassified");
+assert.ok(validateProduct({ ...baseProduct, fulfillmentType:"guess-from-stock" }).error, "invalid fulfillment enums must be rejected");
+const historicalProduct = fromRow({ id:"fixture-legacy", slug:"legacy", sku:"SD-LEGACY001", sku_verified:0, title:"Fixture legacy", category:"wallets", category_label:"Ví", description:"", price:null, stock:10, published:1, images_json:"[]", source_price_confirmed:0, sort_order:1 });
+assert.equal(historicalProduct.fulfillmentType, "unclassified", "legacy rows missing fulfillment_type must not infer from stock or title");
+const publicStockProduct = fromRow({ id:"fixture-in-stock", slug:"in-stock", sku:"SD-TEST002", sku_verified:1, title:"Fixture in-stock", category:"wallets", category_label:"Ví", description:"", price:100000, stock:10, published:1, images_json:"[]", source_price_confirmed:1, sort_order:2, fulfillment_type:"in_stock" }, { publicView:true, showPrices:true });
+assert.equal(publicStockProduct.fulfillmentType, "in_stock", "public product mapping preserves the explicitly stored fulfillment enum");
+
 assert.equal(validPublicQrImageKey("qr-550e8400-e29b-41d4-a716-446655440000.png"), true);
 assert.equal(validPublicQrImageKey("private-originals/qr.png"), false);
 assert.equal(validPublicQrImageKey("../qr.png"), false);
