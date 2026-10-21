@@ -2,9 +2,9 @@
 
 > Đây là điểm bắt đầu bắt buộc cho mọi phiên AI/agent tiếp tục công việc ADMIN. Nội dung chỉ phản ánh trạng thái đã ghi và kiểm chứng; luôn xác minh Git thực tế trước khi sửa.
 
-## Latest checkpoint — 2026-10-21 17:06 UTC
+## Latest checkpoint — 2026-10-21 17:10 UTC
 
-- Latest application/test commit `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; added warranty search status announcement and empty-state assertions. Validate Source #39640751340 and Admin Preview/Playwright #39640751300 were running at checkpoint; verify their final state before treating as passed.
+- Latest application/test commit `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; added warranty search status announcement and empty-state assertions. Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) and Admin Preview/Playwright [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) both SUCCESS on exact source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; artifact #201 contains 63 PNGs.
 - Screen #10 warranty UI now has list-first search/filter and a collapsed accessible issue form; one-line mobile order ID E2E assertion passes. Artifact #197 (ID 12362111591): 63 PNGs / 39 metrics, no errors or fixture writes. Fixture/source evidence only.
 - Overall progress 50% weighted management estimate (49.6% rounded; see `latest-test-results.json` scorecard). Full 12-screen parity NOT ACCEPTED; authenticated real backend QA NOT TESTED/BLOCKED BY ACCESS. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
 - Branch HEAD before this status refresh: `0e9e6560a968f7ca9754c91fda6f8af89c0ae41b`; fetch current HEAD after docs commit.
@@ -448,3 +448,12 @@ Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENC
 
 
 - Final confirmation: Preview screenshot matrix passed on test commit `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; artifact [admin-preview-evidence-201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710). Handoff docs were refreshed after this result; check latest branch SHA and latest Actions runs before subsequent edits.
+
+
+## Anti-repeat checkpoint — 2026-10-21 17:10 UTC
+
+- Customer search label/placeholder and synthetic address-search Playwright test are already implemented. Do not repeat unless a regression is demonstrated.
+- Warranty search `aria-live` result summary and no-match empty states for both warranty and support-claim tables are already implemented and tested on SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`.
+- Validate Source #39640751340 and Preview/Playwright #39640751300 passed on that exact source/test SHA. Artifact [admin-preview-evidence-201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710) has 63 PNGs; fixture modules are synthetic/read-only, not authenticated business QA.
+- Docs-only commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` passed Validate Source #39641183495. Newer handoff commits also triggered CI; always verify latest HEAD/run before claiming current branch tested. Avoid extra docs-only commits unless materially needed.
+- Current progress estimate remains 50% weighted, not pass rate. Next task: read `12-SCREEN-REFERENCE-AUDIT.md` and fix the next unresolved reference parity gap, preferably screen #3 Product list/search/filters or #4 Product editor, without redoing completed customer/warranty search work. Full parity NOT ACCEPTED; authenticated backend QA NOT TESTED; image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
