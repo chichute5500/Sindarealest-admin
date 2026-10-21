@@ -181,7 +181,7 @@ assert.match(finalCss, /\.sd-fullscreen-frame\{background:transparent!important;
   'The full-screen gallery must not add a separate bordered or shadowed image card.');
 assert.match(finalCss, /\.sd-fullscreen-image\.sd-white-background-keyed\{filter:url\(#sdGalleryWhiteBackgroundKey\)\}/,
   'Gallery background blending must be display-only and applied only after a white-canvas check.');
-assert.match(finalCss, /#detailMainImage\.sd-white-background-keyed\{[\s\S]*?filter:url\(#sdGalleryWhiteBackgroundKey\)!important;[\s\S]*?mask-image:linear-gradient\(90deg,transparent 0%,#000 5\.5%,#000 94\.5%,transparent 100%\)!important;/,
+assert.match(finalCss, /#detailMainImage\\.sd-white-background-keyed\\{[\\s\\S]*?filter:url\\(#sdGalleryWhiteBackgroundKey\\)!important;[\\s\\S]*?mask-image:linear-gradient\\(90deg,transparent 0%,transparent 8\\.5%,#000 13%,#000 87%,transparent 91\\.5%,transparent 100%\\)!important;/,
   'The product detail photo may use the same background key only when corner sampling identifies a near-white source canvas.');
 assert.ok(html.includes("$('#detailMainImage').addEventListener('load',()=>syncFullscreenBackgroundKey($('#detailMainImage')));"),
   'The detail photo must run the existing safe corner-sampling key after each source image loads.');
