@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 const html = await readFile(new URL('../public/admin/index.html', import.meta.url), 'utf8');
 const start = html.indexOf('function dashboard()');
-const end = html.indexOf('\nfunction productList()', start);
+const end = html.indexOf('function productList()', start);
 assert.ok(start >= 0 && end > start, 'dashboard renderer must exist');
 const dashboard = html.slice(start, end);
 
