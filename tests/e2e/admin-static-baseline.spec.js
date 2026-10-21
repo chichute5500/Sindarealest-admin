@@ -583,8 +583,26 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await openEditor(variant);
       await saveScreenshot('product-editor', variant, { dialog: true });
       await page.locator('.editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
+      // Exercise local object-URL thumbnails with synthetic images only; do not save the product.
+      await page.locator('#imageInput').setInputFiles([
+        {
+          name: 'ui-fixture-front.svg',
+          mimeType: 'image/svg+xml',
+          buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="12" fill="#eaf3fb"/><path d="M24 112L64 50l26 33 18-20 28 49" fill="none" stroke="#5c91b9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+        },
+        {
+          name: 'ui-fixture-side.svg',
+          mimeType: 'image/svg+xml',
+          buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="12" fill="#09131d"/><circle cx="80" cy="80" r="42" fill="none" stroke="#8ebce0" stroke-width="5"/><path d="M48 90l21-28 17 20 12-13 17 29" fill="none" stroke="#8ebce0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+        }
+      ]);
+      await expect(page.locator('#imageGrid .imageitem')).toHaveCount(2);
+      await expect.poll(async () => page.locator('#imageGrid img').evaluateAll(images =>
+        images.every(image => image.complete && image.naturalWidth > 0)
+      ), { timeout: 5000 }).toBe(true);
+      await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(6);
       await page.locator('#imageGrid').scrollIntoViewIfNeeded();
-      await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 0 });
+      await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 2 });
       await page.locator('#editorClose').click();
     }
 

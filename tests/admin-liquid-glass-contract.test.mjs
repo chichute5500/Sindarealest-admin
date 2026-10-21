@@ -73,6 +73,17 @@ assert.match(previewSpec, /splitSelectorList\(rule\.selectorText\)\.includes\(no
 assert.doesNotMatch(previewSpec, /normalizeSelector\(rule\.selectorText\)\s*===\s*normalizedHideSelector/,
   'Preview diagnostics must not compare a grouped selector list as one selector');
 
+assert.match(adminHtml, /function galleryImageSrc\(value\)\s*\{/,
+  'Gallery thumbnail URLs should be normalized by the dedicated helper');
+assert.match(adminHtml, /esc\(galleryImageSrc\(g\.url\)\)/,
+  'Gallery rendering should preserve blob/data/http image URLs and relative paths');
+assert.match(baselineSpec, /setInputFiles\(\[/,
+  'The visual matrix should supply synthetic image files to the local gallery');
+assert.match(baselineSpec, /naturalWidth > 0/,
+  'Gallery screenshots should verify local thumbnails are actually loaded');
+assert.match(baselineSpec, /fixtureImages: 2/,
+  'Gallery evidence should record the two synthetic visual-only images');
+
 // Guard the visual-capture harness against flaky scrolling of hidden desktop-only table rows.
 const baselineSpec = readFileSync(new URL('./e2e/admin-static-baseline.spec.js', import.meta.url), 'utf8');
 assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
