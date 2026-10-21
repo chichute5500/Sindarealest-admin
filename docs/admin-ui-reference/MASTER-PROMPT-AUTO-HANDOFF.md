@@ -1520,3 +1520,10 @@ Keep PR #111/#108 OPEN/unmerged. No main/static branch write, merge, force-push,
 - Overall progress remains **50%**. This bounded visual change is not acceptance of screen #3 or all-12-screen parity. Authenticated business/backend QA remains NOT TESTED/BLOCKED; image-save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
 - Next: re-fetch current branch/PR state and Actions. Verify source and Preview/Playwright on exact SHA; inspect the new product screenshots at 390×844 and 1280×800 in light/dark. If checks fail, fix the cause without weakening assertions. Update progress only if screenshot review and evidence justify it.
 - Safety unchanged: PR #111/#108 remain open/unmerged; no Production deploy, no edits to `main` or static branch, no Access/secrets changes, no remote D1/R2 or migrations, and no TinyFish.
+
+## Verified checkpoint — 2026-10-22 01:58 +07
+
+- Exact application/test SHA: `c18736b70d0035769408ce3190a6fb729ccd75fd`. Validate Source [#39656347891](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891) and Admin Preview/Playwright [#39656348109](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109) both **SUCCESS** on the exact same SHA.
+- Mobile product-list fixes and matching tests are green. Evidence: 64 responsive/theme screenshots and 40 synthetic/read-only fixture metrics. Authenticated business/backend QA remains NOT TESTED/BLOCKED by Access; no production deployment.
+- Overall progress remains **50%**. Screen #3 and 12-screen visual parity are NOT ACCEPTED; image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+- Next: re-fetch branch HEAD and CI, inspect reference-vs-actual screenshots at 390×844 and 1280×800 in light/dark, continue substantive UI parity work and update handoff docs after verified cycles. Keep PR #108/#111 open; no Production, Access/secrets, D1/R2, migrations, main/static branch edits, or TinyFish.
