@@ -1433,3 +1433,21 @@ Next priority is the 12-screen Admin reference comparison and evidence-backed UI
 - The read-only fixture test verifies that price/terms-unconfirmed orders cannot create payment requests or record received payments, and that Settings has JSON export, JSON restore input and confirmation disclosure. It does not perform payments, export, restore or any API write. QR unsaved-draft guard and accessibility/reduced-motion checks are included in the same passing browser suite.
 - Artifact `admin-preview-evidence-192` ID `12360132558` contains 63 PNGs (16 login + 47 synthetic fixture views) and 39 metrics. No browser/console/network/HTTP errors or attempted fixture writes were recorded. This does not establish authenticated backend behavior.
 - Overall progress stays 48%; screen #7 Orders and #12 Backup/Settings are PARTIAL, screen #8 QR/payment PARTIAL, and full 12-screen visual acceptance remains NOT ACCEPTED. Keep image-save and PRE/PRO migrations deferred. PR #111/#108 remain OPEN/unmerged; preserve all safety boundaries.
+
+
+## AUTHORITATIVE CHECKPOINT — 2026-10-21 — ORDER / PAYMENT / BACKUP FIXTURE EVIDENCE
+
+Continue working autonomously on `chichute5500/Sindarealest-admin`, branch `feature/admin-isolated-handoff-2026-10-20` only. Re-fetch branch HEAD before making changes; the verified test SHA is not necessarily the live branch HEAD because handoff documentation commits have followed it.
+
+- Verified test/source SHA: `4e660a0869dd21d4a688d72823bd08b1795cf2ff`.
+- [Validate Source #39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) SUCCESS.
+- [Admin Preview/Playwright #39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) SUCCESS on the same SHA.
+- Checks: `npm run check`, `npm test`, responsive/theme screenshot matrix, Preview login CSS signature PASS; static browser suite 3 passed (25.5s).
+- [Artifact #192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558): 63 PNGs (16 login shell + 47 synthetic/read-only module captures), 39 metrics, zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths.
+- Fixture coverage now includes QR unsaved-draft activation guard, order payment-request/receipt controls disabled pending price/terms confirmation, and backup/restore JSON controls + confirmation disclosure. No real payment, export or restore was invoked.
+- These results are not authenticated real-backend QA and do not establish full visual parity.
+
+Project progress stays 48%. Screens #7 Orders, #8 Payment QR, and #12 Backup/Restore remain PARTIAL; all-12-screen visual parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED/BLOCKED BY ACCESS; image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER. PR #111 and #108 remain OPEN/unmerged; PR #111 remains mixed-scope and not merge-ready.
+
+The next agent must continue the actual audit and safe implementation/test loop, not just report. Read START-HERE, LATEST-STATUS, latest-test-results.json, PROMPT-NEXT-CHAT and 12-SCREEN-REFERENCE-AUDIT. Re-check current exact refs and CI after each edit. Preserve the existing test assertions; never weaken tests just to turn CI green. Keep all deployment, Access/secrets, database and branch safety restrictions intact.
+
