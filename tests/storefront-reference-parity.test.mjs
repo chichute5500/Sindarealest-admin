@@ -98,10 +98,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-11"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-11"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-11"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-11"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-12"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-12"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-12"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-12"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 
