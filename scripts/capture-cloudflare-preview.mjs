@@ -373,6 +373,9 @@ async function captureAccountDrawer(page, viewport, theme) {
   await captureLocator(page, '#accountDrawer', screenshotStem('state-account-menu', viewport, theme) + '.png', {
     ...captureMeta(viewport, theme), captureType: 'state', state: 'account-menu-open',
   });
+  await capture(page, screenshotStem('state-account-menu-viewport', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme), captureType: 'state-viewport', state: 'account-menu-open',
+  });
   audit.commerceStateChecks.push({ state: 'account-menu-open', status: 'PASS', viewport: viewport.name, theme });
   await page.locator('#accountClose').click();
   await page.waitForFunction(() => !document.querySelector('#accountDrawer')?.classList.contains('open'), null, { timeout: 5000 });
@@ -451,6 +454,9 @@ async function captureGalleryCartCheckoutStates(page, viewport, theme, label, ro
     await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'), null, { timeout: 5000 });
     await page.waitForFunction(() => Boolean(document.querySelector('#cartList .cart-row')), null, { timeout: 5000 });
     await stateCapture('#cartDrawer', screenshotStem('state-cart-with-item', viewport, theme) + '.png', 'cart-with-item');
+    await capture(page, screenshotStem('state-cart-with-item-viewport', viewport, theme) + '.png', false, {
+      ...captureMeta(viewport, theme), captureType: 'state-viewport', state: 'cart-with-item', route,
+    });
     audit.commerceStateChecks.push({ state: 'cart-with-item', status: 'PASS', viewport: viewport.name, theme, route });
 
     const checkout = page.locator('#cartCheckout');
@@ -458,6 +464,9 @@ async function captureGalleryCartCheckoutStates(page, viewport, theme, label, ro
     await checkout.click();
     await page.waitForFunction(() => document.querySelector('#checkoutDrawer')?.classList.contains('open'), null, { timeout: 5000 });
     await stateCapture('#checkoutDrawer', screenshotStem('state-checkout-form', viewport, theme) + '.png', 'checkout-form-open');
+    await capture(page, screenshotStem('state-checkout-form-viewport', viewport, theme) + '.png', false, {
+      ...captureMeta(viewport, theme), captureType: 'state-viewport', state: 'checkout-form-open', route,
+    });
     audit.commerceStateChecks.push({ state: 'checkout-form-open', status: 'PASS', viewport: viewport.name, theme, route, submitted: false });
     await page.locator('#checkoutClose').click();
     await page.waitForFunction(() => !document.querySelector('#checkoutDrawer')?.classList.contains('open'), null, { timeout: 5000 });
