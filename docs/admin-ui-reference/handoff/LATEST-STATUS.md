@@ -1,15 +1,14 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI PASS; PREVIEW SOURCE MISMATCH; MIGRATION SCOPE REVIEW REQUIRED; AUTHENTICATED QA AND 12-SCREEN VISUAL PARITY OPEN`
-**Ước tính tiến độ:** 43% theo giai đoạn công việc; không phải tỷ lệ code.
-**Repository:** `chichute5500/Sindarealest-admin`
-**Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`
-**HEAD tại đầu vòng source-contract audit này:** `21a7e039749e484e42b68ec322481df6a2a797af`; [CI 39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS cho source checks, tests và dependency audit.
-**Preview:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAIL vì CSS signature của Preview không khớp source; không bypass Cloudflare Access.
-**PR #111:** OPEN/unmerged, 909 file (+30,553/−356), 405 commits ahead/6 behind main; mixed-scope, không merge.
-**PR #108:** OPEN/unmerged; nhánh website tĩnh được bảo vệ.
-**D1 remote state/migration ledger:** NOT VERIFIED; không chạy setup/migration/deploy.
-**Production deployment:** NOT PERFORMED.
+**Trạng thái tổng thể:** `IN PROGRESS — CURRENT SOURCE CI PASS; DEPLOYED PREVIEW SOURCE MISMATCH; MIGRATION REVIEW REQUIRED; AUTHENTICATED QA AND 12-SCREEN PARITY OPEN`
+**Ước tính tiến độ:** 43%; ước tính theo các hạng mục nghiệm thu, không phải tỷ lệ code.
+**Repository/branch:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`
+**HEAD đã xác minh:** `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`.
+**Source CI:** [run 39546689786](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786) SUCCESS trên đúng HEAD; dependency audit, project integrity và automated tests PASS.
+**Preview:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILURE tại kiểm tra deployed Preview CSS/UI signature, source được test là `de6114f...`. Chưa có run Preview mới hơn trên HEAD hiện tại.
+**PR #111:** OPEN/unmerged; 909 files, +30,664/−356, 406 commits ahead / 6 behind main. Mixed-scope, chưa đủ điều kiện merge.
+**PR #108:** OPEN/unmerged; static branch được bảo vệ.
+**Remote D1/schema/data/Production:** không truy cập hoặc sửa; migration ledger NOT VERIFIED.
 
 
 
@@ -261,3 +260,14 @@ This check is based on the current GitHub source blob `public/admin/index.html` 
 - CI run [39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS on branch commit `21a7e039749e484e42b68ec322481df6a2a797af` (source checks, automated tests, dependency audit). Latest Preview diagnostic still FAILs separately at [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719).
 - Current PR metadata at this checkpoint: PR #111 OPEN/unmerged, 909 changed files (+30,553/−356), 405 commits ahead and 6 behind main; PR #108 OPEN/unmerged. Current static-branch ref last read: `98764acdd1b9d133292a4fb25adbb0f035970b1c`. No static branch file was edited.
 - Progress remains 43%; full approved 12-screen parity, authenticated real-backend module flows, exact intended Preview identity and full merge-scope/migration review are still incomplete.
+
+
+## Latest execution checkpoint — 2026-10-21 12:02 +07:00
+
+- **Current branch HEAD:** `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`; current branch reference was re-read before this update.
+- **Fresh source CI:** [run 39546689786](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786), exact HEAD `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`, completed SUCCESS. GitHub job steps explicitly show dependency audit, project integrity validation, and automated tests all PASS. This is a documentation-only checkpoint, not a new source-code change.
+- **Latest Preview diagnosis remains a separate failure:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719), tested source `de6114f75cba36193c50ad043175d08be092929f`. Its repository checks, tests, local static Preview and 58 source screenshots passed; only “Diagnose configured deployed Preview” failed due to CSS/UI signature mismatch. The workflow's “Persist screenshots and test state” and “Upload Playwright evidence” steps succeeded. This failure has not been fixed by the newer docs-only commits.
+- **No newer Preview diagnostic run exists** on the current HEAD in the available workflow history. Do not imply the deployed Preview is repaired.
+- **PR #111 live metadata:** OPEN/unmerged, current head `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`, 909 changed files, +30,664/−356, 406 commits ahead and 6 behind `main`. This is still a broad mixed-scope PR. **PR #108 remains OPEN/unmerged.**
+- Source contract conclusions remain limited to static source review: five mobile navigation buttons, responsive `mobilecards` rules, correct current login copy. No authenticated real-backend flow or full 12-screen PNG parity is verified.
+- **Progress remains 43%.** Safe next action: obtain the owner-approved exact Preview URL/deployment identity and ensure Cloudflare Access is working. Do not read/edit secrets or bypass Access. Meanwhile continue read-only review of changed functions/scripts/tests and update the handoff with evidence; do not run remote setup/deploy/migration commands.

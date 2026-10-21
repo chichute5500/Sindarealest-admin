@@ -1,10 +1,10 @@
 {
-  "status": "SOURCE_CI_PASS_PREVIEW_DIAGNOSTICS_FAIL_MIGRATION_REVIEW_REQUIRED_AUTHENTICATED_QA_NOT_VERIFIED",
+  "status": "SOURCE_CI_PASS_CURRENT_HEAD_PREVIEW_DIAGNOSTICS_FAIL_MIGRATION_REVIEW_REQUIRED_AUTHENTICATED_QA_NOT_VERIFIED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "de6114f75cba36193c50ad043175d08be092929f",
-  "testedCommitSha": "21a7e039749e484e42b68ec322481df6a2a797af",
+  "testedCommitSha": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
   "capturedAt": "2026-10-20T20:50:00.385Z",
   "progressEstimatePercent": 43,
   "progressBasis": "Stage-based estimate, not code completion. Current HEAD CI passes, but configured Preview CSS signature still fails; authenticated business flows, full 12-screen comparison, full mixed-scope PR diff audit/remediation and authorized Preview identity remain open.",
@@ -749,11 +749,11 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286",
-  "branchHeadSha": "21a7e039749e484e42b68ec322481df6a2a797af",
-  "latestVerifiedAt": "2026-10-21T11:55:00+07:00",
-  "latestVerifiedSourceCommit": "21a7e039749e484e42b68ec322481df6a2a797af",
-  "currentAdminBranchHead": "21a7e039749e484e42b68ec322481df6a2a797af",
-  "latestVerificationSummary": "CI run 39545978621 PASS on 21a7e039749e484e42b68ec322481df6a2a797af. Source recheck shows five bottom navigation buttons, mobilecards responsive rules, and current login copy matches expected text. Authenticated module visual parity remains NOT VERIFIED; Preview run 39542387719 still FAILS CSS signature. PR #111 remains mixed-scope (909 files, +30553/-356, 405 ahead/6 behind).",
+  "branchHeadSha": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+  "latestVerifiedAt": "2026-10-21T12:02:00+07:00",
+  "latestVerifiedSourceCommit": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+  "currentAdminBranchHead": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+  "latestVerificationSummary": "Source CI 39546689786 SUCCESS on exact current HEAD cbc0c1c9f1504e86121eadcbfc60d76675cd1e91; dependency audit, integrity validation and automated tests PASS. Latest Preview run 39542387719 still FAILS deployed CSS/UI signature on older source de6114f...; no newer Preview run found. Progress remains 43%.",
   "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
@@ -762,13 +762,13 @@
     "merged": false,
     "baseBranch": "main",
     "headBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "headSha": "21a7e039749e484e42b68ec322481df6a2a797af",
-    "commits": 405,
+    "headSha": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+    "commits": 406,
     "changedFiles": 909,
-    "additions": 30553,
+    "additions": 30664,
     "deletions": 356,
     "containsPublicStorefrontAndBackendFiles": true,
-    "warning": "Live metadata checked 2026-10-21: the PR remains mixed-scope. Keep OPEN/unmerged until full audit and owner decision."
+    "warning": "Live metadata verified at this checkpoint. Keep OPEN/unmerged pending complete mixed-scope and migration review."
   },
   "adminInventory": {
     "sourcePath": "public/admin/index.html",
@@ -869,8 +869,8 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-21T11:55:00+07:00",
-  "currentBranchHeadAtHandoff": "21a7e039749e484e42b68ec322481df6a2a797af",
+  "updatedAt": "2026-10-21T12:02:00+07:00",
+  "currentBranchHeadAtHandoff": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -909,24 +909,22 @@
     "scope": "LOCAL SOURCE SCREENSHOTS + SYNTHETIC FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T11:55:00+07:00",
-    "type": "ADMIN_SOURCE_CONTRACT_RECHECK_AND_STALE_GAP_CORRECTION",
+    "updatedAt": "2026-10-21T12:02:00+07:00",
+    "type": "FRESH_CI_AND_PREVIEW_RUN_RECHECK",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceCodeChanged": false,
     "testsRunInThisUpdate": false,
     "verified": [
-      "Read current public/admin/index.html and relevant tests via GitHub; source blob a297b829... at commit 21a7e039749e484e42b68ec322481df6a2a797af.",
-      "Confirmed five bottom nav buttons; later mobile CSS sets five columns, and More exposes warranty/settings.",
-      "Confirmed tables use mobilecards and CSS at max-width 680 overrides inline min-width and creates grid rows.",
-      "Confirmed current login copy is Luxury in Every Detail plus Đăng nhập quản trị; old reversed-copy note was stale.",
-      "Refreshed current PR #111 metadata: 909 files, +30553/-356, 405 ahead/6 behind; PR #108 remains OPEN.",
-      "Latest source CI run 39545978621 PASS; latest deployed Preview diagnostic remains FAIL."
+      "Re-read live branch ref and confirmed current HEAD before writing.",
+      "Fetched current-head GitHub Actions run 39546689786; source CI job and dependency audit, project integrity, automated tests all succeeded.",
+      "Fetched Preview diagnostic run list; latest run 39542387719 still failed only at deployed Preview CSS/UI signature step after local source tests/screenshots passed.",
+      "Refreshed live PR #111 counts and open/unmerged status."
     ],
     "notDone": [
-      "No source code changed.",
-      "No local checkout/git status.",
-      "No reference PNG binary was successfully decoded in this pass; 12-screen parity remains NOT VERIFIED.",
-      "No authenticated real-backend QA, remote D1 query, migration, setup/deploy or production operation."
+      "No new Preview test was triggered in this turn.",
+      "No authenticated backend module QA or complete 12-screen visual comparison.",
+      "No remote D1, setup/migration/deploy, production operation, or secret access.",
+      "No local checkout; local git status not available."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -998,9 +996,9 @@
   },
   "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
   "latestCiVerification": {
-    "runId": 39545978621,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621",
-    "sourceCommit": "21a7e039749e484e42b68ec322481df6a2a797af",
+    "runId": 39546689786,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786",
+    "sourceCommit": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
     "workflow": "Validate source and tests",
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
@@ -1008,7 +1006,7 @@
     "dependencyAudit": "PASS",
     "previewDiagnostics": "NOT INCLUDED",
     "remoteD1": "NOT TESTED",
-    "note": "Standard CI verifies source/tests on this docs-only checkpoint; Preview mismatch and authenticated backend modules remain separate unresolved checks."
+    "note": "Exact current HEAD verified; this is source CI, not deployed Preview or authenticated backend validation."
   },
   "latestPreviewArtifactInspection": {
     "inspectedAt": "2026-10-21T11:21:00+07:00",
@@ -1153,5 +1151,23 @@
       "note": "CSS string contract is in automated tests. Pixel-level parity remains NOT VERIFIED."
     },
     "referenceParity": "NOT VERIFIED; full 12-screen comparison remains open."
+  },
+  "latestPreviewDiagnostics": {
+    "runId": 39542387719,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
+    "sourceCommit": "de6114f75cba36193c50ad043175d08be092929f",
+    "conclusion": "FAILURE",
+    "failedStep": "Diagnose configured deployed Preview",
+    "reason": "CSS/UI signature mismatch",
+    "passedSteps": [
+      "repository checks",
+      "automated tests",
+      "local static preview",
+      "58 source screenshots",
+      "persist screenshots and test state",
+      "upload evidence"
+    ],
+    "currentHeadRunFound": false,
+    "note": "No newer Preview diagnostic run was found in current branch workflow history."
   }
 }

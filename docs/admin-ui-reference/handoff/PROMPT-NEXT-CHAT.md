@@ -131,3 +131,11 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - Latest CI run [39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS on `21a7e039749e484e42b68ec322481df6a2a797af`; Preview run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) still FAILS CSS signature.
 - Current PR #111 metadata: OPEN, 909 files (+30,553/−356), 405 ahead / 6 behind; PR #108 remains OPEN. Do not merge or sync branches.
 - Progress remains 43%. Remaining blockers: authorized intended Preview identity/access, real authenticated module QA, all 12 reference screen comparisons, mixed-scope PR review, and a reviewed D1 migration procedure.
+
+
+## Latest run checkpoint — 2026-10-21
+
+- Current HEAD `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`; [source CI run 39546689786](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786) SUCCESS on exact HEAD. Dependency audit, integrity validation, automated tests PASS.
+- Latest Preview diagnostic is still [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719), FAIL at deployed CSS/UI signature mismatch on source `de6114f...`; local source screenshots and evidence upload succeeded. No Preview diagnostic on current HEAD has been found.
+- PR #111 OPEN/unmerged: 909 files (+30,664/-356), 406 ahead / 6 behind main. PR #108 OPEN. Progress remains 43%.
+- Continue safe read-only review; request the exact authorized Preview URL/deployment identity if needed. Never bypass Access, expose/change secrets, run remote D1 setup/migrations/deploy, merge, or sync branches.

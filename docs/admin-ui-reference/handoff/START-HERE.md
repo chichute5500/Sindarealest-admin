@@ -95,3 +95,10 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 - Product, order, customer, warranty and claim table layouts use `mobilecards`; at max-width 680 CSS overrides inline min-width and stacks rows into mobile cards. This is static source review, not authenticated browser evidence.
 - Login copy is currently tagline “Luxury in Every Detail” + heading “Đăng nhập quản trị”; the old handoff note claiming those strings were reversed is stale.
 - Reference pixel parity and authenticated business-flow testing remain NOT VERIFIED. Latest source CI [39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS; Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILS separately.
+
+
+## Latest run verification — 2026-10-21
+
+- Current ADMIN HEAD `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`; source CI [39546689786](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786) PASS on this exact commit. Job steps confirm dependency audit, project integrity, automated tests all PASS.
+- Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) remains FAIL on older source `de6114f...` at deployed Preview CSS/UI signature. Local source checks/screenshots and evidence upload passed; deployed Preview diagnostic failed. No newer Preview diagnostic run was found for current HEAD.
+- PR #111 remains OPEN, 909 files (+30,664/-356), 406 ahead/6 behind main. PR #108 remains OPEN. Progress 43%; no authenticated module QA, no 12-screen parity claim, no remote D1/deploy.
