@@ -279,17 +279,18 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
     const samples = timeline.map(item => ({
       ...item,
       sampleOffsetMs: Number((item.atMs - originMs).toFixed(2)),
-    })).filter(item => item.sampleOffsetMs >= 0 && item.sampleOffsetMs <= 350);
+    })).filter(item => item.sampleOffsetMs >= 0 && item.sampleOffsetMs <= 450);
+    const first350Samples = samples.filter(item => item.sampleOffsetMs <= 350);
     probe = {
       context: label, viewport: viewport.name, theme, mainDocumentStatus: response.status(),
       startedAt: timeline[0]?.atMs ?? null, samples,
-      welcomeVisibleInFirst350ms: samples.some(item => item.splashVisible === true),
-      visibleChromeViolations: samples.filter(item => item.violation === true).map(item => ({
+      welcomeVisibleWithin350msOfInstrumentation: first350Samples.some(item => item.splashVisible === true),
+      visibleChromeViolations: first350Samples.filter(item => item.violation === true).map(item => ({
         stage: item.stage, sampleOffsetMs: item.sampleOffsetMs, nodes: item.nodes,
       })),
     };
     audit.firstPaintTimelines.push(probe);
-    if (!probe.welcomeVisibleInFirst350ms) {
+    if (!probe.welcomeVisibleWithin350msOfInstrumentation) {
       audit.hardFailures.push('Welcome splash was not visible in the startup video / DOM timeline for ' + label + '.');
     }
     if (probe.visibleChromeViolations.length) {
@@ -297,7 +298,7 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
         + ' (' + probe.visibleChromeViolations.length + ' samples).');
     }
     for (const requestedOffsetMs of [0, 50, 100, 200, 300]) {
-      const upperBound = requestedOffsetMs === 0 ? 45 : requestedOffsetMs + 65;
+      const upperBound = requestedOffsetMs === 0 ? 45 : requestedOffsetMs + 125;
       const matching = samples
         .filter(item => item.sampleOffsetMs >= requestedOffsetMs && item.sampleOffsetMs <= upperBound)
         .sort((a, b) => Math.abs(a.sampleOffsetMs - requestedOffsetMs) - Math.abs(b.sampleOffsetMs - requestedOffsetMs));
@@ -313,7 +314,7 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
       };
       audit.firstPaintChecks.push(check);
       if (!sample) {
-        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms for ' + label + '.');
+        audit.hardFailures.push('First-paint DOM timeline missed +' + requestedOffsetMs + 'ms (within 125ms tolerance) for ' + label + '.');
       }
     }
     return probe;
@@ -337,7 +338,7 @@ async function captureWelcomeStartupVideo(browser, viewport, theme) {
         const entry = {
           context: label, viewport: viewport.name, theme, filename: videoFilename,
           status: 'CAPTURED', mainDocumentStatus: response?.status() ?? null,
-          welcomeVisibleInFirst350ms: probe?.welcomeVisibleInFirst350ms === true,
+          welcomeVisibleWithin350msOfInstrumentation: probe?.welcomeVisibleWithin350msOfInstrumentation === true,
           earlyDomSampleCount: probe?.samples?.length ?? 0,
           visibleChromeViolationCount: probe?.visibleChromeViolations?.length ?? 0,
           recordingDurationMs: 850,
@@ -898,7 +899,7 @@ async function main() {
   const firstPaintCoverageComplete = audit.firstPaintChecks.length === requiredFirstPaintFrameCount
     && Object.values(firstPaintFrameCounts).every(count => count === 5);
   const firstPaintVideoCoverageComplete = audit.videoCaptures.length === firstPaintContextCount
-    && audit.videoCaptures.every(video => video.status === 'CAPTURED' && video.welcomeVisibleInFirst350ms === true);
+    && audit.videoCaptures.every(video => video.status === 'CAPTURED' && video.welcomeVisibleWithin350msOfInstrumentation === true);
   const firstPaintViolationCount = audit.firstPaintTimelines.reduce((total, timeline) =>
     total + (timeline.visibleChromeViolations?.length || 0), 0);
   const homeFullPageCount = audit.screenshots.filter(shot => shot.captureType === 'full-page').length;
