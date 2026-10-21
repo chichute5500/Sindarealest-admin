@@ -366,3 +366,18 @@ This section clarifies storefront behavior and does not authorize work on Admin 
 ## Current handoff pointer — 2026-10-21
 
 Before work, read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and `docs/handoff/PROMPT-NEXT-CHAT-2026-10-21.md`. The storefront branch must only consume public API and implement customer UI/tests. Admin AI owns Admin UI, schema, product classification persistence, QR setup and payment verification on its own branch. Current API creates orders as `pending_confirmation`; no verified active public QR or public order-status lookup exists, so checkout must not show QR/amount and must say “Chờ cửa hàng xác nhận” / “Vui lòng chưa chuyển tiền”. Never infer product type or mark payment paid from QR scan/receipt/customer claim. Keep PR #108 open; no Production changes.
+
+
+## VISUAL REFERENCE REQUIREMENT — CHECKOUT / PAYMENT (2026-10-21)
+
+- Treat `docs/static-web-reference/` as the canonical reference folder for the **public static storefront only**. Keep this separate from `docs/admin-ui-reference/`.
+- The newly rendered checkout/payment storyboard is intended as a supplement to the two existing mobile source references (Ice Pearl light and Deep Navy dark), not a replacement for them. Match the current website's real typography, glass material, spacing, radii, background texture, blue palette and mobile-first density; do not copy the storyboard's illustrative product/SKU, bank data, dates or sample prices into production data.
+- **Required comparison workflow:** before designing checkout, open the checkout/payment storyboard at full resolution alongside both existing original mobile reference images and current Preview. After each meaningful iteration, capture the same relevant screens in mobile light/dark mode, compare side-by-side, and report concrete mismatches and evidence. Do not claim visual comparison unless the image was actually opened and inspected.
+- Important image-asset status: the current render exists as an output attachment in the preceding design conversation, but is **not verified as a committed binary in this repository**. Do not claim that a reference PNG/WebP exists under this folder until you confirm the exact file path from GitHub. Do not create a fake/placeholder image or silently substitute another render. If the image is still absent from the repository, record the missing binary asset as a blocker and ask for the original image to be uploaded to this folder; continue unrelated safe tasks.
+- Checkout must never ask the customer to choose “hàng đặt làm / hàng có sẵn”. This is an owner-controlled product field from Admin/API. The storefront only presents the payment options allowed for that product's current authoritative type:
+  - `made_to_order`: 30% deposit, or 100% full payment with freeship.
+  - `in_stock`: fixed 100,000 VND deposit, or 100% full payment with freeship.
+  - `unclassified` or missing/unknown type: no guessed payment options; allow consultation/order request.
+- Price-based amounts are dynamic. Calculate only from server-confirmed current prices/terms: made-to-order deposit is 30%; in-stock deposit is fixed 100,000 VND; full payment is 100%. Full-payment freeship applies to both types. Never bake the storyboard's example amount into code or request payment if price/type/terms are not confirmed.
+- QR slot in the storyboard is only a layout cue. Render the actual QR and receiver details only from a valid active Admin/API response; no fabricated QR, bank name or account number. A QR scan or customer claim does not mean payment has been verified.
+- Keep changes only on `fix/liquid-glass-audit-2026-10-19`; do not edit Admin files/schema/migrations, merge PR #108, or deploy Production.
