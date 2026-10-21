@@ -449,3 +449,13 @@ File handoff trên GitHub là nguồn sự thật của dự án, không phải 
 3. Duy trì kiểm tra sáu ô Liquid Glass, phần “Phong cách đẳng cấp từ da cá sấu”, nền satin, gallery controls, drawer cart/account/checkout, mobile Back, footer/Zalo và route sản phẩm; không coi kiểm thử tĩnh là visual acceptance.
 4. Audit toàn thể vẫn bị khóa nếu public verified product payload không có đúng SKU `SD-GL052`. Không fake SKU, không thay ảnh khác, không đụng catalog/D1/R2/Admin để làm xanh audit. Giữ fail-closed và ghi blocker cụ thể.
 5. Sau khi có kết quả visual cuối, cập nhật handoff, test results, master prompt, next-chat prompt; chỉ workflow guarded được phép lưu canonical screenshots/manifest khi các điều kiện acceptance đạt. Tiếp tục làm sau khi báo cáo, không tự dừng để hỏi cập nhật tiến độ.
+
+
+## INCIDENT UPDATE — 2026-10-21: user-uploaded image recovery (highest priority for next chat)
+
+- User says they uploaded `tb_image_share_1792519964514.png` into a folder created for this task, then instructed the assistant to retrieve the image and delete the folder. The assistant subsequently could not find the filename in the available Library/conversation listing. This absence is not proof that the image or folder was deleted.
+- At handoff time, it remains **UNVERIFIED** whether the image was retrieved/copied, whether the folder was deleted, whether a safe copy exists, or whether the image was committed to GitHub. Do not claim any of those actions occurred without evidence.
+- **First task:** inspect current-turn attachments, Library search/list and folder metadata, any available operation history, and the current branch/repository for the exact image. If found, open the actual image and create a safe copy before any deletion. Do not immediately ask the user to upload again.
+- The user clarified that they replaced the previously discussed GL052 hero image with their uploaded image. Do not keep blocking unrelated UI work by searching for SKU SD-GL052. Whether the uploaded image is present in repo or hero code is not yet verified.
+- Detailed incident record: [INCIDENT-IMAGE-RECOVERY-2026-10-21.md](INCIDENT-IMAGE-RECOVERY-2026-10-21.md). New-chat prompt: [NEXT-CHAT-PROMPT-IMAGE-RECOVERY-2026-10-21.md](../prompts/NEXT-CHAT-PROMPT-IMAGE-RECOVERY-2026-10-21.md).
+- Scope remains branch `fix/liquid-glass-audit-2026-10-19` only. Do not merge PR #108, deploy/touch Production, Admin, `main`, D1/R2, backend, catalog, bindings or secrets.
