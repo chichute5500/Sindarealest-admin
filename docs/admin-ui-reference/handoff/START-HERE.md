@@ -1,5 +1,14 @@
 # SinDarealest ADMIN — điểm bắt đầu bàn giao cho AI
 
+## Newest verified checkpoint — 2026-10-21 17:26 UTC
+
+- Latest source/test SHA: `535e43121a612570dd84a353870bc118860c0c0d`. Validate Source [#39643505425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505425) PASS; Admin Preview/Playwright [#39643505315](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315) SUCCESS. Browser suite 3 passed; configured Preview login/dashboard smoke 2 passed; CSS signature PASS.
+- Latest UI work targets screen #3 Product list: name/SKU/category search copy; `aria-live` count/range; no-results recovery/reset; synthetic filter tests. Artifact [admin-preview-evidence-203](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731) has 63 PNGs and 39 fixture metrics. 390×844 light and 1280×800 light product screenshots were inspected against the approved reference; parity is still PARTIAL/NOT ACCEPTED.
+- Branch HEAD observed before documentation refresh: `4c68aa361348c0e2aa8398c9635a4bc42d9efb70`, a docs/evidence-only descendant of tested SHA. Re-fetch live HEAD before any new edit; never call docs-only HEAD a new UI-test SHA.
+- Progress remains 50%. All 12 reference families NOT ACCEPTED; real business module workflows NOT TESTED; product image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER / NOT VERIFIED.
+
+---
+
 > Đây là điểm bắt đầu bắt buộc cho mọi phiên AI/agent tiếp tục công việc ADMIN. Nội dung chỉ phản ánh trạng thái đã ghi và kiểm chứng; luôn xác minh Git thực tế trước khi sửa.
 
 ## Latest checkpoint — 2026-10-21 17:10 UTC

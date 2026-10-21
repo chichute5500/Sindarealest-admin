@@ -1,3 +1,14 @@
+## Newest verified cycle — 2026-10-21 17:26 UTC (read this first)
+
+- Exact source/test SHA `535e43121a612570dd84a353870bc118860c0c0d`; Validate Source #39643505425 PASS; Admin Preview/Playwright #39643505315 SUCCESS. Both workflows checked the same SHA. Browser suite: 3 passed; configured Preview login/dashboard smoke: 2 passed; login CSS signature PASS.
+- UI changes committed at `da808593785de5924ac1540e1522421ae5cb5bcd`; test-only stale-label correction at `535e43121a612570dd84a353870bc118860c0c0d`. Product list adds category-aware search, accessible count/range, no-results recovery and a clear-all-filter action. Tests use synthetic fixtures only.
+- Artifact [admin-preview-evidence-203](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731), ID `12365019731`: 63 PNGs / 39 metrics; 16 login shell + 47 read-only fixture module captures; no browser/console/request/HTTP errors or attempted writes. Screen #3 status **PARTIAL** after reviewing 390×844 and 1280×800 screenshots against the approved reference; visual parity NOT ACCEPTED.
+- Branch HEAD before this handoff docs update was `4c68aa361348c0e2aa8398c9635a4bc42d9efb70`; the tested SHA above is not the live branch head after evidence/docs-only commits. Re-fetch HEAD, PR #111/#108 and latest Actions first.
+- Progress stays **50%**. Continue next with a distinct uncompleted gap on product list (published/status filter presentation without inferring inventory) or product editor #4; avoid repeating customer/warranty search work.
+- PR #111/#108 remain OPEN/unmerged. Only ADMIN branch; no Production deploy, Access/secrets changes/bypass, D1/R2/schema/migration/setup actions, or TinyFish. Image-save and PRE/PRO remain deferred.
+
+---
+
 # PROMPT BÀN GIAO — TIẾP TỤC HOÀN THIỆN SINDAREAL EST ADMIN
 
 Bạn phải tiếp tục công việc thực tế, không chỉ lập kế hoạch. Trước khi hành động, hãy đọc toàn bộ các file sau từ nhánh `feature/admin-isolated-handoff-2026-10-20` trong repository `chichute5500/Sindarealest-admin`:

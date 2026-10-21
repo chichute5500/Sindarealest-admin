@@ -19,7 +19,7 @@ Overall Admin progress: **48%** — unchanged until evidence supports a meaningf
 |---:|---|---|---|
 | 1 | Login / unauthenticated shell | PARTIAL | Local Playwright previously checked login shell and masked password with mocked APIs; current approved-reference comparison not accepted. |
 | 2 | Dashboard / summary | PARTIAL | Revenue panel has truthful no-data state; source and Preview diagnostic passed on exact SHA `06d689b6a97fa7bdb05258acb8435a6954d67309`. Not authenticated real-data QA. |
-| 3 | Product list / search / filters | NOT TESTED | Need approved-reference comparison and screenshot evidence at mobile and desktop sizes. |
+| 3 | Product list / search / filters | PARTIAL | Exact source/test SHA `535e43121a612570dd84a353870bc118860c0c0d`: Validate Source #39643505425 PASS and Preview/Playwright #39643505315 SUCCESS; artifact [admin-preview-evidence-203](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731) has 63 PNGs and 39 fixture metrics. Category-label search, live result count/range, no-results recovery, and category/fulfillment combinations pass on synthetic read-only fixtures. Screenshots at 390×844 light and 1280×800 light were reviewed against `admin-mobile-reference.png`. Visual parity remains NOT ACCEPTED: reference uses status chips and more card-like item presentation; fixture data deliberately has no real prices/stock. |
 | 4 | Product editor / core fields | NOT TESTED | Need full field layout, focus order, validation, and reference comparison. |
 | 5 | Product image gallery / image manager | PARTIAL | Horizontal thumbnail rail, prominent cover, responsive/light-dark fixture captures and last-thumbnail clearance passed on prior exact test tree `78a16b6d9fca91d7b080834f293e1690dc7c10cd`; synthetic images only, not real R2 photos or image-save proof. |
 | 6 | Category / product classification | NOT TESTED | Need screen-level reference and safe fixture coverage. |
@@ -104,3 +104,11 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 - Validate Source [#39637611840](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611840) PASS and Admin Preview/Playwright [#39637611768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768) SUCCESS on the exact SHA. Browser baseline 3 passed (34.8s); Preview login CSS signature PASS.
 - Artifact `admin-preview-evidence-197`, ID `12362111591`: 63 PNGs (16 login + 47 synthetic/read-only views), 39 metrics, zero browser/console/request/HTTP errors, no attempted writes or unexpected API paths. Raw PNGs remain in Actions artifact only.
 - Reviewed `warranties__390x844__light.png`: heading/search/filter visible; order ID remains one line. Screen #10 advances to PARTIAL only; all-12-family parity remains NOT ACCEPTED and authenticated backend QA NOT TESTED / BLOCKED BY ACCESS.
+
+
+## Screen #3 evidence update — 2026-10-21 17:26 UTC
+
+- **Status: PARTIAL**, not accepted visual parity. Exact browser suite on `535e43121a612570dd84a353870bc118860c0c0d`; 3 Playwright tests passed in 35.8s and the configured Preview diagnostic passed.
+- Reviewed actual artifact screenshots: `products__390x844__light.png` and `products__1280x800__light.png`, plus the approved composite reference image. In these fixture screenshots, no horizontal overflow is reported at either viewport; local module fixture data is synthetic/read-only.
+- Implemented/tested: category-label search; accessible result-count/range announcement; honest no-match message; in-place reset that clears text/category/fulfillment and restores focus; category + fulfillment filter combination.
+- Still open for #3: compare and improve reference-style published/status filters and card details without deriving stock state from null/incomplete values. No actual prices, inventory, images or product facts may be invented. Full 12-screen parity remains NOT ACCEPTED.

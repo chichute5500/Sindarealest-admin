@@ -1484,3 +1484,20 @@ Already implemented; do not repeat without evidence of regression:
 - Docs-only commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` passed Validate Source #39641183495; this was not a fresh application test run.
 
 Progress remains 50% weighted management estimate, not test-pass rate. Full 12-screen parity NOT ACCEPTED; authenticated business/backend QA NOT TESTED; product image-save/R2 and PRE/PRO migration work remain DEFERRED_BY_OWNER. Next actual engineering task: inspect the 12-screen audit and implement a concrete unresolved parity gap, prioritizing Product list/search/filters (#3) or Product editor (#4). Avoid redundant search fixes and documentation-only commits unless the evidence materially changes. Verify current HEAD and CI before any claim; protect all existing branch/deployment/access/data restrictions.
+
+
+## Latest verified continuation checkpoint — Product list filter feedback (2026-10-21 17:26 UTC)
+
+- Re-read branch files before this cycle; verified PR #111 OPEN/unmerged and wrote only to `feature/admin-isolated-handoff-2026-10-20`.
+- UI commit `da808593785de5924ac1540e1522421ae5cb5bcd` plus test correction `535e43121a612570dd84a353870bc118860c0c0d`: search now clearly advertises name/SKU/category matching; result count/range is announced using an accessible status region; no-match state provides direct filter reset; filter tests cover category labels and fulfillment/category combinations.
+- Exact-SHA Validate Source #39643505425 PASS and Admin Preview/Playwright #39643505315 SUCCESS. Browser E2E 3 passed; Preview login/dashboard smoke 2 passed; login CSS signature PASS. Artifact [admin-preview-evidence-203](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731) contains 63 PNGs and 39 synthetic fixture metrics with no recorded browser/network/HTTP errors and no attempted writes.
+- Reviewed actual product list screenshots at 390×844 light and 1280×800 light against the approved reference. Screen #3 remains PARTIAL: reference status chips/card details are not fully matched; no invented price/stock. All-12 parity remains NOT ACCEPTED; authenticated real business workflows NOT TESTED; image save/R2 and PRE/PRO remain DEFERRED_BY_OWNER.
+- Overall progress remains 50%. Branch HEAD observed before this handoff update: `4c68aa361348c0e2aa8398c9635a4bc42d9efb70`; it is an evidence-only descendant of tested SHA. Re-fetch live refs before next write.
+
+### Next task — execute, don't only plan
+
+Continue with one scoped UI change on the same ADMIN branch, prioritizing the distinct published/status filter gap in screen #3 or core field-layout of screen #4. Preserve fulfillment semantics (never infer availability from stock values), auth/API contracts and data. Add a fixture regression and validate exact SHA with both source CI and Preview/Playwright. Do not duplicate customer/warranty search work.
+
+### Safety
+
+Keep PR #111/#108 OPEN/unmerged. No main/static branch write, merge, force-push, Production deployment, Access/secrets edit/bypass, remote D1/R2, schema/migrations/setup script, real data write, or TinyFish.

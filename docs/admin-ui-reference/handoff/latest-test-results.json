@@ -790,7 +790,7 @@
     "applicationStartup": "PASS",
     "playwrightPreviewDiagnostics": "success",
     "localStaticPlaywrightBaseline": "PASS",
-    "visualComparisonAgainstApprovedPng": "INCOMPLETE_12_SCREEN_COMPARISON; NOT VERIFIED",
+    "visualComparisonAgainstApprovedPng": "PARTIAL_SCREEN_3_REVIEWED; ALL_12_SCREEN_PARITY_NOT_ACCEPTED",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
@@ -801,13 +801,13 @@
     "typecheck": "NOT_SEPARATELY_CONFIGURED_OR_RUN",
     "automatedTests": "PASS",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
-    "businessFlows": "NOT_TESTED_AUTHENTICATED",
+    "businessFlows": "NOT_TESTED_REAL_BUSINESS_MODULE_FLOWS; CONFIGURED_PREVIEW_LOGIN_DASHBOARD_SMOKE_PASS",
     "sharedBackendRegression": "NOT_TESTED",
     "productionDeployment": "NOT_PERFORMED",
     "staticSourceContract": "PASS_GITHUB_SOURCE_INSPECTION_ONLY",
     "fullGitWorkingTree": "NOT_AVAILABLE_NO_LOCAL_CHECKOUT",
     "playwright": "PASS",
-    "referenceImageRead": "PASS_OPENED_EMBEDDED_IMAGE_FROM_ADMIN_MOBILE_REFERENCE_HTML",
+    "referenceImageRead": "PASS_OPENED_APPROVED_ADMIN_MOBILE_REFERENCE_PNG_FROM_ARTIFACT",
     "referenceScreenInventory": "PASS_12_SCREENS_IDENTIFIED",
     "currentAppScreenshotComparison": "PARTIAL_SOURCE_FIXTURE_VIEWS_INSPECTED; FULL_12_SCREEN_PARITY_NOT_VERIFIED",
     "sourceRouteInventory": "PASS_STATIC_GITHUB_SOURCE_INSPECTION",
@@ -816,8 +816,8 @@
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
-    "currentBranchHeadTests": "PASS CHECK+TEST+LOCAL_PLAYWRIGHT ON D408781 via run 39590491689; later evidence/handoff commit moved branch to 701befcb; no test claimed for docs-only descendants",
-    "authenticatedBackendModules": "BLOCKED_BY_ACCESS_NOT_TESTED",
+    "currentBranchHeadTests": "PASS_SOURCE_AND_PLAYWRIGHT_ON_EXACT_SHA_535e43121a612570dd84a353870bc118860c0c0d; docs/evidence descendant observed at 4c68aa361348c0e2aa8398c9635a4bc42d9efb70; re-fetch live ref after handoff commit",
+    "authenticatedBackendModules": "PREVIEW_LOGIN_DASHBOARD_SMOKE_PASS; REAL_BUSINESS_MODULE_FLOWS_NOT_TESTED",
     "visualReferenceParity": "PARTIAL_SOURCE_SCREEN_REVIEW; NOT_ACCEPTED_12_SCREEN_PARITY",
     "mobileOrderCustomerUsability": "SOURCE_CSS_SUPPORTS_MOBILE_CARDS_AT_MAX_680PX; REAL AUTHENTICATED SCREENSHOTS NOT VERIFIED",
     "prFullDiffAudit": "PARTIAL_GITHUB_API_ONLY; NOT_MERGE_APPROVAL",
@@ -854,7 +854,10 @@
     "visualParity12Screens": "NOT_ACCEPTED",
     "configuredPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY_AUTHENTICATED_QA_NOT_TESTED",
     "galleryRail": "PASS_SYNTHETIC_FIXTURE_HORIZONTALLY_SCROLLABLE_THUMBNAILS",
-    "galleryFooterGeometry": "PASS_2PX_SUBPIXEL_TOLERANCE; LAST_IMAGE_CLEARANCE_CHECK_PASS"
+    "galleryFooterGeometry": "PASS_2PX_SUBPIXEL_TOLERANCE; LAST_IMAGE_CLEARANCE_CHECK_PASS",
+    "productListCategorySearch": "PASS_FIXTURE_EXACT_SHA_535E431",
+    "productListResultAnnouncement": "PASS_ROLE_STATUS_ARIA_LIVE_FIXTURE",
+    "productListEmptyStateRecovery": "PASS_RESET_SEARCH_CATEGORY_FULFILLMENT_AND_RESTORE_FOCUS"
   },
   "remainingIssues": [
     "Configured deployed Preview fails PREVIEW_CSS_SIGNATURE_MISMATCH: .topbar > .brand is visible; selector support/match true; 226-rule stylesheet lacks expected login-hide rule. Target identity cannot be inferred from masked secret.",
@@ -886,10 +889,10 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315",
-  "branchHeadSha": "0e9e6560a968f7ca9754c91fda6f8af89c0ae41b",
+  "branchHeadSha": "4c68aa361348c0e2aa8398c9635a4bc42d9efb70",
   "latestVerifiedAt": "2026-10-21T16:47:18Z",
   "latestVerifiedSourceCommit": "f2df0a923080135c5fe92ee2021c76137305699c",
-  "currentAdminBranchHead": "0e9e6560a968f7ca9754c91fda6f8af89c0ae41b",
+  "currentAdminBranchHead": "4c68aa361348c0e2aa8398c9635a4bc42d9efb70",
   "latestVerificationSummary": "Validate Source #39637611840 and Admin Preview/Playwright #39637611768 both SUCCESS on exact SHA f2df0a923080135c5fe92ee2021c76137305699c. Source checks, tests, local screenshot matrix, warranty list/filter/form fixture E2E and configured Preview login CSS signature PASS. Synthetic/read-only only; not authenticated backend acceptance.",
   "branchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "prSafety": {
@@ -2033,18 +2036,22 @@
     }
   ],
   "latestSourceTestRun": {
-    "testedCommitSha": "f2df0a923080135c5fe92ee2021c76137305699c",
-    "validationRunId": 39637611840,
+    "testedCommitSha": "535e43121a612570dd84a353870bc118860c0c0d",
+    "validationRunId": 39643505425,
     "validationConclusion": "success",
-    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611840",
-    "previewRunId": 39637611768,
+    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505425",
+    "previewRunId": 39643505315,
     "previewRunConclusion": "success",
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768",
-    "warrantyListFirstFixtureE2E": "PASS",
-    "warrantySearchAndStatusFilters": "PASS",
-    "warrantyIssueDisclosureAccessibleFields": "PASS",
-    "warrantyOrderNumberOneLineAtMobile": "PASS",
-    "checkedAt": "2026-10-21T16:47:18Z"
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315",
+    "browserPlaywright": "3 passed (35.8s)",
+    "previewLoginDashboardSmoke": "2 passed (4.5s)",
+    "previewCssSignature": "PASS_LOGIN_CSS_SIGNATURE; 535 inline rules; expected login-hide rule present",
+    "screenshotArtifact": "admin-preview-evidence-203",
+    "screenshotArtifactId": 12365019731,
+    "screenshotArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731",
+    "screenshotArtifactExpiresAt": "2026-11-04T17:26:20Z",
+    "productListFixtureE2E": "PASS",
+    "checkedAt": "2026-10-21T17:26:22Z"
   },
   "latestCurrentPreviewDiagnostic": {
     "runId": 39602040135,
@@ -2934,5 +2941,43 @@
       "caveat": "Docs-only validation, not a fresh application UI test run."
     },
     "nextAction": "Read 12-SCREEN-REFERENCE-AUDIT.md and implement/test the next unresolved reference parity gap, prioritizing Product list/search/filters or Product editor. Avoid repeating completed search tasks and avoid documentation-only commits unless evidence materially changes."
-  }
+  },
+  "branchHeadReadNote": "Observed from live PR #111 immediately before this handoff docs commit; this docs commit will advance the branch. Always re-fetch live refs before the next edit.",
+  "latestProductListFeedbackCycle": {
+    "sourceUiCommit": "da808593785de5924ac1540e1522421ae5cb5bcd",
+    "exactTestedSha": "535e43121a612570dd84a353870bc118860c0c0d",
+    "validationRun": 39643505425,
+    "previewRun": 39643505315,
+    "artifact": {
+      "name": "admin-preview-evidence-203",
+      "id": 12365019731,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731",
+      "expiresAt": "2026-11-04T17:26:20Z",
+      "pngCount": 63,
+      "loginShellPngCount": 16,
+      "syntheticFixturePngCount": 47,
+      "fixtureMetricCount": 39
+    },
+    "behaviors": {
+      "searchByNameSkuCategoryLabel": "PASS_FIXTURE",
+      "accessibleResultCountAndRange": "PASS_FIXTURE",
+      "noMatchRecovery": "PASS_FIXTURE",
+      "resetAllFiltersAndFocus": "PASS_FIXTURE",
+      "categoryFulfillmentCombination": "PASS_FIXTURE",
+      "fixtureWrites": "NONE"
+    },
+    "visualReview": {
+      "reference": "docs/admin-ui-reference/admin-mobile-reference.png",
+      "screenshots": [
+        "products__390x844__light.png",
+        "products__1280x800__light.png"
+      ],
+      "reviewed": "YES",
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "remainingGap": "Reference-style status chips and card-detail presentation still differ; empty real price/stock values must not be fabricated."
+    },
+    "authenticatedBackendBusinessQA": "NOT_TESTED",
+    "overallProgressEstimatePercent": 50
+  },
+  "handoffEvidenceScopeNote": "Product-list screenshot/fixture feedback is read-only synthetic UI evidence only, not proof of actual data values or authenticated business write flows."
 }

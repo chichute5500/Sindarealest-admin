@@ -213,3 +213,9 @@ This was a read-only source review of the existing payment contract and route co
 - Exact source/test SHA `f2df0a923080135c5fe92ee2021c76137305699c`; Validate Source #39637611840 PASS and Preview/Playwright #39637611768 SUCCESS.
 - Search/status filter behavior, accessible collapsed issue form, no default warranty duration, and one-line mobile order ID assertions pass. Browser baseline 3 passed (34.8s); configured Preview CSS signature PASS.
 - Artifact #197 (ID 12362111591) contains 63 PNGs and 39 metrics; zero recorded errors or fixture writes. Screen #10 PARTIAL only; all-12 parity NOT ACCEPTED, authenticated business QA NOT TESTED/BLOCKED BY ACCESS, project progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+
+
+## Evidence scope update — product list iteration (2026-10-21)
+
+- Added a verified path in screen #3: search by category label, accessible matching-count/range, no-match recovery and resetting all filters; exact-SHA Playwright fixture assertions pass on `535e43121a612570dd84a353870bc118860c0c0d` (runs #39643505425 and #39643505315).
+- Evidence is explicitly synthetic/read-only; it does not establish production data, actual stock/price correctness, authenticated business transactions or all-12-screen visual acceptance. Those remain incomplete. Project progress remains 50%.
