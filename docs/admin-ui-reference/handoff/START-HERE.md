@@ -102,3 +102,11 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 - Current ADMIN HEAD `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`; source CI [39546689786](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786) PASS on this exact commit. Job steps confirm dependency audit, project integrity, automated tests all PASS.
 - Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) remains FAIL on older source `de6114f...` at deployed Preview CSS/UI signature. Local source checks/screenshots and evidence upload passed; deployed Preview diagnostic failed. No newer Preview diagnostic run was found for current HEAD.
 - PR #111 remains OPEN, 909 files (+30,664/-356), 406 ahead/6 behind main. PR #108 remains OPEN. Progress 43%; no authenticated module QA, no 12-screen parity claim, no remote D1/deploy.
+
+
+## Latest current-HEAD verification — 2026-10-21
+
+- ADMIN branch ref verified at `fbc783d514b194a7f922083e79b66cf333dda2ce`; source CI [39547169787](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787) PASS on exact HEAD.
+- Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) still FAILS at deployed CSS/UI signature mismatch on older tested source `de6114f...`. No newer Preview diagnostic found.
+- Read-only API review found update-product duplicate SKU conflicts likely use generic 500 handling while create-product returns explicit 409. Uniqueness remains DB-enforced; no API change made because backend/business behavior is outside UI-only scope.
+- PR #111 OPEN/unmerged: 909 files (+30,716/-356), 407 ahead/6 behind main. PR #108 OPEN. Progress 43%.

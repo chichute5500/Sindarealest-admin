@@ -1,14 +1,14 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — CURRENT SOURCE CI PASS; DEPLOYED PREVIEW SOURCE MISMATCH; MIGRATION REVIEW REQUIRED; AUTHENTICATED QA AND 12-SCREEN PARITY OPEN`
-**Ước tính tiến độ:** 43%; ước tính theo các hạng mục nghiệm thu, không phải tỷ lệ code.
-**Repository/branch:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`
-**HEAD đã xác minh:** `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`.
-**Source CI:** [run 39546689786](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786) SUCCESS trên đúng HEAD; dependency audit, project integrity và automated tests PASS.
-**Preview:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILURE tại kiểm tra deployed Preview CSS/UI signature, source được test là `de6114f...`. Chưa có run Preview mới hơn trên HEAD hiện tại.
-**PR #111:** OPEN/unmerged; 909 files, +30,664/−356, 406 commits ahead / 6 behind main. Mixed-scope, chưa đủ điều kiện merge.
-**PR #108:** OPEN/unmerged; static branch được bảo vệ.
-**Remote D1/schema/data/Production:** không truy cập hoặc sửa; migration ledger NOT VERIFIED.
+**Trạng thái tổng thể:** `IN PROGRESS — CURRENT SOURCE CI PASS; DEPLOYED PREVIEW MISMATCH; MIGRATION REVIEW REQUIRED; AUTHENTICATED QA AND 12-SCREEN PARITY OPEN`
+**Tiến độ ước tính:** 43%; chưa nghiệm thu hoàn tất.
+**Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`
+**HEAD hiện tại đã xác minh:** `fbc783d514b194a7f922083e79b66cf333dda2ce`.
+**CI source:** [run 39547169787](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787) SUCCESS trên đúng HEAD; dependency audit, integrity check và automated tests PASS.
+**Preview deployed:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILURE tại CSS/UI signature mismatch, source được kiểm tra là `de6114f...`; chưa có run Preview mới hơn trong lịch sử hiện có.
+**PR #111:** OPEN/unmerged, 909 files (+30,716/−356), 407 ahead / 6 behind main. **PR #108:** OPEN/unmerged.
+**Backend/migration:** remote D1 state NOT VERIFIED; không chạy setup/migration/deploy. Duplicate SKU khi sửa sản phẩm có thể trả lỗi chung 500 thay vì 409; ghi nhận để review riêng, chưa sửa API.
+**Production deploy / merge / đồng bộ nhánh:** NOT PERFORMED.
 
 
 
@@ -271,3 +271,12 @@ This check is based on the current GitHub source blob `public/admin/index.html` 
 - **PR #111 live metadata:** OPEN/unmerged, current head `cbc0c1c9f1504e86121eadcbfc60d76675cd1e91`, 909 changed files, +30,664/−356, 406 commits ahead and 6 behind `main`. This is still a broad mixed-scope PR. **PR #108 remains OPEN/unmerged.**
 - Source contract conclusions remain limited to static source review: five mobile navigation buttons, responsive `mobilecards` rules, correct current login copy. No authenticated real-backend flow or full 12-screen PNG parity is verified.
 - **Progress remains 43%.** Safe next action: obtain the owner-approved exact Preview URL/deployment identity and ensure Cloudflare Access is working. Do not read/edit secrets or bypass Access. Meanwhile continue read-only review of changed functions/scripts/tests and update the handoff with evidence; do not run remote setup/deploy/migration commands.
+
+
+## Current HEAD and last source CI — 2026-10-21 12:08 +07:00
+
+- Live ADMIN branch ref verified at `fbc783d514b194a7f922083e79b66cf333dda2ce`. Latest source CI [run 39547169787](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787) completed SUCCESS on this exact HEAD; dependency audit, integrity validation and automated tests all passed. This checkpoint changes documentation only, not application source.
+- Latest deployed Preview diagnostic remains [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719), FAILURE at deployed Preview CSS/UI signature check on tested source `de6114f75cba36193c50ad043175d08be092929f`. There is no newer Preview diagnostic in the currently listed branch workflow history. Do not label deployed Preview fixed.
+- Current PR #111 live metadata: OPEN/unmerged, 909 files (+30,716/−356), 407 commits ahead and 6 behind main. PR #108 remains OPEN/unmerged. No merge, cherry-pick, branch synchronization, deployment, secret access, or remote D1 operation was performed.
+- Additional read-only API review: `functions/api/admin/products/[id].js` updates SKU fields and relies on the database uniqueness constraint. A duplicate SKU on update is caught by the generic DB error path (likely 500) rather than the create route's explicit 409 conflict response. This does not bypass uniqueness, but update-specific duplicate-SKU error behavior lacks a dedicated regression test in the reviewed test files. **Do not change this API in this task without explicit approval**, because it is backend/business behavior outside the allowed UI-only scope; record as a future scoped test/UX item.
+- Current progress remains **43%**. Preview target identity, authenticated module QA, full 12-screen visual comparison, migration strategy and full mixed-scope PR review remain blockers.

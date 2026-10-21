@@ -4,7 +4,7 @@
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "de6114f75cba36193c50ad043175d08be092929f",
-  "testedCommitSha": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+  "testedCommitSha": "fbc783d514b194a7f922083e79b66cf333dda2ce",
   "capturedAt": "2026-10-20T20:50:00.385Z",
   "progressEstimatePercent": 43,
   "progressBasis": "Stage-based estimate, not code completion. Current HEAD CI passes, but configured Preview CSS signature still fails; authenticated business flows, full 12-screen comparison, full mixed-scope PR diff audit/remediation and authorized Preview identity remain open.",
@@ -749,11 +749,11 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286",
-  "branchHeadSha": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
-  "latestVerifiedAt": "2026-10-21T12:02:00+07:00",
-  "latestVerifiedSourceCommit": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
-  "currentAdminBranchHead": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
-  "latestVerificationSummary": "Source CI 39546689786 SUCCESS on exact current HEAD cbc0c1c9f1504e86121eadcbfc60d76675cd1e91; dependency audit, integrity validation and automated tests PASS. Latest Preview run 39542387719 still FAILS deployed CSS/UI signature on older source de6114f...; no newer Preview run found. Progress remains 43%.",
+  "branchHeadSha": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+  "latestVerifiedAt": "2026-10-21T12:08:00+07:00",
+  "latestVerifiedSourceCommit": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+  "currentAdminBranchHead": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+  "latestVerificationSummary": "Source CI run 39547169787 SUCCESS on exact HEAD fbc783d514b194a7f922083e79b66cf333dda2ce; dependency audit, project integrity and automated tests PASS. Preview diagnostic 39542387719 still FAILS deployed CSS/UI signature on older source de6114f...; no newer Preview run found.",
   "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
@@ -762,13 +762,13 @@
     "merged": false,
     "baseBranch": "main",
     "headBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "headSha": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
-    "commits": 406,
+    "headSha": "fbc783d514b194a7f922083e79b66cf333dda2ce",
+    "commits": 407,
     "changedFiles": 909,
-    "additions": 30664,
+    "additions": 30716,
     "deletions": 356,
     "containsPublicStorefrontAndBackendFiles": true,
-    "warning": "Live metadata verified at this checkpoint. Keep OPEN/unmerged pending complete mixed-scope and migration review."
+    "warning": "Mixed-scope PR; do not merge before full review and owner decision."
   },
   "adminInventory": {
     "sourcePath": "public/admin/index.html",
@@ -869,8 +869,8 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-21T12:02:00+07:00",
-  "currentBranchHeadAtHandoff": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+  "updatedAt": "2026-10-21T12:08:00+07:00",
+  "currentBranchHeadAtHandoff": "fbc783d514b194a7f922083e79b66cf333dda2ce",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -909,22 +909,23 @@
     "scope": "LOCAL SOURCE SCREENSHOTS + SYNTHETIC FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T12:02:00+07:00",
-    "type": "FRESH_CI_AND_PREVIEW_RUN_RECHECK",
+    "updatedAt": "2026-10-21T12:08:00+07:00",
+    "type": "CURRENT_HEAD_CI_RECHECK_AND_READ_ONLY_API_REVIEW",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceCodeChanged": false,
     "testsRunInThisUpdate": false,
     "verified": [
-      "Re-read live branch ref and confirmed current HEAD before writing.",
-      "Fetched current-head GitHub Actions run 39546689786; source CI job and dependency audit, project integrity, automated tests all succeeded.",
-      "Fetched Preview diagnostic run list; latest run 39542387719 still failed only at deployed Preview CSS/UI signature step after local source tests/screenshots passed.",
-      "Refreshed live PR #111 counts and open/unmerged status."
+      "Verified live branch ref at current HEAD before write.",
+      "Latest source CI 39547169787 succeeded on exact current HEAD.",
+      "Latest Preview diagnostic still fails separately; no newer Preview run found.",
+      "Reviewed product create/update endpoints and related SKU tests read-only; documented update duplicate conflict response gap without changing API.",
+      "Refreshed live PR metadata."
     ],
     "notDone": [
-      "No new Preview test was triggered in this turn.",
-      "No authenticated backend module QA or complete 12-screen visual comparison.",
-      "No remote D1, setup/migration/deploy, production operation, or secret access.",
-      "No local checkout; local git status not available."
+      "No Preview fix or new Preview test triggered.",
+      "No authenticated backend QA or 12-screen visual parity.",
+      "No remote D1/migration/deploy or secret access.",
+      "No local checkout/git status."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -996,9 +997,9 @@
   },
   "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
   "latestCiVerification": {
-    "runId": 39546689786,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39546689786",
-    "sourceCommit": "cbc0c1c9f1504e86121eadcbfc60d76675cd1e91",
+    "runId": 39547169787,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787",
+    "sourceCommit": "fbc783d514b194a7f922083e79b66cf333dda2ce",
     "workflow": "Validate source and tests",
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
@@ -1006,7 +1007,7 @@
     "dependencyAudit": "PASS",
     "previewDiagnostics": "NOT INCLUDED",
     "remoteD1": "NOT TESTED",
-    "note": "Exact current HEAD verified; this is source CI, not deployed Preview or authenticated backend validation."
+    "note": "Exact current HEAD; this is source CI only."
   },
   "latestPreviewArtifactInspection": {
     "inspectedAt": "2026-10-21T11:21:00+07:00",
@@ -1159,15 +1160,15 @@
     "conclusion": "FAILURE",
     "failedStep": "Diagnose configured deployed Preview",
     "reason": "CSS/UI signature mismatch",
-    "passedSteps": [
-      "repository checks",
-      "automated tests",
-      "local static preview",
-      "58 source screenshots",
-      "persist screenshots and test state",
-      "upload evidence"
-    ],
-    "currentHeadRunFound": false,
-    "note": "No newer Preview diagnostic run was found in current branch workflow history."
+    "currentHeadRunFound": false
+  },
+  "apiReadOnlyAudit": {
+    "checkedAt": "2026-10-21T12:08:00+07:00",
+    "path": "functions/api/admin/products/[id].js",
+    "finding": "PUT product update relies on DB unique constraint for SKU; duplicate SKU conflict likely reaches genericDbError, unlike create route's explicit 409 conflict. DB still prevents duplicate SKU.",
+    "testCoverage": "No dedicated duplicate-SKU update regression found in reviewed tests.",
+    "severity": "LOW_TO_MEDIUM_UX_ERROR_MAPPING",
+    "status": "NOT_CHANGED_OUT_OF_SCOPE",
+    "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   }
 }

@@ -139,3 +139,12 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - Latest Preview diagnostic is still [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719), FAIL at deployed CSS/UI signature mismatch on source `de6114f...`; local source screenshots and evidence upload succeeded. No Preview diagnostic on current HEAD has been found.
 - PR #111 OPEN/unmerged: 909 files (+30,664/-356), 406 ahead / 6 behind main. PR #108 OPEN. Progress remains 43%.
 - Continue safe read-only review; request the exact authorized Preview URL/deployment identity if needed. Never bypass Access, expose/change secrets, run remote D1 setup/migrations/deploy, merge, or sync branches.
+
+
+## Latest checkpoint — 2026-10-21
+
+- Live ADMIN HEAD verified `fbc783d514b194a7f922083e79b66cf333dda2ce`; source CI [39547169787](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39547169787) PASS on exact HEAD.
+- Latest deployed Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) remains FAIL at CSS/UI signature mismatch on source `de6114f...`; no newer Preview diagnostic found.
+- PR #111 remains OPEN/unmerged: 909 files (+30,716/-356), 407 ahead/6 behind main. PR #108 OPEN. Progress 43%.
+- Read-only review notes update-product duplicate SKU errors may fall through to generic 500 handling; DB uniqueness still protects integrity. Do not change backend/business logic without approval; add a scoped regression test only after permission and scope review.
+- Continue safe work: verify current refs/runs, review PR scope and handoff. No Access bypass, secrets, remote D1/migrations, deploy, merge or branch sync.
