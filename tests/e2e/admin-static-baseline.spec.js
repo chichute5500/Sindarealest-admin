@@ -719,6 +719,34 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard', 'dashboard', null, true);
     await captureView('products', 'products', null, true);
 
+    // Mobile product cards keep price and stock in one compact detail row without horizontal overflow.
+    await page.setViewportSize(mobile);
+    await chooseTheme('light');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const mobileProductRows = page.locator('#main .product-table tbody tr');
+    await expect(mobileProductRows).toHaveCount(3);
+    const mobileCardLayout = await mobileProductRows.first().evaluate(row => {
+      const cells = Array.from(row.cells);
+      const rects = cells.map(cell => {
+        const rect = cell.getBoundingClientRect();
+        return { top: rect.top, right: rect.right, bottom: rect.bottom, height: rect.height };
+      });
+      return {
+        rects,
+        rowHeight: row.getBoundingClientRect().height,
+        viewportWidth: document.documentElement.clientWidth,
+        pageWidth: document.documentElement.scrollWidth
+      };
+    });
+    expect(Math.abs(mobileCardLayout.rects[1].top - mobileCardLayout.rects[2].top),
+      'Price and stock should share a compact row on mobile: ' + JSON.stringify(mobileCardLayout)).toBeLessThanOrEqual(2);
+    expect(mobileCardLayout.rects[4].bottom, 'Edit action should remain inside the product card').toBeLessThanOrEqual(
+      mobileCardLayout.rects[0].bottom + mobileCardLayout.rowHeight
+    );
+    expect(mobileCardLayout.rowHeight, 'Mobile product cards should not stack every detail into tall rows').toBeLessThan(250);
+    expect(mobileCardLayout.pageWidth, 'Mobile product list must not overflow horizontally').toBeLessThanOrEqual(mobileCardLayout.viewportWidth + 1);
+    await saveScreenshot('products-compact-mobile-check', { viewport: mobile, theme: 'light' });
+
     // Product list search includes category labels and announces result counts.
     const productNames = page.locator('#main .product-table .prodname');
     await expect(productNames).toHaveCount(3);

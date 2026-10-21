@@ -217,6 +217,9 @@ has('#imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-alig
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
 has('#backdrop{align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor removes the dimmed modal backdrop');
 has('#backdrop>.editor{width:100%;max-width:none;height:100vh;height:100dvh;max-height:100dvh;border-radius:0;box-shadow:none;background:var(--bg)}', 'mobile product editor uses a full-screen opaque surface');
+has('#main .product-table tbody tr{position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:14px;align-items:start}', 'mobile product cards use a compact two-column details grid');
+has('#main .product-table tbody tr td:nth-child(2),\n #main .product-table tbody tr td:nth-child(3){display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px;width:100%;padding:7px 0 5px;border-bottom:0}', 'mobile product price and stock occupy compact detail cells');
+has('#main .product-table tbody tr td:nth-child(4){position:absolute;top:12px;right:12px;display:block;width:auto;max-width:84px;padding:0;border:0}', 'mobile publication status stays at the identity corner');
 has('#backdrop>.editor>form{display:flex;flex:1 0 auto;flex-direction:column;min-height:0}', 'short editor tabs stretch to reserve space for sticky actions');
 has('#backdrop>.editor>form>.editorcontent{flex:1 0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
