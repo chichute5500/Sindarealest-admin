@@ -14,22 +14,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: fda63055e3e2509d6199bf347f4eb33b66dd03c3
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39611416915
+- Tested commit: 45f630e99cfd1dd047c234f0fb42fa197d9bc978
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-156 (not committed to Git).
+- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-158 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Screenshot review addendum — 2026-10-21 (artifact 156)
-
-- Reviewed the actual source/fixture screenshot `product-gallery__390x844__light.png` from [Preview/Playwright run 39611416915](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39611416915), artifact `admin-preview-evidence-156`. Image evidence path in the supplied runtime: `/mnt/data/admin-evidence-156/artifacts/admin-preview-evidence/fda63055e3e2/screenshots/product-gallery__390x844__light.png`.
-- Screenshot review: mobile product editor is a stacked form with tabs `Chi tiết / Giá & loại hàng / Bộ ảnh`; gallery area has an upload picker, two placeholder/example thumbnails, per-image move-up/move-down/delete controls, and a fixed bottom action bar. At 390×844 the layout is legible overall, but the editor occupies nearly the full viewport and the muted grey backdrop/large form cards make the screen feel dense. The visible sample images are placeholders, not proof of real uploaded R2 objects or successful save.
-- Evidence classification: **SOURCE/FIXTURE SCREENSHOT REVIEW ONLY**. It does not prove authenticated product editing, actual image upload/storage, or save success. No approved-reference pixel comparison was completed in this review, so 12-screen visual parity remains **NOT ACCEPTED**.
-- Current latest recorded Preview run reports success on tested source SHA `fda63055e3e2509d6199bf347f4eb33b66dd03c3`; source check/test are PASS for that run only. The current PR head may advance due to handoff commits; do not transfer the test result to a later SHA without fresh CI.
-- PR #111 latest API snapshot: OPEN/unmerged, head `1ffdef972a65d1a13490429a6c9d719cf4153cbe`, 1,110 files changed; PR #108 OPEN/unmerged. PR #111 remains mixed-scope and not merge-ready.
-- Overall progress remains **48%**. Authenticated backend QA **NOT TESTED**; visual parity **NOT ACCEPTED**; image-save and PRE/PRO migration work **DEFERRED_BY_OWNER / NOT VERIFIED**. No source code was changed in this screenshot-review cycle; no Production deploy, merge, remote D1/R2 action, secret/Access change, or TinyFish use.
