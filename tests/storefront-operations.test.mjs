@@ -28,6 +28,14 @@ assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storef
 assert.ok(!storefrontHtml.includes('ghi lại mã SKU để tư vấn nhanh'), 'Order guidance must not instruct customers to record unverified fixture SKUs.');
 assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
 assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
+assert.ok(!storefrontHtml.includes('tap-ripple') && !storefrontHtml.includes('ringRipple') && !storefrontHtml.includes('setupTapRing'), 'Interactive controls must not create expanding ripple effects.');
+assert.ok(storefrontHtml.includes('.tap-target:active::before{opacity:1;transform:scale(.985)}')
+  && storefrontHtml.includes('inset 0 1px 3px rgba(20,42,60,.18)')
+  && storefrontHtml.includes('rgba(92,145,185,.14)'),
+  'Pressed controls must use a restrained inset Liquid Glass tint and depth rather than ripple.');
+assert.ok(storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
+  'Control feedback must remain covered by the storefront reduced-motion policy.');
+
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
 assert.ok(storefrontHtml.includes('id="accountAddressAction"') && storefrontHtml.includes('id="accountAddressView"') && storefrontHtml.includes('id="accountAddressForm"'), 'Account must expose an editable shipping-address book.');
 assert.ok(storefrontHtml.includes('#accountAddressView[hidden]{display:none!important}'), 'The editable address panel must remain hidden until the user selects it; a display:grid rule must not override the hidden state.');
