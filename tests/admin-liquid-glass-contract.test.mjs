@@ -105,8 +105,10 @@ assert.match(adminHtml, /mobilecards/,
   'Responsive order tables should provide the mobile-card layout checked by the visual matrix');
 assert.match(baselineSpec, /captureView\('order-row-details'/,
   'The visual matrix should exercise order details without relying on a hidden desktop-table scroll path');
-assert.match(baselineSpec, /expect\.poll\(async \(\) => page\.evaluate\(\(\) => \{/,
-  'Order row scrolling should wait for an attached DOM node');
+assert.match(baselineSpec, /await page\.locator\('\[data-action="view-order-details"\]:visible'\)\.first\(\)\.click\(\);/,
+  'Order-detail capture should activate a visible details control');
+assert.match(baselineSpec, /await expect\(page\.locator\('#orderDetailBackdrop'\)\)\.toBeVisible\(\);/,
+  'Order-detail capture should wait for the detail dialog to become visible');
 
 // The reorder/remove gallery controls use SVG artwork, not Unicode text glyphs, while
 // retaining record-specific accessible names and remaining legible in both themes.
