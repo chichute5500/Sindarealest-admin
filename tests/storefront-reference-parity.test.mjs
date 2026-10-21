@@ -78,10 +78,10 @@ assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
 
 /* Desktop hero fallback and mobile drawer/navigation separation are deliberate responsive contracts. */
-assert.match(desktopLight, /data-satin-style="fine-satin-drape-v7"/);
-assert.match(desktopDark, /data-satin-style="fine-satin-drape-v7"/);
-assert.match(mobileLight, /data-satin-style="fine-satin-drape-v7"/);
-assert.match(mobileDark, /data-satin-style="fine-satin-drape-v7"/);
+assert.match(desktopLight, /data-satin-style="fine-satin-drape-v8"/);
+assert.match(desktopDark, /data-satin-style="fine-satin-drape-v8"/);
+assert.match(mobileLight, /data-satin-style="fine-satin-drape-v8"/);
+assert.match(mobileDark, /data-satin-style="fine-satin-drape-v8"/);
 
 assert.ok(finalCss.includes('@media(min-width:761px){')
   && finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy{')
