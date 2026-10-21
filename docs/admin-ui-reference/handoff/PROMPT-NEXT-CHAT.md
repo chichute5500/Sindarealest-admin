@@ -1,3 +1,13 @@
+## Newest verified cycle — product published-status filter (2026-10-21 17:34 UTC)
+
+- Exact source/test SHA `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`; Validate Source #39644786469 PASS; Admin Preview/Playwright #39644786736 SUCCESS. Browser tests 3 passed (31.3s); configured Preview login/dashboard smoke 2 passed (3.3s); CSS signature PASS.
+- Added a responsive accessible group labelled `Lọc trạng thái hiển thị`: `Tất cả`, `Đang hiển thị`, `Đã ẩn`, with live counts and `aria-pressed`. Logic uses explicit publication booleans only; it does not infer “hết hàng” from quantity. Clear-all resets this state too.
+- Regression fixture now has 3 synthetic products (2 published / 1 hidden); the tests assert counts and both toggles. Artifact [admin-preview-evidence-204](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736/artifacts/12366373584), ID `12366373584`, contains 63 PNGs and 39 metrics; no browser/network/HTTP errors or attempted writes. Screenshots at 390×844 and 1280×800 light were inspected.
+- Screen #3 remains PARTIAL (not visual-parity accepted); the reference card/detail composition still differs. Overall progress remains 50%; authenticated business workflows NOT TESTED; product image-save/R2 and PRE/PRO migration work DEFERRED_BY_OWNER.
+- Branch head observed before next handoff update: `30c8cc7f87000813b5b50cc8162ca87a06dd1414`; re-fetch current HEAD, PR #111/#108, and latest Actions before code changes. Only ADMIN branch, PRs OPEN/unmerged; no production/Access/secrets/D1/R2/migration actions or TinyFish.
+
+---
+
 ## Newest verified cycle — 2026-10-21 17:26 UTC (read this first)
 
 - Exact source/test SHA `535e43121a612570dd84a353870bc118860c0c0d`; Validate Source #39643505425 PASS; Admin Preview/Playwright #39643505315 SUCCESS. Both workflows checked the same SHA. Browser suite: 3 passed; configured Preview login/dashboard smoke: 2 passed; login CSS signature PASS.

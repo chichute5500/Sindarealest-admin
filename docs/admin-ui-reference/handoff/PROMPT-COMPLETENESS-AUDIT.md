@@ -219,3 +219,9 @@ This was a read-only source review of the existing payment contract and route co
 
 - Added a verified path in screen #3: search by category label, accessible matching-count/range, no-match recovery and resetting all filters; exact-SHA Playwright fixture assertions pass on `535e43121a612570dd84a353870bc118860c0c0d` (runs #39643505425 and #39643505315).
 - Evidence is explicitly synthetic/read-only; it does not establish production data, actual stock/price correctness, authenticated business transactions or all-12-screen visual acceptance. Those remain incomplete. Project progress remains 50%.
+
+
+## Evidence scope addendum — publication filter (2026-10-21)
+
+- Exact-SHA tests #39644786469 and #39644786736 pass on `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`. Product list fixture covers explicit published state (2 true / 1 false), accessible pressed-state chips and reset.
+- This improves filter behavior and screen #3 fixture accessibility but does not complete visual reference parity or prove backend data correctness/authenticated business transactions. Progress remains 50%.

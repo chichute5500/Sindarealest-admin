@@ -1501,3 +1501,12 @@ Continue with one scoped UI change on the same ADMIN branch, prioritizing the di
 ### Safety
 
 Keep PR #111/#108 OPEN/unmerged. No main/static branch write, merge, force-push, Production deployment, Access/secrets edit/bypass, remote D1/R2, schema/migrations/setup script, real data write, or TinyFish.
+
+
+## Latest verified continuation — product publication filter (2026-10-21 17:34 UTC)
+
+- UI commit `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb` introduces screen #3 status chips. Validate Source #39644786469 and Preview/Playwright #39644786736 both SUCCESS on this exact SHA. Playwright 3 passed; configured Preview login/dashboard smoke 2 passed; CSS signature PASS.
+- Artifact #204 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736/artifacts/12366373584) contains 63 real source/fixture PNG captures and 39 fixture metrics; no page/console/request/HTTP errors, attempted writes or unexpected API routes. Actual `products__390x844__light.png` and `products__1280x800__light.png` were inspected, chips fit at both sizes.
+- UI shows `Tất cả`, `Đang hiển thị`, and `Đã ẩn` with counts and `aria-pressed`. Counts respond to other filters. Filtering is strictly by explicit `published` booleans; never infer out-of-stock from quantity. Clear-all resets publication filter.
+- Screen #3 remains PARTIAL; reference card hierarchy is not yet matched, all-12 parity NOT ACCEPTED, real business module transactions NOT TESTED. Overall progress 50%. Image-save/R2 and PRE/PRO migration are still DEFERRED_BY_OWNER.
+- Current HEAD before documentation refresh `30c8cc7f87000813b5b50cc8162ca87a06dd1414`; it will advance with this docs commit. Re-fetch refs before next edit. Keep PR #111/#108 OPEN/unmerged; no protected branch, deployment, secret/Access, D1/R2 or migration action.

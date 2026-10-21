@@ -790,7 +790,7 @@
     "applicationStartup": "PASS",
     "playwrightPreviewDiagnostics": "success",
     "localStaticPlaywrightBaseline": "PASS",
-    "visualComparisonAgainstApprovedPng": "PARTIAL_SCREEN_3_REVIEWED; ALL_12_SCREEN_PARITY_NOT_ACCEPTED",
+    "visualComparisonAgainstApprovedPng": "PARTIAL_SCREEN_3_REVIEWED_AT_390_AND_1280; ALL_12_SCREEN_PARITY_NOT_ACCEPTED",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
@@ -816,7 +816,7 @@
     "prScopeAudit": "HIGH_RISK_OPEN_PR_BASE_MAIN_CONTAINS_STOREFRONT_AND_BACKEND",
     "passwordVisibilityToggle": "PASS_REAL_CLICK_TOGGLE_LOCAL_SOURCE",
     "loginViewportBounds": "PASS_16_THEME_VIEWPORT_COMBINATIONS",
-    "currentBranchHeadTests": "PASS_SOURCE_AND_PLAYWRIGHT_ON_EXACT_SHA_535e43121a612570dd84a353870bc118860c0c0d; docs/evidence descendant observed at 4c68aa361348c0e2aa8398c9635a4bc42d9efb70; re-fetch live ref after handoff commit",
+    "currentBranchHeadTests": "PASS_SOURCE_AND_PLAYWRIGHT_ON_EXACT_SHA_b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb; docs/evidence descendant observed at 30c8cc7f87000813b5b50cc8162ca87a06dd1414; re-fetch after this handoff commit",
     "authenticatedBackendModules": "PREVIEW_LOGIN_DASHBOARD_SMOKE_PASS; REAL_BUSINESS_MODULE_FLOWS_NOT_TESTED",
     "visualReferenceParity": "PARTIAL_SOURCE_SCREEN_REVIEW; NOT_ACCEPTED_12_SCREEN_PARITY",
     "mobileOrderCustomerUsability": "SOURCE_CSS_SUPPORTS_MOBILE_CARDS_AT_MAX_680PX; REAL AUTHENTICATED SCREENSHOTS NOT VERIFIED",
@@ -857,7 +857,10 @@
     "galleryFooterGeometry": "PASS_2PX_SUBPIXEL_TOLERANCE; LAST_IMAGE_CLEARANCE_CHECK_PASS",
     "productListCategorySearch": "PASS_FIXTURE_EXACT_SHA_535E431",
     "productListResultAnnouncement": "PASS_ROLE_STATUS_ARIA_LIVE_FIXTURE",
-    "productListEmptyStateRecovery": "PASS_RESET_SEARCH_CATEGORY_FULFILLMENT_AND_RESTORE_FOCUS"
+    "productListEmptyStateRecovery": "PASS_RESET_SEARCH_CATEGORY_FULFILLMENT_AND_RESTORE_FOCUS",
+    "productListPublishedStatusFilter": "PASS_EXPLICIT_PUBLISHED_BOOLEAN_FIXTURE",
+    "productListStatusCounts": "PASS_COUNTS_UPDATE_WITH_CURRENT_SEARCH_CATEGORY_FULFILLMENT_FILTER",
+    "productListStatusChipAccessibility": "PASS_GROUP_LABEL_AND_ARIA_PRESSED"
   },
   "remainingIssues": [
     "Configured deployed Preview fails PREVIEW_CSS_SIGNATURE_MISMATCH: .topbar > .brand is visible; selector support/match true; 226-rule stylesheet lacks expected login-hide rule. Target identity cannot be inferred from masked secret.",
@@ -889,10 +892,10 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736",
-  "branchHeadSha": "4c68aa361348c0e2aa8398c9635a4bc42d9efb70",
+  "branchHeadSha": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
   "latestVerifiedAt": "2026-10-21T16:47:18Z",
   "latestVerifiedSourceCommit": "f2df0a923080135c5fe92ee2021c76137305699c",
-  "currentAdminBranchHead": "4c68aa361348c0e2aa8398c9635a4bc42d9efb70",
+  "currentAdminBranchHead": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
   "latestVerificationSummary": "Validate Source #39637611840 and Admin Preview/Playwright #39637611768 both SUCCESS on exact SHA f2df0a923080135c5fe92ee2021c76137305699c. Source checks, tests, local screenshot matrix, warranty list/filter/form fixture E2E and configured Preview login CSS signature PASS. Synthetic/read-only only; not authenticated backend acceptance.",
   "branchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "prSafety": {
@@ -2036,22 +2039,22 @@
     }
   ],
   "latestSourceTestRun": {
-    "testedCommitSha": "535e43121a612570dd84a353870bc118860c0c0d",
-    "validationRunId": 39643505425,
+    "testedCommitSha": "b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb",
+    "validationRunId": 39644786469,
     "validationConclusion": "success",
-    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505425",
-    "previewRunId": 39643505315,
+    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786469",
+    "previewRunId": 39644786736,
     "previewRunConclusion": "success",
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315",
-    "browserPlaywright": "3 passed (35.8s)",
-    "previewLoginDashboardSmoke": "2 passed (4.5s)",
-    "previewCssSignature": "PASS_LOGIN_CSS_SIGNATURE; 535 inline rules; expected login-hide rule present",
-    "screenshotArtifact": "admin-preview-evidence-203",
-    "screenshotArtifactId": 12365019731,
-    "screenshotArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731",
-    "screenshotArtifactExpiresAt": "2026-11-04T17:26:20Z",
-    "productListFixtureE2E": "PASS",
-    "checkedAt": "2026-10-21T17:26:22Z"
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736",
+    "browserPlaywright": "3 passed (31.3s)",
+    "previewLoginDashboardSmoke": "2 passed (3.3s)",
+    "previewCssSignature": "PASS_LOGIN_CSS_SIGNATURE; expected rule present; 537 inline rules",
+    "screenshotArtifact": "admin-preview-evidence-204",
+    "screenshotArtifactId": 12366373584,
+    "screenshotArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736/artifacts/12366373584",
+    "screenshotArtifactExpiresAt": "2026-11-04T17:34:45Z",
+    "productListCategoryAndPublishedStatusFilters": "PASS_SYNTHETIC_FIXTURE",
+    "checkedAt": "2026-10-21T17:34:47Z"
   },
   "latestCurrentPreviewDiagnostic": {
     "runId": 39602040135,
@@ -2942,7 +2945,7 @@
     },
     "nextAction": "Read 12-SCREEN-REFERENCE-AUDIT.md and implement/test the next unresolved reference parity gap, prioritizing Product list/search/filters or Product editor. Avoid repeating completed search tasks and avoid documentation-only commits unless evidence materially changes."
   },
-  "branchHeadReadNote": "Observed from live PR #111 immediately before this handoff docs commit; this docs commit will advance the branch. Always re-fetch live refs before the next edit.",
+  "branchHeadReadNote": "Observed from the live PR immediately before this handoff docs commit; this docs commit advances the branch. Re-fetch live refs before any next write.",
   "latestProductListFeedbackCycle": {
     "sourceUiCommit": "da808593785de5924ac1540e1522421ae5cb5bcd",
     "exactTestedSha": "535e43121a612570dd84a353870bc118860c0c0d",
@@ -2979,5 +2982,39 @@
     "authenticatedBackendBusinessQA": "NOT_TESTED",
     "overallProgressEstimatePercent": 50
   },
-  "handoffEvidenceScopeNote": "Product-list screenshot/fixture feedback is read-only synthetic UI evidence only, not proof of actual data values or authenticated business write flows."
+  "handoffEvidenceScopeNote": "Product-list screenshot/fixture feedback is read-only synthetic UI evidence only, not proof of actual data values or authenticated business write flows.",
+  "latestPublishedStatusFilterCycle": {
+    "exactTestedSha": "b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb",
+    "validationRunId": 39644786469,
+    "previewRunId": 39644786736,
+    "artifact": {
+      "name": "admin-preview-evidence-204",
+      "id": 12366373584,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736/artifacts/12366373584",
+      "expiresAt": "2026-11-04T17:34:45Z",
+      "pngCount": 63,
+      "loginShellPngCount": 16,
+      "syntheticFixturePngCount": 47,
+      "fixtureMetricCount": 39
+    },
+    "behaviors": {
+      "explicitPublishedTrueFalseFilter": "PASS_FIXTURE",
+      "liveCounts": "PASS_FIXTURE",
+      "ariaPressedState": "PASS_FIXTURE",
+      "filterReset": "PASS_FIXTURE",
+      "noStockInference": true,
+      "fixtureWrites": 0
+    },
+    "visualReview": {
+      "screenshots": [
+        "products__390x844__light.png",
+        "products__1280x800__light.png"
+      ],
+      "reviewed": "YES",
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "remainingGap": "Reference card/detail hierarchy is not fully matched; all-12 screen parity not accepted."
+    },
+    "authenticatedBusinessFlows": "NOT_TESTED",
+    "overallProgressEstimatePercent": 50
+  }
 }

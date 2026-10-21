@@ -1,5 +1,15 @@
 # SinDarealest ADMIN — điểm bắt đầu bàn giao cho AI
 
+## Newest verified checkpoint — 2026-10-21 17:34 UTC
+
+- Exact source/test SHA: `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`; Validate Source [#39644786469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786469) PASS; Admin Preview/Playwright [#39644786736](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736) SUCCESS. Playwright 3 passed; Preview login/dashboard smoke 2 passed; CSS signature PASS.
+- Screen #3 now has a published-status chip group (all/published/hidden) with counts and `aria-pressed`; it uses explicit boolean publication data only, never inventory inference. Fixture E2E validates 3 total / 2 published / 1 hidden, along with category/fulfillment search, announcement and no-result reset.
+- Artifact [admin-preview-evidence-204](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736/artifacts/12366373584): 63 PNGs / 39 synthetic fixture metrics, no page/console/network/HTTP errors or writes. The actual 390×844 and 1280×800 light screenshots were opened. Screen #3 remains PARTIAL; visual parity not accepted.
+- Branch HEAD observed before this docs update: `30c8cc7f87000813b5b50cc8162ca87a06dd1414`; the latest UI-test SHA is `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`. Re-fetch the live ref after documentation/evidence commits.
+- Progress remains 50%; screens #1, #4 and remaining unaccepted references still require review; all-12 visual parity NOT ACCEPTED; business module transactions NOT TESTED; image save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
+
+---
+
 ## Newest verified checkpoint — 2026-10-21 17:26 UTC
 
 - Latest source/test SHA: `535e43121a612570dd84a353870bc118860c0c0d`. Validate Source [#39643505425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505425) PASS; Admin Preview/Playwright [#39643505315](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315) SUCCESS. Browser suite 3 passed; configured Preview login/dashboard smoke 2 passed; CSS signature PASS.
