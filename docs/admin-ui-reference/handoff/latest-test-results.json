@@ -5,10 +5,10 @@
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "ebb20fa7f2359b19ae91a9c62b3006a16b8db148",
   "testedCommitSha": "ebb20fa7f2359b19ae91a9c62b3006a16b8db148",
-  "capturedAt": "2026-10-21T11:29:56.318Z",
+  "capturedAt": "2026-10-21T11:40:00Z",
   "progressEstimatePercent": 48,
-  "progressBasis": "48% estimate: exact source/test SHA ebb20fa7 passed project check, automated tests (including the refund guard regression), and read-only local Playwright. Remote Preview signature still fails, visual parity is not accepted, authenticated real-backend QA is not verified, and PR #111 mixed-scope semantic/security review is incomplete.",
-  "note": "Latest handoff HEAD 16ea1581ba7cb76762169d57030456cd4c31cffd has Validate source and tests PASS (run 39588603589). Latest UI source commit identified via file history is d553b95c3d43420f9227e9a37e6fe94b9b862b27. Latest verified Preview diagnostic run 39587426878 is FAILURE. Do not claim visual parity or backend QA complete. Owner explicitly requires continuous work after progress reports. Product image-save and PRE/PRO migrations remain deferred by owner. Handoff files and master/next-chat prompts were updated in a docs-only commit series; docs-only commits do not claim source CI was rerun.",
+  "progressBasis": "48% estimate only; unchanged because this checkpoint updates evidence/handoff, not implementation. Existing source/unit/local Playwright PASS applies to tested SHA ebb20fa7f2359b19ae91a9c62b3006a16b8db148 (run 39592097224); remote Preview diagnostic remains FAIL, 12-screen visual parity is not accepted, authenticated real-backend QA is not verified, and PR #111 mixed-scope semantic/security review is incomplete.",
+  "note": "Latest handoff HEAD 16ea1581ba7cb76762169d57030456cd4c31cffd has Validate source and tests PASS (run 39588603589). Latest UI source commit identified via file history is d553b95c3d43420f9227e9a37e6fe94b9b862b27. Latest verified Preview diagnostic run 39587426878 is FAILURE. Do not claim visual parity or backend QA complete. Owner explicitly requires continuous work after progress reports. Product image-save and PRE/PRO migrations remain deferred by owner. Handoff files and master/next-chat prompts were updated in a docs-only commit series; docs-only commits do not claim source CI was rerun. Latest handoff checkpoint (2026-10-21): GitHub confirms PR #111 HEAD 719a537f52eccf66c9642661c2758f8861beabcf, OPEN/unmerged, 1,096 files (+37,835/-392); it is newer than the tested SHA ebb20fa7. User already supplied Preview verification: deployment 564cd391..., commit 3ed2d86b..., successful build, but deployment is behind current HEAD and authenticated access is not proven. User should not be asked to repeat the Preview identity check. Cloudflare reportedly skipped /admin redirect rules due to loop detection; unresolved. Owner says UI still resembles old design 80–85%; real redesign and 12-screen parity remain unaccepted. Documentation checkpoint does not imply source changes or new CI pass.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -1329,17 +1329,12 @@
     "cloudflareAccessBypass": "NOT_PERFORMED"
   },
   "pr111": {
-    "state": "OPEN",
-    "merged": false,
-    "changedFiles": 1096,
-    "additions": 37821,
-    "deletions": 392,
+    "state": "OPEN_UNMERGED",
     "base": "main",
-    "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-    "headSha": "ee914c9a496810801a00df8e4f7da4e8c24c8a85",
-    "latestObservedHeadBeforeHandoffRefresh": "701befcb6d7072646fa3934cbe19315fa7a2d378",
-    "headShaBeforeJsonRefresh": "fbbc5775292e5de8f869a93dbd8d1b31ddc8e210",
-    "mergeReadiness": "NOT_MERGE_READY_MIXED_SCOPE_AND_OPEN_SEMANTIC_SECURITY_REVIEW"
+    "headSha": "719a537f52eccf66c9642661c2758f8861beabcf",
+    "changedFiles": 1096,
+    "additions": 37835,
+    "deletions": 392
   },
   "pr108": {
     "state": "OPEN",
@@ -2001,5 +1996,53 @@
     "currentPr108Files": 250,
     "currentPr108State": "OPEN_UNMERGED",
     "note": "This JSON write will itself advance the ADMIN branch via a handoff-only commit; it does not change the source/test SHA listed above."
-  }
+  },
+  "latestObservedAdminHead": "719a537f52eccf66c9642661c2758f8861beabcf",
+  "latestObservedAdminHeadVerifiedAt": "2026-10-21T11:35:49Z",
+  "latestObservedHeadIsTested": false,
+  "previewDeployment": {
+    "url": "https://564cd391.sindarealest2.pages.dev/admin/",
+    "alias": "https://feature-admin-isolated-hando.sindarealest2.pages.dev",
+    "deploymentId": "564cd391-87d3-4f98-8a68-c81e935a452b",
+    "deployedCommitSha": "3ed2d86b8b97f04718c478979136f986b3d1b07b",
+    "buildReportedAt": "2026-10-21T08:25:00Z",
+    "source": "owner-provided prior verification",
+    "buildSucceeded": true,
+    "sameAsLatestBranchHead": false,
+    "accessPolicyReportedAllowed": true,
+    "authenticatedUserFlow": "NOT_VERIFIED",
+    "doNotAskOwnerToRepeatPriorPreviewIdentityCheck": true
+  },
+  "redirectsFinding": {
+    "sourcePath": "public/_redirects",
+    "observedOnHead": "719a537f52eccf66c9642661c2758f8861beabcf",
+    "rules": [
+      "/admin /admin/ 301",
+      "/admin/ /admin/index.html 200",
+      "/* /index.html 200"
+    ],
+    "cloudflareReported": "rules 2 and 3 skipped due to possible infinite loops",
+    "resolution": "NOT_FIXED; investigate Pages routing/build output safely before edits; no Production deployment"
+  },
+  "visualAcceptance": {
+    "ownerFeedback": "Current Admin still resembles old UI by approximately 80–85%; changes appear mainly color and small details.",
+    "requiredOutcome": "Substantial Admin UI redesign against docs/admin-ui-reference/admin-mobile-reference.png and all 12 reference screens, not only appended CSS",
+    "parity12Screens": "NOT_ACCEPTED"
+  },
+  "ownerActionNeededNow": false,
+  "ownerAlreadyProvidedPreviewCheck": true,
+  "nextSteps": [
+    "Refresh current branch HEAD, PR #111/#108 status, workflow runs, and source-vs-tested SHA evidence before changes.",
+    "Investigate Cloudflare Pages /admin redirect loop and mismatch between deployed commit 3ed2d86b and current branch HEAD 719a537f; do not bypass Access or touch secrets.",
+    "Continue screen-by-screen visual comparison and substantive Admin layout/component redesign against the reference image; preserve auth, API contracts, real product identities and business logic.",
+    "Run checks on the exact new source SHA and record real screenshot/test evidence; do not reuse old PASS as proof for new HEAD.",
+    "Continue a semantic/security review of PR #111's broad mixed scope and clearly mark unresolved risks."
+  ],
+  "ownerRestrictions": [
+    "Only write/commit on feature/admin-isolated-handoff-2026-10-20.",
+    "Do not edit main or fix/liquid-glass-audit-2026-10-19.",
+    "Do not merge PR #111 or #108, deploy Production, or force-push.",
+    "Do not change secrets/Cloudflare Access, run migrations/setup, or write/delete real D1/R2/business data.",
+    "Product image-save and PRE/PRO migration investigations remain DEFERRED_BY_OWNER."
+  ]
 }
