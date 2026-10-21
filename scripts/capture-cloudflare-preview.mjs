@@ -147,7 +147,12 @@ async function navigate(page, url) {
   try { response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 }); }
   catch (error) { audit.hardFailures.push(sanitizeText('Navigation failed for ' + url + ': ' + String(error.message || error))); }
   if (!response) return { response: null, blocked: audit.accessBlocked, status: null, title: '', url: page.url(), bodyText: '' };
-  await page.waitForTimeout(400);
+  // The live audit uses reducedMotion='reduce', which auto-dismisses the intro after 500ms.
+  // Keep the initial homepage navigation delay-free on the 390px viewport so the welcome
+  // overlay can be captured before the page's transient dismissal timer starts.
+  const viewport = page.viewportSize();
+  const captureWelcomeImmediately = viewport?.width === 390 && new URL(url).pathname === '/';
+  if (!captureWelcomeImmediately) await page.waitForTimeout(400);
   const info = await page.evaluate(() => ({ title: document.title || '', url: location.href, bodyText: (document.body?.innerText || '').slice(0, 12000) }))
     .catch(() => ({ title: '', url: page.url(), bodyText: '' }));
   const blocked = accessGate(info.url, response.status(), info.title, info.bodyText);
