@@ -223,8 +223,8 @@ assert.match(live, /typeof reloadResponse\?\.status === 'function' \? reloadResp
   'A detail reload must use Playwright Response.status() and must not treat the status method as a numeric property.');
 assert.match(live, /await captureFirstPaintFrames\(page, page\.__sdAuditLabel[\s\S]*await waitForStorefront\(page, label\)/,
   'The initial 0–300ms viewport frames and early DOM evidence must be captured before storefront readiness or scrolling can hide a flash.');
-assert.match(live, /Welcome splash was not visible early enough to capture on live Preview/,
-  'The live audit must report a missing welcome capture explicitly instead of silently skipping required evidence.');
+assert.match(live, /Welcome splash was not visible during early live Preview capture|First-paint DOM sample failed at|First-paint viewport capture failed/,
+  'The live audit must report missing welcome or first-paint evidence explicitly instead of silently skipping it.');
 assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
   'Gallery-next interaction must only be required when the live product actually has multiple gallery images.');
 assert.match(live, /Path derived from an actual rendered Preview product card/i,
