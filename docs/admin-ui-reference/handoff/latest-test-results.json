@@ -3096,5 +3096,21 @@
       "overallProgressPercent": 50,
       "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance."
     }
-  ]
+  ],
+  "latestHandoffCheckpoint": {
+    "testedSha": "214dd104c17e3837166fac77f8f2106d1a25ffeb",
+    "validateSource": {
+      "runId": 39662986446,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446",
+      "result": "SUCCESS"
+    },
+    "adminPreviewPlaywright": {
+      "runId": 39662986425,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425",
+      "result": "SUCCESS"
+    },
+    "screenshotArtifactReview": "PENDING_NOT_OPENED",
+    "ordersScreen6": "E2E_PASS_VISUAL_REVIEW_PENDING",
+    "overallProgressPercent": 50
+  }
 }
