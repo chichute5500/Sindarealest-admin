@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { sanitizeText, sanitizeUrl } from '../scripts/sanitize-audit-value.mjs';
 import { buildCloudflareAccessHeaders } from '../scripts/cloudflare-access-service-token.mjs';
+import { isApprovedPreviewExternalRead } from '../scripts/preview-external-read-allowlist.mjs';
 import { validatePreviewUrl, matchesPreviewDeployment, inspectPreviewDeployment } from '../scripts/verify-cloudflare-preview-deployment.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
@@ -142,6 +143,30 @@ assert.match(live, /Object\.keys\(accessHeaders\)\.length > 0[\s\S]*route\.conti
 assert.match(live, /u\.origin !== origin[\s\S]*return route\.abort\(\)/,
   'Cross-origin requests must be blocked before any Access service-token header is attached.');
 
+assert.equal(isApprovedPreviewExternalRead('https://provinces.open-api.vn/api/v2/p/', 'GET'), true,
+  'Only the public province list endpoint may be allowed as a read-only external dependency.');
+assert.equal(isApprovedPreviewExternalRead('https://provinces.open-api.vn/api/v2/p/01?depth=2', 'GET'), true,
+  'Only the depth=2 ward lookup may be allowed for a numeric province code.');
+for (const [url, method] of [
+  ['https://provinces.open-api.vn/api/v2/p/', 'POST'],
+  ['https://provinces.open-api.vn/api/v2/p/01?depth=2', 'DELETE'],
+  ['http://provinces.open-api.vn/api/v2/p/', 'GET'],
+  ['https://example.com/api/v2/p/', 'GET'],
+  ['https://provinces.open-api.vn:444/api/v2/p/', 'GET'],
+  ['https://provinces.open-api.vn/api/v2/p/01?depth=1', 'GET'],
+  ['https://provinces.open-api.vn/api/v2/p/01?depth=2&token=secret', 'GET'],
+  ['https://provinces.open-api.vn/api/v2/p/01?depth=2#fragment', 'GET'],
+  ['https://provinces.open-api.vn/api/v2/admin', 'GET'],
+]) {
+  assert.equal(isApprovedPreviewExternalRead(url, method), false,
+    'External read allowlist must fail closed for ' + method + ' ' + url);
+}
+assert.match(live, /isApprovedPreviewExternalRead\(req\.url\(\), req\.method\(\)\)/,
+  'The live audit must only allow external requests using the tested, exact GET allowlist.');
+assert.match(live, /allowedExternalReadRequests\.push[\s\S]*no Preview Access headers forwarded/i,
+  'The audit must report the allowed public lookup separately and document that Access secrets are not forwarded.');
+
+
 assert.match(live, /new URL\(sourceUrl\)\.origin !== origin/,
   'Console errors from the external Access login page must not be reported as storefront errors.');
 assert.match(live, /sanitizeUrl\(info\.url\)/,
@@ -213,6 +238,7 @@ for (const scriptPath of [
   '../scripts/capture-cloudflare-preview.mjs',
   '../scripts/verify-cloudflare-preview-deployment.mjs',
   '../scripts/cloudflare-access-service-token.mjs',
+  '../scripts/preview-external-read-allowlist.mjs',
   '../scripts/compare-website-screenshots.mjs',
   '../scripts/validate-cloudflare-preview-url.mjs',
   '../scripts/sanitize-audit-value.mjs',

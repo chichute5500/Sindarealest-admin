@@ -3,6 +3,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { sanitizeText, sanitizeUrl } from './sanitize-audit-value.mjs';
 import { buildCloudflareAccessHeaders } from './cloudflare-access-service-token.mjs';
+import { isApprovedPreviewExternalRead } from './preview-external-read-allowlist.mjs';
 
 const requested = process.env.PREVIEW_URL || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/';
 const allowedHost = /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i;
@@ -53,6 +54,7 @@ const audit = {
   httpErrors: [],
   failedRequests: [],
   blockedExternalRequests: [],
+  allowedExternalReadRequests: [],
   readOnlyViolations: [],
   hardFailures: [],
   contentChecks: [],
@@ -84,9 +86,20 @@ async function makePage(browser, viewport, theme, label) {
     let u;
     try { u = new URL(req.url()); } catch { return route.abort(); }
     if (u.origin !== origin) {
-      // An Access sign-in commonly lives on a separate *.cloudflareaccess.com host.
-      // Block the cross-origin navigation before it can leave the Preview boundary,
-      // but classify it as an Access gate instead of a generic navigation failure.
+      // One narrowly scoped public dependency is permitted for a realistic checkout/address
+      // audit: GET-only province/ward lookups. This branch runs before same-origin Access
+      // service-token injection below, so Cloudflare credentials never leave the Preview.
+      if (isApprovedPreviewExternalRead(req.url(), req.method())) {
+        audit.allowedExternalReadRequests.push({
+          context: label,
+          method: req.method(),
+          url: sanitizeUrl(req.url()),
+          note: 'Explicit public administrative-division GET allowlist; no Preview Access headers forwarded.',
+        });
+        return route.continue();
+      }
+      // All other cross-origin requests are blocked. Access login redirects are classified
+      // separately so the audit cannot mistake a gated Preview for a healthy storefront.
       if (req.isNavigationRequest() && u.hostname.toLowerCase().endsWith('.cloudflareaccess.com')) {
         audit.accessBlocked = true;
         audit.accessBlockReason = 'The Preview redirected to a Cloudflare Access sign-in host; the external navigation was blocked and no credentials were entered.';
@@ -682,6 +695,7 @@ async function main() {
     brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
     productDetailContextCount: audit.productDetailChecks.length, commerceStateCheckCount: audit.commerceStateChecks.length,
     blockedExternalRequestCount: audit.blockedExternalRequests.length,
+    allowedExternalReadRequestCount: audit.allowedExternalReadRequests.length,
     readOnlyViolationCount: audit.readOnlyViolations.length, hardFailureCount: audit.hardFailures.length,
     requiredSectionScreenshotsComplete, productDetailContextsComplete,
   };
