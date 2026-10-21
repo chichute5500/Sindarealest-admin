@@ -522,3 +522,14 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Canonical screenshot workflow ran its guarded archive and pixel-diff steps. Inspect the artifact's `live-preview/visual-audit.json`, `deployment-verification.json`, and `website-screenshot-diffs` outputs before making visual claims. Do not hand-edit screenshots or `docs/website-screenshots/manifest.json`.
 - Keep Production, Admin UI, backend contracts/data, D1/R2/bindings/secrets, and PR merge out of scope. PR #108 stays open/unmerged.
 - Next: open the exact artifact's home hero captures for mobile Light/Dark and desktop Light/Dark, compare against the supplied original references, and continue fixing remaining visual mismatches section by section (satin background, six Liquid Glass tiles, “Phong cách đẳng cấp từ da cá sấu”, “Đặt hàng an tâm”, product grid/detail/gallery controls, cart/account/checkout and mobile Back, Zalo/footer, direct and invalid routes/404). Keep running validation → Preview deploy → exact-SHA live capture → visual review after each fix. No user action is needed unless a genuine permission/data decision blocks safe progress.
+
+Continuation evidence — mobile cart compacting (2026-10-21)
+## Continuation evidence — mobile cart compacting (2026-10-21)
+
+- Current HEAD recorded at this update: `01191b0a49487145c9837ca9d765328255c64cbf`.
+- `public/index.html`: adds mobile CSS for `.cart-drawer:has(.cart-row)` and a bounded, scrollable `.cart-list`.
+- `tests/storefront-reference-parity.test.mjs`: adds two static regression assertions for the CSS contract.
+- Live diagnostic artifact: [workflow run 39596960250](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39596960250), [artifact 12344517302](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39596960250/artifacts/12344517302). It includes a cart-with-item screenshot at mobile Dark 390×844; visual inspection shows the cart content and actions grouped more compactly.
+- Capture status: NOT PASS for canonical exact-SHA live capture. The diagnostic run's steps `Verify actual Cloudflare Pages deployment before manual capture`, `Capture live Cloudflare Pages Preview`, `Save live Preview images into selected repository archive`, and pixel comparison were skipped. No screenshot archive/manifest was changed by this run.
+- Do not reuse prior 84-screenshot or 8/8 viewport-theme results as proof for HEAD `01191b0`; those belong to earlier captured SHAs. Require a successful exact-SHA deployment verification and guarded live capture.
+- Outstanding: verify current validation/deploy runs, confirm exact deployed source SHA, rerun guarded capture, review hero Light/Dark mobile/desktop and broader required storefront sections. Canonical visual acceptance remains pending human review.
