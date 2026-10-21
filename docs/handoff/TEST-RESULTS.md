@@ -553,3 +553,10 @@ Continuation evidence — mobile cart compacting (2026-10-21)
 - Added a script to compare exact PNG filename sets before a guarded end-of-work archive can replace canonical screenshots; tests cover equal, extra and missing filenames.
 - The baseline (66 PNGs) and prior live end archive (84 PNGs) still differ. The guard intentionally blocks a new end archive until the baseline is refreshed using a verified live Preview capture via the protected workflow.
 - The guard commit is not considered PASS until source tests and workflow run confirm it. Manifest remains workflow-managed and was not edited manually.
+
+## 2026-10-21 — Fresh guarded live capture and pixel comparison
+
+- Captured source/deployment SHA: `a56c12de32d3aa08b84f027217b90af8b7e5e36d`; Preview: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Source validation PASS: [39610598095](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598095). Preview deploy PASS: [39610598134](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598134). Guarded capture [39610598201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598201), artifact [12350401549](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598201/artifacts/12350401549).
+- Results: 84 pairs; 71 identical, 13 changed; zero dimension mismatches, invalid PNGs or unmatched filenames. Live audit: 12 route checks, zero overflow/page/console errors.
+- Interpretation: technical/capture checks PASS only. Human visual/reference acceptance NOT COMPLETE. Open artifact and compare actual images to both original reference PNGs. Manifest stale wording “Nine screenshot pairs” conflicts with current 13 changed pairs; do not manually change workflow-owned counts.
