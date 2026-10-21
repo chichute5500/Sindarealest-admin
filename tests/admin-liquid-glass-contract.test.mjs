@@ -104,12 +104,12 @@ assert.match(adminHtml, /function galleryImageSrc\(value\)\s*\{/,
   'Gallery thumbnail URLs should be normalized by the dedicated helper');
 assert.match(adminHtml, /esc\(galleryImageSrc\(g\.url\)\)/,
   'Gallery rendering should preserve blob/data/http image URLs and relative paths');
-assert.match(baselineSpec, /setInputFiles\(\[/,
-  'The visual matrix should supply synthetic image files to the local gallery');
+assert.match(baselineSpec, /setInputFiles\((?:\[|galleryFixtures\.map\()/,
+  'The visual matrix should supply synthetic image files to the local gallery using the shared fixture list');
 assert.match(baselineSpec, /naturalWidth > 0/,
   'Gallery screenshots should verify local thumbnails are actually loaded');
-assert.match(baselineSpec, /fixtureImages: 2/,
-  'Gallery evidence should record the two synthetic visual-only images');
+assert.match(baselineSpec, /fixtureImages: 6/,
+  'Gallery evidence should record the six synthetic visual-only images and thumbnail rail');
 
 // Guard the visual-capture harness against flaky scrolling of hidden desktop-only table rows.
 assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
