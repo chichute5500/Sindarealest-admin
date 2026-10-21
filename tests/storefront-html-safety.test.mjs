@@ -23,14 +23,60 @@ const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "f
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the dynamic Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261021-hero-upload'"),
-  "the Hero image must use the owner-uploaded static asset");
-assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-supplied'"),
-  "the Hero must mark the image as owner-supplied");
-assert.doesNotMatch(heroSync, /products\.find|wantedSku|sku-not-found|image-missing|catalogGrid|featuredGrid/,
-  "the Hero must not depend on API SKU discovery or substitute an unrelated product");
-assert.ok(heroSync.includes("target.src=url"),
-  "the Hero image source must be set to the owner-supplied asset");
+assert.ok(heroSection.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
+  "the Hero image must stay hidden until a verified matching public SKU is available");
+assert.ok(heroSync.includes("target.hidden=true") && heroSync.includes("target.removeAttribute('src')"),
+  "the hero must start fail-closed and clear any previous image when its SKU cannot be verified");
+assert.ok(heroSync.includes("const product=products.find(p=>String(p?.sku??'').trim().toUpperCase()==='SD-GL052'&&p?.skuVerified===true);"),
+  "the hero may only select the exact SKU when the public product payload marks that SKU as verified");
+assert.ok(heroSync.includes("Array.isArray(product.images)") && heroSync.includes("target.src=url"),
+  "the hero image must come from the matching verified product's public image mapping");
+assert.ok(heroSync.includes("target.dataset.productImageStatus='verified-public-catalog'"),
+  "the hero image state must identify a verified catalog source");
+assert.doesNotMatch(heroSync, /hero-sd-gl052\.png|owner-supplied-hero-image|productImageStatus='owner-supplied'/,
+  "the hero must not label an unverified local image as the missing SD-GL052 product");
+
+function makeHeroTarget() {
+  const attributes = {};
+  return {
+    hidden: false,
+    dataset: {},
+    onerror: null,
+    getAttribute(name) { return Object.hasOwn(attributes, name) ? attributes[name] : null; },
+    removeAttribute(name) { delete attributes[name]; },
+    set src(value) { attributes.src = String(value); },
+    get src() { return attributes.src || ''; },
+  };
+}
+function runHeroSync(rows) {
+  const target = makeHeroTarget();
+  const result = vm.runInNewContext(`${heroSync}\nsyncHeroProductImage();`, {
+    products: rows,
+    $: selector => selector === '#heroProductImage' ? target : null,
+  });
+  return { result, target };
+}
+const missingHero = runHeroSync([]);
+assert.equal(missingHero.result, false);
+assert.equal(missingHero.target.hidden, true);
+assert.equal(missingHero.target.src, '');
+assert.equal(missingHero.target.dataset.productImageStatus, 'sku-unavailable');
+const unverifiedHero = runHeroSync([{ sku: 'SD-GL052', skuVerified: false, images: ['/media/123e4567-e89b-12d3-a456-426614174000.webp'] }]);
+assert.equal(unverifiedHero.result, false, 'an unverified matching SKU must not unlock the hero image');
+assert.equal(unverifiedHero.target.hidden, true);
+const noImageHero = runHeroSync([{ sku: 'SD-GL052', skuVerified: true, images: [] }]);
+assert.equal(noImageHero.result, false, 'the exact verified SKU without a mapped image must still fail closed');
+assert.equal(noImageHero.target.hidden, true);
+const verifiedHero = runHeroSync([{ sku: 'SD-GL052', skuVerified: true, images: ['/media/123e4567-e89b-12d3-a456-426614174000.webp'] }]);
+assert.equal(verifiedHero.result, true);
+assert.equal(verifiedHero.target.hidden, false);
+assert.equal(verifiedHero.target.src, '/media/123e4567-e89b-12d3-a456-426614174000.webp');
+assert.equal(verifiedHero.target.dataset.productSku, 'SD-GL052');
+assert.equal(verifiedHero.target.dataset.productImageStatus, 'verified-public-catalog');
+verifiedHero.target.onerror();
+assert.equal(verifiedHero.target.hidden, true, 'a broken verified image must collapse instead of leaving an empty frame');
+assert.equal(verifiedHero.target.src, '');
+assert.equal(verifiedHero.target.dataset.productImageStatus, 'image-load-failed');
 
 const helperStart = html.indexOf("const escapeHtml=");
 const helperEnd = html.indexOf("function showToast(", helperStart);
