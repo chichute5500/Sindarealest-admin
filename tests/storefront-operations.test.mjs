@@ -29,10 +29,19 @@ assert.ok(!storefrontHtml.includes('ghi lại mã SKU để tư vấn nhanh'), '
 assert.ok(storefrontHtml.includes('id="accountFavoritesAction"') && storefrontHtml.includes('id="accountFavoritesView"') && storefrontHtml.includes('id="accountFavoritesList"'), 'Account must expose a functional favorites screen rather than a dead menu row.');
 assert.ok(storefrontHtml.includes('id="detailFavorite"') && storefrontHtml.includes('aria-pressed="false"') && storefrontHtml.includes("const FAVORITES_STORAGE_KEY='sd-favorites'"), 'Product details must expose an accessible heart control backed by local favorites storage.');
 assert.ok(!storefrontHtml.includes('tap-ripple') && !storefrontHtml.includes('ringRipple') && !storefrontHtml.includes('setupTapRing'), 'Interactive controls must not create expanding ripple effects.');
-assert.ok(storefrontHtml.includes('.tap-target:active::before{opacity:1;transform:scale(.985)}')
-  && storefrontHtml.includes('inset 0 1px 3px rgba(20,42,60,.18)')
-  && storefrontHtml.includes('rgba(92,145,185,.14)'),
-  'Pressed controls must use a restrained inset Liquid Glass tint and depth rather than ripple.');
+assert.ok(storefrontHtml.includes('.tap-target:active::before{opacity:1;transform:scale(.97)}')
+  && storefrontHtml.includes('inset 0 2px 8px rgba(20,42,60,.14)')
+  && storefrontHtml.includes('rgba(92,145,185,.16)')
+  && storefrontHtml.includes('transition:opacity .14s cubic-bezier(.2,.7,.2,1),transform .14s cubic-bezier(.2,.7,.2,1)'),
+  'Pressed controls must follow the restrained Liquid Glass scale, inset depth, accent tint and 140ms timing baseline.');
+assert.ok(storefrontHtml.includes('background:rgba(255,255,255,.42);color:#142a3c;border:1px solid rgba(255,255,255,.72)')
+  && storefrontHtml.includes('backdrop-filter:blur(16px) saturate(145%)')
+  && storefrontHtml.includes('0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80)'),
+  'Light icon controls must follow the documented Liquid Glass surface, border, blur, shadow and inset highlight.');
+assert.ok(storefrontHtml.includes('.detail-favorite-btn[aria-pressed="true"]{background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.72);color:#E5484D}')
+  && storefrontHtml.includes('.detail-favorite-btn[aria-pressed="true"] svg path{fill:currentColor;stroke:currentColor}')
+  && storefrontHtml.includes('html.dark .icon-btn,html.dark .mini-add,html.dark .detail-favorite-btn'),
+  'The favorite heart must be filled red only while selected, with an adaptive dark-mode glass surface.');
 assert.ok(storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
   'Control feedback must remain covered by the storefront reduced-motion policy.');
 
