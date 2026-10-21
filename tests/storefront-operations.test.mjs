@@ -48,7 +48,8 @@ assert.ok(storefrontHtml.includes('.detail-favorite-btn[aria-pressed="true"]{bac
 assert.ok(storefrontHtml.includes('id="sd-icon-state-specificity-fix-2026-10-22"')
   && storefrontHtml.includes('#productOverlay #detailFavorite[aria-pressed="true"]{')
   && storefrontHtml.includes('color:#E5484D!important')
-  && storefrontHtml.includes('fill:currentColor!important')
+  && storefrontHtml.includes('fill:#E5484D!important')
+  && storefrontHtml.includes('stroke:#E5484D!important')
   && storefrontHtml.includes('#productOverlay #detailFavorite:not([aria-pressed="true"]):active{')
   && storefrontHtml.includes('background:rgba(234,243,251,.48)!important')
   && storefrontHtml.includes('transform:scale(.97)!important'),
