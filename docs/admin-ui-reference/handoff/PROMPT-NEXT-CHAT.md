@@ -1,16 +1,18 @@
-## PROMPT TIẾP TỤC — 2026-10-22T03:43:17.921+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T03:55:41.155+07:00
 
-Tiếp tục làm việc thực tế, không dừng ở kế hoạch. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. HEAD trước cập nhật handoff `d7c65c125685bab5c2e974ffcdb7b8cfb896d2db`; exact source/test SHA `e91b933f40aba30814b2b50590893c95ed5de1a5`.
+Tiếp tục làm việc thực tế, không chỉ báo cáo. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. HEAD trước handoff update `80fd27310aacb221894eb382efbbf3ef8cc82c07`; exact source/test SHA `e3e46b649c86346d2c014d12002b2b0c6b012020`.
 
-**Kết quả:** Validate Source [#39672585196](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585196) SUCCESS; Admin Preview/Playwright [#39672585229](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585229) SUCCESS trên cùng SHA. Artifact [admin-preview-evidence-256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585229/artifacts/12379888318) có 64 PNG/40 metrics; metadata hoàn tất, không có browser/console/network/HTTP errors hoặc fixture writes/unexpected API paths. CSS signature PASS không chứng minh backend thật.
+**Kết quả:** Validate Source [#39674335114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335114) SUCCESS; Admin Preview/Playwright [#39674335123](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335123) SUCCESS trên cùng SHA. Artifact [admin-preview-evidence-259](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335123/artifacts/12381230471) gồm 64 PNG/40 metrics; metadata hoàn tất, không có browser/console/network/HTTP errors, attempted writes hay unexpected API paths. Preview CSS signature không chứng minh backend thật.
 
-**Đã làm:** E2E fixture-only cho datalist `#pCategory`, nhập danh mục tùy chỉnh/restore, filter `#categoryBox` match Ví da/Thắt lưng, count/no-result/clear; thêm khoảng cách 10px giữa nhóm trường danh mục và SKU. Ảnh Product editor 390×844 light/dark và Products mobile/desktop đã được kiểm tra. Không lưu dữ liệu thật, không tạo route/API, không có non-GET requests.
+**Đã làm:** Customer cards hiển thị initials suy ra từ tên khách hiện có; không fake ảnh hay dữ liệu. E2E xác nhận initials, aria-hidden trên từng avatar, và search/no-result/reset. Đã xem screenshot customers 390×844 light/dark, 1280×800 light. Hai lỗi assertion test đã được sửa (regex split sai và strict-mode locator nhiều phần tử); final rerun pass. Category datalist/filter E2E và khoảng cách danh mục/SKU cũng đã kiểm tra ở vòng trước.
 
-**Trạng thái:** progress 50%; category controls PARTIAL nhưng screen-family parity NOT ACCEPTED; 12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED. PR #111/#108 OPEN/UNMERGED.
+**Giới hạn:** Customer reference có ảnh đại diện và tabs “Mới/Thân thiết”; API không trả ảnh, chưa có quy tắc phân nhóm được xác nhận nên không tự tạo. Customer screen PARTIAL, category controls PARTIAL; 12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED; progress 50%. PR #111/#108 OPEN/UNMERGED.
 
-**Việc tiếp theo:** kiểm tra screen #9 Customers/customer details: xem source và ảnh fixture mới, so với reference được phê duyệt nếu file thật sự có sẵn; thêm kiểm thử read-only có ý nghĩa và sửa khác biệt ADMIN đã xác minh. Sau mỗi thay đổi chạy exact-SHA Validate + Preview/Playwright, mở artifact, rồi cập nhật/đọc lại đủ 7 file handoff.
+**Việc tiếp theo:** Tiếp tục screen #10 Warranty/after-sales: so sánh screenshot với reference; chỉ sửa những khác biệt có thể thực hiện bằng dữ liệu/API hiện có, không tạo thumbnail giả; mở rộng fixture-only checks nếu có lỗ hổng cụ thể. Chạy exact-SHA Validate + Preview/Playwright sau thay đổi, xem artifact/metadata, rồi cập nhật và đọc lại đủ 7 file handoff.
 
 Trước sửa đổi fetch HEAD mới và dùng expected SHA/CAS. Chỉ nhánh ADMIN; không merge PR, không sửa `main`/static, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 
