@@ -6,7 +6,7 @@
 **HEAD quan sát trước cập nhật bàn giao:** `eff59ab78cfe11b091dfb64df3cc281a3572b343` (commit bằng chứng do workflow sinh); commit source/test gần nhất đã xác minh: `6935eefa3473f1c6a15da08a34389d7223cbd0ea`.
 **CI source:** [run 39548605358](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358) SUCCESS trên `6935eefa`; kiểm tra repository và automated tests PASS.
 **Preview deployed:** [run 39548605474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474) FAILURE tại CSS signature. Log xác nhận browser hỗ trợ selector và selector khớp `.topbar > .brand`, nhưng stylesheet Preview không chứa quy tắc ẩn tương ứng (`ruleCount: 226`, `hasLoginHideRule: false`). `ADMIN_TEST_URL` bị GitHub che trong log; chưa thể nhận diện URL/triển khai cụ thể.
-**PR #111:** OPEN/unmerged; scope được GitHub báo 909 files, gồm docs/evidence cùng storefront/backend/scripts/migration; chưa đủ điều kiện merge. **PR #108:** OPEN/unmerged.
+**PR #111:** OPEN/unmerged; current PR API reports **970 files (+32,282/−356), 415 commits ahead in PR history**. A paginated file-list audit found 854 screenshot PNGs, 70 other docs/notes, and 46 non-doc files, including public storefront, data fixture, Functions/backend, migration, setup/deploy scripts and tests. This is not an ADMIN-only diff; do not merge. **PR #108:** OPEN/unmerged.
 **Backend / Production:** remote D1 và migration ledger NOT VERIFIED. Không chạy setup/migration/deploy; không merge PR #111/#108; không sửa `main` hoặc nhánh website tĩnh.
 **Production deploy / merge / đồng bộ nhánh:** NOT PERFORMED.
 
@@ -164,3 +164,24 @@
 - To make the remote Preview test pass, an authorized owner must provide/update `ADMIN_TEST_URL` to a Preview deployment built from the current ADMIN branch, or explicitly authorize a preview-only deployment after Preview bindings are confirmed isolated. Do not use Production URL, expose secrets, bypass Cloudflare Access, or touch D1/R2.
 - Continue other safe work while this external Preview identity is unresolved: full 12-screen reference comparison, deeper source/accessibility audits and PR #111 mixed-scope inventory. Keep authenticated real-backend workflows marked NOT TESTED until a valid authorized Preview and safe test data are available.
 - Progress estimate: **45%**. Source checks and local screenshots now have current evidence; deployed Preview identity, all 12-screen parity, authenticated live module flows, full diff review, and migration compatibility remain open.
+
+
+## Latest PR file-scope audit — 2026-10-21 12:21 +07
+
+The GitHub Pull Request Files API was paged through all 970 changed entries for PR #111. Category totals:
+
+| File group | Count | Finding |
+|---|---:|---|
+| Handoff/history PNG screenshots | 854 | Binary UI evidence; greatly increases review size but contains no line-level diff |
+| Other docs/notes | 70 | Prompts, instructions, reports and handoff records |
+| Tests | 20 | Includes ADMIN and public-storefront regressions |
+| Backend Functions | 14 | Admin APIs, shared middleware and helpers changed |
+| Scripts | 5 | Includes Cloudflare setup/deploy and migration checking |
+| GitHub workflows | 2 | Includes Preview diagnostics and storefront visual preview |
+| Migration | 1 | `migrations/0008_product_sku_verification.sql` |
+| ADMIN HTML | 1 | `public/admin/index.html` |
+| Public storefront HTML | 1 | `public/index.html` changes outside the ADMIN page |
+| Data fixture | 1 | `data/legacy-products.json` (235 seed SKU verification changes previously identified) |
+| Package file | 1 | `package.json` modified |
+
+Current PR metadata: **970 changed files, +32,282/−356, 415 commits, base `main`, OPEN/unmerged**. The changed-file list confirms scope contamination with public storefront/data/backend/scripts; do not merge PR #111 as-is. Do not try to clean/rewrite history, force-push, cherry-pick, change the PR base or remove evidence screenshots without explicit owner approval. Continue with read-only review and document the scope risk.
