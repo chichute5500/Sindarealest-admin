@@ -131,7 +131,7 @@ assert.ok(html.includes('#home .hero-visual img{\n    width:100%;height:100%;obj
   "Mobile hero imagery should blend into the single editorial banner instead of reading as a separate outlined card.");
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
-assert.ok(html.includes(".product-info{padding:9px 9px 39px}") && html.includes(".product-info{padding:11px 12px 44px}"),
+assert.ok(html.includes(".product-info{padding:9px 9px 36px}") && html.includes(".product-info{padding:11px 12px 44px}"),
   "Product-card content must reserve space for its separate quick-add action instead of letting the cart button overlap price/details.");
 
 assert.ok(html.includes('<div class="product-meta-row"><span class="product-category">') && html.includes("${fulfillmentBadge(p)}"),
