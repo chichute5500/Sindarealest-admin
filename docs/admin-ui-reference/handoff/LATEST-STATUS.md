@@ -66,3 +66,10 @@
 - Commit test: `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`.
 - Workflow Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) và Admin Preview [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) đang chạy trên SHA đó tại thời điểm cập nhật; chưa công nhận pass.
 - Điểm ước lượng có trọng số cập nhật từ 49% lên 50% (49.6% làm tròn) do tăng độ bao phủ kiểm thử; đây không phải mức tăng tương đương về giao diện hoặc nghiệp vụ hoàn chỉnh.
+
+
+## Kết quả xác minh sau khi chạy test — 2026-10-21 17:08 UTC
+
+- Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340): **SUCCESS** trên đúng source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; các assertion mới về trạng thái `aria-live` và empty-state của bảo hành/yêu cầu hỗ trợ đã qua.
+- Admin Preview diagnostic [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300): vẫn đang chụp ma trận ảnh ở thời điểm kiểm tra; kết quả cuối chưa xác nhận.
+- Bảng `latest-test-results.json` đã đánh dấu test mới `executed: true`; điểm quản lý giữ 50% vì thay đổi này tăng kiểm thử, chưa giải quyết các khối lượng lớn về parity/nghiệp vụ.
