@@ -936,3 +936,13 @@ Continue real work autonomously on `chichute5500/Sindarealest-admin`, only write
 - Thực hiện một thay đổi UI có ý nghĩa trên nhánh ADMIN duy nhất, giữ API/data behavior, bổ sung regression test, chạy checks và so sánh ảnh trước/sau. Không chỉ lập kế hoạch, không chỉ cập nhật tài liệu.
 - Cập nhật progress chỉ khi bằng chứng mới hỗ trợ; không tăng % chỉ vì viết handoff. Hạn chế commit tài liệu riêng lẻ vì gây CI dư thừa.
 - Tuyệt đối không merge/deploy Production, không sửa Access/secrets, không chạm remote D1/R2/schema/dữ liệu thật, không dùng TinyFish; PR #111/#108 giữ OPEN.
+
+
+## Continuation checkpoint — 2026-10-22 — product-list fulfillment detail
+
+- Branch scope remains `feature/admin-isolated-handoff-2026-10-20` only. New source commit: `330f4bbaae11c0dd3bdbb61a01b75d5462d3201b` (`public/admin/index.html`); regression-test commit: `7948a320c3fd38a7f73d061de6ca6e3251b72789` (`tests/e2e/admin-static-baseline.spec.js`).
+- Screen #3 product list now renders the existing fulfillment classification as a compact, semantic chip rather than plain secondary text. It explicitly distinguishes `Hàng có sẵn`, `Hàng đặt riêng`, and `Chưa phân loại`; unclassified uses a dashed neutral treatment. No price, inventory, SKU, publication state, or product fact was fabricated, and no API/data behavior was changed.
+- Added fixture assertions for all three chip states using synthetic read-only products. These assertions are committed but **must not be marked PASS until Actions runs on the exact current source/test SHA are observed**. A connector query for PR-associated runs returned no run at the time of this checkpoint; validation is pending, not assumed.
+- Overall progress remains **50%**. This bounded visual change is not acceptance of screen #3 or all-12-screen parity. Authenticated business/backend QA remains NOT TESTED/BLOCKED; image-save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
+- Next: re-fetch current branch/PR state and Actions. Verify source and Preview/Playwright on exact SHA; inspect the new product screenshots at 390×844 and 1280×800 in light/dark. If checks fail, fix the cause without weakening assertions. Update progress only if screenshot review and evidence justify it.
+- Safety unchanged: PR #111/#108 remain open/unmerged; no Production deploy, no edits to `main` or static branch, no Access/secrets changes, no remote D1/R2 or migrations, and no TinyFish.
