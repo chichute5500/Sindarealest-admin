@@ -72,6 +72,13 @@ for(const field of ['bankName','accountName','accountNumber','transferContent'])
 }
 assert.doesNotMatch(html,/payment_status\s*=/i,'The browser must not write payment status.');
 assert.match(html,/Vui lòng chưa chuyển tiền/,'Pending orders must explicitly tell customers not to transfer.');
+const rendererStart=html.indexOf('function renderPaymentInstructions');
+const fallbackStart=html.indexOf('if(!ready){',rendererStart);
+const readyPanelStart=html.indexOf("add('h3','','Hướng dẫn chuyển khoản')",fallbackStart);
+assert.ok(rendererStart>=0&&fallbackStart>rendererStart&&readyPanelStart>fallbackStart,'Payment renderer must expose its guarded pending-state branch.');
+const paymentFallback=html.slice(fallbackStart,readyPanelStart);
+assert.ok(paymentFallback.includes("add('p','payment-warning','Vui lòng chưa chuyển tiền."),'A server-provided message must never replace the mandatory no-transfer warning.');
+assert.ok(paymentFallback.includes("const serverMessage=String(result?.message||'').trim()"),'An optional server message must be rendered separately from the mandatory safety warning.');
 assert.match(html,/Thanh toán chỉ được ghi nhận sau khi cửa hàng kiểm tra giao dịch thực nhận/,'Payment is not considered received until the store verifies the actual transfer.');
 
 console.log('Storefront payment/product-type contract checks passed.');
