@@ -530,3 +530,27 @@ First re-fetch current HEAD, PR #111/#108 and Actions. Latest observed PR #111 h
 Reviewed `product-gallery__390x844__light.png` from artifact `admin-preview-evidence-156`, run [39611416915](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39611416915), tested source SHA `fda63055e3e2509d6199bf347f4eb33b66dd03c3`. Observed stacked product editor, three tabs, upload picker, two placeholder/example thumbnails, image move/delete controls, and fixed bottom action bar. The screen is legible but vertically dense at 390×844. This is source/fixture evidence only; it does not prove real image upload, storage, product save or authenticated backend behavior. Do not treat it as an approved-reference comparison. 12-screen parity remains NOT ACCEPTED.
 
 Overall progress remains 48%. Authenticated backend QA NOT TESTED; product image-save and PRE/PRO migration tasks DEFERRED_BY_OWNER / NOT VERIFIED. Continue safe source-only reference/accessibility/responsive audit and PR scope review. Only ADMIN branch; keep #111/#108 open; no merge, Production deploy, main/static-branch write, secrets/Access change/bypass, remote D1/R2 or migration/setup, and no TinyFish. Do not stop after reporting if safe work remains.
+
+## Latest verified continuation checkpoint — 2026-10-21 21:20 ICT
+
+### UI change and exact-SHA tests
+- Scope: ADMIN-only CSS + regression assertions; no JavaScript business logic, API contract, Functions, data, migrations, secrets, bindings, or Cloudflare configuration changed.
+- Source commit: `1fb56f7b5773876c581847bf44abbef1c5c16a67` — mobile product gallery makes the first image a prominent full-row cover, keeps supporting thumbnails in a responsive grid, and has light/dark rules.
+- Regression test commit: `45f630e99cfd1dd047c234f0fb42fa197d9bc978` — contract assertions cover cover-row layout, full-composition image fit, narrow-phone fallback, dark theme and existing accessible reorder controls.
+- Run [#157](`https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615192697`): exact source SHA `1fb56f7b5773876c581847bf44abbef1c5c16a67`; `npm run check`, `npm test`, local Playwright screenshot matrix and configured Preview diagnostic all PASS.
+- Run [#158](`https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216`): exact tested SHA `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; same checks all PASS. Artifact `admin-preview-evidence-158` (ID `12351884437`, expires 2026-11-04) has the 59 source/fixture screenshots (16 login-shell and 43 synthetic read-only module views) and 36 fixture metrics. This is not authenticated real-backend QA.
+- Visual review of artifact 158's `product-gallery__390x844__light.png`: the primary image is now visually dominant; the screen remains vertically dense and the secondary thumbnail continues below the fixed action area when captured at this scroll position. The approved reference has a more dedicated image-manager composition, so this is a single incremental improvement, not 12-screen visual acceptance.
+- Overall progress remains **48%**. All 12 reference-screen families: **NOT ACCEPTED**; authenticated business flows/backend QA: **NOT TESTED**; real photo upload/save: **DEFERRED_BY_OWNER / NOT VERIFIED**.
+- The workflow saved run evidence and docs-only checkpoint at `068520e4ac62adc32ce5f15226e666479770af91`; handoff-only commits do not change the tested source SHA. Re-fetch the live branch ref before further work.
+
+### Read-only PR scope/security finding
+- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) remains **OPEN / UNMERGED**, base `main`, 1,112 changed paths (+38,619/−392). Current path census: `docs/` 1,050 paths (including 913 PNG assets), 24 Functions files, 2 migrations, 5 scripts, 24 tests, 2 workflows, and root/data/public/package files; both `public/admin/index.html` and the unrelated `public/index.html` are in the PR diff. It is mixed-scope and **not merge-ready**.
+- The PR contains `scripts/setup-cloudflare.mjs`, which can execute remote D1 schema SQL/ALTER statements and then a Pages deployment after interactive confirmation, and `scripts/deploy-cloudflare.mjs`, which performs remote schema checks and a Pages deploy. They were read only and **not executed**. Migrations 0008/0009 were inspected as source only; no migration ledger/schema verification against remote D1 was performed.
+- Keep PR #111 and [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108) OPEN. PR #108 is OPEN/UNMERGED with 269 changed files. Do not silently retarget/split/merge either PR or edit other branches without explicit authorization.
+
+### Immutable safety boundaries
+- Only write on `feature/admin-isolated-handoff-2026-10-20`; do not edit `main` or `fix/liquid-glass-audit-2026-10-19`.
+- No merge/cherry-pick/force-push or Production deploy.
+- No secret/Cloudflare Access changes or bypass, remote D1/R2/schema/data writes, setup/migration script execution, or TinyFish.
+- Product image-save and PRE/PRO migration remain deferred by the owner. Continue source-only responsive/accessibility/reference audit and PR diff review; test every source change on its exact SHA, and update handoff docs after evidence is verified.
+
