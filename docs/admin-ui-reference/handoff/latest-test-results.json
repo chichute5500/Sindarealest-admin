@@ -16,7 +16,7 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "branchHeadSha": "21a7e039749e484e42b68ec322481df6a2a797af",
+    "branchHeadSha": "af543dd83c40d026d2c09aa253b2396ccb3421d3",
     "lastObservedApplicationSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
     "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
     "pr111State": "OPEN_UNMERGED",
@@ -714,17 +714,18 @@
     "expectedLoginHideRuleInPreview": "MISSING"
   },
   "remainingIssues": [
-    "Configured ADMIN_TEST_URL reaches a page whose stylesheet is missing the current ADMIN login-shell hide rule. Owner must identify/point it to an authorized Preview built from the current ADMIN source; secret itself must not be printed.",
+    "Configured ADMIN_TEST_URL reaches a page whose stylesheet lacks the current ADMIN login-shell hide rule. Owner must provide/point to an authorized Preview built from current ADMIN source; do not print or change the secret in this session.",
     "Only local unauthenticated login and synthetic/read-only fixture screens have evidence. Authenticated real backend workflows remain NOT TESTED.",
     "Full visual comparison against all 12 approved reference screens remains incomplete.",
-    "PR #111 is broad/mixed-scope (reported 909 files including public storefront, Functions/backend, migrations, scripts and data fixtures); full diff/scope audit is incomplete and PR must remain unmerged.",
-    "Migration 0008 and scripts/setup-cloudflare.mjs remote D1 behavior/ledger remain NOT VERIFIED; no schema/data or deployment operations were performed.",
-    "No local checkout is available in this runtime; Git working tree and full local diff are NOT VERIFIED."
+    "PR #111 has 970 changed files (+32,282/-356), including 854 screenshot PNGs and 46 non-documentation files. Mixed public storefront/backend/scripts/migration scope requires explicit review and is not safe to merge as-is.",
+    "Migration 0008 and scripts/setup-cloudflare.mjs remote D1 behavior/applied ledger remain NOT VERIFIED; no schema/data/deployment operations were performed.",
+    "No local checkout is available in this runtime; local git status and full git diff are NOT VERIFIED."
   ],
   "blockedItems": [
-    "To clear the remote Preview check, owner action is required: supply an authorized current-source ADMIN Preview URL or authorize a preview-only deployment after verifying Preview bindings are isolated. Do not change secrets from this session or run the main-pinned Production deployment.",
-    "Authenticated live module tests need authorized Preview access and safe synthetic/test data with PII masking.",
-    "Reference 12-screen parity and complete PR #111 scope/migration review remain open."
+    "Preview: owner action is required to identify the authorized current-source ADMIN Preview target or explicitly authorize a preview-only deployment after verifying Preview D1/R2 bindings are isolated. Do not run the workflow hard-pinned to main.",
+    "PR scope: restructuring/resetting or cleaning PR #111 history/scope would violate current no-force-push/no-cherry-pick/no-merge guardrails; obtain explicit owner approval before any such operation.",
+    "Authenticated live module tests require authorized current Preview access and safe synthetic test data/PII masking.",
+    "Reference parity and migration compatibility remain open."
   ],
   "nextActions": [
     "Review the latest real screenshots and metadata under the recorded history path.",
@@ -736,11 +737,11 @@
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
   "branchHeadSha": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
-  "latestVerifiedAt": "2026-10-21T05:19:10Z",
+  "latestVerifiedAt": "2026-10-21T05:21:30Z",
   "latestVerifiedSourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
   "currentAdminBranchHead": "4a1b58950c0b8e9de75009d5af313dfdfbea3595",
   "latestVerificationSummary": "Source CI run 39547341928 SUCCESS on 4a1b58950c0b8e9de75009d5af313dfdfbea3595. Dependency audit, project integrity, and automated tests passed. Latest deployed Preview diagnostic 39542387719 remains FAIL at CSS/UI signature check; no new Preview run was performed.",
-  "branchHeadBeforeHandoffUpdate": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
+  "branchHeadBeforeHandoffUpdate": "af543dd83c40d026d2c09aa253b2396ccb3421d3",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -856,7 +857,7 @@
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
   "updatedAt": "2026-10-21T12:14:00+07:00",
-  "currentBranchHeadAtHandoff": "1677ea93e3b6220bcd9612d9085da5c512300685",
+  "currentBranchHeadAtHandoff": "af543dd83c40d026d2c09aa253b2396ccb3421d3",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -914,23 +915,21 @@
     "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T05:19:10Z",
-    "type": "CSSOM_DIAGNOSTIC_AND_CURRENT_PREVIEW_VERIFICATION",
+    "updatedAt": "2026-10-21T05:21:30Z",
+    "type": "PR_FILE_SCOPE_AUDIT_AND_PREVIEW_DIAGNOSIS",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "sourceCodeChanged": true,
-    "testsRunInThisUpdate": true,
+    "sourceCodeChanged": false,
+    "testsRunInThisUpdate": false,
     "verified": [
-      "Corrected the Playwright CSS selector normalization regex and verified the saved source.",
-      "Current source CI run 39548605358 PASS on exact source commit 6935eefa.",
-      "Current Preview diagnostic run 39548605474 FAILED on exact source commit 6935eefa at the deployed CSS assertion.",
-      "Live Preview signature confirms browserSupportsHideSelector=true, hideSelectorMatchesBrand=true, topbarBrandDisplay=flex, hasLoginHideRule=false; configured Preview response lacks expected rule.",
-      "Local Playwright screenshot/fixture suites PASS with 58 PNGs, zero recorded page/console/network/HTTP errors and no attempted writes.",
-      "Evidence artifact admin-preview-evidence-64 (ID 12322384265) stored until 2026-11-04."
+      "Paginated all 970 changed files in PR #111 and categorized them: 854 screenshot PNGs, 70 other docs/notes and 46 non-documentation files.",
+      "Confirmed PR metadata: OPEN/unmerged, base main, 970 changed files, +32,282/-356, 415 commits.",
+      "Confirmed source/test commit 6935eefa remains validated by source CI PASS; Preview diagnostic 39548605474 FAILS because current login-shell CSS rule is missing from configured Preview response.",
+      "Updated LATEST-STATUS with PR scope findings and Preview root cause."
     ],
     "notDone": [
-      "ADMIN_TEST_URL exact value remains masked and has not been read, exposed or changed.",
-      "No Admin-branch Preview deployment was performed; Production deployment workflow was not run.",
-      "No authenticated live backend QA, full 12-screen visual parity, full PR #111 diff audit or remote D1/migration review."
+      "No local checkout/diff available; GitHub API file list is complete but local working-tree state cannot be stated.",
+      "No PR restructuring, force-push, cherry-pick, merge, deployment, secret change, migration or remote data operation.",
+      "No authenticated live backend QA or full 12-screen visual comparison."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -950,15 +949,20 @@
   },
   "progressPercent": 45,
   "prScopeAudit": {
-    "checkedAt": "2026-10-21",
+    "checkedAt": "2026-10-21T05:21:30Z",
     "prNumber": 111,
     "state": "OPEN",
     "merged": false,
     "base": "main",
-    "headSha": "21a7e039749e484e42b68ec322481df6a2a797af",
-    "changedFileCount": 909,
-    "docsEvidenceFiles": 862,
-    "nonDocumentationFiles": 47,
+    "headSha": "af543dd83c40d026d2c09aa253b2396ccb3421d3",
+    "changedFileCount": 970,
+    "additions": 32282,
+    "deletions": 356,
+    "commits": 415,
+    "docsEvidenceFiles": 924,
+    "otherDocsNotes": 70,
+    "handoffScreenshotPngFiles": 854,
+    "nonDocumentationFiles": 46,
     "nonDocumentationSummary": {
       "adminUi": 1,
       "storefrontPublic": 1,
@@ -969,27 +973,20 @@
       "workflows": 2,
       "packageConfig": 1,
       "tests": 20,
-      "other": 2
-    },
-    "comparison": {
-      "status": "diverged",
-      "aheadBy": 405,
-      "behindBy": 6,
-      "compareEndpointFilesReported": 300
+      "other": 0
     },
     "findings": [
-      "PR is mixed-scope rather than ADMIN-UI-only: public/index.html, data/legacy-products.json, Functions/API, migration, setup/deploy scripts, public-site tests and workflows are included.",
-      "The available exact PR patches for public/index.html and data/legacy-products.json returned null; these diffs remain UNREVIEWED, not assumed safe.",
-      "SKU verification migration 0008 adds products.sku_verified and order_items.sku_verified; multiple public/ADMIN handlers query/write these columns and require explicit migration-order/backward-compatibility review.",
+      "Paged GitHub Pull Request Files API through all 970 changed entries; 854 are handoff/history screenshot PNGs and 70 other docs/notes.",
+      "The remaining 46 non-documentation files include public/index.html, data/legacy-products.json, 14 Functions/backend files, migration 0008, setup/deploy/migration scripts, workflows, package.json, 20 tests, and one ADMIN HTML file.",
+      "PR is mixed-scope rather than ADMIN-UI-only. Public storefront and data fixture changes are present; backend/API and migration changes require review. Keep PR #111 OPEN/unmerged.",
+      "Snapshot comparison of public/index.html confirms it differs from the protected static branch; public design/theme/favourites/watermark/price UI changes are in the PR diff.",
+      "Snapshot comparison of data/legacy-products.json vs main previously found 235 records whose only field deltas are sku -> null and skuVerified -> false; other product fields were unchanged. This is a committed fixture change and must not be treated as live D1 data.",
+      "Migration 0008 adds products.sku_verified and order_items.sku_verified; handlers query/write these columns. Remote schema and applied-migrations ledger remain NOT VERIFIED.",
       "scripts/setup-cloudflare.mjs can run remote D1 migrations and direct ALTER TABLE; it was not executed.",
-      "scripts/capture-liquid-glass-preview.mjs and liquid-glass-visual-preview.yml are public-site-oriented content present in PR #111.",
-      "Snapshot comparison of public/index.html confirms it differs from protected static branch: ADMIN branch 235,860 chars vs static 276,036 chars; broad public design/theme/favourites/watermark/price UI changes are in the PR diff.",
-      "Snapshot comparison of data/legacy-products.json vs main finds 235 records whose only field deltas are sku -> null and skuVerified -> false; all other product fields are unchanged. File is identical in the ADMIN and protected static branch snapshots.",
-      "Latest live PR #111 metadata at 2026-10-21: 909 changed files (+30553/-356), 405 ahead / 6 behind main.",
-      "Current source-only audit supersedes stale hypotheses: five mobile nav items with Warranty/Settings in More; responsive mobilecards styles exist; login text is already Luxury in Every Detail + Đăng nhập quản trị.",
-      "Source-only findings do not prove authenticated business flows or screen-by-screen parity with the approved image."
+      "scripts/capture-liquid-glass-preview.mjs and liquid-glass-visual-preview.yml are storefront-oriented files inside PR #111.",
+      "The compare endpoint reports a capped file list, so paginated PR files results are the source of the 970-file category count. No local checkout is available for git diff/status verification."
     ],
-    "safety": "No merge/deploy/secret/schema/production-data operation performed; keep PR #111 open until scope and migration review."
+    "safety": "No merge/deploy/secret/schema/production-data operation performed; do not clean/rewrite scope or remove history evidence without explicit owner approval."
   },
   "latestWorkflowFixValidation": {
     "status": "VALIDATED_SOURCE_CI_PASS_PREVIEW_CSS_MISMATCH_REPRODUCED",
