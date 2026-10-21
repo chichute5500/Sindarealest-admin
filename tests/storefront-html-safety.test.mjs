@@ -15,7 +15,7 @@ assert.match(heroSection, /<h1 class="serif"><span>Phong cách<\/span><span>đ�
   "the Hero must keep the confirmed three-line brand headline hierarchy");
 assert.match(heroSection, /<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">/,
   "the hero image element must remain available for responsive styling without hardcoding an HTML source");
-assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\\bsrc=/,
+assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\bsrc=/,
   "the hero image source must be assigned by the runtime synchronizer");
 
 const heroSyncStart = html.indexOf("function syncHeroProductImage()");
@@ -28,7 +28,7 @@ assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'"
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
   && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
   "the Hero must display the presentation asset and label it separately from a catalog image");
-assert.doesNotMatch(heroSync, /products\\.find|skuVerified/,
+assert.doesNotMatch(heroSync, /products\.find|skuVerified/,
   "the Hero presentation image must not be gated by the public product SKU payload");
 
 function makeHeroTarget() {
@@ -46,7 +46,7 @@ function makeHeroTarget() {
 }
 function runHeroSync(rows) {
   const target = makeHeroTarget();
-  const result = vm.runInNewContext(`${heroSync}\\nsyncHeroProductImage();`, {
+  const result = vm.runInNewContext(`${heroSync}\nsyncHeroProductImage();`, {
     products: rows,
     $: selector => selector === '#heroProductImage' ? target : null,
   });
