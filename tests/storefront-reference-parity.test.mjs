@@ -181,6 +181,11 @@ assert.match(finalCss, /\.sd-fullscreen-frame\{background:transparent!important;
   'The full-screen gallery must not add a separate bordered or shadowed image card.');
 assert.match(finalCss, /\.sd-fullscreen-image\.sd-white-background-keyed\{filter:url\(#sdGalleryWhiteBackgroundKey\)\}/,
   'Gallery background blending must be display-only and applied only after a white-canvas check.');
+assert.match(finalCss, /#detailMainImage\.sd-white-background-keyed\{filter:url\(#sdGalleryWhiteBackgroundKey\) drop-shadow\(0 12px 20px rgba\(0,22,42,\.16\)\)!important\}/,
+  'The product detail photo may use the same background key only when corner sampling identifies a near-white source canvas.');
+assert.ok(html.includes("$('#detailMainImage').addEventListener('load',()=>syncFullscreenBackgroundKey($('#detailMainImage')));"),
+  'The detail photo must run the existing safe corner-sampling key after each source image loads.');
+
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
 assert.ok(html.includes('id="accountDrawer"') && html.includes('id="mobileAccountNav"'), 'Account screen and mobile navigation remain.');
