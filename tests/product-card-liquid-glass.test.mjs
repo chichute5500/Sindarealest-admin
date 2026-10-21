@@ -194,9 +194,10 @@ assert.ok(darkMobileWaveArtwork.includes('stroke-width="12"') && darkMobileWaveA
 
 
 /* Product photos should sit on satin without changing the catalog's real image URLs. */
-assert.match(html, /<style id="sd-satin-gallery-blend-2026-10-21">[\\s\\S]*?\.sd-fullscreen-frame\\{[\\s\\S]*?background:transparent!important;border:0!important;box-shadow:none!important/,
-  "The fullscreen gallery must not add a second visible card frame around the original product image.");
-assert.match(html, /html:not\\(\.dark\\) \.detail-main-image\\{[\\s\\S]*?mix-blend-mode:multiply!important;background:transparent!important/,
-  "Light-mode detail photos must blend their original white background into the satin surface.");
-assert.match(html, /html\.dark \.detail-main-image\\{mix-blend-mode:normal!important}/,
-  "Dark mode must preserve the original product image colours.");
+assert.ok(
+  html.includes('<style id="sd-satin-gallery-blend-2026-10-21">')
+  && html.includes('.sd-fullscreen-frame{\n  background:transparent!important;border:0!important;box-shadow:none!important;')
+  && html.includes('html:not(.dark) .detail-main-image{\n  mix-blend-mode:multiply!important;background:transparent!important;border-color:transparent!important;')
+  && html.includes('html.dark .detail-main-image{mix-blend-mode:normal!important}'),
+  "Gallery and detail images must blend into satin without a second frame while preserving dark-mode product colours."
+);
