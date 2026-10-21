@@ -146,3 +146,14 @@
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Handoff checkpoint — 2026-10-21 15:39 +07:00
+
+- Owner manually confirmed on Admin Preview: (1) login works, (2) product list/detail opens, (3) image-selection UI opens. These are user-observed basic UI checks only; no product save or image upload was performed/confirmed. This does not establish full backend acceptance.
+- Preview URL checked by owner: https://564cd391.sindarealest2.pages.dev (deployment ID `564cd391-87d3-4f98-8a68-c81e935a452b`, branch `feature/admin-isolated-handoff-2026-10-20`, source commit reported as `3ed2d86b8b97f04718c478979136f986b3d1b07b`). Deployment/build stages reported successful by Cloudflare AI; this is separate from CI and runtime functional verification.
+- New GitHub Actions runs observed for source SHA `3ed2d86b8b97f04718c478979136f986b3d1b07b`: source CI [39569134111](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39569134111) FAILURE at automated tests; Preview diagnostic [39569133914](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39569133914) FAILURE at automated tests, so browser/Playwright and configured deployed-Preview diagnostic steps were skipped. These results supersede older source-CI PASS claims for this checkpoint.
+- Current test failure is not yet root-caused: available job-step evidence identifies the automated-test step but does not provide the assertion/stack trace. Do not assert it is only a stale test contract until detailed failing output is inspected. The previous assistant hypothesis about missing `expect.poll(...)` needs verification against the actual failed test output.
+- Cloudflare build warning: two redirect rules were skipped as infinite loops: `/admin/ /admin/index.html 200` and `/* /index.html 200`. Warning is actionable but not proven to cause the observed owner-tested Admin UI issue. Do not change redirect configuration based only on this warning; reproduce/test first.
+- Overall project progress remains 46% as a management estimate, not completion or test coverage. Real save/upload, full module business flows, 12-screen visual parity, Preview/CI diagnosis, D1 migration ledger, and PR #111 mixed-scope audit remain NOT VERIFIED/open.
+- Guardrails unchanged: only ADMIN branch for edits; keep PR #111 and #108 open/unmerged; no Production deployment, no branch synchronization, no secret/Access changes, no remote D1/R2 writes or migrations.
