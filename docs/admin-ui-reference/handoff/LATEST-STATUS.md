@@ -93,3 +93,13 @@ The artifact was downloaded and the reference PNG was opened alongside current P
 
 - The previously queued exact-source validation run [#39622616336](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336) has now completed **success** on source SHA `e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d` (job `validate`, completed success).
 - This validates the tested source tree at that SHA only. Subsequent handoff-document commits move branch HEAD to `ab02394891b517bc4731372f90c41512f76483e7`; do not conflate docs HEAD with source-tested SHA. Re-check workflow status for current HEAD before claiming it passed.
+
+
+## Dashboard revenue empty-state implementation — 2026-10-21 15:18 UTC
+
+- Implemented a responsive dashboard panel titled “Doanh thu theo thời gian” on the isolated Admin branch. It explicitly states that the complete, verified historical revenue series is unavailable; no sample totals or invented trend line are shown.
+- The panel source was added by commit `ae351fcc2790b70e198ec3db1053bef7ad46981f`; the source CI and Preview diagnostic for that exact SHA both completed success: [source validation #39623789507](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623789507) and [Preview diagnostic #39623789724](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623789724). This is useful baseline evidence, not a pass for later commits.
+- A subsequent parallel edit accidentally introduced a second panel with the same static ID. Source validation correctly failed at [#39623834484](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39623834484) on the duplicate-ID integrity assertion. The duplicate panel has since been removed in commit `5b66b589b9f08bb91fddf3a2d8de07b51313bbf6`; the focused guard test was aligned to the retained panel in `e0cea90c593aff479645ee11ff521cfe34e2732a`.
+- Current branch HEAD observed at this update: `e0cea90c593aff479645ee11ff521cfe34e2732a`. Fresh CI for this exact HEAD has not yet appeared in the Actions listing. **Do not call the latest state validated until a run on this SHA or a descendant succeeds.**
+- The focused test `tests/admin-dashboard-revenue-empty-state.test.mjs` is included in `npm test`. No local test run or real authenticated browser screenshot is claimed; there is no local checkout available in this runtime. The successful Preview diagnostic is for the earlier baseline SHA only.
+- Progress remains **48%**: the revenue empty state is a meaningful UI improvement, but current-HEAD CI, screenshot comparison, all-12-screen parity and authenticated real-backend QA remain outstanding. No merge, Production deploy, Access/secrets changes, D1/R2 operations or migration execution occurred.
