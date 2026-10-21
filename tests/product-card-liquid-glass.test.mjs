@@ -134,6 +134,9 @@ assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    m
 assert.ok(html.includes(".product-info{padding:9px 9px 39px}") && html.includes(".product-info{padding:11px 12px 44px}"),
   "Product-card content must reserve space for its separate quick-add action instead of letting the cart button overlap price/details.");
 
+assert.ok(html.includes('<div class="product-meta-row"><span class="product-category">') && html.includes("${fulfillmentBadge(p)}"),
+  "Catalog product category and fulfillment status should share one compact metadata row on mobile.");
+
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
 
 assert.ok(finalThemeCss.includes('body:has(.sd-fullscreen-viewer.open) .mobile-bottom-nav{display:none!important}'),
