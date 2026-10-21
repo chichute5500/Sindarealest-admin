@@ -673,7 +673,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           const field = document.querySelector('#' + id)?.closest('.field');
           if (!field) return null;
           const rect = field.getBoundingClientRect();
-          return { top: rect.top, bottom: rect.bottom, width: rect.width };
+          return {
+            top: rect.top,
+            bottom: rect.bottom,
+            width: rect.width,
+            inputFontSize: parseFloat(getComputedStyle(field.querySelector('input')).fontSize)
+          };
         };
         const footer = document.querySelector('#backdrop .editorfooter')?.getBoundingClientRect();
         return {
@@ -690,6 +695,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       ).toBeLessThanOrEqual(2);
       expect(mobilePriceStockLayout.price.width, 'Price field must retain usable width').toBeGreaterThan(0);
       expect(mobilePriceStockLayout.stock.width, 'Stock field must retain usable width').toBeGreaterThan(0);
+      expect(mobilePriceStockLayout.price.inputFontSize, 'Price placeholder text should use a compact mobile font').toBeLessThanOrEqual(11);
+      expect(mobilePriceStockLayout.stock.inputFontSize, 'Stock placeholder text should use a compact mobile font').toBeLessThanOrEqual(11);
       if (variant.viewport.width >= 380 && mobilePriceStockLayout.footerTop !== undefined) {
         expect(
           mobilePriceStockLayout.stock.bottom,
