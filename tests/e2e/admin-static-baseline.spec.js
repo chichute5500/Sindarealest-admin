@@ -568,6 +568,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (name === 'order-row-details' && await page.locator('#orderDetailBackdrop').isVisible()) {
         await page.locator('#orderDetailClose').click();
         await expect(page.locator('#orderDetailBackdrop')).toBeHidden();
+        await expect(page.locator('#orderDetailBackdrop')).toHaveAttribute('aria-hidden', 'true');
+        await expect(page.locator('[data-action="view-order-details"]:visible').first()).toBeFocused();
       }
     }
   };
@@ -578,7 +580,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await chooseTheme(variant.theme);
     await page.locator('[data-action="edit"]:visible').first().click();
     await expect(page.locator('#backdrop')).toBeVisible();
+    await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
+    await expect(page.locator('#pTitle')).toBeFocused();
+
+    // Keyboard focus is trapped in the product dialog and wraps at both ends.
+    await page.locator('#editorClose').focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.locator('#saveProduct')).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#editorClose')).toBeFocused();
+    await page.locator('#pTitle').focus();
     await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = 0; });
   };
 
@@ -638,15 +650,34 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('#imageGrid').scrollIntoViewIfNeeded();
       await saveScreenshot('product-gallery', variant, { dialog: true, fixtureImages: 2 });
       await page.locator('#editorClose').click();
+      await expect(page.locator('#backdrop')).toBeHidden();
+      await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'true');
+      await expect(page.locator('[data-action="edit"]:visible').first()).toBeFocused();
     }
 
     await captureView('orders', 'orders', null, true);
     await captureView('order-row-details', 'orders', async () => {
       await page.locator('[data-action="view-order-details"]:visible').first().click();
       await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
+      await expect(page.locator('#orderDetailBackdrop')).toHaveAttribute('aria-hidden', 'false');
       await expect(page.locator('#orderDetailTitle')).toHaveText('Chi tiết đơn hàng');
       await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
       await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
+      await expect(page.locator('#orderDetailClose')).toBeFocused();
+
+      // The details dialog must contain keyboard focus and wrap in both directions.
+      await page.keyboard.press('Shift+Tab');
+      const orderDialogFocus = await page.locator('#orderDetailBackdrop [role="dialog"]').evaluate(dialog => {
+        const selector = 'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+        const focusable = Array.from(dialog.querySelectorAll(selector)).filter(el =>
+          el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden' && !el.closest('[aria-hidden="true"]')
+        );
+        return { activeIndex: focusable.indexOf(document.activeElement), count: focusable.length };
+      });
+      expect(orderDialogFocus.count, 'Order dialog should contain keyboard-focusable controls').toBeGreaterThan(0);
+      expect(orderDialogFocus.activeIndex, 'Shift+Tab from first control should wrap to last').toBe(orderDialogFocus.count - 1);
+      await page.keyboard.press('Tab');
+      await expect(page.locator('#orderDetailClose')).toBeFocused();
     }, true);
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', null, true);
