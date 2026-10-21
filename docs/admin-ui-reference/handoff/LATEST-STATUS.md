@@ -137,65 +137,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 18704cfae445210c20bbe1eaf0f9328b6c90eb87
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352
+- Tested commit: 7b6f98bd30e979ff670c9e503cd3d3bdd8eac4a3
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39581405593
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-123 (not committed to Git).
+- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-127 (not committed to Git).
 - Deployed Preview: failure.
 - Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-
-## Latest verified continuation checkpoint — 2026-10-21 15:50 +07:00 (supersedes stale earlier test/root-cause notes)
-
-- Repository: `chichute5500/Sindarealest-admin`; only permitted branch: `feature/admin-isolated-handoff-2026-10-20`.
-- Exact source/test SHA: `18704cfae445210c20bbe1eaf0f9328b6c90eb87`. The evidence-only workflow commit then advanced the branch to `ee914c9a496810801a00df8e4f7da4e8c24c8a85`; this later docs/evidence SHA is not a source-test SHA. Local checkout/working-tree status remains **NOT VERIFIED** because this session has no local checkout.
-- Two test-harness defects were diagnosed from CI logs and corrected on the ADMIN branch:
-  - `a1aadbd17ca6e894329ba2e2b889fcaabf54cf99`: replaced the obsolete `expect.poll(...)` implementation-string assertion with assertions for the current visible order-details button and dialog.
-  - `18704cfae445210c20bbe1eaf0f9328b6c90eb87`: scoped product editor scroll calls to `#backdrop .editorcontent`; previously the generic locator matched both the product editor and hidden `#orderDetailContent`, causing Playwright strict-mode failure.
-- Source CI [39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003): **PASS** on exact SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` (project integrity and automated tests pass).
-- Source/Preview workflow [39571867352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352): local Playwright matrix **PASS**, remote Preview assertion **FAIL**. Artifact [admin-preview-evidence-123 (ID 12332562278)](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352/artifacts/12332562278), 9,318,827 bytes, expires 2026-11-04. Contains 59 PNGs: 16 real-source login-shell captures (8 viewport sizes × 2 themes), 43 synthetic/read-only fixture module captures and 36 fixture metrics. No page, console, failed-request or HTTP errors; no attempted writes or unexpected API paths. Fixture evidence is not authenticated real-backend QA.
-- Current deployed diagnostic: `PREVIEW_CSS_SIGNATURE_MISMATCH`. The page reports title `Quản trị SinDarealest`, language `vi`, login class `loginwrap`; `.topbar > .brand` is visible (`display:flex`, visibility visible, opacity 1). Selector support/match are true, but the served inline stylesheet has 226 rules and lacks the expected login-hide rule. Do not weaken the assertion. Because `ADMIN_TEST_URL` is secret-masked in logs, stale build vs wrong target cannot be distinguished. Do not inspect/change secrets or bypass Cloudflare Access; owner must confirm the authorized Preview URL/source SHA and legitimate access path.
-- Read-only source inspection confirms Admin UI/API/test code for `fulfillmentType` values `in_stock`, `made_to_order`, `unclassified`, QR configuration/upload, server-derived installments and manual verified payment transactions. This proves source/test coverage only, not current Preview or D1/R2 runtime. Real-bank QR owner scan-verification, authenticated workflows, remote migration ledger and static-branch consumer compatibility remain **NOT VERIFIED**.
-- PR #111 is OPEN/unmerged with 1,082 changed files (+36,501/−389), including 913 PNGs and 61 non-documentation/code files at the latest full file audit. It contains storefront, Functions/API, migrations, scripts, configuration and tests; it is not an Admin-only diff and is **not merge-ready**. PR #108 remains OPEN/unmerged. Do not merge, cherry-pick, force-push, reset/rebase, change PR base or delete evidence.
-- Overall Admin estimate remains **46%** and QR/fulfillment stage estimate **70%**; these are management estimates, not acceptance scores. No Production deployment, remote D1/R2 operation, migration/setup script, secret/Access change, main edit or static branch edit was performed.
-
-### Continue next
-1. Re-fetch branch HEAD, PR metadata and latest Actions before further source edits.
-2. Compare the full 12-screen Admin reference set individually with the artifact; do not claim visual parity from fixture screenshots alone.
-3. Resolve the Preview CSS/source identity with owner-confirmed current-source deployment and legitimate Cloudflare Access; keep signature assertions intact.
-4. Keep authenticated backend workflows NOT TESTED until authorized Preview/login and safe synthetic test data are available. Separately verify product save and actual image upload/storage.
-5. Continue migration compatibility and mixed-scope PR #111 review; no remote D1, Production deploy or merge.
-
-
-
-## Source-level cross-branch contract audit — 2026-10-21 15:52 +07:00
-
-**Review type:** read-only GitHub source comparison; no static branch file was written.
-
-- Protected static consumer file: `public/index.html` at static branch ref `fix/liquid-glass-audit-2026-10-19`, blob `e54110861e273fd7509efb1e3fea06bc658ff48c`.
-- Admin order API: `functions/api/orders.js`, blob `7a9a8a77211efb6eb269814c5f9bdcdd89f140b9`. Static checkout sends `items: [{id, quantity}]`; Admin route reads those fields and derives product price/fulfillment on the server, snapshots `fulfillment_type` into order items, and returns `orderNumber`, `orderAccessToken`, `priceConfirmationRequired`, and a pending-confirmation status.
-- Admin product API: `functions/api/products.js`, blob `416e2802c439829e79a74c3a9c10025fb5a1facb`. Its `fulfillmentType` query and product field use the same three enum values that the static page consumes. Static page maps unknown/missing values to `unclassified`/“Cần xác nhận”, not from stock count. **Source-shape compatibility for fulfillment enum and order-create payload: PASS (source-only).**
-- Admin read-payment API: `functions/api/order-payment.js`, blob `0281ead2d5070c1419b8952b01f8f7fc3b92d5d8`. Its top-level `paymentReady`, `paymentTermsConfirmed`, `priceConfirmationRequired`, `amount`, `qrImageUrl`, bank/account fields and `transferReference` are consumed by the static `refreshOrderPayment()`, which adapts them into the existing nested `paymentInstructions` shape and checks payment terms before showing a ready QR. This is source shape only; there was no deployed cross-branch/API test.
-- **Confirmed source-consumer gap — FAIL:** Admin response includes `freeShippingEligible` and `freeShipping`, where `freeShipping` becomes true only when the ledger-derived order status is paid and the request is full-payment eligible. The static wrapper at `public/index.html` around `refreshOrderPayment()` currently does not copy either field into its mapped client state, and the payment renderer does not display the eligible/applied distinction. Therefore the customer-facing UI can omit this payment/shipping status even if the Admin API sends it. This belongs to the static website branch owner/agent to fix on its own branch; ADMIN work must not patch or sync that branch.
-- **Required next step:** static-site agent should add a backwards-compatible mapping/display for eligibility vs actually applied freeship and a consumer contract test, on `fix/liquid-glass-audit-2026-10-19` only. Then test against the documented response fixtures. Do not claim runtime integration complete until a real authorized Preview proves the deployed source and API response shape.
-- Evidence boundary: Admin source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003); Preview [39571867352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352) still fails CSS signature. No real authenticated backend QA, remote D1/R2 read/write, migration, secrets, Access bypass or Production deployment occurred.
-- Overall integration status: **PARTIAL SOURCE COMPATIBILITY; FAIL for missing freeship display mapping; runtime integration NOT VERIFIED.**
-
-
-
-
-## Handoff bổ sung — 2026-10-21: lỗi lưu ảnh và migration PRE/PRO
-
-- **Báo cáo từ chủ dự án:** Trong Preview Admin, sau khi tải/chọn ảnh và nhấn “Lưu ảnh”, giao diện báo: **“Cơ sở dữ liệu chưa khởi tạo đúng. Hãy chạy hai tệp SQL trong thư mục migrations/.”** Chủ dự án xác nhận muốn xử lý cả **PRE (Preview) và PRO (Production)**.
-- **Hai migration cần điều tra trước:** `migrations/0008_product_sku_verification.sql` và `migrations/0009_fulfillment_and_manual_payments.sql`. Đây là giả thuyết cần xác minh, chưa phải kết luận rằng hai tệp này chắc chắn đang thiếu ở cả hai DB.
-- Migration 0008 thêm `products.sku_verified` và `order_items.sku_verified`. Migration 0009 thêm `fulfillment_type` cho products/order_items, các cột xác nhận điều khoản thanh toán cho orders và bảng/index payment request/transaction. Các tệp dựa vào bảng đã được tạo bởi migration trước đó và không an toàn để chạy lặp sau khi cột/index đã tồn tại.
-- Source route `functions/api/admin/products/[id].js` cập nhật các cột `sku_verified` và `fulfillment_type`; vì vậy schema thiếu cột có thể làm thao tác lưu sản phẩm thất bại. Tuy nhiên thông báo UI chưa đủ để chứng minh chính xác migration nào thiếu. Endpoint upload ảnh riêng dùng R2 bindings `IMAGES`/`ORIGINALS`; cần phân biệt lỗi tải tệp lên R2 với lỗi lưu metadata sản phẩm vào D1.
-- **Trạng thái thao tác từ xa:** không có SQL nào được chạy trên PRE hoặc PRO; không đọc được migration ledger/schema của hai DB. Chủ dự án đã đồng ý kiểm tra cả hai môi trường qua trình duyệt, nhưng sau đó yêu cầu **bỏ qua TinyFish**. Không có công cụ Cloudflare/D1 thay thế được xác nhận trong phiên này; do đó chưa thể kiểm tra hay thực thi remote migration. Không được ghi là đã sửa.
-- **Bước tiếp theo bắt buộc:** tìm một phương thức không dùng TinyFish có quyền Cloudflare/D1 được xác thực; xác định chính xác database binding/name/ID cho PRE và PRO; đọc schema hiện tại và `d1_migrations`/migration ledger của từng DB; đối chiếu với migration 0001–0009. Chỉ áp dụng các migration còn thiếu sau khi đã xác nhận target, thứ tự, khả năng tương thích và trạng thái cột/bảng. Nếu không có phương thức xác thực/đọc trạng thái, dừng trước khi ghi SQL và báo rõ blocker.
-- **An toàn:** không chạy `scripts/setup-cloudflare.mjs` vì script có thể thực hiện nhiều thay đổi schema từ xa; không chạy `ALTER TABLE` thủ công theo phỏng đoán; không chạy lặp migration; không ghi dữ liệu sản phẩm/đơn hàng; không thay secrets/bindings, không bypass Cloudflare Access; không deploy Production, không merge PR #111/#108; không sửa `main` hoặc `fix/liquid-glass-audit-2026-10-19`.
-- **TinyFish:** người dùng yêu cầu bỏ qua hoàn toàn. Không gọi TinyFish, không yêu cầu nạp tiền và không tiếp tục bằng trình duyệt TinyFish.
-- Kết quả người dùng xác nhận trên Preview chỉ gồm đăng nhập, mở danh sách/chi tiết sản phẩm và mở UI chọn ảnh. **Lưu sản phẩm, upload thật và ghi metadata vẫn CHƯA XÁC MINH.**
