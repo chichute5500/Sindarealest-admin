@@ -1340,6 +1340,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       expect(notificationLayout.right, 'Notification panel should remain inside the viewport: ' + JSON.stringify(notificationLayout)).toBeLessThanOrEqual(variant.viewport.width + 1);
       expect(notificationLayout.scrollWidth, 'Notification panel should not clip its own content').toBeLessThanOrEqual(notificationLayout.clientWidth + 1);
       expect(notificationLayout.listScrollWidth, 'Notification text should wrap without horizontal overflow').toBeLessThanOrEqual(notificationLayout.listClientWidth + 1);
+      await page.keyboard.press('Escape');
+      await expect(panel, 'Escape should close the notification panel').toBeHidden();
+      await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      await expect(toggle, 'Closing notifications should restore focus to the toggle').toBeFocused();
+      await toggle.click();
+      await expect(panel).toBeVisible();
+      await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     });
 
     expect(pageErrors, 'Fixture visual renders should not throw browser runtime exceptions').toEqual([]);
