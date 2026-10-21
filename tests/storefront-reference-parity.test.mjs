@@ -109,6 +109,10 @@ assert.ok(html.includes('id="sdWelcomeFirstPaintGuard"')
   && html.indexOf('body:has(#welcomeSplash) #mobileBottomNav') < html.indexOf('</head>')
   && html.indexOf('body:has(#welcomeSplash) #accountDrawer') < html.indexOf('</head>'),
   'Welcome splash guards must be in the document head to prevent first-paint toolbar and account/cart/checkout drawer flashes.');
+assert.match(html.slice(html.indexOf('id="sdWelcomeFirstPaintGuard"'),html.indexOf('</style>',html.indexOf('id="sdWelcomeFirstPaintGuard"'))), /#accountDrawer,[\\s\\S]*#cartDrawer,[\\s\\S]*#checkoutDrawer,[\\s\\S]*#checkoutBackdrop\\{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX\\(105%\\)!important\\}/,
+  'The first-paint guard must remove commerce drawers from rendering while the welcome splash exists, not only hide them after paint.');
+assert.match(html.slice(html.indexOf('id="sdWelcomeFirstPaintGuard"'),html.indexOf('</head>')), /#mobileBottomNav\\{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important\\}/,
+  'The bottom toolbar must be hidden in the early head guard for the entire welcome splash lifetime.');
 
 assert.match(desktopLight, /data-satin-style="fine-satin-creases-v11"/);
 assert.match(desktopDark, /data-satin-style="fine-satin-creases-v12"/);
