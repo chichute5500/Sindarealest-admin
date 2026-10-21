@@ -210,3 +210,20 @@ Current branch HEAD at check start: `ef42282f7c0d66f827e3d0181bc3f0eaa00dced7`. 
 ## Lệnh liên tục của chủ sở hữu (2026-10-21)
 
 Chủ sở hữu yêu cầu không dừng sau báo cáo; chỉ dừng khi thật sự cần họ thao tác. Báo cáo tiến độ xong phải tiếp tục ngay việc an toàn tiếp theo. Không coi kế hoạch là hoàn thành. Luôn kiểm tra CI/Preview và ghi đúng bằng chứng; lỗi lưu ảnh sản phẩm cùng migration PRE/PRO vẫn tạm hoãn theo yêu cầu. Xem `LATEST-STATUS.md` và `latest-test-results.json` để biết trạng thái mới nhất.
+
+
+## Latest verified checkpoint — modal accessibility cycle (2026-10-21)
+
+This supersedes stale test claims in earlier appended checkpoints only for the files/source SHA listed here.
+
+- Current tested source/test SHA: `d408781b95af4942b36681cbe2d0334dc03c8683`; functional modal fix commit: `3fe44a2304f083e6f943c931d43b74039900ace3`.
+- Evidence: [GitHub Actions run 39590491689](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689) on the exact tested SHA. `npm run check`, `npm test`, and the local read-only Playwright source/fixture matrix **PASS**. Preview diagnostic alone remains **FAIL**.
+- New source behavior: shared focus setup/return, Tab/Shift+Tab trap, Escape closing the active product or order dialog, and correct `aria-hidden` transitions.
+- Playwright regression coverage runs through the same workflow and checks initial focus, both focus-wrap directions, Escape, hidden state, and restoration to the triggering control. Do not describe this as real authenticated backend QA.
+- Artifact: [admin-preview-evidence-141](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689/artifacts/12342530827), 59 screenshot PNGs plus metadata/reference; raw PNGs are artifact-only and not committed by the evidence workflow.
+- Remote Preview continues to show `PREVIEW_CSS_SIGNATURE_MISMATCH`: 226 inline CSS rules but no login-hide rule; header brand stays visible. Keep the assertion; do not inspect/change secrets or bypass Cloudflare Access.
+- Visual review opened the approved 12-screen reference and compared the current 390×844 light screenshot montage from SHA `d408781...`. **Parity is NOT ACCEPTED**; major differences remain in chart/data presentation, compact/tabbed product editing, gallery, order details, warranty, backup/restore and activity screens. Do not invent unverified KPI data.
+- PR #111 remains OPEN/unmerged and has 1,094 changed files (+37,393/−392); scope remains mixed and not merge-ready. PR #108 remains OPEN/unmerged (250 changed files). No merge/deploy/schema/data/secrets/static-branch change occurred.
+- Progress remains **48%**. Product-save/image upload and PRE/PRO migrations remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
+- No local checkout or working-tree status was available. Do not claim manual local test execution.
+- Next actions: continue the safe source/reference audit; resolve Preview only with owner-confirmed current source and authorized Access; complete the PR #111 security/scope review; keep authenticated business flows NOT TESTED until a valid Preview and safe synthetic-data plan exist.
