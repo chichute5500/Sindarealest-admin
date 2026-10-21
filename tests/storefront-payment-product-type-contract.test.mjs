@@ -23,7 +23,9 @@ assert.match(pkg.scripts.test,/storefront-payment-product-type-contract\.test\.m
 
 
 // Runtime checks exercise the real QR URL and readiness gates from the inline storefront code.
-const safeUrlSource=html.match(/function safePaymentQrUrl\(value\)\{[^}]+\}/)?.[0];
+const safeUrlStart=html.indexOf('function safePaymentQrUrl(value)');
+const safeUrlEnd=html.indexOf('function renderPaymentInstructions',safeUrlStart);
+const safeUrlSource=safeUrlStart>=0&&safeUrlEnd>safeUrlStart?html.slice(safeUrlStart,safeUrlEnd).trim():'';
 assert.ok(safeUrlSource,'Safe QR URL validator must exist.');
 const safeUrl=vm.runInNewContext('('+safeUrlSource+')',{URL,window:{location:{origin:'https://store.example'}}});
 assert.equal(safeUrl('/public/bank-qr.webp'),'https://store.example/public/bank-qr.webp');
