@@ -3,12 +3,12 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
-  "testedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
-  "capturedAt": "2026-10-21T14:18:48.000Z",
+  "latestCodeCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+  "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+  "capturedAt": "2026-10-21T14:40:04.000Z",
   "progressEstimatePercent": 48,
   "progressBasis": "48% management estimate only. Admin gallery CSS source commit 1fb56f7b5773876c581847bf44abbef1c5c16a67 passed run 39615192697 (npm run check, npm test, local Playwright, configured Preview diagnostic). Regression test commit 45f630e99cfd1dd047c234f0fb42fa197d9bc978 passed the same set in run 39615417216. The workflow artifact contains 59 source/fixture screenshots (16 login and 43 synthetic read-only module views) and 36 fixture metrics. All-12-screen visual parity is not accepted; authenticated real-backend QA not tested. Product image-save and PRE/PRO migration remain deferred by owner. PR #111 remains open/unmerged and mixed-scope (1,112 paths); PR #108 remains open/unmerged (269 paths).",
-  "note": "Latest verified run #158: exact tested SHA 45f630e99cfd1dd047c234f0fb42fa197d9bc978, link https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216; npm run check, npm test, local responsive/theme Playwright baseline and configured Preview diagnostic all PASS. Run #157 separately passed exact source UI commit 1fb56f7b5773876c581847bf44abbef1c5c16a67. Artifact admin-preview-evidence-158 (ID 12351884437), 11,120,485 bytes, expires 2026-11-04. The artifact has 59 source/fixture PNG screenshots (16 login shell, 43 synthetic read-only module screens) and 36 fixture metrics; it is not authenticated business-backend QA. UI change is CSS-only on public/admin/index.html with contract assertions on the next tested SHA. Current evidence-only branch commit at this checkpoint: 068520e4ac62adc32ce5f15226e666479770af91; handoff commits may advance branch without changing app source. PR #111 OPEN/unmerged, 1,112 changed paths (+38,619/-392) and mixed scope, including public storefront, APIs, migrations and setup/deploy scripts; not merge-ready. PR #108 OPEN/unmerged, 269 changed paths. Progress 48%. 12-screen visual parity NOT ACCEPTED; authenticated backend QA NOT TESTED; image-save and PRE/PRO migrations DEFERRED_BY_OWNER. No merge, Production deploy, remote D1/R2 write, secret/Access changes, setup/migration execution, or TinyFish.",
+  "note": "Latest verified source/test SHA a999bfdc529ea38c5309ebfbff33a45c6779c10b. Run #162 (39618556737) and paired validation run (39618556696) both PASS on this exact SHA. Screenshot artifact 162 confirms the mobile gallery cover, second thumbnail, helper text and fixed action bar are all visible without the last image being covered at 390x844; this is still one fixture screenshot and does not establish 12-screen visual acceptance or authenticated backend QA. Product image-save and PRE/PRO migrations remain deferred by owner. PR #111 remains OPEN/unmerged and mixed-scope (1,112 paths); PR #108 OPEN/unmerged (269 paths). Overall progress estimate remains 48% pending a task-weighted re-estimate; do not inflate it based on repeated CI runs.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -2159,16 +2159,22 @@
     ]
   },
   "latestRun": {
-    "runId": 39615417216,
-    "runNumber": 158,
+    "runId": 39618556737,
+    "runNumber": 162,
     "conclusion": "success",
-    "testedCommitSha": "45f630e99cfd1dd047c234f0fb42fa197d9bc978",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216",
+    "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737",
+    "pairedValidationRun": {
+      "runId": 39618556696,
+      "conclusion": "success",
+      "testedCommitSha": "a999bfdc529ea38c5309ebfbff33a45c6779c10b",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696"
+    },
     "artifact": {
-      "name": "admin-preview-evidence-158",
-      "id": 12351884437,
-      "sizeBytes": 11120485,
-      "expiresAt": "2026-11-04T14:18:51Z"
+      "name": "admin-preview-evidence-162",
+      "id": 12354480678,
+      "sizeBytes": 11114027,
+      "expiresAt": "2026-11-04T14:39:59Z"
     },
     "checks": {
       "npmRunCheck": "PASS",
@@ -2217,7 +2223,14 @@
     "referenceParity": "NOT_ACCEPTED",
     "realImageUpload": "NOT_VERIFIED",
     "productSave": "DEFERRED_BY_OWNER / NOT_VERIFIED",
-    "authenticatedBusinessFlow": "NOT_TESTED"
+    "authenticatedBusinessFlow": "NOT_TESTED",
+    "latestScreenshot": {
+      "artifact": "admin-preview-evidence-162",
+      "runId": 39618556737,
+      "screenshotPath": "artifacts/admin-preview-evidence/a999bfdc529e/screenshots/product-gallery__390x844__light.png",
+      "observation": "At 390x844, the primary cover, supporting thumbnail, helper text and fixed footer are all visible; screenshot does not show the last thumbnail covered by the action bar.",
+      "limitation": "Single fixture screenshot, not a full cross-screen or real image upload/save acceptance."
+    }
   },
   "paymentIntegrationSourceAudit": {
     "inspectedAt": "2026-10-21T14:28:00Z",
