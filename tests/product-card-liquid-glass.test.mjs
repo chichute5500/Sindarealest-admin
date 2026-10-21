@@ -181,10 +181,10 @@ for (const [name, svg] of [
   assert.ok(new Set(bodyPaths).size >= 5 && bodyPaths.every(path => /C/.test(path)),
     name + ' must use varied organic curves, not duplicate straight stripe paths.');
 }
-assert.ok(lightWaveArtwork.includes('stroke-width="18"') && lightWaveArtwork.includes('stroke-width="2"'),
-  'Light desktop satin must have visible ridge and fine highlight layers within the desktop stroke budget.');
-assert.ok(darkWaveArtwork.includes('stroke-width="18"') && darkWaveArtwork.includes('stroke-width="2"'),
-  'Dark desktop satin must have visible ridge and fine highlight layers within the desktop stroke budget.');
+assert.ok(lightWaveArtwork.includes('stroke-width="6"') && lightWaveArtwork.includes('stroke-width="10"') && lightWaveArtwork.includes('stroke-width="2"'),
+  'Light desktop satin must retain layered satin body and shadow folds within the desktop stroke budget.');
+assert.ok(darkWaveArtwork.includes('stroke-width="6"') && darkWaveArtwork.includes('stroke-width="10"') && darkWaveArtwork.includes('stroke-width="2"'),
+  'Dark desktop satin must retain layered satin body and shadow folds within the desktop stroke budget.');
 assert.ok(lightMobileWaveArtwork.includes('stroke-width="12"') && lightMobileWaveArtwork.includes('stroke-width="1.6"'),
   'Light mobile satin must show crease details while respecting the mobile stroke budget.');
 assert.ok(darkMobileWaveArtwork.includes('stroke-width="12"') && darkMobileWaveArtwork.includes('stroke-width="1.6"'),
