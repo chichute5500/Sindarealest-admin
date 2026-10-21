@@ -1471,3 +1471,16 @@ Only writable branch remains `feature/admin-isolated-handoff-2026-10-20`. The la
 Docs-only handoff commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` also passed Validate Source #39641183495; this does not imply application tests were rerun against a different application SHA. Verify current HEAD and latest Actions before further edits.
 
 Progress estimate remains 50% weighted management estimate, not pass rate. Remaining major work: compare the 12 reference screen families and fix the next concrete visual/behavior gap; authenticated real backend QA is not tested; image-save/R2 and PRE/PRO migration tasks remain DEFERRED_BY_OWNER. Read `handoff/PROMPT-NEXT-CHAT.md` for the anti-repeat checklist. Avoid docs-only commits unless evidence materially changes. Do not merge/deploy or modify Access/secrets/remote data.
+
+
+## LATEST ANTI-REPEAT HANDOFF — 2026-10-21 17:10 UTC
+
+Read `handoff/PROMPT-NEXT-CHAT.md`, `handoff/START-HERE.md`, `handoff/LATEST-STATUS.md`, `handoff/latest-test-results.json`, and `handoff/12-SCREEN-REFERENCE-AUDIT.md` before continuing. These handoff files were refreshed to prevent repeated work.
+
+Already implemented; do not repeat without evidence of regression:
+- Customer search covers name, phone, email and address; synthetic address-search Playwright test exists.
+- Warranty search exposes an `aria-live` result summary and tests no-match empty states for both issued-warranty and support-claim tables.
+- Validate Source #39640751340 and Admin Preview/Playwright #39640751300 passed on exact source/test SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; artifact #201 contains 63 PNGs. Fixture business views are synthetic/read-only, not authenticated real-backend QA.
+- Docs-only commit `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` passed Validate Source #39641183495; this was not a fresh application test run.
+
+Progress remains 50% weighted management estimate, not test-pass rate. Full 12-screen parity NOT ACCEPTED; authenticated business/backend QA NOT TESTED; product image-save/R2 and PRE/PRO migration work remain DEFERRED_BY_OWNER. Next actual engineering task: inspect the 12-screen audit and implement a concrete unresolved parity gap, prioritizing Product list/search/filters (#3) or Product editor (#4). Avoid redundant search fixes and documentation-only commits unless the evidence materially changes. Verify current HEAD and CI before any claim; protect all existing branch/deployment/access/data restrictions.
