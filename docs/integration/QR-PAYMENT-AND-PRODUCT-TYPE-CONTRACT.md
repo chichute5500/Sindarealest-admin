@@ -188,3 +188,30 @@ Implementation files are developed only on `feature/admin-isolated-handoff-2026-
 - Static website AI: customer-facing UI and API consumption only; never implement Admin screens, schema, migrations, or Admin-only endpoints in the static branch.
 - Admin AI: product type field, persistence/API, QR settings, payment ledger/verification, and API contract only; never commit storefront UI code in the Admin branch.
 - Both AIs must keep their own branch and tests separate. If an endpoint/field is missing, Admin documents the API contract and static consumes only after verifying the real API. Do not claim integration is verified from documentation alone.
+
+
+## Cross-branch synchronization addendum — checkout payment reference — 2026-10-21
+
+### Canonical visual reference and branch boundary
+
+- The static website branch `fix/liquid-glass-audit-2026-10-19` contains the owner-approved checkout/payment-flow reference image at [`docs/static-web-reference/checkout-payment-flow-reference.png`](https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png). The recorded Git blob SHA is `c89ff843af1c094def9233d27a148e048b191990`.
+- This image is a **customer-facing static storefront checkout/payment design reference only**. It is not an Admin UI reference and must not be copied into the Admin design as if it were an Admin screen. Admin continues to use the 12-screen Admin reference set listed in the Admin Master Prompt.
+- The Admin AI may read the static checkout reference to understand the customer journey and expected information hierarchy, but must not commit to, cherry-pick from, merge, or edit the static branch. Do not copy storefront HTML/CSS/assets into Admin.
+- Keep changes isolated to `feature/admin-isolated-handoff-2026-10-20`. PR #111 remains open and unmerged; do not deploy Production, run remote migrations, change real D1/R2 data, or alter secrets/bindings.
+
+### Single shared business contract
+
+- Admin is authoritative for owner-managed product fulfillment type, confirmed price/order terms, active verified receiving QR configuration, payment requests, and the ledger of manually verified bank transactions.
+- Static website is responsible only for the customer-facing checkout/payment presentation and consumption of the public-safe API. It must never infer fulfillment type or payable amounts, create Admin-only functionality, or treat a QR/receipt/customer claim as payment verification.
+- Fulfillment values and wire fields must stay consistent: database `fulfillment_type`; Admin/public API field `fulfillmentType`; enum values `made_to_order`, `in_stock`, `unclassified`. Never infer the value from category, stock count, SKU, image, or legacy labels.
+- Payment options remain: `made_to_order` = 30% deposit or 100% full payment; `in_stock` = fixed 100,000 VND deposit or 100% full payment. Full payment qualifies for freeship; deposit/balance alone does not. The server calculates amounts from confirmed order snapshots; browser-supplied amounts are never authoritative.
+- QR must not encode a fixed amount. Display the confirmed amount separately for the customer to enter manually. If type, price, order terms, or active verified QR are missing, fail closed: allow consultation/request submission where supported, but do not invent an amount or present payment-ready instructions.
+- Keep payment-request state separate from verified receipt state. Only an authorized Admin action after checking the actual bank transaction may record receipt/refund in the ledger and derive payment status.
+
+### API compatibility and conflict prevention
+
+- The endpoint table and schemas in this contract are the shared interface proposal/source of truth for cross-branch coordination, **not proof that each endpoint is implemented, deployed, or reachable in Preview**.
+- Before the static branch consumes any endpoint, Admin must verify its current implementation and response shape on the Admin branch, add/update contract tests, and document the exact source commit and CI evidence. Static must not invent fallback endpoints or silently assume fields exist.
+- If implementation differs from this document, do not independently make incompatible changes in either branch. Record the mismatch here, choose a backward-compatible resolution, update contract tests and both handoff prompts, then implement each side only on its own branch.
+- Any API field/enum/path change must be reviewed for both Admin and static consumers before implementation. Prefer additive, backward-compatible changes; document deprecation/removal separately.
+- Do not mark cross-branch integration complete from matching documentation alone. Completion requires evidence from the actual source SHA, passing contract tests, and a verified compatible Preview; Preview is currently not verified by this addendum.
