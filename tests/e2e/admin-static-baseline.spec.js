@@ -1315,9 +1315,31 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
     });
-    await captureView('notifications', 'dashboard', async () => {
-      await page.locator('#notificationToggle').click();
-      await expect(page.locator('#notificationPanel')).toBeVisible();
+    await captureView('notifications', 'dashboard', async variant => {
+      const toggle = page.locator('#notificationToggle');
+      const panel = page.locator('#notificationPanel');
+      await toggle.click();
+      await expect(panel).toBeVisible();
+      await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      await expect(toggle).toHaveAttribute('aria-controls', 'notificationPanel');
+      await expect(page.locator('#markNotificationsRead')).toBeVisible();
+      const notificationLayout = await panel.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        return {
+          left: box.left,
+          right: box.right,
+          width: box.width,
+          viewportWidth: document.documentElement.clientWidth,
+          scrollWidth: element.scrollWidth,
+          clientWidth: element.clientWidth,
+          listScrollWidth: document.querySelector('#notificationList').scrollWidth,
+          listClientWidth: document.querySelector('#notificationList').clientWidth
+        };
+      });
+      expect(notificationLayout.left, 'Notification panel should remain inside the viewport: ' + JSON.stringify(notificationLayout)).toBeGreaterThanOrEqual(-1);
+      expect(notificationLayout.right, 'Notification panel should remain inside the viewport: ' + JSON.stringify(notificationLayout)).toBeLessThanOrEqual(variant.viewport.width + 1);
+      expect(notificationLayout.scrollWidth, 'Notification panel should not clip its own content').toBeLessThanOrEqual(notificationLayout.clientWidth + 1);
+      expect(notificationLayout.listScrollWidth, 'Notification text should wrap without horizontal overflow').toBeLessThanOrEqual(notificationLayout.listClientWidth + 1);
     });
 
     expect(pageErrors, 'Fixture visual renders should not throw browser runtime exceptions').toEqual([]);
