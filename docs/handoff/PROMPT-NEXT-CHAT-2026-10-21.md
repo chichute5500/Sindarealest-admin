@@ -193,3 +193,23 @@ Next: inspect run 39559590354 and its screenshots; verify runtime fail-closed QR
 3. Re-run the live audit on the current Preview SHA; the old missing-SKU result is historical but still unresolved until public payload evidence changes. Do not invent `SD-GL052`.
 4. Confirm the real Admin/backend API fields with the other branch owner; no QR should display until the actual response meets the readiness gate. Do not create mock API success, submit a live order, or mark a payment paid.
 5. Continue storefront-only visual fixes and tests; do not merge, deploy Production, run Production migrations, or edit Admin/backend code.
+
+
+## AUTHORITATIVE UPDATE — checkout/payment reference image is uploaded (2026-10-21)
+
+This entry supersedes any earlier wording in this file that says the checkout/payment storyboard is absent, not committed, awaiting upload, or only a planned path. The user uploaded the image and GitHub fetch verified the file at the exact path below on this branch:
+
+- **Canonical path:** `docs/static-web-reference/checkout-payment-flow-reference.png`
+- **Branch:** `fix/liquid-glass-audit-2026-10-19`
+- **GitHub URL:** https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png
+- **Blob SHA verified:** `c89ff843af1c094def9233d27a148e048b191990` (re-fetch before relying on this SHA after later edits).
+- **Folder index / usage rules:** https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/README.md
+
+### Mandatory instructions for the storefront AI
+1. Open the uploaded PNG at full resolution before checkout/payment visual work. If the browser cannot render it, use GitHub's download/raw option and inspect the actual image; do not claim visual inspection until done.
+2. Compare it side-by-side with BOTH original storefront mobile references (light Ice/Pearl and dark Deep Navy) and the live Preview. The storyboard is an additional checkout-flow reference, not a replacement for the original brand design.
+3. Preserve the existing Luxury Minimalism + Apple Liquid Glass language, mobile-first layout, both themes, legibility, spacing and responsive behavior. Do not blindly copy storyboard-only details or let it override the actual site.
+4. Never copy illustrative product/SKU, prices, bank/account details, dates or QR from the storyboard into live data/code. The image is a visual and flow reference only.
+5. Follow `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` for actual behavior: type is owner-set in Admin/API (never customer-selected); made-to-order allows server-confirmed 30% deposit or 100% with freeship; in-stock allows fixed 100,000 VND deposit or 100% with freeship; unknown type/price must fail safely to consultation; QR and receiver details must come from active, verified API configuration; a customer claim is not proof of payment.
+6. Keep the source of truth consistent: this prompt, `docs/static-web-reference/README.md`, and the exact PNG path above. If the image disappears or its path changes, re-fetch and report the actual result rather than guessing.
+7. No merge of PR #108, no Production deploy, and no changes to Admin branch/backend/data unless separately authorized.
