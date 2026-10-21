@@ -1388,3 +1388,12 @@ This was a read-only source review of the existing payment contract and route co
 - PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) remains OPEN/UNMERGED, base `main`, currently 1,114 changed paths and mixed Admin/storefront/Functions/migration/setup-deploy/test/evidence scope: **not merge-ready**. PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108) remains OPEN/UNMERGED (269 paths).
 - Source-only migration tracking risk remains: `setup-cloudflare.mjs` omits 0009 and `deploy-cloudflare.mjs` preflights 0007/0008 but not 0009. This does not prove remote D1 lacks that schema. No remote D1/R2, SQL, migration/setup script, merge, Production deployment, secret/Access change/bypass, or TinyFish occurred.
 - Overall progress remains **48%**. Before further edits, re-fetch live branch/PR refs; current HEAD after documentation updates differs from tested source/test SHA.
+
+
+## Latest continuation pointer — 2026-10-21 15:28 UTC
+
+For a new chat, read `docs/admin-ui-reference/handoff/START-HERE.md` and then copy the full prompt from `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`, section “READY-TO-PASTE HANDOFF PROMPT — latest checkpoint 2026-10-21 15:27 UTC”.
+
+Latest completed subtask: a single responsive dashboard revenue panel with a truthful no-data state; source/test validation passed on `06d689b6a97fa7bdb05258acb8435a6954d67309` (run [#39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256)); Preview screenshot diagnostic passed on the same SHA (run [#39624818216](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216)). Handoff validation passed on `c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf` (run [#39625390469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39625390469)). These are historical exact-SHA results; later handoff commits moved HEAD, so the next chat must re-fetch current HEAD and confirm its own CI. Overall progress remains **48%**.
+
+Next priority is the 12-screen Admin reference comparison and evidence-backed UI fixes. Do not fabricate revenue data; full-history aggregation is not implemented. Authenticated real-backend QA remains unproven. Image-save and PRE/PRO migration remain deferred by owner. Preserve all existing branch, merge, Production, Access/secrets, D1/R2, migration and no-TinyFish restrictions.
