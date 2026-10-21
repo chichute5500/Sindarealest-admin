@@ -414,3 +414,19 @@ Use this as the newest checkpoint; re-fetch the current branch HEAD and PRs befo
 2. Continue source-only accessibility/responsive/reference checks and semantic review of PR #111. Do not commit per-run PNGs; use Actions Artifacts.
 3. Re-fetch live HEAD after any evidence/handoff update; do not claim current HEAD is tested if only the earlier source SHA is in CI.
 4. No Production deploy, merge, schema migration, remote D1/R2 writes, secrets/Access changes, or TinyFish. Keep image-save/PRE-PRO work paused.
+
+
+---
+
+## Newest execution checkpoint — 2026-10-21: payment-ledger concurrent refund guard
+
+Re-fetch current PR/HEAD and handoff blobs before further writes. This supplements the preceding modal accessibility checkpoint.
+
+- Source change: `functions/api/admin/payment-transactions.js`, functional commit `d3fa9b85be20d832cbf24678dd7f3c7d862c1e64`. For a refund, the D1 batch's first insert is conditional on the current net receipt ledger still covering the requested amount. Payment-request state, order payment status and audit log are gated on that ledger row being successfully inserted; a lost balance race returns 409.
+- Regression test: `tests/payment-ledger-route.test.mjs` updated in commits `bd1501034f47260472b593334ac807ba362a58ee` and `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`. Test uses a mocked DB to simulate the conditional insert rejecting a refund race. It does **not** verify production/preview D1 locking or remote schema behavior.
+- Exact Actions test SHA `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`: [run 39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224). `npm run check` PASS, `npm test` PASS including the payment ledger route test, and local read-only Playwright matrix PASS. Overall workflow is FAILURE only at remote Preview signature.
+- Artifact [admin-preview-evidence-144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224/artifacts/12342063095), ID 12342063095: 59 PNGs (16 login + 43 fixture module views), 36 synthetic fixture metrics, metadata and reference; zero browser/console/network/HTTP errors; no attempted fixture writes; raw images are not committed to Git.
+- Preview diagnostic remains `PREVIEW_CSS_SIGNATURE_MISMATCH`: served inline stylesheet has 226 rules but no login-hide rule (`hasLoginHideRule=false`), so the brand header stays visible. Do not weaken assertions, read/change secrets, or bypass Access.
+- PR #111 HEAD before current handoff-document commits: `9e0434f769dedf2b20e1365aa96147336afc237c`, OPEN/unmerged, 1,096 files (+37,660/−392) with mixed storefront/backend/migration/script/test/evidence scope. PR #108 remains OPEN/unmerged. No merge.
+- Progress remains **48%**; UI parity remains NOT ACCEPTED; authenticated backend flows NOT TESTED; image-save and PRE/PRO migration tasks remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
+- Next: verify handoff JSON/status updated and valid, re-fetch branch HEAD after doc commits, continue safe source-only audit. No Production deploy, remote D1/R2/SQL, migration/setup, secret/access change, TinyFish, or edits to main/static branch.
