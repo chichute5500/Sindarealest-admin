@@ -745,7 +745,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
     }
 
-    await captureView('orders', 'orders', null, true);
+    await captureView('orders', 'orders', async () => {
+      const row = page.locator('[data-order-row="UI-ONLY-ORDER"]');
+      await expect(row).toBeVisible();
+      await expect(row).toContainText('Chờ xác nhận giá');
+      await expect(row).toContainText('Chưa hoàn tất thanh toán');
+      await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
+      await expect(row.locator('[data-action="record-payment"]')).toBeDisabled();
+    }, true);
     await captureView('order-row-details', 'orders', async () => {
       await page.locator('[data-action="view-order-details"]:visible').first().click();
       await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
@@ -806,7 +813,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#activatePaymentQr')).toBeEnabled();
     }, true);
     await captureView('backup-restore', 'settings', async () => {
-      await page.locator('#main .setting').filter({ hasText: 'Sao lưu & khôi phục' }).scrollIntoViewIfNeeded();
+      const section = page.locator('#main .setting').filter({ hasText: 'Sao lưu & khôi phục' });
+      await section.scrollIntoViewIfNeeded();
+      await expect(section).toBeVisible();
+      await expect(section.locator('#backupBtn')).toContainText('Tải bản sao lưu JSON');
+      await expect(section.locator('#restoreFile')).toHaveAttribute('accept', 'application/json,.json');
+      await expect(section).toContainText('có bước xác nhận trước khi thực hiện');
     });
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
