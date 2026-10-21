@@ -667,6 +667,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productPanelDetails #pDescription')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPrice')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pStock')).toBeVisible();
+    await expect(page.locator('#productPanelDetails #pPrice')).toHaveAttribute('placeholder', 'Chưa có giá');
+    await expect(page.locator('#productPanelDetails #pPrice')).toHaveAttribute('title', 'Để trống nếu chưa có giá');
+    await expect(page.locator('#productPanelDetails #pStock')).toHaveAttribute('placeholder', 'Chưa kiểm kê');
+    await expect(page.locator('#productPanelDetails #pStock')).toHaveAttribute('title', 'Để trống nếu chưa kiểm kê');
     if (variant.viewport.width <= 390) {
       const mobilePriceStockLayout = await page.evaluate(() => {
         const fieldRect = id => {
