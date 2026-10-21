@@ -1051,3 +1051,25 @@ This section is Admin-only. Keep all Admin UI, API, schema/migration, payment se
 - Customer cannot set fulfillment type or amount through the storefront payload; server derives both from persisted product/order values and stores an order-item snapshot.
 - Test missing price/type, mixed-type carts, QR unavailable, duplicate transaction, under/overpayment, authorization, audit logging, and API secret safety.
 - Keep the static AI unblocked by documenting endpoint/request/response/error/authorization requirements in the shared contract. Do not commit static-site code here, merge PR #111, deploy Production, or run Production migrations.
+
+
+## Cross-branch synchronization — static checkout/payment reference — 2026-10-21
+
+Before working on fulfillment type, QR settings, order payment requests, or payment verification, read `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` and preserve its shared API/business contract.
+
+The owner-approved customer-facing checkout/payment-flow reference lives on the separate static branch:
+[`docs/static-web-reference/checkout-payment-flow-reference.png`](https://github.com/chichute5500/Sindarealest-admin/blob/fix/liquid-glass-audit-2026-10-19/docs/static-web-reference/checkout-payment-flow-reference.png) on `fix/liquid-glass-audit-2026-10-19` (recorded blob SHA `c89ff843af1c094def9233d27a148e048b191990`).
+
+**Scope distinction:** this PNG is for the static website's customer checkout/payment UI, not for Admin visual redesign. Admin must continue to follow its own 12-screen reference set. Use the checkout image only to understand what customer-facing data and workflow the Admin API must support; do not copy storefront HTML/CSS/assets or commit to the static branch.
+
+Keep all Admin work on `feature/admin-isolated-handoff-2026-10-20`. Do not merge/cherry-pick the static branch, edit its files, merge PR #111, deploy Production, run remote migrations, change real D1/R2 data, or modify secrets/bindings as part of this synchronization.
+
+Maintain one compatible cross-branch contract:
+- Admin owns product fulfillment classification, persistence/API, confirmed order price/terms, verified QR configuration, payment requests and manual bank-transaction ledger.
+- Static website owns only customer-facing checkout/payment UI and consumes verified public-safe API fields.
+- Product type field contract: database `fulfillment_type`, API `fulfillmentType`, values `made_to_order`, `in_stock`, `unclassified`. Never infer type from stock, category, SKU, image, or legacy data.
+- Deposit/full options: made-to-order = 30% deposit or 100%; in-stock = fixed 100,000 VND deposit or 100%. Only full payment qualifies for freeship. Server-calculated amounts use confirmed order snapshots; never trust client-supplied amounts.
+- QR must not encode an amount. The amount is displayed separately only after price and terms are confirmed. Missing type/price/terms/verified active QR means no invented payment amount and no payment-ready state; keep consultation available where supported.
+- QR display, scan, receipt upload, or customer claim is not proof of payment. Only authorized Admin verification against the real bank transaction updates the ledger/payment status.
+
+The contract's endpoint shapes are coordination targets, not evidence of implementation or deployment. Verify actual source, tests, current Preview, and response shape before claiming integration. If a field, enum, endpoint, or behavior differs, document the mismatch and resolve it backward-compatibly in the contract before either branch independently changes. Keep Admin and static commits/tests separate. Do not claim integration is complete based on documentation alone.
