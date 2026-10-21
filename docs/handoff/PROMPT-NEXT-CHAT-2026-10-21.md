@@ -32,3 +32,13 @@ Bạn tiếp quản công việc trực tiếp từ GitHub, không yêu cầu ng
 
 ## Báo cáo
 Báo cáo ngắn bằng tiếng Việt: SHA mới, file đã đổi, workflow links, trạng thái live audit (không chỉ trạng thái workflow), khác biệt hình ảnh còn lại, blocker và bước tiếp theo. Không tuyên bố 100% khi còn fail hoặc chưa đối chiếu trực quan. Mọi cập nhật yêu cầu mới phải ghi lại trong master prompt và next-chat prompt trên GitHub.
+
+
+## 2026-10-21 11:06 ICT — satin refinement pass 2
+
+- Verified branch HEAD before this pass: `d78ddec509a11eb1efc7fe74b78053e8f52ea4e8`. Run #453 completed successfully: source tests, `npm run check`, Cloudflare Preview deployment metadata verification, and 78 live screenshots / 8 of 8 viewport-theme combinations. Artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39489628054/artifacts/12296050211.
+- Opened the actual artifact images, including Light/Dark mobile home, cart-with-item, checkout form, and account drawer. Commerce drawers cover the mobile bottom nav correctly in captured state images; cart-with-item has excessive empty vertical space but its controls remain readable. Checkout form is legible and contained. Do not report a bottom-nav overlap defect without new evidence.
+- Visual discrepancy confirmed: background still has prominent sweeping curves on dark mobile. Narrowed the long fold/blur strokes in all four satin SVGs and reduced highlight stroke width; changed cache-busting in `public/index.html` and parity test from `20261021-2` to `20261021-3`. Latest change commits include `93d628a9033c7c397f16edd49ac555809264848a` (HTML/cache) and `64c46a4d36ba68e81ebae96cd78c9a22db9ef915` (parity test); the four asset edits precede these in branch history.
+- New workflow for the updated HEAD must be checked before treating the changes as deployed or visually improved. Re-run source tests, deploy verifier, live screenshot capture, then open the resulting images and compare to original reference PNGs.
+- Overall visual audit remains FAIL until exact SKU `SD-GL052` is present in verified public product data; do not substitute a different product image or mutate catalog data. No Production/main change, merge, DB/R2 write, or secret/policy change.
+- Current rough project completion estimate: 55% (visual coverage + verification estimate, not code volume). Remaining: validate new satin pass in live Preview, inspect 360/390/768/1440 in Light/Dark, refine other confirmed visual differences, check account/cart/checkout interactions and mobile back behavior, and update this file, TEST-RESULTS.md, and next-chat prompt after each verified pass.
