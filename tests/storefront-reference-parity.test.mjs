@@ -21,10 +21,28 @@ function assertSatinFoldScale(name, svg, maxStroke, maxBlur, expectedPaths) {
   assert.ok(blur.length > 0 && Math.max(...blur) <= maxBlur,
     name + ' must keep blur tight enough to preserve fine fabric creases.');
 }
-assertSatinFoldScale('Desktop light satin', desktopLight, 13, 4, 25);
-assertSatinFoldScale('Desktop dark satin', desktopDark, 13, 4, 25);
-assertSatinFoldScale('Mobile light satin', mobileLight, 5.6, 2, 25);
-assertSatinFoldScale('Mobile dark satin', mobileDark, 5.6, 2, 25);
+assertSatinFoldScale('Desktop light satin', desktopLight, 7.2, 2, 25);
+assertSatinFoldScale('Desktop dark satin', desktopDark, 7.2, 2, 25);
+assertSatinFoldScale('Mobile light satin', mobileLight, 3.5, 0.9, 25);
+assertSatinFoldScale('Mobile dark satin', mobileDark, 3.5, 0.9, 25);
+
+function assertSatinFoldContrast(name, svg, maxBody, maxShadow, maxShade, maxHighlight) {
+  const maxOpacityFor = layer => {
+    const values = [...svg.matchAll(new RegExp('<path data-fold-layer="' + layer + '"[^>]*\\sopacity="([\\d.]+)"', 'g'))]
+      .map(match => Number(match[1]));
+    assert.ok(values.length > 0, name + ' must keep the ' + layer + ' satin layer.');
+    return Math.max(...values);
+  };
+  assert.ok(maxOpacityFor('body') <= maxBody, name + ' body folds must remain subtle, not broad ribbon bands.');
+  assert.ok(maxOpacityFor('shadow') <= maxShadow, name + ' fold shadows must not form dark rings.');
+  assert.ok(maxOpacityFor('inner-shade') <= maxShade, name + ' inner creases must stay quiet.');
+  assert.ok(maxOpacityFor('highlight') <= maxHighlight, name + ' highlights must read as fine satin, not bright strokes.');
+}
+assertSatinFoldContrast('Desktop light satin', desktopLight, 0.14, 0.06, 0.13, 0.31);
+assertSatinFoldContrast('Desktop dark satin', desktopDark, 0.13, 0.08, 0.13, 0.26);
+assertSatinFoldContrast('Mobile light satin', mobileLight, 0.14, 0.06, 0.13, 0.31);
+assertSatinFoldContrast('Mobile dark satin', mobileDark, 0.13, 0.08, 0.13, 0.26);
+
 
 assert.match(html, /\.theme-bg--light\{background-color:#eaf3fb;background-image:url\('images\/liquid-glass-light\.svg\?v=/);
 assert.match(html, /\.theme-bg--dark\{background-color:#061522;background-image:url\('images\/liquid-glass-dark\.svg\?v=/);
@@ -98,10 +116,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-12"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-12"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-12"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-12"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-13"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-13"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-13"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-13"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 
