@@ -889,3 +889,20 @@ Continue real work autonomously on `chichute5500/Sindarealest-admin`, only write
 4. Capture and inspect real-source screenshots or available fixture evidence and compare against the relevant reference; do not claim parity without evidence.
 5. Update status, scorecard and this prompt only when evidence/progress materially changes. Avoid repeated documentation-only commits that retrigger CI without advancing implementation.
 6. Keep PRs open; no merge/production deploy, no Access/secrets edits, no remote D1/R2/schema/data changes, no TinyFish.
+
+
+## BẮT BUỘC CHỐNG LẶP VIỆC — CHECKPOINT 2026-10-21 17:10 UTC
+
+Đã xác minh các mục sau, không làm lại nếu không có lỗi tái xuất hiện:
+1. Tìm kiếm khách hàng: label/placeholder nêu tên, điện thoại, email, địa chỉ; Playwright có kiểm tra tìm theo địa chỉ bằng fixture tổng hợp. Source/test commit `b3c54d55a5e21ae6377d2a6392349f2402ee333f` đã được Validate Source và Preview kiểm tra.
+2. Tìm kiếm bảo hành: có thông báo kết quả `aria-live`; test kiểm tra empty state cho cả bảng mã bảo hành và yêu cầu hỗ trợ. Source/test commit `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`.
+3. Validate Source [#39640751340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751340) và Preview/Playwright [#39640751300](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300) đều SUCCESS trên SHA `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`. Artifact [admin-preview-evidence-201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39640751300/artifacts/12363374710) chứa 63 PNG. Fixture nghiệp vụ là dữ liệu tổng hợp/read-only, không chứng minh backend thật đã được nghiệm thu.
+4. Docs-only SHA `71187e9afe7359a6a8a0f5f7c14b03a9520cff3b` qua Validate Source #39641183495. Không được diễn giải thành test UI mới.
+5. Tiến độ hiện ghi 50% là ước lượng quản lý có trọng số, không phải tỷ lệ pass.
+
+## Việc tiếp theo — phải làm thực tế
+- Đầu tiên xác minh HEAD, PR #111/#108 và workflow mới nhất. Handoff commits mới có thể làm HEAD tiến lên; không tuyên bố SHA cũ là HEAD.
+- Đọc `12-SCREEN-REFERENCE-AUDIT.md`, ảnh mẫu và `reference-instructions.md`; chọn gap CHƯA giải quyết. Ưu tiên màn hình danh sách/tìm kiếm sản phẩm (#3) hoặc trình sửa sản phẩm (#4), không quay lại tìm kiếm khách hàng/bảo hành.
+- Thực hiện một thay đổi UI có ý nghĩa trên nhánh ADMIN duy nhất, giữ API/data behavior, bổ sung regression test, chạy checks và so sánh ảnh trước/sau. Không chỉ lập kế hoạch, không chỉ cập nhật tài liệu.
+- Cập nhật progress chỉ khi bằng chứng mới hỗ trợ; không tăng % chỉ vì viết handoff. Hạn chế commit tài liệu riêng lẻ vì gây CI dư thừa.
+- Tuyệt đối không merge/deploy Production, không sửa Access/secrets, không chạm remote D1/R2/schema/dữ liệu thật, không dùng TinyFish; PR #111/#108 giữ OPEN.
