@@ -56,7 +56,9 @@ assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese
 
 // Orders stay summary-first on mobile while retaining every price/terms/payment control in an accessible disclosure.
 has('<details class="order-management-details" open><summary class="order-management-summary">Quản lý giá, trạng thái & thanh toán</summary>', 'per-order management disclosure with desktop-open baseline');
-has('<div class="order-price-fields"><b>Giá từng sản phẩm</b>${(o.items||[]).map(i=>`<label class="tiny muted">Giá/đơn vị · ${esc(i.title)} (VNĐ)<input class="control"', 'per-item price confirmation inputs live inside the order-management panel');
+has('<label class="tiny muted order-price-entry">Giá/đơn vị (VNĐ)<input class="control"', 'one per-item price control is kept in the product cell to avoid duplicate API values');
+has('#main .order-table .order-price-entry{display:none}', 'mobile price entry stays hidden while order tools are collapsed');
+has('#main .order-table tbody tr:has(.order-management-details[open]) .order-price-entry{display:grid;gap:4px;width:100%;margin-top:8px}', 'expanding mobile order tools reveals the existing single price entry');
 has("const orderToolsMedia=window.matchMedia('(max-width:680px)')", 'responsive order-management disclosure synchronization');
 has('#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(92,145,185,.08);color:var(--ink);font-size:11px;font-weight:750;cursor:pointer}', 'touch-friendly order-management disclosure summary');
 has('@media(min-width:681px){\n#main .order-table .order-management-summary{display:none}\n#main .order-table .order-management-content{padding-top:0}\n}', 'desktop order controls retain the always-visible baseline layout');
