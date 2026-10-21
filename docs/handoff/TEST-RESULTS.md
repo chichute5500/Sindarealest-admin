@@ -467,3 +467,7 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 3. Duy trì kiểm tra sáu ô Liquid Glass, phần “Phong cách đẳng cấp từ da cá sấu”, nền satin, gallery controls, drawer cart/account/checkout, mobile Back, footer/Zalo và route sản phẩm; không coi kiểm thử tĩnh là visual acceptance.
 4. Audit toàn thể vẫn bị khóa nếu public verified product payload không có đúng SKU `SD-GL052`. Không fake SKU, không thay ảnh khác, không đụng catalog/D1/R2/Admin để làm xanh audit. Giữ fail-closed và ghi blocker cụ thể.
 5. Sau khi có kết quả visual cuối, cập nhật handoff, test results, master prompt, next-chat prompt; chỉ workflow guarded được phép lưu canonical screenshots/manifest khi các điều kiện acceptance đạt. Tiếp tục làm sau khi báo cáo, không tự dừng để hỏi cập nhật tiến độ.
+
+## Handoff clarification — 2026-10-21
+- The user explicitly requested that the prior uploaded-image/folder topic be set aside and restarted separately in a new conversation. Do not continue investigating it or treat it as a project blocker in this handoff.
+- No new test result is asserted by this note. Before any further code change, verify current branch HEAD, diff, workflow runs and Preview deployment; do not repeat previously PASS tests without a relevant code/condition change.
