@@ -65,10 +65,10 @@ assert.match(html, /function trapCheckoutTab\(event\)/, 'Checkout must trap keyb
 assert.match(html, /if\(event\.shiftKey&&\(document\.activeElement===first\|\|!panel\.contains\(document\.activeElement\)\)\)/, 'Shift+Tab from the first checkout control must wrap to the last control.');
 assert.match(html, /else if\(!event\.shiftKey&&\(document\.activeElement===last\|\|!panel\.contains\(document\.activeElement\)\)\)/, 'Tab from the last checkout control must wrap to the first control.');
 assert.match(html, /const target=checkoutReturnFocus;checkoutReturnFocus=null/, 'Checkout must remember and restore focus to the opening control.');
-assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(false\);openCart\(\);setTimeout\(\(\)=>\$\('#cartCheckout'\)\?\.focus\(\{preventScroll:true\}\),0\)\}\)/, 'The back-to-cart action must reopen the cart and restore focus to its continue-order action.');
+assert.ok(html.includes("$('#checkoutBack').addEventListener('click',()=>requestStorefrontModalClose('checkout',()=>{closeCheckout(false);openCart();setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0)}))"), 'The back-to-cart action must close through browser history, with a safe fallback that restores the cart and focus.');
 assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'The cart action must open checkout.');
-assert.match(html, /\$\('#checkoutBack'\)\.addEventListener\('click',\(\)=>\{closeCheckout\(false\);openCart\(\);setTimeout\(\(\)=>\$\('#cartCheckout'\)\?\.focus\(\{preventScroll:true\}\),0\)\}\)/, 'Back action must return to the cart and focus the continue-order action.');
-assert.match(html, /\$\('#checkoutBackdrop'\)\.addEventListener\('click',closeCheckout\)/, 'Backdrop interaction must close checkout.');
+assert.match(html, /currentModal==='checkout'&&targetModal==='cart'\)setTimeout\(\(\)=>\$\('#cartCheckout'\)\?\.focus\(\{preventScroll:true\}\),0\)/, 'Back navigation from checkout to cart must restore focus to the continue-order action.');
+assert.ok(html.includes("$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout))"), 'Backdrop interaction must close checkout through its browser-history state.');
 assert.match(html, /e\.key!=='Escape'/, 'Escape-key handling should be present for modal drawers.');
 assert.match(html, /fetch\('\/api\/orders',\{method:'POST'/, 'The real existing order API submission must be preserved.');
 assert.match(html, /id="checkoutProvince"/, 'Province selection must be preserved.');
