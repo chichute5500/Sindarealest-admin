@@ -294,3 +294,26 @@ Latest CI evidence for source SHA `3ed2d86b8b97f04718c478979136f986b3d1b07b`:
 Next steps: re-fetch current branch HEAD, PRs and Actions; inspect the exact failing automated-test logs; make a minimal safe fix only on the Admin branch if root cause is proven; rerun tests and require exact SHA match; then rerun Playwright/Preview diagnostic. Keep real product save/image upload untested until safely verified. Keep all 12-screen parity, authenticated business-flow coverage, migration ledger and PR #111 scope review NOT VERIFIED/open.
 
 Safety: PR #111 and PR #108 remain open/unmerged; no Production deploy; no edit to `main` or static branch; no secrets/Access changes, no bypass, no remote D1/R2 writes, no migrations/setup scripts.
+
+
+
+## Latest verified continuation checkpoint — 2026-10-21 15:50 +07:00 (supersedes stale earlier test/root-cause notes)
+
+- Repository: `chichute5500/Sindarealest-admin`; only permitted branch: `feature/admin-isolated-handoff-2026-10-20`.
+- Exact source/test SHA: `18704cfae445210c20bbe1eaf0f9328b6c90eb87`. The evidence-only workflow commit then advanced the branch to `ee914c9a496810801a00df8e4f7da4e8c24c8a85`; this later docs/evidence SHA is not a source-test SHA. Local checkout/working-tree status remains **NOT VERIFIED** because this session has no local checkout.
+- Two test-harness defects were diagnosed from CI logs and corrected on the ADMIN branch:
+  - `a1aadbd17ca6e894329ba2e2b889fcaabf54cf99`: replaced the obsolete `expect.poll(...)` implementation-string assertion with assertions for the current visible order-details button and dialog.
+  - `18704cfae445210c20bbe1eaf0f9328b6c90eb87`: scoped product editor scroll calls to `#backdrop .editorcontent`; previously the generic locator matched both the product editor and hidden `#orderDetailContent`, causing Playwright strict-mode failure.
+- Source CI [39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003): **PASS** on exact SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` (project integrity and automated tests pass).
+- Source/Preview workflow [39571867352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352): local Playwright matrix **PASS**, remote Preview assertion **FAIL**. Artifact [admin-preview-evidence-123 (ID 12332562278)](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352/artifacts/12332562278), 9,318,827 bytes, expires 2026-11-04. Contains 59 PNGs: 16 real-source login-shell captures (8 viewport sizes × 2 themes), 43 synthetic/read-only fixture module captures and 36 fixture metrics. No page, console, failed-request or HTTP errors; no attempted writes or unexpected API paths. Fixture evidence is not authenticated real-backend QA.
+- Current deployed diagnostic: `PREVIEW_CSS_SIGNATURE_MISMATCH`. The page reports title `Quản trị SinDarealest`, language `vi`, login class `loginwrap`; `.topbar > .brand` is visible (`display:flex`, visibility visible, opacity 1). Selector support/match are true, but the served inline stylesheet has 226 rules and lacks the expected login-hide rule. Do not weaken the assertion. Because `ADMIN_TEST_URL` is secret-masked in logs, stale build vs wrong target cannot be distinguished. Do not inspect/change secrets or bypass Cloudflare Access; owner must confirm the authorized Preview URL/source SHA and legitimate access path.
+- Read-only source inspection confirms Admin UI/API/test code for `fulfillmentType` values `in_stock`, `made_to_order`, `unclassified`, QR configuration/upload, server-derived installments and manual verified payment transactions. This proves source/test coverage only, not current Preview or D1/R2 runtime. Real-bank QR owner scan-verification, authenticated workflows, remote migration ledger and static-branch consumer compatibility remain **NOT VERIFIED**.
+- PR #111 is OPEN/unmerged with 1,082 changed files (+36,501/−389), including 913 PNGs and 61 non-documentation/code files at the latest full file audit. It contains storefront, Functions/API, migrations, scripts, configuration and tests; it is not an Admin-only diff and is **not merge-ready**. PR #108 remains OPEN/unmerged. Do not merge, cherry-pick, force-push, reset/rebase, change PR base or delete evidence.
+- Overall Admin estimate remains **46%** and QR/fulfillment stage estimate **70%**; these are management estimates, not acceptance scores. No Production deployment, remote D1/R2 operation, migration/setup script, secret/Access change, main edit or static branch edit was performed.
+
+### Continue next
+1. Re-fetch branch HEAD, PR metadata and latest Actions before further source edits.
+2. Compare the full 12-screen Admin reference set individually with the artifact; do not claim visual parity from fixture screenshots alone.
+3. Resolve the Preview CSS/source identity with owner-confirmed current-source deployment and legitimate Cloudflare Access; keep signature assertions intact.
+4. Keep authenticated backend workflows NOT TESTED until authorized Preview/login and safe synthetic test data are available. Separately verify product save and actual image upload/storage.
+5. Continue migration compatibility and mixed-scope PR #111 review; no remote D1, Production deploy or merge.

@@ -44,3 +44,14 @@ Không kết luận “100% hoàn thành” khi chưa có bằng chứng cho cá
 - [ ] Website branch independently consumes/tests shared contract.
 - [ ] Full Admin visual/accessibility/reference parity and migration/PR scope review.
 - Status: IN PROGRESS; overall estimate 46%, QR/fulfillment estimate 70%; no completion claim.
+
+
+## Evidence update — 2026-10-21 15:50 +07:00
+
+- [x] Exact source CI [39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003) PASS on `18704cfae445210c20bbe1eaf0f9328b6c90eb87`.
+- [x] Local Playwright screenshot matrix PASS on the same SHA: 59 PNGs, 16 login-shell captures, 43 synthetic/read-only module fixtures, 36 fixture metrics; zero recorded page/console/failed-request/HTTP errors, no attempted writes or unexpected API paths.
+- [x] Two test-harness defects found from logs and fixed on the ADMIN branch: stale `expect.poll` assertion; ambiguous `.editorcontent` strict-mode locator, now scoped to `#backdrop .editorcontent`.
+- [ ] Deployed Preview signature PASS: **FAIL** in [run 39571867352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352); served 226-rule stylesheet lacks expected login-hide CSS rule. Do not weaken assertion or touch secrets.
+- [ ] Authenticated real-backend modules/save/upload, all 12 reference comparisons, QR owner scan-verification, remote migration ledger, cross-branch compatibility and full PR #111 audit remain NOT VERIFIED.
+- [x] PR #111 and #108 reconfirmed OPEN/unmerged; PR #111 remains mixed-scope and not merge-ready.
+- Status: IN PROGRESS; overall estimate 46%, QR/fulfillment estimate 70%. Not an acceptance claim.

@@ -226,3 +226,15 @@ Source commit `cedebd78b2056ae4d0e6f6982793106b586d99b2` passed [source CI 39565
 - Regression coverage verifies those conditions. The current remote Preview [diagnostic run 39565547828](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39565547828) still FAILS the CSS signature; deployed behavior and cross-branch consumer compatibility remain NOT VERIFIED.
 - Keep all static-website changes on the protected website branch only; do not modify or merge that branch from Admin work.
 
+
+
+## Source implementation and CI checkpoint — 2026-10-21 15:50 +07:00
+
+Source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87` passed [source CI 39571867003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003); the automated regression suite includes fulfillment-type and payment-ledger contract coverage. Read-only source inspection confirms Admin code paths for:
+- product fulfillment mapping `fulfillmentType` ↔ `fulfillment_type`, with `in_stock`, `made_to_order` and `unclassified`;
+- server-derived payment requests that reject browser-supplied `amount`, require confirmed terms and reconciled line totals, and block mixed/unclassified product types;
+- active QR-object existence checks before creating a payment request;
+- Admin-only transaction recording with unique transfer-reference validation, audit logging and payment-status calculation from the verified transaction ledger;
+- private/no-store/no-referrer order-payment responses, with public freeship reported as applied only when the verified order payment status is paid and the request is full-payment eligible.
+
+**Limits:** this is source and automated-test evidence, not successful authenticated Preview or actual D1/R2 runtime. The owner must scan and verify the real bank QR/receiving account before activation. Migration `0009_fulfillment_and_manual_payments.sql` is source/local-test evidence only; no remote migration or schema read was performed. Static branch API consumption remains NOT VERIFIED. Keep PR #111/#108 open and unmerged.

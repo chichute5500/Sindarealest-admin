@@ -157,3 +157,16 @@ Continue from the live `LATEST-STATUS.md` and `latest-test-results.json`. Re-fet
 ## Latest owner Preview check — 2026-10-21 15:39 +07:00
 
 Owner confirmed login, opening product list/detail, and opening image-selection UI on Preview. These are basic UI observations only; save/upload and full backend flows are not confirmed. Latest source CI run #39569134111 and Preview diagnostic run #39569133914 failed at automated tests on source `3ed2d86b8b97f04718c478979136f986b3d1b07b`; the diagnostic skipped browser and deployed Preview checks. Read the newest section in `LATEST-STATUS.md` and JSON before continuing. Inspect detailed failure output; do not guess root cause. Keep both PRs open and do not deploy Production or mutate Cloudflare/D1/R2.
+
+
+## Latest continuation checkpoint — 2026-10-21 15:50 +07:00
+
+The earlier note saying the latest automated-test failure was not root-caused is superseded by this checkpoint. Read the newest records in `LATEST-STATUS.md`, `latest-test-results.json` and Master Prompt section 18.13.
+
+- Source/test SHA `18704cfae445210c20bbe1eaf0f9328b6c90eb87`: source CI PASS and local Playwright source screenshot matrix PASS. [CI](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867003) · [Playwright/Preview run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352) · [artifact admin-preview-evidence-123](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571867352/artifacts/12332562278).
+- Artifact has 59 PNGs (16 login shell + 43 synthetic/read-only fixture module screens, 36 metrics), zero recorded browser/network/HTTP errors, and no attempted writes. It is not authenticated backend evidence.
+- Preview still FAILS `PREVIEW_CSS_SIGNATURE_MISMATCH`: the served 226-rule stylesheet lacks the login-hide CSS rule. Do not weaken the assertion or touch secrets; URL identity is masked in logs.
+- Test harness fixes: obsolete `expect.poll` contract assertion fixed in `a1aadbd...`; duplicate `.editorcontent` locator fixed by scoping to `#backdrop` in `18704cfae445210c20bbe1eaf0f9328b6c90eb87`.
+- PR #111/#108 remain OPEN/unmerged. No Production deploy, remote D1/R2 action, migration, main/static branch edit or Access bypass. Local git status remains NOT VERIFIED (no local checkout).
+
+Continue only on `feature/admin-isolated-handoff-2026-10-20`, rechecking refs and Actions before each further change.
