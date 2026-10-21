@@ -864,6 +864,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#categoryBox')).toHaveValue('all');
     await expect(page.locator('#fulfillmentBox')).toHaveValue('all');
     await expect(productNames).toHaveCount(3);
+    await page.locator('#categoryBox').selectOption('wallets');
+    await expect(productNames).toHaveCount(1);
+    await expect(productNames).toHaveText('Sản phẩm thử nghiệm giao diện');
+    await expect(page.locator('#productResultSummary')).toContainText('Có 1 sản phẩm phù hợp');
+    await page.locator('#categoryBox').selectOption('belts');
+    await expect(productNames).toHaveCount(1);
+    await expect(productNames).toHaveText('Thắt lưng thử nghiệm giao diện');
+    await page.locator('#clearFilter').click();
+    await expect(page.locator('#categoryBox')).toHaveValue('all');
+    await expect(productNames).toHaveCount(3);
+
     await page.locator('#fulfillmentBox').selectOption('made_to_order');
     await expect(productNames).toHaveCount(1);
     await expect(productNames).toHaveText('Dây đồng hồ thử nghiệm giao diện');
