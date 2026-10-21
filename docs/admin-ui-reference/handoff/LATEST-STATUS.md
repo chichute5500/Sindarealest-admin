@@ -1,9 +1,9 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái hiện tại:** `SOURCE CI PASS; LOCAL PLAYWRIGHT PASS; CONFIGURED PREVIEW DIAGNOSTIC PASS; VISUAL PARITY NOT ACCEPTED; AUTHENTICATED QA NOT TESTED`
+**Trạng thái hiện tại:** `LATEST HEAD NOT YET TESTED; PRIOR SOURCE/PLAYWRIGHT/PREVIEW RUN PASS ON OLDER SHA; VISUAL PARITY NOT ACCEPTED; AUTHENTICATED QA NOT TESTED`
 **Tiến độ tổng thể ước tính:** **48%** — ước lượng quản lý, không phải tỷ lệ test pass.
 **Repository/nhánh được phép sửa:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`.
-**Source SHA gần nhất đã kiểm thử:** `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; CSS UI change `1fb56f7b5773876c581847bf44abbef1c5c16a67` cũng có Run #157 PASS. Run #158 (45f630e99cfd1dd047c234f0fb42fa197d9bc978) xác nhận npm run check, npm test, local Playwright và configured Preview diagnostic PASS. [Run #157](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615192697) · [Run #158](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216).
+**Source SHA gần nhất có kiểm thử đầy đủ trong hồ sơ:** `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; HEAD hiện tại `78a16b6d9fca91d7b080834f293e1690dc7c10cd` chưa có workflow run được xác minh; CSS UI change `1fb56f7b5773876c581847bf44abbef1c5c16a67` cũng có Run #157 PASS. Run #158 (45f630e99cfd1dd047c234f0fb42fa197d9bc978) xác nhận npm run check, npm test, local Playwright và configured Preview diagnostic PASS. [Run #157](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615192697) · [Run #158](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216).
 **Bằng chứng lịch sử run #151:** Source `cf594677550f63ddf92ebdba5aea87587dbfe029`, artifact 151; giữ lại như lịch sử, không coi là test SHA mới nhất.
 **HEAD hiện tại sẽ thay đổi bởi commit bàn giao tài liệu này**; không coi commit tài liệu mới là source-test SHA. Local checkout/Git working tree chưa xác minh được.
 **Preview diagnostic gần nhất:** PASS trong run #158 trên source/test SHA `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; chỉ xác nhận URL/configuration được workflow kiểm tra, không xác nhận mọi deployment hoặc authenticated real-backend flows.
@@ -23,3 +23,11 @@
 - Source screenshot matrix: 25 real PNGs; login shell: 16; read-only fixture module screens: 9; fixture metrics: 7.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Xác minh HEAD mới nhất — 2026-10-21 15:00 UTC
+
+- PR #111 hiện OPEN/unmerged, head SHA `78a16b6d9fca91d7b080834f293e1690dc7c10cd`; PR #108 cũng OPEN/unmerged, head `ad5b0e7538a639780adeeac7020a818170aa0caa`. Không merge.
+- Commit HEAD mới nhất chỉ nới ngưỡng sai số hình học trong test footer từ 1px lên 2px (`tests/e2e/admin-static-baseline.spec.js`). Đây là thay đổi test, không phải sửa UI; chưa có Actions run gắn với SHA này và combined commit status trả về không có status checks. Vì vậy HEAD hiện tại **NOT TESTED**, không kế thừa PASS từ commit trước.
+- Run gần nhất có bằng chứng đầy đủ trong JSON: Validate Source #3905 và Admin Preview #162 trên `a999bfdc529ea38c5309ebfbff33a45c6779c10b`, cả hai PASS. Điều đó không xác minh commit HEAD mới.
+- Tiến độ giữ ở **48%**; chưa có bằng chứng mới đủ để tăng. Việc tiếp theo: chạy/quan sát validation trên HEAD mới; kiểm tra test có thực sự đạt trên geometry thực tế thay vì chỉ nới ngưỡng; tiếp tục đối chiếu 12 nhóm ảnh tham chiếu và audit scope PR. Không sửa secrets/Access, không deploy Production, không chạy migration hoặc thao tác D1/R2.
