@@ -125,3 +125,13 @@ Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108
 - Exact test/source tree `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`: Playwright 3 passed; Preview login/dashboard smoke 2 passed; CSS signature PASS. Artifact #204 contains screenshots for both light and dark themes and the approved reference image.
 - The publication filter displays counts based on the active search/category/fulfillment subset. `published===true` maps to “Đang hiển thị” and `published===false` to “Đã ẩn”; missing/unknown values are not reclassified as hidden, and inventory is never used to infer either state.
 - Screenshot review: `products__390x844__light.png` and `products__1280x800__light.png`. The filter chips are visible on both viewports. Remaining visual difference versus approved screen #3 includes row/card presentation and detail hierarchy, so visual parity stays NOT ACCEPTED.
+
+
+## Continuation checkpoint — 2026-10-22 — product-list fulfillment detail
+
+- Branch scope remains `feature/admin-isolated-handoff-2026-10-20` only. New source commit: `330f4bbaae11c0dd3bdbb61a01b75d5462d3201b` (`public/admin/index.html`); regression-test commit: `7948a320c3fd38a7f73d061de6ca6e3251b72789` (`tests/e2e/admin-static-baseline.spec.js`).
+- Screen #3 product list now renders the existing fulfillment classification as a compact, semantic chip rather than plain secondary text. It explicitly distinguishes `Hàng có sẵn`, `Hàng đặt riêng`, and `Chưa phân loại`; unclassified uses a dashed neutral treatment. No price, inventory, SKU, publication state, or product fact was fabricated, and no API/data behavior was changed.
+- Added fixture assertions for all three chip states using synthetic read-only products. These assertions are committed but **must not be marked PASS until Actions runs on the exact current source/test SHA are observed**. A connector query for PR-associated runs returned no run at the time of this checkpoint; validation is pending, not assumed.
+- Overall progress remains **50%**. This bounded visual change is not acceptance of screen #3 or all-12-screen parity. Authenticated business/backend QA remains NOT TESTED/BLOCKED; image-save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
+- Next: re-fetch current branch/PR state and Actions. Verify source and Preview/Playwright on exact SHA; inspect the new product screenshots at 390×844 and 1280×800 in light/dark. If checks fail, fix the cause without weakening assertions. Update progress only if screenshot review and evidence justify it.
+- Safety unchanged: PR #111/#108 remain open/unmerged; no Production deploy, no edits to `main` or static branch, no Access/secrets changes, no remote D1/R2 or migrations, and no TinyFish.
