@@ -512,6 +512,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         viewportHeight: window.innerHeight,
         documentWidth: document.documentElement.scrollWidth,
         horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+        tableScrollStates: [...document.querySelectorAll('.tablewrap')].map(element => ({
+          className: typeof element.className === 'string' ? element.className : '',
+          scrollLeft: Math.round(element.scrollLeft),
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth
+        })),
         visibleTextContainsClosingTag: (document.body.innerText || '').includes('</div>'),
         bodyTextClosingTagContext: (() => {
           const bodyText = document.body.innerText || '';
@@ -589,7 +595,20 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await chooseTheme(variant.theme);
       await page.evaluate(() => window.scrollTo(0, 0));
       if (prepare) await prepare(variant);
+      // Interaction checks can scroll an overflow table to expose right-hand actions.
+      // Normalize the scroll container before saving the baseline screenshot so its
+      // leftmost columns are always visible in the artifact.
+      await page.evaluate(() => {
+        document.querySelectorAll('.tablewrap').forEach(element => { element.scrollLeft = 0; });
+        window.scrollTo(0, 0);
+      });
       await saveScreenshot(name, variant);
+      if (name === 'orders' && variant.viewport.width > 680) {
+        const orderMetric = metrics[metrics.length - 1];
+        expect(orderMetric.tableScrollStates.every(state => state.scrollLeft === 0),
+          'Desktop order screenshot must start from the left edge of each table wrapper: ' +
+          JSON.stringify(orderMetric.tableScrollStates)).toBe(true);
+      }
       if (fullPageAtMobileLight && variant.theme === 'light' && variant.viewport.width === mobile.width) {
         const filename = name + '__' + variant.viewport.width + 'x' + variant.viewport.height + '__light__full.png';
         await page.screenshot({ path: join(screenshotDir, filename), fullPage: true, animations: 'disabled' });
