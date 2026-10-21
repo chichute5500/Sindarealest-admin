@@ -855,6 +855,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('#warrantySearch').fill('UI-ONLY-WARRANTY');
       await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
       await expect(page.locator('[data-claim-status="UI-ONLY-CLAIM"]')).toBeHidden();
+      await expect(page.locator('#warrantyFilterStatus')).toContainText('Hiển thị 1 mã bảo hành và 0 yêu cầu phù hợp.');
+      await expect(page.locator('#warrantyFilterStatus')).toHaveAttribute('aria-live', 'polite');
+      await page.locator('#warrantySearch').fill('no-match-ui-query');
+      await expect(page.locator('.issued-warranty-table tbody')).toContainText('Chưa có mã bảo hành phù hợp.');
+      await expect(page.locator('.claim-table tbody')).toContainText('Chưa có yêu cầu hỗ trợ phù hợp.');
+      await expect(page.locator('#warrantyFilterStatus')).toContainText('Hiển thị 0 mã bảo hành và 0 yêu cầu phù hợp.');
       await page.locator('#warrantySearch').fill('');
       await page.locator('[data-warranty-filter="closed"]').click();
       await expect(page.locator('[data-warranty-filter="closed"]')).toHaveAttribute('aria-pressed', 'true');
