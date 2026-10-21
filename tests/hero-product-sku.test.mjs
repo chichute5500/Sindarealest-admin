@@ -37,14 +37,11 @@ assert.ok(lastHeroImageRule.includes("rgba(4,20,34,0) 64%)"),
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
-  && liveCapture.includes("fetch('/api/products'")
-  && liveCapture.includes("item?.skuVerified === true"),
-  "The live audit must inspect the actual public product payload before deciding whether a hero image is allowed.");
-assert.ok(liveCapture.includes("mappedImages.includes(path)")
-  && liveCapture.includes("status === 'verified-public-catalog'"),
-  "The live audit must require the rendered hero image to belong to the exact verified catalog record.");
-assert.ok(liveCapture.includes("skuUnavailableFallback")
-  && liveCapture.includes("SD-GL052 is not present in the public verified product payload"),
-  "The audit may accept a safe empty hero fallback but must keep the full visual audit blocked when the exact SKU is absent.");
-assert.doesNotMatch(liveCapture, /hero-sd-gl052\.png|owner-supplied/);
+  && liveCapture.includes("presentationAssetLoaded"),
+  "The live audit must verify the dedicated hero presentation asset is loaded and visible.");
+assert.ok(liveCapture.includes("path.endsWith('/images/hero-sd-gl052.png')")
+  && liveCapture.includes("status === 'hero-presentation-asset'")
+  && liveCapture.includes("!frameCollapsed"),
+  "The live audit must check the exact hero asset, visible image state, and non-collapsed frame.");
+assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
 console.log("PASS: hero image is tied to verified public SKU/image mapping; missing SKU fails closed and remains an explicit visual blocker.");
