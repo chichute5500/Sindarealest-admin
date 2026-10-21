@@ -164,27 +164,28 @@ assert.doesNotMatch(sixTileRefinementCss, /#benefits/,
   "The six-tile refinement must not depend on a nonexistent benefits section ID.");
 
 
-/* Regression guard: each viewport/theme uses irregular, layered satin folds rather than parallel diagonal bands. */
+/* Regression guard: each viewport/theme uses eight layered satin folds instead of broad looping ribbons. */
 for (const [name, svg] of [
   ['light desktop', lightWaveArtwork], ['dark desktop', darkWaveArtwork],
   ['light mobile', lightMobileWaveArtwork], ['dark mobile', darkMobileWaveArtwork]
 ]) {
-  assert.match(svg, /data-satin-style="organic-fine-satin-folds-v3"/,
+  assert.match(svg, /data-satin-style="organic-diagonal-folds-v5"/,
     name + ' must use the organic satin composition rather than the legacy parallel ribbons.');
   assert.ok((svg.match(/data-fold-layer="body"/g) || []).length >= 6,
     name + ' must keep multiple independent folded fabric ridges.');
-  assert.ok((svg.match(/data-fold-layer="highlight"/g) || []).length >= 6
-    && (svg.match(/data-fold-layer="fine"/g) || []).length >= 6,
+  assert.ok((svg.match(/data-fold-layer="highlight"/g) || []).length >= 6,
     name + ' must retain fine specular creases on top of the shaded folds.');
+  assert.ok((svg.match(/data-fold-layer="fine"/g) || []).length >= 6,
+    name + ' must retain additional micro-creases that keep the fabric from reading as plain diagonal stripes.');
   const bodyPaths = [...svg.matchAll(/<path data-fold-layer="body" d="([^"]+)"/g)].map(match => match[1]);
   assert.ok(new Set(bodyPaths).size >= 5 && bodyPaths.every(path => /C/.test(path)),
     name + ' must use varied organic curves, not duplicate straight stripe paths.');
 }
-assert.ok(lightWaveArtwork.includes('stroke-width="3.2"') && lightWaveArtwork.includes('stroke-width="0.75"'),
+assert.ok(lightWaveArtwork.includes('stroke-width="30"') && lightWaveArtwork.includes('stroke-width="2.8"'),
   'Light desktop satin must have visible ridge and fine highlight layers within the desktop stroke budget.');
-assert.ok(darkWaveArtwork.includes('stroke-width="3.2"') && darkWaveArtwork.includes('stroke-width="0.75"'),
+assert.ok(darkWaveArtwork.includes('stroke-width="30"') && darkWaveArtwork.includes('stroke-width="2.8"'),
   'Dark desktop satin must have visible ridge and fine highlight layers within the desktop stroke budget.');
-assert.ok(lightMobileWaveArtwork.includes('stroke-width="1.75"') && lightMobileWaveArtwork.includes('stroke-width="0.48"'),
+assert.ok(lightMobileWaveArtwork.includes('stroke-width="20"') && lightMobileWaveArtwork.includes('stroke-width="2.2"'),
   'Light mobile satin must show crease details while respecting the mobile stroke budget.');
-assert.ok(darkMobileWaveArtwork.includes('stroke-width="1.75"') && darkMobileWaveArtwork.includes('stroke-width="0.48"'),
+assert.ok(darkMobileWaveArtwork.includes('stroke-width="20"') && darkMobileWaveArtwork.includes('stroke-width="2.2"'),
   'Dark mobile satin must show crease details while respecting the mobile stroke budget.');
