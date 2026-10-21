@@ -175,3 +175,12 @@ This was a read-only source review of the existing payment contract and route co
 - PR #111 OPEN/UNMERGED, base main, 1,112 paths and mixed Admin/storefront/Functions/migrations/scripts/tests/evidence scope. PR #108 OPEN/UNMERGED (269 paths). Neither is merge-ready.
 - Read-only review found `setup-cloudflare.mjs` omits migration 0009 and `deploy-cloudflare.mjs` preflights 0007/0008 but not 0009. This is a source mismatch, not evidence of a missing remote schema. No remote D1/R2 action, SQL, migration/setup script, or deploy was performed.
 - Only ADMIN branch. No main/static branch edits, merge/cherry-pick/force-push, Production deploy, secrets/Access changes/bypass, remote D1/R2, setup/migration script, or TinyFish. Overall progress remains 48%.
+
+
+## Verification addendum — reduced-motion browser test now executed
+
+- Exact source/test SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e`: Validate Source [#39629076105](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076105) PASS; Admin Preview/Playwright [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142) SUCCESS.
+- The Playwright reduced-motion test ran in browser and passed as part of the three-test static baseline suite. The previous failure was a test-selector mismatch against the actual `#appView` DOM, corrected in test code only.
+- Local source screenshot matrix and deployed Preview login CSS signature both passed; artifact `admin-preview-evidence-188` ID `12357698923` includes 59 PNGs and 36 fixture metrics. Fixture/API access is synthetic/read-only; it is not authenticated real-backend QA.
+- Requirement status: `prefers-reduced-motion` smoke audit = PASS on the exact tested SHA; full 12-screen visual parity = NOT ACCEPTED; authenticated business QA = BLOCKED / NOT TESTED; product image save and PRE/PRO migration = DEFERRED_BY_OWNER.
+- Overall progress remains 48%. No PR merge, Production deployment, secret/Access changes, remote D1/R2 operation, migration/setup execution, or static-branch/main writes.
