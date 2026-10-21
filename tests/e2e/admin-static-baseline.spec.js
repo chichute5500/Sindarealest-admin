@@ -780,7 +780,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', null, true);
     await captureView('settings', 'settings', null, true);
-    await captureView('settings-qr-unsaved-guard', 'settings', async () => {
+    await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
+      // Previous viewport iteration leaves the guard message in the live DOM;
+      // navigate away and back so each viewport starts from a freshly rendered form.
+      await navigateTo('products');
+      await navigateTo('settings');
       await expect(page.locator('#paymentQrBankName')).toBeVisible();
       await expect(page.locator('#paymentQrAccountNumber')).toBeVisible();
       await expect(page.locator('#paymentQrAccountName')).toBeVisible();
