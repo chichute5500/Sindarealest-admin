@@ -376,3 +376,8 @@ Live GitHub confirms Admin branch HEAD at audit start `ef42282f7c0d66f827e3d0181
 PR #111 is OPEN/unmerged, base `main`, 1,088 changed files (+37,133/−390); PR #108 remains OPEN/unmerged, base `main`. The broad PR contains mixed public storefront, backend/API, migration, scripts, tests and documentation/evidence scope. No merge approval. GitHub pagination is only partially categorized; do not claim the full diff is audited. No local checkout is available, so working-tree status is unverified.
 
 Continue safe Admin-only work and handoff consistency checks. Keep product image-save and PRE/PRO migration work DEFERRED_BY_OWNER / NOT VERIFIED. No remote SQL/D1/R2, setup, Production deploy, secret/Access change, bypass, main/static edit or TinyFish.
+
+
+## Bắt buộc tiếp tục sau mỗi báo cáo tiến độ
+
+Chủ sở hữu đã chỉ thị: tiếp tục làm việc, không dừng giữa chừng; chỉ dừng khi thực sự cần thao tác/xác nhận của chủ sở hữu. Sau khi gửi bất kỳ báo cáo tiến độ nào, phải tiếp tục ngay vòng kiểm tra/sửa tiếp theo nếu còn việc an toàn có thể tự làm. Không thay việc bằng báo cáo hoặc kế hoạch. Giữ trạng thái lỗi lưu ảnh và migrations PRE/PRO là tạm hoãn theo yêu cầu hiện tại.
