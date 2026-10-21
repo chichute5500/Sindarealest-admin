@@ -50,6 +50,9 @@
 **Loại cập nhật:** đặc tả + trình tự triển khai an toàn; không phải báo cáo hoàn thành code.
 
 - Prompt nguồn cập nhật: `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`, mục XXII.
+- Ảnh tham chiếu đã tải lên và xác minh tồn tại trên nhánh: `docs/icon-assets/Icon.png` (chuẩn hình dáng icon gốc) và `docs/icon-assets/Chitiet.png` (tham chiếu tương tác/hiệu ứng). Mở trực tiếp hai ảnh trước khi triển khai.
+- Palette nền tảng: `#eaf3fb`, `#142a3c`, `#5c91b9`. HEX riêng cho tim đỏ và trị số kính (opacity/blur/shadow/refraction) chưa được chốt; không xem là token đã duyệt.
+- README tham chiếu: `docs/icon-assets/README.md`.
 - Inventory cập nhật: `docs/icon-system-inventory.md`.
 - Yêu cầu mới: Liquid Glass không ripple; icon lún/đổi màu khi nhấn; heart đỏ khi đã thích; cart badge và toast khớp kết quả thật; mọi điểm thêm hàng dùng chung animation bay đến icon cart trên header; clone dùng đúng ảnh đang hiển thị, product và variant; không dịch chuyển DOM gốc hoặc add trùng.
 - Trình tự: xác minh branch/HEAD/Preview trước; đọc source và baseline; audit mọi điểm add/cart/heart; chia thay đổi nhỏ; test/Playwright và ảnh Preview mỗi lát; kiểm tra đúng ảnh, đúng quantity, responsive và reduced-motion; cập nhật bằng chứng sau cùng.
