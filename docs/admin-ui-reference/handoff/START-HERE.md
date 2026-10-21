@@ -86,3 +86,12 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 
 - `scripts/setup-cloudflare.mjs` uses remote `d1 execute --file` for several schema files and manual `ALTER TABLE` for 0008 columns; it does not apply migration 0008 through `d1 migrations apply --remote`. Deploy gate checks column existence but not the applied-migrations ledger. This may cause schema/history divergence; remote D1 state was NOT queried.
 - Local migration test `scripts/check-migrations.mjs` is not a remote migration proof. Do not run setup/deploy/migrations; require owner-reviewed migration procedure first. See [Cloudflare D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/).
+
+
+## Latest ADMIN source-contract check — 2026-10-21
+
+- At start of this check ADMIN HEAD was `21a7e039749e484e42b68ec322481df6a2a797af`; source file `public/admin/index.html` blob is `a297b8298ff30c5e713896fed1c21d0f8ca3e899`.
+- Rechecking current markup: mobile bottom navigation is five direct buttons and the later mobile CSS sets five columns. “Khác” opens warranty and settings actions. Do not carry forward the old hypothesis that source still has six mobile nav items.
+- Product, order, customer, warranty and claim table layouts use `mobilecards`; at max-width 680 CSS overrides inline min-width and stacks rows into mobile cards. This is static source review, not authenticated browser evidence.
+- Login copy is currently tagline “Luxury in Every Detail” + heading “Đăng nhập quản trị”; the old handoff note claiming those strings were reversed is stale.
+- Reference pixel parity and authenticated business-flow testing remain NOT VERIFIED. Latest source CI [39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS; Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILS separately.

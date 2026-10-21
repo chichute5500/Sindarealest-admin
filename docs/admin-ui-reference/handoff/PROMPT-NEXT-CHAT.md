@@ -122,3 +122,12 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - This is a possible schema/migration-ledger divergence; remote D1 state is NOT VERIFIED because no remote command was run. Local `check-migrations` PASS does not establish remote state. Do not run setup/deploy/migration commands.
 - Cloudflare docs: https://developers.cloudflare.com/workers/wrangler/commands/d1/ and https://developers.cloudflare.com/d1/reference/migrations/.
 - Latest source CI run before this handoff cycle: [39545568905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545568905) PASS on `f744fed18636622ac108f5e9874d3735ae2c2ccc`. The Preview diagnostic still fails and authenticated real-backend QA remains NOT VERIFIED. Progress remains 43%.
+
+
+## Latest ADMIN source-contract correction — 2026-10-21
+
+- Before this update, current ADMIN HEAD was `21a7e039749e484e42b68ec322481df6a2a797af`; current `public/admin/index.html` blob is `a297b8298ff30c5e713896fed1c21d0f8ca3e899`.
+- Supersede stale visual gap notes: source has **five** bottom navigation buttons, with Warranty/Settings under “Khác”; final mobile CSS sets five columns. Tables for products/orders/customers/warranties/claims use `mobilecards` responsive CSS and override inline min-width at <=680px. Login markup already says “Luxury in Every Detail” and “Đăng nhập quản trị”. These are source-only conclusions; real authenticated visual checks and PNG parity remain NOT VERIFIED.
+- Latest CI run [39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS on `21a7e039749e484e42b68ec322481df6a2a797af`; Preview run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) still FAILS CSS signature.
+- Current PR #111 metadata: OPEN, 909 files (+30,553/−356), 405 ahead / 6 behind; PR #108 remains OPEN. Do not merge or sync branches.
+- Progress remains 43%. Remaining blockers: authorized intended Preview identity/access, real authenticated module QA, all 12 reference screen comparisons, mixed-scope PR review, and a reviewed D1 migration procedure.

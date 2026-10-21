@@ -1,15 +1,15 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — CURRENT SOURCE CI PASS; PREVIEW SOURCE MISMATCH; D1 MIGRATION PROCEDURE REVIEW REQUIRED; AUTHENTICATED QA AND VISUAL AUDIT OPEN`
+**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI PASS; PREVIEW SOURCE MISMATCH; MIGRATION SCOPE REVIEW REQUIRED; AUTHENTICATED QA AND 12-SCREEN VISUAL PARITY OPEN`
 **Ước tính tiến độ:** 43% theo giai đoạn công việc; không phải tỷ lệ code.
 **Repository:** `chichute5500/Sindarealest-admin`
 **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`
-**Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`
-**HEAD tại đầu vòng rà soát migration:** `f744fed18636622ac108f5e9874d3735ae2c2ccc`; CI [39545568905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545568905) PASS cho source check/test/dependency audit. Đây không phải kiểm thử Preview hoặc remote D1.
-**Preview:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAIL vì CSS signature không khớp source; artifact `admin-preview-evidence-62`.
-**PR #111:** OPEN/unmerged, 909 files mixed-scope; không merge.
-**PR #108:** OPEN/unmerged; không sửa nhánh website tĩnh.
-**Production deploy, remote migration, schema/data mutation:** NOT PERFORMED.
+**HEAD tại đầu vòng source-contract audit này:** `21a7e039749e484e42b68ec322481df6a2a797af`; [CI 39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS cho source checks, tests và dependency audit.
+**Preview:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAIL vì CSS signature của Preview không khớp source; không bypass Cloudflare Access.
+**PR #111:** OPEN/unmerged, 909 file (+30,553/−356), 405 commits ahead/6 behind main; mixed-scope, không merge.
+**PR #108:** OPEN/unmerged; nhánh website tĩnh được bảo vệ.
+**D1 remote state/migration ledger:** NOT VERIFIED; không chạy setup/migration/deploy.
+**Production deployment:** NOT PERFORMED.
 
 
 
@@ -247,3 +247,17 @@ This was performed by reading current branch files and comparing them with `main
 1. Do not run `setup:cloudflare`, `deploy`, Wrangler remote SQL, or migrations to resolve this automatically.
 2. Get an explicit owner-reviewed migration plan for reconciling migration 0008 and any Wrangler migration ledger before considering deployment.
 3. Continue UI-only work only where it can be safely tested without guessing at the approved PNG; authenticated module tests and full reference comparison remain NOT VERIFIED.
+
+
+## 18.13. ADMIN source-contract recheck — 2026-10-21
+
+This check is based on the current GitHub source blob `public/admin/index.html` SHA `a297b8298ff30c5e713896fed1c21d0f8ca3e899`; no source code was changed by this check.
+
+- **Mobile bottom navigation — source reviewed PASS:** `nav.mobiletabs` contains exactly five direct buttons (Tổng quan, Sản phẩm, Đơn hàng, Khách hàng, Khác). The first CSS rule still contains a legacy 6-column declaration, but a later `@media(max-width:820px)` rule sets `grid-template-columns:repeat(5,minmax(0,1fr))` at the same selector specificity, so the final source cascade uses five columns. Warranty and Settings are reachable from the “Khác” menu. This is source inspection only; reference pixel parity and authenticated mobile interaction remain NOT VERIFIED.
+- **Responsive product/order/customer/warranty/claim lists — source reviewed PASS:** the tables have `mobilecards` classes. At `max-width:680px`, the later CSS sets `#main .mobilecards { min-width:0!important }`, hides the header row and displays body rows as a grid. This overrides inline `min-width:820px` on orders and `720px` on customers at that breakpoint. Do not keep treating the inline table widths alone as proof of horizontal overflow. Real authenticated module screenshots/interaction remain NOT VERIFIED.
+- **Login copy — source reviewed PASS:** current markup has brand tagline `Luxury in Every Detail` and heading `Đăng nhập quản trị`. The earlier note claiming the source had these reversed is stale and is superseded. Text/source check is not a complete visual comparison against the original PNG.
+- **Theme tokens — source contract present:** the later ADMIN-specific CSS block includes light `#eaf3fb`, ink `#142a3c`, accent `#5c91b9`, and dark `#09131d` tokens after earlier legacy warm declarations. Automated CSS-string contract test is included in the standard CI suite. No pixel-level parity is claimed.
+- **Visual gaps remaining:** a distinct order-detail screen and separation of image/backup/activity modules remain candidates from the 12-screen inventory only; because the approved PNG bytes could not be opened through the available repository connector on this pass, these differences remain NOT VERIFIED rather than proven defects. Do not add route/business behavior just to satisfy an unverified visual guess.
+- CI run [39545978621](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545978621) PASS on branch commit `21a7e039749e484e42b68ec322481df6a2a797af` (source checks, automated tests, dependency audit). Latest Preview diagnostic still FAILs separately at [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719).
+- Current PR metadata at this checkpoint: PR #111 OPEN/unmerged, 909 changed files (+30,553/−356), 405 commits ahead and 6 behind main; PR #108 OPEN/unmerged. Current static-branch ref last read: `98764acdd1b9d133292a4fb25adbb0f035970b1c`. No static branch file was edited.
+- Progress remains 43%; full approved 12-screen parity, authenticated real-backend module flows, exact intended Preview identity and full merge-scope/migration review are still incomplete.
