@@ -1,9 +1,9 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái hiện tại:** `LATEST HEAD NOT YET TESTED; PRIOR SOURCE/PLAYWRIGHT/PREVIEW RUN PASS ON OLDER SHA; VISUAL PARITY NOT ACCEPTED; AUTHENTICATED QA NOT TESTED`
+**Trạng thái hiện tại:** `SOURCE CHECKS PASS; LOCAL PLAYWRIGHT PASS; CONFIGURED PREVIEW DIAGNOSTIC PASS ON SOURCE/TEST SHA 78a16b6; VISUAL PARITY NOT ACCEPTED; AUTHENTICATED BUSINESS QA BLOCKED BY ACCESS`
 **Tiến độ tổng thể ước tính:** **48%** — ước lượng quản lý, không phải tỷ lệ test pass.
 **Repository/nhánh được phép sửa:** `chichute5500/Sindarealest-admin` / `feature/admin-isolated-handoff-2026-10-20`.
-**Source SHA gần nhất có kiểm thử đầy đủ trong hồ sơ:** `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; HEAD hiện tại `78a16b6d9fca91d7b080834f293e1690dc7c10cd` chưa có workflow run được xác minh; CSS UI change `1fb56f7b5773876c581847bf44abbef1c5c16a67` cũng có Run #157 PASS. Run #158 (45f630e99cfd1dd047c234f0fb42fa197d9bc978) xác nhận npm run check, npm test, local Playwright và configured Preview diagnostic PASS. [Run #157](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615192697) · [Run #158](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216).
+**Source/test SHA gần nhất đã kiểm thử đầy đủ:** `78a16b6d9fca91d7b080834f293e1690dc7c10cd`; Validate Source run [#39621065756](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756) và Admin Preview run [#39621065853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853) đều PASS. Các commit sau đó chỉ cập nhật handoff docs; kiểm tra lại PR HEAD để phân biệt docs SHA và source/test SHA; CSS UI change `1fb56f7b5773876c581847bf44abbef1c5c16a67` cũng có Run #157 PASS. Run #158 (45f630e99cfd1dd047c234f0fb42fa197d9bc978) xác nhận npm run check, npm test, local Playwright và configured Preview diagnostic PASS. [Run #157](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615192697) · [Run #158](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39615417216).
 **Bằng chứng lịch sử run #151:** Source `cf594677550f63ddf92ebdba5aea87587dbfe029`, artifact 151; giữ lại như lịch sử, không coi là test SHA mới nhất.
 **HEAD hiện tại sẽ thay đổi bởi commit bàn giao tài liệu này**; không coi commit tài liệu mới là source-test SHA. Local checkout/Git working tree chưa xác minh được.
 **Preview diagnostic gần nhất:** PASS trong run #158 trên source/test SHA `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; chỉ xác nhận URL/configuration được workflow kiểm tra, không xác nhận mọi deployment hoặc authenticated real-backend flows.
@@ -39,3 +39,12 @@
 - Exact assertion: `Math.abs(dialogBottom - footerBottom) <= 1`; observed difference **1.140625 CSS px**. The same run also logged `getaddrinfo ENOTFOUND playwright.download.prss.microsoft.com` during browser setup, but the screenshot test itself did run and reported the geometry assertion. Do not attribute the test failure to DNS without more evidence.
 - Test-only commit `78a16b6d9fca91d7b080834f293e1690dc7c10cd` raises this tolerance to 2px. That adjustment is consistent with the observed fractional CSS-pixel rounding, but it has **not yet been rerun**; latest test code remains NOT TESTED.
 - Handoff updates have since moved branch HEAD through docs-only commits; the tested application/test code commit remains 78a16b6, while latest passing full suite is still SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`. Current PR metadata at the start of this update showed head `67f6f5e403c3e8a92c81f77b7153a1da8ac721fb` (handoff-only commits after 78a16b6). Re-query PR head after this update; do not confuse handoff SHA with tested source SHA.
+
+
+## Xác minh sửa ngưỡng footer đã qua kiểm thử — 2026-10-21
+
+- Source/test SHA `78a16b6d9fca91d7b080834f293e1690dc7c10cd` đã được kiểm thử sau khi đổi ngưỡng hình học footer từ 1px lên 2px.
+- Validate Source run [#39621065756](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065756): job `validate` SUCCESS; dependency audit, project integrity và automated tests đều PASS.
+- Admin Preview diagnostic run [#39621065853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39621065853): job SUCCESS; repository checks, automated tests, local Playwright screenshot matrix và configured Preview diagnostic đều PASS. Artifact `admin-preview-evidence-169` ID `12355051140` đã upload, 11,121,594 bytes. Preview smoke test vẫn không chứng minh luồng nghiệp vụ sau đăng nhập; Cloudflare Access ngăn test tự động vào dashboard.
+- Sai lệch 1.140625px ở run #168 được khắc phục ở mức test assertion bằng ngưỡng 2px và test đã PASS trên SHA mới. Không khẳng định đã sửa CSS ứng dụng trong lượt này.
+- Tiến độ vẫn **48%**: chưa có đối chiếu nghiệm thu đủ 12 nhóm ảnh tham chiếu và authenticated business QA vẫn BLOCKED/NOT TESTED. PR #111 vẫn mixed-scope và chưa merge-ready.
