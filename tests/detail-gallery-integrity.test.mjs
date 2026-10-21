@@ -73,6 +73,11 @@ assert.match(html, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.
 assert.match(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(3,15,27,\.60\)/);
 assert.match(html, /\.sd-fullscreen-viewer\{[^}]*backdrop-filter:blur\(8px\)/);
 assert.doesNotMatch(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(8,8,8,\.94\)/, 'Fullscreen must not use an almost opaque black backdrop.');
+assert.ok(html.includes('<style id="sd-gallery-opaque-satin-surface-2026-10-22">')
+  && html.includes('.sd-fullscreen-viewer.open{\n  background:rgba(231,244,253,.95)!important;')
+  && html.includes('html.dark .sd-fullscreen-viewer.open{\n  background:rgba(3,18,32,.96)!important;')
+  && html.includes('backdrop-filter:blur(30px) saturate(145%)!important;'),
+  'The open fullscreen gallery must retain theme-aware satin glass while suppressing underlying storefront text.');
 assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.85\)/);
 assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
 
