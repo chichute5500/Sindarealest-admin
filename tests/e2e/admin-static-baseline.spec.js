@@ -264,7 +264,18 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         status: 'received',
         adminNote: ''
       }],
-      warranties: []
+      warranties: [{
+        warrantyCode: 'UI-ONLY-WARRANTY',
+        orderNumber: 'UI-ONLY-ORDER',
+        sku: 'UI-FIXTURE-001',
+        skuVerified: false,
+        title: 'Sản phẩm thử nghiệm giao diện',
+        policyName: 'Chính sách thử nghiệm giao diện',
+        startsAt: '2026-01-01',
+        endsAt: '2027-01-01',
+        durationMonths: 12,
+        status: 'active'
+      }]
     },
     '/api/admin/audit-logs': {
       logs: [{
@@ -786,8 +797,29 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     }, true);
     await captureView('customers', 'customers', null, true);
     await captureView('warranties', 'warranties', async () => {
-      // Synthetic, read-only coverage for warranty screen #10. Do not issue a warranty,
-      // change a claim, or submit any non-GET request from this fixture.
+      // Screen #10: synthetic, read-only warranty list/filter and accessible issue disclosure.
+      await expect(page.locator('.warranty-toolbar')).toBeVisible();
+      await expect(page.getByLabel('Tìm mã bảo hành, mã đơn, SKU hoặc sản phẩm')).toBeVisible();
+      await expect(page.locator('[data-warranty-filter="all"]')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('[data-warranty-filter="all"]')).toContainText('Tất cả (1)');
+      await expect(page.locator('[data-warranty-filter="active"]')).toContainText('Đang xử lý (1)');
+      await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
+      await expect(page.locator('.claim-table tbody')).toContainText('UI-ONLY-CLAIM');
+
+      // Search only filters local synthetic records; no API mutation is requested.
+      await page.locator('#warrantySearch').fill('UI-ONLY-WARRANTY');
+      await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
+      await expect(page.locator('[data-claim-status="UI-ONLY-CLAIM"]')).toBeHidden();
+      await page.locator('#warrantySearch').fill('');
+      await page.locator('[data-warranty-filter="closed"]').click();
+      await expect(page.locator('[data-warranty-filter="closed"]')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('[data-claim-status="UI-ONLY-CLAIM"]')).toBeHidden();
+      await page.locator('[data-warranty-filter="all"]').click();
+      await expect(page.locator('[data-claim-status="UI-ONLY-CLAIM"]')).toBeVisible();
+
+      const disclosure = page.locator('#warrantyIssueDisclosure');
+      await expect(disclosure).toHaveJSProperty('open', false);
+      await disclosure.locator('summary').click();
       await expect(page.locator('#warrantyIssueForm')).toBeVisible();
       await expect(page.getByLabel('Mã đơn hàng *')).toBeVisible();
       await expect(page.getByLabel('Mã sản phẩm trong đơn (SKU nếu đã xác minh) *')).toBeVisible();
@@ -798,14 +830,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.getByLabel('Ngày bắt đầu *')).toHaveAttribute('type', 'date');
       await expect(page.locator('#issueWarrantyBtn')).toContainText('Phát hành mã bảo hành');
       await expect(page.locator('#warrantyIssueMessage')).toHaveAttribute('aria-live', 'polite');
-
-      const status = page.locator('[data-claim-status="UI-ONLY-CLAIM"]');
-      const note = page.locator('[data-claim-note="UI-ONLY-CLAIM"]');
-      await expect(status).toBeVisible();
-      await expect(status).toHaveAttribute('aria-label', 'Trạng thái yêu cầu bảo hành UI-ONLY-CLAIM');
-      await expect(note).toBeVisible();
-      await expect(note).toHaveAttribute('aria-label', 'Ghi chú quản trị cho yêu cầu bảo hành UI-ONLY-CLAIM');
-      await expect(page.getByRole('button', { name: 'Lưu yêu cầu bảo hành UI-ONLY-CLAIM' })).toBeVisible();
+      await disclosure.locator('summary').click();
+      await expect(disclosure).toHaveJSProperty('open', false);
     }, true);
     await captureView('settings', 'settings', null, true);
     await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
