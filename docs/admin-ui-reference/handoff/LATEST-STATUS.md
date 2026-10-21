@@ -39,24 +39,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 535e43121a612570dd84a353870bc118860c0c0d
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315
+- Tested commit: b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39644786736
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-203 (not committed to Git).
+- Local source Playwright matrix: PASS; 63 real PNGs captured in artifact admin-preview-evidence-204 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 63 real PNGs; login shell: 16; read-only fixture module screens: 47; fixture metrics: 39.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Product list filters — exact-SHA verification (2026-10-21 17:26 UTC)
-
-- UI change commit: `da808593785de5924ac1540e1522421ae5cb5bcd`; exact source/test tree: `535e43121a612570dd84a353870bc118860c0c0d`.
-- Validate Source [run #39643505425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505425) **SUCCESS**; Admin Preview/Playwright [run #39643505315](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315) **SUCCESS** on the exact same SHA.
-- Playwright browser results: **3 passed (35.8s)**. Configured Preview login/dashboard smoke: **2 passed (4.5s)**. Preview CSS signature **PASS_LOGIN_CSS_SIGNATURE**, expected login-hide rule present among 535 inline CSS rules; this is not authenticated business-transaction QA.
-- Artifact [admin-preview-evidence-203](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731), ID `12365019731`, 12,168,440 bytes, expires 2026-11-04. Contains 63 PNGs (16 login-shell + 47 synthetic/read-only module screens) and 39 fixture metrics. No page/console/network/HTTP errors, no attempted writes, no unexpected API paths.
-- Product list UI: searchable by name/SKU/category label; result count and viewed range are announced via `role=status` / `aria-live=polite`; no-results state explains recovery and offers “Xóa tất cả bộ lọc”. The local fixture E2E verifies category-label search, count announcement, empty state, category/fulfillment combinations and recovery, without backend writes.
-- Actually reviewed `products__390x844__light.png`, `products__1280x800__light.png`, and `admin-mobile-reference.png` from the artifact. Screen #3 is **PARTIAL, not visual-parity accepted**: current UI still differs from the reference’s status chips/card presentation; empty price/stock in fixtures is deliberately not fabricated. No real catalogue data was used.
-- Overall progress remains **50%**. All-12-screen parity remains NOT ACCEPTED; real business module flows remain NOT TESTED; product image save/R2 and PRE/PRO migration checks remain DEFERRED_BY_OWNER / NOT VERIFIED.
-- PR #111 and #108 remain OPEN/unmerged. Only ADMIN branch was changed; no Production deployment, secrets/Access edit/bypass or remote D1/R2 operation.
