@@ -247,6 +247,15 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         orderCount: 0,
         lastOrderAt: null,
         createdAt: 'DỮ LIỆU TEST'
+      }, {
+        id: 'UI-ONLY-CUSTOMER-2',
+        fullName: 'Khách UI Fixture 2',
+        phone: '0000000002',
+        email: 'fixture-two@example.test',
+        address: 'ĐỊA CHỈ TEST',
+        orderCount: 2,
+        lastOrderAt: '2026-10-20',
+        createdAt: 'DỮ LIỆU TEST'
       }]
     },
     '/api/admin/warranties': {
@@ -795,7 +804,32 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
       await expect(page.locator('#orderDetailClose')).toBeFocused();
     }, true);
-    await captureView('customers', 'customers', null, true);
+    await captureView('customers', 'customers', async variant => {
+      // Reference screen #8: synthetic, client-side search only; mutation endpoints remain blocked.
+      await expect(page.getByLabel('Tìm tên, số điện thoại hoặc email')).toBeVisible();
+      await expect(page.locator('#customerSearchStatus')).toHaveAttribute('aria-live', 'polite');
+      await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
+      await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
+
+      await page.locator('#customerSearch').fill('Khách UI Fixture 2');
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
+      await expect(page.locator('.customer-table tbody')).not.toContainText('Khách thử nghiệm giao diện');
+      await page.locator('#customerSearch').fill('0000000002');
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
+      await page.locator('#customerSearch').fill('fixture-two@example.test');
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
+      await page.locator('#customerSearch').fill('no-match-ui-query');
+      await expect(page.locator('.customer-table tbody')).toContainText('Không tìm thấy khách hàng phù hợp.');
+      await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 0 / 2');
+
+      await page.locator('#customerSearch').fill('');
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách thử nghiệm giao diện');
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');
+      await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
+      await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect(page.locator('#main .pagehead')).toBeInViewport();
+    }, true);
     await captureView('warranties', 'warranties', async variant => {
       // Screen #10: synthetic, read-only warranty list/filter and accessible issue disclosure.
       await expect(page.locator('.warranty-toolbar')).toBeVisible();
