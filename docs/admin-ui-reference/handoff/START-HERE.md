@@ -397,3 +397,12 @@ Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENC
 - Playwright static baseline: 3 passed (30.5s). Added Home/End key tests for product-editor tabs, asserting focus and `aria-selected`; Arrow navigation, focus trap, Escape close and focus restoration tests remain.
 - Artifact `admin-preview-evidence-189` ID `12359007200`: 59 PNGs (16 login-shell + 43 synthetic fixture screens), 36 fixture metrics, no recorded browser/console/network/HTTP errors or attempted writes. This is fixture/source UI evidence, not authenticated real-backend QA.
 - Live branch HEAD advanced to documentation/evidence commits after the tested SHA. Re-fetch HEAD before source edits; do not claim later HEAD is source-tested unless exact-source CI supports it. Overall progress 48%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
+
+
+## Latest verified QR-settings fixture checkpoint — 2026-10-21 16:11 UTC
+
+- Source/test SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55`: Validate Source [#39632306385](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385) PASS and Admin Preview/Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) SUCCESS.
+- Read-only fixture E2E confirms QR setting fields/accessibility and the client-side activation guard when bank info is changed but not saved; it must warn before confirmation and before any non-GET API call. All mutations remain blocked by the fixture router.
+- Run #190 failed from test state leaking across viewports; retry SHA `0b9e8a2...` now navigates Products → Settings before each variant and passes. No app source/business code was changed.
+- Artifact `admin-preview-evidence-191` ID `12360041542`: 63 PNGs (16 login + 47 synthetic module fixtures), 39 fixture metrics, zero recorded errors/writes. This is not authenticated real-backend QA.
+- Overall progress 48%; QR/Settings fixture status PARTIAL; all-12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
