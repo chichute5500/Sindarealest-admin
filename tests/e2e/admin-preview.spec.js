@@ -151,6 +151,48 @@ test.describe('SinDarealest2 Admin Preview', () => {
         .replace(/\s+/g, ' ')
         .trim();
       const normalizedHideSelector = normalizeSelector(hideSelector);
+      // A CSSStyleRule.selectorText may contain a comma-separated selector list.
+      // Split only on top-level commas, preserving commas nested inside :is(), :has(),
+      // attribute selectors, or quoted values.
+      const splitSelectorList = value => {
+        const selectors = [];
+        let current = '';
+        let nesting = 0;
+        let quote = '';
+        let escaped = false;
+        for (const character of String(value || '')) {
+          if (escaped) {
+            current += character;
+            escaped = false;
+            continue;
+          }
+          if (character.charCodeAt(0) === 92) {
+            current += character;
+            escaped = true;
+            continue;
+          }
+          if (quote) {
+            current += character;
+            if (character === quote) quote = '';
+            continue;
+          }
+          if (character === '"' || character === "'") {
+            quote = character;
+            current += character;
+            continue;
+          }
+          if (character === '(' || character === '[') nesting += 1;
+          else if ((character === ')' || character === ']') && nesting > 0) nesting -= 1;
+          if (character === ',' && nesting === 0) {
+            if (current.trim()) selectors.push(current);
+            current = '';
+            continue;
+          }
+          current += character;
+        }
+        if (current.trim()) selectors.push(current);
+        return selectors.map(normalizeSelector);
+      };
       const stylesheetSources = [...document.styleSheets].map(sheet => {
         let ruleCount = 0;
         const matchingRules = [];
@@ -159,9 +201,10 @@ test.describe('SinDarealest2 Admin Preview', () => {
             for (const rule of rules) {
               ruleCount += 1;
               if (typeof rule.selectorText === 'string'
-                && normalizeSelector(rule.selectorText) === normalizedHideSelector) {
+                && splitSelectorList(rule.selectorText).includes(normalizedHideSelector)) {
                 matchingRules.push({
                   selector: rule.selectorText,
+                  matchedSelector: normalizedHideSelector,
                   display: rule.style?.getPropertyValue('display') || null,
                   displayPriority: rule.style?.getPropertyPriority('display') || null
                 });
