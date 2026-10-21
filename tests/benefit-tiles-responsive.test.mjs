@@ -93,9 +93,9 @@ assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgb
   'Light mode must use an ice-blue translucent glass surface.');
 assert.match(darkThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(36,66,91,\.96\)/,
   'Dark mode must use high-opacity layered navy glass.');
-assert.match(lightThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.96\)/,
+assert.match(lightThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.80\)/,
   'Light mode must keep a bright glass rim.');
-assert.match(darkThemeTokens, /--benefit-tile-border:rgba\(204,231,250,\.68\)/,
+assert.match(darkThemeTokens, /--benefit-tile-border:rgba\(204,231,250,\.44\)/,
   'Dark mode must keep a clear blue-steel rim.');
 assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)/,
   'Tablet must use three columns.');
