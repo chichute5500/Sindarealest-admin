@@ -199,3 +199,12 @@ This entry supersedes any earlier wording in this file that says the checkout/pa
 ## Chat continuity / long conversation rule (2026-10-21)
 
 The GitHub handoff is the authoritative project record; Memory and chat history are secondary. Before working, read docs/handoff/PROMPT-NEXT-CHAT-2026-10-21.md first and verify the live branch HEAD and latest relevant GitHub Actions/deployment evidence. Continue from the latest confirmed next action, not from an old summary. Do not repeat unchanged PASS tests. Update the handoff and this prompt before switching chats or when context is getting long. Keep working after progress reports; stop only when a user action/approval or a genuine external blocker is required. Scope remains static storefront branch fix/liquid-glass-audit-2026-10-19 only; never touch Admin, merge PR #108/#111, change main, or touch Production/D1/R2/config/secrets.
+
+
+## Handoff cập nhật 2026-10-21 — HEAD `1aa9d0e9d4038bbdc13f923a7d3abc702e4ddb67`
+- Đọc trạng thái mới nhất trong `docs/handoff/HANDOFF.md` và `docs/handoff/TEST-RESULTS.md`; phần dưới ưu tiên hơn SHA/trạng thái cũ trong prompt.
+- 6 ô đã được nhắm đúng selector `.service-strip`; khung/ô kính được làm trong hơn, chữ mobile tăng nhẹ. Nền satin 4 SVG Light/Dark desktop/mobile được tinh chỉnh và cache key chuyển sang `20261021-11`. Chưa chốt hoàn tất trước khi xem screenshot/artifact mới.
+- Workflow ở HEAD này: validate [39571633215](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571633215), Preview deploy [39571633205](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571633205), visual [39571633169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39571633169) — đang chạy tại lúc cập nhật, phải xác minh lại trước khi kết luận.
+- Không lặp lại lỗi lượt trước: `storefront-reference-parity` đã fail do giới hạn stroke test cũ; đã cập nhật ngưỡng desktop 13/mobile 5.6. Kiểm tra CI mới nhất xem sửa này đã PASS chưa.
+- Blocker chưa gỡ: public API không có `SD-GL052`; giữ fail-closed, không giả SKU/đổi ảnh. Không đụng Admin/backend, Production, D1/R2, catalog, secrets; không merge PR #108.
+- Tiếp theo: xác minh CI/deploy/visual của HEAD, mở screenshot thật, hoàn thiện satin/6 ô và xử lý fixed bottom-nav che thẻ sản phẩm; cập nhật evidence, chỉ dùng manifest canonical khi guarded workflow chấp nhận audit.
