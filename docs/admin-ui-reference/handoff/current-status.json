@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T02:30:43.029+07:00",
+  "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpoint": "d7488c845202a695b18ea01ec5d87906b6e9bffa",
@@ -89,10 +89,11 @@
     "docs/admin-ui-reference/handoff/current-status.json"
   ],
   "nextActions": [
-    "Inspect the mobile orders list on 390x844 against approved reference screen #6; keep order facts and actions accessible without excessive vertical stacking.",
-    "Make only evidence-backed ADMIN UI changes on this branch, update Playwright/CSS contract tests, and run exact-SHA Validate Source + Admin Preview diagnostics.",
-    "Open the new artifact and inspect 390x844 light/dark and 1280x800; screen #3 and 12-screen parity remain partial until visual evidence supports acceptance.",
-    "Keep PR #111 and #108 open/unmerged; do not deploy Production, edit Access/secrets, mutate remote D1/R2, run SQL/migrations, or use TinyFish."
+    "Fetch live branch HEAD and newest Actions before editing.",
+    "Retrieve/open Preview artifact from run 39662986425 and inspect orders at 390x844 light/dark and 1280x800.",
+    "Fix evidence-backed issues, then run exact-SHA Validate Source and Admin Preview/Playwright.",
+    "Continue unaccepted screen families; keep PR #111/#108 open and unmerged.",
+    "Update and read back all seven handoff files sequentially."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -244,5 +245,25 @@
       "branchHeadBeforeFinalStatusWrite": "28533c21a9f7d873f7663635d96a71acba86c66f",
       "progressPercent": 50
     }
-  ]
+  ],
+  "latestHandoffCheckpoint": {
+    "branchHeadObservedBeforeHandoffRefresh": "db6b8784a3704b6cce980cc4b9a09530cf60ef3b",
+    "latestVerifiedTestSha": "214dd104c17e3837166fac77f8f2106d1a25ffeb",
+    "validateSource": {
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446",
+      "conclusion": "success"
+    },
+    "adminPreviewPlaywright": {
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425",
+      "conclusion": "success"
+    },
+    "screenshotArtifactVisualReview": "PENDING_NOT_OPENED",
+    "ordersScreen6": "CODE_AND_E2E_PASS_VISUAL_REVIEW_PENDING",
+    "productScreen3": "PARTIAL_NOT_ACCEPTED",
+    "twelveScreenParity": "NOT_ACCEPTED",
+    "authenticatedBackendQA": "NOT_TESTED",
+    "pr111": "OPEN_UNMERGED",
+    "pr108": "OPEN_UNMERGED",
+    "nextAction": "Retrieve and inspect the screenshot artifact for run 39662986425; review orders screen at mobile light/dark and desktop."
+  }
 }
