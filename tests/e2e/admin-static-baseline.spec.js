@@ -628,7 +628,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#main .dashboard-shortcuts [data-action="add"]')).toContainText('Thêm sản phẩm');
     await expect(page.locator('#main .dashboard-shortcuts [data-view="orders"]')).toContainText('Đơn hàng');
     await expect(page.locator('#main .dashboard-shortcuts [data-view="customers"]')).toContainText('Khách hàng');
-    await expect(page.locator('#main .dashboard-shortcuts [data-action="backup"]')).toContainText('Sao lưu');
+    await expect(page.locator('#main .dashboard-shortcuts [data-action="backup"]')).toContainText('Sao lưu');    await expect(page.locator('#main .dashboard-activity-table')).toBeVisible();
+    await expect(page.locator('#main .dashboard-activity-table td[data-label="Thời điểm"]').first()).toBeVisible();
+    await expect(page.locator('#main .dashboard-activity-table').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
 
     await captureView('dashboard', 'dashboard', null, true);
     await captureView('products', 'products', null, true);
