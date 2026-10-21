@@ -101,9 +101,9 @@ assert.ok(darkMobileWaveArtwork.includes('viewBox="0 0 390 844"')
 
 const lightWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-light.svg", import.meta.url), "utf8");
 const darkWaveArtwork = readFileSync(new URL("../public/images/liquid-glass-dark.svg", import.meta.url), "utf8");
-assert.ok(lightWaveArtwork.includes('id="base"') && lightWaveArtwork.includes('id="glow"') && lightWaveArtwork.includes('id="fold4"'),
+assert.ok(lightWaveArtwork.includes('id="base"') && lightWaveArtwork.includes('id="glow"') && lightWaveArtwork.includes('data-fold-index="4"'),
   "Light desktop SVG must include layered pearl-satin folds and soft highlights.");
-assert.ok(darkWaveArtwork.includes('id="base"') && darkWaveArtwork.includes('id="glow"') && darkWaveArtwork.includes('id="fold4"'),
+assert.ok(darkWaveArtwork.includes('id="base"') && darkWaveArtwork.includes('id="glow"') && darkWaveArtwork.includes('data-fold-index="4"'),
   "Dark desktop SVG must include layered sapphire-satin folds and soft highlights.");
 
 assert.ok(finalThemeCss.includes("#productOverlay{align-items:stretch;justify-content:stretch;padding:0"),
