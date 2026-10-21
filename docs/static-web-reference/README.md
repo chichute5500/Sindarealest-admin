@@ -38,7 +38,7 @@ Không tự đổi vai trò hai ảnh này. Khi so sánh, kiểm tra giao diện
 
 ## Quy trình thanh toán — tài liệu tham chiếu bổ sung (2026-10-21)
 
-Bộ render checkout/payment được tạo để bổ sung cho hai ảnh gốc mobile ở trên. Khi có mặt trong Git repository, file tham chiếu dự kiến sẽ là `docs/static-web-reference/checkout-payment-flow-reference.webp`; **chưa được đánh dấu là đã có cho đến khi kiểm tra thấy chính xác file này trên GitHub**. Không tự tạo ảnh thay thế.
+Bộ render checkout/payment được tạo để bổ sung cho hai ảnh gốc mobile ở trên. Khi có mặt trong Git repository, file tham chiếu dự kiến sẽ là `docs/static-web-reference/checkout-payment-flow-reference.png`; **chưa được đánh dấu là đã có cho đến khi kiểm tra thấy chính xác file này trên GitHub**. Không tự tạo ảnh thay thế.
 
 Nội dung nghiệp vụ cần đối chiếu trong mẫu:
 - Trạng thái hàng (`made_to_order` / `in_stock` / `unclassified`) do chủ cửa hàng thiết lập ở Admin cho từng sản phẩm; khách hàng không được chọn loại hàng.
