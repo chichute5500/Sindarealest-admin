@@ -22,6 +22,15 @@ assert.equal(summarizePaymentRows([{direction:"received",amount:250}], 100).over
 const adminOrders = read("../functions/api/admin/orders.js");
 assert.match(adminOrders, /body\?\.paymentStatus !== undefined/, "Admin order PATCH must reject direct paymentStatus updates");
 assert.doesNotMatch(adminOrders, /SET status=\?,payment_status=COALESCE/, "order PATCH must never set payment status from a client field");
+const paymentRequestApi = read("../functions/api/admin/payment-requests.js");
+assert.match(paymentRequestApi, /Object\.hasOwn\(body, "amount"\)/, "client-supplied amount must be rejected");
+assert.match(paymentRequestApi, /Math\.ceil\(total \* 0\.3\)/, "made-to-order deposit must be server-derived as 30 percent");
+assert.match(paymentRequestApi, /: 100000;/, "in-stock deposit must be fixed at 100,000 VND");
+assert.match(paymentRequestApi, /fulfillmentTypes\.size !== 1/, "mixed fulfillment order must fail closed");
+assert.match(paymentRequestApi, /fulfillmentType === "unclassified"/, "unclassified items must require manual consultation");
+assert.match(paymentRequestApi, /shippingBenefit = "free_shipping"/, "full payment alone grants free shipping");
+assert.match(paymentRequestApi, /summary\.remainingBalance/, "balance amount must be based on the ledger-calculated remaining balance");
+assert.doesNotMatch(read("../public/admin/index.html"), /data-payment-amount=/, "Admin must not send a client-controlled amount");
 const transactionApi = read("../functions/api/admin/payment-transactions.js");
 assert.match(transactionApi, /payment_received_verified/, "verified receipts need an audit action");
 assert.match(transactionApi, /UNIQUE constraint/i, "duplicate bank references must map to a conflict response");
