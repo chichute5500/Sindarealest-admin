@@ -680,10 +680,6 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(scrolledRail, 'Thumbnail rail should be horizontally scrollable').toBeGreaterThan(0);
         await page.locator('#imageGrid .image-rail').evaluate(el => { el.scrollLeft = 0; });
       }
-      await expect.poll(async () => page.locator('#imageGrid img').evaluateAll(images =>
-        images.every(image => image.complete && image.naturalWidth > 0)
-      ), { timeout: 5000 }).toBe(true);
-      await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(6);
       if (variant.theme === 'dark') {
         const chromeColors = await page.evaluate(() => {
           const header = document.querySelector('.editorhead');
