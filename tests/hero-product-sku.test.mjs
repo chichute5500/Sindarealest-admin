@@ -6,14 +6,14 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("products.find(p=>String(p?.sku??'').trim().toUpperCase()==='SD-GL052'&&p?.skuVerified===true)"),
-  "The hero must require the exact verified public SKU before showing an image.");
-assert.ok(heroSync.includes("Array.isArray(product.images)") && heroSync.includes("target.dataset.productImageStatus='verified-public-catalog'"),
-  "The hero image must come from the matched product's mapped public images.");
-assert.ok(heroSync.includes("target.hidden=true") && heroSync.includes("target.removeAttribute('src')"),
-  "The hero must clear and hide the image until its public SKU is verified.");
-assert.doesNotMatch(heroSync, /hero-sd-gl052\.png|owner-supplied-hero-image|productImageStatus='owner-supplied'/,
-  "The hero must not portray a local static image as the absent commercial SKU.");
+assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'"),
+  "The hero must render the supplied static presentation image independently of public catalog SKU availability.");
+assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'"),
+  "The static hero image must be explicitly identified as a presentation asset, not a catalog product image.");
+assert.ok(heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
+  "The hero presentation asset must be shown and loaded rather than hidden when the SKU is absent.");
+assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
+  "The homepage hero must not be blocked by the availability of SD-GL052 in the public catalog.");
 assert.ok(html.includes('id="heroProductImage"'),
   "The existing hero image element must remain available for responsive styling.");
 
