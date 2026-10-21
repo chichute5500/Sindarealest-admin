@@ -66,6 +66,7 @@ const audit = {
   sectionChecks: [],
   commerceStateChecks: [],
   productDetailChecks: [],
+  iconStateChecks: [],
   brokenImages: [],
   accessServiceTokenConfigured: Object.keys(accessHeaders).length > 0,
   sourceCommit: process.env.SOURCE_SHA || null,
@@ -705,6 +706,96 @@ async function captureGalleryCartCheckoutStates(page, viewport, theme, label, ro
   }
 }
 
+async function captureIconFeedback(page, viewport, theme, label, route) {
+  const button = page.locator('#detailFavorite');
+  if (!await button.isVisible().catch(() => false)) {
+    audit.iconStateChecks.push({ context: label, status: 'FAIL', reason: 'Favorite control is not visible.' });
+    audit.hardFailures.push('Favorite icon state test could not find a visible control: ' + label);
+    return;
+  }
+  const original = await button.evaluate((node) => ({
+    id: document.querySelector('#detailAdd')?.dataset.add || '',
+    imageSrc: document.querySelector('#detailMainImage')?.currentSrc || document.querySelector('#detailMainImage')?.src || '',
+    imageRect: (() => { const r = document.querySelector('#detailMainImage')?.getBoundingClientRect(); return r ? { x:r.x,y:r.y,width:r.width,height:r.height } : null; })(),
+    pressed: node.getAttribute('aria-pressed'),
+    toastVisible: Boolean(document.querySelector('#toast.show')),
+  }));
+  const box = await button.boundingBox();
+  if (!box || !original.id) {
+    audit.iconStateChecks.push({ context: label, status: 'FAIL', reason: 'Favorite control bounds or product identity missing.' });
+    audit.hardFailures.push('Favorite icon state test lacks a real product target: ' + label);
+    return;
+  }
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(35);
+  const pressed = await button.evaluate((node) => {
+    const pseudo = getComputedStyle(node, '::before');
+    const icon = node.querySelector('svg');
+    const transform = getComputedStyle(node).transform;
+    const scale = transform === 'none' ? 1 : Number.parseFloat(transform.slice(transform.indexOf('(') + 1).split(',')[0]);
+    return {
+      active: node.matches(':active'),
+      overlayOpacity: Number.parseFloat(pseudo.opacity || '0'),
+      overlayTransform: pseudo.transform,
+      insetShadow: pseudo.boxShadow,
+      controlScale: scale,
+      iconColor: icon ? getComputedStyle(icon).color : '',
+    };
+  });
+  await capture(page, screenshotStem('icon-favorite-pressed', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme, route), captureType: 'icon-interaction', state: 'favorite-pressed', productTitle: original.id,
+  });
+  await page.mouse.up();
+  await page.waitForFunction(() => document.querySelector('#detailFavorite')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5000 });
+  const selected = await button.evaluate((node, key) => {
+    const path = node.querySelector('svg path');
+    let stored = [];
+    try { stored = JSON.parse(localStorage.getItem('sd-favorites') || '[]'); } catch {}
+    return {
+      pressed: node.getAttribute('aria-pressed'),
+      ariaLabel: node.getAttribute('aria-label'),
+      buttonColor: getComputedStyle(node).color,
+      fill: path ? getComputedStyle(path).fill : '',
+      stored: Array.isArray(stored) && stored.map(String).includes(String(key)),
+      toastVisible: Boolean(document.querySelector('#toast.show')),
+    };
+  }, original.id);
+  await capture(page, screenshotStem('icon-favorite-selected', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme, route), captureType: 'icon-interaction', state: 'favorite-selected', productTitle: original.id,
+  });
+  await button.click();
+  await page.waitForFunction(() => document.querySelector('#detailFavorite')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5000 });
+  const restored = await button.evaluate((node, key) => {
+    const path = node.querySelector('svg path');
+    let stored = [];
+    try { stored = JSON.parse(localStorage.getItem('sd-favorites') || '[]'); } catch {}
+    return {
+      pressed: node.getAttribute('aria-pressed'),
+      buttonColor: getComputedStyle(node).color,
+      fill: path ? getComputedStyle(path).fill : '',
+      stored: Array.isArray(stored) && stored.map(String).includes(String(key)),
+      toastVisible: Boolean(document.querySelector('#toast.show')),
+    };
+  }, original.id);
+  await capture(page, screenshotStem('icon-favorite-restored', viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme, route), captureType: 'icon-interaction', state: 'favorite-unselected', productTitle: original.id,
+  });
+  const expectedRestoredColor = theme === 'dark' ? 'rgb(234, 243, 251)' : 'rgb(20, 42, 60)';
+  const pass = original.pressed === 'false' && pressed.active
+    && pressed.overlayOpacity >= 0.99 && pressed.controlScale <= 0.971 && pressed.controlScale >= 0.969
+    && pressed.iconColor === 'rgb(92, 145, 185)'
+    && pressed.insetShadow.includes('20, 42, 60')
+    && selected.pressed === 'true' && selected.stored
+    && selected.buttonColor === 'rgb(229, 72, 77)' && selected.fill === 'rgb(229, 72, 77)'
+    && !selected.toastVisible
+    && restored.pressed === 'false' && !restored.stored
+    && restored.buttonColor === expectedRestoredColor && !restored.toastVisible
+    && !original.toastVisible;
+  audit.iconStateChecks.push({ context: label, status: pass ? 'PASS' : 'FAIL', route, result: { original, pressed, selected, restored } });
+  if (!pass) audit.hardFailures.push('Live icon press/favorite state mismatch at ' + label + '.');
+}
+
 async function captureProductDetailFlow(page, viewport, theme, label) {
   let cardButton = page.locator('#catalogGrid [data-open-product]').first();
   if (await cardButton.count().catch(() => 0) === 0) cardButton = page.locator('#featuredGrid [data-open-product]').first();
@@ -771,6 +862,8 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
   await captureLocator(page, '#productOverlay', screenshotStem('product-detail-modal-direct-open', viewport, theme) + '.png', {
     ...captureMeta(viewport, theme, directState.path), captureType: 'product-detail-modal', state: 'direct-open', productTitle: clicked.title,
   });
+
+  await captureIconFeedback(page, viewport, theme, label, directState.path);
 
   let galleryNextPassed = null;
   const next = page.locator('#detailNext');
@@ -936,6 +1029,8 @@ async function main() {
     firstPaintContextCount, requiredFirstPaintFrameCount, firstPaintFrameCounts,
     firstPaintCoverageComplete, firstPaintVideoCoverageComplete, firstPaintVideoCount: audit.videoCaptures.length,
     firstPaintViolationCount,
+    iconStateCheckCount: audit.iconStateChecks.length,
+    iconStateChecksComplete: audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS'),
   };
   audit.passed = audit.captureCompleted
     && completedViewportThemePairs === requiredViewportThemePairs
@@ -947,7 +1042,9 @@ async function main() {
     && audit.pageErrors.length === 0 && audit.consoleErrors.length === 0 && audit.httpErrors.length === 0
     && audit.failedRequests.length === 0 && audit.readOnlyViolations.length === 0
     && firstPaintCoverageComplete && firstPaintVideoCoverageComplete
-    && firstPaintViolationCount === 0 && audit.hardFailures.length === 0;
+    && firstPaintViolationCount === 0
+    && audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS')
+    && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
   audit.summary = {
     screenshotCount: audit.screenshots.length, viewportCount: audit.viewportAudits.length, routeCheckCount: audit.routeChecks.length,
@@ -955,6 +1052,7 @@ async function main() {
     pageErrorCount: audit.pageErrors.length, httpErrorCount: audit.httpErrors.length, failedRequestCount: audit.failedRequests.length,
     brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
     productDetailContextCount: audit.productDetailChecks.length, commerceStateCheckCount: audit.commerceStateChecks.length,
+    iconStateCheckCount: audit.iconStateChecks.length,
     firstPaintFrameCount: audit.firstPaintChecks.length, firstPaintViolationCount, firstPaintCoverageComplete,
     firstPaintVideoCount: audit.videoCaptures.length, firstPaintVideoCoverageComplete,
     blockedExternalRequestCount: audit.blockedExternalRequests.length,
