@@ -406,3 +406,11 @@ Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENC
 - Run #190 failed from test state leaking across viewports; retry SHA `0b9e8a2...` now navigates Products → Settings before each variant and passes. No app source/business code was changed.
 - Artifact `admin-preview-evidence-191` ID `12360041542`: 63 PNGs (16 login + 47 synthetic module fixtures), 39 fixture metrics, zero recorded errors/writes. This is not authenticated real-backend QA.
 - Overall progress 48%; QR/Settings fixture status PARTIAL; all-12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
+
+
+## Latest verified UI-safety checkpoint — 2026-10-21 16:18 UTC
+
+- Exact SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff`: [Validate Source #39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) PASS; [Admin Preview/Playwright #39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) SUCCESS.
+- Fixture tests now assert the unconfirmed-price/terms order cannot create a QR request or record a receipt. They also assert backup/restore UI exposes JSON export, JSON input and required-confirmation copy without invoking export or restore. Previously added QR unsaved-draft guard, reduced motion, editor Home/End keys and dialog focus tests all reran.
+- Artifact `admin-preview-evidence-192` ID `12360132558`: 63 PNGs (16 login + 47 synthetic UI fixture screens), 39 metrics, no recorded errors/writes. Fixture only; no authenticated real backend QA.
+- Status: Orders #7 PARTIAL; QR/payment #8 PARTIAL; Backup/settings #12 PARTIAL; full 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED/BLOCKED BY ACCESS. Progress 48%. Product image-save and PRE/PRO migrations remain deferred by owner.
