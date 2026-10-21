@@ -1,35 +1,34 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-21T17:47:00Z",
+  "updatedAt": "2026-10-22T01:58:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpoint": "28e94ef2d69527d3c81252f3d22d7e0f37b938a7",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Weighted management estimate; latest source and Preview checks pass, but full 12-screen reference parity and authenticated backend acceptance remain incomplete.",
+  "progressBasis": "Weighted management estimate; source/test SHA c18736b70d0035769408ce3190a6fb729ccd75fd passed Validate Source and Admin Preview/Playwright. Bounded product-list fixes are verified; 12-screen parity remains not accepted and authenticated backend QA is not tested.",
   "latestVerifiedApplicationTest": {
-    "sourceSha": "04889b6c6bc946483ea683e8345bac3b7cbf3838",
+    "sourceSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
     "validationRun": {
-      "id": 39646606076,
+      "id": 39656347891,
       "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606076"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891"
     },
     "previewPlaywrightRun": {
-      "id": 39646606242,
+      "id": 39656348109,
       "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606242"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109"
     },
-    "browserSuite": "responsive/theme screenshot matrix passed",
+    "browserSuite": "Responsive/theme screenshot matrix PASS; 64 PNGs and 40 synthetic/read-only fixture metrics; no authenticated business backend QA.",
     "checks": {
       "npmRunCheck": "PASS",
       "npmTest": "PASS",
       "responsiveThemeMatrix": "PASS",
       "previewLoginCssSignature": "PASS"
     },
-    "regressionNote": "Fixed false-negative custom switch assertion: wrapper visibility plus checked state; prior run 39646221204 failed at screenshot matrix step 9, rerun passed.",
     "acceptance": {
       "twelveScreenVisualParity": "NOT_ACCEPTED",
-      "authenticatedBusinessQA": "NOT_TESTED",
+      "authenticatedBusinessQA": "NOT_TESTED_BLOCKED_BY_ACCESS",
       "productImageSaveR2": "DEFERRED_BY_OWNER",
       "preProMigrations": "DEFERRED_BY_OWNER"
     }
@@ -61,22 +60,18 @@
   },
   "currentCi": [
     {
-      "id": 39634631503,
-      "sha": "7fd3976c858b8462b343d2fe53e3ccd8807b4c20",
-      "status": "in_progress",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39634631503"
+      "id": 39656347891,
+      "sha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891"
     },
     {
-      "id": 39634539722,
-      "sha": "09be7bf2b42c4f074e097464b715f0fe27383c7f",
-      "status": "in_progress",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39634539722"
-    },
-    {
-      "id": 39634523483,
-      "sha": "7473f9629ae7d14f65e6bd870b251b7e6494b6e4",
-      "status": "in_progress",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39634523483"
+      "id": 39656348109,
+      "sha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109"
     }
   ],
   "updatedHandoffFiles": [
@@ -89,10 +84,10 @@
     "docs/admin-ui-reference/handoff/current-status.json"
   ],
   "nextActions": [
-    "Poll Validate Source for the latest handoff commit and verify no documentation JSON/Markdown regression.",
-    "Re-fetch branch head and PR/workflow state before the next code edit.",
-    "Continue actual 12-screen reference comparison and bounded read-only E2E work; do not claim acceptance from fixture screenshots alone.",
-    "Update handoff docs and progress only after evidence is verified."
+    "Re-fetch branch HEAD, PR state and exact-SHA Actions before source edits.",
+    "Inspect screenshots against reference at 390x844 and 1280x800 in light and dark themes.",
+    "Continue substantive 12-screen parity work; screenshot count alone is not acceptance.",
+    "Update all handoff docs and prompt after each verified cycle."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
