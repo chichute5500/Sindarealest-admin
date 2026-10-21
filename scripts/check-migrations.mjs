@@ -96,6 +96,31 @@ try {
   run(["d1", "execute", databaseName, "--local", "--config", configPath,
     "--command", "SELECT sku_verified FROM order_items LIMIT 0;"],
     "Verify order-item SKU snapshot column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT fulfillment_type FROM products LIMIT 0;"],
+    "Verify product fulfillment type column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT fulfillment_type FROM order_items LIMIT 0;"],
+    "Verify order-item fulfillment snapshot column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT payment_terms_confirmed_at, public_access_token_hash FROM orders LIMIT 0;"],
+    "Verify order payment confirmation and scoped access fields");
+  const fulfillmentCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
+    "--command", "SELECT COUNT(*) AS unclassified_seed_count FROM products WHERE fulfillment_type='unclassified';"],
+    "Verify historical product types remain unclassified");
+  const fulfillmentCountPayload = parseCliJson(fulfillmentCountResult.stdout, "kết quả kiểm tra loại hàng seed chưa phân loại");
+  const findUnclassifiedCount = (value) => {
+    if (Array.isArray(value)) { for (const item of value) { const found = findUnclassifiedCount(item); if (found !== null) return found; } }
+    else if (value && typeof value === "object") {
+      if (Object.hasOwn(value, "unclassified_seed_count")) {
+        const count = Number(value.unclassified_seed_count);
+        return Number.isSafeInteger(count) && count >= 0 ? count : null;
+      }
+      for (const item of Object.values(value)) { const found = findUnclassifiedCount(item); if (found !== null) return found; }
+    }
+    return null;
+  };
+  if (findUnclassifiedCount(fulfillmentCountPayload) !== 235) throw new Error("Migration 0009 must leave all 235 historical products unclassified until a human reviews them.");
   const skuCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
     "--command", "SELECT COUNT(*) AS unverified_seed_count FROM products WHERE sku_verified=0;"],
     "Verify existing seed SKUs default to unverified");
@@ -112,7 +137,7 @@ try {
     return null;
   };
   if (findUnverifiedCount(skuCountPayload) !== 235) throw new Error("Migration 0008 must conservatively mark all 235 generated seed identifiers as unverified.");
-  console.log("PASS: all D1 migrations apply locally; 0007 backfills historic order contacts; migration 0008 keeps the 235 seed codes unverified.");
+  console.log("PASS: temporary local D1 migrations; 0007 backfills historic order contacts; 0008 keeps seed SKUs unverified; 0009 leaves historical fulfillment unclassified and adds payment-ledger fields.");
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
