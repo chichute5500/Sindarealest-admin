@@ -103,6 +103,16 @@
 7. Restrict all changes to `fix/liquid-glass-audit-2026-10-19`. No merge, no production deployment, no backend/API/database/schema/data changes.
 
 
+## Ảnh tham chiếu chính thức của bộ icon — 2026-10-22
+
+- `docs/icon-assets/Icon.png`: ảnh icon gốc người dùng tải lên. Đây là nguồn ưu tiên cho hình dáng, nét vẽ, tỷ lệ, màu sắc và các trạng thái gốc.
+- `docs/icon-assets/Chitiet.png`: bảng tham chiếu chi tiết cho phong cách Liquid Glass, trạng thái nhấn/yêu thích/giỏ hàng và storyboard fly-to-cart.
+- Phải mở và xem cả hai ảnh thực tế trước khi triển khai; không suy đoán chỉ từ tên file hoặc README.
+- Khi có khác biệt: `Icon.png` quyết định hình học icon; `Chitiet.png` bổ sung hành vi/hiệu ứng. Ảnh chi tiết không cấp phép tự ý thay thiết kế gốc.
+- Palette đã xác nhận: nền sáng `#eaf3fb`, nét/chữ chính `#142a3c`, màu nhấn `#5c91b9`.
+- Trái tim khi thích phải chuyển đỏ, nhưng mã HEX đỏ riêng chưa được chốt. Opacity, blur, refraction, viền sáng và shadow cũng chưa khóa bằng trị số; không trình bày chúng như token đã được người dùng duyệt.
+- Các ảnh là tài liệu thiết kế, không tự động là asset được website tải/runtime sử dụng. Đặc tả không đồng nghĩa đã triển khai hoặc test PASS.
+
 ## Bổ sung yêu cầu tương tác đã chốt — 2026-10-22
 
 Đây là phần mở rộng đặc tả; không khẳng định đã triển khai trong source.
