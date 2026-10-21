@@ -23,20 +23,14 @@ const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "f
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the dynamic Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSync.includes("const wantedSku='SD-GL052'"),
-  "the Hero image must target the specifically requested SD-GL052 SKU");
-assert.ok(heroSync.includes("products.find(p=>String(p&&p.sku||'').trim().toUpperCase()===wantedSku)"),
-  "the Hero image must be resolved from that exact SKU in the API product list");
-assert.ok(heroSync.includes("const image=allImages(product)[0]||product.image||''"),
-  "the Hero must use an image belonging to the selected SD-GL052 product");
-assert.doesNotMatch(heroSync, /catalogGrid|featuredGrid/,
-  "the Hero must not silently fall back to a different product image");
-assert.ok(heroSync.includes("target.hidden=true;target.dataset.productImageStatus='sku-not-found'"),
-  "a missing target SKU must fail closed instead of showing an unrelated product");
-assert.ok(heroSync.includes("target.hidden=true;target.dataset.productImageStatus='image-missing'"),
-  "a target SKU without an image must be distinguished from a missing SKU");
-assert.ok(heroSync.includes("target.src=url;target.dataset.sourceProductImage='true';target.dataset.productImageStatus='ready'"),
-  "the Hero image source must update only from the matched SKU");
+assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261021-hero-upload'"),
+  "the Hero image must use the owner-uploaded static asset");
+assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-supplied'"),
+  "the Hero must mark the image as owner-supplied");
+assert.doesNotMatch(heroSync, /products\.find|wantedSku|sku-not-found|image-missing|catalogGrid|featuredGrid/,
+  "the Hero must not depend on API SKU discovery or substitute an unrelated product");
+assert.ok(heroSync.includes("target.src=url"),
+  "the Hero image source must be set to the owner-supplied asset");
 
 const helperStart = html.indexOf("const escapeHtml=");
 const helperEnd = html.indexOf("function showToast(", helperStart);
