@@ -725,3 +725,11 @@ Current HEAD at this update: `9c1046ca184ec7bf1cd53ebcf53173167a6925de` (handoff
 - The one dashboard revenue panel now shows a truthful no-data state, no fabricated values, and no duplicate static ID. The screenshots are fixture/diagnostic evidence only and do not prove authenticated real-backend QA.
 - More than one agent may be updating this same branch in parallel. Before any further write, fetch the latest branch contents and exact file SHA; do not overwrite unseen newer edits. Current handoff commits are moving beyond the tested SHA, so inspect the latest Actions run and validate the newest HEAD before saying the branch is green.
 - Progress remains **48%**. Continue with the all-12-screen visual matrix, accessible real backend read-only checks where authorized, and real product image upload/save plus PRE/PRO migration verification only within existing safety restrictions. Keep PR #111/#108 unmerged; no Production deploy, Access/secrets changes, D1/R2 operations or migration execution.
+
+
+### Verified checkpoint — dashboard revenue empty state
+
+- Validation run [#39624818256](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818256) PASS on exact source/test SHA `06d689b6a97fa7bdb05258acb8435a6954d67309`, including focused guard `admin-dashboard-revenue-empty-state: PASS`.
+- Preview screenshot/diagnostic run [#39624818216](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39624818216) PASS. Artifact `admin-preview-evidence-173` (ID `12356875897`) reviewed at 390×844 and 1280×800; panel is compact and the empty-state disclosure is visible. Diagnostic result `PASS_LOGIN_CSS_SIGNATURE` is not authenticated backend QA.
+- One transient focused-test failure on SHA `a250be98f03e8006ce102044884f0fb2b6b2f96d` was caused by stale wording (“suy diễn” vs current “ước đoán”); corrected in `06d689b6a97fa7bdb05258acb8435a6954d67309`, then full validation passed.
+- Do not fabricate revenue figures or sum the capped latest 1,000 orders as full history. Next priorities remain 12-screen visual parity, authenticated business-flow QA, and owner-deferred image-save PRE/PRO verification when explicitly reauthorized. Keep progress at 48% until a larger acceptance criterion closes.
