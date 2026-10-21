@@ -257,11 +257,13 @@ assert.match(satinHeroVisibility, /rgba\(237,247,255,\.90\) 0%,rgba\(237,247,255
 assert.match(satinHeroVisibility, /rgba\(4,20,34,\.80\) 0%,rgba\(4,20,34,\.70\) 28%,rgba\(4,20,34,\.52\) 48%,rgba\(4,20,34,\.34\) 66%,rgba\(4,20,34,\.14\) 84%/,
   'Dark mobile hero veil must keep copy readable where the product image overlaps while revealing satin and the full product toward the right.');
 
-// The supplied hero asset contains a studio tabletop; blend only the desktop image's lower edge into the satin canvas.
-const desktopHeroEdgeBlend = html.slice(html.lastIndexOf('/* sd-hero-desktop-floor-blend-2026-10-22 */'));
-assert.match(desktopHeroEdgeBlend, /@media\(min-width:761px\)[\\s\\S]*#home \\.hero-visual::after[\\s\\S]*linear-gradient\(180deg,rgba\(237,247,255,0\) 48%,rgba\(237,247,255,\\.04\) 56%,rgba\(237,247,255,\\.16\) 64%,rgba\(237,247,255,\\.34\) 74%,rgba\(237,247,255,\\.58\) 88%,rgba\(237,247,255,\\.76\) 100%/,
+// The supplied hero asset contains a studio tabletop; blend the desktop image's lower edge into the satin canvas.
+const desktopHeroEdgeBlend = html.slice(html.indexOf('/* sd-hero-desktop-floor-blend-2026-10-22:'));
+assert.ok(desktopHeroEdgeBlend.includes('@media(min-width:761px)'), 'The photo-edge fade must be restricted to desktop.');
+assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual::after'), 'The photo-edge fade must not replace or mutate the supplied image asset.');
+assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(237,247,255,0) 48%,rgba(237,247,255,.04) 56%,rgba(237,247,255,.16) 64%,rgba(237,247,255,.34) 74%,rgba(237,247,255,.58) 88%,rgba(237,247,255,.76) 100%)'),
   'Light desktop hero must fade the source photo tabletop into satin without replacing the owner-supplied image.');
-assert.match(desktopHeroEdgeBlend, /html\\.dark #home \\.hero-visual::after[\\s\\S]*linear-gradient\(180deg,rgba\(4,20,34,0\) 48%,rgba\(4,20,34,\\.05\) 56%,rgba\(4,20,34,\\.18\) 64%,rgba\(4,20,34,\\.40\) 74%,rgba\(4,20,34,\\.68\) 88%,rgba\(4,20,34,\\.84\) 100%/,
+assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(4,20,34,0) 48%,rgba(4,20,34,.05) 56%,rgba(4,20,34,.18) 64%,rgba(4,20,34,.40) 74%,rgba(4,20,34,.68) 88%,rgba(4,20,34,.84) 100%)'),
   'Dark desktop hero must fade the source photo tabletop into the navy satin canvas.');
-assert.match(desktopHeroEdgeBlend, /@media\\(min-width:761px\\)[\\s\\S]*#home \\.hero-visual-caption\\{position:absolute;z-index:3\\}/,
+assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual-caption{position:absolute;z-index:3}'),
   'The hero caption must remain above the photo edge blend.');
