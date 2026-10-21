@@ -714,7 +714,10 @@
     "Configured ADMIN_TEST_URL serves a UI/CSS signature different from the tested ADMIN source; intended Preview URL/deployment identity remains unconfirmed.",
     "Complete visual comparison against all 12 approved reference screens remains incomplete.",
     "Full PR #111 diff/scope audit remains incomplete; latest PR metadata reported a broad 909-file diff against main.",
-    "Local screenshot/fixture evidence is not proof that real authenticated backend modules work."
+    "Local screenshot/fixture evidence is not proof that real authenticated backend modules work.",
+    "PR #111 is 909 files (+30195/-356), diverged 393 commits ahead and 6 behind main; includes storefront, backend, migration, data and scripts. Keep unmerged pending complete scope/ancestry audit.",
+    "Workflow reporting changes after run #39495162150 have not been tested on the current HEAD.",
+    "Remote Preview CSS signature mismatch and intended deployment identity remain unresolved."
   ],
   "blockedItems": [
     "Remote authenticated Playwright testing is blocked by ADMIN_TEST_URL pointing to a source/layout that does not match the tested Admin source; update secret to a valid Admin Preview URL and provide valid access if Cloudflare Access protects it.",
@@ -895,7 +898,7 @@
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
-  "updatedAt": "2026-10-21T04:07:00.788Z",
+  "updatedAt": "2026-10-21T04:13:24.949Z",
   "currentBranchHeadAtHandoff": "cdec188efa2198caaf0ac65cd294b682d1088fc9",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": true,
@@ -952,5 +955,49 @@
       "productionDeployment": "NOT_PERFORMED"
     }
   },
-  "progressPercent": 43
+  "progressPercent": 43,
+  "prScopeAudit": {
+    "auditedAt": "2026-10-21",
+    "prNumber": 111,
+    "state": "OPEN_UNMERGED",
+    "base": "main",
+    "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "headSha": "bb320c7f928fbee888df5f641e3f27fe27ca3253",
+    "changedFiles": 909,
+    "additions": 30195,
+    "deletions": 356,
+    "compare": {
+      "status": "diverged",
+      "aheadBy": 393,
+      "behindBy": 6,
+      "comparedFileStats": 300
+    },
+    "inventory": {
+      "docs": 862,
+      "adminEntry": "public/admin/index.html",
+      "storefront": "public/index.html",
+      "functions": 14,
+      "migrations": 1,
+      "dataFiles": 1,
+      "workflows": 2,
+      "scripts": 5,
+      "tests": 20,
+      "packageJson": 1
+    },
+    "conclusion": "NOT_ADMIN_ONLY_DIFF; DO_NOT_MERGE",
+    "nextAudit": [
+      "public/index.html",
+      "data/legacy-products.json",
+      "functions/",
+      "migrations/0008_product_sku_verification.sql",
+      "scripts/"
+    ],
+    "caution": "Do not mass-revert; map commit ancestry and preserve user work before any scope remediation."
+  },
+  "latestWorkflowFixValidation": {
+    "workflowBlob": "3f04b295dc1cf212be4ace76293228c69fd5860e",
+    "currentHead": "bb320c7f928fbee888df5f641e3f27fe27ca3253",
+    "validation": "NOT_YET_RUN",
+    "reason": "No PR-triggered workflow run found for current HEAD; do not infer pass from older run."
+  }
 }
