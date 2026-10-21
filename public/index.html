@@ -2586,18 +2586,19 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
 /* Compact populated carts on phones; preserve the empty-cart state and checkout scrolling. */
 @media(max-width:760px){
   .cart-drawer:has(.cart-row){
-    height:auto!important;
+    height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
     bottom:auto!important;
     min-height:0!important;
     max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
     overflow:hidden!important;
   }
   .cart-drawer:has(.cart-row) .cart-list{
-    flex:0 1 auto!important;
-    max-height:40dvh;
+    flex:1 1 auto!important;
+    max-height:none;
     min-height:0!important;
     overflow-y:auto!important;
   }
+  .cart-drawer:has(.cart-row) .cart-bottom{margin-top:auto}
 }
 
 
