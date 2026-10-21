@@ -1,51 +1,38 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-21T16:25:00Z",
+  "updatedAt": "2026-10-21T17:47:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "7fd3976c858b8462b343d2fe53e3ccd8807b4c20",
+  "branchHeadAtCheckpoint": "28e94ef2d69527d3c81252f3d22d7e0f37b938a7",
   "branchHeadIsTestedSource": false,
-  "progressPercent": 48,
-  "progressBasis": "Management estimate only; full 12-screen reference parity and authenticated backend acceptance are incomplete.",
+  "progressPercent": 50,
+  "progressBasis": "Weighted management estimate; latest source and Preview checks pass, but full 12-screen reference parity and authenticated backend acceptance remain incomplete.",
   "latestVerifiedApplicationTest": {
-    "sourceSha": "4e660a0869dd21d4a688d72823bd08b1795cf2ff",
+    "sourceSha": "04889b6c6bc946483ea683e8345bac3b7cbf3838",
     "validationRun": {
-      "id": 39633278598,
+      "id": 39646606076,
       "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606076"
     },
     "previewPlaywrightRun": {
-      "id": 39633278359,
+      "id": 39646606242,
       "conclusion": "success",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606242"
     },
-    "browserSuite": "3 passed (25.5s)",
+    "browserSuite": "responsive/theme screenshot matrix passed",
     "checks": {
       "npmRunCheck": "PASS",
       "npmTest": "PASS",
       "responsiveThemeMatrix": "PASS",
       "previewLoginCssSignature": "PASS"
     },
-    "artifact": {
-      "name": "admin-preview-evidence-192",
-      "id": 12360132558,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359/artifacts/12360132558",
-      "pngCount": 63,
-      "loginShellPngCount": 16,
-      "syntheticFixturePngCount": 47,
-      "metricsCount": 39,
-      "recordedBrowserConsoleNetworkHttpErrors": 0,
-      "attemptedWrites": 0,
-      "unexpectedApiPaths": 0
-    },
-    "fixtureChecks": {
-      "qrUnsavedDraftActivationGuard": "PASS",
-      "orderPaymentRequestDisabledUntilPriceAndTermsConfirmed": "PASS",
-      "recordPaymentDisabledUntilPriceAndTermsConfirmed": "PASS",
-      "backupJsonExportAndRestoreControlsVisible": "PASS",
-      "backupRestoreActionsInvoked": false
-    },
-    "scope": "Synthetic/read-only fixture evidence only; no authenticated real backend or payment/backup/restore operation."
+    "regressionNote": "Fixed false-negative custom switch assertion: wrapper visibility plus checked state; prior run 39646221204 failed at screenshot matrix step 9, rerun passed.",
+    "acceptance": {
+      "twelveScreenVisualParity": "NOT_ACCEPTED",
+      "authenticatedBusinessQA": "NOT_TESTED",
+      "productImageSaveR2": "DEFERRED_BY_OWNER",
+      "preProMigrations": "DEFERRED_BY_OWNER"
+    }
   },
   "acceptance": {
     "twelveScreenVisualParity": "NOT_ACCEPTED",

@@ -1,3 +1,12 @@
+## Newest verified cycle — custom publication switch test fix (2026-10-21 17:47 UTC)
+
+- Exact source/test SHA `04889b6c6bc946483ea683e8345bac3b7cbf3838`; Validate Source #39646606076 PASS; Admin Preview/Playwright #39646606242 SUCCESS.
+- Fixed false-negative test for the custom publication switch by asserting visible wrapper and checked checkbox state. Previous Preview run #39646221204 failed at responsive/theme screenshot step 9; the rerun passed the full matrix.
+- Handoff files refreshed in the following docs-only commit. Current progress remains 50%; this is a test fix, not screen acceptance. 12-screen visual parity NOT ACCEPTED; authenticated business QA NOT TESTED; image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- PR #111 remains OPEN/UNMERGED. Continue on ADMIN branch only; no Production deployment, secrets/Access changes, remote D1/R2, migration, or TinyFish.
+
+---
+
 ## Newest verified cycle — product published-status filter (2026-10-21 17:34 UTC)
 
 - Exact source/test SHA `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`; Validate Source #39644786469 PASS; Admin Preview/Playwright #39644786736 SUCCESS. Browser tests 3 passed (31.3s); configured Preview login/dashboard smoke 2 passed (3.3s); CSS signature PASS.

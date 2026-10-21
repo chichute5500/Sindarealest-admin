@@ -2,7 +2,13 @@
 
 Updated: 2026-10-21 (ICT)  
 Branch: `feature/admin-isolated-handoff-2026-10-20`  
-Overall Admin progress: **48%** — unchanged until evidence supports a meaningful increase.
+Overall Admin progress: **50%** — weighted management estimate; unchanged after this test-only correction.
+
+## Latest verification checkpoint — 2026-10-21 17:47 UTC
+
+- Exact source/test SHA: `04889b6c6bc946483ea683e8345bac3b7cbf3838`; Validate Source [#39646606076](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606076) PASS and Admin Preview diagnostic [#39646606242](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606242) SUCCESS.
+- Corrected a false-negative assertion for the custom “Hiển thị sản phẩm” switch: assert the visible `label.switch:has(#pPublished)` wrapper and checked checkbox state. Prior run #39646221204 failed only at screenshot-matrix step 9; the new run passes.
+- This test correction does not accept any new screen family. The 12-screen matrix below remains PARTIAL/NOT TESTED as individually recorded; authenticated business QA remains BLOCKED/NOT TESTED.
 
 ## Evidence rules
 
