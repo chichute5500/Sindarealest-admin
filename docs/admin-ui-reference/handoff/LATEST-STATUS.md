@@ -11,23 +11,15 @@
 **Chưa nghiệm thu:** visual parity đủ 12 nhóm màn hình; authenticated real-backend/business QA. **Tạm hoãn theo yêu cầu chủ sở hữu:** product image-save/actual R2 storage và PRE/PRO migration (`DEFERRED_BY_OWNER / NOT VERIFIED`).
 **Giới hạn runtime:** không có local checkout trong phiên này, nên local `git status` là **NOT VERIFIED**. GitHub branch/PR/Actions đã được kiểm tra trực tiếp.
 **Rào chắn:** chỉ ADMIN branch; không sửa `main`/website tĩnh; không merge/cherry-pick/force-push; không Production deploy; không chạy setup/migration; không sửa secrets/Cloudflare Access hoặc bypass; không thao tác D1/R2 từ xa; không dùng TinyFish.
+
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 32c1f28662e7240353b0eda2f5daeaf22359257e
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169
+- Tested commit: 446a75a4100b03278a92f7e4f34be40004a5c55d
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39631879451
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 59 real PNGs captured in artifact admin-preview-evidence-189 (not committed to Git).
+- Local source Playwright matrix: FAILURE; 52 real PNGs captured in artifact admin-preview-evidence-190 (not committed to Git).
 - Deployed Preview: success.
-- Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 36.
+- Source screenshot matrix: 52 real PNGs; login shell: 16; read-only fixture module screens: 36; fixture metrics: 28.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-
-## Latest exact-SHA keyboard navigation cycle — 2026-10-21 16:00 UTC
-
-- Test-only change: `tests/e2e/admin-static-baseline.spec.js`, commit `32c1f28662e7240353b0eda2f5daeaf22359257e`. Added assertions for product editor tab keyboard `Home`/`End` movement and selected-state synchronization, preserving the existing ArrowLeft/ArrowRight tests.
-- Validate Source [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) **SUCCESS** and Admin Preview/Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) **SUCCESS** on exact SHA. Playwright static baseline: `3 passed (30.5s)`; Preview login CSS signature PASS.
-- Artifact `admin-preview-evidence-189` (ID `12359007200`, 11,188,262 bytes, expires 2026-11-04) includes 59 PNGs (16 login + 43 synthetic/read-only module fixtures), 36 metrics, and metadata. Recorded browser/console/request/HTTP errors are zero; attempted fixture writes and unexpected API paths are empty. This does not establish real authenticated backend behavior.
-- The handoff JSON has been refreshed to point to this exact tested SHA; the next docs-only commits advance branch HEAD. Recheck live refs after this update. PR #111/#108 remain OPEN/unmerged; #111 remains mixed-scope/not merge-ready.
-- Progress stays 48%. 12-screen parity NOT ACCEPTED; authenticated backend QA BLOCKED / NOT TESTED; image-save and PRE/PRO migrations DEFERRED_BY_OWNER.
