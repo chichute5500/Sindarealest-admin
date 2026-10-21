@@ -579,7 +579,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await page.locator('[data-action="edit"]:visible').first().click();
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
-    await page.locator('.editorcontent').evaluate(el => { el.scrollTop = 0; });
+    await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = 0; });
   };
 
   try {
@@ -597,7 +597,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     for (const variant of variants) {
       await openEditor(variant);
       await saveScreenshot('product-editor', variant, { dialog: true });
-      await page.locator('.editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
+      await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
       // Exercise local object-URL thumbnails with synthetic images only; do not save the product.
       await page.locator('#imageInput').setInputFiles([
         {
