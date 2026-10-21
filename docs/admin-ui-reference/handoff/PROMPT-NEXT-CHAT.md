@@ -176,3 +176,14 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 3. To make the remote Preview test pass, the owner must eventually provide an authorized Preview URL built from the current ADMIN branch, or explicitly authorize a dedicated preview-only deployment after confirming Preview D1/R2 bindings are isolated. This repository's checked-in `deploy.yml` sets `CLOUDFLARE_PAGES_BRANCH=main` and its deploy path must not be run to fix Preview.
 4. Keep authenticated live backend workflows as NOT TESTED until current-source Preview access and a safe synthetic-data/PII-masking strategy exist. Do not access or modify real business data.
 5. Keep PR #111 and #108 OPEN/unmerged; do not edit `main` or `fix/liquid-glass-audit-2026-10-19`; no Production deploy, migration, D1/R2 action, or secret change.
+
+
+## Latest PR scope audit — 2026-10-21 12:21 +07
+
+- PR #111 currently targets `main`, remains OPEN/unmerged, and the live PR API reports **970 changed files (+32,282/−356; 415 commits)**.
+- A paginated GitHub Pull Request Files API read retrieved all 970 entries: **854 screenshot PNGs**, **70 other docs/notes**, and **46 non-documentation files**. Those 46 include 20 tests, 14 backend Functions, 5 scripts, 2 workflows, one migration, `public/index.html`, `public/admin/index.html`, `data/legacy-products.json`, and `package.json`.
+- This is not an ADMIN-only diff. The public storefront HTML and seed product data are changed along with backend/API/migration/setup scripts. Keep PR #111 unmerged. Do not reset/rewrite/force-push, cherry-pick, change the PR base, or delete screenshot history without explicit owner approval.
+- Migration audit remains static/read-only: `0008_product_sku_verification.sql` adds `sku_verified` to `products` and `order_items`; handlers use these columns. `scripts/setup-cloudflare.mjs` can run remote D1 executes and direct `ALTER TABLE`; it was not executed. Remote D1/migration ledger remain NOT VERIFIED.
+- Latest source checks remain PASS on exact source/test commit `6935eefa3473f1c6a15da08a34389d7223cbd0ea`; deployed Preview check remains FAIL on run `39548605474` because `hasLoginHideRule=false` while selector support/match are true.
+- Handoff files latest versions: `LATEST-STATUS.md`, `latest-test-results.json`, `PROMPT-NEXT-CHAT.md`; verify current branch HEAD/PR state before changing these because every handoff commit advances HEAD.
+- Progress estimate remains **45%**, not completion. Safe next work: continue review of source/reference and public/backend diff risk, keeping all writes on this ADMIN branch only. User/owner action is still needed to provide a valid current-source Admin Preview URL (or authorize a verified preview-only deployment), and to decide how to safely resolve PR #111 scope contamination before merging.
