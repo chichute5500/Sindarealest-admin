@@ -68,3 +68,11 @@ For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file 
 - Still not accepted: all-12-screen visual parity. The approved product-image screen has a horizontal thumbnail rail and richer image-status controls that the current grid/card layout does not yet match. Continue this comparison rather than marking visual completion from passing CSS tests.
 - Authenticated backend QA remains NOT TESTED. Real product image upload/save and PRE/PRO migrations remain DEFERRED_BY_OWNER / NOT VERIFIED. QR/payment source audit is source-only; the public static consumer gap remains the static branch's responsibility. Deployment scripts' migration-0009 coverage risk is documented; do not execute setup/deploy/migration scripts or perform remote D1/R2 operations.
 - PR #111 remains OPEN/UNMERGED and mixed-scope (1,112 changed paths); PR #108 remains OPEN/UNMERGED (269). Progress remains 48%. Only ADMIN branch; no merge, Production deploy, main/static branch edits, secrets/Access changes/bypass, remote D1/R2 operations, or TinyFish.
+
+
+## Accessibility verification update — 2026-10-21
+
+- Reduced-motion E2E is now browser-verified on source/test SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e`, run [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142). The test emulates `prefers-reduced-motion: reduce`, serves synthetic GET-only fixtures, rejects all mutation requests and checks selected interactive layers' transition/animation durations and scroll behavior.
+- A prior failure was traced to Playwright selectors that incorrectly assumed dashboard elements were nested under `#main`; the rendered source injects these elements into `#appView`. Test selectors were corrected and the exact-SHA browser suite passed. No app CSS/business code was changed for that fix.
+- This is a focused accessibility audit, not full visual acceptance. Continue measuring keyboard/focus behavior, target sizes, theme contrast, reduced-motion across additional modules, and reference parity separately. Do not label all 12 screen families PASS based on this one E2E test.
+- Current acceptance remains: 12-screen parity NOT ACCEPTED; authenticated real backend NOT TESTED/BLOCKED BY ACCESS; image-save and PRE/PRO migration DEFERRED_BY_OWNER. Overall progress remains 48%.
