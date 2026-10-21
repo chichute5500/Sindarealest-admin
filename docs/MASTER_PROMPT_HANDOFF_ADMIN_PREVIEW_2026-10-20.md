@@ -74,3 +74,14 @@ Chỉ được báo hoàn tất khi tất cả đều có bằng chứng:
 - Không bao giờ nói “100% hoàn tất” nếu còn một tiêu chí chưa đạt.
 
 Bắt đầu ngay bằng việc đọc file tiến độ, kiểm tra trạng thái PR/Actions mới nhất, sau đó tiếp tục sửa cho đến khi đạt các tiêu chí. Không chỉ đưa ra kế hoạch rồi dừng.
+
+
+---
+
+## BỔ SUNG PHẠM VI ĐƯỢC CHỦ DỰ ÁN DUYỆT — 2026-10-21
+
+Có yêu cầu mới cho hai nhánh riêng: (1) phân loại sản phẩm Hàng có sẵn / Hàng đặt riêng; (2) thanh toán chuyển khoản bằng QR, ưu tiên QR theo đơn hàng nhưng không tích hợp cổng thanh toán. Hợp đồng tích hợp chung nằm tại `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`.
+
+Trên nhánh website tĩnh, chỉ triển khai giao diện khách hàng và dùng dữ liệu/API thực tế. Không giả lập API, không tự đánh dấu thanh toán thành công, không yêu cầu trả tiền trước khi giá/điều kiện được xác nhận. QR cố định từ ảnh chủ dự án cung cấp chỉ là phương án dự phòng sau khi xác minh mã và thông tin nhận tiền.
+
+Giữ nguyên ranh giới: chỉ nhánh `fix/liquid-glass-audit-2026-10-19`, PR #108; không sửa Admin branch, không sửa main, không merge PR #108/#111, không deploy Production. Contract chưa có nghĩa là tính năng đã được triển khai. Đối chiếu code/contract API và cập nhật báo cáo tiến độ trước khi tuyên bố hoàn thành.

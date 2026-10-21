@@ -118,3 +118,20 @@ Bạn tiếp quản trực tiếp công việc **SinDarealest2 Admin Preview & L
 10. Không merge PR, không sửa main, không deploy Production. Không yêu cầu người dùng cung cấp secrets. Chỉ dừng để hỏi người dùng nếu cần ảnh tham chiếu không còn truy cập được hoặc cần quyết định thiết kế/phạm vi không thể suy ra an toàn.
 
 Hãy tiếp tục thực thi ngay, báo cáo ngắn gọn theo bằng chứng và chỉ yêu cầu người dùng thao tác khi thực sự không thể tự làm tiếp.
+
+
+---
+
+## Ghi nhận yêu cầu tích hợp mới — 2026-10-21
+
+**Branch baseline đã xác minh trước cập nhật tài liệu:** `114377d3785c1f20110f5974bdffd13977e9a652`; PR #108 OPEN/unmerged. Đây là mốc trước thay đổi tài liệu tích hợp, không phải test result mới.
+
+Chủ dự án đã duyệt bổ sung yêu cầu:
+- nhãn và bộ lọc Hàng có sẵn / Hàng đặt riêng;
+- UI chuyển khoản bằng QR, ưu tiên dữ liệu QR riêng theo đơn; không có cổng thanh toán/auto-confirm.
+
+Hợp đồng chung: [docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md](integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md) (đường dẫn tương đối từ thư mục docs). Tài liệu quy định ranh giới nhánh, enum đề xuất, dependency API và tiêu chí nghiệm thu.
+
+**Trạng thái yêu cầu mới:** SPECIFIED; IMPLEMENTATION NOT YET VERIFIED. Chưa chạy test riêng cho tính năng mới, chưa kiểm tra mã QR người dùng cung cấp bằng ứng dụng ngân hàng, chưa xác minh cấu hình nhận tiền. Không tuyên bố QR hoạt động cho đến khi kiểm tra payload/ngân hàng và test phù hợp.
+
+Tiếp tục riêng trên nhánh website tĩnh. Không sửa Admin branch/main, không merge PR, không Production deploy. Do push tài liệu có thể kích hoạt workflow Preview tự động của nhánh này, chỉ cho phép Preview có điều kiện theo workflow hiện có; không được đổi target sang Production.
