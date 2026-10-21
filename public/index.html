@@ -2528,35 +2528,46 @@ html.dark .product-photo img{mix-blend-mode:normal}
 
 
 /* 2026-10-21 visual refinement: six benefit tiles stay readable while preserving the satin beneath the glass. */
+.service-strip.glass{
+  background:rgba(244,250,255,.24);
+  border-color:rgba(255,255,255,.54);
+  box-shadow:0 12px 30px rgba(38,82,116,.08),inset 0 1px 0 rgba(255,255,255,.38);
+  backdrop-filter:blur(18px) saturate(135%);
+  -webkit-backdrop-filter:blur(18px) saturate(135%);
+}
+html.dark .service-strip.glass{
+  background:rgba(5,22,38,.36);
+  border-color:rgba(177,214,239,.32);
+  box-shadow:0 12px 30px rgba(0,0,0,.20),inset 0 1px 0 rgba(228,243,255,.14);
+}
 .service-strip .service-copy{
   min-height:78px;padding:10px 8px;gap:7px;
-  background:linear-gradient(145deg,rgba(255,255,255,.78) 0%,rgba(236,246,255,.64) 52%,rgba(216,234,249,.54) 100%);
-  border-color:rgba(255,255,255,.84);
-  box-shadow:0 7px 20px rgba(37,72,98,.11),inset 0 1px 0 rgba(255,255,255,.88),inset 0 -1px 0 rgba(68,112,144,.07);
+  background:linear-gradient(145deg,rgba(255,255,255,.62) 0%,rgba(236,246,255,.48) 52%,rgba(216,234,249,.38) 100%);
+  border-color:rgba(255,255,255,.66);
+  box-shadow:0 7px 20px rgba(37,72,98,.10),inset 0 1px 0 rgba(255,255,255,.72),inset 0 -1px 0 rgba(68,112,144,.06);
   backdrop-filter:blur(17px) saturate(145%);-webkit-backdrop-filter:blur(17px) saturate(145%);
 }
 .service-strip .service-text strong{font-size:12px;line-height:1.35;letter-spacing:-.01em}
-.service-strip .service-icon{width:27px;height:27px;flex-basis:27px}
-.service-strip .service-icon svg{width:15px;height:15px}
+.service-strip .service-icon{width:29px;height:29px;flex-basis:29px;background:rgba(255,255,255,.46);border-color:rgba(122,168,198,.35)}
+.service-strip .service-icon svg{width:16px;height:16px}
 html.dark .service-strip .service-copy{
-  background:linear-gradient(145deg,rgba(36,66,91,.86) 0%,rgba(24,49,72,.80) 48%,rgba(12,31,50,.76) 100%);
-  border-color:rgba(204,231,250,.58);
-  box-shadow:0 8px 22px rgba(0,6,16,.30),inset 0 1px 0 rgba(232,246,255,.42),inset 0 -1px 0 rgba(0,8,19,.20);
+  background:linear-gradient(145deg,rgba(36,66,91,.70) 0%,rgba(24,49,72,.60) 48%,rgba(12,31,50,.50) 100%);
+  border-color:rgba(204,231,250,.48);
+  box-shadow:0 8px 22px rgba(0,6,16,.27),inset 0 1px 0 rgba(232,246,255,.34),inset 0 -1px 0 rgba(0,8,19,.16);
 }
-html.dark .service-strip .service-icon{background:rgba(130,179,215,.22)}
+html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-color:rgba(204,231,250,.33)}
 @media(max-width:760px){
   .service-strip{gap:7px;padding:7px}
   .service-strip .service-copy{min-height:74px;padding:8px 4px;gap:6px;border-radius:14px}
-  .service-strip .service-icon{width:23px;height:23px;flex-basis:23px}
+  .service-strip .service-icon{width:24px;height:24px;flex-basis:24px}
   .service-strip .service-icon svg{width:13px;height:13px}
-  .service-strip .service-text strong{font-size:10px;line-height:1.3;overflow-wrap:normal;word-break:normal}
+  .service-strip .service-text strong{font-size:11px;line-height:1.3;overflow-wrap:normal;word-break:normal}
 }
 @media(max-width:380px){
   .service-strip{gap:5px;padding:6px}
   .service-strip .service-copy{min-height:72px;padding:7px 3px}
-  .service-strip .service-text strong{font-size:9.5px}
+  .service-strip .service-text strong{font-size:10px}
 }
-
 </style>
 
 </body>
