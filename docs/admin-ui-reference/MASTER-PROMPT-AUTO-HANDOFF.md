@@ -1055,3 +1055,19 @@ Không sửa ngay chỉ vì đã có đặc tả. Thực hiện tuần tự, m�
 - [ ] Mọi giới hạn branch/Production/backend/data vẫn được giữ nguyên.
 
 **Trạng thái lúc ghi yêu cầu:** đây là đặc tả/hướng dẫn triển khai; KHÔNG phải bằng chứng tính năng đã được code hoặc kiểm thử. AI tiếp quản phải xác minh source hiện hành trước khi thay đổi.
+
+
+## §XXII implementation checkpoint — storefront Preview — 2026-10-22
+## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
+
+- Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
+- Source + tests: [run 39681751497 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497).
+- Preview deploy: [run 39681751269 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269).
+- Live visual audit: [run 39681751457 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457); artifact [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509).
+- Exact Preview deployment verified at alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, deployment ID `6d641e52-8e30-4e5a-8c29-05e1d974cce7`, environment `preview`, branch/SHA exact.
+- Audit: 100 screenshots, 8/8 viewport-theme pairs, 12 route checks, section/commerce/detail coverage complete, first-paint 20/20 frames and 4/4 videos, no hard failures or console/page/HTTP/request/image/readonly errors.
+- Favorite interaction states: 4/4 live contexts PASS (mobile 390×844 + desktop 1440×900, Light/Dark). Press scale 0.97 with theme-specific glass tint/inset; selected heart and SVG fill/stroke red `#E5484D`; aria/storage match; unselect returns to proper theme outline and removes storage key. Ripple code removed.
+- Still pending: successful add-to-cart toast while detail view is open; shared image-accurate fly-to-cart and its badge/bounce, rapid-click, no-layout-shift, image-failure and reduced-motion tests. Partial PASS is not overall feature completion.
+- No merge, Production/main, Admin code, API/backend, product data, DB/R2, bindings, secrets, DNS or Access change. Canonical screenshot archive/manifest unchanged.
+
+Continue with the next small slice (successful add-to-cart feedback), then shared fly-to-cart. Do not change the original §XXII safety boundaries or mark the remaining requirements complete without exact-SHA live evidence.

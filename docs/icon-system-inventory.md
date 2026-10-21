@@ -1,9 +1,23 @@
+## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
+
+- Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
+- Source + tests: [run 39681751497 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497).
+- Preview deploy: [run 39681751269 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269).
+- Live visual audit: [run 39681751457 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457); artifact [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509).
+- Exact Preview deployment verified at alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, deployment ID `6d641e52-8e30-4e5a-8c29-05e1d974cce7`, environment `preview`, branch/SHA exact.
+- Audit: 100 screenshots, 8/8 viewport-theme pairs, 12 route checks, section/commerce/detail coverage complete, first-paint 20/20 frames and 4/4 videos, no hard failures or console/page/HTTP/request/image/readonly errors.
+- Favorite interaction states: 4/4 live contexts PASS (mobile 390×844 + desktop 1440×900, Light/Dark). Press scale 0.97 with theme-specific glass tint/inset; selected heart and SVG fill/stroke red `#E5484D`; aria/storage match; unselect returns to proper theme outline and removes storage key. Ripple code removed.
+- Still pending: successful add-to-cart toast while detail view is open; shared image-accurate fly-to-cart and its badge/bounce, rapid-click, no-layout-shift, image-failure and reduced-motion tests. Partial PASS is not overall feature completion.
+- No merge, Production/main, Admin code, API/backend, product data, DB/R2, bindings, secrets, DNS or Access change. Canonical screenshot archive/manifest unchanged.
+
+---
+
 # SinDarealest storefront icon inventory — Liquid Glass
 
 - Target branch: `fix/liquid-glass-audit-2026-10-19`
 - Source audited: `public/index.html`
 - Source blob at audit: `d6415ed8dd7c2084bfeafa92bf9d9f261c38f254`
-- Status: inventory/specification only; no storefront markup, CSS, JavaScript behavior, backend, API, product data, database, deployment, or PR merge changed.
+- Status: specification plus partial storefront implementation. Live-verified base icon press/favorite state PASS at exact SHA `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; shared fly-to-cart and add-success/cart-toast/badge animation are not yet implementation-verified. Backend, API, product data and database were not changed.
 - Approved visual direction: thin-stroke Liquid Glass; clear/translucent icy surface, fine bright rim and restrained refraction; pressed state sinks inward and changes icon tint; no ripple.
 
 ## Visual tokens and interaction contract

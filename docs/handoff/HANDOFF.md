@@ -1,3 +1,19 @@
+## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
+
+- Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
+- Source + tests: [run 39681751497 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497).
+- Preview deploy: [run 39681751269 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269).
+- Live visual audit: [run 39681751457 — PASS, exact SHA verified](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457).
+- Evidence artifact: [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509). Evidence-only capture; canonical start/end archive and manifest were not changed.
+- Cloudflare deployment metadata: Preview alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, exact branch/SHA, deployment ID `6d641e52-8e30-4e5a-8c29-05e1d974cce7`, environment `preview`.
+- Live audit: `passed=true`; 100 screenshots; 8/8 viewport-theme pairs; required section coverage complete; 12 route checks; commerce states and 4 detail contexts complete; first-paint 20/20 frames, welcome videos 4/4; zero hard failures, console/page/HTTP errors, failed requests, broken images or read-only violations.
+- Icon states: `iconStateChecksComplete=true`, all four contexts PASS (mobile 390×844 and desktop 1440×900, Light/Dark). Pressed state scale 0.97 with correct theme tint/inset depth. Selected heart button and SVG path fill/stroke are RGB(229,72,77) (`#E5484D`), aria-pressed and local favorite storage agree. Unselect restores the theme-correct outline and removes the stored favorite; no fake toast is emitted for favorite toggles.
+- Ripple JS/CSS removed: no `tap-ripple`, `ringRipple`, or `setupTapRing` remains.
+- Still SPECIFIED / NOT IMPLEMENTED-VERIFIED: successful add-to-cart toast while product detail is open; shared exact-image fly-to-cart, cart bounce/badge semantics, rapid-click/layout-shift/image-failure/reduced-motion cases. Continue the next small slice; do not treat this partial PASS as overall feature completion.
+- Safety held: no merge, Production/main, Admin code, backend/API, product data/mappings, D1/R2, bindings, secrets, DNS or Access policy changes.
+
+---
+
 ## CANONICAL HANDOFF ROUTING — 2026-10-22
 
 - **Active prompt:** [`docs/handoff/PROMPT-NEXT-CHAT-2026-10-22.md`](PROMPT-NEXT-CHAT-2026-10-22.md). It consolidates the latest known workflow evidence and the newly added icon/fly-to-cart requirements from `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md` §XXII and `docs/icon-system-inventory.md`.

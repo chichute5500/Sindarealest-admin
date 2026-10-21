@@ -1,9 +1,23 @@
+## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
+
+- Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
+- Source + tests: [run 39681751497 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497).
+- Preview deploy: [run 39681751269 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269).
+- Live visual audit: [run 39681751457 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457); artifact [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509).
+- Exact Preview deployment verified at alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, deployment ID `6d641e52-8e30-4e5a-8c29-05e1d974cce7`, environment `preview`, branch/SHA exact.
+- Audit: 100 screenshots, 8/8 viewport-theme pairs, 12 route checks, section/commerce/detail coverage complete, first-paint 20/20 frames and 4/4 videos, no hard failures or console/page/HTTP/request/image/readonly errors.
+- Favorite interaction states: 4/4 live contexts PASS (mobile 390×844 + desktop 1440×900, Light/Dark). Press scale 0.97 with theme-specific glass tint/inset; selected heart and SVG fill/stroke red `#E5484D`; aria/storage match; unselect returns to proper theme outline and removes storage key. Ripple code removed.
+- Still pending: successful add-to-cart toast while detail view is open; shared image-accurate fly-to-cart and its badge/bounce, rapid-click, no-layout-shift, image-failure and reduced-motion tests. Partial PASS is not overall feature completion.
+- No merge, Production/main, Admin code, API/backend, product data, DB/R2, bindings, secrets, DNS or Access change. Canonical screenshot archive/manifest unchanged.
+
+---
+
 # CURRENT OVERRIDE — READ THIS FIRST (2026-10-22)
 
 This canonical prompt supersedes the older REV2/REV3 scratch prompts. Read the current `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, `docs/visual-audit-progress-2026-10-19.md`, and `docs/icon-system-inventory.md`; reconcile by exact current branch HEAD and workflow evidence, not by dates or estimates alone.
 
 ## New user requirements — preserve and implement, not just document
-The latest user additions are in `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md` section XXII and `docs/icon-system-inventory.md`. They are new feature requirements and have **NOT yet been proven implemented**:
+The latest user additions are in `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md` section XXII and `docs/icon-system-inventory.md`. They were initially specified, with this partial progress now verified: base pressed/favorite icon states PASS on live Preview at exact SHA `a603c3c8f4c36efb98d604c84c24ae02d217fefa` (source [39681751497](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497), deploy [39681751269](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269), visual [39681751457](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457), artifact [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509)). The remaining add-to-cart toast/badge behavior and shared fly-to-cart remain SPECIFIED / NOT IMPLEMENTED-VERIFIED:
 - Luxury Minimalism + Apple Liquid Glass. Glass surface `#eaf3fb`, main icon/text `#142a3c`, accent `#5c91b9`; heart is red only while favorited.
 - No ripple. Pressed feedback is subtle inset/depressed glass and tint, then returns on release. Short, purposeful animation; respect `prefers-reduced-motion`.
 - Favorite heart, cart badge, toast and every other icon state must match actual functional result; no fake success or visual-only state.

@@ -58,3 +58,16 @@
 - Trình tự: xác minh branch/HEAD/Preview trước; đọc source và baseline; audit mọi điểm add/cart/heart; chia thay đổi nhỏ; test/Playwright và ảnh Preview mỗi lát; kiểm tra đúng ảnh, đúng quantity, responsive và reduced-motion; cập nhật bằng chứng sau cùng.
 - Ranh giới không đổi: chỉ branch `fix/liquid-glass-audit-2026-10-19`; không merge/main/Production; không sửa backend, API, schema, database, secrets, bindings hoặc dữ liệu.
 - **Trạng thái kiểm chứng:** prompt/inventory/handoff là tài liệu yêu cầu. Chưa có bằng chứng cho thấy animation đã được code hoặc Playwright đã xác nhận; ghi nhận là `SPECIFIED / NOT IMPLEMENTED-VERIFIED` cho đến khi có test thực tế.
+
+
+## Storefront icon state checkpoint — 2026-10-22 (separate from Admin acceptance)
+
+- Current storefront source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; PR #108 remains open/unmerged.
+- Source validation [39681751497 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497); Preview deployment [39681751269 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269); live audit [39681751457 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457); artifact [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509).
+- Exact deployment verified: Preview alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, deployment `6d641e52-8e30-4e5a-8c29-05e1d974cce7`, environment `preview`, exact branch and commit.
+- Live audit passed: 100 screenshots, 8/8 viewport-theme pairs, 12 route checks, complete sections/commerce/detail, first-paint 20/20 and 4/4 videos, zero hard failures or browser/network/image/read-only errors.
+- Four live heart state contexts PASS: mobile 390×844 and desktop 1440×900 in Light/Dark. Press state uses scale 0.97, correct tinted glass/inset depth, selected heart and SVG path red `#E5484D`, local storage + `aria-pressed` agree, and unselect restores the correct theme outline. All ripple code removed.
+- Remaining storefront feature work: successful add-to-cart toast while detail overlay is open; single shared exact-image fly-to-cart plus correct badge/cart bounce, rapid click, no layout shift, image-failure, viewport and reduced-motion acceptance.
+- This is storefront Preview evidence only. Do not modify Admin, Production/main, backend/API, product data, database, bindings/secrets, DNS or access policy; no archive manifest changed.
+
+The Admin status table above remains unchanged; this addendum does not represent an Admin test or implementation result.
