@@ -47,7 +47,7 @@ Nguồn chỉ dẫn chính đã được cập nhật trong [MASTER-PROMPT-AUTO-
 
 - Đặc tả inventory: [docs/icon-system-inventory.md](../../../docs/icon-system-inventory.md).
 - **Ảnh tham chiếu phải đọc trực tiếp:** [Icon.png](../../../docs/icon-assets/Icon.png) (chuẩn hình dáng icon gốc) và [Chitiet.png](../../../docs/icon-assets/Chitiet.png) (trạng thái/hiệu ứng chi tiết). Mở ảnh thực tế trước khi code; không dùng ảnh thứ hai để vẽ lại icon gốc.
-- Palette xác nhận: nền `#eaf3fb`, icon/chữ `#142a3c`, accent `#5c91b9`. HEX đỏ của favorite và trị số opacity/blur/shadow chưa được chốt; không tự ghi thành token thương hiệu đã duyệt.
+- Palette: nền `#eaf3fb`, icon/chữ `#142a3c`, accent `#5c91b9`, tim yêu thích bật `#E5484D`. Baseline kính sáng: surface `rgba(255,255,255,0.42)`, viền `1px solid rgba(255,255,255,0.72)`, blur `16px saturate(145%)`, shadow `0 8px 24px rgba(20,42,60,0.10)`, highlight `inset 0 1px 0 rgba(255,255,255,0.80)`. Nhấn: scale `0.97`, inset shadow `inset 0 2px 8px rgba(20,42,60,0.14)`, transition `140ms cubic-bezier(0.2,0.7,0.2,1)`. Đây là baseline kỹ thuật đề xuất; phải kiểm tra trên Preview và không tuyên bố đã triển khai trước khi test.
 - Phạm vi: chỉ website tĩnh trên `fix/liquid-glass-audit-2026-10-19`; không merge PR/main, không deploy Production, không sửa backend/API/database/schema/secrets/bindings/dữ liệu.
 - Yêu cầu quan trọng: heart đỏ khi thích; cart badge/toast phản ánh thao tác thật; mọi điểm add hàng dùng chung fly-to-cart đến icon header; clone phải dùng đúng ảnh đang hiển thị, đúng sản phẩm và variant; không di chuyển trang gốc hoặc add trùng.
 - Quy trình bắt buộc: xác minh HEAD/Preview/baseline → audit source/runtime + test hiện hữu → chia lát thay đổi nhỏ → Playwright/ảnh Preview mỗi lát → cập nhật bằng chứng/handoff.
