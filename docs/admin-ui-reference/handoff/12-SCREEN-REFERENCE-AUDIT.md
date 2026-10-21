@@ -1,14 +1,16 @@
 # Admin 12-screen reference audit matrix
 
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:17:49+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:30:43+07:00
 
-- Repo `chichute5500/Sindarealest-admin`; chỉ nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `960ae090f914bba69267b13dc4d60df7a1a35b59`; branch HEAD khi ghi handoff `26894a8398eff3fa0195419eb223e9ae99210f24` là evidence-only descendant.
-- Validate Source [#39678464156](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39678464156) **SUCCESS** và Admin Preview/Playwright [#39678464417](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39678464417) **SUCCESS**, cùng exact SHA `960ae090f914bba69267b13dc4d60df7a1a35b59`.
-- Artifact [`admin-preview-evidence-265`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39678464417/artifacts/12383460348), ID `12383460348`, 12,512,454 bytes: 65 PNG total; 48 fixture module screenshots + 40 metrics. ZIP metadata ở artifact #264 và #265 đã kiểm tra: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview success vẫn không phải authenticated backend QA.
-- Notifications: thêm đóng panel bằng Escape và trả focus về nút Thông báo; Escape được bỏ qua nếu product/order modal đang mở để modal xử lý phím trước. E2E xác nhận panel hiển thị, `aria-expanded`/`aria-controls`, nút thao tác hiện diện, panel/nội dung không tràn ngang, Escape đóng panel và focus trở lại toggle, mở lại thành công. Screenshot 390×844 light/dark và responsive matrix pass; đã xem trực tiếp ảnh mobile light.
-- Backup/Restore #12: E2E trước đó xác nhận nút full-width/wrap, safety note không tràn, file input ẩn, và screenshot helper chụp đúng panel; không export/restore thật.
-- Screen #11 “AI image review/grouping” chưa có route/controls/API rõ ràng trong `public/admin/index.html` hoặc tên file tương ứng ở repo tree. Không thêm màn hình hoặc endpoint tự suy diễn; không gọi AI provider thật hay tiêu tốn quota. Đây là blocker về feature contract, không phải đã triển khai.
+- Repo `chichute5500/Sindarealest-admin`; chỉ nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17`; branch HEAD khi ghi handoff `1edf32dd74ce94f684e4b4b2c3a017592011b9e9` là evidence-only descendant.
+- Validate Source [#39679023176](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176) **SUCCESS** và Admin Preview/Playwright [#39679023162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162) **SUCCESS**, cùng exact SHA `54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17`.
+- Artifact [`admin-preview-evidence-266`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162/artifacts/12383113090), ID `12383113090`, 13,048,069 bytes: 68 PNG, 51 fixture screenshots, 43 metrics. ZIP metadata đã đọc: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Mobile “Khác” menu: thêm đóng bằng Escape và trả focus về nút trigger; khi chọn Bảo hành/Cài đặt, menu đóng và focus quay về trigger hiển thị. Escape không can thiệp khi product/order modal đang hoạt động. E2E kiểm tra ở các viewport mobile/theme: cả hai menuitem hiện đúng, `aria-expanded`/`aria-controls`, menu nằm trong viewport, không tràn nội dung, Escape đóng, focus trả về, và mở lại thành công. Đã mở screenshot 390×844 light; artifact có ảnh dark và matrix mobile còn lại.
+- Notifications: Escape close/focus restore + viewport/no-clipping tests pass. Backup/Restore #12: mobile actions wrap đúng, note cảnh báo không tràn, file input ẩn; screenshot helper chụp đúng panel. Không export/restore thật, không API write.
+- Screen #11 “AI image review/grouping” chưa có route/controls/API rõ ràng trong source hoặc tên file/module ở recursive tree. Không tự phát minh màn hình/endpoint; không gọi provider thật hoặc tiêu tốn quota. Cần feature contract/reference đã duyệt trước khi triển khai.
 - Tiến độ giữ **50%**; 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111/#108 OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
 
 ---
 
@@ -73,7 +75,7 @@ Overall Admin progress: **50%** — weighted management estimate; unchanged afte
 | 9 | Customers / customer details | PARTIAL — fixture only | Exact-SHA Playwright on `e3e46b6`: search by name/phone/email/address, no-result/reset, derived initials avatar and `aria-hidden` checked. Artifact `admin-preview-evidence-259` inspected at 390×844 light/dark and 1280×800 light. Reference has photo avatars and customer-segmentation tabs; API has no avatar image and no confirmed rule for “Mới/Thân thiết”, so do not fake either. Reference parity and authenticated customer data remain NOT ACCEPTED/NOT TESTED. |
 | 10 | Warranty / after-sales | PARTIAL | Exact-SHA E2E on `08f2525`: read-only search/no-result, filter state, issue-form disclosure and field constraints. Artifact `admin-preview-evidence-260` reviewed at 390×844 light/dark; the three filter tabs now fit on one row without clipped labels. Reference product thumbnails are not fabricated because the source API lacks matching image data; full reference parity/authenticated QA NOT ACCEPTED. |
 | 11 | AI image review / grouping | BLOCKED — feature contract/source route missing | Static inspection of `public/admin/index.html` and recursive Git tree found no AI-image-review/grouping route, controls or dedicated module file. Do not invent UI/API or call live provider; require approved feature contract/reference. |
-| 12 | Backup / restore / settings / responsive navigation | PARTIAL | Exact-SHA E2E on `94c9fb6`: mobile/desktop panel bounds, no clipped action text, safety-note overflow, JSON input hidden; screenshots scroll to the actual panel. Artifact `admin-preview-evidence-263` includes 390×844 light/dark and 1280×800. No export/restore action or API write. |
+| 12 | Backup / restore / settings / responsive navigation | PARTIAL | Exact-SHA fixture E2E on `94c9fb6` checks panel bounds, action text wrapping, safety note and hidden JSON input; screenshot targets the panel. Mobile More/Khác E2E on `54cfb2b` verifies Warranty/Settings, aria state, viewport fit, Escape and focus restoration. Artifact `admin-preview-evidence-266` has 390×844 light/dark and responsive matrix. No export/restore action or API write. |
 
 ## Cross-cutting checks
 

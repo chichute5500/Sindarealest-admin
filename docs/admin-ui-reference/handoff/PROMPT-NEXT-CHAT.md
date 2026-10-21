@@ -1,18 +1,20 @@
-## PROMPT TIẾP TỤC — 2026-10-22T04:17:49+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T04:30:43+07:00
 
-Tiếp tục công việc thực tế. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `960ae090f914bba69267b13dc4d60df7a1a35b59`; branch HEAD khi cập nhật handoff `26894a8398eff3fa0195419eb223e9ae99210f24`.
+Tiếp tục làm việc thực tế. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `54cfb2b19dd079ac00ba003d0d99b57a6e7cdd17`; branch HEAD khi cập nhật handoff `1edf32dd74ce94f684e4b4b2c3a017592011b9e9`.
 
-**Exact-SHA CI:** Validate [#39678464156](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39678464156) SUCCESS; Preview/Playwright [#39678464417](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39678464417) SUCCESS. Artifact [admin-preview-evidence-265](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39678464417/artifacts/12383460348) ID `12383460348`: 65 PNG total, 48 fixture screens, 40 metrics; exact-SHA browser suite passed. Fixture-only; zero API writes/errors; no authenticated backend claims.
+**Exact-SHA CI:** Validate [#39679023176](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023176) SUCCESS; Preview/Playwright [#39679023162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162) SUCCESS. Artifact [admin-preview-evidence-266](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679023162/artifacts/12383113090) ID `12383113090`: 68 PNG, 51 fixture screenshots, 43 metrics; completed=true; zero page/console/network/HTTP errors, attempted writes or unexpected API paths.
 
-**Đã làm:** Notification panel supports Escape close and restores focus to its toggle; Escape does not steal handling from an active product/order modal. E2E verifies aria-expanded/controls, visible action, viewport bounds, no horizontal overflow, Escape close/focus restoration, reopen. Mobile light screenshot inspected; light/dark + viewport matrix passes. Backup/Restore #12 mobile actions and safety note are responsive, input remains hidden behind label, and screenshot target now shows the actual panel; no export/restore invoked.
+**Đã làm:** Mobile More/Khác menu now closes on Escape, restores focus to trigger, and returns focus to the visible trigger when Warranty/Settings is chosen. Escape does not steal handling from active product/order modals. E2E verifies both menu items, aria-expanded/controls, viewport bounds, no content overflow, Escape/focus and reopen across mobile themes/viewports. Mobile screenshot 390×844 light inspected. Notification panel Escape/focus and overflow tests pass. Backup/Restore panel remains responsive and screenshot capture targets the actual panel.
 
-**Blocker #11:** AI image review/grouping has no identifiable route/controls/API in current ADMIN source/tree. Do not invent a page or endpoint, do not call a live provider/spend quota, and do not represent synthetic data as successful AI output. Need approved feature contract/reference before implementation.
+**Blocker #11:** AI image review/grouping has no identifiable route, controls, API or module in current source/tree. Do not invent UI/API, call a live provider, spend quota or represent fixture output as AI success. Require approved feature contract/reference before implementation.
 
 **Trạng thái:** progress 50%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED. PR #111/#108 OPEN/UNMERGED.
 
-**Việc tiếp theo:** continue cross-cutting mobile navigation/accessibility review using source and fixture-only E2E: verify the “Khác” panel exposes Warranty/Settings at 320–412px, correct `aria-expanded`, Escape/close and focus return, no clipping. Fix only verified issues, run exact-SHA Validate + Preview, inspect artifact and update/read back all seven handoff files.
+**Việc tiếp theo:** perform a cross-cutting keyboard/accessibility pass on navigation and notification popovers (Escape priority with active dialogs, focus return, aria states, click-to-navigate), then inspect any remaining fixture gaps. Fix only verified issues, exact-SHA test and inspect artifact; refresh/read back all seven handoff files. AI image grouping remains blocked pending a defined contract.
 
 Before each commit fetch latest HEAD and use expected SHA/CAS. Only ADMIN branch; no merge, no main/static changes, no Production deploy, no Access/secrets, no remote D1/R2/schema/migration/infra, no TinyFish.
+
+---
 
 ---
 
