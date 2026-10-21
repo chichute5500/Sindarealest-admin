@@ -832,6 +832,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#warrantyIssueMessage')).toHaveAttribute('aria-live', 'polite');
       await disclosure.locator('summary').click();
       await expect(disclosure).toHaveJSProperty('open', false);
+
+      // The interaction above scrolls the summary into view. Reset both possible
+      // scroll containers so the screenshot records the intended list-first viewport.
+      await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const headingBox = await page.locator('#main .pagehead').boundingBox();
+      expect(headingBox?.y, 'Warranty screenshot should show the page heading near the top').toBeGreaterThanOrEqual(0);
+      expect(headingBox?.y, 'Warranty screenshot should show the page heading near the top').toBeLessThan(300);
     }, true);
     await captureView('settings', 'settings', null, true);
     await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
