@@ -142,4 +142,23 @@ The storefront renders an actual QR only when the server returns `status: confir
 This is a presentation contract, not a claim that the current API supports payment instructions. Current POST /api/orders creates an order in `pending_confirmation`; no public order-status lookup or QR/receiver configuration exists. The storefront therefore shows “Chờ cửa hàng xác nhận” and does not show an invented QR, ask for money, or claim payment success. Backend/Admin work must design a safe post-confirmation delivery path (such as an order-specific access token or other verified customer authorization); never expose order/customer details using order number alone.
 
 The storefront never sets payment_status, never interprets QR display/scan/upload as payment, and does not trust a browser-supplied amount. A server-confirmed QR must have no preset amount; the amount is presented outside the QR for the customer to enter manually.
-undefined
+
+## Authoritative owner-managed fulfillment and checkout rules — 2026-10-21
+
+### Ownership and data flow
+- Fulfillment type is an owner-managed product field in Admin, persisted as `fulfillment_type` and exposed to the public catalog as `fulfillmentType`: `made_to_order`, `in_stock`, or `unclassified`.
+- The owner chooses the type for each product. Footwear may be made-to-order, while specific products can be set in-stock by the owner; these are examples, not category-based rules. Do not infer fulfillment type from category, stock quantity, SKU, old labels, images, or guesses. Unknown/historical products remain `unclassified` until a human sets the type.
+- The customer never selects fulfillment type at checkout. The storefront reads it from the product/API and displays only the corresponding payment options. Admin/backend owns product classification and authoritative amounts; storefront owns customer-facing presentation only.
+
+### Exact payment rules
+- `made_to_order`: deposit 30% of the server-confirmed product/order value to begin production, OR pay 100% of the value. Full payment qualifies for freeship.
+- `in_stock`: fixed deposit 100,000 VND, OR pay 100% of the value. For deposit-only orders, dispatch follows store verification of the deposit and order confirmation. Full payment qualifies for freeship.
+- Full-payment freeship applies to BOTH fulfillment types. Deposit-only options do not automatically promise freeship.
+- If price, type, or order terms are missing/unconfirmed, allow a consultation/order request but do not invent a price, compute a fake deposit, request money, or expose payment-ready QR instructions.
+- The server validates payment option and amount against confirmed order values; the browser must not be trusted for price, fulfillment type, or payable amount. Store the selected installment/payment request and fulfillment type snapshot on the order/order item as appropriate.
+- QR configuration is managed by authorized Admin. Only a verified, active QR with no embedded fixed amount may be shown. QR scan, receipt upload, or customer claim never marks payment as verified; an authorized person must verify the actual bank transaction.
+
+### Separation of implementation ownership
+- Static website AI: customer-facing UI and API consumption only; never implement Admin screens, schema, migrations, or Admin-only endpoints in the static branch.
+- Admin AI: product type field, persistence/API, QR settings, payment ledger/verification, and API contract only; never commit storefront UI code in the Admin branch.
+- Both AIs must keep their own branch and tests separate. If an endpoint/field is missing, Admin documents the API contract and static consumes only after verifying the real API. Do not claim integration is verified from documentation alone.
