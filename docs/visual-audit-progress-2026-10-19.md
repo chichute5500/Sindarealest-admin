@@ -597,3 +597,14 @@ Regression tests cũng kiểm tra ở lớp serializer D1/public response và en
 - **Kiểm tra live:** 8/8 cặp viewport/theme PASS; điều hướng từ thẻ sản phẩm, mở trực tiếp route canonical và reload trang chi tiết PASS. Không ghi nhận horizontal overflow, page error, console error hoặc hành động ghi dữ liệu ngoài ý muốn.
 - **Còn thiếu:** người đánh giá vẫn cần xem trực tiếp ảnh cuối và đối chiếu với hai ảnh tham chiếu gốc `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` và `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`. Pixel diff giữa ảnh bắt đầu/kết thúc chỉ phát hiện thay đổi, không chứng minh mức độ giống ảnh mẫu. Vì vậy trạng thái vẫn là `AWAITING_HUMAN_VISUAL_REVIEW`, chưa thể tuyên bố đạt 100%.
 - **Phạm vi:** lần cập nhật này chỉ làm đồng bộ hồ sơ bàn giao với manifest và kết quả workflow mới. Không sửa runtime HTML/CSS/JS, không đổi dữ liệu sản phẩm, không sửa Admin, không merge PR, không deploy Production, không thay binding/secret hoặc ghi D1/R2.
+
+## Evidence refresh — 2026-10-21
+
+**Latest verified capture SHA:** `a56c12de32d3aa08b84f027217b90af8b7e5e36d`. Workflow [39610598201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598201), artifact [12350401549](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598201/artifacts/12350401549). Validation [39610598095](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598095) and Preview deploy [39610598134](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39610598134) PASS.
+
+- Live capture: 84 images, 8 viewport/theme combinations, 12 route checks; zero overflow, page errors and console errors.
+- Pixel comparison: 84 pairs, 71 identical, 13 changed, zero dimension mismatch, invalid PNG or unmatched filename.
+- Technical/capture checks PASS; visual/reference acceptance remains pending until actual screenshots are reviewed against original mobile Light/Dark references.
+- Manifest narrative “Nine screenshot pairs” is stale compared with 13 changed pairs. Do not manually edit guarded output/counters; resolve through workflow-owned generation.
+- Review satin/hero, crocodile-leather section, six Liquid Glass tiles, order assurance, product grid/detail/gallery, cart/account/checkout, mobile Back/theme toggle, Zalo/footer, direct/invalid routes and 404 at 360×800, 390×844, 768×1024, 1440×900 in Light/Dark. Re-run only affected tests.
+- No Admin, Production/main, backend/API, D1/R2, secret/binding/DNS or catalog changes; PR #108 remains open; never fabricate `SD-GL052`.
