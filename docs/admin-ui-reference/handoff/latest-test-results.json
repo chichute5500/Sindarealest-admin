@@ -5,9 +5,9 @@
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
   "testedCommitSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
-  "capturedAt": "2026-10-21T18:51:59.177Z",
+  "capturedAt": "2026-10-22T01:58:00+07:00",
   "progressEstimatePercent": 50,
-  "progressBasis": "Weighted management estimate, not test-pass rate: project scope/guardrails 15% × 100% = 15; source integrity and automated tests 20% × 86% = 17.2; Admin UI implementation/behavior coverage 20% × 47% = 9.4; 12-screen visual parity 20% × 25% = 5; authenticated business QA 15% × 0% = 0; semantic/security/release audit 10% × 30% = 3. Total 49.6%, rounded to 50%. The warranty search status/empty-state Playwright assertions passed in Validate Source run #39640751340 on exact source/test SHA 60e63acb67e1c62a0d6390cd8e80ce65b8bcd885. Preview screenshot matrix run #39640751300 remained in progress at this timestamp; verify final result before calling Preview complete. Anti-repeat note added 2026-10-21 17:10 UTC: do not repeat customer address search or warranty search accessibility/empty-state work; next task should target an unresolved screen parity gap. Latest docs-only SHA 71187e9... passed Validate Source #39641183495, but is not a new application test run. Anti-repeat checkpoint: customer address search and warranty search accessibility/empty-state coverage are completed; next work should target an unresolved reference-screen parity gap.",
+  "progressBasis": "Weighted management estimate, not a test pass percentage. Exact source/test SHA passed Validate Source and Admin Preview/Playwright. Screen #3/12-screen parity not accepted; authenticated backend QA not tested.",
   "note": "Exact source/test SHA 4e660a0869dd21d4a688d72823bd08b1795cf2ff: Validate Source [#39633278598] PASS; Admin Preview/Playwright [#39633278359] SUCCESS. Static browser suite 3 passed (25.5s); responsive/theme screenshot matrix, project checks, npm test and Preview CSS signature all passed. New read-only fixture checks assert both create-payment-request and record-payment controls stay disabled when price/terms require confirmation, and backup/restore controls expose JSON export, restore file accept-type and confirmation copy without performing the action. Existing QR unsaved-draft activation guard remains covered. Artifact admin-preview-evidence-192 (ID 12360132558, 11,895,011 bytes, expires 2026-11-04) contains 63 PNGs (16 login shell + 47 synthetic/read-only fixture screenshots), 39 metrics, and zero recorded browser/console/network/HTTP errors, attempted writes or unexpected API paths. No authenticated real backend QA was performed. Full 12-screen parity remains NOT ACCEPTED; authenticated QA BLOCKED/NOT TESTED; PR #111/#108 OPEN and unmerged; PR #111 is mixed-scope/not merge-ready. Progress 48%. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.\n\nCheckpoint 2026-10-21 17:47 UTC: exact source/test SHA 04889b6c6bc946483ea683e8345bac3b7cbf3838; Validate Source #39646606076 and Admin Preview #39646606242 both SUCCESS. Corrected false-negative custom switch visibility assertion; prior Preview run #39646221204 failed only at screenshot matrix step 9; rerun passed. Evidence workflow wrote docs/evidence-only HEAD d90a18db3961958b0928f1fabc598f2d77cedea3. Progress remains 50%; 12-screen parity NOT ACCEPTED, authenticated business QA NOT TESTED, image-save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER; PR #111 OPEN/UNMERGED.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -893,10 +893,10 @@
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109",
   "branchHeadSha": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
-  "latestVerifiedAt": "2026-10-21T16:47:18Z",
+  "latestVerifiedAt": "2026-10-22T01:58:00+07:00",
   "latestVerifiedSourceCommit": "f2df0a923080135c5fe92ee2021c76137305699c",
   "currentAdminBranchHead": "30c8cc7f87000813b5b50cc8162ca87a06dd1414",
-  "latestVerificationSummary": "Validate Source #39637611840 and Admin Preview/Playwright #39637611768 both SUCCESS on exact SHA f2df0a923080135c5fe92ee2021c76137305699c. Source checks, tests, local screenshot matrix, warranty list/filter/form fixture E2E and configured Preview login CSS signature PASS. Synthetic/read-only only; not authenticated backend acceptance.",
+  "latestVerificationSummary": "Validate Source #39656347891 and Admin Preview/Playwright #39656348109 both SUCCESS on exact SHA c18736b70d0035769408ce3190a6fb729ccd75fd. npm run check, npm test, responsive/theme screenshot matrix and configured Preview diagnostic PASS. 64 PNGs and 40 synthetic/read-only fixture metrics; authenticated backend QA NOT TESTED.",
   "branchHeadBeforeHandoffUpdate": "f9a06232377c75352aceea17a27bce88ec05556f",
   "prSafety": {
     "number": 111,
@@ -2296,34 +2296,21 @@
     }
   },
   "latestHeadVerification": {
-    "headSha": "32c1f28662e7240353b0eda2f5daeaf22359257e",
-    "commitMessage": "test(admin): cover Home and End keyboard navigation in editor tabs",
-    "changedPath": "tests/e2e/admin-static-baseline.spec.js",
-    "change": "Adds browser assertions that Home/End move focus and aria-selected state to first/last product editor tab; test only.",
-    "validationRuns": [
-      {
-        "runId": 39630533326,
-        "name": "Validate source and tests",
-        "conclusion": "success",
-        "testedSha": "32c1f28662e7240353b0eda2f5daeaf22359257e"
-      },
-      {
-        "runId": 39630533169,
-        "name": "Admin Preview Playwright",
-        "conclusion": "success",
-        "testedSha": "32c1f28662e7240353b0eda2f5daeaf22359257e"
-      }
-    ],
-    "repositoryChecks": "PASS",
-    "automatedTests": "PASS",
-    "localPlaywrightMatrix": "PASS",
-    "reducedMotionE2E": "PASS",
-    "homeEndKeyboardNavigationE2E": "PASS",
-    "configuredPreviewDiagnostic": "PASS",
-    "authenticatedBusinessQA": "BLOCKED_BY_CLOUDFLARE_ACCESS / NOT_TESTED",
-    "visualParity12ScreenFamilies": "NOT_ACCEPTED",
-    "result": "PASS_FOR_SOURCE_AND_READ_ONLY_BROWSER_REGRESSION_ONLY",
-    "progressRemainsPercent": 48
+    "headSha": "docs-updates-follow-source-test-sha-c18736b",
+    "testedSourceSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
+    "sourceCi": {
+      "runId": 39656347891,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891"
+    },
+    "adminPreview": {
+      "runId": 39656348109,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109"
+    },
+    "overallProgressPercent": 50,
+    "visualParity12Screens": "NOT_ACCEPTED",
+    "authenticatedBusinessQA": "NOT_TESTED_BLOCKED_BY_ACCESS"
   },
   "visualEvidenceSpotCheck": {
     "artifact": "admin-preview-evidence-169",
@@ -2892,40 +2879,27 @@
   },
   "branchHeadReadNote": "Observed from the live PR immediately before this handoff docs commit; this docs commit advances the branch. Re-fetch live refs before any next write.",
   "latestProductListFeedbackCycle": {
-    "sourceUiCommit": "da808593785de5924ac1540e1522421ae5cb5bcd",
-    "exactTestedSha": "535e43121a612570dd84a353870bc118860c0c0d",
-    "validationRun": 39643505425,
-    "previewRun": 39643505315,
-    "artifact": {
-      "name": "admin-preview-evidence-203",
-      "id": 12365019731,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39643505315/artifacts/12365019731",
-      "expiresAt": "2026-11-04T17:26:20Z",
-      "pngCount": 63,
-      "loginShellPngCount": 16,
-      "syntheticFixturePngCount": 47,
-      "fixtureMetricCount": 39
+    "checkedAt": "2026-10-22T01:58:00+07:00",
+    "commits": [
+      "a1acd0c666d6acc2a4a9a43d003f536e1d14ffdd",
+      "1ae35b2fee4f206934b16b08f6865b7f457e7157",
+      "c18736b70d0035769408ce3190a6fb729ccd75fd"
+    ],
+    "changes": [
+      "Top-align mobile price/stock/edit controls",
+      "Shorten and one-line clip unverified SKU hint without changing data",
+      "Give search full mobile row and add accessible clear-all icon",
+      "Scope empty-state reset test to #clearFilterEmpty"
+    ],
+    "validation": {
+      "validateSourceRunId": 39656347891,
+      "validateSource": "PASS",
+      "previewRunId": 39656348109,
+      "preview": "PASS"
     },
-    "behaviors": {
-      "searchByNameSkuCategoryLabel": "PASS_FIXTURE",
-      "accessibleResultCountAndRange": "PASS_FIXTURE",
-      "noMatchRecovery": "PASS_FIXTURE",
-      "resetAllFiltersAndFocus": "PASS_FIXTURE",
-      "categoryFulfillmentCombination": "PASS_FIXTURE",
-      "fixtureWrites": "NONE"
-    },
-    "visualReview": {
-      "reference": "docs/admin-ui-reference/admin-mobile-reference.png",
-      "screenshots": [
-        "products__390x844__light.png",
-        "products__1280x800__light.png"
-      ],
-      "reviewed": "YES",
-      "status": "PARTIAL_NOT_ACCEPTED",
-      "remainingGap": "Reference-style status chips and card-detail presentation still differ; empty real price/stock values must not be fabricated."
-    },
-    "authenticatedBackendBusinessQA": "NOT_TESTED",
-    "overallProgressEstimatePercent": 50
+    "screenshotCount": 64,
+    "fixtureMetrics": 40,
+    "acceptance": "PARTIAL_VISUAL_REFINEMENT_ONLY"
   },
   "handoffEvidenceScopeNote": "Product-list screenshot/fixture feedback is read-only synthetic UI evidence only, not proof of actual data values or authenticated business write flows.",
   "latestPublishedStatusFilterCycle": {
@@ -2992,5 +2966,6 @@
       "no TinyFish"
     ],
     "nextAction": "Re-fetch current head and PR/Actions; validate exact source/test SHA; inspect product screenshots at 390x844 and 1280x800 light/dark; update progress only with acceptance evidence."
-  }
+  },
+  "nextContinuation": "Re-fetch current branch HEAD and exact-SHA workflows; inspect screenshots against the 12-screen reference at 390x844 and 1280x800 in light/dark; continue substantial parity work. Keep progress at 50% until visual/backend acceptance evidence changes."
 }
