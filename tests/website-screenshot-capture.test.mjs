@@ -179,6 +179,17 @@ assert.match(live, /stateCapture\('#checkoutDrawer'[\s\S]*submitted: false/,
 assert.match(live, /commerceStatesComplete[\s\S]*fullscreenGalleryCount === 2[\s\S]*cartWithItemCount === 2[\s\S]*checkoutFormCount === 2/,
   'Visual acceptance must require evidence for gallery/cart/checkout in Light and Dark mobile contexts.');
 
+// Count the canonical state screenshot only; the separate state-viewport image
+// is a second framing of the same interaction, not another interaction test.
+assert.match(live, /const accountMenuCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'account-menu-open'\\)\\.length;/,
+  'Account-menu coverage must not double-count its state-viewport screenshot.');
+assert.match(live, /const fullscreenGalleryCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'fullscreen-gallery'\\)\\.length;/,
+  'Fullscreen-gallery coverage must count canonical state screenshots.');
+assert.match(live, /const cartWithItemCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'cart-with-item'\\)\\.length;/,
+  'Cart coverage must not double-count its state-viewport screenshot.');
+assert.match(live, /const checkoutFormCount = audit\\.screenshots\\.filter\\(shot => shot\\.captureType === 'state' && shot\\.state === 'checkout-form-open'\\)\\.length;/,
+  'Checkout coverage must not double-count its state-viewport screenshot.');
+
 assert.match(live, /product-detail-direct-open[\s\S]*product-detail-reload/,
   'Live capture must directly open and reload a route derived from a real rendered product.');
 assert.match(live, /typeof reloadResponse\?\.status === 'function' \? reloadResponse\.status\(\) : null/,
