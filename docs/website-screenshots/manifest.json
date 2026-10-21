@@ -4,7 +4,7 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-21T13:14:05Z",
+  "updatedAtUtc": "2026-10-21T13:23:06Z",
   "status": "IN PROGRESS",
   "note": "End-of-work live Cloudflare Pages Preview capture and pixel comparison completed successfully in workflow 39425677039 against verified Preview deployment 1ab8617f-aac1-42f2-9112-4acc6b0d007a, branch fix/liquid-glass-audit-2026-10-19, source commit 37163dc3c17af332f948311bc395c9839a10e345. Start and end archives each contain 66 screenshots. Comparison: 57 pixel-identical pairs, 9 changed pairs, zero dimension mismatches, zero unmatched/invalid pairs. The changed pairs are the four full-page home captures and the four 'The art of…' collection captures where the autoplay carousel shows a different product image, plus one subtle product-detail desktop-light difference; the collection layout and image dimensions remain stable. Live audit passed 8/8 viewport/theme pairs, canonical product-detail click/direct-open/reload checks, and recorded zero overflow, page/console errors, or read-only violations. Human review of visual parity against the supplied app-like reference collage remains pending; automated capture success does not establish 100% design parity. Production remains untouched.",
   "stages": {
@@ -1746,19 +1746,19 @@
     },
     "end-of-work": {
       "status": "CAPTURED_PASS",
-      "capturedAtUtc": "2026-10-21T12:41:44Z",
-      "runId": "39601013762",
-      "sourceCommit": "e3757df8056978949b0a29c893d841c3faffb5e9",
-      "previewDeploymentCommit": "e3757df8056978949b0a29c893d841c3faffb5e9",
+      "capturedAtUtc": "2026-10-21T13:23:06Z",
+      "runId": "39606812035",
+      "sourceCommit": "a14b8a33b138cebc8ba1216a58ee450011cf808f",
+      "previewDeploymentCommit": "a14b8a33b138cebc8ba1216a58ee450011cf808f",
       "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
-      "previewDeploymentId": "eb5a9529-fd40-4d59-abf9-344fc271a3a6",
-      "previewDeploymentCreatedOn": "2026-10-21T12:37:40.012Z",
+      "previewDeploymentId": "0be24d92-b89a-4c20-b22c-a4a6855dfc23",
+      "previewDeploymentCreatedOn": "2026-10-21T13:19:04.639Z",
       "previewDeploymentVerified": true,
       "imageCount": 84,
       "directory": "docs/website-screenshots/end-of-work/",
       "sourceKind": "cloudflare-pages-preview-live-read-only",
       "auditPassed": true,
-      "overallVisualComparison": "COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW",
+      "overallVisualComparison": "UNVERIFIED",
       "responsiveOverflowCount": 0,
       "pageErrorCount": 0,
       "consoleErrorCount": 0,
@@ -2658,7 +2658,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-contact-desktop-dark-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-contact-desktop-dark-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -2677,7 +2677,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-contact-desktop-light-1440x900.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-contact-desktop-light-1440x900.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -2696,7 +2696,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-contact-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-contact-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -2715,7 +2715,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/section-contact-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/section-contact-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3114,7 +3114,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3133,7 +3133,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3152,7 +3152,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3171,7 +3171,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-account-menu-viewport-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-account-menu-viewport-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3190,7 +3190,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3209,7 +3209,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3228,7 +3228,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3247,7 +3247,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-cart-with-item-viewport-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3266,7 +3266,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3285,7 +3285,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3304,7 +3304,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3323,7 +3323,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-checkout-form-viewport-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3342,7 +3342,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-dark-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3361,7 +3361,7 @@
           "status": "captured-live-preview",
           "baselinePath": "docs/website-screenshots/start-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
           "resultPath": "docs/website-screenshots/end-of-work/state-fullscreen-gallery-mobile-light-390x844.png",
-          "counterpartExists": false,
+          "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         },
         {
@@ -3478,17 +3478,7 @@
           "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         }
-      ],
-      "pixelComparisonSummary": {
-        "comparablePairs": 36,
-        "identicalPairs": 0,
-        "changedPairs": 36,
-        "dimensionMismatches": 30,
-        "invalidPngPairs": 0,
-        "unmatchedBaselineImages": 0,
-        "unmatchedResultImages": 18
-      },
-      "humanVisualReviewStatus": "PENDING"
+      ]
     }
   },
   "referenceImages": {
@@ -4027,11 +4017,11 @@
     "noProductionDeployOrMerge": true,
     "nextStep": "Finish visual acceptance review of the 9 changed screenshot pairs and clarify the boundary between Admin Preview audit and the separate supplied public-storefront reference design. Do not merge or deploy Production."
   },
-  "sourceCommit": "d5b3a8f5e4a4fd3ca8c510509d019829645c9145",
-  "previewDeploymentCommit": "d5b3a8f5e4a4fd3ca8c510509d019829645c9145",
+  "sourceCommit": "a14b8a33b138cebc8ba1216a58ee450011cf808f",
+  "previewDeploymentCommit": "a14b8a33b138cebc8ba1216a58ee450011cf808f",
   "previewDeploymentBranch": "fix/liquid-glass-audit-2026-10-19",
-  "previewDeploymentId": "f96bd5df-6b48-42cf-8c5e-7f3ef56f45ed",
-  "previewDeploymentCreatedOn": "2026-10-21T13:09:51.494Z",
+  "previewDeploymentId": "0be24d92-b89a-4c20-b22c-a4a6855dfc23",
+  "previewDeploymentCreatedOn": "2026-10-21T13:19:04.639Z",
   "previewCommitVerification": "VERIFIED via Cloudflare Pages API read-only deployment metadata; target alias matched an environment=preview deployment with successful stage status.",
   "captureSource": "Direct Cloudflare Pages Preview capture, read-only; no fixture API",
   "captureCoverage": {
