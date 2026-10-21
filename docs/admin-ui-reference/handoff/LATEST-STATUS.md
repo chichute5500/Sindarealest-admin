@@ -87,3 +87,9 @@ The artifact was downloaded and the reference PNG was opened alongside current P
 - The existing dashboard comment explicitly says it avoids fabricated trend data. Preserve this data-integrity constraint.
 - Still blocked/not accepted: all-12-screen visual parity; authenticated real-backend QA due Cloudflare Access; real product image upload/save; PRE/PRO migration verification. No Access/secrets, deployment, merge, remote D1/R2 or migration/setup execution was performed. PR #111 remains unmerged.
 - Progress remains 48%; this audit adds source evidence but does not itself complete a user-visible requirement.
+
+
+### Validation follow-up — 2026-10-21 15:12 UTC
+
+- The previously queued exact-source validation run [#39622616336](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39622616336) has now completed **success** on source SHA `e9404d10ea799cb51fb5f7e5c4aca68623ea1f2d` (job `validate`, completed success).
+- This validates the tested source tree at that SHA only. Subsequent handoff-document commits move branch HEAD to `ab02394891b517bc4731372f90c41512f76483e7`; do not conflate docs HEAD with source-tested SHA. Re-check workflow status for current HEAD before claiming it passed.
