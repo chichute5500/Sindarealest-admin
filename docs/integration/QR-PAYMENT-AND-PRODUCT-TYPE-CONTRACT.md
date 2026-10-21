@@ -44,10 +44,10 @@ Tên trường API/DB đề xuất thống nhất: `fulfillment_type`. Trước 
 
 ### Trải nghiệm khách hàng
 
-- Ưu tiên QR theo đơn hàng, dùng thông tin tài khoản nhận tiền đã được Admin cấu hình và nội dung chuyển khoản có mã đơn hàng dễ đối chiếu.
+- Mặc định dùng QR chuyển khoản ngân hàng theo mẫu người dùng cung cấp; có thể tạo QR/ nội dung tham chiếu riêng theo đơn nếu kiểm thử xác nhận ngân hàng chấp nhận. QR chỉ mang thông tin tài khoản và tối đa mã/nội dung chuyển khoản để đối chiếu.
 - Có thể giữ QR cố định do chủ dự án cung cấp làm phương án dự phòng sau khi xác minh mã QR, ngân hàng, chủ tài khoản và thông tin nhận tiền. Ảnh QR được cung cấp là tài liệu tham chiếu; chưa coi là đã giải mã/kiểm thử thành công.
 - Nếu tổng tiền, giá, tiền đặt cọc hoặc điều kiện đơn chưa được xác nhận, website phải hiển thị trạng thái chờ tư vấn/xác nhận; không yêu cầu khách chuyển tiền trước.
-- Chỉ điền sẵn số tiền trên QR nếu đó là số tiền phải trả đã được xác nhận từ nguồn dữ liệu tin cậy. Không lấy số tiền do trình duyệt gửi lên làm căn cứ tính tiền.
+- Theo yêu cầu chủ dự án, **QR tuyệt đối không nhúng hoặc điền sẵn số tiền**. Sau khi giá/đợt thanh toán được xác nhận, website hiển thị số tiền cần chuyển bên ngoài QR; khách tự nhập số tiền trong ứng dụng ngân hàng. Không tạo QR có trường số tiền, kể cả khi số tiền đã xác nhận.
 - Không tích hợp cổng thanh toán và không tuyên bố đã thanh toán tự động. QR chỉ khởi tạo hướng dẫn chuyển khoản ngân hàng.
 
 ### Luồng thanh toán
@@ -64,7 +64,7 @@ Tên trường API/DB đề xuất thống nhất: `fulfillment_type`. Trước 
 - Thiết kế phải theo dõi riêng ít nhất: tổng tiền đã được xác nhận, số tiền phải thu của từng đợt, số tiền thực nhận đã xác minh và số dư còn lại. Ưu tiên ledger/record giao dịch để hỗ trợ đặt cọc, thanh toán tiếp và kiểm toán; không chỉ ghi đè một cờ `paid`.
 - Tách trạng thái “đã tạo QR/đang chờ chuyển khoản” khỏi “đã xác nhận nhận tiền”. Cần xử lý xác nhận lặp, chuyển thiếu/thừa, đơn bị hủy và thanh toán nhiều đợt.
 - QR/receiver config phải lấy từ cấu hình được quản lý có kiểm soát. Không đưa secret/API key vào frontend. Chỉ công khai đúng các trường cần để khách chuyển khoản.
-- Endpoint tạo QR phải lấy order, người dùng/phiên và số tiền từ dữ liệu có thẩm quyền; không chấp nhận client tùy ý thay tài khoản nhận hoặc tự tăng/giảm số tiền.
+- Endpoint/logic tạo QR (nếu cần) chỉ lấy tài khoản nhận và nội dung tham chiếu từ cấu hình/order đã xác thực; loại bỏ trường số tiền khỏi payload QR. Số tiền hiển thị ngoài QR phải được đọc từ dữ liệu đơn đã xác nhận, không tin số tiền do trình duyệt gửi lên.
 - Ghi audit log cho hành động xác nhận/thay đổi thanh toán. Không bao giờ tự động đánh dấu `paid` do QR đã được hiển thị.
 
 ## 5. Trách nhiệm theo nhánh
@@ -94,7 +94,7 @@ Tên trường API/DB đề xuất thống nhất: `fulfillment_type`. Trước 
 - [ ] Phân loại ba trạng thái được lưu bền vững, hiển thị chính xác; không đoán loại cho dữ liệu cũ.
 - [ ] Số lượng tồn kho không bị đồng nhất với loại hàng.
 - [ ] Đơn chưa xác nhận giá/điều kiện không đưa ra yêu cầu thanh toán.
-- [ ] QR chứa đúng tài khoản nhận/nội dung đơn; số tiền chỉ được điền sẵn khi đã xác nhận.
+- [ ] QR chứa đúng tài khoản nhận/nội dung tham chiếu và **không chứa số tiền**; website hiển thị riêng số tiền đã xác nhận để khách tự nhập.
 - [ ] Quét/mở QR không chuyển trạng thái thanh toán thành `paid`.
 - [ ] Admin xác nhận thủ công có audit, chống cập nhật lặp và theo dõi được đặt cọc/số dư.
 - [ ] Kiểm thử các tình huống chuyển thiếu/thừa, nhiều lần chuyển, hủy đơn, QR thiếu/sai cấu hình và sản phẩm chưa phân loại.
