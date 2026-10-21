@@ -1,6 +1,6 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CHECKS AND LOCAL PLAYWRIGHT PASS; CONFIGURED PREVIEW IS MISSING THE EXPECTED CSS RULE; AUTHENTICATED QA, 12-SCREEN PARITY AND MIGRATION/SCOPE REVIEW OPEN`
+**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI PASS; PREVIEW CSS SIGNATURE FAILS; SCREENSHOTS NOW ARTIFACT-ONLY; AUTHENTICATED QA, 12-SCREEN PARITY AND PR SCOPE/MIGRATION REVIEW OPEN`
 **Tiến độ ước tính:** 45%; tăng nhẹ nhờ kiểm thử nguồn mới nhất và chẩn đoán CSS chính xác hơn. Đây vẫn là ước lượng theo giai đoạn, chưa nghiệm thu.
 **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`.
 **HEAD quan sát trước cập nhật bàn giao:** `eff59ab78cfe11b091dfb64df3cc281a3572b343` (commit bằng chứng do workflow sinh); commit source/test gần nhất đã xác minh: `6935eefa3473f1c6a15da08a34389d7223cbd0ea`.
@@ -146,3 +146,21 @@
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+## Handoff mới nhất — 2026-10-21 12:43 +07
+
+- **HEAD ADMIN hiện tại khi bắt đầu cập nhật:** `71be37cbe6df5999f165fd102895ca229cfa4237`. PR #111 vẫn OPEN/unmerged; API hiện báo **1.033 file (+33.892/−357; 424 commits)**. Không merge.
+- **Source CI:** [run 39550214045](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214045) SUCCESS trên commit `8fd8aa96a9f80ae7a18fd598b44cc459dd303bca`.
+- **Preview diagnostics:** [run 39550214050](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39550214050) FAILURE trên cùng commit. Log mới: `2 passed` nhưng 1 assertion Preview thất bại; browser hỗ trợ selector và selector khớp brand, tuy nhiên inline stylesheet có 226 rules và `hasLoginHideRule=false`. Đây vẫn là mismatch giữa Preview đang được kiểm tra và CSS login-shell kỳ vọng; không nới lỏng assertion để làm xanh giả.
+- **Bằng chứng đầy đủ:** artifact `admin-preview-evidence-68` là ảnh/metadata đầy đủ của run #39550214050; artifact run cũ #39550195026 là `admin-preview-evidence-67` (ID `12322959928`, ~9,16 MB). Screenshot source/fixture là kiểm thử cục bộ và dữ liệu tổng hợp/read-only, không chứng minh nghiệp vụ trên backend thật.
+- **Giảm phình PR:** workflow `.github/workflows/admin-preview-diagnostics.yml` đã được sửa để ngừng copy PNG/full metadata của từng lượt vào lịch sử Git; lưu ảnh/metadata đầy đủ trong GitHub Actions Artifact (retention 14 ngày), và chỉ giữ báo cáo tóm tắt/chẩn đoán trong nhánh. Test contract `tests/admin-upgrade.test.mjs` bảo vệ quy tắc này. Lượt run cũ #39550195026 phát hiện nhánh đã tiến lên và tự bỏ qua commit ảnh cũ; bằng chứng vẫn ở artifact. Cần xác nhận lượt run sau thay đổi không thêm hàng chục PNG vào Git.
+- **Trợ năng:** đã thêm `aria-label` theo bản ghi cho trạng thái/thanh toán đơn hàng, lưu đơn hàng, trạng thái/ghi chú/lưu yêu cầu bảo hành, thao tác sắp xếp/xóa ảnh và các công tắc cấu hình; thêm contract tests trong `tests/admin-liquid-glass-contract.test.mjs`. Source CI xanh trên commit mới nhất được kiểm tra.
+- **Tiến độ ước tính: 45%** (theo tiêu chí giai đoạn, không phải nghiệm thu). Chưa xác minh Preview đúng source, chưa có authenticated QA với backend thật, chưa hoàn tất so sánh 12 màn hình với reference, chưa hoàn tất xử lý phạm vi PR #111. PR chứa nhiều file ngoài Admin; không merge hoặc tự ý viết lại lịch sử.
+- **An toàn:** không thay đổi main/nhánh web tĩnh, không merge PR #111/#108, không Production deploy, không chạy migration/setup, không sửa secret/Access hoặc dữ liệu D1/R2.
+
+### Next actions bắt buộc cho chat tiếp theo
+1. Đọc MASTER PROMPT, START-HERE, LATEST-STATUS, JSON, PROMPT-NEXT-CHAT, PROMPT-COMPLETENESS-AUDIT và reference instructions trước khi sửa.
+2. Kiểm tra run mới nhất sau commit `8fd8aa9`, nhất là workflow diagnostic: artifact đã được tạo chưa, PR file count có tăng do PNG không, source CI còn xanh không.
+3. Xác minh bằng API read-only chính xác file changed list/commit của PR #111; tiếp tục phân loại phạm vi ngoài Admin. Không xóa lịch sử/ảnh đã có, không force-push hoặc thay base.
+4. Tiếp tục audit accessibility/responsive và so sánh ảnh nguồn với reference có sẵn; tách rõ SOURCE/fixture evidence với deployed Preview evidence.
+5. Với Preview: không đọc/in/đổi secret `ADMIN_TEST_URL`, không bypass Cloudflare Access. Khi không có URL Preview đúng source và được cấp quyền, đánh dấu BLOCKED và tiếp tục các việc an toàn độc lập.
