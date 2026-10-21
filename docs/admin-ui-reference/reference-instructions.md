@@ -83,3 +83,10 @@ For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file 
 - Exact-SHA Playwright run [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) on source/test SHA `32c1f28662e7240353b0eda2f5daeaf22359257e` passed. The product-editor tablist test covers ArrowLeft/ArrowRight and Home/End, asserting focus placement and `aria-selected` state.
 - The same 3-test static baseline passed dialog focus trapping/restoration, reduced-motion checks, source screenshot matrix and configured Preview login CSS signature. Fixture/API data is synthetic/read-only.
 - This remains PARTIAL accessibility evidence, not global acceptance: continue testing focus/name/target sizing screen-by-screen and keep all-12-screen visual parity NOT ACCEPTED until direct reference comparisons pass.
+
+
+## QR settings accessibility and guard verification — 2026-10-21
+
+- Browser test [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) on exact source/test SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55` passed a synthetic/read-only Settings QR check. It verifies bank controls, accessible scan-verification checkbox, inactive-state deactivate disablement, and the unsaved bank details guard. No non-GET API call is allowed by the fixture router.
+- The first attempt failed only because the test reused a warning message between responsive variants. The test now navigates away and returns to Settings before each variant; retry passed without application source changes.
+- This adds partial evidence for QR settings UI and guard behavior only. Do not claim real QR upload, bank-account validation, payment ledger, authenticated backend, or cross-branch runtime acceptance from these fixture screenshots. Overall progress remains 48%; full 12-screen parity remains NOT ACCEPTED.
