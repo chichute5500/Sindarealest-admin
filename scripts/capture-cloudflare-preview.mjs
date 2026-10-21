@@ -67,6 +67,7 @@ const audit = {
   commerceStateChecks: [],
   productDetailChecks: [],
   iconStateChecks: [],
+  cartAddStateChecks: [],
   brokenImages: [],
   accessServiceTokenConfigured: Object.keys(accessHeaders).length > 0,
   sourceCommit: process.env.SOURCE_SHA || null,
@@ -798,6 +799,148 @@ async function captureIconFeedback(page, viewport, theme, label, route) {
   if (!pass) audit.hardFailures.push('Live icon press/favorite state mismatch at ' + label + '.');
 }
 
+async function captureAddToCartFeedback(page, viewport, theme, label, route) {
+  const addButton = page.locator('#detailAdd');
+  const recordFailure = (state, details = {}) => {
+    audit.cartAddStateChecks.push({ context: label, route, state, status: 'FAIL', ...details });
+    audit.hardFailures.push('Live add-to-cart feedback mismatch (' + state + ') at ' + label + '.');
+  };
+  if (!await addButton.isVisible().catch(() => false)) {
+    recordFailure('detail-add-control-missing');
+    return;
+  }
+  const readCartState = async (productId) => page.evaluate((id) => {
+    let stored = {};
+    try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+    const quantities = stored && typeof stored === 'object' ? stored : {};
+    const total = Object.values(quantities).reduce((sum, value) => sum + Number(value || 0), 0);
+    const toast = document.querySelector('#toast');
+    const image = document.querySelector('#detailImageStage');
+    const r = image?.getBoundingClientRect();
+    return {
+      quantity: Number(quantities[id] || 0), total,
+      expectedBadge: total > 99 ? '99+' : String(total),
+      badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
+      toastVisible: Boolean(toast?.classList.contains('show')),
+      toastText: (toast?.textContent || '').trim(),
+      imageRect: r ? { x:r.x, y:r.y, width:r.width, height:r.height } : null,
+    };
+  }, productId);
+  const before = await page.evaluate(() => {
+    let cart = {};
+    try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+    const productId = document.querySelector('#detailAdd')?.dataset.add || '';
+    const title = (document.querySelector('#detailTitle')?.textContent || '').trim();
+    const skuText = (document.querySelector('#detailSku')?.textContent || '').replace(/^Mã SKU:\\s*/i, '').trim();
+    const image = document.querySelector('#detailImageStage');
+    const r = image?.getBoundingClientRect();
+    return {
+      productId, title, skuText,
+      quantity: Number(cart[productId] || 0),
+      total: Object.values(cart).reduce((sum, value) => sum + Number(value || 0), 0),
+      badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
+      toastVisible: Boolean(document.querySelector('#toast.show')),
+      imageRect: r ? { x:r.x, y:r.y, width:r.width, height:r.height } : null,
+    };
+  });
+  if (!before.productId || !before.title || !before.imageRect) {
+    recordFailure('detail-add-baseline-missing', { before });
+    return;
+  }
+  const expectedLabel = before.skuText && !/chưa được cung cấp/i.test(before.skuText) ? before.skuText : before.title;
+  const rectUnchanged = (a, b) => Boolean(a && b
+    && ['x','y','width','height'].every(key => Math.abs(a[key] - b[key]) < 0.5));
+
+  try {
+    await page.evaluate(() => document.querySelector('#toast')?.classList.remove('show'));
+    const invalid = await page.evaluate(() => {
+      const result = typeof window.addToCart === 'function' ? window.addToCart('__invalid-preview-product__') : 'unavailable';
+      let stored = {};
+      try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+      return {
+        result,
+        quantity: Number(stored[document.querySelector('#detailAdd')?.dataset.add || ''] || 0),
+        total: Object.values(stored).reduce((sum, value) => sum + Number(value || 0), 0),
+        badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
+        toastVisible: Boolean(document.querySelector('#toast.show')),
+      };
+    });
+    const invalidPass = invalid.result === false && invalid.quantity === before.quantity
+      && invalid.total === before.total && invalid.badge === before.badge && !invalid.toastVisible;
+
+    await addButton.click();
+    await page.waitForFunction(({ id, quantity }) => {
+      let stored = {};
+      try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+      return Number(stored[id] || 0) === quantity;
+    }, { id: before.productId, quantity: before.quantity + 1 }, { timeout: 6000 });
+    await page.waitForFunction(labelText => {
+      const toast = document.querySelector('#toast');
+      return Boolean(toast?.classList.contains('show') && (toast.textContent || '').includes(labelText));
+    }, expectedLabel, { timeout: 5000 });
+    const afterOne = await readCartState(before.productId);
+    const onePass = afterOne.quantity === before.quantity + 1
+      && afterOne.total === before.total + 1
+      && afterOne.badge === afterOne.expectedBadge
+      && afterOne.toastVisible && afterOne.toastText.includes(expectedLabel)
+      && rectUnchanged(before.imageRect, afterOne.imageRect);
+    await capture(page, screenshotStem('cart-add-success-detail-open', viewport, theme) + '.png', false, {
+      ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'one-successful-add-with-detail-toast',
+      productTitle: before.title, productId: before.productId,
+    });
+
+    await addButton.click();
+    await addButton.click();
+    await page.waitForFunction(({ id, quantity }) => {
+      let stored = {};
+      try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+      return Number(stored[id] || 0) === quantity;
+    }, { id: before.productId, quantity: before.quantity + 3 }, { timeout: 6000 });
+    const afterRapid = await readCartState(before.productId);
+    const rapidPass = afterRapid.quantity === before.quantity + 3
+      && afterRapid.total === before.total + 3
+      && afterRapid.badge === afterRapid.expectedBadge
+      && afterRapid.toastVisible && afterRapid.toastText.includes(expectedLabel)
+      && rectUnchanged(before.imageRect, afterRapid.imageRect);
+    await capture(page, screenshotStem('cart-add-rapid-clicks-detail-open', viewport, theme) + '.png', false, {
+      ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'rapid-two-clicks-exactly-two-adds',
+      productTitle: before.title, productId: before.productId,
+    });
+
+    await page.locator('#detailClose').click();
+    await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 5000 });
+    const beforeOpenCart = await readCartState(before.productId);
+    await page.locator('#cartOpen').click();
+    await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'), null, { timeout: 5000 });
+    const afterOpenCart = await readCartState(before.productId);
+    const headerCartNoAdd = afterOpenCart.quantity === beforeOpenCart.quantity
+      && afterOpenCart.total === beforeOpenCart.total && afterOpenCart.badge === beforeOpenCart.badge;
+    await captureLocator(page, '#cartDrawer', screenshotStem('cart-header-open-no-add', viewport, theme) + '.png', {
+      ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'header-cart-open-without-add',
+      productTitle: before.title, productId: before.productId,
+    });
+    await page.locator('#cartClose').click();
+
+    const pass = invalidPass && onePass && rapidPass && headerCartNoAdd;
+    const result = {
+      context: label, route, status: pass ? 'PASS' : 'FAIL',
+      productId: before.productId, productTitle: before.title, expectedToastLabel: expectedLabel,
+      invalidAddNoMutation: invalidPass, oneClickExactlyOnce: onePass, rapidClicksExactlyOnce: rapidPass,
+      headerCartOpensWithoutAdd: headerCartNoAdd,
+      before: { quantity: before.quantity, total: before.total, badge: before.badge },
+      afterOne: { quantity: afterOne.quantity, total: afterOne.total, badge: afterOne.badge, toastVisible: afterOne.toastVisible, toastText: afterOne.toastText, noLayoutShift: rectUnchanged(before.imageRect, afterOne.imageRect) },
+      afterRapid: { quantity: afterRapid.quantity, total: afterRapid.total, badge: afterRapid.badge, toastVisible: afterRapid.toastVisible, toastText: afterRapid.toastText, noLayoutShift: rectUnchanged(before.imageRect, afterRapid.imageRect) },
+    };
+    audit.cartAddStateChecks.push(result);
+    if (!pass) audit.hardFailures.push('Live add-to-cart acceptance failed at ' + label + '.');
+  } catch (error) {
+    recordFailure('interaction-probe-exception', { reason: sanitizeText(String(error?.message || error).slice(0, 240)) });
+    await page.locator('#cartClose').click({ timeout: 800 }).catch(() => {});
+    await page.locator('#checkoutClose').click({ timeout: 800 }).catch(() => {});
+    await page.locator('#detailClose').click({ timeout: 800 }).catch(() => {});
+  }
+}
+
 async function captureProductDetailFlow(page, viewport, theme, label) {
   let cardButton = page.locator('#catalogGrid [data-open-product]').first();
   if (await cardButton.count().catch(() => 0) === 0) cardButton = page.locator('#featuredGrid [data-open-product]').first();
@@ -912,6 +1055,8 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
   await captureLocator(page, '#productOverlay', screenshotStem('product-detail-modal-after-reload', viewport, theme) + '.png', {
     ...captureMeta(viewport, theme, reloadState.path), captureType: 'product-detail-modal', state: 'after-reload', productTitle: clicked.title,
   });
+
+  await captureAddToCartFeedback(page, viewport, theme, label, reloadState.path);
   const passed = directOpenPassed && reloadPassed;
   audit.productDetailChecks.push({
     context: label, status: passed ? 'PASS' : 'FAIL', path: clicked.path, directOpenPassed, reloadPassed,
@@ -1032,7 +1177,10 @@ async function main() {
     firstPaintCoverageComplete, firstPaintVideoCoverageComplete, firstPaintVideoCount: audit.videoCaptures.length,
     firstPaintViolationCount,
     iconStateCheckCount: audit.iconStateChecks.length,
+    cartAddStateCheckCount: audit.cartAddStateChecks.length,
     iconStateChecksComplete: audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS'),
+    cartAddStateCheckCount: audit.cartAddStateChecks.length,
+    cartAddStateChecksComplete: audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS'),
   };
   audit.passed = audit.captureCompleted
     && completedViewportThemePairs === requiredViewportThemePairs
@@ -1046,6 +1194,7 @@ async function main() {
     && firstPaintCoverageComplete && firstPaintVideoCoverageComplete
     && firstPaintViolationCount === 0
     && audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS')
+    && audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS')
     && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
   audit.summary = {

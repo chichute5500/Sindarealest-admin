@@ -358,6 +358,14 @@ assert.match(live, /iconStateChecksComplete[\s\S]*?audit\.iconStateChecks\.lengt
 assert.match(live, /selected\.buttonColor === 'rgb\(229, 72, 77\)'[\s\S]*?restored\.buttonColor === expectedRestoredColor/,
   'Favorite state verification must assert the real red selected state and theme-correct unselected state.');
 
+
+assert.match(live, /async function captureAddToCartFeedback[\\s\\S]*?oneClickExactlyOnce[\\s\\S]*?rapidClicksExactlyOnce[\\s\\S]*?headerCartOpensWithoutAdd/,
+  'Live Preview must verify detail-add toast, exactly-once quantity, rapid clicks, and that opening the header cart adds nothing.');
+assert.match(live, /cartAddStateChecksComplete: audit\\.cartAddStateChecks\\.length === 4[\\s\\S]*?audit\\.cartAddStateChecks\\.every\(check => check\\.status === 'PASS'\)/,
+  'Live audit cannot PASS unless add-to-cart interaction checks pass in all four detail contexts.');
+assert.match(live, /#cartDrawer','#checkoutDrawer','#accountDrawer'/,
+  'Toast suppression must not include the product detail overlay, so detail add can report success.');
+
 const firstPaintVisibilityLogic = live.slice(
   live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'),
   live.indexOf('const fingerprint', live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'))

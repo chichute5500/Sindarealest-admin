@@ -66,6 +66,12 @@ assert.ok(storefrontHtml.includes('html.dark #productOverlay #detailFavorite:not
   && storefrontHtml.includes('html.dark #productOverlay #detailFavorite[aria-pressed="true"]'),
   'Dark mode must retain a distinct pressed glass tint and red selected heart under cascade overrides.');
 
+
+assert.ok(storefrontHtml.includes("function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDrawer','#checkoutDrawer','#accountDrawer'].some(selector=>$(selector)?.classList.contains('open'))"),
+  'A successful detail add must show its success toast while the product overlay is open.');
+assert.ok(storefrontHtml.includes("function addToCart(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id);if(!p)return false;const key=p.id||p.slug;if(!key)return false;cart[key]=(cart[key]||0)+1;saveCart();showToast(`Đã thêm ${visibleSku(p)||p.title||'sản phẩm'} vào giỏ chọn`);return true}"),
+  'The one existing addToCart function must report invalid identities and only report success after the single cart mutation and badge save.');
+
 assert.ok(storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
   'Control feedback must remain covered by the storefront reduced-motion policy.');
 
