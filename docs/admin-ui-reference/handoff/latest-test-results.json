@@ -8,7 +8,7 @@
   "capturedAt": "2026-10-21T11:02:00Z",
   "progressEstimatePercent": 48,
   "progressBasis": "Estimated total project progress. Recent source CI PASS and incremental UI/accessibility fixes are verified; visual parity, Preview target/source diagnostic, authenticated QA and semantic PR audit remain open. Not a test pass percentage.",
-  "note": "Latest handoff HEAD 16ea1581ba7cb76762169d57030456cd4c31cffd has Validate source and tests PASS (run 39588603589). Latest UI source commit identified via file history is d553b95c3d43420f9227e9a37e6fe94b9b862b27. Latest verified Preview diagnostic run 39587426878 is FAILURE. Do not claim visual parity or backend QA complete. Owner explicitly requires continuous work after progress reports. Product image-save and PRE/PRO migrations remain deferred by owner.",
+  "note": "Latest handoff HEAD 16ea1581ba7cb76762169d57030456cd4c31cffd has Validate source and tests PASS (run 39588603589). Latest UI source commit identified via file history is d553b95c3d43420f9227e9a37e6fe94b9b862b27. Latest verified Preview diagnostic run 39587426878 is FAILURE. Do not claim visual parity or backend QA complete. Owner explicitly requires continuous work after progress reports. Product image-save and PRE/PRO migrations remain deferred by owner. Handoff files and master/next-chat prompts were updated in a docs-only commit series; docs-only commits do not claim source CI was rerun.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -16,7 +16,6 @@
     "mainMerge": false,
     "productionDeployment": false,
     "fullDiffIsolationReview": "PARTIAL_GITHUB_API_REVIEW_NO_LOCAL_CHECKOUT",
-    "branchHeadSha": "16ea1581ba7cb76762169d57030456cd4c31cffd",
     "lastObservedApplicationSourceCommit": "d553b95c3d43420f9227e9a37e6fe94b9b862b27",
     "lastObservedEvidenceOnlyHead": "eff59ab78cfe11b091dfb64df3cc281a3572b343",
     "pr111State": "OPEN_UNMERGED",
@@ -1719,7 +1718,6 @@
     "inventoryStatus": "COMPLETE_PAGINATED_GITHUB_API",
     "semanticSecurityAuditStatus": "PARTIAL_NOT_ACCEPTED_FOR_MERGE"
   },
-  "latestHandoffHeadSha": "16ea1581ba7cb76762169d57030456cd4c31cffd",
   "latestCiRuns": [
     {
       "runId": 39588603589,
@@ -1740,5 +1738,27 @@
     "continueAfterProgressReports": true,
     "stopOnlyWhenOwnerActionRequired": true,
     "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
-  }
+  },
+  "handoffDocsUpdated": [
+    {
+      "path": "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
+      "commitSha": "6510fc80498ac7ec8a5256049d2c517b41c369ba"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/START-HERE.md",
+      "commitSha": "79da5302430a5f1aec4647521fd18b5bc7e66746"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "commitSha": "a35ca6e6a3f8e6422868d9feaaa7e978fe261677"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/latest-test-results.json",
+      "commitSha": "bea1903e2756f4a20efd9b9f4803e5e7e0dc3070"
+    },
+    {
+      "path": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "commitSha": "3d42e686ec30f366ad9e828942e9563d8e641e9b"
+    }
+  ]
 }
