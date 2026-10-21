@@ -19,7 +19,8 @@ assert.match(html, /\.theme-bg--dark\{background-image:url\('images\/liquid-glas
 const end = html.indexOf('/* sd-static-reference-final-pass-2026-10-21 */');
 assert.ok(end >= 0, 'The final storefront visual-pass stylesheet must remain identifiable.');
 const finalCss = html.slice(end, html.indexOf('</style>', end));
-assert.match(finalCss, /\.theme-bg--light::after\{[\s\S]*?linear-gradient\(145deg,transparent 14%,rgba\(255,255,255,\.72\) 22%/);
+assert.match(finalCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/);
+assert.match(finalCss, /\.theme-bg--dark::after\{background:linear-gradient\(118deg,rgba\(3,20,36,\.10\),rgba\(7,31,51,\.06\) 52%,rgba\(3,17,30,\.12\)\)\}/);
 assert.match(finalCss, /\.theme-bg--dark::after\{[\s\S]*?rgba\(183,220,245,\.22\)/);
 assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   'The hero headline must keep the exact three-line hierarchy from the supplied mobile reference.');
@@ -57,10 +58,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-3"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-3"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-3"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-3"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-4"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-4"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-4"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-4"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1/,
   'All four satin backgrounds must use the updated cache key.');
 
