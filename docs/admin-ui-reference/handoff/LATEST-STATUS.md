@@ -1,15 +1,15 @@
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
-**Trạng thái tổng thể:** `IN PROGRESS — SOURCE CI PASS; DEPLOYED PREVIEW SOURCE MISMATCH; AUTHENTICATED MODULE QA, 12-SCREEN VISUAL AUDIT AND FULL PR-SCOPE REVIEW OPEN`
-**Ước tính tiến độ:** 43% theo giai đoạn công việc; đây là ước tính, không phải tỷ lệ code.
+**Trạng thái tổng thể:** `IN PROGRESS — CURRENT SOURCE CI PASS; PREVIEW SOURCE MISMATCH; D1 MIGRATION PROCEDURE REVIEW REQUIRED; AUTHENTICATED QA AND VISUAL AUDIT OPEN`
+**Ước tính tiến độ:** 43% theo giai đoạn công việc; không phải tỷ lệ code.
 **Repository:** `chichute5500/Sindarealest-admin`
-**Nhánh ADMIN duy nhất được phép sửa:** `feature/admin-isolated-handoff-2026-10-20`
+**Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`
 **Nhánh website tĩnh được bảo vệ:** `fix/liquid-glass-audit-2026-10-19`
-**HEAD tại đầu vòng kiểm toán nội dung mới:** `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa` (commit handoff tài liệu; CI source checks/tests/dependency audit PASS trong run 39545082149).
-**Bằng chứng Playwright/Preview gần nhất:** source `de6114f75cba36193c50ad043175d08be092929f`, run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719): local screenshots/fixture PASS; deployed Preview diagnostic FAIL.
-**PR #111:** OPEN, chưa merge; 909 file thay đổi, bao gồm storefront/backend/migration/scripts ngoài giao diện ADMIN — không merge trước khi review/giải quyết scope.
-**PR #108:** OPEN, chưa merge; nhánh website tĩnh vẫn được bảo vệ.
-**Cloudflare Production deployment:** `NOT PERFORMED`
+**HEAD tại đầu vòng rà soát migration:** `f744fed18636622ac108f5e9874d3735ae2c2ccc`; CI [39545568905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545568905) PASS cho source check/test/dependency audit. Đây không phải kiểm thử Preview hoặc remote D1.
+**Preview:** [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAIL vì CSS signature không khớp source; artifact `admin-preview-evidence-62`.
+**PR #111:** OPEN/unmerged, 909 files mixed-scope; không merge.
+**PR #108:** OPEN/unmerged; không sửa nhánh website tĩnh.
+**Production deploy, remote migration, schema/data mutation:** NOT PERFORMED.
 
 
 
@@ -232,3 +232,18 @@ This was performed by reading current branch files and comparing them with `main
 - GitHub's PR patch endpoint still returns `patch=null` for the large public/data files. The snapshot comparisons above reduce ambiguity about the changed fields but **do not** clear PR #111 for merge; review of public behavior, migration order and isolation is still open.
 - **Current-HEAD CI before this documentation update:** [run 39545082149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149) PASS on `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`. This is source repository check/test/dependency-audit evidence only. The latest deployed Preview diagnostic is still [run 39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719), which fails the Preview CSS signature check on source `de6114f75cba36193c50ad043175d08be092929f`.
 - No source changes, branch synchronization, merge, deployment, secret edit, schema/data write or migration execution occurred during this audit.
+
+
+## 18.12. Migration tracking and deploy-gate review — 2026-10-21
+
+- Read-only source review found a second merge/deploy blocker in `scripts/setup-cloudflare.mjs`: it applies migrations `0001` and `0003`–`0007` using `wrangler d1 execute --remote --file`, then runs manual remote `ALTER TABLE` statements for `products.sku_verified` and `order_items.sku_verified` when columns are missing. It does not invoke `wrangler d1 migrations apply --remote` for migration 0008.
+- `scripts/deploy-cloudflare.mjs` checks migration 0007's order-contact snapshot state and checks that the two SKU columns exist via `SELECT ... LIMIT 0`; this does not verify whether migration 0008 is recorded as applied by Wrangler.
+- `scripts/check-migrations.mjs` applies migrations against a temporary **local** D1 database, including 0008, and verifies 235 seed rows are unverified. That is useful local test evidence, but it does not validate the remote setup script or the remote migration ledger.
+- **Risk, not a remote-state claim:** executing raw SQL files/direct ALTER operations may leave physical schema and Wrangler's migration ledger out of sync. No remote D1 query, setup script, migration, or deploy was run, so the actual remote ledger/state is NOT VERIFIED. Reconcile the intended migration procedure before any deployment or later automated migration. Cloudflare docs distinguish executing SQL files from applying tracked migrations and describe the `d1_migrations` table: [D1 Wrangler commands](https://developers.cloudflare.com/workers/wrangler/commands/d1/) and [D1 migrations reference](https://developers.cloudflare.com/d1/reference/migrations/).
+- CI run [39545568905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545568905) PASS on `f744fed18636622ac108f5e9874d3735ae2c2ccc` for source checks/tests/dependency audit. This does not validate remote D1 state or Preview source.
+- No script was executed; no remote DB, schema, data, secrets, bindings or deployment was touched. PR #111 stays OPEN/unmerged. Progress remains 43%.
+
+### Next required decisions/actions
+1. Do not run `setup:cloudflare`, `deploy`, Wrangler remote SQL, or migrations to resolve this automatically.
+2. Get an explicit owner-reviewed migration plan for reconciling migration 0008 and any Wrangler migration ledger before considering deployment.
+3. Continue UI-only work only where it can be safely tested without guessing at the approved PNG; authenticated module tests and full reference comparison remain NOT VERIFIED.

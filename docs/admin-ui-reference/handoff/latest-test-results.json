@@ -1,10 +1,10 @@
 {
-  "status": "SOURCE_CI_PASS_PREVIEW_DIAGNOSTICS_FAIL_AUTHENTICATED_MODULES_NOT_VERIFIED",
+  "status": "SOURCE_CI_PASS_PREVIEW_DIAGNOSTICS_FAIL_MIGRATION_REVIEW_REQUIRED_AUTHENTICATED_QA_NOT_VERIFIED",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "de6114f75cba36193c50ad043175d08be092929f",
-  "testedCommitSha": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+  "testedCommitSha": "f744fed18636622ac108f5e9874d3735ae2c2ccc",
   "capturedAt": "2026-10-20T20:50:00.385Z",
   "progressEstimatePercent": 43,
   "progressBasis": "Stage-based estimate, not code completion. Current HEAD CI passes, but configured Preview CSS signature still fails; authenticated business flows, full 12-screen comparison, full mixed-scope PR diff audit/remediation and authorized Preview identity remain open.",
@@ -723,7 +723,8 @@
     "Full 12-screen visual parity remains NOT VERIFIED.",
     "PR #111 is mixed-scope with 909 files; large public/index.html and data/legacy-products.json diffs remain unreviewed.",
     "Migration 0008 and scripts/setup-cloudflare.mjs remote D1 behavior require explicit migration/backward-compatibility review before merge/deploy.",
-    "No local checkout is available in the runtime; local git status is NOT VERIFIED."
+    "No local checkout is available in the runtime; local git status is NOT VERIFIED.",
+    "Migration procedure mismatch risk: setup uses raw remote d1 execute/direct ALTER for 0008 while deploy gate checks columns only; remote D1 migration ledger is NOT VERIFIED."
   ],
   "blockedItems": [
     "Remote authenticated Playwright testing is blocked by ADMIN_TEST_URL pointing to a source/layout that does not match the tested Admin source; update secret to a valid Admin Preview URL and provide valid access if Cloudflare Access protects it.",
@@ -741,11 +742,11 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39543407286",
-  "branchHeadSha": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
-  "latestVerifiedAt": "2026-10-21T11:42:00+07:00",
-  "latestVerifiedSourceCommit": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
-  "currentAdminBranchHead": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
-  "latestVerificationSummary": "Standard CI run 39545082149 PASS on 179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa for project checks/tests/dependency audit. Latest Preview diagnostic run 39542387719 remains FAIL on source de6114f75cba36193c50ad043175d08be092929f; fixture/screenshots are not authenticated real-backend evidence. Read-only comparison of public files confirms PR #111 is mixed-scope; progress remains 43%.",
+  "branchHeadSha": "f744fed18636622ac108f5e9874d3735ae2c2ccc",
+  "latestVerifiedAt": "2026-10-21T11:49:00+07:00",
+  "latestVerifiedSourceCommit": "f744fed18636622ac108f5e9874d3735ae2c2ccc",
+  "currentAdminBranchHead": "f744fed18636622ac108f5e9874d3735ae2c2ccc",
+  "latestVerificationSummary": "CI run 39545568905 PASS on f744fed18636622ac108f5e9874d3735ae2c2ccc for project checks/tests/dependency audit. Static review found setup-cloudflare.mjs uses remote d1 execute/direct ALTER for sku_verified while deploy gate checks only columns; remote migration ledger is NOT VERIFIED. Preview diagnostic 39542387719 still FAILS CSS signature.",
   "branchHeadBeforeHandoffUpdate": "fbf2955fc0983137cb882f683ec3a17c6695db17",
   "prSafety": {
     "number": 111,
@@ -861,8 +862,8 @@
     "Reference has separate order-detail screen; current source has no separate data-view for order detail. Do not add a route until existing order workflow/URL contracts are reviewed.",
     "Image manager, backup/restore, and activity log are embedded within existing views rather than separate routes."
   ],
-  "updatedAt": "2026-10-21T11:42:00+07:00",
-  "currentBranchHeadAtHandoff": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+  "updatedAt": "2026-10-21T11:49:00+07:00",
+  "currentBranchHeadAtHandoff": "f744fed18636622ac108f5e9874d3735ae2c2ccc",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -901,24 +902,22 @@
     "scope": "LOCAL SOURCE SCREENSHOTS + SYNTHETIC FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
-    "updatedAt": "2026-10-21T11:42:00+07:00",
-    "type": "READ_ONLY_CONTENT_SCOPE_AUDIT_AND_HANDOFF",
+    "updatedAt": "2026-10-21T11:49:00+07:00",
+    "type": "READ_ONLY_MIGRATION_PATH_REVIEW",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceCodeChanged": false,
     "testsRunInThisUpdate": false,
     "verified": [
-      "Read public/index.html and data/legacy-products.json from ADMIN, main and protected static branch snapshots; compared content without writing those files.",
-      "Field-by-field parsed JSON comparison: 235 product records, only sku and skuVerified differ from main.",
-      "Confirmed public/index.html and public/admin/index.html content is not identical between ADMIN and the protected static branch.",
-      "Confirmed CI run 39545082149 SUCCESS on the prior handoff commit 179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa.",
-      "Retained latest Playwright Preview failure as separate evidence; no authenticated real-backend PASS claimed."
+      "Read setup-cloudflare.mjs, deploy-cloudflare.mjs, check-migrations.mjs, migration 0008, seed migration 0002 and SKU tests from the ADMIN branch.",
+      "Confirmed remote setup uses raw SQL execution/direct ALTER; deploy gate checks schema columns, while local migration test applies tracked migrations against temporary local D1.",
+      "Consulted current official Cloudflare documentation for the documented separation between d1 execute and d1 migrations apply.",
+      "CI run 39545568905 succeeded on prior commit; Preview failure remains a separate status."
     ],
     "notDone": [
-      "No local Git checkout, so local git status remains NOT VERIFIED.",
-      "No deployed Preview target identity confirmed; no secrets read or changed.",
-      "No authenticated real backend tests or full 12-screen reference comparison.",
-      "No canonical full unified patch for very large public file; snapshot comparison is read-only and not full merge approval.",
-      "No branch sync, source code edit, D1/R2/schema/data write, migration, deploy, merge or cherry-pick."
+      "No remote D1 state or migration ledger queried.",
+      "No setup/deploy script, SQL migration or remote command executed.",
+      "No application source, secret, binding, schema, data or branch modified.",
+      "No authenticated real-backend QA or full approved 12-screen comparison."
     ],
     "constraints": {
       "adminBranchOnly": "feature/admin-isolated-handoff-2026-10-20",
@@ -987,16 +986,17 @@
   },
   "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719",
   "latestCiVerification": {
-    "runId": 39545082149,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149",
-    "sourceCommit": "179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa",
+    "runId": 39545568905,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545568905",
+    "sourceCommit": "f744fed18636622ac108f5e9874d3735ae2c2ccc",
     "workflow": "Validate source and tests",
     "conclusion": "SUCCESS",
     "repositoryChecks": "PASS",
     "automatedTests": "PASS",
     "dependencyAudit": "PASS",
     "previewDiagnostics": "NOT INCLUDED",
-    "note": "Documentation-only handoff commit on the ADMIN branch. This run does not verify the deployed Preview's served source."
+    "remoteD1": "NOT TESTED",
+    "note": "CI run was green on the preceding documentation checkpoint. It does not validate the configured Preview source or remote D1 migration ledger."
   },
   "latestPreviewArtifactInspection": {
     "inspectedAt": "2026-10-21T11:21:00+07:00",
@@ -1067,5 +1067,26 @@
       "mainBlob": "adad7344659f01358bec7466c8a5c5f752d70d35"
     },
     "scopeStatus": "PR #111 remains mixed-scope and not merge-ready; no file/branch was modified by this read-only comparison."
+  },
+  "migrationTrackingReview": {
+    "checkedAt": "2026-10-21T11:49:00+07:00",
+    "status": "REVIEW_REQUIRED_BEFORE_ANY_DEPLOYMENT",
+    "setupScript": "scripts/setup-cloudflare.mjs",
+    "observed": [
+      "Uses wrangler d1 execute --remote --file for migrations 0001 and 0003-0007",
+      "Uses direct remote ALTER TABLE for products.sku_verified and order_items.sku_verified if columns are absent",
+      "Does not invoke wrangler d1 migrations apply --remote for migration 0008 in that setup flow"
+    ],
+    "deployGate": [
+      "Checks order-contact snapshot rows for migration 0007",
+      "Checks sku_verified columns exist with SELECT ... LIMIT 0",
+      "Does not check whether migration 0008 is recorded in Wrangler's applied migration ledger"
+    ],
+    "localTest": "scripts/check-migrations.mjs applies migrations in a temporary local D1 DB and checks 235 seed identifiers remain unverified; this is not remote-state evidence.",
+    "risk": "Potential schema/ledger divergence; remote D1 state NOT VERIFIED. No remote SQL/setup/deploy/migration executed.",
+    "officialDocs": [
+      "https://developers.cloudflare.com/workers/wrangler/commands/d1/",
+      "https://developers.cloudflare.com/d1/reference/migrations/"
+    ]
   }
 }

@@ -114,3 +114,11 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 - `data/legacy-products.json` is identical between ADMIN and the static branch. Compared with main, the 235 records differ only by `sku:null` and `skuVerified:false`; titles, categories, descriptions, prices and images are unchanged.
 - Latest Preview diagnostic remains FAIL on source `de6114f...` because the served CSS signature does not match. Artifact has 16 login-shell images + 42 fixture module images; this is not authenticated real-backend QA.
 - PR #111 remains OPEN/unmerged with 909 changed files; review of public storefront effects and migration/backward compatibility is still mandatory. No migration/setup/deploy scripts were executed.
+
+
+## Additional blocking finding — migration bookkeeping
+
+- Before any deployment, resolve the migration strategy: `setup-cloudflare.mjs` uses remote `d1 execute --file` for schema files and direct `ALTER TABLE` for the two `sku_verified` columns instead of applying migration 0008 with the Wrangler migration mechanism. `deploy-cloudflare.mjs` checks for columns but not that migration 0008 is recorded in `d1_migrations`.
+- This is a possible schema/migration-ledger divergence; remote D1 state is NOT VERIFIED because no remote command was run. Local `check-migrations` PASS does not establish remote state. Do not run setup/deploy/migration commands.
+- Cloudflare docs: https://developers.cloudflare.com/workers/wrangler/commands/d1/ and https://developers.cloudflare.com/d1/reference/migrations/.
+- Latest source CI run before this handoff cycle: [39545568905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545568905) PASS on `f744fed18636622ac108f5e9874d3735ae2c2ccc`. The Preview diagnostic still fails and authenticated real-backend QA remains NOT VERIFIED. Progress remains 43%.

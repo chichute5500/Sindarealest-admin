@@ -80,3 +80,9 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 - `public/index.html` differs between ADMIN and static branches (blob SHA `bb0ae30...` vs `eca254f...`) and contains extensive public storefront styling plus public price/watermark/favourites presentation. `public/admin/index.html` also differs by branch. Do not sync branches or merge PR #111.
 - `data/legacy-products.json` is byte-identical between ADMIN and static branch; field-level JSON compare vs main found all 235 product records keep other fields unchanged while `sku` became null and `skuVerified=false`. This is not live D1 data, but it is still a public/fixture file in the mixed-scope PR.
 - Current source CI [39545082149](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39545082149) PASS on `179d6d5ae93ebd56215abb0d4bbdaa45679dd7fa`; Preview diagnostic run [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) FAILS on source-signature mismatch. Progress stays 43%.
+
+
+## Additional safety finding — D1 migration tracking
+
+- `scripts/setup-cloudflare.mjs` uses remote `d1 execute --file` for several schema files and manual `ALTER TABLE` for 0008 columns; it does not apply migration 0008 through `d1 migrations apply --remote`. Deploy gate checks column existence but not the applied-migrations ledger. This may cause schema/history divergence; remote D1 state was NOT queried.
+- Local migration test `scripts/check-migrations.mjs` is not a remote migration proof. Do not run setup/deploy/migrations; require owner-reviewed migration procedure first. See [Cloudflare D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/).
