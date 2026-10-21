@@ -227,3 +227,16 @@ This supersedes stale test claims in earlier appended checkpoints only for the f
 - Progress remains **48%**. Product-save/image upload and PRE/PRO migrations remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
 - No local checkout or working-tree status was available. Do not claim manual local test execution.
 - Next actions: continue the safe source/reference audit; resolve Preview only with owner-confirmed current source and authorized Access; complete the PR #111 security/scope review; keep authenticated business flows NOT TESTED until a valid Preview and safe synthetic-data plan exist.
+
+
+## Newest verified source cycle — payment-ledger concurrency guard (2026-10-21)
+
+- Exact source/test SHA: `ebb20fa7f2359b19ae91a9c62b3006a16b8db148`.
+- Actions run [39592097224](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224): `npm run check` PASS, `npm test` PASS (including `payment-ledger-route.test.mjs`), local read-only Playwright source/fixture matrix PASS. Workflow overall remains FAILURE at remote Preview only.
+- Functional source commit `d3fa9b85be20d832cbf24678dd7f3c7d862c1e64`: refund ledger INSERT rechecks net receipts inside a conditional `INSERT…SELECT`; related order/payment-request status updates and audit log require the successful ledger row; a lost refund race returns 409.
+- Regression test commit `ebb20fa7f2359b19ae91a9c62b3006a16b8db148` covers the conditional SQL shape and no-follow-on-write behavior in a synthetic in-memory DB mock. This is **unit-test evidence only**; remote D1 transactional/concurrency behavior remains NOT VERIFIED and no remote SQL was run.
+- Artifact [admin-preview-evidence-144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39592097224/artifacts/12342063095) (ID 12342063095, ~11.18 MB, retention to 2026-11-04) contains 59 PNGs, 36 synthetic fixture metrics, metadata and the approved reference. PNGs are Actions-artifact-only; no per-run PNG bundle is committed to Git.
+- Remote Preview remains FAIL: `PREVIEW_CSS_SIGNATURE_MISMATCH`, 226 inline CSS rules but `hasLoginHideRule=false`; header brand stays visible. Preserve the assertion; do not access/edit secrets or bypass Cloudflare Access.
+- PR #111 observed before the evidence/handoff doc refresh: HEAD `9e0434f769dedf2b20e1365aa96147336afc237c`, OPEN/unmerged, 1,096 files (+37,660/−392), mixed scope and not merge-ready. PR #108 remains OPEN/unmerged. Do not merge or modify static/main branches.
+- Overall progress remains **48%**. Product image save/upload and PRE/PRO migrations remain `DEFERRED_BY_OWNER / NOT VERIFIED`. Authenticated real-backend QA, full 12-screen parity and full semantic/security PR review remain open.
+- No local checkout; do not say tests ran locally. Current exact PASS result comes from GitHub Actions run above.
