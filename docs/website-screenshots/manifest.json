@@ -4,8 +4,8 @@
   "branch": "fix/liquid-glass-audit-2026-10-19",
   "previewUrl": "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/",
   "productionUrl": "https://sindarealest2.pages.dev",
-  "updatedAtUtc": "2026-10-21T11:32:35Z",
-  "status": "IN PROGRESS",
+  "updatedAtUtc": "2026-10-21T11:32:42.534Z",
+  "status": "AWAITING_HUMAN_VISUAL_REVIEW",
   "note": "End-of-work live Cloudflare Pages Preview capture and pixel comparison completed successfully in workflow 39425677039 against verified Preview deployment 1ab8617f-aac1-42f2-9112-4acc6b0d007a, branch fix/liquid-glass-audit-2026-10-19, source commit 37163dc3c17af332f948311bc395c9839a10e345. Start and end archives each contain 66 screenshots. Comparison: 57 pixel-identical pairs, 9 changed pairs, zero dimension mismatches, zero unmatched/invalid pairs. The changed pairs are the four full-page home captures and the four 'The art of…' collection captures where the autoplay carousel shows a different product image, plus one subtle product-detail desktop-light difference; the collection layout and image dimensions remain stable. Live audit passed 8/8 viewport/theme pairs, canonical product-detail click/direct-open/reload checks, and recorded zero overflow, page/console errors, or read-only violations. Human review of visual parity against the supplied app-like reference collage remains pending; automated capture success does not establish 100% design parity. Production remains untouched.",
   "stages": {
     "start-of-work": {
@@ -1416,7 +1416,7 @@
       "directory": "docs/website-screenshots/end-of-work/",
       "sourceKind": "cloudflare-pages-preview-live-read-only",
       "auditPassed": true,
-      "overallVisualComparison": "UNVERIFIED",
+      "overallVisualComparison": "COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW",
       "responsiveOverflowCount": 0,
       "pageErrorCount": 0,
       "consoleErrorCount": 0,
@@ -3136,7 +3136,17 @@
           "counterpartExists": true,
           "comparisonStatus": "UNVERIFIED"
         }
-      ]
+      ],
+      "pixelComparisonSummary": {
+        "comparablePairs": 36,
+        "identicalPairs": 0,
+        "changedPairs": 36,
+        "dimensionMismatches": 30,
+        "invalidPngPairs": 0,
+        "unmatchedBaselineImages": 0,
+        "unmatchedResultImages": 18
+      },
+      "humanVisualReviewStatus": "PENDING"
     }
   },
   "referenceImages": {
@@ -3726,7 +3736,7 @@
     "note": "Pixel diff is a review aid; a person must inspect matched screenshots and the report before visual acceptance."
   },
   "pixelComparison": {
-    "runId": "39590475267",
+    "runId": "39592175072",
     "report": "comparison.json and report.html in the GitHub Actions artifact",
     "status": "COMPLETE_WITH_MISSING_OR_SIZE_MISMATCH_REVIEW",
     "summary": {
