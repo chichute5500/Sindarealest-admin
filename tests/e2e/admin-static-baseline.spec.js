@@ -1340,6 +1340,15 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await trigger.click();
       await expect(menu).toBeVisible();
       await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      await menu.locator('[role="menuitem"][data-view="settings"]').click();
+      await expect(menu).toBeHidden();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await expect(trigger, 'Choosing a More menu item should return focus to the visible trigger').toBeFocused();
+      await expect(page.locator('#main .pagehead h2')).toContainText('Cài đặt & sao lưu');
+      await page.locator('[data-view="dashboard"]:visible').first().click();
+      await trigger.click();
+      await expect(menu).toBeVisible();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     });
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
