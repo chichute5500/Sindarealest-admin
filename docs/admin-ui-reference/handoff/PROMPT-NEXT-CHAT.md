@@ -775,3 +775,12 @@ Continue real work on SinDarealest Admin. Do not stop at planning or a progress 
 - No Cloudflare Access/secrets changes or bypass; no remote D1/R2 operations; do not execute SQL, setup scripts or migrations; no TinyFish.
 - Do not resume product image-save or PRE/PRO migration work unless the owner explicitly reauthorizes it.
 - Before final reporting inspect the diff and confirm no unrelated public storefront changes were introduced. Do not claim a file/screenshot was inspected if the content was not actually accessible.
+
+
+### Latest continuation — evidence-based 12-screen matrix (2026-10-21)
+
+- Read `docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md` before continuing. It lists all 12 screen families and marks only evidence-supported partial states; overall progress remains 48%.
+- Matrix commit: `04ec0f59305ceed927348fdf39cc220fd9ad6082`; status checkpoint commit: `26a1294f98d7ea0273bdca599f2f6a42f5951a6f`.
+- Do not call reduced-motion browser E2E PASS until an exact-SHA Actions run actually executes `tests/e2e/admin-static-baseline.spec.js`. The existing source-validation run did not execute that Playwright suite.
+- First step in the next session: fetch the live branch HEAD, PR #111/#108 status and Actions associated with the exact HEAD. Continue the reference audit and screenshot-backed UI fixes; no revenue panel duplication and no fabricated data.
+- All owner constraints remain binding: only `feature/admin-isolated-handoff-2026-10-20`; keep PR #111/#108 open/unmerged; no edits to main/static branch, merge/cherry-pick/force-push, Production deploy, secrets/Access changes or bypass, remote D1/R2, SQL/migration/setup script execution, TinyFish, product image-save, or PRE/PRO migration work.
