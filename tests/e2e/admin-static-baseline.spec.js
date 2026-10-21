@@ -970,7 +970,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('[data-order-row="UI-ONLY-ORDER-2"]')).toBeVisible();
       await orderSearch.fill('khong-co-don-hang-nay');
       await expect(orderRows).toHaveCount(0);
-      await expect(page.locator('#orderEmptyState')).toContainText('Không tìm thấy đơn hàng phù hợp');
+      await expect(page.locator('#orderEmptyStateFiltered')).toContainText('Không tìm thấy đơn hàng phù hợp');
       await page.locator('#clearOrderFilters').click();
       await expect(orderRows).toHaveCount(3);
       await page.locator('#orderStatusFilter').selectOption('completed');
