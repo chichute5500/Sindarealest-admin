@@ -386,3 +386,31 @@ Chủ sở hữu đã chỉ thị: tiếp tục làm việc, không dừng giữ
 ## Mệnh lệnh bắt buộc: báo cáo xong phải tiếp tục
 
 Chủ sở hữu đã yêu cầu rõ: “Báo cáo % hoàn thành công việc, báo cáo xong tiếp tục chạy” và “chỉ dừng khi cần tôi thao tác”. Không dừng sau khi trả lời hoặc đưa kế hoạch. Sau mỗi checkpoint, tự tiếp tục bước kiểm tra/sửa tiếp theo an toàn; chỉ hỏi chủ sở hữu khi thực sự cần quyền, xác nhận hoặc thao tác không thể thay thế. Không báo 100% nếu Preview, parity 12 màn hình, authenticated QA và nghiệm thu chưa đạt. Giữ PR #111/#108 OPEN/unmerged, chỉ làm trên nhánh ADMIN; không Production deploy; không đụng D1/R2/secrets/Access; lỗi lưu ảnh sản phẩm và migration PRE/PRO vẫn `DEFERRED_BY_OWNER`.
+
+
+---
+
+## Newest continuation checkpoint — 2026-10-21: modal accessibility verified; Preview still failing
+
+Use this as the newest checkpoint; re-fetch the current branch HEAD and PRs before any write.
+
+### Current verified source/test evidence
+- Functional source commit: `3fe44a2304f083e6f943c931d43b74039900ace3`.
+- Test commit SHA run: `d408781b95af4942b36681cbe2d0334dc03c8683`.
+- GitHub Actions [run 39590491689](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689), exact source/test SHA match: `npm run check` PASS, `npm test` PASS, local source/fixture Playwright matrix PASS. New modal-focus test assertions were included in the successful Playwright run.
+- Modal source change: shared focus initialisation/restoration, keyboard focus trap for Tab and Shift+Tab, Escape close for either product editor or order detail, and aria-hidden true/false state.
+- E2E assertions verify open focus, both focus-wrap boundaries, Escape, closed aria-hidden state, and focus returns to opener on synthetic fixtures.
+- Latest evidence [admin-preview-evidence-141](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39590491689/artifacts/12342530827): 59 screenshot PNGs plus metadata; 16 login-shell, 43 synthetic read-only module views, 36 fixture metrics. Zero browser/console/request/HTTP errors; fixture attempted writes=0. Raw images remain in Actions artifact only.
+
+### Still FAIL / NOT VERIFIED
+- Overall Preview diagnostic still **FAIL**: `PREVIEW_CSS_SIGNATURE_MISMATCH`, 226 inline stylesheet rules, `hasLoginHideRule=false`, topbar brand visible. Do not weaken assertions, access/edit secrets, or bypass Cloudflare Access. Owner must confirm an authorized current-source Preview and legitimate access path.
+- Opened and compared the approved reference PNG with the current-source 390×844 light screenshot board. **Visual parity remains NOT ACCEPTED** across the 12 screen families. The source dashboard has no confirmed time-series data for the reference chart; do not fabricate a chart. Product editor uses a different stacked layout; gallery, order details, warranties, backup/restore and activity presentation also need review.
+- Authenticated real backend QA is NOT TESTED; fixture/screenshots do not count as logged-in business-flow evidence.
+- PR #111 remains OPEN/unmerged, currently 1,094 files (+37,393/−392), mixed storefront/API/migration/script/test/documentation scope and not merge-ready. PR #108 is OPEN/unmerged (250 files). Keep both open.
+- Overall progress remains **48%**. Image save / actual image storage and PRE/PRO migration ledger remain **DEFERRED_BY_OWNER / NOT VERIFIED**.
+
+### Continue without unsafe actions
+1. Keep edits on `feature/admin-isolated-handoff-2026-10-20` only. Keep `main` and `fix/liquid-glass-audit-2026-10-19` untouched.
+2. Continue source-only accessibility/responsive/reference checks and semantic review of PR #111. Do not commit per-run PNGs; use Actions Artifacts.
+3. Re-fetch live HEAD after any evidence/handoff update; do not claim current HEAD is tested if only the earlier source SHA is in CI.
+4. No Production deploy, merge, schema migration, remote D1/R2 writes, secrets/Access changes, or TinyFish. Keep image-save/PRE-PRO work paused.
