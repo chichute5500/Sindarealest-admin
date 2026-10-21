@@ -80,10 +80,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-4"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-4"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-4"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-4"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261021-5"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261021-5"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261021-5"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261021-5"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1/,
   'All four satin backgrounds must use the updated cache key.');
 
@@ -92,3 +92,9 @@ assert.match(html, /html\.dark\{[\s\S]*?--sd-reference-surface-strong:rgba\(7,27
 assert.match(html, /\.account-drawer,\.cart-drawer,\.checkout-drawer\{[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\)/,
   'Cart, account and checkout drawers must blur the storefront behind the translucent surface.');
 console.log('PASS: mobile/desktop satin assets, reference-aligned splash and headline, and key storefront screen contracts.');
+
+
+assert.ok(html.includes('color:#15344b!important;') && html.includes('html.dark .detail-zoom-btn') && html.includes('background:rgba(5,22,37,.94)!important;'),
+  'Gallery and product-image controls must have contrast-safe light and dark states.');
+assert.ok(html.includes('.product-photo img{mix-blend-mode:multiply}') && html.includes('html.dark .product-photo img{mix-blend-mode:normal}'),
+  'Product image sources remain unchanged while light-mode photo backgrounds blend into the satin surface.');

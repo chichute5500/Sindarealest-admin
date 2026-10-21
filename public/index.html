@@ -1708,20 +1708,20 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
 }
 
 /* Organic liquid-glass wave assets: curved satin ribbons are the primary ambient backdrop. */
-.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-4');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
-.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-4');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261021-5');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261021-5');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
 html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54))}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72))}
-.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-4');filter:none}
-.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-4');filter:none}
+.welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261021-5');filter:none}
+.welcome-texture--dark{background-image:url('images/liquid-glass-dark.svg?v=20261021-5');filter:none}
 
 /* Portrait screens use a dedicated tall composition so the curved satin ribbons remain visible instead of cropping into diagonal bands. */
 @media(max-width:760px){
- .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-4')}
- .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-4')}
- .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-4')}
- .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-4')}
+ .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-5')}
+ .theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-5')}
+ .welcome-texture--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261021-5')}
+ .welcome-texture--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261021-5')}
 }
 
 /* Mobile product detail follows the full-screen gallery layout in the supplied app reference. */
@@ -2407,6 +2407,49 @@ html.dark .sd-fullscreen-share{
   .cart-list{flex:1 1 auto;min-height:0;overflow-y:auto!important;overscroll-behavior:contain}
   .checkout-drawer{overflow:hidden!important}
 }
+
+/* Contrast pass: gallery actions must remain visible over pale product photography and satin backgrounds. */
+:root{
+  --sd-gallery-glass:rgba(248,252,255,.96);
+  --sd-gallery-glass-border:rgba(70,119,154,.46);
+  --sd-gallery-glass-shadow:inset 0 1px 0 rgba(255,255,255,.96),0 5px 18px rgba(22,54,79,.22);
+}
+:root.dark{
+  --sd-gallery-glass:rgba(4,20,34,.94);
+  --sd-gallery-glass-border:rgba(180,218,244,.76);
+  --sd-gallery-glass-shadow:inset 0 1px 0 rgba(231,246,255,.18),0 5px 18px rgba(0,0,0,.34);
+}
+.detail-zoom-btn,.detail-gallery-arrow,.featured-arrow,.slide-controls button,.page-btn.page-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,.detail-favorite-btn{
+  color:#15344b!important;
+  background:rgba(249,253,255,.96)!important;
+  border:1px solid rgba(73,125,162,.52)!important;
+  box-shadow:0 5px 18px rgba(18,51,76,.24),inset 0 1px 0 rgba(255,255,255,.98)!important;
+  text-shadow:none!important;
+}
+html.dark .detail-zoom-btn,html.dark .detail-gallery-arrow,html.dark .featured-arrow,html.dark .slide-controls button,html.dark .page-btn.page-arrow,html.dark .sd-fullscreen-close,html.dark .sd-fullscreen-arrow,html.dark .detail-favorite-btn{
+  color:#edf7ff!important;
+  background:rgba(5,22,37,.94)!important;
+  border-color:rgba(180,218,244,.78)!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.38),inset 0 1px 0 rgba(231,246,255,.16)!important;
+}
+.detail-zoom-btn svg,.detail-gallery-arrow svg,.featured-arrow svg,.sd-fullscreen-close svg,.sd-fullscreen-arrow svg,.detail-favorite-btn svg{stroke:currentColor!important;fill:none}
+.slide-count,.featured-image-count,.detail-image-count,.sd-fullscreen-count{
+  color:#15344b!important;background:rgba(249,253,255,.96)!important;border-color:rgba(73,125,162,.52)!important;text-shadow:none!important;
+}
+html.dark .slide-count,html.dark .featured-image-count,html.dark .detail-image-count,html.dark .sd-fullscreen-count{
+  color:#edf7ff!important;background:rgba(5,22,37,.94)!important;border-color:rgba(180,218,244,.78)!important;text-shadow:none!important;
+}
+/* Product photos keep their real source and proportions; blend white photo backgrounds into light satin only. */
+.product-photo{background:rgba(232,242,250,.74)!important}
+.product-photo img{mix-blend-mode:multiply}
+html.dark .product-photo{background:rgba(8,28,45,.72)!important}
+html.dark .product-photo img{mix-blend-mode:normal}
+@media(max-width:760px){
+ .detail-zoom-btn,.detail-favorite-btn,.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow{width:40px;height:40px}
+ .detail-gallery-arrow{color:#15344b!important}
+ html.dark .detail-gallery-arrow{color:#edf7ff!important}
+}
+
 </style>
 
 </body>
