@@ -876,7 +876,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       probe.id = '__invalidAddPreviewProbe';
       probe.dataset.add = '__invalid-preview-product__';
       probe.setAttribute('aria-label', 'Preview invalid-add regression probe');
-      probe.style.cssText = 'position:fixed;right:8px;bottom:8px;width:16px;height:16px;opacity:0.01;z-index:99999;';
+      probe.style.cssText = 'position:fixed;left:8px;top:8px;width:16px;height:16px;opacity:0.01;z-index:99999;';
       probe.dataset.clickObserved = 'false';
       probe.addEventListener('click', () => { probe.dataset.clickObserved = 'true'; });
       document.querySelector('#productOverlay')?.appendChild(probe);
