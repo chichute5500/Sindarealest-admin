@@ -728,7 +728,7 @@ async function captureIconFeedback(page, viewport, theme, label, route) {
   }
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(35);
+  await page.waitForTimeout(165);
   const pressed = await button.evaluate((node) => {
     const pseudo = getComputedStyle(node, '::before');
     const icon = node.querySelector('svg');

@@ -350,6 +350,14 @@ assert.match(requiredViewportThemeHeroAudit, /await auditHeroImage\(page, label\
 assert.doesNotMatch(requiredViewportThemeHeroAudit, /if \(viewport\.name === 'mobile-390' && theme === 'light'\)/,
   'Hero asset acceptance must not be limited to a single mobile Light context.');
 
+
+assert.match(live, /await page\.mouse\.down\(\);[\s\S]*?await page\.waitForTimeout\(165\);[\s\S]*?overlayOpacity: Number\.parseFloat\(pseudo\.opacity/ ,
+  'Pressed icon state must be sampled after the 140ms transition has settled while the pointer is still held.');
+assert.match(live, /iconStateChecksComplete[\s\S]*?audit\.iconStateChecks\.length === 4[\s\S]*?check\.status === 'PASS'/,
+  'Live audit acceptance must require real pressed/selected/unselected favorite state checks in all four product-detail contexts.');
+assert.match(live, /selected\.buttonColor === 'rgb\(229, 72, 77\)'[\s\S]*?restored\.buttonColor === expectedRestoredColor/,
+  'Favorite state verification must assert the real red selected state and theme-correct unselected state.');
+
 const firstPaintVisibilityLogic = live.slice(
   live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'),
   live.indexOf('const fingerprint', live.indexOf('const welcomeActive = Boolean(body?.classList.contains(\'welcome-active\'));'))
