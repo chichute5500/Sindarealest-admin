@@ -29,3 +29,13 @@ Các file này lưu trạng thái bền vững nhưng không tự khởi động
 
 ## Lưu ý về ảnh
 Các file `latest-*.png` chỉ được coi là ảnh chụp thực tế sau khi được tạo bởi Playwright từ ứng dụng đang chạy và lưu thành công. Nếu chưa có ảnh, không tạo placeholder PNG và không đánh dấu hoàn thành.
+
+
+## Handoff bổ sung — bộ icon website tĩnh Liquid Glass (2026-10-22)
+- BẮT BUỘC đọc `../../../../docs/icon-system-inventory.md` trước khi tiếp tục bất kỳ công việc icon nào trên website tĩnh.
+- Tài liệu kiểm kê: [docs/icon-system-inventory.md](../../../../docs/icon-system-inventory.md); nhánh `fix/liquid-glass-audit-2026-10-19`; commit tạo tài liệu `0d6119e1adbc815771a7eede3b22a40fb1ff8b5f`.
+- Quy chuẩn đã được người dùng chốt: Liquid Glass trong suốt, viền sáng, khúc xạ nhẹ; nét mảnh; khi nhấn lún kính + đổi màu; KHÔNG ripple.
+- Màu nền/ink/accent mục tiêu: `#eaf3fb`, `#142a3c`, `#5c91b9`.
+- Phạm vi cho công việc icon website tĩnh: chỉ nhánh `fix/liquid-glass-audit-2026-10-19`; không merge main, không deploy Production, không sửa backend/API/schema/bindings/secret/dữ liệu.
+- Trạng thái: đã tạo tài liệu kiểm kê ban đầu từ `public/index.html`; CHƯA triển khai icon vào giao diện; CHƯA có kiểm thử/ảnh trước-sau. Không ghi PASS cho các mục này.
+- Trước triển khai: xác minh lại HEAD và nội dung source hiện tại, kiểm kê cả các control sinh động khi chạy, sau đó thực hiện từng nhóm icon và chạy kiểm thử/ảnh cùng SHA.
