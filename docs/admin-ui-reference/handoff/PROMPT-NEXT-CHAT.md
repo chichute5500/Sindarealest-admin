@@ -604,3 +604,24 @@ This was a read-only source review of the existing payment contract and route co
 
 ## Latest progress-accounting correction — 2026-10-21
 Use latest exact source/test SHA `a999bfdc529ea38c5309ebfbff33a45c6779c10b`; Run #162 and paired validation both PASS. Overall progress remains 48% until a task-weighted checklist is recalculated; do not raise it just because CI passes. The 390×844 gallery screenshot shows cover, supporting thumbnail, helper and fixed footer visible together. Full 12-screen visual parity and authenticated backend QA remain incomplete; image-save and PRE/PRO migrations remain owner-deferred. PR #111/#108 remain open and unmerged.
+
+
+## Latest verified continuation checkpoint — 2026-10-21 21:45 ICT
+
+### Mobile product gallery and footer — exact tested tree
+- Source CSS commit `cc77869873c2f5b4b2d1118dc60c0d88413eb218`: remove the trailing bottom padding from the product-dialog scroll container; put scroll clearance before the sticky action bar and preserve Android safe-area padding.
+- Playwright regression commit `a2c6bd4b867c0b23ef5d026a1cff99b3c2e8123e`: scroll to the gallery end and assert the action footer reaches the dialog edge and the final image is not covered by it.
+- Contract-test commit `5f73373094ba71f467374e8b026bbfc3c5059fec`: assert the relevant layout and safe-area CSS contract. Subsequent tested tree also includes a small five-line test-only contract adjustment.
+- Exact tested tree SHA: `a999bfdc529ea38c5309ebfbff33a45c6779c10b`. [Validate source and tests #3905](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556696) **PASS**. [Admin Preview diagnostic #162](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39618556737) **PASS**; repository check, npm test, local responsive/theme Playwright screenshot matrix, and configured Preview diagnostic all succeeded.
+- Artifact `admin-preview-evidence-162`, ID `12354480678`, 11,114,027 bytes, expires 2026-11-04. The source/fixture matrix contains 59 PNGs (16 login-shell and 43 synthetic/read-only module captures) plus 36 fixture metrics; no authenticated real-business backend flow was tested.
+- Reviewed artifact screenshot `product-gallery__390x844__light.png` and dark counterpart. The footer now reaches the dialog's bottom edge and the second thumbnail plus its controls can be seen without being hidden by the action bar. This fixes the specific overlap seen in artifact 158.
+- The image-manager is still not identical to approved reference screen #5: the source uses a large cover card with further image cards below; the reference has a horizontal thumbnail rail and additional image-management/status details. Reference parity remains **NOT ACCEPTED** for the full 12 screen families; continue iterating from that gap.
+- Current branch HEAD at this handoff is `e7f0990f4c0b78272fdba06e9f90423340b82eaa`; comparison from tested tree `a999bfd...` to that HEAD showed documentation-only changes, no code path changes. Re-fetch the live ref before more edits.
+
+### Current scope audit and boundaries
+- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN / UNMERGED, base `main`, 1,112 changed paths; mixed Admin, public storefront, Functions/API, migrations, scripts, tests and evidence. It is not merge-ready.
+- PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN / UNMERGED, 269 changed paths.
+- Source-only risk remains documented: `setup-cloudflare.mjs` omits migration 0009; `deploy-cloudflare.mjs` preflights 0007/0008 but not 0009. This is not proof that remote D1 is missing the schema. No remote schema read/write, SQL, migration/setup script, R2 operation or deployment was run.
+- QR/payment route source was inspected read-only; contract/unit/mocked-D1 tests PASS on the tested tree. That is not live backend proof. The known public static consumer gap for `freeShippingEligible` / `freeShipping` stays assigned to the static website branch and must not be patched here.
+- Overall progress stays **48%**. Authenticated backend QA: **NOT TESTED**. Product image upload/save and PRE/PRO migration: **DEFERRED_BY_OWNER / NOT VERIFIED**.
+- Only work on `feature/admin-isolated-handoff-2026-10-20`; no main/static-website edits, merge, cherry-pick, force-push, Production deployment, secrets/Cloudflare Access changes/bypass, remote D1/R2, setup/migration script execution, or TinyFish.
