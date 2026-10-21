@@ -2,11 +2,11 @@
 
 > Đây là điểm bắt đầu bắt buộc cho mọi phiên AI/agent tiếp tục công việc ADMIN. Nội dung chỉ phản ánh trạng thái đã ghi và kiểm chứng; luôn xác minh Git thực tế trước khi sửa.
 
-## Latest checkpoint — 2026-10-21 16:47 UTC
+## Latest checkpoint — 2026-10-21 17:06 UTC
 
-- Exact tested SHA `f2df0a923080135c5fe92ee2021c76137305699c`; Validate Source #39637611840 PASS; Admin Preview/Playwright #39637611768 SUCCESS.
+- Latest application/test commit `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885`; added warranty search status announcement and empty-state assertions. Validate Source #39640751340 and Admin Preview/Playwright #39640751300 were running at checkpoint; verify their final state before treating as passed.
 - Screen #10 warranty UI now has list-first search/filter and a collapsed accessible issue form; one-line mobile order ID E2E assertion passes. Artifact #197 (ID 12362111591): 63 PNGs / 39 metrics, no errors or fixture writes. Fixture/source evidence only.
-- Overall progress 48%; full 12-screen parity NOT ACCEPTED; authenticated real backend QA NOT TESTED/BLOCKED BY ACCESS. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+- Overall progress 50% weighted management estimate (49.6% rounded; see `latest-test-results.json` scorecard). Full 12-screen parity NOT ACCEPTED; authenticated real backend QA NOT TESTED/BLOCKED BY ACCESS. Product image-save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
 - Branch HEAD before this status refresh: `0e9e6560a968f7ca9754c91fda6f8af89c0ae41b`; fetch current HEAD after docs commit.
 
 ## Phân chia nhánh — bắt buộc
@@ -438,3 +438,10 @@ Before continuing the 12-screen Admin reference review, read `12-SCREEN-REFERENC
 
 **Next work:** re-fetch live branch head, PR state, workflow runs and current file versions; read this file, `LATEST-STATUS.md`, `latest-test-results.json`, `12-SCREEN-REFERENCE-AUDIT.md`, and the master prompt. Continue with static/reference-based visual parity and safe read-only E2E coverage on the Admin branch. Inspect existing code/tests before editing; run both validation and Preview workflows on every test change; update the handoff files after verified results. Do not claim real authenticated acceptance from fixture tests. Stop only if a user action is truly required.
 
+
+
+## Latest continuation — 2026-10-21 17:06 UTC
+
+- Customer search label and test now cover name, phone, email, address (commit `b3c54d55a5e21ae6377d2a6392349f2402ee333f`; validation and Preview evidence passed on that source SHA).
+- Warranty search test commit `60e63acb67e1c62a0d6390cd8e80ce65b8bcd885` adds assertions for `aria-live` result status and honest empty states for both issued warranties and support claims. Validate Source #39640751340 and Preview #39640751300 were running when recorded; verify exact SHA/results after any subsequent docs commits.
+- Latest status and weighted scorecard are in `LATEST-STATUS.md` and `latest-test-results.json`. Progress 50% is a management estimate, not test pass percentage.
