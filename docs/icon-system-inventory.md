@@ -101,3 +101,34 @@
 5. Verify mobile widths 320, 360, 375, 390, 412 px and tablet/desktop 768, 1280, 1440 px; check safe areas, clipping, touch targets, labels and dark mode.
 6. Run source checks/build and compare before/after screenshots on the fix preview. Do not call a test PASS without its actual output.
 7. Restrict all changes to `fix/liquid-glass-audit-2026-10-19`. No merge, no production deployment, no backend/API/database/schema/data changes.
+
+
+## Bổ sung yêu cầu tương tác đã chốt — 2026-10-22
+
+Đây là phần mở rộng đặc tả; không khẳng định đã triển khai trong source.
+
+### Trạng thái icon
+- Palette: `#eaf3fb` nền kính sáng, `#142a3c` icon/chữ chính, `#5c91b9` màu nhấn; trái tim đỏ khi yêu thích.
+- Nhấn: kính lún nhẹ và đổi sắc, không ripple; khi thả chỉ hiệu ứng nhấn trở về, hành động thực tế vẫn giữ.
+- Heart: mặc định khi chưa thích, đỏ khi thích, trở về mặc định khi bỏ thích.
+- Cart: huy hiệu phản ánh quantity thực; chỉ toast thành công sau khi thao tác add thành công.
+- Search/menu/account/filter/close/gallery/quantity controls: chuyển động ngắn, có ý nghĩa chức năng; tôn trọng `prefers-reduced-motion`.
+
+### Hiệu ứng dùng chung “fly to cart”
+- Tất cả nút thêm giỏ hàng ở product card/listing, trang chi tiết và các khu vực có chức năng add đều dùng chung một cơ chế.
+- Điểm xuất phát là đúng sản phẩm/ảnh tại vị trí vừa thao tác; đích là icon giỏ hàng trên header hiện hành.
+- Dùng clone/overlay; không di chuyển hoặc thu nhỏ DOM gốc.
+- Clone phải lấy đúng ảnh đang hiển thị/chọn (bao gồm ảnh thứ 2/mặt sau trong gallery), đúng product ID/SKU và đúng variant nếu có; tuyệt đối không dùng ảnh chung hoặc ảnh sản phẩm khác.
+- Thời lượng khởi điểm 0,6–0,9 giây; cart nảy nhẹ và badge cập nhật sau khi add thành công.
+- Không gọi add lần thứ hai do animation; không để animation là điều kiện hoàn tất thao tác. Xử lý nhấn nhanh, ảnh lỗi/chưa tải, scroll/resize, mobile/desktop và reduced-motion.
+- Nhấn icon giỏ hàng để mở giỏ không phải thao tác add và không chạy fly-to-cart.
+
+### Trình tự an toàn
+1. Xác minh branch/HEAD/Preview/workflows và baseline trước khi sửa.
+2. Đối chiếu source + runtime DOM, liệt kê toàn bộ điểm add và cách lấy ảnh/variant; không giả định inventory đã exhaustively cover runtime.
+3. Kiểm tra cơ chế cart/heart/toast hiện hữu và test sẵn có.
+4. Thay đổi theo lát nhỏ: icon state → heart/badge/toast → fly-to-cart dùng chung.
+5. Mỗi lát chạy validation + Playwright trên Preview; xác minh ảnh đúng, quantity không trùng, trang gốc không xê dịch và responsive.
+6. Cập nhật prompt/handoff/test evidence. Không merge, không deploy Production, không sửa backend/API/database/secrets/bindings/dữ liệu.
+
+**Trạng thái:** yêu cầu/tiêu chí mới; chưa có bằng chứng code đã triển khai hoặc runtime test đã PASS.
