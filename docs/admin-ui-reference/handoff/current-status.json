@@ -6,7 +6,7 @@
   "branchHeadAtCheckpoint": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Weighted management estimate; source/test SHA c18736b70d0035769408ce3190a6fb729ccd75fd passed Validate Source and Admin Preview/Playwright. Bounded product-list fixes are verified; 12-screen parity remains not accepted and authenticated backend QA is not tested.",
+  "progressBasis": "The weighted scorecard sums to 49.6 points and rounds to 50%. The current mobile product-card source/test update remains PENDING_NOT_VERIFIED until exact-SHA CI and post-change screenshots are observed. Do not infer acceptance from docs commits or earlier successful runs.",
   "latestVerifiedApplicationTest": {
     "sourceSha": "c18736b70d0035769408ce3190a6fb729ccd75fd",
     "validationRun": {
@@ -86,10 +86,9 @@
     "docs/admin-ui-reference/handoff/current-status.json"
   ],
   "nextActions": [
-    "Re-fetch branch HEAD, PR state and exact-SHA Actions before source edits.",
-    "Inspect screenshots against reference at 390x844 and 1280x800 in light and dark themes.",
-    "Continue substantive 12-screen parity work; screenshot count alone is not acceptance.",
-    "Update all handoff docs and prompt after each verified cycle."
+    "Obtain the push-triggered Admin Preview diagnostic / Playwright run for exact source/test SHA a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; distinguish it from the older successful run on b659a19838c1276de7c4bd9ef9edab2279369651.",
+    "Inspect newly generated product-card screenshots at 390x844 light/dark and 1280x800 light before updating screen #3 acceptance.",
+    "Continue with the next screen family only after the mobile card cycle has verified results; keep overall progress at 50% until evidence supports a change."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -103,21 +102,21 @@
   "latestCheckpointVerification": {
     "checkedAt": "2026-10-22T02:14:21.414+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "checkedHeadBeforeDocsRefresh": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
+    "checkedHeadBeforeFinalStatusWrite": "28533c21a9f7d873f7663635d96a71acba86c66f",
+    "codeSourceSha": "8a2acf322f3c785716b0c0d27947f44bf9565727",
+    "codeTestSha": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
     "currentHeadIsTested": false,
-    "latestCodeAndTest": {
-      "sourceSha": "8a2acf322f3c785716b0c0d27947f44bf9565727",
-      "testSha": "a33bb596a1b2cf587f4f2cfb9af84d42592f6b24",
-      "validationStatus": "PENDING_NOT_VERIFIED"
-    },
+    "validationStatus": "PENDING_NOT_VERIFIED",
     "latestSuccessfulPreChangeValidation": {
       "sha": "b659a19838c1276de7c4bd9ef9edab2279369651",
       "runId": 39658657454,
       "conclusion": "success",
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454"
     },
+    "workflowLookupLimitation": "Available fetch_commit_workflow_runs connector returns only pull_request-triggered runs; it did not return the push-triggered Admin Preview diagnostics run for the new source/test SHAs. The GitHub Actions web UI could not be read in this session.",
     "handoffDocsCheckpointWritten": true,
-    "readbackRequired": true,
+    "handoffReadbackRequired": false,
+    "readbackTarget": "All seven designated handoff files at the final branch head after this write",
     "progressPercent": 50
   },
   "latestContinuationCycle": {
@@ -153,6 +152,8 @@
     "visualAcceptance": "SCREEN_3_PARTIAL_NOT_ACCEPTED; ALL_12_NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED_BLOCKED_BY_ACCESS",
     "overallProgressPercent": 50,
-    "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance."
+    "nextAction": "Obtain exact-SHA validation on a33bb596a1b2cf587f4f2cfb9af84d42592f6b24; run Preview/Playwright and inspect new screenshots before claiming acceptance.",
+    "branchHeadBeforeFinalStatusWrite": "28533c21a9f7d873f7663635d96a71acba86c66f",
+    "progressPercent": 50
   }
 }
