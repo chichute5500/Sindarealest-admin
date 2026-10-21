@@ -445,3 +445,25 @@ Nếu không có lý do nào ở trên, tham chiếu kết quả trước thay v
 - Blocker cứng vẫn giữ nguyên: public verified product payload chưa có SKU `SD-GL052`. Giữ fail-closed, không dựng SKU giả, không chọn ảnh thay thế, không thay catalog/backend. Audit toàn thể chỉ được chấp nhận sau khi đúng dữ liệu SKU được xác minh và ảnh live mới được mở, so trực tiếp với PNG gốc.
 - Ngay sau cập nhật tài liệu: tiếp tục lấy kết quả run visual, đọc log khi fail, lấy artifact khi có, mở ảnh thực tế Light/Dark ở bốn viewport, kiểm tra các trạng thái cart/account/checkout và các sai lệch còn xác nhận được. Sau mỗi thay đổi source, chạy lại test và Preview theo quy trình. Không lặp các test PASS nếu source/điều kiện liên quan không đổi.
 - Ghi chú phạm vi: workflow có tên “Admin Preview Playwright” cũng xanh cùng SHA nhưng không phải lý do để mở rộng sang sửa Admin hoặc coi đó là nghiệm thu giao diện storefront.
+
+
+## BÀN GIAO MỚI NHẤT — 2026-10-21 16:55 ICT (supersedes older “current HEAD” notes)
+
+### Trạng thái code và kiểm tra
+- Repo `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`; **code-bearing commit**: `7fe8968e8820b75c2fc696a8433493332e245991` — `fix(storefront): soften satin into fine low-contrast folds`.
+- PR #108 vẫn mở, chưa merge: https://github.com/chichute5500/Sindarealest-admin/pull/108. Production https://sindarealest2.pages.dev/ không được sửa/deploy; không làm Admin/backend.
+- Trên SHA `7fe8968e8820b75c2fc696a8433493332e245991`, source/test validation run [39580407595](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39580407595) đã **PASS**; Preview deployment workflow [39580407427](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39580407427) đã **PASS**; workflow mang tên Admin Preview Playwright [39580407474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39580407474) cũng xanh nhưng ngoài phạm vi công việc, không phải bằng chứng nghiệm thu Admin/storefront.
+- Live visual diagnostic [run 39580407617](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39580407617) **còn chạy khi ghi chú này được tạo**; job đang thực hiện local fixture screenshots/audit và bước metadata/probe/capture live vẫn chờ. Chưa có artifact mới được xác nhận ở lần truy vấn này. Không tuyên bố texture mới đã PASS trực quan chỉ vì CI/deploy xanh.
+- Preview alias đã dùng trong pipeline là `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`; cần xác nhận deployment metadata/commit chính xác trong diagnostic trước khi chấp nhận screenshots như live proof.
+
+### Phần đã sửa trong vòng satin mới
+- Commit `7fe8968e8820b75c2fc696a8433493332e245991` chỉnh bốn SVG `public/images/liquid-glass-{light,dark}(-mobile).svg` sang marker `organic-fine-satin-folds-v3`. Nếp lớn và lớp shadow/highlight giảm độ rộng/độ tương phản; đường nhăn mảnh vẫn giữ để satin không bị phẳng. Desktop shadow stroke 6.8/body 3.2/shade 0.9/highlight 0.75; mobile shadow 3.0/body 1.75/shade 0.55/highlight 0.48 (SVG user-facing appearance vẫn cần kiểm tra bằng ảnh).
+- `public/index.html` cùng test liên quan nâng cache-busting từ `20261021-12` lên `20261021-13`. Regression tests thêm ngưỡng opacity để chặn các dải thành ribbon/ring lớn trở lại.
+- Trước thay đổi này, live artifact của run [39578846635](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39578846635), artifact [12335711675](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39578846635/artifacts/12335711675) có screenshots live nhưng workflow steps để archive/pixel compare đều skipped, không phải canonical screenshot capture. Việc xem ảnh cho thấy nếp satin vẫn đọc thành đường cong lớn, nhất là Dark/desktop; đó là lý do cho vòng v3. Không chỉnh thủ công `docs/website-screenshots/start-of-work/`, `end-of-work/` hay manifest để tạo cảm giác audit đã pass.
+
+### Blocker / các bước tiếp theo bắt buộc
+1. Kiểm tra trạng thái cuối của run `39580407617`, đọc logs nếu lỗi, lấy artifact khi upload xong. Phân biệt local fixture với live Preview, xác minh source/deployment SHA.
+2. Mở ảnh live thực tế ở mobile/desktop và Light/Dark; so cạnh PNG gốc `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` và `file_00000000fcb48207a23aeda23caa5eeb.png`. Kiểm tra các viewport 360×800, 390×844, 768×1024, 1440×900; tiếp tục sửa những sai khác còn thấy rõ.
+3. Duy trì kiểm tra sáu ô Liquid Glass, phần “Phong cách đẳng cấp từ da cá sấu”, nền satin, gallery controls, drawer cart/account/checkout, mobile Back, footer/Zalo và route sản phẩm; không coi kiểm thử tĩnh là visual acceptance.
+4. Audit toàn thể vẫn bị khóa nếu public verified product payload không có đúng SKU `SD-GL052`. Không fake SKU, không thay ảnh khác, không đụng catalog/D1/R2/Admin để làm xanh audit. Giữ fail-closed và ghi blocker cụ thể.
+5. Sau khi có kết quả visual cuối, cập nhật handoff, test results, master prompt, next-chat prompt; chỉ workflow guarded được phép lưu canonical screenshots/manifest khi các điều kiện acceptance đạt. Tiếp tục làm sau khi báo cáo, không tự dừng để hỏi cập nhật tiến độ.
