@@ -976,3 +976,17 @@ Trước mọi lượt tiếp tục, lấy trạng thái mới nhất từ `LATE
 Quy tắc workflow bằng chứng: full-resolution PNG và metadata phải nằm trong GitHub Actions Artifact với retention 14 ngày; nhánh chỉ giữ báo cáo tóm tắt/chẩn đoán. Không commit nguyên ma trận screenshot mỗi lượt. Giữ assertion Preview nguyên vẹn; không đổi secret, không bypass Cloudflare Access.
 
 Bản sửa trợ năng mới thêm `aria-label` theo bản ghi cho các control đơn hàng/thanh toán/bảo hành, gallery và cài đặt, kèm contract tests. PR #111 vẫn OPEN/unmerged và diff rất rộng (1.033 file theo lần kiểm tra 2026-10-21); không merge, force-push, đổi base hoặc xóa lịch sử. Không sửa `main`/nhánh website tĩnh, không Production deploy, không chạy migration/setup, không remote D1/R2 writes.
+
+
+---
+
+## PHỤ LỤC BẮT BUỘC MỚI — QR CHUYỂN KHOẢN VÀ PHÂN LOẠI HÀNG (2026-10-21)
+
+Đọc hợp đồng tích hợp `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`. Chủ dự án đã duyệt bổ sung các yêu cầu:
+- Phân loại `fulfillment_type`: `in_stock` (Hàng có sẵn), `made_to_order` (Hàng đặt riêng), và `unclassified` để rà soát dữ liệu cũ; không suy đoán dựa vào stock.
+- Hỗ trợ quy trình QR chuyển khoản, ưu tiên QR riêng cho từng đơn; Admin quản lý cấu hình nhận tiền, các khoản thanh toán/đặt cọc, số tiền đã nhận xác minh, số dư và lịch sử xác nhận thủ công.
+- Không tự động đánh dấu `paid` vì khách mở/quét/tải QR hoặc gửi ảnh biên lai. Không yêu cầu thanh toán trước khi giá và điều kiện đơn được tư vấn xác nhận.
+- Audit schema/API hiện tại trước khi code; nếu cần migration/API, được phép sửa code/migration và test trên nhánh Admin sau khi đánh giá tương thích/rollback. Không chạy migration lên D1 Production, không ghi dữ liệu thật, không thay đổi secrets/Cloudflare config thật.
+- Chỉ làm trên `feature/admin-isolated-handoff-2026-10-20`; bảo vệ nhánh website `fix/liquid-glass-audit-2026-10-19` và `main`; không merge PR #108/#111, không Production deploy.
+- PR #111 đang có scope rộng hơn Admin thuần; audit changed files và đề xuất tách/giới hạn ngoài phạm vi trước nghiệm thu.
+- Test tối thiểu: giá trị phân loại và dữ liệu cũ; order-item snapshot; quyền Admin; số tiền lấy từ nguồn có thẩm quyền phía server; QR thiếu/sai cấu hình; xác nhận trùng; chuyển thiếu/thừa/nhiều lần; hủy đơn; audit log; regression API/fixture; không rò rỉ secret.

@@ -210,3 +210,19 @@ Bạn phải tiếp tục công việc thực tế, không chỉ lập kế ho�
 4. Tiếp tục audit source-only accessibility/responsive và so sánh ảnh với reference. Ghi rõ SOURCE/fixture vs Preview thật; không tuyên bố authenticated QA đã PASS.
 5. Chỉ xử lý Preview bằng đường hợp lệ: cần Preview URL được ủy quyền, build từ source ADMIN hiện tại và quyền truy cập hợp lệ. Không bypass Access, không thao tác secret, không chạy workflow deploy đang đặt `CLOUDFLARE_PAGES_BRANCH=main`.
 6. Giữ nguyên các hàng rào: chỉ branch `feature/admin-isolated-handoff-2026-10-20`; không sửa `main`/website tĩnh; không merge PR #111/#108; không Production deploy; không migration/setup, không remote D1/R2/data write.
+
+
+---
+
+## Yêu cầu mới đã được chủ dự án duyệt (2026-10-21)
+
+Trước khi tiếp tục hãy đọc `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` và phụ lục mới ở cuối `MASTER-PROMPT-AUTO-HANDOFF.md` / `LATEST-STATUS.md`.
+
+Yêu cầu mới được theo dõi tách biệt với tiến độ Admin nền:
+1. Phân loại sản phẩm Hàng có sẵn / Hàng đặt riêng / Chưa phân loại để rà soát; không đoán từ tồn kho.
+2. QR chuyển khoản, ưu tiên QR riêng theo đơn, không cổng thanh toán; giá và điều kiện đơn phải được xác nhận trước khi yêu cầu tiền.
+3. Admin xác minh giao dịch thủ công, theo dõi số tiền phải thu theo đợt, tiền đã nhận xác minh, số dư và audit log. QR không tự chuyển payment status sang paid.
+4. Xem xét API/schema/migration theo code thật. Có thể sửa code/migration trên Admin branch sau khi ghi tác động, tương thích, rollback và test; tuyệt đối không chạy migration hoặc ghi dữ liệu lên D1 Production.
+5. Giữ PR #111 mở; không merge #108/#111, không sửa main/nhánh website tĩnh và không Production deploy. Vì #111 có phạm vi rộng, audit/tách scope trước nghiệm thu.
+
+Báo PASS/FAIL/BLOCKED/SKIPPED theo bằng chứng và commit SHA. Không tính các yêu cầu mới là hoàn thành khi mới chỉ cập nhật tài liệu.

@@ -146,3 +146,18 @@
 - Source screenshot matrix: 58 real PNGs; login shell: 16; read-only fixture module screens: 42; fixture metrics: 36.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+---
+
+## Yêu cầu mới được chủ dự án duyệt — 2026-10-21
+
+HEAD trước cập nhật tài liệu: `9091916004f554e4b24a2d1d4477f8577333044b`; PR #111 đang mở/chưa merge. Phụ lục này là ghi nhận phạm vi mới, không phải bằng chứng tính năng đã được triển khai.
+
+- Yêu cầu: quản lý Hàng có sẵn/Hàng đặt riêng; dữ liệu cũ chưa rõ phải chờ rà soát.
+- Yêu cầu: QR chuyển khoản, ưu tiên QR riêng từng đơn, không cổng thanh toán; Admin xác nhận tiền thủ công và theo dõi đặt cọc/số dư/hành động audit.
+- Hợp đồng: `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`.
+- Audit source/schema trên Admin branch cho thấy product schema có `stock` nhưng chưa thấy trường phân loại tương ứng trong migration nền tảng đã đọc; order schema có trạng thái thanh toán cơ bản nhưng chưa thấy ledger đa đợt trong migration đã đọc. Xác minh toàn bộ source/migrations trước khi quyết định thiết kế.
+- Trạng thái tính năng mới: **SPECIFIED; implementation/test NOT YET VERIFIED**. Không gộp CI PASS của công việc khác vào nghiệm thu feature.
+- Không chạy D1 migration, không thay đổi D1/R2 thật, secrets hoặc cấu hình Cloudflare thật. Giữ PR #111 chưa merge; audit/tách scope rộng trước nghiệm thu.
+- Giữ nguyên phần trăm Admin nền đã ghi trước đó cho đến khi đánh giá lại có căn cứ; theo dõi yêu cầu mới riêng.

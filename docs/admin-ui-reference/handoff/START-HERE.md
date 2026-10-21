@@ -110,3 +110,12 @@ Các file PNG/HTML tham chiếu là mục tiêu thiết kế, không phải scre
 - Preview diagnostic [39542387719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39542387719) still FAILS at deployed CSS/UI signature mismatch on older tested source `de6114f...`. No newer Preview diagnostic found.
 - Read-only API review found update-product duplicate SKU conflicts likely use generic 500 handling while create-product returns explicit 409. Uniqueness remains DB-enforced; no API change made because backend/business behavior is outside UI-only scope.
 - PR #111 OPEN/unmerged: 909 files (+30,716/-356), 407 ahead/6 behind main. PR #108 OPEN. Progress 43%.
+
+
+---
+
+## Yêu cầu tích hợp mới — 2026-10-21
+
+Đọc `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md` trước khi thực hiện hai tính năng đã được chủ dự án duyệt: phân loại Hàng có sẵn/Hàng đặt riêng và QR chuyển khoản theo đơn (không tích hợp cổng thanh toán). Đây là phạm vi bổ sung; tiếp tục công việc Admin đang dang dở.
+
+Không đoán loại sản phẩm từ tồn kho; dữ liệu cũ chưa rõ cần rà soát. QR không chứng minh tiền đã về; chỉ xác nhận thủ công sau khi kiểm tra giao dịch. Không yêu cầu thanh toán trước khi giá/điều kiện đơn được xác nhận. Nếu cần schema/API/migration, phân tích compat/rollback/test và chỉ sửa code trên nhánh Admin; không chạy migration Production hoặc ghi dữ liệu thật. Bảo vệ nhánh website tĩnh và main. PR #111 giữ mở và cần audit scope rộng trước nghiệm thu.
