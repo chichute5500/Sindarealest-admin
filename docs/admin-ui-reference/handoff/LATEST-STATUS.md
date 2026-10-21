@@ -158,3 +158,11 @@ The artifact was downloaded and the reference PNG was opened alongside current P
 - Exact-SHA validation: [Validate Source run #39627944790](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39627944790) completed **SUCCESS** on `55afadc66a2467825fade4fb7036ae65d9df8d42`; project integrity and automated tests passed. This workflow does not execute the Playwright browser suite in the file above, so the new E2E audit is **NOT YET RUN** by the recorded validation. A later workflow #39628066424 was in progress at last poll and must be rechecked against its own SHA; it reported `e0d7ec8...`, which differs from the current branch HEAD observed earlier, so do not attribute it to `55afadc`.
 - This adds regression coverage but is not visual acceptance of the 12 reference screen families and does not prove authenticated backend workflows. Cloudflare Access remains unchanged; no secrets, remote D1/R2, migration, setup script, or TinyFish action.
 - Overall progress remains **48%**. Outstanding: 12-screen parity acceptance; running the E2E reduced-motion browser audit in the preview-evidence workflow; authenticated business/backend QA; image-save and PRE/PRO migration checks remain `DEFERRED_BY_OWNER / NOT VERIFIED`.
+
+
+## 12-screen reference audit matrix added — 2026-10-21
+
+- Added `docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md` in commit `04ec0f59305ceed927348fdf39cc220fd9ad6082`.
+- The matrix explicitly separates PARTIAL fixture/source evidence from accepted visual parity and authenticated backend QA; it does not inflate overall progress beyond 48%.
+- It records the gallery as PARTIAL only: horizontal thumbnail rail/cover geometry previously passed on exact test tree `78a16b6d9fca91d7b080834f293e1690dc7c10cd`, using synthetic images, not real R2 product images. The reduced-motion Playwright test exists but still needs an exact-SHA workflow run that actually executes that browser suite.
+- Continue from this matrix after re-fetching live branch HEAD and exact-SHA Actions. Preserve all owner restrictions: only this Admin branch; PR #111/#108 open/unmerged; no Production deployment, Access/secrets changes/bypass, remote D1/R2 writes, SQL/migration/setup scripts, TinyFish, image-save, or PRE/PRO migration work.
