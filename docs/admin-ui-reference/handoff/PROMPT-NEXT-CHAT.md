@@ -1,20 +1,23 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
-Bắt đầu từ [START-HERE.md](https://github.com/chichute5500/Sindarealest-admin/blob/feature/admin-isolated-handoff-2026-10-20/docs/admin-ui-reference/handoff/START-HERE.md); chủ dự án không cần dán lại history.
+Single entry point: [START-HERE.md](https://github.com/chichute5500/Sindarealest-admin/blob/feature/admin-isolated-handoff-2026-10-20/docs/admin-ui-reference/handoff/START-HERE.md). Do not request the owner to paste historical prompts.
 
-## Bằng chứng
-- Source/test SHA `4b2220d510a906882e4309df6969c0c43514c421`: Validate [#39813340342](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342) PASS; Preview [#39813340309](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309) PASS.
-- [Artifact #12439794397 / admin-preview-evidence-340](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397): 102 PNGs, 78 fixture metrics.
-- Mobile toast/nav overlap đã sửa và geometry-test PASS; screenshot `warranties-responsive__320x640__light.png`.
-- Timeout retry-customers, CSS assertion `display:block` và screenshot Activity Log lúc còn loading là lỗi test harness cũ đã được sửa. Đừng lặp điều tra nếu run mới không tái hiện.
-- 12 screens vẫn PARTIAL_NOT_ACCEPTED; deployed Preview diagnostic chỉ xác nhận CSS selector login, authenticated backend NOT_TESTED.
+## Live source-audit checkpoint
+- Repo `chichute5500/Sindarealest-admin`, write only `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN/unmerged.
+- Protected website/static branch `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN/unmerged, current observed HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`, read-only.
+- ADMIN HEAD at audit checkpoint start `0502739790fecfdf56f3c267dcaf607f1751908e`; fetch live before every write.
+- Latest source/test SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; [run #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576) SUCCESS; [artifact #339](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558) has 102 PNGs and 78 fixture metrics.
+- Product progress 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED, authenticated business backend NOT_TESTED.
+- Old `retry-customers` timeout in run #39804852604 is historical; do not reopen without new failing evidence.
+- PR #111 current file list contains 1,310 paths. Runtime/config: 36 files, 14 added/22 modified vs merge-base `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; full provenance is still PARTIAL.
+- Source audits confirmed both setup and deploy scripts contain migration-0009 preflight, but no remote D1 query was run. Do not repeat obsolete assertion that 0009 preflight is missing.
 
-## Việc tiếp tục
-1. Fetch live PR #111/#108, HEAD, Actions. Chỉ nhánh ADMIN được ghi; hai PR giữ OPEN/unmerged.
-2. Đọc các handoff JSON/Markdown và screen audit.
-3. So artifact #340 với reference đúng viewport/theme; ưu tiên Gallery #5 rồi #8–#12, ghi bằng chứng trước khi sửa.
-4. Tiếp tục provenance audit của 1,310 changed paths; không dùng ahead/behind cũ nếu chưa tính lại từ live refs.
-5. Đồng bộ status JSON, test results, LATEST-STATUS, START-HERE, prompts và audits trong **một atomic commit/checkpoint**; không ghi trong lúc Preview đang lưu artifact.
+## Continue work
+1. Continue semantic review of the 36 runtime/config files, especially ADMIN `public/index.html` (differs from main and static #108), seven runtime blobs that are exactly equal to static #108, payment API/ledger contracts and setup sequencing. Keep these as source-only findings; do not edit the static branch.
+2. Continue the 12-screen comparison at matching viewport/theme. Gallery source already implements a featured slot + horizontal rail; screenshot fixture art is synthetic, not actual product photography.
+3. Review remaining changed tests/docs/evidence groups and record path provenance; don't call the PR clean/merge-ready until every scope is accounted for.
+4. Make smallest reproducible ADMIN-only fixes with regression coverage, validate exact SHA, update JSON/Markdown and refetch live refs.
+5. If authorized authenticated Preview is unavailable, mark BLOCKED/NOT_TESTED; never bypass Access.
 
-## Safety
-Không merge, không `main`/static writes, Production deploy, Access bypass, secrets access/exposure, remote D1/R2 writes hay setup/migration/deploy scripts. Không tạo dữ liệu kinh doanh giả hoặc API contract chưa duyệt. Authenticated QA cần Preview access được ủy quyền; nếu thiếu thì ghi BLOCKED.
+## Guardrails
+No merge, main/static edits, force-push, Production deploy, secrets/Access bypass, remote D1/R2/schema/ledger action, or setup/migration/deploy execution. Migration 0009, PRE/PRO, R2/product-image save remain DEFERRED_BY_OWNER. AI grouping awaits approved API/UX contract. Never fabricate data.
