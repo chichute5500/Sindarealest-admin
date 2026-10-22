@@ -1,163 +1,164 @@
 {
-  "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:54:00Z",
+  "schemaVersion": 5,
+  "capturedAtUtc": "2026-10-22T16:15:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
+  "branchHeadAtCheckpointStart": "074d8ef712914d456754bdedb26e87c7fc00c5ad",
+  "codeTestSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "codeTestSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-  "sourceCommit": "e11ec06cd5870522735a28205b678897de829361",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
-  "sourceValidation": {
-    "id": 39804852564,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564",
-    "testedSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
+  "status": "SOURCE_AND_LOCAL_PLAYWRIGHT_PASS; PREVIEW_DIAGNOSTIC_PASS; AUTHENTICATED_BACKEND_NOT_TESTED",
+  "latestRun": {
+    "id": 39811730576,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576",
+    "headSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
     "status": "completed",
     "conclusion": "success",
-    "checks": [
-      "dependency audit",
-      "npm run check",
-      "npm test"
-    ]
-  },
-  "visualValidation": {
-    "id": 39804852604,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604",
-    "testedSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-    "status": "completed",
-    "jobs": "COMPLETED; inspect exact job logs to classify failure",
-    "artifacts": "NOT RECHECKED DURING HANDOFF SYNC",
-    "conclusion": "failure",
-    "failureCause": "tests/e2e/admin-static-baseline.spec.js test at line 173 timed out after 120s waiting for [data-action=\"retry-customers\"] at line 1940.",
-    "deployedPreviewDiagnostic": "success",
+    "jobId": 119939493068,
+    "steps": {
+      "repositoryChecks": "success",
+      "automatedTests": "success",
+      "chromiumInstall": "success",
+      "localReadOnlyPreview": "success",
+      "responsiveThemeScreenshotMatrix": "success",
+      "deployedPreviewDiagnostic": "success",
+      "missingPreviewConfiguration": "skipped"
+    },
     "artifact": {
-      "id": 12437154740,
-      "name": "admin-preview-evidence-336",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604/artifacts/12437154740"
+      "id": 12441015558,
+      "name": "admin-preview-evidence-339",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558",
+      "expired": false,
+      "expiresAtUtc": "2026-11-05T16:13:10Z",
+      "sha256": "e3b4d2b1d6c78519527663e71a6868fa6b6f499863fbf5b0a1e9414e2de9a26e",
+      "pngCount": 102,
+      "loginShellPngCount": 16,
+      "fixtureModulePngCount": 86,
+      "fixtureMetricCount": 78
     }
   },
-  "blockingOlderRun": {
-    "id": 39802525217,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217",
-    "testedSha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
-    "status": "completed",
-    "step": null,
-    "conclusion": "cancelled"
-  },
-  "checkResults": {
-    "dependencyAudit": "PASS_EXACT_SHA",
-    "npmRunCheck": "PASS_EXACT_SHA",
-    "npmTest": "PASS_EXACT_SHA",
-    "cloudflarePagesCheck": "SUCCESS_REPORTED_ON_EXACT_SHA; NOT A CLAIM OF PRODUCTION DEPLOYMENT",
-    "localStaticPlaywright": "FAIL_TIMEOUT_RETRY_CUSTOMERS_SELECTOR",
-    "customerWarranty503Recovery": "AUTHORED_NOT_CONFIRMED_BY_PREVIEW_RUN",
-    "authenticatedBusinessBackendQA": "NOT_TESTED",
-    "remoteD1SchemaAndLedger": "NOT_VERIFIED",
-    "productionDeployment": "NOT_PERFORMED",
-    "deployedPreviewDiagnostic": "PASS_STEP_WITHIN_OVERALL_FAILED_RUN"
-  },
-  "screens": {
-    "8_customers": {
-      "status": "PARTIAL_NOT_ACCEPTED",
-      "codeSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "testBlob": "eee92a3e78705393ce40efd5054fb832aafc541d",
-      "coverage": "Synthetic 503 -> error/retry -> GET fixture recovery",
-      "state": "AUTHORED_AWAITING_PLAYWRIGHT"
-    },
-    "9_warranty_support": {
-      "status": "PARTIAL_NOT_ACCEPTED",
-      "codeSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "testBlob": "eee92a3e78705393ce40efd5054fb832aafc541d",
-      "coverage": "Synthetic 503 -> error/retry -> GET fixture recovery",
-      "state": "AUTHORED_AWAITING_PLAYWRIGHT"
-    },
-    "10_website_settings": {
-      "status": "PARTIAL_NOT_ACCEPTED",
-      "codeSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "state": "SCREENSHOT_AND_QR_GUARD_AWAITING_PLAYWRIGHT"
-    },
-    "11_backup_restore": {
-      "status": "PARTIAL_NOT_ACCEPTED",
-      "codeSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "state": "LAYOUT_ONLY_NO_EXPORT_RESTORE_CYCLE"
-    },
-    "12_activity_log": {
-      "status": "PARTIAL_NOT_ACCEPTED",
-      "codeSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "state": "FIXTURE_ASSERTIONS_AWAITING_PLAYWRIGHT"
-    }
-  },
-  "olderArtifact": {
-    "id": 12433587319,
-    "name": "admin-preview-evidence-327",
-    "runId": 39796182324,
-    "testedSha": "401b961cb685a1c3fade6e6d6f66713bb71bf509",
-    "status": "HISTORICAL_ONLY"
-  },
-  "blockedItems": [
-    "#39804852604 pending/no jobs-artifacts; #39802525217 old run blocks concurrency at Chromium installation.",
-    "Authenticated Preview needs authorized access; do not bypass Cloudflare Access."
-  ],
-  "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
-  ],
-  "headSemantics": "Branch HEAD advances with handoff-only commits. Always fetch live branch/PR HEAD; codeTestSha remains the exact tested product revision.",
-  "latestCodeCommitSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
-  "testedCommitSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
-  "capturedAt": "2026-10-22T16:12:04.381Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576",
-  "checks": {
-    "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
-    "applicationStartup": "PASS",
-    "localStaticPlaywrightBaseline": "PASS",
-    "playwright": "PASS",
-    "playwrightPreviewDiagnostics": "success",
-    "deployedPreview": "PASS",
-    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
-    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
-    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS",
-    "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
-    "productionDeployment": "NOT_PERFORMED"
-  },
-  "latestLocalEvidence": {
-    "runId": 39811730576,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576",
-    "sourceCommit": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+  "validatedChecks": {
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
-    "localPlaywright": "PASS",
-    "sourceScreenshotCount": 102,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 86,
-    "uiFixtureMetricCount": 78,
-    "screenshotArtifact": "admin-preview-evidence-339",
+    "localStaticPlaywright": "PASS",
+    "responsiveThemeScreenshotMatrix": "PASS",
+    "deployedPreviewDiagnostic": "PASS",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
     "httpErrors": [],
     "attemptedWrites": [],
-    "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+    "unexpectedApiPaths": []
   },
-  "latestScreenshotArtifact": {
-    "runId": 39811730576,
-    "name": "admin-preview-evidence-339",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576",
-    "sourceCommit": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
-    "screenshotCount": 102,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 86,
-    "uiFixtureMetricCount": 78,
-    "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+  "historicalRuns": [
+    {
+      "id": 39804852564,
+      "sha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
+      "conclusion": "success",
+      "meaning": "Source checks on older SHA; historical, superseded by latest run."
+    },
+    {
+      "id": 39804852604,
+      "sha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
+      "conclusion": "failure",
+      "failure": "Playwright screenshot matrix timed out waiting for retry-customers at tests/e2e/admin-static-baseline.spec.js:1940; deployed Preview diagnostic step succeeded.",
+      "meaning": "Historical failure; latest run on newer SHA passed."
+    },
+    {
+      "id": 39802525217,
+      "sha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
+      "conclusion": "cancelled",
+      "meaning": "Historical cancelled run, not an active concurrency blocker."
+    }
+  ],
+  "screens": {
+    "1_login": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Unauthenticated login shell; no authenticated session acceptance."
+    },
+    "2_dashboard": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Synthetic fixture; live KPI/data acceptance not tested."
+    },
+    "3_product_list": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Fixture/data-limited; pagination and real catalog density not accepted."
+    },
+    "4_product_editor": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Fixture interactions only; persistent save/SKU/AI endpoint not verified."
+    },
+    "5_product_gallery": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Screenshot evidence available; reference parity for thumbnail rail/status controls remains to review; R2 persistence deferred."
+    },
+    "6_orders": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Synthetic orders; authenticated/multipage data not tested."
+    },
+    "7_order_detail": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Fixture detail; live actions/focus workflow not fully accepted."
+    },
+    "8_customers": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "503 → error/retry → fixture recovery exercised by successful local Playwright; live backend not tested."
+    },
+    "9_warranty_support": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Fixture recovery exercised by successful local Playwright; live warranty operations not tested."
+    },
+    "10_website_settings": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Fixture and QR unsaved-draft guard; real persistence/QR activation not verified."
+    },
+    "11_backup_restore": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Layout evidence only; real export/import cycle not tested."
+    },
+    "12_activity_log": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "evidenceRun": 39811730576,
+      "evidenceSha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
+      "gap": "Synthetic fixture only; authenticated audit rows not tested."
+    }
   },
-  "remainingIssues": [],
-  "productionDeployment": "NOT_PERFORMED"
+  "acceptanceBoundary": {
+    "all12Screens": "PARTIAL_NOT_ACCEPTED",
+    "authenticatedBusinessBackendQA": "NOT_TESTED",
+    "remoteD1SchemaAndLedger": "NOT_VERIFIED",
+    "productImageSaveAndR2": "DEFERRED_BY_OWNER",
+    "migration0009": "DEFERRED_BY_OWNER",
+    "preProMigrations": "DEFERRED_BY_OWNER",
+    "productionDeployment": "NOT_PERFORMED"
+  },
+  "nextActions": [
+    "Compare artifact #339 screenshots with approved admin-mobile-reference.png at matching viewport/theme; prioritize Gallery and screens #8–#12.",
+    "Refresh PR #111's live paginated changed-file list; current PR API reports 1,310 files while former grouped census was 1,304.",
+    "Review changed-file provenance in batches, prioritizing runtime/API/migration/setup/workflow paths; write only on ADMIN branch.",
+    "Do not debug the historical retry-customers timeout absent new evidence; the later exact-SHA run passed.",
+    "Keep PRs open and do not deploy, bypass Access, touch secrets, or run remote D1/R2/setup/migration operations."
+  ]
 }
