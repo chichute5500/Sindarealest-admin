@@ -10,4 +10,9 @@ The repeated run-by-run progress narrative has been consolidated into [`docs/han
 - Required capture matrix: 360×800, 390×844, 768×1024, 1440×900; Light and Dark.
 - Hero is temporarily hidden by owner request and explicitly PAUSED until other storefront work is complete. Preserve its source asset and derivative. Do not edit or inspect Hero-specific layout during this pause; continue the visual audit with non-Hero sections first.
 
+## Mandatory work behavior
+- A progress report is not a stop: continue the next safe action automatically; do not wait for the owner to say “continue.”
+- While CI/deploy/capture is pending, work on independent non-conflicting checks/preparation, then inspect results.
+- Hero remains paused and must not be touched until other storefront work is complete.
+
 Do not duplicate run histories here. Add new evidence to `TEST-RESULTS.md` and update current acceptance only after exact-SHA verification.
