@@ -2,7 +2,7 @@
 
 Upload the user-provided transparent PNG for the storefront Hero into this folder.
 
-- Suggested filename: `hero-shoes-transparent.png`
+- Suggested filename: `tb_image_share_1792519964514 (1).png`
 - Use only for the Hero presentation area; this is not a catalog/product image.
 - Keep `public/images/hero-sd-gl052.png` unchanged as the original/fallback.
 - Do not modify unrelated storefront files or product data as part of the upload.
