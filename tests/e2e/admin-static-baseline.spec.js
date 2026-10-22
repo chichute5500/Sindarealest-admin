@@ -795,6 +795,176 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard', 'dashboard', null, true);
     await captureView('products', 'products', null, true);
 
+    // Screen #3 reference matrix: exercise the actual ADMIN product renderer at every
+    // required viewport in both themes. Data remains synthetic and all API writes stay blocked.
+    const productReferenceViewports = [
+      { width: 320, height: 640 },
+      { width: 360, height: 800 },
+      { width: 375, height: 812 },
+      { width: 390, height: 844 },
+      { width: 412, height: 915 },
+      { width: 768, height: 1024 },
+      { width: 1280, height: 800 },
+      { width: 1440, height: 900 }
+    ];
+    for (const productViewport of productReferenceViewports) {
+      for (const productTheme of ['light', 'dark']) {
+        await page.setViewportSize(productViewport);
+        await chooseTheme(productTheme);
+        await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+        await page.evaluate(() => {
+          window.scrollTo(0, 0);
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+          document.querySelectorAll('#main .tablewrap').forEach(element => { element.scrollLeft = 0; });
+        });
+
+        await expect(page.locator('#main .pagehead')).toBeVisible();
+        await expect(page.locator('#searchBox')).toBeVisible();
+        await expect(page.locator('#categoryBox')).toBeVisible();
+        await expect(page.locator('#fulfillmentBox')).toBeVisible();
+        await expect(page.locator('#productPublishFilters')).toBeVisible();
+        await expect(page.locator('#main .product-table tbody tr')).toHaveCount(3);
+        await expect(page.locator('#main .product-table')).toContainText('Chưa nhập');
+        await expect(page.locator('#main .product-table')).toContainText('Chưa kiểm kê');
+
+        const productMatrixLayout = await page.evaluate(() => {
+          const rect = element => {
+            const box = element.getBoundingClientRect();
+            return {
+              left: Math.round(box.left * 100) / 100,
+              right: Math.round(box.right * 100) / 100,
+              top: Math.round(box.top * 100) / 100,
+              bottom: Math.round(box.bottom * 100) / 100,
+              width: Math.round(box.width * 100) / 100,
+              height: Math.round(box.height * 100) / 100
+            };
+          };
+          const main = document.querySelector('#main');
+          const wrapper = document.querySelector('#main .product-table')?.closest('.tablewrap');
+          const table = document.querySelector('#main .product-table');
+          const rows = [...document.querySelectorAll('#main .product-table tbody tr')];
+          const controls = ['#main .pagehead', '#searchBox', '#categoryBox', '#fulfillmentBox', '#productPublishFilters']
+            .map(selector => {
+              const element = document.querySelector(selector);
+              if (!element) return { selector, exists: false };
+              const bounds = rect(element);
+              const style = getComputedStyle(element);
+              return {
+                selector,
+                exists: true,
+                visible: style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0,
+                bounds,
+                clientWidth: element.clientWidth,
+                scrollWidth: element.scrollWidth,
+                accessibleName: element.getAttribute('aria-label') ||
+                  (element.id ? document.querySelector('label[for="' + element.id + '"]')?.innerText?.trim() : null)
+              };
+            });
+          return {
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            documentWidth: document.documentElement.scrollWidth,
+            bodyWidth: document.body.scrollWidth,
+            theme: document.documentElement.dataset.adminTheme || null,
+            main: rect(main),
+            mainClientWidth: main.clientWidth,
+            mainScrollWidth: main.scrollWidth,
+            wrapper: rect(wrapper),
+            wrapperClientWidth: wrapper.clientWidth,
+            wrapperScrollWidth: wrapper.scrollWidth,
+            table: rect(table),
+            tableClientWidth: table.clientWidth,
+            tableScrollWidth: table.scrollWidth,
+            controls,
+            rows: rows.map(row => {
+              const bounds = rect(row);
+              const visibleEditNames = [...row.querySelectorAll('button[data-action="edit"]')]
+                .filter(button => {
+                  const style = getComputedStyle(button);
+                  return style.display !== 'none' && style.visibility !== 'hidden' && button.getClientRects().length > 0;
+                })
+                .map(button => ({
+                  name: (button.getAttribute('aria-label') || button.innerText || '').trim(),
+                  bounds: rect(button),
+                  clientWidth: button.clientWidth,
+                  scrollWidth: button.scrollWidth
+                }));
+              return {
+                bounds,
+                clientWidth: row.clientWidth,
+                scrollWidth: row.scrollWidth,
+                title: row.querySelector('.prodname')?.textContent?.trim() || null,
+                titleAttribute: row.querySelector('.prodname')?.getAttribute('title') || null,
+                priceText: row.querySelector('.product-mobile-inline-metric:first-child')?.innerText?.trim() || null,
+                stockText: row.querySelector('.product-mobile-inline-metric:nth-child(2)')?.innerText?.trim() || null,
+                visibleEditNames,
+                cells: [...row.querySelectorAll('td')].map(cell => ({
+                  text: (cell.innerText || '').trim().slice(0, 90),
+                  bounds: rect(cell),
+                  clientWidth: cell.clientWidth,
+                  scrollWidth: cell.scrollWidth
+                }))
+              };
+            })
+          };
+        });
+
+        expect(productMatrixLayout.documentWidth,
+          'Screen #3 must not widen the document at ' + productViewport.width + 'px (' + productTheme + '): ' + JSON.stringify(productMatrixLayout))
+          .toBeLessThanOrEqual(productViewport.width);
+        expect(productMatrixLayout.bodyWidth,
+          'Screen #3 must not widen the body at ' + productViewport.width + 'px (' + productTheme + '): ' + JSON.stringify(productMatrixLayout))
+          .toBeLessThanOrEqual(productViewport.width);
+        expect(productMatrixLayout.mainScrollWidth,
+          'Screen #3 main content must stay within its layout column: ' + JSON.stringify(productMatrixLayout))
+          .toBeLessThanOrEqual(productMatrixLayout.mainClientWidth + 1);
+        expect(productMatrixLayout.controls.every(control =>
+          control.exists && control.visible && Boolean(control.accessibleName?.trim()) &&
+          control.bounds.left >= -1 && control.bounds.right <= productViewport.width + 1),
+          'Screen #3 search/filter controls must be visible, named and within viewport: ' + JSON.stringify(productMatrixLayout.controls))
+          .toBe(true);
+        expect(productMatrixLayout.rows, 'Screen #3 renders three explicit synthetic products').toHaveLength(3);
+        expect(productMatrixLayout.rows.every(row =>
+          row.bounds.left >= productMatrixLayout.wrapper.left - 1 &&
+          row.bounds.right <= productMatrixLayout.wrapper.right + 1 &&
+          Boolean(row.titleAttribute) &&
+          row.visibleEditNames.length === 1 &&
+          Boolean(row.visibleEditNames[0].name) &&
+          row.visibleEditNames[0].bounds.left >= -1 &&
+          row.visibleEditNames[0].bounds.right <= productViewport.width + 1),
+          'Each product row must fit the table wrapper and expose one named visible edit control: ' + JSON.stringify(productMatrixLayout.rows))
+          .toBe(true);
+        expect(productMatrixLayout.rows.every(row => row.priceText?.includes('Chưa nhập') && row.stockText?.includes('Chưa kiểm kê')),
+          'Fixtures must keep unconfirmed price/stock truthful instead of inventing business data')
+          .toBe(true);
+        if (productViewport.width <= 680) {
+          expect(productMatrixLayout.wrapperScrollWidth,
+            'Narrow product-list wrapper/cards must not create horizontal clipping: ' + JSON.stringify(productMatrixLayout))
+            .toBeLessThanOrEqual(productMatrixLayout.wrapperClientWidth + 1);
+          expect(productMatrixLayout.tableScrollWidth,
+            'Narrow product-list table/cards must fit their wrapper: ' + JSON.stringify(productMatrixLayout))
+            .toBeLessThanOrEqual(productMatrixLayout.tableClientWidth + 1);
+          expect(productMatrixLayout.rows.every(row =>
+            row.scrollWidth <= row.clientWidth + 1 &&
+            row.cells.every(cell => cell.scrollWidth <= cell.clientWidth + 1)),
+            'Narrow product cards and cells must wrap instead of clipping: ' + JSON.stringify(productMatrixLayout.rows))
+            .toBe(true);
+        }
+
+        await saveScreenshot('products-reference-matrix', {
+          viewport: productViewport,
+          theme: productTheme
+        }, {
+          fixtureOnly: true,
+          screenFamily: 3,
+          referenceViewportMatrix: true,
+          noHorizontalOverflow: true,
+          noInventedPriceOrStock: true,
+          fixtureProductCount: 3
+        });
+      }
+    }
+
     // Compact mobile cards keep all product facts in one card and the price/stock metrics side-by-side.
     await page.setViewportSize(mobile);
     await chooseTheme('light');
