@@ -13,6 +13,12 @@ Updated: 2026-10-22 UTC. Read this file first in every new chat.
 - Validate/tests [#39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) reported PASS; Admin Preview read-only smoke [#39760902960](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902960) reported PASS.
 - Docs-only commits are excluded from Preview deploy/live-capture push triggers by workflow `paths-ignore: docs/**`. A docs-only handoff commit must not be presented as a new deployed storefront.
 
+## Latest live run refresh (2026-10-22 UTC)
+- Branch/PR head at this refresh: `99eadd224de1da319598998028ebdcdfda4d495a`; PR #108 remains OPEN, not merged. Fetch again before acting because this branch has been receiving rapid documentation-only commits.
+- Newer workflow run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821) — Liquid Glass isolated visual preview for source SHA `e916ce590b6dbd720dca51405097d20333ce649b` — was IN_PROGRESS at this checkpoint. Do not treat it as evidence for the newer docs-only HEAD or as completed until the run concludes and its artifact is inspected. Preview deploy [#39762445820](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445820) succeeded for `e916ce...`; it predates subsequent docs-only commits and is not a deployment of the current docs HEAD.
+- CI [#39762468528](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762468528) passed for `2bd71f55d1c473852d9bfe5f39b701943ce464d0`; current HEAD advanced later via docs-only edits. The next chat must refresh CI and deployment status rather than transfer this PASS to the current HEAD.
+- Root-level `AUDIT-REPORT-2026-10-17.md`, `UPGRADE-REPORT.md`, and `INTEGRITY-REPORT.md` now carry historical-report banners. They remain for traceability, not as current storefront handoff.
+
 ## Documentation cleanup checkpoint (2026-10-22)
 - Canonical handoff order: this file → `HANDOFF.md` → `TEST-RESULTS.md` → `TASKS.md` → visual audit plan → [canonical new-chat prompt](PROMPT-NEXT-CHAT-2026-10-22.md).
 - Dated prompts `PROMPT-NEXT-CHAT-2026-10-20.md`, `PROMPT-NEXT-CHAT-2026-10-21.md`, and `docs/prompts/NEXT-CHAT-PROMPT-2026-10-21-STATIC-WEB.md` are marked HISTORICAL; REV2/REV3 already direct readers to the canonical prompt. The master prompt now starts with an override saying old embedded checkpoints are historical only.
