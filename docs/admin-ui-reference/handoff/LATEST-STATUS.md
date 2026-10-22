@@ -16,3 +16,15 @@
 1. Verify exact-SHA Validate for this follow-up handoff commit once.
 2. Continue remaining semantic provenance and reconcile any path-count changes from the latest commit.
 3. Keep all screen/backend/remote resource acceptance boundaries in place.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 1674396bec433fb915e3a6b922b9f22436335786
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-355 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
