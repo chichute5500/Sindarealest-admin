@@ -316,3 +316,25 @@ assert.ok(
   accountIconStyle.includes('stroke-width:1.7'),
   'Static order icons must use primary ink and account SVGs must use a consistent reference-scale stroke.'
 );
+
+// The Zalo CTA icon must match the supplied chat-bubble wordmark reference.
+const orderZaloMarkStart = html.indexOf('<span class="order-zalo-mark" aria-hidden="true">');
+const orderZaloMarkEnd = html.indexOf('</span>', orderZaloMarkStart);
+assert.ok(orderZaloMarkStart >= 0 && orderZaloMarkEnd > orderZaloMarkStart,
+  'The order-assurance Zalo CTA must retain its decorative marker.');
+const orderZaloMark = html.slice(orderZaloMarkStart, orderZaloMarkEnd);
+assert.ok(
+  orderZaloMark.includes('viewBox="0 0 32 24"') &&
+  orderZaloMark.includes('data-order-icon="zalo"') &&
+  orderZaloMark.includes('stroke-width="1.7"') &&
+  orderZaloMark.includes('>Zalo</text>'),
+  'The CTA marker must render a thin-stroke speech bubble containing the Zalo wordmark rather than a generic Z.');
+assert.ok(
+  html.includes('.order-zalo-mark svg{display:block;width:28px;height:21px;overflow:visible}') &&
+  html.includes('.order-zalo-mark{width:24px;height:18px;flex-basis:24px}.order-zalo-mark svg{width:24px;height:18px}'),
+  'The Zalo wordmark must retain a readable responsive size on tablet and mobile layouts.');
+assert.ok(
+  html.includes('href="https://zalo.me/0827049192"') &&
+  html.includes('aria-label="Tư vấn hoặc đặt hàng qua Zalo"'),
+  'Changing the Zalo pictogram must not change its destination or accessible action label.');
+
