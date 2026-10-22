@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T14:34:56.856+07:00",
+  "updatedAt": "2026-10-22T14:56:46.664+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "5606518d34a929d74f50330a74ef16d9c2852a29",
+  "branchHeadAtCheckpoint": "84cafe10b60c49593d530ac3b444aedfd268f76c",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Validate Source #39739697272 and Preview/Playwright #39739697312 SUCCESS on exact source/test SHA ed84462c88d6333a07141c03ccd49c971f4179d8; branch HEAD before documentation refresh 5606518d34a929d74f50330a74ef16d9c2852a29 is an evidence-only descendant. Desktop sticky-footer geometry assertion passed and artifact 12408851898 reviewed. 12-screen parity NOT ACCEPTED and authenticated backend QA NOT TESTED, so keep 50%.",
+  "progressBasis": "Validate Source #39742949748 and Preview/Playwright #39742949583 SUCCESS on exact source/test SHA a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93; current HEAD before docs refresh 84cafe10b60c49593d530ac3b444aedfd268f76c is workflow-generated evidence-only descendant. Footer and gallery-tab geometry assertions both PASS, artifact 12409713973 reviewed. Full 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED; remain at 50%.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "testedCommitSha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
     "conclusion": "source_validate_and_preview_pass_exact_sha",
     "validateRun": {
-      "runId": 39739697272,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697272",
-      "sha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+      "runId": 39742949748,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748",
+      "sha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
       "conclusion": "success"
     },
     "previousPreviewRun": {
@@ -25,27 +25,28 @@
     "currentHeadPreview": "PASS_EXACT_TESTED_SHA; BRANCH_HEAD_IS_EVIDENCE_ONLY_DESCENDANT",
     "previousPreviewFailure": "desktop price/stock row overlaps sticky footer in screenshot matrix",
     "previousPreviewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
-    "productEditorScreen4": "DESKTOP_STICKY_FOOTER_REGRESSION_PASS; OVERALL_VISUAL_PARITY_PARTIAL_NOT_ACCEPTED",
+    "productEditorScreen4": "SPECIFIC_PRICE_STOCK_FOOTER_REGRESSION_PASS; OVERALL_VISUAL_PARITY_PARTIAL_NOT_ACCEPTED",
     "productListScreen3": "PARTIAL_NOT_ACCEPTED",
     "twelveScreenVisualParity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
     "progressPercent": 50,
     "previewRun": {
-      "runId": 39739697312,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312",
-      "sha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+      "runId": 39742949583,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583",
+      "sha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
       "conclusion": "success",
       "diagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
     },
     "artifact": {
-      "id": 12408851898,
-      "name": "admin-preview-evidence-296",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312/artifacts/12408851898",
+      "id": 12409713973,
+      "name": "admin-preview-evidence-297",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973",
       "capturedPngs": 99,
       "loginShellPngs": 16,
       "fixturePngs": 83,
       "fixtureMetrics": 75
-    }
+    },
+    "productGalleryScreen5": "SPECIFIC_DESKTOP_TABS_HEADING_OVERLAP_REGRESSION_PASS; OVERALL_VISUAL_PARITY_PARTIAL_NOT_ACCEPTED"
   },
   "acceptance": {
     "twelveScreenVisualParity": "NOT_ACCEPTED",
@@ -64,29 +65,30 @@
     "backupRestoreSettings12": "PARTIAL_FIXTURE_ONLY_SCREENSHOT_TARGET_FIXED_REFERENCE_PARITY_NOT_ACCEPTED",
     "aiImageReviewGrouping11": "BLOCKED_NO_DEFINED_ROUTE_CONTROLS_API_OR_APPROVED_FEATURE_CONTRACT",
     "notificationPanel": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
-    "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_CLICK_TO_NAVIGATE_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED"
+    "mobileMoreMenu": "PARTIAL_FIXTURE_ONLY_ESCAPE_FOCUS_CLICK_TO_NAVIGATE_AND_VIEWPORT_TESTS_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
+    "productGalleryScreen5": "DESKTOP_STICKY_TAB_OVERLAP_REGRESSION_PASS_EXACT_SHA; OVERALL_REFERENCE_PARITY_PARTIAL_NOT_ACCEPTED"
   },
   "pullRequests": {
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "0361cc3d9d7ec7ba01d768504cfae5bb08494c6d",
+      "headSha": "505a5effa353a17f4744088ee7d357d251fda97b",
       "agentWritesAllowed": false,
       "changedFiles": 271,
       "mergeReady": false,
       "headShaObservedBeforeHandoffRefresh": "39d0dc85bb3af8c8c7d8f5362290a9fbefc65f2b",
       "mergeable": false,
       "mergeable_state": "dirty",
-      "reason": "Protected static website PR; do not modify from ADMIN task.",
+      "reason": "Protected static website PR; no edits from ADMIN task.",
       "base": "main"
     },
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "5606518d34a929d74f50330a74ef16d9c2852a29",
+      "headSha": "84cafe10b60c49593d530ac3b444aedfd268f76c",
       "changedFiles": 1193,
       "mergeReady": false,
-      "reason": "Keep ADMIN PR OPEN/unmerged; observed head is evidence-only commit parented to exact tested SHA; full diff scope audit remains open.",
+      "reason": "Keep PR #111 OPEN/unmerged; full diff/scope audit remains open.",
       "headShaObservedBeforeHandoffRefresh": "1814260ee238d194ca5d749954439b15bb8c055a",
       "headShaBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
       "mergeable": false,
@@ -121,10 +123,10 @@
     "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
   ],
   "nextActions": [
-    "Continue the next NOT_ACCEPTED screen family from 12-SCREEN-REFERENCE-AUDIT.md, starting with existing category/product classification controls.",
-    "Compare products list #3 and remaining screen families to the approved reference, focusing on 390x844 light/dark and 1280x800.",
-    "After code/test changes, run Validate Source and Preview/Playwright on the exact same source/test SHA and inspect artifacts.",
-    "Do not perform authenticated backend QA until an authorized Preview path/account and a safe read-only strategy are available."
+    "Continue next NOT_ACCEPTED screen family from 12-SCREEN-REFERENCE-AUDIT.md, starting with existing category/product classification controls.",
+    "Compare product list #3 and remaining families against reference at 390x844 light/dark and 1280x800.",
+    "After changes, run exact-SHA Validate Source and Preview/Playwright and inspect screenshots.",
+    "Only test authenticated backend through authorized Preview/account; no Access bypass."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -134,48 +136,51 @@
     "No SQL/setup/migration execution or remote D1/R2 mutations.",
     "Do not use TinyFish."
   ],
-  "ownerActionRequiredNow": "No immediate action required to verify the desktop layout regression. Real authenticated business QA remains untested and must only be done via an authorized Preview path; no Access bypass. Product image save/R2 and PRE/PRO migrations remain deferred by owner.",
+  "ownerActionRequiredNow": "No immediate action required for these CSS regressions. Authenticated backend QA remains untested and must use an authorized Preview path; do not bypass Access. Product image save/R2 and PRE/PRO migrations remain deferred by owner.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T14:29:08.318+07:00",
+    "checkedAt": "2026-10-22T14:56:46.664+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "latestBranchHead": "5606518d34a929d74f50330a74ef16d9c2852a29",
-    "latestValidateSourceSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
-    "validateRun": 39739697272,
+    "latestBranchHead": "84cafe10b60c49593d530ac3b444aedfd268f76c",
+    "latestValidateSourceSha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
+    "validateRun": 39742949748,
     "previousPreviewRun": 39736231146,
     "previousPreviewSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
     "currentHeadPreview": "SUCCESS_ON_TESTED_SOURCE_SHA_BRANCH_HEAD_IS_EVIDENCE_ONLY_DESCENDANT",
     "previewFailure": "desktop price/stock row overlaps sticky footer on older SHA; rerun required on current HEAD",
     "progressPercent": 50,
     "handoffDocsCommitSha": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
-    "latestPreviewRun": 39739697312,
-    "latestPreviewSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "latestPreviewRun": 39742949583,
+    "latestPreviewSha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
     "previewConclusion": "success",
     "previewStatus": "PASS_SOURCE_SCREENSHOT_MATRIX_AND_PASS_LOGIN_CSS_SIGNATURE",
-    "artifactId": 12408851898,
-    "artifactName": "admin-preview-evidence-296",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312/artifacts/12408851898",
-    "previousPreviewFailureResolved": "previous desktop price/stock overlap on SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778 resolved on tested SHA ed84462c88d6333a07141c03ccd49c971f4179d8"
+    "artifactId": 12409713973,
+    "artifactName": "admin-preview-evidence-297",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973",
+    "previousPreviewFailureResolved": "previous desktop price/stock overlap on SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778 resolved on tested SHA ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "desktopPriceStockFooter": "PASS",
+    "desktopGalleryStickyTabOverlap": "PASS"
   },
   "latestContinuationCycle": {
-    "checkedAt": "2026-10-22T14:29:08.318+07:00",
+    "checkedAt": "2026-10-22T14:56:46.664+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeHandoffRefresh": "5606518d34a929d74f50330a74ef16d9c2852a29",
-    "sourceSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
-    "validateRun": 39739697272,
+    "branchHeadBeforeHandoffRefresh": "84cafe10b60c49593d530ac3b444aedfd268f76c",
+    "sourceSha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
+    "validateRun": 39742949748,
     "validateConclusion": "success",
-    "previewRun": 39739697312,
+    "previewRun": 39742949583,
     "previewConclusion": "success",
-    "artifactId": 12408851898,
-    "artifactName": "admin-preview-evidence-296",
+    "artifactId": 12409713973,
+    "artifactName": "admin-preview-evidence-297",
     "capturedPngs": 99,
     "fixtureMetrics": 75,
     "desktopFooterRegression": "PASS",
+    "desktopGalleryTabsOverlap": "PASS",
     "screen4": "PARTIAL_NOT_ACCEPTED",
+    "screen5": "PARTIAL_NOT_ACCEPTED",
     "screen3": "PARTIAL_NOT_ACCEPTED",
     "all12ScreenParity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED",
-    "progressPercent": 50,
-    "nextAction": "Audit category/product classification existing controls in a fixture-only round; continue remaining screens by reference audit."
+    "progressPercent": 50
   },
   "continuationHistory": [
     {
@@ -314,27 +319,24 @@
     }
   ],
   "latestHandoffCheckpoint": {
-    "checkedAt": "2026-10-22T14:29:08.318+07:00",
+    "checkedAt": "2026-10-22T14:56:46.664+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeHandoffRefresh": "5606518d34a929d74f50330a74ef16d9c2852a29",
-    "sourceSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
-    "validateRun": 39739697272,
-    "previewRun": 39739697312,
+    "branchHeadBeforeHandoffRefresh": "84cafe10b60c49593d530ac3b444aedfd268f76c",
+    "sourceSha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
+    "validateRun": 39742949748,
+    "previewRun": 39742949583,
     "previewConclusion": "success",
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
-    "artifactId": 12408851898,
-    "artifactName": "admin-preview-evidence-296",
-    "progressPercent": 50,
-    "handoffDocsCommitSha": "97883b4b7eb1e82e83fb8bff645a19c44bb7ae3f",
-    "readbackStatus": "PASS"
+    "artifactId": 12409713973,
+    "artifactName": "admin-preview-evidence-297",
+    "progressPercent": 50
   },
-  "handoffRefreshAt": "2026-10-22T14:29:08.318+07:00",
-  "handoffRefreshBaseHead": "5606518d34a929d74f50330a74ef16d9c2852a29",
+  "handoffRefreshAt": "2026-10-22T14:56:46.664+07:00",
+  "handoffRefreshBaseHead": "84cafe10b60c49593d530ac3b444aedfd268f76c",
   "latestHandoffReadback": {
-    "checkedAt": "2026-10-22T14:34:56.856+07:00",
-    "docsCommitSha": "97883b4b7eb1e82e83fb8bff645a19c44bb7ae3f",
-    "verifiedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "readback": "PASS_GITHUB_READBACK_ALL_8_FILES",
+    "checkedAt": "2026-10-22T14:56:46.664+07:00",
+    "docsCommitSha": "PENDING_HANDOFF_COMMIT",
+    "readback": "PENDING_POST_COMMIT_READBACK",
     "files": [
       "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
       "docs/admin-ui-reference/handoff/START-HERE.md",
@@ -345,16 +347,6 @@
       "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
       "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
     ],
-    "fileBlobShas": {
-      "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md": "5574b0a6f62911f5f3eaee500b0ce1adf6417f35",
-      "docs/admin-ui-reference/handoff/START-HERE.md": "d70349f231841ec8429f31091b99aa7cb4812ad8",
-      "docs/admin-ui-reference/handoff/LATEST-STATUS.md": "7b5ff5bf9523cb2c4130488ad74e64128b7e3cf0",
-      "docs/admin-ui-reference/handoff/latest-test-results.json": "870bfd5180d235e7717fe3052065f5d4d35644d7",
-      "docs/admin-ui-reference/handoff/current-status.json": "59965eec24180e2cc7492f76ac88f7d9120b4eb8",
-      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md": "1e2c46f712bb49d010cac46cb8a5cbbc405b6ba5",
-      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md": "a7d500f90b22da3799cfbe49aa6cb493a830a94c",
-      "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md": "920db576684ea9b04676f877a9de1ee27eabf4c1"
-    },
     "progressPercent": 50
   }
 }

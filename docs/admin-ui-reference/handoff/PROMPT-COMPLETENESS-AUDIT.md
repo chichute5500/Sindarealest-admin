@@ -1,13 +1,12 @@
 # Kiểm toán mức độ đầy đủ của prompt bàn giao ADMIN
 
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T14:29:08.318+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T14:56:46.664+07:00
 
-- Validate Source [#39739697272](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697272) và Preview/Playwright [#39739697312](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312) đều **SUCCESS** trên source/test SHA `ed84462c88d6333a07141c03ccd49c971f4179d8`.
-- Artifact [admin-preview-evidence-296](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312/artifacts/12408851898) đã được tải và đọc: 99 ảnh kiểm thử (16 login + 83 fixture), 75 fixture metrics, không lỗi browser/console/request/HTTP; fixture-only, mọi non-GET bị chặn, không truy cập hay ghi backend thật.
-- Desktop editor: giảm header vertical padding 15px xuống 10px chỉ trong media query desktop; giữ nguyên assertion hình học/footer. Assertion đã PASS trên exact SHA và ảnh 1280×800 light cùng 390×844 light/dark đã mở để kiểm tra vị trí hàng Giá/Tồn kho.
-- **Tiến độ hiện hành: 50%.** Desktop overlap regression đã PASS, nhưng 12-screen visual parity **NOT ACCEPTED**, authenticated backend/business QA **NOT TESTED**, màn #4/#3 vẫn PARTIAL, AI grouping #11 BLOCKED, R2 và PRE/PRO migrations DEFERRED_BY_OWNER.
-- Tài liệu này không phải chứng nhận đối chiếu từng câu chữ với prompt gốc đầy đủ: bản nguyên văn prompt đầu tiên chưa được lưu/đọc đầy đủ trong repo. Các mốc 46%/48% ở phần lịch sử dưới đây không phải trạng thái hiện hành.
-- PR #111/#108 OPEN/unmerged. File chỉ dẫn chuẩn: `docs/admin-ui-reference/reference-instructions.md`. Giữ nguyên toàn bộ rào chắn về main/static/Production/Access/secrets/D1/R2/migration.
+- Validate Source [#39742949748](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748) và Preview/Playwright [#39742949583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583) đều **SUCCESS** trên exact source/test SHA `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`.
+- Artifact [admin-preview-evidence-297](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973) đã tải/đọc: 99 ảnh kiểm thử (16 login + 83 fixture), 75 metrics; 0 page/console/request/HTTP errors, 0 fixture writes và 0 unexpected API paths.
+- Cả lỗi desktop Giá/Tồn kho chạm footer và lỗi sticky tab che heading gallery đều được sửa với assertion riêng còn nguyên và PASS. Đã mở gallery 1280×800 light và 390×844 light/dark.
+- **Tiến độ hiện hành: 50%.** #3 Product list, #4 Product editor, #5 Gallery, #6 Classification và các màn khác chưa được nghiệm thu toàn diện; 12-screen parity **NOT ACCEPTED**; authenticated backend QA **NOT TESTED**; AI grouping #11 **BLOCKED**; ảnh/R2 và migrations **DEFERRED_BY_OWNER**.
+- Đây là cập nhật kiểm toán trạng thái, không phải chứng nhận đối chiếu từng câu chữ với bản prompt gốc nếu nguyên văn đầy đủ chưa có trong repo. PR #111/#108 OPEN/unmerged; giữ nguyên mọi rào chắn.
 
 ---
 
