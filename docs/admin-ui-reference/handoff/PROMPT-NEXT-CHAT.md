@@ -1,3 +1,27 @@
+## CONTINUITY PROTOCOL — CURRENT OPERATING RULES (2026-10-22)
+
+**Đọc phần này trước mọi checkpoint lịch sử bên dưới.** Nguồn trạng thái chuẩn là `handoff/current-status.json`; hàng đợi việc cũng nằm trong đó. SHA ghi trong tài liệu chỉ là checkpoint tại thời điểm xác minh, không thay thế việc đọc HEAD/PR trực tiếp trên GitHub.
+
+- **Không khởi động lại từ đầu:** xác minh HEAD và PR #111/#108; đọc `current-status.json`, sau đó chỉ đọc sâu tài liệu/evidence cần cho nhiệm vụ đang làm.
+- **Không lặp test vô ích:** chỉ tái sử dụng kết quả nếu khớp source/test SHA và không có thay đổi liên quan. Docs-only commit không làm source test PASS cho HEAD mới; source changes phải chạy validation phù hợp.
+- **Vòng khép kín:** chọn một task chưa xong → xem code/reference/evidence → sửa thật → chạy test phù hợp → kiểm tra bằng chứng → cập nhật trạng thái và task tiếp theo. Không dừng ở báo cáo giữa chừng.
+- **Trạng thái:** PASS / FAIL / BLOCKED / NOT TESTED / NOT VERIFIED. Fixture, login smoke và CI xanh không thay thế nghiệm thu đủ 12 màn hoặc QA backend/nghiệp vụ thật.
+- **Tiến độ:** giữ 50% cho đến khi có bằng chứng nghiệm thu mới. Chỉ cộng trọng số hạng mục đã ACCEPTED; không cộng vì docs-only commit, sửa test đơn lẻ hoặc workflow xanh.
+- **An toàn ghi Git:** trước khi tạo commit, đọc lại HEAD và PR #111. Nếu SHA thay đổi so với parent dự kiến, hủy ghi và đồng bộ lại. Chỉ update ref với `force:false` và `expected_sha` chính xác.
+- **Giới hạn:** chỉ branch `feature/admin-isolated-handoff-2026-10-20`; không merge PR #111/#108, không sửa `main`/nhánh static, không Production deploy, không bypass Cloudflare Access/đọc hoặc đổi secrets, không chạy migration hay ghi D1/R2 thật. Việc cần quyền/chấp thuận phải giữ BLOCKED và tiếp tục task độc lập an toàn.
+- **Bàn giao ngắn:** ghi SHA đầu vào, file thay đổi, test + SHA, blocker và một task kế tiếp. Checkpoint cũ chỉ là lịch sử, không phải trạng thái hiện tại.
+
+### Hàng đợi thực thi mặc định
+1. **P1 — Product editor #4:** đối chiếu SKU row/checkbox và nút AI mô tả với reference; sửa chỉ khi khác biệt được xác nhận từ source/reference; thêm assertion layout và validate exact source SHA.
+2. **P1 — Product list #3:** đóng các gap reference còn lại bằng screenshot light/dark và viewport bắt buộc; chưa ACCEPTED khi chưa đối chiếu.
+3. **P1 — Parity 12 màn:** theo dõi từng màn riêng, chỉ accept bằng reference comparison và regression evidence phù hợp.
+4. **P2 — Orders/fulfillment #7 và màn PARTIAL:** xử lý từng gap có bằng chứng, kèm regression.
+5. **BLOCKED — AI grouping #11:** không tự dựng route/API/controls khi chưa có contract được duyệt.
+6. **BLOCKED/DEFERRED — backend QA, R2 save và PRE/PRO migration:** chỉ làm khi có đường Preview/quyền hợp lệ và chấp thuận rõ; không bypass Access hoặc ghi Production.
+7. **P1 trước nghiệm thu PR — scope audit:** audit changed files ngoài ADMIN; PR #111 vẫn OPEN/unmerged.
+
+---
+
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:38:06+07:00
 
 - **Nhánh duy nhất được sửa:** feature/admin-isolated-handoff-2026-10-20. HEAD trước loạt làm mới tài liệu: 8419835f07ad7fa6d57c1b8e3fa3dfe954d62721 (evidence/docs-only descendant); source/test SHA đã kiểm thử: 2cf894e476b85e77b646b4bb45596e263a9f2fb6.
