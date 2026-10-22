@@ -1,3 +1,14 @@
+# CHAT TRANSFER — READ BEFORE ANY ACTION (2026-10-22)
+
+
+1. Read `docs/handoff/CURRENT-STATE.md` and `docs/handoff/PROMPT-NEXT-CHAT-2026-10-22.md` first. They contain the latest hero incident and evidence. Fetch current GitHub branch HEAD/PR #108 and workflow/deployment metadata; do not assume old SHAs are current.
+2. The owner says the previous assistant removed the owner-provided hero image before writing the lock. Accept responsibility and do not make the owner repeat the context.
+3. The hero file `/images/hero-sd-gl052.png` is a standalone presentation asset, not a catalog/SKU/product image. It is locked like the official logo. Never replace/edit/retouch/recolour/crop/filter/mask/key its background or change its pixels. Never investigate SD-GL052 catalog linkage.
+4. Known issue in source `fb997b4`: CSS drop-shadow is applied directly to `#home .hero-visual img`. Verify current source and remove only hero-specific visual transformations; test direct asset loading independent of catalog failure. Preserve original PNG bytes.
+5. Review artifact `12423387968` from [visual workflow #39773486043](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773486043); CI success is not visual approval. Verify exact deployed SHA, inspect real Preview screenshots in Light/Dark/mobile/desktop, then report evidence honestly.
+6. Keep PR #108 open/unmerged. Preview storefront only; no Production/main/Admin/backend/API/auth/data/D1/R2/bindings/secrets/DNS/Access changes. Continue work autonomously; do not rerun unrelated passed tests or claim 100% without evidence.
+
+
 ## ABSOLUTE HERO ASSET LOCK — OWNER-SUPPLIED IMAGE (2026-10-22)
 
 **The hero image is a standalone owner-provided presentation asset, not a product listing, SKU, catalog record, product-gallery image, or database-backed product image.** The owner personally supplied `/images/hero-sd-gl052.png` for the hero. Treat this asset as protected at the same level as the official brand logo.
