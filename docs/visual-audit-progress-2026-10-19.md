@@ -1,5 +1,14 @@
 # VISUAL AUDIT PROGRESS — SINDAREALEST2
 
+## Startup video review — observational evidence
+
+## Startup first-paint evidence — run #39762445821 (2026-10-22)
+
+- Inspected the four captured startup videos in artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837): 360×800 and 390×844, Light and Dark. Each video is approximately 1.08–1.16 seconds.
+- Parsed `live-preview/visual-audit.json`: `firstPaintCoverageComplete=true`, `firstPaintVideoCoverageComplete=true`, `firstPaintFrameCount=20`, `firstPaintViolationCount=0`, `firstPaintVideoCount=4`. Across the four startup timelines there are 107 recorded samples; all have `violation=false`. While the welcome splash owns the screen, the bottom navigation and account drawer are recorded as not visible. No account flash or bottom-toolbar overlap was captured in these runs.
+- **Evidence limit:** the artifact's deployment metadata check failed because it expected `e916ce590b6dbd720dca51405097d20333ce649b` but Cloudflare reported `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. Commit comparison shows the seven intervening commits touched documentation only, no storefront code; thus this is strong observational evidence for the same storefront source, but not a new exact-SHA-verified audit. Keep the startup issue as `PASS — captured runs only; device-specific report not disproved`, and do not rerun without new contrary evidence or a new source/environment.
+
+
 ## Manual screenshot review — 2026-10-22 10:35 UTC
 
 - Opened both original reference PNGs, both icon boards, and the observational capture artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837). Home screenshots were visually checked at 360×800, 390×844, 768×1024 and 1440×900 in Light/Dark. Key states sampled: startup splash, benefits, product detail/gallery, favorite pressed in both themes, account, cart-with-item, checkout form, contact/Zalo and 404.
