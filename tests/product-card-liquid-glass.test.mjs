@@ -170,8 +170,8 @@ for (const [name, svg] of [
   ['light mobile', lightMobileWaveArtwork], ['dark mobile', darkMobileWaveArtwork]
 ]) {
   assert.match(svg, name.includes('dark')
-    ? /data-satin-style="fine-satin-creases-v12"/
-    : /data-satin-style="fine-satin-creases-v11"/,
+    ? /data-satin-style="fine-satin-creases-v13"/
+    : /data-satin-style="fine-satin-creases-v12"/,
     name + ' must use the appropriate organic satin asset revision rather than the legacy parallel ribbons.');
   assert.ok((svg.match(/data-fold-layer="body"/g) || []).length >= 6,
     name + ' must keep multiple independent folded fabric ridges.');
