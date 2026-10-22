@@ -293,3 +293,24 @@ assert.match(aftercareIconMarkup, /<svg\b[^>]*data-order-icon="aftercare"[^>]*st
 assert.match(html, /id="sd-icon-order-flow-2026-10-22"[\s\S]*#order \.order-icon svg,[\s\S]*width:15px;height:15px[\s\S]*@media\(max-width:760px\)[\s\S]*width:14px;height:14px/,
   'Order SVGs must remain compact within the existing glass icon circles on desktop and mobile.');
 
+// Account drawer action glyphs must use the same thin-stroke SVG treatment without changing action IDs/URLs.
+const accountActionStart = html.indexOf('<button type="button" class="account-action tap-target" id="accountAddressAction"');
+const accountActionEnd = html.indexOf('<p class="account-note"', accountActionStart);
+assert.ok(accountActionStart >= 0 && accountActionEnd > accountActionStart,
+  'Account action group must remain present.');
+const accountActionHtml = html.slice(accountActionStart, accountActionEnd);
+const accountSvgNames = [...accountActionHtml.matchAll(/<span class="account-action-icon" aria-hidden="true"><svg\\b[^>]*data-account-icon="([^"]+)"/g)]
+  .map(match => match[1]);
+assert.deepEqual(accountSvgNames, ['address', 'orders', 'favorites', 'theme', 'contact'],
+  'Address, order history, favorites, theme and contact must each use a semantic SVG icon in order.');
+assert.equal([...accountActionHtml.matchAll(/class="account-action-chevron"/g)].length, 5,
+  'Each account action must keep a dedicated decorative SVG chevron.');
+assert.doesNotMatch(accountActionHtml, /[⌖▤◐◎›]/,
+  'The account drawer must not fall back to the Unicode pictographs or text chevron being replaced.');
+assert.ok(accountSvgNames.every(name => {
+  const match = accountActionHtml.match(new RegExp('<svg\\\\b[^>]*data-account-icon="' + name + '"[^>]*stroke-width="1\\\\.7"'));
+  return Boolean(match);
+}), 'Account SVGs must use a consistent 1.7px stroke.');
+assert.match(html, /id="sd-icon-account-actions-2026-10-22"[\\s\\S]*#order \\.order-icon,#order \\.order-commitment-icon\\{color:var\\(--ink\\)\\}[\\s\\S]*width:20px;height:20px/,
+  'Non-interactive order glyphs must use the primary ink color and account SVGs must be legible at the reference scale.');
+

@@ -11,6 +11,7 @@ import { isApprovedPreviewExternalRead } from '../scripts/preview-external-read-
 import { validatePreviewUrl, matchesPreviewDeployment, inspectPreviewDeployment } from '../scripts/verify-cloudflare-preview-deployment.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
+const ciWorkflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const deployWorkflow = readFileSync(new URL('../.github/workflows/deploy-storefront-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
@@ -75,6 +76,10 @@ assert.match(workflow, /inputs\.capture_source == 'cloudflare-preview'/,
   'Only real Cloudflare Preview captures may be archived into start/end folders.');
 assert.match(workflow, /node scripts\/validate-cloudflare-preview-url\.mjs/,
   'The manual live-capture gate must use the tested Preview URL validator.');
+
+assert.match(workflow, /- name: Probe supplied Cloudflare Preview on push \\(artifact only; never archives\\)[\\s\\S]*if: \\$\\{\\{ github\\.event_name == 'push' && !contains\\(github\\.event\\.head_commit\\.message, '\\[capture-review\\]'\\) \\}\\}/,
+  'Exact-SHA review captures must skip the redundant pre-verification full screenshot probe and capture once after the deployment gate.');
+
 
 assert.match(workflow, /name: Validate guarded push capture request[\s\S]*capture-review/,
   'A guarded [capture-review] push must validate the non-production Preview URL.');
@@ -475,3 +480,12 @@ assert.match(workflow, /push:\s*branches:[\s\S]*?paths-ignore:\s*- 'docs\/\*\*'/
   'Documentation-only commits must not run a live audit against a different deployed source SHA.');
 assert.match(workflow, /workflow_dispatch:/,
   'Guarded manual live audit capture must remain available after adding the docs-only path filter.');
+
+// Security audit must use a pinned CLI that does not fall back to npm's retired quick-audit endpoint.
+const npmSetupIndex = ciWorkflow.indexOf('name: Use current npm CLI with the supported advisory audit endpoint');
+const npmAuditIndex = ciWorkflow.indexOf('name: Audit installed dependencies');
+assert.ok(npmSetupIndex >= 0 && npmSetupIndex < npmAuditIndex,
+  'The current npm CLI must be selected before dependency audit.');
+assert.match(ciWorkflow, /npm install --global npm@12\\.2\\.0 --no-audit --no-fund[\\s\\S]*test "\\$\\(npm --version\\)" = "12\\.2\\.0"[\\s\\S]*npm audit --audit-level=high/,
+  'CI must use the pinned npm CLI and retain the high-severity audit gate.');
+
