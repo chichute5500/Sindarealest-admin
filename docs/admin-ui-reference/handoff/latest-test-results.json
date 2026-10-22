@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:44:00Z",
+  "capturedAtUtc": "2026-10-22T19:45:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
@@ -240,7 +240,7 @@
     "workflowRunsLookup": "FOUND_EXACT_SHA_RUN",
     "combinedStatus": "SUCCESS",
     "result": "PASS",
-    "note": "npm run check and npm test passed on the exact current PR #111 HEAD. Admin Preview screenshot matrix remains on product/UI SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118 and is not an authenticated backend acceptance."
+    "note": "npm run check and npm test passed on the exact pre-handoff-sync HEAD 30fece366e559073f6c664f6ed0459712c1b0a84. A handoff-only commit then advanced the branch to 976e72d2ec10e9ead74a4c3275b8569d52a4f525; check run #39842755681 for that exact SHA before claiming current HEAD PASS. Admin Preview matrix remains on UI source SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118."
   },
   "scopeAuditStatus": "PARTIAL",
   "livePrState": {
@@ -248,9 +248,11 @@
     "state": "OPEN",
     "merged": false,
     "mergeable": false,
-    "headSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
+    "headSha": "976e72d2ec10e9ead74a4c3275b8569d52a4f525",
     "changedFiles": 385,
-    "additions": 38848,
-    "deletions": 211
+    "additions": 38875,
+    "deletions": 211,
+    "headValidation": "PENDING_AT_LAST_FETCH",
+    "validationRunId": 39842755681
   }
 }

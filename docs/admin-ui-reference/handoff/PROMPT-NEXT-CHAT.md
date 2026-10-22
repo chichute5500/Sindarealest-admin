@@ -5,10 +5,10 @@ Tiếp tục công việc thực tế trên GitHub. Đọc [START-HERE.md](START
 Repository: `chichute5500/Sindarealest-admin`.
 
 ## Last verified checkpoint
-- PR #111 OPEN/unmerged, branch `feature/admin-isolated-handoff-2026-10-20`; parent HEAD `73dfad5e35939da22dd37efd12bf8b06c09e7716`; 385 paths (+38829/−211), mergeable=false.
-- PR #108 OPEN/unmerged, READ-ONLY at `7df19eb8c5a0a6cbdc76886b630905c89cf9c466`, 286 paths.
-- Exact-SHA Validate [#39841964451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451) passed `npm run check` + `npm test` on `73dfad5e35939da22dd37efd12bf8b06c09e7716`. UI matrix + Preview diagnostic pass on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics).
-- B1 cleanup complete; no additional safe deletion/merge proven in reviewed payment/API slice. Payment endpoints have distinct auth boundaries; migrations 0008/0009 remain deferred only for remote application. Broader provenance audit remains PARTIAL.
+- PR #111 was OPEN/unmerged at pre-sync HEAD `30fece366e559073f6c664f6ed0459712c1b0a84`, 385 changed paths (+38848/−211), mergeable=false. Exact-SHA Validate [#39842366701](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842366701) passed `npm run check` + `npm test` on that SHA.
+- Current handoff-only HEAD after syncing status/audit is `976e72d2ec10e9ead74a4c3275b8569d52a4f525`; Validate run [#39842755681](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842755681) was IN_PROGRESS at last fetch. Refetch exact-SHA Actions before claiming current HEAD PASS.
+- Preview matrix and diagnostics pass on product/UI source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics); evidence is synthetic/read-only, not authenticated backend acceptance.
+- B1 remains PARTIAL, not complete. The reviewed payment and core handler slices showed no additional safe deletion/merge proven; endpoint auth boundaries differ. Remote migration/application remains owner-deferred.
 - Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
 
 

@@ -13,11 +13,11 @@
 
 ## Checkpoint đã xác minh qua GitHub API
 - Repo `chichute5500/Sindarealest-admin`; chỉ ghi vào nhánh `feature/admin-isolated-handoff-2026-10-20`.
-- PR #111 parent HEAD `73dfad5e35939da22dd37efd12bf8b06c09e7716`: OPEN/unmerged, 385 paths (+38829/−211), mergeable=false; base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- PR #108 OPEN/unmerged, READ-ONLY at live HEAD `7df19eb8c5a0a6cbdc76886b630905c89cf9c466`, 286 paths.
-- Exact-SHA Validate [#39841964451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451) PASS on `73dfad5e35939da22dd37efd12bf8b06c09e7716`: `npm run check` + `npm test`. UI matrix + Preview diagnostic pass on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics).
-- Live census {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}; extensions {"yml":1,"txt":1,"json":165,"md":166,"html":2,"png":1,"js":26,"sql":2,"mjs":21}; 318 retained history records. B1 cleanup COMPLETE; broader provenance review PARTIAL.
-- This handoff-only sync creates a new HEAD; fetch exact-SHA validation before marking the new HEAD checked.
+- PR #111 was OPEN/unmerged at pre-sync HEAD `30fece366e559073f6c664f6ed0459712c1b0a84`, 385 paths (+38848/−211), mergeable=false; base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- Exact-SHA Validate [#39842366701](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842366701) PASS on that pre-sync HEAD (`npm run check` + `npm test`). Current handoff-only HEAD is `976e72d2ec10e9ead74a4c3275b8569d52a4f525`; its validation run [#39842755681](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842755681) was IN_PROGRESS at last fetch; refetch live state before claiming PASS.
+- PR #108 was OPEN/unmerged and read-only at its last verified checkpoint; fetch its live metadata before acting.
+- Census at pre-sync HEAD: 385 paths; 318 compact history files across 156 run directories (161 JSON, 157 Markdown), 13 non-history docs; path census {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}.
+- B1 remains PARTIAL, not complete. The runtime slice reviewed in the latest checkpoint yielded no additional deletion/merge supported by dependency evidence.
 
 
 ## Required operating sequence

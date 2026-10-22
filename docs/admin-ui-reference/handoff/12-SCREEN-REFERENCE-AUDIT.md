@@ -3,6 +3,8 @@
 **Current product progress: 50% PROVISIONAL.** No screen is fully accepted. Product code/UI evidence and the later handoff-integrity check are tracked separately.
 
 ## Latest successful UI evidence
+
+- Latest verified Preview evidence checkpoint: source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`; Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) PASS and Admin Preview diagnostic [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) SUCCESS. Artifact `admin-preview-evidence-352` contains 102 PNGs and 78 fixture metrics. This evidence is newer than the historical #344 reference below, but still synthetic/read-only and not authenticated backend acceptance.
 - Source/test SHA: `105f46b90dc5664dd091493dbd5cea1af7796c44`.
 - Validate: [#39816652373](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652373) PASS.
 - Screenshot matrix/Preview diagnostic: [#39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346) SUCCESS; [artifact #344 / ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210), 102 PNGs and 78 fixture metrics.
