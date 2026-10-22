@@ -936,3 +936,8 @@ This user confirmation overrides every older conflicting note in this document o
 - Next: reconcile HEAD/workflows/deployment SHA; verify successful-add outcome, toast and real badge; then implement one shared 0.6–0.9s fly-to-cart using the exact displayed/selected image and correct item/variant. Bounce only on successful add; no duplicate quantity or layout shift. Test failed/rapid add, image error, scroll/resize, responsive/sticky target, reduced-motion; inspect actual Preview screenshots.
 - Do not count commit `8afab8bfcebed3ec045b544e277e8e81acba70c3` as accepted: exact-SHA completed validation/deploy/live artifact was not verified in this session. Reconcile it with the later documented heart-state checkpoint rather than overwriting newer work.
 - Hero `/images/hero-sd-gl052.png` is approved; do not return to catalog search. No Admin code, merge, Production/main, backend/API/schema/database/product data/image mapping/D1/R2/bindings/secrets/DNS/Access changes. Continue automatically; do not rerun unrelated PASS tests.
+
+
+## PUSH-TRIGGER CHECKPOINT — 2026-10-22
+
+The evidence reconciliation commit `7451f750e3146ccb52a525cc9ffce2dd7b034ab9` was created through the Git data API and did not emit a push event. To ensure the required workflows run against the actual updated branch HEAD, this handoff edit is being committed through the repository Contents API (push-triggering path). Verify Validate, Preview Deploy, read-only Admin Preview Playwright, and live audit results against the resulting SHA; do not treat earlier runs on `ca5edf1` or `295d8c0` as exact-HEAD verification for the new SHA.
