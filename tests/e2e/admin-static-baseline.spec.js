@@ -1784,6 +1784,18 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('customers', 'customers', async variant => {
       // Reference screen #8: synthetic, client-side search only; mutation endpoints remain blocked.
       await expect(page.getByLabel('Tìm tên, số điện thoại, email hoặc địa chỉ')).toBeVisible();
+      const customerViewportWidth = page.viewportSize()?.width ?? 0;
+      const customerDocumentMetrics = await page.evaluate(() => ({
+        viewport: window.innerWidth,
+        document: document.documentElement.scrollWidth
+      }));
+      expect(customerDocumentMetrics.document, 'Customers screen should not cause document-level horizontal overflow').toBeLessThanOrEqual(customerDocumentMetrics.viewport);
+      const firstCustomerCellDisplay = await page.locator('.customer-table tbody tr').first().locator('td').first().evaluate(element => getComputedStyle(element).display);
+      if (customerViewportWidth <= 680) {
+        expect(firstCustomerCellDisplay, 'Customer rows should use mobile card layout at <=680px').toBe('block');
+      } else {
+        expect(firstCustomerCellDisplay, 'Customer rows should retain table layout above 680px').toBe('table-cell');
+      }
       await expect(page.locator('#customerSearchStatus')).toHaveAttribute('aria-live', 'polite');
       await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
       await expect(page.locator('.customer-avatar')).toHaveCount(2);
