@@ -516,7 +516,7 @@ try {
     const heroImagePass = startup.heroImage.present
       && startup.heroImage.loaded
       && !startup.heroImage.hidden
-      && startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514%20(1).png')
+      && startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514-blended.png')
       && startup.heroImage.status === 'hero-presentation-asset';
     audit.interactions.push({ theme, check: 'initial-render', result: startup });
     if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
