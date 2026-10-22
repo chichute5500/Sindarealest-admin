@@ -1,22 +1,23 @@
-## PROMPT TIẾP TỤC — 2026-10-22T11:39:07+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T11:45:00+07:00
 
-Tiếp tục làm việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA mới nhất PASS: `b503ade1d7b300c38bc2ef8ccb648733215339dd`; HEAD trước handoff tiếp theo: `eb0d2f6492e1e6f91accb0f8b0a301c9510d436e`.
+Tiếp tục công việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã kiểm thử: `5b41777c058bde449f3439e8fba52fce6f293151`; HEAD trước handoff tiếp theo: `480eda6ae1ae06c517d0d87468eebb4abef0341a` (commit report/artifact).
 
 **Exact-SHA evidence**
-- Validate Source [#39723373757](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373757) — SUCCESS.
-- Admin Preview/Playwright [#39723373723](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723) — SUCCESS trên cùng SHA.
-- Artifact [admin-preview-evidence-274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723/artifacts/12401304184), ID `12401304184`: 79 files, 76 PNG (75 test screenshots + 1 reference), 51 fixture metrics. Metadata complete; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
-- Local source Playwright 3/3 PASS; configured Preview login/dashboard smoke 2/2 PASS. This is not full business CRUD/save/upload QA.
-- Customers #9 responsive audit added at 320×640 and 360×800 in light/dark; all no-overflow/card-bound assertions pass and screenshots inspected. Do not fabricate customer avatars/photos. Overall progress stays 50%; all 12-screen visual parity NOT ACCEPTED.
+- Validate Source [#39723837400](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/39723837400) — SUCCESS.
+- Admin Preview/Playwright [#39723837416](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/39723837416) — SUCCESS trên cùng source/test SHA.
+- Artifact [admin-preview-evidence-275](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/39723837416/artifacts/12402147594), ID `12402147594`: 83 entries, 80 PNG (79 test screenshots + 1 reference), 55 fixture metrics. Metadata complete; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Local Playwright 3/3 PASS; configured Preview login/dashboard smoke 2/2 PASS. Full authenticated business CRUD/save/real upload QA NOT TESTED.
+- Warranty #10 narrow viewport regression passed 320×640 and 360×800, light/dark. Customer #9 and gallery #4 narrow tests pass; QR picker local-only guard pass. Those screens remain PARTIAL until actual reference parity is accepted.
+- Overall progress 50%; all 12-screen visual parity NOT ACCEPTED.
 
-**Tiếp tục ngay**
-1. Fetch live ADMIN HEAD and Actions before modifying code.
-2. Add read-only responsive regression to Warranty #10 at 320×640 and 360×800: filter row/button bounds, order/warranty identifiers and no document/card horizontal overflow. Reuse synthetic fixtures only; no product photos, business writes, or live data.
-3. Run Validate Source and Preview/Playwright on exact source/test SHA; open artifact and verify metadata/screenshots.
-4. Update all seven handoff files and read them all back from GitHub.
-5. Continue through NOT_ACCEPTED screens; do not raise progress without real parity evidence.
+**Continue without stopping after reports**
+1. Fetch live ADMIN HEAD, PR states, latest Actions and read these seven handoff files before next edits.
+2. Compare Product list #3 real-source screenshots at 390×844 light/dark and 1280×800 to `admin-mobile-reference.png`. Identify an actual visual mismatch before choosing a code edit; no fake prices/stock/product images.
+3. Use synthetic/read-only E2E only; after every meaningful change run Validate Source + Preview on exact SHA, open artifact/screenshots and verify metrics.
+4. Refresh all seven handoff files with one aligned checkpoint and read back from GitHub. Keep progress at 50% until evidence supports a justified increase.
+5. Continue to remaining NOT_ACCEPTED screen families.
 
-**Guardrails:** PR #111/#108 OPEN/UNMERGED; only ADMIN branch; no main/static-site edits, merge/cherry-pick/force-push/sync, Production deploy, secrets/Access changes or bypass, remote D1/R2/SQL/migration/setup/deploy/infra, or TinyFish. Preserve every `DEFERRED_BY_OWNER` item.
+**Guardrails:** PR #111/#108 OPEN/UNMERGED; only ADMIN branch, no main/static edits, merge/cherry-pick/force-push/sync, Production deployment, secrets/Access changes or bypass, remote D1/R2/SQL/migration/setup/deploy/infra, or TinyFish. Keep `DEFERRED_BY_OWNER` unchanged.
 ---
 
 ---
