@@ -373,7 +373,7 @@ const requiredViewportThemeHeroAudit = live.slice(
   live.indexOf("await auditImageElements(page, label);", live.indexOf("async function main()"))
 );
 assert.match(requiredViewportThemeHeroAudit, /await auditHeroImage\(page, label\);/,
-  'The dedicated owner-supplied Hero asset must be verified as loaded and visible in every required viewport/theme.');
+  'The owner-requested temporary Hero-hidden state and collapsed frame must be verified in every required viewport/theme.');
 assert.doesNotMatch(requiredViewportThemeHeroAudit, /if \(viewport\.name === 'mobile-390' && theme === 'light'\)/,
   'Hero asset acceptance must not be limited to a single mobile Light context.');
 
