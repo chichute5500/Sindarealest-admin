@@ -1373,6 +1373,49 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         'Thông tin ngân hàng đã thay đổi. Hãy lưu thông tin nháp trước khi kích hoạt QR.'
       );
       await expect(page.locator('#activatePaymentQr')).toBeEnabled();
+
+      // Local-only file-picker regression: selecting a fixture must not upload it automatically,
+      // and the explicit upload action must refuse to send a request when no file is selected.
+      await navigateTo('products');
+      await navigateTo('settings');
+      const qrFile = page.locator('#paymentQrFile');
+      const qrFileName = page.locator('#paymentQrFileName');
+      const uploadQr = page.locator('#uploadPaymentQr');
+      await expect(page.getByText('Chọn ảnh QR ngân hàng')).toBeVisible();
+      await expect(qrFile).toHaveAttribute('accept', 'image/png,image/jpeg,image/webp');
+      await expect(qrFileName).toHaveText('Chưa chọn tệp QR.');
+      const writesBeforeQrPicker = attemptedWrites.length;
+      const qrUploadRequestsBefore = fixtureApiRequests.filter(request =>
+        request.path === '/api/admin/payment-qr-upload' && request.method !== 'GET'
+      ).length;
+      const tinyPng = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lqkAAAAASUVORK5CYII=',
+        'base64'
+      );
+      await qrFile.setInputFiles({
+        name: 'ui-only-qr-fixture.png',
+        mimeType: 'image/png',
+        buffer: tinyPng
+      });
+      await expect(qrFileName).toHaveText('ui-only-qr-fixture.png');
+      await expect(page.locator('#paymentQrMessage')).toBeEmpty();
+      expect(attemptedWrites.length, 'Choosing an image must not automatically upload the QR').toBe(writesBeforeQrPicker);
+      expect(fixtureApiRequests.filter(request =>
+        request.path === '/api/admin/payment-qr-upload' && request.method !== 'GET'
+      )).toHaveLength(qrUploadRequestsBefore);
+
+      await qrFile.setInputFiles([]);
+      await expect(qrFileName).toHaveText('Chưa chọn tệp QR.');
+      await uploadQr.click();
+      await expect(page.locator('#paymentQrMessage')).toHaveText('Chọn ảnh QR PNG/JPEG/WebP trước.');
+      expect(attemptedWrites.length, 'Upload without a selected file must be rejected locally').toBe(writesBeforeQrPicker);
+      expect(fixtureApiRequests.filter(request =>
+        request.path === '/api/admin/payment-qr-upload' && request.method !== 'GET'
+      )).toHaveLength(qrUploadRequestsBefore);
+      await navigateTo('products');
+      await navigateTo('settings');
+      await expect(qrFileName).toHaveText('Chưa chọn tệp QR.');
+      await expect(page.locator('#paymentQrMessage')).toBeEmpty();
     }, true);
     await captureView('backup-restore', 'settings', async () => {
       const section = page.locator('#main .setting').filter({ hasText: 'Sao lưu & khôi phục' });
