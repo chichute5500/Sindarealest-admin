@@ -4,20 +4,13 @@
 
 ## Latest verified checkpoint (2026-10-22 UTC)
 
-# CURRENT CHECKPOINT — 2026-10-22 UTC
-
-- Branch HEAD / PR #108 head: `eafa0d0b31723134727ba5f5933018e34f31854a` (documentation-only; PR remains OPEN, NOT merged).
-- Latest verified storefront source, deployed Preview SHA and live-audit source SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
-- Validate/tests: [run #39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) reported PASS.
-- Preview deployment verification + live visual workflow: [run #39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) SUCCESS; logs explicitly confirm `VERIFIED_PREVIEW_DEPLOYMENT`, branch match and exact commit SHA match.
-- Latest artifact: [#12418615814 — sindarealest-liquid-glass-preview-853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814). It reports local fixture audit PASS (58 screenshots, 235 fixtures, 20 responsive cases, 103 interaction checks, zero recorded errors/hard failures) AND live Preview PASS (128 screenshots, 8/8 viewport/theme pairs, 13 route checks, Access service token configured, zero failed requests/hard failures).
-- Screenshot archive comparison state: `COMPLETE_NEEDS_VISUAL_REVIEW`. Workflow success does NOT mean visual parity is finished; real screenshots still require manual visual review against reference images.
-- Docs-only commits do not trigger Preview deploy/live capture (`docs/**` ignored). Do not claim these docs commits redeployed storefront code.
-
-
-- Validate source/tests: [run #39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) — reported PASS for source checkpoint `fc406599e04475e232fad790efd03d46979a5a20`.
-- Admin Preview Playwright [run #39760902960](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902960) — PASS, read-only smoke only; not authorization to change Admin.
-- Live audit has a green machine result, but the visual archive still says `COMPLETE_NEEDS_VISUAL_REVIEW`. Manual screenshot inspection remains open.
+- Branch/PR HEAD changes with documentation-only commits; fetch live HEAD before work. Latest verified storefront source/deployed/audited SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
+- Validate/tests [#39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928): reported PASS.
+- Admin Preview read-only smoke [#39760902960](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902960): PASS; read-only only.
+- Live Preview verification/audit [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036): SUCCESS. Logs confirm `VERIFIED_PREVIEW_DEPLOYMENT`, branch and exact SHA match.
+- Artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814): local fixture PASS (58 screenshots; 235 fixtures; 20 responsive cases; 103 interaction checks; zero recorded errors/hard failures) and live Preview PASS (128 screenshots; 8/8 viewport/theme pairs; 13 route checks; zero failed requests/hard failures).
+- Archive comparison remains `COMPLETE_NEEDS_VISUAL_REVIEW`. Manual screenshot comparison is still required; do not equate machine PASS with visual parity.
+- Docs-only commits do not deploy storefront code because `docs/**` is ignored by the Preview push trigger.
 
 ## Last fully documented live audit (historical evidence)
 - Audited source SHA: `78b0a673a610501bfa4048df0ed614ff48246f97`
