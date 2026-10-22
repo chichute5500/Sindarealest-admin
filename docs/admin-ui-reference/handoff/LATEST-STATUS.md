@@ -38,3 +38,15 @@ No merge, main/static write, Production deploy, Access bypass, secrets access/ch
 1. Compare artifact #340 to `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme, starting with Gallery (#5), then #8–#12.
 2. Refresh live paginated PR #111 changed paths and continue provenance review in batches, prioritizing runtime/API/migration/setup/workflow.
 3. Verify each source change on its exact SHA, synchronize/read back handoff files, and refetch PR/HEAD. Keep both PRs OPEN/unmerged.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 458a4a07f391b6f91c89b85964b52200e15edb72
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39815260389
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-341 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.

@@ -7,7 +7,7 @@
   "codeTestSha": "4b2220d510a906882e4309df6969c0c43514c421",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_LOCAL_PLAYWRIGHT_PASS; PREVIEW_DIAGNOSTIC_PASS; AUTHENTICATED_BACKEND_NOT_TESTED",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
     "id": 39813340309,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309",
@@ -161,10 +161,11 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Compare artifact #340 screenshots with approved admin-mobile-reference.png at matching viewport/theme; prioritize Gallery and screens #8–#12.",
-    "Continue PR #111 changed-file provenance review in batches; current live census is 1,310 paths.",
-    "Do not debug the historical retry-customers timeout absent new evidence; exact-SHA runs #39811730576 and #39813340309 passed.",
-    "Keep access/auth/backend limitations explicit; do not bypass Access or run remote D1/R2/setup/migrations."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -172,5 +173,60 @@
     "description": "At viewport widths <=820px, toast bottom offset is calc(82px + env(safe-area-inset-bottom)); Playwright displays toast and asserts its bottom stays at least 8px above fixed mobile navigation.",
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
     "screenshot": "warranties-responsive__320x640__light.png"
-  }
+  },
+  "latestCodeCommitSha": "458a4a07f391b6f91c89b85964b52200e15edb72",
+  "testedCommitSha": "458a4a07f391b6f91c89b85964b52200e15edb72",
+  "capturedAt": "2026-10-22T16:36:32.663Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39815260389",
+  "checks": {
+    "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
+    "applicationStartup": "PASS",
+    "localStaticPlaywrightBaseline": "PASS",
+    "playwright": "PASS",
+    "playwrightPreviewDiagnostics": "success",
+    "deployedPreview": "PASS",
+    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
+    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
+    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
+    "automatedTests": "PASS",
+    "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
+    "productionDeployment": "NOT_PERFORMED"
+  },
+  "latestLocalEvidence": {
+    "runId": 39815260389,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39815260389",
+    "sourceCommit": "458a4a07f391b6f91c89b85964b52200e15edb72",
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS",
+    "localPlaywright": "PASS",
+    "sourceScreenshotCount": 102,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 86,
+    "uiFixtureMetricCount": 78,
+    "screenshotArtifact": "admin-preview-evidence-341",
+    "pageErrors": [],
+    "consoleErrors": [],
+    "failedRequests": [],
+    "httpErrors": [],
+    "attemptedWrites": [],
+    "unexpectedApiPaths": [],
+    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+  },
+  "latestScreenshotArtifact": {
+    "runId": 39815260389,
+    "name": "admin-preview-evidence-341",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39815260389",
+    "sourceCommit": "458a4a07f391b6f91c89b85964b52200e15edb72",
+    "screenshotCount": 102,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 86,
+    "uiFixtureMetricCount": 78,
+    "retentionDays": 14,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+  },
+  "remainingIssues": [],
+  "blockedItems": [],
+  "productionDeployment": "NOT_PERFORMED"
 }
