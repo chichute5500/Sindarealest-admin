@@ -1953,6 +1953,34 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('warranties', 'warranties', async variant => {
       // Screen #9: synthetic, read-only warranty list/filter and accessible issue disclosure.
       await expect(page.locator('.warranty-toolbar')).toBeVisible();
+      if (variant.viewport.width <= 820) {
+        const toast = page.locator('#toast');
+        const previousState = await toast.evaluate(element => ({
+          shown: element.classList.contains('show'),
+          transition: element.style.transition
+        }));
+        await toast.evaluate(element => {
+          element.style.transition = 'none';
+          element.classList.add('show');
+        });
+        const toastLayout = await page.evaluate(() => {
+          const toastElement = document.querySelector('#toast');
+          const navElement = document.querySelector('.mobiletabs');
+          if (!toastElement || !navElement) return null;
+          return {
+            toastBottom: Math.round(toastElement.getBoundingClientRect().bottom),
+            navTop: Math.round(navElement.getBoundingClientRect().top)
+          };
+        });
+        expect(toastLayout, 'Mobile toast and bottom navigation must both exist').not.toBeNull();
+        expect(toastLayout.toastBottom,
+          'Mobile toast must remain at least 8px above fixed bottom navigation: ' + JSON.stringify(toastLayout))
+          .toBeLessThanOrEqual(toastLayout.navTop - 8);
+        await toast.evaluate((element, state) => {
+          element.style.transition = state.transition;
+          if (!state.shown) element.classList.remove('show');
+        }, previousState);
+      }
       await expect(page.getByLabel('Tìm mã bảo hành, mã đơn, SKU hoặc sản phẩm')).toBeVisible();
       await expect(page.locator('[data-warranty-filter="all"]')).toHaveAttribute('aria-pressed', 'true');
       await expect(page.locator('[data-warranty-filter="all"]')).toContainText('Tất cả (1)');
