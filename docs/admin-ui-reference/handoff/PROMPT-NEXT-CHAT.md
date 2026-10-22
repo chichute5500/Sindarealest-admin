@@ -1,3 +1,30 @@
+# PROMPT NEXT CHAT — SINDAREALEST ADMIN
+
+## One-line starter (user should not need to paste a previous chat's handoff)
+`Tiếp tục SinDarealest Admin theo trạng thái live trên GitHub. Tự xác minh PR/HEAD/Actions, đọc handoff hiện tại, sửa và kiểm chứng lỗi thật, rồi tiếp tục công việc; không dừng sau báo cáo và không yêu cầu tôi dán prompt cũ.`
+
+## Snapshot warning
+PR #111 HEAD observed before this handoff refresh: `4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed`. This is a snapshot, not a permanent current SHA; these documentation commits may advance HEAD. Fetch live PR #111/#108 refs and the latest exact-SHA Actions before work. Keep progress at **50% PROVISIONAL** until acceptance evidence changes.
+
+## Required sequence
+1. Fetch PR #111 and PR #108 live; only write on `feature/admin-isolated-handoff-2026-10-20`.
+2. Read `current-status.json`, `latest-test-results.json`, `LATEST-STATUS.md`, `START-HERE.md`, `12-SCREEN-REFERENCE-AUDIT.md`, and `PR-111-SCOPE-AUDIT.md`. Resolve conflicts using live refs and exact-SHA evidence, not stale copied SHAs.
+3. Poll existing workflow runs for exact live HEAD before any new run. Read job logs and artifacts on failure; fix only a demonstrated cause.
+4. Continue real work after reporting: screens #8–#12, then PR scope/provenance audit. Do not repeat #3/#4 geometry checks unless new source/state or reproducible defect.
+5. After meaningful work, update handoff files and read back to verify. Do not let handoff-only commits count as product completion.
+
+## Guardrails
+- No merge of #111/#108; no writes to `main` or the static branch; no Production deploy.
+- No Cloudflare Access bypass, secret access, remote D1/R2 writes/queries, setup/deploy/migration scripts.
+- No fabricated prices, stock, images, API contracts, or business data.
+- PASS only with exact SHA + evidence; otherwise FAIL / BLOCKED / NOT VERIFIED / PARTIAL_NOT_ACCEPTED.
+- Report briefly in Vietnamese, then continue to the next safe task rather than stopping.
+- User should never need to re-copy an old prompt into each chat.
+
+---
+
+## Historical notes (context only; re-validate against live GitHub before use)
+
 ## PERMANENT START RULE — NO MANUAL PROMPT HANDOFF
 
 This is the permanent operating contract. It overrides stale instructions elsewhere in this file when they conflict.
