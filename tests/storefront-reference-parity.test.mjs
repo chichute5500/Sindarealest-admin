@@ -314,6 +314,8 @@ assert.match(mobileProductTab, /<svg viewBox="0 0 24 24" aria-hidden="true"><pat
   'The mobile Products tab must use the shopping-bag outline specified by the icon reference.');
 assert.doesNotMatch(mobileProductTab, /<rect x="4" y="4" width="16" height="16" rx="3"\/>/,
   'The mobile Products tab must not regress to the generic document/list icon.');
+assert.ok(html.includes('.mobile-tab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}'),
+  'Mobile navigation icons must share a thin, consistent outline stroke and rounded line caps from the icon reference.');
 
 // Reference-driven icon pass: replace the five text glyphs in order flow/aftercare with coherent 24x24 SVG strokes.
 const orderIconMarkup = [...html.matchAll(/<span class="order-icon" aria-hidden="true">([\s\S]*?)<\/span>/g)].map(match => match[1]);
