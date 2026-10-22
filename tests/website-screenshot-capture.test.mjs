@@ -80,7 +80,7 @@ assert.match(workflow, /node scripts\/validate-cloudflare-preview-url\.mjs/,
 const probeStepStart = workflow.indexOf('- name: Probe supplied Cloudflare Preview on push (artifact only; never archives)');
 const probeStepEnd = workflow.indexOf('\n      - name:', probeStepStart + 2);
 const probeStep = workflow.slice(probeStepStart, probeStepEnd < 0 ? workflow.length : probeStepEnd);
-assert.ok(probeStepStart >= 0 && probeStep.includes("if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') }}"),
+assert.ok(probeStepStart >= 0 && probeStep.includes("if: ${{ always() && github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') }}"),
   'Exact-SHA review captures must skip the redundant pre-verification full screenshot probe and capture once after the deployment gate.');
 
 
