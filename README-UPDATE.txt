@@ -12,3 +12,6 @@ KIỂM TRA: npm run check PASS; npm test PASS; SQLite migration và 526 ảnh We
 
 CHƯA XÁC NHẬN DEPLOY PRODUCTION. Trước khi dùng, cấu hình bindings `DB`/`IMAGES`/`ORIGINALS` (`ORIGINALS` là bucket riêng tư khác `IMAGES`) cùng hai secrets trên đúng Pages project; nếu dùng GitHub Actions, chỉ đặt `CLOUDFLARE_PAGES_ORIGINALS_READY=true` sau khi xác minh, rồi mới deploy. Đăng nhập tài khoản khách hàng chưa được bật; tra cứu bảo hành không sử dụng mã xác minh. Chính sách bảo hành phải do cửa hàng xác nhận. Ảnh R2 cũ không tự bị thay đổi; watermark giao diện là lớp phủ trên ảnh lớn, không sửa file ảnh.
 Xem UPGRADE-REPORT.md để biết chi tiết và các giới hạn còn lại.
+
+
+[STATUS NOTE — 2026-10-22] This file is a legacy repository overview/audit snapshot, not the active task/handoff specification. It may describe older architecture, deployment assumptions or completed work. For current storefront scope, branch, safety boundaries and open tasks, read `docs/handoff/CURRENT-STATE.md` first. Do not use this file to override the current handoff or authorize Admin/backend/production changes.
