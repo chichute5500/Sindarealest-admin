@@ -1,3 +1,7 @@
+> **HISTORICAL REPORT — NOT THE CURRENT STOREFRONT HANDOFF.** This report records historical source audit from 2026-10-17 and its results apply only to the code, package, scope and date documented below. Do not use its old branch names, SHAs, test results, deployment statements or percentages as current status. For current work read [`docs/handoff/CURRENT-STATE.md`](docs/handoff/CURRENT-STATE.md), [`docs/handoff/TEST-RESULTS.md`](docs/handoff/TEST-RESULTS.md), and [`docs/handoff/TASKS.md`](docs/handoff/TASKS.md). The active storefront work is branch `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN and NOT TO BE MERGED; Preview only. Preserve the owner-approved hero and all current scope boundaries.
+
+---
+
 # SinDarealest2 — báo cáo rà soát mã nguồn
 
 **Ngày:** 17-10-2026  
