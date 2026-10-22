@@ -1,26 +1,24 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T14:56:46.664+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T15:33:00+07:00
 
-- **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`. HEAD ngay trước lần cập nhật bàn giao này là `84cafe10b60c49593d530ac3b444aedfd268f76c`, commit evidence do workflow tạo, có code/test parent `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`; thay đổi sản phẩm và regression test đã được kiểm thử ở chính SHA `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`.
-- **Validate Source:** [run #39742949748](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748) — **SUCCESS** trên đúng SHA `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`; dependency audit, `npm run check` và `npm test` đều PASS.
-- **Preview diagnostic / Playwright:** [run #39742949583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583) — **SUCCESS** trên cùng SHA `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`. Source screenshot matrix: **3 passed (53.0s)**; configured Preview smoke: **2 passed (3.6s)**; signature `PASS_LOGIN_CSS_SIGNATURE`. Assertion hình học gallery desktop đã pass. Smoke chỉ xác nhận login/CSS shell, không xác nhận backend đã đăng nhập.
-- **Sửa lỗi sticky-footer:** `public/admin/index.html` ở commit `ed84462c88d6333a07141c03ccd49c971f4179d8` giảm padding dọc `.editorhead` từ 15px xuống 10px tại desktop; assertion Giá/Tồn kho không bị xóa/nới lỏng và đã pass.
-- **Sửa lỗi gallery:** commit `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93` đổi `.product-editor-tabs` từ `top:62px` sang `top:0` trong chính scroll viewport; override mobile giữ nguyên. `tests/admin-liquid-glass-contract.test.mjs` thêm contract và `tests/e2e/admin-static-baseline.spec.js` đo vị trí tab, tiêu đề “Bộ ảnh sản phẩm” và tiêu đề vùng chọn ảnh. Assertion desktop pass.
-- **Artifact đã tải/đọc:** [admin-preview-evidence-297 — ID 12409713973](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973), **17,223,438 bytes**. Có **100 PNG** (99 ảnh kiểm thử + ảnh reference đóng gói): **16 ảnh login, 83 ảnh fixture/read-only, 75 fixture metrics**. `completed=true`, 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors, 0 fixture write attempts và 0 unexpected API paths. Đã mở `product-gallery__1280x800__light.png`, `product-gallery__390x844__light.png`, `product-gallery__390x844__dark.png`: heading và vùng “Ảnh chi tiết” nằm dưới tab, không bị che; mobile light/dark giữ nguyên.
-- **Nghiệm thu có giới hạn:** lỗi che Giá/Tồn kho và lỗi tab che heading gallery cụ thể **PASS**. Screen #4 Product editor và #5 Product gallery vẫn **PARTIAL / NOT ACCEPTED** tới khi so sánh toàn màn với reference. #3 Product list, #6 Category/classification và các screen-family khác chưa được chấp nhận toàn diện; 12 màn **NOT ACCEPTED**.
-- **QA và mục còn lại:** fixture/session/data tổng hợp, read-only; authenticated business/backend QA **NOT TESTED**. AI grouping #11 **BLOCKED** vì chưa có route/controls/API/contract được duyệt. Lưu ảnh/R2 thật và ledger migrations PRE/PRO vẫn `DEFERRED_BY_OWNER / NOT VERIFIED`. PR full-diff/scope audit còn mở; đây không phải merge approval.
-- **PR / rào chắn:** PR #111 ADMIN **OPEN / UNMERGED**; PR #108 website tĩnh **OPEN / UNMERGED**. Không sửa `main`/nhánh static; không merge/cherry-pick/force-push/sync; không deploy Production; không chạm/bypass Access hoặc secrets; không chạy SQL/migration/setup hay ghi D1/R2.
-- **Tiến độ: 50%** — giữ nguyên; hai regression cụ thể đã pass nhưng chưa thay thế nghiệm thu 12 màn, backend QA hay audit toàn bộ PR.
+- **ADMIN branch HEAD:** `11b23bb90fe7b0f6595da021d3bf1649b586c97c`. Validate Source đã kiểm tra đúng SHA này.
+- **Validate Source:** [run #39744215657](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744215657) — **SUCCESS** trên `11b23bb90fe7b0f6595da021d3bf1649b586c97c`.
+- **Preview diagnostic:** [run #39742949583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583) — **SUCCESS** trên SHA cũ `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`, artifact [admin-preview-evidence-297 / 12409713973](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973). Đây **không phải** Preview run trên HEAD hiện tại. **Preview trên HEAD `11b23bb90fe7b0f6595da021d3bf1649b586c97c`: NOT VERIFIED**.
+- **Regression đã kiểm thử ở SHA tương ứng:** desktop sticky footer Giá/Tồn kho trên `ed84462c88d6333a07141c03ccd49c971f4179d8`; gallery tabs/heading trên `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`. Không suy rộng PASS sang SHA khác.
+- **Artifact gần nhất:** https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973 — 99 ảnh kiểm thử (16 login + 83 fixture/read-only), 75 metrics; 0 page/console/request/HTTP errors, 0 fixture write attempts, 0 unexpected API paths. Fixture không phải backend QA thật; Preview smoke chỉ chứng minh login CSS signature.
+- **PASS:** Validate Source trên HEAD hiện tại; các regression riêng lẻ trên SHA/run lịch sử. **FAIL:** chưa có kết luận FAIL mới trên HEAD hiện tại. **NOT VERIFIED:** Preview trên HEAD hiện tại; nghiệm thu đủ 12 màn; backend/business QA có xác thực thật. **BLOCKED:** AI grouping màn #11 chưa có route/controls/API/contract được duyệt; R2 image save và PRE/PRO migration vẫn `DEFERRED_BY_OWNER`.
+- **PR/rào chắn:** PR #111 ADMIN OPEN/unmerged; PR #108 static website OPEN/unmerged. Chỉ làm nhánh ADMIN; không sửa `main`/nhánh static, không merge/force-push, không deploy Production, không bypass Cloudflare Access/secrets, không chạy migration/SQL/setup hoặc ghi D1/R2/backend.
+- **Tiến độ: 50%** — giữ nguyên đến khi Preview trên HEAD hiện tại và đối chiếu 12 màn có bằng chứng nghiệm thu đủ mạnh.
 ------
 
 **Continue without stopping after reports**
 
-1. Fetch the live ADMIN HEAD, PR #111/#108 and Actions before each round; verify exact tested SHA instead of trusting the last checkpoint.
-2. First continue the next unaccepted family in `12-SCREEN-REFERENCE-AUDIT.md`, prioritizing category/product classification (#6): inspect real source route/controls at 390×844 light/dark and 1280×800. Do not invent a separate route/API; only test the existing category filter/manual-entry behavior with synthetic read-only fixtures.
-3. Keep product-editor #4’s desktop footer regression covered by the assertion already added; its overlap regression is fixed, but full visual reference parity remains unaccepted. Continue product-list #3 and other unaccepted screen families after reviewing screenshots against the approved reference.
-4. For each real gap, make an ADMIN-only change, add/keep regression assertions, run Validate Source and Preview/Playwright on the exact commit, and open the resulting artifact/screenshots. Never infer backend QA from fixtures.
-5. Update all handoff files in one aligned checkpoint and read back every edited file from GitHub. Keep progress at 50% until evidence supports a justified increase.
+1. Re-read live ADMIN HEAD, PR #111/#108 and Actions before every write.
+2. Current HEAD `11b23bb90fe7b0f6595da021d3bf1649b586c97c` has Validate Source PASS (#39744215657), but Preview is NOT VERIFIED on this SHA. Run configured Preview/Playwright on this exact commit without changing security or weakening assertions.
+3. Inspect logs/artifacts; do not mislabel run #39742949583 on `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93` as current HEAD evidence.
+4. Continue next NOT_ACCEPTED screen in `12-SCREEN-REFERENCE-AUDIT.md`; use synthetic read-only fixtures and do not invent routes/API.
+5. Read back all updated files from GitHub and keep progress at 50% until visual parity is supported.
 
-**Guardrails:** PR #111/#108 OPEN and unmerged; only ADMIN branch. No main/static edits, merge/cherry-pick/force-push/sync, Production deployment, Access/secrets change or bypass, remote D1/R2/SQL/migrations/setup/deploy/infra, or TinyFish. Keep `DEFERRED_BY_OWNER` unchanged.
+**Guardrails:** PR #111/#108 OPEN/unmerged; only ADMIN branch. No main/static edits, merge/cherry-pick/force-push/sync, Production deployment, Access/secrets changes or bypass, remote D1/R2/SQL/migrations/setup/deploy/infra.
 ---
 
 ---
