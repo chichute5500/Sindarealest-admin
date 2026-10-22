@@ -1,18 +1,17 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T13:09:49+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T21:00:00+07:00
 
-- **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`. **HEAD trước cập nhật bộ hồ sơ:** `de42931e1d41606d65703b5115ff49fed41cf814` (commit lưu evidence/docs, không phải source/test SHA). **Source/test SHA đã chạy:** `07f881bbe519a1e6b032f2633d2e2715f0773630`.
-- **Validate Source:** [run #39732018523](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018523) — **SUCCESS** trên đúng source/test SHA.
-- **Admin Preview diagnostic / Playwright:** [run #39732018622](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622) — **SUCCESS** trên đúng source/test SHA. Local Playwright matrix **3 passed**; configured Preview login/dashboard smoke **2 passed**; CSS diagnostic `PASS_LOGIN_CSS_SIGNATURE`. Preview truy cập được cho smoke test; đây **không** phải nghiệm thu đầy đủ nghiệp vụ CRUD/backend thật.
-- **Artifact:** [`admin-preview-evidence-287`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622/artifacts/12405720936), ID `12405720936`, 17,104,020 bytes, 103 ZIP entries, 100 PNG (16 login shell + 83 fixture screenshots + 1 ảnh reference), 75 fixture metrics. Đã tải ZIP và xem trực tiếp ảnh màn chỉnh sửa sản phẩm #4: `product-editor__390x844__light.png`, `product-editor__390x844__dark.png` và `product-editor__1280x800__light.png`. Ảnh mobile xác nhận thanh ứng dụng/điều hướng còn hiển thị, tab dính ngay dưới header và hàng giá/tồn kho nằm trên footer. Desktop drawer vẫn cần tiếp tục rà soát chi tiết; không đánh dấu màn #4 đã nghiệm thu.
-- **Responsive / fixture evidence:** login matrix 16 tổ hợp viewport/theme; 3 bài Playwright source pass; 2 bài Preview smoke pass. Fixture dùng dữ liệu tổng hợp, read-only; không xác nhận luồng nghiệp vụ thật hay dữ liệu thật.
-- **Screen #4 Product editor:** **PARTIAL / NOT ACCEPTED** — đã cải thiện bố cục mobile theo reference, nhưng chưa đủ đối chiếu mọi trạng thái, gallery và desktop để nghiệm thu.
-- **Screen #3 Products và toàn bộ 12 màn:** **NOT ACCEPTED** cho visual parity tổng thể; tiếp tục đối chiếu từng màn với reference. Authenticated business/backend QA vẫn **NOT TESTED**.
-- **Tiến độ tổng thể: 50% — giữ nguyên.** Không tăng tiến độ chỉ vì CI xanh, ảnh mới hoặc số lần commit.
-- **PR #111 ADMIN:** OPEN/unmerged, HEAD trước cập nhật tài liệu `de42931e1d41606d65703b5115ff49fed41cf814`. **PR #108 static website:** OPEN/unmerged; không sửa nhánh website tĩnh, không merge PR nào.
-- **Bước kế tiếp:** rà soát drawer desktop và luồng tab/scroll/fixed footer ở #4; sau đó tiếp tục mismatch đã xác minh ở Products #3. Chạy lại Validate Source + Preview trên SHA chính xác, tải/mở artifact và cập nhật evidence sau thay đổi có ý nghĩa.
+- **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`. **HEAD trước lần cập nhật handoff này:** `3d56556f087c8f0f6689f29a82602883912584cd` (commit lưu evidence/docs, không phải source/test SHA). **Source/test SHA được kiểm thử gần nhất:** `36b69e5e5daf0cf6daa51e3510a18ed3d22e1778`.
+- **Validate Source:** [run #39736231163](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231163) — **SUCCESS** trên đúng SHA `36b69e5e5daf0cf6daa51e3510a18ed3d22e1778`.
+- **Admin Preview diagnostic / Playwright:** [run #39736231146](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231146) — **FAIL** ở bước chụp screenshot real-source responsive/theme matrix. Assertion desktop cho thấy `priceBottom=733.78`, `stockBottom=733.78`, `footerTop=732`; ô Giá/Tồn kho vẫn bị thanh hành động cố định che khoảng 1.8 px và không đạt khoảng cách an toàn 4 px. CSS signature đăng nhập Preview vẫn báo `PASS_LOGIN_CSS_SIGNATURE`; điều này **không** làm cho toàn bộ workflow pass và không chứng minh luồng nghiệp vụ đã được nghiệm thu.
+- **Phân biệt nguồn lỗi:** lỗi hiện tại là kiểm thử bố cục desktop trên source thật trong workflow, không phải bằng chứng trường `feature` sai, cũng không phải bằng chứng Cloudflare Access đang chặn. Trường `feature` không bị thay đổi trong vòng sửa bố cục này. Cần sửa nguyên nhân bố cục thực tế, chạy lại trên SHA mới và chỉ chấp nhận khi screenshot matrix qua; không nới lỏng assertion để che lỗi.
+- **Artifact / nghiệm thu:** lần chạy thất bại tại screenshot matrix; không tuyên bố artifact mới đã được kiểm tra hoặc màn #4 đã đạt. Preview login CSS signature chỉ là chẩn đoán hẹp. Local fixture/read-only tests không xác nhận nghiệp vụ backend thật.
+- **Screen #4 Product editor:** **PARTIAL / NOT ACCEPTED** — desktop sticky-footer overlap vẫn là blocker. **Screen #3 Products và toàn bộ 12 màn:** **NOT ACCEPTED** cho visual parity tổng thể. Authenticated business/backend QA **NOT TESTED**.
+- **Validate Source xanh không đồng nghĩa Preview xanh.** Tiến độ tổng thể giữ **50%**; không tăng do số commit hay một workflow riêng lẻ thành công.
+- **PR #111 ADMIN:** OPEN/unmerged. **PR #108 static website:** OPEN/unmerged. Không merge PR nào; không sửa nhánh website tĩnh.
+- **Bước tiếp theo bắt buộc:** xem DOM/CSS geometry tại desktop editor ở viewport 1280×800, tìm nguyên nhân vì sao flex container vẫn cho hàng giá/tồn kho vượt footer; sửa source + assertion chỉ khi assertion phản ánh đúng yêu cầu, rồi chạy Validate Source và Preview trên exact SHA. Kiểm tra run/artifact/logs, sau đó tiếp tục đối chiếu reference #3 và các màn còn lại. Không lặp lại kết luận cũ rằng Preview xanh.
 - **Rào chắn:** chỉ nhánh ADMIN; không merge/cherry-pick/force-push/sync; không Production deploy; không thay đổi, làm lộ hoặc bypass secrets/Cloudflare Access; không remote D1/R2/SQL/migration/setup/deploy/infra; không TinyFish. Giữ `DEFERRED_BY_OWNER` nguyên trạng.
 
----
+------
 
 ## Checkpoint mới nhất — 2026-10-21 17:47 UTC
 

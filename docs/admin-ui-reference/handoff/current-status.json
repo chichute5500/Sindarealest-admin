@@ -1,43 +1,29 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T13:09:49+07:00",
+  "updatedAt": "2026-10-22T21:00:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "de42931e1d41606d65703b5115ff49fed41cf814",
+  "branchHeadAtCheckpoint": "3d56556f087c8f0f6689f29a82602883912584cd",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Exact-SHA Validate Source #39732018523 PASS, source Playwright 3/3 PASS, configured Preview login/dashboard smoke #39732018622 2/2 PASS; screen #4 and all-12 visual parity remain NOT ACCEPTED; authenticated business/backend QA NOT TESTED.",
+  "progressBasis": "Validate Source #39736231163 PASS on exact source SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; Preview #39736231146 FAIL due to desktop price/stock row overlapping sticky footer (733.78 px vs footer top 732 px). Login CSS signature passed only; visual parity and authenticated backend QA remain unaccepted/untested.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-    "conclusion": "success",
+    "testedCommitSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+    "conclusion": "preview_failure",
     "validateRun": {
-      "runId": 39732018523,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018523",
-      "sha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
+      "runId": 39736231163,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231163",
+      "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39732018622,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622",
-      "sha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-      "conclusion": "success"
+      "runId": 39736231146,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231146",
+      "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+      "conclusion": "failure"
     },
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "previewLoginDashboardSmoke": "PASS_2_OF_2",
-    "localPlaywright": "PASS_3_OF_3",
-    "artifact": {
-      "name": "admin-preview-evidence-287",
-      "id": 12405720936,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622/artifacts/12405720936",
-      "sizeBytes": 17104020,
-      "zipEntryCount": 103,
-      "pngCount": 100,
-      "loginShellPngCount": 16,
-      "fixturePngCount": 83,
-      "fixtureMetricCount": 75,
-      "downloadedAndInspected": true,
-      "screen4MobileLightDarkAndDesktopLightReviewed": true
-    },
+    "sourceScreenshotMatrix": "FAIL_DESKTOP_STICKY_FOOTER_OVERLAP",
     "productEditorScreen4": "PARTIAL_NOT_ACCEPTED",
     "productListScreen3": "PARTIAL_NOT_ACCEPTED",
     "twelveScreenVisualParity": "NOT_ACCEPTED",
@@ -117,9 +103,9 @@
     "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
   ],
   "nextActions": [
-    "Review screen #4 desktop drawer/scroll/footer against reference.",
-    "Continue screen #3 evidence-backed parity changes.",
-    "Keep PR #111/#108 open and unmerged; no Production deployment or backend writes."
+    "Fix desktop editor sticky-footer overlap proven by Preview screenshot-matrix test; do not weaken the assertion.",
+    "Run Validate Source and Preview diagnostic on the exact new source SHA; inspect logs/artifact.",
+    "Continue evidence-backed Products #3 and all remaining reference screens; keep 50% until acceptance criteria pass."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -131,56 +117,34 @@
   ],
   "ownerActionRequiredNow": "No owner action required for continued source/fixture UI work. Preview login/dashboard smoke passes; do not bypass Cloudflare Access. Authenticated business/backend QA remains NOT TESTED.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T13:09:49+07:00",
+    "checkedAt": "2026-10-22T21:00:00+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedApplicationSha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-    "validateRun": {
-      "runId": 39732018523,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018523",
-      "sha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-      "conclusion": "success"
-    },
-    "previewRun": {
-      "runId": 39732018622,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622",
-      "sha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-      "conclusion": "success"
-    },
-    "artifactId": 12405720936,
-    "branchHeadBeforeHandoffRefresh": "de42931e1d41606d65703b5115ff49fed41cf814",
-    "currentHeadIsTestedSource": false,
-    "finalSevenFileReadback": "PASS_READBACK_ALL_SEVEN_FILES_FROM_GITHUB",
-    "progressPercent": 50,
-    "handoffDocsCommitSha": "58724af27af11366fdbe71567ec43a5346452942"
+    "testedApplicationSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+    "branchHeadBeforeHandoffRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
+    "validateRun": 39736231163,
+    "previewRun": 39736231146,
+    "previewConclusion": "failure",
+    "previewFailure": "desktop price/stock row overlaps sticky footer in source screenshot matrix",
+    "previewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
+    "finalSevenFileReadback": "PENDING_AFTER_COMMIT",
+    "progressPercent": 50
   },
   "latestContinuationCycle": {
-    "updatedAt": "2026-10-22T13:09:49+07:00",
+    "updatedAt": "2026-10-22T21:00:00+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "sourceSha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-    "branchHeadBeforeDocsRefresh": "de42931e1d41606d65703b5115ff49fed41cf814",
-    "validateRun": 39732018523,
-    "previewRun": 39732018622,
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "previewSmoke": "PASS_2_OF_2",
-    "localPlaywright": "PASS_3_OF_3",
-    "artifact": {
-      "name": "admin-preview-evidence-287",
-      "id": 12405720936,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622/artifacts/12405720936",
-      "sizeBytes": 17104020,
-      "pngCount": 100,
-      "fixturePngCount": 83,
-      "fixtureMetricCount": 75,
-      "inspected": true
-    },
+    "sourceSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+    "branchHeadBeforeDocsRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
+    "validateRun": 39736231163,
+    "previewRun": 39736231146,
+    "previewConclusion": "failure",
+    "desktopStockBottom": 733.78125,
+    "footerTop": 732,
     "screen4": "PARTIAL_NOT_ACCEPTED",
     "screen3": "PARTIAL_NOT_ACCEPTED",
     "all12Parity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED",
     "progressPercent": 50,
-    "nextAction": "Review #4 desktop drawer and fixed footer; continue #3 reference parity.",
-    "handoffDocsCommitSha": "58724af27af11366fdbe71567ec43a5346452942",
-    "finalSevenFileReadback": "PASS_READBACK_ALL_SEVEN_FILES_FROM_GITHUB"
+    "nextAction": "Fix desktop editor sticky-footer overlap at 1280x800 and rerun exact-SHA tests."
   },
   "continuationHistory": [
     {
@@ -319,32 +283,15 @@
     }
   ],
   "latestHandoffCheckpoint": {
-    "updatedAt": "2026-10-22T13:09:49+07:00",
+    "checkedAt": "2026-10-22T21:00:00+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "sourceSha": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-    "branchHeadBeforeDocsRefresh": "de42931e1d41606d65703b5115ff49fed41cf814",
-    "validateRun": 39732018523,
-    "previewRun": 39732018622,
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "previewSmoke": "PASS_2_OF_2",
-    "localPlaywright": "PASS_3_OF_3",
-    "artifact": {
-      "name": "admin-preview-evidence-287",
-      "id": 12405720936,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622/artifacts/12405720936",
-      "sizeBytes": 17104020,
-      "pngCount": 100,
-      "fixturePngCount": 83,
-      "fixtureMetricCount": 75,
-      "inspected": true
-    },
-    "screen4": "PARTIAL_NOT_ACCEPTED",
-    "screen3": "PARTIAL_NOT_ACCEPTED",
-    "all12Parity": "NOT_ACCEPTED",
-    "authenticatedBusinessQA": "NOT_TESTED",
-    "progressPercent": 50,
-    "nextAction": "Review #4 desktop drawer and fixed footer; continue #3 reference parity."
+    "sourceSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+    "branchHeadBeforeHandoffRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
+    "validateRun": 39736231163,
+    "previewRun": 39736231146,
+    "previewConclusion": "failure",
+    "progressPercent": 50
   },
-  "handoffRefreshAt": "2026-10-22T13:09:49+07:00",
-  "handoffRefreshBaseHead": "de42931e1d41606d65703b5115ff49fed41cf814"
+  "handoffRefreshAt": "2026-10-22T21:00:00+07:00",
+  "handoffRefreshBaseHead": "3d56556f087c8f0f6689f29a82602883912584cd"
 }

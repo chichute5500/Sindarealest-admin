@@ -5,10 +5,10 @@
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "latestCodeCommitSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
   "testedCommitSha": null,
-  "capturedAt": "2026-10-22T06:50:11.262Z",
+  "capturedAt": "2026-10-22T21:00:00+07:00",
   "progressEstimatePercent": 50,
-  "progressBasis": "Keep 50%: exact-SHA Validate Source, local Playwright source matrix and configured Preview login/dashboard smoke pass; all 12-screen visual parity and authenticated business/backend QA remain NOT ACCEPTED/NOT TESTED.",
-  "note": "Exact-SHA source validation #39727105101 PASS; Preview diagnostic #39727105050 SUCCESS on the same source/test SHA. Local Playwright 3/3 PASS; configured Preview login/dashboard smoke 2/2 PASS; diagnostic PASS_LOGIN_CSS_SIGNATURE. Artifact admin-preview-evidence-280 ID 12403891182 (17,121,806 bytes; 103 ZIP entries; 100 PNG; 67 fixture screenshots; 59 fixture metrics) was downloaded and visually spot-checked. Preview is reachable for login/dashboard smoke; full authenticated business/backend QA NOT TESTED. Product list #3 and all 12-screen reference parity remain NOT ACCEPTED. Overall progress 50%.",
+  "progressBasis": "Hold at 50%: exact-SHA Validate Source #39736231163 PASS, but Preview #39736231146 FAILs the real-source desktop editor screenshot matrix due to price/stock row overlapping sticky footer; 12-screen parity and authenticated backend QA remain unaccepted/untested.",
+  "note": "Exact-SHA Validate Source #39736231163 PASS on 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; Preview diagnostic #39736231146 FAIL on the same SHA at the local real-source screenshot matrix: priceBottom/stockBottom 733.78, footerTop 732, expected stockBottom < 728. Preview CSS login signature PASS_LOGIN_CSS_SIGNATURE is only a narrow diagnostic and does not override the failed matrix. Do not claim new artifact inspection or feature-field regression. Overall progress 50%; Product editor #4 PARTIAL_NOT_ACCEPTED; Product list #3 and all-12 parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -929,10 +929,10 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231146",
-  "branchHeadSha": "de42931e1d41606d65703b5115ff49fed41cf814",
+  "branchHeadSha": "3d56556f087c8f0f6689f29a82602883912584cd",
   "latestVerifiedAt": "2026-10-22T13:09:49+07:00",
   "latestVerifiedSourceCommit": "07f881bbe519a1e6b032f2633d2e2715f0773630",
-  "currentAdminBranchHead": "de42931e1d41606d65703b5115ff49fed41cf814",
+  "currentAdminBranchHead": "3d56556f087c8f0f6689f29a82602883912584cd",
   "latestVerificationSummary": "Exact SHA 5b41777c058bde449f3439e8fba52fce6f293151: Validate Source #39723837400 PASS; Admin Preview #39723837416 SUCCESS. Artifact admin-preview-evidence-275 inspected: 79 test screenshots + 1 reference PNG and 55 fixture metrics. Warranty #10 narrow responsive assertions pass in both themes at 320x640 and 360x800; full 12-screen parity and full backend business QA remain unaccepted.",
   "branchHeadBeforeHandoffUpdate": "76769e55ac40d8cb8eff8ee099de15eebab30970",
   "prSafety": {
@@ -1204,7 +1204,7 @@
     "sourceCiRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358",
     "reason": "Normalized CSSOM diagnostics confirm Chromium supports and matches the selector, but the configured Preview stylesheet does not contain the required hide rule."
   },
-  "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622",
+  "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231146",
   "latestCiVerification": {
     "runId": 39548605358,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605358",
@@ -2977,7 +2977,7 @@
     "progressPercent": 50,
     "nextAction": "Compare Product list #3 at 390x844 light/dark and 1280x800 against the approved reference; fix only an evidenced mismatch."
   },
-  "nextAction": "Compare Product list #3 screenshots at 390x844 light/dark and 1280x800 against reference; only implement a proven mismatch.",
+  "nextAction": "Fix desktop editor sticky-footer overlap proven by Preview run #39736231146; then rerun exact-SHA validation and inspect evidence.",
   "progressRoundingNote": {
     "weightedPoints": 49.6,
     "roundedPercent": 50,
@@ -3311,5 +3311,38 @@
       "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
     ],
     "progressPercent": 50
+  },
+  "latestContinuationCheckpoint20261022_stickyFooter": {
+    "checkedAt": "2026-10-22T21:00:00+07:00",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "branchHeadBeforeHandoffRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
+    "sourceSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+    "validateRun": {
+      "runId": 39736231163,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231163",
+      "conclusion": "success",
+      "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778"
+    },
+    "previewRun": {
+      "runId": 39736231146,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231146",
+      "conclusion": "failure",
+      "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778"
+    },
+    "previewFailure": {
+      "step": "Capture real source screenshots across responsive and theme matrix",
+      "priceBottom": 733.78125,
+      "stockBottom": 733.78125,
+      "footerTop": 732,
+      "requiredStockBottomLessThan": 728
+    },
+    "previewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
+    "featureFieldRegression": "NOT_EVIDENCED",
+    "screen4": "PARTIAL_NOT_ACCEPTED",
+    "screen3": "PARTIAL_NOT_ACCEPTED",
+    "all12ScreenParity": "NOT_ACCEPTED",
+    "authenticatedBusinessQA": "NOT_TESTED",
+    "progressPercent": 50,
+    "nextAction": "Inspect actual desktop editor DOM/CSS geometry at 1280x800; fix root cause, do not weaken overlap assertion; rerun exact-SHA Validate Source and Preview."
   }
 }
