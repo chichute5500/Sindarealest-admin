@@ -45,7 +45,7 @@ permissions:
 
 concurrency:
   # Non-archiving capture-review runs get a SHA-scoped group so a stale Chromium install cannot block exact-SHA review.
-group: liquid-glass-preview-${{ github.ref }}-${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-review]') && github.sha || 'serialized' }}
+  group: liquid-glass-preview-${{ github.ref }}-${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[capture-review]') && github.sha || 'serialized' }}
   cancel-in-progress: false
 
 jobs:
