@@ -37,7 +37,7 @@ Tiếp tục công việc thực tế trên GitHub; sau mỗi checkpoint báo c�
 ## Next task — P1 PR #111 scope/provenance audit
 1. Read-only audit .github/workflows/admin-preview-diagnostics.yml: triggers, contents:write, phạm vi cập nhật evidence và chống commit ảnh stale.
 2. Review migrations/0009_fulfillment_and_manual_payments.sql, functions/api/admin/payment-requests.js và payment-transactions.js; đối chiếu schema/contract với tests, không giả lập API.
-3. Review scripts/setup-cloudflare.mjs và scripts/deploy-cloudflare.mjs về preflight migration/schema 0009. Đây là POTENTIAL_BLOCKER_NOT_VERIFIED; chưa có bằng chứng schema remote thiếu.
+3. Source preflight cho migration 0009 đã được vá và test tại SHA `3658ca1069616639b825de2cd7b9c714ce560901`; không lặp lại source review nếu không có mismatch mới. Remote D1 schema vẫn NOT VERIFIED; không chạy query/migration/setup/deploy từ xa.
 4. Phân loại inherited vs authored bằng merge-base/path evidence; không revert mù. Live census PR #111: 1,296 paths. Merge base a3834fed3eb1c012b188d7c95d14ec3d15e3969f; tại checked heads ADMIN ahead 904, static ahead 920.
 5. Sau đó tiếp tục từng màn theo evidence riêng; #6 Orders và #7 Order detail là hai màn khác nhau.
 
