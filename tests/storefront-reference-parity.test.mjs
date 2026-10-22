@@ -189,8 +189,9 @@ assert.ok(heroSync.includes("target.dataset.productImageStatus='temporarily-disa
   'The Hero image is temporarily hidden by owner request; preserve the standalone source and do not load a derivative until Hero is revisited.');
 assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
-assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-failed\''),
-  'Temporary Hero image removal must not rely on an image-load failure or silently restore the image.');
+assert.ok(heroSync.includes("target.onerror=null")
+  && heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'"),
+  'The temporary Hero removal is an intentional owner-requested state, not an asset-load error.');
 assert.ok(!html.includes('sdGalleryWhiteBackgroundKey') && !html.includes('syncFullscreenBackgroundKey') && !html.includes('sd-white-background-keyed'),
   'Product and fullscreen photos must preserve original pixels; do not infer and remove white backgrounds.');
 assert.ok(html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') < html.indexOf('catch(err){$(\'#catalogGrid\').innerHTML=')
