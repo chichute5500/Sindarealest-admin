@@ -1,3 +1,18 @@
+## Latest exact-SHA Hero verification — 2026-10-23
+
+- Branch HEAD / source SHA: `e6f49f7b65297be68a0f9472b613a1acd06c866f`.
+- Automated source validation and tests: PASS — [run #39829962279](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962279).
+- Cloudflare Pages Preview deployment: PASS — [run #39829962530](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962530).
+- Live screenshot workflow: SUCCESS — [run #39829962409](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962409), artifact [#12449195919](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962409/artifacts/12449195919), `sindarealest-liquid-glass-preview-945`.
+- Deployment verification in artifact: `passed=true`, `status=VERIFIED_PREVIEW_DEPLOYMENT`; deployment ID `53dc3bb4-b6ea-4329-a477-ad2cfb7a2e9c`; deployed `commitHash` and `expectedCommitSha` exactly match `e6f49f7b65297be68a0f9472b613a1acd06c866f`; environment Preview, expected branch matches.
+- Actual mobile Hero screenshots inspected: `section-hero-mobile-light-390x844.png` and `section-hero-mobile-dark-390x844.png`. Visual outcome FAILS owner intent: the platform's right and lower silhouette still has obvious hard/cut edges rather than a soft blend. Owner rejected this result. Automated checks/capture PASS do not override visual failure.
+- Artifact also contains desktop Hero captures `section-hero-desktop-light-1440x900.png` and `section-hero-desktop-dark-1440x900.png`; review these alongside the original references before the next patch.
+- The current processor `scripts/process-hero-edge.py` uses a manually authored `PLATFORM` polygon and alpha edge band. That geometry did not produce an acceptable result. Next fix must be grounded in the actual source-image boundary, not blind radius/polygon tweaks.
+- Current owner-provided source image: `public/images/hero-upload/tb_image_share_1792519964514 (1).png`; generated derivative: `public/images/hero-upload/tb_image_share_1792519964514-blended.png`. Source remains separate; do not alter original bytes.
+- Status labels: tests PASS; Preview deploy PASS; exact deployment metadata PASS; live capture PASS; Hero visual acceptance FAIL/PENDING owner approval. PR #108 remains OPEN and unmerged.
+
+---
+
 # LATEST HANDOFF UPDATE — HERO ASSET REPLACEMENT / RESUME FROM LIVE STATE
 **Updated:** 2026-10-22 16:10 UTC  
 **This update is newer than all older status notes below. Keep it when editing this file.**
