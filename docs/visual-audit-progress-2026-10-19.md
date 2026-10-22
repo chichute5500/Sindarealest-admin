@@ -1,3 +1,26 @@
+# VERIFIED LIVE PREVIEW AUDIT — 2026-10-22 13:24:55 UTC
+
+**This evidence supersedes earlier notes that run #39780674947 lacked exact-SHA certification.** Keep PR #108 OPEN and unmerged.
+
+- Repository/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`; PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, merged=false at verification.
+- Audited/deployed source SHA: `38cdde70ae2edf69295232688928bbb9e68f3b3f`. This source commit adds only a regression test to `tests/storefront-reference-parity.test.mjs`; `public/index.html` and `public/images/hero-sd-gl052.png` were not changed in this commit.
+- Validation/full tests: PASS — [run #39786010003](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39786010003).
+- Cloudflare Preview deployment: PASS — [run #39786010114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39786010114); concrete URL https://b64b8055.sindarealest2.pages.dev/; stable alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Guarded live visual audit: SUCCESS — [run #39786009865](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39786009865); artifact [#12428643812 — sindarealest-liquid-glass-preview-880](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39786009865/artifacts/12428643812), 58,476,756 bytes, SHA-256 `9e62038c9ccb8851ec4ac0abee336512fe9cc38dfd739fc8076c5ab932ab5725`.
+- Formal deployment verification: `passed=true`, `status=VERIFIED_PREVIEW_DEPLOYMENT`. Cloudflare deployment ID `b64b8055-c77e-420f-8d45-0e3b86cc17cd`, environment `preview`, branch matches expected, full `commitHash=38cdde70ae2edf69295232688928bbb9e68f3b3f` equals full `expectedCommitSha`. Verification time: `2026-10-22T13:22:44.842Z`.
+- Live audit JSON: `sourceKind=cloudflare-pages-preview-live-read-only`, `sourceCommit=38cdde70ae2edf69295232688928bbb9e68f3b3f`, `captureCompleted=true`, `passed=true`. It records 128 genuine live Preview screenshots; 8/8 viewport/theme pairs (360×800, 390×844, 768×1024, 1440×900 in Light/Dark); 13 route checks; 69 section target checks; 8/8 hero image checks PASS; 0 horizontal overflow, console errors, page errors, HTTP errors, failed requests, broken images, hard failures or read-only violations. Startup coverage: 20 frames, 4 videos, 0 violations. The separate local fixture audit contains 58 screenshots and is not live proof.
+- Actual artifact ZIP was downloaded, SHA-256 recomputed locally and matched GitHub's artifact digest. Manually opened hero section mobile Light/Dark 390×844, desktop Light/Dark 1440×900 and full viewport captures mobile 360×800 and 390×844, tablet 768×1024, desktop 1440×900 in both themes. Also opened benefits/order, account drawer, cart-with-item, checkout form, Dark 404, official icon reference boards `Icon.png` and `Chitiet.png`, and the “Tuyển chọn 25” image 01/19 vs 02/19 captures.
+- Hero viewport-fit observation: PASS in all 8 viewport/theme checks. The dedicated owner-provided PNG `public/images/hero-sd-gl052.png` remains standalone presentation media, not catalog/SKU/product API content. Git blob SHA remains `24038214abefdac9ff2451def39f3e5bd9255462`; a regression test now locks this exact Git blob SHA. The PNG pixels/file were not changed. In Dark mode its original bright gray/white field remains visible by design; do not “fix” it with filters/masks/blending.
+- Remaining findings: full visual parity and full icon parity remain OPEN. Confirmed catalog/data blocker: “Tuyển chọn 25” image 01/19 shows black high-top boots while image 02/19 shows a different green/white sneaker at route `/sanpham/sneaker/sneakers-33-48`. Do not change or hide the catalog image mapping in the UI branch; escalate to the trusted mapping owner.
+- QR/order payment remains fail-closed pending trusted backend confirmation/configuration. The checkout form was captured with `submitted=false`; no real order or payment was submitted.
+- The next documentation-only commit may advance branch HEAD beyond audited source SHA. Since the changed paths are only `docs/**`, do not treat the newer docs HEAD as a new storefront source/deployment; keep the deployed/audited source SHA above explicitly recorded. PR #108 MUST remain OPEN. Do not touch Production/main/Admin/backend/API/auth/catalog mapping/D1/R2/bindings/secrets/DNS/Access or alter the strict exact-SHA guard.
+
+## Visual audit decision
+- **Hero viewport-fit milestone:** exact-SHA certified PASS in run #39786009865, artifact #12428643812. This does not mean full-site visual parity is complete.
+- **Visual parity:** OPEN pending full review against originals and any evidence-backed minimal fixes.
+- **Icon parity:** OPEN; reference boards were opened with current artifact, but the full inventory/state-by-state audit is not yet accepted.
+- **Catalog image consistency:** OPEN / external trusted-data owner needed. The mismatch in “Tuyển chọn 25” image 01/19 vs 02/19 is confirmed and out of scope for UI repair.
+- **Payments:** QR checkout remains fail-closed pending trusted backend confirmation.
 # NEWEST VISUAL AUDIT RESULT — 2026-10-22, run #39780674947
 
 This result supersedes older top-level notes saying that run #39780674947 is still running and no new screenshots were opened.
