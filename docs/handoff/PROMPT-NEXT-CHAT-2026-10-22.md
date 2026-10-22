@@ -1,3 +1,19 @@
+# LATEST CHECKPOINT — 2026-10-22
+
+Current branch HEAD at this checkpoint: `de62c546bab7e175347a4efb4fda5ec54c014a38`. PR #108 remains open/unmerged.
+
+Current SHA checks: [source validation #4448 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936598), [Preview deploy #537 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936551), [Admin Preview Playwright #751 PASS (read-only only)](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936572). [Live visual audit #807 is pending](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501); do not call live visual verification PASS until its artifact and deployment SHA are inspected.
+
+Latest change: `scripts/capture-cloudflare-preview.mjs` waits for the main product image source to match the active thumbnail and for all gallery transition classes (`is-changing`, `sd-slide-out-left/right`, `sd-slide-in-left/right`) to clear. `tests/website-screenshot-capture.test.mjs` asserts this. This only strengthens screenshot readiness; it does not modify storefront behavior.
+
+Last completed live evidence is [run #805, artifact 12402222013](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723518923), exact SHA `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6`, deployment ID `4bde881b-5b48-4860-b410-ec160d6c8dd6`. It passed with 119 screenshots, 8 viewport/theme pairs, 12 route checks, 68 section checks, 8 commerce states, 4 detail contexts, 4 icon checks, 4 cart-add checks, 6 fly-to-cart checks, 2 animation edge checks, 20 first-paint samples, 4 videos, and zero overflow/console/page/HTTP/request/image/read-only/hard failures. Its mobile Light gallery screenshot shows the selected sneaker fully visible, but the stronger wait has not yet been verified on current HEAD. Inspect run #807 screenshots and first-paint evidence before closing that item.
+
+Intermediate SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e`: [validation #4447 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921433), [deploy #536 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921432), [read-only Admin Playwright #750 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921429), [visual audit #806 running](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487). Do not carry those results forward to later SHAs.
+
+Working completion estimate: ~85%, not final acceptance. Next: poll #807/#806, inspect current-SHA artifact/deployment metadata, gallery captures and first-paint timelines/videos, fix genuine issues, then update all handoff records. Continue after progress reports. No merge, Production/main/DNS, Admin changes, backend/API/schema/product data/image mappings/D1/R2/bindings/secrets/Access changes. Keep the user-provided Hero image `/images/hero-sd-gl052.png`; do not restart SKU/hero search. No user action is needed unless a real blocker appears.
+
+---
+
 ## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
 
 - Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
