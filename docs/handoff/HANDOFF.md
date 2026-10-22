@@ -1,3 +1,16 @@
+# LATEST CHECKPOINT — 2026-10-22 (read before older notes)
+
+Current branch HEAD at this checkpoint: `de62c546bab7e175347a4efb4fda5ec54c014a38`; PR #108 remains open and unmerged.
+
+- Current SHA: [Validate #4448 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936598), [Preview deploy #537 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936551), [Admin Preview Playwright #751 PASS; read-only only](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936572). [Live visual audit #807 pending](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501); inspect it before claiming current-SHA live PASS.
+- Latest source change improves the gallery screenshot wait: compare main image URL with active thumbnail and wait until `is-changing`, `sd-slide-out-left/right`, and `sd-slide-in-left/right` are all cleared. Regression assertion added in `tests/website-screenshot-capture.test.mjs`.
+- Last finished live audit: [#805 artifact 12402222013](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723518923), exact SHA `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6`, deployment ID `4bde881b-5b48-4860-b410-ec160d6c8dd6). PASS: 119 screenshots, 8 viewport/theme pairs, 12 routes, 68 section checks, 8 commerce states, 4 detail contexts, 4 icon checks, 4 cart-add checks, 6 fly-to-cart checks, 2 edge checks, 20 first-paint samples, 4 videos; zero overflow, console/page/HTTP errors, failed requests, broken images, read-only violations, or hard failures. Its mobile Light gallery image looked correctly settled, but it predates the stronger guard. Verify run #807's screenshot and first-paint evidence.
+- Intermediate SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e`: [validation #4447 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921433), [deploy #536 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921432), [Admin read-only Playwright #750 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921429), [visual audit #806 running](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487). Never reuse this evidence as proof for later SHAs.
+- Estimated completion ~85%, not final acceptance. Continue automatically after reporting; poll #807/#806, inspect artifacts/deployment SHA, inspect real screenshots and startup timelines/videos, then fix remaining genuine issues.
+- Safety boundaries unchanged: no merge/Production/main/DNS/Admin/backend/API/schema/product data/image mappings/D1/R2/bindings/secrets/Access changes. Keep user-supplied Hero image `/images/hero-sd-gl052.png`; don't restart the old SKU/hero search. No user action currently required.
+
+---
+
 # CURRENT CHECKPOINT — 2026-10-22 (gallery capture settling; supersedes older status snapshots)
 
 - Active repository/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`. PR #108 stays OPEN and unmerged.
