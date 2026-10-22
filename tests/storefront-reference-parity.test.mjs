@@ -183,19 +183,19 @@ assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image r
 assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
   'The hero starts hidden in static markup so the approved presentation asset can be assigned by runtime; catalog SKU availability is not a gate.');
 const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4'")
-  && heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
-  && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
-  'The homepage hero must load the dedicated presentation asset independently of public catalog SKU availability.');
+assert.ok(heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'")
+  && heroSync.includes("target.hidden=true") && heroSync.includes("target.removeAttribute('src')")
+  && !heroSync.includes("target.src="),
+  'The Hero image is temporarily hidden by owner request; preserve the standalone source and do not load a derivative until Hero is revisited.');
 assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
 assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-failed\''),
-  'A failed image request must be diagnosable without hiding the user-approved hero presentation asset.');
+  'Temporary Hero image removal must not rely on an image-load failure or silently restore the image.');
 assert.ok(!html.includes('sdGalleryWhiteBackgroundKey') && !html.includes('syncFullscreenBackgroundKey') && !html.includes('sd-white-background-keyed'),
   'Product and fullscreen photos must preserve original pixels; do not infer and remove white backgrounds.');
 assert.ok(html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') < html.indexOf('catch(err){$(\'#catalogGrid\').innerHTML=')
   && html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') >= 0,
-  'The presentation hero image must initialize before the product API can fail or return early.');
+  'The temporary Hero image-disable state must initialize before the product API can fail or return early.');
 assert.match(finalCss, /\.sd-fullscreen-frame\{border-radius:18px!important;overflow:hidden!important\}/,
   'The full-screen gallery frame must clip the image to softly rounded corners.');
 assert.match(finalCss, /\.sd-fullscreen-image\{border-radius:16px!important\}/,
