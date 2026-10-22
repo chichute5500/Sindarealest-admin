@@ -1,3 +1,32 @@
+# URGENT HANDOFF OVERRIDE — 2026-10-22 (latest verified)
+
+
+**This override supersedes older timestamps and status claims below wherever they conflict. Re-fetch branch HEAD and deployment metadata before source work.**
+
+- Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 is OPEN and MUST NOT be merged: https://github.com/chichute5500/Sindarealest-admin/pull/108
+- Verified branch HEAD at handoff: `e4bcc7cb978743693077694baddf0801832d0808` (docs-only commit). Latest code-bearing source commit: `fb997b448a80a0bc9f34e75b4a31b7b450951fed`. Do not confuse branch HEAD, source SHA, deployed SHA, and audited SHA.
+- Source validation/test workflow #39773486071: PASS for source SHA `fb997b448a80a0bc9f34e75b4a31b7b450951fed`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773486071
+- Preview deploy workflow #39773485868: PASS for that source SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773485868. Alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Workflow success alone does not prove the hero looks correct.
+- Visual workflow #39773486043: job conclusion SUCCESS, artifact `12423387968` (`sindarealest-liquid-glass-preview-873`, ~59.8 MB): https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773486043 . Local fixture audit passed. Live Preview probe/capture step succeeded, but the dedicated guarded “Capture live Cloudflare Pages Preview” step was SKIPPED; **do not call this a completed human visual audit or claim hero is correct until screenshots are opened and reviewed against the exact deployed SHA**.
+
+## Critical incident / immediate next task — hero image
+
+The owner states the assistant deleted/removed the supplied hero image during earlier work, before the protection rule was documented. Acknowledge this as an assistant-caused regression in process; do not make the owner re-explain it. The owner has ended work with this assistant and is moving to a new chat. Do not ask the owner to continue in this chat.
+
+Absolute lock: `/images/hero-sd-gl052.png` is an owner-supplied standalone presentation asset, conceptually protected like the official logo. It is NOT a catalog item, SKU, product gallery, or database-backed image. Never search/validate/map SD-GL052 in the catalog. Never replace, redraw, regenerate, retouch, recolour, crop/recompose, remove/key its background, apply filters/masks, or alter pixels. Keep its file bytes unchanged. Only correct HTML/JS/CSS visibility/loading plumbing so the exact file displays unchanged, independently of product API/catalog outcomes.
+
+**Known source issue at `fb997b4`:** `syncHeroProductImage()` directly assigns `/images/hero-sd-gl052.png?v=20261022-1` and unhides it, but hero-specific CSS still applies `filter:drop-shadow(...)` to `#home .hero-visual img` (around lines 2413 and 2438 in that source). This visually alters the protected asset and violates the new lock. Do not edit blindly: next chat must inspect current branch/source and remove only hero-image effects/transforms (not general product image styles), then add a regression assertion that hero image itself has no filter/mask/blend/crop/recomposition, asset URL is independent of catalog/API, and catalog failure cannot hide it. Do not alter the PNG bytes.
+
+The workflow test being green does not mean the image is correct. Fetch artifact `12423387968`, inspect live Preview screenshots for mobile/desktop and Light/Dark, verify exact deployment SHA, and compare the image visually with the owner-supplied original. If no exact live capture is present, run a guarded read-only Preview capture only after verifying deployment SHA. No production changes.
+
+## Scope and non-negotiable boundaries
+
+- Preview/static storefront only. Never merge PR #108; do not touch `main`, Production, Admin branch, backend/API/auth/business logic, product data/mappings, D1/R2, bindings, secrets, DNS, or Access policy.
+- Preserve the official logo exactly. Do not mutate product image mappings to hide mismatches. QR/payment remains fail-closed.
+- Required viewport/theme audit: 360×800, 390×844, 768×1024, 1440×900 in Light and Dark; home/header/hero, “Phong cách đẳng cấp từ da cá sấu”, six Liquid Glass tiles, “Đặt hàng an tâm”, product grid/search/detail/gallery/cart/account/checkout/Zalo/footer/404.
+- Report truthful PASS/FAIL/PENDING with SHA and evidence. No “100%” claims while any visual check is pending. Keep working autonomously in the new chat; do not repeat unaffected PASS tests.
+
+
 ## ABSOLUTE HERO ASSET LOCK — OWNER-SUPPLIED IMAGE (2026-10-22)
 
 **The hero image is a standalone owner-provided presentation asset, not a product listing, SKU, catalog record, product-gallery image, or database-backed product image.** The owner personally supplied `/images/hero-sd-gl052.png` for the hero. Treat this asset as protected at the same level as the official brand logo.
