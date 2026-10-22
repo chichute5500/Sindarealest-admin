@@ -28,3 +28,10 @@ Không merge #111/#108; không sửa main/static; không Production deploy; khô
 PR #111 and the static branch share merge base `a3834fed3eb1c012b188d7c95d14ec3d15e3969f`; they are independently diverged, so do not sync them. Static `public/index.html`, static preview workflow and setup/deploy scripts' latest path changes predate the merge base and appear inherited, though still in the PR diff vs `main`.
 
 Migration `0009_fulfillment_and_manual_payments.sql` and payment ledger routes are post-merge-base Admin changes. Both `scripts/setup-cloudflare.mjs` and `scripts/deploy-cloudflare.mjs` lack a 0009/schema preflight, while `scripts/check-migrations.mjs` tests 0009 only against temporary local D1. Track this as POTENTIAL_BLOCKER_NOT_VERIFIED; do not inspect/write remote D1 or auto-run migration. Continue the higher-priority #3 UI task first.
+
+
+## Latest handoff checkpoint — 2026-10-22T21:05:00+07:00
+- Current docs checkpoint began from commit `5497d4d3b51d32064a9a993e0f891ca672c543c1` (docs-only consolidation); fetch live branch/PR HEAD again before doing anything. The source validation run `39769095034` is SUCCESS on parent source SHA `b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e`, not proof that a newer source commit was tested.
+- Downloaded and opened artifact #311 from run `39767851318`; compared poster with #3 screenshot `products-reference-matrix__390x844__light.png`. Fixture uses placeholder images and unknown price/stock, so no source data should be fabricated. No proven new source defect yet; do not claim #3 complete.
+- Immediate task: continue matched-state #3 review for 320×640 and 360×800 in both themes using artifact #311 and metrics; inspect toolbar/card actions/pagination/overflow. If no independent defect is demonstrated, record evidence and move to #4 rather than inventing a fix.
+- Any documentation-only commits do not increase the 50% PROVISIONAL project progress. Keep PR #111 and #108 open/unmerged and follow all existing guardrails.
