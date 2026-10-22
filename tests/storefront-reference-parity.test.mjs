@@ -299,18 +299,20 @@ const accountActionEnd = html.indexOf('<p class="account-note"', accountActionSt
 assert.ok(accountActionStart >= 0 && accountActionEnd > accountActionStart,
   'Account action group must remain present.');
 const accountActionHtml = html.slice(accountActionStart, accountActionEnd);
-const accountSvgNames = [...accountActionHtml.matchAll(/<span class="account-action-icon" aria-hidden="true"><svg\\b[^>]*data-account-icon="([^"]+)"/g)]
+const accountSvgNames = [...accountActionHtml.matchAll(/<span class="account-action-icon" aria-hidden="true"><svg\b[^>]*data-account-icon="([^"]+)"/g)]
   .map(match => match[1]);
 assert.deepEqual(accountSvgNames, ['address', 'orders', 'favorites', 'theme', 'contact'],
   'Address, order history, favorites, theme and contact must each use a semantic SVG icon in order.');
 assert.equal([...accountActionHtml.matchAll(/class="account-action-chevron"/g)].length, 5,
   'Each account action must keep a dedicated decorative SVG chevron.');
+assert.equal([...accountActionHtml.matchAll(/<svg\b[^>]*data-account-icon="chevron"[^>]*stroke-width="1\.7"/g)].length, 5,
+  'Each account chevron must use the matching thin-stroke SVG.');
 assert.doesNotMatch(accountActionHtml, /[⌖▤◐◎›]/,
   'The account drawer must not fall back to the Unicode pictographs or text chevron being replaced.');
-assert.ok(accountSvgNames.every(name => {
-  const match = accountActionHtml.match(new RegExp('<svg\\\\b[^>]*data-account-icon="' + name + '"[^>]*stroke-width="1\\\\.7"'));
-  return Boolean(match);
-}), 'Account SVGs must use a consistent 1.7px stroke.');
-assert.match(html, /id="sd-icon-account-actions-2026-10-22"[\\s\\S]*#order \\.order-icon,#order \\.order-commitment-icon\\{color:var\\(--ink\\)\\}[\\s\\S]*width:20px;height:20px/,
-  'Non-interactive order glyphs must use the primary ink color and account SVGs must be legible at the reference scale.');
-
+const accountIconStyle = html.match(/<style id="sd-icon-account-actions-2026-10-22">([\s\S]*?)<\/style>/)?.[1] || '';
+assert.ok(
+  accountIconStyle.includes('#order .order-icon,#order .order-commitment-icon{color:var(--ink)}') &&
+  accountIconStyle.includes('width:20px;height:20px') &&
+  accountIconStyle.includes('stroke-width:1.7'),
+  'Static order icons must use primary ink and account SVGs must use a consistent reference-scale stroke.'
+);

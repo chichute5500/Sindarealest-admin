@@ -77,7 +77,10 @@ assert.match(workflow, /inputs\.capture_source == 'cloudflare-preview'/,
 assert.match(workflow, /node scripts\/validate-cloudflare-preview-url\.mjs/,
   'The manual live-capture gate must use the tested Preview URL validator.');
 
-assert.match(workflow, /- name: Probe supplied Cloudflare Preview on push \\(artifact only; never archives\\)[\\s\\S]*if: \\$\\{\\{ github\\.event_name == 'push' && !contains\\(github\\.event\\.head_commit\\.message, '\\[capture-review\\]'\\) \\}\\}/,
+const probeStepStart = workflow.indexOf('- name: Probe supplied Cloudflare Preview on push (artifact only; never archives)');
+const probeStepEnd = workflow.indexOf('\n      - name:', probeStepStart + 2);
+const probeStep = workflow.slice(probeStepStart, probeStepEnd < 0 ? workflow.length : probeStepEnd);
+assert.ok(probeStepStart >= 0 && probeStep.includes("if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') }}"),
   'Exact-SHA review captures must skip the redundant pre-verification full screenshot probe and capture once after the deployment gate.');
 
 
@@ -486,6 +489,10 @@ const npmSetupIndex = ciWorkflow.indexOf('name: Use current npm CLI with the sup
 const npmAuditIndex = ciWorkflow.indexOf('name: Audit installed dependencies');
 assert.ok(npmSetupIndex >= 0 && npmSetupIndex < npmAuditIndex,
   'The current npm CLI must be selected before dependency audit.');
-assert.match(ciWorkflow, /npm install --global npm@12\\.2\\.0 --no-audit --no-fund[\\s\\S]*test "\\$\\(npm --version\\)" = "12\\.2\\.0"[\\s\\S]*npm audit --audit-level=high/,
-  'CI must use the pinned npm CLI and retain the high-severity audit gate.');
+assert.ok(
+  ciWorkflow.includes('npm install --global npm@12.2.0 --no-audit --no-fund') &&
+  ciWorkflow.includes('test "$(npm --version)" = "12.2.0"') &&
+  ciWorkflow.includes('npm audit --audit-level=high'),
+  'CI must use the pinned npm CLI and retain the high-severity audit gate.'
+);
 
