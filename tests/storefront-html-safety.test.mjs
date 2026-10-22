@@ -23,7 +23,7 @@ const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "f
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-3'"),
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4'"),
   "the Hero must use the supplied presentation asset independently of catalog availability");
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
   && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
@@ -56,13 +56,13 @@ for (const rows of [[], [{ sku: 'SD-GL052', skuVerified: false, images: [] }]]) 
   const hero = runHeroSync(rows);
   assert.equal(hero.result, true, "the hero presentation asset must render regardless of catalog SKU state");
   assert.equal(hero.target.hidden, false);
-  assert.equal(hero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-3');
+  assert.equal(hero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4');
   assert.equal(hero.target.dataset.productImageStatus, 'hero-presentation-asset');
 }
 const visibleHero = runHeroSync([]);
 visibleHero.target.onerror();
 assert.equal(visibleHero.target.hidden, false, "a failed asset request must not hide the user-approved hero");
-assert.equal(visibleHero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-3');
+assert.equal(visibleHero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4');
 assert.equal(visibleHero.target.dataset.productImageStatus, 'hero-asset-load-failed');
 
 const helperStart = html.indexOf("const escapeHtml=");

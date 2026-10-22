@@ -63,43 +63,50 @@ def main() -> None:
             "a platform polygon; an alpha silhouette is required."
         )
 
-    # The leather sheet reaches some original canvas borders. Add genuinely
-    # transparent space before blurring so those crop-boundary edges can fade
-    # inward naturally instead of remaining straight at the image rectangle.
+    # Pad before blur and keep that padding in the final output. Cropping the
+    # blur back to the source rectangle recreates a straight edge at canvas bounds.
     padding = FEATHER_RADIUS * 3
     padded_alpha = Image.new("L", (width + padding * 2, height + padding * 2), 0)
     padded_alpha.paste(alpha, (padding, padding))
-    blurred_alpha = padded_alpha.filter(
+    blurred_padded_alpha = padded_alpha.filter(
         ImageFilter.GaussianBlur(radius=FEATHER_RADIUS)
-    ).crop((padding, padding, padding + width, padding + height))
+    )
+
+    padded_source = Image.new(
+        "RGBA", (width + padding * 2, height + padding * 2), (0, 0, 0, 0)
+    )
+    padded_source.alpha_composite(source, (padding, padding))
 
     keep_shoes = Image.new("L", source.size, 0)
     draw = ImageDraw.Draw(keep_shoes)
     draw.polygon(scaled_polygon(LEFT_SHOE, width, height), fill=255)
     draw.polygon(scaled_polygon(RIGHT_SHOE, width, height), fill=255)
     keep_shoes = keep_shoes.filter(ImageFilter.GaussianBlur(radius=KEEP_MASK_RADIUS))
+    padded_keep_shoes = Image.new("L", padded_source.size, 0)
+    padded_keep_shoes.paste(keep_shoes, (padding, padding))
 
-    original_alpha = list(alpha.getdata())
-    soft_alpha = list(blurred_alpha.getdata())
-    keep = list(keep_shoes.getdata())
-    new_alpha = Image.new("L", source.size)
+    original_alpha = list(padded_source.getchannel("A").getdata())
+    soft_alpha = list(blurred_padded_alpha.getdata())
+    keep = list(padded_keep_shoes.getdata())
+    new_alpha = Image.new("L", padded_source.size)
     new_alpha.putdata([
-        max(0, min(255, round(
-            a * (k / 255.0) + b * (1.0 - k / 255.0)
-        )))
+        max(0, min(255, round(a * (k / 255.0) + b * (1.0 - k / 255.0))))
         for a, b, k in zip(original_alpha, soft_alpha, keep)
     ])
-    source.putalpha(new_alpha)
+    padded_source.putalpha(new_alpha)
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    source.save(OUTPUT, format="PNG", optimize=True)
+    padded_source.save(OUTPUT, format="PNG", optimize=True)
 
     with Image.open(OUTPUT) as result:
         result_alpha = result.getchannel("A")
         report = {
             "source": str(SOURCE.relative_to(ROOT)),
             "output": str(OUTPUT.relative_to(ROOT)),
-            "dimensions": [width, height],
+            "source_dimensions": [width, height],
+            "output_dimensions": list(result.size),
+            "output_padding_pixels": padding,
+            "output_keeps_transparent_padding": result.size == [width + padding * 2, height + padding * 2],
             "source_alpha_extrema": alpha.getextrema(),
             "output_alpha_extrema": result_alpha.getextrema(),
             "feather_radius_source_pixels": FEATHER_RADIUS,

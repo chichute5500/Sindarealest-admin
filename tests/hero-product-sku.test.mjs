@@ -6,7 +6,7 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-3'"),
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4'"),
   "The hero must render the supplied static presentation image independently of public catalog SKU availability.");
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'"),
   "The static hero image must be explicitly identified as a presentation asset, not a catalog product image.");
@@ -57,6 +57,11 @@ assert.ok(edgeProcessor.includes("FEATHER_RADIUS = 48")
 assert.ok(edgeProcessor.includes("padding = FEATHER_RADIUS * 3")
   && edgeProcessor.includes('padded_alpha = Image.new("L"')
   && edgeProcessor.includes("padded_alpha.paste(alpha, (padding, padding))")
+  && edgeProcessor.includes("blurred_padded_alpha = padded_alpha.filter(")
+  && edgeProcessor.includes("padded_source.alpha_composite(source, (padding, padding))")
+  && edgeProcessor.includes("padded_source.putalpha(new_alpha)")
+  && edgeProcessor.includes('"output_keeps_transparent_padding": result.size == [width + padding * 2, height + padding * 2]')
+  && !edgeProcessor.includes(".crop((padding, padding, padding + width, padding + height))")
   && edgeProcessor.includes("source alpha silhouette with transparent padding; shoe regions protected"),
   "Hero edge feather must follow the real alpha silhouette and pad canvas edges transparently instead of guessing a platform polygon.");
 assert.doesNotMatch(edgeProcessor, /^PLATFORM\s*=\s*\[/m,
@@ -68,8 +73,8 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
   && heroEdgeTreatment.includes("mask-image:none!important")
   && !heroEdgeTreatment.includes("mask-image:radial-gradient(")
-  && heroEdgeTreatment.includes("width:118%!important")
-  && heroEdgeTreatment.includes("max-height:290px!important"),
+  && heroEdgeTreatment.includes("width:130%!important")
+  && heroEdgeTreatment.includes("max-height:330px!important"),
   "The derived Hero shoes must be enlarged while alpha edges blend into the page and the original RGB stays unchanged.");
 assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
