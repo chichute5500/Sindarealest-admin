@@ -846,6 +846,19 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     };
   }, productId);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
+  let alternateGalleryImageTested = false;
+  let alternateGalleryImageSource = '';
+  if (label === 'mobile-390-light') {
+    const secondThumb = page.locator('#detailThumbs [data-thumb="1"]');
+    if (await secondThumb.count().catch(() => 0) > 0) {
+      alternateGalleryImageSource = await secondThumb.locator('img').evaluate(image => image.currentSrc || image.src);
+      await secondThumb.click();
+      alternateGalleryImageTested = await page.waitForFunction(expectedSource => {
+        const image = document.querySelector('#detailMainImage');
+        return Boolean(image && (image.currentSrc || image.src) === expectedSource && image.complete && image.naturalWidth > 0);
+      }, alternateGalleryImageSource, { timeout: 5000 }).then(() => true).catch(() => false);
+    }
+  }
   const before = await page.evaluate(() => {
     let cart = {};
     try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
@@ -911,6 +924,39 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
       return Number(stored[id] || 0) === quantity;
     }, { id: before.productId, quantity: before.quantity + 1 }, { timeout: 6000 });
+
+    const detailFlyAppeared = await page.waitForFunction(() => Boolean(document.querySelector('.sd-fly-to-cart-clone')), null, { timeout: 1400 }).then(() => true).catch(() => false);
+    const detailFlyStart = detailFlyAppeared ? await page.evaluate(() => {
+      const node = document.querySelector('.sd-fly-to-cart-clone');
+      if (!node) return null;
+      const rect = node.getBoundingClientRect();
+      return { productId: node.dataset.productId, sourceImage: node.dataset.sourceImage, src: node.currentSrc || node.src,
+        targetId: node.dataset.cartTargetId, durationMs: Number(node.dataset.durationMs), position: getComputedStyle(node).position,
+        progress: Number(node.dataset.flightProgress || 0), transform: node.style.transform,
+        rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
+    }) : null;
+    if (detailFlyAppeared) {
+      await capture(page, screenshotStem('cart-fly-to-header-active-detail-open', viewport, theme) + '.png', false, {
+        ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'selected-product-image-flying-to-header-cart',
+        productTitle: before.title, productId: before.productId,
+      });
+    }
+    await page.waitForTimeout(110);
+    const detailFlyMid = await page.evaluate(() => {
+      const node = document.querySelector('.sd-fly-to-cart-clone');
+      if (!node) return null;
+      const rect = node.getBoundingClientRect();
+      return { productId: node.dataset.productId, sourceImage: node.dataset.sourceImage, targetId: node.dataset.cartTargetId,
+        durationMs: Number(node.dataset.durationMs), position: getComputedStyle(node).position,
+        progress: Number(node.dataset.flightProgress || 0), transform: node.style.transform,
+        rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
+    });
+    await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone')
+      && document.querySelector('#cartOpen')?.classList.contains('sd-cart-bump'), null, { timeout: 1800 })
+      .then(() => true).catch(() => false).then(value => { globalThis.__sdFlyFinished = value; });
+    const detailFlyFinished = await page.evaluate(() => globalThis.__sdFlyFinished === true).catch(() => false);
+    await page.evaluate(() => { try { delete globalThis.__sdFlyFinished; } catch {} });
+
     await page.waitForFunction(labelText => {
       const toast = document.querySelector('#toast');
       if (!toast?.classList.contains('show') || !(toast.textContent || '').includes(labelText)) return false;
@@ -928,6 +974,34 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       return visible && aboveNav;
     }, expectedLabel, { timeout: 6000 });
     const afterOne = await readCartState(before.productId);
+    const sameRect = (a, b) => Boolean(a && b && ['x','y','width','height'].every(key => Math.abs(a[key] - b[key]) < 0.5));
+    const alternateImagePass = label !== 'mobile-390-light'
+      || (alternateGalleryImageTested && before.galleryImageCount > 1 && before.imageSrc === alternateGalleryImageSource);
+    const detailFlyPass = Boolean(before.imageReady && before.imageSrc && detailFlyStart
+      && detailFlyStart.productId === before.productId
+      && detailFlyStart.sourceImage === before.imageSrc && detailFlyStart.src === before.imageSrc
+      && detailFlyStart.targetId === 'cartOpen' && detailFlyStart.position === 'fixed'
+      && detailFlyStart.durationMs >= 600 && detailFlyStart.durationMs <= 900
+      && detailFlyMid && detailFlyMid.productId === before.productId
+      && detailFlyMid.sourceImage === before.imageSrc && detailFlyMid.targetId === 'cartOpen'
+      && detailFlyMid.position === 'fixed' && detailFlyMid.progress > detailFlyStart.progress
+      && detailFlyMid.transform !== detailFlyStart.transform && detailFlyFinished
+      && sameRect(before.imageRect, afterOne.imageRect) && alternateImagePass);
+    audit.flyToCartChecks.push({
+      context: label, entryPoint: 'product-detail-selected-image', route,
+      status: detailFlyPass ? 'PASS' : 'FAIL',
+      productId: before.productId, sourceImage: before.imageSrc, sourceImageReady: before.imageReady,
+      selectedAlternateImageTested: label === 'mobile-390-light' ? alternateGalleryImageTested : 'NOT REQUIRED',
+      selectedAlternateImageSource: label === 'mobile-390-light' ? alternateGalleryImageSource : null,
+      selectedAlternateImageMatchesFlight: alternateImagePass,
+      targetCartId: detailFlyStart?.targetId || null, durationMs: detailFlyStart?.durationMs || null,
+      imageCloneObserved: Boolean(detailFlyStart), movementObserved: Boolean(detailFlyMid && detailFlyStart
+        && detailFlyMid.progress > detailFlyStart.progress && detailFlyMid.transform !== detailFlyStart.transform),
+      cloneRemovedAndCartBumpedAfterSuccess: detailFlyFinished,
+      noLayoutShift: sameRect(before.imageRect, afterOne.imageRect),
+    });
+    if (!detailFlyPass) audit.hardFailures.push('Live fly-to-cart detail/gallery acceptance failed at ' + label + '.');
+
     const onePass = afterOne.quantity === before.quantity + 1
       && afterOne.total === before.total + 1
       && afterOne.badge === afterOne.expectedBadge
@@ -946,18 +1020,86 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       return Number(stored[id] || 0) === quantity;
     }, { id: before.productId, quantity: before.quantity + 3 }, { timeout: 6000 });
     const afterRapid = await readCartState(before.productId);
+    await page.waitForTimeout(80);
+    const rapidFlights = await page.evaluate(() => [...document.querySelectorAll('.sd-fly-to-cart-clone')].map(node => ({
+      productId: node.dataset.productId, sourceImage: node.dataset.sourceImage, targetId: node.dataset.cartTargetId,
+      durationMs: Number(node.dataset.durationMs), progress: Number(node.dataset.flightProgress || 0),
+    })));
+    const rapidFlightPass = rapidFlights.length === 2 && rapidFlights.every(node => node.productId === before.productId
+      && node.sourceImage === before.imageSrc && node.targetId === 'cartOpen' && node.durationMs === 720);
     const rapidPass = afterRapid.quantity === before.quantity + 3
       && afterRapid.total === before.total + 3
       && afterRapid.badge === afterRapid.expectedBadge
       && afterRapid.toastVisible && afterRapid.toastVisuallyVisible && afterRapid.toastText.includes(expectedLabel)
-      && rectUnchanged(before.imageRect, afterRapid.imageRect);
+      && rectUnchanged(before.imageRect, afterRapid.imageRect) && rapidFlightPass;
     await capture(page, screenshotStem('cart-add-rapid-clicks-detail-open', viewport, theme) + '.png', false, {
       ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'rapid-two-clicks-exactly-two-adds',
       productTitle: before.title, productId: before.productId,
     });
 
-    await page.locator('#detailClose').click();
-    await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 5000 });
+    await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone'), null, { timeout: 1800 }).catch(() => {});
+    await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone'), null, { timeout: 1800 }).catch(() => {});
+    if (label === 'mobile-390-light') {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      const reducedBefore = await readCartState(before.productId);
+      await addButton.click();
+      await page.waitForFunction(({ id, quantity }) => {
+        let stored = {};
+        try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+        return Number(stored[id] || 0) === quantity;
+      }, { id: before.productId, quantity: reducedBefore.quantity + 1 }, { timeout: 5000 });
+      await page.waitForTimeout(50);
+      const reducedAfter = await readCartState(before.productId);
+      const reducedState = await page.evaluate(() => ({
+        clonePresent: Boolean(document.querySelector('.sd-fly-to-cart-clone')),
+        bumpPresent: Boolean(document.querySelector('#cartOpen.sd-cart-bump')),
+        staticFeedbackPresent: Boolean(document.querySelector('#cartOpen.sd-cart-confirmed')),
+      }));
+      const reducedPass = reducedAfter.quantity === reducedBefore.quantity + 1
+        && reducedAfter.total === reducedBefore.total + 1 && reducedAfter.badge === reducedAfter.expectedBadge
+        && reducedAfter.toastVisible && !reducedState.clonePresent && !reducedState.bumpPresent && reducedState.staticFeedbackPresent;
+      audit.cartAnimationEdgeChecks.push({ context: label, case: 'prefers-reduced-motion', status: reducedPass ? 'PASS' : 'FAIL',
+        addSucceededOnce: reducedAfter.quantity === reducedBefore.quantity + 1, badgeMatches: reducedAfter.badge === reducedAfter.expectedBadge,
+        toastVisible: reducedAfter.toastVisible, noFlightClone: !reducedState.clonePresent, noBounce: !reducedState.bumpPresent,
+        staticFeedbackPresent: reducedState.staticFeedbackPresent });
+      if (!reducedPass) audit.hardFailures.push('Reduced-motion cart feedback failed at ' + label + '.');
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+      await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone'), null, { timeout: 1800 }).catch(() => {});
+      const imageBeforeFailure = before.imageSrc;
+      await page.evaluate(() => { document.querySelector('#detailMainImage')?.removeAttribute('src'); });
+      const imageUnavailable = await page.evaluate(() => {
+        const image = document.querySelector('#detailMainImage');
+        return Boolean(image && !image.getAttribute('src') && image.complete && image.naturalWidth === 0);
+      });
+      const missingBefore = await readCartState(before.productId);
+      await addButton.click();
+      await page.waitForFunction(({ id, quantity }) => {
+        let stored = {};
+        try { stored = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+        return Number(stored[id] || 0) === quantity;
+      }, { id: before.productId, quantity: missingBefore.quantity + 1 }, { timeout: 5000 });
+      await page.waitForTimeout(50);
+      const missingAfter = await readCartState(before.productId);
+      const missingState = await page.evaluate(() => ({
+        clonePresent: Boolean(document.querySelector('.sd-fly-to-cart-clone')),
+        bumpPresent: Boolean(document.querySelector('#cartOpen.sd-cart-bump')),
+      }));
+      const missingPass = imageUnavailable && missingAfter.quantity === missingBefore.quantity + 1
+        && missingAfter.total === missingBefore.total + 1 && missingAfter.badge === missingAfter.expectedBadge
+        && missingAfter.toastVisible && !missingState.clonePresent;
+      audit.cartAnimationEdgeChecks.push({ context: label, case: 'source-image-unavailable', status: missingPass ? 'PASS' : 'FAIL',
+        imageUnavailable, addSucceededOnce: missingAfter.quantity === missingBefore.quantity + 1,
+        badgeMatches: missingAfter.badge === missingAfter.expectedBadge, toastVisible: missingAfter.toastVisible,
+        noFlightClone: !missingState.clonePresent, cartFeedbackAfterSuccess: missingState.bumpPresent });
+      if (!missingPass) audit.hardFailures.push('Unavailable source image blocked or falsified add-to-cart at ' + label + '.');
+      await page.evaluate(src => { const image = document.querySelector('#detailMainImage'); if (image && src) image.src = src; }, imageBeforeFailure);
+      await page.waitForFunction(() => {
+        const image = document.querySelector('#detailMainImage');
+        return Boolean(image && image.complete && image.naturalWidth > 0);
+      }, null, { timeout: 6000 }).catch(() => {});
+    }
+
     const beforeOpenCart = await readCartState(before.productId);
     await page.locator('#cartOpen').click();
     await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'), null, { timeout: 5000 });
@@ -975,7 +1117,8 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       context: label, route, status: pass ? 'PASS' : 'FAIL',
       productId: before.productId, productTitle: before.title, expectedToastLabel: expectedLabel,
       invalidAddNoMutation: invalidPass, oneClickExactlyOnce: onePass, rapidClicksExactlyOnce: rapidPass,
-      headerCartOpensWithoutAdd: headerCartNoAdd,
+      headerCartOpensWithoutAdd: headerCartNoAdd, detailFlyToCartPass: detailFlyPass,
+      rapidFlightPass, rapidFlightCount: rapidFlights.length,
       before: { quantity: before.quantity, total: before.total, badge: before.badge },
       afterOne: { quantity: afterOne.quantity, total: afterOne.total, badge: afterOne.badge, toastVisible: afterOne.toastVisible, toastText: afterOne.toastText, noLayoutShift: rectUnchanged(before.imageRect, afterOne.imageRect) },
       afterRapid: { quantity: afterRapid.quantity, total: afterRapid.total, badge: afterRapid.badge, toastVisible: afterRapid.toastVisible, toastText: afterRapid.toastText, noLayoutShift: rectUnchanged(before.imageRect, afterRapid.imageRect) },
@@ -988,6 +1131,157 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     await page.locator('#checkoutClose').click({ timeout: 800 }).catch(() => {});
     await page.locator('#detailClose').click({ timeout: 800 }).catch(() => {});
   }
+}
+
+
+async function captureCardFlyToCartProbe(page, button, viewport, theme, context, entryPoint) {
+  if (!await button.count().catch(() => 0)) {
+    const result = { context, entryPoint, status: 'FAIL', reason: 'No real add-to-cart control found.' };
+    audit.flyToCartChecks.push(result);
+    audit.hardFailures.push('Missing add-to-cart entry point: ' + entryPoint + '.');
+    return false;
+  }
+  await button.scrollIntoViewIfNeeded();
+  const before = await button.evaluate(node => {
+    const featured = node.closest('[data-featured-card]');
+    const card = featured || node.closest('.product-card');
+    let image = null;
+    if (node.id === 'detailAdd') image = document.querySelector('#detailMainImage');
+    else if (featured) {
+      const track = featured.querySelector('[data-feature-track]');
+      image = track?.children[Number(featured.dataset.featureIndex || 0)] || featured.querySelector('.feature-single');
+    } else image = card?.querySelector('.product-photo img,.feature-single,.feature-slide');
+    const stage = featured?.querySelector('.featured-media') || card?.querySelector('.product-photo') || image;
+    const imageRect = image?.getBoundingClientRect();
+    const stageRect = stage?.getBoundingClientRect();
+    let cart = {};
+    try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+    const total = Object.values(cart).reduce((sum, value) => sum + Number(value || 0), 0);
+    return {
+      productId: node.dataset.add || '', title: (card?.querySelector('.product-title')?.textContent || '').trim(),
+      sourceImage: image?.currentSrc || image?.src || '',
+      imageReady: Boolean(image?.complete && image?.naturalWidth > 0),
+      imageRect: imageRect ? { x:imageRect.x, y:imageRect.y, width:imageRect.width, height:imageRect.height } : null,
+      stageRect: stageRect ? { x:stageRect.x, y:stageRect.y, width:stageRect.width, height:stageRect.height } : null,
+      quantity: Number(cart[node.dataset.add || ''] || 0), total,
+      badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
+    };
+  });
+  const fail = (reason, details = {}) => {
+    const result = { context, entryPoint, status: 'FAIL', reason, before, ...details };
+    audit.flyToCartChecks.push(result);
+    audit.hardFailures.push('Cart image source/flight failed for ' + entryPoint + ' at ' + context + '.');
+    return false;
+  };
+  if (!before.productId || !before.sourceImage || !before.imageReady || !before.imageRect || !before.stageRect)
+    return fail('source-image-or-product-identity-not-ready');
+  await button.click({ timeout: 10000 });
+  await page.waitForFunction(({ id, quantity }) => {
+    let cart = {};
+    try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+    return Number(cart[id] || 0) === quantity + 1;
+  }, { id: before.productId, quantity: before.quantity }, { timeout: 5000 });
+  const appeared = await page.waitForFunction(() => Boolean(document.querySelector('.sd-fly-to-cart-clone')), null, { timeout: 1400 }).then(() => true).catch(() => false);
+  const start = appeared ? await page.evaluate(() => {
+    const node = document.querySelector('.sd-fly-to-cart-clone');
+    if (!node) return null;
+    return { productId: node.dataset.productId, sourceImage: node.dataset.sourceImage, src: node.currentSrc || node.src,
+      targetId: node.dataset.cartTargetId, durationMs: Number(node.dataset.durationMs), position: getComputedStyle(node).position,
+      progress: Number(node.dataset.flightProgress || 0), transform: node.style.transform };
+  }) : null;
+  if (appeared) await capture(page, screenshotStem('cart-fly-active-' + entryPoint, viewport, theme) + '.png', false, {
+    ...captureMeta(viewport, theme, await page.evaluate(() => location.pathname)), captureType: 'cart-interaction',
+    state: 'cart-fly-from-' + entryPoint, productId: before.productId, productTitle: before.title,
+  });
+  await page.waitForTimeout(90);
+  if (entryPoint === 'featured-selected-image') {
+    const original = { width: viewport.width, height: viewport.height };
+    await page.setViewportSize({ width: original.width + 8, height: original.height });
+    await page.waitForTimeout(35);
+    await page.setViewportSize(original);
+  } else {
+    await page.evaluate(() => window.scrollBy(0, 14)).catch(() => {});
+    await page.waitForTimeout(35);
+    await page.evaluate(() => window.scrollBy(0, -14)).catch(() => {});
+  }
+  const mid = await page.evaluate(() => {
+    const node = document.querySelector('.sd-fly-to-cart-clone');
+    if (!node) return null;
+    const rect = node.getBoundingClientRect();
+    return { productId: node.dataset.productId, sourceImage: node.dataset.sourceImage, targetId: node.dataset.cartTargetId,
+      durationMs: Number(node.dataset.durationMs), position: getComputedStyle(node).position,
+      progress: Number(node.dataset.flightProgress || 0), transform: node.style.transform,
+      rect: { x:rect.x, y:rect.y, width:rect.width, height:rect.height } };
+  });
+  const finished = await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone')
+    && document.querySelector('#cartOpen')?.classList.contains('sd-cart-bump'), null, { timeout: 1800 }).then(() => true).catch(() => false);
+  const after = await page.evaluate(id => {
+    let cart = {};
+    try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
+    const quantities = cart && typeof cart === 'object' ? cart : {};
+    const total = Object.values(quantities).reduce((sum, value) => sum + Number(value || 0), 0);
+    const card = document.querySelector('[data-product="' + CSS.escape(id) + '"]');
+    const featured = card?.matches('[data-featured-card]');
+    const image = featured
+      ? (card.querySelector('[data-feature-track]')?.children[Number(card.dataset.featureIndex || 0)] || card.querySelector('.feature-single'))
+      : card?.querySelector('.product-photo img,.feature-single,.feature-slide');
+    const stage = card?.querySelector('[data-featured-card] .featured-media') || card?.querySelector('.product-photo');
+    const ir=image?.getBoundingClientRect(), sr=stage?.getBoundingClientRect();
+    return { quantity:Number(quantities[id]||0), total, badge:document.querySelector('#cartCount')?.textContent?.trim()||'0',
+      expectedBadge:total>99?'99+':String(total), toastVisible:Boolean(document.querySelector('#toast.show'),
+      imageRect:ir?{x:ir.x,y:ir.y,width:ir.width,height:ir.height}:null,
+      stageRect:sr?{x:sr.x,y:sr.y,width:sr.width,height:sr.height}:null };
+  }, before.productId);
+  const sameRect = (a,b) => Boolean(a&&b&&['x','y','width','height'].every(key=>Math.abs(a[key]-b[key])<0.5));
+  const sourceMatches = Boolean(start && start.sourceImage === before.sourceImage && start.src === before.sourceImage);
+  const moved = Boolean(start && mid && mid.progress > start.progress && mid.transform !== start.transform);
+  const pass = sourceMatches && before.imageReady && start.productId === before.productId
+    && start.targetId === 'cartOpen' && start.position === 'fixed' && start.durationMs >= 600 && start.durationMs <= 900
+    && moved && finished && after.quantity === before.quantity + 1 && after.total === before.total + 1
+    && after.badge === after.expectedBadge && after.toastVisible && sameRect(before.stageRect,after.stageRect);
+  const result = { context, entryPoint, status: pass ? 'PASS' : 'FAIL', productId: before.productId,
+    productTitle: before.title, sourceImage: before.sourceImage, imageReady: before.imageReady,
+    sourceMatchesExactDisplayedImage: sourceMatches, durationMs: start?.durationMs||null, targetCartId: start?.targetId||null,
+    productIdPreserved: start?.productId===before.productId, movementObserved: moved, cloneRemovedAndCartBumpedAfterSuccess: finished,
+    quantityIncreasedOnce: after.quantity===before.quantity+1 && after.total===before.total+1,
+    badgeMatchesActualCart: after.badge===after.expectedBadge, successToastVisible: after.toastVisible,
+    noLayoutShift: sameRect(before.stageRect,after.stageRect), start, mid, after };
+  audit.flyToCartChecks.push(result);
+  if (!pass) audit.hardFailures.push('Cart image source/flight failed for ' + entryPoint + ' at ' + context + '.');
+  return pass;
+}
+
+async function captureCardFlyToCartSources(page, viewport, theme, context) {
+  const productButton = page.locator('#catalogGrid .product-card .mini-add').first();
+  await captureCardFlyToCartProbe(page, productButton, viewport, theme, context, 'catalog-product-card');
+
+  const featuredCard = page.locator('#featuredGrid [data-featured-card]').filter({ has: page.locator('[data-feature-track]') }).first();
+  if (await featuredCard.count().catch(() => 0) === 0) {
+    audit.flyToCartChecks.push({ context, entryPoint: 'featured-selected-image', status: 'FAIL', reason: 'No featured gallery card rendered.' });
+    audit.hardFailures.push('No featured gallery is available for the selected-image fly-to-cart test.');
+    return;
+  }
+  const imageCount = Number(await featuredCard.getAttribute('data-feature-count') || 0);
+  if (imageCount < 2) {
+    audit.flyToCartChecks.push({ context, entryPoint: 'featured-selected-image', status: 'FAIL', reason: 'No real featured product has an alternate image.' });
+    audit.hardFailures.push('The public Preview has no multi-image featured product for gallery fly-to-cart acceptance.');
+    return;
+  }
+  const oldIndex = Number(await featuredCard.getAttribute('data-feature-index') || 0);
+  await featuredCard.locator('[data-feature-step="1"]').click({ timeout: 10000 });
+  const featuredId = await featuredCard.getAttribute('data-product');
+  const selectedLoaded = await page.waitForFunction(({ id, oldIndex }) => {
+    const card = [...document.querySelectorAll('#featuredGrid [data-featured-card]')].find(node => node.dataset.product === id);
+    if (!card || Number(card.dataset.featureIndex || 0) === oldIndex) return false;
+    const image = card.querySelector('[data-feature-track]')?.children[Number(card.dataset.featureIndex || 0)];
+    return Boolean(image && image.complete && image.naturalWidth > 0);
+  }, { id: featuredId, oldIndex }, { timeout: 5000 }).then(() => true).catch(() => false);
+  if (!selectedLoaded) {
+    audit.flyToCartChecks.push({ context, entryPoint: 'featured-selected-image', status: 'FAIL', reason: 'The actual selected image did not load after the carousel step.' });
+    audit.hardFailures.push('Failed to load the real selected featured image for fly-to-cart acceptance.');
+    return;
+  }
+  await captureCardFlyToCartProbe(page, featuredCard.locator('.mini-add[data-add]').first(), viewport, theme, context, 'featured-selected-image');
 }
 
 async function captureProductDetailFlow(page, viewport, theme, label) {
@@ -1123,6 +1417,7 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
   });
 
   await captureAddToCartFeedback(page, viewport, theme, label, reloadState.path);
+  if (label === 'mobile-390-light') await captureCardFlyToCartSources(page, viewport, theme, label);
   const passed = directOpenPassed && reloadPassed;
   audit.productDetailChecks.push({
     context: label, status: passed ? 'PASS' : 'FAIL', path: clicked.path, directOpenPassed, reloadPassed,
@@ -1247,6 +1542,10 @@ async function main() {
     iconStateChecksComplete: audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS'),
     cartAddStateCheckCount: audit.cartAddStateChecks.length,
     cartAddStateChecksComplete: audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS'),
+    flyToCartCheckCount: audit.flyToCartChecks.length,
+    flyToCartChecksComplete: audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS'),
+    cartAnimationEdgeCheckCount: audit.cartAnimationEdgeChecks.length,
+    cartAnimationEdgeChecksComplete: audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS'),
   };
   audit.passed = audit.captureCompleted
     && completedViewportThemePairs === requiredViewportThemePairs
@@ -1261,6 +1560,8 @@ async function main() {
     && firstPaintViolationCount === 0
     && audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS')
     && audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS')
+    && audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS')
+    && audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS')
     && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
   audit.summary = {
@@ -1270,6 +1571,10 @@ async function main() {
     brokenImageContextCount: audit.brokenImages.length, sectionTargetCheckCount: audit.sectionChecks.length,
     productDetailContextCount: audit.productDetailChecks.length, commerceStateCheckCount: audit.commerceStateChecks.length,
     iconStateCheckCount: audit.iconStateChecks.length,
+    flyToCartCheckCount: audit.flyToCartChecks.length,
+    flyToCartChecksComplete: audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS'),
+    cartAnimationEdgeCheckCount: audit.cartAnimationEdgeChecks.length,
+    cartAnimationEdgeChecksComplete: audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS'),
     firstPaintFrameCount: audit.firstPaintChecks.length, firstPaintViolationCount, firstPaintCoverageComplete,
     firstPaintVideoCount: audit.videoCaptures.length, firstPaintVideoCoverageComplete,
     blockedExternalRequestCount: audit.blockedExternalRequests.length,
