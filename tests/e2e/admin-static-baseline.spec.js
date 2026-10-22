@@ -1752,10 +1752,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const orderDetailViewportWidth = page.viewportSize()?.width ?? 0;
       const expectedDetailColumns = orderDetailViewportWidth >= 360 ? 2 : 1;
       const customerGridColumns = await page.locator('#orderDetailContent .order-detail-customer-grid').evaluate(element =>
-        getComputedStyle(element).gridTemplateColumns.trim().split(/\\s+/).length
+        getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
       const itemMetaGridColumns = await page.locator('#orderDetailContent .order-detail-item .order-detail-item-grid').first().evaluate(element =>
-        getComputedStyle(element).gridTemplateColumns.trim().split(/\\s+/).length
+        getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
       expect(customerGridColumns, `Customer fields should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
       expect(itemMetaGridColumns, `Order item details should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
