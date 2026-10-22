@@ -47,7 +47,7 @@ assert.ok(html.includes('--sd-gallery-glass:rgba(248,252,255,.96)')
   && html.includes('--sd-gallery-glass:rgba(4,20,34,.94)'),
   'Later gallery material overrides must keep icons readable in light and dark themes.');
 assert.match(html, /\.slide-count,\.featured-image-count,\.detail-image-count,\.sd-fullscreen-count\{[^}]*backdrop-filter:blur\(18px\)/);
-assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.97\)!important;/,
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{\s*transform:translateY\(-50%\) scale\(\.97\)!important;/,
   'Detail and fullscreen arrows must keep their vertical centering and shrink only subtly while pressed.');
 assert.match(html, /\.detail-gallery-arrow\.tap-target:active::before,\.sd-fullscreen-arrow\.tap-target:active::before\{\s*opacity:0!important;\s*transform:scale\(\.92\)!important;/,
   'Gallery arrow presses must suppress the tap-target ripple-like overlay.');
