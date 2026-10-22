@@ -1,16 +1,15 @@
-# LIVE CONTINUITY ADDENDUM — 2026-10-22 21:20 +07:00
+# LIVE CONTINUITY ADDENDUM — 2026-10-22 21:25 +07:00
 
-This addendum supersedes any older checkpoint SHA or next-task statement below, but does not erase historical evidence.
+This addendum supersedes older checkpoint SHA and next-task statements below; historical evidence remains historical.
 
-- **Canonical state/task queue:** `docs/admin-ui-reference/handoff/current-status.json`.
-- **Start here:** `docs/admin-ui-reference/handoff/START-HERE.md`; **next-chat prompt:** `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`.
-- **ADMIN branch HEAD before this docs-only update:** `8e02cbaa0525baf895074952c5ab968f85d0dcd2`. PR #111 was OPEN/unmerged and matched at preflight. Always fetch live HEAD and PR metadata before every write; handoff commits do not make application code tested.
-- **Last exact source/test SHA:** `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Validate #39756606343 PASS and Preview #39756606227 SUCCESS (CSS signature and login/dashboard smoke only). Latest Validate #39758657800 was on docs-only SHA `e356b312e8a7af14e91da599c26f9c77c6fba18b`. Do not claim full backend QA or all-screen acceptance.
-- **Progress:** provisional 50%, no new acceptance evidence. Recalculate only from weighted, accepted items.
-- **Next task:** inspect current Product editor #4 source and approved reference for SKU verification / AI description alignment. The proposed layout change was not committed; verify the live source first, then implement a concrete fix and exact-source regression tests. Continue Product list #3, 12-screen parity, and PR #111 scope audit.
-- **Unresolved:** 12-screen parity NOT_ACCEPTED; screen #3 PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; AI grouping #11 BLOCKED pending approved contract; product image save/R2 and PRE/PRO migration DEFERRED_BY_OWNER.
-- **Hard limits:** ADMIN branch only; no merge PR #111/#108, no main/static changes, no Production deployment, no Access bypass/secrets, no remote D1/R2 writes or migrations. Do not stop after status reports; continue safe queued work.
-
+- **Canonical status/task queue:** `docs/admin-ui-reference/handoff/current-status.json`.
+- **Start / next-chat:** `docs/admin-ui-reference/handoff/START-HERE.md` and `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`.
+- **ADMIN branch:** `feature/admin-isolated-handoff-2026-10-20`; HEAD at this docs checkpoint `5c88611cd3013d83f6519576eb41040c6307bd57`; PR #111 OPEN/unmerged and matched. PR #108 remains OPEN/unmerged on the separate static branch. Fetch live HEAD/PR before each write.
+- **Latest source evidence currently recorded:** source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`; [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) SUCCESS and [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) SUCCESS; [artifact #311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829) has 99 PNGs and 75 fixture metrics. Handoff-only commits after source SHA are not tested application source.
+- **Progress:** provisional 50%, unchanged. Product list #3 PARTIAL_NOT_ACCEPTED; Product editor #4 overall parity PARTIAL_NOT_ACCEPTED; 12-screen parity NOT_ACCEPTED.
+- **Next:** continue Product list #3 reference comparison beyond the SKU-wrap fix; continue #4 and remaining screens; audit PR #111 scope.
+- **Not verified / blocked / deferred:** authenticated backend QA NOT_TESTED; AI grouping #11 BLOCKED pending approved contract; product image save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- **Hard limits:** ADMIN branch only; do not merge PR #111/#108, edit main/static, deploy Production, bypass Access, touch secrets, or write/migrate remote D1/R2. Continue safe queued work after reports.
 ---
 
 ## CONTINUITY PROTOCOL — CURRENT OPERATING RULES (2026-10-22)
