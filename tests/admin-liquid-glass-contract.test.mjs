@@ -306,3 +306,8 @@ has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobi
 
 
 console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
+
+const renderStart = adminHtml.indexOf('function render(){');
+assert.ok(renderStart >= 0 && adminHtml.slice(renderStart, renderStart + 600).includes("settingsPage();$$('[data-view]').forEach"),
+  "Admin render must iterate every navigation button; single-element querySelector cannot be used with forEach");
+console.log("PASS: Admin render iterates all nav controls via querySelectorAll helper.");
