@@ -61,3 +61,12 @@ This is the single index for test, deployment and visual-audit evidence. Repeate
 - Required viewport/theme matrix: 360×800, 390×844, 768×1024, 1440×900, each Light and Dark.
 - Preserve screenshots/artifacts in Actions; never claim visual acceptance merely because a workflow is green.
 - PR #108 stays OPEN/unmerged; Preview only. No Production/main/Admin/backend/catalog/D1/R2/secrets/bindings/DNS/Access changes.
+
+
+## Session recheck — 2026-10-23 (before evidence-only handoff commit)
+- Live branch HEAD checked: `3f53e0cf7519ae0c5d0be022657845d5eb0f414b`; PR #108 remained OPEN and unmerged. The HEAD commit only updated `docs/visual-audit-progress-2026-10-19.md`.
+- Relevant source/test blobs are unchanged between the checked HEAD, the successful Preview deployment source `33e09dd2bce4c4be1df23c65a47d93217d2153b7`, and the alias-matched deployment SHA `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d` recorded by the last available Cloudflare metadata artifact: HTML blob `d54ed03b0f40e70d02582ab3731e708b25198ffd`; product-card test blob `93999e16efc0be106f8123b124a56806563ef711`; reference-parity test blob `c693c96e7c35cda49df820635f1df4f2fc0961d7`; capture-script blob `0619bda4a7573b8bd0de23820f300b6a8af1b3e9`.
+- Source/test workflow [#39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405) completed SUCCESS on `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`. The later HEAD movement is documentation-only, so storefront code did not change after that validation.
+- Inspected visual artifact [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928), artifact ID `12453971973`: local fixture audit passed with no hard failures and no console/page/HTTP/failed-request errors. It is not a live Preview capture. Its deployment metadata gate failed closed because the matched alias deployment SHA was `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d`, not expected `33e09dd2bce4c4be1df23c65a47d93217d2153b7`.
+- Reviewed local-fixture screenshots for non-Hero product grid, cart, checkout, order process, and contact/warranty. No specific visual defect was evidenced; no UI/source changes were made. Remaining gate: an exact-SHA live Preview screenshot plus owner visual acceptance. Current web/container routes could not fetch the Preview alias; do not infer that Preview itself is down.
+- Current active item is BLOCKED on real Preview evidence or a concrete owner-observed discrepancy. Do not resume Hero and do not make speculative visual edits.

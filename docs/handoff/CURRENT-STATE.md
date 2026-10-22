@@ -42,6 +42,14 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - Current source already includes the hidden-image status, no-src behavior, collapsed visual frame, single-column fallback and regression assertions. Do not make another CSS change based only on the local screenshot without verified evidence of a real layout defect.
 - The Preview URL could not be opened through the available web viewer. Actual live Preview visual evidence and owner acceptance remain pending.
 
+## Session recheck — 2026-10-23 (snapshot before evidence update)
+
+- PR #108 remained OPEN and unmerged. The branch HEAD at this recheck was `3f53e0cf7519ae0c5d0be022657845d5eb0f414b`, a documentation-only handoff-pointer commit. Re-fetch the live HEAD before future changes.
+- Blob SHA for `public/index.html` is `d54ed03b0f40e70d02582ab3731e708b25198ffd` at current HEAD, successful Preview-deploy source `33e09dd2bce4c4be1df23c65a47d93217d2153b7`, and the alias-matched deployment SHA `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d` recorded in artifact `12453971973`. `tests/product-card-liquid-glass.test.mjs`, `tests/storefront-reference-parity.test.mjs`, and `scripts/capture-liquid-glass-preview.mjs` also have identical blob SHAs at those refs. The commit-SHA mismatch is not evidence that the storefront HTML changed.
+- The latest source-and-tests workflow available for this branch is [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405), PASS on `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`. The subsequent branch HEAD change was documentation-only; no storefront-source/test file changed.
+- Artifact [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928), artifact `12453971973`, reports local-fixture `passed: true`, `hardFailures: []`, and no console/page/HTTP/failed-request errors. Screenshots are from `http://127.0.0.1:4173`, not the live Preview. The deployment check embedded in that artifact failed closed: it expected `33e09dd2bce4c4be1df23c65a47d93217d2153b7` but matched deployment SHA `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d`.
+- Local-fixture captures for non-Hero product grid, cart, checkout, order process, and contact/warranty were reviewed. No concrete non-Hero visual defect is supported by that artifact, so no storefront source/CSS was changed. Exact-SHA live screenshot evidence and owner visual acceptance remain PENDING. The web viewer could not fetch the Preview alias and the container network could not resolve it; that is an inspection-path limitation, not evidence that the site is down.
+
 ## Immediate next actions
 1. Re-fetch current HEAD, PR #108, Actions and Cloudflare deployment metadata before any new source change.
 2. Keep Hero paused and untouched; preserve its owner-uploaded source/derivative.
