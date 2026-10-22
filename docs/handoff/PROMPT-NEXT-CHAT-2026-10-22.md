@@ -1,3 +1,15 @@
+# LATEST OVERRIDE — 2026-10-22 10:35 UTC
+
+Before any further source action, fetch branch HEAD and PR #108 again; the HEAD at review start was `7455b50179f3fa0babebab84266b67a53b8b6231`, and this handoff-only update may advance it. PR #108 stays OPEN and MUST NOT MERGE.
+
+Newer artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837) contains 128 real Preview screenshots and both icon/reference boards, but deployment verification FAILED: expected `e916ce590b6dbd720dca51405097d20333ce649b`, observed deployed commit `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. Use the images for visual observation only. The last exact-SHA-verified audit remains run #39760903036 / artifact #12418615814 / SHA `fc406599e04475e232fad790efd03d46979a5a20`.
+
+Manual review has confirmed a “Tuyển chọn 25” gallery inconsistency: image 01/19 shows black high-top boots, image 02/19 a different green/white sneaker; evidence filenames are in the visual audit note. Do not change or hide product/image mappings under this UI-only scope. Both Icon.png and Chitiet.png were freshly opened; sampled icons look broadly aligned, but ICON-PARITY stays open. The provided `/images/hero-sd-gl052.png` remains visible and untouched.
+
+Next: refresh current SHA/deployment metadata; continue only safe evidence-backed UI work; keep visual/icon parity open; never merge PR, touch Production/main/Admin/backend/product mappings or submit checkout/payment. Read CURRENT-STATE.md as source of truth.
+
+---
+
 # PROMPT CHAT MỚI — SINDAREALEST2
 Updated 2026-10-22. This prompt replaces older instructions that conflict with the canonical current-state file.
 
