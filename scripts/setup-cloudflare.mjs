@@ -145,22 +145,7 @@ async function main() {
     runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { interactive: true });
   }
 
-  let productCount = readProductCount(dbName);
-  if (freshAnswer === 'YES') {
-    if (productCount !== 0) {
-      throw new Error(`D1 đang có ${productCount} sản phẩm. Đã từ chối nạp seed để tránh khôi phục/trộn nhầm dữ liệu. Không có sản phẩm nào bị seed ghi đè.`);
-    }
-    console.log('\n4/6 · D1 đang trống; nhập seed 235 sản phẩm…');
-    runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0002_seed_products.sql'], { interactive: true });
-    productCount = readProductCount(dbName);
-    if (productCount !== 235) {
-      throw new Error(`Seed kết thúc nhưng số sản phẩm là ${productCount}, không phải 235. Đã dừng trước khi deploy; kiểm tra D1 trước khi tiếp tục.`);
-    }
-  } else {
-    console.log(`\n4/6 · Giữ nguyên dữ liệu D1 hiện tại (${productCount} sản phẩm); bỏ qua seed.`);
-  }
-
-  console.log('\n5/6 · Xác minh schema fulfillment/payment của migration 0009 trước khi deploy…');
+  console.log('\n4/6 · Xác minh schema fulfillment/payment của migration 0009 trước seed/deploy…');
   try {
     for (const query of [
       "SELECT fulfillment_type FROM products LIMIT 0;",
@@ -172,7 +157,22 @@ async function main() {
       runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { quiet: true });
     }
   } catch {
-    throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Setup đã hoàn tất các bước schema/seed trước đó nhưng bị chặn trước Pages deploy; không tự động chạy migration 0009. Không chạy lại setup mù; chỉ áp dụng migration trong cửa sổ bảo trì được chủ dự án phê duyệt, xác minh lại schema rồi chạy quy trình deploy riêng.');
+    throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Đã dừng trước bước seed và Pages deploy; script không tự động chạy migration 0009. Chỉ tiếp tục sau quy trình được chủ dự án phê duyệt và xác minh lại schema.');
+  }
+
+  let productCount = readProductCount(dbName);
+  if (freshAnswer === 'YES') {
+    if (productCount !== 0) {
+      throw new Error(`D1 đang có ${productCount} sản phẩm. Đã từ chối nạp seed để tránh khôi phục/trộn nhầm dữ liệu. Không có sản phẩm nào bị seed ghi đè.`);
+    }
+    console.log('\n5/6 · D1 đang trống; nhập seed 235 sản phẩm…');
+    runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0002_seed_products.sql'], { interactive: true });
+    productCount = readProductCount(dbName);
+    if (productCount !== 235) {
+      throw new Error(`Seed kết thúc nhưng số sản phẩm là ${productCount}, không phải 235. Đã dừng trước khi deploy; kiểm tra D1 trước khi tiếp tục.`);
+    }
+  } else {
+    console.log(`\n5/6 · Giữ nguyên dữ liệu D1 hiện tại (${productCount} sản phẩm); bỏ qua seed.`);
   }
 
   console.log('\n6/6 · Triển khai website cùng Pages Functions…');
