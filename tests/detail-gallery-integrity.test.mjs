@@ -83,7 +83,7 @@ assert.ok(html.includes('<style id="sd-gallery-opaque-satin-surface-2026-10-22">
   && html.includes('html.dark .sd-fullscreen-viewer.open{\n  background:rgba(3,18,32,.96)!important;')
   && html.includes('backdrop-filter:blur(30px) saturate(145%)!important;'),
   'The open fullscreen gallery must retain theme-aware satin glass while suppressing underlying storefront text.');
-assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.97\)!important;/,
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{\s*transform:translateY\(-50%\) scale\(\.97\)!important;/,
   'Detail and fullscreen arrows must keep their vertical centering and shrink only subtly while pressed.');
 assert.match(html, /\.detail-gallery-arrow\.tap-target:active::before,\.sd-fullscreen-arrow\.tap-target:active::before\{\s*opacity:0!important;\s*transform:scale\(\.92\)!important;/,
   'Gallery arrow presses must suppress the tap-target ripple-like overlay.');
