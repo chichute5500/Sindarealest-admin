@@ -1,5 +1,16 @@
 # Kiểm toán mức độ đầy đủ của prompt bàn giao ADMIN
 
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T15:33:00+07:00
+
+- HEAD lúc kiểm tra: `5a34c38a12fdd02918458a839becbc583895e66d`. Validate Source [#39744215657](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744215657) **SUCCESS** đúng SHA `11b23bb90fe7b0f6595da021d3bf1649b586c97c`.
+- Preview gần nhất [#39742949583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583) **SUCCESS** nhưng chỉ trên SHA cũ `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`; Preview trên HEAD lúc checkpoint **NOT VERIFIED**.
+- Artifact gần nhất [admin-preview-evidence-297 / 12409713973](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973): 99 ảnh kiểm thử (16 login + 83 fixture), 75 metrics. Fixture-only; authenticated backend QA chưa thực hiện.
+- Tiến độ giữ **50%**; 12-screen parity **NOT ACCEPTED**, màn #3/#4/#5 còn PARTIAL, AI grouping #11 BLOCKED; R2 image save và PRE/PRO migrations DEFERRED_BY_OWNER.
+- PR #111 và #108 OPEN/unmerged. Chỉ ADMIN branch; không main/static/Production/Access/secrets/D1/R2/migration writes.
+- Những phần đánh giá trước checkpoint này là lịch sử; không được diễn giải Preview cũ là bằng chứng cho HEAD mới.
+
+---
+
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T14:56:46.664+07:00
 
 - Validate Source [#39742949748](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748) và Preview/Playwright [#39742949583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583) đều **SUCCESS** trên exact source/test SHA `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`.
