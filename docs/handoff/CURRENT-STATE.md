@@ -18,6 +18,13 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - Do not restore obsolete `hero-sd-gl052.png`. Do not resume Hero design work until the owner asks.
 - Required visual condition: no empty Hero frame, reserved blank space, or layout regression on mobile/desktop in Light/Dark.
 
+## Owner-approved working protocol (2026-10-23)
+- Work one acceptance item to completion before switching to the next main item.
+- Do not stop after a progress report. While CI/deploy/capture runs, work immediately on independent, non-conflicting preparation/inspection; resume checking results as soon as available.
+- Reuse valid checks for unchanged code and run only missing/stale/impacted checks. Never duplicate a workflow or apply a result to a different SHA.
+- Keep separate gates for source tests, deployment SHA, live screenshots, and owner visual acceptance.
+- Owner-confirmed PASS locks that item until explicit permission to reopen. Do not ask the owner to approve these already-agreed process rules again.
+
 ## Latest branch / workflow evidence (exact SHA only)
 - Latest code/workflow-changing commit: `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`. It changes only four workflow files under `.github/workflows/`; the subsequent handoff refresh is documentation-only. Always re-fetch the live branch HEAD before acting; do not infer it from this file.
 - Source integrity, dependency audit and full automated tests: PASS on this exact SHA — [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405).
