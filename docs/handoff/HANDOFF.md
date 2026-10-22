@@ -7,6 +7,10 @@
 - Preview only. Do not touch Production/main, Admin, backend/API/auth/schema/business logic, product data/mappings, D1/R2, bindings, secrets, DNS or Access policy.
 - Preserve owner-provided hero `/images/hero-sd-gl052.png`. QR/payment stays fail-closed until trusted backend configuration exists.
 
+
+## Latest inspection note — 2026-10-22
+The newer artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837) has 128 genuine Preview captures and both references/icon boards, but its deployment-verification JSON is `DEPLOYMENT_METADATA_UNVERIFIED` (`e916ce...` expected versus deployed `5f1be31...`). Use it for visual observation only, not exact-SHA acceptance. Read CURRENT-STATE.md for the full screenshot review. The “Tuyển chọn 25” gallery is visibly inconsistent (black boots on image 01/19; different green/white sneaker on image 02/19); product/image mapping remains out of scope and unchanged.
+
 ## How to continue
 1. Read [CURRENT-STATE.md](CURRENT-STATE.md), then fetch current branch and PR HEAD.
 2. Read [TEST-RESULTS.md](TEST-RESULTS.md) and [TASKS.md](TASKS.md) for exact-SHA evidence and outstanding work.
