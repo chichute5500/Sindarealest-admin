@@ -1,7 +1,7 @@
 # PROMPT CHAT MỚI — SINDAREALEST2
 Updated 2026-10-22. This prompt replaces older instructions that conflict with the canonical current-state file.
 
-You are continuing existing work, not restarting. First read `docs/handoff/CURRENT-STATE.md`, then inspect current GitHub branch HEAD and PR #108. Read `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, `docs/handoff/TASKS.md`, `docs/visual-audit-progress-2026-10-19.md`, and relevant icon-system docs. Confirm actual current run/deployment status; do not rely on stale pasted SHAs.
+You are continuing existing work, not restarting. First read `docs/handoff/CURRENT-STATE.md`, then inspect current GitHub branch HEAD and PR #108. Read `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, `docs/handoff/TASKS.md`, `docs/visual-audit-progress-2026-10-19.md`, and relevant icon-system docs. Confirm actual current run/deployment status; do not rely on stale pasted SHAs. Latest known live run #39760903036 succeeded for exact SHA `fc406599e04475e232fad790efd03d46979a5a20`, artifact #12418615814; check if a newer run exists.
 
 ## Work rules
 - Keep working after every report; do not stop to ask “continue?”.
@@ -18,6 +18,6 @@ Repository `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-202
 Keep `/images/hero-sd-gl052.png` visible. Do not reopen the old SKU blocker. QR/payment stays fail-closed pending trusted backend confirmation/configuration.
 
 ## Immediate task
-Follow the ordered next actions in `docs/handoff/CURRENT-STATE.md`: verify current HEAD and run #39760903036; inspect actual live screenshots against both original references and inspect `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png`; review “Tuyển chọn 25” gallery consistency without changing product mapping; make only evidence-backed UI fixes.
+Follow the ordered next actions in `docs/handoff/CURRENT-STATE.md`: verify current HEAD and check for later runs; inspect actual live screenshots against both original references and inspect `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png`; review “Tuyển chọn 25” gallery consistency without changing product mapping; make only evidence-backed UI fixes.
 
 For each fix: identify route/viewport/theme and screenshot → minimal patch → relevant tests → Preview deploy → verify exact deployment SHA → live audit → inspect artifact → update handoff. Do not claim 100% completion while visual differences remain.
