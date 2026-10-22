@@ -1504,6 +1504,26 @@ async function captureSupplementalParityChecks(browser) {
     if (!notFoundPassed) audit.hardFailures.push('Direct unknown route must return HTTP 404 and render the accessible 404 view.');
     await capture(page, 'not-found-mobile-light-390x844.png', false, { ...captureMeta(viewport, theme, missingPath), captureType: 'not-found', state: 'not-found' });
 
+    // Verify the standalone Pages 404 in Dark mode too, not only its CSS source.
+    const dark404State = await page.evaluate(() => {
+      document.documentElement.classList.add('dark');
+      const title = document.querySelector('#notFoundTitle');
+      return {
+        darkClass: document.documentElement.classList.contains('dark'),
+        backgroundImage: getComputedStyle(document.body).backgroundImage,
+        titleColor: title ? getComputedStyle(title).color : '',
+        heading: (title?.textContent || '').trim(),
+        homeHref: document.querySelector('#notFoundPage a[href="/"]')?.getAttribute('href') || null,
+      };
+    }).catch(() => ({ darkClass: false, backgroundImage: '', titleColor: '', heading: '', homeHref: null }));
+    const dark404Passed = dark404State.darkClass
+      && dark404State.backgroundImage.includes('liquid-glass-dark-mobile.svg')
+      && dark404State.titleColor === 'rgb(234, 243, 251)'
+      && dark404State.heading === '404' && dark404State.homeHref === '/';
+    audit.notFoundChecks[0].darkTheme = { ...dark404State, status: dark404Passed ? 'PASS' : 'FAIL' };
+    if (!dark404Passed) audit.hardFailures.push('The standalone 404 must render its dark satin background, readable heading, and home link.');
+    await capture(page, 'not-found-mobile-dark-390x844.png', false, { ...captureMeta(viewport, 'dark', missingPath), captureType: 'not-found', state: 'not-found' });
+
     await page.goto(origin + '/', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await waitForStorefront(page, label); await dismissWelcomeSplash(page); await settle(page);
     const firstTitle = (await page.locator('#catalogGrid .product-title').first().innerText().catch(() => '')).trim();
@@ -1684,7 +1704,7 @@ async function main() {
     flyToCartChecksComplete: audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS'),
     cartAnimationEdgeCheckCount: audit.cartAnimationEdgeChecks.length,
     cartAnimationEdgeChecksComplete: audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS'),
-    notFoundChecksComplete: audit.notFoundChecks.length === 1 && audit.notFoundChecks.every(check => check.status === 'PASS'),
+    notFoundChecksComplete: audit.notFoundChecks.length === 1 && audit.notFoundChecks.every(check => check.status === 'PASS' && check.darkTheme?.status === 'PASS'),
     searchChecksComplete: audit.searchChecks.length === 1 && audit.searchChecks.every(check => check.status === 'PASS'),
     zaloChecksComplete: audit.zaloChecks.length === 1 && audit.zaloChecks.every(check => check.status === 'PASS'),
   };
@@ -1703,6 +1723,7 @@ async function main() {
     && audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS')
     && audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS')
     && audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS')
+    && audit.coverage.notFoundChecksComplete
     && audit.notFoundChecks.length === 1 && audit.notFoundChecks.every(check => check.status === 'PASS')
     && audit.searchChecks.length === 1 && audit.searchChecks.every(check => check.status === 'PASS')
     && audit.zaloChecks.length === 1 && audit.zaloChecks.every(check => check.status === 'PASS')

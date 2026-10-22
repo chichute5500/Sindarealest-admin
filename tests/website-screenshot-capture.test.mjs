@@ -435,3 +435,8 @@ assert.match(live, /isExpectedNotFoundResponse\(sourceUrl, 404\)[\s\S]*msg\.text
   'Only Chromium’s generic 404 console message for the dedicated unknown-route probe may be excluded.');
 assert.match(live, /!isExpectedNotFoundResponse\(res\.url\(\), res\.status\(\)\)/,
   'Other same-origin HTTP errors must remain visible to the live audit.');
+
+assert.match(live, /not-found-mobile-dark-390x844\.png[\s\S]*notFoundChecks\[0\]\.darkTheme[\s\S]*liquid-glass-dark-mobile\.svg/,
+  'The live audit must capture and validate the standalone 404 in Dark mode, not just inspect its CSS.');
+assert.match(live, /notFoundChecksComplete:[^\n]*darkTheme\?\.status === 'PASS'/,
+  'Overall live audit acceptance must require the Dark 404 visual check to pass.');
