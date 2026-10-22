@@ -1,32 +1,33 @@
 # LATEST STATUS — SinDarealest Admin
 
-**Tiến độ sản phẩm: 50% PROVISIONAL.** Checkpoint live 2026-10-22T16:15:00Z. Handoff được sửa vì các bản trước vẫn xem run #39804852604 là lỗi hiện hành dù đã có run mới hơn PASS.
+**Checkpoint 2026-10-22. Progress: 50% PROVISIONAL.** Handoff/fixture-only work does not increase product progress.
 
-## Trạng thái live
-- Repo: [chichute5500/Sindarealest-admin](https://github.com/chichute5500/Sindarealest-admin)
-- PR #111: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), nhánh `feature/admin-isolated-handoff-2026-10-20`, HEAD khi bắt đầu checkpoint `074d8ef712914d456754bdedb26e87c7fc00c5ad`, 1,310 changed files, mergeable=false.
-- PR #108: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), nhánh `fix/liquid-glass-audit-2026-10-19`, HEAD `8976c1e09cacf540c1a5b499455482bf75785705`, 288 changed files, mergeable=false, read-only.
-- Source/test SHA mới nhất đã được xác minh: `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`. HEAD nhánh có thêm commit lưu evidence; handoff-only commit không đổi kết quả code/test.
+## Live PR state
+- PR #111 [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), only writable branch `feature/admin-isolated-handoff-2026-10-20`. HEAD before this handoff batch: `0502739790fecfdf56f3c267dcaf607f1751908e`; re-fetch live after commit.
+- PR #108 [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), static branch read-only, latest observed HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`.
+- No PR merged, no Production deploy, no writes to main or static branch.
 
-## Kiểm thử chính xác SHA
-- [Actions run #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576): **SUCCESS** trên `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`.
-- Job #119939493068: repository checks, automated tests, Chromium install, local read-only preview, responsive/theme screenshot matrix, deployed Preview diagnostic, persist test state và upload evidence đều SUCCESS. “Report missing Preview configuration” SKIPPED.
-- Artifact [admin-preview-evidence-339, ID 12441015558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558): 102 PNG (16 login shell, 86 fixture module screens), 78 fixture metrics; không có page errors, console errors, failed requests, HTTP errors, attempted writes hoặc API path ngoài dự kiến trong kết quả đã ghi.
-- Run #39804852564 PASS source/unit checks trên SHA cũ `326526f8...`; run #39804852604 FAIL ở screenshot matrix trên SHA cũ do timeout selector `retry-customers`. Run mới hơn #39811730576 thay thế tình trạng lỗi đó cho SHA mới; không tiếp tục debug selector cũ khi chưa có bằng chứng mới.
+## Exact-SHA checks
+- Tested source/test SHA [`4b2220d510a906882e4309df6969c0c43514c421`](https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421).
+- Validate [#39813340342](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342): **PASS** (`npm run check`, `npm test`).
+- Preview [#39813340309](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309): **PASS**; Playwright screenshot matrix and deployed Preview login CSS diagnostic passed.
+- Artifact [admin-preview-evidence-340 / 12439794397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397): 102 PNGs (16 login shell + 86 fixture/module screenshots), 78 fixture metrics.
+- Fixture evidence reports 0 page errors, 0 failed requests/unexpected API paths/attempted writes; seven synthetic HTTP 503 console messages are deliberate retry tests. `PASS_LOGIN_CSS_SIGNATURE` tests the Preview login CSS selector only, not authenticated backend behavior.
+- Mobile toast overlap fix is verified with geometry regression and `warranties-responsive__320x640__light.png` in artifact #340.
 
-## Acceptance chưa xong
-- 12/12 màn hình: **PARTIAL_NOT_ACCEPTED**; fixture/screenshot PASS không đồng nghĩa parity được duyệt hoặc backend authenticated PASS.
-- Customers/Warranty: test 503 → error/retry → fixture recovery đã nằm trong lượt Playwright thành công; live customer/warranty backend vẫn NOT_TESTED.
-- Settings: QR unsaved-change guard có source/fixture evidence; save thật và kích hoạt QR thật NOT_VERIFIED.
-- Backup/Restore: chưa chứng minh một chu trình export/import thật.
-- Activity log: dữ liệu fixture, audit log thực authenticated NOT_TESTED.
-- Gallery: cần đối chiếu visual với reference, đặc biệt rail thumbnail và trạng thái/điều khiển ảnh.
-- PR #111 provenance: PARTIAL. Tổng 1,310 file live; kiểm kê nhóm 1,304 file cũ là historical, phải làm mới từ danh sách file live.
+## Issues fixed and verified
+- [`2e7123c`](https://github.com/chichute5500/Sindarealest-admin/commit/2e7123c7dc694efa88a7bfa8902845048eb93db5): retry fixture preserves 503 until Retry controls render.
+- [`88d6f37`](https://github.com/chichute5500/Sindarealest-admin/commit/88d6f372c70cb6bf43ff4d7c670f470d652bd3c4): mobilecards assertion reflects `display:flex`.
+- [`483a039`](https://github.com/chichute5500/Sindarealest-admin/commit/483a03966ba2d1d2e46d2723f440b97ebc31d0e4): Activity Log screenshot waits for async refresh to finish.
+- [`4b2220d`](https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421): toast positioned above fixed mobile navigation; run #39813340309 passed.
 
-## Giới hạn không thay đổi
-Không merge PR, không sửa `main`/nhánh static, không deploy Production, không bypass Access/đụng secrets, không remote D1/R2 hoặc chạy setup/migration/deploy scripts. Migration 0009/PRE-PRO và R2 persistence vẫn DEFERRED_BY_OWNER; không tạo dữ liệu kinh doanh giả.
+## What is still not accepted
+All 12 screens remain **PARTIAL_NOT_ACCEPTED**. Customers/Warranty synthetic retry passes but live backend is untested; Settings real persistence/QR activation unverified; Backup/Restore has no real export/import cycle; Activity Log uses fixtures; Product Gallery still needs visual comparison and R2 persistence is deferred. Remote D1 schema/payment ledger NOT_VERIFIED. Migration 0009, PRE/PRO and R2 are DEFERRED_BY_OWNER.
 
 ## Next
-1. So sánh artifact #339 với `admin-mobile-reference.png` theo viewport/theme; ghi tên file evidence và từng sai khác trước khi sửa.
-2. Audit changed-file provenance PR #111 từ paginated live filenames theo batch; ưu tiên file runtime/API/migration/setup/workflow ngoài phạm vi Admin UI.
-3. Sau mỗi thay đổi nguồn, kiểm tra đúng SHA; đồng bộ JSON/Markdown và fetch lại HEAD/PR.
+1. Compare artifact #340 with `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme, prioritizing Gallery (#5) then #8–#12. Record exact image path and observed difference before changing code.
+2. Continue PR #111 provenance review over 1,310 live paths; recalculate ahead/behind/merge-base from exact refs before relying on them.
+3. For missing authenticated Preview access, record BLOCKED. Never bypass Access.
+
+## Guardrails
+Only write ADMIN branch. Keep PR #111/#108 open/unmerged. No main/static edits, Production deploy, Access bypass, secrets access, remote D1/R2 operations or setup/migration/deploy scripts. Never invent business data/API contracts.

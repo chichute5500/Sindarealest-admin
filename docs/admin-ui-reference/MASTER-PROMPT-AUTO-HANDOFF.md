@@ -1,33 +1,34 @@
 # SINDAREALEST ADMIN — MASTER PROMPT (LIVE)
 
-> **Single entry point for every chat:** [handoff/START-HERE.md](handoff/START-HERE.md). Send only its one-line starter. Fetch GitHub live state before doing work; do not request the owner's old prompts or repeat completed tasks.
-
-## Live checkpoint — 2026-10-22
-- Repo `chichute5500/Sindarealest-admin`; writable ADMIN branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN/unmerged.
-- Protected website/static branch `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN/unmerged and read-only.
-- Latest source/test SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; [Actions #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576) SUCCESS and screenshot artifact [#339](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558).
-- Prior run #39804852604 failed on an older SHA at the retry-customers Playwright selector. The newer run passed. Do not treat the obsolete failure as active work.
-- Progress stays 50% PROVISIONAL; all 12 screens remain PARTIAL_NOT_ACCEPTED; live authenticated backend acceptance is NOT_TESTED.
+> **Single entry point:** read [`handoff/START-HERE.md`](handoff/START-HERE.md). Do not ask the owner to paste old prompts/history. Latest tested source/test SHA `4b2220d510a906882e4309df6969c0c43514c421`: Validate #39813340342 PASS; Preview #39813340309 PASS. [Artifact #12439794397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397) contains 102 PNGs / 78 fixture metrics. Mobile toast/navigation overlap is fixed and geometry-tested. All 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
 
 ## Mission
-Continue real GitHub work after each short Vietnamese checkpoint. Do not stop at analysis/reporting if a safe actionable task remains. Make small evidence-based changes, validate exact SHAs, then synchronize the handoff.
+Do real GitHub work, not only analysis/reporting. After each checkpoint continue to the next safe evidence-backed task; stop only if owner authority/access is truly required or no safe task remains.
 
-## UI reference and acceptance
-Use `docs/admin-ui-reference/admin-mobile-reference.png` as the visual standard. Official screen mapping is `handoff/12-SCREEN-REFERENCE-AUDIT.md`. Mobile-first Luxury Minimalism / Liquid Glass; light/dark, Vietnamese text, keyboard/focus/accessibility, no clipping/overlap. Compare identical viewport/theme; record the actual tested combinations. Preserve authentication, business logic and API contracts.
+## Repository / branch isolation
+- Repo `chichute5500/Sindarealest-admin`.
+- Only writable branch: `feature/admin-isolated-handoff-2026-10-20`, PR #111.
+- Protected website/static branch: `fix/liquid-glass-audit-2026-10-19`, PR #108; read-only.
+- Fetch live PR/branch HEAD and Actions before writing. Test SHA and docs-only HEAD are distinct.
+- No merge, rebase, blind revert, cherry-pick, force-push or cross-branch write. Verify provenance before edits.
+
+## Forbidden
+- No Production deployment; no Cloudflare Access bypass; no secret access/exposure/change.
+- No remote D1/R2 writes, migration, setup or deploy-script execution. R2 persistence and migration 0009/PRE/PRO are DEFERRED_BY_OWNER.
+- No invented product/customer/order/price/stock/image facts or unapproved API routes/contracts.
+- QR must not encode payment amount; manual payment confirmation follows `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`.
+
+## Visual / functional acceptance
+- Reference: `docs/admin-ui-reference/admin-mobile-reference.png`; screen map: `handoff/12-SCREEN-REFERENCE-AUDIT.md`.
+- Luxury-minimalist Liquid Glass, mobile-first Vietnamese UI, light/dark, no clipping/overlap, accessible focus/targets, preserve auth/business/API behavior.
+- Viewports: 320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900.
+- Status vocabulary: PASS, PARTIAL_NOT_ACCEPTED, FAIL, BLOCKED, NOT_TESTED, NOT_VERIFIED, DEFERRED_BY_OWNER.
+- Green CI and synthetic fixtures are not authenticated backend QA or complete visual acceptance. Keep progress 50% PROVISIONAL until weighted product acceptance improves.
 
 ## Execution loop
-1. Fetch live PR #111/#108 metadata, branch HEAD, relevant Actions run and artifact.
-2. Read current-status JSON, test JSON and the relevant audit.
-3. Pick the highest-value unresolved safe task; don't repeat green exact-SHA tests without a concrete reason.
-4. Reproduce the issue, make the smallest ADMIN-only change and add regression coverage where appropriate.
-5. Validate on the exact new SHA; inspect matching screenshot evidence.
-6. Update handoff JSON/Markdown, reread it, then refetch live HEAD/PR.
-7. Continue with the next safe task.
-
-Use PASS, FAIL, PARTIAL_NOT_ACCEPTED, BLOCKED, NOT_TESTED, NOT_VERIFIED, DEFERRED_BY_OWNER truthfully. CI/fixtures do not equal authenticated backend QA.
-
-## Hard safety boundaries
-- Do not merge PRs, edit `main` or the static branch, force-push, cherry-pick blindly, or deploy Production.
-- No Cloudflare Access bypass, secret access/exposure/change, remote D1/R2/schema/ledger operation, or execution of setup/migration/deploy scripts.
-- PRE/PRO migrations, migration 0009 and product-image/R2 persistence remain DEFERRED_BY_OWNER.
-- No fabricated products, prices, stock, images, customers, orders, payment status or unapproved API/route contracts.
+1. Fetch live PR #111/#108, branch HEAD and Actions.
+2. Read the canonical handoff and relevant source/reference/artifact.
+3. Reproduce a concrete gap, make the smallest ADMIN-only change and add regression coverage.
+4. Validate the exact SHA and inspect screenshots at matching viewport/theme.
+5. Update state/test JSON, status, START-HERE, next-chat prompt, completeness/screen/scope audits and this master prompt together in one atomic commit per meaningful checkpoint; do not commit individual docs or write while Preview saves artifacts.
+6. Read back changes, validate JSON, fetch live HEAD/PR, and continue safely.
