@@ -308,11 +308,11 @@ assert.ok(
   "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the full, unprocessed image remains visible."
 );
 
-// The bottom Products tab follows the shopping-bag icon in the approved icon reference. 
-const mobileProductTab = html.match(/<a class="mobile-tab" href="#products" data-mobile-tab="products">([\\s\\S]*?)<\\/a>/)?.[1] || '';
-assert.match(mobileProductTab, /<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"\\/><path d="M9 8V6a3 3 0 0 1 6 0v2"\\/><\\/svg>/,
+// The bottom Products tab follows the shopping-bag icon in the approved icon reference.
+const mobileProductTab = html.match(/<a class="mobile-tab" href="#products" data-mobile-tab="products">([\s\S]*?)<\/a>/)?.[1] || '';
+assert.match(mobileProductTab, /<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"\/><path d="M9 8V6a3 3 0 0 1 6 0v2"\/><\/svg>/,
   'The mobile Products tab must use the shopping-bag outline specified by the icon reference.');
-assert.doesNotMatch(mobileProductTab, /<rect x="4" y="4" width="16" height="16" rx="3"\\/>/,
+assert.doesNotMatch(mobileProductTab, /<rect x="4" y="4" width="16" height="16" rx="3"\/>/,
   'The mobile Products tab must not regress to the generic document/list icon.');
 
 // Reference-driven icon pass: replace the five text glyphs in order flow/aftercare with coherent 24x24 SVG strokes.
