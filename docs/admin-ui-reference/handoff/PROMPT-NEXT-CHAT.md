@@ -18,3 +18,11 @@ Repository: `chichute5500/Sindarealest-admin`.
 3. Do not edit `public/index.html`, `main`, PR #108 or the static branch. Keep PR #111 and #108 OPEN/unmerged.
 4. No merge, force-push, Production deploy, Cloudflare Access bypass, secret access, remote D1/R2/schema/ledger operations, or setup/migration/deploy scripts. Migration 0009, PRE/PRO and R2/product-image save remain DEFERRED_BY_OWNER; AI grouping requires an owner-approved API/UX contract.
 5. After each checkpoint, synchronize the handoff, read it back, refetch HEAD/PR/Actions and continue working. Do not increase progress without acceptance evidence.
+
+## Live checkpoint — 2026-10-23
+- PR #111 HEAD: `ae7e915d7de15f4f0a03f59d1caaad39fc6a9231`, OPEN/unmerged, 385 changed paths (+38,879/−211), mergeable=false. Exact-SHA Actions/status lookup returned no runs/checks; validation is NOT_VERIFIED.
+- PR #108 remains OPEN/unmerged and read-only. No changes to PR #108, `main`, or the static website branch.
+- Reconciled one stale instruction in `reference-instructions.md`: current PR #111 changed-path census does not include `public/index.html`; `public/admin/index.html` is the ADMIN UI source. Always re-fetch the live file list.
+- Provenance review: `tests/e2e/admin-static-baseline.spec.js` is invoked directly by `.github/workflows/admin-preview-diagnostics.yml`; `tests/e2e/admin-preview.spec.js` is conditionally invoked by the same workflow. Both are live dependencies and must not be deleted. `playwright.config.js` was not found at this branch ref, but that alone is not grounds to remove configuration references without reviewing package/runner defaults.
+- B1 cleanup of previously identified generated screenshots and stale handoff snapshots remains complete. Full provenance review remains PARTIAL; no speculative deletion or merge.
+- Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
