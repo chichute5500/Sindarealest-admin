@@ -83,10 +83,14 @@ assert.match(css, /\.service-strip \.service-icon\{[^}]*border:1px solid rgba\(1
   'Reference-aligned benefit icons must have a subtle rounded glass chip inside each tile.');
 assert.match(css, /html\.dark \.service-strip \.service-icon\{[^}]*border-color:rgba\(204,231,250,\.38\)[^}]*background:rgba\(130,179,215,\.16\)[^}]*box-shadow:/,
   'Dark mode must use its own restrained translucent icon-chip surface.');
-assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-icon\{flex-basis:19px;width:19px;height:19px\}[\s\S]*?\.service-strip \.service-icon svg\{width:12px;height:12px\}/,
+assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.service-strip \.service-icon\{flex-basis:25px;width:25px;height:25px\}[\s\S]*?\.service-strip \.service-icon svg\{width:15px;height:15px\}/,
   'Mobile icon chips and symbols must shrink to protect the 3×2 tile layout.');
-assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-icon\{flex-basis:18px;width:18px;height:18px\}[\s\S]*?\.service-strip \.service-icon svg\{width:11px;height:11px\}/,
+assert.match(css, /@media\(max-width:390px\)\{[\s\S]*?\.service-strip \.service-icon\{flex-basis:23px;width:23px;height:23px\}[\s\S]*?\.service-strip \.service-icon svg\{width:14px;height:14px\}/,
   'Very narrow phones must use smaller icon chips and symbols.');
+assert.match(css, /\.service-strip \.service-icon\{[^}]*flex:0 0 28px[^}]*width:28px;height:28px/,
+  'Desktop benefit icon chips must be large enough to match the approved glass-icon reference.');
+assert.match(css, /\.service-strip \.service-icon svg\{display:block;width:17px;height:17px/,
+  'Desktop benefit SVG strokes must stay legible at the larger reference-aligned chip scale.');
 const lightThemeTokens = html.match(/:root\{([^}]*)\}/)?.[1] || '';
 const darkThemeTokens = html.match(/html\.dark\{([^}]*)\}/)?.[1] || '';
 assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(255,255,255,\.88\)/,

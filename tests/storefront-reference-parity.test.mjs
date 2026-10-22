@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const desktopLight = readFileSync(new URL('../public/images/liquid-glass-light.svg', import.meta.url), 'utf8');
+const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
 const desktopDark = readFileSync(new URL('../public/images/liquid-glass-dark.svg', import.meta.url), 'utf8');
 const mobileLight = readFileSync(new URL('../public/images/liquid-glass-light-mobile.svg', import.meta.url), 'utf8');
 const mobileDark = readFileSync(new URL('../public/images/liquid-glass-dark-mobile.svg', import.meta.url), 'utf8');
@@ -33,13 +34,13 @@ function assertSatinFoldContrast(name, svg, maxBody, maxShadow, maxShade, maxHig
     assert.ok(values.length > 0, name + ' must keep the ' + layer + ' satin layer.');
     return Math.max(...values);
   };
-  assert.ok(maxOpacityFor('body') >= 0.12, name + ' body folds must remain visibly defined against the satin base.');
+  assert.ok(maxOpacityFor('body') >= 0.14, name + ' body folds must remain visibly defined against the satin base.');
   assert.ok(maxOpacityFor('body') <= maxBody, name + ' body folds must remain subtle, not broad ribbon bands.');
-  assert.ok(maxOpacityFor('shadow') >= 0.02, name + ' fold shadows must define the crease without forming rings.');
+  assert.ok(maxOpacityFor('shadow') >= 0.035, name + ' fold shadows must define the crease without forming rings.');
   assert.ok(maxOpacityFor('shadow') <= maxShadow, name + ' fold shadows must not form dark rings.');
-  assert.ok(maxOpacityFor('inner-shade') >= 0.07, name + ' inner creases must stay visible at the fold edge.');
+  assert.ok(maxOpacityFor('inner-shade') >= 0.10, name + ' inner creases must stay visible at the fold edge.');
   assert.ok(maxOpacityFor('inner-shade') <= maxShade, name + ' inner creases must stay quiet.');
-  assert.ok(maxOpacityFor('highlight') >= 0.21, name + ' satin highlights must be visible but remain thin.');
+  assert.ok(maxOpacityFor('highlight') >= 0.24, name + ' satin highlights must be visible but remain thin.');
   assert.ok(maxOpacityFor('highlight') <= maxHighlight, name + ' highlights must read as fine satin, not bright strokes.');
 }
 assertSatinFoldContrast('Desktop light satin', desktopLight, 0.15, 0.05, 0.13, 0.25);
@@ -74,10 +75,14 @@ assertFineSatinMicroCreases('Mobile dark satin', mobileDark, 8);
 
 
 
-assert.match(html, /liquid-glass-light\.svg\?v=20261022-2/);
-assert.match(html, /liquid-glass-dark\.svg\?v=20261022-2/);
-assert.match(html, /liquid-glass-light-mobile\.svg\?v=20261022-2/);
-assert.match(html, /liquid-glass-dark-mobile\.svg\?v=20261022-2/);
+assert.match(html, /liquid-glass-light\.svg\?v=20261022-3/);
+assert.match(html, /liquid-glass-dark\.svg\?v=20261022-3/);
+assert.match(html, /liquid-glass-light-mobile\.svg\?v=20261022-3/);
+assert.match(html, /liquid-glass-dark-mobile\.svg\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-light-mobile\\.svg\\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-dark-mobile\\.svg\\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-light\\.svg\\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-dark\\.svg\\?v=20261022-3/);
 
 const end = html.indexOf('/* sd-static-reference-final-pass-2026-10-21 */');
 assert.ok(end >= 0, 'The final storefront visual-pass stylesheet must remain identifiable.');
@@ -126,10 +131,10 @@ assert.ok(welcomeGuard.includes('body.welcome-active #mobileBottomNav{display:no
 assert.ok(welcomeGuard.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}'),
   'The DOM splash selector remains a secondary guard for the welcome lifecycle.');
  
-assert.match(desktopLight, /data-satin-style="fine-satin-creases-v11"/);
-assert.match(desktopDark, /data-satin-style="fine-satin-creases-v12"/);
-assert.match(mobileLight, /data-satin-style="fine-satin-creases-v11"/);
-assert.match(mobileDark, /data-satin-style="fine-satin-creases-v12"/);
+assert.match(desktopLight, /data-satin-style="fine-satin-creases-v12"/);
+assert.match(desktopDark, /data-satin-style="fine-satin-creases-v13"/);
+assert.match(mobileLight, /data-satin-style="fine-satin-creases-v12"/);
+assert.match(mobileDark, /data-satin-style="fine-satin-creases-v13"/);
 
 assert.ok(finalCss.includes('@media(min-width:761px){')
   && finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy{')
@@ -208,10 +213,10 @@ for (const [name, svg] of [['mobile light', mobileLight], ['mobile dark', mobile
 assert.match(html, /--sd-reference-surface-strong:rgba\(249,253,255,\.95\)/,
   'Light theme drawers must use an opaque enough frosted-glass surface for readable commerce content.');
 
-assert.ok(html.includes("images/liquid-glass-light.svg?v=20261022-2"));
-assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261022-2"));
-assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261022-2"));
-assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261022-2"));
+assert.ok(html.includes("images/liquid-glass-light.svg?v=20261022-3"));
+assert.ok(html.includes("images/liquid-glass-dark.svg?v=20261022-3"));
+assert.ok(html.includes("images/liquid-glass-light-mobile.svg?v=20261022-3"));
+assert.ok(html.includes("images/liquid-glass-dark-mobile.svg?v=20261022-3"));
 assert.doesNotMatch(html, /liquid-glass-(?:light|dark)(?:-mobile)?\.svg\?v=20261021-1(?:\D|$)/,
   'All four satin backgrounds must use the updated cache key.');
 
