@@ -5,6 +5,7 @@ Current facts and next-step order: [CURRENT-STATE.md](CURRENT-STATE.md). This le
 ## Open work
 | ID | Status | Next action / acceptance |
 |---|---|---|
+| STARTUP-FIRST-PAINT | PASS — CAPTURED RUNS | Artifact #12418823837: all four startup videos (360/390, Light/Dark), 107 timeline samples, 0 violations; bottom nav/account drawer remain hidden while splash owns screen. Caveat: deployment metadata SHA mismatch; observational evidence only, no rerun absent contrary evidence. |
 | VISUAL-PARITY | IN_PROGRESS | Manual review completed on observational artifact #12418823837 across all 8 home viewport/theme pairs and key mobile states; its deployment SHA gate failed, so exact-SHA visual acceptance remains pending. Continue reviewing safe visual mismatches. |
 | ICON-PARITY | IN_PROGRESS | Freshly opened Icon.png and Chitiet.png in artifact #12418823837 and compared sampled live home/detail states. Broad style alignment observed; complete the remaining icon-state audit before closure. |
 | PRODUCT-GALLERY-25 | CONFIRMED MISMATCH / SCOPE-LOCKED | Read-only screenshots confirm image 01/19 shows black boots while image 02/19 shows a different green/white sneaker. Do not edit or hide product/image mappings under this scope; requires trusted catalog/mapping correction outside this task. |
