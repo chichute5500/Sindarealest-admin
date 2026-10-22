@@ -47,9 +47,13 @@ for (const query of requiredPaymentSchemaQueries) {
 }
 assert.ok(!setupScript.includes('--file=migrations/0009_fulfillment_and_manual_payments.sql'), 'Setup must not silently apply migration 0009 remotely');
 assert.ok(!deployScript.includes('--file=migrations/0009_fulfillment_and_manual_payments.sql'), 'Deploy must not apply migration 0009 automatically');
-const setupPaymentPreflight = setupScript.indexOf('Xác minh schema fulfillment/payment của migration 0009 trước khi deploy');
+const setupPaymentPreflight = setupScript.indexOf('Xác minh schema fulfillment/payment của migration 0009 trước seed/deploy');
+const setupSeedCommand = setupScript.indexOf("--file=migrations/0002_seed_products.sql");
+const setupSeedCount = setupScript.indexOf('let productCount = readProductCount(dbName)');
 const setupPagesDeploy = setupScript.indexOf("runWrangler(['pages', 'deploy'");
-assert.ok(setupPaymentPreflight >= 0 && setupPaymentPreflight < setupPagesDeploy, 'Setup must fail closed on a missing 0009 schema before Pages deployment');
+assert.ok(setupPaymentPreflight >= 0 && setupPaymentPreflight < setupSeedCount && setupPaymentPreflight < setupSeedCommand,
+  'Setup must verify migration 0009 schema before reading or seeding products');
+assert.ok(setupPaymentPreflight < setupPagesDeploy, 'Setup must fail closed before Pages deployment');
 const deployPaymentPreflight = deployScript.indexOf('Xác minh schema fulfillment/payment migration 0009 trước deploy');
 const deployPagesDeploy = deployScript.indexOf("runWrangler(['pages', 'deploy'");
 assert.ok(deployPaymentPreflight >= 0 && deployPaymentPreflight < deployPagesDeploy, 'Deploy must fail closed on a missing 0009 schema before Pages deployment');
