@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const readText = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 const readJson = path => JSON.parse(readText(path));
@@ -48,6 +48,26 @@ assert.match(startHere, /fetch live/i,
   'START-HERE must require a live-state fetch rather than trusting historical checkpoints.');
 assert.match(nextPrompt, /START-HERE\.md/,
   'The next-chat prompt must point back to the single entry point.');
+const historyRoot = new URL('../docs/admin-ui-reference/handoff/history/', import.meta.url);
+const historyFiles = [];
+const walkHistory = directory => {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
+    if (entry.isDirectory()) {
+      assert.ok(!entry.name.startsWith('legacy-'), `Obsolete duplicated handoff snapshot folder must not return: ${entry.name}`);
+      walkHistory(path);
+    } else {
+      historyFiles.push(path.pathname);
+    }
+  }
+};
+assert.ok(existsSync(historyRoot), 'Compact per-run test history must remain available.');
+walkHistory(historyRoot);
+assert.equal(historyFiles.filter(path => path.toLowerCase().endsWith('.png')).length, 0,
+  'Generated Playwright screenshot matrices must stay in Actions artifacts, not the Git history.');
+assert.ok(historyFiles.some(path => path.endsWith('/report.md')) || historyFiles.some(path => path.endsWith('/preview-diagnostics.json')),
+  'Keep compact per-run text/JSON evidence while pruning generated screenshot matrices.');
+
 assert.match(masterPrompt, /START-HERE\.md/,
   'The master prompt must point to the same single entry point.');
 
