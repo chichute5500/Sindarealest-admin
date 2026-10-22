@@ -6,7 +6,7 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-1'"),
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-2'"),
   "The hero must render the supplied static presentation image independently of public catalog SKU availability.");
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'"),
   "The static hero image must be explicitly identified as a presentation asset, not a catalog product image.");
