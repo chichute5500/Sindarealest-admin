@@ -79,10 +79,10 @@ assert.match(html, /liquid-glass-light\.svg\?v=20261022-3/);
 assert.match(html, /liquid-glass-dark\.svg\?v=20261022-3/);
 assert.match(html, /liquid-glass-light-mobile\.svg\?v=20261022-3/);
 assert.match(html, /liquid-glass-dark-mobile\.svg\?v=20261022-3/);
-assert.match(notFound, /liquid-glass-light-mobile\\.svg\\?v=20261022-3/);
-assert.match(notFound, /liquid-glass-dark-mobile\\.svg\\?v=20261022-3/);
-assert.match(notFound, /liquid-glass-light\\.svg\\?v=20261022-3/);
-assert.match(notFound, /liquid-glass-dark\\.svg\\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-light-mobile\.svg\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-dark-mobile\.svg\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-light\.svg\?v=20261022-3/);
+assert.match(notFound, /liquid-glass-dark\.svg\?v=20261022-3/);
 
 const end = html.indexOf('/* sd-static-reference-final-pass-2026-10-21 */');
 assert.ok(end >= 0, 'The final storefront visual-pass stylesheet must remain identifiable.');
