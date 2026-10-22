@@ -64,3 +64,10 @@ Opened artifact #311 screenshots for #3 at 320×640 light/dark and 360×800 ligh
 - Live PR #111 pre-write head e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; PR #108 head e3328dee37b125c5821bcaad03199afc44ed06fa; both OPEN/unmerged. PR #111 file census is 1,296 paths. Branch merge base a3834fed3eb1c012b188d7c95d14ec3d15e3969f; comparison status diverged, ADMIN ahead 904 and static ahead 920 at the checked heads.
 - App source SHA dca19a2af32a78390878b9ccfa5c7c26b816f2ff remains unchanged across 21 commits / 22 paths compared with pre-write ADMIN HEAD; only handoff/docs/reference paths changed. No run is claimed for the exact docs-only HEAD.
 - Next inspect the Admin Preview workflow, migration 0009, payment routes and setup/deploy schema preflight. No remote D1/R2 query/write, migration, setup or deploy. Keep both PRs open and unmerged.
+
+## Evidence update — workflow #39778009734 (source 3658ca1)
+
+- Workflow [#39778009734](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734) succeeded on source SHA `3658ca1069616639b825de2cd7b9c714ce560901`; repository checks, automated tests, local Playwright matrix, safe Preview diagnostics and artifact upload passed. Artifact [#314 / ID 12425910948](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948) contains screenshots and synthetic/read-only fixture evidence; it is not authenticated backend QA.
+- #4 Product editor: opened `product-editor__390x844__light.png`. Screenshot shows basic/info-image-other tabs, title/category, SKU and confirmation checkbox, AI description suggestion, truthful blank price/stock fields and fixed footer. No new independent source defect is established; SKU persistence, real save and AI result remain NOT VERIFIED. #4 remains PARTIAL_NOT_ACCEPTED.
+- #7 Order detail: opened `order-row-details__390x844__light.png`. Fixture shows summary/customer/product and fixed footer action. This is synthetic UI-only data and does not verify the real order action flow or payment/status controls. #7 remains PARTIAL_NOT_ACCEPTED.
+- Progress stays 50% PROVISIONAL; no screen accepted from this artifact.
