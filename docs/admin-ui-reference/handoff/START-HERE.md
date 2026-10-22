@@ -9,6 +9,7 @@
 - [Trạng thái tổng hợp — current-status.json](current-status.json)
 - [Báo cáo hiện trạng — LATEST-STATUS.md](LATEST-STATUS.md)
 - [Audit 12 màn hình](12-SCREEN-REFERENCE-AUDIT.md) · [Audit phạm vi PR #111](PR-111-SCOPE-AUDIT.md)
+- [Chính sách lưu lịch sử kiểm thử](history/README.md)
 
 ## Checkpoint đã xác minh qua GitHub API
 - Repo: `chichute5500/Sindarealest-admin`; nhánh duy nhất được phép ghi: `feature/admin-isolated-handoff-2026-10-20`; PR #111 OPEN/unmerged, HEAD tại checkpoint trước khi đồng bộ này là `7a60099f96bb0be4f68dbda47fbec9c10df44390`, 1,315 changed files, +49,743 / −404, mergeable=false.
