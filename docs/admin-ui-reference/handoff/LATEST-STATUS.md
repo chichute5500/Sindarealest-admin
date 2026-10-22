@@ -46,3 +46,15 @@ All 12 screens remain PARTIAL_NOT_ACCEPTED. In particular:
 - Root symptom: 120-second timeout waiting for selector `[data-action="retry-customers"]` at line 1940.
 - Deployed Preview diagnostic step completed successfully within the same overall failed run; do not label that step itself as failed.
 - Artifact `admin-preview-evidence-336` (ID `12437154740`) contains test evidence. Next: inspect test/error context, make the smallest confirmed fix, then rerun focused Playwright.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 2e7123c7dc694efa88a7bfa8902845048eb93db5
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39810281876
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: FAILURE; 96 real PNGs captured in artifact admin-preview-evidence-337 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 96 real PNGs; login shell: 16; read-only fixture module screens: 80; fixture metrics: 72.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.

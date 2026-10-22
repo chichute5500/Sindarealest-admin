@@ -7,7 +7,7 @@
   "progressStatus": "PROVISIONAL",
   "codeTestSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
   "sourceCommit": "e11ec06cd5870522735a28205b678897de829361",
-  "status": "SOURCE_CHECKS_PASS_LOCAL_PLAYWRIGHT_FIXTURE_TIMEOUT",
+  "status": "IN_PROGRESS_TEST_FAILURE",
   "sourceValidation": {
     "id": 39804852564,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564",
@@ -99,9 +99,65 @@
     "Authenticated Preview needs authorized access; do not bypass Cloudflare Access."
   ],
   "nextActions": [
-    "Inspect artifact admin-preview-evidence-336 and the exact failing test around line 1940.",
-    "Fix the confirmed test fixture/UI mismatch, then run focused Playwright and full validation on the new code SHA.",
-    "Do not infer authenticated real-backend acceptance from deployed Preview diagnostic success."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
-  "headSemantics": "Branch HEAD advances with handoff-only commits. Always fetch live branch/PR HEAD; codeTestSha remains the exact tested product revision."
+  "headSemantics": "Branch HEAD advances with handoff-only commits. Always fetch live branch/PR HEAD; codeTestSha remains the exact tested product revision.",
+  "latestCodeCommitSha": "2e7123c7dc694efa88a7bfa8902845048eb93db5",
+  "testedCommitSha": null,
+  "capturedAt": "2026-10-22T16:02:31.830Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39810281876",
+  "checks": {
+    "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
+    "applicationStartup": "FAILURE",
+    "localStaticPlaywrightBaseline": "FAILURE",
+    "playwright": "PASS",
+    "playwrightPreviewDiagnostics": "success",
+    "deployedPreview": "PASS",
+    "responsiveViewports": "FAIL_OR_NOT_RUN",
+    "lightMode": "FAIL_OR_NOT_RUN",
+    "darkMode": "FAIL_OR_NOT_RUN",
+    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
+    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
+    "automatedTests": "PASS",
+    "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
+    "productionDeployment": "NOT_PERFORMED"
+  },
+  "latestLocalEvidence": {
+    "runId": 39810281876,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39810281876",
+    "sourceCommit": "2e7123c7dc694efa88a7bfa8902845048eb93db5",
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS",
+    "localPlaywright": "FAILURE",
+    "sourceScreenshotCount": 96,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 80,
+    "uiFixtureMetricCount": 72,
+    "screenshotArtifact": "admin-preview-evidence-337",
+    "pageErrors": [],
+    "consoleErrors": [],
+    "failedRequests": [],
+    "httpErrors": [],
+    "attemptedWrites": [],
+    "unexpectedApiPaths": [],
+    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+  },
+  "latestScreenshotArtifact": {
+    "runId": 39810281876,
+    "name": "admin-preview-evidence-337",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39810281876",
+    "sourceCommit": "2e7123c7dc694efa88a7bfa8902845048eb93db5",
+    "screenshotCount": 96,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 80,
+    "uiFixtureMetricCount": 72,
+    "retentionDays": 14,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+  },
+  "remainingIssues": [],
+  "productionDeployment": "NOT_PERFORMED"
 }
