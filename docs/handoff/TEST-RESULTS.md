@@ -1,5 +1,5 @@
 # TEST & VISUAL AUDIT EVIDENCE INDEX
-Updated: 2026-10-23
+Updated: 2026-10-23 — handoff protocol reconciled
 
 This is the single index for test, deployment and visual-audit evidence. Repeated run-by-run narratives were consolidated here. Old artifacts remain accessible from GitHub Actions; a PASS applies only to its exact SHA.
 
@@ -48,6 +48,11 @@ This is the single index for test, deployment and visual-audit evidence. Repeate
 - Its `deployment-verification.json` reports `DEPLOYMENT_METADATA_UNVERIFIED`: expected SHA `33e09dd2bce4c4be1df23c65a47d93217d2153b7`, matched deployment SHA `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d`. Comparing these commits confirms the difference was docs-only (`docs/MASTER_PROMPT_HANDOFF_ADMIN_PREVIEW_2026-10-20.md` and `docs/handoff/STOREFRONT-ADMIN-CROSSCHECK-2026-10-20.md`), but the metadata gate correctly refused to claim an exact-SHA live capture.
 - Source review confirms the hidden-Hero path already removes the image source, marks `temporarily-disabled-owner-request`, collapses the visual frame, and includes a CSS rule to use one column; the existing regression test checks the single-column fallback and frame collapse. No source change was made based solely on interpreting local-fixture whitespace as a confirmed defect.
 - Remaining gate: fresh actual Preview screenshot evidence plus owner visual acceptance. The public web viewer could not access the Preview URL, so do not claim live visual PASS from this artifact.
+
+## Report-then-continue protocol — 2026-10-23
+- Owner explicitly requires work to continue after each progress report. This is a workflow rule, not test evidence.
+- During waits, inspect independent source/tests/artifacts without editing the same behavior being validated; resume result review when the run completes.
+- A report never upgrades a result to PASS. Each gate remains tied to its exact SHA and evidence.
 
 ## Evidence rules
 - Source tests, Preview deployment, deployment SHA, live screenshot capture and human visual acceptance are separate gates.
