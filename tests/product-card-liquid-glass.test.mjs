@@ -81,8 +81,8 @@ assert.doesNotMatch(welcomeDark, /theme-croc-/,
   "Welcome splash must not bring the hard crocodile scale texture back in dark mode.");
 
 
-assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261022-1')}")
-  && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261022-1')}"),
+assert.ok(finalThemeCss.includes("@media(max-width:760px){\n .theme-bg--light{background-image:url('images/liquid-glass-light-mobile.svg?v=20261022-2')}")
+  && finalThemeCss.includes(".theme-bg--dark{background-image:url('images/liquid-glass-dark-mobile.svg?v=20261022-2')}"),
   "Portrait viewports must use dedicated vertical wave compositions so the irregular gathered folds remain visible.");
 assert.match(finalBackgroundCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/,
   "The last Light overlay must preserve the base SVG and avoid broad overlay ribbons.");
