@@ -880,6 +880,128 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#categoryBox')).toHaveValue('all');
     await expect(productNames).toHaveCount(3);
 
+    // Narrow-width responsive audit for the real product-list UI, using read-only UI-ONLY fixtures.
+    // Keep product prices/stock as "Chưa nhập"/"Chưa kiểm kê"; never replace them with invented values.
+    for (const narrowViewport of [{ width: 320, height: 640 }, { width: 360, height: 800 }]) {
+      for (const narrowTheme of ['light', 'dark']) {
+        await page.setViewportSize(narrowViewport);
+        await chooseTheme(narrowTheme);
+        await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+        await page.evaluate(() => {
+          window.scrollTo(0, 0);
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+        });
+        await expect(page.locator('#main .pagehead')).toBeVisible();
+        await expect(page.locator('#searchBox')).toBeVisible();
+        await expect(page.locator('#categoryBox')).toBeVisible();
+        await expect(page.locator('#fulfillmentBox')).toBeVisible();
+        await expect(page.locator('#productPublishFilters')).toBeVisible();
+        await expect(page.locator('#main .product-table tbody tr')).toHaveCount(3);
+        await expect(page.locator('#main .product-table')).toContainText('Chưa nhập');
+        await expect(page.locator('#main .product-table')).toContainText('Chưa kiểm kê');
+        const productListLayout = await page.evaluate(() => {
+          const rect = element => {
+            const box = element.getBoundingClientRect();
+            return { left: box.left, right: box.right, top: box.top, bottom: box.bottom, width: box.width, height: box.height };
+          };
+          const main = document.querySelector('#main');
+          const wrap = document.querySelector('#main .product-table')?.closest('.tablewrap');
+          const table = document.querySelector('#main .product-table');
+          const rows = [...document.querySelectorAll('#main .product-table tbody tr')];
+          const filters = [...document.querySelectorAll('#productPublishFilters [data-published-filter]')];
+          const controls = ['#searchBox', '#categoryBox', '#fulfillmentBox', '#productPublishFilters']
+            .map(selector => {
+              const element = document.querySelector(selector);
+              return {
+                selector,
+                rect: rect(element),
+                clientWidth: element.clientWidth,
+                scrollWidth: element.scrollWidth
+              };
+            });
+          return {
+            viewportWidth: window.innerWidth,
+            documentWidth: document.documentElement.scrollWidth,
+            bodyWidth: document.body.scrollWidth,
+            main: { rect: rect(main), clientWidth: main.clientWidth, scrollWidth: main.scrollWidth },
+            wrapper: wrap && { rect: rect(wrap), clientWidth: wrap.clientWidth, scrollWidth: wrap.scrollWidth },
+            table: table && { rect: rect(table), clientWidth: table.clientWidth, scrollWidth: table.scrollWidth },
+            controls,
+            filters: filters.map(element => ({
+              text: (element.innerText || '').trim(),
+              rect: rect(element),
+              clientWidth: element.clientWidth,
+              scrollWidth: element.scrollWidth
+            })),
+            rows: rows.map(row => ({
+              rect: rect(row),
+              clientWidth: row.clientWidth,
+              scrollWidth: row.scrollWidth,
+              cells: [...row.querySelectorAll('td')].map(cell => ({
+                text: (cell.innerText || '').trim().slice(0, 90),
+                rect: rect(cell),
+                clientWidth: cell.clientWidth,
+                scrollWidth: cell.scrollWidth
+              })),
+              productTitle: row.querySelector('.prodname')?.textContent?.trim(),
+              editLabel: row.querySelector('.product-mobile-edit')?.getAttribute('aria-label')
+            }))
+          };
+        });
+        expect(productListLayout.documentWidth,
+          'Product list must not overflow the document at this width: ' + JSON.stringify(productListLayout))
+          .toBeLessThanOrEqual(narrowViewport.width);
+        expect(productListLayout.bodyWidth,
+          'Product list must not overflow the body at this width: ' + JSON.stringify(productListLayout))
+          .toBeLessThanOrEqual(narrowViewport.width);
+        expect(productListLayout.main.scrollWidth,
+          'Product list main area must not overflow horizontally: ' + JSON.stringify(productListLayout))
+          .toBeLessThanOrEqual(productListLayout.main.clientWidth + 1);
+        expect(productListLayout.wrapper.scrollWidth,
+          'Product table wrapper must not have hidden horizontal overflow: ' + JSON.stringify(productListLayout))
+          .toBeLessThanOrEqual(productListLayout.wrapper.clientWidth + 1);
+        expect(productListLayout.table.scrollWidth,
+          'Product table/cards must fit the table wrapper: ' + JSON.stringify(productListLayout))
+          .toBeLessThanOrEqual(productListLayout.table.clientWidth + 1);
+        for (const control of productListLayout.controls) {
+          expect(control.rect.left, control.selector + ' should stay inside viewport').toBeGreaterThanOrEqual(-1);
+          expect(control.rect.right, control.selector + ' should stay inside viewport')
+            .toBeLessThanOrEqual(narrowViewport.width + 1);
+          expect(control.scrollWidth, control.selector + ' content should not clip').toBeLessThanOrEqual(control.clientWidth + 1);
+        }
+        for (const filter of productListLayout.filters) {
+          expect(filter.rect.left, 'Published-state filter should stay inside viewport: ' + JSON.stringify(filter))
+            .toBeGreaterThanOrEqual(-1);
+          expect(filter.rect.right, 'Published-state filter should stay inside viewport: ' + JSON.stringify(filter))
+            .toBeLessThanOrEqual(narrowViewport.width + 1);
+          expect(filter.scrollWidth, 'Published-state label should not clip: ' + JSON.stringify(filter))
+            .toBeLessThanOrEqual(filter.clientWidth + 1);
+        }
+        for (const row of productListLayout.rows) {
+          expect(row.rect.left, 'Product card should stay inside table wrapper').toBeGreaterThanOrEqual(productListLayout.wrapper.rect.left - 1);
+          expect(row.rect.right, 'Product card should stay inside table wrapper')
+            .toBeLessThanOrEqual(productListLayout.wrapper.rect.right + 1);
+          expect(row.scrollWidth, 'Product card should not clip its content: ' + JSON.stringify(row))
+            .toBeLessThanOrEqual(row.clientWidth + 1);
+          expect(row.productTitle, 'Existing product titles must remain available to assistive technology').toBeTruthy();
+          expect(row.editLabel, 'Edit control should retain its accessible name').toContain('Sửa sản phẩm');
+          for (const cell of row.cells) {
+            expect(cell.rect.right, 'Product field should remain inside viewport: ' + JSON.stringify(cell))
+              .toBeLessThanOrEqual(narrowViewport.width + 1);
+            expect(cell.scrollWidth, 'Product field should wrap rather than clip: ' + JSON.stringify(cell))
+              .toBeLessThanOrEqual(cell.clientWidth + 1);
+          }
+        }
+        await saveScreenshot('products-responsive', { viewport: narrowViewport, theme: narrowTheme }, {
+          fixtureOnly: true, responsiveProductListAudit: true, noHorizontalOverflow: true,
+          noInventedPriceOrStock: true, fixtureProductCount: 3
+        });
+      }
+    }
+    await page.setViewportSize(mobile);
+    await chooseTheme('light');
+    await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+
     await page.locator('#fulfillmentBox').selectOption('made_to_order');
     await expect(productNames).toHaveCount(1);
     await expect(productNames).toHaveText('Dây đồng hồ thử nghiệm giao diện');
