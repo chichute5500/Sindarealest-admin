@@ -2084,6 +2084,59 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     });
 
+    // Scroll-to-end geometry audit: fixed mobile navigation must not cover the final content.
+    // Use the real source screens with synthetic read-only fixtures; no business writes are allowed.
+    const bottomNavigationScrollAudit = [];
+    for (const screen of ['products', 'orders', 'customers', 'warranties', 'settings']) {
+      await navigateTo(screen);
+      for (const viewport of [{ width: 320, height: 640 }, { width: 390, height: 844 }]) {
+        await page.setViewportSize(viewport);
+        for (const theme of ['light', 'dark']) {
+          await chooseTheme(theme);
+          await page.evaluate(() => window.scrollTo(0, 0));
+          await page.waitForTimeout(50);
+          await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+          await page.waitForTimeout(50);
+          const geometry = await page.evaluate(() => {
+            const main = document.querySelector('#main');
+            const nav = document.querySelector('.mobiletabs');
+            const mainRect = main?.getBoundingClientRect();
+            const navRect = nav?.getBoundingClientRect();
+            return {
+              screen: main?.querySelector('.pagehead h2')?.textContent?.trim() || null,
+              viewportWidth: window.innerWidth,
+              viewportHeight: window.innerHeight,
+              theme: document.documentElement.dataset.adminTheme || null,
+              documentWidth: document.documentElement.scrollWidth,
+              documentHeight: document.documentElement.scrollHeight,
+              scrollY: window.scrollY,
+              atDocumentEnd: window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2,
+              mainBottom: mainRect ? Math.round(mainRect.bottom) : null,
+              navTop: navRect ? Math.round(navRect.top) : null,
+              contentGapAboveNav: mainRect && navRect ? Math.round(navRect.top - mainRect.bottom) : null,
+              navVisible: Boolean(navRect && navRect.width > 0 && navRect.height > 0)
+            };
+          });
+          expect(geometry.documentWidth,
+            'Bottom-navigation scroll audit must not overflow horizontally: ' + JSON.stringify(geometry))
+            .toBeLessThanOrEqual(viewport.width);
+          expect(geometry.atDocumentEnd,
+            'Scroll-to-end must reach the end of the document: ' + JSON.stringify(geometry)).toBe(true);
+          expect(geometry.navVisible,
+            'Fixed mobile navigation must remain visible at scroll end: ' + JSON.stringify(geometry)).toBe(true);
+          expect(geometry.contentGapAboveNav,
+            'Final content box must end above the fixed mobile navigation: ' + JSON.stringify(geometry))
+            .toBeGreaterThanOrEqual(8);
+          bottomNavigationScrollAudit.push(geometry);
+        }
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
+    visualAudit.bottomNavigationScrollAudit = bottomNavigationScrollAudit;
+    expect(bottomNavigationScrollAudit,
+      'Every mobile screen/theme/viewport combination must be checked at document scroll end')
+      .toHaveLength(20);
+
     expect(pageErrors, 'Fixture visual renders should not throw browser runtime exceptions').toEqual([]);
     expect(attemptedWrites, 'The local fixture should block all mutating API calls').toEqual([]);
     expect(unexpectedApiPaths, 'Every Admin API request should use an explicit synthetic fixture').toEqual([]);
