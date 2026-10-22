@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T16:29:06.121Z",
+  "capturedAtUtc": "2026-10-22T16:52:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "0502739790fecfdf56f3c267dcaf607f1751908e",
+  "branchHeadAtCheckpointStart": "9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e",
   "checkpointSemantics": "Live PR/branch HEAD changes with each contents-API commit; branchHeadAtCheckpointStart is the fetched head immediately before this status refresh. Fetch live refs before acting. codeTestSha is a distinct exact tested source revision.",
-  "codeTestSha": "4b2220d510a906882e4309df6969c0c43514c421",
-  "latestProductSourceCommit": "4b2220d510a906882e4309df6969c0c43514c421",
+  "codeTestSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+  "latestProductSourceCommit": "105f46b90dc5664dd091493dbd5cea1af7796c44",
   "latestActionsRun": {
-    "id": 39813340309,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309",
+    "id": 39816652346,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "4b2220d510a906882e4309df6969c0c43514c421",
-    "jobId": 119945212164,
-    "artifactId": 12439794397
+    "testedSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+    "jobId": 119957441128,
+    "artifactId": 12441639210
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -39,10 +39,10 @@
       "mergeable": false,
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
-      "headSha": "0502739790fecfdf56f3c267dcaf607f1751908e",
+      "headSha": "9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e",
       "commits": 1246,
-      "changedFiles": 1310,
-      "additions": 49381,
+      "changedFiles": 1314,
+      "additions": 49710,
       "deletions": 404,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
@@ -50,21 +50,19 @@
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39813340309,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309",
-      "testedSha": "4b2220d510a906882e4309df6969c0c43514c421",
+      "id": 39816652346,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
+      "testedSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
       "status": "completed",
       "conclusion": "success",
-      "jobId": 119945212164,
+      "jobId": 119957441128,
       "artifact": {
-        "id": 12439794397,
-        "name": "admin-preview-evidence-340",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
-        "pngs": 102,
-        "loginShell": 16,
-        "fixtureModuleScreens": 86,
-        "fixtureMetrics": 78,
-        "expiresAtUtc": "2026-11-05T16:23:29Z"
+        "id": 12441639210,
+        "name": "admin-preview-evidence-344",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210",
+        "expired": false,
+        "expiresAtUtc": "2026-11-05T16:49:42Z",
+        "pngs": 102
       }
     },
     "historicalFailed": {
@@ -139,9 +137,9 @@
   },
   "scopeAudit": {
     "status": "PARTIAL",
-    "liveChangedFiles": 1310,
-    "previousCensus": 1304,
-    "previousCensusStatus": "HISTORICAL_STALE; refreshed live total is 1310",
+    "liveChangedFiles": 1314,
+    "previousCensus": 1310,
+    "previousCensusStatus": "HISTORICAL_STALE; latest PR metadata reports 1314. Refresh paginated filenames before new counts.",
     "priority": "Refresh paginated filenames and classify provenance for each changed path; prioritize runtime/API/migration/setup/workflow paths.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "migration0009": "DEFERRED_BY_OWNER",
@@ -181,15 +179,15 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Compare artifact #340 with admin-mobile-reference.png at matching viewport/theme, prioritize Product Gallery (#5), then screens #8–#12; note exact screenshot and reproducible difference before fixing.",
-    "Continue PR #111 provenance audit from the live 1,310-file list; recompute any ahead/behind/merge-base values from exact current refs.",
-    "Authenticated backend QA requires an owner-authorized Preview path; do not bypass Cloudflare Access or touch secrets.",
-    "Remote D1 schema/payment ledger NOT_VERIFIED; migration 0009, PRE/PRO migrations and R2 persistence DEFERRED_BY_OWNER."
+    "Inspect artifact #344 against admin-mobile-reference.png at matching viewport/theme; prioritize Gallery (#5), then screens #8–#12.",
+    "Refresh PR #111 paginated changed-file census (live PR metadata now 1314) and continue semantic provenance review of runtime/API/migration/setup/workflow paths.",
+    "Make reproducible ADMIN-only fixes, add regression coverage, validate exact SHA, then resync handoff files.",
+    "Mark authenticated QA blocked/not tested if authorized access is unavailable; never bypass Access."
   ],
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T16:29:06.121Z",
-    "syncPurpose": "Updated exact test SHA, passing Validate/Preview runs and artifact #340; progress remains 50% provisional."
+    "lastSyncAtUtc": "2026-10-22T16:52:00Z",
+    "syncPurpose": "Synced to live PR #111 count 1314, source/test SHA 105f46b, successful validation run 39816652373, successful Playwright/Preview run 39816652346 and artifact #344."
   }
 }
