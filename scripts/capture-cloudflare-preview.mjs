@@ -76,6 +76,7 @@ const audit = {
   iconStateChecks: [],
   cartAddStateChecks: [],
   flyToCartChecks: [],
+  arrowPressChecks: [],
   cartAnimationEdgeChecks: [],
   notFoundChecks: [],
   searchChecks: [],
@@ -458,6 +459,12 @@ async function capture(page, filename, fullPage, meta) {
   await page.screenshot({ path: path.join(outputDir, filename), type: 'png', fullPage, animations: 'disabled', timeout: 30000 });
   audit.screenshots.push({ filename, fullPage, ...meta });
 }
+async function captureDuringAnimation(page, filename, fullPage, meta) {
+  // Do not use animations:'disabled' for a frame whose purpose is to prove motion:
+  // Playwright fast-forwards finite transitions and could remove the flying clone before its mid-flight sample.
+  await page.screenshot({ path: path.join(outputDir, filename), type: 'png', fullPage, timeout: 30000 });
+  audit.screenshots.push({ filename, fullPage, ...meta });
+}
 async function captureLocator(page, selector, filename, meta) {
   let lastError = null;
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -493,6 +500,86 @@ async function captureLocator(page, selector, filename, meta) {
   }
   throw lastError || new Error('Could not capture ' + selector + '.');
 }
+async function captureArrowPressInPlace(page, {
+  selector, previousSelector, counterSelector, viewport, theme, context, route, surface,
+}) {
+  const arrow = page.locator(selector).first();
+  const fail = (reason, details = {}) => {
+    const check = { context, route, viewport: viewport.name, theme, surface, selector, status: 'FAIL', reason, ...details };
+    audit.arrowPressChecks.push(check);
+    audit.hardFailures.push('Gallery arrow press/navigation failed for ' + surface + ' at ' + context + '.');
+    return check;
+  };
+  if (!await arrow.isVisible().catch(() => false)) return fail('next-arrow-not-visible');
+  await arrow.scrollIntoViewIfNeeded();
+  const box = await arrow.boundingBox();
+  if (!box) return fail('next-arrow-has-no-bounding-box');
+  const markerBefore = (await page.locator(counterSelector).textContent().catch(() => '') || '').trim();
+  if (!markerBefore) return fail('gallery-counter-missing');
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  const metrics = async () => arrow.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    const style = getComputedStyle(el);
+    const matrix = new DOMMatrixReadOnly(style.transform === 'none'
+      ? 'matrix(1, 0, 0, 1, 0, 0)' : style.transform);
+    return {
+      active: el.matches(':active'),
+      centerX: rect.left + rect.width / 2,
+      centerY: rect.top + rect.height / 2,
+      scaleX: Math.hypot(matrix.a, matrix.b),
+      scaleY: Math.hypot(matrix.c, matrix.d),
+      transform: style.transform,
+      rippleOverlayOpacity: getComputedStyle(el, '::before').opacity,
+    };
+  });
+  await page.mouse.move(x, y);
+  await page.waitForTimeout(360);
+  const rest = await metrics();
+  await page.mouse.down();
+  await page.waitForTimeout(125);
+  const pressed = await metrics();
+  const filename = screenshotStem(surface + '-arrow-pressed', viewport, theme) + '.png';
+  await captureDuringAnimation(page, filename, false, {
+    ...captureMeta(viewport, theme, route),
+    captureType: 'interaction', state: surface + '-arrow-held', productSurface: surface,
+  });
+  await page.mouse.up();
+  await page.mouse.move(Math.max(1, x - box.width - 24), Math.max(1, y - box.height - 24));
+  const navigationChanged = await page.waitForFunction(({ counterSelector, markerBefore }) => {
+    const marker = (document.querySelector(counterSelector)?.textContent || '').trim();
+    return Boolean(marker && marker !== markerBefore);
+  }, { counterSelector, markerBefore }, { timeout: 5000 }).then(() => true).catch(() => false);
+  await page.waitForTimeout(360);
+  const released = await metrics();
+  let previousRestored = false;
+  if (navigationChanged) {
+    await page.locator(previousSelector).click({ timeout: 5000 });
+    previousRestored = await page.waitForFunction(({ counterSelector, markerBefore }) => {
+      return (document.querySelector(counterSelector)?.textContent || '').trim() === markerBefore;
+    }, { counterSelector, markerBefore }, { timeout: 5000 }).then(() => true).catch(() => false);
+    await page.waitForTimeout(360);
+  }
+  const centerShiftPx = Math.abs(pressed.centerY - rest.centerY);
+  const activeStylePass = pressed.active && centerShiftPx <= 1
+    && pressed.scaleX >= 0.95 && pressed.scaleX <= 0.99
+    && pressed.scaleY >= 0.95 && pressed.scaleY <= 0.99
+    && pressed.rippleOverlayOpacity === '0';
+  const releaseStylePass = released.scaleX >= 0.985 && released.scaleX <= 1.015
+    && released.scaleY >= 0.985 && released.scaleY <= 1.015;
+  const pass = activeStylePass && releaseStylePass && navigationChanged && previousRestored;
+  const check = {
+    context, route, viewport: viewport.name, theme, surface, selector,
+    status: pass ? 'PASS' : 'FAIL',
+    centerShiftPx, rest, pressed, released, activeStylePass, releaseStylePass,
+    navigationChanged, previousRestored, markerBefore,
+    criteria: 'held pointer: <=1px vertical shift, scale .95-.99, no ::before overlay, reset near 1 after release, Next then Previous restores original image',
+  };
+  audit.arrowPressChecks.push(check);
+  if (!pass) audit.hardFailures.push('Gallery arrow press/navigation failed for ' + surface + ' at ' + context + '.');
+  return check;
+}
+
 function screenshotStem(prefix, viewport, theme) {
   return prefix + '-' + viewport.name.split('-')[0] + '-' + theme + '-' + viewport.width + 'x' + viewport.height;
 }
@@ -672,6 +759,13 @@ async function captureGalleryCartCheckoutStates(page, viewport, theme, label, ro
       return Boolean(viewer?.classList.contains('open')
         && images.some(image => image.complete && image.naturalWidth > 0));
     }, null, { timeout: 12000 });
+    const fullscreenThumbCount = await page.locator('#sdFullscreenThumbs .sd-fullscreen-thumb').count().catch(() => 0);
+    if (fullscreenThumbCount > 1) {
+      await captureArrowPressInPlace(page, {
+        selector: '#sdFullscreenNext', previousSelector: '#sdFullscreenPrev', counterSelector: '#sdFullscreenCount',
+        viewport, theme, context: label, route, surface: 'fullscreen-gallery',
+      });
+    }
     await stateCapture('#sdFullscreenViewer', screenshotStem('state-fullscreen-gallery', viewport, theme) + '.png', 'fullscreen-gallery');
     audit.commerceStateChecks.push({ state: 'fullscreen-gallery', status: 'PASS', viewport: viewport.name, theme, route });
     await page.locator('#sdFullscreenClose').click();
@@ -958,7 +1052,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
         rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
     }) : null;
     if (detailFlyAppeared) {
-      await capture(page, screenshotStem('cart-fly-to-header-active-detail-open', viewport, theme) + '.png', false, {
+      await captureDuringAnimation(page, screenshotStem('cart-fly-to-header-active-detail-open', viewport, theme) + '.png', false, {
         ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'selected-product-image-flying-to-header-cart',
         productTitle: before.title, productId: before.productId,
       });
@@ -1211,7 +1305,7 @@ async function captureCardFlyToCartProbe(page, button, viewport, theme, context,
       targetId: node.dataset.cartTargetId, durationMs: Number(node.dataset.durationMs), position: getComputedStyle(node).position,
       progress: Number(node.dataset.flightProgress || 0), transform: node.style.transform };
   }) : null;
-  if (appeared) await capture(page, screenshotStem('cart-fly-active-' + entryPoint, viewport, theme) + '.png', false, {
+  if (appeared) await captureDuringAnimation(page, screenshotStem('cart-fly-active-' + entryPoint, viewport, theme) + '.png', false, {
     ...captureMeta(viewport, theme, await page.evaluate(() => location.pathname)), captureType: 'cart-interaction',
     state: 'cart-fly-from-' + entryPoint, productId: before.productId, productTitle: before.title,
   });
@@ -1329,8 +1423,8 @@ async function captureCardFlyToCartSources(page, viewport, theme, context) {
 
 async function captureProductDetailFlow(page, viewport, theme, label) {
   let cardButton = page.locator('#catalogGrid [data-open-product]').first();
-  if (label === 'mobile-390-light') {
-    // Use a genuine rendered featured product whose markup exposes its real gallery length.
+  if (viewport.name === 'mobile-390') {
+    // Use a genuine rendered multi-image featured product in both themes for the gallery interaction checks.
     // This avoids relying on private JS lexical bindings from a Playwright page.evaluate world.
     const galleryCard = page.locator('#featuredGrid [data-featured-card][data-feature-count]:not([data-feature-count="1"]) [data-open-product]').first();
     if (await galleryCard.count().catch(() => 0) > 0) cardButton = galleryCard;
@@ -1408,6 +1502,10 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
   // Some site styles can override the browser's [hidden] presentation. Trust the
   // actual rendered gallery data, not visibility of the arrow alone.
   if (galleryImageCount > 1 && await next.isVisible().catch(() => false)) {
+    await captureArrowPressInPlace(page, {
+      selector: '#detailNext', previousSelector: '#detailPrev', counterSelector: '#detailImageCount',
+      viewport, theme, context: label, route: directState.path, surface: 'detail-gallery',
+    });
     const before = await page.locator('#detailImageCount').textContent().catch(() => '');
     await next.click();
     await page.waitForFunction(previous => {
@@ -1701,6 +1799,8 @@ async function main() {
     cartAddStateCheckCount: audit.cartAddStateChecks.length,
     cartAddStateChecksComplete: audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS'),
     flyToCartCheckCount: audit.flyToCartChecks.length,
+arrowPressCheckCount: audit.arrowPressChecks.length,
+    arrowPressChecksComplete: audit.arrowPressChecks.length === 4 && audit.arrowPressChecks.every(check => check.status === 'PASS'),
     flyToCartChecksComplete: audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS'),
     cartAnimationEdgeCheckCount: audit.cartAnimationEdgeChecks.length,
     cartAnimationEdgeChecksComplete: audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS'),
@@ -1722,6 +1822,7 @@ async function main() {
     && audit.iconStateChecks.length === 4 && audit.iconStateChecks.every(check => check.status === 'PASS')
     && audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS')
     && audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS')
+    && audit.arrowPressChecks.length === 4 && audit.arrowPressChecks.every(check => check.status === 'PASS')
     && audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS')
     && audit.coverage.notFoundChecksComplete
     && audit.notFoundChecks.length === 1 && audit.notFoundChecks.every(check => check.status === 'PASS')
