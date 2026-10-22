@@ -23,11 +23,11 @@ The user should not have to copy the previous chat's prompt, summarize status, o
 - A session counts as progress only if it delivers a verified product improvement or closes a previously open acceptance/blocker with evidence. Otherwise state the actual blocker; do not disguise activity as completion.
 
 ### Historical checkpoint — revalidate before use
-- ADMIN code/test commit last observed: `7d9cde727476ac05ee7431b457e7377b34c750fe`.
-- Workflow `39797841880` was queued when last observed; re-query it. Do not assume it is still queued or passed.
+- ADMIN HEAD at the 2026-10-22 checkpoint: `9d5d838fe53d657ed98650161bf605868793aba2` (handoff-only commit after Order detail source fix `3d10e163d3a88884ad109d0245b7b9c38e0ec603` and responsive regression commit `da5139c39ec1a7e96d93ab9ede4ebab83e07094f`).
+- The connector returned no PR-triggered workflow runs or combined status checks for the latest commits `617496b` and `da5139c`; exact-HEAD CI is NOT VERIFIED. Inspect Actions/run-discovery or supported dispatch capability; never infer PASS from an empty result.
 - Earlier test failures: run `39794007381` failed the `.mobiletabs` visibility expectation; run `39796182324` failed with `ReferenceError: variant is not defined`. Commit `7d9cde7` changed the test to use `page.viewportSize()?.width`; its exact-SHA outcome was not verified at the last checkpoint.
 - PR #111 and PR #108 were last observed OPEN/unmerged. Revalidate both before claiming their state.
-- Overall progress was last stated as 50% provisional; recalculate from accepted deliverables before presenting it as current.
+- Overall progress remains 50% PROVISIONAL. The Order detail responsive grid fix and Customers responsive-layout assertions are not accepted until exact-HEAD Playwright evidence passes.
 - These are historical facts, not live state.
 
 ---
