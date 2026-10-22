@@ -1,41 +1,67 @@
 # PR #111 SCOPE / PROVENANCE AUDIT
 
-## Live tested checkpoint
+## Live checkpoint used for this audit
 
-- Repository chichute5500/Sindarealest-admin. PR #111 OPEN/unmerged; branch feature/admin-isolated-handoff-2026-10-20; exact SHA dacc776531248cd38bf761a2381b31b630f94213; base main at 28c768ba26b1d9f7d40e14efac5112526ed1c8b3; mergeable=false.
-- Validate [#39846423113](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113) SUCCESS on exact SHA dacc776531248cd38bf761a2381b31b630f94213. Follow-up handoff commit needs its own exact-SHA run once; use live GitHub after that rather than writing another pointer-only commit.
-- PR #108 OPEN/unmerged, read-only; live head d869cc63660b75f434d2ea86f925e528b0ffa806. No writes to PR #108, main or static website branch.
+- Repository: chichute5500/Sindarealest-admin.
+- PR #111 OPEN/unmerged; writable branch feature/admin-isolated-handoff-2026-10-20; HEAD at checkpoint start b3b71fb925875e9dd8f1b38e71737a2af1bb71b2; base main SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3. PR API reported 386 changed files, +38,838/-212.
+- Application source/test SHA 1674396bec433fb915e3a6b922b9f22436335786 passed Validate [#39847591944](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944): dependency audit, project integrity and automated tests succeeded. Preview diagnostic [#39847591916](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916) also passed on the exact same SHA.
+- PR #108 OPEN/unmerged, READ-ONLY; branch fix/liquid-glass-audit-2026-10-19; latest checkpoint head 3f53e0cf7519ae0c5d0be022657845d5eb0f414b; 286 changed files, +20,489/-394. Main/static branch untouched.
+- Treat those numbers as a checkpoint snapshot. Always fetch live PR/HEAD/Actions before a new action.
 
-## Live changed-path census (after empty-viewer removal)
+## Current diff census — 386 paths
 
-- PR API: 384 files, +38,796/−211. Root counts: .github 1, root-level 2, data 1, docs 330, functions 24, migrations 2, public 1, scripts 4, tests 19. Extensions: yml 1, txt 1, json 165, md 166, png 1, js 26, sql 2, mjs 21, html 1.
-- Tree confirms viewer path removed; canonical admin-mobile-reference.png retained. The one HTML change/file remaining is public/admin/index.html. Tree entries (1,164) and PR changed paths (384) are different measures.
-- Previous cleanup: 912 generated screenshots, 10 stale snapshots, old prompt/audit artifacts, unreferenced ZIP and web-static-only workflow/script/test pollution removed; 318 compact history records retained.
+| Area | Files | Disposition |
+|---|---:|---|
+| Documentation and handoff evidence | 332 | Keep canonical reference/instructions/contracts and SHA-keyed text/JSON run evidence; remove only verified stale duplicates/empty assets |
+| Pages Functions handlers/modules | 24 | Keep active route handlers and shared helpers; routing/auth contracts or current tests reference them |
+| Database migrations | 2 | Keep 0008 SKU verification and 0009 fulfillment/payment-ledger schema |
+| Admin UI | 1 | Keep public/admin/index.html; it is the one remaining changed HTML file |
+| Scripts | 4 | Keep package/check/migration/deploy/setup tools; consumers and tests reference them. No scripts were executed |
+| Tests | 19 | Keep tests in npm test and the Playwright specs invoked by Preview workflow |
+| Workflow | 1 | Keep admin-preview-diagnostics.yml; it runs repository checks, source screenshot matrix, safe Preview diagnostic and artifacts |
+| Seed data | 1 | Keep data/legacy-products.json; source integrity check validates 235 items, images, IDs/SKU rules and matches the 0002 seed SQL, and smoke tests exercise related contracts |
+| Root guide/package | 2 | Keep README-DEPLOY.txt, which config-integrity tests read, and package.json, which defines checks/tests/runtime |
 
-## Payment/API provenance decisions
+Path counts from live PR API: .github 1; root-level 2; data 1; docs 332; functions 24; migrations 2; public 1; scripts 4; tests 19. Extension counts: yml 1, txt 1, json 166, md 167, png 1, js 26, sql 2, html 1, mjs 21.
 
-- functions/_payments.js: shared fulfillment/token/QR allowlist/full-ledger summary helpers used by handlers/tests — KEEP.
+## Historical evidence decision
+
+- The complete branch history tree contains 157 SHA-keyed evidence directories, 319 report/metadata/Preview-diagnostic text/JSON files, and the history README. It contains no generated PNG matrices. One older record is report-only because its source screenshot matrix failed; retain that failure evidence.
+- Keep compact per-run SHA and failure/success evidence under history/README.md policy. Full screenshot matrices remain in temporary Actions artifacts, not in the Git diff.
+- Prior status text saying “318 records” was imprecise: 318 was a previous evidence-file count; the current tree has 157 directories and 319 evidence files.
+
+## Cleanup completed and retained
+
+- Removed earlier: 912 generated historical screenshot PNGs; 10 duplicate/stale handoff snapshot files; obsolete prompt/static audit material; static-only workflow/script/test artifacts; unreferenced reference ZIP; zero-byte docs/admin-ui-reference/admin-mobile-reference.html.
+- Retained approved docs/admin-ui-reference/admin-mobile-reference.png and reference-instructions.md.
+- Previously centralized normalizeFulfillmentType in functions/_lib.js and deleted the duplicate definition plus unreferenced isValidPaymentBankId, isValidPaymentAccountNo and isValidPaymentAccountName validators from functions/_payments.js. tests/fulfillment-payment-contract.test.mjs imports the canonical helper from _lib.js.
+- data/legacy-products.json is not an unused runtime catalogue: scripts/check-project.mjs verifies its 235 products, IDs, unverified SKU handling, image paths and correspondence to the 235 SQL seed rows; tests/smoke.test.mjs also uses these contracts. README-DEPLOY.txt is consumed by tests/config-integrity.test.mjs.
+
+## Payment routes — no safe consolidation
+
+- functions/_payments.js: shared fulfillment/token/QR allowlist/full-ledger summary helpers — KEEP.
 - functions/api/admin/payment-qr.js: Admin-only draft/save/activate/deactivate and audit — KEEP.
-- functions/api/admin/payment-qr-upload.js: bounded, signature-checked upload that stages pending image — KEEP.
-- functions/api/admin/payment-qr-preview.js: Admin-authenticated pending-key preview, private/no-store — KEEP; not a replacement for public serving.
-- functions/payment-qr/[key].js: public route serves active QR only — KEEP.
-- functions/api/payment-settings.js: public active configuration GET; write method disabled — KEEP.
-- functions/api/admin/payment-requests.js: create/cancel requests and full-ledger aggregate separate from 100-row display — KEEP.
-- functions/api/admin/payment-transactions.js: manually verified receipt/refund and atomic ledger/status/audit transition — KEEP.
-- functions/api/order-payment.js: read-only capability-token customer endpoint, private/no-store, term and current QR gated — KEEP.
-- Evidence: tests/fulfillment-payment-contract.test.mjs and tests/payment-ledger-route.test.mjs; both passed in Validate #39846423113 on exact SHA dacc776531248cd38bf761a2381b31b630f94213. No safe endpoint consolidation is supported.
+- functions/api/admin/payment-qr-upload.js: bounded signature-checked upload that stages a pending inactive image — KEEP.
+- functions/api/admin/payment-qr-preview.js: Admin-authenticated pending-key preview, private/no-store — KEEP.
+- functions/payment-qr/[key].js: public route serves the active QR key only — KEEP.
+- functions/api/payment-settings.js: public active-configuration GET; writes disabled — KEEP.
+- functions/api/admin/payment-requests.js: create/cancel payment requests and aggregate full ledger — KEEP.
+- functions/api/admin/payment-transactions.js: manually verified receipts/refunds, atomic payment/status/audit transition — KEEP.
+- functions/api/order-payment.js: read-only capability-token customer endpoint, private/no-store and terms/current-QR gated — KEEP.
+- Evidence: tests/fulfillment-payment-contract.test.mjs, tests/payment-ledger-route.test.mjs, migration 0009, package checks/tests. Route authorization/exposure/cache/state contracts differ; merging would remove important boundaries.
 
-## Orders and Order detail — separate review
+## Orders and Order detail — source review only
 
-- functions/api/admin/orders.js applies LIMIT 1000 to parent orders before joining all line items; one D1 read groups by order id. tests/admin-orders-query.test.mjs asserts a single query, grouping, null price preservation and empty-item order behavior.
-- functions/api/orders.js + migration 0007 snapshot purchase-time contact data. tests/order-contact-isolation.test.mjs asserts checkout does not UPDATE the customer's existing profile, does atomically bind to canonical customer row and creates order_contact_details; warranty views use the order snapshot.
-- public/admin/index.html has a separate order-detail view routed via selected orderId; details read from the Admin orders dataset and return-to-list focuses the selected row/actions. E2E fixtures exercise route/layout/navigation, not authenticated D1-backed workflows.
-- Finding: code/query/mock-test contracts are reviewed; authenticated Order/Order detail acceptance remains NOT_TESTED and both screens remain PARTIAL_NOT_ACCEPTED. No file deletion/merge is justified from this review.
+- functions/api/admin/orders.js bounds parent orders to 1,000 before joining items; one D1 read groups line items. The test asserts bounded query count, grouping, null prices and empty-item behavior.
+- functions/api/orders.js plus migration 0007 preserve purchase-time contact details without updating a customer profile; order_contact_details records the order snapshot.
+- public/admin/index.html has a separate Order detail view routed by selected order ID, using the Admin orders dataset and a return-to-list path.
+- Fixture/mock tests are not authenticated D1-backed workflow evidence. Orders and Order detail remain PARTIAL_NOT_ACCEPTED.
 
-## Remaining B1 work and guardrails
+## B1 conclusion and overall acceptance boundaries
 
-1. Validate this follow-up handoff SHA once and stop metadata-only pointer updates after the live run passes.
-2. Finish remaining changed-path provenance across docs/history/config/workflow/data contracts/tests. Preserve per-run records even if identical.
-3. Keep migration 0009, PRE/PRO changes, product-image/R2 persistence and AI image grouping deferred as required. No remote D1/R2/schema/ledger actions.
-4. B1 PARTIAL — NOT COMPLETE; progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
-5. Only write the Admin branch; PR #111/#108 open/unmerged. Never write PR #108, main or static branch; no merge, rebase, force-push, Production deploy, setup/migration/deploy scripts, secrets or Access bypass.
+**B1 PR cleanup/provenance review is COMPLETE for the current 386-file diff.** All current diff categories have been classified by consumer/purpose. No additional safe deletion or helper/API merge is justified by available evidence. Reopen the cleanup audit only if the live diff changes or new unused-file evidence appears.
+
+Overall Admin acceptance remains PARTIAL: 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+
+Migration 0009, PRE/PRO migration changes, product-image/R2 persistence and AI image grouping remain DEFERRED_BY_OWNER. No remote D1/R2/schema/ledger actions; no setup/migration/deploy script execution; no merge/deploy/secret/Access changes.
+

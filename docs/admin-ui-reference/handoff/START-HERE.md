@@ -1,40 +1,44 @@
 # START HERE — SINDAREALEST ADMIN
 
-**Điểm vào duy nhất cho chat mới.** Đọc file này trước; không yêu cầu chủ dự án dán lại lịch sử hoặc prompt dài.
+**Single entry point for every new chat.** Read this file, fetch live GitHub state, then continue from the unfinished work. Do not ask the owner to paste previous prompts or re-read old chat history.
 
-## Liên kết chuẩn
-- [Prompt bàn giao chat mới — PROMPT-NEXT-CHAT.md](PROMPT-NEXT-CHAT.md)
-- [Master prompt tương thích — MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md)
-- [Trạng thái kiểm thử — latest-test-results.json](latest-test-results.json)
-- [Trạng thái tổng hợp — current-status.json](current-status.json)
-- [Báo cáo tiến độ — LATEST-STATUS.md](LATEST-STATUS.md)
-- [Audit phạm vi PR #111](PR-111-SCOPE-AUDIT.md)
-- [Audit 12 màn hình](12-SCREEN-REFERENCE-AUDIT.md)
-- [Chính sách lưu bằng chứng theo run](history/README.md)
+## Canonical documents
+- [Next-chat prompt](PROMPT-NEXT-CHAT.md)
+- [Master compatibility pointer](../MASTER-PROMPT-AUTO-HANDOFF.md)
+- [Latest status](LATEST-STATUS.md)
+- [Current status JSON](current-status.json)
+- [Latest test results](latest-test-results.json)
+- [PR #111 scope/provenance audit](PR-111-SCOPE-AUDIT.md)
+- [12-screen acceptance audit](12-SCREEN-REFERENCE-AUDIT.md)
+- [Evidence retention policy](history/README.md)
 
-## Checkpoint live đã kiểm thử
-- Repository chichute5500/Sindarealest-admin.
-- PR #111 OPEN/unmerged; branch feature/admin-isolated-handoff-2026-10-20; checkpoint HEAD dacc776531248cd38bf761a2381b31b630f94213; 384 changed files (+38,796/−211); mergeable=false. [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111)
-- PR #108 OPEN/unmerged, read-only; branch fix/liquid-glass-audit-2026-10-19; head d869cc63660b75f434d2ea86f925e528b0ffa806. Main/base SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3.
-- Validate [#39846423113](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113) **SUCCESS trên đúng SHA dacc776531248cd38bf761a2381b31b630f94213**; Actions run head_sha khớp live checkpoint và job validate hoàn tất thành công, gồm project integrity và npm test.
-- Handoff sync tiếp theo tạo một SHA mới. Phải kiểm tra run có head_sha đúng SHA mới một lần; sau đó dùng live GitHub làm nguồn sự thật và không tạo commit chỉ để tự cập nhật pointer của chính run đó.
+## Verified checkpoint when this handoff sync started
+- Repository: chichute5500/Sindarealest-admin.
+- PR #111 is OPEN/unmerged, branch feature/admin-isolated-handoff-2026-10-20. HEAD at checkpoint start: b3b71fb925875e9dd8f1b38e71737a2af1bb71b2. Live PR census: 386 changed files (+38,838/-212), base main SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3. Re-fetch live metadata before acting.
+- Application/source Validate [#39847591944](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944) passed on exact source SHA 1674396bec433fb915e3a6b922b9f22436335786: dependency audit, project integrity and automated tests all succeeded.
+- Admin Preview diagnostic [#39847591916](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916) passed on the same source SHA. Artifact admin-preview-evidence-355 contains 102 PNGs (16 login-shell, 86 read-only fixture screens; 78 fixture metrics). It is not authenticated backend acceptance.
+- PR #108 is OPEN/unmerged/read-only; branch fix/liquid-glass-audit-2026-10-19, checkpoint head 3f53e0cf7519ae0c5d0be022657845d5eb0f414b. Main remains 28c768ba26b1d9f7d40e14efac5112526ed1c8b3.
+- HEAD/evidence distinction matters: commit b3b71fb925875e9dd8f1b38e71737a2af1bb71b2 records the Playwright artifact and test report for source SHA 1674396bec433fb915e3a6b922b9f22436335786; it did not change Admin application code. This handoff sync will create another documentation-only SHA. Check its exact-HEAD Actions result once, then stop pointer-chasing commits.
 
-## B1 — tiến độ và bằng chứng
-- B1 **PARTIAL, chưa hoàn tất**. Cleanup trước đó: 912 PNG cũ, 10 snapshot handoff trùng/lỗi thời, prompt/audit lỗi thời, ZIP không tham chiếu, workflow/script/test riêng web tĩnh; giữ 318 bản ghi history gọn.
-- Đã xóa docs/admin-ui-reference/admin-mobile-reference.html vì blob 0 byte; sửa README. PNG chuẩn admin-mobile-reference.png và reference-instructions.md vẫn còn. Live PR census xác nhận 384 changed paths; còn một file HTML là Admin UI.
-- Payment provenance: các route cấu hình QR, upload pending, preview riêng tư, serve QR active công khai, public settings, token-scoped customer view, tạo/hủy request và ledger xác minh giao dịch khác trách nhiệm/quyền/cache/trạng thái. Tests assert các ranh giới; không có căn cứ gộp/xóa.
-- Orders: query giới hạn 1.000 parent orders trước khi join items trong một lần đọc; test mock kiểm tra grouping, giá null và số query. Checkout snapshot giữ thông tin liên hệ tại thời điểm đặt, không ghi đè hồ sơ khách; tests/migration 0007 kiểm tra điều đó.
-- Order detail là route/view riêng dựa trên orderId, đọc lại dữ liệu orders hiện có và có luồng quay về dòng thao tác. E2E ảnh dùng fixture/mock, không phải authenticated backend acceptance; Orders và Order detail tiếp tục PARTIAL_NOT_ACCEPTED.
-- Migration 0009, PRE/PRO, R2 product-image persistence còn DEFERRED_BY_OWNER. Không chạy setup/deploy/migration scripts hoặc remote D1/R2.
+## B1 — PR #111 cleanup disposition
+- The current 386-file diff has been classified by group and consumer. This cleanup/provenance review is COMPLETE for the current diff; no further deletion or helper/API consolidation is justified without new evidence.
+- Earlier verified cleanup removed 912 generated PNG screenshots, 10 duplicate handoff snapshots, stale prompt/audit material, static-only workflow/script/test artifacts, an unreferenced reference ZIP and the zero-byte admin-mobile-reference.html. The approved admin-mobile-reference.png and written instructions remain.
+- Live diff groups: docs 332; Functions 24; migrations 2; Admin UI 1; scripts 4; tests 19; workflow 1; data source 1; root deployment guide/package 2.
+- The history tree contains 157 SHA-keyed evidence directories and 319 report/metadata/Preview-diagnostic text/JSON files, plus its README. No generated screenshot PNGs remain in history. Keep historical success/failure evidence under the retention policy.
+- data/legacy-products.json remains needed: source checks validate its 235 records, image paths, IDs/SKU rules and correspondence to migration 0002; smoke tests also exercise the related contract. README-DEPLOY.txt is covered by configuration-integrity tests. Migrations 0008/0009 are schema work, not dead files.
+- The payment routes retain distinct authorization, exposure, cache and state-transition responsibilities. The fulfillment helper is canonical in functions/_lib.js; duplicate/unused payment validators were removed earlier.
 
-## Việc tiếp theo
-1. Fetch live branch HEAD, PR #111/#108, main, changed paths và Actions; xác minh run exact-SHA của handoff sync cuối cùng một lần.
-2. Nếu run exact SHA thành công, tiếp tục B1 mà không tạo commit chỉ để đuổi theo pointer mới; live GitHub là nguồn trạng thái kiểm thử.
-3. Hoàn thiện provenance cho changed paths/docs/history/config/workflow/data contracts/tests còn lại. Giữ per-run compact history theo policy.
-4. Không nâng Orders/Order detail hay 12 màn hình lên accepted trước khi có bằng chứng backend được xác thực.
+## Product acceptance is still partial
+- Overall progress remains 50% PROVISIONAL. All 12 screens remain PARTIAL_NOT_ACCEPTED. Authenticated business/backend QA is NOT_TESTED; remote D1 schema/ledger are NOT_VERIFIED; Production is NOT_PERFORMED.
+- Orders and Order detail have source/query/mock-test review only, not authenticated live-data acceptance.
+- Migration 0009, PRE/PRO migration changes, product-image/R2 persistence and AI image grouping remain DEFERRED_BY_OWNER.
 
-## Rào chắn
-- Chỉ ghi branch feature/admin-isolated-handoff-2026-10-20. Giữ PR #111/#108 OPEN/unmerged; không ghi PR #108, main hoặc static branch.
-- Không merge/rebase/force-push/deploy Production; không chạy setup/migration/deploy; không remote D1/R2/schema/ledger; không secret hay Cloudflare Access bypass.
-- Không tạo dữ liệu giả; không thay API contract chưa được duyệt.
-- Tiến độ 50% PROVISIONAL; 12 màn hình PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+## Next actions
+1. Fetch live PR #111/#108, main, writable branch HEAD, changed-path census and Actions. Verify the Validate run whose head_sha exactly matches the current handoff-sync HEAD once.
+2. If it passes, record the result in the report or next substantive checkpoint; do not create another metadata-only commit solely to update its own run pointer.
+3. Continue authenticated product/workflow acceptance only where authorized and available. Do not mark screens accepted from fixture screenshots.
+
+## Guardrails
+- Write only to feature/admin-isolated-handoff-2026-10-20. Keep PR #111/#108 open and unmerged. Do not write PR #108, main or the static website branch.
+- No merge/rebase/force-push, Production deploy, setup/migration/deploy scripts, remote D1/R2/schema/ledger operations, secrets changes or Cloudflare Access bypass.
+- No fabricated business data or unapproved API contracts. Do not execute deferred work.

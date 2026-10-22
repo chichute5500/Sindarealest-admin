@@ -1,31 +1,27 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
-Tiếp tục công việc thật trên GitHub. Đọc [START-HERE.md](START-HERE.md) trước, tự fetch trạng thái live và tiếp tục phần chưa hoàn thành; không yêu cầu chủ dự án dán lại lịch sử.
+Continue actual work on GitHub. Read [START-HERE.md](START-HERE.md) first; fetch the live PRs, current branch HEAD and Actions before acting. Do not ask the owner to paste history or repeat already-completed cleanup.
 
 Repository: chichute5500/Sindarealest-admin.
 
-## Checkpoint đã xác minh
-- PR #111 OPEN/unmerged, branch feature/admin-isolated-handoff-2026-10-20; exact SHA đã test dacc776531248cd38bf761a2381b31b630f94213.
-- Validate #39846423113 SUCCESS trên exact SHA dacc776531248cd38bf761a2381b31b630f94213: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113.
-- Follow-up handoff commit sinh một SHA mới; fetch Actions run theo head_sha của SHA mới đúng một lần. Khi thành công, không tạo thêm metadata-only commit để chase pointer; nguồn chuẩn là live GitHub.
-- PR #108 và main/static branch read-only. Không merge/deploy.
+## Checkpoint facts (fetch live again)
+- At the start of the latest handoff sync, PR #111 HEAD was b3b71fb925875e9dd8f1b38e71737a2af1bb71b2 (386 files, +38,838/-212; OPEN/unmerged). That snapshot is historical after the current synchronization commit; fetch actual HEAD.
+- Application/source Validate [#39847591944](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944) and Admin Preview diagnostic [#39847591916](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916) both PASS on exact source SHA 1674396bec433fb915e3a6b922b9f22436335786. Preview artifact admin-preview-evidence-355 contains 102 PNGs and 78 fixture metrics; it is not authenticated business-data acceptance.
+- PR #108 remains OPEN/unmerged/read-only; checkpoint head 3f53e0cf7519ae0c5d0be022657845d5eb0f414b. main/base is 28c768ba26b1d9f7d40e14efac5112526ed1c8b3.
 
-## B1 state
-- PARTIAL, chưa nghiệm thu. Cleanup cũ đã hoàn tất; 318 per-run compact records được giữ.
-- Viewer HTML 0 byte đã xóa; README sửa; PNG chuẩn và instructions giữ lại; PR changed paths reconciled 384.
-- Payment APIs được provenance-audit, không có căn cứ route merge/delete.
-- Orders list query and tests were reviewed; order-contact snapshot tests protect per-order contact without mutating customer profile. Order detail is a distinct deep-link view over the same Admin orders data. Fixture/mocks are not authenticated QA.
-- Remaining: exact-SHA run for follow-up handoff; finish remaining path/provenance audit; authenticated acceptance for Orders and Order detail is still missing.
+## B1 cleanup disposition
+- B1 PR #111 cleanup/provenance review is complete for the current 386-file diff. The 386 paths have been classified by category/consumer; no additional safe deletion or API/helper consolidation was justified.
+- Current diff grouping: 332 docs (including 157 SHA-keyed history directories / 319 text-JSON evidence files), 24 Functions files, 2 migrations, 1 Admin HTML, 4 scripts, 19 tests, 1 workflow, 1 data source, and root guide/package files (2).
+- Earlier cleanup removed 912 generated screenshot PNGs, 10 duplicate snapshot files, stale prompts/audits and static-only artifacts, unreferenced ZIP and zero-byte viewer. Keep approved PNG reference, data/legacy-products.json, README-DEPLOY.txt, migrations 0008/0009, active routes/tests/scripts and compact historical evidence because consumers or retention policy are documented.
+- Fulfillment helper is canonical in functions/_lib.js. Payment endpoints stay separate because authorization/exposure/cache/state-transition contracts differ.
 
-## Actions
-1. Fetch PR #111/#108, main, current branch HEAD, merge/base, full changed-file list and Actions.
-2. Inspect Validate run with head_sha exactly equal to current HEAD; inspect logs if a step fails. Do not infer from older SHA.
-3. Continue provenance on remaining configs/workflows/data contracts/docs/history/tests. Keep history records; no deletions without consumer evidence.
-4. Do not repeat earlier cleanup or merge payment routes with distinct security/exposure/state contracts.
-5. Update handoff only at a substantive checkpoint; avoid endless metadata-only commits.
+## Continue from here
+1. Fetch PR #111/#108, main, branch HEAD, complete changed paths and recent Actions. Inspect exact-head Validate once for the current handoff sync.
+2. Do not make another pointer-only commit after that run passes.
+3. Work on the remaining Admin acceptance—not another cleanup census. Keep all 12 screens PARTIAL_NOT_ACCEPTED and Orders/Order detail unaccepted until authenticated backend workflows are actually evidenced.
+4. Keep remote schema/ledger NOT_VERIFIED, authenticated backend QA NOT_TESTED and Production NOT_PERFORMED. Migration 0009, PRE/PRO, product-image/R2 persistence and AI image grouping remain deferred.
 
-## Guardrails
-- Write only feature/admin-isolated-handoff-2026-10-20; PR #111 and #108 remain open/unmerged. No writes to PR #108, main or static website branch.
-- No merge/rebase/force-push/Production deploy, setup/migration/deploy script execution, remote D1/R2/schema/ledger or secrets/Access policy actions.
-- Migration 0009, PRE/PRO, product-image/R2 persistence and AI grouping remain deferred unless separately owner-approved.
-- Keep 50% PROVISIONAL, all 12 screens PARTIAL_NOT_ACCEPTED, authenticated backend QA NOT_TESTED, remote schema/ledger NOT_VERIFIED and Production NOT_PERFORMED.
+## Non-negotiable safety
+- Write only feature/admin-isolated-handoff-2026-10-20. No write to PR #108, main or static website branch. Keep both PRs OPEN/unmerged.
+- No merge/rebase/force-push/Production deploy; no setup/migration/deploy scripts or remote D1/R2; no secrets/Access changes or Cloudflare Access bypass.
+- No fabricated business data or unapproved API contract.

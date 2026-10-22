@@ -4,7 +4,13 @@
 
 ## Latest successful UI evidence
 
-- Latest verified Preview evidence checkpoint: source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`; Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) PASS and Admin Preview diagnostic [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) SUCCESS. Artifact `admin-preview-evidence-352` contains 102 PNGs and 78 fixture metrics. This evidence is newer than the historical #344 reference below, but still synthetic/read-only and not authenticated backend acceptance.
+- Application source/test SHA: `1674396bec433fb915e3a6b922b9f22436335786`. Validate [#39847591944](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944) PASS on exact SHA; Admin Preview diagnostic [#39847591916](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916) SUCCESS on the same SHA.
+- Artifact `admin-preview-evidence-355` contains 102 PNGs: 16 login-shell captures, 86 read-only fixture/module screenshots and 78 fixture metrics. Screenshots are stored in the Actions artifact, not committed to the source tree.
+- Preview diagnostic status: `PASS_LOGIN_CSS_SIGNATURE`. This confirms the configured login-shell CSS signature on Preview; it is not authenticated business-data acceptance. The screenshot matrix uses a mocked unauthenticated session and synthetic/read-only fixtures.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`. Authenticated business/backend QA is `NOT_TESTED`; Orders and Order detail require authenticated end-to-end workflow evidence.
+
+## Older successful runs (historical evidence)
+
 - Source/test SHA: `105f46b90dc5664dd091493dbd5cea1af7796c44`.
 - Validate: [#39816652373](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652373) PASS.
 - Screenshot matrix/Preview diagnostic: [#39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346) SUCCESS; [artifact #344 / ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210), 102 PNGs and 78 fixture metrics.

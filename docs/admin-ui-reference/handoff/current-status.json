@@ -1,19 +1,19 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T20:12:14.822Z",
+  "capturedAtUtc": "2026-10-22T20:28:28.277Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "dacc776531248cd38bf761a2381b31b630f94213",
-  "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
-  "codeTestSha": "dacc776531248cd38bf761a2381b31b630f94213",
-  "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+  "branchHeadAtCheckpointStart": "b3b71fb925875e9dd8f1b38e71737a2af1bb71b2",
+  "checkpointSemantics": "This is a checkpoint snapshot taken before a handoff-only synchronization commit. The verified application/source SHA is codeTestSha; subsequent handoff or workflow-evidence commits can advance branch HEAD without changing application source. Every new chat must fetch live GitHub state first and check the exact-current-HEAD Actions run once, without creating metadata-only pointer-chasing commits.",
+  "codeTestSha": "1674396bec433fb915e3a6b922b9f22436335786",
+  "latestProductSourceCommit": "1674396bec433fb915e3a6b922b9f22436335786",
   "latestActionsRun": {
-    "id": 39846423113,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113",
+    "id": 39847591944,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "dacc776531248cd38bf761a2381b31b630f94213",
-    "currentHeadApplicability": "PASS_ON_EXACT_SHA; FOLLOWING_HANDOFF_ONLY_COMMIT_REVALIDATION_PENDING"
+    "testedSha": "1674396bec433fb915e3a6b922b9f22436335786",
+    "currentHeadApplicability": "PASS_ON_EXACT_APPLICATION_SOURCE_SHA_1674396; HANDOFF/EVIDENCE COMMITS ARE SEPARATE; VERIFY THE NEXT LIVE HANDOFF HEAD ONCE"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -25,11 +25,11 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "d869cc63660b75f434d2ea86f925e528b0ffa806",
+      "headSha": "3f53e0cf7519ae0c5d0be022657845d5eb0f414b",
       "changedFiles": 286,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
-      "additions": 20414,
+      "additions": 20489,
       "deletions": 394
     },
     "111": {
@@ -39,24 +39,24 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "dacc776531248cd38bf761a2381b31b630f94213",
-      "changedFiles": 384,
-      "additions": 38796,
-      "deletions": 211,
+      "headSha": "b3b71fb925875e9dd8f1b38e71737a2af1bb71b2",
+      "changedFiles": 386,
+      "additions": 38838,
+      "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
-      "validationRunId": 39846423113,
-      "validation": "PASS_ON_EXACT_SHA_DACC; this follow-up handoff commit requires its own run"
+      "validationRunId": 39847591944,
+      "validation": "PASS on exact source SHA 1674396bec433fb915e3a6b922b9f22436335786; the current checkpoint HEAD b3b71fb925875e9dd8f1b38e71737a2af1bb71b2 is an evidence-only follow-up. Check live Actions for the next handoff synchronization SHA once."
     }
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39846423113,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113",
+      "id": 39847591944,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "dacc776531248cd38bf761a2381b31b630f94213",
-      "currentHeadApplicability": "PASS_ON_EXACT_SHA_DACC; FOLLOWING_HANDOFF_ONLY_COMMIT_REVALIDATION_PENDING"
+      "testedSha": "1674396bec433fb915e3a6b922b9f22436335786",
+      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_SHA_1674396; SEE LIVE ACTIONS FOR CURRENT HANDOFF SHA"
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -72,32 +72,31 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-22T19:35:37.668Z",
-      "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+      "capturedAtUtc": "2026-10-22T20:28:28.277Z",
+      "testedSha": "1674396bec433fb915e3a6b922b9f22436335786",
       "validateRun": {
-        "id": 39840693024,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024",
+        "id": 39847591944,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944",
         "status": "completed",
         "conclusion": "success"
       },
       "previewRun": {
-        "id": 39840692976,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
+        "id": 39847591916,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916",
         "status": "completed",
         "conclusion": "success",
-        "jobId": 120040591092,
-        "artifactName": "admin-preview-evidence-352",
+        "artifactName": "admin-preview-evidence-355",
         "sourceScreenshotCount": 102
       },
-      "reason": "Previous storefront watermark assertion failure was removed from the Admin-only test path. Exact source SHA 2eb6e7e passed source validation and Preview diagnostic; this does not validate the subsequently generated evidence commit."
+      "reason": "Exact application-source SHA passed dependency audit, project integrity and automated tests. Preview diagnostic and 102-screenshot matrix passed on the same source SHA. Fixture/screenshots do not prove authenticated live data workflows."
     },
     "latestValidateAttempt": {
-      "id": 39846423113,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113",
+      "id": 39847591944,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "dacc776531248cd38bf761a2381b31b630f94213",
-      "currentHeadApplicability": "PASS_ON_EXACT_SHA_DACC; FOLLOWING_HANDOFF_ONLY_COMMIT_REVALIDATION_PENDING",
+      "testedSha": "1674396bec433fb915e3a6b922b9f22436335786",
+      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_SHA_1674396",
       "workflow": "Validate source and tests"
     },
     "lastFailed": {
@@ -166,11 +165,11 @@
     }
   },
   "scopeAudit": {
-    "status": "PARTIAL",
-    "liveChangedFiles": 384,
+    "status": "PARTIAL_PRODUCT_ACCEPTANCE; B1_CLEANUP_REVIEW_COMPLETE",
+    "liveChangedFiles": 386,
     "previousCensus": 1314,
-    "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
-    "priority": "Validate this follow-up handoff SHA once; continue remaining provenance by evidence, and keep Orders and Order detail separately PARTIAL_NOT_ACCEPTED until authenticated acceptance.",
+    "previousCensusStatus": "Current live PR #111 census captured at this checkpoint is 386 changed paths, +38,838/-212. Re-fetch live PR metadata after every substantive change; old 384/385 snapshots are historical only.",
+    "priority": "B1 PR cleanup/provenance classification is complete for the current 386-file diff. No further deletions or API consolidations are justified without new consumer evidence. Overall product acceptance remains partial: authenticated backend QA and remote schema/ledger verification are not done.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "migration0009": "DEFERRED_BY_OWNER",
     "preProMigrations": "DEFERRED_BY_OWNER",
@@ -180,7 +179,7 @@
       ".github": 1,
       "(root)": 2,
       "data": 1,
-      "docs": 330,
+      "docs": 332,
       "functions": 24,
       "migrations": 2,
       "public": 1,
@@ -190,11 +189,12 @@
     "liveExtensionCensus": {
       "yml": 1,
       "txt": 1,
-      "json": 165,
-      "md": 166,
+      "json": 166,
+      "md": 167,
       "png": 1,
       "js": 26,
       "sql": 2,
+      "html": 1,
       "mjs": 21
     },
     "cleanupCheckpoint": {
@@ -218,11 +218,10 @@
       "scopeAuditStatus": "PARTIAL",
       "productionDeployment": "NOT_PERFORMED"
     },
-    "historyRecordCount": 318,
+    "historyRecordCount": 157,
     "nonHistoryDocs": [
       "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
       "docs/admin-ui-reference/README.md",
-      "docs/admin-ui-reference/admin-mobile-reference.html",
       "docs/admin-ui-reference/admin-mobile-reference.png",
       "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
       "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
@@ -235,22 +234,27 @@
       "docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
     ],
     "lastReviewCheckpoint": {
-      "capturedAtUtc": "2026-10-22T20:12:14.822Z",
-      "head": "dacc776531248cd38bf761a2381b31b630f94213",
-      "changedFiles": 384,
-      "additions": 38796,
-      "deletions": 211,
-      "historyRecords": 318,
-      "exactShaValidationRun": 39846423113,
-      "exactShaValidation": "PASS",
-      "reviewedSlice": "Payment configuration/upload/preview/active QR, customer payment endpoint, request/verified-transaction ledger, Admin Orders and Order detail frontend, order list SQL and order-contact/payment regression tests; source inspection plus synthetic/mock tests only.",
+      "capturedAtUtc": "2026-10-22T20:28:28.277Z",
+      "head": "b3b71fb925875e9dd8f1b38e71737a2af1bb71b2",
+      "sourceTestSha": "1674396bec433fb915e3a6b922b9f22436335786",
+      "changedFiles": 386,
+      "additions": 38838,
+      "deletions": 212,
+      "historyRunDirectories": 157,
+      "historyEvidenceFiles": 319,
+      "exactShaValidationRun": 39847591944,
+      "exactShaValidation": "PASS_ON_EXACT_SOURCE_SHA_1674396",
+      "previewRun": 39847591916,
+      "previewResult": "PASS_ON_EXACT_SOURCE_SHA_1674396",
+      "reviewedSlice": "Full changed-path category census plus source/data/workflow/test/config/migration dependency checks; payment and Orders/Order detail contracts retained from preceding source review.",
       "findings": [
-        "Payment endpoints do not share one interchangeable contract; no route merge/deletion is justified.",
-        "Admin Orders list applies a 1,000-parent-order cap before joining all item rows in one D1 read; test checks grouping, null prices and bounded query count.",
-        "Order contact snapshot prevents public checkout from overwriting a customer profile and keeps purchase-time contact details associated with the order; tests and migration 0007 assert this contract.",
-        "Order detail is a separate route/view driven by selected order ID; it reuses the Admin orders dataset. UI fixture screenshots and mock tests do not prove authenticated live backend acceptance.",
-        "The zero-byte reference viewer was removed; live PR file list confirms 384 changed paths, one HTML file (the Admin UI), the approved PNG still in the Git tree, and 318 compact history records retained.",
-        "B1 remains partial; no more deletions justified without full consumer/provenance evidence."
+        "The live 386-file diff is classified by path and consumer: docs/evidence 332; functions 24; migrations 2; Admin UI 1; scripts 4; tests 19; workflow 1; legacy seed-data source 1; root guide/package 2.",
+        "History currently contains 157 SHA-keyed run directories and 319 report/metadata/diagnostic files (plus the README policy); no generated PNG is stored in history. Keep per-run failure/success evidence under the explicit retention policy.",
+        "data/legacy-products.json is not an unused runtime catalogue: scripts/check-project.mjs validates its 235 entries, image files, IDs/SKU rules and correspondence with migration 0002 seed rows; smoke tests also exercise related data contracts.",
+        "README-DEPLOY.txt is intentionally retained and covered by tests/config-integrity.test.mjs. The package scripts call source/migration checks and the changed .mjs tests; the E2E specs are invoked by the Preview diagnostic workflow.",
+        "The approved PNG reference and written instructions are retained; the empty viewer was removed. public/admin/index.html is the only remaining changed HTML route/view.",
+        "The duplicate fulfillment helper/unused payment validators were removed earlier; current tests import normalizeFulfillmentType from functions/_lib.js. No further safe helper/endpoint merge was found.",
+        "Payment endpoints have distinct authorization, exposure, cache and state-transition contracts. Orders/Order detail still lack authenticated backend acceptance."
       ],
       "remoteActions": "NONE",
       "productionDeployment": "NOT_PERFORMED"
@@ -331,6 +335,35 @@
         "scripts/check-migrations.mjs"
       ],
       "result": "Authorization, exposure, cache and state-transition boundaries differ; current evidence does not justify consolidation or deletion."
+    },
+    "historyEvidenceFileCount": 319,
+    "historyCountSemantics": "157 SHA-keyed history directories; 319 report/metadata/Preview-diagnostic text/JSON files, plus history/README.md. The earlier value 318 described the prior evidence-file checkpoint, not the number of run directories.",
+    "currentCleanupReview": {
+      "status": "COMPLETE_FOR_CURRENT_PR_DIFF",
+      "capturedAtUtc": "2026-10-22T20:28:28.277Z",
+      "changedFiles": 386,
+      "additions": 38838,
+      "deletions": 212,
+      "classified": {
+        "historyEvidenceDirectories": 157,
+        "historyEvidenceFiles": 319,
+        "docs": 332,
+        "functions": 24,
+        "migrations": 2,
+        "publicAdminUi": 1,
+        "scripts": 4,
+        "tests": 19,
+        "workflow": 1,
+        "dataSeedSource": 1,
+        "rootDeploymentGuideAndPackage": 2
+      },
+      "deletedDuringEarlierCleanup": {
+        "generatedHistoricalPngs": 912,
+        "duplicateHandoffSnapshots": 10,
+        "zeroByteViewerHtml": 1,
+        "unreferencedReferenceZip": 1
+      },
+      "disposition": "Keep all remaining files: active routes/modules, required schema, source seed/validator/test data, package-driven tests, Preview workflow/evidence, approved UI reference/instructions, integration contract and unique historical run evidence. No remaining safe deletion or API/helper merge found from consumer/provenance evidence."
     }
   },
   "guardrails": [
@@ -341,37 +374,40 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Fetch live PR #111/#108, main, branch HEAD and Actions; find Validate whose head_sha exactly equals the live branch HEAD. Do this once after this handoff commit.",
-    "If exact-SHA Validate succeeds, record result in the work report but do not create another metadata-only commit solely to chase its own pointer; always use live GitHub state first.",
-    "Continue remaining changed-path provenance review and preserve compact per-run history.",
-    "Keep Orders and Order detail PARTIAL_NOT_ACCEPTED until authenticated backend workflow acceptance can be demonstrated.",
-    "Keep both PRs open/unmerged; no main/static writes, Production deploy, setup/migration execution, remote D1/R2, secrets or Access changes."
+    "Fetch live PR #111/#108, main, writable branch HEAD and Actions. Verify the Actions Validate run whose head_sha exactly equals the current handoff-sync SHA once.",
+    "If that exact-SHA run passes, use live GitHub state in reports and do not create another metadata-only commit only to update its own run pointer.",
+    "Continue the product acceptance work only where authenticated access is authorized; keep all 12 screens PARTIAL_NOT_ACCEPTED without authenticated backend evidence.",
+    "Keep migration 0009, PRE/PRO, product-image/R2 persistence and AI image grouping deferred; do not run setup/migration/deploy or remote D1/R2 actions."
   ],
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T20:12:14.822Z",
-    "syncPurpose": "Record successful exact-SHA Validate #39846423113, reconcile the live PR census after removal of the verified zero-byte viewer, and capture Orders/Order detail source/test acceptance boundaries."
+    "lastSyncAtUtc": "2026-10-22T20:28:28.277Z",
+    "syncPurpose": "Reconcile live HEAD, exact-SHA source Validate and Preview evidence, updated PR census, history retention counts and B1 cleanup disposition without changing application/API code."
   },
-  "currentHeadAtCheckpoint": "dacc776531248cd38bf761a2381b31b630f94213",
-  "currentHeadValidation": "PASS_ON_EXACT_SHA_DACC; FOLLOWING_HANDOFF_ONLY_COMMIT_REVALIDATION_PENDING",
-  "currentHeadValidationReason": "Validate #39846423113 passed on exact SHA dacc776531248cd38bf761a2381b31b630f94213. This follow-up handoff commit produces a new SHA; the next live-state fetch must verify that SHA's own run. Do not create repeated metadata-only commits after that solely to chase the run pointer.",
+  "currentHeadAtCheckpoint": "b3b71fb925875e9dd8f1b38e71737a2af1bb71b2",
+  "currentHeadValidation": "PASS_ON_EXACT_APPLICATION_SOURCE_SHA_1674396bec433fb915e3a6b922b9f22436335786; HANDOFF_SYNC_HEAD_REQUIRES_ONE_LIVE_ACTIONS_CHECK",
+  "currentHeadValidationReason": "Validate #39847591944 passed dependency audit, project integrity and automated tests on exact application-source SHA 1674396bec433fb915e3a6b922b9f22436335786. Preview diagnostic #39847591916 also passed on that exact SHA. The current checkpoint HEAD b3b71fb925875e9dd8f1b38e71737a2af1bb71b2 is a generated evidence-only child; read current live Actions after the next handoff commit once, then avoid another metadata-only commit just to chase that result.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-22T20:12:14.822Z",
-    "headAtStart": "dacc776531248cd38bf761a2381b31b630f94213",
-    "validatedSha": "dacc776531248cd38bf761a2381b31b630f94213",
-    "headValidation": "PASS_ON_EXACT_SHA_DACC; FOLLOWING_HANDOFF_ONLY_COMMIT_REVALIDATION_PENDING",
+    "capturedAtUtc": "2026-10-22T20:28:28.277Z",
+    "headAtStart": "b3b71fb925875e9dd8f1b38e71737a2af1bb71b2",
+    "validatedSha": "1674396bec433fb915e3a6b922b9f22436335786",
+    "headValidation": "PASS_ON_EXACT_SOURCE_SHA_1674396bec433fb915e3a6b922b9f22436335786; LIVE HANDOFF SHA CHECK REQUIRED ONCE",
     "pr111": "OPEN_UNMERGED",
     "pr108": "OPEN_UNMERGED_READ_ONLY",
     "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-    "changedFiles": 384,
-    "additions": 38796,
-    "deletions": 211,
-    "validationRunId": 39846423113,
-    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113",
+    "changedFiles": 386,
+    "additions": 38838,
+    "deletions": 212,
+    "validationRunId": 39847591944,
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944",
+    "previewRunId": 39847591916,
+    "previewUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916",
+    "historyRunDirectories": 157,
+    "historyEvidenceFiles": 319,
     "progressPercent": 50,
     "progressStatus": "PROVISIONAL",
-    "finding": "Exact-SHA Validate succeeded; current PR census is 384 changed paths after removing the zero-byte viewer. Payment routes remain distinct; Orders/Order detail still lack authenticated backend acceptance."
+    "finding": "B1 changed-file cleanup/provenance review complete for this diff; no safe extra deletion or API consolidation found. Backend acceptance remains partial."
   },
-  "latestReviewFinding": "Validate #39846423113 passed on exact SHA dacc776531248cd38bf761a2381b31b630f94213. Live PR census reconciled to 384 files. Orders/Order detail source and fixture review is complete for this slice only; authenticated business QA remains untested."
+  "latestReviewFinding": "B1 cleanup/provenance review is complete for the current 386-file PR #111 diff. Validate #39847591944 PASS on exact source SHA 1674396bec433fb915e3a6b922b9f22436335786; Preview #39847591916 PASS on the same SHA. Current HEAD at the start of this handoff sync was b3b71fb925875e9dd8f1b38e71737a2af1bb71b2; check current live Actions after this sync once. Overall Admin acceptance remains 50% PROVISIONAL; authenticated backend QA is NOT_TESTED."
 }
