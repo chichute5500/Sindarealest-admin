@@ -1,3 +1,11 @@
+> **LIVE CHECKPOINT — supersedes all older SHA/run snapshots below (2026-10-22 21:00 +07).** ADMIN branch HEAD: `df819968a1b3b561bba00abde4fe3432adaa8b39`. PR #111 OPEN/unmerged and matches this HEAD. PR #108 OPEN/unmerged; latest observed static HEAD `f291209565dbc49d78a0b3a387d00be0c754df45`. Progress stays **50% PROVISIONAL**.
+>
+> - Source validation [#39790514805](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805) = SUCCESS on exact HEAD `df819968a1b3b561bba00abde4fe3432adaa8b39`.
+> - Preview diagnostic [#39790514765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765) = IN_PROGRESS on exact HEAD `df819968a1b3b561bba00abde4fe3432adaa8b39`; last observed step was Chromium install. Screenshot matrix and Preview diagnosis pending; no artifact available at that poll. Do not mark visual QA PASS.
+> - Fixes since earlier checkpoints: [`9209ac3`](https://github.com/chichute5500/Sindarealest-admin/commit/9209ac398636e2187beb2731359ae9c205901157) restores nav collection iteration; [`df81996`](https://github.com/chichute5500/Sindarealest-admin/commit/df819968a1b3b561bba00abde4fe3432adaa8b39) updates Order detail E2E to choose the visible responsive button. Source CI is green; E2E/visual result still pending.
+> - #6 Orders remains PARTIAL_NOT_ACCEPTED (3 UI-only fixtures; no live backend or multi-page pagination proof). #7 Order detail NOT VERIFIED pending this run's logs and screenshot artifact.
+> - **First action next chat:** poll run #39790514765, jobs/steps/logs/artifacts to completion. Only then review screenshots and update screen statuses. Do not repeat old #3/#4 geometry without a new failure/state.
+
 # LIVE STATUS — 2026-10-22T19:59:12.897+07:00
 
 ## Refs and exact-SHA evidence

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "status": "IN_PROGRESS_TEST_FAILURE",
+  "status": "SOURCE_PASS_PREVIEW_IN_PROGRESS",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "capturedAt": "2026-10-22T13:48:47.327Z",
+  "capturedAt": "2026-10-22T14:00:00Z",
   "currentHeadAtCheckpoint": "78697c759185e04f58cdf2ac629fdb368204a3b8",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "305fc139c22d682b4b6882af18d6d79836887cc7",
@@ -430,6 +430,78 @@
       "Poll Preview run #39784873281 only as evidence for SHA 340f50d6; do not attribute it to current HEAD.",
       "Verify a safe screenshot/Preview run for current HEAD; no Production deployment.",
       "Continue independent 12-screen acceptance and PR scope audit without repeating valid exact-SHA tests."
+    ]
+  },
+  "latestVerifiedCheckpoint": {
+    "updatedAt": "2026-10-22T21:00:00+07:00",
+    "liveAdminHead": "df819968a1b3b561bba00abde4fe3432adaa8b39",
+    "adminBranch": "feature/admin-isolated-handoff-2026-10-20",
+    "pr111": {
+      "state": "OPEN",
+      "merged": false,
+      "head": "df819968a1b3b561bba00abde4fe3432adaa8b39"
+    },
+    "protectedStaticBranch": "fix/liquid-glass-audit-2026-10-19",
+    "pr108": {
+      "state": "OPEN",
+      "merged": false,
+      "head": "f291209565dbc49d78a0b3a387d00be0c754df45"
+    },
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL",
+    "sourceValidation": {
+      "runId": 39790514805,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805",
+      "headSha": "df819968a1b3b561bba00abde4fe3432adaa8b39",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "previewDiagnostic": {
+      "runId": 39790514765,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765",
+      "headSha": "df819968a1b3b561bba00abde4fe3432adaa8b39",
+      "status": "in_progress",
+      "conclusion": null,
+      "lastObserved": "Chromium installation in progress; local screenshot matrix, configured Preview diagnosis and artifact upload pending; no artifact available at last poll."
+    },
+    "recentFixes": [
+      {
+        "sha": "9209ac398636e2187beb2731359ae9c205901157",
+        "summary": "Restored querySelectorAll helper for nav button iteration; regression assertion added.",
+        "validation": "source workflow SUCCESS; Preview diagnostic FAILED later in Playwright"
+      },
+      {
+        "sha": "df819968a1b3b561bba00abde4fe3432adaa8b39",
+        "summary": "Order detail E2E now selects the visible responsive detail button and contract test matches selector.",
+        "validation": "source workflow SUCCESS; Preview diagnostic still running at last poll"
+      }
+    ],
+    "screens": {
+      "orders": {
+        "status": "PARTIAL_NOT_ACCEPTED",
+        "scope": "fixture-based; only three UI-only orders; no real backend or multi-page pagination proof"
+      },
+      "orderDetail": {
+        "status": "NOT_VERIFIED",
+        "scope": "visible responsive locator fixed in E2E; wait for current run and inspect logs/screenshots before status change"
+      }
+    },
+    "nextActions": [
+      "Poll Preview run 39790514765 until completed; inspect jobs, step logs and artifact list. Run is bound only to exact SHA df819968a1b3b561bba00abde4fe3432adaa8b39.",
+      "If run fails, inspect failing step/log and make only a reproducible, safe source/test correction on ADMIN branch with expected-SHA lease; rerun relevant validation.",
+      "Review screenshot artifact for Orders (#6) and Order detail (#7) separately; fixtures are not authenticated live-data QA.",
+      "Continue the remaining unaccepted screens and provenance audit; do not repeat completed #3/#4 geometry without a new reason.",
+      "Update handoff only after current run conclusion is known; read back changed files and verify new HEAD plus both PR states."
+    ],
+    "boundaries": [
+      "No merge PR #111/#108",
+      "No static branch or main writes",
+      "No Production deploy",
+      "No Access bypass or secrets",
+      "No setup/deploy/migrations",
+      "No remote D1/R2 read/write",
+      "No invented business data or API contracts",
+      "No PASS without exact-SHA evidence"
     ]
   }
 }
