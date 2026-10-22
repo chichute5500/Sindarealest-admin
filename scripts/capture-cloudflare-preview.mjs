@@ -951,11 +951,9 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
         progress: Number(node.dataset.flightProgress || 0), transform: node.style.transform,
         rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
     });
-    await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone')
+    const detailFlyFinished = await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone')
       && document.querySelector('#cartOpen')?.classList.contains('sd-cart-bump'), null, { timeout: 1800 })
-      .then(() => true).catch(() => false).then(value => { globalThis.__sdFlyFinished = value; });
-    const detailFlyFinished = await page.evaluate(() => globalThis.__sdFlyFinished === true).catch(() => false);
-    await page.evaluate(() => { try { delete globalThis.__sdFlyFinished; } catch {} });
+      .then(() => true).catch(() => false);
 
     await page.waitForFunction(labelText => {
       const toast = document.querySelector('#toast');
@@ -1225,10 +1223,10 @@ async function captureCardFlyToCartProbe(page, button, viewport, theme, context,
     const image = featured
       ? (card.querySelector('[data-feature-track]')?.children[Number(card.dataset.featureIndex || 0)] || card.querySelector('.feature-single'))
       : card?.querySelector('.product-photo img,.feature-single,.feature-slide');
-    const stage = card?.querySelector('[data-featured-card] .featured-media') || card?.querySelector('.product-photo');
+    const stage = card?.querySelector('.featured-media,.product-photo');
     const ir=image?.getBoundingClientRect(), sr=stage?.getBoundingClientRect();
     return { quantity:Number(quantities[id]||0), total, badge:document.querySelector('#cartCount')?.textContent?.trim()||'0',
-      expectedBadge:total>99?'99+':String(total), toastVisible:Boolean(document.querySelector('#toast.show'),
+      expectedBadge:total>99?'99+':String(total), toastVisible:Boolean(document.querySelector('#toast.show')),
       imageRect:ir?{x:ir.x,y:ir.y,width:ir.width,height:ir.height}:null,
       stageRect:sr?{x:sr.x,y:sr.y,width:sr.width,height:sr.height}:null };
   }, before.productId);
