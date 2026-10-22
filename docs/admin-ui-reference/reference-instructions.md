@@ -10,7 +10,7 @@ Open `docs/admin-ui-reference/admin-mobile-reference.png` before editing. Preser
 ## Requirements
 - Mobile-first Liquid Glass; light/dark; Vietnamese; accessible focus/names/keyboard; no clipping/overlap.
 - Unknown product images/price/stock remain unknown. Fixture placeholders must not become product data.
-- Latest source/test matrix: [run #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576), SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`. It passed source/fixture checks but does not prove per-screen visual acceptance or authenticated backend flows.
+- Latest source/test matrix: [run #39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346), SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`. It passed source/fixture checks but does not prove per-screen visual acceptance or authenticated backend flows.
 - Gallery has a featured cover slot and horizontal thumbnail rail in source; no concrete defect was confirmed in the reviewed synthetic fixture screenshot.
 - PR #111 includes cross-scope `public/index.html` which differs from main and static PR #108; do not edit the static version from this branch.
 - Both setup/deploy script sources include 0009 preflight, but no remote D1 schema was checked. Do not run scripts.
