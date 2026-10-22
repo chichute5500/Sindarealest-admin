@@ -1,5 +1,15 @@
 # SinDarealest2 — CURRENT STATE
-Updated: 2026-10-22 UTC. Read this file first in every new chat.
+Updated: 2026-10-22 10:35 UTC. Read this file first in every new chat.
+
+## Latest visual-review checkpoint — 2026-10-22 10:35 UTC
+
+- Live GitHub state at review start: branch and PR #108 HEAD were `7455b50179f3fa0babebab84266b67a53b8b6231`; PR #108 remains OPEN and NOT MERGED. Comparing `e916ce590b6dbd720dca51405097d20333ce649b` to that HEAD showed 12 commits ahead with reported changes confined to documentation/report files, not storefront source.
+- Newer screenshot artifact: workflow run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821), artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837). It contains 128 real Preview captures, all 8 viewport/theme pairs, 13 route checks, zero recorded hard failures/failed requests, plus fresh copies of both mobile references and both icon boards.
+- **Exact-deployment verification did not pass for that artifact.** `deployment-verification.json` says `DEPLOYMENT_METADATA_UNVERIFIED`: expected `e916ce590b6dbd720dca51405097d20333ce649b`, while the Preview alias metadata returned deployment `3e174ea2-9b58-4801-9f98-f8f941280cc0` with commit `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. The screenshot artifact is suitable for observational visual review because the intervening commits compare as docs-only, but it is **not** a new exact-SHA verification. The last exact-SHA-verified live audit remains run [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036), artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814), SHA `fc406599e04475e232fad790efd03d46979a5a20`.
+- Actual screenshots inspected: home across 360×800, 390×844, 768×1024 and 1440×900 in Light/Dark; first-paint splash; six benefit tiles; mobile product detail/gallery and next-image state; icon pressed state in Light/Dark; account, cart-with-item, checkout form, Zalo CTA, footer/contact and 404. The owner-supplied `/images/hero-sd-gl052.png` is present. The icon boards `Icon.png` and `Chitiet.png` were opened from the artifact; the sampled home/detail controls use outlined icon artwork and the favorite pressed tint is consistent with the blue/navy reference palette. This is not a claim that every icon state is fully accepted.
+- **Confirmed gallery mismatch, read-only:** `/sanpham/sneaker/sneakers-33-48`, title “Sneaker da cá sấu – Tuyển chọn 25”. Screenshot `product-detail-modal-direct-open-mobile-light-390x844.png` shows black high-top boots as image 01/19; `product-gallery-next-mobile-light-390x844.png` shows a visibly different green/white sneaker as image 02/19, and the visible thumbnails span different shoe designs. The automated `galleryNext: PASS` only proves navigation works, not image-to-product consistency. Product/image mapping is locked by scope, so do not edit it or hide the mismatch as a UI workaround; record as a trusted-catalog/mapping dependency.
+- No storefront code was changed in this review. The confirmed gallery issue cannot be corrected inside the present no-mapping-change scope. Keep visual parity and icon parity OPEN; do not claim 100%. Planning estimate remains 88% unless the evidence-backed work scope is recalculated.
+
 
 ## Source of truth
 - Repository: https://github.com/chichute5500/Sindarealest-admin
@@ -15,7 +25,7 @@ Updated: 2026-10-22 UTC. Read this file first in every new chat.
 
 ## Latest live run refresh (2026-10-22 UTC)
 - Branch/PR head at this refresh: `99eadd224de1da319598998028ebdcdfda4d495a`; PR #108 remains OPEN, not merged. Fetch again before acting because this branch has been receiving rapid documentation-only commits.
-- Newer workflow run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821) — Liquid Glass isolated visual preview for source SHA `e916ce590b6dbd720dca51405097d20333ce649b` — was IN_PROGRESS at this checkpoint. Do not treat it as evidence for the newer docs-only HEAD or as completed until the run concludes and its artifact is inspected. Preview deploy [#39762445820](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445820) succeeded for `e916ce...`; it predates subsequent docs-only commits and is not a deployment of the current docs HEAD.
+- HISTORICAL at prior refresh: run #39762445821 was IN_PROGRESS. It has since completed; see the Latest visual-review checkpoint above. Its screenshot artifact is observational only because the artifact's deployment metadata did not match the expected SHA.
 - CI [#39762468528](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762468528) passed for `2bd71f55d1c473852d9bfe5f39b701943ce464d0`; current HEAD advanced later via docs-only edits. The next chat must refresh CI and deployment status rather than transfer this PASS to the current HEAD.
 - Root-level `AUDIT-REPORT-2026-10-17.md`, `UPGRADE-REPORT.md`, and `INTEGRITY-REPORT.md` now carry historical-report banners. They remain for traceability, not as current storefront handoff.
 
@@ -47,15 +57,12 @@ Updated: 2026-10-22 UTC. Read this file first in every new chat.
 360×800, 390×844, 768×1024, 1440×900 × Light and Dark = 8 combinations.
 
 ## Next actions (in order)
-1. Fetch branch HEAD and PR #108 head; inspect commits since this checkpoint.
-2. Run #39760903036 is now verified SUCCESS with artifact #12418615814; use this newest exact-SHA artifact as the visual-review source and check for later runs before further changes.
-3. Open the actual artifact images from #12418615814 and both reference PNGs; inspect all 8 combinations and record specific mismatches (route, viewport, theme, screenshot).
-4. Open both icon reference boards and compare actual icon states. Fix only demonstrated mismatches.
-5. Review “Tuyển chọn 25” image/gallery relationships read-only; no data or mapping changes.
-6. For each confirmed UI mismatch: minimal fix → affected tests → Preview deploy → verify exact deployment SHA → live audit/artifact → inspect screenshots.
-7. Update this file, `HANDOFF.md`, `TEST-RESULTS.md`, `TASKS.md`, `docs/visual-audit-progress-2026-10-19.md` and `docs/prompts/NEXT-CHAT-PROMPT.md` only when their facts change. Keep these synchronized.
-8. Continue to the next useful action after reporting. Stop only for a real missing permission/data/user decision.
-
+1. After this documentation update, fetch branch HEAD and PR #108 HEAD again; PR must remain OPEN and unmerged.
+2. Refresh Cloudflare Preview metadata before treating any later capture as exact-SHA evidence. Run #39762445821 is not exact-SHA verified; separate source SHA, deployed SHA and audited SHA.
+3. Keep VISUAL-PARITY and ICON-PARITY open. Continue only with evidence-backed storefront CSS/icon fixes; preserve official logo and owner-supplied hero asset.
+4. Keep PRODUCT-GALLERY-25 as a confirmed read-only mismatch. Do not change product/catalog/image mappings; correction requires trusted catalog data and authorization outside this scope.
+5. After any future UI code change: run only affected tests, deploy Preview, verify exact deployment SHA, run live audit, inspect artifact images, then update evidence docs.
+6. QR/payment remains fail-closed pending trusted backend confirmation/configuration; no real checkout/payment tests.
 ## Canonical document rules
 - This file is the single current-state summary. Other handoff docs should link here and retain only evidence/history they uniquely own.
 - Never copy an old SHA or percentage forward without re-verifying it.
