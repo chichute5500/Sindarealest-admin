@@ -135,7 +135,7 @@ jobs:
           EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Probe supplied Cloudflare Preview on push (artifact only; never archives)
-        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') }}
+        if: ${{ always() && github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') }}
         continue-on-error: true
         env:
           PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
