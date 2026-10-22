@@ -40,3 +40,11 @@
 - Consolidated `MASTER-PROMPT-AUTO-HANDOFF.md` into a compatibility pointer to START-HERE; shortened PROMPT-NEXT-CHAT to a current-state-first continuation prompt.
 - Live PR #111 census at this checkpoint: 404 changed paths; 340 under `docs`, of which 326 are retained per-run history records. Historical text/JSON evidence and the approved UI reference remain; generated screenshot matrices are stored in Actions artifacts, not the PR diff.
 - PR #111 remains OPEN/unmerged. The static website PR #108 remains OPEN/unmerged and read-only. Do not treat these counts or SHA as current after subsequent commits; fetch live GitHub state first.
+
+## Live checkpoint — 2026-10-23
+- PR #111 HEAD: `ae7e915d7de15f4f0a03f59d1caaad39fc6a9231`, OPEN/unmerged, 385 changed paths (+38,879/−211), mergeable=false. Exact-SHA Actions/status lookup returned no runs/checks; validation is NOT_VERIFIED.
+- PR #108 remains OPEN/unmerged and read-only. No changes to PR #108, `main`, or the static website branch.
+- Reconciled one stale instruction in `reference-instructions.md`: current PR #111 changed-path census does not include `public/index.html`; `public/admin/index.html` is the ADMIN UI source. Always re-fetch the live file list.
+- Provenance review: `tests/e2e/admin-static-baseline.spec.js` is invoked directly by `.github/workflows/admin-preview-diagnostics.yml`; `tests/e2e/admin-preview.spec.js` is conditionally invoked by the same workflow. Both are live dependencies and must not be deleted. `playwright.config.js` was not found at this branch ref, but that alone is not grounds to remove configuration references without reviewing package/runner defaults.
+- B1 cleanup of previously identified generated screenshots and stale handoff snapshots remains complete. Full provenance review remains PARTIAL; no speculative deletion or merge.
+- Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
