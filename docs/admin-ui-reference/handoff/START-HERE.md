@@ -1,12 +1,13 @@
-# START HERE — LIVE CHECKPOINT (2026-10-22 21:20 +07:00)
+# START HERE — LIVE CHECKPOINT (2026-10-22 18:08 +07:00)
 
-1. Read `current-status.json` first; it is the canonical structured status and contains the prioritized task queue.
-2. Current verified branch HEAD before this docs-only refresh: `6a44432a59b9b8dbb638311cd8650254df3505db`; PR #111 was OPEN/unmerged and matched. Re-fetch both HEADs before any subsequent write.
-3. Last source/test evidence remains SHA `2cf894e476b85e77b646b4bb45596e263a9f2fb6` (Validate #39756606343 PASS; Preview #39756606227 SUCCESS for login CSS signature + login/dashboard smoke). Latest Validate #39758657800 belongs to docs-only SHA `e356b312e8a7af14e91da599c26f9c77c6fba18b`. Neither proves full UI parity or authenticated business QA.
-4. Progress is provisional 50%; no increase without newly accepted weighted items.
-5. Start with Product editor #4: inspect live source/reference for SKU row and AI description action; prior proposed code edit was not committed. Make a verified fix, add exact-SHA tests, inspect screenshots, and continue to Product list #3 / 12-screen parity / PR scope audit.
-6. Keep all-12 parity NOT_ACCEPTED, authenticated backend QA NOT TESTED, AI grouping #11 BLOCKED pending approved contract, R2 image save and PRE/PRO migration DEFERRED_BY_OWNER.
-7. Never merge PR #111/#108, edit main/static, deploy Production, bypass Access, touch secrets, or write/migrate remote D1/R2. Continue safe tasks without waiting for another user prompt.
+1. Read `current-status.json` first; it is the canonical structured status and prioritized task queue.
+2. Current ADMIN HEAD at checkpoint: `db1f9f73baa365ac011b90719cefb285bee282e5`; PR #111 OPEN/unmerged and matched. PR #108 remains OPEN/unmerged on the separate static branch. Re-fetch before any write.
+3. [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) PASS on exact source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff` (`npm run check` + `npm test`). [Preview matrix #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) PASS; [artifact #311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829) contains 99 PNGs and 75 fixture metrics.
+4. Reviewed Product list #3 screenshots at 320×640 and 360×800 in light/dark: SKU/category hint wraps to two lines. This is a localized fix only; screen #3 remains PARTIAL_NOT_ACCEPTED.
+5. Product editor #4 geometry regression assertions passed on `466199f`, but full screen parity remains partial. Progress remains **50% provisional**.
+6. Immediate next task: continue Product list #3 reference comparison and fix only evidenced gaps. Then continue #4, remaining 12-screen parity, and PR #111 scope audit.
+7. Authenticated backend QA = NOT TESTED; AI grouping #11 = BLOCKED pending approved contract; image save/R2 and PRE/PRO migrations = DEFERRED_BY_OWNER.
+8. Never merge PR #111/#108, edit main/static, deploy Production, bypass Access, touch secrets, or write/migrate remote D1/R2. Continue safe tasks without waiting for another prompt.
 
 ---
 

@@ -1,12 +1,14 @@
-# LIVE STATUS — 2026-10-22 21:20 +07:00
+# LIVE STATUS — 2026-10-22 18:08 +07:00
 
-- ADMIN branch HEAD before this docs-only refresh: `3beef9ada8117a728eb31cb25551d0e60daf5d97`; PR #111 OPEN/unmerged and matched at preflight. Re-fetch before every write.
-- Last source/test SHA: `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Validate #39756606343 PASS and Preview #39756606227 SUCCESS (CSS signature + login/dashboard smoke only). Validate #39758657800 passed on docs-only SHA `e356b312e8a7af14e91da599c26f9c77c6fba18b`. Current handoff edits do not extend test coverage to their new docs commit.
-- Progress: **50% provisional**; no new acceptance evidence. Do not increase based on docs/test-only commits or generic CI PASS.
-- Priority next: inspect Product editor #4 current code/reference for SKU verification and AI-description alignment. Proposed layout change is not committed; verify before editing. Then test exact source SHA and inspect images.
-- Remaining: Product list #3 PARTIAL_NOT_ACCEPTED; 12-screen parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; AI grouping #11 BLOCKED pending approved contract; image save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER; PR #111 scope audit open.
-- Safety: ADMIN branch only; no merge, no main/static changes, no Production deploy, no Access bypass/secrets, no remote D1/R2 writes/migrations.
-
+- **Current ADMIN HEAD at checkpoint:** `db1f9f73baa365ac011b90719cefb285bee282e5`; PR #111 OPEN/unmerged and matched. PR #108 remains OPEN/unmerged on the separate static branch. Re-fetch HEAD/PR before every write.
+- **Exact source validation:** [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) SUCCESS on `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`; `npm run check` and `npm test` passed.
+- **Preview matrix:** [Admin Preview diagnostic #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) SUCCESS on exact source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`; local responsive/theme Playwright matrix PASS, 99 PNGs captured in [artifact #311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829).
+- **Visual spot-check:** reviewed Product list #3 at 320×640 and 360×800, light/dark. SKU/category hint now wraps instead of one-line ellipsis; this does not close the other reference gaps.
+- **Recent changes:** #4 editor geometry assertions passed on `466199f`; #3 narrow SKU wrapping + regression tests passed on `dca19a2`.
+- **Progress: 50% provisional, unchanged.** Product list #3 remains PARTIAL_NOT_ACCEPTED; all-12 parity NOT_ACCEPTED; fixture-only screenshots do not prove authenticated backend QA.
+- **Next:** continue Product list #3 reference comparison, then #4 remaining parity, other screens, and PR #111 scope audit.
+- **Still NOT TESTED / BLOCKED / DEFERRED:** authenticated backend QA NOT TESTED; AI grouping #11 BLOCKED pending approved contract; product image save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- **Safety:** ADMIN branch only; no merge, no main/static changes, no Production deploy, no Access bypass/secrets, no remote D1/R2 writes/migrations.
 ---
 
 ## CONTINUITY PROTOCOL — CURRENT OPERATING RULES (2026-10-22)
