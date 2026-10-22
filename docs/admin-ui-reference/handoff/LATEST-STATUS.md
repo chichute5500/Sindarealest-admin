@@ -27,3 +27,10 @@ Continue the **P1 read-only PR #111 scope/provenance audit**: inspect .github/wo
 - Source screenshot matrix: 99 real PNGs; login shell: 16; read-only fixture module screens: 83; fixture metrics: 75.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## 2026-10-22 — live handoff refresh
+- ADMIN HEAD at refresh: `f46966afe09a80540e04e5df40baf4645a777da4`; PR #111 is OPEN, merged=false. Protected PR #108 is OPEN, merged=false.
+- Run #314 tested commit `3658ca1069616639b825de2cd7b9c714ce560901`; do not attribute it to later HEAD without checking workflow head_sha. Job results: Audit ADMIN source, capture baselines, and diagnose Preview: success.
+- Progress remains 50% PROVISIONAL. Next: current-head CI, artifact #311 metrics, product editor #4, then screens #6/#7 and full 12-screen/scope audit.
+- Safety constraints unchanged: no merges, Production deploy, Access bypass, secrets, remote writes or migrations.
