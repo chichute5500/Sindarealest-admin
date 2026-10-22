@@ -337,7 +337,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     orders: 'Mã đơn / thời gian',
     customers: 'Số đơn',
     warranties: 'Mã bảo hành đã phát hành',
-    settings: 'Watermark ảnh sản phẩm'
+    settings: 'Watermark ảnh sản phẩm',
+    activity: 'Nhật ký hoạt động'
   };
   const visualAudit = {
     test: 'local-static-admin-ui-fixture-visuals',
@@ -1909,7 +1910,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
     }, true);
     await captureView('warranties', 'warranties', async variant => {
-      // Screen #10: synthetic, read-only warranty list/filter and accessible issue disclosure.
+      // Screen #9: synthetic, read-only warranty list/filter and accessible issue disclosure.
       await expect(page.locator('.warranty-toolbar')).toBeVisible();
       await expect(page.getByLabel('Tìm mã bảo hành, mã đơn, SKU hoặc sản phẩm')).toBeVisible();
       await expect(page.locator('[data-warranty-filter="all"]')).toHaveAttribute('aria-pressed', 'true');
@@ -2243,6 +2244,33 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     });
     await captureView('dashboard-activity', 'dashboard', async () => {
       await page.locator('#main .panel').last().scrollIntoViewIfNeeded();
+    });
+    await captureView('activity-log', 'activity', async variant => {
+      // Official screen #12: test the dedicated audit-log route, not only the dashboard's recent-activity preview.
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Nhật ký hoạt động');
+      await expect(page.locator('#activityLogSearch')).toBeVisible();
+      await expect(page.locator('#activityActionFilter')).toBeVisible();
+      await expect(page.locator('#refreshActivityLogs')).toBeVisible();
+      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+
+      const width = page.viewportSize()?.width ?? 0;
+      const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+      expect(documentWidth, 'Activity log must not cause document-level horizontal overflow').toBeLessThanOrEqual(width);
+      if (width <= 680) {
+        await expect(page.locator('.activity-log-table tbody tr td').first()).toHaveCSS('display', 'block');
+      }
+
+      await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('UI-ONLY-PRODUCT');
+      await page.locator('#activityLogSearch').fill('no-match-ui-query');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('Không có bản ghi phù hợp với bộ lọc.');
+      await page.locator('#clearActivityFilters').click();
+      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await page.locator('#activityActionFilter').selectOption('product_updated');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await page.locator('#activityActionFilter').selectOption('all');
+      await page.locator('#refreshActivityLogs').click();
+      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
     });
     await captureView('notifications', 'dashboard', async variant => {
       const toggle = page.locator('#notificationToggle');
