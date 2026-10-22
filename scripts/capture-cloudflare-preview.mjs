@@ -1399,6 +1399,7 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
       const previousIndex = Number.parseInt(String(previous || '').split('/')[0], 10);
       return Number.isFinite(current) && Number.isFinite(previousIndex) && current !== previousIndex;
     }, before, { timeout: 5000 });
+    // Exact-SHA live-audit evidence must finish before another branch update.
     // The counter changes before the CSS opacity/transform transition finishes.
     // Wait for the selected image to be decoded and its transition state to settle
     // so the evidence cannot capture a half-crossfaded frame that looks cropped.
