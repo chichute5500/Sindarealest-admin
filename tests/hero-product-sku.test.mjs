@@ -46,7 +46,12 @@ for (const [, selector, declarations] of heroImageRules) {
 assert.ok(html.includes("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
 assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
-assert.ok(html.includes("#home .hero-visual::before,#home .hero-visual::after,#home.hero:after"));
+assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
+assert.ok(html.includes("#home .hero-visual::before{")
+  && html.includes("z-index:0!important;")
+  && html.includes("filter:blur(18px)!important;")
+  && html.includes("position:relative!important;z-index:1!important;"),
+  "The hero presentation asset must be untouched above a separate background halo.");
 assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
   && html.includes("grid-column:1!important;")
   && html.includes("grid-column:2!important;")
