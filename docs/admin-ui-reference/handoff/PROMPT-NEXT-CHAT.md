@@ -1,14 +1,15 @@
-## PROMPT TIẾP TỤC — 2026-10-22T11:45:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T21:30:00+07:00
 
-Tiếp tục công việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã kiểm thử: `5b41777c058bde449f3439e8fba52fce6f293151`; HEAD trước handoff tiếp theo: `480eda6ae1ae06c517d0d87468eebb4abef0341a` (commit report/artifact).
-
-**Exact-SHA evidence**
-- Validate Source [#39723837400](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/39723837400) — SUCCESS.
-- Admin Preview/Playwright [#39723837416](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/39723837416) — SUCCESS trên cùng source/test SHA.
-- Artifact [admin-preview-evidence-275](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/39723837416/artifacts/12402147594), ID `12402147594`: 83 entries, 80 PNG (79 test screenshots + 1 reference), 55 fixture metrics. Metadata complete; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
-- Local Playwright 3/3 PASS; configured Preview login/dashboard smoke 2/2 PASS. Full authenticated business CRUD/save/real upload QA NOT TESTED.
-- Warranty #10 narrow viewport regression passed 320×640 and 360×800, light/dark. Customer #9 and gallery #4 narrow tests pass; QR picker local-only guard pass. Those screens remain PARTIAL until actual reference parity is accepted.
-- Overall progress 50%; all 12-screen visual parity NOT ACCEPTED.
+- **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`. **HEAD trước checkpoint tài liệu:** `55ae20603089afc34409fd1bd54efc897a5a3ab8` (commit evidence/docs, không phải source/test SHA). **Source/test SHA đã chạy:** `a0e17a7e625c89875e81ff14abf52d1eb03b5cf0`.
+- **Validate Source:** [run #39727105101](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727105101) — **SUCCESS** đúng source/test SHA.
+- **Admin Preview diagnostic / Playwright:** [run #39727105050](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727105050) — **SUCCESS** đúng source/test SHA. Local Playwright **3/3 PASS**; configured Preview login/dashboard smoke **2/2 PASS**; Preview CSS diagnostic `PASS_LOGIN_CSS_SIGNATURE`. Điều này xác nhận trang Preview đã được truy cập và signature/login-dashboard smoke đạt; **không** phải full authenticated business CRUD/backend QA.
+- **Artifact mới nhất:** [`admin-preview-evidence-280`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727105050/artifacts/12403891182), ID `12403891182`, 17,121,806 bytes, 103 ZIP entries, 100 PNG, 67 fixture screenshots, 59 fixture metrics. Đã tải ZIP và mở ảnh contact sheet: Products #3 mobile `390×844` light/dark và desktop `1280×800` light đã kiểm tra trực quan. Fixture screens dùng synthetic/read-only data, không phải dữ liệu thật.
+- **Responsive evidence:** login matrix 16 tổ hợp viewport/theme không tràn ngang; 3 local Playwright tests và 2 Preview smoke tests PASS; fixture metadata ghi 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors. Các fixture metrics không chứng minh nghiệp vụ backend thật.
+- **Screen #3 Products:** trạng thái vẫn **PARTIAL / NOT ACCEPTED**. Ảnh hiện tại cho thấy thẻ sản phẩm mobile, bộ lọc và điều hướng dưới; desktop vẫn dùng bảng. Chưa đủ đối chiếu đầy đủ với reference để nghiệm thu parity. **12 screen parity NOT ACCEPTED**; authenticated business QA **NOT TESTED**.
+- **Tiến độ tổng thể: 50% — giữ nguyên.** Không tăng phần trăm chỉ vì CI xanh, chụp thêm ảnh hoặc sửa test.
+- **PR #111 ADMIN:** OPEN/unmerged, HEAD hiện tại trước docs checkpoint `55ae20603089afc34409fd1bd54efc897a5a3ab8`. **PR #108 static website:** OPEN/unmerged; không chỉnh nhánh static, không merge PR nào.
+- **Bước kế tiếp:** đối chiếu Products #3 trực tiếp với ảnh reference ở `390×844` light/dark và `1280×800` light/dark; xác định mismatch cụ thể trước khi sửa. Sau sửa chạy lại Validate Source + Preview trên đúng SHA, tải/mở artifact, cập nhật evidence.
+- **Rào chắn:** chỉ nhánh ADMIN; không merge/cherry-pick/force-push/sync; không Production deploy; không thay đổi/đọc lộ/bypass secrets hoặc Cloudflare Access; không remote D1/R2/SQL/migration/setup/deploy/infra; không TinyFish. Giữ `DEFERRED_BY_OWNER` nguyên trạng.
 
 **Continue without stopping after reports**
 1. Fetch live ADMIN HEAD, PR states, latest Actions and read these seven handoff files before next edits.
