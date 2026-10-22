@@ -1,11 +1,16 @@
 # Instructions for AI: use the ADMIN UI reference
 
-## CURRENT VERIFIED CHECKPOINT — 2026-10-22T16:12:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:32:00+07:00
 
-- Validate Source [#39753005337](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337) and Preview/Playwright [#39753005347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347) both SUCCESS on exact source/test SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`; current branch HEAD `085e6f14fef7a7ac45f45d3a5e5e5d5308d22fb5` is evidence-only.
-- Artifact [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768) has 99 PNGs, 75 metrics and 20/20 bottom-nav scroll geometry checks PASS. Five mobile screens at 320×640 and 390×844 in light/dark reach document end with 16–65px gap above nav.
-- Preview is `PASS_LOGIN_CSS_SIGNATURE` only, not authenticated backend QA. Screen #3 and all-12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED; progress 50%.
-- PR #111/#108 OPEN/unmerged; only ADMIN branch, no main/static edits, Production deploy, Access/secrets bypass or remote D1/R2/schema/migration writes.
+- **ADMIN branch HEAD trước commit bàn giao này:** `06e679cb8502a1e657331d6b6fd204dcc86b91c9`; source-code commit gần nhất được kiểm tra là `d1047c6e898a5995295f8ce7e6191674207c4fe3`. Không được gộp nhầm source SHA với evidence/docs-only HEAD.
+- **Validate Source** [#39755520563](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520563) **SUCCESS** trên `d1047c6e898a5995295f8ce7e6191674207c4fe3`.
+- **Admin Preview diagnostic smoke test** [#39755520573](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520573) **FAIL** trên cùng `d1047c6e898a5995295f8ce7e6191674207c4fe3`, bước lỗi: `Capture real source screenshots across responsive and theme matrix`. Chưa xác minh được nguyên nhân gốc ở checkpoint này; không gọi đây là Preview PASS. Cần mở job log và sửa assertion/implementation dựa vào lỗi cụ thể, không nới lỏng kiểm tra.
+- **Thay đổi UI mới nhất:** custom checkbox SKU xác minh (focus-visible, light/dark, reduced-motion) và Playwright assertion checked/unchecked. Lần Preview trước đó #39754867245 fail vì assertion so màu với CSS custom property `--accent` không tồn tại tại root; đã sửa màu explicit theo theme. Nhưng run mới #39755520573 vẫn FAIL nên thay đổi checkbox chưa được chấp nhận cho đến khi log mới được đọc và test xanh.
+- **Kết quả đã xác minh trước đó, không phải trạng thái CI mới:** artifact [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768), source SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`, 99 PNG/75 metrics và 20/20 scroll-to-end geometry checks PASS trên 5 màn, 2 viewport, 2 theme. Không dùng artifact cũ để tuyên bố source hiện tại đã đạt Preview.
+- **Tiến độ giữ 50%.** Screen #3 PARTIAL/NOT ACCEPTED; 12-screen visual parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED; AI grouping #11 BLOCKED chờ contract được duyệt; R2 image save và PRE/PRO migration DEFERRED_BY_OWNER.
+- **PR #111 ADMIN và PR #108 static vẫn OPEN/unmerged.** Chỉ nhánh ADMIN; không sửa main/static, không merge, không deploy Production, không bypass Access/secrets, không ghi D1/R2 hoặc chạy migration thật.
+------
+
 
 ## CURRENT VERIFIED CHECKPOINT — 2026-10-22T15:52:00+07:00
 

@@ -1,27 +1,27 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T16:12:00+07:00",
+  "updatedAt": "2026-10-22T16:32:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "085e6f14fef7a7ac45f45d3a5e5e5d5308d22fb5",
+  "branchHeadAtCheckpoint": "06e679cb8502a1e657331d6b6fd204dcc86b91c9",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Validate Source #39753005337 and Preview #39753005347 SUCCESS on exact source/test SHA 4ba76894734e3cc83615f0d91eb7663bcb0b25d4. 20/20 mobile bottom-nav scroll geometry checks PASS; no CSS fix warranted. Preview is login CSS signature only; screen parity/backend QA remain incomplete.",
+  "progressBasis": "Validate Source #39755520563 PASS, Preview #39755520573 FAIL on exact source SHA d1047c6e898a5995295f8ce7e6191674207c4fe3; latest failure occurs during responsive/theme screenshot capture and root cause is not yet verified. Earlier 20/20 scroll evidence is from older SHA only.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "4ba76894734e3cc83615f0d91eb7663bcb0b25d4",
-    "conclusion": "current source validation pass; preview diagnostic pass on prior identical app source; handoff/docs commits are docs-only",
+    "testedCommitSha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
+    "conclusion": "source pass; preview fail on exact same source SHA",
     "validateRun": {
-      "runId": 39753005337,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337",
-      "sha": "4ba76894734e3cc83615f0d91eb7663bcb0b25d4",
+      "runId": 39755520563,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520563",
+      "sha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39753005347,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347",
-      "sha": "4ba76894734e3cc83615f0d91eb7663bcb0b25d4",
-      "conclusion": "success",
-      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
+      "runId": 39755520573,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520573",
+      "sha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
+      "conclusion": "failure",
+      "failingStep": "Capture real source screenshots across responsive and theme matrix"
     },
     "artifact": {
       "id": 12413849768,
@@ -114,11 +114,10 @@
     "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
   ],
   "nextActions": [
-    "Continue next distinct visual parity gap using approved reference.",
-    "Do not modify bottom-nav CSS: 20/20 scroll-to-end geometry checks passed.",
-    "Keep authenticated backend/business QA NOT TESTED until authorized access and safe read-only strategy exist.",
-    "Preserve PR #111/#108 OPEN/unmerged; no Production deployment, Access/secrets changes, D1/R2 writes or migrations.",
-    "Progress stays 50% until all-12-screen parity is accepted."
+    "Inspect Preview #39755520573 log and fix exact failure without weakening assertions.",
+    "Run Preview again on latest source code and verify both workflow outcomes.",
+    "Keep progress 50% until visual parity/backend acceptance evidence exists.",
+    "Keep PR #111/#108 open/unmerged and do not deploy Production or write remote D1/R2."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -130,19 +129,15 @@
   ],
   "ownerActionRequiredNow": "No immediate action required for these CSS regressions. Authenticated backend QA remains untested and must use an authorized Preview path; do not bypass Access. Product image save/R2 and PRE/PRO migrations remain deferred by owner.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T16:12:00+07:00",
+    "checkedAt": "2026-10-22T16:32:00+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "latestBranchHead": "085e6f14fef7a7ac45f45d3a5e5e5d5308d22fb5",
-    "latestValidateSourceSha": "4ba76894734e3cc83615f0d91eb7663bcb0b25d4",
-    "validateRun": 39753005337,
-    "latestPreviewRun": 39753005347,
-    "latestPreviewSha": "4ba76894734e3cc83615f0d91eb7663bcb0b25d4",
-    "previewConclusion": "success",
-    "previewStatus": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
-    "artifactId": 12413849768,
-    "artifactName": "admin-preview-evidence-300",
-    "scrollToEndChecks": 20,
-    "scrollToEndConclusion": "PASS",
+    "latestBranchHead": "06e679cb8502a1e657331d6b6fd204dcc86b91c9",
+    "latestValidateSourceSha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
+    "validateRun": 39755520563,
+    "latestPreviewRun": 39755520573,
+    "latestPreviewSha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
+    "previewConclusion": "failure",
+    "previewStatus": "FAIL_CAPTURE_REAL_SOURCE_SCREENSHOTS_RESPONSIVE_THEME_MATRIX",
     "progressPercent": 50
   },
   "latestContinuationCycle": {
@@ -416,7 +411,7 @@
     },
     "progressPercent": 50
   },
-  "currentHeadPreview": "PASS_ON_TESTED_APP_SOURCE_SHA; BRANCH_HEAD_IS_EVIDENCE_ONLY_DESCENDANT",
+  "currentHeadPreview": "FAIL_ON_LATEST_SOURCE_SHA",
   "previewRun": {
     "runId": 39750503783,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783",
