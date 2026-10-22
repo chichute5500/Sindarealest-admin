@@ -1,3 +1,14 @@
+# LATEST OVERRIDE — HERO IMAGE TEMPORARILY HIDDEN BY OWNER REQUEST (2026-10-23)
+
+- Owner decision: temporarily remove the Hero image from the visible storefront and finish the Hero image treatment later. This is a deliberate pause, NOT Hero visual acceptance and NOT permission to delete the source asset.
+- Implementation commit: `6727ee051f8f9a62bebad9eebc43d5b1cee616c4` changes `public/index.html` so `syncHeroProductImage()` keeps `#heroProductImage` hidden, removes its `src`, and marks `data-product-image-status="temporarily-disabled-owner-request"`. Commit `32d5e3c7bc3054662855eb59ef2604c02a9e4315` updates the source-level parity test for this temporary state.
+- Keep the original owner-uploaded source `public/images/hero-upload/tb_image_share_1792519964514 (1).png` and its separate derivative in the repo. Do not delete, overwrite, rename, or map either file to a catalog product. Do not restore obsolete `hero-sd-gl052.png`.
+- Existing CSS hides the Hero visual container when the image remains `hidden`, and expands the copy to one column. Verify this on the actual Preview after Actions finishes.
+- Next: inspect latest Actions for source tests and Preview deployment on the new HEAD; confirm the image and empty visual frame are both absent in Light and Dark at mobile and desktop, no broken layout/blank reserved box, and no unrelated regression. If tests fail, fix tests/code on this branch only. Do not begin other UI work until owner decides the Hero should be resumed; when resumed, inspect the supplied source/reference carefully and then restore image loading only through an explicit implementation change.
+- PR #108 remains OPEN/unmerged. Preview only. No Production, `main`, Admin, backend/API/auth/catalog/SKU/product data, D1/R2, bindings/secrets/DNS/Access, or official logo changes. This temporary removal is NOT an owner PASS; Hero remains paused and unaccepted.
+
+---
+
 # LATEST OVERRIDE — HERO PADDING FIX / LIVE VISUAL GATE STILL OPEN (2026-10-23)
 
 This block supersedes older SHA, asset-processing, and preview-status claims below where they conflict. Preserve the historical evidence; do not delete it.
