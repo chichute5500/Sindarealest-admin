@@ -1,3 +1,15 @@
+> **CURRENT STATUS OVERRIDE — 2026-10-22, supersedes stale percentages and pending-state notes below where they conflict.**
+>
+> - Working branch: `fix/liquid-glass-audit-2026-10-19`; source HEAD at last verified source checkpoint: `34f64fa944159580ebb303fcbd2171630359a442` (`polish(404): make dark satin folds visible in live view`). PR #108 stays OPEN; do not merge.
+> - Validate source and tests #4505 PASS on this SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601157
+> - Cloudflare Preview deployment #566 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601086. The isolated visual audit #828 is QUEUED pending serialized workflow capacity: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601079. Admin Preview Playwright #783 was IN PROGRESS at checkpoint: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601168. Do not describe the 404 CSS change as live-verified until audit #828 produces an artifact whose deployment verification matches exact SHA `34f64fa944159580ebb303fcbd2171630359a442`.
+> - Latest completed full live audit before this CSS change remains #825 at SHA `36099cf764ffe3d9bc5587acab2c03df8f7a1cfc`: 123 screenshots, 8 viewport/theme combinations, 13 route checks, 69 section checks; zero overflow, console/page/HTTP errors, failed requests, broken images, read-only violations, or hard failures. Artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39735097393/artifacts/12407151723. This is prior-SHA evidence, not proof for `34f64fa`.
+> - Latest source change adjusts the dark 404 overlay to increase satin-fold visibility: `public/404.html`. Focused test and live screenshot verification must follow audit #828. Do not broaden this into unrelated redesign work unless screenshots reveal a specific defect.
+> - Current hero image `/images/hero-sd-gl052.png` is approved, loaded/visible in the prior exact-SHA audit 8/8 contexts. Do not search catalog for SD-GL052 or replace/hide the hero.
+> - Icon reference images `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` have not yet been visually inspected successfully in this session. Treat icon visual comparison and full approved-reference parity as OPEN, not PASS.
+> - QR checkout remains intentionally fail-closed; no QR or transfer amount until trusted backend confirmation/payment configuration exists. Local fixture audit is not live Preview evidence.
+> - Strict boundaries remain: no Production/main/DNS, Admin code, merge, backend/API/schema/business logic/product data/image mapping/D1/R2/bindings/secrets/Access changes. Continue after reporting; stop only for a genuine user action/permission/blocker.
+>
 > **LATEST VERIFIED CHECKPOINT — 2026-10-22, Live audit #822 exact-SHA PASS on source SHA `76a1241e1bdfc5af75a17e3fc69cbfc17cda17e1`; PR #108 remains OPEN and unmerged.**
 
 ## Current verified checkpoint — 2026-10-22
