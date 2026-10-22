@@ -4,12 +4,12 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "capturedAt": "2026-10-22T21:20:00+07:00",
-  "currentHeadAtCheckpoint": "411b87c04526ffbd6fed9f51040daec3016f9bd2",
+  "capturedAt": "2026-10-22",
+  "currentHeadAtCheckpoint": "f46966afe09a80540e04e5df40baf4645a777da4",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
   "progressPercent": 50,
-  "progressBasis": "50% PROVISIONAL; source drift after last successful workflow must be revalidated. No screen accepted; docs/CI alone do not increase progress.",
+  "progressBasis": "50% PROVISIONAL. No progress increase for documentation or CI-only work; 12-screen acceptance and authenticated Preview remain incomplete.",
   "currentHeadValidation": {
     "status": "NOT_VERIFIED_FOR_CURRENT_SOURCE_BLOBS",
     "liveHead": "411b87c04526ffbd6fed9f51040daec3016f9bd2",
@@ -161,6 +161,10 @@
     }
   },
   "screenAcceptance": {
+    "3": "PARTIAL — screenshots previously viewed; interaction/metrics and real-data limitations still need verification.",
+    "4": "NOT VERIFIED — full-screen review pending",
+    "6": "NOT VERIFIED",
+    "7": "NOT VERIFIED",
     "1_login": "PARTIAL_NOT_ACCEPTED",
     "2_dashboard": "PARTIAL_NOT_ACCEPTED",
     "3_product_list": "PARTIAL_NOT_ACCEPTED",
@@ -257,11 +261,12 @@
     }
   ],
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Check latest workflow runs/jobs and require head_sha=current ADMIN HEAD before reporting PASS.",
+    "Inspect admin-preview-evidence-311 (artifact 12420678829, run 39767851318) for product list interactions and metrics; do not invent missing images/prices/stock.",
+    "Review product editor #4 tabs, fields, SKU checkbox, AI suggestions and sticky footer.",
+    "Continue independent evidence for all 12 screens; fixtures or green CI alone do not accept a screen.",
+    "Continue PR #111 scope audit for migration/API/deploy files; distinguish inherited changes from new changes and never blind-revert.",
+    "Update handoff files after meaningful live-state changes and reread at resulting HEAD."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -337,5 +342,27 @@
   },
   "remainingIssues": [],
   "blockedItems": [],
-  "productionDeployment": "NOT_PERFORMED"
+  "productionDeployment": "NOT_PERFORMED",
+  "latestRelevantWorkflowRun": {
+    "id": 39778009734,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+    "testedCommit": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "jobs": [
+      {
+        "id": 119821882420,
+        "name": "Audit ADMIN source, capture baselines, and diagnose Preview",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12425910948,
+        "name": "admin-preview-evidence-314",
+        "expired": false,
+        "url": "https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/artifacts/12425910948"
+      }
+    ]
+  },
+  "passPolicy": "Only count workflow evidence for the exact commit it tested. npm checks/green CI do not independently accept any screen."
 }
