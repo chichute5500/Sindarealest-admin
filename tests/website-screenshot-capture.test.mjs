@@ -10,6 +10,7 @@ import { isApprovedPreviewExternalRead } from '../scripts/preview-external-read-
 import { validatePreviewUrl, matchesPreviewDeployment, inspectPreviewDeployment } from '../scripts/verify-cloudflare-preview-deployment.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
+const deployWorkflow = readFileSync(new URL('../.github/workflows/deploy-storefront-preview.yml', import.meta.url), 'utf8');
 const live = readFileSync(new URL('../scripts/capture-cloudflare-preview.mjs', import.meta.url), 'utf8');
 const storefrontHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const deploymentVerifier = readFileSync(new URL('../scripts/verify-cloudflare-preview-deployment.mjs', import.meta.url), 'utf8');
@@ -444,3 +445,8 @@ assert.match(live, /audit\.notFoundChecks\[0\]\.darkTheme = \{[\s\S]*status: dar
   'The Dark 404 visual check must be recorded in the live audit result.');
 assert.match(live, /notFoundChecksComplete:[^\n]*darkTheme\?\.status === 'PASS'/,
   'Overall live audit acceptance must require the Dark 404 visual check to pass.');
+
+assert.match(deployWorkflow, /push:\s*branches:[\s\S]*?paths-ignore:\s*- 'docs\/\*\*'/,
+  'Documentation-only commits must not redeploy the storefront or move the verified Preview SHA.');
+assert.match(deployWorkflow, /workflow_dispatch:/,
+  'Manual Preview deployment must remain available after adding the docs-only path filter.');
