@@ -428,6 +428,10 @@ assert.match(redirects, /^\/sanpham\/\* \/index\.html 200$/m, 'Canonical product
 assert.match(redirects, /^\/san-pham\/\* \/index\.html 200$/m, 'Legacy product-detail routes must retain the SPA fallback.');
 assert.doesNotMatch(redirects, /^\/\* \/index\.html 200$/m, 'Unknown paths must be allowed to return the real Pages 404 response.');
 assert.match(notFoundHtml, /id="notFoundTitle">404<\/h1>[\s\S]*href="\/"/, 'The real 404 document must include a heading and home link.');
+assert.match(notFoundHtml, /html\.dark body::after\{[^}]*linear-gradient\(138deg/,
+  'The standalone 404 Dark theme must include visible satin-fold lighting rather than a flat navy field.');
+assert.match(notFoundHtml, /\.not-found-page\{position:relative;z-index:1/,
+  'The 404 card must remain above the dark satin overlay.');
 assert.match(live, /response\?\.status\(\) === 404[\s\S]*state\.hasNotFoundView/, 'The live 404 check must require HTTP status 404 and visible 404 content.');
 
 assert.match(live, /function isExpectedNotFoundResponse\(url, status\)[\s\S]*parsed\.pathname === expectedNotFoundPath[\s\S]*status === 404/,
