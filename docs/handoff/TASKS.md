@@ -11,6 +11,14 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 | STOREFRONT-VISUAL-AUDIT | PAUSED UNTIL HIDDEN LAYOUT VERIFIED | Do not resume unrelated visual redesign until temporary Hero state is verified. Then continue from current evidence, not old percentages. |
 | QR-PAYMENT-CONTRACT | BLOCKED ON TRUSTED BACKEND CONTRACT/CONFIG | Keep fail-closed: no QR or transfer request until trusted order status and complete receiver/payment instructions exist. Do not modify Admin/backend in this branch. |
 
+## Working protocol (owner-approved 2026-10-23)
+- One active acceptance item at a time; do not spread effort across multiple unfinished main tasks.
+- While CI/deploy/capture is running, immediately do independent, safe work that advances the active item. No idling or duplicate workflow runs; avoid editing the same code under validation.
+- After a report, continue automatically. Stop only for required owner visual acceptance/decision, missing permission, or a genuine blocker.
+- Reuse valid evidence for unchanged code; rerun only missing/stale/impacted checks. Tie every result to exact SHA and deployment.
+- Separate code-test PASS, Preview deployment PASS, live screenshot evidence, and owner visual acceptance. Owner PASS locks the item until explicit permission to reopen.
+- Current active item remains HERO-TEMP-HIDDEN: verify the latest actual Preview has no empty frame/blank reserved space and no responsive Light/Dark regression. Do not restore the old Hero asset or resume visible-Hero design unless the owner explicitly asks.
+
 ## Guardrails
 - Repo `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`.
 - PR #108 stays OPEN and unmerged.
