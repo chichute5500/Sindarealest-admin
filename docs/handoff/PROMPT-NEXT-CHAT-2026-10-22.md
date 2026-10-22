@@ -9,7 +9,7 @@ Updated: 2026-10-23 — consolidated working protocol and current owner decision
 - PR #108 must stay OPEN and unmerged.
 - Preview/storefront branch only. Never deploy Production or change `main`, Admin branch, DNS, D1/R2 data/config, bindings, secrets, Access policy, backend/API/auth/business logic, or product/catalog data.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
-- Hero owner decision: image is temporarily hidden; this is NOT PASS. Do not resume visible-Hero design or restore obsolete `hero-sd-gl052.png` unless the owner explicitly asks. Preserve `public/images/hero-upload/tb_image_share_1792519964514 (1).png` and its separate derivative unchanged. Current permitted work is verifying that the hidden Hero leaves no empty frame/blank space or responsive Light/Dark regression.
+- Hero owner decision: image is temporarily hidden and explicitly PAUSED. Owner says leave it alone and return to Hero only after other storefront work is complete. Do not edit Hero markup/CSS/assets, run Hero-specific redesign/checks, or restore obsolete `hero-sd-gl052.png` during the pause. Preserve `public/images/hero-upload/tb_image_share_1792519964514 (1).png` and its separate derivative unchanged. Hero is not PASS.
 
 ## Required working protocol — fastest safe completion
 1. **One active acceptance item at a time.** Finish, verify, and present that item for owner acceptance before switching to another main item. Do not scatter partial changes across several features.
