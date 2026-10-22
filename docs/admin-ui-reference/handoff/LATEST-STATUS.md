@@ -1,5 +1,17 @@
 # LATEST STATUS — SinDarealest Admin
 
+## Current live checkpoint — 2026-10-22T19:35:37Z
+
+- Live HEAD at this checkpoint: `8101482978109dc0c9fe93dc29569d4dc8496018`; PR #111 OPEN/unmerged, 385 changed paths (+38,795/−211), mergeable=false. This HEAD contains handoff/documentation synchronization after the successful code/test SHA below.
+- PR #108 remains OPEN/unmerged and READ-ONLY at `ae2a46506a1b1f4db9dea5bd9131e71bf4fd5f86` (286 changed paths).
+- Exact source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`: Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) SUCCESS; Preview diagnostic [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) SUCCESS. `npm run check`, `npm test`, Playwright matrix and configured Preview diagnostic all passed on that exact source/test SHA.
+- Artifact [admin-preview-evidence-352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976/artifacts/12451964183): 102 PNGs (16 login shell, 86 read-only fixture module captures, 78 fixture metrics), no recorded browser/console/network errors or attempted writes. Fixture captures are not authenticated business-backend acceptance.
+- B1 cleanup is complete for generated historical PNGs, duplicate/stale handoff material, unreferenced ZIP, static-only workflow/capture script and static-site test pollution. Current diff: 385 paths; 331 docs, 24 functions, 19 tests, 4 scripts; no generated PNGs in history and no legacy snapshot folder. The approved reference PNG remains; `public/index.html` is byte-identical to `main`.
+- Product progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+
+## Historical checkpoints below
+
+
 **Captured from GitHub at the 2026-10-23 checkpoint. All SHAs below are checkpoint-specific; fetch live again before acting.**
 
 ## Live GitHub state before this handoff sync

@@ -8,7 +8,7 @@ This directory retains compact per-run evidence: `report.md`, `metadata.json`, a
 
 Do not commit generated Playwright screenshot matrices into this history directory. The prior tree contained 912 historical PNG screenshots across repeated runs; they made the ADMIN PR dominated by old generated evidence rather than source changes. Those screenshots have been removed from the current PR diff. The approved source reference, `docs/admin-ui-reference/admin-mobile-reference.png`, is not part of that removal and must remain in Git.
 
-New full-resolution screenshots and metadata belong in the corresponding GitHub Actions artifact, as already configured by `.github/workflows/admin-preview-diagnostics.yml`. The latest successful matrix recorded before this cleanup is [run #39821242400](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39821242400), artifact `admin-preview-evidence-346` (102 PNGs; 16 login-shell captures, 86 read-only fixture screenshots, 78 fixture metrics). That artifact has a 14-day retention and is not authenticated backend acceptance.
+New full-resolution screenshots and metadata belong in the corresponding GitHub Actions artifact, as already configured by `.github/workflows/admin-preview-diagnostics.yml`. The latest successful matrix is [run #39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976), artifact `admin-preview-evidence-352` (102 PNGs; 16 login-shell captures, 86 read-only fixture screenshots, 78 fixture metrics). It has a 14-day retention and is not authenticated backend acceptance.
 
 ## Superseded handoff snapshots
 
