@@ -18,7 +18,7 @@
 ## Evidence discipline
 - PASS is scoped to the exact commit, test suite, environment and artifact.
 - Gallery press (4/4) and fly-to-cart (6/6 plus 2 animation-edge checks) were PASS in the recorded live audit for SHA `78b0a673a610501bfa4048df0ed614ff48246f97`; do not reopen without newer contrary evidence.
-- The most recent documented full live audit is run #39756327625, artifact #12416207670, for SHA `78b0a673a610501bfa4048df0ed614ff48246f97`. It is not evidence that later SHA `fc406599e04475e232fad790efd03d46979a5a20` has passed live visual audit.
+- Latest exact-SHA machine-verified live audit is run #39760903036, artifact #12418615814, for SHA `fc406599e04475e232fad790efd03d46979a5a20`; deployment verification passed. Screenshot archive still requires manual visual review, so this does not certify final visual parity.
 - Docs-only commits are excluded from Preview deployment/live-capture push triggers. Do not say a documentation commit has deployed storefront code.
 
 See [NEXT-CHAT prompt](PROMPT-NEXT-CHAT-2026-10-22.md) for the concise handoff instructions.
