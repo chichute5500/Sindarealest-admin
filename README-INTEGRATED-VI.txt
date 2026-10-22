@@ -40,3 +40,6 @@ GIỚI HẠN
 - Watermark được phủ trên ảnh lớn ở trang chi tiết/toàn ảnh theo cài đặt; không phủ thẻ danh sách/thumbnail. Watermark overlay không sửa file ảnh. Ảnh sản phẩm tĩnh trong gói nền đã được xử lý riêng; ảnh tải mới lưu WebP sạch trong `IMAGES`, file gốc trong `ORIGINALS`.
 - Watermark không thể ngăn tuyệt đối chụp/quay màn hình.
 - Chưa deploy Production hoặc kiểm tra bằng trình duyệt thật; xem UPGRADE-REPORT.md.
+
+
+[STATUS NOTE — 2026-10-22] This file is a legacy repository overview/audit snapshot, not the active task/handoff specification. It may describe older architecture, deployment assumptions or completed work. For current storefront scope, branch, safety boundaries and open tasks, read `docs/handoff/CURRENT-STATE.md` first. Do not use this file to override the current handoff or authorize Admin/backend/production changes.
