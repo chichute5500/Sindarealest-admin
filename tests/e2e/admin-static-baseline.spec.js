@@ -323,6 +323,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const attemptedWrites = [];
   const unexpectedApiPaths = [];
   const fixtureApiRequests = [];
+  const optionalEndpointFailures = new Set();
   const fixtureApiErrors = [];
   const mobile = { width: 390, height: 844 };
   const desktop = { width: 1280, height: 800 };
@@ -381,6 +382,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         contentType: 'application/json',
         body: JSON.stringify({ error: 'Read-only UI fixture blocked this request.' })
       });
+      return;
+    }
+    if (optionalEndpointFailures.has(pathname)) {
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'UI-only simulated unavailable endpoint.' }) });
       return;
     }
     if (!Object.prototype.hasOwnProperty.call(fixtureApi, pathname)) {
@@ -1909,6 +1914,38 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
       }
     }, true);
+    // Regression: endpoint failures must not appear as real empty lists.
+    // Temporary routes simulate read-only 503s; retries fall back to in-memory GET fixtures only.
+    const optionalFailureHandler = async route => {
+      const pathname = new URL(route.request().url()).pathname;
+      if (optionalEndpointFailures.has(pathname) && route.request().method() === 'GET') {
+        await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'UI-only simulated unavailable endpoint.' }) });
+        return;
+      }
+      await route.fallback();
+    };
+    optionalEndpointFailures.add('/api/admin/customers');
+    optionalEndpointFailures.add('/api/admin/warranties');
+    await page.route('**/api/admin/customers', optionalFailureHandler);
+    await page.route('**/api/admin/warranties', optionalFailureHandler);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#appView')).toBeVisible();
+    await expect(page.locator('#main')).toContainText('Không thể tải danh sách khách hàng từ máy chủ.');
+    await expect(page.locator('[data-action="retry-customers"]')).toBeVisible();
+    await navigateTo('warranties');
+    await expect(page.locator('#main')).toContainText('Không thể tải dữ liệu bảo hành và hỗ trợ từ máy chủ.');
+    await expect(page.locator('[data-action="retry-warranties"]')).toBeVisible();
+    optionalEndpointFailures.clear();
+    await navigateTo('customers');
+    await page.locator('[data-action="retry-customers"]').click();
+    await expect(page.locator('.customer-table tbody')).toContainText('Khách thử nghiệm giao diện');
+    await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
+    await navigateTo('warranties');
+    await page.locator('[data-action="retry-warranties"]').click();
+    await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
+    await expect(page.locator('.claim-table tbody')).toContainText('UI-ONLY-CLAIM');
+    await page.unroute('**/api/admin/customers', optionalFailureHandler);
+    await page.unroute('**/api/admin/warranties', optionalFailureHandler);
     await captureView('warranties', 'warranties', async variant => {
       // Screen #9: synthetic, read-only warranty list/filter and accessible issue disclosure.
       await expect(page.locator('.warranty-toolbar')).toBeVisible();
