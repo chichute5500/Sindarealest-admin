@@ -1,6 +1,6 @@
 # CANONICAL STATUS OVERRIDE — 2026-10-22 (read first)
 
-**This header supersedes every older checkpoint, SHA, percentage, run number, and claim below.** Do not use historical facts as current status.
+**This header supersedes every older checkpoint, SHA, percentage, run number, and claim below.** Do not use historical facts as current status. Fetch live branch/PR HEAD and check for newer Actions runs before every session.
 
 - Repository: `chichute5500/Sindarealest-admin`
 - Branch: `fix/liquid-glass-audit-2026-10-19`
@@ -17,6 +17,11 @@
 ## Canonical prompt and rules for reading the historical notes below
 
 For a new chat, use [the canonical prompt](../handoff/PROMPT-NEXT-CHAT-2026-10-22.md); do not start from the dated 2026-10-20/21 prompts or this large historical file alone.
+
+## Latest verified machine audit (2026-10-22 UTC)
+
+- Live Preview workflow [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) SUCCESS; exact deployed/audited SHA `fc406599e04475e232fad790efd03d46979a5a20`.
+- Artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814): 128 live screenshots, 8/8 viewport/theme pairs, 13 route checks, zero failed requests/hard failures. Comparison is `COMPLETE_NEEDS_VISUAL_REVIEW`; manually inspect screenshots before calling visual parity complete.
 
 ## Rules for reading the historical notes below
 
