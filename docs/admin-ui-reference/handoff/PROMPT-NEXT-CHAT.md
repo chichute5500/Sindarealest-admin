@@ -28,12 +28,9 @@ Tiếp tục công việc thực tế trên GitHub; sau mỗi checkpoint báo c�
 - Chưa chứng minh toggle/save SKU persistence, AI endpoint trả kết quả thật, save qua backend thật hoặc full-screen parity. Fixture chặn mọi API write. #4 vẫn PARTIAL_NOT_ACCEPTED; không lặp lại geometry đã chạy khi chưa có trạng thái mới.
 
 ## Latest checkpoint — migration 0009 preflight tested
-- Source change commit: `3658ca1069616639b825de2cd7b9c714ce560901`.
-- Files changed: `scripts/setup-cloudflare.mjs`, `scripts/deploy-cloudflare.mjs`, `tests/config-integrity.test.mjs`. Both scripts now issue read-only `SELECT ... LIMIT 0` checks for the 0009 fulfillment/payment schema before Pages deploy and fail closed on errors; they do not run migration 0009.
-- Workflow #39778009734 is SUCCESS for repository checks, automated tests, screenshot matrix, safe diagnostics and artifact upload. Artifact #314 / ID 12425910948 was downloaded; its metadata confirms local/static + synthetic fixture scope. No setup/deploy/remote D1/R2/migration was run.
-- Product editor screenshot 390×844 light was opened; no overflow issue established. Order-detail fixture screenshot confirms visible summary/customer/product/footer CTA but does not prove real action/business behavior. Both remain PARTIAL_NOT_ACCEPTED.
-- Product list #3 review remains closed as fixture-data-limited; do not repeat without new state/data.
-
+- Earlier workflow [#39778009734](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734) passed `npm run check`, `npm test`, Playwright capture and diagnostics on source SHA `3658ca1069616639b825de2cd7b9c714ce560901`; artifact [#314 / ID 12425910948](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948) was downloaded and inspected.
+- Important validation drift: current live source blob for `scripts/setup-cloudflare.mjs` is `ec1c614048b84657ef8824d865dda42f0c8341fe` (tested blob was `0a95620c547604b5419672b9396247c88cf9a6f5`); `tests/config-integrity.test.mjs` current blob is `45c292c45f445628f5d36e02acfc54ac123f837d` (tested blob `6d5b2a3e3c2261ef7da38d4cf7d25d70fcd4dd68`). The preflight stage moved from before deploy to before seed/deploy and the test anchor changed accordingly. These newer source blobs are **NOT VERIFIED by run #39778009734**; do not claim current source PASS until a fresh run covers them.
+- No setup/deploy/migration/remote D1/R2 operation was executed. PR #111/#108 remain OPEN/unmerged. Progress stays 50% PROVISIONAL.
 ## Next task — P1 PR #111 scope/provenance audit
 1. Read-only audit .github/workflows/admin-preview-diagnostics.yml: triggers, contents:write, phạm vi cập nhật evidence và chống commit ảnh stale.
 2. Review migrations/0009_fulfillment_and_manual_payments.sql, functions/api/admin/payment-requests.js và payment-transactions.js; đối chiếu schema/contract với tests, không giả lập API.
