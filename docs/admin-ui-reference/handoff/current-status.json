@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T14:00:00+07:00",
+  "updatedAt": "2026-10-22T14:29:08.318+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
+  "branchHeadAtCheckpoint": "5606518d34a929d74f50330a74ef16d9c2852a29",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Validate Source #39737160773 PASS on source SHA 844020a5aa572421bf558c8c0ff8b38dcfed8a27. Latest known Preview #39736231146 FAIL was on older SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; no Preview run for current HEAD found in the checked Actions list, so current Preview is PENDING/NOT VERIFIED.",
+  "progressBasis": "Validate Source #39739697272 and Preview/Playwright #39739697312 SUCCESS on exact source/test SHA ed84462c88d6333a07141c03ccd49c971f4179d8; branch HEAD before documentation refresh 5606518d34a929d74f50330a74ef16d9c2852a29 is an evidence-only descendant. Desktop sticky-footer geometry assertion passed and artifact 12408851898 reviewed. 12-screen parity NOT ACCEPTED and authenticated backend QA NOT TESTED, so keep 50%.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
-    "conclusion": "validate_pass_preview_pending",
+    "testedCommitSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "conclusion": "source_validate_and_preview_pass_exact_sha",
     "validateRun": {
-      "runId": 39737160773,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39737160773",
-      "sha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+      "runId": 39739697272,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697272",
+      "sha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
       "conclusion": "success"
     },
     "previousPreviewRun": {
@@ -22,14 +22,30 @@
       "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
       "conclusion": "failure"
     },
-    "currentHeadPreview": "PENDING_NOT_VERIFIED",
+    "currentHeadPreview": "PASS_EXACT_TESTED_SHA; BRANCH_HEAD_IS_EVIDENCE_ONLY_DESCENDANT",
     "previousPreviewFailure": "desktop price/stock row overlaps sticky footer in screenshot matrix",
     "previousPreviewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
-    "productEditorScreen4": "PARTIAL_NOT_ACCEPTED",
+    "productEditorScreen4": "DESKTOP_STICKY_FOOTER_REGRESSION_PASS; OVERALL_VISUAL_PARITY_PARTIAL_NOT_ACCEPTED",
     "productListScreen3": "PARTIAL_NOT_ACCEPTED",
     "twelveScreenVisualParity": "NOT_ACCEPTED",
-    "authenticatedBusinessQA": "NOT_TESTED",
-    "progressPercent": 50
+    "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
+    "progressPercent": 50,
+    "previewRun": {
+      "runId": 39739697312,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312",
+      "sha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+      "conclusion": "success",
+      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
+    },
+    "artifact": {
+      "id": 12408851898,
+      "name": "admin-preview-evidence-296",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312/artifacts/12408851898",
+      "capturedPngs": 99,
+      "loginShellPngs": 16,
+      "fixturePngs": 83,
+      "fixtureMetrics": 75
+    }
   },
   "acceptance": {
     "twelveScreenVisualParity": "NOT_ACCEPTED",
@@ -41,7 +57,7 @@
     "preProMigrations": "DEFERRED_BY_OWNER_NOT_VERIFIED",
     "productListScreen3": "PARTIAL_NOT_ACCEPTED",
     "ordersFulfillmentScreen7": "PARTIAL_NOT_ACCEPTED",
-    "productEditorScreen4": "PARTIAL_NOT_ACCEPTED",
+    "productEditorScreen4": "DESKTOP_PRICE_STOCK_FOOTER_OVERLAP_REGRESSION_PASS_EXACT_SHA; OVERALL_REFERENCE_PARITY_PARTIAL_NOT_ACCEPTED",
     "categoryProductClassificationScreen6": "PARTIAL_EXISTING_CONTROLS_ONLY_SCREEN_PARITY_NOT_ACCEPTED",
     "customersScreen9": "PARTIAL_FIXTURE_ONLY_REFERENCE_PARITY_NOT_ACCEPTED",
     "warrantyScreen10": "PARTIAL_FIXTURE_ONLY_REFERENCE_PARITY_NOT_ACCEPTED",
@@ -54,7 +70,7 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "29e5d6f75aec714cfe6691ef43a9e1c69a337660",
+      "headSha": "0361cc3d9d7ec7ba01d768504cfae5bb08494c6d",
       "agentWritesAllowed": false,
       "changedFiles": 271,
       "mergeReady": false,
@@ -67,10 +83,10 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "480eda6ae1ae06c517d0d87468eebb4abef0341a",
+      "headSha": "5606518d34a929d74f50330a74ef16d9c2852a29",
       "changedFiles": 1193,
       "mergeReady": false,
-      "reason": "Open/unmerged; keep ADMIN branch isolated and audit mixed PR scope before any future merge.",
+      "reason": "Keep ADMIN PR OPEN/unmerged; observed head is evidence-only commit parented to exact tested SHA; full diff scope audit remains open.",
       "headShaObservedBeforeHandoffRefresh": "1814260ee238d194ca5d749954439b15bb8c055a",
       "headShaBeforeHandoffRefresh": "596ea3d7d6da524c6993ce37ccc41579c785929d",
       "mergeable": false,
@@ -101,12 +117,14 @@
     "docs/admin-ui-reference/handoff/latest-test-results.json",
     "docs/admin-ui-reference/handoff/current-status.json",
     "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
+    "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+    "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
   ],
   "nextActions": [
-    "Run Admin Preview diagnostic on exact current HEAD 844020a5aa572421bf558c8c0ff8b38dcfed8a27; inspect job logs and screenshot artifact.",
-    "If the desktop sticky-footer overlap persists, fix root cause and rerun exact-SHA Validate Source + Preview without weakening assertions.",
-    "Continue evidence-backed Products #3 and remaining screen reference parity; keep overall progress at 50% until acceptance criteria pass."
+    "Continue the next NOT_ACCEPTED screen family from 12-SCREEN-REFERENCE-AUDIT.md, starting with existing category/product classification controls.",
+    "Compare products list #3 and remaining screen families to the approved reference, focusing on 390x844 light/dark and 1280x800.",
+    "After code/test changes, run Validate Source and Preview/Playwright on the exact same source/test SHA and inspect artifacts.",
+    "Do not perform authenticated backend QA until an authorized Preview path/account and a safe read-only strategy are available."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -116,36 +134,48 @@
     "No SQL/setup/migration execution or remote D1/R2 mutations.",
     "Do not use TinyFish."
   ],
-  "ownerActionRequiredNow": "No owner action required for continued source/fixture UI work. Preview login/dashboard smoke passes; do not bypass Cloudflare Access. Authenticated business/backend QA remains NOT TESTED.",
+  "ownerActionRequiredNow": "No immediate action required to verify the desktop layout regression. Real authenticated business QA remains untested and must only be done via an authorized Preview path; no Access bypass. Product image save/R2 and PRE/PRO migrations remain deferred by owner.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T14:00:00+07:00",
+    "checkedAt": "2026-10-22T14:29:08.318+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "latestBranchHead": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
-    "latestValidateSourceSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
-    "validateRun": 39737160773,
+    "latestBranchHead": "5606518d34a929d74f50330a74ef16d9c2852a29",
+    "latestValidateSourceSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "validateRun": 39739697272,
     "previousPreviewRun": 39736231146,
     "previousPreviewSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-    "currentHeadPreview": "PENDING_NOT_VERIFIED",
+    "currentHeadPreview": "SUCCESS_ON_TESTED_SOURCE_SHA_BRANCH_HEAD_IS_EVIDENCE_ONLY_DESCENDANT",
     "previewFailure": "desktop price/stock row overlaps sticky footer on older SHA; rerun required on current HEAD",
     "progressPercent": 50,
-    "handoffDocsCommitSha": "c264b4edecd33ad582474c76dcc286a9c7e241a3"
+    "handoffDocsCommitSha": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
+    "latestPreviewRun": 39739697312,
+    "latestPreviewSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "previewConclusion": "success",
+    "previewStatus": "PASS_SOURCE_SCREENSHOT_MATRIX_AND_PASS_LOGIN_CSS_SIGNATURE",
+    "artifactId": 12408851898,
+    "artifactName": "admin-preview-evidence-296",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39739697312/artifacts/12408851898",
+    "previousPreviewFailureResolved": "previous desktop price/stock overlap on SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778 resolved on tested SHA ed84462c88d6333a07141c03ccd49c971f4179d8"
   },
   "latestContinuationCycle": {
-    "updatedAt": "2026-10-22T21:00:00+07:00",
+    "checkedAt": "2026-10-22T14:29:08.318+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "sourceSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-    "branchHeadBeforeDocsRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
-    "validateRun": 39736231163,
-    "previewRun": 39736231146,
-    "previewConclusion": "failure",
-    "desktopStockBottom": 733.78125,
-    "footerTop": 732,
+    "branchHeadBeforeHandoffRefresh": "5606518d34a929d74f50330a74ef16d9c2852a29",
+    "sourceSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "validateRun": 39739697272,
+    "validateConclusion": "success",
+    "previewRun": 39739697312,
+    "previewConclusion": "success",
+    "artifactId": 12408851898,
+    "artifactName": "admin-preview-evidence-296",
+    "capturedPngs": 99,
+    "fixtureMetrics": 75,
+    "desktopFooterRegression": "PASS",
     "screen4": "PARTIAL_NOT_ACCEPTED",
     "screen3": "PARTIAL_NOT_ACCEPTED",
-    "all12Parity": "NOT_ACCEPTED",
+    "all12ScreenParity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED",
     "progressPercent": 50,
-    "nextAction": "Fix desktop editor sticky-footer overlap at 1280x800 and rerun exact-SHA tests."
+    "nextAction": "Audit category/product classification existing controls in a fixture-only round; continue remaining screens by reference audit."
   },
   "continuationHistory": [
     {
@@ -284,29 +314,33 @@
     }
   ],
   "latestHandoffCheckpoint": {
-    "checkedAt": "2026-10-22T21:00:00+07:00",
+    "checkedAt": "2026-10-22T14:29:08.318+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "sourceSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-    "branchHeadBeforeHandoffRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
-    "validateRun": 39736231163,
-    "previewRun": 39736231146,
-    "previewConclusion": "failure",
+    "branchHeadBeforeHandoffRefresh": "5606518d34a929d74f50330a74ef16d9c2852a29",
+    "sourceSha": "ed84462c88d6333a07141c03ccd49c971f4179d8",
+    "validateRun": 39739697272,
+    "previewRun": 39739697312,
+    "previewConclusion": "success",
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
+    "artifactId": 12408851898,
+    "artifactName": "admin-preview-evidence-296",
     "progressPercent": 50
   },
-  "handoffRefreshAt": "2026-10-22T21:00:00+07:00",
-  "handoffRefreshBaseHead": "3d56556f087c8f0f6689f29a82602883912584cd",
+  "handoffRefreshAt": "2026-10-22T14:29:08.318+07:00",
+  "handoffRefreshBaseHead": "5606518d34a929d74f50330a74ef16d9c2852a29",
   "latestHandoffReadback": {
-    "checkedAt": "2026-10-22T21:00:00+07:00",
-    "docsCommitSha": "931bb8ec9d92cfcf5ab086e542c533d0e55397d0",
-    "readback": "PASS",
+    "checkedAt": "2026-10-22T14:29:08.318+07:00",
+    "docsCommitSha": "PENDING_FIRST_HANDOFF_COMMIT",
+    "readback": "PENDING_POST_COMMIT_READBACK",
     "files": [
-      "docs/admin-ui-reference/handoff/latest-test-results.json",
-      "docs/admin-ui-reference/handoff/current-status.json",
       "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
       "docs/admin-ui-reference/handoff/START-HERE.md",
       "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/latest-test-results.json",
+      "docs/admin-ui-reference/handoff/current-status.json",
       "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
     ],
     "progressPercent": 50
   }
