@@ -63,3 +63,12 @@ assert.ok(!previewWorkflow.includes('cp "$SOURCE_DIR"/screenshots/*.png "$DEST/s
   "The workflow must not commit each Playwright screenshot matrix to the ADMIN branch");
 assert.ok(previewWorkflow.includes("retention-days: 14"),
   "The screenshot artifact retention window must remain explicit");
+
+assert.ok(admin.includes("function activityLogPage()"), "Dedicated activity-log screen must exist");
+assert.ok(admin.includes("view==='activity'?activityLogPage()"), "Activity-log route must render a dedicated screen");
+assert.ok(admin.includes("data-view=\"activity\""), "Activity-log screen must be reachable from navigation");
+assert.ok(admin.includes("id=\"activityLogSearch\"") && admin.includes("id=\"activityActionFilter\""), "Activity log must support search and action filtering");
+assert.ok(admin.includes("id=\"refreshActivityLogs\"") && admin.includes("api('/api/admin/audit-logs')"), "Activity log must refresh from the existing authenticated read endpoint");
+assert.ok(admin.includes("auditLogLoadError=optional[3].status!=='fulfilled'"), "Activity log must distinguish a failed load from a genuinely empty log");
+assert.ok(admin.includes("Tối đa 200 bản ghi gần nhất từ máy chủ"), "Activity log must disclose the existing server-side record limit");
+console.log("PASS: dedicated read-only activity-log screen and route contracts.");
