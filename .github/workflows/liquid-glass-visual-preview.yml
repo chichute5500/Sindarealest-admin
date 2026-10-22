@@ -7,14 +7,11 @@ on:
     branches:
       - fix/liquid-glass-redesign
       - fix/liquid-glass-audit-2026-10-19
+    # Handoff and specification-only changes must not launch a live audit
+    # against a SHA that was not deployed. Workflow/source changes still trigger
+    # both Preview deployment and live audit for exact-SHA evidence.
     paths-ignore:
-      - 'docs/website-screenshots/start-of-work/**'
-      - 'docs/website-screenshots/end-of-work/**'
-      - 'docs/website-screenshots/manifest.json'
-      - 'docs/website-screenshots/README.md'
-      - 'docs/handoff/**'
-      - 'docs/static-web-reference/**'
-      - 'docs/visual-audit-progress-2026-10-19.md'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       capture_stage:
