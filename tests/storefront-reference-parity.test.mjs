@@ -183,13 +183,16 @@ assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-fai
   'A failed image request must be diagnosable without hiding the user-approved hero presentation asset.');
 assert.ok(!html.includes('sdGalleryWhiteBackgroundKey') && !html.includes('syncFullscreenBackgroundKey') && !html.includes('sd-white-background-keyed'),
   'Product and fullscreen photos must preserve original pixels; do not infer and remove white backgrounds.');
+assert.ok(html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') < html.indexOf('catch(err){$(\'#catalogGrid\').innerHTML=')
+  && html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') >= 0,
+  'The presentation hero image must initialize before the product API can fail or return early.');
 assert.match(finalCss, /\.sd-fullscreen-frame\{border-radius:18px!important;overflow:hidden!important\}/,
   'The full-screen gallery frame must clip the image to softly rounded corners.');
 assert.match(finalCss, /\.sd-fullscreen-image\{border-radius:16px!important\}/,
   'The full-screen photo itself must have soft rounded corners.');
 assert.match(html, /class="footer-brand"[^>]*>[\s\S]*?<img src="logo\.png" alt="Logo chính thức SinDarealest"/,
   'The footer must use the same official logo asset as the welcome screen.');
-assert.match(finalCss, /\.footer-brand img\{[^}]*filter:none!important;mix-blend-mode:normal!important\}/,
+assert.match(html, /\.footer-brand img\{[^}]*filter:none!important;mix-blend-mode:normal!important\}/,
   'The official logo asset must not be recoloured or blended by CSS.');
 
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
