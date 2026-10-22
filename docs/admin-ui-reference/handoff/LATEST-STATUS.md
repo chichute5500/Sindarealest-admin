@@ -41,12 +41,12 @@ Next: fetch the post-documentation HEAD and its exact SHA run; then audit #6/#7 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 75f51d8c044b8012d9cd07f4ede06762ccf24a66
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39788772753
+- Tested commit: 9209ac398636e2187beb2731359ae9c205901157
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789963741
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: FAILURE; 16 real PNGs captured in artifact admin-preview-evidence-321 (not committed to Git).
+- Local source Playwright matrix: FAILURE; 59 real PNGs captured in artifact admin-preview-evidence-322 (not committed to Git).
 - Deployed Preview: success.
-- Source screenshot matrix: 16 real PNGs; login shell: 16; read-only fixture module screens: 0; fixture metrics: 0.
+- Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 40.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
