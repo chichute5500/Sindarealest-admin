@@ -106,6 +106,7 @@ jobs:
       - name: Run project and migration checks
         run: npm run check
       - name: Install isolated Chromium
+        id: install_chromium
         run: npx playwright install --with-deps chromium
       - name: Start read-only local static preview
         shell: bash
@@ -124,7 +125,7 @@ jobs:
       - name: Capture local Light/Dark screenshots and run fixture audit
         run: node scripts/capture-liquid-glass-preview.mjs
       - name: Verify supplied Preview deployment metadata on push (diagnostic only)
-        if: github.event_name == 'push'
+        if: ${{ always() && github.event_name == 'push' && steps.install_chromium.outcome == 'success' }}
         continue-on-error: true
         env:
           PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
@@ -134,14 +135,22 @@ jobs:
           EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Probe supplied Cloudflare Preview on push (artifact only; never archives)
-        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') }}
+        if: ${{ always() && github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-review]') && steps.install_chromium.outcome == 'success' }}
         continue-on-error: true
         env:
           PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+          CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+          EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+          EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: |
+          set -euo pipefail
           node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
+          # A failing local-fixture audit must not suppress a separate, exact-SHA
+          # read-only capture of the actual Preview. Keep its result/artifact distinct.
+          node scripts/verify-cloudflare-preview-deployment.mjs
           node scripts/capture-cloudflare-preview.mjs
       - name: Verify actual Cloudflare Pages deployment before manual capture/archive
         if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]')))
