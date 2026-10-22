@@ -1,23 +1,30 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
-Tiếp tục công việc thực tế trên GitHub. Đọc [START-HERE.md](START-HERE.md) trước; không yêu cầu chủ dự án dán lại lịch sử hoặc prompt dài. Tự fetch live HEAD/PR/Actions, tiếp tục từ việc chưa xong và cập nhật handoff sau checkpoint.
+Tiếp tục công việc thực tế trên GitHub. Đọc [START-HERE.md](START-HERE.md) trước; không yêu cầu chủ dự án dán lại lịch sử hoặc prompt dài. Tự fetch live HEAD/PR/Actions, tiếp tục việc chưa xong và cập nhật handoff sau checkpoint.
 
-Repository: `chichute5500/Sindarealest-admin`.
+Repository: chichute5500/Sindarealest-admin.
 
-## Trạng thái tại checkpoint 2026-10-22T19:54:30Z
-- PR #111 OPEN/unmerged, branch `feature/admin-isolated-handoff-2026-10-20`, HEAD `e749873c0635eec31c4d5467cc357238edbebd6c`, 385 changed paths (+38,962/−211), mergeable=false. [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111)
-- Validate [#39844022556](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844022556): project integrity PASS, npm test FAIL vì `tests/handoff-integrity.test.mjs:35` — `latest-test-results.json.latestRun.id/url` null. Đây là lỗi handoff metadata cụ thể, không phải bằng chứng lỗi logic payment. Đã ghi lại pointer để sửa và phải xác minh trên SHA mới.
-- Validate [#39844009143](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844009143) PASS trên SHA cũ `2ccfd452643c431a25f9bb7789f2bbe1acb41e5b`; không áp dụng cho HEAD mới.
-- B1 PARTIAL: cleanup ảnh/snapshot/prompt/web-static cũ hoàn tất; full provenance audit runtime/API/config/migration/scripts/tests còn dang dở. 318 per-run history records được giữ theo chính sách.
+## Checkpoint đã xác minh
+- PR #111 OPEN/unmerged, branch feature/admin-isolated-handoff-2026-10-20; checkpoint SHA đã test b8aff9d341e5c08d16ccc52efdab0b63da0e0869; mergeable=false. [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111)
+- Validate [#39844529679](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679) SUCCESS trên đúng SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869; checkout SHA khớp và npm run check + npm test đều PASS.
+- Lần đồng bộ handoff này tạo SHA mới; cần xác minh Validate trên exact SHA live mới. Không dùng run #39844529679 làm bằng chứng cho child SHA.
+- PR #108, main và nhánh tĩnh vẫn read-only. Không merge hoặc deploy.
+
+## B1 state
+- PARTIAL, không tuyên bố hoàn tất. Cleanup cũ đã hoàn tất; 318 per-run compact records được giữ.
+- Đã loại viewer admin-mobile-reference.html rỗng 0 byte và sửa README; PNG chuẩn cùng chỉ dẫn reference được giữ.
+- Payment provenance đã đọc cùng consumers/tests/migration 0009; trách nhiệm auth/config/upload/preview/serve/request/ledger/customer-token riêng biệt. Không có căn cứ gộp/xóa runtime route.
+- Remaining: verify exact-SHA Actions for new sync head; finish path/provenance reconciliation; audit Orders and Order detail separately; preserve QA/deferred boundaries.
 
 ## Hành động bắt buộc
-1. Fetch live PR #111/#108, HEAD, changed paths, Actions; xác minh handoff files vừa đồng bộ có còn là HEAD không.
-2. Xác minh `latestRun.id/url` đã hợp lệ, chạy lại Validate trên exact SHA mới; đọc logs nếu fail. Không tuyên bố pass cho SHA khác.
-3. Tiếp tục B1 bằng dependency/provenance review, ưu tiên payment APIs, migration 0009, deploy/setup scripts, data contracts và test coverage. Chỉ xóa/gộp với bằng chứng cụ thể; không đoán.
-4. Cập nhật `current-status.json`, `latest-test-results.json`, `START-HERE.md`, `PROMPT-NEXT-CHAT.md`, `LATEST-STATUS.md`, `PR-111-SCOPE-AUDIT.md` đồng bộ; đọc lại từ GitHub và xác minh live HEAD/Actions.
+1. Fetch PR #111/#108 and main, current branch HEAD, base/compare, complete changed paths and latest Actions. Không tin SHA lịch sử là live truth.
+2. Inspect Validate run whose head_sha exactly equals live HEAD; read logs if a step fails. Keep failure #39844022556 in history but recognize #39844529679 passed on b8aff9d341e5c08d16ccc52efdab0b63da0e0869.
+3. Continue B1 using consumer/provenance evidence. Do not repeat old deletions or merge endpoints with different auth/exposure/state contracts.
+4. After each checkpoint synchronize current-status.json, latest-test-results.json, START-HERE.md, this prompt, LATEST-STATUS.md and PR-111-SCOPE-AUDIT.md; read back from GitHub and verify refs.
+5. Preserve separate acceptance for Orders and Order detail. Fixture screenshots do not prove authenticated backend acceptance.
 
-## Giới hạn không được vi phạm
-- Chỉ ghi PR #111 branch `feature/admin-isolated-handoff-2026-10-20`; PR #108, `main`, nhánh web tĩnh là read-only. Không merge/rebase/force-push/deploy Production.
-- Không chạy migration/setup/deploy scripts, không thao tác remote D1/R2/schema/ledger, không đọc/đổi secrets hoặc bypass Access.
-- Migration 0009, PRE/PRO migrations, R2 persistence, product image save deferred by owner; AI grouping requires owner-approved API/UX contract.
-- Không fabricate dữ liệu hoặc API. Authenticated backend QA chưa test; 12 màn hình vẫn PARTIAL_NOT_ACCEPTED; tiến độ 50% PROVISIONAL.
+## Guardrails
+- Write only to feature/admin-isolated-handoff-2026-10-20; keep PR #111 and #108 OPEN/unmerged. Never write PR #108, main or static website branch.
+- No merge/rebase/force-push/Production deploy; do not run setup/migration/deploy scripts; no remote D1/R2/schema/ledger actions; no secrets or Cloudflare Access bypass.
+- Migration 0009, PRE/PRO migration changes, product image save/R2 and AI image grouping remain deferred unless separately owner-approved.
+- Keep progress 50% PROVISIONAL, all 12 screens PARTIAL_NOT_ACCEPTED, authenticated backend QA NOT_TESTED, remote D1 schema/ledger NOT_VERIFIED and Production NOT_PERFORMED.

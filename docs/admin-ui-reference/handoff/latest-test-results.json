@@ -1,36 +1,44 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:54:30Z",
+  "capturedAtUtc": "2026-10-22T20:09:25.482Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "e749873c0635eec31c4d5467cc357238edbebd6c",
-  "codeTestSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+  "branchHeadAtCheckpointStart": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+  "codeTestSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "CURRENT_HEAD_VALIDATION_FAILED_HANDOFF_POINTER",
+  "status": "CHECKPOINT_VALIDATE_PASS_HANDOFF_SYNC_REVALIDATION_PENDING",
   "latestRun": {
-    "id": 39844022556,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844022556",
-    "headSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+    "id": 39844529679,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679",
+    "headSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
     "status": "completed",
-    "conclusion": "failure",
-    "summary": "Validate project integrity passed. npm test failed at tests/handoff-integrity.test.mjs:35 because latest-test-results.json latestRun.id and latestRun.url were null. Handoff metadata pointer is being repaired; the next commit must be revalidated on its exact SHA."
+    "conclusion": "success",
+    "summary": "Validate passed on exact checkpoint SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869. Run metadata and checkout log identify this SHA. npm run check and npm test passed, including handoff integrity and fulfillment/payment regressions. The handoff/provenance sync is a new SHA and requires independent exact-SHA validation."
   },
   "validatedChecks": {
-    "npmRunCheck": "PASS_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
-    "npmTest": "FAIL_HANDOFF_INTEGRITY_POINTER_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
-    "testedSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
-    "projectIntegrity": "PASS_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
+    "npmRunCheck": "PASS_ON_b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "npmTest": "PASS_ON_b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "testedSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "projectIntegrity": "PASS_ON_b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
     "localStaticPlaywright": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "deployedPreviewDiagnostic": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-    "currentHeadPlaywright": "NOT_RUN_AFTER_TEST_FAILURE",
+    "currentHeadPlaywright": "NOT_RUN_IN_VALIDATE_RUN_39844529679",
     "productionDeployment": "NOT_PERFORMED",
-    "currentHead": "FAIL_HANDOFF_INTEGRITY_POINTER",
-    "currentHeadSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
-    "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES"
+    "currentHead": "PASS_ON_CHECKPOINT_SHA_b8aff9d341e5c08d16ccc52efdab0b63da0e0869_POST_SYNC_SHA_REVALIDATION_PENDING",
+    "currentHeadSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES",
+    "exactShaValidationRun": 39844529679,
+    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679"
   },
   "historicalRuns": [
+    {
+      "id": 39844529679,
+      "sha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+      "conclusion": "success",
+      "meaning": "Exact-SHA Validate passed project integrity, npm run check and npm test; a later handoff-only child commit requires its own exact-SHA Actions check."
+    },
     {
       "id": 39844022556,
       "sha": "e749873c0635eec31c4d5467cc357238edbebd6c",
@@ -168,11 +176,10 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Continue provenance review of runtime/API/migration/setup/deploy/workflow files; no remote setup/migration/deploy execution.",
-    "Preserve separate payment route boundaries because authentication and public exposure differ.",
-    "Keep per-run compact history even when blobs are identical unless policy changes with owner approval.",
-    "Fetch exact-SHA validation for the next handoff-only commit.",
-    "Keep authenticated backend QA NOT_TESTED, all 12 screens PARTIAL_NOT_ACCEPTED, Production deployment NOT_PERFORMED."
+    "Fetch the post-sync live branch head and Actions run; require exact head_sha match and successful Validate before treating the new HEAD as tested.",
+    "Review remaining docs/history/config/workflow/data contracts/tests for provenance; do not remove compact run history based only on identical content.",
+    "Audit Orders and Order detail separately from payment request/transaction code and fixture screenshots.",
+    "Keep all acceptance boundaries: all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; migration 0009, PRE/PRO and R2 persistence DEFERRED_BY_OWNER; Production NOT_PERFORMED."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -181,10 +188,10 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
-  "testedCommitSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
-  "capturedAt": "2026-10-22T19:41:44.271Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
+  "latestCodeCommitSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+  "testedCommitSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+  "capturedAt": "2026-10-22T20:09:25.482Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -197,7 +204,7 @@
     "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS",
+    "automatedTests": "PASS_ON_b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED"
   },
@@ -234,45 +241,56 @@
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
-    "B1 provenance audit remains PARTIAL; remaining changed docs/history and full semantic path review are not fully closed.",
-    "Authenticated business/backend QA remains NOT_TESTED; screenshots use read-only synthetic fixtures."
+    "B1 provenance audit remains PARTIAL; finish remaining changed-path/semantic review and reconcile the census after the zero-byte viewer removal.",
+    "Authenticated business/backend QA remains NOT_TESTED; screenshots use read-only synthetic fixtures.",
+    "Orders and Order detail need separate acceptance; payment route source tests do not replace authenticated workflow QA."
   ],
   "blockedItems": [
-    "Authenticated Preview backend workflows are not proven by fixture screenshots; no Cloudflare Access bypass or secret changes permitted."
+    "Authenticated backend workflows are not proven by fixture screenshots; no Cloudflare Access bypass or secret changes permitted.",
+    "Migration 0009, PRE/PRO migration changes and product-image/R2 persistence remain DEFERRED_BY_OWNER; no remote schema/data operations."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "NOT_VERIFIED",
+  "currentHeadValidation": "PASS_ON_CHECKPOINT_SHA_b8aff9d341e5c08d16ccc52efdab0b63da0e0869_POST_SYNC_SHA_REVALIDATION_PENDING",
   "scopeAuditStatus": "PARTIAL",
   "livePrState": {
     "number": 111,
     "state": "OPEN",
     "merged": false,
     "mergeable": false,
-    "headSha": "976e72d2ec10e9ead74a4c3275b8569d52a4f525",
+    "headSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
     "changedFiles": 385,
-    "additions": 38875,
+    "additions": 38670,
     "deletions": 211,
-    "headValidation": "PENDING_AT_LAST_FETCH",
-    "validationRunId": 39842755681
+    "headValidation": "PASS_ON_EXACT_SHA_b8aff9d341e5c08d16ccc52efdab0b63da0e0869_POST_SYNC_SHA_REVALIDATION_PENDING",
+    "validationRunId": 39844529679,
+    "validationRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679"
   },
-  "currentHeadValidationReason": "Historical successful run pointer retained for integrity; it applies only to 73dfad5e35939da22dd37efd12bf8b06c09e7716, not the live HEAD.",
+  "currentHeadValidationReason": "Run #39844529679 succeeded on exact SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869. The new sync commit has a new SHA; fetch the branch HEAD and its own Validate result before claiming that new HEAD passed.",
   "liveCheckpoint": {
-    "headAtStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
-    "headAfterHandoffSync": "803f6f7ce9ac114d4f3917b802c5f2a6542a5363",
-    "headValidation": "NOT_VERIFIED",
-    "lastRecordedValidatedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+    "capturedAtUtc": "2026-10-22T20:09:25.482Z",
+    "headAtStart": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "validatedSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "headValidation": "PASS_ON_EXACT_SHA_B8AFF; POST_SYNC_SHA_REVALIDATION_PENDING",
     "pr111": "OPEN_UNMERGED",
-    "changedFiles": 385,
+    "pr108": "OPEN_UNMERGED_READ_ONLY",
+    "changedFilesBeforeCleanup": 385,
+    "expectedChangedFilesAfterEmptyViewerRemoval": 384,
+    "validationRunId": 39844529679,
     "progressPercent": 50,
-    "progressStatus": "PROVISIONAL"
+    "progressStatus": "PROVISIONAL",
+    "finding": "Checkpoint Validate passes; payment route provenance supports keeping routes distinct. One zero-byte HTML viewer is removed. Full B1 remains partial."
   },
   "currentChange": {
-    "sha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
+    "sha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
     "files": [
-      "functions/api/admin/payment-requests.js",
-      "tests/payment-ledger-route.test.mjs"
+      "docs/admin-ui-reference/handoff/START-HERE.md",
+      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json"
     ],
-    "summary": "GET payment summary now uses aggregate totals across the full ledger while the display list remains limited to 100 rows; regression test covers mismatch.",
-    "validation": "NOT_VERIFIED"
+    "summary": "Exact validation checkpoint and handoff sync. Validate #39844529679 passed on this SHA; the child sync commit requires its own exact-SHA result.",
+    "validation": "PASS_ON_EXACT_SHA_B8AFF; sync commit validation pending"
   }
 }

@@ -1,23 +1,23 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:54:30Z",
+  "capturedAtUtc": "2026-10-22T20:09:25.482Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "e749873c0635eec31c4d5467cc357238edbebd6c",
+  "branchHeadAtCheckpointStart": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
   "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
-  "codeTestSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+  "codeTestSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
   "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestActionsRun": {
-    "id": 39844009143,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844009143",
+    "id": 39844529679,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "2ccfd452643c431a25f9bb7789f2bbe1acb41e5b",
-    "currentHeadApplicability": "HISTORICAL_ONLY_NOT_VERIFIED_FOR_CURRENT_HEAD"
+    "testedSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "currentHeadApplicability": "PASS_ON_EXACT_CHECKPOINT_SHA; POST_SYNC_SHA_REVALIDATION_PENDING"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Latest exact-SHA Validate run #39844022556 on e749873c0635eec31c4d5467cc357238edbebd6c passed project-integrity but failed npm test because latest-test-results.json had null latestRun.id/url. Previous SHA 2ccfd452643c431a25f9bb7789f2bbe1acb41e5b passed. The handoff pointer is being repaired; the resulting handoff commit requires its own exact-SHA validation. Authenticated backend acceptance remains untested.",
+  "progressBasis": "50% PROVISIONAL. Validate #39844529679 completed SUCCESS on exact checkpoint SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869. Run metadata and checkout logs confirm the SHA; npm run check and npm test passed, including handoff-integrity, fulfillment/payment contract and payment-ledger route tests. The new handoff/audit commit is a different SHA and requires its own validation. Authenticated backend QA remains untested; B1 remains partial.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -25,11 +25,11 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d",
+      "headSha": "06a409152455474dab99a134e6f59b16184c11e2",
       "changedFiles": 286,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
-      "additions": 20407,
+      "additions": 20414,
       "deletions": 394
     },
     "111": {
@@ -39,22 +39,24 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+      "headSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
       "changedFiles": 385,
-      "additions": 38962,
+      "additions": 38670,
       "deletions": 211,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
-      "writeAllowed": true
+      "writeAllowed": true,
+      "validationRunId": 39844529679,
+      "validation": "PASS_ON_EXACT_CHECKPOINT_SHA; sync commit requires independent validation"
     }
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39844009143,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844009143",
+      "id": 39844529679,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "2ccfd452643c431a25f9bb7789f2bbe1acb41e5b",
-      "currentHeadApplicability": "HISTORICAL_ONLY_NOT_VERIFIED_FOR_CURRENT_HEAD"
+      "testedSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+      "currentHeadApplicability": "PASS_ON_EXACT_CHECKPOINT_SHA; POST_SYNC_SHA_REVALIDATION_PENDING"
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -88,6 +90,23 @@
         "sourceScreenshotCount": 102
       },
       "reason": "Previous storefront watermark assertion failure was removed from the Admin-only test path. Exact source SHA 2eb6e7e passed source validation and Preview diagnostic; this does not validate the subsequently generated evidence commit."
+    },
+    "latestValidateAttempt": {
+      "id": 39844529679,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+      "currentHeadApplicability": "PASS_ON_EXACT_CHECKPOINT_SHA; POST_SYNC_SHA_REVALIDATION_PENDING",
+      "workflow": "Validate source and tests"
+    },
+    "lastFailed": {
+      "id": 39844022556,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844022556",
+      "status": "completed",
+      "conclusion": "failure",
+      "testedSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+      "meaning": "Historical failure because latestRun.id/url were null; superseded by successful exact-SHA Validate #39844529679 on b8aff."
     }
   },
   "latestProductChange": {
@@ -151,7 +170,7 @@
     "liveChangedFiles": 385,
     "previousCensus": 1314,
     "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
-    "priority": "Repair handoff-integrity pointer, validate resulting exact SHA, then continue runtime/API provenance review.",
+    "priority": "Validate the post-sync SHA; finish remaining semantic provenance and path reconciliation; audit Orders and Order detail independently.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "migration0009": "DEFERRED_BY_OWNER",
     "preProMigrations": "DEFERRED_BY_OWNER",
@@ -217,27 +236,102 @@
       "docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
     ],
     "lastReviewCheckpoint": {
-      "capturedAtUtc": "2026-10-22T19:44:00Z",
-      "head": "30fece366e559073f6c664f6ed0459712c1b0a84",
-      "changedFiles": 385,
+      "capturedAtUtc": "2026-10-22T20:09:25.482Z",
+      "head": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+      "changedFilesBeforeCleanup": 385,
+      "expectedChangedFilesAfterCleanup": 384,
       "historyRecords": 318,
-      "historyMarkdown": 157,
-      "historyJson": 161,
-      "otherDocs": 13,
-      "exactShaValidationRun": 39842366701,
-      "exactShaValidation": "PASS",
-      "reviewedSlice": "Backup/restore, admin orders/products/warranty endpoints, middleware/shared helpers, public order/product/warranty/sitemap endpoints and their safety tests; source inspection only.",
+      "exactShaValidationRun": 39844529679,
+      "exactShaValidation": "PASS_ON_B8AFF",
+      "reviewedSlice": "Payment settings/upload/preview/active QR, requests/verified transactions/customer capability-token read, shared helper, order API, migration 0009 and referenced scripts/tests; source inspection only.",
       "findings": [
-        "No safe deletion or route merge proven in this reviewed slice; endpoint auth/exposure responsibilities differ.",
-        "Backup and restore implement separate export/import safety contracts and must remain separate.",
-        "The three byte-identical historical preview-diagnostics JSON files are retained because per-run evidence history is the recorded policy.",
-        "B1 remains PARTIAL: full semantic provenance review and current path census reconciliation are not complete."
+        "No safe payment route consolidation/deletion was proven; authorization and exposure responsibilities differ.",
+        "Payment-request GET separates full-ledger totals from the capped 100-row visible list; a regression test covers this.",
+        "Migration 0009 is referenced by runtime queries/tests and remains DEFERRED_BY_OWNER; no remote migration was run.",
+        "Setup/deploy scripts are package targets with preflight gates; they are not dead code and were not executed.",
+        "The empty HTML viewer can be removed while preserving the approved PNG and written reference instructions.",
+        "B1 remains partial; remaining semantic review and separate Orders/Order detail acceptance are still open."
       ],
       "remoteActions": "NONE",
       "productionDeployment": "NOT_PERFORMED"
     },
     "latestReviewFinding": "Validate #39844022556 failed npm test at tests/handoff-integrity.test.mjs:35 because latest-test-results.json latestRun.id/url were null. Project integrity passed. Previous exact SHA 2ccfd452643c431a25f9bb7789f2bbe1acb41e5b passed.",
-    "currentHeadValidation": "FAIL_HANDOFF_INTEGRITY_POINTER_ON_e749873c0635eec31c4d5467cc357238edbebd6c"
+    "currentHeadValidation": "FAIL_HANDOFF_INTEGRITY_POINTER_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
+    "preCleanupPathCensus": {
+      ".github": 1,
+      "(root)": 2,
+      "data": 1,
+      "docs": 331,
+      "functions": 24,
+      "migrations": 2,
+      "public": 1,
+      "scripts": 4,
+      "tests": 19
+    },
+    "preCleanupExtensionCensus": {
+      "yml": 1,
+      "txt": 1,
+      "json": 165,
+      "md": 166,
+      "html": 2,
+      "png": 1,
+      "js": 26,
+      "sql": 2,
+      "mjs": 21
+    },
+    "expectedPostCleanupPathCount": 384,
+    "expectedPostCleanupCensus": {
+      ".github": 1,
+      "(root)": 2,
+      "data": 1,
+      "docs": 330,
+      "functions": 24,
+      "migrations": 2,
+      "public": 1,
+      "scripts": 4,
+      "tests": 19
+    },
+    "expectedPostCleanupExtensions": {
+      "yml": 1,
+      "txt": 1,
+      "json": 165,
+      "md": 166,
+      "html": 1,
+      "png": 1,
+      "js": 26,
+      "sql": 2,
+      "mjs": 21
+    },
+    "emptyViewerCleanup": {
+      "path": "docs/admin-ui-reference/admin-mobile-reference.html",
+      "blobSha": "6ff4fc52979192eb8c6cb0cf23ab0c4079ca31f6",
+      "byteLength": 0,
+      "reason": "The tracked blob has zero bytes even though README called it a self-contained viewer; reference-instructions.md directs contributors to the approved PNG.",
+      "action": "Remove the empty viewer and its README entry; retain the approved PNG and written instructions."
+    },
+    "reviewedPaymentRoutes": {
+      "status": "SOURCE_REVIEWED_NO_SAFE_ROUTE_MERGE",
+      "routes": {
+        "functions/_payments.js": "Shared fulfillment/token/QR allowlist/full-ledger summary helper referenced by endpoints and tests.",
+        "functions/api/admin/payment-qr.js": "Admin-only bank configuration draft/save/activate/deactivate and audit.",
+        "functions/api/admin/payment-qr-upload.js": "Admin-only bounded/signature-checked upload creating a pending inactive QR image.",
+        "functions/api/admin/payment-qr-preview.js": "Admin-authenticated preview scoped to the pending image key; private/no-store.",
+        "functions/payment-qr/[key].js": "Public route serves only the exact active QR key; different exposure/cache contract.",
+        "functions/api/payment-settings.js": "Public active configuration GET only; PUT returns 405.",
+        "functions/api/admin/payment-requests.js": "Creates/cancels requests and presents bounded history with an independent full-ledger summary.",
+        "functions/api/admin/payment-transactions.js": "Manually verified receipts/refunds, atomic payment state updates and audit logging.",
+        "functions/api/order-payment.js": "Read-only customer payment view scoped to hashed capability token, private/no-store and term/current-QR gated."
+      },
+      "evidence": [
+        "tests/fulfillment-payment-contract.test.mjs",
+        "tests/payment-ledger-route.test.mjs",
+        "tests/handoff-integrity.test.mjs",
+        "migrations/0009_fulfillment_and_manual_payments.sql",
+        "package.json scripts check/test",
+        "scripts/check-migrations.mjs"
+      ],
+      "result": "Authorization, exposure, cache and state-transition boundaries differ; current evidence does not justify consolidation or deletion."
+    }
   },
   "guardrails": [
     "Only write feature/admin-isolated-handoff-2026-10-20.",
@@ -247,29 +341,36 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Verify GitHub Actions for payment-summary fix commit 9f87b4fe496b48558a9682a1d4165f0956d86e9b; do not claim PASS without exact-SHA evidence.",
-    "Continue runtime/API/migration/setup/workflow provenance review; delete only with clear dependency evidence.",
-    "Keep PR #111 and #108 open/unmerged; no main/static branch writes or production operations."
+    "Fetch live PR #111 HEAD and Actions after this commit; require a Validate result whose head_sha equals that new HEAD.",
+    "Continue consumer/provenance review for remaining docs/history/config/workflow/data contracts/tests and reconcile the changed-path census.",
+    "Audit Orders and Order detail independently; keep them PARTIAL_NOT_ACCEPTED without authenticated acceptance evidence.",
+    "Preserve per-run compact history, even when some contents are identical.",
+    "Keep PR #111 and #108 OPEN/unmerged; no main/static writes, Production deployment, setup/migration execution, remote D1/R2, or secret/Access changes."
   ],
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T19:41:44.271Z",
-    "syncPurpose": "Refresh exact validation state and record runtime/API provenance findings; the new handoff commit needs exact-SHA validation."
+    "lastSyncAtUtc": "2026-10-22T20:09:25.482Z",
+    "syncPurpose": "Record exact-SHA Validate pass, update provenance checkpoint, remove a verified zero-byte unused reference viewer, then validate the resulting sync SHA independently."
   },
-  "currentHeadAtCheckpoint": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
-  "currentHeadValidation": "NOT_VERIFIED",
-  "currentHeadValidationReason": "Exact-SHA Actions lookup returned no PR-triggered runs and combined commit status returned no checks for the payment-summary fix commit.",
+  "currentHeadAtCheckpoint": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+  "currentHeadValidation": "PASS_ON_CHECKPOINT_SHA_B8AFF; POST_SYNC_SHA_REVALIDATION_PENDING",
+  "currentHeadValidationReason": "Validate #39844529679 passed on b8aff9d341e5c08d16ccc52efdab0b63da0e0869. This handoff/audit commit creates a new SHA; do not consider the new HEAD validated until its own exact-SHA Actions run passes.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T03:20:00+07:00",
-    "headAtStart": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
-    "headValidation": "NOT_VERIFIED",
+    "capturedAtUtc": "2026-10-22T20:09:25.482Z",
+    "headAtStart": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "validatedSha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
+    "headValidation": "PASS_ON_EXACT_SHA_B8AFF; POST_SYNC_SHA_REVALIDATION_PENDING",
     "pr111": "OPEN_UNMERGED",
-    "changedFiles": 385,
-    "additions": 38949,
-    "deletions": 211,
+    "pr108": "OPEN_UNMERGED_READ_ONLY",
+    "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "changedFilesBeforeCleanup": 385,
+    "expectedChangedFilesAfterEmptyViewerRemoval": 384,
+    "validationRunId": 39844529679,
+    "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679",
     "progressPercent": 50,
     "progressStatus": "PROVISIONAL",
-    "finding": "Full-ledger payment summary fix plus regression test committed; exact-SHA CI evidence not available through current lookup."
-  }
+    "finding": "Exact-SHA Validate passes after repair of the handoff run pointer. B1 remains partial; payment routes are not safe consolidation candidates based on current evidence."
+  },
+  "latestReviewFinding": "Validate #39844529679 passed on exact SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869"
 }
