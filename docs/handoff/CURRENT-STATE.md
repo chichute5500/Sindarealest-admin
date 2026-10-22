@@ -36,9 +36,6 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 ## Latest owner decision (2026-10-23)
 - Owner confirmed Hero must remain untouched temporarily; resume Hero only after completing the other storefront work. `TASKS.md` now puts non-Hero visual-audit work next. This owner decision supersedes any older instruction to verify/adjust the hidden-Hero layout immediately.
 
-## Latest owner decision (2026-10-23)
-- Owner confirmed Hero must remain untouched temporarily; resume Hero only after completing the other storefront work. `TASKS.md` now puts non-Hero visual-audit work next. This supersedes any older instruction to verify/adjust the hidden-Hero layout immediately.
-
 ## Latest evidence review (2026-10-23)
 - Inspected artifact `12453971973` from visual workflow [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928). Local fixture audit passed with no hard failures, but it is not live Preview evidence.
 - The artifact's live deployment metadata check failed closed: expected `33e09dd2bce4c4be1df23c65a47d93217d2153b7`, matched deployment `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d`. The compare shows only two documentation files changed between these SHAs; nevertheless, no exact-SHA live screenshot was accepted by that run.
