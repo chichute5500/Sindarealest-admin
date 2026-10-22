@@ -1,14 +1,14 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-22T19:15:21.463+07:00",
+  "updatedAt": "2026-10-22T21:20:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "checkpointSemantics": "Refs checked live immediately before this docs-only checkpoint. Pre-write ADMIN HEAD e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; application source dca19a2af32a78390878b9ccfa5c7c26b816f2ff is unchanged over 21 commits / 22 paths in the source-to-head comparison, limited to handoff/docs/reference files. These docs-only commits advance HEAD; fetch current refs before further writes.",
-  "branchHeadAtCheckpoint": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
+  "branchHeadAtCheckpoint": "f9c1e011881768d077dcbb1ce24cdc5ae6175d7f",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "No application source change and no newly accepted whole screen. Product list review is closed as fixture-data-limited; Product editor remains partial. Documentation-only writes and CI status do not increase progress.",
+  "progressBasis": "50% PROVISIONAL: no screen accepted. Migration 0009 fail-closed preflight source changes passed workflow #39778009734 on tested source SHA 3658ca1069616639b825de2cd7b9c714ce560901. Fixture-only screenshots and CI do not establish whole-screen/backend acceptance; docs/CI do not increase progress.",
   "sourceTreeComparison": {
     "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
     "checkpointHead": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
@@ -18,40 +18,41 @@
     "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/dca19a2af32a78390878b9ccfa5c7c26b816f2ff...e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe"
   },
   "sourceValidationOnHead": {
-    "status": "NOT_VERIFIED_FOR_EXACT_LIVE_HEAD",
-    "liveHead": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
-    "combinedStatus": "no status checks returned",
-    "associatedPrWorkflowRuns": "none returned by commit-run lookup",
-    "latestKnownSuccessfulValidation": {
-      "runId": 39773285617,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773285617",
-      "sha": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
-      "conclusion": "success",
-      "note": "This is an earlier docs-only HEAD, not the current live HEAD."
-    },
-    "latestApplicationSourceValidation": {
-      "runId": 39767851282,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282",
-      "sha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
-      "conclusion": "success"
-    },
-    "note": "Application source is unchanged since the successful source validation, but the exact current docs-only HEAD is not labelled CI-tested."
+    "status": "TESTED_SOURCE_ANCESTOR_NOT_EXACT_LIVE_HEAD",
+    "liveHead": "f9c1e011881768d077dcbb1ce24cdc5ae6175d7f",
+    "testedSourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "workflowRun": 39778009734,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+    "conclusion": "success",
+    "checks": [
+      "npm run check",
+      "npm test",
+      "responsive/theme Playwright capture",
+      "safe preview diagnostics",
+      "artifact upload"
+    ],
+    "note": "Workflow tested source SHA 3658ca1. Current HEAD is later and docs-only; exact live HEAD is not claimed tested."
   },
   "latestVisualEvidence": {
-    "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
-    "validateRun": 39767851282,
-    "previewRun": 39767851318,
-    "previewUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318",
+    "sourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "validateRun": 39778009734,
+    "previewRun": 39778009734,
+    "previewUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
     "artifact": {
-      "id": 12420678829,
-      "name": "admin-preview-evidence-311",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829",
-      "screenshots": 99,
-      "loginShellPngs": 16,
-      "uiFixturePngs": 83,
-      "fixtureMetrics": 75,
+      "id": 12425910948,
+      "name": "admin-preview-evidence-314",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948",
+      "screenshotCount": 89,
+      "fixtureMetrics": 16,
       "expired": false,
-      "scope": "synthetic/read-only; not authenticated backend QA"
+      "scope": "local static source screenshots and synthetic/read-only fixture; not authenticated backend QA"
+    },
+    "diagnostic": {
+      "status": "PASS_LOGIN_CSS_SIGNATURE",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "httpErrors": 0
     }
   },
   "latestVisualReview": {
@@ -306,8 +307,8 @@
       "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
     }
   },
-  "lastCompletedTask": "Inspected artifact #311 metrics for Product list #3 at 320x640 and 360x800 light/dark; opened Product editor screenshots at 390x844 light/dark and 1280x800 light; reviewed source and existing fixture tests. No independent source defect proven; no application source changed.",
-  "currentTask": "P1 PR #111 scope/provenance audit; review post-merge-base API/migration/workflow paths read-only. Do not run remote setup/deploy/migrations or D1/R2 operations.",
+  "lastCompletedTask": "Added fail-closed migration 0009 schema preflight to setup/deploy scripts and regression tests; workflow #39778009734 succeeded on source SHA 3658ca1069616639b825de2cd7b9c714ce560901. Downloaded artifact #314 and inspected metadata, diagnostics, product editor and order detail screenshots.",
+  "currentTask": "P1 continue read-only PR #111 scope/provenance audit; reconcile migration 0009 schema with payment route contracts and local tests; review stale-HEAD guards in admin preview workflow. No remote query, setup, deploy or migration.",
   "taskQueue": [
     {
       "id": "P1-PRODUCTS-03",
@@ -387,14 +388,15 @@
   "ownerActionRequiredNow": "No action needed for documentation consolidation. Authenticated QA needs legitimate Preview identity; AI grouping needs approved contract; R2/PRE-PRO remain deferred.",
   "legacyArchiveRoot": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22",
   "latestCheckpointVerification": {
-    "pr108Head": "e3328dee37b125c5821bcaad03199afc44ed06fa",
-    "pr108State": "open",
-    "pr108Merged": false,
-    "pr111Head": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
-    "pr111State": "open",
-    "pr111Merged": false,
-    "at": "2026-10-22T19:15:21.463+07:00",
-    "note": "Refs verified immediately before docs writes; fetch current PR heads again because these commits advance ADMIN HEAD."
+    "checkedAt": "2026-10-22T21:20:00+07:00",
+    "liveHead": "f9c1e011881768d077dcbb1ce24cdc5ae6175d7f",
+    "pr111": "OPEN_UNMERGED",
+    "pr108": "OPEN_UNMERGED",
+    "testedCommit": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "workflowRun": 39778009734,
+    "workflowConclusion": "success",
+    "artifactId": 12425910948,
+    "artifactName": "admin-preview-evidence-314"
   },
   "handoffReviewAt": "2026-10-22T19:15:21.463+07:00",
   "latestCheckpoint": {
