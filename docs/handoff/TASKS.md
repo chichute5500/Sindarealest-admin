@@ -1,5 +1,5 @@
 # ACTIVE TASK LEDGER — SINDAREALEST2
-Updated: 2026-10-23
+Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
 Only current, actionable tasks belong here. Historical run-by-run evidence is in [TEST-RESULTS.md](TEST-RESULTS.md); do not treat old checkpoint rows as current.
 
@@ -8,13 +8,13 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 | HANDOFF-CLEANUP | COMPLETED — verify links on each future change | Superseded dated prompts were removed; duplicate audit history consolidated into TEST-RESULTS.md; canonical state/prompt pointers updated. |
 | WORKFLOW-EFFICIENCY | APPLIED; source validation PASS | Commit `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`; [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405) PASS. Docs/README and workflow-only changes no longer trigger needless deployment/capture; Admin smoke is manual; stale validation/review runs are superseded. |
 | HERO-TEMP-HIDDEN | PAUSED BY OWNER — DO NOT TOUCH | Owner says leave Hero unchanged for now and return to it only after other storefront work is complete. Do not edit Hero markup/CSS/assets, run Hero-specific rework, or call it PASS during this pause. Preserve the uploaded image and derivative. |
-| STOREFRONT-VISUAL-AUDIT | NEXT — EXCLUDE HERO | Resume the remaining storefront visual-audit work outside Hero. Pick one concrete unfinished section from current source/evidence, verify its exact-SHA state, fix only that section, and present it for owner review. Hero stays untouched until these other tasks are complete. |
+| STOREFRONT-VISUAL-AUDIT | NEXT — EXCLUDE HERO | Inspect current source/tests and existing artifacts, identify one evidenced defect outside Hero, then fix and verify that section before moving on. Do not edit speculatively. Continue automatically after each report. Hero stays untouched until other storefront work is complete. |
 | QR-PAYMENT-CONTRACT | BLOCKED ON TRUSTED BACKEND CONTRACT/CONFIG | Keep fail-closed: no QR or transfer request until trusted order status and complete receiver/payment instructions exist. Do not modify Admin/backend in this branch. |
 
 ## Working protocol (owner-approved 2026-10-23)
 - One active acceptance item at a time; do not spread effort across multiple unfinished main tasks.
 - While CI/deploy/capture is running, immediately do independent, safe work that advances the active item. No idling or duplicate workflow runs; avoid editing the same code under validation.
-- After a report, continue automatically. Stop only for required owner visual acceptance/decision, missing permission, or a genuine blocker.
+- Mandatory: a progress report is not a stop. Continue the next safe step automatically without waiting for the owner to say “continue.” While CI/deploy/capture runs, do independent non-conflicting work, then inspect results. Stop only for required owner visual acceptance/decision, missing permission, or a genuine external blocker; keep doing independent safe work while blocked.
 - Reuse valid evidence for unchanged code; rerun only missing/stale/impacted checks. Tie every result to exact SHA and deployment.
 - Separate code-test PASS, Preview deployment PASS, live screenshot evidence, and owner visual acceptance. Owner PASS locks the item until explicit permission to reopen.
 - Current active item is the next non-Hero storefront visual-audit section. Hero is explicitly paused by the owner and must remain untouched until the other agreed work is completed.
