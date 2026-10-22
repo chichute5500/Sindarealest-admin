@@ -12,8 +12,14 @@ export async function onRequestGet(context) {
     const db=context.env.DB;
     const requests=await db.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by,created_at,updated_at FROM order_payment_requests WHERE order_id=? ORDER BY created_at DESC LIMIT 50").bind(orderId).all();
     const transactions=await db.prepare("SELECT id,payment_request_id,direction,amount,transaction_reference,note,actor,verified_at,created_at FROM order_payment_transactions WHERE order_id=? ORDER BY created_at DESC LIMIT 100").bind(orderId).all();
+    // Keep the display list bounded, but compute financial totals across the complete ledger.
+    const totals=await db.prepare("SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE 0 END),0) AS received_amount, COALESCE(SUM(CASE WHEN direction='refunded' THEN amount ELSE 0 END),0) AS refunded_amount FROM order_payment_transactions WHERE order_id=?").bind(orderId).first();
     const order=await db.prepare("SELECT total FROM orders WHERE id=? LIMIT 1").bind(orderId).first();
-    return json({requests:requests.results||[],transactions:transactions.results||[],summary:summarizePaymentRows(transactions.results||[],order?.total)});
+    const summary=summarizePaymentRows([
+      {direction:"received",amount:totals?.received_amount},
+      {direction:"refunded",amount:totals?.refunded_amount}
+    ],order?.total);
+    return json({requests:requests.results||[],transactions:transactions.results||[],summary});
   } catch { return fail("Không đọc được lịch sử thanh toán.",503); }
 }
 export async function onRequestPost(context) {
