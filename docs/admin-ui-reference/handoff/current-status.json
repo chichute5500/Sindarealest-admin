@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:54:00Z",
+  "capturedAtUtc": "2026-10-22T15:56:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "checkpointSemantics": "Branch HEAD changes with every documentation commit. The SHA recorded as headObservedBeforeHandoffSync is historical only; always fetch live PR/branch HEAD. codeTestSha is the exact product revision validated by the recorded source CI and may differ from current docs-only HEAD.",
@@ -13,31 +13,28 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "32c4aa52e03e8917b930ff13d9775215e2876f62",
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
       "changedFiles": 288,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
-      "writeAllowed": false
+      "writeAllowed": false,
+      "lastObservedHeadSha": "ff60d41b2bee9367aa88e8c0e3cd4b8d830977bb"
     },
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "4d6dab2f56d4dec53955c300e8ea477062fd2587",
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "changedFiles": 1304,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
+      "lastObservedHeadSha": "79903cc79477046a4a0670b5eca2a62222c4420f"
     }
   },
   "sourceTreeComparison": {
-    "status": "diverged",
-    "adminHead": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-    "staticHead": "32c4aa52e03e8917b930ff13d9775215e2876f62",
-    "adminAhead": 978,
-    "staticAhead": 957,
-    "mergeBase": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/compare/32c4aa52e03e8917b930ff13d9775215e2876f62...326526f8f74172ae0aea7fa37739c9a8e8f513ec"
+    "status": "STALE_RECOMPUTE_BEFORE_SCOPE_DECISIONS",
+    "note": "Prior divergence counts and merge-base were computed against old static head 32c4aa52... and must not be relied on after PR #108 advanced.",
+    "previousAdminCodeSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
+    "previousStaticHeadSha": "32c4aa52e03e8917b930ff13d9775215e2876f62"
   },
   "actions": {
     "sourceValidation": {
@@ -263,5 +260,6 @@
     "Sync all handoff files after test evidence changes; progress remains 50% PROVISIONAL."
   ],
   "handoffSync": "Core handoff files synchronized; live HEAD must be fetched at session start because subsequent handoff-only commits advance it. Latest Preview workflow failure cause is recorded.",
-  "headObservedBeforeHandoffSync": "4d6dab2f56d4dec53955c300e8ea477062fd2587"
+  "headObservedBeforeHandoffSync": "4d6dab2f56d4dec53955c300e8ea477062fd2587",
+  "snapshotSemantics": "PR heads below are the last live refs observed immediately before this status commit. This commit advances the ADMIN branch HEAD, so every new chat MUST fetch live branch/PR heads before acting; codeTestSha remains the exact tested product SHA."
 }
