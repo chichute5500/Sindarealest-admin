@@ -1749,7 +1749,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderDetailBackdrop')).toHaveCount(0);
       await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
       await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
-      if (variant.viewport.width <= 820) {
+      const orderDetailViewportWidth = page.viewportSize()?.width ?? 0;
+      if (orderDetailViewportWidth <= 820) {
         await expect(page.locator('.mobiletabs')).toBeVisible();
       } else {
         await expect(page.locator('.mobiletabs')).toBeHidden();
