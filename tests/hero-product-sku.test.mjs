@@ -50,7 +50,7 @@ for (const [, selector, declarations] of heroImageRules) {
 assert.ok(html.includes("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
 const edgeProcessor = readFileSync(new URL("../scripts/process-hero-edge.py", import.meta.url), "utf8");
 assert.ok(edgeProcessor.includes("FEATHER_RADIUS = 48")
-  && edgeProcessor.includes('source.putalpha(new_alpha)')
+  && edgeProcessor.includes('padded_source.putalpha(new_alpha)')
   && edgeProcessor.includes('"rgb_modified": False')
   && edgeProcessor.includes("GaussianBlur(radius=KEEP_MASK_RADIUS)"),
   "Hero edge blend must feather only alpha, preserve original RGB/color, and protect shoe regions.");
