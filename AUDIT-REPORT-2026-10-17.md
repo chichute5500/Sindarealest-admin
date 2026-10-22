@@ -269,3 +269,6 @@ Workflow deploy dùng token Pages để đọc cài đặt public-access của R
 ### Preview và dependency lockfile còn chờ
 
 Preview của nhánh audit yêu cầu đăng nhập/Cloudflare Access khi kiểm tra không có phiên hợp lệ (`login_required`). Chưa dùng browser profile đã đăng nhập vì hiện không có profile nào xác nhận đã đăng nhập vào miền Preview. Ngoài ra, repo vẫn chưa có `package-lock.json`; CI hiện cài bằng `npm install`, không phải `npm ci`. Hai mục này vẫn cần xử lý trước khi xác nhận phát hành hoàn tất.
+
+
+[STATUS NOTE — 2026-10-22] This file is a legacy repository overview/audit snapshot, not the active task/handoff specification. It may describe older architecture, deployment assumptions or completed work. For current storefront scope, branch, safety boundaries and open tasks, read `docs/handoff/CURRENT-STATE.md` first. Do not use this file to override the current handoff or authorize Admin/backend/production changes.
