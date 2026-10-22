@@ -1,10 +1,14 @@
 # ADMIN — 12-SCREEN REFERENCE AUDIT
 
-**Checkpoint:** 2026-10-22T14:20:00Z  
-**Code/test SHA before this docs-only handoff commit:** `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`  
+**Checkpoint:** 2026-10-22T21:50+07:00  
+**Current ADMIN HEAD:** `7d9cde727476ac05ee7431b457e7377b34c750fe`  
 **Progress:** 50% PROVISIONAL; all screens remain unaccepted overall.
 
 ## Latest relevant test evidence
+
+- Current exact-SHA run [#39797841880](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880) on `7d9cde7` is **QUEUED** at last poll. Commit `7d9cde7` changes the E2E assertion to read the actual page viewport width; it is not a product fix and has no acceptance result yet.
+- Run [#39796182324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324) on `401b961` failed with `ReferenceError: variant is not defined` at line 1752; [artifact #327](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324/artifacts/12433587319).
+- Run [#39794007381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381) on `26f1c6f` failed because `.mobiletabs` was hidden when test expected visible at line 1752; [artifact #326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381/artifacts/12432254530).
 
 - Source Playwright run [#39792844330](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330) checked out `a6fc090b60e579e9d708775f0c25e3ba56f3439b`; [artifact #324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330/artifacts/12431484447).
 - Artifact #324: 61 PNGs = 16 login-shell images + 45 local fixture images; 41 fixture metrics. Page errors, console errors, failed requests and HTTP errors were zero; fixture mode blocked/recorded all attempted non-GET requests.
@@ -38,6 +42,6 @@
 
 ## Next
 
-1. Poll runs #325 and #326; use #326 as the primary exact latest test commit and inspect artifacts before changing this table.
-2. Continue screens #8–#12 with their own reference comparison and evidence; reuse prior tests/screenshots instead of repeating geometry already closed for #3/#4.
+1. Poll run #39797841880 (exact SHA `7d9cde7`); update this table only when there is new screen evidence.
+2. After CI is understood, continue screens #8–#12 with independent reference comparison and evidence; reuse prior tests/screenshots instead of repeating geometry already closed for #3/#4.
 3. Continue PR #111 provenance/payment guard review. Remote D1 schema/ledger remains NOT VERIFIED; migration 0009 and PRE/PRO migrations deferred; R2 save deferred; AI grouping blocked pending owner contract.
