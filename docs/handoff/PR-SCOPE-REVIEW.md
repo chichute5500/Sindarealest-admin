@@ -1,4 +1,4 @@
-# PR #108 scope review — static storefront audit
+> **HISTORICAL SCOPE REVIEW — 2026-10-20.** File counts, reviewed SHA, branch-divergence numbers, workflow state and URLs in the body are historical and must not be reused as current facts. The review remains useful as a warning that PR #108 contains mixed storefront/Admin/backend scope; do not merge it wholesale. For current state use [CURRENT-STATE.md](CURRENT-STATE.md), for current tests/deploy evidence use [TEST-RESULTS.md](TEST-RESULTS.md). PR #108 must remain OPEN/unmerged; Preview only.\n\n# PR #108 scope review — static storefront audit
 
 Checkpoint: 2026-10-20
 Repository: `chichute5500/Sindarealest-admin`
