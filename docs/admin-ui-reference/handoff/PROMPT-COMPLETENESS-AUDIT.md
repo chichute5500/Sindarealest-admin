@@ -1,3 +1,13 @@
+## LIVE PROMPT COMPLETENESS CHECKPOINT — 2026-10-22 21:20 +07:00
+
+- Canonical task/status queue: `handoff/current-status.json`; next-chat instructions: `handoff/PROMPT-NEXT-CHAT.md`; start procedure: `handoff/START-HERE.md`.
+- Branch HEAD before this docs-only update: `73c7a26e3821db8afe62675a9057bb3f6aea3c47`; PR #111 was OPEN/unmerged and matched. The source/test SHA is still `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; handoff commits do not extend application test coverage.
+- Existing successful source/Preview runs prove only their recorded scope. All-12-screen parity NOT_ACCEPTED; authenticated business QA NOT_TESTED; screen #3 PARTIAL_NOT_ACCEPTED; screen #11 BLOCKED pending approved contract; R2 image save and PRE/PRO migration DEFERRED_BY_OWNER.
+- First technical action for the next session: inspect current Product editor #4 source and reference; the proposed SKU/AI-heading layout change was not committed. Do not repeat stale assumptions; verify live files and then implement/test a concrete change.
+- Anti-loop requirements: no report-only sessions; reuse only valid exact-SHA evidence; queue every task with acceptance criteria; keep progress provisional 50% until weighted acceptance evidence changes; preflight branch/PR before each write; continue to the next safe task automatically.
+
+---
+
 # Kiểm toán mức độ đầy đủ của prompt bàn giao ADMIN
 
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:38:06+07:00
