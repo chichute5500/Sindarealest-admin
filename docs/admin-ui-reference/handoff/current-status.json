@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:50:00Z",
+  "capturedAtUtc": "2026-10-22T15:52:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "checkpointSemantics": "Live branch HEAD is checkpointHeadSha. codeTestSha is the product/code revision validated by recorded source CI and may differ from docs-only HEAD. Always fetch live PR/branch/Actions before acting.",
@@ -63,7 +63,16 @@
       "jobs": "COMPLETED; inspect job logs/artifacts to determine root cause",
       "artifacts": "NOT RECHECKED DURING THIS SYNC",
       "createdAt": "2026-10-22T15:26:29Z",
-      "queuedBehindRunId": 39802525217
+      "queuedBehindRunId": 39802525217,
+      "workflowConclusion": "failure",
+      "deployedPreviewDiagnostic": "success",
+      "localStaticBaseline": "failure",
+      "failureCause": "Playwright test tests/e2e/admin-static-baseline.spec.js timed out after 120s waiting for [data-action=\"retry-customers\"] at line 1940; local source fixture test failed. Preview diagnostic step itself completed successfully.",
+      "artifact": {
+        "id": 12437154740,
+        "name": "admin-preview-evidence-336",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604/artifacts/12437154740"
+      }
     },
     "blockingOlderPreview": {
       "id": 39802525217,
@@ -248,11 +257,11 @@
     "No fabricated business facts or unapproved APIs."
   ],
   "nextActions": [
-    "Inspect jobs/logs/artifacts for Preview run 39804852604 and classify the exact failure.",
-    "Fix the smallest confirmed issue only on the ADMIN branch; rerun relevant validation on the resulting code SHA.",
-    "Sync latest-test-results.json, START-HERE.md, LATEST-STATUS.md and PROMPT-COMPLETENESS-AUDIT.md to this checkpoint.",
-    "Do not raise progress above 50% PROVISIONAL based on docs-only changes or source CI alone."
+    "Inspect artifact 12437154740 and the retry-customers fixture path in tests/e2e/admin-static-baseline.spec.js around line 1940.",
+    "Determine whether the test setup or UI retry affordance is incorrect; fix the confirmed cause on ADMIN branch only.",
+    "Run focused Playwright test and full source validation on the new exact code SHA.",
+    "Sync all handoff files after test evidence changes; progress remains 50% PROVISIONAL."
   ],
   "checkpointHeadSha": "4d6dab2f56d4dec53955c300e8ea477062fd2587",
-  "handoffSync": "PARTIAL_SYNCED: current-status.json reflects live ADMIN HEAD 4d6dab2f56d4dec53955c300e8ea477062fd2587 and known workflow conclusions; remaining handoff files still need synchronization."
+  "handoffSync": "Current state synced with run 39804852604: overall workflow FAIL due local static Playwright timeout; deployed Preview diagnostic step SUCCESS. Branch HEAD changes with each handoff commit, so fetch live HEAD at session start."
 }
