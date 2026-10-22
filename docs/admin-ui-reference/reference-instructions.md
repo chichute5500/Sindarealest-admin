@@ -1,11 +1,11 @@
-## LIVE REFERENCE-INSTRUCTIONS CHECKPOINT — 2026-10-22 21:20 +07:00
+## LIVE REFERENCE-INSTRUCTIONS CHECKPOINT — 2026-10-22 21:25 +07:00
 
-- Read `handoff/current-status.json` before this guide; use its task queue and acceptance status. Fetch live ADMIN HEAD and PR #111/#108 before any write.
-- Branch HEAD before this docs-only update: `543b4c0fb8b1b2d83e42cdf9d6267f61c6da27b2`; PR #111 was OPEN/unmerged and matched. Last source/test SHA is `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; historical PASS does not imply current docs HEAD tested.
-- Screen #4 is the immediate technical task: inspect the live Product editor against the approved reference, especially SKU verification and AI-description heading/action alignment. Do not assume an uncommitted proposed change exists.
-- Use exact-SHA evidence, viewport/theme screenshot review, and screen-level acceptance. Keep 12-screen parity NOT_ACCEPTED and backend QA NOT_TESTED until evidence supports otherwise.
-- Only the ADMIN branch may be written. No merge, main/static edits, Production deploy, Access bypass/secrets, remote D1/R2 write or migration. Continue safe tasks without waiting for another prompt.
-
+- Read `handoff/current-status.json` first. Fetch live ADMIN HEAD and PR #111/#108 before each write.
+- ADMIN HEAD at checkpoint: `5c88611cd3013d83f6519576eb41040c6307bd57`; PR #111 OPEN/unmerged and matched. PR #108 remains separate and OPEN/unmerged.
+- Latest recorded source/test SHA: `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`; Validate #39767851282 and Preview #39767851318 both SUCCESS. Artifact #311 has 99 screenshots; four Product list screenshots at 320×640 / 360×800, light/dark, were spot-checked for SKU hint wrapping. Handoff commits after that source SHA are docs-only and not app-test evidence.
+- Product list #3 remains PARTIAL_NOT_ACCEPTED; Product editor #4 overall parity remains partial; full 12-screen parity NOT_ACCEPTED. Authenticated backend QA NOT_TESTED.
+- Next safe task: continue Product list #3 reference comparison, then Product editor #4, remaining screens and PR #111 scope audit.
+- No merge, main/static edits, Production deploy, Access bypass/secrets, remote D1/R2 writes or migrations. Continue safe work without waiting for another prompt.
 ---
 
 # Instructions for AI: use the ADMIN UI reference
