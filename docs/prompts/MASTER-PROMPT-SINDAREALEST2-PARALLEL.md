@@ -1,3 +1,7 @@
+## Latest startup capture result — 2026-10-22
+
+Artifact #12418823837 contains 4 startup videos (360×800/390×844, Light/Dark), 107 timeline samples and 0 first-paint violations. During welcome splash, bottom navigation and account drawer remained hidden in all captured sample states. This is observational evidence only because Preview metadata expected SHA `e916ce...` but returned `5f1be31...`; compare shows only documentation commits in between. Do not repeat the old startup investigation unless new contrary evidence appears. Canonical live status remains `docs/handoff/CURRENT-STATE.md`.
+
 # CANONICAL STATUS OVERRIDE — 2026-10-22 (read first)
 
 **This header supersedes every older checkpoint, SHA, percentage, run number, and claim below.** Do not use historical facts as current status. Fetch live branch/PR HEAD and check for newer Actions runs before every session.
