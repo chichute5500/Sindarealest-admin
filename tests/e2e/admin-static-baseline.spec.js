@@ -725,6 +725,16 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         ).toBeLessThan(mobilePriceStockLayout.footerTop - 4);
       }
     }
+    if (variant.viewport.width > 680) {
+      const desktopPriceStockLayout = await page.evaluate(() => {
+        const fieldBottom = id => document.querySelector('#' + id)?.closest('.field')?.getBoundingClientRect().bottom ?? null;
+        const footerTop = document.querySelector('#backdrop .editorfooter')?.getBoundingClientRect().top ?? null;
+        return { priceBottom: fieldBottom('pPrice'), stockBottom: fieldBottom('pStock'), footerTop };
+      });
+      expect(desktopPriceStockLayout.priceBottom, 'Desktop product price field should stay above the sticky footer: ' + JSON.stringify(desktopPriceStockLayout)).not.toBeNull();
+      expect(desktopPriceStockLayout.stockBottom, 'Desktop product stock field should stay above the sticky footer: ' + JSON.stringify(desktopPriceStockLayout)).not.toBeNull();
+      expect(desktopPriceStockLayout.stockBottom, 'Desktop price/stock row should not be obscured by the sticky footer: ' + JSON.stringify(desktopPriceStockLayout)).toBeLessThan(desktopPriceStockLayout.footerTop - 4);
+    }
     await expect(page.locator('#productPanelDetails .product-visibility-row')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPublished')).toBeChecked();
     await expect(page.locator('#productPanelDetails #pFulfillmentType')).toHaveCount(0);
