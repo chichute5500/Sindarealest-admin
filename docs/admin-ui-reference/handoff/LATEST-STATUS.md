@@ -38,3 +38,15 @@ Next: fetch the post-documentation HEAD and its exact SHA run; then audit #6/#7 
 - Preview diagnostic #39784873281 remains IN_PROGRESS on older SHA `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; capture and deployed Preview diagnostic steps were pending at last poll. Do not treat it as current-HEAD visual evidence.
 - Activity Log source implemented; visual and authorized live-data QA NOT VERIFIED.
 - Progress remains **50% PROVISIONAL**. No merge, Production deploy, remote migration or writes.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 75f51d8c044b8012d9cd07f4ede06762ccf24a66
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39788772753
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: FAILURE; 16 real PNGs captured in artifact admin-preview-evidence-321 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 16 real PNGs; login shell: 16; read-only fixture module screens: 0; fixture metrics: 0.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
