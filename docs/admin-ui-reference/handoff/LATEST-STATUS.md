@@ -43,3 +43,10 @@ No merge/force push/deploy; no main/static writes; no Access bypass or secret op
 - Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+## PR #111 scope cleanup — 2026-10-23
+- Exact cleanup SHA `dcd5f1c2ae45d1c0ae22d49838757ec1ada69d7a`: Validate source and tests [#39836967488](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39836967488) SUCCESS. This validates project integrity/tests on that exact docs-cleanup SHA; it does not add new UI screenshot or authenticated backend evidence.
+- PR #111 at the same checkpoint: 404 changed paths (+49,386/−404), OPEN/unmerged, mergeable=false.
+- Removed two superseded/out-of-scope docs: the static-site audit report and old prompt completeness snapshot. Consolidated the master prompt to a compatibility pointer and reduced PROMPT-NEXT-CHAT from 3,602 to 1,661 characters.
+- Preserved the 326 per-run history files under `handoff/history/` because the repository's retention policy requires compact text/JSON evidence. No approved reference image, product/runtime source, or historical test record was deleted.
+- The next-chat prompt and this status note were updated after the successful SHA; re-fetch Actions for the resulting live HEAD before calling the final handoff state PASS.
