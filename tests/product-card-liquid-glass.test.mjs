@@ -132,16 +132,17 @@ assert.ok(protectedHeroDisplayLock.includes('#home .hero-visual img{')
   && protectedHeroDisplayLock.includes('object-fit:contain!important;object-position:center!important;padding:0!important;')
   && protectedHeroDisplayLock.includes('filter:none!important')
   && protectedHeroDisplayLock.includes('mix-blend-mode:normal!important;opacity:1!important;')
+  && protectedHeroDisplayLock.includes('transform:none!important;')
   && protectedHeroDisplayLock.includes('border-radius:0!important;box-shadow:none!important;')
-  && protectedHeroDisplayLock.includes('display:flex!important;') 
+  && protectedHeroDisplayLock.includes('display:flex!important;')
   && protectedHeroDisplayLock.includes('justify-content:center!important;align-items:center!important;')
-  && protectedHeroDisplayLock.includes('width:100vw!important;max-width:100vw!important;')
-  && protectedHeroDisplayLock.includes('margin:0 0 0 calc(50% - 50vw)!important;')
-  && protectedHeroDisplayLock.includes('max-width:calc(100vw - 22px)!important;')
-  && protectedHeroDisplayLock.includes('margin-inline:auto!important;')
+  && protectedHeroDisplayLock.includes('grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;')
+  && protectedHeroDisplayLock.includes('grid-column:1!important;')
+  && protectedHeroDisplayLock.includes('grid-column:2!important;')
+  && protectedHeroDisplayLock.includes('max-height:210px!important;')
   && !protectedHeroDisplayLock.includes('drop-shadow')
   && protectedHeroDisplayLock.includes('#home .hero-visual-caption{display:none!important}'),
-  "The mobile hero must present the owner's full original image unboxed, without filters, blending, cropping, or a caption overlay.");
+  "The mobile hero must place copy and the full original image side-by-side, without filters, blending, cropping, transforms, shadows, or a caption overlay.");
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
