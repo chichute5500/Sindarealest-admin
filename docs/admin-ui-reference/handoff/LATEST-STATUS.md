@@ -49,12 +49,12 @@ All 12 screens remain PARTIAL_NOT_ACCEPTED. In particular:
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 2e7123c7dc694efa88a7bfa8902845048eb93db5
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39810281876
+- Tested commit: 88d6f372c70cb6bf43ff4d7c670f470d652bd3c4
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39810848895
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: FAILURE; 96 real PNGs captured in artifact admin-preview-evidence-337 (not committed to Git).
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-338 (not committed to Git).
 - Deployed Preview: success.
-- Source screenshot matrix: 96 real PNGs; login shell: 16; read-only fixture module screens: 80; fixture metrics: 72.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
