@@ -1,3 +1,9 @@
+# LATEST RUN OVERRIDE — 2026-10-22 UTC
+
+A newer isolated visual run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821) for source SHA `e916ce590b6dbd720dca51405097d20333ce649b` was IN_PROGRESS at the latest handoff refresh. Its final result/artifact must be checked before any current audit claim. Until a newer exact-SHA audit completes and screenshots are opened, the last completed evidence remains run [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036), artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814), SHA `fc406599e04475e232fad790efd03d46979a5a20`. That run's archive comparison status is `COMPLETE_NEEDS_VISUAL_REVIEW`; icon visual acceptance remains OPEN. Read `docs/handoff/CURRENT-STATE.md` and refresh branch/deploy/audit metadata before work.
+
+---
+
 # CURRENT CHECKPOINT OVERRIDE — 2026-10-22 UTC
 
 This inventory contains older checkpoint details below. They are historical unless re-verified. Latest machine-verified live Preview audit is run [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036), exact deployed/audited SHA `fc406599e04475e232fad790efd03d46979a5a20`, artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814). It captured the reference boards and 128 live screenshots, but the workflow marks archive comparison `COMPLETE_NEEDS_VISUAL_REVIEW`; fresh manual icon comparison against live screenshots remains open. Do not treat prior claims as closing that gate.
