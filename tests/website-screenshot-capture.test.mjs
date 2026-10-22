@@ -391,7 +391,7 @@ console.log('PASS: Preview capture is source-restricted/read-only, optional Acce
 
 assert.match(storefrontHtml, /id="notFoundPage"[\s\S]*id="notFoundTitle"/,
   'Unknown public routes must have an accessible 404 presentation view.');
-assert.match(storefrontHtml, /sd-not-found-route[\s\S]*normalizedPath/,
+assert.match(storefrontHtml, /normalizedPath[\s\S]*sd-not-found-route/,
   'Unknown routes must be detected without changing canonical product routes.');
 assert.match(live, /async function captureSupplementalParityChecks[\s\S]*notFoundChecks[\s\S]*searchChecks[\s\S]*zaloChecks/,
   'The live audit must explicitly cover 404, catalog search, and Zalo CTA states.');
