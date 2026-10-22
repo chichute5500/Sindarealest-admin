@@ -13,12 +13,13 @@
 
 ## Checkpoint đã xác minh qua GitHub API
 - Repo: `chichute5500/Sindarealest-admin`; nhánh được phép ghi: `feature/admin-isolated-handoff-2026-10-20`.
-- PR #111 OPEN/unmerged, HEAD `5b9764b3f6b023537551a49d87ec16ef325bf76d`, **391 changed paths** (+38,984 / −251), mergeable=false.
-- PR #108 OPEN/unmerged, READ-ONLY; nhánh `fix/liquid-glass-audit-2026-10-19`, HEAD `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8`, 291 changed paths. Do not edit this branch.
-- Cleanup since the original 1,315-path census: removed 912 generated historical PNGs; removed 10 duplicate legacy handoff snapshots; removed the obsolete prompt-completeness audit and out-of-scope static-site audit; removed the static-only Liquid Glass preview workflow and its dedicated capture script; restored `public/index.html` to the exact `main` blob so it no longer appears in PR #111's diff.
-- Current PR census: .github 1; README-DEPLOY.txt 1; data 1; docs 330; functions 24; migrations 2; package.json 1; public 1; scripts 4; tests 26. The approved `admin-mobile-reference.png` and compact per-run test evidence remain. No generated screenshot matrices remain in history.
-- Last known successful full source/UI evidence is run #39816652346 on SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; this is historical, not a validation of the current HEAD. The current cleanup HEAD has no confirmed matching successful Actions run/status in the available lookup.
-- Product progress stays **50% PROVISIONAL**; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED.
+- PR #111 OPEN/unmerged, HEAD trước lần đồng bộ bàn giao này `61d68b3f05ae349755e6807843e9aa83bd5f01ba`; **390 changed paths** (census đã đối chiếu danh sách tên file; metadata diff của GitHub được refetch sau commit), mergeable=false.
+- PR #108 OPEN/unmerged và READ-ONLY: nhánh `fix/liquid-glass-audit-2026-10-19`; không ghi vào nhánh này.
+- Đã bỏ 912 PNG kiểm thử sinh tự động; 10 snapshot bàn giao trùng; prompt-completeness audit cũ; báo cáo audit của static site; workflow Liquid Glass chỉ chạy cho nhánh static và script capture riêng; ZIP tham chiếu không được tài liệu nào liên kết. Giữ PNG tham chiếu chuẩn và HTML viewer được README mô tả.
+- `public/index.html` được trả về đúng blob trên `main` nên không còn trong diff PR #111. Chỉ giữ `public/admin/index.html` cho giao diện Admin.
+- Bằng chứng kiểm thử gọn theo từng SHA vẫn được giữ; không còn PNG matrix trong history. PR hiện còn các mã nguồn, API, migrations, tests, workflow Admin, cấu hình và tài liệu cần cho Admin.
+- CI của HEAD mới nhất chưa được xác minh thành công. Lần chạy UI đầy đủ PASS gần nhất là #39816652346 trên SHA cũ `105f46b90dc5664dd091493dbd5cea1af7796c44`; không gán PASS đó cho HEAD mới.
+- Tiến độ sản phẩm vẫn **50% PROVISIONAL**; 12 màn hình PARTIAL_NOT_ACCEPTED; QA backend đã xác thực NOT_TESTED.
 
 ## Required operating sequence
 1. Fetch live PR #111 and #108, branch HEAD, merge base and recent Actions. Treat every SHA/count in these docs as a checkpoint, not live truth.

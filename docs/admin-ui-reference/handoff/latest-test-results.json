@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:15:36.363Z",
+  "capturedAtUtc": "2026-10-22T19:18:10.382Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
+  "branchHeadAtCheckpointStart": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
   "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -242,10 +242,10 @@
   "blockedItems": [],
   "productionDeployment": "NOT_PERFORMED",
   "currentHeadValidation": {
-    "sha": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
+    "sha": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
     "workflowRunsLookup": "NO_PR_TRIGGERED_RUN_RETURNED",
     "combinedStatus": "NO_CHECKS_RETURNED",
     "result": "NOT_VERIFIED",
-    "note": "The workflow lookup wrapper returns PR-triggered runs only; no exact-SHA successful run was confirmed for this cleanup HEAD. Prior source/UI pass on 105f46b is historical."
+    "note": "Current source cleanup and documentation commits have no confirmed successful exact-SHA Actions result in the available lookup. Last full UI/source PASS is historical."
   }
 }

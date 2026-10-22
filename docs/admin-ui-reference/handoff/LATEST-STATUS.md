@@ -60,3 +60,10 @@ No merge/force push/deploy; no main/static writes; no Access bypass or secret op
 - Current changed paths: **391** — `.github` 1; `README-DEPLOY.txt` 1; `data` 1; `docs` 330; `functions` 24; `migrations` 2; `package.json` 1; `public` 1; `scripts` 4; `tests` 26. Extensions: YML 1; TXT 1; JSON 164; MD 165; HTML 2; PNG 1; ZIP 1; JS 26; SQL 2; MJS 28.
 - Exact current-HEAD Actions validation is **NOT_VERIFIED**: the commit-run lookup returned no PR-triggered runs and combined status returned no checks. The last known full source/UI pass remains run #39816652346 on SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; do not transfer that PASS to the current HEAD.
 - Product progress remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; no authenticated backend acceptance claimed.
+
+
+## Scope cleanup checkpoint — 2026-10-22T19:18:10.382Z
+- Before this handoff sync, PR #111 HEAD was `61d68b3f05ae349755e6807843e9aa83bd5f01ba`, OPEN/unmerged. This pass removes the unreferenced `sindarealest-admin-mobile-reference.zip`; `README.md` documents the approved PNG, HTML viewer and instructions but does not link the ZIP. The approved PNG and documented HTML viewer remain.
+- The static-only workflow/capture script and `public/index.html` diff were already removed in the preceding checkpoint. `public/index.html` now matches `main`; do not edit static website code here.
+- Expected changed-file census after ZIP removal: **390**. Top-level: `.github` 1; `README-DEPLOY.txt` 1; `data` 1; `docs` 329; `functions` 24; `migrations` 2; `package.json` 1; `public` 1; `scripts` 4; `tests` 26. Extensions: YML 1; TXT 1; JSON 164; MD 165; HTML 2; PNG 1; JS 26; SQL 2; MJS 28.
+- Current-head CI remains NOT_VERIFIED; the last known full source/UI pass is historical and does not validate this HEAD.

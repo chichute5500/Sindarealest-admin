@@ -157,3 +157,13 @@ Older tables above are historical and must not be used as live counts. PR #111 w
 - Kept compact per-run report/diagnostics JSON/Markdown and the approved reference image. They preserve test outcomes, including failures/blocks, and are not generated screenshot matrices.
 - Current-head CI is NOT_VERIFIED: no matching successful Action/check was returned by the available exact-SHA lookup. Last known UI matrix remains run #39816652346 on older SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`.
 - Product progress remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
+
+
+## Latest scope census — 2026-10-22T19:18:10.382Z
+
+This supersedes prior census counts above. PR #111 was verified at HEAD `61d68b3f05ae349755e6807843e9aa83bd5f01ba`, OPEN/unmerged before this docs sync. One unreferenced ZIP archive was removed because the canonical reference README documents the PNG, HTML viewer and instructions but never links the ZIP. Keep the approved PNG and documented HTML viewer.
+
+- Expected current diff: **390 paths** — .github 1; README-DEPLOY.txt 1; data 1; docs 329; functions 24; migrations 2; package.json 1; public 1; scripts 4; tests 26.
+- Extensions: yml 1; txt 1; json 164; md 165; html 2; png 1; js 26; sql 2; mjs 28.
+- Current-head CI: NOT_VERIFIED. Do not claim success based on older SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`.
+- No main/static branch write, merge, deployment, remote database operation or secret access was performed.

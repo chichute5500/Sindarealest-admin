@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:15:36.363Z",
+  "capturedAtUtc": "2026-10-22T19:18:10.382Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
+  "branchHeadAtCheckpointStart": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
   "checkpointSemantics": "Live PR/branch HEAD changes with each contents-API commit; branchHeadAtCheckpointStart is the fetched head immediately before this status refresh. Fetch live refs before acting. codeTestSha is a distinct exact tested source revision.",
   "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "latestProductSourceCommit": "105f46b90dc5664dd091493dbd5cea1af7796c44",
@@ -39,9 +39,9 @@
       "mergeable": false,
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
-      "headSha": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
+      "headSha": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
       "commits": 1290,
-      "changedFiles": 391,
+      "changedFiles": 390,
       "additions": 38984,
       "deletions": 251,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -163,7 +163,7 @@
   },
   "scopeAudit": {
     "status": "PARTIAL",
-    "liveChangedFiles": 391,
+    "liveChangedFiles": 390,
     "previousCensus": 1314,
     "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
     "priority": "Refresh paginated filenames and classify provenance for each changed path; prioritize runtime/API/migration/setup/workflow paths.",
@@ -176,7 +176,7 @@
       ".github": 1,
       "README-DEPLOY.txt": 1,
       "data": 1,
-      "docs": 330,
+      "docs": 329,
       "functions": 24,
       "migrations": 2,
       "package.json": 1,
@@ -191,15 +191,14 @@
       "md": 165,
       "html": 2,
       "png": 1,
-      "zip": 1,
       "js": 26,
       "sql": 2,
       "mjs": 28
     },
     "cleanupCheckpoint": {
-      "capturedAtUtc": "2026-10-22T19:15:36.363Z",
-      "parentSha": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
-      "changedFiles": 391,
+      "capturedAtUtc": "2026-10-22T19:18:10.382Z",
+      "parentSha": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
+      "changedFiles": 390,
       "removedGeneratedHistoricalPngs": 912,
       "removedLegacySnapshotFiles": 10,
       "removedObsoletePromptAudit": true,
@@ -208,7 +207,8 @@
       "removedStaticOnlyCaptureScript": true,
       "restoredPublicIndexToMain": true,
       "approvedReferenceRetained": true,
-      "currentHeadActions": "NOT_VERIFIED"
+      "currentHeadActions": "NOT_VERIFIED",
+      "removedUnreferencedReferenceZip": true
     }
   },
   "guardrails": [
@@ -227,8 +227,8 @@
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T19:15:36.363Z",
-    "syncPurpose": "Refresh canonical handoff after PR #111 cleanup: 912 generated PNGs, 10 legacy snapshots, obsolete audit docs, static-only preview workflow/script removed; public/index.html restored to main blob; live census 391. Current-head CI not verified."
+    "lastSyncAtUtc": "2026-10-22T19:18:10.382Z",
+    "syncPurpose": "Final cleanup pass: remove unreferenced reference ZIP while preserving documented PNG/HTML; current changed-path census 390. Current-head CI remains NOT_VERIFIED."
   },
-  "currentHeadAtCheckpoint": "5b9764b3f6b023537551a49d87ec16ef325bf76d"
+  "currentHeadAtCheckpoint": "61d68b3f05ae349755e6807843e9aa83bd5f01ba"
 }
