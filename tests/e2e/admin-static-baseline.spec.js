@@ -1252,17 +1252,48 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       expect(skuUncheckedStyle.width).toBe('20px');
       expect(skuUncheckedStyle.height).toBe('20px');
       expect(skuUncheckedStyle.radius).toBe('6px');
-      await skuVerifiedCheckbox.check();
-      const skuCheckedStyle = await skuVerifiedCheckbox.evaluate(element => ({
-        checked: element.checked,
-        background: getComputedStyle(element).backgroundColor,
-        checkmarkTransform: getComputedStyle(element, '::before').transform
-      }));
-      expect(skuCheckedStyle.checked, 'SKU verification state remains keyboard-operable').toBe(true);
-      expect(skuCheckedStyle.background, 'Checked SKU state should use the reference blue in light mode and accessible pale blue in dark mode')
-        .toBe(variant.theme === 'dark' ? 'rgb(142, 188, 224)' : 'rgb(92, 145, 185)');
-      expect(skuCheckedStyle.checkmarkTransform, 'Checked SKU state should visibly render a checkmark').not.toBe('matrix(0, 0, 0, 0, 0, 0)');
+      const expectedCheckedBackground = variant.theme === 'dark' ? 'rgb(142, 188, 224)' : 'rgb(92, 145, 185)';
+      const expectedUncheckedBackground = variant.theme === 'dark'
+        ? 'rgba(12, 27, 40, 0.88)'
+        : 'rgba(255, 255, 255, 0.82)';
+
+      // Normalize the current fixture state and wait for CSS transitions to settle.
+      // Reading getComputedStyle immediately after check()/uncheck() can observe the
+      // transition's starting color, not the final :checked CSS rule.
       await skuVerifiedCheckbox.uncheck();
+      await expect(skuVerifiedCheckbox).not.toBeChecked();
+      await expect(skuVerifiedCheckbox).toHaveCSS('background-color', expectedUncheckedBackground);
+
+      await skuVerifiedCheckbox.check();
+      await expect(skuVerifiedCheckbox, 'SKU verification state remains keyboard-operable').toBeChecked();
+      // toHaveCSS retries until the strict target color is reached; this does not relax the assertion.
+      await expect(skuVerifiedCheckbox, 'Checked SKU state should use the reference blue in light mode and accessible pale blue in dark mode')
+        .toHaveCSS('background-color', expectedCheckedBackground);
+      await expect.poll(async () => skuVerifiedCheckbox.evaluate(element =>
+        getComputedStyle(element, '::before').transform
+      ), { message: 'Checked SKU state should visibly render a checkmark' })
+        .not.toBe('matrix(0, 0, 0, 0, 0, 0)');
+
+      await skuVerifiedCheckbox.uncheck();
+      await expect(skuVerifiedCheckbox).not.toBeChecked();
+      await expect(skuVerifiedCheckbox).toHaveCSS('background-color', expectedUncheckedBackground);
+
+      // Verify keyboard focus styling and Space toggling, which must behave like pointer interaction.
+      await page.locator('#pSku').focus();
+      await page.keyboard.press('Tab');
+      await expect(skuVerifiedCheckbox).toBeFocused();
+      await expect.poll(async () => skuVerifiedCheckbox.evaluate(element =>
+        getComputedStyle(element).outlineWidth
+      ), { message: 'SKU checkbox should expose visible keyboard focus' }).toBe('3px');
+      await expect.poll(async () => skuVerifiedCheckbox.evaluate(element =>
+        getComputedStyle(element).outlineStyle
+      ), { message: 'SKU checkbox focus indicator should remain visible' }).toBe('solid');
+      await skuVerifiedCheckbox.press('Space');
+      await expect(skuVerifiedCheckbox).toBeChecked();
+      await expect(skuVerifiedCheckbox).toHaveCSS('background-color', expectedCheckedBackground);
+      await skuVerifiedCheckbox.press('Space');
+      await expect(skuVerifiedCheckbox).not.toBeChecked();
+      await expect(skuVerifiedCheckbox).toHaveCSS('background-color', expectedUncheckedBackground);
       if (variant.viewport.width <= 680) {
         const surface = await page.locator('#backdrop>.editor').evaluate(el => {
           const rect = el.getBoundingClientRect();
