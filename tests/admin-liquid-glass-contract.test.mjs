@@ -114,7 +114,7 @@ for (const [width, height] of [
 ]) {
   assert.match(
     baselineSpec,
-    new RegExp(String.raw`\\{ width: ${width}, height: ${height} \\}`),
+    new RegExp(String.raw`\{ width: ${width}, height: ${height} \}`),
     `Required ADMIN screenshot viewport ${width}x${height} must remain in the baseline matrix`
   );
 }
