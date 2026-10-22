@@ -48,7 +48,13 @@ for (const [, selector, declarations] of heroImageRules) {
   assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied hero asset must never be cropped.");
 }
 assert.ok(html.includes("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
-assert.ok(html.includes('id="hero-image-blend-owner-asset"') && html.includes("mix-blend-mode:multiply!important") && html.includes("mask-image:radial-gradient("), "The owner Hero artwork canvas must feather into the page background without replacing the source image.");
+const heroEdgeTreatment = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
+assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
+  && heroEdgeTreatment.includes("#home .hero-visual{")
+  && heroEdgeTreatment.includes("mask-image:radial-gradient(")
+  && heroEdgeTreatment.includes("width:118%!important")
+  && heroEdgeTreatment.includes("max-height:290px!important"),
+  "The original Hero shoes must be enlarged with edge feathering, without changing image brightness or replacing the source asset.");
 assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
 assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
