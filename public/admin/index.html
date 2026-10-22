@@ -596,7 +596,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 #backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 #backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}
 /* Keep the desktop price/stock row clear of the sticky action footer at the default editor scroll position. */
-@media(min-width:681px){#backdrop>.editor>form>.editorcontent{gap:12px}}
+@media(min-width:681px){#backdrop>.editor>.editorhead{padding-top:12px;padding-bottom:12px}#backdrop>.editor>form>.editorcontent{gap:12px}}
 
 /* On phones, keep the product editor on a clean full-screen glass surface instead of dimming it through the modal backdrop. */
 @media(max-width:680px){
