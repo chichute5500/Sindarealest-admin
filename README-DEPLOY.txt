@@ -1,3 +1,5 @@
+> **LEGACY REFERENCE — NOT CURRENT DEPLOYMENT AUTHORIZATION.** This file preserves the original package/setup overview and may contain obsolete migration numbers, test results, architecture notes or deployment assumptions. For the active storefront task, branch, scope and current verification read [`docs/handoff/CURRENT-STATE.md`](docs/handoff/CURRENT-STATE.md), [`docs/handoff/TASKS.md`](docs/handoff/TASKS.md) and [`docs/handoff/TEST-RESULTS.md`](docs/handoff/TEST-RESULTS.md). PR #108 must remain OPEN/unmerged; Preview only. Do not use these legacy instructions to authorize Production, Admin/backend, D1/R2, secrets, bindings, DNS or Access changes. Verify current source and migrations before any operational use.
+
 SINDAREALest — HƯỚNG DẪN THIẾT LẬP VÀ DEPLOY AN TOÀN
 
 0. TRƯỚC KHI BẮT ĐẦU

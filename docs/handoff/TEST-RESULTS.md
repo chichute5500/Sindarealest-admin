@@ -4,13 +4,18 @@ Updated: 2026-10-23
 This is the single index for test, deployment and visual-audit evidence. Repeated run-by-run narratives were consolidated here. Old artifacts remain accessible from GitHub Actions; a PASS applies only to its exact SHA.
 
 ## Current acceptance
-- Owner requested that the Hero image be temporarily hidden. This is a pause, not visual acceptance.
-- Required state: `#heroProductImage` exists, is hidden, has no `src`, has status `temporarily-disabled-owner-request`, and its `.hero-visual` frame collapses with no blank reserved area.
-- Before the current consolidation batch, Actions failed because `tests/storefront-html-safety.test.mjs` still required the old visible Hero image:
-  - [Source/tests #39840595749](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840595749) — failed at `tests/storefront-html-safety.test.mjs:26`.
-  - [Preview deploy #39839970275](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39839970275) — blocked by the same assertion.
-  - [Visual preview #39839970322](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39839970322) — blocked by the same assertion.
-- The test/audit expectations are being aligned with the owner's hidden-Hero decision. Do not call this fixed until fresh Actions on the new HEAD pass and deployed Preview SHA is verified.
+- Owner requested the Hero image be temporarily hidden. This is a pause, not visual acceptance.
+- Required hidden state: `#heroProductImage` exists, is hidden, has no `src`, carries status `temporarily-disabled-owner-request`, and the `.hero-visual` frame collapses with no blank reserved area.
+- Code SHA `697c434f7e0c0408bcc7e2049cd660a2fb642d91`:
+  - Source validation/tests PASS: [#39841739503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841739503).
+  - Cloudflare Pages Preview deploy PASS: [#39841739555](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841739555). Deployment log reports alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev` and URL `https://307f4e2c.sindarealest2.pages.dev`.
+  - Visual local-fixture [#39841739442](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841739442) and read-only Admin Preview smoke [#39841739471](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841739471) remained `in_progress` at the last status read; do not label these PASS without final status and artifact inspection.
+- The subsequent commits up to `7df19eb8c5a0a6cbdc76886b630905c89cf9c466` only update handoff/reference documentation. Latest HEAD Actions must still be checked after this batch.
+- Previous failure was a stale assertion requiring the Hero to remain visible:
+  - [Source/tests #39840595749](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840595749).
+  - [Preview deploy #39839970275](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39839970275).
+  - [Visual preview #39839970322](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39839970322).
+  Those failures were addressed by aligning the source test contract with the owner-requested hidden state.
 
 ## Historical exact-SHA evidence (not current proof)
 | Gate | Run | SHA / limitation |

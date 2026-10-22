@@ -1,3 +1,5 @@
+> **LEGACY REFERENCE — NOT CURRENT DEPLOYMENT AUTHORIZATION.** This file preserves the original package/setup overview and may contain obsolete migration numbers, test results, architecture notes or deployment assumptions. For the active storefront task, branch, scope and current verification read [`docs/handoff/CURRENT-STATE.md`](docs/handoff/CURRENT-STATE.md), [`docs/handoff/TASKS.md`](docs/handoff/TASKS.md) and [`docs/handoff/TEST-RESULTS.md`](docs/handoff/TEST-RESULTS.md). PR #108 must remain OPEN/unmerged; Preview only. Do not use these legacy instructions to authorize Production, Admin/backend, D1/R2, secrets, bindings, DNS or Access changes. Verify current source and migrations before any operational use.
+
 SINDAREALest — TÓM TẮT BẢN NÂNG CẤP SDVIP
 
 - Giữ kiến trúc HTML/CSS/JavaScript tĩnh và hiệu ứng Liquid nền sáng/tối hiện tại; không chuyển framework, không tự đổi phong cách thương hiệu.
@@ -12,6 +14,3 @@ KIỂM TRA: npm run check PASS; npm test PASS; SQLite migration và 526 ảnh We
 
 CHƯA XÁC NHẬN DEPLOY PRODUCTION. Trước khi dùng, cấu hình bindings `DB`/`IMAGES`/`ORIGINALS` (`ORIGINALS` là bucket riêng tư khác `IMAGES`) cùng hai secrets trên đúng Pages project; nếu dùng GitHub Actions, chỉ đặt `CLOUDFLARE_PAGES_ORIGINALS_READY=true` sau khi xác minh, rồi mới deploy. Đăng nhập tài khoản khách hàng chưa được bật; tra cứu bảo hành không sử dụng mã xác minh. Chính sách bảo hành phải do cửa hàng xác nhận. Ảnh R2 cũ không tự bị thay đổi; watermark giao diện là lớp phủ trên ảnh lớn, không sửa file ảnh.
 Xem UPGRADE-REPORT.md để biết chi tiết và các giới hạn còn lại.
-
-
-[STATUS NOTE — 2026-10-22] This file is a legacy repository overview/audit snapshot, not the active task/handoff specification. It may describe older architecture, deployment assumptions or completed work. For current storefront scope, branch, safety boundaries and open tasks, read `docs/handoff/CURRENT-STATE.md` first. Do not use this file to override the current handoff or authorize Admin/backend/production changes.

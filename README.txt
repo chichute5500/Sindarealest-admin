@@ -1,3 +1,5 @@
+> **LEGACY REFERENCE — NOT CURRENT DEPLOYMENT AUTHORIZATION.** This file preserves the original package/setup overview and may contain obsolete migration numbers, test results, architecture notes or deployment assumptions. For the active storefront task, branch, scope and current verification read [`docs/handoff/CURRENT-STATE.md`](docs/handoff/CURRENT-STATE.md), [`docs/handoff/TASKS.md`](docs/handoff/TASKS.md) and [`docs/handoff/TEST-RESULTS.md`](docs/handoff/TEST-RESULTS.md). PR #108 must remain OPEN/unmerged; Preview only. Do not use these legacy instructions to authorize Production, Admin/backend, D1/R2, secrets, bindings, DNS or Access changes. Verify current source and migrations before any operational use.
+
 SINDAREALest — WEBSITE + QUẢN TRỊ CLOUDFLARE
 
 Gói này nâng cấp từ SDVIP.zip, giữ kiến trúc HTML/CSS/JavaScript tĩnh + Cloudflare Pages Functions + D1 + R2 và giữ hiệu ứng Liquid nền sáng/tối hiện có.
@@ -32,6 +34,3 @@ LƯU Ý
 - Mã bảo hành chỉ phát hành theo chính sách cửa hàng nhập rõ ràng và sau khi đơn hoàn tất.
 - Ảnh sản phẩm tĩnh đã được đóng watermark; ảnh R2 cũ cần tải lại qua quản trị để watermark nằm trong file gốc. Ảnh R2 cần sao lưu riêng.
 - Watermark không thể ngăn tuyệt đối chụp/quay màn hình.
-
-
-[STATUS NOTE — 2026-10-22] This file is a legacy repository overview, not the active task/handoff specification. It may describe older architecture, deployment assumptions or completed work. For current storefront scope, branch, safety boundaries and open tasks, read `docs/handoff/CURRENT-STATE.md` first. Do not use this file to override the current handoff or authorize Admin/backend/production changes.
