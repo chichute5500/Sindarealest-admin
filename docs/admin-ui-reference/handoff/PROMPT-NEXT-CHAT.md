@@ -1,20 +1,22 @@
-## PROMPT TIẾP TỤC — 2026-10-22T11:13:00+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T11:25:05+07:00
 
-Repo `chichute5500/Sindarealest-admin`; chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã xác minh: `5dc55d2c27d16fa019bf35104ab8740b715ce79d`; handoff base trước cập nhật này `d9f3af24570485241f9169a0aa20c6ad0c3b9b71`.
+Tiếp tục làm việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA PASS: `3d39e8f7316f300b26a582348abe0873e10891f0`. HEAD trước commit handoff tiếp theo: `4ab5893c1882bf9d2914e729ab786a761d4e9f25` (commit evidence/docs; không phải source SHA đã test).
 
-**CI chính xác:**
-- Validate Source [#39720698955](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955) SUCCESS trên `5dc55d2c27d16fa019bf35104ab8740b715ce79d`.
-- Admin Preview/Playwright [#39720698900](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900) SUCCESS trên `5dc55d2c27d16fa019bf35104ab8740b715ce79d`.
-- Artifact [admin-preview-evidence-271](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676), ID `12400933676`: 68 PNG trong ZIP, 16 login, 51 fixture, 43 metrics; metadata completed=true, 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths. Fixture-only, không phải authenticated backend QA.
-- Gallery test giờ kiểm tra overflow trước khi xóa thumbnail, kiểm tra nút cuối disabled sau khi xóa; đồng thời xác nhận mỗi ảnh có group label/alt, mỗi nút có accessible name và SVG trang trí được ẩn với assistive tech. Commit [`5dc55d2`](https://github.com/chichute5500/Sindarealest-admin/commit/5dc55d2c27d16fa019bf35104ab8740b715ce79d).
-- Preview signature `PASS_LOGIN_CSS_SIGNATURE` chỉ là login shell, không phải đăng nhập thật.
+**CI exact-SHA:**
+- Validate Source [#39722057929](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722057929) — SUCCESS.
+- Admin Preview/Playwright [#39722057890](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722057890) — SUCCESS trên cùng SHA.
+- Artifact [admin-preview-evidence-272](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722057890/artifacts/12401661901), ID `12401661901`: 71 ảnh test + 1 reference PNG, 47 fixture metrics; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Preview login/dashboard smoke: 2/2 test PASS. Đây không phải full backend/business QA; save/upload dữ liệu thật vẫn NOT TESTED. Không bypass Access.
+- Gallery tests mới: keyboard reorder qua focus/Enter, responsive bounds/no-horizontal-overflow/thumbnail rail ở 320×640 và 360×800. Gallery vẫn PARTIAL, toàn bộ 12-screen visual parity NOT ACCEPTED. Tiến độ tổng thể 50%.
 
-**Progress:** 50%. Full 12-screen parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED.
+**Tiếp tục ngay — không chỉ báo cáo rồi dừng:**
+1. Đọc trạng thái live/HEAD/Actions trước khi ghi.
+2. Ưu tiên màn #6 Category/product classification: test `#pCategory` datalist/manual entry và `#categoryBox` matching/no-result/reset chỉ bằng synthetic/read-only fixture, không Save, không tạo route/API.
+3. Thêm assertion phù hợp, chạy Validate Source + Preview trên exact source SHA; xem artifact mới trực tiếp.
+4. Đồng bộ 7 file handoff và đọc lại từ GitHub sau commit.
+5. Chọn tiếp màn hình chưa nghiệm thu; không lặp công việc đã PASS nếu không có lỗi tái xuất hiện. Giữ tiến độ 50% đến khi có evidence parity thực chất.
 
-**Tiếp tục:** kiểm tra gallery responsive/keyboard so với reference; dùng synthetic fixture only, không save/upload dữ liệu thật. Sau thay đổi chạy exact-SHA Validate + Preview, kiểm tra artifact, cập nhật và đọc lại đủ 7 tệp handoff.
-
-**Rào chắn:** chỉ ADMIN branch; PR #111/#108 OPEN/UNMERGED; không sửa main/static, không Production deploy, không bypass Access, không thao tác secrets/remote D1/R2/schema/migration/infra.
-
+**Rào chắn:** PR #111/#108 để OPEN/UNMERGED; chỉ ADMIN branch, không main/static, không merge/cherry-pick/force-push/branch sync, không Production deploy, không secrets/Access changes/bypass, không remote D1/R2/SQL/migration/setup/deploy/infra, không TinyFish. Giữ mọi `DEFERRED_BY_OWNER` nguyên trạng.
 ---
 
 ---
