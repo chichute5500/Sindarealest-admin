@@ -1493,7 +1493,7 @@ async function captureSupplementalParityChecks(browser) {
     await page.goto(origin + '/', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await waitForStorefront(page, label); await dismissWelcomeSplash(page); await settle(page);
     const firstTitle = (await page.locator('#catalogGrid .product-title').first().innerText().catch(() => '')).trim();
-    const query = firstTitle.split(/\s+/).slice(0, 2).join(' ').trim();
+    const query = firstTitle;
     const originalCount = await page.locator('#catalogGrid .product-card').count();
     const input = page.locator('#catalogSearch');
     try {
@@ -1519,6 +1519,14 @@ async function captureSupplementalParityChecks(browser) {
     await capture(page, 'search-results-mobile-light-390x844.png', false, { ...captureMeta(viewport, theme, '/'), captureType: 'interaction', state: 'search-results' });
     await input.fill('');
 
+    const orderToggle = page.locator('#orderDetailsToggle');
+    if (await orderToggle.getAttribute('aria-expanded').catch(() => 'false') !== 'true') {
+      await orderToggle.click({ timeout: 8000 }).catch(error => audit.hardFailures.push(sanitizeText('Could not expand order details for Zalo verification: ' + String(error.message || error))));
+    }
+    await page.waitForFunction(() => { const panel = document.querySelector('#orderDetailsPanel'); return Boolean(panel && !panel.hidden); }, null, { timeout: 5000 })
+      .catch(error => audit.hardFailures.push(sanitizeText('Order details panel did not expand for Zalo verification: ' + String(error.message || error))));
+    await page.locator('#order').scrollIntoViewIfNeeded().catch(() => {});
+    await page.waitForTimeout(420);
     const zalo = page.locator('#order .order-zalo-cta').first();
     await zalo.scrollIntoViewIfNeeded().catch(() => {});
     await page.waitForTimeout(260);

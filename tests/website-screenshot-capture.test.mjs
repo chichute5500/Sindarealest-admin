@@ -407,3 +407,9 @@ assert.match(live, /page\.locator\('#products'\)\.scrollIntoViewIfNeeded/,
   'Search audit must scroll the product section into view before capturing results.');
 assert.match(live, /const zalo = page\.locator[\s\S]*zalo\.scrollIntoViewIfNeeded[\s\S]*zaloChecks/,
   'Zalo CTA visibility must be measured after scrolling the live CTA into view.');
+
+
+assert.match(live, /const query = firstTitle;[\s\S]*searchState\.visibleResultCount < originalCount/,
+  'Search audit must use the rendered product title and prove that results narrow.');
+assert.match(live, /orderDetailsToggle[\s\S]*orderDetailsPanel[\s\S]*const zalo = page\.locator/,
+  'Zalo CTA audit must expand the order details panel before checking the hidden CTA.');
