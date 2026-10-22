@@ -1,3 +1,5 @@
+> **HISTORICAL CROSS-CHECK — 2026-10-20.** This note captures the parallel storefront/Admin coordination context at that date. Any branch names, URLs, progress, or deployment state in the body are not current proof. Do not use it as authorization to work on the Admin branch. For the active storefront state, use [CURRENT-STATE.md](CURRENT-STATE.md); for test/deployment evidence, use [TEST-RESULTS.md](TEST-RESULTS.md). PR #108 stays OPEN/unmerged; Preview only.
+
 # BIÊN BẢN ĐỐI CHIẾU CHÉO — WEB TĨNH & WEB ADMIN SINDAREALEST2
 
 **Ngày ghi nhận:** 20/10/2026 (UTC+7)  
