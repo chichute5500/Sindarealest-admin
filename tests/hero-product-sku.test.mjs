@@ -6,25 +6,22 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4'"),
-  "The hero must render the supplied static presentation image independently of public catalog SKU availability.");
-assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'"),
-  "The static hero image must be explicitly identified as a presentation asset, not a catalog product image.");
-assert.ok(heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
-  "The hero presentation asset must be shown and loaded rather than hidden when the SKU is absent.");
-assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
-  "The homepage hero must not be blocked by the availability of SD-GL052 in the public catalog.");
+assert.ok(heroSync.includes("target.hidden=true")
+  && heroSync.includes("target.removeAttribute('src')")
+  && heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'")
+  && heroSync.includes("target.onerror=null"),
+  "The owner-requested temporary Hero pause must clear the image source and hide the element.");
+assert.doesNotMatch(heroSync, /target\\.src=url|target\\.hidden=false/,
+  "The paused Hero must not load or show the image.");
 assert.ok(html.includes('id="heroProductImage"'),
-  "The existing hero image element must remain available for responsive styling.");
+  "The existing Hero image element must remain available for responsive styling.");
 
 const visualAudit = readFileSync(new URL("../scripts/capture-liquid-glass-preview.mjs", import.meta.url), "utf8");
-assert.ok(visualAudit.includes("hero-presentation-asset-visible-with-unverified-fixture"),
-  "The local fixture audit must confirm the hero presentation asset remains visible without a verified SKU.");
-assert.ok(visualAudit.includes("startup.heroImage.status === 'hero-presentation-asset'")
-  && visualAudit.includes("startup.heroImage.loaded")
-  && visualAudit.includes("!startup.heroImage.hidden")
-  && visualAudit.includes("startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514-blended.png')"),
-  "The local audit must require the presentation asset to load and remain visible independent of SKU verification.");
+assert.ok(visualAudit.includes("hero-image-temporarily-hidden-owner-request")
+  && visualAudit.includes("startup.heroImage.status === 'temporarily-disabled-owner-request'")
+  && visualAudit.includes("startup.heroImage.hidden")
+  && visualAudit.includes("startup.heroImage.source === ''"),
+  "The local fixture audit must validate the temporary hidden Hero state.");
 
 const styleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
 const heroImageRules = [...styleContents.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
@@ -94,11 +91,12 @@ assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!impor
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
-  && liveCapture.includes("presentationAssetLoaded"),
-  "The live audit must verify the dedicated hero presentation asset is loaded and visible.");
-assert.ok(liveCapture.includes("path.endsWith('/images/hero-upload/tb_image_share_1792519964514-blended.png')")
-  && liveCapture.includes("status === 'hero-presentation-asset'")
-  && liveCapture.includes("!frameCollapsed"),
-  "The live audit must check the exact hero asset, visible image state, and non-collapsed frame.");
+  && liveCapture.includes("temporarilyHiddenByOwnerRequest"),
+  "The live audit must verify the owner-requested hidden Hero state.");
+assert.ok(liveCapture.includes("status === 'temporarily-disabled-owner-request'")
+  && liveCapture.includes("!source")
+  && liveCapture.includes("frameCollapsed"),
+  "The live audit must require no image source and a collapsed visual frame.");
+
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
-console.log("PASS: hero presentation image remains visible independently of catalog SKU verification.");
+console.log("PASS: owner-requested temporary Hero-hidden state is enforced.");
