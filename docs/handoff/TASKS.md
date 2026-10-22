@@ -1,5 +1,18 @@
 # TASK LEDGER — SINDAREALEST2
 
+## Active checkpoint — 2026-10-22 11:16 UTC
+
+| ID | Status | Current evidence / acceptance |
+|---|---|---|
+| HERO-DARK-MATTE | CODE PATCH DEPLOYED; VISUAL ACCEPTANCE PENDING | Source SHA `dff584114dfd3916219f38b24950e5bf531e2199`; conditional 8-point image-edge sample, filter only if >=6 neutral-light votes. Exact same owner-supplied asset. Review new live artifact before deciding keep/revert. |
+| VALIDATE-SHA | PASS | [Run #39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097), complete test suite, SHA `dff584114dfd3916219f38b24950e5bf531e2199`. |
+| PREVIEW-DEPLOY-SHA | DEPLOY JOB PASS; METADATA GATE PENDING | [Run #39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975); `b7858119.sindarealest2.pages.dev`; source SHA was supplied in deployment command. Await visual audit verification rather than assuming metadata gate passed. |
+| LIVE-VISUAL-AUDIT | PENDING | [Run #39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207); check run status and artifact. |
+| PR-SCOPE | PASS | PR #108 OPEN / NOT MERGED; no Production/main or product image mapping edits. |
+
+Failed intermediate checks: radial-mask era and the first two conditional-matte test attempts were superseded. Root causes were a mocked image without `classList`, followed by a stale assertion that expected non-optional `classList.toggle`. Current SHA test suite passes; use only the current evidence above.
+
+
 Current facts and next-step order: [CURRENT-STATE.md](CURRENT-STATE.md). This ledger contains open work and stable completed gates; older task narratives are retired to prevent stale statuses being mistaken for current state.
 
 ## Open work
