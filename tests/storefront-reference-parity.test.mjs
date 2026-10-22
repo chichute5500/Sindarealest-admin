@@ -295,8 +295,14 @@ assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && he
   "The protected Hero image must retain its original colour and opacity.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
   "The protected Hero image must be fully visible with no crop or transform.");
-assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,#home .hero-visual::after,#home.hero:after{"),
-  "Gloss, tabletop fade, and text-side veil overlays must not cover the owner-supplied image.");
+assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
+  "Pseudo-elements that would overlay the owner-supplied image remain disabled.");
+assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before{")
+  && heroAssetDisplayLock.includes("inset:-10% -16%!important;")
+  && heroAssetDisplayLock.includes("z-index:0!important;")
+  && heroAssetDisplayLock.includes("filter:blur(18px)!important;")
+  && heroAssetDisplayLock.includes("position:relative!important;z-index:1!important;"),
+  "The satin halo must stay outside/behind the complete original hero image, never cover or crop it.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
   "No page caption may cover any portion of the supplied image.");
 assert.ok(
