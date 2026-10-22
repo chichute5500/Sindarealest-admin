@@ -1,18 +1,17 @@
-# LIVE STATUS — 2026-10-22T18:44:39+07:00
+# LIVE STATUS — 2026-10-22T19:15:21.463+07:00
 
-- **PR #111:** OPEN/unmerged; parent HEAD `b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e`. [Validate exact HEAD #39769095034](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769095034) SUCCESS.
-- **Visual evidence:** [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) SUCCESS on source `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`; artifact #311 contains 99 PNG and 75 fixture metrics. Fixture-only, not authenticated QA.
-- Poster and Product list #3 source screenshot were opened. #3 remains PARTIAL_NOT_ACCEPTED; unknown images/price/stock are deliberate fixture states.
-- **Progress 50% PROVISIONAL**, full parity remains NOT_ACCEPTED.
-- Poster numbering: #1 Login, #2 Dashboard, #3 Products, #4 Editor, #5 Gallery, #6 Orders, #7 Order detail, #8 Customers, #9 Warranty, #10 Website settings, #11 Backup/Restore, #12 Activity log. Classification belongs to #3/#4; AI grouping is separate and BLOCKED.
-- PR #111 diff: 1,285 paths; storefront, functions/API, migrations, setup/deploy scripts and workflow paths require ancestry review before any merge decision.
-- Blockers: backend QA NOT_TESTED; AI grouping BLOCKED; R2 save and PRE/PRO migrations DEFERRED_BY_OWNER.
+- **Repository / branch:** chichute5500/Sindarealest-admin / feature/admin-isolated-handoff-2026-10-20.
+- **PR #111:** OPEN, unmerged. Pre-write HEAD checked as e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; the documentation writes advance the branch, so fetch live HEAD before any new work.
+- **Protected PR #108:** OPEN, unmerged. Latest checked head e3328dee37b125c5821bcaad03199afc44ed06fa; no writes were made to the static branch.
+- **Source and validation:** visual/application source dca19a2af32a78390878b9ccfa5c7c26b816f2ff. [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) and [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) succeeded on that source SHA. The exact pre-write docs-only HEAD returned no status checks/associated PR workflow run; do not claim that exact SHA was tested. Compare source to pre-write HEAD: 21 commits / 22 changed paths, handoff/docs/reference only; source code unchanged.
+- **Artifact:** [#311 / ID 12420678829](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829), 99 PNG and 75 fixture metrics. Synthetic/read-only evidence, not authenticated backend QA.
+- **Product list #3:** comparison CLOSED AS DATA-LIMITED; no overflow in 320×640 and 360×800 light/dark; existing tests cover search/filter and edit-to-open. Pagination is not exercised beyond page 1/1 because fixture has 3 UI-only records and page size 12. Placeholder photos and unknown price/stock are intentional. No independent source defect proven. **Screen remains PARTIAL_NOT_ACCEPTED.**
+- **Product editor #4:** reviewed 390×844 light/dark and 1280×800 light; tests cover tab switching/keyboard, SKU checkbox geometry, AI button geometry, price/stock placeholders and footer geometry. No real save, backend or AI response proven. **Screen remains PARTIAL_NOT_ACCEPTED.**
+- **12-screen acceptance:** all 12 remain PARTIAL_NOT_ACCEPTED. Poster mapping: #1 Login, #2 Dashboard, #3 Product list, #4 Product editor, #5 Gallery, #6 Orders, #7 Order detail, #8 Customers, #9 Warranty/support, #10 Website settings, #11 Backup/Restore, #12 Activity log.
+- **Progress:** **50% PROVISIONAL**. Docs-only work and CI green alone do not increase progress.
+- **PR #111 scope:** 1,296 paths: 1,233 docs, 25 tests, 24 functions, 5 scripts, 2 workflows, 2 migrations, 2 public paths, 1 data file, 1 package manifest and 1 deploy README. Static/Admin branches diverge from merge base a3834fed3eb1c012b188d7c95d14ec3d15e3969f; checked heads were ADMIN ahead 904 / static ahead 920. Inherited website paths must not be reverted blindly.
+- **Potential blocker:** migration 0009/setup-deploy schema preflight needs source review; it is NOT VERIFIED whether remote schema/ledger is missing. No remote query or operation was made.
 
-Next: #3 matched-state comparison → #4 → #6/#7 → remaining screens and read-only scope audit. No merge, Production deploy, main/static edits, Access/secrets bypass or remote D1/R2 write.
+## Next task
 
-
-## Source-only scope addendum — 2026-10-22T18:50:41+07:00
-- ADMIN/static merge base: `a3834fed3eb1c012b188d7c95d14ec3d15e3969f`; branches diverged (ADMIN ahead 890 commits, static ahead 915 at comparison).
-- `public/index.html`, the static visual-preview workflow and setup/deploy scripts have path-history commits before this merge base; they appear inherited in the PR diff against main rather than recent post-split Admin edits.
-- New payment/fulfillment migration `0009` and payment API routes were added after the merge base. Setup/deploy scripts do not reference/preflight `0009`; local `check-migrations.mjs` does test it against temporary D1. This is a potential deployment-readiness blocker, NOT proof the remote database lacks the schema. No remote operations were performed.
-- [Validate #39773285617](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773285617) PASS on exact ADMIN HEAD `5497d4d3b51d32064a9a993e0f891ca672c543c1`.
+Continue the **P1 read-only PR #111 scope/provenance audit**: inspect .github/workflows/admin-preview-diagnostics.yml, migrations/0009_fulfillment_and_manual_payments.sql, functions/api/admin/payment-requests.js, functions/api/admin/payment-transactions.js and local-only tests against scripts/setup-cloudflare.mjs / scripts/deploy-cloudflare.mjs. No remote setup/deploy/migration, no D1/R2 query/write. Do not merge #111/#108, edit main/static, bypass Cloudflare Access, or read/change secrets. AI image grouping remains BLOCKED pending approved contract; R2 image save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
