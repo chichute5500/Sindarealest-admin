@@ -659,6 +659,29 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.setViewportSize({ width: 320, height: 640 });
       await assertProductTabsFit(320);
       await expect(page.locator('#backdrop .editor').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
+      const narrowEditorLayout = await page.evaluate(() => {
+        const rect = element => { const r=element.getBoundingClientRect(); return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,centerY:r.top+r.height/2}; };
+        return {
+          sku:rect(document.querySelector('#pSku')),
+          checkbox:rect(document.querySelector('#pSkuVerified')),
+          verifyLabel:rect(document.querySelector('label.sku-verify-option')),
+          descriptionLabel:rect(document.querySelector('.product-description-heading>label')),
+          descriptionAction:rect(document.querySelector('#generateDescription')),
+          description:rect(document.querySelector('#pDescription')),
+          documentWidth:document.documentElement.scrollWidth,
+          viewportWidth:window.innerWidth
+        };
+      });
+      expect(narrowEditorLayout.checkbox.left, '320px SKU verification should remain beside the SKU field: ' + JSON.stringify(narrowEditorLayout))
+        .toBeGreaterThan(narrowEditorLayout.sku.right);
+      expect(Math.abs(narrowEditorLayout.checkbox.centerY-narrowEditorLayout.sku.centerY),
+        '320px SKU input and checkbox should remain row-aligned: ' + JSON.stringify(narrowEditorLayout)).toBeLessThanOrEqual(2);
+      expect(narrowEditorLayout.verifyLabel.right, '320px verification label should fit: ' + JSON.stringify(narrowEditorLayout))
+        .toBeLessThanOrEqual(321);
+      expect(narrowEditorLayout.descriptionAction.bottom, '320px AI action should remain above description input: ' + JSON.stringify(narrowEditorLayout))
+        .toBeLessThanOrEqual(narrowEditorLayout.description.top);
+      expect(narrowEditorLayout.documentWidth, '320px Product editor must not overflow horizontally: ' + JSON.stringify(narrowEditorLayout))
+        .toBeLessThanOrEqual(320);
       await page.setViewportSize(variant.viewport);
     }
 
@@ -682,6 +705,45 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(categoryInput).toHaveValue(originalCategory);
     await expect(page.locator('#productPanelDetails #pSku')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pDescription')).toBeVisible();
+    await expect(page.locator('label.sku-verify-option')).toContainText('Kiểm tra SKU');
+    await expect(page.locator('#pSkuVerified')).toHaveAttribute('aria-label', 'Xác nhận SKU thương mại chính thức');
+    const skuRowLayout = await page.evaluate(() => {
+      const rect = element => {
+        const r = element.getBoundingClientRect();
+        return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height,
+          centerY:r.top+r.height/2 };
+      };
+      return {
+        sku:rect(document.querySelector('#pSku')),
+        checkbox:rect(document.querySelector('#pSkuVerified')),
+        verifyLabel:rect(document.querySelector('label.sku-verify-option')),
+        documentWidth:document.documentElement.scrollWidth,
+        viewportWidth:window.innerWidth
+      };
+    });
+    expect(skuRowLayout.checkbox.left, 'SKU verification checkbox should sit beside, not below, the commercial SKU input: ' + JSON.stringify(skuRowLayout))
+      .toBeGreaterThan(skuRowLayout.sku.right);
+    expect(Math.abs(skuRowLayout.checkbox.centerY-skuRowLayout.sku.centerY),
+      'SKU input and verification checkbox should align on the same row: ' + JSON.stringify(skuRowLayout)).toBeLessThanOrEqual(2);
+    expect(skuRowLayout.verifyLabel.right, 'SKU verification option must fit inside the viewport: ' + JSON.stringify(skuRowLayout))
+      .toBeLessThanOrEqual(skuRowLayout.viewportWidth+1);
+    expect(skuRowLayout.documentWidth, 'Product editor SKU row must not introduce horizontal page overflow: ' + JSON.stringify(skuRowLayout))
+      .toBeLessThanOrEqual(skuRowLayout.viewportWidth);
+    const descriptionLayout = await page.evaluate(() => {
+      const rect = element => { const r=element.getBoundingClientRect(); return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,centerY:r.top+r.height/2}; };
+      const heading=document.querySelector('.product-description-heading');
+      const label=heading?.querySelector('label');
+      const action=heading?.querySelector('#generateDescription');
+      const textarea=document.querySelector('#pDescription');
+      return {heading:rect(heading),label:rect(label),action:rect(action),textarea:rect(textarea),
+        documentWidth:document.documentElement.scrollWidth,viewportWidth:window.innerWidth};
+    });
+    expect(descriptionLayout.action.bottom, 'AI suggestion button must be in the description heading above the textarea: ' + JSON.stringify(descriptionLayout))
+      .toBeLessThanOrEqual(descriptionLayout.textarea.top);
+    expect(Math.abs(descriptionLayout.action.centerY-descriptionLayout.label.centerY),
+      'Description label and AI action should align in a compact heading row: ' + JSON.stringify(descriptionLayout)).toBeLessThanOrEqual(5);
+    expect(descriptionLayout.documentWidth, 'Description heading must not create horizontal overflow: ' + JSON.stringify(descriptionLayout))
+      .toBeLessThanOrEqual(descriptionLayout.viewportWidth);
     await expect(page.locator('#productPanelDetails #pPrice')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pStock')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPrice')).toHaveAttribute('placeholder', 'Chưa có giá');
