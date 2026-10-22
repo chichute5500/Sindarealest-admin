@@ -1749,7 +1749,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderDetailBackdrop')).toHaveCount(0);
       await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
       await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
-      await expect(page.locator('.mobiletabs')).toBeVisible();
+      if (variant.viewport.width <= 820) {
+        await expect(page.locator('.mobiletabs')).toBeVisible();
+      } else {
+        await expect(page.locator('.mobiletabs')).toBeHidden();
+      }
       const detailUrl = new URL(page.url());
       expect(detailUrl.searchParams.get('view'), 'Opening a detail screen should create a direct route').toBe('order-detail');
       expect(detailUrl.searchParams.get('orderId'), 'Detail route should identify only the selected existing order').toBe('UI-ONLY-ORDER');
