@@ -7,8 +7,10 @@ Updated: 2026-10-22 UTC. Read this file first in every new chat.
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, DO NOT MERGE.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Branch HEAD is intentionally not frozen in this file: the documentation cleanup adds docs-only commits. Fetch the branch and PR #108 HEAD live before every new work session; distinguish branch HEAD from deployed storefront SHA and audited SHA.
-- Last source commit in this verified checkpoint: `fc406599e04475e232fad790efd03d46979a5a20`. Do NOT assume that a green deploy workflow alone proves the deployed SHA; inspect deployment metadata and audit source SHA separately.
-- Recent workflow links: Validate #39760902928; Preview Deploy #39760903008; Admin Preview read-only smoke #39760902960; Liquid Glass visual workflow #39760903036. The first three were reported PASS for this SHA. The terminal result/artifact of #39760903036 was not independently confirmed while this handoff was written; refresh it before claiming a new live audit.
+- Latest verified storefront source, deployed Preview and audited SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
+- Latest live audit [run #39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) SUCCESS; logs confirm `VERIFIED_PREVIEW_DEPLOYMENT` with exact branch and SHA match.
+- Latest artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814): live Preview PASS, 128 screenshots, 8/8 viewport/theme pairs, 13 route checks, zero failed requests/hard failures. Archive comparison remains `COMPLETE_NEEDS_VISUAL_REVIEW`, so visual parity is not yet complete.
+- Validate/tests [#39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) reported PASS; Admin Preview read-only smoke [#39760902960](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902960) reported PASS.
 - Docs-only commits are excluded from Preview deploy/live-capture push triggers by workflow `paths-ignore: docs/**`. A docs-only handoff commit must not be presented as a new deployed storefront.
 
 ## Documentation cleanup checkpoint (2026-10-22)
@@ -41,7 +43,7 @@ Updated: 2026-10-22 UTC. Read this file first in every new chat.
 ## Next actions (in order)
 1. Fetch branch HEAD and PR #108 head; inspect commits since this checkpoint.
 2. Run #39760903036 is now verified SUCCESS with artifact #12418615814; use this newest exact-SHA artifact as the visual-review source and check for later runs before further changes.
-3. Open the actual artifact images and both reference PNGs; inspect all 8 combinations and record specific mismatches (route, viewport, theme, screenshot).
+3. Open the actual artifact images from #12418615814 and both reference PNGs; inspect all 8 combinations and record specific mismatches (route, viewport, theme, screenshot).
 4. Open both icon reference boards and compare actual icon states. Fix only demonstrated mismatches.
 5. Review “Tuyển chọn 25” image/gallery relationships read-only; no data or mapping changes.
 6. For each confirmed UI mismatch: minimal fix → affected tests → Preview deploy → verify exact deployment SHA → live audit/artifact → inspect screenshots.
