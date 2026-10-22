@@ -1,3 +1,13 @@
+# HISTORICAL — DO NOT USE AS ACTIVE HANDOFF
+
+This dated prompt is retained for audit history only. Its old SHAs, workflow IDs, preview URLs, progress percentages, blockers, and instructions are not current authority and must not be copied into a new session.
+
+**Use instead:** [canonical new-chat prompt](PROMPT-NEXT-CHAT-2026-10-22.md) when this file is under `docs/handoff/`, or [canonical prompt](../handoff/PROMPT-NEXT-CHAT-2026-10-22.md) when under `docs/prompts/`. Always fetch current branch HEAD, PR #108 status, current workflow artifacts, and deployed Preview SHA before acting. The current task ledger is [TASKS.md](../handoff/TASKS.md) and the canonical state is [CURRENT-STATE.md](../handoff/CURRENT-STATE.md).
+
+Do not delete historical evidence blindly; do not treat it as current state. The owner-approved hero `/images/hero-sd-gl052.png` must remain visible; do not reopen the old SKU blocker. PR #108 stays open and must not be merged. Preview-only; respect all scope boundaries in CURRENT-STATE.md.
+
+---
+
 # PROMPT CHAT MỚI — TIẾP TỤC SINDAREALEST2 STATIC STOREFRONT
 Cập nhật: 22/10/2026 — ưu tiên bằng chứng mới nhất, không làm lại từ đầu
 
