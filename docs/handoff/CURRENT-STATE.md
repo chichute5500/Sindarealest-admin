@@ -1,5 +1,5 @@
 # SinDarealest2 — CURRENT STATE
-Updated: 2026-10-22. Read this file first in every new chat.
+Updated: 2026-10-22 UTC. Read this file first in every new chat.
 
 ## Source of truth
 - Repository: https://github.com/chichute5500/Sindarealest-admin
@@ -26,11 +26,11 @@ Updated: 2026-10-22. Read this file first in every new chat.
 - The owner-supplied hero `/images/hero-sd-gl052.png` is settled and must remain visible. Do not search the catalog for SKU SD-GL052, hide, replace or delete this asset.
 
 ## Verified facts vs open work
-- The last documented full live audit is SHA `78b0a673a610501bfa4048df0ed614ff48246f97`, run #39756327625, artifact #12416207670: 128 screenshots, all 8 required viewport/theme combinations, reported zero overflow/console/page/HTTP/request/image errors and zero hard failures. This is historical evidence for that SHA only, not proof for `fc406599e04475e232fad790efd03d46979a5a20`.
+- The prior live audit SHA `78b0a673a610501bfa4048df0ed614ff48246f97` / run #39756327625 / artifact #12416207670 is historical; the newer exact-SHA audit is run #39760903036 / artifact #12418615814 for `fc406599e04475e232fad790efd03d46979a5a20`.
 - Gallery arrow press: 4/4 PASS in that audit (detail/fullscreen, Light/Dark; vertical center shift <=1px; press scale ~0.97; Next/Previous returns to original image).
 - Fly-to-cart: 6/6 PASS and animation edge cases 2/2 in that audit. Preserve animation capture behavior; do not reopen without new contrary evidence.
 - Visual parity is NOT complete. Must inspect real screenshots against `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` and `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`.
-- Icon redesign is NOT declared complete until `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` are opened and compared with live Preview. Older docs disagree about whether reference boards were inspected; use fresh direct inspection as the acceptance criterion.
+- Icon redesign is NOT declared complete until `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` are freshly opened and compared against actual live Preview screenshots in the current audit artifact. A prior checkpoint says they were inspected, but this acceptance gate still needs explicit current evidence.
 - Check “Tuyển chọn 25” and other multi-image product galleries for main-image/thumbnail consistency. Visual concern is UNVERIFIED; do not modify product/image mapping without trusted source evidence.
 - Six Liquid Glass tiles must have three glass layers; do not blur the whole page. Review satin folds, header/logo/hero, trust section, catalog/search/cards, product detail/gallery, cart/account/checkout, Zalo, footer and 404 in all 8 viewport/theme pairs.
 - Approximate progress: 88% is a planning estimate only, not an audit score. Recalculate from current evidence; never claim 100% while visual differences remain.
@@ -40,7 +40,7 @@ Updated: 2026-10-22. Read this file first in every new chat.
 
 ## Next actions (in order)
 1. Fetch branch HEAD and PR #108 head; inspect commits since this checkpoint.
-2. Refresh run #39760903036 and any later runs; record final conclusion, artifact URL, audited SHA and deployment metadata.
+2. Run #39760903036 is now verified SUCCESS with artifact #12418615814; use this newest exact-SHA artifact as the visual-review source and check for later runs before further changes.
 3. Open the actual artifact images and both reference PNGs; inspect all 8 combinations and record specific mismatches (route, viewport, theme, screenshot).
 4. Open both icon reference boards and compare actual icon states. Fix only demonstrated mismatches.
 5. Review “Tuyển chọn 25” image/gallery relationships read-only; no data or mapping changes.
