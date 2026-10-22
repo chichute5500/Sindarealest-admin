@@ -106,6 +106,20 @@ assert.doesNotMatch(previewSpec, /normalizeSelector\(rule\.selectorText\)\s*===\
   'Preview diagnostics must not compare a grouped selector list as one selector');
 
 const baselineSpec = readFileSync(new URL('./e2e/admin-static-baseline.spec.js', import.meta.url), 'utf8');
+
+// Guard the required viewport matrix so future edits cannot silently drop a required device size.
+for (const [width, height] of [
+  [320, 640], [360, 800], [375, 812], [390, 844],
+  [412, 915], [768, 1024], [1280, 800], [1440, 900]
+]) {
+  assert.match(
+    baselineSpec,
+    new RegExp(String.raw`\\{ width: ${width}, height: ${height} \\}`),
+    `Required ADMIN screenshot viewport ${width}x${height} must remain in the baseline matrix`
+  );
+}
+assert.match(baselineSpec, /for \(const theme of \['light', 'dark'\]\)/,
+  'The required viewport matrix must continue capturing both light and dark themes');
 assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
   'Editor header must follow the active theme surface/text tokens');
 assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
