@@ -42,6 +42,13 @@ This is the single index for test, deployment and visual-audit evidence. Repeate
 - Reporting does not end work. Continue until owner acceptance or a genuine owner-dependent blocker.
 - These are process rules, not new test evidence; they do not change any historical PASS/PENDING status.
 
+## Latest artifact inspection — 2026-10-23
+- Downloaded and inspected artifact [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928), artifact ID `12453971973`.
+- The local static fixture audit itself reports `passed: true`, `hardFailures: []`, and zero console/page/HTTP errors. These screenshots are from `http://127.0.0.1:4173`, not the live Cloudflare Preview.
+- Its `deployment-verification.json` reports `DEPLOYMENT_METADATA_UNVERIFIED`: expected SHA `33e09dd2bce4c4be1df23c65a47d93217d2153b7`, matched deployment SHA `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d`. Comparing these commits confirms the difference was docs-only (`docs/MASTER_PROMPT_HANDOFF_ADMIN_PREVIEW_2026-10-20.md` and `docs/handoff/STOREFRONT-ADMIN-CROSSCHECK-2026-10-20.md`), but the metadata gate correctly refused to claim an exact-SHA live capture.
+- Source review confirms the hidden-Hero path already removes the image source, marks `temporarily-disabled-owner-request`, collapses the visual frame, and includes a CSS rule to use one column; the existing regression test checks the single-column fallback and frame collapse. No source change was made based solely on interpreting local-fixture whitespace as a confirmed defect.
+- Remaining gate: fresh actual Preview screenshot evidence plus owner visual acceptance. The public web viewer could not access the Preview URL, so do not claim live visual PASS from this artifact.
+
 ## Evidence rules
 - Source tests, Preview deployment, deployment SHA, live screenshot capture and human visual acceptance are separate gates.
 - Local fixtures are not live Preview evidence.
