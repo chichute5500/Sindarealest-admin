@@ -24,9 +24,9 @@ Updated: 2026-10-23 — consolidated working protocol and current owner decision
 
 ## Start work immediately
 1. Verify PR #108 and current branch HEAD; check the latest relevant Actions and exact Cloudflare Preview deployment SHA.
-2. Follow the highest-priority actionable task in `TASKS.md`; currently verify the owner-requested hidden-Hero layout on the actual Preview, all required viewports/themes, with no empty frame/blank area. Inspect actual screenshots/artifacts, not only workflow status.
+2. Follow `TASKS.md`. The current active item is the next unfinished storefront visual-audit section OUTSIDE Hero. Verify current source/evidence and fix one section at a time. Hero is paused until other storefront work is complete.
 3. While any workflow runs, do useful independent preparation and resume evidence review as soon as results arrive.
-4. Once hidden-Hero layout is verified, report the actual Preview link and ask the owner to visually check only the specific remaining acceptance point. Do not switch to unrelated redesign before their decision.
+4. For each non-Hero section, report the actual Preview link and ask the owner to review only when a genuine visual acceptance decision is needed. Do not resume Hero until other storefront work is complete.
 5. Update `CURRENT-STATE.md`, `TASKS.md`, and `TEST-RESULTS.md` when verified state changes. Historical evidence belongs in `TEST-RESULTS.md`; never copy old SHA/run IDs forward as current.
 
 ## Owner-facing reporting language
