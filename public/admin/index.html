@@ -682,6 +682,8 @@ body:has(#loginView:not(.hidden)) .loginwrap{
  #main .product-table .product-mobile-inline-metric{gap:2px;font-size:8px}
  #main .product-table .product-mobile-inline-metric>span{font-size:7px}
  #main .product-table .product-mobile-inline-metric>b{font-size:8px}
+ /* Keep the full SKU/category hint readable on 320–360px phones instead of clipping it to one line. */
+ #main .product-table .product-row-info .sku{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
  #main:has(#searchBox) .toolbar{gap:6px;padding:8px}
  #main:has(#searchBox) .toolbar>.btn{padding:7px 8px;font-size:10px}
 }

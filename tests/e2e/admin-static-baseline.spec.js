@@ -1270,6 +1270,19 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
                 scrollWidth: cell.scrollWidth
               })),
               productTitle: row.querySelector('.prodname')?.textContent?.trim(),
+              sku: (() => {
+                const element = row.querySelector('.sku');
+                const style = getComputedStyle(element);
+                return {
+                  text: element.textContent?.trim(),
+                  whiteSpace: style.whiteSpace,
+                  overflow: style.overflow,
+                  textOverflow: style.textOverflow,
+                  overflowWrap: style.overflowWrap,
+                  lineClamp: style.webkitLineClamp,
+                  height: element.getBoundingClientRect().height
+                };
+              })(),
               editLabel: row.querySelector('.product-mobile-edit')?.getAttribute('aria-label')
             }))
           };
@@ -1310,6 +1323,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           expect(row.scrollWidth, 'Product card should not clip its content: ' + JSON.stringify(row))
             .toBeLessThanOrEqual(row.clientWidth + 1);
           expect(row.productTitle, 'Existing product titles must remain available to assistive technology').toBeTruthy();
+          if (narrowViewport.width <= 360) {
+            expect(row.sku.text, 'SKU/category hint should keep its full DOM text').toContain('UI-FIXTURE-001');
+            expect(row.sku.whiteSpace, 'Narrow-phone SKU hint should wrap instead of being forced to one line').toBe('normal');
+            expect(row.sku.overflowWrap, 'Narrow-phone SKU hint may break long segments without horizontal overflow').toBe('anywhere');
+            expect(row.sku.lineClamp, 'Narrow-phone SKU hint should wrap to at most two lines').toBe('2');
+            expect(row.sku.height, 'Wrapped SKU hint should remain visible').toBeGreaterThan(0);
+          }
           expect(row.editLabel, 'Edit control should retain its accessible name').toContain('Sửa sản phẩm');
           for (const cell of row.cells) {
             expect(cell.rect.right, 'Product field should remain inside viewport: ' + JSON.stringify(cell))
