@@ -2,10 +2,23 @@ name: Validate source and tests
 
 on:
   push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README*.md'
+      - 'README*.txt'
   workflow_dispatch:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
+      - 'README*.md'
+      - 'README*.txt'
+
+concurrency:
+  # A newer push supersedes stale tests for the same branch/PR; the newest revision remains the one to verify.
+  group: validate-source-tests-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

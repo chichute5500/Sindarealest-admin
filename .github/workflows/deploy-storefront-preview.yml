@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - fix/liquid-glass-audit-2026-10-19
-    # Documentation-only commits do not change the deployed storefront; avoid
-    # advancing the Preview deployment SHA after a verified source audit.
+    # Docs, root README updates and workflow-only changes do not change the deployed site.
     paths-ignore:
       - 'docs/**'
+      - 'README*.md'
+      - 'README*.txt'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:

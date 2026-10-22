@@ -1,20 +1,15 @@
 name: Admin Preview Playwright
 
+# Admin Preview is a separate workstream. Run its read-only smoke checks only when explicitly requested.
 on:
-  push:
-    branches:
-      - fix/liquid-glass-audit-2026-10-19
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: admin-preview-playwright
-  cancel-in-progress: false
+  group: admin-preview-playwright-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   admin-preview:

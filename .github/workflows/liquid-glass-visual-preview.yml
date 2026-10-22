@@ -1,17 +1,18 @@
 name: Liquid Glass isolated visual preview
 # Guarded capture: start/end markers may archive verified live captures; [capture-review] verifies/captures to the run artifact only, without touching canonical archives.
-# Note: paths-ignore excludes docs/handoff/**, so a handoff-only commit cannot trigger capture; keep the guarded capture marker on a workflow/source commit. End-of-work archive for satin v7.
+# Trigger policy: docs, root README and workflow-only commits never launch the expensive screenshot matrix. End-of-work archive for satin v7.
 
 on:
   push:
     branches:
       - fix/liquid-glass-redesign
       - fix/liquid-glass-audit-2026-10-19
-    # Handoff and specification-only changes must not launch a live audit
-    # against a SHA that was not deployed. Workflow/source changes still trigger
-    # both Preview deployment and live audit for exact-SHA evidence.
+    # Documentation-only updates and workflow changes do not alter the storefront.
     paths-ignore:
       - 'docs/**'
+      - 'README*.md'
+      - 'README*.txt'
+      - '.github/workflows/**'
   workflow_dispatch:
     inputs:
       capture_stage:
@@ -44,9 +45,10 @@ permissions:
   contents: write
 
 concurrency:
-  # Non-archiving capture-review runs get a SHA-scoped group so a stale Chromium install cannot block exact-SHA review.
-  group: liquid-glass-preview-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || 'serialized' }}
-  cancel-in-progress: false
+  # Ordinary reviews share a branch group so newer commits cancel stale long-running captures.
+  # Deliberate start/end archives are serialized separately and are never automatically cancelled.
+  group: liquid-glass-preview-${{ github.ref }}-${{ (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')) && 'archive' || 'review' }}
+  cancel-in-progress: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '[capture-start-of-work]') && !contains(github.event.head_commit.message, '[capture-end-of-work]') }}
 
 jobs:
   visual-preview:
