@@ -1,5 +1,16 @@
 # TEST RESULTS — EXACT-SHA EVIDENCE
 
+## Latest UI patch verification — 2026-10-22 11:16 UTC
+
+- **Source SHA:** `dff584114dfd3916219f38b24950e5bf531e2199`.
+- **Validation and complete npm test:** PASS in [run #39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097).
+- **Preview deploy:** PASS in [run #39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975); deployment alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, concrete deployment URL `https://b7858119.sindarealest2.pages.dev/`. Visual audit must still confirm deployment metadata before its captures count as exact-SHA evidence.
+- **Live visual audit:** [run #39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207) was PENDING at last check; no artifact yet. This is the next acceptance gate.
+- UI patch: removed rejected radial CSS mask, added `syncHeroBackgroundKey` that samples 8 neutral-light edge/corner points from the supplied hero image and applies the existing gallery white-matte SVG filter in Dark mode only when at least 6 votes pass. Same source path remains `/images/hero-sd-gl052.png?v=20261022-1`; image/product mapping is unchanged.
+- Intermediate failures are historical: the first new test failed because its mocked image lacks `classList`; after defensive optional guards, the next failed because the test expected non-optional `classList.toggle`. The test was corrected to the optional-chain implementation; current validation at run #39769146097 passed. Do not treat these intermediate SHAs as accepted.
+- Do not claim visual improvement until artifact screenshots are opened. Check hero Dark at 390×844 and 1440×900 and Light mode; if matte remains rectangular or shoe edges/colour are damaged, revert only this hero matte helper/filter and assertion.
+
+
 > Current branch/next steps: [CURRENT-STATE.md](CURRENT-STATE.md). Never treat a result for one SHA as a PASS for another.
 
 ## Startup first-paint capture — observational, not exact-SHA verified
