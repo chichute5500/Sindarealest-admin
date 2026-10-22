@@ -7,8 +7,8 @@
   "testedCommitSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
   "capturedAt": "2026-10-22T09:38:06.000Z",
   "progressEstimatePercent": 50,
-  "progressBasis": "Validate Source #39756606343 PASS and Admin Preview diagnostic #39756606227 PASS on exact tested source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6. Checkbox assertion now waits for final computed CSS color via toHaveCSS; strict light/dark values were preserved and checked/unchecked + keyboard tests pass. Source screenshot matrix and deployed login/dashboard smoke passed. Full 12-screen parity NOT_ACCEPTED, real authenticated business/backend QA NOT_TESTED; progress remains 50%.",
-  "note": "Verified checkpoint 2026-10-22T16:38:06+07:00: branch head before this JSON update is 4444d176f1a4d494ffa8226454e720902810ef05, a docs-only descendant after the tested source 2cf894e476b85e77b646b4bb45596e263a9f2fb6. Validate #39756606343 SUCCESS; Preview #39756606227 SUCCESS on the exact source SHA. Source matrix captured 99 PNGs over 8 required viewports, light/dark (16 login shell, 83 read-only UI fixtures; 75 metrics). Deployed Preview reported PASS_LOGIN_CSS_SIGNATURE and login/dashboard smoke 2/2. The source CSS selector/theme was correct; the old test sampled computed background during the 180 ms transition. Strict target colors remain unchanged. Progress 50%, 12-screen parity NOT_ACCEPTED, authenticated business/backend QA NOT_TESTED.",
+  "progressBasis": "Validate #39756606343 PASS and Preview #39756606227 PASS on exact tested source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6; strict checkbox computed-color assertions now wait for final CSS state and keyboard tests pass. Source screenshot matrix and deployed login/dashboard smoke passed. Full 12-screen parity NOT_ACCEPTED and real authenticated business/backend QA NOT_TESTED; progress remains 50%.",
+  "note": "Checkpoint 2026-10-22T16:38:06+07:00: HEAD before final JSON sync 9c715bbd9424d14f2040deed6afa1af1a005eb77 is docs-only descendant of tested source 2cf894e476b85e77b646b4bb45596e263a9f2fb6. Validate Source #39756606343 and Preview #39756606227 both SUCCESS on source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6. Artifact admin-preview-evidence-304 (12416033404): 99 PNGs for eight required viewports and both themes, 16 login screenshots, 83 read-only UI fixtures and 75 metrics. Deployed Preview diagnostics: PASS_LOGIN_CSS_SIGNATURE; login/dashboard smoke 2/2. Root cause of prior checkbox assertion was style sampling during the 180 ms transition; exact light/dark expected colors were retained. 12-screen parity NOT_ACCEPTED, real authenticated business/backend QA NOT_TESTED, progress 50%.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -809,7 +809,7 @@
     "applicationStartup": "PASS",
     "playwrightPreviewDiagnostics": "PASS",
     "localStaticPlaywrightBaseline": "PASS_3_OF_3",
-    "visualComparisonAgainstApprovedPng": "PARTIAL; FULL_12_SCREEN_REFERENCE_PARITY_NOT_ACCEPTED",
+    "visualComparisonAgainstApprovedPng": "PARTIAL; FULL_12_SCREEN REFERENCE PARITY NOT ACCEPTED",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
@@ -918,6 +918,9 @@
     "Product editor #4 overall visual reference parity remains PARTIAL/NOT_ACCEPTED although the desktop price/stock footer-overlap regression now passes exact-SHA Playwright.",
     "Latest exact-source CI checkpoint 2cf894e476b85e77b646b4bb45596e263a9f2fb6: Validate #39756606343 and Preview #39756606227 both PASS; deployed preview CSS signature and login/dashboard smoke pass, but this is not full business/backend QA.",
     "Full 12-screen visual comparison remains NOT_ACCEPTED; screen #3 Product list remains PARTIAL/NOT_ACCEPTED without inventing images, price or stock.",
+    "Authenticated backend/business-module workflows remain NOT_TESTED; local screenshots use synthetic read-only fixtures. Remote D1/R2 and PRE/PRO migrations remain NOT VERIFIED/DEFERRED_BY_OWNER.",
+    "Latest exact-source CI checkpoint 2cf894e476b85e77b646b4bb45596e263a9f2fb6: Validate #39756606343 and Preview #39756606227 both PASS; deployed login/CSS signature and dashboard smoke pass, but this is not full business/backend QA.",
+    "Full 12-screen visual comparison remains NOT_ACCEPTED; screen #3 Product list remains PARTIAL/NOT_ACCEPTED without inventing images, prices or stock.",
     "Authenticated backend/business-module workflows remain NOT_TESTED; local screenshots use synthetic read-only fixtures. Remote D1/R2 and PRE/PRO migrations remain NOT VERIFIED/DEFERRED_BY_OWNER."
   ],
   "blockedItems": [
@@ -926,23 +929,24 @@
     "No force-push, history rewrite, merge, cross-branch sync, Production deploy, secret change or remote D1/R2 action is allowed.",
     "Cross-branch integration is NOT VERIFIED until the static consumer displays freeShippingEligible/freeShipping correctly and a currently authorized Preview validates the deployed API.",
     "Owner action is required to confirm a currently deployed Preview built from ADMIN source and legitimate Cloudflare Access; no secret or bypass is allowed. Product save and PRE/PRO migrations stay DEFERRED_BY_OWNER.",
+    "Authenticated business QA beyond the deployed login/dashboard smoke still requires owner-authorized real-backend workflows; do not bypass Access, expose secrets, or write real data.",
     "Authenticated business QA beyond the deployed login/dashboard smoke still requires owner-authorized real-backend workflows; do not bypass Access, expose secrets, or write real data."
   ],
   "nextActions": [
-    "Review admin-preview-evidence-304 (ID 12416033404) against the approved 12 Admin references and continue fixing only demonstrated UI gaps.",
-    "Keep all-12-screen parity NOT_ACCEPTED and screen #3 Product list PARTIAL until explicit reference comparisons pass.",
-    "Run authenticated business-module QA only through owner-authorized access and approved synthetic/test records; do not confuse login/dashboard smoke or fixture tests with backend QA.",
+    "Review artifact admin-preview-evidence-304 (ID 12416033404) against the approved 12 Admin references and continue only demonstrated UI gaps.",
+    "Keep 12-screen parity NOT_ACCEPTED and screen #3 Product list PARTIAL until explicit comparisons pass.",
+    "Run authenticated business-module QA only through owner-authorized access and approved test records; fixtures and login/dashboard smoke are not backend QA.",
     "Keep AI grouping screen #11 BLOCKED; keep R2 product-image persistence and PRE/PRO migrations DEFERRED_BY_OWNER.",
-    "Keep PR #111 and #108 OPEN/unmerged. Do not edit main/static branch, deploy Production, bypass Cloudflare Access, access/change secrets, or write D1/R2/run real migrations."
+    "Keep PR #111 and #108 OPEN/unmerged; do not edit main/static branch, deploy Production, bypass Access, access/change secrets, or write D1/R2/run real migrations."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
-  "branchHeadSha": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "branchHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestVerifiedAt": "2026-10-22T16:38:06+07:00",
   "latestVerifiedSourceCommit": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
-  "currentAdminBranchHead": "4444d176f1a4d494ffa8226454e720902810ef05",
-  "latestVerificationSummary": "Validate Source #39756606343 and Preview #39756606227 both SUCCESS on exact source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6; HEAD before this JSON update 4444d176f1a4d494ffa8226454e720902810ef05 is a docs/evidence-only descendant. SKU checked-color test waits for the final CSS state without weakening target colors. Deployed login/dashboard smoke passed 2/2. Full 12-screen parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED. Progress 50%.",
-  "branchHeadBeforeHandoffUpdate": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "currentAdminBranchHead": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "latestVerificationSummary": "Validate #39756606343 and #39756606227 both SUCCESS on exact source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6; HEAD before final JSON sync 9c715bbd9424d14f2040deed6afa1af1a005eb77 is docs/evidence-only descendant. SKU assertion now waits for final CSS colors without weakening values; Preview login/dashboard smoke 2/2 passed. Full 12-screen parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED. Progress 50%.",
+  "branchHeadBeforeHandoffUpdate": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -1062,9 +1066,9 @@
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
   "updatedAt": "2026-10-22T16:38:06+07:00",
-  "currentBranchHeadAtHandoff": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "currentBranchHeadAtHandoff": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "sourceInventoryOnly": true,
-  "sourceModifiedThisTurn": false,
+  "sourceModifiedThisTurn": true,
   "previewDiagnostics": {
     "runId": 39548605474,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
@@ -1126,12 +1130,12 @@
   },
   "handoffUpdate": {
     "at": "2026-10-22T16:38:06+07:00",
-    "branchHeadBeforeJSONUpdate": "4444d176f1a4d494ffa8226454e720902810ef05",
+    "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "progressPercent": 50,
-    "postCommitReadback": "PENDING_UNTIL_LIVE_READBACK"
+    "postCommitReadback": "The post-commit live fetch and JSON.parse verification will be performed before handoff completion."
   },
   "progressPercent": 50,
   "prScopeAudit": {
@@ -1336,24 +1340,25 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "currentAdminBranchHeadBeforeHandoffUpdate": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestScreenshotArtifact": {
     "runId": 39756606227,
     "id": 12416033404,
     "name": "admin-preview-evidence-304",
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227/artifacts/12416033404",
     "sourceCommit": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
-    "screenshotCount": 99,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 83,
-    "uiFixtureMetricCount": 75,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "capturedPngs": 99,
+    "loginShellPngs": 16,
+    "fixturePngs": 83,
+    "fixtureMetrics": 75,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to Git"
   },
   "latestVerification": {
     "checkedAt": "2026-10-22T16:38:06+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "sourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
-    "branchHeadBeforeDocsRefresh": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+    "branchHeadBeforeHandoffSeries": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+    "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "validateSource": {
       "runId": 39756606343,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343",
@@ -1374,7 +1379,7 @@
     "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
     "progressPercent": 50
   },
-  "latestObservedBranchHeadSha": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "latestObservedBranchHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestVerifiedSourceCi": {
     "runId": 39742949748,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748",
@@ -1392,7 +1397,7 @@
   "pr111": {
     "state": "OPEN",
     "merged": false,
-    "headSha": "4444d176f1a4d494ffa8226454e720902810ef05",
+    "headSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "changedFiles": 1265,
     "mergeable": false,
     "mergeable_state": "dirty",
@@ -1844,7 +1849,7 @@
     "remoteD1RuntimeConcurrency": "NOT_VERIFIED_TESTS_USE_IN_MEMORY_MOCK",
     "finding": "Refund row uses conditional INSERT…SELECT to recheck the net received/refunded ledger at insert time; order/request status updates and audit write are gated on that row existing; a rejected balance race returns 409."
   },
-  "latestHandoffHeadSha": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "latestHandoffHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "pr111State": "OPEN_UNMERGED",
   "pr108State": "OPEN_UNMERGED",
   "safety": {
@@ -1869,7 +1874,7 @@
     "previewRun": 39750503783,
     "currentHeadValidateRun": 39751463904
   },
-  "latestObservedAdminHead": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "latestObservedAdminHead": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestObservedAdminHeadVerifiedAt": "2026-10-22T15:52:00+07:00",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
@@ -1930,12 +1935,12 @@
   "overallProgressPercent": 50,
   "latestHandoffUpdate": {
     "at": "2026-10-22T16:38:06+07:00",
-    "branchHeadBeforeJSONUpdate": "4444d176f1a4d494ffa8226454e720902810ef05",
+    "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "progressPercent": 50,
-    "postCommitReadback": "PENDING_UNTIL_LIVE_READBACK"
+    "postCommitReadback": "The post-commit live fetch and JSON.parse verification will be performed before handoff completion."
   },
   "latestRun": {
     "sourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
@@ -2017,7 +2022,7 @@
   "latestHeadVerification": {
     "checkedAt": "2026-10-22T16:38:06+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "headShaBeforeJSONUpdate": "4444d176f1a4d494ffa8226454e720902810ef05",
+    "headShaBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "validateConclusion": "success",
@@ -2333,7 +2338,7 @@
   },
   "currentBranchHeadBeforeHandoffUpdate": "dcb60b39d5813b82fabeab0f390826e558e7e676",
   "currentAdminBranchHeadIsBeforeHandoffUpdate": true,
-  "latestObservedAdminHeadSha": "4444d176f1a4d494ffa8226454e720902810ef05",
+  "latestObservedAdminHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestKeyboardTabNavigationAudit": {
     "implementedInCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
     "changedPath": "tests/e2e/admin-static-baseline.spec.js",

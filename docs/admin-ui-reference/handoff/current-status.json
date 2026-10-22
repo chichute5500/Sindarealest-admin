@@ -3,13 +3,13 @@
   "updatedAt": "2026-10-22T16:38:06+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
+  "branchHeadAtCheckpoint": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Validate Source #39756606343 SUCCESS and Preview diagnostic #39756606227 SUCCESS on exact source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6. SKU test now waits for final computed colors without weakening strict light/dark values and covers checked/unchecked, focus-visible and Space. HEAD ff6dd8bae9c36b5b7f7c01122bed8cfc325598da before this JSON refresh is a docs/evidence-only descendant; all-12-screen visual parity NOT_ACCEPTED, authenticated business/backend QA NOT_TESTED. Progress remains 50%.",
+  "progressBasis": "Validate #39756606343 PASS and Preview #39756606227 PASS on exact tested source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6; checkbox checked/unchecked light/dark color + keyboard focus/Space assertions now PASS with strict target values. Current branch head before JSON refresh 9c715bbd9424d14f2040deed6afa1af1a005eb77 is docs-only descendant. 12-screen parity NOT_ACCEPTED; real authenticated business/backend QA NOT_TESTED; progress 50%.",
   "latestVerifiedApplicationTest": {
     "testedCommitSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
-    "conclusion": "SOURCE_AND_PREVIEW_CHECKS_PASS_ON_EXACT_SOURCE_SHA; login/dashboard smoke only; full business/backend QA not tested",
+    "conclusion": "SOURCE_AND_PREVIEW_CHECKS_PASS_ON_EXACT_SOURCE_SHA; login/dashboard smoke only; real business/backend QA not tested",
     "validateRun": {
       "runId": 39756606343,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343",
@@ -21,20 +21,21 @@
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
       "sha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
       "conclusion": "success",
-      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; deployed login/dashboard smoke 2/2"
+      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; login/dashboard smoke 2/2"
     },
     "artifact": {
       "id": 12416033404,
       "name": "admin-preview-evidence-304",
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227/artifacts/12416033404",
+      "sourceCommit": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
       "capturedPngs": 99,
       "loginShellPngs": 16,
       "fixturePngs": 83,
       "fixtureMetrics": 75
     },
-    "rootCause": "Test sampled computed background immediately during 180 ms background-color transition. The expected :checked/theme CSS rule was present and no overriding selector was found; Playwright now waits for exact final target colors without weakening assertions.",
+    "rootCause": "Most consistent with observed logs and passing fix: the old test sampled computed background at the start of the 180 ms color transition. Source selector/theme matched; the test now waits for exact final color without weakening assertion.",
     "twelveScreenVisualParity": "NOT_ACCEPTED",
-    "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY; deployed login/dashboard smoke only",
+    "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
     "progressPercent": 50,
     "screen3": "PARTIAL_NOT_ACCEPTED"
   },
@@ -75,7 +76,7 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
+      "headSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
       "changedFiles": 1265,
       "mergeReady": false,
       "reason": "Keep PR #111 OPEN/unmerged; full diff/scope audit remains open.",
@@ -114,10 +115,10 @@
     "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
   ],
   "nextActions": [
-    "Review admin-preview-evidence-304 (ID 12416033404) against the approved references; continue screen-by-screen visual parity and keep NOT_ACCEPTED until every screen has evidence.",
-    "Keep authenticated backend/business-module QA NOT TESTED until owner-authorized real-backend workflows and safe test records are available; fixtures and login/dashboard smoke are not business QA.",
-    "Keep AI grouping screen #11 BLOCKED pending approved contract; keep R2 product-image save and PRE/PRO migrations DEFERRED_BY_OWNER.",
-    "Keep PR #111/#108 OPEN/unmerged; no Production deploy, main/static edits, Access bypass, secrets access/change, or remote D1/R2 writes/migrations."
+    "Compare admin-preview-evidence-304 with all 12 approved Admin references and keep overall parity NOT_ACCEPTED until each screen is accepted.",
+    "Keep authenticated backend/business QA NOT_TESTED except login/dashboard smoke; use only owner-authorized Preview and approved test data.",
+    "Keep AI grouping #11 BLOCKED, product image save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.",
+    "Keep PR #111 and #108 OPEN/unmerged; no Production deployment, main/static edits, Access bypass, secrets read/change, or remote D1/R2 writes/migrations."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -130,17 +131,16 @@
   "ownerActionRequiredNow": "No immediate action required for these CSS regressions. Authenticated backend QA remains untested and must use an authorized Preview path; do not bypass Access. Product image save/R2 and PRE/PRO migrations remain deferred by owner.",
   "latestCheckpointVerification": {
     "checkedAt": "2026-10-22T16:38:06+07:00",
-    "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeDocsRefresh": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
-    "latestBranchHeadBeforeJsonRefresh": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
-    "latestTestedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+    "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "validateConclusion": "success",
     "previewRun": 39756606227,
     "previewSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "previewConclusion": "success",
     "previewStatus": "PASS_LOGIN_CSS_SIGNATURE_AND_LOGIN_DASHBOARD_SMOKE_2_OF_2",
-    "localSourceMatrix": "PASS_3_OF_3_WITH_8_VIEWPORTS_LIGHT_DARK",
+    "localSourceMatrix": "PASS_3_OF_3; 8_VIEWPORTS_LIGHT_DARK",
     "artifactId": 12416033404,
     "artifactName": "admin-preview-evidence-304",
     "progressPercent": 50
@@ -148,7 +148,8 @@
   "latestContinuationCycle": {
     "checkedAt": "2026-10-22T16:38:06+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeDocsRefresh": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+    "branchHeadBeforeHandoffSeries": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+    "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "sourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "validateConclusion": "success",
@@ -162,7 +163,7 @@
     "loginShellPngs": 16,
     "fixturePngs": 83,
     "fixtureMetrics": 75,
-    "skuColorTransitionTest": "PASS_EXACT_LIGHT_DARK_COLORS_AND_KEYBOARD_FOCUS_SPACE",
+    "skuColorTransitionTest": "PASS_STRICT_LIGHT_DARK_COLORS_CHECKED_UNCHECKED_FOCUS_VISIBLE_SPACE",
     "screen3": "PARTIAL_NOT_ACCEPTED",
     "all12ScreenParity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED",
@@ -328,17 +329,45 @@
         "authenticatedBusinessQA": "NOT_TESTED",
         "progressPercent": 50
       }
+    },
+    {
+      "type": "superseded-checkpoint",
+      "archivedAt": "2026-10-22T16:38:06+07:00",
+      "checkpoint": {
+        "checkedAt": "2026-10-22T16:38:06+07:00",
+        "branch": "feature/admin-isolated-handoff-2026-10-20",
+        "branchHeadBeforeDocsRefresh": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+        "sourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+        "validateRun": 39756606343,
+        "validateConclusion": "success",
+        "previewRun": 39756606227,
+        "previewConclusion": "success",
+        "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE; LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2",
+        "localPlaywright": "PASS_3_OF_3",
+        "artifactId": 12416033404,
+        "artifactName": "admin-preview-evidence-304",
+        "capturedPngs": 99,
+        "loginShellPngs": 16,
+        "fixturePngs": 83,
+        "fixtureMetrics": 75,
+        "skuColorTransitionTest": "PASS_EXACT_LIGHT_DARK_COLORS_AND_KEYBOARD_FOCUS_SPACE",
+        "screen3": "PARTIAL_NOT_ACCEPTED",
+        "all12ScreenParity": "NOT_ACCEPTED",
+        "authenticatedBusinessQA": "NOT_TESTED",
+        "progressPercent": 50
+      }
     }
   ],
   "latestHandoffCheckpoint": {
     "checkedAt": "2026-10-22T16:38:06+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadBeforeHandoffRefresh": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+    "branchHeadBeforeHandoffSeries": "8419835f07ad7fa6d57c1b8e3fa3dfe954d62721",
+    "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "previewConclusion": "success",
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE; LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2",
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_AND_LOGIN_DASHBOARD_SMOKE_2_OF_2",
     "artifactId": 12416033404,
     "artifactName": "admin-preview-evidence-304",
     "progressPercent": 50
@@ -346,25 +375,26 @@
   "handoffRefreshAt": "2026-10-22T14:56:46.664+07:00",
   "handoffRefreshBaseHead": "84cafe10b60c49593d530ac3b444aedfd268f76c",
   "latestHandoffReadback": {
-    "checkedAt": "2026-10-22T14:56:46.664+07:00",
-    "docsCommitSha": "PENDING_HANDOFF_COMMIT",
-    "readback": "PENDING_POST_COMMIT_READBACK",
+    "checkedAt": "2026-10-22T16:38:06+07:00",
+    "docsCommitSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+    "readback": "PASS: live readback verified all seven Markdown handoff/reference files contain the current checkpoint, source SHA, run IDs and explicit historic separators. This final commit synchronizes the two JSON files; JSON post-commit parsing/readback will be reported separately.",
     "files": [
       "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
       "docs/admin-ui-reference/handoff/START-HERE.md",
       "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
-      "docs/admin-ui-reference/handoff/latest-test-results.json",
-      "docs/admin-ui-reference/handoff/current-status.json",
       "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
       "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
-      "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md"
+      "docs/admin-ui-reference/handoff/PROMPT-COMPLETENESS-AUDIT.md",
+      "docs/admin-ui-reference/reference-instructions.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json"
     ],
     "progressPercent": 50
   },
   "progressEstimatePercent": 50,
-  "branchHeadSha": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
-  "currentAdminBranchHead": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
-  "currentBranchHeadAtHandoff": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
+  "branchHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "currentAdminBranchHead": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "currentBranchHeadAtHandoff": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestCodeCommitSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
   "testedCommitSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
   "latestSourceTestRun": {
@@ -397,21 +427,21 @@
     "conclusion": "success",
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; DEPLOYED_LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2"
   },
-  "latestObservedAdminHeadSha": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
-  "latestObservedAdminHead": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
+  "latestObservedAdminHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "latestObservedAdminHead": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "latestObservedHeadIsTested": false,
   "latestObservedHeadIsTestedSource": false,
   "latestHeadVerification": {
     "checkedAt": "2026-10-22T16:38:06+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "headShaBeforeJsonRefresh": "ff6dd8bae9c36b5b7f7c01122bed8cfc325598da",
+    "headShaBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "validateConclusion": "success",
     "previewRun": 39756606227,
     "previewSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "previewConclusion": "success",
-    "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA; latest HEAD includes docs-only descendants",
+    "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA; source SHA differs from current docs-only descendant",
     "progressPercent": 50
   },
   "latestContinuationCheckpoint20261022_stickyFooter": {
@@ -444,7 +474,7 @@
     },
     "progressPercent": 50
   },
-  "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA_2cf894e476b85e77b646b4bb45596e263a9f2fb6; current checkpoint head ff6dd8bae9c36b5b7f7c01122bed8cfc325598da is docs/evidence-only and is not the tested source SHA",
+  "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA_2cf894e476b85e77b646b4bb45596e263a9f2fb6; branch HEAD at JSON refresh 9c715bbd9424d14f2040deed6afa1af1a005eb77 is an evidence/docs-only descendant",
   "previewRun": {
     "runId": 39756606227,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
@@ -453,7 +483,7 @@
     "conclusion": "success",
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; DEPLOYED_LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2"
   },
-  "latestHandoffCommitSha": "55a0db927a3b9cc9a6b7fed48eca663f9c3bfa0c",
+  "latestHandoffCommitSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
   "currentHeadValidation": {
     "runId": 39756606343,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343",
