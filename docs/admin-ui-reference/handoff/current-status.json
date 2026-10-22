@@ -3,7 +3,7 @@
   "updatedAt": "2026-10-22T14:00:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+  "branchHeadAtCheckpoint": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressBasis": "Validate Source #39737160773 PASS on source SHA 844020a5aa572421bf558c8c0ff8b38dcfed8a27. Latest known Preview #39736231146 FAIL was on older SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; no Preview run for current HEAD found in the checked Actions list, so current Preview is PENDING/NOT VERIFIED.",
@@ -120,14 +120,15 @@
   "latestCheckpointVerification": {
     "checkedAt": "2026-10-22T14:00:00+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "latestBranchHead": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+    "latestBranchHead": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
     "latestValidateSourceSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
     "validateRun": 39737160773,
     "previousPreviewRun": 39736231146,
     "previousPreviewSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
     "currentHeadPreview": "PENDING_NOT_VERIFIED",
     "previewFailure": "desktop price/stock row overlaps sticky footer on older SHA; rerun required on current HEAD",
-    "progressPercent": 50
+    "progressPercent": 50,
+    "handoffDocsCommitSha": "c264b4edecd33ad582474c76dcc286a9c7e241a3"
   },
   "latestContinuationCycle": {
     "updatedAt": "2026-10-22T21:00:00+07:00",
