@@ -23,7 +23,7 @@ const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "f
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'"),
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4'"),
   "the Hero must use the supplied presentation asset independently of catalog availability");
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
   && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
