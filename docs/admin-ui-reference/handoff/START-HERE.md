@@ -8,15 +8,15 @@
 3. Làm task an toàn kế tiếp; không lặp lỗi đã được run SHA mới vượt qua.
 4. Sau checkpoint, cập nhật nguồn trạng thái và các prompt liên quan, đọc lại JSON/Markdown rồi refetch HEAD/PR.
 
-## Checkpoint live — 2026-10-22
-- Repo: `chichute5500/Sindarealest-admin`.
-- Chỉ ghi nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. HEAD tại đầu đợt audit này: `0502739790fecfdf56f3c267dcaf607f1751908e`; các commit handoff tiếp theo sẽ làm HEAD tiến lên.
-- PR #111 OPEN/unmerged, 1,310 changed files, +49,466 / −404, mergeable=false.
-- PR #108 OPEN/unmerged, HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`, 288 changed files, mergeable=false; nhánh website/static chỉ đọc.
-- Source/test SHA gần nhất: `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`. [Run #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576) SUCCESS. [Artifact #339](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558) có 102 PNG / 78 fixture metrics.
-- Run #39804852604 lỗi selector `retry-customers` trên SHA cũ `326526f8...`; run mới #39811730576 PASS, nên không debug lại trừ khi có bằng chứng hồi quy mới.
-- Tiến độ sản phẩm **50% PROVISIONAL**. Cả 12 màn hình vẫn PARTIAL_NOT_ACCEPTED; ảnh/fixtures không chứng minh authenticated backend acceptance.
-
+## Checkpoint live — 2026-10-22 (latest tested change)
+- Repo `chichute5500/Sindarealest-admin`; writable ADMIN branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN/unmerged. PR #108 OPEN/unmerged, website/static branch read-only.
+- HEAD before this handoff edit: `23b93779f232966aa150668cfd6bbe4c083ffe40`; fetch live HEAD before later writes.
+- Latest tested source/test SHA: `4b2220d510a906882e4309df6969c0c43514c421` — [toast/navigation fix](<https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421>).
+- Source CI [#39813340342](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342>) SUCCESS; local Playwright matrix + Preview diagnostic [#39813340309](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309>) SUCCESS, both on exact SHA `4b2220d510a906882e4309df6969c0c43514c421`.
+- [Artifact #340 / ID 12439794397](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397>): 102 PNG (16 login shell, 86 fixture-module screens), 78 fixture metrics. Reviewed `warranties__390x844__light.png`: toast is above mobile nav and nav labels remain visible.
+- Fix reserves safe-area-aware space above fixed nav and adds an assertion for at least 8px clearance. Authenticated backend acceptance remains NOT_TESTED.
+- Old timeout #39804852604 at `retry-customers` on SHA `326526f8...` is historical, not the active blocker; newer runs passed.
+- Product progress **50% PROVISIONAL**; all 12 screens PARTIAL_NOT_ACCEPTED. PR #111 has 1,310 changed files; provenance remains PARTIAL.
 ## Đã xác minh trong audit nguồn hiện tại
 - PR #111 chứa 1,310 paths; census cũ 1,304 lỗi thời. Trong 36 runtime/config paths, 14 thêm mới và 22 sửa so với merge-base `f38cefe4647b33bd42f9018fde00c420ee5c7c66`.
 - Bảy blob runtime trùng chính xác với PR #108; `public/index.html` trên PR #111 khác cả `main` lẫn static PR #108. Không sửa file storefront hoặc nhánh static từ đây; scope cần giải quyết trước merge.
@@ -24,9 +24,10 @@
 - Gallery #5: source có featured slot + horizontal thumbnail rail và test accessibility/reorder; ảnh trong fixture là placeholder tổng hợp, không tự điền ảnh sản phẩm thật.
 
 ## Việc tiếp theo
-1. Audit ngữ nghĩa 36 runtime/config paths theo batch, ưu tiên `public/index.html`, các blob trùng static, payment API/ledger và sequencing của setup; chỉ đọc hoặc sửa code ADMIN nếu có lỗi tái hiện rõ.
-2. Tiếp tục acceptance từng màn dựa trên `docs/admin-ui-reference/admin-mobile-reference.png` và artifact #339 theo đúng viewport/theme.
-3. Làm mới provenance batch của tests/docs/evidence; chưa kết luận PR-wide PASS trước khi toàn bộ scope được phân loại.
+1. Compare artifact #340 with `docs/admin-ui-reference/admin-mobile-reference.png` at identical viewport/theme; prioritize Gallery (#5), then screens #8–#12.
+2. Continue PR #111 provenance review from the live paginated 1,310-file list; prioritize runtime/API/migration/setup/workflow paths and distinguish inherited files from new changes.
+3. For every meaningful change, validate exact SHA, update/read back handoff files, then refetch PR/HEAD. Do not rerun unchanged passing tests without reason.
+4. Keep progress at 50% PROVISIONAL until actual product acceptance evidence changes; screenshots/fixtures are not backend acceptance.
 
 ## Guardrails
 - Giữ PR #111/#108 OPEN/unmerged. Không sửa `main` hoặc nhánh static; không merge.

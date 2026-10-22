@@ -114,3 +114,9 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 1. Continue semantic review of the 36 runtime/config paths—especially `public/index.html`, the 7 static-shared blobs, the payment route/ledger, and setup safety sequencing—without executing remote operations.
 2. Review changed test/evidence/docs batches against their provenance and intended scope; do not call the overall PR audit complete until each path group is classified.
 3. Keep #111/#108 open/unmerged; only write to the ADMIN branch.
+
+
+## Latest validated UI checkpoint — run #39813340309
+- Tested source SHA [`4b2220d510a906882e4309df6969c0c43514c421`](<https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421>); source CI [#39813340342](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342>) and Playwright/Preview [#39813340309](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309>) both SUCCESS.
+- Artifact [#340 / 12439794397](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397>) contains 102 PNGs and 78 fixture metrics. Mobile toast/navigation regression PASS.
+- The old retry-customers timeout is historical. Authenticated backend data, remote schema/ledger and production deployment remain untested/unverified/not performed as applicable.

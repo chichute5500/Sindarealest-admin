@@ -1,6 +1,6 @@
 # LATEST STATUS — SinDarealest Admin
 
-**Product progress: 50% PROVISIONAL.** Live-source audit checkpoint 2026-10-22T16:28:00Z. Latest tested application code remains `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; the branch HEAD advances with documentation commits and must be fetched before every write.
+**Product progress: 50% PROVISIONAL.** Live-source audit checkpoint 2026-10-22T16:28:00Z. Latest tested application code is `4b2220d510a906882e4309df6969c0c43514c421`; see the newer exact-SHA source/Preview runs below.; the branch HEAD advances with documentation commits and must be fetched before every write.
 
 ## Live state
 - ADMIN [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, mergeable=false, 1,310 changed files, +49,466 / −404. HEAD at source-audit checkpoint start: `0502739790fecfdf56f3c267dcaf607f1751908e`.
@@ -26,7 +26,15 @@
 ## Guardrails
 No merge, main/static write, Production deploy, Access bypass, secrets access/change, remote D1/R2 operation, or setup/migration/deploy script execution. Migration 0009 and PRE/PRO/R2 work remain DEFERRED_BY_OWNER. AI grouping requires an approved API/UX contract.
 
+
+## Latest validated UI fix — 2026-10-22
+- Source/test SHA: [`4b2220d510a906882e4309df6969c0c43514c421`](<https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421>).
+- Source CI [#39813340342](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342>): **SUCCESS**. Playwright matrix / Preview diagnostic [#39813340309](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309>): **SUCCESS** on the same SHA.
+- Artifact [#340 / ID 12439794397](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397>): 102 PNG (16 login shell, 86 fixture screens), 78 fixture metrics; metadata reports no page/console/network errors or attempted writes.
+- Mobile toast/nav regression: PASS. Safe-area-aware offset and automated assertion require an 8px gap. Reviewed `warranties__390x844__light.png`; nav labels remain visible. [Commit](<https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421>).
+- Timeout #39804852604 is historical. All 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated backend flows NOT_TESTED/NOT_VERIFIED; Production deployment NOT_PERFORMED.
+
 ## Next
-1. Continue semantic review of runtime/payment paths and record risk/fix proposals without performing remote actions.
-2. Review test/evidence/docs provenance groups; keep full PR audit PARTIAL until complete.
-3. Continue screen-by-screen visual and interaction acceptance against the approved reference; keep the progress at 50% until acceptance evidence supports a change.
+1. Compare artifact #340 to `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme, starting with Gallery (#5), then #8–#12.
+2. Refresh live paginated PR #111 changed paths and continue provenance review in batches, prioritizing runtime/API/migration/setup/workflow.
+3. Verify each source change on its exact SHA, synchronize/read back handoff files, and refetch PR/HEAD. Keep both PRs OPEN/unmerged.

@@ -1,24 +1,22 @@
 # PROMPT COMPLETENESS AUDIT — 2026-10-22
 
-**Result: SINGLE ENTRY POINT UPDATED; STALE STATEMENTS CORRECTED.** All new sessions start at `docs/admin-ui-reference/handoff/START-HERE.md`.
+**Result: SYNCHRONIZED TO RUN #39813340309.** `docs/admin-ui-reference/handoff/START-HERE.md` is the single entry point. Owner should not paste historical prompts.
 
 | Requirement | Status |
 |---|---|
-| No long prompt paste | PASS — one-line starter and authoritative GitHub paths exist. |
-| Latest source/test evidence | PASS — run #39811730576 is SUCCESS on `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; 102 PNG / 78 fixture metrics artifact #339. |
-| Old timeout not active | PASS — run #39804852604 is historical and superseded by a newer successful run. |
-| Progress honesty | PASS — retain 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED. |
-| Live PR state | PASS at this checkpoint — #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; fetch both heads every new session. |
-| File-count consistency | PASS — live file list 1,310; old 1,304 census explicitly historical. |
-| Runtime provenance | PARTIAL — 36 runtime/config paths compared with merge-base `f38cefe4647b33bd42f9018fde00c420ee5c7c66`: 14 added, 22 modified; 7 exact ADMIN blobs also exist at current PR #108 HEAD. |
-| Cross-scope files | BLOCKER FOR MERGE REVIEW — ADMIN `public/index.html` differs from main and static #108; do not patch cross-branch here. |
-| Migration 0009 claims | CORRECTED — both setup and deploy script source contains 0009 preflight. The remote schema remains NOT_VERIFIED; scripts remain forbidden to execute under current constraints. |
-| Gallery visual status | PARTIAL_NOT_ACCEPTED — featured image slot/horizontal rail/accessibility/reorder checks exist, but placeholder fixture art and matrix PASS do not equal per-screen product acceptance. |
-| Safety | PASS — no merge, production, Access bypass, secrets, remote D1/R2, or script execution. |
+| One-line start | PASS — START-HERE contains the starter and live-check instructions. |
+| Live PR/HEAD | PASS at sync start — #111 OPEN/unmerged, HEAD `23b93779f232966aa150668cfd6bbe4c083ffe40`; fetch again before later writes. #108 remains OPEN/unmerged/read-only. |
+| Exact source/test SHA | PASS — `4b2220d510a906882e4309df6969c0c43514c421`; [source CI #39813340342](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342>) SUCCESS. |
+| Screenshot / Playwright matrix | PASS — [run #39813340309](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309>) SUCCESS; artifact [#340 / 12439794397](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397>) includes 102 PNG and 78 fixture metrics. |
+| Mobile toast/nav regression | PASS — safe-area-aware CSS offset + automated >=8px clearance assertion; 390×844 Light screenshot reviewed. |
+| Old retry-customers timeout | Historical only; #39804852604 is not the current blocker. |
+| Screen acceptance | PARTIAL_NOT_ACCEPTED — all 12 screens need visual/functional acceptance; authenticated backend remains NOT_TESTED. |
+| PR #111 provenance | PARTIAL — 1,310 live changed paths; 36 runtime/config paths partially reviewed (14 added/22 modified). |
+| Remote D1/R2/migrations | NOT_VERIFIED / DEFERRED_BY_OWNER; no remote operations performed. |
+| Safety and progress | PASS — no merge/Production/access/secret/database changes; 50% PROVISIONAL retained. |
 
-## Process
-1. Fetch live PR/branch/Actions, then read current-status/test JSON before choosing a task.
-2. Pick the next uncompleted task; don't repeat successful exact-SHA checks absent a source change.
-3. Keep historical evidence distinct from active blockers.
-4. Keep source-only claims separate from deployed/authenticated runtime claims.
-5. Update/re-read related status and prompt files after evidence changes, then fetch HEAD again.
+## Required process
+1. Fetch live PR metadata, HEAD, current Actions and artifacts at chat start.
+2. Read status JSON, latest-test-results, START-HERE and relevant UI/provenance references.
+3. Continue the next unresolved safe task, not a superseded failure.
+4. After source changes, validate exact SHA, synchronize/read-back handoff files, and fetch PR/HEAD again.
