@@ -1,19 +1,19 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:41:44.271Z",
+  "capturedAtUtc": "2026-10-22T19:44:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "branchHeadAtCheckpointStart": "30fece366e559073f6c664f6ed0459712c1b0a84",
   "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
-  "codeTestSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "codeTestSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
   "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestActionsRun": {
-    "id": 39841964451,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
+    "id": 39842366701,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842366701",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
-    "jobId": 120045068730
+    "testedSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
+    "jobId": 120046485714
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -37,9 +37,9 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+      "headSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
       "changedFiles": 385,
-      "additions": 38829,
+      "additions": 38848,
       "deletions": 211,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
@@ -178,9 +178,11 @@
       "mjs": 21
     },
     "cleanupCheckpoint": {
-      "capturedAtUtc": "2026-10-22T19:35:37.668Z",
-      "parentSha": "d49c09c582be2e8dad2d501347415581abbe01d5",
+      "capturedAtUtc": "2026-10-22T19:44:00Z",
+      "parentSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
       "changedFiles": 385,
+      "additions": 38848,
+      "deletions": 211,
       "removedGeneratedHistoricalPngs": 912,
       "removedLegacySnapshotFiles": 10,
       "removedObsoletePromptAudit": true,
@@ -189,14 +191,12 @@
       "removedStaticOnlyCaptureScript": true,
       "restoredPublicIndexToMain": true,
       "approvedReferenceRetained": true,
-      "currentHeadActions": "NOT_VERIFIED",
       "removedUnreferencedReferenceZip": true,
-      "additions": 38756,
-      "deletions": 211,
       "historyRecordCount": 318,
-      "currentCodeChecks": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-      "previewDiagnostic": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-      "branchHeadValidation": "NOT_VERIFIED_FOR_EVIDENCE_COMMIT_d49c09c582be2e8dad2d501347415581abbe01d5"
+      "currentHeadValidation": "PASS_ON_30fece366e559073f6c664f6ed0459712c1b0a84",
+      "exactShaValidationRun": 39842366701,
+      "scopeAuditStatus": "PARTIAL",
+      "productionDeployment": "NOT_PERFORMED"
     },
     "historyRecordCount": 318,
     "nonHistoryDocs": [
@@ -215,22 +215,21 @@
       "docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
     ],
     "lastReviewCheckpoint": {
-      "capturedAtUtc": "2026-10-22T19:41:44.271Z",
-      "head": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+      "capturedAtUtc": "2026-10-22T19:44:00Z",
+      "head": "30fece366e559073f6c664f6ed0459712c1b0a84",
       "changedFiles": 385,
       "historyRecords": 318,
       "historyMarkdown": 157,
       "historyJson": 161,
       "otherDocs": 13,
-      "exactShaValidationRun": 39841964451,
+      "exactShaValidationRun": 39842366701,
       "exactShaValidation": "PASS",
-      "reviewedSlice": "Payment QR configuration/upload/preview, active public QR serving, customer capability-token payment view, admin payment requests/ledger, migrations 0008/0009, setup/deploy scripts and Preview workflow.",
+      "reviewedSlice": "Backup/restore, admin orders/products/warranty endpoints, middleware/shared helpers, public order/product/warranty/sitemap endpoints and their safety tests; source inspection only.",
       "findings": [
-        "No safe additional deletion or merge proven in reviewed slice.",
-        "Payment endpoints have distinct authentication/exposure responsibilities; keep separate.",
-        "Migration 0008/0009 are referenced by source checks/tests; owner deferral prohibits remote application, not deletion.",
-        "playwright.config.js has no current repository search references; both E2E specs are invoked by explicit path in the replacement workflow.",
-        "Three identical historical preview-diagnostics JSON records retained under per-run evidence policy."
+        "No safe deletion or route merge proven in this reviewed slice; endpoint auth/exposure responsibilities differ.",
+        "Backup and restore implement separate export/import safety contracts and must remain separate.",
+        "The three byte-identical historical preview-diagnostics JSON files are retained because per-run evidence history is the recorded policy.",
+        "B1 remains PARTIAL: full semantic provenance review and current path census reconciliation are not complete."
       ],
       "remoteActions": "NONE",
       "productionDeployment": "NOT_PERFORMED"
@@ -244,10 +243,10 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Fetch live PR #111/#108 and exact-SHA Actions after the handoff sync; do not infer current HEAD PASS from older runs.",
-    "Continue semantic provenance review of remaining runtime/API/migration/setup/workflow paths; delete only when proven unused.",
-    "Retain compact per-run test evidence and approved reference; no generated screenshots in Git history.",
-    "Keep authenticated backend QA NOT_TESTED and all 12 screens PARTIAL_NOT_ACCEPTED until acceptance evidence exists."
+    "Continue semantic provenance review for remaining runtime/config/tests and the 13 non-history docs; delete only when no consumer/reference is demonstrated.",
+    "Refresh complete PR file census and handoff metadata after each checkpoint; do not call B1 complete while scopeAudit.status is PARTIAL.",
+    "Use exact-SHA Actions evidence for any newly committed source or handoff state.",
+    "Keep PR #111 and #108 open/unmerged; do not write main or the static branch; no production deployment."
   ],
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
