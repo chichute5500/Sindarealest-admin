@@ -511,22 +511,18 @@ try {
       mobileNav: (() => { const nav = document.querySelector('#mobileBottomNav'); return { present: !!nav, visible: !!nav && getComputedStyle(nav).display !== 'none', tabs: nav?.querySelectorAll('[data-mobile-tab]').length || 0 }; })(),
       title: document.title,
     }));
-    // The homepage hero uses a dedicated presentation asset and is independent
-    // of whether SD-GL052 exists in the public catalog payload.
+    // Owner-requested pause: hidden Hero and collapsed frame are the expected state.
     const heroImagePass = startup.heroImage.present
-      && startup.heroImage.loaded
-      && !startup.heroImage.hidden
-      && startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514-blended.png')
-      && startup.heroImage.status === 'hero-presentation-asset';
-    audit.interactions.push({ theme, check: 'initial-render', result: startup });
-    if (!startup.cards || startup.dark !== (theme === 'dark')) hardFailures.push('Initial render/theme failed: ' + theme);
+      && startup.heroImage.hidden
+      && startup.heroImage.source === ''
+      && startup.heroImage.status === 'temporarily-disabled-owner-request';
     audit.interactions.push({
       theme,
-      check: 'hero-presentation-asset-visible-with-unverified-fixture',
+      check: 'hero-image-temporarily-hidden-owner-request',
       pass: heroImagePass,
-      result: { ...startup.heroImage, expectedState: 'visible-loaded-presentation-asset-independent-of-catalog-SKU' },
+      result: { ...startup.heroImage, expectedState: 'hidden-no-src-owner-request' },
     });
-    if (!heroImagePass) hardFailures.push('Hero presentation asset must remain visible and loaded independently of SD-GL052 catalog availability: ' + theme);
+    if (!heroImagePass) hardFailures.push('Hero must remain temporarily hidden without a source during the owner-requested pause: ' + theme);
     audit.interactions.push({ theme, check: 'mobile-bottom-navigation-visible-with-four-tabs', pass: startup.mobileNav.present && startup.mobileNav.visible && startup.mobileNav.tabs === 4 });
     if (!startup.mobileNav.present || !startup.mobileNav.visible || startup.mobileNav.tabs !== 4) hardFailures.push('Mobile bottom navigation missing or incomplete: ' + theme);
 
