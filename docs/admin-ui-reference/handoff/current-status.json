@@ -1,37 +1,49 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-22T21:20:00+07:00",
+  "updatedAt": "2026-10-22T21:35:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "checkpointSemantics": "Refs checked live immediately before this docs-only checkpoint. Pre-write ADMIN HEAD e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; application source dca19a2af32a78390878b9ccfa5c7c26b816f2ff is unchanged over 21 commits / 22 paths in the source-to-head comparison, limited to handoff/docs/reference files. These docs-only commits advance HEAD; fetch current refs before further writes.",
-  "branchHeadAtCheckpoint": "f9c1e011881768d077dcbb1ce24cdc5ae6175d7f",
+  "branchHeadAtCheckpoint": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "progressBasis": "50% PROVISIONAL: no screen accepted. Migration 0009 fail-closed preflight source changes passed workflow #39778009734 on tested source SHA 3658ca1069616639b825de2cd7b9c714ce560901. Fixture-only screenshots and CI do not establish whole-screen/backend acceptance; docs/CI do not increase progress.",
   "sourceTreeComparison": {
-    "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
-    "checkpointHead": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
-    "commitsAhead": 21,
-    "changedPathsSinceSource": 22,
-    "applicationSourceChanged": false,
-    "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/dca19a2af32a78390878b9ccfa5c7c26b816f2ff...e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe"
+    "sourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "checkpointHead": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
+    "commitsAhead": 10,
+    "changedPathsSinceTestedSource": 11,
+    "applicationSourceChanged": true,
+    "changedApplicationPaths": [
+      "scripts/setup-cloudflare.mjs",
+      "tests/config-integrity.test.mjs"
+    ],
+    "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/3658ca1069616639b825de2cd7b9c714ce560901...27b453e6f4ebefb0191fb970039b018b3bd4e66d",
+    "note": "Live compare shows 10 commits / 11 paths after the workflow-tested source. Most changes are handoff/docs, but setup-cloudflare.mjs and config-integrity.test.mjs also changed. Do not claim workflow #39778009734 validates these newer blobs."
   },
   "sourceValidationOnHead": {
-    "status": "TESTED_SOURCE_ANCESTOR_NOT_EXACT_LIVE_HEAD",
-    "liveHead": "f9c1e011881768d077dcbb1ce24cdc5ae6175d7f",
-    "testedSourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
-    "workflowRun": 39778009734,
-    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
-    "conclusion": "success",
-    "checks": [
-      "npm run check",
-      "npm test",
-      "responsive/theme Playwright capture",
-      "safe preview diagnostics",
-      "artifact upload"
-    ],
-    "note": "Workflow tested source SHA 3658ca1. Current HEAD is later and docs-only; exact live HEAD is not claimed tested."
+    "status": "NOT_VERIFIED_FOR_CURRENT_SOURCE_BLOBS",
+    "liveHead": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
+    "lastSuccessfulWorkflow": {
+      "runId": 39778009734,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+      "testedSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+      "conclusion": "success"
+    },
+    "sourceDrift": {
+      "setupCloudflare": {
+        "testedBlob": "0a95620c547604b5419672b9396247c88cf9a6f5",
+        "liveBlob": "ec1c614048b84657ef8824d865dda42f0c8341fe",
+        "change": "Preflight moved earlier to before seed/deploy."
+      },
+      "configIntegrityTests": {
+        "testedBlob": "6d5b2a3e3c2261ef7da38d4cf7d25d70fcd4dd68",
+        "liveBlob": "45c292c45f445628f5d36e02acfc54ac123f837d",
+        "change": "Expected preflight stage updated to before seed/deploy."
+      }
+    },
+    "note": "These newer source blobs are not covered by the cited successful workflow. Re-run checks on current source before claiming PASS; no workflow dispatch tool was available in this session."
   },
   "latestVisualEvidence": {
     "sourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
@@ -308,7 +320,7 @@
     }
   },
   "lastCompletedTask": "Added fail-closed migration 0009 schema preflight to setup/deploy scripts and regression tests; workflow #39778009734 succeeded on source SHA 3658ca1069616639b825de2cd7b9c714ce560901. Downloaded artifact #314 and inspected metadata, diagnostics, product editor and order detail screenshots.",
-  "currentTask": "P1 continue read-only PR #111 scope/provenance audit; reconcile migration 0009 schema with payment route contracts and local tests; review stale-HEAD guards in admin preview workflow. No remote query, setup, deploy or migration.",
+  "currentTask": "P1 obtain validation on the exact current source blobs after setup preflight was moved before seed/deploy; then continue scope audit. Do not trigger setup/deploy/migration or remote D1/R2.",
   "taskQueue": [
     {
       "id": "P1-PRODUCTS-03",
@@ -388,15 +400,15 @@
   "ownerActionRequiredNow": "No action needed for documentation consolidation. Authenticated QA needs legitimate Preview identity; AI grouping needs approved contract; R2/PRE-PRO remain deferred.",
   "legacyArchiveRoot": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T21:20:00+07:00",
-    "liveHead": "f9c1e011881768d077dcbb1ce24cdc5ae6175d7f",
+    "checkedAt": "2026-10-22T21:35:00+07:00",
+    "liveHead": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
     "pr111": "OPEN_UNMERGED",
     "pr108": "OPEN_UNMERGED",
-    "testedCommit": "3658ca1069616639b825de2cd7b9c714ce560901",
-    "workflowRun": 39778009734,
-    "workflowConclusion": "success",
-    "artifactId": 12425910948,
-    "artifactName": "admin-preview-evidence-314"
+    "lastSuccessfulWorkflowRun": 39778009734,
+    "testedSourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "currentSetupBlob": "ec1c614048b84657ef8824d865dda42f0c8341fe",
+    "currentTestBlob": "45c292c45f445628f5d36e02acfc54ac123f837d",
+    "currentSourceValidation": "NOT_VERIFIED"
   },
   "handoffReviewAt": "2026-10-22T19:15:21.463+07:00",
   "latestCheckpoint": {
