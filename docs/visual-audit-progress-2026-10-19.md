@@ -1,3 +1,18 @@
+## Hero-only visual checkpoint — 2026-10-23 (not accepted)
+
+The latest Hero result is explicitly **not accepted** by the owner. This block supersedes older status claims where they conflict.
+
+- Source/branch HEAD: `e6f49f7b65297be68a0f9472b613a1acd06c866f`.
+- Preview deployment exact-SHA verified: deployment `53dc3bb4-b6ea-4329-a477-ad2cfb7a2e9c`, URL https://53dc3bb4.sindarealest2.pages.dev/, stable alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Live visual workflow #39829962409 SUCCESS; artifact #12449195919. Deployment metadata matches exact SHA.
+- Opened live screenshots: mobile Light/Dark at 390×844. Both show the crocodile platform with obvious hard/cut edges on its right/lower silhouette; this does not match the reference's soft integration into the page. Owner reaction was strongly negative. Hero is not PASS.
+- Required references remain Light `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` and Dark `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`.
+- Next work is limited to inspecting the source image and these references, deriving a faithful platform-edge treatment from the actual pixels/silhouette, and validating new live Preview screenshots. Do not brighten the image; preserve crisp shoes and original upload bytes. Do not guess polygon coordinates or repeatedly widen the same mask.
+- Required viewport matrix remains 360×800, 390×844, 768×1024, 1440×900, both Light and Dark. Capture all eight for acceptance, but do not ask the owner to review until the actual visible edge issue has been corrected and verified.
+- PR #108 OPEN/unmerged; Preview only. No Production/main/Admin/backend/catalog mapping/data/D1/R2/secrets/bindings/DNS/Access/logo changes. No non-Hero work until explicit owner PASS.
+
+---
+
 # LATEST HANDOFF UPDATE — HERO ASSET REPLACEMENT / RESUME FROM LIVE STATE
 **Updated:** 2026-10-22 16:10 UTC  
 **This update is newer than all older status notes below. Keep it when editing this file.**
