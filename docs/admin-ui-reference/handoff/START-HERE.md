@@ -1,27 +1,34 @@
 # START HERE — SINDAREALEST ADMIN
 
-**Live refs required:** the last pre-refresh PR #111 HEAD was `4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed`; handoff-only commits advance HEAD, so fetch live PR #111/#108 before work. Progress remains **50% PROVISIONAL**.
+**Code/test SHA before this handoff-only commit:** `326526f8f74172ae0aea7fa37739c9a8e8f513ec`  
+**Progress:** 50% PROVISIONAL. Source/unit CI is green; current Playwright is pending.
 
-**Next:** poll Actions for the exact live HEAD, inspect logs/artifacts on failure, then continue screens #8–#12 and the PR scope audit. Do not stop after reporting.
+## Current refs
+- [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, `feature/admin-isolated-handoff-2026-10-20`.
+- [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN/unmerged, protected website branch, latest observed head `32c4aa52e03e8917b930ff13d9775215e2876f62`; read-only.
+- The handoff commit advances ADMIN HEAD but does not change the code SHA tested below. Fetch live refs at session start.
 
-## Snapshot
-- Pre-write ADMIN HEAD c002a34d0df955e4d804615f665d6ae5bedc4072 (https://github.com/chichute5500/Sindarealest-admin/commit/c002a34d0df955e4d804615f665d6ae5bedc4072). Its parent source-validation record is documented in LATEST-STATUS.md; this docs-only commit advances HEAD. Fetch the live refs and exact-SHA workflow run at every session start.
-- PR #111 OPEN/unmerged on feature/admin-isolated-handoff-2026-10-20. Protected PR #108 OPEN/unmerged on fix/liquid-glass-audit-2026-10-19; do not write to static branch.
-- Progress 50% PROVISIONAL; all 12 screens remain PARTIAL_NOT_ACCEPTED.
-- #3 Product list review closed as data-limited; #4 Product editor remains partial. Do not repeat geometry checks without new state or a reproducible defect. Next screen work: #6 Orders and #7 Order detail independently.
-- Migration 0009 source preflight is tested; remote schema/ledger NOT VERIFIED and migration DEFERRED_BY_OWNER. Setup's 0009 gate follows earlier remote migrations; do not run setup.
+## Actions
+- [Validate #39804852564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564): SUCCESS on `326526f8...`; dependency audit, `npm run check`, `npm test` passed.
+- [Preview #39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): PENDING; no job/artifact at last poll.
+- [Older blocker #39802525217](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217): in progress at Chromium installation on old SHA `920f53d...`. Poll existing run; don't dispatch duplicates.
 
-## Canonical files
-1. PROMPT-NEXT-CHAT.md — paste-ready transfer prompt.
-2. current-status.json — refs, checkpoint, progress, queue and scope.
-3. latest-test-results.json — exact-SHA source checks versus visual evidence.
-4. LATEST-STATUS.md — human-readable summary.
-5. 12-SCREEN-REFERENCE-AUDIT.md — official screen numbering and acceptance.
-6. PR-111-SCOPE-AUDIT.md — source provenance, schema/API/deploy risks.
-7. PROMPT-COMPLETENESS-AUDIT.md — checklist of handoff completeness.
+## Product fix delivered
+- `e11ec06cd5870522735a28205b678897de829361`: Customers/Warranty endpoint failure or malformed response now renders an explicit error and GET-only retry.
+- `326526f8f74172ae0aea7fa37739c9a8e8f513ec`: synthetic HTTP 503→retry→GET fixture recovery test, authored but not yet run.
 
-## Anti-duplication
-- Every PASS must match workflow head_sha to the relevant source SHA. Older run evidence remains contextual only.
-- Do not rerun #3/#4 geometry absent a new state, changed app source or reproducible bug.
-- Never invent product photos/prices/stock, API contracts or acceptance evidence.
-- No merge, main/static writes, Production deployment, Access bypass, secret access, remote D1/R2 queries/writes, setup/deploy/migration.
+## Read these live files
+1. `docs/admin-ui-reference/handoff/current-status.json`
+2. `docs/admin-ui-reference/handoff/latest-test-results.json`
+3. `docs/admin-ui-reference/handoff/LATEST-STATUS.md`
+4. `docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md`
+5. `docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md`
+6. `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`
+
+## Next actions
+Poll existing Preview runs; review screens #8 Customers, #9 Warranty/support, #10 Settings, #11 Backup/Restore and #12 Activity log against the approved reference at matching viewport/theme. Continue PR provenance review.
+
+## Guardrails
+- Only write ADMIN branch. Keep #111/#108 open/unmerged.
+- No main/static edits, Production deploy, Access bypass, secrets, setup/deploy/migration or remote D1/R2 operations.
+- No fake business data/API contracts. PASS requires exact SHA and logs/artifact; pending/no job is not PASS.
