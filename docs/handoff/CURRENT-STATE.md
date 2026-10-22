@@ -1,9 +1,9 @@
 # SinDarealest2 — CURRENT STATE
-Updated: 2026-10-22 10:35 UTC. Read this file first in every new chat.
+Updated: 2026-10-22 11:05 UTC. Read this file first in every new chat.
 
 ## Latest visual-review checkpoint — 2026-10-22 10:35 UTC
 
-- Live GitHub state at review start: branch and PR #108 HEAD were `7455b50179f3fa0babebab84266b67a53b8b6231`; PR #108 remains OPEN and NOT MERGED. Comparing `e916ce590b6dbd720dca51405097d20333ce649b` to that HEAD showed 12 commits ahead with reported changes confined to documentation/report files, not storefront source.
+- Live GitHub state at this review: branch and PR #108 HEAD `666ac0e65b81317d232ae526d3327e498a8b3f76`; PR #108 remains OPEN and NOT MERGED. Comparing `e916ce590b6dbd720dca51405097d20333ce649b` to this HEAD shows 19 commits ahead; changed files are documentation/report files only, no storefront source.
 - Newer screenshot artifact: workflow run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821), artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837). It contains 128 real Preview captures, all 8 viewport/theme pairs, 13 route checks, zero recorded hard failures/failed requests, plus fresh copies of both mobile references and both icon boards.
 - **Exact-deployment verification did not pass for that artifact.** `deployment-verification.json` says `DEPLOYMENT_METADATA_UNVERIFIED`: expected `e916ce590b6dbd720dca51405097d20333ce649b`, while the Preview alias metadata returned deployment `3e174ea2-9b58-4801-9f98-f8f941280cc0` with commit `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. The screenshot artifact is suitable for observational visual review because the intervening commits compare as docs-only, but it is **not** a new exact-SHA verification. The last exact-SHA-verified live audit remains run [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036), artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814), SHA `fc406599e04475e232fad790efd03d46979a5a20`.
 - Actual screenshots inspected: home across 360×800, 390×844, 768×1024 and 1440×900 in Light/Dark; first-paint splash; six benefit tiles; mobile product detail/gallery and next-image state; icon pressed state in Light/Dark; account, cart-with-item, checkout form, Zalo CTA, footer/contact and 404. The owner-supplied `/images/hero-sd-gl052.png` is present. The icon boards `Icon.png` and `Chitiet.png` were opened from the artifact; the sampled home/detail controls use outlined icon artwork and the favorite pressed tint is consistent with the blue/navy reference palette. This is not a claim that every icon state is fully accepted.
@@ -24,7 +24,7 @@ Updated: 2026-10-22 10:35 UTC. Read this file first in every new chat.
 - Docs-only commits are excluded from Preview deploy/live-capture push triggers by workflow `paths-ignore: docs/**`. A docs-only handoff commit must not be presented as a new deployed storefront.
 
 ## Latest live run refresh (2026-10-22 UTC)
-- Branch/PR head at this refresh: `99eadd224de1da319598998028ebdcdfda4d495a`; PR #108 remains OPEN, not merged. Fetch again before acting because this branch has been receiving rapid documentation-only commits.
+- HISTORICAL: branch/PR head was `99eadd224de1da319598998028ebdcdfda4d495a` before later documentation-only commits. Current verified head at this refresh is `666ac0e65b81317d232ae526d3327e498a8b3f76`; fetch again before acting.
 - HISTORICAL at prior refresh: run #39762445821 was IN_PROGRESS. It has since completed; see the Latest visual-review checkpoint above. Its screenshot artifact is observational only because the artifact's deployment metadata did not match the expected SHA.
 - CI [#39762468528](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762468528) passed for `2bd71f55d1c473852d9bfe5f39b701943ce464d0`; current HEAD advanced later via docs-only edits. The next chat must refresh CI and deployment status rather than transfer this PASS to the current HEAD.
 - Root-level `AUDIT-REPORT-2026-10-17.md`, `UPGRADE-REPORT.md`, and `INTEGRITY-REPORT.md` now carry historical-report banners. They remain for traceability, not as current storefront handoff.
@@ -48,10 +48,10 @@ Updated: 2026-10-22 10:35 UTC. Read this file first in every new chat.
 - Gallery arrow press: 4/4 PASS in that audit (detail/fullscreen, Light/Dark; vertical center shift <=1px; press scale ~0.97; Next/Previous returns to original image).
 - Fly-to-cart: 6/6 PASS and animation edge cases 2/2 in that audit. Preserve animation capture behavior; do not reopen without new contrary evidence.
 - Visual parity is NOT complete. Must inspect real screenshots against `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` and `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`.
-- Icon redesign is NOT declared complete until `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` are freshly opened and compared against actual live Preview screenshots in the current audit artifact. A prior checkpoint says they were inspected, but this acceptance gate still needs explicit current evidence.
-- Check “Tuyển chọn 25” and other multi-image product galleries for main-image/thumbnail consistency. Visual concern is UNVERIFIED; do not modify product/image mapping without trusted source evidence.
+- Icon redesign is NOT declared complete. Both `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` were freshly opened from artifact #12418823837 and compared with sampled live Preview home/detail states on 2026-10-22; sampled icons broadly align, but remaining icon contexts and exact-SHA capture are still required.
+- “Tuyển chọn 25” gallery has a CONFIRMED visible image inconsistency in artifact #12418823837 (image 01/19 black boots; image 02/19 different green/white sneaker). Do not modify product/image mapping without trusted catalog evidence and authorization; retain as a scope-locked dependency.
 - Six Liquid Glass tiles must have three glass layers; do not blur the whole page. Review satin folds, header/logo/hero, trust section, catalog/search/cards, product detail/gallery, cart/account/checkout, Zalo, footer and 404 in all 8 viewport/theme pairs.
-- Approximate progress: 88% is a planning estimate only, not an audit score. Recalculate from current evidence; never claim 100% while visual differences remain.
+- Approximate progress: 88% remains a planning estimate only, not an audit score. The actual screenshot review now covers the 8 home viewport/theme pairs and key states; visual and icon parity remain open.
 
 ## Required viewport/theme matrix
 360×800, 390×844, 768×1024, 1440×900 × Light and Dark = 8 combinations.
