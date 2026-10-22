@@ -376,6 +376,15 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 @media(max-width:760px){.nav{position:relative;padding-left:48px!important}.menu-btn{position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}.nav-actions{margin-left:auto}}
 
 
+
+/* Dark hero: softly feather the owner-supplied image's matte at the perimeter without replacing, recoloring, or hiding the product. */
+html.dark #home .hero-visual img:not([hidden]){
+  -webkit-mask-image:radial-gradient(ellipse 56% 78% at 62% 50%,#000 48%,rgba(0,0,0,.98) 58%,rgba(0,0,0,.78) 72%,rgba(0,0,0,.30) 88%,transparent 100%);
+  mask-image:radial-gradient(ellipse 56% 78% at 62% 50%,#000 48%,rgba(0,0,0,.98) 58%,rgba(0,0,0,.78) 72%,rgba(0,0,0,.30) 88%,transparent 100%);
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+}
+
 </style>
 
 
