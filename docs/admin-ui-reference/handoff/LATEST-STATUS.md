@@ -30,3 +30,11 @@ Next: fetch the post-documentation HEAD and its exact SHA run; then audit #6/#7 
 - Responsive/Preview #4741: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281 — IN_PROGRESS on exact HEAD at last poll. Chromium/Playwright and final Preview smoke are NOT VERIFIED; inspect final job/log/artifact before claiming visual acceptance.
 - Added a read-only Activity Log screen using existing `GET /api/admin/audit-logs`, search/action filter/refresh/error state and server-limit disclosure. Source + unit test PASS; visual and authenticated QA NOT VERIFIED.
 - Progress remains **50% PROVISIONAL**. No merge, Production deploy, remote migration, D1/R2 write, Access bypass or static-branch change.
+
+
+## Live checkpoint update — 2026-10-22T20:25:00+07:00
+- ADMIN HEAD: `78697c759185e04f58cdf2ac629fdb368204a3b8`; PR #111 OPEN/unmerged. PR #108 OPEN/unmerged.
+- Source validation #39785571172 completed SUCCESS on exact HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39785571172.
+- Preview diagnostic #39784873281 remains IN_PROGRESS on older SHA `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; capture and deployed Preview diagnostic steps were pending at last poll. Do not treat it as current-HEAD visual evidence.
+- Activity Log source implemented; visual and authorized live-data QA NOT VERIFIED.
+- Progress remains **50% PROVISIONAL**. No merge, Production deploy, remote migration or writes.

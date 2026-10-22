@@ -62,3 +62,10 @@ Payment-transaction handler validates amounts/references, rejects duplicates, bl
 Confirmed: exact-source check and unit tests passed on the recorded pre-write HEAD; 0009 preflight and ordering guards exist; payment route safeguards have local test coverage. Not verified: remote schema/ledger, exact-current-HEAD responsive/Preview, authenticated business-module QA, complete PR ancestry and all 12 screen acceptances.
 
 Next safe work: audit Orders #6 and Order detail #7 independently, continue remaining screens and PR path provenance. Keep both PRs OPEN/unmerged. No main/static edits, Production, Access bypass, secrets, remote D1/R2, setup/deploy/migration. AI grouping BLOCKED; R2 image save and PRE/PRO migrations DEFERRED_BY_OWNER.
+
+
+## Live verification addendum — 2026-10-22T20:25:00+07:00
+- PR #111 head confirmed as `78697c759185e04f58cdf2ac629fdb368204a3b8`, OPEN/unmerged. Source workflow #39785571172 SUCCESS on exact HEAD.
+- Preview workflow #39784873281 remains in progress on parent SHA `340f50d6...`; final browser/Preview results are not current-head evidence.
+- No migration, remote D1/R2 write, setup/deploy script, Production deployment or Access bypass was performed. Migration 0009 remains DEFERRED_BY_OWNER; PRE/PRO migrations and R2 save remain deferred; AI image grouping remains blocked pending approved contract.
+- PR scope audit is not complete merely because source CI is green. Continue reviewing migration/API/deploy diffs and inherited commits; do not revert blindly.

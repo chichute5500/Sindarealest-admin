@@ -5,29 +5,28 @@
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "capturedAt": "2026-10-22",
-  "currentHeadAtCheckpoint": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+  "currentHeadAtCheckpoint": "78697c759185e04f58cdf2ac629fdb368204a3b8",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "305fc139c22d682b4b6882af18d6d79836887cc7",
   "progressPercent": 50,
-  "progressBasis": "50% PROVISIONAL. Exact-HEAD source checks and unit tests pass, but exact-HEAD responsive/Preview run is still in progress, full 12-screen visual acceptance and authenticated business-module QA remain incomplete.",
+  "progressBasis": "50% PROVISIONAL. Source workflow passed on exact HEAD; responsive/Preview evidence and independent 12-screen acceptance remain incomplete.",
   "currentHeadValidation": {
-    "status": "PASS_SOURCE_CHECKS_AND_UNIT_TESTS; RESPONSIVE_PREVIEW_IN_PROGRESS",
-    "liveHead": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+    "status": "SOURCE_WORKFLOW_PASS; PREVIEW_VISUAL_QA_NOT_VERIFIED",
+    "liveHead": "78697c759185e04f58cdf2ac629fdb368204a3b8",
     "sourceWorkflow": {
-      "id": 39784873315,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315",
-      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
-      "conclusion": "success",
-      "checks": "npm run check PASS; npm test PASS; log confirmed activity-log regression assertion"
+      "id": 39785571172,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39785571172",
+      "sha": "78697c759185e04f58cdf2ac629fdb368204a3b8",
+      "status": "completed",
+      "conclusion": "success"
     },
-    "visualWorkflow": {
+    "previewWorkflow": {
       "id": 39784873281,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281",
       "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
-      "status": "IN_PROGRESS",
+      "status": "in_progress",
       "conclusion": null,
-      "jobId": 119845280271,
-      "steps": "repo checks and automated tests success; job continues in Playwright/Chromium stage; final Playwright and Preview smoke outcomes not yet verified"
+      "details": "Job still in progress; screenshot matrix and deployed Preview diagnostic steps pending at last poll. This is an older SHA and does not validate current HEAD."
     }
   },
   "latestResponsiveThemePreviewEvidence": {
@@ -382,35 +381,37 @@
   },
   "passPolicy": "Only count workflow evidence for the exact commit it tested. npm checks/green CI do not independently accept any screen.",
   "latestLiveCheckpoint": {
-    "head": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+    "timestamp": "2026-10-22T20:25:00+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "head": "78697c759185e04f58cdf2ac629fdb368204a3b8",
     "pr111": "OPEN/unmerged",
-    "pr108": "OPEN/unmerged; no writes to static branch",
+    "pr108": "OPEN/unmerged",
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL",
     "sourceRun": {
-      "id": 39784873315,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315",
-      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
-      "conclusion": "success",
-      "checks": "npm run check PASS; npm test PASS; log confirmed activity-log regression assertion"
+      "id": 39785571172,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39785571172",
+      "sha": "78697c759185e04f58cdf2ac629fdb368204a3b8",
+      "status": "completed",
+      "conclusion": "success"
     },
     "previewRun": {
       "id": 39784873281,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281",
       "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
-      "status": "IN_PROGRESS",
+      "status": "in_progress",
       "conclusion": null,
-      "jobId": 119845280271,
-      "steps": "repo checks and automated tests success; job continues in Playwright/Chromium stage; final Playwright and Preview smoke outcomes not yet verified"
+      "details": "Job still in progress; screenshot matrix and deployed Preview diagnostic steps pending at last poll. This is an older SHA and does not validate current HEAD."
     },
     "activityLog": {
-      "status": "IMPLEMENTED_SOURCE_AND_UNIT_TESTED; VISUAL/AUTHENTICATED_QA_NOT_VERIFIED",
-      "files": [
-        "public/admin/index.html",
-        "tests/admin-upgrade.test.mjs"
-      ],
-      "description": "Read-only activity log route uses existing GET /api/admin/audit-logs; search, action filter, refresh, error state, server limit disclosed; reachable from desktop navigation and mobile More; no new API/contract/mock data"
+      "source": "IMPLEMENTED; source workflow passed on exact HEAD",
+      "visualAndAuthenticatedQA": "NOT VERIFIED"
     },
-    "progressPercent": 50,
-    "progressStatus": "PROVISIONAL"
+    "nextActions": [
+      "Review exact-HEAD source run #39785571172 logs for step-level results.",
+      "Poll Preview run #39784873281 only as evidence for SHA 340f50d6; do not attribute it to current HEAD.",
+      "Verify a safe screenshot/Preview run for current HEAD; no Production deployment.",
+      "Continue independent 12-screen acceptance and PR scope audit without repeating valid exact-SHA tests."
+    ]
   }
 }

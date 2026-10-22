@@ -39,3 +39,10 @@
 - Screen #12 Activity log: **NOT VERIFIED (visual/authenticated QA)**. Source change adds a dedicated read-only page using existing `GET /api/admin/audit-logs`, search, action filter, refresh, load-error state, 200-record limit disclosure, desktop navigation and mobile “Khác”. Regression assertions passed in exact-HEAD source workflow. This is not sufficient to mark the screen PASS without viewport screenshots and authorized Preview/business-data verification.
 - Exact-HEAD responsive/Preview workflow #4741 remains IN_PROGRESS at checkpoint: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281. Do not infer screen acceptance from unit-test success.
 - Progress remains 50% PROVISIONAL; no new screen receives PASS without screen-specific evidence.
+
+
+## Latest checkpoint — 2026-10-22T20:25:00+07:00
+- Source HEAD: `78697c759185e04f58cdf2ac629fdb368204a3b8`. Exact-HEAD source workflow #39785571172 completed SUCCESS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39785571172.
+- Activity Log (#12): source implemented; visual layout, mobile interaction and authorized live-data behavior remain NOT VERIFIED. Do not mark PASS from unit tests alone.
+- Preview diagnostic #39784873281 is IN_PROGRESS on older SHA `340f50d6...`; screenshot/Preview steps were pending at last poll and are not current-HEAD evidence.
+- Progress remains 50% PROVISIONAL. Each screen needs its own SHA, viewport, artifact/workflow URL, scope and limitations.

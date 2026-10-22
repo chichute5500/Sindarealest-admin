@@ -43,3 +43,12 @@ Mapping chuẩn: #1 Login, #2 Dashboard, #3 Product list, #4 Product editor, #5 
 - Implemented a dedicated read-only Activity Log screen in `public/admin/index.html`, with regression assertions in `tests/admin-upgrade.test.mjs`. It uses existing authenticated GET `/api/admin/audit-logs`; includes search/action filter/manual refresh/error state, declares the 200-record server limit, and is reachable from desktop nav and mobile “Khác”. No new API contract, fake business data, remote writes, migration, or deployment.
 - Activity Log source/unit tests: PASS at `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; visual/mobile/desktop and authenticated live-data QA: NOT VERIFIED. Do not mark screen #12 PASS based on source tests.
 - Keep progress **50% PROVISIONAL**. Next: (1) poll #4741 and inspect artifacts; (2) only fix reproducible source defects; (3) update screen #12 evidence after actual screenshots/Preview access; (4) continue remaining screen audit and PR scope audit without repeating valid exact-SHA checks.
+
+
+## Latest verified handoff update — 2026-10-22T20:25:00+07:00
+- ADMIN branch HEAD and PR #111 head: `78697c759185e04f58cdf2ac629fdb368204a3b8`. PR #111 OPEN/unmerged; PR #108 OPEN/unmerged. Do not edit static branch.
+- Exact-HEAD source workflow #39785571172 completed SUCCESS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39785571172. Inspect job logs for step-level details; do not reuse an older SHA's results as current-HEAD evidence.
+- Preview diagnostic #39784873281 remains IN_PROGRESS on older SHA `340f50d6ed79afbe11e1db36c878c58f4eec77d6`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281. Screenshot/deployed Preview steps were pending at last poll; it does not validate current HEAD.
+- Activity Log screen exists in `public/admin/index.html` with regression assertions in `tests/admin-upgrade.test.mjs`; uses existing `GET /api/admin/audit-logs`, search, action filter, refresh, error state, 200-record limit disclosure, desktop nav and mobile More. Visual and authorized live-data QA remain NOT VERIFIED.
+- Progress remains **50% PROVISIONAL**. Next: inspect exact-HEAD source logs; obtain safe Preview evidence on current HEAD; record separate PASS/FAIL/BLOCKED/NOT VERIFIED for all 12 screens; continue PR scope audit.
+- Safety: no merge, Production deploy, Access bypass, secrets, remote D1/R2 writes, migration/setup execution, fake data or unapproved API contract. Migration 0009, PRE/PRO migrations, R2 save and AI grouping remain deferred/blocked.
