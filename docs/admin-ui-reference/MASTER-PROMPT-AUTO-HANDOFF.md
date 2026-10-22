@@ -1,5 +1,7 @@
 # SINDAREALEST ADMIN — MASTER PROMPT (LIVE)
 
+> **Single entry point for a new chat:** read [`handoff/START-HERE.md`](handoff/START-HERE.md) first. The owner should only need to send its one-line starter, not paste this master prompt or historical notes. Fetch live GitHub state before acting; embedded SHAs are historical. Current known issue to triage: Preview workflow `39804852604` overall failed because local Playwright timed out waiting for `[data-action="retry-customers"]` at `tests/e2e/admin-static-baseline.spec.js:1940`, while the deployed Preview diagnostic step itself passed. Inspect [artifact 12437154740](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604/artifacts/12437154740).
+
 ## Mission
 Tiếp tục làm việc thực tế trên GitHub, không chỉ phân tích/báo cáo. Sau mỗi checkpoint tự chuyển sang task an toàn tiếp theo; chỉ dừng khi cần quyết định/quyền từ chủ dự án hoặc hết nhiệm vụ an toàn.
 
