@@ -1273,6 +1273,88 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
       await page.evaluate(() => window.scrollTo(0, 0));
       await expect(page.locator('#main .pagehead')).toBeInViewport();
+
+      // Capture the customer list at narrower Android widths as well as 390px.
+      // Customer data stays synthetic; no avatar/photo is invented and no API write is allowed.
+      if (variant.viewport.width === 390 && variant.theme === 'light') {
+        const originalViewport = variant.viewport;
+        for (const narrowViewport of [{ width: 320, height: 640 }, { width: 360, height: 800 }]) {
+          for (const narrowTheme of ['light', 'dark']) {
+            await page.setViewportSize(narrowViewport);
+            await chooseTheme(narrowTheme);
+            await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+            await page.evaluate(() => {
+              window.scrollTo(0, 0);
+              if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+            });
+            await expect(page.locator('#main .pagehead')).toBeVisible();
+            await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
+            const customerLayout = await page.evaluate(() => {
+              const main = document.querySelector('#main');
+              const table = document.querySelector('#main .customer-table');
+              if (!main || !table) throw new Error('Customer list layout is missing');
+              const rect = element => {
+                const box = element.getBoundingClientRect();
+                return { left: box.left, right: box.right, width: box.width };
+              };
+              return {
+                viewportWidth: window.innerWidth,
+                documentScrollWidth: document.documentElement.scrollWidth,
+                bodyScrollWidth: document.body.scrollWidth,
+                mainClientWidth: main.clientWidth,
+                mainScrollWidth: main.scrollWidth,
+                tableClientWidth: table.clientWidth,
+                tableScrollWidth: table.scrollWidth,
+                main: rect(main),
+                table: rect(table),
+                rows: [...table.querySelectorAll('tbody tr')].map(row => ({
+                  ...rect(row),
+                  clientWidth: row.clientWidth,
+                  scrollWidth: row.scrollWidth,
+                  cells: [...row.querySelectorAll('td')].map(cell => ({
+                    text: (cell.innerText || '').trim().slice(0, 80),
+                    clientWidth: cell.clientWidth,
+                    scrollWidth: cell.scrollWidth,
+                    clientHeight: cell.clientHeight,
+                    scrollHeight: cell.scrollHeight,
+                    left: cell.getBoundingClientRect().left,
+                    right: cell.getBoundingClientRect().right
+                  }))
+                }))
+              };
+            });
+            expect(customerLayout.documentScrollWidth,
+              'Customer screen must not create document-level horizontal overflow: ' + JSON.stringify(customerLayout))
+              .toBeLessThanOrEqual(narrowViewport.width);
+            expect(customerLayout.bodyScrollWidth,
+              'Customer screen must not overflow the body horizontally: ' + JSON.stringify(customerLayout))
+              .toBeLessThanOrEqual(narrowViewport.width);
+            expect(customerLayout.mainScrollWidth,
+              'Customer content area must not overflow horizontally: ' + JSON.stringify(customerLayout))
+              .toBeLessThanOrEqual(customerLayout.mainClientWidth + 1);
+            expect(customerLayout.tableScrollWidth,
+              'Mobile customer table/cards must fit the available width: ' + JSON.stringify(customerLayout))
+              .toBeLessThanOrEqual(customerLayout.tableClientWidth + 1);
+            expect(customerLayout.table.left).toBeGreaterThanOrEqual(customerLayout.main.left - 1);
+            expect(customerLayout.table.right).toBeLessThanOrEqual(customerLayout.main.right + 1);
+            for (const row of customerLayout.rows) {
+              expect(row.left, 'Customer card should stay inside its table bounds').toBeGreaterThanOrEqual(customerLayout.table.left - 1);
+              expect(row.right, 'Customer card should stay inside its table bounds').toBeLessThanOrEqual(customerLayout.table.right + 1);
+              expect(row.scrollWidth, 'Customer card should not clip long contact text: ' + JSON.stringify(row)).toBeLessThanOrEqual(row.clientWidth + 1);
+              for (const cell of row.cells) {
+                expect(cell.scrollWidth, 'Customer field should wrap within its cell: ' + JSON.stringify(cell)).toBeLessThanOrEqual(cell.clientWidth + 1);
+                expect(cell.right, 'Customer field should remain inside viewport').toBeLessThanOrEqual(narrowViewport.width + 1);
+              }
+            }
+            await saveScreenshot('customers-responsive', { viewport: narrowViewport, theme: narrowTheme }, {
+              fixtureCustomers: 2, noHorizontalOverflow: true, noFabricatedAvatars: true, responsiveCustomerAudit: true
+            });
+          }
+        }
+        await page.setViewportSize(originalViewport);
+        await chooseTheme(variant.theme);
+        await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+      }
     }, true);
     await captureView('warranties', 'warranties', async variant => {
       // Screen #10: synthetic, read-only warranty list/filter and accessible issue disclosure.
