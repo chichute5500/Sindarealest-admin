@@ -21,6 +21,7 @@ PLATFORM_EDGE_RADIUS = 58
 PLATFORM_INNER_BLUR = 18
 
 # Polygons wrap the visible shoe silhouettes with a small safety margin.
+# [capture-review] Validate the platform-edge feather on the exact deployed Preview SHA.
 # Coordinates are expressed against the supplied 1200 x 1600 reference canvas
 # and scaled proportionally if the owner ever replaces the source asset.
 LEFT_SHOE = [
