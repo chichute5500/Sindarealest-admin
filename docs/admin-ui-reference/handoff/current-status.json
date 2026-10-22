@@ -149,8 +149,9 @@
     "artifactId": 12405720936,
     "branchHeadBeforeHandoffRefresh": "de42931e1d41606d65703b5115ff49fed41cf814",
     "currentHeadIsTestedSource": false,
-    "finalSevenFileReadback": "PENDING_AFTER_ATOMIC_HANDOFF_COMMIT",
-    "progressPercent": 50
+    "finalSevenFileReadback": "PASS_READBACK_ALL_SEVEN_FILES_FROM_GITHUB",
+    "progressPercent": 50,
+    "handoffDocsCommitSha": "58724af27af11366fdbe71567ec43a5346452942"
   },
   "latestContinuationCycle": {
     "updatedAt": "2026-10-22T13:09:49+07:00",
@@ -177,7 +178,9 @@
     "all12Parity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED",
     "progressPercent": 50,
-    "nextAction": "Review #4 desktop drawer and fixed footer; continue #3 reference parity."
+    "nextAction": "Review #4 desktop drawer and fixed footer; continue #3 reference parity.",
+    "handoffDocsCommitSha": "58724af27af11366fdbe71567ec43a5346452942",
+    "finalSevenFileReadback": "PASS_READBACK_ALL_SEVEN_FILES_FROM_GITHUB"
   },
   "continuationHistory": [
     {
