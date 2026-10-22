@@ -26,15 +26,29 @@ assert.ok(visualAudit.includes("startup.heroImage.status === 'hero-presentation-
   && visualAudit.includes("startup.heroImage.source.includes('/images/hero-sd-gl052.png')"),
   "The local audit must require the presentation asset to load and remain visible independent of SKU verification.");
 
-const lastHeroImageRule = html.slice(html.lastIndexOf("/* Keep the exact product crisp and blend it into the satin-glass background"));
-assert.ok(lastHeroImageRule.includes("#home .hero-visual img{mix-blend-mode:normal!important;opacity:1!important;filter:drop-shadow"),
-  "The hero product should retain its real colors and use a natural drop shadow rather than color-altering blending.");
-assert.ok(lastHeroImageRule.includes("object-fit:contain!important;object-position:center right!important"),
-  "The product must remain fully visible without being cropped on mobile.");
-assert.ok(lastHeroImageRule.includes("rgba(237,247,255,0) 64%)"),
-  "The text-side veil must fade before covering the product side of the hero.");
-assert.ok(lastHeroImageRule.includes("rgba(4,20,34,0) 64%)"),
-  "The dark-theme veil must also preserve product visibility.");
+const styleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
+const heroImageRules = [...styleContents.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  .filter(([, selector]) => selector.includes(".hero-visual img"));
+assert.ok(heroImageRules.length >= 5, "The hero display contract must cover base, responsive, and theme-specific CSS rules.");
+for (const [, selector, declarations] of heroImageRules) {
+  for (const declaration of declarations.split(";").map(value => value.trim()).filter(Boolean)) {
+    const effect = declaration.match(/^(-webkit-)?(filter|mask(?:-image)?|clip-path|mix-blend-mode|opacity|transform)\s*:\s*(.*?)\s*$/i);
+    if (!effect) continue;
+    const property = effect[2].toLowerCase();
+    const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
+    const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
+      || (property === "mix-blend-mode" && value === "normal")
+      || (property === "opacity" && value === "1"));
+    assert.ok(neutral, "Hero image CSS must not apply visual effects (" + selector.trim() + ": " + declaration + ").");
+  }
+  assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied hero asset must never be cropped.");
+}
+assert.ok(html.includes("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
+assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
+assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
+assert.ok(html.includes("#home .hero-visual::before,#home .hero-visual::after,#home.hero:after"));
+assert.ok(html.includes("grid-template-columns:minmax(0,1fr)!important") && html.includes("height:auto!important;max-width:100%!important;max-height:360px!important"),
+  "On mobile, the hero image must sit in its own row and display its full source without cropping or overlays.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")

@@ -260,27 +260,37 @@ assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/
   'Theme switching must not animate expensive backdrop-filter changes across glass surfaces.');
 
  
-// The hero must reveal the satin texture beneath a readable, non-opaque text veil.
-const satinHeroVisibility = html.slice(html.lastIndexOf('/* Satin visibility correction:'));
-assert.match(satinHeroVisibility, /#home\.hero\.wrap\{\s*background:rgba\(246,251,255,\.20\)!important;/,
-  'Light hero surface must be transparent enough to reveal satin folds.');
-assert.match(satinHeroVisibility, /html\.dark #home\.hero\.wrap\{\s*background:rgba\(7,27,45,\.22\)!important;/,
-  'Dark hero surface must reveal the navy satin texture.');
-assert.match(satinHeroVisibility, /rgba\(237,247,255,\.90\) 0%,rgba\(237,247,255,\.82\) 28%,rgba\(237,247,255,\.64\) 48%,rgba\(237,247,255,\.42\) 66%,rgba\(237,247,255,\.18\) 84%/,
-  'Light mobile hero veil must keep copy readable where the product image overlaps while revealing satin and the full product toward the right.');
-assert.match(satinHeroVisibility, /rgba\(4,20,34,\.80\) 0%,rgba\(4,20,34,\.70\) 28%,rgba\(4,20,34,\.52\) 48%,rgba\(4,20,34,\.34\) 66%,rgba\(4,20,34,\.14\) 84%/,
-  'Dark mobile hero veil must keep copy readable where the product image overlaps while revealing satin and the full product toward the right.');
-
-// The supplied hero asset contains a studio tabletop; blend the desktop image's lower edge into the satin canvas.
-const desktopHeroEdgeBlend = html.slice(html.indexOf('/* sd-hero-desktop-floor-blend-2026-10-22:'));
-assert.ok(desktopHeroEdgeBlend.includes('@media(min-width:761px)'), 'The photo-edge fade must be restricted to desktop.');
-assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual::after'), 'The photo-edge fade must not replace or mutate the supplied image asset.');
-assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(237,247,255,0) 52%,rgba(237,247,255,.02) 58%,rgba(237,247,255,.08) 64%,rgba(237,247,255,.14) 72%,rgba(237,247,255,.24) 84%,rgba(237,247,255,.36) 100%)'),
-  'Light desktop hero must fade the source photo tabletop into satin without replacing the owner-supplied image.');
-assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(4,20,34,0) 52%,rgba(4,20,34,.02) 58%,rgba(4,20,34,.07) 64%,rgba(4,20,34,.13) 72%,rgba(4,20,34,.24) 84%,rgba(4,20,34,.36) 100%)'),
-  'Dark desktop hero must fade the source photo tabletop into the navy satin canvas.');
-assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual-caption{position:absolute;z-index:3}'),
-  'The hero caption must remain above the photo edge blend.');
+// The owner-supplied Hero is a standalone presentation asset; overlays and edge masks are forbidden.
+const heroStyleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
+const heroImageDeclarations = [...heroStyleContents.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  .filter(([, selector]) => selector.includes(".hero-visual img"));
+assert.ok(heroImageDeclarations.length >= 5, "The protected hero must retain responsive display rules.");
+for (const [, selector, declarations] of heroImageDeclarations) {
+  assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied image must not be cropped.");
+  for (const declaration of declarations.split(";").map(value => value.trim()).filter(Boolean)) {
+    const effect = declaration.match(/^(-webkit-)?(filter|mask(?:-image)?|clip-path|mix-blend-mode|opacity|transform)\s*:\s*(.*?)\s*$/i);
+    if (!effect) continue;
+    const property = effect[2].toLowerCase();
+    const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
+    const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
+      || (property === "mix-blend-mode" && value === "normal")
+      || (property === "opacity" && value === "1"));
+    assert.ok(neutral, "Hero image must remain visually untouched (" + selector.trim() + ": " + declaration + ").");
+  }
+}
+const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
+assert.ok(heroAssetDisplayLock.includes("filter:none!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
+  "The protected Hero image must render without CSS filters or masks.");
+assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
+  "The protected Hero image must retain its original colour and opacity.");
+assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
+  "The protected Hero image must be fully visible with no crop or transform.");
+assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,#home .hero-visual::after,#home.hero:after{"),
+  "Gloss, tabletop fade, and text-side veil overlays must not cover the owner-supplied image.");
+assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
+  "No page caption may cover any portion of the supplied image.");
+assert.ok(heroAssetDisplayLock.includes("position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important"),
+  "On mobile, the image must occupy its own row instead of being composited beneath hero text.");
 
 // Reference-driven icon pass: replace the five text glyphs in order flow/aftercare with coherent 24x24 SVG strokes.
 const orderIconMarkup = [...html.matchAll(/<span class="order-icon" aria-hidden="true">([\s\S]*?)<\/span>/g)].map(match => match[1]);
