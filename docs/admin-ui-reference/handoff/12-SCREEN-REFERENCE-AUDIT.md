@@ -1,3 +1,12 @@
+## LIVE HANDOFF POINTER — 2026-10-22 21:20 +07:00
+
+- ADMIN branch HEAD before this docs-only update: `706dd4bccb31b45c9fbaa64cb905d12078812101`; PR #111 OPEN/unmerged and matched. The latest source/test evidence remains `2cf894e476b85e77b646b4bb45596e263a9f2fb6`, not this handoff HEAD.
+- Historical Validate #39756606343 PASS and Preview #39756606227 SUCCESS cover exact source SHA `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Preview checks login CSS signature and login/dashboard smoke only. Full 12-screen parity remains NOT_ACCEPTED; authenticated backend QA remains NOT_TESTED.
+- Prioritize screen #4 only after rechecking current source against the reference (SKU verification layout / AI description heading). The proposed fix was not committed; do not record it as completed without verifying live source.
+- Then continue screen #3 and each remaining PARTIAL screen. Use status labels and evidence per screen; fixture screenshots alone do not equal acceptance. Keep AI grouping #11 BLOCKED pending approved contract; R2 save and PRE/PRO migrations DEFERRED_BY_OWNER.
+
+---
+
 # Admin 12-screen reference audit matrix
 
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:38:06+07:00
