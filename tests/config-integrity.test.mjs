@@ -17,8 +17,8 @@ assert.ok(workflow.includes('npm run check'));
 assert.ok(workflow.includes('npm test'));
 assert.ok(workflow.includes('CLOUDFLARE_PAGES_PROJECT'));
 const setupScript = readFileSync(new URL('../scripts/setup-cloudflare.mjs', import.meta.url), 'utf8');
-assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n1/5 · Áp dụng schema SQL idempotent cho D1…'"), 'Setup must require bindings/secrets before migrations');
-assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n5/5 · Triển khai website cùng Pages Functions…'"), 'Setup must require bindings/secrets before deploy');
+assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n1/6 · Áp dụng schema SQL idempotent cho D1…'"), 'Setup must require bindings/secrets before migrations');
+assert.ok(setupScript.indexOf('bindingsReady') < setupScript.indexOf("'\\n6/6 · Triển khai website cùng Pages Functions…'"), 'Setup must require bindings/secrets before deploy');
 assert.ok(setupScript.includes('migrations/0004_admin_notifications.sql'), 'Setup must apply admin notification migration');
 assert.ok(setupScript.includes('migrations/0005_address_warranty_verification.sql'), 'Setup must apply address and warranty metadata migration');
 assert.ok(setupScript.includes('migrations/0006_remove_warranty_otp.sql'), 'Setup must apply the OTP removal migration');
@@ -34,6 +34,25 @@ assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deploy
 const deployScript = readFileSync(new URL('../scripts/deploy-cloudflare.mjs', import.meta.url), 'utf8');
 assert.ok(deployScript.includes('GITHUB_REF_NAME'), 'CI must reject deploy from a source branch different from production');
 assert.ok(deployScript.includes('CLOUDFLARE_PAGES_ORIGINALS_READY'), 'Deploy must be blocked until private ORIGINALS is verified');
+const requiredPaymentSchemaQueries = [
+  "SELECT fulfillment_type FROM products LIMIT 0;",
+  "SELECT fulfillment_type FROM order_items LIMIT 0;",
+  "SELECT payment_terms_confirmed_at, payment_terms_confirmed_by, payment_terms_note, public_access_token_hash FROM orders LIMIT 0;",
+  "SELECT id, order_id, installment_type, amount, shipping_benefit, transfer_reference, qr_image_key, bank_name, account_number, account_name, status, created_by, created_at, updated_at FROM order_payment_requests LIMIT 0;",
+  "SELECT id, order_id, payment_request_id, direction, amount, transaction_reference, note, actor, verified_at, created_at FROM order_payment_transactions LIMIT 0;",
+];
+for (const query of requiredPaymentSchemaQueries) {
+  assert.ok(setupScript.includes(query), 'Setup must verify migration 0009 schema before deployment: ' + query);
+  assert.ok(deployScript.includes(query), 'Deploy must verify migration 0009 schema before deployment: ' + query);
+}
+assert.ok(!setupScript.includes('--file=migrations/0009_fulfillment_and_manual_payments.sql'), 'Setup must not silently apply migration 0009 remotely');
+assert.ok(!deployScript.includes('--file=migrations/0009_fulfillment_and_manual_payments.sql'), 'Deploy must not apply migration 0009 automatically');
+const setupPaymentPreflight = setupScript.indexOf('Xác minh schema fulfillment/payment của migration 0009 trước khi deploy');
+const setupPagesDeploy = setupScript.indexOf("runWrangler(['pages', 'deploy'");
+assert.ok(setupPaymentPreflight >= 0 && setupPaymentPreflight < setupPagesDeploy, 'Setup must fail closed on a missing 0009 schema before Pages deployment');
+const deployPaymentPreflight = deployScript.indexOf('Xác minh schema fulfillment/payment migration 0009 trước deploy');
+const deployPagesDeploy = deployScript.indexOf("runWrangler(['pages', 'deploy'");
+assert.ok(deployPaymentPreflight >= 0 && deployPaymentPreflight < deployPagesDeploy, 'Deploy must fail closed on a missing 0009 schema before Pages deployment');
 assert.ok(setupScript.includes('originalsBucket === bucket'), 'Setup must require ORIGINALS separate from IMAGES');
 assert.ok(workflow.includes("CLOUDFLARE_PAGES_ORIGINALS_READY: 'true'"), 'Deploy may set readiness only after the mandatory verifier succeeds');
 assert.ok(workflow.indexOf('Verify Production Pages and private R2 bindings') < workflow.indexOf('Deploy to verified Cloudflare Pages project'), 'Actual production bindings must be verified before deployment');
