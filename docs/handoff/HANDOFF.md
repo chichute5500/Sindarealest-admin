@@ -1,3 +1,54 @@
+# AUTHORITATIVE HANDOFF OVERRIDE — HERO FIRST / OWNER PASS GATE
+**Updated:** 2026-10-22  
+**Priority:** This section overrides conflicting older instructions or stale assumptions elsewhere in this document. Do not remove it during future handoffs.
+
+## Non-negotiable workflow
+1. Work ONLY on the storefront Hero until the owner explicitly confirms **PASS**. Do not start unrelated visual polish, icon work, checkout/payment, catalog, or other tasks while Hero is awaiting owner approval.
+2. Fix the Hero, publish an allowed Preview deployment, verify the exact deployed source SHA, inspect the actual screenshots, then give the owner the Preview URL and evidence. Stop and wait for the owner's explicit PASS. Workflow green, HTTP 200, image load, and no overflow are not equivalent to visual PASS.
+3. After owner PASS, mark Hero **OWNER-APPROVED — LOCKED**, record the approved source SHA, deployment, and evidence in handoff docs, and do not modify Hero (asset, DOM, CSS, layout, background blending, image loading behavior, or related tests) without the owner's explicit permission.
+4. Before any work, re-check branch HEAD, PR #108 status, latest workflow runs, deployment SHA and artifacts. Historical SHAs below are clues only, never assumed current.
+5. Keep PR #108 OPEN. Never merge. Do not deploy Production or change main, DNS, D1/R2 data/config, bindings, secrets, Access, backend/API/auth, Admin, or product identity/data relationships.
+6. Do not report files as updated, code as deployed, tests as passed, or the Hero as complete without checking the actual GitHub/Preview evidence. Do not say “100%” while any gate remains open.
+
+## Hero asset — owner-authoritative definition
+- Asset: `public/images/hero-sd-gl052.png`
+- Canonical image blob SHA previously recorded: `24038214abefdac9ff2451def39f3e5bd9255462`. Re-verify before editing.
+- This is a standalone presentation image supplied by the owner. It is NOT a catalog product image, has NO SKU, is NOT tied to catalog records, and must not be treated as product data. It sits alongside presentation/icons, outside the product catalog.
+- Preserve its original bytes and pixels exactly. Never delete, hide, replace, redraw, crop, recolor, retouch, mask, filter, or otherwise alter the image itself. Never hide it to evade a visual issue.
+- The image must visually blend into the surrounding page background like the supplied reference in both Light and Dark themes. Keeping the original image does NOT mean accepting a bright rectangle/frame that visibly clashes with the page. Inspect the asset's alpha/background and use appropriate surrounding layout/CSS only. Do not ask the owner to make a new transparent image.
+- Any old note that says blending is prohibited, that a visible frame is acceptable, or that this presentation image must have a product SKU is superseded and must not be repeated.
+
+## Required source and visual audit
+- Light reference: `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png`
+- Dark reference: `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`
+- Required 8 combinations: 360×800 Light/Dark; 390×844 Light/Dark; 768×1024 Light/Dark; 1440×900 Light/Dark.
+- Inspect the effective cascade, not just the first CSS declaration. Audit the Hero DOM, every later CSS override/media query, `.hero`, `.hero-visual`, `#home .hero-visual`, image/caption rules, Light/Dark backgrounds, and `syncHeroProductImage()` including `hidden`, `src`, `onerror`, and any SKU-dependent behavior. Remove the root cause rather than stacking blind overrides.
+- Inspect actual captured screenshots against the supplied references. Confirm image visibility and background integration, content/layout, responsive behavior, Light/Dark behavior, console/runtime errors where available, and horizontal overflow. Asset load success alone is not visual parity.
+- Make only Hero-scoped changes and the minimum relevant tests/docs needed. Do not disturb the original image asset.
+
+## Handoff sequence and stop condition
+- Verify the live branch HEAD and open PR before editing. Use the existing branch `fix/liquid-glass-audit-2026-10-19`; PR: https://github.com/chichute5500/Sindarealest-admin/pull/108
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Deploy only through the permitted Preview workflow; verify exact source SHA and inspect resulting screenshots/artifacts.
+- Report commit SHA, exact deployment SHA/URL, screenshot/artifact links, tests run, and remaining differences honestly.
+- When Preview is ready, ask the owner to inspect and explicitly say PASS. Then STOP. No unrelated work until that PASS.
+- After PASS only, write `OWNER-APPROVED — LOCKED` into all handoff records and preserve the approval SHA/evidence. Any subsequent Hero modification requires explicit owner authorization.
+
+## Five-file synchronization rule
+At the end of a meaningful handoff, synchronize all of these files without erasing prior valid history:
+- `docs/handoff/CURRENT-STATE.md`
+- `docs/handoff/PROMPT-NEXT-CHAT-2026-10-22.md`
+- `docs/handoff/HANDOFF.md`
+- `docs/handoff/TEST-RESULTS.md`
+- `docs/visual-audit-progress-2026-10-19.md`
+
+When updating these documents, preserve existing evidence/history and append a dated state entry rather than replacing older records wholesale. Make the Hero-first gate and the owner-controlled lock explicit in the next-chat prompt. Verify all five files on GitHub after committing; do not claim synchronization until verified.
+
+---
+
+## State update — 2026-10-22
+The owner has explicitly directed that Hero be completed first, presented for visual verification, and left untouched after owner PASS. At this point, do not infer Hero is fixed or approved: inspect current source and fresh Preview evidence. The hero-first owner-PASS gate remains open until the owner says PASS. This documentation update itself does not alter storefront code or deploy anything.
+
 ## Verified mobile hero follow-up — 2026-10-22 (exact-SHA audit)
 
 - Latest verified source/deployment SHA: `ca233f279169aef33b7f5a0cb712816738f98ed7`.
