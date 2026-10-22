@@ -31,3 +31,15 @@ Extensions: PNG 913; MD 173; JSON 165; MJS 29; JS 26; HTML 3; YML 2; SQL 2; TXT 
 
 ## Hard limits
 No merge/force push/deploy; no main/static writes; no Access bypass or secret operations; no remote D1/R2/schema/ledger and no setup/migration/deploy script execution. Migration 0009, PRE/PRO migrations and R2/product-image save remain DEFERRED_BY_OWNER. No fabricated business data or unapproved API contracts.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: c0f420ae4a70851e05df39808597e0ac760cbc2e
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39821242400
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-346 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
