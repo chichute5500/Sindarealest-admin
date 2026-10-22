@@ -1241,6 +1241,33 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     // Product editor and image gallery are true source components. Only their input data is fixture-only.
     for (const variant of variants) {
       await openEditor(variant);
+      const skuVerifiedCheckbox = page.locator('#pSkuVerified');
+      await expect(skuVerifiedCheckbox, 'SKU verification control remains a native accessible checkbox').toBeVisible();
+      await expect(skuVerifiedCheckbox).toHaveAttribute('type', 'checkbox');
+      const skuUncheckedStyle = await skuVerifiedCheckbox.evaluate(element => {
+        const style = getComputedStyle(element);
+        return { appearance: style.appearance, width: style.width, height: style.height, radius: style.borderRadius };
+      });
+      expect(skuUncheckedStyle.appearance, 'SKU checkbox should use the custom reference-aligned control, not browser-native square chrome').toBe('none');
+      expect(skuUncheckedStyle.width).toBe('20px');
+      expect(skuUncheckedStyle.height).toBe('20px');
+      expect(skuUncheckedStyle.radius).toBe('6px');
+      await skuVerifiedCheckbox.check();
+      const skuCheckedStyle = await skuVerifiedCheckbox.evaluate(element => ({
+        checked: element.checked,
+        background: getComputedStyle(element).backgroundColor,
+        checkmarkTransform: getComputedStyle(element, '::before').transform
+      }));
+      expect(skuCheckedStyle.checked, 'SKU verification state remains keyboard-operable').toBe(true);
+      expect(skuCheckedStyle.background, 'Checked SKU state should use the ADMIN accent token').toBe(
+        await page.locator('html').evaluate(element => getComputedStyle(element).getPropertyValue('--accent').trim())
+          .then(hex => {
+            const value = hex.replace('#', '');
+            return value.length === 6 ? `rgb(${parseInt(value.slice(0,2),16)}, ${parseInt(value.slice(2,4),16)}, ${parseInt(value.slice(4,6),16)})` : '';
+          })
+      );
+      expect(skuCheckedStyle.checkmarkTransform, 'Checked SKU state should visibly render a checkmark').not.toBe('matrix(0, 0, 0, 0, 0, 0)');
+      await skuVerifiedCheckbox.uncheck();
       if (variant.viewport.width <= 680) {
         const surface = await page.locator('#backdrop>.editor').evaluate(el => {
           const rect = el.getBoundingClientRect();
