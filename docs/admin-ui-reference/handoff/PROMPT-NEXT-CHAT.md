@@ -1,22 +1,22 @@
-## PROMPT TIẾP TỤC — 2026-10-22T11:33:42+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T11:39:07+07:00
 
-Tiếp tục làm việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã kiểm thử chính xác: `28949e7b34977d05b5c593e5c98ec8223cf7f8b7`; HEAD trước commit handoff kế tiếp là `f3e7cfe4543e5b0b39e2d922c4e1df5212b30cb5`.
+Tiếp tục làm việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA mới nhất PASS: `b503ade1d7b300c38bc2ef8ccb648733215339dd`; HEAD trước handoff tiếp theo: `eb0d2f6492e1e6f91accb0f8b0a301c9510d436e`.
 
-**CI exact-SHA:**
-- Validate Source [#39722800395](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722800395) — SUCCESS.
-- Admin Preview diagnostic/Playwright [#39722800447](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722800447) — SUCCESS trên cùng SHA.
-- Artifact [admin-preview-evidence-273](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722800447/artifacts/12401448918), ID `12401448918`: 75 files, 72 PNG (71 test screenshots + 1 reference image), 47 fixture metrics; metadata completed; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
-- Local source Playwright 3/3 PASS; configured Preview login/dashboard 2/2 PASS. Full backend business CRUD, product save and actual image upload remain NOT TESTED.
-- Change: QR file-picker test now checks local filename feedback, no implicit upload on selection, local “no file selected” error, and no upload request/write. All progress remains 50%; 12-screen parity NOT ACCEPTED.
+**Exact-SHA evidence**
+- Validate Source [#39723373757](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373757) — SUCCESS.
+- Admin Preview/Playwright [#39723373723](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723) — SUCCESS trên cùng SHA.
+- Artifact [admin-preview-evidence-274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723/artifacts/12401304184), ID `12401304184`: 79 files, 76 PNG (75 test screenshots + 1 reference), 51 fixture metrics. Metadata complete; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Local source Playwright 3/3 PASS; configured Preview login/dashboard smoke 2/2 PASS. This is not full business CRUD/save/upload QA.
+- Customers #9 responsive audit added at 320×640 and 360×800 in light/dark; all no-overflow/card-bound assertions pass and screenshots inspected. Do not fabricate customer avatars/photos. Overall progress stays 50%; all 12-screen visual parity NOT ACCEPTED.
 
-**Tiếp tục ngay — không chỉ báo cáo rồi dừng:**
-1. Fetch live ADMIN HEAD and existing Actions before further edits.
-2. Add a focused read-only responsive regression for Customers #9 at 320×640 and 360×800: check page/card bounds, no horizontal overflow, long contact fields fit or wrap inside the card. Use existing synthetic fixtures; do not add fabricated customer photos/avatars or claim data provenance.
-3. Run Validate Source and Preview/Playwright on exact source/test SHA, open artifact and inspect the customer screenshots.
-4. Update all seven handoff files in one consistent checkpoint and read all seven back from GitHub.
-5. Continue the next not-accepted screen and only change UI if screenshots/tests show a genuine gap. Keep progress 50% until actual reference parity evidence warrants a change.
+**Tiếp tục ngay**
+1. Fetch live ADMIN HEAD and Actions before modifying code.
+2. Add read-only responsive regression to Warranty #10 at 320×640 and 360×800: filter row/button bounds, order/warranty identifiers and no document/card horizontal overflow. Reuse synthetic fixtures only; no product photos, business writes, or live data.
+3. Run Validate Source and Preview/Playwright on exact source/test SHA; open artifact and verify metadata/screenshots.
+4. Update all seven handoff files and read them all back from GitHub.
+5. Continue through NOT_ACCEPTED screens; do not raise progress without real parity evidence.
 
-**Rào chắn:** PR #111/#108 OPEN/UNMERGED; only ADMIN branch; no main/static edits, merge/cherry-pick/force-push/branch sync, Production deploy, secrets/Access changes/bypass, remote D1/R2/SQL/migration/setup/deploy/infra, or TinyFish. Preserve all `DEFERRED_BY_OWNER` items and never use live business data in visual fixtures.
+**Guardrails:** PR #111/#108 OPEN/UNMERGED; only ADMIN branch; no main/static-site edits, merge/cherry-pick/force-push/sync, Production deploy, secrets/Access changes or bypass, remote D1/R2/SQL/migration/setup/deploy/infra, or TinyFish. Preserve every `DEFERRED_BY_OWNER` item.
 ---
 
 ---
