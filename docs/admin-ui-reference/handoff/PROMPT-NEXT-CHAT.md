@@ -47,3 +47,12 @@ Tiếp tục công việc thực tế trên GitHub; sau mỗi checkpoint báo c�
 - Không bịa ảnh, giá, tồn kho, nghiệp vụ/API contract.
 - PASS/FAIL/BLOCKED/NOT VERIFIED phải có evidence và SHA. Không PASS toàn màn dựa riêng fixture, screenshot hoặc CI.
 - Khi status đổi đáng kể, cập nhật current-status.json, latest-test-results.json, PROMPT-NEXT-CHAT.md và audit liên quan; đọc lại GitHub sau khi ghi; tiếp tục task an toàn kế tiếp.
+
+
+## Live checkpoint — 2026-10-22
+- Live ADMIN HEAD at refresh: `f46966afe09a80540e04e5df40baf4645a777da4`; always recheck PR #111 before editing. PR #111/#108 stay OPEN and must not be merged.
+- Run #314 (`39778009734`) tested `3658ca1069616639b825de2cd7b9c714ce560901`, not necessarily current HEAD. Jobs: Audit ADMIN source, capture baselines, and diagnose Preview=success. Verify exact run head and logs before claiming PASS. Artifact inventory: admin-preview-evidence-314 (12425910948, expired=false).
+- Migration 0009 read-only preflight changes: `scripts/setup-cloudflare.mjs`, `scripts/deploy-cloudflare.mjs`, `tests/config-integrity.test.mjs`. Do not auto-apply migration; no remote setup/deploy/migration/D1/R2 writes.
+- Progress remains **50% PROVISIONAL**; docs and CI alone do not increase completion. Product list #3 is only partial; product editor #4 and other screens require independent evidence.
+- Next: verify current-HEAD CI, inspect artifact `admin-preview-evidence-311` ID `12420678829` from run `39767851318`, continue screen #4 and Orders #6/Order detail #7, then complete all 12 screens and PR scope audit.
+- Never merge #111/#108, modify `main` or static branch, deploy Production, bypass Access, inspect secrets, invent business data, or run deferred migrations. AI image grouping is BLOCKED pending approved contract; R2 save and PRE/PRO migrations are DEFERRED_BY_OWNER.
