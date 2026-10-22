@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:52:00Z",
+  "capturedAtUtc": "2026-10-22T15:54:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "progressPercent": 50,
@@ -103,5 +103,5 @@
     "Fix the confirmed test fixture/UI mismatch, then run focused Playwright and full validation on the new code SHA.",
     "Do not infer authenticated real-backend acceptance from deployed Preview diagnostic success."
   ],
-  "branchHeadShaAtHandoff": "f631596621f2ccd97727bb3ff71350121d401919"
+  "headSemantics": "Branch HEAD advances with handoff-only commits. Always fetch live branch/PR HEAD; codeTestSha remains the exact tested product revision."
 }
