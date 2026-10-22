@@ -41,3 +41,7 @@ Older status text misnumbered Category #6, AI grouping #11 and Backup/Restore #1
 - Finding: data-state mismatch prevents a fair card-density/content-parity judgment. It is not evidence that source should fabricate images, price or stock. The visible UI has search, category/fulfillment filters, publish-state chips, edit controls and pagination; full screen #3 remains NOT_ACCEPTED.
 - No source code changed in this checkpoint because no specific, reproducible ADMIN-only visual defect was established from the available fixture screenshot. Next compare the same #3 state at 320×640 and 360×800 light/dark, inspect relevant metrics, then change source only if a concrete defect independent of missing fixture data is proven.
 - This is a docs-only checkpoint, not a screen acceptance or progress increase.
+
+
+### Additional narrow-viewport review — 2026-10-22T21:12:00+07:00
+Opened artifact #311 screenshots for #3 at 320×640 light/dark and 360×800 light/dark. No clear horizontal page overflow was apparent in these captures; at 320px, product names are intentionally ellipsized and SKU/category details wrap. The same fixture-data mismatch remains, and these screenshots alone do not establish complete card/action/filter/pagination parity. Screen #3 remains NOT_ACCEPTED; no source edit justified from the evidence inspected so far.
