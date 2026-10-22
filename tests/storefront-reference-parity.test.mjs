@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 // Pin the owner-supplied hero PNG bytes, not just its path or CSS behavior.
 const ownerSuppliedHeroBytes = readFileSync(new URL('../public/images/hero-sd-gl052.png', import.meta.url));
 const ownerSuppliedHeroGitBlobSha = createHash('sha1')
-  .update(`blob ${ownerSuppliedHeroBytes.length}\\0`)
+  .update(`blob ${ownerSuppliedHeroBytes.length}\0`)
   .update(ownerSuppliedHeroBytes)
   .digest('hex');
 assert.equal(ownerSuppliedHeroGitBlobSha, '24038214abefdac9ff2451def39f3e5bd9255462',
