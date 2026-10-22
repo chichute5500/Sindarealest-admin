@@ -70,3 +70,11 @@ Status: **POTENTIAL_BLOCKER_NOT_VERIFIED**. Do not query or write remote D1/R2, 
 3. Audit setup/deploy scripts and decide whether an explicit, fail-closed local preflight/regression is justified; do not run either script.
 4. Continue the 12-screen audit independently for each official poster screen.
 5. Keep PR #111/#108 OPEN/unmerged; do not edit main/static, deploy Production, bypass Cloudflare Access, or use remote D1/R2. AI grouping is BLOCKED pending approved contract; R2 image save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+
+## Update — migration 0009 preflight and workflow review (2026-10-22)
+
+- Source commit `3658ca1069616639b825de2cd7b9c714ce560901` adds read-only `SELECT ... LIMIT 0` schema checks to `scripts/setup-cloudflare.mjs` and `scripts/deploy-cloudflare.mjs`, with regression assertions in `tests/config-integrity.test.mjs`. Both paths fail closed before Pages deploy if expected columns/tables are unavailable. No automatic migration 0009 invocation was added.
+- Workflow [#39778009734](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734) passed `npm run check`, `npm test`, responsive/theme Playwright capture, safe Preview diagnostics and artifact upload. Artifact [#314](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948) was downloaded and inspected.
+- Read-only workflow review at blob `bfc42beeb3506289975f277af95b0d4db314a0f4`: trigger limited to the ADMIN branch and relevant paths plus manual dispatch; checkout pins `${{ github.sha }}`; before evidence commit, it compares remote ADMIN branch SHA to `GITHUB_SHA` and skips stale evidence; it does not force-push. `permissions: contents: write` is workflow-wide because evidence is committed. Least-privilege scoping remains a possible improvement, but no permission edit was made without validating GitHub Actions token semantics.
+- Migration 0009 schema and payment routes are consistent for the columns queried by the preflight. Remote D1 schema remains NOT VERIFIED. No remote D1/R2 read/write, setup, deployment or migration was executed.
+- Classification: preflight gap mitigated in source and regression-tested; remote readiness is NOT VERIFIED, not PASS. Preserve inherited `scripts/setup-cloudflare.mjs` / `scripts/deploy-cloudflare.mjs`; do not revert blindly.
