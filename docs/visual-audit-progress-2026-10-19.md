@@ -1,3 +1,15 @@
+# LATEST VISUAL AUDIT CHECKPOINT — 2026-10-22
+
+Current source HEAD at checkpoint: `de62c546bab7e175347a4efb4fda5ec54c014a38`. [Current-SHA live audit #807 is pending](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501). Source validation #4448 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936598. Preview deploy #537 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936551. Admin Preview Playwright #751 PASS (read-only): https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936572.
+
+The last completed live audit is #805 / artifact 12402222013, exact SHA `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723518923. Deployment ID `4bde881b-5b48-4860-b410-ec160d6c8dd6`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. It passed 119 screenshots / 8 viewport-theme pairs / 12 route checks / 68 section checks / 8 commerce states / 4 detail contexts / 4 icon checks / 4 cart-add checks / 6 fly-to-cart checks / 2 animation edge checks / 20 first-paint frames / 4 videos. Overflow, console/page/HTTP errors, failed requests, broken images, read-only violations and hard failures were all zero.
+
+Gallery note: the #805 mobile Light next-image screenshot shows the selected white/green sneaker fully displayed, not a half-transition frame. But #805 ran before the latest stricter capture wait. Current code waits until main image source equals the active thumbnail and all gallery transition classes clear. Inspect #807's exact-SHA screenshot and first-paint video/timeline before declaring gallery capture/visual issue closed. Local fixture audit (54 screenshots, 235 fixtures, 20 responsive cases, 95 interactions) is separate from live Preview evidence.
+
+Intermediate #806 is for SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e`, not current HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487. Working estimate remains ~85%; not final acceptance. Continue without stopping after reporting.
+
+---
+
 ## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
 
 - Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
