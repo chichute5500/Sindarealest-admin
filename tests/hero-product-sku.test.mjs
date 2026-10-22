@@ -55,7 +55,7 @@ assert.ok(html.includes("#home .hero-visual::before{")
 assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
   && html.includes("grid-column:1!important;")
   && html.includes("grid-column:2!important;")
-  && html.includes("width:92%!important;height:auto!important;max-width:100%!important;max-height:210px!important;")
+  && html.includes("width:88%!important;height:auto!important;max-width:100%!important;max-height:210px!important;")
   && html.includes("object-fit:contain!important;object-position:center!important;")
   && html.includes("margin:0!important;"),
   "On mobile, hero copy and image must use separate side-by-side columns while the full source image stays centered and unprocessed.");
