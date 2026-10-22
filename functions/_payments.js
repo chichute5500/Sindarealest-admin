@@ -1,9 +1,3 @@
-export const FULFILLMENT_TYPES = Object.freeze(["in_stock", "made_to_order", "unclassified"]);
-
-export function normalizeFulfillmentType(value) {
-  return FULFILLMENT_TYPES.includes(value) ? value : "unclassified";
-}
-
 export function createOrderAccessToken() {
   // Read-only capability token for one order; store only its SHA-256 hash.
   return crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", "");
@@ -14,10 +8,6 @@ export async function hashOrderAccessToken(token) {
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
   return [...digest].map(value => value.toString(16).padStart(2, "0")).join("");
 }
-
-export function isValidPaymentBankId(value) { return typeof value === "string" && /^[a-z0-9-]{2,32}$/.test(value); }
-export function isValidPaymentAccountNo(value) { return typeof value === "string" && /^\d{6,19}$/.test(value); }
-export function isValidPaymentAccountName(value) { return typeof value === "string" && /^[A-Z0-9 ]{5,50}$/.test(value); }
 
 export function validPublicQrImageKey(value) {
   return typeof value === "string" && /^qr-[0-9a-f-]{36}\.(?:png|jpe?g|webp)$/.test(value);

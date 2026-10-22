@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normalizeFulfillmentType, summarizePaymentRows, validPublicQrImageKey, createOrderAccessToken, hashOrderAccessToken } from "../functions/_payments.js";
-import { fromRow, validateProduct } from "../functions/_lib.js";
+import { summarizePaymentRows, validPublicQrImageKey, createOrderAccessToken, hashOrderAccessToken } from "../functions/_payments.js";
+import { fromRow, normalizeFulfillmentType, validateProduct } from "../functions/_lib.js";
 const read = path => readFileSync(new URL(path, import.meta.url), "utf8");
 assert.equal(normalizeFulfillmentType("in_stock"), "in_stock");
 assert.equal(normalizeFulfillmentType("made_to_order"), "made_to_order");
