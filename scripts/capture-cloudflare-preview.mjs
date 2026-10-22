@@ -1399,6 +1399,14 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
       const previousIndex = Number.parseInt(String(previous || '').split('/')[0], 10);
       return Number.isFinite(current) && Number.isFinite(previousIndex) && current !== previousIndex;
     }, before, { timeout: 5000 });
+    // The counter changes before the CSS opacity/transform transition finishes.
+    // Wait for the selected image to be decoded and its transition state to settle
+    // so the evidence cannot capture a half-crossfaded frame that looks cropped.
+    await page.waitForFunction(() => {
+      const image = document.querySelector('#detailMainImage');
+      return image && image.complete && image.naturalWidth > 0 && !image.classList.contains('is-changing');
+    }, null, { timeout: 5000 });
+    await page.waitForTimeout(80);
     await captureLocator(page, '#productOverlay', screenshotStem('product-gallery-next', viewport, theme) + '.png', {
       ...captureMeta(viewport, theme, directState.path), captureType: 'product-gallery', state: 'next-image', productTitle: clicked.title,
     });
