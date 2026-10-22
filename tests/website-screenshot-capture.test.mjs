@@ -227,6 +227,8 @@ assert.match(live, /Welcome splash was not visible in the startup video \/ DOM t
   'The live audit must report missing welcome or early DOM timeline evidence instead of silently skipping it.');
 assert.match(live, /const galleryImageCount = await page\.locator\('#detailThumbs \.detail-thumb'\)\.count\([\s\S]*if \(galleryImageCount > 1/,
   'Gallery-next interaction must only be required when the live product actually has multiple gallery images.');
+assert.match(live, /const activeThumb = document\.querySelector\('#detailThumbs \.detail-thumb\.active img'\)[\s\S]*const transitionClasses = \[[\s\S]*'sd-slide-in-left'[\s\S]*displayedSource === selectedSource[\s\S]*transitionClasses\.some/,
+  'Gallery screenshot must wait for the displayed image to match the active thumb and every slide-transition class to settle.');
 assert.match(live, /Path derived from an actual rendered Preview product card/i,
   'Product route checks must be derived from actual Preview card navigation.');
 assert.doesNotMatch(live, /\/san-pham\/sd2929|\/sanpham\/giaytay\/sd2929/,
