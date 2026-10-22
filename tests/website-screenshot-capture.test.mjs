@@ -419,3 +419,12 @@ assert.match(storefrontHtml, /body\.sd-not-found-route\{[^}]*liquid-glass-light-
   'The 404 route must retain the branded satin backdrop in Light and Dark themes.');
 assert.match(live, /zalo\.evaluate\(el => el\.scrollIntoView\(\{ block: 'center'[\s\S]*zaloChecks/,
   'The Zalo CTA element screenshot must center the actual CTA away from fixed navigation overlays.');
+
+
+const notFoundHtml = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8');
+const redirects = readFileSync(new URL('../public/_redirects', import.meta.url), 'utf8');
+assert.match(redirects, /^\/sanpham\/\* \/index\.html 200$/m, 'Canonical product-detail routes must retain the SPA fallback.');
+assert.match(redirects, /^\/san-pham\/\* \/index\.html 200$/m, 'Legacy product-detail routes must retain the SPA fallback.');
+assert.doesNotMatch(redirects, /^\/\* \/index\.html 200$/m, 'Unknown paths must be allowed to return the real Pages 404 response.');
+assert.match(notFoundHtml, /id="notFoundTitle">404<\/h1>[\s\S]*href="\/"/, 'The real 404 document must include a heading and home link.');
+assert.match(live, /response\?\.status\(\) === 404[\s\S]*state\.hasNotFoundView/, 'The live 404 check must require HTTP status 404 and visible 404 content.');

@@ -1,3 +1,4 @@
 /admin /admin/ 301
 /admin/ /admin/index.html 200
-/* /index.html 200
+/sanpham/* /index.html 200
+/san-pham/* /index.html 200

@@ -1479,15 +1479,15 @@ async function captureSupplementalParityChecks(browser) {
     catch (error) { audit.hardFailures.push(sanitizeText('Direct not-found route navigation failed: ' + String(error.message || error))); }
     const state = await page.evaluate(() => ({
       path: location.pathname,
-      routeClass: document.body.classList.contains('sd-not-found-route'),
+      hasNotFoundView: Boolean(document.querySelector('#notFoundPage')),
       viewVisible: (() => { const el = document.querySelector('#notFoundPage'); return Boolean(el && !el.hidden && getComputedStyle(el).display !== 'none'); })(),
       heading: (document.querySelector('#notFoundTitle')?.textContent || '').trim(),
       homeHref: document.querySelector('#notFoundPage a[href="/"]')?.getAttribute('href') || null,
-    })).catch(() => ({ path: page.url(), routeClass: false, viewVisible: false, heading: '', homeHref: null }));
-    const notFoundPassed = state.routeClass && state.viewVisible && state.heading === '404' && state.homeHref === '/';
+    })).catch(() => ({ path: page.url(), hasNotFoundView: false, viewVisible: false, heading: '', homeHref: null }));
+    const notFoundPassed = response?.status() === 404 && state.hasNotFoundView && state.viewVisible && state.heading === '404' && state.homeHref === '/';
     audit.notFoundChecks.push({ path: missingPath, httpStatus: response?.status() ?? null, ...state, status: notFoundPassed ? 'PASS' : 'FAIL' });
     audit.routeChecks.push({ kind: 'not-found-route', path: missingPath, status: response?.status() ?? null, finalPath: state.path, result: notFoundPassed ? 'PASS' : 'FAIL', notFoundViewVisible: state.viewVisible });
-    if (!notFoundPassed) audit.hardFailures.push('Direct unknown route did not render the accessible 404 view.');
+    if (!notFoundPassed) audit.hardFailures.push('Direct unknown route must return HTTP 404 and render the accessible 404 view.');
     await capture(page, 'not-found-mobile-light-390x844.png', false, { ...captureMeta(viewport, theme, missingPath), captureType: 'not-found', state: 'not-found' });
 
     await page.goto(origin + '/', { waitUntil: 'domcontentloaded', timeout: 45000 });
