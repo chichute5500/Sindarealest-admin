@@ -135,3 +135,12 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 - This sync adds the explicit canonical prompt link and removes brittle coupling between the stable handoff snapshot and separately updated latest Action run records. Re-fetch Actions and only mark handoff test PASS after a green exact-SHA result.
 - The reference image could not be rendered by the available browser/tool path in this audit; therefore exact pixel/reference parity remains **NOT_VERIFIED**. Do not claim it was visually compared. Artifact #344 is still the latest successful UI matrix on source SHA `105f46b90dc5664dd091493dbd5cea1af7796c44` (102 PNGs/78 synthetic fixture metrics); all 12 screens remain PARTIAL_NOT_ACCEPTED.
 - Progress remains 50% PROVISIONAL. The handoff-only changes add no product acceptance; authenticated backend QA NOT_TESTED, D1 schema/ledger NOT_VERIFIED, remote writes/deployment NOT_PERFORMED.
+
+## Scope cleanup checkpoint — 2026-10-23
+
+- Live PR #111 metadata at cleanup: OPEN/unmerged, HEAD `dcd5f1c2ae45d1c0ae22d49838757ec1ada69d7a`, 404 changed paths, +49,386 / −404, mergeable=false.
+- Validate source and tests [#39836967488](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39836967488) SUCCESS on that exact SHA. This is repository source/test validation for the documentation cleanup, not a new screenshot matrix or authenticated backend QA.
+- Removed `docs/visual-audit-progress-2026-10-19.md`: it reports work on the static-site branch and is outside Admin PR scope. Removed `handoff/PROMPT-COMPLETENESS-AUDIT.md`: it was a superseded status/prompt audit snapshot not linked from the canonical entry point.
+- Consolidated duplicate prompt content: `MASTER-PROMPT-AUTO-HANDOFF.md` now serves only as a compatibility pointer to START-HERE; `PROMPT-NEXT-CHAT.md` is reduced to current-state-first instructions. Handoff integrity tests continue to require both paths to point to START-HERE.
+- Remaining `docs` count is 340, including 326 per-run history files. Retain these text/JSON records under `handoff/history/README.md` policy; the 912 historical generated PNGs have already been removed from the PR diff and new matrices belong in Actions artifacts.
+- Not changed: `public/index.html` and `.github/workflows/liquid-glass-visual-preview.yml` remain scope/provenance items requiring separate review; the static branch is read-only. PR #111 remains open/unmerged. All 12 Admin screens remain PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
