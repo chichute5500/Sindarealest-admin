@@ -34,36 +34,12 @@ No merge/force push/deploy; no main/static writes; no Access bypass or secret op
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: c0f420ae4a70851e05df39808597e0ac760cbc2e
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39821242400
+- Tested commit: 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-346 (not committed to Git).
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-352 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
-
-## PR #111 scope cleanup — 2026-10-23
-- Exact cleanup SHA `dcd5f1c2ae45d1c0ae22d49838757ec1ada69d7a`: Validate source and tests [#39836967488](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39836967488) SUCCESS. This validates project integrity/tests on that exact docs-cleanup SHA; it does not add new UI screenshot or authenticated backend evidence.
-- PR #111 at the same checkpoint: 404 changed paths (+49,386/−404), OPEN/unmerged, mergeable=false.
-- Removed two superseded/out-of-scope docs: the static-site audit report and old prompt completeness snapshot. Consolidated the master prompt to a compatibility pointer and reduced PROMPT-NEXT-CHAT from 3,602 to 1,661 characters.
-- Preserved the 326 per-run history files under `handoff/history/` because the repository's retention policy requires compact text/JSON evidence. No approved reference image, product/runtime source, or historical test record was deleted.
-- The next-chat prompt and this status note were updated after the successful SHA; re-fetch Actions for the resulting live HEAD before calling the final handoff state PASS.
-
-
-## Live scope-cleanup checkpoint — 2026-10-22T19:15:36.363Z
-- Verified PR #111 HEAD before this documentation-sync commit: `5b9764b3f6b023537551a49d87ec16ef325bf76d`; OPEN/unmerged; 391 changed paths (+38,984/−251); mergeable=false.
-- PR #108 remains OPEN/unmerged and read-only at `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8` (291 changed paths).
-- Removed the static-only workflow `.github/workflows/liquid-glass-visual-preview.yml` and its sole dedicated script `scripts/capture-liquid-glass-preview.mjs`; neither was referenced by `package.json`. This workflow only targeted static-site branches, not the Admin branch.
-- Restored `public/index.html` to the exact `main` blob. GitHub now omits it from PR #111's changed-file list.
-- Current changed paths: **391** — `.github` 1; `README-DEPLOY.txt` 1; `data` 1; `docs` 330; `functions` 24; `migrations` 2; `package.json` 1; `public` 1; `scripts` 4; `tests` 26. Extensions: YML 1; TXT 1; JSON 164; MD 165; HTML 2; PNG 1; ZIP 1; JS 26; SQL 2; MJS 28.
-- Exact current-HEAD Actions validation is **NOT_VERIFIED**: the commit-run lookup returned no PR-triggered runs and combined status returned no checks. The last known full source/UI pass remains run #39816652346 on SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; do not transfer that PASS to the current HEAD.
-- Product progress remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; no authenticated backend acceptance claimed.
-
-
-## Scope cleanup checkpoint — 2026-10-22T19:18:10.382Z
-- Before this handoff sync, PR #111 HEAD was `61d68b3f05ae349755e6807843e9aa83bd5f01ba`, OPEN/unmerged. This pass removes the unreferenced `sindarealest-admin-mobile-reference.zip`; `README.md` documents the approved PNG, HTML viewer and instructions but does not link the ZIP. The approved PNG and documented HTML viewer remain.
-- The static-only workflow/capture script and `public/index.html` diff were already removed in the preceding checkpoint. `public/index.html` now matches `main`; do not edit static website code here.
-- Expected changed-file census after ZIP removal: **390**. Top-level: `.github` 1; `README-DEPLOY.txt` 1; `data` 1; `docs` 329; `functions` 24; `migrations` 2; `package.json` 1; `public` 1; `scripts` 4; `tests` 26. Extensions: YML 1; TXT 1; JSON 164; MD 165; HTML 2; PNG 1; JS 26; SQL 2; MJS 28.
-- Current-head CI remains NOT_VERIFIED; the last known full source/UI pass is historical and does not validate this HEAD.
