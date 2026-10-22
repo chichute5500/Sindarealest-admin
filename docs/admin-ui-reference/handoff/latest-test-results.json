@@ -5,26 +5,31 @@
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "capturedAt": "2026-10-22T21:20:00+07:00",
-  "currentHeadAtCheckpoint": "3b7ea1d6054faccba1fc274a2e75dc58a5e9f2ec",
+  "currentHeadAtCheckpoint": "411b87c04526ffbd6fed9f51040daec3016f9bd2",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
   "progressPercent": 50,
-  "progressBasis": "50% PROVISIONAL: no screen accepted; docs and CI do not increase completion.",
+  "progressBasis": "50% PROVISIONAL; source drift after last successful workflow must be revalidated. No screen accepted; docs/CI alone do not increase progress.",
   "currentHeadValidation": {
-    "status": "TESTED_SOURCE_ANCESTOR_NOT_EXACT_LIVE_HEAD",
-    "liveHead": "3b7ea1d6054faccba1fc274a2e75dc58a5e9f2ec",
-    "testedSha": "3658ca1069616639b825de2cd7b9c714ce560901",
-    "runId": 39778009734,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
-    "conclusion": "success",
-    "passed": [
-      "npm run check",
-      "npm test",
-      "Playwright responsive/theme screenshot capture",
-      "safe preview diagnostics",
-      "artifact upload"
-    ],
-    "note": "The workflow tested source commit 3658ca1; live HEAD is later and includes handoff documentation changes. Do not claim exact live HEAD was tested."
+    "status": "NOT_VERIFIED_FOR_CURRENT_SOURCE_BLOBS",
+    "liveHead": "411b87c04526ffbd6fed9f51040daec3016f9bd2",
+    "lastSuccessfulWorkflow": {
+      "runId": 39778009734,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+      "testedSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+      "conclusion": "success"
+    },
+    "sourceDrift": {
+      "setupCloudflare": {
+        "testedBlob": "0a95620c547604b5419672b9396247c88cf9a6f5",
+        "liveBlob": "ec1c614048b84657ef8824d865dda42f0c8341fe"
+      },
+      "configIntegrityTests": {
+        "testedBlob": "6d5b2a3e3c2261ef7da38d4cf7d25d70fcd4dd68",
+        "liveBlob": "45c292c45f445628f5d36e02acfc54ac123f837d"
+      }
+    },
+    "note": "The current setup preflight is moved earlier to before seed/deploy and the test marker was updated. These current blobs are not covered by run #39778009734. Source validation must be repeated before PASS."
   },
   "latestResponsiveThemePreviewEvidence": {
     "sourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
@@ -276,7 +281,7 @@
     "note": "Source scripts perform read-only SELECT LIMIT 0 preflight and fail closed before Pages deploy if schema is missing. Remote D1 was not queried; no migration/setup/deploy was run."
   },
   "note": "Live pre-write head e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe differs from visual source dca19a2af32a78390878b9ccfa5c7c26b816f2ff by 21 commits / 22 docs/handoff/reference paths; application source unchanged. No run was returned for exact current docs-only HEAD. Product list #3 is data-limited; editor #4 remains partial; 12-screen parity not accepted. Migration 0009 setup/deploy preflight remains POTENTIAL_BLOCKER_NOT_VERIFIED; remote schema was not inspected.",
-  "updatedAt": "2026-10-22T21:20:00+07:00",
+  "updatedAt": "2026-10-22T21:35:00+07:00",
   "latestVisualReview": {
     "followUpAt": "2026-10-22T19:15:21.463+07:00",
     "followUpResult": "PRODUCT_LIST_03_REVIEW_CLOSED_DATA_LIMITED_NO_SOURCE_DEFECT_PROVEN",
@@ -298,7 +303,10 @@
     "artifactUpload": "PASS",
     "wholeScreenAcceptance": "NOT_VERIFIED",
     "authenticatedBackend": "NOT_VERIFIED",
-    "productionDeploy": "NOT_RUN"
+    "productionDeploy": "NOT_RUN",
+    "currentLiveSourceValidation": "NOT_VERIFIED",
+    "lastTestedSourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "sourceDriftDetected": true
   },
   "latestLocalEvidence": {
     "runId": 39778009734,
