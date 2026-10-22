@@ -7,9 +7,7 @@ on:
     branches:
       - fix/liquid-glass-redesign
       - fix/liquid-glass-audit-2026-10-19
-    # Documentation-only commits must not run a new visual audit against a different deployed SHA.
     paths-ignore:
-      - 'docs/**'
       - 'docs/website-screenshots/start-of-work/**'
       - 'docs/website-screenshots/end-of-work/**'
       - 'docs/website-screenshots/manifest.json'
