@@ -98,10 +98,10 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 - This corrects any older handoff statement that either script “does not reference migration 0009.” That claim is stale. The true runtime state of remote D1 schema/ledger remains **NOT_VERIFIED** because the script was not run and remote access is not authorized. Do not infer that migration 0009 is applied or absent from source code alone.
 
 ## Latest test/source evidence
-- [Actions #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576) SUCCESS on exact code/test SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`.
-- [Artifact #339](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558): 102 PNGs and 78 fixture metrics. Gallery screenshot `product-gallery__390x844__light.png` reviewed alongside the included reference poster; current CSS provides a featured cover slot, 1.55:1 mobile image frame and horizontal thumbnail rail, with existing Playwright assertions for image count/accessibility/reorder. The fixture uses synthetic placeholder images, so this does **not** justify adding fake product photography. No specific UI fix is promoted from this visual review; screen #5 remains PARTIAL_NOT_ACCEPTED until per-screen acceptance is complete.
+- [Actions #39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346) SUCCESS on exact code/test SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`.
+- [Artifact #344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210): 102 PNGs and 78 fixture metrics. Gallery screenshot `product-gallery__390x844__light.png` reviewed alongside the included reference poster; current CSS provides a featured cover slot, 1.55:1 mobile image frame and horizontal thumbnail rail, with existing Playwright assertions for image count/accessibility/reorder. The fixture uses synthetic placeholder images, so this does **not** justify adding fake product photography. No specific UI fix is promoted from this visual review; screen #5 remains PARTIAL_NOT_ACCEPTED until per-screen acceptance is complete.
 - The protected static `public/index.html` at PR #108 head `2d80095f7323b1a790931dc2ab67b59e7e6edf8d` currently adapts `/api/order-payment` without mapping/displaying the API's `freeShippingEligible` / `freeShipping` fields (source-level observation only). Admin payment API source returns these flags; this integration display gap belongs to the static-branch owner/agent. No static write was made here.
-- Run #39804852604's retry-customers timeout is historical; the newer #39811730576 run passes.
+- Run #39804852604's retry-customers timeout is historical; the newer #39816652346 run passes.
 
 ## Safety/deferred scope
 - D1 remote schema/ledger: NOT_VERIFIED.
@@ -120,3 +120,9 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 - Tested source SHA [`4b2220d510a906882e4309df6969c0c43514c421`](<https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421>); source CI [#39813340342](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342>) and Playwright/Preview [#39813340309](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309>) both SUCCESS.
 - Artifact [#340 / 12439794397](<https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397>) contains 102 PNGs and 78 fixture metrics. Mobile toast/navigation regression PASS.
 - The old retry-customers timeout is historical. Authenticated backend data, remote schema/ledger and production deployment remain untested/unverified/not performed as applicable.
+
+
+## Latest evidence refresh — 2026-10-22
+- Current source/test SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; source validation #39816652373 PASS and responsive/theme + Preview diagnostic #39816652346 PASS.
+- Current screenshot artifact: [admin-preview-evidence-344, ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210). The earlier artifact #339 is historical.
+- Live PR #111 metadata is now 1,314 changed files. The 1,310-path census and its detailed counts are historical until the paginated live file list is refreshed.
