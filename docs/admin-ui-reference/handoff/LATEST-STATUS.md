@@ -1,11 +1,11 @@
 # LATEST STATUS — SinDarealest Admin
 
-**Progress: 50% PROVISIONAL.** Source/unit checks passed on the recorded code/test SHA, but Playwright/full screen acceptance is still pending. Documentation changes do not increase product progress.
+**Progress: 50% PROVISIONAL.** Source/unit checks passed on the recorded code/test SHA. The local static Playwright fixture test FAILED by timeout; the deployed Preview diagnostic step passed. Full screen acceptance remains pending. Documentation changes do not increase product progress.
 
 ## Repository / PRs
 - PR #111: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), writable branch `feature/admin-isolated-handoff-2026-10-20`.
 - PR #108: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), website branch is read-only for this task.
-- Last recorded code/test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec`. Live ADMIN branch HEAD at handoff sync: `4d6dab2f56d4dec53955c300e8ea477062fd2587` (docs-only commits; not tested product code). Fetch live HEAD before further work.
+- Last recorded code/test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec`. Previously observed ADMIN HEAD before subsequent handoff-only commits: `4d6dab2f56d4dec53955c300e8ea477062fd2587` (historical docs-only ref; fetch live HEAD before further work).
 
 ## Product change
 - Source commit [`e11ec06cd5870522735a28205b678897de829361`](https://github.com/chichute5500/Sindarealest-admin/commit/e11ec06cd5870522735a28205b678897de829361) makes Customers/Warranty API failure or malformed responses explicit and provides GET-only retry.
