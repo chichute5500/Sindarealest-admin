@@ -1,31 +1,35 @@
 # LATEST STATUS — SinDarealest Admin
 
-**Code/test checkpoint before this handoff-only commit:** `326526f8f74172ae0aea7fa37739c9a8e8f513ec`
-**Progress: 50% PROVISIONAL.** Source/UI fix and unit CI are real; Playwright/full screen acceptance remains pending.
+**Progress: 50% PROVISIONAL.** Source/unit checks passed on the recorded code/test SHA, but Playwright/full screen acceptance is still pending. Documentation changes do not increase product progress.
 
-## Live repository
-- PR #111: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), branch `feature/admin-isolated-handoff-2026-10-20`.
-- PR #108: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), protected website branch, latest observed head `32c4aa52e03e8917b930ff13d9775215e2876f62`; read-only.
-- Branch relation: `diverged`; ADMIN ahead 978, website ahead 957; merge base `a3834fed3eb1c012b188d7c95d14ec3d15e3969f` ([compare](https://github.com/chichute5500/Sindarealest-admin/compare/32c4aa52e03e8917b930ff13d9775215e2876f62...326526f8f74172ae0aea7fa37739c9a8e8f513ec)).
-- PR #111 census: **1,304 files** — docs 1,241; functions 24; tests 25; scripts 5; migrations 2; public 2; workflows 2; data 1; package.json 1; README-DEPLOY.txt 1.
+## Repository / PRs
+- PR #111: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), writable branch `feature/admin-isolated-handoff-2026-10-20`.
+- PR #108: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), website branch is read-only for this task.
+- Last recorded code/test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec`. Fetch live HEAD before further work; the next-chat prompt was refreshed in a docs-only commit, so don't mistake that commit for tested product code.
 
-## Latest product fix
-- Source commit [`e11ec06cd5870522735a28205b678897de829361`](https://github.com/chichute5500/Sindarealest-admin/commit/e11ec06cd5870522735a28205b678897de829361) corrects a real misleading state: failed/malformed Customers and Warranty responses no longer masquerade as valid empty lists; retry is GET-only.
-- Test commit [`326526f8f74172ae0aea7fa37739c9a8e8f513ec`](https://github.com/chichute5500/Sindarealest-admin/commit/326526f8f74172ae0aea7fa37739c9a8e8f513ec) adds synthetic HTTP 503 → error/retry → GET fixture recovery coverage. No business records were written.
-- Regression has not yet run in Playwright.
+## Product change
+- Source commit [`e11ec06cd5870522735a28205b678897de829361`](https://github.com/chichute5500/Sindarealest-admin/commit/e11ec06cd5870522735a28205b678897de829361) makes Customers/Warranty API failure or malformed responses explicit and provides GET-only retry.
+- Test commit [`326526f8f74172ae0aea7fa37739c9a8e8f513ec`](https://github.com/chichute5500/Sindarealest-admin/commit/326526f8f74172ae0aea7fa37739c9a8e8f513ec) authors synthetic HTTP 503 → retry → GET fixture recovery. Playwright regression execution remains unverified.
 
-## Exact-SHA Actions
-- [Validate #39804852564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564): **SUCCESS** on exact SHA `326526f8...`; dependency audit, `npm run check`, `npm test` passed.
-- [Preview #39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): **PENDING**, same SHA; no job/artifact at last poll.
-- [Queue blocker #39802525217](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217) remains in progress on older SHA `920f53d...`, at Chromium installation since `2026-10-22T15:12:38Z`. Logs/artifacts unavailable; do not start a duplicate.
-- Pages check reported success on the exact SHA; this is not a claim that Production was deployed.
+## Actions — last recorded state; must poll live
+- [Validate #39804852564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564): SUCCESS on exact SHA `326526f8...`; dependency audit, `npm run check`, `npm test` passed.
+- [Preview #39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): PENDING, no job/artifact in last recorded snapshot.
+- [Older Preview #39802525217](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217): previously in progress at Chromium installation on older SHA `920f53d...`. Poll before any rerun; do not dispatch duplicates while concurrency is occupied.
 
-## Screens / constraints
-- #8 Customers/#9 Warranty-support: fix committed; 503 recovery regression awaits Playwright. #10 Settings awaits screenshot/QR guard; live save unverified. #11 Backup/Restore has layout only, no export/restore UI cycle. #12 Activity log fixture tests await current-SHA Playwright. All remain `PARTIAL_NOT_ACCEPTED`.
-- All 12 screens remain partial. #3 data-limited; #4 persistence/SKU/AI behavior unverified.
-- ADMIN `public/index.html` is inherited unchanged from the split merge-base; do not blindly revert or copy across branches.
-- `scripts/setup-cloudflare.mjs` may run remote migrations 0001 and 0003–0008 before the 0009 preflight: **do not run**. Do not run the deploy script.
-- Remote D1 schema/ledger NOT VERIFIED; migration 0009 and PRE/PRO deferred; R2 persistence deferred; AI grouping blocked pending owner-approved API contract.
+## Screens
+All 12 screens remain PARTIAL_NOT_ACCEPTED. In particular:
+- #8 Customers / #9 Warranty: source fix committed; synthetic 503 recovery test awaits Playwright; live authenticated backend acceptance is not established.
+- #10 Website settings: screenshot and QR unsaved-change guard await current-SHA evidence; real persistence unverified.
+- #11 Backup/Restore: layout/state only; no real export/restore UI cycle.
+- #12 Activity log: fixture assertions await Playwright; authenticated audit data untested.
+- Screens #1–#7 also remain partial; see `12-SCREEN-REFERENCE-AUDIT.md`.
 
-## Next
-Poll #39802525217 and #39804852604, inspect exact-SHA artifacts, and review #8–#12 against `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme. Re-fetch both PR heads next session.
+## PR #111 scope / safety
+- Last recorded census: 1,304 paths; full provenance audit is PARTIAL. Read `PR-111-SCOPE-AUDIT.md` and continue evidence-backed batches.
+- Remote D1 schema/ledger NOT VERIFIED; migrations and PRE/PRO deferred; R2 persistence deferred; AI grouping requires owner-approved API contract.
+- Do not run setup/deploy/migration scripts, remote D1/R2 operations, Production deploy, Access bypass or secret access.
+
+## Next actions
+1. Re-fetch live PR heads and poll runs #39802525217 and #39804852604; inspect exact-SHA job logs and artifacts.
+2. Review screens #8–#12 against `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme; fix only reproduced issues.
+3. Continue PR #111 provenance audit. Keep both PRs OPEN/unmerged and update this handoff only with evidence-backed changes.
