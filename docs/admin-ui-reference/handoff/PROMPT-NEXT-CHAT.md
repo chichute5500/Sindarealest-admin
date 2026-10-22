@@ -6,9 +6,9 @@ Tiếp tục công việc thực tế trên GitHub; sau mỗi checkpoint báo c�
 - Repository: chichute5500/Sindarealest-admin.
 - ADMIN branch duy nhất: feature/admin-isolated-handoff-2026-10-20; PR #111 phải OPEN, không merge.
 - Static website branch được bảo vệ: fix/liquid-glass-audit-2026-10-19; PR #108 phải OPEN, không merge.
-- Live refs được xác minh ngay trước checkpoint tài liệu này: ADMIN HEAD e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; static PR #108 HEAD e3328dee37b125c5821bcaad03199afc44ed06fa. Những cập nhật handoff hiện tại chỉ sửa docs; fetch HEAD/PR/workflow live trước mọi write tiếp theo.
+- Live ADMIN HEAD phải được fetch trước mỗi lần ghi; lần cập nhật này bắt đầu từ HEAD 2e274dcc18d3479e183a6385144858146a6c2fb9. PR #111 và #108 vẫn phải OPEN/unmerged; xác minh HEAD PR #108 trực tiếp trước khi thao tác tiếp theo. Không dùng SHA trong handoff làm HEAD hiện tại.
 - Visual/application source SHA: dca19a2af32a78390878b9ccfa5c7c26b816f2ff. Compare source → pre-write HEAD: 21 commits / 22 paths tài liệu/handoff/reference; application source không đổi.
-- [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) và [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) SUCCESS trên source SHA dca19a2af32a78390878b9ccfa5c7c26b816f2ff. Artifact [#311 / ID 12420678829](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829): 99 PNG, 75 fixture metrics, synthetic/read-only; không phải authenticated backend QA.
+- Workflow [#39778009734](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734) SUCCESS trên source SHA `3658ca1069616639b825de2cd7b9c714ce560901`: `npm run check`, `npm test`, responsive/theme Playwright capture, safe preview diagnostics và artifact upload đều PASS. Artifact [#314 / ID 12425910948](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948): 89 PNG, 16 login metrics, fixture/read-only; không phải authenticated backend QA. Current live HEAD có docs-only commits phía sau source tested; không tuyên bố exact live HEAD đã test.
 - Exact live docs-only HEAD không có status checks/PR workflow run được trả về. Run #39773285617 thành công trên SHA cũ 5497d4d3b51d32064a9a993e0f891ca672c543c1, không gọi nhầm là test trên HEAD hiện tại.
 - Progress giữ 50% PROVISIONAL; docs hoặc CI xanh không tự làm tăng tiến độ.
 
@@ -26,6 +26,13 @@ Tiếp tục công việc thực tế trên GitHub; sau mỗi checkpoint báo c�
 - Đã mở screenshots 390×844 sáng/tối và 1280×800 sáng; metrics không thấy horizontal overflow.
 - Test hiện có cover tab click/ARIA và keyboard ArrowLeft/ArrowRight/Home/End, trường title/category, vị trí checkbox SKU, hình học nút AI suggestion, placeholder/align giá-tồn kho, footer cố định và scroll content.
 - Chưa chứng minh toggle/save SKU persistence, AI endpoint trả kết quả thật, save qua backend thật hoặc full-screen parity. Fixture chặn mọi API write. #4 vẫn PARTIAL_NOT_ACCEPTED; không lặp lại geometry đã chạy khi chưa có trạng thái mới.
+
+## Latest checkpoint — migration 0009 preflight tested
+- Source change commit: `3658ca1069616639b825de2cd7b9c714ce560901`.
+- Files changed: `scripts/setup-cloudflare.mjs`, `scripts/deploy-cloudflare.mjs`, `tests/config-integrity.test.mjs`. Both scripts now issue read-only `SELECT ... LIMIT 0` checks for the 0009 fulfillment/payment schema before Pages deploy and fail closed on errors; they do not run migration 0009.
+- Workflow #39778009734 is SUCCESS for repository checks, automated tests, screenshot matrix, safe diagnostics and artifact upload. Artifact #314 / ID 12425910948 was downloaded; its metadata confirms local/static + synthetic fixture scope. No setup/deploy/remote D1/R2/migration was run.
+- Product editor screenshot 390×844 light was opened; no overflow issue established. Order-detail fixture screenshot confirms visible summary/customer/product/footer CTA but does not prove real action/business behavior. Both remain PARTIAL_NOT_ACCEPTED.
+- Product list #3 review remains closed as fixture-data-limited; do not repeat without new state/data.
 
 ## Next task — P1 PR #111 scope/provenance audit
 1. Read-only audit .github/workflows/admin-preview-diagnostics.yml: triggers, contents:write, phạm vi cập nhật evidence và chống commit ảnh stale.
