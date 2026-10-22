@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "status": "LIVE_HEAD_DOCS_ONLY_SOURCE_VALIDATION_ON_PRIOR_SHA_VISUAL_PARITY_PARTIAL",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "capturedAt": "2026-10-22T19:15:21.463+07:00",
+  "capturedAt": "2026-10-22T12:25:29.378Z",
   "currentHeadAtCheckpoint": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
@@ -255,12 +255,11 @@
     }
   ],
   "nextActions": [
-    "P1: Continue PR #111 provenance/scope review read-only: Admin Preview workflow, migration 0009, payment request/transaction routes, setup/deploy preflight.",
-    "P1: Keep Product editor #4 PARTIAL_NOT_ACCEPTED; do not repeat measured screenshot/tab/geometry checks without new evidence.",
-    "P1: Continue official 12-screen audit; no screen PASS from fixture-only evidence.",
-    "P2: Keep Orders #6 and Order detail #7 independent.",
-    "BLOCKED: Authenticated backend QA requires an owner-authorized Preview identity; AI grouping needs an approved contract.",
-    "DEFERRED_BY_OWNER: R2 image persistence and PRE/PRO migrations."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -295,5 +294,59 @@
     "acceptance": "NOT_ACCEPTED",
     "note": "Metrics at 320x640 and 360x800 light/dark show no horizontal overflow. Three UI-only fixture products with placeholder images and unknown price/stock. Filter/search and edit-to-open have test coverage; pagination beyond page 1/1 is not demonstrated."
   },
-  "lastCompletedTask": "Reviewed #3 narrow-viewport metrics in both themes and #4 screenshots/source test coverage. No source defect proven; no application source changed."
+  "lastCompletedTask": "Reviewed #3 narrow-viewport metrics in both themes and #4 screenshots/source test coverage. No source defect proven; no application source changed.",
+  "latestCodeCommitSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+  "testedCommitSha": "3658ca1069616639b825de2cd7b9c714ce560901",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+  "checks": {
+    "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
+    "applicationStartup": "PASS",
+    "localStaticPlaywrightBaseline": "PASS",
+    "playwright": "PASS",
+    "playwrightPreviewDiagnostics": "success",
+    "deployedPreview": "PASS",
+    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
+    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
+    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
+    "automatedTests": "PASS",
+    "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
+    "productionDeployment": "NOT_PERFORMED"
+  },
+  "latestLocalEvidence": {
+    "runId": 39778009734,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+    "sourceCommit": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "npmRunCheck": "PASS",
+    "npmTest": "PASS",
+    "localPlaywright": "PASS",
+    "sourceScreenshotCount": 99,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 83,
+    "uiFixtureMetricCount": 75,
+    "screenshotArtifact": "admin-preview-evidence-314",
+    "pageErrors": [],
+    "consoleErrors": [],
+    "failedRequests": [],
+    "httpErrors": [],
+    "attemptedWrites": [],
+    "unexpectedApiPaths": [],
+    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+  },
+  "latestScreenshotArtifact": {
+    "runId": 39778009734,
+    "name": "admin-preview-evidence-314",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+    "sourceCommit": "3658ca1069616639b825de2cd7b9c714ce560901",
+    "screenshotCount": 99,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 83,
+    "uiFixtureMetricCount": 75,
+    "retentionDays": 14,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+  },
+  "remainingIssues": [],
+  "blockedItems": [],
+  "productionDeployment": "NOT_PERFORMED"
 }

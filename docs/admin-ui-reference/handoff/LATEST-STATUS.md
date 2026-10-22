@@ -15,3 +15,15 @@
 ## Next task
 
 Continue the **P1 read-only PR #111 scope/provenance audit**: inspect .github/workflows/admin-preview-diagnostics.yml, migrations/0009_fulfillment_and_manual_payments.sql, functions/api/admin/payment-requests.js, functions/api/admin/payment-transactions.js and local-only tests against scripts/setup-cloudflare.mjs / scripts/deploy-cloudflare.mjs. No remote setup/deploy/migration, no D1/R2 query/write. Do not merge #111/#108, edit main/static, bypass Cloudflare Access, or read/change secrets. AI image grouping remains BLOCKED pending approved contract; R2 image save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 3658ca1069616639b825de2cd7b9c714ce560901
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 99 real PNGs captured in artifact admin-preview-evidence-314 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 99 real PNGs; login shell: 16; read-only fixture module screens: 83; fixture metrics: 75.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
