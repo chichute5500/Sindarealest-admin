@@ -1,18 +1,18 @@
 # LATEST STATUS — SinDarealest Admin
 
-## Verified checkpoint — 2026-10-22T20:09:25.482Z
+## Verified checkpoint — 2026-10-22T20:12:14.822Z
 
-- Repository chichute5500/Sindarealest-admin; PR #111 OPEN/unmerged, branch feature/admin-isolated-handoff-2026-10-20, checkpoint SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869, mergeable=false. Before cleanup, 385 changed paths (+38,670/−211); removal of the empty viewer should reduce the live changed-path count to 384. Re-fetch live PR metadata to reconcile.
-- Validate [#39844529679](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844529679) **SUCCESS on exact SHA b8aff9d341e5c08d16ccc52efdab0b63da0e0869**. Run metadata and checkout logs identify the same SHA; npm run check and npm test passed, including handoff integrity and payment regression tests.
-- Failure #39844022556 on e749873c0635eec31c4d5467cc357238edbebd6c is historical: latestRun.id/url were null. Validate #39844529679 on the next checkpoint passed. The handoff sync creates a new commit that must be validated independently.
-- PR #108 remains OPEN/unmerged and read-only; main and static website branch remain untouched.
-- B1 remains **PARTIAL**. Old cleanup stands: 912 generated PNGs, 10 duplicated legacy snapshots, stale prompt/audit files, unreferenced ZIP and static-only workflow/script/test pollution removed; 318 compact per-run history records preserved.
-- New cleanup: zero-byte docs/admin-ui-reference/admin-mobile-reference.html removed, README corrected; canonical 1024×1536 PNG and instructions retained.
-- Provenance outcome: no safe runtime/payment route merge or deletion proven. Routes have distinct Admin/public/pending-image/customer-token/ledger responsibilities; tests guard them. Migration 0009 and setup/deploy scripts have real consumers and remain untouched.
-- Progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; migration 0009 and PRE/PRO/R2 persistence deferred; Production NOT_PERFORMED.
+- PR #111 OPEN/unmerged; branch feature/admin-isolated-handoff-2026-10-20; tested checkpoint dacc776531248cd38bf761a2381b31b630f94213; 384 changed paths (+38,796/−211), mergeable=false. [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111)
+- Validate [#39846423113](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39846423113) **SUCCESS on exact SHA dacc776531248cd38bf761a2381b31b630f94213**. Actions run metadata matches that SHA; validate job completed, including project integrity and npm test.
+- The following handoff-only synchronization creates a new SHA; check its own Validate run once. Do not start a metadata-only loop to chase its pointer after live Actions passes.
+- PR #108 stays OPEN/unmerged/read-only. Main and static website branch untouched.
+- B1 remains PARTIAL. Earlier cleanup removed 912 generated PNGs, 10 duplicate snapshots, obsolete prompt/static audit material, unreferenced ZIP and static-only workflow/script/test. 318 compact per-run records remain.
+- Zero-byte admin-mobile-reference.html removed; README corrected. Approved PNG reference remains. Live PR path census is 384, roots docs 330, extension html 1.
+- Payment route provenance: no safe route consolidation/deletion proven. Tests protect auth/exposure, amount rules, full-ledger totals and manually verified receipt/refund flows.
+- Orders query/contact tests reviewed; Order detail is a separate route view but fixture/mocks do not prove live authenticated backend. Both remain PARTIAL_NOT_ACCEPTED.
+- Progress 50% PROVISIONAL; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; migration 0009/PRE/PRO/R2 persistence deferred; Production NOT_PERFORMED.
 
 ## Next actions
-1. Fetch the post-sync live PR HEAD and Validate run; require exact head_sha match and success.
-2. Continue full semantic provenance/path audit and reconcile actual changed-file census.
-3. Audit Orders and Order detail independently; fixture captures do not prove authenticated backend behavior.
-4. Preserve branch, migration, remote-resource and production guardrails.
+1. Verify exact-SHA Validate for this follow-up handoff commit once.
+2. Continue remaining semantic provenance and reconcile any path-count changes from the latest commit.
+3. Keep all screen/backend/remote resource acceptance boundaries in place.
