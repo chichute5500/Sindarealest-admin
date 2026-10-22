@@ -1,48 +1,46 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:18:10.382Z",
+  "capturedAtUtc": "2026-10-22T19:35:37.668Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
-  "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+  "branchHeadAtCheckpointStart": "d49c09c582be2e8dad2d501347415581abbe01d5",
+  "codeTestSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_ON_TESTED_SOURCE_SHA",
   "latestRun": {
-    "id": 39820105048,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048",
-    "headSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+    "id": 39840692976,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
+    "headSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "status": "completed",
-    "conclusion": "failure",
-    "jobId": 119968823787,
-    "failedStep": "Run automated tests",
-    "failureSummary": "The new handoff-integrity test found that START-HERE.md lacked an explicit PROMPT-NEXT-CHAT.md link. Playwright screenshot and deployed Preview steps were skipped.",
+    "conclusion": "success",
+    "jobId": 120040591092,
+    "failedStep": null,
+    "summary": "npm run check and npm test passed; local responsive/theme Playwright baseline captured 102 PNGs; deployed Preview diagnostic passed. This tests source SHA 2eb6e7e, not the workflow-generated evidence commit d49c09c.",
     "artifact": {
-      "id": 12444406482,
-      "name": "admin-preview-evidence-345",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048/artifacts/12444406482",
+      "name": "admin-preview-evidence-352",
       "expired": false,
-      "containsScreenshotMatrix": false,
-      "note": "The artifact upload preserved the approved reference image only; it is not new UI evidence."
-    },
-    "note": "Historical run on 7a60099; not the current HEAD. Do not treat as current validation."
+      "containsScreenshotMatrix": true,
+      "screenshotCount": 102,
+      "fixtureMetrics": 78,
+      "retentionDays": 14
+    }
   },
   "validatedChecks": {
     "npmRunCheck": "PASS",
-    "npmTest": "FAIL_HANDOFF_INTEGRITY_ASSERTION",
-    "localStaticPlaywright": "NOT_RUN_DUE_TO_TEST_FAILURE",
-    "responsiveThemeScreenshotMatrix": "NOT_RUN_DUE_TO_TEST_FAILURE",
-    "deployedPreviewDiagnostic": "NOT_RUN_DUE_TO_TEST_FAILURE",
-    "pageErrors": "NOT_COLLECTED",
-    "consoleErrors": "NOT_COLLECTED",
-    "failedRequests": "NOT_COLLECTED",
-    "httpErrors": "NOT_COLLECTED",
-    "attemptedWrites": "NOT_COLLECTED",
-    "unexpectedApiPaths": "NOT_COLLECTED",
-    "currentHeadProjectCheck": "NOT_VERIFIED",
-    "currentHeadAutomatedTests": "NOT_VERIFIED",
-    "currentHeadPlaywright": "NOT_VERIFIED",
-    "currentHeadPreviewDiagnostic": "NOT_VERIFIED"
+    "npmTest": "PASS",
+    "localStaticPlaywright": "PASS",
+    "responsiveThemeScreenshotMatrix": "PASS_102_PNGS",
+    "deployedPreviewDiagnostic": "PASS",
+    "pageErrors": "NONE_RECORDED",
+    "consoleErrors": "NONE_RECORDED",
+    "failedRequests": "NONE_RECORDED",
+    "httpErrors": "NONE_RECORDED",
+    "attemptedWrites": "NONE_RECORDED",
+    "unexpectedApiPaths": "NONE_RECORDED",
+    "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "currentBranchHead": "d49c09c582be2e8dad2d501347415581abbe01d5",
+    "currentBranchHeadValidation": "NOT_VERIFIED"
   },
   "historicalRuns": [
     {
@@ -175,11 +173,10 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Continue semantic provenance review of remaining runtime/API/configuration and test paths in PR #111; no speculative deletions.",
+    "Retain per-run compact text/JSON evidence; screenshot matrices belong in Actions artifacts.",
+    "Fetch exact-SHA validation for current branch HEAD after this handoff sync.",
+    "Keep authenticated backend QA NOT_TESTED, all 12 screens PARTIAL_NOT_ACCEPTED, and Production deployment NOT_PERFORMED."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -190,13 +187,13 @@
   },
   "latestCodeCommitSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "testedCommitSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-  "capturedAt": "2026-10-22T19:31:43.047Z",
+  "capturedAt": "2026-10-22T19:35:37.668Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
     "localStaticPlaywrightBaseline": "PASS",
-    "playwright": "PASS",
+    "playwright": "PASS_LOCAL_MATRIX_AND_PREVIEW_DIAGNOSTIC",
     "playwrightPreviewDiagnostics": "success",
     "deployedPreview": "PASS",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
@@ -240,14 +237,19 @@
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
-  "remainingIssues": [],
-  "blockedItems": [],
+  "remainingIssues": [
+    "Current branch HEAD d49c09c is a workflow-generated evidence commit; exact-SHA source validation has not been verified yet.",
+    "Authenticated business/backend QA remains NOT_TESTED; screenshots use a local static login shell and read-only synthetic fixtures."
+  ],
+  "blockedItems": [
+    "Authenticated Preview backend workflows are not proven by fixture screenshots; no Cloudflare Access bypass or secret changes permitted."
+  ],
   "productionDeployment": "NOT_PERFORMED",
   "currentHeadValidation": {
-    "sha": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
-    "workflowRunsLookup": "NO_PR_TRIGGERED_RUN_RETURNED",
-    "combinedStatus": "NO_CHECKS_RETURNED",
+    "sha": "d49c09c582be2e8dad2d501347415581abbe01d5",
+    "workflowRunsLookup": "NO_RUN_RETURNED_FOR_GENERATED_EVIDENCE_COMMIT",
+    "combinedStatus": "NOT_YET_VERIFIED",
     "result": "NOT_VERIFIED",
-    "note": "Current source cleanup and documentation commits have no confirmed successful exact-SHA Actions result in the available lookup. Last full UI/source PASS is historical."
+    "note": "Source/test/Preview passed on 2eb6e7e, then workflow committed evidence and advanced branch HEAD to d49c09c. Do not transfer PASS to d49c09c without exact-SHA checks."
   }
 }

@@ -1,24 +1,24 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:18:10.382Z",
+  "capturedAtUtc": "2026-10-22T19:35:37.668Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
-  "checkpointSemantics": "Live PR/branch HEAD changes with each contents-API commit; branchHeadAtCheckpointStart is the fetched head immediately before this status refresh. Fetch live refs before acting. codeTestSha is a distinct exact tested source revision.",
-  "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
-  "latestProductSourceCommit": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+  "branchHeadAtCheckpointStart": "d49c09c582be2e8dad2d501347415581abbe01d5",
+  "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
+  "codeTestSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+  "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestActionsRun": {
-    "id": 39816652346,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
+    "id": 39840692976,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
-    "jobId": 119957441128,
-    "artifactId": 12441639210
+    "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "jobId": 120040591092,
+    "artifactName": "admin-preview-evidence-352"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL; no UI product source changed in the handoff-integrity test commit. The previous source/UI evidence remains PASS on SHA 105f46b90dc5664dd091493dbd5cea1af7796c44. The latest automated attempt on 7a60099 failed on a missing START-HERE -> PROMPT-NEXT-CHAT link; this handoff sync repairs that contract. Revalidate on the resulting live HEAD before claiming test PASS.",
+  "progressBasis": "50% PROVISIONAL; source checks, npm test, local responsive/theme screenshot matrix, and deployed Preview diagnostic passed on source SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118 (run #39840692976). This is not authenticated business-backend acceptance. Workflow evidence commit moved branch HEAD to d49c09c582be2e8dad2d501347415581abbe01d5; exact-SHA validation for that generated-evidence HEAD is not verified.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -26,9 +26,9 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8",
-      "changedFiles": 291,
-      "additions": 23573,
+      "headSha": "ae2a46506a1b1f4db9dea5bd9131e71bf4fd5f86",
+      "changedFiles": 286,
+      "additions": 21065,
       "deletions": 394,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false
@@ -39,30 +39,28 @@
       "mergeable": false,
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
-      "headSha": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
-      "commits": 1290,
-      "changedFiles": 390,
-      "additions": 38984,
-      "deletions": 251,
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+      "headSha": "d49c09c582be2e8dad2d501347415581abbe01d5",
+      "changedFiles": 385,
+      "additions": 38756,
+      "deletions": 211,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
     }
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39816652346,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
-      "testedSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+      "id": 39840692976,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
+      "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
       "status": "completed",
       "conclusion": "success",
-      "jobId": 119957441128,
+      "jobId": 120040591092,
       "artifact": {
-        "id": 12441639210,
-        "name": "admin-preview-evidence-344",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210",
-        "expired": false,
-        "expiresAtUtc": "2026-11-05T16:49:42Z",
-        "pngs": 102
+        "name": "admin-preview-evidence-352",
+        "storage": "GitHub Actions artifact",
+        "screenshots": 102,
+        "retentionDays": 14
       }
     },
     "historicalFailed": {
@@ -79,30 +77,24 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-22T17:10:01Z",
-      "testedSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+      "capturedAtUtc": "2026-10-22T19:35:37.668Z",
+      "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
       "validateRun": {
-        "id": 39820101711,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820101711",
+        "id": 39840693024,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024",
         "status": "completed",
-        "conclusion": "failure",
-        "failedStep": "Run automated tests"
+        "conclusion": "success"
       },
       "previewRun": {
-        "id": 39820105048,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048",
+        "id": 39840692976,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
         "status": "completed",
-        "conclusion": "failure",
-        "failedStep": "Run automated tests",
-        "jobId": 119968823787,
-        "artifact": {
-          "id": 12444406482,
-          "name": "admin-preview-evidence-345",
-          "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048/artifacts/12444406482",
-          "contents": "Reference PNG only; Playwright screenshot matrix was skipped."
-        }
+        "conclusion": "success",
+        "jobId": 120040591092,
+        "artifactName": "admin-preview-evidence-352",
+        "sourceScreenshotCount": 102
       },
-      "reason": "tests/handoff-integrity.test.mjs detected that START-HERE.md lacked an explicit PROMPT-NEXT-CHAT.md link. The source integrity check passed; the failure stopped the automated-test step, so screenshot and deployed Preview checks were skipped."
+      "reason": "Previous storefront watermark assertion failure was removed from the Admin-only test path. Exact source SHA 2eb6e7e passed source validation and Preview diagnostic; this does not validate the subsequently generated evidence commit."
     }
   },
   "latestProductChange": {
@@ -163,10 +155,10 @@
   },
   "scopeAudit": {
     "status": "PARTIAL",
-    "liveChangedFiles": 390,
+    "liveChangedFiles": 385,
     "previousCensus": 1314,
     "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
-    "priority": "Refresh paginated filenames and classify provenance for each changed path; prioritize runtime/API/migration/setup/workflow paths.",
+    "priority": "Continue provenance review of runtime/API/migration and tests. Delete only with consumer/reference proof; retain per-run compact evidence.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "migration0009": "DEFERRED_BY_OWNER",
     "preProMigrations": "DEFERRED_BY_OWNER",
@@ -174,31 +166,30 @@
     "aiImageGrouping": "BLOCKED_OWNER_APPROVED_API_CONTRACT_REQUIRED",
     "livePathCensus": {
       ".github": 1,
-      "README-DEPLOY.txt": 1,
+      "(root)": 2,
       "data": 1,
-      "docs": 329,
+      "docs": 331,
       "functions": 24,
       "migrations": 2,
-      "package.json": 1,
       "public": 1,
       "scripts": 4,
-      "tests": 26
+      "tests": 19
     },
     "liveExtensionCensus": {
       "yml": 1,
       "txt": 1,
-      "json": 164,
-      "md": 165,
+      "json": 165,
+      "md": 166,
       "html": 2,
       "png": 1,
       "js": 26,
       "sql": 2,
-      "mjs": 28
+      "mjs": 21
     },
     "cleanupCheckpoint": {
-      "capturedAtUtc": "2026-10-22T19:18:10.382Z",
-      "parentSha": "61d68b3f05ae349755e6807843e9aa83bd5f01ba",
-      "changedFiles": 390,
+      "capturedAtUtc": "2026-10-22T19:35:37.668Z",
+      "parentSha": "d49c09c582be2e8dad2d501347415581abbe01d5",
+      "changedFiles": 385,
       "removedGeneratedHistoricalPngs": 912,
       "removedLegacySnapshotFiles": 10,
       "removedObsoletePromptAudit": true,
@@ -208,8 +199,30 @@
       "restoredPublicIndexToMain": true,
       "approvedReferenceRetained": true,
       "currentHeadActions": "NOT_VERIFIED",
-      "removedUnreferencedReferenceZip": true
-    }
+      "removedUnreferencedReferenceZip": true,
+      "additions": 38756,
+      "deletions": 211,
+      "historyRecordCount": 318,
+      "currentCodeChecks": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+      "previewDiagnostic": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+      "branchHeadValidation": "NOT_VERIFIED_FOR_EVIDENCE_COMMIT_d49c09c582be2e8dad2d501347415581abbe01d5"
+    },
+    "historyRecordCount": 318,
+    "nonHistoryDocs": [
+      "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
+      "docs/admin-ui-reference/README.md",
+      "docs/admin-ui-reference/admin-mobile-reference.html",
+      "docs/admin-ui-reference/admin-mobile-reference.png",
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "docs/admin-ui-reference/handoff/START-HERE.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json",
+      "docs/admin-ui-reference/reference-instructions.md",
+      "docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
+    ]
   },
   "guardrails": [
     "Only write feature/admin-isolated-handoff-2026-10-20.",
@@ -227,8 +240,8 @@
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T19:18:10.382Z",
-    "syncPurpose": "Final cleanup pass: remove unreferenced reference ZIP while preserving documented PNG/HTML; current changed-path census 390. Current-head CI remains NOT_VERIFIED."
+    "lastSyncAtUtc": "2026-10-22T19:35:37.668Z",
+    "syncPurpose": "B1 checkpoint: refreshed exact PR #111/#108 state, changed-path/extension census, source/test/Preview evidence on SHA 2eb6e7e, and NOT_VERIFIED boundary for current evidence commit d49c09c."
   },
-  "currentHeadAtCheckpoint": "61d68b3f05ae349755e6807843e9aa83bd5f01ba"
+  "currentHeadAtCheckpoint": "d49c09c582be2e8dad2d501347415581abbe01d5"
 }

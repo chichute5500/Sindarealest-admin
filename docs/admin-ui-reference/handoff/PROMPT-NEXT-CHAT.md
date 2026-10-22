@@ -5,10 +5,10 @@ Tiếp tục làm việc thực tế trên GitHub. Đọc [START-HERE.md](START-
 Repository: `chichute5500/Sindarealest-admin`.
 
 ## Checkpoint bàn giao gần nhất (phải xác minh lại trước khi thao tác)
-- PR #111 OPEN/unmerged; branch `feature/admin-isolated-handoff-2026-10-20`; HEAD được xác minh trong phiên bàn giao: `aa72c11d3bab73a2d49c76121f37b94fa6299892`; changed paths tại checkpoint trước đó là 390; mergeable=false.
-- PR #108 OPEN/unmerged; branch `fix/liquid-glass-audit-2026-10-19`; READ-ONLY.
-- GitHub connector không trả workflow runs/combined statuses cho HEAD trước đó `edb54cc3d832ded55e3fa07c615f46a98717a578`; exact-SHA validation khi đó NOT_VERIFIED. Kiểm tra lại trên HEAD hiện tại.
-- Tiến độ vẫn 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+- PR #111 OPEN/unmerged; branch `feature/admin-isolated-handoff-2026-10-20`; HEAD trước handoff sync `d49c09c582be2e8dad2d501347415581abbe01d5`; 385 changed paths (+38756/−211); mergeable=false.
+- PR #108 OPEN/unmerged, read-only; live HEAD `ae2a46506a1b1f4db9dea5bd9131e71bf4fd5f86`; 286 changed files.
+- Exact source validation/test [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) and Preview diagnostic [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) passed on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`; artifact `admin-preview-evidence-352` contains 102 PNGs. Workflow evidence commit advanced live HEAD to `d49c09c582be2e8dad2d501347415581abbe01d5`; exact-SHA validation for that HEAD is NOT_VERIFIED.
+- Census before handoff sync: 385 paths; docs 331, including 318 retained per-run history records. Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
 
 ## Giới hạn bắt buộc
 - Chỉ ghi lên `feature/admin-isolated-handoff-2026-10-20`; giữ PR #111 và #108 OPEN/unmerged. Không sửa PR #108, nhánh web tĩnh hoặc `main`.

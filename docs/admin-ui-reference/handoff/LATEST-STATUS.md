@@ -43,3 +43,15 @@ No merge/force push/deploy; no main/static writes; no Access bypass or secret op
 - Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.
+
+
+## Live B1 checkpoint — 2026-10-22T19:35:37.668Z
+
+- Verified PR #111 HEAD before this handoff-only commit: `d49c09c582be2e8dad2d501347415581abbe01d5`; OPEN/unmerged, base `main` at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, **385 changed paths** (+38756/−211), mergeable=false.
+- PR #108 remains OPEN/unmerged and read-only at live HEAD `ae2a46506a1b1f4db9dea5bd9131e71bf4fd5f86` (286 changed files). No write was made to PR #108 or `main`.
+- Live changed-path census: {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}.
+- Live extension census: {"yml":1,"txt":1,"json":165,"md":166,"html":2,"png":1,"js":26,"sql":2,"mjs":21}.
+- 318 per-run history files retained (161 JSON, 157 Markdown); 13 other docs/reference/contract files remain. A byte-identical group of three historical `preview-diagnostics.json` files was inspected but retained under the per-run evidence policy.
+- Exact-SHA source/test validation [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) PASS and Preview diagnostics [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) PASS on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`. Artifact `admin-preview-evidence-352` contains 102 screenshots (16 login shell, 86 read-only fixture screens; 78 fixture metrics).
+- Workflow then committed compact evidence, advancing live HEAD to `d49c09c582be2e8dad2d501347415581abbe01d5`. Exact-SHA validation for that generated-evidence HEAD is **NOT_VERIFIED**; do not transfer the prior PASS to it.
+- Product progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
