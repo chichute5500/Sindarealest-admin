@@ -5,11 +5,15 @@ Current facts and next-step order: [CURRENT-STATE.md](CURRENT-STATE.md). This le
 ## Open work
 | ID | Status | Next action / acceptance |
 |---|---|---|
-| VISUAL-PARITY | IN_PROGRESS | Inspect newest verified live Preview artifact against both original reference PNGs across all 8 viewport/theme pairs. Record each mismatch by route, viewport, theme and screenshot; fix only proven UI issues. |
-| ICON-PARITY | IN_PROGRESS | Freshly open both icon reference boards and compare them against actual current Preview screenshots; historical notes alone do not close this gate. |
-| PRODUCT-GALLERY-25 | UNVERIFIED | Read-only review of “Tuyển chọn 25” and multi-image detail pages; verify main image ↔ thumbnails and switching. Never change product/image mappings to improve screenshots. |
+| VISUAL-PARITY | IN_PROGRESS | Manual review completed on observational artifact #12418823837 across all 8 home viewport/theme pairs and key mobile states; its deployment SHA gate failed, so exact-SHA visual acceptance remains pending. Continue reviewing safe visual mismatches. |
+| ICON-PARITY | IN_PROGRESS | Freshly opened Icon.png and Chitiet.png in artifact #12418823837 and compared sampled live home/detail states. Broad style alignment observed; complete the remaining icon-state audit before closure. |
+| PRODUCT-GALLERY-25 | CONFIRMED MISMATCH / SCOPE-LOCKED | Read-only screenshots confirm image 01/19 shows black boots while image 02/19 shows a different green/white sneaker. Do not edit or hide product/image mappings under this scope; requires trusted catalog/mapping correction outside this task. |
 | EXACT-SHA-VERIFY | PASS | Run #39760903036 verifies deployed Preview branch and exact SHA `fc406599e04475e232fad790efd03d46979a5a20`; artifact #12418615814. Recheck later runs before any subsequent code changes. |
 | HANDOFF-SYNC | PASS for docs checkpoint | Current state, prompt, handoff, test ledger and visual plan are synchronized. Recheck when facts change. |
+
+
+## Newest screenshot-review caveat
+- Artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837) includes real Preview captures, but deployment verification failed (`e916ce...` expected, `5f1be31...` observed). Treat it as visual-observation evidence, not a new exact-SHA PASS. Current exact-SHA evidence remains run #39760903036 for `fc406599e04475e232fad790efd03d46979a5a20`.
 
 ## Latest verified audit evidence
 - Exact deployed/audited SHA: `fc406599e04475e232fad790efd03d46979a5a20`; live run [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036), artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814).
