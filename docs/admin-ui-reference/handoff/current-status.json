@@ -1,34 +1,41 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-22T21:15:00+07:00",
+  "updatedAt": "2026-10-22T19:13:05.161+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "The handoff consolidation commit 5497d4d3b51d32064a9a993e0f891ca672c543c1 was docs-only. This update records a later docs-only visual-review checkpoint; always fetch live HEAD and PR state before new writes.",
-  "branchHeadAtCheckpoint": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
+  "checkpointSemantics": "Refs checked live before these docs-only updates. Pre-write ADMIN HEAD 63f20793fe2812d3d905b8a9db52a0733d45927d; application source dca19a2af32a78390878b9ccfa5c7c26b816f2ff is unchanged over 15 commits / 22 paths, all documentation/handoff/reference paths. The docs writes advance HEAD; fetch live refs again before further writes.",
+  "branchHeadAtCheckpoint": "63f20793fe2812d3d905b8a9db52a0733d45927d",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "No source change or newly accepted screen in the latest checkpoint; do not increase progress for documentation or a partial fixture comparison.",
+  "progressBasis": "No application source changes and no newly accepted whole screen. Product list review closed as fixture-data-limited; editor review remains partial. Documentation and CI alone do not increase progress.",
   "sourceTreeComparison": {
     "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
-    "checkpointHead": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
-    "commitsAhead": 6,
-    "changedPathsSinceSource": 10,
+    "checkpointHead": "63f20793fe2812d3d905b8a9db52a0733d45927d",
+    "commitsAhead": 15,
+    "changedPathsSinceSource": 22,
     "applicationSourceChanged": false,
-    "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/dca19a2af32a78390878b9ccfa5c7c26b816f2ff...b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e"
+    "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/dca19a2af32a78390878b9ccfa5c7c26b816f2ff...63f20793fe2812d3d905b8a9db52a0733d45927d"
   },
   "sourceValidationOnHead": {
-    "runId": 39769095034,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769095034",
-    "sha": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
-    "status": "completed",
-    "conclusion": "success",
-    "steps": [
-      "Install dependencies",
-      "Audit installed dependencies",
-      "Validate project integrity",
-      "Run automated tests"
-    ]
+    "status": "NOT_VERIFIED_FOR_EXACT_LIVE_HEAD",
+    "liveHead": "63f20793fe2812d3d905b8a9db52a0733d45927d",
+    "combinedStatus": "no status checks returned",
+    "associatedPrWorkflowRuns": "none returned by commit-run lookup",
+    "latestKnownSuccessfulValidation": {
+      "runId": 39773285617,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773285617",
+      "sha": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
+      "conclusion": "success",
+      "note": "This validates an earlier docs-only HEAD, not the currently observed HEAD."
+    },
+    "latestApplicationSourceValidation": {
+      "runId": 39767851282,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282",
+      "sha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
+      "conclusion": "success"
+    },
+    "note": "Application source remains unchanged from the tested source SHA. Do not label the exact current docs-only HEAD as CI-tested."
   },
   "latestVisualEvidence": {
     "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
@@ -48,7 +55,7 @@
     }
   },
   "latestVisualReview": {
-    "checkedAt": "2026-10-22T18:44:39+07:00",
+    "checkedAt": "2026-10-22T19:13:05.161+07:00",
     "referenceOpened": "docs/admin-ui-reference/admin-mobile-reference.png from artifact #311",
     "screenshotOpened": "products-reference-matrix__390x844__light.png",
     "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
@@ -58,24 +65,107 @@
       "Reference #3 shows photos and sample price/stock; source fixture uses explicitly missing-image placeholders and unknown price/stock. This is a fixture-data limitation, not proof of a source bug.",
       "Continue #3 same-viewport/state comparison beyond SKU-wrap fix; do not fabricate data."
     ],
-    "followUpAt": "2026-10-22T21:12:00+07:00",
+    "followUpAt": "2026-10-22T19:13:05.161+07:00",
     "followUpArtifact": "admin-preview-evidence-311 / 12420678829",
     "followUpSourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
     "followUpScreenshot": "products-reference-matrix__390x844__light.png",
-    "followUpResult": "LIMITED_REVIEW_NO_CLEAR_HORIZONTAL_OVERFLOW_NO_INDEPENDENT_SOURCE_DEFECT_PROVEN",
+    "followUpResult": "PRODUCT_LIST_03_REVIEW_CLOSED_DATA_LIMITED_NO_INDEPENDENT_SOURCE_DEFECT_PROVEN",
     "followUpFindings": [
-      "Poster and #3 screenshot opened directly from downloaded artifact #311.",
-      "Fixture uses placeholder thumbnails and unknown price/stock; poster uses example photos and populated values. Do not fabricate data to match it.",
-      "No reproducible independent source defect confirmed from this screenshot; screen #3 remains PARTIAL_NOT_ACCEPTED."
+      "No horizontal overflow in inspected 320x640 and 360x800 Product list light/dark states.",
+      "Existing tests cover status filters, search/category/fulfillment filters, empty-state clear and edit-to-open; the screenshot fixture has only three products.",
+      "Fixture placeholders and unknown price/stock prevent poster content-density parity; no business data may be fabricated.",
+      "Pagination behavior is not demonstrated: page size 12 with three fixture products yields page 1 of 1.",
+      "No independent source defect was proven. No source code changed; screen #3 remains PARTIAL_NOT_ACCEPTED."
     ],
     "followUpScreenshotsOpened": [
-      "products-reference-matrix__390x844__light.png",
       "products-reference-matrix__320x640__light.png",
       "products-reference-matrix__320x640__dark.png",
       "products-reference-matrix__360x800__light.png",
-      "products-reference-matrix__360x800__dark.png"
+      "products-reference-matrix__360x800__dark.png",
+      "products-reference-matrix__390x844__light.png"
     ],
-    "acceptance": "NOT_ACCEPTED"
+    "acceptance": "NOT_ACCEPTED",
+    "followUpMetricSummary": {
+      "fixtureProductCount": 3,
+      "viewportThemePairs": 16,
+      "targetNarrowPairs": [
+        {
+          "viewport": "320x640",
+          "theme": "light",
+          "documentWidth": 320,
+          "wrapperClientWidth": 292,
+          "wrapperScrollWidth": 292,
+          "horizontalOverflow": false
+        },
+        {
+          "viewport": "320x640",
+          "theme": "dark",
+          "documentWidth": 320,
+          "wrapperClientWidth": 292,
+          "wrapperScrollWidth": 292,
+          "horizontalOverflow": false
+        },
+        {
+          "viewport": "360x800",
+          "theme": "light",
+          "documentWidth": 360,
+          "wrapperClientWidth": 332,
+          "wrapperScrollWidth": 332,
+          "horizontalOverflow": false
+        },
+        {
+          "viewport": "360x800",
+          "theme": "dark",
+          "documentWidth": 360,
+          "wrapperClientWidth": 332,
+          "wrapperScrollWidth": 332,
+          "horizontalOverflow": false
+        }
+      ],
+      "pageErrorCount": 0,
+      "consoleErrorCount": 0,
+      "failedRequestCount": 0,
+      "httpErrorCount": 0
+    },
+    "productEditorReview": {
+      "result": "PARTIAL_REVIEW_NO_INDEPENDENT_SOURCE_DEFECT_PROVEN",
+      "screenshotFilesOpened": [
+        "product-editor__390x844__light.png",
+        "product-editor__390x844__dark.png",
+        "product-editor__1280x800__light.png"
+      ],
+      "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
+      "metrics": {
+        "mobileLight": {
+          "viewport": "390x844",
+          "documentWidth": 390,
+          "horizontalOverflow": false
+        },
+        "mobileDark": {
+          "viewport": "390x844",
+          "documentWidth": 390,
+          "horizontalOverflow": false
+        },
+        "desktopLight": {
+          "viewport": "1280x800",
+          "documentWidth": 1280,
+          "horizontalOverflow": false
+        }
+      },
+      "existingRegressionCoverage": [
+        "Tabs: click switching, ARIA selection, ArrowLeft/ArrowRight/Home/End navigation.",
+        "SKU: checkbox accessible name and geometry beside the input; persisted toggle/save behavior is not proven.",
+        "AI description: button/heading geometry covered; successful endpoint behavior not asserted.",
+        "Price/stock: truthful blank-state placeholders and mobile alignment.",
+        "Footer: price/stock stays above footer in tested states; desktop content scrolling/footer geometry covered.",
+        "Fixture mode blocks non-GET API writes; no real-save or authenticated backend claim is allowed."
+      ],
+      "residuals": [
+        "Fixture is not authenticated backend QA.",
+        "Whole-screen #4 visual parity is not accepted."
+      ],
+      "acceptance": "NOT_ACCEPTED"
+    }
   },
   "acceptance": {
     "screen1Login": "PARTIAL_NOT_ACCEPTED",
@@ -101,7 +191,7 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
+      "headSha": "e3328dee37b125c5821bcaad03199afc44ed06fa",
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
@@ -110,43 +200,44 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
+      "headSha": "63f20793fe2812d3d905b8a9db52a0733d45927d",
       "base": "main",
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "mergeReady": false,
-      "changedFileCount": 1285
+      "changedFileCount": 1296,
+      "branch": "feature/admin-isolated-handoff-2026-10-20"
     }
   },
   "pr111ScopeAudit": {
-    "checkedAt": "2026-10-22T18:50:41+07:00",
+    "checkedAt": "2026-10-22T19:13:05.161+07:00",
     "status": "PARTIAL_NOT_ACCEPTED",
-    "fileCount": 1285,
+    "fileCount": 1296,
     "auditFile": "docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md",
     "byTopLevelPath": {
-      "docs": 1222,
-      "tests": 25,
-      "functions": 24,
-      "scripts": 5,
       ".github": 2,
-      "migrations": 2,
-      "public": 2,
+      "README-DEPLOY.txt": 1,
       "data": 1,
+      "docs": 1233,
+      "functions": 24,
+      "migrations": 2,
       "package.json": 1,
-      "README-DEPLOY.txt": 1
+      "public": 2,
+      "scripts": 5,
+      "tests": 25
     },
     "byExtension": {
-      "png": 913,
-      "md": 155,
-      "json": 154,
-      "mjs": 28,
-      "js": 26,
-      "html": 3,
       "yml": 2,
-      "sql": 2,
       "txt": 1,
-      "zip": 1
+      "json": 156,
+      "md": 164,
+      "html": 3,
+      "png": 913,
+      "zip": 1,
+      "js": 26,
+      "sql": 2,
+      "mjs": 28
     },
-    "finding": "Diff contains storefront/API/migration/deploy/workflow paths. Must distinguish inherited from branch-authored changes using merge-base/path evidence before remediation.",
+    "finding": "Live PR census refreshed. The diff contains inherited storefront/setup/deploy paths plus Admin-owned APIs, migrations, tests and a Preview diagnostic workflow; ancestry and sensitive paths still need per-path review.",
     "mergeBase": {
       "sha": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
       "url": "https://github.com/chichute5500/Sindarealest-admin/commit/a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
@@ -155,13 +246,13 @@
     },
     "currentBranchComparison": {
       "baseBranch": "fix/liquid-glass-audit-2026-10-19",
-      "baseHead": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
-      "adminHead": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
+      "baseHead": "e3328dee37b125c5821bcaad03199afc44ed06fa",
+      "adminHead": "63f20793fe2812d3d905b8a9db52a0733d45927d",
       "baseStatus": "diverged",
-      "adminAheadBy": 890,
-      "staticAheadBy": 915,
+      "adminAheadBy": 898,
+      "staticAheadBy": 920,
       "mergeBaseSha": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/compare/fix/liquid-glass-audit-2026-10-19...5497d4d3b51d32064a9a993e0f891ca672c543c1"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/compare/e3328dee37b125c5821bcaad03199afc44ed06fa...63f20793fe2812d3d905b8a9db52a0733d45927d"
     },
     "provenance": {
       "inheritedBeforeMergeBase": [
@@ -216,16 +307,17 @@
       "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
     }
   },
-  "lastCompletedTask": "Verified handoff files live on ADMIN branch; downloaded/opened artifact #311 and official poster; compared Product list #3 at 390x844 light and recorded fixture-data limitation. No source change because no independent reproducible defect was proven.",
-  "currentTask": "Inspect artifact #311 metrics for Product list #3 at 320x640 and 360x800 light/dark; if no independent reproducible defect is found, close the comparison as data-limited and move to Product editor #4.",
+  "lastCompletedTask": "Inspected artifact #311 metrics for Product list #3 at 320x640 and 360x800 light/dark; opened Product editor screenshots at 390x844 light/dark and 1280x800 light; reviewed existing source/tests. No independent source defect proven; no application source changed.",
+  "currentTask": "P1 PR #111 scope/provenance audit; review post-merge-base API/migration/workflow paths read-only. Do not run remote setup/deploy/migrations or D1/R2 operations.",
   "taskQueue": [
     {
       "id": "P1-PRODUCTS-03",
       "priority": 1,
-      "status": "IN_PROGRESS",
+      "status": "REVIEW_CLOSED_DATA_LIMITED_NO_SOURCE_DEFECT_PROVEN",
       "task": "Product list #3 parity beyond narrow-SKU wrapping.",
       "acceptance": "Matched viewport/theme screenshots, card density/actions/filters/pagination/overflow review, no invented data, exact-SHA regression evidence.",
-      "nextAction": "Inspect artifact #311 metrics for #3 at 320x640 and 360x800 light/dark; assess actions, filters and pagination. If no independent defect, document limitation and proceed to #4."
+      "nextAction": "Do not repeat this comparison. Reopen only with a different state, approved fixture or concrete regression. Screen #3 stays PARTIAL_NOT_ACCEPTED because poster parity and multi-page behavior are unproven.",
+      "lastEvidence": "Artifact #311 / 12420678829, source dca19a2..., target 320x640 and 360x800 light/dark metrics; three fixture products and one page."
     },
     {
       "id": "P1-EDITOR-04",
@@ -233,7 +325,7 @@
       "status": "PARTIAL_NOT_ACCEPTED",
       "task": "Product editor #4 parity.",
       "acceptance": "Matched mobile/desktop comparison of tabs, fields, SKU checkbox, AI suggestion and sticky footer.",
-      "nextAction": "Use artifact #311 screenshots; retest after code changes."
+      "nextAction": "Existing screenshots/tests cover tabs/keyboard, field groups, SKU checkbox geometry, AI-button geometry and footer geometry. Do not repeat absent a new state. Move next to PR #111 scope audit; keep #4 unaccepted pending stronger state/business evidence."
     },
     {
       "id": "P1-12SCREEN",
@@ -246,10 +338,10 @@
     {
       "id": "P1-PR111-SCOPE",
       "priority": 1,
-      "status": "PARTIAL_NOT_ACCEPTED",
+      "status": "IN_PROGRESS",
       "task": "Audit PR #111 scope and ancestry.",
       "acceptance": "Classify inherited/authored paths; review sensitive API, migration and deploy paths.",
-      "nextAction": "Read-only common merge-base/path comparison; do not revert inherited files blindly."
+      "nextAction": "Use live merge base a3834fed... and heads; review Admin Preview workflow, migration 0009, payment routes and setup/deploy preflight with source-only tests. No remote execution."
     },
     {
       "id": "P2-ORDERS-06-07",
@@ -296,13 +388,26 @@
   "ownerActionRequiredNow": "No action needed for documentation consolidation. Authenticated QA needs legitimate Preview identity; AI grouping needs approved contract; R2/PRE-PRO remain deferred.",
   "legacyArchiveRoot": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22",
   "latestCheckpointVerification": {
-    "pr108Head": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
+    "pr108Head": "e3328dee37b125c5821bcaad03199afc44ed06fa",
     "pr108State": "open",
     "pr108Merged": false,
-    "at": "2026-10-22T18:50:41+07:00",
-    "pr111Head": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
+    "pr111Head": "63f20793fe2812d3d905b8a9db52a0733d45927d",
     "pr111State": "open",
-    "pr111Merged": false
+    "pr111Merged": false,
+    "at": "2026-10-22T19:13:05.161+07:00",
+    "note": "Both refs verified immediately before docs writes; fetch current PR heads again because the docs commits advance ADMIN HEAD."
   },
-  "handoffReviewAt": "2026-10-22T21:05:00+07:00"
+  "handoffReviewAt": "2026-10-22T19:13:05.161+07:00",
+  "latestCheckpoint": {
+    "timestamp": "2026-10-22T19:13:05.161+07:00",
+    "prewriteHead": "63f20793fe2812d3d905b8a9db52a0733d45927d",
+    "visualSourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
+    "sourceChanged": false,
+    "docsOnlyUpdate": true,
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL",
+    "productList03": "REVIEW_CLOSED_DATA_LIMITED_NO_SOURCE_DEFECT_PROVEN; screen acceptance remains PARTIAL_NOT_ACCEPTED",
+    "productEditor04": "PARTIAL_REVIEW_NO_INDEPENDENT_SOURCE_DEFECT_PROVEN; screen acceptance remains PARTIAL_NOT_ACCEPTED",
+    "nextTask": "P1 PR #111 scope/provenance audit"
+  }
 }
