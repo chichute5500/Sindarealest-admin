@@ -1259,13 +1259,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         checkmarkTransform: getComputedStyle(element, '::before').transform
       }));
       expect(skuCheckedStyle.checked, 'SKU verification state remains keyboard-operable').toBe(true);
-      expect(skuCheckedStyle.background, 'Checked SKU state should use the ADMIN accent token').toBe(
-        await page.locator('html').evaluate(element => getComputedStyle(element).getPropertyValue('--accent').trim())
-          .then(hex => {
-            const value = hex.replace('#', '');
-            return value.length === 6 ? `rgb(${parseInt(value.slice(0,2),16)}, ${parseInt(value.slice(2,4),16)}, ${parseInt(value.slice(4,6),16)})` : '';
-          })
-      );
+      expect(skuCheckedStyle.background, 'Checked SKU state should use the reference blue in light mode and accessible pale blue in dark mode')
+        .toBe(variant.theme === 'dark' ? 'rgb(142, 188, 224)' : 'rgb(92, 145, 185)');
       expect(skuCheckedStyle.checkmarkTransform, 'Checked SKU state should visibly render a checkmark').not.toBe('matrix(0, 0, 0, 0, 0, 0)');
       await skuVerifiedCheckbox.uncheck();
       if (variant.viewport.width <= 680) {
