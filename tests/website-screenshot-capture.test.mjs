@@ -455,5 +455,7 @@ assert.match(deployWorkflow, /push:\s*branches:[\s\S]*?paths-ignore:\s*- 'docs\/
 assert.match(deployWorkflow, /workflow_dispatch:/,
   'Manual Preview deployment must remain available after adding the docs-only path filter.');
 
+assert.match(workflow, /push:\s*branches:[\s\S]*?paths-ignore:\s*- 'docs\/\*\*'/,
+  'Documentation-only commits must not run a live audit against a different deployed source SHA.');
 assert.match(workflow, /workflow_dispatch:/,
   'Guarded manual live audit capture must remain available after adding the docs-only path filter.');
