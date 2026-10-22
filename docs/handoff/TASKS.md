@@ -1,3 +1,32 @@
+# CURRENT CHECKPOINT — 2026-10-22 (audit #836; refreshed handoff)
+
+
+This override is the current source of truth. Historical checkpoints below are retained for traceability only and must not override these facts.
+
+- **Repo / branch / PR:** `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19` / [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108), OPEN and NOT merged.
+- **Branch/PR HEAD at start of handoff refresh:** `71d7e302a8fad535756a4bc358f3ba9d7c1d61d8`. This is a documentation-only checkpoint (`docs(handoff): refresh verified live audit #836 checkpoint`); it is not the storefront source deployed to Preview. The most recent verified storefront source and deployed SHA is **`2dca48f562fef5985e8f823e4bb4db20a98fd0df`**.
+- **Exact Preview deployment:** deployment ID `6d3deb3a-ca6b-4d84-80d9-d2bd18287777`; direct URL https://6d3deb3a.sindarealest2.pages.dev; stable alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Keep Preview only.
+- **Exact-SHA evidence:** [Validate #4537 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912663), [Preview Deploy #574 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912646), [Admin Preview Playwright #805 PASS — read-only smoke only](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912642), [Live visual audit #836 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912578), [artifact #12411645475](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912578/artifacts/12411645475). Audit metadata says `sourceKind=cloudflare-pages-preview-live-read-only`, `sourceCommit=2dca48f562fef5985e8f823e4bb4db20a98fd0df`, exact deployment SHA match, `captureCompleted=true`.
+- **Verified live coverage:** 123 real Preview screenshots; 8/8 required viewport/theme pairs (360×800, 390×844, 768×1024, 1440×900 × Light/Dark); 13 route checks, 69 section captures, 4 product detail checks, 8 commerce states, 4 icon states, 6 fly-to-cart checks and 2 animation-edge checks. Responsive overflow, console/page/HTTP errors, failed requests, broken-image contexts and hard failures are all 0. Screenshots were opened and inspected; a green workflow alone is not full visual parity.
+- **Icons / hero:** reference boards `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` were inspected. Order/aftercare, account actions/chevrons, Zalo CTA and product-detail promise icons now use SVGs; live audit confirms interaction states. Keep the owner-approved hero `/images/hero-sd-gl052.png` visible. **Do not search catalog for SKU SD-GL052, reopen the old SKU blocker, or hide/replace/delete the supplied hero.**
+- **Visual work remains OPEN:** review the rest of desktop/tablet and mobile live screenshots against the two approved reference PNGs; focus header/logo/hero, six Liquid Glass tiles (three layers, no page-wide blur), trust section, catalog/search/cards, product detail/gallery, cart/account/checkout, Zalo, footer and 404 in both themes. Inspect spacing/type, satin folds, icon shapes/states, drawer contrast, gallery-to-product image relationship and animation edge cases. A gallery for “Tuyển chọn 25” showed thumbnails that look different from the main image; origin is not verified. Do not change product data or image mapping without trusted source evidence.
+- **Rough completion estimate:** about 80% (working estimate only, not an audit score). Do not claim 100% until visual differences are resolved with screenshots.
+- **QR/fulfillment:** remain fail-closed; do not show QR/payment amount until trusted backend confirmation and receiver configuration exist. This is a backend/Admin dependency and is outside this storefront-only task.
+- **Hard boundaries:** no merge PR #108; no Production, `main`, DNS, Admin branch/code, backend/API/auth/schema/business logic, catalog/product/SKU/price/image mapping, D1/R2, bindings, secrets or Access policy changes. No real checkout submission. No fixture screenshot may be represented as live proof.
+- **Next action:** fetch current branch HEAD and PR #108 HEAD before further changes (docs commits may have advanced the branch). Continue inspecting the existing #836 artifact and reference images; make a narrow code fix only when a real mismatch is confirmed, then run only affected tests, deploy Preview, verify the exact deployed SHA and inspect a new live artifact. Do not rerun unrelated PASS suites. Continue working after reporting; no user action is currently required.
+
+---
+
+## Task status update
+- `LIVE-AUDIT-836`: PASS — exact source SHA `2dca48f562fef5985e8f823e4bb4db20a98fd0df`, 123 live Preview screenshots, 8/8 viewport/theme pairs, zero reported hard failures. Evidence: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912578/artifacts/12411645475.
+- `ICON-PARITY`: live SVG/state checks PASS for current audited contexts; whole-site pixel parity remains OPEN.
+- `HERO-OWNER-ASSET`: approved `/images/hero-sd-gl052.png` is settled; do not search catalog SKU or hide/replace the image.
+- `GALLERY-MAPPING-REVIEW`: UNVERIFIED — thumbnails for “Tuyển chọn 25” look visually different from the main image; do not edit product mapping without trusted source evidence.
+- `VISUAL-PARITY-REMAINDER`: IN_PROGRESS — compare remaining live desktop/tablet/mobile captures to the reference boards, only fix proven UI mismatches.
+- `QR-FULFILLMENT`: BLOCKED by trusted backend confirmation and receiver configuration; preserve fail-closed behavior.
+
+---
+
 # Task ledger — SinDarealest2
 
 Mỗi task có ID bền vững. Cập nhật trạng thái và bằng chứng, không tạo task trùng cho cùng một lỗi.
