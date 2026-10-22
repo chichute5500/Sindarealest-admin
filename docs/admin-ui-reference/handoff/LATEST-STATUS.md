@@ -1,74 +1,49 @@
-> **LIVE HANDOFF UPDATE — 2026-10-22 (last verified poll).** Current documentation HEAD before this update: `e93b2384c89513c0911ef019153de28198f4e2b4`. PR #111 remains OPEN/unmerged and matches ADMIN branch. PR #108 remains OPEN/unmerged; latest observed static PR head `f291209565dbc49d78a0b3a387d00be0c754df45`. Overall progress remains **50% PROVISIONAL**.
->
-> **Active run:** [Preview diagnostic #39790514765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765) is still `IN_PROGRESS` for source SHA `df819968a1b3b561bba00abde4fe3432adaa8b39` (NOT current docs HEAD). Latest poll: job `119865005259`, step “Install Chromium for Playwright” still in progress; no artifacts returned. Do not infer success/failure from elapsed time, and do not treat this as evidence for the docs HEAD.
->
-> **Source validation:** [#39790514805](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805) was SUCCESS on `df819968a1b3b561bba00abde4fe3432adaa8b39`, not later docs-only HEADs. State the tested SHA exactly; do not say the current docs HEAD was tested unless a workflow confirms it.
->
-> **Recent code changes:** [`9209ac3`](https://github.com/chichute5500/Sindarealest-admin/commit/9209ac398636e2187beb2731359ae9c205901157) fixes navigation collection iteration. [`df81996`](https://github.com/chichute5500/Sindarealest-admin/commit/df819968a1b3b561bba00abde4fe3432adaa8b39) updates Order detail E2E to select the visible responsive detail button and updates the contract assertion. Current Playwright result is unresolved.
->
-> **Screen audit:** #6 Orders = `PARTIAL_NOT_ACCEPTED` (3 UI-only fixtures; no live backend data or multi-page pagination proof). #7 Order detail = `NOT VERIFIED` until run logs and screenshot artifacts are inspected. Do not mark either PASS based on unit tests or fixture screenshots alone.
->
-> **Next chat MUST start by polling** run #39790514765: run status, jobs/steps, logs, artifacts. If it remains stuck at Chromium installation, diagnose workflow/dependency/cache behavior from logs; do not blindly queue duplicate runs. If completed, inspect screenshots and report per-screen evidence. Then continue remaining screen and PR #111 provenance audits.
->
-> **Safety:** PR #111/#108 stay OPEN/unmerged. No main/static branch writes, Production deploy, Access bypass, secrets, setup/deploy/migrations, or remote D1/R2 access. Use expected-SHA updates and read back every handoff write.
+# LIVE STATUS — SinDarealest Admin
 
-> **LIVE CHECKPOINT — supersedes all older SHA/run snapshots below (2026-10-22 21:00 +07).** ADMIN branch HEAD: `df819968a1b3b561bba00abde4fe3432adaa8b39`. PR #111 OPEN/unmerged and matches this HEAD. PR #108 OPEN/unmerged; latest observed static HEAD `f291209565dbc49d78a0b3a387d00be0c754df45`. Progress stays **50% PROVISIONAL**.
->
-> - Source validation [#39790514805](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805) = SUCCESS on exact HEAD `df819968a1b3b561bba00abde4fe3432adaa8b39`.
-> - Preview diagnostic [#39790514765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765) = IN_PROGRESS on exact HEAD `df819968a1b3b561bba00abde4fe3432adaa8b39`; last observed step was Chromium install. Screenshot matrix and Preview diagnosis pending; no artifact available at that poll. Do not mark visual QA PASS.
-> - Fixes since earlier checkpoints: [`9209ac3`](https://github.com/chichute5500/Sindarealest-admin/commit/9209ac398636e2187beb2731359ae9c205901157) restores nav collection iteration; [`df81996`](https://github.com/chichute5500/Sindarealest-admin/commit/df819968a1b3b561bba00abde4fe3432adaa8b39) updates Order detail E2E to choose the visible responsive button. Source CI is green; E2E/visual result still pending.
-> - #6 Orders remains PARTIAL_NOT_ACCEPTED (3 UI-only fixtures; no live backend or multi-page pagination proof). #7 Order detail NOT VERIFIED pending this run's logs and screenshot artifact.
-> - **First action next chat:** poll run #39790514765, jobs/steps/logs/artifacts to completion. Only then review screenshots and update screen statuses. Do not repeat old #3/#4 geometry without a new failure/state.
+**Checkpoint timestamp:** 2026-10-22T14:20:00Z  
+**Code/test SHA before this docs-only handoff commit:** `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`  
+**Overall progress:** **50% PROVISIONAL** — unchanged; documentation and regression-test fixes do not count as product completion.
 
-# LIVE STATUS — 2026-10-22T19:59:12.897+07:00
+## Live refs
 
-## Refs and exact-SHA evidence
-- ADMIN PR #111 OPEN/unmerged on feature/admin-isolated-handoff-2026-10-20. Pre-write HEAD 368b3f26911f47f12cdb7ab6f300ad359283b9cc; this is a docs-only refresh so fetch resulting HEAD before more work.
-- Protected PR #108 OPEN/unmerged; snapshot HEAD ebdd5e657c317490ce7747056ffa37be8c65ab0c. No static branch writes.
-- Exact source checks [Validate #4737](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597) on 368b3f26911f47f12cdb7ab6f300ad359283b9cc: job validate PASS; npm run check PASS; npm test PASS; temporary local D1 migrations passed.
-- Responsive/Preview [run #316](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707) and [artifact #316 / 12426370257](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707/artifacts/12426370257) on 305fc139c22d682b4b6882af18d6d79836887cc7: 3 local Playwright tests + 2 configured Preview smoke tests PASS, login CSS signature PASS. Compare shows only README/handoff/docs changed since visual SHA, but exact-SHA policy keeps visual diagnostics at current HEAD NOT VERIFIED.
-- Cloudflare Pages check reports Preview success at https://86630339.sindarealest2.pages.dev and https://feature-admin-isolated-hando.sindarealest2.pages.dev. No Production deploy was run.
+- ADMIN [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): **OPEN / unmerged**, branch `feature/admin-isolated-handoff-2026-10-20`, code/test HEAD at checkpoint `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`.
+- Protected website [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108): **OPEN / unmerged**, latest observed static HEAD `a1fa5ca5731d827cbd7c3680468fd0df7bf35f53`. No writes to this branch or `main`.
+- Branch comparison is `diverged`, ADMIN ahead 948, static ahead 938, merge base `a3834fed3eb1c012b188d7c95d14ec3d15e3969f`. [Compare current snapshots](https://github.com/chichute5500/Sindarealest-admin/compare/a1fa5ca5731d827cbd7c3680468fd0df7bf35f53...26f1c6fb0632a2b80b3f8d4864fa043fc3e98642).
 
-## Progress and screen status
-- Progress remains 50% PROVISIONAL.
-- #3 Product list remains PARTIAL_NOT_ACCEPTED; review closed data-limited, no source defect proven; 3 fixtures/page-size 12 cannot prove pagination, no fake images/prices/stock.
-- #4 Product editor remains PARTIAL_NOT_ACCEPTED; no persistent save/backend/AI result or whole-screen parity proved.
-- All 12 screens PARTIAL_NOT_ACCEPTED. Next UI work is #6 Orders then #7 Order detail as independent audits.
+## Latest actions
 
-## PR #111 source/scope findings
-- 1,298 paths: 1,235 docs, 24 functions, 25 tests, 5 scripts, 2 migrations, 2 workflows, 2 public paths, 1 data, package.json and README-DEPLOY.txt.
-- Migration 0009 source preflight is tested; remote schema/ledger NOT VERIFIED. Setup's 0009 gate runs after remote migrations 0001 and 0003–0008: gate is read-only, but setup as a whole is not. Do not run setup.
-- Payment routes include Admin auth, server-derived amounts, confirmed terms/price, fulfillment/QR checks, duplicate-reference and atomic refund guards. This is source/unit evidence, not live authenticated backend QA.
-- Full path provenance still IN PROGRESS; inherited file ancestry is not the same as current line provenance.
+| Run | Tested SHA | Current evidence / result |
+|---|---|---|
+| [#39790514765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765) | `df819968a1b3b561bba00abde4fe3432adaa8b39` | **FAIL** local Playwright focus restoration; source/unit checks PASS; limited Preview smoke. [Artifact #323](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765/artifacts/12432090526). |
+| [#39790514805](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805) | `df819968a1b3b561bba00abde4fe3432adaa8b39` | Source workflow SUCCESS on that SHA only; not later commits. |
+| [#39792844330](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330) | `a6fc090b60e579e9d708775f0c25e3ba56f3439b` | **FAIL** local Playwright: 2 passed / 1 failed due strict-mode ambiguity at test line 630. `npm run check` and `npm test` PASS. Limited Preview smoke 2/2 PASS. [Artifact #324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330/artifacts/12431484447). |
+| [#39793390442](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39793390442) | `37c3c40e24c7f222adeac52ac2cbb6d30ed433f4` | **IN PROGRESS** at last poll; it has the source visibility fix but the older ambiguous test assertion. |
+| [#39794007381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381) | `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642` | **QUEUED** at last poll. This is the primary run for the latest assertion fix. Do not spawn duplicates. |
 
-## Guardrails / next task
-No merge, main/static edit, Production deployment, Access bypass, secret access, remote D1/R2 operations, setup or migration. Migration 0009 DEFERRED_BY_OWNER; AI grouping BLOCKED; R2 image save and PRE/PRO migrations DEFERRED_BY_OWNER.
-Next: fetch the post-documentation HEAD and its exact SHA run; then audit #6/#7 and remaining screens. Do not repeat #3/#4 geometry without new state or a reproducible defect.
+## Regression fix chain
 
+- [`a6fc090`](https://github.com/chichute5500/Sindarealest-admin/commit/a6fc090b60e579e9d708775f0c25e3ba56f3439b): select visible responsive action after returning from Order detail.
+- [`37c3c40`](https://github.com/chichute5500/Sindarealest-admin/commit/37c3c40e24c7f222adeac52ac2cbb6d30ed433f4): choose visible order row/card as well.
+- [`26f1c6f`](https://github.com/chichute5500/Sindarealest-admin/commit/26f1c6fb0632a2b80b3f8d4864fa043fc3e98642): update Playwright assertion to check only the visible responsive button. **Exact-SHA verification pending.**
 
-## Live checkpoint 2026-10-22T20:15:00+07:00
-- ADMIN HEAD: `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; PR #111 OPEN/unmerged. PR #108 OPEN/unmerged; no writes to static branch.
-- Source validation #4740: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315 — PASS on exact HEAD; `npm run check`, `npm test`, activity-log regression checks passed.
-- Responsive/Preview #4741: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281 — IN_PROGRESS on exact HEAD at last poll. Chromium/Playwright and final Preview smoke are NOT VERIFIED; inspect final job/log/artifact before claiming visual acceptance.
-- Added a read-only Activity Log screen using existing `GET /api/admin/audit-logs`, search/action filter/refresh/error state and server-limit disclosure. Source + unit test PASS; visual and authenticated QA NOT VERIFIED.
-- Progress remains **50% PROVISIONAL**. No merge, Production deploy, remote migration, D1/R2 write, Access bypass or static-branch change.
+## New #6 / #7 evidence from artifact #324
 
+- **#6 Orders — PARTIAL_NOT_ACCEPTED.** Source SHA `a6fc090...`; 390×844 light/dark and 1280×800 light. Document width matched viewport; desktop table has intentional internal horizontal scroll (934px client / 987px content). Three UI-only fixture orders; no real backend data or multipage pagination.
+- **#7 Order detail — PARTIAL_NOT_ACCEPTED.** Source SHA `a6fc090...`; normal and full-page screenshots at 390×844 light, document width 390 with no horizontal overflow. Detail fixture rendered, then Playwright failed in its capture helper because the focus selector matched both responsive button copies. No authenticated business data or full visual acceptance.
+- Artifact #324 records 61 PNGs (16 login-shell, 45 fixture screens) and 41 fixture metrics; no page/console/failed-request/HTTP errors and non-GET fixture requests are blocked. All evidence is from local source and synthetic UI fixtures, not authenticated backend QA.
 
-## Live checkpoint update — 2026-10-22T20:25:00+07:00
-- ADMIN HEAD: `78697c759185e04f58cdf2ac629fdb368204a3b8`; PR #111 OPEN/unmerged. PR #108 OPEN/unmerged.
-- Source validation #39785571172 completed SUCCESS on exact HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39785571172.
-- Preview diagnostic #39784873281 remains IN_PROGRESS on older SHA `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; capture and deployed Preview diagnostic steps were pending at last poll. Do not treat it as current-HEAD visual evidence.
-- Activity Log source implemented; visual and authorized live-data QA NOT VERIFIED.
-- Progress remains **50% PROVISIONAL**. No merge, Production deploy, remote migration or writes.
+## PR #111 scope and safety
 
-## Kết quả kiểm thử tự động gần nhất
+- Current PR file census: **1,302 paths** (docs 1,239; functions 24; tests 25; scripts 5; migrations 2; public 2; workflows 2; data 1; package.json 1; README-DEPLOY.txt 1).
+- `public/index.html` and `.github/workflows/liquid-glass-visual-preview.yml` on ADMIN match their merge-base blobs. `scripts/setup-cloudflare.mjs` and `scripts/deploy-cloudflare.mjs` have post-merge-base ADMIN changes and must not be blindly reverted.
+- Remote D1 schema/ledger remain **NOT VERIFIED**. `setup-cloudflare.mjs` may execute remote migrations 0001 and 0003–0008 before its 0009 preflight: **do not run**. Migration 0009 and PRE/PRO migrations are deferred; R2 image save deferred; AI grouping blocked pending owner-approved API contract.
+- Payment safeguards have local source/test evidence only, not live authenticated payment/back-end proof.
 
-- Tested commit: 9209ac398636e2187beb2731359ae9c205901157
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789963741
-- npm run check: PASS
-- npm test: PASS
-- Local source Playwright matrix: FAILURE; 59 real PNGs captured in artifact admin-preview-evidence-322 (not committed to Git).
-- Deployed Preview: success.
-- Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 40.
-- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
-- Production deployment: NOT PERFORMED.
+## Next actions
+
+1. Poll existing runs #325 (`37c3c40...`) and #326 (`26f1c6f...`); read completed logs/artifacts and verify exact checkout SHA.
+2. Only after evidence is complete, update screen #6/#7 status and do not label backend/12-screen PASS from fixture screenshots or CSS/login smoke.
+3. Continue #8 Customers, #9 Warranty/support, #10 Website settings, #11 Backup/Restore, #12 Activity log using existing artifact evidence first; add missing screen-specific viewports/theme/interaction.
+4. Continue PR #111 path provenance review without touching protected branch, `main`, remote D1/R2, setup/migrations or Production.
+
+No merge, deployment, Access bypass or remote data/schema operation was performed.
