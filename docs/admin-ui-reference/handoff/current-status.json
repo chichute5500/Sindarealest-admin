@@ -5,7 +5,7 @@
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
   "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
-  "codeTestSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+  "codeTestSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestActionsRun": {
     "id": 39842366701,
@@ -18,7 +18,7 @@
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Current documentation/handoff HEAD has no exact-SHA Actions or status-check evidence; do not claim current validation PASS. Historical source/UI evidence remains on its own recorded SHAs. Authenticated backend acceptance remains untested.",
+  "progressBasis": "50% PROVISIONAL. Last recorded source/test validation is historical on exact SHA 73dfad5e35939da22dd37efd12bf8b06c09e7716. Current live HEAD is not verified by Actions. Latest product/UI evidence remains on its own SHA; authenticated backend acceptance remains untested.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -259,19 +259,15 @@
   },
   "currentHeadAtCheckpoint": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "currentHeadValidation": "NOT_VERIFIED",
-  "currentHeadValidationReason": "No PR-triggered Actions runs or commit status checks returned for this exact SHA. Prior successful runs apply only to their recorded SHAs.",
+  "currentHeadValidationReason": "Exact-SHA lookup on current live HEAD returned no PR-triggered workflow runs and no commit status checks.",
   "liveCheckpoint": {
-    "headBeforeHandoffSync": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "headAtStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "headAfterHandoffSync": "803f6f7ce9ac114d4f3917b802c5f2a6542a5363",
     "headValidation": "NOT_VERIFIED",
+    "lastRecordedValidatedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
     "pr111": "OPEN_UNMERGED",
     "changedFiles": 385,
-    "additions": 38879,
-    "deletions": 211,
-    "mergeable": false,
     "progressPercent": 50,
-    "progressStatus": "PROVISIONAL",
-    "authenticatedBackendQA": "NOT_TESTED",
-    "d1SchemaLedger": "NOT_VERIFIED",
-    "productionDeployment": "NOT_PERFORMED"
+    "progressStatus": "PROVISIONAL"
   }
 }
