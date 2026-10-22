@@ -107,7 +107,8 @@ jobs:
         run: npm run check
       - name: Install isolated Chromium
         id: install_chromium
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 6
+        run: npx playwright install chromium
       - name: Start read-only local static preview
         shell: bash
         run: |
