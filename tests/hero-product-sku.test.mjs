@@ -37,13 +37,15 @@ for (const [, selector, declarations] of heroImageRules) {
     const property = effect[2].toLowerCase();
     const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
     const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
-      || (property === "mix-blend-mode" && value === "normal")
+      || (property.startsWith("mask") && value.startsWith("radial-gradient("))
+      || (property === "mix-blend-mode" && (value === "normal" || value === "multiply"))
       || (property === "opacity" && value === "1"));
     assert.ok(neutral, "Hero image CSS must not apply visual effects (" + selector.trim() + ": " + declaration + ").");
   }
   assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied hero asset must never be cropped.");
 }
 assert.ok(html.includes("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
+assert.ok(html.includes('id="hero-image-blend-owner-asset"') && html.includes("mix-blend-mode:multiply!important") && html.includes("mask-image:radial-gradient("), "The owner Hero artwork canvas must feather into the page background without replacing the source image.");
 assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
 assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
