@@ -1,3 +1,21 @@
+# VERIFIED MOBILE HERO FOLLOW-UP — 2026-10-22
+
+- Current storefront source/deployment SHA: `ca233f279169aef33b7f5a0cb712816738f98ed7`.
+- CI/full project validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189790
+- Cloudflare Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189767
+- Guarded live Preview audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189878
+- Artifact #12429813463: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189878/artifacts/12429813463 ; name `sindarealest-liquid-glass-preview-883`; SHA-256 `84c67928a338f16b0b287a7515f2f5ed956684d0db16c43d54b9a83372cfbb49`.
+- Deployment metadata is exact: Preview deployment `0514a4f0-0be4-4769-a31a-39c2315ba081`, commitHash and expectedCommitSha both `ca233f279169aef33b7f5a0cb712816738f98ed7`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Live audit JSON: `passed=true`, `captureCompleted=true`, sourceCommit matches exact SHA; 128 live Preview screenshots; 8 viewport/theme audits; 13 route checks; 69 section checks; 8/8 hero image checks PASS; zero overflow, console/page/HTTP errors, failed requests, broken images, read-only violations, or hard failures.
+- Opened real screenshots `home-mobile-light-390x844-viewport.png` and `home-mobile-dark-390x844-viewport.png` from the downloaded artifact. At 390×844 the hero now places copy on the left and the untouched owner-supplied shoe image on the right; the image is visible in its full rectangular frame without CSS crop/filter/mask. Desktop/tablet/mobile captures exist in the artifact; visual spot checks are not a declaration of full-site parity.
+- Source changes on this SHA: mobile hero CSS uses two columns; two legacy regression tests were updated to assert the new layout while retaining image integrity/no-filter/no-overlay checks. The hero PNG was not changed; required blob remains `24038214abefdac9ff2451def39f3e5bd9255462`. Official logo remains unchanged.
+- Important distinction: local fixture audit is separate from live Preview proof. Steps 17–21 (archive/pixel-diff flow) were skipped by the workflow's current push path; live capture and upload completed successfully, so do not claim a new archived pixel-diff comparison.
+- Confirmed unresolved catalog-data mismatch: “Tuyển chọn 25” gallery image 01/19 is black high-top boots while 02/19 is a different green/white sneaker. Do not alter catalog mapping in this UI branch; escalate to trusted mapping owner.
+- QR checkout remains fail-closed; no real order/payment was submitted. Full visual parity and icon parity remain OPEN. PR #108 must remain OPEN and unmerged; no Production/main/Admin/backend/API/auth/catalog/D1/R2/bindings/secrets/DNS/Access changes.
+
+
+---
+
 # VERIFIED LIVE PREVIEW AUDIT — 2026-10-22 13:24:55 UTC
 
 **This evidence supersedes earlier notes that run #39780674947 lacked exact-SHA certification.** Keep PR #108 OPEN and unmerged.
