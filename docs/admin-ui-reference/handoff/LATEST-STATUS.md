@@ -1,7 +1,7 @@
 # LIVE STATUS — SinDarealest Admin
 
-**Checkpoint timestamp:** 2026-10-22T14:20:00Z  
-**Code/test SHA before this docs-only handoff commit:** `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`  
+**Checkpoint timestamp:** 2026-10-22T21:50+07:00 (live ref checked)  
+**Current ADMIN HEAD:** `7d9cde727476ac05ee7431b457e7377b34c750fe`  
 **Overall progress:** **50% PROVISIONAL** — unchanged; documentation and regression-test fixes do not count as product completion.
 
 ## Live refs
@@ -12,6 +12,8 @@
 
 ## Latest actions
 
+| [#39797841880](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880) | `7d9cde727476ac05ee7431b457e7377b34c750fe` | **QUEUED** at last live poll; tests viewport width from `page.viewportSize()` after #327 hit `ReferenceError: variant is not defined`. No result yet. |
+
 | Run | Tested SHA | Current evidence / result |
 |---|---|---|
 | [#39790514765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765) | `df819968a1b3b561bba00abde4fe3432adaa8b39` | **FAIL** local Playwright focus restoration; source/unit checks PASS; limited Preview smoke. [Artifact #323](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765/artifacts/12432090526). |
@@ -21,6 +23,10 @@
 | [#39794007381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381) | `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642` | **QUEUED** at last poll. This is the primary run for the latest assertion fix. Do not spawn duplicates. |
 
 ## Regression fix chain
+
+- [`7d9cde7`](https://github.com/chichute5500/Sindarealest-admin/commit/7d9cde727476ac05ee7431b457e7377b34c750fe): replace out-of-scope `variant` reference with actual page viewport width. Workflow #39797841880 is queued; this is a test-harness fix, not product completion.
+- Run #326 on `26f1c6f` failed because `.mobiletabs` was hidden while the test expected visible at line 1752; artifact [#326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381/artifacts/12432254530).
+- Run #327 on `401b961` failed with `ReferenceError: variant is not defined` at the same line; artifact [#327](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324/artifacts/12433587319).
 
 - [`a6fc090`](https://github.com/chichute5500/Sindarealest-admin/commit/a6fc090b60e579e9d708775f0c25e3ba56f3439b): select visible responsive action after returning from Order detail.
 - [`37c3c40`](https://github.com/chichute5500/Sindarealest-admin/commit/37c3c40e24c7f222adeac52ac2cbb6d30ed433f4): choose visible order row/card as well.
@@ -41,14 +47,17 @@
 
 ## Next actions
 
-1. Poll existing runs #325 (`37c3c40...`) and #326 (`26f1c6f...`); read completed logs/artifacts and verify exact checkout SHA.
-2. Only after evidence is complete, update screen #6/#7 status and do not label backend/12-screen PASS from fixture screenshots or CSS/login smoke.
+1. Poll run #39797841880 on exact HEAD `7d9cde7`; inspect completed log/artifact before any further edit.
+2. Fix only a newly proven test/source failure; then move to unaccepted product screens. Do not count harness or docs work as product progress.
 3. Continue #8 Customers, #9 Warranty/support, #10 Website settings, #11 Backup/Restore, #12 Activity log using existing artifact evidence first; add missing screen-specific viewports/theme/interaction.
 4. Continue PR #111 path provenance review without touching protected branch, `main`, remote D1/R2, setup/migrations or Production.
 
 No merge, deployment, Access bypass or remote data/schema operation was performed.
 
 ## Kết quả kiểm thử tự động gần nhất
+
+- Current HEAD `7d9cde727476ac05ee7431b457e7377b34c750fe`; exact-SHA run #39797841880 is QUEUED at last poll.
+- Latest completed Playwright failure is #39796182324 on `401b961...`: `ReferenceError: variant is not defined` at line 1752. Previous run #39794007381 failed the `.mobiletabs` visibility expectation. Current fix awaits CI.
 
 - Tested commit: 401b961cb685a1c3fade6e6d6f66713bb71bf509
 - Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324
