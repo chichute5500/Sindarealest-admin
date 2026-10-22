@@ -1,46 +1,33 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:38:09.287Z",
+  "capturedAtUtc": "2026-10-22T19:41:44.271Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
-  "codeTestSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+  "branchHeadAtCheckpointStart": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "codeTestSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS_ON_TESTED_SOURCE_SHA",
+  "status": "SOURCE_CHECKS_AND_AUTOMATED_TESTS_PASS_ON_EXACT_SHA",
   "latestRun": {
-    "id": 39840692976,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
-    "headSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "id": 39841964451,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
+    "headSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
     "status": "completed",
     "conclusion": "success",
-    "jobId": 120040591092,
+    "jobId": 120045068730,
     "failedStep": null,
-    "summary": "npm run check and npm test passed; local responsive/theme Playwright baseline captured 102 PNGs; deployed Preview diagnostic passed. This tests source SHA 2eb6e7e, not the workflow-generated evidence commit d49c09c.",
-    "artifact": {
-      "name": "admin-preview-evidence-352",
-      "expired": false,
-      "containsScreenshotMatrix": true,
-      "screenshotCount": 102,
-      "fixtureMetrics": 78,
-      "retentionDays": 14
-    }
+    "summary": "Exact-SHA project integrity checks and npm test passed; parent checkpoint contains documentation-only changes after last product source SHA."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
-    "localStaticPlaywright": "PASS",
-    "responsiveThemeScreenshotMatrix": "PASS_102_PNGS",
-    "deployedPreviewDiagnostic": "PASS",
-    "pageErrors": "NONE_RECORDED",
-    "consoleErrors": "NONE_RECORDED",
-    "failedRequests": "NONE_RECORDED",
-    "httpErrors": "NONE_RECORDED",
-    "attemptedWrites": "NONE_RECORDED",
-    "unexpectedApiPaths": "NONE_RECORDED",
-    "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-    "currentBranchHead": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
-    "currentBranchHeadValidation": "NOT_VERIFIED_DOCS_ONLY_HEAD"
+    "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+    "projectIntegrity": "PASS",
+    "localStaticPlaywright": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "deployedPreviewDiagnostic": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "currentHeadPlaywright": "NOT_RUN_FOR_DOCS_ONLY_CHECKPOINT",
+    "productionDeployment": "NOT_PERFORMED"
   },
   "historicalRuns": [
     {
@@ -173,10 +160,11 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Continue semantic provenance review of remaining runtime/API/configuration and test paths in PR #111; no speculative deletions.",
-    "Retain per-run compact text/JSON evidence; screenshot matrices belong in Actions artifacts.",
-    "Fetch exact-SHA validation for current branch HEAD after this handoff sync.",
-    "Keep authenticated backend QA NOT_TESTED, all 12 screens PARTIAL_NOT_ACCEPTED, and Production deployment NOT_PERFORMED."
+    "Continue provenance review of runtime/API/migration/setup/deploy/workflow files; no remote setup/migration/deploy execution.",
+    "Preserve separate payment route boundaries because authentication and public exposure differ.",
+    "Keep per-run compact history even when blobs are identical unless policy changes with owner approval.",
+    "Fetch exact-SHA validation for the next handoff-only commit.",
+    "Keep authenticated backend QA NOT_TESTED, all 12 screens PARTIAL_NOT_ACCEPTED, Production deployment NOT_PERFORMED."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -185,10 +173,10 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-  "testedCommitSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-  "capturedAt": "2026-10-22T19:35:37.668Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
+  "latestCodeCommitSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "testedCommitSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "capturedAt": "2026-10-22T19:41:44.271Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -238,18 +226,20 @@
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
-    "Current branch HEAD d49c09c is a workflow-generated evidence commit; exact-SHA source validation has not been verified yet.",
-    "Authenticated business/backend QA remains NOT_TESTED; screenshots use a local static login shell and read-only synthetic fixtures."
+    "Broader source/API/migration/setup/workflow provenance review remains PARTIAL; no additional safe deletion or route merge was proven in the reviewed slice.",
+    "Authenticated business/backend QA remains NOT_TESTED; screenshot fixtures are read-only synthetic data."
   ],
   "blockedItems": [
     "Authenticated Preview backend workflows are not proven by fixture screenshots; no Cloudflare Access bypass or secret changes permitted."
   ],
   "productionDeployment": "NOT_PERFORMED",
   "currentHeadValidation": {
-    "sha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-    "validationRun": 39840693024,
-    "previewRun": 39840692976,
-    "result": "PASS_SOURCE_AND_PREVIEW_CHECKS",
-    "note": "Source/test SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118 passed both workflows. Branch HEAD f25ae00d3613b9047c79f8ae8673685b752d6d66 includes documentation-only updates after that tested SHA; fetch live before acting."
+    "sha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+    "workflowRunId": 39841964451,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
+    "workflowRunsLookup": "FOUND_EXACT_SHA_RUN",
+    "combinedStatus": "SUCCESS",
+    "result": "PASS",
+    "note": "npm run check and npm test passed on exact parent HEAD. Upcoming handoff-only commit has a new SHA and must be checked separately; Preview matrix remains on product/UI SHA 2eb6e7e."
   }
 }

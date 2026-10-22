@@ -12,14 +12,13 @@
 - [Chính sách lưu lịch sử kiểm thử](history/README.md)
 
 ## Checkpoint đã xác minh qua GitHub API
-- Repo: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`.
-- PR #111 trước lần đồng bộ handoff này: HEAD `f25ae00d3613b9047c79f8ae8673685b752d6d66`, OPEN/unmerged, 385 changed paths (+38799/−211), mergeable=false; base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- PR #108 OPEN/unmerged, READ-ONLY; live HEAD `697c434f7e0c0408bcc7e2049cd660a2fb642d91`, 286 changed paths. Không sửa PR #108/static branch.
-- Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) và Preview [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) PASS trên exact source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`; `npm run check`, `npm test`, Playwright và Preview diagnostic đều PASS.
-- Artifact `admin-preview-evidence-352`: 102 PNG (16 login shell, 86 read-only fixture screens, 78 fixture metrics); không ghi nhận browser/console/network errors hoặc attempted writes. Đây không phải authenticated business-backend QA.
-- B1 cleanup hoàn tất: 912 PNG lịch sử, 10 snapshot bàn giao trùng, prompt/static audit cũ, ZIP không tham chiếu, static-only workflow/capture script và static-only test pollution đã được xử lý. `public/index.html` trùng blob với `main`; chỉ `public/admin/index.html` nằm trong diff. Ảnh tham chiếu chuẩn được giữ.
-- Census: 385 paths — .github 1; root 2; data 1; docs 331; functions 24; migrations 2; package.json 1; public 1; scripts 4; tests 19. Không còn PNG sinh tự động trong history hoặc thư mục legacy snapshot.
-- Tiến độ sản phẩm vẫn **50% PROVISIONAL**; 12 màn hình PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+- Repo `chichute5500/Sindarealest-admin`; chỉ ghi vào nhánh `feature/admin-isolated-handoff-2026-10-20`.
+- PR #111 parent HEAD `73dfad5e35939da22dd37efd12bf8b06c09e7716`: OPEN/unmerged, 385 paths (+38829/−211), mergeable=false; base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- PR #108 OPEN/unmerged, READ-ONLY at live HEAD `7df19eb8c5a0a6cbdc76886b630905c89cf9c466`, 286 paths.
+- Exact-SHA Validate [#39841964451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451) PASS on `73dfad5e35939da22dd37efd12bf8b06c09e7716`: `npm run check` + `npm test`. UI matrix + Preview diagnostic pass on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics).
+- Live census {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}; extensions {"yml":1,"txt":1,"json":165,"md":166,"html":2,"png":1,"js":26,"sql":2,"mjs":21}; 318 retained history records. B1 cleanup COMPLETE; broader provenance review PARTIAL.
+- This handoff-only sync creates a new HEAD; fetch exact-SHA validation before marking the new HEAD checked.
+
 
 ## Required operating sequence
 1. Fetch live PR #111 and #108, branch HEAD, merge base and recent Actions. Treat every SHA/count in these docs as a checkpoint, not live truth.

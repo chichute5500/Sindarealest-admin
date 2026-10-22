@@ -11,14 +11,14 @@
 ## Historical checkpoint snapshots below
 
 
-## Current live checkpoint — 2026-10-22T19:35:37Z
+## Current live checkpoint — 2026-10-22T19:41:44.271Z
 
-- Live HEAD at this checkpoint: `8101482978109dc0c9fe93dc29569d4dc8496018`; PR #111 OPEN/unmerged, 385 changed paths (+38,795/−211), mergeable=false. This HEAD contains handoff/documentation synchronization after the successful code/test SHA below.
-- PR #108 remains OPEN/unmerged and READ-ONLY at `ae2a46506a1b1f4db9dea5bd9131e71bf4fd5f86` (286 changed paths).
-- Exact source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`: Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) SUCCESS; Preview diagnostic [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) SUCCESS. `npm run check`, `npm test`, Playwright matrix and configured Preview diagnostic all passed on that exact source/test SHA.
-- Artifact [admin-preview-evidence-352](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976/artifacts/12451964183): 102 PNGs (16 login shell, 86 read-only fixture module captures, 78 fixture metrics), no recorded browser/console/network errors or attempted writes. Fixture captures are not authenticated business-backend acceptance.
-- B1 cleanup is complete for generated historical PNGs, duplicate/stale handoff material, unreferenced ZIP, static-only workflow/capture script and static-site test pollution. Current diff: 385 paths; 331 docs, 24 functions, 19 tests, 4 scripts; no generated PNGs in history and no legacy snapshot folder. The approved reference PNG remains; `public/index.html` is byte-identical to `main`.
-- Product progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+- Verified parent HEAD `73dfad5e35939da22dd37efd12bf8b06c09e7716`; PR #111 OPEN/unmerged, 385 paths (+38829/−211), mergeable=false. This docs-only sync creates a new HEAD needing exact-SHA validation.
+- PR #108 OPEN/unmerged/read-only at `7df19eb8c5a0a6cbdc76886b630905c89cf9c466` (286 paths).
+- Exact-SHA Validate #39841964451 PASS on `73dfad5e35939da22dd37efd12bf8b06c09e7716`: `npm run check`, `npm test`. UI matrix/Preview diagnostic PASS on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics).
+- B1 cleanup complete; census {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}, 318 per-run history records retained. Payment/API slice reviewed; no safe additional deletion/merge proven. Broader provenance review PARTIAL.
+- Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
+
 
 ## Historical checkpoints below
 
@@ -78,3 +78,12 @@ No merge/force push/deploy; no main/static writes; no Access bypass or secret op
 - Exact-SHA source/test validation [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) PASS and Preview diagnostics [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) PASS on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`. Artifact `admin-preview-evidence-352` contains 102 screenshots (16 login shell, 86 read-only fixture screens; 78 fixture metrics).
 - Workflow then committed compact evidence, advancing live HEAD to `d49c09c582be2e8dad2d501347415581abbe01d5`. Exact-SHA validation for that generated-evidence HEAD is **NOT_VERIFIED**; do not transfer the prior PASS to it.
 - Product progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
+
+
+## Live source/API review checkpoint — 2026-10-22T19:41:44.271Z
+
+- Parent HEAD `73dfad5e35939da22dd37efd12bf8b06c09e7716`: PR #111 OPEN/unmerged, 385 paths (+38829/−211), mergeable=false. PR #108 OPEN/unmerged/read-only at `7df19eb8c5a0a6cbdc76886b630905c89cf9c466` (286 paths).
+- Exact-SHA [Validate #39841964451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451) PASS on `73dfad5e35939da22dd37efd12bf8b06c09e7716`: `npm run check` + `npm test`. Latest UI matrix/Preview diagnostic PASS on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics); this is not authenticated backend acceptance.
+- Census: {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}; extensions {"yml":1,"txt":1,"json":165,"md":166,"html":2,"png":1,"js":26,"sql":2,"mjs":21}. Retain 318 history records (161 JSON, 157 Markdown), plus 13 other docs.
+- Reviewed payment QR configuration/upload/preview, active public QR serving, customer capability-token view, admin payment requests/ledger, migrations 0008/0009, setup/deploy scripts and Preview workflow. No safe deletion/merge proven: payment endpoints have different auth/exposure responsibilities; migrations are referenced by checks/tests and are deferred only for remote application; setup/deploy scripts were read but not executed. `playwright.config.js` has no current repository references and the replacement workflow invokes both E2E specs by explicit path. Three identical historical diagnostics retained by policy.
+- B1 cleanup COMPLETE; broader provenance review PARTIAL. Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.

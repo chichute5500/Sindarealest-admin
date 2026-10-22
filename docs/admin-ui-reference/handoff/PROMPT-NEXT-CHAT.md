@@ -5,11 +5,12 @@ Tiếp tục công việc thực tế trên GitHub. Đọc [START-HERE.md](START
 Repository: `chichute5500/Sindarealest-admin`.
 
 ## Last verified checkpoint
-- PR #111 OPEN/unmerged, writable branch `feature/admin-isolated-handoff-2026-10-20`; HEAD trước handoff sync `f25ae00d3613b9047c79f8ae8673685b752d6d66`; 385 changed paths (+38799/−211); mergeable=false.
-- PR #108 OPEN/unmerged, READ-ONLY; HEAD `697c434f7e0c0408bcc7e2049cd660a2fb642d91`, 286 changed paths.
-- Source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`: Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) and Preview diagnostic [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) both SUCCESS. Artifact `admin-preview-evidence-352` contains 102 PNGs and 78 fixture metrics. This is read-only fixture coverage, not authenticated business-backend QA.
-- **B1 cleanup is complete; do not repeat it.** 912 historical generated PNGs, 10 duplicate handoff snapshots, stale prompt/static audit docs, unreferenced ZIP, static-only workflow/capture script and static-only test pollution were removed. `public/index.html` is byte-identical to `main`; approved Admin reference PNG is retained.
-- Broader source/API/migration/setup/workflow provenance review remains PARTIAL. Product progress 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+- PR #111 OPEN/unmerged, branch `feature/admin-isolated-handoff-2026-10-20`; parent HEAD `73dfad5e35939da22dd37efd12bf8b06c09e7716`; 385 paths (+38829/−211), mergeable=false.
+- PR #108 OPEN/unmerged, READ-ONLY at `7df19eb8c5a0a6cbdc76886b630905c89cf9c466`, 286 paths.
+- Exact-SHA Validate [#39841964451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451) passed `npm run check` + `npm test` on `73dfad5e35939da22dd37efd12bf8b06c09e7716`. UI matrix + Preview diagnostic pass on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118` (102 PNGs, 78 fixture metrics).
+- B1 cleanup complete; no additional safe deletion/merge proven in reviewed payment/API slice. Payment endpoints have distinct auth boundaries; migrations 0008/0009 remain deferred only for remote application. Broader provenance audit remains PARTIAL.
+- Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+
 
 ## Next task
 1. Read `current-status.json`, `latest-test-results.json`, `LATEST-STATUS.md`, `12-SCREEN-REFERENCE-AUDIT.md`, `PR-111-SCOPE-AUDIT.md` and `history/README.md`; fetch live state first.

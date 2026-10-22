@@ -1,24 +1,23 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:38:09.287Z",
+  "capturedAtUtc": "2026-10-22T19:41:44.271Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
+  "branchHeadAtCheckpointStart": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
-  "codeTestSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+  "codeTestSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestActionsRun": {
-    "id": 39840692976,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
+    "id": 39841964451,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-    "jobId": 120040591092,
-    "artifactName": "admin-preview-evidence-352"
+    "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+    "jobId": 120045068730
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL; source checks, npm test, local responsive/theme screenshot matrix, and deployed Preview diagnostic passed on source SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118 (run #39840692976). This is not authenticated business-backend acceptance. Workflow evidence commit moved branch HEAD to d49c09c582be2e8dad2d501347415581abbe01d5; exact-SHA validation for that generated-evidence HEAD is not verified.",
+  "progressBasis": "50% PROVISIONAL. npm run check and npm test passed on exact parent HEAD 73dfad5e35939da22dd37efd12bf8b06c09e7716 (run #39841964451). Latest product/UI source SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118 passed source tests, Playwright screenshot matrix and Preview diagnostic. Authenticated backend acceptance remains untested.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -26,10 +25,8 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "697c434f7e0c0408bcc7e2049cd660a2fb642d91",
+      "headSha": "7df19eb8c5a0a6cbdc76886b630905c89cf9c466",
       "changedFiles": 286,
-      "additions": 20464,
-      "deletions": 394,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false
     },
@@ -40,9 +37,9 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
+      "headSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
       "changedFiles": 385,
-      "additions": 38799,
+      "additions": 38829,
       "deletions": 211,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
@@ -50,18 +47,12 @@
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39840692976,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976",
-      "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+      "id": 39841964451,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
+      "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
       "status": "completed",
       "conclusion": "success",
-      "jobId": 120040591092,
-      "artifact": {
-        "name": "admin-preview-evidence-352",
-        "storage": "GitHub Actions artifact",
-        "screenshots": 102,
-        "retentionDays": 14
-      }
+      "jobId": 120045068730
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -171,7 +162,6 @@
       "docs": 331,
       "functions": 24,
       "migrations": 2,
-      "package.json": 1,
       "public": 1,
       "scripts": 4,
       "tests": 19
@@ -223,7 +213,28 @@
       "docs/admin-ui-reference/handoff/latest-test-results.json",
       "docs/admin-ui-reference/reference-instructions.md",
       "docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
-    ]
+    ],
+    "lastReviewCheckpoint": {
+      "capturedAtUtc": "2026-10-22T19:41:44.271Z",
+      "head": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+      "changedFiles": 385,
+      "historyRecords": 318,
+      "historyMarkdown": 157,
+      "historyJson": 161,
+      "otherDocs": 13,
+      "exactShaValidationRun": 39841964451,
+      "exactShaValidation": "PASS",
+      "reviewedSlice": "Payment QR configuration/upload/preview, active public QR serving, customer capability-token payment view, admin payment requests/ledger, migrations 0008/0009, setup/deploy scripts and Preview workflow.",
+      "findings": [
+        "No safe additional deletion or merge proven in reviewed slice.",
+        "Payment endpoints have distinct authentication/exposure responsibilities; keep separate.",
+        "Migration 0008/0009 are referenced by source checks/tests; owner deferral prohibits remote application, not deletion.",
+        "playwright.config.js has no current repository search references; both E2E specs are invoked by explicit path in the replacement workflow.",
+        "Three identical historical preview-diagnostics JSON records retained under per-run evidence policy."
+      ],
+      "remoteActions": "NONE",
+      "productionDeployment": "NOT_PERFORMED"
+    }
   },
   "guardrails": [
     "Only write feature/admin-isolated-handoff-2026-10-20.",
@@ -241,10 +252,10 @@
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T19:38:09.287Z",
-    "syncPurpose": "Refresh live PR #111/#108 checkpoint after B1 cleanup and exact-SHA successful validation. Keep broader source/API/migration/setup/workflow provenance audit partial."
+    "lastSyncAtUtc": "2026-10-22T19:41:44.271Z",
+    "syncPurpose": "Refresh exact validation state and record runtime/API provenance findings; the new handoff commit needs exact-SHA validation."
   },
-  "currentHeadAtCheckpoint": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
+  "currentHeadAtCheckpoint": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "currentHeadValidation": {
     "sha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "workflowRunsLookup": "PASS_ON_TESTED_SOURCE_SHA",
