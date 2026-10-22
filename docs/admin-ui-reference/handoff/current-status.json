@@ -1,6 +1,6 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:56:00Z",
+  "capturedAtUtc": "2026-10-22T15:58:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "checkpointSemantics": "Branch HEAD changes with every documentation commit. The SHA recorded as headObservedBeforeHandoffSync is historical only; always fetch live PR/branch HEAD. codeTestSha is the exact product revision validated by the recorded source CI and may differ from current docs-only HEAD.",
@@ -18,7 +18,8 @@
       "changedFiles": 288,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
-      "lastObservedHeadSha": "ff60d41b2bee9367aa88e8c0e3cd4b8d830977bb"
+      "lastObservedHeadSha": "03d05fe78adaab9661ea0960560ea22600d98cae",
+      "lastObservedAt": "2026-10-22T15:57Z"
     },
     "111": {
       "state": "OPEN",
