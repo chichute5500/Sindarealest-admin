@@ -54,6 +54,58 @@ async function captureElement(page, selector, filename) {
   await element.screenshot({ path: path.join(outDir, filename), animations: 'disabled', type: 'jpeg', quality: 88 });
   audit.screenshots.push({ filename, fullPage: false, element: selector });
 }
+async function auditArrowPressInPlace(page, selector, theme, surface, audit) {
+  const arrow = page.locator(selector).first();
+  await arrow.waitFor({ state: 'visible' });
+  await arrow.scrollIntoViewIfNeeded();
+  const box = await arrow.boundingBox();
+  if (!box) {
+    return { selector, theme, surface, pass: false, reason: 'arrow has no visible bounding box' };
+  }
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+  const metrics = async () => arrow.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    const style = getComputedStyle(el);
+    const transform = style.transform === 'none'
+      ? new DOMMatrixReadOnly('matrix(1,0,0,1,0,0)')
+      : new DOMMatrixReadOnly(style.transform);
+    return {
+      active: el.matches(':active'),
+      centerX: rect.left + rect.width / 2,
+      centerY: rect.top + rect.height / 2,
+      scaleX: Math.hypot(transform.a, transform.b),
+      scaleY: Math.hypot(transform.c, transform.d),
+      transform: style.transform,
+      rippleOverlayOpacity: getComputedStyle(el, '::before').opacity,
+    };
+  });
+  await page.mouse.move(x, y);
+  await page.waitForTimeout(360);
+  const rest = await metrics();
+  await page.mouse.down();
+  await page.waitForTimeout(125);
+  const pressed = await metrics();
+  await capture(page, `${surface}-arrow-pressed-mobile-${theme}.jpg`);
+  await page.mouse.up();
+  await page.mouse.move(Math.max(1, x - box.width - 20), Math.max(1, y - box.height - 20));
+  await page.waitForTimeout(360);
+  const released = await metrics();
+  const centerShiftPx = Math.abs(pressed.centerY - rest.centerY);
+  const passed = pressed.active
+    && centerShiftPx <= 1
+    && pressed.scaleX >= 0.95 && pressed.scaleX <= 0.99
+    && pressed.scaleY >= 0.95 && pressed.scaleY <= 0.99
+    && pressed.rippleOverlayOpacity === '0'
+    && released.scaleX >= 0.985 && released.scaleX <= 1.015
+    && released.scaleY >= 0.985 && released.scaleY <= 1.015;
+  return {
+    selector, theme, surface, pass: passed, centerShiftPx,
+    rest, pressed, released,
+    criteria: 'hold pointer: active state, <=1px vertical-center shift, scale .95-.99, no active pseudo overlay, scale resets near 1 after release',
+  };
+}
+
 async function settle(page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
@@ -779,6 +831,22 @@ try {
       url: location.pathname,
       thumbnailCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
     }));
+    const detailArrowPress = await auditArrowPressInPlace(page, '#detailNext', theme, 'detail-gallery', audit);
+    audit.interactions.push({ theme, check: 'detail-gallery-arrow-press-stays-centered-no-ripple', ...detailArrowPress });
+    if (!detailArrowPress.pass) hardFailures.push('Detail gallery arrow moved vertically, lost pressed scale, or showed an overlay: ' + theme);
+    const detailSourceBeforeArrow = await page.locator('#detailMainImage').getAttribute('src');
+    await page.locator('#detailNext').click();
+    await page.waitForFunction((before) => document.querySelector('#detailMainImage')?.getAttribute('src') !== before, detailSourceBeforeArrow);
+    const detailSourceAfterNext = await page.locator('#detailMainImage').getAttribute('src');
+    await page.locator('#detailPrev').click();
+    await page.waitForFunction((before) => document.querySelector('#detailMainImage')?.getAttribute('src') === before, detailSourceBeforeArrow);
+    const detailArrowNavigationPass = Boolean(detailSourceBeforeArrow)
+      && Boolean(detailSourceAfterNext)
+      && detailSourceAfterNext !== detailSourceBeforeArrow
+      && await page.locator('#detailMainImage').getAttribute('src') === detailSourceBeforeArrow;
+    audit.interactions.push({ theme, check: 'detail-gallery-next-then-previous-restores-image', pass: detailArrowNavigationPass,
+      result: { before: detailSourceBeforeArrow, afterNext: detailSourceAfterNext, afterPrevious: await page.locator('#detailMainImage').getAttribute('src') } });
+    if (!detailArrowNavigationPass) hardFailures.push('Detail gallery previous/next arrows did not restore the original image: ' + theme);
     const expectedRoute = galleryState.url === '/sanpham/sneaker/sneakers-new-sneaker-contrast';
     const galleryBasePass = galleryState.dialogSemantics && galleryState.focusOnClose
       && galleryState.sku.includes('Chưa được cung cấp')
@@ -842,6 +910,21 @@ try {
         && !document.querySelector('#sdFullscreenViewer')?.hasAttribute('inert'),
       focusOnClose: document.activeElement?.id === 'sdFullscreenClose',
     }));
+    const fullscreenArrowPress = await auditArrowPressInPlace(page, '#sdFullscreenNext', theme, 'fullscreen-gallery', audit);
+    audit.interactions.push({ theme, check: 'fullscreen-gallery-arrow-press-stays-centered-no-ripple', ...fullscreenArrowPress });
+    if (!fullscreenArrowPress.pass) hardFailures.push('Fullscreen gallery arrow moved vertically, lost pressed scale, or showed an overlay: ' + theme);
+    const fullscreenCountBeforeArrow = (await page.locator('#sdFullscreenCount').textContent() || '').trim();
+    await page.locator('#sdFullscreenNext').click();
+    await page.waitForFunction((before) => (document.querySelector('#sdFullscreenCount')?.textContent || '').trim() !== before, fullscreenCountBeforeArrow);
+    const fullscreenCountAfterNext = (await page.locator('#sdFullscreenCount').textContent() || '').trim();
+    await page.locator('#sdFullscreenPrev').click();
+    await page.waitForFunction((before) => (document.querySelector('#sdFullscreenCount')?.textContent || '').trim() === before, fullscreenCountBeforeArrow);
+    const fullscreenArrowNavigationPass = Boolean(fullscreenCountBeforeArrow)
+      && fullscreenCountAfterNext !== fullscreenCountBeforeArrow
+      && (await page.locator('#sdFullscreenCount').textContent() || '').trim() === fullscreenCountBeforeArrow;
+    audit.interactions.push({ theme, check: 'fullscreen-gallery-next-then-previous-restores-image', pass: fullscreenArrowNavigationPass,
+      result: { before: fullscreenCountBeforeArrow, afterNext: fullscreenCountAfterNext, afterPrevious: (await page.locator('#sdFullscreenCount').textContent() || '').trim() } });
+    if (!fullscreenArrowNavigationPass) hardFailures.push('Fullscreen gallery previous/next arrows did not restore the original image: ' + theme);
     const fullscreenPass = fullscreenState.dialogSemantics && fullscreenState.focusOnClose;
     audit.interactions.push({ theme, check: 'fullscreen-gallery-dialog-and-focus', pass: fullscreenPass, result: fullscreenState });
     if (!fullscreenPass) hardFailures.push('Fullscreen product gallery dialog state failed: ' + theme);
