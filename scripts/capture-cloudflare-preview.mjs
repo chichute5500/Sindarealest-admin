@@ -1066,10 +1066,10 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone'), null, { timeout: 1800 }).catch(() => {});
       const imageBeforeFailure = before.imageSrc;
       await page.evaluate(() => { document.querySelector('#detailMainImage')?.removeAttribute('src'); });
-      const imageUnavailable = await page.evaluate(() => {
+      const imageUnavailable = await page.waitForFunction(() => {
         const image = document.querySelector('#detailMainImage');
         return Boolean(image && !image.getAttribute('src') && image.complete && image.naturalWidth === 0);
-      });
+      }, null, { timeout: 1000 }).then(() => true).catch(() => false);
       const missingBefore = await readCartState(before.productId);
       await addButton.click();
       await page.waitForFunction(({ id, quantity }) => {
@@ -1098,6 +1098,8 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       }, null, { timeout: 6000 }).catch(() => {});
     }
 
+    await page.locator('#detailClose').click();
+    await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 5000 });
     const beforeOpenCart = await readCartState(before.productId);
     await page.locator('#cartOpen').click();
     await page.waitForFunction(() => document.querySelector('#cartDrawer')?.classList.contains('open'), null, { timeout: 5000 });
@@ -1213,12 +1215,13 @@ async function captureCardFlyToCartProbe(page, button, viewport, theme, context,
   });
   const finished = await page.waitForFunction(() => !document.querySelector('.sd-fly-to-cart-clone')
     && document.querySelector('#cartOpen')?.classList.contains('sd-cart-bump'), null, { timeout: 1800 }).then(() => true).catch(() => false);
-  const after = await page.evaluate(id => {
+  const after = await page.evaluate(({ id, entryPoint }) => {
     let cart = {};
     try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
     const quantities = cart && typeof cart === 'object' ? cart : {};
     const total = Object.values(quantities).reduce((sum, value) => sum + Number(value || 0), 0);
-    const card = document.querySelector('[data-product="' + CSS.escape(id) + '"]');
+    const grid = entryPoint === 'featured-selected-image' ? '#featuredGrid' : '#catalogGrid';
+    const card = document.querySelector(grid + ' [data-product="' + CSS.escape(id) + '"]');
     const featured = card?.matches('[data-featured-card]');
     const image = featured
       ? (card.querySelector('[data-feature-track]')?.children[Number(card.dataset.featureIndex || 0)] || card.querySelector('.feature-single'))
@@ -1229,7 +1232,7 @@ async function captureCardFlyToCartProbe(page, button, viewport, theme, context,
       expectedBadge:total>99?'99+':String(total), toastVisible:Boolean(document.querySelector('#toast.show')),
       imageRect:ir?{x:ir.x,y:ir.y,width:ir.width,height:ir.height}:null,
       stageRect:sr?{x:sr.x,y:sr.y,width:sr.width,height:sr.height}:null };
-  }, before.productId);
+  }, { id: before.productId, entryPoint });
   const sameRect = (a,b) => Boolean(a&&b&&['x','y','width','height'].every(key=>Math.abs(a[key]-b[key])<0.5));
   const sourceMatches = Boolean(start && start.sourceImage === before.sourceImage && start.src === before.sourceImage);
   const moved = Boolean(start && mid && mid.progress > start.progress && mid.transform !== start.transform);
