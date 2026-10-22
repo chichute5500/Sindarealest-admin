@@ -1,14 +1,14 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-22T18:50:41+07:00",
+  "updatedAt": "2026-10-22T21:05:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "HEAD below was verified immediately before this documentation-only consolidation commit. Each new session must fetch the live branch and PR HEAD again.",
+  "checkpointSemantics": "The handoff consolidation commit 5497d4d3b51d32064a9a993e0f891ca672c543c1 was docs-only. This update records a later docs-only visual-review checkpoint; always fetch live HEAD and PR state before new writes.",
   "branchHeadAtCheckpoint": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% tạm tính. Chưa nghiệm thu đủ 12 màn theo poster gốc; backend/nghiệp vụ thật chưa được kiểm thử. Không cộng tiến độ do docs-only, test đơn lẻ hoặc CI xanh.",
+  "progressBasis": "No source change or newly accepted screen in the latest checkpoint; do not increase progress for documentation or a partial fixture comparison.",
   "sourceTreeComparison": {
     "sourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
     "checkpointHead": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
@@ -57,6 +57,16 @@
       "Official poster: #6 Orders, #7 Order detail, #11 Backup/Restore, #12 Activity log.",
       "Reference #3 shows photos and sample price/stock; source fixture uses explicitly missing-image placeholders and unknown price/stock. This is a fixture-data limitation, not proof of a source bug.",
       "Continue #3 same-viewport/state comparison beyond SKU-wrap fix; do not fabricate data."
+    ],
+    "followUpAt": "2026-10-22T21:05:00+07:00",
+    "followUpArtifact": "admin-preview-evidence-311 / 12420678829",
+    "followUpSourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
+    "followUpScreenshot": "products-reference-matrix__390x844__light.png",
+    "followUpResult": "LIMITED_COMPARISON_FIXTURE_DATA_MISMATCH_NO_NEW_SOURCE_DEFECT_PROVEN",
+    "followUpFindings": [
+      "Poster and #3 screenshot opened directly from downloaded artifact #311.",
+      "Fixture uses placeholder thumbnails and unknown price/stock; poster uses example photos and populated values. Do not fabricate data to match it.",
+      "No reproducible independent source defect confirmed from this screenshot; screen #3 remains PARTIAL_NOT_ACCEPTED."
     ]
   },
   "acceptance": {
@@ -198,8 +208,8 @@
       "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
     }
   },
-  "lastCompletedTask": "Verified live GitHub state/workflow; opened reference and Product list #3 screenshot from artifact #311; enumerated 1,285 PR #111 paths; corrected official 12-screen indexing in current handoff.",
-  "currentTask": "Continue Product list #3 same-viewport/theme reference comparison; change source only if a concrete ADMIN-only gap is proven.",
+  "lastCompletedTask": "Verified handoff files live on ADMIN branch; downloaded/opened artifact #311 and official poster; compared Product list #3 at 390x844 light and recorded fixture-data limitation. No source change because no independent reproducible defect was proven.",
+  "currentTask": "Continue Product list #3 matched-state review at 320x640 and 360x800 light/dark using artifact #311/metrics; only patch a proven ADMIN-only defect, otherwise proceed to screen #4.",
   "taskQueue": [
     {
       "id": "P1-PRODUCTS-03",
@@ -207,7 +217,7 @@
       "status": "IN_PROGRESS",
       "task": "Product list #3 parity beyond narrow-SKU wrapping.",
       "acceptance": "Matched viewport/theme screenshots, card density/actions/filters/pagination/overflow review, no invented data, exact-SHA regression evidence.",
-      "nextAction": "Inspect #3 markup/CSS and metrics; distinguish layout defects from missing fixture data."
+      "nextAction": "Review 320x640 and 360x800 light/dark #3 screenshots and metrics from artifact #311; separate fixture-data mismatch from layout defects; patch only a proven defect."
     },
     {
       "id": "P1-EDITOR-04",
@@ -285,5 +295,6 @@
     "pr111Head": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
     "pr111State": "open",
     "pr111Merged": false
-  }
+  },
+  "handoffReviewAt": "2026-10-22T21:05:00+07:00"
 }
