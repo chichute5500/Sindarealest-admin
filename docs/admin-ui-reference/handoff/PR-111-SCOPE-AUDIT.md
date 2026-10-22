@@ -179,3 +179,13 @@ This supersedes prior census counts above. PR #111 was verified at HEAD `61d68b3
 - Exact-SHA source/test validation [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) PASS and Preview diagnostics [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) PASS on source SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`. Artifact `admin-preview-evidence-352` contains 102 screenshots (16 login shell, 86 read-only fixture screens; 78 fixture metrics).
 - Workflow then committed compact evidence, advancing live HEAD to `d49c09c582be2e8dad2d501347415581abbe01d5`. Exact-SHA validation for that generated-evidence HEAD is **NOT_VERIFIED**; do not transfer the prior PASS to it.
 - Product progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
+
+
+## Latest live checkpoint — 2026-10-22T19:38:09Z
+
+- PR #111 HEAD before this handoff synchronization: `f25ae00d3613b9047c79f8ae8673685b752d6d66`; OPEN/unmerged; 385 changed paths (+38,799/−211), mergeable=false.
+- PR #108 remains OPEN/unmerged/read-only at `697c434f7e0c0408bcc7e2049cd660a2fb642d91` (286 changed paths). The static branch was not edited.
+- Exact-SHA Validate #39840693024 and Preview #39840692976 both PASS on source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`. Artifact `admin-preview-evidence-352` contains 102 PNGs/78 fixture metrics, not authenticated backend evidence.
+- Top-level path census: .github 1; root 2; data 1; docs 331; functions 24; migrations 2; package.json 1; public 1; scripts 4; tests 19. Extensions: yml 1; txt 1; json 165; md 166; html 2; png 1; js 26; sql 2; mjs 21.
+- Cleanup is complete for generated evidence, duplicated/stale handoff material, unreferenced ZIP, static-only workflow/capture script and static-site test pollution. The approved reference PNG remains; no generated PNGs or legacy snapshot paths remain in the PR diff. `public/index.html` is byte-identical to `main`.
+- B1 cleanup subtask: **COMPLETE**. Full runtime/API/migration/setup/workflow provenance review remains **PARTIAL**. Product progress remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:35:37.668Z",
+  "capturedAtUtc": "2026-10-22T19:38:09.287Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "d49c09c582be2e8dad2d501347415581abbe01d5",
+  "branchHeadAtCheckpointStart": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
   "codeTestSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -39,8 +39,8 @@
     "attemptedWrites": "NONE_RECORDED",
     "unexpectedApiPaths": "NONE_RECORDED",
     "testedSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-    "currentBranchHead": "d49c09c582be2e8dad2d501347415581abbe01d5",
-    "currentBranchHeadValidation": "NOT_VERIFIED"
+    "currentBranchHead": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
+    "currentBranchHeadValidation": "NOT_VERIFIED_DOCS_ONLY_HEAD"
   },
   "historicalRuns": [
     {
@@ -246,10 +246,10 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "currentHeadValidation": {
-    "sha": "d49c09c582be2e8dad2d501347415581abbe01d5",
-    "workflowRunsLookup": "NO_RUN_RETURNED_FOR_GENERATED_EVIDENCE_COMMIT",
-    "combinedStatus": "NOT_YET_VERIFIED",
-    "result": "NOT_VERIFIED",
-    "note": "Source/test/Preview passed on 2eb6e7e, then workflow committed evidence and advanced branch HEAD to d49c09c. Do not transfer PASS to d49c09c without exact-SHA checks."
+    "sha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "validationRun": 39840693024,
+    "previewRun": 39840692976,
+    "result": "PASS_SOURCE_AND_PREVIEW_CHECKS",
+    "note": "Source/test SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118 passed both workflows. Branch HEAD f25ae00d3613b9047c79f8ae8673685b752d6d66 includes documentation-only updates after that tested SHA; fetch live before acting."
   }
 }

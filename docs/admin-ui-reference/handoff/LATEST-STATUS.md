@@ -1,5 +1,16 @@
 # LATEST STATUS — SinDarealest Admin
 
+## Current checkpoint — 2026-10-22T19:38:09.287Z
+
+- PR #111 pre-handoff-sync HEAD `f25ae00d3613b9047c79f8ae8673685b752d6d66`, OPEN/unmerged, 385 paths (+38799/−211), mergeable=false. PR #108 remains OPEN/unmerged/read-only at `697c434f7e0c0408bcc7e2049cd660a2fb642d91` (286 paths).
+- Source/test SHA `2eb6e7e9d6b1cf15002a7d67e299c713a4d32118`: Validate [#39840693024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840693024) and Preview [#39840692976](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39840692976) PASS. Artifact `admin-preview-evidence-352` has 102 PNGs and 78 fixture metrics; not authenticated backend QA.
+- B1 cleanup complete: 912 generated PNGs, 10 legacy snapshots, stale prompt/static audit docs, unreferenced ZIP, static-only workflow/capture script and static-only test pollution removed. `public/index.html` matches `main`; only `public/admin/index.html` remains under `public/` diff.
+- Current census: 385 paths; .github 1, root 2, data 1, docs 331, functions 24, migrations 2, package 1, public 1, scripts 4, tests 19. No history PNGs or legacy snapshots remain.
+- Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT PERFORMED.
+
+## Historical checkpoint snapshots below
+
+
 ## Current live checkpoint — 2026-10-22T19:35:37Z
 
 - Live HEAD at this checkpoint: `8101482978109dc0c9fe93dc29569d4dc8496018`; PR #111 OPEN/unmerged, 385 changed paths (+38,795/−211), mergeable=false. This HEAD contains handoff/documentation synchronization after the successful code/test SHA below.

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:35:37.668Z",
+  "capturedAtUtc": "2026-10-22T19:38:09.287Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "d49c09c582be2e8dad2d501347415581abbe01d5",
+  "branchHeadAtCheckpointStart": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
   "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
   "codeTestSha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
@@ -26,9 +26,9 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "ae2a46506a1b1f4db9dea5bd9131e71bf4fd5f86",
+      "headSha": "697c434f7e0c0408bcc7e2049cd660a2fb642d91",
       "changedFiles": 286,
-      "additions": 21065,
+      "additions": 20464,
       "deletions": 394,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false
@@ -40,9 +40,9 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "d49c09c582be2e8dad2d501347415581abbe01d5",
+      "headSha": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
       "changedFiles": 385,
-      "additions": 38756,
+      "additions": 38799,
       "deletions": 211,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
@@ -171,6 +171,7 @@
       "docs": 331,
       "functions": 24,
       "migrations": 2,
+      "package.json": 1,
       "public": 1,
       "scripts": 4,
       "tests": 19
@@ -240,8 +241,16 @@
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T19:35:37.668Z",
-    "syncPurpose": "B1 checkpoint: refreshed exact PR #111/#108 state, changed-path/extension census, source/test/Preview evidence on SHA 2eb6e7e, and NOT_VERIFIED boundary for current evidence commit d49c09c."
+    "lastSyncAtUtc": "2026-10-22T19:38:09.287Z",
+    "syncPurpose": "Refresh live PR #111/#108 checkpoint after B1 cleanup and exact-SHA successful validation. Keep broader source/API/migration/setup/workflow provenance audit partial."
   },
-  "currentHeadAtCheckpoint": "d49c09c582be2e8dad2d501347415581abbe01d5"
+  "currentHeadAtCheckpoint": "f25ae00d3613b9047c79f8ae8673685b752d6d66",
+  "currentHeadValidation": {
+    "sha": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
+    "workflowRunsLookup": "PASS_ON_TESTED_SOURCE_SHA",
+    "validateRun": 39840693024,
+    "previewRun": 39840692976,
+    "result": "PASS_SOURCE_AND_PREVIEW_CHECKS",
+    "note": "The current branch checkpoint f25ae00d3613b9047c79f8ae8673685b752d6d66 contains only handoff/documentation updates after tested source/test SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118; exact-SHA checks passed on 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118, not necessarily on the documentation-only HEAD."
+  }
 }
