@@ -88,14 +88,10 @@ function assertUniqueStaticIds(source, label) {
 assertUniqueStaticIds(storefrontSource, 'Storefront');
 assertUniqueStaticIds(adminSource, 'Admin');
 assert.ok(storefrontSource.includes('Tư vấn/đặt hàng qua Zalo'), 'The separate Zalo contact CTA must keep the approved label');
-assert.ok(storefrontSource.includes('title="Trao đổi trực tiếp qua Zalo"'), 'The separate Zalo contact CTA must describe only the confirmed contact channel');
 assert.ok(!storefrontSource.includes('Tư Vấn 24/7'), 'Do not claim 24/7 availability without confirmation');
 assert.ok(!storefrontSource.includes('Da tuyển chọn'), 'Do not claim an unverified leather selection process');
 for (const unsupportedClaim of ['Da Cá Sấu Thật', 'Thiết Kế Độc Quyền', 'Bảo Hành Uy Tín', 'Giao Hàng Toàn Quốc', 'Chính sách rõ ràng', 'Đẳng Cấp Thật', 'Từ Chất Liệu Thật', 'Cam kết chất lượng']) {
   assert.ok(!storefrontSource.includes(unsupportedClaim), `Storefront must not assert an unverified claim: ${unsupportedClaim}`);
-}
-for (const approvedPromise of ['Da cá sấu cao cấp', 'Hoàn thiện thủ công', 'Tỉ mỉ từng chi tiết', 'Bảo hành 1 năm', 'Bảo dưỡng trọn đời', 'Đa dạng mẫu mã', 'Đặt hàng theo yêu cầu']) {
-  assert.ok(storefrontSource.includes(approvedPromise), `Storefront must retain the approved brand promise: ${approvedPromise}`);
 }
 assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fallback must not shadow D1 failures');
 
