@@ -1,34 +1,33 @@
 # START HERE — SINDAREALEST ADMIN
 
-**Code/test SHA before this handoff-only commit:** `326526f8f74172ae0aea7fa37739c9a8e8f513ec`  
-**Progress:** 50% PROVISIONAL. Source/unit CI is green; current Playwright is pending.
+**This is the single entry point for every new chat. Do not ask the owner to paste old prompts or repeat project history.**
 
-## Current refs
-- [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, `feature/admin-isolated-handoff-2026-10-20`.
-- [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN/unmerged, protected website branch, latest observed head `32c4aa52e03e8917b930ff13d9775215e2876f62`; read-only.
-- The handoff commit advances ADMIN HEAD but does not change the code SHA tested below. Fetch live refs at session start.
+## First actions (mandatory)
+1. Fetch live PR #111, PR #108, branch HEAD and GitHub Actions. Treat this file as a map, not a substitute for live checks.
+2. Read `current-status.json` and `latest-test-results.json`; then read `LATEST-STATUS.md`, `12-SCREEN-REFERENCE-AUDIT.md`, and `PR-111-SCOPE-AUDIT.md`.
+3. Inspect the existing failed Preview run before dispatching any new run. Continue real work after a short checkpoint; do not stop after reporting.
+4. After every meaningful change, validate the exact code SHA and update the handoff files. Keep status files consistent with each other.
 
-## Actions
-- [Validate #39804852564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564): SUCCESS on `326526f8...`; dependency audit, `npm run check`, `npm test` passed.
-- [Preview #39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): PENDING; no job/artifact at last poll.
-- [Older blocker #39802525217](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217): in progress at Chromium installation on old SHA `920f53d...`. Poll existing run; don't dispatch duplicates.
+## Live checkpoint recorded 2026-10-22
+- Repository: `chichute5500/Sindarealest-admin`
+- Only writable branch: `feature/admin-isolated-handoff-2026-10-20`
+- PR #111: OPEN/unmerged. Last synchronized HEAD: `4d6dab2f56d4dec53955c300e8ea477062fd2587`; fetch live HEAD before acting.
+- PR #108: OPEN/unmerged and read-only for this task; fetch its live HEAD before acting.
+- Product/code-test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec` (different from documentation-only branch HEAD).
+- Progress: **50% PROVISIONAL**. Documentation changes do not increase product progress.
+- Source validation [run 39804852564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564): completed SUCCESS on code/test SHA `326526f8...`.
+- Preview diagnostics [run 39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): completed FAILURE on code/test SHA `326526f8...`; inspect job logs/artifacts to identify cause.
+- Older Preview [run 39802525217](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217): CANCELLED. Do not describe it as running or pending.
 
-## Product fix delivered
-- `e11ec06cd5870522735a28205b678897de829361`: Customers/Warranty endpoint failure or malformed response now renders an explicit error and GET-only retry.
-- `326526f8f74172ae0aea7fa37739c9a8e8f513ec`: synthetic HTTP 503→retry→GET fixture recovery test, authored but not yet run.
-
-## Read these live files
-1. `docs/admin-ui-reference/handoff/current-status.json`
-2. `docs/admin-ui-reference/handoff/latest-test-results.json`
-3. `docs/admin-ui-reference/handoff/LATEST-STATUS.md`
-4. `docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md`
-5. `docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md`
-6. `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`
-
-## Next actions
-Poll existing Preview runs; review screens #8 Customers, #9 Warranty/support, #10 Settings, #11 Backup/Restore and #12 Activity log against the approved reference at matching viewport/theme. Continue PR provenance review.
+## Immediate next task
+Inspect run 39804852604 jobs/logs/artifacts. Determine the exact failure before changing code. Fix only verified ADMIN issues on the writable branch and validate the resulting code SHA. Continue review of screens #8–#12 and PR #111 changed-file provenance.
 
 ## Guardrails
-- Only write ADMIN branch. Keep #111/#108 open/unmerged.
-- No main/static edits, Production deploy, Access bypass, secrets, setup/deploy/migration or remote D1/R2 operations.
-- No fake business data/API contracts. PASS requires exact SHA and logs/artifact; pending/no job is not PASS.
+- Keep PR #111 and #108 open/unmerged. Never write to `main` or the website/static branch.
+- No Production deployment, Cloudflare Access bypass, secrets access/exposure, or remote D1/R2/setup/migration operations.
+- No fabricated product/customer/order/pricing/stock/image data or unapproved API contracts.
+- Do not mark PASS without exact-SHA evidence. A source CI pass is not authenticated backend QA or full screen acceptance.
+- If a tool/action is blocked, state exactly what could not be changed; never claim an update that did not commit.
+
+## One-line command for future chats
+`Continue SinDarealest Admin from this START-HERE file: fetch live PR/branch/Actions, read the current status and test evidence, inspect the known Preview failure, then continue real work on the permitted ADMIN branch. Do not ask me to paste old prompts or repeat completed work; update all handoff files after checkpoints.`
