@@ -428,3 +428,10 @@ assert.match(redirects, /^\/san-pham\/\* \/index\.html 200$/m, 'Legacy product-d
 assert.doesNotMatch(redirects, /^\/\* \/index\.html 200$/m, 'Unknown paths must be allowed to return the real Pages 404 response.');
 assert.match(notFoundHtml, /id="notFoundTitle">404<\/h1>[\s\S]*href="\/"/, 'The real 404 document must include a heading and home link.');
 assert.match(live, /response\?\.status\(\) === 404[\s\S]*state\.hasNotFoundView/, 'The live 404 check must require HTTP status 404 and visible 404 content.');
+
+assert.match(live, /function isExpectedNotFoundResponse\(url, status\)[\s\S]*parsed\.pathname === expectedNotFoundPath[\s\S]*status === 404/,
+  'Only the exact dedicated unknown-route HTTP 404 may be excluded from generic HTTP error counts.');
+assert.match(live, /isExpectedNotFoundResponse\(sourceUrl, 404\)[\s\S]*msg\.text\(\)/,
+  'Only Chromium’s generic 404 console message for the dedicated unknown-route probe may be excluded.');
+assert.match(live, /!isExpectedNotFoundResponse\(res\.url\(\), res\.status\(\)\)/,
+  'Other same-origin HTTP errors must remain visible to the live audit.');

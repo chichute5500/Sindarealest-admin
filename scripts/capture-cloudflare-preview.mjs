@@ -22,6 +22,13 @@ try {
   process.exit(2);
 }
 const origin = previewUrl.origin;
+const expectedNotFoundPath = '/__sd-audit-not-found-20261022';
+function isExpectedNotFoundResponse(url, status) {
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === origin && parsed.pathname === expectedNotFoundPath && status === 404;
+  } catch { return false; }
+}
 let accessHeaders;
 try {
   accessHeaders = buildCloudflareAccessHeaders();
@@ -213,6 +220,10 @@ async function makePage(browser, viewport, theme, label, options = {}) {
     if (msg.type() !== 'error') return;
     const sourceUrl = msg.location()?.url || page.url();
     try { if (new URL(sourceUrl).origin !== origin) return; } catch { return; }
+    // Navigating to the dedicated unknown-route probe is expected to emit Chromium's
+    // generic document-404 console message; do not mask 404s for any other URL.
+    if (isExpectedNotFoundResponse(sourceUrl, 404)
+        && /Failed to load resource: the server responded with a status of 404/i.test(msg.text())) return;
     audit.consoleErrors.push({ context: label, message: sanitizeText(msg.text()), url: sanitizeUrl(sourceUrl) });
   });
   page.on('pageerror', (error) => {
@@ -220,7 +231,10 @@ async function makePage(browser, viewport, theme, label, options = {}) {
     audit.pageErrors.push({ context: label, message: sanitizeText(error.message) });
   });
   page.on('response', (res) => {
-    if (res.status() >= 400 && new URL(res.url()).origin === origin) audit.httpErrors.push({ context: label, status: res.status(), method: res.request().method(), url: sanitizeUrl(res.url()) });
+    if (res.status() >= 400 && new URL(res.url()).origin === origin
+        && !isExpectedNotFoundResponse(res.url(), res.status())) {
+      audit.httpErrors.push({ context: label, status: res.status(), method: res.request().method(), url: sanitizeUrl(res.url()) });
+    }
   });
   page.on('requestfailed', (req) => {
     let u; try { u = new URL(req.url()); } catch { return; }
@@ -1473,7 +1487,7 @@ async function captureSupplementalParityChecks(browser) {
   const label = 'supplemental-mobile-390-light';
   const { context, page } = await makePage(browser, viewport, theme, label);
   try {
-    const missingPath = '/__sd-audit-not-found-20261022';
+    const missingPath = expectedNotFoundPath;
     let response = null;
     try { response = await page.goto(origin + missingPath, { waitUntil: 'domcontentloaded', timeout: 45000 }); await page.waitForTimeout(220); }
     catch (error) { audit.hardFailures.push(sanitizeText('Direct not-found route navigation failed: ' + String(error.message || error))); }
