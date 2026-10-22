@@ -8,7 +8,7 @@
   "latestProductSourceCommit": "e11ec06cd5870522735a28205b678897de829361",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Source/unit validation passed on the explicit code/test SHA, but current Playwright and full screen acceptance remain pending. Handoff/test-only edits do not increase product progress.",
+  "progressBasis": "50% PROVISIONAL. Source/unit validation passed on exact codeTestSha, but local static Playwright fixture test timed out; deployed Preview diagnostic step passed. Full screen acceptance remains pending. Handoff/test-only edits do not increase product progress.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -67,7 +67,7 @@
       "workflowConclusion": "failure",
       "deployedPreviewDiagnostic": "success",
       "localStaticBaseline": "failure",
-      "failureCause": "Playwright test tests/e2e/admin-static-baseline.spec.js timed out after 120s waiting for [data-action=\"retry-customers\"] at line 1940; local source fixture test failed. Preview diagnostic step itself completed successfully.",
+      "failureCause": "Overall workflow failed because tests/e2e/admin-static-baseline.spec.js timed out after 120 seconds waiting for [data-action=\"retry-customers\"] at line 1940. The deployed Preview diagnostic step itself succeeded.",
       "artifact": {
         "id": 12437154740,
         "name": "admin-preview-evidence-336",
