@@ -270,7 +270,7 @@ assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/
   'Theme switching must not animate expensive backdrop-filter changes across glass surfaces.');
 
  
-// The owner-supplied Hero is a standalone presentation asset; overlays and edge masks are forbidden.
+// The owner-supplied Hero is a standalone presentation asset; only feathered canvas blending is permitted.
 const heroStyleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
 const heroImageDeclarations = [...heroStyleContents.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
   .filter(([, selector]) => selector.includes(".hero-visual img"));
@@ -283,16 +283,18 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     const property = effect[2].toLowerCase();
     const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
     const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
-      || (property === "mix-blend-mode" && value === "normal")
+      || (property.startsWith("mask") && value.startsWith("radial-gradient("))
+      || (property === "mix-blend-mode" && (value === "normal" || value === "multiply"))
       || (property === "opacity" && value === "1"));
     assert.ok(neutral, "Hero image must remain visually untouched (" + selector.trim() + ": " + declaration + ").");
   }
 }
 const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
 assert.ok(heroAssetDisplayLock.includes("filter:none!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
-  "The protected Hero image must render without CSS filters or masks.");
+  "The protected Hero image must not use CSS filters; the final feathered edge mask is explicitly tested separately.");
 assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
-  "The protected Hero image must retain its original colour and opacity.");
+  "The protected Hero image keeps full opacity; the final multiply blend is explicitly tested separately.");
+assert.ok(html.includes('id="hero-image-blend-owner-asset"') && html.includes("mix-blend-mode:multiply!important") && html.includes("mask-image:radial-gradient("), "The Hero source canvas must feather into the page background.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
   "The protected Hero image must be fully visible with no crop or transform.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
