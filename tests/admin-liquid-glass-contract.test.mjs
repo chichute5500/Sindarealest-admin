@@ -254,7 +254,7 @@ has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) minmax(0
 has('#main .product-table .product-mobile-edit{display:inline-flex;align-items:center;justify-content:center;width:28px;min-width:28px;min-height:28px;height:28px;padding:4px;border-radius:9px}', 'mobile edit action remains a compact touch-friendly control');
 has('aria-label="Sửa sản phẩm: ${esc(p.title)}"', 'mobile edit action retains a product-specific accessible name');
 has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
-has('#backdrop>.editor>form{display:flex;flex:1 0 auto;flex-direction:column;min-height:0}', 'short editor tabs stretch to reserve space for sticky actions');
+has('#backdrop>.editor>form{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
 has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:68px;width:68px}}', 'thumbnail rail remains touchable on narrow phones');
