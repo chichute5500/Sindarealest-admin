@@ -1,19 +1,21 @@
-## PROMPT TIẾP TỤC — 2026-10-22T11:06:00+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T11:13:00+07:00
 
-Tiếp tục công việc thực tế trong repo `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA đã kiểm tra: `2357cf6a3659758d62331f6cb65846410bc7ba43`; handoff commit base trước lần cập nhật này `1a300d97cb3a0832b445d967e315fd73c4ae5d41`.
+Repo `chichute5500/Sindarealest-admin`; chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã xác minh: `5dc55d2c27d16fa019bf35104ab8740b715ce79d`; handoff base trước cập nhật này `d9f3af24570485241f9169a0aa20c6ad0c3b9b71`.
 
-**Kết quả xác minh:**
-- Validate Source [#39720164328](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328) — SUCCESS trên `2357cf6a3659758d62331f6cb65846410bc7ba43`.
-- Admin Preview/Playwright [#39720164321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321) — SUCCESS trên `2357cf6a3659758d62331f6cb65846410bc7ba43`.
-- Artifact [admin-preview-evidence-270](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626), ID `12400543626`: 68 PNG trong ZIP, 16 ảnh login, 51 ảnh fixture, 43 metrics. Metadata: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Fixture-only, không phải backend QA thật.
-- Lỗi gallery test đã sửa: kiểm tra rail overflow trước khi xóa thumbnail; kiểm tra nút cuối disabled sau khi xóa. Commit [`2357cf6`](https://github.com/chichute5500/Sindarealest-admin/commit/2357cf6a3659758d62331f6cb65846410bc7ba43).
-- Preview diagnostic `PASS_LOGIN_CSS_SIGNATURE` không xác nhận authenticated session. Không bypass Cloudflare Access.
+**CI chính xác:**
+- Validate Source [#39720698955](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955) SUCCESS trên `5dc55d2c27d16fa019bf35104ab8740b715ce79d`.
+- Admin Preview/Playwright [#39720698900](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900) SUCCESS trên `5dc55d2c27d16fa019bf35104ab8740b715ce79d`.
+- Artifact [admin-preview-evidence-271](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676), ID `12400933676`: 68 PNG trong ZIP, 16 login, 51 fixture, 43 metrics; metadata completed=true, 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths. Fixture-only, không phải authenticated backend QA.
+- Gallery test giờ kiểm tra overflow trước khi xóa thumbnail, kiểm tra nút cuối disabled sau khi xóa; đồng thời xác nhận mỗi ảnh có group label/alt, mỗi nút có accessible name và SVG trang trí được ẩn với assistive tech. Commit [`5dc55d2`](https://github.com/chichute5500/Sindarealest-admin/commit/5dc55d2c27d16fa019bf35104ab8740b715ce79d).
+- Preview signature `PASS_LOGIN_CSS_SIGNATURE` chỉ là login shell, không phải đăng nhập thật.
 
-**Tiến độ:** 50%; 12-screen parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED. Không tăng % chỉ vì CI xanh.
+**Progress:** 50%. Full 12-screen parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED.
 
-**Việc tiếp theo:** audit product-editor gallery với ảnh fixture tổng hợp (alt text, ảnh bìa, reorder/delete, accessible names), không save/upload thật; sửa các khác biệt có bằng chứng; chạy Validate + Preview trên exact SHA, kiểm tra artifact; cập nhật và đọc lại cả 7 tệp handoff.
+**Tiếp tục:** kiểm tra gallery responsive/keyboard so với reference; dùng synthetic fixture only, không save/upload dữ liệu thật. Sau thay đổi chạy exact-SHA Validate + Preview, kiểm tra artifact, cập nhật và đọc lại đủ 7 tệp handoff.
 
-**Rào chắn:** chỉ ADMIN branch; PR #111/#108 để OPEN/UNMERGED; không sửa `main`/static, không deploy Production, không bypass Access, không thao tác secrets hoặc remote D1/R2/schema/migration/infra, không ghi dữ liệu thật bằng fixture.
+**Rào chắn:** chỉ ADMIN branch; PR #111/#108 OPEN/UNMERGED; không sửa main/static, không Production deploy, không bypass Access, không thao tác secrets/remote D1/R2/schema/migration/infra.
+
+---
 
 ---
 

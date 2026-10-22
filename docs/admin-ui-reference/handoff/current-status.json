@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T11:06:00+07:00",
+  "updatedAt": "2026-10-22T11:13:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "1a300d97cb3a0832b445d967e315fd73c4ae5d41",
+  "branchHeadAtCheckpoint": "d9f3af24570485241f9169a0aa20c6ad0c3b9b71",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Source and Preview checks pass on 2357cf6, but full 12-screen reference parity and authenticated backend QA remain unaccepted.",
+  "progressBasis": "Exact source and Preview checks pass on 5dc55d2; full 12-screen reference parity and authenticated backend QA remain unaccepted.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+    "testedCommitSha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
     "conclusion": "success",
     "validateRun": {
-      "runId": 39720164328,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698955,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39720164321,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698900,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-270",
-      "id": 12400543626,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626",
+      "name": "admin-preview-evidence-271",
+      "id": 12400933676,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676",
       "sizeBytes": 13075368,
       "zipEntryCount": 71,
       "pngCount": 68,
@@ -42,6 +42,7 @@
     },
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY_NOT_AUTHENTICATED_QA",
     "galleryRegressionFix": "PASS_EXACT_SHA",
+    "galleryAccessibilityAssertions": "PASS_6_FIXTURE_IMAGES",
     "twelveScreenVisualParity": "NOT_ACCEPTED",
     "authenticatedBusinessQA": "NOT_TESTED"
   },
@@ -116,7 +117,7 @@
     "docs/admin-ui-reference/handoff/current-status.json"
   ],
   "nextActions": [
-    "Audit gallery alt text, cover designation, reorder/delete accessible names with synthetic fixture images only.",
+    "Compare gallery keyboard/responsive behavior to the approved reference using synthetic fixtures only.",
     "Do not save or upload real product data during visual QA.",
     "Run exact-SHA Validate and Preview after meaningful changes and inspect artifact.",
     "Keep PR #111/#108 OPEN/UNMERGED; no main/static/Production/Access/secrets/remote DB/schema/migration/infra changes."
@@ -131,57 +132,57 @@
   ],
   "ownerActionRequiredNow": "No owner action needed for fixture-only work. AI image review/grouping requires an approved feature contract/reference before implementation; authenticated backend/business QA remains untested.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T11:06:00+07:00",
+    "checkedAt": "2026-10-22T11:13:00+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedApplicationSha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+    "testedApplicationSha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
     "validateRun": {
-      "runId": 39720164328,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698955,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "previewRun": {
-      "runId": 39720164321,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698900,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-270",
-      "id": 12400543626,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626",
+      "name": "admin-preview-evidence-271",
+      "id": 12400933676,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676",
       "sizeBytes": 13075368,
       "pngCount": 68,
       "loginShellPngCount": 16,
       "fixturePngCount": 51,
       "fixtureMetricCount": 43
     },
-    "branchHeadBeforeHandoffRefresh": "1a300d97cb3a0832b445d967e315fd73c4ae5d41",
+    "branchHeadBeforeHandoffRefresh": "d9f3af24570485241f9169a0aa20c6ad0c3b9b71",
     "currentHeadIsTestedSource": false,
     "finalSevenFileReadback": "PENDING_AFTER_THIS_DOCS_COMMIT",
     "progressPercent": 50
   },
   "latestContinuationCycle": {
-    "updatedAt": "2026-10-22T11:06:00+07:00",
+    "updatedAt": "2026-10-22T11:13:00+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedSha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
-    "branchHeadBeforeHandoffRefresh": "1a300d97cb3a0832b445d967e315fd73c4ae5d41",
+    "testedSha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
+    "branchHeadBeforeHandoffRefresh": "d9f3af24570485241f9169a0aa20c6ad0c3b9b71",
     "validateSource": {
-      "runId": 39720164328,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698955,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "adminPreviewPlaywright": {
-      "runId": 39720164321,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698900,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-270",
-      "id": 12400543626,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626",
+      "name": "admin-preview-evidence-271",
+      "id": 12400933676,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676",
       "sizeBytes": 13075368,
       "pngCount": 68,
       "loginShellPngCount": 16,
@@ -189,7 +190,7 @@
       "fixtureMetricCount": 43
     },
     "progressPercent": 50,
-    "nextAction": "Continue gallery accessibility/responsive audit using synthetic fixtures only; no real save/upload."
+    "nextAction": "Continue gallery responsive/keyboard comparison against reference with synthetic fixtures only; no real save/upload."
   },
   "continuationHistory": [
     {
@@ -368,6 +369,6 @@
     "progressPercent": 50,
     "nextAction": "Audit product-editor gallery accessibility and responsive behavior using synthetic fixture images only."
   },
-  "handoffRefreshAt": "2026-10-22T11:06:00+07:00",
-  "handoffRefreshBaseHead": "1a300d97cb3a0832b445d967e315fd73c4ae5d41"
+  "handoffRefreshAt": "2026-10-22T11:13:00+07:00",
+  "handoffRefreshBaseHead": "d9f3af24570485241f9169a0aa20c6ad0c3b9b71"
 }

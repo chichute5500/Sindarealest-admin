@@ -1,5 +1,18 @@
 # Admin 12-screen reference audit matrix
 
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T11:13:00+07:00
+
+- **Nhánh:** `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `5dc55d2c27d16fa019bf35104ab8740b715ce79d`; HEAD trước cập nhật handoff `d9f3af24570485241f9169a0aa20c6ad0c3b9b71` (các commit bot sau chỉ lưu evidence/docs).
+- **Validate Source:** [run #39720698955](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955) — **SUCCESS**, đúng SHA `5dc55d2c27d16fa019bf35104ab8740b715ce79d`.
+- **Admin Preview / Playwright:** [run #39720698900](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900) — **SUCCESS**, đúng SHA `5dc55d2c27d16fa019bf35104ab8740b715ce79d`.
+- **Artifact:** [`admin-preview-evidence-271`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676), ID `12400933676`: ZIP có 71 entries, 68 PNG (16 login screenshots + 51 fixture screenshots + 1 reference image), 43 fixture metrics. Metadata `completed=true`; 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors, 0 attempted writes, 0 unexpected API paths. Fixture dùng dữ liệu tổng hợp; không phải backend QA đã xác thực.
+- **Gallery regression test:** đã sửa thứ tự kiểm tra rail overflow trước khi xóa thumbnail, giữ assertion nút cuối disabled sau khi xóa. Bổ sung kiểm tra accessibility cho 6 ảnh fixture: tên group, alt không rỗng, đủ 3 nút mỗi ảnh có accessible name và SVG trang trí `aria-hidden=true`. Exact-SHA run mới xanh; commit [`5dc55d2`](https://github.com/chichute5500/Sindarealest-admin/commit/5dc55d2c27d16fa019bf35104ab8740b715ce79d).
+- **Preview diagnostic:** `PASS_LOGIN_CSS_SIGNATURE` chỉ xác nhận CSS/login shell, không xác nhận phiên đăng nhập backend thật. Không bypass Cloudflare Access.
+- **Tiến độ tổng thể: 50%**. Chưa nâng vì test/audit gallery xanh không có nghĩa hoàn tất đối chiếu đủ 12 màn. 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111/#108 vẫn OPEN/UNMERGED; không sửa `main`/nhánh static, không Production deploy, không đụng secrets/remote D1/R2/schema/migration/infra.
+- **Bước tiếp theo:** tiếp tục đối chiếu gallery với reference và kiểm tra responsive/keyboard behavior; chỉ fixture, không save/upload thật. Sau mỗi thay đổi đáng kể, chạy exact-SHA Validate + Preview, mở artifact và cập nhật/đọc lại đủ 7 tệp.
+
+---
+
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T11:06:00+07:00
 
 - **Nhánh:** `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã xác minh: `2357cf6a3659758d62331f6cb65846410bc7ba43`; HEAD hiện tại trước cập nhật handoff là `1a300d97cb3a0832b445d967e315fd73c4ae5d41` (các commit sau chỉ lưu evidence/docs).

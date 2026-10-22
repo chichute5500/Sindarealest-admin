@@ -7,7 +7,7 @@
   "testedCommitSha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
   "capturedAt": "2026-10-22T04:10:07.413Z",
   "progressEstimatePercent": 50,
-  "progressBasis": "50% remains the honest overall estimate: current source and preview checks pass, but the full 12-screen reference audit and authenticated backend QA are not accepted.",
+  "progressBasis": "50% remains the honest overall estimate: exact-SHA source and Preview checks pass and gallery accessibility assertions pass, but full 12-screen reference parity and authenticated backend QA remain unaccepted.",
   "note": "Exact-SHA cycle 6dcbcdccb45d824095f5dd50f5f7c919ae72e77a: Validate #39679652666 PASS; Preview/Playwright #39679652720 SUCCESS. Artifact admin-preview-evidence-267 ID 12382874321 (13,069,621 bytes): 68 PNG, 51 fixture screens, 43 metrics; completed=true; zero page/console/failed-request/HTTP errors, attempted writes or unexpected API paths. Mobile More menu E2E verifies Warranty/Settings items, aria-expanded/controls, bounds/no clipping, Escape/focus return, selecting Settings, page heading, return to dashboard and reopen. AI image review/grouping route/API/module absent in current source/tree; blocked pending approved contract. Progress 50%; 12-screen parity NOT ACCEPTED; authenticated QA NOT TESTED.",
   "branchIsolation": {
     "adminBranchExists": true,
@@ -810,7 +810,7 @@
     "playwrightPreviewDiagnostics": "success",
     "localStaticPlaywrightBaseline": "PASS",
     "visualComparisonAgainstApprovedPng": "PARTIAL_SCREEN_3_REVIEWED_AT_390_LIGHT_DARK_AND_1280_LIGHT; ALL_12_SCREEN_PARITY_NOT_ACCEPTED",
-    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
+    "consoleErrors": 0,
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
     "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
@@ -933,7 +933,7 @@
   "latestVerifiedAt": "2026-10-22T03:25:42.193+07:00",
   "latestVerifiedSourceCommit": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
   "currentAdminBranchHead": "596ea3d7d6da524c6993ce37ccc41579c785929d",
-  "latestVerificationSummary": "Exact SHA 2357cf6a3659758d62331f6cb65846410bc7ba43: Validate #39720164328 PASS; Preview #39720164321 SUCCESS; artifact #12400543626 reviewed (68 PNG, 43 metrics; no browser/network errors or attempted writes). Gallery test-order fix is green. Full visual parity and authenticated backend QA remain open.",
+  "latestVerificationSummary": "Exact SHA 5dc55d2c27d16fa019bf35104ab8740b715ce79d: Validate #39720698955 PASS; Preview #39720698900 SUCCESS; artifact #12400933676 inspected (68 PNG, 43 metrics, no browser/network errors or attempted writes). Gallery overflow ordering and accessible labels/alt tests pass.",
   "branchHeadBeforeHandoffUpdate": "76769e55ac40d8cb8eff8ee099de15eebab30970",
   "prSafety": {
     "number": 111,
@@ -1053,7 +1053,7 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-22T11:06:00+07:00",
+  "updatedAt": "2026-10-22T11:13:00+07:00",
   "currentBranchHeadAtHandoff": "76769e55ac40d8cb8eff8ee099de15eebab30970",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
@@ -1408,14 +1408,17 @@
   "latestScreenshotArtifact": {
     "runId": 39720698900,
     "name": "admin-preview-evidence-271",
+    "id": 12400933676,
     "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900",
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676",
+    "sizeBytes": 13075368,
     "sourceCommit": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
-    "screenshotCount": 67,
+    "screenshotCount": 68,
     "loginShellPngCount": 16,
     "uiFixturePngCount": 51,
     "uiFixtureMetricCount": 43,
     "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "rawPngsCommittedToGit": false
   },
   "latestVerification": {
     "checkedAt": "2026-10-22T03:25:42.193+07:00",
@@ -1919,16 +1922,16 @@
   },
   "latestCiRuns": [
     {
-      "runId": 39720164328,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698955,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "status": "completed",
       "conclusion": "success"
     },
     {
-      "runId": 39720164321,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698900,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "status": "completed",
       "conclusion": "success"
     }
@@ -2956,26 +2959,26 @@
     "progressPercent": 50
   },
   "latestContinuationCycle": {
-    "updatedAt": "2026-10-22T11:06:00+07:00",
+    "updatedAt": "2026-10-22T11:13:00+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedSha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
-    "branchHeadBeforeHandoffRefresh": "1a300d97cb3a0832b445d967e315fd73c4ae5d41",
+    "testedSha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
+    "branchHeadBeforeHandoffRefresh": "d9f3af24570485241f9169a0aa20c6ad0c3b9b71",
     "validateSource": {
-      "runId": 39720164328,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698955,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698955",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "adminPreviewPlaywright": {
-      "runId": 39720164321,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321",
-      "sha": "2357cf6a3659758d62331f6cb65846410bc7ba43",
+      "runId": 39720698900,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900",
+      "sha": "5dc55d2c27d16fa019bf35104ab8740b715ce79d",
       "conclusion": "success"
     },
     "artifact": {
-      "name": "admin-preview-evidence-270",
-      "id": 12400543626,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626",
+      "name": "admin-preview-evidence-271",
+      "id": 12400933676,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720698900/artifacts/12400933676",
       "sizeBytes": 13075368,
       "zipEntryCount": 71,
       "pngCount": 68,
@@ -2992,16 +2995,17 @@
       "rawPngsCommittedToGit": false
     },
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY_NOT_AUTHENTICATED_QA",
-    "galleryRegressionFix": "Overflow checked before removing thumbnail; final-item disabled assertion checked after removal.",
+    "galleryRegressionFix": "PASS_EXACT_SHA",
+    "galleryAccessibilityAssertions": "PASS_6_FIXTURE_IMAGES_NONEMPTY_GROUP_ALT_AND_CONTROL_LABELS_DECORATIVE_SVG_HIDDEN",
     "latestScreenStatuses": {
-      "productEditorGallery": "PARTIAL_FIXTURE_ONLY_E2E_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
+      "productEditorGallery": "PARTIAL_FIXTURE_ONLY_ACCESSIBILITY_E2E_PASS_REFERENCE_PARITY_NOT_ACCEPTED",
       "twelveScreenVisualParity": "NOT_ACCEPTED",
       "authenticatedBackendQA": "NOT_TESTED"
     },
     "progressPercent": 50,
-    "nextAction": "Continue product-editor gallery accessibility/responsive audit using synthetic fixtures only; do not save/upload real data."
+    "nextAction": "Continue comparing gallery responsive and keyboard behavior against approved reference using synthetic fixtures only; no real save/upload."
   },
-  "nextAction": "Continue product-editor gallery accessibility/responsive audit using synthetic fixtures only; do not save/upload real data.",
+  "nextAction": "Continue comparing gallery responsive and keyboard behavior against approved reference using synthetic fixtures only; no real save/upload.",
   "progressRoundingNote": {
     "weightedPoints": 49.6,
     "roundedPercent": 50,
@@ -3244,6 +3248,6 @@
     "docs/admin-ui-reference/handoff/latest-test-results.json",
     "docs/admin-ui-reference/handoff/current-status.json"
   ],
-  "handoffRefreshAt": "2026-10-22T11:06:00+07:00",
-  "handoffRefreshBaseHead": "1a300d97cb3a0832b445d967e315fd73c4ae5d41"
+  "handoffRefreshAt": "2026-10-22T11:13:00+07:00",
+  "handoffRefreshBaseHead": "d9f3af24570485241f9169a0aa20c6ad0c3b9b71"
 }
