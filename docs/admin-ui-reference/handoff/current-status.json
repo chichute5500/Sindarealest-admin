@@ -3,12 +3,12 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Live checkpoint after product CSS change and Playwright regression assertion on Order detail. Current HEAD must be re-fetched each session. Exact-SHA workflow result for current HEAD has not been returned by connector; do not claim PASS.",
-  "branchHeadAtCheckpoint": "617496b7588b90ad6f76f80e1c9611615c7599b5",
+  "checkpointSemantics": "Live checkpoint after Order detail responsive-grid change and Customers screen responsive regression assertions. Exact-HEAD workflow result has not been returned by the available connector; never infer PASS from an empty workflow list.",
+  "branchHeadAtCheckpoint": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Order-detail responsive grid change is implemented but not accepted until exact-SHA Playwright/preview evidence passes; test/handoff edits do not count as completion.",
+  "progressBasis": "50% PROVISIONAL. Order detail responsive fix and Customers responsive regression checks are implemented but not accepted until exact-HEAD test evidence is available.",
   "sourceTreeComparison": {
     "comparisonTarget": "fix/liquid-glass-audit-2026-10-19",
     "staticHead": "a1fa5ca5731d827cbd7c3680468fd0df7bf35f53",
@@ -22,9 +22,10 @@
   },
   "sourceValidationOnHead": {
     "status": "NOT_VERIFIED_EXACT_SHA",
-    "liveCodeHead": "617496b7588b90ad6f76f80e1c9611615c7599b5",
+    "liveCodeHead": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
     "latestObservedWorkflowRuns": [],
-    "note": "fetch_commit_workflow_runs returned no PR-triggered runs for current HEAD; this is not evidence of PASS or FAIL. Check GitHub Actions directly through supported connector before asserting result."
+    "combinedStatus": "No status checks returned",
+    "note": "The workflow lookup only returns PR-triggered runs and returned none for the current commit. This does not prove no workflow exists or that checks passed. Need inspect GitHub Actions run page / workflow dispatch capability."
   },
   "latestVisualEvidence": {
     "sourceSha": "a6fc090b60e579e9d708775f0c25e3ba56f3439b",
@@ -1069,20 +1070,21 @@
   "capturedAtUtc": "2026-10-22T14:20:00Z",
   "nextAction": "Poll run 39797841880. If it fails, inspect exact checkout SHA and line-level failure before another change; do not infer success from older runs.",
   "latestProductChange": {
-    "status": "IMPLEMENTED_AWAITING_EXACT_SHA_VALIDATION",
+    "status": "IMPLEMENTED_AWAITING_VALIDATION",
     "sourceCommit": "3d10e163d3a88884ad109d0245b7b9c38e0ec603",
-    "testCommit": "617496b7588b90ad6f76f80e1c9611615c7599b5",
     "sourceFile": "public/admin/index.html",
     "sourceBlob": "bebfb0896e28dd64654df17fe185cc2f0f508bb0",
+    "testCommit": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
     "testFile": "tests/e2e/admin-static-baseline.spec.js",
-    "testBlob": "4ff83e85670187888e9aa0170928a019da3c043e",
-    "change": [
-      "Order detail customer fields use two columns at viewport >=360px and one column below 360px; email/address span full width.",
-      "Order item metadata grid retains two columns at >=360px and falls back to one column below 360px.",
-      "Playwright checks computed grid column counts for customer and item metadata; regex corrected to split computed grid-template-columns on whitespace."
+    "testBlob": "7689975293ad174b14707d8e401d8442c4265ef2",
+    "changes": [
+      "Order detail customer fields and item metadata use two columns at >=360px, one column below 360px; customer email/address span full width.",
+      "Playwright verifies computed grid column counts for Order detail customer and item metadata.",
+      "Customers screen test verifies no document-level horizontal overflow and mobile card layout at <=680px versus table cells above 680px.",
+      "Computed CSS grid column parsing regex was corrected to split on whitespace."
     ],
     "acceptance": "NOT_VERIFIED",
-    "next": "Obtain exact-HEAD workflow/test result. If no run exists, inspect available workflow triggers and use a supported dispatch mechanism only if safely available; otherwise continue screen #8 review using existing source/tests without claiming validation."
+    "next": "Resolve exact-SHA Actions/Playwright validation through a supported workflow-run discovery or dispatch path; meanwhile continue audit of screen #8 and then #9 without claiming acceptance."
   },
-  "currentNextAction": "Review screen #8 Customers source/reference and test coverage while exact-SHA validation is unresolved; do not repeat #3/#4 geometry checks. Preserve all branch/deploy/schema safety restrictions."
+  "currentNextAction": "Continue Customer screen (#8) and Warranty/support (#9) source/test/reference review; no duplicate geometry-only testing of screens #3/#4. Check workflow run discovery/dispatch capability before further source writes."
 }
