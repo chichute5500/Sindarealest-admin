@@ -1,6 +1,14 @@
 # PROMPT BÀN GIAO CHAT MỚI — SINDAREALEST ADMIN
 
-Tiếp tục làm việc thực tế trên GitHub, không chỉ phân tích/báo cáo. Sau mỗi checkpoint hãy báo cáo tiếng Việt ngắn gọn rồi làm tiếp bước an toàn kế tiếp trong cùng phiên. Không hỏi lại thông tin đã có.
+Tiếp tục làm việc thực tế trên GitHub, không chỉ phân tích/báo cáo. Sau mỗi checkpoint hãy tiếp tục ngay bước an toàn kế tiếp trong cùng phiên. Không hỏi lại thông tin đã có, không lặp lại chẩn đoán đã đóng. **Mục tiêu mỗi phiên phải tạo ra tiến triển sản phẩm hoặc một kết luận kiểm thử mới có bằng chứng; không tính sửa tài liệu/test harness là tiến độ sản phẩm.**
+
+## LIVE CHECKPOINT — 2026-10-22
+- ADMIN HEAD hiện tại: `7d9cde727476ac05ee7431b457e7377b34c750fe`.
+- PR #111 vẫn OPEN/unmerged; PR #108 vẫn chỉ đọc.
+- Run duy nhất cần poll trước tiên: [#39797841880](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880), exact SHA `7d9cde7`; trạng thái gần nhất QUEUED. Không tạo run trùng.
+- Lỗi chain đã xác minh: #326 trên `26f1c6f` fail vì `.mobiletabs` hidden trong khi test mong visible ở line 1752; #327 trên `401b961` fail `ReferenceError: variant is not defined` cùng line. Commit `7d9cde7` đọc viewport thực từ `page.viewportSize()` để bỏ biến ngoài scope; CI chưa xác nhận kết quả.
+- Progress giữ 50% PROVISIONAL; chỉ tăng khi hạng mục sản phẩm/màn hình đạt tiêu chí chấp nhận, không tăng vì commit kiểm thử hoặc docs.
+- Sau CI, dành phiên cho hạng mục chức năng/màn hình chưa được chấp nhận. Không tiếp tục tạo chuỗi docs-only commits trừ khi có kết quả mới cần bàn giao.
 
 ## 1. Repository và phạm vi cứng
 
@@ -15,13 +23,10 @@ Tiếp tục làm việc thực tế trên GitHub, không chỉ phân tích/báo
 
 ## 2. Bước đầu tiên — live refs, sau đó workflow hiện có
 
-Handoff này được tạo từ code/test SHA trước cập nhật tài liệu `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`. Commit handoff mới chỉ chứa 6 file tài liệu. Vì vậy:
-1. Đọc 6 file bên dưới trực tiếp từ ADMIN branch mới nhất; fetch live PR #111/#108 và xác định HEAD mới sau commit handoff.
-2. Không coi docs commit là đã được code-test. Source/test SHA hiện cần xác minh là `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`.
-3. Poll các run đã tồn tại, không tạo duplicate:
-   - #39793390442 — SHA `37c3c40e24c7f222adeac52ac2cbb6d30ed433f4`, tại checkpoint đang chạy; run này vẫn có assertion mơ hồ cũ.
-   - #39794007381 — SHA `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`, tại checkpoint QUEUED; đây là run ưu tiên xác nhận assertion mới.
-   - #39792844330 — SHA `a6fc090b60e579e9d708775f0c25e3ba56f3439b`, hoàn tất FAIL; 2 test passed/1 failed. Artifact #324: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330/artifacts/12431484447.
+Handoff cũ bên dưới là lịch sử, không phải trạng thái live. HEAD mới nhất đã tiến tới `7d9cde727476ac05ee7431b457e7377b34c750fe`; không dùng các SHA/run cũ làm trạng thái hiện tại. Vì vậy:
+1. Poll run #39797841880 và xác minh PR refs live; chỉ đọc lại file handoff khi cần chỉnh theo kết quả mới.
+2. Code/test SHA cần xác minh hiện tại là `7d9cde727476ac05ee7431b457e7377b34c750fe`; commit này vẫn chỉ sửa harness, không phải product fix.
+3. Poll run #39797841880 trước tiên, không tạo duplicate. Nếu fail, lấy log đúng run và sửa nguyên nhân mới đã chứng minh. Các run #39794007381/#39796182324 là bằng chứng lịch sử cho lỗi breakpoint và lỗi biến `variant`, không phải run hiện tại.
 4. Run #324 chứng minh `npm run check` và `npm test` PASS trên `a6fc090`; không chứng minh SHA mới `26f1c6f`. Run #326 phải được đọc log + artifact trước khi cập nhật trạng thái.
 
 ## 3. Lỗi và sửa gần nhất
@@ -65,6 +70,6 @@ PR #111 census hiện 1.302 paths: docs 1.239, functions 24, tests 25, scripts 5
 
 ## 7. Quy tắc làm việc
 
-Trình tự: verify live refs/run → inspect logs/artifacts → fix lỗi source/test đã chứng minh → đợi/kiểm tra run exact SHA → review per-screen/scope → cập nhật handoff đồng bộ → lease-protected commit → read back → verify cả hai PR.
+Trình tự: poll run hiện hữu → xác định lỗi theo log chính xác → sửa một nguyên nhân mỗi commit → xác minh exact SHA → tiếp tục hạng mục sản phẩm tiếp theo → chỉ cập nhật handoff khi có kết quả mới đáng kể. Hạn chế commit docs-only và không báo cáo tiến độ bằng số lần kiểm tra. Mỗi phiên phải kết thúc với một deliverable/defect fix đã kiểm chứng hoặc blocker thật được chứng minh. Sau mọi ghi Git, đọc lại và xác minh cả hai PR.
 
 Mỗi lần ghi Git, dùng expected-SHA/lease và dừng nếu branch thay đổi. Không merge PR. Sau mỗi checkpoint báo cáo ngắn gọn bằng tiếng Việt và tiếp tục bước an toàn tiếp theo.
