@@ -969,6 +969,23 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         images.length === 6 && images.every(image => image.complete && image.naturalWidth > 0)
       ), { timeout: 5000 }).toBe(true);
       await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(18);
+      const galleryA11y = await page.locator('#imageGrid .imageitem').evaluateAll(items =>
+        items.map(item => ({
+          groupLabel: item.getAttribute('aria-label'),
+          imageAlt: item.querySelector('img')?.getAttribute('alt'),
+          controls: [...item.querySelectorAll('button[data-gallery]')].map(button => ({
+            action: button.getAttribute('data-gallery'),
+            label: button.getAttribute('aria-label'),
+            iconHidden: button.querySelector('svg')?.getAttribute('aria-hidden')
+          }))
+        }))
+      );
+      expect(galleryA11y, 'Every fixture gallery item should have a named group and descriptive image alt').toHaveLength(6);
+      expect(galleryA11y.every(item => Boolean(item.groupLabel?.trim()) && Boolean(item.imageAlt?.trim())),
+        'Gallery group names and image alt text must not be empty: ' + JSON.stringify(galleryA11y)).toBe(true);
+      expect(galleryA11y.every(item => item.controls.length === 3 && item.controls.every(control =>
+        Boolean(control.label?.trim()) && control.iconHidden === 'true')),
+        'Every gallery control needs an accessible name and decorative icons must be hidden: ' + JSON.stringify(galleryA11y)).toBe(true);
       await expect(page.locator('#chooseImages')).toBeVisible();
       await expect(page.locator('#galleryStatus')).toHaveAttribute('role', 'status');
       await expect(page.locator('#galleryStatus')).toHaveAttribute('aria-live', 'polite');
