@@ -82,12 +82,12 @@
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: b503ade1d7b300c38bc2ef8ccb648733215339dd
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723
+- Tested commit: 5b41777c058bde449f3439e8fba52fce6f293151
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723837416
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 75 real PNGs captured in artifact admin-preview-evidence-274 (not committed to Git).
+- Local source Playwright matrix: PASS; 79 real PNGs captured in artifact admin-preview-evidence-275 (not committed to Git).
 - Deployed Preview: success.
-- Source screenshot matrix: 75 real PNGs; login shell: 16; read-only fixture module screens: 59; fixture metrics: 51.
+- Source screenshot matrix: 79 real PNGs; login shell: 16; read-only fixture module screens: 63; fixture metrics: 55.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
 - Production deployment: NOT PERFORMED.

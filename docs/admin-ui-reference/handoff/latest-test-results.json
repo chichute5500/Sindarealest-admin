@@ -3,9 +3,9 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "b503ade1d7b300c38bc2ef8ccb648733215339dd",
-  "testedCommitSha": "b503ade1d7b300c38bc2ef8ccb648733215339dd",
-  "capturedAt": "2026-10-22T04:38:57.800Z",
+  "latestCodeCommitSha": "5b41777c058bde449f3439e8fba52fce6f293151",
+  "testedCommitSha": "5b41777c058bde449f3439e8fba52fce6f293151",
+  "capturedAt": "2026-10-22T04:43:30.265Z",
   "progressEstimatePercent": 50,
   "progressBasis": "50% remains the honest overall estimate: exact-SHA source and Preview checks pass and gallery accessibility assertions pass, but full 12-screen reference parity and authenticated backend QA remain unaccepted.",
   "note": "Exact-SHA cycle 6dcbcdccb45d824095f5dd50f5f7c919ae72e77a: Validate #39679652666 PASS; Preview/Playwright #39679652720 SUCCESS. Artifact admin-preview-evidence-267 ID 12382874321 (13,069,621 bytes): 68 PNG, 51 fixture screens, 43 metrics; completed=true; zero page/console/failed-request/HTTP errors, attempted writes or unexpected API paths. Mobile More menu E2E verifies Warranty/Settings items, aria-expanded/controls, bounds/no clipping, Escape/focus return, selecting Settings, page heading, return to dashboard and reopen. AI image review/grouping route/API/module absent in current source/tree; blocked pending approved contract. Progress 50%; 12-screen parity NOT ACCEPTED; authenticated QA NOT TESTED.",
@@ -921,14 +921,14 @@
     "Owner action is required to confirm a currently deployed Preview built from ADMIN source and legitimate Cloudflare Access; no secret or bypass is allowed. Product save and PRE/PRO migrations stay DEFERRED_BY_OWNER."
   ],
   "nextActions": [
-    "Add 320x640 and 360x800 responsive bounds/no-horizontal-overflow assertions for Warranty #10 filter buttons and warranty/order identifiers, synthetic fixtures only.",
-    "Run exact-SHA Validate Source and Admin Preview/Playwright; inspect the new screenshots/artifact and metadata.",
-    "Continue remaining NOT_ACCEPTED screens using evidence-based visual comparison; never fabricate product/customer images or business data.",
-    "Keep progress 50% until visual parity acceptance evidence supports a higher estimate.",
-    "Preserve DEFERRED_BY_OWNER and branch/security/deployment guardrails."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723837416",
   "branchHeadSha": "eb0d2f6492e1e6f91accb0f8b0a301c9510d436e",
   "latestVerifiedAt": "2026-10-22T03:25:42.193+07:00",
   "latestVerifiedSourceCommit": "44778d91ff5f084a5bb89a166e97536bd4f42b9d",
@@ -1093,39 +1093,24 @@
     "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED"
   },
   "latestLocalEvidence": {
-    "runId": 39723373723,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723",
-    "sourceCommit": "b503ade1d7b300c38bc2ef8ccb648733215339dd",
+    "runId": 39723837416,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723837416",
+    "sourceCommit": "5b41777c058bde449f3439e8fba52fce6f293151",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
-    "localPlaywright": "PASS_3_TESTS",
-    "remotePreviewLoginDashboardSmoke": "PASS_2_OF_2_TESTS",
-    "sourceScreenshotCount": 75,
+    "localPlaywright": "PASS",
+    "sourceScreenshotCount": 79,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 59,
-    "uiFixtureMetricCount": 51,
-    "screenshotArtifact": "admin-preview-evidence-274",
+    "uiFixturePngCount": 63,
+    "uiFixtureMetricCount": 55,
+    "screenshotArtifact": "admin-preview-evidence-275",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
     "httpErrors": [],
     "attemptedWrites": [],
     "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND SYNTHETIC READ-ONLY FIXTURES; REMOTE LOGIN/DASHBOARD SMOKE PASS; FULL BUSINESS CRUD/SAVE/UPLOAD NOT TESTED",
-    "customerNarrowResponsive": {
-      "viewports": [
-        "320x640",
-        "360x800"
-      ],
-      "themes": [
-        "light",
-        "dark"
-      ],
-      "documentWidthMatchesViewport": true,
-      "horizontalOverflow": false,
-      "cardAndCellBounds": "PASS",
-      "fabricatedCustomerImages": false
-    }
+    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "handoffUpdate": {
     "timestamp": "2026-10-21T16:23:00Z",
@@ -1421,20 +1406,16 @@
   },
   "currentAdminBranchHeadBeforeHandoffUpdate": "76769e55ac40d8cb8eff8ee099de15eebab30970",
   "latestScreenshotArtifact": {
-    "runId": 39723373723,
-    "name": "admin-preview-evidence-274",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723",
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723373723/artifacts/12401304184",
-    "artifactId": 12401304184,
-    "sourceCommit": "b503ade1d7b300c38bc2ef8ccb648733215339dd",
-    "screenshotCount": 75,
-    "archivePngCount": 76,
+    "runId": 39723837416,
+    "name": "admin-preview-evidence-275",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723837416",
+    "sourceCommit": "5b41777c058bde449f3439e8fba52fce6f293151",
+    "screenshotCount": 79,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 59,
-    "referencePngCount": 1,
-    "uiFixtureMetricCount": 51,
+    "uiFixturePngCount": 63,
+    "uiFixtureMetricCount": 55,
     "retentionDays": 14,
-    "rawPngsCommittedToGit": false
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "latestVerification": {
     "checkedAt": "2026-10-22T11:39:07+07:00",
