@@ -95,10 +95,10 @@ async function main() {
     throw new Error('Chuỗi xác nhận không khớp. Đã hủy trước khi chạy SQL hoặc deploy.');
   }
 
-  console.log('\n1/5 · Áp dụng schema SQL idempotent cho D1…');
+  console.log('\n1/6 · Áp dụng schema SQL idempotent cho D1…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0001_schema.sql'], { interactive: true });
 
-  console.log('\n2/5 · Áp dụng bảng đơn hàng, khách hàng, bảo hành và audit log…');
+  console.log('\n2/6 · Áp dụng bảng đơn hàng, khách hàng, bảo hành và audit log…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0003_storefront_operations.sql'], { interactive: true });
   console.log('Áp dụng migration thông báo quản trị (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0004_admin_notifications.sql'], { interactive: true });
@@ -126,7 +126,7 @@ async function main() {
     runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE order_items ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
   }
 
-  console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
+  console.log('\n3/6 · Xác minh các cột cần thiết của D1…');
   for (const query of [
     'SELECT id, slug, sku, sku_verified, title, category, category_label, description, price, stock, published, images_json, source_price_confirmed, sort_order, created_at, updated_at FROM products LIMIT 0;',
     'SELECT key, value, updated_at FROM settings LIMIT 0;',
@@ -150,17 +150,32 @@ async function main() {
     if (productCount !== 0) {
       throw new Error(`D1 đang có ${productCount} sản phẩm. Đã từ chối nạp seed để tránh khôi phục/trộn nhầm dữ liệu. Không có sản phẩm nào bị seed ghi đè.`);
     }
-    console.log('\n4/5 · D1 đang trống; nhập seed 235 sản phẩm…');
+    console.log('\n4/6 · D1 đang trống; nhập seed 235 sản phẩm…');
     runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0002_seed_products.sql'], { interactive: true });
     productCount = readProductCount(dbName);
     if (productCount !== 235) {
       throw new Error(`Seed kết thúc nhưng số sản phẩm là ${productCount}, không phải 235. Đã dừng trước khi deploy; kiểm tra D1 trước khi tiếp tục.`);
     }
   } else {
-    console.log(`\n4/5 · Giữ nguyên dữ liệu D1 hiện tại (${productCount} sản phẩm); bỏ qua seed.`);
+    console.log(`\n4/6 · Giữ nguyên dữ liệu D1 hiện tại (${productCount} sản phẩm); bỏ qua seed.`);
   }
 
-  console.log('\n5/5 · Triển khai website cùng Pages Functions…');
+  console.log('\n5/6 · Xác minh schema fulfillment/payment của migration 0009 trước khi deploy…');
+  try {
+    for (const query of [
+      "SELECT fulfillment_type FROM products LIMIT 0;",
+      "SELECT fulfillment_type FROM order_items LIMIT 0;",
+      "SELECT payment_terms_confirmed_at, payment_terms_confirmed_by, payment_terms_note, public_access_token_hash FROM orders LIMIT 0;",
+      "SELECT id, order_id, installment_type, amount, shipping_benefit, transfer_reference, qr_image_key, bank_name, account_number, account_name, status, created_by, created_at, updated_at FROM order_payment_requests LIMIT 0;",
+      "SELECT id, order_id, payment_request_id, direction, amount, transaction_reference, note, actor, verified_at, created_at FROM order_payment_transactions LIMIT 0;"
+    ]) {
+      runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { quiet: true });
+    }
+  } catch {
+    throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Setup đã hoàn tất các bước schema/seed trước đó nhưng bị chặn trước Pages deploy; không tự động chạy migration 0009. Không chạy lại setup mù; chỉ áp dụng migration trong cửa sổ bảo trì được chủ dự án phê duyệt, xác minh lại schema rồi chạy quy trình deploy riêng.');
+  }
+
+  console.log('\n6/6 · Triển khai website cùng Pages Functions…');
   runWrangler(['pages', 'deploy', 'public', `--project-name=${project}`, `--branch=${branch}`], { interactive: true });
 
   console.log('\n=== KIỂM TRA SAU DEPLOY ===');
