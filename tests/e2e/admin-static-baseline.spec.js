@@ -1429,6 +1429,130 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const headingBox = await page.locator('#main .pagehead').boundingBox();
       expect(headingBox?.y, 'Warranty screenshot should show the page heading near the top').toBeGreaterThanOrEqual(0);
       expect(headingBox?.y, 'Warranty screenshot should show the page heading near the top').toBeLessThan(300);
+
+      // Narrow Android regression: test the actual warranty screen at 320px and 360px
+      // in both themes. Read-only fixture data only; do not submit the issue form.
+      if (variant.viewport.width === 390 && variant.theme === 'light') {
+        for (const narrowViewport of [{ width: 320, height: 640 }, { width: 360, height: 800 }]) {
+          for (const narrowTheme of ['light', 'dark']) {
+            await page.setViewportSize(narrowViewport);
+            await chooseTheme(narrowTheme);
+            await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+            await page.evaluate(() => {
+              window.scrollTo(0, 0);
+              if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+            });
+            await page.locator('#warrantySearch').fill('');
+            await page.locator('[data-warranty-filter="all"]').click();
+            await expect(page.locator('.warranty-toolbar')).toBeVisible();
+            await expect(page.locator('#main .pagehead')).toBeVisible();
+            await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
+            await expect(page.locator('.claim-table tbody')).toContainText('UI-ONLY-CLAIM');
+            const warrantyLayout = await page.evaluate(() => {
+              const $ = selector => document.querySelector(selector);
+              const rect = element => {
+                const box = element.getBoundingClientRect();
+                return { left: box.left, right: box.right, top: box.top, bottom: box.bottom, width: box.width, height: box.height };
+              };
+              const main = $('#main');
+              const toolbar = $('.warranty-toolbar');
+              const filters = [...document.querySelectorAll('.warranty-toolbar .warranty-filter-button')];
+              const tables = ['.issued-warranty-table', '.claim-table'].map(selector => {
+                const table = $(selector);
+                return {
+                  selector,
+                  rect: rect(table),
+                  clientWidth: table.clientWidth,
+                  scrollWidth: table.scrollWidth,
+                  rows: [...table.querySelectorAll('tbody tr')].map(row => ({
+                    rect: rect(row),
+                    clientWidth: row.clientWidth,
+                    scrollWidth: row.scrollWidth,
+                    cells: [...row.querySelectorAll('td')].map(cell => ({
+                      text: (cell.innerText || '').trim().slice(0, 80),
+                      rect: rect(cell),
+                      clientWidth: cell.clientWidth,
+                      scrollWidth: cell.scrollWidth
+                    }))
+                  }))
+                };
+              });
+              return {
+                viewportWidth: window.innerWidth,
+                documentScrollWidth: document.documentElement.scrollWidth,
+                bodyScrollWidth: document.body.scrollWidth,
+                main: { rect: rect(main), clientWidth: main.clientWidth, scrollWidth: main.scrollWidth },
+                toolbar: { rect: rect(toolbar), clientWidth: toolbar.clientWidth, scrollWidth: toolbar.scrollWidth },
+                filters: filters.map(filter => ({
+                  text: (filter.innerText || '').trim(),
+                  rect: rect(filter),
+                  clientWidth: filter.clientWidth,
+                  scrollWidth: filter.scrollWidth
+                })),
+                tables,
+                orderNumber: $('.issued-warranty-table .warranty-order-number')
+                  ? { text: $('.issued-warranty-table .warranty-order-number').textContent.trim(),
+                      clientWidth: $('.issued-warranty-table .warranty-order-number').clientWidth,
+                      scrollWidth: $('.issued-warranty-table .warranty-order-number').scrollWidth,
+                      rect: rect($('.issued-warranty-table .warranty-order-number')) }
+                  : null
+              };
+            });
+            expect(warrantyLayout.documentScrollWidth,
+              'Warranty screen must not overflow the document horizontally: ' + JSON.stringify(warrantyLayout))
+              .toBeLessThanOrEqual(narrowViewport.width);
+            expect(warrantyLayout.bodyScrollWidth,
+              'Warranty screen must not overflow the body horizontally: ' + JSON.stringify(warrantyLayout))
+              .toBeLessThanOrEqual(narrowViewport.width);
+            expect(warrantyLayout.main.scrollWidth,
+              'Warranty content area must not overflow horizontally: ' + JSON.stringify(warrantyLayout))
+              .toBeLessThanOrEqual(warrantyLayout.main.clientWidth + 1);
+            expect(warrantyLayout.toolbar.scrollWidth,
+              'Warranty filter toolbar must stay within its own content box: ' + JSON.stringify(warrantyLayout))
+              .toBeLessThanOrEqual(warrantyLayout.toolbar.clientWidth + 1);
+            expect(warrantyLayout.filters.length).toBeGreaterThanOrEqual(3);
+            for (const filter of warrantyLayout.filters) {
+              expect(filter.rect.left, 'Warranty filter button should remain inside viewport: ' + JSON.stringify(filter))
+                .toBeGreaterThanOrEqual(-1);
+              expect(filter.rect.right, 'Warranty filter button should remain inside viewport: ' + JSON.stringify(filter))
+                .toBeLessThanOrEqual(narrowViewport.width + 1);
+              expect(filter.scrollWidth, 'Warranty filter label should not be clipped: ' + JSON.stringify(filter))
+                .toBeLessThanOrEqual(filter.clientWidth + 1);
+            }
+            for (const table of warrantyLayout.tables) {
+              expect(table.scrollWidth,
+                table.selector + ' should not create an unreported horizontal scrollbar: ' + JSON.stringify(table))
+                .toBeLessThanOrEqual(table.clientWidth + 1);
+              for (const row of table.rows) {
+                expect(row.rect.left, table.selector + ' row should stay within viewport').toBeGreaterThanOrEqual(-1);
+                expect(row.rect.right, table.selector + ' row should stay within viewport')
+                  .toBeLessThanOrEqual(narrowViewport.width + 1);
+                expect(row.scrollWidth,
+                  table.selector + ' row should not clip warranty/order identifiers: ' + JSON.stringify(row))
+                  .toBeLessThanOrEqual(row.clientWidth + 1);
+                for (const cell of row.cells) {
+                  expect(cell.rect.right, 'Warranty cell should stay inside the viewport: ' + JSON.stringify(cell))
+                    .toBeLessThanOrEqual(narrowViewport.width + 1);
+                  expect(cell.scrollWidth, 'Warranty cell text should wrap without clipping: ' + JSON.stringify(cell))
+                    .toBeLessThanOrEqual(cell.clientWidth + 1);
+                }
+              }
+            }
+            if (warrantyLayout.orderNumber) {
+              expect(warrantyLayout.orderNumber.scrollWidth,
+                'Warranty order number should remain legible at narrow widths: ' + JSON.stringify(warrantyLayout.orderNumber))
+                .toBeLessThanOrEqual(warrantyLayout.orderNumber.clientWidth + 1);
+            }
+            await saveScreenshot('warranties-responsive', { viewport: narrowViewport, theme: narrowTheme }, {
+              fixtureOnly: true, noHorizontalOverflow: true, responsiveWarrantyAudit: true,
+              filterButtonsWithinViewport: true, noFormSubmission: true
+            });
+          }
+        }
+        await page.setViewportSize(variant.viewport);
+        await chooseTheme(variant.theme);
+        await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
+      }
     }, true);
     await captureView('settings', 'settings', null, true);
     await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
