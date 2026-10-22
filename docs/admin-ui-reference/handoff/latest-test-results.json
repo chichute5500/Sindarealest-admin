@@ -189,5 +189,15 @@
     "limitation": "No remote D1 schema inspection, setup/deploy execution or migration was performed. This does not prove the configured remote D1 lacks migration 0009.",
     "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
   },
-  "note": "Current source validation is green on exact HEAD 5497d4d3b51d32064a9a993e0f891ca672c543c1. Visual matrix remains sourced from dca19a2. Source-level audit found a potential 0009 setup/deploy preflight gap; remote schema was not inspected."
+  "note": "Current source validation is green on exact HEAD 5497d4d3b51d32064a9a993e0f891ca672c543c1. Visual matrix remains sourced from dca19a2. Source-level audit found a potential 0009 setup/deploy preflight gap; remote schema was not inspected.",
+  "updatedAt": "2026-10-22T21:05:00+07:00",
+  "latestVisualReview": {
+    "followUpAt": "2026-10-22T21:05:00+07:00",
+    "followUpResult": "PRODUCT_LIST_390X844_LIGHT_OPENED; visual comparison limited by synthetic fixture data",
+    "followUpArtifact": "admin-preview-evidence-311 / 12420678829",
+    "followUpSourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
+    "sourceCodeChanged": false,
+    "acceptance": "NOT_ACCEPTED",
+    "note": "Reference poster and #3 screenshot were opened. Placeholder image and unknown price/stock mismatch prevents fair content-density parity judgment; no independent reproducible source defect confirmed. This is not a test pass."
+  }
 }
