@@ -986,7 +986,6 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(page.locator('#galleryStatus')).toContainText('Đã chuyển ảnh lên vị trí ảnh đại diện');
         await expect(page.locator('#imageGrid [data-gallery="down"][data-index="0"]')).toBeFocused();
         await expect(page.locator('#imageGrid .imageitem-cover img')).toHaveAttribute('alt', 'Ảnh đại diện sản phẩm');
-        await expect(page.locator('#imageGrid [data-gallery="down"][data-index="4"]')).toBeDisabled();
       }
       if (variant.viewport.width <= 480) {
         // Assert the rail while all five thumbnails still exist. After deleting
@@ -1010,6 +1009,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(page.locator('#imageGrid .imageitem')).toHaveCount(5);
         await expect(page.locator('#galleryStatus')).toContainText('Đã xóa ảnh 3. Còn 5 ảnh.');
         await expect(page.locator('#imageGrid [data-gallery="remove"][data-index="2"]')).toBeFocused();
+        await expect(page.locator('#imageGrid [data-gallery="down"][data-index="4"]')).toBeDisabled();
         expect(attemptedWrites, 'Gallery reorder/delete must remain local until the explicit product save action').toEqual([]);
       }
       if (variant.theme === 'dark') {
