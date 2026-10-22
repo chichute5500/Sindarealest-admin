@@ -284,8 +284,10 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
     const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
       || (property.startsWith("mask") && value.startsWith("radial-gradient("))
-      || (property === "mix-blend-mode" && (value === "normal" || value === "multiply"))
-      || (property === "opacity" && value === "1"));
+      || (property === "mix-blend-mode" && value === "normal")
+      || (property === "opacity" && value === "1")
+      // The only permitted transform is the small, source-preserving zoom requested for the Hero.
+      || (property === "transform" && (value === "scale(1.04)" || value === "scale(1.02)")));
     assert.ok(neutral, "Hero image must remain visually untouched (" + selector.trim() + ": " + declaration + ").");
   }
 }
@@ -294,7 +296,12 @@ assert.ok(heroAssetDisplayLock.includes("filter:none!important") && heroAssetDis
   "The protected Hero image must not use CSS filters; the final feathered edge mask is explicitly tested separately.");
 assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
   "The protected Hero image keeps full opacity; the final multiply blend is explicitly tested separately.");
-assert.ok(html.includes('id="hero-image-blend-owner-asset"') && html.includes("mix-blend-mode:multiply!important") && html.includes("mask-image:radial-gradient("), "The Hero source canvas must feather into the page background.");
+const heroBlendOverride = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
+assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
+  && heroBlendOverride.includes("mask-image:radial-gradient(")
+  && heroBlendOverride.includes("width:118%!important")
+  && heroBlendOverride.includes("max-height:290px!important"),
+  "The owner Hero image must be enlarged and only its perimeter feathered, without a brightness/blend-mode change.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
   "The protected Hero image must be fully visible with no crop or transform.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
