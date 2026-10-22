@@ -366,3 +366,7 @@ assert.ok(
   'Trust chip SVGs must remain navy and compact inside the existing circular glass treatment.'
 );
 
+assert.ok(finalCss.includes('html.dark #home .hero-visual img:not([hidden]){')
+  && finalCss.includes('-webkit-mask-image:radial-gradient(ellipse 56% 78% at 62% 50%,#000 48%,rgba(0,0,0,.98) 58%,rgba(0,0,0,.78) 72%,rgba(0,0,0,.30) 88%,transparent 100%);')
+  && finalCss.includes('mask-image:radial-gradient(ellipse 56% 78% at 62% 50%,#000 48%,rgba(0,0,0,.98) 58%,rgba(0,0,0,.78) 72%,rgba(0,0,0,.30) 88%,transparent 100%);'),
+  'Dark-mode hero may feather only the photo perimeter to blend the matte; keep the owner-provided product image visible and unmodified.');
