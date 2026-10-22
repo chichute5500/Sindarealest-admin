@@ -238,6 +238,7 @@ has('#imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-alig
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
 has('@media(min-width:681px){#backdrop>.editor>form>.editorcontent{gap:12px}}', 'desktop product price and stock fields clear the sticky action footer at the initial scroll position');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'desktop editor content scrolls within its bounded region so fields cannot push the sticky action footer out of view');
 has('#backdrop{top:70px;bottom:calc(80px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header and above bottom navigation without a dimmed backdrop');
 has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--bg);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
 has('#productEditorTabs{position:sticky;top:0;gap:2px;padding:1px}', 'mobile product editor tabs stick directly below the editor header without covering form fields');

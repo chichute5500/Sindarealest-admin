@@ -734,6 +734,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       expect(desktopPriceStockLayout.priceBottom, 'Desktop product price field should stay above the sticky footer: ' + JSON.stringify(desktopPriceStockLayout)).not.toBeNull();
       expect(desktopPriceStockLayout.stockBottom, 'Desktop product stock field should stay above the sticky footer: ' + JSON.stringify(desktopPriceStockLayout)).not.toBeNull();
       expect(desktopPriceStockLayout.stockBottom, 'Desktop price/stock row should not be obscured by the sticky footer: ' + JSON.stringify(desktopPriceStockLayout)).toBeLessThan(desktopPriceStockLayout.footerTop - 4);
+      const desktopEditorScroll = await page.locator('#backdrop .editorcontent').evaluate(el => ({clientHeight: el.clientHeight, scrollHeight: el.scrollHeight, overflowY: getComputedStyle(el).overflowY}));
+      expect(desktopEditorScroll.overflowY, 'Desktop editor content should own vertical scrolling instead of pushing the sticky footer off-screen').toBe('auto');
+      expect(desktopEditorScroll.clientHeight, 'Desktop editor content should have a bounded viewport above the footer').toBeGreaterThan(0);
     }
     await expect(page.locator('#productPanelDetails .product-visibility-row')).toBeVisible();
     await expect(page.locator('#productPanelDetails #pPublished')).toBeChecked();

@@ -593,7 +593,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 }
 #backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}
 #backdrop>.editor>form{display:flex;flex:1 0 auto;flex-direction:column;min-height:0}
-#backdrop>.editor>form>.editorcontent{flex:1 0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+#backdrop>.editor>form>.editorcontent{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 #backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}
 /* Keep the desktop price/stock row clear of the sticky action footer at the default editor scroll position. */
 @media(min-width:681px){#backdrop>.editor>form>.editorcontent{gap:12px}}
