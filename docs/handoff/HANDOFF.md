@@ -1,3 +1,17 @@
+## Latest handoff — Hero edge result still rejected (2026-10-23)
+
+Current live state and next action are defined in [CURRENT-STATE.md](CURRENT-STATE.md). This checkpoint overrides older SHAs/assets/status claims below where they conflict.
+
+- Current branch HEAD: `e6f49f7b65297be68a0f9472b613a1acd06c866f`; PR #108 OPEN, unmerged.
+- Exact-SHA Preview deployment: `53dc3bb4-b6ea-4329-a477-ad2cfb7a2e9c`, https://53dc3bb4.sindarealest2.pages.dev/; stable alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Tests #39829962279 PASS; deploy #39829962530 PASS; live visual workflow #39829962409 SUCCESS; artifact #12449195919 (`sindarealest-liquid-glass-preview-945`) has verified deployment metadata and actual Preview screenshots.
+- Manual inspection of mobile Light/Dark Hero screenshots shows hard platform edges remain. Owner rejected the visual result. Do not claim Hero PASS or owner approval.
+- Owner's upload `public/images/hero-upload/tb_image_share_1792519964514 (1).png` is a standalone presentation asset. The current generated derivative is `public/images/hero-upload/tb_image_share_1792519964514-blended.png`. Keep source unchanged; do not use product/catalog/SKU logic.
+- Next: inspect source + references and replace guessed polygon-based edge masking with an evidence-based treatment of the real platform silhouette. Keep shoes crisp and unbrightened. Deploy/verify/capture/inspect exact Preview before presenting it. Stay Hero-only until owner explicitly says PASS.
+- No merge, Production/main/Admin/backend/API/auth/catalog/data/D1/R2/secrets/bindings/DNS/Access or official-logo changes.
+
+---
+
 # LATEST HANDOFF UPDATE — HERO ASSET REPLACEMENT / RESUME FROM LIVE STATE
 **Updated:** 2026-10-22 16:10 UTC  
 **This update is newer than all older status notes below. Keep it when editing this file.**
