@@ -74,6 +74,21 @@ assert.match(workflow, /inputs\.capture_source == 'cloudflare-preview'/,
   'Only real Cloudflare Preview captures may be archived into start/end folders.');
 assert.match(workflow, /node scripts\/validate-cloudflare-preview-url\.mjs/,
   'The manual live-capture gate must use the tested Preview URL validator.');
+
+assert.match(workflow, /name: Validate guarded push capture request[\s\S]*capture-review/,
+  'A guarded [capture-review] push must validate the non-production Preview URL.');
+assert.match(workflow, /name: Verify actual Cloudflare Pages deployment before manual capture\/archive[\s\S]*capture-review/,
+  'Review-only captures must run the exact Preview branch/SHA deployment gate.');
+assert.match(workflow, /name: Capture live Cloudflare Pages Preview \(read-only\)[\s\S]*capture-review/,
+  'Review-only captures must capture the real Preview into the run artifact.');
+const archiveStepStart = workflow.indexOf('- name: Save live Preview images into selected repository archive');
+const archiveStepEnd = workflow.indexOf('\n      - name:', archiveStepStart + 2);
+const archiveStep = workflow.slice(archiveStepStart, archiveStepEnd < 0 ? workflow.length : archiveStepEnd);
+assert.doesNotMatch(archiveStep, /capture-review/,
+  'Review-only captures must never mutate the canonical start/end screenshot archive.');
+assert.match(workflow, /test -s docs\/icon-assets\/Icon\.png[\s\S]*test -s docs\/icon-assets\/Chitiet\.png[\s\S]*cp docs\/icon-assets\/Icon\.png[\s\S]*cp docs\/icon-assets\/Chitiet\.png/,
+  'Both user-provided icon reference PNGs must be carried in the audit artifact for visual review.');
+
 assert.match(workflow, /artifacts\/liquid-glass-preview\/live-preview/,
   'The archive must source files from the dedicated live-capture directory.');
 assert.match(workflow, /audit\.sourceKind !== 'cloudflare-pages-preview-live-read-only'/,

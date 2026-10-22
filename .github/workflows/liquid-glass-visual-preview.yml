@@ -1,5 +1,5 @@
 name: Liquid Glass isolated visual preview
-# Guarded capture: explicit start/end capture commits on the fix branch may archive only verified live Cloudflare Preview screenshots.
+# Guarded capture: start/end markers may archive verified live captures; [capture-review] verifies/captures to the run artifact only, without touching canonical archives.
 # Note: paths-ignore excludes docs/handoff/**, so a handoff-only commit cannot trigger capture; keep the guarded capture marker on a workflow/source commit. End-of-work archive for satin v7.
 
 on:
@@ -84,7 +84,7 @@ jobs:
             node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           fi
       - name: Validate guarded push capture request
-        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]'))
+if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]'))
         env:
           REF_NAME: ${{ github.ref_name }}
           PREVIEW_URL: 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/'
@@ -143,7 +143,7 @@ jobs:
           node scripts/validate-cloudflare-preview-url.mjs "${PREVIEW_URL}"
           node scripts/capture-cloudflare-preview.mjs
       - name: Verify actual Cloudflare Pages deployment before manual capture/archive
-        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')))
+if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]')))
         env:
           PREVIEW_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.preview_url || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
@@ -152,7 +152,7 @@ jobs:
           EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Capture live Cloudflare Pages Preview (read-only)
-        if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]')))
+if: (github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]')))
         env:
           PREVIEW_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.preview_url || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/' }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
@@ -374,9 +374,13 @@ jobs:
           set -euo pipefail
           test -s docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png
           test -s docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png
+          test -s docs/icon-assets/Icon.png
+          test -s docs/icon-assets/Chitiet.png
           mkdir -p artifacts/liquid-glass-preview/reference-images
           cp docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png artifacts/liquid-glass-preview/reference-images/
           cp docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png artifacts/liquid-glass-preview/reference-images/
+          cp docs/icon-assets/Icon.png artifacts/liquid-glass-preview/reference-images/
+          cp docs/icon-assets/Chitiet.png artifacts/liquid-glass-preview/reference-images/
       - name: Summarize local fixture, live Preview, and deployment verification separately
         if: always()
         shell: bash
