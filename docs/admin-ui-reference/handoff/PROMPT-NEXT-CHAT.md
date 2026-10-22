@@ -1,15 +1,13 @@
-## LIVE HANDOFF CHECKPOINT — 2026-10-22 21:20 +07:00
+## LIVE HANDOFF CHECKPOINT — 2026-10-22 18:08 +07:00
 
-- **Canonical state:** read `handoff/current-status.json` first. It now contains the task queue and the latest verified handoff checkpoint.
-- **Branch HEAD before this handoff edit:** `b6b244ce87ce3cce48d038198f30652ee2769894`; PR #111 was OPEN/unmerged and matched this SHA. This edit is docs-only and does not make application source tested at the resulting commit.
-- **Last verified source/test SHA:** `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Validate #39756606343 PASS and Preview #39756606227 SUCCESS. Preview scope is CSS signature + login/dashboard smoke only. Validate #39758657800 passed on docs-only SHA `e356b312e8a7af14e91da599c26f9c77c6fba18b`. Do not describe any of these as full backend QA or all-screen acceptance.
-- **Progress:** provisional 50%; do not increase until weighted acceptance evidence changes.
-- **Immediate next task:** inspect the current Product editor #4 source and approved reference, especially SKU verification layout and AI-description heading/action. The previously proposed layout edit was not committed; verify live code before editing. Add exact-source geometry/accessibility assertions, run relevant checks, and inspect screenshots.
-- **Queue after that:** Product list #3 parity; remaining 12-screen parity audit; PR #111 mixed-scope audit; orders/fulfillment #7 and other partial screens.
-- **Not accepted / blocked:** all-12-screen parity NOT_ACCEPTED; screen #3 PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; AI grouping #11 BLOCKED pending approved contract; product image save/R2 and PRE/PRO migration DEFERRED_BY_OWNER.
-- **Safety:** only `feature/admin-isolated-handoff-2026-10-20`; no merge PR #111/#108, no main/static edits, no Production deploy, no Access bypass/secrets, no remote D1/R2 writes or migrations. Before every write, re-fetch branch and PR #111 heads and require exact match; use non-force update with expected SHA.
-- **Anti-repeat:** reuse test evidence only when source/test SHA and relevant inputs still match. Every work cycle must implement a real change, test it, record evidence, update status and continue to the next safe task without waiting for “continue”.
-
+- **Canonical state:** `handoff/current-status.json`; read it first and follow its task queue.
+- **ADMIN HEAD at checkpoint:** `6b976c233efbe8847d8fd038911a4262e8f2823d`; PR #111 OPEN/unmerged and matched. PR #108 remains separate and OPEN/unmerged. Re-fetch refs before every write.
+- **Exact-SHA evidence:** [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) SUCCESS and [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) SUCCESS on source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`. Artifact [admin-preview-evidence-311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829): 99 PNGs, 16 login shell, 83 read-only UI fixtures, 75 metrics; no errors/writes were recorded.
+- **Recent changes:** Product editor #4 geometry assertions passed on `466199f`; Product list #3 SKU/category hint wraps to at most two lines at 320–360px, validated by tests and screenshot spot-check on `dca19a2`.
+- **Progress:** provisional 50%, unchanged. Product list #3 and overall 12-screen parity remain NOT_ACCEPTED until complete reference comparison.
+- **Immediate task:** continue Product list #3 comparison beyond the SKU-wrap fix, then #4 remaining parity, other screens, and PR #111 scope audit.
+- **Not accepted/blocked:** authenticated business/backend QA NOT TESTED; AI grouping #11 BLOCKED pending approved route/controls/API contract; product image save/R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- **Hard limits:** only `feature/admin-isolated-handoff-2026-10-20`; no merge PR #111/#108, no main/static edits, no Production deploy, no Access bypass/secrets, no remote D1/R2 writes/migrations. Continue after reports.
 ---
 
 ## CONTINUITY PROTOCOL — CURRENT OPERATING RULES (2026-10-22)
