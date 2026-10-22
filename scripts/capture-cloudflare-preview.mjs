@@ -1404,8 +1404,24 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     // so the evidence cannot capture a half-crossfaded frame that looks cropped.
     await page.waitForFunction(() => {
       const image = document.querySelector('#detailMainImage');
-      return image && image.complete && image.naturalWidth > 0 && !image.classList.contains('is-changing');
-    }, null, { timeout: 5000 });
+      const activeThumb = document.querySelector('#detailThumbs .detail-thumb.active img');
+      if (!image || !activeThumb) return false;
+      const normalize = value => {
+        try { return new URL(value, document.baseURI).href; } catch { return ''; }
+      };
+      const displayedSource = normalize(image.currentSrc || image.src);
+      const selectedSource = normalize(activeThumb.currentSrc || activeThumb.src);
+      const transitionClasses = [
+        'is-changing',
+        'sd-slide-out-left',
+        'sd-slide-out-right',
+        'sd-slide-in-left',
+        'sd-slide-in-right',
+      ];
+      return image.complete && image.naturalWidth > 0
+        && displayedSource && displayedSource === selectedSource
+        && !transitionClasses.some(className => image.classList.contains(className));
+    }, null, { timeout: 10000 });
     await page.waitForTimeout(80);
     await captureLocator(page, '#productOverlay', screenshotStem('product-gallery-next', viewport, theme) + '.png', {
       ...captureMeta(viewport, theme, directState.path), captureType: 'product-gallery', state: 'next-image', productTitle: clicked.title,
