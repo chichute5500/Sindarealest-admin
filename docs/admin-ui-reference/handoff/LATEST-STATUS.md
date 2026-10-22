@@ -1,8 +1,8 @@
 # LIVE STATUS — SinDarealest Admin
 
-**Checkpoint timestamp:** 2026-10-22 (live ref revalidated after responsive grid change)  
-**Current ADMIN HEAD:** `0ffeec8e377ecfd7f92926cdb98dcb91bd9b6602`  
-**Overall progress:** **50% PROVISIONAL** — responsive Order detail grid fix is implemented but does not count as accepted until exact-HEAD automated evidence passes.
+**Checkpoint timestamp:** 2026-10-22 (live checkpoint after Order detail and Customers responsive test updates)  
+**Current ADMIN HEAD:** `9d5d838fe53d657ed98650161bf605868793aba2`  
+**Overall progress:** **50% PROVISIONAL** — new responsive checks are authored but exact-HEAD test results remain NOT VERIFIED.
 
 ## Live refs
 
@@ -12,12 +12,13 @@
 
 ## Latest actions
 
-- Latest observed source commit [`3d10e16`](https://github.com/chichute5500/Sindarealest-admin/commit/3d10e163d3a88884ad109d0245b7b9c38e0ec603): adjusts Order detail responsive grids in `public/admin/index.html`.
-- Test commit [`617496b`](https://github.com/chichute5500/Sindarealest-admin/commit/617496b7588b90ad6f76f80e1c9611615c7599b5): adds computed-grid-column assertions and fixes regex parsing of computed CSS columns.
-- Handoff checkpoint [`0ffeec8`](https://github.com/chichute5500/Sindarealest-admin/commit/0ffeec8e377ecfd7f92926cdb98dcb91bd9b6602): updates `current-status.json` to reflect the actual work and outstanding validation.
-- Exact-HEAD workflow lookup for `617496b` returned no PR-triggered runs through the available connector. **CI/Playwright on current HEAD: NOT VERIFIED**, not PASS. Do not use prior runs on `7d9cde7` or earlier as validation of this change.
-- Product change details: customer fields now use two columns at viewport width >=360px (email/address span full width); item metadata uses two columns at >=360px; both collapse below 360px. Playwright checks computed column counts for both grids.
-- Overall progress remains 50% PROVISIONAL. No preview acceptance or authenticated backend QA has been established by these commits.
+- Product source commit [`3d10e16`](https://github.com/chichute5500/Sindarealest-admin/commit/3d10e163d3a88884ad109d0245b7b9c38e0ec603): Order detail customer fields and item metadata use two columns at >=360px and one column below 360px.
+- Regression commit [`617496b`](https://github.com/chichute5500/Sindarealest-admin/commit/617496b7588b90ad6f76f80e1c9611615c7599b5): computed grid-column assertions for Order detail; regex corrected to split on whitespace.
+- Customer screen test commit [`da5139c`](https://github.com/chichute5500/Sindarealest-admin/commit/da5139c39ec1a7e96d93ab9ede4ebab83e07094f): asserts no document-level horizontal overflow and correct mobile-card vs desktop-table layout at 680px breakpoint.
+- Handoff checkpoint [`9d5d838`](https://github.com/chichute5500/Sindarealest-admin/commit/9d5d838fe53d657ed98650161bf605868793aba2): current-status.json refreshed with current SHA and validation gap.
+- Latest exact-SHA status/PR-triggered workflow lookups returned no status checks or runs for the tested commits through the available connector. **CI/Playwright: NOT VERIFIED**; do not treat an empty response as PASS or proof of no run. Resolve workflow run discovery/dispatch before claiming acceptance.
+- PR #111 remains OPEN/unmerged. PR #108 remains protected and OPEN/unmerged. No Production deploy, merge, or remote schema changes performed.
+- Overall progress remains 50% PROVISIONAL; test and handoff changes are not product acceptance evidence.
 
 ## PR #111 scope and safety
 
