@@ -1,3 +1,23 @@
+# CURRENT CHECKPOINT — 2026-10-22 (gallery capture settling; supersedes older status snapshots)
+
+- Active repository/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`. PR #108 stays OPEN and unmerged.
+- Current source HEAD at this checkpoint: `de62c546bab7e175347a4efb4fda5ec54c014a38`.
+- Latest source change: `scripts/capture-cloudflare-preview.mjs` now waits until the main detail image matches the active thumbnail and all detail-gallery transition classes have cleared before capturing the next-image screenshot; `tests/website-screenshot-capture.test.mjs` asserts this guard. This is a screenshot-readiness/test correction, not a production storefront behavior change.
+- Exact current SHA workflow results:
+  - [Validate source/tests #4448 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936598)
+  - [Preview deploy #537 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936551)
+  - [Admin Preview Playwright #751 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936572) (read-only smoke only; do not modify Admin)
+  - [Liquid Glass live visual audit #807 — PENDING at checkpoint](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501). Do not claim current-SHA live visual PASS until this finishes and the artifact/deployment SHA are checked.
+- Intermediate capture-fix SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e`: source validation [#4447 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921433), deploy [#536 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921432), Admin read-only Playwright [#750 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921429), live audit [#806 running](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487). Avoid treating its live evidence as evidence for the later SHA.
+- Last completed live audit artifact: [run #805 / artifact 12402222013](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723518923). It verified exact deployment SHA `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6`, Preview alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, deployment ID `4bde881b-5b48-4860-b410-ec160d6c8dd6`; 119 live screenshots, 8 viewport/theme pairs, 12 route checks, 68 section checks, 8 commerce states, 4 product-detail contexts, 4 icon-state checks, 4 cart-add checks, 6 fly-to-cart checks, 2 animation edge checks, 20 first-paint samples and 4 videos. It passed with 0 overflow, console/page/HTTP errors, failed requests, broken images, read-only violations or hard failures. Local fixture audit separately passed with 54 screenshots, 235 fixture products, 20 responsive cases and 95 interaction checks; do not mix local-fixture evidence with live Preview evidence.
+- The run #805 mobile Light gallery screenshot showed the selected white/green sneaker fully displayed, without the previously suspected half-crossfade/cropped-frame appearance. However, #805 used the earlier weaker capture wait and an older SHA; treat it as encouraging evidence only, not proof for current HEAD. Inspect the new #807 artifact's gallery screenshot before deciding the issue is closed. The updated guard now checks active thumbnail/source equality plus all five transition classes (`is-changing`, `sd-slide-out-left/right`, `sd-slide-in-left/right`).
+- Estimated overall completion: about 85%, NOT final acceptance. Percentage is a working estimate, not an audit result. Keep all unfinished requirements explicitly open.
+- Next: poll #807 and #806; download the current-SHA artifact; confirm deployment SHA; inspect actual gallery screenshots and first-paint video/timelines; resolve any genuine source/UI defect rather than hiding it with a screenshot delay; then update this checkpoint with evidence. Continue working after progress reports.
+- Hard boundaries: no merge; no Production deploy/main/DNS; no Admin code; no backend/API/schema/product data/image mapping/database/R2/binding/secret/Access changes. Hero stays the user-provided `/images/hero-sd-gl052.png`; do not restart the old SKU/hero search.
+- User does not need to act unless a concrete permission, credential, or decision blocker appears.
+
+---
+
 ## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
 
 - Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
