@@ -1,13 +1,17 @@
 # Admin 12-screen reference audit matrix
 
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:05:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:12:00+07:00
 
-- Validate Source [#39752153329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39752153329) SUCCESS on pre-handoff HEAD `55a0db927a3b9cc9a6b7fed48eca663f9c3bfa0c`.
-- Preview/Playwright [#39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) SUCCESS on app source SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; `PASS_LOGIN_CSS_SIGNATURE` only, not authenticated business QA.
-- Artifact [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) was downloaded and reviewed: 99 PNGs, 75 fixture metrics. Screen #3 remains PARTIAL/NOT ACCEPTED; screenshots do not authorize fake product photos/prices/stock.
-- Screens #4/#5/#7/#12 also visually reviewed; scroll-to-end geometry still needs explicit testing. Full 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED; progress 50%.
-- PR #111/#108 OPEN/unmerged. Only ADMIN branch; no main/static edits, Production deployment, Access/secrets bypass, or remote D1/R2/schema/migration writes.
----
+- **Nhánh/HEAD trước lần cập nhật bàn giao:** `085e6f14fef7a7ac45f45d3a5e5e5d5308d22fb5` (commit evidence-only). Source/test SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4` đã chạy cả hai workflow: Validate Source [#39753005337](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337) **SUCCESS**, Preview/Playwright [#39753005347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347) **SUCCESS**.
+- **Artifact:** [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768) — 99 PNG + 75 metrics. Screenshot matrix 8 viewport/light-dark PASS; fixture dùng session/API stub, không phải business QA thật.
+- **Scroll-to-end regression:** 20/20 checks PASS cho Sản phẩm, Đơn hàng, Khách hàng, Bảo hành và Cài đặt/Sao lưu tại 320×640 và 390×844, light/dark. Cuối nội dung kết thúc trên fixed bottom navigation với khoảng hở 16–65 px; document width không vượt viewport; nav vẫn hiện; scroll đến cuối thành công. Không sửa CSS vì không có lỗi che nội dung trong các cấu hình đã kiểm tra.
+- **Screen #3 review:** ảnh product list đã xem ở 320×640, 390×844, 1280×800 không thấy tràn ngang. Reference có ảnh/giá/kho cụ thể, fixture chủ ý dùng placeholder có nhãn và `Chưa nhập`/`Chưa kiểm kê`. Không fake dữ liệu; screen #3 vẫn **PARTIAL / NOT ACCEPTED**.
+- **Screens #4/#5/#7/#12:** đã xem ảnh editor, gallery, orders, settings/backup. Geometry scroll đã kiểm tra; ảnh tĩnh không chứng minh CRUD thật, upload/save ảnh hoặc backend đã xác thực.
+- **Artifact quality:** 99 PNG (16 login + 83 fixture/read-only), 75 metrics; 0 page errors, console errors, failed requests, HTTP errors, fixture write attempts, unexpected API paths. Test dùng local source với synthetic fixtures.
+- **PASS:** source checks + scroll geometry trên SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`; Preview CSS signature `PASS_LOGIN_CSS_SIGNATURE` chỉ. **NOT VERIFIED / NOT ACCEPTED:** đủ 12 màn đối chiếu reference, authenticated business/backend QA, ảnh upload/save/R2 và D1 migration ledger. **BLOCKED:** AI grouping #11 chưa có feature contract được duyệt. R2 image save và PRE/PRO migrations `DEFERRED_BY_OWNER`.
+- **An toàn:** PR #111 ADMIN và PR #108 static OPEN/unmerged. Chỉ nhánh ADMIN; không sửa main/static, không merge/force-push, không deploy Production, không bypass Access/secrets, không ghi D1/R2 hoặc chạy migrations.
+- **Tiến độ: 50%** — 20 geometry checks pass không đồng nghĩa visual parity 12 màn hoặc backend QA thật đã hoàn thành.
+------
 ---
 
 ---
@@ -239,3 +243,11 @@ Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322
 - Screens #4/#5: editor/gallery modal header, tabs and fixed footer are visible; existing geometry regression assertions remain required. Static screenshots do not prove scroll/CRUD/image-save behavior.
 - Screens #7/#12: order cards and settings/backup continue below the initial viewport. Do not call this a defect from a cropped screenshot alone; run scroll-to-end geometry checks for 320×640 and 390×844 in light/dark before concluding content is hidden behind the fixed bottom nav.
 - No UI change was made just to imitate reference values with fake data. Next: run Playwright scroll-to-end geometry checks, then fix ADMIN-only CSS only if a real overlap is demonstrated. Fixture screenshots are not authenticated business QA.
+
+
+## Scroll-to-end geometry audit — artifact 300 — 2026-10-22
+
+- Source/test SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`; Validate Source [#39753005337](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337) and Preview/Playwright [#39753005347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347) both SUCCESS on the exact same SHA.
+- Artifact [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768) includes `uiFixtureVisualAudit.bottomNavigationScrollAudit`: **20/20 PASS** across products/orders/customers/warranties/settings, viewports 320×640 and 390×844, light/dark.
+- Every combination reached document end, kept document width within viewport, retained visible fixed navigation, and measured main-content bottom at least 16 px above nav top. Measured gap range 16–65 px. The suspected overlap is not present in tested configurations; **no CSS change warranted**.
+- Local source with synthetic read-only fixtures; not authenticated backend QA. Screen #3 and all-12-screen parity remain NOT ACCEPTED.

@@ -1,5 +1,12 @@
 # Instructions for AI: use the ADMIN UI reference
 
+## CURRENT VERIFIED CHECKPOINT — 2026-10-22T16:12:00+07:00
+
+- Validate Source [#39753005337](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337) and Preview/Playwright [#39753005347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347) both SUCCESS on exact source/test SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`; current branch HEAD `085e6f14fef7a7ac45f45d3a5e5e5d5308d22fb5` is evidence-only.
+- Artifact [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768) has 99 PNGs, 75 metrics and 20/20 bottom-nav scroll geometry checks PASS. Five mobile screens at 320×640 and 390×844 in light/dark reach document end with 16–65px gap above nav.
+- Preview is `PASS_LOGIN_CSS_SIGNATURE` only, not authenticated backend QA. Screen #3 and all-12-screen parity NOT ACCEPTED; authenticated business QA NOT TESTED; progress 50%.
+- PR #111/#108 OPEN/unmerged; only ADMIN branch, no main/static edits, Production deploy, Access/secrets bypass or remote D1/R2/schema/migration writes.
+
 ## CURRENT VERIFIED CHECKPOINT — 2026-10-22T15:52:00+07:00
 
 - ADMIN branch HEAD: `dcb60b39d5813b82fabeab0f390826e558e7e676` (evidence-only descendant); exact source/test SHA: `78b87d71f82090cb7399a68207ef436a200d3c9f`.

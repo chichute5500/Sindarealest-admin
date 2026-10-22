@@ -1,13 +1,14 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T15:52:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:12:00+07:00
 
-- **Nhánh/HEAD:** `dcb60b39d5813b82fabeab0f390826e558e7e676` trên `feature/admin-isolated-handoff-2026-10-20`. Đây là commit evidence-only; source/test SHA thực tế là `78b87d71f82090cb7399a68207ef436a200d3c9f`. Không gọi HEAD evidence-only là source đã chạy test.
-- **Validate Source:** [run #39750503800](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503800) — **SUCCESS** trên SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`.
-- **Admin Preview diagnostic / Playwright:** [run #39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) — **SUCCESS** trên cùng SHA. Screenshot matrix **PASS** cho 8 viewport (320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900), light/dark.
-- **Artifact:** [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) — 99 PNG (16 login + 83 fixture/read-only), 75 metrics. Không có page/console/failed-request/HTTP errors, fixture write attempts hoặc unexpected API paths.
-- **Phạm vi Preview:** `PASS_LOGIN_CSS_SIGNATURE` — chỉ kiểm tra CSS/màn login. Không phải đăng nhập thật hay QA backend/business. 83 ảnh fixture dùng dữ liệu tổng hợp/read-only.
-- **PASS:** Validate Source + local Playwright/screenshot matrix trên SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; Preview login CSS signature trên cùng SHA. **NOT VERIFIED / NOT ACCEPTED:** đối chiếu đầy đủ 12 màn; authenticated business/backend QA; upload/save ảnh thật và D1 migration ledger. **BLOCKED:** AI grouping màn #11 chưa có route/controls/API/contract được duyệt. R2 image save và PRE/PRO migrations `DEFERRED_BY_OWNER`.
-- **An toàn:** PR #111 ADMIN OPEN/unmerged; PR #108 static OPEN/unmerged. Chỉ làm nhánh ADMIN; không sửa `main`/static, không merge/force-push, không deploy Production, không bypass Cloudflare Access/secrets, không ghi D1/R2/backend hoặc chạy migration.
-- **Tiến độ: 50%** — CI/fixture xanh không chứng minh visual parity 12 màn hoặc backend QA thật.
+- **Nhánh/HEAD trước lần cập nhật bàn giao:** `085e6f14fef7a7ac45f45d3a5e5e5d5308d22fb5` (commit evidence-only). Source/test SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4` đã chạy cả hai workflow: Validate Source [#39753005337](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337) **SUCCESS**, Preview/Playwright [#39753005347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347) **SUCCESS**.
+- **Artifact:** [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768) — 99 PNG + 75 metrics. Screenshot matrix 8 viewport/light-dark PASS; fixture dùng session/API stub, không phải business QA thật.
+- **Scroll-to-end regression:** 20/20 checks PASS cho Sản phẩm, Đơn hàng, Khách hàng, Bảo hành và Cài đặt/Sao lưu tại 320×640 và 390×844, light/dark. Cuối nội dung kết thúc trên fixed bottom navigation với khoảng hở 16–65 px; document width không vượt viewport; nav vẫn hiện; scroll đến cuối thành công. Không sửa CSS vì không có lỗi che nội dung trong các cấu hình đã kiểm tra.
+- **Screen #3 review:** ảnh product list đã xem ở 320×640, 390×844, 1280×800 không thấy tràn ngang. Reference có ảnh/giá/kho cụ thể, fixture chủ ý dùng placeholder có nhãn và `Chưa nhập`/`Chưa kiểm kê`. Không fake dữ liệu; screen #3 vẫn **PARTIAL / NOT ACCEPTED**.
+- **Screens #4/#5/#7/#12:** đã xem ảnh editor, gallery, orders, settings/backup. Geometry scroll đã kiểm tra; ảnh tĩnh không chứng minh CRUD thật, upload/save ảnh hoặc backend đã xác thực.
+- **Artifact quality:** 99 PNG (16 login + 83 fixture/read-only), 75 metrics; 0 page errors, console errors, failed requests, HTTP errors, fixture write attempts, unexpected API paths. Test dùng local source với synthetic fixtures.
+- **PASS:** source checks + scroll geometry trên SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`; Preview CSS signature `PASS_LOGIN_CSS_SIGNATURE` chỉ. **NOT VERIFIED / NOT ACCEPTED:** đủ 12 màn đối chiếu reference, authenticated business/backend QA, ảnh upload/save/R2 và D1 migration ledger. **BLOCKED:** AI grouping #11 chưa có feature contract được duyệt. R2 image save và PRE/PRO migrations `DEFERRED_BY_OWNER`.
+- **An toàn:** PR #111 ADMIN và PR #108 static OPEN/unmerged. Chỉ nhánh ADMIN; không sửa main/static, không merge/force-push, không deploy Production, không bypass Access/secrets, không ghi D1/R2 hoặc chạy migrations.
+- **Tiến độ: 50%** — 20 geometry checks pass không đồng nghĩa visual parity 12 màn hoặc backend QA thật đã hoàn thành.
 ------
 ## Checkpoint mới nhất — 2026-10-21 17:47 UTC
 
