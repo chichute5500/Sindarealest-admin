@@ -33,6 +33,12 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - Workflow trigger optimization is now applied: docs/root README-only changes skip full CI; workflow-only changes skip deploy and expensive visual capture; Admin Preview smoke is manual-only; stale source-test and ordinary visual-review runs are superseded by newer work. Deliberate start/end screenshot archives stay in a separate serialized concurrency group and are not automatically cancelled.
 - Previous runs showed rapid stale-commit churn, including cancelled Admin smoke runs such as [#39842480951](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480951) and [#39842289407](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842289407). These are historical evidence of the inefficiency, not current failures.
 
+## Latest evidence review (2026-10-23)
+- Inspected artifact `12453971973` from visual workflow [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928). Local fixture audit passed with no hard failures, but it is not live Preview evidence.
+- The artifact's live deployment metadata check failed closed: expected `33e09dd2bce4c4be1df23c65a47d93217d2153b7`, matched deployment `d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d`. The compare shows only two documentation files changed between these SHAs; nevertheless, no exact-SHA live screenshot was accepted by that run.
+- Current source already includes the hidden-image status, no-src behavior, collapsed visual frame, single-column fallback and regression assertions. Do not make another CSS change based only on the local screenshot without verified evidence of a real layout defect.
+- The Preview URL could not be opened through the available web viewer. Actual live Preview visual evidence and owner acceptance remain pending.
+
 ## Immediate next actions
 1. Re-fetch current HEAD, PR #108, Actions and Cloudflare deployment metadata before any new source change.
 2. Keep the Hero temporarily hidden and preserve its owner-uploaded source/derivative. Inspect actual Preview screenshots for no empty frame or reserved blank area and no mobile/desktop Light/Dark regression; do not call this visual PASS until inspected.
