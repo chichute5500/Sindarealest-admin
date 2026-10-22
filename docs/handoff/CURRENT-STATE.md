@@ -19,7 +19,7 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - Required visual condition: no empty Hero frame, reserved blank space, or layout regression on mobile/desktop in Light/Dark.
 
 ## Latest branch / workflow evidence (exact SHA only)
-- Current HEAD: `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`. This commit changes only four workflow files under `.github/workflows/`; it does not alter storefront source, the Hero image, product data or runtime behavior.
+- Latest code/workflow-changing commit: `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`. It changes only four workflow files under `.github/workflows/`; the subsequent handoff refresh is documentation-only. Always re-fetch the live branch HEAD before acting; do not infer it from this file.
 - Source integrity, dependency audit and full automated tests: PASS on this exact SHA — [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405).
 - The workflow-only push correctly triggered source validation only. Preview deploy, live screenshot capture and Admin smoke were not launched by this commit; do not claim the current HEAD is deployed or visually accepted.
 - Latest recorded successful Preview deploy before this workflow-only commit: [run #39842480998](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480998), SHA `33e09dd2bce4c4be1df23c65a47d93217d2153b7`. Related Liquid Glass audit: [run #39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928), same SHA. These old results do not replace a fresh check of the alias/deployment metadata or human inspection of screenshots.
