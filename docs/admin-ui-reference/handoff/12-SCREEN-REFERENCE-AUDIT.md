@@ -1,5 +1,18 @@
 # Admin 12-screen reference audit matrix
 
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T11:06:00+07:00
+
+- **Nhánh:** `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã xác minh: `2357cf6a3659758d62331f6cb65846410bc7ba43`; HEAD hiện tại trước cập nhật handoff là `1a300d97cb3a0832b445d967e315fd73c4ae5d41` (các commit sau chỉ lưu evidence/docs).
+- **Validate Source:** [run #39720164328](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328) — **SUCCESS**, đúng SHA `2357cf6a3659758d62331f6cb65846410bc7ba43`.
+- **Admin Preview / Playwright:** [run #39720164321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321) — **SUCCESS**, đúng SHA `2357cf6a3659758d62331f6cb65846410bc7ba43`.
+- **Artifact:** [`admin-preview-evidence-270`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626), ID `12400543626`, 68 PNG trong ZIP (16 ảnh login + 51 ảnh fixture + 1 ảnh reference được đóng gói), 43 fixture metrics; metadata `completed=true`, 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors, 0 attempted writes và 0 unexpected API paths. Các ảnh fixture dùng dữ liệu tổng hợp, không đăng nhập backend thật và không ghi dữ liệu.
+- **Lỗi test đã sửa:** assertion dải ảnh trước đây chạy sau khi xóa ảnh, làm dải chỉ còn 4 thumbnail và không còn vượt ngưỡng scroll. Đã chuyển kiểm tra overflow lên trước khi xóa, giữ kiểm tra nút “xuống” bị disable ở đúng thời điểm sau khi xóa. Commit test fix [`2357cf6`](https://github.com/chichute5500/Sindarealest-admin/commit/2357cf6a3659758d62331f6cb65846410bc7ba43); Validate và Preview đều xanh ở SHA này.
+- **Preview diagnostic:** `PASS_LOGIN_CSS_SIGNATURE` — chỉ xác nhận CSS/điều hướng màn đăng nhập. Không được diễn giải thành QA đã đăng nhập thật; Cloudflare Access không bị bypass.
+- **Tiến độ tổng thể: 50%**. Giữ nguyên vì sửa test và CI xanh chưa đồng nghĩa nghiệm thu 12 màn. 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. Không merge PR #111/#108; không sửa `main`/nhánh static, không Production deploy, không chạm secrets/remote D1/R2/schema/migration/infra.
+- **Bước tiếp theo:** tiếp tục audit gallery sản phẩm bằng fixture tổng hợp: alt text, trạng thái ảnh bìa, reorder/delete và accessible names; không bấm lưu/upload thật. Sau thay đổi tiếp tục chạy exact-SHA Validate + Preview, xem artifact và cập nhật/đọc lại đủ 7 tệp.
+
+---
+
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:35:36+07:00
 
 - Repo `chichute5500/Sindarealest-admin`; chỉ nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `6dcbcdccb45d824095f5dd50f5f7c919ae72e77a`; branch HEAD khi ghi handoff `76769e55ac40d8cb8eff8ee099de15eebab30970` là evidence-only descendant.

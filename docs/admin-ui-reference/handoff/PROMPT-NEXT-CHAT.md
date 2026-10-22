@@ -1,18 +1,21 @@
-## PROMPT TIẾP TỤC — 2026-10-22T04:35:36+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T11:06:00+07:00
 
-Tiếp tục làm việc thực tế. Repo `chichute5500/Sindarealest-admin`; chỉ sửa `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `6dcbcdccb45d824095f5dd50f5f7c919ae72e77a`; branch HEAD khi cập nhật handoff `76769e55ac40d8cb8eff8ee099de15eebab30970`.
+Tiếp tục công việc thực tế trong repo `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA đã kiểm tra: `2357cf6a3659758d62331f6cb65846410bc7ba43`; handoff commit base trước lần cập nhật này `1a300d97cb3a0832b445d967e315fd73c4ae5d41`.
 
-**Exact-SHA CI:** Validate [#39679652666](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666) SUCCESS; Preview/Playwright [#39679652720](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720) SUCCESS. Artifact [admin-preview-evidence-267](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720/artifacts/12382874321) ID `12382874321`: 68 PNG, 51 fixture screens, 43 metrics; completed=true; zero page/console/network/HTTP errors, attempted writes or unexpected API paths.
+**Kết quả xác minh:**
+- Validate Source [#39720164328](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164328) — SUCCESS trên `2357cf6a3659758d62331f6cb65846410bc7ba43`.
+- Admin Preview/Playwright [#39720164321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321) — SUCCESS trên `2357cf6a3659758d62331f6cb65846410bc7ba43`.
+- Artifact [admin-preview-evidence-270](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39720164321/artifacts/12400543626), ID `12400543626`: 68 PNG trong ZIP, 16 ảnh login, 51 ảnh fixture, 43 metrics. Metadata: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Fixture-only, không phải backend QA thật.
+- Lỗi gallery test đã sửa: kiểm tra rail overflow trước khi xóa thumbnail; kiểm tra nút cuối disabled sau khi xóa. Commit [`2357cf6`](https://github.com/chichute5500/Sindarealest-admin/commit/2357cf6a3659758d62331f6cb65846410bc7ba43).
+- Preview diagnostic `PASS_LOGIN_CSS_SIGNATURE` không xác nhận authenticated session. Không bypass Cloudflare Access.
 
-**Đã làm:** Mobile More/Khác menu closes on Escape and restores focus; selecting Settings closes menu, resets aria-expanded, returns focus to trigger and changes page correctly; test navigates back to dashboard and reopens menu. E2E verifies Warranty/Settings menuitems, bounds/no clipping and keyboard behavior. Mobile screenshot inspected. Notification panel Escape/focus and viewport tests pass. Backup/Restore panel is responsive and screenshot target is correct.
+**Tiến độ:** 50%; 12-screen parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED. Không tăng % chỉ vì CI xanh.
 
-**Blocker #11:** AI image review/grouping has no identifiable route, controls, API or module in current source/tree. Do not invent UI/API, call a live provider, spend quota or claim fixture output is real AI success. Require approved feature contract/reference before implementation.
+**Việc tiếp theo:** audit product-editor gallery với ảnh fixture tổng hợp (alt text, ảnh bìa, reorder/delete, accessible names), không save/upload thật; sửa các khác biệt có bằng chứng; chạy Validate + Preview trên exact SHA, kiểm tra artifact; cập nhật và đọc lại cả 7 tệp handoff.
 
-**Trạng thái:** progress 50%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED. PR #111/#108 OPEN/UNMERGED.
+**Rào chắn:** chỉ ADMIN branch; PR #111/#108 để OPEN/UNMERGED; không sửa `main`/static, không deploy Production, không bypass Access, không thao tác secrets hoặc remote D1/R2/schema/migration/infra, không ghi dữ liệu thật bằng fixture.
 
-**Việc tiếp theo:** audit product-editor gallery accessibility and responsive behavior: image alt text, cover designation, reorder/delete controls and keyboard/screen-reader labels; only test synthetic fixture images and do not save/upload real images. Fix verified gaps, run exact-SHA Validate + Preview, inspect artifact and update/read back all seven handoff files.
-
-Before each commit fetch latest HEAD and use expected SHA/CAS. Only ADMIN branch; no merge, no main/static changes, no Production deploy, no Access/secrets, no remote D1/R2/schema/migration/infra, no TinyFish.
+---
 
 ---
 
