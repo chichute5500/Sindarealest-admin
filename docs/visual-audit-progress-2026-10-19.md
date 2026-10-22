@@ -1,3 +1,20 @@
+# LATEST OVERRIDE — HERO PADDING FIX / LIVE VISUAL GATE STILL OPEN (2026-10-23)
+
+This block supersedes older SHA, asset-processing, and preview-status claims below where they conflict. Preserve the historical evidence; do not delete it.
+
+- Repository/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`. PR #108 remains OPEN and unmerged. Do not merge.
+- Current branch HEAD at this update: `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8`. This SHA includes a capture-workflow reliability adjustment; Hero app code is from the immediately preceding tested/deployed changes. Source validation and full automated tests PASS at `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8`: run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39838207248 (check final status before relying on it).
+- Preview deployment PASS at exact SHA `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8`: run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39838207235; unique URL https://b6c153d5.sindarealest2.pages.dev/; stable alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Preview only. Production and `main` remain out of scope.
+- Owner-provided source remains `public/images/hero-upload/tb_image_share_1792519964514 (1).png`; it is a standalone Hero presentation asset, not a catalog product/SKU/image relationship. Never overwrite it or restore `public/images/hero-sd-gl052.png`.
+- Root cause fixed in `scripts/process-hero-edge.py`: prior code padded alpha, blurred it, then cropped back to original dimensions, recreating a hard straight edge where the platform touched the source canvas. New derivative retains the full transparent padding: source 1200×1600, output 1488×1888, 144 px padding, `output_keeps_transparent_padding: true`. Last processor report SHA-256: source `dab6493ecb782ffeef6c1ade0224390ffe1ba1bdd7d4a95ad6a2889e49f99f83`; derivative `6a260e31c0ce5bbc450c1cd1f953e0b2f01a4f8744ab6b3e60347daceb0461a7`; RGB unchanged. Cache key is `20261023-4`. CSS scales the padded derivative to preserve shoe size (desktop 124%; mobile 130%, max-height 330px) and does not brighten/recolor the shoe.
+- The latest visual capture workflow run is https://github.com/chichute5500/Sindarealest-admin/actions/runs/39838207215 (SHA `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8`). It was still capturing/probing the live Preview at the last checkpoint; check its final status and artifact list. A previous capture job stalled at Chromium installation, so the workflow was adjusted to use `npx playwright install chromium` with a 6-minute step timeout and a SHA-scoped push concurrency group. Do not confuse a local fixture screenshot with a real Preview screenshot.
+- **Visual acceptance remains OPEN / NOT PASS until the new live Light and Dark Hero screenshots are opened and checked.** Required checks: no straight right/bottom canvas edge, no horizontal seam, no halo/glow pretending to be edge feather, crisp shoes, appropriate large scale, natural blend on both themes. Automated tests and deploy success are not visual acceptance. The owner has not approved PASS.
+- Next: poll run #39838207215, download its artifacts, inspect `section-hero-mobile-light-390x844.png`, `section-hero-mobile-dark-390x844.png`, and desktop Hero screenshots against the reference PNGs in `docs/static-web-reference/`. If the right/bottom cut or seam remains, keep working only on Hero and repeat test → Preview deploy → exact-SHA verification → actual screenshot review. Do not ask the owner to reselect the image.
+- After owner explicitly says PASS, mark `OWNER-APPROVED — LOCKED` and never modify the Hero again without explicit authorization. Until then, do not work on unrelated UI.
+- Hard boundaries: no production deploy, no `main`, no merge, no Admin branch, no backend/API/auth/product data/SKU mappings, no D1/R2/bindings/secrets/DNS/Access, and no official-logo edits.
+
+---
+
 ## Hero-only visual checkpoint — 2026-10-23 (not accepted)
 
 The latest Hero result is explicitly **not accepted** by the owner. This block supersedes older status claims where they conflict.
