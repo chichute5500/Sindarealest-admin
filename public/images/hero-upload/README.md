@@ -1,9 +1,9 @@
 # Hero image upload
 
-Upload the user-provided transparent PNG for the storefront Hero into this folder.
+The owner-supplied PNG in this folder replaces the previous standalone Hero image.
 
-- Suggested filename: `tb_image_share_1792519964514 (1).png`
-- Use only for the Hero presentation area; this is not a catalog/product image.
-- Keep `public/images/hero-sd-gl052.png` unchanged as the original/fallback.
-- Do not modify unrelated storefront files or product data as part of the upload.
-- After uploading, verify transparency (alpha channel), edge quality, shoe clarity, and Light/Dark appearance before changing the Hero implementation.
+- Active asset: `tb_image_share_1792519964514 (1).png`
+- Use only for the storefront Hero presentation area; it is not a catalog/product image.
+- The previous `public/images/hero-sd-gl052.png` asset is being retired and must not be referenced by the storefront.
+- Do not modify unrelated storefront files or product data as part of this change.
+- The Hero source pixels are used directly; do not process or alter the uploaded image.
