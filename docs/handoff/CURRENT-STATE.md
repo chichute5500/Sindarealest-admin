@@ -16,7 +16,7 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - `public/index.html` keeps `#heroProductImage` hidden, removes `src`, and marks `temporarily-disabled-owner-request`.
 - Preserve the owner-uploaded source `public/images/hero-upload/tb_image_share_1792519964514 (1).png` and its separate derivative. Do not delete, overwrite, rename, or associate either with a catalog product.
 - Do not restore obsolete `hero-sd-gl052.png`. Do not resume Hero design work until the owner asks.
-- Required visual condition: no empty Hero frame, reserved blank space, or layout regression on mobile/desktop in Light/Dark.
+- Future Hero acceptance condition, to revisit only after the other storefront work is complete: no empty frame, reserved blank space, or responsive Light/Dark regression. Do not inspect or change this during the current pause.
 
 ## Owner-approved working protocol (2026-10-23)
 - Work one acceptance item to completion before switching to the next main item.
@@ -47,8 +47,8 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 
 ## Immediate next actions
 1. Re-fetch current HEAD, PR #108, Actions and Cloudflare deployment metadata before any new source change.
-2. Keep the Hero temporarily hidden and preserve its owner-uploaded source/derivative. Inspect actual Preview screenshots for no empty frame or reserved blank area and no mobile/desktop Light/Dark regression; do not call this visual PASS until inspected.
-3. Continue the storefront audit from current evidence. Run visual captures only after relevant storefront/source/test changes or deliberate manual dispatch. Never deploy Production or touch Admin/backend/catalog data.
+2. Keep Hero paused and untouched; preserve its owner-uploaded source/derivative.
+3. Continue the next unfinished non-Hero storefront section from current source/tests/evidence. Complete one section at a time; run targeted checks only when needed. Never deploy Production or touch Admin/backend/catalog data.
 
 ## Evidence rules
 - Source tests, deploy, deployment SHA, live screenshot capture and human visual acceptance are separate gates.
