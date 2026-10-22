@@ -3,12 +3,12 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "This live handoff supersedes all older date/SHA/run snapshots in this file. It was prepared against code/test SHA 26f1c6fb0632a2b80b3f8d4864fa043fc3e98642 before a docs-only handoff commit. After that commit, re-read the branch ref before any further code write. Visual evidence and unit/source checks always record their own exact tested SHA.",
-  "branchHeadAtCheckpoint": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
+  "checkpointSemantics": "Live checkpoint after regression-test commit 7d9cde727476ac05ee7431b457e7377b34c750fe. This commit changes only the E2E viewport-width assertion, not product functionality. Latest exact-SHA workflow 39797841880 is queued at last poll. Older runs are historical evidence.",
+  "branchHeadAtCheckpoint": "7d9cde727476ac05ee7431b457e7377b34c750fe",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Handoff maintenance and fixes to a failing fixture test do not count as product completion; exact latest-SHA workflow is still queued and 12-screen visual/backend acceptance remains incomplete.",
+  "progressBasis": "50% PROVISIONAL. Test-harness and handoff edits do not count as product completion; latest SHA workflow is queued and screen/backend acceptance remains incomplete.",
   "sourceTreeComparison": {
     "comparisonTarget": "fix/liquid-glass-audit-2026-10-19",
     "staticHead": "a1fa5ca5731d827cbd7c3680468fd0df7bf35f53",
@@ -21,22 +21,25 @@
     "note": "Diverged branches are not to be merged or cherry-picked. Re-fetch before later use."
   },
   "sourceValidationOnHead": {
-    "status": "LATEST_SHA_NOT_VERIFIED; PREVIOUS_SHA_CHECKS_PASS_PLAYWRIGHT_FAIL",
-    "liveCodeHead": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
+    "status": "QUEUED_EXACT_SHA",
+    "liveCodeHead": "7d9cde727476ac05ee7431b457e7377b34c750fe",
     "latestQueuedRun": {
-      "id": 39794007381,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381",
-      "testedSha": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
+      "id": 39797841880,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880",
+      "testedSha": "7d9cde727476ac05ee7431b457e7377b34c750fe",
       "status": "queued"
     },
-    "previousCheckedCommit": {
-      "sha": "a6fc090b60e579e9d708775f0c25e3ba56f3439b",
-      "runId": 39792844330,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330",
-      "npmRunCheck": "PASS",
-      "npmTest": "PASS",
-      "localPlaywright": "FAIL_TEST_SELECTOR_AMBIGUITY",
-      "previewSmoke": "PASS_LIMITED_2_TESTS"
+    "previousFailure": {
+      "runId": 39796182324,
+      "sha": "401b961cb685a1c3fade6e6d6f66713bb71bf509",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324",
+      "failure": "ReferenceError: variant is not defined at tests/e2e/admin-static-baseline.spec.js:1752; artifact #327"
+    },
+    "previousBreakpointFailure": {
+      "runId": 39794007381,
+      "sha": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381",
+      "failure": "Expected .mobiletabs visible but received hidden at line 1752; artifact #326"
     }
   },
   "latestVisualEvidence": {
@@ -1079,5 +1082,6 @@
       "Continue PR #111 provenance/security review; keep migration 0009, PRE/PRO migrations, R2 save deferred; AI grouping blocked pending owner contract."
     ]
   },
-  "capturedAtUtc": "2026-10-22T14:20:00Z"
+  "capturedAtUtc": "2026-10-22T14:20:00Z",
+  "nextAction": "Poll run 39797841880. If it fails, inspect exact checkout SHA and line-level failure before another change; do not infer success from older runs."
 }
