@@ -1324,7 +1324,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
             .toBeLessThanOrEqual(row.clientWidth + 1);
           expect(row.productTitle, 'Existing product titles must remain available to assistive technology').toBeTruthy();
           if (narrowViewport.width <= 360) {
-            expect(row.sku.text, 'SKU/category hint should keep its full DOM text').toContain('UI-FIXTURE-001');
+            expect(row.sku.text, 'Each narrow-phone SKU/category hint should retain its fixture SKU identifier').toMatch(/UI-FIXTURE-\\d{3}/);
             expect(row.sku.whiteSpace, 'Narrow-phone SKU hint should wrap instead of being forced to one line').toBe('normal');
             expect(row.sku.overflowWrap, 'Narrow-phone SKU hint may break long segments without horizontal overflow').toBe('anywhere');
             expect(row.sku.lineClamp, 'Narrow-phone SKU hint should wrap to at most two lines').toBe('2');
