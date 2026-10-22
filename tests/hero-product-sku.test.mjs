@@ -6,7 +6,7 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'"),
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4'"),
   "The hero must render the supplied static presentation image independently of public catalog SKU availability.");
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'"),
   "The static hero image must be explicitly identified as a presentation asset, not a catalog product image.");
@@ -23,7 +23,7 @@ assert.ok(visualAudit.includes("hero-presentation-asset-visible-with-unverified-
 assert.ok(visualAudit.includes("startup.heroImage.status === 'hero-presentation-asset'")
   && visualAudit.includes("startup.heroImage.loaded")
   && visualAudit.includes("!startup.heroImage.hidden")
-  && visualAudit.includes("startup.heroImage.source.includes('/images/hero-sd-gl052.png')"),
+  && visualAudit.includes("startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514%20(1).png')"),
   "The local audit must require the presentation asset to load and remain visible independent of SKU verification.");
 
 const styleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
@@ -64,7 +64,7 @@ const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
   && liveCapture.includes("presentationAssetLoaded"),
   "The live audit must verify the dedicated hero presentation asset is loaded and visible.");
-assert.ok(liveCapture.includes("path.endsWith('/images/hero-sd-gl052.png')")
+assert.ok(liveCapture.includes("path.endsWith('/images/hero-upload/tb_image_share_1792519964514%20(1).png')")
   && liveCapture.includes("status === 'hero-presentation-asset'")
   && liveCapture.includes("!frameCollapsed"),
   "The live audit must check the exact hero asset, visible image state, and non-collapsed frame.");
