@@ -1,5 +1,9 @@
 # START HERE — SINDAREALEST ADMIN
 
+**Live refs required:** the last pre-refresh PR #111 HEAD was `4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed`; handoff-only commits advance HEAD, so fetch live PR #111/#108 before work. Progress remains **50% PROVISIONAL**.
+
+**Next:** poll Actions for the exact live HEAD, inspect logs/artifacts on failure, then continue screens #8–#12 and the PR scope audit. Do not stop after reporting.
+
 ## Snapshot
 - Pre-write ADMIN HEAD c002a34d0df955e4d804615f665d6ae5bedc4072 (https://github.com/chichute5500/Sindarealest-admin/commit/c002a34d0df955e4d804615f665d6ae5bedc4072). Its parent source-validation record is documented in LATEST-STATUS.md; this docs-only commit advances HEAD. Fetch the live refs and exact-SHA workflow run at every session start.
 - PR #111 OPEN/unmerged on feature/admin-isolated-handoff-2026-10-20. Protected PR #108 OPEN/unmerged on fix/liquid-glass-audit-2026-10-19; do not write to static branch.
