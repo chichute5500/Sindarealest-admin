@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T15:55:00+07:00",
+  "updatedAt": "2026-10-22T16:00:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
+  "branchHeadAtCheckpoint": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Validate Source #39750503800 and Preview/Playwright #39750503783 SUCCESS on exact tested source SHA 78b87d71f82090cb7399a68207ef436a200d3c9f. Current HEAD c5e25325f944ba2260ca21192a08c17df8ff3a82 includes handoff-only changes; new Validate Source #39751463904 is running. Preview check only PASS_LOGIN_CSS_SIGNATURE; all-12-screen parity NOT ACCEPTED and authenticated backend QA NOT TESTED.",
+  "progressBasis": "Validate Source #39751590339 SUCCESS on exact current pre-handoff HEAD 1f1a78bf0ba692e2f858610031e61135b52d63c5. Preview/Playwright #39750503783 SUCCESS on tested source SHA 78b87d71f82090cb7399a68207ef436a200d3c9f; Preview is login CSS signature only, not authenticated backend QA. Full 12-screen parity NOT ACCEPTED; real authenticated backend QA NOT TESTED.",
   "latestVerifiedApplicationTest": {
     "testedCommitSha": "78b87d71f82090cb7399a68207ef436a200d3c9f",
-    "conclusion": "source_validate_and_preview_pass_exact_sha; branch HEAD evidence-only descendant",
+    "conclusion": "current source validation pass; preview diagnostic pass on prior identical app source; handoff/docs commits are docs-only",
     "validateRun": {
-      "runId": 39750503800,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503800",
-      "sha": "78b87d71f82090cb7399a68207ef436a200d3c9f",
+      "runId": 39751590339,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39751590339",
+      "sha": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
       "conclusion": "success"
     },
     "previewRun": {
@@ -60,7 +60,7 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "551b0641ca8fe27f1e5054213142d5f0f6add791",
+      "headSha": "0d4180cf62f9aea90dfe7101f50542dc446dccce",
       "agentWritesAllowed": false,
       "changedFiles": 280,
       "mergeReady": false,
@@ -73,7 +73,7 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
+      "headSha": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
       "changedFiles": 1265,
       "mergeReady": false,
       "reason": "Keep PR #111 OPEN/unmerged; full diff/scope audit remains open.",
@@ -126,14 +126,14 @@
   ],
   "ownerActionRequiredNow": "No immediate action required for these CSS regressions. Authenticated backend QA remains untested and must use an authorized Preview path; do not bypass Access. Product image save/R2 and PRE/PRO migrations remain deferred by owner.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T15:55:00+07:00",
+    "checkedAt": "2026-10-22T16:00:00+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "latestBranchHead": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
-    "latestValidateSourceSha": "78b87d71f82090cb7399a68207ef436a200d3c9f",
-    "validateRun": 39750503800,
+    "latestBranchHead": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
+    "latestValidateSourceSha": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
+    "validateRun": 39751590339,
     "previousPreviewRun": 39736231146,
     "previousPreviewSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-    "currentHeadPreview": "NOT_VERIFIED_ON_DOCS_ONLY_HEAD",
+    "currentHeadPreview": "SOURCE_VALIDATED_ON_HEAD; PREVIEW_DIAGNOSTIC_ON_TESTED_APP_SOURCE_SHA",
     "previewFailure": "desktop price/stock row overlaps sticky footer on older SHA; rerun required on current HEAD",
     "progressPercent": 50,
     "handoffDocsCommitSha": "c264b4edecd33ad582474c76dcc286a9c7e241a3",
@@ -427,12 +427,12 @@
     "conclusion": "success",
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
   },
-  "latestHandoffCommitSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
+  "latestHandoffCommitSha": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
   "currentHeadValidation": {
-    "runId": 39751463904,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39751463904",
-    "sha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
-    "status": "in_progress",
-    "conclusion": null
+    "runId": 39751590339,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39751590339",
+    "sha": "1f1a78bf0ba692e2f858610031e61135b52d63c5",
+    "status": "completed",
+    "conclusion": "success"
   }
 }
