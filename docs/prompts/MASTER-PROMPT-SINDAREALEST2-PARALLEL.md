@@ -5,7 +5,7 @@
 - Repository: `chichute5500/Sindarealest-admin`
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: OPEN; DO NOT MERGE.
-- Current docs-only branch HEAD verified during handoff cleanup: `b81f034dc545a11f0809f787c8d7df4952037195`.
+- Current branch/PR HEAD is intentionally not pinned in this long historical prompt because documentation-only commits advance it; fetch live HEAD from GitHub at the start of every session.
 - Latest documented storefront source checkpoint in `docs/handoff/CURRENT-STATE.md`: `fc406599e04475e232fad790efd03d46979a5a20`. Fetch the branch and PR HEAD again before work; separate branch HEAD, deployed Preview SHA and audited SHA.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Canonical current status and next actions: [`docs/handoff/CURRENT-STATE.md`](../handoff/CURRENT-STATE.md). Read that file first, then `HANDOFF.md`, `TEST-RESULTS.md`, `TASKS.md`, `docs/visual-audit-progress-2026-10-19.md`, and [current new-chat prompt](../handoff/PROMPT-NEXT-CHAT-2026-10-22.md).
