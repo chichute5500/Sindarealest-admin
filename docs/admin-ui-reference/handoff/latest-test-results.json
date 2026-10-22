@@ -1,35 +1,25 @@
 {
   "schemaVersion": 3,
-  "status": "QUEUED_EXACT_SHA_VALIDATION",
+  "status": "NOT_VERIFIED_EXACT_HEAD",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "capturedAt": "2026-10-22",
-  "currentHeadAtCheckpoint": "7d9cde727476ac05ee7431b457e7377b34c750fe",
+  "currentHeadAtCheckpoint": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "37c3c40e24c7f222adeac52ac2cbb6d30ed433f4",
-  "latestCodeCommitSha": "7d9cde727476ac05ee7431b457e7377b34c750fe",
+  "latestCodeCommitSha": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
   "testedCommitSha": null,
   "progressPercent": 50,
   "progressBasis": "50% PROVISIONAL. Regression-test edits and handoff maintenance do not count as product completion.",
   "currentHeadValidation": {
-    "status": "QUEUED",
-    "liveCodeSha": "7d9cde727476ac05ee7431b457e7377b34c750fe",
+    "status": "NOT_VERIFIED_EXACT_HEAD",
+    "liveCodeSha": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
     "workflow": {
-      "id": 39797841880,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880",
-      "status": "queued",
+      "status": "NOT_RECONFIRMED_FOR_THIS_HEAD",
       "conclusion": null
     },
-    "previousExactRun": {
-      "id": 39796182324,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324",
-      "sha": "401b961cb685a1c3fade6e6d6f66713bb71bf509",
-      "npmRunCheck": "PASS",
-      "npmTest": "PASS",
-      "localPlaywright": "FAIL_REFERENCEERROR_VARIANT_UNDEFINED",
-      "previewSmoke": "PASS_LIMITED"
-    }
+    "note": "Old run IDs in the historical runs list are not automatically evidence for this HEAD. Re-query GitHub Actions for this exact SHA and inspect logs/artifact before marking PASS."
   },
   "checks": {
     "repositoryCheck": "PASS_ON_A6FC_NOT_26F1",
@@ -193,7 +183,8 @@
     "Screen #3 pagination/content density remains data-limited; do not repeat geometry without a new reason.",
     "Screen #4 persistent save/SKU state/AI endpoint remain unverified. R2 image persistence, PRE/PRO migrations and migration 0009 remain deferred; remote D1 schema/ledger not verified.",
     "AI image grouping remains blocked pending owner-approved API contract.",
-    "PR #111 complete per-path provenance review remains partial; do not blind-revert inherited storefront/setup/deploy paths."
+    "PR #111 complete per-path provenance review remains partial; do not blind-revert inherited storefront/setup/deploy paths.",
+    "Current exact-HEAD Actions status must be re-queried; prior run IDs and SHA references are historical until matched to live HEAD."
   ],
   "blockedItems": [
     "Run #326 is queued behind the active Preview workflow concurrency group; poll rather than generating duplicate workflows.",
@@ -233,5 +224,5 @@
       }
     }
   ],
-  "nextAction": "Poll run 39797841880 first; do not spawn a duplicate. If it fails, inspect exact logs and determine whether the failure is the responsive breakpoint behavior or test-variable scope before editing."
+  "nextAction": "Fetch the live PR #111 HEAD after docs commits, then poll exact-SHA Actions. Inspect latest failing log/artifact before making any code edit. Do not duplicate a queued or running workflow."
 }
