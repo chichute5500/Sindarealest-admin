@@ -1739,7 +1739,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         document.querySelectorAll('#main .tablewrap').forEach(wrapper => { wrapper.scrollLeft = 0; });
       });
     }, true);
-    await captureView('order-detail', 'orders', async () => {
+    await captureView('order-detail', 'orders', async variant => {
       const orderRow = page.locator('[data-order-row="UI-ONLY-ORDER"]');
       const detailsButton = orderRow.locator('[data-action="view-order-details"]:visible').first();
       await expect(orderRow).toBeVisible();
