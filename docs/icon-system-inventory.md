@@ -1,15 +1,16 @@
-## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
+## VERIFIED STOREFRONT ICON + CART-ANIMATION CHECKPOINT — 2026-10-22 (audit #808)
 
-- Active source SHA: `a603c3c8f4c36efb98d604c84c24ae02d217fefa`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and unmerged.
-- Source + tests: [run 39681751497 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751497).
-- Preview deploy: [run 39681751269 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751269).
-- Live visual audit: [run 39681751457 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457); artifact [12385195509](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39681751457/artifacts/12385195509).
-- Exact Preview deployment verified at alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`, deployment ID `6d641e52-8e30-4e5a-8c29-05e1d974cce7`, environment `preview`, branch/SHA exact.
-- Audit: 100 screenshots, 8/8 viewport-theme pairs, 12 route checks, section/commerce/detail coverage complete, first-paint 20/20 frames and 4/4 videos, no hard failures or console/page/HTTP/request/image/readonly errors.
-- Favorite interaction states: 4/4 live contexts PASS (mobile 390×844 + desktop 1440×900, Light/Dark). Press scale 0.97 with theme-specific glass tint/inset; selected heart and SVG fill/stroke red `#E5484D`; aria/storage match; unselect returns to proper theme outline and removes storage key. Ripple code removed.
-- Still pending: successful add-to-cart toast while detail view is open; shared image-accurate fly-to-cart and its badge/bounce, rapid-click, no-layout-shift, image-failure and reduced-motion tests. Partial PASS is not overall feature completion.
-- No merge, Production/main, Admin code, API/backend, product data, DB/R2, bindings, secrets, DNS or Access change. Canonical screenshot archive/manifest unchanged.
-
+- Live-tested branch `fix/liquid-glass-audit-2026-10-19`, audited SHA `ca5edf1acea5f778c5179f356615afc327b5941a`; PR #108 remains OPEN and unmerged.
+- Current verified workflow evidence for that SHA:
+  - Source validation: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39725065422 — PASS.
+  - Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39725065391 — PASS.
+  - Admin Preview Playwright: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39725065406 — PASS; read-only only, no Admin edits.
+  - Live visual audit #808: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39725065434; artifact 12402134680: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39725065434/artifacts/12402134680.
+- Exact deployment proof in artifact: `deployment-verification.passed=true`; `status=VERIFIED_PREVIEW_DEPLOYMENT`; environment `preview`; deployment ID `7908a8a3-2f95-4bec-a340-3e456c539d51`; deployed SHA and expected SHA both `${expectedHead}`; branch and Preview alias match.
+- Verified live interaction results: 4/4 icon/favorite checks; 4/4 add-to-cart checks; 6/6 shared fly-to-cart checks; 2/2 edge cases. Heart state, `aria-pressed` and storage agree; selected heart is `#E5484D`; no ripple. Add-to-cart correctly updates badge and toast exactly once; rapid clicks do not double-count; opening cart does not add.
+- Fly-to-cart uses exact visible/selected source image and correct product ID, flies to `#cartOpen` in 720ms, removes its clone and bounces cart only after success, and causes no layout shift. The alternate gallery image path is verified. `prefers-reduced-motion` and unavailable source image pass by omitting the flight/bounce and still showing truthful successful-add feedback.
+- Remaining qualification: these are the automated interaction contexts from audit #808, not proof that every icon in the full inventory has every possible interaction state tested. Finish a direct reference-parity review and add distinct evidence for any missing search/Zalo/404 interactions. Re-fetch HEAD and validate the latest workflow/deployment SHA after this docs commit before claiming the new branch HEAD is verified.
+- Restrictions remain unchanged: public storefront only, no merge, no Production/main, no Admin code, no backend/API/schema/product data, no asset mapping mutation, no D1/R2/bindings/secrets/DNS/Access change.
 ---
 
 # SinDarealest storefront icon inventory — Liquid Glass
