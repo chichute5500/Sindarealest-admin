@@ -72,3 +72,11 @@ assert.ok(admin.includes("id=\"refreshActivityLogs\"") && admin.includes("api('/
 assert.ok(admin.includes("auditLogLoadError=optional[3].status!=='fulfilled'"), "Activity log must distinguish a failed load from a genuinely empty log");
 assert.ok(admin.includes("Tối đa 200 bản ghi gần nhất từ máy chủ"), "Activity log must disclose the existing server-side record limit");
 console.log("PASS: dedicated read-only activity-log screen and route contracts.");
+
+assert.ok(admin.includes("function orderDetailMarkup(order)"), "Order detail panels must reuse a single source-backed renderer");
+assert.ok(admin.includes("function orderDetailPage()"), "Order detail must render as its own Admin screen");
+assert.ok(admin.includes("view==='order-detail'?orderDetailPage()"), "The Admin view router must render the dedicated order detail screen");
+assert.ok(admin.includes("selectedOrderId=new URLSearchParams(location.search).get('orderId')||''"), "Order detail deep links must restore the selected existing order");
+assert.ok(admin.includes('data-action="order-detail-to-row"'), "Order detail must provide a real route back to the matching order's management controls");
+assert.ok(!admin.includes('<div id="orderDetailBackdrop"'), "Order detail must not regress to a modal overlay");
+console.log("PASS: dedicated Order detail screen, deep-link state and return-to-actions contracts.");

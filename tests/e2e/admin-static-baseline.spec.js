@@ -623,11 +623,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const menu = page.locator('#mobileMorePanel');
         if (await menu.isVisible()) await page.locator('#mobileMoreTrigger').click();
       }
-      if (name === 'order-row-details' && await page.locator('#orderDetailBackdrop').isVisible()) {
-        await page.locator('#orderDetailClose').click();
-        await expect(page.locator('#orderDetailBackdrop')).toBeHidden();
-        await expect(page.locator('#orderDetailBackdrop')).toHaveAttribute('aria-hidden', 'true');
-        await expect(page.locator('[data-action="view-order-details"]:visible').first()).toBeFocused();
+      if (name === 'order-detail' && await page.locator('.order-detail-page').isVisible()) {
+        const orderId = await page.locator('.order-detail-page').getAttribute('data-order-detail-id');
+        await page.locator('[data-action="back-to-orders"]:visible').first().click();
+        await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
+        await expect(page.locator('[data-order-row="' + orderId + '"] [data-action="view-order-details"]')).toBeFocused();
       }
     }
   };
@@ -1739,36 +1739,33 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         document.querySelectorAll('#main .tablewrap').forEach(wrapper => { wrapper.scrollLeft = 0; });
       });
     }, true);
-    await captureView('order-row-details', 'orders', async () => {
-      await page.locator('[data-action="view-order-details"]:visible').first().click();
-      await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
-      await expect(page.locator('#orderDetailBackdrop')).toHaveAttribute('aria-hidden', 'false');
-      await expect(page.locator('#orderDetailTitle')).toHaveText('Chi tiết đơn hàng');
+    await captureView('order-detail', 'orders', async () => {
+      const orderRow = page.locator('[data-order-row="UI-ONLY-ORDER"]');
+      const detailsButton = orderRow.locator('[data-action="view-order-details"]');
+      await expect(orderRow).toBeVisible();
+      await detailsButton.click();
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Chi tiết đơn hàng');
+      await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id', 'UI-ONLY-ORDER');
+      await expect(page.locator('#orderDetailBackdrop')).toHaveCount(0);
       await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
       await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
-      await expect(page.locator('#orderDetailClose')).toBeFocused();
-
-      // The details dialog must contain keyboard focus and wrap in both directions.
-      await page.keyboard.press('Shift+Tab');
-      const orderDialogFocus = await page.locator('#orderDetailBackdrop [role="dialog"]').evaluate(dialog => {
-        const selector = 'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-        const focusable = Array.from(dialog.querySelectorAll(selector)).filter(el =>
-          el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden' && !el.closest('[aria-hidden="true"]')
-        );
-        return { activeIndex: focusable.indexOf(document.activeElement), count: focusable.length };
-      });
-      expect(orderDialogFocus.count, 'Order dialog should contain keyboard-focusable controls').toBeGreaterThan(0);
-      expect(orderDialogFocus.activeIndex, 'Shift+Tab from first control should wrap to last').toBe(orderDialogFocus.count - 1);
-      await page.keyboard.press('Tab');
-      await expect(page.locator('#orderDetailClose')).toBeFocused();
+      await expect(page.locator('.mobiletabs')).toBeVisible();
+      const detailUrl = new URL(page.url());
+      expect(detailUrl.searchParams.get('view'), 'Opening a detail screen should create a direct route').toBe('order-detail');
+      expect(detailUrl.searchParams.get('orderId'), 'Detail route should identify only the selected existing order').toBe('UI-ONLY-ORDER');
 
       await page.keyboard.press('Escape');
-      await expect(page.locator('#orderDetailBackdrop')).toBeHidden();
-      await expect(page.locator('#orderDetailBackdrop')).toHaveAttribute('aria-hidden', 'true');
-      await expect(page.locator('[data-action="view-order-details"]:visible').first()).toBeFocused();
-      await page.locator('[data-action="view-order-details"]:visible').first().click();
-      await expect(page.locator('#orderDetailBackdrop')).toBeVisible();
-      await expect(page.locator('#orderDetailClose')).toBeFocused();
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
+      await expect(detailsButton).toBeFocused();
+
+      await detailsButton.click();
+      await expect(page.locator('.order-detail-page')).toBeVisible();
+      await page.locator('[data-action="order-detail-to-row"]').click();
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
+      await expect(orderRow.locator('[data-action="save-order"]')).toBeFocused();
+
+      await detailsButton.click();
+      await expect(page.locator('.order-detail-page')).toBeVisible();
     }, true);
     await captureView('customers', 'customers', async variant => {
       // Reference screen #8: synthetic, client-side search only; mutation endpoints remain blocked.
