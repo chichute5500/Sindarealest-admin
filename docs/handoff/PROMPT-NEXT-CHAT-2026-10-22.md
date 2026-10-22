@@ -6,6 +6,8 @@ Newer artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin
 
 Manual review has confirmed a “Tuyển chọn 25” gallery inconsistency: image 01/19 shows black high-top boots, image 02/19 a different green/white sneaker; evidence filenames are in the visual audit note. Do not change or hide product/image mappings under this UI-only scope. Both Icon.png and Chitiet.png were freshly opened; sampled icons look broadly aligned, but ICON-PARITY stays open. The provided `/images/hero-sd-gl052.png` remains visible and untouched.
 
+Startup capture work is no longer an open repeat task: artifact #12418823837 includes 4 welcome-startup videos (360/390 px, Light/Dark), 107 timeline samples and 0 first-paint violations. Bottom nav/account drawer stay hidden while welcome owns the screen in captured runs. Deployment metadata SHA mismatch means observational, not exact-SHA proof; do not rerun this unless new contrary evidence or a source/environment change appears.
+
 Next: refresh current SHA/deployment metadata; continue only safe evidence-backed UI work; keep visual/icon parity open; never merge PR, touch Production/main/Admin/backend/product mappings or submit checkout/payment. Read CURRENT-STATE.md as source of truth.
 
 ---
