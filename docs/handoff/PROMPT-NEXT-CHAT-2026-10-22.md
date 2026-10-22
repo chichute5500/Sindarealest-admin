@@ -1,3 +1,13 @@
+# LATEST OVERRIDE — 2026-10-22 11:16 UTC
+
+PR #108 remains OPEN / MUST NOT MERGE. Latest **storefront source** SHA is `dff584114dfd3916219f38b24950e5bf531e2199`; docs-only commits may make current branch HEAD newer. Validation/tests PASS: [#39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097). Preview deploy PASS: [#39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), deployment URL `https://b7858119.sindarealest2.pages.dev/`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. Latest live visual audit [#39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207) was PENDING with no artifact at last check.
+
+Current UI patch replaced a visually ineffective radial edge mask with conditional Dark-mode matte keying: sample 8 edge/corner points from the unchanged owner-supplied hero image; use existing SVG matte filter only when >=6 neutral/light votes pass. Do not accept/reject until you download and inspect the live artifact (Dark 390×844 and 1440×900, plus Light comparison). If rectangle remains or product edges/colour suffer, revert this helper + filter + test assertion; do not stack filters. Full validation passed on source SHA above after two intermediate test failures were repaired (mock image missing `classList`, then stale optional-chain assertion).
+
+Next chat: read CURRENT-STATE first, refresh branch HEAD/PR/run/deployment metadata and audit status, inspect artifact screenshots, update all handoff evidence. Keep product-gallery mapping read-only, preserve hero path, do not merge PR, deploy Production or touch Admin/backend/data/payments.
+
+---
+
 # LATEST OVERRIDE — 2026-10-22 10:35 UTC
 
 Before any further source action, fetch branch HEAD and PR #108 again; the HEAD at review start was `7455b50179f3fa0babebab84266b67a53b8b6231`, and this handoff-only update may advance it. PR #108 stays OPEN and MUST NOT MERGE.
