@@ -1,33 +1,36 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T19:45:00Z",
+  "capturedAtUtc": "2026-10-23T03:05:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
-  "codeTestSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "branchHeadAtCheckpointStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+  "codeTestSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_CHECKS_AND_AUTOMATED_TESTS_PASS_ON_EXACT_SHA",
+  "status": "CURRENT_HEAD_VALIDATION_NOT_VERIFIED",
   "latestRun": {
-    "id": 39841964451,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
-    "headSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
-    "status": "completed",
-    "conclusion": "success",
-    "jobId": 120045068730,
+    "id": 0,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
+    "headSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "status": "not_found_for_exact_sha",
+    "conclusion": "not_verified",
+    "jobId": null,
     "failedStep": null,
-    "summary": "Exact-SHA project integrity checks and npm test passed; parent checkpoint contains documentation-only changes after last product source SHA."
+    "summary": "No PR-triggered Actions run or commit status check was returned for this exact SHA. Historical successful results remain historical."
   },
   "validatedChecks": {
-    "npmRunCheck": "PASS",
-    "npmTest": "PASS",
+    "npmRunCheck": "NOT_VERIFIED_ON_CURRENT_HEAD",
+    "npmTest": "NOT_VERIFIED_ON_CURRENT_HEAD",
     "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
     "projectIntegrity": "PASS",
     "localStaticPlaywright": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "deployedPreviewDiagnostic": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "currentHeadPlaywright": "NOT_RUN_FOR_DOCS_ONLY_CHECKPOINT",
-    "productionDeployment": "NOT_PERFORMED"
+    "productionDeployment": "NOT_PERFORMED",
+    "currentHead": "NOT_VERIFIED",
+    "currentHeadSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES"
   },
   "historicalRuns": [
     {
@@ -233,15 +236,7 @@
     "Authenticated Preview backend workflows are not proven by fixture screenshots; no Cloudflare Access bypass or secret changes permitted."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": {
-    "sha": "30fece366e559073f6c664f6ed0459712c1b0a84",
-    "workflowRunId": 39842366701,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842366701",
-    "workflowRunsLookup": "FOUND_EXACT_SHA_RUN",
-    "combinedStatus": "SUCCESS",
-    "result": "PASS",
-    "note": "npm run check and npm test passed on the exact pre-handoff-sync HEAD 30fece366e559073f6c664f6ed0459712c1b0a84. A handoff-only commit then advanced the branch to 976e72d2ec10e9ead74a4c3275b8569d52a4f525; check run #39842755681 for that exact SHA before claiming current HEAD PASS. Admin Preview matrix remains on UI source SHA 2eb6e7e9d6b1cf15002a7d67e299c713a4d32118."
-  },
+  "currentHeadValidation": "NOT_VERIFIED",
   "scopeAuditStatus": "PARTIAL",
   "livePrState": {
     "number": 111,
@@ -254,5 +249,20 @@
     "deletions": 211,
     "headValidation": "PENDING_AT_LAST_FETCH",
     "validationRunId": 39842755681
+  },
+  "currentHeadValidationReason": "No PR-triggered Actions runs or commit status checks returned for this exact SHA. Prior successful runs apply only to their recorded SHAs.",
+  "liveCheckpoint": {
+    "headBeforeHandoffSync": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "headValidation": "NOT_VERIFIED",
+    "pr111": "OPEN_UNMERGED",
+    "changedFiles": 385,
+    "additions": 38879,
+    "deletions": 211,
+    "mergeable": false,
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL",
+    "authenticatedBackendQA": "NOT_TESTED",
+    "d1SchemaLedger": "NOT_VERIFIED",
+    "productionDeployment": "NOT_PERFORMED"
   }
 }
