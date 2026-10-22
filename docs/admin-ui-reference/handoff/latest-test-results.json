@@ -1,13 +1,13 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:50:00Z",
+  "capturedAtUtc": "2026-10-22T15:52:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "codeTestSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
   "sourceCommit": "e11ec06cd5870522735a28205b678897de829361",
-  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
+  "status": "SOURCE_CHECKS_PASS_LOCAL_PLAYWRIGHT_FIXTURE_TIMEOUT",
   "sourceValidation": {
     "id": 39804852564,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564",
@@ -27,7 +27,14 @@
     "status": "completed",
     "jobs": "COMPLETED; inspect exact job logs to classify failure",
     "artifacts": "NOT RECHECKED DURING HANDOFF SYNC",
-    "conclusion": "failure"
+    "conclusion": "failure",
+    "failureCause": "tests/e2e/admin-static-baseline.spec.js test at line 173 timed out after 120s waiting for [data-action=\"retry-customers\"] at line 1940.",
+    "deployedPreviewDiagnostic": "success",
+    "artifact": {
+      "id": 12437154740,
+      "name": "admin-preview-evidence-336",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604/artifacts/12437154740"
+    }
   },
   "blockingOlderRun": {
     "id": 39802525217,
@@ -42,11 +49,12 @@
     "npmRunCheck": "PASS_EXACT_SHA",
     "npmTest": "PASS_EXACT_SHA",
     "cloudflarePagesCheck": "SUCCESS_REPORTED_ON_EXACT_SHA; NOT A CLAIM OF PRODUCTION DEPLOYMENT",
-    "localStaticPlaywright": "FAILED_OR_INCOMPLETE; exact failure requires log review",
+    "localStaticPlaywright": "FAIL_TIMEOUT_RETRY_CUSTOMERS_SELECTOR",
     "customerWarranty503Recovery": "AUTHORED_NOT_CONFIRMED_BY_PREVIEW_RUN",
     "authenticatedBusinessBackendQA": "NOT_TESTED",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
-    "productionDeployment": "NOT_PERFORMED"
+    "productionDeployment": "NOT_PERFORMED",
+    "deployedPreviewDiagnostic": "PASS_STEP_WITHIN_OVERALL_FAILED_RUN"
   },
   "screens": {
     "8_customers": {
@@ -91,10 +99,9 @@
     "Authenticated Preview needs authorized access; do not bypass Cloudflare Access."
   ],
   "nextActions": [
-    "Inspect run 39804852604 jobs/logs/artifacts and identify root cause.",
-    "Do not dispatch duplicate run before inspecting existing run evidence.",
-    "Fix confirmed issue on ADMIN branch, then validate exact new code SHA.",
-    "Keep progress at 50% PROVISIONAL until screen acceptance evidence changes."
+    "Inspect artifact admin-preview-evidence-336 and the exact failing test around line 1940.",
+    "Fix the confirmed test fixture/UI mismatch, then run focused Playwright and full validation on the new code SHA.",
+    "Do not infer authenticated real-backend acceptance from deployed Preview diagnostic success."
   ],
   "branchHeadShaAtHandoff": "f631596621f2ccd97727bb3ff71350121d401919"
 }
