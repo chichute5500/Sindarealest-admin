@@ -299,8 +299,14 @@ assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,#home .hero-
   "Gloss, tabletop fade, and text-side veil overlays must not cover the owner-supplied image.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
   "No page caption may cover any portion of the supplied image.");
-assert.ok(heroAssetDisplayLock.includes("position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important"),
-  "On mobile, the image must occupy its own row instead of being composited beneath hero text.");
+assert.ok(
+  heroAssetDisplayLock.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;") &&
+  heroAssetDisplayLock.includes("grid-column:1!important;") &&
+  heroAssetDisplayLock.includes("grid-column:2!important;") &&
+  heroAssetDisplayLock.includes("max-height:210px!important;") &&
+  heroAssetDisplayLock.includes("object-fit:contain!important"),
+  "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the full, unprocessed image remains visible."
+);
 
 // Reference-driven icon pass: replace the five text glyphs in order flow/aftercare with coherent 24x24 SVG strokes.
 const orderIconMarkup = [...html.matchAll(/<span class="order-icon" aria-hidden="true">([\s\S]*?)<\/span>/g)].map(match => match[1]);
