@@ -1,3 +1,30 @@
+# NEWEST HANDOFF — HERO EDGE STILL FAILS VISUAL REVIEW (2026-10-23)
+
+Continue existing work; do not ask the owner to repeat context. First read `docs/handoff/CURRENT-STATE.md`, then refresh live branch HEAD, PR #108 and workflow/artifact status.
+
+## Verified starting point
+- Repo `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 OPEN / DO NOT MERGE.
+- Branch HEAD: `e6f49f7b65297be68a0f9472b613a1acd06c866f`.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Exact-SHA Preview deployment ID `53dc3bb4-b6ea-4329-a477-ad2cfb7a2e9c`, concrete URL https://53dc3bb4.sindarealest2.pages.dev/.
+- Tests PASS [#39829962279](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962279); Preview deploy PASS [#39829962530](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962530); live visual capture workflow SUCCESS [#39829962409](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962409), artifact [#12449195919](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39829962409/artifacts/12449195919), `sindarealest-liquid-glass-preview-945`.
+- Screenshots already opened: `liquid-glass-preview/live-preview/section-hero-mobile-light-390x844.png` and `section-hero-mobile-dark-390x844.png`. The platform's hard right/lower edges remain visible. Owner rejected the result. **Hero is NOT PASS and NOT OWNER-APPROVED.**
+- Source asset: `public/images/hero-upload/tb_image_share_1792519964514 (1).png`; separate processed derivative: `public/images/hero-upload/tb_image_share_1792519964514-blended.png`. It is a standalone Hero presentation image, not product/SKU/catalog data. Do not restore old `hero-sd-gl052.png`.
+
+## Immediate task — do only this
+1. Inspect the owner-provided source image, the two original reference PNGs (`docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png` and `file_00000000fcb48207a23aeda23caa5eeb.png`) and the exact live artifact before editing.
+2. Correct the platform-edge blend based on the actual image silhouette, not guessed polygon coordinates. Existing `PLATFORM` polygon in `scripts/process-hero-edge.py` produced visibly hard/cut edges; do not repeat the same method by arbitrarily increasing its radius. Goal: shoes enlarged and crisp; black crocodile platform fades softly into the page; do not brighten the image, recolor/retouch shoe pixels, or blur the shoes.
+3. Keep the original upload unchanged; create/update only a separate derivative if needed. Do not introduce the Hero into catalog/product/SKU data.
+4. Run relevant tests, deploy only Preview, verify exact deployed SHA, download/open the fresh live screenshots in Light and Dark, and report the exact evidence. Automated green status is not visual PASS.
+5. Give the owner the Preview link and wait for their explicit PASS before doing anything else. Once they say PASS, lock Hero and do not touch it again without explicit authorization.
+
+## Hard boundaries
+PR #108 stays OPEN/unmerged. No Production, `main`, Admin, backend/API/auth/business logic, catalog data/mappings, D1/R2, bindings, secrets, DNS, Access, or official-logo changes. Do not start any non-Hero audit work. Keep going after status updates; don't stop at reporting unless genuine permission/trusted-data/user decision is required.
+
+Read the rest of this file for history, but this top block and CURRENT-STATE are authoritative when older notes conflict.
+
+---
+
 # LATEST HANDOFF UPDATE — HERO ASSET REPLACEMENT / RESUME FROM LIVE STATE
 **Updated:** 2026-10-22 16:10 UTC  
 **This update is newer than all older status notes below. Keep it when editing this file.**
