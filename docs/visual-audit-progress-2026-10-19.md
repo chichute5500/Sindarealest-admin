@@ -1,3 +1,22 @@
+## Verified mobile hero follow-up — 2026-10-22 (exact-SHA audit)
+
+- Latest verified source/deployment SHA: `ca233f279169aef33b7f5a0cb712816738f98ed7`.
+- Follow-up docs-only commit (previously reported): `b7e5b12b10d3c3b0c1af8e04fde2d44669b8f739`. Re-check branch HEAD before continuing; this commit is not the deployed source SHA.
+- CI/full validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189790
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189767
+- Guarded live Preview audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189878
+- Artifact #12429813463: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189878/artifacts/12429813463; name `sindarealest-liquid-glass-preview-883`; SHA-256 `84c67928a338f16b0b287a7515f2f5ed956684d0db16c43d54b9a83372cfbb49`.
+- Deployment ID `0514a4f0-0be4-4769-a31a-39c2315ba081`; Cloudflare metadata `commitHash` and `expectedCommitSha` both equal `ca233f279169aef33b7f5a0cb712816738f98ed7`; alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Live audit: `passed=true`, `captureCompleted=true`; 128 Preview screenshots, 8 viewport/theme audits, 13 route checks, 69 section checks; hero image checks 8/8 PASS; no horizontal overflow, console/page/HTTP errors, failed requests, broken images, read-only violations or hard failures.
+- Real artifact screenshots opened: `home-mobile-light-390x844-viewport.png` and `home-mobile-dark-390x844-viewport.png`. Mobile hero copy and image now sit side by side; CSS retains `object-fit:contain` and does not apply image processing. Screenshot spot-check does not prove full-site visual parity.
+- Hero image must remain the owner-provided standalone presentation asset, not a catalog item. PNG unchanged, blob SHA `24038214abefdac9ff2451def39f3e5bd9255462`. Never replace, retouch, crop/recompose, recolor, mask, blend, filter or recreate it. Official logo remains protected.
+- Changed on audited source: `public/index.html` mobile hero CSS; `tests/storefront-reference-parity.test.mjs`, `tests/product-card-liquid-glass.test.mjs`, `tests/hero-product-sku.test.mjs` assertions updated for side-by-side layout while preserving image integrity guards. Do not loosen exact-SHA audit.
+- Pixel-diff/archive flow was skipped by the current workflow push path. Do not claim a new archived pixel-diff comparison.
+- Still OPEN: complete visual parity and icon parity; catalog mapping discrepancy in “Tuyển chọn 25” (image 01/19 black high-top boots vs 02/19 different green/white sneaker) must go to authorized data owner; QR checkout remains fail-closed until trusted backend confirmation. No real checkout/payment submitted.
+- Guardrails: PR #108 remains OPEN and unmerged. No Production/main/Admin/backend/API/auth/catalog mapping/D1/R2/bindings/secrets/DNS/Access changes.
+
+---
+
 # VERIFIED MOBILE HERO FOLLOW-UP — 2026-10-22
 
 - Current storefront source/deployment SHA: `ca233f279169aef33b7f5a0cb712816738f98ed7`.
