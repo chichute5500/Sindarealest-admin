@@ -4,7 +4,7 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
-  "codeTestSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+  "codeTestSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "CURRENT_HEAD_VALIDATION_NOT_VERIFIED",
@@ -16,11 +16,11 @@
     "conclusion": "not_verified",
     "jobId": null,
     "failedStep": null,
-    "summary": "No PR-triggered Actions run or commit status check was returned for this exact SHA. Historical successful results remain historical."
+    "summary": "Historical exact-SHA success only; no PR-triggered run/status returned for current HEAD 803f6f7ce9ac114d4f3917b802c5f2a6542a5363."
   },
   "validatedChecks": {
-    "npmRunCheck": "NOT_VERIFIED_ON_CURRENT_HEAD",
-    "npmTest": "NOT_VERIFIED_ON_CURRENT_HEAD",
+    "npmRunCheck": "PASS_ON_HISTORICAL_SHA_ONLY",
+    "npmTest": "PASS_ON_HISTORICAL_SHA_ONLY",
     "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
     "projectIntegrity": "PASS",
     "localStaticPlaywright": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
@@ -29,7 +29,7 @@
     "currentHeadPlaywright": "NOT_RUN_FOR_DOCS_ONLY_CHECKPOINT",
     "productionDeployment": "NOT_PERFORMED",
     "currentHead": "NOT_VERIFIED",
-    "currentHeadSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "currentHeadSha": "803f6f7ce9ac114d4f3917b802c5f2a6542a5363",
     "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES"
   },
   "historicalRuns": [
@@ -250,19 +250,15 @@
     "headValidation": "PENDING_AT_LAST_FETCH",
     "validationRunId": 39842755681
   },
-  "currentHeadValidationReason": "No PR-triggered Actions runs or commit status checks returned for this exact SHA. Prior successful runs apply only to their recorded SHAs.",
+  "currentHeadValidationReason": "Exact-SHA lookup on current live HEAD returned no PR-triggered workflow runs and no commit status checks.",
   "liveCheckpoint": {
-    "headBeforeHandoffSync": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "headAtStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
+    "headAfterHandoffSync": "803f6f7ce9ac114d4f3917b802c5f2a6542a5363",
     "headValidation": "NOT_VERIFIED",
+    "lastRecordedValidatedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
     "pr111": "OPEN_UNMERGED",
     "changedFiles": 385,
-    "additions": 38879,
-    "deletions": 211,
-    "mergeable": false,
     "progressPercent": 50,
-    "progressStatus": "PROVISIONAL",
-    "authenticatedBackendQA": "NOT_TESTED",
-    "d1SchemaLedger": "NOT_VERIFIED",
-    "productionDeployment": "NOT_PERFORMED"
+    "progressStatus": "PROVISIONAL"
   }
 }
