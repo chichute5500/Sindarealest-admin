@@ -1,3 +1,20 @@
+# LATEST OVERRIDE — 2026-10-22 12:46 UTC
+
+This block supersedes older SHA/status claims below wherever they conflict. PR #108 remains OPEN and MUST NOT MERGE.
+
+- Repository/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`.
+- Current branch HEAD: `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50` (test-only follow-up to the UI commit below). PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108
+- UI source commit: `d28c663f39b22fa4fa29dafa509ec30234722d73` — hero mobile viewport fit/centering, only `public/index.html` and its matching regression assertion changed.
+- Current validation + full `npm test`: PASS for HEAD `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674913
+- Preview deploy: PASS for the same HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674951. Stable alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Visual workflow: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674947 was still IN_PROGRESS at the last check (Chromium installation). No artifact for this SHA had yet been reviewed. Admin Preview Playwright #39780674999 was PENDING; it is a repository check only, not permission to modify Admin.
+- Earlier artifact #12426665632 for SHA `39652e9fba71e82ccb0cfef682cf88701a00f3f5` exposed a real mobile issue: at 390×844 the hero presentation image extended beyond the right edge. Do not claim that issue fixed until screenshots from the new SHA are opened. Commit `d28c663` sets the mobile image row to viewport width, centers it, and limits the image to `calc(100vw - 22px)`; the test assertion was aligned on `96bb6eb`. Exact visual acceptance remains PENDING.
+- Critical asset lock: `public/images/hero-sd-gl052.png` is an owner-supplied standalone presentation asset, NOT a catalog/SKU/product image. Never replace, crop, filter, mask, blend, recolour, retouch, edit pixels, or search the catalog for SD-GL052. Only HTML/CSS visibility/layout plumbing is in scope. Current layout patch does not edit the PNG. Keep it visible independently of product API/catalog state.
+- No Production deploy, merge, `main`, Admin source, backend/API/auth, catalog/data/image mappings, D1/R2, bindings/secrets, DNS or Access policy changes. Do not submit checkout/payment.
+- Next required action: poll visual workflow #39780674947; after it finishes download/open the actual live Preview hero screenshots for mobile 360/390 and desktop, Light and Dark; inspect that the full image fits without clipping and original image appearance is unchanged. Verify deployment metadata matches the audited SHA. If the visual workflow fails, inspect logs and fix the smallest cause. Then update this file, TEST-RESULTS, visual audit progress, and this prompt with final evidence. Do not stop at green CI status or claim 100%.
+
+---
+
 # URGENT HANDOFF OVERRIDE — 2026-10-22 (latest verified)
 
 

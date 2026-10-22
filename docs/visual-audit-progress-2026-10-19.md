@@ -1,3 +1,14 @@
+## Latest hero viewport-fit checkpoint — 2026-10-22 12:46 UTC
+
+- Real screenshot review of artifact #12426665632 (run #39779375984, SHA `39652e9fba71e82ccb0cfef682cf88701a00f3f5`) found the supplied hero presentation asset visibly clipped at the right edge on mobile 390×844. This was a confirmed visual failure.
+- UI commit `d28c663f39b22fa4fa29dafa509ec30234722d73` adjusts only mobile hero layout: the image row spans viewport width, the image is centered, and its maximum width is `calc(100vw - 22px)`. Follow-up `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50` aligns the regression assertion with the intended CSS.
+- Source validation/full tests PASS: [#39780674913](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674913). Preview deployment PASS: [#39780674951](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674951).
+- Fresh visual workflow [#39780674947](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674947) was still in progress at last poll; no fresh screenshots have been opened. Therefore hero-fit fix remains **PENDING VISUAL VERIFICATION**.
+- Preserve `public/images/hero-sd-gl052.png` byte-for-byte. It is an owner-provided standalone presentation asset, not a catalog product. No image filters, masks, blending, cropping, replacements or catalog lookups are allowed. Only display/layout CSS is in scope.
+- Next: poll workflow, inspect actual mobile Light/Dark and desktop Light/Dark screenshots, confirm deployment SHA, then record exact artifact filenames and whether clipping is resolved. Do not claim overall visual parity complete.
+
+---
+
 ## Latest UI experiment — 2026-10-22 11:16 UTC
 
 - Dark-mode hero matte: an initial radial edge mask did not remove the visible rectangle and was superseded. Current source SHA `dff584114dfd3916219f38b24950e5bf531e2199` removes that mask and samples 8 near-edge pixels from the owner-provided hero asset; only if at least 6 are neutral/light does it enable the existing display-only SVG matte filter for the Dark hero. The image URL and pixels/catalog mapping are untouched.

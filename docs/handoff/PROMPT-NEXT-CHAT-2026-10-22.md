@@ -1,3 +1,30 @@
+# IMMEDIATE OVERRIDE — 2026-10-22 12:46 UTC
+
+Continue existing work; do not restart or ask the owner to repeat context. Read `docs/handoff/CURRENT-STATE.md` first and refresh live branch HEAD, PR #108, Actions, artifact and Cloudflare deployment metadata.
+
+Current known state:
+- Branch `fix/liquid-glass-audit-2026-10-19`; HEAD `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50`; PR #108 OPEN and MUST NOT MERGE.
+- UI change `d28c663f39b22fa4fa29dafa509ec30234722d73` fixed mobile hero viewport fit/centering in `public/index.html`; follow-up `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50` updated the exact CSS regression assertion.
+- Full validation/tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674913
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674951
+- Visual audit #39780674947 was IN_PROGRESS at last poll, during Chromium installation. Do not assume it passed or that the screenshot fix is visually accepted. Admin Preview Playwright #39780674999 was pending and is not authorization to edit Admin.
+- Prior real screenshot artifact #12426665632 revealed the 390×844 hero image clipped at the right edge. New viewport-fit CSS is intended to fix this, but only accept after opening fresh exact-SHA Preview screenshots.
+
+## Absolute owner asset lock
+`public/images/hero-sd-gl052.png` is an owner-supplied standalone presentation asset, not a product, SKU, catalog record, gallery image or database-backed image. Never replace, recreate, retouch, recolour, crop/recompose, remove/key its background, apply filters/masks/blend modes, or alter pixels. Never investigate SD-GL052 in the catalog. Only correct loading/visibility/layout plumbing; the image must be visible independently of catalog/API outcomes. Preserve its file bytes and the official logo.
+
+## Required next actions
+1. Poll #39780674947. If complete, download artifact and inspect `section-hero-mobile-light-390x844.png`, mobile Dark, desktop Light/Dark and other viewport hero screenshots. Compare with the supplied source and verify no clipping, effects or asset change.
+2. Check deployment verification JSON and require exact deployed/audited SHA match. If screenshot coverage is missing, use only the guarded read-only Preview workflow; never use Production.
+3. If visual failure, inspect logs and make the smallest evidence-based correction, then rerun affected tests and Preview audit.
+4. Update CURRENT-STATE, TEST-RESULTS and visual audit progress with exact SHA, URLs, artifact and verified findings. Update this prompt last. Keep older notes clearly historical/superseded.
+5. Continue autonomously after reporting. Never ask “continue?”. Stop only for genuine user permission/action or unavailable trusted data.
+
+## Scope
+Preview/static storefront only. Do not merge PR #108; no Production/main/Admin/backend/API/auth/schema/business logic/catalog/product image mapping/D1/R2/bindings/secrets/DNS/Access changes. QR/payment remains fail-closed; never fabricate payment data or submit real checkout.
+
+---
+
 # NEW CHAT — MANDATORY INCIDENT OVERRIDE (2026-10-22)
 
 

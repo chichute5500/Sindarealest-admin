@@ -1,3 +1,14 @@
+## Latest hero viewport-fit checkpoint — 2026-10-22 12:46 UTC
+
+- UI source commit: `d28c663f39b22fa4fa29dafa509ec30234722d73`. Follow-up test commit / current HEAD at this checkpoint: `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50`.
+- Validation and complete `npm test`: **PASS** for `96bb6ebd3067689d5652fa4a4823ff2bb3b60d50`: [run #39780674913](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674913).
+- Preview deployment: **PASS**: [run #39780674951](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674951). Alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Visual audit: [run #39780674947](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780674947) was **IN_PROGRESS** during Chromium installation at last poll. No final artifact/result had been reviewed; visual acceptance is **PENDING**.
+- Reason for change: artifact [#12426665632](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39779375984/artifacts/12426665632) showed the owner-supplied hero presentation image clipped off the right side at mobile 390×844. Commit `d28c663` changed only hero mobile layout CSS and its parity test; commit `96bb6eb` corrected the hero contract assertion to match the viewport-width/centered CSS. Original PNG was not edited.
+- Required acceptance: open new artifact screenshots and check mobile 360×800/390×844 plus desktop 1440×900 in Light and Dark. Confirm the image fits fully, is centered, and remains visually unchanged. Check deployment metadata for exact SHA. Do not infer visual PASS from source tests or deploy status.
+
+---
+
 # TEST RESULTS — EXACT-SHA EVIDENCE
 
 ## Latest UI patch verification — 2026-10-22 11:16 UTC
