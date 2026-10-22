@@ -1,3 +1,19 @@
+# NEW CHAT — MANDATORY INCIDENT OVERRIDE (2026-10-22)
+
+
+You are taking over existing work, not restarting. Read `docs/handoff/CURRENT-STATE.md` first, then fetch live GitHub branch HEAD, PR #108, relevant workflow runs/artifacts, current source, and Cloudflare Preview deployment metadata. Current last-known branch HEAD: `e4bcc7cb978743693077694baddf0801832d0808`; source commit: `fb997b448a80a0bc9f34e75b4a31b7b450951fed`. Refresh rather than assuming these remain current.
+
+**Incident context:** The owner says the assistant removed/deleted the owner-supplied hero image before the lock rule was written. Accept responsibility; do not argue, minimize, or ask the owner to repeat the context. Owner is transferring to a new chat.
+
+**ABSOLUTE HERO ASSET LOCK:** `public/images/hero-sd-gl052.png` is a standalone owner-supplied presentation asset, not a product/SKU/catalog/gallery/database image. It is protected like the official logo. Never replace, recreate, retouch, recolour, crop/recompose, background-key/remove, filter, mask, or alter pixels. Never investigate SKU/catalog linkage. Only fix visibility/loading plumbing so this exact asset appears unchanged and independently of product/API success. Keep original PNG bytes intact.
+
+**Known violation to investigate first:** source commit `fb997b4` has hero-specific CSS `filter:drop-shadow(...)` on `#home .hero-visual img` around lines 2413/2438, despite the new absolute lock. Remove only hero-specific visual effects/transforms that change the supplied image's appearance; don't change product image styles globally. Add a regression test proving no image filters/masks/blend/crop/recomposition on the hero and API failure does not hide it. Before patching, inspect history/current source and confirm exact paths. Then run targeted tests, deploy Preview only, verify exact deployed SHA, capture and OPEN real Preview screenshots (360×800 and 1440×900 at minimum, Light/Dark), compare hero against the supplied original. Do not claim success from green CI alone.
+
+Latest evidence: validation #39773486071 PASS; Preview deployment workflow #39773485868 PASS; visual workflow #39773486043 success with artifact `12423387968`, but dedicated guarded live-capture step was skipped. Review the artifact first; do not assume it proves the hero is correct. Links and full boundaries are in CURRENT-STATE.md.
+
+PR #108 must remain OPEN and unmerged. Preview/static storefront only. No Production/main/Admin/backend/API/auth/data/D1/R2/config/secrets/DNS/Access changes. Continue autonomously after reports; only stop for a genuine owner action or permission blocker. No false completion percentages.
+
+
 ## ABSOLUTE HERO ASSET LOCK — OWNER-SUPPLIED IMAGE (2026-10-22)
 
 **The hero image is a standalone owner-provided presentation asset, not a product listing, SKU, catalog record, product-gallery image, or database-backed product image.** The owner personally supplied `/images/hero-sd-gl052.png` for the hero. Treat this asset as protected at the same level as the official brand logo.
