@@ -6,4 +6,4 @@ The owner-supplied PNG in this folder replaces the previous standalone Hero imag
 - Use only for the storefront Hero presentation area; it is not a catalog/product image.
 - The previous `public/images/hero-sd-gl052.png` asset is being retired and must not be referenced by the storefront.
 - Do not modify unrelated storefront files or product data as part of this change.
-- The Hero source pixels are used directly; do not process or alter the uploaded image.
+- Keep the owner-uploaded PNG byte-for-byte unchanged. The standalone `-blended.png` derivative may alter alpha only to feather the real silhouette into the page; never brighten, recolor, blur, crop, or retouch shoe pixels.

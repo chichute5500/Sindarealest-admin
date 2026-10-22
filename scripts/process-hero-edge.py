@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Create a presentation-only Hero derivative by feathering PNG alpha at canvas/platform edges.
+"""Create a presentation-only Hero derivative by feathering the real alpha silhouette.
 
-RGB pixels are never brightened, recolored, blurred, or retouched. The owner-supplied
-source PNG remains intact; only edge alpha is softened in a separate derivative.
+The owner-supplied source PNG remains byte-for-byte intact. RGB pixels are not
+brightened, recolored, blurred, or retouched. The only output change is alpha:
+the true source silhouette is softly feathered against transparent padding,
+while the two shoe regions are protected by the existing shoe keep masks.
 """
 from __future__ import annotations
 
@@ -17,13 +19,10 @@ SOURCE = ROOT / "public/images/hero-upload/tb_image_share_1792519964514 (1).png"
 OUTPUT = ROOT / "public/images/hero-upload/tb_image_share_1792519964514-blended.png"
 FEATHER_RADIUS = 48
 KEEP_MASK_RADIUS = 12
-PLATFORM_EDGE_RADIUS = 58
-PLATFORM_INNER_BLUR = 18
 
-# Polygons wrap the visible shoe silhouettes with a small safety margin.
-# [capture-review] Validate the platform-edge feather on the exact deployed Preview SHA.
-# Coordinates are expressed against the supplied 1200 x 1600 reference canvas
-# and scaled proportionally if the owner ever replaces the source asset.
+# These protection polygons cover the two shoe silhouettes only. They are not
+# used to define or cut the crocodile platform edge; that edge comes from the
+# uploaded image's actual alpha silhouette and its transparent surroundings.
 LEFT_SHOE = [
     (138, 715), (154, 662), (185, 610), (216, 578), (253, 558), (285, 557),
     (325, 577), (369, 599), (413, 625), (459, 650), (506, 680), (550, 708),
@@ -32,14 +31,6 @@ LEFT_SHOE = [
     (503, 971), (461, 951), (420, 929), (377, 907), (336, 885), (295, 861),
     (255, 835), (220, 808), (189, 778), (163, 747)
 ]
-PLATFORM = [
-    (105, 775), (175, 700), (275, 660), (385, 655), (505, 685),
-    (625, 715), (770, 735), (930, 755), (1085, 770), (1198, 785),
-    (1198, 1390), (1125, 1460), (1035, 1515), (950, 1570), (870, 1598),
-    (790, 1555), (715, 1500), (640, 1430), (565, 1350), (485, 1265),
-    (405, 1175), (325, 1085), (250, 1000), (190, 920), (145, 850)
-]
-
 RIGHT_SHOE = [
     (587, 568), (590, 505), (599, 438), (611, 378), (630, 325), (650, 281),
     (674, 247), (698, 231), (721, 229), (743, 241), (766, 267), (789, 307),
@@ -57,6 +48,7 @@ def scaled_polygon(points: list[tuple[int, int]], width: int, height: int) -> li
 def main() -> None:
     if not SOURCE.is_file():
         raise SystemExit(f"Missing owner-provided Hero image: {SOURCE}")
+    source_bytes = SOURCE.read_bytes()
     with Image.open(SOURCE) as opened:
         source = opened.convert("RGBA")
 
@@ -65,45 +57,37 @@ def main() -> None:
         raise SystemExit(f"Unexpectedly small Hero image ({width} x {height}); refusing to process.")
 
     alpha = source.getchannel("A")
-    alpha_min, alpha_max = alpha.getextrema()
-    if alpha_min == alpha_max == 255:
+    if alpha.getextrema() == (255, 255):
         raise SystemExit(
-            "The source has no transparent pixels. Refusing to blur the RGB image or apply "
-            "an unverified background-removal operation."
+            "The source has no transparent pixels. Refusing to blur RGB or guess "
+            "a platform polygon; an alpha silhouette is required."
         )
 
-    blurred_alpha = alpha.filter(ImageFilter.GaussianBlur(radius=FEATHER_RADIUS))
+    # The leather sheet reaches some original canvas borders. Add genuinely
+    # transparent space before blurring so those crop-boundary edges can fade
+    # inward naturally instead of remaining straight at the image rectangle.
+    padding = FEATHER_RADIUS * 3
+    padded_alpha = Image.new("L", (width + padding * 2, height + padding * 2), 0)
+    padded_alpha.paste(alpha, (padding, padding))
+    blurred_alpha = padded_alpha.filter(
+        ImageFilter.GaussianBlur(radius=FEATHER_RADIUS)
+    ).crop((padding, padding, padding + width, padding + height))
+
     keep_shoes = Image.new("L", source.size, 0)
     draw = ImageDraw.Draw(keep_shoes)
     draw.polygon(scaled_polygon(LEFT_SHOE, width, height), fill=255)
     draw.polygon(scaled_polygon(RIGHT_SHOE, width, height), fill=255)
     keep_shoes = keep_shoes.filter(ImageFilter.GaussianBlur(radius=KEEP_MASK_RADIUS))
 
-    # Build a feather band on the crocodile-leather platform's own silhouette.
-    # Unlike a whole-image oval, this fades only the platform edge; the shoe
-    # silhouettes are protected below. Keep the owner-provided RGB untouched.
-    platform = Image.new("L", source.size, 0)
-    ImageDraw.Draw(platform).polygon(scaled_polygon(PLATFORM, width, height), fill=255)
-    shrink = max(3, PLATFORM_EDGE_RADIUS * 2 + 1)
-    platform_inner = platform.filter(ImageFilter.MinFilter(size=shrink))
-    platform_inner = platform_inner.filter(ImageFilter.GaussianBlur(radius=PLATFORM_INNER_BLUR))
-    platform_edge = Image.new("L", source.size)
-    platform_edge.putdata([
-        max(0, min(255, int(outer) - int(inner)))
-        for outer, inner in zip(platform.getdata(), platform_inner.getdata())
-    ])
-
     original_alpha = list(alpha.getdata())
     soft_alpha = list(blurred_alpha.getdata())
     keep = list(keep_shoes.getdata())
-    edge = list(platform_edge.getdata())
     new_alpha = Image.new("L", source.size)
     new_alpha.putdata([
         max(0, min(255, round(
-            (a * (k / 255.0 + (1.0 - k / 255.0) * (1.0 - e / 255.0)))
-            if e else (a * (k / 255.0) + b * (1.0 - k / 255.0))
+            a * (k / 255.0) + b * (1.0 - k / 255.0)
         )))
-        for a, b, k, e in zip(original_alpha, soft_alpha, keep, edge)
+        for a, b, k in zip(original_alpha, soft_alpha, keep)
     ])
     source.putalpha(new_alpha)
 
@@ -119,11 +103,11 @@ def main() -> None:
             "source_alpha_extrema": alpha.getextrema(),
             "output_alpha_extrema": result_alpha.getextrema(),
             "feather_radius_source_pixels": FEATHER_RADIUS,
+            "transparent_padding_source_pixels": padding,
             "shoe_keep_mask_feather_source_pixels": KEEP_MASK_RADIUS,
-            "platform_edge_feather_source_pixels": PLATFORM_EDGE_RADIUS,
-            "platform_edge_mask": "polygon feather band; shoe regions protected",
+            "platform_edge_mask": "source alpha silhouette with transparent padding; shoe regions protected",
             "rgb_modified": False,
-            "source_sha256": hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
+            "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
             "output_sha256": hashlib.sha256(OUTPUT.read_bytes()).hexdigest(),
             "output_bytes": OUTPUT.stat().st_size,
         }

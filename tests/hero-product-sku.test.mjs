@@ -54,6 +54,15 @@ assert.ok(edgeProcessor.includes("FEATHER_RADIUS = 48")
   && edgeProcessor.includes('"rgb_modified": False')
   && edgeProcessor.includes("GaussianBlur(radius=KEEP_MASK_RADIUS)"),
   "Hero edge blend must feather only alpha, preserve original RGB/color, and protect shoe regions.");
+assert.ok(edgeProcessor.includes("padding = FEATHER_RADIUS * 3")
+  && edgeProcessor.includes('padded_alpha = Image.new("L"')
+  && edgeProcessor.includes("padded_alpha.paste(alpha, (padding, padding))")
+  && edgeProcessor.includes("source alpha silhouette with transparent padding; shoe regions protected"),
+  "Hero edge feather must follow the real alpha silhouette and pad canvas edges transparently instead of guessing a platform polygon.");
+assert.doesNotMatch(edgeProcessor, /^PLATFORM\s*=\s*\[/m,
+  "Hero feathering must not use an approximate polygon to define the platform silhouette.");
+assert.doesNotMatch(edgeProcessor, /MinFilter|PLATFORM_EDGE_RADIUS|PLATFORM_INNER_BLUR/,
+  "The rejected polygon-derived platform edge band must remain removed.");
 const heroEdgeTreatment = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
 assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
