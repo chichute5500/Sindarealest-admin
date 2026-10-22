@@ -23,47 +23,39 @@ const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "f
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4'"),
-  "the Hero must use the supplied presentation asset independently of catalog availability");
-assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
-  && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
-  "the Hero must display the presentation asset and label it separately from a catalog image");
-assert.doesNotMatch(heroSync, /products\.find|skuVerified/,
-  "the Hero presentation image must not be gated by the public product SKU payload");
+assert.ok(heroSync.includes("target.hidden=true")
+  && heroSync.includes("target.removeAttribute('src')")
+  && heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'")
+  && heroSync.includes("target.onerror=null"),
+  "the Hero must remain hidden without a source during the owner-requested pause");
+assert.doesNotMatch(heroSync, /target\\.src=url|target\\.hidden=false/,
+  "the temporarily paused Hero must not assign or display its image");
 
 function makeHeroTarget() {
   const attributes = {};
   return {
-    hidden: true,
-    alt: "",
-    dataset: {},
-    onerror: null,
+    hidden: false, alt: "old", dataset: { productSku: "stale", sourceProductImage: "stale" }, onerror: () => {},
     getAttribute(name) { return Object.hasOwn(attributes, name) ? attributes[name] : null; },
     removeAttribute(name) { delete attributes[name]; },
     set src(value) { attributes.src = String(value); },
     get src() { return attributes.src || ''; },
   };
 }
-function runHeroSync(rows) {
+function runHeroSync() {
   const target = makeHeroTarget();
   const result = vm.runInNewContext(heroSync + String.fromCharCode(10) + "syncHeroProductImage();", {
-    products: rows,
     $: selector => selector === '#heroProductImage' ? target : null,
   });
   return { result, target };
 }
-for (const rows of [[], [{ sku: 'SD-GL052', skuVerified: false, images: [] }]]) {
-  const hero = runHeroSync(rows);
-  assert.equal(hero.result, true, "the hero presentation asset must render regardless of catalog SKU state");
-  assert.equal(hero.target.hidden, false);
-  assert.equal(hero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4');
-  assert.equal(hero.target.dataset.productImageStatus, 'hero-presentation-asset');
-}
-const visibleHero = runHeroSync([]);
-visibleHero.target.onerror();
-assert.equal(visibleHero.target.hidden, false, "a failed asset request must not hide the user-approved hero");
-assert.equal(visibleHero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-4');
-assert.equal(visibleHero.target.dataset.productImageStatus, 'hero-asset-load-failed');
+const pausedHero = runHeroSync();
+assert.equal(pausedHero.result, true);
+assert.equal(pausedHero.target.hidden, true);
+assert.equal(pausedHero.target.src, '');
+assert.equal(pausedHero.target.dataset.productImageStatus, 'temporarily-disabled-owner-request');
+assert.equal(pausedHero.target.onerror, null);
+assert.equal('productSku' in pausedHero.target.dataset, false);
+assert.equal('sourceProductImage' in pausedHero.target.dataset, false);
 
 const helperStart = html.indexOf("const escapeHtml=");
 const helperEnd = html.indexOf("function showToast(", helperStart);
