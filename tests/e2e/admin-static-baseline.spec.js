@@ -893,6 +893,15 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
                 bounds,
                 clientWidth: row.clientWidth,
                 scrollWidth: row.scrollWidth,
+                thumbnail: (() => {
+                  const element = row.querySelector('.thumb');
+                  return {
+                    tagName: element?.tagName || null,
+                    role: element?.getAttribute('role') || null,
+                    accessibleName: element?.getAttribute('aria-label') || null,
+                    source: element?.getAttribute('src') || null
+                  };
+                })(),
                 title: row.querySelector('.prodname')?.textContent?.trim() || null,
                 titleAttribute: row.querySelector('.prodname')?.getAttribute('title') || null,
                 priceText: row.querySelector('.product-mobile-inline-metric:first-child')?.innerText?.trim() || null,
@@ -941,6 +950,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           ))),
           'Each product row must fit the table wrapper and expose one named visible edit control: ' + JSON.stringify(productMatrixLayout.rows))
           .toBe(true);
+        expect(productMatrixLayout.rows.every(row =>
+          row.thumbnail.tagName === 'SPAN' &&
+          row.thumbnail.role === 'img' &&
+          row.thumbnail.accessibleName === 'Chưa có ảnh sản phẩm' &&
+          row.thumbnail.source === null),
+          'A missing product image must show an explicitly labelled placeholder, never a generic texture presented as product photography')
+          .toBe(true);
         expect(productMatrixLayout.rows.every(row => row.priceText?.includes('Chưa nhập') && row.stockText?.includes('Chưa kiểm kê')),
           'Fixtures must keep unconfirmed price/stock truthful instead of inventing business data')
           .toBe(true);
@@ -978,6 +994,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await page.evaluate(() => window.scrollTo(0, 0));
     const mobileProductRows = page.locator('#main .product-table tbody tr');
     await expect(mobileProductRows).toHaveCount(3);
+    await expect(page.locator('#main .product-table .product-thumb-placeholder[role="img"][aria-label="Chưa có ảnh sản phẩm"]')).toHaveCount(3);
+    await expect(page.locator('#main .product-table img.thumb')).toHaveCount(0);
     const mobileCardLayout = await mobileProductRows.first().evaluate(row => {
       const rect = selector => {
         const box = row.querySelector(selector).getBoundingClientRect();

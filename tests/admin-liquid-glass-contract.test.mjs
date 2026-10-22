@@ -241,6 +241,8 @@ has('#backdrop{align-items:stretch;justify-content:stretch;background:var(--bg);
 has('#backdrop>.editor{width:100%;max-width:none;height:100vh;height:100dvh;max-height:100dvh;border-radius:0;box-shadow:none;background:var(--bg)}', 'mobile product editor uses a full-screen opaque surface');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
+has('class="thumb product-thumb-placeholder" role="img" aria-label="Chưa có ảnh sản phẩm"', 'missing product images use an explicitly labelled placeholder, not a generic branded texture');
+has('.product-thumb-placeholder{display:grid;place-items:center;box-sizing:border-box;', 'missing-image placeholder remains a visual, bounded thumbnail');
 has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;align-items:start;margin-top:3px;max-width:100%}', 'mobile product price and stock are grouped compactly beneath product identity');
 has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price and stock labels share a single compact baseline');
 has('#main .product-table .prodname{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', 'long product titles truncate neatly without increasing mobile card height');
