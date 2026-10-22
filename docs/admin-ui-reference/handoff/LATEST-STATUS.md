@@ -1,5 +1,24 @@
 # LIVE STATUS — SinDarealest Admin
 
+> **Snapshot only:** PR #111 HEAD observed immediately before this handoff refresh: `4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed`. Handoff-only commits advance HEAD; always fetch live PR #111 and #108 before acting. This snapshot does not certify current HEAD tests.
+
+**Overall progress:** **50% PROVISIONAL** — test harness and documentation edits do not count as product acceptance. No whole screen is accepted fully on the evidence currently summarized.
+
+## Current operating rules
+
+- Work only on `feature/admin-isolated-handoff-2026-10-20`; PR #111 stays OPEN/unmerged.
+- PR #108 / `fix/liquid-glass-audit-2026-10-19` and `main` are read-only; no merge, Production deploy, Access bypass, secret access, remote D1/R2 operation, setup, or migration.
+- Exact-SHA checks are **NOT VERIFIED** until a workflow run is matched to the exact live SHA and its logs/results inspected. Historical runs are context only.
+- Continue after each short report; don't stop at status, don't ask the user to paste the old prompt, and don't repeat already-evidenced checks without a new reason.
+
+## Immediate next steps
+
+1. Fetch live PR #111 and #108 refs again after these docs commits.
+2. Poll existing Actions for the exact live PR #111 HEAD; do not assume previously queued run IDs still apply.
+3. Read the failing job log/artifact for any failure and fix only a demonstrated cause.
+4. Continue unaccepted screens #8 Customers, #9 Warranty/support, #10 Website settings, #11 Backup/Restore, #12 Activity log, reusing existing evidence to avoid duplicate work.
+5. Continue PR #111 per-path provenance review without remote mutation.
+
 **Checkpoint timestamp:** 2026-10-22 (live checkpoint after Order detail and Customers responsive test updates)  
 **Current ADMIN HEAD:** `9d5d838fe53d657ed98650161bf605868793aba2`  
 **Overall progress:** **50% PROVISIONAL** — new responsive checks are authored but exact-HEAD test results remain NOT VERIFIED.
