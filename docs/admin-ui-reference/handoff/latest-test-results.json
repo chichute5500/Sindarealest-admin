@@ -9,14 +9,14 @@
   "progressStatus": "PROVISIONAL",
   "status": "CURRENT_HEAD_VALIDATION_NOT_VERIFIED",
   "latestRun": {
-    "id": 0,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
-    "headSha": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
-    "status": "not_found_for_exact_sha",
-    "conclusion": "not_verified",
-    "jobId": null,
+    "id": 39841964451,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
+    "headSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+    "status": "completed",
+    "conclusion": "success",
+    "jobId": 120045068730,
     "failedStep": null,
-    "summary": "Historical exact-SHA success only; no PR-triggered run/status returned for current HEAD 803f6f7ce9ac114d4f3917b802c5f2a6542a5363."
+    "summary": "Historical exact-SHA source checks and npm test passed on 73dfad5e35939da22dd37efd12bf8b06c09e7716. This is not a validation of current HEAD; exact-SHA Actions/status lookup for current HEAD returned no result."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_HISTORICAL_SHA_ONLY",
@@ -250,7 +250,7 @@
     "headValidation": "PENDING_AT_LAST_FETCH",
     "validationRunId": 39842755681
   },
-  "currentHeadValidationReason": "Exact-SHA lookup on current live HEAD returned no PR-triggered workflow runs and no commit status checks.",
+  "currentHeadValidationReason": "Historical successful run pointer retained for integrity; it applies only to 73dfad5e35939da22dd37efd12bf8b06c09e7716, not the live HEAD.",
   "liveCheckpoint": {
     "headAtStart": "ae7e915d7de15f4f0a03f59d1caaad39fc6a9231",
     "headAfterHandoffSync": "803f6f7ce9ac114d4f3917b802c5f2a6542a5363",
