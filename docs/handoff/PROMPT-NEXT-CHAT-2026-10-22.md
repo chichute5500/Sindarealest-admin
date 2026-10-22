@@ -1,7 +1,7 @@
 # CHAT HANDOFF — SINDAREALEST2 STATIC STOREFRONT
-Updated: 2026-10-23
+Updated: 2026-10-23 — refreshed after handoff cleanup
 
-**Start with `docs/handoff/CURRENT-STATE.md`.** It is the only canonical live status. Do not ask the owner to repeat context; inspect GitHub and continue the work.
+**Optional handoff prompt. Start with `docs/handoff/CURRENT-STATE.md`.** That file is the only canonical live status; this prompt repeats the guardrails for convenience. Do not ask the owner to repeat context; inspect GitHub and continue the work.
 
 1. Verify current HEAD and PR #108 in `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`.
 2. PR #108 must remain OPEN/unmerged. Preview only; no Production, `main`, Admin, backend/API/auth, catalog/product data, D1/R2, bindings/secrets, DNS, or Access changes.
