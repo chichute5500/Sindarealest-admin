@@ -7,7 +7,7 @@ Bạn tiếp quản trực tiếp từ GitHub. Không yêu cầu người dùng 
 - Repo: `chichute5500/Sindarealest-admin`
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — vẫn OPEN, tuyệt đối không merge.
-- Branch/PR HEAD ở lần bàn giao này: `71d7e302a8fad535756a4bc358f3ba9d7c1d61d8` (commit docs-only `docs(handoff): refresh verified live audit #836 checkpoint`). Không nhầm với source code đang chạy.
+- Branch/PR HEAD sau khi cập nhật handoff: `fbd341d807175b9cc3abeaf8f33bde6145f9daf2` (các commit chỉ cập nhật tài liệu bàn giao). Đây không phải source storefront đang deploy Preview; source đã deploy và audit live chính xác vẫn là `2dca48f562fef5985e8f823e4bb4db20a98fd0df`.
 - Storefront source SHA đã deploy và audit live chính xác: `2dca48f562fef5985e8f823e4bb4db20a98fd0df`.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Exact deployment ID: `6d3deb3a-ca6b-4d84-80d9-d2bd18287777`; direct URL: https://6d3deb3a.sindarealest2.pages.dev
