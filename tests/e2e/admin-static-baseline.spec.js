@@ -1741,7 +1741,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     }, true);
     await captureView('order-detail', 'orders', async () => {
       const orderRow = page.locator('[data-order-row="UI-ONLY-ORDER"]');
-      const detailsButton = orderRow.locator('[data-action="view-order-details"]');
+      const detailsButton = orderRow.locator('[data-action="view-order-details"]:visible').first();
       await expect(orderRow).toBeVisible();
       await detailsButton.click();
       await expect(page.locator('#main .pagehead h2')).toHaveText('Chi tiết đơn hàng');

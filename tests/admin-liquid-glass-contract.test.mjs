@@ -170,7 +170,7 @@ assert.match(adminHtml, /mobilecards/,
   'Responsive order tables should provide the mobile-card layout checked by the visual matrix');
 assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
   'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
-assert.match(baselineSpec, /const detailsButton = orderRow\.locator\('\[data-action="view-order-details"\]'\);\s*await expect\(orderRow\)\.toBeVisible\(\);\s*await detailsButton\.click\(\);/,
+assert.match(baselineSpec, /const detailsButton = orderRow\.locator\('\[data-action="view-order-details"\]:visible'\)\.first\(\);\s*await expect\(orderRow\)\.toBeVisible\(\);\s*await detailsButton\.click\(\);/,
   'Order-detail capture should open the selected UI-only order from its visible row');
 assert.match(baselineSpec, /await expect\(page\.locator\('\.order-detail-page'\)\)\.toBeVisible\(\);/,
   'Order-detail capture should wait for the dedicated page to render');
