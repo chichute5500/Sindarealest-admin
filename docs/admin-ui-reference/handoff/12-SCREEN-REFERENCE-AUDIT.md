@@ -32,3 +32,12 @@ Older status text misnumbered Category #6, AI grouping #11 and Backup/Restore #1
 1. Finish #3 matched viewport/theme comparison and change only demonstrated ADMIN-only defects.
 2. Complete #4, then #6 and #7 as separate screens.
 3. Continue remaining screens and PR #111 read-only ancestry/scope audit. Keep PRs open/unmerged.
+
+
+## Visual comparison checkpoint — 2026-10-22T21:05:00+07:00
+
+- Reference: `docs/admin-ui-reference/admin-mobile-reference.png`; artifact [#311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829), source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`.
+- Opened the poster and the `products-reference-matrix__390x844__light.png` screenshot from the downloaded artifact ZIP. Screenshot is a synthetic fixture with three product rows, explicit placeholder thumbnails, unknown prices and unverified stock; the poster's sample products have photos and filled commercial fields.
+- Finding: data-state mismatch prevents a fair card-density/content-parity judgment. It is not evidence that source should fabricate images, price or stock. The visible UI has search, category/fulfillment filters, publish-state chips, edit controls and pagination; full screen #3 remains NOT_ACCEPTED.
+- No source code changed in this checkpoint because no specific, reproducible ADMIN-only visual defect was established from the available fixture screenshot. Next compare the same #3 state at 320×640 and 360×800 light/dark, inspect relevant metrics, then change source only if a concrete defect independent of missing fixture data is proven.
+- This is a docs-only checkpoint, not a screen acceptance or progress increase.
