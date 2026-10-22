@@ -941,12 +941,12 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
-  "branchHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "branchHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "latestVerifiedAt": "2026-10-22T16:38:06+07:00",
   "latestVerifiedSourceCommit": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
-  "currentAdminBranchHead": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "currentAdminBranchHead": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "latestVerificationSummary": "Validate #39756606343 and #39756606227 both SUCCESS on exact source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6; HEAD before final JSON sync 9c715bbd9424d14f2040deed6afa1af1a005eb77 is docs/evidence-only descendant. SKU assertion now waits for final CSS colors without weakening values; Preview login/dashboard smoke 2/2 passed. Full 12-screen parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED. Progress 50%.",
-  "branchHeadBeforeHandoffUpdate": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "branchHeadBeforeHandoffUpdate": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "prSafety": {
     "number": 111,
     "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
@@ -1066,7 +1066,7 @@
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
   "updatedAt": "2026-10-22T16:38:06+07:00",
-  "currentBranchHeadAtHandoff": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "currentBranchHeadAtHandoff": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": true,
   "previewDiagnostics": {
@@ -1135,7 +1135,8 @@
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "progressPercent": 50,
-    "postCommitReadback": "The post-commit live fetch and JSON.parse verification will be performed before handoff completion."
+    "postCommitReadback": "PASS: live GitHub fetched the JSON files at HEAD 6fbd49abb04ecf9d8915c76184b990565579360b and JSON.parse succeeded; Markdown checkpoints were read back too.",
+    "branchHeadBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b"
   },
   "progressPercent": 50,
   "prScopeAudit": {
@@ -1340,7 +1341,7 @@
     "status": "NOT_CHANGED_OUT_OF_SCOPE",
     "next": "Review only under an explicitly approved backend/API scope; preserve DB uniqueness and add a focused regression test."
   },
-  "currentAdminBranchHeadBeforeHandoffUpdate": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "currentAdminBranchHeadBeforeHandoffUpdate": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "latestScreenshotArtifact": {
     "runId": 39756606227,
     "id": 12416033404,
@@ -1379,7 +1380,7 @@
     "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
     "progressPercent": 50
   },
-  "latestObservedBranchHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "latestObservedBranchHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "latestVerifiedSourceCi": {
     "runId": 39742949748,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748",
@@ -1397,7 +1398,7 @@
   "pr111": {
     "state": "OPEN",
     "merged": false,
-    "headSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+    "headSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
     "changedFiles": 1265,
     "mergeable": false,
     "mergeable_state": "dirty",
@@ -1849,7 +1850,7 @@
     "remoteD1RuntimeConcurrency": "NOT_VERIFIED_TESTS_USE_IN_MEMORY_MOCK",
     "finding": "Refund row uses conditional INSERT…SELECT to recheck the net received/refunded ledger at insert time; order/request status updates and audit write are gated on that row existing; a rejected balance race returns 409."
   },
-  "latestHandoffHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "latestHandoffHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "pr111State": "OPEN_UNMERGED",
   "pr108State": "OPEN_UNMERGED",
   "safety": {
@@ -1874,7 +1875,7 @@
     "previewRun": 39750503783,
     "currentHeadValidateRun": 39751463904
   },
-  "latestObservedAdminHead": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "latestObservedAdminHead": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "latestObservedAdminHeadVerifiedAt": "2026-10-22T15:52:00+07:00",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
@@ -1940,7 +1941,8 @@
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "progressPercent": 50,
-    "postCommitReadback": "The post-commit live fetch and JSON.parse verification will be performed before handoff completion."
+    "postCommitReadback": "PASS: read back and parsed current-status.json and latest-test-results.json from the live branch at 6fbd49abb04ecf9d8915c76184b990565579360b",
+    "branchHeadBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b"
   },
   "latestRun": {
     "sourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
@@ -2338,7 +2340,7 @@
   },
   "currentBranchHeadBeforeHandoffUpdate": "dcb60b39d5813b82fabeab0f390826e558e7e676",
   "currentAdminBranchHeadIsBeforeHandoffUpdate": true,
-  "latestObservedAdminHeadSha": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
+  "latestObservedAdminHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "latestKeyboardTabNavigationAudit": {
     "implementedInCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
     "changedPath": "tests/e2e/admin-static-baseline.spec.js",
