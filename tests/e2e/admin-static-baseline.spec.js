@@ -655,6 +655,42 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         'Product tab labels must remain on one line at ' + viewportWidth + 'px: ' + JSON.stringify(layout)).toBe(true);
     };
     await assertProductTabsFit(variant.viewport.width);
+
+    // Screen #4 regression: lock the reference-aligned SKU/verification row and AI action
+    // against future changes at ordinary mobile, tablet, and desktop widths.
+    if (variant.viewport.width >= 360) {
+      const editorLayout = await page.evaluate(() => {
+        const rect = element => {
+          const r = element.getBoundingClientRect();
+          return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, centerY:r.top+r.height/2 };
+        };
+        return {
+          sku: rect(document.querySelector('#pSku')),
+          skuRow: rect(document.querySelector('.sku-entry-row')),
+          checkbox: rect(document.querySelector('#pSkuVerified')),
+          verifyLabel: rect(document.querySelector('label.sku-verify-option')),
+          descriptionLabel: rect(document.querySelector('.product-description-heading>label')),
+          descriptionAction: rect(document.querySelector('#generateDescription')),
+          description: rect(document.querySelector('#pDescription')),
+          documentWidth: document.documentElement.scrollWidth,
+          viewportWidth: window.innerWidth
+        };
+      });
+      const context = JSON.stringify({ viewport: variant.viewport.width, theme: variant.theme, layout: editorLayout });
+      expect(editorLayout.checkbox.left, 'SKU verification must sit beside the SKU input: ' + context)
+        .toBeGreaterThan(editorLayout.sku.right);
+      expect(Math.abs(editorLayout.checkbox.centerY-editorLayout.sku.centerY),
+        'SKU input and verification checkbox must align vertically: ' + context).toBeLessThanOrEqual(4);
+      expect(editorLayout.verifyLabel.right, 'SKU verification label must stay inside its row: ' + context)
+        .toBeLessThanOrEqual(editorLayout.skuRow.right + 1);
+      expect(editorLayout.descriptionLabel.right, 'AI action must not overlap the description label: ' + context)
+        .toBeLessThanOrEqual(editorLayout.descriptionAction.left);
+      expect(editorLayout.descriptionAction.bottom, 'AI action must remain above the description field: ' + context)
+        .toBeLessThanOrEqual(editorLayout.description.top);
+      expect(editorLayout.documentWidth, 'Product editor must not overflow its viewport: ' + context)
+        .toBeLessThanOrEqual(editorLayout.viewportWidth);
+    }
+
     if (variant.viewport.width === mobile.width && variant.theme === 'light') {
       await page.setViewportSize({ width: 320, height: 640 });
       await assertProductTabsFit(320);
