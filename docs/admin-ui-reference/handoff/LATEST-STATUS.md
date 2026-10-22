@@ -47,3 +47,15 @@
 4. Continue PR #111 path provenance review without touching protected branch, `main`, remote D1/R2, setup/migrations or Production.
 
 No merge, deployment, Access bypass or remote data/schema operation was performed.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 401b961cb685a1c3fade6e6d6f66713bb71bf509
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: FAILURE; 59 real PNGs captured in artifact admin-preview-evidence-327 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 59 real PNGs; login shell: 16; read-only fixture module screens: 43; fixture metrics: 40.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
