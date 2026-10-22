@@ -6,7 +6,7 @@
 **Artifact:** [admin-preview-evidence-340 / 12439794397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397)  
 **Progress:** 50% PROVISIONAL; no screen fully accepted.
 
-Artifact #340 has 102 PNGs (16 login shell + 86 fixture/module shots) and 78 fixture metrics. Session/data are mocked and read-only. Seven fixture console HTTP 503 messages are intentional retry simulations; no page errors, failed requests, unexpected API paths, or attempted writes were recorded. The deployed Preview diagnostic only confirms the login CSS signature.
+Artifact #344 has 102 PNGs (16 login shell + 86 fixture/module shots) and 78 fixture metrics. Session/data are mocked and read-only. Seven fixture console HTTP 503 messages are intentional retry simulations; no page errors, failed requests, unexpected API paths, or attempted writes were recorded. The deployed Preview diagnostic only confirms the login CSS signature.
 
 | # | Screen | Status | Current evidence / gap |
 |---:|---|---|---|
