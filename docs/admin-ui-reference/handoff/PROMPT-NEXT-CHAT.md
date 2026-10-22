@@ -1,3 +1,17 @@
+## LIVE HANDOFF CHECKPOINT — 2026-10-22 21:20 +07:00
+
+- **Canonical state:** read `handoff/current-status.json` first. It now contains the task queue and the latest verified handoff checkpoint.
+- **Branch HEAD before this handoff edit:** `b6b244ce87ce3cce48d038198f30652ee2769894`; PR #111 was OPEN/unmerged and matched this SHA. This edit is docs-only and does not make application source tested at the resulting commit.
+- **Last verified source/test SHA:** `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Validate #39756606343 PASS and Preview #39756606227 SUCCESS. Preview scope is CSS signature + login/dashboard smoke only. Validate #39758657800 passed on docs-only SHA `e356b312e8a7af14e91da599c26f9c77c6fba18b`. Do not describe any of these as full backend QA or all-screen acceptance.
+- **Progress:** provisional 50%; do not increase until weighted acceptance evidence changes.
+- **Immediate next task:** inspect the current Product editor #4 source and approved reference, especially SKU verification layout and AI-description heading/action. The previously proposed layout edit was not committed; verify live code before editing. Add exact-source geometry/accessibility assertions, run relevant checks, and inspect screenshots.
+- **Queue after that:** Product list #3 parity; remaining 12-screen parity audit; PR #111 mixed-scope audit; orders/fulfillment #7 and other partial screens.
+- **Not accepted / blocked:** all-12-screen parity NOT_ACCEPTED; screen #3 PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; AI grouping #11 BLOCKED pending approved contract; product image save/R2 and PRE/PRO migration DEFERRED_BY_OWNER.
+- **Safety:** only `feature/admin-isolated-handoff-2026-10-20`; no merge PR #111/#108, no main/static edits, no Production deploy, no Access bypass/secrets, no remote D1/R2 writes or migrations. Before every write, re-fetch branch and PR #111 heads and require exact match; use non-force update with expected SHA.
+- **Anti-repeat:** reuse test evidence only when source/test SHA and relevant inputs still match. Every work cycle must implement a real change, test it, record evidence, update status and continue to the next safe task without waiting for “continue”.
+
+---
+
 ## CONTINUITY PROTOCOL — CURRENT OPERATING RULES (2026-10-22)
 
 **Đọc phần này trước mọi checkpoint lịch sử bên dưới.** Nguồn trạng thái chuẩn là `handoff/current-status.json`; hàng đợi việc cũng nằm trong đó. SHA ghi trong tài liệu chỉ là checkpoint tại thời điểm xác minh, không thay thế việc đọc HEAD/PR trực tiếp trên GitHub.
