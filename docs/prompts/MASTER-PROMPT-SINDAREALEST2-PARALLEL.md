@@ -1,3 +1,13 @@
+## CURRENT OVERRIDE — 2026-10-22 11:16 UTC
+
+Canonical source SHA now under Preview verification: `dff584114dfd3916219f38b24950e5bf531e2199` (docs-only commits can advance branch HEAD). Validation/tests PASS [#39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097); Preview deploy PASS [#39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), concrete deployment `https://b7858119.sindarealest2.pages.dev/`. Live visual audit [#39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207) was pending at last check.
+
+A conditional Dark hero matte key replaced a visually ineffective radial mask. It samples 8 edge/corner points from the owner-provided image and enables the existing SVG filter only when >=6 samples confirm a neutral-light canvas. Inspect fresh Preview screenshots before accepting. Revert the helper/filter/test only if rectangle remains or the product outline/colour is compromised. Historical intermediate test failures were fixed; do not confuse with latest validation PASS.
+
+Maintain scope lock: PR #108 OPEN, never merge; Preview only; no Production/main, Admin, backend, product/image mapping, D1/R2/config or real checkout/payment. The user-provided `/images/hero-sd-gl052.png` remains the same asset. Read `docs/handoff/CURRENT-STATE.md` first; do not rely on stale embedded prompts.
+
+---
+
 ## Latest startup capture result — 2026-10-22
 
 Artifact #12418823837 contains 4 startup videos (360×800/390×844, Light/Dark), 107 timeline samples and 0 first-paint violations. During welcome splash, bottom navigation and account drawer remained hidden in all captured sample states. This is observational evidence only because Preview metadata expected SHA `e916ce...` but returned `5f1be31...`; compare shows only documentation commits in between. Do not repeat the old startup investigation unless new contrary evidence appears. Canonical live status remains `docs/handoff/CURRENT-STATE.md`.
