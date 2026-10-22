@@ -2,14 +2,22 @@
 
 > Current branch/next steps: [CURRENT-STATE.md](CURRENT-STATE.md). Never treat a result for one SHA as a PASS for another.
 
-## Latest checkpoint (2026-10-22)
-- Branch: `fix/liquid-glass-audit-2026-10-19`
-- Source checkpoint: `fc406599e04475e232fad790efd03d46979a5a20`
-- Validate source/tests: [run #39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) — reported PASS.
-- Preview deploy workflow: [run #39760903008](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903008) — reported PASS. This does not alone prove the exact deployment SHA; verify Cloudflare deployment metadata before attributing live screenshots to this commit.
-- Admin Preview Playwright: [run #39760902960](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902960) — reported PASS; read-only smoke only, not authorization to change Admin.
-- Liquid Glass visual workflow: [run #39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) — final conclusion/artifact was not independently confirmed in the handoff refresh. Refresh before claiming PASS or launching a duplicate run.
-- Docs-only handoff changes do not deploy storefront code because the Preview workflow ignores `docs/**`.
+## Latest verified checkpoint (2026-10-22 UTC)
+
+# CURRENT CHECKPOINT — 2026-10-22 UTC
+
+- Branch HEAD / PR #108 head: `eafa0d0b31723134727ba5f5933018e34f31854a` (documentation-only; PR remains OPEN, NOT merged).
+- Latest verified storefront source, deployed Preview SHA and live-audit source SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
+- Validate/tests: [run #39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) reported PASS.
+- Preview deployment verification + live visual workflow: [run #39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) SUCCESS; logs explicitly confirm `VERIFIED_PREVIEW_DEPLOYMENT`, branch match and exact commit SHA match.
+- Latest artifact: [#12418615814 — sindarealest-liquid-glass-preview-853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814). It reports local fixture audit PASS (58 screenshots, 235 fixtures, 20 responsive cases, 103 interaction checks, zero recorded errors/hard failures) AND live Preview PASS (128 screenshots, 8/8 viewport/theme pairs, 13 route checks, Access service token configured, zero failed requests/hard failures).
+- Screenshot archive comparison state: `COMPLETE_NEEDS_VISUAL_REVIEW`. Workflow success does NOT mean visual parity is finished; real screenshots still require manual visual review against reference images.
+- Docs-only commits do not trigger Preview deploy/live capture (`docs/**` ignored). Do not claim these docs commits redeployed storefront code.
+
+
+- Validate source/tests: [run #39760902928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902928) — reported PASS for source checkpoint `fc406599e04475e232fad790efd03d46979a5a20`.
+- Admin Preview Playwright [run #39760902960](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760902960) — PASS, read-only smoke only; not authorization to change Admin.
+- Live audit has a green machine result, but the visual archive still says `COMPLETE_NEEDS_VISUAL_REVIEW`. Manual screenshot inspection remains open.
 
 ## Last fully documented live audit (historical evidence)
 - Audited source SHA: `78b0a673a610501bfa4048df0ed614ff48246f97`
