@@ -33,11 +33,13 @@ function assertSatinFoldContrast(name, svg, maxBody, maxShadow, maxShade, maxHig
     assert.ok(values.length > 0, name + ' must keep the ' + layer + ' satin layer.');
     return Math.max(...values);
   };
-  assert.ok(maxOpacityFor('body') >= 0.07, name + ' body folds must remain subtly visible against the satin base.');
+  assert.ok(maxOpacityFor('body') >= 0.12, name + ' body folds must remain visibly defined against the satin base.');
   assert.ok(maxOpacityFor('body') <= maxBody, name + ' body folds must remain subtle, not broad ribbon bands.');
+  assert.ok(maxOpacityFor('shadow') >= 0.02, name + ' fold shadows must define the crease without forming rings.');
   assert.ok(maxOpacityFor('shadow') <= maxShadow, name + ' fold shadows must not form dark rings.');
+  assert.ok(maxOpacityFor('inner-shade') >= 0.07, name + ' inner creases must stay visible at the fold edge.');
   assert.ok(maxOpacityFor('inner-shade') <= maxShade, name + ' inner creases must stay quiet.');
-  assert.ok(maxOpacityFor('highlight') >= 0.13, name + ' highlights must remain perceptible in both themes.');
+  assert.ok(maxOpacityFor('highlight') >= 0.21, name + ' satin highlights must be visible but remain thin.');
   assert.ok(maxOpacityFor('highlight') <= maxHighlight, name + ' highlights must read as fine satin, not bright strokes.');
 }
 assertSatinFoldContrast('Desktop light satin', desktopLight, 0.15, 0.05, 0.13, 0.25);
