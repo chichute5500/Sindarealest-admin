@@ -997,7 +997,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (variant.viewport.width === mobile.width && variant.theme === 'light') {
         const originalFirstSrc = await page.locator('#imageGrid img').nth(0).getAttribute('src');
         const originalSecondSrc = await page.locator('#imageGrid img').nth(1).getAttribute('src');
-        await page.locator('#imageGrid [data-gallery="up"][data-index="1"]').click();
+        // Activate a gallery control from the keyboard, not only by pointer.
+        await page.locator('#imageGrid [data-gallery="up"][data-index="1"]').focus();
+        await page.keyboard.press('Enter');
         await expect(page.locator('#imageGrid img').nth(0)).toHaveAttribute('src', originalSecondSrc);
         await expect(page.locator('#imageGrid img').nth(1)).toHaveAttribute('src', originalFirstSrc);
         await expect(page.locator('#galleryStatus')).toContainText('Đã chuyển ảnh lên vị trí ảnh đại diện');
@@ -1020,6 +1022,49 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         });
         expect(scrolledRail, 'Thumbnail rail should be horizontally scrollable').toBeGreaterThan(0);
         await page.locator('#imageGrid .image-rail').evaluate(el => { el.scrollLeft = 0; });
+
+        // The reference includes narrow phones at 320px and 360px, not only 390px.
+        // Capture actual gallery renders and assert that the page/dialog stay in bounds
+        // while the thumbnail rail alone owns horizontal scrolling.
+        for (const narrowViewport of [{ width: 320, height: 640 }, { width: 360, height: 800 }]) {
+          await page.setViewportSize(narrowViewport);
+          await expect(page.locator('#imageGrid .image-rail')).toBeVisible();
+          const narrowLayout = await page.evaluate(() => {
+            const dialog = document.querySelector('#backdrop>.editor');
+            const grid = document.querySelector('#imageGrid');
+            const rail = document.querySelector('#imageGrid .image-rail');
+            if (!dialog || !grid || !rail) throw new Error('Responsive gallery geometry is incomplete');
+            const rect = element => {
+              const box = element.getBoundingClientRect();
+              return { left: box.left, right: box.right, width: box.width };
+            };
+            return {
+              viewportWidth: window.innerWidth,
+              pageWidth: document.documentElement.scrollWidth,
+              dialog: rect(dialog),
+              grid: rect(grid),
+              rail: rect(rail),
+              railOverflowX: getComputedStyle(rail).overflowX,
+              railClientWidth: rail.clientWidth,
+              railScrollWidth: rail.scrollWidth
+            };
+          });
+          expect(narrowLayout.pageWidth,
+            'At ' + narrowViewport.width + 'px the document must not overflow horizontally: ' + JSON.stringify(narrowLayout))
+            .toBeLessThanOrEqual(narrowViewport.width);
+          expect(narrowLayout.dialog.left, 'Mobile editor should remain inside the left viewport edge').toBeGreaterThanOrEqual(-1);
+          expect(narrowLayout.dialog.right, 'Mobile editor should remain inside the right viewport edge').toBeLessThanOrEqual(narrowViewport.width + 1);
+          expect(narrowLayout.grid.left, 'Gallery grid should not escape the editor left edge').toBeGreaterThanOrEqual(narrowLayout.dialog.left - 1);
+          expect(narrowLayout.grid.right, 'Gallery grid should not escape the editor right edge').toBeLessThanOrEqual(narrowLayout.dialog.right + 1);
+          expect(narrowLayout.rail.right, 'Thumbnail rail container should stay inside the gallery grid').toBeLessThanOrEqual(narrowLayout.grid.right + 1);
+          expect(narrowLayout.railOverflowX, 'Only the thumbnail rail should scroll horizontally').toBe('auto');
+          expect(narrowLayout.railScrollWidth,
+            'At ' + narrowViewport.width + 'px all fixture thumbnails should remain horizontally reachable').toBeGreaterThan(narrowLayout.railClientWidth + 20);
+          await saveScreenshot('product-gallery-responsive', { viewport: narrowViewport, theme: variant.theme }, {
+            dialog: true, fixtureImages: 6, horizontalThumbnailRail: true, responsiveViewportAudit: true
+          });
+        }
+        await page.setViewportSize(variant.viewport);
       }
       if (variant.viewport.width <= 480) {
         await page.locator('#imageGrid [data-gallery="remove"][data-index="2"]').click();
