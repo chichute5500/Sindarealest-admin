@@ -3,12 +3,12 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Live checkpoint after Order detail responsive-grid change and Customers screen responsive regression assertions. Exact-HEAD workflow result has not been returned by the available connector; never infer PASS from an empty workflow list.",
-  "branchHeadAtCheckpoint": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
+  "checkpointSemantics": "Live checkpoint refreshed after test-only commit 920f53d. This commit adds dedicated Activity log UI fixture assertions; it does not prove those assertions passed and is not a product-source acceptance commit.",
+  "branchHeadAtCheckpoint": "920f53d42c643084d7390198b1f6a875ec4f68e7",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Order detail responsive fix and Customers responsive regression checks are implemented but not accepted until exact-HEAD test evidence is available.",
+  "progressBasis": "50% PROVISIONAL. Do not count test-harness or handoff changes as product completion. The latest source UI changes remain unaccepted until a run on exact relevant SHA provides evidence.",
   "sourceTreeComparison": {
     "comparisonTarget": "fix/liquid-glass-audit-2026-10-19",
     "staticHead": "a1fa5ca5731d827cbd7c3680468fd0df7bf35f53",
@@ -22,10 +22,10 @@
   },
   "sourceValidationOnHead": {
     "status": "NOT_VERIFIED_EXACT_SHA",
-    "liveCodeHead": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
+    "liveCodeHead": "920f53d42c643084d7390198b1f6a875ec4f68e7",
     "latestObservedWorkflowRuns": [],
     "combinedStatus": "No status checks returned",
-    "note": "The workflow lookup only returns PR-triggered runs and returned none for the current commit. This does not prove no workflow exists or that checks passed. Need inspect GitHub Actions run page / workflow dispatch capability."
+    "note": "fetch_commit_workflow_runs returned no PR-triggered runs for current HEAD and combined status returned an empty list. This is not PASS and does not prove Actions are absent. The latest commit is test-only; validate its exact source/test state through an actual Actions run before acceptance."
   },
   "latestVisualEvidence": {
     "sourceSha": "a6fc090b60e579e9d708775f0c25e3ba56f3439b",
@@ -1074,17 +1074,34 @@
     "sourceCommit": "3d10e163d3a88884ad109d0245b7b9c38e0ec603",
     "sourceFile": "public/admin/index.html",
     "sourceBlob": "bebfb0896e28dd64654df17fe185cc2f0f508bb0",
-    "testCommit": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
-    "testFile": "tests/e2e/admin-static-baseline.spec.js",
-    "testBlob": "7689975293ad174b14707d8e401d8442c4265ef2",
-    "changes": [
-      "Order detail customer fields and item metadata use two columns at >=360px, one column below 360px; customer email/address span full width.",
-      "Playwright verifies computed grid column counts for Order detail customer and item metadata.",
-      "Customers screen test verifies no document-level horizontal overflow and mobile card layout at <=680px versus table cells above 680px.",
-      "Computed CSS grid column parsing regex was corrected to split on whitespace."
-    ],
+    "latestTestCommit": "920f53d42c643084d7390198b1f6a875ec4f68e7",
+    "latestTestFile": "tests/e2e/admin-static-baseline.spec.js",
+    "latestTestBlob": "7689975293ad174b14707d8e401d8442c4265ef2",
     "acceptance": "NOT_VERIFIED",
-    "next": "Resolve exact-SHA Actions/Playwright validation through a supported workflow-run discovery or dispatch path; meanwhile continue audit of screen #8 and then #9 without claiming acceptance."
+    "next": "Find supported Actions run discovery / workflow dispatch or inspect the live Actions page for exact SHA 920f53d. Then execute/verify test results and continue the next incomplete product screen using existing artifacts. Avoid more docs-only or harness-only commits unless a new fact requires them."
   },
-  "currentNextAction": "Continue Customer screen (#8) and Warranty/support (#9) source/test/reference review; no duplicate geometry-only testing of screens #3/#4. Check workflow run discovery/dispatch capability before further source writes."
+  "currentNextAction": "First obtain exact-SHA Actions result for 920f53d (latest test-only commit); available connector's fetch_commit_workflow_runs is limited to PR-triggered runs and returned empty, so use a supported run-discovery path if available. Do not claim PASS. Then continue remaining screens and source provenance audit. No merge, production deploy, migrations, remote D1/R2, secrets, or Access bypass.",
+  "latestCodeChanges": [
+    {
+      "commit": "3d10e163d3a88884ad109d0245b7b9c38e0ec603",
+      "type": "product-source",
+      "path": "public/admin/index.html",
+      "status": "IMPLEMENTED_NOT_ACCEPTED",
+      "summary": "Order detail customer fields and item metadata responsive grids: 2 columns >=360px; one column below 360px; email/address full span."
+    },
+    {
+      "commit": "da5139c39ec1a7e96d93ab9ede4ebab83e07094f",
+      "type": "test",
+      "path": "tests/e2e/admin-static-baseline.spec.js",
+      "status": "AUTHORED_NOT_RUN_ON_EXACT_SHA",
+      "summary": "Customers screen no document overflow and responsive card/table assertion; order detail computed grid checks also present."
+    },
+    {
+      "commit": "920f53d42c643084d7390198b1f6a875ec4f68e7",
+      "type": "test",
+      "path": "tests/e2e/admin-static-baseline.spec.js",
+      "status": "AUTHORED_NOT_RUN_ON_EXACT_SHA",
+      "summary": "Adds dedicated read-only Activity log screen capture and assertions for search, action filter, empty state, clear filters, refresh, and mobile row display. Does not prove tests pass."
+    }
+  ]
 }
