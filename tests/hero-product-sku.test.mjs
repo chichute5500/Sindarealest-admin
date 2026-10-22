@@ -49,7 +49,7 @@ assert.ok(html.includes("object-fit:contain!important;object-position:center!imp
 assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
 assert.ok(html.includes("#home .hero-visual::before{")
   && html.includes("z-index:0!important;")
-  && html.includes("filter:blur(23px)!important;")
+  && html.includes("filter:blur(16px)!important;")
   && html.includes("position:relative!important;z-index:1!important;"),
   "The hero presentation asset must be untouched above a separate background halo.");
 assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
