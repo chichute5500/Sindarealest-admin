@@ -1,5 +1,16 @@
 # SinDarealest2 — CURRENT STATE
-Updated: 2026-10-22 11:05 UTC. Read this file first in every new chat.
+Updated: 2026-10-22 11:16 UTC. Read this file first in every new chat.
+
+## Latest active work checkpoint — 2026-10-22 11:16 UTC
+
+- PR #108 is OPEN / NOT MERGED. Current storefront-source candidate SHA: `dff584114dfd3916219f38b24950e5bf531e2199`; docs-only handoff commits after this point may move branch HEAD without changing deployed storefront source.
+- Validation + full `npm test` **PASS for source SHA `dff584114dfd3916219f38b24950e5bf531e2199`**: [run #39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097).
+- Preview deployment **PASS** for requested source SHA `dff584114dfd3916219f38b24950e5bf531e2199`: [run #39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), deployment URL `https://b7858119.sindarealest2.pages.dev/`, stable Preview alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. Treat as deploy job evidence; still require the visual audit's deployment metadata gate before calling a fresh screenshot audit exact-SHA verified.
+- Live visual audit for this source SHA is queued: [run #39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207). At last refresh status was PENDING with no artifact. Read status again before acting.
+- Latest UI change replaces the rejected radial edge mask with a conditional Dark-mode matte key: the same owner-provided `/images/hero-sd-gl052.png?v=20261022-1` is sampled at 8 image-edge/corner points; existing gallery SVG filter is applied only after at least 6 neutral near-white votes. No source URL, image pixels, product mapping, catalog data or backend code is changed by this effect. **Visual acceptance is pending until new Preview screenshots are actually opened.**
+- Regression history: radial feather version did not visibly remove the rectangular matte and was superseded. Two subsequent intermediate test failures were traced to (a) fake image objects in `storefront-html-safety.test.mjs` lacking `classList`, then (b) an assertion expecting non-optional `classList.toggle`; guards and assertion were corrected. Do not transfer those failed intermediate results to the current SHA; current validation run above is PASS.
+- Admin Preview Playwright for this source SHA: [run #39769146129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146129); refresh status. No Admin source was intentionally edited; the workflow is a repository-wide check.
+- Keep VISUAL-PARITY / ICON-PARITY open. Do not touch the confirmed “Tuyển chọn 25” product-gallery mapping; that remains a trusted-catalog dependency.
 
 ## Latest visual-review checkpoint — 2026-10-22 10:35 UTC
 
@@ -64,12 +75,12 @@ Updated: 2026-10-22 11:05 UTC. Read this file first in every new chat.
 360×800, 390×844, 768×1024, 1440×900 × Light and Dark = 8 combinations.
 
 ## Next actions (in order)
-1. After this documentation update, fetch branch HEAD and PR #108 HEAD again; PR must remain OPEN and unmerged.
-2. Refresh Cloudflare Preview metadata before treating any later capture as exact-SHA evidence. Run #39762445821 is not exact-SHA verified; separate source SHA, deployed SHA and audited SHA.
-3. Keep VISUAL-PARITY and ICON-PARITY open. Continue only with evidence-backed storefront CSS/icon fixes; preserve official logo and owner-supplied hero asset. Startup splash/account-flash concern has 4 video + 107 timeline sample checks with 0 captured violations in artifact #12418823837; do not rerun unless new contrary evidence appears.
-4. Keep PRODUCT-GALLERY-25 as a confirmed read-only mismatch. Do not change product/catalog/image mappings; correction requires trusted catalog data and authorization outside this scope.
-5. After any future UI code change: run only affected tests, deploy Preview, verify exact deployment SHA, run live audit, inspect artifact images, then update evidence docs.
-6. QR/payment remains fail-closed pending trusted backend confirmation/configuration; no real checkout/payment tests.
+1. Refresh branch HEAD and PR #108 after this documentation-only update. PR must remain OPEN and unmerged. Separate docs HEAD from storefront source SHA `dff584114dfd3916219f38b24950e5bf531e2199`.
+2. Check [validation #39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097), [Preview deploy #39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), [Admin Playwright #39769146129](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146129) and especially [live visual audit #39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207). Wait until audit ends, download and open the artifact screenshots, and confirm deployed/source/audited SHA before acceptance.
+3. Specifically compare hero Dark-mode matte at 390×844 and 1440×900, and also check Light mode to ensure the conditional filter is inactive where not verified. If the matte still looks rectangular or any shoe edge/colour is damaged, revert only the new hero matte helper/filter and its test rather than stacking more filters.
+4. Keep VISUAL-PARITY and ICON-PARITY open; preserve the official logo and supplied hero `/images/hero-sd-gl052.png`. Startup splash/account-flash issue has 4 videos and 107 timeline samples with 0 captured violations in artifact #12418823837; do not repeat unless contrary evidence appears.
+5. Keep PRODUCT-GALLERY-25 as a confirmed read-only mismatch. Do not change product/catalog/image mappings; correction requires trusted catalog data and authorization outside this scope.
+6. After any future UI code change: run affected tests, deploy Preview, verify exact deployment SHA, run live audit, inspect artifact images, then update evidence docs. QR/payment stays fail-closed; no real checkout/payment tests.
 ## Canonical document rules
 - This file is the single current-state summary. Other handoff docs should link here and retain only evidence/history they uniquely own.
 - Never copy an old SHA or percentage forward without re-verifying it.
