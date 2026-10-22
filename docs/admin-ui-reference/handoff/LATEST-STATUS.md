@@ -22,3 +22,11 @@
 ## Guardrails / next task
 No merge, main/static edit, Production deployment, Access bypass, secret access, remote D1/R2 operations, setup or migration. Migration 0009 DEFERRED_BY_OWNER; AI grouping BLOCKED; R2 image save and PRE/PRO migrations DEFERRED_BY_OWNER.
 Next: fetch the post-documentation HEAD and its exact SHA run; then audit #6/#7 and remaining screens. Do not repeat #3/#4 geometry without new state or a reproducible defect.
+
+
+## Live checkpoint 2026-10-22T20:15:00+07:00
+- ADMIN HEAD: `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; PR #111 OPEN/unmerged. PR #108 OPEN/unmerged; no writes to static branch.
+- Source validation #4740: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315 — PASS on exact HEAD; `npm run check`, `npm test`, activity-log regression checks passed.
+- Responsive/Preview #4741: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281 — IN_PROGRESS on exact HEAD at last poll. Chromium/Playwright and final Preview smoke are NOT VERIFIED; inspect final job/log/artifact before claiming visual acceptance.
+- Added a read-only Activity Log screen using existing `GET /api/admin/audit-logs`, search/action filter/refresh/error state and server-limit disclosure. Source + unit test PASS; visual and authenticated QA NOT VERIFIED.
+- Progress remains **50% PROVISIONAL**. No merge, Production deploy, remote migration, D1/R2 write, Access bypass or static-branch change.

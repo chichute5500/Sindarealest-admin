@@ -1,50 +1,34 @@
 {
   "schemaVersion": 2,
-  "status": "SOURCE_CHECKS_PASS_EXACT_HEAD_VISUAL_ACCEPTANCE_INCOMPLETE",
+  "status": "SOURCE_CHECKS_AND_UNIT_TESTS_PASS_EXACT_HEAD_VISUAL_ACCEPTANCE_PENDING",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
   "capturedAt": "2026-10-22",
-  "currentHeadAtCheckpoint": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+  "currentHeadAtCheckpoint": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "305fc139c22d682b4b6882af18d6d79836887cc7",
   "progressPercent": 50,
-  "progressBasis": "50% PROVISIONAL. Validate #4737 passed npm run check and npm test on exact pre-write HEAD 368b3f26911f47f12cdb7ab6f300ad359283b9cc. Preview/Playwright evidence used 305fc139c22d682b4b6882af18d6d79836887cc7 and is not an exact-SHA match; all 12 screens and authenticated business QA remain incomplete.",
+  "progressBasis": "50% PROVISIONAL. Exact-HEAD source checks and unit tests pass, but exact-HEAD responsive/Preview run is still in progress, full 12-screen visual acceptance and authenticated business-module QA remain incomplete.",
   "currentHeadValidation": {
-    "status": "PASS_CHECK_AND_UNIT_TESTS_ONLY_VISUAL_MATRIX_NOT_VERIFIED_AT_EXACT_HEAD",
-    "liveHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
-    "lastSuccessfulWorkflow": {
-      "runId": 39780791597,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597",
-      "testedSha": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+    "status": "PASS_SOURCE_CHECKS_AND_UNIT_TESTS; RESPONSIVE_PREVIEW_IN_PROGRESS",
+    "liveHead": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+    "sourceWorkflow": {
+      "id": 39784873315,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315",
+      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
       "conclusion": "success",
-      "jobId": 119831205638
+      "checks": "npm run check PASS; npm test PASS; log confirmed activity-log regression assertion"
     },
-    "checks": {
-      "npmRunCheck": "PASS",
-      "npmTest": "PASS",
-      "dependencyAudit": "PASS",
-      "temporaryLocalD1MigrationCheck": "PASS"
-    },
-    "exactShaMatch": true,
-    "sourceDrift": {
-      "setupCloudflare": {
-        "blobAtHead": "ec1c614048b84657ef8824d865dda42f0c8341fe",
-        "validatedOnHead": true
-      },
-      "configIntegrityTests": {
-        "blobAtHead": "45c292c45f445628f5d36e02acfc54ac123f837d",
-        "validatedOnHead": true
-      }
-    },
-    "visualTest": {
-      "runId": 39778678707,
-      "testedSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
-      "exactShaMatch": false,
-      "applicationSourcePathsUnchangedSince": true,
-      "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/305fc139c22d682b4b6882af18d6d79836887cc7...368b3f26911f47f12cdb7ab6f300ad359283b9cc"
-    },
-    "note": "Snapshot is pre-docs commit; verify successor SHA separately."
+    "visualWorkflow": {
+      "id": 39784873281,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281",
+      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+      "status": "IN_PROGRESS",
+      "conclusion": null,
+      "jobId": 119845280271,
+      "steps": "repo checks and automated tests success; job continues in Playwright/Chromium stage; final Playwright and Preview smoke outcomes not yet verified"
+    }
   },
   "latestResponsiveThemePreviewEvidence": {
     "sourceSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
@@ -396,5 +380,37 @@
       "environment": "Preview"
     }
   },
-  "passPolicy": "Only count workflow evidence for the exact commit it tested. npm checks/green CI do not independently accept any screen."
+  "passPolicy": "Only count workflow evidence for the exact commit it tested. npm checks/green CI do not independently accept any screen.",
+  "latestLiveCheckpoint": {
+    "head": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "pr111": "OPEN/unmerged",
+    "pr108": "OPEN/unmerged; no writes to static branch",
+    "sourceRun": {
+      "id": 39784873315,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315",
+      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+      "conclusion": "success",
+      "checks": "npm run check PASS; npm test PASS; log confirmed activity-log regression assertion"
+    },
+    "previewRun": {
+      "id": 39784873281,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281",
+      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+      "status": "IN_PROGRESS",
+      "conclusion": null,
+      "jobId": 119845280271,
+      "steps": "repo checks and automated tests success; job continues in Playwright/Chromium stage; final Playwright and Preview smoke outcomes not yet verified"
+    },
+    "activityLog": {
+      "status": "IMPLEMENTED_SOURCE_AND_UNIT_TESTED; VISUAL/AUTHENTICATED_QA_NOT_VERIFIED",
+      "files": [
+        "public/admin/index.html",
+        "tests/admin-upgrade.test.mjs"
+      ],
+      "description": "Read-only activity log route uses existing GET /api/admin/audit-logs; search, action filter, refresh, error state, server limit disclosed; reachable from desktop navigation and mobile More; no new API/contract/mock data"
+    },
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL"
+  }
 }

@@ -32,3 +32,10 @@
 1. Audit #6 Orders and #7 Order detail independently; use existing evidence first and avoid duplicating captures.
 2. Continue other screens with actual matching reference/viewport/theme evidence.
 3. Keep PRs #111/#108 open and unmerged. No main/static writes, Production deploy, Access bypass, secrets, remote setup/deploy/migrations or D1/R2 access.
+
+
+## Incremental evidence — 2026-10-22T20:15:00+07:00
+- Exact source SHA: `340f50d6ed79afbe11e1db36c878c58f4eec77d6`. Source/unit workflow #4740 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315.
+- Screen #12 Activity log: **NOT VERIFIED (visual/authenticated QA)**. Source change adds a dedicated read-only page using existing `GET /api/admin/audit-logs`, search, action filter, refresh, load-error state, 200-record limit disclosure, desktop navigation and mobile “Khác”. Regression assertions passed in exact-HEAD source workflow. This is not sufficient to mark the screen PASS without viewport screenshots and authorized Preview/business-data verification.
+- Exact-HEAD responsive/Preview workflow #4741 remains IN_PROGRESS at checkpoint: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281. Do not infer screen acceptance from unit-test success.
+- Progress remains 50% PROVISIONAL; no new screen receives PASS without screen-specific evidence.

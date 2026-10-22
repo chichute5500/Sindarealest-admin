@@ -34,3 +34,12 @@ Mapping chuẩn: #1 Login, #2 Dashboard, #3 Product list, #4 Product editor, #5 
 4. Continue PR #111 path provenance. Preserve inherited files and never blind-revert.
 5. No merge #111/#108; no main/static writes; no Production deployment; no Access bypass; no secret read/change; no setup/deploy/migration or remote D1/R2 query/write; no invented product data, API contract or acceptance evidence.
 6. After every documentation write, read back all affected files from GitHub at resulting commit, report exact commit SHA and re-confirm both PRs open/unmerged.
+
+
+## Live checkpoint 2026-10-22T20:15:00+07:00 — use this before repeating any earlier steps
+- Verified ADMIN branch HEAD: `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; PR #111 OPEN/unmerged. PR #108 remains OPEN/unmerged; do not write to its static branch.
+- Exact-HEAD source workflow #4740: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315 — PASS, `npm run check`, `npm test`, and activity-log route regression assertions passed.
+- Exact-HEAD responsive/Preview workflow #4741: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281 — IN_PROGRESS at last poll. Source/unit steps passed; Chromium/Playwright and final Preview smoke outcomes are NOT VERIFIED yet. Poll this run and inspect job logs/artifacts before rerunning any tests.
+- Implemented a dedicated read-only Activity Log screen in `public/admin/index.html`, with regression assertions in `tests/admin-upgrade.test.mjs`. It uses existing authenticated GET `/api/admin/audit-logs`; includes search/action filter/manual refresh/error state, declares the 200-record server limit, and is reachable from desktop nav and mobile “Khác”. No new API contract, fake business data, remote writes, migration, or deployment.
+- Activity Log source/unit tests: PASS at `340f50d6ed79afbe11e1db36c878c58f4eec77d6`; visual/mobile/desktop and authenticated live-data QA: NOT VERIFIED. Do not mark screen #12 PASS based on source tests.
+- Keep progress **50% PROVISIONAL**. Next: (1) poll #4741 and inspect artifacts; (2) only fix reproducible source defects; (3) update screen #12 evidence after actual screenshots/Preview access; (4) continue remaining screen audit and PR scope audit without repeating valid exact-SHA checks.

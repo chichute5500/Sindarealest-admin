@@ -3,12 +3,12 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Live refs checked at 2026-10-22T19:59:12.897+07:00. Pre-write ADMIN HEAD 368b3f26911f47f12cdb7ab6f300ad359283b9cc. Validate #4737 passed npm run check and npm test on that exact SHA. Responsive/Preview run #316 used 305fc139c22d682b4b6882af18d6d79836887cc7, not an exact SHA match. Current docs-only commits will move HEAD again; fetch live refs before further work.",
-  "branchHeadAtCheckpoint": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
-  "branchHeadIsTestedSource": false,
+  "checkpointSemantics": "Live Git ref and PR #111 verified at 2026-10-22T20:15:00+07:00. HEAD 340f50d6ed79afbe11e1db36c878c58f4eec77d6. Source workflow #4740 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315) completed PASS on this exact SHA, including npm run check, npm test and activity-log regression assertion. Responsive/Preview run #4741 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281) is still in progress on the same SHA; do not claim visual or Preview PASS until final job conclusion and logs are checked. Dedicated read-only activity-log screen added in public/admin/index.html and tests/admin-upgrade.test.mjs. PR #111 OPEN/unmerged; PR #108 OPEN/unmerged; progress remains 50% PROVISIONAL.",
+  "branchHeadAtCheckpoint": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+  "branchHeadIsTestedSource": true,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Exact-HEAD source checks and unit tests passed, but full 12-screen acceptance, exact-HEAD responsive/Preview validation and authenticated business-module QA remain incomplete. Docs/CI alone do not raise completion.",
+  "progressBasis": "50% PROVISIONAL. Exact-HEAD source checks and unit tests pass, but exact-HEAD responsive/Preview run is still in progress, full 12-screen visual acceptance and authenticated business-module QA remain incomplete.",
   "sourceTreeComparison": {
     "sourceSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
     "checkpointHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
@@ -517,5 +517,37 @@
     "Continue #6 Orders and #7 Order detail separately; then remaining screens with independent evidence.",
     "Continue PR #111 path ancestry audit; preserve inherited files and do not blind-revert.",
     "Keep remote schema/migration/setup/deploy/Production operations deferred; no Access bypass or secret access."
-  ]
+  ],
+  "latestLiveCheckpoint": {
+    "head": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "pr111": "OPEN/unmerged",
+    "pr108": "OPEN/unmerged; no writes to static branch",
+    "sourceRun": {
+      "id": 39784873315,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873315",
+      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+      "conclusion": "success",
+      "checks": "npm run check PASS; npm test PASS; log confirmed activity-log regression assertion"
+    },
+    "previewRun": {
+      "id": 39784873281,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39784873281",
+      "sha": "340f50d6ed79afbe11e1db36c878c58f4eec77d6",
+      "status": "IN_PROGRESS",
+      "conclusion": null,
+      "jobId": 119845280271,
+      "steps": "repo checks and automated tests success; job continues in Playwright/Chromium stage; final Playwright and Preview smoke outcomes not yet verified"
+    },
+    "activityLog": {
+      "status": "IMPLEMENTED_SOURCE_AND_UNIT_TESTED; VISUAL/AUTHENTICATED_QA_NOT_VERIFIED",
+      "files": [
+        "public/admin/index.html",
+        "tests/admin-upgrade.test.mjs"
+      ],
+      "description": "Read-only activity log route uses existing GET /api/admin/audit-logs; search, action filter, refresh, error state, server limit disclosed; reachable from desktop navigation and mobile More; no new API/contract/mock data"
+    },
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL"
+  }
 }
