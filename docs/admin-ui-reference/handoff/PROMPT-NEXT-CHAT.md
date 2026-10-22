@@ -8,7 +8,7 @@
 - Read-only static branch: `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN/unmerged.
 - PR #111 live metadata: 1,314 changed files; mergeable=false.
 - Branch HEAD at checkpoint start: `9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e`. Latest source/test SHA: `105f46b90dc5664dd091493dbd5cea1af7796c44`.
-- Source validation [run #39816652373](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652373}) SUCCESS.
+- Source validation [run #39816652373](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652373) SUCCESS.
 - Responsive/theme Playwright and Preview diagnostic [run #39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346) SUCCESS on the same source/test SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`.
 - Latest artifact [admin-preview-evidence-344, ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210) is available. Inspect this artifact; do not fall back to older #339 unless comparing history.
 - Product progress **50% PROVISIONAL**. All 12 screens PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED.
