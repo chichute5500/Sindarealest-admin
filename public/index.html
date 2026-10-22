@@ -2916,10 +2916,31 @@ html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,
   mix-blend-mode:normal!important;opacity:1!important;transform:none!important;
   border-radius:0!important;box-shadow:none!important;
 }
-#home .hero-visual::before,#home .hero-visual::after,#home.hero:after{
+#home .hero-visual::after,#home.hero:after{
   content:none!important;display:none!important;background:none!important;
 }
 #home .hero-visual-glow,#home .hero-visual-caption{display:none!important}
+/* Ambient stage stays behind the original photo; it does not overlay, crop or tint image pixels. */
+#home .hero-visual{z-index:0!important}
+#home .hero-visual::before{
+  content:""!important;display:block!important;position:absolute!important;z-index:0!important;
+  inset:-10% -16%!important;border-radius:50%!important;pointer-events:none!important;
+  background:radial-gradient(ellipse at 52% 42%,rgba(210,219,225,.72) 0%,rgba(205,220,232,.40) 44%,rgba(205,220,232,0) 82%)!important;
+  filter:blur(18px)!important;
+}
+html.dark #home .hero-visual::before{
+  background:radial-gradient(ellipse at 52% 42%,rgba(225,230,233,.88) 0%,rgba(142,174,195,.52) 43%,rgba(38,77,105,0) 82%)!important;
+}
+#home .hero-visual img{
+  position:relative!important;z-index:1!important;
+  display:block!important;width:92%!important;height:auto!important;
+  max-width:100%!important;max-height:none!important;
+  object-fit:contain!important;object-position:center!important;padding:0!important;
+  filter:none!important;-webkit-mask:none!important;mask:none!important;
+  -webkit-mask-image:none!important;mask-image:none!important;clip-path:none!important;
+  mix-blend-mode:normal!important;opacity:1!important;transform:none!important;
+  border-radius:0!important;box-shadow:none!important;
+}
 @media(min-width:761px){
   #home .hero-visual{height:auto!important;min-height:0!important}
   #home .hero-visual img{height:auto!important;max-height:560px!important}
@@ -2942,7 +2963,7 @@ html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,
     justify-content:center!important;align-items:center!important;
   }
   #home .hero-visual img{
-    width:100%!important;height:auto!important;max-width:100%!important;max-height:210px!important;
+    width:92%!important;height:auto!important;max-width:100%!important;max-height:210px!important;
     margin:0!important;object-fit:contain!important;object-position:center!important;
   }
 }
