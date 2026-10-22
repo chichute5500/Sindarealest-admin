@@ -1,13 +1,23 @@
-# START HERE — LIVE (2026-10-22T18:44:39+07:00)
+# START HERE — SINDAREALEST ADMIN
 
-Canonical status/task queue: `handoff/current-status.json`. Previous long-form snapshots are preserved under `docs/admin-ui-reference/handoff/history/legacy-2026-10-22/`, not current status.
+## Snapshot
+- Pre-write ADMIN HEAD c002a34d0df955e4d804615f665d6ae5bedc4072 (https://github.com/chichute5500/Sindarealest-admin/commit/c002a34d0df955e4d804615f665d6ae5bedc4072). Its parent source-validation record is documented in LATEST-STATUS.md; this docs-only commit advances HEAD. Fetch the live refs and exact-SHA workflow run at every session start.
+- PR #111 OPEN/unmerged on feature/admin-isolated-handoff-2026-10-20. Protected PR #108 OPEN/unmerged on fix/liquid-glass-audit-2026-10-19; do not write to static branch.
+- Progress 50% PROVISIONAL; all 12 screens remain PARTIAL_NOT_ACCEPTED.
+- #3 Product list review closed as data-limited; #4 Product editor remains partial. Do not repeat geometry checks without new state or a reproducible defect. Next screen work: #6 Orders and #7 Order detail independently.
+- Migration 0009 source preflight is tested; remote schema/ledger NOT VERIFIED and migration DEFERRED_BY_OWNER. Setup's 0009 gate follows earlier remote migrations; do not run setup.
 
-- Repo `chichute5500/Sindarealest-admin`; ADMIN branch `feature/admin-isolated-handoff-2026-10-20`; PR #111 OPEN/unmerged.
-- Parent HEAD before documentation consolidation: `b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e`. [Validate #39769095034](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769095034) SUCCESS on exact SHA.
-- [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) / [artifact #311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829) SUCCESS on visual source `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`: 99 PNG, 75 fixture metrics, read-only.
-- **Progress 50% PROVISIONAL.** Product list #3, editor #4 and all 12-screen parity remain unaccepted. Authenticated backend QA NOT_TESTED.
-- Opened the approved poster and #3 screenshot at 390×844 light. Truthful fixture placeholders/unknown price-stock are not permission to fabricate product data.
-- Correct numbering: #6 Orders, #7 Order detail, #11 Backup/Restore, #12 Activity log. Classification belongs to #3/#4; AI grouping is a separate BLOCKED feature.
-- PR #111 diff census: 1,285 paths and mixed Admin/storefront/API/migration/deploy scope. See `PR-111-SCOPE-AUDIT.md`.
+## Canonical files
+1. PROMPT-NEXT-CHAT.md — paste-ready transfer prompt.
+2. current-status.json — refs, checkpoint, progress, queue and scope.
+3. latest-test-results.json — exact-SHA source checks versus visual evidence.
+4. LATEST-STATUS.md — human-readable summary.
+5. 12-SCREEN-REFERENCE-AUDIT.md — official screen numbering and acceptance.
+6. PR-111-SCOPE-AUDIT.md — source provenance, schema/API/deploy risks.
+7. PROMPT-COMPLETENESS-AUDIT.md — checklist of handoff completeness.
 
-Next: finish #3 matched-state comparison → #4 → #6/#7 → remaining screens → read-only PR scope ancestry audit. No merge, main/static edits, Production deployment, Access/secrets bypass, or remote D1/R2 writes/migrations.
+## Anti-duplication
+- Every PASS must match workflow head_sha to the relevant source SHA. Older run evidence remains contextual only.
+- Do not rerun #3/#4 geometry absent a new state, changed app source or reproducible bug.
+- Never invent product photos/prices/stock, API contracts or acceptance evidence.
+- No merge, main/static writes, Production deployment, Access bypass, secret access, remote D1/R2 queries/writes, setup/deploy/migration.

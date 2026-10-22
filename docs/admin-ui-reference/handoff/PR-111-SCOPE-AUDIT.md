@@ -1,80 +1,64 @@
 # PR #111 — READ-ONLY SCOPE AND DEPLOYMENT READINESS AUDIT
 
-**Checked:** 2026-10-22T19:15:21.463+07:00  
-**PR #111:** [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111)  
-**ADMIN HEAD observed before this docs checkpoint:** e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe  
-**Protected static PR #108:** [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), live head e3328dee37b125c5821bcaad03199afc44ed06fa. This audit is updated on the ADMIN branch only.
+**Checkpoint:** 2026-10-22T20:00:23.859+07:00
+**Pre-write ADMIN HEAD:** c002a34d0df955e4d804615f665d6ae5bedc4072
+**PR #111:** OPEN/unmerged, base main. **Protected PR #108:** OPEN/unmerged, snapshot head ebdd5e657c317490ce7747056ffa37be8c65ab0c. This file is updated only on the ADMIN branch.
 
-## 1. Live changed-file census
-
-GitHub live PR file-list endpoint returned **1,296 paths**.
+## 1. Live file census
+PR #111 currently reports 1,298 changed paths.
 
 | Top-level path | Count |
 |---|---:|
 | .github/ | 2 |
 | README-DEPLOY.txt | 1 |
 | data/ | 1 |
-| docs/ | 1,233 |
+| docs/ | 1,235 |
 | functions/ | 24 |
 | migrations/ | 2 |
 | package.json | 1 |
 | public/ | 2 |
 | scripts/ | 5 |
 | tests/ | 25 |
-| **Total** | **1,296** |
+| **Total** | **1,298** |
 
-By extension: PNG 913, MD 164, JSON 156, MJS 28, JS 26, HTML 3, YML 2, SQL 2, TXT 1, ZIP 1.
+Extensions: PNG 913, MD 165, JSON 157, MJS 28, JS 26, HTML 3, YML 2, SQL 2, TXT 1, ZIP 1.
 
-## 2. Branch ancestry and provenance
+Live compare from static HEAD ebdd5e657c317490ce7747056ffa37be8c65ab0c to ADMIN HEAD c002a34d0df955e4d804615f665d6ae5bedc4072: DIVERGED, ADMIN ahead 931, static ahead 926, merge base a3834fed3eb1c012b188d7c95d14ec3d15e3969f. Compare URL: https://github.com/chichute5500/Sindarealest-admin/compare/ebdd5e657c317490ce7747056ffa37be8c65ab0c...c002a34d0df955e4d804615f665d6ae5bedc4072. This is a snapshot, not a permanent value; re-fetch refs before another write.
 
-Live compare from static head e3328dee37b125c5821bcaad03199afc44ed06fa to ADMIN head e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe:
-- Status: DIVERGED.
-- Merge base: a3834fed3eb1c012b188d7c95d14ec3d15e3969f.
-- ADMIN ahead: 904 commits; static ahead: 920 commits at the checked heads.
-- Do not merge/sync the two working branches as a routine operation. Do not revert files blindly just because they appear in PR #111's diff against main.
+## 2. Ancestry versus later edits
+Paths with ancestry before the split point include public/index.html, .github/workflows/liquid-glass-visual-preview.yml, scripts/setup-cloudflare.mjs and scripts/deploy-cloudflare.mjs. The setup/deploy files still contain post-split ADMIN changes; inherited file origin does not make every current line inherited. Never blind-revert because a path is present in the diff against main.
 
-Path histories recorded in the prior scope audit show these were inherited before the split point:
-- public/index.html
-- .github/workflows/liquid-glass-visual-preview.yml
-- scripts/setup-cloudflare.mjs
-- scripts/deploy-cloudflare.mjs
+Post-split changes reviewed:
+- Setup 0009 gate: ca06ac02253644ed0290c5bca343c33a872010d0; current blob ec1c614048b84657ef8824d865dda42f0c8341fe.
+- Deploy 0009 gate: 6ad36a5bbb3b7ffb5ee2f90d5df0eb4d47c75972; current blob 9a1e30c770527f27f20210b9ceb98ca25244f771.
+- Regression checks: 305fc139c22d682b4b6882af18d6d79836887cc7; current test blob 45c292c45f445628f5d36e02acfc54ac123f837d.
+- Migration 0009 was introduced in 75a60f760e01341c6e4cc02faec1f53642ebe94e and later amended in 24181fd2fb166bc13fb7840d77cb53cefa30035a.
+- Payment request route: 2045892129184ea62d203c1f6578ad33683cbd6a adds rejection for unpriced order lines; 0f197e8d1892c7635ae4b953ec25b94f6bce63f6 fails closed if the active QR asset is missing.
+- Transaction route: d3fa9b85be20d832cbf24678dd7f3c7d862c1e64 adds the atomic net-refund guard.
+- Full per-path provenance for all 1,298 paths remains IN PROGRESS.
 
-Their presence in the PR diff does not prove recent Admin-specific authorship. Preserve and classify each path by history before considering any scope change.
+## 3. Migration 0009 / setup-deploy sequencing
+Migration 0009 adds conservative unclassified fulfillment defaults, payment-term confirmation fields, an order capability-token hash and payment-request/payment-transaction ledger tables with constraints/indexes.
 
-The prior path audit identifies these as Admin-owned/post-merge-base changes requiring focused contract/schema review:
-- .github/workflows/admin-preview-diagnostics.yml
-- migrations/0009_fulfillment_and_manual_payments.sql
-- functions/api/admin/payment-requests.js
-- functions/api/admin/payment-transactions.js
+Both setup and deploy source include read-only SELECT ... LIMIT 0 schema checks for 0009 columns/tables. Current tests/config-integrity.test.mjs asserts the required queries, no automatic migration 0009 execution and the preflight order. Validate #4737 passed npm run check and npm test on the preceding exact source HEAD 368b3f26911f47f12cdb7ab6f300ad359283b9cc: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597.
 
-## 3. Potential migration/setup/deploy readiness issue
+**Critical setup caveat:** scripts/setup-cloudflare.mjs reaches the 0009 preflight only after remote migration commands 0001 and 0003–0008. The 0009 queries are read-only and block seed/Pages deployment, but the full setup script is not read-only and may already have changed schema before a missing-0009 error. Do NOT execute setup, deploy or migration in this task.
 
-Source-only review to date indicates migration 0009 introduces fulfillment/manual-payment schema while setup/deploy scripts do not clearly preflight its readiness. The local migration checker validates scripts against temporary/local D1; this does not prove the remote D1 migration ledger or schema state.
+Remote D1 schema/migration ledger are NOT VERIFIED. Temporary local D1 checks cannot prove remote readiness. Migration 0009 stays DEFERRED_BY_OWNER.
 
-Status: **POTENTIAL_BLOCKER_NOT_VERIFIED**. Do not query or write remote D1/R2, run migrations, or execute setup/deploy scripts. Next safe work is inspect exact migration statements and route schema dependencies, then add/adjust local-only regression/preflight tests only if a reproducible source gap is confirmed and the expected fail-closed behavior is unambiguous.
+## 4. Payment API source review
+Payment-request handlers require Admin authentication, reject client-provided amount, require confirmed pricing/terms, validate item totals, reject unpriced/mixed/unclassified fulfillment and invalid active QR. Amounts are server-derived: 30% made-to-order deposit, 100,000 VND in-stock deposit, total for full payment, ledger-calculated balance.
 
-## 4. Latest visual evidence and source delta
+Payment-transaction handler validates amounts/references, rejects duplicates, blocks receipts on cancelled/unconfirmed orders, caps refunds at verified net receipts and rechecks the amount in the atomic D1 batch. Status/audit updates require successful ledger insertion. Local route tests cover refund races and fail-closed cases; they are not authenticated remote backend QA.
 
-- [Validate #39767851282](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851282) and [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) succeeded on visual/application source SHA dca19a2af32a78390878b9ccfa5c7c26b816f2ff.
-- [Artifact #311 / ID 12420678829](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829) is fixture/read-only: 99 PNGs, 75 UI fixture metrics; not authenticated backend QA.
-- Product list #3 screenshots/metrics reviewed at 320×640 and 360×800 light/dark; no horizontal overflow was recorded, but three UI-only products prevent multi-page pagination and content-density acceptance.
-- Product editor #4 reviewed at 390×844 light/dark and 1280×800 light; tests cover tabs, keyboard navigation, checkbox/button geometry and footer, but not real save/backend data.
-- Comparing visual source dca19a2af32a78390878b9ccfa5c7c26b816f2ff to pre-write ADMIN HEAD e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe: 21 commits and 22 changed paths, all handoff/docs/reference files; application source unchanged.
-- No workflow/check run is asserted for the exact docs-only pre-write HEAD; previous successes must be labelled with their exact tested SHA.
-- Progress remains **50% PROVISIONAL**; no screen accepted from this evidence.
+## 5. Workflow and evidence limits
+- [Validate #4737](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597) passed npm run check and npm test on 368b3f26911f47f12cdb7ab6f300ad359283b9cc.
+- [Preview run #316](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707) and [artifact ID 12426370257](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707/artifacts/12426370257) use SHA 305fc139c22d682b4b6882af18d6d79836887cc7. Logs record 3 local Playwright tests and 2 limited Preview smoke tests passed; not exact HEAD or full 12-screen/business QA.
+- admin-preview-diagnostics.yml pins checkout to github.sha and avoids persisting stale evidence if branch HEAD moved. contents:write exists for committing evidence; least-privilege review remains open.
+- An older #315 failure at ca06ac0 was an earlier assertion-order regression; later test updates and exact-HEAD check/test evidence pass.
+- No Production deploy, remote D1/R2 query/write, setup or migration was performed.
 
-## 5. Next actions and guardrails
+## 6. Findings / next actions
+Confirmed: exact-source check and unit tests passed on the recorded pre-write HEAD; 0009 preflight and ordering guards exist; payment route safeguards have local test coverage. Not verified: remote schema/ledger, exact-current-HEAD responsive/Preview, authenticated business-module QA, complete PR ancestry and all 12 screen acceptances.
 
-1. Inspect .github/workflows/admin-preview-diagnostics.yml permissions, triggers, and logic guarding screenshot persistence against stale HEAD; do not expose secrets.
-2. Compare migration 0009 with payment-requests/payment-transactions route dependencies and local migration tests.
-3. Audit setup/deploy scripts and decide whether an explicit, fail-closed local preflight/regression is justified; do not run either script.
-4. Continue the 12-screen audit independently for each official poster screen.
-5. Keep PR #111/#108 OPEN/unmerged; do not edit main/static, deploy Production, bypass Cloudflare Access, or use remote D1/R2. AI grouping is BLOCKED pending approved contract; R2 image save and PRE/PRO migrations remain DEFERRED_BY_OWNER.
-
-## Update — migration 0009 preflight and workflow review (2026-10-22)
-
-- Source commit `3658ca1069616639b825de2cd7b9c714ce560901` adds read-only `SELECT ... LIMIT 0` schema checks to `scripts/setup-cloudflare.mjs` and `scripts/deploy-cloudflare.mjs`, with regression assertions in `tests/config-integrity.test.mjs`. Both paths fail closed before Pages deploy if expected columns/tables are unavailable. No automatic migration 0009 invocation was added.
-- Workflow [#39778009734](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734) passed `npm run check`, `npm test`, responsive/theme Playwright capture, safe Preview diagnostics and artifact upload. Artifact [#314](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948) was downloaded and inspected.
-- Read-only workflow review at blob `bfc42beeb3506289975f277af95b0d4db314a0f4`: trigger limited to the ADMIN branch and relevant paths plus manual dispatch; checkout pins `${{ github.sha }}`; before evidence commit, it compares remote ADMIN branch SHA to `GITHUB_SHA` and skips stale evidence; it does not force-push. `permissions: contents: write` is workflow-wide because evidence is committed. Least-privilege scoping remains a possible improvement, but no permission edit was made without validating GitHub Actions token semantics.
-- Migration 0009 schema and payment routes are consistent for the columns queried by the preflight. Remote D1 schema remains NOT VERIFIED. No remote D1/R2 read/write, setup, deployment or migration was executed.
-- Classification: preflight gap mitigated in source and regression-tested; remote readiness is NOT VERIFIED, not PASS. Preserve inherited `scripts/setup-cloudflare.mjs` / `scripts/deploy-cloudflare.mjs`; do not revert blindly.
+Next safe work: audit Orders #6 and Order detail #7 independently, continue remaining screens and PR path provenance. Keep both PRs OPEN/unmerged. No main/static edits, Production, Access bypass, secrets, remote D1/R2, setup/deploy/migration. AI grouping BLOCKED; R2 image save and PRE/PRO migrations DEFERRED_BY_OWNER.

@@ -1,73 +1,34 @@
-# ADMIN — 12-SCREEN REFERENCE AUDIT (CANONICAL MAPPING)
+# ADMIN — 12-SCREEN REFERENCE AUDIT
 
-**Checkpoint:** 2026-10-22T19:15:21.463+07:00 · pre-write ADMIN HEAD e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe
-**Visual evidence:** [Preview #39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318), [artifact #311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829), source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`. Artifact: 99 PNGs (16 login shell + 83 fixtures) and 75 metrics. [Validate exact parent HEAD #39769095034](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769095034) SUCCESS.
-
-Older status text misnumbered Category #6, AI grouping #11 and Backup/Restore #12. The poster's real mapping is below; the old wording is archived at `docs/admin-ui-reference/handoff/history/legacy-2026-10-22/12-SCREEN-REFERENCE-AUDIT.md`.
+## Checkpoint 2026-10-22T20:00:23.859+07:00
+- Pre-write ADMIN HEAD: c002a34d0df955e4d804615f665d6ae5bedc4072 (https://github.com/chichute5500/Sindarealest-admin/commit/c002a34d0df955e4d804615f665d6ae5bedc4072). PR #111 was OPEN/unmerged; the next docs-only commit advances HEAD.
+- Validate #4737 passed source checks and tests on preceding source SHA 368b3f26911f47f12cdb7ab6f300ad359283b9cc: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597. The screens were not accepted by that result.
+- Responsive/Preview run #316 and artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707/artifacts/12426370257 use SHA 305fc139c22d682b4b6882af18d6d79836887cc7, not this HEAD. Application source paths were unchanged in the compared range, but exact-SHA policy still says visual acceptance at current HEAD is NOT VERIFIED.
+- Keep progress 50% PROVISIONAL. Do not repeat #3/#4 geometry without a new state, approved fixture, or reproducible defect.
 
 | # | Official reference screen | Status | Evidence / gap |
 |---:|---|---|---|
-| 1 | Login | PARTIAL_NOT_ACCEPTED | Login shell tests only. |
-| 2 | Dashboard | PARTIAL_NOT_ACCEPTED | Fixture/no-data state; do not invent chart data. |
-| 3 | Product list | PARTIAL_NOT_ACCEPTED | Artifact #311 metrics reviewed at 320×640 and 360×800 light/dark; no overflow. Filter/search/edit-to-open covered by fixture tests; poster data parity and multi-page pagination unproven (3 fixtures / 12 per page). Review closed as data-limited, not accepted. |
-| 4 | Product editor | PARTIAL_NOT_ACCEPTED | Opened 390×844 light/dark and 1280×800 light. Existing tests cover tabs/keyboard, fields, SKU-checkbox geometry, AI-button placement and footer geometry; no authenticated save/AI result or whole-screen acceptance. |
-| 5 | Product gallery | PARTIAL_NOT_ACCEPTED | Regression evidence exists on prior SHA; R2 deferred. |
-| 6 | Orders | PARTIAL_NOT_ACCEPTED | Fixture list/filter evidence only; compare to poster. |
-| 7 | Order detail | PARTIAL_NOT_ACCEPTED | Verify totals, timeline, status controls and guarded actions independently. |
-| 8 | Customers | PARTIAL_NOT_ACCEPTED | Fixture search tests; do not invent avatar photos or segmentation. |
-| 9 | Warranty/support | PARTIAL_NOT_ACCEPTED | Fixture checks; live-data parity not accepted. |
-| 10 | Website settings | PARTIAL_NOT_ACCEPTED | Compare settings groups and toggles. |
-| 11 | Backup/Restore | PARTIAL_NOT_ACCEPTED | UI checks do not prove actual export/restore. |
+| 1 | Login | PARTIAL_NOT_ACCEPTED | Login shell and limited Preview smoke only. |
+| 2 | Dashboard | PARTIAL_NOT_ACCEPTED | Fixture/no-data state; no invented business data. |
+| 3 | Product list | PARTIAL_NOT_ACCEPTED | 320×640 and 360×800 light/dark metrics show no horizontal overflow; status/search/category/fulfillment filters and edit-to-open covered by fixture tests. Three fixture products and page size 12 mean multi-page pagination/content density is unproven. Placeholder photos and unknown price/stock remain truthful. No independent source defect proven. |
+| 4 | Product editor | PARTIAL_NOT_ACCEPTED | 390×844 light/dark and 1280×800 light; tabs/keyboard/fields/SKU checkbox geometry/AI button/footer reviewed. Real SKU persistence, backend save, AI response and whole-screen parity remain unproven. |
+| 5 | Product gallery | PARTIAL_NOT_ACCEPTED | Prior regression evidence exists; actual R2 image persistence is deferred. |
+| 6 | Orders | PARTIAL_NOT_ACCEPTED | Next distinct audit: filters, totals, statuses, empty/loading/error states and responsive layout with screen-specific evidence. |
+| 7 | Order detail | PARTIAL_NOT_ACCEPTED | Inspect totals, payment timeline, fulfillment, status controls and guarded actions independently of #6. |
+| 8 | Customers | PARTIAL_NOT_ACCEPTED | Fixture search only; no invented avatars/segments. |
+| 9 | Warranty/support | PARTIAL_NOT_ACCEPTED | Fixture checks only; live-data parity unaccepted. |
+| 10 | Website settings | PARTIAL_NOT_ACCEPTED | Compare settings groups and toggle states independently. |
+| 11 | Backup/Restore | PARTIAL_NOT_ACCEPTED | UI checks do not prove a real export/restore cycle. |
 | 12 | Activity log | PARTIAL_NOT_ACCEPTED | Fixture log is not live audit-log acceptance. |
 
-## Cross-cutting
-- Viewports: 320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900. Matrix coverage is PARTIAL; record only actually exercised combinations.
-- Light/dark and accessibility: PARTIAL.
-- Product classification: capability inside #3/#4, PARTIAL_EXISTING_CONTROLS_ONLY.
-- AI image review/grouping: BLOCKED separate feature; no approved route, controls, API or behavior contract.
-- Authenticated backend QA: NOT_TESTED; R2 and PRE/PRO: DEFERRED_BY_OWNER.
-- No screen PASS from CI, fixture screenshots, one assertion or login smoke alone.
+## Acceptance rules
+- Viewport matrix: 320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900. Report only states actually tested, including theme and state.
+- Each screen requires PASS / FAIL / BLOCKED / NOT VERIFIED, exact source SHA, viewport/theme, artifact/workflow URL, test scope and residual limitations.
+- Product classification belongs to #3/#4. AI image grouping is a separate BLOCKED feature, not screen #11.
+- Authenticated business/backend QA remains NOT_TESTED despite limited login/dashboard smoke. Remote migration 0009 schema is NOT VERIFIED and DEFERRED_BY_OWNER.
+- No screen PASS from shared CI, a fixture screenshot, a single assertion, or evidence from a different screen.
 
 ## Next
-1. Finish #3 matched viewport/theme comparison and change only demonstrated ADMIN-only defects.
-2. Complete #4, then #6 and #7 as separate screens.
-3. Continue remaining screens and PR #111 read-only ancestry/scope audit. Keep PRs open/unmerged.
-
-
-## Visual comparison checkpoint — 2026-10-22T21:05:00+07:00
-
-- Reference: `docs/admin-ui-reference/admin-mobile-reference.png`; artifact [#311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829), source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`.
-- Opened the poster and the `products-reference-matrix__390x844__light.png` screenshot from the downloaded artifact ZIP. Screenshot is a synthetic fixture with three product rows, explicit placeholder thumbnails, unknown prices and unverified stock; the poster's sample products have photos and filled commercial fields.
-- Finding: data-state mismatch prevents a fair card-density/content-parity judgment. It is not evidence that source should fabricate images, price or stock. The visible UI has search, category/fulfillment filters, publish-state chips, edit controls and pagination; full screen #3 remains NOT_ACCEPTED.
-- No source code changed in this checkpoint because no specific, reproducible ADMIN-only visual defect was established from the available fixture screenshot. Next compare the same #3 state at 320×640 and 360×800 light/dark, inspect relevant metrics, then change source only if a concrete defect independent of missing fixture data is proven.
-- This is a docs-only checkpoint, not a screen acceptance or progress increase.
-
-
-### Additional narrow-viewport review — 2026-10-22T21:12:00+07:00
-Opened artifact #311 screenshots for #3 at 320×640 light/dark and 360×800 light/dark. No clear horizontal page overflow was apparent in these captures; at 320px, product names are intentionally ellipsized and SKU/category details wrap. The same fixture-data mismatch remains, and these screenshots alone do not establish complete card/action/filter/pagination parity. Screen #3 remains NOT_ACCEPTED; no source edit justified from the evidence inspected so far.
-
-
-## Live evidence checkpoint — 2026-10-22T19:15:21.463+07:00
-
-### #3 Product list — review closed as data-limited, screen not accepted
-- Preview [#39767851318](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318) / artifact [#311, ID 12420678829](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829) was downloaded and inspected directly. Fixture audit is synthetic/read-only: 3 UI-only products, no actual photos or verified price/stock, all non-GET API calls blocked.
-- Inspected products-reference-matrix screenshots at 320×640 light/dark and 360×800 light/dark, plus 390×844 light. Four target metrics show documentWidth 320/360; wrapper client/scroll widths 292/332 and equal respectively; horizontalOverflow=false. Artifact metadata records zero page/console errors, failed requests or HTTP errors.
-- Existing tests/e2e/admin-static-baseline.spec.js verifies status-filter chips/counts, case-insensitive category text search, category/fulfillment filter interactions, no-result/clear, truthful placeholders, responsive card layout and edit-to-open. It does not test pagination with more than one page: 3 fixture records / 12 per page yields page 1 of 1. Poster photos/real-looking commercial values cannot be substituted as fixture facts.
-- Result: review closed as data-limited, no independent source defect proven; no source code change. #3 remains PARTIAL_NOT_ACCEPTED.
-
-### #4 Product editor — review partial, no source defect proven
-- Opened product-editor screenshots at 390×844 light/dark and 1280×800 light from artifact #311. Metrics show document width equals viewport and no horizontal overflow in those states. Screens expose the tabs, title/category fields, SKU and confirmation checkbox, AI description suggestion control, truthful blank price/stock placeholders and footer actions.
-- Existing tests/e2e/admin-static-baseline.spec.js cover tab switching/ARIA and ArrowLeft/ArrowRight/Home/End, SKU checkbox naming/position, AI button geometry, price/stock alignment and fixed/sticky footer geometry. They do not prove SKU toggle persistence, successful AI endpoint results, actual save behavior or authenticated business parity; fixture mode blocks writes.
-- Result: partial review only; #4 remains PARTIAL_NOT_ACCEPTED. Do not repeat the same geometry checks without a new test state.
-
-### Scope freshness and next action
-- Live PR #111 pre-write head e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; PR #108 head e3328dee37b125c5821bcaad03199afc44ed06fa; both OPEN/unmerged. PR #111 file census is 1,296 paths. Branch merge base a3834fed3eb1c012b188d7c95d14ec3d15e3969f; comparison status diverged, ADMIN ahead 904 and static ahead 920 at the checked heads.
-- App source SHA dca19a2af32a78390878b9ccfa5c7c26b816f2ff remains unchanged across 21 commits / 22 paths compared with pre-write ADMIN HEAD; only handoff/docs/reference paths changed. No run is claimed for the exact docs-only HEAD.
-- Next inspect the Admin Preview workflow, migration 0009, payment routes and setup/deploy schema preflight. No remote D1/R2 query/write, migration, setup or deploy. Keep both PRs open and unmerged.
-
-## Evidence update — workflow #39778009734 (source 3658ca1)
-
-- Workflow [#39778009734](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734) succeeded on source SHA `3658ca1069616639b825de2cd7b9c714ce560901`; repository checks, automated tests, local Playwright matrix, safe Preview diagnostics and artifact upload passed. Artifact [#314 / ID 12425910948](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948) contains screenshots and synthetic/read-only fixture evidence; it is not authenticated backend QA.
-- #4 Product editor: opened `product-editor__390x844__light.png`. Screenshot shows basic/info-image-other tabs, title/category, SKU and confirmation checkbox, AI description suggestion, truthful blank price/stock fields and fixed footer. No new independent source defect is established; SKU persistence, real save and AI result remain NOT VERIFIED. #4 remains PARTIAL_NOT_ACCEPTED.
-- #7 Order detail: opened `order-row-details__390x844__light.png`. Fixture shows summary/customer/product and fixed footer action. This is synthetic UI-only data and does not verify the real order action flow or payment/status controls. #7 remains PARTIAL_NOT_ACCEPTED.
-- Progress stays 50% PROVISIONAL; no screen accepted from this artifact.
+1. Audit #6 Orders and #7 Order detail independently; use existing evidence first and avoid duplicating captures.
+2. Continue other screens with actual matching reference/viewport/theme evidence.
+3. Keep PRs #111/#108 open and unmerged. No main/static writes, Production deploy, Access bypass, secrets, remote setup/deploy/migrations or D1/R2 access.
