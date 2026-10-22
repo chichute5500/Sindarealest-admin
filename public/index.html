@@ -564,6 +564,15 @@ body:has(#welcomeSplash) #cartDrawer,
 body:has(#welcomeSplash) #checkoutDrawer,
 body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX(105%)!important}
 </style>
+<style id="sd-icon-order-flow-2026-10-22">
+/* Use the approved thin-stroke SVG language for the order flow and aftercare icons. */
+#order .order-icon svg,
+#order .order-commitment-icon svg{display:block;width:15px;height:15px;flex:0 0 auto}
+@media(max-width:760px){
+ #order .order-icon svg,
+ #order .order-commitment-icon svg{width:14px;height:14px}
+}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -635,13 +644,13 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
     <div id="orderDetailsPanel" class="order-details-panel" hidden>
     <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title">Đặt hàng từng bước rõ ràng</h2></div><p class="section-note">Bốn bước rõ ràng; mọi điều kiện quan trọng được xác nhận trước khi đặt cọc.</p></div>
     <div class="order-steps" role="list" aria-label="Quy trình đặt hàng gồm bốn bước">
-      <article class="order-step glass" role="listitem" data-reveal><div class="order-step-top"><span class="order-number" aria-label="Bước 1">01</span><span class="order-icon" aria-hidden="true">◇</span></div><h3>Chọn sản phẩm</h3><p>Chọn mẫu yêu thích và ghi lại tên mẫu để được tư vấn nhanh.</p></article>
-      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:60ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 2">02</span><span class="order-icon" aria-hidden="true">✧</span></div><h3>Xác nhận đơn hàng</h3><p>Thống nhất mẫu, giá và yêu cầu trước khi đặt hàng.</p></article>
-      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:120ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 3">03</span><span class="order-icon" aria-hidden="true">◷</span></div><h3>Đặt cọc & chế tác</h3><p>Đặt cọc <strong>30%</strong>. Thời gian dự kiến <strong>5–20 ngày</strong>, tùy sản phẩm.</p></article>
-      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:180ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 4">04</span><span class="order-icon" aria-hidden="true">✓</span></div><h3>Nhận hàng & hậu mãi</h3><p>Kiểm tra sản phẩm trước khi nhận; bảo hành <strong>1 năm</strong>, bảo dưỡng trọn đời.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal><div class="order-step-top"><span class="order-number" aria-label="Bước 1">01</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="product" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2"/></svg></span></div><h3>Chọn sản phẩm</h3><p>Chọn mẫu yêu thích và ghi lại tên mẫu để được tư vấn nhanh.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:60ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 2">02</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="confirmation" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5.5" y="4.5" width="13" height="16" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h5.5M8.5 13.5H12M14.5 15.5l1.5 1.5 3-3"/></svg></span></div><h3>Xác nhận đơn hàng</h3><p>Thống nhất mẫu, giá và yêu cầu trước khi đặt hàng.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:120ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 3">03</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="production" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3.2 1.9"/></svg></span></div><h3>Đặt cọc & chế tác</h3><p>Đặt cọc <strong>30%</strong>. Thời gian dự kiến <strong>5–20 ngày</strong>, tùy sản phẩm.</p></article>
+      <article class="order-step glass" role="listitem" data-reveal style="--reveal-delay:180ms"><div class="order-step-top"><span class="order-number" aria-label="Bước 4">04</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="complete" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.3 2.3 2.3 4.8-5"/></svg></span></div><h3>Nhận hàng & hậu mãi</h3><p>Kiểm tra sản phẩm trước khi nhận; bảo hành <strong>1 năm</strong>, bảo dưỡng trọn đời.</p></article>
     </div>
     <div class="order-assurance-footer glass" data-reveal>
-      <div class="order-commitment"><span class="order-commitment-icon" aria-hidden="true">✦</span><div class="order-commitment-copy"><strong>Cam kết hậu mãi</strong><span>Bảo hành 1 năm <i aria-hidden="true">·</i> Bảo dưỡng trọn đời <i aria-hidden="true">·</i> Hoàn thiện thủ công <i aria-hidden="true">·</i> Đặt hàng theo yêu cầu</span></div></div>
+      <div class="order-commitment"><span class="order-commitment-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="aftercare" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3 19 6v5.3c0 4.4-2.9 7.6-7 9.7-4.1-2.1-7-5.3-7-9.7V6l7-3Z"/><path d="m8.5 11.9 2.2 2.2 4.7-4.5"/></svg></span><div class="order-commitment-copy"><strong>Cam kết hậu mãi</strong><span>Bảo hành 1 năm <i aria-hidden="true">·</i> Bảo dưỡng trọn đời <i aria-hidden="true">·</i> Hoàn thiện thủ công <i aria-hidden="true">·</i> Đặt hàng theo yêu cầu</span></div></div>
       <a class="pill-btn primary tap-target order-zalo-cta" title="Trao đổi trực tiếp qua Zalo" href="https://zalo.me/0827049192" target="_blank" rel="noopener noreferrer" aria-label="Tư vấn hoặc đặt hàng qua Zalo"><span class="order-zalo-mark" aria-hidden="true">Z</span><span>Tư vấn/đặt hàng qua Zalo</span><span aria-hidden="true">↗</span></a>
     </div>
     </div>

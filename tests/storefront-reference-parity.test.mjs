@@ -272,3 +272,24 @@ assert.ok(desktopHeroEdgeBlend.includes('linear-gradient(180deg,rgba(4,20,34,0) 
   'Dark desktop hero must fade the source photo tabletop into the navy satin canvas.');
 assert.ok(desktopHeroEdgeBlend.includes('#home .hero-visual-caption{position:absolute;z-index:3}'),
   'The hero caption must remain above the photo edge blend.');
+
+// Reference-driven icon pass: replace the five text glyphs in order flow/aftercare with coherent 24x24 SVG strokes.
+const orderIconMarkup = [...html.matchAll(/<span class="order-icon" aria-hidden="true">([\s\S]*?)<\/span>/g)].map(match => match[1]);
+assert.equal(orderIconMarkup.length, 4, 'The four order steps must each retain one icon.');
+assert.deepEqual(
+  orderIconMarkup.map(markup => markup.match(/data-order-icon="([^"]+)"/)?.[1]),
+  ['product', 'confirmation', 'production', 'complete'],
+  'Order-step icons must represent product selection, confirmation, production timing and completion in order.'
+);
+assert.ok(
+  orderIconMarkup.every(markup => /<svg\b[^>]*viewBox="0 0 24 24"[^>]*stroke-width="1\.7"/.test(markup)),
+  'Order-step SVGs must share the 24x24 viewBox and thin 1.7 stroke specified by the icon reference.'
+);
+assert.doesNotMatch(orderIconMarkup.join(''), /[◇✧◷✓]/,
+  'Order steps must not use the text glyphs identified in the icon inventory.');
+const aftercareIconMarkup = html.match(/<span class="order-commitment-icon" aria-hidden="true">([\s\S]*?)<\/span>/)?.[1] || '';
+assert.match(aftercareIconMarkup, /<svg\b[^>]*data-order-icon="aftercare"[^>]*stroke-width="1\.7"/,
+  'Aftercare commitment must use the matching thin-stroke shield/check SVG.');
+assert.match(html, /id="sd-icon-order-flow-2026-10-22"[\s\S]*#order \.order-icon svg,[\s\S]*width:15px;height:15px[\s\S]*@media\(max-width:760px\)[\s\S]*width:14px;height:14px/,
+  'Order SVGs must remain compact within the existing glass icon circles on desktop and mobile.');
+
