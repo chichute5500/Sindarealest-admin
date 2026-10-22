@@ -882,7 +882,7 @@ function showOrderDetails(id){
 }
 async function returnToOrderList(id,focusActions=false){
  const targetId=String(id||selectedOrderId||'');selectedOrderId='';await setView('orders');
- const target=Array.from(document.querySelectorAll('[data-order-row]')).find(element=>element.dataset.orderRow===targetId);
+ const target=Array.from(document.querySelectorAll('[data-order-row]')).find(element=>element.dataset.orderRow===targetId&&element instanceof HTMLElement&&element.getClientRects().length>0&&getComputedStyle(element).visibility!=='hidden'&&!element.closest('[aria-hidden="true"]'));
  if(target){target.scrollIntoView({block:'center',behavior:'auto'});const findVisibleAction=selector=>Array.from(target.querySelectorAll(selector)).find(element=>element instanceof HTMLElement&&element.getClientRects().length>0&&getComputedStyle(element).visibility!=='hidden'&&!element.disabled&&!element.closest('[aria-hidden="true"]'));if(focusActions){const disclosure=target.querySelector('details.order-management-details');if(disclosure)disclosure.open=true;const focusable=findVisibleAction('[data-action="save-order"]');if(focusable)focusable.focus()}else{const focusable=findVisibleAction('[data-action="view-order-details"]');if(focusable)focusable.focus()}}
 }
 function closeOrderDetails(id){return returnToOrderList(id||selectedOrderId,false)}
