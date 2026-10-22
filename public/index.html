@@ -2977,15 +2977,21 @@ html.dark #home .hero-visual::before{
 </style>
 
 <style id="hero-image-blend-owner-asset">
-/* Feather the dark crocodile-leather platform outward while keeping both shoes in the clear center. */
-#home .hero-visual{background:transparent!important;border:0!important;box-shadow:none!important;}
-#home .hero-visual img{
-  mix-blend-mode:multiply!important;
-  -webkit-mask-image:radial-gradient(ellipse 58% 58% at 55% 42%,#000 0%,#000 40%,rgba(0,0,0,.98) 47%,rgba(0,0,0,.78) 61%,rgba(0,0,0,.28) 78%,transparent 100%)!important;
-  mask-image:radial-gradient(ellipse 58% 58% at 55% 42%,#000 0%,#000 40%,rgba(0,0,0,.98) 47%,rgba(0,0,0,.78) 61%,rgba(0,0,0,.28) 78%,transparent 100%)!important;
+/* Match owner reference: enlarge the shoes; feather only the outer image/platform edges, never brighten the photo. */
+#home .hero-visual{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  overflow:hidden!important;
 }
-html.dark #home .hero-visual img{mix-blend-mode:normal!important;}
-@media(max-width:760px){#home .hero-visual img{width:100%!important;max-height:250px!important;}}
+#home .hero-visual img{
+  width:112%!important;max-width:none!important;height:auto!important;
+  margin-left:-6%!important;transform:scale(1.04)!important;transform-origin:55% 48%!important;
+  mix-blend-mode:normal!important;filter:none!important;opacity:1!important;
+  -webkit-mask-image:radial-gradient(ellipse 72% 76% at 55% 46%,#000 0%,#000 66%,rgba(0,0,0,.96) 75%,rgba(0,0,0,.76) 85%,rgba(0,0,0,.34) 94%,transparent 100%)!important;
+  mask-image:radial-gradient(ellipse 72% 76% at 55% 46%,#000 0%,#000 66%,rgba(0,0,0,.96) 75%,rgba(0,0,0,.76) 85%,rgba(0,0,0,.34) 94%,transparent 100%)!important;
+}
+@media(max-width:760px){
+  #home .hero-visual img{width:118%!important;max-width:none!important;max-height:290px!important;margin-left:-9%!important;transform:scale(1.02)!important;}
+}
 </style>
 </body>
 </html>
