@@ -1,11 +1,11 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T16:52:00Z",
+  "capturedAtUtc": "2026-10-22T17:10:01Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e",
+  "branchHeadAtCheckpointStart": "3bd5523544310818e8f8c4543ab386eea217dd68",
   "checkpointSemantics": "Live PR/branch HEAD changes with each contents-API commit; branchHeadAtCheckpointStart is the fetched head immediately before this status refresh. Fetch live refs before acting. codeTestSha is a distinct exact tested source revision.",
-  "codeTestSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+  "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "latestProductSourceCommit": "105f46b90dc5664dd091493dbd5cea1af7796c44",
   "latestActionsRun": {
     "id": 39816652346,
@@ -18,7 +18,7 @@
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "Mobile toast/bottom-navigation overlap fix and Playwright geometry regression pass on exact SHA 4b2220d510a906882e4309df6969c0c43514c421. Validate, npm run check, npm test and local read-only screenshot matrix PASS; authenticated business backend not tested. All 12 screens remain PARTIAL_NOT_ACCEPTED.",
+  "progressBasis": "50% PROVISIONAL; no UI product source changed in the handoff-integrity test commit. The previous source/UI evidence remains PASS on SHA 105f46b90dc5664dd091493dbd5cea1af7796c44. The latest automated attempt on 7a60099 failed on a missing START-HERE -> PROMPT-NEXT-CHAT link; this handoff sync repairs that contract. Revalidate on the resulting live HEAD before claiming test PASS.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -26,9 +26,9 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "2d80095f7323b1a790931dc2ab67b59e7e6edf8d",
+      "headSha": "eafb4259f612552da210089aadfb0c8c05fa2cbd",
       "changedFiles": 288,
-      "additions": 23248,
+      "additions": 23260,
       "deletions": 394,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false
@@ -39,10 +39,10 @@
       "mergeable": false,
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
-      "headSha": "9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e",
-      "commits": 1246,
-      "changedFiles": 1314,
-      "additions": 49710,
+      "headSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+      "commits": 1290,
+      "changedFiles": 1315,
+      "additions": 49743,
       "deletions": 404,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
@@ -77,6 +77,32 @@
       "testedSha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
       "conclusion": "cancelled",
       "activeBlocker": false
+    },
+    "latestAttempt": {
+      "capturedAtUtc": "2026-10-22T17:10:01Z",
+      "testedSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+      "validateRun": {
+        "id": 39820101711,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820101711",
+        "status": "completed",
+        "conclusion": "failure",
+        "failedStep": "Run automated tests"
+      },
+      "previewRun": {
+        "id": 39820105048,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048",
+        "status": "completed",
+        "conclusion": "failure",
+        "failedStep": "Run automated tests",
+        "jobId": 119968823787,
+        "artifact": {
+          "id": 12444406482,
+          "name": "admin-preview-evidence-345",
+          "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048/artifacts/12444406482",
+          "contents": "Reference PNG only; Playwright screenshot matrix was skipped."
+        }
+      },
+      "reason": "tests/handoff-integrity.test.mjs detected that START-HERE.md lacked an explicit PROMPT-NEXT-CHAT.md link. The source integrity check passed; the failure stopped the automated-test step, so screenshot and deployed Preview checks were skipped."
     }
   },
   "latestProductChange": {
@@ -137,9 +163,9 @@
   },
   "scopeAudit": {
     "status": "PARTIAL",
-    "liveChangedFiles": 1314,
-    "previousCensus": 1310,
-    "previousCensusStatus": "HISTORICAL_STALE; latest PR metadata reports 1314. Refresh paginated filenames before new counts.",
+    "liveChangedFiles": 1315,
+    "previousCensus": 1314,
+    "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
     "priority": "Refresh paginated filenames and classify provenance for each changed path; prioritize runtime/API/migration/setup/workflow paths.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "migration0009": "DEFERRED_BY_OWNER",
@@ -150,19 +176,19 @@
       ".github": 2,
       "README-DEPLOY.txt": 1,
       "data": 1,
-      "docs": 1247,
+      "docs": 1251,
       "functions": 24,
       "migrations": 2,
       "package.json": 1,
       "public": 2,
       "scripts": 5,
-      "tests": 25
+      "tests": 26
     },
     "liveExtensionCensus": {
       "png": 913,
-      "md": 171,
-      "json": 163,
-      "mjs": 28,
+      "md": 173,
+      "json": 165,
+      "mjs": 29,
       "js": 26,
       "html": 3,
       "yml": 2,
@@ -187,7 +213,8 @@
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T16:52:00Z",
-    "syncPurpose": "Synced to live PR #111 count 1314, source/test SHA 105f46b, successful validation run 39816652373, successful Playwright/Preview run 39816652346 and artifact #344."
-  }
+    "lastSyncAtUtc": "2026-10-22T17:10:01Z",
+    "syncPurpose": "Refresh live PR #111 census to 1,315; record the exact failed handoff test attempt on 7a60099 and its concrete missing-link cause; correct canonical handoff links and make integrity test resilient to separately updated run records. Preserve product progress at 50% PROVISIONAL."
+  },
+  "currentHeadAtCheckpoint": "7a60099f96bb0be4f68dbda47fbec9c10df44390"
 }

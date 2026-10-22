@@ -11,7 +11,7 @@
 | Mobile toast/nav regression | PASS — safe-area-aware CSS offset + automated >=8px clearance assertion; 390×844 Light screenshot reviewed. |
 | Old retry-customers timeout | Historical only; #39804852604 is not the current blocker. |
 | Screen acceptance | PARTIAL_NOT_ACCEPTED — all 12 screens need visual/functional acceptance; authenticated backend remains NOT_TESTED. |
-| PR #111 provenance | PARTIAL — 1,310 live changed paths; 36 runtime/config paths partially reviewed (14 added/22 modified). |
+| PR #111 provenance | PARTIAL — 1,314 live changed paths; 36 runtime/config paths partially reviewed (14 added/22 modified). |
 | Remote D1/R2/migrations | NOT_VERIFIED / DEFERRED_BY_OWNER; no remote operations performed. |
 | Safety and progress | PASS — no merge/Production/access/secret/database changes; 50% PROVISIONAL retained. |
 
@@ -25,5 +25,12 @@
 ## Latest sync addendum — 2026-10-22
 - Current source/test SHA: `105f46b90dc5664dd091493dbd5cea1af7796c44`; validation #39816652373 and screenshot/Preview run #39816652346 both SUCCESS.
 - Current artifact: [admin-preview-evidence-344, ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210).
-- PR #111 current changed-file metadata: 1,314; the 1,310-path census is historical.
+- PR #111 current changed-file metadata: 1,315; the 1,314-path census is historical.
 - Progress stays 50% PROVISIONAL; all 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
+
+
+## Live failure triage and handoff integrity — 2026-10-23
+- PR #111 head at last verification: `7a60099f96bb0be4f68dbda47fbec9c10df44390`, 1,315 paths, OPEN/unmerged. Census pages 1–14 were all fetched; path and extension totals reconcile to 1,315.
+- Validate #39820101711 and Preview #39820105048 failed in the `Run automated tests` step. Decoded job logs identify the exact assertion: `START-HERE must link the next-chat prompt`; code integrity check itself passed. Playwright/deployed Preview steps were not run on that attempt.
+- The corresponding sync adds an explicit markdown link in START-HERE and removes test coupling between a stable status snapshot and the independently updated latest Actions run. This is a handoff-quality fix only, not product progress; the exact new SHA must pass Actions before PASS is recorded.
+- The reference image has not been visually rendered in the inspection tool this turn; pixel comparison is NOT_VERIFIED. Do not repeat older unsupported claims that #344 was compared pixel-for-pixel against the reference poster.

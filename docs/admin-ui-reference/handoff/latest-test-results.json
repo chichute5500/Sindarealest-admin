@@ -1,42 +1,43 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T16:52:00Z",
+  "capturedAtUtc": "2026-10-22T17:10:01Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e",
-  "codeTestSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+  "branchHeadAtCheckpointStart": "3bd5523544310818e8f8c4543ab386eea217dd68",
+  "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "HANDOFF_INTEGRITY_TEST_FAILED_LINK_REPAIR_PENDING_VALIDATION",
   "latestRun": {
-    "id": 39816652346,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
-    "headSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+    "id": 39820105048,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048",
+    "headSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
     "status": "completed",
-    "conclusion": "success",
-    "jobId": 119957441128,
+    "conclusion": "failure",
+    "jobId": 119968823787,
+    "failedStep": "Run automated tests",
+    "failureSummary": "The new handoff-integrity test found that START-HERE.md lacked an explicit PROMPT-NEXT-CHAT.md link. Playwright screenshot and deployed Preview steps were skipped.",
     "artifact": {
-      "id": 12441639210,
-      "name": "admin-preview-evidence-344",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210",
+      "id": 12444406482,
+      "name": "admin-preview-evidence-345",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048/artifacts/12444406482",
       "expired": false,
-      "expiresAtUtc": "2026-11-05T16:49:42Z",
-      "pngCount": 102
+      "containsScreenshotMatrix": false,
+      "note": "The artifact upload preserved the approved reference image only; it is not new UI evidence."
     }
   },
   "validatedChecks": {
     "npmRunCheck": "PASS",
-    "npmTest": "PASS",
-    "localStaticPlaywright": "PASS",
-    "responsiveThemeScreenshotMatrix": "PASS",
-    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
-    "pageErrors": [],
-    "consoleErrors": [],
-    "failedRequests": [],
-    "httpErrors": [],
-    "attemptedWrites": [],
-    "unexpectedApiPaths": [],
-    "fixtureExpectedHttp503Count": 7
+    "npmTest": "FAIL_HANDOFF_INTEGRITY_ASSERTION",
+    "localStaticPlaywright": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "responsiveThemeScreenshotMatrix": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "deployedPreviewDiagnostic": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "pageErrors": "NOT_COLLECTED",
+    "consoleErrors": "NOT_COLLECTED",
+    "failedRequests": "NOT_COLLECTED",
+    "httpErrors": "NOT_COLLECTED",
+    "attemptedWrites": "NOT_COLLECTED",
+    "unexpectedApiPaths": "NOT_COLLECTED"
   },
   "historicalRuns": [
     {
@@ -69,6 +70,20 @@
       "sha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
       "conclusion": "success",
       "meaning": "Latest responsive/theme screenshot and configured Preview diagnostic run; artifact #344 is the current evidence."
+    },
+    {
+      "id": 39820101711,
+      "sha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+      "conclusion": "failure",
+      "failure": "Automated test step failed at the new handoff integrity assertion; project integrity check passed.",
+      "meaning": "Latest failed Validate attempt before the single-entry-point link repair."
+    },
+    {
+      "id": 39820105048,
+      "sha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+      "conclusion": "failure",
+      "failure": "Automated test step failed; Playwright and deployed Preview steps were skipped.",
+      "meaning": "Latest failed Preview workflow attempt before the single-entry-point link repair."
     }
   ],
   "screens": {
@@ -155,10 +170,12 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Inspect artifact #344 against admin-mobile-reference.png at matching viewport/theme; prioritize Gallery (#5), then screens #8–#12.",
-    "Refresh PR #111 paginated changed-file census (live PR metadata now 1314) and continue semantic provenance review of runtime/API/migration/setup/workflow paths.",
-    "Make reproducible ADMIN-only fixes, add regression coverage, validate exact SHA, then resync handoff files.",
-    "Mark authenticated QA blocked/not tested if authorized access is unavailable; never bypass Access."
+    "Fetch live HEAD and Actions; validate the link-repair commit SHA before treating handoff-integrity as PASS.",
+    "Inspect artifact #344 only for the last successful screenshot matrix; compare to the reference at identical viewport/theme only when both images can actually be inspected.",
+    "Continue Gallery and screens #8–#12 audit; do not assert visual defects from fixture screenshots alone.",
+    "Refresh all PR #111 file counts if any paths are added; 1,315 is the checkpoint count including tests/handoff-integrity.test.mjs.",
+    "Continue semantic provenance review, especially PR #111 vs #108 shared blobs, public/index.html scope conflict, runtime/API/migration/setup/workflow paths.",
+    "Do not raise product progress above 50% until real product acceptance changes."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -167,45 +184,39 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
-  "testedCommitSha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+  "latestCodeCommitSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+  "testedCommitSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "capturedAt": "2026-10-22T16:48:37.719Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
-    "applicationStartup": "PASS",
-    "localStaticPlaywrightBaseline": "PASS",
-    "playwright": "PASS",
-    "playwrightPreviewDiagnostics": "success",
-    "deployedPreview": "PASS",
-    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
-    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
-    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS",
+    "applicationStartup": "NOT_RUN_ON_FAILED_ATTEMPT",
+    "localStaticPlaywrightBaseline": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "playwright": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "playwrightPreviewDiagnostics": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "deployedPreview": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "responsiveViewports": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "lightMode": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "darkMode": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "consoleErrors": "NOT_COLLECTED",
+    "networkErrors": "NOT_COLLECTED",
+    "automatedTests": "FAIL_HANDOFF_INTEGRITY_ASSERTION",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED"
   },
   "latestLocalEvidence": {
-    "runId": 39816652346,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346",
-    "sourceCommit": "105f46b90dc5664dd091493dbd5cea1af7796c44",
+    "runId": 39820105048,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048",
+    "sourceCommit": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
     "npmRunCheck": "PASS",
-    "npmTest": "PASS",
-    "localPlaywright": "PASS",
-    "sourceScreenshotCount": 102,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 86,
-    "uiFixtureMetricCount": 78,
-    "screenshotArtifact": "admin-preview-evidence-344",
-    "pageErrors": [],
-    "consoleErrors": [],
-    "failedRequests": [],
-    "httpErrors": [],
-    "attemptedWrites": [],
-    "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+    "npmTest": "FAIL",
+    "localPlaywright": "NOT_RUN_DUE_TO_TEST_FAILURE",
+    "sourceScreenshotCount": 0,
+    "loginShellPngCount": 0,
+    "uiFixturePngCount": 0,
+    "uiFixtureMetricCount": 0,
+    "screenshotArtifact": "admin-preview-evidence-345 (no screenshot matrix)",
+    "scope": "TEST FAILURE BEFORE PLAYWRIGHT; NOT NEW UI EVIDENCE"
   },
   "latestScreenshotArtifact": {
     "runId": 39816652346,
@@ -217,7 +228,9 @@
     "uiFixturePngCount": 86,
     "uiFixtureMetricCount": 78,
     "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210",
+    "semantics": "Last successful screenshot matrix, not the latest failed automated attempt."
   },
   "remainingIssues": [],
   "blockedItems": [],

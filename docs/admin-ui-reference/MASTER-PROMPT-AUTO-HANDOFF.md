@@ -1,8 +1,12 @@
 # SINDAREALEST ADMIN — MASTER PROMPT (LIVE)
 
+**Canonical handoff entry point:** [START-HERE.md](handoff/START-HERE.md). Fetch live GitHub state before acting; this master prompt is not a substitute for START-HERE.
+
 > **Single entry point:** [handoff/START-HERE.md](handoff/START-HERE.md). Chat starter should be one line; do not ask the owner to paste this long prompt or re-explain project history.
 
-## Live checkpoint — 2026-10-22
+## Last source/UI evidence checkpoint — 2026-10-22 (not current HEAD)
+
+The last successful source/UI screenshot matrix was source SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`, runs #39816652373 and #39816652346, artifact #344 / ID 12441639210. Handoff integrity test added at `7a60099f96bb0be4f68dbda47fbec9c10df44390` subsequently failed because START-HERE lacked a direct prompt link; this sync adds the link. Fetch live Actions to verify the fix.
 - Repo `chichute5500/Sindarealest-admin`; writable ADMIN branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN/unmerged.
 - Static branch `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN/unmerged and read-only.
 - Branch HEAD at sync start `9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e`; latest source/test SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`.

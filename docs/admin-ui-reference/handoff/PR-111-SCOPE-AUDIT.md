@@ -1,36 +1,36 @@
 # PR #111 SCOPE / PROVENANCE AUDIT
 
-**Live source audit checkpoint:** 2026-10-22T16:28:00Z. This is a read-only comparison of tree blobs and source text; no deploy/setup script, remote SQL, migration, D1 or R2 action was executed.
+**Historical source audit checkpoint:** 2026-10-22T16:28:00Z (historical). This is a read-only comparison of tree blobs and source text; no deploy/setup script, remote SQL, migration, D1 or R2 action was executed.
 
 ## Current PR metadata
-- ADMIN [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, base `main`, HEAD at checkpoint start `0502739790fecfdf56f3c267dcaf607f1751908e`, 1,310 changed files, +49,466 / −404, mergeable=false.
-- Protected website/static [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN/unmerged, HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`, 288 changed files, +23,248 / −394, mergeable=false; read-only in this task.
+- ADMIN [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, base `main`, HEAD at that historical checkpoint `0502739790fecfdf56f3c267dcaf607f1751908e`, 1,310 changed files, +49,466 / −404, mergeable=false.
+- Protected website/static [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN/unmerged, HEAD `eafb4259f612552da210089aadfb0c8c05fa2cbd`, 288 changed files, +23,260 / −394, mergeable=false; read-only in this task.
 - `main` HEAD: `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Current merge base for ADMIN vs main: `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; branch comparison is diverged (ADMIN ahead 1,260 and behind 6 when checked).
 - Tree snapshots were non-truncated: ADMIN 1,906 blobs; main 638; merge base 635; PR #108 tree was re-fetched at its live HEAD.
 
 ## Live changed-file census
-The paginated GitHub PR file list and PR metadata both report **1,310 paths**.
+The paginated GitHub PR file list and PR metadata reported 1,310 at the older census. This count is historical; the refreshed complete 14-page list at the later 1,315-path checkpoint includes the new handoff integrity test.
 
 | Top-level path | Count |
 |---|---:|
 | `.github` | 2 |
 | `README-DEPLOY.txt` | 1 |
 | `data` | 1 |
-| `docs` | 1,247 |
+| `docs` | 1,251 |
 | `functions` | 24 |
 | `migrations` | 2 |
 | `package.json` | 1 |
 | `public` | 2 |
 | `scripts` | 5 |
-| `tests` | 25 |
-| **Total** | **1,310** |
+| `tests` | 26 |
+| **Total** | **1,315** |
 
 | Extension | Count |
 |---|---:|
 | PNG | 913 |
-| MD | 171 |
-| JSON | 163 |
-| MJS | 28 |
+| MD | 173 |
+| JSON | 165 |
+| MJS | 29 |
 | JS | 26 |
 | HTML | 3 |
 | YML | 2 |
@@ -41,7 +41,7 @@ The paginated GitHub PR file list and PR metadata both report **1,310 paths**.
 
 The current runtime/config set (including `package.json`) has 36 paths: **14 added and 22 modified relative to the live merge base**. The older 1,304 census and old merge-base SHA `a3834fed...` are historical and must not be used as current evidence.
 
-## Runtime/config path provenance (ADMIN tree at `0502739790fecfdf56f3c267dcaf607f1751908e`)
+## Runtime/config path provenance (ADMIN tree at historical code checkpoint; runtime blobs are unchanged through `7a60099f96bb0be4f68dbda47fbec9c10df44390`)
 “ADDED” means no blob existed at the merge base; “MODIFIED” means the path existed but the ADMIN blob differs from the merge-base blob. The blob hashes below are exact at this checkpoint, not claims that every change is correct.
 
 | Path | Relationship | ADMIN blob SHA |
@@ -74,7 +74,7 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 | `functions/sitemap.xml.js` | MODIFIED vs merge-base | `779a1d98ca5a53bab0a30be06d32cdef972f5a5c` |
 | `migrations/0008_product_sku_verification.sql` | ADDED vs merge-base | `5710d484214245795cc7ff5d37395599bdaf4c3d` |
 | `migrations/0009_fulfillment_and_manual_payments.sql` | ADDED vs merge-base | `dbb64910bedd3e0ee8badf2e9870d5b1d9397b15` |
-| `package.json` | MODIFIED vs merge-base | `446fcdfe0c92d843fa311f6266629a808188e47e` |
+| `package.json` | MODIFIED vs merge-base | `68c72b180b15467b8643f6b2ad1e5c66e4299084` |
 | `public/admin/index.html` | MODIFIED vs merge-base | `6246d2cde2e9c9e041019e169984bb23fe6c7b9d` |
 | `public/index.html` | MODIFIED vs merge-base | `bb0ae30ecb06319eb87e5725ad47fda82595eeb8` |
 | `scripts/capture-liquid-glass-preview.mjs` | ADDED vs merge-base | `9b3c88ecb762245d6ee01984c595ece512c801cb` |
@@ -84,10 +84,10 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 | `scripts/setup-cloudflare.mjs` | MODIFIED vs merge-base | `ec1c614048b84657ef8824d865dda42f0c8341fe` |
 
 ## Cross-branch and scope findings
-1. **Seven current ADMIN blobs exactly match blobs at live PR #108 HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`**:  
+1. **Seven current ADMIN blobs exactly match blobs at live PR #108 HEAD `eafb4259f612552da210089aadfb0c8c05fa2cbd`**:  
    `functions/_lib/watermark-settings.js` — `60ba2f27d522d13b06238306095af69cca7e9ac2`; `functions/api/admin/products.js` — `89197b4a9d2f1bd449f73ccabdae460608ae361f`; `functions/api/admin/products/reset-skus.js` — `132b30d3a986973f5427bd779346710a4d3239b4`; `functions/api/admin/settings.js` — `440d9d35c962a57e5fd87c364a7e431e1f369d1a`; `functions/api/admin/warranties.js` — `e07ca549db7175ecc748d2883fb335ec62c1b156`; `functions/api/warranty-lookup.js` — `10f408449e23814c44a1d634696b3bc92731ccc7`; `migrations/0008_product_sku_verification.sql` — `5710d484214245795cc7ff5d37395599bdaf4c3d`.  
    Identical blobs do not by themselves prove incorrect duplication, but they require provenance/contract review before either PR is merged; do not edit the static branch from here.
-2. **`public/index.html` is a real scope conflict to review before merge.** At this checkpoint ADMIN blob is `bb0ae30ecb06319eb87e5725ad47fda82595eeb8`, main/merge-base blob is `1e9362341a6c30976dfb9e86886c38e0ff3e5fd4`, and live PR #108's file blob is `94542aff3710eb5cbc2919ae503602b691f7b334`. The ADMIN version therefore differs from both main and the protected website branch. Do not change this path here; keep the PR unmerged until its intended ownership is resolved.
+2. **`public/index.html` is a real scope conflict to review before merge.** At this checkpoint ADMIN blob is `bb0ae30ecb06319eb87e5725ad47fda82595eeb8`, main/merge-base blob is `1e9362341a6c30976dfb9e86886c38e0ff3e5fd4`, and live PR #108's file blob is `52671448d2dca04b5da32d661f0998743a669339`. The ADMIN version therefore differs from both main and the protected website branch. Do not change this path here; keep the PR unmerged until its intended ownership is resolved.
 3. `.github/workflows/liquid-glass-visual-preview.yml` is added relative to the ADMIN merge base, but the live static PR has a different blob (`32f8b13fb5c5635e3be1cbb720059c23c500a940`). Review the two workflows separately; do not copy across branches.
 4. Full PR provenance is **PARTIAL**, not PASS. This section accounts for the 36 runtime/config paths but does not yet validate every docs/history/image/test path or every semantic code change.
 
@@ -97,7 +97,7 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 - `scripts/deploy-cloudflare.mjs` **also includes a 0009 preflight** (blob `9a1e30c770527f27f20210b9ceb98ca25244f771`), after checks for 0007 contact snapshots and 0008 SKU columns, before Pages deploy. It checks schema via SELECT/zero-row queries; it does not apply 0009.
 - This corrects any older handoff statement that either script “does not reference migration 0009.” That claim is stale. The true runtime state of remote D1 schema/ledger remains **NOT_VERIFIED** because the script was not run and remote access is not authorized. Do not infer that migration 0009 is applied or absent from source code alone.
 
-## Latest test/source evidence
+## Last successful test/source evidence (before handoff-integrity test was added)
 - [Actions #39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346) SUCCESS on exact code/test SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`.
 - [Artifact #344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210): 102 PNGs and 78 fixture metrics. Gallery screenshot `product-gallery__390x844__light.png` reviewed alongside the included reference poster; current CSS provides a featured cover slot, 1.55:1 mobile image frame and horizontal thumbnail rail, with existing Playwright assertions for image count/accessibility/reorder. The fixture uses synthetic placeholder images, so this does **not** justify adding fake product photography. No specific UI fix is promoted from this visual review; screen #5 remains PARTIAL_NOT_ACCEPTED until per-screen acceptance is complete.
 - The protected static `public/index.html` at PR #108 head `2d80095f7323b1a790931dc2ab67b59e7e6edf8d` currently adapts `/api/order-payment` without mapping/displaying the API's `freeShippingEligible` / `freeShipping` fields (source-level observation only). Admin payment API source returns these flags; this integration display gap belongs to the static-branch owner/agent. No static write was made here.
@@ -125,4 +125,13 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 ## Latest evidence refresh — 2026-10-22
 - Current source/test SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; source validation #39816652373 PASS and responsive/theme + Preview diagnostic #39816652346 PASS.
 - Current screenshot artifact: [admin-preview-evidence-344, ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210). The earlier artifact #339 is historical.
-- Live PR #111 metadata is now 1,314 changed files. The 1,310-path census and its detailed counts are historical until the paginated live file list is refreshed.
+- At that point PR #111 reported 1,314 changed files. The next complete paginated census including `tests/handoff-integrity.test.mjs` reported 1,315 paths; exact path counts are documented in the 2026-10-23 checkpoint below.
+
+
+## Latest handoff test attempt — 2026-10-23 checkpoint (failure is real; fix now in the new handoff sync)
+- Live ADMIN branch checkpoint before this sync: `7a60099f96bb0be4f68dbda47fbec9c10df44390`; PR #111 OPEN/unmerged, 1,315 changed paths, +49,743 / −404, mergeable=false. PR #108 is OPEN/unmerged and read-only at `eafb4259f612552da210089aadfb0c8c05fa2cbd` (288 files, +23,260 / −394).
+- Full changed-path census (14 API pages): .github 2; README-DEPLOY.txt 1; data 1; docs 1,251; functions 24; migrations 2; package.json 1; public 2; scripts 5; tests 26; total 1,315. Extensions: PNG 913, MD 173, JSON 165, MJS 29, JS 26, HTML 3, YML 2, SQL 2, TXT 1, ZIP 1.
+- Validate [#39820101711](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820101711) and Preview diagnostic [#39820105048](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048) both failed on the automated-test step on SHA `7a60099f96bb0be4f68dbda47fbec9c10df44390`. Precise error: `tests/handoff-integrity.test.mjs` asserted that START-HERE must explicitly link `PROMPT-NEXT-CHAT.md`; it did not. Project integrity checks passed. Playwright/screenshots/deployed Preview checks were skipped. Artifact #345 / ID 12444406482 does not contain a new screenshot matrix.
+- This sync adds the explicit canonical prompt link and removes brittle coupling between the stable handoff snapshot and separately updated latest Action run records. Re-fetch Actions and only mark handoff test PASS after a green exact-SHA result.
+- The reference image could not be rendered by the available browser/tool path in this audit; therefore exact pixel/reference parity remains **NOT_VERIFIED**. Do not claim it was visually compared. Artifact #344 is still the latest successful UI matrix on source SHA `105f46b90dc5664dd091493dbd5cea1af7796c44` (102 PNGs/78 synthetic fixture metrics); all 12 screens remain PARTIAL_NOT_ACCEPTED.
+- Progress remains 50% PROVISIONAL. The handoff-only changes add no product acceptance; authenticated backend QA NOT_TESTED, D1 schema/ledger NOT_VERIFIED, remote writes/deployment NOT_PERFORMED.

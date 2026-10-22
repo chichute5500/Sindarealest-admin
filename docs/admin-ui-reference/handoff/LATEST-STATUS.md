@@ -1,32 +1,33 @@
 # LATEST STATUS — SinDarealest Admin
 
-Checkpoint 2026-10-22T16:52:00Z; live HEAD before this handoff sync: `9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e`.
+**Captured from GitHub at the 2026-10-23 checkpoint. All SHAs below are checkpoint-specific; fetch live again before acting.**
 
-## Live GitHub status
-- PR #111: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), ADMIN branch `feature/admin-isolated-handoff-2026-10-20`, 1,314 changed files, +49,710 / −404, mergeable=false.
-- PR #108: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), static branch `fix/liquid-glass-audit-2026-10-19`, 288 changed files; read-only.
-- Current branch HEAD at checkpoint: `9ec143a6d0250b4c5949cfaa6e6f6eed01d6748e`. Source/test revision used by latest successful checks: `105f46b90dc5664dd091493dbd5cea1af7796c44`. These are different: later commits can update evidence/docs. Always fetch live HEAD before writes.
+## Live GitHub state before this handoff sync
+- ADMIN PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, branch `feature/admin-isolated-handoff-2026-10-20`, HEAD `7a60099f96bb0be4f68dbda47fbec9c10df44390`, 1,315 changed files, +49,743/−404, mergeable=false.
+- Static PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN/unmerged, branch `fix/liquid-glass-audit-2026-10-19`, HEAD `eafb4259f612552da210089aadfb0c8c05fa2cbd`, 288 changed files, +23,260/−394, mergeable=false; read-only.
+- `main` HEAD `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; merge base ADMIN/main `f38cefe4647b33bd42f9018fde00c420ee5c7c66`; ADMIN branch is diverged (ahead 1,289, behind 6 at last comparison).
 
-## Latest Actions and evidence
-- [Source validation #39816652373](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652373): SUCCESS on `105f46b90dc5664dd091493dbd5cea1af7796c44`, including dependency audit, project integrity validation, and automated tests.
-- [Responsive/theme screenshot + Preview diagnostic #39816652346]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346 ): SUCCESS on the exact same source/test SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`. Repository checks, automated tests, Chromium setup, read-only local preview, responsive/theme screenshot matrix, configured Preview diagnostic, persisted evidence and artifact upload succeeded. Missing-Preview-configuration step was skipped.
-- [Artifact admin-preview-evidence-344, ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210): available, 102 PNG screenshots and fixture metrics. Use this newest artifact, not #339, for further screen review.
-- Older retry-customers timeout in run #39804852604 on SHA `326526f8...` is historical and superseded by passing later runs; do not repeat that investigation unless new failure evidence appears.
+## Exact-SHA validation history
+- Last successful product source/UI evidence: source SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; Validate [#39816652373](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652373) SUCCESS; UI screenshot/Preview diagnostic [#39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346) SUCCESS. Artifact [#344 / ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210) has 102 PNGs/78 fixture metrics.
+- Latest attempted code/test SHA `7a60099f96bb0be4f68dbda47fbec9c10df44390`: Validate [#39820101711](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820101711) FAIL; Preview diagnostic [#39820105048](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048) FAIL at automated tests. The decoded assertion says START-HERE lacked an explicit link to `PROMPT-NEXT-CHAT.md`. Project integrity check PASS; later Playwright, screenshots and deployed Preview stages were SKIPPED. Artifact #345 / ID 12444406482 is not a screenshot matrix.
+- This sync adds explicit links to the canonical prompt and changes the integrity test so run IDs may update independently in status vs test evidence. The new branch HEAD must pass live Actions before this is marked PASS.
 
 ## Progress and acceptance
-- Product progress remains **50% PROVISIONAL**. Handoff cleanup, CI success and fixture screenshots do not equal product acceptance.
-- All 12 screens remain PARTIAL_NOT_ACCEPTED until per-screen visual comparison against `docs/admin-ui-reference/admin-mobile-reference.png` and relevant interactions are accepted.
-- Authenticated business/backend flows: NOT_TESTED. Remote D1/R2/schema/ledger: NOT_VERIFIED. Production deployment: NOT_PERFORMED.
-- Product Gallery screenshot review at #339 showed a featured image frame and horizontal thumbnail rail; no reproducible defect established in that pass. Recheck with latest #344 only if it gives new evidence.
+- Product progress: **50% PROVISIONAL** — unchanged; handoff/fixture testing is not product acceptance.
+- All 12 screens remain PARTIAL_NOT_ACCEPTED. Authenticated business/backend QA NOT_TESTED. D1 schema/ledger NOT_VERIFIED. Production deployment NOT_PERFORMED.
+- #344 inspected: Gallery has featured placeholder image + controls + horizontal thumbnail rail; Customers, Warranty, Website Settings, Backup/Restore, Activity Log screenshots are synthetic fixture evidence. Warranty toast sits above the fixed nav in the light 390×844 capture. No new reproducible UI defect is confirmed from the available inspection.
+- Exact reference image pixel comparison is NOT_VERIFIED: the reference is present in GitHub (1024×1536) but could not be rendered by the current inspection tool. Do not repeat a claim that the image was directly compared.
 
-## PR #111 scope census
-Live PR metadata reports 1,314 changed files. The previous 1,310-file census is now historical. The earlier 1,310-file paginated census comprised 1,247 docs, 913 PNGs, 36 runtime/config paths and 25 tests. Refresh the full paginated filename census before quoting new per-path totals; prioritize `functions/`, `migrations/`, `scripts/`, `.github/workflows/`, `public/` and `package.json`. Existing runtime provenance review was partial: 36 paths, 14 added and 22 modified vs the then-current merge base; revalidate against live refs before relying on this count.
+## PR #111 census (verified before adding any subsequent path)
+Complete paginated API count: **1,315 paths** — `.github` 2; README-DEPLOY.txt 1; data 1; docs 1,251; functions 24; migrations 2; package.json 1; public 2; scripts 5; tests 26.
+Extensions: PNG 913; MD 173; JSON 165; MJS 29; JS 26; HTML 3; YML 2; SQL 2; TXT 1; ZIP 1.
+36 runtime/config paths remain 14 added and 22 modified vs merge base in the existing source audit. Seven blobs remain identical to PR #108; ADMIN `public/index.html` differs from main and static PR #108. Do not change cross-scope storefront file here.
 
 ## Next actions
-1. Inspect artifact #344 against the approved reference at identical viewport/theme; prioritize Gallery (#5), then screens #8–#12. Record concrete mismatch and screenshot filename before making changes.
-2. Refresh PR #111 live changed-file census and continue semantic provenance review, especially runtime/API/migration/setup/workflow paths.
-3. Make only reproducible ADMIN-branch fixes, add regression tests, validate exact SHA, and resync all handoff docs after each checkpoint.
-4. If authenticated testing requires unavailable permission, mark BLOCKED/NOT_TESTED. Never bypass Cloudflare Access.
+1. Fetch live HEAD/PR/Actions, confirm the single-entry-point link fix passes exact-SHA Validate + Preview diagnostic.
+2. Continue Gallery (#5) and screens #8–#12; record exact file names and actual differences only when both reference and screenshot can be inspected at same viewport/theme.
+3. Continue semantic provenance review of runtime/API/migration/setup/workflow and test/evidence/docs batches. Classify inheritance vs additions; don't call whole PR audit complete while partial.
+4. After a verified checkpoint, read back synchronized JSON/Markdown and re-fetch live branch/PR/Actions.
 
 ## Hard limits
-No merge, no `main` or static-branch edits, no Production deploy, no force-push, no Access bypass or secrets access, no remote D1/R2/schema/ledger operations, and do not run setup/migration/deploy scripts. Migration 0009, PRE/PRO migrations, and R2/product-image persistence remain DEFERRED_BY_OWNER. No fabricated business data or unapproved API contracts.
+No merge/force push/deploy; no main/static writes; no Access bypass or secret operations; no remote D1/R2/schema/ledger and no setup/migration/deploy script execution. Migration 0009, PRE/PRO migrations and R2/product-image save remain DEFERRED_BY_OWNER. No fabricated business data or unapproved API contracts.
