@@ -5,7 +5,7 @@
 ## Repository / PRs
 - PR #111: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), writable branch `feature/admin-isolated-handoff-2026-10-20`.
 - PR #108: [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), website branch is read-only for this task.
-- Last recorded code/test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec`. Fetch live HEAD before further work; the next-chat prompt was refreshed in a docs-only commit, so don't mistake that commit for tested product code.
+- Last recorded code/test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec`. Live ADMIN branch HEAD at handoff sync: `4d6dab2f56d4dec53955c300e8ea477062fd2587` (docs-only commits; not tested product code). Fetch live HEAD before further work.
 
 ## Product change
 - Source commit [`e11ec06cd5870522735a28205b678897de829361`](https://github.com/chichute5500/Sindarealest-admin/commit/e11ec06cd5870522735a28205b678897de829361) makes Customers/Warranty API failure or malformed responses explicit and provides GET-only retry.
@@ -33,3 +33,9 @@ All 12 screens remain PARTIAL_NOT_ACCEPTED. In particular:
 1. Re-fetch live PR heads and poll runs #39802525217 and #39804852604; inspect exact-SHA job logs and artifacts.
 2. Review screens #8–#12 against `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme; fix only reproduced issues.
 3. Continue PR #111 provenance audit. Keep both PRs OPEN/unmerged and update this handoff only with evidence-backed changes.
+
+
+## Handoff synchronization note — 2026-10-22
+- `START-HERE.md` is the single entry point. New chats should not require the owner to paste long prompts or re-explain history.
+- Live branch HEAD and tested code SHA are separate: HEAD `4d6dab2f...` is documentation-only; validated code SHA remains `326526f8...`.
+- Next action is to inspect the failed Preview run `39804852604` logs/artifacts, identify the confirmed cause, and continue work. Progress stays 50% PROVISIONAL.
