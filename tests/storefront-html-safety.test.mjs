@@ -56,13 +56,13 @@ for (const rows of [[], [{ sku: 'SD-GL052', skuVerified: false, images: [] }]]) 
   const hero = runHeroSync(rows);
   assert.equal(hero.result, true, "the hero presentation asset must render regardless of catalog SKU state");
   assert.equal(hero.target.hidden, false);
-  assert.equal(hero.target.src, '/images/hero-sd-gl052.png?v=20261022-1');
+  assert.equal(hero.target.src, '/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4');
   assert.equal(hero.target.dataset.productImageStatus, 'hero-presentation-asset');
 }
 const visibleHero = runHeroSync([]);
 visibleHero.target.onerror();
 assert.equal(visibleHero.target.hidden, false, "a failed asset request must not hide the user-approved hero");
-assert.equal(visibleHero.target.src, '/images/hero-sd-gl052.png?v=20261022-1');
+assert.equal(visibleHero.target.src, '/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4');
 assert.equal(visibleHero.target.dataset.productImageStatus, 'hero-asset-load-failed');
 
 const helperStart = html.indexOf("const escapeHtml=");
