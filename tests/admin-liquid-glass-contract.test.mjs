@@ -238,7 +238,7 @@ has('#imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-alig
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
 has('@media(min-width:681px){#backdrop>.editor>form>.editorcontent{gap:12px}}', 'desktop product price and stock fields clear the sticky action footer at the initial scroll position');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'desktop editor content scrolls within its bounded region so fields cannot push the sticky action footer out of view');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'desktop editor content scrolls within its bounded region so fields cannot push the sticky action footer out of view');
 has('#backdrop{top:70px;bottom:calc(80px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header and above bottom navigation without a dimmed backdrop');
 has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--bg);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
 has('#productEditorTabs{position:sticky;top:0;gap:2px;padding:1px}', 'mobile product editor tabs stick directly below the editor header without covering form fields');
@@ -254,8 +254,8 @@ has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) minmax(0
 has('#main .product-table .product-mobile-edit{display:inline-flex;align-items:center;justify-content:center;width:28px;min-width:28px;min-height:28px;height:28px;padding:4px;border-radius:9px}', 'mobile edit action remains a compact touch-friendly control');
 has('aria-label="Sửa sản phẩm: ${esc(p.title)}"', 'mobile edit action retains a product-specific accessible name');
 has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
-has('#backdrop>.editor>form{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
+has('#backdrop>.editor>form{display:flex;flex:1 1 0%;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
 has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:68px;width:68px}}', 'thumbnail rail remains touchable on narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
@@ -263,7 +263,7 @@ has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder contr
 has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
 has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobile editor action footer does not shrink');
 
 
