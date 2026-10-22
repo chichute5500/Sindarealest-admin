@@ -6,7 +6,7 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4'"),
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514-blended.png?v=20261023-1'"),
   "The hero must render the supplied static presentation image independently of public catalog SKU availability.");
 assert.ok(heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'"),
   "The static hero image must be explicitly identified as a presentation asset, not a catalog product image.");
@@ -23,7 +23,7 @@ assert.ok(visualAudit.includes("hero-presentation-asset-visible-with-unverified-
 assert.ok(visualAudit.includes("startup.heroImage.status === 'hero-presentation-asset'")
   && visualAudit.includes("startup.heroImage.loaded")
   && visualAudit.includes("!startup.heroImage.hidden")
-  && visualAudit.includes("startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514%20(1).png')"),
+  && visualAudit.includes("startup.heroImage.source.includes('/images/hero-upload/tb_image_share_1792519964514-blended.png')"),
   "The local audit must require the presentation asset to load and remain visible independent of SKU verification.");
 
 const styleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
@@ -47,14 +47,21 @@ for (const [, selector, declarations] of heroImageRules) {
   }
   assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied hero asset must never be cropped.");
 }
-assert.ok(html.includes("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
+assert.ok(html.includes("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
+const edgeProcessor = readFileSync(new URL("../scripts/process-hero-edge.py", import.meta.url), "utf8");
+assert.ok(edgeProcessor.includes("FEATHER_RADIUS = 48")
+  && edgeProcessor.includes('source.putalpha(new_alpha)')
+  && edgeProcessor.includes('"rgb_modified": False')
+  && edgeProcessor.includes("GaussianBlur(radius=KEEP_MASK_RADIUS)"),
+  "Hero edge blend must feather only alpha, preserve original RGB/color, and protect shoe regions.");
 const heroEdgeTreatment = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
 assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
-  && heroEdgeTreatment.includes("mask-image:radial-gradient(")
+  && heroEdgeTreatment.includes("mask-image:none!important")
+  && !heroEdgeTreatment.includes("mask-image:radial-gradient(")
   && heroEdgeTreatment.includes("width:118%!important")
   && heroEdgeTreatment.includes("max-height:290px!important"),
-  "The original Hero shoes must be enlarged with edge feathering, without changing image brightness or replacing the source asset.");
+  "The derived Hero shoes must be enlarged while alpha edges blend into the page and the original RGB stays unchanged.");
 assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
 assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
@@ -69,13 +76,13 @@ assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!impor
   && html.includes("width:88%!important;height:auto!important;max-width:100%!important;max-height:210px!important;")
   && html.includes("object-fit:contain!important;object-position:center!important;")
   && html.includes("margin:0!important;"),
-  "On mobile, hero copy and image must use separate side-by-side columns while the full source image stays centered and unprocessed.");
+  "On mobile, hero copy and image must use separate side-by-side columns while the full source-derived image stays centered and clear.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
   && liveCapture.includes("presentationAssetLoaded"),
   "The live audit must verify the dedicated hero presentation asset is loaded and visible.");
-assert.ok(liveCapture.includes("path.endsWith('/images/hero-upload/tb_image_share_1792519964514%20(1).png')")
+assert.ok(liveCapture.includes("path.endsWith('/images/hero-upload/tb_image_share_1792519964514-blended.png')")
   && liveCapture.includes("status === 'hero-presentation-asset'")
   && liveCapture.includes("!frameCollapsed"),
   "The live audit must check the exact hero asset, visible image state, and non-collapsed frame.");
