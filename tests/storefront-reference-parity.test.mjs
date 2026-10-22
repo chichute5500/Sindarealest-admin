@@ -181,17 +181,16 @@ assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
 assert.ok(html.includes('target.dataset.productImageStatus=\'hero-asset-load-failed\''),
   'A failed image request must be diagnosable without hiding the user-approved hero presentation asset.');
-assert.ok(html.includes('id="sdGalleryWhiteBackgroundKey"'), 'A browser-only SVG filter is available for photos with a near-white canvas.');
-assert.match(html, /function syncFullscreenBackgroundKey\(img\)[\s\S]*?votes>=6[\s\S]*?sd-white-background-keyed/,
-  'Only gallery photos whose corner samples confirm a near-white canvas may use background removal.');
-assert.match(finalCss, /\.sd-fullscreen-frame\{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;/,
-  'The full-screen gallery must not add a separate bordered or shadowed image card.');
-assert.match(finalCss, /\.sd-fullscreen-image\.sd-white-background-keyed\{filter:url\(#sdGalleryWhiteBackgroundKey\)\}/,
-  'Gallery background blending must be display-only and applied only after a white-canvas check.');
-assert.match(finalCss, /#detailMainImage\.sd-white-background-keyed\{[\s\S]*?filter:url\(#sdGalleryWhiteBackgroundKey\)!important;[\s\S]*?mask-image:linear-gradient\(90deg,transparent 0%,transparent 8\.5%,#000 13%,#000 87%,transparent 91\.5%,transparent 100%\)!important;/,
-  'The product detail photo may use the same background key only when corner sampling identifies a near-white source canvas.');
-assert.ok(html.includes("$('#detailMainImage').addEventListener('load',()=>syncFullscreenBackgroundKey($('#detailMainImage')));"),
-  'The detail photo must run the existing safe corner-sampling key after each source image loads.');
+assert.ok(!html.includes('sdGalleryWhiteBackgroundKey') && !html.includes('syncFullscreenBackgroundKey') && !html.includes('sd-white-background-keyed'),
+  'Product and fullscreen photos must preserve original pixels; do not infer and remove white backgrounds.');
+assert.match(finalCss, /\.sd-fullscreen-frame\{border-radius:18px!important;overflow:hidden!important\}/,
+  'The full-screen gallery frame must clip the image to softly rounded corners.');
+assert.match(finalCss, /\.sd-fullscreen-image\{border-radius:16px!important\}/,
+  'The full-screen photo itself must have soft rounded corners.');
+assert.match(html, /class="footer-brand"[^>]*>[\s\S]*?<img src="logo\.png" alt="Logo chính thức SinDarealest"/,
+  'The footer must use the same official logo asset as the welcome screen.');
+assert.match(finalCss, /\.footer-brand img\{[^}]*filter:none!important;mix-blend-mode:normal!important\}/,
+  'The official logo asset must not be recoloured or blended by CSS.');
 
 assert.ok(html.includes('id="sdFullscreenViewer"'), 'The full-screen image gallery remains available.');
 assert.ok(html.includes('id="cartDrawer"') && html.includes('id="checkoutDrawer"'), 'Cart and checkout screens remain in the storefront.');
