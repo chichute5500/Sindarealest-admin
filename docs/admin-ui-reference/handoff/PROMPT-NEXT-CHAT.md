@@ -1,14 +1,12 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T15:52:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:05:00+07:00
 
-- **Nhánh/HEAD:** `dcb60b39d5813b82fabeab0f390826e558e7e676` trên `feature/admin-isolated-handoff-2026-10-20`. Đây là commit evidence-only; source/test SHA thực tế là `78b87d71f82090cb7399a68207ef436a200d3c9f`. Không gọi HEAD evidence-only là source đã chạy test.
-- **Validate Source:** [run #39750503800](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503800) — **SUCCESS** trên SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`.
-- **Admin Preview diagnostic / Playwright:** [run #39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) — **SUCCESS** trên cùng SHA. Screenshot matrix **PASS** cho 8 viewport (320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900), light/dark.
-- **Artifact:** [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) — 99 PNG (16 login + 83 fixture/read-only), 75 metrics. Không có page/console/failed-request/HTTP errors, fixture write attempts hoặc unexpected API paths.
-- **Phạm vi Preview:** `PASS_LOGIN_CSS_SIGNATURE` — chỉ kiểm tra CSS/màn login. Không phải đăng nhập thật hay QA backend/business. 83 ảnh fixture dùng dữ liệu tổng hợp/read-only.
-- **PASS:** Validate Source + local Playwright/screenshot matrix trên SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; Preview login CSS signature trên cùng SHA. **NOT VERIFIED / NOT ACCEPTED:** đối chiếu đầy đủ 12 màn; authenticated business/backend QA; upload/save ảnh thật và D1 migration ledger. **BLOCKED:** AI grouping màn #11 chưa có route/controls/API/contract được duyệt. R2 image save và PRE/PRO migrations `DEFERRED_BY_OWNER`.
-- **An toàn:** PR #111 ADMIN OPEN/unmerged; PR #108 static OPEN/unmerged. Chỉ làm nhánh ADMIN; không sửa `main`/static, không merge/force-push, không deploy Production, không bypass Cloudflare Access/secrets, không ghi D1/R2/backend hoặc chạy migration.
-- **Tiến độ: 50%** — CI/fixture xanh không chứng minh visual parity 12 màn hoặc backend QA thật.
-------
+1. Repository `chichute5500/Sindarealest-admin`; write branch only `feature/admin-isolated-handoff-2026-10-20`. Re-fetch current HEAD before each write and use expected SHA/fast-forward only.
+2. Validate Source [#39752153329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39752153329) SUCCESS on pre-handoff SHA `55a0db927a3b9cc9a6b7fed48eca663f9c3bfa0c`. Preview/Playwright [#39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) SUCCESS on app source SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; Preview diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only.
+3. Artifact [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) downloaded and visually reviewed (99 PNGs, 75 fixture metrics). Screen #3 remains PARTIAL/NOT ACCEPTED; don't fake missing photos, prices, stock or business data.
+4. Next task: add/run Playwright scroll-to-end geometry assertions for fixed bottom navigation at 320×640 and 390×844 in light/dark. Only fix CSS if tests prove overlap; preserve existing assertions.
+5. Progress 50%. Full 12-screen reference parity NOT ACCEPTED; authenticated business/backend QA NOT TESTED; AI grouping #11 BLOCKED; R2 image save and PRE/PRO migrations DEFERRED_BY_OWNER.
+
+**Guardrails:** PR #111/#108 OPEN/unmerged; only ADMIN branch. No main/static edits, merge/cherry-pick/force-push/sync, Production deployment, Access/secrets changes or bypass, remote D1/R2/SQL/migrations/setup/infra.
 **Continue without stopping after reports**
 
 1. Re-read live ADMIN HEAD, PR #111/#108 and Actions before every write.

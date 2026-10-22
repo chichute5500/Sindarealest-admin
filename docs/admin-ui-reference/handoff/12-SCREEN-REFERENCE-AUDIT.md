@@ -1,28 +1,13 @@
 # Admin 12-screen reference audit matrix
 
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T15:52:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:05:00+07:00
 
-- **Nhánh/HEAD:** `dcb60b39d5813b82fabeab0f390826e558e7e676` trên `feature/admin-isolated-handoff-2026-10-20`. Đây là commit evidence-only; source/test SHA thực tế là `78b87d71f82090cb7399a68207ef436a200d3c9f`. Không gọi HEAD evidence-only là source đã chạy test.
-- **Validate Source:** [run #39750503800](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503800) — **SUCCESS** trên SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`.
-- **Admin Preview diagnostic / Playwright:** [run #39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) — **SUCCESS** trên cùng SHA. Screenshot matrix **PASS** cho 8 viewport (320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900), light/dark.
-- **Artifact:** [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) — 99 PNG (16 login + 83 fixture/read-only), 75 metrics. Không có page/console/failed-request/HTTP errors, fixture write attempts hoặc unexpected API paths.
-- **Phạm vi Preview:** `PASS_LOGIN_CSS_SIGNATURE` — chỉ kiểm tra CSS/màn login. Không phải đăng nhập thật hay QA backend/business. 83 ảnh fixture dùng dữ liệu tổng hợp/read-only.
-- **PASS:** Validate Source + local Playwright/screenshot matrix trên SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; Preview login CSS signature trên cùng SHA. **NOT VERIFIED / NOT ACCEPTED:** đối chiếu đầy đủ 12 màn; authenticated business/backend QA; upload/save ảnh thật và D1 migration ledger. **BLOCKED:** AI grouping màn #11 chưa có route/controls/API/contract được duyệt. R2 image save và PRE/PRO migrations `DEFERRED_BY_OWNER`.
-- **An toàn:** PR #111 ADMIN OPEN/unmerged; PR #108 static OPEN/unmerged. Chỉ làm nhánh ADMIN; không sửa `main`/static, không merge/force-push, không deploy Production, không bypass Cloudflare Access/secrets, không ghi D1/R2/backend hoặc chạy migration.
-- **Tiến độ: 50%** — CI/fixture xanh không chứng minh visual parity 12 màn hoặc backend QA thật.
-------
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T04:35:36+07:00
-
-- Repo `chichute5500/Sindarealest-admin`; chỉ nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA `6dcbcdccb45d824095f5dd50f5f7c919ae72e77a`; branch HEAD khi ghi handoff `76769e55ac40d8cb8eff8ee099de15eebab30970` là evidence-only descendant.
-- Validate Source [#39679652666](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652666) **SUCCESS** và Admin Preview/Playwright [#39679652720](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720) **SUCCESS**, cùng exact SHA `6dcbcdccb45d824095f5dd50f5f7c919ae72e77a`.
-- Artifact [`admin-preview-evidence-267`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39679652720/artifacts/12382874321), ID `12382874321`, 13,069,621 bytes: 68 PNG, 51 fixture screenshots, 43 metrics. ZIP metadata đã đọc: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths.
-- Mobile “Khác” menu: Escape đóng menu và focus trả về trigger; chọn “Cài đặt & sao lưu” đóng menu, đặt `aria-expanded=false`, trả focus về trigger và chuyển đúng nội dung; test sau đó quay về Tổng quan và mở menu lại. E2E còn kiểm tra Warranty/Settings menuitems, aria-controls, bounds và overflow ở mobile. Screenshot 390×844 light đã xem trực tiếp; artifact có theme/viewports khác.
-- Notifications: Escape close/focus restore + viewport/no-clipping tests pass. Backup/Restore #12: mobile actions wrap đúng, note cảnh báo không tràn, file input ẩn; screenshot helper chụp đúng panel. Không export/restore thật, không API write.
-- Screen #11 “AI image review/grouping” chưa có route/controls/API rõ ràng trong source hoặc tên file/module ở recursive tree. Không tự phát minh màn hình/endpoint; không gọi provider thật hoặc tiêu tốn quota. Cần feature contract/reference đã duyệt trước khi triển khai.
-- Tiến độ giữ **50%**; 12-screen parity **NOT ACCEPTED**; authenticated backend/business QA **NOT TESTED**. PR #111/#108 OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
-
+- Validate Source [#39752153329](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39752153329) SUCCESS on pre-handoff HEAD `55a0db927a3b9cc9a6b7fed48eca663f9c3bfa0c`.
+- Preview/Playwright [#39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) SUCCESS on app source SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; `PASS_LOGIN_CSS_SIGNATURE` only, not authenticated business QA.
+- Artifact [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) was downloaded and reviewed: 99 PNGs, 75 fixture metrics. Screen #3 remains PARTIAL/NOT ACCEPTED; screenshots do not authorize fake product photos/prices/stock.
+- Screens #4/#5/#7/#12 also visually reviewed; scroll-to-end geometry still needs explicit testing. Full 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED; progress 50%.
+- PR #111/#108 OPEN/unmerged. Only ADMIN branch; no main/static edits, Production deployment, Access/secrets bypass, or remote D1/R2/schema/migration writes.
 ---
-
 ---
 
 ---
@@ -244,3 +229,13 @@ Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322
 - Screen #4 Product editor PARTIAL; #7 Orders PARTIAL; #6 Category/classification NOT TESTED as a distinct screen family. No categories route exists: current logic uses `#pCategory` and `#categoryBox`.
 - Fixture-only checks; full 12-screen parity NOT ACCEPTED, authenticated business QA NOT TESTED, overall progress 50%.
 - Next: safe fixture tests for current category options/manual entry/list filter. Do not create route/API or save data.
+
+
+## Screenshot review — artifact 299 — 2026-10-22
+
+- Artifact source SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) was downloaded, extracted and inspected visually.
+- Opened `products__390x844__light.png`, `products__1280x800__light.png`, `products-reference-matrix__320x640__light.png`, `product-editor__1280x800__light.png`, `product-gallery__1280x800__light.png`, `orders__390x844__light.png`, `settings__390x844__light.png`, `backup-restore__390x844__light.png`, and approved `admin-mobile-reference.png`.
+- Screen #3: no horizontal overflow visible in the captures reviewed; edit action and unknown-value labels are legible. Reference contains concrete product photography/prices/stock, while fixtures intentionally use labelled image placeholders and `Chưa nhập`/`Chưa kiểm kê`. Keep facts truthful; screen #3 remains PARTIAL/NOT ACCEPTED due to whole-screen reference parity and lack of authorized real data.
+- Screens #4/#5: editor/gallery modal header, tabs and fixed footer are visible; existing geometry regression assertions remain required. Static screenshots do not prove scroll/CRUD/image-save behavior.
+- Screens #7/#12: order cards and settings/backup continue below the initial viewport. Do not call this a defect from a cropped screenshot alone; run scroll-to-end geometry checks for 320×640 and 390×844 in light/dark before concluding content is hidden behind the fixed bottom nav.
+- No UI change was made just to imitate reference values with fake data. Next: run Playwright scroll-to-end geometry checks, then fix ADMIN-only CSS only if a real overlap is demonstrated. Fixture screenshots are not authenticated business QA.
