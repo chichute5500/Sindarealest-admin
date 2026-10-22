@@ -1,3 +1,15 @@
+## CONTINUITY PROTOCOL — READ FIRST (2026-10-22)
+
+Use `current-status.json` as the canonical structured state and task queue. Fetch the live ADMIN branch HEAD and PR #111/#108 before relying on any SHA below; historical checkpoint blocks are evidence history, not current state. Reuse tests only when the exact tested source SHA and relevant inputs still match. For each task: inspect the existing evidence, implement a real change, run the relevant tests, verify results, update the status and immediately select the next safe task. Do not stop after a progress report.
+
+Progress remains **50%** until a weighted acceptance item gains new evidence. Docs-only commits, test-only fixes, login smoke, and fixture screenshots do not by themselves increase progress or prove authenticated backend workflows. Use PASS / FAIL / BLOCKED / NOT TESTED / NOT VERIFIED accurately.
+
+Only edit `feature/admin-isolated-handoff-2026-10-20`; keep PR #111/#108 open and unmerged; do not touch `main` or the static-site branch, deploy Production, bypass Cloudflare Access, access/change secrets, or run real D1/R2 writes/migrations. Before every write, recheck the exact branch parent and PR #111 head; if moved, abort and resync. After changes, read the updated files back from GitHub.
+
+**Next task queue:** product editor #4 SKU/description layout evidence check → product list #3 remaining reference gaps → per-screen 12-screen parity audit → orders/fulfillment #7. AI grouping #11 remains blocked on an approved contract. Authenticated backend QA requires authorized Preview access; R2 and PRE/PRO migrations remain deferred by owner.
+
+---
+
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:38:06+07:00
 
 - **Nhánh duy nhất được sửa:** feature/admin-isolated-handoff-2026-10-20. HEAD trước loạt làm mới tài liệu này: 8419835f07ad7fa6d57c1b8e3fa3dfe954d62721 (commit evidence/docs-only do workflow tạo sau source/test commit); PR #111 trỏ đúng SHA này lúc bắt đầu. **Source/test SHA đã kiểm thử:** 2cf894e476b85e77b646b4bb45596e263a9f2fb6. Luôn phân biệt source SHA với commit tài liệu/evidence.
