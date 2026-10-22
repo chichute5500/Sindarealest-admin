@@ -1,13 +1,13 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:40:27Z",
+  "capturedAtUtc": "2026-10-22T15:50:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "codeTestSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
   "sourceCommit": "e11ec06cd5870522735a28205b678897de829361",
-  "status": "SOURCE_CHECKS_PASS_PLAYWRIGHT_PENDING",
+  "status": "SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL",
   "sourceValidation": {
     "id": 39804852564,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564",
@@ -24,24 +24,26 @@
     "id": 39804852604,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604",
     "testedSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-    "status": "pending",
-    "jobs": 0,
-    "artifacts": 0
+    "status": "completed",
+    "jobs": "COMPLETED; inspect exact job logs to classify failure",
+    "artifacts": "NOT RECHECKED DURING HANDOFF SYNC",
+    "conclusion": "failure"
   },
   "blockingOlderRun": {
     "id": 39802525217,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217",
     "testedSha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
-    "status": "in_progress",
-    "step": "Install Chromium for Playwright"
+    "status": "completed",
+    "step": null,
+    "conclusion": "cancelled"
   },
   "checkResults": {
     "dependencyAudit": "PASS_EXACT_SHA",
     "npmRunCheck": "PASS_EXACT_SHA",
     "npmTest": "PASS_EXACT_SHA",
     "cloudflarePagesCheck": "SUCCESS_REPORTED_ON_EXACT_SHA; NOT A CLAIM OF PRODUCTION DEPLOYMENT",
-    "localStaticPlaywright": "PENDING",
-    "customerWarranty503Recovery": "AUTHORED_NOT_YET_RUN",
+    "localStaticPlaywright": "FAILED_OR_INCOMPLETE; exact failure requires log review",
+    "customerWarranty503Recovery": "AUTHORED_NOT_CONFIRMED_BY_PREVIEW_RUN",
     "authenticatedBusinessBackendQA": "NOT_TESTED",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "productionDeployment": "NOT_PERFORMED"
@@ -89,8 +91,10 @@
     "Authenticated Preview needs authorized access; do not bypass Cloudflare Access."
   ],
   "nextActions": [
-    "Poll #39802525217 and #39804852604; inspect exact logs/artifacts after completion; no duplicate runs.",
-    "Review #8–#12 screenshots versus the approved reference at matching viewport/theme and verify 503 recovery.",
-    "Continue PR #111 provenance audit; 1,304 changed paths, branches diverged."
-  ]
+    "Inspect run 39804852604 jobs/logs/artifacts and identify root cause.",
+    "Do not dispatch duplicate run before inspecting existing run evidence.",
+    "Fix confirmed issue on ADMIN branch, then validate exact new code SHA.",
+    "Keep progress at 50% PROVISIONAL until screen acceptance evidence changes."
+  ],
+  "branchHeadShaAtHandoff": "f631596621f2ccd97727bb3ff71350121d401919"
 }
