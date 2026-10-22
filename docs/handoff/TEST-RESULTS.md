@@ -13,6 +13,9 @@ Previous live PASS #805 / artifact 12402222013 is for SHA `f16acd5fe8ac5a7f8fbc2
 
 The latest source update strengthened gallery screenshot readiness by waiting for the main image source to match the active thumbnail and for all image transition classes to be removed; regression assertion added in `tests/website-screenshot-capture.test.mjs`. Run #807 must verify this on the exact current SHA before it is marked PASS. Run #806 belongs to intermediate SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e` and must not be used as current-SHA evidence: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487.
 
+
+Current live-audit note: [run #807](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501) is still in progress at the Cloudflare Preview probe step and has no artifact yet. Do not mark current live visual audit complete until a successful artifact and matching deployment metadata are available.
+
 ---
 
 # CURRENT CHECKPOINT — 2026-10-22 (gallery capture settling; supersedes older status snapshots)

@@ -8,6 +8,9 @@ Gallery note: the #805 mobile Light next-image screenshot shows the selected whi
 
 Intermediate #806 is for SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e`, not current HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487. Working estimate remains ~85%; not final acceptance. Continue without stopping after reporting.
 
+
+Current live-audit note: [run #807](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501) is still in progress at the Cloudflare Preview probe step and has no artifact yet. Do not mark current live visual audit complete until a successful artifact and matching deployment metadata are available.
+
 ---
 
 ## VERIFIED STOREFRONT ICON-STATE CHECKPOINT — 2026-10-22
