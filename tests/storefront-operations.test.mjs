@@ -87,6 +87,10 @@ assert.ok(storefrontHtml.includes('function addToCartFromControl(id,button)')
   && storefrontHtml.includes("$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget))")
   && storefrontHtml.includes('e.stopPropagation();addToCartFromControl(add.dataset.add,add);return'),
   'Every product add control must invoke one shared feedback wrapper while preserving the single existing addToCart business operation.');
+assert.ok(storefrontHtml.includes("t.classList.toggle('toast-detail-context',Boolean($('#productOverlay')?.classList.contains('open')))")
+  && storefrontHtml.includes('.toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}')
+  && storefrontHtml.includes("t.classList.remove('show','toast-detail-context')"),
+  'A successful detail toast must clear the fixed add-to-cart action instead of covering the button on mobile; card toasts keep their normal placement.');
 assert.ok(storefrontHtml.includes('function flyProductImageToCart(sourceImage,productId)')
   && storefrontHtml.includes("clone.dataset.cartTargetId='cartOpen'")
   && storefrontHtml.includes("clone.dataset.durationMs='720'")

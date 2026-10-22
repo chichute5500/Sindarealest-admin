@@ -833,13 +833,18 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       && Number.parseInt(toastStyle?.zIndex || '0', 10) > Number.parseInt(navStyle?.zIndex || '0', 10));
     const image = document.querySelector('#detailImageStage');
     const r = image?.getBoundingClientRect();
+    const addRect = document.querySelector('#detailAdd')?.getBoundingClientRect();
+    const toastClearOfAddButton = !addRect || !toastRect || toastRect.right <= addRect.left
+      || toastRect.left >= addRect.right || toastRect.bottom <= addRect.top || toastRect.top >= addRect.bottom;
     return {
       quantity: Number(quantities[id] || 0), total,
       expectedBadge: total > 99 ? '99+' : String(total),
       badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
       toastVisible: toastShown,
-      toastVisuallyVisible: toastShown && toastOpacity >= 0.95 && toastOnScreen && toastAboveMobileNav,
+      toastVisuallyVisible: toastShown && toastOpacity >= 0.95 && toastOnScreen && toastAboveMobileNav && toastClearOfAddButton,
+      toastClearOfAddButton,
       toastOpacity, toastRect: toastRect ? { x:toastRect.x, y:toastRect.y, width:toastRect.width, height:toastRect.height, bottom:toastRect.bottom } : null,
+      addRect: addRect ? { x:addRect.x, y:addRect.y, width:addRect.width, height:addRect.height, top:addRect.top, bottom:addRect.bottom } : null,
       mobileNavRect: navVisible && navRect ? { top:navRect.top, bottom:navRect.bottom, zIndex:navStyle.zIndex } : null,
       toastText: (toast?.textContent || '').trim(),
       imageRect: r ? { x:r.x, y:r.y, width:r.width, height:r.height } : null,
@@ -1003,7 +1008,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     const onePass = afterOne.quantity === before.quantity + 1
       && afterOne.total === before.total + 1
       && afterOne.badge === afterOne.expectedBadge
-      && afterOne.toastVisible && afterOne.toastVisuallyVisible && afterOne.toastText.includes(expectedLabel)
+      && afterOne.toastVisible && afterOne.toastVisuallyVisible && afterOne.toastClearOfAddButton && afterOne.toastText.includes(expectedLabel)
       && rectUnchanged(before.imageRect, afterOne.imageRect);
     await capture(page, screenshotStem('cart-add-success-detail-open', viewport, theme) + '.png', false, {
       ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'one-successful-add-with-detail-toast',
@@ -1028,7 +1033,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     const rapidPass = afterRapid.quantity === before.quantity + 3
       && afterRapid.total === before.total + 3
       && afterRapid.badge === afterRapid.expectedBadge
-      && afterRapid.toastVisible && afterRapid.toastVisuallyVisible && afterRapid.toastText.includes(expectedLabel)
+      && afterRapid.toastVisible && afterRapid.toastVisuallyVisible && afterRapid.toastClearOfAddButton && afterRapid.toastText.includes(expectedLabel)
       && rectUnchanged(before.imageRect, afterRapid.imageRect) && rapidFlightPass;
     await capture(page, screenshotStem('cart-add-rapid-clicks-detail-open', viewport, theme) + '.png', false, {
       ...captureMeta(viewport, theme, route), captureType: 'cart-interaction', state: 'rapid-two-clicks-exactly-two-adds',
@@ -1264,6 +1269,7 @@ async function captureCardFlyToCartProbe(page, button, viewport, theme, context,
     sourceMatchesExactDisplayedImage: sourceMatches, durationMs: start?.durationMs||null, targetCartId: start?.targetId||null,
     productIdPreserved: start?.productId===before.productId, movementObserved: moved, cloneRemovedAndCartBumpedAfterSuccess: finished,
     quantityIncreasedOnce: after.quantity===before.quantity+1 && after.total===before.total+1,
+    beforeStageRect: before.stageRect, afterStageRect: after.stageRect,
     badgeMatchesActualCart: after.badge===after.expectedBadge, successToastVisible: after.toastVisible,
     noLayoutShift: sameRect(before.stageRect,after.stageRect), start, mid, after };
   audit.flyToCartChecks.push(result);
