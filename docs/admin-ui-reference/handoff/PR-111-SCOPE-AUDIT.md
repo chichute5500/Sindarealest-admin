@@ -144,3 +144,16 @@ The current runtime/config set (including `package.json`) has 36 paths: **14 add
 - Consolidated duplicate prompt content: `MASTER-PROMPT-AUTO-HANDOFF.md` now serves only as a compatibility pointer to START-HERE; `PROMPT-NEXT-CHAT.md` is reduced to current-state-first instructions. Handoff integrity tests continue to require both paths to point to START-HERE.
 - Remaining `docs` count is 340, including 326 per-run history files. Retain these text/JSON records under `handoff/history/README.md` policy; the 912 historical generated PNGs have already been removed from the PR diff and new matrices belong in Actions artifacts.
 - Not changed: `public/index.html` and `.github/workflows/liquid-glass-visual-preview.yml` remain scope/provenance items requiring separate review; the static branch is read-only. PR #111 remains open/unmerged. All 12 Admin screens remain PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
+
+
+## Live scope-cleanup checkpoint — 2026-10-22T19:15:36.363Z
+
+Older tables above are historical and must not be used as live counts. PR #111 was verified at HEAD `5b9764b3f6b023537551a49d87ec16ef325bf76d`, OPEN/unmerged, 391 changed paths (+38,984/−251), mergeable=false. PR #108 remains OPEN/unmerged/read-only at `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8` (291 changed paths).
+
+- Current top-level census: .github 1; README-DEPLOY.txt 1; data 1; docs 330; functions 24; migrations 2; package.json 1; public 1; scripts 4; tests 26.
+- Current extension census: yml 1; txt 1; json 164; md 165; html 2; png 1; zip 1; js 26; sql 2; mjs 28.
+- Removed 912 generated historical PNGs, 10 duplicate legacy handoff files, obsolete prompt/static-site audit docs, static-only workflow `.github/workflows/liquid-glass-visual-preview.yml`, and its unreferenced capture script `scripts/capture-liquid-glass-preview.mjs`.
+- Restored `public/index.html` to the exact `main` blob; it no longer appears in PR #111 changed paths. `public/admin/index.html` remains the Admin UI source.
+- Kept compact per-run report/diagnostics JSON/Markdown and the approved reference image. They preserve test outcomes, including failures/blocks, and are not generated screenshot matrices.
+- Current-head CI is NOT_VERIFIED: no matching successful Action/check was returned by the available exact-SHA lookup. Last known UI matrix remains run #39816652346 on older SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`.
+- Product progress remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.

@@ -50,3 +50,13 @@ No merge/force push/deploy; no main/static writes; no Access bypass or secret op
 - Removed two superseded/out-of-scope docs: the static-site audit report and old prompt completeness snapshot. Consolidated the master prompt to a compatibility pointer and reduced PROMPT-NEXT-CHAT from 3,602 to 1,661 characters.
 - Preserved the 326 per-run history files under `handoff/history/` because the repository's retention policy requires compact text/JSON evidence. No approved reference image, product/runtime source, or historical test record was deleted.
 - The next-chat prompt and this status note were updated after the successful SHA; re-fetch Actions for the resulting live HEAD before calling the final handoff state PASS.
+
+
+## Live scope-cleanup checkpoint — 2026-10-22T19:15:36.363Z
+- Verified PR #111 HEAD before this documentation-sync commit: `5b9764b3f6b023537551a49d87ec16ef325bf76d`; OPEN/unmerged; 391 changed paths (+38,984/−251); mergeable=false.
+- PR #108 remains OPEN/unmerged and read-only at `3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8` (291 changed paths).
+- Removed the static-only workflow `.github/workflows/liquid-glass-visual-preview.yml` and its sole dedicated script `scripts/capture-liquid-glass-preview.mjs`; neither was referenced by `package.json`. This workflow only targeted static-site branches, not the Admin branch.
+- Restored `public/index.html` to the exact `main` blob. GitHub now omits it from PR #111's changed-file list.
+- Current changed paths: **391** — `.github` 1; `README-DEPLOY.txt` 1; `data` 1; `docs` 330; `functions` 24; `migrations` 2; `package.json` 1; `public` 1; `scripts` 4; `tests` 26. Extensions: YML 1; TXT 1; JSON 164; MD 165; HTML 2; PNG 1; ZIP 1; JS 26; SQL 2; MJS 28.
+- Exact current-HEAD Actions validation is **NOT_VERIFIED**: the commit-run lookup returned no PR-triggered runs and combined status returned no checks. The last known full source/UI pass remains run #39816652346 on SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`; do not transfer that PASS to the current HEAD.
+- Product progress remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; no authenticated backend acceptance claimed.

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T17:10:01Z",
+  "capturedAtUtc": "2026-10-22T19:15:36.363Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "3bd5523544310818e8f8c4543ab386eea217dd68",
+  "branchHeadAtCheckpointStart": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
   "checkpointSemantics": "Live PR/branch HEAD changes with each contents-API commit; branchHeadAtCheckpointStart is the fetched head immediately before this status refresh. Fetch live refs before acting. codeTestSha is a distinct exact tested source revision.",
   "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "latestProductSourceCommit": "105f46b90dc5664dd091493dbd5cea1af7796c44",
@@ -26,9 +26,9 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "eafb4259f612552da210089aadfb0c8c05fa2cbd",
-      "changedFiles": 288,
-      "additions": 23260,
+      "headSha": "3c6a6c30864e76c8e2d3afb8c2cac36e282dcce8",
+      "changedFiles": 291,
+      "additions": 23573,
       "deletions": 394,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false
@@ -39,11 +39,11 @@
       "mergeable": false,
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
-      "headSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
+      "headSha": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
       "commits": 1290,
-      "changedFiles": 1315,
-      "additions": 49743,
-      "deletions": 404,
+      "changedFiles": 391,
+      "additions": 38984,
+      "deletions": 251,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
     }
@@ -163,7 +163,7 @@
   },
   "scopeAudit": {
     "status": "PARTIAL",
-    "liveChangedFiles": 1315,
+    "liveChangedFiles": 391,
     "previousCensus": 1314,
     "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
     "priority": "Refresh paginated filenames and classify provenance for each changed path; prioritize runtime/API/migration/setup/workflow paths.",
@@ -173,28 +173,42 @@
     "r2Persistence": "DEFERRED_BY_OWNER",
     "aiImageGrouping": "BLOCKED_OWNER_APPROVED_API_CONTRACT_REQUIRED",
     "livePathCensus": {
-      ".github": 2,
+      ".github": 1,
       "README-DEPLOY.txt": 1,
       "data": 1,
-      "docs": 1251,
+      "docs": 330,
       "functions": 24,
       "migrations": 2,
       "package.json": 1,
-      "public": 2,
-      "scripts": 5,
+      "public": 1,
+      "scripts": 4,
       "tests": 26
     },
     "liveExtensionCensus": {
-      "png": 913,
-      "md": 173,
-      "json": 165,
-      "mjs": 29,
-      "js": 26,
-      "html": 3,
-      "yml": 2,
-      "sql": 2,
+      "yml": 1,
       "txt": 1,
-      "zip": 1
+      "json": 164,
+      "md": 165,
+      "html": 2,
+      "png": 1,
+      "zip": 1,
+      "js": 26,
+      "sql": 2,
+      "mjs": 28
+    },
+    "cleanupCheckpoint": {
+      "capturedAtUtc": "2026-10-22T19:15:36.363Z",
+      "parentSha": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
+      "changedFiles": 391,
+      "removedGeneratedHistoricalPngs": 912,
+      "removedLegacySnapshotFiles": 10,
+      "removedObsoletePromptAudit": true,
+      "removedOutOfScopeStaticAudit": true,
+      "removedStaticOnlyWorkflow": true,
+      "removedStaticOnlyCaptureScript": true,
+      "restoredPublicIndexToMain": true,
+      "approvedReferenceRetained": true,
+      "currentHeadActions": "NOT_VERIFIED"
     }
   },
   "guardrails": [
@@ -205,16 +219,16 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Inspect artifact #344 against admin-mobile-reference.png at matching viewport/theme; prioritize Gallery (#5), then screens #8–#12.",
-    "Refresh PR #111 paginated changed-file census (live PR metadata now 1314) and continue semantic provenance review of runtime/API/migration/setup/workflow paths.",
-    "Make reproducible ADMIN-only fixes, add regression coverage, validate exact SHA, then resync handoff files.",
-    "Mark authenticated QA blocked/not tested if authorized access is unavailable; never bypass Access."
+    "Fetch live PR #111/#108 and exact-SHA Actions after the handoff sync; do not infer current HEAD PASS from older runs.",
+    "Continue semantic provenance review of remaining runtime/API/migration/setup/workflow paths; delete only when proven unused.",
+    "Retain compact per-run test evidence and approved reference; no generated screenshots in Git history.",
+    "Keep authenticated backend QA NOT_TESTED and all 12 screens PARTIAL_NOT_ACCEPTED until acceptance evidence exists."
   ],
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-22T17:10:01Z",
-    "syncPurpose": "Refresh live PR #111 census to 1,315; record the exact failed handoff test attempt on 7a60099 and its concrete missing-link cause; correct canonical handoff links and make integrity test resilient to separately updated run records. Preserve product progress at 50% PROVISIONAL."
+    "lastSyncAtUtc": "2026-10-22T19:15:36.363Z",
+    "syncPurpose": "Refresh canonical handoff after PR #111 cleanup: 912 generated PNGs, 10 legacy snapshots, obsolete audit docs, static-only preview workflow/script removed; public/index.html restored to main blob; live census 391. Current-head CI not verified."
   },
-  "currentHeadAtCheckpoint": "7a60099f96bb0be4f68dbda47fbec9c10df44390"
+  "currentHeadAtCheckpoint": "5b9764b3f6b023537551a49d87ec16ef325bf76d"
 }

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-22T17:10:01Z",
+  "capturedAtUtc": "2026-10-22T19:15:36.363Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "3bd5523544310818e8f8c4543ab386eea217dd68",
+  "branchHeadAtCheckpointStart": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
   "codeTestSha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "NOT_VERIFIED_CURRENT_HEAD",
   "latestRun": {
     "id": 39820105048,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39820105048",
@@ -24,7 +24,8 @@
       "expired": false,
       "containsScreenshotMatrix": false,
       "note": "The artifact upload preserved the approved reference image only; it is not new UI evidence."
-    }
+    },
+    "note": "Historical run on 7a60099; not the current HEAD. Do not treat as current validation."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS",
@@ -37,7 +38,11 @@
     "failedRequests": "NOT_COLLECTED",
     "httpErrors": "NOT_COLLECTED",
     "attemptedWrites": "NOT_COLLECTED",
-    "unexpectedApiPaths": "NOT_COLLECTED"
+    "unexpectedApiPaths": "NOT_COLLECTED",
+    "currentHeadProjectCheck": "NOT_VERIFIED",
+    "currentHeadAutomatedTests": "NOT_VERIFIED",
+    "currentHeadPlaywright": "NOT_VERIFIED",
+    "currentHeadPreviewDiagnostic": "NOT_VERIFIED"
   },
   "historicalRuns": [
     {
@@ -170,11 +175,9 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Verify Actions against live branch HEAD before reporting PASS.",
+    "Run source and automated tests on exact current SHA; confirm Playwright and Preview diagnostics.",
+    "Keep 50% PROVISIONAL and all 12 screens PARTIAL_NOT_ACCEPTED until accepted."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -237,5 +240,12 @@
   },
   "remainingIssues": [],
   "blockedItems": [],
-  "productionDeployment": "NOT_PERFORMED"
+  "productionDeployment": "NOT_PERFORMED",
+  "currentHeadValidation": {
+    "sha": "5b9764b3f6b023537551a49d87ec16ef325bf76d",
+    "workflowRunsLookup": "NO_PR_TRIGGERED_RUN_RETURNED",
+    "combinedStatus": "NO_CHECKS_RETURNED",
+    "result": "NOT_VERIFIED",
+    "note": "The workflow lookup wrapper returns PR-triggered runs only; no exact-SHA successful run was confirmed for this cleanup HEAD. Prior source/UI pass on 105f46b is historical."
+  }
 }
