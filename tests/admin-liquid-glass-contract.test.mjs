@@ -54,6 +54,26 @@ for (const route of [
 assert.equal(adminHtml.split('</style>').length - 1, 1, 'ADMIN must retain one complete style block');
 assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese document language');
 
+// Product editor #4: keep SKU verification and AI-assisted copy explicit and accessible.
+for (const [id, label] of [
+  ['pSku', 'commercial SKU input'],
+  ['pSkuVerified', 'explicit commercial SKU verification checkbox'],
+  ['generateDescription', 'AI description suggestion action'],
+  ['pDescription', 'editable product description'],
+  ['pPrice', 'optional product price input'],
+  ['pStock', 'optional stock input']
+]) {
+  has(`id="${id}"`, label);
+}
+has('aria-label="Xác nhận SKU thương mại chính thức"', 'clear accessible label for SKU verification');
+has('Chỉ bật khi mã chính thức đã được xác nhận.', 'warning that internal/generated SKU is not an official verified SKU');
+has('AI chỉ đề xuất nội dung; hãy kiểm tra và chỉnh sửa trước khi lưu.', 'human review before saving AI-suggested copy');
+has('class="sku-entry-row"', 'SKU and verification controls share a responsive row');
+has('class="product-description-heading"', 'description label and AI action share a heading row');
+has('placeholder="Chưa có giá"', 'missing price is represented as unknown rather than fabricated');
+has('placeholder="Chưa kiểm kê"', 'unknown stock is distinguished from a counted zero');
+has('aria-label="Nhóm thông tin sản phẩm"', 'product editor tabs have an accessible group label');
+
 // Orders stay summary-first and use local search/status/payment filters on already-loaded orders.
 has('const filteredOrders=orders.filter', 'orders filters operate only on the currently loaded orders array');
 has('id="orderSearchBox"', 'orders list exposes a labeled search field');
