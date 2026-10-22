@@ -623,5 +623,37 @@
       "No invented business data or API contracts",
       "No PASS without exact-SHA evidence"
     ]
+  },
+  "latestLiveHandoff": {
+    "documentationHeadBeforeUpdate": "e93b2384c89513c0911ef019153de28198f4e2b4",
+    "adminBranch": "feature/admin-isolated-handoff-2026-10-20",
+    "pr111": {
+      "state": "OPEN",
+      "merged": false,
+      "head": "e93b2384c89513c0911ef019153de28198f4e2b4"
+    },
+    "pr108": {
+      "state": "OPEN",
+      "merged": false,
+      "head": "f291209565dbc49d78a0b3a387d00be0c754df45"
+    },
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL",
+    "sourceValidation": {
+      "runId": 39790514805,
+      "headSha": "df819968a1b3b561bba00abde4fe3432adaa8b39",
+      "conclusion": "success"
+    },
+    "previewDiagnostic": {
+      "runId": 39790514765,
+      "headSha": "df819968a1b3b561bba00abde4fe3432adaa8b39",
+      "status": "in_progress",
+      "lastObservedJob": 119865005259,
+      "lastObservedStep": "Install Chromium for Playwright",
+      "artifacts": [],
+      "visualAcceptance": "NOT VERIFIED"
+    },
+    "orders": "PARTIAL_NOT_ACCEPTED",
+    "orderDetail": "NOT VERIFIED"
   }
 }

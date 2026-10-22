@@ -1,3 +1,17 @@
+> **LIVE HANDOFF UPDATE — 2026-10-22 (last verified poll).** Current documentation HEAD before this update: `e93b2384c89513c0911ef019153de28198f4e2b4`. PR #111 remains OPEN/unmerged and matches ADMIN branch. PR #108 remains OPEN/unmerged; latest observed static PR head `f291209565dbc49d78a0b3a387d00be0c754df45`. Overall progress remains **50% PROVISIONAL**.
+>
+> **Active run:** [Preview diagnostic #39790514765](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514765) is still `IN_PROGRESS` for source SHA `df819968a1b3b561bba00abde4fe3432adaa8b39` (NOT current docs HEAD). Latest poll: job `119865005259`, step “Install Chromium for Playwright” still in progress; no artifacts returned. Do not infer success/failure from elapsed time, and do not treat this as evidence for the docs HEAD.
+>
+> **Source validation:** [#39790514805](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805) was SUCCESS on `df819968a1b3b561bba00abde4fe3432adaa8b39`, not later docs-only HEADs. State the tested SHA exactly; do not say the current docs HEAD was tested unless a workflow confirms it.
+>
+> **Recent code changes:** [`9209ac3`](https://github.com/chichute5500/Sindarealest-admin/commit/9209ac398636e2187beb2731359ae9c205901157) fixes navigation collection iteration. [`df81996`](https://github.com/chichute5500/Sindarealest-admin/commit/df819968a1b3b561bba00abde4fe3432adaa8b39) updates Order detail E2E to select the visible responsive detail button and updates the contract assertion. Current Playwright result is unresolved.
+>
+> **Screen audit:** #6 Orders = `PARTIAL_NOT_ACCEPTED` (3 UI-only fixtures; no live backend data or multi-page pagination proof). #7 Order detail = `NOT VERIFIED` until run logs and screenshot artifacts are inspected. Do not mark either PASS based on unit tests or fixture screenshots alone.
+>
+> **Next chat MUST start by polling** run #39790514765: run status, jobs/steps, logs, artifacts. If it remains stuck at Chromium installation, diagnose workflow/dependency/cache behavior from logs; do not blindly queue duplicate runs. If completed, inspect screenshots and report per-screen evidence. Then continue remaining screen and PR #111 provenance audits.
+>
+> **Safety:** PR #111/#108 stay OPEN/unmerged. No main/static branch writes, Production deploy, Access bypass, secrets, setup/deploy/migrations, or remote D1/R2 access. Use expected-SHA updates and read back every handoff write.
+
 > **LIVE CHECKPOINT — supersedes all older SHA/run snapshots below (2026-10-22 21:00 +07).** ADMIN branch HEAD: `df819968a1b3b561bba00abde4fe3432adaa8b39`. PR #111 OPEN/unmerged and matches this HEAD. PR #108 OPEN/unmerged; latest observed static HEAD `f291209565dbc49d78a0b3a387d00be0c754df45`. Progress stays **50% PROVISIONAL**.
 >
 > - Source validation [#39790514805](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39790514805) = SUCCESS on exact HEAD `df819968a1b3b561bba00abde4fe3432adaa8b39`.
