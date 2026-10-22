@@ -625,7 +625,7 @@ async function auditHeroImage(page, label) {
     const hidden = Boolean(imageElement?.hidden);
     const frameStyle = frame ? getComputedStyle(frame) : null;
     const frameCollapsed = !frame || frameStyle.display === 'none' || frame.getBoundingClientRect().width < 1 || frame.getBoundingClientRect().height < 1;
-    const presentationAssetLoaded = path.endsWith('/images/hero-sd-gl052.png')
+    const presentationAssetLoaded = path.endsWith('/images/hero-upload/tb_image_share_1792519964514%20(1).png')
       && loaded && !hidden && status === 'hero-presentation-asset' && !frameCollapsed;
     return {
       actualImage: path,
