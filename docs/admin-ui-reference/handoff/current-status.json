@@ -3,8 +3,8 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Live checkpoint refreshed after test-only commit 920f53d. This commit adds dedicated Activity log UI fixture assertions; it does not prove those assertions passed and is not a product-source acceptance commit.",
-  "branchHeadAtCheckpoint": "920f53d42c643084d7390198b1f6a875ec4f68e7",
+  "checkpointSemantics": "Handoff refresh on 2026-10-22. Snapshot values are not authoritative live refs: fetch PR #111/#108 and exact-SHA Actions at every session start. Latest observed PR #111 HEAD before this handoff refresh: 4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed.",
+  "branchHeadAtCheckpoint": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -22,10 +22,10 @@
   },
   "sourceValidationOnHead": {
     "status": "NOT_VERIFIED_EXACT_SHA",
-    "liveCodeHead": "920f53d42c643084d7390198b1f6a875ec4f68e7",
+    "liveCodeHead": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
     "latestObservedWorkflowRuns": [],
-    "combinedStatus": "No status checks returned",
-    "note": "fetch_commit_workflow_runs returned no PR-triggered runs for current HEAD and combined status returned an empty list. This is not PASS and does not prove Actions are absent. The latest commit is test-only; validate its exact source/test state through an actual Actions run before acceptance."
+    "combinedStatus": "Re-query required for this HEAD",
+    "note": "Prior workflow IDs/SHAs in this file are historical until re-polled. Empty workflow/status results are not PASS. Poll Actions for this exact SHA; do not duplicate queued runs."
   },
   "latestVisualEvidence": {
     "sourceSha": "a6fc090b60e579e9d708775f0c25e3ba56f3439b",
@@ -273,12 +273,13 @@
     ]
   },
   "lastCompletedTask": "Downloaded and inspected artifact #324; diagnosed Order detail focus test failure; patched source responsive target selection and E2E focus selector on ADMIN branch. Exact latest commit verification still pending.",
-  "currentTask": "Poll existing run #325 and #326, prioritizing #326 SHA 26f1c6f; then continue screen #8–#12 audits and scope review.",
+  "currentTask": "Refresh handoff to stop stale SHA/run instructions; next poll existing Actions for live PR #111 HEAD, inspect exact logs, then continue next unaccepted screen without repeating already evidenced checks.",
   "taskQueue": [
-    "Poll #39793390442 and #39794007381; no duplicate dispatch.",
-    "Verify exact SHA and read artifact before any PASS.",
-    "Continue #8 Customers, #9 Warranty, #10 Website settings, #11 Backup/Restore, #12 Activity log.",
-    "Continue per-path provenance/payment/setup/deploy review without remote mutation."
+    "Fetch live PR #111 and #108; current HEAD before this docs refresh was 4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed. Re-fetch after these docs commits because each commit advances HEAD.",
+    "Poll existing workflow runs on the exact live PR #111 HEAD; do not rely on old queued run IDs unless GitHub confirms they still exist.",
+    "If run fails, read exact job logs and artifact, fix one proven cause per commit, then verify again.",
+    "Continue screen #8 Customers, #9 Warranty/support, #10 Website settings, #11 Backup/Restore, #12 Activity log with existing evidence inspected first.",
+    "Continue PR #111 per-path provenance/payment/setup/deploy review; no remote mutation."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -294,14 +295,14 @@
   "ownerActionRequiredNow": "No immediate owner action for fixture-source testing. Authenticated Preview/business QA still requires an approved access path; AI grouping requires the owner-approved contract.",
   "legacyArchiveRoot": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22",
   "latestCheckpointVerification": {
-    "capturedAtUtc": "2026-10-22T14:20:00Z",
-    "branchBeforeDocsCommit": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
-    "codeTestHead": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
+    "capturedAtUtc": "2026-10-22",
+    "branchBeforeDocsCommit": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
+    "codeTestHead": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
     "adminPr": {
       "number": 111,
       "state": "OPEN",
       "merged": false,
-      "headSha": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
+      "headSha": "4f5b7cdc67cc4f1aea3036ae1597eda0f06ac2ed",
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111"
     },
     "staticPr": {
@@ -443,7 +444,8 @@
       "If #326 finishes, verify exact checked-out SHA 26f1c6f..., read its complete log and artifact, then update statuses based on evidence.",
       "Continue #8 Customers, #9 Warranty/support, #10 Website settings, #11 Backup/Restore, #12 Activity log using existing artifact/screens first; add screen-specific viewport/theme/state and evidence only when real.",
       "Continue PR #111 provenance/security review; keep migration 0009, PRE/PRO migrations, R2 save deferred; AI grouping blocked pending owner contract."
-    ]
+    ],
+    "note": "Snapshot taken before docs-only commits. Must fetch live HEAD again after handoff updates; this checkpoint is not evidence the latest code/tests passed."
   },
   "handoffReviewAt": "2026-10-22T14:20:00Z",
   "latestCheckpoint": {
