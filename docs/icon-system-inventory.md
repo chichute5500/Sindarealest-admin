@@ -1,3 +1,11 @@
+# MANUAL ICON REVIEW OVERRIDE — 2026-10-22 10:35 UTC
+
+Freshly opened `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` from artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837) and compared the live Preview's home benefit icons, header/bottom navigation, product-detail controls and favorite pressed states. Sampled icons use outlined artwork rather than text-glyph stand-ins, and the pressed favorite's blue tint broadly matches the blue/navy palette. This does not close full ICON-PARITY: remaining icon contexts still need review. Preserve the official brand emblem unchanged.
+
+Important evidence limitation: the artifact's real live screenshots are observational only; its deployment metadata failed exact-SHA verification (`e916ce...` expected versus `5f1be31...` observed). See `docs/handoff/CURRENT-STATE.md`. Do not use this artifact to claim exact-SHA release acceptance.
+
+---
+
 # LATEST RUN OVERRIDE — 2026-10-22 UTC
 
 A newer isolated visual run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821) for source SHA `e916ce590b6dbd720dca51405097d20333ce649b` was IN_PROGRESS at the latest handoff refresh. Its final result/artifact must be checked before any current audit claim. Until a newer exact-SHA audit completes and screenshots are opened, the last completed evidence remains run [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036), artifact [#12418615814](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814), SHA `fc406599e04475e232fad790efd03d46979a5a20`. That run's archive comparison status is `COMPLETE_NEEDS_VISUAL_REVIEW`; icon visual acceptance remains OPEN. Read `docs/handoff/CURRENT-STATE.md` and refresh branch/deploy/audit metadata before work.
