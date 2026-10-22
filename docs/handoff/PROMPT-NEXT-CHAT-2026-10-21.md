@@ -1,3 +1,50 @@
+# PROMPT CHAT MỚI — TIẾP TỤC SINDAREALEST2 STATIC STOREFRONT
+Cập nhật: 22/10/2026 — ưu tiên bằng chứng mới nhất, không làm lại từ đầu
+
+Bạn tiếp quản trực tiếp từ GitHub. Không yêu cầu người dùng kể lại bối cảnh, không chỉ báo cáo rồi dừng. Đọc checkpoint này trước, sau đó xác minh trạng thái GitHub hiện tại và tiếp tục công việc liên tục.
+
+## Source of truth đã xác minh
+- Repo: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — vẫn OPEN, tuyệt đối không merge.
+- Branch/PR HEAD ở lần bàn giao này: `71d7e302a8fad535756a4bc358f3ba9d7c1d61d8` (commit docs-only `docs(handoff): refresh verified live audit #836 checkpoint`). Không nhầm với source code đang chạy.
+- Storefront source SHA đã deploy và audit live chính xác: `2dca48f562fef5985e8f823e4bb4db20a98fd0df`.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Exact deployment ID: `6d3deb3a-ca6b-4d84-80d9-d2bd18287777`; direct URL: https://6d3deb3a.sindarealest2.pages.dev
+
+## Bằng chứng PASS — không chạy lại vô cớ
+- Validate #4537 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912663
+- Preview Deploy #574 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912646
+- Admin Preview Playwright #805 PASS, chỉ smoke read-only: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912642
+- Live visual audit #836 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912578
+- Artifact #12411645475: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39744912578/artifacts/12411645475
+- Artifact xác nhận `sourceKind=cloudflare-pages-preview-live-read-only`, source/deployment SHA khớp `2dca48f562fef5985e8f823e4bb4db20a98fd0df`, `captureCompleted=true`; 123 ảnh chụp Preview thật, đủ 8/8 viewport/theme: 360×800, 390×844, 768×1024, 1440×900 ở Light/Dark. 13 route checks, 69 section captures, 4 product-detail checks, 8 commerce states, 4 icon states, 6 fly-to-cart checks, 2 animation-edge checks. Overflow, console/page/HTTP errors, failed requests, broken-image contexts, hard failures đều 0. Ảnh thật đã được mở xem.
+- Icon boards `docs/icon-assets/Icon.png` và `docs/icon-assets/Chitiet.png` đã được xem. SVG icon cho luồng đặt hàng/aftercare, tài khoản/chevron, Zalo và các cam kết ở product detail đã được đưa vào và audit hiện tại xác minh state.
+
+## Việc đã chốt — đừng làm ngược lại
+- Hero là ảnh do người dùng cung cấp `/images/hero-sd-gl052.png`, đã được duyệt. Giữ ảnh visible. Không tìm SKU SD-GL052 trong catalog, không yêu cầu người dùng tải lại ảnh, không gate/hide/delete/replace Hero và không mở lại blocker SKU cũ.
+- Giữ nguyên logo SinDarealest chính thức.
+- Không sửa dữ liệu/mapping sản phẩm, SKU, giá, ảnh sản phẩm, backend/API/auth/schema/logic nghiệp vụ, Admin, D1/R2, bindings/secrets/Access, DNS hay Production.
+- QR checkout fail-closed: chưa có trusted backend confirmation/receiver config thì không hiển thị QR hoặc số tiền cần chuyển; không giả lập thanh toán.
+- Không dùng local fixture làm bằng chứng live; không submit checkout thật.
+
+## Việc còn lại — tiếp tục ngay
+1. Fetch lại branch HEAD và PR HEAD trước mọi sửa đổi vì docs commit có thể đã tiến branch. Phân biệt branch HEAD với source SHA đang deploy.
+2. Tiếp tục mở các ảnh desktop/tablet/mobile trong artifact #836 và so sánh với hai PNG gốc:
+   - `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png`
+   - `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`
+3. Review header/logo/hero, sáu ô Liquid Glass (ba lớp, không blur toàn trang), “Đặt hàng an tâm”, catalog/search/card, detail/gallery, cart/account/checkout, Zalo, footer và 404 ở Light/Dark. Kiểm tra khoảng cách, typography, satin folds, trạng thái icon, drawer opacity/contrast, favorite aria/storage, toast/badge, fly-to-cart/reduced-motion/rapid-click/scroll-resize.
+4. Đã ghi nhận gallery của “Sneaker da cá sấu – Tuyển chọn 25” có thumbnail nhìn khác ảnh chính; nguồn gốc chưa xác minh. Không sửa mapping dữ liệu. Chỉ xử lý nếu tìm được bằng chứng đáng tin cậy và thay đổi vẫn trong phạm vi.
+5. Chỉ sửa một mismatch giao diện khi đã xác nhận bằng screenshot. Sau sửa: chạy test liên quan, deploy Preview, xác minh deployment SHA chính xác và mở artifact live mới. Không rerun suite PASS không liên quan.
+6. Sau khi có kết quả mới, cập nhật `docs/handoff/HANDOFF.md`, `docs/handoff/TEST-RESULTS.md`, `docs/handoff/TASKS.md`, `docs/visual-audit-progress-2026-10-19.md`, `docs/prompts/NEXT-CHAT-PROMPT.md`, `docs/prompts/MASTER-PROMPT-SINDAREALEST2-PARALLEL.md` và prompt handoff trong `docs/handoff/` bằng SHA, workflow URL, artifact ID, PASS/FAIL/UNVERIFIED.
+7. Báo cáo ngắn gọn bằng tiếng Việt: SHA, changed files, links, trạng thái audit, phần còn lại và blocker. Sau báo cáo tiếp tục làm, không dừng trừ khi thật sự cần thao tác/quyền/quyết định/dữ liệu từ người dùng.
+
+## Ước lượng
+Khoảng 80% là ước lượng làm việc, không phải điểm audit. Không tuyên bố 100% khi chưa hoàn tất đối chiếu trực quan.
+
+
+---
+
 ## CHECKPOINT CHỐNG LÀM LẠI — 2026-10-22 (đọc đầu tiên, thay cho mọi trạng thái cũ mâu thuẫn)
 
 ### Source of truth tại checkpoint
