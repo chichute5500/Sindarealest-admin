@@ -1,7 +1,7 @@
 # PR #111 — READ-ONLY SCOPE AND DEPLOYMENT READINESS AUDIT
 
-**Checkpoint:** 2026-10-22T14:20:00Z  
-**ADMIN code/test SHA before this docs-only handoff commit:** `26f1c6fb0632a2b80b3f8d4864fa043fc3e98642`  
+**Checkpoint:** 2026-10-22T21:50+07:00  
+**Current ADMIN HEAD:** `7d9cde727476ac05ee7431b457e7377b34c750fe`  
 **PR #111:** OPEN/unmerged. **Protected PR #108:** OPEN/unmerged. Full provenance review remains partial.
 
 ## 1. Live census
@@ -61,12 +61,16 @@ Source and local tests record these guards: Admin authentication, server-derived
 
 ## 6. New workflow facts
 
+- Current exact-SHA workflow [#39797841880](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880) on `7d9cde7` is QUEUED at last poll. It checks the viewport-width test-harness fix, not product completion.
+- Run [#39796182324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324) on `401b961` failed with `ReferenceError: variant is not defined` at test line 1752; artifact #327: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324/artifacts/12433587319.
+- Run [#39794007381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381) on `26f1c6f` failed because `.mobiletabs` was hidden when expected visible; artifact #326: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381/artifacts/12432254530.
+
 - [Run #39792844330](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330) tested `a6fc090...`: `npm run check` and `npm test` PASS; local Playwright 2 passed/1 failed due strict-mode ambiguity in Order-detail focus assertion; limited Preview smoke 2/2 passed. [Artifact #324](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39792844330/artifacts/12431484447).
 - Run #39793390442 tests older SHA `37c3c40...`; run #39794007381 tests `26f1c6f...` and was queued at last poll. Use live logs/artifact before updating findings.
 
 ## 7. Next actions
 
-1. Poll run #39793390442 and #39794007381, no duplicate jobs.
-2. Complete screen #8–#12 evidence review using exact SHA and artifact.
+1. Poll run #39797841880 on current HEAD first; do not create duplicate jobs.
+2. After the test result, prioritize unaccepted screen/product deliverables; do not count harness/docs fixes as product progress.
 3. Continue PR path provenance by reviewing relevant diffs in small, evidence-backed batches.
 4. Preserve all deployment/migration restrictions; keep both PRs OPEN/unmerged.
