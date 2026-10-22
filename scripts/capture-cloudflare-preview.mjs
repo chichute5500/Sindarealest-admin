@@ -1200,9 +1200,28 @@ async function captureCardFlyToCartProbe(page, button, viewport, theme, context,
     await page.waitForTimeout(35);
     await page.setViewportSize(original);
   } else {
-    await page.evaluate(() => window.scrollBy(0, 14)).catch(() => {});
+    // Disable smooth scrolling only during this live probe so returning to the
+    // original scroll offset is synchronous and the geometry assertion is meaningful.
+    await page.evaluate(() => {
+      const root = document.documentElement, body = document.body;
+      window.__sdFlyScrollProbe = {
+        top: window.scrollY,
+        rootBehavior: root.style.scrollBehavior,
+        bodyBehavior: body.style.scrollBehavior,
+      };
+      root.style.scrollBehavior = 'auto';
+      body.style.scrollBehavior = 'auto';
+      window.scrollTo(0, window.__sdFlyScrollProbe.top + 14);
+    }).catch(() => {});
     await page.waitForTimeout(35);
-    await page.evaluate(() => window.scrollBy(0, -14)).catch(() => {});
+    await page.evaluate(() => {
+      const saved = window.__sdFlyScrollProbe;
+      if (!saved) return;
+      window.scrollTo(0, saved.top);
+      document.documentElement.style.scrollBehavior = saved.rootBehavior;
+      document.body.style.scrollBehavior = saved.bodyBehavior;
+      delete window.__sdFlyScrollProbe;
+    }).catch(() => {});
   }
   const mid = await page.evaluate(() => {
     const node = document.querySelector('.sd-fly-to-cart-clone');
@@ -1288,21 +1307,10 @@ async function captureCardFlyToCartSources(page, viewport, theme, context) {
 async function captureProductDetailFlow(page, viewport, theme, label) {
   let cardButton = page.locator('#catalogGrid [data-open-product]').first();
   if (label === 'mobile-390-light') {
-    const galleryProduct = await page.evaluate(() => {
-      try {
-        for (const card of document.querySelectorAll('#catalogGrid [data-open-product]')) {
-          const key = card.getAttribute('data-open-product');
-          const product = products.find(item => String(item.id || item.slug) === String(key));
-          if (product && allImages(product).length > 1) return { id: key, imageCount: allImages(product).length };
-        }
-      } catch {}
-      return null;
-    });
-    if (galleryProduct?.id) {
-      const safeKey = String(galleryProduct.id).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-      const galleryCard = page.locator('#catalogGrid [data-open-product="' + safeKey + '"]').first();
-      if (await galleryCard.count().catch(() => 0) > 0) cardButton = galleryCard;
-    }
+    // Use a genuine rendered featured product whose markup exposes its real gallery length.
+    // This avoids relying on private JS lexical bindings from a Playwright page.evaluate world.
+    const galleryCard = page.locator('#featuredGrid [data-featured-card][data-feature-count]:not([data-feature-count="1"]) [data-open-product]').first();
+    if (await galleryCard.count().catch(() => 0) > 0) cardButton = galleryCard;
   }
   if (await cardButton.count().catch(() => 0) === 0) cardButton = page.locator('#featuredGrid [data-open-product]').first();
   if (await cardButton.count().catch(() => 0) === 0) {
