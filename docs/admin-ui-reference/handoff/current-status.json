@@ -3,12 +3,12 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Live checkpoint after regression-test commit 7d9cde727476ac05ee7431b457e7377b34c750fe. This commit changes only the E2E viewport-width assertion, not product functionality. Latest exact-SHA workflow 39797841880 is queued at last poll. Older runs are historical evidence.",
-  "branchHeadAtCheckpoint": "7d9cde727476ac05ee7431b457e7377b34c750fe",
+  "checkpointSemantics": "Live checkpoint after product CSS change and Playwright regression assertion on Order detail. Current HEAD must be re-fetched each session. Exact-SHA workflow result for current HEAD has not been returned by connector; do not claim PASS.",
+  "branchHeadAtCheckpoint": "617496b7588b90ad6f76f80e1c9611615c7599b5",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Test-harness and handoff edits do not count as product completion; latest SHA workflow is queued and screen/backend acceptance remains incomplete.",
+  "progressBasis": "50% PROVISIONAL. Order-detail responsive grid change is implemented but not accepted until exact-SHA Playwright/preview evidence passes; test/handoff edits do not count as completion.",
   "sourceTreeComparison": {
     "comparisonTarget": "fix/liquid-glass-audit-2026-10-19",
     "staticHead": "a1fa5ca5731d827cbd7c3680468fd0df7bf35f53",
@@ -21,26 +21,10 @@
     "note": "Diverged branches are not to be merged or cherry-picked. Re-fetch before later use."
   },
   "sourceValidationOnHead": {
-    "status": "QUEUED_EXACT_SHA",
-    "liveCodeHead": "7d9cde727476ac05ee7431b457e7377b34c750fe",
-    "latestQueuedRun": {
-      "id": 39797841880,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39797841880",
-      "testedSha": "7d9cde727476ac05ee7431b457e7377b34c750fe",
-      "status": "queued"
-    },
-    "previousFailure": {
-      "runId": 39796182324,
-      "sha": "401b961cb685a1c3fade6e6d6f66713bb71bf509",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39796182324",
-      "failure": "ReferenceError: variant is not defined at tests/e2e/admin-static-baseline.spec.js:1752; artifact #327"
-    },
-    "previousBreakpointFailure": {
-      "runId": 39794007381,
-      "sha": "26f1c6fb0632a2b80b3f8d4864fa043fc3e98642",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39794007381",
-      "failure": "Expected .mobiletabs visible but received hidden at line 1752; artifact #326"
-    }
+    "status": "NOT_VERIFIED_EXACT_SHA",
+    "liveCodeHead": "617496b7588b90ad6f76f80e1c9611615c7599b5",
+    "latestObservedWorkflowRuns": [],
+    "note": "fetch_commit_workflow_runs returned no PR-triggered runs for current HEAD; this is not evidence of PASS or FAIL. Check GitHub Actions directly through supported connector before asserting result."
   },
   "latestVisualEvidence": {
     "sourceSha": "a6fc090b60e579e9d708775f0c25e3ba56f3439b",
@@ -1083,5 +1067,22 @@
     ]
   },
   "capturedAtUtc": "2026-10-22T14:20:00Z",
-  "nextAction": "Poll run 39797841880. If it fails, inspect exact checkout SHA and line-level failure before another change; do not infer success from older runs."
+  "nextAction": "Poll run 39797841880. If it fails, inspect exact checkout SHA and line-level failure before another change; do not infer success from older runs.",
+  "latestProductChange": {
+    "status": "IMPLEMENTED_AWAITING_EXACT_SHA_VALIDATION",
+    "sourceCommit": "3d10e163d3a88884ad109d0245b7b9c38e0ec603",
+    "testCommit": "617496b7588b90ad6f76f80e1c9611615c7599b5",
+    "sourceFile": "public/admin/index.html",
+    "sourceBlob": "bebfb0896e28dd64654df17fe185cc2f0f508bb0",
+    "testFile": "tests/e2e/admin-static-baseline.spec.js",
+    "testBlob": "4ff83e85670187888e9aa0170928a019da3c043e",
+    "change": [
+      "Order detail customer fields use two columns at viewport >=360px and one column below 360px; email/address span full width.",
+      "Order item metadata grid retains two columns at >=360px and falls back to one column below 360px.",
+      "Playwright checks computed grid column counts for customer and item metadata; regex corrected to split computed grid-template-columns on whitespace."
+    ],
+    "acceptance": "NOT_VERIFIED",
+    "next": "Obtain exact-HEAD workflow/test result. If no run exists, inspect available workflow triggers and use a supported dispatch mechanism only if safely available; otherwise continue screen #8 review using existing source/tests without claiming validation."
+  },
+  "currentNextAction": "Review screen #8 Customers source/reference and test coverage while exact-SHA validation is unresolved; do not repeat #3/#4 geometry checks. Preserve all branch/deploy/schema safety restrictions."
 }
