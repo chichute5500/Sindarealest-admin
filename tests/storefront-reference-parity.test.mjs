@@ -298,9 +298,9 @@ assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroA
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
   "Pseudo-elements that would overlay the owner-supplied image remain disabled.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before{")
-  && heroAssetDisplayLock.includes("inset:-22% -28%!important;")
+  && heroAssetDisplayLock.includes("inset:-8% -10%!important;")
   && heroAssetDisplayLock.includes("z-index:0!important;")
-  && heroAssetDisplayLock.includes("filter:blur(23px)!important;")
+  && heroAssetDisplayLock.includes("filter:blur(16px)!important;")
   && heroAssetDisplayLock.includes("position:relative!important;z-index:1!important;"),
   "The satin halo must stay outside/behind the complete original hero image, never cover or crop it.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
