@@ -338,3 +338,24 @@ assert.ok(
   html.includes('aria-label="Tư vấn hoặc đặt hàng qua Zalo"'),
   'Changing the Zalo pictogram must not change its destination or accessible action label.');
 
+// Product-detail trust chips use semantic SVGs, not the remaining decorative Unicode glyphs.
+const detailPromiseStart = html.indexOf('<div class="promise-tags">');
+const detailPromiseEnd = html.indexOf('</div><div class="detail-actions">', detailPromiseStart);
+assert.ok(detailPromiseStart >= 0 && detailPromiseEnd > detailPromiseStart,
+  'The four product-detail trust chips must remain present.');
+const detailPromiseHtml = html.slice(detailPromiseStart, detailPromiseEnd);
+const promiseIconNames = [...detailPromiseHtml.matchAll(/data-promise-icon="([^"]+)"/g)].map(match => match[1]);
+assert.deepEqual(promiseIconNames, ['material', 'craftsmanship', 'support', 'consultation'],
+  'Material, craftsmanship, support and consultation must each use a semantic icon in display order.');
+assert.equal([...detailPromiseHtml.matchAll(/<svg\b[^>]*viewBox="0 0 24 24"[^>]*stroke-width="1\.7"/g)].length, 4,
+  'All trust chips must use the 24x24 thin-stroke SVG system.');
+assert.doesNotMatch(detailPromiseHtml, /[✦◇✓↗]/,
+  'The trust chips must not fall back to the replaced text glyphs.');
+const modalIconStyle = html.match(/<style id="sd-modal-navigation-promise-icons-2026-10-22">([\s\S]*?)<\/style>/)?.[1] || '';
+assert.ok(
+  modalIconStyle.includes('.promise-tag i{color:var(--ink)}') &&
+  modalIconStyle.includes('width:13px;height:13px') &&
+  modalIconStyle.includes('stroke-width:1.7'),
+  'Trust chip SVGs must remain navy and compact inside the existing circular glass treatment.'
+);
+

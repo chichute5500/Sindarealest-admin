@@ -54,3 +54,14 @@ assert.match(html,
   'Escape must close fullscreen gallery through the history-aware path.');
 
 console.log('PASS: mobile navigation and browser Back/Forward dismiss account, cart, checkout and gallery states.');
+
+// The sticky bottom navigation must not cover actions in full-screen mobile overlays.
+const modalNavigationStyle = html.match(/<style id="sd-modal-navigation-promise-icons-2026-10-22">([\s\S]*?)<\/style>/)?.[1] || '';
+assert.ok(
+  modalNavigationStyle.includes('body:has(#productOverlay.open) #mobileBottomNav') &&
+  modalNavigationStyle.includes('body:has(#sdFullscreenViewer.open) #mobileBottomNav') &&
+  modalNavigationStyle.includes('display:none!important') &&
+  modalNavigationStyle.includes('pointer-events:none!important'),
+  'Mobile bottom navigation must hide while the product detail modal or fullscreen gallery is open.'
+);
+
