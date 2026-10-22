@@ -1,5 +1,14 @@
 # Instructions for AI: use the ADMIN UI reference
 
+## CURRENT VERIFIED CHECKPOINT — 2026-10-22T15:52:00+07:00
+
+- ADMIN branch HEAD: `dcb60b39d5813b82fabeab0f390826e558e7e676` (evidence-only descendant); exact source/test SHA: `78b87d71f82090cb7399a68207ef436a200d3c9f`.
+- Validate Source [#39750503800](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503800) **SUCCESS** and Preview/Playwright [#39750503783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783) **SUCCESS** on the exact source/test SHA.
+- Artifact [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086): 99 PNGs (16 login + 83 fixtures), 75 metrics; matrix passed eight viewports in light/dark.
+- Preview is `PASS_LOGIN_CSS_SIGNATURE` only, not real authenticated backend/business QA. 12-screen parity NOT ACCEPTED; backend QA NOT TESTED; AI grouping #11 BLOCKED; R2 image save and PRE/PRO migrations DEFERRED_BY_OWNER.
+- Progress remains **50%**. Only ADMIN branch; PR #111/#108 OPEN/unmerged; no main/static edits, Production deployment, Access/secrets bypass, or remote D1/R2/schema/migration writes.
+- The dated status block below is historical. Always fetch live HEAD and workflow runs before editing.
+
 ## Goal
 Redesign and audit the SinDarealest ADMIN interface to align with the approved mobile visual reference while preserving existing business logic, API contracts, authentication and backend behavior. The public/static website is being developed by a separate AI and must not be overwritten.
 
@@ -35,7 +44,7 @@ Redesign and audit the SinDarealest ADMIN interface to align with the approved m
 For every task, mark PASS, FAIL, BLOCKED, or NOT TESTED; include evidence, file paths, test results, known limitations, and exact commit SHA. Clearly state that no merge to the static website branch/main and no Cloudflare production deployment occurred.
 
 
-## Latest handoff update — 2026-10-21 (owner request: update handoff files and prompt)
+## Historical handoff checkpoint — 2026-10-21 (superseded by current checkpoint above)
 
 ### Current verified state
 - Work is restricted to `feature/admin-isolated-handoff-2026-10-20` in `chichute5500/Sindarealest-admin`. Current application/test SHA remains `45f630e99cfd1dd047c234f0fb42fa197d9bc978`; gallery CSS source commit `1fb56f7b5773876c581847bf44abbef1c5c16a67`; regression test commit `45f630e99cfd1dd047c234f0fb42fa197d9bc978`.
