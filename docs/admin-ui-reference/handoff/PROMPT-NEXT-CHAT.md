@@ -1,22 +1,22 @@
-## PROMPT TIẾP TỤC — 2026-10-22T11:25:05+07:00
+## PROMPT TIẾP TỤC — 2026-10-22T11:33:42+07:00
 
-Tiếp tục làm việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA PASS: `3d39e8f7316f300b26a582348abe0873e10891f0`. HEAD trước commit handoff tiếp theo: `4ab5893c1882bf9d2914e729ab786a761d4e9f25` (commit evidence/docs; không phải source SHA đã test).
+Tiếp tục làm việc thực tế trong `chichute5500/Sindarealest-admin`, chỉ nhánh `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA đã kiểm thử chính xác: `28949e7b34977d05b5c593e5c98ec8223cf7f8b7`; HEAD trước commit handoff kế tiếp là `f3e7cfe4543e5b0b39e2d922c4e1df5212b30cb5`.
 
 **CI exact-SHA:**
-- Validate Source [#39722057929](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722057929) — SUCCESS.
-- Admin Preview/Playwright [#39722057890](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722057890) — SUCCESS trên cùng SHA.
-- Artifact [admin-preview-evidence-272](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722057890/artifacts/12401661901), ID `12401661901`: 71 ảnh test + 1 reference PNG, 47 fixture metrics; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
-- Preview login/dashboard smoke: 2/2 test PASS. Đây không phải full backend/business QA; save/upload dữ liệu thật vẫn NOT TESTED. Không bypass Access.
-- Gallery tests mới: keyboard reorder qua focus/Enter, responsive bounds/no-horizontal-overflow/thumbnail rail ở 320×640 và 360×800. Gallery vẫn PARTIAL, toàn bộ 12-screen visual parity NOT ACCEPTED. Tiến độ tổng thể 50%.
+- Validate Source [#39722800395](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722800395) — SUCCESS.
+- Admin Preview diagnostic/Playwright [#39722800447](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722800447) — SUCCESS trên cùng SHA.
+- Artifact [admin-preview-evidence-273](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39722800447/artifacts/12401448918), ID `12401448918`: 75 files, 72 PNG (71 test screenshots + 1 reference image), 47 fixture metrics; metadata completed; 0 browser/network/HTTP errors, 0 attempted writes, 0 unexpected API paths.
+- Local source Playwright 3/3 PASS; configured Preview login/dashboard 2/2 PASS. Full backend business CRUD, product save and actual image upload remain NOT TESTED.
+- Change: QR file-picker test now checks local filename feedback, no implicit upload on selection, local “no file selected” error, and no upload request/write. All progress remains 50%; 12-screen parity NOT ACCEPTED.
 
 **Tiếp tục ngay — không chỉ báo cáo rồi dừng:**
-1. Đọc trạng thái live/HEAD/Actions trước khi ghi.
-2. Ưu tiên màn #6 Category/product classification: test `#pCategory` datalist/manual entry và `#categoryBox` matching/no-result/reset chỉ bằng synthetic/read-only fixture, không Save, không tạo route/API.
-3. Thêm assertion phù hợp, chạy Validate Source + Preview trên exact source SHA; xem artifact mới trực tiếp.
-4. Đồng bộ 7 file handoff và đọc lại từ GitHub sau commit.
-5. Chọn tiếp màn hình chưa nghiệm thu; không lặp công việc đã PASS nếu không có lỗi tái xuất hiện. Giữ tiến độ 50% đến khi có evidence parity thực chất.
+1. Fetch live ADMIN HEAD and existing Actions before further edits.
+2. Add a focused read-only responsive regression for Customers #9 at 320×640 and 360×800: check page/card bounds, no horizontal overflow, long contact fields fit or wrap inside the card. Use existing synthetic fixtures; do not add fabricated customer photos/avatars or claim data provenance.
+3. Run Validate Source and Preview/Playwright on exact source/test SHA, open artifact and inspect the customer screenshots.
+4. Update all seven handoff files in one consistent checkpoint and read all seven back from GitHub.
+5. Continue the next not-accepted screen and only change UI if screenshots/tests show a genuine gap. Keep progress 50% until actual reference parity evidence warrants a change.
 
-**Rào chắn:** PR #111/#108 để OPEN/UNMERGED; chỉ ADMIN branch, không main/static, không merge/cherry-pick/force-push/branch sync, không Production deploy, không secrets/Access changes/bypass, không remote D1/R2/SQL/migration/setup/deploy/infra, không TinyFish. Giữ mọi `DEFERRED_BY_OWNER` nguyên trạng.
+**Rào chắn:** PR #111/#108 OPEN/UNMERGED; only ADMIN branch; no main/static edits, merge/cherry-pick/force-push/branch sync, Production deploy, secrets/Access changes/bypass, remote D1/R2/SQL/migration/setup/deploy/infra, or TinyFish. Preserve all `DEFERRED_BY_OWNER` items and never use live business data in visual fixtures.
 ---
 
 ---
