@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createSession } from "../functions/_lib.js";
 import { createOrderAccessToken, hashOrderAccessToken } from "../functions/_payments.js";
 import { onRequestPost as postVerifiedTransaction } from "../functions/api/admin/payment-transactions.js";
-import { onRequestPost as createPaymentRequest } from "../functions/api/admin/payment-requests.js";
+import { onRequestPost as createPaymentRequest, onRequestGet as getAdminPaymentRequests } from "../functions/api/admin/payment-requests.js";
 import { onRequestPatch as cancelPaymentRequest } from "../functions/api/admin/payment-requests.js";
 import { onRequestGet as getOrderPayment } from "../functions/api/order-payment.js";
 import { onRequestGet as getPaymentSettings } from "../functions/api/payment-settings.js";
@@ -42,6 +42,7 @@ function makeDb(options = {}) {
           calls.push({ sql, values });
           if (sql.includes("SELECT id,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders") || sql.includes("SELECT id,order_number,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders")) return options.order ?? baseOrder;
           if (sql.includes("AS net_received")) return { net_received: options.netReceived ?? 0 };
+          if (sql.includes("AS received_amount")) return options.paymentTotals ?? { received_amount: 0, refunded_amount: 0 };
           if (sql.includes("SELECT id,order_id,status FROM order_payment_requests")) return options.paymentRequest ?? null;
           if (sql.includes("SELECT id,order_number,status,payment_status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders")) {
             if (options.publicOrder && values[0] === options.publicOrder.order_number && values[1] === options.publicOrder.public_access_token_hash) return options.publicOrder;
@@ -62,6 +63,8 @@ function makeDb(options = {}) {
             { key: "payment_qr_account_name", value: "NGUYEN VAN A" },
           ] };
           if (sql.includes("SELECT direction,amount FROM order_payment_transactions")) return { results: options.transactions ?? [] };
+          if (sql.includes("FROM order_payment_transactions WHERE order_id=? ORDER BY created_at DESC LIMIT 100")) return { results: options.displayTransactions ?? [] };
+          if (sql.includes("FROM order_payment_requests WHERE order_id=? ORDER BY created_at DESC LIMIT 50")) return { results: options.displayRequests ?? [] };
           return { results: [] };
         },
         async run() { calls.push({ sql, values }); return { success: true, meta: { changes: 1 } }; },
@@ -84,6 +87,30 @@ function makeDb(options = {}) {
   };
 }
 function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PASSWORD, SESSION_SECRET, IMAGES: { head: async key => ({ key }) } } }; }
+
+// The visible transaction list is capped at 100 rows; summary amounts must use the complete ledger aggregate.
+{
+  const displayTransactions = Array.from({ length: 100 }, (_, index) => ({
+    id: "visible-" + index, direction: "received", amount: 1000
+  }));
+  const db = makeDb({
+    order: { ...baseOrder, total: 300000 },
+    paymentTotals: { received_amount: 200000, refunded_amount: 50000 },
+    displayTransactions
+  });
+  const response = await getAdminPaymentRequests(adminContext(db, request("/api/admin/payment-requests?orderId=order-1", undefined, "GET")));
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.transactions.length, 100, "the response keeps the transaction display list bounded");
+  assert.deepEqual(payload.summary, {
+    receivedAmount: 200000,
+    refundedAmount: 50000,
+    netReceivedAmount: 150000,
+    remainingBalance: 150000,
+    overpaidAmount: 0
+  }, "financial summary must use full-ledger totals, not only the visible 100 rows");
+  assert.ok(db.calls.some(call => call.sql.includes("AS received_amount")), "GET must query aggregate totals separately from the capped display list");
+}
 
 {
   const db = makeDb({ netReceived: 50000 });
