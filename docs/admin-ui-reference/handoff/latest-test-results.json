@@ -1065,44 +1065,29 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-22T16:38:06+07:00",
+  "updatedAt": "2026-10-22T16:51:11.407+07:00",
   "currentBranchHeadAtHandoff": "6fbd49abb04ecf9d8915c76184b990565579360b",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": true,
   "previewDiagnostics": {
-    "runId": 39548605474,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
-    "sourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
-    "conclusion": "FAILURE",
-    "failedStep": "Diagnose configured deployed Preview",
-    "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
-    "observed": {
-      "title": "Quản trị SinDarealest",
-      "lang": "vi",
-      "loginViewClass": "loginwrap",
-      "topbarBrandDisplay": "flex",
-      "topbarBrandVisibility": "visible",
-      "topbarBrandOpacity": "1",
-      "browserSupportsHideSelector": true,
-      "hideSelectorMatchesBrand": true,
-      "stylesheetSources": [
-        {
-          "href": "[inline stylesheet]",
-          "ruleCount": 226,
-          "hasLoginHideRule": false,
-          "matchingRules": []
-        }
-      ]
-    },
+    "runId": 39756606227,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
+    "sourceCommit": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+    "conclusion": "SUCCESS",
+    "status": "PASS_LOGIN_CSS_SIGNATURE",
+    "loginDashboardSmoke": "PASS_2_OF_2",
+    "sourceScreenshotMatrix": "PASS_8_VIEWPORTS_LIGHT_DARK",
+    "localBaselineTests": "3_PASSED",
     "artifact": {
-      "name": "admin-preview-evidence-64",
-      "id": 12322384265,
-      "sizeBytes": 9175416,
-      "expiresAt": "2026-11-04T05:19:09Z"
+      "name": "admin-preview-evidence-304",
+      "id": 12416033404,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227/artifacts/12416033404",
+      "capturedPngs": 99,
+      "loginShellPngs": 16,
+      "fixturePngs": 83,
+      "fixtureMetrics": 75
     },
-    "rootCauseStatus": "CONFIGURED_PREVIEW_RESPONSE_MISSING_EXPECTED_ADMIN_LOGIN_SHELL_CSS; whether stale deployment or wrong target cannot be distinguished while ADMIN_TEST_URL is masked",
-    "cloudflareAccess": "Test reached ADMIN login; do not bypass or change Access",
-    "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED"
+    "scope": "LOGIN/CSS-SIGNATURE AND DASHBOARD SMOKE ONLY; real business/backend flows not tested"
   },
   "latestLocalEvidence": {
     "runId": 39756606227,
@@ -1398,7 +1383,7 @@
   "pr111": {
     "state": "OPEN",
     "merged": false,
-    "headSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
+    "headSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
     "changedFiles": 1265,
     "mergeable": false,
     "mergeable_state": "dirty",
@@ -1444,7 +1429,14 @@
     "sourceCiConclusion": "PASS",
     "previewRun": 39565547828,
     "previewConclusion": "FAIL_PREVIEW_CSS_SIGNATURE_MISMATCH",
-    "crossBranchIntegration": "NOT_VERIFIED"
+    "crossBranchIntegration": "NOT_VERIFIED",
+    "recordStatus": "HISTORICAL_PAYMENT_HARDENING_CHECKPOINT; previewConclusion below refers to older run #39565547828, not the current Preview result",
+    "supersededBy": {
+      "runId": 39756606227,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
+      "conclusion": "success",
+      "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6"
+    }
   },
   "latestOwnerPreviewCheck": {
     "checkedAt": "2026-10-21 15:39 +07:00",
@@ -1492,9 +1484,10 @@
     }
   },
   "latestSourceCi": {
-    "runId": 39755520563,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520563",
-    "sha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
+    "runId": 39756606343,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343",
+    "sha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+    "status": "completed",
     "conclusion": "success"
   },
   "latestSourcePlaywright": {
@@ -1515,11 +1508,14 @@
   "uiFixturePngCount": 83,
   "uiFixtureMetricCount": 75,
   "latestExecutionCheckpoint": {
-    "at": "2026-10-22T16:32:00+07:00",
-    "branchHead": "06e679cb8502a1e657331d6b6fd204dcc86b91c9",
-    "testedSourceSha": "d1047c6e898a5995295f8ce7e6191674207c4fe3",
-    "validateRun": 39755520563,
-    "previewRun": 39755520573
+    "at": "2026-10-22T16:51:11.407+07:00",
+    "branchHeadBeforeAliasCleanup": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
+    "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+    "validateRun": 39756606343,
+    "previewRun": 39756606227,
+    "validateConclusion": "success",
+    "previewConclusion": "success",
+    "artifactId": 12416033404
   },
   "sourceLevelCrossBranchAudit": {
     "checkedAt": "2026-10-21 15:52 +07:00",
@@ -1651,7 +1647,14 @@
       "remoteD1R2Mutation": false,
       "remoteMigrationRun": false
     },
-    "progressEstimatePercent": 46
+    "progressEstimatePercent": 46,
+    "recordStatus": "HISTORICAL_OWNER_PRIORITY_CHECKPOINT_2026-10-21; nested Preview failure belongs to its historical run and is not current status",
+    "supersededBy": {
+      "runId": 39756606227,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
+      "conclusion": "success",
+      "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6"
+    }
   },
   "latestContinuationAudit": {
     "at": "2026-10-21T10:52:00Z",
@@ -1682,55 +1685,35 @@
     "conclusion": "success"
   },
   "currentVerification": {
-    "latestSourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
-    "sourceCi": "pending fresh run",
+    "checkedAt": "2026-10-22T16:51:11.407+07:00",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "branchHeadBeforeAliasCleanup": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
+    "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+    "sourceCi": {
+      "runId": 39756606343,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343",
+      "sha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
+      "status": "completed",
+      "conclusion": "success"
+    },
     "previewDiagnostic": {
-      "runId": 39587110831,
-      "conclusion": "failure",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587110831",
-      "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
-      "observedInlineRuleCount": 226,
-      "loginHideRuleInServedCss": false,
-      "loginMarkupPresent": true
+      "runId": 39756606227,
+      "conclusion": "success",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
+      "status": "PASS_LOGIN_CSS_SIGNATURE",
+      "loginHideRuleInServedCss": true,
+      "inlineRuleCount": 699,
+      "loginDashboardSmoke": "PASS_2_OF_2"
     },
-    "referenceComparison": {
-      "artifactId": 12340845895,
-      "runId": 39586771504,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39586771504/artifacts/12340845895",
-      "referenceImageIncluded": true,
-      "visualParity": "NOT_ACCEPTED",
-      "notes": "Initial visual inspection of 390x844 dashboard screenshot: pale blue rounded cards are present, but overall screen structure/content differs from reference. Need continue per-screen comparison."
-    },
-    "ownerInstruction": {
-      "continueAfterProgressReports": true,
-      "stopOnlyWhenOwnerActionRequired": true,
-      "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
-    },
-    "latestHandoffHeadSha": "b2f6d29fa288098c0c154a993db104f2898a291d",
-    "pr111FileInventory": "COMPLETE_1092_FILES",
-    "pr111SemanticAudit": "PARTIAL",
+    "sourceScreenshotMatrix": "PASS_8_VIEWPORTS_LIGHT_DARK",
+    "artifactId": 12416033404,
+    "all12ScreenVisualParity": "NOT_ACCEPTED",
+    "screen3": "PARTIAL_NOT_ACCEPTED",
+    "authenticatedBusinessQA": "NOT_TESTED_FIXTURE_ONLY",
+    "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER",
     "pr111State": "OPEN_UNMERGED",
     "pr108State": "OPEN_UNMERGED",
-    "capturedAt": "2026-10-21T15:24:45Z",
-    "head": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
-    "duplicateStaticId": "resolved in source; fresh CI not yet confirmed",
-    "progressEstimatePercent": 48,
-    "headBeforeStatusRefresh": "a250be98f03e8006ce102044884f0fb2b6b2f96d",
-    "latestPassingSourceCi": {
-      "runId": 39624406745,
-      "sha": "5d0d94ea3b6677af8b9371f61bb8b3e82cab8a03",
-      "conclusion": "success"
-    },
-    "testedSourceSha": "06d689b6a97fa7bdb05258acb8435a6954d67309",
-    "sourceRun": 39624818256,
-    "previewRun": 39624818216,
-    "headBeforeHandoffRefresh": "4ef712beda3bb62591e6bac2445f84aaa87908df",
-    "headBeforeJsonRefresh": "c63ac375dd3d3ad89345ca8a4dee880e7ec4acd1",
-    "latestHandoffCi": {
-      "runId": 39625390469,
-      "sha": "c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf",
-      "conclusion": "success"
-    }
+    "progressEstimatePercent": 50
   },
   "pr111FileInventory": {
     "retrievedPages": 12,
@@ -1850,7 +1833,7 @@
     "remoteD1RuntimeConcurrency": "NOT_VERIFIED_TESTS_USE_IN_MEMORY_MOCK",
     "finding": "Refund row uses conditional INSERT…SELECT to recheck the net received/refunded ledger at insert time; order/request status updates and audit write are gated on that row existing; a rejected balance race returns 409."
   },
-  "latestHandoffHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
+  "latestHandoffHeadSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
   "pr111State": "OPEN_UNMERGED",
   "pr108State": "OPEN_UNMERGED",
   "safety": {
@@ -1935,14 +1918,15 @@
   },
   "overallProgressPercent": 50,
   "latestHandoffUpdate": {
-    "at": "2026-10-22T16:38:06+07:00",
+    "at": "2026-10-22T16:51:11.407+07:00",
     "branchHeadBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "progressPercent": 50,
-    "postCommitReadback": "PASS: read back and parsed current-status.json and latest-test-results.json from the live branch at 6fbd49abb04ecf9d8915c76184b990565579360b",
-    "branchHeadBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b"
+    "postCommitReadback": "Previous JSON snapshot passed live fetch/JSON.parse; this alias-cleanup follow-up is read back after commit before completion.",
+    "branchHeadBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b",
+    "branchHeadBeforeAliasCleanup": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97"
   },
   "latestRun": {
     "sourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
@@ -3258,5 +3242,93 @@
     "conclusion": "success",
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; DEPLOYED_LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2"
   },
-  "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA; current branch head is a docs/evidence-only descendant"
+  "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA; current branch head is a docs/evidence-only descendant",
+  "historicalPreviewDiagnostics_39548605474": {
+    "runId": 39548605474,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39548605474",
+    "sourceCommit": "6935eefa3473f1c6a15da08a34389d7223cbd0ea",
+    "conclusion": "FAILURE",
+    "failedStep": "Diagnose configured deployed Preview",
+    "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
+    "observed": {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "loginViewClass": "loginwrap",
+      "topbarBrandDisplay": "flex",
+      "topbarBrandVisibility": "visible",
+      "topbarBrandOpacity": "1",
+      "browserSupportsHideSelector": true,
+      "hideSelectorMatchesBrand": true,
+      "stylesheetSources": [
+        {
+          "href": "[inline stylesheet]",
+          "ruleCount": 226,
+          "hasLoginHideRule": false,
+          "matchingRules": []
+        }
+      ]
+    },
+    "artifact": {
+      "name": "admin-preview-evidence-64",
+      "id": 12322384265,
+      "sizeBytes": 9175416,
+      "expiresAt": "2026-11-04T05:19:09Z"
+    },
+    "rootCauseStatus": "CONFIGURED_PREVIEW_RESPONSE_MISSING_EXPECTED_ADMIN_LOGIN_SHELL_CSS; whether stale deployment or wrong target cannot be distinguished while ADMIN_TEST_URL is masked",
+    "cloudflareAccess": "Test reached ADMIN login; do not bypass or change Access",
+    "exactSecretValues": "NOT_READ_NOT_DISPLAYED_NOT_CHANGED",
+    "recordStatus": "HISTORICAL; superseded by latest Preview run #39756606227"
+  },
+  "historicalCurrentVerification_20261021": {
+    "latestSourceSha": "29621b8bacf03cc08136e08eabcc4ed8f6138db1",
+    "sourceCi": "pending fresh run",
+    "previewDiagnostic": {
+      "runId": 39587110831,
+      "conclusion": "failure",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39587110831",
+      "status": "PREVIEW_CSS_SIGNATURE_MISMATCH",
+      "observedInlineRuleCount": 226,
+      "loginHideRuleInServedCss": false,
+      "loginMarkupPresent": true
+    },
+    "referenceComparison": {
+      "artifactId": 12340845895,
+      "runId": 39586771504,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39586771504/artifacts/12340845895",
+      "referenceImageIncluded": true,
+      "visualParity": "NOT_ACCEPTED",
+      "notes": "Initial visual inspection of 390x844 dashboard screenshot: pale blue rounded cards are present, but overall screen structure/content differs from reference. Need continue per-screen comparison."
+    },
+    "ownerInstruction": {
+      "continueAfterProgressReports": true,
+      "stopOnlyWhenOwnerActionRequired": true,
+      "imageSaveAndPreProMigrations": "DEFERRED_BY_OWNER"
+    },
+    "latestHandoffHeadSha": "b2f6d29fa288098c0c154a993db104f2898a291d",
+    "pr111FileInventory": "COMPLETE_1092_FILES",
+    "pr111SemanticAudit": "PARTIAL",
+    "pr111State": "OPEN_UNMERGED",
+    "pr108State": "OPEN_UNMERGED",
+    "capturedAt": "2026-10-21T15:24:45Z",
+    "head": "b64bd926f03858b7a84bf0f19076ab18241e3aeb",
+    "duplicateStaticId": "resolved in source; fresh CI not yet confirmed",
+    "progressEstimatePercent": 48,
+    "headBeforeStatusRefresh": "a250be98f03e8006ce102044884f0fb2b6b2f96d",
+    "latestPassingSourceCi": {
+      "runId": 39624406745,
+      "sha": "5d0d94ea3b6677af8b9371f61bb8b3e82cab8a03",
+      "conclusion": "success"
+    },
+    "testedSourceSha": "06d689b6a97fa7bdb05258acb8435a6954d67309",
+    "sourceRun": 39624818256,
+    "previewRun": 39624818216,
+    "headBeforeHandoffRefresh": "4ef712beda3bb62591e6bac2445f84aaa87908df",
+    "headBeforeJsonRefresh": "c63ac375dd3d3ad89345ca8a4dee880e7ec4acd1",
+    "latestHandoffCi": {
+      "runId": 39625390469,
+      "sha": "c7a7bd9e7094f95f90d9d8aa39f52a46ef20a4cf",
+      "conclusion": "success"
+    },
+    "recordStatus": "HISTORICAL_VERIFICATION_SNAPSHOT; superseded by exact-source passing runs #39756606343 and #39756606227"
+  }
 }

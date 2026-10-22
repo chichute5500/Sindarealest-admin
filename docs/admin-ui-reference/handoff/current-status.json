@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T16:38:06+07:00",
+  "updatedAt": "2026-10-22T16:51:11.407+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "6fbd49abb04ecf9d8915c76184b990565579360b",
+  "branchHeadAtCheckpoint": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressBasis": "Validate #39756606343 PASS and Preview #39756606227 PASS on exact tested source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6; checkbox checked/unchecked light/dark color + keyboard focus/Space assertions now PASS with strict target values. Current branch head before JSON refresh 9c715bbd9424d14f2040deed6afa1af1a005eb77 is docs-only descendant. 12-screen parity NOT_ACCEPTED; real authenticated business/backend QA NOT_TESTED; progress 50%.",
@@ -76,7 +76,7 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
+      "headSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
       "changedFiles": 1265,
       "mergeReady": false,
       "reason": "Keep PR #111 OPEN/unmerged; full diff/scope audit remains open.",
@@ -375,9 +375,9 @@
   "handoffRefreshAt": "2026-10-22T14:56:46.664+07:00",
   "handoffRefreshBaseHead": "84cafe10b60c49593d530ac3b444aedfd268f76c",
   "latestHandoffReadback": {
-    "checkedAt": "2026-10-22T16:38:06+07:00",
-    "docsCommitSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
-    "readback": "PASS: fetched all seven Markdown handoff/reference files from live GitHub and confirmed each has the current checkpoint, source SHA, run IDs and historic separator. Fetched both JSON files from this branch state and JSON.parse succeeded. The following commit only persists this readback marker and updates no source code or test evidence.",
+    "checkedAt": "2026-10-22T16:51:11.407+07:00",
+    "docsCommitSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
+    "readback": "PASS: all seven Markdown checkpoint files and both JSON files were fetched from live GitHub at the parent commit and JSON.parse succeeded. This follow-up commit cleans up generic latest aliases, preserves older failing records as explicitly historical, and does not change source or workflow evidence.",
     "files": [
       "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
       "docs/admin-ui-reference/handoff/START-HERE.md",
@@ -392,9 +392,9 @@
     "progressPercent": 50
   },
   "progressEstimatePercent": 50,
-  "branchHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
-  "currentAdminBranchHead": "6fbd49abb04ecf9d8915c76184b990565579360b",
-  "currentBranchHeadAtHandoff": "6fbd49abb04ecf9d8915c76184b990565579360b",
+  "branchHeadSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
+  "currentAdminBranchHead": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
+  "currentBranchHeadAtHandoff": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
   "latestCodeCommitSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
   "testedCommitSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
   "latestSourceTestRun": {
@@ -427,12 +427,12 @@
     "conclusion": "success",
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; DEPLOYED_LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2"
   },
-  "latestObservedAdminHeadSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
-  "latestObservedAdminHead": "6fbd49abb04ecf9d8915c76184b990565579360b",
+  "latestObservedAdminHeadSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
+  "latestObservedAdminHead": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
   "latestObservedHeadIsTested": false,
   "latestObservedHeadIsTestedSource": false,
   "latestHeadVerification": {
-    "checkedAt": "2026-10-22T16:38:06+07:00",
+    "checkedAt": "2026-10-22T16:51:11.407+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
     "headShaBeforeJsonRefresh": "9c715bbd9424d14f2040deed6afa1af1a005eb77",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
@@ -441,9 +441,10 @@
     "previewRun": 39756606227,
     "previewSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "previewConclusion": "success",
-    "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA; this checkpoint snapshot precedes a docs-only readback-marker commit",
+    "currentHeadPreview": "PASS_ON_TESTED_SOURCE_SHA; branch HEAD at this snapshot is docs-only descendant",
     "progressPercent": 50,
-    "headShaBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b"
+    "headShaBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b",
+    "headShaBeforeAliasCleanup": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97"
   },
   "latestContinuationCheckpoint20261022_stickyFooter": {
     "checkedAt": "2026-10-22T15:33:00+07:00",
@@ -484,7 +485,7 @@
     "conclusion": "success",
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; DEPLOYED_LOGIN_DASHBOARD_SMOKE_PASS_2_OF_2"
   },
-  "latestHandoffCommitSha": "6fbd49abb04ecf9d8915c76184b990565579360b",
+  "latestHandoffCommitSha": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97",
   "currentHeadValidation": {
     "runId": 39756606343,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343",
@@ -494,12 +495,13 @@
   },
   "latestPreviewDiagnosticRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227",
   "latestHandoffUpdate": {
-    "at": "2026-10-22T16:38:06+07:00",
+    "at": "2026-10-22T16:51:11.407+07:00",
     "branchHeadBeforeReadbackMarkerCommit": "6fbd49abb04ecf9d8915c76184b990565579360b",
     "testedSourceSha": "2cf894e476b85e77b646b4bb45596e263a9f2fb6",
     "validateRun": 39756606343,
     "previewRun": 39756606227,
     "progressPercent": 50,
-    "postCommitReadback": "PASS for the JSON/Markdown snapshot read from live branch HEAD 6fbd49abb04ecf9d8915c76184b990565579360b"
+    "postCommitReadback": "Previous snapshot parsed on live GitHub; alias-cleanup follow-up will be fetched and JSON-validated before final handoff.",
+    "branchHeadBeforeAliasCleanup": "8b859f465a7f45f5591f95d2ccf19bb2ae644b97"
   }
 }
