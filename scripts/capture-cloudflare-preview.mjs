@@ -615,33 +615,22 @@ async function dismissWelcomeSplash(page) {
   await page.waitForTimeout(950);
 }
 async function auditHeroImage(page, label) {
-  const result = await page.evaluate(async () => {
+  const result = await page.evaluate(() => {
     const imageElement = document.querySelector('#heroProductImage');
     const frame = document.querySelector('#home .hero-visual');
     const source = imageElement?.getAttribute('src') || '';
-    const path = source.split(/[?#]/, 1)[0].replace(/^\.\//, '');
-    const loaded = Boolean(imageElement && imageElement.complete && imageElement.naturalWidth > 0);
     const status = imageElement?.dataset.productImageStatus || '';
     const hidden = Boolean(imageElement?.hidden);
     const frameStyle = frame ? getComputedStyle(frame) : null;
     const frameCollapsed = !frame || frameStyle.display === 'none' || frame.getBoundingClientRect().width < 1 || frame.getBoundingClientRect().height < 1;
-    const presentationAssetLoaded = path.endsWith('/images/hero-upload/tb_image_share_1792519964514-blended.png')
-      && loaded && !hidden && status === 'hero-presentation-asset' && !frameCollapsed;
-    return {
-      actualImage: path,
-      status,
-      loaded,
-      hidden,
-      frameCollapsed,
-      presentationAssetLoaded,
-    };
+    const temporarilyHiddenByOwnerRequest = Boolean(imageElement)
+      && hidden && !source && status === 'temporarily-disabled-owner-request' && frameCollapsed;
+    return { actualImage: source, status, hidden, frameCollapsed, temporarilyHiddenByOwnerRequest };
   });
-  const pass = result.presentationAssetLoaded === true;
-  const status = pass ? 'PASS_HERO_PRESENTATION_ASSET' : 'FAIL';
+  const pass = result.temporarilyHiddenByOwnerRequest === true;
+  const status = pass ? 'PASS_HERO_TEMPORARILY_HIDDEN_OWNER_REQUEST' : 'FAIL';
   audit.heroImageChecks.push({ context: label, status, pass, result });
-  if (!pass) {
-    audit.hardFailures.push('The dedicated hero presentation asset must be visible and loaded at ' + label + '.');
-  }
+  if (!pass) audit.hardFailures.push('Hero must have no image source and its visual frame must collapse during the owner-requested pause at ' + label + '.');
 }
 async function auditImageElements(page, label) {
   const broken = await page.evaluate(() => Array.from(document.images).filter((img) => {
