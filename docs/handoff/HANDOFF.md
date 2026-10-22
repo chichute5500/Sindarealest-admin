@@ -1,3 +1,15 @@
+# HANDOFF OVERRIDE — HERO INCIDENT AND CURRENT EVIDENCE (2026-10-22)
+
+
+Use `CURRENT-STATE.md` as source of truth; this override supersedes stale source/deployment timestamps below. Owner is moving to a new chat after the assistant's handling of the hero image reduced progress. Do not ask the owner to repeat the story.
+
+- Last verified branch HEAD: `e4bcc7cb978743693077694baddf0801832d0808`; last code-bearing source SHA: `fb997b448a80a0bc9f34e75b4a31b7b450951fed`; refresh both.
+- Validation: [#39773486071 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773486071). Preview deploy workflow: [#39773485868 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773485868). Visual workflow: [#39773486043](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773486043), artifact `12423387968`; local audit passed but live screenshots still need direct visual review and exact deployed-SHA confirmation.
+- Immediate source concern: hero-specific drop-shadow filters remain in `public/index.html` at source `fb997b4`; these violate the no-alteration rule. See CURRENT-STATE.md for safe next steps.
+
+Absolute asset lock: `/images/hero-sd-gl052.png` is a user-provided standalone presentation image, not a product/SKU/catalog image. Do not replace or modify its bytes or appearance, including filters, cropping, masks or background removal. Never pursue SKU/catalog lookup. Only fix loading/visibility plumbing. Preview only; PR #108 remains open/unmerged; no Production/main/Admin/backend/data/config changes.
+
+
 ## ABSOLUTE HERO ASSET LOCK — OWNER-SUPPLIED IMAGE (2026-10-22)
 
 **The hero image is a standalone owner-provided presentation asset, not a product listing, SKU, catalog record, product-gallery image, or database-backed product image.** The owner personally supplied `/images/hero-sd-gl052.png` for the hero. Treat this asset as protected at the same level as the official brand logo.
