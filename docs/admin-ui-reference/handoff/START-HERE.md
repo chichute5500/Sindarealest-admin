@@ -11,16 +11,16 @@
 ## Live checkpoint recorded 2026-10-22
 - Repository: `chichute5500/Sindarealest-admin`
 - Only writable branch: `feature/admin-isolated-handoff-2026-10-20`
-- PR #111: OPEN/unmerged. Last synchronized HEAD: `4d6dab2f56d4dec53955c300e8ea477062fd2587`; fetch live HEAD before acting.
+- PR #111: OPEN/unmerged. Previously observed HEAD before handoff-only commits: `4d6dab2f56d4dec53955c300e8ea477062fd2587`; handoff commits have advanced it since, so fetch live HEAD before acting.
 - PR #108: OPEN/unmerged and read-only for this task; fetch its live HEAD before acting.
 - Product/code-test SHA: `326526f8f74172ae0aea7fa37739c9a8e8f513ec` (different from documentation-only branch HEAD).
 - Progress: **50% PROVISIONAL**. Documentation changes do not increase product progress.
 - Source validation [run 39804852564](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852564): completed SUCCESS on code/test SHA `326526f8...`.
-- Preview diagnostics [run 39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): completed FAILURE on code/test SHA `326526f8...`; inspect job logs/artifacts to identify cause.
+- Preview workflow [run 39804852604](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604): overall FAILURE because local Playwright test timed out waiting for `[data-action="retry-customers"]` at `tests/e2e/admin-static-baseline.spec.js:1940`; the deployed Preview diagnostic step itself was SUCCESS. Evidence artifact: [admin-preview-evidence-336](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604/artifacts/12437154740).
 - Older Preview [run 39802525217](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217): CANCELLED. Do not describe it as running or pending.
 
 ## Immediate next task
-Inspect run 39804852604 jobs/logs/artifacts. Determine the exact failure before changing code. Fix only verified ADMIN issues on the writable branch and validate the resulting code SHA. Continue review of screens #8–#12 and PR #111 changed-file provenance.
+Inspect artifact 12437154740 and test `tests/e2e/admin-static-baseline.spec.js` around line 1940. Establish whether the retry button is missing because the fixture setup is wrong or the UI regressed before changing code. Fix only verified ADMIN issues on the writable branch and validate the resulting code SHA. Continue review of screens #8–#12 and PR #111 changed-file provenance.
 
 ## Guardrails
 - Keep PR #111 and #108 open/unmerged. Never write to `main` or the website/static branch.
