@@ -1,12 +1,12 @@
 > **FOLLOW-UP CHECKPOINT — 2026-10-22, audit #808 artifact independently inspected; supersedes any claim below that the current branch HEAD was already audited.**
 
-## Latest checkpoint — 2026-10-22, audit #814 reviewed; Zalo/search follow-up
+## Latest checkpoint — 2026-10-22, audit #815 exact-SHA PASS; final screenshot polish
 
-- Audit #814 [run 39728726514](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39728726514), artifact [12404645054](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39728726514/artifacts/12404645054), used SHA `072fe4042b92e7d6079c4555903a8ff5524d8fa8`. Deployment verification was exact-SHA PASS (deployment `d0beb283-1f1a-4a62-b855-ddcc0c51e6c6`); audit `passed=false`, 121 screenshots, 13 route checks, 69 section checks, hard failures=3.
-- **404 now PASS**: unknown route rendered the visible 404 heading and home link. Search query `Sneaker da` returned all 8 sneaker cards, so narrowing was not proven. Zalo CTA remains inside collapsed `#orderDetailsPanel`; capture checked it before opening the panel and then marked it hidden. Other technical error/overflow counters remained zero.
-- This follow-up uses the full title of the actual first rendered product as search query, still requires result count to shrink, and expands `#orderDetailsPanel` before scrolling to and checking the Zalo CTA. New regression assertions cover both behaviors.
-- Validate, Preview Deploy, Admin read-only smoke, and a new live audit must run on the same new SHA. Inspect artifact images and metadata; accept only when expected SHA = actual deployment SHA = branch HEAD and all supplemental checks PASS.
-- PR #108 stays OPEN/unmerged. No Production/main/DNS/Admin/backend/API/schema/product data/image mappings/D1/R2/bindings/secrets/Access changes. Preserve `/images/hero-sd-gl052.png`.
+- Audit #815 [run 39729299026](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39729299026), artifact [12404438059](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39729299026/artifacts/12404438059), used SHA `c9ac6c8f7ea0410e23b90016e5b3d7851fed0785`. Deployment verification passed exactly: expected SHA = deployed commit hash, deployment ID `2b03cfd8-e649-41d5-8807-911ba35c9b41`; visual audit `passed=true`, 122 screenshots, 13 route checks, 69 section checks, all hard-failure/error/overflow/read-only counters zero.
+- Supplemental checks all PASS: 404 visible with home link; search `Sneaker da cá sấu – Tuyển chọn 01` reduced 8 cards to 1; Zalo HTTPS target, `_blank`, `noopener noreferrer` verified after expanding order details.
+- **Human review found one evidence-quality issue despite PASS:** the artifact's `zalo-cta-mobile-light-390x844.png` is only 170×40 and visually shows the fixed bottom-nav icons over the CTA area, not the CTA text itself. The next patch centers the actual CTA in the viewport before element capture. Also apply the existing branded satin SVG background to the new 404 view in Light/Dark, because the first 404 screenshot was plain white.
+- The next workflow set must validate/deploy/audit the same new SHA; inspect the real Zalo screenshot and 404 Light/Dark captures and require exact SHA equality. Do not update docs while that audit runs.
+- PR #108 remains OPEN/unmerged. No Production/main/DNS/Admin/backend/API/schema/product data/image mappings/D1/R2/bindings/secrets/Access changes. Preserve `/images/hero-sd-gl052.png`.
 
 # PROMPT TIẾP QUẢN CHAT MỚI — CHECKPOINT AUDIT #808 (2026-10-22)
 

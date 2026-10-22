@@ -1528,8 +1528,10 @@ async function captureSupplementalParityChecks(browser) {
     await page.locator('#order').scrollIntoViewIfNeeded().catch(() => {});
     await page.waitForTimeout(420);
     const zalo = page.locator('#order .order-zalo-cta').first();
+    await zalo.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' })).catch(() => {});
+    await page.waitForTimeout(320);
     await zalo.scrollIntoViewIfNeeded().catch(() => {});
-    await page.waitForTimeout(260);
+    await page.waitForTimeout(180);
     const zaloState = await zalo.evaluate(el => ({
       visible: Boolean(el.getClientRects().length) && getComputedStyle(el).visibility !== 'hidden',
       href: el.getAttribute('href'), target: el.getAttribute('target'),

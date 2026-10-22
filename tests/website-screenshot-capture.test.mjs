@@ -413,3 +413,9 @@ assert.match(live, /const query = firstTitle;[\s\S]*searchState\.visibleResultCo
   'Search audit must use the rendered product title and prove that results narrow.');
 assert.match(live, /orderDetailsToggle[\s\S]*orderDetailsPanel[\s\S]*const zalo = page\.locator/,
   'Zalo CTA audit must expand the order details panel before checking the hidden CTA.');
+
+
+assert.match(storefrontHtml, /body\.sd-not-found-route\{[^}]*liquid-glass-light-mobile\.svg[\s\S]*liquid-glass-dark-mobile\.svg/,
+  'The 404 route must retain the branded satin backdrop in Light and Dark themes.');
+assert.match(live, /zalo\.evaluate\(el => el\.scrollIntoView\(\{ block: 'center'[\s\S]*zaloChecks/,
+  'The Zalo CTA element screenshot must center the actual CTA away from fixed navigation overlays.');
