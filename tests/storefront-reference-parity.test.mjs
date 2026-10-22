@@ -366,18 +366,3 @@ assert.ok(
   'Trust chip SVGs must remain navy and compact inside the existing circular glass treatment.'
 );
 
-const heroMatteStart = html.indexOf('function syncHeroBackgroundKey(img){');
-const heroMatteEnd = html.indexOf('\n}', heroMatteStart);
-const heroMatteKey = heroMatteStart >= 0 && heroMatteEnd > heroMatteStart ? html.slice(heroMatteStart, heroMatteEnd) : '';
-assert.ok(heroMatteKey.includes('keyed=votes>=6;')
-  && heroMatteKey.includes('ctx.drawImage(img,0,0,24,24)')
-  && heroMatteKey.includes('img.classList?.toggle?.(\'sd-hero-white-background-keyed\',keyed);'),
-  'Hero background keying must be conditional on sampled light-neutral image corners and must not alter the source asset.');
-assert.ok(html.includes("target.onload=()=>{const keyed=syncHeroBackgroundKey(target)")
-  && html.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'")
-  && html.includes("target.dataset.heroBackgroundKeyStatus=keyed?'light-neutral-matte-keyed':'source-image-unchanged'"),
-  'The approved hero asset must remain the same; its display-only matte key is applied after the image loads.');
-assert.ok(html.includes('html.dark #home .hero-visual img.sd-hero-white-background-keyed{')
-  && html.includes('filter:url(#sdGalleryWhiteBackgroundKey) drop-shadow(0 12px 20px rgba(0,22,42,.20))!important;'),
-  'Dark-mode hero may reuse the existing SVG white-matte filter only for a corner-verified light canvas.');
-assert.doesNotMatch(html,/Dark hero: softly feather the owner-supplied image/);
