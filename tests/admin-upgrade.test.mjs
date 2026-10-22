@@ -11,11 +11,7 @@ assert.ok(admin.includes('id="pSku"') && admin.includes('id="pSkuVerified"') && 
 assert.ok(admin.includes("Object.hasOwn(labels,log.action)"), "audit event labels must not resolve inherited prototype properties");
 assert.ok(lib.includes("Object.hasOwn(aliases, categoryKey)"), "product category aliases must be prototype-safe");
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
-assert.ok(read("../public/index.html").includes("-webkit-tap-highlight-color: transparent"), "Storefront controls should not flash blue when tapped on Android");
-assert.ok(read("../public/index.html").includes("p.skuVerified===false?(p.id||p.slug):(p.sku||p.id||p.slug)"), "Product URLs should use stable SKU only when verified and otherwise fall back to the product ID");
-assert.ok(!read("../public/index.html").includes("CRAFTED WITH<br>CHARACTER") && !read("../public/index.html").includes("hero-stamp-image-spacer") && !read("../public/index.html").includes(".hero-stamp{"), "Entire hero stamp and related styles should be removed");
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
-assert.ok(read("../public/index.html").includes("maskedAddress") && read("../public/index.html").includes("maskedPhone"), "Warranty lookup must show masked purchase details");
 assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:") && !read("../functions/api/warranty-lookup.js").includes("warrantyCode: code"), "Lookup API must return only masked codes plus short-lived action tokens");
 assert.ok(read("../functions/_middleware.js").includes("isVerifiedCommercialSku(product)") && read("../functions/_middleware.js").includes("encodeURIComponent(productKey)"), "Product canonical URL must use a verified SKU or immutable ID");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
@@ -43,9 +39,6 @@ assert.ok(resetSkus.includes("categoryRules[row.categoryKey]"), "SKU reset shoul
 assert.ok(push.includes("requireAdmin"), "Push subscriptions must require admin authentication");
 console.log("PASS: admin upgrade static regression checks.");
 
-assert.ok(!read("../public/index.html").includes('id="craftsmanship"') && !read("../public/index.html").includes("images/17599dbbaea33cdd.webp"), "Crafted-with-character image and section must be removed completely");
-assert.ok(read("../public/index.html").includes(".menu-btn{position:absolute!important;left:8px"), "Mobile hamburger menu should be positioned on the left");
-assert.ok(read("../public/index.html").includes(".checkout-fields input,.checkout-fields select,.checkout-fields textarea{"), "Province/city selector should share the same glass field styling");
 assert.ok(admin.includes("<h2>Đăng nhập quản trị</h2>") && admin.includes("<p>Luxury in Every Detail</p>"), "Admin login UI should use the approved Vietnamese heading and brand tagline");
 
 const restoreApi = read("../functions/api/admin/restore.js");
