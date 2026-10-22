@@ -1,33 +1,32 @@
 # LATEST STATUS — SinDarealest Admin
 
-**Checkpoint 2026-10-22. Progress: 50% PROVISIONAL.** Handoff/fixture-only work does not increase product progress.
+**Product progress: 50% PROVISIONAL.** Live-source audit checkpoint 2026-10-22T16:28:00Z. Latest tested application code remains `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; the branch HEAD advances with documentation commits and must be fetched before every write.
 
-## Live PR state
-- PR #111 [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), only writable branch `feature/admin-isolated-handoff-2026-10-20`. HEAD before this handoff batch: `0502739790fecfdf56f3c267dcaf607f1751908e`; re-fetch live after commit.
-- PR #108 [OPEN / unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/108), static branch read-only, latest observed HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`.
-- No PR merged, no Production deploy, no writes to main or static branch.
+## Live state
+- ADMIN [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN/unmerged, mergeable=false, 1,310 changed files, +49,466 / −404. HEAD at source-audit checkpoint start: `0502739790fecfdf56f3c267dcaf607f1751908e`.
+- Protected website/static [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN/unmerged, mergeable=false, 288 changed files, HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`.
+- Main HEAD at comparison: `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; current merge base ADMIN/main: `f38cefe4647b33bd42f9018fde00c420ee5c7c66`. ADMIN PR diverged and is six commits behind main.
 
-## Exact-SHA checks
-- Tested source/test SHA [`4b2220d510a906882e4309df6969c0c43514c421`](https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421).
-- Validate [#39813340342](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340342): **PASS** (`npm run check`, `npm test`).
-- Preview [#39813340309](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309): **PASS**; Playwright screenshot matrix and deployed Preview login CSS diagnostic passed.
-- Artifact [admin-preview-evidence-340 / 12439794397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397): 102 PNGs (16 login shell + 86 fixture/module screenshots), 78 fixture metrics.
-- Fixture evidence reports 0 page errors, 0 failed requests/unexpected API paths/attempted writes; seven synthetic HTTP 503 console messages are deliberate retry tests. `PASS_LOGIN_CSS_SIGNATURE` tests the Preview login CSS selector only, not authenticated backend behavior.
-- Mobile toast overlap fix is verified with geometry regression and `warranties-responsive__320x640__light.png` in artifact #340.
+## Exact-SHA validation
+- [Actions #39811730576]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576 ): **SUCCESS** on `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; repo checks, automated tests, local read-only Playwright screenshot matrix, and configured Preview diagnostic succeeded.
+- [Artifact #339, ID 12441015558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558): 102 PNGs (16 login shell, 86 fixture module screens), 78 fixture metrics. No page/console errors, failed requests, HTTP errors, attempted writes, or unexpected API paths are reported in the artifact metadata.
+- Older run #39804852604 failed the screenshot test on SHA `326526f8...`; it is superseded by the newer passing run and is not the active blocker.
+- All 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated backend flows and real data persistence remain NOT_TESTED/NOT_VERIFIED.
 
-## Issues fixed and verified
-- [`2e7123c`](https://github.com/chichute5500/Sindarealest-admin/commit/2e7123c7dc694efa88a7bfa8902845048eb93db5): retry fixture preserves 503 until Retry controls render.
-- [`88d6f37`](https://github.com/chichute5500/Sindarealest-admin/commit/88d6f372c70cb6bf43ff4d7c670f470d652bd3c4): mobilecards assertion reflects `display:flex`.
-- [`483a039`](https://github.com/chichute5500/Sindarealest-admin/commit/483a03966ba2d1d2e46d2723f440b97ebc31d0e4): Activity Log screenshot waits for async refresh to finish.
-- [`4b2220d`](https://github.com/chichute5500/Sindarealest-admin/commit/4b2220d510a906882e4309df6969c0c43514c421): toast positioned above fixed mobile navigation; run #39813340309 passed.
+## Product/UI review
+- Gallery source/fixture review at `product-gallery__390x844__light.png`: responsive featured image slot + horizontally scrollable thumbnail rail + named controls and reorder assertions are present at `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`. The visible artwork is synthetic fixture data. No product image was invented and no concrete visual regression was established in this pass; screen #5 stays PARTIAL_NOT_ACCEPTED.
+- Continue exact-viewport/theme screenshot comparison for remaining screens; do not turn a fixture matrix PASS into all-screen approval.
 
-## What is still not accepted
-All 12 screens remain **PARTIAL_NOT_ACCEPTED**. Customers/Warranty synthetic retry passes but live backend is untested; Settings real persistence/QR activation unverified; Backup/Restore has no real export/import cycle; Activity Log uses fixtures; Product Gallery still needs visual comparison and R2 persistence is deferred. Remote D1 schema/payment ledger NOT_VERIFIED. Migration 0009, PRE/PRO and R2 are DEFERRED_BY_OWNER.
-
-## Next
-1. Compare artifact #340 with `docs/admin-ui-reference/admin-mobile-reference.png` at matching viewport/theme, prioritizing Gallery (#5) then #8–#12. Record exact image path and observed difference before changing code.
-2. Continue PR #111 provenance review over 1,310 live paths; recalculate ahead/behind/merge-base from exact refs before relying on them.
-3. For missing authenticated Preview access, record BLOCKED. Never bypass Access.
+## PR provenance / deployment readiness
+- Refreshed live PR file census: 1,310 paths (1,247 docs; 913 PNG; 36 runtime/config paths including package.json; 25 test paths). Old 1,304-path census is stale.
+- Current merge-base blob audit classifies the 36 runtime/config paths as 14 added and 22 modified. Seven exact blobs are shared with PR #108; ADMIN `public/index.html` differs from both main and current static PR #108. Full provenance remains PARTIAL; keep both PRs unmerged pending scope resolution.
+- **Migration 0009 preflight exists in both setup and deploy scripts.** Setup performs some remote DDL/migrations before the 0009 check and does not apply 0009 itself; deploy checks 0007/0008/0009 before Pages deploy. This is source-level only. Do not run either script; actual remote D1 schema/ledger remains NOT_VERIFIED.
+- Static integration note: current PR #108 `public/index.html` consumes payment response but does not map/display `freeShippingEligible` and `freeShipping`; this gap belongs to the static branch, which remains read-only here.
 
 ## Guardrails
-Only write ADMIN branch. Keep PR #111/#108 open/unmerged. No main/static edits, Production deploy, Access bypass, secrets access, remote D1/R2 operations or setup/migration/deploy scripts. Never invent business data/API contracts.
+No merge, main/static write, Production deploy, Access bypass, secrets access/change, remote D1/R2 operation, or setup/migration/deploy script execution. Migration 0009 and PRE/PRO/R2 work remain DEFERRED_BY_OWNER. AI grouping requires an approved API/UX contract.
+
+## Next
+1. Continue semantic review of runtime/payment paths and record risk/fix proposals without performing remote actions.
+2. Review test/evidence/docs provenance groups; keep full PR audit PARTIAL until complete.
+3. Continue screen-by-screen visual and interaction acceptance against the approved reference; keep the progress at 50% until acceptance evidence supports a change.
