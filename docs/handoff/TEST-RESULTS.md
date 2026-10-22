@@ -1,3 +1,20 @@
+# LATEST TEST CHECKPOINT — 2026-10-22
+
+Source HEAD at checkpoint: `de62c546bab7e175347a4efb4fda5ec54c014a38`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Source validation #4448 | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936598 |
+| Preview deploy #537 | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936551 |
+| Admin Preview Playwright #751 | PASS, read-only smoke | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936572 |
+| Live visual audit #807 | PENDING at checkpoint | https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501 |
+
+Previous live PASS #805 / artifact 12402222013 is for SHA `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6`, not current HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723518923. It has 119 live screenshots, 8 viewport/theme pairs, 12 route checks, 68 section checks, 8 commerce states, 4 detail contexts, 4 icon-state checks, 4 cart-add checks, 6 fly-to-cart checks, 2 animation edge checks, 20 first-paint frames and 4 videos; zero overflow, console/page/HTTP errors, failed requests, broken images, read-only violations, or hard failures. The matching Preview deployment was ID `4bde881b-5b48-4860-b410-ec160d6c8dd6`.
+
+The latest source update strengthened gallery screenshot readiness by waiting for the main image source to match the active thumbnail and for all image transition classes to be removed; regression assertion added in `tests/website-screenshot-capture.test.mjs`. Run #807 must verify this on the exact current SHA before it is marked PASS. Run #806 belongs to intermediate SHA `72fd33c54470d3eeb7763cb5b5173b34c4f25d5e` and must not be used as current-SHA evidence: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723921487.
+
+---
+
 # CURRENT CHECKPOINT — 2026-10-22 (gallery capture settling; supersedes older status snapshots)
 
 - Active repository/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`. PR #108 stays OPEN and unmerged.
