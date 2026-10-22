@@ -47,7 +47,12 @@ assert.ok(html.includes('--sd-gallery-glass:rgba(248,252,255,.96)')
   && html.includes('--sd-gallery-glass:rgba(4,20,34,.94)'),
   'Later gallery material overrides must keep icons readable in light and dark themes.');
 assert.match(html, /\.slide-count,\.featured-image-count,\.detail-image-count,\.sd-fullscreen-count\{[^}]*backdrop-filter:blur\(18px\)/);
-assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.85\)/);
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.97\)!important;/,
+  'Detail and fullscreen arrows must keep their vertical centering and shrink only subtly while pressed.');
+assert.match(html, /\.detail-gallery-arrow\.tap-target:active::before,\.sd-fullscreen-arrow\.tap-target:active::before\{\s*opacity:0!important;\s*transform:scale\(\.92\)!important;/,
+  'Gallery arrow presses must suppress the tap-target ripple-like overlay.');
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{[^}]*box-shadow:inset 0 2px 8px/,
+  'Gallery arrow press feedback must use an inset/depressed glass shadow.');
 assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
 assert.match(html, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdFullscreenOutLeft 300ms/);
 assert.match(html, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdFullscreenInRight 300ms/);
@@ -78,7 +83,12 @@ assert.ok(html.includes('<style id="sd-gallery-opaque-satin-surface-2026-10-22">
   && html.includes('html.dark .sd-fullscreen-viewer.open{\n  background:rgba(3,18,32,.96)!important;')
   && html.includes('backdrop-filter:blur(30px) saturate(145%)!important;'),
   'The open fullscreen gallery must retain theme-aware satin glass while suppressing underlying storefront text.');
-assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.85\)/);
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{transform:translateY\(-50%\) scale\(\.97\)!important;/,
+  'Detail and fullscreen arrows must keep their vertical centering and shrink only subtly while pressed.');
+assert.match(html, /\.detail-gallery-arrow\.tap-target:active::before,\.sd-fullscreen-arrow\.tap-target:active::before\{\s*opacity:0!important;\s*transform:scale\(\.92\)!important;/,
+  'Gallery arrow presses must suppress the tap-target ripple-like overlay.');
+assert.match(html, /\.detail-gallery-arrow:active,\.sd-fullscreen-arrow:active\{[^}]*box-shadow:inset 0 2px 8px/,
+  'Gallery arrow press feedback must use an inset/depressed glass shadow.');
 assert.match(html, /\.featured-arrow:active,\.slide-controls button:active,\.page-btn\.page-arrow:active\{transform:scale\(\.85\)/);
 
 
