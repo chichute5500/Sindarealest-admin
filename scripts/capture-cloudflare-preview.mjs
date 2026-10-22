@@ -1493,7 +1493,7 @@ async function captureSupplementalParityChecks(browser) {
     await page.goto(origin + '/', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await waitForStorefront(page, label); await dismissWelcomeSplash(page); await settle(page);
     const firstTitle = (await page.locator('#catalogGrid .product-title').first().innerText().catch(() => '')).trim();
-    const query = firstTitle.split(/\s+/).slice(-2).join(' ').trim();
+    const query = firstTitle.split(/\s+/).slice(0, 2).join(' ').trim();
     const originalCount = await page.locator('#catalogGrid .product-card').count();
     const input = page.locator('#catalogSearch');
     try {
@@ -1504,12 +1504,15 @@ async function captureSupplementalParityChecks(browser) {
         return Boolean(q) && titles.length > 0 && titles.every(title => title.includes(q.toLocaleLowerCase('vi')));
       }, query, { timeout: 8000 });
     } catch (error) { audit.hardFailures.push(sanitizeText('Live catalog search interaction failed: ' + String(error.message || error))); }
+    await page.locator('#products').scrollIntoViewIfNeeded().catch(() => {});
+    await page.waitForTimeout(220);
     const searchState = await page.evaluate(() => ({
       query: document.querySelector('#catalogSearch')?.value || '',
       visibleResultCount: document.querySelectorAll('#catalogGrid .product-card').length,
       resultTitles: [...document.querySelectorAll('#catalogGrid .product-title')].map(el => (el.textContent || '').trim()),
     })).catch(() => ({ query: '', visibleResultCount: 0, resultTitles: [] }));
     const searchPassed = Boolean(query) && searchState.query === query && searchState.visibleResultCount > 0
+      && searchState.visibleResultCount < originalCount
       && searchState.resultTitles.every(title => title.toLocaleLowerCase('vi').includes(query.toLocaleLowerCase('vi')));
     audit.searchChecks.push({ context: label, query, originalCount, ...searchState, status: searchPassed ? 'PASS' : 'FAIL' });
     if (!searchPassed) audit.hardFailures.push('Catalog search did not return matching live Preview products.');
@@ -1517,6 +1520,8 @@ async function captureSupplementalParityChecks(browser) {
     await input.fill('');
 
     const zalo = page.locator('#order .order-zalo-cta').first();
+    await zalo.scrollIntoViewIfNeeded().catch(() => {});
+    await page.waitForTimeout(260);
     const zaloState = await zalo.evaluate(el => ({
       visible: Boolean(el.getClientRects().length) && getComputedStyle(el).visibility !== 'hidden',
       href: el.getAttribute('href'), target: el.getAttribute('target'),

@@ -2936,9 +2936,18 @@ html.dark .sd-fullscreen-arrow:active,html.dark #mobileBottomNav .tap-target:act
 </style>
 
 
-<main id="notFoundPage" class="not-found-page" hidden aria-labelledby="notFoundTitle"><section class="not-found-card"><p class="not-found-eyebrow">SINDAREALEST · THỜI TRANG DA CÁ SẤU</p><h1 id="notFoundTitle">404</h1><h2>Không tìm thấy trang</h2><p>Đường dẫn này không tồn tại hoặc nội dung đã được chuyển đi.</p><a class="not-found-home" href="/">Về trang chủ <span aria-hidden="true">→</span></a></section></main>
+<main id="notFoundPage" class="not-found-page" aria-labelledby="notFoundTitle"><section class="not-found-card"><p class="not-found-eyebrow">SINDAREALEST · THỜI TRANG DA CÁ SẤU</p><h1 id="notFoundTitle">404</h1><h2>Không tìm thấy trang</h2><p>Đường dẫn này không tồn tại hoặc nội dung đã được chuyển đi.</p><a class="not-found-home" href="/">Về trang chủ <span aria-hidden="true">→</span></a></section></main>
+<script id="sd-not-found-route-init">
+(() => {
+  const rawPath = location.pathname;
+  const path = rawPath.endsWith('/') ? rawPath.slice(0, -1) || '/' : rawPath;
+  const parts = path.split('/').filter(Boolean);
+  const productRoute = (path.startsWith('/sanpham/') && parts.length === 3) || (path.startsWith('/san-pham/') && parts.length === 2);
+  if (path !== '/' && path !== '/index.html' && !productRoute) document.body.classList.add('sd-not-found-route');
+})();
+</script>
 <style id="sd-not-found-route-styles">
-body.sd-not-found-route > :not(#notFoundPage){display:none!important} body.sd-not-found-route > #notFoundPage{display:grid!important}
+#notFoundPage{display:none} body.sd-not-found-route > :not(#notFoundPage){display:none!important} body.sd-not-found-route > #notFoundPage{display:grid!important}
 .not-found-page{min-height:100svh;box-sizing:border-box;place-items:center;padding:28px;color:inherit;background:transparent}
 .not-found-card{width:min(100%,520px);box-sizing:border-box;padding:clamp(28px,7vw,56px);border:1px solid rgba(92,145,185,.35);border-radius:28px;background:rgba(255,255,255,.42);box-shadow:0 18px 60px rgba(20,42,60,.09);backdrop-filter:blur(22px);text-align:center}
 html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,185,.45);box-shadow:0 18px 60px rgba(0,0,0,.22)}

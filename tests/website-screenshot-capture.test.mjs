@@ -397,3 +397,11 @@ assert.match(live, /async function captureSupplementalParityChecks[\s\S]*notFoun
   'The live audit must explicitly cover 404, catalog search, and Zalo CTA states.');
 assert.match(live, /audit\.notFoundChecks\.length === 1[\s\S]*audit\.searchChecks\.length === 1[\s\S]*audit\.zaloChecks\.length === 1/,
   'The live audit must fail closed if any supplemental parity check is missing.');
+
+
+assert.match(storefrontHtml, /<main id="notFoundPage" class="not-found-page" aria-labelledby="notFoundTitle">[\s\S]*<script id="sd-not-found-route-init">[\s\S]*sd-not-found-route/,
+  'The 404 view must be available to the route initializer after its markup exists.');
+assert.match(live, /searchState\.visibleResultCount < originalCount[\s\S]*#products[\s\S]*scrollIntoViewIfNeeded/,
+  'Search audit must prove that a query narrows the live catalog and capture the result section.');
+assert.match(live, /const zalo = page\.locator[\s\S]*zalo\.scrollIntoViewIfNeeded[\s\S]*zaloChecks/,
+  'Zalo CTA visibility must be measured after scrolling the live CTA into view.');
