@@ -1,3 +1,36 @@
+# LATEST HANDOFF UPDATE — HERO ASSET REPLACEMENT / RESUME FROM LIVE STATE
+**Updated:** 2026-10-22 16:05 UTC  
+**This update is newer than all older status notes below. Keep it when editing this file.**
+
+## Current source and verified GitHub state
+- Repository: `chichute5500/Sindarealest-admin`
+- Work branch: `fix/liquid-glass-audit-2026-10-19`
+- Current observed branch HEAD: `03d05fe78adaab9661ea0960560ea22600d98cae`
+- PR #108: OPEN, not merged. Keep it open. Do not merge.
+- User-supplied standalone Hero image is now referenced as `/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4`.
+- Previous `public/images/hero-sd-gl052.png` was deleted. The replacement image is a standalone presentation/Hero asset, NOT a catalog image, NOT tied to SKU `SD-GL052`, and must never be sourced/gated by product payload or SKU availability.
+- Relevant code/test/doc changes in latest commits include `public/index.html`, `scripts/capture-liquid-glass-preview.mjs`, `scripts/capture-cloudflare-preview.mjs`, `tests/hero-product-sku.test.mjs`, `tests/storefront-reference-parity.test.mjs`, `tests/storefront-html-safety.test.mjs`, and `public/images/hero-upload/README.md`. Re-check actual branch diff before further edits rather than assuming this is the complete changed-file list.
+
+## Latest workflow state (same SHA above)
+- Source validation / full automated tests: **PASS** — run [39809611368](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39809611368).
+- Cloudflare Pages Preview deploy: **PASS** — run [39809611147](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39809611147). This is a Preview deployment only, not Production.
+- Visual preview workflow: **IN PROGRESS at last check** — run [39809611151](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39809611151). The job had passed complete project tests and migration checks and was still installing isolated Chromium. No completed live screenshot artifact or actual visual review was confirmed at handoff time.
+- Admin Preview Playwright run [39809611190](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39809611190) was pending at last check; do not work on Admin or treat this as a storefront requirement.
+- Preview alias to verify: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Do not claim exact deployed runtime SHA, image HTTP success, screenshot coverage, visual parity, or Hero PASS solely from source tests/deploy workflow. Verify deployment metadata and fetch/inspect actual screenshots/artifacts once the visual workflow finishes.
+
+## Mandatory next actions — continue, do not restart
+1. Read this latest block and then inspect live GitHub HEAD/PR #108/workflow run 39809611151 before changing anything.
+2. Poll run 39809611151 until terminal. If it fails, inspect failed step logs, fix only the blocker relevant to Hero capture/verification, commit to the same branch, and rerun required checks. Do not stop after reporting progress.
+3. Verify the preview deployment corresponds to exact SHA `03d05fe78adaab9661ea0960560ea22600d98cae` (or the newer exact SHA after any justified fix). Probe the supplied Hero URL and capture real Preview screenshots at required viewports 360×800, 390×844, 768×1024, and 1440×900 in Light and Dark. Distinguish real deployed captures from local fixture captures.
+4. Inspect screenshot evidence and compare Hero against original reference PNGs: Light `docs/static-web-reference/file_0000000017088207af45f5e6dd90cfa4.png`; Dark `docs/static-web-reference/file_00000000fcb48207a23aeda23caa5eeb.png`. Check asset loads, crop/fit, alignment, responsiveness, borders/background, and no blank/old-image state. Do not claim visual PASS until supported by live evidence.
+5. Give owner the Preview URL and concise evidence so they can inspect. **Only the owner can approve Hero PASS.** Until explicit owner PASS, work ONLY on Hero and verification; do not start unrelated UI, icons, checkout, catalog, or other audit items.
+6. Once owner explicitly says PASS, mark Hero `OWNER-APPROVED — LOCKED` in all handoff files and do not touch it again without explicit authorization.
+7. Keep PR #108 open/unmerged. Never touch `main`, Production, DNS, D1/R2, secrets, bindings, Access, Admin branch, backend/API/auth, product data/mappings, or the official logo. No production deployment.
+
+## Owner intent / correction
+The owner uploaded this Hero image intentionally and explicitly instructed it to replace the old Hero asset without further debate or image-selection review. Do not ask the owner to reselect or re-approve the asset choice. The only remaining gate is to verify the actual deployed rendering and let the owner judge the visual result.
+---
 # AUTHORITATIVE HANDOFF OVERRIDE — HERO FIRST / OWNER PASS GATE
 **Updated:** 2026-10-22  
 **Priority:** This section overrides conflicting older instructions or stale assumptions elsewhere in this document. Do not remove it during future handoffs.
