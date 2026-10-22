@@ -1,29 +1,30 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T21:00:00+07:00",
+  "updatedAt": "2026-10-22T14:00:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpoint": "3d56556f087c8f0f6689f29a82602883912584cd",
+  "branchHeadAtCheckpoint": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
-  "progressBasis": "Validate Source #39736231163 PASS on exact source SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; Preview #39736231146 FAIL due to desktop price/stock row overlapping sticky footer (733.78 px vs footer top 732 px). Login CSS signature passed only; visual parity and authenticated backend QA remain unaccepted/untested.",
+  "progressBasis": "Validate Source #39737160773 PASS on source SHA 844020a5aa572421bf558c8c0ff8b38dcfed8a27. Latest known Preview #39736231146 FAIL was on older SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; no Preview run for current HEAD found in the checked Actions list, so current Preview is PENDING/NOT VERIFIED.",
   "latestVerifiedApplicationTest": {
-    "testedCommitSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-    "conclusion": "preview_failure",
+    "testedCommitSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+    "conclusion": "validate_pass_preview_pending",
     "validateRun": {
-      "runId": 39736231163,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231163",
-      "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+      "runId": 39737160773,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39737160773",
+      "sha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
       "conclusion": "success"
     },
-    "previewRun": {
+    "previousPreviewRun": {
       "runId": 39736231146,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736231146",
       "sha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
       "conclusion": "failure"
     },
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "sourceScreenshotMatrix": "FAIL_DESKTOP_STICKY_FOOTER_OVERLAP",
+    "currentHeadPreview": "PENDING_NOT_VERIFIED",
+    "previousPreviewFailure": "desktop price/stock row overlaps sticky footer in screenshot matrix",
+    "previousPreviewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
     "productEditorScreen4": "PARTIAL_NOT_ACCEPTED",
     "productListScreen3": "PARTIAL_NOT_ACCEPTED",
     "twelveScreenVisualParity": "NOT_ACCEPTED",
@@ -103,9 +104,9 @@
     "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
   ],
   "nextActions": [
-    "Fix desktop editor sticky-footer overlap proven by Preview screenshot-matrix test; do not weaken the assertion.",
-    "Run Validate Source and Preview diagnostic on the exact new source SHA; inspect logs/artifact.",
-    "Continue evidence-backed Products #3 and all remaining reference screens; keep 50% until acceptance criteria pass."
+    "Run Admin Preview diagnostic on exact current HEAD 844020a5aa572421bf558c8c0ff8b38dcfed8a27; inspect job logs and screenshot artifact.",
+    "If the desktop sticky-footer overlap persists, fix root cause and rerun exact-SHA Validate Source + Preview without weakening assertions.",
+    "Continue evidence-backed Products #3 and remaining screen reference parity; keep overall progress at 50% until acceptance criteria pass."
   ],
   "guardrails": [
     "Only write to feature/admin-isolated-handoff-2026-10-20.",
@@ -117,18 +118,16 @@
   ],
   "ownerActionRequiredNow": "No owner action required for continued source/fixture UI work. Preview login/dashboard smoke passes; do not bypass Cloudflare Access. Authenticated business/backend QA remains NOT TESTED.",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T21:00:00+07:00",
+    "checkedAt": "2026-10-22T14:00:00+07:00",
     "checkedBranch": "feature/admin-isolated-handoff-2026-10-20",
-    "testedApplicationSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-    "branchHeadBeforeHandoffRefresh": "3d56556f087c8f0f6689f29a82602883912584cd",
-    "validateRun": 39736231163,
-    "previewRun": 39736231146,
-    "previewConclusion": "failure",
-    "previewFailure": "desktop price/stock row overlaps sticky footer in source screenshot matrix",
-    "previewCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
-    "finalSevenFileReadback": "PASS_READBACK_ALL_SEVEN_FILES_FROM_GITHUB",
-    "progressPercent": 50,
-    "handoffDocsCommitSha": "931bb8ec9d92cfcf5ab086e542c533d0e55397d0"
+    "latestBranchHead": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+    "latestValidateSourceSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+    "validateRun": 39737160773,
+    "previousPreviewRun": 39736231146,
+    "previousPreviewSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
+    "currentHeadPreview": "PENDING_NOT_VERIFIED",
+    "previewFailure": "desktop price/stock row overlaps sticky footer on older SHA; rerun required on current HEAD",
+    "progressPercent": 50
   },
   "latestContinuationCycle": {
     "updatedAt": "2026-10-22T21:00:00+07:00",

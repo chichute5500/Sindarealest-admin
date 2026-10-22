@@ -1,14 +1,14 @@
 {
-  "status": "IN_PROGRESS_TEST_FAILURE",
+  "status": "PREVIEW_PENDING_AFTER_SOURCE_CHANGES",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "latestCodeCommitSha": "36b69e5e5daf0cf6daa51e3510a18ed3d22e1778",
-  "testedCommitSha": null,
-  "capturedAt": "2026-10-22T21:00:00+07:00",
+  "latestCodeCommitSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+  "testedCommitSha": "844020a5aa572421bf558c8c0ff8b38dcfed8a27",
+  "capturedAt": "2026-10-22T14:00:00+07:00",
   "progressEstimatePercent": 50,
-  "progressBasis": "Hold at 50%: exact-SHA Validate Source #39736231163 PASS, but Preview #39736231146 FAILs the real-source desktop editor screenshot matrix due to price/stock row overlapping sticky footer; 12-screen parity and authenticated backend QA remain unaccepted/untested.",
-  "note": "Exact-SHA Validate Source #39736231163 PASS on 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; Preview diagnostic #39736231146 FAIL on the same SHA at the local real-source screenshot matrix: priceBottom/stockBottom 733.78, footerTop 732, expected stockBottom < 728. Preview CSS login signature PASS_LOGIN_CSS_SIGNATURE is only a narrow diagnostic and does not override the failed matrix. Do not claim new artifact inspection or feature-field regression. Overall progress 50%; Product editor #4 PARTIAL_NOT_ACCEPTED; Product list #3 and all-12 parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED.",
+  "progressBasis": "Hold at 50%: Validate Source #39737160773 PASS on SHA 844020a5aa572421bf558c8c0ff8b38dcfed8a27. Latest known Preview #39736231146 FAIL is on older SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778; no Preview run for current HEAD was present in the checked Actions list, so current-HEAD Preview is pending/not verified. Visual parity and authenticated backend QA remain unaccepted/untested.",
+  "note": "Latest Validate Source #39737160773 PASS on 844020a5aa572421bf558c8c0ff8b38dcfed8a27. Latest known Preview #39736231146 FAIL on older SHA 36b69e5e5daf0cf6daa51e3510a18ed3d22e1778 due to desktop price/stock row overlapping sticky footer (733.78 px vs footerTop 732 px; expected stockBottom < 728). Later Validate Source runs #39737026443 and #39737160773 passed on newer SHAs; no Preview run for current HEAD 844020a5aa572421bf558c8c0ff8b38dcfed8a27 appears in the checked latest 20 Actions runs. Therefore current Preview state is PENDING/NOT VERIFIED, not pass or fail. Login CSS signature was narrow-only. Progress 50%; Product editor #4 PARTIAL_NOT_ACCEPTED; Product list #3 and 12-screen parity NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED.",
   "branchIsolation": {
     "adminBranchExists": true,
     "staticWebsiteBranchMustNotBeModified": true,
@@ -3344,5 +3344,10 @@
     "authenticatedBusinessQA": "NOT_TESTED",
     "progressPercent": 50,
     "nextAction": "Inspect actual desktop editor DOM/CSS geometry at 1280x800; fix root cause, do not weaken overlap assertion; rerun exact-SHA Validate Source and Preview."
+  },
+  "progress": {
+    "percent": 50,
+    "progressPercent": 50,
+    "nextAction": "Run Preview diagnostic on current HEAD 844020a5aa572421bf558c8c0ff8b38dcfed8a27; inspect logs and screenshot artifact. If desktop editor overlap persists, fix root cause without weakening assertions. Keep visual parity and authenticated QA unaccepted until evidence supports acceptance."
   }
 }
