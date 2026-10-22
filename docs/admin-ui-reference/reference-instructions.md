@@ -14,7 +14,7 @@ Open `docs/admin-ui-reference/admin-mobile-reference.png` before editing. Preser
 - Unknown product images/price/stock remain unknown. Fixture placeholders must not become product data.
 - Last successful source/UI matrix: [run #39816652346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346), SHA `105f46b90dc5664dd091493dbd5cea1af7796c44`. It passed source/fixture checks but does not prove per-screen visual acceptance or authenticated backend flows.
 - Gallery has a featured cover slot and horizontal thumbnail rail in source; no concrete defect was confirmed in the reviewed synthetic fixture screenshot.
-- PR #111 includes cross-scope `public/index.html` which differs from main and static PR #108; do not edit the static version from this branch.
+- Live scope verification at the 2026-10-23 checkpoint: `public/index.html` is absent from PR #111's changed-file list, while `public/admin/index.html` remains the ADMIN UI source. Re-check the live PR file list before acting; never edit the static website branch from ADMIN.
 - Both setup/deploy script sources include 0009 preflight, but no remote D1 schema was checked. Do not run scripts.
 
 No merge, main/static edits, Production deployment, Access bypass, secrets, remote D1/R2, or setup/migration/deploy execution. See handoff current-status, 12-screen audit and scope audit.
