@@ -1,4 +1,12 @@
 > **FOLLOW-UP CHECKPOINT — 2026-10-22, audit #808 artifact independently inspected; supersedes any claim below that the current branch HEAD was already audited.**
+
+## Latest checkpoint — 2026-10-22, supplemental parity coverage
+
+- Last exact-SHA live PASS: audit #809, SHA `295d8c0c7f302eaf47cf1d69ce735ba3adf956e5`, artifact 12402483868 (119 screenshots; zero technical hard failures).
+- Audit #810 on SHA `7451f750e3146ccb52a525cc9ffce2dd7b034ab9` has a passed visual-audit JSON but is **not accepted as deployment proof**: deployment-verification has `passed=false`; expected SHA 7451f75… but actual Preview deployment SHA was `4a7d07902c26aa037014d3ea5809ec4c0753fd9b`.
+- This source slice adds a dedicated unknown-route 404 view and live read-only capture checks for direct 404, catalog search, and safe Zalo CTA attributes. All three must PASS for the live audit to pass.
+- After this commit, verify Validate, Preview Deploy, Admin read-only smoke, and Live visual audit on the same new SHA. Inspect artifact images and confirm expected SHA = actual deployed SHA = branch HEAD. Do not update docs while the audit is running.
+- PR #108 stays OPEN/unmerged. No Production/main/DNS/Admin/backend/API/schema/product data/image mappings/D1/R2/bindings/secrets/Access changes. Preserve `/images/hero-sd-gl052.png`.
 >
 > - Current branch HEAD at inspection: `295d8c0c7f302eaf47cf1d69ce735ba3adf956e5`; it is a documentation-only commit whose parent is audited source SHA `ca5edf1acea5f778c5179f356615afc327b5941a`. Changed files: HANDOFF.md, TEST-RESULTS.md, visual-audit-progress-2026-10-19.md, PROMPT-NEXT-CHAT-2026-10-22.md, icon-system-inventory.md. No storefront source changed in that commit.
 > - Workflow run status: Validate #4460 PASS, Preview Deploy #546 PASS, Admin Preview Playwright #760 PASS (read-only), Live visual audit #808 PASS; all four runs were executed on `ca5edf1acea5f778c5179f356615afc327b5941a`.

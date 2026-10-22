@@ -70,6 +70,9 @@ const audit = {
   cartAddStateChecks: [],
   flyToCartChecks: [],
   cartAnimationEdgeChecks: [],
+  notFoundChecks: [],
+  searchChecks: [],
+  zaloChecks: [],
   brokenImages: [],
   accessServiceTokenConfigured: Object.keys(accessHeaders).length > 0,
   sourceCommit: process.env.SOURCE_SHA || null,
@@ -1464,6 +1467,71 @@ async function captureProductDetailFlow(page, viewport, theme, label) {
     productTitleMatches: true, galleryNext: galleryNextPassed === null ? 'NOT APPLICABLE' : 'PASS',
   });
 }
+async function captureSupplementalParityChecks(browser) {
+  const viewport = viewports.find(item => item.width === 390 && item.height === 844);
+  const theme = 'light';
+  const label = 'supplemental-mobile-390-light';
+  const { context, page } = await makePage(browser, viewport, theme, label);
+  try {
+    const missingPath = '/__sd-audit-not-found-20261022';
+    let response = null;
+    try { response = await page.goto(origin + missingPath, { waitUntil: 'domcontentloaded', timeout: 45000 }); await page.waitForTimeout(220); }
+    catch (error) { audit.hardFailures.push(sanitizeText('Direct not-found route navigation failed: ' + String(error.message || error))); }
+    const state = await page.evaluate(() => ({
+      path: location.pathname,
+      routeClass: document.body.classList.contains('sd-not-found-route'),
+      viewVisible: (() => { const el = document.querySelector('#notFoundPage'); return Boolean(el && !el.hidden && getComputedStyle(el).display !== 'none'); })(),
+      heading: (document.querySelector('#notFoundTitle')?.textContent || '').trim(),
+      homeHref: document.querySelector('#notFoundPage a[href="/"]')?.getAttribute('href') || null,
+    })).catch(() => ({ path: page.url(), routeClass: false, viewVisible: false, heading: '', homeHref: null }));
+    const notFoundPassed = state.routeClass && state.viewVisible && state.heading === '404' && state.homeHref === '/';
+    audit.notFoundChecks.push({ path: missingPath, httpStatus: response?.status() ?? null, ...state, status: notFoundPassed ? 'PASS' : 'FAIL' });
+    audit.routeChecks.push({ kind: 'not-found-route', path: missingPath, status: response?.status() ?? null, finalPath: state.path, result: notFoundPassed ? 'PASS' : 'FAIL', notFoundViewVisible: state.viewVisible });
+    if (!notFoundPassed) audit.hardFailures.push('Direct unknown route did not render the accessible 404 view.');
+    await capture(page, 'not-found-mobile-light-390x844.png', false, { ...captureMeta(viewport, theme, missingPath), captureType: 'not-found', state: 'not-found' });
+
+    await page.goto(origin + '/', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await waitForStorefront(page, label); await dismissWelcomeSplash(page); await settle(page);
+    const firstTitle = (await page.locator('#catalogGrid .product-title').first().innerText().catch(() => '')).trim();
+    const query = firstTitle.split(/\s+/).slice(-2).join(' ').trim();
+    const originalCount = await page.locator('#catalogGrid .product-card').count();
+    const input = page.locator('#catalogSearch');
+    try {
+      await page.locator('#searchJump').click({ timeout: 8000 });
+      await input.fill(query, { timeout: 8000 });
+      await page.waitForFunction(q => {
+        const titles = [...document.querySelectorAll('#catalogGrid .product-title')].map(el => (el.textContent || '').trim().toLocaleLowerCase('vi'));
+        return Boolean(q) && titles.length > 0 && titles.every(title => title.includes(q.toLocaleLowerCase('vi')));
+      }, query, { timeout: 8000 });
+    } catch (error) { audit.hardFailures.push(sanitizeText('Live catalog search interaction failed: ' + String(error.message || error))); }
+    const searchState = await page.evaluate(() => ({
+      query: document.querySelector('#catalogSearch')?.value || '',
+      visibleResultCount: document.querySelectorAll('#catalogGrid .product-card').length,
+      resultTitles: [...document.querySelectorAll('#catalogGrid .product-title')].map(el => (el.textContent || '').trim()),
+    })).catch(() => ({ query: '', visibleResultCount: 0, resultTitles: [] }));
+    const searchPassed = Boolean(query) && searchState.query === query && searchState.visibleResultCount > 0
+      && searchState.resultTitles.every(title => title.toLocaleLowerCase('vi').includes(query.toLocaleLowerCase('vi')));
+    audit.searchChecks.push({ context: label, query, originalCount, ...searchState, status: searchPassed ? 'PASS' : 'FAIL' });
+    if (!searchPassed) audit.hardFailures.push('Catalog search did not return matching live Preview products.');
+    await capture(page, 'search-results-mobile-light-390x844.png', false, { ...captureMeta(viewport, theme, '/'), captureType: 'interaction', state: 'search-results' });
+    await input.fill('');
+
+    const zalo = page.locator('#order .order-zalo-cta').first();
+    const zaloState = await zalo.evaluate(el => ({
+      visible: Boolean(el.getClientRects().length) && getComputedStyle(el).visibility !== 'hidden',
+      href: el.getAttribute('href'), target: el.getAttribute('target'),
+      rel: (el.getAttribute('rel') || '').split(/\s+/).filter(Boolean),
+      label: (el.getAttribute('aria-label') || el.textContent || '').trim(),
+    })).catch(() => ({ visible: false, href: null, target: null, rel: [], label: '' }));
+    const zaloPassed = zaloState.visible && /^https:\/\/zalo\.me\//i.test(zaloState.href || '')
+      && zaloState.target === '_blank' && zaloState.rel.includes('noopener') && zaloState.rel.includes('noreferrer');
+    audit.zaloChecks.push({ context: label, ...zaloState, externalNavigationClicked: false, status: zaloPassed ? 'PASS' : 'FAIL',
+      note: 'Verified the live CTA and safe external-link attributes; did not navigate away from Preview.' });
+    if (!zaloPassed) audit.hardFailures.push('Zalo CTA is missing, hidden, or lacks a safe HTTPS target.');
+    await captureLocator(page, '#order .order-zalo-cta', 'zalo-cta-mobile-light-390x844.png', { ...captureMeta(viewport, theme, '/'), captureType: 'interaction', state: 'zalo-cta' });
+  } finally { await context.close(); }
+}
+
 async function main() {
   await fs.mkdir(outputDir, { recursive: true });
   await fs.rm(firstPaintVideoDir, { recursive: true, force: true });
@@ -1534,6 +1602,7 @@ async function main() {
         }
       }
     }
+    await captureSupplementalParityChecks(browser);
   } finally { await browser.close(); }
 
   audit.responsiveOverflowCount = audit.viewportAudits.filter(item => item.horizontalOverflow).length;
@@ -1586,6 +1655,9 @@ async function main() {
     flyToCartChecksComplete: audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS'),
     cartAnimationEdgeCheckCount: audit.cartAnimationEdgeChecks.length,
     cartAnimationEdgeChecksComplete: audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS'),
+    notFoundChecksComplete: audit.notFoundChecks.length === 1 && audit.notFoundChecks.every(check => check.status === 'PASS'),
+    searchChecksComplete: audit.searchChecks.length === 1 && audit.searchChecks.every(check => check.status === 'PASS'),
+    zaloChecksComplete: audit.zaloChecks.length === 1 && audit.zaloChecks.every(check => check.status === 'PASS'),
   };
   audit.passed = audit.captureCompleted
     && completedViewportThemePairs === requiredViewportThemePairs
@@ -1602,6 +1674,9 @@ async function main() {
     && audit.cartAddStateChecks.length === 4 && audit.cartAddStateChecks.every(check => check.status === 'PASS')
     && audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS')
     && audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS')
+    && audit.notFoundChecks.length === 1 && audit.notFoundChecks.every(check => check.status === 'PASS')
+    && audit.searchChecks.length === 1 && audit.searchChecks.every(check => check.status === 'PASS')
+    && audit.zaloChecks.length === 1 && audit.zaloChecks.every(check => check.status === 'PASS')
     && audit.hardFailures.length === 0;
   audit.finishedAtUtc = new Date().toISOString();
   audit.summary = {
@@ -1615,6 +1690,7 @@ async function main() {
     flyToCartChecksComplete: audit.flyToCartChecks.length === 6 && audit.flyToCartChecks.every(check => check.status === 'PASS'),
     cartAnimationEdgeCheckCount: audit.cartAnimationEdgeChecks.length,
     cartAnimationEdgeChecksComplete: audit.cartAnimationEdgeChecks.length === 2 && audit.cartAnimationEdgeChecks.every(check => check.status === 'PASS'),
+    notFoundCheckCount: audit.notFoundChecks.length, searchCheckCount: audit.searchChecks.length, zaloCheckCount: audit.zaloChecks.length,
     firstPaintFrameCount: audit.firstPaintChecks.length, firstPaintViolationCount, firstPaintCoverageComplete,
     firstPaintVideoCount: audit.videoCaptures.length, firstPaintVideoCoverageComplete,
     blockedExternalRequestCount: audit.blockedExternalRequests.length,

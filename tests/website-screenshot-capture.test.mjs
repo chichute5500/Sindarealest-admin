@@ -387,3 +387,13 @@ assert.match(storefrontHtml, /body\.welcome-active #mobileBottomNav/,
   'The storefront early guard must use the initial body flag and not rely only on :has().');
 
 console.log('PASS: Preview capture is source-restricted/read-only, optional Access service-token credentials are paired, isolated to the Preview origin, and never logged; Production URLs are rejected and secrets are redacted.');
+
+
+assert.match(storefrontHtml, /id="notFoundPage"[\s\S]*id="notFoundTitle"/,
+  'Unknown public routes must have an accessible 404 presentation view.');
+assert.match(storefrontHtml, /sd-not-found-route[\s\S]*normalizedPath/,
+  'Unknown routes must be detected without changing canonical product routes.');
+assert.match(live, /async function captureSupplementalParityChecks[\s\S]*notFoundChecks[\s\S]*searchChecks[\s\S]*zaloChecks/,
+  'The live audit must explicitly cover 404, catalog search, and Zalo CTA states.');
+assert.match(live, /audit\.notFoundChecks\.length === 1[\s\S]*audit\.searchChecks\.length === 1[\s\S]*audit\.zaloChecks\.length === 1/,
+  'The live audit must fail closed if any supplemental parity check is missing.');
