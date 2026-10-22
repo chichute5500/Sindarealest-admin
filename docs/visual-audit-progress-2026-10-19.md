@@ -1,5 +1,14 @@
 # VISUAL AUDIT PROGRESS — SINDAREALEST2
 
+## Manual screenshot review — 2026-10-22 10:35 UTC
+
+- Opened both original reference PNGs, both icon boards, and the observational capture artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837). Home screenshots were visually checked at 360×800, 390×844, 768×1024 and 1440×900 in Light/Dark. Key states sampled: startup splash, benefits, product detail/gallery, favorite pressed in both themes, account, cart-with-item, checkout form, contact/Zalo and 404.
+- Artifact machine summary: 128 live screenshots, 8/8 pairs, 13 routes, zero recorded failed requests/hard failures. However `deployment-verification.json` failed exact-SHA verification: expected `e916ce590b6dbd720dca51405097d20333ce649b`, observed Preview commit `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. This artifact is real visual evidence, **not exact-SHA acceptance**.
+- Icon comparison: sampled line icons/pressed favorite tint broadly follow the light-blue/navy palette. Keep ICON-PARITY open; no UI code change was justified by the sampled icon states alone. Preserve the official logo asset as-is.
+- Confirmed issue, route `/sanpham/sneaker/sneakers-33-48`: `product-detail-modal-direct-open-mobile-light-390x844.png` shows black high-top boots at image 01/19, while `product-gallery-next-mobile-light-390x844.png` shows a different green/white sneaker at image 02/19. Do not modify product/catalog/image mapping in this UI-only scope; mark as a trusted catalog/mapping blocker. Gallery navigation PASS is not image-consistency PASS.
+- The owner-supplied hero `/images/hero-sd-gl052.png` loads. In Dark screenshots the image has a bright gray field behind the shoes, reducing contrast versus the dark reference; no speculative blend/filter was applied because the background appears tied to the supplied asset and a filter could alter product appearance. Keep this as an open visual difference while preserving the asset.
+- Latest exact-SHA-verified audit remains run #39760903036 / artifact #12418615814 / SHA `fc406599e04475e232fad790efd03d46979a5a20`. New run #39762445821 is later but fails the deployment-SHA gate.
+
 ## Latest machine-verified run — 2026-10-22 UTC
 - Live Preview workflow: [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) — SUCCESS.
 - Exact verified deployed/audited SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
