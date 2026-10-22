@@ -1,5 +1,12 @@
 # VISUAL AUDIT PROGRESS — SINDAREALEST2
 
+## Latest machine-verified run — 2026-10-22 UTC
+- Live Preview workflow: [#39760903036](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036) — SUCCESS.
+- Exact verified deployed/audited SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
+- Artifact: [#12418615814 — sindarealest-liquid-glass-preview-853](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39760903036/artifacts/12418615814).
+- Machine coverage: 128 live Preview screenshots, 8/8 viewport/theme pairs, 13 route checks, zero failed requests/hard failures. Local fixture audit separately reports 58 screenshots and is NOT live proof.
+- Archive comparison is `COMPLETE_NEEDS_VISUAL_REVIEW`: manual visual inspection remains required; do not call visual parity complete based on workflow status alone.
+
 Current summary: [docs/handoff/CURRENT-STATE.md](handoff/CURRENT-STATE.md). This file tracks the audit plan and open visual acceptance criteria; current SHA/run facts must be read from the canonical summary.
 
 ## Required reference set
