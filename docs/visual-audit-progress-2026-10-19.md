@@ -1,3 +1,12 @@
+## Latest UI experiment — 2026-10-22 11:16 UTC
+
+- Dark-mode hero matte: an initial radial edge mask did not remove the visible rectangle and was superseded. Current source SHA `dff584114dfd3916219f38b24950e5bf531e2199` removes that mask and samples 8 near-edge pixels from the owner-provided hero asset; only if at least 6 are neutral/light does it enable the existing display-only SVG matte filter for the Dark hero. The image URL and pixels/catalog mapping are untouched.
+- Current source validation/tests PASS: [#39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097). Preview deploy PASS: [#39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), concrete URL `https://b7858119.sindarealest2.pages.dev/`.
+- Fresh live audit [#39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207) is pending; no screenshot artifact available at the last poll. Do not declare the matte successful until actual 390×844 and 1440×900 Dark screenshots plus Light controls are opened.
+- Two intermediate test failures were repaired before current validation passed: test fake image lacks `classList`, so calls now use optional guards; assertion was updated for optional-chain `classList.toggle`. Do not repeat earlier failures as current state.
+- Decision rule: if the rectangle remains or the shoe silhouette/colour is affected, revert only `syncHeroBackgroundKey`, its Dark-mode filter rule, and the corresponding parity assertion, then re-run validation. Do not layer another blind filter.
+
+
 # VISUAL AUDIT PROGRESS — SINDAREALEST2
 
 ## Startup video review — observational evidence
