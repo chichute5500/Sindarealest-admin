@@ -3,13 +3,13 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 // Pin the owner-supplied hero PNG bytes, not just its path or CSS behavior.
-const ownerSuppliedHeroBytes = readFileSync(new URL('../public/images/hero-sd-gl052.png', import.meta.url));
+const ownerSuppliedHeroBytes = readFileSync(new URL('../public/images/hero-upload/tb_image_share_1792519964514 (1).png', import.meta.url));
 const ownerSuppliedHeroGitBlobSha = createHash('sha1')
   .update(`blob ${ownerSuppliedHeroBytes.length}\0`)
   .update(ownerSuppliedHeroBytes)
   .digest('hex');
-assert.equal(ownerSuppliedHeroGitBlobSha, '24038214abefdac9ff2451def39f3e5bd9255462',
-  'The owner-supplied standalone hero image must remain byte-for-byte unchanged.');
+assert.equal(ownerSuppliedHeroGitBlobSha, 'd62bc2d190a9b0f94d1a20a7ab8f6cc891d3fa20',
+  'The newly supplied Hero replacement asset must remain byte-for-byte unchanged.');
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const desktopLight = readFileSync(new URL('../public/images/liquid-glass-light.svg', import.meta.url), 'utf8');
