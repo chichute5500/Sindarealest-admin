@@ -127,8 +127,16 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-assert.ok(html.includes('#home .hero-visual img{\n    width:100%;height:100%;object-fit:cover;object-position:center right;\n    padding:0;opacity:.98;mix-blend-mode:multiply;'),
-  "Mobile hero imagery should blend into the single editorial banner instead of reading as a separate outlined card.");
+const protectedHeroDisplayLock = html.slice(html.lastIndexOf('/* Owner-supplied hero asset display lock — presentation only; never process the image. */'));
+assert.ok(protectedHeroDisplayLock.includes('#home .hero-visual img{')
+  && protectedHeroDisplayLock.includes('object-fit:contain!important;object-position:center!important;padding:0!important;')
+  && protectedHeroDisplayLock.includes('filter:none!important')
+  && protectedHeroDisplayLock.includes('mix-blend-mode:normal!important;opacity:1!important;')
+  && protectedHeroDisplayLock.includes('border-radius:0!important;box-shadow:none!important;')
+  && !protectedHeroDisplayLock.includes('drop-shadow')
+  && protectedHeroDisplayLock.includes('#home .hero-visual-caption{display:none!important}'),
+  "The mobile hero must present the owner's full original image unboxed, without filters, blending, cropping, or a caption overlay.");
+
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
 assert.ok(html.includes(".product-info{padding:9px 9px 36px}") && html.includes(".product-info{padding:11px 12px 44px}"),
