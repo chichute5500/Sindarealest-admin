@@ -15,7 +15,7 @@
 - PR #111: OPEN, unmerged, 1,310 changed files, mergeable=false tại lần đọc live.
 - PR #108: OPEN, unmerged, 288 changed files, mergeable=false; nhánh website/static chỉ đọc.
 - Source + test SHA đã kiểm thử mới nhất: `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`.
-- Actions mới nhất [run #39811730576]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576 ): SUCCESS trên đúng SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`. Job bước kiểm tra source, npm tests, cài Chromium, Playwright screenshot matrix và Preview diagnostic đều SUCCESS; bước báo thiếu cấu hình bị SKIPPED vì không cần. Artifact `admin-preview-evidence-339`, ID `12441015558`, chứa 102 PNG (16 login shell, 86 fixture module screens) và 78 fixture metrics.
+- Actions mới nhất [run #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576): SUCCESS trên đúng SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`. Job bước kiểm tra source, npm tests, cài Chromium, Playwright screenshot matrix và Preview diagnostic đều SUCCESS; bước báo thiếu cấu hình bị SKIPPED vì không cần. Artifact `admin-preview-evidence-339`, ID `12441015558`, chứa 102 PNG (16 login shell, 86 fixture module screens) và 78 fixture metrics.
 - Run cũ #39804852604 thất bại ở Playwright timeout selector retry-customers trên SHA `326526f8...`; đây là lỗi lịch sử, **không phải task hiện tại** vì run mới hơn đã PASS.
 - Tiến độ sản phẩm: **50% PROVISIONAL**. 12 màn hình vẫn PARTIAL_NOT_ACCEPTED; screenshots/fixture và CI không chứng minh authenticated business/backend flows.
 
