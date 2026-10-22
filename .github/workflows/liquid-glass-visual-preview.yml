@@ -153,6 +153,7 @@ jobs:
           node scripts/verify-cloudflare-preview-deployment.mjs
           node scripts/capture-cloudflare-preview.mjs
       - name: Verify actual Cloudflare Pages deployment before manual capture/archive
+        id: verify_preview
         if: ${{ always() && steps.install_chromium.outcome == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]')))) }}
         env:
           PREVIEW_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.preview_url || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/' }}
@@ -162,7 +163,7 @@ jobs:
           EXPECTED_DEPLOYMENT_SHA: ${{ env.SOURCE_SHA }}
         run: node scripts/verify-cloudflare-preview-deployment.mjs
       - name: Capture live Cloudflare Pages Preview (read-only)
-        if: ${{ always() && steps.install_chromium.outcome == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]')))) }}
+        if: ${{ always() && steps.install_chromium.outcome == 'success' && steps.verify_preview.outcome == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.capture_source == 'cloudflare-preview') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[capture-start-of-work]') || contains(github.event.head_commit.message, '[capture-end-of-work]') || contains(github.event.head_commit.message, '[capture-review]')))) }}
         env:
           PREVIEW_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.preview_url || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/' }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
