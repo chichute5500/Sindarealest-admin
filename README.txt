@@ -32,3 +32,6 @@ LƯU Ý
 - Mã bảo hành chỉ phát hành theo chính sách cửa hàng nhập rõ ràng và sau khi đơn hoàn tất.
 - Ảnh sản phẩm tĩnh đã được đóng watermark; ảnh R2 cũ cần tải lại qua quản trị để watermark nằm trong file gốc. Ảnh R2 cần sao lưu riêng.
 - Watermark không thể ngăn tuyệt đối chụp/quay màn hình.
+
+
+[STATUS NOTE — 2026-10-22] This file is a legacy repository overview, not the active task/handoff specification. It may describe older architecture, deployment assumptions or completed work. For current storefront scope, branch, safety boundaries and open tasks, read `docs/handoff/CURRENT-STATE.md` first. Do not use this file to override the current handoff or authorize Admin/backend/production changes.
