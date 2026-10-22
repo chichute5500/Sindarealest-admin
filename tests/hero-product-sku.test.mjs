@@ -47,8 +47,12 @@ assert.ok(html.includes("/* Owner-supplied hero asset display lock — presentat
 assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
 assert.ok(html.includes("#home .hero-visual::before,#home .hero-visual::after,#home.hero:after"));
-assert.ok(html.includes("grid-template-columns:minmax(0,1fr)!important") && html.includes("height:auto!important;max-width:100%!important;max-height:360px!important"),
-  "On mobile, the hero image must sit in its own row and display its full source without cropping or overlays.");
+assert.ok(html.includes("grid-template-columns:minmax(0,1fr)!important")
+  && html.includes("width:100vw!important;max-width:100vw!important;")
+  && html.includes("margin:0 0 0 calc(50% - 50vw)!important;")
+  && html.includes("height:auto!important;max-width:calc(100vw - 22px)!important;max-height:360px!important;")
+  && html.includes("margin-inline:auto!important;"),
+  "On mobile, the hero image must sit in its own row, fit and center within the viewport, and display its full source without cropping or overlays.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
