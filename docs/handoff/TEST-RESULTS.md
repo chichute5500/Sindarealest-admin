@@ -3,6 +3,12 @@ Updated: 2026-10-23
 
 This is the single index for test, deployment and visual-audit evidence. Repeated run-by-run narratives were consolidated here. Old artifacts remain accessible from GitHub Actions; a PASS applies only to its exact SHA.
 
+## Automation efficiency — applied 2026-10-23
+- Workflow-only commit: `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`; source integrity, dependency audit and full test suite PASS — [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405).
+- Workflow files changed: `.github/workflows/ci.yml`, `admin-preview-playwright.yml`, `deploy-storefront-preview.yml`, `liquid-glass-visual-preview.yml`.
+- Docs/README-only commits skip full source CI; workflow-only commits do not deploy or launch the expensive visual capture; Admin Preview smoke is manual-only. New commits supersede stale full validation and ordinary visual-review runs. Start/end archive jobs remain serialized separately and are not auto-cancelled.
+- The latest successful Preview deployment evidence before this workflow-only commit is [#39842480998](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480998), SHA `33e09dd2bce4c4be1df23c65a47d93217d2153b7`; related Liquid Glass audit [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928) used that SHA. This is not fresh confirmation of the currently served alias, nor human visual acceptance.
+
 ## Current acceptance
 - Owner requested the Hero image be temporarily hidden. This is a pause, not visual acceptance.
 - Required hidden state: `#heroProductImage` exists, is hidden, has no `src`, carries status `temporarily-disabled-owner-request`, and the `.hero-visual` frame collapses with no blank reserved area.
