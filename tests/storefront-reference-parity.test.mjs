@@ -371,7 +371,7 @@ const heroMatteEnd = html.indexOf('\n}', heroMatteStart);
 const heroMatteKey = heroMatteStart >= 0 && heroMatteEnd > heroMatteStart ? html.slice(heroMatteStart, heroMatteEnd) : '';
 assert.ok(heroMatteKey.includes('keyed=votes>=6;')
   && heroMatteKey.includes('ctx.drawImage(img,0,0,24,24)')
-  && heroMatteKey.includes('img.classList.toggle(\'sd-hero-white-background-keyed\',keyed);'),
+  && heroMatteKey.includes('img.classList?.toggle?.(\'sd-hero-white-background-keyed\',keyed);'),
   'Hero background keying must be conditional on sampled light-neutral image corners and must not alter the source asset.');
 assert.ok(html.includes("target.onload=()=>{const keyed=syncHeroBackgroundKey(target)")
   && html.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'")
