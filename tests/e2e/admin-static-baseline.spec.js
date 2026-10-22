@@ -1226,12 +1226,20 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           };
         });
         expect(surface.left, 'Mobile product editor should align with the viewport edge').toBe(0);
-        expect(surface.top, 'Mobile product editor should start at the top edge').toBe(0);
+        expect(surface.top, 'Mobile editor should start below the shared app header').toBeGreaterThanOrEqual(60);
+        expect(surface.top, 'Mobile editor must not cover the shared app header').toBeGreaterThanOrEqual(
+          await page.locator('.topbar').evaluate(el => Math.round(el.getBoundingClientRect().bottom))
+        );
         expect(surface.width, 'Mobile product editor should fill the viewport width').toBe(variant.viewport.width);
-        expect(surface.height, 'Mobile product editor should fill the viewport height').toBe(variant.viewport.height);
+        expect(surface.height, 'Mobile product editor should fit the space above the mobile navigation').toBeLessThan(variant.viewport.height);
+        expect(await page.locator('.topbar').isVisible(), 'Shared app header should remain visible while editing').toBe(true);
+        expect(await page.locator('.mobiletabs').isVisible(), 'Mobile navigation should remain visible while editing').toBe(true);
         expect(surface.radius, 'Mobile product editor should not retain a floating-card radius').toBe('0px');
         expect(surface.shadow, 'Mobile product editor should not cast a desktop drawer shadow').toBe('none');
         expect(surface.background, 'Mobile product editor should use an opaque theme surface').toBe(surface.expectedBackground);
+        const editorBottom = await page.locator('#backdrop>.editor').evaluate(el => Math.round(el.getBoundingClientRect().bottom));
+        const mobileNavTop = await page.locator('.mobiletabs').evaluate(el => Math.round(el.getBoundingClientRect().top));
+        expect(editorBottom, 'Mobile editor must stop before the fixed bottom navigation').toBeLessThanOrEqual(mobileNavTop);
       }
       await saveScreenshot('product-editor', variant, { dialog: true });
       if (variant.viewport.width === mobile.width && variant.theme === 'light') {
