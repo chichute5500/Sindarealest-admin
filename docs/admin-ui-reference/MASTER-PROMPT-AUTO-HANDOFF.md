@@ -1,34 +1,26 @@
 # SINDAREALEST ADMIN — MASTER PROMPT (LIVE)
 
-> **Single entry point:** read [`handoff/START-HERE.md`](handoff/START-HERE.md). Do not ask the owner to paste old prompts/history. Latest tested source/test SHA `4b2220d510a906882e4309df6969c0c43514c421`: Validate #39813340342 PASS; Preview #39813340309 PASS. [Artifact #12439794397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397) contains 102 PNGs / 78 fixture metrics. Mobile toast/navigation overlap is fixed and geometry-tested. All 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
+> **Single entry point:** [handoff/START-HERE.md](handoff/START-HERE.md). Chat starter should be one line; do not ask the owner to paste this long prompt or re-explain project history.
 
-## Mission
-Do real GitHub work, not only analysis/reporting. After each checkpoint continue to the next safe evidence-backed task; stop only if owner authority/access is truly required or no safe task remains.
+## Live checkpoint — 2026-10-22
+- Repo `chichute5500/Sindarealest-admin`; write only ADMIN branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN/unmerged.
+- Protected static branch `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN/unmerged, latest observed HEAD `2d80095f7323b1a790931dc2ab67b59e7e6edf8d`, read-only.
+- Latest source/test SHA `483a03966ba2d1d2e46d2723f440b97ebc31d0e4`; [Actions #39811730576](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576) SUCCESS and artifact [#339](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39811730576/artifacts/12441015558).
+- Old retry-customers failure is historical; new run passed. Progress stays 50% PROVISIONAL and all 12 screens remain PARTIAL_NOT_ACCEPTED.
+- PR #111 live file census = 1,310; runtime/config paths 36 (14 added/22 modified vs merge-base). The ADMIN storefront `public/index.html` differs from main and static #108 and needs explicit scope review before any merge. Seven other current runtime blobs match static #108 exactly.
 
-## Repository / branch isolation
-- Repo `chichute5500/Sindarealest-admin`.
-- Only writable branch: `feature/admin-isolated-handoff-2026-10-20`, PR #111.
-- Protected website/static branch: `fix/liquid-glass-audit-2026-10-19`, PR #108; read-only.
-- Fetch live PR/branch HEAD and Actions before writing. Test SHA and docs-only HEAD are distinct.
-- No merge, rebase, blind revert, cherry-pick, force-push or cross-branch write. Verify provenance before edits.
+## Mission and process
+Continue actual, evidence-based GitHub work after short Vietnamese checkpoints. Verify current HEAD/PRs/Actions, inspect code/reference, reproduce real defects, make minimal ADMIN-only fixes, run tests on exact SHA, sync handoff, read it back and refetch status. Do not stall at a report if safe work remains.
 
-## Forbidden
-- No Production deployment; no Cloudflare Access bypass; no secret access/exposure/change.
-- No remote D1/R2 writes, migration, setup or deploy-script execution. R2 persistence and migration 0009/PRE/PRO are DEFERRED_BY_OWNER.
-- No invented product/customer/order/price/stock/image facts or unapproved API routes/contracts.
-- QR must not encode payment amount; manual payment confirmation follows `docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md`.
+## Reference and acceptance
+Use `docs/admin-ui-reference/admin-mobile-reference.png` as visual reference and `handoff/12-SCREEN-REFERENCE-AUDIT.md` as mapping. Mobile-first Luxury Minimalism / Liquid Glass, light/dark, Vietnamese, accessible names/focus/keyboard, no clipping/overlap. Tests should compare same viewport/theme. Fixtures prove fixture behavior only, not authenticated real backend.
 
-## Visual / functional acceptance
-- Reference: `docs/admin-ui-reference/admin-mobile-reference.png`; screen map: `handoff/12-SCREEN-REFERENCE-AUDIT.md`.
-- Luxury-minimalist Liquid Glass, mobile-first Vietnamese UI, light/dark, no clipping/overlap, accessible focus/targets, preserve auth/business/API behavior.
-- Viewports: 320×640, 360×800, 375×812, 390×844, 412×915, 768×1024, 1280×800, 1440×900.
-- Status vocabulary: PASS, PARTIAL_NOT_ACCEPTED, FAIL, BLOCKED, NOT_TESTED, NOT_VERIFIED, DEFERRED_BY_OWNER.
-- Green CI and synthetic fixtures are not authenticated backend QA or complete visual acceptance. Keep progress 50% PROVISIONAL until weighted product acceptance improves.
+## Source-level migration note
+Current `scripts/setup-cloudflare.mjs` and `scripts/deploy-cloudflare.mjs` both contain migration-0009 schema preflight. Setup performs earlier remote migrations/DDL before the preflight and does not apply 0009 itself; deploy checks 0007, 0008 and 0009 before deployment. This is source-only evidence, not remote D1 state. Never run these scripts unless owner restrictions are explicitly changed.
 
-## Execution loop
-1. Fetch live PR #111/#108, branch HEAD and Actions.
-2. Read the canonical handoff and relevant source/reference/artifact.
-3. Reproduce a concrete gap, make the smallest ADMIN-only change and add regression coverage.
-4. Validate the exact SHA and inspect screenshots at matching viewport/theme.
-5. Update state/test JSON, status, START-HERE, next-chat prompt, completeness/screen/scope audits and this master prompt together in one atomic commit per meaningful checkpoint; do not commit individual docs or write while Preview saves artifacts.
-6. Read back changes, validate JSON, fetch live HEAD/PR, and continue safely.
+## Hard safety boundaries
+- Keep PR #111/#108 OPEN/unmerged. Do not write to `main` or static branch, deploy Production, or blindly cherry-pick/force-push.
+- No Cloudflare Access bypass, secret access/exposure/change, remote D1/R2/schema/ledger, or setup/migration/deploy script execution.
+- Migration 0009 and PRE/PRO migrations; R2 persistence/product image save remain DEFERRED_BY_OWNER.
+- AI grouping remains blocked until owner approves API/UX contract.
+- No fabricated products, prices, stock, images, customers, orders, payment state or unapproved API/route contracts.
