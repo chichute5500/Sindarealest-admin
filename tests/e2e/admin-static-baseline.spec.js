@@ -627,7 +627,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const orderId = await page.locator('.order-detail-page').getAttribute('data-order-detail-id');
         await page.locator('[data-action="back-to-orders"]:visible').first().click();
         await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
-        await expect(page.locator('[data-order-row="' + orderId + '"] [data-action="view-order-details"]')).toBeFocused();
+        await expect(page.locator('[data-order-row="' + orderId + '"] [data-action="view-order-details"]:visible').first()).toBeFocused();
       }
     }
   };
