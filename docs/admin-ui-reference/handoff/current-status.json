@@ -3,68 +3,80 @@
   "updatedAt": "2026-10-22",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Refs checked live immediately before this docs-only checkpoint. Pre-write ADMIN HEAD e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe; application source dca19a2af32a78390878b9ccfa5c7c26b816f2ff is unchanged over 21 commits / 22 paths in the source-to-head comparison, limited to handoff/docs/reference files. These docs-only commits advance HEAD; fetch current refs before further writes.",
-  "branchHeadAtCheckpoint": "f46966afe09a80540e04e5df40baf4645a777da4",
+  "checkpointSemantics": "Live refs checked at 2026-10-22T19:59:12.897+07:00. Pre-write ADMIN HEAD 368b3f26911f47f12cdb7ab6f300ad359283b9cc. Validate #4737 passed npm run check and npm test on that exact SHA. Responsive/Preview run #316 used 305fc139c22d682b4b6882af18d6d79836887cc7, not an exact SHA match. Current docs-only commits will move HEAD again; fetch live refs before further work.",
+  "branchHeadAtCheckpoint": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
   "branchHeadIsTestedSource": false,
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. No progress increase for documentation or CI-only work; 12-screen acceptance and authenticated Preview remain incomplete.",
+  "progressBasis": "50% PROVISIONAL. Exact-HEAD source checks and unit tests passed, but full 12-screen acceptance, exact-HEAD responsive/Preview validation and authenticated business-module QA remain incomplete. Docs/CI alone do not raise completion.",
   "sourceTreeComparison": {
-    "sourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
-    "checkpointHead": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
-    "commitsAhead": 10,
-    "changedPathsSinceTestedSource": 11,
-    "applicationSourceChanged": true,
-    "changedApplicationPaths": [
-      "scripts/setup-cloudflare.mjs",
-      "tests/config-integrity.test.mjs"
-    ],
-    "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/3658ca1069616639b825de2cd7b9c714ce560901...27b453e6f4ebefb0191fb970039b018b3bd4e66d",
-    "note": "Live compare shows 10 commits / 11 paths after the workflow-tested source. Most changes are handoff/docs, but setup-cloudflare.mjs and config-integrity.test.mjs also changed. Do not claim workflow #39778009734 validates these newer blobs."
+    "sourceSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
+    "checkpointHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+    "commitsAhead": 14,
+    "changedPathsSinceTestedSource": 7,
+    "applicationSourceChanged": false,
+    "changedApplicationPaths": [],
+    "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/305fc139c22d682b4b6882af18d6d79836887cc7...368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+    "note": "Compare from visual SHA 305fc13 to source HEAD 368b3f2 shows only README and handoff/docs paths changed. Application source unchanged, but exact-SHA policy still marks visual/Preview validation on current HEAD NOT VERIFIED."
   },
   "sourceValidationOnHead": {
-    "status": "NOT_VERIFIED_FOR_CURRENT_SOURCE_BLOBS",
-    "liveHead": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
+    "status": "PASS_CHECK_AND_UNIT_TESTS_ONLY_VISUAL_MATRIX_NOT_VERIFIED_AT_EXACT_HEAD",
+    "liveHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
     "lastSuccessfulWorkflow": {
-      "runId": 39778009734,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
-      "testedSha": "3658ca1069616639b825de2cd7b9c714ce560901",
-      "conclusion": "success"
-    },
-    "sourceDrift": {
-      "setupCloudflare": {
-        "testedBlob": "0a95620c547604b5419672b9396247c88cf9a6f5",
-        "liveBlob": "ec1c614048b84657ef8824d865dda42f0c8341fe",
-        "change": "Preflight moved earlier to before seed/deploy."
-      },
-      "configIntegrityTests": {
-        "testedBlob": "6d5b2a3e3c2261ef7da38d4cf7d25d70fcd4dd68",
-        "liveBlob": "45c292c45f445628f5d36e02acfc54ac123f837d",
-        "change": "Expected preflight stage updated to before seed/deploy."
+      "runId": 39780791597,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597",
+      "testedSha": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+      "conclusion": "success",
+      "jobId": 119831205638,
+      "steps": {
+        "npm run check": "PASS",
+        "npm test": "PASS",
+        "dependency audit": "PASS",
+        "temporary local D1 migration check": "PASS"
       }
     },
-    "note": "These newer source blobs are not covered by the cited successful workflow. Re-run checks on current source before claiming PASS; no workflow dispatch tool was available in this session."
+    "sourceBlobs": {
+      "scripts/setup-cloudflare.mjs": "ec1c614048b84657ef8824d865dda42f0c8341fe",
+      "scripts/deploy-cloudflare.mjs": "9a1e30c770527f27f20210b9ceb98ca25244f771",
+      "tests/config-integrity.test.mjs": "45c292c45f445628f5d36e02acfc54ac123f837d"
+    },
+    "visualEvidence": {
+      "runId": 39778678707,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707",
+      "testedSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
+      "artifactId": 12426370257,
+      "artifactName": "admin-preview-evidence-316",
+      "exactHeadMatch": false,
+      "summary": "3 local Playwright matrix tests and 2 configured Preview smoke tests passed; not 12-screen acceptance or authenticated business-module QA."
+    },
+    "note": "No remote D1/R2 operation, setup, deploy or migration was run."
   },
   "latestVisualEvidence": {
-    "sourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
-    "validateRun": 39778009734,
-    "previewRun": 39778009734,
-    "previewUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
+    "sourceSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
+    "validateRun": 39778678723,
+    "validateUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678723",
+    "previewRun": 39778678707,
+    "previewUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707",
+    "exactCurrentHeadMatch": false,
     "artifact": {
-      "id": 12425910948,
-      "name": "admin-preview-evidence-314",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734/artifacts/12425910948",
-      "screenshotCount": 89,
-      "fixtureMetrics": 16,
-      "expired": false,
-      "scope": "local static source screenshots and synthetic/read-only fixture; not authenticated backend QA"
+      "id": 12426370257,
+      "name": "admin-preview-evidence-316",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707/artifacts/12426370257",
+      "expiresAt": "2026-11-05T12:31:13Z",
+      "scope": "local responsive/theme Playwright and limited Preview smoke, not authenticated business QA"
     },
-    "diagnostic": {
-      "status": "PASS_LOGIN_CSS_SIGNATURE",
-      "pageErrors": 0,
-      "consoleErrors": 0,
-      "failedRequests": 0,
-      "httpErrors": 0
+    "results": {
+      "localPlaywright": "PASS: 3 tests",
+      "configuredPreviewSmoke": "PASS: 2 tests",
+      "loginCssSignature": "PASS_LOGIN_CSS_SIGNATURE",
+      "exactHeadStatus": "NOT_VERIFIED_AT_EXACT_HEAD"
+    },
+    "sourceComparison": {
+      "currentHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+      "visualSource": "305fc139c22d682b4b6882af18d6d79836887cc7",
+      "changedPaths": 7,
+      "changedApplicationPaths": 0,
+      "compareUrl": "https://github.com/chichute5500/Sindarealest-admin/compare/305fc139c22d682b4b6882af18d6d79836887cc7...368b3f26911f47f12cdb7ab6f300ad359283b9cc"
     }
   },
   "latestVisualReview": {
@@ -203,7 +215,7 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "e3328dee37b125c5821bcaad03199afc44ed06fa",
+      "headSha": "ebdd5e657c317490ce7747056ffa37be8c65ab0c",
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
@@ -212,24 +224,24 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
+      "headSha": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
       "base": "main",
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "mergeReady": false,
-      "changedFileCount": 1296,
+      "changedFileCount": 1298,
       "branch": "feature/admin-isolated-handoff-2026-10-20"
     }
   },
   "pr111ScopeAudit": {
-    "checkedAt": "2026-10-22T19:15:21.463+07:00",
+    "checkedAt": "2026-10-22T19:59:12.897+07:00",
     "status": "PARTIAL_NOT_ACCEPTED",
-    "fileCount": 1296,
+    "fileCount": 1298,
     "auditFile": "docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md",
     "byTopLevelPath": {
       ".github": 2,
       "README-DEPLOY.txt": 1,
       "data": 1,
-      "docs": 1233,
+      "docs": 1235,
       "functions": 24,
       "migrations": 2,
       "package.json": 1,
@@ -238,16 +250,16 @@
       "tests": 25
     },
     "byExtension": {
-      "yml": 2,
-      "txt": 1,
-      "json": 156,
-      "md": 164,
-      "html": 3,
       "png": 913,
-      "zip": 1,
+      "md": 165,
+      "json": 157,
+      "mjs": 28,
       "js": 26,
+      "html": 3,
+      "yml": 2,
       "sql": 2,
-      "mjs": 28
+      "txt": 1,
+      "zip": 1
     },
     "finding": "Live PR census refreshed. The diff contains inherited storefront/setup/deploy paths plus Admin-owned APIs, migrations, tests and a Preview diagnostic workflow; per-path ancestry and deployment/sensitive-surface review remains in progress.",
     "mergeBase": {
@@ -258,13 +270,11 @@
     },
     "currentBranchComparison": {
       "baseBranch": "fix/liquid-glass-audit-2026-10-19",
-      "baseHead": "e3328dee37b125c5821bcaad03199afc44ed06fa",
-      "adminHead": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
+      "baseHead": "ebdd5e657c317490ce7747056ffa37be8c65ab0c",
+      "adminHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
       "baseStatus": "diverged",
-      "adminAheadBy": 904,
-      "staticAheadBy": 920,
       "mergeBaseSha": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/compare/e3328dee37b125c5821bcaad03199afc44ed06fa...e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe"
+      "url": "https://github.com/chichute5500/Sindarealest-admin/compare/ebdd5e657c317490ce7747056ffa37be8c65ab0c...368b3f26911f47f12cdb7ab6f300ad359283b9cc"
     },
     "provenance": {
       "inheritedBeforeMergeBase": [
@@ -309,18 +319,54 @@
       "interpretation": "The public storefront/visual-preview workflow/setup/deploy files in the PR diff are inherited at the merge base, not evidence of recent post-split ADMIN edits. They remain in the PR diff against main, so a merge would still include them. New payment/fulfillment migration and API routes were added after split and require focused review."
     },
     "deploymentReadinessPotentialBlocker": {
-      "status": "POTENTIAL_BLOCKER_NOT_VERIFIED",
+      "status": "SOURCE_PREFLIGHT_PRESENT_REMOTE_SCHEMA_NOT_VERIFIED",
       "migration": "migrations/0009_fulfillment_and_manual_payments.sql",
-      "sourceRequirement": "payment API routes query order_payment_requests, order_payment_transactions, fulfillment_type and payment_terms_confirmed_at introduced by migration 0009.",
       "setupScriptPath": "scripts/setup-cloudflare.mjs",
       "deployScriptPath": "scripts/deploy-cloudflare.mjs",
-      "verifiedFinding": "Neither setup nor deploy script contains a reference/preflight for migration 0009 or its new schema; tests/check-migrations.mjs runs a temporary local D1 migration check for 0009.",
-      "limitation": "No remote D1 schema inspection, setup/deploy execution or migration was performed. This does not prove the configured remote D1 lacks migration 0009.",
-      "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
+      "verifiedFinding": "Setup/deploy use SELECT ... LIMIT 0 checks for 0009 schema; regression tests assert required queries/order. Exact-HEAD run #4737 passes source checks and tests.",
+      "importantCaveat": "setup-cloudflare.mjs reaches the 0009 preflight only after earlier remote migration commands 0001 and 0003–0008. The check is read-only, but the entire setup script is not; a missing-0009 failure may happen after earlier schema writes. Do not execute setup.",
+      "limitation": "Remote D1 schema and migration ledger were not queried. Local temporary D1 tests do not prove remote readiness.",
+      "nextAction": "Keep migration 0009 DEFERRED_BY_OWNER; do not run schema operations without explicit approval and maintenance plan."
+    },
+    "scopeSummary": {
+      "status": "PARTIAL_NOT_ACCEPTED",
+      "inheritedBeforeMergeBase": [
+        "public/index.html",
+        ".github/workflows/liquid-glass-visual-preview.yml",
+        "scripts/setup-cloudflare.mjs",
+        "scripts/deploy-cloudflare.mjs"
+      ],
+      "postSplitChanges": [
+        {
+          "path": "scripts/setup-cloudflare.mjs",
+          "commit": "ca06ac02253644ed0290c5bca343c33a872010d0"
+        },
+        {
+          "path": "scripts/deploy-cloudflare.mjs",
+          "commit": "6ad36a5bbb3b7ffb5ee2f90d5df0eb4d47c75972"
+        },
+        {
+          "path": "tests/config-integrity.test.mjs",
+          "commit": "305fc139c22d682b4b6882af18d6d79836887cc7"
+        },
+        {
+          "path": "migrations/0009_fulfillment_and_manual_payments.sql",
+          "commit": "24181fd2fb166bc13fb7840d77cb53cefa30035a"
+        },
+        {
+          "path": "functions/api/admin/payment-requests.js",
+          "commit": "2045892129184ea62d203c1f6578ad33683cbd6a"
+        },
+        {
+          "path": "functions/api/admin/payment-transactions.js",
+          "commit": "d3fa9b85be20d832cbf24678dd7f3c7d862c1e64"
+        }
+      ],
+      "note": "Inherited path ancestry does not imply all current lines are inherited. Full path-by-path provenance for all 1,298 files remains incomplete."
     }
   },
-  "lastCompletedTask": "Recorded read-only migration 0009 schema preflight and regression-guard changes; workflow #314 check/unit-test results were on 3658ca1, not assumed valid for current HEAD.",
-  "currentTask": "Verify CI for current HEAD, inspect product-list artifact metrics, continue product editor and the remaining screen-specific evidence, and audit PR #111 scope.",
+  "lastCompletedTask": "Exact pre-write HEAD 368b3f26911f47f12cdb7ab6f300ad359283b9cc passed source checks and tests in #4737; reviewed 0009 schema gate ordering and payment source/test safeguards without remote actions.",
+  "currentTask": "Audit screens #6 Orders and #7 Order detail separately; continue remaining unaccepted screens and PR #111 path provenance.",
   "taskQueue": [
     {
       "id": "P1-PRODUCTS-03",
@@ -328,7 +374,7 @@
       "status": "REVIEW_CLOSED_DATA_LIMITED_NO_SOURCE_DEFECT_PROVEN",
       "task": "Product list #3 parity beyond narrow-SKU wrapping.",
       "acceptance": "Matched viewport/theme screenshots, card density/actions/filters/pagination/overflow review, no invented data, exact-SHA regression evidence.",
-      "nextAction": "Do not repeat this comparison. Reopen only with a different state, approved fixture or concrete regression. Screen #3 stays PARTIAL_NOT_ACCEPTED because poster parity and multi-page behavior are unproven.",
+      "nextAction": "Do not repeat without a new state or reproducible defect; fixture count 3 and page size 12 do not exercise pagination.",
       "lastEvidence": "Artifact #311 / 12420678829, source dca19a2..., target 320x640 and 360x800 light/dark metrics; three fixture products and one page."
     },
     {
@@ -337,7 +383,7 @@
       "status": "PARTIAL_NOT_ACCEPTED",
       "task": "Product editor #4 parity.",
       "acceptance": "Matched mobile/desktop comparison of tabs, fields, SKU checkbox, AI suggestion and sticky footer.",
-      "nextAction": "Existing screenshots/tests cover tabs/keyboard, field groups, SKU checkbox geometry, AI-button geometry and footer geometry. Do not repeat absent a new state; move next to PR #111 scope audit and keep #4 unaccepted pending stronger state/business evidence."
+      "nextAction": "Do not repeat prior geometry. Real SKU persistence, AI response, backend save and full-screen parity are unproven."
     },
     {
       "id": "P1-12SCREEN",
@@ -345,15 +391,15 @@
       "status": "IN_PROGRESS",
       "task": "Complete official twelve-screen reference audit.",
       "acceptance": "Each screen independently evaluated against poster and regression evidence.",
-      "nextAction": "Use correct mapping in 12-SCREEN-REFERENCE-AUDIT.md."
+      "nextAction": "Audit #6 Orders and #7 Order detail separately, then remaining screens."
     },
     {
       "id": "P1-PR111-SCOPE",
       "priority": 1,
-      "status": "IN_PROGRESS",
+      "status": "IN_PROGRESS_FOCUSED_REVIEW",
       "task": "Audit PR #111 scope and ancestry.",
       "acceptance": "Classify inherited/authored paths; review sensitive API, migration and deploy paths.",
-      "nextAction": "Use merge base a3834fed... and live heads; review the Admin Preview workflow, migration 0009, payment routes and setup/deploy preflight with source-only tests; no remote execution."
+      "nextAction": "Continue per-path provenance; source-level 0009 and payment review done, full census audit and remote readiness incomplete."
     },
     {
       "id": "P2-ORDERS-06-07",
@@ -365,10 +411,10 @@
     {
       "id": "BLOCKED-AUTH-QA",
       "priority": 2,
-      "status": "BLOCKED",
+      "status": "NOT_TESTED",
       "task": "Authenticated business/backend QA.",
-      "blocker": "No owner-authorized Preview identity established.",
-      "nextAction": "Continue local/read-only work; do not bypass Access."
+      "blocker": "Full business-module/backend QA is not established by limited login/dashboard smoke.",
+      "nextAction": "Use owner-authorized Preview only; never bypass Access."
     },
     {
       "id": "BLOCKED-AI-GROUPING",
@@ -398,77 +444,78 @@
     "Continue with the next safe queued task after each report."
   ],
   "ownerActionRequiredNow": [
-    "Do not run migration 0009 or remote setup/deploy/D1/R2 writes; owner approval and maintenance plan required.",
-    "Do not bypass Cloudflare Access; authenticated Preview checks require authorized access.",
-    "AI image grouping remains BLOCKED pending approved contract; R2 image save and PRE/PRO migrations remain DEFERRED_BY_OWNER."
+    "Do not run migration 0009 or remote setup/deploy/D1/R2 operations; setup's 0009 gate follows earlier remote migrations 0001 and 0003–0008.",
+    "Do not merge PR #111/#108, edit main/static or deploy Production.",
+    "Do not bypass Cloudflare Access or read/change secrets. Preview smoke is limited and on a different SHA than current source.",
+    "AI image grouping remains BLOCKED; R2 image save and PRE/PRO migrations remain DEFERRED_BY_OWNER."
   ],
   "legacyArchiveRoot": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22",
   "latestCheckpointVerification": {
-    "checkedAt": "2026-10-22T21:35:00+07:00",
-    "liveHead": "27b453e6f4ebefb0191fb970039b018b3bd4e66d",
+    "checkedAt": "2026-10-22T19:59:12.897+07:00",
+    "liveHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
     "pr111": "OPEN_UNMERGED",
     "pr108": "OPEN_UNMERGED",
-    "lastSuccessfulWorkflowRun": 39778009734,
-    "testedSourceSha": "3658ca1069616639b825de2cd7b9c714ce560901",
-    "currentSetupBlob": "ec1c614048b84657ef8824d865dda42f0c8341fe",
-    "currentTestBlob": "45c292c45f445628f5d36e02acfc54ac123f837d",
-    "currentSourceValidation": "NOT_VERIFIED"
+    "lastSuccessfulWorkflowRun": 39780791597,
+    "workflowUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597",
+    "testedSourceSha": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+    "currentSourceValidation": "PASS_NPM_RUN_CHECK_AND_NPM_TEST_EXACT_SHA",
+    "exactHeadResponsivePreview": "NOT_VERIFIED",
+    "note": "Snapshot is pre-write; documentation-only commit advances HEAD."
   },
-  "handoffReviewAt": "2026-10-22T19:15:21.463+07:00",
+  "handoffReviewAt": "2026-10-22T19:59:12.897+07:00",
   "latestCheckpoint": {
-    "timestamp": "2026-10-22T19:15:21.463+07:00",
-    "prewriteHead": "e8ba8ca8b2cfba072dc5f4cad36112d7c04b4ffe",
-    "visualSourceSha": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
-    "sourceChanged": false,
+    "timestamp": "2026-10-22T19:59:12.897+07:00",
+    "prewriteHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+    "visualSourceSha": "305fc139c22d682b4b6882af18d6d79836887cc7",
+    "sourceChecksPassExactSha": true,
+    "visualSourceFilesChangedSince": false,
+    "exactHeadVisualDiagnostics": false,
     "docsOnlyUpdate": true,
     "progressPercent": 50,
     "progressStatus": "PROVISIONAL",
-    "productList03": "REVIEW_CLOSED_DATA_LIMITED_NO_SOURCE_DEFECT_PROVEN; screen acceptance remains PARTIAL_NOT_ACCEPTED",
-    "productEditor04": "PARTIAL_REVIEW_NO_INDEPENDENT_SOURCE_DEFECT_PROVEN; screen acceptance remains PARTIAL_NOT_ACCEPTED",
-    "nextTask": "P1 PR #111 scope/provenance audit"
+    "productList03": "REVIEW_CLOSED_DATA_LIMITED_NO_SOURCE_DEFECT_PROVEN; acceptance remains PARTIAL_NOT_ACCEPTED",
+    "productEditor04": "PARTIAL_REVIEW_NO_INDEPENDENT_SOURCE_DEFECT_PROVEN; acceptance remains PARTIAL_NOT_ACCEPTED",
+    "migration0009": "SOURCE_PREFLIGHT_TESTED; REMOTE_SCHEMA_NOT_VERIFIED; DEFERRED_BY_OWNER",
+    "nextTask": "Audit #6 Orders and #7 Order detail and continue remaining scope/provenance work"
   },
   "latestLiveVerification": {
-    "checkedAt": "2026-10-22",
-    "adminHead": "f46966afe09a80540e04e5df40baf4645a777da4",
+    "checkedAt": "2026-10-22T19:59:12.897+07:00",
+    "adminHead": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
     "pr111": {
       "state": "open",
       "merged": false,
-      "branch": "feature/admin-isolated-handoff-2026-10-20"
+      "branch": "feature/admin-isolated-handoff-2026-10-20",
+      "headSha": "368b3f26911f47f12cdb7ab6f300ad359283b9cc"
     },
     "pr108": {
       "state": "open",
       "merged": false,
-      "head": "96bb6ebd3067689d5652fa4a4823ff2bb3b60d50"
+      "branch": "fix/liquid-glass-audit-2026-10-19",
+      "headSha": "ebdd5e657c317490ce7747056ffa37be8c65ab0c"
     },
-    "run": {
-      "id": 39778009734,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778009734",
-      "testedCommit": "3658ca1069616639b825de2cd7b9c714ce560901",
-      "jobs": [
-        {
-          "id": 119821882420,
-          "name": "Audit ADMIN source, capture baselines, and diagnose Preview",
-          "status": "completed",
-          "conclusion": "success"
-        }
-      ],
-      "artifacts": [
-        {
-          "id": 12425910948,
-          "name": "admin-preview-evidence-314",
-          "expired": false,
-          "url": "https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/artifacts/12425910948"
-        }
-      ]
+    "sourceValidation": {
+      "runId": 39780791597,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39780791597",
+      "testedCommit": "368b3f26911f47f12cdb7ab6f300ad359283b9cc",
+      "conclusion": "success",
+      "npmRunCheck": "PASS",
+      "npmTest": "PASS"
     },
-    "note": "Run evidence belongs only to its tested commit, not automatically to the current HEAD."
+    "responsivePreview": {
+      "runId": 39778678707,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39778678707",
+      "testedCommit": "305fc139c22d682b4b6882af18d6d79836887cc7",
+      "conclusion": "success",
+      "exactHeadMatch": false,
+      "artifactId": 12426370257
+    }
   },
   "nextActions": [
-    "Check latest workflow runs/jobs and require head_sha=current ADMIN HEAD before reporting PASS.",
-    "Inspect admin-preview-evidence-311 (artifact 12420678829, run 39767851318) for product list interactions and metrics; do not invent missing images/prices/stock.",
-    "Review product editor #4 tabs, fields, SKU checkbox, AI suggestions and sticky footer.",
-    "Continue independent evidence for all 12 screens; fixtures or green CI alone do not accept a screen.",
-    "Continue PR #111 scope audit for migration/API/deploy files; distinguish inherited changes from new changes and never blind-revert.",
-    "Update handoff files after meaningful live-state changes and reread at resulting HEAD."
+    "Fetch live PR refs and resulting HEAD after every documentation write; do not use this pre-write SHA as current HEAD.",
+    "Run #4737 passed npm run check and npm test on exact pre-write SHA 368b3f26911f47f12cdb7ab6f300ad359283b9cc; validate docs successor separately.",
+    "Do not repeat #3/#4 geometry. Reopen only for new state, approved fixture or reproducible defect.",
+    "Continue #6 Orders and #7 Order detail separately; then remaining screens with independent evidence.",
+    "Continue PR #111 path ancestry audit; preserve inherited files and do not blind-revert.",
+    "Keep remote schema/migration/setup/deploy/Production operations deferred; no Access bypass or secret access."
   ]
 }
