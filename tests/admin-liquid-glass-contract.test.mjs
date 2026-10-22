@@ -91,12 +91,13 @@ has('#main .order-table .order-management-summary{list-style:none;display:flex;a
 has('#main .order-table .order-management-details:not([open])>.order-management-content{display:none!important}', 'closed order disclosures explicitly hide management content');
 has('@media(min-width:681px){\n#main .order-table .order-management-details{min-width:210px}\n#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(92,145,185,.08);color:var(--ink);font-size:10px;font-weight:750;cursor:pointer}\n#main .order-table .order-management-summary::-webkit-details-marker{display:none}\n#main .order-table .order-management-summary::marker{content:"";display:none}\n#main .order-table .order-management-summary::after{content:"+";flex:0 0 auto;font-size:17px;line-height:1}\n#main .order-table .order-management-details[open]>.order-management-summary::after{content:"−"}\n#main .order-table .order-management-content{padding-top:10px}\n}', 'desktop order controls use the same compact liquid-glass disclosure style');
 
-// Product and order dialogs share keyboard focus management, Escape handling, and focus restoration.
+// The product editor remains a modal; Order detail is a standalone screen with an Escape-to-list route.
 has('function activateAdminModal(backdrop,initialFocusSelector)', 'modal initial focus setup');
 has('function deactivateAdminModal(backdrop)', 'modal aria-hidden and focus restoration');
 has('function trapAdminModalFocus(e)', 'modal keyboard focus trap');
 has("document.addEventListener('keydown',trapAdminModalFocus)", 'shared keyboard handler for both modal dialogs');
-has("if(backdrop.id==='orderDetailBackdrop')closeOrderDetails();else closeEditor();", 'Escape closes the currently open Admin modal');
+has("if(e.key==='Escape'&&view==='order-detail'){e.preventDefault();closeOrderDetails()}", 'Escape leaves the dedicated Order detail screen');
+has("if(e.key==='Escape'){e.preventDefault();closeEditor();return}", 'Escape closes the currently open product editor modal');
 
 // Accessible names for repeated controls must identify the affected record, not just say "Save".
 has('data-order-status="${esc(o.id)}" aria-label="Trạng thái đơn hàng ${esc(o.order_number)}"', 'accessible per-order status select');
@@ -167,12 +168,12 @@ assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
   'Visual capture should pass viewport/theme context into screen-specific setup');
 assert.match(adminHtml, /mobilecards/,
   'Responsive order tables should provide the mobile-card layout checked by the visual matrix');
-assert.match(baselineSpec, /captureView\('order-row-details'/,
-  'The visual matrix should exercise order details without relying on a hidden desktop-table scroll path');
+assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
+  'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
 assert.match(baselineSpec, /await page\.locator\('\[data-action="view-order-details"\]:visible'\)\.first\(\)\.click\(\);/,
   'Order-detail capture should activate a visible details control');
-assert.match(baselineSpec, /await expect\(page\.locator\('#orderDetailBackdrop'\)\)\.toBeVisible\(\);/,
-  'Order-detail capture should wait for the detail dialog to become visible');
+assert.match(baselineSpec, /await expect\(page\.locator\('\.order-detail-page'\)\)\.toBeVisible\(\);/,
+  'Order-detail capture should wait for the dedicated page to render');
 
 // The reorder/remove gallery controls use SVG artwork, not Unicode text glyphs, while
 // retaining record-specific accessible names and remaining legible in both themes.
