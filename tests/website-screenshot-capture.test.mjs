@@ -1,3 +1,4 @@
+// [capture-review] requests exact-SHA Preview evidence only; it must never archive canonical start/end screenshots.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
