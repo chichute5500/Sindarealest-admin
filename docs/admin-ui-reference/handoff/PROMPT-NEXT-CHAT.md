@@ -1,3 +1,37 @@
+## PERMANENT START RULE — NO MANUAL PROMPT HANDOFF
+
+This is the permanent operating contract. It overrides stale instructions elsewhere in this file when they conflict.
+
+### User's only action
+The user should not have to copy the previous chat's prompt, summarize status, or paste a handoff. A new chat receives only this fixed starter:
+"Tiếp tục SinDarealest Admin theo nguồn trạng thái live trong GitHub. Tự xác minh HEAD/PR/CI, đọc handoff mới nhất, rồi tiếp tục làm việc thực tế; không hỏi tôi dán prompt cũ."
+
+### Mandatory startup protocol for every chat
+1. Identify repository `chichute5500/Sindarealest-admin` and ADMIN branch `feature/admin-isolated-handoff-2026-10-20`.
+2. Fetch live PR #111 and PR #108, current ADMIN branch HEAD, and latest relevant workflow runs. Do not assume SHAs/statuses copied into this file are current.
+3. Read `current-status.json`, `latest-test-results.json`, `LATEST-STATUS.md`, `12-SCREEN-REFERENCE-AUDIT.md`, `PR-111-SCOPE-AUDIT.md`, and this prompt from the live ADMIN branch. Resolve disagreements using evidence tied to exact SHA and timestamp.
+4. Poll already-running workflows for the current HEAD before triggering another. Never start duplicate runs just to create activity. A run on an older SHA is historical, not proof for current HEAD.
+5. Select the next incomplete product acceptance item from the live audit. Reuse existing evidence; don't repeat completed checks without a changed source, failed test, or explicit reason.
+6. Make a focused, reversible change on ADMIN branch only when a concrete defect or missing acceptance criterion is evidenced. Never touch `main`, PR #108/static branch, Production, secrets, Cloudflare Access, remote D1/R2, or migrations. Do not run `setup-cloudflare.mjs`.
+7. Validate the change on the exact commit, inspect logs/artifacts, and read back the changed file. If CI is queued, continue safe work on an independent item instead of waiting passively, but do not claim the queued test passed.
+8. Update handoff files only when meaningful evidence or the next action changes. Keep JSON and Markdown consistent; avoid docs-only commits that merely restate old status. Commit and re-read from the live branch.
+9. End the session with exact current HEAD, PR states, latest CI status, verified deliverables, blockers, and next action written to the live source of truth. Report briefly, then continue safe work when possible.
+
+### Progress rules
+- Never increase the overall percentage for prompt edits, docs-only commits, test-harness-only fixes, repeated investigations, or screenshots without accepted criteria.
+- Increase progress only when a product screen/feature passes explicit acceptance criteria with evidence tied to exact SHA. Keep unverified backend/payment/R2/AI/migration capabilities explicitly unverified.
+- A session counts as progress only if it delivers a verified product improvement or closes a previously open acceptance/blocker with evidence. Otherwise state the actual blocker; do not disguise activity as completion.
+
+### Historical checkpoint — revalidate before use
+- ADMIN code/test commit last observed: `7d9cde727476ac05ee7431b457e7377b34c750fe`.
+- Workflow `39797841880` was queued when last observed; re-query it. Do not assume it is still queued or passed.
+- Earlier test failures: run `39794007381` failed the `.mobiletabs` visibility expectation; run `39796182324` failed with `ReferenceError: variant is not defined`. Commit `7d9cde7` changed the test to use `page.viewportSize()?.width`; its exact-SHA outcome was not verified at the last checkpoint.
+- PR #111 and PR #108 were last observed OPEN/unmerged. Revalidate both before claiming their state.
+- Overall progress was last stated as 50% provisional; recalculate from accepted deliverables before presenting it as current.
+- These are historical facts, not live state.
+
+---
+
 # PROMPT BÀN GIAO CHAT MỚI — SINDAREALEST ADMIN
 
 Tiếp tục làm việc thực tế trên GitHub, không chỉ phân tích/báo cáo. Sau mỗi checkpoint hãy tiếp tục ngay bước an toàn kế tiếp trong cùng phiên. Không hỏi lại thông tin đã có, không lặp lại chẩn đoán đã đóng. **Mục tiêu mỗi phiên phải tạo ra tiến triển sản phẩm hoặc một kết luận kiểm thử mới có bằng chứng; không tính sửa tài liệu/test harness là tiến độ sản phẩm.**
