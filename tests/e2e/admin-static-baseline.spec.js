@@ -2311,7 +2311,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('#activityActionFilter').selectOption('product_updated');
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
       await page.locator('#activityActionFilter').selectOption('all');
-      await page.locator('#refreshActivityLogs').click();
+      const refreshActivityButton = page.locator('#refreshActivityLogs');
+      await refreshActivityButton.click();
+      // Wait for the async refresh to finish before screenshot capture; the old
+      // row may already exist while the button is still in its loading state.
+      await expect(refreshActivityButton).toBeEnabled();
+      await expect(refreshActivityButton).toHaveText('Làm mới');
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
     });
     await captureView('notifications', 'dashboard', async variant => {
