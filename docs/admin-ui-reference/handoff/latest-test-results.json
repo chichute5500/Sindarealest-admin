@@ -1,36 +1,43 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:20:00+07:00",
+  "capturedAtUtc": "2026-10-22T19:54:30Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
-  "codeTestSha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
+  "branchHeadAtCheckpointStart": "e749873c0635eec31c4d5467cc357238edbebd6c",
+  "codeTestSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "CURRENT_HEAD_VALIDATION_NOT_VERIFIED",
+  "status": "CURRENT_HEAD_VALIDATION_FAILED_HANDOFF_POINTER",
   "latestRun": {
-    "id": null,
-    "url": null,
-    "headSha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
-    "status": "not_found_by_available_exact_sha_lookup",
-    "conclusion": null,
-    "summary": "Payment ledger summary fix and regression test were read back from GitHub. Exact-SHA workflow/status lookup returned no PR-triggered run or status checks; validation remains NOT_VERIFIED."
+    "id": 39844022556,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844022556",
+    "headSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+    "status": "completed",
+    "conclusion": "failure",
+    "summary": "Validate project integrity passed. npm test failed at tests/handoff-integrity.test.mjs:35 because latest-test-results.json latestRun.id and latestRun.url were null. Handoff metadata pointer is being repaired; the next commit must be revalidated on its exact SHA."
   },
   "validatedChecks": {
-    "npmRunCheck": "NOT_VERIFIED_ON_CURRENT_SHA",
-    "npmTest": "NOT_VERIFIED_ON_CURRENT_SHA",
-    "testedSha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
-    "projectIntegrity": "NOT_VERIFIED_ON_CURRENT_SHA",
+    "npmRunCheck": "PASS_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
+    "npmTest": "FAIL_HANDOFF_INTEGRITY_POINTER_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
+    "testedSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+    "projectIntegrity": "PASS_ON_e749873c0635eec31c4d5467cc357238edbebd6c",
     "localStaticPlaywright": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
     "deployedPreviewDiagnostic": "PASS_ON_2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
-    "currentHeadPlaywright": "NOT_RUN_FOR_DOCS_ONLY_CHECKPOINT",
+    "currentHeadPlaywright": "NOT_RUN_AFTER_TEST_FAILURE",
     "productionDeployment": "NOT_PERFORMED",
-    "currentHead": "NOT_VERIFIED",
-    "currentHeadSha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
+    "currentHead": "FAIL_HANDOFF_INTEGRITY_POINTER",
+    "currentHeadSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
     "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES"
   },
   "historicalRuns": [
+    {
+      "id": 39844022556,
+      "sha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+      "conclusion": "failure",
+      "failure": "tests/handoff-integrity.test.mjs:35 — latest-test-results.json latestRun.id/url were null; project integrity check passed.",
+      "meaning": "Latest failed exact-SHA Validate attempt at the handoff sync checkpoint; repair the pointer and rerun validation."
+    },
     {
       "id": 39804852564,
       "sha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
@@ -174,8 +181,8 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
-  "testedCommitSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+  "latestCodeCommitSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+  "testedCommitSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
   "capturedAt": "2026-10-22T19:41:44.271Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
   "checks": {

@@ -1,24 +1,23 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:20:00+07:00",
+  "capturedAtUtc": "2026-10-22T19:54:30Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
+  "branchHeadAtCheckpointStart": "e749873c0635eec31c4d5467cc357238edbebd6c",
   "checkpointSemantics": "Live PR/branch HEAD changes with each commit. branchHeadAtCheckpointStart is the exact live HEAD fetched before this handoff-only synchronization. codeTestSha is the source revision actually validated; workflow-generated evidence commits and handoff-only commits require separate exact-SHA validation.",
-  "codeTestSha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
+  "codeTestSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
   "latestProductSourceCommit": "2eb6e7e9d6b1cf15002a7d67e299c713a4d32118",
   "latestActionsRun": {
-    "id": 39842366701,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842366701",
+    "id": 39844009143,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844009143",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
-    "jobId": 120046485714,
+    "testedSha": "2ccfd452643c431a25f9bb7789f2bbe1acb41e5b",
     "currentHeadApplicability": "HISTORICAL_ONLY_NOT_VERIFIED_FOR_CURRENT_HEAD"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL. Last recorded source/test validation is historical on exact SHA 73dfad5e35939da22dd37efd12bf8b06c09e7716. Current live HEAD is not verified by Actions. Latest product/UI evidence remains on its own SHA; authenticated backend acceptance remains untested.",
+  "progressBasis": "50% PROVISIONAL. Latest exact-SHA Validate run #39844022556 on e749873c0635eec31c4d5467cc357238edbebd6c passed project-integrity but failed npm test because latest-test-results.json had null latestRun.id/url. Previous SHA 2ccfd452643c431a25f9bb7789f2bbe1acb41e5b passed. The handoff pointer is being repaired; the resulting handoff commit requires its own exact-SHA validation. Authenticated backend acceptance remains untested.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -40,9 +39,9 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "9f87b4fe496b48558a9682a1d4165f0956d86e9b",
+      "headSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
       "changedFiles": 385,
-      "additions": 38949,
+      "additions": 38962,
       "deletions": 211,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true
@@ -50,12 +49,12 @@
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39841964451,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39841964451",
-      "testedSha": "73dfad5e35939da22dd37efd12bf8b06c09e7716",
+      "id": 39844009143,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844009143",
       "status": "completed",
       "conclusion": "success",
-      "jobId": 120045068730
+      "testedSha": "2ccfd452643c431a25f9bb7789f2bbe1acb41e5b",
+      "currentHeadApplicability": "HISTORICAL_ONLY_NOT_VERIFIED_FOR_CURRENT_HEAD"
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -152,7 +151,7 @@
     "liveChangedFiles": 385,
     "previousCensus": 1314,
     "previousCensusStatus": "The 1,314-path census describes the state before tests/handoff-integrity.test.mjs was added. Live PR #111 metadata now reports 1,315 changed paths; recount after each future PR file addition.",
-    "priority": "Validate payment summary fix on exact SHA, then continue provenance review.",
+    "priority": "Repair handoff-integrity pointer, validate resulting exact SHA, then continue runtime/API provenance review.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
     "migration0009": "DEFERRED_BY_OWNER",
     "preProMigrations": "DEFERRED_BY_OWNER",
@@ -237,7 +236,8 @@
       "remoteActions": "NONE",
       "productionDeployment": "NOT_PERFORMED"
     },
-    "latestReviewFinding": "Payment-request GET summary now aggregates full ledger independently from the capped 100-row display list; regression test added. Exact-SHA validation NOT_VERIFIED."
+    "latestReviewFinding": "Validate #39844022556 failed npm test at tests/handoff-integrity.test.mjs:35 because latest-test-results.json latestRun.id/url were null. Project integrity passed. Previous exact SHA 2ccfd452643c431a25f9bb7789f2bbe1acb41e5b passed.",
+    "currentHeadValidation": "FAIL_HANDOFF_INTEGRITY_POINTER_ON_e749873c0635eec31c4d5467cc357238edbebd6c"
   },
   "guardrails": [
     "Only write feature/admin-isolated-handoff-2026-10-20.",

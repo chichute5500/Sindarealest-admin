@@ -1,56 +1,36 @@
 # START HERE — SINDAREALEST ADMIN
 
-**Điểm vào duy nhất cho chat mới.** Mở file này trước; không yêu cầu chủ dự án dán lại lịch sử hoặc prompt dài.
+**Điểm vào duy nhất cho chat mới.** Đọc file này trước; không yêu cầu chủ dự án dán lại lịch sử hoặc prompt dài.
 
 ## Liên kết chuẩn
 - [Prompt bàn giao chat mới — PROMPT-NEXT-CHAT.md](PROMPT-NEXT-CHAT.md)
-- [Master prompt — MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md)
-- [Trạng thái kiểm thử gần nhất — latest-test-results.json](latest-test-results.json)
+- [Master prompt tương thích — MASTER-PROMPT-AUTO-HANDOFF.md](../MASTER-PROMPT-AUTO-HANDOFF.md)
+- [Trạng thái kiểm thử — latest-test-results.json](latest-test-results.json)
 - [Trạng thái tổng hợp — current-status.json](current-status.json)
-- [Báo cáo hiện trạng — LATEST-STATUS.md](LATEST-STATUS.md)
-- [Audit 12 màn hình](12-SCREEN-REFERENCE-AUDIT.md) · [Audit phạm vi PR #111](PR-111-SCOPE-AUDIT.md)
-- [Chính sách lưu lịch sử kiểm thử](history/README.md)
+- [Báo cáo tiến độ — LATEST-STATUS.md](LATEST-STATUS.md)
+- [Audit phạm vi PR #111](PR-111-SCOPE-AUDIT.md)
+- [Audit 12 màn hình](12-SCREEN-REFERENCE-AUDIT.md)
+- [Chính sách lưu bằng chứng theo run](history/README.md)
 
-## Checkpoint đã xác minh qua GitHub API
-- Repo `chichute5500/Sindarealest-admin`; chỉ ghi vào nhánh `feature/admin-isolated-handoff-2026-10-20`.
-- PR #111 was OPEN/unmerged at pre-sync HEAD `30fece366e559073f6c664f6ed0459712c1b0a84`, 385 paths (+38848/−211), mergeable=false; base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- Exact-SHA Validate [#39842366701](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842366701) PASS on that pre-sync HEAD (`npm run check` + `npm test`). Current handoff-only HEAD is `976e72d2ec10e9ead74a4c3275b8569d52a4f525`; its validation run [#39842755681](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842755681) was IN_PROGRESS at last fetch; refetch live state before claiming PASS.
-- PR #108 was OPEN/unmerged and read-only at its last verified checkpoint; fetch its live metadata before acting.
-- Census at pre-sync HEAD: 385 paths; 318 compact history files across 156 run directories (161 JSON, 157 Markdown), 13 non-history docs; path census {".github":1,"(root)":2,"data":1,"docs":331,"functions":24,"migrations":2,"public":1,"scripts":4,"tests":19}.
-- B1 remains PARTIAL, not complete. The runtime slice reviewed in the latest checkpoint yielded no additional deletion/merge supported by dependency evidence.
+## Checkpoint live gần nhất
+- Repository: `chichute5500/Sindarealest-admin`.
+- PR #111: OPEN/unmerged; branch `feature/admin-isolated-handoff-2026-10-20`; HEAD tại checkpoint `e749873c0635eec31c4d5467cc357238edbebd6c`; 385 changed files (+38,962/−211); `mergeable=false`. [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111)
+- PR #108 và `main` là read-only; không sửa, merge hoặc deploy Production.
+- Validate [#39844022556](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844022556) trên HEAD trên: project-integrity PASS, automated tests FAIL tại `tests/handoff-integrity.test.mjs:35`, vì `latest-test-results.json.latestRun.id/url` là null. Đã xác định lỗi cụ thể; cập nhật pointer và chạy lại kiểm thử trên SHA mới.
+- Validate [#39844009143](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844009143) PASS trên SHA cũ `2ccfd452643c431a25f9bb7789f2bbe1acb41e5b`; đây **không** phải bằng chứng PASS cho HEAD hiện tại.
+- B1 vẫn PARTIAL. Đã loại 912 PNG sinh tự động cũ, 10 snapshot handoff trùng/lỗi thời, prompt/audit tĩnh lỗi thời, ZIP không được tham chiếu và workflow/script/test chỉ phục vụ web tĩnh; giữ 318 bản ghi lịch sử gọn theo chính sách. Chưa chứng minh đủ căn cứ để xóa/gộp thêm runtime/API.
+- Progress 50% PROVISIONAL; 12 màn hình PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
 
+## Việc tiếp theo — theo đúng thứ tự
+1. Fetch live PR #111/#108, HEAD, merge base, changed-path census và Actions. Không dùng SHA/counters lịch sử làm live truth.
+2. Đọc `latest-test-results.json` và logs. Sửa pointer `latestRun.id/url` đã xác định, chạy Validate và xác minh exact SHA của commit bàn giao mới.
+3. Nếu workflow còn fail, sửa lỗi có log chứng minh trước khi quay lại B1. Không đánh dấu PASS cho tới khi exact-SHA workflow thành công.
+4. Tiếp tục rà dependency/provenance cho payment APIs, migration `0009`, scripts/config/workflow, data contracts và tests. Chỉ xóa/gộp khi chứng minh không có consumer và không làm mất giá trị audit/safety. Orders và Order detail phải audit riêng.
+5. Sau checkpoint, cập nhật các file bàn giao liên quan trong một commit nguyên tử; đọc lại từ GitHub và fetch lại live HEAD/Actions.
 
-## Required operating sequence
-1. Fetch live PR #111 and #108, branch HEAD, merge base and recent Actions. Treat every SHA/count in these docs as a checkpoint, not live truth.
-2. Read `current-status.json`, `latest-test-results.json`, this file, `LATEST-STATUS.md`, the 12-screen audit and PR scope audit. Read actual failing logs for new failures.
-3. Continue from the first unresolved safe task. Do not repeat the historical retry-customers timeout on SHA `326526f8...`; exact later source/UI run #39816652346 passed.
-4. Make minimal ADMIN-only source changes, add regression coverage, and run checks on the exact SHA. No fabricated defect or unverified product data.
-5. After a checkpoint, sync all relevant handoff files in one atomic Git tree/commit where possible; read them back and refetch live HEAD/PR/Actions. Do not call a queued/running run PASS.
-
-## Guardrails
-- Keep PR #111 and PR #108 OPEN/unmerged. No `main` or static-branch writes, no merge, force-push or Production deploy.
-- Never bypass Cloudflare Access; do not retrieve/expose/change secrets.
-- Do not run setup, migration or deploy scripts; do not operate remote D1/R2/schema/ledger.
-- Migration 0009 and PRE/PRO migrations, R2 persistence and product image save are DEFERRED_BY_OWNER. AI grouping requires an owner-approved API/UX contract.
-- Do not fabricate products, prices, stock, images, customers, orders, payment status or APIs.
-
-## PR #111 cleanup checkpoint — 2026-10-23
-- Cleanup validated by source/test workflow #39836967488 on exact cleanup SHA `dcd5f1c2ae45d1c0ae22d49838757ec1ada69d7a` (SUCCESS). The subsequent handoff-note commit, if any, requires its own exact-SHA validation.
-- Removed the out-of-scope static-site audit report `docs/visual-audit-progress-2026-10-19.md` and superseded `handoff/PROMPT-COMPLETENESS-AUDIT.md`.
-- Consolidated `MASTER-PROMPT-AUTO-HANDOFF.md` into a compatibility pointer to START-HERE; shortened PROMPT-NEXT-CHAT to a current-state-first continuation prompt.
-- Live PR #111 census at this checkpoint: 404 changed paths; 340 under `docs`, of which 326 are retained per-run history records. Historical text/JSON evidence and the approved UI reference remain; generated screenshot matrices are stored in Actions artifacts, not the PR diff.
-- PR #111 remains OPEN/unmerged. The static website PR #108 remains OPEN/unmerged and read-only. Do not treat these counts or SHA as current after subsequent commits; fetch live GitHub state first.
-
-## Live checkpoint — 2026-10-23
-- PR #111 HEAD: `ae7e915d7de15f4f0a03f59d1caaad39fc6a9231`, OPEN/unmerged, 385 changed paths (+38,879/−211), mergeable=false. Exact-SHA Actions/status lookup returned no runs/checks; validation is NOT_VERIFIED.
-- PR #108 remains OPEN/unmerged and read-only. No changes to PR #108, `main`, or the static website branch.
-- Reconciled one stale instruction in `reference-instructions.md`: current PR #111 changed-path census does not include `public/index.html`; `public/admin/index.html` is the ADMIN UI source. Always re-fetch the live file list.
-- Provenance review: `tests/e2e/admin-static-baseline.spec.js` is invoked directly by `.github/workflows/admin-preview-diagnostics.yml`; `tests/e2e/admin-preview.spec.js` is conditionally invoked by the same workflow. Both are live dependencies and must not be deleted. `playwright.config.js` was not found at this branch ref, but that alone is not grounds to remove configuration references without reviewing package/runner defaults.
-- B1 cleanup of previously identified generated screenshots and stale handoff snapshots remains complete. Full provenance review remains PARTIAL; no speculative deletion or merge.
-- Product progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
-
-## Live checkpoint — 2026-10-23 (payment ledger summary fix)
-- PR #111 is OPEN/unmerged on `feature/admin-isolated-handoff-2026-10-20`, source/test change HEAD at checkpoint `9f87b4fe496b48558a9682a1d4165f0956d86e9b`; 385 changed paths (+38,949/−211), mergeable=false. PR #108 remains OPEN/unmerged and read-only; no changes to it, `main`, or the static branch.
-- Fixed `GET /api/admin/payment-requests`: the returned transaction display remains capped at 100 rows, while summary amounts now come from a separate aggregate query over the full ledger. Added regression coverage asserting that the summary reflects full-ledger totals when the display list is capped.
-- Read-back verified both changed files contain the fix and regression test. Exact-SHA Actions/check lookup for `9f87b4fe496b48558a9682a1d4165f0956d86e9b` returned no PR-triggered runs and no status checks; validation is NOT_VERIFIED, not PASS. Recheck Actions from GitHub UI/API before relying on this change.
-- B1 remains PARTIAL. Further provenance review and exact-SHA test validation remain outstanding. Progress stays 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; D1 schema/ledger NOT_VERIFIED; Production deployment NOT_PERFORMED.
+## Rào chắn
+- Chỉ ghi vào nhánh PR #111. Giữ PR #111 và #108 OPEN/unmerged. Không sửa PR #108, `main` hay nhánh web tĩnh; không merge/rebase/force-push/deploy Production.
+- Không bypass Cloudflare Access; không đọc/đổi secrets.
+- Không chạy setup/deploy/migration scripts; không thao tác remote D1/R2/schema/ledger.
+- Migration 0009, PRE/PRO migrations, R2 persistence và lưu ảnh sản phẩm đang DEFERRED_BY_OWNER. AI image grouping cần hợp đồng API/UX được chủ dự án duyệt.
+- Không tạo dữ liệu giả về sản phẩm, giá, tồn kho, khách hàng, đơn hàng, thanh toán hoặc API.
