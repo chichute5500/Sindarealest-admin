@@ -183,7 +183,7 @@ assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image r
 assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
   'The hero starts hidden in static markup so the approved presentation asset can be assigned by runtime; catalog SKU availability is not a gate.');
 const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
-assert.ok(heroSync.includes("const url='/images/hero-sd-gl052.png?v=20261022-1'")
+assert.ok(heroSync.includes("const url='/images/hero-upload/tb_image_share_1792519964514%20(1).png?v=20261022-4'")
   && heroSync.includes("target.dataset.productImageStatus='hero-presentation-asset'")
   && heroSync.includes("target.hidden=false") && heroSync.includes("target.src=url"),
   'The homepage hero must load the dedicated presentation asset independently of public catalog SKU availability.');
