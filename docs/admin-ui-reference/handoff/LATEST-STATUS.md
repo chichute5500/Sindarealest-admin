@@ -39,3 +39,10 @@ All 12 screens remain PARTIAL_NOT_ACCEPTED. In particular:
 - `START-HERE.md` is the single entry point. New chats should not require the owner to paste long prompts or re-explain history.
 - Live branch HEAD and tested code SHA are separate: HEAD `4d6dab2f...` is documentation-only; validated code SHA remains `326526f8...`.
 - Next action is to inspect the failed Preview run `39804852604` logs/artifacts, identify the confirmed cause, and continue work. Progress stays 50% PROVISIONAL.
+
+
+### Preview failure triage (verified from job logs)
+- Overall run fails at local source screenshot Playwright test `tests/e2e/admin-static-baseline.spec.js:173`.
+- Root symptom: 120-second timeout waiting for selector `[data-action="retry-customers"]` at line 1940.
+- Deployed Preview diagnostic step completed successfully within the same overall failed run; do not label that step itself as failed.
+- Artifact `admin-preview-evidence-336` (ID `12437154740`) contains test evidence. Next: inspect test/error context, make the smallest confirmed fix, then rerun focused Playwright.
