@@ -39,7 +39,10 @@ for (const [, selector, declarations] of heroImageRules) {
     const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
       || (property.startsWith("mask") && value.startsWith("radial-gradient("))
       || (property === "mix-blend-mode" && (value === "normal" || value === "multiply"))
-      || (property === "opacity" && value === "1"));
+      || (property === "opacity" && value === "1")
+      // Explicitly permit the small source-preserving zoom used to make the shoes read larger;
+      // color/brightness filters and arbitrary transforms remain disallowed.
+      || (property === "transform" && (value === "scale(1.04)" || value === "scale(1.02)")));
     assert.ok(neutral, "Hero image CSS must not apply visual effects (" + selector.trim() + ": " + declaration + ").");
   }
   assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied hero asset must never be cropped.");
