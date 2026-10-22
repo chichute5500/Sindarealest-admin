@@ -1,17 +1,20 @@
 # Admin 12-screen reference audit matrix
 
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T21:30:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T13:09:49+07:00
 
-- **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`. **HEAD trước checkpoint tài liệu:** `55ae20603089afc34409fd1bd54efc897a5a3ab8` (commit evidence/docs, không phải source/test SHA). **Source/test SHA đã chạy:** `a0e17a7e625c89875e81ff14abf52d1eb03b5cf0`.
-- **Validate Source:** [run #39727105101](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727105101) — **SUCCESS** đúng source/test SHA.
-- **Admin Preview diagnostic / Playwright:** [run #39727105050](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727105050) — **SUCCESS** đúng source/test SHA. Local Playwright **3/3 PASS**; configured Preview login/dashboard smoke **2/2 PASS**; Preview CSS diagnostic `PASS_LOGIN_CSS_SIGNATURE`. Điều này xác nhận trang Preview đã được truy cập và signature/login-dashboard smoke đạt; **không** phải full authenticated business CRUD/backend QA.
-- **Artifact mới nhất:** [`admin-preview-evidence-280`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727105050/artifacts/12403891182), ID `12403891182`, 17,121,806 bytes, 103 ZIP entries, 100 PNG, 67 fixture screenshots, 59 fixture metrics. Đã tải ZIP và mở ảnh contact sheet: Products #3 mobile `390×844` light/dark và desktop `1280×800` light đã kiểm tra trực quan. Fixture screens dùng synthetic/read-only data, không phải dữ liệu thật.
-- **Responsive evidence:** login matrix 16 tổ hợp viewport/theme không tràn ngang; 3 local Playwright tests và 2 Preview smoke tests PASS; fixture metadata ghi 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors. Các fixture metrics không chứng minh nghiệp vụ backend thật.
-- **Screen #3 Products:** trạng thái vẫn **PARTIAL / NOT ACCEPTED**. Ảnh hiện tại cho thấy thẻ sản phẩm mobile, bộ lọc và điều hướng dưới; desktop vẫn dùng bảng. Chưa đủ đối chiếu đầy đủ với reference để nghiệm thu parity. **12 screen parity NOT ACCEPTED**; authenticated business QA **NOT TESTED**.
-- **Tiến độ tổng thể: 50% — giữ nguyên.** Không tăng phần trăm chỉ vì CI xanh, chụp thêm ảnh hoặc sửa test.
-- **PR #111 ADMIN:** OPEN/unmerged, HEAD hiện tại trước docs checkpoint `55ae20603089afc34409fd1bd54efc897a5a3ab8`. **PR #108 static website:** OPEN/unmerged; không chỉnh nhánh static, không merge PR nào.
-- **Bước kế tiếp:** đối chiếu Products #3 trực tiếp với ảnh reference ở `390×844` light/dark và `1280×800` light/dark; xác định mismatch cụ thể trước khi sửa. Sau sửa chạy lại Validate Source + Preview trên đúng SHA, tải/mở artifact, cập nhật evidence.
-- **Rào chắn:** chỉ nhánh ADMIN; không merge/cherry-pick/force-push/sync; không Production deploy; không thay đổi/đọc lộ/bypass secrets hoặc Cloudflare Access; không remote D1/R2/SQL/migration/setup/deploy/infra; không TinyFish. Giữ `DEFERRED_BY_OWNER` nguyên trạng.
+- **Nhánh ADMIN:** `feature/admin-isolated-handoff-2026-10-20`. **HEAD trước cập nhật bộ hồ sơ:** `de42931e1d41606d65703b5115ff49fed41cf814` (commit lưu evidence/docs, không phải source/test SHA). **Source/test SHA đã chạy:** `07f881bbe519a1e6b032f2633d2e2715f0773630`.
+- **Validate Source:** [run #39732018523](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018523) — **SUCCESS** trên đúng source/test SHA.
+- **Admin Preview diagnostic / Playwright:** [run #39732018622](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622) — **SUCCESS** trên đúng source/test SHA. Local Playwright matrix **3 passed**; configured Preview login/dashboard smoke **2 passed**; CSS diagnostic `PASS_LOGIN_CSS_SIGNATURE`. Preview truy cập được cho smoke test; đây **không** phải nghiệm thu đầy đủ nghiệp vụ CRUD/backend thật.
+- **Artifact:** [`admin-preview-evidence-287`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39732018622/artifacts/12405720936), ID `12405720936`, 17,104,020 bytes, 103 ZIP entries, 100 PNG (16 login shell + 83 fixture screenshots + 1 ảnh reference), 75 fixture metrics. Đã tải ZIP và xem trực tiếp ảnh màn chỉnh sửa sản phẩm #4: `product-editor__390x844__light.png`, `product-editor__390x844__dark.png` và `product-editor__1280x800__light.png`. Ảnh mobile xác nhận thanh ứng dụng/điều hướng còn hiển thị, tab dính ngay dưới header và hàng giá/tồn kho nằm trên footer. Desktop drawer vẫn cần tiếp tục rà soát chi tiết; không đánh dấu màn #4 đã nghiệm thu.
+- **Responsive / fixture evidence:** login matrix 16 tổ hợp viewport/theme; 3 bài Playwright source pass; 2 bài Preview smoke pass. Fixture dùng dữ liệu tổng hợp, read-only; không xác nhận luồng nghiệp vụ thật hay dữ liệu thật.
+- **Screen #4 Product editor:** **PARTIAL / NOT ACCEPTED** — đã cải thiện bố cục mobile theo reference, nhưng chưa đủ đối chiếu mọi trạng thái, gallery và desktop để nghiệm thu.
+- **Screen #3 Products và toàn bộ 12 màn:** **NOT ACCEPTED** cho visual parity tổng thể; tiếp tục đối chiếu từng màn với reference. Authenticated business/backend QA vẫn **NOT TESTED**.
+- **Tiến độ tổng thể: 50% — giữ nguyên.** Không tăng tiến độ chỉ vì CI xanh, ảnh mới hoặc số lần commit.
+- **PR #111 ADMIN:** OPEN/unmerged, HEAD trước cập nhật tài liệu `de42931e1d41606d65703b5115ff49fed41cf814`. **PR #108 static website:** OPEN/unmerged; không sửa nhánh website tĩnh, không merge PR nào.
+- **Bước kế tiếp:** rà soát drawer desktop và luồng tab/scroll/fixed footer ở #4; sau đó tiếp tục mismatch đã xác minh ở Products #3. Chạy lại Validate Source + Preview trên SHA chính xác, tải/mở artifact và cập nhật evidence sau thay đổi có ý nghĩa.
+- **Rào chắn:** chỉ nhánh ADMIN; không merge/cherry-pick/force-push/sync; không Production deploy; không thay đổi, làm lộ hoặc bypass secrets/Cloudflare Access; không remote D1/R2/SQL/migration/setup/deploy/infra; không TinyFish. Giữ `DEFERRED_BY_OWNER` nguyên trạng.
+
+---
 
 ## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T11:06:00+07:00
 
