@@ -308,12 +308,15 @@ assert.ok(
   "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the full, unprocessed image remains visible."
 );
 
-// The bottom Products tab follows the shopping-bag icon in the approved icon reference.
+// The approved icon board assigns the shopping-bag silhouette to Cart; Products remains a distinct catalogue/list destination.
 const mobileProductTab = html.match(/<a class="mobile-tab" href="#products" data-mobile-tab="products">([\s\S]*?)<\/a>/)?.[1] || '';
-assert.match(mobileProductTab, /<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"\/><path d="M9 8V6a3 3 0 0 1 6 0v2"\/><\/svg>/,
-  'The mobile Products tab must use the shopping-bag outline specified by the icon reference.');
-assert.doesNotMatch(mobileProductTab, /<rect x="4" y="4" width="16" height="16" rx="3"\/>/,
-  'The mobile Products tab must not regress to the generic document/list icon.');
+const mobileCartTab = html.match(/<button class="mobile-tab" type="button" id="mobileCartNav"([\s\S]*?)<\/button>/)?.[1] || '';
+assert.match(mobileCartTab, /<path d="M3 4h2l2\.2 11\.1[\s\S]*?L21 8H6"\/>/,
+  'The mobile Cart tab must keep its cart-outline icon as shown on the reference board.');
+assert.match(mobileCartTab, /<circle cx="10" cy="20" r="1"\/><circle cx="18" cy="20" r="1"\/>/,
+  'The mobile Cart icon must retain both wheel details.');
+assert.doesNotMatch(mobileProductTab, /<path d="M6 8h12l1 12H5L6 8Z"\/>/,
+  'The Products tab must not reuse the shopping-bag silhouette assigned to Cart by the reference board.');
 assert.ok(html.includes('.mobile-tab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}'),
   'Mobile navigation icons must share a thin, consistent outline stroke and rounded line caps from the icon reference.');
 
