@@ -11,6 +11,13 @@ Updated: 2026-10-22 11:05 UTC. Read this file first in every new chat.
 - No storefront code was changed in this review. The confirmed gallery issue cannot be corrected inside the present no-mapping-change scope. Keep visual parity and icon parity OPEN; do not claim 100%. Planning estimate remains 88% unless the evidence-backed work scope is recalculated.
 
 
+## Startup first-paint evidence — run #39762445821 (2026-10-22)
+
+- Inspected the four captured startup videos in artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837): 360×800 and 390×844, Light and Dark. Each video is approximately 1.08–1.16 seconds.
+- Parsed `live-preview/visual-audit.json`: `firstPaintCoverageComplete=true`, `firstPaintVideoCoverageComplete=true`, `firstPaintFrameCount=20`, `firstPaintViolationCount=0`, `firstPaintVideoCount=4`. Across the four startup timelines there are 107 recorded samples; all have `violation=false`. While the welcome splash owns the screen, the bottom navigation and account drawer are recorded as not visible. No account flash or bottom-toolbar overlap was captured in these runs.
+- **Evidence limit:** the artifact's deployment metadata check failed because it expected `e916ce590b6dbd720dca51405097d20333ce649b` but Cloudflare reported `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. Commit comparison shows the seven intervening commits touched documentation only, no storefront code; thus this is strong observational evidence for the same storefront source, but not a new exact-SHA-verified audit. Keep the startup issue as `PASS — captured runs only; device-specific report not disproved`, and do not rerun without new contrary evidence or a new source/environment.
+
+
 ## Source of truth
 - Repository: https://github.com/chichute5500/Sindarealest-admin
 - Work branch: `fix/liquid-glass-audit-2026-10-19`
@@ -59,7 +66,7 @@ Updated: 2026-10-22 11:05 UTC. Read this file first in every new chat.
 ## Next actions (in order)
 1. After this documentation update, fetch branch HEAD and PR #108 HEAD again; PR must remain OPEN and unmerged.
 2. Refresh Cloudflare Preview metadata before treating any later capture as exact-SHA evidence. Run #39762445821 is not exact-SHA verified; separate source SHA, deployed SHA and audited SHA.
-3. Keep VISUAL-PARITY and ICON-PARITY open. Continue only with evidence-backed storefront CSS/icon fixes; preserve official logo and owner-supplied hero asset.
+3. Keep VISUAL-PARITY and ICON-PARITY open. Continue only with evidence-backed storefront CSS/icon fixes; preserve official logo and owner-supplied hero asset. Startup splash/account-flash concern has 4 video + 107 timeline sample checks with 0 captured violations in artifact #12418823837; do not rerun unless new contrary evidence appears.
 4. Keep PRODUCT-GALLERY-25 as a confirmed read-only mismatch. Do not change product/catalog/image mappings; correction requires trusted catalog data and authorization outside this scope.
 5. After any future UI code change: run only affected tests, deploy Preview, verify exact deployment SHA, run live audit, inspect artifact images, then update evidence docs.
 6. QR/payment remains fail-closed pending trusted backend confirmation/configuration; no real checkout/payment tests.
