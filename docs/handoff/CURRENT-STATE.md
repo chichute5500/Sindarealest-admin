@@ -6,10 +6,17 @@ Updated: 2026-10-22. Read this file first in every new chat.
 - Work branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, DO NOT MERGE.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
-- Branch HEAD at this handoff edit: `fc406599e04475e232fad790efd03d46979a5a20` (the handoff update is docs-only; fetch HEAD again before acting).
+- Branch HEAD is intentionally not frozen in this file: the documentation cleanup adds docs-only commits. Fetch the branch and PR #108 HEAD live before every new work session; distinguish branch HEAD from deployed storefront SHA and audited SHA.
 - Last source commit in this verified checkpoint: `fc406599e04475e232fad790efd03d46979a5a20`. Do NOT assume that a green deploy workflow alone proves the deployed SHA; inspect deployment metadata and audit source SHA separately.
 - Recent workflow links: Validate #39760902928; Preview Deploy #39760903008; Admin Preview read-only smoke #39760902960; Liquid Glass visual workflow #39760903036. The first three were reported PASS for this SHA. The terminal result/artifact of #39760903036 was not independently confirmed while this handoff was written; refresh it before claiming a new live audit.
 - Docs-only commits are excluded from Preview deploy/live-capture push triggers by workflow `paths-ignore: docs/**`. A docs-only handoff commit must not be presented as a new deployed storefront.
+
+## Documentation cleanup checkpoint (2026-10-22)
+- Canonical handoff order: this file → `HANDOFF.md` → `TEST-RESULTS.md` → `TASKS.md` → visual audit plan → [canonical new-chat prompt](PROMPT-NEXT-CHAT-2026-10-22.md).
+- Dated prompts `PROMPT-NEXT-CHAT-2026-10-20.md`, `PROMPT-NEXT-CHAT-2026-10-21.md`, and `docs/prompts/NEXT-CHAT-PROMPT-2026-10-21-STATIC-WEB.md` are marked HISTORICAL; REV2/REV3 already direct readers to the canonical prompt. The master prompt now starts with an override saying old embedded checkpoints are historical only.
+- `docs/website-screenshots/README.md` no longer presents the old blocked-Access/local-fixture run as current project status; it distinguishes the before/after screenshot archive from real live Preview audit artifacts.
+- This is a targeted handoff cleanup, not a claim that every historical report in the repository is current. Old audit reports and packaging/deployment READMEs are retained for historical context; never use them to override this file or the current code/config. If a task depends on one, compare it against current code and platform metadata.
+- After the documentation-only edits, fetch the live branch HEAD and PR head again. Documentation changes do not imply a new storefront deploy because `docs/**` is excluded from the Preview push trigger.
 
 ## Non-negotiable scope
 - Storefront public UI only: HTML/CSS/JS, layout, icons, effects, responsive behavior and visual parity.
