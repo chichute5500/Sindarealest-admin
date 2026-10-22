@@ -106,8 +106,8 @@ assert.match(storefrontHtml, /class="mosaic-photo material-photo material-photo-
   'The editorial material sample image must keep its albino-material identity.');
 
 const adminThemeHtml = readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
-assert.ok(adminThemeHtml.includes('theme-croc-dark.webp?v='), 'Admin dark theme background URL must also be cache-busted');
-assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(adminThemeHtml), 'Admin theme background must not retain an unversioned dark asset reference');
+assert.ok(!adminThemeHtml.includes("'/images/theme-croc-dark.webp?v=20261017-1'"), 'Admin product cards must not use a branded theme texture as a fallback product photo');
+assert.ok(!/theme-croc-dark\.webp(?!\?v=)/.test(adminThemeHtml), 'Any Admin dark texture asset reference must retain a cache-busting version query');
 assert.ok(themeCacheHeaders.includes('/images/theme-croc-dark.webp\n  ! Cache-Control\n  Cache-Control: public, max-age=0, must-revalidate'), 'Dark theme asset must detach inherited immutable caching and revalidate when its stable path is requested');
 assert.ok(themeCacheHeaders.includes('/images/theme-croc-albino.webp\n  ! Cache-Control\n  Cache-Control: public, max-age=0, must-revalidate'), 'Light theme asset must detach inherited immutable caching and revalidate when its stable path is requested');
 assert.ok(!storefrontHtml.includes('sd-admin-shortcut') && !storefrontHtml.includes('href="/admin/"'), 'The public storefront must not expose a management link while admin remains at its separate route');
