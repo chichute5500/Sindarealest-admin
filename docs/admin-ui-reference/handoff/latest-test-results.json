@@ -934,10 +934,10 @@
   ],
   "productionDeployment": "NOT_PERFORMED",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783",
-  "branchHeadSha": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "branchHeadSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "latestVerifiedAt": "2026-10-22T15:52:00+07:00",
   "latestVerifiedSourceCommit": "78b87d71f82090cb7399a68207ef436a200d3c9f",
-  "currentAdminBranchHead": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "currentAdminBranchHead": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "latestVerificationSummary": "Validate Source and Preview/Playwright SUCCESS on tested source SHA 78b87d71f82090cb7399a68207ef436a200d3c9f; current HEAD dcb60b39d5813b82fabeab0f390826e558e7e676 is evidence-only descendant; Preview login CSS signature only; 12-screen parity not accepted; authenticated backend QA not tested.",
   "branchHeadBeforeHandoffUpdate": "84cafe10b60c49593d530ac3b444aedfd268f76c",
   "prSafety": {
@@ -1058,8 +1058,8 @@
     "ORDER_DETAIL_SCREEN: prior 12-screen inventory suggests a separate order detail view, but the approved PNG could not be re-opened in this pass; compare original reference and review URL/workflow contracts before calling this a defect or adding route. Status NOT VERIFIED.",
     "MODULE_GROUPING: image manager, backup/restore, and activity log are embedded in current views. Whether this differs materially from the approved reference remains NOT VERIFIED; do not invent routes based on assumptions."
   ],
-  "updatedAt": "2026-10-22T15:52:00+07:00",
-  "currentBranchHeadAtHandoff": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "updatedAt": "2026-10-22T15:55:00+07:00",
+  "currentBranchHeadAtHandoff": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "sourceInventoryOnly": true,
   "sourceModifiedThisTurn": false,
   "previewDiagnostics": {
@@ -1397,7 +1397,7 @@
     "authenticatedBusinessQA": "NOT_TESTED",
     "progressPercent": 50
   },
-  "latestObservedBranchHeadSha": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "latestObservedBranchHeadSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "latestVerifiedSourceCi": {
     "runId": 39742949748,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748",
@@ -1412,25 +1412,20 @@
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
   },
   "pr111": {
-    "state": "OPEN",
-    "base": "main",
-    "headSha": "480eda6ae1ae06c517d0d87468eebb4abef0341a",
-    "changedFiles": 1126,
-    "additions": 40556,
-    "deletions": 392,
+    "state": "open",
     "merged": false,
-    "mergeReady": false,
-    "scope": "Mixed Admin + public storefront + Functions/API + migrations + setup/deploy scripts + tests/evidence; not merge-ready."
+    "headSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
+    "changedFiles": 1265,
+    "mergeable": false,
+    "mergeable_state": "dirty"
   },
   "pr108": {
-    "state": "OPEN",
-    "base": "main",
-    "headSha": "29e5d6f75aec714cfe6691ef43a9e1c69a337660",
-    "changedFiles": 269,
-    "additions": 20972,
-    "deletions": 380,
+    "state": "open",
     "merged": false,
-    "writeScope": "NO_EDITS_FROM_ADMIN_TASK"
+    "headSha": "551b0641ca8fe27f1e5054213142d5f0f6add791",
+    "changedFiles": 280,
+    "mergeable": false,
+    "mergeable_state": "dirty"
   },
   "integrationProgressEstimatePercent": 70,
   "integrationStatus": "PARTIAL_SOURCE_COMPATIBILITY_WITH_CONFIRMED_STATIC_FREESHIP_DISPLAY_GAP; RUNTIME_NOT_VERIFIED",
@@ -1534,12 +1529,13 @@
   "uiFixturePngCount": 83,
   "uiFixtureMetricCount": 75,
   "latestExecutionCheckpoint": {
-    "at": "2026-10-22T15:52:00+07:00",
-    "branchHead": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+    "at": "2026-10-22T15:55:00+07:00",
+    "branchHead": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
     "testedSourceSha": "78b87d71f82090cb7399a68207ef436a200d3c9f",
     "validateRun": 39750503800,
     "previewRun": 39750503783,
-    "artifactId": 12413611086
+    "artifactId": 12413611086,
+    "currentHeadValidateRun": 39751463904
   },
   "sourceLevelCrossBranchAudit": {
     "checkedAt": "2026-10-21 15:52 +07:00",
@@ -1866,7 +1862,7 @@
     "remoteD1RuntimeConcurrency": "NOT_VERIFIED_TESTS_USE_IN_MEMORY_MOCK",
     "finding": "Refund row uses conditional INSERT…SELECT to recheck the net received/refunded ledger at insert time; order/request status updates and audit write are gated on that row existing; a rejected balance race returns 409."
   },
-  "latestHandoffHeadSha": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "latestHandoffHeadSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "pr111State": "OPEN_UNMERGED",
   "pr108State": "OPEN_UNMERGED",
   "safety": {
@@ -1884,13 +1880,14 @@
   },
   "currentAdminBranchHeadIsBeforeJsonRefresh": true,
   "latestHandoffWriteCheckpoint": {
-    "at": "2026-10-22T15:52:00+07:00",
-    "branchHead": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+    "at": "2026-10-22T15:55:00+07:00",
+    "branchHead": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
     "testedSourceSha": "78b87d71f82090cb7399a68207ef436a200d3c9f",
     "validateRun": 39750503800,
-    "previewRun": 39750503783
+    "previewRun": 39750503783,
+    "currentHeadValidateRun": 39751463904
   },
-  "latestObservedAdminHead": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "latestObservedAdminHead": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "latestObservedAdminHeadVerifiedAt": "2026-10-22T15:52:00+07:00",
   "latestObservedHeadIsTested": false,
   "previewDeployment": {
@@ -2033,14 +2030,14 @@
     }
   },
   "latestHeadVerification": {
-    "checkedAt": "2026-10-22T15:33:00+07:00",
+    "checkedAt": "2026-10-22T15:55:00+07:00",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "headSha": "11b23bb90fe7b0f6595da021d3bf1649b586c97c",
-    "validateRun": 39744215657,
-    "validateConclusion": "success",
-    "previewRun": 39742949583,
-    "previewSha": "a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93",
-    "previewConclusion": "success_on_older_sha",
+    "headSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
+    "validateRun": 39751463904,
+    "validateConclusion": "in_progress",
+    "previewRun": 39750503783,
+    "previewSha": "78b87d71f82090cb7399a68207ef436a200d3c9f",
+    "previewConclusion": "success_on_tested_parent_sha",
     "currentHeadPreview": "NOT_VERIFIED",
     "progressPercent": 50
   },
@@ -2350,7 +2347,7 @@
   },
   "currentBranchHeadBeforeHandoffUpdate": "dcb60b39d5813b82fabeab0f390826e558e7e676",
   "currentAdminBranchHeadIsBeforeHandoffUpdate": true,
-  "latestObservedAdminHeadSha": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "latestObservedAdminHeadSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "latestKeyboardTabNavigationAudit": {
     "implementedInCommit": "32c1f28662e7240353b0eda2f5daeaf22359257e",
     "changedPath": "tests/e2e/admin-static-baseline.spec.js",
@@ -2922,7 +2919,7 @@
     "progressPercent": 50,
     "nextAction": "Compare Product list #3 at 390x844 light/dark and 1280x800 against reference."
   },
-  "currentAdminBranchHeadSha": "dcb60b39d5813b82fabeab0f390826e558e7e676",
+  "currentAdminBranchHeadSha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
   "latestObservedHeadIsTestedSource": false,
   "latestProductEditorMobileInputsReview": {
     "checkedAt": "2026-10-22T03:25:42.193+07:00",
@@ -3252,5 +3249,12 @@
       "unexpectedApiPaths": 0
     },
     "nextAction": "Continue next unaccepted screen family in 12-SCREEN-REFERENCE-AUDIT.md; audit existing category/product classification (#6) using fixture-only behavior, then return to product list #3 visual parity."
+  },
+  "currentHeadValidation": {
+    "runId": 39751463904,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39751463904",
+    "sha": "c5e25325f944ba2260ca21192a08c17df8ff3a82",
+    "status": "in_progress",
+    "conclusion": null
   }
 }
