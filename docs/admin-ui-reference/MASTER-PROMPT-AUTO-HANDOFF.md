@@ -1,3 +1,18 @@
+# LIVE CONTINUITY ADDENDUM — 2026-10-22 21:20 +07:00
+
+This addendum supersedes any older checkpoint SHA or next-task statement below, but does not erase historical evidence.
+
+- **Canonical state/task queue:** `docs/admin-ui-reference/handoff/current-status.json`.
+- **Start here:** `docs/admin-ui-reference/handoff/START-HERE.md`; **next-chat prompt:** `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`.
+- **ADMIN branch HEAD before this docs-only update:** `8e02cbaa0525baf895074952c5ab968f85d0dcd2`. PR #111 was OPEN/unmerged and matched at preflight. Always fetch live HEAD and PR metadata before every write; handoff commits do not make application code tested.
+- **Last exact source/test SHA:** `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Validate #39756606343 PASS and Preview #39756606227 SUCCESS (CSS signature and login/dashboard smoke only). Latest Validate #39758657800 was on docs-only SHA `e356b312e8a7af14e91da599c26f9c77c6fba18b`. Do not claim full backend QA or all-screen acceptance.
+- **Progress:** provisional 50%, no new acceptance evidence. Recalculate only from weighted, accepted items.
+- **Next task:** inspect current Product editor #4 source and approved reference for SKU verification / AI description alignment. The proposed layout change was not committed; verify the live source first, then implement a concrete fix and exact-source regression tests. Continue Product list #3, 12-screen parity, and PR #111 scope audit.
+- **Unresolved:** 12-screen parity NOT_ACCEPTED; screen #3 PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED; AI grouping #11 BLOCKED pending approved contract; product image save/R2 and PRE/PRO migration DEFERRED_BY_OWNER.
+- **Hard limits:** ADMIN branch only; no merge PR #111/#108, no main/static changes, no Production deployment, no Access bypass/secrets, no remote D1/R2 writes or migrations. Do not stop after status reports; continue safe queued work.
+
+---
+
 ## CONTINUITY PROTOCOL — CURRENT OPERATING RULES (2026-10-22)
 
 **Đọc phần này trước mọi checkpoint lịch sử bên dưới.** Nguồn trạng thái chuẩn là `handoff/current-status.json`; hàng đợi việc cũng nằm trong đó. SHA ghi trong tài liệu chỉ là checkpoint tại thời điểm xác minh, không thay thế việc đọc HEAD/PR trực tiếp trên GitHub.
