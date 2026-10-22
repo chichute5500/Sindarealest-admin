@@ -1935,12 +1935,16 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await navigateTo('warranties');
     await expect(page.locator('#main')).toContainText('Không thể tải dữ liệu bảo hành và hỗ trợ từ máy chủ.');
     await expect(page.locator('[data-action="retry-warranties"]')).toBeVisible();
-    optionalEndpointFailures.clear();
+    // setView() calls loadData(). Keep each endpoint failing until its screen is
+    // rendered with the explicit error/retry state; disable only that endpoint
+    // immediately before clicking Retry so the retry itself can recover.
     await navigateTo('customers');
+    optionalEndpointFailures.delete('/api/admin/customers');
     await page.locator('[data-action="retry-customers"]').click();
     await expect(page.locator('.customer-table tbody')).toContainText('Khách thử nghiệm giao diện');
     await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
     await navigateTo('warranties');
+    optionalEndpointFailures.delete('/api/admin/warranties');
     await page.locator('[data-action="retry-warranties"]').click();
     await expect(page.locator('.issued-warranty-table tbody')).toContainText('UI-ONLY-WARRANTY');
     await expect(page.locator('.claim-table tbody')).toContainText('UI-ONLY-CLAIM');
