@@ -1,3 +1,22 @@
+# CURRENT STATUS OVERRIDE — 2026-10-22 (latest verified handoff refresh)
+
+This block supersedes conflicting older “latest/current/pending” statements below. Older audit records remain historical evidence only; do not treat them as current-HEAD acceptance.
+
+- Repository: `chichute5500/Sindarealest-admin`; working branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and must NOT be merged.
+- Latest known storefront/source checkpoint from the current handoff retrieval: `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6`, updating `scripts/capture-cloudflare-preview.mjs` to improve gallery screenshot timing/readiness. A later docs-only HEAD was recorded as `2ce2a2f3d966fe23578cdfe66f6136fd12020476`; refresh branch state before relying on either as current HEAD.
+- Current live-audit blocker: the audit associated with `f16acd5…` reached the Preview verification step but did not produce a new live screenshot artifact. Do NOT mark that SHA's live visual audit PASS, do not infer live parity from source tests/local fixtures, and do not reuse prior-SHA artifacts as current proof. Check the latest Actions jobs/logs and exact Cloudflare deployment SHA, then run/repair the read-only live capture path as needed.
+- Correction to audit #828: run [39736601079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601079), artifact [12406843766](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601079/artifacts/12406843766) completed successfully as a workflow, but its steps “Verify actual Cloudflare Pages deployment before manual capture/archive” and “Capture live Cloudflare Pages Preview” were SKIPPED. Therefore it is not live screenshot verification for SHA `34f64fa944159580ebb303fcbd2171630359a442`; do not use it to claim the dark 404 satin adjustment visually passed.
+- Earlier audit #825 [artifact 12407151723](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39735097393/artifacts/12407151723) is valid only for its recorded SHA `36099cf764ffe3d9bc5587acab2c03df8f7a1cfc`. Earlier exact-SHA passes (#822 and older) remain historical and do not prove the latest source.
+- Gallery capture readiness is the current targeted code/test thread: verify that the main product image matches the selected thumbnail and that `sd-slide-in-*`/`sd-slide-out-*` transition classes have cleared before capturing. Preserve current product image, product IDs/data and behavior; this is capture timing, not permission to alter catalog or image mapping.
+- Hero remains resolved and approved: `/images/hero-sd-gl052.png`. Do NOT search catalog for SKU SD-GL052, ask the user to resend it, hide/remove/replace the hero, or reopen the old SKU blocker.
+- Icon references `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` still require actual visual inspection. Until pixels are inspected and implementation evidence is captured, icon-reference parity is OPEN/UNVERIFIED. Do not describe the icon/fly-to-cart design requirements as complete merely because older tests passed.
+- QR/fulfillment stays fail-closed: no QR or transfer amount before trusted confirmation/configuration. Do not alter backend/Admin/API/schema/product data.
+- Scope lock: no Production, `main`, DNS, Admin code/branch, merge, backend/API/auth/schema/business logic/catalog/product data/image mapping/D1/R2/bindings/secrets/Access changes. Preview-only storefront and safe documentation/test work only.
+- Required next steps, in order: (1) inspect current branch HEAD and latest workflow jobs/logs; (2) establish why Preview verification/live capture did not produce an artifact; (3) verify deployment branch/SHA exactly; (4) obtain and inspect actual live screenshots plus audit JSON; (5) only then make targeted changes for observed defects and run relevant checks; (6) update the handoff with exact run/artifact/SHA and evidence. Do not rerun unrelated PASS suites.
+- No user action is currently identified as required. Continue autonomously; report only confirmed facts, label unknowns UNVERIFIED, and never claim 100% while visual/reference work remains open.
+
+---
+
 # SinDarealest ADMIN — trạng thái bàn giao mới nhất
 
 **Trạng thái khởi tạo:** `NOT YET AUDITED IN THIS HANDOFF`  
