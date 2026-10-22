@@ -20,3 +20,10 @@
 2. Read status JSON, latest-test-results, START-HERE and relevant UI/provenance references.
 3. Continue the next unresolved safe task, not a superseded failure.
 4. After source changes, validate exact SHA, synchronize/read-back handoff files, and fetch PR/HEAD again.
+
+
+## Latest sync addendum — 2026-10-22
+- Current source/test SHA: `105f46b90dc5664dd091493dbd5cea1af7796c44`; validation #39816652373 and screenshot/Preview run #39816652346 both SUCCESS.
+- Current artifact: [admin-preview-evidence-344, ID 12441639210](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39816652346/artifacts/12441639210).
+- PR #111 current changed-file metadata: 1,314; the 1,310-path census is historical.
+- Progress stays 50% PROVISIONAL; all 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated backend QA NOT_TESTED.
