@@ -848,6 +848,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#backdrop .editor').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
     await page.locator('#productTabGallery').click();
     await expect(page.locator('#productTabGallery')).toHaveText('Hình ảnh');
+    await expect(page.locator('#editorTitle')).toHaveText('Hình ảnh sản phẩm');
     await expect(page.locator('#productTabGallery')).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#imageDropZone')).toBeVisible();
     if (variant.viewport.width > 680) {
@@ -879,6 +880,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productTabPricing')).toBeFocused();
     await expect(page.locator('#productTabPricing')).toHaveText('Khác');
     await expect(page.locator('#productTabPricing')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#editorTitle')).toHaveText('Chỉnh sửa sản phẩm');
     await expect(page.locator('#productPanelPricing #pFulfillmentType')).toBeVisible();
     await expect(page.locator('#productPanelPricing #pPublished')).toHaveCount(0);
     await expect(page.locator('#productPanelPricing .product-visibility-row')).toHaveCount(0);
@@ -886,6 +888,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#imageDropZone')).toBeHidden();
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#productTabGallery')).toBeFocused();
+    await expect(page.locator('#editorTitle')).toHaveText('Hình ảnh sản phẩm');
     await expect(page.locator('#productTabGallery')).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('Home');
     await expect(page.locator('#productTabDetails')).toBeFocused();
