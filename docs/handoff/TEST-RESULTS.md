@@ -35,6 +35,13 @@ This is the single index for test, deployment and visual-audit evidence. Repeate
 | Earlier full test suite | [#39789189790](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189790) PASS | Same historical SHA |
 | Earlier Preview deployment | [#39789189767](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39789189767) PASS | Same historical SHA |
 
+## Working-efficiency protocol (owner-approved 2026-10-23)
+- The active task is singular; use parallel time only for independent, non-conflicting checks/preparation while an existing CI/deploy/capture is running.
+- Do not duplicate workflows or treat a run as validating code committed after its tested SHA.
+- Reuse PASS evidence only when the exact relevant source/scope is unchanged; otherwise rerun the smallest impacted checks.
+- Reporting does not end work. Continue until owner acceptance or a genuine owner-dependent blocker.
+- These are process rules, not new test evidence; they do not change any historical PASS/PENDING status.
+
 ## Evidence rules
 - Source tests, Preview deployment, deployment SHA, live screenshot capture and human visual acceptance are separate gates.
 - Local fixtures are not live Preview evidence.
