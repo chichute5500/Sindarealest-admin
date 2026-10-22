@@ -8,6 +8,15 @@
 - Preserve owner-provided hero `/images/hero-sd-gl052.png`. QR/payment stays fail-closed until trusted backend configuration exists.
 
 
+## Latest source/deploy handoff — 2026-10-22 11:16 UTC
+
+- PR #108 is OPEN / NOT MERGED. Latest storefront source SHA: `dff584114dfd3916219f38b24950e5bf531e2199`; documentation-only commits can move branch HEAD without changing this deployed source.
+- Validation/tests PASS [#39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097). Preview deploy job PASS [#39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), URL `https://b7858119.sindarealest2.pages.dev/`, stable alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`.
+- Live visual audit [#39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207) was still pending at last poll. Next chat must read status/artifact before making any parity claim.
+- Latest patch is conditional Dark hero matte keying, not a radial mask: sample 8 corners/edge points and reuse existing SVG background filter only at >=6 neutral-light votes. Hero asset path remains unchanged. Keep only if screenshots show improvement without clipping/recolouring the shoe.
+- Historical intermediate commits failed tests because test-double `classList` was missing and then an assertion expected the non-optional call. Both were corrected before the passing validation SHA above.
+- All scope lock rules in CURRENT-STATE remain in force; no gallery image mapping fix is permitted.
+
 ## Latest inspection note — 2026-10-22
 The newer artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837) has 128 genuine Preview captures and both references/icon boards, but its deployment-verification JSON is `DEPLOYMENT_METADATA_UNVERIFIED` (`e916ce...` expected versus deployed `5f1be31...`). Use it for visual observation only, not exact-SHA acceptance. Read CURRENT-STATE.md for the full screenshot review. The “Tuyển chọn 25” gallery is visibly inconsistent (black boots on image 01/19; different green/white sneaker on image 02/19); product/image mapping remains out of scope and unchanged.
 
