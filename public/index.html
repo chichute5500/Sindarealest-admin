@@ -573,6 +573,15 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
  #order .order-commitment-icon svg{width:14px;height:14px}
 }
 </style>
+
+<style id="hero-image-blend-owner-asset">
+/* Owner-provided standalone Hero artwork: blend its pale canvas into the storefront instead of showing a pasted rectangle. Keep the asset and catalog data untouched. */
+.hero-visual{background:transparent!important;border-color:transparent!important;box-shadow:none!important;}
+.hero-visual-glow{inset:14% 12%!important;background:radial-gradient(ellipse,rgba(132,190,230,.14),transparent 70%)!important;filter:blur(10px)!important;}
+.hero-visual img{mix-blend-mode:multiply;mask-image:radial-gradient(ellipse 80% 76% at 50% 48%,#000 45%,rgba(0,0,0,.98) 59%,rgba(0,0,0,.78) 72%,rgba(0,0,0,.32) 87%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 80% 76% at 50% 48%,#000 45%,rgba(0,0,0,.98) 59%,rgba(0,0,0,.78) 72%,rgba(0,0,0,.32) 87%,transparent 100%);}
+html.dark .hero-visual img{mix-blend-mode:normal;}
+@media(max-width:760px){.hero-visual{background:transparent!important;border-color:transparent!important;box-shadow:none!important}.hero-visual img{mask-image:radial-gradient(ellipse 84% 78% at 50% 47%,#000 43%,rgba(0,0,0,.98) 58%,rgba(0,0,0,.76) 73%,rgba(0,0,0,.28) 88%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 84% 78% at 50% 47%,#000 43%,rgba(0,0,0,.98) 58%,rgba(0,0,0,.76) 73%,rgba(0,0,0,.28) 88%,transparent 100%);}}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
