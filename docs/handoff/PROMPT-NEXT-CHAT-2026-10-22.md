@@ -1,6 +1,6 @@
 # LATEST CHECKPOINT — 2026-10-22
 
-Last non-documentation source SHA: `de62c546bab7e175347a4efb4fda5ec54c014a38`. Documentation-only commits have since advanced the branch HEAD to `29e5d6f75aec714cfe6691ef43a9e1c69a337660`; storefront source has not changed after the source SHA above.. PR #108 remains open/unmerged.
+Last non-documentation source SHA: `de62c546bab7e175347a4efb4fda5ec54c014a38`. Documentation-only commits have since advanced the branch HEAD; storefront source has not changed after the source SHA above. PR #108 remains open/unmerged.
 
 Current SHA checks: [source validation #4448 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936598), [Preview deploy #537 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936551), [Admin Preview Playwright #751 PASS (read-only only)](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936572). [Live visual audit #807 is pending](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39723936501); do not call live visual verification PASS until its artifact and deployment SHA are inspected.
 
