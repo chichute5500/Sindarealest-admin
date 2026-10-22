@@ -1,5 +1,5 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
-Updated: 2026-10-23
+Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
 ## Read this file first
 This is the single current source of truth. Re-fetch GitHub state before acting; never treat a SHA copied into a document as the live branch HEAD.
@@ -20,7 +20,7 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 
 ## Owner-approved working protocol (2026-10-23)
 - Work one acceptance item to completion before switching to the next main item.
-- Do not stop after a progress report. While CI/deploy/capture runs, work immediately on independent, non-conflicting preparation/inspection; resume checking results as soon as available.
+- Mandatory report-then-continue: a report is not a stopping point. Immediately perform the next safe action for the same active task. While CI/deploy/capture runs, do independent, non-conflicting preparation/inspection and then inspect the result. Never wait for the owner to say “continue.” Stop only for a genuine owner decision/visual acceptance, missing permission, or a real external blocker; continue independent safe work while blocked.
 - Reuse valid checks for unchanged code and run only missing/stale/impacted checks. Never duplicate a workflow or apply a result to a different SHA.
 - Keep separate gates for source tests, deployment SHA, live screenshots, and owner visual acceptance.
 - Owner-confirmed PASS locks that item until explicit permission to reopen. Do not ask the owner to approve these already-agreed process rules again.
@@ -48,7 +48,8 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 ## Immediate next actions
 1. Re-fetch current HEAD, PR #108, Actions and Cloudflare deployment metadata before any new source change.
 2. Keep Hero paused and untouched; preserve its owner-uploaded source/derivative.
-3. Continue the next unfinished non-Hero storefront section from current source/tests/evidence. Complete one section at a time; run targeted checks only when needed. Never deploy Production or touch Admin/backend/catalog data.
+3. Continue the next unfinished non-Hero storefront section from current source/tests/evidence. Identify a concrete issue before editing; complete one section at a time and run only impacted checks. After each report, keep executing rather than waiting for another instruction. Never deploy Production or touch Admin/backend/catalog data.
+4. Before handoff, reconcile `CURRENT-STATE.md`, `TASKS.md`, the active prompt and the visual-audit pointer; archive obsolete instructions instead of leaving contradictory active directions.
 
 ## Evidence rules
 - Source tests, deploy, deployment SHA, live screenshot capture and human visual acceptance are separate gates.
