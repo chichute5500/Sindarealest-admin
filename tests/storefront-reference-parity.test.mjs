@@ -366,7 +366,9 @@ assert.ok(
   'Trust chip SVGs must remain navy and compact inside the existing circular glass treatment.'
 );
 
-const heroMatteKey = html.match(/function syncHeroBackgroundKey\(img\)\{([\\s\\S]*?)\n\}/)?.[1] || '';
+const heroMatteStart = html.indexOf('function syncHeroBackgroundKey(img){');
+const heroMatteEnd = html.indexOf('\n}', heroMatteStart);
+const heroMatteKey = heroMatteStart >= 0 && heroMatteEnd > heroMatteStart ? html.slice(heroMatteStart, heroMatteEnd) : '';
 assert.ok(heroMatteKey.includes('keyed=votes>=6;')
   && heroMatteKey.includes('ctx.drawImage(img,0,0,24,24)')
   && heroMatteKey.includes('img.classList.toggle(\'sd-hero-white-background-keyed\',keyed);'),
