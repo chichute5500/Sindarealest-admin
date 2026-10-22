@@ -1,3 +1,19 @@
+# CURRENT STATUS OVERRIDE — 2026-10-22 (supersedes conflicting checkpoints below)
+
+- Active repo/branch: `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19`. PR #108 must remain OPEN/unmerged.
+- Latest known storefront/source checkpoint: `f16acd5fe8ac5a7f8fbc2fb85dff4b440387e5c6` (`scripts/capture-cloudflare-preview.mjs`, gallery-transition capture wait). A docs-only HEAD `2ce2a2f3d966fe23578cdfe66f6136fd12020476` was previously observed; always fetch current branch HEAD before acting.
+- Current live blocker: audit at `f16acd5…` did not produce a new live screenshot artifact because Preview verification/capture did not complete successfully. Diagnose the latest Actions job/log and exact deployment SHA; no live PASS until a fresh artifact verifies branch + deployed SHA and actual screenshots are inspected.
+- Correction: audit #828 run [39736601079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601079) uploaded artifact [12406843766](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39736601079/artifacts/12406843766), but live-deployment verification and live capture steps were SKIPPED. It is not live visual evidence for `34f64fa944159580ebb303fcbd2171630359a442`.
+- Prior-SHA evidence is historical only. Audit #825 artifact [12407151723](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39735097393/artifacts/12407151723) belongs to SHA `36099cf764ffe3d9bc5587acab2c03df8f7a1cfc`; do not use it as proof for newer code.
+- Gallery capture code is intended to wait until the displayed image URL matches the selected thumbnail and all `sd-slide-in-*` / `sd-slide-out-*` classes clear. Confirm this with live screenshots; do not change product data or image mapping.
+- Hero is resolved: keep `/images/hero-sd-gl052.png`. Do not search SKU SD-GL052, ask for the image again, or hide/replace the hero.
+- Icon references `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` still require visual inspection. Icon/reference parity is OPEN/UNVERIFIED.
+- QR/fulfillment remains fail-closed until trusted backend confirmation/configuration exists.
+- Scope: no Production/main/DNS, Admin code/branch, merge, backend/API/auth/schema/product data/image mapping/D1/R2/bindings/secrets/Access changes. Preview-only and docs/tests.
+- Next actions: fetch current HEAD; inspect latest workflow jobs/logs; fix capture/deployment verification; verify exact Preview SHA; inspect live artifact screenshots and JSON; then make only evidence-based targeted fixes. Do not rerun unrelated PASS suites or claim 100% while reference parity remains open. No user action is currently required; continue autonomously.
+
+---
+
 ## CHECKPOINT CHỐNG LÀM LẠI — 2026-10-22 (đọc đầu tiên, thay cho mọi trạng thái cũ mâu thuẫn)
 
 ### Source of truth tại checkpoint
