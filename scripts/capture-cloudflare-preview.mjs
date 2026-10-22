@@ -68,6 +68,8 @@ const audit = {
   productDetailChecks: [],
   iconStateChecks: [],
   cartAddStateChecks: [],
+  flyToCartChecks: [],
+  cartAnimationEdgeChecks: [],
   brokenImages: [],
   accessServiceTokenConfigured: Object.keys(accessHeaders).length > 0,
   sourceCommit: process.env.SOURCE_SHA || null,
@@ -843,6 +845,7 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
       imageRect: r ? { x:r.x, y:r.y, width:r.width, height:r.height } : null,
     };
   }, productId);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   const before = await page.evaluate(() => {
     let cart = {};
     try { cart = JSON.parse(localStorage.getItem('sd-cart') || '{}') || {}; } catch {}
@@ -853,6 +856,9 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
     const r = image?.getBoundingClientRect();
     return {
       productId, title, skuText,
+      imageSrc: document.querySelector('#detailMainImage')?.currentSrc || document.querySelector('#detailMainImage')?.src || '',
+      imageReady: Boolean(document.querySelector('#detailMainImage')?.complete && document.querySelector('#detailMainImage')?.naturalWidth > 0),
+      galleryImageCount: document.querySelectorAll('#detailThumbs .detail-thumb').length,
       quantity: Number(cart[productId] || 0),
       total: Object.values(cart).reduce((sum, value) => sum + Number(value || 0), 0),
       badge: document.querySelector('#cartCount')?.textContent?.trim() || '0',
@@ -986,6 +992,23 @@ async function captureAddToCartFeedback(page, viewport, theme, label, route) {
 
 async function captureProductDetailFlow(page, viewport, theme, label) {
   let cardButton = page.locator('#catalogGrid [data-open-product]').first();
+  if (label === 'mobile-390-light') {
+    const galleryProduct = await page.evaluate(() => {
+      try {
+        for (const card of document.querySelectorAll('#catalogGrid [data-open-product]')) {
+          const key = card.getAttribute('data-open-product');
+          const product = products.find(item => String(item.id || item.slug) === String(key));
+          if (product && allImages(product).length > 1) return { id: key, imageCount: allImages(product).length };
+        }
+      } catch {}
+      return null;
+    });
+    if (galleryProduct?.id) {
+      const safeKey = String(galleryProduct.id).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      const galleryCard = page.locator('#catalogGrid [data-open-product="' + safeKey + '"]').first();
+      if (await galleryCard.count().catch(() => 0) > 0) cardButton = galleryCard;
+    }
+  }
   if (await cardButton.count().catch(() => 0) === 0) cardButton = page.locator('#featuredGrid [data-open-product]').first();
   if (await cardButton.count().catch(() => 0) === 0) {
     audit.productDetailChecks.push({ context: label, status: 'NOT TESTED', reason: 'No live product card rendered.' });

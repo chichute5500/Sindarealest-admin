@@ -78,6 +78,30 @@ assert.ok(storefrontHtml.includes("function addToCart(id){const p=products.find(
 assert.ok(storefrontHtml.includes('@media(prefers-reduced-motion:reduce)'),
   'Control feedback must remain covered by the storefront reduced-motion policy.');
 
+assert.ok(storefrontHtml.includes('function selectedCartSourceImage(button)')
+  && storefrontHtml.includes("if(button.id==='detailAdd')return $('#detailMainImage')")
+  && storefrontHtml.includes('const selected=track?.children[index]')
+  && storefrontHtml.includes("return productCard.querySelector('.product-photo img,.feature-single,.feature-slide')"),
+  'The shared cart flight must use the currently displayed detail image, selected featured-carousel image, or actual product-card image.');
+assert.ok(storefrontHtml.includes('function addToCartFromControl(id,button)')
+  && storefrontHtml.includes("$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget))")
+  && storefrontHtml.includes('e.stopPropagation();addToCartFromControl(add.dataset.add,add);return'),
+  'Every product add control must invoke one shared feedback wrapper while preserving the single existing addToCart business operation.');
+assert.ok(storefrontHtml.includes('function flyProductImageToCart(sourceImage,productId)')
+  && storefrontHtml.includes("clone.dataset.cartTargetId='cartOpen'")
+  && storefrontHtml.includes("clone.dataset.durationMs='720'")
+  && storefrontHtml.includes("clone.dataset.productId=String(productId||'')")
+  && storefrontHtml.includes("clone.className='sd-fly-to-cart-clone'")
+  && storefrontHtml.includes("const liveTarget=$('#cartOpen')"),
+  'A successful add may animate a non-interactive clone to the real header cart using the exact source image, product id, and 720ms target-tracking flight.');
+assert.ok(storefrontHtml.includes('if(cartMotionReduced()||!sourceImage||!sourceImage.complete||sourceImage.naturalWidth<1)return false')
+  && storefrontHtml.includes('function confirmHeaderCartAdd()')
+  && storefrontHtml.includes('#cartOpen.sd-cart-bump{animation:sdCartAddBump')
+  && storefrontHtml.includes('#cartOpen.sd-cart-confirmed')
+  && storefrontHtml.includes('@media(prefers-reduced-motion:reduce){#cartOpen.sd-cart-bump{animation:none!important;transform:none!important}'),
+  'Missing/broken source imagery must not block the cart mutation; cart feedback is success-only and reduced-motion has no fly/bounce animation.');
+
+
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
 assert.ok(storefrontHtml.includes('id="accountAddressAction"') && storefrontHtml.includes('id="accountAddressView"') && storefrontHtml.includes('id="accountAddressForm"'), 'Account must expose an editable shipping-address book.');
 assert.ok(storefrontHtml.includes('#accountAddressView[hidden]{display:none!important}'), 'The editable address panel must remain hidden until the user selects it; a display:grid rule must not override the hidden state.');
