@@ -1,17 +1,21 @@
-> **FOLLOW-UP CHECKPOINT — 2026-10-22, audit #808 artifact independently inspected; supersedes any claim below that the current branch HEAD was already audited.**
->
-> - Current branch HEAD at inspection: `295d8c0c7f302eaf47cf1d69ce735ba3adf956e5`; it is a documentation-only commit whose parent is audited source SHA `ca5edf1acea5f778c5179f356615afc327b5941a`. Changed files: HANDOFF.md, TEST-RESULTS.md, visual-audit-progress-2026-10-19.md, PROMPT-NEXT-CHAT-2026-10-22.md, icon-system-inventory.md. No storefront source changed in that commit.
-> - Workflow run status: Validate #4460 PASS, Preview Deploy #546 PASS, Admin Preview Playwright #760 PASS (read-only), Live visual audit #808 PASS; all four runs were executed on `ca5edf1acea5f778c5179f356615afc327b5941a`.
-> - Artifact #808: [12402134680](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39725065434/artifacts/12402134680), 119 screenshots; all 8 viewport/theme combinations; 12 route checks; 68 section checks; 8 commerce states; 4 product-detail contexts; 4 icon checks; 4 add-to-cart checks; 6 fly-to-cart checks; 2 animation-edge checks; 20 first-paint frames and 4 videos. Overflow=0; console/page/HTTP errors=0; failed requests=0; broken-image contexts=0; read-only violations=0; hard failures=0.
-> - Hero image verification passed in all 8 contexts: `/images/hero-sd-gl052.png` loaded, visible, frame not collapsed. Do not search for SKU SD-GL052 or replace/remove the user-provided hero image.
-> - Visual artifact inspection: mobile gallery screenshot shows selected alternate shoe image in the main gallery and matching selected thumbnail, stable full image (no visible crop in the captured frame); mobile product detail Light/Dark captured; no black band visible in inspected Dark capture. These are observations of those artifact frames, not a claim that every possible interaction has been exhaustively proven.
-> - Fly-to-cart checks all PASS; sampled duration 720ms, correct product IDs/source image, one quantity increment, matching badge, success toast, no layout shift. Reduced-motion and unavailable-source-image edge cases PASS.
-> - Deployment verification JSON in artifact says `passed=true`, preview alias correct, and expected SHA equals actual deployed SHA `ca5edf1acea5f778c5179f356615afc327b5941a`. **That proves the deployment matches the audited source SHA, not the later docs-only branch HEAD `295d8c0c7f302eaf47cf1d69ce735ba3adf956e5`. Do not describe audit #808 as exact-HEAD proof for the current branch until a new Preview deployment and live audit run on the new HEAD both verify matching metadata.**
-> - Next action: trigger/allow Validate, Preview Deploy, read-only Admin smoke, and live visual audit on the updated branch HEAD; inspect the new deployment-verification.json and artifact before changing completion estimate. PR #108 stays OPEN; no merge, Production, main, Admin code, backend/API, product data, bindings, secrets, D1/R2 or Access changes.
->
-> ---
->
-## VERIFIED STOREFRONT ICON + CART-ANIMATION CHECKPOINT — 2026-10-22 (audit #808)
+> **LATEST VERIFIED CHECKPOINT — 2026-10-22, Live audit #822 exact-SHA PASS on source SHA `76a1241e1bdfc5af75a17e3fc69cbfc17cda17e1`; PR #108 remains OPEN and unmerged.**
+
+## Current verified checkpoint — 2026-10-22
+
+- **Repository / branch / PR:** `chichute5500/Sindarealest-admin` / `fix/liquid-glass-audit-2026-10-19` / [PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108), OPEN and not merged. Production, `main`, Admin code, backend/API, product data/mappings, D1/R2, bindings, secrets and Access policy remain out of scope.
+- **Exact source SHA:** `76a1241e1bdfc5af75a17e3fc69cbfc17cda17e1`. Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/; exact deployment ID `d4b6b30d-e2fb-4421-82e0-5d7187a01c73`; deployed SHA equals expected SHA.
+- **Workflow results on this SHA:** [Validate #4493 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39733809663), [Preview Deploy #561 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39733809705), [Admin Preview Playwright #775 PASS — read-only smoke](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39733809620), [Live visual audit #822 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39733809701), [artifact #12405683796](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39733809701/artifacts/12405683796).
+- **Live artifact:** 123 screenshots; 8/8 viewport-theme combinations (360×800, 390×844, 768×1024, 1440×900 in Light/Dark); 13 route checks; 69 section checks; 8 commerce states; 4 product-detail contexts; 4 icon-state checks; 4 add-to-cart checks; 6 fly-to-cart checks; 2 animation-edge checks; 20 first-paint frames and 4 videos. Responsive overflow, console errors, page errors, HTTP errors, failed requests, broken images, read-only violations and hard failures are all 0.
+- **404 is now verified, not assumed:** the dedicated unknown path returns HTTP 404 and renders the visible `public/404.html` heading and home link. Both `not-found-mobile-light-390x844.png` and `not-found-mobile-dark-390x844.png` are present in the live artifact. Dark 404 now adds satin-fold lighting, readable text and a working home link; its visual check is part of the audit pass condition. Canonical `/sanpham/*` product routes still return HTTP 200 and pass direct-open/reload/title checks; legacy `/san-pham/*` fallback remains explicit.
+- **Docs-only deploy protection:** `.github/workflows/deploy-storefront-preview.yml` now ignores `docs/**` for push-triggered deployments while preserving `workflow_dispatch`. The rule is covered by a regression test and was validated/deployed/audited on this SHA. A subsequent docs-only commit must not redeploy the storefront or move the verified Preview SHA; Validate/Admin checks may still run.
+- **Hero remains solved:** retain the user-provided `/images/hero-sd-gl052.png`; do not search the catalog for SKU SD-GL052 or remove/replace the hero image.
+- **Remaining work / completion estimate:** approximately **82%** (working estimate, not a claim of full parity). The icon set is not fully finished: order-flow and commitment areas still use text glyphs (`◇`, `✧`, `◷`, `✓`, `✦`) and must be compared against `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png` before targeted SVG replacement. Continue visual comparison of the remaining storefront sections and interactions; do not rerun passed tests without a specific reason.
+- **QR checkout/fulfillment remains fail-closed:** do not show a QR or payment amount until trusted backend confirmation/config exists. This is an out-of-scope backend/Admin dependency, not a reason to fabricate a storefront workaround.
+
+
+---
+
+## Historical icon/cart checkpoint — audit #808 (superseded by live audit #822)
 
 - Live-tested branch `fix/liquid-glass-audit-2026-10-19`, audited SHA `ca5edf1acea5f778c5179f356615afc327b5941a`; PR #108 remains OPEN and unmerged.
 - Current verified workflow evidence for that SHA:
