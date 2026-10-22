@@ -1,6 +1,8 @@
-# LATEST OVERRIDE — 2026-10-22 11:16 UTC
+# LATEST OVERRIDE — 2026-10-22 11:20 UTC
 
 PR #108 remains OPEN / MUST NOT MERGE. Latest **storefront source** SHA is `dff584114dfd3916219f38b24950e5bf531e2199`; docs-only commits may make current branch HEAD newer. Validation/tests PASS: [#39769146097](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146097). Preview deploy PASS: [#39769145975](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769145975), deployment URL `https://b7858119.sindarealest2.pages.dev/`, alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. Latest live visual audit [#39769146207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39769146207) was PENDING with no artifact at last check.
+
+Documentation sync triggered PR validation jobs on each docs-only commit even though docs are excluded from push deploy triggers. Current source evidence is run #39769146097 for source SHA `dff584114dfd3916219f38b24950e5bf531e2199`; do not treat later docs-only HEAD validation runs as new storefront deployments. Minimize future docs commits by batching changes when possible.
 
 Current UI patch replaced a visually ineffective radial edge mask with conditional Dark-mode matte keying: sample 8 edge/corner points from the unchanged owner-supplied hero image; use existing SVG matte filter only when >=6 neutral/light votes pass. Do not accept/reject until you download and inspect the live artifact (Dark 390×844 and 1440×900, plus Light comparison). If rectangle remains or product edges/colour suffer, revert this helper + filter + test assertion; do not stack filters. Full validation passed on source SHA above after two intermediate test failures were repaired (mock image missing `classList`, then stale optional-chain assertion).
 
