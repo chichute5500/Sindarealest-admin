@@ -4,8 +4,8 @@
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "protectedStaticWebsiteBranch": "fix/liquid-glass-audit-2026-10-19",
-  "capturedAt": "2026-10-22T18:44:39+07:00",
-  "currentHeadAtCheckpoint": "b7a466f95b8ad4b5956540d0bdfef89e5dd0ff8e",
+  "capturedAt": "2026-10-22T18:50:41+07:00",
+  "currentHeadAtCheckpoint": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
   "currentHeadMatchesPr111": true,
   "latestApplicationSourceCommit": "dca19a2af32a78390878b9ccfa5c7c26b816f2ff",
   "progressPercent": 50,
@@ -119,7 +119,25 @@
       "scripts/deploy-cloudflare.mjs",
       ".github/workflows/liquid-glass-visual-preview.yml"
     ],
-    "warning": "Diff paths do not establish authorship; ancestry audit remains."
+    "warning": "Diff paths do not establish authorship; ancestry audit remains.",
+    "checkedAt": "2026-10-22T18:50:41+07:00",
+    "mergeBaseSha": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
+    "staticHead": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
+    "adminHead": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
+    "branchesDiverged": true,
+    "adminAheadBy": 890,
+    "staticAheadBy": 915,
+    "inheritedPaths": [
+      "public/index.html",
+      ".github/workflows/liquid-glass-visual-preview.yml",
+      "scripts/setup-cloudflare.mjs",
+      "scripts/deploy-cloudflare.mjs"
+    ],
+    "postMergeBasePaths": [
+      "migrations/0009_fulfillment_and_manual_payments.sql",
+      "functions/api/admin/payment-transactions.js",
+      "functions/api/admin/payment-requests.js"
+    ]
   },
   "blockers": [
     {
@@ -160,5 +178,16 @@
     "Do not mark whole-screen PASS solely from CI, assertions, fixtures or login smoke.",
     "Continue with the next safe queued task after each report."
   ],
-  "previousLargeResultsArchivedAt": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22/latest-test-results.json"
+  "previousLargeResultsArchivedAt": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22/latest-test-results.json",
+  "deploymentReadinessPotentialBlocker": {
+    "status": "POTENTIAL_BLOCKER_NOT_VERIFIED",
+    "migration": "migrations/0009_fulfillment_and_manual_payments.sql",
+    "sourceRequirement": "payment API routes query order_payment_requests, order_payment_transactions, fulfillment_type and payment_terms_confirmed_at introduced by migration 0009.",
+    "setupScriptPath": "scripts/setup-cloudflare.mjs",
+    "deployScriptPath": "scripts/deploy-cloudflare.mjs",
+    "verifiedFinding": "Neither setup nor deploy script contains a reference/preflight for migration 0009 or its new schema; tests/check-migrations.mjs runs a temporary local D1 migration check for 0009.",
+    "limitation": "No remote D1 schema inspection, setup/deploy execution or migration was performed. This does not prove the configured remote D1 lacks migration 0009.",
+    "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
+  },
+  "note": "Current source validation is green on exact HEAD 5497d4d3b51d32064a9a993e0f891ca672c543c1. Visual matrix remains sourced from dca19a2. Source-level audit found a potential 0009 setup/deploy preflight gap; remote schema was not inspected."
 }

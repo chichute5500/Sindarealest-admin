@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-22T18:44:39+07:00",
+  "updatedAt": "2026-10-22T18:50:41+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "checkpointSemantics": "HEAD below was verified immediately before this documentation-only consolidation commit. Each new session must fetch the live branch and PR HEAD again.",
@@ -83,7 +83,7 @@
     "108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "0ec126c02fa87e11d4e5d45e95ddd19472bfe90c",
+      "headSha": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
@@ -100,7 +100,7 @@
     }
   },
   "pr111ScopeAudit": {
-    "checkedAt": "2026-10-22T18:44:39+07:00",
+    "checkedAt": "2026-10-22T18:50:41+07:00",
     "status": "PARTIAL_NOT_ACCEPTED",
     "fileCount": 1285,
     "auditFile": "docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md",
@@ -128,7 +128,75 @@
       "txt": 1,
       "zip": 1
     },
-    "finding": "Diff contains storefront/API/migration/deploy/workflow paths. Must distinguish inherited from branch-authored changes using merge-base/path evidence before remediation."
+    "finding": "Diff contains storefront/API/migration/deploy/workflow paths. Must distinguish inherited from branch-authored changes using merge-base/path evidence before remediation.",
+    "mergeBase": {
+      "sha": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/commit/a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
+      "message": "Link prompt completeness audit from handoff start page",
+      "authoredAt": "2026-10-19T19:06:41Z"
+    },
+    "currentBranchComparison": {
+      "baseBranch": "fix/liquid-glass-audit-2026-10-19",
+      "baseHead": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
+      "adminHead": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
+      "baseStatus": "diverged",
+      "adminAheadBy": 890,
+      "staticAheadBy": 915,
+      "mergeBaseSha": "a3834fed3eb1c012b188d7c95d14ec3d15e3969f",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/compare/fix/liquid-glass-audit-2026-10-19...5497d4d3b51d32064a9a993e0f891ca672c543c1"
+    },
+    "provenance": {
+      "inheritedBeforeMergeBase": [
+        {
+          "path": "public/index.html",
+          "lastRelevantCommit": "a9456c3071bfc6070645408f32f82f1163df6a54",
+          "date": "2026-10-19T08:32:59Z"
+        },
+        {
+          "path": ".github/workflows/liquid-glass-visual-preview.yml",
+          "lastRelevantCommit": "fa084dd8a6b208b43900a6dc7e2d95a248bbdbdd",
+          "date": "2026-10-19T00:35:38Z"
+        },
+        {
+          "path": "scripts/setup-cloudflare.mjs",
+          "lastRelevantCommit": "e5bd3821cdd80206651f99365a16d8484164905b",
+          "date": "2026-10-19T05:44:14Z"
+        },
+        {
+          "path": "scripts/deploy-cloudflare.mjs",
+          "lastRelevantCommit": "5e8bda2394c060cb105a90c1311d9c6027e3be92",
+          "date": "2026-10-19T05:37:01Z"
+        }
+      ],
+      "authoredAfterMergeBase": [
+        {
+          "path": "migrations/0009_fulfillment_and_manual_payments.sql",
+          "lastRelevantCommit": "24181fd2fb166bc13fb7840d77cb53cefa30035a",
+          "date": "2026-10-21T07:17:54Z"
+        },
+        {
+          "path": "functions/api/admin/payment-transactions.js",
+          "lastRelevantCommit": "d3fa9b85be20d832cbf24678dd7f3c7d862c1e64",
+          "date": "2026-10-21T11:26:34Z"
+        },
+        {
+          "path": "functions/api/admin/payment-requests.js",
+          "lastRelevantCommit": "6cfcd864793180cb4e3bc6e48a9ca3def547c06b",
+          "date": "2026-10-21T06:41:55Z"
+        }
+      ],
+      "interpretation": "The public storefront/visual-preview workflow/setup/deploy files in the PR diff are inherited at the merge base, not evidence of recent post-split ADMIN edits. They remain in the PR diff against main, so a merge would still include them. New payment/fulfillment migration and API routes were added after split and require focused review."
+    },
+    "deploymentReadinessPotentialBlocker": {
+      "status": "POTENTIAL_BLOCKER_NOT_VERIFIED",
+      "migration": "migrations/0009_fulfillment_and_manual_payments.sql",
+      "sourceRequirement": "payment API routes query order_payment_requests, order_payment_transactions, fulfillment_type and payment_terms_confirmed_at introduced by migration 0009.",
+      "setupScriptPath": "scripts/setup-cloudflare.mjs",
+      "deployScriptPath": "scripts/deploy-cloudflare.mjs",
+      "verifiedFinding": "Neither setup nor deploy script contains a reference/preflight for migration 0009 or its new schema; tests/check-migrations.mjs runs a temporary local D1 migration check for 0009.",
+      "limitation": "No remote D1 schema inspection, setup/deploy execution or migration was performed. This does not prove the configured remote D1 lacks migration 0009.",
+      "nextAction": "Keep migration/deploy readiness as a review blocker; consider a fail-closed preflight/test change only within authorized source scope. Do not execute remote operations."
+    }
   },
   "lastCompletedTask": "Verified live GitHub state/workflow; opened reference and Product list #3 screenshot from artifact #311; enumerated 1,285 PR #111 paths; corrected official 12-screen indexing in current handoff.",
   "currentTask": "Continue Product list #3 same-viewport/theme reference comparison; change source only if a concrete ADMIN-only gap is proven.",
@@ -210,8 +278,12 @@
   "ownerActionRequiredNow": "No action needed for documentation consolidation. Authenticated QA needs legitimate Preview identity; AI grouping needs approved contract; R2/PRE-PRO remain deferred.",
   "legacyArchiveRoot": "docs/admin-ui-reference/handoff/history/legacy-2026-10-22",
   "latestCheckpointVerification": {
-    "pr108Head": "0ec126c02fa87e11d4e5d45e95ddd19472bfe90c",
+    "pr108Head": "fb997b448a80a0bc9f34e75b4a31b7b450951fed",
     "pr108State": "open",
-    "pr108Merged": false
+    "pr108Merged": false,
+    "at": "2026-10-22T18:50:41+07:00",
+    "pr111Head": "5497d4d3b51d32064a9a993e0f891ca672c543c1",
+    "pr111State": "open",
+    "pr111Merged": false
   }
 }

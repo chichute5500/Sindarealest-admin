@@ -22,3 +22,9 @@ Tiếp tục việc thực tế trên GitHub; báo cáo xong phải làm tiếp 
 
 ## Guardrails
 Không merge #111/#108; không sửa main/static; không Production deploy; không bypass Access hoặc đọc/đổi secrets; không remote D1/R2 writes/migrations/setup/deploy; không tạo dữ liệu/ảnh/API contract giả. Mỗi source change phải có regression, exact SHA, readback và kiểm tra CI.
+
+
+## New source-only release-readiness finding (2026-10-22T18:50:41+07:00)
+PR #111 and the static branch share merge base `a3834fed3eb1c012b188d7c95d14ec3d15e3969f`; they are independently diverged, so do not sync them. Static `public/index.html`, static preview workflow and setup/deploy scripts' latest path changes predate the merge base and appear inherited, though still in the PR diff vs `main`.
+
+Migration `0009_fulfillment_and_manual_payments.sql` and payment ledger routes are post-merge-base Admin changes. Both `scripts/setup-cloudflare.mjs` and `scripts/deploy-cloudflare.mjs` lack a 0009/schema preflight, while `scripts/check-migrations.mjs` tests 0009 only against temporary local D1. Track this as POTENTIAL_BLOCKER_NOT_VERIFIED; do not inspect/write remote D1 or auto-run migration. Continue the higher-priority #3 UI task first.

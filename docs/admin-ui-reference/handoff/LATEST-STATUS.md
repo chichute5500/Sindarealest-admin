@@ -9,3 +9,10 @@
 - Blockers: backend QA NOT_TESTED; AI grouping BLOCKED; R2 save and PRE/PRO migrations DEFERRED_BY_OWNER.
 
 Next: #3 matched-state comparison → #4 → #6/#7 → remaining screens and read-only scope audit. No merge, Production deploy, main/static edits, Access/secrets bypass or remote D1/R2 write.
+
+
+## Source-only scope addendum — 2026-10-22T18:50:41+07:00
+- ADMIN/static merge base: `a3834fed3eb1c012b188d7c95d14ec3d15e3969f`; branches diverged (ADMIN ahead 890 commits, static ahead 915 at comparison).
+- `public/index.html`, the static visual-preview workflow and setup/deploy scripts have path-history commits before this merge base; they appear inherited in the PR diff against main rather than recent post-split Admin edits.
+- New payment/fulfillment migration `0009` and payment API routes were added after the merge base. Setup/deploy scripts do not reference/preflight `0009`; local `check-migrations.mjs` does test it against temporary D1. This is a potential deployment-readiness blocker, NOT proof the remote database lacks the schema. No remote operations were performed.
+- [Validate #39773285617](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39773285617) PASS on exact ADMIN HEAD `5497d4d3b51d32064a9a993e0f891ca672c543c1`.
