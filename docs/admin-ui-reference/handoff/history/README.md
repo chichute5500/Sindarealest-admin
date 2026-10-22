@@ -10,6 +10,10 @@ Do not commit generated Playwright screenshot matrices into this history directo
 
 New full-resolution screenshots and metadata belong in the corresponding GitHub Actions artifact, as already configured by `.github/workflows/admin-preview-diagnostics.yml`. The latest successful matrix recorded before this cleanup is [run #39821242400](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39821242400), artifact `admin-preview-evidence-346` (102 PNGs; 16 login-shell captures, 86 read-only fixture screenshots, 78 fixture metrics). That artifact has a 14-day retention and is not authenticated backend acceptance.
 
+## Superseded handoff snapshots
+
+The duplicated `history/legacy-2026-10-22/` copies of `START-HERE.md`, prompts, status files, screen audit, and reference instructions were removed because the canonical live versions remain in the parent handoff folder and the snapshots contain stale SHAs. This cleanup does not remove per-run `report.md`, `metadata.json`, or `preview-diagnostics.json` records. The old `PROMPT-COMPLETENESS-AUDIT.md` was also removed; `START-HERE.md` is the single entry point and `PROMPT-NEXT-CHAT.md` is the active prompt.
+
 ## Evidence rules
 
 - Keep the approved UI reference and application source files; do not replace the reference with a generated screenshot.
