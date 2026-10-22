@@ -60,7 +60,7 @@ assert.ok(edgeProcessor.includes("padding = FEATHER_RADIUS * 3")
   && edgeProcessor.includes("blurred_padded_alpha = padded_alpha.filter(")
   && edgeProcessor.includes("padded_source.alpha_composite(source, (padding, padding))")
   && edgeProcessor.includes("padded_source.putalpha(new_alpha)")
-  && edgeProcessor.includes('"output_keeps_transparent_padding": result.size == [width + padding * 2, height + padding * 2]')
+  && edgeProcessor.includes('"output_keeps_transparent_padding": list(result.size) == [width + padding * 2, height + padding * 2]')
   && !edgeProcessor.includes(".crop((padding, padding, padding + width, padding + height))")
   && edgeProcessor.includes("source alpha silhouette with transparent padding; shoe regions protected"),
   "Hero edge feather must follow the real alpha silhouette and pad canvas edges transparently instead of guessing a platform polygon.");

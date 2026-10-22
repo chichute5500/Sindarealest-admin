@@ -106,7 +106,7 @@ def main() -> None:
             "source_dimensions": [width, height],
             "output_dimensions": list(result.size),
             "output_padding_pixels": padding,
-            "output_keeps_transparent_padding": result.size == [width + padding * 2, height + padding * 2],
+            "output_keeps_transparent_padding": list(result.size) == [width + padding * 2, height + padding * 2],
             "source_alpha_extrema": alpha.getextrema(),
             "output_alpha_extrema": result_alpha.getextrema(),
             "feather_radius_source_pixels": FEATHER_RADIUS,
