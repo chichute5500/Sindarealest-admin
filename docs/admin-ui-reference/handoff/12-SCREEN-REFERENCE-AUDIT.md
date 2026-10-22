@@ -1,10 +1,10 @@
-## LIVE HANDOFF POINTER — 2026-10-22 21:20 +07:00
+## LIVE HANDOFF POINTER — 2026-10-22 18:08 +07:00
 
-- ADMIN branch HEAD before this docs-only update: `706dd4bccb31b45c9fbaa64cb905d12078812101`; PR #111 OPEN/unmerged and matched. The latest source/test evidence remains `2cf894e476b85e77b646b4bb45596e263a9f2fb6`, not this handoff HEAD.
-- Historical Validate #39756606343 PASS and Preview #39756606227 SUCCESS cover exact source SHA `2cf894e476b85e77b646b4bb45596e263a9f2fb6`; Preview checks login CSS signature and login/dashboard smoke only. Full 12-screen parity remains NOT_ACCEPTED; authenticated backend QA remains NOT_TESTED.
-- Prioritize screen #4 only after rechecking current source against the reference (SKU verification layout / AI description heading). The proposed fix was not committed; do not record it as completed without verifying live source.
-- Then continue screen #3 and each remaining PARTIAL screen. Use status labels and evidence per screen; fixture screenshots alone do not equal acceptance. Keep AI grouping #11 BLOCKED pending approved contract; R2 save and PRE/PRO migrations DEFERRED_BY_OWNER.
-
+- ADMIN HEAD at checkpoint: `fe12e708841a6e98554d15b5a8651053d9d8ea04`; PR #111 OPEN/unmerged and matched. Validate #39767851282 and Preview #39767851318 both SUCCESS on exact source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`.
+- Artifact [#311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829): 99 PNGs; four Product list screenshots at 320×640 and 360×800, light/dark, were reviewed. SKU/category hint wraps instead of one-line ellipsis; this does not close other screen #3 gaps.
+- Product editor #4 geometry assertions passed on `466199f`, but overall parity remains PARTIAL_NOT_ACCEPTED.
+- Full 12-screen parity remains NOT_ACCEPTED; authenticated backend QA NOT TESTED; AI grouping #11 BLOCKED pending approved contract; R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- Continue Product list #3 reference comparison and update per-screen status only with exact artifact/SHA and visual evidence.
 ---
 
 # Admin 12-screen reference audit matrix
