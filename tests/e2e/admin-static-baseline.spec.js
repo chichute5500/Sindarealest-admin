@@ -2298,7 +2298,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(documentWidth, 'Activity log must not cause document-level horizontal overflow').toBeLessThanOrEqual(width);
       if (width <= 680) {
-        await expect(page.locator('.activity-log-table tbody tr td').first()).toHaveCSS('display', 'block');
+        // The shared mobilecards layout uses a label/value flex row for each cell.
+        await expect(page.locator('.activity-log-table tbody tr td').first()).toHaveCSS('display', 'flex');
       }
 
       await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');
