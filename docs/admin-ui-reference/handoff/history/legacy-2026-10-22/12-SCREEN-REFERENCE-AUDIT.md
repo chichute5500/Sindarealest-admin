@@ -1,0 +1,266 @@
+## LIVE HANDOFF POINTER — 2026-10-22 18:08 +07:00
+
+- ADMIN HEAD at checkpoint: `fe12e708841a6e98554d15b5a8651053d9d8ea04`; PR #111 OPEN/unmerged and matched. Validate #39767851282 and Preview #39767851318 both SUCCESS on exact source SHA `dca19a2af32a78390878b9ccfa5c7c26b816f2ff`.
+- Artifact [#311](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39767851318/artifacts/12420678829): 99 PNGs; four Product list screenshots at 320×640 and 360×800, light/dark, were reviewed. SKU/category hint wraps instead of one-line ellipsis; this does not close other screen #3 gaps.
+- Product editor #4 geometry assertions passed on `466199f`, but overall parity remains PARTIAL_NOT_ACCEPTED.
+- Full 12-screen parity remains NOT_ACCEPTED; authenticated backend QA NOT TESTED; AI grouping #11 BLOCKED pending approved contract; R2 and PRE/PRO migrations DEFERRED_BY_OWNER.
+- Continue Product list #3 reference comparison and update per-screen status only with exact artifact/SHA and visual evidence.
+---
+
+# Admin 12-screen reference audit matrix
+
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:38:06+07:00
+
+- **Nhánh ADMIN duy nhất:** feature/admin-isolated-handoff-2026-10-20. HEAD trước loạt làm mới handoff: 8419835f07ad7fa6d57c1b8e3fa3dfe954d62721; đây là commit evidence/docs-only, không phải source SHA đã test. **Source/test SHA:** 2cf894e476b85e77b646b4bb45596e263a9f2fb6.
+- [Validate Source #39756606343](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343): **SUCCESS** trên source SHA chính xác 2cf894e476b85e77b646b4bb45596e263a9f2fb6.
+- [Admin Preview diagnostic #39756606227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227): **SUCCESS** trên cùng SHA. Local Playwright matrix 3/3 PASS; ma trận screenshot 8 viewport và light/dark PASS. Deployed Preview tests 2/2 PASS cho login-shell/CSS signature và login/dashboard smoke; status file là PASS_LOGIN_CSS_SIGNATURE.
+- **SKU checkbox:** lỗi cũ #39755520573 đọc nền rgba(255, 255, 255, 0.82) ngay sau thao tác check trong khi CSS transition 180 ms vừa bắt đầu; selector checked và giá trị màu light/dark đã đúng, không thấy cascade ghi đè. Test đã chuyển sang chờ giá trị CSS cuối chính xác qua toHaveCSS, giữ nguyên assertion nghiêm ngặt và thêm unchecked, focus-visible, Space toggling. Vòng test mới PASS; CSS source không đổi.
+- Artifact mới [admin-preview-evidence-304 / ID 12416033404](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227/artifacts/12416033404): 99 PNG (16 login shell, 83 UI fixtures), 75 metrics. Fixtures là synthetic/read-only, không chứng minh backend nghiệp vụ thật.
+- **Tiến độ 50%, không tăng.** 12-screen reference parity **NOT ACCEPTED**; screen #3 Product list **PARTIAL/NOT ACCEPTED**; authenticated business/backend QA **NOT TESTED**; AI grouping #11 **BLOCKED** chờ contract; R2 image save và PRE/PRO migrations **DEFERRED_BY_OWNER**.
+- PR #111 ADMIN và PR #108 static vẫn OPEN/unmerged. Không merge/deploy Production, không sửa main/static branch, không bypass Cloudflare Access/đọc secrets, không ghi D1/R2/chạy migration thật.
+- Checkpoint cũ bên dưới dấu phân cách là lịch sử. QR/payment contract được đọc và giữ nguyên vì thay đổi hiện tại chỉ liên quan test timing checkbox.
+
+------
+------
+---
+
+---
+
+---
+
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T03:55:41.155+07:00
+
+- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước lần cập nhật handoff này `80fd27310aacb221894eb382efbbf3ef8cc82c07`; exact source/test SHA `e3e46b649c86346d2c014d12002b2b0c6b012020`.
+- Validate Source [#39674335114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335114) **SUCCESS** và Admin Preview/Playwright [#39674335123](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335123) **SUCCESS**, cùng SHA.
+- Artifact [`admin-preview-evidence-259`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39674335123/artifacts/12381230471), ID `12381230471`: 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata đọc từ ZIP: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview `PASS_LOGIN_CSS_SIGNATURE` chỉ kiểm tra shell/CSS, không phải authenticated backend QA.
+- Customer screen: thêm avatar chữ cái đầu được suy ra từ tên khách hàng có sẵn (không giả lập ảnh đại diện/không thêm dữ liệu), và E2E xác nhận initials + aria-hidden từng avatar; customer search theo tên/điện thoại/email/địa chỉ, no-result/reset đã có fixture coverage. Đã xem trực tiếp screenshot 390×844 light/dark và 1280×800 light. Reference yêu cầu ảnh đại diện và tab phân nhóm; API hiện không có ảnh, quy tắc “Mới/Thân thiết” chưa được xác nhận nên không bịa ảnh hay phân loại. Screen customer **PARTIAL**, reference parity chưa được chấp nhận.
+- Hai lần E2E trước đó thất bại do assertion test mới: (1) regex split tên bị escape sai, (2) locator aria-hidden strict-mode áp vào 2 avatar; đã sửa cả hai và rerun thành công trên SHA `e3e46b649c86346d2c014d12002b2b0c6b012020`. Không phải lỗi dữ liệu/backend.
+- Category controls #6 **PARTIAL — existing controls only**; không có trang quản lý danh mục riêng. Tổng tiến độ giữ **50%**; full 12-screen parity **NOT ACCEPTED**; authenticated business/backend QA **NOT TESTED**.
+- PR #111/#108 vẫn OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
+
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T03:43:17.921+07:00
+
+- Chỉ sửa nhánh ADMIN `feature/admin-isolated-handoff-2026-10-20`; HEAD trước handoff update `d7c65c125685bab5c2e974ffcdb7b8cfb896d2db`, source/test SHA đã kiểm tra `e91b933f40aba30814b2b50590893c95ed5de1a5`.
+- Validate Source [#39672585196](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585196) **SUCCESS** và Admin Preview/Playwright [#39672585229](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585229) **SUCCESS**, cùng exact SHA.
+- Artifact [`admin-preview-evidence-256`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39672585229/artifacts/12379888318), ID `12379888318`, có 64 PNG (16 login shell + 48 fixture) và 40 metrics. Metadata được tải/kiểm tra: completed=true; 0 page/console/failed-request/HTTP errors, 0 attempted writes, 0 unexpected API paths. Preview diagnostic `PASS_LOGIN_CSS_SIGNATURE` chỉ xác nhận shell/CSS, không phải authenticated backend QA.
+- E2E fixture/read-only mới: `#pCategory` datalist 8 options, manual custom category entry/restore; `#categoryBox` match Ví da/Thắt lưng, count, no-result và clear/reset. Không nhấn Save; không có non-GET API requests. CSS đã thêm khoảng cách 10px sau nhóm trường chính; ảnh Product editor 390×844 light/dark và Products 390×844/1280×800 đã được mở/kiểm tra.
+- #6 Category/classification **PARTIAL — existing controls only**; không có trang quản lý danh mục riêng nên reference parity cho screen-family chưa được chấp nhận. Progress giữ **50%**; full 12-screen parity **NOT ACCEPTED**; authenticated business/backend QA **NOT TESTED**.
+- PR #111/#108 vẫn OPEN/UNMERGED. Không sửa `main`/nhánh static, không merge, không Production deploy, không Access/secrets, không remote D1/R2/schema/migration/infra, không TinyFish.
+
+---
+
+Updated: 2026-10-21 (ICT)  
+Branch: `feature/admin-isolated-handoff-2026-10-20`  
+Overall Admin progress: **50%** — weighted management estimate; unchanged after this test-only correction.
+
+## Latest verification checkpoint — 2026-10-21 17:47 UTC
+
+- Exact source/test SHA: `04889b6c6bc946483ea683e8345bac3b7cbf3838`; Validate Source [#39646606076](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606076) PASS and Admin Preview diagnostic [#39646606242](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39646606242) SUCCESS.
+- Corrected a false-negative assertion for the custom “Hiển thị sản phẩm” switch: assert the visible `label.switch:has(#pPublished)` wrapper and checked checkbox state. Prior run #39646221204 failed only at screenshot-matrix step 9; the new run passes.
+- This test correction does not accept any new screen family. The 12-screen matrix below remains PARTIAL/NOT TESTED as individually recorded; authenticated business QA remains BLOCKED/NOT TESTED.
+
+## Evidence rules
+
+- **PASS** means the screen was compared with the approved reference and has direct screenshot/test evidence.
+- **PARTIAL** means a narrow source/fixture check passed but full reference parity is not accepted.
+- **BLOCKED** means an external prerequisite prevents verification.
+- **NOT TESTED** means no valid acceptance evidence is recorded.
+- Synthetic fixture screenshots are not real product-data or authenticated-backend acceptance.
+- Do not mark any screen PASS solely because `npm test` passes.
+
+## Matrix
+
+| # | Screen family | Status | Evidence / gap |
+|---:|---|---|---|
+| 1 | Login / unauthenticated shell | PARTIAL | Local Playwright previously checked login shell and masked password with mocked APIs; current approved-reference comparison not accepted. |
+| 2 | Dashboard / summary | PARTIAL | Revenue panel has truthful no-data state; source and Preview diagnostic passed on exact SHA `06d689b6a97fa7bdb05258acb8435a6954d67309`. Not authenticated real-data QA. |
+| 3 | Product list / search / filters | PARTIAL | Latest exact-SHA tree `d7488c845202a695b18ea01ec5d87906b6e9bffa`: Validate Source [#39661154355](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154355) PASS; Admin Preview/Playwright [#39661154345](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345) SUCCESS; [artifact `admin-preview-evidence-227`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345/artifacts/12373068383). Inspected `products__390x844__light.png`, `products__390x844__dark.png`, and `products__1280x800__light.png`: all 3 fixture products and pagination fit in mobile view; no horizontal overflow; mobile title ellipsis retains a title attribute; price/stock are inline with an accessible SVG edit action; desktop table remains intact. Fixture-only evidence. Screen #3 remains PARTIAL/NOT ACCEPTED because whole-screen/reference parity and real authenticated data are not accepted. |
+| 4 | Product editor / core fields | PARTIAL | Exact-SHA Validate [#39742949748](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949748) and Preview/Playwright [#39742949583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583) SUCCESS on `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`; artifact [admin-preview-evidence-297](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973). Desktop price/stock footer-overlap regression was fixed on `ed84462`, assertion preserved. Desktop gallery tab/heading overlap fixed on `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93` with a separate geometry assertion. Opened desktop 1280×800 and mobile 390×844 light/dark gallery captures. Screen #4 remains PARTIAL pending whole-screen reference parity and authorized CRUD QA. |
+| 5 | Product image gallery / image manager | PARTIAL | Artifact [admin-preview-evidence-297](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39742949583/artifacts/12409713973) reviewed on exact SHA `a3ee0cdc5d9dafca2c9b69abb84c71ccf8d64e93`: `product-gallery__1280x800__light.png`, `product-gallery__390x844__light.png`, `product-gallery__390x844__dark.png`. Gallery heading/upload title now sit below desktop sticky tabs; assertion passed. Thumbnail rail remains fixture-only. Real photo save/R2 is `DEFERRED_BY_OWNER / NOT VERIFIED`; whole-screen/reference parity remains NOT ACCEPTED. |
+| 6 | Category / product classification | PARTIAL — existing controls only | Exact-SHA fixture E2E on `e91b933`: `#pCategory` datalist (8 options), custom entry/restore, `#categoryBox` match for Ví da/Thắt lưng, result count/no-result/clear reset. No standalone category page; screen-family reference parity remains NOT ACCEPTED. No non-GET writes. |
+| 7 | Orders / fulfillment | PARTIAL | Exact-SHA Validate [#39669112058](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112058) PASS + Preview [#39669112068](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39669112068) SUCCESS on `44778d91ff5f084a5bb89a166e97536bd4f42b9d`; artifact `admin-preview-evidence-254` reviewed at orders mobile light/dark 390×844 and desktop 1280×800. Search/status/payment filters, count/reset/no-result, compact mobile summary and collapsed management disclosure work on synthetic fixtures. API lacks item image snapshot; no fake thumbnail. Desktop table remains scrollable. Backend QA NOT TESTED. |
+| 8 | Payment QR / payment requests / ledger | PARTIAL | Latest fixture Playwright [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) on SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff` reruns accessible QR bank fields/manual verification checkbox, inactive-state disablement, unsaved-bank-details guard before confirmation/API write, and order payment-request/receipt disabled state before price/terms confirmation. Synthetic/read-only; mocked-D1 tests only, no live backend proof. |
+| 9 | Customers / customer details | PARTIAL — fixture only | Exact-SHA Playwright on `e3e46b6`: search by name/phone/email/address, no-result/reset, derived initials avatar and `aria-hidden` checked. Artifact `admin-preview-evidence-259` inspected at 390×844 light/dark and 1280×800 light. Reference has photo avatars and customer-segmentation tabs; API has no avatar image and no confirmed rule for “Mới/Thân thiết”, so do not fake either. Reference parity and authenticated customer data remain NOT ACCEPTED/NOT TESTED. |
+| 10 | Warranty / after-sales | PARTIAL | Exact-SHA E2E on `08f2525`: read-only search/no-result, filter state, issue-form disclosure and field constraints. Artifact `admin-preview-evidence-260` reviewed at 390×844 light/dark; the three filter tabs now fit on one row without clipped labels. Reference product thumbnails are not fabricated because the source API lacks matching image data; full reference parity/authenticated QA NOT ACCEPTED. |
+| 11 | AI image review / grouping | BLOCKED — feature contract/source route missing | Static inspection of `public/admin/index.html` and recursive Git tree found no AI-image-review/grouping route, controls or dedicated module file. Do not invent UI/API or call live provider; require approved feature contract/reference. |
+| 12 | Backup / restore / settings / responsive navigation | PARTIAL | Exact-SHA E2E on `94c9fb6` checks panel bounds, action text wrapping, safety note and hidden JSON input; screenshot targets the panel. Mobile More/Khác E2E on `6dcbcdc` verifies Warranty/Settings, aria state, viewport fit, Escape, focus restoration and actual Settings navigation. Artifact `admin-preview-evidence-267` includes 390×844 light/dark and responsive matrix. No export/restore action or API write. |
+
+## Cross-cutting checks
+
+| Check | Status | Notes |
+|---|---|---|
+| Light/dark themes | PARTIAL | Fixture/screenshot checks exist; complete reference parity is not accepted. |
+| Narrow Android viewport / horizontal overflow | PARTIAL | Exact-SHA Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) reran the responsive/theme matrix on `0b9e8a2...`; 320–412px and tablet/desktop viewports are included, with no horizontal overflow assertions failing. Visual parity is still not accepted. |
+| Keyboard / focus / accessible names | PARTIAL | The latest descendant run [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) on SHA `4e660a0...` reran product-editor ArrowLeft/ArrowRight/Home/End tab focus and `aria-selected`, dialog focus trap/restoration, order-detail focus and QR verification checkbox naming. Other screens still need per-module acceptance. |
+| `prefers-reduced-motion` | PASS — BROWSER E2E ON SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff` | Admin Preview Playwright [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) reran the 3-test static browser suite successfully; reduced-motion emulation passed. Synthetic GET fixtures reject non-GET API calls; not authenticated backend QA. |
+| Authenticated real backend | BLOCKED / NOT TESTED | Do not change Access or secrets to work around this. |
+| Product image upload/save | DEFERRED_BY_OWNER | Do not resume without explicit owner authorization. |
+| PRE/PRO migration | DEFERRED_BY_OWNER | Do not inspect remote schema through writes or execute migration/setup scripts. |
+
+## Next execution order
+
+1. Re-fetch current branch HEAD and exact-SHA Actions results; do not reuse old green runs as proof for newer code.
+2. Obtain and compare the actual approved reference for screen family #5 and complete a focused gallery/accessibility audit using screenshots that are genuinely accessible.
+3. Ensure the reduced-motion Playwright test runs in a workflow that executes `tests/e2e/admin-static-baseline.spec.js`; record the exact tested SHA and actual browser result.
+4. Continue one screen family per iteration, with screenshot evidence and targeted ADMIN-only changes.
+5. Update this matrix and handoff status only after verifying results.
+
+## Safety boundaries
+
+Only write to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and #108 open/unmerged. No edits to `main` or the static website branch; no merge/cherry-pick/force-push; no Production deploy; no secrets/Cloudflare Access changes or bypass; no remote D1/R2 writes; no SQL/migration/setup script execution; no TinyFish.
+
+
+## Browser verification follow-up — 2026-10-21
+
+- Playwright E2E on exact source/test SHA `131d6f395a94ef82b8d1d827fb5f000ab92df60e` passed in Admin Preview workflow [#39629076142](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39629076142). The `respects the reduced-motion preference across interactive ADMIN layers` test ran and passed; it uses only synthetic GET fixtures and rejects non-GET API calls.
+- Root cause of the prior E2E failure on `979fa3500775c2b48af4db4f49e973b9c71eeda4`: test selectors incorrectly assumed `.dashboard-revenue` and `.dashboard-shortcut` lived under `#main`. In the actual rendered source those elements are inserted directly into `#appView`; the test now queries the actual classes and the dashboard assertion was aligned to `.dashboard-revenue`. No app business logic or CSS behavior was changed by this fix.
+- The same run passed project check, automated tests, responsive/theme source Playwright matrix, and Preview login CSS signature. Artifact `admin-preview-evidence-188` (ID `12357698923`, 11,188,289 bytes, retained until 2026-11-04) contains 59 PNGs (16 login shell + 43 synthetic fixture screens), 36 fixture metrics and metadata. Metadata shows zero browser/console/request/HTTP errors and no attempted fixture writes. These are source/fixture captures, not authenticated business-flow evidence.
+- Full 12-screen parity remains NOT ACCEPTED; authenticated backend QA remains BLOCKED / NOT TESTED. Overall estimate stays 48%.
+
+
+## Keyboard-navigation follow-up — 2026-10-21 16:00 UTC
+
+- Test-only commit `32c1f28662e7240353b0eda2f5daeaf22359257e` adds Home/End navigation assertions to the product editor tabs, including focus target and `aria-selected` state. Existing ArrowLeft/ArrowRight, dialog focus trapping, Escape close, and focus restoration checks remain.
+- Exact source validation [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) both SUCCESS. Static baseline suite: 3 passed (30.5s); responsive/theme matrix and Preview CSS signature PASS. Artifact `admin-preview-evidence-189`, ID `12359007200`, has 59 PNGs and 36 synthetic fixture metrics.
+- Keyboard/focus is now **PARTIAL**, not globally PASS: these checks cover selected editor and order-detail dialog behavior using synthetic fixtures. Full screen-by-screen keyboard/a11y review and all-12-screen visual parity remain NOT ACCEPTED.
+- Overall progress remains 48%; authenticated real-backend QA is still BLOCKED / NOT TESTED. Image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
+
+
+## Keyboard-navigation follow-up — 2026-10-21 16:00 UTC
+
+- Test-only commit `32c1f28662e7240353b0eda2f5daeaf22359257e` adds Home/End navigation assertions to the product editor tabs, including focus target and `aria-selected` state. Existing ArrowLeft/ArrowRight, dialog focus trapping, Escape close, and focus restoration checks remain.
+- Exact source validation [#39630533326](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533326) and Playwright [#39630533169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39630533169) both SUCCESS. Static baseline suite: 3 passed (30.5s); responsive/theme matrix and Preview CSS signature PASS. Artifact `admin-preview-evidence-189`, ID `12359007200`, has 59 PNGs and 36 synthetic fixture metrics.
+- Keyboard/focus is now **PARTIAL**, not globally PASS: these checks cover selected editor and order-detail dialog behavior using synthetic fixtures. Full screen-by-screen keyboard/a11y review and all-12-screen visual parity remain NOT ACCEPTED.
+- Overall progress remains 48%; authenticated real-backend QA is still BLOCKED / NOT TESTED. Image-save/PRE-PRO migrations remain DEFERRED_BY_OWNER.
+
+
+## QR Settings client-side guard — 2026-10-21 16:11 UTC
+
+- Exact test/source SHA `0b9e8a2f6a734ef328726c9c80e8e0e56328ce55`: Validate Source [#39632306385](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306385) and Admin Preview/Playwright [#39632306588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39632306588) both SUCCESS.
+- Added `settings-qr-unsaved-guard` fixture coverage for the Settings screen. It verifies the QR bank fields are available and the verification checkbox has an accessible name; with active QR false, deactivate remains disabled. Changing the bank name and ticking the manual verification checkbox must still show “Hãy lưu thông tin nháp trước khi kích hoạt QR.” and return before confirmation or API mutation.
+- First attempt [#39631879451](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39631879451) failed because the test expected a blank status message after the previous viewport had already produced the warning. Test-only fix in `0b9e8a2...` navigates Products → Settings to create a fresh form per viewport. The retry passed; source logic was not changed.
+- Artifact `admin-preview-evidence-191` ID `12360041542`: 63 PNGs, 47 fixture module images, 39 fixture metrics; 16 login-shell captures; no recorded browser/console/network/HTTP errors and no attempted writes. This confirms UI guard behavior under fixture-only input, not actual remote D1/R2 or authenticated business-flow behavior.
+- QR screen status stays PARTIAL; screen #12 settings/backup status stays PARTIAL. The overall 12-screen visual parity remains NOT ACCEPTED and project progress remains 48%.
+
+
+## Order-payment readiness and backup UI follow-up — 2026-10-21 16:18 UTC
+
+- Exact tested SHA `4e660a0869dd21d4a688d72823bd08b1795cf2ff`; Validate Source [#39633278598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278598) and Admin Preview/Playwright [#39633278359](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39633278359) both SUCCESS. Browser baseline 3 passed (25.5s), responsive/theme matrix and Preview login CSS signature PASS.
+- Orders fixture now asserts that an order requiring price confirmation and lacking terms confirmation keeps `create-payment-request` and `record-payment` disabled, even while the UI displays the unpaid/needs-confirmation state. No actual request/receipt is submitted; non-GET API calls remain blocked.
+- Backup/restore fixture now asserts the JSON download control, restore file input accepts JSON, and the confirmation disclosure is present. It does not click export or restore.
+- Artifact `admin-preview-evidence-192`, ID `12360132558`, 11,895,011 bytes, expires 2026-11-04: 63 PNGs (16 login + 47 synthetic/read-only fixtures), 39 metrics, zero recorded browser/console/network/HTTP errors, no attempted writes or unexpected API paths.
+- This advances screens #7 and #12 from NOT TESTED to **PARTIAL** for narrow UI safety and control coverage only. Payment/QR #8 remains PARTIAL; real authenticated backend/payment ledger still NOT TESTED. No screen family is accepted as fully matching the reference on the basis of fixture tests alone; overall 12-screen parity remains NOT ACCEPTED. Project progress remains 48%.
+
+
+## Warranty / after-sales visual iteration — 2026-10-21 16:47 UTC
+
+- UI commit `c5e89c59fa6f3d083e128196b9da26de772c9ffd` changed the warranty page to list-first with local search, all/in-progress/closed filters and a collapsed native disclosure. Screenshot-framing test commit `43509973e79010711f28b437940f052cd83996ce` resets scroll before capture; readability commit `64eef4eb269212585ecf3cc9b2cd8a2988be327c` shortens the placeholder and wraps order ID; exact tested SHA `f2df0a923080135c5fe92ee2021c76137305699c` makes the mobile order cell block-layout and asserts a single-line order ID.
+
+- Validate Source [#39637611840](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611840) PASS and Admin Preview/Playwright [#39637611768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39637611768) SUCCESS on the exact SHA. Browser baseline 3 passed (34.8s); Preview login CSS signature PASS.
+- Artifact `admin-preview-evidence-197`, ID `12362111591`: 63 PNGs (16 login + 47 synthetic/read-only views), 39 metrics, zero browser/console/request/HTTP errors, no attempted writes or unexpected API paths. Raw PNGs remain in Actions artifact only.
+- Reviewed `warranties__390x844__light.png`: heading/search/filter visible; order ID remains one line. Screen #10 advances to PARTIAL only; all-12-family parity remains NOT ACCEPTED and authenticated backend QA NOT TESTED / BLOCKED BY ACCESS.
+
+
+## Screen #3 evidence update — 2026-10-21 17:26 UTC
+
+- **Status: PARTIAL**, not accepted visual parity. Exact browser suite on `535e43121a612570dd84a353870bc118860c0c0d`; 3 Playwright tests passed in 35.8s and the configured Preview diagnostic passed.
+- Reviewed actual artifact screenshots: `products__390x844__light.png` and `products__1280x800__light.png`, plus the approved composite reference image. In these fixture screenshots, no horizontal overflow is reported at either viewport; local module fixture data is synthetic/read-only.
+- Implemented/tested: category-label search; accessible result-count/range announcement; honest no-match message; in-place reset that clears text/category/fulfillment and restores focus; category + fulfillment filter combination.
+- Still open for #3: compare and improve reference-style published/status filters and card details without deriving stock state from null/incomplete values. No actual prices, inventory, images or product facts may be invented. Full 12-screen parity remains NOT ACCEPTED.
+
+
+## Product screen #3 — second verified UI cycle (2026-10-21 17:34 UTC)
+
+- Exact test/source tree `b33e2d0e7b63feecddb1ad8dc66d88ddd3925ceb`: Playwright 3 passed; Preview login/dashboard smoke 2 passed; CSS signature PASS. Artifact #204 contains screenshots for both light and dark themes and the approved reference image.
+- The publication filter displays counts based on the active search/category/fulfillment subset. `published===true` maps to “Đang hiển thị” and `published===false` to “Đã ẩn”; missing/unknown values are not reclassified as hidden, and inventory is never used to infer either state.
+- Screenshot review: `products__390x844__light.png` and `products__1280x800__light.png`. The filter chips are visible on both viewports. Remaining visual difference versus approved screen #3 includes row/card presentation and detail hierarchy, so visual parity stays NOT ACCEPTED.
+
+
+## Continuation checkpoint — 2026-10-22 — product-list fulfillment detail
+
+- Branch scope remains `feature/admin-isolated-handoff-2026-10-20` only. New source commit: `330f4bbaae11c0dd3bdbb61a01b75d5462d3201b` (`public/admin/index.html`); regression-test commit: `7948a320c3fd38a7f73d061de6ca6e3251b72789` (`tests/e2e/admin-static-baseline.spec.js`).
+- Screen #3 product list now renders the existing fulfillment classification as a compact, semantic chip rather than plain secondary text. It explicitly distinguishes `Hàng có sẵn`, `Hàng đặt riêng`, and `Chưa phân loại`; unclassified uses a dashed neutral treatment. No price, inventory, SKU, publication state, or product fact was fabricated, and no API/data behavior was changed.
+- Added fixture assertions for all three chip states using synthetic read-only products. These assertions are committed but **must not be marked PASS until Actions runs on the exact current source/test SHA are observed**. A connector query for PR-associated runs returned no run at the time of this checkpoint; validation is pending, not assumed.
+- Overall progress remains **50%**. This bounded visual change is not acceptance of screen #3 or all-12-screen parity. Authenticated business/backend QA remains NOT TESTED/BLOCKED; image-save/R2 and PRE/PRO migration remain DEFERRED_BY_OWNER.
+- Next: re-fetch current branch/PR state and Actions. Verify source and Preview/Playwright on exact SHA; inspect the new product screenshots at 390×844 and 1280×800 in light/dark. If checks fail, fix the cause without weakening assertions. Update progress only if screenshot review and evidence justify it.
+- Safety unchanged: PR #111/#108 remain open/unmerged; no Production deploy, no edits to `main` or static branch, no Access/secrets changes, no remote D1/R2 or migrations, and no TinyFish.
+
+## Verified checkpoint — 2026-10-22 01:58 +07
+
+- Exact application/test SHA: `c18736b70d0035769408ce3190a6fb729ccd75fd`. Validate Source [#39656347891](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656347891) and Admin Preview/Playwright [#39656348109](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39656348109) both **SUCCESS** on the exact same SHA.
+- Mobile product-list fixes and matching tests are green. Evidence: 64 responsive/theme screenshots and 40 synthetic/read-only fixture metrics. Authenticated business/backend QA remains NOT TESTED/BLOCKED by Access; no production deployment.
+- Overall progress remains **50%**. Screen #3 and 12-screen visual parity are NOT ACCEPTED; image-save/R2 and PRE/PRO migrations remain DEFERRED_BY_OWNER.
+- Next: re-fetch branch HEAD and CI, inspect reference-vs-actual screenshots at 390×844 and 1280×800 in light/dark, continue substantive UI parity work and update handoff docs after verified cycles. Keep PR #108/#111 open; no Production, Access/secrets, D1/R2, migrations, main/static branch edits, or TinyFish.
+
+
+## Checkpoint note — 2026-10-22
+
+Live branch checkpoint verification: HEAD was `3f50b4d14e890a4c7b1d2b679f364f322fc3933c`; exact-HEAD Validate source and tests run [#39657885958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39657885958) succeeded. This does **not** establish visual acceptance. Keep screen parity incomplete until actual reference screenshots are inspected at 390x844 and 1280x800 in light and dark themes, and record only observations actually verified. Progress remains 50%; PR #111/#108 remain unmerged.
+
+## Iteration continuation — 2026-10-22T02:14:21.414+07:00
+
+- Baseline artifact `12371792374`, source SHA `c18736b70d0035769408ce3190a6fb729ccd75fd`, was opened and visually compared with `admin-mobile-reference.png` at its product screen. The before-change product screenshots inspected were 390×844 light/dark and 1280×800 light.
+- Observed gap: mobile price/stock/edit occupied a separate row below the product identity, unlike the reference's denser product card. The ADMIN-only source/test changes are `8a2acf322f3c785716b0c0d27947f44bf9565727` and `a33bb596a1b2cf587f4f2cfb9af84d42592f6b24`; product values, API and data behavior remain unchanged.
+- Screen #3 remains **PARTIAL / NOT ACCEPTED**. No post-change screenshot is available yet, so the new layout remains **PENDING / NOT VERIFIED**. Keep all 12 screen acceptance incomplete and progress at **50%**.
+- Last successful validation before the change is [run #39658657454](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39658657454) on `b659a19838c1276de7c4bd9ef9edab2279369651`, not the edited SHA. Next: run exact-SHA validation and Preview/Playwright, inspect the new 390×844 light/dark and 1280×800 light screenshots, then update Screen #3 only if the evidence supports it.
+
+## Latest screenshot review — 2026-10-22T02:30:43.029+07:00 (Asia/Ho_Chi_Minh)
+
+## Verified continuation checkpoint — 2026-10-22T02:30:43.029+07:00 (Asia/Ho_Chi_Minh)
+
+- Branch: `feature/admin-isolated-handoff-2026-10-20`. Tested application/test tree SHA: `d7488c845202a695b18ea01ec5d87906b6e9bffa`. Source density pass: `30608b533014f2b5c2eb48110d29c8731b8bbe4c`; Playwright measurement/assertion update: `339bddc64618058a72626091569e72f6fb7c5806`; aligned ADMIN regression contract: `d7488c845202a695b18ea01ec5d87906b6e9bffa`.
+- Exact-SHA CI: Validate Source [#39661154355](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154355) **PASS**; Admin Preview diagnostic + Playwright [#39661154345](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345) **SUCCESS**. Both checked out `d7488c845202a695b18ea01ec5d87906b6e9bffa`. The earlier failures on `8a2acf3`/`a33bb59` and `30608b5` were stale CSS-contract expectations; these were repaired and the final exact-SHA workflows are green.
+- Evidence artifact: [`admin-preview-evidence-227`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39661154345/artifacts/12373068383), artifact ID `12373068383`. It contains 64 PNGs: 16 login-shell captures, 48 read-only synthetic fixture-module captures, and 40 fixture metrics. PNGs live in the Actions artifact, not in Git.
+- I opened the approved `admin-mobile-reference.png` and current `products__390x844__light.png`, `products__390x844__dark.png`, `products__1280x800__light.png`, and `orders__390x844__light.png`. For product-list screen #3, 390×844 light/dark show all 3 fixture cards plus pagination without horizontal overflow; product title is one line with a `title` attribute, price/stock facts are inline, and the mobile edit control is an accessible SVG button. At 1280×800 the desktop table layout remains intact. This is **PARTIAL evidence, not full reference acceptance**: keep screen #3 PARTIAL/NOT ACCEPTED and all-12-screen parity NOT ACCEPTED.
+- Automated evidence: `npm run check` PASS; `npm test` PASS; Chromium install and source screenshot matrix PASS; Preview CSS signature PASS. The run reports zero page errors, console errors, failed requests, HTTP errors, unexpected API paths, and fixture write attempts. The preview/login signature is not proof of authenticated business workflows.
+- No product data, API semantics, authentication, real business records, D1/R2, Access, secrets, Production deployment, or PR merge was changed. Authenticated business/backend QA remains **NOT TESTED**. PR #111 and #108 remain OPEN/UNMERGED.
+- Overall progress remains **50%**: automation and one screen-family iteration improved, but 12-screen visual acceptance, several screen families, and authorized real backend QA remain incomplete.
+- Next safe task: inspect the orders list at 390×844 against reference screen #6, implement a focused ADMIN-only mobile card layout if justified, add E2E regression checks, run exact-SHA Validate Source + Preview/Playwright, open the new screenshot artifact, then update and re-read all seven handoff files.
+
+
+## Screen #6 — orders list continuation (2026-10-22)
+
+- Code/test SHA validated: `214dd104c17e3837166fac77f8f2106d1a25ffeb`; Validate Source [#39662986446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986446) and Preview/Playwright [#39662986425](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39662986425) both SUCCESS.
+- Improvement: mobile order card keeps the primary summary compact; per-item price inputs and management/payment actions are inside a labelled disclosure that starts collapsed at ≤680px. Desktop hides the disclosure label and leaves controls expanded. Regression tests check toggle behavior, price visibility and payment safety guards.
+- This acceptance note is historical and is superseded by the verified Orders/Fulfillment screen #7 visual review below (artifact `admin-preview-evidence-240`). Do not infer acceptance for screen #6 / Category and product classification, which remains NOT TESTED.
+- Overall project progress remains 50%; 12-screen parity NOT ACCEPTED; authenticated backend QA NOT TESTED.
+
+## Latest verified Orders/Fulfillment visual review — 2026-10-22T02:53:48.575+07:00
+
+- Tested SHA: `8d4009f785cc89ff0ff5575460aacac8d2119746`; Validate Source [#39664727740](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727740) PASS; Preview/Playwright [#39664727558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558) SUCCESS.
+- Opened artifact [admin-preview-evidence-240](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39664727558/artifacts/12377312578): `orders__390x844__light.png`, `orders__390x844__dark.png`, `orders__1280x800__light.png`. Mobile card is summary-first; details collapse on all viewports; desktop row remains compact with the existing single price field in the product column.
+- 64 PNGs are stored in the Actions artifact; 16 login-shell and 48 fixture-module screens with 40 metrics. Zero page/console/request/HTTP errors and no non-GET fixture writes. This is synthetic/read-only coverage, not live backend QA.
+- Screen #7 remains PARTIAL / NOT ACCEPTED; all 12 screens NOT ACCEPTED; progress remains 50%. Next: select the next unaudited screen family in the matrix.
+
+
+## Verified checkpoint — 2026-10-22T03:25:42.193+07:00
+
+- Tested source/test SHA `44778d91ff5f084a5bb89a166e97536bd4f42b9d`, Validate #39669112058 and Preview #39669112068 SUCCESS; artifact `admin-preview-evidence-254` (12378134004) inspected.
+- Screen #4 Product editor PARTIAL; #7 Orders PARTIAL; #6 Category/classification NOT TESTED as a distinct screen family. No categories route exists: current logic uses `#pCategory` and `#categoryBox`.
+- Fixture-only checks; full 12-screen parity NOT ACCEPTED, authenticated business QA NOT TESTED, overall progress 50%.
+- Next: safe fixture tests for current category options/manual entry/list filter. Do not create route/API or save data.
+
+
+## Screenshot review — artifact 299 — 2026-10-22
+
+- Artifact source SHA `78b87d71f82090cb7399a68207ef436a200d3c9f`; [admin-preview-evidence-299 / 12413611086](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39750503783/artifacts/12413611086) was downloaded, extracted and inspected visually.
+- Opened `products__390x844__light.png`, `products__1280x800__light.png`, `products-reference-matrix__320x640__light.png`, `product-editor__1280x800__light.png`, `product-gallery__1280x800__light.png`, `orders__390x844__light.png`, `settings__390x844__light.png`, `backup-restore__390x844__light.png`, and approved `admin-mobile-reference.png`.
+- Screen #3: no horizontal overflow visible in the captures reviewed; edit action and unknown-value labels are legible. Reference contains concrete product photography/prices/stock, while fixtures intentionally use labelled image placeholders and `Chưa nhập`/`Chưa kiểm kê`. Keep facts truthful; screen #3 remains PARTIAL/NOT ACCEPTED due to whole-screen reference parity and lack of authorized real data.
+- Screens #4/#5: editor/gallery modal header, tabs and fixed footer are visible; existing geometry regression assertions remain required. Static screenshots do not prove scroll/CRUD/image-save behavior.
+- Screens #7/#12: order cards and settings/backup continue below the initial viewport. Do not call this a defect from a cropped screenshot alone; run scroll-to-end geometry checks for 320×640 and 390×844 in light/dark before concluding content is hidden behind the fixed bottom nav.
+- No UI change was made just to imitate reference values with fake data. Next: run Playwright scroll-to-end geometry checks, then fix ADMIN-only CSS only if a real overlap is demonstrated. Fixture screenshots are not authenticated business QA.
+
+
+## Scroll-to-end geometry audit — artifact 300 — 2026-10-22
+
+- Source/test SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`; Validate Source [#39753005337](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005337) and Preview/Playwright [#39753005347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347) both SUCCESS on the exact same SHA.
+- Artifact [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768) includes `uiFixtureVisualAudit.bottomNavigationScrollAudit`: **20/20 PASS** across products/orders/customers/warranties/settings, viewports 320×640 and 390×844, light/dark.
+- Every combination reached document end, kept document width within viewport, retained visible fixed navigation, and measured main-content bottom at least 16 px above nav top. Measured gap range 16–65 px. The suspected overlap is not present in tested configurations; **no CSS change warranted**.
+- Local source with synthetic read-only fixtures; not authenticated backend QA. Screen #3 and all-12-screen parity remain NOT ACCEPTED.
+
+
+## Latest status correction — 2026-10-22T16:32:00+07:00
+
+Preview #39755520573 fails on source SHA `d1047c6e898a5995295f8ce7e6191674207c4fe3` at screenshot capture; Validate Source #39755520563 passes. Older artifact 300's 20/20 scroll geometry PASS is historical evidence from SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`, not a current-HEAD acceptance. Do not mark the current responsive/theme screenshot matrix PASS until the failure is diagnosed and rerun succeeds.
