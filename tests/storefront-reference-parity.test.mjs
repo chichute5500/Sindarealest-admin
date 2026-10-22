@@ -270,7 +270,7 @@ assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/
   'Theme switching must not animate expensive backdrop-filter changes across glass surfaces.');
 
  
-// The owner-supplied Hero is a standalone presentation asset; only feathered canvas blending is permitted.
+// The owner-supplied Hero remains intact; a separate derivative changes alpha only around the platform/canvas edges.
 const heroStyleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
 const heroImageDeclarations = [...heroStyleContents.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
   .filter(([, selector]) => selector.includes(".hero-visual img"));
@@ -283,27 +283,25 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     const property = effect[2].toLowerCase();
     const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
     const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
-      || (property.startsWith("mask") && value.startsWith("radial-gradient("))
       || (property === "mix-blend-mode" && value === "normal")
-      || (property === "opacity" && value === "1")
-      // The only permitted transform is the small, source-preserving zoom requested for the Hero.
-      || (property === "transform" && (value === "scale(1.04)" || value === "scale(1.02)")));
+      || (property === "opacity" && value === "1"));
     assert.ok(neutral, "Hero image must remain visually untouched (" + selector.trim() + ": " + declaration + ").");
   }
 }
-const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied hero asset display lock — presentation only; never process the image. */"));
+const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
 assert.ok(heroAssetDisplayLock.includes("filter:none!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
-  "The protected Hero image must not use CSS filters; the final feathered edge mask is explicitly tested separately.");
+  "Hero image must not use CSS filters or CSS masks; the separate PNG already has alpha-feathered platform/canvas edges.");
 assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
-  "The protected Hero image keeps full opacity; the final multiply blend is explicitly tested separately.");
+  "Hero image keeps full opacity and normal color blending; no brightness/multiply blend is permitted.");
 const heroBlendOverride = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
 assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
-  && heroBlendOverride.includes("mask-image:radial-gradient(")
+  && heroBlendOverride.includes("mask-image:none!important")
+  && !heroBlendOverride.includes("mask-image:radial-gradient(")
   && heroBlendOverride.includes("width:118%!important")
   && heroBlendOverride.includes("max-height:290px!important"),
-  "The owner Hero image must be enlarged and only its perimeter feathered, without a brightness/blend-mode change.");
+  "The alpha-feathered Hero derivative must be enlarged with no CSS brightness, color blending, or whole-image mask.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
-  "The protected Hero image must be fully visible with no crop or transform.");
+  "The Hero image must be fully visible with no CSS crop or transform; edge feathering is baked into alpha only.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
   "Pseudo-elements that would overlay the owner-supplied image remain disabled.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before{")
@@ -311,7 +309,7 @@ assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before{")
   && heroAssetDisplayLock.includes("z-index:0!important;")
   && heroAssetDisplayLock.includes("filter:blur(16px)!important;")
   && heroAssetDisplayLock.includes("position:relative!important;z-index:1!important;"),
-  "The satin halo must stay outside/behind the complete original hero image, never cover or crop it.");
+  "The satin halo must stay behind the shoe image; it does not brighten, blur, or mask the image itself.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
   "No page caption may cover any portion of the supplied image.");
 assert.ok(
@@ -320,7 +318,7 @@ assert.ok(
   heroAssetDisplayLock.includes("grid-column:2!important;") &&
   heroAssetDisplayLock.includes("max-height:210px!important;") &&
   heroAssetDisplayLock.includes("object-fit:contain!important"),
-  "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the full, unprocessed image remains visible."
+  "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the enlarged alpha-feathered image remains visible."
 );
 
 // The approved icon board assigns the shopping-bag silhouette to Cart; Products remains a distinct catalogue/list destination.
