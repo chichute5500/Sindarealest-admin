@@ -1,9 +1,9 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:52:00Z",
+  "capturedAtUtc": "2026-10-22T15:54:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "Live branch HEAD is checkpointHeadSha. codeTestSha is the product/code revision validated by recorded source CI and may differ from docs-only HEAD. Always fetch live PR/branch/Actions before acting.",
+  "checkpointSemantics": "Branch HEAD changes with every documentation commit. The SHA recorded as headObservedBeforeHandoffSync is historical only; always fetch live PR/branch HEAD. codeTestSha is the exact product revision validated by the recorded source CI and may differ from current docs-only HEAD.",
   "codeTestSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
   "latestProductSourceCommit": "e11ec06cd5870522735a28205b678897de829361",
   "progressPercent": 50,
@@ -262,6 +262,6 @@
     "Run focused Playwright test and full source validation on the new exact code SHA.",
     "Sync all handoff files after test evidence changes; progress remains 50% PROVISIONAL."
   ],
-  "checkpointHeadSha": "4d6dab2f56d4dec53955c300e8ea477062fd2587",
-  "handoffSync": "Current state synced with run 39804852604: overall workflow FAIL due local static Playwright timeout; deployed Preview diagnostic step SUCCESS. Branch HEAD changes with each handoff commit, so fetch live HEAD at session start."
+  "handoffSync": "Core handoff files synchronized; live HEAD must be fetched at session start because subsequent handoff-only commits advance it. Latest Preview workflow failure cause is recorded.",
+  "headObservedBeforeHandoffSync": "4d6dab2f56d4dec53955c300e8ea477062fd2587"
 }
