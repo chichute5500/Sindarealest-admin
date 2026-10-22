@@ -1,12 +1,15 @@
-## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:32:00+07:00
+## CHECKPOINT XÁC MINH MỚI NHẤT — 2026-10-22T16:38:06+07:00
 
-- **ADMIN branch HEAD trước commit bàn giao này:** `06e679cb8502a1e657331d6b6fd204dcc86b91c9`; source-code commit gần nhất được kiểm tra là `d1047c6e898a5995295f8ce7e6191674207c4fe3`. Không được gộp nhầm source SHA với evidence/docs-only HEAD.
-- **Validate Source** [#39755520563](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520563) **SUCCESS** trên `d1047c6e898a5995295f8ce7e6191674207c4fe3`.
-- **Admin Preview diagnostic smoke test** [#39755520573](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39755520573) **FAIL** trên cùng `d1047c6e898a5995295f8ce7e6191674207c4fe3`, bước lỗi: `Capture real source screenshots across responsive and theme matrix`. Chưa xác minh được nguyên nhân gốc ở checkpoint này; không gọi đây là Preview PASS. Cần mở job log và sửa assertion/implementation dựa vào lỗi cụ thể, không nới lỏng kiểm tra.
-- **Thay đổi UI mới nhất:** custom checkbox SKU xác minh (focus-visible, light/dark, reduced-motion) và Playwright assertion checked/unchecked. Lần Preview trước đó #39754867245 fail vì assertion so màu với CSS custom property `--accent` không tồn tại tại root; đã sửa màu explicit theo theme. Nhưng run mới #39755520573 vẫn FAIL nên thay đổi checkbox chưa được chấp nhận cho đến khi log mới được đọc và test xanh.
-- **Kết quả đã xác minh trước đó, không phải trạng thái CI mới:** artifact [admin-preview-evidence-300 / 12413849768](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39753005347/artifacts/12413849768), source SHA `4ba76894734e3cc83615f0d91eb7663bcb0b25d4`, 99 PNG/75 metrics và 20/20 scroll-to-end geometry checks PASS trên 5 màn, 2 viewport, 2 theme. Không dùng artifact cũ để tuyên bố source hiện tại đã đạt Preview.
-- **Tiến độ giữ 50%.** Screen #3 PARTIAL/NOT ACCEPTED; 12-screen visual parity NOT ACCEPTED; authenticated backend/business QA NOT TESTED; AI grouping #11 BLOCKED chờ contract được duyệt; R2 image save và PRE/PRO migration DEFERRED_BY_OWNER.
-- **PR #111 ADMIN và PR #108 static vẫn OPEN/unmerged.** Chỉ nhánh ADMIN; không sửa main/static, không merge, không deploy Production, không bypass Access/secrets, không ghi D1/R2 hoặc chạy migration thật.
+- **Nhánh duy nhất được sửa:** feature/admin-isolated-handoff-2026-10-20. HEAD trước loạt làm mới tài liệu: 8419835f07ad7fa6d57c1b8e3fa3dfe954d62721 (evidence/docs-only descendant); source/test SHA đã kiểm thử: 2cf894e476b85e77b646b4bb45596e263a9f2fb6.
+- **Validate Source** [#39756606343](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606343): **SUCCESS** trên source SHA 2cf894e476b85e77b646b4bb45596e263a9f2fb6.
+- **Admin Preview diagnostic** [#39756606227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227): **SUCCESS** trên cùng source SHA. Local source Playwright matrix 3/3 pass; deployed Preview suite 2/2 pass (login CSS signature + login/dashboard smoke). Diagnostics status là PASS_LOGIN_CSS_SIGNATURE; chỉ là smoke, không phải QA nghiệp vụ backend.
+- **Lỗi checkbox SKU đã được xử lý ở test:** source selector :checked và theme colors là chính xác; test cũ đọc computed background ngay khi transition 180 ms vừa bắt đầu. Test mới chờ màu đích exact bằng toHaveCSS (không hạ assertion), kiểm tra checked/unchecked, focus-visible và Space toggle. Preview mới PASS.
+- Artifact [admin-preview-evidence-304 / ID 12416033404](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39756606227/artifacts/12416033404): 99 PNG, trong đó 16 login shell + 83 UI fixtures và 75 metrics; 8 viewport bắt buộc, light/dark. Fixture là read-only, không đại diện dữ liệu/backend thật. Lịch sử chi tiết ở handoff/history/2cf894e476b8/.
+- **Tiến độ giữ 50%.** 12-screen visual parity NOT ACCEPTED; screen #3 Product list PARTIAL/NOT ACCEPTED; authenticated backend/business-module QA NOT TESTED; AI grouping screen #11 BLOCKED chờ contract; R2 image save và PRE/PRO migration DEFERRED_BY_OWNER.
+- PR #111 ADMIN và PR #108 website tĩnh vẫn OPEN/unmerged. Không merge, không sửa main/static branch, không Production deploy, không Access/secrets bypass, không remote D1/R2 write hoặc migration thật.
+- Các checkpoint cũ sau dấu phân cách bên dưới chỉ là lịch sử, không phải hiện trạng. QR/payment contract đã đọc và được giữ nguyên vì thay đổi trong vòng này chỉ là timing của test checkbox.
+
+------
 ------
 ## Checkpoint mới nhất — 2026-10-21 17:47 UTC
 
