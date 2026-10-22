@@ -3,6 +3,7 @@ import { createSession } from "../functions/_lib.js";
 import { createOrderAccessToken, hashOrderAccessToken } from "../functions/_payments.js";
 import { onRequestPost as postVerifiedTransaction } from "../functions/api/admin/payment-transactions.js";
 import { onRequestPost as createPaymentRequest } from "../functions/api/admin/payment-requests.js";
+import { onRequestPatch as cancelPaymentRequest } from "../functions/api/admin/payment-requests.js";
 import { onRequestGet as getOrderPayment } from "../functions/api/order-payment.js";
 import { onRequestGet as getPaymentSettings } from "../functions/api/payment-settings.js";
 
@@ -72,11 +73,12 @@ function makeDb(options = {}) {
       if (options.failUnique) throw new Error("UNIQUE constraint failed: order_payment_transactions.transaction_reference");
       const atomicRefundRejected = Boolean(options.atomicRefundGuardReject
         && statements[0]?.sql.includes("WHERE ? != 'refunded' OR ? <="));
-      return statements.map(() => ({
+      const cancellationRace = Boolean(options.cancelUpdateHasNoChanges
+        && statements[0]?.sql.includes("UPDATE order_payment_requests SET status='cancelled'"));
+      return statements.map((statement, index) => ({
         success: true,
-        // Simulate a concurrent refund consuming the remaining net receipt before
-        // the conditional INSERT executes; follow-on statements must then be no-ops.
-        meta: { changes: atomicRefundRejected ? 0 : 1 }
+        // Simulate concurrent state changes at the guarded write boundary.
+        meta: { changes: atomicRefundRejected || (cancellationRace && index === 0) ? 0 : 1 }
       }));
     },
   };
@@ -337,4 +339,31 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(payload.accountNumber, "");
   assert.equal(payload.accountName, "");
 }
+{
+  const db = makeDb({
+    paymentRequest: { id: "request-cancel-race", order_id: "order-1", status: "pending" },
+    cancelUpdateHasNoChanges: true
+  });
+  const response = await cancelPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    action: "cancel", id: "request-cancel-race"
+  })));
+  assert.equal(response.status, 409, "a request settled by another actor before the guarded UPDATE must not report cancellation success");
+  assert.equal(db.batches.length, 1);
+  const statements = db.batches[0];
+  assert.match(statements[0].sql, /UPDATE order_payment_requests SET status='cancelled'.*WHERE id=\? AND status='pending'/);
+  assert.match(statements[1].sql, /INSERT INTO audit_logs[\s\S]*SELECT \?,'admin','payment_request_cancelled','order',\?,\? WHERE changes\(\)=1/,
+    "the audit event must be conditional on the preceding cancellation UPDATE changing one row");
+}
+{
+  const db = makeDb({
+    paymentRequest: { id: "request-cancel-success", order_id: "order-1", status: "pending" }
+  });
+  const response = await cancelPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    action: "cancel", id: "request-cancel-success"
+  })));
+  assert.equal(response.status, 200, "a pending request whose guarded UPDATE changes one row may be cancelled");
+  assert.equal((await response.json()).ok, true);
+  assert.match(db.batches[0][1].sql, /WHERE changes\(\)=1/);
+}
+
 console.log("PASS payment ledger route behavior: owner-derived deposit amounts, client amount rejection, mixed/unclassified cart gates, freeship and verified ledger.");

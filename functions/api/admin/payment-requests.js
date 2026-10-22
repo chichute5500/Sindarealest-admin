@@ -92,10 +92,11 @@ export async function onRequestPatch(context) {
     const row=await context.env.DB.prepare("SELECT id,order_id,status FROM order_payment_requests WHERE id=? LIMIT 1").bind(id).first();
     if(!row)return fail("Không tìm thấy yêu cầu thanh toán.",404);
     if(row.status!=="pending")return fail("Chỉ hủy yêu cầu đang chờ.",409);
-    await context.env.DB.batch([
+    const results=await context.env.DB.batch([
       context.env.DB.prepare("UPDATE order_payment_requests SET status='cancelled',updated_at=datetime('now') WHERE id=? AND status='pending'").bind(id),
-      context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,'admin','payment_request_cancelled','order',?,?)").bind(crypto.randomUUID(),row.order_id,JSON.stringify({requestId:id}))
+      context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?,'admin','payment_request_cancelled','order',?,? WHERE changes()=1").bind(crypto.randomUUID(),row.order_id,JSON.stringify({requestId:id}))
     ]);
+    if(Number(results?.[0]?.meta?.changes)!==1)return fail("Yêu cầu đã được xử lý hoặc không còn chờ; không thể hủy.",409);
     return json({ok:true,message:"Đã hủy yêu cầu thanh toán đang chờ."});
   } catch { return fail("Không hủy được yêu cầu thanh toán.",503); }
 }
