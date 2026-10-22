@@ -1,4 +1,4 @@
-# Unblock and verify read-only Cloudflare Pages Preview capture
+> **Current-target correction (2026-10-23):** Any older `3ed49bcc` URL in this guide is stale. The intended stable Preview alias is `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. Always verify the actual deployment SHA/branch with the read-only verifier before treating screenshots as current evidence. This guide never authorizes Production or Access policy changes.\n\n# Unblock and verify read-only Cloudflare Pages Preview capture
 
 Purpose: enable GitHub Actions to read and screenshot the **Preview hostname only**, verify the exact alias maps to a successful Cloudflare Pages Preview deployment, and record its actual deployment commit. This is not permission to deploy, merge, or change Production.
 
@@ -19,7 +19,7 @@ Official documentation: https://developers.cloudflare.com/cloudflare-one/access-
 
 The current screenshot workflow target is:
 
-`https://3ed49bcc.sindarealest2.pages.dev/`
+`https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`
 
 In **Access controls → Applications**, verify which Access application protects that exact hostname.
 
@@ -67,7 +67,7 @@ Open **Actions → Liquid Glass isolated visual preview → Run workflow** and c
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - `confirm_preview_only`: `true`
 - `capture_source`: `cloudflare-preview`
-- `preview_url`: `https://3ed49bcc.sindarealest2.pages.dev/`
+- `preview_url`: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`
 
 Choose `start-of-work` only when the deployment commit shown by the verifier is the intended starting checkpoint. The API verifies which revision the alias currently points to; it cannot reconstruct a historical screenshot that was never captured. If the preview already contains the changes and the actual old state cannot be recovered, do not backdate it as the original baseline. Review the verified SHA in the workflow artifact/manifest.
 
