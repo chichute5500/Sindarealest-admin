@@ -242,6 +242,7 @@ has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:a
 has('#backdrop{top:70px;bottom:calc(80px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header and above bottom navigation without a dimmed backdrop');
 has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--bg);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
 has('#productEditorTabs{position:sticky;top:0;gap:2px;padding:1px}', 'mobile product editor tabs stick directly below the editor header without covering form fields');
+has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
 has('class="thumb product-thumb-placeholder" role="img" aria-label="Chưa có ảnh sản phẩm"', 'missing product images use an explicitly labelled placeholder, not a generic branded texture');

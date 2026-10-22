@@ -746,6 +746,26 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#productTabGallery')).toHaveText('Hình ảnh');
     await expect(page.locator('#productTabGallery')).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#imageDropZone')).toBeVisible();
+    if (variant.viewport.width > 680) {
+      const desktopGalleryLayout = await page.evaluate(() => {
+        const rect = selector => {
+          const element = document.querySelector(selector);
+          if (!element) return null;
+          const bounds = element.getBoundingClientRect();
+          return { top: bounds.top, bottom: bounds.bottom };
+        };
+        return {
+          tabs: rect('#productEditorTabs'),
+          galleryHeading: rect('#productPanelGallery > .sectionlabel'),
+          uploadTitle: rect('#imageDropZone > div')
+        };
+      });
+      expect(desktopGalleryLayout.tabs?.bottom, 'Desktop editor tab strip should have measurable bounds: ' + JSON.stringify(desktopGalleryLayout)).not.toBeNull();
+      expect(desktopGalleryLayout.galleryHeading?.top, 'Desktop gallery heading should be visible below the editor tabs: ' + JSON.stringify(desktopGalleryLayout)).not.toBeNull();
+      expect(desktopGalleryLayout.galleryHeading.top, 'Desktop gallery heading must not be obscured by sticky tabs: ' + JSON.stringify(desktopGalleryLayout)).toBeGreaterThanOrEqual(desktopGalleryLayout.tabs.bottom - 1);
+      expect(desktopGalleryLayout.uploadTitle?.top, 'Desktop upload title should have measurable bounds: ' + JSON.stringify(desktopGalleryLayout)).not.toBeNull();
+      expect(desktopGalleryLayout.uploadTitle.top, 'Desktop upload title should follow the gallery heading without overlap: ' + JSON.stringify(desktopGalleryLayout)).toBeGreaterThan(desktopGalleryLayout.galleryHeading.bottom - 1);
+    }
     await expect(page.locator('#productPanelGallery #pTitle')).toHaveCount(0);
     await expect(page.locator('#productPanelGallery #pCategory')).toHaveCount(0);
     await expect(page.locator('#pPrice')).toBeHidden();
