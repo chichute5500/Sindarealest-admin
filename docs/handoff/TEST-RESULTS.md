@@ -1,12 +1,11 @@
 > **FOLLOW-UP CHECKPOINT — 2026-10-22, audit #808 artifact independently inspected; supersedes any claim below that the current branch HEAD was already audited.**
 
-## Latest checkpoint — 2026-10-22, audit #812 reviewed and corrections in progress
+## Latest checkpoint — 2026-10-22, audit #813 test assertion corrected
 
-- Audit #812 [run 39727879555](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727879555), artifact [12404360709](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727879555/artifacts/12404360709), used source SHA `f02d9b89ae65ee668b0572d5c8304e12fbdf5071`. Deployment verification was exact-SHA PASS (Cloudflare deployment `11591858-44e5-490e-9180-96cc443056e3`), but visual audit `passed=false` with 121 screenshots, 13 route checks, 69 section checks, and 3 hard failures.
-- Failures inspected in artifact: direct unknown route screenshot showed the welcome splash rather than 404; search query `chọn 01` returned all 8 cards because it was not selective; Zalo CTA was checked before scrolling into view and its screenshot target was marked missing. Technical error counters and overflow remained zero.
-- Corrections in this commit: initialize 404 view after its markup exists and remove stale `hidden` state; use a selective search query, require result count to shrink and capture the product section; scroll Zalo CTA into view before checking visibility and capturing it. Regression assertions added.
-- The next workflow set must be checked on the same new HEAD; inspect artifact and screenshot evidence, and accept only if deployment metadata SHA equals expected SHA and the new 404/search/Zalo checks all PASS. Do not change docs again while audit runs.
-- PR #108 remains OPEN/unmerged. No Production/main/DNS/Admin/backend/API/schema/product data/image mapping/D1/R2/bindings/secrets/Access changes. Preserve `/images/hero-sd-gl052.png`.
+- Audit #812 [run 39727879555](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727879555), artifact [12404360709](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39727879555/artifacts/12404360709), used SHA `f02d9b89ae65ee668b0572d5c8304e12fbdf5071`. Deployment verification was exact-SHA PASS, but visual audit failed its new 404/search/Zalo checks; the artifact was inspected and the UI/capture corrections were committed as `3fdcaa2c7f1c60c356e365fb8119ba2caf768bf1`.
+- Audit #813 failed before live capture because a new regression-test regex incorrectly required source tokens to appear in an impossible order. The assertion has now been split into independent checks for narrowing search results and scrolling the product section.
+- The next workflow set must validate the current branch HEAD and deploy Preview before the new live audit. Inspect actual 404/search/Zalo screenshots, all check arrays, and deployment metadata; require expected SHA = actual deployed SHA = branch HEAD and all three supplemental checks PASS.
+- Do not change docs while that audit is running. PR #108 remains OPEN/unmerged. No Production/main/DNS/Admin/backend/API/schema/product data/image mappings/D1/R2/bindings/secrets/Access changes. Preserve `/images/hero-sd-gl052.png`.
 
 # LATEST TEST CHECKPOINT — 2026-10-22 (audit #808, exact-SHA evidence)
 

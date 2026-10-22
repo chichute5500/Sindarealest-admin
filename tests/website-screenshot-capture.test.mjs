@@ -401,7 +401,9 @@ assert.match(live, /audit\.notFoundChecks\.length === 1[\s\S]*audit\.searchCheck
 
 assert.match(storefrontHtml, /<main id="notFoundPage" class="not-found-page" aria-labelledby="notFoundTitle">[\s\S]*<script id="sd-not-found-route-init">[\s\S]*sd-not-found-route/,
   'The 404 view must be available to the route initializer after its markup exists.');
-assert.match(live, /searchState\.visibleResultCount < originalCount[\s\S]*#products[\s\S]*scrollIntoViewIfNeeded/,
-  'Search audit must prove that a query narrows the live catalog and capture the result section.');
+assert.match(live, /searchState\.visibleResultCount < originalCount/,
+  'Search audit must require a genuinely narrower result set.');
+assert.match(live, /page\.locator\('#products'\)\.scrollIntoViewIfNeeded/,
+  'Search audit must scroll the product section into view before capturing results.');
 assert.match(live, /const zalo = page\.locator[\s\S]*zalo\.scrollIntoViewIfNeeded[\s\S]*zaloChecks/,
   'Zalo CTA visibility must be measured after scrolling the live CTA into view.');
