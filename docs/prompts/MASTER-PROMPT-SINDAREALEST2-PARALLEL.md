@@ -14,6 +14,10 @@
 - Never merge, deploy Production, change `main`, Admin, backend/API/auth/schema/business logic, product data/mappings, D1/R2, bindings, secrets, DNS or Access. No real checkout/payment tests. QR remains fail-closed pending trusted backend confirmation/configuration.
 - Keep working after each report. Do not repeat unaffected PASS tests. Update handoff files when facts change and continue to the next useful action without asking whether to continue.
 
+## Canonical prompt and rules for reading the historical notes below
+
+For a new chat, use [the canonical prompt](../handoff/PROMPT-NEXT-CHAT-2026-10-22.md); do not start from the dated 2026-10-20/21 prompts or this large historical file alone.
+
 ## Rules for reading the historical notes below
 
 Everything below this header is retained for traceability only. Treat it as historical unless independently re-verified against current GitHub/Cloudflare evidence. If any historical text conflicts with `CURRENT-STATE.md`, the current-state file and newly fetched platform metadata win.
