@@ -2,6 +2,13 @@
 
 > Current branch/next steps: [CURRENT-STATE.md](CURRENT-STATE.md). Never treat a result for one SHA as a PASS for another.
 
+## Newer observation-only artifact — 2026-10-22 10:29 UTC
+
+- Run [#39762445821](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821), artifact [#12418823837](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39762445821/artifacts/12418823837): the visual-preview job completed successfully and its live capture JSON reports 128 screenshots, 8/8 viewport/theme pairs, 13 route checks, zero failed requests/hard failures.
+- **Do not record this as an exact-SHA PASS.** Its `deployment-verification.json` has `passed:false`, status `DEPLOYMENT_METADATA_UNVERIFIED`, expected commit `e916ce590b6dbd720dca51405097d20333ce649b`, observed deployment commit `5f1be31d3b2d1c1f01b7352071186ac32e5af0a1`. The screenshots remain useful for visual inspection; only the earlier run #39760903036 / artifact #12418615814 is exact-SHA-verified for SHA `fc406599e04475e232fad790efd03d46979a5a20`.
+- Manual review of artifact #12418823837 confirmed a “Tuyển chọn 25” image/gallery consistency issue: image 01/19 is a black high-top pair and image 02/19 is a visibly different green/white sneaker. This is a catalog/image-mapping issue and was not changed. Gallery navigation passing does not establish product-image consistency.
+- The icon boards `Icon.png` and `Chitiet.png` were opened and compared with sampled live home/detail states. Sampled SVG-style icons and blue pressed-state tint align broadly with the palette; exhaustive icon parity remains IN_PROGRESS.
+
 ## Latest verified checkpoint (2026-10-22 UTC)
 
 - Branch/PR HEAD changes with documentation-only commits; fetch live HEAD before work. Latest verified storefront source/deployed/audited SHA: `fc406599e04475e232fad790efd03d46979a5a20`.
