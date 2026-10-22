@@ -1,9 +1,9 @@
 {
   "schemaVersion": 4,
-  "capturedAtUtc": "2026-10-22T15:40:27Z",
+  "capturedAtUtc": "2026-10-22T15:50:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "checkpointSemantics": "codeTestSha is the exact code/test revision validated below. This handoff-only commit advances branch HEAD; each new session must fetch live PR HEAD and Actions. Do not treat docs-only HEAD as tested product code.",
+  "checkpointSemantics": "Live branch HEAD is checkpointHeadSha. codeTestSha is the product/code revision validated by recorded source CI and may differ from docs-only HEAD. Always fetch live PR/branch/Actions before acting.",
   "codeTestSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
   "latestProductSourceCommit": "e11ec06cd5870522735a28205b678897de829361",
   "progressPercent": 50,
@@ -23,7 +23,7 @@
     "111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
+      "headSha": "4d6dab2f56d4dec53955c300e8ea477062fd2587",
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "changedFiles": 1304,
@@ -58,10 +58,10 @@
       "id": 39804852604,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39804852604",
       "testedSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "status": "pending",
-      "conclusion": null,
-      "jobs": 0,
-      "artifacts": 0,
+      "status": "completed",
+      "conclusion": "failure",
+      "jobs": "COMPLETED; inspect job logs/artifacts to determine root cause",
+      "artifacts": "NOT RECHECKED DURING THIS SYNC",
       "createdAt": "2026-10-22T15:26:29Z",
       "queuedBehindRunId": 39802525217
     },
@@ -69,9 +69,9 @@
       "id": 39802525217,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39802525217",
       "testedSha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
-      "status": "in_progress",
-      "conclusion": null,
-      "activeStep": "Install Chromium for Playwright",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "activeStep": null,
       "stepStartedAt": "2026-10-22T15:12:38Z",
       "note": "Older SHA; occupies preview concurrency. Logs/artifacts unavailable at last poll."
     }
@@ -248,10 +248,11 @@
     "No fabricated business facts or unapproved APIs."
   ],
   "nextActions": [
-    "Poll existing #39802525217 (old SHA) and exact-SHA #39804852604; no duplicate runs.",
-    "When #39804852604 runs, inspect exact SHA logs/artifact; verify customers/warranty 503->GET recovery and review screens #8–#12 screenshots against reference at matching viewport/theme.",
-    "Fix only reproduced failures and validate on the new code/test SHA.",
-    "Continue PR #111 per-path provenance in small batches.",
-    "Keep both PRs OPEN/unmerged; no main/static, Production, Access bypass, secrets, setup/migration, remote D1/R2."
-  ]
+    "Inspect jobs/logs/artifacts for Preview run 39804852604 and classify the exact failure.",
+    "Fix the smallest confirmed issue only on the ADMIN branch; rerun relevant validation on the resulting code SHA.",
+    "Sync latest-test-results.json, START-HERE.md, LATEST-STATUS.md and PROMPT-COMPLETENESS-AUDIT.md to this checkpoint.",
+    "Do not raise progress above 50% PROVISIONAL based on docs-only changes or source CI alone."
+  ],
+  "checkpointHeadSha": "4d6dab2f56d4dec53955c300e8ea477062fd2587",
+  "handoffSync": "PARTIAL_SYNCED: current-status.json reflects live ADMIN HEAD 4d6dab2f56d4dec53955c300e8ea477062fd2587 and known workflow conclusions; remaining handoff files still need synchronization."
 }
