@@ -133,6 +133,9 @@ assert.ok(protectedHeroDisplayLock.includes('#home .hero-visual img{')
   && protectedHeroDisplayLock.includes('filter:none!important')
   && protectedHeroDisplayLock.includes('mix-blend-mode:normal!important;opacity:1!important;')
   && protectedHeroDisplayLock.includes('border-radius:0!important;box-shadow:none!important;')
+  && protectedHeroDisplayLock.includes('display:flex!important;') 
+  && protectedHeroDisplayLock.includes('justify-content:center!important;align-items:center!important;')
+  && protectedHeroDisplayLock.includes('margin-inline:auto!important;')
   && !protectedHeroDisplayLock.includes('drop-shadow')
   && protectedHeroDisplayLock.includes('#home .hero-visual-caption{display:none!important}'),
   "The mobile hero must present the owner's full original image unboxed, without filters, blending, cropping, or a caption overlay.");
