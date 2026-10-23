@@ -146,3 +146,12 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 | CATALOG-ACTIVATION-VISIBLE | **OPEN — OWNER SAYS EFFECT IS NOT VISIBLE** | Inspect final status/artifact of audit #39926240364; reproduce a real selected-category change on verified Preview; diagnose why the 460ms animation is not perceptible; fix root cause and add behavior-level regression coverage; test, Preview deploy, verify SHA/public tree, inspect Light/Dark desktop/mobile evidence. Do not close on CSS declaration or source tests alone. |
 
 This active-task override supersedes earlier “ready for owner visual review” wording for category activation. Owner visual acceptance remains PENDING. Guardrails remain: Hero paused/untouched, #order owner-PASS/LOCKED/untouched, PR #108 open/unmerged, Preview only, status filter panel stays removed.
+
+
+## Catalog activation live audit final result — 2026-10-23
+
+- Latest storefront source/test validation: PASS [CI #39931617414](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617414). Live catalog-only Preview audit PASS [#39931617426](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617426); [artifact #12492051199 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617426/artifacts/12492051199).
+- Branch HEAD at audit: `f4b4d82873535d9920d177c99eceb383078a687b`; deployed Preview SHA `9b5302ef7bcd5252922ba3ad8f11581cd78d6bef`; manifest verifies public-tree equivalence. Preview: https://2284eff5.sindarealest2.pages.dev/.
+- Behavioral checks PASS: activation animation across mobile 360/390, tablet 768, desktop 1440 and Light/Dark; touch, keyboard, persistent selected state and reduced motion. 460ms spring/glass bloom, observed scale peak ~1.046–1.090; no perpetual pulse. Zero runtime errors, same-origin HTTP errors, or read-only violations.
+- TECHNICAL PASS only; owner visual acceptance PENDING. Prior audit failure #39931188126 was a brittle exact-RGBA test and has been superseded by #39931617426 PASS.
+- Guardrails: Hero PAUSED/untouched; #order OWNER PASS/LOCKED/untouched; PR #108 OPEN/unmerged; Preview only. Never restore the deleted dedicated product-status filter panel; no Production/Admin/backend/data/config changes.
