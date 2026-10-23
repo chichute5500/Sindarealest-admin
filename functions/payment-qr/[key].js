@@ -11,7 +11,7 @@ export async function onRequestGet({ params, env }) {
     const headers = new Headers(); object.writeHttpMetadata(headers);
     const type = object.httpMetadata?.contentType || "";
     if (!["image/png","image/jpeg","image/webp"].includes(type)) return fail("Định dạng ảnh QR không hợp lệ.",415);
-    headers.set("Content-Type",type); headers.set("Cache-Control","public, max-age=300");
+    headers.set("Content-Type",type); headers.set("Cache-Control","no-store");
     headers.set("X-Content-Type-Options","nosniff");
     return new Response(object.body,{headers});
   } catch { return fail("Không thể tải ảnh QR.",503); }

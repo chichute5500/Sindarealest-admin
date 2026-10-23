@@ -56,6 +56,7 @@ assert.match(orderPaymentApi, /public_access_token_hash/, "public order payment 
 assert.match(orderPaymentApi, /payment_terms_confirmed_at/, "payment details must wait for server-side price and terms confirmation");
 assert.doesNotMatch(read("../functions/api/payment-settings.js"), /ADMIN_PASSWORD|SESSION_SECRET|ORIGINALS/, "public QR settings must not expose secrets or private bindings");
 assert.match(read("../functions/payment-qr/[key].js"), /activeKey !== key/, "pending QR assets must not be publicly served");
+assert.match(read("../functions/payment-qr/[key].js"), /Cache-Control.*no-store/, "public QR cache must re-check active state immediately after deactivation/replacement");
 assert.match(read("../functions/api/admin/payment-qr-upload.js"), /payment_qr_pending_key/, "new QR upload must stay pending until manual verification/activation");
 assert.match(read("../functions/api/admin/payment-qr-upload.js"), /MAX_BYTES = 5 \* 1024 \* 1024/, "QR upload size limit must be explicit");
 assert.match(read("../functions/api/admin/payment-qr-preview.js"), /requireAdmin/, "pending QR preview is Admin-authenticated");
