@@ -1,3 +1,32 @@
+# AUTHORITATIVE NEXT-CHAT OVERRIDE — FAVORITES MIGRATION FIX DEPLOYED — 2026-10-24
+
+Continue the existing SinDarealest2 repository; do not restart. First re-fetch branch HEAD and PR #108, then use all four handoff files as history and live GitHub as source of truth.
+
+## Current repository and verified change
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Source/test commit: `384e0b503416d9fa0395fd1d485ac522259c913a`.
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — MUST remain OPEN/unmerged, base `main`.
+- Bug fixed: legacy favorites stored by SKU were resolvable but not canonicalized. A SKU plus product ID could duplicate one item and its saved heart state could appear false. The normalizer now resolves keys, stores canonical ID/slug, removes invalid keys, deduplicates, and persists only if changed.
+- Regression test in `tests/storefront-accessibility-contract.test.mjs` checks legacy SKU/case-insensitive fallback, duplicate collapse, invalid-key removal, normalized persistence, favorite state and UI refreshes.
+- Exact-SHA CI/full suite PASS: [#39993582024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993582024).
+- Exact-SHA Preview deploy workflow PASS: [#39993581910](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993581910). Preview https://e831f6dd.sindarealest2.pages.dev/; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. The deployment log confirms project `sindarealest2`, Production branch `main`, and the run SHA supplied with `--commit-hash=$GITHUB_SHA`.
+- No real browser screenshot or owner visual acceptance occurred. State this as automated/source PASS + Preview deploy PASS, NOT browser/visual PASS.
+
+## Immediate next action
+Continue source-first audit of unlocked storefront behavior/tests. Check exact HEAD, PR, recent CI/Preview runs, and source SHA before another code change. Fix only concrete, reproducible defects and add regression coverage. After any code change, run CI and Preview on the same SHA, compare the public tree, and keep all four handoff documents synchronized. While workflows run, audit a separate safe unlocked area and then verify workflow results.
+
+## Hard locks and safety
+- Hero PAUSED BY OWNER: do not inspect, edit, test, redesign, restore, screenshot or capture it.
+- `#order` / “Đặt hàng an tâm” OWNER PASS/LOCKED: do not touch or retest.
+- Catalog Liquid Glass/filter chips/icons/height/effects OWNER PASS/LOCKED; do not reopen absent explicit owner authorization and both `owner_authorized=true` and `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+- Warranty claim form OWNER PASS/LOCKED; do not proactively edit or retest.
+- Keep the removed standalone product-status filter panel removed.
+- No Production deploy, no `main` changes, no Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access/infrastructure/real-payment changes. Never bypass Access. PR #108 must stay OPEN/unmerged.
+- Keep source audit, automated CI, Preview deploy, browser capture, and owner visual acceptance as separate evidence gates.
+
+---
+
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
 ## NEWEST HANDOFF OVERRIDE — WARRANTY CLAIM FOCUS FIX DEPLOYED — 2026-10-23 23:31 ICT
