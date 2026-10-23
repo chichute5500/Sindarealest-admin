@@ -1633,6 +1633,20 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(page.locator('#imageGrid [data-gallery="down"][data-index="4"]')).toBeDisabled();
         expect(attemptedWrites, 'Gallery reorder/delete must remain local until the explicit product save action').toEqual([]);
       }
+      if (variant.viewport.width === 390 && variant.viewport.height === 844 && variant.theme === 'light') {
+        const uploadVisibility = await page.evaluate(() => {
+          const dialog = document.querySelector('#backdrop>.editor');
+          const footer = document.querySelector('#backdrop .editorfooter');
+          const dropZone = document.querySelector('#imageDropZone');
+          if (!dialog || !footer || !dropZone) throw new Error('Gallery upload controls are missing');
+          const drop = dropZone.getBoundingClientRect();
+          const foot = footer.getBoundingClientRect();
+          return { dropTop: drop.top, dropBottom: drop.bottom, footerTop: foot.top, viewportHeight: innerHeight };
+        });
+        expect(uploadVisibility.dropTop,
+          'At the reference 390x844 mobile viewport, the image-upload area should begin above the sticky action bar: ' + JSON.stringify(uploadVisibility))
+          .toBeLessThan(uploadVisibility.footerTop);
+      }
       if (variant.theme === 'dark') {
         const chromeColors = await page.evaluate(() => {
           const header = document.querySelector('.editorhead');
