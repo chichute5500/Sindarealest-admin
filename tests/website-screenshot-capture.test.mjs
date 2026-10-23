@@ -208,7 +208,7 @@ assert.match(live, /name: 'desktop-1440', width: 1440, height: 900/,
   'Live Preview capture must include the required 1440×900 desktop viewport.');
 assert.match(live, /async function captureMenuOpen[\s\S]*await page\.keyboard\.press\('Escape'\);[\s\S]*waitForFunction\(\(\) => !document\.querySelector\('#mobileNav'\)\?\.classList\.contains\('open'\)/,
   'Live menu-state capture must close the drawer with Escape rather than clicking a toggle covered by the open drawer.');
-assert.ok(storefrontHtml.includes("e.key==='Escape'&&$('#mobileNav').classList.contains('open'))setMobileMenu(false)"),
+assert.ok(storefrontHtml.includes("e.key==='Escape'&&$('#mobileNav').classList.contains('open')){setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})}"),
   'The public storefront must expose its own Escape-to-close behavior used by the read-only Playwright check.');
 assert.match(live, /currentRouteMatches[\s\S]*audit\.routeChecks\.push[\s\S]*expectedPattern/,
   'A live product card that uses a non-canonical route must be recorded as an explicit route-check failure.');
