@@ -1,3 +1,12 @@
+## LATEST TASK RESULT — SLIDESHOW MISSING-CONTROL GUARD — 2026-10-24
+
+- Follow-up guard added: slideshow now verifies all three required controls exist before event binding/timer setup, avoiding a runtime exception if markup is incomplete.
+- Added regression case for missing pause control; prior pause/resume and reduced-motion tests retained.
+- Current SHA `3fabbfc0bea134f9babde0b856276a47c966553f`; CI #39995117962 and Preview deploy #39995118190 were running when documented. Verify exact-SHA results before calling complete.
+- Previous slideshow implementation CI/Preview passed at `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`; follow-up requires its own gates. No manual browser/visual acceptance.
+
+---
+
 ## LATEST TASK RESULT — COLLECTION SLIDESHOW PAUSE CONTROL — 2026-10-24
 
 - COMPLETE: added accessible pause/resume to the unlocked Collections slideshow. Pause clears its interval; resume restarts one timer; accessible name and `aria-pressed` update correctly. Reduced-motion keeps autoplay off and disables the toggle while preserving manual navigation.
