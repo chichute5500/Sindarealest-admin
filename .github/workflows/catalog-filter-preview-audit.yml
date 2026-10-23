@@ -491,7 +491,7 @@ jobs:
                     assert.equal(selectedGlassMotion.animationDuration, '0.46s',
                       'Category activation must retain the visible 460ms glass-pop timing.');
                     // Sample actual computed frames while the CSS animation is running, not just its declaration.
-                    await page.waitForTimeout(95);
+                    await page.waitForTimeout(50);
                     const activationMidFrame = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
                       const animation = el.getAnimations().find(item =>
@@ -758,7 +758,7 @@ jobs:
                 await touchPage.touchscreen.tap(touchBox.x + touchBox.width / 2, touchBox.y + touchBox.height / 2);
                 assert.equal(await touchCategory.getAttribute('aria-pressed'), 'true',
                   'A real touchscreen tap must change selected category state.');
-                await touchPage.waitForTimeout(95);
+                await touchPage.waitForTimeout(50);
                 const touchActivation = await touchCategory.evaluate(el => {
                   const css = getComputedStyle(el);
                   const animation = el.getAnimations().find(item =>
