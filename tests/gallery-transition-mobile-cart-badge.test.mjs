@@ -11,8 +11,11 @@ assert.ok(detailStart >= 0 && detailEnd > detailStart, 'Detail gallery transitio
 const detailTransition = html.slice(detailStart, detailEnd);
 assert.match(detailTransition, /const preload=new Image\(\);preload\.decoding='async'/);
 assert.match(detailTransition, /preload\.decode\(\)/);
-assert.ok(detailTransition.indexOf('preload.onload=') < detailTransition.indexOf("img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left')"),
-  'The outgoing animation must begin only after the next photo has loaded/decoded.');
+assert.match(detailTransition, /const beginTransition=\(\)=>\{[\s\S]*?img\.classList\.add\(direction==='right'\?'sd-slide-out-right':'sd-slide-out-left'\)/);
+assert.match(detailTransition, /preload\.onload=\(\)=>\{[\s\S]*?Promise\.resolve\(decoded\)\.catch\(\(\)=>\{\}\)\.then\(beginTransition\)/);
+assert.match(detailTransition, /preload\.onerror=beginTransition/);
+assert.ok(detailTransition.indexOf('const beginTransition=()=>') < detailTransition.indexOf('preload.onload='),
+  'The outgoing animation callback must be defined before it is wired to the load/decode completion callbacks.');
 assert.match(detailTransition, /if\(transitionId!==detailTransitionId\)return/);
 
 assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
