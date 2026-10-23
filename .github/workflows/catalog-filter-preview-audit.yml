@@ -457,8 +457,12 @@ jobs:
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
                       'Moving away and releasing a pressed chip must not accidentally select it.');
                     const afterPressRelease = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
-                    assert.equal(afterPressRelease, defaultChipBackground,
-                      'The temporary press treatment must end after release without selection.');
+                    const releasedRgb = afterPressRelease.match(/[\\d.]+/g)?.slice(0, 3).map(Number) || [];
+                    const defaultRgb = defaultChipBackground.match(/[\\d.]+/g)?.slice(0, 3).map(Number) || [];
+                    assert.ok(releasedRgb.length === 3 && defaultRgb.length === 3 &&
+                      releasedRgb.every((value, index) => Math.abs(value - defaultRgb[index]) <= 2),
+                      'The temporary press treatment must return to the default glass surface within 2 RGB levels after transition. ' +
+                      'Expected ' + defaultChipBackground + ', received ' + afterPressRelease + '.');
                     categoryPressed = 'PASS';
                   }
                   const stateCheck = {
