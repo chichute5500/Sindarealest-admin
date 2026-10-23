@@ -108,3 +108,8 @@ Read-only static review of current `public/index.html` (blob `d54ed03b0f40e70d02
 - Manifest: `captureCompleted: true`, `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`, zero runtime errors, zero same-origin HTTP errors, zero read-only violations, no Access block. Cloudflare Insights requests were blocked by the external-read allowlist and are recorded as blocked external requests.
 - Owner visual acceptance remains **PENDING**. Capture success is not visual acceptance/PASS; owner review is required before this section can be marked PASS/LOCKED.
 - Earlier run #39894291884 failed before capture due a selector assertion mismatch (`section.section.wrap#order` versus `#order`); commit `cb8901b` corrected the assertion, and run #39894447648 succeeded.
+
+
+## Owner visual acceptance — order-step heading typography — 2026-10-23
+
+Owner explicitly confirmed PASS for the order-step heading readability change. This narrow item is PASS/LOCKED. Source/test CI and Preview deployment passed at commit `c8a14685efa3fbfa12475fe895405b5999489329`: [CI #39895567918](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567918), [Preview deploy #39895567897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567897). PR #108 remains open and unmerged; no Production deployment. Hero remains paused and untouched. Do not treat this owner acceptance as approval of other sections.
