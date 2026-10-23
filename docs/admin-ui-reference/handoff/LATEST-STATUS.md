@@ -27,3 +27,15 @@ PR #111 provenance/cleanup review remains complete. No more deletions or API con
 2. Inspect Screen 8 mobile assertions and fix only concrete remaining failures; do not accept the screen until Preview passes.
 3. Continue 12-screen audit and obtain authorized authenticated Preview access. Never bypass Cloudflare Access.
 4. No merge/rebase/force-push, Production deploy, remote D1/R2/schema/ledger operations, or writes to PR #108/`main`.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: cd432ecd775129ee652bd0e127cfcea24e5d9e57
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884082
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-367 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
