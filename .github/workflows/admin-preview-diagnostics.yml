@@ -10,6 +10,7 @@ on:
       - "migrations/**"
       - "scripts/**"
       - "tests/**"
+      - "docs/admin-ui-reference/handoff/**"
       - "package.json"
       - ".github/workflows/admin-preview-diagnostics.yml"
   workflow_dispatch:
