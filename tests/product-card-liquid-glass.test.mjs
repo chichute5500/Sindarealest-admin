@@ -222,18 +222,18 @@ assert.ok(
 
 const catalogFilterPill = html.match(/\.filter-pill\{[^}]+\}/)?.[0] || "";
 assert.match(catalogFilterPill, /min-height:32px;padding:6px 13px/,
-  "Desktop catalog filter pills should be slightly slimmer without changing their horizontal spacing.");
+  "The generic filter-pill fallback should stay compact without changing its horizontal spacing.");
 assert.match(html, /\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13px\}/,
-  "The compact mobile catalog filter pills should be slimmer while retaining readable labels.");
+  "The compact mobile filter-pill fallback should stay slim while retaining readable labels.");
 assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"]),')
   && html.includes('transform:translateY(1px) scale(.965)'),
   "Slimming catalog filter pills must preserve the existing press feedback.");
 
 assert.match(html, /#products \.filter-pill\{[^}]*min-height:44px;\s*padding:9px 19px;/,
-  "The authoritative desktop product filter style should be 4px shorter while keeping its horizontal padding and glass layers.");
+  "The authoritative product filter must keep a 44px hit target while clipping its visible glass surface 2px inward at top and bottom.");
 
 assert.match(html, /#products \.filter-pill\{min-height:44px;padding:7px 11px;font-size:13\.5px\}/,
-  "Narrow-phone product filters should use a reduced 40px touch target, not the previous oversized 44px height.");
+  "Narrow-phone product filters must preserve the 44px touch target while keeping the visible glass surface slim.");
 assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(--panel-strong);border-color:var(--gold);box-shadow:inset 0 1px rgba(255,255,255,.26)}'),
   "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
 
