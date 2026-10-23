@@ -235,3 +235,13 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - Status: TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING. Do not mark owner PASS until explicit owner approval.
 - Previous audit #39931188126 failed due to overly strict exact RGBA equality and malformed RGB parsing in the harness; this was corrected and superseded by final PASS #39931617426.
 - Guardrails: Hero PAUSED BY OWNER and untouched; #order OWNER PASS / LOCKED and untouched; PR #108 OPEN/unmerged; Preview only; no Production, Admin/backend/API/auth/data/D1/R2/secrets/bindings/DNS/Access changes. Never restore the removed dedicated status-filter panel.
+
+## Latest handoff checkpoint — category Liquid Glass — 2026-10-23 12:23 UTC
+
+- Current workflow commit: `b534c8fb8861157fb07da0b507a1e5f791966872`. PR #108 remains OPEN/unmerged.
+- Source validation #39952718374 passed on prior SHA `ecee210c0906edc66d00a7396a55a19f029e7c6c`. Live audit #39952718436 failed due to a harness TypeError: `activationMidFrame.Math.abs` is undefined. This is a test harness bug, not a visual PASS/FAIL result. Artifact #12501390897 exists but is not valid PASS evidence.
+- Fixed three erroneous calls to `Math.abs(...)` in the audit workflow without weakening the frame-time tolerance or spring scale threshold.
+- Current validation #39953050846 and catalog-only audit #39953050974 were IN_PROGRESS at this checkpoint. Fetch final statuses, logs, artifact and manifest before deciding next step.
+- Previous Preview deployment #39952539810 is at older storefront SHA `f3131d668fef72c652942a051f0ac53e7c739da6`. Do not claim it contains current storefront changes without exact deployment verification.
+- Owner says the category Liquid Glass effect remains far from the supplied reference. Keep task OPEN. Compare actual reference image `docs/design-reference/liquid-glass-product-filters.png` against real activation frames; verify mobile 360/390, tablet 768, desktop 1440, Light/Dark, mouse/touch/keyboard, reselection and reduced motion. Fix confirmed mismatches before asking the owner to inspect.
+- Hero remains PAUSED and untouched. `#order` remains OWNER PASS/LOCKED and untouched. Keep deleted product-status filter panel removed. PR #108 OPEN/unmerged; Preview only; no Production/Admin/backend/data/config changes.
