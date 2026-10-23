@@ -258,3 +258,10 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - New validation #39953050846 and live catalog audit #39953050974 were IN_PROGRESS when recorded. Fetch their final status and inspect the logs/artifact/manifest.
 - Last successful Preview deploy #39952539810 points to older storefront SHA `f3131d668fef72c652942a051f0ac53e7c739da6`. Do not imply that deploy includes later storefront code without checking exact deployment SHA/public tree.
 - Owner visual acceptance is PENDING because the category effect still looks unlike the supplied reference. Compare actual captured frames to `docs/design-reference/liquid-glass-product-filters.png` across mobile 360/390, tablet 768, desktop 1440 and Light/Dark; test mouse, touch, keyboard, category switching/reselection, selected persistence and reduced motion. No Hero capture. A source test or animation-name assertion alone is not visual acceptance.
+
+## Audit retry checkpoint — 2026-10-23 12:26 UTC
+
+- Catalog audit #39953050974: FAIL due `ReferenceError: currentTime is not defined` in the harness. This is separate from the earlier `Math.abs` typo and is not a visual PASS.
+- Commit `e9b35186e4273410253b4158f45105be19c7c483` now references each sampled animation object's `.currentTime` for desktop activation, category reselection and touch. The 1ms frame-time tolerance and `scaleX > 1.04` checks remain.
+- Validation #39953590662 and live catalog audit #39953590658 were IN_PROGRESS. Inspect final status, logs and artifact.
+- Owner visual acceptance remains pending. If the next audit passes, still compare captured frames with the supplied reference across viewport/theme states before asking owner to review.
