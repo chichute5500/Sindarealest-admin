@@ -74,6 +74,17 @@ has('placeholder="Chưa có giá"', 'missing price is represented as unknown rat
 has('placeholder="Chưa kiểm kê"', 'unknown stock is distinguished from a counted zero');
 has('aria-label="Nhóm thông tin sản phẩm"', 'product editor tabs have an accessible group label');
 
+// Screen 8 customer cards should be compact on phones without inventing missing totals or profile photos.
+has("class='customer-mobile-summary'", 'compact customer mobile summary');
+has("class='customer-mobile-details'", 'progressively disclosed customer contact/address details');
+has("customer-mobile-last-order", 'last order date based only on server-returned customer data');
+has("#main .customer-table tbody tr:has(.customer-mobile-summary)>td:nth-child(n+2){display:none!important}", 'phone cards avoid repeating the verbose desktop table cells');
+has("class=\"pagehead customer-pagehead\"", 'customer page heading has a scope for compact mobile layout');
+assert.match(adminHtml, /customer-mobile-extra[\\s\\S]*?c\\.email\\|\\|'Chưa cung cấp'[\\s\\S]*?c\\.address\\|\\|'Chưa cung cấp'/,
+  'Email and address remain available in an accessible details disclosure');
+assert.doesNotMatch(adminHtml, /customer-mobile-(?:total|revenue|amount)/,
+  'Customer cards must not invent order totals/revenue that the endpoint does not return');
+
 // Orders stay summary-first and use local search/status/payment filters on already-loaded orders.
 has('const filteredOrders=orders.filter', 'orders filters operate only on the currently loaded orders array');
 has('id="orderSearchBox"', 'orders list exposes a labeled search field');

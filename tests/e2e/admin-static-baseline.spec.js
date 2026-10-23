@@ -1829,6 +1829,28 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('.customer-avatar').nth(0)).toHaveAttribute('aria-hidden', 'true');
       await expect(page.locator('.customer-avatar').nth(1)).toHaveAttribute('aria-hidden', 'true');
       await expect(page.locator('#customerSearchStatus')).toContainText('Hiển thị 2 / 2');
+      await expect(page.locator('.customer-mobile-summary')).toHaveCount(2);
+      if (customerViewportWidth <= 680) {
+        const mobileSummary = page.locator('.customer-mobile-summary').first();
+        await expect(mobileSummary).toBeVisible();
+        await expect(page.locator('.customer-desktop-identity').first()).toBeHidden();
+        const contactCellDisplay = await page.locator('.customer-table tbody tr').first().locator('td').nth(1)
+          .evaluate(element => getComputedStyle(element).display);
+        expect(contactCellDisplay, 'Mobile customer cards should collapse secondary table columns').toBe('none');
+        const summaryHeight = await mobileSummary.evaluate(element => element.getBoundingClientRect().height);
+        expect(summaryHeight, 'Customer mobile summary should remain compact without opening contact details').toBeLessThanOrEqual(138);
+        const details = mobileSummary.locator('.customer-mobile-details');
+        await expect(details.locator('.customer-mobile-extra')).toBeHidden();
+        await details.locator('summary').click();
+        await expect(details.locator('.customer-mobile-extra')).toBeVisible();
+        await expect(details.locator('.customer-mobile-extra')).toContainText('Email');
+        await expect(details.locator('.customer-mobile-extra')).toContainText('Địa chỉ');
+        await details.locator('summary').click();
+        await expect(details.locator('.customer-mobile-extra')).toBeHidden();
+      } else {
+        await expect(page.locator('.customer-mobile-summary').first()).toBeHidden();
+        await expect(page.locator('.customer-desktop-identity').first()).toBeVisible();
+      }
 
       await page.locator('#customerSearch').fill('Khách UI Fixture 2');
       await expect(page.locator('.customer-table tbody')).toContainText('Khách UI Fixture 2');

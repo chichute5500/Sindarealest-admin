@@ -7,6 +7,11 @@
 - Direct comparison is now possible using the approved reference crops and the Preview screenshot at 390×844. The source combined Screen 10 Website settings and Screen 11 Backup/Restore in one `settings` view/title, while the reference maps them separately; baseline capture consequently scrolled deep inside Settings for the backup image.
 - This change splits the existing Backup/Restore, D1 summary and binding-information panels into a dedicated `backup` view, adds desktop/mobile navigation and history routing, and updates the static baseline to capture that route from its top. This is a source-level UI correction only; it does not establish backend acceptance. Check live Validate/Preview for the candidate SHA before changing screen statuses.
 
+
+## Screen 8 compact mobile customer cards
+- The exact 390×844 Preview screenshot showed verbose stacked table columns (five separately labeled rows per customer), while the approved Screen 8 reference uses a compact identity/contact/order summary. Changed only presentation: a compact mobile summary uses existing name, phone, order count and last-order fields; email/address/created timestamp remain behind an explicit details disclosure. It does not add mock profile photos or order totals that the API does not return. Desktop table columns and search over existing fields remain intact.
+- Added source-contract assertions and Playwright checks for mobile summary height, hidden desktop columns, details disclosure, search behavior, and the unchanged desktop table. Re-check exact-SHA Validate and Preview before assigning acceptance.
+
 ## Latest successful UI evidence
 
 - Latest live branch checkpoint (documentation only): HEAD `83733513da6d3a28a13e773f479b596a4432df1f`; Validate [#39893834166](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166) SUCCESS on exact SHA. This validates source integrity/tests but is not a new screenshot/Preview run.
