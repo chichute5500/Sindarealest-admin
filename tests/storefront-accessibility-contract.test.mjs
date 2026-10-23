@@ -403,4 +403,5 @@ assert.ok(html.includes('backdrop-filter:blur(22px) saturate(180%) !important'),
 assert.ok(html.includes('radial-gradient(125% 115% at 12% 0%'), 'final icon shell must contain a visible specular highlight');
 assert.ok(html.includes('linear-gradient(145deg,rgba(255,255,255,.57) 0%,rgba(226,242,253,.38) 46%,rgba(151,194,223,.24) 100%) !important'), 'light icon shells must use a translucent pearl/ice glass surface');
 assert.ok(html.includes('html.dark .detail-gallery-arrow:hover'), 'dark mode must have an equivalent shared glass hover state');
-assert.ok(!html.includes('#products .filter-pill{background:') && !html.includes('#order .order-cta'), 'final glass system must not override the owner-locked catalog filters or order section');
+const finalGlassCss = html.slice(finalGlassStart, html.indexOf('</style>', finalGlassStart));
+assert.ok(!finalGlassCss.includes('#products .filter-pill') && !finalGlassCss.includes('#order .order-cta'), 'final glass system must not override the owner-locked catalog filters or order section');
