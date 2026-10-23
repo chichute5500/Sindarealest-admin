@@ -297,3 +297,27 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - No Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes; no Production deployment; do not merge PR #108.
 - Do not restore the removed dedicated “Tình trạng sản phẩm” panel.
 - Continue autonomous work after reporting; update all four handoff documents and keep the prompt synchronized with the actual latest state.
+
+
+## LATEST TEST / DEPLOY / LIVE AUDIT RESULTS — 2026-10-23 13:06 UTC
+
+| Gate | Result |
+|---|---|
+| Source validation and tests | PASS — [#39958226480](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226480) |
+| Preview deploy | PASS — [#39958225930](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958225930) |
+| Catalog-only live audit | PASS — [#39958226206](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206) |
+| Artifact | [#12503252707 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206/artifacts/12503252707) |
+| Source/deployed Preview SHA | Exact match: `07d027d8d6a6a60b598d5d45686c5491ea5bc2e4` |
+| Deployment | `26b9aea6-fa95-4128-8262-13323bbe3c98`; https://26b9aea6.sindarealest2.pages.dev/ |
+
+Manifest: `captureCompleted: true`, exact source match true, deployed public-tree equivalent true, owner visual acceptance still PENDING. Scope: catalog search/category controls only. 8/8 filter checks, 8/8 interaction-state checks and 2/2 touch checks passed across 360/390 mobile, 768 tablet, 1440 desktop in Light/Dark. Search/category hover, press, focus, keyboard selection, selected persistence, reselection and reduced-motion pass. Real animation samples confirm 460ms timing, ~1.07949 scale at the 100ms spring frame, later-frame transform/bloom changes and persistent selection. Runtime errors 0; same-origin HTTP errors 0; read-only violations 0.
+
+### Final visual result
+
+Artifact 67 has been opened and compared directly with the reference image. The final Light-only icy-blue edge adjustment makes the moving diagonal reflection visible on mobile, tablet and desktop. Dark reflection remains clear; settled frames have no perpetual pulse. Owner acceptance is still pending—do not convert the technical result into owner PASS.
+
+### Historical failures superseded
+
+- #39956624603 failed because `el.getAnimations()` did not return the pseudo-element animation. The audit now discovers CSS animations via `document.getAnimations()`; intermediate audit #39957189240 passed.
+- The first run for `b60011b` stopped at a malformed escaped-newline test assertion; corrected in `ae153e8`. Current CI/deploy/audit listed above all PASS.
+- Cloudflare Insights GETs were blocked by the existing external-read allowlist; no same-origin/runtime/read-only issues were found.

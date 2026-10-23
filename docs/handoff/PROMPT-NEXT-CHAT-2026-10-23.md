@@ -206,3 +206,37 @@ Audit #39953590658 failed after the harness reference fixes because it expected 
 - No Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes; no Production deployment; do not merge PR #108.
 - Do not restore the removed dedicated “Tình trạng sản phẩm” panel.
 - Continue autonomous work after reporting; update all four handoff documents and keep the prompt synchronized with the actual latest state.
+
+
+# NEWEST HANDOFF OVERRIDE — CATEGORY LIQUID GLASS AWAITS OWNER VISUAL DECISION — 2026-10-23 13:06 UTC
+
+Continue the existing project from GitHub; do not restart or ask the owner to repeat context. First read `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS.md` and `docs/handoff/TEST-RESULTS.md`; then fetch current branch HEAD, PR #108 state, workflows and Preview deployment metadata.
+
+## Current verified source and Preview
+
+- Repo: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: OPEN / UNMERGED.
+- Storefront source deployed to Preview: `07d027d8d6a6a60b598d5d45686c5491ea5bc2e4`.
+- Validation: [#39958226480 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226480).
+- Preview deploy: [#39958225930 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958225930).
+- Live catalog-only audit: [#39958226206 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206).
+- Artifact [#12503252707 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206/artifacts/12503252707).
+- Immutable Preview: https://26b9aea6.sindarealest2.pages.dev/ ; deployment ID `26b9aea6-fa95-4128-8262-13323bbe3c98`.
+
+Artifact 67's manifest confirms exact source/deployed SHA match, public-tree equivalence and completed capture. Only `#products .catalog-tools` was captured. Test matrix: 360/390 mobile, 768 tablet, 1440 desktop × Light/Dark, plus touch activation in both themes. All 8 filter checks, 8 state checks and 2 touch checks passed. Runtime errors 0, same-origin HTTP errors 0, read-only violations 0.
+
+## Immediate next action — owner visual gate
+
+Status is **TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING**. The latest artifact has been inspected side-by-side with `docs/design-reference/liquid-glass-product-filters.png`; after the final Light-only reflection contrast adjustment, the diagonal specular sweep is visible in Light at mobile/tablet/desktop and remains clear in Dark. The chip settles without a continuous pulse. You may now ask the owner to inspect the immutable Preview and artifact and explicitly PASS or identify a concrete discrepancy. Never claim owner PASS before they say it.
+
+If the owner identifies a concrete mismatch, change only catalog search/category UI, add/update regression coverage, run validation/tests, deploy Preview only, verify exact SHA/public-tree integrity, capture and inspect a fresh catalog-only artifact, then update all four handoff docs. If the owner explicitly says PASS, mark the catalog Liquid Glass controls OWNER PASS/LOCKED and do not edit them unless the owner explicitly reopens the scope. Do not start another acceptance item before the owner gate resolves.
+
+## Hard guardrails
+
+- Hero PAUSED BY OWNER: never inspect/edit/test/capture/restore.
+- `#order` / “Đặt hàng an tâm” OWNER PASS/LOCKED: never touch/retest.
+- Never restore the deleted dedicated “Tình trạng sản phẩm” filter panel; preserve per-product status metadata.
+- No Production deploy, Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+- Keep PR #108 OPEN and unmerged.
+- A docs-only commit may follow the source SHA above. Re-fetch live HEAD in the next session and compare the deployed `public/` tree before assuming it changes the Preview.

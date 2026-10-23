@@ -293,3 +293,20 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - No Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes; no Production deployment; do not merge PR #108.
 - Do not restore the removed dedicated “Tình trạng sản phẩm” panel.
 - Continue autonomous work after reporting; update all four handoff documents and keep the prompt synchronized with the actual latest state.
+
+
+## LATEST CHECKPOINT — 2026-10-23 13:06 UTC — CATEGORY LIQUID GLASS READY FOR OWNER REVIEW
+
+- Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and UNMERGED.
+- Storefront-code SHA deployed to Preview: `07d027d8d6a6a60b598d5d45686c5491ea5bc2e4`.
+- Source validation/tests PASS: [#39958226480](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226480). Preview deploy PASS: [#39958225930](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958225930). Catalog-only live audit PASS: [#39958226206](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206).
+- Artifact [#12503252707 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206/artifacts/12503252707).
+- Immutable Preview: https://26b9aea6.sindarealest2.pages.dev/ ; deployment ID `26b9aea6-fa95-4128-8262-13323bbe3c98`.
+
+Manifest: `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`; source and deployed Preview SHA match exactly; public-tree equivalence true; capture complete. Scope is `#products .catalog-tools` only. 26 screenshots cover mobile 360/390, tablet 768, desktop 1440 × Light/Dark, plus two touch activation captures. All 8 filter checks, 8 state checks and 2 touch checks pass. Runtime errors 0, same-origin HTTP errors 0, read-only violations 0; Cloudflare Insights GETs were blocked by the established external-read allowlist.
+
+Artifact 67 was opened and compared with `docs/design-reference/liquid-glass-product-filters.png`. The final Light-only icy-blue specular edges make the diagonal band visible on mobile/tablet/desktop; Dark keeps a clear white-blue sweep. The selected state settles with no endless pulse. This is ready for the owner's visual decision, not owner acceptance.
+
+**Status: TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING.** Next action: owner inspects the immutable Preview and artifact, then explicitly says PASS or points out a concrete discrepancy. Do not start another acceptance item until this gate is resolved.
+
+Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWNER PASS/LOCKED—do not touch. Never restore the removed dedicated product-status panel. Preview only; no Production or restricted-scope changes. Keep PR #108 OPEN/unmerged. If a docs-only commit follows, fetch live HEAD; it does not change deployed storefront code.

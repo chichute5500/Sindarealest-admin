@@ -214,3 +214,19 @@ Guardrails: Hero PAUSED/untouched; `#order` OWNER PASS/LOCKED/untouched; removed
 - No Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes; no Production deployment; do not merge PR #108.
 - Do not restore the removed dedicated “Tình trạng sản phẩm” panel.
 - Continue autonomous work after reporting; update all four handoff documents and keep the prompt synchronized with the actual latest state.
+
+
+## ACTIVE TASK OVERRIDE — CATEGORY LIQUID GLASS — 2026-10-23 13:06 UTC
+
+**Task: selected-category activation parity with the Liquid Glass reference. Status: TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING.**
+
+Latest evidence is tied to storefront SHA `07d027d8d6a6a60b598d5d45686c5491ea5bc2e4`:
+- CI/source validation #39958226480 PASS.
+- Preview deploy #39958225930 PASS; immutable URL https://26b9aea6.sindarealest2.pages.dev/ ; deployment ID `26b9aea6-fa95-4128-8262-13323bbe3c98`.
+- Catalog-only live audit #39958226206 PASS; artifact #12503252707 (26 screenshots + manifest): https://github.com/chichute5500/Sindarealest-admin/actions/runs/39958226206/artifacts/12503252707.
+
+The latest artifact was opened and compared to `docs/design-reference/liquid-glass-product-filters.png`. The Light diagonal reflection is now visibly discernible at 360/390 mobile, 768 tablet and 1440 desktop; Dark retains a clear sweep. The effect uses a 460 ms spring activation and returns to a persistent selected glass state without an endless pulse. Touch, keyboard selection, selected persistence, reselection and reduced-motion checks pass across all 8 viewport/theme contexts. Runtime errors, same-origin HTTP errors and read-only violations are all zero.
+
+Next step: ask the owner to inspect the latest Preview/artifact and explicitly PASS or identify a concrete discrepancy. Do not self-accept, modify CSS without a concrete issue, or start another acceptance item while owner acceptance is pending.
+
+Guardrails unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; keep the deleted dedicated product-status filter panel deleted; Preview only; no Production/Admin/backend/API/auth/data/config edits; PR #108 OPEN/unmerged.
