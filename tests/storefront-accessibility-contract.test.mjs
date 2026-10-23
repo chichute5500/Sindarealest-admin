@@ -191,7 +191,7 @@ assert.ok(html.includes("$('#accountContactAction')?.addEventListener('click',na
  // Opening the warranty claim form dynamically must move keyboard focus into
  // the newly revealed form; scrolling alone leaves focus on the old selector.
 const warrantyHandlerStart = html.indexOf('function showWarrantyRecords(records){');
-const warrantyHandlerEnd = html.indexOf('\\nasync function optimizeWarrantyPhoto(file){', warrantyHandlerStart);
+const warrantyHandlerEnd = html.indexOf('\nasync function optimizeWarrantyPhoto(file){', warrantyHandlerStart);
 assert.ok(warrantyHandlerStart >= 0 && warrantyHandlerEnd > warrantyHandlerStart,
   'warranty records must have a dedicated claim-selection transition');
 const warrantyHandler = html.slice(warrantyHandlerStart, warrantyHandlerEnd);
@@ -230,7 +230,7 @@ const warrantyNodes = {
   '#claimIssueType': claimSelect
 };
 const warrantyDollar = selector => warrantyNodes[selector] || null;
-vm.runInNewContext(warrantyHandler + "\\nshowWarrantyRecords([{eligible:true,claimToken:'test-token',maskedWarrantyCode:'SDW-***',title:'Sample item'}]);", {
+vm.runInNewContext(warrantyHandler + "\nshowWarrantyRecords([{eligible:true,claimToken:'test-token',maskedWarrantyCode:'SDW-***',title:'Sample item'}]);", {
   $: warrantyDollar,
   escapeHtml: value => String(value ?? ''),
   imgPath: value => value
