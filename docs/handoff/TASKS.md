@@ -1,3 +1,13 @@
+## LATEST TASK RESULT — COLLECTION SLIDESHOW PAUSE CONTROL — 2026-10-24
+
+- COMPLETE: added accessible pause/resume to the unlocked Collections slideshow. Pause clears its interval; resume restarts one timer; accessible name and `aria-pressed` update correctly. Reduced-motion keeps autoplay off and disables the toggle while preserving manual navigation.
+- Regression harness added to `tests/storefront-accessibility-contract.test.mjs` for timer lifecycle, ARIA updates, and reduced-motion behavior.
+- Source/test SHA `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`: CI PASS [#39994601040](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994601040); Preview deploy PASS [#39994600974](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994600974). Preview https://5052d769.sindarealest2.pages.dev/.
+- Deploy warning: Wrangler ignored `wrangler.toml` because `pages_build_output_dir` is missing. Deploy succeeded, but do not change infrastructure/config without separate scoped approval.
+- Browser visual acceptance NOT PERFORMED. Continue audit only in unlocked storefront areas; keep all locks and Preview-only policy.
+
+---
+
 ## LATEST TASK RESULT — LEGACY FAVORITES KEY MIGRATION — 2026-10-24
 
 - COMPLETE: normalize locally stored favorites that reference a legacy SKU into the canonical product ID/slug key; remove stale entries and collapse ID/SKU duplicates so a product appears once and its heart state matches its saved state.
