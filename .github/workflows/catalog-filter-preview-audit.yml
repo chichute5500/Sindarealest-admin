@@ -75,7 +75,7 @@ jobs:
             { name: 'desktop-1440', width: 1440, height: 900 }
           ];
           const themes = ['light', 'dark'];
-          const targetSelectors = ['#products .catalog-tools', '#products .fulfillment-filter-row'];
+          const targetSelectors = ['#products .catalog-tools'];
           const previewUrl = new URL(process.env.PREVIEW_URL);
           const origin = previewUrl.origin;
           const targetUrl = new URL('#products', previewUrl).href;
@@ -98,7 +98,7 @@ jobs:
 
           const audit = {
             sourceKind: 'cloudflare-pages-preview-live-read-only',
-            auditScope: 'catalog-filter-controls-only',
+            auditScope: 'catalog-search-and-category-controls-only',
             previewOrigin: origin,
             branch,
             sourceHeadSha: sourceSha,
@@ -310,32 +310,24 @@ jobs:
 
                   const productsSection = page.locator('#products');
                   await productsSection.scrollIntoViewIfNeeded();
+                  assert.equal(await page.locator('#products .fulfillment-filter-row, #fulfillmentFilters').count(), 0,
+                    'The dedicated product-status panel and its filter controls must be absent.');
                   const categoryGroup = page.locator('#categoryFilters');
-                  const fulfillmentGroup = page.locator('#fulfillmentFilters');
                   await categoryGroup.waitFor({ state: 'visible', timeout: 25000 });
-                  await fulfillmentGroup.waitFor({ state: 'visible', timeout: 25000 });
                   assert.equal(await categoryGroup.getAttribute('role'), 'group');
                   assert.equal(await categoryGroup.getAttribute('aria-label'), 'Lọc theo danh mục');
-                  assert.equal(await fulfillmentGroup.getAttribute('role'), 'group');
-                  assert.equal(await fulfillmentGroup.getAttribute('aria-label'), 'Lọc theo tình trạng sản phẩm');
 
                   const categoryButtons = categoryGroup.locator('button[data-category]');
-                  const fulfillmentButtons = fulfillmentGroup.locator('button[data-fulfillment]');
                   await categoryButtons.first().waitFor({ state: 'visible', timeout: 25000 });
-                  await fulfillmentButtons.first().waitFor({ state: 'visible', timeout: 25000 });
                   assert.ok(await categoryButtons.count() >= 1, 'Category filter group has no buttons.');
-                  assert.equal(await fulfillmentButtons.count(), 4, 'Fulfillment filter group must expose four filter choices.');
                   assert.equal(await categoryGroup.locator('button[aria-pressed="true"]').count(), 1);
-                  assert.equal(await fulfillmentGroup.locator('button[aria-pressed="true"]').count(), 1);
 
                   for (const selector of targetSelectors) {
                     const target = page.locator(selector);
                     await target.scrollIntoViewIfNeeded();
                     const box = await target.boundingBox();
                     assert.ok(box && box.width > 0 && box.height > 0, 'Catalog filter target is missing or has no layout: ' + selector);
-                    const filename = selector.includes('catalog-tools')
-                      ? 'catalog-search-and-category-filters-' + contextName + '.png'
-                      : 'catalog-fulfillment-filters-' + contextName + '.png';
+                    const filename = 'catalog-search-and-category-filters-' + contextName + '.png';
                     await target.screenshot({
                       path: path.join(outDir, filename),
                       animations: 'disabled',
@@ -381,12 +373,16 @@ jobs:
                   await page.waitForTimeout(300);
                   const searchFocus = await searchField.evaluate(el => {
                     const css = getComputedStyle(el);
-                    return { border: css.borderColor, shadow: css.boxShadow };
+                    return { border: css.borderColor, shadow: css.boxShadow, outlineStyle: css.outlineStyle, outlineWidth: Number.parseFloat(css.outlineWidth), hasFocusWithin: el.matches(':focus-within') };
                   });
-                  assert.notEqual(searchFocus.border, searchDefault.border,
-                    'Keyboard/programmatic focus on search must expose a visible boundary.');
+                  assert.equal(searchFocus.hasFocusWithin, true,
+                    'Search input focus must reach its containing field.');
+                  assert.equal(searchFocus.outlineStyle, 'solid',
+                    'Focused search must expose a visible outline.');
+                  assert.ok(searchFocus.outlineWidth >= 3,
+                    'Focused search outline must be at least 3px wide.');
                   assert.notEqual(searchFocus.shadow, searchDefault.shadow,
-                    'Focused search must expose a visible focus treatment.');
+                    'Focused search must expose a distinct glass focus treatment.');
                   await page.keyboard.press('Tab');
                   await page.waitForTimeout(50);
                   const firstCategoryButton = categoryGroup.locator('button').first();
@@ -461,21 +457,13 @@ jobs:
                     assert.equal(await categoryGroup.locator('button[data-category="all"]').getAttribute('aria-pressed'), 'true');
                     categoryInteraction = 'PASS';
                   }
-                  const otherFulfillment = fulfillmentGroup.locator('button[data-fulfillment]:not([data-fulfillment="all"])').first();
-                  await otherFulfillment.click();
-                  assert.equal(await otherFulfillment.getAttribute('aria-pressed'), 'true',
-                    'Selected fulfillment filter did not expose aria-pressed=true.');
-                  await fulfillmentGroup.locator('button[data-fulfillment="all"]').click();
-                  assert.equal(await fulfillmentGroup.locator('button[data-fulfillment="all"]').getAttribute('aria-pressed'), 'true');
                   audit.stateChecks.push(otherCategoryState);
                   audit.filterChecks.push({
                     context: contextName,
+                    dedicatedProductStatusPanelAbsent: true,
                     namedCategoryGroup: true,
-                    namedFulfillmentGroup: true,
                     categoryButtonCount: await categoryButtons.count(),
-                    fulfillmentButtonCount: await fulfillmentButtons.count(),
-                    categoryInteraction,
-                    fulfillmentInteraction: 'PASS'
+                    categoryInteraction
                   });
                 } finally {
                   await context.close();
@@ -483,7 +471,7 @@ jobs:
                 }
               }
             }
-            audit.captureCompleted = audit.screenshots.length === 16;
+            audit.captureCompleted = audit.screenshots.length === 8;
             audit.passed = audit.captureCompleted &&
               audit.accessBlocked === false &&
               audit.runtimeErrors.length === 0 &&
@@ -494,7 +482,7 @@ jobs:
             audit.status = audit.passed ? 'CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE' : 'CAPTURED_WITH_ISSUES';
             audit.finishedAtUtc = new Date().toISOString();
             await writeAudit();
-            assert.equal(audit.screenshots.length, 16, 'Expected eight viewport/theme pairs and two catalog-only screenshots per pair.');
+            assert.equal(audit.screenshots.length, 8, 'Expected one screenshot of the remaining search/category controls for each of eight viewport/theme pairs.');
             assert.equal(audit.runtimeErrors.length, 0, 'Runtime errors were detected.');
             assert.equal(audit.sameOriginHttpErrors.length, 0, 'Same-origin HTTP errors were detected.');
             assert.equal(audit.readOnlyViolations.length, 0, 'Non-read-only requests were attempted.');

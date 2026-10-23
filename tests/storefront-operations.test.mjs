@@ -27,7 +27,7 @@ assert.ok(storefrontHtml.includes('<input id="catalogSearch" type="search" aria-
 assert.ok(storefrontHtml.includes("n===page?'aria-current=\"page\"':''"), "The currently selected catalog page must expose aria-current=\"page\" to assistive technology.");
 assert.ok(storefrontHtml.includes("<nav class=\"pagination\" id=\"pagination\" aria-label=\"Phân trang sản phẩm\"></nav>"), "Product pagination must be a named navigation landmark.");
 assert.ok(storefrontHtml.includes('id="categoryFilters" role="group" aria-label="Lọc theo danh mục"'), "Catalog category filters must be a named group in the accessibility tree.");
-assert.ok(storefrontHtml.includes('id="fulfillmentFilters" role="group" aria-label="Lọc theo tình trạng sản phẩm"'), "Catalog fulfillment filters must be a named group in the accessibility tree.");
+assert.ok(!storefrontHtml.includes('class="fulfillment-filter-row"') && !storefrontHtml.includes('id="fulfillmentFilters"') && !storefrontHtml.includes("selectedFulfillment") && !storefrontHtml.includes('data-fulfillment="'), "The unnecessary dedicated product-status filter panel and its interactive controls must be fully removed.");
 assert.ok(storefrontHtml.includes('<style id="sd-catalog-liquid-glass-reference-2026-10-23">')
   && storefrontHtml.includes('--sd-catalog-glass-default:rgba(255,255,255,0.48)')
   && storefrontHtml.includes('--sd-catalog-glass-hover:rgba(255,255,255,0.72)')
@@ -36,9 +36,7 @@ assert.ok(storefrontHtml.includes('<style id="sd-catalog-liquid-glass-reference-
   && storefrontHtml.includes('--sd-catalog-muted:#6C89A6')
   && storefrontHtml.includes('--sd-catalog-accent:#1684E8')
   && storefrontHtml.includes('--sd-catalog-edge:#B5D9F8'),
-  'Catalog search, status panel and category pills must define the agreed icy-blue Liquid Glass tokens.');
-assert.ok(storefrontHtml.indexOf('class="fulfillment-filter-row"') < storefrontHtml.indexOf('class="catalog-tools"'),
-  'The product-status glass panel must precede the search-and-category glass panel as shown in the reference.');
+  'Catalog search and category pills must define the agreed icy-blue Liquid Glass tokens.');
 assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
   && storefrontHtml.includes('#products .filter-pill[aria-pressed="true"]')
   && storefrontHtml.includes('#products .filter-pill:active:not(:disabled)')
@@ -58,9 +56,6 @@ assert.ok(storefrontHtml.includes('flex:0 0 auto;\n  min-width:max-content;\n  m
 assert.ok(storefrontHtml.includes('0 0 14px rgba(22,132,232,0.30)')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
   'The selected pill must have a distinct visible blue glass glow and readable label typography.');
-assert.ok(storefrontHtml.includes('fulfillment-filter-label"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">')
-  && storefrontHtml.includes('#products .fulfillment-filter-label svg'),
-  'The product status heading must retain the reference slider icon with a decorative accessible treatment.');
 assert.ok(storefrontHtml.includes('#products .search-field:hover:not(:focus-within)')
   && storefrontHtml.includes('#products .search-field:active')
   && storefrontHtml.includes('#products .search-field:active svg')
@@ -68,11 +63,11 @@ assert.ok(storefrontHtml.includes('#products .search-field:hover:not(:focus-with
   'Search and pill controls must provide separate hover/pressed feedback while preserving persistent selection.');
 
 assert.ok(storefrontHtml.includes("selectedCategory===c?'active':'')")
-  && storefrontHtml.includes("selectedFulfillment===type?'active':'')")
   && storefrontHtml.includes("selectedCategory==='all'||p.category===selectedCategory")
-  && storefrontHtml.includes("selectedFulfillment==='all'||productFulfillmentType(p)===selectedFulfillment")
-  && storefrontHtml.includes("count=type==='all'?products.length:fulfillmentCounts[type]"),
-  'Catalog visual refinements must preserve dynamically counted category/status selection and combined filtering logic.');
+  && storefrontHtml.includes("const q=foldSearch(($('#catalogSearch').value||'').trim())")
+  && storefrontHtml.includes("visibleSku(p)")
+  && storefrontHtml.includes("function fulfillmentBadge(p,detail=false)"),
+  'Catalog must preserve dynamically counted category selection, search/category filtering, verified-SKU search and per-product status metadata.');
 
 assert.ok(storefrontHtml.includes("#order .section-head .section-note{width:min(440px,48vw);max-width:100%;min-width:0;white-space:normal;overflow-wrap:break-word}"), "The order-section summary must wrap within the available heading width rather than clip at the right edge.");
 assert.ok(storefrontHtml.includes("Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}"), 'Storefront product cards must clearly disclose when no verified SKU is available.');
