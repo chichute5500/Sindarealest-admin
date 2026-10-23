@@ -162,7 +162,7 @@ assert.ok(finalCss.includes('@media(max-width:760px){')
 assert.ok(html.includes('<body class="welcome-active">'),
   'The welcome lifecycle guard must be present in the initial body markup before first paint.');
 assert.ok(html.includes("document.body.classList.remove('welcome-active')")
-  && html.includes("s.parentNode.removeChild(s);document.body.classList.remove('welcome-active')"),
+  && /s\.parentNode\.removeChild\(s\);\s*document\.body\.classList\.remove\('welcome-active'\)/.test(html),
   'The mobile toolbar and drawers remain hidden through the splash fade and are released only when the splash node is removed.');
 assert.ok(html.includes('body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}')
   && html.includes('body.welcome-active #accountDrawer,body.welcome-active #cartDrawer,body.welcome-active #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}'),
