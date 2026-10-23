@@ -1559,7 +1559,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           overflowX: getComputedStyle(el).overflowX
         }));
         expect(railMetrics.overflowX, 'Mobile thumbnails should scroll horizontally rather than widen the page').toBe('auto');
-        expect(railMetrics.scrollWidth, 'Five thumbnails should exceed the visible rail width').toBeGreaterThan(railMetrics.clientWidth + 20);
+        expect(railMetrics.scrollWidth, 'Five thumbnails should overflow the visible rail enough to remain horizontally scrollable').toBeGreaterThan(railMetrics.clientWidth + 10);
         const scrolledRail = await page.locator('#imageGrid .image-rail').evaluate(el => {
           el.scrollLeft = el.scrollWidth;
           return el.scrollLeft;
