@@ -112,3 +112,11 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - On opening a product's fullscreen album, proactively preload all images belonging to that product album; prioritize the selected photo, then warm the rest at low fetch priority.
 - Keep reduced-motion support, stale-transition guards, decode-failure fallback, original product image URLs, and existing gallery controls. Do not change unrelated gallery/detail behavior.
 - Acceptance remains pending until the owner tests the Preview on a real phone. CI/Preview deployment do not prove the flicker is fixed.
+
+
+## DEC-011 — Pause fullscreen flicker and preserve owner PASS/LOCKED scope (2026-10-24)
+
+- Owner explicitly paused mobile fullscreen-gallery flicker work and directed the next chat to move to a new task.
+- Current gallery slide + full-album preload source/test commits remain in Preview, with CI and deployment PASS, but the visual issue is **not accepted** because the owner still observed flicker. Mark PAUSED / NOT ACCEPTED, not PASS. Do not continue editing or request a phone retest unless the owner reopens it.
+- All other owner-accepted areas remain PASS/LOCKED; do not repeat audits or reopen them. See CURRENT-STATE.md and TASKS.md for the inventory.
+- If no clearly authorized unlocked task is available, ask the owner what new task to do. Preserve PR #108 open/unmerged and all project safety boundaries.
