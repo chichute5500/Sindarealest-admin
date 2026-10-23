@@ -32,6 +32,13 @@ Updated: 2026-10-23 — canonical handoff, owner decisions, and report-then-cont
 5. Update `CURRENT-STATE.md`, `TASKS.md`, and `TEST-RESULTS.md` when verified state changes. Also reconcile contradictory older instructions before handing off. Historical evidence belongs in `TEST-RESULTS.md`; never copy old SHA/run IDs forward as current.
 6. Before ending a session, verify that the active task and Hero pause agree across `CURRENT-STATE.md`, `TASKS.md`, this prompt, and the visual-audit pointer. The archived `docs/prompts/NEXT-CHAT-PROMPT.md` and `docs/prompts/MASTER-PROMPT-SINDAREALEST2-PARALLEL.md` are intentionally non-active pointers; do not revive their old instructions.
 
+
+### Current Preview evidence blocker (2026-10-23)
+
+- A read-only external browser fetch of the Preview alias returned the Cloudflare Access login page, not the storefront. Treat this as an authentication boundary, not proof that the deployment is down; never bypass Access.
+- The latest available visual workflow's local fixture passed but deployment verification failed closed on an exact commit SHA mismatch, so it did not produce accepted live Preview screenshots.
+- Keep the active non-Hero visual audit blocked on authorized Preview access and exact-SHA proof. The existing comprehensive capture requires Hero coverage; while Hero is paused, do not run that full capture. Use a non-Hero-only read-only capture if authorized access is available. No speculative visual edits: current local evidence does not establish a concrete non-Hero defect.
+
 ## Owner-facing reporting language
 - Say PASS only for the exact gate that passed and cite its SHA.
 - Say PENDING for visual acceptance not yet confirmed by the owner.

@@ -8,6 +8,7 @@ The repeated run-by-run progress narrative has been consolidated into [`docs/han
 - Tests, Preview deployment and visual evidence: [`docs/handoff/TEST-RESULTS.md`](handoff/TEST-RESULTS.md)
 - Original visual references remain in `docs/static-web-reference/`.
 - Required capture matrix: 360×800, 390×844, 768×1024, 1440×900; Light and Dark.
+- External Preview request returned Cloudflare Access sign-in rather than storefront content; this is an auth gate, not proof of outage. Live exact-SHA capture is still blocked. Do not bypass Access or run the comprehensive capture while Hero is paused; only a non-Hero-only authorized capture can advance this gate.
 - Hero is temporarily hidden by owner request and explicitly PAUSED until other storefront work is complete. Preserve its source asset and derivative. Do not edit or inspect Hero-specific layout during this pause; continue the visual audit with non-Hero sections first.
 
 ## Mandatory work behavior

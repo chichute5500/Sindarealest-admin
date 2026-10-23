@@ -43,6 +43,15 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - Current source already includes the hidden-image status, no-src behavior, collapsed visual frame, single-column fallback and regression assertions. Do not make another CSS change based only on the local screenshot without verified evidence of a real layout defect.
 - The Preview URL could not be opened through the available web viewer. Actual live Preview visual evidence and owner acceptance remain pending.
 
+
+## Follow-up real Preview access probe — 2026-10-23
+
+- Pre-update branch recheck: PR #108 was OPEN/unmerged at HEAD 4ff25f02ec8255b98a6db1583c6d473a7c40a0bb; that commit changes only handoff documentation. The last code/workflow-changing commit remains 51e6f937b56c9c8ff04f4bbfd82298c3f8307d02; source/test evidence must still be interpreted by its exact SHA.
+- A read-only external browser fetch of the Preview alias returned a Cloudflare Access sign-in page (title "Sign in ・ Cloudflare Access", heading "Log in to sindarealest2 - Cloudflare Pages") rather than storefront content. This proves the unauthenticated browser path is Access-gated; it does not prove the Preview deployment is down. No authentication bypass was attempted.
+- Existing screenshot workflow [#39842480928](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39842480928) passed its local fixture only (58 screenshots, 235 fixture products, 20 responsive cases, 101 interaction checks; zero overflow/console/page/HTTP errors, no hard failures). Its deployment-verification step failed closed: expected 33e09dd2bce4c4be1df23c65a47d93217d2153b7, while the alias-matched deployment reported d39860cd92dd50cf8bf05fffc3b79eeef3e3e54d; real Preview screenshot capture/archiving did not pass.
+- Reviewed the available local non-Hero captures for the home viewport, product grid, order-assurance/process, and relevant product/contact sections. No concrete non-Hero visual defect is substantiated by this fixture evidence, so no storefront source/CSS was changed.
+- Next action: use an authorized Preview-only access path and verify the exact deployed branch/SHA before capturing non-Hero sections. Do not bypass Access. The existing comprehensive visual workflow requires Hero coverage; do not run that full capture while Hero is paused. If an authorized non-Hero-only capture cannot be run, continue source/test review outside Hero without speculative UI changes.
+
 ## Session recheck — 2026-10-23 (snapshot before evidence update)
 
 - PR #108 remained OPEN and unmerged. The branch HEAD at this recheck was `3f53e0cf7519ae0c5d0be022657845d5eb0f414b`, a documentation-only handoff-pointer commit. Re-fetch the live HEAD before future changes.
