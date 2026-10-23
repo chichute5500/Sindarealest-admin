@@ -1,5 +1,14 @@
 # START HERE — SINDAREALEST ADMIN
 
+## Current checkpoint — 2026-10-23 12:15 UTC — Narrow-mobile SKU hint refined; Validate and Preview pass
+
+- **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD at checkpoint start is `cd5d3e1c52b85aba494b312f14b5fca4464ea298`, the Actions evidence child after tested source/test commit `efb49359a4e8b4ad65ea0120f41ad4c6cfa90631`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, Production deploy, or writes to `main`/the static website branch.
+- **UI finding/fix:** the Product Editor's commercial-SKU placeholder was clipped at a 320px viewport. Commit [`efb4935`](https://github.com/chichute5500/Sindarealest-admin/commit/efb49359a4e8b4ad65ea0120f41ad4c6cfa90631) shortens it to `SKU chính thức` and adds a Playwright assertion for the placeholder. Artifact [admin-preview-evidence-421](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461/artifacts/12500492455) confirms the hint now fits the narrow mobile input; no business data/API/database behavior changed.
+- **Exact-SHA checks:** [Validate #39951430535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430535) PASS and [Preview #39951430461](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461) PASS on `efb49359a4e8b4ad65ea0120f41ad4c6cfa90631`. Artifact 421 contains 132 PNGs (16 login shell + 116 module/UI screenshots) and 112 fixture metrics. Deployed diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; authenticated business/backend QA remains NOT_TESTED.
+- **Acceptance remains incomplete:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- **Next:** continue matching viewport/theme comparison for Screens 4/5 and 7 using artifact 421 and the approved reference; make only reproducible UI changes, run both workflows on the exact tested SHA, inspect evidence, then sync all handoff files again. Preserve all guardrails.
+
+
 ## Current checkpoint — 2026-10-23 11:42 UTC — Screen 12 unread badge capture corrected; Validate and Preview pass
 
 - **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD at checkpoint start is `ab61a99d138380aa21642e9873446c3c442f418b`, an Actions evidence child after tested commit `6de79a88579d4798efba518f97c63cb150452bbd`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, Production deployment, or writes to `main`/the static website branch.

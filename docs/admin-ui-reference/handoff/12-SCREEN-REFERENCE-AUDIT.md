@@ -1,5 +1,21 @@
 # ADMIN — 12-SCREEN REFERENCE AUDIT
 
+## Current checkpoint — 2026-10-23 12:15 UTC — Narrow-mobile SKU hint refined; Validate and Preview pass
+
+- **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD at checkpoint start is `cd5d3e1c52b85aba494b312f14b5fca4464ea298`, the Actions evidence child after tested source/test commit `efb49359a4e8b4ad65ea0120f41ad4c6cfa90631`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, Production deploy, or writes to `main`/the static website branch.
+- **UI finding/fix:** the Product Editor's commercial-SKU placeholder was clipped at a 320px viewport. Commit [`efb4935`](https://github.com/chichute5500/Sindarealest-admin/commit/efb49359a4e8b4ad65ea0120f41ad4c6cfa90631) shortens it to `SKU chính thức` and adds a Playwright assertion for the placeholder. Artifact [admin-preview-evidence-421](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461/artifacts/12500492455) confirms the hint now fits the narrow mobile input; no business data/API/database behavior changed.
+- **Exact-SHA checks:** [Validate #39951430535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430535) PASS and [Preview #39951430461](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461) PASS on `efb49359a4e8b4ad65ea0120f41ad4c6cfa90631`. Artifact 421 contains 132 PNGs (16 login shell + 116 module/UI screenshots) and 112 fixture metrics. Deployed diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; authenticated business/backend QA remains NOT_TESTED.
+- **Acceptance remains incomplete:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- **Next:** continue matching viewport/theme comparison for Screens 4/5 and 7 using artifact 421 and the approved reference; make only reproducible UI changes, run both workflows on the exact tested SHA, inspect evidence, then sync all handoff files again. Preserve all guardrails.
+
+## Product Editor — narrow mobile SKU hint
+
+- The 320×640 screenshot showed the commercial-SKU placeholder clipped because its text was longer than the available input width beside the SKU verification control.
+- Source/test commit [`efb4935`](https://github.com/chichute5500/Sindarealest-admin/commit/efb49359a4e8b4ad65ea0120f41ad4c6cfa90631) shortens the placeholder to `SKU chính thức` and adds a Playwright assertion. This is presentation-only and does not change SKU validation or persistence.
+- Validate [#39951430535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430535) and Preview [#39951430461](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461) passed on exact SHA. Artifact [admin-preview-evidence-421](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461/artifacts/12500492455) shows the updated 320×640 capture.
+- The screenshot matrix is still fixture-only. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact reference parity and authenticated backend QA remain unverified.
+
+
 ## Current checkpoint — 2026-10-23 11:42 UTC — Screen 12 unread badge capture corrected; Validate and Preview pass
 
 - **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD at checkpoint start is `ab61a99d138380aa21642e9873446c3c442f418b`, an Actions evidence child after tested commit `6de79a88579d4798efba518f97c63cb150452bbd`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, Production deployment, or writes to `main`/the static website branch.
@@ -97,8 +113,8 @@
 Fixture/test PASS does not mean final visual parity or authenticated backend PASS. D1 schema/payment ledger NOT_VERIFIED; migration 0009, PRE/PRO and R2/product-image save DEFERRED_BY_OWNER; Production deployment NOT_PERFORMED.
 
 ## Next actions
-1. Continue reference-driven review with Screen 12 Activity/Notifications, then Screens 4/5 (Product editor/Gallery) and 7 (Order detail), using artifact admin-preview-evidence-374 (run 39906240167) at matching mobile viewports/themes. Record precise, repeatable differences only; do not fabricate product/customer data to imitate the reference.
-2. Preserve `PARTIAL_NOT_ACCEPTED` for all 12 screens until both interactions and reference parity are substantiated. Fixture coverage does not establish live data, persistence, authorization or backend behavior.
+1. Continue reference-driven comparison of Screens 4 (Product Editor), 5 (Product Gallery), and 7 (Order Detail) using artifact [admin-preview-evidence-421](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461/artifacts/12500492455) and the approved `admin-mobile-reference.png` at matching viewports/themes. Record repeatable differences only; do not fabricate business data to imitate reference content.
+2. Keep `PARTIAL_NOT_ACCEPTED` for all 12 screens until interaction behavior and reference parity are substantiated; fixture screenshots do not establish live data, persistence, authorization or backend behavior.
 3. Obtain an authorized authenticated Preview path before testing business workflows; never bypass Cloudflare Access or change secrets.
 4. Keep remote D1 schema/ledger `NOT_VERIFIED`, Production `NOT_PERFORMED`, and migration 0009, PRE/PRO, product-image/R2 and AI grouping deferred.
 5. Do not repeat B1 cleanup/provenance, merge/rebase/force-push, deploy, or write to `main`/PR #108.
