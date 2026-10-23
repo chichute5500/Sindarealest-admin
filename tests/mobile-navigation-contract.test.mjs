@@ -31,7 +31,7 @@ assert.match(modalHistory,
   /function activeStorefrontModal\(\)[\s\S]*?return 'gallery'[\s\S]*?return 'checkout'[\s\S]*?return 'cart'[\s\S]*?return 'account'/,
   'History navigation must identify gallery, checkout, cart and account states.');
 for (const opener of [
-  /function openCart\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('cart'\)/,
+  /function openCart\([^)]*\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('cart'\)/,
   /function openCheckout\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('checkout'\)/,
   /function openAccount\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('account'\)/,
   /function openFullscreenImage\(\)[\s\S]*?!restoringStorefrontModalHistory\)pushStorefrontModalHistory\('gallery'\)/
