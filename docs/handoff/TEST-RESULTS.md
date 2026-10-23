@@ -473,3 +473,11 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Mobile navigation focus regression coverage includes backdrop focus return to `#menuToggle` and focus transfer to destination heading/target after link activation. No live browser/manual acceptance is recorded for these changes.
 - Static audit on source SHA: 23 internal fragments resolve; 22 images have alt; 6 target-blank links have rel; 0 duplicate IDs. These are source checks, not live acceptance.
 - Continue source-first review only in unlocked scopes. Hero PAUSED; `#order` and catalog filter Liquid Glass/height locked; Preview only; no Admin/backend/API/auth/data/config or Production; PR #108 OPEN/unmerged.
+
+
+## OWNER ACCEPTANCE NOTE — WARRANTY CLAIM FORM — 2026-10-23
+
+- Owner decision: PASS current warranty claim form state and handle any issue later.
+- Automated regression tests and exact-SHA Preview deployment passed at `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43` (CI #39986991649; Preview #39986991635).
+- Manual live-flow verification was not completed because a valid warranty code / registered phone number was unavailable. Do not mislabel this as a live browser PASS. Owner acceptance is a scope decision, separate from manual verification.
+- Scope is OWNER PASS / LOCKED until explicitly reopened by the owner.

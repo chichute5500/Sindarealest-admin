@@ -456,3 +456,12 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Source-only audit on deployed source: 23 internal fragment links / 0 missing targets; 22 image tags / 0 missing alt; 6 target-blank links / 0 missing rel; 0 duplicate IDs. Static checks are not browser acceptance.
 - Next: re-fetch HEAD/PR/Actions/deployment metadata at session start. Continue a safe source-first audit in unlocked storefront sections; identify a reproducible defect before editing. Do not pause after reporting unless owner action is genuinely required.
 - Locks: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; catalog filter Liquid Glass/height OWNER PASS/LOCKED. Keep removed dedicated product-status panel removed. Preview only; no Production, Admin/backend/API/auth/data/config/Cloudflare Access changes; keep PR #108 OPEN/unmerged.
+
+
+## OWNER DECISION — WARRANTY CLAIM FORM ACCEPTED FOR NOW — 2026-10-23
+
+- Owner explicitly said to PASS the warranty claim form check and handle any issue later.
+- This is an owner decision to accept/lock the current state for now, NOT evidence of live functional/browser verification. The owner could not complete the real-data path because a valid warranty code or registered phone number was not available.
+- Keep the already-tested source change: after selecting an eligible warranty record, focus moves to `#claimIssueType`. CI and Preview deployment PASS on source/test SHA `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43` (CI #39986991649; Preview #39986991635). No live browser verification was performed.
+- Mark warranty claim form OWNER PASS / LOCKED unless the owner explicitly reopens it. Do not alter or retest this area proactively. If the owner later reports a concrete issue, reopen only that scope with their instruction.
+- Preserve all other guardrails: Hero PAUSED; `#order` and catalog filter controls PASS/LOCKED; PR #108 OPEN/unmerged; Preview only; no Production or restricted-scope changes.

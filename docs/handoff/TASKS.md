@@ -344,3 +344,8 @@ Guardrails unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; keep the
 4. After a source change, run CI/full tests, wait for Preview deploy, verify deployed SHA/public tree, inspect workflow evidence, then update all four handoff docs. Do not claim live browser or visual PASS based on CI/deploy alone.
 5. Never inspect/edit/test/capture Hero; never touch or retest `#order` or catalog filter height/Liquid Glass. Do not trigger the locked catalog audit without explicit owner reopening plus both required unlocks.
 6. PR #108 stays OPEN/unmerged; Preview only; no Production/Admin/backend/API/auth/data/config changes.
+
+
+## TASK STATUS — WARRANTY CLAIM FORM OWNER PASS / LOCKED — 2026-10-23
+
+Owner explicitly accepted the current warranty claim form state for now and will report any issue later. Lock this scope. Important evidence distinction: valid warranty lookup data was unavailable during the owner's check, so there is no owner live-flow/browser verification; automated tests and Preview deployment passed on source/test SHA `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`. Do not proactively retest or modify this scope unless the owner explicitly reopens it.

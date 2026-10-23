@@ -456,3 +456,8 @@ Continue the existing SinDarealest2 project directly from GitHub. Do not restart
 
 ## Immediate next action
 Re-fetch current branch, PR and Actions/deployment metadata; verify the latest source/deployed SHA. Then continue safe source-first audit on an unlocked area, fix only a concrete defect, and maintain all four handoff files. If browser acceptance is unavailable, record it as pending rather than pretending it passed.
+
+
+## NEWEST OWNER DECISION — WARRANTY CLAIM FORM PASS / LOCKED — 2026-10-23
+
+The owner explicitly said to PASS the current warranty claim form and handle any issue later. Treat this area as OWNER PASS / LOCKED; do not proactively edit or retest it unless explicitly reopened. The owner did not have a valid warranty code or registered phone number to complete the live lookup, so manual live-flow/browser verification remains unperformed. Automated CI and exact-SHA Preview deployment passed on `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43` (CI #39986991649; Preview #39986991635). Keep evidence categories distinct.
