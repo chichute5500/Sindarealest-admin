@@ -1,3 +1,17 @@
+## LATEST TASK RESULT — VERIFIED-SKU PRODUCT URLS — 2026-10-24
+
+- Result: technical PASS on exact-SHA CI and Cloudflare Pages Preview deployment; not a browser/device or owner visual acceptance claim.
+- Source + test SHA: `10c074c9199d27badcbe825a7122033b9fe8fbb5`.
+- Rule: use `/sanpham/{category}/{sku}` only when the API explicitly marks SKU verified (`skuVerified === true`) and the SKU is non-empty after trimming; otherwise fall back to product ID/key. The existing category map translates `dress-shoes` to `giaytay`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40040101794.
+- Preview deployment PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40040101630.
+- Immutable Preview: https://3cb163a7.sindarealest2.pages.dev/.
+- Fixed the stale legacy expectation in `tests/admin-upgrade.test.mjs`; a previous run had correctly stopped before deploy because that assertion still expected the old conditional. The final SHA passes.
+- PR #108 remains OPEN/unmerged, base `main`; Production untouched. Hero PAUSED, fullscreen gallery PAUSED / NOT ACCEPTED, all owner-accepted sections remain PASS / LOCKED.
+- No additional unlocked task has been identified after this route task. Do not invent work or reopen locked sections; request the owner's next task/unlock.
+
+---
+
 ## LATEST TASK RESULT — PRODUCT ROUTE VALIDATION GUARD — 2026-10-24
 
 **Technical status: PASS on CI and Preview; this is not a visual acceptance claim.**

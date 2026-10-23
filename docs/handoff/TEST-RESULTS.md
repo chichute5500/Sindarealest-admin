@@ -1,3 +1,14 @@
+## LATEST EXACT-SHA TEST + DEPLOY RESULT — VERIFIED-SKU PRODUCT URLS — 2026-10-24
+
+- Source/test/deployed SHA: `10c074c9199d27badcbe825a7122033b9fe8fbb5`.
+- CI PASS: [run #40040101794](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40040101794). All validation/test steps succeeded; dependency audit reported zero vulnerabilities.
+- Preview deploy PASS: [run #40040101630](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40040101630). Logs confirm exact-SHA checkout, project `sindarealest2`, Production branch `main`, successful Wrangler deployment with the exact commit hash, and deployed URL https://3cb163a7.sindarealest2.pages.dev/ . Branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Source rule: generated product URLs use SKU only with explicit `skuVerified === true` and non-empty trimmed SKU; otherwise use the internal product key. Existing mapping maps `dress-shoes` to `giaytay`.
+- The first CI attempt after the source edit failed because `tests/admin-upgrade.test.mjs` still asserted the obsolete source expression; the assertion was updated in `10c074c9199d27badcbe825a7122033b9fe8fbb5`. The final CI and deploy both passed.
+- Scope verification only: automated test and deployment results are PASS; no live browser/device route test or owner acceptance is claimed. No Production deploy, PR merge, or restricted-scope change.
+
+---
+
 ## LATEST EXACT-SHA TEST + DEPLOY RESULT — PRODUCT ROUTE VALIDATION — 2026-10-24
 
 - Source/test tree SHA: `8a92278e189bd9f83063bcd35284ea88a065cc01`.
