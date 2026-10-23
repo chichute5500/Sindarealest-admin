@@ -56,6 +56,9 @@ assert.match(html,
 assert.ok(html.includes("$('#mobileNavBackdrop').addEventListener('click',()=>{setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})})"),
   'Closing the mobile navigation through its backdrop must return focus to the menu toggle after the backdrop is hidden.');
 
+assert.ok(html.includes("function navClick(e){const a=e.target.closest('[data-nav]');if(!a)return;setActiveNav(a.dataset.nav);setMobileMenu(false);if(e.currentTarget.id==='mobileNav'){const target=document.getElementById(a.dataset.nav),heading=target&&(target.matches('h1,h2,h3,h4,[role=\"heading\"]')?target:target.querySelector('h1,h2,h3,h4,[role=\"heading\"]')||target);if(heading){if(!heading.hasAttribute('tabindex'))heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}}}"),
+  'Activating a mobile navigation link must move focus into the destination instead of leaving focus inside the hidden drawer.');
+
 console.log('PASS: mobile navigation and browser Back/Forward dismiss account, cart, checkout and gallery states.');
 
 // The sticky bottom navigation must not cover actions in full-screen mobile overlays.
