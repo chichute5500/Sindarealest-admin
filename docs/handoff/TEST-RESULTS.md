@@ -1,3 +1,12 @@
+## LATEST TEST STATUS — SLIDESHOW MISSING-CONTROL HARNESS — 2026-10-24
+
+- Current source/test SHA `ed06d73b89477b637a72c25c7939ee94f32c056f`.
+- Previous run `5c1ba570934588ec80b8fffd69d4f69f4ae6225a` failed because the test harness assembled invalid evaluated JS (literal newline) and incorrectly called the vm return as a function. Both test issues corrected in this commit.
+- CI #39995473464 and Preview #39995473418 were in progress when this was recorded. Their exact-SHA outcomes are required before PASS.
+- Last known green SHA is `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`; Preview https://5052d769.sindarealest2.pages.dev/.
+
+---
+
 ## LATEST TEST RECORD — SLIDESHOW MISSING-CONTROL GUARD — 2026-10-24
 
 - Follow-up source/test SHA: `3fabbfc0bea134f9babde0b856276a47c966553f`.
