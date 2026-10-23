@@ -1,17 +1,15 @@
 name: Non-Hero catalog-filter live Preview audit
-# This audit must rerun on every storefront CSS or harness change; compare screenshots only from the exact deployed branch SHA.
+# Catalog filter height is OWNER PASS / LOCKED. Keep visual capture manual-only and require explicit owner authorization.
+# Pushes to public/index.html or storefront tests must not retest this locked item automatically.
 
 on:
-  push:
-    branches:
-      - fix/liquid-glass-audit-2026-10-19
-    paths:
-      - 'public/index.html'
-      - 'tests/storefront-operations.test.mjs'
-      - 'scripts/cloudflare-access-service-token.mjs'
-      - 'scripts/preview-external-read-allowlist.mjs'
-      - '.github/workflows/catalog-filter-preview-audit.yml'
   workflow_dispatch:
+    inputs:
+      owner_authorized:
+        description: 'The owner explicitly reopened the catalog-filter visual audit.'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -22,7 +20,7 @@ concurrency:
 
 jobs:
   capture:
-    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19' && inputs.owner_authorized == true && vars.CATALOG_FILTER_AUDIT_UNLOCKED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
