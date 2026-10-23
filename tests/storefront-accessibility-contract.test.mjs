@@ -112,6 +112,10 @@ assert.match(html, /role="dialog"[^>]*aria-modal="true"|aria-modal="true"[^>]*ro
   'modal/drawer UI must expose dialog semantics');
 assert.match(html, /aria-live="polite"/,
   'dynamic cart/account/status content must expose polite live regions');
+assert.match(html, /<div class="catalog-grid" id="catalogGrid"><\/div>/,
+  'catalog result cards must not be the only live region announcing every card to assistive technology');
+assert.match(html, /<div class="page-summary" id="pageSummary" role="status" aria-live="polite" aria-atomic="true"><\/div>/,
+  'catalog search and category updates must announce a concise result summary to screen readers');
 assert.match(html, /min-height:\s*44px/,
   'interactive mobile controls must provide at least a 44px minimum target height');
 assert.match(html, /addEventListener\(['"]keydown['"]/,
