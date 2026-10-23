@@ -36,13 +36,13 @@ assert.match(section, /Tư vấn\/đặt hàng qua Zalo/,
 const orderStyles = html.match(/<style id="sd-order-uniform-tiles">([\s\S]*?)<\/style>/)?.[1] || '';
 assert.match(orderStyles, /#order \.order-zalo-cta\{[^}]*background:#0068ff;border-color:#0068ff;color:#fff/,
   'The Zalo CTA must keep an opaque Zalo-blue surface in both light and dark themes.');
-assert.match(orderStyles, /#order \.order-step h3\{[^}]*font:400 14\.5px/,
+assert.match(orderStyles, /#order \.order-step h3\{[^}]*font:600 15\.5px/,
   'Desktop order-step headings must remain comfortably readable.');
 assert.match(orderStyles, /#order \.order-step p\{[^}]*font-size:10\.5px/,
   'Desktop order-step body text must be larger than the previous tiny 9.5px setting.');
 assert.match(orderStyles, /@media\(max-width:760px\)[\s\S]*?#order \.order-step p\{font-size:10\.5px/,
   'Mobile order-step body text must remain readable.');
-assert.match(orderStyles, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?#order \.order-step h3\{font-size:13\.5px\}/,
+assert.match(orderStyles, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?#order \.order-step h3\{font-size:14\.5px\}/,
   'Tablet order-step headings must not regress to tiny text.');
 
 assert.match(orderStyles, /#order \.order-zalo-cta:hover\{background:#0068ff;border-color:#0068ff/,
