@@ -231,3 +231,8 @@ assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.activ
 
 assert.match(html, /#products \.filter-pill\{[^}]*min-height:40px;\s*padding:9px 19px;/,
   "The authoritative desktop product filter style should be 4px shorter while keeping its horizontal padding and glass layers.");
+
+assert.match(html, /#products \.filter-pill\{min-height:40px;padding:7px 11px;font-size:13\.5px\}/,
+  "Narrow-phone product filters should use a reduced 40px touch target, not the previous oversized 44px height.");
+assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(--panel-strong);border-color:var(--gold);box-shadow:inset 0 1px rgba(255,255,255,.26)}'),
+  "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
