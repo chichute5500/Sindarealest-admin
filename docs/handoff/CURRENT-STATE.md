@@ -1,3 +1,16 @@
+## LATEST VERIFIED STOREFRONT FIXES — CART DATA + PRODUCT SHARE FALLBACK — 2026-10-24
+
+- Final combined source/test SHA: `5f86282be26c34f4cf0587f36be8011b9d1d46ec`. PR #108 remains OPEN/unmerged, base `main`.
+- **Fix A — Zalo cart consultation feedback.** `consultCart()` now uses `copyText()`'s boolean result. Clipboard failure no longer produces a false success toast; if the Zalo popup is blocked after failed copy, the customer is told to paste/send the list manually. SKU/quantity rows retain an actual newline separator. Behavioral regression tests live in `tests/storefront-accessibility-contract.test.mjs`.
+- **Fix B — stale/invalid local cart normalization.** After a successful `/api/products` response and image-path mapping, `normalizeCart()` retains only IDs in the loaded catalog and positive safe-integer quantities. Valid numeric strings normalize to numbers; blank, malformed, fractional, boolean, zero, negative and stale-product entries are removed. Changed state persists once to `sd-cart`, and the header badge is refreshed from retained products. If the catalog fetch fails, normalization does not run, so local cart state is not purged without a valid catalog. Behavioral coverage is in `tests/cart-checkout-separation.test.mjs`.
+- **Fix C — fullscreen product share fallback.** If Web Share API rejects for a reason other than `AbortError`, the handler now tries copying the product URL. Success/failure messages track the copy result; native share success avoids duplicate copying/toasts, and user cancellation remains quiet. Behavioral coverage in `tests/storefront-accessibility-contract.test.mjs` covers native share success, non-cancel rejection, clipboard success/failure, and `AbortError`.
+- Exact-SHA full CI, integrity checks, dependency audit and all automated tests PASS: [run #40004265503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40004265503).
+- Exact-SHA Preview deployment PASS: [run #40004265341](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40004265341). Immutable Preview: https://7b538028.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Deploy log checks Pages project `sindarealest2`, confirms Production branch `main`, checks the fix-branch ref/checkout against `$GITHUB_SHA`, and deploys with `--commit-hash=$GITHUB_SHA`.
+- These changes have source/test PASS and exact-SHA Preview deploy PASS. No browser screenshot or manual visual acceptance was performed. Later docs-only commits do not create a new storefront deployment.
+- All owner locks unchanged: Hero PAUSED; shared icon appearance PASS/LOCKED; `#order`, catalog Liquid Glass filter controls and warranty claim form PASS/LOCKED. Never restore the removed standalone product-status filter panel. PR #108 OPEN/unmerged; no Production/main or restricted backend/infrastructure/payment changes.
+
+---
+
 ## LATEST VERIFIED STOREFRONT FIXES — CART CONSULTATION + STALE CART — 2026-10-24
 
 - Final combined source/test SHA: `373c282d626b6ec2291111adb7d81ec2a26e1c2d`. PR #108 remains OPEN/unmerged, base `main`.
