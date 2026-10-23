@@ -1,3 +1,12 @@
+## VERIFIED GREEN FOLLOW-UP — SLIDESHOW CONTROL GUARD — 2026-10-24
+
+- COMPLETE: collection slideshow pause/resume, accessible Vietnamese labels and `aria-pressed`, single managed 3-second interval, reduced-motion autoplay disabled, manual prev/next retained.
+- Defensive guard: if pause/previous/next control is missing, slideshow setup safely returns before binding or starting autoplay.
+- Final source/test SHA `74bcd512abc19d3fba4bad64654321091073b8ea`: CI PASS [#39995656182](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656182); Preview PASS [#39995656107](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656107); URL https://e7b33eeb.sindarealest2.pages.dev/.
+- No manual visual/browser acceptance. Keep all locks, Preview-only and PR #108 OPEN/unmerged.
+
+---
+
 ## LATEST TASK STATUS — SLIDESHOW HARNESS FIX ROUND 3 — 2026-10-24
 
 - Test harness fix: reduced-motion keeps the pause control in the fixture; only the dedicated missing-control test deletes it. This separates the two behaviors accurately.
