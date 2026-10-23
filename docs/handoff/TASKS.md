@@ -175,3 +175,10 @@ Guardrails: Hero PAUSED/untouched; `#order` OWNER PASS/LOCKED/untouched; removed
 - Corrected all three in workflow commit `e9b35186e4273410253b4158f45105be19c7c483`; did not weaken visual thresholds.
 - Validation #39953590662 and catalog-only live audit #39953590658 are running. Check both final results and review screenshot/manifest artifact.
 - Active UI task remains OPEN: the owner says the Liquid Glass activation still differs materially from the sample. Technical PASS alone does not complete it. Compare actual animation frames with `docs/design-reference/liquid-glass-product-filters.png` at 360/390 mobile, 768 tablet and 1440 desktop in Light/Dark, including mouse/touch/keyboard/reselection/reduced-motion. Fix confirmed differences before asking owner to review.
+
+## Latest audit retry — 2026-10-23 12:26 UTC
+
+- Audit #39953050974 failed with a harness typo: `ReferenceError: currentTime is not defined`. The checks referenced a free variable rather than `activationMidFrame.currentTime`, `reselectionMotion.currentTime`, and `touchActivation.currentTime`.
+- Workflow commit `e9b35186e4273410253b4158f45105be19c7c483` corrects all three while retaining the visual thresholds.
+- Validation #39953590662 and catalog-only live audit #39953590658 are running; inspect final results and screenshots/manifest.
+- Active UI task remains OPEN. Owner says the effect differs materially from the reference. Compare real animation frames with `docs/design-reference/liquid-glass-product-filters.png` at 360/390 mobile, 768 tablet and 1440 desktop in Light/Dark, including mouse, touch, keyboard, reselection and reduced motion. Technical PASS alone does not complete the task.
