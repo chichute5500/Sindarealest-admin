@@ -2398,8 +2398,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('notifications', 'dashboard', async variant => {
       const toggle = page.locator('#notificationToggle');
       const panel = page.locator('#notificationPanel');
+      // Make unread-state coverage deterministic for every viewport/theme capture.
+      await page.evaluate(() => localStorage.removeItem('sd-admin-last-seen'));
       await toggle.click();
       await expect(panel).toBeVisible();
+      const unreadCount = page.locator('#notificationCount');
+      await expect(unreadCount, 'A recent fixture audit event should appear as unread').toBeVisible();
+      await expect(unreadCount).toHaveText('1');
+      await page.locator('#markNotificationsRead').click();
+      await expect(unreadCount, 'Marking notifications read should clear the unread badge').toBeHidden();
+      const lastSeen = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
+      expect(Number.isFinite(Date.parse(lastSeen || '')), 'Mark-read action should persist a valid local last-seen timestamp').toBe(true);
       await expect(toggle).toHaveAttribute('aria-expanded', 'true');
       await expect(toggle).toHaveAttribute('aria-controls', 'notificationPanel');
       await expect(page.locator('#markNotificationsRead')).toBeVisible();
