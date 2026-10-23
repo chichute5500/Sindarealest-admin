@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T02:54:13Z",
+  "capturedAtUtc": "2026-10-23T03:05:10Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "620d7b07dd7f92aed8325846785c8b231b256e36",
+  "branchHeadAtCheckpointStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
   "codeTestSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
-    "id": 39891441964,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
-    "headSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
+    "id": 39892969609,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609",
+    "headSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Validate source and tests passed on exact source/test SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285. Dependency audit, project integrity, automated tests and Screen 10 settings-order regression passed. See Preview run 39891442082 for the 102-image source/fixture matrix and login CSS diagnostic."
+    "summary": "Exact current handoff HEAD validated: dependency audit, project integrity and automated tests all passed."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
@@ -245,9 +245,9 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39813340309/artifacts/12439794397",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-  "testedCommitSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-  "capturedAt": "2026-10-23T02:54:13Z",
+  "latestCodeCommitSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
+  "testedCommitSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
+  "capturedAt": "2026-10-23T03:05:10Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
@@ -317,15 +317,15 @@
     "PR #111 must remain open/unmerged; no merge/rebase/force-push."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "SOURCE_AND_PREVIEW_PASS_ON_EXACT_SHA_4ac7465; PREVIEW GENERATED EVIDENCE-ONLY CHILD 620d7b0; VALIDATE NEXT HANDOFF COMMIT ONCE",
+  "currentHeadValidation": "PASS_ON_EXACT_SHA_6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
   "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; OVERALL_ADMIN_ACCEPTANCE_PARTIAL",
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
-      "headAtStart": "620d7b07dd7f92aed8325846785c8b231b256e36",
+      "headAtStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
       "changedFiles": 396,
-      "additions": 39234,
+      "additions": 39229,
       "deletions": 212
     },
     "pr108": {
@@ -339,18 +339,18 @@
     },
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
-  "currentHeadValidationReason": "The current branch head at this checkpoint is a Preview-generated evidence-only child. Product source and tests plus Preview diagnostics both passed on exact SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285. Verify the next handoff checkpoint SHA once and do not chase the resulting pointer.",
+  "currentHeadValidationReason": "Validate run 39892969609 completed success on exact current branch HEAD 6264adcdd1f3982c5cd96cd21006c6217ac3cd87.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T02:54:13Z",
-    "headAtStart": "620d7b07dd7f92aed8325846785c8b231b256e36",
+    "capturedAtUtc": "2026-10-23T03:05:10Z",
+    "headAtStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
     "codeTestSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "validateRunId": 39891441964,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
+    "validateRunId": 39892969609,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609",
     "previewRunId": 39891442082,
     "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082",
     "previewArtifact": "admin-preview-evidence-361",
     "pr111ChangedFiles": 396,
-    "pr111Additions": 39234,
+    "pr111Additions": 39229,
     "pr111Deletions": 212,
     "historyRunDirectories": 163,
     "historyEvidenceFiles": 330

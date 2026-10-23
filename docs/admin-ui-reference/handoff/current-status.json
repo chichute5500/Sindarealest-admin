@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T02:54:13Z",
+  "capturedAtUtc": "2026-10-23T03:05:10Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "620d7b07dd7f92aed8325846785c8b231b256e36",
@@ -8,12 +8,11 @@
   "codeTestSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
   "latestProductSourceCommit": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
   "latestActionsRun": {
-    "id": 39891441964,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
+    "id": 39892969609,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_SHA; branch HEAD is Preview-generated evidence-only child 620d7b0"
+    "testedSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -39,14 +38,14 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "620d7b07dd7f92aed8325846785c8b231b256e36",
+      "headSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
       "changedFiles": 396,
-      "additions": 39234,
+      "additions": 39229,
       "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
-      "validationRunId": 39891441964,
-      "validation": "PASS on exact source/test SHA 4ac7465; current branch HEAD 620d7b0 is Preview-generated evidence-only child; next handoff sync receives one Validate check",
+      "validationRunId": 39892969609,
+      "validation": "PASS_ON_EXACT_CURRENT_BRANCH_HEAD",
       "mergeableState": "dirty"
     }
   },
@@ -381,29 +380,29 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Validate the next handoff-doc checkpoint commit on its exact SHA once; do not create a metadata-only commit just to update that commit's SHA.",
-    "Continue Admin screen acceptance and inspect the latest artifact screenshots against the approved reference only where direct inspection is possible; record concrete differences before editing.",
-    "Obtain an authorized authenticated Preview login/access path for business workflow QA; do not bypass Cloudflare Access or treat fixtures as backend proof."
+    "Continue Admin screen acceptance and inspect Preview evidence against approved reference where direct inspection is possible; fix only reproducible defects.",
+    "Obtain an authorized authenticated Preview access path before testing business-data persistence; do not bypass Cloudflare Access.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED until evidence supports acceptance; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED."
   ],
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-23T02:54:13Z",
-    "syncPurpose": "Record Screen 10 settings-order fix, regression guard, exact-SHA Validate/Preview results, current live PR census and latest Preview-generated evidence. No backend/API/production changes."
+    "lastSyncAtUtc": "2026-10-23T03:05:10Z",
+    "syncPurpose": "Sync handoff checkpoint to current live branch HEAD and exact-SHA successful Validate result."
   },
-  "currentHeadAtCheckpoint": "620d7b07dd7f92aed8325846785c8b231b256e36",
-  "currentHeadValidation": "SOURCE_AND_PREVIEW_PASS_ON_EXACT_SHA_4ac7465; PREVIEW EVIDENCE CHILD 620d7b0; VALIDATE THE NEXT HANDOFF CHECKPOINT ONCE",
-  "currentHeadValidationReason": "Validate #39891441964 and Preview #39891442082 passed on exact source/test SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285. Preview recorded compact evidence in child 620d7b0; handoff documents are now synced at this substantive UI checkpoint. Validate the ensuing handoff commit once, then stop pointer-chasing.",
+  "currentHeadAtCheckpoint": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
+  "currentHeadValidation": "PASS_ON_EXACT_SHA_6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
+  "currentHeadValidationReason": "Validate run 39892969609 completed success on exact current branch HEAD 6264adcdd1f3982c5cd96cd21006c6217ac3cd87, including dependency audit, project integrity and automated tests. No further commit is needed solely to update the SHA.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T02:54:13Z",
-    "headAtStart": "620d7b07dd7f92aed8325846785c8b231b256e36",
+    "capturedAtUtc": "2026-10-23T03:05:10Z",
+    "headAtStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
     "codeTestSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "headValidation": "Validate and Preview PASS on exact source/test SHA; branch HEAD is a Preview-generated evidence-only child. Validate next handoff checkpoint once.",
+    "headValidation": "PASS_ON_EXACT_SHA",
     "pr111": "OPEN_UNMERGED",
     "pr108": "OPEN_UNMERGED_READ_ONLY",
     "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
     "changedFiles": 396,
-    "additions": 39234,
+    "additions": 39229,
     "deletions": 212,
     "validationRunId": 39891441964,
     "validationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
@@ -414,7 +413,9 @@
     "historyRunDirectories": 163,
     "historyEvidenceFiles": 330,
     "progressPercent": 50,
-    "progressStatus": "PROVISIONAL"
+    "progressStatus": "PROVISIONAL",
+    "validateRunId": 39892969609,
+    "validateUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609"
   },
   "latestReviewFinding": "Screen 10 settings order defect fixed and guarded by admin-liquid-glass-contract.test.mjs. Validate #39891441964 and Preview #39891442082 passed on exact source/test SHA 4ac7465; deployed diagnostic only confirms login CSS signature. Persistence remains unverified."
 }
