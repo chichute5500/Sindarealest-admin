@@ -1,4 +1,10 @@
 # ACTIVE TASK LEDGER — SINDAREALEST2
+
+## LATEST TASK — ACCOUNT → CONTACT HISTORY REGRESSION
+
+| ID | Status | Next action / acceptance |
+|---|---|---|
+| ACCOUNT-CONTACT-HISTORY | IMPLEMENTED — CI / PREVIEW PENDING | Replaced direct account-drawer close with a history-safe transition to #contact; clears the account modal marker from the replaced history entry, preserves unrelated state, avoids focus restoration into a hidden drawer, and focuses the destination heading. Added behavior-level contract assertions in tests/storefront-accessibility-contract.test.mjs. Await exact-SHA CI and Preview results before calling it technical PASS. |
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
 ## LATEST VERIFIED TASK — MOBILE NAV ESCAPE FOCUS — 2026-10-23 22:10 ICT

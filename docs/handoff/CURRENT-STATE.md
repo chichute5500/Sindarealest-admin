@@ -1,4 +1,12 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
+
+## LATEST SOURCE AUDIT — ACCOUNT → CONTACT HISTORY REGRESSION — 2026-10-23
+
+- Confirmed an unlocked storefront behavior defect in the account drawer: clicking “Liên hệ hỗ trợ” closed the drawer directly, leaving the account modal history marker on the current entry. Same-document fragment navigation carries history state forward, so a later Back traversal could reopen the account drawer; deferred focus restoration could also fight the contact-anchor scroll.
+- Fix in public/index.html: the account contact link now uses a dedicated handler that replaces the current modal history entry with #contact, clears only the modal marker (preserving unrelated state), closes the account without restoring focus to the hidden trigger, sets active navigation, scrolls to the contact section, and focuses its heading.
+- Added a behavior-level regression contract in tests/storefront-accessibility-contract.test.mjs for state-marker removal, preserved state, focus behavior and navigation.
+- Source/CI/Preview results: PENDING at handoff time. Do not claim technical PASS until the latest code SHA finishes CI and Preview deployment and the exact deployed SHA is verified.
+- No Hero, #order, catalog-filter UI, payment/backend contract, or Production scope was changed. PR #108 remains OPEN/unmerged.
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
 ## LATEST AUTHORITATIVE UPDATE — MOBILE NAV ESCAPE FOCUS — 2026-10-23 22:10 ICT

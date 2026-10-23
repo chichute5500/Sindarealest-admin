@@ -1,5 +1,12 @@
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
+## NEWEST TASK HANDOFF — ACCOUNT CONTACT HISTORY FIX — 2026-10-23
+
+- Source change: account drawer’s “Liên hệ hỗ trợ” now navigates to #contact through a history-safe handler. It replaces the current modal state entry, clears the account marker while preserving other state, closes the drawer without sending focus back to its hidden trigger, scrolls to contact, and focuses the contact heading.
+- Regression coverage: tests/storefront-accessibility-contract.test.mjs includes behavior-level assertions for history state and focus/scroll behavior.
+- CI / Preview validation is pending. Fetch live branch HEAD and PR #108, verify exact-SHA CI and Preview deploy completion, check deployed SHA/public-tree equivalence, then update handoff docs with run URLs and results. Do not claim visual PASS based on a keyboard/history fix.
+- Guardrails unchanged: Hero PAUSED BY OWNER; #order and catalog Liquid Glass controls OWNER PASS/LOCKED; do not restore the dedicated product-status filter panel; PR #108 OPEN/unmerged; Preview only; no Production or Admin/backend/API/auth/data/config changes.
+
 
 ## NEWEST AUTHORITATIVE HANDOFF — MOBILE NAV ESCAPE FOCUS FIX — 2026-10-23 22:10 ICT
 

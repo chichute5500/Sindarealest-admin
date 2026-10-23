@@ -49,4 +49,52 @@ assert.ok(html.includes("document.addEventListener('keydown',e=>{if(e.key==='Esc
   'Escape must dismiss only an open product detail dialog, preserving focus management for unrelated dialogs and the mobile navigation');
 assert.ok(!html.includes("if(e.key==='Escape'){closeDetail();closeCart();$('#mobileNav').classList.remove('open')}"),
   'The legacy global Escape handler must not close inactive dialogs or override the mobile menu focus return');
+// Account-to-contact navigation must replace its modal history entry. Otherwise
+// the fragment entry can inherit the stale account state and browser Back reopens
+// the drawer; focus restoration to the drawer trigger can also override anchor scroll.
+const contactStart = html.indexOf('function navigateAccountContact(event){');
+const contactEnd = html.indexOf('\nfunction trapTabWithin', contactStart);
+assert.ok(contactStart >= 0 && contactEnd > contactStart,
+  'account contact navigation must have a dedicated history-safe transition');
+const contactHelper = html.slice(contactStart, contactEnd);
+const contactEffects = [];
+const contactHistory = {
+  state: { __sdStorefrontModal: 'account', retained: 'state' },
+  replacement: null,
+  replaceState(state, _title, url) { this.state = state; this.replacement = { state, url }; },
+};
+const contactHeading = {
+  attrs: {},
+  focused: null,
+  setAttribute(name, value) { this.attrs[name] = value; },
+  focus(options) { this.focused = options; },
+};
+const contactTarget = {
+  scrolled: null,
+  scrollIntoView(options) { this.scrolled = options; },
+};
+let contactDefaultPrevented = false;
+vm.runInNewContext(contactHelper + '\nnavigateAccountContact({ preventDefault() { contactDefaultPrevented = true; } });', {
+  SD_MODAL_HISTORY_KEY: '__sdStorefrontModal',
+  history: contactHistory,
+  closeAccount(restoreFocus) { contactEffects.push({ type: 'closeAccount', restoreFocus }); },
+  setActiveNav(id) { contactEffects.push({ type: 'activeNav', id }); },
+  $: selector => selector === '#contact' ? contactTarget : selector === '#footer-contact-title' ? contactHeading : null,
+  matchMedia: () => ({ matches: false }),
+});
+assert.equal(contactDefaultPrevented, true, 'the handler must control navigation instead of creating a duplicate fragment entry');
+assert.equal(contactHistory.replacement.url, '#contact', 'the account modal entry must be replaced with the contact anchor');
+assert.equal(contactHistory.state.__sdStorefrontModal, null, 'the stale account marker must be removed before subsequent Back navigation');
+assert.equal(contactHistory.state.retained, 'state', 'unrelated history state must be preserved');
+assert.deepEqual(contactEffects[0], { type: 'closeAccount', restoreFocus: false },
+  'account-to-contact navigation must not restore focus to the hidden account trigger');
+assert.deepEqual(contactEffects[1], { type: 'activeNav', id: 'contact' },
+  'the contact destination must be reflected in primary navigation state');
+assert.equal(contactTarget.scrolled.behavior, 'smooth', 'the contact section must use smooth scrolling unless reduced motion is requested');
+assert.equal(contactTarget.scrolled.block, 'start', 'the contact section must align at the start of the viewport');
+assert.equal(contactHeading.attrs.tabindex, '-1', 'the destination heading must become programmatically focusable');
+assert.equal(contactHeading.focused.preventScroll, true, 'focus must move to the destination heading without overriding its scroll position');
+assert.ok(html.includes("$('#accountContactAction')?.addEventListener('click',navigateAccountContact)"),
+  'the account contact link must use the history-safe navigation handler');
+
 console.log('PASS: storefront accessibility contracts cover reduced motion, keyboard focus, safe areas, dialog semantics, live regions and mobile target sizing.');

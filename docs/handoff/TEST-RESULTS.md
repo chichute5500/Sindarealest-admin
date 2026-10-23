@@ -1,4 +1,11 @@
 # TEST & VISUAL AUDIT EVIDENCE INDEX
+
+## LATEST SOURCE CHANGE — ACCOUNT → CONTACT HISTORY REGRESSION — 2026-10-23
+
+- Finding: the account drawer contact link called closeAccount() and allowed fragment navigation while the active history state still carried the account modal marker. Same-document fragment navigation carries state forward, which could cause the popstate handler to reopen the account drawer on a later Back navigation. Deferred focus restoration could also pull focus away from the contact destination.
+- Fix: a dedicated handler replaces the current modal entry with #contact, clears the modal marker without discarding unrelated state, closes without restoring focus behind the page, updates nav state, scrolls to contact, and focuses the contact heading.
+- Regression test: behavior-level VM assertions cover history replacement, marker clearing/state preservation, no focus restoration, active navigation, scroll and destination focus.
+- CI and Preview: PENDING at commit time. Amend this section with exact run IDs and tested/deployed SHA after runs finish. Do not claim PASS before confirmation.
 Updated: 2026-10-23 — handoff protocol reconciled
 
 ## LATEST EXACT-SHA REGRESSION / PREVIEW RESULT — MOBILE NAV ESCAPE FOCUS — 2026-10-23 22:10 ICT
