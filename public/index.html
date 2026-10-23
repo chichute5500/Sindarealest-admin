@@ -579,7 +579,7 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
 
 <style id="sd-unified-icon-system">
 /* Shared storefront Liquid Glass icon system. Excludes owner-locked catalog filters and #order. */
-:root{--sd-icon-size:18px;--sd-icon-stroke:1.7;--sd-icon-glass-bg:rgba(194,222,242,.14);--sd-icon-glass-bg-hover:rgba(194,222,242,.26);--sd-icon-glass-border:rgba(226,242,255,.42);--sd-icon-glass-highlight:rgba(255,255,255,.52);--sd-icon-glass-shadow:0 5px 14px rgba(0,12,27,.16),inset 0 1px 0 var(--sd-icon-glass-highlight),inset 0 0 0 1px rgba(255,255,255,.06);--sd-icon-press-color:#8bc6ee;--sd-icon-press-duration:180ms}
+:root{--sd-icon-size:18px;--sd-icon-stroke:1.7;--sd-icon-glass-bg:rgba(194,222,242,.14);--sd-icon-glass-bg-hover:rgba(194,222,242,.26);--sd-icon-glass-border:rgba(226,242,255,.42);--sd-icon-glass-highlight:rgba(255,255,255,.52);--sd-icon-glass-shadow:0 5px 14px rgba(0,12,27,.16),inset 0 1px 0 var(--sd-icon-glass-highlight),inset 0 0 0 1px rgba(255,255,255,.06);--sd-icon-press-color:#5c91b9;--sd-icon-press-duration:180ms}
 html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hover:rgba(236,247,255,.74);--sd-icon-glass-border:rgba(255,255,255,.78);--sd-icon-glass-highlight:rgba(255,255,255,.88);--sd-icon-glass-shadow:0 5px 16px rgba(25,57,82,.12),inset 0 1px 0 var(--sd-icon-glass-highlight),inset 0 0 0 1px rgba(255,255,255,.12);--sd-icon-press-color:#397eae}
 :root.dark{--sd-icon-glass-bg:rgba(112,170,207,.15);--sd-icon-glass-bg-hover:rgba(126,190,231,.28);--sd-icon-glass-border:rgba(214,237,255,.42);--sd-icon-glass-highlight:rgba(255,255,255,.28);--sd-icon-glass-shadow:0 5px 16px rgba(0,0,0,.24),inset 0 1px 0 var(--sd-icon-glass-highlight),inset 0 0 0 1px rgba(255,255,255,.06)}
 /* Consistent optical canvas and line rendering; original SVG paths are preserved. */
@@ -3501,6 +3501,106 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
   #products .filter-pill:hover,
   #products .filter-pill:active,
   #products .filter-pill:active svg{transform:none!important}
+}
+</style>
+
+
+<style id="sd-unified-icon-system-final">
+/* Final-cascade Liquid Glass material contract: deliberately placed after the legacy !important gallery rules. */
+/* This selector list is limited to unlocked icon controls; catalog filters, Hero, and #order are excluded. */
+:root{
+ --sd-icon-glass-refraction:rgba(196,226,247,.22);
+ --sd-icon-press-color:#5c91b9;
+ --sd-icon-shell-border:rgba(229,244,255,.72);
+ --sd-icon-shell-highlight:rgba(255,255,255,.88);
+ --sd-icon-shell-shadow:0 7px 20px rgba(18,49,72,.15),inset 0 1px 0 var(--sd-icon-shell-highlight),inset 0 0 0 1px rgba(255,255,255,.10),inset 0 -1px 0 rgba(57,112,153,.12);
+}
+html.dark{
+ --sd-icon-press-color:#9bcdf3;
+ --sd-icon-shell-border:rgba(190,224,246,.50);
+ --sd-icon-shell-highlight:rgba(248,253,255,.32);
+ --sd-icon-shell-shadow:0 7px 21px rgba(0,0,0,.28),inset 0 1px 0 var(--sd-icon-shell-highlight),inset 0 0 0 1px rgba(226,244,255,.07),inset 0 -1px 0 rgba(0,4,12,.18);
+}
+/* Same translucent pearl/ice material and rim light across icon-only controls. */
+.icon-btn,.nav-wrap .icon-btn,
+.slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
+.sd-fullscreen-close,.sd-fullscreen-arrow,.detail-favorite-btn{
+ background:
+  radial-gradient(125% 115% at 12% 0%,rgba(255,255,255,.90) 0%,rgba(255,255,255,.42) 27%,rgba(255,255,255,0) 65%),
+  linear-gradient(145deg,rgba(255,255,255,.57) 0%,rgba(226,242,253,.38) 46%,rgba(151,194,223,.24) 100%) !important;
+ border:1px solid var(--sd-icon-shell-border) !important;
+ -webkit-backdrop-filter:blur(22px) saturate(180%) !important;
+ backdrop-filter:blur(22px) saturate(180%) !important;
+ box-shadow:var(--sd-icon-shell-shadow) !important;
+ color:#16374e !important;
+ text-shadow:none !important;
+}
+html.dark .icon-btn,html.dark .nav-wrap .icon-btn,
+html.dark .slide-controls button,html.dark .featured-arrow,
+html.dark .detail-zoom-btn,html.dark .detail-gallery-arrow,
+html.dark .sd-fullscreen-close,html.dark .sd-fullscreen-arrow,html.dark .detail-favorite-btn{
+ background:
+  radial-gradient(125% 115% at 12% 0%,rgba(214,241,255,.28) 0%,rgba(157,206,238,.13) 28%,rgba(255,255,255,0) 66%),
+  linear-gradient(145deg,rgba(27,62,88,.78) 0%,rgba(12,39,61,.68) 48%,rgba(5,24,41,.76) 100%) !important;
+ border-color:var(--sd-icon-shell-border) !important;
+ box-shadow:var(--sd-icon-shell-shadow) !important;
+ color:#eaf5ff !important;
+}
+.icon-btn:hover,.nav-wrap .icon-btn:hover,
+.slide-controls button:hover,.featured-arrow:hover,.detail-zoom-btn:hover,
+.detail-gallery-arrow:hover,.sd-fullscreen-close:hover,.sd-fullscreen-arrow:hover,.detail-favorite-btn:hover{
+ background:
+  radial-gradient(125% 115% at 14% 0%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.54) 26%,rgba(255,255,255,0) 67%),
+  linear-gradient(145deg,rgba(250,253,255,.74) 0%,rgba(223,241,253,.52) 46%,rgba(136,190,225,.32) 100%) !important;
+ border-color:rgba(255,255,255,.95) !important;
+ box-shadow:0 9px 24px rgba(26,67,96,.18),inset 0 1px 0 rgba(255,255,255,.98),inset 0 0 0 1px rgba(255,255,255,.18),inset 0 -1px 0 rgba(57,112,153,.13) !important;
+}
+html.dark .icon-btn:hover,html.dark .nav-wrap .icon-btn:hover,
+html.dark .slide-controls button:hover,html.dark .featured-arrow:hover,
+html.dark .detail-zoom-btn:hover,html.dark .detail-gallery-arrow:hover,
+html.dark .sd-fullscreen-close:hover,html.dark .sd-fullscreen-arrow:hover,html.dark .detail-favorite-btn:hover{
+ background:
+  radial-gradient(125% 115% at 14% 0%,rgba(230,247,255,.42) 0%,rgba(157,206,238,.20) 29%,rgba(255,255,255,0) 67%),
+  linear-gradient(145deg,rgba(35,77,106,.86) 0%,rgba(14,46,71,.80) 48%,rgba(7,29,48,.86) 100%) !important;
+ border-color:rgba(234,247,255,.82) !important;
+ box-shadow:0 9px 24px rgba(0,0,0,.32),inset 0 1px 0 rgba(248,253,255,.46),inset 0 0 0 1px rgba(230,246,255,.08),inset 0 -1px 0 rgba(0,4,12,.2) !important;
+}
+.icon-btn:active,.nav-wrap .icon-btn:active,
+.slide-controls button:active,.featured-arrow:active,.detail-zoom-btn:active,
+.detail-gallery-arrow:active,.sd-fullscreen-close:active,.sd-fullscreen-arrow:active,.detail-favorite-btn:active{
+ background:
+  linear-gradient(155deg,rgba(197,225,245,.44) 0%,rgba(229,243,253,.32) 52%,rgba(130,180,212,.27) 100%) !important;
+ border-color:rgba(201,230,249,.92) !important;
+ box-shadow:inset 0 2px 8px rgba(22,62,91,.18),inset 0 1px 0 rgba(255,255,255,.48),inset 0 0 0 1px rgba(255,255,255,.09) !important;
+}
+html.dark .icon-btn:active,html.dark .nav-wrap .icon-btn:active,
+html.dark .slide-controls button:active,html.dark .featured-arrow:active,
+html.dark .detail-zoom-btn:active,html.dark .detail-gallery-arrow:active,
+html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html.dark .detail-favorite-btn:active{
+ background:
+  linear-gradient(155deg,rgba(78,131,169,.42) 0%,rgba(28,67,96,.54) 52%,rgba(8,30,49,.74) 100%) !important;
+ border-color:rgba(190,224,246,.62) !important;
+ box-shadow:inset 0 2px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(242,250,255,.18),inset 0 0 0 1px rgba(219,240,255,.06) !important;
+}
+.detail-favorite-btn[aria-pressed="true"]{color:#E5484D !important}
+.detail-favorite-btn[aria-pressed="true"] svg path{fill:currentColor;stroke:currentColor}
+.icon-btn svg,.slide-controls button svg,.featured-arrow svg,.detail-zoom-btn svg,
+.detail-gallery-arrow svg,.sd-fullscreen-close svg,.sd-fullscreen-arrow svg,.detail-favorite-btn svg{
+ width:var(--sd-icon-size,18px);height:var(--sd-icon-size,18px);
+ stroke-width:var(--sd-icon-stroke,1.7);stroke-linecap:round;stroke-linejoin:round;
+}
+.icon-btn:focus-visible,.slide-controls button:focus-visible,.featured-arrow:focus-visible,
+.detail-zoom-btn:focus-visible,.detail-gallery-arrow:focus-visible,.sd-fullscreen-close:focus-visible,
+.sd-fullscreen-arrow:focus-visible,.detail-favorite-btn:focus-visible{
+ outline:2px solid var(--sd-icon-press-color) !important;outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+ .icon-btn,.nav-wrap .icon-btn,.icon-btn svg,.slide-controls button,.slide-controls button svg,
+ .featured-arrow,.featured-arrow svg,.detail-zoom-btn,.detail-zoom-btn svg,
+ .detail-gallery-arrow,.detail-gallery-arrow svg,.sd-fullscreen-close,.sd-fullscreen-close svg,
+ .sd-fullscreen-arrow,.sd-fullscreen-arrow svg,.detail-favorite-btn,.detail-favorite-btn svg{
+  transition:none !important;animation:none !important;
+ }
 }
 </style>
 

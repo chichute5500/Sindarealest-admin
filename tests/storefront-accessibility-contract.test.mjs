@@ -392,3 +392,15 @@ assert.ok(html.includes('inset 0 1px 0 var(--sd-icon-glass-highlight)'), 'shared
 assert.ok(html.includes('.slide-controls button:active') && html.includes('.detail-gallery-arrow:active'), 'icon controls must share a pressed glass state');
 assert.ok(html.includes('focus-visible') && html.includes('prefers-reduced-motion:reduce'), 'shared icon controls must retain keyboard focus and reduced-motion support');
 assert.ok(!html.includes('#products .catalog-tools svg{') && !html.includes('.catalog-tools svg{width:18px;height:18px'), 'owner-locked catalog filter controls must not be overridden');
+
+
+// Verify the final-cascade glass contract comes AFTER all legacy opaque !important rules.
+// This guards against regression to the prior appearance where the base shared layer was overridden.
+const finalGlassStart = html.indexOf('<style id="sd-unified-icon-system-final">');
+const legacyOpaqueGlass = html.lastIndexOf('background:rgba(249,253,255,.96)!important');
+assert.ok(finalGlassStart > legacyOpaqueGlass, 'final Liquid Glass contract must outrank later legacy opaque icon-button rules');
+assert.ok(html.includes('backdrop-filter:blur(22px) saturate(180%) !important'), 'final icon shells must apply translucent backdrop blur and saturation');
+assert.ok(html.includes('radial-gradient(125% 115% at 12% 0%'), 'final icon shell must contain a visible specular highlight');
+assert.ok(html.includes('linear-gradient(145deg,rgba(255,255,255,.57) 0%,rgba(226,242,253,.38) 46%,rgba(151,194,223,.24) 100%) !important'), 'light icon shells must use a translucent pearl/ice glass surface');
+assert.ok(html.includes('html.dark .detail-gallery-arrow:hover'), 'dark mode must have an equivalent shared glass hover state');
+assert.ok(!html.includes('#products .filter-pill{background:') && !html.includes('#order .order-cta'), 'final glass system must not override the owner-locked catalog filters or order section');
