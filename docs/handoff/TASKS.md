@@ -419,3 +419,14 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - Owner explicitly PASSed and LOCKED warranty claim form for now; do not edit/retest without reopening. A valid warranty code/registered phone was unavailable, so live lookup was not verified. Hero remains PAUSED. `#order` and catalog Liquid Glass remain PASS/LOCKED.
 - Latest read-only source audit found no reproducible issue. Static results: 23 fragments resolve, buttons have detectable names, image alts present, new-tab rel present, no duplicate static IDs. No source edit/CI/deploy resulted.
 - Next: continue source-first audit only in unlocked storefront areas, inspect source/tests for a concrete defect, and patch only when reproducible. Preserve all restrictions in CURRENT-STATE. Keep PR #108 open, no Production, no `main`, no Admin/backend/API/auth/data/infra changes, no Access bypass. CI/Preview exact-SHA verification is required for any code change; do not call static audit a browser PASS.
+
+
+## VERIFIED ICON-SYSTEM FOLLOW-UP — 2026-10-24
+
+- Source/test SHA: `753009fc76be47897a9a8088f083c292f8804dda`.
+- Added a shared Liquid Glass icon-rendering layer in `public/index.html`: consistent 18px SVG box for unlocked line-icon contexts, common 1.7 stroke token, rounded joins/caps, approved blue press feedback `#5c91b9`, and reduced-motion handling. Existing SVG paths and official brand marks remain unchanged.
+- Explicitly scoped out owner-locked catalog filter controls and the locked `#order` area. No product data, business logic, API, or Production changes.
+- Regression/static contract validation PASS: [run #39997680269](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39997680269).
+- Preview deploy PASS on the same source SHA: [run #39997680201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39997680201). Immutable Preview: https://7d851231.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Visual/browser acceptance remains OPEN; ask owner to compare the Preview against `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png`. Do not call full icon parity PASS until this visual review is complete.
+- PR #108 remains OPEN/unmerged; branch HEAD may advance with docs-only commits after source SHA. No Production deployment.

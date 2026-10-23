@@ -566,3 +566,14 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Preview only; never deploy Production. `main` must not change. Do not touch Admin/backend/API/auth, product/catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access, infrastructure, real payment flows, or other restricted scopes. Never bypass Cloudflare Access.
 - If a concrete defect is found in unlocked scope, make a minimal targeted fix, add/adjust regression tests, wait for CI and Preview, verify exact deployed SHA, and do safe independent audit while jobs run. Do not claim a browser check unless actually done.
 - After reporting a result, continue to the next safe task rather than stopping. Update all four handoff files after meaningful changes.
+
+
+## VERIFIED ICON-SYSTEM FOLLOW-UP — 2026-10-24
+
+- Source/test SHA: `753009fc76be47897a9a8088f083c292f8804dda`.
+- Added a shared Liquid Glass icon-rendering layer in `public/index.html`: consistent 18px SVG box for unlocked line-icon contexts, common 1.7 stroke token, rounded joins/caps, approved blue press feedback `#5c91b9`, and reduced-motion handling. Existing SVG paths and official brand marks remain unchanged.
+- Explicitly scoped out owner-locked catalog filter controls and the locked `#order` area. No product data, business logic, API, or Production changes.
+- Regression/static contract validation PASS: [run #39997680269](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39997680269).
+- Preview deploy PASS on the same source SHA: [run #39997680201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39997680201). Immutable Preview: https://7d851231.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Visual/browser acceptance remains OPEN; ask owner to compare the Preview against `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png`. Do not call full icon parity PASS until this visual review is complete.
+- PR #108 remains OPEN/unmerged; branch HEAD may advance with docs-only commits after source SHA. No Production deployment.

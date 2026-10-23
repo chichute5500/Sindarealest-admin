@@ -560,3 +560,14 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Owner accepted warranty claim form for now despite no valid lookup data; label OWNER PASS/LOCKED, not manual test PASS. Do not retest/edit unless reopened. Hero PAUSED; `#order` and catalog Liquid Glass PASS/LOCKED.
 - Static audit results: 23 internal fragment targets resolve; 62 buttons show an accessible-name signal under the static check; no missing image alt, target-blank rel, or duplicate static ID found. Checkout/account address and canonical product routing review yielded no reproducible defect. No code changes.
 - PR #108 remains OPEN/unmerged; Preview only; no Production or restricted-scope edits.
+
+
+## VERIFIED ICON-SYSTEM FOLLOW-UP — 2026-10-24
+
+- Source/test SHA: `753009fc76be47897a9a8088f083c292f8804dda`.
+- Added a shared Liquid Glass icon-rendering layer in `public/index.html`: consistent 18px SVG box for unlocked line-icon contexts, common 1.7 stroke token, rounded joins/caps, approved blue press feedback `#5c91b9`, and reduced-motion handling. Existing SVG paths and official brand marks remain unchanged.
+- Explicitly scoped out owner-locked catalog filter controls and the locked `#order` area. No product data, business logic, API, or Production changes.
+- Regression/static contract validation PASS: [run #39997680269](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39997680269).
+- Preview deploy PASS on the same source SHA: [run #39997680201](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39997680201). Immutable Preview: https://7d851231.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Visual/browser acceptance remains OPEN; ask owner to compare the Preview against `docs/icon-assets/Icon.png` and `docs/icon-assets/Chitiet.png`. Do not call full icon parity PASS until this visual review is complete.
+- PR #108 remains OPEN/unmerged; branch HEAD may advance with docs-only commits after source SHA. No Production deployment.
