@@ -29,10 +29,10 @@ assert.match(html, /key\s*===?\s*['"]Escape['"]|keyCode\s*===\s*27/,
 
 assert.match(html, /<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal">/,
   'the product detail overlay must be the single modal dialog container');
-assert.match(html, /function trapProductTab\\(event\\)\\s*\\{\\s*trapTabWithin\\(\\$\\('#productOverlay'\\),event\\)\\s*\\}/,
+assert.ok(html.includes("function trapProductTab(event){trapTabWithin($('#productOverlay'),event)}"),
   'the product detail dialog must keep keyboard focus inside its modal while tabbing');
-assert.match(html, /if\\(\\$\\('#productOverlay'\\)\\.classList\\.contains\\('open'\\)\\)\\{trapProductTab\\(e\\);return\\}/,
+assert.ok(html.includes("if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}"),
   'Tab events must invoke the product detail dialog focus trap when the modal is open');
-assert.match(html, /document\\.addEventListener\\('keydown',e=>\\{if\\(e\\.key===['"]Escape['"]\\)\\{closeDetail\\(\\);/,
+assert.ok(html.includes("document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();"),
   'Escape must dismiss the product detail dialog');
 console.log('PASS: storefront accessibility contracts cover reduced motion, keyboard focus, safe areas, dialog semantics, live regions and mobile target sizing.');
