@@ -176,3 +176,9 @@ After reporting, immediately continue the next safe step without waiting for “
 ## NEWEST RETRY STATUS — 2026-10-23 12:26 UTC
 
 Audit #39953050974 failed with `ReferenceError: currentTime is not defined`, a separate harness bug. Commit `e9b35186e4273410253b4158f45105be19c7c483` now references each sampled animation object's `.currentTime` for desktop, reselection and touch without weakening the 1ms time tolerance or `scaleX > 1.04` spring threshold. Check validation [#39953590662](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590662) and live catalog audit [#39953590658](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590658); both were running at handoff. Inspect final logs, manifest and screenshots. Do not mark audit PASS if it fails, and do not ask owner to review until actual effect has been compared with `docs/design-reference/liquid-glass-product-filters.png` across mobile/tablet/desktop and Light/Dark.
+
+---
+
+## NEWEST VISUAL CORRECTION — 2026-10-23 12:30 UTC
+
+Audit #39953590658 failed after the harness reference fixes because it expected computed `box-shadow` to change between two frames, but the shadow remained identical at the sampled times. Do not interpret that brittle assertion as proof the animation itself failed. The UI now moves the specular reflection across the glass during the spring settle in both Light and Dark (`public/index.html` commit `7013ee6c9b4fe8a3247b0f2b7a7305ef7e044824`). The audit was updated to pin a deterministic 205ms frame and verify background-position movement (`1311be92c3a97931e09ee36bdc7b95c2f8e25269`). Current validation #39954296929 and audit #39954296537 were pending; inspect final results, deployment SHA/public tree and artifact. Then visually compare real captured frames to `docs/design-reference/liquid-glass-product-filters.png` across mobile/tablet/desktop and Light/Dark before asking owner to inspect.
