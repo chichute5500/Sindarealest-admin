@@ -483,24 +483,41 @@ jobs:
                       'Selected category did not expose aria-pressed=true.');
                     const selectedGlassMotion = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
-                      return { animationName: css.animationName, animationDuration: css.animationDuration };
+                      const reflection = getComputedStyle(el, '::after');
+                      return {
+                        animationName: css.animationName,
+                        animationDuration: css.animationDuration,
+                        reflectionAnimationName: reflection.animationName,
+                        reflectionAnimationDuration: reflection.animationDuration
+                      };
                     });
                     assert.equal(selectedGlassMotion.animationName,
                       theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
                       'Selecting a category must start the visible Liquid Glass activation animation for the current theme.');
                     assert.equal(selectedGlassMotion.animationDuration, '0.46s',
                       'Category activation must retain the visible 460ms glass-pop timing.');
+                    assert.equal(selectedGlassMotion.reflectionAnimationName, 'sdCatalogSpecularSweep',
+                      'The selected category must run a separate composited diagonal reflection, not only animate a blue outline.');
+                    assert.equal(selectedGlassMotion.reflectionAnimationDuration, '0.46s',
+                      'The specular sweep must share the short 460ms activation window.');
                     // Pin the real CSS animation at 100ms only inside this disposable audit page.
                     // This captures the spring peak deterministically despite CI scheduling jitter.
                     const activationMidFrame = await otherCategory.evaluate(el => {
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      const reflectionAnimation = el.getAnimations().find(item => item.animationName === 'sdCatalogSpecularSweep');
                       const wasRunningBeforeCapture = animation?.playState === 'running';
+                      const reflectionWasRunningBeforeCapture = reflectionAnimation?.playState === 'running';
                       if (animation) {
                         animation.currentTime = 100;
                         animation.pause();
                       }
+                      if (reflectionAnimation) {
+                        reflectionAnimation.currentTime = 100;
+                        reflectionAnimation.pause();
+                      }
                       const css = getComputedStyle(el);
+                      const reflection = getComputedStyle(el, '::after');
                       const matrix = css.transform.match(/^matrix\(([^)]+)\)$/);
                       return {
                         animationName: css.animationName,
@@ -509,7 +526,14 @@ jobs:
                         wasRunningBeforeCapture,
                         transform: css.transform,
                         scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
-                        boxShadow: css.boxShadow
+                        boxShadow: css.boxShadow,
+                        reflectionAnimationName: reflection.animationName,
+                        reflectionCurrentTime: typeof reflectionAnimation?.currentTime === 'number' ? reflectionAnimation.currentTime : null,
+                        reflectionPlayState: reflectionAnimation?.playState || 'missing',
+                        reflectionWasRunningBeforeCapture,
+                        reflectionOpacity: Number(reflection.opacity),
+                        reflectionBackgroundPosition: reflection.backgroundPosition,
+                        reflectionTransform: reflection.transform
                       };
                     });
                     assert.ok(activationMidFrame.wasRunningBeforeCapture && Math.abs(activationMidFrame.currentTime - 100) < 1 &&
@@ -517,6 +541,12 @@ jobs:
                       'A real category click must start the live CSS animation before the audit pins its 100ms visual frame; observed ' + JSON.stringify(activationMidFrame));
                     assert.ok(activationMidFrame.scaleX > 1.04,
                       'The mid-animation category chip must visibly spring above its resting size; observed ' + JSON.stringify(activationMidFrame));
+                    assert.ok(activationMidFrame.reflectionWasRunningBeforeCapture &&
+                      activationMidFrame.reflectionAnimationName === 'sdCatalogSpecularSweep' &&
+                      Math.abs(activationMidFrame.reflectionCurrentTime - 100) < 1 &&
+                      activationMidFrame.reflectionPlayState === 'paused' &&
+                      activationMidFrame.reflectionOpacity > 0.45,
+                      'The separate specular sweep must be actively visible at the real 100ms activation frame; observed ' + JSON.stringify(activationMidFrame));
                     assert.ok(defaultChipStyleForActivation, 'The unselected category style must be captured before selection.');
                     assert.notEqual(activationMidFrame.boxShadow, defaultChipStyleForActivation.shadow,
                       'The selected chip must bloom beyond its unselected glass shadow during activation.');
@@ -537,16 +567,26 @@ jobs:
                     const activationLaterFrame = await otherCategory.evaluate(el => {
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      const reflectionAnimation = el.getAnimations().find(item => item.animationName === 'sdCatalogSpecularSweep');
                       if (animation) {
                         animation.currentTime = 205;
                         animation.pause();
                       }
+                      if (reflectionAnimation) {
+                        reflectionAnimation.currentTime = 205;
+                        reflectionAnimation.pause();
+                      }
                       const css = getComputedStyle(el);
+                      const reflection = getComputedStyle(el, '::after');
                       return {
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
                         transform: css.transform,
                         backgroundPosition: css.backgroundPosition,
-                        boxShadow: css.boxShadow
+                        boxShadow: css.boxShadow,
+                        reflectionCurrentTime: typeof reflectionAnimation?.currentTime === 'number' ? reflectionAnimation.currentTime : null,
+                        reflectionBackgroundPosition: reflection.backgroundPosition,
+                        reflectionTransform: reflection.transform,
+                        reflectionOpacity: Number(reflection.opacity)
                       };
                     });
                     assert.ok(activationLaterFrame.currentTime !== null && activationLaterFrame.currentTime > activationMidFrame.currentTime,
@@ -554,9 +594,26 @@ jobs:
                     assert.notEqual(activationLaterFrame.transform, activationMidFrame.transform,
                       'Computed transform must change between real animation frames.');
                     assert.notEqual(activationLaterFrame.backgroundPosition, activationMidFrame.backgroundPosition,
-                      'The specular reflection must visibly sweep across the glass between activation frames.');
+                      'The base glass gradient must advance between activation frames.');
+                    assert.ok(activationLaterFrame.reflectionCurrentTime !== null &&
+                      activationLaterFrame.reflectionCurrentTime > activationMidFrame.reflectionCurrentTime,
+                      'The separate reflection timeline must advance after the selected state change.');
+                    assert.notEqual(activationLaterFrame.reflectionBackgroundPosition, activationMidFrame.reflectionBackgroundPosition,
+                      'The separate specular reflection must visibly traverse the chip between captured frames.');
+                    assert.notEqual(activationLaterFrame.reflectionTransform, activationMidFrame.reflectionTransform,
+                      'The diagonal reflection layer must move independently from the pill outline.');
+                    assert.ok(activationLaterFrame.reflectionOpacity > 0.3,
+                      'The 205ms reflection frame must still be visible while sweeping across the glass.');
 
-                    await page.waitForTimeout(300);
+                    await otherCategory.evaluate(el => {
+                      for (const animation of el.getAnimations()) {
+                        if (typeof animation.animationName === 'string' &&
+                          (animation.animationName.startsWith('sdCatalogGlassActivate') || animation.animationName === 'sdCatalogSpecularSweep')) {
+                          animation.finish();
+                        }
+                      }
+                    });
+                    await page.waitForTimeout(30);
                     const settledCategoryStyle = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
                       return { background: css.backgroundColor, boxShadow: css.boxShadow, transform: css.transform };

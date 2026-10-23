@@ -40,6 +40,11 @@ assert.ok(storefrontHtml.includes('<style id="sd-catalog-liquid-glass-reference-
   'Catalog search and category pills must define the agreed icy-blue Liquid Glass tokens.');
 assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
   && storefrontHtml.includes('#products .filter-pill[aria-pressed="true"]')
+  && storefrontHtml.includes('#products .filter-pill::after{\\n  content:"";\\n  position:absolute;\\n  inset:1px;\\n  z-index:-1;')
+  && storefrontHtml.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;')
+  && storefrontHtml.includes('15%{opacity:.70}')
+  && storefrontHtml.includes('52%{opacity:.66;background-position:45% 0;')
+  && storefrontHtml.includes('html.dark #products .filter-pill::after{')
   && storefrontHtml.includes('#products .filter-pill:active:not(:disabled)')
   && storefrontHtml.includes('#products .filter-pill:focus-visible'),
   'Persistent selected, physical pressed and keyboard-focus states must be implemented as distinct catalog-pill states.');
@@ -69,12 +74,12 @@ assert.ok(storefrontHtml.includes('#products .catalog-tools .filter-pills{\n  mi
   && storefrontHtml.includes('touch-action:manipulation;')
   && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:7px;column-gap:7px;row-gap:8px}'),
   'Desktop spacing and dedicated touch-first mobile sizing, tap targets, readable search text and compact 360px chip wrapping must all remain explicit.');
-assert.ok(storefrontHtml.includes('0 0 0 3px rgba(142,207,255,0.90)')
-  && storefrontHtml.includes('0 0 18px 5px rgba(83,169,255,0.38)')
-  && storefrontHtml.includes('0 0 32px rgba(83,169,255,0.30)')
+assert.ok(storefrontHtml.includes('0 0 0 2px rgba(157,211,250,0.62)')
+  && storefrontHtml.includes('0 0 10px 2px rgba(83,169,255,0.23)')
+  && storefrontHtml.includes('0 0 25px 6px rgba(87,174,255,.18)')
   && storefrontHtml.includes('26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.08) saturate(1.12);')
   && storefrontHtml.includes('linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(239,249,255,.38) 45%,rgba(183,222,255,.26) 100%)')
-  && storefrontHtml.includes('border-color:rgba(255,255,255,.98)')
+  && storefrontHtml.includes('border-color:rgba(255,255,255,.90)')
   && storefrontHtml.includes('radial-gradient(125% 160% at 18% 0%,rgba(255,255,255,.70) 0%,rgba(255,255,255,.22) 34%,rgba(255,255,255,0) 74%)')
   && storefrontHtml.includes('linear-gradient(108deg,rgba(255,255,255,0) 18%,rgba(255,255,255,.62) 46%,rgba(255,255,255,0) 72%)')
   && storefrontHtml.includes('background-size:190% 100%,230% 100%,100% 100%')

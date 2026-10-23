@@ -3020,7 +3020,7 @@ html.dark #home .hero-visual::before{
   --sd-catalog-edge-soft:rgba(181,217,248,0.74);
   --sd-catalog-shadow:0 12px 30px rgba(37,88,128,0.11),inset 0 1px 0 rgba(255,255,255,0.88),inset 0 -1px 0 rgba(108,137,166,0.10);
   --sd-catalog-shadow-hover:0 10px 24px rgba(37,105,157,0.15),inset 0 1px 0 rgba(255,255,255,0.96),inset 0 -1px 0 rgba(108,137,166,0.08);
-  --sd-catalog-shadow-selected:0 0 0 1px rgba(255,255,255,1),0 0 0 3px rgba(142,207,255,0.90),0 0 18px 5px rgba(83,169,255,0.38),0 0 32px rgba(83,169,255,0.30),0 9px 24px rgba(49,137,224,0.22),inset 0 2px 0 rgba(255,255,255,1),inset 0 -3px 8px rgba(90,154,223,0.20);
+  --sd-catalog-shadow-selected:0 0 0 1px rgba(255,255,255,0.96),0 0 0 2px rgba(157,211,250,0.62),0 0 10px 2px rgba(83,169,255,0.23),0 6px 16px rgba(49,137,224,0.13),inset 0 1px 0 rgba(255,255,255,0.96),inset 0 -2px 6px rgba(90,154,223,0.14);
 }
 html.dark{
   --sd-catalog-glass-default:rgba(17,49,73,0.68);
@@ -3032,7 +3032,7 @@ html.dark{
   --sd-catalog-edge-soft:rgba(181,217,248,0.30);
   --sd-catalog-shadow:0 14px 32px rgba(0,5,15,0.30),inset 0 1px 0 rgba(235,247,255,0.17),inset 0 -1px 0 rgba(0,8,19,0.18);
   --sd-catalog-shadow-hover:0 12px 27px rgba(0,5,15,0.32),inset 0 1px 0 rgba(245,251,255,0.24),inset 0 -1px 0 rgba(0,8,19,0.15);
-  --sd-catalog-shadow-selected:0 0 0 1px rgba(239,250,255,0.92),0 0 0 2.5px rgba(106,191,250,0.68),0 0 15px 3px rgba(62,161,232,0.34),0 0 25px rgba(62,161,232,0.32),0 8px 22px rgba(0,8,20,0.22),inset 0 1px 0 rgba(250,253,255,0.76),inset 0 -2px 6px rgba(0,8,19,0.14);
+  --sd-catalog-shadow-selected:0 0 0 1px rgba(239,250,255,0.82),0 0 0 2px rgba(106,191,250,0.44),0 0 11px 2px rgba(62,161,232,0.23),0 6px 16px rgba(0,8,20,0.20),inset 0 1px 0 rgba(250,253,255,0.60),inset 0 -2px 6px rgba(0,8,19,0.14);
 }
 #products .catalog-tools{
   color:var(--sd-catalog-ink);
@@ -3149,7 +3149,7 @@ html.dark #products .filter-pill{
 }
 @keyframes sdCatalogGlassActivate{
   0%{transform:scale(.93) translateY(2px);filter:brightness(.96) saturate(1.02);background-position:100% 0%,130% 0%,50% 50%;box-shadow:inset 0 3px 10px rgba(25,69,107,.18),0 0 0 1px rgba(255,255,255,.72),0 0 0 0 rgba(92,176,255,0)}
-  26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.08) saturate(1.12);background-position:0% 0%,0% 0%,50% 50%;box-shadow:0 0 0 2px rgba(255,255,255,.98),0 0 0 4px rgba(126,199,255,.74),0 0 14px 4px rgba(87,174,255,.52),0 0 31px 9px rgba(87,174,255,.25),0 13px 28px rgba(49,137,224,.20),inset 0 1px 0 rgba(255,255,255,1),inset 0 -2px 7px rgba(117,185,243,.16)}
+  26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.08) saturate(1.12);background-position:0% 0%,0% 0%,50% 50%;box-shadow:0 0 0 1px rgba(255,255,255,.96),0 0 0 3px rgba(126,199,255,.56),0 0 12px 3px rgba(87,174,255,.38),0 0 25px 6px rgba(87,174,255,.18),0 9px 20px rgba(49,137,224,.16),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 7px rgba(117,185,243,.14)}
   50%{transform:scale(1.018) translateY(0);filter:brightness(1.025) saturate(1.04);background-position:0% 0%,35% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
   70%{transform:scale(.992) translateY(0);filter:brightness(1.005) saturate(1.01);background-position:0% 0%,75% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
   84%{transform:scale(1.004) translateY(0);filter:brightness(1) saturate(1);background-position:0% 0%,100% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
@@ -3160,7 +3160,7 @@ html.dark #products .filter-pill{
   background:radial-gradient(100% 180% at 18% 0%,rgba(255,255,255,.78) 0%,rgba(255,255,255,.24) 32%,rgba(255,255,255,0) 72%),linear-gradient(108deg,rgba(255,255,255,0) 18%,rgba(255,255,255,.62) 46%,rgba(255,255,255,0) 72%),linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(239,249,255,.38) 45%,rgba(183,222,255,.26) 100%);
   background-size:190% 100%,230% 100%,100% 100%;
   background-position:100% 0%,130% 0%,50% 50%;
-  border-color:rgba(255,255,255,.98);
+  border-color:rgba(255,255,255,.90);
   color:#155486;
   font-weight:750;
   box-shadow:var(--sd-catalog-shadow-selected);
@@ -3171,19 +3171,52 @@ html.dark #products .filter-pill[aria-pressed="true"]{
   background:radial-gradient(100% 180% at 18% 0%,rgba(248,253,255,.68) 0%,rgba(206,236,255,.18) 32%,rgba(255,255,255,0) 72%),linear-gradient(108deg,rgba(248,253,255,0) 18%,rgba(248,253,255,.46) 46%,rgba(248,253,255,0) 72%),linear-gradient(180deg,rgba(133,202,242,.52) 0%,rgba(69,143,193,.40) 46%,rgba(24,78,122,.50) 100%);
   background-size:190% 100%,230% 100%,100% 100%;
   background-position:100% 0%,130% 0%,50% 50%;
-  border-color:rgba(246,253,255,.94);
+  border-color:rgba(246,253,255,.86);
   color:#F7FCFF;
   box-shadow:var(--sd-catalog-shadow-selected);
   animation-name:sdCatalogGlassActivateDark;
 }
 @keyframes sdCatalogGlassActivateDark{
   0%{transform:scale(.93) translateY(2px);filter:brightness(.94) saturate(1.03);background-position:100% 0%,130% 0%,50% 50%;box-shadow:inset 0 3px 10px rgba(0,5,15,.30),0 0 0 1px rgba(245,251,255,.52),0 0 0 0 rgba(62,161,232,0)}
-  26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.16) saturate(1.16);background-position:0% 0%,0% 0%,50% 50%;box-shadow:0 0 0 2px rgba(245,252,255,.90),0 0 0 4px rgba(106,191,250,.66),0 0 15px 4px rgba(62,161,232,.52),0 0 32px 9px rgba(62,161,232,.30),0 13px 28px rgba(0,8,20,.24),inset 0 1px 0 rgba(255,255,255,.80),inset 0 -2px 7px rgba(0,8,19,.16)}
+  26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.16) saturate(1.16);background-position:0% 0%,0% 0%,50% 50%;box-shadow:0 0 0 1px rgba(245,252,255,.88),0 0 0 3px rgba(106,191,250,.50),0 0 12px 3px rgba(62,161,232,.36),0 0 25px 6px rgba(62,161,232,.19),0 9px 20px rgba(0,8,20,.22),inset 0 1px 0 rgba(255,255,255,.78),inset 0 -2px 7px rgba(0,8,19,.14)}
   50%{transform:scale(1.018) translateY(0);filter:brightness(1.035) saturate(1.07);background-position:0% 0%,35% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
   70%{transform:scale(.992) translateY(0);filter:brightness(1.008) saturate(1.02);background-position:0% 0%,75% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
   84%{transform:scale(1.004) translateY(0);filter:brightness(1) saturate(1);background-position:0% 0%,100% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
   100%{transform:scale(1) translateY(0);filter:brightness(1) saturate(1);background-position:0% 0%,130% 0%,50% 50%;box-shadow:var(--sd-catalog-shadow-selected)}
 }
+/* A separate composited reflection layer keeps the diagonal specular sweep visible even when
+   the selected-chip background and its box-shadow are being transitioned. */
+#products .filter-pill{isolation:isolate}
+#products .filter-pill::after{
+  content:"";
+  position:absolute;
+  inset:1px;
+  z-index:-1;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(112deg,rgba(255,255,255,0) 25%,rgba(255,255,255,.12) 37%,rgba(255,255,255,.94) 48%,rgba(212,236,255,.72) 52%,rgba(255,255,255,0) 65%);
+  background-size:260% 100%;
+  background-position:136% 0;
+  opacity:0;
+  transform:skewX(-12deg) translateX(8%) scaleX(.98);
+  mix-blend-mode:screen;
+}
+html.dark #products .filter-pill::after{
+  background:linear-gradient(112deg,rgba(255,255,255,0) 25%,rgba(255,255,255,.10) 37%,rgba(245,252,255,.82) 47%,rgba(185,225,255,.60) 52%,rgba(255,255,255,0) 65%);
+}
+#products .filter-pill.active::after,
+#products .filter-pill[aria-pressed="true"]::after{
+  animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes sdCatalogSpecularSweep{
+  0%{opacity:0;background-position:136% 0;transform:skewX(-12deg) translateX(8%) scaleX(.98)}
+  15%{opacity:.70}
+  26%{opacity:.94;background-position:0% 0;transform:skewX(-12deg) translateX(0) scaleX(1.02)}
+  52%{opacity:.66;background-position:45% 0;transform:skewX(-12deg) translateX(-2%) scaleX(1.01)}
+  80%{opacity:.20;background-position:105% 0}
+  100%{opacity:0;background-position:136% 0;transform:skewX(-12deg) translateX(-8%) scaleX(.98)}
+}
+
 @media(hover:hover) and (pointer:fine){
   #products .filter-pill:hover:not(:disabled):not(.active):not([aria-pressed="true"]){
     background:radial-gradient(120% 170% at 18% 0%,rgba(255,255,255,.74) 0%,rgba(255,255,255,.18) 35%,rgba(255,255,255,0) 75%),linear-gradient(108deg,rgba(255,255,255,0) 16%,rgba(255,255,255,.48) 47%,rgba(255,255,255,0) 74%),linear-gradient(180deg,rgba(255,255,255,.46) 0%,rgba(245,251,255,.34) 46%,rgba(191,225,255,.26) 100%),var(--sd-catalog-glass-hover);
@@ -3313,6 +3346,7 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
   #products .search-field svg{transition:none!important}
   #products .filter-pill.active,
   #products .filter-pill[aria-pressed="true"]{animation:none!important}
+  #products .filter-pill::after{animation:none!important;opacity:0!important}
   #products .filter-pill:hover,
   #products .filter-pill:active,
   #products .filter-pill:active svg{transform:none!important}
