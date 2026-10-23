@@ -115,3 +115,7 @@ assert.ok(admin.includes('class="settingsgrid website-settings"'),
   "Screen 10 must have a dedicated layout hook so mobile compaction does not affect Backup/Restore.");
 assert.ok(admin.includes('#main:has(.website-settings) > .pagehead .eyebrow'),
   "Screen 10 mobile heading must collapse without affecting the Backup/Restore pagehead.");
+assert.ok(admin.includes('.website-settings>section:nth-of-type(-n+3)>p{display:none}'),
+  "Mobile compaction may hide only explanatory copy on the three reference panels; QR payment and Reset SKU safety guidance must remain visible.");
+assert.ok(!admin.includes('.website-settings>.setting>p{display:none}'),
+  "Do not hide safety instructions across the entire Settings page on mobile.");
