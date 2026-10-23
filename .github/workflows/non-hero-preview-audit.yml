@@ -92,7 +92,7 @@ jobs:
           assert.match(sourceSha, /^[a-f0-9]{40}$/, 'The source revision must be an exact Git SHA.');
           assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().toLowerCase(), sourceSha,
             'Checked-out source must match the triggering commit.');
-          assert.equal(targetSelector, '#order', 'Only the order-process section is in scope.');
+          assert.equal(targetSelector, 'section.section.wrap#order', 'Only the order-process section is in scope.');
           assert.doesNotMatch(targetSelector, /hero/i, 'The paused Hero must never be a screenshot target.');
           if (!/^[a-f0-9]{32}$/i.test(accountId)) throw new Error('Missing or invalid Cloudflare account ID.');
           if (!apiToken) throw new Error('Missing read-only Cloudflare Pages metadata token.');
