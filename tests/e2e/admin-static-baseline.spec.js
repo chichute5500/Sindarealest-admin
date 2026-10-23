@@ -2349,6 +2349,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.getByRole('heading', { name: 'Cài đặt watermark' })).toBeVisible();
 
       if (variant.viewport.width === 390 && variant.viewport.height === 844 && variant.theme === 'light') {
+        const priceStatus = page.locator('.website-settings > section:first-child .switchrow .tiny.muted');
+        await expect(priceStatus, 'Reference Screen 10 shows the public-price toggle without an extra status line').toBeHidden();
         const mobileNavTop = await page.locator('.mobiletabs').evaluate(element => element.getBoundingClientRect().top);
         for (const selector of ['#watermarkSettingsForm > .switchrow', '#watermarkLogoUrl', '#watermarkPosition', '#watermarkSize', '#watermarkOpacity']) {
           const bounds = await page.locator(selector).boundingBox();
