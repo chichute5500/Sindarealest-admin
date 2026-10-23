@@ -48,8 +48,12 @@ assert.ok(restoreApi.includes("const MAX_BACKUP_BYTES = 20 * 1024 * 1024"),
   "Restore API must retain its 20 MB hard limit");
 
 const previewWorkflow = read("../.github/workflows/admin-preview-diagnostics.yml");
-assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v4"),
-  "Full ADMIN Playwright screenshots must remain available as a run artifact");
+assert.ok(previewWorkflow.includes("uses: actions/checkout@v7"),
+  "The isolated ADMIN diagnostic workflow must use a Node.js 24-compatible checkout action");
+assert.ok(previewWorkflow.includes("uses: actions/setup-node@v7"),
+  "The isolated ADMIN diagnostic workflow must use a Node.js 24-compatible setup-node action");
+assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v7"),
+  "Full ADMIN Playwright screenshots must remain available as a run artifact using a Node.js 24-compatible action");
 assert.ok(previewWorkflow.includes("data.latestScreenshotArtifact = {"),
   "The handoff must point to the latest screenshot artifact instead of committing every PNG");
 assert.ok(!previewWorkflow.includes('cp "$SOURCE_DIR"/screenshots/*.png "$DEST/screenshots/"'),
