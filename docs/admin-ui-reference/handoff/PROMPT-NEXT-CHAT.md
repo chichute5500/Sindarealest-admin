@@ -2,13 +2,15 @@
 
 Canonical entry point: read [`START-HERE.md`](START-HERE.md) first, then fetch live branch/PR/Actions state before continuing; historical checkpoint values are not authoritative without revalidation.
 
-## Live checkpoint — 2026-10-23 06:04 UTC
-- Writable branch source/test SHA at sync: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; Validate #39909118547 is **SUCCESS**. [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547).
-- Admin Preview #39909118491 is **IN_PROGRESS**, last observed at Chromium installation. [Check live result](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) before changing code.
-- Previous Preview #39908380252 failed the stale 320px thumbnail-rail assertion: measured scroll width 284px, old requirement >288px. Current SHA lowers required overflow to >10px. **Do not repeat the same threshold change**; wait for exact-SHA Preview and inspect its result.
-- Gallery CSS is compacted; Playwright requires the full upload zone above the sticky footer at 390×844. Screenshot verification remains pending.
-- PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866`; `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- B1 cleanup is already complete; do not redo the census/deletion/API-consolidation review. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; backend QA `NOT_TESTED`; D1 `NOT_VERIFIED`; exact visual parity `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Live checkpoint — 2026-10-23 06:14 UTC
+- Before this sync, PR #111 branch HEAD was `feb29900e4680a1fec0a8411c6caa22c6d714d91`; the gallery CSS remains from application-source SHA `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`. Re-fetch live HEAD and Actions before coding.
+- Validate [#39910157079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079) **FAILURE** on `feb29900e4680a1fec0a8411c6caa22c6d714d91`: project integrity/dependency audit and `npm run check` passed, but `npm test` failed because `START-HERE.md` did not explicitly link `PROMPT-NEXT-CHAT.md`. This handoff sync adds the link. No pass is claimed for the resulting head until fresh Actions complete.
+- Preview diagnostic [#39910156991](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991) **FAILURE** at the same test gate. Chromium and screenshot steps were skipped. Artifact [admin-preview-evidence-381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991/artifacts/12482711337) is not a screenshot matrix.
+- The previous full Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) failed a 360×800 nested assertion with `scrollWidth=308`, expected `>318`. Five compact thumbnails can fit in that rail; code-only test commit `feb29900e4680a1fec0a8411c6caa22c6d714d91` now checks actual reachability while preserving the initial 320px scroll assertion. Do not revisit the 320px threshold without new evidence. Screenshot artifact: [admin-preview-evidence-380](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491/artifacts/12481833079).
+- Next: inspect fresh validation and screenshot-matrix runs on the post-sync HEAD. Verify the 390×844 upload/drop zone and mobile/desktop themes before making another UI change.
+- PR #111 OPEN/unmerged; PR #108 OPEN/unmerged/read-only; `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. B1 cleanup is complete. All 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- Hard restrictions: no merge/rebase/force-push, no `main` or PR #108 writes, no Production deployment, no Cloudflare Access bypass, no secret changes, no remote D1/R2/schema/ledger operation, and no owner-deferred migration/image workflow.
+
 ## Historical checkpoint
 
 ## Historical checkpoint

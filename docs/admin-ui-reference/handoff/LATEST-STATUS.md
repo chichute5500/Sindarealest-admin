@@ -1,11 +1,13 @@
 # LATEST STATUS — SinDarealest Admin
 
-## Live checkpoint — 2026-10-23 06:04 UTC
-- Source/test SHA: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`. Validate [#39909118547](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547) **SUCCESS** on this exact SHA.
-- Admin Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) is **IN_PROGRESS**; last observed step was Chromium installation. Prior Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) failed a stale 320px rail assertion (284px measured versus >288px required). The threshold was lowered to >10px on current SHA; wait for the new run before claiming PASS.
-- Product-gallery CSS was compacted; test now requires the full upload zone to fit above the sticky footer at 390×844. Screenshot-level confirmation is pending.
-- PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2` (418 files, +40,048/-212); PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866` (291 files); `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge/deployment.
-- B1 cleanup/provenance audit is complete; do not repeat without new evidence.
+## Live checkpoint — 2026-10-23 06:14 UTC
+- Validate [#39910157079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079) **FAILURE** on `feb29900e4680a1fec0a8411c6caa22c6d714d91`: dependency audit, project integrity, and `npm run check` passed; `npm test` failed at handoff-integrity because `START-HERE.md` lacked an explicit prompt link. This sync adds that link; validate the resulting branch head before claiming success.
+- Preview diagnostic [#39910156991](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991) **FAILURE** for the same `npm test` gate. Chromium and screenshot matrix were skipped; artifact [admin-preview-evidence-381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991/artifacts/12482711337) is not a screenshot matrix.
+- Previous screenshot-matrix run [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) **FAILURE** on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`: 360×800 test expected rail scroll width >318px but measured 308px; this is consistent with all compact thumbnails fitting. Artifact [admin-preview-evidence-380](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491/artifacts/12481833079) has 16 login PNGs, 35 read-only fixture PNGs, and 33 fixture metrics.
+- Test-only commit `feb29900e4680a1fec0a8411c6caa22c6d714d91` changes the nested viewport check to verify reachability whether or not overflow exists. The original 320px overflow test remains strict; do not repeat the prior threshold adjustment. Gallery CSS unchanged.
+- PR #111 OPEN/unmerged; PR #108 OPEN/unmerged/read-only at `3fcbbedfc81dd6cfb6f8ea96dbfaf96137c6c36d`; `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` unchanged. B1 complete.
+- Acceptance stays partial: all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+
 ## Historical source/Preview checkpoint
 
 ## Historical source/Preview checkpoint
@@ -43,12 +45,8 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 593d4eb6b093e26ce465f6e010a953c3f0453d19
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252
-- npm run check: PASS
-- npm test: PASS
-- Local source Playwright matrix: FAILURE; 50 real PNGs captured in artifact admin-preview-evidence-379 (not committed to Git).
-- Deployed Preview: success.
-- Source screenshot matrix: 50 real PNGs; login shell: 16; read-only fixture module screens: 34; fixture metrics: 32.
-- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
-- Production deployment: NOT PERFORMED.
+- Validate [#39910157079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079) on `feb29900e4680a1fec0a8411c6caa22c6d714d91`: `npm run check` PASS; dependency audit PASS; project integrity PASS; `npm test` FAILURE — handoff-integrity requires START-HERE to link PROMPT-NEXT-CHAT explicitly.
+- Preview diagnostic [#39910156991](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991) on the same SHA: FAILURE at the shared `npm test` gate; Chromium and responsive/theme matrix SKIPPED. Artifact [admin-preview-evidence-381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991/artifacts/12482711337) is diagnostic only.
+- Last full screenshot matrix: Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`, FAILURE at 360×800 thumbnail reachability assertion (`scrollWidth=308`, expected `>318`). Artifact [admin-preview-evidence-380](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491/artifacts/12481833079): 51 real screenshots (16 login + 35 read-only fixture) and 33 fixture metrics.
+- The test-only fix at `feb29900e4680a1fec0a8411c6caa22c6d714d91` now allows thumbnails to fit without requiring artificial overflow and still tests reachability when scroll is needed. A fresh run on the post-sync HEAD is still required; no Preview pass is claimed.
+- Authenticated business/backend workflows remain NOT TESTED; fixture screenshots do not prove persistence or authorization. Remote D1 remains NOT VERIFIED; Production deployment NOT PERFORMED.

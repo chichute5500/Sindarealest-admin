@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T06:04:00Z",
+  "capturedAtUtc": "2026-10-23T06:14:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
-  "checkpointSemantics": "Live sync 2026-10-23 06:04 UTC: Validate #39909118547 passed on exact source/test SHA a3f5f28025efb6ebfc308e3f11a6239565cdfff2. Admin Preview #39909118491 remains in progress at Chromium installation. Previous Preview #39908380252 failed the 320px thumbnail rail assertion (scroll width 284px versus stale >288px requirement); current SHA adjusts the requirement to +10px. Gallery screenshot/metrics still need verification. B1 is complete and must not be repeated.",
-  "codeTestSha": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
+  "branchHeadAtCheckpointStart": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+  "checkpointSemantics": "Live sync 2026-10-23T06:14:00Z: last pre-sync branch head feb29900e4680a1fec0a8411c6caa22c6d714d91. Validate #39910157079 FAILURE on exact SHA: npm run check/dependency audit/project integrity PASS, npm test FAIL because START-HERE lacked an explicit PROMPT-NEXT-CHAT.md link; this handoff sync adds it. Preview diagnostic #39910156991 failed the same npm test gate before browser/screenshot steps. Earlier full Preview #39909118491 failed at 360x800 rail reachability assertion (308px measured against >318px requirement); test-only fix feb29900e4680a1fec0a8411c6caa22c6d714d91 permits visible fit or verified scroll, while preserving the original 320px overflow assertion. New head requires fresh Actions verification. B1 remains complete; do not repeat.",
+  "codeTestSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
   "latestProductSourceCommit": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
   "latestActionsRun": {
-    "id": 39909118491,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491",
-    "headSha": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
-    "status": "in_progress",
-    "conclusion": null,
-    "workflow": "Admin Preview diagnostic smoke test",
-    "summary": "Still at Install Chromium for Playwright when last checked; no screenshot-matrix result yet."
+    "id": 39910157079,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079",
+    "headSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+    "status": "completed",
+    "conclusion": "failure",
+    "workflow": "Validate source and tests",
+    "summary": "npm run check, dependency audit and project integrity passed; npm test failed only at handoff integrity because START-HERE must explicitly link PROMPT-NEXT-CHAT.md. The current handoff sync adds the missing link; fresh Actions on the resulting HEAD are pending."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -26,7 +26,7 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "0e4a1d5eef3662951b3ce182c8bbf154467a8866",
+      "headSha": "3fcbbedfc81dd6cfb6f8ea96dbfaf96137c6c36d",
       "changedFiles": 291,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
@@ -42,14 +42,14 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
+      "headSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
       "changedFiles": 418,
-      "additions": 40048,
+      "additions": 40063,
       "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
-      "validationRunId": 39903088401,
-      "validation": "PASS_ON_EXACT_HANDOFF_HEAD",
+      "validationRunId": 39910157079,
+      "validation": "FAILURE_HANDOFF_LINK_ASSERTION_ON_PRE_SYNC_SHA",
       "mergeableState": "dirty"
     }
   },
@@ -76,39 +76,34 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-23T04:29:08.656Z",
-      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "capturedAtUtc": "2026-10-23T06:14:00Z",
+      "testedSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
       "validateRun": {
-        "id": 39899961562,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+        "id": 39910157079,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079",
         "status": "completed",
-        "conclusion": "success"
+        "conclusion": "failure"
       },
       "previewRun": {
-        "id": 39899961344,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+        "id": 39910156991,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991",
         "status": "completed",
-        "conclusion": "success"
+        "conclusion": "failure"
       },
       "previewArtifact": {
-        "name": "admin-preview-evidence-370",
-        "id": 12478995473,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473",
-        "pngCount": 133,
-        "uniqueGeneratedScreenshots": 132,
-        "loginScreenshots": 16,
-        "distinctModuleScreenshots": 116,
-        "moduleCaptureEntries": 120,
-        "fixtureMetrics": 112
+        "name": "admin-preview-evidence-381",
+        "id": 12482711337,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991/artifacts/12482711337",
+        "screenshotCount": 0
       },
-      "reason": "Notification unread/mark-read regression test added; Validate and Admin Preview completed successfully on exact source/test SHA. Preview evidence is synthetic/read-only fixture coverage; authenticated business/backend acceptance remains incomplete."
+      "reason": "Both workflows on the test-only commit were blocked at npm test by the handoff-integrity assertion requiring START-HERE to link PROMPT-NEXT-CHAT.md. The handoff link is being repaired; revalidate fresh HEAD."
     },
     "latestValidateAttempt": {
-      "id": 39909118547,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547",
+      "id": 39910157079,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079",
       "status": "completed",
-      "conclusion": "success",
-      "testedSha": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
+      "conclusion": "failure",
+      "testedSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
       "workflow": "Validate source and tests"
     },
     "lastFailed": {
@@ -120,25 +115,26 @@
       "meaning": "Historical failure because latestRun.id/url were null; superseded by successful exact-SHA Validate #39844529679 on b8aff."
     },
     "latestPreviewAttempt": {
-      "id": 39909118491,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491",
-      "status": "in_progress",
-      "conclusion": null,
-      "testedSha": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
-      "activeStep": "Install Chromium for Playwright",
-      "artifact": null
+      "id": 39910156991,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991",
+      "status": "completed",
+      "conclusion": "failure",
+      "testedSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+      "activeStep": "Run automated tests (failed)",
+      "artifact": "admin-preview-evidence-381",
+      "artifactId": 12482711337
     }
   },
   "latestProductChange": {
-    "status": "MOBILE_GALLERY_COMPACTED; VALIDATE_PASS; PREVIEW_PENDING; ACCEPTANCE_PARTIAL",
-    "sourceAndTestSha": "a3f5f28025efb6ebfc308e3f11a6239565cdfff2",
-    "validateRunId": 39909118547,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547",
-    "previewRunId": 39909118491,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491",
-    "previewArtifact": null,
-    "previewArtifactId": null,
-    "summary": "Mobile product gallery compacted; test checks full upload zone above sticky footer at 390x844. Previous Preview failed the stale 320px rail-overflow assertion (284px measured vs >288px expected); current SHA lowers the overflow threshold to +10px. Validate passed; exact-SHA Preview still in progress."
+    "status": "THUMBNAIL_REACHABILITY_TEST_UPDATED; HANDOFF_LINK_FIX_ADDED; PREVIEW_RECHECK_PENDING; ACCEPTANCE_PARTIAL",
+    "sourceAndTestSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+    "validateRunId": 39910157079,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079",
+    "previewRunId": 39910156991,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991",
+    "previewArtifact": "admin-preview-evidence-381",
+    "previewArtifactId": 12482711337,
+    "summary": "The latest source screenshot matrix found an overstrict nested 360px rail assertion; the test-only correction is committed. The next run was blocked by handoff-integrity because START-HERE lacked the explicit prompt link. This sync repairs that contract. No source CSS adjustment was warranted; 320px overflow condition remains unchanged."
   },
   "screenStatuses": {
     "1_login": {
@@ -192,7 +188,7 @@
   },
   "scopeAudit": {
     "status": "B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
-    "liveChangedFiles": 406,
+    "liveChangedFiles": 418,
     "previousCensus": 1314,
     "previousCensusStatus": "Checkpoint-start PR #111 census: 390 changed paths, +39,075/-212. Fetch live PR metadata before acting; the Preview workflow may add compact evidence files.",
     "priority": "B1 cleanup/provenance review complete for current diff; no further deletion or route consolidation without new evidence.",
@@ -406,45 +402,45 @@
     "Do not repeat completed B1 cleanup, merge/rebase/force-push, deploy Production, or write to main/PR #108."
   ],
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T06:04:00Z",
+    "lastSyncAtUtc": "2026-10-23T06:14:00Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "syncPurpose": "Current exact-SHA validation, in-progress Preview and stale 320px assertion adjustment; prevent repeating B1 or the same threshold edit."
+    "syncPurpose": "Correct missing explicit prompt link; sync verified #39909118491 screenshot failure, current #39910157079/#39910156991 handoff-integrity failures, test-only reachability fix and acceptance guardrails."
   },
-  "currentHeadAtCheckpoint": "a5d0076eda669b670b3de9ba4da2069c25f149f2",
-  "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; HANDOFF EVIDENCE/DOCS CHILD COMMITS ARE NOT CODE TESTS",
-  "currentHeadValidationReason": "Admin Preview run 39906240167 tested source/test SHA a4e2508235cb928568992f8dba408acc913f2baf and passed. Evidence child a5d0076eda669b670b3de9ba4da2069c25f149f2 and later handoff-only commits do not change application code; do not claim those commits were separately rerun.",
+  "currentHeadAtCheckpoint": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+  "currentHeadValidation": "FAILURE_ON_PRE_SYNC_SHA; HANDOFF_LINK_FIX_ADDED_IN_THIS_SYNC; FRESH_ACTIONS_PENDING",
+  "currentHeadValidationReason": "Validate #39910157079 tested feb29900e4680a1fec0a8411c6caa22c6d714d91 and failed npm test at the handoff link assertion; Preview diagnostic #39910156991 stopped at the same gate before Playwright. This sync inserts the explicit Markdown link required by tests/handoff-integrity.test.mjs. Do not claim pass until Actions on the new HEAD finish.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T05:34:00Z",
-    "branchHeadAtCheckpointStart": "a5d0076eda669b670b3de9ba4da2069c25f149f2",
-    "codeTestSha": "a4e2508235cb928568992f8dba408acc913f2baf",
-    "validateRunId": 39906240167,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
-    "validateConclusion": "success",
-    "previewRunId": 39906240167,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
-    "previewConclusion": "success",
-    "previewArtifact": "admin-preview-evidence-374",
-    "previewArtifactId": 12481355528,
-    "screenshotCount": 132,
+    "capturedAtUtc": "2026-10-23T06:14:00Z",
+    "headAtStart": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+    "codeTestSha": "feb29900e4680a1fec0a8411c6caa22c6d714d91",
+    "validateRunId": 39910157079,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079",
+    "validateConclusion": "failure",
+    "previewRunId": 39910156991,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991",
+    "previewConclusion": "failure",
+    "previewArtifact": "admin-preview-evidence-381",
+    "previewArtifactId": 12482711337,
+    "screenshotCount": 51,
     "loginShellPngCount": 16,
-    "distinctModuleScreenshots": 120,
-    "uiFixtureCaptureEntryCount": 120,
-    "uiFixtureMetricCount": 112,
-    "archivePngCount": 133,
-    "screen12ActivityNotificationRegression": "PASS_ON_EXACT_SOURCE_TEST_SHA",
+    "uiFixturePngCount": 35,
+    "uiFixtureMetricCount": 33,
+    "latestScreenshotMatrixRunId": 39909118491,
+    "latestScreenshotMatrixConclusion": "failure",
+    "latestScreenshotMatrixArtifact": "admin-preview-evidence-380",
+    "latestScreenshotMatrixArtifactId": 12481833079,
+    "screenshotMatrixFailure": "360x800 thumbnail rail measured 308px; old assertion expected >318px. Test-only reachability correction committed; no CSS change.",
+    "handoffIntegrityFailure": "START-HERE must explicitly link PROMPT-NEXT-CHAT.md; this handoff sync adds the link.",
     "fixtureOnly": true,
     "allScreens": "PARTIAL_NOT_ACCEPTED",
     "authenticatedBackendQA": "NOT_TESTED",
     "remoteD1SchemaLedger": "NOT_VERIFIED",
     "exactReferenceParity": "NOT_VERIFIED",
     "production": "NOT_PERFORMED",
-    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-    "sourceValidateRunId": 39906240167,
-    "sourcePreviewRunId": 39906240167,
-    "sourcePreviewConclusion": "success"
+    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
-  "latestReviewFinding": "Screen 12 Activity Log/Notifications now uses two in-page tabs. Playwright initially exposed a test assertion mismatch (internal event key vs rendered Vietnamese label); the test now asserts the rendered label. Exact source/test SHA a4e2508235cb928568992f8dba408acc913f2baf passed npm run check, npm test and the local Playwright screenshot matrix in Admin Preview run 39906240167. Fixture-only evidence; all 12 screens remain PARTIAL_NOT_ACCEPTED, authenticated backend QA NOT_TESTED and full screen-by-screen reference parity NOT_VERIFIED.",
+  "latestReviewFinding": "Preview #39909118491 failed on a3f5f28025efb6ebfc308e3f11a6239565cdfff2 at 360x800 because a nested assertion required artificial rail overflow (308px vs >318px). Test-only correction was committed as feb29900e4680a1fec0a8411c6caa22c6d714d91. Validate #39910157079 and Preview diagnostic #39910156991 then failed before UI testing because START-HERE lacked an explicit prompt link. The current sync repairs that handoff link; run Actions on the resulting HEAD.",
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
 }
