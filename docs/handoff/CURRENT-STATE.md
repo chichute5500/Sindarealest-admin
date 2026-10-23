@@ -1,3 +1,16 @@
+## LATEST AUTHORITATIVE UPDATE — COLLECTION SLIDESHOW PAUSE CONTROL — 2026-10-24
+
+- Source/test SHA: `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`.
+- New confirmed accessibility issue in unlocked `#collections` (not Hero): carousel auto-advanced every 3 seconds without a visitor-facing pause control.
+- Fix adds an accessible pause/resume button with changing Vietnamese accessible label, `aria-pressed` state, and a single managed interval. `prefers-reduced-motion: reduce` continues to disable autoplay and disables the resume action; manual previous/next remains available.
+- Regression harness tests autoplay start at 3000 ms, pause clears the active timer, resume starts one new timer, ARIA state/name updates, reduced-motion disables autoplay and keeps manual navigation.
+- Exact-SHA CI PASS [#39994601040](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994601040); exact-SHA Preview deploy PASS [#39994600974](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994600974).
+- Immutable Preview: https://5052d769.sindarealest2.pages.dev/; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy log confirms Pages project `sindarealest2`, uploaded 551 files (1 changed), deployment complete and supplied `--commit-hash=$GITHUB_SHA`. Wrangler emitted a warning that `wrangler.toml` lacks `pages_build_output_dir` and was ignored; deployment nevertheless succeeded. Do not silently expand scope to infra; track this warning for a separate approved config review only if needed.
+- No manual browser screenshot/visual acceptance. PR #108 OPEN/unmerged; no Production deploy, main change, or locked-scope changes.
+
+---
+
 ## LATEST AUTHORITATIVE UPDATE — LEGACY FAVORITES KEY MIGRATION — 2026-10-24
 
 - Source/test commit: `384e0b503416d9fa0395fd1d485ac522259c913a`; current branch HEAD at this update is exactly the source/test commit (following update is docs-only).
