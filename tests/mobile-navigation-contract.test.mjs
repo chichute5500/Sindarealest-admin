@@ -6,6 +6,7 @@ const start = html.indexOf('function setupMobileBottomNav()');
 const end = html.indexOf('function syncHeroProductImage()', start);
 assert.ok(start >= 0 && end > start, 'Mobile navigation setup must exist and remain isolated.');
 const setup = html.slice(start, end);
+assert.match(setup, /const tabs=\$\$\('\[data-mobile-tab\]'\)/, 'Mobile navigation must collect every tab as an array; a single-element query breaks setup and prevents cart/account click handlers from binding.');
 assert.match(setup, /data-mobile-tab/ , 'All mobile navigation tabs must use the shared active-state contract.');
 assert.ok(setup.includes("['products',$('#products')]"), 'Catalog visibility must activate the products tab.');
 assert.ok(setup.includes("['home',$('#siteFooter')]"), 'The footer must be treated as part of the home screen, not the account screen.');
