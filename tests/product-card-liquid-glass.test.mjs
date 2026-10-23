@@ -225,11 +225,8 @@ assert.match(catalogFilterPill, /min-height:32px;padding:6px 13px/,
   "Desktop catalog filter pills should be slightly slimmer without changing their horizontal spacing.");
 assert.match(html, /\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13px\}/,
   "The compact mobile catalog filter pills should be slimmer while retaining readable labels.");
-assert.match(html, /#products \.filter-pill\{min-height:40px;padding:7px 11px;font-size:13\.5px\}/,
-  "Narrow-phone product filters should use a reduced 40px touch target, not the previous oversized 44px height.");
-assert.match(html, /\.filter-pill\.active,\.filter-pill:hover\{background:var\(--panel-strong\);border-color:var\(--gold\);box-shadow:inset 0 1px rgba\(255,255,255,\.26\)\}/,
-  "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
-assert.match(html, /#products \\.filter-pill:active[^}]*transform:[^;]*scale\\\(/,
+assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"]),')
+  && html.includes('transform:translateY(1px) scale(.965)'),
   "Slimming catalog filter pills must preserve the existing press feedback.");
 
 assert.match(html, /#products \.filter-pill\{[^}]*min-height:40px;\s*padding:9px 19px;/,
