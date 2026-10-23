@@ -680,3 +680,11 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Added assertions that opening the fullscreen viewer starts preloading all album photos and that mobile transitions use the directional slide after decode; runtime coverage checks decode failure and stale competing requests.
 - Not run/accepted: real-device visual test. Owner must verify slow and rapid taps and confirm there is no residual flicker or ghosting. Do not treat the skipped Hero-guarded visual workflow as visual PASS.
 - Source commit: `be27230919462aabbb86c8a9b4a2369375dd752f`; test commit: `87cef74f427ff7178e984e3bd836152948f1d974`.
+
+
+## OWNER DIRECTIVE — CURRENT GALLERY STATUS AND NON-REGRESSION RULE — 2026-10-24
+
+- Latest source/test verification: CI PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813; Preview https://9fe68f80.sindarealest2.pages.dev/.
+- Source commit `be27230919462aabbb86c8a9b4a2369375dd752f`; regression-test commit `87cef74f427ff7178e984e3bd836152948f1d974`. Tests cover source contracts/runtime behavior, including full-album preload and decoded directional transitions; they do not establish visual acceptance.
+- Owner says flicker persists and explicitly pauses this work. Mark gallery **PAUSED / NOT ACCEPTED**. Do not make further gallery changes or ask for retest until reopened.
+- Preserve other accepted areas as PASS/LOCKED without repeating tests or reopening them. Hero and guarded visual scopes remain off limits. Continue only a clearly authorized, unlocked task.
