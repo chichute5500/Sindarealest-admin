@@ -155,3 +155,16 @@ This active-task override supersedes earlier “ready for owner visual review”
 - Behavioral checks PASS: activation animation across mobile 360/390, tablet 768, desktop 1440 and Light/Dark; touch, keyboard, persistent selected state and reduced motion. 460ms spring/glass bloom, observed scale peak ~1.046–1.090; no perpetual pulse. Zero runtime errors, same-origin HTTP errors, or read-only violations.
 - TECHNICAL PASS only; owner visual acceptance PENDING. Prior audit failure #39931188126 was a brittle exact-RGBA test and has been superseded by #39931617426 PASS.
 - Guardrails: Hero PAUSED/untouched; #order OWNER PASS/LOCKED/untouched; PR #108 OPEN/unmerged; Preview only. Never restore the deleted dedicated product-status filter panel; no Production/Admin/backend/data/config changes.
+
+## ACTIVE OVERRIDE — CATEGORY LIQUID GLASS MUST MATCH REFERENCE — 2026-10-23
+
+**Status: OPEN.** Owner reports the category-chip activation still looks materially different from the supplied sample. Do not ask the owner to check until a valid audit and reference comparison are complete.
+
+- Source validation #39952718374 passed on prior SHA `ecee210c0906edc66d00a7396a55a19f029e7c6c`.
+- Live audit #39952718436 failed because of a harness typo (`activationMidFrame.Math.abs`); artifact #12501390897 is not PASS evidence.
+- Fixed three incorrect `Math.abs` calls in commit `b534c8fb8861157fb07da0b507a1e5f791966872` without lowering the visible spring threshold.
+- Validation #39953050846 and live catalog audit #39953050974 were running at handoff. Inspect their final result, logs, manifest and captured frames.
+- Compare against `docs/design-reference/liquid-glass-product-filters.png`. Verify the translucent glass surface, moving specular sheen, theme-specific bloom, press-in/spring/settle, persistent selected state and retriggering when switching categories. Test mobile 360/390, tablet 768, desktop 1440 × Light/Dark, mouse, touch, keyboard and reduced motion. Animation semantics must remain consistent across breakpoints.
+- Do not call CSS declaration presence or source-test PASS a visual PASS. If audit fails, fix the root cause and rerun. If it passes but the image still differs, improve catalog-only UI and repeat Preview verification/capture.
+
+Guardrails: Hero PAUSED/untouched; `#order` OWNER PASS/LOCKED/untouched; removed product-status filter panel stays removed; PR #108 OPEN/unmerged; Preview only; no Production/Admin/backend/data/config changes.
