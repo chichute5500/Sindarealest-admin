@@ -48,3 +48,12 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 - Order-only live capture: 8 screenshots, exact SHA match at `72cb5b365c5f7d6438e6ad0a37df43ba0142c1fc`, artifact [#12477450904](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896962874/artifacts/12477450904). Current HEAD differs only by removing two redundant test lines, so storefront HTML is unchanged. Capture does not visually verify the product-detail dialog; broader owner visual acceptance remains pending.
 - Hero stays paused. No Hero capture, merge, Production deploy, or restricted-scope changes.
 - Next: continue source-first audit outside Hero and outside the already locked order-step heading. Require a concrete finding before edits.
+
+## Latest execution ledger — 2026-10-23
+
+- **ORDER-CTA-MOBILE-NAV-CLEARANCE:** fixed a confirmed overlap in 360px dark-mode live capture by reserving bottom clearance on `#order` for viewports ≤380px; did not change the locked order-step heading.
+- Regression assertion: `tests/storefront-operations.test.mjs`.
+- Final source/test SHA `d2123c60203cba768ac91555262707139f24f5c7`: CI PASS [#39899622059](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899622059); Preview deploy PASS [#39899622020](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899622020).
+- Exact-source/deployment capture of the CSS change at `08017a955fa42081e59457397b210a26b6038f6d`: [run #39899486321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321), artifact [#12477679857](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321/artifacts/12477679857). The final SHA differs only in test assertion correction; public HTML is identical. Captures: 8/8, no runtime/same-origin HTTP errors; CTA clear of fixed nav at 360px in both themes.
+- Broader order-section owner visual acceptance remains **PENDING**. Owner-approved heading typography remains PASS/LOCKED. Hero remains PAUSED BY OWNER. PR #108 remains OPEN/unmerged. Preview only.
+- After owner reviews the current order-section evidence, continue the next non-Hero section. Keep one active visual-acceptance item at a time; don't touch Hero or the locked heading.
