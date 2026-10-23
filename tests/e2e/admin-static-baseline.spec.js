@@ -2484,7 +2484,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#activityActorFilter')).toBeVisible();
       await expect(page.locator('#activityDateFrom')).toBeVisible();
       await expect(page.locator('#activityDateTo')).toBeVisible();
-      if (width <= 680) {
+      const mobileViewportWidth = page.viewportSize()?.width ?? 0;
+      if (mobileViewportWidth <= 680) {
         const mobileFilterHeights = await page.evaluate(() => ({
           categoryChip: document.querySelector('.activity-category-chip')?.getBoundingClientRect().height ?? 0,
           actorControl: document.querySelector('#activityActorFilter')?.getBoundingClientRect().height ?? 0,
