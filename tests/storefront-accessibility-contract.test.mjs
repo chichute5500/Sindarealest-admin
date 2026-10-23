@@ -248,3 +248,39 @@ assert.match(claimStatus.textContent, /Đã chọn mã bảo hành/,
   'the claim selection status must be announced in the live region');
 
 console.log('PASS: storefront accessibility contracts cover reduced motion, keyboard focus, safe areas, dialog semantics, live regions and mobile target sizing.');
+
+
+// Legacy favorite keys may be SKUs from an older storefront version. Resolve
+// them to the canonical product key and deduplicate before updating the UI.
+const extractFavoriteFunction = (name) => {
+  const start = html.indexOf('function ' + name + '(');
+  assert.ok(start >= 0, 'favorite helper must exist: ' + name);
+  const end = html.indexOf('\nfunction ', start + 1);
+  assert.ok(end > start, 'favorite helper boundary must exist: ' + name);
+  return html.slice(start, end);
+};
+const favoriteHelpers = ['favoriteKey', 'findProductByKey', 'isFavorite', 'normalizeFavorites']
+  .map(extractFavoriteFunction).join('\n');
+const favoriteProducts = [{ id: 'product-1', slug: 'shoe-1', sku: 'SD-001' }];
+const favoriteStorageWrites = [];
+let favoriteControlRefreshes = 0;
+let favoriteListRefreshes = 0;
+const favoriteContext = {
+  products: favoriteProducts,
+  favorites: ['SD-001', 'product-1', 'sd-001', 'deleted-product'],
+  FAVORITES_STORAGE_KEY: 'sd-favorites',
+  localStorage: {
+    setItem(key, value) { favoriteStorageWrites.push({ key, value }); }
+  },
+  updateFavoriteControls() { favoriteControlRefreshes += 1; },
+  renderFavoriteList() { favoriteListRefreshes += 1; }
+};
+vm.runInNewContext(favoriteHelpers + '\nnormalizeFavorites();', favoriteContext, { timeout: 1000 });
+assert.deepEqual(Array.from(favoriteContext.favorites), ['product-1'],
+  'legacy SKU keys and canonical ID keys for the same product must become one canonical favorite');
+assert.deepEqual(favoriteStorageWrites, [{ key: 'sd-favorites', value: '["product-1"]' }],
+  'the migrated and deduplicated favorites must persist on the device');
+assert.equal(vm.runInNewContext('isFavorite(favoriteKey(products[0]))', favoriteContext), true,
+  'the saved-heart state must agree with the normalized product key');
+assert.equal(favoriteControlRefreshes, 1, 'favorite counters must refresh once after normalization');
+assert.equal(favoriteListRefreshes, 1, 'the favorites list must refresh once after normalization');
