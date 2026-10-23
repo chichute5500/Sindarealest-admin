@@ -85,3 +85,14 @@ Files labelled historical/archived are context, not active instructions.
 
 
 Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test and Preview deployment passed at `0f7151a95391fbe55c59d6c426b458f6e075d7ce`; the full visual workflow is guarded and was skipped. Gallery accessibility fix and Hero capture guard are committed. Live non-Hero screenshots and owner visual acceptance remain pending. Hero remains paused.
+
+
+## Verified non-Hero order-section live capture — 2026-10-23
+- Branch HEAD at capture: `cb8901b7218964e0609b5048a9ea28bfb52c42f7`; PR #108 remained OPEN and unmerged.
+- Source/test CI PASS on that exact SHA: [run #39894447637](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447637).
+- Isolated live order-section capture succeeded: [run #39894447648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447648); commit status `non-hero-order-live-preview-capture: success`.
+- Cloudflare Pages read-only metadata verified the alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/` resolves to Preview deployment `148c3208-1b1d-4182-81ba-0058ec7e0c0f`, deployed SHA `cb8901b7218964e0609b5048a9ea28bfb52c42f7`, branch `fix/liquid-glass-audit-2026-10-19`, successful deploy stage. Exact source SHA match: true.
+- Artifact: [8 live order-section screenshots and manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447648/artifacts/12476071825) — mobile 360/390, tablet 768, desktop 1440; Light/Dark; element-only selector `section.section.wrap#order`. Exactly four expanded process cards. No Hero capture.
+- Manifest: `captureCompleted: true`, `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`, zero runtime errors, zero same-origin HTTP errors, zero read-only violations, no Access block. Cloudflare Insights requests were blocked by the external-read allowlist and are recorded as blocked external requests.
+- Owner visual acceptance remains **PENDING**. Capture success is not visual acceptance/PASS; owner review is required before this section can be marked PASS/LOCKED.
+- Earlier run #39894291884 failed before capture due a selector assertion mismatch (`section.section.wrap#order` versus `#order`); commit `cb8901b` corrected the assertion, and run #39894447648 succeeded.
