@@ -183,11 +183,11 @@ assert.ok(storefrontHtml.includes('function flyProductImageToCart(sourceImage,pr
   && storefrontHtml.includes("const liveTarget=$('#cartOpen')"),
   'A successful add may animate a non-interactive clone to the real header cart using the exact source image, product id, and 720ms target-tracking flight.');
 assert.ok(storefrontHtml.includes('if(cartMotionReduced()||!sourceImage||!sourceImage.complete||sourceImage.naturalWidth<1)return false')
-  && storefrontHtml.includes('function confirmHeaderCartAdd()')
-  && storefrontHtml.includes('#cartOpen.sd-cart-bump{animation:sdCartAddBump')
-  && storefrontHtml.includes('#cartOpen.sd-cart-confirmed')
-  && storefrontHtml.includes('@media(prefers-reduced-motion:reduce){#cartOpen.sd-cart-bump{animation:none!important;transform:none!important}'),
-  'Missing/broken source imagery must not block the cart mutation; cart feedback is success-only and reduced-motion has no fly/bounce animation.');
+  && storefrontHtml.includes('function confirmCartTargets()')
+  && storefrontHtml.includes('#cartOpen.sd-cart-bump svg,#mobileCartNav.sd-cart-bump svg{animation:sdCartIconShake 1s')
+  && storefrontHtml.includes('#cartOpen.sd-cart-confirmed,#mobileCartNav.sd-cart-confirmed')
+  && storefrontHtml.includes('@media(prefers-reduced-motion:reduce){#cartOpen.sd-cart-bump svg,#mobileCartNav.sd-cart-bump svg{animation:none!important;transform:none!important}'),
+  'Missing/broken source imagery must not block the cart mutation; both cart controls get success-only feedback and reduced-motion avoids shaking.');
 
 
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
