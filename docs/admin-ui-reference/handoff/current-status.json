@@ -1,22 +1,22 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T09:10:00Z",
+  "capturedAtUtc": "2026-10-23T11:03:30Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "checkpointSemantics": "At 2026-10-23T09:10:00Z, live PR #111 head/source SHA is 81a458404b950eb0087da4b89f9a98c4af59fe99. Validate #39928772341 passed on exact SHA. Preview #39928772347 is still in progress at Install Chromium for Playwright; do not report responsive/theme screenshot matrix or deployed Preview diagnostics as passed until the run completes. This handoff sync commit is docs-only and will not independently retest application code. PR #108 remains open/read-only; main 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 unchanged.",
-  "codeTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "latestProductSourceCommit": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+  "branchHeadAtCheckpointStart": "690b03731f534fa572f93462f11e3774f13a75bf",
+  "checkpointSemantics": "At 2026-10-23T11:03:30Z, branch HEAD at checkpoint start was evidence-only child 690b03731f534fa572f93462f11e3774f13a75bf, parent/tested source-test SHA f1fdd19db4d6aa87465d25274d27adfa60f558f9. Validate #39943070380 and Preview #39943070469 passed on the exact tested SHA. Preview artifact admin-preview-evidence-411 (#12496308590) contains 133 PNG files and 112 fixture metrics; deployed diagnostic is PASS_LOGIN_CSS_SIGNATURE only, not authenticated business QA. PR #111/#108 remain open/unmerged; main 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 unchanged.",
+  "codeTestSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+  "latestProductSourceCommit": "0a9cd88f8702fd3aa8600b67572c52bfa0158204",
   "latestActionsRun": {
-    "id": 39928772347,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
-    "headSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "status": "in_progress",
-    "conclusion": null,
+    "id": 39943070469,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
+    "headSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "status": "completed",
+    "conclusion": "success",
     "workflow": "Admin Preview diagnostic smoke test",
-    "startedAtUtc": "2026-10-23T09:00:55Z",
-    "activeStep": "Install Chromium for Playwright",
-    "summary": "Run #39928772347 is active on exact SHA 81a458404b950eb0087da4b89f9a98c4af59fe99. Checkout, setup, dependency install, npm run check and npm test passed. Chromium installation is still in progress; screenshot matrix, deployed Preview diagnostic, evidence persistence and artifact upload have not run."
+    "startedAtUtc": "2026-10-23T11:00:38Z",
+    "activeStep": null,
+    "summary": "Preview #39943070469 passed on exact SHA f1fdd19db4d6aa87465d25274d27adfa60f558f9. Local source matrix completed: 133 PNG files in artifact admin-preview-evidence-411, 16 login-shell capture entries, 120 fixture capture entries, 112 fixture metrics; 0 page errors, 0 console errors, 0 failed requests, 0 HTTP errors. Deployed Preview check was PASS_LOGIN_CSS_SIGNATURE only; authenticated business/backend QA remains NOT_TESTED."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -58,12 +58,12 @@
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39928772341,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
+      "id": 39943070380,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070380",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-      "currentHeadApplicability": "VALIDATE_PASS_ON_EXACT_SOURCE_TEST_SHA; Preview #39928772347 still in progress"
+      "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+      "currentHeadApplicability": "VALIDATE_PASS_ON_EXACT_SOURCE_TEST_SHA; Preview #39943070469 also passed on same SHA"
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -79,32 +79,38 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-23T09:10:00Z",
-      "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+      "capturedAtUtc": "2026-10-23T11:03:30Z",
+      "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
       "validateRun": {
-        "id": 39928772341,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
+        "id": 39943070380,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070380",
         "status": "completed",
         "conclusion": "success",
-        "sha": "81a458404b950eb0087da4b89f9a98c4af59fe99"
+        "sha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9"
       },
       "previewRun": {
-        "id": 39928772347,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
-        "status": "in_progress",
-        "conclusion": null,
-        "sha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-        "activeStep": "Install Chromium for Playwright"
+        "id": 39943070469,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+        "activeStep": null
       },
-      "previewArtifact": null,
-      "reason": "Validate passed on exact SHA. Preview workflow has completed npm run check and npm test but Chromium installation remains in progress; screenshot and remote Preview diagnostic have not run."
+      "previewArtifact": {
+        "id": 12496308590,
+        "name": "admin-preview-evidence-411",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469/artifacts/12496308590",
+        "pngCount": 133,
+        "fixtureMetricCount": 112
+      },
+      "reason": "Validate and Preview both passed on exact source/test SHA f1fdd19db4d6aa87465d25274d27adfa60f558f9. Preview artifact 411 contains 133 PNG files and 112 fixture metrics; deployed diagnostic is login CSS signature only."
     },
     "latestValidateAttempt": {
-      "id": 39911090605,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090605",
+      "id": 39943070380,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070380",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
+      "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
       "workflow": "Validate source and tests"
     },
     "lastFailed": {
@@ -116,26 +122,26 @@
       "meaning": "Historical failure because latestRun.id/url were null; superseded by successful exact-SHA Validate #39844529679 on b8aff."
     },
     "latestPreviewAttempt": {
-      "id": 39914870835,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835",
+      "id": 39943070469,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
+      "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
       "activeStep": null,
-      "artifact": "admin-preview-evidence-385",
-      "artifactId": 12484820528,
+      "artifact": "admin-preview-evidence-411",
+      "artifactId": 12496308590,
       "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_BACKEND_NOT_TESTED"
     }
   },
   "latestProductChange": {
-    "status": "ORDER_DETAIL_CUSTOMER_CARD_EMAIL_GRID_COMPACTED; VALIDATE_PASS; PREVIEW_IN_PROGRESS",
-    "sourceAndTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "validateRunId": 39928772341,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
-    "previewRunId": 39928772347,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
-    "previewStatus": "IN_PROGRESS_AT_CHROMIUM_INSTALL",
-    "summary": "Adjusted the third field in the order-detail customer grid so email no longer forces a full-row span; added Playwright computed-grid and CSS contract assertions. Exact-SHA Validate passed. Preview screenshots/diagnostics have not completed."
+    "status": "MOBILE_ACTIVITY_LOG_TEST_ASSERTION_CORRECTED; VALIDATE_PASS; PREVIEW_PASS",
+    "sourceAndTestSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "validateRunId": 39943070380,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070380",
+    "previewRunId": 39943070469,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
+    "previewStatus": "SUCCESS",
+    "summary": "Corrected the Playwright test to measure mobile activity search width only after expanding the advanced filters. No application source change in this test-fix commit. Validate and Preview passed on exact SHA; evidence artifact 411 contains 133 PNG files and 112 fixture metrics."
   },
   "screenStatuses": {
     "1_login": {
@@ -408,54 +414,52 @@
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "syncPurpose": "Record the order-detail customer-card email grid fix, Validate #39928772341 PASS on exact SHA 81a4584, and Preview #39928772347 IN_PROGRESS at Chromium installation. No screenshot or deployed Preview pass is claimed."
   },
-  "currentHeadAtCheckpoint": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "currentHeadValidation": "VALIDATE_PASS_ON_EXACT_SHA_81a458404b950eb0087da4b89f9a98c4af59fe99; PREVIEW_39928772347_IN_PROGRESS_AT_CHROMIUM_INSTALL",
-  "currentHeadValidationReason": "Validate #39928772341 passed dependency audit, project integrity and automated tests on exact SHA 81a458404b950eb0087da4b89f9a98c4af59fe99. Preview #39928772347 has passed its npm check/test steps but is still installing Chromium; responsive screenshots and deployed Preview diagnostics have not run.",
+  "currentHeadAtCheckpoint": "690b03731f534fa572f93462f11e3774f13a75bf",
+  "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA_AND_PREVIEW_MATRIX; BRANCH_HEAD_IS_EVIDENCE_CHILD",
+  "currentHeadValidationReason": "Exact source/test SHA f1fdd19 passed Validate and Preview. Branch HEAD 690b037 is the workflow-generated evidence child; full screenshot metadata and PNGs are in artifact 411.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T09:10:00Z",
-    "headAtStart": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "codeTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "validateRunId": 39928772341,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
-    "validateConclusion": "success",
-    "previewRunId": 39928772347,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
-    "previewConclusion": null,
-    "previewStatus": "in_progress",
-    "previewActiveStep": "Install Chromium for Playwright",
-    "previewArtifact": null,
-    "previewArtifactId": null,
-    "previewArtifactUrl": null,
-    "previewDiagnostic": "NOT_RUN_YET",
-    "allScreens": "PARTIAL_NOT_ACCEPTED",
-    "authenticatedBackendQA": "NOT_TESTED",
-    "remoteD1SchemaLedger": "NOT_VERIFIED",
-    "exactReferenceParity": "NOT_VERIFIED",
-    "production": "NOT_PERFORMED",
+    "capturedAtUtc": "2026-10-23T11:03:30Z",
+    "branchHeadAtCheckpointStart": "690b03731f534fa572f93462f11e3774f13a75bf",
+    "codeTestSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "validateRunId": 39943070380,
+    "previewRunId": 39943070469,
+    "previewArtifactId": 12496308590,
+    "previewConclusion": "success",
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-    "sourceChange": "Order-detail customer email field compacted in CSS grid; automated regression assertions added."
+    "pr111": "OPEN",
+    "pr108": "OPEN"
   },
-  "latestReviewFinding": "A reproducible order-detail customer-card layout issue was addressed: the third field (email) no longer forces a full-row grid span. A computed-grid Playwright assertion and CSS contract assertion were added. Validate passed on exact SHA 81a4584. Preview run remains active at Chromium installation; no new screenshot evidence yet.",
-  "snapshotCapturedBeforeHandoffSync": true,
+  "latestReviewFinding": "Previous Preview failure was a test assertion measuring a hidden mobile search field; corrected on f1fdd19 and exact-SHA Validate/Preview now pass.",
+  "snapshotCapturedBeforeHandoffSync": false,
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-  "latestCodeCommitSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "testedCommitSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "capturedAt": "2026-10-23T09:10:00Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+  "latestCodeCommitSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+  "testedCommitSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+  "capturedAt": "2026-10-23T11:03:30Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
   "checks": {
     "playwright": "PENDING_CHROMIUM_INSTALL_ON_PREVIEW_39928772347",
-    "automatedTests": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "automatedTests": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
     "deployedPreview": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "sourceValidation": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "projectIntegrity": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "dependencyAudit": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "sourceValidation": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "projectIntegrity": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "dependencyAudit": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
     "responsiveViewports": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
     "lightMode": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
     "darkMode": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
     "productionDeployment": "NOT_PERFORMED",
     "authenticatedBackendQA": "NOT_TESTED",
     "remoteD1SchemaLedger": "NOT_VERIFIED",
-    "exactReferenceParity": "NOT_VERIFIED"
+    "exactReferenceParity": "NOT_VERIFIED",
+    "npmRunCheck": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "npmTest": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "localStaticPlaywright": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "responsiveThemeScreenshotMatrix": "PASS_133_GENERATED_PNGS_112_FIXTURE_METRICS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9; AUTHENTICATED_BACKEND_NOT_TESTED; HISTORICAL_ACCESS_ROOT_CAUSE_UNCONFIRMED",
+    "currentHeadPlaywright": "PASS_LOCAL_RESPONSIVE_THEME_MATRIX_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9; DEPLOYED PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES NOT TESTED",
+    "currentHead": "SOURCE_TESTS_AND_PREVIEW_MATRIX_PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9; BRANCH EVIDENCE CHILD 690b03731f534fa572f93462f11e3774f13a75bf",
+    "currentHeadSha": "690b03731f534fa572f93462f11e3774f13a75bf",
+    "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_HEAD"
   },
   "latestLocalEvidence": {
     "runId": 39925598940,
@@ -481,19 +485,13 @@
     "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
   },
   "latestScreenshotArtifact": {
-    "name": "admin-preview-evidence-401",
-    "id": 12489985219,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
-    "runId": 39925598940,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
-    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "screenshotCount": 132,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
-    "uiFixtureMetricCount": 112,
-    "sha256Digest": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4",
-    "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "id": 12496308590,
+    "name": "admin-preview-evidence-411",
+    "runId": 39943070469,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469/artifacts/12496308590",
+    "pngCount": 133,
+    "fixtureMetrics": 112,
+    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9"
   },
   "remainingIssues": [
     "Preview workflow #39928772347 is still in progress at Install Chromium for Playwright; wait for its actual conclusion before claiming screenshot/diagnostic results.",
@@ -501,31 +499,57 @@
     "Historical BLOCKED_CLOUDFLARE_ACCESS root cause remains UNCONFIRMED; correlate exact failed-run hostname/time with Access logs before configuration changes."
   ],
   "latestDiagnosticArtifact": {
-    "name": "admin-preview-evidence-401",
-    "id": 12489985219,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
-    "runId": 39925598940,
-    "sourceSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
-    "sha256Digest": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4"
+    "id": 12496308590,
+    "name": "admin-preview-evidence-411",
+    "runId": 39943070469,
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9"
   },
   "latestValidateAttempt": {
-    "id": 39928772341,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
+    "id": 39943070380,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070380",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
     "workflow": "Validate source and tests"
   },
   "latestPreviewAttempt": {
-    "id": 39928772347,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
-    "status": "in_progress",
-    "conclusion": null,
-    "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-    "activeStep": "Install Chromium for Playwright",
-    "screenshotMatrix": "NOT_RUN_YET",
-    "deployedPreviewDiagnostic": "NOT_RUN_YET",
-    "artifact": null
-  }
+    "id": 39943070469,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
+    "status": "completed",
+    "conclusion": "success",
+    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "activeStep": null,
+    "artifact": "admin-preview-evidence-411",
+    "artifactId": 12496308590,
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_BACKEND_NOT_TESTED"
+  },
+  "latestAttempt": {
+    "capturedAtUtc": "2026-10-23T11:03:30Z",
+    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "validateRun": {
+      "id": 39943070380,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070380",
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9"
+    },
+    "previewRun": {
+      "id": 39943070469,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+      "activeStep": null
+    },
+    "previewArtifact": {
+      "id": 12496308590,
+      "name": "admin-preview-evidence-411",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469/artifacts/12496308590",
+      "pngCount": 133,
+      "fixtureMetricCount": 112
+    },
+    "reason": "Validate and Preview both passed on exact source/test SHA f1fdd19db4d6aa87465d25274d27adfa60f558f9. Preview artifact 411 contains 133 PNG files and 112 fixture metrics; deployed diagnostic is login CSS signature only."
+  },
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469"
 }
