@@ -137,3 +137,12 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 - Implemented a 460ms selected-category glass-pop/glow animation with theme-specific light/dark keyframes and reduced-motion support. Source/test CI PASS: [#39925861305](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925861305); Preview deploy PASS: [#39925861382](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925861382), deployed immutable URL https://5c3369cb.sindarealest2.pages.dev/.
 - Updated the live catalog audit to use the immutable deployment URL and explicitly assert theme-specific animation name plus 0.46s duration. Current run [#39926240364](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39926240364) is pending completion. Its result and screenshots must be checked before claiming visual behavior is verified.
 - Next: inspect audit result/artifact; if pass, review the screenshots and manifest and give the owner the verified Preview URL for a visual check. If audit fails, diagnose and fix the real cause before sending any link. Do not touch Hero, locked `#order`, Admin, Production or backend/data/config.
+
+
+## ACTIVE TASK OVERRIDE — VISIBLE LIQUID GLASS CATEGORY ACTIVATION
+
+| ID | Status | Next action / acceptance |
+|---|---|---|
+| CATALOG-ACTIVATION-VISIBLE | **OPEN — OWNER SAYS EFFECT IS NOT VISIBLE** | Inspect final status/artifact of audit #39926240364; reproduce a real selected-category change on verified Preview; diagnose why the 460ms animation is not perceptible; fix root cause and add behavior-level regression coverage; test, Preview deploy, verify SHA/public tree, inspect Light/Dark desktop/mobile evidence. Do not close on CSS declaration or source tests alone. |
+
+This active-task override supersedes earlier “ready for owner visual review” wording for category activation. Owner visual acceptance remains PENDING. Guardrails remain: Hero paused/untouched, #order owner-PASS/LOCKED/untouched, PR #108 open/unmerged, Preview only, status filter panel stays removed.
