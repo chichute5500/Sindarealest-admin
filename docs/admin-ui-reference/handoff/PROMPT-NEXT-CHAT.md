@@ -1,3 +1,13 @@
+## Quy tắc vận hành bắt buộc
+
+1. Không chờ CI/deploy một cách thụ động: trong thời gian chờ, rà soát độc lập ở khu vực an toàn; sau đó quay lại kiểm tra kết quả thực tế.
+2. Báo cáo xong tự động làm tiếp; không coi việc báo cáo là lý do dừng công việc.
+3. Chỉ sửa khi tìm thấy lỗi cụ thể có thể tái hiện; bổ sung kiểm thử hồi quy trước khi sửa.
+4. Trước khi kết luận, kiểm tra SHA chính xác, CI, Preview và bằng chứng triển khai. Không suy diễn PASS khi chưa có bằng chứng.
+5. Chỉ dừng khi thực sự cần chủ tài khoản kiểm tra, quyết định mở khóa hoặc thao tác trên thiết bị/tài khoản.
+6. Nếu một đầu việc bị chặn, tiếp tục các đầu việc an toàn, độc lập khác.
+7. Giữ nguyên mọi giới hạn cô lập đã nêu trong handoff; không triển khai Production, không ghi dữ liệu nghiệp vụ, không chạy seed/import lại, không in secret.
+
 ## VERIFIED CHECKPOINT — 2026-10-24 ICT — Authenticated Admin read-only route audit PASS
 
 - Preview validation source SHA: `0be55ce7385fa1bc9408e0faca17c5be6a42373e`; validation run [#40001316207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316207) PASS and authenticated Preview run [#40001316195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195) SUCCESS.
