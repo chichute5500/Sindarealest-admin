@@ -1,45 +1,26 @@
 # LATEST STATUS — SinDarealest Admin
 
-## Latest source and Preview evidence
-- Source SHA: `574a94827fa3429a2022e6cfca552bb3ded07315`.
-- Validate [#39887267741](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267741) **PASS on exact SHA**: dependency audit, project integrity and automated tests succeeded, including runtime public QR cache/deactivation tests.
-- Admin Preview [#39887267725](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267725) **PASS on exact same SHA**: local responsive/theme Playwright matrix and configured Preview diagnostic succeeded. Artifact `admin-preview-evidence-357` contains 102 PNGs (16 login-shell, 86 read-only fixture screens) and 78 fixture metrics; expires 2026-11-06.
-- Concrete fix: `functions/payment-qr/[key].js` now sets `Cache-Control: no-store`. Runtime tests verify active QR returns 200/no-store, while deactivated/replaced keys return 404.
-- Preview workflow committed evidence-only child `a0503f0909c25d71b43fdd72b4fcf9320cb1fae8`. It did not change application code. This handoff sync is a documentation checkpoint; check its exact-SHA Validate once and do not chase metadata pointers after that.
+## Latest verified source and Preview runs
+- Source/test SHA: `bb001c7d047a94058a6c028a6748e5849a19442b`.
+- Validate [#39888898010](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898010) **SUCCESS on exact SHA**: dependency audit, project integrity and automated tests passed.
+- Admin Preview [#39888898083](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898083) **SUCCESS on the same SHA**. Artifact `admin-preview-evidence-359`: 102 PNGs (16 login shell, 86 read-only fixture screens) and 78 fixture metrics.
+- These source/fixture checks do not establish authenticated business-data persistence.
+- Branch HEAD at checkpoint: `c5677623d9723f266cda40ba32f18b12ef862f1f`, an evidence-only child of `bb001c7d047a94058a6c028a6748e5849a19442b`. The handoff update changes docs only. Check Validate on the new exact HEAD once, then stop pointer chasing.
 
-## Live checkpoint snapshot
-- PR #111 OPEN/unmerged; branch `feature/admin-isolated-handoff-2026-10-20`; HEAD at checkpoint start `a0503f0909c25d71b43fdd72b4fcf9320cb1fae8`; 390 changed paths, +39,075/-212; base `main` SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. GitHub reports `mergeable_state=dirty`; no merge/rebase/force-push is authorized.
-- PR #108 OPEN/unmerged/read-only; latest observed head `2954e2107d1274f070780803f7e1c07bb03eadfc`; 286 changed files, +20,533/-394. Main/static branch untouched.
-- Changed-path census: docs 336; Functions 24; migrations 2; Admin HTML 1; scripts 4; tests 19; workflow 1; data 1; root guide/package 2.
-- History: 158 SHA-keyed evidence directories, 323 compact report/metadata/Preview-diagnostic files plus `history/README.md`; no generated PNG matrices committed in history.
+## B1 — PR #111 cleanup/provenance
+**COMPLETE for the current 394-file diff** (+39,201 / -212). All changed paths have been classified by category and consumers. No further removal/consolidation is justified without new evidence.
+- Path census: docs 340; Functions 24; migrations 2; Admin UI 1; scripts 4; tests 19; workflow 1; data seed 1; root guide/package 2.
+- History: 162 SHA-keyed directories and 328 compact report/metadata/Preview-diagnostic files plus README. Generated screenshot matrices are not committed to history.
+- Earlier cleanup removed 912 generated historical PNGs, 10 duplicate snapshots, stale prompt/static-only artifacts, an unreferenced ZIP and the zero-byte viewer HTML.
+- Fulfillment helper is canonical in `functions/_lib.js`. Payment routes retain distinct authorization, exposure, cache and state-transition boundaries.
 
-## B1 cleanup/provenance
-**COMPLETE for the current checkpoint diff.** All changed-path categories and principal consumers/contracts were classified. No further removal or helper/API consolidation is supported by evidence.
-- Earlier cleanup removed 912 historical PNGs, 10 duplicate snapshots, obsolete prompt/static-only artifacts, an unreferenced ZIP and zero-byte viewer.
-- Retained files have documented consumers: seed validation, config integrity, package checks, active Pages routes, migrations, Admin UI, Preview workflow, approved reference, integration contract and unique SHA-keyed evidence.
-- Payment endpoints remain separate due to distinct authorization/exposure/cache/state-transition responsibilities.
+## Overall product acceptance remains PARTIAL
+- Progress: **50% PROVISIONAL**. All 12 screens: `PARTIAL_NOT_ACCEPTED`.
+- Authenticated backend QA: `NOT_TESTED`. Remote D1 schema/ledger: `NOT_VERIFIED`. Production: `NOT_PERFORMED`.
+- Orders and Order detail need authorized authenticated workflow evidence.
+- Migration 0009, PRE/PRO migration changes, product-image/R2 persistence and AI image grouping remain deferred by owner.
 
-## Overall Admin product acceptance — PARTIAL
-- Progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED.
-- Authenticated business/backend QA: NOT_TESTED. Remote D1 schema/ledger: NOT_VERIFIED. Production: NOT_PERFORMED.
-- Orders and Order detail are source/query/mock-test reviewed, not accepted without authenticated workflow evidence. Reference-image pixel parity remains NOT_VERIFIED.
-- Migration 0009, PRE/PRO changes, product-image/R2 persistence and AI image grouping remain DEFERRED_BY_OWNER.
-
-## Next actions
-1. Fetch live branch HEAD, both PRs and Actions; verify Validate on the exact handoff-sync SHA once.
-2. Then continue product acceptance; do not repeat B1 census unless the live diff changes.
-3. Leave PR #111/#108 open. No merge, Production deployment, setup/migration/deploy script, remote D1/R2, secret or Cloudflare Access changes.
-
-Checkpoint prepared: 2026-10-23T02:05:24.726Z.
-
-## Kết quả kiểm thử tự động gần nhất
-
-- Tested commit: bb001c7d047a94058a6c028a6748e5849a19442b
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898083
-- npm run check: PASS
-- npm test: PASS
-- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-359 (not committed to Git).
-- Deployed Preview: success.
-- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
-- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
-- Production deployment: NOT PERFORMED.
+## Next
+1. Fetch live PRs, main, writable branch HEAD and Actions; check Validate on the exact current HEAD once.
+2. Do not repeat the B1 census unless the live diff materially changes.
+3. Continue real product acceptance or fix a newly evidenced defect. No merge/deploy/remote data operations.

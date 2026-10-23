@@ -1,41 +1,53 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T02:05:24.726Z",
+  "capturedAtUtc": "2026-10-23T02:37:02.015Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "a0503f0909c25d71b43fdd72b4fcf9320cb1fae8",
-  "codeTestSha": "574a94827fa3429a2022e6cfca552bb3ded07315",
+  "branchHeadAtCheckpointStart": "c5677623d9723f266cda40ba32f18b12ef862f1f",
+  "codeTestSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS; HANDOFF_DOC_SYNC_REQUIRES_EXACT_HEAD_CHECK",
   "latestRun": {
-    "id": 39887267741,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267741",
-    "headSha": "574a94827fa3429a2022e6cfca552bb3ded07315",
+    "id": 39888898010,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898010",
+    "headSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Validate source and tests succeeded on exact source SHA 574a94827fa3429a2022e6cfca552bb3ded07315. Dependency audit, project integrity and automated tests all passed, including behavioral public QR route tests."
+    "summary": "Validate source and tests passed on exact source SHA bb001c7; dependency audit, project integrity and automated tests passed. Verify the next handoff-doc commit once."
   },
   "validatedChecks": {
-    "npmRunCheck": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
-    "npmTest": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
-    "testedSha": "574a94827fa3429a2022e6cfca552bb3ded07315",
-    "projectIntegrity": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
-    "localStaticPlaywright": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
-    "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
-    "deployedPreviewDiagnostic": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
+    "npmRunCheck": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "npmTest": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "testedSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
+    "projectIntegrity": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "localStaticPlaywright": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "deployedPreviewDiagnostic": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
     "currentHeadPlaywright": "NOT_RUN_IN_VALIDATE_JOB; PREVIEW WORKFLOW RAN SEPARATELY",
     "productionDeployment": "NOT_PERFORMED",
-    "currentHead": "SOURCE_AND_PREVIEW_VALIDATED_ON_EXACT_SHA_574a94827fa3429a2022e6cfca552bb3ded07315; PREVIEW EVIDENCE CHILD a0503f0909c25d71b43fdd72b4fcf9320cb1fae8",
-    "currentHeadSha": "a0503f0909c25d71b43fdd72b4fcf9320cb1fae8",
+    "currentHead": "SOURCE_AND_PREVIEW_VALIDATED_ON_EXACT_SHA_bb001c7; EVIDENCE CHILD c567762",
+    "currentHeadSha": "c5677623d9723f266cda40ba32f18b12ef862f1f",
     "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES",
-    "exactShaValidationRun": 39887267741,
-    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267741",
-    "automatedTests": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315",
+    "exactShaValidationRun": 39888898010,
+    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898010",
+    "automatedTests": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
     "publicQrCacheContract": "PASS_ON_1ec3cc72db94f07ce500d4e43830674b39a9eb03: public QR route sets Cache-Control no-store",
-    "publicQrCacheBehavior": "PASS_ON_574a94827fa3429a2022e6cfca552bb3ded07315: active=200/no-store; deactivated/replaced=404"
+    "publicQrCacheBehavior": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b: active=200/no-store; deactivated/replaced=404"
   },
   "historicalRuns": [
+    {
+      "id": 39888898010,
+      "sha": "bb001c7d047a94058a6c028a6748e5849a19442b",
+      "conclusion": "success",
+      "meaning": "Latest source Validate: dependency audit, project integrity and automated tests passed, including public QR active/deactivated behavior."
+    },
+    {
+      "id": 39888898083,
+      "sha": "bb001c7d047a94058a6c028a6748e5849a19442b",
+      "conclusion": "success",
+      "meaning": "Preview diagnostic and 102-screenshot matrix passed on same SHA; artifact admin-preview-evidence-359 contains 102 PNGs and 78 fixture metrics; not authenticated backend acceptance."
+    },
     {
       "id": 39887267741,
       "sha": "574a94827fa3429a2022e6cfca552bb3ded07315",
@@ -236,8 +248,8 @@
   },
   "latestCodeCommitSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
   "testedCommitSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
-  "capturedAt": "2026-10-23T02:20:17.978Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898083",
+  "capturedAt": "2026-10-23T02:37:02.015Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898010",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -250,13 +262,13 @@
     "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS",
+    "automatedTests": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED",
-    "sourceValidation": "PASS_ON_EXACT_SOURCE_SHA_1674396",
-    "dependencyAudit": "PASS_ON_EXACT_SOURCE_SHA_1674396",
-    "projectIntegrity": "PASS_ON_EXACT_SOURCE_SHA_1674396",
-    "previewDiagnostic": "PASS_ON_EXACT_SOURCE_SHA_1674396"
+    "sourceValidation": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "dependencyAudit": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "projectIntegrity": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b",
+    "previewDiagnostic": "PASS_ON_bb001c7d047a94058a6c028a6748e5849a19442b"
   },
   "latestLocalEvidence": {
     "runId": 39888898083,
@@ -291,69 +303,67 @@
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
-    "B1 PR #111 cleanup/provenance review is complete for the current 390-path checkpoint; no extra deletions or API consolidations are justified without new consumer evidence.",
-    "PR #111 currently reports mergeable_state=dirty; do not merge/rebase/force-push without explicit authorization.",
-    "Authenticated business/backend QA remains NOT_TESTED; static Playwright screenshots use read-only fixtures and do not prove durable data workflows.",
-    "Orders and Order detail remain PARTIAL_NOT_ACCEPTED until authenticated workflow acceptance is evidenced.",
+    "B1 cleanup/provenance review complete for current 394-path diff; no extra deletions or API consolidations are justified without new evidence.",
+    "PR #111 remains OPEN/unmerged; check live mergeability before any future action. Do not merge/rebase/force-push.",
+    "Authenticated business/backend QA remains NOT_TESTED; read-only fixture screenshots do not prove durable business workflows.",
+    "Orders and Order detail remain PARTIAL_NOT_ACCEPTED until authenticated workflow evidence exists.",
     "Remote D1 schema/ledger remain NOT_VERIFIED; migration 0009, PRE/PRO migration changes, product-image/R2 persistence and AI image grouping remain DEFERRED_BY_OWNER."
   ],
   "blockedItems": [
     "Authenticated backend workflows are not proven by fixture screenshots; no Cloudflare Access bypass, credential retrieval, or secret changes permitted.",
     "Migration 0009, PRE/PRO migration changes and product-image/R2 persistence remain DEFERRED_BY_OWNER; no remote schema/data operations.",
-    "PR #111 mergeable_state=dirty; no merge/rebase/force-push action permitted."
+    "PR #111 must remain open/unmerged; no merge/rebase/force-push."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "SOURCE_AND_PREVIEW_PASS_ON_EXACT_SHA_574a94827fa3429a2022e6cfca552bb3ded07315; PREVIEW EVIDENCE CHILD a0503f0909c25d71b43fdd72b4fcf9320cb1fae8; VERIFY HANDOFF SYNC SHA ONCE",
+  "currentHeadValidation": "SOURCE_AND_PREVIEW_PASS_ON_EXACT_SHA_bb001c7; HANDOFF_DOC HEAD c567762 REQUIRES ONE LIVE VALIDATE CHECK",
   "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; OVERALL_ADMIN_ACCEPTANCE_PARTIAL",
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
-      "headAtStart": "a0503f0909c25d71b43fdd72b4fcf9320cb1fae8",
-      "mergeable": false,
-      "mergeableState": "dirty",
-      "changedFiles": 390,
-      "additions": 39075,
+      "headAtStart": "c5677623d9723f266cda40ba32f18b12ef862f1f",
+      "changedFiles": 394,
+      "additions": 39201,
       "deletions": 212
     },
     "pr108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "2954e2107d1274f070780803f7e1c07bb03eadfc",
+      "headSha": "051c8db495282abbf5e6a97f332b64d9ff263e1e",
       "changedFiles": 286,
-      "additions": 20533,
+      "additions": 20545,
       "deletions": 394,
       "readOnly": true
     },
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
-  "currentHeadValidationReason": "Validate #39887267741 and Preview #39887267725 passed on exact source SHA 574a94827fa3429a2022e6cfca552bb3ded07315. Preview workflow committed evidence-only child a0503f0909c25d71b43fdd72b4fcf9320cb1fae8. This handoff sync will have its own SHA; check its Validate once and then avoid pointer-only commits.",
+  "currentHeadValidationReason": "Validate #39888898010 and Preview #39888898083 passed on exact source SHA bb001c7. Current HEAD c567762 is evidence-only; check the handoff-doc sync SHA once, then avoid pointer-only commits.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T02:05:24.726Z",
-    "headAtStart": "a0503f0909c25d71b43fdd72b4fcf9320cb1fae8",
-    "codeTestSha": "574a94827fa3429a2022e6cfca552bb3ded07315",
-    "validateRunId": 39887267741,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267741",
-    "previewRunId": 39887267725,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267725",
-    "previewArtifact": "admin-preview-evidence-357",
-    "pr111ChangedFiles": 390,
-    "pr111Additions": 39075,
+    "capturedAtUtc": "2026-10-23T02:37:02.015Z",
+    "headAtStart": "c5677623d9723f266cda40ba32f18b12ef862f1f",
+    "codeTestSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
+    "validateRunId": 39888898010,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898010",
+    "previewRunId": 39888898083,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898083",
+    "previewArtifact": "admin-preview-evidence-359",
+    "pr111ChangedFiles": 394,
+    "pr111Additions": 39201,
     "pr111Deletions": 212,
-    "historyRunDirectories": 158,
-    "historyEvidenceFiles": 323
+    "historyRunDirectories": 162,
+    "historyEvidenceFiles": 328
   },
   "currentChange": {
-    "status": "PUBLIC_QR_CACHE_AND_RUNTIME_TESTS_PASS",
-    "headAtStart": "a0503f0909c25d71b43fdd72b4fcf9320cb1fae8",
-    "codeTestSha": "574a94827fa3429a2022e6cfca552bb3ded07315",
-    "changedFiles": 390,
-    "additions": 39075,
+    "status": "B1_CLEANUP_REVIEW_COMPLETE_FOR_CURRENT_DIFF",
+    "headAtStart": "c5677623d9723f266cda40ba32f18b12ef862f1f",
+    "codeTestSha": "bb001c7d047a94058a6c028a6748e5849a19442b",
+    "changedFiles": 394,
+    "additions": 39201,
     "deletions": 212,
     "findings": [
-      "Public active-QR image route sets Cache-Control no-store to prevent a cached old QR after deactivation/replacement.",
-      "Behavioral tests call the route with mocked D1/R2: active QR returns 200/no-store; deactivated and replaced keys return 404.",
-      "Validate and Preview both passed on exact source SHA. Overall authenticated backend acceptance remains separate and incomplete."
+      "All changed-path categories and consumers classified; no additional safe deletion or API consolidation found.",
+      "Current source and Preview checks passed on exact SHA; evidence commit does not alter application source.",
+      "Authenticated acceptance remains a separate incomplete workstream."
     ]
   }
 }
