@@ -385,6 +385,7 @@ jobs:
                     'Search surface pressed state must change its inset/depth treatment.');
                   await page.mouse.up();
                   await page.mouse.move(0, 0);
+                  await page.waitForTimeout(240);
                   const searchReleased = await searchField.evaluate(el => getComputedStyle(el).backgroundColor);
                   assert.notEqual(searchReleased, searchPressed.background,
                     'Search pressed treatment must end after pointer release.');
