@@ -239,7 +239,7 @@ assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(-
 
 assert.ok(html.includes('border-top:2px solid transparent;')
   && html.includes('border-bottom:2px solid transparent;')
-  && html.includes('background-clip:padding-box;'),
+  && html.includes('background-clip:padding-box!important;'),
   "The visible Liquid Glass surface should be inset vertically while the real button keeps its 44px touch target.");
 assert.ok(html.includes('inset:3px 1px;') && html.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;'),
   "The specular sweep must remain inside the slimmer glass surface and retain its existing activation animation.");
