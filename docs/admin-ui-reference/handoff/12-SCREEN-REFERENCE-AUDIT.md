@@ -55,3 +55,6 @@ Fixture/test PASS does not mean final visual parity or authenticated backend PAS
 1. Fetch current HEAD/Actions first; verify whether the link-repair commit passes the new handoff test.
 2. If image rendering becomes available, compare reference and screenshot at matching viewport/theme and log concrete names/coordinates; until then do not claim pixel parity.
 3. Continue Gallery and screens #8–#12; make only visible, reproducible ADMIN-specific fixes. Keep each screen PARTIAL_NOT_ACCEPTED until its behavior and reference are truly accepted.
+
+## Screen 8 mobile CSS regression found and fixed
+- Preview run [#39895792200](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895792200) failed its Playwright screenshot matrix because the desktop customer identity block was not explicitly hidden alongside the compact mobile summary. The source contract now asserts the missing CSS rule. Re-run exact-SHA Validate and Preview before treating Screen 8 layout as passing.
