@@ -2,11 +2,6 @@ name: Seed isolated Admin Preview products
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - fix/admin-preview-project-target
-    paths:
-      - ".github/workflows/seed-admin-preview-products.yml"
 
 permissions:
   contents: read
