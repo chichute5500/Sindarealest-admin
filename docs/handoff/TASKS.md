@@ -265,3 +265,12 @@ Guardrails unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; keep the
 - Verified Preview: https://761fdddb.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Static whole-document anchor audit on public/index.html SHA 560f4e3048f2c556da066b76767ebecea2da1004: 23 internal fragment links checked, zero missing targets. The earlier broken craftsmanship link is fixed to #about and regression-tested. This is source-level validation, not a claim of manual device/browser visual acceptance.
 - PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; catalog filter height/Liquid Glass remains OWNER PASS/LOCKED; #order remains OWNER PASS/LOCKED. Do not edit or retest those areas unless explicitly reopened. Preview only; no Production or restricted-scope changes.
+
+
+## Handoff refresh — 2026-10-23 22:03 ICT
+- Verified current branch/PR head: `c23641bcfda078cce132c339f30631262fef68b5` (handoff-only); PR #108 OPEN/unmerged.
+- Latest source/test CI PASS: [#39974038357](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038357) on `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`. Preview deploy PASS: [#39974038555](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038555), URL https://2100d7ae.sindarealest2.pages.dev/.
+- Static storefront audit on `public/index.html` SHA `560f4e3048f2c556da066b76767ebecea2da1004`: 23 internal anchors resolve, 7 asset references exist, 6 new-tab links include `rel="noopener"`, 62 buttons have accessible text/labels, no unlabeled inputs found by the static rule. Source-only; no visual acceptance claimed.
+- CART-DIALOG-KEYBOARD-ACCESSIBILITY remains COMPLETE — CI/Preview PASS at SHA above. Do not alter behavior without a concrete regression.
+- Next work: read current-state and test results, re-fetch GitHub state, then audit a safe non-locked section only if a concrete defect is identified. No speculative CSS changes.
+- Locked boundaries unchanged: Hero paused; `#order` and catalog-filter chip height/Liquid Glass are owner PASS/LOCKED; no Admin/backend/API/auth/data/config or Production; PR #108 stays open/unmerged. Catalog visual audit requires explicit owner unlock.
