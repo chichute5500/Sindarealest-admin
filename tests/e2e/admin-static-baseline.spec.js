@@ -2486,10 +2486,53 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
       await page.evaluate(() => window.scrollTo(0, 0));
     }
+    // Screen 7 is a separate route rather than a primary navigation view; include it
+    // explicitly so its long payment/timeline content is checked against the fixed mobile tabs.
+    for (const viewport of [{ width: 320, height: 640 }, { width: 390, height: 844 }]) {
+      for (const theme of ['light', 'dark']) {
+        await navigateTo('orders');
+        await page.setViewportSize(viewport);
+        await chooseTheme(theme);
+        await page.locator('[data-order-row="UI-ONLY-ORDER"] [data-action="view-order-details"]:visible').first().click();
+        await expect(page.locator('.order-detail-page')).toBeVisible();
+        await page.waitForTimeout(50);
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await page.waitForTimeout(50);
+        const geometry = await page.evaluate(() => {
+          const main = document.querySelector('#main');
+          const nav = document.querySelector('.mobiletabs');
+          const mainRect = main?.getBoundingClientRect();
+          const navRect = nav?.getBoundingClientRect();
+          return {
+            screen: main?.querySelector('.pagehead h2')?.textContent?.trim() || null,
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            theme: document.documentElement.dataset.adminTheme || null,
+            documentWidth: document.documentElement.scrollWidth,
+            documentHeight: document.documentElement.scrollHeight,
+            scrollY: window.scrollY,
+            atDocumentEnd: window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2,
+            mainBottom: mainRect ? Math.round(mainRect.bottom) : null,
+            navTop: navRect ? Math.round(navRect.top) : null,
+            contentGapAboveNav: mainRect && navRect ? Math.round(navRect.top - mainRect.bottom) : null,
+            navVisible: Boolean(navRect && navRect.width > 0 && navRect.height > 0)
+          };
+        });
+        expect(geometry.documentWidth, 'Order detail must not overflow horizontally: ' + JSON.stringify(geometry))
+          .toBeLessThanOrEqual(viewport.width);
+        expect(geometry.atDocumentEnd, 'Order detail must scroll to its final content: ' + JSON.stringify(geometry)).toBe(true);
+        expect(geometry.navVisible, 'Fixed mobile navigation must remain visible on order detail: ' + JSON.stringify(geometry)).toBe(true);
+        expect(geometry.contentGapAboveNav, 'Order-detail content must end above fixed mobile navigation: ' + JSON.stringify(geometry))
+          .toBeGreaterThanOrEqual(8);
+        bottomNavigationScrollAudit.push({...geometry, auditRoute:'order-detail'});
+        await page.evaluate(() => window.scrollTo(0, 0));
+      }
+    }
+
     visualAudit.bottomNavigationScrollAudit = bottomNavigationScrollAudit;
     expect(bottomNavigationScrollAudit,
-      'Every mobile screen/theme/viewport combination must be checked at document scroll end')
-      .toHaveLength(20);
+      'Every mobile screen/theme/viewport combination, including order detail, must be checked at document scroll end')
+      .toHaveLength(24);
 
     expect(pageErrors, 'Fixture visual renders should not throw browser runtime exceptions').toEqual([]);
     expect(attemptedWrites, 'The local fixture should block all mutating API calls').toEqual([]);
