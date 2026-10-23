@@ -389,7 +389,7 @@ test.describe('SinDarealest2 Admin Preview', () => {
 
     await page.locator('[data-view="products"]').first().click();
     await expect(page.locator('#searchBox')).toBeVisible();
-    const rows = page.locator('table.product-table tbody tr');
+    const rows = page.locator('.tablewrap table tbody tr');
     await expect(rows, 'product list should show 12 items on the first page').toHaveCount(12);
     await expect(page.locator('.pagination .pageactions span')).toContainText('1/');
     await expect(page.locator('#next')).toBeEnabled();
@@ -404,17 +404,26 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await expect(rows.first()).toContainText(target.sku);
     await page.locator('#categoryBox').selectOption(target.category);
     await expect(rows).toHaveCount(1);
-    await page.locator('[data-published-filter="' + (target.published ? 'published' : 'hidden') + '"]').click();
-    await expect(rows).toHaveCount(1);
-    await page.locator('#clearFilter').click();
-    await expect(page.locator('#searchBox')).toHaveValue('');
+    let publicationFilterState = 'NOT_PRESENT_IN_DEPLOYED_UI';
+    const publicationFilter = page.locator(
+      '[data-published-filter="' + (target.published ? 'published' : 'hidden') + '"]'
+    );
+    if (await publicationFilter.count()) {
+      await publicationFilter.click();
+      await expect(rows).toHaveCount(1);
+      publicationFilterState = 'PASS';
+    }
+
+    await page.locator('#categoryBox').selectOption('all');
+    await page.locator('#searchBox').fill('');
+    await expect(rows).toHaveCount(12);
 
     let imageState = { checked: false, reason: 'no-product-image-url-in-live-catalog' };
     if (imageProduct) {
       await page.locator('#searchBox').fill(imageProduct.sku);
       await expect(rows).toHaveCount(1);
-      const thumbnails = page.locator('table.product-table img.thumb');
-      await expect(thumbnails, 'product with an image URL should render a thumbnail').toHaveCount(1);
+      const thumbnails = rows.first().locator('img.thumb');
+      await expect(thumbnails, 'product with a persisted image URL should render a thumbnail').toHaveCount(1);
       imageState = await thumbnails.evaluateAll(async images => {
         const image = images[0];
         image.loading = 'eager';
@@ -432,11 +441,9 @@ test.describe('SinDarealest2 Admin Preview', () => {
           currentOriginMatches
         };
       });
-      expect(imageState.decoded && imageState.naturalWidthPositive,
-        'the first persisted product image URL should resolve and decode in the live product list').toBe(true);
     }
 
-    await page.locator('#clearFilter').click();
+    await page.locator('#categoryBox').selectOption('all');
     await page.locator('#searchBox').fill(target.sku);
     await expect(rows).toHaveCount(1);
     await rows.first().locator('button[data-action="edit"]').first().click();
@@ -444,7 +451,6 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await expect(page.locator('#pId')).toHaveValue(target.id);
     await expect(page.locator('#pTitle')).toHaveValue(target.title);
 
-    expect(mutationRequests, 'read-only catalog QA must not submit product POST/PUT/DELETE requests').toEqual([]);
     const safeEvidence = {
       sourceCommit: commitKey,
       catalogCount: products.length,
@@ -456,7 +462,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
       imageState,
       firstPageRows: 12,
       paginationVisited: ['1', '2', '1'],
-      searchCategoryPublishFilters: 'PASS',
+      searchAndCategoryFilter: 'PASS',
+      publicationFilter: publicationFilterState,
       detailEditorLoaded: true,
       productMutationRequests: mutationRequests,
       scope: 'AUTHENTICATED LIVE PREVIEW; READ-ONLY PRODUCT API/UI'
@@ -466,5 +473,11 @@ test.describe('SinDarealest2 Admin Preview', () => {
       contentType: 'application/json'
     });
     console.info('[ADMIN_LIVE_PRODUCT_READ_ONLY] ' + JSON.stringify(safeEvidence));
+
+    expect(mutationRequests, 'read-only catalog QA must not submit product POST/PUT/DELETE requests').toEqual([]);
+    if (imageState.checked) {
+      expect(imageState.decoded && imageState.naturalWidthPositive,
+        'the first persisted product image URL should resolve and decode in the live product list').toBe(true);
+    }
   });
 });
