@@ -1,3 +1,17 @@
+## LATEST TASK RESULT — PRODUCT ROUTE VALIDATION GUARD — 2026-10-24
+
+**Technical status: PASS on CI and Preview; this is not a visual acceptance claim.**
+
+- Fixed a frontend/middleware route-contract mismatch using strict canonical route patterns before product-key decoding.
+- Exact code+test tree SHA: `8a92278e189bd9f83063bcd35284ea88a065cc01`.
+- CI PASS: [run #40022567725](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567725).
+- Preview deploy PASS: [run #40022567643](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567643).
+- Preview: https://b9ee1245.sindarealest2.pages.dev/
+- The gallery remains PAUSED / NOT ACCEPTED; never reopen it without owner permission. All previously accepted sections remain PASS / LOCKED. Hero is PAUSED BY OWNER.
+- After this task, no additional specifically enumerated unlocked task is present. Do not invent scope or re-audit accepted areas; ask the owner for the next task unless a clearly authorized unlocked backlog item is available.
+
+---
+
 ## LATEST VERIFIED UPDATE — MOBILE GALLERY ROOT-CAUSE REWORK — 2026-10-24
 
 - Latest code commit deployed to Preview: `11a35b0d01eff46463675ee39ce80fc4465a655c`; latest test-only commit: `5fbb3cd5610200b04f285008895d0f6890887af6`.

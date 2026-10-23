@@ -1,3 +1,13 @@
+## IMPLEMENTATION RECORD — STRICT CLIENT PRODUCT ROUTE MATCHING — 2026-10-24
+
+- Technical change committed in tree `8a92278e189bd9f83063bcd35284ea88a065cc01`: frontend route detection now validates product route segments against the canonical character/length constraints used by the existing middleware before calling `decodeURIComponent()`.
+- Regression coverage rejects malformed encoded paths on both direct-load and history-navigation matchers. Valid legacy and modern product routes remain accepted.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567725
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567643; immutable Preview https://b9ee1245.sindarealest2.pages.dev/.
+- This is an implementation/test record, not an owner visual acceptance. Gallery remains PAUSED / NOT ACCEPTED; PR #108 remains OPEN/unmerged; Production branch remains `main`; no restricted scopes were changed.
+
+---
+
 ## LATEST VERIFIED UPDATE — MOBILE GALLERY ROOT-CAUSE REWORK — 2026-10-24
 
 - Latest code commit deployed to Preview: `11a35b0d01eff46463675ee39ce80fc4465a655c`; latest test-only commit: `5fbb3cd5610200b04f285008895d0f6890887af6`.

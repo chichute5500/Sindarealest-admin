@@ -1,3 +1,23 @@
+## LATEST VERIFIED HANDOFF — PRODUCT ROUTE VALIDATION GUARD — 2026-10-24
+
+> This update supersedes stale historical task/SHA notes below. The current gallery pause and all owner locks remain authoritative.
+
+- Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN/unmerged, base `main`.
+- Latest storefront source/test tree and deployed SHA: `8a92278e189bd9f83063bcd35284ea88a065cc01`. This tree includes the route fix from `f06f99212e261674276cc03f537d6db190fdb031` and the corrected regression-test fixture committed in `8a92278e189bd9f83063bcd35284ea88a065cc01`.
+- Source-first audit found the browser's initial-load and history-navigation product route matchers accepted arbitrary path segments, unlike `functions/_middleware.js`. Malformed percent-encoded paths could match a product route and throw during `decodeURIComponent()` rather than selecting the storefront not-found view.
+- Minimal fix in `public/index.html`: both frontend matchers now constrain category/key characters and length to the canonical route format already enforced by the middleware. Regression tests cover normal modern/legacy routes and four malformed/non-canonical paths. No gallery, design, product data, middleware, API, or other accepted section was changed by this fix.
+- Exact-SHA validation CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567725
+- Exact-SHA Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567643
+- Immutable Preview: https://b9ee1245.sindarealest2.pages.dev/ ; branch Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Deployment job checked out `8a92278e189bd9f83063bcd35284ea88a065cc01`, verified the project is `sindarealest2` and Production branch is `main`, and invoked Wrangler with `--commit-hash="$GITHUB_SHA"`. Deployment completed successfully. No Production/main changes.
+- Liquid Glass visual workflow #40022567751 was SKIPPED by the Hero-safety guard. No browser screenshot or visual/device acceptance is claimed.
+- Gallery status remains PAUSED / NOT ACCEPTED at the previously deployed slide + full-album-preload behavior. Do not edit or retest it, and do not ask the owner for a phone test unless the owner explicitly reopens it.
+- PASS / LOCKED sections remain frozen: mobile cart/account and modal/history; icon system/Liquid Glass appearance and dimensions; catalog filters/chips/heights/effects; `#order`; warranty form/lookup; mobile navigation and accessibility fixes; slideshow, favorites, cart, share/Zalo/contact and all other owner-accepted storefront work. Hero remains PAUSED BY OWNER and must never be inspected, captured, edited, or included in visual workflows.
+- This documentation refresh does not change storefront source/test assets and is not a new storefront deployment. The deploy workflow ignores `docs/**`. Re-fetch branch HEAD next session because the handoff-only commit may advance HEAD beyond `8a92278e189bd9f83063bcd35284ea88a065cc01`.
+- No other specific unlocked task has been identified after this route fix. Continue only a clearly authorized, unlocked task; otherwise ask the owner what new task to start. Preview only; no merge, no `main`, no Admin/backend/API/auth, catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or live-payment changes.
+
+---
+
 ## LATEST VERIFIED UPDATE — MOBILE GALLERY ROOT-CAUSE REWORK — 2026-10-24
 
 - Latest code commit deployed to Preview: `11a35b0d01eff46463675ee39ce80fc4465a655c`; latest test-only commit: `5fbb3cd5610200b04f285008895d0f6890887af6`.

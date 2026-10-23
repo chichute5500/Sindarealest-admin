@@ -1,3 +1,36 @@
+# LATEST PROMPT HANDOFF — SINDAREALEST2 — 2026-10-24
+
+> Read first. This supersedes older task/SHA entries below. Continue the existing project; do not restart it.
+
+## Current repository state
+- Repo: `chichute5500/Sindarealest-admin`
+- Working branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, not merged, base `main`.
+- Latest storefront source/test tree and Preview SHA: `8a92278e189bd9f83063bcd35284ea88a065cc01`. After this docs-only commit, fetch live branch HEAD rather than assuming HEAD still equals the deployed code SHA.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567725
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567643
+- Immutable Preview: https://b9ee1245.sindarealest2.pages.dev/
+- Project `sindarealest2`; Production branch `main`. No Production deployment or PR merge.
+
+## Latest completed task — safe product-route guard
+- A source-first audit found the storefront's product route regexes looser than the canonical route validation in `functions/_middleware.js`.
+- Updated both initial-load and history-navigation matchers in `public/index.html` to reject invalid segment characters/length before `decodeURIComponent()`.
+- Added regression assertions for valid modern/legacy routes plus malformed percent-encoded paths. Full validation CI and Preview deploy passed on `8a92278e189bd9f83063bcd35284ea88a065cc01`.
+- This is a technical routing fix; no browser visual audit is claimed.
+
+## Mandatory owner decisions and scope locks
+- Fullscreen mobile product-gallery flicker is **PAUSED / NOT ACCEPTED**. Keep the currently deployed slide + full-album-preload behavior in place; do not inspect/change gallery CSS/JS, transitions, preload, layers, tests, roll back, or ask for a phone retest until the owner explicitly reopens it.
+- Hero is **PAUSED BY OWNER**: never inspect, capture, edit, or include it in any visual workflow.
+- Do not reopen/retest owner PASS/LOCKED areas: mobile cart/account and modal/history; icon system/Liquid Glass appearance/press/dimensions; catalog filters/chips/icons/heights/effects (never restore the removed product-status panel); `#order`; warranty claim/lookup; mobile navigation/focus/history; welcome dialog; gallery focus/accessibility (distinct from visual flicker); warranty focus; favorites migration; slideshow guard; stale cart/badge; Zalo/contact/share; and other owner-accepted storefront work.
+- Keep PR #108 OPEN/unmerged. Preview only. Do not touch `main`, Production, Admin/backend/API/auth, catalog/product data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or live-payment flow.
+
+## Next action
+- Re-fetch branch HEAD, PR state and recent Actions before any code change.
+- Continue only a specifically authorized, unlocked backlog task. The route guard is complete; no other concrete unlocked task is currently enumerated. Do not create scope from historical audit notes or retest PASS items. If no clearly authorized unlocked task is available, ask the owner one concise question: what new task should be started?
+- A docs-only handoff commit does not alter storefront source or represent a new deployment.
+
+---
+
 ## LATEST VERIFIED UPDATE — MOBILE GALLERY ROOT-CAUSE REWORK — 2026-10-24
 
 - Latest code commit deployed to Preview: `11a35b0d01eff46463675ee39ce80fc4465a655c`; latest test-only commit: `5fbb3cd5610200b04f285008895d0f6890887af6`.

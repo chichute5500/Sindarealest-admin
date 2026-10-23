@@ -1,3 +1,14 @@
+## LATEST EXACT-SHA TEST + DEPLOY RESULT — PRODUCT ROUTE VALIDATION — 2026-10-24
+
+- Source/test tree SHA: `8a92278e189bd9f83063bcd35284ea88a065cc01`.
+- Full validation CI PASS: [#40022567725](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567725). Job logs show `npm test` ran `tests/product-route-canonical.test.mjs` successfully; dependency audit reports `found 0 vulnerabilities`.
+- Exact branch commit was checked out and the deployment job passed: [Preview deploy #40022567643](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40022567643). Wrangler deployment completed at https://b9ee1245.sindarealest2.pages.dev/ and passed the project/`main` safety checks for Cloudflare Pages project `sindarealest2`.
+- Added coverage for valid modern/legacy product paths and four malformed/non-canonical path forms that must not reach `decodeURIComponent()`.
+- Visual workflow #40022567751: SKIPPED by Hero guard. No real-device visual acceptance is claimed.
+- Gallery is PAUSED / NOT ACCEPTED. All owner-accepted areas remain PASS / LOCKED; no Production deploy, PR merge, or restricted-scope changes.
+
+---
+
 ## LATEST VERIFIED UPDATE — MOBILE GALLERY ROOT-CAUSE REWORK — 2026-10-24
 
 - Latest code commit deployed to Preview: `11a35b0d01eff46463675ee39ce80fc4465a655c`; latest test-only commit: `5fbb3cd5610200b04f285008895d0f6890887af6`.
