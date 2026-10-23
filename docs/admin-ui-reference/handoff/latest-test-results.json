@@ -7,7 +7,7 @@
   "codeTestSha": "6de79a88579d4798efba518f97c63cb150452bbd",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS; SCREEN_ACCEPTANCE_INCOMPLETE",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
     "id": 39947460591,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460591",
@@ -217,10 +217,11 @@
     "exactReferenceParity": "NOT_VERIFIED"
   },
   "nextActions": [
-    "Continue remaining screen-by-screen comparison against approved admin-mobile-reference.png using the latest evidence artifact; fix only reproducible mismatches.",
-    "Run Validate and Preview on exact source/test SHA after each meaningful UI iteration; inspect screenshot evidence and diagnostics.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED, exact reference parity NOT_VERIFIED, authenticated backend QA NOT_TESTED, remote D1 schema/ledger NOT_VERIFIED, and Production NOT_PERFORMED until evidence supports a change.",
-    "Only write feature/admin-isolated-handoff-2026-10-20; keep PR #111/#108 open/unmerged; do not modify main/static website, Cloudflare settings/secrets/DNS, remote D1/R2/schema/ledger, or run migration/setup/deploy scripts."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -232,10 +233,10 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "6de79a88579d4798efba518f97c63cb150452bbd",
-  "testedCommitSha": "6de79a88579d4798efba518f97c63cb150452bbd",
-  "capturedAt": "2026-10-23T11:39:11.349Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460554",
+  "latestCodeCommitSha": "6cab534e6f585f0fc7ccc8c50d10470fbcbab9d1",
+  "testedCommitSha": "6cab534e6f585f0fc7ccc8c50d10470fbcbab9d1",
+  "capturedAt": "2026-10-23T11:44:31.933Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39948057179",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -279,9 +280,9 @@
     "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_HEAD"
   },
   "latestLocalEvidence": {
-    "runId": 39947460554,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460554",
-    "sourceCommit": "6de79a88579d4798efba518f97c63cb150452bbd",
+    "runId": 39948057179,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39948057179",
+    "sourceCommit": "6cab534e6f585f0fc7ccc8c50d10470fbcbab9d1",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -289,7 +290,7 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-417",
+    "screenshotArtifact": "admin-preview-evidence-418",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
@@ -299,14 +300,13 @@
     "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "latestScreenshotArtifact": {
-    "runId": 39947460554,
-    "name": "admin-preview-evidence-417",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460554",
-    "artifactId": 12499200648,
-    "sourceCommit": "6de79a88579d4798efba518f97c63cb150452bbd",
+    "runId": 39948057179,
+    "name": "admin-preview-evidence-418",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39948057179",
+    "sourceCommit": "6cab534e6f585f0fc7ccc8c50d10470fbcbab9d1",
     "screenshotCount": 132,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 116,
+    "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
