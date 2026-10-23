@@ -151,6 +151,9 @@ assert.ok(html.includes(".product-info{padding:9px 9px 36px}") && html.includes(
 
 assert.ok(html.includes('<div class="product-meta-row"><span class="product-category">') && html.includes("${fulfillmentBadge(p)}"),
   "Catalog product category and fulfillment status should share one compact metadata row on mobile.");
+assert.ok(html.includes('<div class="product-open" role="button" tabindex="0" data-open-product=')
+  && html.includes("if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}"),
+  "Product cards must use valid flow-content containers and preserve Enter/Space activation for keyboard users.");
 
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
 
