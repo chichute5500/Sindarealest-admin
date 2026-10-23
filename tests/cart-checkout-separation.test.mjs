@@ -166,3 +166,50 @@ assert.doesNotMatch(populatedCartListRules, /max-height:40dvh/,
   'The populated cart item list must not be capped to a small fraction of the screen.');
 assert.match(html, /\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{margin-top:auto\}/,
   'The cart subtotal and actions must be anchored below the expandable item list.');
+
+
+// A local cart may contain keys for products that were later removed/unpublished.
+// After the current catalog loads, purge stale/invalid entries and refresh the badge
+// so the header count stays consistent with the visible cart drawer.
+const updateCartCountSource = html.match(/function updateCartCount\(\)\{[^\n]+\}/)?.[0];
+const normalizeCartSource = html.match(/function normalizeCart\(\)\{[^\n]+\}/)?.[0];
+assert.ok(updateCartCountSource && normalizeCartSource,
+  'cart count and catalog-aware cart normalizer must exist for behavior regression tests');
+const cartBadge = { textContent: '' };
+const cartWrites = [];
+const cartNormalizationContext = {
+  cart: {
+    'product-1': 2,
+    'removed-product': 3,
+    'product-2': '4',
+    'fractional-quantity': 1.5,
+    'zero-quantity': 0,
+    'negative-quantity': -1,
+    'invalid-quantity': 'not-a-number'
+  },
+  products: [{ id: 'product-1' }, { id: 'product-2' }],
+  $: selector => selector === '#cartCount' ? cartBadge : null,
+  localStorage: {
+    setItem(key, value) { cartWrites.push({ key, value }); }
+  }
+};
+vm.runInNewContext(updateCartCountSource + String.fromCharCode(10) + normalizeCartSource + String.fromCharCode(10) + 'normalizeCart();',
+  cartNormalizationContext, { timeout: 1000 });
+assert.deepEqual(JSON.parse(JSON.stringify(cartNormalizationContext.cart)), {
+  'product-1': 2,
+  'product-2': 4
+}, 'only current-catalog products with positive whole-number quantities should remain in cart storage');
+assert.equal(cartBadge.textContent, '6',
+  'the cart badge must be refreshed from normalized available items, not stale product IDs');
+assert.deepEqual(cartWrites, [{
+  key: 'sd-cart',
+  value: '{"product-1":2,"product-2":4}'
+}], 'the cleaned cart should be persisted once and normalize numeric quantity strings');
+const initSource = html.slice(html.indexOf('async function init(){'));
+const productMapPos = initSource.indexOf("products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));");
+const normalizeCartPos = initSource.indexOf('normalizeCart();', productMapPos);
+const normalizeFavoritesPos = initSource.indexOf('normalizeFavorites();', normalizeCartPos);
+const initCatchPos = initSource.indexOf("}catch(err){", productMapPos);
+assert.ok(productMapPos >= 0 && normalizeCartPos > productMapPos && normalizeFavoritesPos > normalizeCartPos && initCatchPos > normalizeFavoritesPos,
+  'cart normalization must wait for a successful catalog response and run before the first cart render');
+console.log('PASS: stale local cart entries are removed after catalog load and the visible cart count is synchronized.');
