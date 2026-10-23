@@ -777,7 +777,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await categoryInput.fill(originalCategory);
     await expect(categoryInput).toHaveValue(originalCategory);
     await expect(page.locator('#productPanelDetails #pSku')).toBeVisible();
-    await expect(page.locator('#productPanelDetails #pSku')).toHaveAttribute('placeholder', 'Mã SKU chính thức');
+    await expect(page.locator('#productPanelDetails #pSku')).toHaveAttribute('placeholder', 'SKU chính thức');
     await expect(page.locator('#productPanelDetails #pDescription')).toBeVisible();
     await expect(page.locator('label.sku-verify-option')).toContainText('Kiểm tra SKU');
     await expect(page.locator('#pSkuVerified')).toHaveAttribute('aria-label', 'Xác nhận SKU thương mại chính thức');
