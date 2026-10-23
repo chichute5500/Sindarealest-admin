@@ -11,6 +11,19 @@ assert.equal(count('id="sdFullscreenImageNext"'), 1, 'The fullscreen gallery nee
 assert.match(html, /id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình"/);
 assert.match(html, /function sizeFullscreenFrame\([^)]*\)/);
 assert.match(html, /function setFullscreenPhoto\(/);
+
+const fullscreenA11yStart = html.indexOf('function setFullscreenPhoto(');
+const fullscreenA11yEnd = html.indexOf('function renderFullscreenThumbs(', fullscreenA11yStart);
+assert.ok(fullscreenA11yStart >= 0 && fullscreenA11yEnd > fullscreenA11yStart,
+  'Fullscreen image accessibility state must be synchronized by the gallery image transition handler.');
+const fullscreenA11y = html.slice(fullscreenA11yStart, fullscreenA11yEnd);
+assert.match(fullscreenA11y, /const altText=.*currentProduct\?\.title/,
+  'The active fullscreen product image must receive a meaningful product-specific alternative text.');
+assert.match(fullscreenA11y, /if\(img===shown\)\{img\.removeAttribute\('aria-hidden'\);img\.alt=altText\}/,
+  'The visible fullscreen image must be exposed to assistive technology and have meaningful alternative text.');
+assert.match(fullscreenA11y, /else\{img\.setAttribute\('aria-hidden','true'\);img\.alt=''\}/,
+  'The inactive preloaded image layer must remain hidden from assistive technology.');
+
 assert.match(html, /function renderFullscreenThumbs\(/);
 assert.match(html, /function openFullscreenImage\(\)/);
 assert.match(html, /function closeFullscreenImage\(\)/);

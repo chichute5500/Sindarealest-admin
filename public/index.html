@@ -865,30 +865,36 @@ function setFullscreenPhoto(src,direction='left',instant=false){
  clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
  const transitionId=++fullscreenTransitionId,images=fullscreenImages(),active=activeFullscreenImage(),incoming=images.find(img=>img!==active),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
  if(!active||!incoming||!frame)return;
+ const imageIndex=Math.max(0,detailImages.indexOf(src))+1;
+ const altText=(currentProduct?.title||'Sản phẩm SinDarealest')+' — ảnh '+imageIndex;
+ const syncImageAccessibility=shown=>images.forEach(img=>{
+  if(img===shown){img.removeAttribute('aria-hidden');img.alt=altText}
+  else{img.setAttribute('aria-hidden','true');img.alt=''}
+ });
  images.forEach(clearFullscreenSlideClasses);
  const activeSrc=active.getAttribute('src')||'';
  if(activeSrc===next&&active.complete&&active.naturalWidth){
-  active.classList.add('is-active');incoming.classList.remove('is-active');sizeFullscreenFrame(active);window.__sdUpdateDetailWatermark?.();return;
+  active.classList.add('is-active');incoming.classList.remove('is-active');syncImageAccessibility(active);sizeFullscreenFrame(active);window.__sdUpdateDetailWatermark?.();return;
  }
  const finishLoad=()=>{
   if(transitionId!==fullscreenTransitionId)return;
   incoming.onload=null;incoming.onerror=null;
   if(!incoming.naturalWidth){clearFullscreenSlideClasses(incoming);return}
-  
+  incoming.alt=altText;
   sizeFullscreenFrame(incoming);
   if(instant||!active.complete||!active.naturalWidth){
    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
-   clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);window.__sdUpdateDetailWatermark?.();return;
+   syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);window.__sdUpdateDetailWatermark?.();return;
   }
   active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
   incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
   fullscreenAnimationTimer=setTimeout(()=>{
    if(transitionId!==fullscreenTransitionId)return;
    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
-   clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
+   syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
   },FULLSCREEN_SLIDE_MS+20);
  };
- const failLoad=()=>{if(transitionId!==fullscreenTransitionId)return;incoming.onload=null;incoming.onerror=null;clearFullscreenSlideClasses(incoming);active.classList.add('is-active');window.__sdUpdateDetailWatermark?.()};
+ const failLoad=()=>{if(transitionId!==fullscreenTransitionId)return;incoming.onload=null;incoming.onerror=null;clearFullscreenSlideClasses(incoming);active.classList.add('is-active');syncImageAccessibility(active);window.__sdUpdateDetailWatermark?.()};
  if((incoming.getAttribute('src')||'')===next&&incoming.complete&&incoming.naturalWidth){finishLoad();return}
  incoming.onload=finishLoad;incoming.onerror=failLoad;incoming.src=next;
  if(incoming.complete&&incoming.naturalWidth)finishLoad();
