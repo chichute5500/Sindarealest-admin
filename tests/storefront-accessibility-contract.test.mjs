@@ -187,4 +187,64 @@ assert.equal(contactHeading.focused.preventScroll, true, 'focus must move to the
 assert.ok(html.includes("$('#accountContactAction')?.addEventListener('click',navigateAccountContact)"),
   'the account contact link must use the history-safe navigation handler');
 
+
+ // Opening the warranty claim form dynamically must move keyboard focus into
+ // the newly revealed form; scrolling alone leaves focus on the old selector.
+const warrantyHandlerStart = html.indexOf('function showWarrantyRecords(records){');
+const warrantyHandlerEnd = html.indexOf('\\nasync function optimizeWarrantyPhoto(file){', warrantyHandlerStart);
+assert.ok(warrantyHandlerStart >= 0 && warrantyHandlerEnd > warrantyHandlerStart,
+  'warranty records must have a dedicated claim-selection transition');
+const warrantyHandler = html.slice(warrantyHandlerStart, warrantyHandlerEnd);
+const claimSelect = {
+  focused: null,
+  focus(options) { this.focused = options; }
+};
+const claimStatus = { textContent: '' };
+const claimCode = { value: '' };
+const claimCodeLabel = { textContent: '' };
+const claimResults = { hidden: true };
+const claimForm = {
+  hidden: true,
+  scrolled: null,
+  scrollIntoView(options) { this.scrolled = options; }
+};
+const claimSelectionButton = {
+  dataset: { claimWarranty: 'test-token', claimLabel: 'SDW-***' },
+  clickHandler: null,
+  addEventListener(type, handler) { if (type === 'click') this.clickHandler = handler; }
+};
+const warrantyRecords = {
+  innerHTML: '',
+  querySelectorAll(selector) {
+    assert.equal(selector, '[data-claim-warranty]');
+    return [claimSelectionButton];
+  }
+};
+const warrantyNodes = {
+  '#warrantyRecords': warrantyRecords,
+  '#warrantyResults': claimResults,
+  '#warrantyClaimForm': claimForm,
+  '#claimWarrantyCode': claimCode,
+  '#claimWarrantyCodeLabel': claimCodeLabel,
+  '#warrantyClaimMessage': claimStatus,
+  '#claimIssueType': claimSelect
+};
+const warrantyDollar = selector => warrantyNodes[selector] || null;
+vm.runInNewContext(warrantyHandler + "\\nshowWarrantyRecords([{eligible:true,claimToken:'test-token',maskedWarrantyCode:'SDW-***',title:'Sample item'}]);", {
+  $: warrantyDollar,
+  escapeHtml: value => String(value ?? ''),
+  imgPath: value => value
+}, { timeout: 1000 });
+assert.equal(typeof claimSelectionButton.clickHandler, 'function',
+  'eligible warranty entries must expose the claim-selection action');
+claimSelectionButton.clickHandler();
+assert.equal(claimForm.hidden, false, 'selecting a warranty entry must reveal the claim form');
+assert.equal(claimCode.value, 'test-token', 'the selected claim token must be carried into the form');
+assert.equal(claimSelect.focused?.preventScroll, true,
+  'focus must move into the first required claim field without overriding the scroll transition');
+assert.equal(claimForm.scrolled?.block, 'nearest',
+  'the revealed claim form must still scroll into view');
+assert.match(claimStatus.textContent, /Đã chọn mã bảo hành/,
+  'the claim selection status must be announced in the live region');
+
 console.log('PASS: storefront accessibility contracts cover reduced motion, keyboard focus, safe areas, dialog semantics, live regions and mobile target sizing.');

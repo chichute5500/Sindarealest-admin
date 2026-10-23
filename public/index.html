@@ -1378,6 +1378,7 @@ function showWarrantyRecords(records){
   claimForm.hidden=false;
   $('#warrantyClaimMessage').textContent='Đã chọn mã bảo hành '+(button.dataset.claimLabel||'đã che')+'.';
   claimForm.scrollIntoView({behavior:'smooth',block:'nearest'});
+  $('#claimIssueType').focus({preventScroll:true});
  }));
 }
 
