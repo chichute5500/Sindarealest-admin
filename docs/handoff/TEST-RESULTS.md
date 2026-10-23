@@ -1,3 +1,11 @@
+## LATEST TEST STATUS — SLIDESHOW REDUCED-MOTION FIXTURE — 2026-10-24
+
+- Current source/test SHA `74bcd512abc19d3fba4bad64654321091073b8ea`.
+- The latest correction removes a test-fixture condition that accidentally removed `#artPause` in the reduced-motion case; missing-control test still removes it intentionally.
+- Earlier follow-up CI failures were harness errors, not successful validations. CI #39995656182 and Preview #39995656107 are currently pending. No browser visual acceptance.
+
+---
+
 ## LATEST TEST STATUS — SLIDESHOW MISSING-CONTROL HARNESS — 2026-10-24
 
 - Current source/test SHA `ed06d73b89477b637a72c25c7939ee94f32c056f`.
