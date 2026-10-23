@@ -374,3 +374,12 @@ assert.match(reducedArt.elements['#artPause'].attributes['aria-label'], /tắt t
 assert.equal(typeof reducedArt.elements['#artNext'].listeners.click, 'function', 'manual next control must remain available with reduced motion enabled');
 
 console.log('PASS: collection slideshow autoplay can be paused/resumed and remains off under prefers-reduced-motion.');
+
+
+// Shared icon rendering contract: keep line-art sizing and press color consistent
+// across unlocked storefront icon contexts without touching locked catalog filters or #order.
+assert.ok(html.includes('id="sd-unified-icon-system"'), 'the storefront must include the shared Liquid Glass icon system');
+assert.ok(html.includes('--sd-icon-stroke:1.7'), 'the shared icon system must define a consistent SVG stroke baseline');
+assert.ok(html.includes('--sd-icon-press-color:#5c91b9'), 'icon press feedback must use the approved Liquid Glass accent');
+assert.ok(html.includes('@media(prefers-reduced-motion:reduce)'), 'icon transitions must respect reduced motion');
+assert.ok(!html.includes('#products .catalog-tools svg{') && !html.includes('.catalog-tools svg{width:18px;height:18px'), 'the icon standardization must not override the owner-locked catalog filter controls');
