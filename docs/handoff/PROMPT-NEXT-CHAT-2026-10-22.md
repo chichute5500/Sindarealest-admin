@@ -54,3 +54,23 @@ Updated: 2026-10-23 — canonical handoff, owner decisions, and report-then-cont
 - Verified Cloudflare Preview deployment SHA equals capture source SHA `cb8901b7218964e0609b5048a9ea28bfb52c42f7`; alias: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. Manifest confirms 8/8, no runtime/same-origin HTTP errors, no write requests, and no Access bypass. Cloudflare Insights requests were blocked by allowlist.
 - **Owner visual acceptance remains PENDING.** Owner must review the order-section screenshots; do not mark PASS/LOCKED until the owner confirms. Hero remains PAUSED and untouched.
 - Prior run #39894291884 failed on a selector assertion; commit `cb8901b` corrected the assertion and run #39894447648 succeeded. Do not rerun this successful capture unless evidence becomes stale.
+
+
+## New-chat continuation checkpoint — 2026-10-23 (latest)
+
+Start by reading, in order: `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS.md`, `docs/handoff/TEST-RESULTS.md`, then `docs/handoff/DECISIONS.md` only for relevant decisions. Verify live branch HEAD and PR #108 before any work; documentation commits after the tested source SHA do not imply source validation of a new source change.
+
+### Latest owner decision
+- Owner replied **PASS** to the order-step heading typography change. Treat only that narrow item as **PASS/LOCKED**; do not reopen it without explicit permission.
+- Source/test CI PASS and Preview deployment PASS for source commit `c8a14685efa3fbfa12475fe895405b5999489329`: [CI run #39895567918](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567918), [Preview deploy #39895567897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567897). Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Verify current alias deployment SHA before asserting it still serves this commit.
+- `public/index.html` order-step headings were changed to weight 600 and one size larger; responsive tablet/mobile/narrow-phone overrides were adjusted. `tests/order-trust-layout.test.mjs` regression expectations were updated.
+- PR #108 remains OPEN/unmerged. Preview only; no Production deploy.
+
+### Mandatory guardrails
+- Hero is PAUSED BY OWNER. Do not edit Hero markup/CSS/assets, restore `hero-sd-gl052.png`, or run full-page/comprehensive captures that include Hero.
+- Do not touch Admin/backend/API/auth/catalog, D1/R2, DNS, secrets, bindings, or bypass Cloudflare Access.
+- Keep source/test CI, Preview deployment, deployed SHA, live screenshot capture, and owner visual acceptance as separate evidence gates.
+- After reporting, continue to the next safe step without waiting for the owner. While workflows run, work on independent tasks and return to check results. Never invent progress, screenshot evidence, or PASS.
+
+### Immediate next action
+Continue the next unfinished storefront audit section OUTSIDE Hero. Re-fetch HEAD/PR/workflows/Preview deployment metadata; inspect current source, relevant tests, and existing artifacts; identify a concrete defect before editing. Change one item at a time, run impacted tests, deploy Preview only, verify exact deployed SHA, and request owner review only when visual acceptance is genuinely needed. Update the handoff files after verified state changes.
