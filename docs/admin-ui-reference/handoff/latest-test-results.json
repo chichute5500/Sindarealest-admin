@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:56:00Z",
+  "capturedAtUtc": "2026-10-23T05:00:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "95b12624d2598de31f3f2a87a0d5c01f4732a35d",
+  "branchHeadAtCheckpointStart": "695a6a4e318d7464d029efefb0780a3002db0c4f",
   "codeTestSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
-    "id": 39901444449,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
-    "headSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "id": 39903088401,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39903088401",
+    "headSha": "695a6a4e318d7464d029efefb0780a3002db0c4f",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Validate #39901444416 and Admin Preview #39901444449 passed on exact source/test SHA. Artifact 371 has 132 distinct screenshots (16 login + 116 module), 120 module capture entries, 112 fixture metrics. Screen 7 scroll clearance passed at 320x640 and 390x844 in light/dark. Fixture-only; authenticated backend remains untested."
+    "summary": "Validate passed on verified handoff HEAD. Product source SHA 9515d03 passed Validate #39901444416 and Admin Preview #39901444449. Evidence artifact 371: 132 unique screenshots, 120 module capture entries, 112 fixture metrics. Screen 7 scroll audit fixture-only. Authenticated backend remains untested."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
@@ -27,7 +27,7 @@
     "currentHeadPlaywright": "PASS_LOCAL_MATRIX; PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES UNTESTED",
     "productionDeployment": "NOT_PERFORMED",
     "currentHead": "SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_9515d03d504ca9c49836b719ccede1eb3c2d2ce1; documentation sync head 95b12624d2598de31f3f2a87a0d5c01f4732a35d",
-    "currentHeadSha": "95b12624d2598de31f3f2a87a0d5c01f4732a35d",
+    "currentHeadSha": "695a6a4e318d7464d029efefb0780a3002db0c4f",
     "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES",
     "exactShaValidationRun": 39901444416,
     "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444416",
@@ -36,7 +36,10 @@
     "publicQrCacheBehavior": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: existing public QR active=200/no-store; deactivated/replaced=404",
     "settingsScreenOrder": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: price, welcome, watermark, then QR panel",
     "sourceValidation": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "uiFixtureConsoleErrors": "7 expected simulated HTTP 503 retry-path entries; no page errors, unexpected API paths, attempted writes or fixture API errors."
+    "uiFixtureConsoleErrors": "7 expected simulated HTTP 503 retry-path entries; no page errors, unexpected API paths, attempted writes or fixture API errors.",
+    "currentHeadValidation": "PASS_ON_EXACT_HANDOFF_HEAD",
+    "latestHandoffValidationRun": 39903088401,
+    "latestHandoffValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39903088401"
   },
   "historicalRuns": [
     {
@@ -387,7 +390,7 @@
     "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T04:56:00Z",
+    "capturedAtUtc": "2026-10-23T05:00:00Z",
     "testedSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
     "validateRun": {
       "id": 39901444416,
@@ -413,11 +416,19 @@
       "fixtureMetrics": 112
     },
     "orderDetailScrollRegression": "PASS: Screen 7 scroll reachability, no horizontal overflow, mobile navigation visible and >=8px content clearance at 320x640 and 390x844 in light/dark.",
-    "acceptanceBoundary": "Fixture-only; authenticated business/backend QA NOT_TESTED; all 12 screens PARTIAL_NOT_ACCEPTED."
+    "acceptanceBoundary": "Fixture-only; authenticated business/backend QA NOT_TESTED; all 12 screens PARTIAL_NOT_ACCEPTED.",
+    "handoffHead": "695a6a4e318d7464d029efefb0780a3002db0c4f",
+    "latestHandoffValidateRun": {
+      "id": 39903088401,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39903088401",
+      "status": "completed",
+      "conclusion": "success"
+    }
   },
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T04:56:00Z",
-    "syncPurpose": "Synchronize exact-SHA order-detail evidence pointers."
+    "lastSyncAtUtc": "2026-10-23T05:00:00Z",
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
   },
   "latestProductSourceCommit": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1"
 }
