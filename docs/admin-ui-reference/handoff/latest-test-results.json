@@ -349,10 +349,11 @@
     "pr108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "1311be92c3a97931e09ee36bdc7b95c2f8e25269",
+      "headSha": "17e668a3091de609acac7b4cf2e5bec60bcb2617",
       "readOnly": true,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
-      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+      "branch": "fix/liquid-glass-audit-2026-10-19"
     },
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
