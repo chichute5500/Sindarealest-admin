@@ -75,8 +75,10 @@ const contactTarget = {
   scrollIntoView(options) { this.scrolled = options; },
 };
 let contactDefaultPrevented = false;
-vm.runInNewContext(contactHelper + '\nnavigateAccountContact({ preventDefault() { contactDefaultPrevented = true; } });', {
+const contactEvent = { preventDefault() { contactDefaultPrevented = true; } };
+vm.runInNewContext(contactHelper + '\nnavigateAccountContact(contactEvent);', {
   SD_MODAL_HISTORY_KEY: '__sdStorefrontModal',
+  contactEvent,
   history: contactHistory,
   closeAccount(restoreFocus) { contactEffects.push({ type: 'closeAccount', restoreFocus }); },
   setActiveNav(id) { contactEffects.push({ type: 'activeNav', id }); },

@@ -2,7 +2,7 @@
 
 ## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
 
-- CI on source commit c4f41c60d56c0841e6146734dc28d6f57415dee0 reached the new regression test but failed because the test referenced vm without importing node:vm. This patch adds the missing import; exact-SHA CI is pending.
+- CI on source commit c4f41c60d56c0841e6146734dc28d6f57415dee0 first exposed a missing node:vm import, which was added in 3fb504d50b068647a38dcc0b7547d57616184a55. The next CI reached the regression assertions but the preventDefault callback was created inside the VM and its flag did not update the host scope. This patch passes a host-created callback into the VM; exact-SHA CI is pending.
 - The same commit’s Preview deployment run #39979048662 failed before deployment at the intentional target-safety gate. The resolved GitHub Actions variable CLOUDFLARE_PAGES_PROJECT was `sindarealest-admin-preview`, but the storefront workflow requires project `sindarealest2` and verifies Production remains on `main`. Previous successful deploy #39975778958 resolved the expected `sindarealest2`.
 - No Cloudflare deployment or Cloudflare settings were changed by the failed run. Do not bypass the guard or deploy to the other project. Owner action is needed to reconcile the repository Actions variable `CLOUDFLARE_PAGES_PROJECT` with the intended storefront project before Preview deployment can succeed.
 - Liquid Glass screenshot run #39979048660 was SKIPPED by its Hero-coverage guard; the catalog-filter audit was not run. Keep all locks and Preview-only rule intact.
