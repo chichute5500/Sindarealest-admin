@@ -7,7 +7,7 @@ const ADMIN_PASSWORD = "admin-order-price-immutability-password";
 const session = await createSession(SESSION_SECRET);
 const baselineItem = { id: "item-1", quantity: 1, unit_price: 100000 };
 
-function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingRequest = false } = {}) {
+function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingRequest = false, conflictDuringBatch = false } = {}) {
   const calls = { first: [], all: [], batches: [] };
   return {
     calls,
@@ -18,8 +18,8 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
         async first() {
           calls.first.push({ sql, values: this.values });
           if (sql === "SELECT id FROM orders WHERE id=?") return { id: "order-1" };
-          if (/EXISTS\s*\(SELECT 1 FROM order_payment_transactions/.test(sql)) {
-            return { hasTransactions: hasTransactions ? 1 : 0, hasPendingRequest: hasPendingRequest ? 1 : 0 };
+          if (sql.startsWith("SELECT EXISTS (SELECT 1 FROM order_payment_transactions")) {
+            return { has_transactions: hasTransactions ? 1 : 0, has_pending_request: hasPendingRequest ? 1 : 0 };
           }
           return null;
         },
@@ -35,7 +35,11 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
     },
     async batch(statements) {
       calls.batches.push(statements.map(s => ({ sql: s.sql, values: s.values })));
-      return statements.map(() => ({ success: true, meta: { changes: 1 } }));
+      return statements.map(statement => {
+        const guardedWrite = /NOT EXISTS \\(SELECT 1 FROM order_payment_transactions/.test(statement.sql)
+          && /NOT EXISTS \\(SELECT 1 FROM order_payment_requests/.test(statement.sql);
+        return { success: true, meta: { changes: conflictDuringBatch && guardedWrite ? 0 : 1 } };
+      });
     }
   };
 }
@@ -88,6 +92,23 @@ async function patchOrder(DB, prices) {
   const response = await patchOrder(db, [{ itemId: "item-1", unitPrice: 200000 }]);
   assert.equal(response.status, 200, "an order without financial activity may still be repriced");
   assert.equal(db.calls.batches.length, 1);
+  const statements = db.calls.batches[0];
+  assert.equal(statements.length, 3, "one item, the order summary, and the audit row are written together");
+  assert.ok(statements.every(statement =>
+    /NOT EXISTS \\(SELECT 1 FROM order_payment_transactions/.test(statement.sql)
+    && /NOT EXISTS \\(SELECT 1 FROM order_payment_requests/.test(statement.sql)
+  ), "all repricing writes must recheck payment activity inside the atomic batch");
+}
+
+{
+  const db = makeDB({ conflictDuringBatch: true });
+  const response = await patchOrder(db, [{ itemId: "item-1", unitPrice: 200000 }]);
+  assert.equal(response.status, 409, "a payment request created after preflight must still block repricing atomically");
+  assert.equal(db.calls.batches.length, 1);
+  assert.ok(db.calls.batches[0].every(statement =>
+    /NOT EXISTS \\(SELECT 1 FROM order_payment_transactions/.test(statement.sql)
+    && /NOT EXISTS \\(SELECT 1 FROM order_payment_requests/.test(statement.sql)
+  ), "item, order, and audit writes must all be guarded against a concurrent payment");
 }
 
 console.log("PASS: order repricing respects pending QR requests and verified payment history, while unchanged-price saves remain allowed.");
