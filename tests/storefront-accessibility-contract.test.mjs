@@ -459,3 +459,60 @@ const finalIconStyle = html.slice(finalIconStart, html.indexOf('</style>', final
 assert.ok(finalIconStyle.includes('.mini-add:hover') && finalIconStyle.includes('.page-btn.page-arrow:hover:not(:disabled)'), 'product-card add and pagination-arrow buttons must use the common glass shell');
 assert.ok(finalIconStyle.includes('.account-action>span.account-action-icon svg') && finalIconStyle.includes('#mobileBottomNav .mobile-tab svg'), 'account and mobile navigation SVG sizing must follow the shared optical baseline');
 assert.ok(!finalIconStyle.includes('#mobileBottomNav .mobile-tab{') && !finalIconStyle.includes('.service-strip .service-icon{'), 'do not replace mobile tab geometry or benefit-tile shells with generic button shells');
+
+
+// Native share can be present yet reject for reasons other than user cancellation.
+// In that case the fullscreen share control must still try clipboard fallback.
+const fullscreenShareStart = html.indexOf("$('#sdFullscreenShare').addEventListener('click',async()=>{");
+const fullscreenShareEnd = html.indexOf(String.fromCharCode(10) + '});', fullscreenShareStart);
+assert.ok(fullscreenShareStart >= 0 && fullscreenShareEnd > fullscreenShareStart,
+  'fullscreen share must have a dedicated handler for rejection-path regression tests');
+const fullscreenShareHandler = html.slice(fullscreenShareStart, fullscreenShareEnd + 4);
+async function runFullscreenShareHarness(shareOutcome, copySucceeded) {
+  let handler = null;
+  const copyCalls = [];
+  const shareCalls = [];
+  const messages = [];
+  const context = {
+    currentProduct: { title: 'Sản phẩm thử' },
+    navigator: {
+      async share(payload) {
+        shareCalls.push(payload);
+        if (shareOutcome === 'success') return;
+        throw Object.assign(new Error('share failed for test'), { name: shareOutcome });
+      }
+    },
+    window: { location: { href: 'https://example.test/sanpham/danh-muc/sku-001' } },
+    async copyText(value) { copyCalls.push(value); return copySucceeded; },
+    showToast(message) { messages.push(message); },
+    $: selector => selector === '#sdFullscreenShare'
+      ? { addEventListener(type, callback) { assert.equal(type, 'click'); handler = callback; } }
+      : null
+  };
+  vm.runInNewContext(fullscreenShareHandler, context, { timeout: 1000 });
+  assert.equal(typeof handler, 'function', 'share click handler must be registered');
+  await handler();
+  return { copyCalls, shareCalls, messages };
+}
+const nativeShareRejects = await runFullscreenShareHarness('NotAllowedError', true);
+assert.equal(nativeShareRejects.shareCalls.length, 1, 'native sharing should be attempted first');
+assert.deepEqual(nativeShareRejects.copyCalls, ['https://example.test/sanpham/danh-muc/sku-001'],
+  'native share rejection must fall back to copying the product URL');
+assert.match(nativeShareRejects.messages[0], /Đã sao chép liên kết sản phẩm/,
+  'successful copy fallback must confirm the copied URL truthfully');
+const nativeShareAndCopyFail = await runFullscreenShareHarness('NotAllowedError', false);
+assert.equal(nativeShareAndCopyFail.copyCalls.length, 1, 'clipboard fallback must still be attempted when it will fail');
+assert.match(nativeShareAndCopyFail.messages[0], /Không thể chia sẻ hoặc sao chép/,
+  'a failed share and failed copy must not claim success');
+assert.doesNotMatch(nativeShareAndCopyFail.messages.join(' '), /Đã sao chép/i,
+  'failed share/copy must never say the URL was copied');
+const nativeShareCancelled = await runFullscreenShareHarness('AbortError', true);
+assert.equal(nativeShareCancelled.copyCalls.length, 0,
+  'explicit user cancellation must not unexpectedly copy the URL');
+assert.equal(nativeShareCancelled.messages.length, 0,
+  'explicit share cancellation must remain quiet');
+const nativeShareSuccess = await runFullscreenShareHarness('success', true);
+assert.equal(nativeShareSuccess.copyCalls.length, 0,
+  'a successful native share must not also trigger clipboard fallback');
+assert.equal(nativeShareSuccess.messages.length, 0,
+  'a successful native share needs no extra toast');
