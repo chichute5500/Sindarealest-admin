@@ -16,11 +16,12 @@ permissions:
 
 concurrency:
   group: non-hero-order-preview-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
+  # This capture targets the owner-locked #order section. Keep it disabled unless the owner explicitly unlocks it.
   capture:
-    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19' && vars.ORDER_SECTION_AUDIT_UNLOCKED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -422,7 +423,7 @@ jobs:
           retention-days: 14
 
   publish-result:
-    if: always() && github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    if: always() && github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19' && vars.ORDER_SECTION_AUDIT_UNLOCKED == 'true'
     needs: capture
     runs-on: ubuntu-latest
     permissions:
