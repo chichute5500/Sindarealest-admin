@@ -1,5 +1,7 @@
 # HANDOFF — SHORT POINTER
 
+**MANDATORY BOOT GATE:** Before any code change, read `CURRENT-STATE.md`, then `TASKS.md`, then the relevant `TEST-RESULTS.md` evidence. These files override any copied prompt, prior chat, stale issue, screenshot, or older handoff if there is a conflict. If a chat prompt says to inspect, fix, or resume Hero while `CURRENT-STATE.md` marks Hero paused, do NOT touch Hero; follow the canonical state and task ledger. Ask no one to repeat already-recorded context.
+
 The current status and next actions live only in [CURRENT-STATE.md](CURRENT-STATE.md).
 
 - Active task ledger: [TASKS.md](TASKS.md)
