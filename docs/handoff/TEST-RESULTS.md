@@ -337,4 +337,4 @@ The owner asked to reduce the visual height of the catalog category chips while 
 
 Manifest: passed true, captureCompleted true, status CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE, exact source/deployed SHA match, public-tree equivalence true, 26 screenshots across mobile 360/390, tablet 768, desktop 1440 in Light/Dark plus touch activation frames. Touch selection and persistent state pass 2/2. Runtime errors 0; same-origin HTTP errors 0; read-only violations 0. Cloudflare Insights requests were blocked by the external-read allowlist and recorded.
 
-This is not owner visual acceptance. Await explicit owner review; do not claim OWNER PASS.
+Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip height/Liquid Glass controls are OWNER PASS/LOCKED. No further edits or retests unless the owner explicitly reopens the item.
