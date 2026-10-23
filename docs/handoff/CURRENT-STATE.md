@@ -1,3 +1,17 @@
+## LATEST VERIFIED STOREFRONT FIXES — CART CONSULTATION + STALE CART — 2026-10-24
+
+- Final combined source/test SHA: `373c282d626b6ec2291111adb7d81ec2a26e1c2d`. PR #108 remains OPEN/unmerged, base `main`.
+- Fix 1 — Zalo cart consultation: `consultCart()` now branches on `copyText()`'s boolean result. Failed clipboard attempts no longer produce success copy text; if the Zalo popup is blocked after a failed copy, the user is instructed to send/paste the cart list manually. Multi-product SKU/quantity lines retain a real newline separator.
+- Regression coverage in `tests/storefront-accessibility-contract.test.mjs`: two products, newline-separated SKUs/quantities, copy success/failure, truthful feedback and blocked-popup fallback. Intermediate iterations exposed an over-escaped newline; the final source restores the normal JavaScript newline escape and its behavioral test passes.
+- Fix 2 — stale local cart: `loadCart()` runs before the async catalog fetch, so deleted/unavailable product IDs could keep inflating the header badge even though `renderCart()` filtered them from the drawer. After a successful `/api/products` response, `normalizeCart()` keeps only current product keys and positive whole-number quantities, normalizes numeric quantity strings, persists changed storage once, and refreshes the badge. If catalog fetch fails, this normalization does not run and existing local cart data is not purged.
+- Regression coverage in `tests/cart-checkout-separation.test.mjs`: stale ID removal, invalid/fractional/zero/negative quantity removal, numeric string normalization, one persisted cleaned cart and badge total matching visible quantities.
+- Exact-SHA full CI / integrity / dependency audit PASS: [run #40003445574](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40003445574). The test log explicitly reports `PASS: stale local cart entries are removed after catalog load and the visible cart count is synchronized.`
+- Exact-SHA Preview deploy PASS: [run #40003445503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40003445503). Immutable Preview: https://6e52aeb8.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Deployment log checks project `sindarealest2`, Production branch `main`, and uses `--commit-hash=$GITHUB_SHA` on the exact SHA above.
+- Source, full CI and Preview deployment are PASS. No manual browser screenshot or visual acceptance was performed; do not claim live interaction/browser PASS. The upcoming handoff commits are docs-only and do not create a newer storefront deployment.
+- All locks unchanged: Hero PAUSED; icon appearance PASS/LOCKED; `#order`, catalog Liquid Glass filter controls and warranty claim form PASS/LOCKED. Never restore the removed standalone product-status filter. PR #108 OPEN/unmerged; Preview only; no Production/main or restricted backend/infrastructure changes.
+
+---
+
 ## VERIFIED GREEN FOLLOW-UP — SLIDESHOW CONTROL GUARD — 2026-10-24
 
 - Final source/test SHA for slideshow pause control + defensive missing-control guard: `74bcd512abc19d3fba4bad64654321091073b8ea`.
