@@ -36,8 +36,8 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
     async batch(statements) {
       calls.batches.push(statements.map(s => ({ sql: s.sql, values: s.values })));
       return statements.map(statement => {
-        const guardedWrite = /NOT EXISTS \\(SELECT 1 FROM order_payment_transactions/.test(statement.sql)
-          && /NOT EXISTS \\(SELECT 1 FROM order_payment_requests/.test(statement.sql);
+        const guardedWrite = statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
+          && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests")
         return { success: true, meta: { changes: conflictDuringBatch && guardedWrite ? 0 : 1 } };
       });
     }
@@ -95,8 +95,8 @@ async function patchOrder(DB, prices) {
   const statements = db.calls.batches[0];
   assert.equal(statements.length, 3, "one item, the order summary, and the audit row are written together");
   assert.ok(statements.every(statement =>
-    /NOT EXISTS \\(SELECT 1 FROM order_payment_transactions/.test(statement.sql)
-    && /NOT EXISTS \\(SELECT 1 FROM order_payment_requests/.test(statement.sql)
+    statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
+    && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests")
   ), "all repricing writes must recheck payment activity inside the atomic batch");
 }
 
@@ -106,8 +106,8 @@ async function patchOrder(DB, prices) {
   assert.equal(response.status, 409, "a payment request created after preflight must still block repricing atomically");
   assert.equal(db.calls.batches.length, 1);
   assert.ok(db.calls.batches[0].every(statement =>
-    /NOT EXISTS \\(SELECT 1 FROM order_payment_transactions/.test(statement.sql)
-    && /NOT EXISTS \\(SELECT 1 FROM order_payment_requests/.test(statement.sql)
+    statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
+    && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests")
   ), "item, order, and audit writes must all be guarded against a concurrent payment");
 }
 
