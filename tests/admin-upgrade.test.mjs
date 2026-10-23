@@ -96,3 +96,9 @@ assert.ok(admin.includes("selectedOrderId=new URLSearchParams(location.search).g
 assert.ok(admin.includes('data-action="order-detail-to-row"'), "Order detail must provide a real route back to the matching order's management controls");
 assert.ok(!admin.includes('<div id="orderDetailBackdrop"'), "Order detail must not regress to a modal overlay");
 console.log("PASS: dedicated Order detail screen, deep-link state and return-to-actions contracts.");
+
+const staticBaseline = read("../tests/e2e/admin-static-baseline.spec.js");
+assert.match(staticBaseline, /['"]\/api\/admin\/settings['"]\s*:\s*\{\s*showPrices:\s*true,/,
+  "Screen 10 baseline fixture must match the approved reference's public-price-enabled state.");
+assert.ok(staticBaseline.includes("await expect(page.locator('#showPrices')).toBeChecked()"),
+  "Screen 10 screenshot capture must assert the reference state rather than silently capturing a different setting.");
