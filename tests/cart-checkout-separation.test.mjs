@@ -185,7 +185,8 @@ const cartNormalizationContext = {
     'fractional-quantity': 1.5,
     'zero-quantity': 0,
     'negative-quantity': -1,
-    'invalid-quantity': 'not-a-number'
+    'invalid-quantity': 'not-a-number',
+    'boolean-quantity': true
   },
   products: [{ id: 'product-1' }, { id: 'product-2' }],
   $: selector => selector === '#cartCount' ? cartBadge : null,
@@ -199,6 +200,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(cartNormalizationContext.cart)), {
   'product-1': 2,
   'product-2': 4
 }, 'only current-catalog products with positive whole-number quantities should remain in cart storage');
+assert.ok(!Object.hasOwn(cartNormalizationContext.cart, 'boolean-quantity'),
+  'boolean values must not be coerced into valid cart quantities');
 assert.equal(cartBadge.textContent, '6',
   'the cart badge must be refreshed from normalized available items, not stale product IDs');
 assert.deepEqual(cartWrites, [{
