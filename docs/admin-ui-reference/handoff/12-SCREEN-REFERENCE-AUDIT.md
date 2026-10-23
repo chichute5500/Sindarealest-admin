@@ -3,6 +3,13 @@
 **Current product progress: 50% PROVISIONAL.** No screen is fully accepted. Product code/UI evidence and the later handoff-integrity check are tracked separately.
 
 
+## Latest exact-SHA narrow viewport and Screen 9 clearance checkpoint — 2026-10-23 04:07 UTC
+- Source/test SHA `000d3d84a9cf8c63144388f80879b5cc1439d161` passed Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) and Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) on the exact same SHA.
+- Artifact [admin-preview-evidence-369](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219) records 132 unique generated screenshots (16 login-shell captures; 120 fixture module capture entries) and 112 fixture metrics. The broader matrix includes 320×640 and 360×800, plus 390×844 and 1280×800; measured fixture layouts reported no document-level horizontal overflow.
+- The first expanded run [#39897883648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897883648) reproduced a real Screen 9 positioning regression at 320×640: toast bottom 558 px, navigation top 564 px, leaving only 6 px where the test requires 8 px. CSS changed from `bottom: calc(82px + env(safe-area-inset-bottom))` to `bottom: calc(84px + env(safe-area-inset-bottom))`. Follow-up Validate/Preview on `000d3d84a9cf8c63144388f80879b5cc1439d161` passed the same assertion.
+- Fixture audit metadata recorded zero page errors, unexpected API paths or attempted writes. Seven console messages were expected 503 responses from deliberate endpoint failure/retry tests; these are not authenticated backend errors. All fixture API writes remain blocked.
+- The approved composite reference `admin-mobile-reference.png` was successfully rendered from the downloaded artifact for qualitative comparison. Visual comparison is now possible, but exact pixel parity and full acceptance of all 12 screens remain **NOT_VERIFIED / PARTIAL_NOT_ACCEPTED**. Preview's deployed diagnostic still proves only the login-shell CSS signature, not authenticated business persistence.
+
 ## Screen 10/11 structural parity work
 - Direct comparison is now possible using the approved reference crops and the Preview screenshot at 390×844. The source combined Screen 10 Website settings and Screen 11 Backup/Restore in one `settings` view/title, while the reference maps them separately; baseline capture consequently scrolled deep inside Settings for the backup image.
 - This change splits the existing Backup/Restore, D1 summary and binding-information panels into a dedicated `backup` view, adds desktop/mobile navigation and history routing, and updates the static baseline to capture that route from its top. This is a source-level UI correction only; it does not establish backend acceptance. Check live Validate/Preview for the candidate SHA before changing screen statuses.
@@ -52,9 +59,12 @@
 Fixture/test PASS does not mean final visual parity or authenticated backend PASS. D1 schema/payment ledger NOT_VERIFIED; migration 0009, PRE/PRO and R2/product-image save DEFERRED_BY_OWNER; Production deployment NOT_PERFORMED.
 
 ## Next actions
-1. Fetch current HEAD/Actions first; verify whether the link-repair commit passes the new handoff test.
-2. If image rendering becomes available, compare reference and screenshot at matching viewport/theme and log concrete names/coordinates; until then do not claim pixel parity.
-3. Continue Gallery and screens #8–#12; make only visible, reproducible ADMIN-specific fixes. Keep each screen PARTIAL_NOT_ACCEPTED until its behavior and reference are truly accepted.
+1. Continue reference-driven review with Screen 12 Activity/Notifications, then Screens 4/5 (Product editor/Gallery) and 7 (Order detail), using artifact 369 at matching mobile viewports/themes. Record precise, repeatable differences only; do not fabricate product/customer data to imitate the reference.
+2. Preserve `PARTIAL_NOT_ACCEPTED` for all 12 screens until both interactions and reference parity are substantiated. Fixture coverage does not establish live data, persistence, authorization or backend behavior.
+3. Obtain an authorized authenticated Preview path before testing business workflows; never bypass Cloudflare Access or change secrets.
+4. Keep remote D1 schema/ledger `NOT_VERIFIED`, Production `NOT_PERFORMED`, and migration 0009, PRE/PRO, product-image/R2 and AI grouping deferred.
+5. Do not repeat B1 cleanup/provenance, merge/rebase/force-push, deploy, or write to `main`/PR #108.
+
 
 ## Screen 8 mobile CSS regression found and fixed
 - Preview run [#39895792200](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895792200) failed its Playwright screenshot matrix because the desktop customer identity block was not explicitly hidden alongside the compact mobile summary. The source contract now asserts the missing CSS rule. Re-run exact-SHA Validate and Preview before treating Screen 8 layout as passing.
