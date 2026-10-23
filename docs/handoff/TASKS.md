@@ -1,3 +1,11 @@
+## LATEST TASK STATUS — SLIDESHOW GUARD REGRESSION — 2026-10-24
+
+- Follow-up fix is limited to the regression test harness for missing slideshow controls: evaluate `setupArtSlideshow()` with a real newline using `String.fromCharCode(10)`, instead of creating invalid JS source or calling a non-function vm result.
+- Current SHA `ed06d73b89477b637a72c25c7939ee94f32c056f`; CI #39995473464 and Preview #39995473418 were in progress. Verify results before declaring done.
+- Previous slideshow pause/resume source passed CI/Preview on `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`; the later defensive guard is not green until current tests/deploy pass.
+
+---
+
 ## LATEST TASK RESULT — SLIDESHOW MISSING-CONTROL GUARD — 2026-10-24
 
 - Follow-up guard added: slideshow now verifies all three required controls exist before event binding/timer setup, avoiding a runtime exception if markup is incomplete.
