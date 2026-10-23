@@ -1,5 +1,14 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
+## Current checkpoint — 2026-10-23 11:24 UTC — Mobile activity-log density refinement; Validate and Preview pass
+
+- **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD is `f7f46e48856cd292ae012e2075da2625e99ff152` (Actions evidence child after tested source/test commit `ff807aa4e3175e61d4d001c84b4bb815cd11388c`). PR #111 is OPEN/unmerged and points to the live branch; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, or writes to `main`/the static website branch.
+- **UI change:** commit [`ff807aa`](https://github.com/chichute5500/Sindarealest-admin/commit/ff807aa4e3175e61d4d001c84b4bb815cd11388c) tightened mobile activity-log filter labels and card spacing, added a two-line description clamp, and added Playwright height assertions for mobile controls/cards. The screenshot at 390×844 light theme shows the activity log and five visible/partly visible audit cards without horizontal page overflow. This is synthetic/read-only fixture content, not proof of authenticated business data.
+- **Exact-SHA checks:** [Validate #39945405222](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39945405222) PASS and [Preview #39945405006](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39945405006) PASS on `ff807aa4e3175e61d4d001c84b4bb815cd11388c`. Artifact [admin-preview-evidence-415](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39945405006/artifacts/12497727381) contains 132 PNGs and 112 fixture metrics. Deployed diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; it does not establish authenticated backend QA.
+- **Acceptance remains incomplete:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- **Next:** continue the remaining screen-by-screen reference comparison using the newest artifact and approved `admin-mobile-reference.png`; fix only reproducible mismatches, rerun exact-SHA checks, then synchronize all five handoff files again. Keep the guardrails below.
+
+
 Canonical entry point: read [`START-HERE.md`](START-HERE.md) first, then fetch live branch/PR/Actions state before continuing; historical checkpoint values are not authoritative without revalidation.
 
 **Next-chat execution directive:** Do not ask the owner to restate history. Recheck live HEAD, PR #111/#108, and Actions. Continue practical UI acceptance from the newest evidence artifact; inspect approved reference comparisons, fix only a reproducible defect, run exact-SHA checks, and update all five handoff files after meaningful work. Keep PRs open/unmerged, `main` untouched, no production/Cloudflare/remote data changes.
