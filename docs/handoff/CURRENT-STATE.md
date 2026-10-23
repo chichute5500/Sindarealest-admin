@@ -1,3 +1,19 @@
+## LATEST VERIFIED UPDATE — MOBILE FULLSCREEN GALLERY CROSSFADE — 2026-10-24
+
+- **Source/test SHA deployed:** `e0b9e10325b42c5b658e6e911b9fa745530a67b0`.
+- **Root-cause hypothesis addressed:** mobile was forcibly setting `instant=true` for every gallery change, bypassing the intended transition. Even after image decode, it immediately swapped active layers, a plausible source of compositor flicker.
+- **Fix:** incoming image must load and decode before reveal; mobile next/previous now uses a 460 ms opacity crossfade while the old decoded photo remains visible. Incoming layer activates before outgoing layer deactivates. Failed decode retains the current photo; transition IDs prevent stale requests from winning.
+- **Regression coverage:** actual `setFullscreenPhoto()` runs in a deterministic VM harness. Tests cover pending decode, rejection, overlapping requests, 460 ms mobile fade, and active-layer order.
+- **Exact-SHA CI PASS:** [#40018595783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595783).
+- **Exact-SHA Preview deploy PASS:** [#40018595733](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595733). Project `sindarealest2`, Production branch `main`, deployment commit hash verified.
+- **Immutable Preview:** https://c05ce8c0.sindarealest2.pages.dev/
+- **Branch alias:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- **Visual workflow:** SKIPPED by Hero-coverage guard. No browser/Playwright screenshot or real-device visual verification is claimed.
+- **Acceptance OPEN:** owner must test only fullscreen product gallery on mobile and confirm whether flicker is gone. Do not call it fixed/accepted before that confirmation.
+- PR #108 remains OPEN/unmerged, base `main`. No Production deployment, no changes to `main), Hero, Admin/backend/API/auth, catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access/infrastructure, or live payment.
+
+---
+
 ## LATEST VERIFIED UPDATE — FULLSCREEN GALLERY DECODE GUARD — 2026-10-24
 
 - **Deployed source/test commit:** `fa24269d7e1c06b511d1b08455d77493bd4c9d1e`. The only source/test files in this change are `public/index.html` and `tests/gallery-transition-mobile-cart-badge.test.mjs`.

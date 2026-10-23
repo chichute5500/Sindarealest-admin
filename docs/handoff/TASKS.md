@@ -1,3 +1,16 @@
+## LATEST TASK — MOBILE FULLSCREEN PHOTO FLICKER — 2026-10-24
+
+- Source/test/deployed SHA: `e0b9e10325b42c5b658e6e911b9fa745530a67b0`.
+- Removed the automatic mobile-forced instant swap. After successful load/decode, mobile photo changes use a 460 ms crossfade; outgoing decoded photo stays visible through the transition.
+- Regression tests execute the actual gallery transition function and cover delayed decode, decode rejection, stale competing requests, mobile fade timer, and layer activation order.
+- CI PASS [#40018595783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595783); Preview deployment PASS [#40018595733](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595733).
+- Preview: https://c05ce8c0.sindarealest2.pages.dev/
+- Visual audit workflow SKIPPED due to Hero guard; no browser screenshot/manual acceptance.
+- **Only remaining owner action:** open a product fullscreen gallery on a phone, switch next/previous and tap thumbnails repeatedly, then report whether any flash/ghost frame remains. All other sections remain PASS/LOCKED.
+- PR #108 OPEN/unmerged; no Production/main changes.
+
+---
+
 ## LATEST TASK STATUS — FULLSCREEN GALLERY DECODE GUARD — 2026-10-24
 
 **Completed with exact-SHA CI and Preview deployment PASS; owner visual acceptance is still pending.**

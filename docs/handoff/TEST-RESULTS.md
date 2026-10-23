@@ -1,3 +1,17 @@
+## LATEST EXACT-SHA TEST + DEPLOY RECORD — MOBILE FULLSCREEN CROSSFADE — 2026-10-24
+
+- Source/test/deployed SHA: `e0b9e10325b42c5b658e6e911b9fa745530a67b0`.
+- CI PASS [#40018595783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595783). Full automated test suite, integrity checks and dependency audit passed.
+- Runtime regression output includes:
+  - `PASS: gallery changes preload/decode before outgoing animation; fullscreen retains layered images...`
+  - `PASS: fullscreen runtime preserves the current frame, rejects failed decodes, and ignores stale competing transitions.`
+- Preview deploy PASS [#40018595733](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595733), immutable Preview https://c05ce8c0.sindarealest2.pages.dev/. Log confirms project `sindarealest2`, Production branch `main`, and deployment with exact `GITHUB_SHA`.
+- Implementation changes: mobile forced-instant behavior removed; incoming image is loaded/decoded before transition; mobile uses 460 ms crossfade; outgoing image stays visible; stale decode/rejection is guarded; regression tests updated for the layer-order invariant.
+- Liquid Glass visual workflow SKIPPED by Hero guard. No Playwright browser run, screenshots, or manual visual acceptance.
+- Acceptance remains OPEN until owner retests fullscreen gallery on phone. PR #108 OPEN/unmerged; Preview only.
+
+---
+
 ## LATEST EXACT-SHA RESULT — FULLSCREEN GALLERY DECODE GUARD — 2026-10-24
 
 - Source/test commit and deployed SHA: `fa24269d7e1c06b511d1b08455d77493bd4c9d1e`.

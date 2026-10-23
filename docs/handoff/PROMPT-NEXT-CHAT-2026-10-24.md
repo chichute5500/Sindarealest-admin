@@ -1,3 +1,39 @@
+# CURRENT HANDOFF UPDATE — MOBILE FULLSCREEN GALLERY FLICKER — 2026-10-24
+
+> Read this update first. This supersedes older source SHA, run, and Preview details below; old entries remain historical records.
+
+## Current verified state
+
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, not merged, base `main`.
+- Source/test SHA deployed: `e0b9e10325b42c5b658e6e911b9fa745530a67b0`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595783
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595733
+- Immutable Preview: https://c05ce8c0.sindarealest2.pages.dev/
+- Branch Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Cloudflare Pages project `sindarealest2`; Production branch remains `main`. No Production deployment or PR merge.
+
+## Latest gallery investigation
+
+- Found a plausible root cause: the mobile media query forcibly set every gallery navigation to `instant=true`, bypassing transition animation even when the next image was successfully loaded and decoded.
+- Removed that forced instant mode for ordinary next/previous changes. After load and decode, mobile uses a 460 ms opacity crossfade; outgoing photo remains visible until the transition commits. Incoming active layer is enabled before outgoing layer is disabled.
+- Decode failures keep the current photo; transition IDs prevent stale overlapping requests from taking over.
+- Tests run the real `setFullscreenPhoto()` function with controlled load/decode promises and verify pending decode, rejection, stale requests, mobile fade timing, and layer ordering.
+- CI and Preview deployment passed on the exact SHA. The Liquid Glass visual workflow was SKIPPED by its Hero guard. No browser/Playwright screenshot or device visual acceptance is claimed.
+
+## Only open item
+
+Owner must test the immutable Preview on a phone: open a product fullscreen gallery, switch next/previous several times and tap different thumbnails. Confirm whether any flicker, flash, or ghost/overlaid image remains. Do not mark PASS before owner confirmation. Do not ask to retest cart/account or any other accepted section.
+
+## Boundaries
+
+Hero remains PAUSED BY OWNER: never inspect, capture, edit, or include it in visual workflows. All other storefront sections remain PASS/LOCKED. Do not change `main`, merge PR #108, deploy Production, or touch Admin/backend/API/auth, catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or payment flow.
+
+The latest source/test SHA can differ from branch HEAD after this handoff commit because this commit updates documentation only; documentation updates are not new storefront deployments.
+
+---
+
 # CURRENT HANDOFF UPDATE — SinDarealest2 Storefront — 2026-10-24
 
 > Read this update first. It supersedes older SHA/run details below; historical records are retained as history.

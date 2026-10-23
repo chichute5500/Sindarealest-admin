@@ -1,3 +1,13 @@
+## DECISION UPDATE — MOBILE FULLSCREEN GALLERY TRANSITION — 2026-10-24
+
+- Keep the existing image visible until the incoming image has both loaded and decoded.
+- On mobile, do not force ordinary next/previous navigation into an immediate swap. Use a 460 ms opacity crossfade after decode; activate the incoming layer before deactivating the outgoing layer.
+- Decode rejection and stale requests must not reveal an unconfirmed image or override a newer request.
+- Evidence: CI [#40018595783 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595783); exact-SHA Preview deploy [#40018595733 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018595733); Preview https://c05ce8c0.sindarealest2.pages.dev/.
+- This is not owner visual acceptance. Keep gallery acceptance OPEN until owner verifies on a real mobile device. Hero remains PAUSED BY OWNER; PR #108 OPEN/unmerged; no Production/main changes.
+
+---
+
 ## DECISION UPDATE — FULLSCREEN DECODE FAILURE — 2026-10-24
 
 - Accept the minimal decode-failure guard as an implementation change pending owner visual acceptance; it does not alter Liquid Glass styling, layout, controls, or gallery interaction design.
