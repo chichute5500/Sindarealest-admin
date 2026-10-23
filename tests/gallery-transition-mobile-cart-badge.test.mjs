@@ -23,12 +23,11 @@ assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /const mobile=window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
-assert.match(html, /const FULLSCREEN_MOBILE_FADE_MS=460/);
-assert.match(html, /sd-mobile-fade-out/);
-assert.match(html, /sd-mobile-fade-in/);
-assert.match(html, /mobileFade\?FULLSCREEN_MOBILE_FADE_MS:FULLSCREEN_SLIDE_MS\+20/);
-assert.match(html, /@keyframes sdFullscreenMobileFadeOut\{from\{opacity:1\}to\{opacity:0\}\}/);
-assert.match(html, /@keyframes sdFullscreenMobileFadeIn\{from\{opacity:0\}to\{opacity:1\}\}/);
+assert.doesNotMatch(html, /sd-mobile-fade-(?:out|in)|FULLSCREEN_MOBILE_FADE_MS|sdFullscreenMobileFade/,
+  'Mobile must not crossfade two product photos, which creates the reported ghosted double image.');
+assert.match(html, /function preloadFullscreenPhotos\(/);
+assert.match(html, /image\.fetchPriority='low';fullscreenPreloadCache\.set\(src,image\);image\.src=src/);
+assert.match(html, /@media\(max-width:760px\)\{\.sd-fullscreen-image\{animation:none!important;transition:none!important;transform:none!important;will-change:auto!important/);
 
 const fullscreenMobileSwap = html.slice(html.indexOf('function setFullscreenPhoto('), html.indexOf('function renderFullscreenThumbs(', html.indexOf('function setFullscreenPhoto(')));
 assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
@@ -194,13 +193,11 @@ function assertExactlyOneActivePhoto(images, expected) {
   assert.equal(gallery.decodeQueue.length, 1);
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
-  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
-  assert.equal(gallery.images[0].classList.contains('sd-mobile-fade-out'), true);
-  assert.equal(gallery.images[1].classList.contains('sd-mobile-fade-in'), true);
-  assert.equal([...gallery.timers.values()].some(timer => timer.delay === 460), true,
-    'Mobile photo changes must use the slower 460ms fade after decode, not an immediate layer swap.');
-  gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
+  assert.equal(gallery.images[0].classList.contains('sd-mobile-fade-out'), false);
+  assert.equal(gallery.images[1].classList.contains('sd-mobile-fade-in'), false);
+  assert.equal(gallery.timers.size, 0,
+    'Mobile must switch layers atomically after decode, with no overlapping fade or delayed z-index swap.');
   assert.equal(gallery.images[1].getAttribute('src'), 'new.jpg');
 }
 {
@@ -220,9 +217,8 @@ function assertExactlyOneActivePhoto(images, expected) {
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[1].resolve(); await flushGalleryMicrotasks();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
-  gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
   assert.equal(gallery.images[1].getAttribute('src'), 'newer.jpg',
     'A stale decode must never replace the latest requested next/previous photo.');
 }
-console.log('PASS: fullscreen runtime preserves the current frame, rejects failed decodes, and ignores stale competing transitions.');
+console.log('PASS: fullscreen runtime preserves the current frame, atomically swaps decoded mobile layers, rejects failed decodes, and ignores stale competing transitions.');
