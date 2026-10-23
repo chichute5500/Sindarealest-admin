@@ -75,11 +75,11 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: 7631f1badaf774fc35616fc21445e94af0bca027
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39923533998
+- Tested commit: 09f22474e2c0bc55b2f08f447d9052bebe4e1d5a
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39924660838
 - npm run check: PASS
 - npm test: PASS
-- Local source Playwright matrix: PASS; 132 real PNGs captured in artifact admin-preview-evidence-395 (not committed to Git).
+- Local source Playwright matrix: PASS; 132 real PNGs captured in artifact admin-preview-evidence-400 (not committed to Git).
 - Deployed Preview: success.
 - Source screenshot matrix: 132 real PNGs; login shell: 16; read-only fixture module screens: 120; fixture metrics: 112.
 - Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
