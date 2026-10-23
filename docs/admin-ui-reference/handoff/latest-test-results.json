@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:05:10Z",
+  "capturedAtUtc": "2026-10-23T03:13:50Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
@@ -368,5 +368,23 @@
       "Preview diagnostic proves the configured unauthenticated login CSS signature only; no authenticated business-data persistence was tested.",
       "B1 provenance cleanup remains complete; two new files are compact automatic Preview evidence, not a reason for further deletion."
     ]
+  },
+  "latestValidateRun": {
+    "id": 39893834166,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166",
+    "status": "completed",
+    "conclusion": "success",
+    "testedSha": "83733513da6d3a28a13e773f479b596a4432df1f"
+  },
+  "latestAttempt": {
+    "capturedAtUtc": "2026-10-23T03:13:50Z",
+    "testedSha": "83733513da6d3a28a13e773f479b596a4432df1f",
+    "validateRun": {
+      "id": 39893834166,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "note": "Handoff refresh validation passed on exact SHA. Admin Preview evidence is still pinned to source/test SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285."
   }
 }

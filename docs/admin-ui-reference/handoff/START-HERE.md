@@ -11,17 +11,13 @@
 - [12-screen acceptance audit](12-SCREEN-REFERENCE-AUDIT.md)
 - [Evidence retention policy](history/README.md)
 
-## Live checkpoint (2026-10-23T02:54:13Z)
-- Repository: `chichute5500/Sindarealest-admin`.
-- PR #111: OPEN/unmerged, base `main` at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, 396 changed files (+39,229 / -212). Working branch: `feature/admin-isolated-handoff-2026-10-20`.
-- Branch HEAD at checkpoint: `6264adcdd1f3982c5cd96cd21006c6217ac3cd87`. Validate [#39892969609](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609) completed **SUCCESS on exact current branch SHA `6264adcdd1f3982c5cd96cd21006c6217ac3cd87`** after fixing the explicit live-fetch instruction required by the handoff integrity test.
-- Validate [#39892969609](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609) **SUCCESS on exact handoff HEAD `6264adcdd1f3982c5cd96cd21006c6217ac3cd87`**. The preceding source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285` also passed Validate and Admin Preview [#39891442082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082).
-- Admin Preview [#39891442082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082) **SUCCESS on the same source/test SHA**. Artifact [`admin-preview-evidence-361`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082/artifacts/12474998216) contains 102 PNGs (16 login-shell, 86 read-only fixture screens) and 78 fixture metrics. The mobile Settings screenshot shows the fixed order: price controls, welcome controls, watermark, then QR payment panel.
-- Earlier checkpoint Validate [#39890582750](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39890582750) completed SUCCESS on exact SHA `71ca210f0a024f29b5960cc07705171096adb920`.
-- Product change: Screen 10 Settings now renders price, welcome and watermark controls before the separate QR payment panel. A regression assertion guards the DOM order. This does not verify persisted settings or real QR activation.
-- Preview-generated evidence is retained in `docs/admin-ui-reference/handoff/history/4ac7465539e7/`; the screenshot artifact remains in Actions, not Git.
-- PR #108 remains OPEN/unmerged/read-only on `fix/liquid-glass-audit-2026-10-19`, current observed HEAD `5a11a5264ab6186c36eac764dd7755c3b2c1bf9a`, 286 changed files (+20,602 / -398). Do not write to that branch/PR.
-- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Live checkpoint (verified after Validate #39893834166)
+- Live writable branch HEAD and PR #111 head: `83733513da6d3a28a13e773f479b596a4432df1f`. Validate [#39893834166](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166) completed **SUCCESS on this exact SHA**; dependency audit, project integrity and automated tests all passed.
+- PR #111 remains OPEN/unmerged, base `main` at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, 396 changed files (+39,231 / -212). No merge action taken.
+- PR #108 remains OPEN/unmerged and read-only. Live API now reports head `7e8c33f52e9216ff07484133910479ea5a456225`, 287 files (+21,043 / -398). Do not write to that branch.
+- `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- Screen 10 settings order remains covered by the regression test: public price, welcome page, watermark, then QR payment panel. Prior Admin Preview [#39891442082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082) passed on source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`; it is fixture-only and does not prove backend persistence.
+- Acceptance remains incomplete: all 12 screens `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
 ## B1 — PR #111 cleanup/provenance
 **B1 audit remains complete.** The two new files since the 394-path cleanup census are compact Preview evidence (`report.md` and `preview-diagnostics.json`), not a reason to reopen file deletion or API consolidation.
@@ -31,8 +27,8 @@
 - Keep active consumers and distinct payment contracts. `normalizeFulfillmentType` is canonical in `functions/_lib.js`. No further deletions or route/helper merges without new evidence.
 
 ## Next actions
-1. Validate the **next handoff-doc checkpoint commit** on that exact SHA once, because it follows the already-passing source/test and Preview run above. Do not make a further metadata-only commit to chase its own SHA.
-2. Continue Screen 10 reference comparison and the remaining Admin acceptance work. Fix only reproducible ADMIN-specific defects supported by screenshot/code evidence.
+1. Validate this handoff refresh on its exact commit SHA once; do not make another metadata-only commit to chase its own SHA.
+2. Continue the 12-screen acceptance audit. Current source/tests were reviewed for Screens 8–12; no new reproducible source defect was established from the available text evidence. Exact pixel/reference parity remains NOT_VERIFIED because direct reference-image comparison is unavailable.
 3. Obtain an authorized authenticated Preview test path before testing business persistence. Never bypass Cloudflare Access or substitute fixtures for backend evidence.
 
 ## Guardrails

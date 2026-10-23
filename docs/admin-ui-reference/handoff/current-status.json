@@ -1,18 +1,18 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:05:10Z",
+  "capturedAtUtc": "2026-10-23T03:13:50Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "620d7b07dd7f92aed8325846785c8b231b256e36",
-  "checkpointSemantics": "Checkpoint reflects current live branch refs. codeTestSha points to the exact source/test SHA validated by Validate and Preview. The branch HEAD at checkpoint may be an evidence-only child committed by the Preview workflow. Validate the next handoff checkpoint once; do not chase its resulting SHA with metadata-only commits.",
+  "branchHeadAtCheckpointStart": "83733513da6d3a28a13e773f479b596a4432df1f",
+  "checkpointSemantics": "Live refs verified after Validate #39893834166. This SHA is the handoff checkpoint head and Validate passed on the exact SHA. Do not create metadata-only commits to chase this checkpoint. codeTestSha remains the exact application source/test SHA validated by source/Preview runs.",
   "codeTestSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
   "latestProductSourceCommit": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
   "latestActionsRun": {
-    "id": 39892969609,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609",
+    "id": 39893834166,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87"
+    "testedSha": "83733513da6d3a28a13e773f479b596a4432df1f"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -24,11 +24,11 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "5a11a5264ab6186c36eac764dd7755c3b2c1bf9a",
-      "changedFiles": 286,
+      "headSha": "7e8c33f52e9216ff07484133910479ea5a456225",
+      "changedFiles": 287,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
-      "additions": 20602,
+      "additions": 21043,
       "deletions": 398
     },
     "111": {
@@ -38,13 +38,13 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
+      "headSha": "83733513da6d3a28a13e773f479b596a4432df1f",
       "changedFiles": 396,
-      "additions": 39229,
+      "additions": 39231,
       "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
-      "validationRunId": 39892969609,
+      "validationRunId": 39893834166,
       "validation": "PASS_ON_EXACT_CURRENT_BRANCH_HEAD",
       "mergeableState": "dirty"
     }
@@ -72,36 +72,23 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-23T02:54:13Z",
-      "testedSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
+      "capturedAtUtc": "2026-10-23T03:13:50Z",
+      "testedSha": "83733513da6d3a28a13e773f479b596a4432df1f",
       "validateRun": {
-        "id": 39891441964,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
+        "id": 39893834166,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166",
         "status": "completed",
         "conclusion": "success"
       },
-      "previewRun": {
-        "id": 39891442082,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082",
-        "status": "completed",
-        "conclusion": "success",
-        "artifactName": "admin-preview-evidence-361",
-        "artifactId": 12474998216,
-        "sourceScreenshotCount": 102,
-        "loginShellPngCount": 16,
-        "readOnlyFixturePngCount": 86,
-        "fixtureMetricCount": 78,
-        "diagnostic": "PASS_LOGIN_CSS_SIGNATURE"
-      },
-      "reason": "Screen 10 settings order changed and regression-guarded; exact-SHA Validate and Preview passed on 4ac7465. Preview added compact evidence-only child 620d7b0. Authenticated business acceptance remains incomplete."
+      "reason": "Handoff checkpoint SHA validated successfully. Most recent Admin Preview remains successful on source/test SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285; no new Preview run was performed."
     },
     "latestValidateAttempt": {
-      "id": 39891441964,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
+      "id": 39893834166,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_SHA",
+      "testedSha": "83733513da6d3a28a13e773f479b596a4432df1f",
+      "currentHeadApplicability": "PASS_ON_EXACT_CURRENT_BRANCH_HEAD",
       "workflow": "Validate source and tests"
     },
     "lastFailed": {

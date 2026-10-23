@@ -1,8 +1,9 @@
 # LATEST STATUS — SinDarealest Admin
 
 ## Latest verified handoff checkpoint
-- Current branch HEAD: `6264adcdd1f3982c5cd96cd21006c6217ac3cd87`. Validate [#39892969609](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39892969609) completed SUCCESS on this exact SHA, including dependency audit, project integrity and automated tests.
-- Current PR #111 diff: 396 files (+39,229 / -212), base main `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- Live branch/PR #111 HEAD: `83733513da6d3a28a13e773f479b596a4432df1f`. Validate [#39893834166](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166) completed **SUCCESS on exact SHA `83733513da6d3a28a13e773f479b596a4432df1f`**; dependency audit, project integrity and automated tests passed.
+- PR #111 remains OPEN/unmerged, 396 changed files (+39,231 / -212), base main `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- PR #108 remains OPEN/unmerged/read-only; live observed head `7e8c33f52e9216ff07484133910479ea5a456225`, 287 files (+21,043 / -398). Do not write there.
 
 ## Latest verified source and Preview evidence
 - Application/source/test SHA: `4ac7465539e746b7f37517327d7bf9bddcfa3285`.
@@ -32,6 +33,6 @@
 - Migration 0009, PRE/PRO migration changes, product-image/R2 persistence and AI image grouping remain deferred by owner.
 
 ## Next
-1. Verify Validate on the next handoff-doc checkpoint SHA once; do not create another metadata-only commit after that.
-2. Continue concrete screen acceptance and reference comparison only where evidence can be inspected; keep fixtures distinct from backend proof.
+1. Validate this handoff refresh on its exact SHA once, then stop pointer-chasing.
+2. Continue screen acceptance only where evidence can be inspected; exact reference parity remains NOT_VERIFIED and all 12 screens remain PARTIAL_NOT_ACCEPTED.
 3. Obtain an authorized authenticated Preview path before testing persisted business workflows. No merge/deploy/remote-data operations.
