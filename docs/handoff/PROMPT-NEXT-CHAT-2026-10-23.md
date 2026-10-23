@@ -1,3 +1,31 @@
+# AUTHORITATIVE NEXT-CHAT OVERRIDE — COLLECTION SLIDESHOW PAUSE FIX — 2026-10-24
+
+Continue the existing SinDarealest2 repository. First fetch latest branch HEAD and PR #108; read all four handoff files. Do not restart or assume the previous SHA remains HEAD.
+
+## Latest source/test and evidence
+- Repo `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`.
+- Latest source/test commit at handoff: `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`.
+- PR #108 https://github.com/chichute5500/Sindarealest-admin/pull/108 MUST remain OPEN/unmerged; base `main`.
+- In unlocked Collections (`#collections`, not Hero), fixed the missing visitor pause control for 3-second slideshow autoplay. Button has Vietnamese accessible name, updates `aria-pressed` and label, clears/restarts exactly one interval. Reduced-motion leaves autoplay off and disables resume, while manual next/previous remains available.
+- Regression tests cover timer lifecycle, ARIA state/name, and reduced-motion.
+- Exact-SHA CI PASS: [#39994601040](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994601040).
+- Exact-SHA Preview deploy PASS: [#39994600974](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994600974). Preview https://5052d769.sindarealest2.pages.dev/; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy log warning: Wrangler found `wrangler.toml` but ignored it because `pages_build_output_dir` is missing. No config/infrastructure changes authorized or made.
+- No manual browser screenshot/visual acceptance. Do not call this visual/browser PASS.
+
+## Next action
+Continue source-first audit of unlocked storefront code/test contracts. Check latest HEAD, PR, run metadata, and exact SHA before any new edit. Only fix concrete reproducible defects and add regression tests. After edits run CI and Preview on the same code SHA; while workflows run audit a separate safe unlocked area; then verify conclusions and deployment URL. Update all four handoff files after meaningful changes, and distinguish code SHA from docs-only HEAD.
+
+## Hard locks
+- Hero PAUSED BY OWNER: do not inspect/edit/test/redesign/restore/screenshot/capture.
+- `#order` / “Đặt hàng an tâm” OWNER PASS/LOCKED: do not touch or retest.
+- Catalog Liquid Glass/filter chips/icons/height/effects OWNER PASS/LOCKED; only unlock with explicit owner authorization plus `owner_authorized=true` and `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+- Warranty claim form OWNER PASS/LOCKED. Keep standalone product-status filter removed.
+- No Production deploy, no `main` changes, no Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access/infrastructure/real-payment changes. Never bypass Access. PR #108 remains OPEN/unmerged.
+- Keep source audit, CI, Preview deploy, browser capture and owner visual acceptance as distinct evidence gates.
+
+---
+
 # AUTHORITATIVE NEXT-CHAT OVERRIDE — FAVORITES MIGRATION FIX DEPLOYED — 2026-10-24
 
 Continue the existing SinDarealest2 repository; do not restart. First re-fetch branch HEAD and PR #108, then use all four handoff files as history and live GitHub as source of truth.
