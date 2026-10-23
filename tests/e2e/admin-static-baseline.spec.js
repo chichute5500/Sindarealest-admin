@@ -2353,6 +2353,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(priceStatus, 'Reference Screen 10 shows the public-price toggle without an extra status line').toBeHidden();
         await expect(page.locator('#welcomeSettingsForm .field:has(#welcomeLine2)'),
           'Reference Screen 10 shows one welcome-title field on mobile, followed by the welcome copy').toBeHidden();
+        const welcomeCopyHeight = await page.locator('#welcomeCopy').evaluate(element => element.getBoundingClientRect().height);
+        expect(welcomeCopyHeight,
+          'Reference Screen 10 welcome copy should use a compact two-line field at 390x844: ' + welcomeCopyHeight)
+          .toBeLessThanOrEqual(56);
         const mobileNavTop = await page.locator('.mobiletabs').evaluate(element => element.getBoundingClientRect().top);
         for (const selector of ['#watermarkSettingsForm > .switchrow', '#watermarkLogoUrl', '#watermarkPosition', '#watermarkSize', '#watermarkOpacity']) {
           const bounds = await page.locator(selector).boundingBox();
