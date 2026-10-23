@@ -113,3 +113,5 @@ for (const referenceHeading of [
 }
 assert.ok(admin.includes('class="settingsgrid website-settings"'),
   "Screen 10 must have a dedicated layout hook so mobile compaction does not affect Backup/Restore.");
+assert.ok(admin.includes('#main:has(.website-settings) > .pagehead .eyebrow'),
+  "Screen 10 mobile heading must collapse without affecting the Backup/Restore pagehead.");

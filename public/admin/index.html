@@ -828,10 +828,10 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   .website-settings>.setting h3{font-size:12px;line-height:1.3;margin:0 0 6px}
   .website-settings>.setting>p{display:none}
   .website-settings>.setting:first-of-type>.callout{display:none}
-  .website-settings .pagehead{align-items:flex-start;gap:0;margin-bottom:8px}
-  .website-settings .pagehead .eyebrow,
-  .website-settings .pagehead p{display:none}
-  .website-settings .pagehead h2{font-size:23px;margin:0}
+  #main:has(.website-settings) > .pagehead{align-items:flex-start;gap:0;margin-bottom:8px}
+  #main:has(.website-settings) > .pagehead .eyebrow,
+  #main:has(.website-settings) > .pagehead p{display:none}
+  #main:has(.website-settings) > .pagehead h2{font-size:23px;margin:0}
   .website-settings .switchrow{gap:8px}
   .website-settings .switchrow b{font-size:11px}
   .website-settings .switch{width:44px;height:26px}
