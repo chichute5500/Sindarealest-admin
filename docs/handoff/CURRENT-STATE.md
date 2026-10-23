@@ -165,3 +165,13 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - The latest documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7`; CI #39902525107, Preview deploy #39902525216, and technical live capture #39902525271 passed. The documentation-only handoff update does not alter `public/` or the deployed Preview source.
 - Next active task: continue source-first audit of the next unfinished **non-Hero** storefront section, starting with the product/catalog area and existing tests/evidence. Establish a concrete defect before changing source. Hero remains PAUSED BY OWNER and must not be opened, edited, tested, or captured.
 - PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
+
+## ACTIVE NON-HERO TASK — CATALOG FILTER ACCESSIBLE NAMES — 2026-10-23
+
+- Concrete source issue found in the product catalog: the category and fulfillment filter containers carried `aria-label` but had no explicit named grouping role. They are now `role="group"` with their existing Vietnamese accessible labels, so assistive technology can expose the two related button sets as named groups.
+- Source change: `public/index.html`, commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`.
+- Regression assertions: `tests/storefront-operations.test.mjs`, commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`.
+- Read-back verification confirms both role/label pairs and both regression assertions are present. This is static read-back only, **not** a passing Node test suite, Preview deployment, live capture, or owner visual acceptance.
+- GitHub combined-status queries for both commits currently return no statuses; no CI/deploy PASS has been established for this change. Do not claim this change is validated or deployed. The previously documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7` until a new successful deployment is verified.
+- Next: obtain/run the relevant validation using an authorized workflow path, inspect the final result, then deploy Preview only and verify exact deployed SHA before any live catalog capture. Do not change other catalog behavior without another concrete finding.
+- The previously owner-PASSed `#order` section remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged; no Production deployment or restricted-scope changes.
