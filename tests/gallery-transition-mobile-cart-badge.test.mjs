@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 
@@ -24,7 +25,8 @@ assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /instant=instant\|\|window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /const decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)/);
-assert.match(html, /Promise\.resolve\(decoded\)\.catch\(\(\)=>\{\}\)\.then\(revealDecodedImage\)/);
+assert.match(html, /Promise\.resolve\(decoded\)\.then\(revealDecodedImage,rejectDecodedImage\)/);
+assert.match(html, /const rejectDecodedImage=\(\)=>\{[\s\S]*?incoming\.classList\.remove\('is-active'\)[\s\S]*?active\.classList\.add\('is-active'\)/);
 assert.match(html, /@keyframes sdFullscreenOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-18%\)/);
 assert.match(html, /@keyframes sdFullscreenInRight\{from\{opacity:1;transform:translateX\(18%\)/);
 assert.match(html, /@keyframes sdGalleryOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-22%\) scale\(\.985\);filter:blur\(0\)\}\}/);
@@ -60,3 +62,134 @@ assert.match(html, /history\.replaceState\(\{\.\.\.current,\[SD_MODAL_HISTORY_KE
 assert.match(html, /const intentionalCheckoutBack=currentModal==='checkout'&&targetModal==='cart'[\s\S]*?targetModal==='cart'\|\|targetModal==='account'[\s\S]*?history\.back\(\);return/);
 
 console.log('PASS: gallery changes preload/decode before outgoing animation; fullscreen retains layered images; synchronized 1-second cart animation, modal toggles/history, mobile cart badge synchronizes and welcome fade reveals the bar.');
+
+
+// Execute the actual fullscreen transition function with deterministic load/decode timing.
+const fullscreenRuntimeStart = html.indexOf('const FULLSCREEN_SLIDE_MS=300;');
+const fullscreenRuntimeEnd = html.indexOf('function renderFullscreenThumbs(', fullscreenRuntimeStart);
+assert.ok(fullscreenRuntimeStart >= 0 && fullscreenRuntimeEnd > fullscreenRuntimeStart,
+  'The fullscreen runtime fixture must isolate the current transition implementation.');
+const fullscreenRuntimeSource = html.slice(fullscreenRuntimeStart, fullscreenRuntimeEnd);
+
+function deferredDecode() {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+  return { promise, resolve, reject };
+}
+function mockClassList(initial = []) {
+  const values = new Set(initial);
+  return {
+    add(...names) { names.forEach(name => values.add(name)); },
+    remove(...names) { names.forEach(name => values.delete(name)); },
+    contains(name) { return values.has(name); }
+  };
+}
+function createFullscreenHarness() {
+  const decodeQueue = [];
+  function makeImage(id, initialSrc, active) {
+    let source = initialSrc;
+    const attributes = new Map();
+    if (initialSrc) attributes.set('src', initialSrc);
+    return {
+      id, complete: Boolean(initialSrc), naturalWidth: initialSrc ? 320 : 0,
+      naturalHeight: initialSrc ? 240 : 0, alt: '', onload: null, onerror: null,
+      classList: mockClassList(active ? ['is-active'] : []),
+      get src() { return source; },
+      set src(value) {
+        if (value !== source) {
+          source = value;
+          if (value) attributes.set('src', value); else attributes.delete('src');
+          this.complete = false; this.naturalWidth = 0; this.naturalHeight = 0;
+        }
+      },
+      getAttribute(name) { return name === 'src' ? (source || null) : (attributes.get(name) ?? null); },
+      setAttribute(name, value) { attributes.set(name, String(value)); },
+      removeAttribute(name) { attributes.delete(name); },
+      decode() {
+        const pending = deferredDecode();
+        decodeQueue.push(pending);
+        return pending.promise;
+      }
+    };
+  }
+  const images = [makeImage('sdFullscreenImage', 'old.jpg', true), makeImage('sdFullscreenImageNext', '', false)];
+  const frame = { style: {} };
+  const context = {
+    images, frame, decodeQueue,
+    window: { matchMedia: () => ({ matches: true }), __sdUpdateDetailWatermark() {} },
+    currentProduct: { title: 'Regression product' },
+    detailImages: ['old.jpg', 'new.jpg', 'newer.jpg'],
+    imgPath: value => value,
+    $: selector => selector === '#sdFullscreenFrame' ? frame
+      : selector === '#sdFullscreenImage' ? images[0]
+      : selector === '#sdFullscreenImageNext' ? images[1] : null,
+    sizeFullscreenFrame() {}
+  };
+  const prelude = [
+    "let fullscreenSwapTimer = null;",
+    "let fullscreenAnimationTimer = null;",
+    "let fullscreenTransitionId = 0;",
+    "let fullscreenActiveLayer = 0;",
+    "function $(selector) { return context.$(selector); }",
+    "function fullscreenImages() { return images; }",
+    "function activeFullscreenImage() { return images[fullscreenActiveLayer ? 1 : 0]; }",
+    "function sizeFullscreenFrame(image) { return context.sizeFullscreenFrame(image); }",
+    "function imgPath(value) { return context.imgPath(value); }",
+    "const window = context.window;",
+    "const currentProduct = context.currentProduct;",
+    "const detailImages = context.detailImages;",
+    "const frame = context.frame;",
+    "const images = context.images;"
+  ].join(String.fromCharCode(10));
+  const sandbox = { context };
+  runInNewContext(prelude + String.fromCharCode(10) + fullscreenRuntimeSource, sandbox);
+  return {
+    images, decodeQueue,
+    run: source => sandbox.setFullscreenPhoto(source, 'left', true),
+    loadIncoming: image => {
+      const handler = image.onload;
+      assert.equal(typeof handler, 'function', 'Incoming image should wait for its load event.');
+      image.complete = true; image.naturalWidth = 320; image.naturalHeight = 240;
+      handler();
+    }
+  };
+}
+async function flushGalleryMicrotasks() {
+  for (let i = 0; i < 5; i++) await Promise.resolve();
+}
+function assertExactlyOneActivePhoto(images, expected) {
+  assert.equal(images.filter(image => image.classList.contains('is-active')).length, 1,
+    'Exactly one fullscreen photo layer must be visible at each settled checkpoint.');
+  assert.equal(expected.classList.contains('is-active'), true);
+}
+{
+  const gallery = createFullscreenHarness();
+  gallery.run('new.jpg'); gallery.loadIncoming(gallery.images[1]);
+  assert.equal(gallery.decodeQueue.length, 1);
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
+  assert.equal(gallery.images[1].getAttribute('src'), 'new.jpg');
+}
+{
+  const gallery = createFullscreenHarness();
+  gallery.run('new.jpg'); gallery.loadIncoming(gallery.images[1]);
+  gallery.decodeQueue[0].reject(new Error('simulated decode failure')); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  assert.equal(gallery.images[1].classList.contains('is-active'), false,
+    'Decode rejection must not reveal an image that is not confirmed decoded.');
+}
+{
+  const gallery = createFullscreenHarness();
+  gallery.run('new.jpg'); gallery.loadIncoming(gallery.images[1]);
+  gallery.run('newer.jpg'); gallery.loadIncoming(gallery.images[1]);
+  assert.equal(gallery.decodeQueue.length, 2);
+  gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  gallery.decodeQueue[1].resolve(); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
+  assert.equal(gallery.images[1].getAttribute('src'), 'newer.jpg',
+    'A stale decode must never replace the latest requested next/previous photo.');
+}
+console.log('PASS: fullscreen runtime preserves the current frame, rejects failed decodes, and ignores stale competing transitions.');

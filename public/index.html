@@ -998,8 +998,19 @@ function setFullscreenPhoto(src,direction='left',instant=false){
     syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
    },FULLSCREEN_SLIDE_MS+20);
   };
-  const decoded=typeof incoming.decode==='function'?incoming.decode():Promise.resolve();
-  Promise.resolve(decoded).catch(()=>{}).then(revealDecodedImage);
+  const rejectDecodedImage=()=>{
+   if(transitionId!==fullscreenTransitionId)return;
+   // A failed decode is not a successful transition: keep the last decoded photo visible.
+   incoming.classList.remove('is-active');
+   clearFullscreenSlideClasses(incoming);
+   active.classList.add('is-active');
+   syncImageAccessibility(active);
+   window.__sdUpdateDetailWatermark?.();
+  };
+  let decoded;
+  try{decoded=typeof incoming.decode==='function'?incoming.decode():Promise.resolve()}
+  catch{decoded=Promise.reject()}
+  Promise.resolve(decoded).then(revealDecodedImage,rejectDecodedImage);
  };
  const failLoad=()=>{if(transitionId!==fullscreenTransitionId)return;incoming.onload=null;incoming.onerror=null;clearFullscreenSlideClasses(incoming);active.classList.add('is-active');syncImageAccessibility(active);window.__sdUpdateDetailWatermark?.()};
  if((incoming.getAttribute('src')||'')===next&&incoming.complete&&incoming.naturalWidth){finishLoad();return}
