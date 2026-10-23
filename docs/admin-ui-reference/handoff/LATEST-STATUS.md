@@ -1,11 +1,13 @@
 # LATEST STATUS — SinDarealest Admin
 
-## Live checkpoint — 2026-10-23 05:34 UTC
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Live branch HEAD at the start of this sync: `a5d0076eda669b670b3de9ba4da2069c25f149f2`; exact source/test SHA verified by Actions: `a4e2508235cb928568992f8dba408acc913f2baf`. The evidence child and handoff-only commits are not new application-source tests.
-- [Admin Preview diagnostics #39906240167](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167) **SUCCESS** on exact source/test SHA `a4e2508235cb928568992f8dba408acc913f2baf`: `npm run check`, `npm test`, and the local Playwright screenshot matrix all PASS. Artifact [admin-preview-evidence-374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167/artifacts/12481355528): 132 generated PNGs, 120 fixture module captures, 112 fixture metrics (archive also includes the approved reference PNG). This is local source/read-only fixture evidence; deployed diagnostic confirms the login-shell CSS signature only.
-- Screen 12 Activity Log/Notifications tabs and regression assertion are fixed and pass on the exact SHA. The prior test failure was an assertion mismatch: it expected internal event key `product_updated`, while the rendered UI correctly showed `Đã sửa sản phẩm`.
-- PR #111 remains OPEN/unmerged; branch head at checkpoint `a5d0076eda669b670b3de9ba4da2069c25f149f2`. PR #108 remains OPEN/unmerged/read-only at `c0dcfa6ff60519dc78bc9aef5aaed10cdf2763dc`. `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; no merge or production deployment.
-- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Live checkpoint — 2026-10-23 06:04 UTC
+- Source/test SHA: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`. Validate [#39909118547](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547) **SUCCESS** on this exact SHA.
+- Admin Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) is **IN_PROGRESS**; last observed active step was Chromium installation. Prior Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) failed the 320px fixture assertion: scroll width 284px versus stale requirement >288px. The threshold was adjusted to >10px on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; wait for the new run before claiming a pass.
+- Mobile product-gallery CSS was compacted; the test now checks the full upload zone is above the sticky footer at 390×844. Screenshot-level confirmation is still pending.
+- PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2` (418 files, +40,048/-212); PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866` (291 files); `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge/deployment.
+- B1 cleanup/provenance audit is complete and must not be repeated without new evidence.
+## Historical source/Preview checkpoint
+
 ## Historical source/Preview checkpoint — 2026-10-23 04:07 UTC (superseded above)
 - Application source/test SHA: `000d3d84a9cf8c63144388f80879b5cc1439d161`.
 - Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) **SUCCESS on exact SHA**; Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) **SUCCESS on that same SHA**.
