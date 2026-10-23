@@ -636,7 +636,7 @@ jobs:
                         duration: css.animationDuration,
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
                         playState: animation?.playState || 'missing',
-                        scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1
+                        scaleX
                       };
                     });
                     assert.equal(reselectionMotion.animationName,
