@@ -671,3 +671,12 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Most recent unlocked source audit: no concrete reproducible defect found; no code change and no new CI/deploy from that audit. Static anchor/button/image/link/ID checks are source-level only, not real browser or visual acceptance.
 - Keep CI, Preview deploy, browser capture, and owner acceptance as separate evidence categories. Never infer one from another.
 - Multi-track execution requirement: while one gate runs, perform a non-conflicting audit/review in an unlocked area; return to check gate result and exact SHA. Do not idle or stop after a status report.
+ 
+## LATEST TEST UPDATE — MOBILE SLIDE + PRELOAD ALL ALBUM PHOTOS — 2026-10-24
+
+- PASS — source and automated tests, including gallery transition assertions: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856
+- PASS — Cloudflare Pages Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813
+- Preview URL: https://9fe68f80.sindarealest2.pages.dev/
+- Added assertions that opening the fullscreen viewer starts preloading all album photos and that mobile transitions use the directional slide after decode; runtime coverage checks decode failure and stale competing requests.
+- Not run/accepted: real-device visual test. Owner must verify slow and rapid taps and confirm there is no residual flicker or ghosting. Do not treat the skipped Hero-guarded visual workflow as visual PASS.
+- Source commit: `be27230919462aabbb86c8a9b4a2369375dd752f`; test commit: `87cef74f427ff7178e984e3bd836152948f1d974`.

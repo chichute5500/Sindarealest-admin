@@ -698,3 +698,16 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Locks remain: Hero PAUSED (do not inspect/edit/test/capture); `#order` PASS/LOCKED; catalog Liquid Glass filters PASS/LOCKED; warranty claim form PASS/LOCKED. No Admin/backend/API/auth, catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access/infrastructure, payment-path or Production changes.
 - Latest read-only source audit found no new reproducible defect; static checks are not browser/visual acceptance. Next work: source-first audit of an unlocked storefront area, concrete reproducible issue only, regression test before fix.
 - Operating protocol: report with evidence, then continue automatically. While CI/deploy runs, work on a separate safe audit stream; never wait idle. Recheck workflow outcomes and exact deployed SHA before reporting. Stop only when owner inspection/decision or a user-side action is genuinely required.
+ 
+## LATEST VERIFIED UPDATE — MOBILE FULLSCREEN SLIDE + FULL-ALBUM PRELOAD — 2026-10-24
+
+- Owner confirmed the mobile fullscreen gallery still flickers and requested a directional image transition plus preloading every image when a product album is opened.
+- `public/index.html` now enables the existing 300 ms directional slide on mobile as well as desktop. It waits for incoming image load/decode before starting the slide, retains transition-token guards, and keeps reduced-motion preferences intact.
+- Opening fullscreen clears the per-album preload cache and starts preloading every image in `detailImages`; the selected image gets high fetch priority and other album images low priority. The previous 12-image cap and mobile animation/transform suppression were removed.
+- Source/test changes: `be27230919462aabbb86c8a9b4a2369375dd752f` (gallery behavior) and `87cef74f427ff7178e984e3bd836152948f1d974` (regression tests).
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813
+- Exact Preview: https://9fe68f80.sindarealest2.pages.dev/
+- The CI assertions now cover full-album preload and the mobile directional transition/runtime decode race. This is source/test validation, not real-device visual acceptance.
+- Owner must retest the fullscreen gallery on a phone with both slow and fast previous/next taps. Do not mark the issue PASS until owner confirms flicker and ghosting are gone.
+- PR #108 stays OPEN/unmerged; `main` and Production remain untouched. Hero remains paused/guarded.

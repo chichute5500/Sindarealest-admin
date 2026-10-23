@@ -166,3 +166,17 @@ Các commit mới nhất trên nhánh:
 - Không in hoặc yêu cầu secrets.
 - Giữ PR #108 OPEN/unmerged.
 - Người dùng đã xác nhận các phần ngoài fullscreen image là PASS; không yêu cầu họ test lại các phần đó. Chỉ cần họ kiểm tra lại fullscreen gallery sau bản sửa kế tiếp.
+ 
+## HANDOFF UPDATE — 2026-10-24 — FULLSCREEN GALLERY SLIDE + PRELOAD ALL PHOTOS
+
+Tiếp tục từ Preview hiện có, không khởi động lại dự án.
+
+- Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 vẫn OPEN/unmerged.
+- Thay đổi mới: fullscreen gallery dùng directional slide 300 ms trên mobile và desktop. Khi mở bộ ảnh sản phẩm, bắt đầu preload toàn bộ ảnh trong album; ảnh đang chọn ưu tiên cao, các ảnh còn lại ưu tiên thấp. Chỉ bắt đầu chuyển khi ảnh đích load/decode xong; giữ guard chống request/decode cũ và tôn trọng reduced-motion.
+- Code commit: `be27230919462aabbb86c8a9b4a2369375dd752f`; test commit: `87cef74f427ff7178e984e3bd836152948f1d974`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813
+- Preview URL: https://9fe68f80.sindarealest2.pages.dev/
+- **Chưa được coi là PASS về hình ảnh.** Chủ dự án cần test trên điện thoại: nhấn chậm và nhấn nhanh liên tục nút trước/sau, xác nhận hết nháy và ảnh bóng. Nếu còn lỗi, tiếp tục trace CSS/layer thực tế, không quay lại cách bỏ hoàn toàn hiệu ứng.
+- Không merge PR, không deploy Production, không chỉnh `main`, không mở lại các mục PASS/LOCKED. Hero vẫn PAUSED BY OWNER và visual workflow có thể bị guard skip.
+

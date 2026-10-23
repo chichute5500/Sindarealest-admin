@@ -105,3 +105,10 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Run [39357805505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505) and artifact [12236385238](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39357805505/artifacts/12236385238) report `accessServiceTokenConfigured=false` and `accessBlocked=true` before the storefront rendered.
 - Decision: never substitute fixture screenshots into canonical screenshot folders and do not modify HTML/CSS or product routing against an unobserved render. First enable Preview-only Service Auth, then validate a genuine baseline.
 - Compare at commit `8dda620a6e2fede306de9ad3440ff5e34b338eb1`: diverged, 311 ahead / 6 behind / 73 files changed. Keep PR #108 unmerged and do not deploy Production until out-of-scope admin/API/migration/config changes are isolated and reviewed.
+ 
+## DECISION UPDATE — FULLSCREEN GALLERY TRANSITION — 2026-10-24
+
+- Use a directional slide for both desktop and mobile instead of the mobile atomic no-animation swap. Both image layers remain in the same viewer frame; the incoming image must finish load/decode before the 300 ms slide starts.
+- On opening a product's fullscreen album, proactively preload all images belonging to that product album; prioritize the selected photo, then warm the rest at low fetch priority.
+- Keep reduced-motion support, stale-transition guards, decode-failure fallback, original product image URLs, and existing gallery controls. Do not change unrelated gallery/detail behavior.
+- Acceptance remains pending until the owner tests the Preview on a real phone. CI/Preview deployment do not prove the flicker is fixed.

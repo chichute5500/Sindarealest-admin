@@ -555,3 +555,12 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - Hero: PAUSED.
 - `#order`, catalog Liquid Glass filters, warranty claim form: PASS/LOCKED.
 - PR #108 must remain OPEN/unmerged. No Production deploy or restricted-scope changes.
+ 
+## LATEST OPEN TASK UPDATE — 2026-10-24
+
+- Current open task remains mobile fullscreen product-gallery flicker.
+- New behavior: 300 ms directional slide is enabled on mobile; opening the fullscreen album starts preloading all photos in that product's `detailImages` collection. Incoming photos must load and decode before animation starts; transition-token checks guard rapid taps and stale decode completions.
+- Source commit: `be27230919462aabbb86c8a9b4a2369375dd752f`; regression-test commit: `87cef74f427ff7178e984e3bd836152948f1d974`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813. Preview: https://9fe68f80.sindarealest2.pages.dev/
+- Next: owner phone test, slow taps and rapid taps. If any flicker/ghost remains, keep this task OPEN and inspect actual rendered layer/CSS behavior; do not claim visual acceptance from CI alone.
+- Preserve PR #108 OPEN/unmerged; no Production deploy, no Hero work, no other PASS/LOCKED area reopening.
