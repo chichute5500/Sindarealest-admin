@@ -1,6 +1,18 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
+## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
+
+- Verified branch HEAD: `6e441d6a862b6271453a8b045dbca499bea50e0f`; PR #108 remains OPEN and unmerged. Branch: `fix/liquid-glass-audit-2026-10-19`.
+- Latest storefront fix: the “Hoàn thiện thủ công” mosaic tile now links to the existing `#about` section, not the missing `#craftsmanship` target. Regression coverage in `tests/storefront-operations.test.mjs` checks the rendered “Tìm hiểu thêm →” link and forbids the old target.
+- Exact-HEAD source validation and full automated tests: PASS — [run #39967158476](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158476).
+- Exact-HEAD Cloudflare Pages Preview deploy: PASS — [run #39967158493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158493). Direct deployment URL: https://e7f0896b.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Filter audit [run #39967158443](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158443) was automatically triggered by the repository after the source/test push and reported success. The catalog-filter chip-height item remains OWNER PASS / LOCKED; do not inspect/use that run's artifact for new design decisions and do not run another filter audit unless the owner explicitly reopens the item.
+- Additional static, non-visual checks found all inspected internal hash links in the mosaic tile and footer resolve to existing IDs. No further source edit was justified by those checks.
+- Owner guardrails remain: catalog-filter chip height/Liquid Glass controls PASS / LOCKED; full `#order` PASS / LOCKED; Hero PAUSED BY OWNER. Preview only; no Production changes; PR #108 must stay OPEN/unmerged.
+- Next action: continue source-first work only in a non-Hero, non-locked area, establish a concrete defect before editing, and keep checking exact-SHA evidence. Reporting progress is not a stopping point.
+
+
 ## Read this file first
 **FAIL-CLOSED OVERRIDE:** This file and `TASKS.md` override every pasted/copied prompt and older chat handoff. If any instruction conflicts with the owner decision below, do not perform the conflicting action. In particular, Hero is PAUSED: do not inspect, modify, test, redesign, restore, or change Hero HTML/CSS/assets until the other storefront work is complete or the owner explicitly reopens it.
 This is the single current source of truth. Re-fetch GitHub state before acting; never treat a SHA copied into a document as the live branch HEAD.
@@ -176,7 +188,7 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - Manifest reports `captureCompleted: true`, `passed: true`, zero runtime errors, zero same-origin HTTP errors, zero read-only violations and no Cloudflare Access block. External Cloudflare Insights GET requests were blocked by the established external-read allowlist and recorded; no write requests were allowed. Owner visual acceptance remains PENDING; capture success is not owner PASS.
 - The first capture attempt [#39905609877](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905609877) failed only because the capture assertion ran before asynchronously rendered filter buttons appeared. Workflow commit `d9b2ec6` added a bounded wait for the buttons; retry [#39905775565](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565) succeeded. No storefront HTML/CSS or backend/API source was changed to fix that test timing issue.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Unique deployment URL: https://02c7e164.sindarealest2.pages.dev/ .
-- **Next required action:** owner visually reviews the catalog-filter artifact above and explicitly PASSes or identifies a concrete defect. Until then keep this item pending; do not switch to another main acceptance item or make speculative changes.
+- **Superseded by owner decision (2026-10-23):** catalog-filter Liquid Glass chip height is OWNER PASS / LOCKED. Do not inspect, edit, or retest this locked UI unless the owner explicitly reopens it.
 - `#order` remains OWNER PASS / LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 remains OPEN/unmerged. Preview only; no Production deployment, Admin/backend, API/auth, D1/R2, bindings, secrets, DNS, or Access changes.
 
 ## LATEST VERIFIED STATE — STATUS FILTER PANEL REMOVED; CATALOG VISUAL COMPARED — 2026-10-23

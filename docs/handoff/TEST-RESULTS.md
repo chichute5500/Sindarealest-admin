@@ -1,6 +1,18 @@
 # TEST & VISUAL AUDIT EVIDENCE INDEX
 Updated: 2026-10-23 — handoff protocol reconciled
 
+## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
+
+- Verified branch HEAD: `6e441d6a862b6271453a8b045dbca499bea50e0f`; PR #108 remains OPEN and unmerged. Branch: `fix/liquid-glass-audit-2026-10-19`.
+- Latest storefront fix: the “Hoàn thiện thủ công” mosaic tile now links to the existing `#about` section, not the missing `#craftsmanship` target. Regression coverage in `tests/storefront-operations.test.mjs` checks the rendered “Tìm hiểu thêm →” link and forbids the old target.
+- Exact-HEAD source validation and full automated tests: PASS — [run #39967158476](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158476).
+- Exact-HEAD Cloudflare Pages Preview deploy: PASS — [run #39967158493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158493). Direct deployment URL: https://e7f0896b.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Filter audit [run #39967158443](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158443) was automatically triggered by the repository after the source/test push and reported success. The catalog-filter chip-height item remains OWNER PASS / LOCKED; do not inspect/use that run's artifact for new design decisions and do not run another filter audit unless the owner explicitly reopens the item.
+- Additional static, non-visual checks found all inspected internal hash links in the mosaic tile and footer resolve to existing IDs. No further source edit was justified by those checks.
+- Owner guardrails remain: catalog-filter chip height/Liquid Glass controls PASS / LOCKED; full `#order` PASS / LOCKED; Hero PAUSED BY OWNER. Preview only; no Production changes; PR #108 must stay OPEN/unmerged.
+- Next action: continue source-first work only in a non-Hero, non-locked area, establish a concrete defect before editing, and keep checking exact-SHA evidence. Reporting progress is not a stopping point.
+
+
 This is the single index for test, deployment and visual-audit evidence. Repeated run-by-run narratives were consolidated here. Old artifacts remain accessible from GitHub Actions; a PASS applies only to its exact SHA.
 
 ## Automation efficiency — applied 2026-10-23

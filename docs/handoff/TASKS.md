@@ -1,6 +1,18 @@
 # ACTIVE TASK LEDGER — SINDAREALEST2
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
+## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
+
+- Verified branch HEAD: `6e441d6a862b6271453a8b045dbca499bea50e0f`; PR #108 remains OPEN and unmerged. Branch: `fix/liquid-glass-audit-2026-10-19`.
+- Latest storefront fix: the “Hoàn thiện thủ công” mosaic tile now links to the existing `#about` section, not the missing `#craftsmanship` target. Regression coverage in `tests/storefront-operations.test.mjs` checks the rendered “Tìm hiểu thêm →” link and forbids the old target.
+- Exact-HEAD source validation and full automated tests: PASS — [run #39967158476](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158476).
+- Exact-HEAD Cloudflare Pages Preview deploy: PASS — [run #39967158493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158493). Direct deployment URL: https://e7f0896b.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Filter audit [run #39967158443](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158443) was automatically triggered by the repository after the source/test push and reported success. The catalog-filter chip-height item remains OWNER PASS / LOCKED; do not inspect/use that run's artifact for new design decisions and do not run another filter audit unless the owner explicitly reopens the item.
+- Additional static, non-visual checks found all inspected internal hash links in the mosaic tile and footer resolve to existing IDs. No further source edit was justified by those checks.
+- Owner guardrails remain: catalog-filter chip height/Liquid Glass controls PASS / LOCKED; full `#order` PASS / LOCKED; Hero PAUSED BY OWNER. Preview only; no Production changes; PR #108 must stay OPEN/unmerged.
+- Next action: continue source-first work only in a non-Hero, non-locked area, establish a concrete defect before editing, and keep checking exact-SHA evidence. Reporting progress is not a stopping point.
+
+
 Only current, actionable tasks belong here. Historical run-by-run evidence is in [TEST-RESULTS.md](TEST-RESULTS.md); do not treat old checkpoint rows as current.
 
 | ID | Status | Next action / acceptance |
@@ -9,7 +21,7 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 | WORKFLOW-EFFICIENCY | APPLIED; source validation PASS | Commit `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`; [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405) PASS. Docs/README and workflow-only changes no longer trigger needless deployment/capture; Admin smoke is manual; stale validation/review runs are superseded. |
 | HERO-TEMP-HIDDEN | PAUSED BY OWNER — DO NOT TOUCH | Owner says leave Hero unchanged for now and return to it only after other storefront work is complete. Do not edit Hero markup/CSS/assets, run Hero-specific rework, or call it PASS during this pause. Preserve the uploaded image and derivative. |
 | STOREFRONT-VISUAL-AUDIT | ORDER SECTION OWNER PASS / LOCKED | Owner explicitly PASSed the current full `#order` section on 2026-10-23. Do not alter without explicit permission. |
-| CATALOG-FILTER-A11Y / HEIGHT | TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING | Accessibility and Liquid Glass activation remain intact. Owner-directed height refinement in public/index.html: visible chip surface inset 2px vertically while real button hit target stays 44px. Exact-source CI/deploy/live capture PASS at 5b7596aba026cf4d4ed72fc4802ba461b105eb34; latest artifact is linked below. Next gate: owner visual review; do not mark OWNER PASS until explicit confirmation. |
+| CATALOG-FILTER-A11Y / HEIGHT | ACCESSIBILITY IMPLEMENTATION TECHNICAL PASS; CHIP HEIGHT OWNER PASS / LOCKED | `#categoryFilters` and `#fulfillmentFilters` keep their named group roles. The owner explicitly PASSed and locked the current 2px vertical chip-surface inset while preserving the 44px hit target on 2026-10-23. Do not change or retest the locked filter item unless explicitly reopened. Historical exact-SHA evidence remains below; the latest `#about` link fix does not change filter styling. |
 | QR-PAYMENT-CONTRACT | BLOCKED ON TRUSTED BACKEND CONTRACT/CONFIG | Keep fail-closed: no QR or transfer request until trusted order status and complete receiver/payment instructions exist. Do not modify Admin/backend in this branch. |
 
 ## Working protocol (owner-approved 2026-10-23)
@@ -101,7 +113,7 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 
 ## ACTIVE NON-HERO TASK — CATALOG FILTER ACCESSIBLE NAMES — 2026-10-23
 
-- **Status: TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING.**
+- **Status: ACCESSIBLE-NAME IMPLEMENTATION / REGRESSION COVERAGE TECHNICAL PASS.** The separate filter chip-height visual item is OWNER PASS / LOCKED; do not retest or edit that locked UI without explicit permission.
 - Source issue/fix: `public/index.html` uses `role="group"` with Vietnamese accessible names for `#categoryFilters` and `#fulfillmentFilters`. Regression assertions live in `tests/storefront-operations.test.mjs`.
 - Automated source integrity, dependency audit and full test suite PASS at [run #39905775440](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775440), SHA `d9b2ec642b4afede7c16a2a4224546d2b5df3423`. Earlier final source/test commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a` also passed full CI in [run #39904430124](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39904430124).
 - Catalog-only live Preview capture PASS: [run #39905775565](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565), [artifact #12480418806](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806). Verified `sourceHeadSha == deployedPreviewSha == d9b2ec642b4afede7c16a2a4224546d2b5df3423`, successful Preview deployment ID `02c7e164-92a9-4167-b3ab-a2de343a041d`, public-tree equivalence and exact source SHA match.

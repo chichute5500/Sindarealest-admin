@@ -14,10 +14,10 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108
 - PR phải giữ OPEN, không merge.
-- Storefront source SHA verified by the latest live catalog capture: `5b7596aba026cf4d4ed72fc4802ba461b105eb34`. A docs-only handoff refresh may advance branch HEAD; refetch GitHub HEAD directly before acting.
-- Latest source/Preview SHA match at capture: `5b7596aba026cf4d4ed72fc4802ba461b105eb34`; Preview deploy PASS (deployment ID `6a0000cc-ff21-4a6b-bba5-daff4245a663`).
-- Latest CI/source tests PASS at SHA `5b7596aba026cf4d4ed72fc4802ba461b105eb34`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829322
-- Latest catalog-only Preview capture PASS kỹ thuật, 26 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350. Visual acceptance của chủ dự án vẫn PENDING.
+- Latest verified branch HEAD: `6e441d6a862b6271453a8b045dbca499bea50e0f`. Always refetch branch HEAD before acting. The latest storefront fix corrects the “Hoàn thiện thủ công” tile from missing `#craftsmanship` to existing `#about`.
+- Latest source/Preview deployment SHA: `6e441d6a862b6271453a8b045dbca499bea50e0f`; Preview deploy PASS at [run #39967158493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158493). Direct URL: https://e7f0896b.sindarealest2.pages.dev/ ; alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Latest CI/source tests PASS at SHA `6e441d6a862b6271453a8b045dbca499bea50e0f`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158476
+- Owner đã xác nhận PASS / LOCKED chiều cao chip Liquid Glass của bộ lọc danh mục. Workflow audit #39967158443 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158443) tự kích hoạt sau push source/test và báo thành công; không mở/đọc artifact này để đưa ra quyết định thiết kế mới, không chạy audit bộ lọc lần nữa khi chưa được chủ dự án mở khóa.
 - Chụp live Preview phần `#order` PASS về mặt kỹ thuật: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271
 - Artifact 8 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271/artifacts/12479461634
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
@@ -42,13 +42,13 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 ## Bước tiếp theo bắt buộc
 
 1. Chủ dự án đã xác nhận **PASS phiên bản hiện tại của toàn bộ phần quy trình đặt hàng an tâm (`#order`)**. Đánh dấu PASS/LOCKED; tuyệt đối không yêu cầu duyệt lại hoặc chỉnh phần này nếu chưa có phép mở khóa rõ ràng.
-2. Catalog filter accessibility: source/test and Preview technical gates PASS; catalog-only capture has 16 screenshots tied to exact Preview SHA `d9b2ec642b4afede7c16a2a4224546d2b5df3423`. See CI #39905775440, capture #39905775565 and artifact #12480418806. The only remaining gate is owner visual acceptance. Do not run Hero-inclusive capture; do not touch the owner-locked `#order`.
+2. Catalog-filter chip height / current Liquid Glass controls are OWNER PASS / LOCKED (2026-10-23). Do not edit or retest this item unless the owner explicitly reopens it. Accessible-name code and assertions remain intact. Do not run Hero-inclusive capture and do not touch the owner-locked `#order`.
 3. Trước mọi thay đổi, đọc HEAD mới nhất, PR #108, trạng thái CI, Preview deploy và SHA đã deploy. Đối chiếu mọi thay đổi kể từ SHA trong prompt; không dựa vào SHA cũ như HEAD hiện tại.
 4. Sau mỗi thay đổi, kiểm tra workflow đến trạng thái cuối; trong lúc CI/deploy/capture chạy, làm việc độc lập an toàn nếu có. Không tuyên bố PASS khi chưa có bằng chứng.
 5. Cập nhật cả bốn file handoff sau mỗi trạng thái quan trọng. Commit tài liệu riêng khi cần; không đổi source chỉ để cập nhật handoff.
 6. Hero vẫn PAUSED BY OWNER: không mở, sửa, kiểm thử riêng, chụp ảnh hay khôi phục. PR #108 giữ OPEN, không merge. Chỉ Preview; không Production.
 
-**Tóm tắt trạng thái:** source/tests/deploy và ảnh live hiện đều PASS về mặt kỹ thuật; phần #order đang chờ chủ dự án duyệt trực quan. Hero vẫn tạm dừng. PR #108 OPEN, không merge. Production không bị thay đổi.
+**Tóm tắt trạng thái hiện tại:** link “Tìm hiểu thêm” đã sửa sang `#about`; CI và Preview deploy PASS ở HEAD `6e441d6a862b6271453a8b045dbca499bea50e0f`. Chiều cao filter Liquid Glass và `#order` đều OWNER PASS / LOCKED; Hero PAUSED BY OWNER. PR #108 OPEN, không merge. Chỉ Preview, không Production.
 
 ## OWNER CONFIRMED — ORDER SECTION PASS/LOCKED — 2026-10-23
 
