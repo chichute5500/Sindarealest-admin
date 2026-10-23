@@ -1,5 +1,14 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
+## Current checkpoint — 2026-10-23 11:42 UTC — Screen 12 unread badge capture corrected; Validate and Preview pass
+
+- **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD at checkpoint start is `ab61a99d138380aa21642e9873446c3c442f418b`, an Actions evidence child after tested commit `6de79a88579d4798efba518f97c63cb150452bbd`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, Production deployment, or writes to `main`/the static website branch.
+- **Finding and fix:** approved reference Screen 12 shows an unread-notification badge. The source UI already calculates unread notifications; the screenshot test had marked them read before capturing, so the artifact falsely omitted the badge. Commit [`6de79a8`](https://github.com/chichute5500/Sindarealest-admin/commit/6de79a88579d4798efba518f97c63cb150452bbd) resets the synthetic local read state after behavior assertions and leaves the tab in the reference-relevant unread state before capture. This is test-only; no application source/business data/API/database changed.
+- **Exact-SHA verification:** [Validate #39947460591](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460591) PASS and [Preview #39947460554](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460554) PASS on `6de79a88579d4798efba518f97c63cb150452bbd`. Artifact [admin-preview-evidence-417](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460554/artifacts/12499200648) contains 132 PNGs and 112 fixture metrics. The 390×844 light screenshot now shows the unread badge with synthetic fixture count 5; it does not claim the reference's real count of 3 or any authenticated business state.
+- **Acceptance boundary unchanged:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Deployed diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only.
+- **Next:** continue comparing remaining screen screenshots against the approved reference; only fix reproducible issues, verify on exact SHA, and update handoff after meaningful work. Keep all safety boundaries.
+
+
 ## Current checkpoint — 2026-10-23 11:24 UTC — Mobile activity-log density refinement; Validate and Preview pass
 
 - **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD is `f7f46e48856cd292ae012e2075da2625e99ff152` (Actions evidence child after tested source/test commit `ff807aa4e3175e61d4d001c84b4bb815cd11388c`). PR #111 is OPEN/unmerged and points to the live branch; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, or writes to `main`/the static website branch.
