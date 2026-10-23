@@ -1,3 +1,16 @@
+# AUTHORITATIVE NEXT-CHAT OVERRIDE — VERIFY SLIDESHOW TEST HARNESS — 2026-10-24
+
+Continue existing repository. First re-fetch HEAD, PR #108, and all four handoff files.
+
+Current follow-up SHA `ed06d73b89477b637a72c25c7939ee94f32c056f` fixes only the slideshow missing-control regression harness: invoke setup in evaluated source with `String.fromCharCode(10)`. Earlier SHA `5c1ba570934588ec80b8fffd69d4f69f4ae6225a` failed due to invalid JS assembly; do not hide that failed gate.
+- CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995473464 (in progress when recorded).
+- Preview: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995473418 (in progress when recorded).
+- Verify both exact SHA outcomes before marking PASS. Last known green source/test SHA: `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`, CI #39994601040, Preview #39994600974, URL https://5052d769.sindarealest2.pages.dev/.
+
+Keep PR #108 open/unmerged, no Production deploy, main change or locked-scope changes. Hero paused; #order, catalog filter and warranty claim form locked.
+
+---
+
 # AUTHORITATIVE NEXT-CHAT OVERRIDE — SLIDESHOW CONTROL GUARD IN CI — 2026-10-24
 
 Continue existing repository, re-fetch HEAD/PR and all four handoff files first.
