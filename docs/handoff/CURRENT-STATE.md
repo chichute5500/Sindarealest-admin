@@ -1,3 +1,13 @@
+## LATEST AUTHORITATIVE UPDATE — SLIDESHOW CONTROL GUARD — 2026-10-24
+
+- Follow-up source/test commit: `3fabbfc0bea134f9babde0b856276a47c966553f`. Defensive guard added to `setupArtSlideshow()`: require the pause, previous, and next controls before binding handlers or starting timers. If a required control is absent, the slideshow safely returns rather than throwing or creating an unreachable autoplay interval.
+- Added regression coverage for a missing pause control and retained tests for normal pause/resume and reduced-motion.
+- CI run [#39995117962](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995117962) and Preview deploy [#39995118190](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995118190) were in progress at this handoff. Do not mark this follow-up PASS until both finish on exact SHA `3fabbfc0bea134f9babde0b856276a47c966553f`.
+- Previous slideshow fix passed CI and Preview on `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`; Preview URL from that deployed SHA was https://5052d769.sindarealest2.pages.dev/. This follow-up SHA needs its own deployment verification.
+- PR #108 remains OPEN/unmerged; Preview only, no Production, all owner locks remain in effect. No browser visual acceptance.
+
+---
+
 ## LATEST AUTHORITATIVE UPDATE — COLLECTION SLIDESHOW PAUSE CONTROL — 2026-10-24
 
 - Source/test SHA: `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`.
