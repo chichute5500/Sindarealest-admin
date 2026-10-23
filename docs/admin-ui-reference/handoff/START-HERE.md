@@ -1,3 +1,16 @@
+## CURRENT HANDOFF — 2026-10-24 — Product catalog visible in isolated Admin Preview; continue runtime verification
+
+**User confirmation:** the user has now confirmed that products are visible in Admin Preview. Treat the “0 products” UI symptom as resolved for the current observed session; do not repeat seed/import or ask the user to re-check the same thing. This confirms the visible product list only, not full CRUD, images, login/session stability, or backend acceptance.
+
+- **Dedicated Preview:** `sindarealest-admin-preview`; stable alias `https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/`; dedicated D1 `sindarealest-admin-preview-db`, UUID `573ad702-05fc-405e-8ef3-0cf2e7fea98d`. Do not attach production/shared resources.
+- **Latest successful deploy evidence known:** [Actions run #39988045568](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39988045568), SHA `22e16f88c2e61d42007d40ba20732fd1b47fcfec`, deployment `d6fe9eb8-0447-4c9f-8aa6-1ae7cd1b1183`. Verify current live run/alias before relying on this as latest.
+- **Seed guard result:** [run #39991459897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39991459897) deliberately stopped before import because the isolated D1 already had `235` products (guard expected exactly zero). It verified the dedicated D1 name/UUID and seed source count (235); import and post-import steps were skipped. This run did not change the database. Do not rerun/import or modify seed workflow just to turn its red X green. The user's current confirmation that products are visible supersedes the earlier UI symptom.
+- **Do next:** inspect live API/UI behavior read-only first: product list GET, pagination/filters, image URL loading, and whether detail/edit screens load. Only make a targeted fix if a reproducible defect is found; add a regression test and run source validation plus isolated Preview on the exact tested SHA. Update this handoff after the next verified checkpoint.
+- **Isolation/safety:** do not change shared `CLOUDFLARE_PAGES_PROJECT`, storefront project `sindarealest2`, storefront branch `fix/liquid-glass-audit-2026-10-19`, or `main`; do not merge PR #111/#108/#112. Never use production D1 `sindarealest-db` UUID `f6c208a1-052a-445c-a3b7-a442783f9bd3` or AI Preview DB UUID prefix `6f444e33-`. Do not request or print secrets. No shared storefront R2; dedicated R2 was not created. Do not load `0002_seed_products.sql` again without explicit review/approval.
+- **Legacy UI acceptance remains separate:** all 12 reference screens still `PARTIAL_NOT_ACCEPTED`; exact visual parity `NOT_VERIFIED`; authenticated business/backend QA was not proven by synthetic screenshots. Product visibility does not close those acceptance gates.
+
+---
+
 ## CURRENT HANDOFF — 2026-10-23 16:10 UTC — Isolated Admin Pages project is deployed, but not configured for backend
 
 **Important correction for next chat:** The newly created Cloudflare Pages project is not ready for Admin login. Do not mistake a successful static deployment or a green source-validation workflow for a configured Admin environment. The user explicitly wants a new, separate Admin Preview and requires all existing storefront projects/branches/settings to remain unchanged.
