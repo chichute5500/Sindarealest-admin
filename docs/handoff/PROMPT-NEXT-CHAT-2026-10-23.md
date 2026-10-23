@@ -21,7 +21,7 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - Chụp live Preview phần `#order` PASS về mặt kỹ thuật (lịch sử): https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271
 - Artifact 8 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271/artifacts/12479461634
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
-- Exact deployment: https://6a0000cc.sindarealest2.pages.dev/
+- Historical Preview URL for the earlier #order capture (run #39902525271, not the current deployment): https://6a0000cc.sindarealest2.pages.dev/
 
 ## Việc đã hoàn tất và kiểm chứng
 
