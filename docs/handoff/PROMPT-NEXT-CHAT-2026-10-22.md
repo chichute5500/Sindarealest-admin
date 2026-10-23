@@ -45,3 +45,12 @@ Updated: 2026-10-23 — canonical handoff, owner decisions, and report-then-cont
 - Say BLOCKED only when a real dependency or permission is missing, and state the exact action needed.
 - Do not merely report progress and stop; continue working unless owner input or a genuine blocker is required.
 
+
+ 
+## Latest verified handoff update — 2026-10-23
+- Branch HEAD at capture: `cb8901b7218964e0609b5048a9ea28bfb52c42f7`; PR #108 OPEN and unmerged. Handoff documentation commits advance HEAD; re-fetch live branch HEAD before further changes.
+- Source/test CI PASS at exact SHA: [#39894447637](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447637).
+- Non-Hero order section: live element-only capture succeeded [#39894447648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447648), 8 images (mobile 360/390, tablet 768, desktop 1440; Light/Dark), selector `section.section.wrap#order` only. Artifact: [#12476071825](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447648/artifacts/12476071825).
+- Verified Cloudflare Preview deployment SHA equals capture source SHA `cb8901b7218964e0609b5048a9ea28bfb52c42f7`; alias: `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`. Manifest confirms 8/8, no runtime/same-origin HTTP errors, no write requests, and no Access bypass. Cloudflare Insights requests were blocked by allowlist.
+- **Owner visual acceptance remains PENDING.** Owner must review the order-section screenshots; do not mark PASS/LOCKED until the owner confirms. Hero remains PAUSED and untouched.
+- Prior run #39894291884 failed on a selector assertion; commit `cb8901b` corrected the assertion and run #39894447648 succeeded. Do not rerun this successful capture unless evidence becomes stale.
