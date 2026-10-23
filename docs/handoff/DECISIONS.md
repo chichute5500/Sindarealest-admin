@@ -1,3 +1,13 @@
+## DECISION UPDATE — CATALOG RESULT ANNOUNCEMENT — 2026-10-24
+
+- Use the concise `#pageSummary` as the polite atomic status region for product search/category result updates.
+- Do not make the entire product-card grid the live region; this avoids announcing a large set of card contents when the customer only needs the updated result summary.
+- Implemented in source SHA `7939990c2387654a66cf6f859933ca718ccd3848`; regression contract in `046629d4170221d4bd3858d405ca36a26f1b5ef9`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40041239674; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40041239657; Preview https://66a04db0.sindarealest2.pages.dev/.
+- This decision changes accessibility announcement semantics only. It does not reopen catalog filter appearance, catalog data, SKU routes, gallery, Hero, or other PASS/LOCKED scopes.
+
+---
+
 ## IMPLEMENTATION RECORD — STRICT CLIENT PRODUCT ROUTE MATCHING — 2026-10-24
 
 - Technical change committed in tree `8a92278e189bd9f83063bcd35284ea88a065cc01`: frontend route detection now validates product route segments against the canonical character/length constraints used by the existing middleware before calling `decodeURIComponent()`.

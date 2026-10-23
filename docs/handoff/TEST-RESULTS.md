@@ -1,3 +1,15 @@
+## LATEST EXACT-SHA TEST + DEPLOY RESULT — ACCESSIBLE CATALOG RESULT ANNOUNCEMENTS — 2026-10-24
+
+- Source commit: `7939990c2387654a66cf6f859933ca718ccd3848`; final source + regression-test commit: `046629d4170221d4bd3858d405ca36a26f1b5ef9`.
+- Regression test asserts that `#catalogGrid` is not the live region and `#pageSummary` is `role="status" aria-live="polite" aria-atomic="true"`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40041239674; all project integrity checks, dependency audit, and automated tests passed.
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40041239657; immutable URL https://66a04db0.sindarealest2.pages.dev/; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deployment logs verify exact `046629d4170221d4bd3858d405ca36a26f1b5ef9`, project `sindarealest2`, and Production branch `main`. Preview only.
+- Visual workflow was SKIPPED by the Hero safety guard. No manual screen-reader/device acceptance is claimed.
+- PR #108 remains OPEN/unmerged; no Production/main or restricted-scope changes.
+
+---
+
 ## LATEST EXACT-SHA TEST + DEPLOY RESULT — VERIFIED-SKU PRODUCT URLS — 2026-10-24
 
 - Source/test/deployed SHA: `10c074c9199d27badcbe825a7122033b9fe8fbb5`.
