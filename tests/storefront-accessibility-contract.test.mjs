@@ -34,6 +34,10 @@ assert.ok(html.includes("function trapMobileMenuTab(event){trapTabWithin($('#mob
   'Tab focus must be kept inside the open mobile navigation drawer');
 assert.ok(html.includes("if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}"),
   'The global key handler must route Tab through the mobile navigation drawer focus trap');
+assert.ok(html.includes("function trapCartTab(event){trapTabWithin($('#cartDrawer'),event)}"),
+  'Tab focus must be kept inside the active cart dialog');
+assert.ok(html.includes("if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}"),
+  'The global key handler must route Tab through the open cart dialog focus trap');
 
 assert.match(html, /<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal">/,
   'the product detail overlay must be the single modal dialog container');
