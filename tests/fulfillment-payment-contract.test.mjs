@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { summarizePaymentRows, validPublicQrImageKey, createOrderAccessToken, hashOrderAccessToken } from "../functions/_payments.js";
 import { fromRow, normalizeFulfillmentType, validateProduct } from "../functions/_lib.js";
+import { onRequestGet as servePublicQrImage } from "../functions/payment-qr/[key].js";
 const read = path => readFileSync(new URL(path, import.meta.url), "utf8");
 assert.equal(normalizeFulfillmentType("in_stock"), "in_stock");
 assert.equal(normalizeFulfillmentType("made_to_order"), "made_to_order");
@@ -23,6 +24,27 @@ assert.equal(validPublicQrImageKey("qr-550e8400-e29b-41d4-a716-446655440000.png"
 assert.equal(validPublicQrImageKey("private-originals/qr.png"), false);
 assert.equal(validPublicQrImageKey("../qr.png"), false);
 assert.equal(validPublicQrImageKey("qr-550e8400-e29b-41d4-a716-446655440000.svg"), false);
+
+const publicQrKey = "qr-550e8400-e29b-41d4-a716-446655440000.png";
+async function publicQrResponse(active, activeKey = publicQrKey) {
+  const settings = { payment_qr_active: active ? "1" : "0", payment_qr_active_key: activeKey };
+  const DB = { prepare() { return { bind(key) { return { first: async () => settings[key] === undefined ? null : { value: settings[key] } }; } }; } };
+  const image = {
+    body: new Uint8Array([137,80,78,71,13,10,26,10]),
+    httpMetadata: { contentType: "image/png" },
+    writeHttpMetadata(headers) { headers.set("Content-Type", "image/png"); }
+  };
+  const IMAGES = { get: async key => key === publicQrKey ? image : null };
+  return servePublicQrImage({ params: { key: publicQrKey }, env: { DB, IMAGES } });
+}
+const activeQrResponse = await publicQrResponse(true);
+assert.equal(activeQrResponse.status, 200, "the currently active QR key may be served");
+assert.equal(activeQrResponse.headers.get("Cache-Control"), "no-store", "active public QR responses must not stay cached across deactivation/replacement");
+const inactiveQrResponse = await publicQrResponse(false);
+assert.equal(inactiveQrResponse.status, 404, "a deactivated QR key must immediately stop being served");
+const replacedQrResponse = await publicQrResponse(true, "qr-550e8400-e29b-41d4-a716-446655440001.png");
+assert.equal(replacedQrResponse.status, 404, "a replaced QR key must immediately stop being served");
+
 const token = createOrderAccessToken();
 assert.ok(token.length >= 60 && token.length <= 100);
 assert.equal(await hashOrderAccessToken(token), await hashOrderAccessToken(token));
