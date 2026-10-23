@@ -3,17 +3,17 @@
 ## Live checkpoint used for this audit
 
 - Repository: chichute5500/Sindarealest-admin.
-- PR #111 OPEN/unmerged; writable branch `feature/admin-isolated-handoff-2026-10-20`; HEAD at checkpoint start `7fe4d80c900859faf388b0e7dc585adb4350d1fe` (evidence-only child of tested source SHA `1ec3cc72db94f07ce500d4e43830674b39a9eb03`); base main SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. PR API reported 388 changed files, +38,988/-212, and `mergeable_state=dirty`.
-- Validate [#39886592981](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886592981) and Preview [#39886593197](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886593197) both PASS on exact source SHA `1ec3cc72db94f07ce500d4e43830674b39a9eb03`.
-- PR #108 OPEN/unmerged, READ-ONLY; branch `fix/liquid-glass-audit-2026-10-19`; checkpoint head `4ff25f02ec8255b98a6db1583c6d473a7c40a0bb`; 286 changed files, +20,509/-394. Main/static branch untouched.
-- Public QR cache correctness fix: `functions/payment-qr/[key].js` now sends `Cache-Control: no-store`, with a source contract assertion. This avoids stale active-QR display after deactivation/replacement.
+- PR #111 OPEN/unmerged; writable branch `feature/admin-isolated-handoff-2026-10-20`; HEAD at checkpoint start `a0503f0909c25d71b43fdd72b4fcf9320cb1fae8` (evidence-only child of tested source SHA `574a94827fa3429a2022e6cfca552bb3ded07315`); base main SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. PR API reported 390 changed files, +39,075/-212, and `mergeable_state=dirty`.
+- Validate [#39887267741](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267741) and Preview [#39887267725](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267725) both PASS on exact source SHA `574a94827fa3429a2022e6cfca552bb3ded07315`.
+- PR #108 OPEN/unmerged, READ-ONLY; branch `fix/liquid-glass-audit-2026-10-19`; latest observed head `2954e2107d1274f070780803f7e1c07bb03eadfc`; 286 changed files, +20,533/-394. Main/static branch untouched.
+- Public QR cache fix: `functions/payment-qr/[key].js` sends `Cache-Control: no-store`; runtime tests prove active=200/no-store and deactivated/replaced=404.
 - Treat these numbers as a checkpoint snapshot. Fetch live PR/HEAD/Actions before acting.
 
-## Current diff census — 388 paths
+## Current diff census — 390 paths
 
 | Area | Files | Disposition |
 |---|---:|---|
-| Documentation and handoff evidence | 334 | Keep canonical reference/instructions/contracts and SHA-keyed text/JSON run evidence; remove only verified stale duplicates/empty assets |
+| Documentation and handoff evidence | 336 | Keep canonical reference/instructions/contracts and SHA-keyed text/JSON run evidence; remove only verified stale duplicates/empty assets |
 | Pages Functions handlers/modules | 24 | Keep active route handlers and shared helpers; routing/auth contracts or current tests reference them |
 | Database migrations | 2 | Keep 0008 SKU verification and 0009 fulfillment/payment-ledger schema |
 | Admin UI | 1 | Keep public/admin/index.html; it is the one remaining changed HTML file |
@@ -23,7 +23,7 @@
 | Seed data | 1 | Keep data/legacy-products.json; source integrity check validates 235 items, images, IDs/SKU rules and matches the 0002 seed SQL, and smoke tests exercise related contracts |
 | Root guide/package | 2 | Keep README-DEPLOY.txt, which config-integrity tests read, and package.json, which defines checks/tests/runtime |
 
-Path counts from live PR API at checkpoint start: .github 1; root-level 2; data 1; docs 334; functions 24; migrations 2; public 1; scripts 4; tests 19. Extension counts: yml 1, txt 1, json 167, md 168, png 1, js 26, sql 2, html 1, mjs 21.
+Path counts from live PR API at checkpoint start: .github 1; root-level 2; data 1; docs 336; functions 24; migrations 2; public 1; scripts 4; tests 19. Extension counts: yml 1, txt 1, json 168, md 169, png 1, js 26, sql 2, html 1, mjs 21.
 
 ## Historical evidence decision
 
