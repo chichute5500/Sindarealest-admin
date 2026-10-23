@@ -55,7 +55,7 @@ assert.ok(storefrontHtml.includes('flex:0 0 auto;\n  min-width:max-content;\n  m
 assert.ok(storefrontHtml.includes('0 0 14px rgba(22,132,232,0.30)')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
   'The selected pill must have a distinct visible blue glass glow and readable label typography.');
-assert.ok(storefrontHtml.includes('fulfillment-filter-label"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24")')
+assert.ok(storefrontHtml.includes('fulfillment-filter-label"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">')
   && storefrontHtml.includes('#products .fulfillment-filter-label svg'),
   'The product status heading must retain the reference slider icon with a decorative accessible treatment.');
 assert.ok(storefrontHtml.includes('#products .search-field:hover:not(:focus-within)')
