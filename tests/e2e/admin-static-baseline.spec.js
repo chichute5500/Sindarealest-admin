@@ -640,6 +640,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         window.scrollTo(0, 0);
       });
       if (scrollSelector) await page.locator(scrollSelector).scrollIntoViewIfNeeded();
+      if (name === 'warranties') {
+        await expect(page.locator('#toast'),
+          'Screen 9 baseline screenshot must not retain the success toast from the preceding retry test')
+          .not.toHaveClass(/(?:^|\\s)show(?:\\s|$)/);
+      }
       await saveScreenshot(name, variant);
       if (name === 'orders' && variant.viewport.width > 680) {
         const orderMetric = metrics[metrics.length - 1];
