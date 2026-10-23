@@ -30,6 +30,10 @@ assert.ok(html.includes('id="menuToggle" aria-label="Mở menu" aria-controls="m
   'the mobile menu toggle must explicitly identify the controlled navigation');
 assert.ok(html.includes("if(e.key==='Escape'&&$('#mobileNav').classList.contains('open')){setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})}"),
   'Escape must close the mobile menu and return keyboard focus to its toggle');
+assert.ok(html.includes("function trapMobileMenuTab(event){trapTabWithin($('#mobileNav'),event)}"),
+  'Tab focus must be kept inside the open mobile navigation drawer');
+assert.ok(html.includes("if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}"),
+  'The global key handler must route Tab through the mobile navigation drawer focus trap');
 
 assert.match(html, /<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal">/,
   'the product detail overlay must be the single modal dialog container');
