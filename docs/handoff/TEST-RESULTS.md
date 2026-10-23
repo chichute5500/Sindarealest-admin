@@ -190,3 +190,21 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - **Technical source/test gate: PASS. Preview deployment-SHA gate: PASS. Catalog-only live capture gate: PASS. Owner visual acceptance: PENDING.**
 - Next action is for the owner to visually review [the 16-screen catalog-only artifact](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806) and explicitly PASS or report a concrete discrepancy. Do not declare visual acceptance on the owner’s behalf, alter storefront CSS speculatively, or move to the next main acceptance item before the owner gate is resolved.
 - Owner-PASSed `#order` remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 remains OPEN/unmerged. No Production deploy or restricted-scope changes were made.
+
+## LATEST CATALOG VERIFICATION — STATUS PANEL REMOVAL — 2026-10-23
+
+### Source and behavior
+- Latest code commit: `370a5a2c90832aee8eaecad6160bc2c5e50afe36`.
+- Removed the dedicated catalog status-filter box, its `#fulfillmentFilters` button group, state, click handler and combined fulfillment predicate. Kept search, category chips, the 9 dynamic category chips/counts, and product/detail fulfillment information.
+- Compared the actual screenshots to `docs/design-reference/liquid-glass-product-filters.png`. The comparison identified and fixed the desktop chip spacing/wrapping mismatch: at >=1200px the remaining catalog tools panel is inset 44px from each side; desktop horizontal chip gap is 18px / row gap 10px; mobile gap remains 8px. Last category chip now wraps to row two, like the supplied reference. Search keyboard focus visibly outlines at 3px.
+- New regression checks require the old panel and catalog filter state to stay absent and require the responsive chip spacing to remain aligned.
+
+### Automated and live Preview evidence
+- Catalog-only live audit PASS: [run #39916701643](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701643); [artifact #12484953368 — eight screenshots + exact sample PNG + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701643/artifacts/12484953368).
+- Manifest verifies source/deployment SHA exactly `370a5a2c90832aee8eaecad6160bc2c5e50afe36`, `sourcePublicTreeEquivalentToDeployment: true`, `captureCompleted: true`, no JavaScript/runtime errors, no same-origin HTTP errors, no read-only violations, and no Cloudflare Access block. External `static.cloudflareinsights.com` GETs are blocked by the configured audit allowlist and recorded.
+- At each of 8 contexts (360, 390, 768, 1440px × Light/Dark): status panel absent, category group accessible, 9 category buttons present, category interaction PASS. Search hover/pressed/focus, category hover/pressed/keyboard focus and persistent selection are all PASS.
+- Automated validation run [#39916701536](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701536): “Run automated tests” succeeded; deployment [#39916701627](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701627) completed successfully after integrity/tests. The live audit itself independently matched the exact deployed SHA.
+
+### Current gate and guardrails
+- My visual comparison is complete; the updated remaining search/category area visually aligns with the supplied reference after the width/gap correction. Audit manifest stays `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE` until owner explicitly accepts.
+- `#order` is owner-PASS/LOCKED and not to be modified. Hero remains paused and untouched. PR #108 OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.

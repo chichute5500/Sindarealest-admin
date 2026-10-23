@@ -68,3 +68,28 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - Initial capture [#39905609877](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905609877) failed because the harness checked before dynamic filter rendering; workflow-only wait fix in `d9b2ec6` made the retry pass. No storefront CSS/HTML or backend/API source was changed for that timing issue.
 - **Next required action:** owner reviews [artifact #12480418806](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806) and explicitly PASSes or identifies a concrete discrepancy. Do not self-assign visual acceptance or start another main acceptance item before this owner gate is resolved.
 - `#order` remains OWNER PASS / LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
+
+## PROMPT TIẾP QUẢN MỚI NHẤT — CATALOG STATUS PANEL ĐÃ XÓA — 23/10/2026
+
+Tiếp tục từ trạng thái GitHub hiện tại, không khởi động lại và không khôi phục phần đã bị chủ dự án yêu cầu xóa.
+
+- Repo: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108 phải giữ OPEN, không merge.
+- Latest storefront-code commit: `370a5a2c90832aee8eaecad6160bc2c5e50afe36`. Một commit cập nhật tài liệu bàn giao sẽ nằm sau SHA này nhưng chỉ sửa `docs/handoff/*`, không đổi `public/` hoặc Preview.
+- Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+
+### Trạng thái đã thực hiện và kiểm tra
+1. Xóa hẳn box riêng **“Tình trạng sản phẩm”** khỏi khu vực danh mục: không còn markup/CSS `fulfillment-filter-row`, `#fulfillmentFilters`, `selectedFulfillment`, listener hay predicate lọc trạng thái trong danh mục. **Không tái tạo box hoặc lọc này.**
+2. Giữ nguyên ô tìm kiếm, chip danh mục, đếm chip tự động và hiển thị tình trạng trên từng thẻ / thông tin chi tiết / hướng dẫn thanh toán. Không gỡ nhầm metadata theo từng sản phẩm.
+3. So sánh trực tiếp ảnh mẫu `docs/design-reference/liquid-glass-product-filters.png` với ảnh Preview. Điều chỉnh desktop vì bản đầu còn sai: panel tìm kiếm/danh mục ở >=1200px được inset 44px mỗi bên; gap chip ngang 18px, row gap 10px; mobile giữ gap 8px. Chip cuối xuống hàng dưới như ảnh mẫu. Search focus có outline màu xanh 3px.
+4. Live audit PASS ở [run #39916701643](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701643), artifact [#12484953368 — 8 ảnh live + ảnh mẫu gốc + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701643/artifacts/12484953368). Manifest xác nhận `sourceHeadSha == deployedPreviewSha == 370a5a2c90832aee8eaecad6160bc2c5e50afe36`, `exactSourceHeadMatch: true`, `sourcePublicTreeEquivalentToDeployment: true`.
+5. Phạm vi ảnh: chỉ `#products .catalog-tools`, ở 360/390 mobile, 768 tablet, 1440 desktop, Light/Dark. Tám tổ hợp đều xác nhận status panel vắng mặt, 9 chip danh mục render, các trạng thái search hover/press/focus và chip hover/press/keyboard-focus/selection persistent PASS. Runtime errors = 0, same-origin HTTP errors = 0, read-only violations = 0.
+6. Validation: [#39916701536](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701536), bước automated tests thành công; [Preview deploy #39916701627](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39916701627) hoàn thành thành công sau kiểm tra source/test.
+7. Tôi đã xem ảnh mẫu và screenshot thật; đối chiếu phần còn lại đạt về khung Liquid Glass, màu sáng/tối, khoảng cách/wrap chip sau chỉnh. Trạng thái quản lý vẫn là chờ chủ dự án xác nhận PASS rõ ràng; không tự ghi owner PASS thay chủ dự án.
+
+### Guardrails
+- Hero: PAUSED BY OWNER — tuyệt đối không mở, sửa, test/capture, restore.
+- `#order` / “Đặt hàng an tâm”: owner-PASS/LOCKED — không đổi, không retest.
+- Không sửa Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Access. Không Production deploy.
+- Trước khi sửa gì tiếp, fetch branch HEAD, PR #108, trạng thái CI/Preview và file handoff này. Không làm lại test đã PASS. Bước tiếp theo cho catalog này: owner xem artifact/Preview và PASS hoặc chỉ ra lệch cụ thể; không tự ý thay đổi tiếp khi chưa có lỗi mới được chỉ rõ.
