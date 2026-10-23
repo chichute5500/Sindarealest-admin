@@ -14,8 +14,8 @@ for (const id of ['home','order','featured','promise','collections','siteFooter'
   assert.ok(setup.includes("['home',$('#" + id + "')]"), 'Homepage section must map to the home tab: ' + id);
 }
 assert.match(setup, /const activate=key=>tabs\.forEach\(tab=>\{const active=tab\.dataset\.mobileTab===key/ , 'Active tabs must be updated via their actual semantic key.');
-assert.match(setup, /if\(tab\.dataset\.mobileTab==='cart'\).*openCart\(\)/, 'Cart tab must open the real cart drawer.');
-assert.match(setup, /else if\(tab\.dataset\.mobileTab==='account'\).*openAccount\(\)/, 'Account tab must open the real account drawer.');
+assert.match(setup, /if\(tab\.dataset\.mobileTab==='cart'\).*toggleStorefrontModal\('cart'\)/, 'Cart tab must toggle the real cart drawer open/closed.');
+assert.match(setup, /else if\(tab\.dataset\.mobileTab==='account'\).*toggleStorefrontModal\('account'\)/, 'Account tab must toggle the real account drawer open/closed.');
 
 const modalHistoryStart = html.indexOf("const SD_MODAL_HISTORY_KEY='__sdStorefrontModal';");
 const modalHistoryEnd = html.indexOf('function openFullscreenImage()', modalHistoryStart);
