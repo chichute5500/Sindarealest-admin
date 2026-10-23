@@ -217,6 +217,8 @@ assert.match(adminHtml, /\.activity-log-cards\{display:none\}/, 'Activity log sh
 assert.match(adminHtml, /id="activityAdvancedToggle"/, 'Screen 12 should expose expandable advanced search controls rather than pushing the event list below mobile navigation');
 assert.match(adminHtml, /activity-log-push-settings/, 'Screen 12 should show a notification-permission settings card with a real action');
 assert.match(adminHtml, /id="activityLogEnablePush"/, 'Screen 12 log-tab notification action must use a unique DOM id distinct from the notifications-tab action');
+assert.match(baselineSpec, /toContainText\(fixtureProduct\.title\)/, 'Compact mobile activity cards should assert their visible event summary, not hidden entity identifiers');
+
 assert.match(baselineSpec, /await advancedToggle\.click\(\)/, 'Screen 12 tests should open/close advanced filters before the mobile screenshot is captured');
 assert.match(adminHtml, /data-activity-entity-filter=/, 'Activity log should expose working entity-category filter buttons');
 assert.match(adminHtml, /id="activityActorFilter"/, 'Activity log should provide a source-backed actor filter');

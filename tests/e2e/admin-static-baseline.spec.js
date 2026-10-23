@@ -2528,8 +2528,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-ORDER-3');
       await productEntityFilter.click();
       await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(2);
-      await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-PRODUCT');
-      await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-PRODUCT-2');
+      await expect(page.locator('.activity-log-cards')).toContainText(fixtureProduct.title);
+      await expect(page.locator('.activity-log-cards')).toContainText('Sản phẩm UI fixture 2');
       await page.locator('[data-activity-entity-filter="customer"]').click();
       await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(1);
       await page.locator('[data-activity-entity-filter="all"]').click();
