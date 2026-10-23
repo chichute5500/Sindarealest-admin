@@ -1895,6 +1895,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#customerSearch')).toBeFocused();
       await expect(page.locator('.customer-table tbody tr')).toHaveCount(1);
       await expect(page.locator('.customer-table tbody')).toContainText('Khách thử nghiệm giao diện');
+      // Reset the shortcut query so it cannot leak into the next independent screen capture.
+      await page.locator('#customerSearch').fill('');
+      await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
       await page.locator('[data-view="orders"]:visible').first().click();
       await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
       await page.locator('[data-order-row="UI-ONLY-ORDER"] [data-action="view-order-details"]:visible').first().click();
