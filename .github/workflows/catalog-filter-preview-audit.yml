@@ -507,7 +507,9 @@ jobs:
                     assert.ok(frameBox && frameBox.height > 0 && frameBox.height < 100,
                       'Activation evidence must be a single category chip, not a page/section screenshot.');
                     const midFilename = 'category-activation-midframe-' + contextName + '.png';
-                    await otherCategory.screenshot({ path: path.join(outDir, midFilename), animations: 'allow', timeout: 30000 });
+                    // Page-level clipped capture avoids locator.screenshot's stability wait consuming the short animation.
+                    await page.screenshot({ path: path.join(outDir, midFilename), animations: 'allow', timeout: 30000,
+                      clip: { x: Math.max(0, frameBox.x), y: Math.max(0, frameBox.y), width: frameBox.width, height: frameBox.height } });
                     audit.screenshots.push({ filename: midFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'activation-midframe', viewport: viewport.name, width: Math.round(frameBox.width), height: Math.round(frameBox.height), theme });
 
                     await page.waitForTimeout(105);
@@ -705,7 +707,9 @@ jobs:
                 assert.ok(touchActivation.currentTime !== null && touchActivation.currentTime < 460 && touchActivation.scaleX > 1.005,
                   'Touch selection must expose a live, perceptible animation frame; observed ' + JSON.stringify(touchActivation));
                 const touchFrameFile = 'touch-category-activation-midframe-' + theme + '.png';
-                await touchCategory.screenshot({ path: path.join(outDir, touchFrameFile), animations: 'allow', timeout: 30000 });
+                // Capture a clipped page frame so Playwright does not wait for the chip's bounding box to become stable.
+                await touchPage.screenshot({ path: path.join(outDir, touchFrameFile), animations: 'allow', timeout: 30000,
+                  clip: { x: Math.max(0, touchBox.x), y: Math.max(0, touchBox.y), width: touchBox.width, height: touchBox.height } });
                 audit.screenshots.push({
                   filename: touchFrameFile,
                   selector: '#products .filter-pill[aria-pressed="true"]',
