@@ -1,14 +1,15 @@
 # LATEST STATUS — SinDarealest Admin
 
-## Live checkpoint — 2026-10-23 06:14 UTC
-- Validate [#39910157079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079) **FAILURE** on `feb29900e4680a1fec0a8411c6caa22c6d714d91`: dependency audit, project integrity, and `npm run check` passed; `npm test` failed at handoff-integrity because `START-HERE.md` lacked an explicit prompt link. This sync adds that link; validate the resulting branch head before claiming success.
-- Preview diagnostic [#39910156991](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991) **FAILURE** for the same `npm test` gate. Chromium and screenshot matrix were skipped; artifact [admin-preview-evidence-381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991/artifacts/12482711337) is not a screenshot matrix.
-- Previous screenshot-matrix run [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) **FAILURE** on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`: 360×800 test expected rail scroll width >318px but measured 308px; this is consistent with all compact thumbnails fitting. Artifact [admin-preview-evidence-380](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491/artifacts/12481833079) has 16 login PNGs, 35 read-only fixture PNGs, and 33 fixture metrics.
-- Test-only commit `feb29900e4680a1fec0a8411c6caa22c6d714d91` changes the nested viewport check to verify reachability whether or not overflow exists. The original 320px overflow test remains strict; do not repeat the prior threshold adjustment. Gallery CSS unchanged.
-- PR #111 OPEN/unmerged; PR #108 OPEN/unmerged/read-only at `3fcbbedfc81dd6cfb6f8ea96dbfaf96137c6c36d`; `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` unchanged. B1 complete.
-- Acceptance stays partial: all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Live checkpoint — 2026-10-23 06:26 UTC
+- Validate [#39911090605](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090605) **SUCCESS** on exact source/test SHA `f2a3bee28523cc0ecb541a17b095c80acb2a4b31`: dependency audit, project integrity, `npm run check`, and `npm test` all PASS.
+- Admin Preview [#39911090568](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568) **SUCCESS** on the same SHA. Responsive/theme matrix PASS. Artifact [admin-preview-evidence-383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568/artifacts/12482517911) records 132 generated PNGs (16 login + 116 distinct module screenshot files; 120 module capture entries) and 112 fixture metrics. All document horizontal-overflow metrics are false; page errors 0, failed requests 0, HTTP errors 0, attempted writes 0, unexpected API paths 0. Seven expected HTTP 503 console entries are from synthetic read-only retry tests.
+- Deployed Preview diagnostic returned `PASS_LOGIN_CSS_SIGNATURE` only; it does not prove authenticated business workflows. Preview evidence is local source + synthetic/read-only fixture coverage.
+- The two failing 360×800 checks were overstrict assumptions that the rail must overflow even when thumbnails fit. Both were corrected in tests only; no UI CSS was changed and the existing 320px scroll requirement remains.
+- PR #111 OPEN/unmerged; PR #108 OPEN/unmerged/read-only at `97153b5351fadc0169205db20e3049a219f0bf7c`; `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. B1 cleanup/provenance audit COMPLETE.
+- Product acceptance is unchanged: all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
 ## Historical source/Preview checkpoint
+
 
 ## Historical source/Preview checkpoint
 
@@ -45,12 +46,9 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: f2a3bee28523cc0ecb541a17b095c80acb2a4b31
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568
-- npm run check: PASS
-- npm test: PASS
-- Local source Playwright matrix: PASS; 132 real PNGs captured in artifact admin-preview-evidence-383 (not committed to Git).
-- Deployed Preview: success.
-- Source screenshot matrix: 132 real PNGs; login shell: 16; read-only fixture module screens: 120; fixture metrics: 112.
-- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
-- Production deployment: NOT PERFORMED.
+- Tested source/test commit: `f2a3bee28523cc0ecb541a17b095c80acb2a4b31`.
+- Validate [#39911090605](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090605): **SUCCESS** — dependency audit PASS, project integrity PASS, `npm run check` PASS, `npm test` PASS.
+- Admin Preview [#39911090568](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568): **SUCCESS** — Chromium setup and static source server PASS; responsive/theme screenshot matrix PASS; deployed Preview login CSS signature diagnostic PASS; artifact upload PASS.
+- Artifact [admin-preview-evidence-383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568/artifacts/12482517911): 132 generated PNGs (16 login, 116 distinct module files; 120 fixture capture entries), 112 fixture metrics, plus approved reference PNG in archive. Document horizontal overflow metrics: 0/112; page errors 0; failed requests 0; HTTP errors 0; attempted writes 0; unexpected API paths 0. Seven expected HTTP 503 console entries belong to synthetic retry tests.
+- Gallery: 320×640 and 360×800 reachability checks pass; 320px scroll requirement remains. The 390×844 upload/drop-zone and sticky-footer regression passed. No UI CSS change was made for the assertion corrections.
+- The deployed Preview diagnostic only confirms `PASS_LOGIN_CSS_SIGNATURE`; authenticated backend/business workflows remain `NOT_TESTED`. Production deployment `NOT_PERFORMED`.
