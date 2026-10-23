@@ -55,8 +55,14 @@ assert.ok(storefrontHtml.includes('flex:0 0 auto;\n  min-width:max-content;\n  m
   'Catalog pills must retain natural content width and wrap as complete chips rather than squeeze text vertically on mobile.');
 assert.ok(storefrontHtml.includes('#products .catalog-tools .filter-pills{\n  min-width:0;\n  max-width:100%;\n  column-gap:18px;\n  row-gap:10px;')
   && storefrontHtml.includes('@media(min-width:1200px){\n  #products .catalog-tools{\n    width:calc(100% - 88px);\n    margin:0 auto 18px;\n  }\n}')
-  && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:8px;row-gap:8px}'),
-  'Desktop search/category panel width and chip spacing must match the source reference while mobile chips keep compact gaps.');
+  && storefrontHtml.includes('@media(max-width:760px){\n  /* Mobile gets its own touch-first layout; desktop spacing never leaks into this breakpoint. */')
+  && storefrontHtml.includes('font-size:16px;\n    line-height:1.35;')
+  && storefrontHtml.includes('min-height:44px;\n    padding:10px 13px;\n    font-size:14px;')
+  && storefrontHtml.includes('@media(max-width:390px){')
+  && storefrontHtml.includes('@media(max-width:360px){')
+  && storefrontHtml.includes('touch-action:manipulation;')
+  && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:7px;column-gap:7px;row-gap:8px}'),
+  'Desktop spacing and dedicated touch-first mobile sizing, tap targets, readable search text and compact 360px chip wrapping must all remain explicit.');
 assert.ok(storefrontHtml.includes('0 0 14px rgba(22,132,232,0.30)')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
   'The selected pill must have a distinct visible blue glass glow and readable label typography.');
