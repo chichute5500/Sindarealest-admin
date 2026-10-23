@@ -579,7 +579,7 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
-<div class="welcome-splash" id="welcomeSplash" role="dialog" aria-modal="true" aria-label="Chào mừng đến với SinDarealest">
+<div class="welcome-splash" id="welcomeSplash" role="dialog" aria-modal="true" aria-label="Chào mừng đến với SinDarealest" tabindex="-1">
   <div class="welcome-texture welcome-texture--dark" aria-hidden="true"></div><div class="welcome-texture welcome-texture--light" aria-hidden="true"></div>
   <div class="welcome-shade" aria-hidden="true"></div>
   <div class="welcome-content">
@@ -595,7 +595,81 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
     <button class="welcome-skip tap-target" id="skipIntro" type="button">Vào cửa hàng <span>→</span></button>
   </div>
 </div>
-<script>(function(){var s=document.getElementById('welcomeSplash');if(!s)return;var closed=false;function dismiss(){if(closed)return;closed=true;s.classList.add('is-leaving');window.setTimeout(function(){if(s&&s.parentNode)s.parentNode.removeChild(s);document.body.classList.remove('welcome-active')},900)}window.__sdDismissWelcome=dismiss;var skip=document.getElementById('skipIntro');if(skip)skip.addEventListener('click',dismiss);var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.setTimeout(dismiss,reduced?500:2500);fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){if(!c)return;if(c.welcomeEnabled===false)dismiss();var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');if(a&&typeof c.welcomeTitleLine1==='string')a.textContent=c.welcomeTitleLine1;if(b&&typeof c.welcomeTitleLine2==='string')b.textContent=c.welcomeTitleLine2;if(p&&typeof c.welcomeText==='string')p.textContent=c.welcomeText}).catch(function(){})})();</script>
+<script>
+(function(){
+  var s=document.getElementById('welcomeSplash');
+  if(!s)return;
+  var closed=false;
+  var skip=document.getElementById('skipIntro');
+  function focusableItems(){
+    return Array.from(s.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+      .filter(function(el){return !el.closest('[inert]')&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'});
+  }
+  function keepFocus(event){
+    if(closed||!s.isConnected)return;
+    if(event.key==='Escape'){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      dismiss();
+      return;
+    }
+    if(event.key!=='Tab')return;
+    var items=focusableItems();
+    var active=document.activeElement;
+    if(!items.length){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      s.focus({preventScroll:true});
+      return;
+    }
+    var first=items[0],last=items[items.length-1];
+    if(event.shiftKey&&(active===first||!s.contains(active))){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      last.focus({preventScroll:true});
+    }else if(!event.shiftKey&&(active===last||!s.contains(active))){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      first.focus({preventScroll:true});
+    }
+  }
+  function keepFocusInside(event){
+    if(closed||!s.isConnected||s.contains(event.target))return;
+    var items=focusableItems();
+    (items[0]||s).focus({preventScroll:true});
+  }
+  function dismiss(){
+    if(closed)return;
+    closed=true;
+    document.removeEventListener('keydown',keepFocus,true);
+    document.removeEventListener('focusin',keepFocusInside,true);
+    s.classList.add('is-leaving');
+    var destination=document.querySelector('.brand');
+    if(destination&&typeof destination.focus==='function')destination.focus({preventScroll:true});
+    s.setAttribute('aria-hidden','true');
+    s.setAttribute('inert','');
+    window.setTimeout(function(){
+      if(s&&s.parentNode)s.parentNode.removeChild(s);
+      document.body.classList.remove('welcome-active');
+    },900);
+  }
+  window.__sdDismissWelcome=dismiss;
+  if(skip)skip.addEventListener('click',dismiss);
+  document.addEventListener('keydown',keepFocus,true);
+  document.addEventListener('focusin',keepFocusInside,true);
+  if(skip)skip.focus({preventScroll:true});
+  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.setTimeout(dismiss,reduced?500:2500);
+  fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
+    if(!c)return;
+    if(c.welcomeEnabled===false)dismiss();
+    var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');
+    if(a&&typeof c.welcomeTitleLine1==='string')a.textContent=c.welcomeTitleLine1;
+    if(b&&typeof c.welcomeTitleLine2==='string')b.textContent=c.welcomeTitleLine2;
+    if(p&&typeof c.welcomeText==='string')p.textContent=c.welcomeText;
+  }).catch(function(){});
+})();
+</script>
 <div class="theme-bg theme-bg--dark" aria-hidden="true"></div><div class="theme-bg theme-bg--light" aria-hidden="true"></div>
 <header class="nav-wrap">
   <nav class="nav tap-target" aria-label="Điều hướng chính">

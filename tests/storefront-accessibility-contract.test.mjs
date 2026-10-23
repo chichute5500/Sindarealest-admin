@@ -7,6 +7,93 @@ const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf
 // Accessibility and mobile-safety contracts for the real storefront markup/CSS.
 // These assertions complement the Playwright preview; they do not claim an
 // independent WCAG audit or replace testing on physical devices.
+
+// Welcome is a modal dialog, so keyboard focus must stay inside it until it
+// is dismissed, and focus must be handed back to a useful page control.
+assert.ok(html.includes('id="welcomeSplash" role="dialog" aria-modal="true" aria-label="Chào mừng đến với SinDarealest" tabindex="-1"'),
+  'the welcome dialog must have modal semantics and a programmatic focus fallback');
+const welcomeScriptStart = html.indexOf("<script>\n(function(){\n  var s=document.getElementById('welcomeSplash');");
+const welcomeScriptEnd = html.indexOf('</script>', welcomeScriptStart);
+assert.ok(welcomeScriptStart >= 0 && welcomeScriptEnd > welcomeScriptStart,
+  'the welcome dialog must have a dedicated focus-management script');
+const welcomeScript = html.slice(welcomeScriptStart + '<script>'.length, welcomeScriptEnd);
+const welcomeFocusCalls = [];
+const welcomeTimers = [];
+const welcomeListeners = { keydown: [], focusin: [] };
+const welcome = {
+  isConnected: true,
+  parentNode: { removeChild(node) { node.isConnected = false; node.parentNode = null; } },
+  attributes: {},
+  classList: { added: [], add(name) { this.added.push(name); } },
+  contains(node) { return node === this || node === skipIntro || !!node?.insideWelcome; },
+  querySelectorAll() { return [skipIntro]; },
+  setAttribute(name, value) { this.attributes[name] = value; },
+  focus(options) { welcomeFocusCalls.push({ target: 'dialog', options }); doc.activeElement = this; }
+};
+const skipIntro = {
+  disabled: false,
+  closest() { return null; },
+  getClientRects() { return [1]; },
+  focus(options) { welcomeFocusCalls.push({ target: 'skip', options }); doc.activeElement = this; },
+  addEventListener(type, handler) { this.clickHandler = type === 'click' ? handler : this.clickHandler; }
+};
+const welcomeBrand = {
+  focus(options) { welcomeFocusCalls.push({ target: 'brand', options }); doc.activeElement = this; }
+};
+const doc = {
+  activeElement: null,
+  body: { classList: { removed: [], remove(name) { this.removed.push(name); } } },
+  getElementById(id) { return id === 'welcomeSplash' ? welcome : id === 'skipIntro' ? skipIntro : null; },
+  querySelector(selector) { return selector === '.brand' ? welcomeBrand : null; },
+  addEventListener(type, handler, capture) { if (welcomeListeners[type]) welcomeListeners[type].push({ handler, capture }); },
+  removeEventListener(type, handler, capture) {
+    if (welcomeListeners[type]) welcomeListeners[type] = welcomeListeners[type].filter(item => item.handler !== handler || item.capture !== capture);
+  }
+};
+const welcomeWindow = { setTimeout(fn, delay) { welcomeTimers.push({ fn, delay }); return welcomeTimers.length; }, matchMedia() { return { matches: false }; } };
+vm.runInNewContext(welcomeScript, {
+  document: doc,
+  window: welcomeWindow,
+  fetch: () => Promise.resolve({ ok: false }),
+  getComputedStyle: () => ({ visibility: 'visible' }),
+  Array
+}, { timeout: 1000 });
+assert.equal(doc.activeElement, skipIntro, 'opening the welcome dialog must initially focus its primary action');
+assert.equal(welcomeListeners.keydown.length, 1, 'the modal must register a capturing keyboard handler');
+assert.equal(welcomeListeners.focusin.length, 1, 'the modal must guard against programmatic focus escaping behind it');
+let tabPrevented = false, tabStopped = false;
+welcomeListeners.keydown[0].handler({
+  key: 'Tab', shiftKey: false,
+  preventDefault() { tabPrevented = true; },
+  stopImmediatePropagation() { tabStopped = true; }
+});
+assert.equal(tabPrevented, true, 'Tab on the last focusable item must wrap within the modal');
+assert.equal(tabStopped, true, 'the wrapped Tab event must not reach unrelated page handlers');
+assert.equal(doc.activeElement, skipIntro, 'Tab wrapping must return focus to the first/last welcome control');
+const outsideControl = { insideWelcome: false };
+doc.activeElement = outsideControl;
+welcomeListeners.focusin[0].handler({ target: outsideControl });
+assert.equal(doc.activeElement, skipIntro, 'programmatic focus must not escape to the page behind the modal');
+let escapePrevented = false, escapeStopped = false;
+welcomeListeners.keydown[0].handler({
+  key: 'Escape',
+  preventDefault() { escapePrevented = true; },
+  stopImmediatePropagation() { escapeStopped = true; }
+});
+assert.equal(escapePrevented, true, 'Escape must be consumed by the welcome dialog');
+assert.equal(escapeStopped, true, 'Escape dismissal must not leak to unrelated overlay handlers');
+assert.ok(welcome.classList.added.includes('is-leaving'), 'Escape must dismiss the welcome dialog');
+assert.equal(welcome.attributes['aria-hidden'], 'true', 'a dismissing dialog must immediately leave the accessibility tree');
+assert.equal(welcome.attributes.inert, '', 'a dismissing dialog must become inert during its exit transition');
+assert.equal(doc.activeElement, welcomeBrand, 'dismissal must move focus to the storefront brand/navigation');
+assert.equal(welcomeListeners.keydown.length, 0, 'the keyboard trap must be removed after dismissal starts');
+assert.equal(welcomeListeners.focusin.length, 0, 'the focus guard must be removed after dismissal starts');
+const removalTimer = welcomeTimers.find(timer => timer.delay === 900);
+assert.ok(removalTimer, 'dialog removal must follow the existing exit transition');
+removalTimer.fn();
+assert.equal(welcome.isConnected, false, 'the dialog must be removed after its exit transition');
+assert.deepEqual(doc.body.classList.removed, ['welcome-active'], 'the welcome active state must be cleaned up');
+
 assert.match(html, /@media\s*\(prefers-reduced-motion:\s*reduce\)/i,
   'the storefront must respect users who request reduced motion');
 assert.match(html, /function setupArtSlideshow\(\)[\s\S]*?const reduceMotion=!!\(window\.matchMedia&&window\.matchMedia\('\(prefers-reduced-motion: reduce\)'\)\.matches\)[\s\S]*?if\(reduceMotion\)[\s\S]*?return\}show\(Math\.floor\(Math\.random\(\)\*pool\.length\)\);artTimer=setInterval/i,
