@@ -119,6 +119,7 @@ jobs:
             blockedExternalRequests: [],
             filterChecks: [],
             stateChecks: [],
+            touchChecks: [],
             screenshots: [],
             startedAtUtc: new Date().toISOString()
           };
@@ -572,6 +573,27 @@ jobs:
                     assert.equal(reducedMotionState.activationAnimations, 0,
                       'Reduced-motion selection must not start a category animation.');
                     otherCategoryState.reducedMotionSelection = 'PASS';
+                    await page.emulateMedia({ reducedMotion: 'no-preference' });
+                    const allCategoryButton = categoryGroup.locator('button[data-category="all"]');
+                    await allCategoryButton.click();
+                    await allCategoryButton.focus();
+                    await page.keyboard.press('Tab');
+                    assert.equal(await otherCategory.evaluate(el => el.matches(':focus-visible')), true,
+                      'Keyboard navigation must focus the next category before keyboard activation.');
+                    await page.keyboard.press('Enter');
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
+                      'Enter on a keyboard-focused category must change the selected category.');
+                    assert.equal(await categoryGroup.locator('button[data-category="all"]').getAttribute('aria-pressed'), 'false',
+                      'Keyboard category selection must clear the previous selected state.');
+                    const keyboardActivation = await otherCategory.evaluate(el => ({
+                      animationName: getComputedStyle(el).animationName,
+                      running: el.getAnimations().some(item => typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate') && item.playState === 'running')
+                    }));
+                    assert.equal(keyboardActivation.animationName, theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
+                      'Keyboard selection must trigger the theme-appropriate activation animation.');
+                    assert.equal(keyboardActivation.running, true,
+                      'Keyboard selection must start the category activation animation, not merely set aria-pressed.');
+                    otherCategoryState.keyboardSelection = 'PASS';
                     categoryInteraction = 'PASS';
                   }
                   audit.stateChecks.push(otherCategoryState);
@@ -588,6 +610,128 @@ jobs:
                 }
               }
             }
+
+            // Add genuine touch-device checks; these contexts are scoped to the catalog controls only.
+            for (const theme of themes) {
+              const contextName = 'mobile-390-touch-' + theme;
+              const touchContext = await browser.newContext({
+                viewport: { width: 390, height: 844 },
+                deviceScaleFactor: 1,
+                isMobile: true,
+                hasTouch: true,
+                colorScheme: theme,
+                reducedMotion: 'no-preference',
+                serviceWorkers: 'block'
+              });
+              try {
+                await touchContext.addInitScript(({ themeName }) => {
+                  try { localStorage.setItem('sd-theme-mode', themeName); } catch {}
+                }, { themeName: theme });
+                const touchPage = await touchContext.newPage();
+                touchPage.setDefaultTimeout(20000);
+                touchPage.on('pageerror', error => {
+                  if (audit.runtimeErrors.length < 80) audit.runtimeErrors.push({
+                    context: contextName, type: 'pageerror', message: sanitizeText(error.message || 'Page error')
+                  });
+                });
+                touchPage.on('response', response => {
+                  let responseUrl;
+                  try { responseUrl = new URL(response.url()); } catch { return; }
+                  if (responseUrl.origin === origin && response.status() >= 400 && audit.sameOriginHttpErrors.length < 80) {
+                    audit.sameOriginHttpErrors.push({
+                      context: contextName, status: response.status(), method: response.request().method(),
+                      path: responseUrl.pathname
+                    });
+                  }
+                });
+                await touchPage.route('**/*', async route => {
+                  const request = route.request();
+                  let requestUrl;
+                  try { requestUrl = new URL(request.url()); } catch {
+                    await route.abort();
+                    return;
+                  }
+                  if (requestUrl.origin === origin) {
+                    if (!['GET', 'HEAD'].includes(request.method().toUpperCase())) {
+                      if (audit.readOnlyViolations.length < 80) audit.readOnlyViolations.push({
+                        context: contextName, method: request.method(), path: requestUrl.pathname
+                      });
+                      await route.abort();
+                      return;
+                    }
+                    const headers = Object.keys(browserAccessHeaders).length
+                      ? { ...request.headers(), ...browserAccessHeaders } : request.headers();
+                    await route.continue({ headers });
+                    return;
+                  }
+                  if (isApprovedPreviewExternalRead(request.url(), request.method())) {
+                    await route.continue();
+                    return;
+                  }
+                  if (audit.blockedExternalRequests.length < 80) audit.blockedExternalRequests.push({
+                    context: contextName, method: request.method(), origin: requestUrl.origin, type: request.resourceType()
+                  });
+                  await route.abort();
+                });
+                await touchPage.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+                await touchPage.waitForFunction(() => !document.body.classList.contains('welcome-active'), null, { timeout: 8000 });
+                await touchPage.locator('#products').scrollIntoViewIfNeeded();
+                const touchGroup = touchPage.locator('#categoryFilters');
+                await touchGroup.waitFor({ state: 'visible', timeout: 25000 });
+                const touchCategory = touchGroup.locator('button[data-category]:not([data-category="all"])').first();
+                await touchCategory.waitFor({ state: 'visible', timeout: 25000 });
+                const touchBox = await touchCategory.boundingBox();
+                assert.ok(touchBox && touchBox.height >= 44 && touchBox.height < 100,
+                  'Touch category chip must be a valid, single mobile tap target.');
+                await touchPage.touchscreen.tap(touchBox.x + touchBox.width / 2, touchBox.y + touchBox.height / 2);
+                assert.equal(await touchCategory.getAttribute('aria-pressed'), 'true',
+                  'A real touchscreen tap must change selected category state.');
+                await touchPage.waitForTimeout(135);
+                const touchActivation = await touchCategory.evaluate(el => {
+                  const css = getComputedStyle(el);
+                  const animation = el.getAnimations().find(item =>
+                    typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                  const matrix = css.transform.match(/^matrix\(([^)]+)\)$/);
+                  return {
+                    animationName: css.animationName,
+                    currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
+                    scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
+                    boxShadow: css.boxShadow
+                  };
+                });
+                assert.equal(touchActivation.animationName, theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
+                  'Touch selection must trigger the theme-appropriate activation animation.');
+                assert.ok(touchActivation.currentTime !== null && touchActivation.currentTime < 460 && touchActivation.scaleX > 1.005,
+                  'Touch selection must expose a live, perceptible animation frame; observed ' + JSON.stringify(touchActivation));
+                const touchFrameFile = 'touch-category-activation-midframe-' + theme + '.png';
+                await touchCategory.screenshot({ path: path.join(outDir, touchFrameFile), animations: 'allow', timeout: 30000 });
+                audit.screenshots.push({
+                  filename: touchFrameFile,
+                  selector: '#products .filter-pill[aria-pressed="true"]',
+                  stage: 'touch-activation-midframe',
+                  viewport: 'mobile-390-touch',
+                  width: Math.round(touchBox.width),
+                  height: Math.round(touchBox.height),
+                  theme
+                });
+                await touchPage.waitForTimeout(500);
+                assert.equal(await touchCategory.getAttribute('aria-pressed'), 'true',
+                  'Touch selected state must persist after the activation effect settles.');
+                audit.touchChecks.push({
+                  context: contextName,
+                  input: 'touchscreen.tap',
+                  selectedState: 'PASS',
+                  animationName: touchActivation.animationName,
+                  animationCurrentTimeMs: touchActivation.currentTime,
+                  peakFrameScaleX: touchActivation.scaleX,
+                  persistentSelection: 'PASS'
+                });
+              } finally {
+                await touchContext.close();
+                await writeAudit();
+              }
+            }
+
             const catalogSurfaceScreenshotCount = audit.screenshots.filter(item => item.stage === 'catalog-controls-resting-state').length;
             const activationFrameScreenshotCount = audit.screenshots.filter(item => item.stage === 'activation-midframe').length;
             const settledSelectionScreenshotCount = audit.screenshots.filter(item => item.stage === 'selection-settled').length;
@@ -599,7 +743,8 @@ jobs:
               audit.sameOriginHttpErrors.length === 0 &&
               audit.readOnlyViolations.length === 0 &&
               audit.filterChecks.length === 8 &&
-              audit.stateChecks.length === 8;
+              audit.stateChecks.length === 8 &&
+              audit.touchChecks.length === 2;
             audit.status = audit.passed ? 'CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE' : 'CAPTURED_WITH_ISSUES';
             audit.finishedAtUtc = new Date().toISOString();
             await writeAudit();
@@ -611,6 +756,7 @@ jobs:
             assert.equal(audit.readOnlyViolations.length, 0, 'Non-read-only requests were attempted.');
             assert.equal(audit.filterChecks.length, 8, 'Some viewport/theme filter checks did not complete.');
             assert.equal(audit.stateChecks.length, 8, 'Some hover/pressed/focus/selection state checks did not complete.');
+            assert.equal(audit.touchChecks.length, 2, 'Both light/dark real-touch category-selection checks must pass.');
             assert.equal(audit.accessBlocked, false, 'Cloudflare Access blocked the Preview request.');
             assert.equal(audit.passed, true, 'The catalog-only Preview audit did not pass.');
             console.log(JSON.stringify({
@@ -625,6 +771,7 @@ jobs:
               settledSelectionScreenshots: settledSelectionScreenshotCount,
               filterChecks: audit.filterChecks.length,
               stateChecks: audit.stateChecks.length,
+              touchChecks: audit.touchChecks.length,
               runtimeErrors: audit.runtimeErrors.length,
               sameOriginHttpErrors: audit.sameOriginHttpErrors.length,
               readOnlyViolations: audit.readOnlyViolations.length,
