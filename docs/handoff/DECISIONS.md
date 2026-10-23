@@ -1,3 +1,12 @@
+## DECISION UPDATE — PRODUCT CARD INTERACTIVE CONTAINER — 2026-10-24
+
+- Do not put flow-content descendants such as `div` or `h3` inside a native `button`. Preserve the existing visual DOM classes while using a flow-content `div role="button" tabindex="0"` and explicit Enter/Space activation.
+- Keep the modal Escape/arrow key handler separate and unchanged to preserve the existing keyboard contract.
+- Implemented and tested at `380182e79c43da7fb2f6472a17be689de0cae62e`; CI https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042040952; Preview deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042040897; Preview https://d207ce0f.sindarealest2.pages.dev/.
+- No CSS redesign, product data, route, gallery, Hero, or locked-scope changes.
+
+---
+
 ## DECISION UPDATE — CATALOG RESULT ANNOUNCEMENT — 2026-10-24
 
 - Use the concise `#pageSummary` as the polite atomic status region for product search/category result updates.

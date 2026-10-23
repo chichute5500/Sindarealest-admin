@@ -1,3 +1,15 @@
+## LATEST TASK RESULT — PRODUCT CARD MARKUP / KEYBOARD ACTIVATION — 2026-10-24
+
+- Concrete defect fixed: invalid flow-content descendants inside native product-card buttons.
+- The product-open wrapper is now a flow-content `div` with `role="button"` and `tabindex="0"`; Enter/Space activate the existing delegated click behavior. The product-card content and CSS structure are preserved, and the existing modal Escape/arrow key contract is unchanged.
+- Regression assertion added in `tests/product-card-liquid-glass.test.mjs`.
+- CI PASS at exact SHA `380182e79c43da7fb2f6472a17be689de0cae62e`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042040952.
+- Preview deploy PASS at exact SHA `380182e79c43da7fb2f6472a17be689de0cae62e`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042040897; Preview https://d207ce0f.sindarealest2.pages.dev/.
+- Visual acceptance not performed. Hero/#order capture workflows skipped by safety guards.
+- Keep SKU and fullscreen flicker paused; do not reopen any PASS/LOCKED scope. Continue report-then-continue protocol after each result.
+
+---
+
 ## LATEST TASK RESULT — ACCESSIBLE CATALOG RESULT ANNOUNCEMENTS — 2026-10-24
 
 - Concrete issue found in unlocked catalog accessibility semantics: the full product grid was `aria-live="polite"`, while the concise result summary was not a status region.

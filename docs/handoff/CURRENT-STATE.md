@@ -1,3 +1,18 @@
+## LATEST VERIFIED HANDOFF — PRODUCT CARD KEYBOARD SEMANTICS — 2026-10-24
+
+- Final source + regression-test SHA: `380182e79c43da7fb2f6472a17be689de0cae62e`.
+- Concrete defect: product cards used a native `<button>` wrapper containing flow-content elements (`div` and `h3`), violating the button content model. Fix changes only the outer card activation wrapper to `<div role="button" tabindex="0">`, preserves the existing card content/CSS structure, and adds Enter/Space activation via a separate keydown listener.
+- Existing product detail Escape/arrow-key dispatcher remains unchanged and its contract test passes. Product card visual CSS, dimensions, image behavior, cart quick-add button, SKU route logic, catalog filters and data are unchanged.
+- Regression assertion is in `tests/product-card-liquid-glass.test.mjs`; exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042040952.
+- Exact-SHA Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042040897. Immutable Preview: https://d207ce0f.sindarealest2.pages.dev/; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deployment log confirms `380182e79c43da7fb2f6472a17be689de0cae62e`, project `sindarealest2`, Production branch `main`; Preview only. PR #108 remains OPEN/unmerged.
+- Visual workflows targeting Hero and `#order` were SKIPPED by their guards. No live visual/device acceptance is claimed.
+- Two intermediate revisions failed automated checks and were corrected before this final SHA: one changed the required metadata-row element; the next combined the new key handler with the existing modal keyboard contract. Final CI and Preview deploy are green.
+- Dependency audit still reports 3 MODERATE advisories in `undici` via `miniflare`/`wrangler`; audit threshold is high, so CI passes. Suggested `npm audit fix --force` would downgrade Wrangler to 4.35.0 (breaking change). No dependency/config changes made.
+- SKU verification remains paused; fullscreen gallery flicker remains PAUSED / NOT ACCEPTED; Hero remains PAUSED BY OWNER; previously accepted scopes remain PASS/LOCKED.
+
+---
+
 ## LATEST VERIFIED HANDOFF — ACCESSIBLE CATALOG RESULT ANNOUNCEMENTS — 2026-10-24
 
 - Current source/test SHA: `046629d4170221d4bd3858d405ca36a26f1b5ef9`; source change commit: `7939990c2387654a66cf6f859933ca718ccd3848`.
