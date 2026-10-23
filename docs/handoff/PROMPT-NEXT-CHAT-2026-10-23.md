@@ -110,3 +110,25 @@ Tiếp tục từ trạng thái GitHub hiện tại, không khởi động lại
 Owner reported that category selection still lacked an obvious effect comparable to the desktop icon. This is a concrete visual issue, not accepted by prior hover/pressed checks. The catalog now has a 460ms spring-pop/glow animation on the selected chip, separate light/dark keyframes, and reduced-motion support. Regression source/test run PASS [#39925861305](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925861305); Preview deploy PASS [#39925861382](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925861382), immutable Preview URL https://5c3369cb.sindarealest2.pages.dev/.
 
 The first live audit attempt [#39925845436](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925845436) failed closed because its URL targeted an older deployment. The audit workflow now uses the verified immutable deployment and explicitly checks the theme-specific animation name and 460ms duration with normal motion enabled. Current audit [#39926240364](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39926240364) and validation [#39926240370](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39926240370) are the active evidence. Check final run/artifact before declaring success or giving the owner a verified test link. Owner visual acceptance is still pending. Keep PR #108 open/unmerged, Preview-only; do not touch Hero or locked `#order`, Admin, Production, backend or data/config.
+
+
+## CHAT HANDOFF OVERRIDE — FIX VISIBLE CATEGORY ACTIVATION, NOT JUST CSS ASSERTIONS — 2026-10-23
+
+Continue the existing SinDarealest2 project directly from GitHub; do not restart or ask the owner to repeat context. Read docs/handoff/CURRENT-STATE.md, docs/handoff/TASKS.md, and docs/handoff/TEST-RESULTS.md first, then re-fetch branch HEAD, PR #108, workflow statuses and Preview deployment metadata.
+
+### Current active task
+The owner has explicitly said the category controls still show no effect like desktop icon activation. The CSS currently contains a 460ms selected-category animation, and source tests pass, but this is NOT accepted as proof of visible behavior. The latest live audit #39926240364 was in progress when the previous note was written; check its final result and artifact first. Never call the effect complete based only on a CSS string, computed animation name, or passing source tests.
+
+1. Inspect #39926240364 status, job logs, artifact and manifest; verify Preview branch/deployment and public-tree equivalence. If failed/incomplete, diagnose the actual cause.
+2. Reproduce a real change from one category to another on the immutable deployed Preview. Inspect actual animation frames/behavior in Light/Dark desktop and mobile; test tap/click, keyboard selection, persistent selected state, and reduced-motion. Determine whether the animation is suppressed/overridden, fails to retrigger, is too subtle, or is merely not captured by the audit.
+3. Fix the root cause only in catalog search/category UI in public/index.html, with regression tests that prove the state-change animation is triggered behaviorally, not only that a keyframe declaration exists. Make the activation clearly visible: responsive press-in, short spring/glass bloom or accent glow, then settle into a persistent selected glass state. No endless pulse; preserve readability and accessibility.
+4. Run source/tests; deploy to Preview only; verify exact deployed storefront source/public tree; capture and inspect real screenshots/animation evidence before giving any Preview URL. If current audit already passes but owner still reports no visible effect, do not argue with the owner or close the task—improve the effect based on reproduced behavior.
+5. Update all handoff documents after substantive work. Report actual evidence only; do not claim owner PASS until the owner explicitly says PASS.
+
+### Guardrails
+- Repo chichute5500/Sindarealest-admin; branch fix/liquid-glass-audit-2026-10-19; PR #108 remains OPEN and unmerged.
+- Hero is PAUSED BY OWNER: do not inspect, edit, test, capture, restore, or change it.
+- #order / “Đặt hàng an tâm” is OWNER PASS / LOCKED: do not touch or retest.
+- Never restore the removed dedicated “Tình trạng sản phẩm” catalog filter panel. Keep per-product status/fulfillment information intact.
+- No Production deployment, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+- Do not send a Preview link until deployment integrity and the live visual audit have been checked. Source-test PASS alone is insufficient.
