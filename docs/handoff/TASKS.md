@@ -237,4 +237,4 @@ Guardrails unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; keep the
 - Preserve current Liquid Glass effects; do not revert to a 40px actual hit target or remove the 460ms activation sweep.
 - Latest exact-source evidence: CI #39962829322 PASS, Preview deploy #39962829540 PASS, catalog-only live audit #39962829226 PASS at 5b7596aba026cf4d4ed72fc4802ba461b105eb34.
 - Preview: https://6a0000cc.sindarealest2.pages.dev/ ; artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350 (26 screenshots + manifest).
-- Status remains TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING. Ask the owner to review the Preview/artifact and accept or specify a concrete visual correction. Do not change the locked order section or paused Hero.
+- OWNER DECISION RECEIVED 2026-10-23: PASS AND LOCK. Catalog filter chip height/Liquid Glass controls are OWNER PASS/LOCKED. Do not edit or retest this item unless the owner explicitly reopens it. Do not change the locked order section or paused Hero.
