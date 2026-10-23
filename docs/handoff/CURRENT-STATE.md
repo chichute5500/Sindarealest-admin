@@ -465,3 +465,12 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Keep the already-tested source change: after selecting an eligible warranty record, focus moves to `#claimIssueType`. CI and Preview deployment PASS on source/test SHA `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43` (CI #39986991649; Preview #39986991635). No live browser verification was performed.
 - Mark warranty claim form OWNER PASS / LOCKED unless the owner explicitly reopens it. Do not alter or retest this area proactively. If the owner later reports a concrete issue, reopen only that scope with their instruction.
 - Preserve all other guardrails: Hero PAUSED; `#order` and catalog filter controls PASS/LOCKED; PR #108 OPEN/unmerged; Preview only; no Production or restricted-scope changes.
+
+
+## CONTINUATION AUDIT — PUBLIC STOREFRONT MARKUP AND PRODUCT ROUTING — 2026-10-24
+
+- Re-fetched live branch HEAD before review: `0e9685d6135dd7c33efe8c0c26bad4609d0d4831`; PR #108 remains OPEN/unmerged, base `main`.
+- Read-only static audit of `public/index.html`: 23 internal fragment links / 0 missing targets; 62 button elements / 0 buttons missing a text or accessible-name signal under the static rule; 22 image/input-like scan reported no missing image alt; 0 target-blank links missing `rel`; 0 duplicate static IDs. One dynamic template interpolation was excluded from the duplicate-ID check.
+- Read-only review of the checkout/account address flow and product canonical-route regression contract did not establish a concrete reproducible defect. No source/test code changed and no CI/deploy was triggered for this source audit.
+- These are source-level checks, not live-browser/visual acceptance. Preserve warranty claim form OWNER PASS/LOCKED per owner decision; Hero remains PAUSED; `#order` and catalog Liquid Glass remain OWNER PASS/LOCKED. PR #108 OPEN/unmerged; Preview only; no restricted-scope changes.
+- Next: continue source-first review in an unlocked area, use existing tests as contracts, and edit only if a specific defect is evidenced.

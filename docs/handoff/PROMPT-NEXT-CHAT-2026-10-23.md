@@ -461,3 +461,8 @@ Re-fetch current branch, PR and Actions/deployment metadata; verify the latest s
 ## NEWEST OWNER DECISION — WARRANTY CLAIM FORM PASS / LOCKED — 2026-10-23
 
 The owner explicitly said to PASS the current warranty claim form and handle any issue later. Treat this area as OWNER PASS / LOCKED; do not proactively edit or retest it unless explicitly reopened. The owner did not have a valid warranty code or registered phone number to complete the live lookup, so manual live-flow/browser verification remains unperformed. Automated CI and exact-SHA Preview deployment passed on `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43` (CI #39986991649; Preview #39986991635). Keep evidence categories distinct.
+
+
+## LATEST CONTINUATION NOTE — SOURCE AUDIT 2026-10-24
+
+Re-fetched live branch before review. Read-only audit of `public/index.html`, checkout/account address prefill, and product canonical routing found no concrete reproducible defect. Static checks: 23 internal fragment links resolve; 62 buttons have accessible-name signals; no missing image alt, target-blank rel, or duplicate static ID found (dynamic template IDs excluded). No code was changed and no CI/deployment was triggered; do not represent this as browser/visual acceptance. Continue autonomous source-first audit only in unlocked scope. Warranty claim form OWNER PASS/LOCKED; Hero PAUSED; `#order` and catalog Liquid Glass OWNER PASS/LOCKED; PR #108 OPEN/unmerged; Preview only; no restricted-scope changes.
