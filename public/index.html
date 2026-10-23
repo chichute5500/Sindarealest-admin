@@ -985,7 +985,7 @@ function setFullscreenPhoto(src,direction='left',instant=false){
   const revealDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
    if(instant||!active.complete||!active.naturalWidth){
-    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
+    incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
     syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();return;
    }
    // Keep the old decoded photo fully visible until the incoming photo is decoded.

@@ -23,6 +23,11 @@ assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /instant=instant\|\|window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
+
+const fullscreenMobileSwap = html.slice(html.indexOf('function setFullscreenPhoto('), html.indexOf('function renderFullscreenThumbs(', html.indexOf('function setFullscreenPhoto(')));
+assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
+  'Mobile swaps must activate the already-decoded incoming layer before deactivating the current layer, preventing an intermediate frame with no active photo.');
+
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /let decoded;[\s\S]*?try\{decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)\}[\s\S]*?catch\{decoded=Promise\.reject\(\)\}/, 'Decode failures must be handled without revealing an unconfirmed image.');
 assert.match(html, /Promise\.resolve\(decoded\)\.then\(revealDecodedImage,rejectDecodedImage\)/);
