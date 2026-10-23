@@ -4,7 +4,7 @@
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
-  "checkpointSemantics": "Branch HEAD 290d3de4110f235c0a0ea963f0bc191dbd374b11 is an evidence-only child created by Admin Preview; application/source-test SHA a04e7f581f81403aae19aa9249d383a27f947ab5 passed Validate 39899961562 and Admin Preview 39899961344 on the exact same SHA. Artifact admin-preview-evidence-370 (ID 12478995473) contains 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one additional approved reference PNG. Local fixture evidence has 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors; seven simulated HTTP 503 console entries are expected retry fixtures. Deployed diagnostic confirms login CSS signature only.",
+  "checkpointSemantics": "Branch HEAD 290d3de4110f235c0a0ea963f0bc191dbd374b11 is an evidence-only child created by Admin Preview; application/source-test SHA a04e7f581f81403aae19aa9249d383a27f947ab5 passed Validate 39899961562 and Admin Preview 39899961344 on the exact same SHA. Artifact admin-preview-evidence-370 (ID 12478995473) contains 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one additional approved reference PNG. Local fixture evidence has 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors; seven simulated HTTP 503 console entries are expected retry fixtures. Deployed diagnostic confirms login CSS signature only. The recorded branch head is the pre-handoff-sync evidence checkpoint; current branch/PR refs must always be fetched live.",
   "codeTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
   "latestProductSourceCommit": "a04e7f581f81403aae19aa9249d383a27f947ab5",
   "latestActionsRun": {
@@ -458,5 +458,6 @@
     "artifactArchivePngCount": 133,
     "screenshotCountSemantics": "132 distinct screenshot PNGs (16 login + 116 module files); metadata records 120 module capture entries; archive includes the reference image as one extra PNG."
   },
-  "latestReviewFinding": "Screen 9 responsive audit found a reproducible toast/navigation clearance gap of 6px at 320x640; CSS offset changed from 82px to 84px plus safe-area inset. Validate and Playwright passed on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. The approved reference image has now been visually inspected, but full screen-by-screen parity remains NOT_VERIFIED. All screens remain PARTIAL_NOT_ACCEPTED."
+  "latestReviewFinding": "Screen 9 responsive audit found a reproducible toast/navigation clearance gap of 6px at 320x640; CSS offset changed from 82px to 84px plus safe-area inset. Validate and Playwright passed on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. The approved reference image has now been visually inspected, but full screen-by-screen parity remains NOT_VERIFIED. All screens remain PARTIAL_NOT_ACCEPTED.",
+  "snapshotCapturedBeforeHandoffSync": true
 }
