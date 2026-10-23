@@ -11,13 +11,12 @@
 - [12-screen acceptance audit](12-SCREEN-REFERENCE-AUDIT.md)
 - [Evidence retention policy](history/README.md)
 
-## Live checkpoint (verified after Validate #39893834166)
-- Live writable branch HEAD and PR #111 head: `83733513da6d3a28a13e773f479b596a4432df1f`. Validate [#39893834166](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166) completed **SUCCESS on this exact SHA**; dependency audit, project integrity and automated tests all passed.
-- PR #111 remains OPEN/unmerged, base `main` at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, 396 changed files (+39,231 / -212). No merge action taken.
-- PR #108 remains OPEN/unmerged and read-only. Live API now reports head `7e8c33f52e9216ff07484133910479ea5a456225`, 287 files (+21,043 / -398). Do not write to that branch.
-- `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- Screen 10 settings order remains covered by the regression test: public price, welcome page, watermark, then QR payment panel. Prior Admin Preview [#39891442082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082) passed on source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`; it is fixture-only and does not prove backend persistence.
-- Acceptance remains incomplete: all 12 screens `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Live checkpoint (2026-10-23 03:43 UTC; re-fetch before action)
+- Writable branch / PR #111 HEAD: `6516bda5b21cc748e64d767a3041e36c2b26a822`. Prior Validate [#39896046593](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046593) and Preview [#39896046601](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046601) **FAILED on prior SHA `605ac706b59f166868544ea5719cb75204501631` before the UI screenshot matrix**. Root cause: `tests/handoff-integrity.test.mjs:31` rejected `testedCommitSha=null`, correct when the baseline has not passed. That test is now fixed at current HEAD `6516bda5b21cc748e64d767a3041e36c2b26a822`; verify new exact-SHA runs before claiming success.
+- PR #111 remains OPEN/unmerged, 400 files (+39434 / -212), base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge action.
+- PR #108 remains OPEN/unmerged/read-only at head `7b1c201315a6349add55a07e4a561972c392fa98` (287 files); do not write there. `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- Screen 10 settings order passed earlier on source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`. Screen 8 mobile CSS correction remains unverified because the prior Preview skipped Playwright.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
 ## B1 — PR #111 cleanup/provenance
 **B1 audit remains complete.** The two new files since the 394-path cleanup census are compact Preview evidence (`report.md` and `preview-diagnostics.json`), not a reason to reopen file deletion or API consolidation.
@@ -27,9 +26,10 @@
 - Keep active consumers and distinct payment contracts. `normalizeFulfillmentType` is canonical in `functions/_lib.js`. No further deletions or route/helper merges without new evidence.
 
 ## Next actions
-1. Validate this handoff refresh on its exact commit SHA once; do not make another metadata-only commit to chase its own SHA.
-2. Continue the 12-screen acceptance audit. Current source/tests were reviewed for Screens 8–12; no new reproducible source defect was established from the available text evidence. Exact pixel/reference parity remains NOT_VERIFIED because direct reference-image comparison is unavailable.
-3. Obtain an authorized authenticated Preview test path before testing business persistence. Never bypass Cloudflare Access or substitute fixtures for backend evidence.
+1. Verify Validate and Admin Preview on the current handoff commit; inspect exact-SHA result.
+2. Confirm Playwright actually runs and Screen 8 mobile customer assertions pass; fix only reproducible failures.
+3. Continue remaining screen acceptance; exact reference parity remains NOT_VERIFIED and all 12 screens remain PARTIAL_NOT_ACCEPTED.
+4. Obtain authorized authenticated Preview access before persistence QA. Never bypass Cloudflare Access or substitute fixtures for backend evidence.
 
 ## Guardrails
 - Write only to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and PR #108 open/unmerged; do not write to PR #108, `main`, or the static website branch.
