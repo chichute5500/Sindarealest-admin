@@ -3194,15 +3194,16 @@ html.dark #products .filter-pill[aria-pressed="true"]{
   z-index:-1;
   border-radius:inherit;
   pointer-events:none;
-  background:linear-gradient(112deg,rgba(255,255,255,0) 25%,rgba(255,255,255,.12) 37%,rgba(255,255,255,.94) 48%,rgba(212,236,255,.72) 52%,rgba(255,255,255,0) 65%);
+  background:linear-gradient(112deg,rgba(255,255,255,0) 25%,rgba(91,163,224,.10) 35%,rgba(255,255,255,.94) 45%,rgba(255,255,255,.98) 48%,rgba(173,215,249,.86) 52%,rgba(78,150,214,.22) 57%,rgba(255,255,255,0) 67%);
   background-size:260% 100%;
   background-position:136% 0;
   opacity:0;
   transform:skewX(-12deg) translateX(8%) scaleX(.98);
-  mix-blend-mode:screen;
+  mix-blend-mode:normal;
 }
 html.dark #products .filter-pill::after{
   background:linear-gradient(112deg,rgba(255,255,255,0) 25%,rgba(255,255,255,.10) 37%,rgba(245,252,255,.82) 47%,rgba(185,225,255,.60) 52%,rgba(255,255,255,0) 65%);
+  mix-blend-mode:screen;
 }
 #products .filter-pill.active::after,
 #products .filter-pill[aria-pressed="true"]::after{

@@ -45,7 +45,9 @@ assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
   && storefrontHtml.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;')
   && storefrontHtml.includes('15%{opacity:.70}')
   && storefrontHtml.includes('52%{opacity:.66;background-position:45% 0;')
+  && storefrontHtml.includes('mix-blend-mode:normal;')
   && storefrontHtml.includes('html.dark #products .filter-pill::after{')
+  && storefrontHtml.includes('mix-blend-mode:screen;')
   && storefrontHtml.includes('#products .filter-pill:active:not(:disabled)')
   && storefrontHtml.includes('#products .filter-pill:focus-visible'),
   'Persistent selected, physical pressed and keyboard-focus states must be implemented as distinct catalog-pill states.');
