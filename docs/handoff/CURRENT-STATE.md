@@ -1,3 +1,19 @@
+## LATEST VERIFIED HANDOFF — PRODUCT CARD KEYBOARD ACCESSIBILITY — 2026-10-24
+
+- Final source + regression-test SHA: `d59892143b5000f48b4b4b940545509f4cb6980a`.
+- Fix: product card activation no longer uses a native `button` containing flow-content descendants. The outer `.product-open` is a `div role="button" tabindex="0"`, with explicit Enter/Space activation.
+- Focus indicator preserved: `.product-open:focus-visible` receives the existing 2px gold outline and 3px offset. Existing card inner DOM/classes, card CSS/dimensions, product images, quick-add button, search/filter behavior, route logic and data are unchanged.
+- Existing product detail Escape/arrow-key handler remains separate and unchanged. Regression assertions are in `tests/product-card-liquid-glass.test.mjs`.
+- Exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042253871. Exact-SHA Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042253931.
+- Immutable Preview: https://2b670d6b.sindarealest2.pages.dev/; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deployment logs confirm exact `d59892143b5000f48b4b4b940545509f4cb6980a`, Pages project `sindarealest2`, Production branch `main`; Preview only.
+- Visual workflows targeting Hero and `#order` were SKIPPED by safety guards. No live visual/device acceptance is claimed.
+- Intermediate test failures were diagnosed and corrected: `e637a9c` changed the required metadata-row element; `3b0b48c` combined the new key handler with the modal keyboard contract. Final SHA preserves metadata-row structure, separates keyboard handlers and passes all tests.
+- Dependency audit still reports 3 MODERATE `undici` advisories via `miniflare`/`wrangler`; CI threshold is high. Suggested `npm audit fix --force` would downgrade Wrangler to 4.35.0 (breaking change). No dependency/config changes made.
+- PR #108 remains OPEN/unmerged. SKU verification and fullscreen gallery flicker remain paused; Hero and all accepted scopes remain locked.
+
+---
+
 ## LATEST VERIFIED HANDOFF — PRODUCT CARD KEYBOARD SEMANTICS — 2026-10-24
 
 - Final source + regression-test SHA: `380182e79c43da7fb2f6472a17be689de0cae62e`.

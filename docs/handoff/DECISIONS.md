@@ -1,3 +1,13 @@
+## DECISION UPDATE — PRODUCT CARD ACTIVATION SEMANTICS — 2026-10-24
+
+- Do not place `div` or `h3` flow-content elements inside a native `button`.
+- Preserve existing visual DOM/classes using a focusable `div role="button" tabindex="0"`, explicit Enter/Space activation, and a visible focus outline.
+- Keep product-modal keyboard handling separate and unchanged.
+- Final implementation/test SHA `d59892143b5000f48b4b4b940545509f4cb6980a`; CI https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042253871; Preview deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042253931; Preview https://2b670d6b.sindarealest2.pages.dev/.
+- No CSS redesign, product data, product route, gallery, Hero or locked-scope changes.
+
+---
+
 ## DECISION UPDATE — PRODUCT CARD INTERACTIVE CONTAINER — 2026-10-24
 
 - Do not put flow-content descendants such as `div` or `h3` inside a native `button`. Preserve the existing visual DOM classes while using a flow-content `div role="button" tabindex="0"` and explicit Enter/Space activation.

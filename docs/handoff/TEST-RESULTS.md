@@ -1,3 +1,16 @@
+## LATEST EXACT-SHA TEST + DEPLOY RESULT — PRODUCT CARD KEYBOARD ACCESSIBILITY — 2026-10-24
+
+- Final source/test SHA: `d59892143b5000f48b4b4b940545509f4cb6980a`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042253871. Project integrity and all automated tests passed, including product-card Liquid Glass structure and storefront accessibility contracts.
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042253931. Immutable Preview https://2b670d6b.sindarealest2.pages.dev/; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy logs confirm exact source SHA, project `sindarealest2`, Production branch `main`; no Production deploy.
+- Intermediate runs failed before final corrections and were not represented as PASS: the metadata-row structure and product-modal keyboard contract were restored/preserved; final run is green.
+- Visual workflows targeting Hero/`#order` were skipped by safety guards; no manual visual acceptance claimed.
+- Dependency audit reports 3 moderate `undici` advisories through `miniflare`/`wrangler`; no high/critical advisories. Automatic `--force` remediation would downgrade Wrangler to 4.35.0, so dependencies/config were left unchanged.
+- PR #108 OPEN/unmerged; no Production/main changes. SKU and fullscreen flicker remain paused; Hero and accepted areas remain locked.
+
+---
+
 ## LATEST EXACT-SHA TEST + DEPLOY RESULT — PRODUCT CARD KEYBOARD SEMANTICS — 2026-10-24
 
 - Final source/test SHA: `380182e79c43da7fb2f6472a17be689de0cae62e`.
