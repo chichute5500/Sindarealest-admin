@@ -24,11 +24,11 @@ assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /const decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)/);
 assert.match(html, /Promise\.resolve\(decoded\)\.catch\(\(\)=>\{\}\)\.then\(revealDecodedImage\)/);
-assert.match(html, /@keyframes sdFullscreenOutLeft\\{[\\s\\S]*?to\\{opacity:1;transform:translateX\\(-18%\\)/);
-assert.match(html, /@keyframes sdFullscreenInRight\\{from\\{opacity:1;transform:translateX\\(18%\\)/);
-assert.match(html, /@keyframes sdGalleryOutLeft\\{[\\s\\S]*?to\\{opacity:1;transform:translateX\\(-22%\\) scale\\(\\.985\\);filter:blur\\(0\\)\\}\\}/);
-assert.match(html, /@keyframes sdGalleryInRight\\{from\\{opacity:1;transform:translateX\\(22%\\) scale\\(\\.985\\);filter:blur\\(0\\)\\}/);
-assert.match(html, /\\.sd-fullscreen-frame\\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
+assert.match(html, /@keyframes sdFullscreenOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-18%\)/);
+assert.match(html, /@keyframes sdFullscreenInRight\{from\{opacity:1;transform:translateX\(18%\)/);
+assert.match(html, /@keyframes sdGalleryOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-22%\) scale\(\.985\);filter:blur\(0\)\}\}/);
+assert.match(html, /@keyframes sdGalleryInRight\{from\{opacity:1;transform:translateX\(22%\) scale\(\.985\);filter:blur\(0\)\}/);
+assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
 
 assert.equal((html.match(/id="mobileCartCount"/g) || []).length, 1);
 assert.match(html, /id="mobileCartCount"[^>]*aria-hidden="true" hidden/);
