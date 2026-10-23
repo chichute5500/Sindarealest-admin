@@ -308,9 +308,9 @@ has('aria-label="Ghi chú điều kiện đơn hàng ${esc(o.order_number)}"', '
 has('function renderGalleryItem(g,i)', 'shared gallery thumbnail renderer');
 has('class="image-cover-slot"', 'featured cover occupies its own responsive row');
 has('class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ, vuốt ngang để xem thêm"', 'thumbnail rail has an accessible Vietnamese group label');
-has('#imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.55/1;object-fit:contain;background:rgba(218,235,247,.40)}', 'cover image keeps its full composition visible on mobile');
-has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:4px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
-has('#imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-align:start}', 'thumbnail rail uses fixed mobile targets and snap points');
+has('#imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.75/1;object-fit:contain;background:rgba(218,235,247,.40)}', 'cover image keeps its full composition visible on mobile');
+has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
+has('#imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-align:start}', 'thumbnail rail uses fixed mobile targets and snap points');
 
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
@@ -339,7 +339,7 @@ has('#main:has(#searchBox) #productResultSummary{position:absolute!important;wid
 has('#backdrop>.editor>form{display:flex;flex:1 1 0%;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
-has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:68px;width:68px}}', 'thumbnail rail remains touchable on narrow phones');
+has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}', 'thumbnail rail remains touchable on narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
 has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder controls remain present');
 has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
