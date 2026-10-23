@@ -2469,7 +2469,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(
           mobileActivityLabels,
           'Mobile audit-log cells must show the existing data-label so values remain identifiable'
-        ).toEqual(['Thời điểm', 'Thao tác', 'Đối tượng', 'Actor', 'Chi tiết']);
+        ).toEqual(['Thời điểm', 'Thao tác', 'Đối tượng', 'Người thực hiện', 'Chi tiết']);
         const searchWidth = await page.locator('#activityLogSearch').evaluate(el => el.getBoundingClientRect().width);
         expect(searchWidth, 'Activity-log search must have a usable full-width row on mobile').toBeGreaterThanOrEqual(width * 0.65);
       }

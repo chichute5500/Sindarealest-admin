@@ -253,7 +253,7 @@ assert.match(dashboardSource, /data-view=\\?"customers\\?"/, 'Dashboard should p
 assert.match(dashboardSource, /data-action=\\?"backup\\?"/, 'Dashboard should preserve backup action');
 has('.dashboard-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))', 'four-column compact dashboard action layout');
 assert.ok(dashboardSource.includes('dashboard-activity-table'), 'Dashboard should keep the audit table source for desktop and mobile');
-for (const label of ['Thời điểm', 'Thao tác', 'Đối tượng', 'Actor']) assert.ok(dashboardSource.includes('data-label="' + label + '"'), 'Responsive audit cell should expose the ' + label + ' label');
+for (const label of ['Thời điểm', 'Thao tác', 'Đối tượng', 'Người thực hiện']) assert.ok(dashboardSource.includes('data-label="' + label + '"'), 'Responsive audit cell should expose the ' + label + ' label');
 has('.dashboard-activity-table table{width:100%;min-width:520px}', 'desktop audit table sizing');
 has('.dashboard-activity-table table{display:block;width:100%;min-width:0!important;border-collapse:separate;border-spacing:0}', 'mobile audit table card layout');
 has('.dashboard-activity-table td::before{content:attr(data-label)', 'mobile audit cards show each field label');
