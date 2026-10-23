@@ -229,5 +229,5 @@ assert.match(html, /#products \.filter-pill\{min-height:40px;padding:7px 11px;fo
   "Narrow-phone product filters should use a reduced 40px touch target, not the previous oversized 44px height.");
 assert.match(html, /\.filter-pill\.active,\.filter-pill:hover\{background:var\(--panel-strong\);border-color:var\(--gold\);box-shadow:inset 0 1px rgba\(255,255,255,\.26\)\}/,
   "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
-assert.match(html, /#products \.filter-pill:active[^}]*transform:scale\(/,
+assert.match(html, /#products \\.filter-pill:active[^}]*transform:[^;]*scale\\\(/,
   "Slimming catalog filter pills must preserve the existing press feedback.");
