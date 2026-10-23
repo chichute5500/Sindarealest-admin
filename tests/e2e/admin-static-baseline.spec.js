@@ -2579,7 +2579,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(refreshActivityButton).toHaveText('Làm mới');
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
       await expect(page.locator('.activity-log-push-settings')).toBeVisible();
-      await expect(page.locator('#activityEnablePush')).toHaveText('Bật thông báo đẩy');
+      await expect(page.locator('#activityLogEnablePush')).toHaveText('Bật thông báo đẩy');
       if (width <= 680) {
         await advancedToggle.click();
         await expect(advancedToggle).toHaveAttribute('aria-expanded', 'false');
