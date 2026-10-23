@@ -24,11 +24,11 @@ for (const key of statusScreens) {
 }
 assert.equal(statusScreens.length, 12, 'The current acceptance scope must include all 12 admin screens.');
 
-assert.ok(!/opened\\.type === 'blocked'\\)\\s*test\\.skip/.test(previewTest),
+assert.ok(!/opened\.type === 'blocked'\)\s*test\.skip/.test(previewTest),
   'A Cloudflare Access gate must not be reported as a successful Playwright run by skipping the remote smoke test.');
 assert.ok((previewTest.match(/BLOCKED_CLOUDFLARE_ACCESS: Preview diagnostics were saved/g) || []).length === 2,
   'Both remote Preview tests must fail explicitly with the blocked Access diagnostic when the login page is not reached.');
-assert.match(previewWorkflow, /data\\.checks\\.deployedPreview = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' \\? 'BLOCKED_CLOUDFLARE_ACCESS'/,
+assert.match(previewWorkflow, /data\.checks\.deployedPreview = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' \? 'BLOCKED_CLOUDFLARE_ACCESS'/,
   'The persisted deployedPreview status must prioritize an Access block over a generic successful test-process exit.');
 
 for (const [label, sha] of [
