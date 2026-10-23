@@ -4,7 +4,7 @@
 
 - Repository: `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN/unmerged, base `main`.
 - Source + test commit deployed to Preview: `10c074c9199d27badcbe825a7122033b9fe8fbb5`.
-- `public/index.html` now includes a product key in `/sanpham/{category}/{key}` using SKU only when `p.skuVerified === true` and trimmed SKU is non-empty; otherwise it falls back to the internal product ID/key. Existing category mapping translates `dress-shoes` to `giaytay`, enabling `/sanpham/giaytay/sd-gl-012` only when that SKU is actually verified and supplied.
+- `public/index.html` now includes a product key in `/sanpham/{category}/{key}` using SKU only when `p.skuVerified === true` and trimmed SKU is non-empty; otherwise it falls back to the internal product ID/key. Existing category mapping translates `dress-shoes` to `giaytay`, enabling `/sanpham/giaytay/sd-gl012` only when that SKU is actually verified and supplied.
 - Updated stale assertion in `tests/admin-upgrade.test.mjs` to agree with the strict verified-SKU rule; retained focused route regression coverage in `tests/product-route-canonical.test.mjs`.
 - Exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40040101794. Full automated test suite, project integrity checks, and dependency audit passed (0 vulnerabilities in logs).
 - Exact-SHA Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40040101630. Deployed URL: https://3cb163a7.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Workflow checked out the exact SHA and used `--commit-hash=$GITHUB_SHA`; project is `sindarealest2`, Production branch remains `main`.
