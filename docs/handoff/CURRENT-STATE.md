@@ -156,3 +156,12 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - **Preview links:** [branch alias](https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/) · [exact deployment](https://0e93eb50.sindarealest2.pages.dev/).
 - **Next action:** ask the owner to inspect the 8-image artifact above for the order section. After the owner accepts that section, continue to the next non-Hero item; do not modify the locked heading or paused Hero without permission. PR #108 remains OPEN/unmerged. No Production deployment or restricted-scope changes were made.
 - The handoff files are being updated in a docs-only commit after this note. That will advance branch HEAD but will not change the `public/` tree or the deployed Preview source SHA `a84eef725171826f595f61b236533d6dd882dbe7`; next chat must re-fetch live branch HEAD and PR status before editing.
+
+## OWNER CONFIRMED — ORDER SECTION PASS/LOCKED — 2026-10-23
+
+- The owner explicitly confirms the **current version of the full order-assurance/process section (`section.section.wrap#order`) is PASS** and directs the team to lock it and move to another section.
+- Status is now **OWNER PASS / LOCKED**. Do not change this section's layout, summary note, CTA clearance, cards, or order-step typography unless the owner explicitly reopens it. The earlier `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE` labels in historical evidence are superseded by this later owner decision.
+- This acceptance covers the current `#order` section as shown in the deployed Preview; it does not mean every other storefront section is accepted.
+- The latest documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7`; CI #39902525107, Preview deploy #39902525216, and technical live capture #39902525271 passed. The documentation-only handoff update does not alter `public/` or the deployed Preview source.
+- Next active task: continue source-first audit of the next unfinished **non-Hero** storefront section, starting with the product/catalog area and existing tests/evidence. Establish a concrete defect before changing source. Hero remains PAUSED BY OWNER and must not be opened, edited, tested, or captured.
+- PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
