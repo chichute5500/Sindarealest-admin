@@ -407,8 +407,11 @@ jobs:
                   if (await otherCategory.count() > 0) {
                     const defaultChipBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
                     await otherCategory.hover();
-                    const hoverChipBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
-                    assert.notEqual(hoverChipBackground, defaultChipBackground,
+                    const hoverChipStyle = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      return { background: css.backgroundColor, shadow: css.boxShadow };
+                    });
+                    assert.notEqual(hoverChipStyle.background, defaultChipBackground,
                       'Unselected category chip hover must differ from its default surface.');
                     categoryHover = 'PASS';
                     await page.mouse.down();
@@ -416,13 +419,10 @@ jobs:
                       const css = getComputedStyle(el);
                       return { background: css.backgroundColor, shadow: css.boxShadow };
                     });
-                    assert.notEqual(pressedChip.background, hoverChipBackground,
+                    assert.notEqual(pressedChip.background, hoverChipStyle.background,
                       'Physical chip press must be visibly distinct from hover.');
-                    assert.notEqual(pressedChip.shadow, (await otherCategory.evaluate(el => {
-                      // Capture hover shadow after the active press ends below, for a state-independent comparison.
-                      return getComputedStyle(el).boxShadow;
-                    })) === pressedChip.shadow ? '' : pressedChip.shadow,
-                      'The press state must expose an inset depth treatment.');
+                    assert.notEqual(pressedChip.shadow, hoverChipStyle.shadow,
+                      'The press state must expose a different inset depth treatment from hover.');
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
                       'A physical press alone must not set persistent selection before click release.');
                     await page.mouse.move(0, 0);
