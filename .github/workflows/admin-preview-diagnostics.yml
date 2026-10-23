@@ -1,5 +1,6 @@
 name: Admin Preview diagnostic smoke test
 
+# Source validation and read-only Playwright only. Evidence lives in the Actions artifact.
 on:
   push:
     branches:
@@ -10,21 +11,20 @@ on:
       - "migrations/**"
       - "scripts/**"
       - "tests/**"
-      - "docs/admin-ui-reference/handoff/**"
       - "package.json"
       - ".github/workflows/admin-preview-diagnostics.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: admin-preview-diagnostics
+  group: admin-preview-diagnostics-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   admin-preview:
-    name: Audit ADMIN source, capture baselines, and diagnose Preview
+    name: Validate ADMIN source and capture Preview evidence
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -34,6 +34,15 @@ jobs:
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       LOCAL_ADMIN_URL: http://127.0.0.1:4173/admin/
     steps:
+      - name: Guard exact feature branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20" || {
+            echo "::error::This diagnostic workflow may only run from the ADMIN feature branch."
+            exit 1
+          }
+
       - name: Check out the exact tested commit
         uses: actions/checkout@v7
         with:
@@ -42,7 +51,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install project and Playwright dependencies
         run: npm install --no-save @playwright/test
@@ -77,207 +86,27 @@ jobs:
         id: baseline
         run: npx playwright test tests/e2e/admin-static-baseline.spec.js --reporter=line,html
 
-      - name: Diagnose configured deployed Preview
+      - name: Diagnose configured deployed Admin Preview (read-only)
         id: preview
         if: ${{ !cancelled() && steps.project-check.outcome == 'success' && steps.unit-tests.outcome == 'success' && env.ADMIN_TEST_URL != '' }}
         run: npx playwright test tests/e2e/admin-preview.spec.js --reporter=line,html
 
-      - name: Report missing Preview configuration
-        if: ${{ !cancelled() && steps.project-check.outcome == 'success' && steps.unit-tests.outcome == 'success' && env.ADMIN_TEST_URL == '' }}
-        run: echo "ADMIN_TEST_URL is not configured; deployed-preview checks were skipped. Local static source checks still ran."
-
-      - name: Persist screenshots and test state on the ADMIN branch
+      - name: Verify branch HEAD still matches the tested SHA
         if: always()
-        env:
-          CHECK_OUTCOME: ${{ steps.project-check.outcome }}
-          UNIT_OUTCOME: ${{ steps.unit-tests.outcome }}
-          BASELINE_OUTCOME: ${{ steps.baseline.outcome }}
-          PREVIEW_OUTCOME: ${{ steps.preview.outcome }}
         shell: bash
         run: |
           set -euo pipefail
-          TARGET_BRANCH="feature/admin-isolated-handoff-2026-10-20"
-          SHA_SHORT="${GITHUB_SHA:0:12}"
-          SOURCE_DIR="artifacts/admin-preview-evidence/$SHA_SHORT"
-
-          if [[ ! -d "$SOURCE_DIR/screenshots" ]] || ! compgen -G "$SOURCE_DIR/screenshots/*.png" >/dev/null || [[ ! -f "$SOURCE_DIR/metadata.json" ]]; then
-            echo "Complete screenshot evidence/metadata was not produced; preserving logs/artifacts only."
-            exit 0
+          remote_sha="$(git ls-remote origin "refs/heads/feature/admin-isolated-handoff-2026-10-20" | awk '{print $1}')"
+          echo "Tested SHA: $GITHUB_SHA"
+          echo "Current branch SHA: $remote_sha"
+          test -n "$remote_sha"
+          if [[ "$remote_sha" != "$GITHUB_SHA" ]]; then
+            echo "::error::The feature branch moved during this run. This run's evidence belongs only to $GITHUB_SHA and is not a latest-HEAD acceptance result."
+            exit 1
           fi
+          echo "Verified: tested SHA is still branch HEAD."
 
-          REMOTE_SHA="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          if [[ "$REMOTE_SHA" != "$GITHUB_SHA" ]]; then
-            echo "The ADMIN branch moved after this run started; skipping stale screenshot commit. Raw evidence remains in the Actions artifact."
-            exit 0
-          fi
-
-          DEST="docs/admin-ui-reference/handoff/history/$SHA_SHORT"
-          export DEST SOURCE_DIR
-          # Keep compact summaries in Git. Full PNGs and metadata are uploaded
-          # through the Actions artifact step below, not committed per run.
-          mkdir -p "$DEST"
-          if [[ -f "$SOURCE_DIR/preview-diagnostics.json" ]]; then
-            cp "$SOURCE_DIR/preview-diagnostics.json" "$DEST/preview-diagnostics.json"
-          fi
-
-          PREVIEW_REPORT_STATE="$PREVIEW_OUTCOME"
-          if [[ -f "$SOURCE_DIR/preview-diagnostics.json" ]] && grep -q '"status"[[:space:]]*:[[:space:]]*"BLOCKED_CLOUDFLARE_ACCESS"' "$SOURCE_DIR/preview-diagnostics.json"; then
-            PREVIEW_REPORT_STATE="BLOCKED_CLOUDFLARE_ACCESS (browser did not reach ADMIN)"
-          fi
-
-          {
-            printf '# ADMIN Playwright evidence\n\n'
-            printf -- '- Tested source commit: `%s`\n' "$GITHUB_SHA"
-            printf -- '- GitHub Actions run: https://github.com/%s/actions/runs/%s\n' "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
-            printf -- '- Captured at (UTC): %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            printf -- '- Project checks: `%s`\n' "$CHECK_OUTCOME"
-            printf -- '- Automated tests: `%s`\n' "$UNIT_OUTCOME"
-            printf -- '- Local source screenshots: `%s`\n' "$BASELINE_OUTCOME"
-            printf -- '- Deployed Preview check: `%s`\n' "$PREVIEW_REPORT_STATE"
-            printf -- '- Full screenshot/metadata artifact: `admin-preview-evidence-%s` (raw PNGs are not committed to Git).\n' "$GITHUB_RUN_NUMBER"
-            printf -- '- Route: `/admin/`\n'
-            printf '%s\n' '- Local screenshots only exercise the real source HTML/CSS with a mocked unauthenticated session response; they do not write or read business data.'
-            printf '%s\n' '- Screenshots are captured in light and dark themes for 320x640, 360x800, 375x812, 390x844, 412x915, 768x1024, 1280x800 and 1440x900.'
-            printf '%s\n' '- If preview-diagnostics.json reports Cloudflare Access, the deployed app itself was not reached and its authenticated modules remain untested.'
-            printf -- '- Cloudflare production deployment: `NOT PERFORMED`.\n'
-          } > "$DEST/report.md"
-
-          node --input-type=module <<'NODE'
-          import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
-          import { join } from 'node:path';
-
-          const jsonPath = 'docs/admin-ui-reference/handoff/latest-test-results.json';
-          const statusPath = 'docs/admin-ui-reference/handoff/LATEST-STATUS.md';
-          const metadataPath = join(process.env.SOURCE_DIR, 'metadata.json');
-          const previewPath = join(process.env.DEST, 'preview-diagnostics.json');
-          const data = JSON.parse(readFileSync(jsonPath, 'utf8'));
-          const meta = JSON.parse(readFileSync(metadataPath, 'utf8'));
-          const sha = process.env.GITHUB_SHA;
-          const imageFiles = readdirSync(join(process.env.SOURCE_DIR, 'screenshots')).filter(name => name.endsWith('.png')).sort();
-          let previewState = process.env.PREVIEW_OUTCOME || 'not-run';
-          let previewGate = null;
-          if (existsSync(previewPath)) {
-            try {
-              previewGate = JSON.parse(readFileSync(previewPath, 'utf8'));
-              if (previewGate.status === 'BLOCKED_CLOUDFLARE_ACCESS') previewState = 'BLOCKED_CLOUDFLARE_ACCESS';
-            } catch {}
-          }
-          const checkState = outcome => outcome === 'success' ? 'PASS' : String(outcome || 'NOT_RUN').toUpperCase();
-          data.status = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'IN_PROGRESS_BLOCKED_PREVIEW_ACCESS' :
-            (process.env.CHECK_OUTCOME !== 'success' || process.env.UNIT_OUTCOME !== 'success' || process.env.BASELINE_OUTCOME !== 'success'
-              ? 'IN_PROGRESS_TEST_FAILURE'
-              : (process.env.PREVIEW_OUTCOME !== 'success'
-                ? 'SOURCE_CHECKS_PASS_PREVIEW_DIAGNOSTICS_FAIL'
-                : 'SOURCE_AND_PREVIEW_CHECKS_PASS'));
-          data.latestCodeCommitSha = sha;
-          data.testedCommitSha = process.env.BASELINE_OUTCOME === 'success' ? sha : null;
-          data.capturedAt = meta.capturedAt || new Date().toISOString();
-          data.lastActionsRunUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-          data.checks = data.checks || {};
-          data.checks.baselineGitState = 'NOT_TESTED_BY_PLAYWRIGHT_RUNNER';
-          data.checks.applicationStartup = checkState(process.env.BASELINE_OUTCOME);
-          data.checks.localStaticPlaywrightBaseline = checkState(process.env.BASELINE_OUTCOME);
-          data.checks.playwright = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'PASS_LOCAL_MATRIX_BLOCKED_PREVIEW_ACCESS' : checkState(process.env.PREVIEW_OUTCOME);
-          data.checks.playwrightPreviewDiagnostics = previewState;
-          data.checks.deployedPreview = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'BLOCKED_CLOUDFLARE_ACCESS' :
-            (process.env.PREVIEW_OUTCOME === 'success' ? 'PASS' : 'FAIL_SIGNATURE_OR_NAVIGATION');
-          data.checks.responsiveViewports = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_SOURCE_SCREENSHOT_MATRIX' : 'FAIL_OR_NOT_RUN';
-          data.checks.lightMode = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
-          data.checks.darkMode = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
-          data.checks.consoleErrors = meta.pageErrors?.length === 0 && meta.consoleErrors?.length === 0 ? 'PASS_LOCAL_LOGIN_ONLY' : 'ERRORS_RECORDED_OR_NOT_RUN';
-          data.checks.networkErrors = meta.failedRequests?.length === 0 && meta.httpErrors?.length === 0 ? 'PASS_LOCAL_FIXTURE_ONLY' : 'ERRORS_RECORDED_OR_NOT_RUN';
-          data.checks.automatedTests = checkState(process.env.UNIT_OUTCOME);
-          data.checks.build = 'NOT_CONFIGURED_IN_PACKAGE_SCRIPTS';
-          data.checks.productionDeployment = 'NOT_PERFORMED';
-          const fixtureAudit = meta.uiFixtureVisualAudit || null;
-          data.latestLocalEvidence = {
-            runId: Number(process.env.GITHUB_RUN_ID),
-            url: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-            sourceCommit: sha,
-            npmRunCheck: checkState(process.env.CHECK_OUTCOME),
-            npmTest: checkState(process.env.UNIT_OUTCOME),
-            localPlaywright: checkState(process.env.BASELINE_OUTCOME),
-            sourceScreenshotCount: imageFiles.length,
-            loginShellPngCount: meta.screenshots?.length || 0,
-            uiFixturePngCount: fixtureAudit?.screenshots?.length || 0,
-            uiFixtureMetricCount: fixtureAudit?.metrics?.length || 0,
-            screenshotArtifact: 'admin-preview-evidence-' + process.env.GITHUB_RUN_NUMBER,
-            pageErrors: meta.pageErrors || [],
-            consoleErrors: meta.consoleErrors || [],
-            failedRequests: meta.failedRequests || [],
-            httpErrors: meta.httpErrors || [],
-            attemptedWrites: fixtureAudit?.attemptedWrites || [],
-            unexpectedApiPaths: fixtureAudit?.unexpectedApiPaths || [],
-            scope: 'LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND'
-          };
-          // Keep existing historical screenshot references untouched. The current
-          // full-resolution files and per-test metadata stay in the Actions artifact.
-          data.latestScreenshotArtifact = {
-            runId: Number(process.env.GITHUB_RUN_ID),
-            name: 'admin-preview-evidence-' + process.env.GITHUB_RUN_NUMBER,
-            runUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-            sourceCommit: sha,
-            screenshotCount: imageFiles.length,
-            loginShellPngCount: meta.screenshots?.length || 0,
-            uiFixturePngCount: fixtureAudit?.screenshots?.length || 0,
-            uiFixtureMetricCount: fixtureAudit?.metrics?.length || 0,
-            retentionDays: 14,
-            storage: 'GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch'
-          };
-          const issues = Array.isArray(data.remainingIssues) ? data.remainingIssues : [];
-          data.remainingIssues = issues.filter(item => !String(item).includes('Cloudflare Access') && !String(item).includes('screenshots have not been produced'));
-          if (previewState === 'BLOCKED_CLOUDFLARE_ACCESS') {
-            data.remainingIssues.push('Deployed Preview is intercepted by Cloudflare Access; authenticated ADMIN UI could not be reached by the read-only smoke test.');
-          }
-          if (meta.pageErrors?.length || meta.consoleErrors?.length || meta.failedRequests?.length || meta.httpErrors?.length) {
-            data.remainingIssues.push('Local baseline metadata records browser or network errors; inspect history evidence before accepting the UI.');
-          }
-          data.nextActions = [
-            'Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.',
-            'Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.',
-            'Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.',
-            'Run the source checks and Playwright matrix again after every meaningful UI iteration.',
-            'Keep the public website branch and main untouched; do not merge or deploy Production.'
-          ];
-          data.blockedItems = (data.blockedItems || []).filter(item => !String(item).includes('No new Actions run') && !String(item).includes('no local repository checkout'));
-          if (previewState === 'BLOCKED_CLOUDFLARE_ACCESS') {
-            data.blockedItems.push('Cloudflare Access authentication gate prevents the remote Playwright job from reaching the ADMIN login/dashboard. The remote test has not entered credentials or bypassed Access.');
-          }
-          data.productionDeployment = 'NOT_PERFORMED';
-          writeFileSync(jsonPath, JSON.stringify(data, null, 2) + '\n');
-
-          let status = readFileSync(statusPath, 'utf8');
-          const sectionMarker = '## Kết quả kiểm thử tự động gần nhất';
-          const existing = status.indexOf(sectionMarker);
-          if (existing >= 0) status = status.slice(0, existing).trimEnd() + '\n';
-          const statusLines = [
-            '',
-            sectionMarker,
-            '',
-            '- Tested commit: ' + sha,
-            '- Run: https://github.com/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID,
-            '- npm run check: ' + checkState(process.env.CHECK_OUTCOME),
-            '- npm test: ' + checkState(process.env.UNIT_OUTCOME),
-            '- Local source Playwright matrix: ' + checkState(process.env.BASELINE_OUTCOME) + '; ' + imageFiles.length + ' real PNGs captured in artifact admin-preview-evidence-' + process.env.GITHUB_RUN_NUMBER + ' (not committed to Git).',
-            '- Deployed Preview: ' + previewState + '.',
-            '- Source screenshot matrix: ' + imageFiles.length + ' real PNGs; login shell: ' + (meta.screenshots?.length || 0) + '; read-only fixture module screens: ' + ((meta.uiFixtureVisualAudit?.screenshots || []).length) + '; fixture metrics: ' + ((meta.uiFixtureVisualAudit?.metrics || []).length) + '.',
-            '- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.',
-            '- Production deployment: NOT PERFORMED.'
-          ];
-          status += statusLines.join(String.fromCharCode(10)) + String.fromCharCode(10);
-          writeFileSync(statusPath, status);
-          NODE
-
-          git switch -c "$TARGET_BRANCH" "$GITHUB_SHA"
-          git add -- "$DEST" docs/admin-ui-reference/handoff/latest-test-results.json docs/admin-ui-reference/handoff/LATEST-STATUS.md
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "test(admin): save Playwright evidence for $SHA_SHORT"
-          if ! git push origin "HEAD:refs/heads/$TARGET_BRANCH"; then
-            echo "Evidence was generated, but the branch advanced during the run; refusing to force-push. Raw screenshots remain in the Actions artifact."
-            exit 0
-          fi
-          echo "Verified: screenshot evidence and test state were committed on $TARGET_BRANCH."
-
-      - name: Upload Playwright evidence and safe diagnostics
+      - name: Upload Playwright screenshots, metadata, reports, and reference
         if: always()
         uses: actions/upload-artifact@v7
         with:
