@@ -28,6 +28,33 @@ assert.ok(storefrontHtml.includes("n===page?'aria-current=\"page\"':''"), "The c
 assert.ok(storefrontHtml.includes("<nav class=\"pagination\" id=\"pagination\" aria-label=\"Phân trang sản phẩm\"></nav>"), "Product pagination must be a named navigation landmark.");
 assert.ok(storefrontHtml.includes('id="categoryFilters" role="group" aria-label="Lọc theo danh mục"'), "Catalog category filters must be a named group in the accessibility tree.");
 assert.ok(storefrontHtml.includes('id="fulfillmentFilters" role="group" aria-label="Lọc theo tình trạng sản phẩm"'), "Catalog fulfillment filters must be a named group in the accessibility tree.");
+assert.ok(storefrontHtml.includes('<style id="sd-catalog-liquid-glass-reference-2026-10-23">')
+  && storefrontHtml.includes('--sd-catalog-glass-default:rgba(255,255,255,0.48)')
+  && storefrontHtml.includes('--sd-catalog-glass-hover:rgba(255,255,255,0.72)')
+  && storefrontHtml.includes('--sd-catalog-glass-selected:rgba(255,255,255,0.82)')
+  && storefrontHtml.includes('--sd-catalog-ink:#183B5B')
+  && storefrontHtml.includes('--sd-catalog-muted:#6C89A6')
+  && storefrontHtml.includes('--sd-catalog-accent:#1684E8')
+  && storefrontHtml.includes('--sd-catalog-edge:#B5D9F8'),
+  'Catalog search, status panel and category pills must define the agreed icy-blue Liquid Glass tokens.');
+assert.ok(storefrontHtml.indexOf('class="fulfillment-filter-row"') < storefrontHtml.indexOf('class="catalog-tools"'),
+  'The product-status glass panel must precede the search-and-category glass panel as shown in the reference.');
+assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
+  && storefrontHtml.includes('#products .filter-pill[aria-pressed="true"]')
+  && storefrontHtml.includes('#products .filter-pill:active:not(:disabled)')
+  && storefrontHtml.includes('#products .filter-pill:focus-visible'),
+  'Persistent selected, physical pressed and keyboard-focus states must be implemented as distinct catalog-pill states.');
+assert.ok(storefrontHtml.includes('@media(hover:hover) and (pointer:fine)')
+  && storefrontHtml.includes('@media(prefers-reduced-motion:reduce)')
+  && storefrontHtml.includes('@supports not (backdrop-filter: blur(20px))'),
+  'Catalog Liquid Glass must respect hover-capable devices, reduced-motion preferences and a no-backdrop-filter fallback.');
+assert.ok(storefrontHtml.includes("selectedCategory===c?'active':'')")
+  && storefrontHtml.includes("selectedFulfillment===type?'active':'')")
+  && storefrontHtml.includes("selectedCategory==='all'||p.category===selectedCategory")
+  && storefrontHtml.includes("selectedFulfillment==='all'||productFulfillmentType(p)===selectedFulfillment")
+  && storefrontHtml.includes("const count=type==='all'?products.length:fulfillmentCounts[type]"),
+  'Catalog visual refinements must preserve dynamically counted category/status selection and combined filtering logic.');
+
 assert.ok(storefrontHtml.includes("#order .section-head .section-note{width:min(440px,48vw);max-width:100%;min-width:0;white-space:normal;overflow-wrap:break-word}"), "The order-section summary must wrap within the available heading width rather than clip at the right edge.");
 assert.ok(storefrontHtml.includes("Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}"), 'Storefront product cards must clearly disclose when no verified SKU is available.');
 assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');

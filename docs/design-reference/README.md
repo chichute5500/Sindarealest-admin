@@ -28,6 +28,6 @@ The screenshot is a visual guide, not a source of exact pixel colors. Use the co
 
 ## Status
 
-- [ ] Reference image uploaded
-- [ ] Coding AI has reviewed the image
-- [ ] Real UI implemented and verified
+- [x] Reference image uploaded on the working branch (`34c5ac34…`)
+- [x] Coding AI reviewed the actual PNG; it shows light/dark variants of the status panel, search field and category chips
+- [ ] Real UI implementation and Preview verification pending CI/capture results and owner visual review
