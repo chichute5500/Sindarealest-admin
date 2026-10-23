@@ -534,14 +534,18 @@ jobs:
                     await page.screenshot({ path: path.join(outDir, midFilename), animations: 'allow', timeout: 30000, clip: frameClip });
                     audit.screenshots.push({ filename: midFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'activation-midframe', viewport: viewport.name, width: Math.round(frameBox.width), height: Math.round(frameBox.height), captureMarginPx: 36, theme });
 
-                    await page.waitForTimeout(105);
                     const activationLaterFrame = await otherCategory.evaluate(el => {
-                      const css = getComputedStyle(el);
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      if (animation) {
+                        animation.currentTime = 205;
+                        animation.pause();
+                      }
+                      const css = getComputedStyle(el);
                       return {
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
                         transform: css.transform,
+                        backgroundPosition: css.backgroundPosition,
                         boxShadow: css.boxShadow
                       };
                     });
@@ -549,8 +553,8 @@ jobs:
                       'Animation timeline must advance after the category selection state change.');
                     assert.notEqual(activationLaterFrame.transform, activationMidFrame.transform,
                       'Computed transform must change between real animation frames.');
-                    assert.notEqual(activationLaterFrame.boxShadow, activationMidFrame.boxShadow,
-                      'Computed glass bloom must evolve between real animation frames.');
+                    assert.notEqual(activationLaterFrame.backgroundPosition, activationMidFrame.backgroundPosition,
+                      'The specular reflection must visibly sweep across the glass between activation frames.');
 
                     await page.waitForTimeout(300);
                     const settledCategoryStyle = await otherCategory.evaluate(el => {
