@@ -386,8 +386,8 @@ async function runCartConsultHarness(copySucceeded) {
   let copiedMessage = null;
   let scheduled = null;
   const context = {
-    cart: { 'product-1': 2 },
-    products: [{ id: 'product-1', slug: 'product-1', sku: 'SD-001', title: 'Giày thử' }],
+    cart: { 'product-1': 2, 'product-2': 1 },
+    products: [{ id: 'product-1', slug: 'product-1', sku: 'SD-001', title: 'Giày thử' }, { id: 'product-2', slug: 'product-2', sku: 'SD-002', title: 'Giày thử 2' }],
     visibleSku: product => product.sku,
     async copyText(value) { copiedMessage = value; return copySucceeded; },
     showToast(message, url) { toastMessages.push({ message, url }); },
@@ -399,7 +399,7 @@ async function runCartConsultHarness(copySucceeded) {
   return { toastMessages, copiedMessage, scheduled };
 }
 const cartConsultCopyFailed = await runCartConsultHarness(false);
-assert.equal(cartConsultCopyFailed.copiedMessage, 'SD-001 × 2',
+assert.equal(cartConsultCopyFailed.copiedMessage, 'SD-001 × 2\nSD-002 × 1',
   'consultation must copy the visible SKU and quantity for the cart');
 assert.match(cartConsultCopyFailed.toastMessages[0].message, /Không thể tự sao chép/,
   'a failed clipboard operation must never be presented as a successful copy');
