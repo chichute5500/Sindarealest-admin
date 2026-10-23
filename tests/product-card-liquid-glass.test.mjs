@@ -154,6 +154,8 @@ assert.ok(html.includes('<div class="product-meta-row"><span class="product-cate
 assert.ok(html.includes('<div class="product-open" role="button" tabindex="0" data-open-product=')
   && html.includes("if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}"),
   "Product cards must use valid flow-content containers and preserve Enter/Space activation for keyboard users.");
+assert.ok(html.includes(".product-open:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}"),
+  "Keyboard-focusable product cards must retain a visible focus indicator after replacing the native button wrapper.");
 
 console.log("PASS: storefront product cards use reference ice-blue/navy Liquid Glass on desktop/mobile and during theme transitions.");
 
