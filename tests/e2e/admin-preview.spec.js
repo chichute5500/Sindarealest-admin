@@ -481,6 +481,107 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await expect(page.locator('#pTitle')).toHaveValue(target.title);
     stage('product-editor-verified');
 
+    stage('read-only-admin-routes-start');
+    // Exercise only authenticated GET endpoints used by existing Admin modules.
+    // Response bodies remain in-page; evidence stores status/schema/counts only, never business values.
+    const adminReadOnlyMutations = [];
+    page.on('request', request => {
+      let url;
+      try { url = new URL(request.url()); } catch { return; }
+      if (
+        url.origin === new URL(adminUrl).origin &&
+        url.pathname.startsWith('/api/admin/') &&
+        !['GET', 'HEAD', 'OPTIONS'].includes(request.method().toUpperCase())
+      ) {
+        adminReadOnlyMutations.push({ method: request.method().toUpperCase(), path: url.pathname });
+      }
+    });
+    const adminReadOnlyRoutes = await page.evaluate(async () => {
+      const routes = [
+        { path: '/api/admin/session', fields: ['ok', 'authenticated'], fieldTypes: { ok: 'boolean', authenticated: 'boolean' }, expected: { ok: true, authenticated: true } },
+        { path: '/api/admin/orders', arrays: ['orders'] },
+        { path: '/api/admin/customers', arrays: ['customers'] },
+        { path: '/api/admin/warranties', arrays: ['claims', 'warranties'] },
+        { path: '/api/admin/audit-logs', arrays: ['logs'] },
+        { path: '/api/admin/settings', fields: ['showPrices', 'welcomeEnabled'], fieldTypes: { showPrices: 'boolean', welcomeEnabled: 'boolean' } },
+        { path: '/api/admin/payment-qr', fields: ['active', 'bankName', 'accountNumber', 'accountName'], fieldTypes: { active: 'boolean', bankName: 'string', accountNumber: 'string', accountName: 'string' } }
+      ];
+      const checks = [];
+      // Sequential fetches allow the ADMIN session-rotation middleware to settle between requests.
+      for (const route of routes) {
+        try {
+          const response = await fetch(route.path, {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' }
+          });
+          const contentType = response.headers.get('content-type') || '';
+          let payload = null;
+          try { payload = await response.json(); } catch {}
+          const isObject = Boolean(payload && typeof payload === 'object' && !Array.isArray(payload));
+          const arrays = Object.fromEntries((route.arrays || []).map(key => [
+            key,
+            Array.isArray(payload?.[key]) ? payload[key].length : null
+          ]));
+          const requiredFieldsPresent = (route.fields || []).every(key =>
+            isObject && Object.prototype.hasOwnProperty.call(payload, key)
+          );
+          const fieldTypesMatch = Object.entries(route.fieldTypes || {}).every(([key, type]) =>
+            typeof payload?.[key] === type
+          );
+          const expectedValuesMatch = Object.entries(route.expected || {}).every(([key, value]) =>
+            payload?.[key] === value
+          );
+          const arraysValid = Object.values(arrays).every(count => count !== null);
+          checks.push({
+            path: route.path,
+            status: response.status,
+            jsonObject: isObject && contentType.includes('application/json'),
+            responseKeys: isObject ? Object.keys(payload).sort() : [],
+            arrayCounts: arrays,
+            requiredFieldsPresent,
+            fieldTypesMatch,
+            expectedValuesMatch,
+            arraysValid,
+            pass: response.status === 200 && isObject &&
+              contentType.includes('application/json') && requiredFieldsPresent &&
+              fieldTypesMatch && expectedValuesMatch && arraysValid
+          });
+        } catch (error) {
+          checks.push({
+            path: route.path,
+            status: null,
+            jsonObject: false,
+            responseKeys: [],
+            arrayCounts: {},
+            requiredFieldsPresent: false,
+            fieldTypesMatch: false,
+            expectedValuesMatch: false,
+            arraysValid: false,
+            errorType: error?.name || 'Error',
+            pass: false
+          });
+        }
+      }
+      return checks;
+    });
+    const adminReadOnlyRouteEvidence = {
+      routes: adminReadOnlyRoutes,
+      nonReadOnlyRequests: adminReadOnlyMutations,
+      scope: 'AUTHENTICATED LIVE PREVIEW; ADMIN GET ROUTES ONLY; RESPONSE VALUES NOT RECORDED'
+    };
+    await testInfo.attach('admin-live-read-only-routes.json', {
+      body: Buffer.from(JSON.stringify(adminReadOnlyRouteEvidence, null, 2)),
+      contentType: 'application/json'
+    });
+    console.info('[ADMIN_READ_ONLY_API_ROUTES] ' + JSON.stringify(adminReadOnlyRouteEvidence));
+    expect(adminReadOnlyMutations, 'read-only route audit must not issue mutating ADMIN requests').toEqual([]);
+    for (const route of adminReadOnlyRoutes) {
+      expect(route.status, `${route.path} should return authenticated HTTP 200`).toBe(200);
+      expect(route.pass, `${route.path} should return its expected JSON shape`).toBe(true);
+    }
+
     const safeEvidence = {
       sourceCommit: commitKey,
       catalogCount: products.length,
@@ -496,7 +597,9 @@ test.describe('SinDarealest2 Admin Preview', () => {
       publicationFilter: publicationFilterState,
       detailEditorLoaded: true,
       productMutationRequests: mutationRequests,
-      scope: 'AUTHENTICATED LIVE PREVIEW; READ-ONLY PRODUCT API/UI'
+      adminReadOnlyRoutes: adminReadOnlyRouteEvidence.routes.map(route => ({ path: route.path, status: route.status, pass: route.pass, arrayCounts: route.arrayCounts, responseKeys: route.responseKeys })),
+      adminReadOnlyMutations: adminReadOnlyRouteEvidence.nonReadOnlyRequests,
+      scope: 'AUTHENTICATED LIVE PREVIEW; READ-ONLY PRODUCT + ADMIN GET API/UI'
     };
     await testInfo.attach('admin-live-product-read-only-evidence.json', {
       body: Buffer.from(JSON.stringify(safeEvidence, null, 2)),
