@@ -28,8 +28,15 @@ assert.ok(!/opened\.type === 'blocked'\)\s*test\.skip/.test(previewTest),
   'A Cloudflare Access gate must not be reported as a successful Playwright run by skipping the remote smoke test.');
 assert.ok((previewTest.match(/BLOCKED_CLOUDFLARE_ACCESS: Preview diagnostics were saved/g) || []).length === 2,
   'Both remote Preview tests must fail explicitly with the blocked Access diagnostic when the login page is not reached.');
-assert.match(previewWorkflow, /data\.checks\.deployedPreview = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' \? 'BLOCKED_CLOUDFLARE_ACCESS'/,
-  'The persisted deployedPreview status must prioritize an Access block over a generic successful test-process exit.');
+assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v7"),
+  'The workflow must save screenshot and Playwright evidence as a GitHub Actions artifact.');
+assert.ok(previewWorkflow.includes('Verify branch HEAD still matches the tested SHA'),
+  'The workflow must verify tested SHA against current branch HEAD after running tests.');
+assert.ok(!previewWorkflow.includes('contents: write') &&
+  !previewWorkflow.includes('git commit') && !previewWorkflow.includes('git push'),
+  'The workflow must not commit evidence or push a follow-up commit to the source branch.');
+assert.ok(!previewWorkflow.includes('docs/admin-ui-reference/handoff/**'),
+  'Handoff-only evidence updates must not trigger another workflow run.');
 
 for (const [label, sha] of [
   ['current status codeTestSha', status.codeTestSha],
