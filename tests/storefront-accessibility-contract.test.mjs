@@ -26,6 +26,10 @@ assert.match(html, /addEventListener\(['"]keydown['"]/,
   'keyboard dismissal/navigation handling must be registered');
 assert.match(html, /key\s*===?\s*['"]Escape['"]|keyCode\s*===\s*27/,
   'Escape key must be handled for dismissible overlays');
+assert.ok(html.includes('id="menuToggle" aria-label="Mở menu" aria-controls="mobileNav" aria-expanded="false"'),
+  'the mobile menu toggle must explicitly identify the controlled navigation');
+assert.ok(html.includes("if(e.key==='Escape'&&$('#mobileNav').classList.contains('open')){setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})}"),
+  'Escape must close the mobile menu and return keyboard focus to its toggle');
 
 assert.match(html, /<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal">/,
   'the product detail overlay must be the single modal dialog container');
