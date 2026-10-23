@@ -1450,13 +1450,13 @@ $('#detailNext').addEventListener('click',()=>changeDetailImage(detailIndex+1,tr
 $('#sdFullscreenClose').addEventListener('click',()=>requestStorefrontModalClose('gallery',closeFullscreenImage));
 $('#sdFullscreenShare').addEventListener('click',async()=>{
  const p=currentProduct,title=p?.title||'Sản phẩm SinDarealest',url=window.location.href;
- try{
-  if(typeof navigator.share==='function'){await navigator.share({title,text:title+' · SinDarealest',url});return}
-  const copied=await copyText(url);
-  showToast(copied?'Đã sao chép liên kết sản phẩm.':'Trình duyệt không hỗ trợ chia sẻ hoặc sao chép liên kết.');
- }catch(error){
-  if(error?.name!=='AbortError')showToast('Không thể chia sẻ liên kết lúc này.');
+ let nativeShareFailed=false;
+ if(typeof navigator.share==='function'){
+  try{await navigator.share({title,text:title+' · SinDarealest',url});return}
+  catch(error){if(error?.name==='AbortError')return;nativeShareFailed=true}
  }
+ const copied=await copyText(url);
+ showToast(copied?(nativeShareFailed?'Không mở được bảng chia sẻ. Đã sao chép liên kết sản phẩm.':'Đã sao chép liên kết sản phẩm.'):'Không thể chia sẻ hoặc sao chép liên kết sản phẩm lúc này.');
 });
 $('#sdFullscreenThumbs').addEventListener('click',e=>{const b=e.target.closest('[data-full-thumb]');if(b)changeDetailImage(Number(b.dataset.fullThumb),true)});
 $('#sdFullscreenPrev').addEventListener('click',()=>changeDetailImage(detailIndex-1,true,'right'));
