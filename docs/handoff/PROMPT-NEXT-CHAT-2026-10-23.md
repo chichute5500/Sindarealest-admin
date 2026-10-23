@@ -14,10 +14,10 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108
 - PR phải giữ OPEN, không merge.
-- HEAD bàn giao hiện tại: `2cc4e5d5b97659de6429eb0ad2be1a0d177f0a4c` (docs-only; đã xác minh trên GitHub).
-- Mã nguồn public đã được kiểm thử và deploy Preview: `a84eef725171826f595f61b236533d6dd882dbe7`. Commit tài liệu sau đó không thay đổi `public/`, nên Preview vẫn chạy đúng source SHA này.
-- CI/tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525107
-- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525216
+- HEAD đã xác minh gần nhất: `d9b2ec642b4afede7c16a2a4224546d2b5df3423`; các cập nhật tài liệu trong bàn giao này sẽ tạo thêm docs-only commits, vì vậy chat tiếp theo phải đọc lại HEAD trực tiếp.
+- Source/Preview SHA đã khớp chính xác tại lần capture: `d9b2ec642b4afede7c16a2a4224546d2b5df3423`; Preview deploy metadata PASS (deployment ID `02c7e164-92a9-4167-b3ab-a2de343a041d`).
+- CI/tests PASS tại SHA `d9b2ec642b4afede7c16a2a4224546d2b5df3423`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775440
+- Catalog-only Preview capture PASS kỹ thuật, 16 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806. Visual acceptance của chủ dự án vẫn PENDING.
 - Chụp live Preview phần `#order` PASS về mặt kỹ thuật: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271
 - Artifact 8 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271/artifacts/12479461634
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
@@ -42,7 +42,7 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 ## Bước tiếp theo bắt buộc
 
 1. Chủ dự án đã xác nhận **PASS phiên bản hiện tại của toàn bộ phần quy trình đặt hàng an tâm (`#order`)**. Đánh dấu PASS/LOCKED; tuyệt đối không yêu cầu duyệt lại hoặc chỉnh phần này nếu chưa có phép mở khóa rõ ràng.
-2. Active task: verify the catalog filter accessibility fix. `public/index.html` adds `role="group"` to `#categoryFilters` and `#fulfillmentFilters`; regression assertions are in `tests/storefront-operations.test.mjs`. Source commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`; test commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`. Static read-back passed. Live capture run #39904394642 confirms Preview source/deployed SHA `bd3d6f6d4268d63b1907a0533613d1cab6da3c05` exactly, but its 8 screenshots cover only `#order`, not catalog filters. Test-only commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a` has no combined status, and the available workflow-run lookup did not expose the source-validation run. Automated tests and catalog-specific visual evidence are still pending; obtain the authorized validation result before claiming PASS. Do not run a Hero-inclusive capture.
+2. Catalog filter accessibility: source/test and Preview technical gates PASS; catalog-only capture has 16 screenshots tied to exact Preview SHA `d9b2ec642b4afede7c16a2a4224546d2b5df3423`. See CI #39905775440, capture #39905775565 and artifact #12480418806. The only remaining gate is owner visual acceptance. Do not run Hero-inclusive capture; do not touch the owner-locked `#order`.
 3. Trước mọi thay đổi, đọc HEAD mới nhất, PR #108, trạng thái CI, Preview deploy và SHA đã deploy. Đối chiếu mọi thay đổi kể từ SHA trong prompt; không dựa vào SHA cũ như HEAD hiện tại.
 4. Sau mỗi thay đổi, kiểm tra workflow đến trạng thái cuối; trong lúc CI/deploy/capture chạy, làm việc độc lập an toàn nếu có. Không tuyên bố PASS khi chưa có bằng chứng.
 5. Cập nhật cả bốn file handoff sau mỗi trạng thái quan trọng. Commit tài liệu riêng khi cần; không đổi source chỉ để cập nhật handoff.
@@ -61,17 +61,10 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 
 ## ACTIVE NON-HERO TASK — CATALOG FILTER ACCESSIBLE NAMES — 2026-10-23
 
-- Concrete source issue found in the product catalog: the category and fulfillment filter containers carried `aria-label` but had no explicit named grouping role. They are now `role="group"` with their existing Vietnamese accessible labels, so assistive technology can expose the two related button sets as named groups.
-- Source change: `public/index.html`, commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`.
-- Regression assertions: `tests/storefront-operations.test.mjs`, commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`.
-- Read-back verification confirms both role/label pairs and both regression assertions are present. This is static read-back only, **not** a passing Node test suite, Preview deployment, live capture, or owner visual acceptance.
-- GitHub combined-status queries for both commits currently return no statuses; no CI/deploy PASS has been established for this change. Do not claim this change is validated or deployed. The previously documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7` until a new successful deployment is verified.
-- Next: obtain/run the relevant validation using an authorized workflow path, inspect the final result, then deploy Preview only and verify exact deployed SHA before any live catalog capture. Do not change other catalog behavior without another concrete finding.
-- The previously owner-PASSed `#order` section remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged; no Production deployment or restricted-scope changes.
-
-## FOLLOW-UP VERIFICATION — CATALOG FILTER FIX PREVIEW DEPLOYMENT — 2026-10-23
-
-- Follow-up live capture workflow [#39904394642](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39904394642) completed successfully and its log confirms the Preview alias deployed source SHA `bd3d6f6d4268d63b1907a0533613d1cab6da3c05` exactly (`sourceHeadSha == deployedPreviewSha`, `exactSourceHeadMatch: true`). Artifact [#12480013477](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39904394642/artifacts/12480013477) contains 8 screenshots, but its selector is only `section.section.wrap#order`; it is not visual evidence for catalog filters and does not reopen or change the owner's #order PASS.
-- The subsequent test-only commit is `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`; it changes `tests/storefront-operations.test.mjs` only, so deployed `public/` remains the tested source commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05` until another source change.
-- Combined status for the source SHA exposes the successful order-capture context; combined status for the test-only SHA is empty. The available workflow-run lookup only returns PR-triggered runs and did not expose the source-validation workflow result. Therefore **automated test-suite PASS remains unverified**; do not claim it passed.
-- Next: retrieve the final source-validation/test workflow result through an authorized path if available. Then arrange a catalog-only live check if an existing safe workflow supports it; otherwise document that catalog-filter visual evidence is pending rather than running any Hero-inclusive capture. No more source changes until this validation gate is resolved.
+- **Status: TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING.** Fix in `public/index.html`: `#categoryFilters` and `#fulfillmentFilters` are named `role="group"` elements; regressions are asserted in `tests/storefront-operations.test.mjs`.
+- Full source integrity/dependency audit/test suite PASS at SHA `d9b2ec642b4afede7c16a2a4224546d2b5df3423`, [CI run #39905775440](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775440).
+- Catalog-only live Preview capture PASS at that same source/deployed SHA, [run #39905775565](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565) and [artifact #12480418806 — 16 images + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806). Manifest confirms Preview deployment ID `02c7e164-92a9-4167-b3ab-a2de343a041d`, successful stage, exact source SHA match, public tree equivalent, 8 viewport/theme checks, no runtime errors, no same-origin HTTP errors, no write attempts, no Access block. Cloudflare Insights GETs were blocked by the established external-read allowlist.
+- Scope is only `#products .catalog-tools` and `#products .fulfillment-filter-row`, at 360/390 mobile, 768 tablet, 1440 desktop, Light/Dark. No Hero and no `#order` screenshots.
+- Initial capture [#39905609877](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905609877) failed because the harness checked before dynamic filter rendering; workflow-only wait fix in `d9b2ec6` made the retry pass. No storefront CSS/HTML or backend/API source was changed for that timing issue.
+- **Next required action:** owner reviews [artifact #12480418806](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806) and explicitly PASSes or identifies a concrete discrepancy. Do not self-assign visual acceptance or start another main acceptance item before this owner gate is resolved.
+- `#order` remains OWNER PASS / LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
