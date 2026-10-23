@@ -88,12 +88,12 @@ assert.deepEqual(
 
 // Invalid encoded segments must be rejected by the browser route parser before decodeURIComponent runs.
 // These constraints mirror functions/_middleware.js so malformed paths fall through to the storefront 404 view.
-const strictFrontendRouteMatcher = String.raw`location.pathname.match(/^\\/sanpham\\/[a-z0-9][a-z0-9-]{0,99}\\/([a-z0-9][a-z0-9._-]{0,119})\\/?$/i)||location.pathname.match(/^\\/san-pham\\/([a-z0-9][a-z0-9._-]{0,119})\\/?$/i)`;
+const strictFrontendRouteMatcher = String.raw`location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)`;
 assert.equal((storefrontSource.split(strictFrontendRouteMatcher).length - 1), 2,
   "initial load and history navigation must both validate product route segments before decoding");
 
-const modernClientRoute = /^\\/sanpham\\/[a-z0-9][a-z0-9-]{0,99}\\/([a-z0-9][a-z0-9._-]{0,119})\\/?$/i;
-const legacyClientRoute = /^\\/san-pham\\/([a-z0-9][a-z0-9._-]{0,119})\\/?$/i;
+const modernClientRoute = /^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i;
+const legacyClientRoute = /^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i;
 assert.equal(modernClientRoute.exec("/sanpham/giaytay/internal-abc123")?.[1], "internal-abc123");
 assert.equal(legacyClientRoute.exec("/san-pham/SD-REAL-001")?.[1], "SD-REAL-001");
 for (const malformedPath of [
