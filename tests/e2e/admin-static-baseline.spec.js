@@ -307,10 +307,21 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         entity_type: 'product',
         entity_id: 'UI-ONLY-PRODUCT',
         actor: 'UI fixture',
-        details_json: JSON.stringify({
-          title: fixtureProduct.title,
-          sku: fixtureProduct.sku
-        })
+        details_json: JSON.stringify({ title: fixtureProduct.title, sku: fixtureProduct.sku })
+      }, {
+        created_at: '2026-10-20 10:15:00',
+        action: 'order_created',
+        entity_type: 'order',
+        entity_id: 'UI-ONLY-ORDER-2',
+        actor: 'admin',
+        details_json: JSON.stringify({ orderNumber: 'UI-ONLY-ORDER-2' })
+      }, {
+        created_at: '2026-10-19 08:20:00',
+        action: 'customer_updated',
+        entity_type: 'customer',
+        entity_id: 'UI-ONLY-CUSTOMER-2',
+        actor: 'admin',
+        details_json: JSON.stringify({ customerId: 'UI-ONLY-CUSTOMER-2' })
       }]
     }
   };
@@ -2469,7 +2480,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await notificationsTab.click();
       await expect(notificationsTab).toHaveAttribute('aria-pressed', 'true');
       await expect(page.locator('#activityNotificationList')).toContainText('Đã sửa sản phẩm');
-      await expect(page.locator('#activityNotificationsUnread')).toHaveText('1');
+      await expect(page.locator('#activityNotificationsUnread')).toHaveText('3');
       await page.locator('#activityMarkNotificationsRead').click();
       const activityReadAt = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
       expect(Number.isFinite(Date.parse(activityReadAt || '')), 'Screen 12 notification tab must persist the local read timestamp').toBe(true);
@@ -2481,18 +2492,42 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const width = page.viewportSize()?.width ?? 0;
       const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(documentWidth, 'Activity log must not cause document-level horizontal overflow').toBeLessThanOrEqual(width);
+      await expect(page.locator('.activity-log-category-filters')).toBeVisible();
+      await expect(page.locator('#activityActorFilter')).toBeVisible();
+      await expect(page.locator('#activityDateFrom')).toBeVisible();
+      await expect(page.locator('#activityDateTo')).toBeVisible();
+      const productEntityFilter = page.locator('[data-activity-entity-filter="product"]');
+      const orderEntityFilter = page.locator('[data-activity-entity-filter="order"]');
+      await orderEntityFilter.click();
+      await expect(orderEntityFilter).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(1);
+      await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-ORDER-2');
+      await productEntityFilter.click();
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(1);
+      await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-PRODUCT');
+      await page.locator('[data-activity-entity-filter="all"]').click();
+      await page.locator('#activityActorFilter').selectOption('admin');
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(2);
+      await page.locator('#activityActorFilter').selectOption('all');
+      await page.locator('#activityDateFrom').fill('2026-10-22');
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(0);
+      await page.locator('#activityDateFrom').fill('');
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(3);
       if (width <= 680) {
-        // The shared mobilecards layout uses a label/value flex row for each cell.
-        await expect(page.locator('.activity-log-table tbody tr td').first()).toHaveCSS('display', 'flex');
-        const mobileActivityLabels = await page.locator('.activity-log-table tbody tr').first().evaluate(row =>
-          [...row.cells].map(cell => getComputedStyle(cell, '::before').content.replace(/^["']|["']$/g, ''))
-        );
-        expect(
-          mobileActivityLabels,
-          'Mobile audit-log cells must show the existing data-label so values remain identifiable'
-        ).toEqual(['Thời điểm', 'Thao tác', 'Đối tượng', 'Người thực hiện', 'Chi tiết']);
+        await expect(page.locator('.activity-log-table-wrap')).toBeHidden();
+        await expect(page.locator('.activity-log-cards')).toBeVisible();
+        await expect(page.locator('.activity-log-card-avatar').first()).toHaveAttribute('aria-hidden', 'true');
+        const cardLayout = await page.locator('.activity-log-card').first().evaluate(element => {
+          const box=element.getBoundingClientRect();
+          return { left:box.left, right:box.right, width:box.width, scrollWidth:element.scrollWidth, clientWidth:element.clientWidth };
+        });
+        expect(cardLayout.left, 'Mobile activity cards should stay within the viewport').toBeGreaterThanOrEqual(-1);
+        expect(cardLayout.right, 'Mobile activity cards should not cross the viewport edge').toBeLessThanOrEqual(width+1);
+        expect(cardLayout.scrollWidth, 'Mobile activity cards must not have internal horizontal overflow').toBeLessThanOrEqual(cardLayout.clientWidth+1);
         const searchWidth = await page.locator('#activityLogSearch').evaluate(el => el.getBoundingClientRect().width);
         expect(searchWidth, 'Activity-log search must have a usable full-width row on mobile').toBeGreaterThanOrEqual(width * 0.65);
+      } else {
+        await expect(page.locator('.activity-log-table-wrap')).toBeVisible();
       }
 
       await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');
@@ -2521,7 +2556,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(panel).toBeVisible();
       const unreadCount = page.locator('#notificationCount');
       await expect(unreadCount, 'A recent fixture audit event should appear as unread').toBeVisible();
-      await expect(unreadCount).toHaveText('1');
+      await expect(unreadCount).toHaveText('3');
       await page.locator('#markNotificationsRead').click();
       await expect(unreadCount, 'Marking notifications read should clear the unread badge').toBeHidden();
       const lastSeen = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
