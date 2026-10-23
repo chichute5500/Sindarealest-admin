@@ -221,3 +221,14 @@ B1 scope/provenance review is complete. The current diff is 396 files; the two a
 ## Immediate next-chat instructions (supersede stale next-step text below)
 
 Continue from live branch `feature/admin-isolated-handoff-2026-10-20`, not from a SHA copied from old messages. First fetch current branch HEAD, PR #111/#108, and latest Actions. At checkpoint time HEAD was `d763f0fe6742848d42626176627bf8edb20e9bfe`; tested SHA `19202ac0b351ab6623047c057a5c1af41f97cefe`; Validate #39952239465 and Preview #39952239467 both PASS; artifact admin-preview-evidence-422 ID 12500722416. Inspect its screenshots against `docs/admin-ui-reference/admin-mobile-reference.png`, prioritizing Screens 4/5 and 7 at matching viewport/theme. Fix only confirmed ADMIN-specific mismatches, add assertions, verify exact tested SHA, inspect artifact, then update all six handoff/audit files. Do not ask the owner to restate context or ask permission to continue routine work. Never claim complete until screen evidence supports it. All acceptance boundaries and hard restrictions in the checkpoint remain in force.
+
+
+## Immediate continuation checkpoint — 2026-10-24 ICT
+
+1. Re-fetch live branch HEAD, PR #111/#108 and Actions before doing anything; handoff SHA `74268971ddf4bfe06827974b9efb5def12e60665` is a checkpoint, not a substitute for live verification.
+2. Validate #40012438226 is PASS on that exact SHA. Preview #40012438208 was IN_PROGRESS at handoff and last observed installing Chromium; inspect fresh status/jobs/logs/artifacts. Do not assume success or stop after reporting.
+3. Concurrency fix is already committed: `.github/workflows/admin-preview-diagnostics.yml` groups by branch plus SHA. Do not repeat this fix unless fresh evidence disproves it.
+4. A mobile greeting-heading UI fix plus regression assertion is included in the current tested SHA; verify the actual diff and screenshots before claiming acceptance. Compare Screen 10 and that heading with the approved reference at matching viewport/theme.
+5. User has confirmed catalog products are visible. Do not repeat the “0 products” investigation or seed/import. Keep all 12 screens PARTIAL_NOT_ACCEPTED until evidence supports acceptance.
+6. Synchronize exactly these six files after the next meaningful verified checkpoint: `START-HERE.md`, `PROMPT-NEXT-CHAT.md`, `LATEST-STATUS.md`, `current-status.json`, `latest-test-results.json`, `12-SCREEN-REFERENCE-AUDIT.md`.
+7. Preserve the seven mandatory operational rules and all safety boundaries in this prompt. No merge, production deploy, Access bypass, secret/shared Cloudflare changes, remote D1/R2/schema/ledger writes, migrations, seed/import, or business writes.
