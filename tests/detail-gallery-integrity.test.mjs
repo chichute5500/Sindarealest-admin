@@ -2,6 +2,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+const visualWorkflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
+assert.match(visualWorkflow, /confirm_hero_coverage:[\s\S]*?default: false/,
+  'Manual comprehensive visual capture must default to no Hero coverage while Hero is paused.');
+assert.match(visualWorkflow, /github\.event_name == 'push' && contains\(github\.event\.head_commit\.message, '\[hero-capture-approved\]'\)/,
+  'Push-triggered comprehensive capture must require an explicit Hero-coverage approval marker.');
+
 const count = text => html.split(text).length - 1;
 
 assert.equal(count('id="detailZoom"'), 1, 'The detail viewer must expose exactly one full-image control.');
