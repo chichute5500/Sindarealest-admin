@@ -405,3 +405,11 @@ assert.ok(html.includes('linear-gradient(145deg,rgba(255,255,255,.57) 0%,rgba(22
 assert.ok(html.includes('html.dark .detail-gallery-arrow:hover'), 'dark mode must have an equivalent shared glass hover state');
 const finalGlassCss = html.slice(finalGlassStart, html.indexOf('</style>', finalGlassStart));
 assert.ok(!finalGlassCss.includes('#products .filter-pill') && !finalGlassCss.includes('#order .order-cta'), 'final glass system must not override the owner-locked catalog filters or order section');
+
+
+// Extend parity coverage to every unlocked icon-button family without changing nav/tab geometry.
+const finalIconStart = html.indexOf('<style id="sd-unified-icon-system-final">');
+const finalIconStyle = html.slice(finalIconStart, html.indexOf('</style>', finalIconStart));
+assert.ok(finalIconStyle.includes('.mini-add:hover') && finalIconStyle.includes('.page-btn.page-arrow:hover:not(:disabled)'), 'product-card add and pagination-arrow buttons must use the common glass shell');
+assert.ok(finalIconStyle.includes('.account-action>span.account-action-icon svg') && finalIconStyle.includes('#mobileBottomNav .mobile-tab svg'), 'account and mobile navigation SVG sizing must follow the shared optical baseline');
+assert.ok(!finalIconStyle.includes('#mobileBottomNav .mobile-tab{') && !finalIconStyle.includes('.service-strip .service-icon{'), 'do not replace mobile tab geometry or benefit-tile shells with generic button shells');
