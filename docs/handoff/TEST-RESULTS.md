@@ -171,17 +171,22 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 
 ## ACTIVE NON-HERO TASK — CATALOG FILTER ACCESSIBLE NAMES — 2026-10-23
 
-- Concrete source issue found in the product catalog: the category and fulfillment filter containers carried `aria-label` but had no explicit named grouping role. They are now `role="group"` with their existing Vietnamese accessible labels, so assistive technology can expose the two related button sets as named groups.
-- Source change: `public/index.html`, commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`.
-- Regression assertions: `tests/storefront-operations.test.mjs`, commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`.
-- Read-back verification confirms both role/label pairs and both regression assertions are present. This is static read-back only, **not** a passing Node test suite, Preview deployment, live capture, or owner visual acceptance.
-- GitHub combined-status queries for both commits currently return no statuses; no CI/deploy PASS has been established for this change. Do not claim this change is validated or deployed. The previously documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7` until a new successful deployment is verified.
-- Next: obtain/run the relevant validation using an authorized workflow path, inspect the final result, then deploy Preview only and verify exact deployed SHA before any live catalog capture. Do not change other catalog behavior without another concrete finding.
-- The previously owner-PASSed `#order` section remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged; no Production deployment or restricted-scope changes.
+### Source and automated tests
+- Source fix: `public/index.html`, commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`: `#categoryFilters` and `#fulfillmentFilters` now have `role="group"` and explicit Vietnamese accessible names.
+- Regression checks: `tests/storefront-operations.test.mjs`, commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`.
+- Full source integrity, dependency audit and automated test suite PASS on `d9b2ec642b4afede7c16a2a4224546d2b5df3423`, [run #39905775440](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775440). Full CI/tests also PASS on `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`, [run #39904430124](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39904430124).
+- Workflow-only capture harness fix commit: `d9b2ec642b4afede7c16a2a4224546d2b5df3423`, adding a bounded wait until dynamically rendered filter buttons are visible. It does not change `public/` or backend/API source.
 
-## FOLLOW-UP VERIFICATION — CATALOG FILTER FIX PREVIEW DEPLOYMENT — 2026-10-23
+### Exact-SHA Preview evidence
+- Catalog-only capture workflow PASS: [run #39905775565](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565).
+- [Artifact #12480418806 — 16 screenshots and `catalog-filter-audit.json`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806).
+- Manifest: `sourceHeadSha == deployedPreviewSha == d9b2ec642b4afede7c16a2a4224546d2b5df3423`; `exactSourceHeadMatch: true`; `sourcePublicTreeEquivalentToDeployment: true`; Preview environment/branch verified; deploy ID `02c7e164-92a9-4167-b3ab-a2de343a041d`, successful stage; alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/`; unique deployment `https://02c7e164.sindarealest2.pages.dev/`.
+- Coverage is isolated to `#products .catalog-tools` and `#products .fulfillment-filter-row`, not Hero or `#order`: viewport widths 360, 390, 768, 1440, in Light and Dark = 8 viewport/theme pairs and 16 screenshots.
+- All 8 filter checks passed: group roles/names recognized, 9 category buttons and 4 fulfillment choices rendered, category and fulfillment selection/reset interactions updated `aria-pressed) as expected.
+- Manifest verdict: `captureCompleted: true`, `passed: true`, `ownerVisualAcceptance: PENDING`. Zero runtime errors, zero same-origin HTTP errors, zero read-only violations and no Cloudflare Access block. `static.cloudflareinsights.com` GETs were blocked by the pre-existing external-read allowlist and recorded as blocked external requests.
+- Initial harness run [#39905609877](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905609877) failed at “Category filter group has no buttons” because the assertion raced async product rendering. The wait was added and retry #39905775565 passed. Treat the first run as a capture-harness timing failure, not a confirmed storefront defect.
 
-- Follow-up live capture workflow [#39904394642](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39904394642) completed successfully and its log confirms the Preview alias deployed source SHA `bd3d6f6d4268d63b1907a0533613d1cab6da3c05` exactly (`sourceHeadSha == deployedPreviewSha`, `exactSourceHeadMatch: true`). Artifact [#12480013477](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39904394642/artifacts/12480013477) contains 8 screenshots, but its selector is only `section.section.wrap#order`; it is not visual evidence for catalog filters and does not reopen or change the owner's #order PASS.
-- The subsequent test-only commit is `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`; it changes `tests/storefront-operations.test.mjs` only, so deployed `public/` remains the tested source commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05` until another source change.
-- Combined status for the source SHA exposes the successful order-capture context; combined status for the test-only SHA is empty. The available workflow-run lookup only returns PR-triggered runs and did not expose the source-validation workflow result. Therefore **automated test-suite PASS remains unverified**; do not claim it passed.
-- Next: retrieve the final source-validation/test workflow result through an authorized path if available. Then arrange a catalog-only live check if an existing safe workflow supports it; otherwise document that catalog-filter visual evidence is pending rather than running any Hero-inclusive capture. No more source changes until this validation gate is resolved.
+### Acceptance still required
+- **Technical source/test gate: PASS. Preview deployment-SHA gate: PASS. Catalog-only live capture gate: PASS. Owner visual acceptance: PENDING.**
+- Next action is for the owner to visually review [the 16-screen catalog-only artifact](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806) and explicitly PASS or report a concrete discrepancy. Do not declare visual acceptance on the owner’s behalf, alter storefront CSS speculatively, or move to the next main acceptance item before the owner gate is resolved.
+- Owner-PASSed `#order` remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 remains OPEN/unmerged. No Production deploy or restricted-scope changes were made.
