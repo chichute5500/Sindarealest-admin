@@ -378,6 +378,7 @@ jobs:
                   assert.notEqual(searchReleased, searchPressed.background,
                     'Search pressed treatment must end after pointer release.');
                   await searchInput.focus();
+                  await page.waitForTimeout(300);
                   const searchFocus = await searchField.evaluate(el => {
                     const css = getComputedStyle(el);
                     return { border: css.borderColor, shadow: css.boxShadow };
@@ -387,6 +388,7 @@ jobs:
                   assert.notEqual(searchFocus.shadow, searchDefault.shadow,
                     'Focused search must expose a visible focus treatment.');
                   await page.keyboard.press('Tab');
+                  await page.waitForTimeout(50);
                   const firstCategoryButton = categoryGroup.locator('button').first();
                   assert.equal(await firstCategoryButton.evaluate(el => el.matches(':focus-visible')), true,
                     'Keyboard navigation must expose focus-visible on the next category pill.');
