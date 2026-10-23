@@ -1,3 +1,12 @@
+## LATEST AUTHORITATIVE UPDATE — SLIDESHOW TEST HARNESS CORRECTION — 2026-10-24
+
+- Current follow-up source/test SHA: `ed06d73b89477b637a72c25c7939ee94f32c056f`. The prior CI on `5c1ba570934588ec80b8fffd69d4f69f4ae6225a` exposed a harness-only issue: a literal newline was embedded in evaluated JavaScript, causing a SyntaxError. Corrected test assembly to use `String.fromCharCode(10)`.
+- The earlier attempt also incorrectly treated the vm result as a callable function; that was corrected by appending the setup invocation to the evaluated source.
+- Current exact-SHA CI [#39995473464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995473464) and Preview [#39995473418](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995473418) were in progress at documentation time. Do not mark PASS until both finish on `ed06d73b89477b637a72c25c7939ee94f32c056f`.
+- Last fully green source/test SHA remains `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`, CI #39994601040 and Preview #39994600974, Preview URL https://5052d769.sindarealest2.pages.dev/. Current follow-up must earn its own gates.
+
+---
+
 ## LATEST AUTHORITATIVE UPDATE — SLIDESHOW CONTROL GUARD — 2026-10-24
 
 - Follow-up source/test commit: `3fabbfc0bea134f9babde0b856276a47c966553f`. Defensive guard added to `setupArtSlideshow()`: require the pause, previous, and next controls before binding handlers or starting timers. If a required control is absent, the slideshow safely returns rather than throwing or creating an unreachable autoplay interval.
