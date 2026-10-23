@@ -2,9 +2,9 @@
 
 ## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
 
-- CI on source commit c4f41c60d56c0841e6146734dc28d6f57415dee0 first exposed a missing node:vm import, which was added in 3fb504d50b068647a38dcc0b7547d57616184a55. The next CI reached the regression assertions but the preventDefault callback was created inside the VM and its flag did not update the host scope. This patch passes a host-created callback into the VM; exact-SHA CI is pending.
-- The same commit’s Preview deployment run #39979048662 failed before deployment at the intentional target-safety gate. The resolved GitHub Actions variable CLOUDFLARE_PAGES_PROJECT was `sindarealest-admin-preview`, but the storefront workflow requires project `sindarealest2` and verifies Production remains on `main`. Previous successful deploy #39975778958 resolved the expected `sindarealest2`.
-- No Cloudflare deployment or Cloudflare settings were changed by the failed run. Do not bypass the guard or deploy to the other project. Owner action is needed to reconcile the repository Actions variable `CLOUDFLARE_PAGES_PROJECT` with the intended storefront project before Preview deployment can succeed.
+- The first two CI attempts exposed test-harness issues (missing `node:vm` import and a callback created in the wrong JavaScript context). Both are corrected. Full project integrity, dependency audit and `npm test` now PASS at exact code/test SHA `0371b82c71e39f67ad0afd74a08e7a2557341bab` — [CI #39979850514](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39979850514).
+- The latest Preview deployment run [#39979850588](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39979850588) failed at the pre-deploy target-safety gate: the resolved deployment project is `sindarealest-admin-preview`, but this storefront workflow requires `sindarealest2` and checks that Production remains on `main`. The earlier successful Preview deployment [#39975778958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975778958) resolved to the expected storefront project.
+- No deployment or project-setting change happened in the failed runs. Keep the gate intact and do not deploy to the alternate project. The owner needs to confirm/correct the repository Actions project setting to `sindarealest2` before retrying Preview. If the alternate project is now intentional, the target and approved Preview URL need explicit owner confirmation first.
 - Liquid Glass screenshot run #39979048660 was SKIPPED by its Hero-coverage guard; the catalog-filter audit was not run. Keep all locks and Preview-only rule intact.
 
 
@@ -14,7 +14,7 @@
 - Confirmed an unlocked storefront behavior defect in the account drawer: clicking “Liên hệ hỗ trợ” closed the drawer directly, leaving the account modal history marker on the current entry. Same-document fragment navigation carries history state forward, so a later Back traversal could reopen the account drawer; deferred focus restoration could also fight the contact-anchor scroll.
 - Fix in public/index.html: the account contact link now uses a dedicated handler that replaces the current modal history entry with #contact, clears only the modal marker (preserving unrelated state), closes the account without restoring focus to the hidden trigger, sets active navigation, scrolls to the contact section, and focuses its heading.
 - Added a behavior-level regression contract in tests/storefront-accessibility-contract.test.mjs for state-marker removal, preserved state, focus behavior and navigation.
-- Source/CI/Preview results: PENDING at handoff time. Do not claim technical PASS until the latest code SHA finishes CI and Preview deployment and the exact deployed SHA is verified.
+- Code/test validation: PASS at exact SHA `0371b82c71e39f67ad0afd74a08e7a2557341bab`, CI #39979850514. Preview remains BLOCKED before deployment by the target-safety gate in run #39979850588; this fix is not yet deployed or visually verified.
 - No Hero, #order, catalog-filter UI, payment/backend contract, or Production scope was changed. PR #108 remains OPEN/unmerged.
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
