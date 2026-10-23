@@ -1,3 +1,15 @@
+## VERIFIED TEST RECORD — CART CONSULTATION + CART NORMALIZATION — 2026-10-24
+
+- Combined source/test SHA: `373c282d626b6ec2291111adb7d81ec2a26e1c2d`.
+- Full validation / dependency audit / test suite PASS: [#40003445574](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40003445574).
+- Preview deployment PASS on the same SHA: [#40003445503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40003445503), immutable URL https://6e52aeb8.sindarealest2.pages.dev/. Deploy log verifies `sindarealest2`, Production branch `main`, and `--commit-hash=$GITHUB_SHA`.
+- `tests/storefront-accessibility-contract.test.mjs`: validates Zalo cart message line breaks, copy success/failure feedback, and manual-send fallback when popup opening is blocked.
+- `tests/cart-checkout-separation.test.mjs`: validates catalog-aware cart normalization, stale entry cleanup, integer quantity rules, persistence and header badge synchronization.
+- No browser capture/manual visual acceptance was performed.
+- Lock status unchanged; PR #108 remains OPEN/unmerged; Preview only.
+
+---
+
 ## VERIFIED GREEN TEST RECORD — SLIDESHOW CONTROL GUARD — 2026-10-24
 
 - Final source/test SHA: `74bcd512abc19d3fba4bad64654321091073b8ea`.
