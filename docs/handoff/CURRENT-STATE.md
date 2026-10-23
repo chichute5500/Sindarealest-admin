@@ -1,3 +1,14 @@
+## VERIFIED GREEN FOLLOW-UP — SLIDESHOW CONTROL GUARD — 2026-10-24
+
+- Final source/test SHA for slideshow pause control + defensive missing-control guard: `74bcd512abc19d3fba4bad64654321091073b8ea`.
+- CI/full automated suite PASS on exact SHA: [#39995656182](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656182). Test log includes `PASS: collection slideshow autoplay can be paused/resumed and remains off under prefers-reduced-motion.` and all existing project checks.
+- Preview deploy PASS on exact SHA: [#39995656107](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656107). Immutable Preview: https://e7b33eeb.sindarealest2.pages.dev/; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy log confirms project `sindarealest2`, Production branch `main`, correct target branch, successful upload/deployment, and `--commit-hash=$GITHUB_SHA` supplied for the run SHA.
+- The final regression fixture separates reduced-motion (pause button present but disabled) from missing-control (pause button removed). No manual browser screenshot/visual acceptance was performed.
+- PR #108 remains OPEN/unmerged; docs-only commits follow source SHA, and public storefront files did not change after the source/test SHA. All owner locks unchanged.
+
+---
+
 ## LATEST AUTHORITATIVE UPDATE — SLIDESHOW HARNESS FIX ROUND 3 — 2026-10-24
 
 - Current source/test SHA: `74bcd512abc19d3fba4bad64654321091073b8ea`. Follow-up fixes the harness-only fixture issue: the reduced-motion scenario must retain the pause button so it can assert the control is disabled and labeled correctly. Missing-control scenario explicitly removes the pause button separately.
