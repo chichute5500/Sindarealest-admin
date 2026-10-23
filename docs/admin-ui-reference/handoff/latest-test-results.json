@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:13:50Z",
+  "capturedAtUtc": "2026-10-23T03:19:30Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
@@ -380,11 +380,11 @@
     "capturedAtUtc": "2026-10-23T03:13:50Z",
     "testedSha": "83733513da6d3a28a13e773f479b596a4432df1f",
     "validateRun": {
-      "id": 39893834166,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166",
-      "status": "completed",
-      "conclusion": "success"
+      "id": 39894319427,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894319427",
+      "status": "in_progress",
+      "conclusion": null
     },
-    "note": "Handoff refresh validation passed on exact SHA. Admin Preview evidence is still pinned to source/test SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285."
+    "note": "Handoff refresh commit e6b3161ff86805a0b1efa42d116ae8b38bbe27a9 is awaiting Validate run #39894319427; do not claim pass until live Actions confirms it. Admin Preview evidence remains pinned to source/test SHA 4ac7465539e746b7f37517327d7bf9bddcfa3285."
   }
 }

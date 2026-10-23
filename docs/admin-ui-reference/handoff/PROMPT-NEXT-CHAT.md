@@ -1,17 +1,16 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
-Continue actual GitHub work on the current live repository. Read [START-HERE.md](START-HERE.md) first, then verify live refs and Actions. Do not ask the owner to paste history or repeat completed B1 cleanup.
+Continue actual GitHub work on the current live repository. Read [START-HERE.md](START-HERE.md) and this file, then fetch live PR #111/#108 metadata, main SHA, writable branch HEAD and recent Actions before acting. Treat the checkpoint below as historical until re-verified. Do not ask the owner to paste history or repeat completed B1 cleanup.
 
 Repository: `chichute5500/Sindarealest-admin`
 
 ## Latest verified checkpoint
 - Writable branch: `feature/admin-isolated-handoff-2026-10-20`.
-- At checkpoint time (`2026-10-23T03:05:10Z`), PR #111 was OPEN/unmerged at HEAD `6264adcdd1f3982c5cd96cd21006c6217ac3cd87`, 396 changed files (+39,229 / -212), base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. HEAD is a Preview-generated evidence-only child of source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`.
-- Validate [#39891441964](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964) and Admin Preview [#39891442082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082) both completed **SUCCESS on exact source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`**. Preview artifact [`admin-preview-evidence-361`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082/artifacts/12474998216) contains 102 PNGs (16 login shell, 86 read-only fixture/module screens) and 78 fixture metrics. These screenshots and the deployed login CSS diagnostic do not prove authenticated business-data persistence.
-- The Admin Preview workflow committed compact evidence under `docs/admin-ui-reference/handoff/history/4ac7465539e7/`. Current source/test result and artifact remain pinned to `4ac7465539e746b7f37517327d7bf9bddcfa3285`; don't mistake the evidence-only child for a new app build.
-- Product fix validated: Screen 10 moved the QR payment panel after public-price, welcome and watermark settings. `tests/admin-liquid-glass-contract.test.mjs` guards the order. Persistent settings and real QR activation remain unverified.
-- Previous checkpoint Validate [#39890582750](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39890582750) was SUCCESS on exact SHA `71ca210f0a024f29b5960cc07705171096adb920`.
-- PR #108 is READ-ONLY, OPEN/unmerged, observed head `5a11a5264ab6186c36eac764dd7755c3b2c1bf9a`, 286 changed files (+20,602 / -398). Main remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Do not write to PR #108/main/static website branch.
+- Last verified live branch HEAD before this handoff refresh: `83733513da6d3a28a13e773f479b596a4432df1f`; Validate [#39893834166](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166) SUCCESS on exact SHA. Handoff refresh commit `e6b3161ff86805a0b1efa42d116ae8b38bbe27a9` has a new Validate run [#39894319427](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894319427); fetch live status before treating it as passed.
+- PR #111 remains OPEN/unmerged, 396 files (+39,231 / -212), base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- PR #108 is OPEN/unmerged and READ-ONLY. Last live observation during this checkpoint: head `49b61d2340709304fba485c6002567c0ea9cf79f`, 287 files (+21,055 / -398). Re-fetch before acting; do not write there.
+- Latest Admin Preview remains SUCCESS on source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`; its screenshots are read-only fixtures and do not prove authenticated business-data persistence.
+- Screen 10 settings order is guarded by a regression assertion. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
 ## B1 — complete; don't repeat without new evidence
 B1 scope/provenance review is complete. The current diff is 396 files; the two additions after the last census are generated compact Preview evidence (`report.md`, `preview-diagnostics.json`). Current path census: docs 342, functions 24, migrations 2, Admin HTML 1, scripts 4, tests 19, workflow 1, seed data 1, root 2. History has 163 SHA-keyed directories and 330 compact text/JSON evidence files plus README. No further deletion or API consolidation is justified without newly discovered consumer/provenance evidence.
