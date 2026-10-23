@@ -1,5 +1,14 @@
 # ACTIVE TASK LEDGER — SINDAREALEST2
 
+## LATEST TASK UPDATE — MOBILE NAVIGATION FOCUS ROUTING — 2026-10-23 22:59 ICT
+
+- Completed the mobile-nav focus routing correction at `abd7c42b5371bce7bfa4d90977e414139547f392`: backdrop close returns focus to the menu toggle; selecting a mobile drawer link focuses its destination heading/target after closing the drawer.
+- Full CI PASS [#39982751954](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751954); Preview deploy PASS [#39982751719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751719).
+- Immutable Preview: https://e9f95857.sindarealest2.pages.dev/.
+- Source-only checks: internal fragment targets resolve, image tags have alt attributes, target-blank links have rel, IDs are unique, and no implicit submit buttons were found inside forms. No runtime/browser visual acceptance claimed.
+- Next: continue source-first audit in an unlocked non-Hero area; do not edit without a concrete defect. All owner locks remain active; PR #108 stays OPEN/unmerged.
+
+
 ## LATEST TASK UPDATE — MOBILE BACKDROP FOCUS RETURN — 2026-10-23 22:53 ICT
 
 - Completed the non-locked mobile navigation backdrop focus-return fix at `07ff556aa957cfc119c48651769a4edbbe1dbe01`.

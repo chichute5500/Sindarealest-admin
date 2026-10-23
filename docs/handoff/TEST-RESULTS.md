@@ -1,5 +1,15 @@
 # TEST & VISUAL AUDIT EVIDENCE INDEX
 
+## LATEST EXACT-SHA RESULT — MOBILE NAVIGATION FOCUS ROUTING — 2026-10-23 22:59 ICT
+
+- Commit `abd7c42b5371bce7bfa4d90977e414139547f392` changes only `public/index.html` and `tests/mobile-navigation-contract.test.mjs`.
+- The mobile menu now returns focus to its toggle on backdrop dismissal and transfers focus to the destination heading/target when a mobile navigation link is activated.
+- Full source integrity/dependency audit/tests PASS: [#39982751954](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751954).
+- Preview deploy PASS on the same exact commit: [#39982751719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751719); immutable URL https://e9f95857.sindarealest2.pages.dev/.
+- Source-only scan: 23 fragment links resolve; 22 image tags have alt attributes; 6 target-blank links include rel; no duplicate IDs; no missing button type was found inside static forms.
+- Live browser capture was not performed for this keyboard interaction fix; no visual/owner acceptance is claimed. Owner locks remain unchanged.
+
+
 ## LATEST EXACT-SHA RESULT — MOBILE BACKDROP FOCUS RETURN — 2026-10-23 22:53 ICT
 
 - Commit: `07ff556aa957cfc119c48651769a4edbbe1dbe01`.

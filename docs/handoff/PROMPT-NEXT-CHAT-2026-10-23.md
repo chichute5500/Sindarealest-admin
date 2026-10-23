@@ -1,5 +1,28 @@
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
+## NEWEST HANDOFF OVERRIDE — MOBILE NAVIGATION FOCUS ROUTING COMPLETE — 2026-10-23 22:59 ICT
+
+Continue the existing repository; do not restart. Re-fetch live branch HEAD, PR state, and workflow evidence before future edits.
+
+- Repo: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 OPEN/unmerged.
+- Latest source/test SHA: `abd7c42b5371bce7bfa4d90977e414139547f392`.
+- Fixes: mobile backdrop dismissal returns focus to `#menuToggle`; mobile drawer link activation focuses the destination heading (or target fallback) after closing the drawer.
+- CI PASS: [#39982751954](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751954).
+- Preview deploy PASS: [#39982751719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751719).
+- Immutable Preview: https://e9f95857.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- A static follow-up found no missing internal fragment targets, image alt attributes, new-tab rel attributes, duplicate IDs, or implicit submit buttons inside static forms. This is source-level evidence only; no live browser capture/visual acceptance is claimed.
+- Continue safe source-first audit of an unlocked non-Hero section. Establish a concrete defect before editing; do not idle after reporting.
+
+## Hard guardrails
+- Hero PAUSED BY OWNER: do not inspect, edit, test, redesign, restore, or capture.
+- `#order` / “Đặt hàng an tâm” OWNER PASS/LOCKED: do not touch or retest.
+- Catalog filter Liquid Glass/chip height OWNER PASS/LOCKED; no edits or audit unless explicitly reopened and required unlock is set.
+- Do not restore the deleted dedicated product-status filter panel.
+- No Production deploy, main changes, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+- PR #108 must remain OPEN/unmerged.
+- If live browser access is blocked, do not bypass Access; continue independent safe source/test work.
+
+
 ## NEWEST HANDOFF OVERRIDE — MOBILE BACKDROP FOCUS FIX COMPLETE — 2026-10-23 22:53 ICT
 
 Continue the existing repository; do not restart. Re-fetch branch HEAD and PR state before further edits.

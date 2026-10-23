@@ -1,5 +1,17 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
 
+## LATEST AUTHORITATIVE UPDATE — MOBILE NAVIGATION FOCUS ROUTING — 2026-10-23 22:59 ICT
+
+- Latest source/test commit: `abd7c42b5371bce7bfa4d90977e414139547f392`; PR #108 remains OPEN/unmerged.
+- Two related mobile navigation focus defects are now covered: backdrop dismissal returns focus to `#menuToggle`; activating a link in the mobile drawer moves focus to the destination heading (or target fallback) instead of leaving focus in the hidden drawer. Regression contracts are in `tests/mobile-navigation-contract.test.mjs`.
+- Exact-SHA source/dependency validation and full test suite PASS: [CI #39982751954](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751954).
+- Exact-SHA Preview deploy PASS: [#39982751719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751719). Immutable Preview: https://e9f95857.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deployment log confirms project `sindarealest2`, Production branch `main`, and Wrangler invoked with `--commit-hash=$GITHUB_SHA`. No Production deploy.
+- Source-only follow-up scan: 23 internal fragment links / 0 missing targets; 22 image tags / 0 missing alt attributes; 6 target-blank links / 0 missing rel attributes; 0 duplicate IDs; no buttons without explicit type were found inside the four static form elements. These checks are not live browser acceptance.
+- No new screenshot/browser interaction capture was run for this keyboard-focus change. Do not claim live-browser or visual PASS. Continue safe source-first audit and edit only on a concrete defect.
+- Hard locks unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; catalog filter Liquid Glass/height OWNER PASS/LOCKED; removed status-filter panel stays removed. PR #108 remains OPEN/unmerged; Preview only; no Admin/backend/API/auth/data/config changes.
+
+
 ## LATEST AUTHORITATIVE UPDATE — MOBILE BACKDROP FOCUS RETURN — 2026-10-23 22:53 ICT
 
 - Branch/PR head for this source change: `07ff556aa957cfc119c48651769a4edbbe1dbe01`; PR #108 remains OPEN/unmerged.
