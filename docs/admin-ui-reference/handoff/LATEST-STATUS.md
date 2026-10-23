@@ -46,9 +46,12 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested source/test commit: `f2a3bee28523cc0ecb541a17b095c80acb2a4b31`.
-- Validate [#39911090605](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090605): **SUCCESS** — dependency audit PASS, project integrity PASS, `npm run check` PASS, `npm test` PASS.
-- Admin Preview [#39911090568](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568): **SUCCESS** — Chromium setup and static source server PASS; responsive/theme screenshot matrix PASS; deployed Preview login CSS signature diagnostic PASS; artifact upload PASS.
-- Artifact [admin-preview-evidence-383](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090568/artifacts/12482517911): 132 generated PNGs (16 login, 116 distinct module files; 120 fixture capture entries), 112 fixture metrics, plus approved reference PNG in archive. Document horizontal overflow metrics: 0/112; page errors 0; failed requests 0; HTTP errors 0; attempted writes 0; unexpected API paths 0. Seven expected HTTP 503 console entries belong to synthetic retry tests.
-- Gallery: 320×640 and 360×800 reachability checks pass; 320px scroll requirement remains. The 390×844 upload/drop-zone and sticky-footer regression passed. No UI CSS change was made for the assertion corrections.
-- The deployed Preview diagnostic only confirms `PASS_LOGIN_CSS_SIGNATURE`; authenticated backend/business workflows remain `NOT_TESTED`. Production deployment `NOT_PERFORMED`.
+- Tested commit: b512367db26035a1a95979121430c38e7f182c4f
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911703264
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 132 real PNGs captured in artifact admin-preview-evidence-384 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 132 real PNGs; login shell: 16; read-only fixture module screens: 120; fixture metrics: 112.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
