@@ -1598,6 +1598,21 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           expect(narrowLayout.railOverflowX, 'Only the thumbnail rail should scroll horizontally').toBe('auto');
           expect(narrowLayout.railScrollWidth,
             'At ' + narrowViewport.width + 'px all fixture thumbnails should remain horizontally reachable').toBeGreaterThan(narrowLayout.railClientWidth + 20);
+          if (narrowViewport.width <= 360) {
+            const footerActions = await page.evaluate(() => ['#deleteProduct', '#editorCancel', '#saveProduct'].map(selector => {
+              const element = document.querySelector(selector);
+              if (!element) throw new Error('Missing gallery footer action ' + selector);
+              const rect = element.getBoundingClientRect();
+              return { selector, left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, visible: rect.width > 0 && rect.height > 0 };
+            }));
+            for (const action of footerActions) {
+              expect(action.visible, action.selector + ' must remain visible on narrow phones').toBe(true);
+              expect(action.left, action.selector + ' must stay inside the viewport').toBeGreaterThanOrEqual(-1);
+              expect(action.right, action.selector + ' must stay inside the viewport').toBeLessThanOrEqual(narrowViewport.width + 1);
+            }
+            expect(Math.max(...footerActions.map(action => action.top)) - Math.min(...footerActions.map(action => action.top)),
+              'Delete, cancel and save actions must remain on one row at 320px').toBeLessThanOrEqual(3);
+          }
           await saveScreenshot('product-gallery-responsive', { viewport: narrowViewport, theme: variant.theme }, {
             dialog: true, fixtureImages: 6, horizontalThumbnailRail: true, responsiveViewportAudit: true
           });

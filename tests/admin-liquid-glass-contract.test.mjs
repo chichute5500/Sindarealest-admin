@@ -305,6 +305,8 @@ has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join(''
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
 has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobile editor action footer does not shrink');
+has('@media(max-width:360px){#backdrop>.editor>form>.editorfooter{gap:6px;padding-left:8px;padding-right:8px}', 'narrow-phone gallery actions use a compact single-row footer');
+has('#backdrop>.editor>form>.editorfooter .btn{padding-inline:9px;font-size:10px;white-space:nowrap}', 'narrow-phone gallery action labels remain on one line');
 
 
 
