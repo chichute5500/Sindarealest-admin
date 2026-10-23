@@ -99,6 +99,7 @@ jobs:
           const audit = {
             sourceKind: 'cloudflare-pages-preview-live-read-only',
             auditScope: 'catalog-search-and-category-controls-only',
+            referenceImage: 'docs/design-reference/liquid-glass-product-filters.png',
             previewOrigin: origin,
             branch,
             sourceHeadSha: sourceSha,
@@ -123,6 +124,10 @@ jobs:
           };
           await fs.rm(outDir, { recursive: true, force: true });
           await fs.mkdir(outDir, { recursive: true });
+          await fs.copyFile(
+            path.join(process.cwd(), 'docs/design-reference/liquid-glass-product-filters.png'),
+            path.join(outDir, 'liquid-glass-product-filters-reference.png')
+          );
           const writeAudit = async () => {
             await fs.mkdir(outDir, { recursive: true });
             await fs.writeFile(manifestPath, JSON.stringify(audit, null, 2) + '\n', 'utf8');
