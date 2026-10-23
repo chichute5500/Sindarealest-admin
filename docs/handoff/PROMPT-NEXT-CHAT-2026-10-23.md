@@ -147,3 +147,26 @@ Read CURRENT-STATE.md, TASKS.md and TEST-RESULTS.md first, then fetch current br
 - PR #108 must remain OPEN/unmerged. Hero PAUSED BY OWNER — never inspect/edit/test/capture. #order OWNER PASS/LOCKED — never touch/retest. Never restore the deleted dedicated product-status filter panel. Preview only; no Production, Admin/backend/API/auth/data/D1/R2/secrets/bindings/DNS/Access changes.
 
 **Next action:** Do not start another acceptance item until the owner reviews the catalog activation artifact and either says PASS or specifies a concrete issue. Keep this task in technical PASS / owner visual acceptance pending.
+
+---
+
+# LATEST HANDOFF OVERRIDE — MATCH THE CATEGORY LIQUID GLASS REFERENCE — 2026-10-23 12:23 UTC
+
+Continue the existing project from GitHub. Do not restart or ask the owner to repeat context. Read `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS.md`, and `docs/handoff/TEST-RESULTS.md` first, then fetch the live branch HEAD, PR #108, Actions and Preview deployment metadata.
+
+## Active task — still OPEN
+The owner says the category-chip activation is materially different from the provided Liquid Glass sample. Do not ask the owner to check yet. Compare the real category activation against `docs/design-reference/liquid-glass-product-filters.png`, correct confirmed differences, and collect reliable live Preview evidence first.
+
+- Prior source validation #39952718374 passed on SHA `ecee210c0906edc66d00a7396a55a19f029e7c6c`.
+- Audit #39952718436 failed because the harness incorrectly called `activationMidFrame.Math.abs`; its artifact #12501390897 is not PASS evidence.
+- Fix commit `b534c8fb8861157fb07da0b507a1e5f791966872` corrects three such calls and preserves the frame tolerance and `scaleX > 1.04` spring threshold.
+- Current validation #39953050846 and catalog-only audit #39953050974 were in progress at handoff. Check final statuses, logs, artifact and manifest.
+- Previous successful Preview deployment #39952539810 is at older storefront SHA `f3131d668fef72c652942a051f0ac53e7c739da6`. Verify current deployed SHA/public-tree equivalence before claiming current UI is live.
+
+## Required visual criteria
+A CSS animation declaration is not enough. The activation must read as Liquid Glass: translucent depth, visible moving diagonal specular sheen, theme-appropriate bloom, press-in followed by a clear spring/bounce and settle, persistent selected state, reliable retrigger on category change/reselection, legible label and no endless pulse. Desktop mouse/keyboard and mobile touch must share the same animation semantics; layout may adapt. Respect reduced motion. Verify mobile 360/390, tablet 768, desktop 1440 × Light/Dark. Capture catalog filters only—never Hero or `#order`.
+
+If audit fails, inspect the exact error and fix it, then rerun. If audit passes but the real appearance still differs from the sample, improve the catalog-only UI and repeat source tests, Preview deployment, exact SHA/public-tree verification and live captures. Only then ask the owner to inspect; do not claim owner PASS unless explicitly given.
+
+## Report-then-continue and safety
+After reporting, immediately continue the next safe step without waiting for “continue.” While CI/deploy/capture runs, do independent non-conflicting review and then inspect results. Keep PR #108 OPEN/unmerged; Preview only. Hero PAUSED BY OWNER—never inspect/edit/test/capture/restore. `#order` OWNER PASS/LOCKED—never touch/retest. Do not restore the deleted dedicated product-status filter panel. No Production, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes. Update all four handoff docs after meaningful work.
