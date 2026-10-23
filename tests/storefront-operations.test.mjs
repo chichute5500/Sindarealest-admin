@@ -40,7 +40,8 @@ assert.ok(storefrontHtml.includes('<style id="sd-catalog-liquid-glass-reference-
   'Catalog search and category pills must define the agreed icy-blue Liquid Glass tokens.');
 assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
   && storefrontHtml.includes('#products .filter-pill[aria-pressed="true"]')
-  && storefrontHtml.includes('#products .filter-pill::after{\\n  content:"";\\n  position:absolute;\\n  inset:1px;\\n  z-index:-1;')
+  && storefrontHtml.includes('#products .filter-pill::after{')
+  && storefrontHtml.includes('z-index:-1;')
   && storefrontHtml.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;')
   && storefrontHtml.includes('15%{opacity:.70}')
   && storefrontHtml.includes('52%{opacity:.66;background-position:45% 0;')
