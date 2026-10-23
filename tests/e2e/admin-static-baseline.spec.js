@@ -643,7 +643,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (name === 'warranties') {
         await expect(page.locator('#toast'),
           'Screen 9 baseline screenshot must not retain the success toast from the preceding retry test')
-          .not.toHaveClass(/(?:^|\\s)show(?:\\s|$)/);
+          .not.toHaveClass(/show/);
       }
       await saveScreenshot(name, variant);
       if (name === 'orders' && variant.viewport.width > 680) {
