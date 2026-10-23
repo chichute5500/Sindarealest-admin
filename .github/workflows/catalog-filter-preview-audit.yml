@@ -500,7 +500,7 @@ jobs:
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
                         playState: animation?.playState || 'missing',
                         transform: css.transform,
-                        scaleX,
+                        scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
                         boxShadow: css.boxShadow
                       };
                     });
