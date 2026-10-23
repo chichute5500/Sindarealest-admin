@@ -383,3 +383,12 @@ assert.ok(html.includes('--sd-icon-stroke:1.7'), 'the shared icon system must de
 assert.ok(html.includes('--sd-icon-press-color:#5c91b9'), 'icon press feedback must use the approved Liquid Glass accent');
 assert.ok(html.includes('@media(prefers-reduced-motion:reduce)'), 'icon transitions must respect reduced motion');
 assert.ok(!html.includes('#products .catalog-tools svg{') && !html.includes('.catalog-tools svg{width:18px;height:18px'), 'the icon standardization must not override the owner-locked catalog filter controls');
+
+
+// Shared icon Liquid Glass shell contract; owner-locked catalog filters and #order remain excluded.
+assert.ok(html.includes('--sd-icon-glass-bg:rgba(194,222,242,.14)'), 'shared dark-theme glass surface token must exist');
+assert.ok(html.includes('backdrop-filter:blur(18px) saturate(165%)'), 'icon-only controls must share translucent blur/saturation');
+assert.ok(html.includes('inset 0 1px 0 var(--sd-icon-glass-highlight)'), 'shared icon shells must include a specular highlight');
+assert.ok(html.includes('.slide-controls button:active') && html.includes('.detail-gallery-arrow:active'), 'icon controls must share a pressed glass state');
+assert.ok(html.includes('focus-visible') && html.includes('prefers-reduced-motion:reduce'), 'shared icon controls must retain keyboard focus and reduced-motion support');
+assert.ok(!html.includes('#products .catalog-tools svg{') && !html.includes('.catalog-tools svg{width:18px;height:18px'), 'owner-locked catalog filter controls must not be overridden');
