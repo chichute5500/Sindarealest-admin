@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:14:57Z",
+  "capturedAtUtc": "2026-10-23T04:17:49Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
@@ -227,7 +227,7 @@
   },
   "latestCodeCommitSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
   "testedCommitSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-  "capturedAt": "2026-10-23T04:14:57.890Z",
+  "capturedAt": "2026-10-23T04:17:49Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
@@ -261,7 +261,7 @@
     "localPlaywright": "PASS",
     "sourceScreenshotCount": 132,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
+    "uiFixturePngCount": 116,
     "uiFixtureMetricCount": 112,
     "screenshotArtifact": "admin-preview-evidence-369",
     "screenshotArtifactId": 12478285219,
@@ -275,7 +275,11 @@
     "unexpectedApiPaths": [],
     "horizontalOverflowMetrics": 0,
     "scope": "LOCAL SOURCE AND READ-ONLY SYNTHETIC FIXTURE; NOT AUTHENTICATED REAL BACKEND",
-    "referenceImageReview": "Approved composite admin-mobile-reference.png was successfully opened from artifact 369 for qualitative comparison; full pixel parity remains NOT_VERIFIED."
+    "referenceImageReview": "Approved composite admin-mobile-reference.png was successfully opened from artifact 369 for qualitative comparison; full pixel parity remains NOT_VERIFIED.",
+    "uiFixtureCaptureEntryCount": 120,
+    "screenshotCount": 132,
+    "artifactArchivePngCount": 133,
+    "referenceImageArchiveNote": "The ZIP contains 133 PNG files in total: 132 distinct generated screenshot PNGs plus the approved reference PNG."
   },
   "latestScreenshotArtifact": {
     "runId": 39898454274,
@@ -285,10 +289,13 @@
     "sourceCommit": "000d3d84a9cf8c63144388f80879b5cc1439d161",
     "screenshotCount": 132,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
+    "uiFixturePngCount": 116,
     "uiFixtureMetricCount": 112,
     "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch",
+    "uiFixtureCaptureEntryCount": 120,
+    "archivePngCount": 133,
+    "archivePngMeaning": "ZIP has 133 PNG files: 132 unique captured screenshots plus the reference image; module metadata records 120 capture entries but only 116 distinct module screenshot filenames."
   },
   "remainingIssues": [
     "B1 cleanup/provenance review is complete; no further deletion/API consolidation without new consumer evidence.",
@@ -341,7 +348,7 @@
     "previewArtifactId": 12478285219,
     "screenshotCount": 132,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
+    "uiFixturePngCount": 116,
     "uiFixtureMetricCount": 112,
     "fixturePageErrors": 0,
     "fixtureConsoleErrors": 7,
@@ -362,7 +369,10 @@
     "pr111Deletions": 212,
     "pr108Head": "63079aabf853d6b4d492942020a71603754046d8",
     "pr108ChangedFiles": 287,
-    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "uiFixtureCaptureEntryCount": 120,
+    "artifactArchivePngCount": 133,
+    "screenshotCountSemantics": "132 distinct screenshot PNGs (16 login + 116 module files); metadata records 120 module capture entries; archive includes the reference image as one extra PNG."
   },
   "currentChange": {
     "status": "SCREEN_9_MOBILE_TOAST_CLEARANCE_FIX_VALIDATED; NARROW_VIEWPORT_MATRIX_PASS; B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
@@ -411,7 +421,7 @@
     }
   },
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T04:14:57Z",
-    "syncPurpose": "Sync latest exact-SHA Validate/Preview pass, Screen 9 toast clearance fix and 320x640/360x800 matrix across canonical handoff files."
+    "lastSyncAtUtc": "2026-10-23T04:17:49Z",
+    "syncPurpose": "Clarify artifact counts accurately across canonical handoff files."
   }
 }

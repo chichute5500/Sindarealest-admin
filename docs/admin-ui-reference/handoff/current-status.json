@@ -1,10 +1,10 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:14:57Z",
+  "capturedAtUtc": "2026-10-23T04:17:49Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-  "checkpointSemantics": "Live branch HEAD 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0 is a generated evidence-only child; application/source-test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161 is independently verified by Validate 39898454195 and Admin Preview 39898454274.",
+  "checkpointSemantics": "Live branch HEAD 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0 is a generated evidence-only child; application/source-test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161 is independently verified by Validate 39898454195 and Admin Preview 39898454274. Artifact counting semantics: 132 distinct captured screenshots = 16 login + 116 distinct module PNGs; metadata lists 120 module capture entries because some names recur; ZIP contains one additional reference PNG.",
   "codeTestSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
   "latestProductSourceCommit": "000d3d84a9cf8c63144388f80879b5cc1439d161",
   "latestActionsRun": {
@@ -387,8 +387,8 @@
   "handoffSync": {
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "lastSyncAtUtc": "2026-10-23T04:14:57Z",
-    "syncPurpose": "Sync all canonical handoff files to exact-SHA Validate/Preview success, Screen 9 toast clearance fix, and 320x640/360x800 matrix."
+    "lastSyncAtUtc": "2026-10-23T04:17:49Z",
+    "syncPurpose": "Clarify artifact counts: 132 captured screenshot PNGs, 120 module capture entries, 116 distinct module PNGs and one additional reference PNG in the archive."
   },
   "currentHeadAtCheckpoint": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
   "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_FOLLOWS",
@@ -407,7 +407,7 @@
     "previewArtifactId": 12478285219,
     "screenshotCount": 132,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
+    "uiFixturePngCount": 116,
     "uiFixtureMetricCount": 112,
     "fixturePageErrors": 0,
     "fixtureConsoleErrors": 7,
@@ -428,7 +428,10 @@
     "pr111Deletions": 212,
     "pr108Head": "63079aabf853d6b4d492942020a71603754046d8",
     "pr108ChangedFiles": 287,
-    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "uiFixtureCaptureEntryCount": 120,
+    "artifactArchivePngCount": 133,
+    "screenshotCountSemantics": "132 distinct screenshot PNGs (16 login + 116 module files); metadata records 120 module capture entries; archive includes the reference image as one extra PNG."
   },
   "latestReviewFinding": "Screen 9 responsive audit found a reproducible toast/navigation clearance gap of 6px at 320x640; CSS offset changed from 82px to 84px plus safe-area inset. Validate and Playwright passed on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. The approved reference image has now been visually inspected, but full screen-by-screen parity remains NOT_VERIFIED. All screens remain PARTIAL_NOT_ACCEPTED."
 }
