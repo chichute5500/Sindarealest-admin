@@ -1,22 +1,24 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T05:00:00Z",
+  "capturedAtUtc": "2026-10-23T05:34:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "695a6a4e318d7464d029efefb0780a3002db0c4f",
+  "branchHeadAtCheckpointStart": "a5d0076eda669b670b3de9ba4da2069c25f149f2",
   "checkpointSemantics": "Branch HEAD 290d3de4110f235c0a0ea963f0bc191dbd374b11 is an evidence-only child created by Admin Preview; application/source-test SHA a04e7f581f81403aae19aa9249d383a27f947ab5 passed Validate 39899961562 and Admin Preview 39899961344 on the exact same SHA. Artifact admin-preview-evidence-370 (ID 12478995473) contains 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one additional approved reference PNG. Local fixture evidence has 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors; seven simulated HTTP 503 console entries are expected retry fixtures. Deployed diagnostic confirms login CSS signature only. The recorded branch head is the pre-handoff-sync evidence checkpoint; current branch/PR refs must always be fetched live.",
-  "codeTestSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
-  "latestProductSourceCommit": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+  "codeTestSha": "a4e2508235cb928568992f8dba408acc913f2baf",
+  "latestProductSourceCommit": "a4e2508235cb928568992f8dba408acc913f2baf",
   "latestActionsRun": {
-    "id": 39903088401,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39903088401",
-    "headSha": "695a6a4e318d7464d029efefb0780a3002db0c4f",
+    "id": 39906240167,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
+    "headSha": "a4e2508235cb928568992f8dba408acc913f2baf",
     "status": "completed",
-    "conclusion": "success"
+    "conclusion": "success",
+    "workflow": "Admin Preview diagnostic smoke test",
+    "summary": "npm run check PASS; npm test PASS; local source Playwright matrix PASS; 132 PNGs, 120 fixture module captures, 112 fixture metrics. Deployed diagnostic verifies login-shell CSS only; authenticated backend remains NOT_TESTED."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL remains an overall estimate only. Notification unread/mark-read UI regression checks and the responsive/theme fixture matrix passed on the exact source/test SHA, but all 12 screens remain unaccepted, full reference parity is unverified and authenticated backend workflows are untested.",
+  "progressBasis": "50% PROVISIONAL remains an overall estimate only. Screen 12 tabs and regression tests passed on exact source/test SHA a4e2508235cb928568992f8dba408acc913f2baf, but all 12 screens remain unaccepted, full reference parity is unverified and authenticated backend workflows are untested.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -40,7 +42,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "695a6a4e318d7464d029efefb0780a3002db0c4f",
+      "headSha": "a5d0076eda669b670b3de9ba4da2069c25f149f2",
       "changedFiles": 410,
       "additions": 39805,
       "deletions": 212,
@@ -134,15 +136,15 @@
     }
   },
   "latestProductChange": {
-    "status": "NOTIFICATION_UNREAD_MARK_READ_REGRESSION_TEST_ADDED; VALIDATE_AND_PREVIEW_PASS; BACKEND_ACCEPTANCE_PARTIAL",
-    "sourceAndTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "validateRunId": 39899961562,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
-    "previewRunId": 39899961344,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
-    "previewArtifact": "admin-preview-evidence-370",
-    "previewArtifactId": 12478995473,
-    "summary": "Added deterministic notification unread/mark-read persistence and keyboard close/focus regression checks. Exact-SHA Validate and Admin Preview passed; screenshot matrix completed. Authenticated notifications/business backend and full reference parity remain unverified."
+    "status": "SCREEN_12_ACTIVITY_NOTIFICATION_TABS_AND_TEST_ASSERTION_FIXED; CHECKS_AND_PLAYWRIGHT_PASS; BACKEND_ACCEPTANCE_PARTIAL",
+    "sourceAndTestSha": "a4e2508235cb928568992f8dba408acc913f2baf",
+    "validateRunId": 39906240167,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
+    "previewRunId": 39906240167,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
+    "previewArtifact": "admin-preview-evidence-374",
+    "previewArtifactId": 12481355528,
+    "summary": "Screen 12 now has in-page Activity Log and Notifications tabs; regression covers notification label, unread badge, mark-read timestamp, Escape close and focus restoration. The first Playwright attempt failed because it expected an internal event key instead of the rendered Vietnamese label; the assertion was corrected and the exact-SHA Admin Preview run passed. Fixture-only; authenticated audit feed and real notifications remain untested."
   },
   "screenStatuses": {
     "1_login": {
@@ -191,7 +193,7 @@
     },
     "12_activity_log": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Fixture records only; authenticated audit feed not tested."
+      "gap": "In-page Activity Log/Notifications tabs and unread/mark-read fixture regression pass on exact source/test SHA a4e2508235cb928568992f8dba408acc913f2baf; authenticated audit feed and real notification delivery remain untested."
     }
   },
   "scopeAudit": {
@@ -410,33 +412,33 @@
     "Do not repeat completed B1 cleanup, merge/rebase/force-push, deploy Production, or write to main/PR #108."
   ],
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T05:00:00Z",
+    "lastSyncAtUtc": "2026-10-23T05:34:00Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "syncPurpose": "Current branch/PR/Actions state and next-chat instructions."
+    "syncPurpose": "Sync verified run 39906240167 and Screen 12 regression result; source SHA is distinct from evidence and handoff-only commits."
   },
-  "currentHeadAtCheckpoint": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-  "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_FOLLOWS",
-  "currentHeadValidationReason": "Validate #39898454195 and Admin Preview #39898454274 both succeeded on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. Artifact admin-preview-evidence-369 (ID 12478285219) records 132 unique generated PNGs and 112 fixture metrics. The broader fixture matrix passed with no horizontal overflow; Screen 9 toast gap measured 6px on prior SHA and passed after CSS offset changed 82px to 84px plus safe-area inset. Preview diagnostic is login-shell CSS signature only; authenticated backend remains NOT_TESTED.",
+  "currentHeadAtCheckpoint": "a5d0076eda669b670b3de9ba4da2069c25f149f2",
+  "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; HANDOFF EVIDENCE/DOCS CHILD COMMITS ARE NOT CODE TESTS",
+  "currentHeadValidationReason": "Admin Preview run 39906240167 tested source/test SHA a4e2508235cb928568992f8dba408acc913f2baf and passed. Evidence child a5d0076eda669b670b3de9ba4da2069c25f149f2 and later handoff-only commits do not change application code; do not claim those commits were separately rerun.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T05:00:00Z",
-    "branchHeadAtCheckpointStart": "695a6a4e318d7464d029efefb0780a3002db0c4f",
-    "codeTestSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
-    "validateRunId": 39903088401,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39903088401",
+    "capturedAtUtc": "2026-10-23T05:34:00Z",
+    "branchHeadAtCheckpointStart": "a5d0076eda669b670b3de9ba4da2069c25f149f2",
+    "codeTestSha": "a4e2508235cb928568992f8dba408acc913f2baf",
+    "validateRunId": 39906240167,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
     "validateConclusion": "success",
-    "previewRunId": 39901444449,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
+    "previewRunId": 39906240167,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167",
     "previewConclusion": "success",
-    "previewArtifact": "admin-preview-evidence-371",
-    "previewArtifactId": 12478713244,
+    "previewArtifact": "admin-preview-evidence-374",
+    "previewArtifactId": 12481355528,
     "screenshotCount": 132,
     "loginShellPngCount": 16,
-    "distinctModuleScreenshots": 116,
+    "distinctModuleScreenshots": 120,
     "uiFixtureCaptureEntryCount": 120,
     "uiFixtureMetricCount": 112,
     "archivePngCount": 133,
-    "screen7OrderDetailMobileScrollAudit": "PASS_ON_EXACT_SOURCE_TEST_SHA",
+    "screen12ActivityNotificationRegression": "PASS_ON_EXACT_SOURCE_TEST_SHA",
     "fixtureOnly": true,
     "allScreens": "PARTIAL_NOT_ACCEPTED",
     "authenticatedBackendQA": "NOT_TESTED",
@@ -444,11 +446,11 @@
     "exactReferenceParity": "NOT_VERIFIED",
     "production": "NOT_PERFORMED",
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-    "sourceValidateRunId": 39901444416,
-    "sourcePreviewRunId": 39901444449,
+    "sourceValidateRunId": 39906240167,
+    "sourcePreviewRunId": 39906240167,
     "sourcePreviewConclusion": "success"
   },
-  "latestReviewFinding": "Screen 9 responsive audit found a reproducible toast/navigation clearance gap of 6px at 320x640; CSS offset changed from 82px to 84px plus safe-area inset. Validate and Playwright passed on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. The approved reference image has now been visually inspected, but full screen-by-screen parity remains NOT_VERIFIED. All screens remain PARTIAL_NOT_ACCEPTED.",
+  "latestReviewFinding": "Screen 12 Activity Log/Notifications now uses two in-page tabs. Playwright initially exposed a test assertion mismatch (internal event key vs rendered Vietnamese label); the test now asserts the rendered label. Exact source/test SHA a4e2508235cb928568992f8dba408acc913f2baf passed npm run check, npm test and the local Playwright screenshot matrix in Admin Preview run 39906240167. Fixture-only evidence; all 12 screens remain PARTIAL_NOT_ACCEPTED, authenticated backend QA NOT_TESTED and full screen-by-screen reference parity NOT_VERIFIED.",
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
 }
