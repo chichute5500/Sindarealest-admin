@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PREVIEW_URL: https://63589276.sindarealest2.pages.dev/
+      PREVIEW_URL: https://5c3369cb.sindarealest2.pages.dev/
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
       CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
@@ -243,7 +243,7 @@ jobs:
                   viewport: { width: viewport.width, height: viewport.height },
                   deviceScaleFactor: 1,
                   colorScheme: theme,
-                  reducedMotion: 'reduce',
+                  reducedMotion: 'no-preference',
                   serviceWorkers: 'block'
                 });
                 await context.addInitScript(({ themeName }) => {
@@ -451,6 +451,15 @@ jobs:
                     await otherCategory.click();
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
                       'Selected category did not expose aria-pressed=true.');
+                    const selectedGlassMotion = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      return { animationName: css.animationName, animationDuration: css.animationDuration };
+                    });
+                    assert.equal(selectedGlassMotion.animationName,
+                      theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
+                      'Selecting a category must start the visible Liquid Glass activation animation for the current theme.');
+                    assert.equal(selectedGlassMotion.animationDuration, '0.46s',
+                      'Category activation must retain the visible 460ms glass-pop timing.');
                     const selectedCategoryBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
                     await page.mouse.move(0, 0);
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
