@@ -582,7 +582,7 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
 :root{--sd-icon-stroke:1.7;--sd-icon-press-color:#5c91b9;--sd-icon-press-duration:140ms}
 :root.dark{--sd-icon-press-color:#9bcdf3}
 .icon-btn svg,.service-icon svg,.slide-controls button svg,.featured-arrow svg,.detail-zoom-btn svg,.detail-gallery-arrow svg,.sd-fullscreen-close svg,.sd-fullscreen-arrow svg,.detail-favorite-btn svg,.account-action-icon svg,#mobileBottomNav .mobile-tab svg{
-  width:18px;height:18px;flex:none;display:block;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke
+  width:18px;height:18px;flex:none;display:block;stroke-width:var(--sd-icon-stroke);stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke
 }
 .icon-btn svg,.service-icon svg,.slide-controls button svg,.featured-arrow svg,.detail-zoom-btn svg,.detail-gallery-arrow svg,.sd-fullscreen-close svg,.sd-fullscreen-arrow svg,.detail-favorite-btn svg,.account-action-icon svg,#mobileBottomNav .mobile-tab svg{
   transition:color var(--sd-icon-press-duration) cubic-bezier(.2,.7,.2,1),stroke var(--sd-icon-press-duration) cubic-bezier(.2,.7,.2,1),transform var(--sd-icon-press-duration) cubic-bezier(.2,.7,.2,1)
