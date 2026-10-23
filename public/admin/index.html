@@ -844,6 +844,8 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   #welcomeSettingsForm .control,#watermarkSettingsForm .control{min-height:32px;padding:6px 8px;border-radius:9px;font-size:12px}
   #welcomeSettingsForm textarea.control,#watermarkSettingsForm textarea.control{min-height:48px;line-height:1.3}
   #welcomeSettingsForm,#watermarkSettingsForm{gap:6px!important}
+  /* Match the approved mobile reference: one welcome title field plus the body; keep the second title editable on wider screens. */
+  .website-settings #welcomeSettingsForm .field:has(#welcomeLine2){display:none}
   .website-settings #welcomeSettingsForm{grid-template-columns:repeat(2,minmax(0,1fr))}
   .website-settings #welcomeSettingsForm>.switchrow,
   .website-settings #welcomeSettingsForm>#saveWelcomeSettings,
