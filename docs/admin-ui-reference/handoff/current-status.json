@@ -1,25 +1,25 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T17:04:27.950Z",
+  "capturedAtUtc": "2026-10-24T02:00:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
+  "branchHeadAtCheckpointStart": "74268971ddf4bfe06827974b9efb5def12e60665",
   "checkpointSemantics": "At 2026-10-23T12:43:35Z, live branch HEAD at checkpoint start was 4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19, an evidence-only child of tested SHA 7f5df6bb63a264a495c1f76517861496e3cc3643. Validate #39953114181 and Preview #39953114180 both passed on exact SHA 7f5df6bb63a264a495c1f76517861496e3cc3643. Artifact admin-preview-evidence-423 (#12501226741) has 132 PNG screenshots and 112 fixture metrics; diagnostic proves login-shell CSS signature only. Screens 4/5/7 reviewed; no new reproducible source defect confirmed. This checkpoint does not accept visual parity or authenticated business QA.",
-  "codeTestSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
+  "codeTestSha": "74268971ddf4bfe06827974b9efb5def12e60665",
   "latestProductSourceCommit": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
   "latestActionsRun": {
-    "id": 39953114180,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180",
-    "headSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
-    "status": "completed",
-    "conclusion": "success",
+    "id": 40012438208,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40012438208",
+    "headSha": "74268971ddf4bfe06827974b9efb5def12e60665",
+    "status": "in_progress",
+    "conclusion": null,
     "workflow": "Admin Preview diagnostic smoke test",
-    "activeStep": null,
-    "summary": "Exact SHA passed Validate #39953114181 and Preview #39953114180. Artifact 423 has 132 PNGs/112 fixture metrics; deployed diagnostic is PASS_LOGIN_CSS_SIGNATURE only."
+    "activeStep": "Install Chromium for Playwright",
+    "summary": "Repository checks and automated tests passed; Preview still running, no artifact yet."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% remains a provisional project-level estimate, not a measured acceptance rate. All 12 screens remain unaccepted; exact reference parity and authenticated backend QA are unverified.",
+  "progressBasis": "Provisional overall project estimate only, not a measured screen acceptance rate. All 12 screens remain unaccepted; reference parity and authenticated backend QA are unverified.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -425,7 +425,7 @@
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "purpose": "Sync all six canonical handoff files with live branch checkpoint 4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19, exact-SHA Validate #39953114181/Preview #39953114180 on 7f5df6bb63a264a495c1f76517861496e3cc3643, artifact 423, inspected Screen 4/5/7 results, and unchanged acceptance/safety boundaries."
   },
-  "currentHeadAtCheckpoint": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
+  "currentHeadAtCheckpoint": "74268971ddf4bfe06827974b9efb5def12e60665",
   "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA_AND_PREVIEW_MATRIX; BRANCH_HEAD_IS_EVIDENCE_ONLY_CHILD",
   "currentHeadValidationReason": "Validate #39953114181 and Preview #39953114180 ran successfully on 7f5df6bb63a264a495c1f76517861496e3cc3643. Current branch HEAD at sync start 4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19 is the evidence-only child recorded by the Preview workflow; no source changes occurred after latest UI source commit efb49359a4e8b4ad65ea0120f41ad4c6cfa90631.",
   "liveCheckpoint": {
@@ -566,39 +566,25 @@
     "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_BACKEND_NOT_TESTED"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T12:43:35Z",
-    "testedSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
+    "capturedAtUtc": "2026-10-24T02:00:00+07:00",
+    "testedSha": "74268971ddf4bfe06827974b9efb5def12e60665",
     "validateRun": {
-      "id": 39953114181,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114181",
+      "id": 40012438226,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40012438226",
       "status": "completed",
       "conclusion": "success",
-      "sha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
-      "testedSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
-      "workflow": "Validate source and tests"
+      "sha": "74268971ddf4bfe06827974b9efb5def12e60665"
     },
     "previewRun": {
-      "id": 39953114180,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180",
-      "status": "completed",
-      "conclusion": "success",
-      "headSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
-      "testedSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
-      "workflow": "Admin Preview diagnostic smoke test",
-      "activeStep": null,
-      "artifact": "admin-preview-evidence-423",
-      "artifactId": 12501226741,
-      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180/artifacts/12501226741",
-      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_BACKEND_NOT_TESTED"
+      "id": 40012438208,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40012438208",
+      "status": "in_progress",
+      "conclusion": null,
+      "sha": "74268971ddf4bfe06827974b9efb5def12e60665",
+      "activeStep": "Install Chromium for Playwright",
+      "artifact": null
     },
-    "previewArtifact": {
-      "id": 12501226741,
-      "name": "admin-preview-evidence-423",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180/artifacts/12501226741",
-      "pngCount": 132,
-      "fixtureMetricCount": 112
-    },
-    "reason": "Validate and Preview passed on this exact SHA. Artifact 423 was inspected at the mobile viewports against the approved reference. Screens 4/5/7 were reviewed; no new reproducible code defect was confirmed. Screenshot fixtures are not authenticated backend or parity acceptance."
+    "note": "Concurrency isolation fix and mobile greeting-heading regression fix are in this SHA. Preview artifact and visual acceptance are pending."
   },
   "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180",
   "previewRuntimeCheckpoint": {
@@ -616,5 +602,5 @@
     "next": "Read-only verify product GET/list, images, detail/edit and pagination; fix only reproducible defects; exact-SHA validation and isolated Preview",
     "doNotRepeat": "Do not re-run product import/seed or ask user to re-check product visibility"
   },
-  "nextChatInstructions": "Read START-HERE.md and PROMPT-NEXT-CHAT.md first. Verify live Actions/deployment, then continue read-only Admin Preview runtime QA from the confirmed-visible product list. Do not repeat seeding."
+  "nextChatInstructions": "Read START-HERE.md and PROMPT-NEXT-CHAT.md first. Verify live HEAD/PR/Actions, finish Preview #40012438208 and inspect artifact. Do not repeat seed/import or concurrency fix. Keep 12 screens PARTIAL_NOT_ACCEPTED pending evidence."
 }
