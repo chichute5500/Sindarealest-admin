@@ -636,7 +636,7 @@ jobs:
                         const currentTime = typeof animation?.currentTime === 'number' ? animation.currentTime : null;
                         // The spring intentionally starts with a press-in. Sample after its rise toward
                         // the bloom peak, rather than treating the first ~16ms frame as the whole effect.
-                        if ((currentTime !== null && currentTime >= 120) || performance.now() - startedAt >= 280) {
+                        if ((currentTime !== null && currentTime >= 80) || performance.now() - startedAt >= 280) {
                           resolve({
                             animationName: css.animationName,
                             duration: css.animationDuration,
