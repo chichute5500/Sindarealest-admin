@@ -379,3 +379,12 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Preview deploy PASS on that commit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038555
 - Latest exact deployment from workflow log: https://2100d7ae.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Subsequent commits `d120c1152989cb3cd0a3508a6353a0eecae0bdf2` and `7a07dbbe3bedf31eff5994273311c4801bf2be00` are documentation-only and do not alter storefront source. Keep PR #108 OPEN/unmerged and all owner-locked scopes unchanged.
+
+
+## Verification record — 2026-10-23 22:03 ICT
+- Current branch/PR head: `c23641bcfda078cce132c339f30631262fef68b5`, a handoff/documentation update. PR #108 remains OPEN/unmerged.
+- Passing source/test SHA: `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`; validation [#39974038357](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038357) PASS; Preview deployment [#39974038555](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038555) PASS. Immutable deployment URL: https://2100d7ae.sindarealest2.pages.dev/.
+- Source blob `public/index.html`: `560f4e3048f2c556da066b76767ebecea2da1004`. Static checks: 23 internal fragment links / 0 missing IDs; 7 asset references / 0 missing files; 6 new-tab links all have `rel="noopener"`; 62 buttons have visible text or accessible labels; no unlabeled inputs detected by the static rule set.
+- These are static checks. They do not assert live visual parity, manual browser/device acceptance, or owner PASS. The latest Preview deploy corresponds to source/test SHA `3540e4c...`; the current branch HEAD is later due to handoff-only updates.
+- Cart-dialog keyboard behavior has regression coverage and passing CI: focus placement on open, Tab/Shift+Tab containment, focus restoration on close, and avoiding focus theft during cart-to-checkout/account transitions.
+- The catalog-filter visual workflow was skipped on recent storefront pushes and remains manual-only with explicit owner authorization plus repository unlock. Do not inspect or change the locked catalog-filter item.
