@@ -420,12 +420,14 @@ jobs:
                   const otherCategory = categoryGroup.locator('button[data-category]:not([data-category="all"])').first();
                   let categoryHover = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
                   let categoryPressed = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
+                  let defaultChipStyleForActivation = null;
                   let categoryKeyboardFocus = 'PASS';
                   if (await otherCategory.count() > 0) {
                     const defaultChipStyle = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
                       return { background: css.backgroundColor, shadow: css.boxShadow };
                     });
+                    defaultChipStyleForActivation = defaultChipStyle;
                     const defaultChipBackground = defaultChipStyle.background;
                     await otherCategory.hover();
                     await page.waitForTimeout(240);
@@ -501,7 +503,8 @@ jobs:
                       'Category click must leave a live CSS animation in progress; observed ' + JSON.stringify(activationMidFrame));
                     assert.ok(activationMidFrame.scaleX > 1.005,
                       'The mid-animation category chip must visibly spring above its resting size; observed ' + JSON.stringify(activationMidFrame));
-                    assert.notEqual(activationMidFrame.boxShadow, defaultChipStyle.shadow,
+                    assert.ok(defaultChipStyleForActivation, 'The unselected category style must be captured before selection.');
+                    assert.notEqual(activationMidFrame.boxShadow, defaultChipStyleForActivation.shadow,
                       'The selected chip must bloom beyond its unselected glass shadow during activation.');
                     const frameBox = await otherCategory.boundingBox();
                     assert.ok(frameBox && frameBox.height > 0 && frameBox.height < 100,
