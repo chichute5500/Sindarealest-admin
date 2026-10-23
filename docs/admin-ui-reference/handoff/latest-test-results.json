@@ -231,10 +231,10 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "09f22474e2c0bc55b2f08f447d9052bebe4e1d5a",
-  "testedCommitSha": "09f22474e2c0bc55b2f08f447d9052bebe4e1d5a",
-  "capturedAt": "2026-10-23T08:30:10.453Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39924660838",
+  "latestCodeCommitSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+  "testedCommitSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+  "capturedAt": "2026-10-23T08:37:53.833Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -268,9 +268,9 @@
     "exactReferenceParity": "NOT_VERIFIED"
   },
   "latestLocalEvidence": {
-    "runId": 39924660838,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39924660838",
-    "sourceCommit": "09f22474e2c0bc55b2f08f447d9052bebe4e1d5a",
+    "runId": 39925598940,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -278,7 +278,7 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-400",
+    "screenshotArtifact": "admin-preview-evidence-401",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
@@ -288,10 +288,10 @@
     "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "latestScreenshotArtifact": {
-    "runId": 39924660838,
-    "name": "admin-preview-evidence-400",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39924660838",
-    "sourceCommit": "09f22474e2c0bc55b2f08f447d9052bebe4e1d5a",
+    "runId": 39925598940,
+    "name": "admin-preview-evidence-401",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
     "screenshotCount": 132,
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
