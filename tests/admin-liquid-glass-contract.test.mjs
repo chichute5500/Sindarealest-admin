@@ -116,6 +116,17 @@ has('id="showPrices" type="checkbox" aria-label="Hiển thị giá cho khách h�
 has('id="welcomeEnabled" type="checkbox" aria-label="Hiển thị trang chào mừng"', 'welcome page toggle accessible name');
 has('id="watermarkEnabled" type="checkbox" aria-label="Bật watermark khi xem chi tiết"', 'watermark toggle accessible name');
 
+// The approved Screen 10 order puts website controls ahead of QR payment configuration.
+const websiteSettingsOrder = [
+  adminHtml.indexOf('id="showPrices"'),
+  adminHtml.indexOf('id="welcomeEnabled"'),
+  adminHtml.indexOf('id="watermarkEnabled"'),
+  adminHtml.indexOf('id="paymentQrFile"')
+];
+assert.ok(websiteSettingsOrder.every((position, index) =>
+  position >= 0 && (index === 0 || websiteSettingsOrder[index - 1] < position)
+), 'Screen 10 should place price, welcome and watermark controls before the separate QR payment panel');
+
 // Preview CSSOM rules can group multiple selectors. Guard against regressions that
 // compare the complete selectorText string to just one member of that list.
 const previewSpec = readFileSync(new URL('./e2e/admin-preview.spec.js', import.meta.url), 'utf8');
