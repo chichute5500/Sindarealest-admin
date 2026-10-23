@@ -401,10 +401,10 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .sd-fullscreen-stage{position:absolute;inset:0;z-index:1;display:grid;place-items:center;padding:calc(70px + env(safe-area-inset-top)) 58px calc(84px + env(safe-area-inset-bottom));box-sizing:border-box}
 .sd-fullscreen-frame{position:relative;display:block;flex:none;max-width:100%;max-height:100%;overflow:hidden;border-radius:10px;background:rgba(205,230,249,.055);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 12px 55px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.26)}
 .sd-fullscreen-image{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;object-position:center;opacity:0;z-index:1;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}.sd-fullscreen-image.is-active{opacity:1;z-index:2}
-@keyframes sdFullscreenOutLeft{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:0;transform:translateX(-100%);filter:blur(1px)}}
-@keyframes sdFullscreenOutRight{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:0;transform:translateX(100%);filter:blur(1px)}}
-@keyframes sdFullscreenInRight{from{opacity:0;transform:translateX(100%);filter:blur(1px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
-@keyframes sdFullscreenInLeft{from{opacity:0;transform:translateX(-100%);filter:blur(1px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+@keyframes sdFullscreenOutLeft{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:.22;transform:translateX(-100%);filter:blur(1px)}}
+@keyframes sdFullscreenOutRight{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:.22;transform:translateX(100%);filter:blur(1px)}}
+@keyframes sdFullscreenInRight{from{opacity:.18;transform:translateX(100%);filter:blur(1px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+@keyframes sdFullscreenInLeft{from{opacity:.18;transform:translateX(-100%);filter:blur(1px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
 .sd-fullscreen-image.sd-slide-out-left{animation:sdFullscreenOutLeft 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:2}
 .sd-fullscreen-image.sd-slide-out-right{animation:sdFullscreenOutRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:2}
 .sd-fullscreen-image.sd-slide-in-right{animation:sdFullscreenInRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:3}
@@ -553,16 +553,22 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 /* Parsed in <head>: the initial body flag must gate storefront chrome before first paint; :has() remains a secondary safeguard. */
 .welcome-splash{z-index:2147483000!important}
 body.welcome-active .welcome-splash{z-index:2147483000!important}
-body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+/* Keep the mobile bar mounted beneath the welcome layer so the splash fade reveals it in the same transition. */
 body.welcome-active #accountDrawer,
 body.welcome-active #cartDrawer,
 body.welcome-active #checkoutDrawer,
 body.welcome-active #checkoutBackdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX(105%)!important}
-body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 body:has(#welcomeSplash) #accountDrawer,
 body:has(#welcomeSplash) #cartDrawer,
 body:has(#welcomeSplash) #checkoutDrawer,
 body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX(105%)!important}
+</style>
+<style id="sd-mobile-cart-count-badge">
+@media(max-width:760px){
+ #mobileCartNav{position:relative}
+ #mobileCartCount{position:absolute;top:1px;left:calc(50% + 1px);z-index:5;display:grid;place-items:center;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border:1px solid rgba(255,255,255,.92);border-radius:999px;background:#e53935;color:#fff;font:750 9px/1 Arial,sans-serif;box-shadow:0 2px 6px rgba(93,15,15,.24);white-space:nowrap;pointer-events:none}
+ #mobileCartCount[hidden]{display:none!important}
+}
 </style>
 <style id="sd-icon-order-flow-2026-10-22">
 /* Use the approved thin-stroke SVG language for the order flow and aftercare icons. */
@@ -1081,7 +1087,6 @@ function changeDetailImage(index,resetTimer=true,direction){
  clearTimeout(detailAnimationTimer);
  img.onload=null;img.onerror=null;
  img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
- img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
  $('#detailImageCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
  thumbs.forEach((thumb,j)=>{const active=j===detailIndex;thumb.classList.toggle('active',active);if(active&&resetTimer)thumb.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})});
  if($('#sdFullscreenViewer').classList.contains('open')){
@@ -1089,22 +1094,31 @@ function changeDetailImage(index,resetTimer=true,direction){
   $('#sdFullscreenThumbs').querySelectorAll('[data-full-thumb]').forEach((thumb,j)=>{const active=j===detailIndex;thumb.classList.toggle('active',active);thumb.setAttribute('aria-current',active?'true':'false');if(active&&resetTimer)thumb.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'})});
   setFullscreenPhoto(next,direction);
  }
- const swap=()=>{
-  img.onload=null;img.onerror=null;
-  const finish=()=>{
+ // Keep the current decoded frame visible while the next source loads and decodes.
+ // Only begin the outgoing animation after the incoming image is ready, avoiding a blank/white gap.
+ const preload=new Image();preload.decoding='async';
+ let transitionStarted=false;
+ const beginTransition=()=>{
+  if(transitionStarted||transitionId!==detailTransitionId)return;
+  transitionStarted=true;
+  img.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
+  detailSwapTimer=setTimeout(()=>{
    if(transitionId!==detailTransitionId)return;
-   img.onload=null;img.onerror=null;
-   img.classList.remove('sd-slide-out-left','sd-slide-out-right','is-changing');
+   img.onload=null;img.onerror=null;img.src=next;
+   img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right');
    const incoming=direction==='right'?'sd-slide-in-left':'sd-slide-in-right';
-   img.classList.remove('sd-slide-in-left','sd-slide-in-right');
    img.classList.add(incoming);
    clearTimeout(detailAnimationTimer);
    detailAnimationTimer=setTimeout(()=>{if(transitionId===detailTransitionId&&img.getAttribute('src')===next)img.classList.remove(incoming)},620);
-  };
-  img.onload=finish;img.onerror=finish;img.src=next;
-  if(img.complete&&img.naturalWidth)finish();
+  },230);
  };
- detailSwapTimer=setTimeout(swap,230);
+ preload.onload=()=>{
+  const decoded=typeof preload.decode==='function'?preload.decode():Promise.resolve();
+  Promise.resolve(decoded).catch(()=>{}).then(beginTransition);
+ };
+ preload.onerror=beginTransition;
+ preload.src=next;
+ if(preload.complete){if(preload.naturalWidth)preload.onload();else preload.onerror()}
  scheduleDetailAutoplay();
 }
 function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;updateDetailFavoriteButton(p);document.title=(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===false?(p.id||p.slug):(p.sku||p.id||p.slug))}`)}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=p.title||'Sản phẩm SinDarealest';$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').textContent=p.title||'Sản phẩm tuyển chọn';const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice;$('#detailPrice').hidden=!detailPrice;$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailCategory').textContent=p.categoryLabel||categoryLabels[p.category]||'Selected piece';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').removeAttribute('inert');$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
@@ -1123,7 +1137,7 @@ function closeDetail(fromUrl=false,restoreFocus=true){
 }
 function loadCart(){try{cart=JSON.parse(localStorage.getItem('sd-cart')||'{}')||{}}catch(e){cart={}};Object.keys(cart).forEach(k=>{if(!Number.isFinite(Number(cart[k]))||Number(cart[k])<1)delete cart[k]});updateCartCount()}
 function saveCart(){try{localStorage.setItem('sd-cart',JSON.stringify(cart))}catch(e){}updateCartCount();renderCart()}
-function updateCartCount(){const n=Object.values(cart).reduce((s,v)=>s+Number(v||0),0);$('#cartCount').textContent=n>99?'99+':String(n)}
+function updateCartCount(){const n=Object.values(cart).reduce((s,v)=>s+Number(v||0),0),label=n>99?'99+':String(n),mobileCount=$('#mobileCartCount'),mobileButton=$('#mobileCartNav');$('#cartCount').textContent=label;if(mobileCount){mobileCount.textContent=label;mobileCount.hidden=n<1}if(mobileButton)mobileButton.setAttribute('aria-label',n>0?'Mở giỏ hàng, '+n+' sản phẩm':'Mở giỏ hàng')}
 function normalizeCart(){const normalized={};Object.entries(cart).forEach(([id,value])=>{if(!products.some(p=>(p.id||p.slug)===id))return;if(typeof value!=='number'&&(typeof value!=='string'||!value.trim()))return;const quantity=Number(value);if(!Number.isSafeInteger(quantity)||quantity<1)return;normalized[id]=quantity});const normalizedText=JSON.stringify(normalized);const changed=normalizedText!==JSON.stringify(cart);cart=normalized;if(changed)try{localStorage.setItem('sd-cart',normalizedText)}catch(e){}updateCartCount()}
 function addToCart(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id);if(!p)return false;const key=p.id||p.slug;if(!key)return false;cart[key]=(cart[key]||0)+1;saveCart();showToast(`Đã thêm ${visibleSku(p)||p.title||'sản phẩm'} vào giỏ chọn`);return true}
 
@@ -1498,7 +1512,7 @@ img { -webkit-user-drag:none; user-select:none; }
 <nav class="mobile-bottom-nav glass" id="mobileBottomNav" aria-label="Điều hướng chính trên điện thoại">
 <a class="mobile-tab is-active" href="#home" data-mobile-tab="home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Trang chủ</span></a>
 <a class="mobile-tab" href="#products" data-mobile-tab="products"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h4"/></svg><span>Sản phẩm</span></a>
-<button class="mobile-tab" type="button" id="mobileCartNav" data-mobile-tab="cart" aria-label="Mở giỏ hàng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span>Giỏ hàng</span></button>
+<button class="mobile-tab" type="button" id="mobileCartNav" data-mobile-tab="cart" aria-label="Mở giỏ hàng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span class="mobile-cart-count" id="mobileCartCount" aria-hidden="true" hidden>0</span><span>Giỏ hàng</span></button>
 <button class="mobile-tab" type="button" id="mobileAccountNav" data-mobile-tab="account" aria-label="Mở tài khoản"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4.1 3.4-6.2 8-6.2s7.3 2.1 8 6.2"/></svg><span>Tài khoản</span></button>
 </nav>
 <script id="sd-protection-script">
