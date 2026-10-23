@@ -124,9 +124,9 @@ has('aria-label="Chuyển ảnh ${i+1} lên"', 'gallery reorder-up accessible na
 has('aria-label="Chuyển ảnh ${i+1} xuống"', 'gallery reorder-down accessible name');
 has('aria-label="Xóa ảnh ${i+1}"', 'gallery remove accessible name');
 has('id="pPublished" type="checkbox" aria-label="Hiển thị sản phẩm"', 'published toggle accessible name');
-has('id="showPrices" type="checkbox" aria-label="Hiển thị giá cho khách hàng"', 'public price toggle accessible name');
-has('id="welcomeEnabled" type="checkbox" aria-label="Hiển thị trang chào mừng"', 'welcome page toggle accessible name');
-has('id="watermarkEnabled" type="checkbox" aria-label="Bật watermark khi xem chi tiết"', 'watermark toggle accessible name');
+has('id="showPrices" type="checkbox" aria-label="Hiển thị giá trên website"', 'public price toggle accessible name');
+has('id="welcomeEnabled" type="checkbox" aria-label="Bật lớp phủ chào mừng"', 'welcome overlay toggle accessible name');
+has('id="watermarkEnabled" type="checkbox" aria-label="Bật watermark"', 'watermark toggle accessible name');
 
 // The approved Screen 10 order puts website controls ahead of QR payment configuration.
 const websiteSettingsOrder = [
