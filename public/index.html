@@ -401,6 +401,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .sd-fullscreen-stage{position:absolute;inset:0;z-index:1;display:grid;place-items:center;padding:calc(70px + env(safe-area-inset-top)) 58px calc(84px + env(safe-area-inset-bottom));box-sizing:border-box}
 .sd-fullscreen-frame{position:relative;display:block;flex:none;max-width:100%;max-height:100%;overflow:hidden;border-radius:10px;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border:1px solid rgba(255,255,255,.18)}
 .sd-fullscreen-image{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;object-position:center;opacity:0;z-index:1;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:opacity,transform;transform:translate3d(0,0,0)}.sd-fullscreen-image.is-active{opacity:1;z-index:2}
+@media(max-width:760px){.sd-fullscreen-image{animation:none!important;transition:none!important;transform:none!important;will-change:auto!important;backface-visibility:visible!important;-webkit-backface-visibility:visible!important}}
 @keyframes sdFullscreenOutLeft{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:1;transform:translateX(-18%);filter:blur(0)}}
 @keyframes sdFullscreenOutRight{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:1;transform:translateX(18%);filter:blur(0)}}
 @keyframes sdFullscreenInRight{from{opacity:1;transform:translateX(18%);filter:blur(0)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
@@ -409,10 +410,7 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .sd-fullscreen-image.sd-slide-out-right{animation:sdFullscreenOutRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:2}
 .sd-fullscreen-image.sd-slide-in-right{animation:sdFullscreenInRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:3}
 .sd-fullscreen-image.sd-slide-in-left{animation:sdFullscreenInLeft 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:3}
-@keyframes sdFullscreenMobileFadeOut{from{opacity:1}to{opacity:0}}
-@keyframes sdFullscreenMobileFadeIn{from{opacity:0}to{opacity:1}}
-.sd-fullscreen-image.sd-mobile-fade-out{animation:sdFullscreenMobileFadeOut 460ms ease-in-out both!important;z-index:2}
-.sd-fullscreen-image.sd-mobile-fade-in{animation:sdFullscreenMobileFadeIn 460ms ease-in-out both!important;z-index:3}
+
 .sd-fullscreen-close,.sd-fullscreen-arrow{position:absolute;z-index:7;display:grid;place-items:center;box-sizing:border-box;width:42px;height:42px;padding:0;border-radius:50%;font-size:27px;line-height:1;cursor:pointer}
 .sd-fullscreen-close{top:calc(13px + env(safe-area-inset-top));right:14px}
 .sd-fullscreen-close svg{width:19px;height:19px}
@@ -963,13 +961,25 @@ function sizeFullscreenFrame(imageOverride){
 }
 // Product photos are always rendered from their original pixels; never infer and remove a white canvas.
 const FULLSCREEN_SLIDE_MS=300;
-const FULLSCREEN_MOBILE_FADE_MS=460;
-function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','sd-mobile-fade-out','sd-mobile-fade-in','is-changing')}
+const fullscreenPreloadCache=new Map();
+function preloadFullscreenPhotos(index=detailIndex){
+ if(!detailImages.length)return;
+ const count=detailImages.length;
+ for(const photoIndex of new Set([(index+1)%count,(index-1+count)%count])){
+  const src=imgPath(detailImages[photoIndex]||'');
+  if(!src||fullscreenPreloadCache.has(src))continue;
+  const image=new Image();image.decoding='async';image.fetchPriority='low';fullscreenPreloadCache.set(src,image);image.src=src;
+  if(typeof image.decode==='function')image.decode().catch(()=>{});
+  while(fullscreenPreloadCache.size>12)fullscreenPreloadCache.delete(fullscreenPreloadCache.keys().next().value);
+ }
+}
+function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing')}
 function setFullscreenPhoto(src,direction='left',instant=false){
  clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
  const transitionId=++fullscreenTransitionId,images=fullscreenImages(),active=activeFullscreenImage(),incoming=images.find(img=>img!==active),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
- // Mobile navigation uses a slower opacity crossfade, but only after the incoming photo has loaded and decoded.
+ // Mobile uses a decoded, atomic layer swap: overlapping photos caused the reported ghost image.
  const mobile=window.matchMedia('(max-width:760px)').matches;
+ preloadFullscreenPhotos(Math.max(0,detailImages.indexOf(src)));
  if(!active||!incoming||!frame)return;
  const imageIndex=Math.max(0,detailImages.indexOf(src))+1;
  const altText=(currentProduct?.title||'Sản phẩm SinDarealest')+' — ảnh '+imageIndex;
@@ -989,25 +999,18 @@ function setFullscreenPhoto(src,direction='left',instant=false){
   incoming.alt=altText;
   const revealDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
-   if(instant||!active.complete||!active.naturalWidth){
+   if(instant||mobile||!active.complete||!active.naturalWidth){
     incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
     syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();return;
    }
-   // Mobile GPU/compositor flicker came from an immediate two-layer opacity/z-index swap.
-   // Keep the outgoing decoded photo visible while the decoded incoming photo fades in over it.
-   const mobileFade=mobile;
-   if(mobileFade){
-    active.classList.add('sd-mobile-fade-out');
-    incoming.classList.add('sd-mobile-fade-in');
-   }else{
-    active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
-    incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
-   }
+   // Desktop keeps the directional slide. Mobile returned above so its two image layers never overlap during animation.
+   active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
+   incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
    fullscreenAnimationTimer=setTimeout(()=>{
     if(transitionId!==fullscreenTransitionId)return;
     incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
     syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
-   },mobileFade?FULLSCREEN_MOBILE_FADE_MS:FULLSCREEN_SLIDE_MS+20);
+   },FULLSCREEN_SLIDE_MS+20);
   };
   const rejectDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
@@ -1093,6 +1096,7 @@ function openFullscreenImage(){
  $('#sdFullscreenCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
  viewer.removeAttribute('inert');viewer.classList.add('open');viewer.setAttribute('aria-hidden','false');
  renderFullscreenThumbs();
+ fullscreenPreloadCache.clear();
  setFullscreenPhoto(detailImages[detailIndex],'left',true);
  document.body.style.overflow='hidden';
  requestAnimationFrame(sizeFullscreenFrame);
