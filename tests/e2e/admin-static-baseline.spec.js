@@ -2414,6 +2414,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(section.locator('#backupBtn')).toContainText('Tải bản sao lưu JSON');
       await expect(section.locator('#restoreFile')).toHaveAttribute('accept', 'application/json,.json');
       await expect(section).toContainText('có bước xác nhận trước khi thực hiện');
+      const historyPanel = page.locator('#main .backup-history');
+      await expect(historyPanel, 'Backup/Restore reference includes a recent-files panel').toBeVisible();
+      await expect(historyPanel).toContainText('Tệp sao lưu gần đây');
+      await expect(historyPanel).toContainText('API hiện tại chưa cung cấp dữ liệu này');
       const backupLayout = await section.evaluate(element => {
         const panel = element.getBoundingClientRect();
         const actions = element.querySelector('.backup-actions').getBoundingClientRect();
