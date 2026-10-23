@@ -1,3 +1,35 @@
+# AUTHORITATIVE NEXT-CHAT UPDATE — CART + SHARE FIXES VERIFIED — 2026-10-24
+
+Continue the existing repository; do not restart. Read all four handoff files, then re-fetch live branch HEAD, PR #108, recent Actions and Preview deployment metadata before any further edit.
+
+## Verified source and Preview
+- Repository `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 must remain OPEN/unmerged, base `main`.
+- Final combined source/test SHA: `5f86282be26c34f4cf0587f36be8011b9d1d46ec`.
+- Full CI / source integrity / dependency audit / automated tests PASS: [#40004265503](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40004265503).
+- Preview deploy PASS on exact same SHA: [#40004265341](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40004265341).
+- Immutable Preview: https://7b538028.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy log verified Pages project `sindarealest2`, Production branch `main`, exact fix-branch checkout, and `--commit-hash=$GITHUB_SHA`.
+- No live browser capture or manual visual acceptance was performed. Do not claim browser/visual PASS.
+
+## Latest changes
+1. Cart-to-Zalo consultation now bases toast/fallback wording on the clipboard result; blocked Zalo popup after copy failure tells the customer to send the cart list manually. Multi-SKU lines use actual line breaks.
+2. Following a successful catalog fetch, `normalizeCart()` removes IDs absent from the current product list and invalid quantities, converts valid numeric strings to safe positive integers, persists only changed storage and refreshes the cart badge. It is intentionally not run when the product API fails.
+3. Fullscreen product sharing now attempts clipboard fallback when Web Share rejects for a reason other than `AbortError`; cancelled native share remains quiet. Copy success/failure messages are truthful.
+
+## Immediate next action
+Continue a source-first audit on an unlocked storefront area. Before writes, re-check current HEAD, PR state and recent Actions. Fix only concrete, reproducible defects and add behavioral regressions. For each combined source/test SHA, wait for full CI and Preview deploy to finish, verify exact-SHA/project/Production-branch/deployment URL and inspect the logs. While workflows run, continue an independent safe read-only audit and then return to verify outcomes. Keep all four handoff docs updated. The docs commits after `5f86282be26c34f4cf0587f36be8011b9d1d46ec` are docs-only and do not mean a newer storefront build was deployed.
+
+## Hard locks and boundaries
+- Hero PAUSED BY OWNER: do not inspect, edit, test, redesign, restore, screenshot or capture it.
+- Shared icon appearance PASS/LOCKED; do not alter its appearance/shell.
+- `#order` / “Đặt hàng an tâm” PASS/LOCKED.
+- Catalog Liquid Glass filter controls PASS/LOCKED; reopen only with explicit owner authorization and both `owner_authorized=true` and `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+- Warranty claim form PASS/LOCKED; no proactive edits or retests.
+- Never restore the removed standalone product-status filter panel.
+- PR #108 remains OPEN/unmerged. No `main` or Production changes. Do not touch Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access/infrastructure/real-payment paths. Never bypass Access.
+
+---
+
 # AUTHORITATIVE NEXT-CHAT UPDATE — CART FIXES VERIFIED — 2026-10-24
 
 Continue the existing repository, do not restart. Read all four handoff files, then re-fetch live branch HEAD, PR #108, recent Actions and deployment evidence before any new edits.
