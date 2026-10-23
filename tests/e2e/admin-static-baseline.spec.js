@@ -2484,6 +2484,18 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#activityActorFilter')).toBeVisible();
       await expect(page.locator('#activityDateFrom')).toBeVisible();
       await expect(page.locator('#activityDateTo')).toBeVisible();
+      if (width <= 680) {
+        const mobileFilterHeights = await page.evaluate(() => ({
+          categoryChip: document.querySelector('.activity-category-chip')?.getBoundingClientRect().height ?? 0,
+          actorControl: document.querySelector('#activityActorFilter')?.getBoundingClientRect().height ?? 0,
+          dateControl: document.querySelector('#activityDateFrom')?.getBoundingClientRect().height ?? 0,
+          advancedToggle: document.querySelector('#activityAdvancedToggle')?.getBoundingClientRect().height ?? 0
+        }));
+        expect(mobileFilterHeights.categoryChip, 'Mobile activity category chips should be compact').toBeLessThanOrEqual(32);
+        expect(mobileFilterHeights.actorControl, 'Mobile actor filter should fit the compact control height').toBeLessThanOrEqual(36);
+        expect(mobileFilterHeights.dateControl, 'Mobile date filters should fit the compact control height').toBeLessThanOrEqual(36);
+        expect(mobileFilterHeights.advancedToggle, 'Mobile advanced-search toggle should be compact').toBeLessThanOrEqual(34);
+      }
       await expect(page.locator('#refreshActivityLogs')).toBeVisible();
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
 
