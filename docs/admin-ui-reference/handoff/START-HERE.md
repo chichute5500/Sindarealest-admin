@@ -1,5 +1,8 @@
 # START HERE — SINDAREALEST ADMIN
 
+## Mandatory live-state check
+Before any work, fetch live GitHub branch HEAD, PR #111/#108 state, and the latest Actions runs for the current source SHA. Treat the checkpoint below as historical context only until those live refs are revalidated; never trust an older recorded checkpoint as current.
+
 ## Live checkpoint — 2026-10-23 05:34 UTC
 - Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Live branch HEAD at the start of this sync: `a5d0076eda669b670b3de9ba4da2069c25f149f2`; exact source/test SHA verified by Actions: `a4e2508235cb928568992f8dba408acc913f2baf`. The evidence child and handoff-only commits are not new application-source tests.
 - [Admin Preview diagnostics #39906240167](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167) **SUCCESS** on exact source/test SHA `a4e2508235cb928568992f8dba408acc913f2baf`: `npm run check`, `npm test`, and the local Playwright screenshot matrix all PASS. Artifact [admin-preview-evidence-374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167/artifacts/12481355528): 132 generated PNGs, 120 fixture module captures, 112 fixture metrics (archive also includes the approved reference PNG). This is local source/read-only fixture evidence; deployed diagnostic confirms the login-shell CSS signature only.
