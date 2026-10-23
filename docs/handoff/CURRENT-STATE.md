@@ -1,3 +1,16 @@
+## LATEST AUTHORITATIVE UPDATE — LEGACY FAVORITES KEY MIGRATION — 2026-10-24
+
+- Source/test commit: `384e0b503416d9fa0395fd1d485ac522259c913a`; current branch HEAD at this update is exactly the source/test commit (following update is docs-only).
+- Confirmed storefront defect: `findProductByKey()` still accepted legacy favorites stored by SKU, but `normalizeFavorites()` did not migrate keys to the canonical product ID/slug. A legacy SKU plus its canonical key could make one product appear twice, while the product-detail heart checked only the canonical key and could show the wrong pressed state.
+- Minimal fix in `public/index.html`: resolve every stored key to its product, convert it to `favoriteKey(product)`, discard stale keys, deduplicate, and persist only when normalized content/order differs.
+- Added behavior-level regression coverage in `tests/storefront-accessibility-contract.test.mjs` for case-insensitive legacy SKU recognition, ID/SKU duplicate collapse, stale-key removal, persistence, favorite-state agreement, and single refresh of count/list.
+- Exact-source validation and complete test suite PASS: [CI #39993582024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993582024).
+- Exact-source Cloudflare Pages Preview workflow PASS: [deploy #39993581910](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993581910). Log confirms project `sindarealest2`, Production branch `main`, successful pre-deploy checks, and Wrangler passed `--commit-hash=$GITHUB_SHA` from the run whose SHA is `384e0b503416d9fa0395fd1d485ac522259c913a`. Immutable Preview: https://e831f6dd.sindarealest2.pages.dev/; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Browser screenshot/manual visual acceptance was not performed. This is source + automated CI + Preview deploy evidence only; do not call it visual/browser PASS.
+- Guardrails unchanged: PR #108 OPEN/unmerged; Hero PAUSED BY OWNER; `#order`, catalog-filter Liquid Glass/height and warranty claim form OWNER PASS/LOCKED. No Production, `main`, Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+
+---
+
 ## LATEST AUTHORITATIVE UPDATE — WARRANTY CLAIM ACCESSIBILITY FIX DEPLOYED — 2026-10-23 23:31 ICT
 
 - Latest source/test/deployed Preview SHA: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`.
