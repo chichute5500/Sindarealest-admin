@@ -21,6 +21,7 @@ assert.match(detailTransition, /if\(transitionId!==detailTransitionId\)return/);
 assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
+assert.match(html, /instant=instant\|\|window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /const decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)/);
 assert.match(html, /Promise\.resolve\(decoded\)\.catch\(\(\)=>\{\}\)\.then\(revealDecodedImage\)/);
