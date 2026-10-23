@@ -362,3 +362,10 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Verified Preview: https://761fdddb.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Static whole-document anchor audit on public/index.html SHA 560f4e3048f2c556da066b76767ebecea2da1004: 23 internal fragment links checked, zero missing targets. The earlier broken craftsmanship link is fixed to #about and regression-tested. This is source-level validation, not a claim of manual device/browser visual acceptance.
 - PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; catalog filter height/Liquid Glass remains OWNER PASS/LOCKED; #order remains OWNER PASS/LOCKED. Do not edit or retest those areas unless explicitly reopened. Preview only; no Production or restricted-scope changes.
+
+
+## Follow-up static storefront audit — 2026-10-23 21:57 ICT
+- `public/index.html` source SHA: 560f4e3048f2c556da066b76767ebecea2da1004.
+- Internal anchors: 23 checked, zero missing target IDs. Asset references: 7 checked against the current repository tree, zero missing files. New-tab links: 6 checked, all include `rel="noopener". Buttons: 62 checked, zero without text or an accessible label. Inputs: no unlabeled inputs found by this static rule set.
+- These are source-level checks only; they do not claim manual device/browser visual acceptance or replace runtime tests.
+- Exact-source CI PASS #39973525900 and Preview deploy PASS #39973526262 apply to source/test commit 2dd3bddfa2ddf13614491d2ac9d0b407157c32f9. Handoff docs were subsequently updated in docs-only commit d120c1152989cb3cd0a3508a6353a0eecae0bdf2; storefront source was unchanged by that documentation commit.
