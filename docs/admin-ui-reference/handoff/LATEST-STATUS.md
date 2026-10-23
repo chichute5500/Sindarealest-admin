@@ -152,12 +152,12 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Tested commit: daa838cce4ce6dc5a73e785372f128637406e4b8
-- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999927146
-- npm run check: PASS
-- npm test: PASS
-- Local source Playwright matrix: PASS; 132 real PNGs captured in artifact admin-preview-evidence-440 (not committed to Git).
-- Deployed Preview: success.
-- Source screenshot matrix: 132 real PNGs; login shell: 16; read-only fixture module screens: 120; fixture metrics: 112.
-- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
-- Production deployment: NOT PERFORMED.
+- Authenticated Preview test SHA: `0be55ce7385fa1bc9408e0faca17c5be6a42373e`; run [#40001316195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195): SUCCESS.
+- Source validation on the same test SHA: [#40001316207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316207): PASS.
+- Follow-up source validation on workflow-target commit `c904e4422c054c4249ef6f56d00e3d5229a1982e`: [#40001610207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001610207): PASS.
+- Artifact: [admin-preview-evidence-442](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195/artifacts/12521608634); 132 PNGs, 112 fixture metrics; synthetic module fixture screens are not live backend acceptance.
+- Live catalog: 235 products, 12 rows/page, pagination and search/category/publication filters PASS, one persisted image decoded, product editor opened; no product mutation requests.
+- Authenticated read-only routes: session, orders, customers, warranties, audit logs, settings, payment QR — all HTTP 200 and schema checks PASS; no non-GET ADMIN requests. Orders/customers/warranties/log arrays were empty on this isolated Preview; do not infer real business-data acceptance.
+- Node 24-compatible action versions are pinned in ADMIN diagnostics and manual Admin Preview workflow. Manual deployment workflow was not run.
+- Production deployment: NOT PERFORMED. All 12 screens: `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; persistence/CRUD and remote D1 schema/ledger are not verified.
+

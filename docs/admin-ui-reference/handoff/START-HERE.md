@@ -1,3 +1,16 @@
+## VERIFIED CHECKPOINT — 2026-10-24 ICT — Authenticated Admin read-only route audit PASS
+
+- Preview validation source SHA: `0be55ce7385fa1bc9408e0faca17c5be6a42373e`; validation run [#40001316207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316207) PASS and authenticated Preview run [#40001316195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195) SUCCESS.
+- Exact Preview artifact: [admin-preview-evidence-442](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195/artifacts/12521608634) (132 PNGs; login shell 16; fixture module captures 120; fixture metrics 112). The module fixtures are synthetic and are not backend acceptance evidence.
+- Live product UI remains PASS: authenticated `GET /api/admin/products` returned 235 products; 12 rows/page; pagination 1→2→1; search/category/publication filters pass; a persisted image decoded and had positive naturalWidth; product editor opened and matched target id/title. No product POST/PUT/DELETE requests.
+- Seven authenticated read-only API checks all returned HTTP 200 and expected JSON shapes: `/api/admin/session` (authenticated true), `/api/admin/orders`, `/api/admin/customers`, `/api/admin/warranties`, `/api/admin/audit-logs`, `/api/admin/settings`, `/api/admin/payment-qr`. The first five relevant list endpoints returned empty arrays on this isolated Preview; this proves endpoint/shape/auth reachability, not that orders/customers/warranties/audit data exists. No response values were written to evidence, and zero non-GET ADMIN requests were observed.
+- Branch configuration commit `c904e4422c054c4249ef6f56d00e3d5229a1982e) also passed source validation in [run #40001610207](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001610207). Since that workflow-only commit came after the Preview test SHA, this checkpoint follow-up triggers exact-HEAD verification again.
+- Fixed the stale static assertion that had required `actions/upload-artifact@v4` after migration to Node 24 compatible `actions/checkout@v7`, `actions/setup-node@v7`, and `actions/upload-artifact@v7`. The first failed runs (#40000974975/#40000975037) failed only at that outdated assertion before Playwright; assertion now checks the new versions.
+- Hardened the manual feature Preview deployment workflow to hardcode `sindarealest-admin-preview` and avoid the shared `CLOUDFLARE_PAGES_PROJECT` variable; did NOT dispatch or deploy it. No shared/storefront settings, production database, seed/import, or deployment changed.
+- Next: compare remaining real ADMIN screens to the approved reference and fix only reproducible UI defects. Continue read-only route checks where safe. Do not test persistence/CRUD, upload, QR activation, backup/restore, or other state changes without explicit isolated-data authorization. Production deployment remains NOT PERFORMED.
+
+---
+
 ## VERIFIED CHECKPOINT — 2026-10-23 18:01 UTC — Read-only isolated Preview catalog test PASS
 
 - Exact tested source SHA: `2e1262631be17f7ef9bf9d4e2102db0d3d2610bc`.

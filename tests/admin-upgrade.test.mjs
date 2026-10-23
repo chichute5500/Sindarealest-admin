@@ -54,6 +54,17 @@ assert.ok(previewWorkflow.includes("uses: actions/setup-node@v7"),
   "The isolated ADMIN diagnostic workflow must use a Node.js 24-compatible setup-node action");
 assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v7"),
   "Full ADMIN Playwright screenshots must remain available as a run artifact using a Node.js 24-compatible action");
+const adminFeatureDeployWorkflow = read("../.github/workflows/deploy-admin-feature-preview.yml");
+assert.ok(adminFeatureDeployWorkflow.includes("CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview"),
+  "Manual ADMIN feature deployments must be pinned to the dedicated Admin Pages project");
+assert.ok(!adminFeatureDeployWorkflow.includes("vars.CLOUDFLARE_PAGES_PROJECT"),
+  "Admin Preview deployment must not read the shared storefront Pages project variable");
+assert.ok(adminFeatureDeployWorkflow.includes('test "$CLOUDFLARE_PAGES_PROJECT" = "sindarealest-admin-preview"'),
+  "Manual ADMIN Preview deployment must refuse any Pages target except the isolated Admin project");
+assert.ok(adminFeatureDeployWorkflow.includes("uses: actions/checkout@v7") &&
+  adminFeatureDeployWorkflow.includes("uses: actions/setup-node@v7"),
+  "Manual ADMIN Preview deployment must use Node.js 24-compatible Actions versions");
+
 assert.ok(previewWorkflow.includes("data.latestScreenshotArtifact = {"),
   "The handoff must point to the latest screenshot artifact instead of committing every PNG");
 assert.ok(!previewWorkflow.includes('cp "$SOURCE_DIR"/screenshots/*.png "$DEST/screenshots/"'),

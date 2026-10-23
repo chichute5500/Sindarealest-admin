@@ -7,7 +7,7 @@
   "codeTestSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_AND_READ_ONLY_PREVIEW_CHECKS_PASS",
   "latestRun": {
     "id": 39953114181,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114181",
@@ -223,11 +223,10 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Inspect artifact admin-preview-evidence-442 and compare remaining module screenshots against docs/admin-ui-reference/admin-mobile-reference.png; fix only reproducible ADMIN-specific differences.",
+    "Continue authorized read-only checks for relevant GET routes where they do not expose business values in logs.",
+    "Do not perform product edits/saves, uploads, QR activation, order/warranty state changes, backup/restore or other writes without explicit isolated-data authorization.",
+    "Keep main and storefront settings untouched; do not merge PR #108/#111/#112 or deploy Production."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -239,10 +238,10 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "daa838cce4ce6dc5a73e785372f128637406e4b8",
-  "testedCommitSha": "daa838cce4ce6dc5a73e785372f128637406e4b8",
-  "capturedAt": "2026-10-23T18:04:26.486Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999927146",
+  "latestCodeCommitSha": "c904e4422c054c4249ef6f56d00e3d5229a1982e",
+  "testedCommitSha": "0be55ce7385fa1bc9408e0faca17c5be6a42373e",
+  "capturedAt": "2026-10-23T18:14:16Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -258,7 +257,7 @@
     "automatedTests": "PASS",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED",
-    "sourceValidation": "PASS_ON_7f5df6bb63a264a495c1f76517861496e3cc3643",
+    "sourceValidation": "PASS_ON_c904e4422c054c4249ef6f56d00e3d5229a1982e",
     "dependencyAudit": "PASS_ON_7f5df6bb63a264a495c1f76517861496e3cc3643",
     "projectIntegrity": "PASS_ON_7f5df6bb63a264a495c1f76517861496e3cc3643",
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_fa6937fea1a269a6b40de0e7f136ab969bd70a14",
@@ -283,12 +282,17 @@
     "currentHeadPlaywright": "PASS_LOCAL_RESPONSIVE_THEME_MATRIX_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9; DEPLOYED PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES NOT TESTED",
     "currentHead": "SOURCE_TESTS_AND_PREVIEW_MATRIX_PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9; BRANCH EVIDENCE CHILD 690b03731f534fa572f93462f11e3774f13a75bf",
     "currentHeadSha": "690b03731f534fa572f93462f11e3774f13a75bf",
-    "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_HEAD"
+    "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_HEAD",
+    "sourceValidationRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001610207",
+    "authenticatedReadOnlyAdminRoutes": "PASS_7_OF_7_ON_0be55ce7385fa1bc9408e0faca17c5be6a42373e",
+    "adminReadOnlyApiMutationRequests": "0",
+    "productMutationRequests": "0",
+    "actionRuntime": "NODE24_COMPATIBLE_ADMIN_WORKFLOWS"
   },
   "latestLocalEvidence": {
-    "runId": 39999927146,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999927146",
-    "sourceCommit": "daa838cce4ce6dc5a73e785372f128637406e4b8",
+    "runId": 40001316195,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195",
+    "sourceCommit": "0be55ce7385fa1bc9408e0faca17c5be6a42373e",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -296,31 +300,32 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-440",
+    "screenshotArtifact": "admin-preview-evidence-442",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
     "httpErrors": [],
     "attemptedWrites": [],
     "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+    "scope": "LOCAL SOURCE FIXTURES PLUS AUTHENTICATED READ-ONLY ADMIN PREVIEW; NO BUSINESS WRITE TESTS"
   },
   "latestScreenshotArtifact": {
-    "runId": 39999927146,
-    "name": "admin-preview-evidence-440",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999927146",
-    "sourceCommit": "daa838cce4ce6dc5a73e785372f128637406e4b8",
+    "runId": 40001316195,
+    "name": "admin-preview-evidence-442",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40001316195",
+    "sourceCommit": "0be55ce7385fa1bc9408e0faca17c5be6a42373e",
+    "artifactId": 12521608634,
     "screenshotCount": 132,
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
     "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to Git"
   },
   "remainingIssues": [
     "Screens 4/5/7 remain PARTIAL_NOT_ACCEPTED. Artifact 423 review found no new repeatable app-source defect; exact approved-reference parity remains NOT_VERIFIED.",
     "All 12 screens remain PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
-    "Historical BLOCKED_CLOUDFLARE_ACCESS root cause remains UNCONFIRMED; correlate the exact failing run's hostname/time with Access events before configuration changes."
+    "Read-only Admin GET routes return HTTP 200, but orders/customers/warranties/audit lists are empty on isolated Preview; authenticated non-empty business data is not verified."
   ],
   "blockedItems": [
     "Authenticated backend workflows require authorized Preview access; do not bypass Cloudflare Access or change secrets.",
@@ -488,5 +493,39 @@
     "meaning": "Workflow refused because target Preview DB already contained 235 product rows. User subsequently confirmed products are visible in UI. Do not re-import.",
     "unverified": "CRUD, image delivery, authenticated API end-to-end behavior, visual acceptance of all 12 screens, production"
   },
-  "nextStep": "Inspect current live Actions/deployment and read-only product API/list, image URLs, detail/edit and pagination. Do not seed/import again. Only fix reproduced defects and validate exact SHA."
+  "nextStep": "Inspect current live Actions/deployment and read-only product API/list, image URLs, detail/edit and pagination. Do not seed/import again. Only fix reproduced defects and validate exact SHA.",
+  "latestAuthenticatedReadOnlyRoutes": {
+    "runId": 40001316195,
+    "sourceCommit": "0be55ce7385fa1bc9408e0faca17c5be6a42373e",
+    "routeCount": 7,
+    "passed": 7,
+    "failed": 0,
+    "nonReadOnlyRequests": 0,
+    "routeStatuses": {
+      "/api/admin/session": 200,
+      "/api/admin/orders": 200,
+      "/api/admin/customers": 200,
+      "/api/admin/warranties": 200,
+      "/api/admin/audit-logs": 200,
+      "/api/admin/settings": 200,
+      "/api/admin/payment-qr": 200
+    },
+    "emptyArrayRoutes": [
+      "/api/admin/orders",
+      "/api/admin/customers",
+      "/api/admin/warranties",
+      "/api/admin/audit-logs"
+    ],
+    "scope": "Response values are not stored; only route, status, keys, counts, and pass/fail status are recorded. Empty arrays are not business-data acceptance."
+  },
+  "deployWorkflowSafety": {
+    "status": "CONFIGURATION_HARDENED_NOT_DISPATCHED",
+    "targetProject": "sindarealest-admin-preview",
+    "sharedCloudflarePagesProjectVariableUsed": false,
+    "actions": [
+      "actions/checkout@v7",
+      "actions/setup-node@v7"
+    ],
+    "deployment": "NOT_PERFORMED"
+  }
 }
