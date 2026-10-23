@@ -52,6 +52,9 @@ This is the single current source of truth. Re-fetch GitHub state before acting;
 - Reviewed the available local non-Hero captures for the home viewport, product grid, order-assurance/process, and relevant product/contact sections. No concrete non-Hero visual defect is substantiated by this fixture evidence, so no storefront source/CSS was changed.
 - Next action: use an authorized Preview-only access path and verify the exact deployed branch/SHA before capturing non-Hero sections. Do not bypass Access. The existing comprehensive visual workflow requires Hero coverage; do not run that full capture while Hero is paused. If an authorized non-Hero-only capture cannot be run, continue source/test review outside Hero without speculative UI changes.
 
+
+Continued safe work after the Preview access blocker: completed a read-only static markup/accessibility-oriented scan of the current storefront source outside any Hero editing. It found no confirmed non-Hero defect, so no storefront code was changed. Details and limits are recorded in TEST-RESULTS.md. This does not replace authorized live Preview capture or owner visual acceptance.
+
 ## Session recheck — 2026-10-23 (snapshot before evidence update)
 
 - PR #108 remained OPEN and unmerged. The branch HEAD at this recheck was `3f53e0cf7519ae0c5d0be022657845d5eb0f414b`, a documentation-only handoff-pointer commit. Re-fetch the live HEAD before future changes.
