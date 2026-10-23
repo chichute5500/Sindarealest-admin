@@ -1646,6 +1646,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(uploadVisibility.dropTop,
           'At the reference 390x844 mobile viewport, the image-upload area should begin above the sticky action bar: ' + JSON.stringify(uploadVisibility))
           .toBeLessThan(uploadVisibility.footerTop);
+        expect(uploadVisibility.dropBottom,
+          'At the reference 390x844 mobile viewport, the complete image-upload area should remain above the sticky action bar: ' + JSON.stringify(uploadVisibility))
+          .toBeLessThanOrEqual(uploadVisibility.footerTop);
       }
       if (variant.theme === 'dark') {
         const chromeColors = await page.evaluate(() => {
