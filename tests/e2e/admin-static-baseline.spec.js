@@ -207,7 +207,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     '/api/admin/session': { authenticated: true, fixtureOnly: true },
     '/api/admin/products': { products: fixtureProducts },
     '/api/admin/settings': {
-      showPrices: false,
+      showPrices: true,
       welcomeEnabled: true,
       welcomeTitleLine1: 'Tiêu đề thử nghiệm',
       welcomeTitleLine2: 'Chỉ phục vụ kiểm tra',
@@ -2340,7 +2340,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
       }
     }, true);
-    await captureView('settings', 'settings', null, true);
+    await captureView('settings', 'settings', async () => {
+      // The approved Screen 10 reference shows public prices enabled. Keep this canonical
+      // screenshot in that state instead of conflating it with the alternate hidden-price state.
+      await expect(page.locator('#showPrices')).toBeChecked();
+      await expect(page.locator('#main')).toContainText('Đang bật');
+    }, true);
     await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
       // Previous viewport iteration leaves the guard message in the live DOM;
       // navigate away and back so each viewport starts from a freshly rendered form.
