@@ -168,3 +168,10 @@ This active-task override supersedes earlier “ready for owner visual review”
 - Do not call CSS declaration presence or source-test PASS a visual PASS. If audit fails, fix the root cause and rerun. If it passes but the image still differs, improve catalog-only UI and repeat Preview verification/capture.
 
 Guardrails: Hero PAUSED/untouched; `#order` OWNER PASS/LOCKED/untouched; removed product-status filter panel stays removed; PR #108 OPEN/unmerged; Preview only; no Production/Admin/backend/data/config changes.
+
+## Latest audit retry — 2026-10-23 12:26 UTC
+
+- Run #39953050974 failed on another harness bug: `ReferenceError: currentTime is not defined`. It used a free variable rather than `activationMidFrame.currentTime`, `reselectionMotion.currentTime`, and `touchActivation.currentTime`.
+- Corrected all three in workflow commit `e9b35186e4273410253b4158f45105be19c7c483`; did not weaken visual thresholds.
+- Validation #39953590662 and catalog-only live audit #39953590658 are running. Check both final results and review screenshot/manifest artifact.
+- Active UI task remains OPEN: the owner says the Liquid Glass activation still differs materially from the sample. Technical PASS alone does not complete it. Compare actual animation frames with `docs/design-reference/liquid-glass-product-filters.png` at 360/390 mobile, 768 tablet and 1440 desktop in Light/Dark, including mouse/touch/keyboard/reselection/reduced-motion. Fix confirmed differences before asking owner to review.
