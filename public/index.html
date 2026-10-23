@@ -401,10 +401,10 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .sd-fullscreen-stage{position:absolute;inset:0;z-index:1;display:grid;place-items:center;padding:calc(70px + env(safe-area-inset-top)) 58px calc(84px + env(safe-area-inset-bottom));box-sizing:border-box}
 .sd-fullscreen-frame{position:relative;display:block;flex:none;max-width:100%;max-height:100%;overflow:hidden;border-radius:10px;background:rgba(205,230,249,.055);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 12px 55px rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.26)}
 .sd-fullscreen-image{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;object-position:center;opacity:0;z-index:1;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}.sd-fullscreen-image.is-active{opacity:1;z-index:2}
-@keyframes sdFullscreenOutLeft{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:.22;transform:translateX(-100%);filter:blur(1px)}}
-@keyframes sdFullscreenOutRight{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:.22;transform:translateX(100%);filter:blur(1px)}}
-@keyframes sdFullscreenInRight{from{opacity:.18;transform:translateX(100%);filter:blur(1px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
-@keyframes sdFullscreenInLeft{from{opacity:.18;transform:translateX(-100%);filter:blur(1px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+@keyframes sdFullscreenOutLeft{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:.88;transform:translateX(-18%);filter:blur(0)}}
+@keyframes sdFullscreenOutRight{from{opacity:1;transform:translateX(0);filter:blur(0)}to{opacity:.88;transform:translateX(18%);filter:blur(0)}}
+@keyframes sdFullscreenInRight{from{opacity:.55;transform:translateX(18%);filter:blur(0)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+@keyframes sdFullscreenInLeft{from{opacity:.55;transform:translateX(-18%);filter:blur(0)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
 .sd-fullscreen-image.sd-slide-out-left{animation:sdFullscreenOutLeft 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:2}
 .sd-fullscreen-image.sd-slide-out-right{animation:sdFullscreenOutRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:2}
 .sd-fullscreen-image.sd-slide-in-right{animation:sdFullscreenInRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:3}
@@ -980,18 +980,24 @@ function setFullscreenPhoto(src,direction='left',instant=false){
   incoming.onload=null;incoming.onerror=null;
   if(!incoming.naturalWidth){clearFullscreenSlideClasses(incoming);return}
   incoming.alt=altText;
-  sizeFullscreenFrame(incoming);
-  if(instant||!active.complete||!active.naturalWidth){
-   active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
-   syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);window.__sdUpdateDetailWatermark?.();return;
-  }
-  active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
-  incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
-  fullscreenAnimationTimer=setTimeout(()=>{
+  const revealDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
-   active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
-   syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
-  },FULLSCREEN_SLIDE_MS+20);
+   if(instant||!active.complete||!active.naturalWidth){
+    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
+    syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();return;
+   }
+   // Keep the old decoded photo fully visible until the incoming photo is decoded.
+   // Crossfade both real image layers; never expose the frame's pale glass background between photos.
+   active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
+   incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
+   fullscreenAnimationTimer=setTimeout(()=>{
+    if(transitionId!==fullscreenTransitionId)return;
+    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
+    syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
+   },FULLSCREEN_SLIDE_MS+20);
+  };
+  const decoded=typeof incoming.decode==='function'?incoming.decode():Promise.resolve();
+  Promise.resolve(decoded).catch(()=>{}).then(revealDecodedImage);
  };
  const failLoad=()=>{if(transitionId!==fullscreenTransitionId)return;incoming.onload=null;incoming.onerror=null;clearFullscreenSlideClasses(incoming);active.classList.add('is-active');syncImageAccessibility(active);window.__sdUpdateDetailWatermark?.()};
  if((incoming.getAttribute('src')||'')===next&&incoming.complete&&incoming.naturalWidth){finishLoad();return}
