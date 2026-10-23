@@ -249,3 +249,12 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - Runtime errors 0; same-origin HTTP errors 0; read-only violations 0. Audit status remains `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`; owner visual acceptance PENDING.
 - Audit #39931188126 failed due to exact RGBA equality/regex parsing in the audit harness; final rerun #39931617426 PASS supersedes it.
 - Guardrails unchanged: Hero paused and untouched; #order owner-PASS/LOCKED and untouched; PR #108 open/unmerged; Preview only; deleted dedicated status-filter panel stays deleted.
+
+## Category Liquid Glass audit checkpoint — 2026-10-23 12:23 UTC
+
+- Source validation #39952718374: PASS on `ecee210c0906edc66d00a7396a55a19f029e7c6c`.
+- Live catalog audit #39952718436: FAIL because the harness threw `TypeError: Cannot read properties of undefined (reading 'abs')`; code called `activationMidFrame.Math.abs(...)` instead of `Math.abs(...)`. This is a harness defect, not a valid visual verdict. Artifact #12501390897 exists but must not be called PASS evidence.
+- Workflow-only fix `b534c8fb8861157fb07da0b507a1e5f791966872` corrected three such calls while preserving the `abs(currentTime - 100) < 1` tolerance and `scaleX > 1.04` peak threshold.
+- New validation #39953050846 and live catalog audit #39953050974 were IN_PROGRESS when recorded. Fetch their final status and inspect the logs/artifact/manifest.
+- Last successful Preview deploy #39952539810 points to older storefront SHA `f3131d668fef72c652942a051f0ac53e7c739da6`. Do not imply that deploy includes later storefront code without checking exact deployment SHA/public tree.
+- Owner visual acceptance is PENDING because the category effect still looks unlike the supplied reference. Compare actual captured frames to `docs/design-reference/liquid-glass-product-filters.png` across mobile 360/390, tablet 768, desktop 1440 and Light/Dark; test mouse, touch, keyboard, category switching/reselection, selected persistence and reduced motion. No Hero capture. A source test or animation-name assertion alone is not visual acceptance.
