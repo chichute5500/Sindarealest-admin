@@ -313,6 +313,8 @@ jobs:
                     throw new Error('Preview main document did not return a successful response.');
                   }
 
+                  // Wait for the page's non-catalog intro to release its scroll lock. Do not capture or inspect that section.
+                  await page.waitForFunction(() => !document.body.classList.contains('welcome-active'), null, { timeout: 8000 });
                   const productsSection = page.locator('#products');
                   await productsSection.scrollIntoViewIfNeeded();
                   assert.equal(await page.locator('#products .fulfillment-filter-row, #fulfillmentFilters').count(), 0,
@@ -332,6 +334,7 @@ jobs:
                     await target.scrollIntoViewIfNeeded();
                     const box = await target.boundingBox();
                     assert.ok(box && box.width > 0 && box.height > 0, 'Catalog filter target is missing or has no layout: ' + selector);
+                    assert.ok(box.height < viewport.height * 0.75, 'Refusing a catalog-filter screenshot whose target unexpectedly spans most of the viewport.');
                     const filename = 'catalog-search-and-category-filters-' + contextName + '.png';
                     await target.screenshot({
                       path: path.join(outDir, filename),
@@ -341,6 +344,7 @@ jobs:
                     audit.screenshots.push({
                       filename,
                       selector,
+                      stage: 'catalog-controls-resting-state',
                       viewport: viewport.name,
                       width: viewport.width,
                       height: viewport.height,
@@ -357,16 +361,24 @@ jobs:
                   });
                   await page.mouse.move(0, 0);
                   await searchField.hover();
-                  const searchHover = await searchField.evaluate(el => getComputedStyle(el).backgroundColor);
+                  const searchHoverStyle = await searchField.evaluate(el => {
+                    const css = getComputedStyle(el);
+                    return { background: css.backgroundColor, shadow: css.boxShadow };
+                  });
+                  const searchHover = searchHoverStyle.background;
                   assert.notEqual(searchHover, searchDefault.background,
                     'Search surface hover must visibly differ from its default surface.');
                   await page.mouse.down();
+                  // The catalog surface has 220ms transitions; sample after the pressed glass has settled.
+                  await page.waitForTimeout(240);
                   const searchPressed = await searchField.evaluate(el => {
                     const css = getComputedStyle(el);
                     return { background: css.backgroundColor, shadow: css.boxShadow };
                   });
                   assert.notEqual(searchPressed.background, searchHover,
-                    'Search surface pressed state must be distinguishable from hover.');
+                    'Search surface pressed state must be distinguishable from hover after its transition.');
+                  assert.notEqual(searchPressed.shadow, searchHoverStyle.shadow,
+                    'Search press must change its glass depth from the hover treatment.');
                   assert.notEqual(searchPressed.shadow, searchDefault.shadow,
                     'Search surface pressed state must change its inset/depth treatment.');
                   await page.mouse.up();
@@ -408,7 +420,11 @@ jobs:
                   let categoryPressed = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
                   let categoryKeyboardFocus = 'PASS';
                   if (await otherCategory.count() > 0) {
-                    const defaultChipBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
+                    const defaultChipStyle = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      return { background: css.backgroundColor, shadow: css.boxShadow };
+                    });
+                    const defaultChipBackground = defaultChipStyle.background;
                     await otherCategory.hover();
                     const hoverChipStyle = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
@@ -418,6 +434,7 @@ jobs:
                       'Unselected category chip hover must differ from its default surface.');
                     categoryHover = 'PASS';
                     await page.mouse.down();
+                    await page.waitForTimeout(240);
                     const pressedChip = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
                       return { background: css.backgroundColor, shadow: css.boxShadow };
@@ -460,7 +477,78 @@ jobs:
                       'Selecting a category must start the visible Liquid Glass activation animation for the current theme.');
                     assert.equal(selectedGlassMotion.animationDuration, '0.46s',
                       'Category activation must retain the visible 460ms glass-pop timing.');
-                    const selectedCategoryBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
+                    // Sample actual computed frames while the CSS animation is running, not just its declaration.
+                    await page.waitForTimeout(135);
+                    const activationMidFrame = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      const animation = el.getAnimations().find(item =>
+                        typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      const matrix = css.transform.match(/^matrix\\(([^)]+)\\)$/);
+                      return {
+                        animationName: css.animationName,
+                        currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
+                        playState: animation?.playState || 'missing',
+                        transform: css.transform,
+                        scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
+                        boxShadow: css.boxShadow
+                      };
+                    });
+                    assert.ok(activationMidFrame.currentTime !== null && activationMidFrame.currentTime < 460,
+                      'Category click must leave a live CSS animation in progress; observed ' + JSON.stringify(activationMidFrame));
+                    assert.ok(activationMidFrame.scaleX > 1.005,
+                      'The mid-animation category chip must visibly spring above its resting size; observed ' + JSON.stringify(activationMidFrame));
+                    assert.notEqual(activationMidFrame.boxShadow, defaultChipStyle.shadow,
+                      'The selected chip must bloom beyond its unselected glass shadow during activation.');
+                    const frameBox = await otherCategory.boundingBox();
+                    assert.ok(frameBox && frameBox.height > 0 && frameBox.height < 100,
+                      'Activation evidence must be a single category chip, not a page/section screenshot.');
+                    const midFilename = 'category-activation-midframe-' + contextName + '.png';
+                    await otherCategory.screenshot({ path: path.join(outDir, midFilename), animations: 'allow', timeout: 30000 });
+                    audit.screenshots.push({ filename: midFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'activation-midframe', viewport: viewport.name, width: Math.round(frameBox.width), height: Math.round(frameBox.height), theme });
+
+                    await page.waitForTimeout(105);
+                    const activationLaterFrame = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      const animation = el.getAnimations().find(item =>
+                        typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      return {
+                        currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
+                        transform: css.transform,
+                        boxShadow: css.boxShadow
+                      };
+                    });
+                    assert.ok(activationLaterFrame.currentTime !== null && activationLaterFrame.currentTime > activationMidFrame.currentTime,
+                      'Animation timeline must advance after the category selection state change.');
+                    assert.notEqual(activationLaterFrame.transform, activationMidFrame.transform,
+                      'Computed transform must change between real animation frames.');
+                    assert.notEqual(activationLaterFrame.boxShadow, activationMidFrame.boxShadow,
+                      'Computed glass bloom must evolve between real animation frames.');
+
+                    await page.waitForTimeout(300);
+                    const settledCategoryStyle = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      return { background: css.backgroundColor, boxShadow: css.boxShadow, transform: css.transform };
+                    });
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
+                      'Selected category must remain selected after the activation animation ends.');
+                    assert.notEqual(settledCategoryStyle.boxShadow, activationMidFrame.boxShadow,
+                      'The settled selected-glass state must be distinct from the activation bloom frame.');
+                    const settledBox = await otherCategory.boundingBox();
+                    const settledFilename = 'category-selection-settled-' + contextName + '.png';
+                    await otherCategory.screenshot({ path: path.join(outDir, settledFilename), animations: 'disabled', timeout: 30000 });
+                    audit.screenshots.push({ filename: settledFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'selection-settled', viewport: viewport.name, width: Math.round(settledBox.width), height: Math.round(settledBox.height), theme });
+                    otherCategoryState.categoryActivationBehavior = {
+                      status: 'PASS',
+                      animationName: selectedGlassMotion.animationName,
+                      animationDuration: selectedGlassMotion.animationDuration,
+                      midFrameScaleX: activationMidFrame.scaleX,
+                      midFrameCurrentTimeMs: activationMidFrame.currentTime,
+                      laterFrameCurrentTimeMs: activationLaterFrame.currentTime,
+                      transformChangedBetweenFrames: activationMidFrame.transform !== activationLaterFrame.transform,
+                      bloomChangedBetweenFrames: activationMidFrame.boxShadow !== activationLaterFrame.boxShadow,
+                      persistentSelectedState: 'PASS'
+                    };
+                    const selectedCategoryBackground = settledCategoryStyle.background;
                     await page.mouse.move(0, 0);
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
                       'Selected category must remain selected after pointer release and mouse leave.');
@@ -469,6 +557,19 @@ jobs:
                     otherCategoryState.categorySelectedPersists = 'PASS';
                     await categoryGroup.locator('button[data-category="all"]').click();
                     assert.equal(await categoryGroup.locator('button[data-category="all"]').getAttribute('aria-pressed'), 'true');
+                    // Exercise the real selection handler under a reduced-motion preference.
+                    await page.emulateMedia({ reducedMotion: 'reduce' });
+                    await otherCategory.click();
+                    const reducedMotionState = await otherCategory.evaluate(el => ({
+                      animationName: getComputedStyle(el).animationName,
+                      activationAnimations: el.getAnimations().filter(item =>
+                        typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate')).length
+                    }));
+                    assert.equal(reducedMotionState.animationName, 'none',
+                      'Reduced-motion preference must suppress category activation animation.');
+                    assert.equal(reducedMotionState.activationAnimations, 0,
+                      'Reduced-motion selection must not start a category animation.');
+                    otherCategoryState.reducedMotionSelection = 'PASS';
                     categoryInteraction = 'PASS';
                   }
                   audit.stateChecks.push(otherCategoryState);
@@ -485,7 +586,11 @@ jobs:
                 }
               }
             }
-            audit.captureCompleted = audit.screenshots.length === 8;
+            const catalogSurfaceScreenshotCount = audit.screenshots.filter(item => item.stage === 'catalog-controls-resting-state').length;
+            const activationFrameScreenshotCount = audit.screenshots.filter(item => item.stage === 'activation-midframe').length;
+            const settledSelectionScreenshotCount = audit.screenshots.filter(item => item.stage === 'selection-settled').length;
+            audit.captureCompleted = catalogSurfaceScreenshotCount === 8 &&
+              activationFrameScreenshotCount === 8 && settledSelectionScreenshotCount === 8;
             audit.passed = audit.captureCompleted &&
               audit.accessBlocked === false &&
               audit.runtimeErrors.length === 0 &&
@@ -496,7 +601,9 @@ jobs:
             audit.status = audit.passed ? 'CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE' : 'CAPTURED_WITH_ISSUES';
             audit.finishedAtUtc = new Date().toISOString();
             await writeAudit();
-            assert.equal(audit.screenshots.length, 8, 'Expected one screenshot of the remaining search/category controls for each of eight viewport/theme pairs.');
+            assert.equal(catalogSurfaceScreenshotCount, 8, 'Expected one element-only screenshot of the catalog filter panel for each of eight viewport/theme pairs.');
+            assert.equal(activationFrameScreenshotCount, 8, 'Expected one live activation animation frame for each viewport/theme pair.');
+            assert.equal(settledSelectionScreenshotCount, 8, 'Expected one settled selected-chip frame for each viewport/theme pair.');
             assert.equal(audit.runtimeErrors.length, 0, 'Runtime errors were detected.');
             assert.equal(audit.sameOriginHttpErrors.length, 0, 'Same-origin HTTP errors were detected.');
             assert.equal(audit.readOnlyViolations.length, 0, 'Non-read-only requests were attempted.');
@@ -511,6 +618,9 @@ jobs:
               exactSourceHeadMatch: audit.exactSourceHeadMatch,
               sourcePublicTreeEquivalentToDeployment: audit.sourcePublicTreeEquivalentToDeployment,
               screenshots: audit.screenshots.length,
+              catalogSurfaceScreenshots: catalogSurfaceScreenshotCount,
+              activationMidframeScreenshots: activationFrameScreenshotCount,
+              settledSelectionScreenshots: settledSelectionScreenshotCount,
               filterChecks: audit.filterChecks.length,
               stateChecks: audit.stateChecks.length,
               runtimeErrors: audit.runtimeErrors.length,
