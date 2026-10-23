@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:43:00Z",
+  "capturedAtUtc": "2026-10-23T03:51:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-  "codeTestSha": "6516bda5b21cc748e64d767a3041e36c2b26a822",
+  "branchHeadAtCheckpointStart": "d0db56b7a16ff9a95f9eca016685fe1a4e6d53de",
+  "codeTestSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_TESTS_AND_PREVIEW_PASS_ON_EXACT_SHA; AUTHENTICATED_BACKEND_NOT_TESTED",
   "latestRun": {
-    "id": 39896046601,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046601",
-    "headSha": "605ac706b59f166868544ea5719cb75204501631",
+    "id": 39896884082,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884082",
+    "headSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
     "status": "completed",
-    "conclusion": "failure",
-    "summary": "Prior SHA stopped at handoff-integrity.test.mjs because testedCommitSha=null was rejected before Playwright. The assertion is now fixed on the current handoff commit; this prior run is historical."
+    "conclusion": "success",
+    "summary": "Validate and Playwright responsive/theme matrix passed on exact source/test SHA; deployed Preview diagnostic passed for the login-shell signature only."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
@@ -210,11 +210,11 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
+    "Continue the remaining 12-screen acceptance audit using artifact 367 and approved reference where directly inspectable; fix only reproducible issues.",
+    "Obtain authorized authenticated Preview access before testing persisted business workflows; never bypass Cloudflare Access.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED until complete behavior/reference evidence supports acceptance.",
+    "Remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED; owner-deferred migration/R2/AI work remains deferred.",
+    "Do not repeat B1 cleanup, merge/rebase/force-push, deploy, or perform remote data/schema operations."
   ],
   "mobileToastFix": {
     "status": "PASS",
@@ -232,19 +232,19 @@
     "applicationStartup": "PASS",
     "localStaticPlaywrightBaseline": "PASS",
     "playwright": "PASS",
-    "playwrightPreviewDiagnostics": "success",
-    "deployedPreview": "PASS",
+    "playwrightPreviewDiagnostics": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
+    "deployedPreview": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
     "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
     "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS",
+    "automatedTests": "PASS_ON_cd432ecd775129ee652bd0e127cfcea24e5d9e57",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED",
-    "sourceValidation": "PRIOR_SHA_FAIL_HANDOFF_INTEGRITY; RERUN_PENDING",
-    "dependencyAudit": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "projectIntegrity": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
+    "sourceValidation": "PASS_ON_cd432ecd775129ee652bd0e127cfcea24e5d9e57",
+    "dependencyAudit": "PASS_ON_cd432ecd775129ee652bd0e127cfcea24e5d9e57",
+    "projectIntegrity": "PASS_ON_cd432ecd775129ee652bd0e127cfcea24e5d9e57",
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
     "settingsScreenOrder": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285"
   },
@@ -277,46 +277,44 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 86,
     "uiFixtureMetricCount": 78,
+    "artifactId": 12476992112,
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
     "B1 cleanup/provenance review complete; no further deletion/API consolidation without new evidence.",
-    "Previous Validate/Preview failed before Playwright because testedCommitSha=null was rejected; test contract fix is now on current HEAD pending rerun.",
-    "Screen 8 mobile CSS correction is not yet verified by a successful Playwright screenshot matrix.",
-    "All 12 screens remain PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED.",
-    "Authenticated business/backend QA NOT_TESTED; fixture screenshots do not prove persistence.",
+    "All 12 screens remain PARTIAL_NOT_ACCEPTED until complete behavior and approved-reference parity are supported.",
+    "Authenticated business/backend QA remains NOT_TESTED; fixture screenshots do not prove persistence.",
     "Remote D1 schema/ledger NOT_VERIFIED; migration 0009, PRE/PRO migrations, product-image/R2 persistence and AI image grouping DEFERRED_BY_OWNER.",
     "Production deployment NOT_PERFORMED; PR #111/#108 remain open and unmerged."
   ],
   "blockedItems": [
-    "Current HEAD needs exact-SHA Validate/Preview after nullable testedCommitSha test fix.",
     "Authenticated backend workflows require authorized Preview access; do not bypass Cloudflare Access or change secrets.",
     "Migration 0009, PRE/PRO migration changes and product-image/R2 persistence remain DEFERRED_BY_OWNER.",
     "PR #111 must remain open/unmerged; no merge/rebase/force-push."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "PENDING_AFTER_HANDOFF_TEST_FIX",
+  "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_FOLLOWS",
   "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; OVERALL_ADMIN_ACCEPTANCE_PARTIAL",
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
-      "headAtStart": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-      "changedFiles": 400,
-      "additions": 39434,
+      "headAtStart": "d0db56b7a16ff9a95f9eca016685fe1a4e6d53de",
+      "changedFiles": 402,
+      "additions": 39441,
       "deletions": 212
     },
     "pr108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "7b1c201315a6349add55a07e4a561972c392fa98",
+      "headSha": "bc1a631d5ca82995b3a772da9bc26a4e8f241309",
       "changedFiles": 287,
       "readOnly": true
     },
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
-  "currentHeadValidationReason": "Latest failed Validate #39896046593 and Preview #39896046601 were on prior SHA 605ac706b59f166868544ea5719cb75204501631. Both stopped at tests/handoff-integrity.test.mjs because testedCommitSha=null was rejected when the full baseline had not passed. The test contract fix is committed at 6516bda5b21cc748e64d767a3041e36c2b26a822; wait for new exact-SHA runs before claiming success.",
+  "currentHeadValidationReason": "Validate #39896884047 and Admin Preview #39896884082 both succeeded on exact source/test SHA cd432ecd775129ee652bd0e127cfcea24e5d9e57. Preview captured 102 PNGs (16 login shell, 86 read-only fixture screens) and 78 fixture metrics in admin-preview-evidence-367. Workflow committed compact evidence child d0db56b7a16ff9a95f9eca016685fe1a4e6d53de; that child is not a new application-source test SHA.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-23T03:05:10Z",
     "headAtStart": "6264adcdd1f3982c5cd96cd21006c6217ac3cd87",
@@ -347,27 +345,27 @@
     ]
   },
   "latestValidateRun": {
-    "id": 39896046593,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046593",
+    "id": 39896884047,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884047",
     "status": "completed",
-    "conclusion": "failure",
-    "testedSha": "605ac706b59f166868544ea5719cb75204501631"
+    "conclusion": "success",
+    "testedSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T03:43:00Z",
-    "testedSha": "605ac706b59f166868544ea5719cb75204501631",
+    "capturedAtUtc": "2026-10-23T03:51:00Z",
+    "testedSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
     "validateRun": {
-      "id": 39896046593,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046593",
+      "id": 39896884047,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884047",
       "status": "completed",
-      "conclusion": "failure"
+      "conclusion": "success"
     },
     "previewRun": {
-      "id": 39896046601,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046601",
+      "id": 39896884082,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884082",
       "status": "completed",
-      "conclusion": "failure"
+      "conclusion": "success"
     },
-    "note": "Both runs failed before Playwright on prior SHA 605ac706b59f166868544ea5719cb75204501631; testedCommitSha=null was rejected. Test contract fix is on current HEAD 6516bda5b21cc748e64d767a3041e36c2b26a822; do not claim the new run passed until live Actions confirms."
+    "note": "Exact source/test SHA cd432ecd775129ee652bd0e127cfcea24e5d9e57 passed Validate and Preview. Artifact admin-preview-evidence-367 (ID 12476992112) contains 102 PNGs, including 86 fixture/module shots and 78 metrics. Evidence-only child commit d0db56b7a16ff9a95f9eca016685fe1a4e6d53de followed. Authenticated business workflows remain untested."
   }
 }

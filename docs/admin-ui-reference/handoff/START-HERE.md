@@ -11,11 +11,11 @@
 - [12-screen acceptance audit](12-SCREEN-REFERENCE-AUDIT.md)
 - [Evidence retention policy](history/README.md)
 
-## Live checkpoint (2026-10-23 03:43 UTC; re-fetch before action)
-- Writable branch / PR #111 HEAD: `6516bda5b21cc748e64d767a3041e36c2b26a822`. Prior Validate [#39896046593](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046593) and Preview [#39896046601](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046601) **FAILED on prior SHA `605ac706b59f166868544ea5719cb75204501631` before the UI screenshot matrix**. Root cause: `tests/handoff-integrity.test.mjs:31` rejected `testedCommitSha=null`, correct when the baseline has not passed. That test is now fixed at current HEAD `6516bda5b21cc748e64d767a3041e36c2b26a822`; verify new exact-SHA runs before claiming success.
-- PR #111 remains OPEN/unmerged, 400 files (+39434 / -212), base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge action.
-- PR #108 remains OPEN/unmerged/read-only at head `7b1c201315a6349add55a07e4a561972c392fa98` (287 files); do not write there. `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- Screen 10 settings order passed earlier on source/test SHA `4ac7465539e746b7f37517327d7bf9bddcfa3285`. Screen 8 mobile CSS correction remains unverified because the prior Preview skipped Playwright.
+## Live checkpoint (2026-10-23 03:51 UTC; re-fetch before action)
+- Last verified live branch / PR #111 HEAD before this handoff refresh: `d0db56b7a16ff9a95f9eca016685fe1a4e6d53de` (Preview-generated evidence-only child). Application source/test SHA `cd432ecd775129ee652bd0e127cfcea24e5d9e57` passed Validate [#39896884047](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884047) and Admin Preview [#39896884082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884082) on the exact same SHA.
+- Preview artifact [admin-preview-evidence-367](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884082/artifacts/12476992112) contains 102 PNGs: 16 login-shell and 86 read-only fixture/module screenshots, plus 78 fixture metrics. Deployed diagnostic confirms login-shell CSS signature only; no authenticated business persistence proof.
+- PR #111 OPEN/unmerged, 402 files (+39441 / -212), base `main` `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. PR #108 OPEN/unmerged/read-only at head `bc1a631d5ca82995b3a772da9bc26a4e8f241309` (287 files). Do not write there. `main` unchanged.
+- Screen 8 mobile customer identity CSS specificity correction passed the Playwright matrix on `cd432ecd775129ee652bd0e127cfcea24e5d9e57`. Screen 10 settings order previously passed on `4ac7465539e746b7f37517327d7bf9bddcfa3285`; Screen 11 Backup/Restore route split passed Validate/Preview on `5ba5bf69b71e3512491ece4023c886c056ced4fc`.
 - All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
 ## B1 — PR #111 cleanup/provenance
@@ -26,10 +26,9 @@
 - Keep active consumers and distinct payment contracts. `normalizeFulfillmentType` is canonical in `functions/_lib.js`. No further deletions or route/helper merges without new evidence.
 
 ## Next actions
-1. Verify Validate and Admin Preview on the current handoff commit; inspect exact-SHA result.
-2. Confirm Playwright actually runs and Screen 8 mobile customer assertions pass; fix only reproducible failures.
-3. Continue remaining screen acceptance; exact reference parity remains NOT_VERIFIED and all 12 screens remain PARTIAL_NOT_ACCEPTED.
-4. Obtain authorized authenticated Preview access before persistence QA. Never bypass Cloudflare Access or substitute fixtures for backend evidence.
+1. Continue remaining screen acceptance using artifact 367 and the approved reference where direct comparison is possible; fix only reproducible issues.
+2. Obtain an authorized authenticated Preview path before testing persistence. Never bypass Cloudflare Access or substitute fixtures for backend evidence.
+3. Keep all 12 screens PARTIAL_NOT_ACCEPTED until behavior and reference evidence supports acceptance; do not chase evidence-child SHAs with metadata-only commits.
 
 ## Guardrails
 - Write only to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and PR #108 open/unmerged; do not write to PR #108, `main`, or the static website branch.

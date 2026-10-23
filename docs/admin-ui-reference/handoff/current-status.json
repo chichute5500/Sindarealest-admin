@@ -1,18 +1,18 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T03:43:00Z",
+  "capturedAtUtc": "2026-10-23T03:51:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-  "checkpointSemantics": "Current branch HEAD 6516bda5b21cc748e64d767a3041e36c2b26a822 includes the handoff test fix. Previous Validate #39896046593 and Preview #39896046601 failed on 605ac706b59f166868544ea5719cb75204501631 before the UI matrix because the test rejected testedCommitSha=null. New exact-SHA runs for 6516bda5b21cc748e64d767a3041e36c2b26a822 are pending; do not claim pass until confirmed.",
-  "codeTestSha": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-  "latestProductSourceCommit": "605ac706b59f166868544ea5719cb75204501631",
+  "branchHeadAtCheckpointStart": "d0db56b7a16ff9a95f9eca016685fe1a4e6d53de",
+  "checkpointSemantics": "Current live branch HEAD d0db56b7a16ff9a95f9eca016685fe1a4e6d53de is the evidence-only child produced by Preview #39896884082; application source/test SHA cd432ecd775129ee652bd0e127cfcea24e5d9e57 passed Validate and Preview. Do not create metadata-only commits to chase the evidence child SHA.",
+  "codeTestSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
+  "latestProductSourceCommit": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
   "latestActionsRun": {
-    "id": 39896046593,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046593",
+    "id": 39896884047,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884047",
     "status": "completed",
-    "conclusion": "failure",
-    "testedSha": "605ac706b59f166868544ea5719cb75204501631"
+    "conclusion": "success",
+    "testedSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -24,7 +24,7 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "7b1c201315a6349add55a07e4a561972c392fa98",
+      "headSha": "bc1a631d5ca82995b3a772da9bc26a4e8f241309",
       "changedFiles": 287,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
@@ -39,14 +39,14 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-      "changedFiles": 400,
-      "additions": 39434,
+      "headSha": "d0db56b7a16ff9a95f9eca016685fe1a4e6d53de",
+      "changedFiles": 402,
+      "additions": 39441,
       "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
-      "validationRunId": 39896046593,
-      "validation": "PRIOR_SHA_FAILED_HANDOFF_INTEGRITY; FIX_COMMITTED_PENDING_RERUN",
+      "validationRunId": 39896884047,
+      "validation": "PASS_ON_EXACT_SOURCE_TEST_SHA; PREVIEW_PASS_ON_SAME_SHA",
       "mergeableState": "dirty"
     }
   },
@@ -102,11 +102,13 @@
     }
   },
   "latestProductChange": {
-    "status": "SCREEN_8_MOBILE_SUMMARY_CANDIDATE; HANDOFF_TEST_FIX_PENDING_VALIDATION",
-    "sourceAndTestSha": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-    "previousValidateRunId": 39896046593,
-    "previousPreviewRunId": 39896046601,
-    "summary": "The mobile customer summary and desktop identity hide rule are committed, but the previous Preview stopped before Playwright because of the nullable testedCommitSha assertion. The assertion is fixed on current HEAD; rerun and inspect the full UI matrix."
+    "status": "SCREEN_8_MOBILE_CUSTOMER_LAYOUT_FIX_VALIDATED; BACKEND_ACCEPTANCE_PARTIAL",
+    "sourceAndTestSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
+    "validateRunId": 39896884047,
+    "previewRunId": 39896884082,
+    "previewArtifact": "admin-preview-evidence-367",
+    "previewArtifactId": 12476992112,
+    "summary": "CSS now hides the desktop customer identity with sufficient priority. Validate and Playwright matrix passed on exact source/test SHA cd432ecd775129ee652bd0e127cfcea24e5d9e57. Screenshots are still synthetic/read-only fixtures; backend persistence and full reference parity remain unverified."
   },
   "screenStatuses": {
     "1_login": {
@@ -367,10 +369,10 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Verify Validate and Admin Preview on the current handoff commit and inspect exact-SHA result.",
-    "Confirm Playwright actually runs and Screen 8 mobile customer assertions pass; fix only reproducible failures.",
-    "Continue remaining screen acceptance; all 12 screens remain PARTIAL_NOT_ACCEPTED.",
-    "Authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED. Obtain authorized Preview access; never bypass Access.",
+    "Continue the remaining 12-screen acceptance audit using artifact 367 and approved reference where directly inspectable; fix only reproducible issues.",
+    "Obtain authorized authenticated Preview access before testing persisted business workflows; never bypass Cloudflare Access.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED until complete behavior/reference evidence supports acceptance.",
+    "Remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED; owner-deferred migration/R2/AI work remains deferred.",
     "Do not repeat B1 cleanup, merge/rebase/force-push, deploy, or perform remote data/schema operations."
   ],
   "handoffSync": {
@@ -379,24 +381,30 @@
     "lastSyncAtUtc": "2026-10-23T03:43:00Z",
     "syncPurpose": "Refresh canonical handoff to current live HEAD and accurately record failed prior validation plus the nullable testedCommitSha test fix."
   },
-  "currentHeadAtCheckpoint": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-  "currentHeadValidation": "PENDING_AFTER_HANDOFF_TEST_FIX",
-  "currentHeadValidationReason": "Latest failed Validate #39896046593 and Preview #39896046601 were on prior SHA 605ac706b59f166868544ea5719cb75204501631. Both stopped at tests/handoff-integrity.test.mjs because testedCommitSha=null was rejected when the full baseline had not passed. The test contract fix is committed at 6516bda5b21cc748e64d767a3041e36c2b26a822; wait for new exact-SHA runs before claiming success.",
+  "currentHeadAtCheckpoint": "d0db56b7a16ff9a95f9eca016685fe1a4e6d53de",
+  "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA",
+  "currentHeadValidationReason": "Validate #39896884047 and Admin Preview #39896884082 both succeeded on exact source/test SHA cd432ecd775129ee652bd0e127cfcea24e5d9e57. Preview captured 102 PNGs (16 login shell, 86 read-only fixture screens) and 78 fixture metrics in admin-preview-evidence-367. Workflow committed compact evidence child d0db56b7a16ff9a95f9eca016685fe1a4e6d53de; that child is not a new application-source test SHA.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T03:43:00Z",
-    "headAtStart": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-    "codeTestSha": "6516bda5b21cc748e64d767a3041e36c2b26a822",
-    "priorFailedSha": "605ac706b59f166868544ea5719cb75204501631",
-    "priorValidateRunId": 39896046593,
-    "priorValidateUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046593",
-    "priorPreviewRunId": 39896046601,
-    "priorPreviewUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896046601",
-    "priorRunsConclusion": "failure before Playwright",
-    "pr111ChangedFiles": 400,
-    "pr111Additions": 39434,
+    "capturedAtUtc": "2026-10-23T03:51:00Z",
+    "headAtStart": "d0db56b7a16ff9a95f9eca016685fe1a4e6d53de",
+    "codeTestSha": "cd432ecd775129ee652bd0e127cfcea24e5d9e57",
+    "validateRunId": 39896884047,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884047",
+    "validateConclusion": "success",
+    "previewRunId": 39896884082,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896884082",
+    "previewConclusion": "success",
+    "previewArtifact": "admin-preview-evidence-367",
+    "previewArtifactId": 12476992112,
+    "screenshotCount": 102,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 86,
+    "uiFixtureMetricCount": 78,
+    "pr111ChangedFiles": 402,
+    "pr111Additions": 39441,
     "pr111Deletions": 212,
-    "pr108Head": "7b1c201315a6349add55a07e4a561972c392fa98",
+    "pr108Head": "bc1a631d5ca82995b3a772da9bc26a4e8f241309",
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
-  "latestReviewFinding": "Screen 8 mobile Preview #39895792200 found desktop identity still visible. CSS hide rule was added on 605ac706b59f166868544ea5719cb75204501631; subsequent Validate/Preview stopped before Playwright due to the handoff SHA assertion. The test now allows null until baseline passes; Screen 8 remains unverified pending new Preview."
+  "latestReviewFinding": "Screen 8 compact mobile customer card is now verified by successful Playwright matrix on cd432ecd775129ee652bd0e127cfcea24e5d9e57; CSS uses display:none!important to prevent later desktop identity styles overriding the mobile hide rule. All screens remain PARTIAL_NOT_ACCEPTED because backend acceptance and full reference parity are not established."
 }
