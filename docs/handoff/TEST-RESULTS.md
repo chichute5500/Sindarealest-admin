@@ -1,3 +1,13 @@
+## VERIFIED GREEN TEST RECORD — SLIDESHOW CONTROL GUARD — 2026-10-24
+
+- Final source/test SHA: `74bcd512abc19d3fba4bad64654321091073b8ea`.
+- Regression tests PASS for one 3000-ms autoplay interval, pause clears timer, resume starts a fresh single interval, accessible name and `aria-pressed` update, reduced-motion retains the control but disables it and creates no timer, manual next remains available, and missing-control setup returns without throwing or leaving an interval.
+- Complete CI/test suite PASS [#39995656182](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656182).
+- Preview deployment PASS [#39995656107](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656107), immutable URL https://e7b33eeb.sindarealest2.pages.dev/. Deploy log confirms correct Pages project/Production branch guard and commit hash argument.
+- No manual browser screenshot/visual PASS. PR #108 OPEN/unmerged; no Production deployment.
+
+---
+
 ## LATEST TEST STATUS — SLIDESHOW REDUCED-MOTION FIXTURE — 2026-10-24
 
 - Current source/test SHA `74bcd512abc19d3fba4bad64654321091073b8ea`.
