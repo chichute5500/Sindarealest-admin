@@ -24,6 +24,7 @@ assert.equal(legacyProducts.length, 235, 'The read-only legacy product fixture s
 assert.ok(legacyProducts.every(product => product.sku === null && product.skuVerified === false), 'Legacy fixture SKUs must be null when unverified; do not retain generated commercial SKU values.');
 assert.ok(storefrontHtml.includes("function visibleSku(p){return p&&p.skuVerified!==false?String(p.sku||'').trim():''}"), 'Storefront must have one explicit helper that hides unverified fixture identifiers.');
 assert.ok(storefrontHtml.includes('<input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU"'), 'Catalog search input must have an explicit accessible name independent of its placeholder.');
+assert.ok(storefrontHtml.includes("n===page?'aria-current=\"page\"':''", "The currently selected catalog page must expose aria-current=\"page\" to assistive technology.");
 assert.ok(storefrontHtml.includes("Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}"), 'Storefront product cards must clearly disclose when no verified SKU is available.');
 assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');
 assert.ok(!storefrontHtml.includes('ghi lại mã SKU để tư vấn nhanh'), 'Order guidance must not instruct customers to record unverified fixture SKUs.');
