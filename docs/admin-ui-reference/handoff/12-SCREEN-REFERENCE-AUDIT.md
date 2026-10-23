@@ -1,19 +1,12 @@
 # ADMIN — 12-SCREEN REFERENCE AUDIT
 
-## Newest verified checkpoint — 2026-10-23 04:29 UTC
-- Application/source-test SHA: `a04e7f581f81403aae19aa9249d383a27f947ab5`. Validate [#39899961562](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562) and Admin Preview [#39899961344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344) both completed **SUCCESS on this exact SHA**.
-- Preview artifact [admin-preview-evidence-370](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473) (ID `12478995473`) completed: 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics; ZIP has one additional approved reference PNG (133 PNGs total). Fixture evidence: 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors. Seven console entries are expected simulated HTTP 503 retry-path responses.
-- Deployed Preview diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; it does **not** validate authenticated business workflows. The Preview workflow created evidence-only child commit [`290d3de`](https://github.com/chichute5500/Sindarealest-admin/commit/290d3de4110f235c0a0ea963f0bc191dbd374b11). That was the branch/PR head immediately before this handoff-sync commit; fetch the current live branch head before acting. The tested source/test SHA remains `a04e7f581f81403aae19aa9249d383a27f947ab5`.
-- Live refs: PR #111 OPEN/unmerged, head `290d3de4110f235c0a0ea963f0bc191dbd374b11`, base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, mergeability `dirty`, 408 changed files; PR #108 OPEN/unmerged/read-only, head `bc5b08a357ba8bf6069348e2fa7c86e4c78e84f0`, 287 changed files; `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`. Migration 0009, PRE/PRO migrations, product-image/R2 persistence and AI image grouping remain deferred by owner.
-
-## Screen 12 — Notifications regression test added
-- On source/test SHA `a04e7f581f81403aae19aa9249d383a27f947ab5`, Playwright resets `sd-admin-last-seen`, verifies one unread fixture event, confirms “Đánh dấu đã đọc” hides the unread badge and persists a valid timestamp, and retains Escape-close/focus-restoration and responsive overflow assertions.
-- Validate and the full local screenshot/fixture matrix passed on the exact SHA. This remains fixture-only evidence; Screen 12 and all other screens remain `PARTIAL_NOT_ACCEPTED` pending authenticated backend and reference-parity evidence.
-
-
-**Current product progress: 50% PROVISIONAL.** No screen is fully accepted. Product code/UI evidence and the later handoff-integrity check are tracked separately.
-
+## Live checkpoint — 2026-10-23 04:56 UTC
+- Writable branch at checkpoint start: `95b12624d2598de31f3f2a87a0d5c01f4732a35d`; application/source-test SHA: `9515d03d504ca9c49836b719ccede1eb3c2d2ce1`.
+- Validate [#39901444416](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444416) and Admin Preview [#39901444449](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449) both **SUCCESS on exact source/test SHA `9515d03d504ca9c49836b719ccede1eb3c2d2ce1`**. Artifact [admin-preview-evidence-371](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449/artifacts/12478713244): 132 distinct screenshot PNGs (16 login + 116 module), 120 module capture entries, 112 fixture metrics; 133 archive PNGs including the approved reference image.
+- Screen 7 order-detail Playwright checks passed at 320×640 and 390×844, light/dark: no horizontal overflow, document end reachable, mobile navigation visible, content clearance >=8px. Fixture-only/read-only.
+- Preview diagnostic `PASS_LOGIN_CSS_SIGNATURE` confirms login-shell CSS only. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- PR #111 and #108 remain OPEN/unmerged; `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Fetch live refs and Actions before next action. No merge/deploy or writes to `main`/PR #108.
+- Continue reproducible reference-driven UI audits; do not repeat B1 cleanup or mark screens accepted based on fixtures.
 
 ## Historical narrow-viewport and Screen 9 clearance checkpoint — 2026-10-23 04:07 UTC (superseded above)
 - Source/test SHA `000d3d84a9cf8c63144388f80879b5cc1439d161` passed Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) and Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) on the exact same SHA.
