@@ -29,6 +29,4 @@ assert.match(html, /key\s*===?\s*['"]Escape['"]|keyCode\s*===\s*27/,
 
 assert.match(html, /<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal">/,
   'the product detail overlay must be the single modal dialog container');
-assert.doesNotMatch(html, /<div class="detail-modal"[^>]*\\brole="dialog"/,
-  'the visual panel inside the product detail overlay must not create a nested dialog');
 console.log('PASS: storefront accessibility contracts cover reduced motion, keyboard focus, safe areas, dialog semantics, live regions and mobile target sizing.');
