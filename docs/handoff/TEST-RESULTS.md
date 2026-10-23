@@ -238,3 +238,14 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - Important limitation: a keyframe declaration, computed animation name, or 0.46s duration does not prove that changing the selected category visibly triggers the animation. The owner has explicitly reported that the effect is not perceptible. Keep the task OPEN, reproduce real category selection on the deployed Preview, inspect the actual visual response, diagnose root cause and improve behavior as needed. Add a behavior-level regression test, not merely a CSS string assertion.
 - Acceptance criteria: visible press-in then short spring/glass bloom or accent glow when selection changes; settles into a persistent selected state; works on desktop mouse/keyboard and mobile touch in Light/Dark; readable label; honors reduced-motion; no perpetual pulsing. Re-run tests, Preview deployment/SHA verification and live captures before sharing a verified Preview link.
 - Scope protection: Hero PAUSED/untouched; #order OWNER PASS/LOCKED/untouched; PR #108 OPEN/unmerged; Preview only; no Production or Admin/backend/API/auth/data/D1/R2/secrets/bindings/DNS/Access changes. Do not restore the removed dedicated status-filter panel.
+
+
+## Final catalog activation audit evidence — 2026-10-23
+
+- Source/tests: PASS [#39931617414](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617414).
+- Live Preview interaction audit: PASS [#39931617426](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617426); [artifact #12492051199, 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617426/artifacts/12492051199).
+- Tested real category changes across mobile 360/390, tablet 768, desktop 1440, Light/Dark; hover/press/focus, keyboard selection, touch tap, persistent selected state and reduced-motion all PASS. 460ms animation; observed peak scale ~1.046–1.090, transform and bloom change across frames. No perpetual pulse.
+- Deployment integrity: audit source HEAD `f4b4d82873535d9920d177c99eceb383078a687b`, deployed Preview `9b5302ef7bcd5252922ba3ad8f11581cd78d6bef`; manifest public-tree equivalence true. Preview https://2284eff5.sindarealest2.pages.dev/.
+- Runtime errors 0; same-origin HTTP errors 0; read-only violations 0. Audit status remains `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`; owner visual acceptance PENDING.
+- Audit #39931188126 failed due to exact RGBA equality/regex parsing in the audit harness; final rerun #39931617426 PASS supersedes it.
+- Guardrails unchanged: Hero paused and untouched; #order owner-PASS/LOCKED and untouched; PR #108 open/unmerged; Preview only; deleted dedicated status-filter panel stays deleted.
