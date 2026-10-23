@@ -73,7 +73,7 @@ assert.equal(productCategoryRouteSlug("custom-category"), "custom-category", "un
 // Keep the duplicated browser and Pages Functions route maps in sync.
 // Parse source text as JSON-compatible object literals instead of evaluating code.
 const storefrontSource = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
-assert.match(storefrontSource, /p\\.skuVerified===true&&String\\(p\\.sku\\|\\|''\\)\\.trim\\(\\)\\?\\(p\\.sku\\):\\(p\\.id\\|\\|p\\.slug\\)/,
+assert.ok(storefrontSource.includes("p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug)"),
   "client-generated product URLs may use SKU only when the API explicitly marks it verified; otherwise they must use the internal product key");
 const sharedLibrarySource = readFileSync(new URL("../functions/_lib.js", import.meta.url), "utf8");
 const frontendRouteMapMatch = storefrontSource.match(/const productCategoryRouteSlugs=Object\.freeze\((\{[^;]*\})\);function routeSlug/);
