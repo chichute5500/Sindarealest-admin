@@ -36,3 +36,15 @@
 1. Validate this handoff refresh on its exact SHA once, then stop pointer-chasing.
 2. Continue screen acceptance only where evidence can be inspected; exact reference parity remains NOT_VERIFIED and all 12 screens remain PARTIAL_NOT_ACCEPTED.
 3. Obtain an authorized authenticated Preview path before testing persisted business workflows. No merge/deploy/remote-data operations.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 5ba5bf69b71e3512491ece4023c886c056ced4fc
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895256212
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-362 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
