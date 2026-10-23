@@ -426,6 +426,7 @@ jobs:
                     });
                     const defaultChipBackground = defaultChipStyle.background;
                     await otherCategory.hover();
+                    await page.waitForTimeout(240);
                     const hoverChipStyle = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
                       return { background: css.backgroundColor, shadow: css.boxShadow };
@@ -447,6 +448,7 @@ jobs:
                       'A physical press alone must not set persistent selection before click release.');
                     await page.mouse.move(0, 0);
                     await page.mouse.up();
+                    await page.waitForTimeout(240);
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
                       'Moving away and releasing a pressed chip must not accidentally select it.');
                     const afterPressRelease = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
