@@ -1,24 +1,26 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T08:44:17Z",
+  "capturedAtUtc": "2026-10-23T09:10:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "79554d75556664527ca41cf9bd6d334429b41305",
-  "checkpointSemantics": "Branch HEAD at checkpoint start was evidence-only child 79554d75556664527ca41cf9bd6d334429b41305 (\"test(admin): save Playwright evidence for 3290febb0e89\"), parent source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924. CI 39925598976 and full Preview 39925598940 both passed on exact source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924. Latest artifact admin-preview-evidence-401 (#12489985219) inspected; only UI-only local fixture evidence, no authenticated backend test. The handoff-only sync commit that follows is not an independent source/test SHA. Historical Cloudflare Access root cause remains UNCONFIRMED.",
-  "codeTestSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-  "latestProductSourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+  "branchHeadAtCheckpointStart": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+  "checkpointSemantics": "At 2026-10-23T09:10:00Z, live PR #111 head/source SHA is 81a458404b950eb0087da4b89f9a98c4af59fe99. Validate #39928772341 passed on exact SHA. Preview #39928772347 is still in progress at Install Chromium for Playwright; do not report responsive/theme screenshot matrix or deployed Preview diagnostics as passed until the run completes. This handoff sync commit is docs-only and will not independently retest application code. PR #108 remains open/read-only; main 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 unchanged.",
+  "codeTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+  "latestProductSourceCommit": "81a458404b950eb0087da4b89f9a98c4af59fe99",
   "latestActionsRun": {
-    "id": 39925598940,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
-    "headSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "status": "completed",
-    "conclusion": "success",
+    "id": 39928772347,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
+    "headSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "status": "in_progress",
+    "conclusion": null,
     "workflow": "Admin Preview diagnostic smoke test",
-    "summary": "Exact source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924 passed CI #39925598976 and full Preview #39925598940. Artifact admin-preview-evidence-401 (#12489985219) contains 132 generated PNGs and 112 fixture metrics. The audit-log label is now Vietnamese (“Người thực hiện”) and is confirmed in 390×844 and 320×640 screenshots. Local UI fixtures only; authenticated business/backend QA NOT_TESTED."
+    "startedAtUtc": "2026-10-23T09:00:55Z",
+    "activeStep": "Install Chromium for Playwright",
+    "summary": "Run #39928772347 is active on exact SHA 81a458404b950eb0087da4b89f9a98c4af59fe99. Checkout, setup, dependency install, npm run check and npm test passed. Chromium installation is still in progress; screenshot matrix, deployed Preview diagnostic, evidence persistence and artifact upload have not run."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL is an overall estimate, not a measured acceptance percentage. The Vietnamese activity actor label has now been localized and reverified in exact-SHA mobile screenshots; all 12 screens remain PARTIAL_NOT_ACCEPTED because exact reference parity, authenticated backend QA, and remote D1 schema/ledger remain unverified.",
+  "progressBasis": "50% is a provisional project-level estimate, not a measured acceptance rate. The current order-detail customer-card spacing fix passed Validate #39928772341 on exact SHA 81a4584; its Preview screenshot/diagnostic workflow is still in progress.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -26,7 +28,7 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "c5198a82b6d2f3bcdbda70a7a3cd5febfb0ff807",
+      "headSha": "481dd1f3b35759d1f8fabb868d4ebeaa06d82a83",
       "changedFiles": 291,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
@@ -43,7 +45,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "79554d75556664527ca41cf9bd6d334429b41305",
+      "headSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
       "changedFiles": 436,
       "additions": 40646,
       "deletions": 212,
@@ -56,12 +58,12 @@
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39914870835,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835",
+      "id": 39928772341,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
-      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; current PR head is evidence-only child 3f1b9f28d3f4b92600d752ab3de173c81940e0b0; no production operations"
+      "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+      "currentHeadApplicability": "VALIDATE_PASS_ON_EXACT_SOURCE_TEST_SHA; Preview #39928772347 still in progress"
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -77,31 +79,25 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-23T07:01:48Z",
-      "testedSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
+      "capturedAtUtc": "2026-10-23T09:10:00Z",
+      "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
       "validateRun": {
-        "id": null,
-        "url": null,
-        "status": "not-run-separately-on-this-source-sha",
-        "conclusion": "see Preview workflow repo checks"
+        "id": 39928772341,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "81a458404b950eb0087da4b89f9a98c4af59fe99"
       },
       "previewRun": {
-        "id": 39914870835,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835",
-        "status": "completed",
-        "conclusion": "success"
+        "id": 39928772347,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
+        "status": "in_progress",
+        "conclusion": null,
+        "sha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+        "activeStep": "Install Chromium for Playwright"
       },
-      "previewArtifact": {
-        "name": "admin-preview-evidence-385",
-        "id": 12484820528,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835/artifacts/12484820528",
-        "screenshotCount": 132,
-        "loginShellPngCount": 16,
-        "distinctModuleScreenshots": 116,
-        "moduleCaptureEntries": 120,
-        "fixtureMetrics": 112
-      },
-      "reason": "Preview workflow repo checks, npm run check, npm test and responsive/theme Playwright matrix pass on exact SHA; added Screen 12 mobile field-label assertion and fix."
+      "previewArtifact": null,
+      "reason": "Validate passed on exact SHA. Preview workflow has completed npm run check and npm test but Chromium installation remains in progress; screenshot and remote Preview diagnostic have not run."
     },
     "latestValidateAttempt": {
       "id": 39911090605,
@@ -132,16 +128,14 @@
     }
   },
   "latestProductChange": {
-    "status": "VIETNAMESE_AUDIT_ACTOR_LABEL_FIXED; EXACT_SHA_CI_AND_PREVIEW_PASS; SCREEN_ACCEPTANCE_PARTIAL",
-    "sourceAndTestSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "validateRunId": 39925598976,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598976",
-    "previewRunId": 39925598940,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
-    "previewArtifact": "admin-preview-evidence-401",
-    "previewArtifactId": 12489985219,
-    "previewArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
-    "summary": "Localized Actor to Người thực hiện in dashboard recent activity and dedicated audit log, updated E2E/contract expectations, and verified exact-SHA CI/Preview plus 320×640 and 390×844 screenshots. No business data, backend APIs or persistence changed. Overall UI/reference/backend acceptance remains partial."
+    "status": "ORDER_DETAIL_CUSTOMER_CARD_EMAIL_GRID_COMPACTED; VALIDATE_PASS; PREVIEW_IN_PROGRESS",
+    "sourceAndTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "validateRunId": 39928772341,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
+    "previewRunId": 39928772347,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
+    "previewStatus": "IN_PROGRESS_AT_CHROMIUM_INSTALL",
+    "summary": "Adjusted the third field in the order-detail customer grid so email no longer forces a full-row span; added Playwright computed-grid and CSS contract assertions. Exact-SHA Validate passed. Preview screenshots/diagnostics have not completed."
   },
   "screenStatuses": {
     "1_login": {
@@ -402,63 +396,66 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Continue reference-driven UI review for the remaining PARTIAL_NOT_ACCEPTED screens; fix only a visual/interaction defect that is observable in the approved reference and reproducible in Playwright.",
-    "Do not repeat the completed B1 cleanup/provenance audit or the just-verified Vietnamese audit actor label fix.",
-    "Obtain an owner-authorized authenticated Preview path before testing business workflows or persistence; never bypass Cloudflare Access.",
-    "Keep remote D1 schema/ledger NOT_VERIFIED, all 12 screens PARTIAL_NOT_ACCEPTED, and Production NOT_PERFORMED until actual evidence changes those states.",
+    "Recheck Preview run #39928772347; after completion inspect workflow steps and the new artifact on exact source SHA 81a458404b950eb0087da4b89f9a98c4af59fe99, especially order-detail customer email layout.",
+    "If Preview fails, retrieve exact failing step/log, correct only a reproducible cause, rerun exact-SHA checks, then synchronize all five handoff files.",
+    "Do not repeat the B1 cleanup/provenance audit or the earlier Vietnamese activity-actor localization fix.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED, exact reference parity NOT_VERIFIED, authenticated backend QA NOT_TESTED, remote D1 schema/ledger NOT_VERIFIED, and Production NOT_PERFORMED until evidence justifies a status change.",
     "Only write feature/admin-isolated-handoff-2026-10-20; keep PR #111/#108 open/unmerged; do not modify main/static website, Cloudflare settings/secrets/DNS, remote D1/R2/schema/ledger, or run migration/setup/deploy scripts."
   ],
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T08:44:17Z",
+    "lastSyncAtUtc": "2026-10-23T09:10:00Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "syncPurpose": "Synchronize the exact-SHA Vietnamese activity-label fix, passing CI #39925598976, passing Preview #39925598940, artifact admin-preview-evidence-401 #12489985219, and unconfirmed historical Cloudflare Access root cause."
+    "syncPurpose": "Record the order-detail customer-card email grid fix, Validate #39928772341 PASS on exact SHA 81a4584, and Preview #39928772347 IN_PROGRESS at Chromium installation. No screenshot or deployed Preview pass is claimed."
   },
-  "currentHeadAtCheckpoint": "79554d75556664527ca41cf9bd6d334429b41305",
-  "currentHeadValidation": "VIETNAMESE_AUDIT_ACTOR_LABEL_PASS_ON_EXACT_SHA_3290febb0e894e02988f2e9987d4ecb0c0ad6924; CI 39925598976 SUCCESS; PREVIEW 39925598940 SUCCESS; BRANCH HEAD AT CHECKPOINT START IS EVIDENCE-ONLY CHILD 79554d75556664527ca41cf9bd6d334429b41305",
-  "currentHeadValidationReason": "CI and Preview both completed successfully on exact source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924. Preview artifact admin-preview-evidence-401 confirms the localized label in mobile screenshots and 112 fixture metrics; local UI-only fixture and deployed diagnostic PASS_LOGIN_CSS_SIGNATURE only. Branch HEAD 79554d75556664527ca41cf9bd6d334429b41305 is an evidence-only child created after the tested source commit; the handoff-sync commit itself is not independently source-tested.",
+  "currentHeadAtCheckpoint": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+  "currentHeadValidation": "VALIDATE_PASS_ON_EXACT_SHA_81a458404b950eb0087da4b89f9a98c4af59fe99; PREVIEW_39928772347_IN_PROGRESS_AT_CHROMIUM_INSTALL",
+  "currentHeadValidationReason": "Validate #39928772341 passed dependency audit, project integrity and automated tests on exact SHA 81a458404b950eb0087da4b89f9a98c4af59fe99. Preview #39928772347 has passed its npm check/test steps but is still installing Chromium; responsive screenshots and deployed Preview diagnostics have not run.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T08:44:17Z",
-    "headAtStart": "79554d75556664527ca41cf9bd6d334429b41305",
-    "codeTestSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "validateRunId": 39925598976,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598976",
+    "capturedAtUtc": "2026-10-23T09:10:00Z",
+    "headAtStart": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "codeTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "validateRunId": 39928772341,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
     "validateConclusion": "success",
-    "previewRunId": 39925598940,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
-    "previewConclusion": "success",
-    "previewArtifact": "admin-preview-evidence-401",
-    "previewArtifactId": 12489985219,
-    "previewArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
-    "screenshotCount": 132,
-    "uiFixturePngCount": 120,
-    "uiFixtureMetricCount": 112,
-    "artifactSha256": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4",
-    "fixturePageErrors": 0,
-    "fixtureApiErrors": 0,
-    "expectedSimulated503ConsoleEntries": 7,
-    "attemptedWrites": 0,
-    "unexpectedApiPaths": 0,
-    "accessRootCause": "UNCONFIRMED; historical failure not reproduced with matching event evidence",
+    "previewRunId": 39928772347,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
+    "previewConclusion": null,
+    "previewStatus": "in_progress",
+    "previewActiveStep": "Install Chromium for Playwright",
+    "previewArtifact": null,
+    "previewArtifactId": null,
+    "previewArtifactUrl": null,
+    "previewDiagnostic": "NOT_RUN_YET",
     "allScreens": "PARTIAL_NOT_ACCEPTED",
     "authenticatedBackendQA": "NOT_TESTED",
     "remoteD1SchemaLedger": "NOT_VERIFIED",
     "exactReferenceParity": "NOT_VERIFIED",
     "production": "NOT_PERFORMED",
-    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "sourceChange": "Order-detail customer email field compacted in CSS grid; automated regression assertions added."
   },
-  "latestReviewFinding": "Confirmed and fixed a UI localization mismatch: old artifact admin-preview-evidence-395 showed “Actor” in a Vietnamese audit table. Commit 3290febb0e894e02988f2e9987d4ecb0c0ad6924 changes it to “Người thực hiện” and updates matching tests. Exact-SHA CI/Preview passed; new artifact admin-preview-evidence-401 confirms the label. All product acceptance boundaries stay partial.",
+  "latestReviewFinding": "A reproducible order-detail customer-card layout issue was addressed: the third field (email) no longer forces a full-row grid span. A computed-grid Playwright assertion and CSS contract assertion were added. Validate passed on exact SHA 81a4584. Preview run remains active at Chromium installation; no new screenshot evidence yet.",
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-  "latestCodeCommitSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-  "testedCommitSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-  "capturedAt": "2026-10-23T08:44:17Z",
+  "latestCodeCommitSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+  "testedCommitSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+  "capturedAt": "2026-10-23T09:10:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
   "checks": {
-    "playwright": "PASS_ON_3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "automatedTests": "PASS_ON_3290febb0e894e02988f2e9987d4ecb0c0ad6924",
-    "deployedPreview": "PASS_LOGIN_CSS_SIGNATURE_ONLY_ON_3290febb0e894e02988f2e9987d4ecb0c0ad6924; AUTHENTICATED_BACKEND_NOT_TESTED; HISTORICAL_ACCESS_ROOT_CAUSE_UNCONFIRMED"
+    "playwright": "PENDING_CHROMIUM_INSTALL_ON_PREVIEW_39928772347",
+    "automatedTests": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "deployedPreview": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "sourceValidation": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "projectIntegrity": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "dependencyAudit": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "responsiveViewports": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "lightMode": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "darkMode": "NOT_RUN_YET_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "productionDeployment": "NOT_PERFORMED",
+    "authenticatedBackendQA": "NOT_TESTED",
+    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "exactReferenceParity": "NOT_VERIFIED"
   },
   "latestLocalEvidence": {
     "runId": 39925598940,
@@ -499,8 +496,9 @@
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
-    "Historical BLOCKED_CLOUDFLARE_ACCESS root cause remains UNCONFIRMED; correlate exact failed-run hostname/time with Cloudflare Access events before any configuration change.",
-    "Current HEAD 8e7914b7754ec4a80cde535ccee041636a256c9f is evidence-only; latest full Preview run validated parent source/test SHA 7631f1badaf774fc35616fc21445e94af0bca027."
+    "Preview workflow #39928772347 is still in progress at Install Chromium for Playwright; wait for its actual conclusion before claiming screenshot/diagnostic results.",
+    "All 12 screens remain PARTIAL_NOT_ACCEPTED; exact approved-reference parity NOT_VERIFIED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
+    "Historical BLOCKED_CLOUDFLARE_ACCESS root cause remains UNCONFIRMED; correlate exact failed-run hostname/time with Access logs before configuration changes."
   ],
   "latestDiagnosticArtifact": {
     "name": "admin-preview-evidence-401",
@@ -510,5 +508,24 @@
     "sourceSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
     "sha256Digest": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4"
+  },
+  "latestValidateAttempt": {
+    "id": 39928772341,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
+    "status": "completed",
+    "conclusion": "success",
+    "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "workflow": "Validate source and tests"
+  },
+  "latestPreviewAttempt": {
+    "id": 39928772347,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772347",
+    "status": "in_progress",
+    "conclusion": null,
+    "testedSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "activeStep": "Install Chromium for Playwright",
+    "screenshotMatrix": "NOT_RUN_YET",
+    "deployedPreviewDiagnostic": "NOT_RUN_YET",
+    "artifact": null
   }
 }
