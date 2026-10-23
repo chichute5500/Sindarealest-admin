@@ -302,26 +302,40 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     },
     '/api/admin/audit-logs': {
       logs: [{
-        created_at: '2026-10-21 00:00:00',
+        created_at: '2026-10-21 10:24:00',
         action: 'product_updated',
         entity_type: 'product',
         entity_id: 'UI-ONLY-PRODUCT',
         actor: 'UI fixture',
         details_json: JSON.stringify({ title: fixtureProduct.title, sku: fixtureProduct.sku })
       }, {
-        created_at: '2026-10-20 10:15:00',
+        created_at: '2026-10-20 09:17:00',
         action: 'order_created',
         entity_type: 'order',
         entity_id: 'UI-ONLY-ORDER-2',
         actor: 'admin',
         details_json: JSON.stringify({ orderNumber: 'UI-ONLY-ORDER-2' })
       }, {
-        created_at: '2026-10-19 08:20:00',
+        created_at: '2026-10-19 08:56:00',
         action: 'customer_updated',
         entity_type: 'customer',
         entity_id: 'UI-ONLY-CUSTOMER-2',
         actor: 'admin',
-        details_json: JSON.stringify({ customerId: 'UI-ONLY-CUSTOMER-2' })
+        details_json: JSON.stringify({ customerName: 'Khách UI fixture 2' })
+      }, {
+        created_at: '2026-10-18 08:32:00',
+        action: 'product_created',
+        entity_type: 'product',
+        entity_id: 'UI-ONLY-PRODUCT-2',
+        actor: 'admin',
+        details_json: JSON.stringify({ title: 'Sản phẩm UI fixture 2', sku: 'UI-FIXTURE-002' })
+      }, {
+        created_at: '2026-10-17 07:45:00',
+        action: 'order_updated',
+        entity_type: 'order',
+        entity_id: 'UI-ONLY-ORDER-3',
+        actor: 'admin',
+        details_json: JSON.stringify({ orderNumber: 'UI-ONLY-ORDER-3' })
       }]
     }
   };
@@ -2466,8 +2480,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('activity-log', 'activity', async variant => {
       // Official screen #12: test the dedicated audit-log route, not only the dashboard's recent-activity preview.
       await expect(page.locator('#main .pagehead h2')).toHaveText('Nhật ký hoạt động');
-      await expect(page.locator('#activityLogSearch')).toBeVisible();
-      await expect(page.locator('#activityActionFilter')).toBeVisible();
+      await expect(page.locator('.activity-log-category-filters')).toBeVisible();
+      await expect(page.locator('#activityActorFilter')).toBeVisible();
+      await expect(page.locator('#activityDateFrom')).toBeVisible();
+      await expect(page.locator('#activityDateTo')).toBeVisible();
       await expect(page.locator('#refreshActivityLogs')).toBeVisible();
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
 
@@ -2480,16 +2496,23 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await notificationsTab.click();
       await expect(notificationsTab).toHaveAttribute('aria-pressed', 'true');
       await expect(page.locator('#activityNotificationList')).toContainText('Đã sửa sản phẩm');
-      await expect(page.locator('#activityNotificationsUnread')).toHaveText('3');
+      await expect(page.locator('#activityNotificationsUnread')).toHaveText('5');
       await page.locator('#activityMarkNotificationsRead').click();
       const activityReadAt = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
       expect(Number.isFinite(Date.parse(activityReadAt || '')), 'Screen 12 notification tab must persist the local read timestamp').toBe(true);
       await expect(page.locator('#activityNotificationsUnread')).toBeHidden();
       await activityTab.click();
       await expect(activityTab).toHaveAttribute('aria-pressed', 'true');
-      await expect(page.locator('#activityLogSearch')).toBeVisible();
 
       const width = page.viewportSize()?.width ?? 0;
+      const advancedToggle = page.locator('#activityAdvancedToggle');
+      if (width <= 680) {
+        await expect(advancedToggle).toBeVisible();
+        if (await advancedToggle.getAttribute('aria-expanded') === 'true') await advancedToggle.click();
+        await expect(page.locator('#activityLogSearch')).toBeHidden();
+      } else {
+        await expect(page.locator('#activityLogSearch')).toBeVisible();
+      }
       const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(documentWidth, 'Activity log must not cause document-level horizontal overflow').toBeLessThanOrEqual(width);
       await expect(page.locator('.activity-log-category-filters')).toBeVisible();
@@ -2500,19 +2523,23 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       const orderEntityFilter = page.locator('[data-activity-entity-filter="order"]');
       await orderEntityFilter.click();
       await expect(orderEntityFilter).toHaveAttribute('aria-pressed', 'true');
-      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(1);
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(2);
       await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-ORDER-2');
+      await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-ORDER-3');
       await productEntityFilter.click();
-      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(1);
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(2);
       await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-PRODUCT');
+      await expect(page.locator('.activity-log-cards')).toContainText('UI-ONLY-PRODUCT-2');
+      await page.locator('[data-activity-entity-filter="customer"]').click();
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(1);
       await page.locator('[data-activity-entity-filter="all"]').click();
       await page.locator('#activityActorFilter').selectOption('admin');
-      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(2);
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(4);
       await page.locator('#activityActorFilter').selectOption('all');
       await page.locator('#activityDateFrom').fill('2026-10-22');
       await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(0);
       await page.locator('#activityDateFrom').fill('');
-      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(3);
+      await expect(page.locator('.activity-log-cards .activity-log-card')).toHaveCount(5);
       if (width <= 680) {
         await expect(page.locator('.activity-log-table-wrap')).toBeHidden();
         await expect(page.locator('.activity-log-cards')).toBeVisible();
@@ -2530,6 +2557,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(page.locator('.activity-log-table-wrap')).toBeVisible();
       }
 
+      if (width <= 680) {
+        await advancedToggle.click();
+        await expect(advancedToggle).toHaveAttribute('aria-expanded', 'true');
+      }
+      await expect(page.locator('#activityLogSearch')).toBeVisible();
       await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');
       await expect(page.locator('.activity-log-table tbody')).toContainText('UI-ONLY-PRODUCT');
       await page.locator('#activityLogSearch').fill('no-match-ui-query');
@@ -2546,6 +2578,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(refreshActivityButton).toBeEnabled();
       await expect(refreshActivityButton).toHaveText('Làm mới');
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await expect(page.locator('.activity-log-push-settings')).toBeVisible();
+      await expect(page.locator('#activityEnablePush')).toHaveText('Bật thông báo đẩy');
+      if (width <= 680) {
+        await advancedToggle.click();
+        await expect(advancedToggle).toHaveAttribute('aria-expanded', 'false');
+        await expect(page.locator('#activityLogSearch')).toBeHidden();
+      }
     });
     await captureView('notifications', 'dashboard', async variant => {
       const toggle = page.locator('#notificationToggle');
@@ -2556,7 +2595,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(panel).toBeVisible();
       const unreadCount = page.locator('#notificationCount');
       await expect(unreadCount, 'A recent fixture audit event should appear as unread').toBeVisible();
-      await expect(unreadCount).toHaveText('3');
+      await expect(unreadCount).toHaveText('5');
       await page.locator('#markNotificationsRead').click();
       await expect(unreadCount, 'Marking notifications read should clear the unread badge').toBeHidden();
       const lastSeen = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));

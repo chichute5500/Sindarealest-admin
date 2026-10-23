@@ -214,6 +214,9 @@ assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
   'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
 assert.match(adminHtml, /\.order-detail-customer-card\{display:grid;grid-template-columns:42px minmax\(0,1fr\) auto/, 'Order detail should render a compact customer identity/contact card with a distinct action');
 assert.match(adminHtml, /\.activity-log-cards\{display:none\}/, 'Activity log should keep an explicit desktop/table and mobile/card presentation split');
+assert.match(adminHtml, /id="activityAdvancedToggle"/, 'Screen 12 should expose expandable advanced search controls rather than pushing the event list below mobile navigation');
+assert.match(adminHtml, /activity-log-push-settings/, 'Screen 12 should show a notification-permission settings card with a real action');
+assert.match(baselineSpec, /await advancedToggle\.click\(\)/, 'Screen 12 tests should open/close advanced filters before the mobile screenshot is captured');
 assert.match(adminHtml, /data-activity-entity-filter=/, 'Activity log should expose working entity-category filter buttons');
 assert.match(adminHtml, /id="activityActorFilter"/, 'Activity log should provide a source-backed actor filter');
 assert.match(adminHtml, /id="activityDateFrom"/, 'Activity log should provide date-range filtering from existing audit timestamps');
