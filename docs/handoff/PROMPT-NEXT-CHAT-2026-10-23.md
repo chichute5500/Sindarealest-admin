@@ -258,3 +258,19 @@ If the owner identifies a concrete mismatch, change only catalog search/category
 - Verified Preview: https://761fdddb.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Static whole-document anchor audit on public/index.html SHA 560f4e3048f2c556da066b76767ebecea2da1004: 23 internal fragment links checked, zero missing targets. The earlier broken craftsmanship link is fixed to #about and regression-tested. This is source-level validation, not a claim of manual device/browser visual acceptance.
 - PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; catalog filter height/Liquid Glass remains OWNER PASS/LOCKED; #order remains OWNER PASS/LOCKED. Do not edit or retest those areas unless explicitly reopened. Preview only; no Production or restricted-scope changes.
+
+
+---
+
+# NEXT CHAT — AUTHORITATIVE HANDOFF ADDENDUM — 2026-10-23 22:03 ICT
+
+Continue the existing project. Do not restart and do not ask the owner to repeat context.
+
+1. Read `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS.md`, and `docs/handoff/TEST-RESULTS.md` first. Then re-fetch live branch HEAD, PR #108, recent Actions and Preview deployment metadata before making changes.
+2. Repo `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 OPEN/unmerged. At this handoff refresh, branch/PR head was `c23641bcfda078cce132c339f30631262fef68b5`, a handoff-only commit.
+3. Latest passing storefront source/test SHA is `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`: CI [#39974038357 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038357); Preview deploy [#39974038555 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038555); immutable URL https://2100d7ae.sindarealest2.pages.dev/ and branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Current `public/index.html` blob SHA is `560f4e3048f2c556da066b76767ebecea2da1004`. Do not call the latest branch HEAD deployed without re-verifying exact deployment/source equivalence.
+4. Static source audit on that HTML: 23 internal anchors resolved, 7 asset references present, 6 new-tab links have `rel="noopener"`, 62 buttons have text/accessibility labels, no unlabeled inputs found by the rule set. This is not live visual acceptance.
+5. Cart dialog keyboard accessibility is implemented and covered by passing tests: focus to close control on open, Tab/Shift+Tab trapped, focus returned on close, and no focus theft during cart-to-checkout/account transitions. If working on it, first inspect existing tests and reproduce a real defect; avoid speculative edits.
+6. Hard rules: Hero PAUSED BY OWNER—never inspect/edit/test/capture/restore. `#order` OWNER PASS/LOCKED—never touch/retest. Catalog filter chip height/Liquid Glass OWNER PASS/LOCKED—never touch/retest unless explicitly reopened. Never restore the removed dedicated product-status filter panel. No Production deploy, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes. Keep PR #108 open and unmerged.
+7. Catalog filter visual audit is manual-only and requires both workflow input `owner_authorized=true` and repo variable `CATALOG_FILTER_AUDIT_UNLOCKED=true`; do not trigger it absent explicit owner reopening.
+8. Continue autonomous work after any report. Choose the next safe non-locked section, establish a concrete defect before editing, run impacted checks, deploy Preview only where appropriate, verify exact SHA and evidence, then update all four handoff files. Keep source tests, deployment, live screenshots, and owner visual acceptance separate; never claim visual PASS without evidence or owner approval.
