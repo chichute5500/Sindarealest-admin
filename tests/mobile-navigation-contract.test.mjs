@@ -53,6 +53,9 @@ assert.match(html,
   /if\(e\.key==='Escape'\)\{e\.preventDefault\(\);e\.stopPropagation\(\);requestStorefrontModalClose\('gallery',closeFullscreenImage\)\}/,
   'Escape must close fullscreen gallery through the history-aware path.');
 
+assert.ok(html.includes("$('#mobileNavBackdrop').addEventListener('click',()=>{setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})})"),
+  'Closing the mobile navigation through its backdrop must return focus to the menu toggle after the backdrop is hidden.');
+
 console.log('PASS: mobile navigation and browser Back/Forward dismiss account, cart, checkout and gallery states.');
 
 // The sticky bottom navigation must not cover actions in full-screen mobile overlays.
