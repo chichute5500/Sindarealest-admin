@@ -3,7 +3,7 @@ Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
 ## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
 
-- Verified branch HEAD: `6e441d6a862b6271453a8b045dbca499bea50e0f`; PR #108 remains OPEN and unmerged. Branch: `fix/liquid-glass-audit-2026-10-19`.
+- Latest code/Preview SHA verified by source tests and deploy: `6e441d6a862b6271453a8b045dbca499bea50e0f`. This handoff-only commit may advance branch HEAD; always refetch live branch HEAD before acting. PR #108 remains OPEN and unmerged on `fix/liquid-glass-audit-2026-10-19`.
 - Latest storefront fix: the “Hoàn thiện thủ công” mosaic tile now links to the existing `#about` section, not the missing `#craftsmanship` target. Regression coverage in `tests/storefront-operations.test.mjs` checks the rendered “Tìm hiểu thêm →” link and forbids the old target.
 - Exact-HEAD source validation and full automated tests: PASS — [run #39967158476](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158476).
 - Exact-HEAD Cloudflare Pages Preview deploy: PASS — [run #39967158493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158493). Direct deployment URL: https://e7f0896b.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.

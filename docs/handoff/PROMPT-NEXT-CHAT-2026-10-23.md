@@ -14,7 +14,7 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108
 - PR phải giữ OPEN, không merge.
-- Latest verified branch HEAD: `6e441d6a862b6271453a8b045dbca499bea50e0f`. Always refetch branch HEAD before acting. The latest storefront fix corrects the “Hoàn thiện thủ công” tile from missing `#craftsmanship` to existing `#about`.
+- Latest code/Preview SHA verified by source tests and deployment: `6e441d6a862b6271453a8b045dbca499bea50e0f`. Always refetch the live branch HEAD before acting; documentation-only commits can advance it. The latest storefront fix corrects the “Hoàn thiện thủ công” tile from missing `#craftsmanship` to existing `#about`.
 - Latest source/Preview deployment SHA: `6e441d6a862b6271453a8b045dbca499bea50e0f`; Preview deploy PASS at [run #39967158493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158493). Direct URL: https://e7f0896b.sindarealest2.pages.dev/ ; alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
 - Latest CI/source tests PASS at SHA `6e441d6a862b6271453a8b045dbca499bea50e0f`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158476
 - Owner đã xác nhận PASS / LOCKED chiều cao chip Liquid Glass của bộ lọc danh mục. Workflow audit #39967158443 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/39967158443) tự kích hoạt sau push source/test và báo thành công; không mở/đọc artifact này để đưa ra quyết định thiết kế mới, không chạy audit bộ lọc lần nữa khi chưa được chủ dự án mở khóa.
