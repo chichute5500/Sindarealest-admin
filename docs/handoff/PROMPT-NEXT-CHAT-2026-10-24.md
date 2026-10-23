@@ -19,6 +19,22 @@
 - Liquid Glass isolated visual preview: SKIPPED — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40012914085. Không gọi đây là visual audit PASS; workflow này bị skip theo guard hiện có.
 - Các kết quả CI/deploy là bằng chứng tự động; không thay thế xác nhận hình ảnh thực tế từ chủ dự án.
 
+## 2. DANH SÁCH RÕ RÀNG CÁC VIỆC CÒN LẠI (BẮT BUỘC ĐỌC TRƯỚC KHI LÀM)
+
+**Chỉ còn 1 việc đang mở:** xử lý nháy ảnh sản phẩm khi xem toàn màn hình trên mobile. Chủ dự án vừa kiểm tra và xác nhận đã giảm rõ rệt nhưng thỉnh thoảng vẫn nháy 1–2 lần. Không tuyên bố hoàn tất cho đến khi chủ dự án kiểm tra Preview mới và xác nhận.
+
+**Tất cả hạng mục khác hiện PASS / LOCKED theo quyết định mới nhất; không mở lại và không yêu cầu chủ dự án kiểm tra lại:**
+- Giỏ hàng và tài khoản từ mobile navigation: giữ nguyên hoạt động mở/đóng, không làm tái phát lỗi.
+- Icon system/Liquid Glass appearance, press feedback, kích thước control và hiệu ứng đã chấp nhận.
+- Catalog Liquid Glass filter controls/chips/icons/height/effects; tuyệt đối không khôi phục panel lọc trạng thái sản phẩm riêng đã bị loại bỏ.
+- `#order` / “Đặt hàng an tâm”.
+- Warranty claim form/lookup; không yêu cầu mã bảo hành hoặc số điện thoại giả và không mở lại.
+- Hero: PAUSED BY OWNER; không kiểm tra, sửa, chụp hoặc đưa vào workflow.
+- Các fix đã làm và không phải việc còn mở: mobile navigation focus/history; welcome dialog keyboard/focus; gallery focus handling; warranty form focus transfer; favorites legacy-key migration; collection slideshow pause/reduced-motion/missing-control guard; stale cart cleanup và badge sync; Zalo cart consultation copy/fallback; fullscreen product share fallback.
+- Các mục audit/visual parity cũ trong tài liệu lịch sử đã bị quyết định PASS mới nhất thay thế; chỉ mở lại khi chủ dự án báo lỗi cụ thể hoặc mở khóa rõ ràng.
+
+**Quy trình duy nhất cho việc còn lại:** đọc source/test hiện hành → tái hiện/nghiên cứu nguyên nhân race/load/decode/layer flash → thêm regression test thực chất → sửa tối thiểu → focused test + full CI → Preview deploy exact SHA → xác minh SHA/URL → gửi URL cho chủ dự án chỉ để kiểm tra fullscreen gallery. Trong lúc CI/deploy chạy, tiếp tục review độc lập an toàn; báo cáo xong không dừng chờ nhắc.
+
 ## 2. Quyết định nghiệm thu mới nhất của chủ dự án — 2026-10-24
 
 Chủ dự án xác nhận: **PASS tất cả các phần, NGOẠI TRỪ phần xem ảnh toàn màn hình**.
