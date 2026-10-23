@@ -1,5 +1,14 @@
 # ADMIN — 12-SCREEN REFERENCE AUDIT
 
+## Current checkpoint — 2026-10-23 12:26 UTC — Latest evidence 422 recorded
+
+- Live branch HEAD at sync start: `d763f0fe6742848d42626176627bf8edb20e9bfe`; tested SHA: `19202ac0b351ab6623047c057a5c1af41f97cefe`.
+- Validate [#39952239465](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239465) PASS; Preview [#39952239467](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467) PASS.
+- Artifact [admin-preview-evidence-422](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467/artifacts/12500722416) contains 132 PNG screenshots and 112 fixture metrics. It was captured from synthetic/read-only fixtures; no authenticated backend claim is implied.
+- Most recent product UI change: [`efb4935`](https://github.com/chichute5500/Sindarealest-admin/commit/efb49359a4e8b4ad65ea0120f41ad4c6cfa90631), shortening the Product Editor SKU placeholder for narrow mobile and asserting its visibility.
+- **Next comparison:** Screens 4/5 and 7 against `docs/admin-ui-reference/admin-mobile-reference.png`, matching viewport/theme. Change only reproducible Admin-specific mismatches. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+
+
 ## Current checkpoint — 2026-10-23 12:15 UTC — Narrow-mobile SKU hint refined; Validate and Preview pass
 
 - **Live state:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD at checkpoint start is `cd5d3e1c52b85aba494b312f14b5fca4464ea298`, the Actions evidence child after tested source/test commit `efb49359a4e8b4ad65ea0120f41ad4c6cfa90631`. PR #111 remains OPEN/unmerged; PR #108 remains OPEN/unmerged and read-only. No merge, rebase, force-push, Production deploy, or writes to `main`/the static website branch.

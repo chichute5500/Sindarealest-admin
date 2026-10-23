@@ -1,22 +1,21 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T12:15:00Z",
+  "capturedAtUtc": "2026-10-23T12:26:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "cd5d3e1c52b85aba494b312f14b5fca4464ea298",
-  "checkpointSemantics": "At 2026-10-23T12:15:00Z, live branch HEAD cd5d3e1c52b85aba494b312f14b5fca4464ea298 is an Actions evidence child after source/test SHA efb49359a4e8b4ad65ea0120f41ad4c6cfa90631. Validate #39951430535 and Preview #39951430461 passed on exact tested SHA. Artifact 421 contains 132 PNGs, 16 login shell PNGs, 116 UI fixture PNGs, and 112 fixture metrics. The Product Editor SKU placeholder now fits 320px mobile better. Deployed diagnostic PASS_LOGIN_CSS_SIGNATURE only; authenticated backend QA remains NOT_TESTED.",
-  "codeTestSha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
+  "branchHeadAtCheckpointStart": "d763f0fe6742848d42626176627bf8edb20e9bfe",
+  "checkpointSemantics": "At 2026-10-23T12:26:00Z, live branch HEAD d763f0fe6742848d42626176627bf8edb20e9bfe is an evidence-save child after tested SHA 19202ac0b351ab6623047c057a5c1af41f97cefe. Validate #39952239465 and Preview #39952239467 passed on exact SHA 19202ac0b351ab6623047c057a5c1af41f97cefe. Artifact admin-preview-evidence-422 (#12500722416) contains 132 PNG screenshots and 112 fixture metrics. UI change immediately preceding this run is efb4935 (shortened mobile Product Editor SKU placeholder). Authenticated backend QA remains NOT_TESTED; exact visual parity NOT_VERIFIED; all 12 screens PARTIAL_NOT_ACCEPTED.",
+  "codeTestSha": "19202ac0b351ab6623047c057a5c1af41f97cefe",
   "latestProductSourceCommit": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
   "latestActionsRun": {
-    "id": 39947460554,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39947460554",
-    "headSha": "6de79a88579d4798efba518f97c63cb150452bbd",
+    "id": 39952239467,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467",
+    "headSha": "19202ac0b351ab6623047c057a5c1af41f97cefe",
     "status": "completed",
     "conclusion": "success",
     "workflow": "Admin Preview diagnostic smoke test",
-    "startedAtUtc": "2026-10-23T11:35:00Z",
     "activeStep": null,
-    "summary": "Validate #39947460591 and Preview #39947460554 both passed on exact SHA 6de79a88579d4798efba518f97c63cb150452bbd. Artifact 417 has 132 PNGs and 112 fixture metrics; the activity-log capture shows the unread badge after deterministic fixture-state reset. Deployed diagnostic remains login CSS signature only."
+    "summary": "Preview passed on exact SHA 19202ac0b351ab6623047c057a5c1af41f97cefe; artifact admin-preview-evidence-422 has 132 PNG screenshots and 112 fixture metrics. Diagnostic verifies login-shell CSS signature only."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -406,18 +405,19 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Compare Screens 4/5 and 7 against the approved admin-mobile-reference.png at matching viewports/themes using artifact 421; fix only repeatable ADMIN-specific UI differences.",
-    "Run Validate and Preview on exact source/test SHA after each meaningful change; inspect screenshot artifacts and diagnostics.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED, exact reference parity NOT_VERIFIED, authenticated backend QA NOT_TESTED, remote D1 schema/ledger NOT_VERIFIED, and Production NOT_PERFORMED until evidence supports changes.",
-    "Only write feature/admin-isolated-handoff-2026-10-20; keep PR #111/#108 open/unmerged; do not modify main/static website, Cloudflare settings/secrets/DNS, remote D1/R2/schema/ledger, or run migration/setup/deploy scripts."
+    "Immediately inspect admin-preview-evidence-422 against docs/admin-ui-reference/admin-mobile-reference.png at matching viewport/theme, prioritizing Screens 4/5 and 7.",
+    "Fix only reproducible Admin-specific UI mismatches; add targeted assertions and run Validate plus Preview on the exact tested SHA after each meaningful change.",
+    "Inspect the next screenshot artifact and diagnostic results; update all six handoff/audit files after verified progress.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
+    "Write only feature/admin-isolated-handoff-2026-10-20; keep PR #111/#108 open and unmerged. No main/static website writes, PR #108 changes, Cloudflare Access bypass or settings/secrets/DNS changes, remote D1/R2/schema/ledger writes, or migration/setup/deploy scripts."
   ],
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T12:15:00Z",
+    "lastSyncAtUtc": "2026-10-23T12:26:00Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "syncPurpose": "Record Product Editor SKU placeholder mobile refinement on efb4935; Validate #39951430535 and Preview #39951430461 PASS; artifact 421 contains 132 PNGs and 112 fixture metrics. Acceptance remains incomplete."
+    "purpose": "Refresh all handoff files with live HEAD d763f0fe, exact-SHA passing Validate/Preview on 19202ac, artifact 422, and actionable next task: compare Screens 4/5 and 7; keep acceptance and safety boundaries explicit."
   },
-  "currentHeadAtCheckpoint": "cd5d3e1c52b85aba494b312f14b5fca4464ea298",
+  "currentHeadAtCheckpoint": "d763f0fe6742848d42626176627bf8edb20e9bfe",
   "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA_AND_PREVIEW_MATRIX; BRANCH_HEAD_IS_EVIDENCE_CHILD",
   "currentHeadValidationReason": "Exact source/test SHA f1fdd19 passed Validate and Preview. Branch HEAD 690b037 is the workflow-generated evidence child; full screenshot metadata and PNGs are in artifact 411.",
   "liveCheckpoint": {
@@ -488,15 +488,13 @@
     "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
   },
   "latestScreenshotArtifact": {
-    "id": 12500492455,
-    "name": "admin-preview-evidence-421",
-    "runId": 39951430461,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461/artifacts/12500492455",
+    "id": 12500722416,
+    "name": "admin-preview-evidence-422",
+    "runId": 39952239467,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467/artifacts/12500722416",
     "pngCount": 132,
-    "loginPngCount": 16,
-    "uiFixturePngCount": 116,
     "fixtureMetrics": 112,
-    "testedSha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631"
+    "testedSha": "19202ac0b351ab6623047c057a5c1af41f97cefe"
   },
   "remainingIssues": [
     "Preview workflow #39928772347 is still in progress at Install Chromium for Playwright; wait for its actual conclusion before claiming screenshot/diagnostic results.",
@@ -511,55 +509,47 @@
     "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9"
   },
   "latestValidateAttempt": {
-    "id": 39951430535,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430535",
+    "id": 39952239465,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239465",
     "status": "completed",
     "conclusion": "success",
-    "sha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
+    "sha": "19202ac0b351ab6623047c057a5c1af41f97cefe",
     "workflow": "Validate source and tests"
   },
   "latestPreviewAttempt": {
-    "id": 39951430461,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461",
+    "id": 39952239467,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467",
     "status": "completed",
     "conclusion": "success",
-    "sha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
+    "sha": "19202ac0b351ab6623047c057a5c1af41f97cefe",
     "workflow": "Admin Preview diagnostic smoke test",
-    "activeStep": null,
-    "artifact": "admin-preview-evidence-421",
-    "artifactId": 12500492455,
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_BACKEND_NOT_TESTED"
+    "artifact": "admin-preview-evidence-422",
+    "artifactId": 12500722416,
+    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_BACKEND_NOT_TESTED"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T12:15:00Z",
-    "testedSha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
+    "capturedAtUtc": "2026-10-23T12:26:00Z",
+    "testedSha": "19202ac0b351ab6623047c057a5c1af41f97cefe",
     "validateRun": {
-      "id": 39951430535,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430535",
+      "id": 39952239465,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239465",
       "status": "completed",
-      "conclusion": "success",
-      "sha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
-      "workflow": "Validate source and tests"
+      "conclusion": "success"
     },
     "previewRun": {
-      "id": 39951430461,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461",
+      "id": 39952239467,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467",
       "status": "completed",
-      "conclusion": "success",
-      "sha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
-      "workflow": "Admin Preview diagnostic smoke test",
-      "activeStep": null
+      "conclusion": "success"
     },
     "previewArtifact": {
-      "id": 12500492455,
-      "name": "admin-preview-evidence-421",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461/artifacts/12500492455",
+      "id": 12500722416,
+      "name": "admin-preview-evidence-422",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467/artifacts/12500722416",
       "pngCount": 132,
-      "loginPngCount": 16,
-      "uiFixturePngCount": 116,
       "fixtureMetricCount": 112
     },
-    "reason": "Validate #39951430535 and Preview #39951430461 passed on exact source/test SHA efb49359a4e8b4ad65ea0120f41ad4c6cfa90631. Artifact 421 confirms the shortened SKU placeholder in the 320px screenshot; authenticated business QA remains NOT_TESTED."
+    "reason": "Current exact-SHA checks passed; artifact 422 captured 132 PNGs and 112 fixture metrics. UI source change is efb4935; tested SHA 19202 is a handoff sync commit. This is not authenticated backend or exact-parity acceptance."
   },
-  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39945405006"
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467"
 }
