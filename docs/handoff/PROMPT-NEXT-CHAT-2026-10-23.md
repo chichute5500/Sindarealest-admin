@@ -170,3 +170,9 @@ If audit fails, inspect the exact error and fix it, then rerun. If audit passes 
 
 ## Report-then-continue and safety
 After reporting, immediately continue the next safe step without waiting for “continue.” While CI/deploy/capture runs, do independent non-conflicting review and then inspect results. Keep PR #108 OPEN/unmerged; Preview only. Hero PAUSED BY OWNER—never inspect/edit/test/capture/restore. `#order` OWNER PASS/LOCKED—never touch/retest. Do not restore the deleted dedicated product-status filter panel. No Production, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes. Update all four handoff docs after meaningful work.
+
+---
+
+## NEWEST RETRY STATUS — 2026-10-23 12:26 UTC
+
+Audit #39953050974 failed with `ReferenceError: currentTime is not defined`, a separate harness bug. Commit `e9b35186e4273410253b4158f45105be19c7c483` now references each sampled animation object's `.currentTime` for desktop, reselection and touch without weakening the 1ms time tolerance or `scaleX > 1.04` spring threshold. Check validation [#39953590662](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590662) and live catalog audit [#39953590658](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590658); both were running at handoff. Inspect final logs, manifest and screenshots. Do not mark audit PASS if it fails, and do not ask owner to review until actual effect has been compared with `docs/design-reference/liquid-glass-product-filters.png` across mobile/tablet/desktop and Light/Dark.
