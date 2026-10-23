@@ -3,16 +3,17 @@
 ## Live checkpoint used for this audit
 
 - Repository: chichute5500/Sindarealest-admin.
-- PR #111 OPEN/unmerged; writable branch feature/admin-isolated-handoff-2026-10-20; HEAD at checkpoint start b3b71fb925875e9dd8f1b38e71737a2af1bb71b2; base main SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3. PR API reported 386 changed files, +38,838/-212.
-- Application source/test SHA 1674396bec433fb915e3a6b922b9f22436335786 passed Validate [#39847591944](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944): dependency audit, project integrity and automated tests succeeded. Preview diagnostic [#39847591916](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916) also passed on the exact same SHA.
-- PR #108 OPEN/unmerged, READ-ONLY; branch fix/liquid-glass-audit-2026-10-19; latest checkpoint head 3f53e0cf7519ae0c5d0be022657845d5eb0f414b; 286 changed files, +20,489/-394. Main/static branch untouched.
-- Treat those numbers as a checkpoint snapshot. Always fetch live PR/HEAD/Actions before a new action.
+- PR #111 OPEN/unmerged; writable branch `feature/admin-isolated-handoff-2026-10-20`; HEAD at checkpoint start `7fe4d80c900859faf388b0e7dc585adb4350d1fe` (evidence-only child of tested source SHA `1ec3cc72db94f07ce500d4e43830674b39a9eb03`); base main SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. PR API reported 388 changed files, +38,988/-212, and `mergeable_state=dirty`.
+- Validate [#39886592981](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886592981) and Preview [#39886593197](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886593197) both PASS on exact source SHA `1ec3cc72db94f07ce500d4e43830674b39a9eb03`.
+- PR #108 OPEN/unmerged, READ-ONLY; branch `fix/liquid-glass-audit-2026-10-19`; checkpoint head `4ff25f02ec8255b98a6db1583c6d473a7c40a0bb`; 286 changed files, +20,509/-394. Main/static branch untouched.
+- Public QR cache correctness fix: `functions/payment-qr/[key].js` now sends `Cache-Control: no-store`, with a source contract assertion. This avoids stale active-QR display after deactivation/replacement.
+- Treat these numbers as a checkpoint snapshot. Fetch live PR/HEAD/Actions before acting.
 
-## Current diff census — 386 paths
+## Current diff census — 388 paths
 
 | Area | Files | Disposition |
 |---|---:|---|
-| Documentation and handoff evidence | 332 | Keep canonical reference/instructions/contracts and SHA-keyed text/JSON run evidence; remove only verified stale duplicates/empty assets |
+| Documentation and handoff evidence | 334 | Keep canonical reference/instructions/contracts and SHA-keyed text/JSON run evidence; remove only verified stale duplicates/empty assets |
 | Pages Functions handlers/modules | 24 | Keep active route handlers and shared helpers; routing/auth contracts or current tests reference them |
 | Database migrations | 2 | Keep 0008 SKU verification and 0009 fulfillment/payment-ledger schema |
 | Admin UI | 1 | Keep public/admin/index.html; it is the one remaining changed HTML file |
@@ -22,13 +23,13 @@
 | Seed data | 1 | Keep data/legacy-products.json; source integrity check validates 235 items, images, IDs/SKU rules and matches the 0002 seed SQL, and smoke tests exercise related contracts |
 | Root guide/package | 2 | Keep README-DEPLOY.txt, which config-integrity tests read, and package.json, which defines checks/tests/runtime |
 
-Path counts from live PR API: .github 1; root-level 2; data 1; docs 332; functions 24; migrations 2; public 1; scripts 4; tests 19. Extension counts: yml 1, txt 1, json 166, md 167, png 1, js 26, sql 2, html 1, mjs 21.
+Path counts from live PR API at checkpoint start: .github 1; root-level 2; data 1; docs 334; functions 24; migrations 2; public 1; scripts 4; tests 19. Extension counts: yml 1, txt 1, json 167, md 168, png 1, js 26, sql 2, html 1, mjs 21.
 
 ## Historical evidence decision
 
-- The complete branch history tree contains 157 SHA-keyed evidence directories, 319 report/metadata/Preview-diagnostic text/JSON files, and the history README. It contains no generated PNG matrices. One older record is report-only because its source screenshot matrix failed; retain that failure evidence.
+- The complete branch history tree contains 158 SHA-keyed evidence directories, 321 report/metadata/Preview-diagnostic text/JSON files, and the history README. It contains no generated PNG matrices. One older record is report-only because its source screenshot matrix failed; retain that failure evidence.
 - Keep compact per-run SHA and failure/success evidence under history/README.md policy. Full screenshot matrices remain in temporary Actions artifacts, not in the Git diff.
-- Prior status text saying “318 records” was imprecise: 318 was a previous evidence-file count; the current tree has 157 directories and 319 evidence files.
+- Prior status text saying “318 records” was imprecise: 318 was a previous evidence-file count; the current tree has 158 directories and 321 evidence files.
 
 ## Cleanup completed and retained
 
@@ -59,7 +60,7 @@ Path counts from live PR API: .github 1; root-level 2; data 1; docs 332; functio
 
 ## B1 conclusion and overall acceptance boundaries
 
-**B1 PR cleanup/provenance review is COMPLETE for the current 386-file diff.** All current diff categories have been classified by consumer/purpose. No additional safe deletion or helper/API merge is justified by available evidence. Reopen the cleanup audit only if the live diff changes or new unused-file evidence appears.
+**B1 PR cleanup/provenance review is COMPLETE for the current 388-file checkpoint diff.** All current diff categories have been classified by consumer/purpose. No additional safe deletion or helper/API merge is justified by available evidence. Reopen the cleanup audit only if the live diff changes or new unused-file evidence appears.
 
 Overall Admin acceptance remains PARTIAL: 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
 

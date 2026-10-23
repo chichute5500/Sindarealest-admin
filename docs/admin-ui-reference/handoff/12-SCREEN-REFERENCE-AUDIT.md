@@ -4,9 +4,10 @@
 
 ## Latest successful UI evidence
 
-- Application source/test SHA: `1674396bec433fb915e3a6b922b9f22436335786`. Validate [#39847591944](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591944) PASS on exact SHA; Admin Preview diagnostic [#39847591916](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39847591916) SUCCESS on the same SHA.
-- Artifact `admin-preview-evidence-355` contains 102 PNGs: 16 login-shell captures, 86 read-only fixture/module screenshots and 78 fixture metrics. Screenshots are stored in the Actions artifact, not committed to the source tree.
-- Preview diagnostic status: `PASS_LOGIN_CSS_SIGNATURE`. This confirms the configured login-shell CSS signature on Preview; it is not authenticated business-data acceptance. The screenshot matrix uses a mocked unauthenticated session and synthetic/read-only fixtures.
+- Application source/test SHA: `1ec3cc72db94f07ce500d4e43830674b39a9eb03`. Validate [#39886592981](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886592981) PASS on exact SHA; Admin Preview diagnostic [#39886593197](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886593197) SUCCESS on the same SHA.
+- Artifact `admin-preview-evidence-356` contains 102 PNGs: 16 login-shell captures, 86 read-only fixture/module screenshots and 78 fixture metrics. Expires 2026-11-06; raw PNGs are not committed to source.
+- Public QR image cache fix (`Cache-Control: no-store`) and contract assertion passed Validate on this SHA.
+- Preview diagnostic confirms the configured login-shell CSS signature. The screenshot matrix uses read-only synthetic fixtures; it is not authenticated business-data acceptance.
 - All 12 screens remain `PARTIAL_NOT_ACCEPTED`. Authenticated business/backend QA is `NOT_TESTED`; Orders and Order detail require authenticated end-to-end workflow evidence.
 
 ## Older successful runs (historical evidence)
