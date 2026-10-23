@@ -1,3 +1,11 @@
+## LATEST TASK STATUS — SLIDESHOW HARNESS FIX ROUND 3 — 2026-10-24
+
+- Test harness fix: reduced-motion keeps the pause control in the fixture; only the dedicated missing-control test deletes it. This separates the two behaviors accurately.
+- Current SHA `74bcd512abc19d3fba4bad64654321091073b8ea`; CI #39995656182 and Preview #39995656107 were in progress when recorded. Check both before calling complete.
+- Previous main slideshow pause/resume implementation was green at `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`; latest guard/test follow-up remains pending until gates pass.
+
+---
+
 ## LATEST TASK STATUS — SLIDESHOW GUARD REGRESSION — 2026-10-24
 
 - Follow-up fix is limited to the regression test harness for missing slideshow controls: evaluate `setupArtSlideshow()` with a real newline using `String.fromCharCode(10)`, instead of creating invalid JS source or calling a non-function vm result.
