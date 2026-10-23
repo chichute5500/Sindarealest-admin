@@ -4,11 +4,12 @@
 
 ## Latest successful UI evidence
 
-- Application source/test SHA: `574a94827fa3429a2022e6cfca552bb3ded07315`. Validate [#39887267741](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267741) PASS on exact SHA; Admin Preview diagnostic [#39887267725](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39887267725) SUCCESS on the same SHA.
-- Artifact `admin-preview-evidence-357` contains 102 PNGs: 16 login-shell captures, 86 read-only fixture/module screenshots and 78 fixture metrics. Expires 2026-11-06; raw PNGs are not committed to source.
-- Public QR image cache fix (`Cache-Control: no-store`) and runtime tests (active=200/no-store; deactivated/replaced=404) passed Validate on this SHA.
-- Preview diagnostic status: `PASS_LOGIN_CSS_SIGNATURE`. It confirms the configured login-shell CSS signature, not authenticated business-data acceptance. The screenshot matrix uses synthetic/read-only fixtures.
-- All 12 screens remain `PARTIAL_NOT_ACCEPTED`. Authenticated business/backend QA is `NOT_TESTED`; Orders and Order detail require authenticated end-to-end workflow evidence.
+- Application source/test SHA: `4ac7465539e746b7f37517327d7bf9bddcfa3285`. Validate [#39891441964](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964) **PASS on exact SHA**; Admin Preview [#39891442082](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082) **SUCCESS on the same SHA**.
+- Artifact [`admin-preview-evidence-361`](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082/artifacts/12474998216) contains 102 PNGs: 16 login-shell captures, 86 read-only fixture/module screenshots and 78 fixture metrics. Raw PNGs are retained in the Actions artifact rather than Git history.
+- Screen 10 order correction: public-price control, welcome settings, watermark controls, then the separate QR payment panel. `tests/admin-liquid-glass-contract.test.mjs` now asserts this order.
+- Screenshot `settings__390x844__light.png` in the artifact shows price controls followed by welcome controls in the initial viewport; watermark and QR remain lower in the settings flow. The screenshot is generated from real source HTML/CSS with synthetic/read-only fixtures.
+- Preview diagnostic `PASS_LOGIN_CSS_SIGNATURE` verifies the configured unauthenticated login-shell CSS signature only. It does **not** confirm authenticated module access, settings persistence or QR activation.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`. Authenticated business/backend QA is `NOT_TESTED`; remote D1 schema/ledger is `NOT_VERIFIED`; Production is `NOT_PERFORMED`.
 
 ## Older successful runs (historical evidence)
 
