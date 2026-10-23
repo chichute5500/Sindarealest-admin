@@ -37,6 +37,8 @@ assert.match(html, /@keyframes sdFullscreenInRight\{from\{opacity:1;transform:tr
 assert.match(html, /@keyframes sdGalleryOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-22%\) scale\(\.985\);filter:blur\(0\)\}\}/);
 assert.match(html, /@keyframes sdGalleryInRight\{from\{opacity:1;transform:translateX\(22%\) scale\(\.985\);filter:blur\(0\)\}/);
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
+assert.match(html, /\.sd-fullscreen-image\{[^}]*backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:opacity,transform;transform:translate3d\(0,0,0\)/,
+  'Fullscreen image layers must stay compositor-ready to avoid mobile opacity-swap flashes.');
 
 assert.equal((html.match(/id="mobileCartCount"/g) || []).length, 1);
 assert.match(html, /id="mobileCartCount"[^>]*aria-hidden="true" hidden/);
