@@ -626,19 +626,30 @@ jobs:
                       'Switching to another category must update persistent selection.');
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
                       'Switching categories must clear the previous selected state.');
-                    const reselectionMotion = await nextCategory.evaluate(el => {
-                      const css = getComputedStyle(el);
-                      const animation = el.getAnimations().find(item =>
-                        typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                      const scaleX = new DOMMatrixReadOnly(css.transform).a;
-                      return {
-                        animationName: css.animationName,
-                        duration: css.animationDuration,
-                        currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
-                        playState: animation?.playState || 'missing',
-                        scaleX
+                    const reselectionMotion = await nextCategory.evaluate(el => new Promise(resolve => {
+                      const startedAt = performance.now();
+                      const sample = () => {
+                        const css = getComputedStyle(el);
+                        const animation = el.getAnimations().find(item =>
+                          typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                        const scaleX = new DOMMatrixReadOnly(css.transform).a;
+                        const currentTime = typeof animation?.currentTime === 'number' ? animation.currentTime : null;
+                        // The spring intentionally starts with a press-in. Sample after its rise toward
+                        // the bloom peak, rather than treating the first ~16ms frame as the whole effect.
+                        if ((currentTime !== null && currentTime >= 120) || performance.now() - startedAt >= 280) {
+                          resolve({
+                            animationName: css.animationName,
+                            duration: css.animationDuration,
+                            currentTime,
+                            playState: animation?.playState || 'missing',
+                            scaleX
+                          });
+                          return;
+                        }
+                        requestAnimationFrame(sample);
                       };
-                    });
+                      sample();
+                    }));
                     assert.equal(reselectionMotion.animationName,
                       theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
                       'Switching to another category must retrigger the theme-appropriate glass animation.');
