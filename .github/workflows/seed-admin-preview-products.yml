@@ -1,0 +1,138 @@
+name: Seed isolated Admin Preview products
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - fix/admin-preview-project-target
+    paths:
+      - ".github/workflows/seed-admin-preview-products.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seed-sindarealest-admin-preview-products
+  cancel-in-progress: false
+
+jobs:
+  seed-preview-only:
+    name: Import 235 products into isolated Preview D1 only
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TARGET_DB_NAME: sindarealest-admin-preview-db
+      TARGET_DB_ID: 573ad702-05fc-405e-8ef3-0cf2e7fea98d
+      SOURCE_BRANCH: feature/admin-isolated-handoff-2026-10-20
+    steps:
+      - name: Validate credentials are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+
+      - name: Check out isolated Admin source and seed file
+        uses: actions/checkout@v4
+        with:
+          ref: feature/admin-isolated-handoff-2026-10-20
+          path: admin-source
+
+      - name: Verify exact target D1 identity through Cloudflare API
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database")"
+          printf '%s' "$response" | node --input-type=module -e '
+            let raw = "";
+            for await (const chunk of process.stdin) raw += chunk;
+            const payload = JSON.parse(raw);
+            if (!payload.success) throw new Error("Cloudflare D1 listing failed.");
+            const expected = payload.result.find(db =>
+              db.name === process.env.TARGET_DB_NAME &&
+              db.uuid === process.env.TARGET_DB_ID
+            );
+            if (!expected) throw new Error("Target D1 name/UUID mismatch; import refused.");
+            const forbidden = new Set([
+              "f6c208a1-052a-445c-a3b7-a442783f9bd3",
+              "6f444e33-0000-0000-0000-000000000000"
+            ]);
+            if (forbidden.has(expected.uuid)) throw new Error("Forbidden shared/production database.");
+            console.log("PASS: exact isolated Preview D1 name and UUID verified.");
+          '
+
+      - name: Verify seed SQL contains exactly 235 product inserts
+        shell: bash
+        run: |
+          set -euo pipefail
+          seed="admin-source/migrations/0002_seed_products.sql"
+          test -s "$seed"
+          count="$(grep -c "INSERT OR IGNORE INTO products" "$seed")"
+          test "$count" = "235" || { echo "::error::Expected 235 seed statements; found $count"; exit 1; }
+          echo "PASS: 235 INSERT OR IGNORE product statements."
+
+      - name: Refuse import unless Preview products table is empty
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4.149.0 d1 execute "$TARGET_DB_NAME" --remote --json --command="SELECT COUNT(*) AS product_count FROM products;" > before-count.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const text = readFileSync("before-count.json", "utf8");
+          const payload = JSON.parse(text);
+          const walk = value => {
+            if (Array.isArray(value)) for (const item of value) { const n = walk(item); if (n !== null) return n; }
+            else if (value && typeof value === "object") {
+              if (Object.hasOwn(value, "product_count")) {
+                const n = Number(value.product_count);
+                return Number.isSafeInteger(n) && n >= 0 ? n : null;
+              }
+              for (const item of Object.values(value)) { const n = walk(item); if (n !== null) return n; }
+            }
+            return null;
+          };
+          const count = walk(payload);
+          if (count !== 0) throw new Error(`Preview products count is ${count}; expected exactly 0. Refusing to seed.`);
+          console.log("PASS: isolated Preview products table is empty.");
+          NODE
+
+      - name: Import seed into isolated Preview D1
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4.149.0 d1 execute "$TARGET_DB_NAME" --remote --file=admin-source/migrations/0002_seed_products.sql
+
+      - name: Verify exact product count after import
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4.149.0 d1 execute "$TARGET_DB_NAME" --remote --json --command="SELECT COUNT(*) AS product_count FROM products;" > after-count.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const payload = JSON.parse(readFileSync("after-count.json", "utf8"));
+          const walk = value => {
+            if (Array.isArray(value)) for (const item of value) { const n = walk(item); if (n !== null) return n; }
+            else if (value && typeof value === "object") {
+              if (Object.hasOwn(value, "product_count")) {
+                const n = Number(value.product_count);
+                return Number.isSafeInteger(n) && n >= 0 ? n : null;
+              }
+              for (const item of Object.values(value)) { const n = walk(item); if (n !== null) return n; }
+            }
+            return null;
+          };
+          const count = walk(payload);
+          if (count !== 235) throw new Error(`Post-import Preview products count is ${count}; expected 235.`);
+          console.log("PASS: product_count=235 in isolated Preview D1.");
+          NODE
+
+      - name: Summarize safe target and source
+        if: always()
+        run: |
+          echo "Target: ${TARGET_DB_NAME} (${TARGET_DB_ID})"
+          echo "Source seed: ${SOURCE_BRANCH}/migrations/0002_seed_products.sql"
+          echo "Production/storefront D1 was not targeted."
