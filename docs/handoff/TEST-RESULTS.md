@@ -1,3 +1,12 @@
+## LATEST EXACT-SHA RESULT — WELCOME DIALOG KEYBOARD ACCESSIBILITY — 2026-10-23 23:22 ICT
+
+- Exact source/test SHA: `48096d776421b27723e90b923d02606c0e5100cb`.
+- CI, source integrity, dependency audit and complete automated test suite PASS: [#39986058962](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058962).
+- Preview deploy PASS for the same exact SHA: [#39986058742](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058742). Log confirms Pages project `sindarealest2`, Production branch `main`, and explicit commit hash. Immutable URL https://adcb7480.sindarealest2.pages.dev/ ; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Regression tests cover initial focus, focus containment at Tab boundaries, programmatic focus escape guard, Escape handling, accessibility-tree/inert transition, focus handoff and end-of-transition cleanup.
+- The first attempt at `90aca5aaa5eae082456105f92329038e9e0c7e1a` failed an existing test that matched an exact minified snippet. The parity contract was corrected in test-only commit `48096d776421b27723e90b923d02606c0e5100cb` to use a whitespace-tolerant regex preserving the lifecycle-order invariant; full tests then passed.
+- No live browser capture/visual inspection/owner acceptance was performed. These results are source/test and deployment gates only; they are not visual acceptance. Locked areas were not intentionally touched.
+
 # TEST & VISUAL AUDIT EVIDENCE INDEX
 
 ## LATEST EXACT-SHA RESULT — MOBILE NAVIGATION FOCUS ROUTING — 2026-10-23 22:59 ICT

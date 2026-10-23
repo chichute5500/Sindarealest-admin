@@ -1,3 +1,11 @@
+## LATEST TASK UPDATE — WELCOME DIALOG KEYBOARD ACCESSIBILITY — 2026-10-23 23:22 ICT
+
+- Completed source/test correction for the welcome modal at deployed SHA `48096d776421b27723e90b923d02606c0e5100cb`.
+- `public/index.html`: dialog receives initial focus on “Vào cửa hàng”, traps Tab/Shift+Tab, consumes Escape for dismissal, returns focus behind the dialog only as it exits, and becomes `aria-hidden`/inert before removal.
+- Added behavior-level VM regression coverage in `tests/storefront-accessibility-contract.test.mjs`; adjusted the existing `tests/storefront-reference-parity.test.mjs` assertion to preserve ordering requirements without relying on minified whitespace.
+- CI/full automated tests PASS: [#39986058962](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058962). Exact-SHA Preview deploy PASS: [#39986058742](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058742), immutable URL https://adcb7480.sindarealest2.pages.dev/.
+- No browser screenshot or owner visual acceptance; technical PASS only. Continue source-first audit in unlocked, non-Hero scope. Keep PR #108 OPEN/unmerged; all owner locks and Preview-only constraints remain active.
+
 # ACTIVE TASK LEDGER — SINDAREALEST2
 
 ## LATEST TASK UPDATE — MOBILE NAVIGATION FOCUS ROUTING — 2026-10-23 22:59 ICT

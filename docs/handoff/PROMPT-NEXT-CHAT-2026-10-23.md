@@ -1,5 +1,34 @@
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
+## NEWEST HANDOFF OVERRIDE — WELCOME DIALOG ACCESSIBILITY FIX DEPLOYED — 2026-10-23 23:22 ICT
+
+Continue the existing project directly from GitHub. Do not restart or infer branch state from this handoff; re-check live HEAD, PR #108, and Actions before further edits.
+
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: OPEN and unmerged; never merge.
+- Latest source/test/deployed Preview SHA: `48096d776421b27723e90b923d02606c0e5100cb`.
+- Fix: `public/index.html` now manages keyboard focus for `#welcomeSplash`: initial focus to the primary “Vào cửa hàng” button, Tab/Shift+Tab containment, Escape dismissal, protection against programmatic focus escaping to the page behind it, and focus handoff to the brand/navigation control as the splash exits.
+- Regression tests: `tests/storefront-accessibility-contract.test.mjs`; existing parity test `tests/storefront-reference-parity.test.mjs` now checks splash cleanup order without depending on minified whitespace.
+- Full CI/test PASS: [#39986058962](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058962).
+- Exact-SHA Preview deploy PASS: [#39986058742](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058742). Immutable Preview: https://adcb7480.sindarealest2.pages.dev/ ; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Preview log confirmed Cloudflare project `sindarealest2`, Production branch `main`, and deployment commit hash passed as `$GITHUB_SHA`. No Production deploy.
+- No new live browser screenshot, browser interaction acceptance or owner visual PASS is recorded. Do not claim visual PASS from CI/deployment.
+- A preceding test-only correction removed a brittle whitespace dependency; the full suite passed on the final SHA above.
+- Continue source-first audit in unlocked, non-Hero scope and only edit upon a concrete reproducible defect. Report findings and continue the next safe action rather than stopping after a report.
+
+## LOCKED OWNER SCOPE — STILL IN FORCE
+
+- Hero: PAUSED BY OWNER; do not inspect, edit, test, redesign, restore, or capture.
+- `#order` / “Đặt hàng an tâm”: OWNER PASS/LOCKED; do not touch or retest.
+- Catalog filter Liquid Glass/chip height/control behavior: OWNER PASS/LOCKED. No audit until explicit owner reopening and `CATALOG_FILTER_AUDIT_UNLOCKED=true` with required owner authorization.
+- Do not restore the deleted product-status filter panel.
+- No Production deployment; no changes to `main`, Admin/backend/API/auth, catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access or infrastructure.
+- Never bypass Cloudflare Access.
+- Every future update must distinguish source/test PASS, exact Preview deploy SHA, live browser capture, and owner visual acceptance. This handoff update is docs-only and does not itself create a deployed storefront.
+
+# PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
+
 ## NEWEST HANDOFF OVERRIDE — MOBILE NAVIGATION FOCUS ROUTING COMPLETE — 2026-10-23 22:59 ICT
 
 Continue the existing repository; do not restart. Re-fetch live branch HEAD, PR state, and workflow evidence before future edits.

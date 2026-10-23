@@ -1,3 +1,13 @@
+## LATEST AUTHORITATIVE UPDATE — WELCOME DIALOG KEYBOARD ACCESSIBILITY — 2026-10-23 23:22 ICT
+
+- Source/test fix deployed at exact SHA `48096d776421b27723e90b923d02606c0e5100cb`. Source file `public/index.html` and regression contract `tests/storefront-accessibility-contract.test.mjs` add initial focus, Tab/Shift+Tab containment, Escape dismissal, protection against programmatic focus escaping, and focus return to the brand/navigation control.
+- Full integrity/dependency validation and all automated tests PASS: [CI #39986058962](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058962).
+- Exact-SHA Cloudflare Pages Preview deploy PASS: [#39986058742](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986058742). Deployment log confirms project `sindarealest2`, Production branch `main`, and `--commit-hash=$GITHUB_SHA`. Immutable Preview: https://adcb7480.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- The first run at `90aca5aaa5eae082456105f92329038e9e0c7e1a` exposed an existing parity assertion that depended on minified one-line formatting. Test-only commit `48096d7...` changed it to allow whitespace while still asserting splash removal precedes removal of `welcome-active`; the complete test suite and Preview preflight then passed at `48096d7...`.
+- No live browser capture or owner visual acceptance was performed. Do not label this as visual/browser PASS. A separate source-only audit of gallery focus handling and checkout/contact form semantics found no additional concrete defect to patch during this pass.
+- Latest source/test/deployed Preview SHA before this handoff-only update: `48096d776421b27723e90b923d02606c0e5100cb`. PR #108 remains OPEN/unmerged; Hero PAUSED; `#order` and catalog-filter Liquid Glass/height OWNER PASS/LOCKED. Preview only; no Production or Admin/backend/API/auth/data/config change.
+- Continue source-first audit only in unlocked non-Hero areas; make no speculative edits. This entry is documentation only and does not itself constitute a deployment.
+
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
 
 ## LATEST AUTHORITATIVE UPDATE — MOBILE NAVIGATION FOCUS ROUTING — 2026-10-23 22:59 ICT
