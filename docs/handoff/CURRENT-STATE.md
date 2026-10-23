@@ -253,3 +253,11 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - Current reruns on that exact SHA: validation [#39953590662](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590662), live catalog audit [#39953590658](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590658). They were IN_PROGRESS when this note was written; inspect final results and artifact.
 - The owner still reports that the visual effect is not close enough to the supplied reference. A successful technical audit is only a prerequisite: inspect captured frames and compare the actual effect to `docs/design-reference/liquid-glass-product-filters.png` before asking the owner to check.
 - All previous guardrails still apply: Hero paused/untouched; `#order` owner-PASS/LOCKED/untouched; deleted product-status panel stays deleted; PR #108 open/unmerged; Preview only; no Production/Admin/backend/data/config changes.
+
+## Handoff update — audit retry — 2026-10-23 12:26 UTC
+
+- Audit #39953050974 failed with a second harness typo: `ReferenceError: currentTime is not defined`. It used an undeclared variable rather than the sampled animation object's `.currentTime`. This run is FAILED, not visual acceptance.
+- Workflow-only fix commit `e9b35186e4273410253b4158f45105be19c7c483` corrected desktop, reselection and touch assertions while preserving the 1ms timing tolerance and `scaleX > 1.04` threshold.
+- Current reruns: validation [#39953590662](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590662) and live catalog audit [#39953590658](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953590658). They were IN_PROGRESS at this checkpoint; inspect final status, logs and artifact.
+- Owner says the effect remains unlike the supplied reference. After the harness is valid, inspect actual frames against `docs/design-reference/liquid-glass-product-filters.png` across mobile/tablet/desktop and Light/Dark before inviting owner review.
+- Guardrails unchanged: Hero paused/untouched; `#order` owner-PASS/LOCKED/untouched; deleted product-status panel stays removed; PR #108 open/unmerged; Preview only; no Production/Admin/backend/data/config changes.
