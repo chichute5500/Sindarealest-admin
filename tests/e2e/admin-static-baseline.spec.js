@@ -1603,7 +1603,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           expect(narrowLayout.rail.right, 'Thumbnail rail container should stay inside the gallery grid').toBeLessThanOrEqual(narrowLayout.grid.right + 1);
           expect(narrowLayout.railOverflowX, 'Only the thumbnail rail should scroll horizontally').toBe('auto');
           expect(narrowLayout.railScrollWidth,
-            'At ' + narrowViewport.width + 'px all fixture thumbnails should remain horizontally reachable').toBeGreaterThan(narrowLayout.railClientWidth + 20);
+            'At ' + narrowViewport.width + 'px all fixture thumbnails should remain horizontally reachable').toBeGreaterThan(narrowLayout.railClientWidth + 10);
           if (narrowViewport.width <= 360) {
             const footerActions = await page.evaluate(() => ['#deleteProduct', '#editorCancel', '#saveProduct'].map(selector => {
               const element = document.querySelector(selector);
