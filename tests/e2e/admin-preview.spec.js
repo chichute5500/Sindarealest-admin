@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const adminUrl = process.env.ADMIN_TEST_URL;
+const adminUrl = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/'; // Pin all remote QA to the isolated Admin project.
 const adminPassword = process.env.ADMIN_TEST_PASSWORD;
 const accessClientId = process.env.CF_ACCESS_CLIENT_ID;
 const accessClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
@@ -74,8 +74,17 @@ async function openLoginPage(page, testInfo) {
   let previewTargetLabel = 'invalid-url';
   try {
     const previewTargetUrl = new URL(adminUrl);
+    if (
+      previewTargetUrl.protocol !== 'https:' ||
+      previewTargetUrl.hostname !== 'feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev' ||
+      previewTargetUrl.pathname !== '/admin/'
+    ) {
+      throw new Error('unsafe Preview target');
+    }
     previewTargetLabel = `host=${previewTargetUrl.hostname} path=${previewTargetUrl.pathname}`;
-  } catch {}
+  } catch {
+    throw new Error('Refusing to run ADMIN Preview tests outside the dedicated isolated Pages project.');
+  }
   // Log only the non-secret hostname/path: GitHub otherwise masks the whole URL secret as ***.
   console.info(`[ADMIN_PREVIEW_TARGET] ${previewTargetLabel}`);
   // Optional Cloudflare Access service-token headers; values are never logged or attached.

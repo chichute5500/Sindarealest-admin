@@ -20,7 +20,7 @@ permissions:
 
 concurrency:
   group: admin-preview-diagnostics
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   admin-preview:
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      ADMIN_TEST_URL: ${{ secrets.ADMIN_TEST_URL }}
+      ADMIN_TEST_URL: "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/"
       ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
