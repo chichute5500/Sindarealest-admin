@@ -1,13 +1,15 @@
 # ADMIN — 12-SCREEN REFERENCE AUDIT
 
-## Current checkpoint — 2026-10-23 12:26 UTC — Latest evidence 422 recorded
+## Current checkpoint — 2026-10-23 12:43 UTC — Preview 423 verified; Screens 4/5/7 reviewed
 
-- Live branch HEAD at sync start: `d763f0fe6742848d42626176627bf8edb20e9bfe`; tested SHA: `19202ac0b351ab6623047c057a5c1af41f97cefe`.
-- Validate [#39952239465](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239465) PASS; Preview [#39952239467](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467) PASS.
-- Artifact [admin-preview-evidence-422](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39952239467/artifacts/12500722416) contains 132 PNG screenshots and 112 fixture metrics. It was captured from synthetic/read-only fixtures; no authenticated backend claim is implied.
-- Most recent product UI change: [`efb4935`](https://github.com/chichute5500/Sindarealest-admin/commit/efb49359a4e8b4ad65ea0120f41ad4c6cfa90631), shortening the Product Editor SKU placeholder for narrow mobile and asserting its visibility.
-- **Next comparison:** Screens 4/5 and 7 against `docs/admin-ui-reference/admin-mobile-reference.png`, matching viewport/theme. Change only reproducible Admin-specific mismatches. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
-
+- **Live state at sync start:** branch `feature/admin-isolated-handoff-2026-10-20` HEAD `4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19`; this is an evidence-only child of tested SHA `7f5df6bb63a264a495c1f76517861496e3cc3643`. The six-file checkpoint update is documentation-only; no app-source change is being claimed.
+- **Exact-SHA verification:** [Validate #39953114181](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114181) PASS and [Admin Preview #39953114180](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180) PASS on the same SHA `7f5df6bb63a264a495c1f76517861496e3cc3643`. Preview job, repository checks, automated tests, Chromium setup, responsive/theme capture, diagnostic, and artifact upload all completed successfully.
+- **Artifact inspected:** [admin-preview-evidence-423](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180/artifacts/12501226741) has 132 PNG screenshots (16 login-shell entries plus 120 fixture capture entries) and 112 fixture metrics. Main report page/console/request/HTTP errors are all zero; the fixture audit has seven expected simulated HTTP 503 retry-path console entries, with fixture API errors, unexpected paths, and attempted writes all zero.
+- **Preview diagnostic boundary:** `PASS_LOGIN_CSS_SIGNATURE` only. These are local screenshots with synthetic, read-only UI fixtures; no authenticated business/backend workflow was tested.
+- **Screens 4/5/7 review:** Screen 4's `SKU chính thức` placeholder fits the 320px field in the capture from existing source/test change `efb4935`. Screen 5's responsive fixture screenshots/metrics show the featured cover and horizontal thumbnail rail; a short viewport crop alone is not evidence that lower controls are inaccessible. Screen 7 shows stacked order/detail cards with the remainder available by scrolling; fixture values and actions do not prove live order behavior. No *new* reproducible source defect was confirmed, so no speculative CSS or business-data change was made.
+- **Acceptance is unchanged:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact visual parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. R2/product image persistence, migration 0009, PRE/PRO, and AI image grouping remain deferred.
+- **PR / safety state:** PR #111 OPEN/unmerged on this branch; PR #108 OPEN/unmerged and read-only; `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge, rebase, force-push, Production deployment, Cloudflare Access/settings/secrets/DNS changes, or remote D1/R2/schema/ledger write.
+- **Next:** continue reference-driven inspection of remaining screen discrepancies, prioritize a repeatable visual/interaction mismatch with targeted regression coverage, then run Validate + Preview on its exact source/test SHA. Obtain an owner-authorized authenticated Preview path for backend QA; do not bypass Access.
 
 ## Current checkpoint — 2026-10-23 12:15 UTC — Narrow-mobile SKU hint refined; Validate and Preview pass
 
@@ -117,6 +119,14 @@
 | 10 | Website settings | PARTIAL_NOT_ACCEPTED | `settings__390x844__light.png`/dark counterpart; QR/draft UI only. Real save/activation unverified. |
 | 11 | Backup/Restore | PARTIAL_NOT_ACCEPTED | `backup-restore__390x844__light.png` and desktop evidence; no real export/import cycle. A screenshot starting mid-page is not evidence of clipping by itself. |
 | 12 | Activity log / notifications | PARTIAL_NOT_ACCEPTED | Activity log is fixture-only; new exact-SHA Playwright checks cover unread badge, mark-read timestamp, Escape close and focus restoration. Authenticated audit feed and real notifications remain untested. |
+
+## Screen 4/5/7 visual review — artifact 423
+
+- **Screen 4 — Product Editor:** `product-editor__320x640__light.png` shows the existing `SKU chính thức` placeholder fitting beside the SKU verification control. This confirms the narrow-input clipping fix is present in the tested source capture, not real SKU verification or saving.
+- **Screen 5 — Product Gallery:** responsive fixture captures and metrics show the featured cover with a horizontal thumbnail rail at narrow widths, with no reported horizontal overflow. A screenshot cut at viewport height does not independently demonstrate an inaccessible control; R2 persistence and exact reference parity remain unverified.
+- **Screen 7 — Order Detail:** the 320×640 and 390×844 captures show order summary, customer, item and payment cards. Lower content is reached by scrolling. Content is fixture-only, so this is not evidence for real order data or live actions.
+- **Decision:** no additional repeatable defect was demonstrated in these three captures, so no new app-source/CSS patch was applied. Keep Screens 4/5/7 and all other screens `PARTIAL_NOT_ACCEPTED`; overall exact reference parity remains `NOT_VERIFIED`. The next pass should compare specific elements/spacing/interaction, and only change code when the same mismatch is reproduced.
+
 
 ## Acceptance boundary
 Fixture/test PASS does not mean final visual parity or authenticated backend PASS. D1 schema/payment ledger NOT_VERIFIED; migration 0009, PRE/PRO and R2/product-image save DEFERRED_BY_OWNER; Production deployment NOT_PERFORMED.
