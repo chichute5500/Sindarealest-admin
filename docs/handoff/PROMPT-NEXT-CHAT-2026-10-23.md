@@ -250,3 +250,11 @@ If the owner identifies a concrete mismatch, change only catalog search/category
 - Catalog-only live audit PASS [#39962829226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226); artifact [#12505621350 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350). Captured SHA 5b7596aba026cf4d4ed72fc4802ba461b105eb34 matches deployed SHA exactly. Runtime errors, same-origin HTTP errors and read-only violations are zero; touch interaction passes 2/2.
 - OWNER DECISION RECEIVED 2026-10-23: PASS AND LOCK. Catalog filter chip height/Liquid Glass controls are OWNER PASS/LOCKED. Do not edit or retest unless the owner explicitly reopens this item.
 - Hero remains PAUSED BY OWNER; #order remains OWNER PASS/LOCKED; PR #108 stays OPEN/unmerged; Preview only, no Production or restricted-scope changes.
+
+## Latest continuation update — 2026-10-23 21:55 ICT
+- Current branch HEAD: 2dd3bddfa2ddf13614491d2ac9d0b407157c32f9 (test-only commit: align the mobile-navigation history assertion with the current openCart(event) signature).
+- Exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39973525900
+- Exact-SHA Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39973526262
+- Verified Preview: https://761fdddb.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Static whole-document anchor audit on public/index.html SHA 560f4e3048f2c556da066b76767ebecea2da1004: 23 internal fragment links checked, zero missing targets. The earlier broken craftsmanship link is fixed to #about and regression-tested. This is source-level validation, not a claim of manual device/browser visual acceptance.
+- PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; catalog filter height/Liquid Glass remains OWNER PASS/LOCKED; #order remains OWNER PASS/LOCKED. Do not edit or retest those areas unless explicitly reopened. Preview only; no Production or restricted-scope changes.

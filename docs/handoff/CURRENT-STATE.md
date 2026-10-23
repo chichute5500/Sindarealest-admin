@@ -336,3 +336,11 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Deployment ID 6a0000cc-ff21-4a6b-bba5-daff4245a663; immutable Preview https://6a0000cc.sindarealest2.pages.dev/ ; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
 - Artifact [#12505621350 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350). Manifest: CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE, passed true, exact source/deployed SHA match, public-tree equivalent, capture complete, 2/2 touchscreen checks PASS, zero runtime errors, zero same-origin HTTP errors, zero read-only violations. Cloudflare Insights GETs remain blocked by the established external-read allowlist and are recorded.
 - OWNER DECISION RECEIVED 2026-10-23: PASS AND LOCK for the slimmer catalog filter chips. Mark this catalog Liquid Glass filter-height item OWNER PASS/LOCKED; no further edits, styling changes, or retests unless the owner explicitly reopens it. Keep Hero paused, #order locked, PR #108 OPEN/unmerged, Preview only, and all restricted scopes untouched.
+
+## Latest continuation update — 2026-10-23 21:55 ICT
+- Current branch HEAD: 2dd3bddfa2ddf13614491d2ac9d0b407157c32f9 (test-only commit: align the mobile-navigation history assertion with the current openCart(event) signature).
+- Exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39973525900
+- Exact-SHA Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39973526262
+- Verified Preview: https://761fdddb.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Static whole-document anchor audit on public/index.html SHA 560f4e3048f2c556da066b76767ebecea2da1004: 23 internal fragment links checked, zero missing targets. The earlier broken craftsmanship link is fixed to #about and regression-tested. This is source-level validation, not a claim of manual device/browser visual acceptance.
+- PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; catalog filter height/Liquid Glass remains OWNER PASS/LOCKED; #order remains OWNER PASS/LOCKED. Do not edit or retest those areas unless explicitly reopened. Preview only; no Production or restricted-scope changes.
