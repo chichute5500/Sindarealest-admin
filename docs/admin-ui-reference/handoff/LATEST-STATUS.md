@@ -1,3 +1,13 @@
+## Quy tắc vận hành bắt buộc
+
+1. Không chờ CI/deploy một cách thụ động: trong thời gian chờ, rà soát độc lập ở khu vực an toàn; sau đó quay lại kiểm tra kết quả thực tế.
+2. Báo cáo xong tự động làm tiếp; không coi việc báo cáo là lý do dừng công việc.
+3. Chỉ sửa khi tìm thấy lỗi cụ thể có thể tái hiện; bổ sung kiểm thử hồi quy trước khi sửa.
+4. Trước khi kết luận, kiểm tra SHA chính xác, CI, Preview và bằng chứng triển khai. Không suy diễn PASS khi chưa có bằng chứng.
+5. Chỉ dừng khi thực sự cần chủ tài khoản kiểm tra, quyết định mở khóa hoặc thao tác trên thiết bị/tài khoản.
+6. Nếu một đầu việc bị chặn, tiếp tục các đầu việc an toàn, độc lập khác.
+7. Giữ nguyên mọi giới hạn cô lập đã nêu trong handoff; không triển khai Production, không ghi dữ liệu nghiệp vụ, không chạy seed/import lại, không in secret.
+
 ## CURRENT HANDOFF — 2026-10-24 — Product catalog visible in isolated Admin Preview; continue runtime verification
 
 **User confirmation:** the user has now confirmed that products are visible in Admin Preview. Treat the “0 products” UI symptom as resolved for the current observed session; do not repeat seed/import or ask the user to re-check the same thing. This confirms the visible product list only, not full CRUD, images, login/session stability, or backend acceptance.
