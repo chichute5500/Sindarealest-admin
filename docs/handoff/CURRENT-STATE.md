@@ -96,3 +96,13 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - Manifest: `captureCompleted: true`, `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`, zero runtime errors, zero same-origin HTTP errors, zero read-only violations, no Access block. Cloudflare Insights requests were blocked by the external-read allowlist and are recorded as blocked external requests.
 - Owner visual acceptance remains **PENDING**. Capture success is not visual acceptance/PASS; owner review is required before this section can be marked PASS/LOCKED.
 - Earlier run #39894291884 failed before capture due a selector assertion mismatch (`section.section.wrap#order` versus `#order`); commit `cb8901b` corrected the assertion, and run #39894447648 succeeded.
+
+
+## Owner acceptance — order-step heading readability — 2026-10-23
+
+- Owner explicitly confirmed **PASS** for the requested order-step heading typography update. This narrow item is now **PASS/LOCKED**; do not alter it without explicit owner permission.
+- CSS change in `public/index.html`: order-step headings use `font-weight:600` and desktop `15.5px`; tablet/mobile heading sizes were increased by one size step, including narrow-phone override. Regression expectations were updated in `tests/order-trust-layout.test.mjs`.
+- Verified branch HEAD and PR #108 head at acceptance: `c8a14685efa3fbfa12475fe895405b5999489329`; PR remains OPEN/unmerged.
+- Source/test CI PASS: [run #39895567918](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567918). Preview deployment PASS: [run #39895567897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567897). Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . No Production deployment or merge.
+- This owner PASS applies only to order-step heading typography. It does not automatically accept the whole order section or any other section. Hero remains PAUSED BY OWNER and untouched.
+- Next action: inspect the next unfinished non-Hero storefront section from current source/tests/evidence. Establish a concrete discrepancy before editing; run targeted checks and re-verify the exact Preview deployment SHA before claiming visual evidence.
