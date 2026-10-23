@@ -320,6 +320,8 @@ jobs:
 
                   const categoryButtons = categoryGroup.locator('button[data-category]');
                   const fulfillmentButtons = fulfillmentGroup.locator('button[data-fulfillment]');
+                  await categoryButtons.first().waitFor({ state: 'visible', timeout: 25000 });
+                  await fulfillmentButtons.first().waitFor({ state: 'visible', timeout: 25000 });
                   assert.ok(await categoryButtons.count() >= 1, 'Category filter group has no buttons.');
                   assert.equal(await fulfillmentButtons.count(), 4, 'Fulfillment filter group must expose four filter choices.');
                   assert.equal(await categoryGroup.locator('button[aria-pressed="true"]').count(), 1);
