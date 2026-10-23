@@ -1,5 +1,14 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
 
+## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
+
+- CI on source commit c4f41c60d56c0841e6146734dc28d6f57415dee0 reached the new regression test but failed because the test referenced vm without importing node:vm. This patch adds the missing import; exact-SHA CI is pending.
+- The same commit’s Preview deployment run #39979048662 failed before deployment at the intentional target-safety gate. The resolved GitHub Actions variable CLOUDFLARE_PAGES_PROJECT was `sindarealest-admin-preview`, but the storefront workflow requires project `sindarealest2` and verifies Production remains on `main`. Previous successful deploy #39975778958 resolved the expected `sindarealest2`.
+- No Cloudflare deployment or Cloudflare settings were changed by the failed run. Do not bypass the guard or deploy to the other project. Owner action is needed to reconcile the repository Actions variable `CLOUDFLARE_PAGES_PROJECT` with the intended storefront project before Preview deployment can succeed.
+- Liquid Glass screenshot run #39979048660 was SKIPPED by its Hero-coverage guard; the catalog-filter audit was not run. Keep all locks and Preview-only rule intact.
+
+
+
 ## LATEST SOURCE AUDIT — ACCOUNT → CONTACT HISTORY REGRESSION — 2026-10-23
 
 - Confirmed an unlocked storefront behavior defect in the account drawer: clicking “Liên hệ hỗ trợ” closed the drawer directly, leaving the account modal history marker on the current entry. Same-document fragment navigation carries history state forward, so a later Back traversal could reopen the account drawer; deferred focus restoration could also fight the contact-anchor scroll.
