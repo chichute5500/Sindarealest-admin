@@ -48,6 +48,14 @@ assert.ok(storefrontHtml.includes('@media(hover:hover) and (pointer:fine)')
   && storefrontHtml.includes('@media(prefers-reduced-motion:reduce)')
   && storefrontHtml.includes('@supports not (backdrop-filter: blur(20px))'),
   'Catalog Liquid Glass must respect hover-capable devices, reduced-motion preferences and a no-backdrop-filter fallback.');
+assert.ok(storefrontHtml.includes('flex:0 0 auto;\n  min-width:max-content;\n  max-width:100%;')
+  && storefrontHtml.includes('white-space:nowrap;\n  overflow-wrap:normal;')
+  && storefrontHtml.includes('flex-wrap:wrap;\n  align-content:flex-start;\n  overflow:visible;'),
+  'Catalog pills must retain natural content width and wrap as complete chips rather than squeeze text vertically on mobile.');
+assert.ok(storefrontHtml.includes('0 0 14px rgba(22,132,232,0.30)')
+  && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
+  'The selected pill must have a distinct visible blue glass glow and readable label typography.');
+
 assert.ok(storefrontHtml.includes("selectedCategory===c?'active':'')")
   && storefrontHtml.includes("selectedFulfillment===type?'active':'')")
   && storefrontHtml.includes("selectedCategory==='all'||p.category===selectedCategory")
