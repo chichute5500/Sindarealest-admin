@@ -171,7 +171,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
 
 
 test('captures read-only Admin module UI states using explicit local fixtures', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   mkdirSync(screenshotDir, { recursive: true });
 
   const fixtureProduct = {
@@ -325,9 +325,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const fixtureApiRequests = [];
   const optionalEndpointFailures = new Set();
   const fixtureApiErrors = [];
+  const narrowMobile = { width: 320, height: 640 };
+  const compactMobile = { width: 360, height: 800 };
   const mobile = { width: 390, height: 844 };
   const desktop = { width: 1280, height: 800 };
+  // Audit every fixture module at narrow widths, not only the product/warranty specials.
   const variants = [
+    { viewport: narrowMobile, theme: 'light' },
+    { viewport: compactMobile, theme: 'light' },
     { viewport: mobile, theme: 'light' },
     { viewport: mobile, theme: 'dark' },
     { viewport: desktop, theme: 'light' }
