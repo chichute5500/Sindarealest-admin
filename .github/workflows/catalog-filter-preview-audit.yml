@@ -621,9 +621,8 @@ jobs:
                     await page.waitForTimeout(500);
                     const nextCategory = categoryGroup.locator('button[data-category]:not([data-category="all"])').nth(1);
                     assert.ok(await nextCategory.count() > 0, 'A second non-default category is required to verify animation retriggering.');
-                    // Attach a real animationstart listener before the second click. Playwright's
-                    // post-click assertions can consume >100ms, so sampling only after click may miss
-                    // the short spring peak. Track actual frames from the event through the 180ms bloom.
+                    // Track the Web Animations API on every animation frame from before the click.
+                    // Playwright's click promise resolves after page JS and can miss the short bloom peak.
                     await nextCategory.evaluate(el => {
                       const trace = {
                         animationStarted: false, complete: false, timedOut: false,
@@ -632,42 +631,39 @@ jobs:
                         lastCurrentTime: null, lastPlayState: 'missing'
                       };
                       window.__sdGlassReselectionTrace = trace;
-                      const onAnimationStart = event => {
-                        if (typeof event.animationName !== 'string' ||
-                            !event.animationName.startsWith('sdCatalogGlassActivate')) return;
-                        trace.animationStarted = true;
-                        trace.animationName = event.animationName;
-                        trace.duration = getComputedStyle(el).animationDuration;
-                        const sample = () => {
-                          const css = getComputedStyle(el);
-                          const animation = el.getAnimations().find(item =>
-                            typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                          const currentTime = typeof animation?.currentTime === 'number' ? animation.currentTime : null;
-                          const scaleX = new DOMMatrixReadOnly(css.transform).a;
+                      const startedAt = performance.now();
+                      const sample = () => {
+                        const css = getComputedStyle(el);
+                        const animation = el.getAnimations().find(item =>
+                          typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                        const currentTime = typeof animation?.currentTime === 'number' ? animation.currentTime : null;
+                        const scaleX = new DOMMatrixReadOnly(css.transform).a;
+                        if (animation && !trace.animationStarted) {
+                          trace.animationStarted = true;
+                          trace.animationName = animation.animationName;
+                          trace.duration = css.animationDuration;
+                        }
+                        if (animation && currentTime !== null && animation.playState !== 'idle') {
                           trace.sampleCount += 1;
                           trace.lastCurrentTime = currentTime;
-                          trace.lastPlayState = animation?.playState || 'missing';
+                          trace.lastPlayState = animation.playState;
                           if (scaleX > trace.peakScaleX) {
                             trace.peakScaleX = scaleX;
                             trace.peakCurrentTime = currentTime;
                           }
-                          if (currentTime !== null && currentTime >= 180) {
+                          if (currentTime >= 180) {
                             trace.complete = true;
-                            el.removeEventListener('animationstart', onAnimationStart);
                             return;
                           }
-                          requestAnimationFrame(sample);
-                        };
+                        }
+                        if (performance.now() - startedAt >= 700) {
+                          trace.complete = true;
+                          trace.timedOut = !trace.animationStarted;
+                          return;
+                        }
                         requestAnimationFrame(sample);
                       };
-                      el.addEventListener('animationstart', onAnimationStart);
-                      window.setTimeout(() => {
-                        if (!trace.complete) {
-                          trace.complete = true;
-                          trace.timedOut = true;
-                          el.removeEventListener('animationstart', onAnimationStart);
-                        }
-                      }, 700);
+                      requestAnimationFrame(sample);
                     });
                     await nextCategory.click();
                     assert.equal(await nextCategory.getAttribute('aria-pressed'), 'true',
