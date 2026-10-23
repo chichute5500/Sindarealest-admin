@@ -365,8 +365,9 @@ const missingPauseContext = {
   setInterval() { throw new Error('slideshow must not start when a required control is absent'); },
   clearInterval() {}, clearTimeout() {}, setTimeout() { return 1; }
 };
-const missingPauseSetup = vm.runInNewContext(artPauseSetup, missingPauseContext, { timeout: 1000 });
-assert.doesNotThrow(() => missingPauseSetup(), 'slideshow setup must safely abort if any required control is missing');
+assert.doesNotThrow(() => vm.runInNewContext(artPauseSetup + '\\nsetupArtSlideshow();', missingPauseContext, { timeout: 1000 }),
+  'slideshow setup must safely abort if any required control is missing');
+assert.equal(missingPauseContext.artTimer, null, 'missing pause control must not leave an unreachable autoplay interval');
 
 assert.equal(reducedArt.intervals.length, 0, 'reduced-motion must continue to disable autoplay');
 assert.equal(reducedArt.elements['#artPause'].disabled, true, 'reduced-motion users must not be offered an autoplay-resume action');
