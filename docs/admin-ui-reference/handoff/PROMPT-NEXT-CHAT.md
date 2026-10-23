@@ -1,3 +1,44 @@
+# PROMPT NEXT CHAT — SINDAREALEST ADMIN
+
+Continue the project directly on GitHub. Do not ask the user to paste history or repeat the prompt. Read this handoff and then verify live state first.
+
+## Quy tắc vận hành bắt buộc — PHẢI GIỮ NGUYÊN
+
+1. **Không chờ CI/deploy một cách thụ động.** Trong lúc chờ kết quả, rà soát độc lập các hạng mục an toàn; sau đó quay lại kiểm tra kết quả thực tế.
+2. **Báo cáo xong tự động làm tiếp.** Báo cáo tiến độ không phải lý do để dừng công việc.
+3. **Chỉ sửa khi có lỗi cụ thể, tái hiện được.** Bổ sung kiểm thử hồi quy trước khi sửa lỗi.
+4. **Xác minh trước khi kết luận.** Kiểm tra SHA chính xác, CI, Preview và bằng chứng triển khai; không suy diễn PASS hoặc coi test fixture là bằng chứng backend.
+5. **Chỉ dừng khi cần người dùng thao tác thật sự.** Ví dụ: thao tác thiết bị/tài khoản, cấp quyền hoặc quyết định mở khóa. Nêu chính xác hành động cần làm; không hỏi lại điều đã có trong handoff.
+6. **Nếu một việc bị chặn, tiếp tục việc an toàn độc lập khác.** Không ngồi chờ một blocker nếu còn việc hợp lệ để làm.
+7. **Tuân thủ ranh giới an toàn/cô lập.** Không deploy Production, không ghi dữ liệu nghiệp vụ, không chạy seed/import, không in/tiết lộ secret; không sửa `main`, storefront hoặc shared Cloudflare project/variables; không merge PR #111/#108/#112, không force-push, không bypass Cloudflare Access. Chỉ thao tác trên nhánh Admin được cho phép.
+
+
+## First execution steps
+
+1. Fetch current HEAD for `feature/admin-isolated-handoff-2026-10-20`, PR #111 and #108 state, and latest Actions runs. Treat the live SHA as authoritative.
+2. Check Preview diagnostic run [#40010281144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281144) (source SHA at handoff: `3341bc3d89652fc753a826d082c0a5e5bdf3db80`) to completion. Confirm exact `head_sha`, inspect jobs/logs and the artifact. Validate run [#40010281084](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281084) passed on that exact SHA.
+3. Inspect Screen 10 screenshots against `docs/admin-ui-reference/admin-mobile-reference.png`, especially 390×844 light, and confirm price-setting copy/state, compact card layout, and watermark control reachability above the fixed mobile nav.
+4. If a test fails, read its exact log. Reproduce the concrete defect and add regression coverage **before** changing source. Do not make another speculative CSS/test edit.
+5. If Screen 10 is accepted by evidence, proceed to the next screen with a reproducible mismatch. Continue independent safe work while waiting for Actions; reporting progress does not stop the work.
+6. Keep all three handoff files synchronized after the next meaningful verified checkpoint.
+
+## Checkpoint at handoff
+
+- Branch: `feature/admin-isolated-handoff-2026-10-20`
+- HEAD at sync start: `3341bc3d89652fc753a826d082c0a5e5bdf3db80`
+- Validate: [#40010281084 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281084) on exact HEAD.
+- Preview diagnostic: [#40010281144 IN_PROGRESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281144) at checkpoint; inspect fresh status.
+- PR #111 OPEN/unmerged, `mergeable=false`, 489 changed files; base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- Screen 10 work touched `public/admin/index.html`, `tests/e2e/admin-static-baseline.spec.js`, and `tests/admin-upgrade.test.mjs`. Latest commit `3341bc3d89652fc753a826d082c0a5e5bdf3db80`. UI changes target reference-aligned headings/copy and a mobile-only `.website-settings` compact layout. Preview evidence still needs inspection.
+- Do not repeat the B1 cleanup, do not merge PRs, do not deploy Production, and do not infer live backend acceptance from fixture screenshots.
+
+## Acceptance status
+
+All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated business/backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Update these only with fresh, exact-SHA evidence.
+
+
+---
+
 ## Quy tắc vận hành bắt buộc
 
 1. Không chờ CI/deploy một cách thụ động: trong thời gian chờ, rà soát độc lập ở khu vực an toàn; sau đó quay lại kiểm tra kết quả thực tế.

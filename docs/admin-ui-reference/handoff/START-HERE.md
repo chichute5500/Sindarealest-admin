@@ -1,3 +1,42 @@
+# CURRENT HANDOFF — 2026-10-24 — Screen 10 settings UI fix; Preview run pending
+
+## Verified live repository state
+
+- Repository: `chichute5500/Sindarealest-admin`
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`
+- HEAD at handoff sync start: `3341bc3d89652fc753a826d082c0a5e5bdf3db80` — commit message: `[CF-Pages-Skip] fix(admin): compact Screen 10 watermark controls`.
+- PR #111: OPEN, unmerged, `mergeable=false`, 489 changed files; base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Do not merge or attempt cleanup by rebasing.
+- Validate run [#40010281084](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281084): **SUCCESS** on exact HEAD `3341bc3d89652fc753a826d082c0a5e5bdf3db80`.
+- Admin Preview diagnostic run [#40010281144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281144): **IN_PROGRESS** on exact HEAD at sync. Re-fetch status/jobs/artifacts before relying on it. Preview acceptance is NOT verified until this run finishes and evidence is inspected.
+- Previous run #40009827236 failed on SHA `0c1b97432a9afbd87c3c9a5c0e2276f6e7807a9d`; inspect its exact failed step only if needed to prevent repeating that issue. Do not label the current HEAD failed based on an older SHA.
+- Latest source work: commit `147f677` began Screen 10 settings/reference alignment. Follow-up commits `0c1b974` and `3341bc3` iteratively corrected test assumptions and compacted watermark controls. Earlier tests failed on incorrect assumptions about labels/heading; logs identified the mismatch. Verify the latest test and live UI evidence instead of assuming the CSS is accepted.
+- Current Screen 10 scope: align the reference-facing settings headings/copy; compact only the `.website-settings` layout at mobile widths; preserve save handlers and unrelated settings/backup UI. Regression tests assert expected headings and that watermark controls remain above the fixed mobile navigation at 390×844 light theme.
+- This does **not** establish full visual parity or authenticated settings persistence. No settings were saved remotely, no business data written, no production deploy.
+
+## Next actions for the next chat
+
+1. Re-fetch branch HEAD, PR #111/#108 status, and latest Actions; do not assume the checkpoint SHA is still HEAD.
+2. Inspect run #40010281144 to completion: jobs, step logs, artifact availability. Confirm exact `head_sha` equals the tested source SHA; download/inspect Screen 10 screenshots at 390×844 light and other tested viewports/themes. If the run fails, read the exact log and add a focused regression test before any further fix.
+3. Check the actual Screen 10 screenshot against `docs/admin-ui-reference/admin-mobile-reference.png`; ensure the compact CSS affects only `.website-settings`, the price toggle state/copy is reference-aligned, and watermark controls are reachable above mobile navigation.
+4. If Screen 10 passes, continue the next unaccepted screen only where an actual reproducible mismatch can be shown. Avoid speculative CSS and don't repeat already-passed checks without new evidence.
+5. Update the three handoff files together after the next meaningful verified checkpoint. Keep the seven rules below verbatim.
+
+## Acceptance truth
+
+- Screen 10: source/test changes exist; current latest Preview run is pending at this checkpoint; visual acceptance is **NOT VERIFIED** until artifact inspection.
+- All 12 reference screens: **PARTIAL_NOT_ACCEPTED**; exact reference parity: **NOT_VERIFIED**.
+- Authenticated backend/business QA and settings persistence: **NOT_TESTED**.
+- Production deployment: **NOT PERFORMED**.
+
+## Isolation boundaries
+
+- Keep `main` at its existing base; do not modify `main`.
+- Do not change storefront project `sindarealest2`, storefront branch `fix/liquid-glass-audit-2026-10-19`, or shared `CLOUDFLARE_PAGES_PROJECT`.
+- Dedicated Admin Preview target: `sindarealest-admin-preview`; dedicated D1: `sindarealest-admin-preview-db`. Never attach Production/AI Preview databases or copy production credentials.
+- Do not merge PR #111/#108/#112, force-push, deploy Production, run seed/import/migrations/setup/deploy scripts, mutate remote D1/R2/schema/ledger, alter Access/secrets/DNS, or bypass Access.
+- Synthetic fixture screenshots only prove the local UI fixture. Do not claim business/backend acceptance from them.
+
+
 ## Quy tắc vận hành bắt buộc
 
 1. Không chờ CI/deploy một cách thụ động: trong thời gian chờ, rà soát độc lập ở khu vực an toàn; sau đó quay lại kiểm tra kết quả thực tế.
