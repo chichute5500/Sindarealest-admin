@@ -313,6 +313,7 @@ function makeArtPauseHarness(reducedMotion = false) {
     '#artNext': makeElement(),
     '#artPause': makeElement()
   };
+  if (reducedMotion) delete elements['#artPause'];
   const intervals = [], clearedIntervals = [];
   class FakeImage {
     set src(value) { this._src = value; }
@@ -350,6 +351,23 @@ assert.equal(artAuto.intervals.length, 2, 'resuming must start a fresh interval 
 assert.equal(artAuto.context.artTimer, artAuto.intervals[1]);
 assert.equal(artPause.attributes['aria-pressed'], 'false');
 const reducedArt = makeArtPauseHarness(true);
+assert.equal(typeof artAuto.elements['#artPrev'].listeners.click, 'function',
+  'previous navigation must remain available with the pause control');
+const missingPause = makeArtPauseHarness(false);
+delete missingPause.elements['#artPause'];
+
+const missingPauseContext = {
+  products: [{ category: 'sneakers' }],
+  uniqueImages: () => ['images/a.webp'],
+  window: { matchMedia: () => ({ matches: false }) },
+  document: { hidden: false }, Image: class { set src(value) { this._src = value; } },
+  artIndex: 0, artTimer: null, $: selector => missingPause.elements[selector] || null,
+  setInterval() { throw new Error('slideshow must not start when a required control is absent'); },
+  clearInterval() {}, clearTimeout() {}, setTimeout() { return 1; }
+};
+const missingPauseSetup = vm.runInNewContext(artPauseSetup, missingPauseContext, { timeout: 1000 });
+assert.doesNotThrow(() => missingPauseSetup(), 'slideshow setup must safely abort if any required control is missing');
+
 assert.equal(reducedArt.intervals.length, 0, 'reduced-motion must continue to disable autoplay');
 assert.equal(reducedArt.elements['#artPause'].disabled, true, 'reduced-motion users must not be offered an autoplay-resume action');
 assert.match(reducedArt.elements['#artPause'].attributes['aria-label'], /tắt theo cài đặt giảm chuyển động/);

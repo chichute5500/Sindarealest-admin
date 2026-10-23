@@ -1344,6 +1344,10 @@ function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
  const imgs=uniqueImages(sneakerProducts);
  if(!imgs.length)return;
+ const pauseButton=$('#artPause');
+ const previousButton=$('#artPrev');
+ const nextButton=$('#artNext');
+ if(!pauseButton||!previousButton||!nextButton)return;
  const reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
  let pool=imgs.slice();
  if(!reduceMotion)pool.sort(()=>Math.random()-.5);
