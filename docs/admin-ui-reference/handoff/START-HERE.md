@@ -30,7 +30,7 @@
 - Keep active consumers and distinct payment contracts. `normalizeFulfillmentType` is canonical in `functions/_lib.js`. No further deletions or route/helper merges without new evidence.
 
 ## Next actions
-1. Continue remaining screen acceptance using artifact 367 and the approved reference where direct comparison is possible; fix only reproducible issues.
+1. Continue remaining screen acceptance using artifact admin-preview-evidence-374 (run 39906240167) and the approved reference where direct comparison is possible; fix only reproducible issues.
 2. Obtain an authorized authenticated Preview path before testing persistence. Never bypass Cloudflare Access or substitute fixtures for backend evidence.
 3. Keep all 12 screens PARTIAL_NOT_ACCEPTED until behavior and reference evidence supports acceptance; do not chase evidence-child SHAs with metadata-only commits.
 
