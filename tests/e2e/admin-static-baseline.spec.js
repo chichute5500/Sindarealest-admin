@@ -2551,8 +2551,6 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(cardLayout.left, 'Mobile activity cards should stay within the viewport').toBeGreaterThanOrEqual(-1);
         expect(cardLayout.right, 'Mobile activity cards should not cross the viewport edge').toBeLessThanOrEqual(width+1);
         expect(cardLayout.scrollWidth, 'Mobile activity cards must not have internal horizontal overflow').toBeLessThanOrEqual(cardLayout.clientWidth+1);
-        const searchWidth = await page.locator('#activityLogSearch').evaluate(el => el.getBoundingClientRect().width);
-        expect(searchWidth, 'Activity-log search must have a usable full-width row on mobile').toBeGreaterThanOrEqual(width * 0.65);
       } else {
         await expect(page.locator('.activity-log-table-wrap')).toBeVisible();
       }
@@ -2560,6 +2558,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (width <= 680) {
         await advancedToggle.click();
         await expect(advancedToggle).toHaveAttribute('aria-expanded', 'true');
+        const searchWidth = await page.locator('#activityLogSearch').evaluate(el => el.getBoundingClientRect().width);
+        expect(searchWidth, 'Expanded activity-log search must have a usable full-width row on mobile').toBeGreaterThanOrEqual(width * 0.65);
       }
       await expect(page.locator('#activityLogSearch')).toBeVisible();
       await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');
