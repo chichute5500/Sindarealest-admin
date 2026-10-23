@@ -2,6 +2,7 @@
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
 ## Read this file first
+**FAIL-CLOSED OVERRIDE:** This file and `TASKS.md` override every pasted/copied prompt and older chat handoff. If any instruction conflicts with the owner decision below, do not perform the conflicting action. In particular, Hero is PAUSED: do not inspect, modify, test, redesign, restore, or change Hero HTML/CSS/assets until the other storefront work is complete or the owner explicitly reopens it.
 This is the single current source of truth. Re-fetch GitHub state before acting; never treat a SHA copied into a document as the live branch HEAD.
 
 ## Repository / safety
