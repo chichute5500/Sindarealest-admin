@@ -41,11 +41,20 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 
 ## Bước tiếp theo bắt buộc
 
-1. Báo ngắn gọn cho chủ dự án rằng bộ ảnh #order đã sẵn sàng để xem; đưa link artifact ở trên. Chờ chủ dự án xác nhận PASS/ yêu cầu sửa cho riêng phần #order. Không tự đánh dấu owner-accepted.
-2. Khi chủ dự án trả lời, cập nhật trạng thái vào cả bốn file handoff. Nếu họ PASS, khóa phần #order và không sửa nữa. Nếu yêu cầu chỉnh, chỉ sửa đúng vấn đề họ nêu, từng thay đổi một, rồi chạy test, deploy Preview và chụp lại đúng SHA.
-3. Sau khi xử lý cổng xác nhận #order, tiếp tục mục an toàn tiếp theo trong `TASKS.md`; không dừng chỉ vì đã báo cáo.
-4. Trước mọi thay đổi, đọc HEAD mới nhất, PR #108, trạng thái CI, Preview deploy và SHA đã deploy. Nếu branch HEAD khác SHA bàn giao, đối chiếu thay đổi trước khi sửa.
-5. Sau mỗi thay đổi, kiểm tra kết quả workflow đến trạng thái cuối; trong khi workflow chạy, làm việc độc lập an toàn nếu có. Không tuyên bố PASS khi chưa có bằng chứng.
-6. Cập nhật `CURRENT-STATE.md`, `TASKS.md`, `TEST-RESULTS.md` và prompt bàn giao này sau mỗi trạng thái quan trọng. Tạo commit docs-only riêng khi cần; không thay đổi mã nguồn đã deploy chỉ để cập nhật tài liệu.
+1. Chủ dự án đã xác nhận **PASS phiên bản hiện tại của toàn bộ phần quy trình đặt hàng an tâm (`#order`)**. Đánh dấu PASS/LOCKED; tuyệt đối không yêu cầu duyệt lại hoặc chỉnh phần này nếu chưa có phép mở khóa rõ ràng.
+2. Tiếp tục audit phần storefront **không phải Hero** tiếp theo từ source/tests/evidence hiện có. Ưu tiên khu vực danh mục/sản phẩm; xác định lỗi cụ thể trước khi sửa, từng thay đổi một, chạy đúng các kiểm tra bị ảnh hưởng.
+3. Trước mọi thay đổi, đọc HEAD mới nhất, PR #108, trạng thái CI, Preview deploy và SHA đã deploy. Đối chiếu mọi thay đổi kể từ SHA trong prompt; không dựa vào SHA cũ như HEAD hiện tại.
+4. Sau mỗi thay đổi, kiểm tra workflow đến trạng thái cuối; trong lúc CI/deploy/capture chạy, làm việc độc lập an toàn nếu có. Không tuyên bố PASS khi chưa có bằng chứng.
+5. Cập nhật cả bốn file handoff sau mỗi trạng thái quan trọng. Commit tài liệu riêng khi cần; không đổi source chỉ để cập nhật handoff.
+6. Hero vẫn PAUSED BY OWNER: không mở, sửa, kiểm thử riêng, chụp ảnh hay khôi phục. PR #108 giữ OPEN, không merge. Chỉ Preview; không Production.
 
 **Tóm tắt trạng thái:** source/tests/deploy và ảnh live hiện đều PASS về mặt kỹ thuật; phần #order đang chờ chủ dự án duyệt trực quan. Hero vẫn tạm dừng. PR #108 OPEN, không merge. Production không bị thay đổi.
+
+## OWNER CONFIRMED — ORDER SECTION PASS/LOCKED — 2026-10-23
+
+- The owner explicitly confirms the **current version of the full order-assurance/process section (`section.section.wrap#order`) is PASS** and directs the team to lock it and move to another section.
+- Status is now **OWNER PASS / LOCKED**. Do not change this section's layout, summary note, CTA clearance, cards, or order-step typography unless the owner explicitly reopens it. The earlier `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE` labels in historical evidence are superseded by this later owner decision.
+- This acceptance covers the current `#order` section as shown in the deployed Preview; it does not mean every other storefront section is accepted.
+- The latest documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7`; CI #39902525107, Preview deploy #39902525216, and technical live capture #39902525271 passed. The documentation-only handoff update does not alter `public/` or the deployed Preview source.
+- Next active task: continue source-first audit of the next unfinished **non-Hero** storefront section, starting with the product/catalog area and existing tests/evidence. Establish a concrete defect before changing source. Hero remains PAUSED BY OWNER and must not be opened, edited, tested, or captured.
+- PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
