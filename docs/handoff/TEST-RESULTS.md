@@ -1,3 +1,16 @@
+## LATEST TEST RECORD — FAVORITES LEGACY-KEY MIGRATION — 2026-10-24
+
+- Source/test SHA: `384e0b503416d9fa0395fd1d485ac522259c913a`.
+- Defect basis: the lookup function had an SKU fallback, but normalization preserved the old SKU string rather than canonicalizing to `favoriteKey(product)`. A legacy SKU and canonical ID could survive as duplicate entries, and `isFavorite(favoriteKey(product))` could disagree with the saved legacy SKU.
+- Fix: canonicalize every resolvable record, drop stale keys, deduplicate via `Set`, compare normalized sequence, and write localStorage only when changed.
+- Regression assertions: case-insensitive legacy SKU and canonical ID collapse to one canonical key; stale key removed; storage receives normalized JSON; saved-heart lookup agrees; counter and list each refresh once.
+- Full project validation, dependency audit and complete automated test suite PASS: [CI run #39993582024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993582024).
+- Cloudflare Pages Preview deploy PASS on the exact workflow SHA: [run #39993581910](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993581910). Immutable URL https://e831f6dd.sindarealest2.pages.dev/. The log confirms `sindarealest2`, Production branch `main`, and `--commit-hash=$GITHUB_SHA` on this run SHA.
+- Capture/manual visual acceptance: NOT PERFORMED. The Liquid Glass visual workflow and non-Hero order audit were skipped; no locked scope was reopened or inspected.
+- No changes to Admin/backend/API/auth, catalog data, D1/R2, secrets, bindings, DNS, Access, infrastructure or real-payment flow. PR #108 OPEN/unmerged; no Production deployment.
+
+---
+
 ## LATEST EXACT-SHA RESULT — WARRANTY CLAIM FOCUS TRANSITION — 2026-10-23 23:31 ICT
 
 - Source/test/deployed Preview SHA: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`.
