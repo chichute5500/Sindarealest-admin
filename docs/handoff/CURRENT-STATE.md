@@ -1,3 +1,23 @@
+## OWNER LATEST STATUS — REMAINING WORK CLARIFIED — 2026-10-24
+
+**Only active owner-reported defect:** mobile product image fullscreen/gallery still occasionally flickers 1–2 times. Owner confirms it is markedly improved, but not completely fixed. Do not mark fullscreen gallery complete until the owner rechecks a newer Preview and accepts it.
+
+**All other areas are PASS / LOCKED per the owner's latest instruction. Do not treat historical audit notes below as open tasks.** This includes:
+- Mobile cart/account entry points: owner says current behavior is stable; keep their open/close handlers working.
+- Shared icon/Liquid Glass appearance, press feedback, dimensions and accepted controls.
+- Catalog Liquid Glass filter controls/chips/icons/height/effects; do not restore the removed standalone product-status filter panel.
+- `#order` / “Đặt hàng an tâm”.
+- Warranty claim form and warranty lookup flow; do not demand fake warranty code/phone or reopen this area.
+- Hero: PAUSED BY OWNER; never inspect, capture, edit or include in a visual workflow.
+- Previously completed storefront behavior fixes: mobile navigation focus/history, welcome dialog keyboard handling, gallery focus handling, warranty-form focus transfer, favorites legacy-key normalization, collection slideshow pause/reduced-motion/missing-control guard, stale-cart cleanup/badge sync, Zalo cart consultation copy/fallback, fullscreen product share fallback.
+- Other visual parity/icon audits from older handoffs are superseded by the owner's latest acceptance; do not reopen unless the owner reports a concrete issue or explicitly unlocks it.
+
+**Next chat's exact scope:** inspect current gallery source/tests, find a reproducible cause for the remaining fullscreen flicker (atomic image swap, image load/decode timing, stale/racing next/previous requests, resize/orientation or background/layer flash); add a meaningful regression test; make the smallest fix; run focused tests and full CI; deploy Preview only and verify exact SHA; give the owner the new Preview URL for fullscreen-only retest. Do not ask the owner to retest cart/account or accepted sections.
+
+Keep PR #108 OPEN/unmerged, base `main`; no Production deploy, no changes to `main`, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access/infrastructure/payment. Automated tests and deploy are not visual acceptance. Do not claim Playwright/browser verification unless actually run and evidenced.
+
+---
+
 ## LATEST VERIFIED STOREFRONT FIXES — CART DATA + PRODUCT SHARE FALLBACK — 2026-10-24
 
 - Final combined source/test SHA: `5f86282be26c34f4cf0587f36be8011b9d1d46ec`. PR #108 remains OPEN/unmerged, base `main`.
