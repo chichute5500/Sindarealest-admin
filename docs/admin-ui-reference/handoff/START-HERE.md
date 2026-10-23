@@ -3,20 +3,15 @@
 ## Mandatory live-state check
 Before any work, fetch live GitHub branch HEAD, PR #111/#108 state, and the latest Actions runs for the current source SHA. Treat the checkpoint below as historical context only until those live refs are revalidated; never trust an older recorded checkpoint as current.
 
-## Live checkpoint — 2026-10-23 05:34 UTC
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Live branch HEAD at the start of this sync: `a5d0076eda669b670b3de9ba4da2069c25f149f2`; exact source/test SHA verified by Actions: `a4e2508235cb928568992f8dba408acc913f2baf`. The evidence child and handoff-only commits are not new application-source tests.
-- [Admin Preview diagnostics #39906240167](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167) **SUCCESS** on exact source/test SHA `a4e2508235cb928568992f8dba408acc913f2baf`: `npm run check`, `npm test`, and the local Playwright screenshot matrix all PASS. Artifact [admin-preview-evidence-374](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39906240167/artifacts/12481355528): 132 generated PNGs, 120 fixture module captures, 112 fixture metrics (archive also includes the approved reference PNG). This is local source/read-only fixture evidence; deployed diagnostic confirms the login-shell CSS signature only.
-- Screen 12 Activity Log/Notifications tabs and regression assertion are fixed and pass on the exact SHA. The prior test failure was an assertion mismatch: it expected internal event key `product_updated`, while the rendered UI correctly showed `Đã sửa sản phẩm`.
-- PR #111 remains OPEN/unmerged; branch head at checkpoint `a5d0076eda669b670b3de9ba4da2069c25f149f2`. PR #108 remains OPEN/unmerged/read-only at `c0dcfa6ff60519dc78bc9aef5aaed10cdf2763dc`. `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; no merge or production deployment.
-- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Live checkpoint — 2026-10-23 06:04 UTC
+- Live writable branch HEAD at sync: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`. This is the source/test commit containing the mobile product-gallery compaction and current test assertions; re-fetch live HEAD/PR/Actions before any further action because Preview can add an evidence-only child commit.
+- **Validate #39909118547: SUCCESS** on exact SHA `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`: source checks and unit tests pass. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547).
+- **Admin Preview #39909118491: IN_PROGRESS** on exact SHA `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; last observed active step was “Install Chromium for Playwright.” This is a slow dependency setup step, not yet evidence of a permanent hang. [Live run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491). Do not claim screenshot matrix pass until this run completes.
+- Previous Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) failed the local fixture matrix at 320px: expected thumbnail rail scroll width >288px, measured 284px (client width 264px; overflow 20px). This was a stale assertion threshold, not a browser crash. Commit `a3f5f28025efb6ebfc308e3f11a6239565cdfff2` lowers the required overflow from >20px to >10px. Validate is green; the new Preview must confirm the change.
+- Recent mobile gallery change on source commit `21b60398eec70e37e6586e947399441f81505aaa`: cover ratio 1.75, smaller thumbnails/gaps/control buttons, to fit upload controls above sticky footer. Test now asserts the full upload zone fits above footer at 390×844. Do not mark the gallery accepted until new Preview screenshot/metrics confirm it.
+- PR #111 is OPEN/unmerged, head `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`, 418 changed files (+40,048/-212), mergeability reported false; PR #108 is OPEN/unmerged and read-only, head `0e4a1d5eef3662951b3ce182c8bbf154467a8866`, 291 changed files. `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge or production deployment.
+- B1 PR #111 cleanup/provenance review remains COMPLETE; do not repeat it absent new evidence. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 ## Canonical handoff
-- [Prompt for next chat](PROMPT-NEXT-CHAT.md)
-- [Latest status](LATEST-STATUS.md)
-- [Current status JSON](current-status.json)
-- [Latest test results](latest-test-results.json)
-- [PR #111 scope/provenance audit](PR-111-SCOPE-AUDIT.md)
-- [12-screen acceptance audit](12-SCREEN-REFERENCE-AUDIT.md)
-- [Evidence retention policy](history/README.md)
 
 ## Historical checkpoint (2026-10-23 04:07 UTC; superseded by newest verified checkpoint above)
 - Writable branch HEAD is evidence-only child `1596bbd07c2257f19ecad9b2f77a7a45e9161cd0`; application/source-test SHA is `000d3d84a9cf8c63144388f80879b5cc1439d161`. Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) and Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) both **SUCCESS on the exact same source/test SHA**. The child stores generated history and is not a new application-source revision.
