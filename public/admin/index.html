@@ -823,10 +823,21 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 
 /* Screen 12: compact the redundant heading on very narrow mobile screens so the first record stays above fixed navigation. */
 @media(max-width:360px){
-  #main .pagehead:has(+ .activity-view-tabs){align-items:center;margin-bottom:10px}
+  #main .pagehead:has(+ .activity-view-tabs){align-items:center;margin-bottom:4px}
   #main .pagehead:has(+ .activity-view-tabs) .eyebrow,
   #main .pagehead:has(+ .activity-view-tabs) p{display:none}
   #main .pagehead:has(+ .activity-view-tabs) h2{font-size:23px;margin:0}
+  .activity-view-tabs{gap:3px;padding:3px;margin-bottom:5px}
+  .activity-view-tabs .warranty-filter-button{min-height:28px;padding:4px 5px;font-size:9px}
+  .activity-view-tabs + .panel{margin-bottom:5px!important}
+  .activity-view-tabs + .panel > .panelhead{display:none}
+  .activity-view-tabs + .panel > .panelbody{padding:0 8px 8px}
+  .activity-log-category-filters{gap:4px;padding:0 0 4px}
+  .activity-category-chip{min-height:24px;padding:4px 7px;font-size:10px}
+  .activity-log-reference-filters{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:4px;margin-bottom:4px}
+  .activity-log-reference-filters .field:first-child{grid-column:auto}
+  .activity-log-reference-filters .control{min-height:28px;padding:3px 4px;font-size:9px}
+  .activity-advanced-toggle{width:auto;min-height:24px;margin:0;padding:4px 6px;font-size:9px}
 }
 
 /* Screen 10: match the approved compact mobile settings layout without changing save behavior. */
