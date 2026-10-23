@@ -7,7 +7,7 @@
   "codeTestSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "VALIDATE_PASS_PREVIEW_IN_PROGRESS",
+  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
     "id": 39928772341,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39928772341",
@@ -217,10 +217,11 @@
     "exactReferenceParity": "NOT_VERIFIED"
   },
   "nextActions": [
-    "Recheck Preview run #39928772347 and inspect its exact conclusion/logs.",
-    "If Preview completes successfully, inspect its artifact/screenshots on source SHA 81a458404b950eb0087da4b89f9a98c4af59fe99; if it fails, diagnose the exact failing step before changing code.",
-    "After the Preview result is known, re-synchronize and re-verify all five handoff files.",
-    "Do not repeat completed B1 cleanup or prior Vietnamese audit actor localization. Keep PRs open, do not deploy, and do not mutate remote data/Cloudflare settings."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -232,23 +233,23 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "testedCommitSha": "81a458404b950eb0087da4b89f9a98c4af59fe99",
-  "capturedAt": "2026-10-23T09:10:00Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+  "latestCodeCommitSha": "7d72b42414a019a83e3cc279fc0b95e6d55d2e2b",
+  "testedCommitSha": "7d72b42414a019a83e3cc279fc0b95e6d55d2e2b",
+  "capturedAt": "2026-10-23T09:17:21.939Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39930305862",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
     "localStaticPlaywrightBaseline": "PASS",
-    "playwright": "IN_PROGRESS_CHROMIUM_INSTALL_ON_PREVIEW_39928772347",
-    "playwrightPreviewDiagnostics": "NOT_RUN_YET",
-    "deployedPreview": "NOT_RUN_YET",
-    "responsiveViewports": "NOT_RUN_YET",
-    "lightMode": "NOT_RUN_YET",
-    "darkMode": "NOT_RUN_YET",
+    "playwright": "PASS",
+    "playwrightPreviewDiagnostics": "success",
+    "deployedPreview": "PASS",
+    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
+    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
+    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
+    "automatedTests": "PASS",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED",
     "sourceValidation": "PASS_ON_81a458404b950eb0087da4b89f9a98c4af59fe99",
@@ -269,9 +270,9 @@
     "exactReferenceParity": "NOT_VERIFIED"
   },
   "latestLocalEvidence": {
-    "runId": 39925598940,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
-    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "runId": 39930305862,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39930305862",
+    "sourceCommit": "7d72b42414a019a83e3cc279fc0b95e6d55d2e2b",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -279,37 +280,30 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-401",
+    "screenshotArtifact": "admin-preview-evidence-403",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
     "httpErrors": [],
-    "fixtureVisualAuditConsoleEntries": 7,
-    "fixtureVisualAuditConsoleNote": "7 expected simulated HTTP 503 retry-path entries from the local retry fixture; fixtureApiErrors=0.",
     "attemptedWrites": [],
     "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND READ-ONLY SYNTHETIC UI-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND",
-    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
+    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "latestScreenshotArtifact": {
-    "name": "admin-preview-evidence-401",
-    "id": 12489985219,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
-    "runId": 39925598940,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
-    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "runId": 39930305862,
+    "name": "admin-preview-evidence-403",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39930305862",
+    "sourceCommit": "7d72b42414a019a83e3cc279fc0b95e6d55d2e2b",
     "screenshotCount": 132,
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "sha256Digest": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4",
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
     "Preview #39928772347 has not completed Chromium installation; screenshot matrix, deployed Preview diagnostics and artifact upload remain pending.",
-    "All 12 screens remain PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
-    "Historical Cloudflare Access root cause remains UNCONFIRMED."
+    "All 12 screens remain PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED."
   ],
   "blockedItems": [
     "Authenticated backend workflows require authorized Preview access; do not bypass Cloudflare Access or change secrets.",
