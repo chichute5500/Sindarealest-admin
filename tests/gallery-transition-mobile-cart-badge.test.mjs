@@ -216,7 +216,6 @@ function assertExactlyOneActivePhoto(images, expected) {
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[1].resolve(); await flushGalleryMicrotasks();
-  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
   assert.equal(gallery.images[1].getAttribute('src'), 'newer.jpg',
     'A stale decode must never replace the latest requested next/previous photo.');
