@@ -88,8 +88,12 @@ assert.match(html, /\.checkout-drawer\{position:fixed;z-index:186;[^}]*backgroun
 assert.match(html, /function dismissToast\(\)/, 'Drawers must be able to dismiss a toast before it overlaps their action area.');
 assert.match(html, /function showToast\(msg,link=null\)\{const t=\$\('#toast'\);const panelOpen=\['#cartDrawer','#checkoutDrawer','#accountDrawer'\]/, 'Toast display must be suppressed while blocking cart, checkout, or account panels are open, but a successful add can announce itself above the product detail overlay.');
 assert.ok((html.match(/function showToast\(msg,link=null\)[^\n]*/)?.[0] || '').includes("t.classList.toggle('toast-detail-context',Boolean($('#productOverlay')?.classList.contains('open')))"), 'The product detail overlay may reposition, but must not suppress, a truthful add-to-cart success toast.');
-assert.match(html, /function openCart\(\)\{dismissToast\(\)/, 'Opening the cart must clear a previously displayed toast.');
+assert.ok(html.includes("function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast()"), 'Opening the cart must record its invoker and clear a previously displayed toast.');
 assert.match(html, /function openCheckout\(\)\{\s*dismissToast\(\)/, 'Opening checkout must clear a previously displayed toast.');
+assert.ok(html.includes("requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})}"), 'Opening the cart must place keyboard focus inside the active dialog.');
+assert.ok(html.includes("function closeCart(restoreFocus=true)"), 'Closing the cart must support restoring keyboard focus to its invoker.');
+assert.ok(html.includes("closeCart(false);$('#cartDrawer').setAttribute('inert','')"), 'Moving from cart to checkout must not return focus behind the active checkout dialog.');
+assert.ok(html.includes("closeCheckout(false);closeCart(false);closeDetail(false,false)"), 'Opening account from the cart must not steal focus by restoring the closed cart.');
 assert.match(html, /\$\('#cartCheckout'\)\.addEventListener\('click',openCheckout\)/, 'Checkout must be reachable from the cart CTA.');
 
 const accountStart = html.indexOf('<aside class="account-drawer glass" id="accountDrawer"');
