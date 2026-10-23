@@ -168,9 +168,9 @@ assert.match(storefrontHtml, /\.mobile-tab\.is-active\{color:var\(--nav-ink\);bo
 assert.match(storefrontHtml, /html\.dark \.mobile-tab\.is-active\{background:rgba\(13,39,58,\.97\)\}/,
   'The selected mobile tab must retain a clear navy glass state in dark mode.');
 assert.match(storefrontHtml, /html\.dark \.mobile-bottom-nav\{background:rgba\(5,22,38,\.82\);border-color:rgba\(174,207,231,\.34\)\}/,
+  'Mobile bottom navigation must retain a readable translucent navy glass surface in dark mode.');
 assert.match(storefrontHtml, /@media\(max-width:380px\)\{#order\{padding-bottom:calc\(88px \+ env\(safe-area-inset-bottom\)\)!important\}\}/,
   'Narrow mobile order details must reserve space below the assurance/CTA area so the fixed bottom navigation cannot cover it.');
-  'Mobile bottom navigation must retain a readable translucent navy glass surface in dark mode.');
 assert.ok(storefrontHtml.includes('linear-gradient(118deg,rgba(225,241,255,.72),rgba(211,231,249,.68) 52%,rgba(237,247,255,.74))'),
   'The final light glaze must leave medium crocodile-texture visibility instead of washing the background flat.');
 assert.match(storefrontHtml, /\.theme-bg--light::after\{[^}]*rgba\(239,247,255,\.68\)/,
