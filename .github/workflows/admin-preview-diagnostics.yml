@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: admin-preview-diagnostics-${{ github.ref }}
+  group: admin-preview-diagnostics-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
