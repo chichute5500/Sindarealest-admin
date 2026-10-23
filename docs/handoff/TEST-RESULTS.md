@@ -443,3 +443,12 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - These are static checks. They do not assert live visual parity, manual browser/device acceptance, or owner PASS. The latest Preview deploy corresponds to source/test SHA `3540e4c...`; the current branch HEAD is later due to handoff-only updates.
 - Cart-dialog keyboard behavior has regression coverage and passing CI: focus placement on open, Tab/Shift+Tab containment, focus restoration on close, and avoiding focus theft during cart-to-checkout/account transitions.
 - The catalog-filter visual workflow was skipped on recent storefront pushes and remains manual-only with explicit owner authorization plus repository unlock. Do not inspect or change the locked catalog-filter item.
+
+
+## VERIFICATION RECORD — 2026-10-23 23:05 ICT
+- Re-fetched live branch: `9c6311d94b4fd3040f876c686973f227d3fce2fa`; PR #108 is OPEN, unmerged, base `main`.
+- Latest known source/test SHA with successful full CI: `abd7c42b5371bce7bfa4d90977e414139547f392`, [CI #39982751954](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751954) PASS. Preview deploy on that exact SHA: [#39982751719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751719) PASS, immutable URL https://e9f95857.sindarealest2.pages.dev/.
+- Latest HEAD is handoff-only and has not itself been validated as a new storefront deploy. Do not conflate docs HEAD with source/test/deployed SHA.
+- Mobile navigation focus regression coverage includes backdrop focus return to `#menuToggle` and focus transfer to destination heading/target after link activation. No live browser/manual acceptance is recorded for these changes.
+- Static audit on source SHA: 23 internal fragments resolve; 22 images have alt; 6 target-blank links have rel; 0 duplicate IDs. These are source checks, not live acceptance.
+- Continue source-first review only in unlocked scopes. Hero PAUSED; `#order` and catalog filter Liquid Glass/height locked; Preview only; no Admin/backend/API/auth/data/config or Production; PR #108 OPEN/unmerged.

@@ -317,3 +317,12 @@ Guardrails unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; keep the
 - CART-DIALOG-KEYBOARD-ACCESSIBILITY remains COMPLETE — CI/Preview PASS at SHA above. Do not alter behavior without a concrete regression.
 - Next work: read current-state and test results, re-fetch GitHub state, then audit a safe non-locked section only if a concrete defect is identified. No speculative CSS changes.
 - Locked boundaries unchanged: Hero paused; `#order` and catalog-filter chip height/Liquid Glass are owner PASS/LOCKED; no Admin/backend/API/auth/data/config or Production; PR #108 stays open/unmerged. Catalog visual audit requires explicit owner unlock.
+
+
+## NEXT WORK QUEUE — refreshed 2026-10-23 23:05 ICT
+1. Start by checking live branch HEAD, PR #108, recent Actions, and the exact Preview deployment SHA; current handoff HEAD at refresh is `9c6311d94b4fd3040f876c686973f227d3fce2fa`, while last known source/test PASS is `abd7c42...`.
+2. Mobile navigation focus changes are CI/Preview PASS, but live browser/manual visual acceptance is not recorded. If an authorized browser/capture path is available without bypassing Access, validate focus behavior; otherwise state the blocker accurately and continue safe source-first audit.
+3. Audit only unlocked storefront behaviors and test contracts. Confirm a concrete defect before code changes; prefer small targeted test-backed fixes.
+4. After a source change, run CI/full tests, wait for Preview deploy, verify deployed SHA/public tree, inspect workflow evidence, then update all four handoff docs. Do not claim live browser or visual PASS based on CI/deploy alone.
+5. Never inspect/edit/test/capture Hero; never touch or retest `#order` or catalog filter height/Liquid Glass. Do not trigger the locked catalog audit without explicit owner reopening plus both required unlocks.
+6. PR #108 stays OPEN/unmerged; Preview only; no Production/Admin/backend/API/auth/data/config changes.

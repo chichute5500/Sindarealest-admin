@@ -349,3 +349,51 @@ Continue the existing project. Do not restart and do not ask the owner to repeat
 6. Hard rules: Hero PAUSED BY OWNER—never inspect/edit/test/capture/restore. `#order` OWNER PASS/LOCKED—never touch/retest. Catalog filter chip height/Liquid Glass OWNER PASS/LOCKED—never touch/retest unless explicitly reopened. Never restore the removed dedicated product-status filter panel. No Production deploy, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes. Keep PR #108 open and unmerged.
 7. Catalog filter visual audit is manual-only and requires both workflow input `owner_authorized=true` and repo variable `CATALOG_FILTER_AUDIT_UNLOCKED=true`; do not trigger it absent explicit owner reopening.
 8. Continue autonomous work after any report. Choose the next safe non-locked section, establish a concrete defect before editing, run impacted checks, deploy Preview only where appropriate, verify exact SHA and evidence, then update all four handoff files. Keep source tests, deployment, live screenshots, and owner visual acceptance separate; never claim visual PASS without evidence or owner approval.
+
+
+---
+
+# AUTHORITATIVE NEXT-CHAT PROMPT — REFRESHED 2026-10-23 23:05 ICT
+
+Continue the existing SinDarealest2 project directly from GitHub. Do not restart and do not ask the owner to repeat context.
+
+## Repository / live state
+- Repo: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — must remain OPEN and UNMERGED; base `main`.
+- Live branch/PR head at this refresh: `9c6311d94b4fd3040f876c686973f227d3fce2fa` (handoff/docs-only commit).
+- Latest known source/test SHA with passing full CI and Preview deployment: `abd7c42b5371bce7bfa4d90977e414139547f392`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751954
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39982751719
+- Immutable Preview: https://e9f95857.sindarealest2.pages.dev/
+- Branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Re-fetch current HEAD, PR state, latest Actions and deployment SHA at the start of the next chat. Do not assume a docs-only HEAD was deployed.
+
+## Latest work and evidence
+- Mobile navigation backdrop dismissal returns focus to `#menuToggle`.
+- Activating a mobile navigation link closes the drawer and focuses the destination heading (or destination target fallback), not a now-hidden drawer link.
+- Regression contracts: `tests/mobile-navigation-contract.test.mjs`.
+- Full CI and Preview deployment passed on exact source/test SHA `abd7c42...`.
+- Static source scan: 23 internal fragment links / 0 missing targets; 22 image tags / 0 missing alt; 6 target-blank links / 0 missing rel; 0 duplicate IDs.
+- Important distinction: no live browser/manual visual acceptance was recorded for the newest mobile focus behavior. Do not claim it passed visual/browser acceptance.
+
+## Required work protocol
+1. Read `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS.md`, `docs/handoff/TEST-RESULTS.md`, and this prompt.
+2. Re-fetch live GitHub state before acting.
+3. Continue autonomously after reports; do not stop just because a status update was delivered. While CI/deploy runs, do a separate safe review and then return to check results.
+4. Audit safe, unlocked storefront sections source-first. Establish a concrete reproducible defect before editing; avoid speculative changes.
+5. After a code/test change: run impacted tests and full CI, wait for Preview deploy, verify exact source/deployed SHA and public-tree equivalence, inspect artifacts/logs, then update all four handoff files.
+6. Keep CI PASS, Preview deploy PASS, live browser/screenshot PASS, and owner visual acceptance as separate gates. Never overstate evidence.
+7. Stop and ask the owner only when a real owner decision, explicit unlock, or user-side action is necessary.
+
+## Hard locks / non-negotiable safety
+- HERO: PAUSED BY OWNER. Do not inspect, edit, test, redesign, restore, screenshot, or capture it.
+- `#order` / “Đặt hàng an tâm”: OWNER PASS / LOCKED. Do not touch or retest.
+- Catalog filter Liquid Glass/chip height/controls: OWNER PASS / LOCKED. Do not touch or retest unless the owner explicitly reopens it.
+- Never restore the removed dedicated “Tình trạng sản phẩm” filter panel; product status stays as per-product metadata.
+- Catalog visual audit requires explicit owner reopening and both `owner_authorized=true` and `CATALOG_FILTER_AUDIT_UNLOCKED=true`. Do not trigger it otherwise.
+- No Production deploy; no `main` changes; no Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+- PR #108 must stay OPEN/unmerged.
+
+## Immediate next action
+Re-fetch current branch, PR and Actions/deployment metadata; verify the latest source/deployed SHA. Then continue safe source-first audit on an unlocked area, fix only a concrete defect, and maintain all four handoff files. If browser acceptance is unavailable, record it as pending rather than pretending it passed.
