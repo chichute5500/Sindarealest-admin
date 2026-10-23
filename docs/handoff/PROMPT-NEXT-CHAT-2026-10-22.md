@@ -91,3 +91,10 @@ Continue the next concrete audit outside Hero. Hero remains PAUSED BY OWNER: do 
 - Exact source/deployment live capture at `08017a955fa42081e59457397b210a26b6038f6d`: [run #39899486321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321), artifact [#12477679857](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321/artifacts/12477679857). 8/8 captures, no runtime/same-origin HTTP errors; CTA is clear at 360px in Light and Dark. Latest `d2123c6` changes only the test file relative to capture SHA; storefront HTML is identical.
 - The order-section capture is evidence only; broader owner visual acceptance remains pending. Hero is PAUSED BY OWNER; order-step heading typography is PASS/LOCKED; PR #108 remains OPEN/unmerged; Preview only.
 - Next action: request/rely on owner review of the updated order-section capture before closing this acceptance item; after that, continue the next non-Hero section. Do not edit Hero or the locked heading.
+
+
+## Handoff addendum — verified 2026-10-23 04:29 UTC
+
+Latest source/test SHA: `82fe8a3d41289ca308748bd7a7f326737326f457`. Added an explicit accessible name to catalog search and a regression assertion. CI PASS [#39900425348](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425348); Preview deployment PASS [#39900425331](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425331). Exact deployment `https://1142d16c.sindarealest2.pages.dev`, alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
+
+Order-only current-SHA capture [#39900425363](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425363) was still installing Chromium; no screenshots/artifact confirmed. Do not claim current-SHA visual verification until complete. Hero remains paused; no Hero edits/captures, merge or Production deployment. PR #108 remains OPEN/unmerged.

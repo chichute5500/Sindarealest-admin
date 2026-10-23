@@ -129,3 +129,10 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - Final tested/deployed SHA: `d2123c60203cba768ac91555262707139f24f5c7`. CI [#39899622059](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899622059) PASS; Preview deployment [#39899622020](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899622020) PASS. Live Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
 - Live non-Hero capture [#39899486321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321), artifact [#12477679857](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321/artifacts/12477679857), captured source/deployment SHA `08017a955fa42081e59457397b210a26b6038f6d`. Final SHA `d2123c6` differs only in the test file, and the public HTML is unchanged. Eight captures succeeded; zero runtime and same-origin HTTP errors; CTA clear in 360px Light/Dark screenshots.
 - Do not treat screenshot success as owner acceptance: broader order-section visual acceptance is still pending. Hero remains paused; the order-step heading remains owner PASS/LOCKED. PR #108 must stay open/unmerged; Preview only. Continue only after the required owner review for this acceptance item, while keeping Hero untouched.
+
+
+## Verified status update — 2026-10-23
+
+- `82fe8a3d41289ca308748bd7a7f326737326f457` labels the catalog search input explicitly (`aria-label="Tìm theo tên sản phẩm hoặc mã SKU"`) and includes a regression assertion.
+- CI PASS [#39900425348](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425348). Preview deployment PASS [#39900425331](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425331); exact deployment `https://1142d16c.sindarealest2.pages.dev`, alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
+- Current-SHA order-only live capture [#39900425363](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425363) remains in progress during Chromium installation; no artifact available yet. Owner visual acceptance of order section remains pending. Hero paused, PR open/unmerged.

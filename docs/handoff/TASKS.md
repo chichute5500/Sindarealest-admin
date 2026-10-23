@@ -57,3 +57,11 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 - Exact-source/deployment capture of the CSS change at `08017a955fa42081e59457397b210a26b6038f6d`: [run #39899486321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321), artifact [#12477679857](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321/artifacts/12477679857). The final SHA differs only in test assertion correction; public HTML is identical. Captures: 8/8, no runtime/same-origin HTTP errors; CTA clear of fixed nav at 360px in both themes.
 - Broader order-section owner visual acceptance remains **PENDING**. Owner-approved heading typography remains PASS/LOCKED. Hero remains PAUSED BY OWNER. PR #108 remains OPEN/unmerged. Preview only.
 - After owner reviews the current order-section evidence, continue the next non-Hero section. Keep one active visual-acceptance item at a time; don't touch Hero or the locked heading.
+
+
+## Verified continuation — 2026-10-23
+
+- Latest source SHA `82fe8a3d41289ca308748bd7a7f326737326f457`: added an explicit accessible name to the catalog search field and a regression assertion.
+- CI PASS [#39900425348](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425348); Preview deployment PASS [#39900425331](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425331). Alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
+- Order-only screenshot run [#39900425363](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425363) was still installing Chromium when recorded; artifact/visual result pending. Do not claim current-SHA visual verification yet.
+- PR #108 stays open/unmerged; Hero stays paused; Preview only.

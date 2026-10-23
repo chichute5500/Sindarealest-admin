@@ -125,3 +125,11 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - Exact-SHA non-Hero capture at source/deployed SHA `08017a955fa42081e59457397b210a26b6038f6d`: [run #39899486321](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321), artifact [#12477679857](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899486321/artifacts/12477679857). All 8 Light/Dark captures completed with no runtime or same-origin HTTP errors. Screenshots show the CTA clear of the fixed nav at 360px in both themes. Commit `d2123c6` differs from capture SHA `08017a9` only in the test file; `public/index.html` is identical, and the latest Preview deploy passed at `d2123c6`.
 - The first attempt at `08017a9` had a malformed test assertion; it was corrected in `d2123c6`, and the final CI/deploy both pass. Do not cite the failed first-attempt CI/deploy as current status.
 - This is capture evidence, **not owner visual acceptance**. Broader order-section acceptance remains pending. Hero remains paused. PR #108 remains open/unmerged; Preview only.
+
+
+## Verified continuation — 2026-10-23 04:29 UTC
+
+- Latest source change: `82fe8a3d41289ca308748bd7a7f326737326f457` (`fix(a11y): label catalog search input`). Catalog search now has an explicit accessible name independent of placeholder; regression assertion added in `tests/storefront-operations.test.mjs`.
+- CI PASS: [run #39900425348](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425348). Preview deployment PASS at exact source SHA: [run #39900425331](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425331). Deployment URL `https://1142d16c.sindarealest2.pages.dev`; alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev`.
+- Current-SHA non-Hero order-only screenshot run [#39900425363](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39900425363) is still in progress at Chromium installation; no artifact yet, so no new visual claim. Previous owner acceptance remains pending.
+- PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; no Hero inspection/edit/capture, no merge, no Production deployment. After capture completes, inspect artifact and exact deployed SHA, then continue safe source-first audit outside Hero.
