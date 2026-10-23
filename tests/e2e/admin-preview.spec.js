@@ -472,7 +472,10 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await page.locator('#searchBox').fill(target.sku);
     await expect(rows).toHaveCount(1);
     stage('opening-product-editor');
-    await rows.first().locator('button[data-action="edit"]').first().click();
+    // Each product row renders a desktop edit button and a mobile edit button;
+    // select the visible one so Playwright does not wait on the hidden responsive variant.
+    await rows.first().locator('button[data-action="edit"]:visible').first().click();
+    stage('product-editor-click-completed');
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#pId')).toHaveValue(target.id);
     await expect(page.locator('#pTitle')).toHaveValue(target.title);
