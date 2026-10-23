@@ -314,4 +314,157 @@ test.describe('SinDarealest2 Admin Preview', () => {
       );
     }
   });
+
+  test('reads the live product catalog without product writes', async ({ page }, testInfo) => {
+    const opened = await openLoginPage(page, testInfo);
+    if (opened.type === 'blocked') {
+      throw new Error('BLOCKED_CLOUDFLARE_ACCESS: cannot test the live catalog without an authorized Preview path.');
+    }
+    if (!adminPassword) throw new Error('Missing GitHub Actions secret ADMIN_TEST_PASSWORD.');
+
+    const mutationRequests = [];
+    page.on('request', request => {
+      let url;
+      try { url = new URL(request.url()); } catch { return; }
+      if (
+        url.pathname.startsWith('/api/admin/products') &&
+        !['GET', 'HEAD', 'OPTIONS'].includes(request.method().toUpperCase())
+      ) {
+        mutationRequests.push({ method: request.method().toUpperCase(), path: url.pathname });
+      }
+    });
+
+    const catalogResponsePromise = page.waitForResponse(response => {
+      try {
+        const url = new URL(response.url());
+        return url.pathname === '/api/admin/products'
+          && response.request().method().toUpperCase() === 'GET';
+      } catch {
+        return false;
+      }
+    }, { timeout: 25_000 });
+
+    await page.locator('#password').fill(adminPassword);
+    await page.locator('#loginForm button[type="submit"]').click();
+    await expect(page.locator('#appView')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('#logout')).toBeVisible();
+
+    const catalogResponse = await catalogResponsePromise;
+    expect(catalogResponse.status(), 'authenticated GET /api/admin/products should return 200').toBe(200);
+    const payload = await catalogResponse.json();
+    expect(Array.isArray(payload.products), 'catalog response should contain a products array').toBe(true);
+
+    const products = payload.products;
+    expect(products.length, 'live product catalog should contain more than one UI page').toBeGreaterThan(12);
+    expect(products.every(product =>
+      product && typeof product.id === 'string' &&
+      typeof product.title === 'string' &&
+      typeof product.sku === 'string'
+    ), 'products should include stable IDs, titles and SKUs').toBe(true);
+
+    const target = products.find(product =>
+      product.id && product.sku && product.category &&
+      typeof product.published === 'boolean'
+    );
+    expect(target, 'catalog should include at least one editable product with category and publish state').toBeTruthy();
+
+    const imageProduct = products.find(product =>
+      product.id && product.sku &&
+      Array.isArray(product.images) &&
+      typeof product.images[0] === 'string' &&
+      product.images[0].trim()
+    ) || null;
+    const imageUrls = products.flatMap(product =>
+      (Array.isArray(product.images) ? product.images : [])
+        .filter(value => typeof value === 'string' && value.trim())
+    );
+    const imageUrlKinds = {
+      absolute: imageUrls.filter(value => /^https?:\/\//i.test(value)).length,
+      rooted: imageUrls.filter(value => value.startsWith('/')).length,
+      inlineOrBlob: imageUrls.filter(value => /^(?:data:image\/|blob:)/i.test(value)).length,
+      relative: imageUrls.filter(value =>
+        !/^(?:https?:\/\/|\/|data:image\/|blob:)/i.test(value)
+      ).length
+    };
+
+    await page.locator('[data-view="products"]').first().click();
+    await expect(page.locator('#searchBox')).toBeVisible();
+    const rows = page.locator('table.product-table tbody tr');
+    await expect(rows, 'product list should show 12 items on the first page').toHaveCount(12);
+    await expect(page.locator('.pagination .pageactions span')).toContainText('1/');
+    await expect(page.locator('#next')).toBeEnabled();
+    await page.locator('#next').click();
+    await expect(page.locator('.pagination .pageactions span')).toContainText('2/');
+    await expect(rows).toHaveCount(12);
+    await page.locator('#prev').click();
+    await expect(page.locator('.pagination .pageactions span')).toContainText('1/');
+
+    await page.locator('#searchBox').fill(target.sku);
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText(target.sku);
+    await page.locator('#categoryBox').selectOption(target.category);
+    await expect(rows).toHaveCount(1);
+    await page.locator('[data-published-filter="' + (target.published ? 'published' : 'hidden') + '"]').click();
+    await expect(rows).toHaveCount(1);
+    await page.locator('#clearFilter').click();
+    await expect(page.locator('#searchBox')).toHaveValue('');
+
+    let imageState = { checked: false, reason: 'no-product-image-url-in-live-catalog' };
+    if (imageProduct) {
+      await page.locator('#searchBox').fill(imageProduct.sku);
+      await expect(rows).toHaveCount(1);
+      const thumbnails = page.locator('table.product-table img.thumb');
+      await expect(thumbnails, 'product with an image URL should render a thumbnail').toHaveCount(1);
+      imageState = await thumbnails.evaluateAll(async images => {
+        const image = images[0];
+        image.loading = 'eager';
+        const decode = await Promise.race([
+          image.decode().then(() => ({ decoded: true })).catch(() => ({ decoded: false })),
+          new Promise(resolve => setTimeout(() => resolve({ decoded: false, timeout: true }), 6_000))
+        ]);
+        let currentOriginMatches = false;
+        try { currentOriginMatches = new URL(image.currentSrc).origin === location.origin; } catch {}
+        return {
+          checked: true,
+          decoded: decode.decoded,
+          timedOut: Boolean(decode.timeout),
+          naturalWidthPositive: image.naturalWidth > 0,
+          currentOriginMatches
+        };
+      });
+      expect(imageState.decoded && imageState.naturalWidthPositive,
+        'the first persisted product image URL should resolve and decode in the live product list').toBe(true);
+    }
+
+    await page.locator('#clearFilter').click();
+    await page.locator('#searchBox').fill(target.sku);
+    await expect(rows).toHaveCount(1);
+    await rows.first().locator('button[data-action="edit"]').first().click();
+    await expect(page.locator('#backdrop')).toBeVisible();
+    await expect(page.locator('#pId')).toHaveValue(target.id);
+    await expect(page.locator('#pTitle')).toHaveValue(target.title);
+
+    expect(mutationRequests, 'read-only catalog QA must not submit product POST/PUT/DELETE requests').toEqual([]);
+    const safeEvidence = {
+      sourceCommit: commitKey,
+      catalogCount: products.length,
+      productsWithImages: products.filter(product =>
+        Array.isArray(product.images) && product.images.some(value => typeof value === 'string' && value.trim())
+      ).length,
+      totalPersistedImageUrls: imageUrls.length,
+      imageUrlKinds,
+      imageState,
+      firstPageRows: 12,
+      paginationVisited: ['1', '2', '1'],
+      searchCategoryPublishFilters: 'PASS',
+      detailEditorLoaded: true,
+      productMutationRequests: mutationRequests,
+      scope: 'AUTHENTICATED LIVE PREVIEW; READ-ONLY PRODUCT API/UI'
+    };
+    await testInfo.attach('admin-live-product-read-only-evidence.json', {
+      body: Buffer.from(JSON.stringify(safeEvidence, null, 2)),
+      contentType: 'application/json'
+    });
+    console.info('[ADMIN_LIVE_PRODUCT_READ_ONLY] ' + JSON.stringify(safeEvidence));
+  });
 });
