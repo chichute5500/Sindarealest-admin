@@ -132,3 +132,18 @@ The owner has explicitly said the category controls still show no effect like de
 - Never restore the removed dedicated “Tình trạng sản phẩm” catalog filter panel. Keep per-product status/fulfillment information intact.
 - No Production deployment, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
 - Do not send a Preview link until deployment integrity and the live visual audit have been checked. Source-test PASS alone is insufficient.
+
+
+## CHAT HANDOFF ADDENDUM — CATEGORY ACTIVATION AUDIT PASS — 2026-10-23
+
+Read CURRENT-STATE.md, TASKS.md and TEST-RESULTS.md first, then fetch current branch HEAD and PR/workflow status. Latest storefront/test HEAD at final live audit: `f4b4d82873535d9920d177c99eceb383078a687b`.
+
+- Source validation PASS: [CI #39931617414](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617414).
+- Catalog-only live Preview audit PASS: [#39931617426](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617426); [artifact #12492051199 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39931617426/artifacts/12492051199).
+- Preview: https://2284eff5.sindarealest2.pages.dev/. Manifest confirms deployment ID `2284eff5-74df-4ca3-935e-927c6cf07bee`, deployed SHA `9b5302ef7bcd5252922ba3ad8f11581cd78d6bef`, source/public tree equivalent true. Audit HEAD is newer because only workflow/docs changed after deployed storefront code.
+- Real animation evidence PASS across mobile 360/390, tablet 768, desktop 1440 and Light/Dark. Category tap/click/keyboard, selected persistence and reduced-motion PASS. Animation duration 460ms, scale peak ~1.046–1.090, transform and bloom change across frames. No perpetual pulse. Runtime errors 0, same-origin HTTP errors 0, read-only violations 0.
+- Owner visual acceptance remains PENDING. Do not self-assign owner PASS; owner must inspect artifact/Preview and explicitly accept or identify a concrete discrepancy.
+- Previous run #39931188126 failed due to brittle exact RGBA comparison and malformed RGB regex in harness; final run #39931617426 is the successful superseding audit.
+- PR #108 must remain OPEN/unmerged. Hero PAUSED BY OWNER — never inspect/edit/test/capture. #order OWNER PASS/LOCKED — never touch/retest. Never restore the deleted dedicated product-status filter panel. Preview only; no Production, Admin/backend/API/auth/data/D1/R2/secrets/bindings/DNS/Access changes.
+
+**Next action:** Do not start another acceptance item until the owner reviews the catalog activation artifact and either says PASS or specifies a concrete issue. Keep this task in technical PASS / owner visual acceptance pending.
