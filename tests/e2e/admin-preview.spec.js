@@ -140,7 +140,9 @@ async function openLoginPage(page, testInfo) {
 test.describe('SinDarealest2 Admin Preview', () => {
   test('opens the admin login page without exposing protected content', async ({ page }, testInfo) => {
     const opened = await openLoginPage(page, testInfo);
-    if (opened.type === 'blocked') test.skip(true, 'BLOCKED: Cloudflare Access requires a separately authorized test path.');
+    if (opened.type === 'blocked') {
+      throw new Error('BLOCKED_CLOUDFLARE_ACCESS: Preview diagnostics were saved, but the remote smoke test cannot reach the ADMIN login page. Use an authorized Access test path; do not bypass Access.');
+    }
     await expect(page.locator('#password')).toHaveAttribute('type', 'password');
     await expect(page.locator('#appView')).toBeHidden();
     // Record a safe CSS signature before failing: this distinguishes an old deployment
@@ -270,7 +272,9 @@ test.describe('SinDarealest2 Admin Preview', () => {
 
   test('logs in once and verifies the admin dashboard', async ({ page }, testInfo) => {
     const opened = await openLoginPage(page, testInfo);
-    if (opened.type === 'blocked') test.skip(true, 'BLOCKED: Cloudflare Access requires a separately authorized test path.');
+    if (opened.type === 'blocked') {
+      throw new Error('BLOCKED_CLOUDFLARE_ACCESS: Preview diagnostics were saved, but the remote smoke test cannot reach the ADMIN login page. Use an authorized Access test path; do not bypass Access.');
+    }
     if (!adminPassword) throw new Error('Missing GitHub Actions secret ADMIN_TEST_PASSWORD.');
 
     const serverErrors = [];
