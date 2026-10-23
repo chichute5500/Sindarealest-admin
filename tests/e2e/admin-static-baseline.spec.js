@@ -2600,6 +2600,15 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(advancedToggle).toHaveAttribute('aria-expanded', 'false');
         await expect(page.locator('#activityLogSearch')).toBeHidden();
       }
+
+      // Leave the screenshot in the reference's unread-notification state.
+      // The behavior assertion above verifies mark-read; reset the fixture state after that check.
+      await page.evaluate(() => localStorage.removeItem('sd-admin-last-seen'));
+      await notificationsTab.click();
+      await expect(page.locator('#activityNotificationsUnread')).toHaveText('5');
+      await activityTab.click();
+      await expect(activityTab).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#activityNotificationsUnread')).toHaveText('5');
     });
     await captureView('notifications', 'dashboard', async variant => {
       const toggle = page.locator('#notificationToggle');
