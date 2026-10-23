@@ -632,16 +632,16 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   #imageGrid{grid-template-columns:minmax(0,1fr);gap:8px;align-items:start}
   #imageGrid .image-cover-slot{display:block;grid-column:1/-1;min-width:0}
   #imageGrid .image-cover-slot .imageitem{width:100%}
-  #imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.55/1;object-fit:contain;background:rgba(218,235,247,.40)}
-  #imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-  #imageGrid .image-rail .imageitem{flex:0 0 74px;width:74px;scroll-snap-align:start}
+  #imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.75/1;object-fit:contain;background:rgba(218,235,247,.40)}
+  #imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-align:start}
   #imageGrid .image-rail .imageitem img{aspect-ratio:1;object-fit:cover}
-  #imageGrid .image-rail .imagebuttons{gap:2px;padding:4px 0;justify-content:flex-start}
-  #imageGrid .image-rail .imagebuttons button{width:22px;height:22px;border-radius:7px}
-  #imageGrid .image-rail .imagebuttons button svg{width:12px;height:12px}
+  #imageGrid .image-rail .imagebuttons{gap:2px;padding:3px 0;justify-content:flex-start}
+  #imageGrid .image-rail .imagebuttons button{width:18px;height:18px;border-radius:6px}
+  #imageGrid .image-rail .imagebuttons button svg{width:10px;height:10px}
   #imageGrid .imagebuttons{gap:3px}
 }
-@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:68px;width:68px}}
+@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}
 :root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}
 
 /* Keep the product editor's sticky actions flush with the dialog edge on phones.
