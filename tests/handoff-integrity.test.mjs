@@ -8,6 +8,8 @@ const results = readJson('../docs/admin-ui-reference/handoff/latest-test-results
 const startHere = readText('../docs/admin-ui-reference/handoff/START-HERE.md');
 const nextPrompt = readText('../docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md');
 const masterPrompt = readText('../docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md');
+const previewTest = readText('../tests/e2e/admin-preview.spec.js');
+const previewWorkflow = readText('../.github/workflows/admin-preview-diagnostics.yml');
 
 assert.equal(status.repository, results.repository, 'Handoff status files must identify the same repository.');
 assert.equal(status.activeBranch, results.targetBranch, 'Handoff status files must identify the same writable branch.');
@@ -21,6 +23,13 @@ for (const key of statusScreens) {
   assert.equal(status.screenStatuses[key].status, results.screens[key].status, `Screen status drift: ${key}`);
 }
 assert.equal(statusScreens.length, 12, 'The current acceptance scope must include all 12 admin screens.');
+
+assert.ok(!/opened\\.type === 'blocked'\\)\\s*test\\.skip/.test(previewTest),
+  'A Cloudflare Access gate must not be reported as a successful Playwright run by skipping the remote smoke test.');
+assert.ok((previewTest.match(/BLOCKED_CLOUDFLARE_ACCESS: Preview diagnostics were saved/g) || []).length === 2,
+  'Both remote Preview tests must fail explicitly with the blocked Access diagnostic when the login page is not reached.');
+assert.match(previewWorkflow, /data\\.checks\\.deployedPreview = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' \\? 'BLOCKED_CLOUDFLARE_ACCESS'/,
+  'The persisted deployedPreview status must prioritize an Access block over a generic successful test-process exit.');
 
 for (const [label, sha] of [
   ['current status codeTestSha', status.codeTestSha],
