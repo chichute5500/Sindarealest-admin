@@ -2529,6 +2529,21 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(mobileFilterHeights.advancedToggle, 'Mobile advanced-search toggle should be compact').toBeLessThanOrEqual(34);
         const firstActivityCardHeight = await page.locator('.activity-log-card').first().evaluate(el => el.getBoundingClientRect().height);
         expect(firstActivityCardHeight, 'Mobile activity cards should stay compact enough to show more audit events').toBeLessThanOrEqual(60);
+        if (mobileViewportWidth <= 320 && (page.viewportSize()?.height ?? 0) <= 640) {
+          const firstRecordVisibility = await page.evaluate(() => {
+            const card = document.querySelector('.activity-log-card');
+            const nav = document.querySelector('.mobiletabs');
+            if (!card || !nav) return null;
+            return {
+              cardBottom: Math.round(card.getBoundingClientRect().bottom),
+              navigationTop: Math.round(nav.getBoundingClientRect().top)
+            };
+          });
+          expect(firstRecordVisibility, '320×640 Screen 12 must render an activity record and the mobile navigation').not.toBeNull();
+          expect(firstRecordVisibility.cardBottom,
+            'The first Screen 12 activity record must fit above the fixed mobile navigation at 320×640')
+            .toBeLessThanOrEqual(firstRecordVisibility.navigationTop);
+        }
       }
       await expect(page.locator('#refreshActivityLogs')).toBeVisible();
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
