@@ -1,3 +1,16 @@
+## LATEST VERIFIED UPDATE — MOBILE GALLERY ROOT-CAUSE REWORK — 2026-10-24
+
+- Latest code commit deployed to Preview: `11a35b0d01eff46463675ee39ce80fc4465a655c`; latest test-only commit: `5fbb3cd5610200b04f285008895d0f6890887af6`.
+- Root-cause direction: removed the 460ms overlapping mobile crossfade and its keyframes; mobile transitions now wait for the incoming image to load/decode, then atomically activate the incoming layer and deactivate the outgoing layer without a fade or delayed animation. Desktop directional animation remains.
+- CSS mobile rule disables animation, transition, transform, and will-change on fullscreen image layers to reduce compositor artifacts. Added low-priority neighbor preload/decode cache, bounded to 12 images; preload is guarded for non-browser test harnesses and cleared on product-gallery open.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020102663
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020102657
+- Immutable Preview: https://43851571.sindarealest2.pages.dev/
+- Deployment logs confirm Pages project `sindarealest2`, Production branch `main`, and exact SHA deployment. No Production deployment or main-branch change.
+- Liquid Glass visual workflow skipped by Hero guard; do not inspect Hero. No real-device visual acceptance yet.
+- PR #108 remains OPEN/unmerged, base `main`.
+- Acceptance remains OPEN until owner retests the fullscreen product gallery on a phone. If flicker persists, inspect rendered CSS/compositor behavior and all duplicate selectors/history before another visual tweak.
+
 ## DECISION UPDATE — MOBILE FULLSCREEN GALLERY TRANSITION — 2026-10-24
 
 - Keep the existing image visible until the incoming image has both loaded and decoded.
