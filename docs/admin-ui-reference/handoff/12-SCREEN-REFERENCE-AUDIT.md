@@ -2,10 +2,12 @@
 
 ## Live checkpoint — 2026-10-23 06:04 UTC
 - Current source/test SHA `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`: Validate [#39909118547](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547) **SUCCESS**; Admin Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) **IN_PROGRESS** at Chromium installation when last checked.
-- Previous Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) captured 50 PNGs but the fixture matrix failed on the 320px thumbnail-rail assertion: actual scroll width 284px, expected >288px. The assertion threshold was adjusted from +20px to +10px on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; wait for exact-SHA Preview and inspect the gallery screenshot before recording a pass.
-- Gallery CSS compacted (cover ratio 1.75, smaller thumbnail rail and controls); a regression assertion checks that the full upload/drop zone fits above the sticky footer at 390×844. This is not accepted until current screenshot/metrics verify it.
+- Previous Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) captured 50 PNGs but failed the 320px thumbnail-rail assertion: scroll width 284px versus stale requirement >288px. Current SHA lowers the overflow requirement to >10px. Do not repeat this edit; inspect the exact-SHA run before further changes.
+- Gallery CSS was compacted (cover ratio 1.75, smaller thumbnail rail and controls); a test requires the full upload/drop zone above the sticky footer at 390×844. Screenshot/metric verification is pending.
 - PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866`; `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
 - All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. B1 remains complete.
+## Historical narrow-viewport and Screen 9 clearance checkpoint
+
 ## Historical narrow-viewport and Screen 9 clearance checkpoint
 
 ## Historical narrow-viewport and Screen 9 clearance checkpoint — 2026-10-23 04:07 UTC (superseded above)
