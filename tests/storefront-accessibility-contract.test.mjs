@@ -313,7 +313,6 @@ function makeArtPauseHarness(reducedMotion = false) {
     '#artNext': makeElement(),
     '#artPause': makeElement()
   };
-  if (reducedMotion) delete elements['#artPause'];
   const intervals = [], clearedIntervals = [];
   class FakeImage {
     set src(value) { this._src = value; }
