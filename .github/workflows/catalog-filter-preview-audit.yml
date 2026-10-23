@@ -500,7 +500,7 @@ jobs:
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
                         playState: animation?.playState || 'missing',
                         transform: css.transform,
-                        scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
+                        scaleX,
                         boxShadow: css.boxShadow
                       };
                     });
@@ -630,7 +630,7 @@ jobs:
                       const css = getComputedStyle(el);
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                      const matrix = css.transform.match(/^matrix\\(([^)]+)\\)$/);
+                      const scaleX = new DOMMatrixReadOnly(css.transform).a;
                       return {
                         animationName: css.animationName,
                         duration: css.animationDuration,
