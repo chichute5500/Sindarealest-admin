@@ -96,8 +96,12 @@ assert.deepEqual(doc.body.classList.removed, ['welcome-active'], 'the welcome ac
 
 assert.match(html, /@media\s*\(prefers-reduced-motion:\s*reduce\)/i,
   'the storefront must respect users who request reduced motion');
-assert.match(html, /function setupArtSlideshow\(\)[\s\S]*?const reduceMotion=!!\(window\.matchMedia&&window\.matchMedia\('\(prefers-reduced-motion: reduce\)'\)\.matches\)[\s\S]*?if\(reduceMotion\)[\s\S]*?return\}show\(Math\.floor\(Math\.random\(\)\*pool\.length\)\);artTimer=setInterval/i,
-  'the editorial carousel must use a stable initial image and disable auto-advance for reduced-motion users while preserving manual controls');
+assert.match(html, /function setupArtSlideshow\(\)[\s\S]*?prefers-reduced-motion: reduce[\s\S]*?startAutoAdvance\(\)/i,
+  'the editorial carousel must preserve reduced-motion handling and manage autoplay through one explicit timer helper');
+assert.ok(html.includes('id="artPause" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false"'),
+  'the collections slideshow must expose an accessible pause/resume control');
+assert.ok(html.includes("$('#artPause').addEventListener('click',()=>setPaused(!paused))"),
+  'the pause/resume control must own the autoplay state transition');
 assert.match(html, /button:focus-visible,a:focus-visible,input:focus-visible/,
   'keyboard users must receive a visible focus indicator');
 assert.match(html, /env\(safe-area-inset-top\)/,
@@ -284,3 +288,71 @@ assert.equal(vm.runInNewContext('isFavorite(favoriteKey(products[0]))', favorite
   'the saved-heart state must agree with the normalized product key');
 assert.equal(favoriteControlRefreshes, 1, 'favorite counters must refresh once after normalization');
 assert.equal(favoriteListRefreshes, 1, 'the favorites list must refresh once after normalization');
+
+
+// The collections slideshow automatically changes imagery every three seconds.
+// Verify that a visitor can stop/resume it, while reduced-motion keeps autoplay off.
+const artPauseSetupStart = html.indexOf('function setupArtSlideshow(){');
+const artPauseSetupEnd = html.indexOf('\nfunction ', artPauseSetupStart + 1);
+assert.ok(artPauseSetupStart >= 0 && artPauseSetupEnd > artPauseSetupStart,
+  'the collection slideshow setup must be independently testable');
+const artPauseSetup = html.slice(artPauseSetupStart, artPauseSetupEnd);
+function makeArtPauseHarness(reducedMotion = false) {
+  const listeners = {};
+  const makeElement = (initial = {}) => ({
+    attributes: {}, listeners: {}, style: {}, disabled: false, title: '',
+    innerHTML: '', textContent: '', ...initial,
+    getAttribute(name) { return Object.hasOwn(this.attributes, name) ? this.attributes[name] : null; },
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    addEventListener(type, fn) { this.listeners[type] = fn; }
+  });
+  const elements = {
+    '#artSlide': makeElement({ attributes: { src: 'images/current.webp' } }),
+    '#artSlideCount': makeElement(),
+    '#artPrev': makeElement(),
+    '#artNext': makeElement(),
+    '#artPause': makeElement()
+  };
+  const intervals = [], clearedIntervals = [];
+  class FakeImage {
+    set src(value) { this._src = value; }
+    get src() { return this._src || ''; }
+  }
+  const context = {
+    products: [{ category: 'sneakers' }, { category: 'sneakers' }],
+    uniqueImages: () => ['images/a.webp', 'images/b.webp'],
+    window: { matchMedia: () => ({ matches: reducedMotion }) },
+    document: { hidden: false },
+    Image: FakeImage,
+    artIndex: 0, artTimer: null,
+    $(selector) { return elements[selector] || null; },
+    setInterval(fn, ms) { const id = { fn, ms, sequence: intervals.length + 1 }; intervals.push(id); return id; },
+    clearInterval(id) { clearedIntervals.push(id); },
+    clearTimeout() {}, setTimeout() { return 1; }
+  };
+  vm.runInNewContext(artPauseSetup, context, { timeout: 1000 });
+  context.setupArtSlideshow();
+  return { context, elements, intervals, clearedIntervals };
+}
+const artAuto = makeArtPauseHarness(false);
+const artPause = artAuto.elements['#artPause'];
+assert.equal(artAuto.intervals.length, 1, 'normal motion must start one autoplay interval');
+assert.equal(artAuto.intervals[0].ms, 3000, 'the existing three-second cadence must be preserved');
+assert.equal(artPause.attributes['aria-pressed'], 'false', 'autoplay begins with the pause toggle unpressed');
+assert.equal(artPause.attributes['aria-label'], 'Tạm dừng tự động chuyển ảnh');
+artPause.listeners.click();
+assert.equal(artAuto.clearedIntervals.length, 1, 'pausing must clear the active interval');
+assert.equal(artAuto.context.artTimer, null, 'pausing must release the active timer handle');
+assert.equal(artPause.attributes['aria-pressed'], 'true', 'paused state must be exposed to assistive technology');
+assert.equal(artPause.attributes['aria-label'], 'Tiếp tục tự động chuyển ảnh', 'the accessible name must announce the available resume action');
+artPause.listeners.click();
+assert.equal(artAuto.intervals.length, 2, 'resuming must start a fresh interval rather than duplicate a live timer');
+assert.equal(artAuto.context.artTimer, artAuto.intervals[1]);
+assert.equal(artPause.attributes['aria-pressed'], 'false');
+const reducedArt = makeArtPauseHarness(true);
+assert.equal(reducedArt.intervals.length, 0, 'reduced-motion must continue to disable autoplay');
+assert.equal(reducedArt.elements['#artPause'].disabled, true, 'reduced-motion users must not be offered an autoplay-resume action');
+assert.match(reducedArt.elements['#artPause'].attributes['aria-label'], /tắt theo cài đặt giảm chuyển động/);
+assert.equal(typeof reducedArt.elements['#artNext'].listeners.click, 'function', 'manual next control must remain available with reduced motion enabled');
+
+console.log('PASS: collection slideshow autoplay can be paused/resumed and remains off under prefers-reduced-motion.');
