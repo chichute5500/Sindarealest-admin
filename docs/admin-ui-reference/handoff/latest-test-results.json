@@ -1,37 +1,37 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:29:08.656Z",
+  "capturedAtUtc": "2026-10-23T04:56:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
-  "codeTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+  "branchHeadAtCheckpointStart": "95b12624d2598de31f3f2a87a0d5c01f4732a35d",
+  "codeTestSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
-    "id": 39899961344,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
-    "headSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "id": 39901444449,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
+    "headSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Validate #39899961562 and Admin Preview #39899961344 passed on exact source/test SHA. Artifact admin-preview-evidence-370 has 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one approved reference PNG. Seven expected fixture 503 console entries; no page errors, unexpected API paths, attempted writes or fixture API errors. Preview diagnostic verifies login CSS signature only."
+    "summary": "Validate #39901444416 and Admin Preview #39901444449 passed on exact source/test SHA. Artifact 371 has 132 distinct screenshots (16 login + 116 module), 120 module capture entries, 112 fixture metrics. Screen 7 scroll clearance passed at 320x640 and 390x844 in light/dark. Fixture-only; authenticated backend remains untested."
   },
   "validatedChecks": {
-    "npmRunCheck": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "npmTest": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "projectIntegrity": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "localStaticPlaywright": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "responsiveThemeScreenshotMatrix": "PASS_132_UNIQUE_PNGS_112_FIXTURE_METRICS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "npmRunCheck": "PASS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "npmTest": "PASS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "testedSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "projectIntegrity": "PASS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "localStaticPlaywright": "PASS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "responsiveThemeScreenshotMatrix": "PASS_132_UNIQUE_PNGS_112_FIXTURE_METRICS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
     "currentHeadPlaywright": "PASS_LOCAL_MATRIX; PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES UNTESTED",
     "productionDeployment": "NOT_PERFORMED",
-    "currentHead": "SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_a04e7f581f81403aae19aa9249d383a27f947ab5; PREVIEW EVIDENCE CHILD 290d3de4110f235c0a0ea963f0bc191dbd374b11",
-    "currentHeadSha": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
+    "currentHead": "SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_9515d03d504ca9c49836b719ccede1eb3c2d2ce1; documentation sync head 95b12624d2598de31f3f2a87a0d5c01f4732a35d",
+    "currentHeadSha": "95b12624d2598de31f3f2a87a0d5c01f4732a35d",
     "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES",
-    "exactShaValidationRun": 39899961562,
-    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
-    "automatedTests": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "exactShaValidationRun": 39901444416,
+    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444416",
+    "automatedTests": "PASS_ON_9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
     "publicQrCacheContract": "PASS_ON_1ec3cc72db94f07ce500d4e43830674b39a9eb03: public QR route sets Cache-Control no-store",
     "publicQrCacheBehavior": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: existing public QR active=200/no-store; deactivated/replaced=404",
     "settingsScreenOrder": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: price, welcome, watermark, then QR panel",
@@ -387,24 +387,24 @@
     "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T04:29:08.656Z",
-    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "capturedAtUtc": "2026-10-23T04:56:00Z",
+    "testedSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
     "validateRun": {
-      "id": 39899961562,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+      "id": 39901444416,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444416",
       "status": "completed",
       "conclusion": "success"
     },
     "previewRun": {
-      "id": 39899961344,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+      "id": 39901444449,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
       "status": "completed",
       "conclusion": "success"
     },
     "previewArtifact": {
-      "name": "admin-preview-evidence-370",
-      "id": 12478995473,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473",
+      "name": "admin-preview-evidence-371",
+      "id": 12478713244,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449/artifacts/12478713244",
       "pngCount": 133,
       "uniqueGeneratedScreenshots": 132,
       "loginScreenshots": 16,
@@ -412,12 +412,12 @@
       "moduleCaptureEntries": 120,
       "fixtureMetrics": 112
     },
-    "notificationRegression": "PASS: deterministic unread badge, mark-read local timestamp, Escape close and focus restoration on exact source/test SHA.",
+    "orderDetailScrollRegression": "PASS: Screen 7 scroll reachability, no horizontal overflow, mobile navigation visible and >=8px content clearance at 320x640 and 390x844 in light/dark.",
     "acceptanceBoundary": "Fixture-only; authenticated business/backend QA NOT_TESTED; all 12 screens PARTIAL_NOT_ACCEPTED."
   },
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T04:17:49Z",
-    "syncPurpose": "Clarify artifact counts accurately across canonical handoff files."
+    "lastSyncAtUtc": "2026-10-23T04:56:00Z",
+    "syncPurpose": "Synchronize exact-SHA order-detail evidence pointers."
   },
-  "latestProductSourceCommit": "a04e7f581f81403aae19aa9249d383a27f947ab5"
+  "latestProductSourceCommit": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1"
 }
