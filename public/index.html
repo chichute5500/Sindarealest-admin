@@ -3122,9 +3122,14 @@ html.dark #products .search-field:active{
   flex:0 0 auto;
   min-width:max-content;
   max-width:100%;
-  min-height:40px;
+  min-height:44px;
   padding:9px 19px;
   border:1px solid rgba(255,255,255,0.84);
+  border-top:2px solid transparent;
+  border-bottom:2px solid transparent;
+  border-top-color:transparent!important;
+  border-bottom-color:transparent!important;
+  background-clip:padding-box;
   border-radius:999px;
   background:radial-gradient(125% 160% at 18% 0%,rgba(255,255,255,.70) 0%,rgba(255,255,255,.22) 34%,rgba(255,255,255,0) 74%),linear-gradient(145deg,rgba(255,255,255,.38) 0%,rgba(232,246,255,.24) 54%,rgba(189,224,255,.16) 100%),var(--sd-catalog-glass-default);
   color:var(--sd-catalog-ink);
@@ -3190,7 +3195,7 @@ html.dark #products .filter-pill[aria-pressed="true"]{
 #products .filter-pill::after{
   content:"";
   position:absolute;
-  inset:1px;
+  inset:3px 1px;
   z-index:-1;
   border-radius:inherit;
   pointer-events:none;
@@ -3320,7 +3325,7 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
     row-gap:8px;
   }
   #products .filter-pill{
-    min-height:40px;
+    min-height:44px;
     padding:8px 13px;
     font-size:14px;
     line-height:1.2;
@@ -3333,7 +3338,7 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
   #products .search-field{min-height:50px;padding:0 12px}
   #products .search-field svg{width:20px;height:20px;flex-basis:20px}
   #products .catalog-tools .filter-pills{gap:7px;column-gap:7px;row-gap:8px}
-  #products .filter-pill{min-height:40px;padding:7px 11px;font-size:13.5px}
+  #products .filter-pill{min-height:44px;padding:7px 11px;font-size:13.5px}
 }
 @media(max-width:360px){
   #products .catalog-tools{padding:7px}
