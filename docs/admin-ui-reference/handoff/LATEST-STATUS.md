@@ -1,6 +1,14 @@
 # LATEST STATUS — SinDarealest Admin
 
-## Latest verified source/Preview checkpoint — 2026-10-23 04:07 UTC
+## Newest verified checkpoint — 2026-10-23 04:29 UTC
+- Application/source-test SHA: `a04e7f581f81403aae19aa9249d383a27f947ab5`. Validate [#39899961562](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562) and Admin Preview [#39899961344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344) both completed **SUCCESS on this exact SHA**.
+- Preview artifact [admin-preview-evidence-370](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473) (ID `12478995473`) completed: 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics; ZIP has one additional approved reference PNG (133 PNGs total). Fixture evidence: 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors. Seven console entries are expected simulated HTTP 503 retry-path responses.
+- Deployed Preview diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; it does **not** validate authenticated business workflows. Evidence-only child commit [`290d3de`](https://github.com/chichute5500/Sindarealest-admin/commit/290d3de4110f235c0a0ea963f0bc191dbd374b11) is the branch HEAD; source/test SHA remains `a04e7f581f81403aae19aa9249d383a27f947ab5`.
+- Live refs: PR #111 OPEN/unmerged, head `290d3de4110f235c0a0ea963f0bc191dbd374b11`, base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, mergeability `dirty`, 408 changed files; PR #108 OPEN/unmerged/read-only, head `bc5b08a357ba8bf6069348e2fa7c86e4c78e84f0`, 287 changed files; `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`. Migration 0009, PRE/PRO migrations, product-image/R2 persistence and AI image grouping remain deferred by owner.
+
+
+## Historical source/Preview checkpoint — 2026-10-23 04:07 UTC (superseded above)
 - Application source/test SHA: `000d3d84a9cf8c63144388f80879b5cc1439d161`.
 - Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) **SUCCESS on exact SHA**; Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) **SUCCESS on that same SHA**.
 - Artifact [admin-preview-evidence-369](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219) records 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics; ZIP includes the approved reference PNG. Expanded 320×640 / 360×800 mobile coverage passed alongside 390×844 and 1280×800 checks; measured fixture screens showed no horizontal overflow.

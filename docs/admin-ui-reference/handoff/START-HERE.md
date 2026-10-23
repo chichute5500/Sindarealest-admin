@@ -1,5 +1,13 @@
 # START HERE — SINDAREALEST ADMIN
 
+## Newest verified checkpoint — 2026-10-23 04:29 UTC
+- Application/source-test SHA: `a04e7f581f81403aae19aa9249d383a27f947ab5`. Validate [#39899961562](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562) and Admin Preview [#39899961344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344) both completed **SUCCESS on this exact SHA**.
+- Preview artifact [admin-preview-evidence-370](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473) (ID `12478995473`) completed: 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics; ZIP has one additional approved reference PNG (133 PNGs total). Fixture evidence: 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors. Seven console entries are expected simulated HTTP 503 retry-path responses.
+- Deployed Preview diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; it does **not** validate authenticated business workflows. Evidence-only child commit [`290d3de`](https://github.com/chichute5500/Sindarealest-admin/commit/290d3de4110f235c0a0ea963f0bc191dbd374b11) is the branch HEAD; source/test SHA remains `a04e7f581f81403aae19aa9249d383a27f947ab5`.
+- Live refs: PR #111 OPEN/unmerged, head `290d3de4110f235c0a0ea963f0bc191dbd374b11`, base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, mergeability `dirty`, 408 changed files; PR #108 OPEN/unmerged/read-only, head `bc5b08a357ba8bf6069348e2fa7c86e4c78e84f0`, 287 changed files; `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`. Migration 0009, PRE/PRO migrations, product-image/R2 persistence and AI image grouping remain deferred by owner.
+
+
 **Single entry point for every new chat.** Read this file and PROMPT-NEXT-CHAT.md. Before acting, fetch live GitHub PR #111/#108 metadata, main SHA, writable branch HEAD and recent Actions; treat the checkpoint below as historical until re-verified. Then continue unfinished work without asking the owner to paste prior history or repeating completed B1 cleanup.
 
 ## Canonical handoff
@@ -11,7 +19,7 @@
 - [12-screen acceptance audit](12-SCREEN-REFERENCE-AUDIT.md)
 - [Evidence retention policy](history/README.md)
 
-## Live checkpoint (2026-10-23 04:07 UTC; fetch live refs again before acting)
+## Historical checkpoint (2026-10-23 04:07 UTC; superseded by newest verified checkpoint above)
 - Writable branch HEAD is evidence-only child `1596bbd07c2257f19ecad9b2f77a7a45e9161cd0`; application/source-test SHA is `000d3d84a9cf8c63144388f80879b5cc1439d161`. Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) and Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) both **SUCCESS on the exact same source/test SHA**. The child stores generated history and is not a new application-source revision.
 - Artifact [admin-preview-evidence-369](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219) records 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics; the ZIP also includes the approved reference PNG. The expanded matrix covers 320×640, 360×800, 390×844 in light/dark where specified, plus desktop at 1280×800. The measured fixture screens reported no horizontal overflow.
 - The expanded matrix reproduced Screen 9's toast clearance defect on prior SHA `640c100a9bdffbc6c2d30fb961cbe97145972151`: at 320×640, toast bottom was 558 px and fixed navigation top was 564 px (6 px clearance; assertion requires at least 8 px). The CSS offset was raised from 82 to 84 px plus safe-area inset, then exact-SHA Preview passed. Seven console messages in the fixture run are expected 503 responses from deliberate read-only endpoint-failure/retry tests.

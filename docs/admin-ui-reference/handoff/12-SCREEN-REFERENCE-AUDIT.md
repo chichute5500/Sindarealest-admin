@@ -1,9 +1,21 @@
 # ADMIN — 12-SCREEN REFERENCE AUDIT
 
+## Newest verified checkpoint — 2026-10-23 04:29 UTC
+- Application/source-test SHA: `a04e7f581f81403aae19aa9249d383a27f947ab5`. Validate [#39899961562](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562) and Admin Preview [#39899961344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344) both completed **SUCCESS on this exact SHA**.
+- Preview artifact [admin-preview-evidence-370](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473) (ID `12478995473`) completed: 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics; ZIP has one additional approved reference PNG (133 PNGs total). Fixture evidence: 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors. Seven console entries are expected simulated HTTP 503 retry-path responses.
+- Deployed Preview diagnostic is `PASS_LOGIN_CSS_SIGNATURE` only; it does **not** validate authenticated business workflows. Evidence-only child commit [`290d3de`](https://github.com/chichute5500/Sindarealest-admin/commit/290d3de4110f235c0a0ea963f0bc191dbd374b11) is the branch HEAD; source/test SHA remains `a04e7f581f81403aae19aa9249d383a27f947ab5`.
+- Live refs: PR #111 OPEN/unmerged, head `290d3de4110f235c0a0ea963f0bc191dbd374b11`, base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, mergeability `dirty`, 408 changed files; PR #108 OPEN/unmerged/read-only, head `bc5b08a357ba8bf6069348e2fa7c86e4c78e84f0`, 287 changed files; `main` remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; exact reference parity `NOT_VERIFIED`; Production `NOT_PERFORMED`. Migration 0009, PRE/PRO migrations, product-image/R2 persistence and AI image grouping remain deferred by owner.
+
+## Screen 12 — Notifications regression test added
+- On source/test SHA `a04e7f581f81403aae19aa9249d383a27f947ab5`, Playwright resets `sd-admin-last-seen`, verifies one unread fixture event, confirms “Đánh dấu đã đọc” hides the unread badge and persists a valid timestamp, and retains Escape-close/focus-restoration and responsive overflow assertions.
+- Validate and the full local screenshot/fixture matrix passed on the exact SHA. This remains fixture-only evidence; Screen 12 and all other screens remain `PARTIAL_NOT_ACCEPTED` pending authenticated backend and reference-parity evidence.
+
+
 **Current product progress: 50% PROVISIONAL.** No screen is fully accepted. Product code/UI evidence and the later handoff-integrity check are tracked separately.
 
 
-## Latest exact-SHA narrow viewport and Screen 9 clearance checkpoint — 2026-10-23 04:07 UTC
+## Historical narrow-viewport and Screen 9 clearance checkpoint — 2026-10-23 04:07 UTC (superseded above)
 - Source/test SHA `000d3d84a9cf8c63144388f80879b5cc1439d161` passed Validate [#39898454195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195) and Admin Preview [#39898454274](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274) on the exact same SHA.
 - Artifact [admin-preview-evidence-369](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219) records 132 unique generated screenshot PNGs (16 login-shell + 116 distinct module PNGs), 120 fixture module capture entries, 112 fixture metrics; ZIP includes the approved reference PNG. The broader matrix includes 320×640 and 360×800, plus 390×844 and 1280×800; measured fixture layouts reported no document-level horizontal overflow.
 - The first expanded run [#39897883648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897883648) reproduced a real Screen 9 positioning regression at 320×640: toast bottom 558 px, navigation top 564 px, leaving only 6 px where the test requires 8 px. CSS changed from `bottom: calc(82px + env(safe-area-inset-bottom))` to `bottom: calc(84px + env(safe-area-inset-bottom))`. Follow-up Validate/Preview on `000d3d84a9cf8c63144388f80879b5cc1439d161` passed the same assertion.
@@ -53,7 +65,7 @@
 | 9 | Warranty/support | PARTIAL_NOT_ACCEPTED | `warranties__390x844__light.png`/dark counterpart. In light shot, toast is above fixed mobile navigation; geometry fix passed in prior Playwright. Real warranty operations untested. |
 | 10 | Website settings | PARTIAL_NOT_ACCEPTED | `settings__390x844__light.png`/dark counterpart; QR/draft UI only. Real save/activation unverified. |
 | 11 | Backup/Restore | PARTIAL_NOT_ACCEPTED | `backup-restore__390x844__light.png` and desktop evidence; no real export/import cycle. A screenshot starting mid-page is not evidence of clipping by itself. |
-| 12 | Activity log | PARTIAL_NOT_ACCEPTED | `activity-log__390x844__light.png`/dark counterpart; fixture-only single record, authenticated audit feed untested. |
+| 12 | Activity log / notifications | PARTIAL_NOT_ACCEPTED | Activity log is fixture-only; new exact-SHA Playwright checks cover unread badge, mark-read timestamp, Escape close and focus restoration. Authenticated audit feed and real notifications remain untested. |
 
 ## Acceptance boundary
 Fixture/test PASS does not mean final visual parity or authenticated backend PASS. D1 schema/payment ledger NOT_VERIFIED; migration 0009, PRE/PRO and R2/product-image save DEFERRED_BY_OWNER; Production deployment NOT_PERFORMED.

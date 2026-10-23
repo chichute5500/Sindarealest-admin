@@ -1,37 +1,37 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:17:49Z",
+  "capturedAtUtc": "2026-10-23T04:29:08.656Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-  "codeTestSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
+  "branchHeadAtCheckpointStart": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
+  "codeTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
-    "id": 39898454274,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274",
-    "headSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
+    "id": 39899961344,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+    "headSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Validate and Admin Preview passed on exact source/test SHA. The expanded responsive fixture matrix includes 320x640/360x800, corrected Screen 9 toast clearance, 132 unique generated PNGs and 112 metrics; deployed Preview diagnostic confirms login-shell CSS signature only."
+    "summary": "Validate #39899961562 and Admin Preview #39899961344 passed on exact source/test SHA. Artifact admin-preview-evidence-370 has 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one approved reference PNG. Seven expected fixture 503 console entries; no page errors, unexpected API paths, attempted writes or fixture API errors. Preview diagnostic verifies login CSS signature only."
   },
   "validatedChecks": {
-    "npmRunCheck": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "npmTest": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "testedSha": "4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "projectIntegrity": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "localStaticPlaywright": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "responsiveThemeScreenshotMatrix": "PASS_102_PNGS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
+    "npmRunCheck": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "npmTest": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "projectIntegrity": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "localStaticPlaywright": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "responsiveThemeScreenshotMatrix": "PASS_132_UNIQUE_PNGS_112_FIXTURE_METRICS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
     "currentHeadPlaywright": "PASS_LOCAL_MATRIX; PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES UNTESTED",
     "productionDeployment": "NOT_PERFORMED",
-    "currentHead": "SCREEN_10_SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_4ac7465; PREVIEW EVIDENCE CHILD 620d7b0",
-    "currentHeadSha": "620d7b07dd7f92aed8325846785c8b231b256e36",
+    "currentHead": "SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_a04e7f581f81403aae19aa9249d383a27f947ab5; PREVIEW EVIDENCE CHILD 290d3de4110f235c0a0ea963f0bc191dbd374b11",
+    "currentHeadSha": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
     "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES",
-    "exactShaValidationRun": 39891441964,
-    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891441964",
-    "automatedTests": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
+    "exactShaValidationRun": 39899961562,
+    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+    "automatedTests": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
     "publicQrCacheContract": "PASS_ON_1ec3cc72db94f07ce500d4e43830674b39a9eb03: public QR route sets Cache-Control no-store",
     "publicQrCacheBehavior": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: existing public QR active=200/no-store; deactivated/replaced=404",
     "settingsScreenOrder": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: price, welcome, watermark, then QR panel"
@@ -385,31 +385,37 @@
     "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T04:14:57Z",
-    "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
+    "capturedAtUtc": "2026-10-23T04:29:08.656Z",
+    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
     "validateRun": {
-      "id": 39898454195,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
+      "id": 39899961562,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
       "status": "completed",
       "conclusion": "success"
     },
     "previewRun": {
-      "id": 39898454274,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274",
+      "id": 39899961344,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
       "status": "completed",
       "conclusion": "success"
     },
-    "note": "Exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161 passed Validate and Admin Preview. Artifact admin-preview-evidence-369 (ID 12478285219) records 132 unique generated PNGs and 112 fixture metrics; Screen 9 toast clearance and narrow viewport checks passed. Branch HEAD 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0 is generated evidence-only. Authenticated business workflows remain untested.",
-    "parentFailedRun": {
-      "id": 39897883648,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897883648",
-      "testedSha": "640c100a9bdffbc6c2d30fb961cbe97145972151",
-      "conclusion": "failure",
-      "cause": "Screen 9 toast was only 6px above fixed navigation at 320x640; fixed by raising CSS bottom offset 82px to 84px plus safe-area."
-    }
+    "previewArtifact": {
+      "name": "admin-preview-evidence-370",
+      "id": 12478995473,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473",
+      "pngCount": 133,
+      "uniqueGeneratedScreenshots": 132,
+      "loginScreenshots": 16,
+      "distinctModuleScreenshots": 116,
+      "moduleCaptureEntries": 120,
+      "fixtureMetrics": 112
+    },
+    "notificationRegression": "PASS: deterministic unread badge, mark-read local timestamp, Escape close and focus restoration on exact source/test SHA.",
+    "acceptanceBoundary": "Fixture-only; authenticated business/backend QA NOT_TESTED; all 12 screens PARTIAL_NOT_ACCEPTED."
   },
   "handoffSync": {
     "lastSyncAtUtc": "2026-10-23T04:17:49Z",
     "syncPurpose": "Clarify artifact counts accurately across canonical handoff files."
-  }
+  },
+  "latestProductSourceCommit": "a04e7f581f81403aae19aa9249d383a27f947ab5"
 }

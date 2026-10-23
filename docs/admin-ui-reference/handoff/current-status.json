@@ -1,22 +1,22 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:17:49Z",
+  "capturedAtUtc": "2026-10-23T04:29:08.656Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-  "checkpointSemantics": "Live branch HEAD 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0 is a generated evidence-only child; application/source-test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161 is independently verified by Validate 39898454195 and Admin Preview 39898454274. Artifact counting semantics: 132 distinct captured screenshots = 16 login + 116 distinct module PNGs; metadata lists 120 module capture entries because some names recur; ZIP contains one additional reference PNG.",
-  "codeTestSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-  "latestProductSourceCommit": "000d3d84a9cf8c63144388f80879b5cc1439d161",
+  "branchHeadAtCheckpointStart": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
+  "checkpointSemantics": "Branch HEAD 290d3de4110f235c0a0ea963f0bc191dbd374b11 is an evidence-only child created by Admin Preview; application/source-test SHA a04e7f581f81403aae19aa9249d383a27f947ab5 passed Validate 39899961562 and Admin Preview 39899961344 on the exact same SHA. Artifact admin-preview-evidence-370 (ID 12478995473) contains 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one additional approved reference PNG. Local fixture evidence has 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors; seven simulated HTTP 503 console entries are expected retry fixtures. Deployed diagnostic confirms login CSS signature only.",
+  "codeTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+  "latestProductSourceCommit": "a04e7f581f81403aae19aa9249d383a27f947ab5",
   "latestActionsRun": {
-    "id": 39898454195,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
+    "id": 39899961562,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
     "status": "completed",
     "conclusion": "success",
-    "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161"
+    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL remains an overall estimate only. Screen 9 toast/navigation clearance and the expanded narrow-viewport fixture matrix passed on the exact source/test SHA, but all 12 screens remain unaccepted, full reference parity is unverified and authenticated backend workflows are untested.",
+  "progressBasis": "50% PROVISIONAL remains an overall estimate only. Notification unread/mark-read UI regression checks and the responsive/theme fixture matrix passed on the exact source/test SHA, but all 12 screens remain unaccepted, full reference parity is unverified and authenticated backend workflows are untested.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -24,11 +24,11 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "63079aabf853d6b4d492942020a71603754046d8",
+      "headSha": "bc5b08a357ba8bf6069348e2fa7c86e4c78e84f0",
       "changedFiles": 287,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
-      "additions": 21171,
+      "additions": 21239,
       "deletions": 404,
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
       "mergeableState": "dirty"
@@ -40,25 +40,25 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-      "changedFiles": 406,
-      "additions": 39536,
+      "headSha": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
+      "changedFiles": 408,
+      "additions": 39670,
       "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
-      "validationRunId": 39898454195,
+      "validationRunId": 39899961562,
       "validation": "PASS_ON_EXACT_SOURCE_TEST_SHA; PREVIEW_PASS_ON_SAME_SHA",
       "mergeableState": "dirty"
     }
   },
   "actions": {
     "latestSuccessful": {
-      "id": 39898454195,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
+      "id": 39899961562,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; branch evidence-only child 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0"
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; branch evidence-only child 290d3de4110f235c0a0ea963f0bc191dbd374b11"
     },
     "historicalFailed": {
       "id": 39804852604,
@@ -74,29 +74,40 @@
       "activeBlocker": false
     },
     "latestAttempt": {
-      "capturedAtUtc": "2026-10-23T04:14:57Z",
-      "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
+      "capturedAtUtc": "2026-10-23T04:29:08.656Z",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
       "validateRun": {
-        "id": 39898454195,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
+        "id": 39899961562,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
         "status": "completed",
         "conclusion": "success"
       },
       "previewRun": {
-        "id": 39898454274,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274",
+        "id": 39899961344,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
         "status": "completed",
         "conclusion": "success"
       },
-      "reason": "Exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161 passed Validate and Admin Preview. Artifact admin-preview-evidence-369 has 132 unique generated PNGs and 112 fixture metrics. Screen 9 toast clearance at 320x640 was corrected (82px to 84px plus safe area) after a measured 6px gap; preview is fixture/login-shell evidence only."
+      "previewArtifact": {
+        "name": "admin-preview-evidence-370",
+        "id": 12478995473,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473",
+        "pngCount": 133,
+        "uniqueGeneratedScreenshots": 132,
+        "loginScreenshots": 16,
+        "distinctModuleScreenshots": 116,
+        "moduleCaptureEntries": 120,
+        "fixtureMetrics": 112
+      },
+      "reason": "Notification unread/mark-read regression test added; Validate and Admin Preview completed successfully on exact source/test SHA. Preview evidence is synthetic/read-only fixture coverage; authenticated business/backend acceptance remains incomplete."
     },
     "latestValidateAttempt": {
-      "id": 39898454195,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
+      "id": 39899961562,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
       "status": "completed",
       "conclusion": "success",
-      "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; branch HEAD 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0 is evidence-only",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; branch evidence-only child 290d3de4110f235c0a0ea963f0bc191dbd374b11",
       "workflow": "Validate source and tests"
     },
     "lastFailed": {
@@ -106,18 +117,32 @@
       "conclusion": "failure",
       "testedSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
       "meaning": "Historical failure because latestRun.id/url were null; superseded by successful exact-SHA Validate #39844529679 on b8aff."
+    },
+    "latestPreviewAttempt": {
+      "id": 39899961344,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "artifact": {
+        "name": "admin-preview-evidence-370",
+        "id": 12478995473,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473"
+      },
+      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+      "evidence": "132 unique generated PNGs; 112 fixture metrics; zero page errors, unexpected API paths, attempted writes or fixture API errors."
     }
   },
   "latestProductChange": {
-    "status": "SCREEN_9_MOBILE_TOAST_CLEARANCE_FIX_VALIDATED; NARROW_VIEWPORT_MATRIX_PASS; BACKEND_ACCEPTANCE_PARTIAL",
-    "sourceAndTestSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "validateRunId": 39898454195,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
-    "previewRunId": 39898454274,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274",
-    "previewArtifact": "admin-preview-evidence-369",
-    "previewArtifactId": 12478285219,
-    "summary": "Raised the mobile toast bottom offset from 82px to 84px plus safe-area inset after a reproducible 6px gap at 320x640. Exact-SHA Validate and Preview pass; broad fixture metrics show no horizontal overflow. Authenticated warranty/backend operations and full reference parity remain unverified."
+    "status": "NOTIFICATION_UNREAD_MARK_READ_REGRESSION_TEST_ADDED; VALIDATE_AND_PREVIEW_PASS; BACKEND_ACCEPTANCE_PARTIAL",
+    "sourceAndTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "validateRunId": 39899961562,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+    "previewRunId": 39899961344,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+    "previewArtifact": "admin-preview-evidence-370",
+    "previewArtifactId": 12478995473,
+    "summary": "Added deterministic notification unread/mark-read persistence and keyboard close/focus regression checks. Exact-SHA Validate and Admin Preview passed; screenshot matrix completed. Authenticated notifications/business backend and full reference parity remain unverified."
   },
   "screenStatuses": {
     "1_login": {
