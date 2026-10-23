@@ -1,3 +1,16 @@
+# AUTHORITATIVE NEXT-CHAT OVERRIDE — SLIDESHOW REGRESSION GATES PENDING — 2026-10-24
+
+Continue current repo; fetch live HEAD, PR #108, and all four handoff files first.
+
+Current follow-up SHA `74bcd512abc19d3fba4bad64654321091073b8ea` fixes test fixture separation: reduced-motion retains `#artPause` and asserts it is disabled; the separate missing-control case removes it and verifies setup safely returns. Previous test harness commits failed; don't describe them as PASS.
+- CI #39995656182: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656182 (in progress at handoff).
+- Preview #39995656107: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656107 (in progress at handoff).
+- Verify both on exact SHA before claiming PASS. Last green source/test was `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`, Preview https://5052d769.sindarealest2.pages.dev/.
+
+All locks unchanged: Hero paused; #order, catalog filter and warranty form locked; PR #108 open/unmerged; no Production, main, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Access/infrastructure/payment changes.
+
+---
+
 # AUTHORITATIVE NEXT-CHAT OVERRIDE — VERIFY SLIDESHOW TEST HARNESS — 2026-10-24
 
 Continue existing repository. First re-fetch HEAD, PR #108, and all four handoff files.
