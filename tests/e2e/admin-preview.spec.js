@@ -69,7 +69,7 @@ function isCloudflareAccessGate(page, details) {
 }
 
 async function openLoginPage(page, testInfo) {
-  if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
+  if (!adminUrl) throw new Error('ADMIN_TEST_URL is not configured for the isolated Admin Preview.');
   // Log only the origin/path (safeUrl removes query and hash) so we can verify the Preview target without exposing tokens.
   let previewTargetLabel = 'invalid-url';
   try {
