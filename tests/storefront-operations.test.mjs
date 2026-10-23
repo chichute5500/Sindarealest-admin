@@ -69,7 +69,10 @@ assert.ok(storefrontHtml.includes('#products .catalog-tools .filter-pills{\n  mi
   && storefrontHtml.includes('touch-action:manipulation;')
   && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:7px;column-gap:7px;row-gap:8px}'),
   'Desktop spacing and dedicated touch-first mobile sizing, tap targets, readable search text and compact 360px chip wrapping must all remain explicit.');
-assert.ok(storefrontHtml.includes('0 0 14px rgba(22,132,232,0.30)')
+assert.ok(storefrontHtml.includes('0 0 22px rgba(22,132,232,0.46)')
+  && storefrontHtml.includes('0 0 34px rgba(22,132,232,.62)')
+  && storefrontHtml.includes('scale(1.09) translateY(-2px)')
+  && storefrontHtml.includes('linear-gradient(135deg,rgba(255,255,255,.98) 0%,rgba(235,247,255,.96) 58%,rgba(213,236,255,.92) 100%)')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
   'The selected pill must have a distinct visible blue glass glow and readable label typography.');
 assert.ok(storefrontHtml.includes('#products .search-field:hover:not(:focus-within)')
