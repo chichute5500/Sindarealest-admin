@@ -44,6 +44,9 @@ assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
   && storefrontHtml.includes('#products .filter-pill:active:not(:disabled)')
   && storefrontHtml.includes('#products .filter-pill:focus-visible'),
   'Persistent selected, physical pressed and keyboard-focus states must be implemented as distinct catalog-pill states.');
+assert.ok(storefrontHtml.includes('#products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"])')
+  && storefrontHtml.includes('html.dark #products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"])'),
+  'Pressed selectors must be at least as specific as unselected-chip hover selectors in both themes, so physical press overrides hover.');
 assert.ok(storefrontHtml.includes('@media(hover:hover) and (pointer:fine)')
   && storefrontHtml.includes('@media(prefers-reduced-motion:reduce)')
   && storefrontHtml.includes('@supports not (backdrop-filter: blur(20px))'),
