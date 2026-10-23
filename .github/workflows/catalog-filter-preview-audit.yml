@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PREVIEW_URL: https://5c3369cb.sindarealest2.pages.dev/
+      PREVIEW_URL: https://2284eff5.sindarealest2.pages.dev/
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
       CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
@@ -485,7 +485,7 @@ jobs:
                     assert.equal(selectedGlassMotion.animationDuration, '0.46s',
                       'Category activation must retain the visible 460ms glass-pop timing.');
                     // Sample actual computed frames while the CSS animation is running, not just its declaration.
-                    await page.waitForTimeout(135);
+                    await page.waitForTimeout(95);
                     const activationMidFrame = await otherCategory.evaluate(el => {
                       const css = getComputedStyle(el);
                       const animation = el.getAnimations().find(item =>
@@ -502,7 +502,7 @@ jobs:
                     });
                     assert.ok(activationMidFrame.currentTime !== null && activationMidFrame.currentTime < 460,
                       'Category click must leave a live CSS animation in progress; observed ' + JSON.stringify(activationMidFrame));
-                    assert.ok(activationMidFrame.scaleX > 1.005,
+                    assert.ok(activationMidFrame.scaleX > 1.04,
                       'The mid-animation category chip must visibly spring above its resting size; observed ' + JSON.stringify(activationMidFrame));
                     assert.ok(defaultChipStyleForActivation, 'The unselected category style must be captured before selection.');
                     assert.notEqual(activationMidFrame.boxShadow, defaultChipStyleForActivation.shadow,
@@ -511,10 +511,15 @@ jobs:
                     assert.ok(frameBox && frameBox.height > 0 && frameBox.height < 100,
                       'Activation evidence must be a single category chip, not a page/section screenshot.');
                     const midFilename = 'category-activation-midframe-' + contextName + '.png';
-                    // Page-level clipped capture avoids locator.screenshot's stability wait consuming the short animation.
-                    await page.screenshot({ path: path.join(outDir, midFilename), animations: 'allow', timeout: 30000,
-                      clip: { x: Math.max(0, frameBox.x), y: Math.max(0, frameBox.y), width: frameBox.width, height: frameBox.height } });
-                    audit.screenshots.push({ filename: midFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'activation-midframe', viewport: viewport.name, width: Math.round(frameBox.width), height: Math.round(frameBox.height), theme });
+                    // Keep a 36px margin so the actual blue glass halo is visible outside the pill bounds.
+                    const frameClip = {
+                      x: Math.max(0, frameBox.x - 36),
+                      y: Math.max(0, frameBox.y - 36),
+                      width: Math.min(viewport.width, frameBox.x + frameBox.width + 36) - Math.max(0, frameBox.x - 36),
+                      height: Math.min(viewport.height, frameBox.y + frameBox.height + 36) - Math.max(0, frameBox.y - 36)
+                    };
+                    await page.screenshot({ path: path.join(outDir, midFilename), animations: 'allow', timeout: 30000, clip: frameClip });
+                    audit.screenshots.push({ filename: midFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'activation-midframe', viewport: viewport.name, width: Math.round(frameBox.width), height: Math.round(frameBox.height), captureMarginPx: 36, theme });
 
                     await page.waitForTimeout(105);
                     const activationLaterFrame = await otherCategory.evaluate(el => {
@@ -545,8 +550,14 @@ jobs:
                       'The settled selected-glass state must be distinct from the activation bloom frame.');
                     const settledBox = await otherCategory.boundingBox();
                     const settledFilename = 'category-selection-settled-' + contextName + '.png';
-                    await otherCategory.screenshot({ path: path.join(outDir, settledFilename), animations: 'disabled', timeout: 30000 });
-                    audit.screenshots.push({ filename: settledFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'selection-settled', viewport: viewport.name, width: Math.round(settledBox.width), height: Math.round(settledBox.height), theme });
+                    const settledClip = {
+                      x: Math.max(0, settledBox.x - 36),
+                      y: Math.max(0, settledBox.y - 36),
+                      width: Math.min(viewport.width, settledBox.x + settledBox.width + 36) - Math.max(0, settledBox.x - 36),
+                      height: Math.min(viewport.height, settledBox.y + settledBox.height + 36) - Math.max(0, settledBox.y - 36)
+                    };
+                    await page.screenshot({ path: path.join(outDir, settledFilename), animations: 'disabled', timeout: 30000, clip: settledClip });
+                    audit.screenshots.push({ filename: settledFilename, selector: '#products .filter-pill[aria-pressed="true"]', stage: 'selection-settled', viewport: viewport.name, width: Math.round(settledBox.width), height: Math.round(settledBox.height), captureMarginPx: 36, theme });
                     otherCategoryState.categoryActivationBehavior = {
                       status: 'PASS',
                       animationName: selectedGlassMotion.animationName,
@@ -693,7 +704,7 @@ jobs:
                 await touchPage.touchscreen.tap(touchBox.x + touchBox.width / 2, touchBox.y + touchBox.height / 2);
                 assert.equal(await touchCategory.getAttribute('aria-pressed'), 'true',
                   'A real touchscreen tap must change selected category state.');
-                await touchPage.waitForTimeout(135);
+                await touchPage.waitForTimeout(95);
                 const touchActivation = await touchCategory.evaluate(el => {
                   const css = getComputedStyle(el);
                   const animation = el.getAnimations().find(item =>
@@ -708,19 +719,27 @@ jobs:
                 });
                 assert.equal(touchActivation.animationName, theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
                   'Touch selection must trigger the theme-appropriate activation animation.');
-                assert.ok(touchActivation.currentTime !== null && touchActivation.currentTime < 460 && touchActivation.scaleX > 1.005,
+                assert.ok(touchActivation.currentTime !== null && touchActivation.currentTime < 460 && touchActivation.scaleX > 1.04,
                   'Touch selection must expose a live, perceptible animation frame; observed ' + JSON.stringify(touchActivation));
                 const touchFrameFile = 'touch-category-activation-midframe-' + theme + '.png';
-                // Capture a clipped page frame so Playwright does not wait for the chip's bounding box to become stable.
-                await touchPage.screenshot({ path: path.join(outDir, touchFrameFile), animations: 'allow', timeout: 30000,
-                  clip: { x: Math.max(0, touchBox.x), y: Math.max(0, touchBox.y), width: touchBox.width, height: touchBox.height } });
+                // Surround the chip with enough viewport context to inspect the activation halo.
+                const touchFrameBox = await touchCategory.boundingBox();
+                assert.ok(touchFrameBox, 'Selected touch chip must remain visible for animation capture.');
+                const touchClip = {
+                  x: Math.max(0, touchFrameBox.x - 36),
+                  y: Math.max(0, touchFrameBox.y - 36),
+                  width: Math.min(390, touchFrameBox.x + touchFrameBox.width + 36) - Math.max(0, touchFrameBox.x - 36),
+                  height: Math.min(844, touchFrameBox.y + touchFrameBox.height + 36) - Math.max(0, touchFrameBox.y - 36)
+                };
+                await touchPage.screenshot({ path: path.join(outDir, touchFrameFile), animations: 'allow', timeout: 30000, clip: touchClip });
                 audit.screenshots.push({
                   filename: touchFrameFile,
                   selector: '#products .filter-pill[aria-pressed="true"]',
                   stage: 'touch-activation-midframe',
                   viewport: 'mobile-390-touch',
-                  width: Math.round(touchBox.width),
-                  height: Math.round(touchBox.height),
+                  width: Math.round(touchFrameBox.width),
+                  height: Math.round(touchFrameBox.height),
+                  captureMarginPx: 36,
                   theme
                 });
                 await touchPage.waitForTimeout(500);
