@@ -9,7 +9,7 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 | WORKFLOW-EFFICIENCY | APPLIED; source validation PASS | Commit `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`; [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405) PASS. Docs/README and workflow-only changes no longer trigger needless deployment/capture; Admin smoke is manual; stale validation/review runs are superseded. |
 | HERO-TEMP-HIDDEN | PAUSED BY OWNER — DO NOT TOUCH | Owner says leave Hero unchanged for now and return to it only after other storefront work is complete. Do not edit Hero markup/CSS/assets, run Hero-specific rework, or call it PASS during this pause. Preserve the uploaded image and derivative. |
 | STOREFRONT-VISUAL-AUDIT | ORDER SECTION OWNER PASS / LOCKED | Owner explicitly PASSed the current full `#order` section on 2026-10-23. Do not alter without explicit permission. |
-| CATALOG-FILTER-A11Y | TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING | Group roles/names and regression assertions are in place. CI/tests PASS at `d9b2ec642b4afede7c16a2a4224546d2b5df3423` ([#39905775440](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775440)); catalog-only Preview capture passed with 16 images, exact source/deployed SHA match, zero runtime or same-origin HTTP errors, and zero write attempts ([#39905775565](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565), [artifact #12480418806](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806)). Next gate is owner visual acceptance; do not change source speculatively. |
+| CATALOG-FILTER-A11Y / HEIGHT | TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING | Accessibility and Liquid Glass activation remain intact. Owner-directed height refinement in public/index.html: visible chip surface inset 2px vertically while real button hit target stays 44px. Exact-source CI/deploy/live capture PASS at 5b7596aba026cf4d4ed72fc4802ba461b105eb34; latest artifact is linked below. Next gate: owner visual review; do not mark OWNER PASS until explicit confirmation. |
 | QR-PAYMENT-CONTRACT | BLOCKED ON TRUSTED BACKEND CONTRACT/CONFIG | Keep fail-closed: no QR or transfer request until trusted order status and complete receiver/payment instructions exist. Do not modify Admin/backend in this branch. |
 
 ## Working protocol (owner-approved 2026-10-23)
@@ -230,3 +230,11 @@ The latest artifact was opened and compared to `docs/design-reference/liquid-gla
 Next step: ask the owner to inspect the latest Preview/artifact and explicitly PASS or identify a concrete discrepancy. Do not self-accept, modify CSS without a concrete issue, or start another acceptance item while owner acceptance is pending.
 
 Guardrails unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; keep the deleted dedicated product-status filter panel deleted; Preview only; no Production/Admin/backend/API/auth/data/config edits; PR #108 OPEN/unmerged.
+
+
+## Latest active item — slimmer catalog filter chips (2026-10-23)
+- Owner-directed visual change is implemented and technically verified. The visible glass surface is 2px shorter at the top and bottom while the clickable button remains 44px tall for mobile touch accessibility.
+- Preserve current Liquid Glass effects; do not revert to a 40px actual hit target or remove the 460ms activation sweep.
+- Latest exact-source evidence: CI #39962829322 PASS, Preview deploy #39962829540 PASS, catalog-only live audit #39962829226 PASS at 5b7596aba026cf4d4ed72fc4802ba461b105eb34.
+- Preview: https://6a0000cc.sindarealest2.pages.dev/ ; artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350 (26 screenshots + manifest).
+- Status remains TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING. Ask the owner to review the Preview/artifact and accept or specify a concrete visual correction. Do not change the locked order section or paused Hero.

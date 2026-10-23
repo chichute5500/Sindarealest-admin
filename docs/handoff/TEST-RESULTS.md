@@ -321,3 +321,20 @@ Artifact 67 has been opened and compared directly with the reference image. The 
 - #39956624603 failed because `el.getAnimations()` did not return the pseudo-element animation. The audit now discovers CSS animations via `document.getAnimations()`; intermediate audit #39957189240 passed.
 - The first run for `b60011b` stopped at a malformed escaped-newline test assertion; corrected in `ae153e8`. Current CI/deploy/audit listed above all PASS.
 - Cloudflare Insights GETs were blocked by the existing external-read allowlist; no same-origin/runtime/read-only issues were found.
+
+
+## Latest exact-SHA catalog filter height refinement — 2026-10-23
+| Gate | Result |
+|---|---|
+| Source validation and full tests | PASS — [#39962829322](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829322) |
+| Preview deploy | PASS — [#39962829540](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829540) |
+| Catalog-only live audit | PASS — [#39962829226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226) |
+| Artifact | [#12505621350 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350) |
+| Source / deployed SHA | Exact match: 5b7596aba026cf4d4ed72fc4802ba461b105eb34 |
+| Deployment | 6a0000cc-ff21-4a6b-bba5-daff4245a663; https://6a0000cc.sindarealest2.pages.dev/ |
+
+The owner asked to reduce the visual height of the catalog category chips while preserving the current Liquid Glass effect. The rendered glass surface is inset 2px at the top and bottom; the actual button remains a 44px mobile tap target. The background clip is enforced across light/dark, selected, hover and pressed backgrounds. Existing spring/press/specular effects remain.
+
+Manifest: passed true, captureCompleted true, status CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE, exact source/deployed SHA match, public-tree equivalence true, 26 screenshots across mobile 360/390, tablet 768, desktop 1440 in Light/Dark plus touch activation frames. Touch selection and persistent state pass 2/2. Runtime errors 0; same-origin HTTP errors 0; read-only violations 0. Cloudflare Insights requests were blocked by the external-read allowlist and recorded.
+
+This is not owner visual acceptance. Await explicit owner review; do not claim OWNER PASS.

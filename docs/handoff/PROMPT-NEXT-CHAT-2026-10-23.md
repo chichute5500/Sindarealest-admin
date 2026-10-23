@@ -14,14 +14,14 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108
 - PR phải giữ OPEN, không merge.
-- HEAD đã xác minh gần nhất: `d9b2ec642b4afede7c16a2a4224546d2b5df3423`; các cập nhật tài liệu trong bàn giao này sẽ tạo thêm docs-only commits, vì vậy chat tiếp theo phải đọc lại HEAD trực tiếp.
-- Source/Preview SHA đã khớp chính xác tại lần capture: `d9b2ec642b4afede7c16a2a4224546d2b5df3423`; Preview deploy metadata PASS (deployment ID `02c7e164-92a9-4167-b3ab-a2de343a041d`).
-- CI/tests PASS tại SHA `d9b2ec642b4afede7c16a2a4224546d2b5df3423`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775440
-- Catalog-only Preview capture PASS kỹ thuật, 16 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39905775565/artifacts/12480418806. Visual acceptance của chủ dự án vẫn PENDING.
+- Storefront source SHA verified by the latest live catalog capture: `5b7596aba026cf4d4ed72fc4802ba461b105eb34`. A docs-only handoff refresh may advance branch HEAD; refetch GitHub HEAD directly before acting.
+- Latest source/Preview SHA match at capture: `5b7596aba026cf4d4ed72fc4802ba461b105eb34`; Preview deploy PASS (deployment ID `6a0000cc-ff21-4a6b-bba5-daff4245a663`).
+- Latest CI/source tests PASS at SHA `5b7596aba026cf4d4ed72fc4802ba461b105eb34`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829322
+- Latest catalog-only Preview capture PASS kỹ thuật, 26 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350. Visual acceptance của chủ dự án vẫn PENDING.
 - Chụp live Preview phần `#order` PASS về mặt kỹ thuật: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271
 - Artifact 8 ảnh + manifest: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39902525271/artifacts/12479461634
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
-- Exact deployment: https://0e93eb50.sindarealest2.pages.dev/
+- Exact deployment: https://6a0000cc.sindarealest2.pages.dev/
 
 ## Việc đã hoàn tất và kiểm chứng
 
@@ -240,3 +240,13 @@ If the owner identifies a concrete mismatch, change only catalog search/category
 - No Production deploy, Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
 - Keep PR #108 OPEN and unmerged.
 - A docs-only commit may follow the source SHA above. Re-fetch live HEAD in the next session and compare the deployed `public/` tree before assuming it changes the Preview.
+
+
+## LATEST OWNER-DIRECTED CHANGE — CATALOG FILTER CHIP HEIGHT — 2026-10-23
+- Owner asked to make the category/filter chips visually slimmer while preserving the current Liquid Glass effect.
+- Implemented in public/index.html: the visible glass surface is inset 2px at top/bottom; the actual button retains a 44px touch target. background-clip:padding-box!important keeps the inset consistent across Light/Dark and selected/hover/pressed backgrounds. The existing specular sweep and activation/press effects remain.
+- Regression tests updated; latest source/test CI PASS [#39962829322](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829322).
+- Preview deploy PASS [#39962829540](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829540). Exact deployment ID 6a0000cc-ff21-4a6b-bba5-daff4245a663, URL https://6a0000cc.sindarealest2.pages.dev/ .
+- Catalog-only live audit PASS [#39962829226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226); artifact [#12505621350 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350). Captured SHA 5b7596aba026cf4d4ed72fc4802ba461b105eb34 matches deployed SHA exactly. Runtime errors, same-origin HTTP errors and read-only violations are zero; touch interaction passes 2/2.
+- Status remains TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING. The next action is owner review of the Preview/artifact. Do not self-accept or change this item again unless the owner requests a correction.
+- Hero remains PAUSED BY OWNER; #order remains OWNER PASS/LOCKED; PR #108 stays OPEN/unmerged; Preview only, no Production or restricted-scope changes.

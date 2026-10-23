@@ -310,3 +310,13 @@ Artifact 67 was opened and compared with `docs/design-reference/liquid-glass-pro
 **Status: TECHNICAL PASS; OWNER VISUAL ACCEPTANCE PENDING.** Next action: owner inspects the immutable Preview and artifact, then explicitly says PASS or points out a concrete discrepancy. Do not start another acceptance item until this gate is resolved.
 
 Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWNER PASS/LOCKED—do not touch. Never restore the removed dedicated product-status panel. Preview only; no Production or restricted-scope changes. Keep PR #108 OPEN/unmerged. If a docs-only commit follows, fetch live HEAD; it does not change deployed storefront code.
+
+
+## Owner-directed catalog filter height refinement — 2026-10-23 (latest)
+- Owner explicitly asked to make the category/filter chips visually less tall while keeping the existing Liquid Glass effect. This is a narrow authorization to reopen the catalog-filter visual item only.
+- public/index.html: the visible chip surface is inset by 2px at the top and bottom via transparent vertical borders and background-clip:padding-box!important; the actual button keeps its 44px touch target. The specular sweep is inset to the slim surface. Existing light/dark glass gradients, active/hover/pressed states, selection animation and reduced-motion behavior remain in place.
+- Regression assertions cover the new sizing, clip behavior, preserved specular animation, pressed state and 44px touch target.
+- Source SHA deployed and captured: 5b7596aba026cf4d4ed72fc4802ba461b105eb34. CI/source tests PASS [#39962829322](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829322); Preview deploy PASS [#39962829540](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829540); catalog-only live audit PASS [#39962829226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226).
+- Deployment ID 6a0000cc-ff21-4a6b-bba5-daff4245a663; immutable Preview https://6a0000cc.sindarealest2.pages.dev/ ; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
+- Artifact [#12505621350 — 26 screenshots + manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39962829226/artifacts/12505621350). Manifest: CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE, passed true, exact source/deployed SHA match, public-tree equivalent, capture complete, 2/2 touchscreen checks PASS, zero runtime errors, zero same-origin HTTP errors, zero read-only violations. Cloudflare Insights GETs remain blocked by the established external-read allowlist and are recorded.
+- This is a technical PASS, not owner visual acceptance. Keep Hero paused, #order locked, PR #108 OPEN/unmerged, Preview only, and all restricted scopes untouched.
