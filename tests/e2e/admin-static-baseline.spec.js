@@ -2340,11 +2340,24 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await page.locator('#main').evaluate(element => { element.scrollTop = 0; });
       }
     }, true);
-    await captureView('settings', 'settings', async () => {
-      // The approved Screen 10 reference shows public prices enabled. Keep this canonical
-      // screenshot in that state instead of conflating it with the alternate hidden-price state.
+    await captureView('settings', 'settings', async variant => {
+      // Screen 10 should reproduce the approved public-price-enabled state and keep its
+      // three primary controls visible before the mobile navigation at the reference viewport.
       await expect(page.locator('#showPrices')).toBeChecked();
-      await expect(page.locator('#main')).toContainText('Đang bật');
+      await expect(page.getByRole('heading', { name: 'Hiển thị giá sản phẩm công khai' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Lớp phủ chào mừng (Welcome Overlay)' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Cài đặt watermark' })).toBeVisible();
+
+      if (variant.viewport.width === 390 && variant.viewport.height === 844 && variant.theme === 'light') {
+        const mobileNavTop = await page.locator('.mobiletabs').evaluate(element => element.getBoundingClientRect().top);
+        for (const selector of ['#watermarkEnabled', '#watermarkLogoUrl', '#watermarkPosition', '#watermarkSize', '#watermarkOpacity']) {
+          const bounds = await page.locator(selector).boundingBox();
+          expect(bounds, 'Reference Screen 10 control should render: ' + selector).not.toBeNull();
+          expect(bounds.y + bounds.height,
+            'Reference Screen 10 control must remain above fixed mobile navigation: ' + selector)
+            .toBeLessThanOrEqual(mobileNavTop + 1);
+        }
+      }
     }, true);
     await captureView('settings-qr-unsaved-guard', 'settings', async variant => {
       // Previous viewport iteration leaves the guard message in the live DOM;

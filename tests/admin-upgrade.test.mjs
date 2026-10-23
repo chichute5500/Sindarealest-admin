@@ -102,3 +102,14 @@ assert.match(staticBaseline, /['"]\/api\/admin\/settings['"]\s*:\s*\{\s*showPric
   "Screen 10 baseline fixture must match the approved reference's public-price-enabled state.");
 assert.ok(staticBaseline.includes("await expect(page.locator('#showPrices')).toBeChecked()"),
   "Screen 10 screenshot capture must assert the reference state rather than silently capturing a different setting.");
+
+for (const referenceHeading of [
+  'Hiển thị giá sản phẩm công khai',
+  'Hiển thị giá trên website',
+  'Lớp phủ chào mừng (Welcome Overlay)',
+  'Cài đặt watermark'
+]) {
+  assert.ok(admin.includes(referenceHeading), `Screen 10 must retain reference-aligned settings copy: ${referenceHeading}`);
+}
+assert.ok(admin.includes('class="settingsgrid website-settings"'),
+  "Screen 10 must have a dedicated layout hook so mobile compaction does not affect Backup/Restore.");
