@@ -1,3 +1,20 @@
+## LATEST EXACT-SHA RESULT — FULLSCREEN GALLERY DECODE GUARD — 2026-10-24
+
+- Source/test commit and deployed SHA: `fa24269d7e1c06b511d1b08455d77493bd4c9d1e`.
+- Change limited to `public/index.html` and `tests/gallery-transition-mobile-cart-badge.test.mjs`.
+- Implementation: a rejected Promise or synchronous throw from `incoming.decode()` no longer leads into `revealDecodedImage()`. The error path retains the active decoded image and clears incoming transition classes. The transition ID suppresses both stale success and stale failure callbacks.
+- Runtime regression harness runs the actual `setFullscreenPhoto()` implementation with controlled asynchronous decode promises. PASS cases:
+  1. The outgoing/current photo remains the only active layer while decode is pending; the incoming image becomes active only after decode success.
+  2. Decode rejection does not reveal the incoming layer.
+  3. Resolving a stale earlier decode after a later request does not change the latest requested image.
+- Full integrity, dependency audit and test suite PASS: [CI #40015701227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701227). The audit reported `found 0 vulnerabilities`; logs explicitly report the fullscreen runtime regression tests PASS.
+- Exact-SHA Preview deployment PASS: [deploy #40015701262](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701262). Immutable URL: https://6f355551.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Initial CI/deploy attempt on `c69077136b7c31bed5165053082cd14afc4f708f` exposed an outdated static assertion that required the previous `const decoded` form. The Preview workflow failed at pre-deploy test validation, before Wrangler upload. The assertion and VM timer fixture were corrected in follow-up commits; both final exact-SHA workflows passed.
+- The Liquid Glass visual-preview workflow was skipped by the Hero-coverage guard. No browser/Playwright gallery validation, screenshot, or manual visual acceptance was performed.
+- **Not owner-PASS yet:** owner must verify the exact Preview above on a mobile device. Keep fullscreen flicker as the only active acceptance item until the owner confirms.
+
+---
+
 ## VERIFIED TEST RECORD — CART STORAGE + SHARE FALLBACK — 2026-10-24
 
 - Final combined source/test SHA: `5f86282be26c34f4cf0587f36be8011b9d1d46ec`.

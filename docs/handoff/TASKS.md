@@ -1,3 +1,17 @@
+## LATEST TASK STATUS — FULLSCREEN GALLERY DECODE GUARD — 2026-10-24
+
+**Completed with exact-SHA CI and Preview deployment PASS; owner visual acceptance is still pending.**
+
+- Source/test SHA deployed: `fa24269d7e1c06b511d1b08455d77493bd4c9d1e`.
+- Fixed one confirmed unsafe decode-failure path in `setFullscreenPhoto()`: rejected/synchronous `decode()` failures no longer fall through to revealing the incoming photo. The current visible photo remains active.
+- Added a runtime regression harness for delayed decode, decode rejection, and two overlapping image requests. Final test log explicitly reports: `PASS: fullscreen runtime preserves the current frame, rejects failed decodes, and ignores stale competing transitions.`
+- Full CI PASS: [#40015701227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701227). Exact-SHA Preview deployment PASS: [#40015701262](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701262).
+- New immutable Preview URL: https://6f355551.sindarealest2.pages.dev/
+- Next and only owner action: recheck fullscreen product gallery on mobile, especially opening fullscreen and rapidly switching next/previous across multiple photos. Do not ask for retesting other areas.
+- This is not yet visual PASS. Keep PR #108 OPEN/unmerged, Preview only, and all other owner-accepted sections LOCKED.
+
+---
+
 ## OWNER LATEST STATUS — REMAINING WORK CLARIFIED — 2026-10-24
 
 **Only active owner-reported defect:** mobile product image fullscreen/gallery still occasionally flickers 1–2 times. Owner confirms it is markedly improved, but not completely fixed. Do not mark fullscreen gallery complete until the owner rechecks a newer Preview and accepts it.

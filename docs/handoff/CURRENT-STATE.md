@@ -1,3 +1,19 @@
+## LATEST VERIFIED UPDATE — FULLSCREEN GALLERY DECODE GUARD — 2026-10-24
+
+- **Deployed source/test commit:** `fa24269d7e1c06b511d1b08455d77493bd4c9d1e`. The only source/test files in this change are `public/index.html` and `tests/gallery-transition-mobile-cart-badge.test.mjs`.
+- **Fix:** mobile fullscreen image transitions no longer treat a rejected or synchronously thrown `HTMLImageElement.decode()` as success. A failed decode leaves the currently active, already-rendered photo visible, removes transition state from the incoming layer, restores active-image accessibility state, and ignores stale failures through the existing transition ID guard.
+- **Runtime regression test:** executes the actual `setFullscreenPhoto()` source in an isolated Node VM with controlled load/decode timing. It verifies the prior photo remains visible until decode succeeds, decode rejection does not reveal the unconfirmed layer, and an older competing request cannot override the latest requested photo.
+- **Exact-SHA CI PASS:** [Validate source and tests #40015701227](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701227). Project integrity, dependency audit (zero vulnerabilities), and the full automated test suite passed.
+- **Exact-SHA Preview deploy PASS:** [Preview deployment #40015701262](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701262). The log confirms checkout of `fa24269d7e1c06b511d1b08455d77493bd4c9d1e`, Pages project `sindarealest2`, Production branch `main`, and successful deployment with the exact SHA supplied as the commit hash.
+- **Immutable Preview:** https://6f355551.sindarealest2.pages.dev/
+- **Branch Preview alias:** https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- **Visual workflow:** Liquid Glass isolated visual Preview was SKIPPED by its current Hero-coverage guard, intentionally. No browser/Playwright gallery run or manual visual acceptance is claimed.
+- **Acceptance remains OPEN:** owner-reported flicker is not considered resolved until the owner checks this newer Preview on a phone, opens fullscreen, and moves through multiple photos. This update does not reopen any other PASS/LOCKED scope.
+- PR #108 remains OPEN/unmerged, base `main`. No Production deployment or changes to `main`, Admin/backend/API/auth, catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access/infrastructure, or payment flow.
+- The first run on the initial source commit failed because a legacy test assertion expected the previous decode expression; the Preview workflow stopped during pre-deploy tests and did not upload that revision. The assertion/VM timer fixtures were corrected, then the exact-SHA CI and Preview deployment above passed.
+
+---
+
 ## OWNER LATEST STATUS — REMAINING WORK CLARIFIED — 2026-10-24
 
 **Only active owner-reported defect:** mobile product image fullscreen/gallery still occasionally flickers 1–2 times. Owner confirms it is markedly improved, but not completely fixed. Do not mark fullscreen gallery complete until the owner rechecks a newer Preview and accepts it.

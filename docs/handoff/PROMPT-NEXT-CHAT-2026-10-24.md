@@ -1,3 +1,35 @@
+# CURRENT HANDOFF UPDATE — SinDarealest2 Storefront — 2026-10-24
+
+> Read this update first. It supersedes older SHA/run details below; historical records are retained as history.
+
+## Current source, tests, and Preview
+
+- Repository: `chichute5500/Sindarealest-admin`.
+- Working branch: `fix/liquid-glass-audit-2026-10-19`.
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, not merged, base `main`.
+- Latest storefront source/test SHA deployed to Preview: `fa24269d7e1c06b511d1b08455d77493bd4c9d1e` (`fix: preserve fullscreen photo when decode fails`, plus regression-test fixture corrections in the same source/test series).
+- Exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701227
+- Exact-SHA Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40015701262
+- Immutable Preview: https://6f355551.sindarealest2.pages.dev/
+- Branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Project must remain `sindarealest2`; Production branch must remain `main`. No Production deploy and no PR merge.
+
+## Only open item
+
+Investigate/verify the occasional mobile product fullscreen-image flicker. A confirmed unsafe path was fixed: decode failure used to be swallowed and then treated as a successful reveal. It now keeps the existing image visible on decode failure. A real-function runtime regression test covers pending decode, rejected decode, and stale overlapping requests.
+
+**Next action:** owner tests the immutable Preview on a phone: open a product’s fullscreen gallery, move next/previous and tap different thumbnails repeatedly, noting whether any flash or ghost/overlaid image remains. Do not ask owner to retest cart/account or other accepted work. Do not label visual acceptance PASS until owner confirms.
+
+## Acceptance and boundaries
+
+- CI PASS and Preview deploy PASS are automated evidence; they are not visual acceptance.
+- Liquid Glass isolated visual workflow is SKIPPED because it requires Hero coverage; Hero remains PAUSED BY OWNER and must not be inspected, captured, or modified.
+- All other items remain PASS/LOCKED per latest owner instruction: mobile cart/account controls; accepted icon/Liquid Glass appearance and dimensions; catalog filters/chips; `#order`; warranty claim form/lookup; every other previously accepted storefront section. Do not reopen any.
+- No changes to `main`, Production, Admin/backend/API/auth, catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access/infrastructure, or live-payment flow.
+- The newest source/test SHA can differ from branch HEAD after this handoff commit because this commit updates documentation only. This docs update does not change deployed storefront assets and must not be described as a new deployment.
+
+---
+
 # PROMPT TIẾP QUẢN — SinDarealest2 Storefront — 2026-10-24
 
 > Đây là prompt bàn giao mới nhất cho phiên tiếp theo. Đọc cùng `CURRENT-STATE.md`, `TASKS.md`, `DECISIONS.md` và `TEST-RESULTS.md`; nếu dữ liệu cũ mâu thuẫn với trạng thái GitHub mới nhất hoặc quyết định mới nhất của chủ dự án, hãy xác minh GitHub và tôn trọng quyết định mới nhất. Không khởi động lại dự án.

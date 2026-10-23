@@ -1,3 +1,12 @@
+## DECISION UPDATE — FULLSCREEN DECODE FAILURE — 2026-10-24
+
+- Accept the minimal decode-failure guard as an implementation change pending owner visual acceptance; it does not alter Liquid Glass styling, layout, controls, or gallery interaction design.
+- When the incoming fullscreen photo fails to decode (including a synchronous throw), do not reveal that layer. Keep the previously active photo visible and restore its active/accessibility state. The transition ID remains authoritative so stale callbacks cannot affect the newest request.
+- Automated regression + exact-SHA CI + Preview deploy are implementation gates only. The owner must still confirm perceived flicker on a phone before marking fullscreen gallery PASS.
+- Existing decisions remain unchanged: PR #108 OPEN/unmerged; Production branch `main`; Hero PAUSED BY OWNER; all other storefront sections PASS/LOCKED; no Production/main, Admin/backend/API/data/storage/secrets/infrastructure/payment changes.
+
+---
+
 # Decision log — SinDarealest2
 
 Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đảo ngược tùy tiện. Nội dung trong file này là ràng buộc dự án; khi có yêu cầu mới rõ ràng từ người dùng, ghi quyết định mới kèm ngày và phạm vi thay đổi.
