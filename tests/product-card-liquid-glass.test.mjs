@@ -229,10 +229,17 @@ assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.activ
   && html.includes('transform:translateY(1px) scale(.965)'),
   "Slimming catalog filter pills must preserve the existing press feedback.");
 
-assert.match(html, /#products \.filter-pill\{[^}]*min-height:40px;\s*padding:9px 19px;/,
+assert.match(html, /#products \.filter-pill\{[^}]*min-height:44px;\s*padding:9px 19px;/,
   "The authoritative desktop product filter style should be 4px shorter while keeping its horizontal padding and glass layers.");
 
-assert.match(html, /#products \.filter-pill\{min-height:40px;padding:7px 11px;font-size:13\.5px\}/,
+assert.match(html, /#products \.filter-pill\{min-height:44px;padding:7px 11px;font-size:13\.5px\}/,
   "Narrow-phone product filters should use a reduced 40px touch target, not the previous oversized 44px height.");
 assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(--panel-strong);border-color:var(--gold);box-shadow:inset 0 1px rgba(255,255,255,.26)}'),
   "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
+
+assert.ok(html.includes('border-top:2px solid transparent;')
+  && html.includes('border-bottom:2px solid transparent;')
+  && html.includes('background-clip:padding-box;'),
+  "The visible Liquid Glass surface should be inset vertically while the real button keeps its 44px touch target.");
+assert.ok(html.includes('inset:3px 1px;') && html.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;'),
+  "The specular sweep must remain inside the slimmer glass surface and retain its existing activation animation.");
