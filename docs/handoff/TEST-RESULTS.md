@@ -265,3 +265,11 @@ Owner explicitly confirmed PASS for the order-step heading readability change. T
 - Commit `e9b35186e4273410253b4158f45105be19c7c483` now references each sampled animation object's `.currentTime` for desktop activation, category reselection and touch. The 1ms frame-time tolerance and `scaleX > 1.04` checks remain.
 - Validation #39953590662 and live catalog audit #39953590658 were IN_PROGRESS. Inspect final status, logs and artifact.
 - Owner visual acceptance remains pending. If the next audit passes, still compare captured frames with the supplied reference across viewport/theme states before asking owner to review.
+
+## Specular sweep and deterministic frame audit — 2026-10-23 12:30 UTC
+
+- Live audit #39953590658: FAIL. After fixing harness reference errors, it failed at `Computed glass bloom must evolve between real animation frames` because `box-shadow` was unchanged at the two captured times. This check was brittle and did not demonstrate that the visual effect was absent.
+- UI changed at commit `7013ee6c9b4fe8a3247b0f2b7a7305ef7e044824`: Light/Dark keyframes now move the diagonal specular layer through the spring settle (background-position 35%, 75%, 100%, 130%).
+- Audit changed at commit `1311be92c3a97931e09ee36bdc7b95c2f8e25269`: later frame is pinned deterministically to 205ms and background-position movement is asserted, rather than requiring box-shadow interpolation.
+- Current validation #39954296929 and audit #39954296537 were pending. The preceding CSS commit also triggered deploy #39954232102 and other workflows; inspect final results and verify the exact Preview SHA/public tree.
+- Owner visual acceptance remains pending. Passing behavior checks do not replace visual comparison with `docs/design-reference/liquid-glass-product-filters.png` at mobile/tablet/desktop × Light/Dark.
