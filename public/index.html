@@ -409,6 +409,10 @@ html.theme-transitioning body,html.theme-transitioning body:after,html.theme-tra
 .sd-fullscreen-image.sd-slide-out-right{animation:sdFullscreenOutRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:2}
 .sd-fullscreen-image.sd-slide-in-right{animation:sdFullscreenInRight 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:3}
 .sd-fullscreen-image.sd-slide-in-left{animation:sdFullscreenInLeft 300ms cubic-bezier(.22,.75,.25,1) both!important;z-index:3}
+@keyframes sdFullscreenMobileFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes sdFullscreenMobileFadeIn{from{opacity:0}to{opacity:1}}
+.sd-fullscreen-image.sd-mobile-fade-out{animation:sdFullscreenMobileFadeOut 460ms ease-in-out both!important;z-index:2}
+.sd-fullscreen-image.sd-mobile-fade-in{animation:sdFullscreenMobileFadeIn 460ms ease-in-out both!important;z-index:3}
 .sd-fullscreen-close,.sd-fullscreen-arrow{position:absolute;z-index:7;display:grid;place-items:center;box-sizing:border-box;width:42px;height:42px;padding:0;border-radius:50%;font-size:27px;line-height:1;cursor:pointer}
 .sd-fullscreen-close{top:calc(13px + env(safe-area-inset-top));right:14px}
 .sd-fullscreen-close svg{width:19px;height:19px}
@@ -959,12 +963,13 @@ function sizeFullscreenFrame(imageOverride){
 }
 // Product photos are always rendered from their original pixels; never infer and remove a white canvas.
 const FULLSCREEN_SLIDE_MS=300;
+const FULLSCREEN_MOBILE_FADE_MS=460;
 function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','sd-mobile-fade-out','sd-mobile-fade-in','is-changing')}
 function setFullscreenPhoto(src,direction='left',instant=false){
  clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
  const transitionId=++fullscreenTransitionId,images=fullscreenImages(),active=activeFullscreenImage(),incoming=images.find(img=>img!==active),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
- // Mobile browsers can briefly composite two full-resolution layers unevenly; wait for decode, then swap atomically instead of animating both layers.
- instant=instant||window.matchMedia('(max-width:760px)').matches;
+ // Mobile navigation uses a slower opacity crossfade, but only after the incoming photo has loaded and decoded.
+ const mobile=window.matchMedia('(max-width:760px)').matches;
  if(!active||!incoming||!frame)return;
  const imageIndex=Math.max(0,detailImages.indexOf(src))+1;
  const altText=(currentProduct?.title||'Sản phẩm SinDarealest')+' — ảnh '+imageIndex;
@@ -988,15 +993,21 @@ function setFullscreenPhoto(src,direction='left',instant=false){
     incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
     syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();return;
    }
-   // Keep the old decoded photo fully visible until the incoming photo is decoded.
-   // Crossfade both real image layers; never expose the frame's pale glass background between photos.
-   active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
-   incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
+   // Mobile GPU/compositor flicker came from an immediate two-layer opacity/z-index swap.
+   // Keep the outgoing decoded photo visible while the decoded incoming photo fades in over it.
+   const mobileFade=mobile;
+   if(mobileFade){
+    active.classList.add('sd-mobile-fade-out');
+    incoming.classList.add('sd-mobile-fade-in');
+   }else{
+    active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
+    incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
+   }
    fullscreenAnimationTimer=setTimeout(()=>{
     if(transitionId!==fullscreenTransitionId)return;
-    active.classList.remove('is-active');incoming.classList.add('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
+    incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
     syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
-   },FULLSCREEN_SLIDE_MS+20);
+   },mobileFade?FULLSCREEN_MOBILE_FADE_MS:FULLSCREEN_SLIDE_MS+20);
   };
   const rejectDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
