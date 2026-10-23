@@ -1,3 +1,15 @@
+## LATEST COMPLETED WORK — CART ACCURACY + SHARE FALLBACK — 2026-10-24
+
+- **COMPLETE / CI + Preview PASS** on final combined source/test SHA `5f86282be26c34f4cf0587f36be8011b9d1d46ec`.
+- Zalo cart consultation: truthful copy-success/failure notices, honest blocked-popup fallback, correct newline-separated SKU/quantity message. Behavioral regression test covers multiple products and both copy outcomes.
+- Local cart: after successful catalog load, discard stale product keys and malformed quantities (including boolean `true`), normalize numeric strings to safe positive integer quantities, persist cleaned state only if changed and refresh badge. Keep stored cart untouched if product API fails. Regression in `tests/cart-checkout-separation.test.mjs`.
+- Fullscreen product share: retry through clipboard if native sharing rejects except on user-cancel `AbortError`; status reflects clipboard result, cancellation stays quiet. Regression in `tests/storefront-accessibility-contract.test.mjs`.
+- CI [#40004265503 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40004265503); Preview deploy [#40004265341 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40004265341); immutable Preview https://7b538028.sindarealest2.pages.dev/.
+- No live browser screenshot/manual visual acceptance. Keep evidence categories distinct.
+- No locked area, backend/API/data, Production or main change.
+
+---
+
 ## LATEST COMPLETED TASKS — CART CONSULTATION + STALE CART — 2026-10-24
 
 - **COMPLETE / CI + Preview PASS** at combined source/test SHA `373c282d626b6ec2291111adb7d81ec2a26e1c2d`.
