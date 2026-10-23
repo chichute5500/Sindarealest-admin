@@ -24,3 +24,15 @@
 1. Fetch live PRs, main, writable branch HEAD and Actions; check Validate on the exact current HEAD once.
 2. Do not repeat the B1 census unless the live diff materially changes.
 3. Continue real product acceptance or fix a newly evidenced defect. No merge/deploy/remote data operations.
+
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 4ac7465539e746b7f37517327d7bf9bddcfa3285
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39891442082
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-361 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
