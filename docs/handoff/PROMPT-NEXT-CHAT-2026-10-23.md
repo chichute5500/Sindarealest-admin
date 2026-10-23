@@ -1,3 +1,16 @@
+# AUTHORITATIVE NEXT-CHAT OVERRIDE — SLIDESHOW CONTROL GUARD IN CI — 2026-10-24
+
+Continue existing repository, re-fetch HEAD/PR and all four handoff files first.
+
+Latest follow-up SHA `3fabbfc0bea134f9babde0b856276a47c966553f`: slideshow setup now checks that pause/previous/next controls exist before wiring handlers. Regression test covers missing pause control as well as pause/resume and reduced-motion.
+- CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995117962 — was in progress when written.
+- Preview: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995118190 — was in progress when written.
+- Do not call this follow-up PASS until both workflows finish on exact SHA. Previous slideshow fix passed CI/Preview at `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`; its URL was https://5052d769.sindarealest2.pages.dev/.
+
+Keep PR #108 OPEN/unmerged, no Production/main change. Hero paused; #order, catalog filter and warranty form locked. Do not touch Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Access/infrastructure/payment. No visual/browser PASS claim. Continue source-first audit of unlocked storefront only.
+
+---
+
 # AUTHORITATIVE NEXT-CHAT OVERRIDE — COLLECTION SLIDESHOW PAUSE FIX — 2026-10-24
 
 Continue the existing SinDarealest2 repository. First fetch latest branch HEAD and PR #108; read all four handoff files. Do not restart or assume the previous SHA remains HEAD.
