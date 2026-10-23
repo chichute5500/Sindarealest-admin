@@ -1,5 +1,16 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
 
+## LATEST AUTHORITATIVE UPDATE — MOBILE BACKDROP FOCUS RETURN — 2026-10-23 22:53 ICT
+
+- Branch/PR head for this source change: `07ff556aa957cfc119c48651769a4edbbe1dbe01`; PR #108 remains OPEN/unmerged.
+- Fixed a confirmed mobile-navigation focus issue: clicking the backdrop closes the menu and now returns focus to `#menuToggle`, matching the existing Escape dismissal behavior. Regression contract added to `tests/mobile-navigation-contract.test.mjs`.
+- Exact-SHA source/dependency validation and full automated tests PASS: [CI #39981926738](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926738).
+- Exact-SHA Preview deploy PASS: [deploy #39981926942](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926942). Immutable Preview: https://22e2ec6d.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deployment log confirms Pages project `sindarealest2`, Production branch `main`, and Wrangler invoked with `--commit-hash=$GITHUB_SHA`. No Production deployment.
+- No screenshot/browser acceptance was run for this keyboard-focus-only change; do not claim live visual/browser PASS. Continue source-first checks only in unlocked, non-Hero areas.
+- Locks remain unchanged: Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; catalog filter Liquid Glass/height OWNER PASS/LOCKED. Do not reopen or retest those areas, do not restore the deleted status-filter panel, and keep PR #108 open/unmerged.
+
+
 ## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
 
 - The first two CI attempts exposed test-harness issues (missing `node:vm` import and a callback created in the wrong JavaScript context). Both are corrected. Full project integrity, dependency audit and `npm test` now PASS at exact code/test SHA `0371b82c71e39f67ad0afd74a08e7a2557341bab` — [CI #39979850514](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39979850514).

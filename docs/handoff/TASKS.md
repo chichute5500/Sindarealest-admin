@@ -1,5 +1,14 @@
 # ACTIVE TASK LEDGER — SINDAREALEST2
 
+## LATEST TASK UPDATE — MOBILE BACKDROP FOCUS RETURN — 2026-10-23 22:53 ICT
+
+- Completed the non-locked mobile navigation backdrop focus-return fix at `07ff556aa957cfc119c48651769a4edbbe1dbe01`.
+- Regression assertion added; full CI PASS [#39981926738](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926738).
+- Preview deploy PASS [#39981926942](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926942), immutable URL https://22e2ec6d.sindarealest2.pages.dev/.
+- This is a source/test/deploy technical PASS only, not manual browser visual acceptance. Continue with the next safe source-first audit in unlocked storefront behavior; require a concrete defect before editing.
+- Do not touch Hero, `#order`, catalog filter Liquid Glass/height, Admin/backend/API/auth/data/config, or Production. PR #108 stays OPEN/unmerged.
+
+
 ## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
 
 - The first two CI attempts exposed test-harness issues (missing `node:vm` import and a callback created in the wrong JavaScript context). Both are corrected. Full project integrity, dependency audit and `npm test` now PASS at exact code/test SHA `0371b82c71e39f67ad0afd74a08e7a2557341bab` — [CI #39979850514](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39979850514).

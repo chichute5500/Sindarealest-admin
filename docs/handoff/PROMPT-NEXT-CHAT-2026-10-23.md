@@ -1,5 +1,26 @@
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
+## NEWEST HANDOFF OVERRIDE — MOBILE BACKDROP FOCUS FIX COMPLETE — 2026-10-23 22:53 ICT
+
+Continue the existing repository; do not restart. Re-fetch branch HEAD and PR state before further edits.
+
+- Repo `chichute5500/Sindarealest-admin`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 OPEN/unmerged.
+- Latest source/test commit: `07ff556aa957cfc119c48651769a4edbbe1dbe01`.
+- Fix: mobile navigation backdrop dismissal now closes the menu and returns focus to `#menuToggle`; regression assertion added in `tests/mobile-navigation-contract.test.mjs`.
+- CI PASS: [#39981926738](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926738).
+- Preview deploy PASS: [#39981926942](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926942).
+- Immutable Preview: https://22e2ec6d.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- No screenshot/live-browser acceptance is claimed for this keyboard interaction fix. Continue with source-first audit of unlocked, non-Hero storefront behavior and only edit after identifying a concrete defect.
+
+## Hard guardrails
+- Hero PAUSED BY OWNER: do not inspect, edit, test, redesign, restore, or capture.
+- `#order` / “Đặt hàng an tâm” OWNER PASS/LOCKED: do not touch or retest.
+- Catalog filter Liquid Glass/chip height OWNER PASS/LOCKED; do not change or run its audit without explicit owner reopening plus required unlock.
+- Do not restore the deleted dedicated product-status filter panel.
+- No Production deploy, main changes, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+- PR #108 must remain OPEN/unmerged.
+- Report progress and continue; do not stop at a report. If a live-browser gate is blocked by Access, do not bypass it; continue independent safe source/test work.
+
 ## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
 
 - The first two CI attempts exposed test-harness issues (missing `node:vm` import and a callback created in the wrong JavaScript context). Both are corrected. Full project integrity, dependency audit and `npm test` now PASS at exact code/test SHA `0371b82c71e39f67ad0afd74a08e7a2557341bab` — [CI #39979850514](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39979850514).

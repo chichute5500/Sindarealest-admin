@@ -1,5 +1,15 @@
 # TEST & VISUAL AUDIT EVIDENCE INDEX
 
+## LATEST EXACT-SHA RESULT — MOBILE BACKDROP FOCUS RETURN — 2026-10-23 22:53 ICT
+
+- Commit: `07ff556aa957cfc119c48651769a4edbbe1dbe01`.
+- Change scope: `public/index.html` now restores focus to `#menuToggle` after backdrop dismissal hides the mobile navigation; `tests/mobile-navigation-contract.test.mjs` adds a regression contract.
+- Full source integrity/dependency audit/test suite PASS: [CI #39981926738](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926738).
+- Cloudflare Pages Preview deploy PASS on the exact run SHA: [#39981926942](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39981926942); immutable URL https://22e2ec6d.sindarealest2.pages.dev/.
+- Logs confirmed project `sindarealest2`, Production branch `main`, and explicit `--commit-hash=$GITHUB_SHA`; no Production deploy.
+- No new live screenshots were captured. Treat this as CI/deploy PASS, not live-browser visual or owner acceptance. All owner locks remain intact.
+
+
 ## IMMEDIATE VALIDATION CORRECTION / PREVIEW CONFIGURATION GATE — 2026-10-23
 
 - The first two CI attempts exposed test-harness issues (missing `node:vm` import and a callback created in the wrong JavaScript context). Both are corrected. Full project integrity, dependency audit and `npm test` now PASS at exact code/test SHA `0371b82c71e39f67ad0afd74a08e7a2557341bab` — [CI #39979850514](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39979850514).
