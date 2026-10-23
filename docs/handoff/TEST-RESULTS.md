@@ -1,3 +1,12 @@
+## LATEST TEST RECORD — SLIDESHOW MISSING-CONTROL GUARD — 2026-10-24
+
+- Follow-up source/test SHA: `3fabbfc0bea134f9babde0b856276a47c966553f`.
+- New assertion: if the pause control is missing, setup returns without throwing and does not start an interval. Normal pause/resume lifecycle and reduced-motion assertions remain.
+- CI #39995117962 and Preview #39995118190 were in progress at the time of this update. Their exact-SHA conclusions must be checked before marking PASS.
+- No browser screenshot/manual visual PASS; Preview-only, no Production.
+
+---
+
 ## LATEST TEST RECORD — COLLECTION SLIDESHOW PAUSE/RESUME — 2026-10-24
 
 - Exact source/test SHA: `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`.
