@@ -22,7 +22,13 @@ assert.match(detailTransition, /if\(transitionId!==detailTransitionId\)return/);
 assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
-assert.match(html, /instant=instant\|\|window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
+assert.match(html, /const mobile=window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
+assert.match(html, /const FULLSCREEN_MOBILE_FADE_MS=460/);
+assert.match(html, /sd-mobile-fade-out/);
+assert.match(html, /sd-mobile-fade-in/);
+assert.match(html, /mobileFade\?FULLSCREEN_MOBILE_FADE_MS:FULLSCREEN_SLIDE_MS\+20/);
+assert.match(html, /@keyframes sdFullscreenMobileFadeOut\{from\{opacity:1\}to\{opacity:0\}\}/);
+assert.match(html, /@keyframes sdFullscreenMobileFadeIn\{from\{opacity:0\}to\{opacity:1\}\}/);
 
 const fullscreenMobileSwap = html.slice(html.indexOf('function setFullscreenPhoto('), html.indexOf('function renderFullscreenThumbs(', html.indexOf('function setFullscreenPhoto(')));
 assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
@@ -94,6 +100,8 @@ function mockClassList(initial = []) {
 }
 function createFullscreenHarness() {
   const decodeQueue = [];
+  const timers = new Map();
+  let nextTimerId = 1;
   function makeImage(id, initialSrc, active) {
     let source = initialSrc;
     const attributes = new Map();
@@ -123,7 +131,7 @@ function createFullscreenHarness() {
   const images = [makeImage('sdFullscreenImage', 'old.jpg', true), makeImage('sdFullscreenImageNext', '', false)];
   const frame = { style: {} };
   const context = {
-    images, frame, decodeQueue,
+    images, frame, decodeQueue, timers,
     window: { matchMedia: () => ({ matches: true }), __sdUpdateDetailWatermark() {} },
     currentProduct: { title: 'Regression product' },
     detailImages: ['old.jpg', 'new.jpg', 'newer.jpg'],
@@ -133,11 +141,12 @@ function createFullscreenHarness() {
       : selector === '#sdFullscreenImageNext' ? images[1] : null,
     sizeFullscreenFrame() {}
   };
+  context.nextTimerId = nextTimerId;
   const prelude = [
     "let fullscreenSwapTimer = null;",
     "let fullscreenAnimationTimer = null;",
-    "function clearTimeout(timer) {}",
-    "function setTimeout(callback, delay) { return 0; }",
+    "function clearTimeout(timer) { context.timers.delete(timer); }",
+    "function setTimeout(callback, delay) { const id = context.nextTimerId++; context.timers.set(id, { callback, delay }); return id; }",
     "let fullscreenTransitionId = 0;",
     "let fullscreenActiveLayer = 0;",
     "function $(selector) { return context.$(selector); }",
@@ -154,8 +163,15 @@ function createFullscreenHarness() {
   const sandbox = { context };
   runInNewContext(prelude + String.fromCharCode(10) + fullscreenRuntimeSource, sandbox);
   return {
-    images, decodeQueue,
-    run: source => sandbox.setFullscreenPhoto(source, 'left', true),
+    images, decodeQueue, timers,
+    run: (source, instant = false) => sandbox.setFullscreenPhoto(source, 'left', instant),
+    finishAnimation: () => {
+      const item = [...timers.entries()].find(([, timer]) => timer.delay >= 300);
+      assert.ok(item, 'A timed image transition should remain pending until the fade completes.');
+      timers.delete(item[0]);
+      item[1].callback();
+      context.fullscreenActiveLayer = 1;
+    },
     loadIncoming: image => {
       const handler = image.onload;
       assert.equal(typeof handler, 'function', 'Incoming image should wait for its load event.');
@@ -178,6 +194,12 @@ function assertExactlyOneActivePhoto(images, expected) {
   assert.equal(gallery.decodeQueue.length, 1);
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  assert.equal(gallery.images[0].classList.contains('sd-mobile-fade-out'), true);
+  assert.equal(gallery.images[1].classList.contains('sd-mobile-fade-in'), true);
+  assert.equal([...gallery.timers.values()].some(timer => timer.delay === 460), true,
+    'Mobile photo changes must use the slower 460ms fade after decode, not an immediate layer swap.');
+  gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
   assert.equal(gallery.images[1].getAttribute('src'), 'new.jpg');
 }

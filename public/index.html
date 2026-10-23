@@ -959,7 +959,7 @@ function sizeFullscreenFrame(imageOverride){
 }
 // Product photos are always rendered from their original pixels; never infer and remove a white canvas.
 const FULLSCREEN_SLIDE_MS=300;
-function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing')}
+function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','sd-mobile-fade-out','sd-mobile-fade-in','is-changing')}
 function setFullscreenPhoto(src,direction='left',instant=false){
  clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
  const transitionId=++fullscreenTransitionId,images=fullscreenImages(),active=activeFullscreenImage(),incoming=images.find(img=>img!==active),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
