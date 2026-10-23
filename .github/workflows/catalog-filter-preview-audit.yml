@@ -621,6 +621,12 @@ jobs:
                     await page.waitForTimeout(500);
                     const nextCategory = categoryGroup.locator('button[data-category]:not([data-category="all"])').nth(1);
                     assert.ok(await nextCategory.count() > 0, 'A second non-default category is required to verify animation retriggering.');
+                    // Trigger the actual category change first; then sample the live animation state.
+                    await nextCategory.click();
+                    assert.equal(await nextCategory.getAttribute('aria-pressed'), 'true',
+                      'Switching to another category must update persistent selection.');
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
+                      'Switching categories must clear the previous selected state.');
                     // Sample the second activation after its initial press-in and compare both scale
                     // and bloom against the unselected chip. The first activation above separately
                     // captures the actual peak (>1.04); this check proves reselection starts a fresh,
