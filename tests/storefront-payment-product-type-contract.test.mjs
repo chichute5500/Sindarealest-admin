@@ -9,9 +9,9 @@ assert.equal(fromRow({id:'p2',slug:'p2',sku:'SD-P2',title:'P2',category:'sneaker
 assert.equal(fromRow({id:'p3',slug:'p3',sku:'SD-P3',title:'P3',category:'sneakers',stock:0,fulfillment_type:'in_stock',published:1}).fulfillmentType,'in_stock');
 assert.equal(fromRow({id:'p4',slug:'p4',sku:'SD-P4',title:'P4',category:'sneakers',stock:5,fulfillment_type:'made_to_order',published:1}).fulfillmentType,'made_to_order');
 assert.equal(fromRow({id:'p5',slug:'p5',sku:'SD-P5',title:'P5',category:'sneakers',fulfillment_type:'guess',published:1}).fulfillmentType,'unclassified');
-for(const id of ['fulfillmentFilters','detailFulfillment','paymentInstructions'])assert.match(html,new RegExp('id="'+id+'"'));
-assert.ok(html.includes("data-fulfillment-type=\"'+type+'\""), 'Filter uses the explicit fulfillment enum.');
-assert.match(html,/selectedFulfillment==='all'\|\|productFulfillmentType\(p\)===selectedFulfillment/);
+for(const id of ['detailFulfillment','paymentInstructions'])assert.match(html,new RegExp('id="'+id+'"'));
+assert.ok(!html.includes('id="fulfillmentFilters"')&&!html.includes('selectedFulfillment'), 'The unnecessary catalog product-status filter panel and its filtering state must stay removed.');
+assert.ok(html.includes("data-fulfillment-type=\"'+type+'\""), 'Per-product status badges must keep the explicit fulfillment enum for product/detail information.');
 assert.match(html,/result\?\.status==='confirmed'/);
 assert.match(html,/result\?\.paymentReady===true/,'QR display must require an explicit server paymentReady flag.');
 assert.match(html,/fetch\(url,\{method:'GET',cache:'no-store'/,'Payment status refresh must call the order-payment API without cache.');
