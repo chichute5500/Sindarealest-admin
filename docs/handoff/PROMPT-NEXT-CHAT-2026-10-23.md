@@ -1,5 +1,35 @@
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
+## NEWEST HANDOFF OVERRIDE — WARRANTY CLAIM FOCUS FIX DEPLOYED — 2026-10-23 23:31 ICT
+
+Continue the current repository from GitHub, not by recreating the project. Always re-check the branch and PR before additional edits.
+
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- Latest source/test/deployed Preview SHA: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`.
+- PR #108 must remain OPEN and unmerged.
+- Fix in `public/index.html`: selecting an eligible warranty record now reveals/scrolls the claim form and focuses the required `#claimIssueType` select, instead of leaving focus on the old selection button.
+- New behavior-level regression coverage in `tests/storefront-accessibility-contract.test.mjs` checks the form reveal, token propagation, scroll, focus transfer and status update.
+- CI / all automated tests PASS: [#39986991649](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991649).
+- Preview deploy PASS on the exact same SHA: [#39986991635](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991635).
+- Immutable Preview: https://00283315.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy log verified project `sindarealest2`, Production branch `main`, and the SHA passed using `--commit-hash=$GITHUB_SHA`.
+- Commit `43cc718...` included the source fix but its first test harness had double-escaped newline separators. The harness was corrected in test-only commit `a6097ad3...`; the complete suite and deploy preflight passed on the latter SHA.
+- No live browser capture or owner visual acceptance is recorded. Preview URLs were not accessible through the browsing tool; never bypass Cloudflare Access or claim a visual PASS.
+- Latest follow-up source audit did not find another concrete defect in account-address, checkout/warranty labels or fullscreen focus dispatch. Continue source-first audit of unlocked, non-Hero areas and only patch evidence-backed defects.
+
+## LOCKED OWNER SCOPE — STILL IN FORCE
+
+- Hero: PAUSED BY OWNER. Do not inspect, edit, test, redesign, restore or capture it.
+- `#order` / “Đặt hàng an tâm”: OWNER PASS/LOCKED; do not modify or retest.
+- Catalog-filter Liquid Glass, chip height, icons, effect and control: OWNER PASS/LOCKED. Do not reopen without explicit authorization plus `owner_authorized=true` and `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+- Do not restore the separate product-status filter panel.
+- No Production deployment; do not change `main`; do not edit Admin/backend/API/authentication, catalog data, D1/R2, secrets, bindings, DNS or Cloudflare settings.
+- Never bypass Cloudflare Access.
+- Separate source/test/CI PASS, Preview deployment PASS, real-browser inspection and owner visual acceptance in all reports. This docs-only handoff commit itself is not a storefront deployment.
+
+# PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
+
 ## NEWEST HANDOFF OVERRIDE — WELCOME DIALOG ACCESSIBILITY FIX DEPLOYED — 2026-10-23 23:22 ICT
 
 Continue the existing project directly from GitHub. Do not restart or infer branch state from this handoff; re-check live HEAD, PR #108, and Actions before further edits.

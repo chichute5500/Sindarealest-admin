@@ -1,3 +1,16 @@
+## LATEST AUTHORITATIVE UPDATE — WARRANTY CLAIM ACCESSIBILITY FIX DEPLOYED — 2026-10-23 23:31 ICT
+
+- Latest source/test/deployed Preview SHA: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`.
+- Concrete defect fixed in `public/index.html`: after a user selects an eligible warranty record, the claim form is revealed and scrolled into view, but keyboard focus previously remained on the record-selection button. The handler now focuses `#claimIssueType` with `preventScroll:true` after starting the scroll.
+- Added behavior-level VM regression coverage to `tests/storefront-accessibility-contract.test.mjs`, checking form reveal, selected claim-token propagation, focus transfer, scroll behavior and live status update.
+- CI, project validation, dependency audit and complete automated test suite PASS on the exact SHA above: [#39986991649](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991649).
+- Exact-SHA Cloudflare Pages Preview deployment PASS: [#39986991635](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991635). Deployment log confirms project `sindarealest2`, Production branch `main`, and deploy command includes `--commit-hash=$GITHUB_SHA`. Immutable Preview: https://00283315.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- The test harness had a newline-escaping error in commit `43cc71829c1c03087893c0516c79adb1e95a35fe`; it was corrected by test-only commit `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`. The corrected harness and full test suite PASS at the latter SHA.
+- A read-only source audit of account-address, checkout and warranty form control names/labels did not find another confirmed defect requiring changes. The fullscreen-gallery focus trap was rechecked and is already wired to the keydown dispatcher and covered by `tests/detail-gallery-integrity.test.mjs`; no gallery edit was made.
+- No live browser capture or owner visual acceptance was completed. The browser retrieval tool could not access the Preview URL; do not infer or claim a visual/browser PASS and do not bypass Cloudflare Access.
+- The most recent code deployment is SHA `a6097ad3...`. This update to handoff documents is docs-only and must not be described as a storefront deployment. PR #108 remains OPEN/unmerged; Hero PAUSED; `#order` and catalog-filter Liquid Glass/height OWNER PASS/LOCKED. No Production deploy or Admin/backend/API/auth/data/infrastructure changes.
+- Continue source-first audit only in unlocked, non-Hero areas; make changes only for concrete, reproducible defects. The owner-required checks remain separate: static/automated PASS, Preview deployment PASS, browser/visual acceptance not verified.
+
 ## LATEST AUTHORITATIVE UPDATE — WELCOME DIALOG KEYBOARD ACCESSIBILITY — 2026-10-23 23:22 ICT
 
 - Source/test fix deployed at exact SHA `48096d776421b27723e90b923d02606c0e5100cb`. Source file `public/index.html` and regression contract `tests/storefront-accessibility-contract.test.mjs` add initial focus, Tab/Shift+Tab containment, Escape dismissal, protection against programmatic focus escaping, and focus return to the brand/navigation control.

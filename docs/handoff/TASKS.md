@@ -1,3 +1,13 @@
+## LATEST TASK UPDATE — WARRANTY CLAIM ACCESSIBILITY FIX — 2026-10-23 23:31 ICT
+
+- Fixed keyboard focus after dynamically revealing the warranty claim form: the newly opened form now focuses its first required field (`#claimIssueType`) using `focus({preventScroll:true})` after scrolling it into view.
+- Added a behavior-level regression contract to `tests/storefront-accessibility-contract.test.mjs`. It verifies the claim form is exposed, selected claim token is retained, the first field receives focus, the scroll behavior remains present and selection status is updated.
+- Source/test tree SHA validated and deployed: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`.
+- CI/full automated test suite PASS: [#39986991649](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991649). Exact-SHA Preview deploy PASS: [#39986991635](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991635), immutable Preview https://00283315.sindarealest2.pages.dev/.
+- Static form label audit did not uncover another defect to patch. Fullscreen gallery focus trap has an active dispatcher and existing contract test; the initial tentative concern was a read-result truncation false positive, and no edit was made there.
+- Live browser/visual capture and owner visual acceptance remain unverified; Preview retrieval was unavailable through the browsing tool. The Liquid Glass isolated visual and non-Hero order audit workflows were SKIPPED by guard; no locked-area artifacts were opened.
+- Next task: continue source-first static/contract audit in unlocked areas only, keeping PR #108 open and unmerged and preserving all project locks.
+
 ## LATEST TASK UPDATE — WELCOME DIALOG KEYBOARD ACCESSIBILITY — 2026-10-23 23:22 ICT
 
 - Completed source/test correction for the welcome modal at deployed SHA `48096d776421b27723e90b923d02606c0e5100cb`.

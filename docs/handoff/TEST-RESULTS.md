@@ -1,3 +1,15 @@
+## LATEST EXACT-SHA RESULT — WARRANTY CLAIM FOCUS TRANSITION — 2026-10-23 23:31 ICT
+
+- Source/test/deployed Preview SHA: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`.
+- CI plus complete automated test suite PASS: [run #39986991649](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991649).
+- Exact-SHA Preview deploy PASS: [run #39986991635](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991635).
+- Immutable Pages URL: https://00283315.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Cloudflare deploy log verifies Pages project `sindarealest2`, Production branch `main`, and deploy invocation with `--commit-hash=$GITHUB_SHA`.
+- The warranty-record selection handler now focuses `#claimIssueType` after exposing and scrolling the claim form. Added regression contract tests the transition with a mocked runtime.
+- Earlier commit `43cc718...` tests initially failed because newline escapes in the test harness were double-escaped; the test-only correction on `a6097ad3...` restored real newlines. All tests then passed on final SHA.
+- No real-browser interaction, visual screenshot or owner acceptance is recorded. Do not label this visual/browser PASS.
+- Read-only follow-up audits of form labels and fullscreen modal focus dispatch did not produce a further confirmed fix. No locked area was intentionally modified.
+
 ## LATEST EXACT-SHA RESULT — WELCOME DIALOG KEYBOARD ACCESSIBILITY — 2026-10-23 23:22 ICT
 
 - Exact source/test SHA: `48096d776421b27723e90b923d02606c0e5100cb`.
