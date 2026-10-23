@@ -644,3 +644,10 @@ You are continuing an existing project. Do not restart or redo completed work. F
 
 
 Continue from the latest GitHub branch; do not start over. Work only on the approved fix branch/Preview. Check CI/deploy for 58f67a424e74b86e798cb5faa043a5d18e10b228, verify exact-SHA deployment metadata and URL, then inspect or add a scoped non-Hero icon-only screenshot test. Never run the full Liquid Glass visual workflow while it requires Hero coverage: Hero is paused by owner. Do not inspect or style the owner-locked catalog filter pills, `#order`, or warranty form. Once gates are green, keep comparing icon shape, stroke, optical size, glass transparency, rim and reflection against reference files; full visual acceptance remains OPEN until actual screenshots are visually inspected. PR #108 must remain OPEN/unmerged; Production branch remains `main`.
+
+## OWNER ACCEPTANCE — ICON SYSTEM PASS — 2026-10-24
+
+- Owner explicitly accepted the current icon implementation as **PASS** on 2026-10-24. Freeze the icon appearance and do not make further visual/icon-shell changes unless the owner explicitly unlocks it.
+- Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
+- Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
+- Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.

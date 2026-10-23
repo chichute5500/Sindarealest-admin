@@ -253,3 +253,10 @@ Các giá trị dưới đây được chốt làm **baseline triển khai để
 ## 2026-10-24 — Final-cascade icon-shell correction
 
 The final Liquid Glass style is now placed after the legacy cascade, because prior rules with `!important` were painting the icon shells almost opaque and defeating the supposed shared material. The final layer covers unlocked icon-only actions including product-card add and pagination arrows; account and mobile tab SVGs share an 18px, 1.7-stroke baseline. It intentionally leaves mobile tab backgrounds, benefit tile shells, catalog filters, Hero, `#order`, brand logos and all business logic untouched. Regression checks assert the final layer position, glass highlight/blur, dark-mode states, and locked-area exclusions. Source: `58f67a424e74b86e798cb5faa043a5d18e10b228`; gate status must be re-verified before calling it deployable. Visual parity against `Icon.png` and `Chitiet.png` is still OPEN, not inferred from CI.
+
+## OWNER ACCEPTANCE — ICON SYSTEM PASS — 2026-10-24
+
+- Owner explicitly accepted the current icon implementation as **PASS** on 2026-10-24. Freeze the icon appearance and do not make further visual/icon-shell changes unless the owner explicitly unlocks it.
+- Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
+- Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
+- Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.

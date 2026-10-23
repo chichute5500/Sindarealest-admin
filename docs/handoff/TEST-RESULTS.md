@@ -586,3 +586,10 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Commit `05cbaafd151c4b85f247fb68c112bdd19fc2a57f`: CI failed at the `icon press feedback must use the approved Liquid Glass accent` assertion; deploy correctly stopped before deployment.
 - Commit `587d433d5a35782c72fc1abd2b874c28fa8df661`: CI failed because the new exclusion assertion looked for locked-region selectors in the entire HTML rather than only the final layer; deploy stopped before deployment.
 - Commit `aa464ee4d220724a06762b5e4b5a40fda89b3061`: CI and Preview deploy both PASS. It is not the latest source after the expansion commit 58f67a424e74b86e798cb5faa043a5d18e10b228; verify new gates separately.
+
+## OWNER ACCEPTANCE — ICON SYSTEM PASS — 2026-10-24
+
+- Owner explicitly accepted the current icon implementation as **PASS** on 2026-10-24. Freeze the icon appearance and do not make further visual/icon-shell changes unless the owner explicitly unlocks it.
+- Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
+- Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
+- Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.
