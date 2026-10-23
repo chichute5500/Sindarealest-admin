@@ -25,11 +25,12 @@ assert.equal(statusScreens.length, 12, 'The current acceptance scope must includ
 for (const [label, sha] of [
   ['current status codeTestSha', status.codeTestSha],
   ['test results codeTestSha', results.codeTestSha],
-  ['testedCommitSha', results.testedCommitSha],
   ['latestCodeCommitSha', results.latestCodeCommitSha]
 ]) {
   assert.match(String(sha), /^[0-9a-f]{40}$/i, `${label} must be a complete Git SHA`);
 }
+assert.ok(results.testedCommitSha === null || /^[0-9a-f]{40}$/i.test(results.testedCommitSha),
+  'testedCommitSha must be null until the full local baseline passes, otherwise a complete Git SHA');
 assert.ok(Number.isInteger(status.latestActionsRun.id) && status.latestActionsRun.id > 0,
   'The last-known successful/recorded Action pointer must remain identifiable.');
 assert.ok(Number.isInteger(results.latestRun.id) && results.latestRun.id > 0,
