@@ -217,7 +217,7 @@ assert.match(adminHtml, /\.activity-log-cards\{display:none\}/, 'Activity log sh
 assert.match(adminHtml, /data-activity-entity-filter=/, 'Activity log should expose working entity-category filter buttons');
 assert.match(adminHtml, /id="activityActorFilter"/, 'Activity log should provide a source-backed actor filter');
 assert.match(adminHtml, /id="activityDateFrom"/, 'Activity log should provide date-range filtering from existing audit timestamps');
-assert.match(spec, /Mobile activity cards should stay within the viewport/, 'Screen 12 mobile event cards should be checked for horizontal overflow');
+assert.match(baselineSpec, /Mobile activity cards should stay within the viewport/, 'Screen 12 mobile event cards should be checked for horizontal overflow');
 assert.match(adminHtml, /data-action="view-order-customer"/, 'The order-detail customer card should expose a read-only view-profile action rather than an unsupported edit control');
 assert.match(adminHtml, /async function showOrderCustomerProfile\(searchTerm\)/, 'The customer shortcut should route to the customer list with a searchable contact key');
 assert.match(baselineSpec, /const detailsButton = orderRow\.locator\('\[data-action="view-order-details"\]:visible'\)\.first\(\);\s*await expect\(orderRow\)\.toBeVisible\(\);\s*await detailsButton\.click\(\);/,
