@@ -24,7 +24,7 @@ assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /instant=instant\|\|window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
-assert.match(html, /const decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)/);
+assert.match(html, /let decoded;[\s\S]*?try\{decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)\}[\s\S]*?catch\{decoded=Promise\.reject\(\)\}/, 'Decode failures must be handled without revealing an unconfirmed image.');
 assert.match(html, /Promise\.resolve\(decoded\)\.then\(revealDecodedImage,rejectDecodedImage\)/);
 assert.match(html, /const rejectDecodedImage=\(\)=>\{[\s\S]*?incoming\.classList\.remove\('is-active'\)[\s\S]*?active\.classList\.add\('is-active'\)/);
 assert.match(html, /@keyframes sdFullscreenOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-18%\)/);
