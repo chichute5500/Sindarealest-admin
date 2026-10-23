@@ -3,11 +3,14 @@
 Canonical entry point: read [`START-HERE.md`](START-HERE.md) first, then fetch live branch/PR/Actions state before continuing; historical checkpoint values are not authoritative without revalidation.
 
 ## Live checkpoint — 2026-10-23 06:04 UTC
-- Writable branch HEAD at sync: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; exact-SHA Validate #39909118547 is **SUCCESS**. [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547).
-- Admin Preview #39909118491 is **IN_PROGRESS**, last observed at Chromium installation. [Check live result](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) before changing code. Previous Preview #39908380252 failed only the stale 320px fixture assertion (scroll width 284px, old requirement >288px); commit `a3f5f28025efb6ebfc308e3f11a6239565cdfff2` lowers the overflow threshold to >10px. Do not repeat the same threshold change; wait for the exact-SHA Preview evidence.
-- Product gallery CSS was compacted and a 390×844 assertion now requires the entire upload zone to fit above the sticky footer. Review the new artifact/screenshot if the Preview completes; do not accept the gallery on source checks alone.
-- PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866`; `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Keep all guardrails below.
-- B1 cleanup is already complete; do not redo its census/deletion/API-consolidation review. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; backend QA `NOT_TESTED`; D1 `NOT_VERIFIED`; exact visual parity `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- Writable branch source/test SHA at sync: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; Validate #39909118547 is **SUCCESS**. [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547).
+- Admin Preview #39909118491 is **IN_PROGRESS**, last observed at Chromium installation. [Check live result](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) before changing code.
+- Previous Preview #39908380252 failed the stale 320px thumbnail-rail assertion: measured scroll width 284px, old requirement >288px. Current SHA lowers required overflow to >10px. **Do not repeat the same threshold change**; wait for exact-SHA Preview and inspect its result.
+- Gallery CSS is compacted; Playwright requires the full upload zone above the sticky footer at 390×844. Screenshot verification remains pending.
+- PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866`; `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- B1 cleanup is already complete; do not redo the census/deletion/API-consolidation review. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; backend QA `NOT_TESTED`; D1 `NOT_VERIFIED`; exact visual parity `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+## Historical checkpoint
+
 ## Historical checkpoint
 
 ## Historical checkpoint (2026-10-23 04:07 UTC; superseded by newest verified checkpoint above)
