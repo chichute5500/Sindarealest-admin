@@ -81,7 +81,7 @@ assert.ok(storefrontHtml.includes('0 0 0 2.5px rgba(142,207,255,0.76)')
 assert.ok(storefrontHtml.includes('#products .search-field:hover:not(:focus-within)')
   && storefrontHtml.includes('#products .search-field:active')
   && storefrontHtml.includes('#products .search-field:active svg')
-  && storefrontHtml.includes('background:var(--sd-catalog-glass-selected);\n  transform:translateY(1px) scale(.98);'),
+  && storefrontHtml.includes('background:linear-gradient(180deg,rgba(221,241,255,.90) 0%,rgba(244,251,255,.78) 48%,rgba(255,255,255,.76) 100%),var(--sd-catalog-glass-selected);\n  border-color:rgba(255,255,255,.94);\n  transform:translateY(1px) scale(.965);'),
   'Search and pill controls must provide separate hover/pressed feedback while preserving persistent selection.');
 
 assert.ok(storefrontHtml.includes("selectedCategory===c?'active':'')")
