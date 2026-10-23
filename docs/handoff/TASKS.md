@@ -1,3 +1,14 @@
+## LATEST COMPLETED TASKS — CART CONSULTATION + STALE CART — 2026-10-24
+
+- **COMPLETE / CI + Preview PASS** at combined source/test SHA `373c282d626b6ec2291111adb7d81ec2a26e1c2d`.
+- Zalo cart consultation feedback now reflects the true clipboard result; a blocked Zalo popup no longer falsely claims the cart list was copied if copy failed. Preserved actual newline-separated product SKU/quantity lines. Regression test covers two products and both clipboard outcomes.
+- Cart state normalization after successful catalog load now removes product IDs absent from current `/api/products`, drops invalid quantities, converts valid numeric strings to integers, persists only if changed, and synchronizes the header badge. Regression test covers missing product ID, valid keys, invalid quantities, storage and badge total.
+- CI [#40003445574 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40003445574); Preview deploy [#40003445503 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40003445503); immutable Preview https://6e52aeb8.sindarealest2.pages.dev/.
+- Browser screenshot/manual visual acceptance NOT performed. Keep evidence categories separate.
+- Owner locks unchanged; no payment/backend/admin/data/config or Production work.
+
+---
+
 ## VERIFIED GREEN FOLLOW-UP — SLIDESHOW CONTROL GUARD — 2026-10-24
 
 - COMPLETE: collection slideshow pause/resume, accessible Vietnamese labels and `aria-pressed`, single managed 3-second interval, reduced-motion autoplay disabled, manual prev/next retained.
