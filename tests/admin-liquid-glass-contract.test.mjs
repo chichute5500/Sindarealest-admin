@@ -127,6 +127,25 @@ assert.ok(websiteSettingsOrder.every((position, index) =>
   position >= 0 && (index === 0 || websiteSettingsOrder[index - 1] < position)
 ), 'Screen 10 should place price, welcome and watermark controls before the separate QR payment panel');
 
+// Screen 10 and Screen 11 are separate views, not one long Settings page.
+const settingsPageStart = adminHtml.indexOf('function settingsPage(){');
+const backupPageStart = adminHtml.indexOf('function backupPage(){');
+const renderFunctionStart = adminHtml.indexOf('function render(){');
+assert.ok(settingsPageStart >= 0 && backupPageStart > settingsPageStart && renderFunctionStart > backupPageStart,
+  'Website settings and Backup/Restore must have distinct render functions');
+const settingsPageSource = adminHtml.slice(settingsPageStart, backupPageStart);
+const backupPageSource = adminHtml.slice(backupPageStart, renderFunctionStart);
+assert.match(settingsPageSource, /head\('Thiết lập','Cài đặt website'/, 'Screen 10 should be titled Cài đặt website');
+assert.doesNotMatch(settingsPageSource, /id="backupBtn"|id="restoreFile"|Sao lưu & khôi phục/,
+  'Screen 10 must not contain the Backup/Restore panel');
+assert.match(backupPageSource, /head\('Dữ liệu','Sao lưu \/ Khôi phục'/, 'Screen 11 should have its own Backup/Restore heading');
+assert.match(backupPageSource, /id="backupBtn"[\s\S]*id="restoreFile"/, 'Backup/Restore controls should exist only on Screen 11');
+assert.match(adminHtml, /view==='backup'\?backupPage\(\)/, 'The main router should render the dedicated Backup/Restore view');
+assert.match(adminHtml, /data-view="backup"[\s\S]{0,900}Sao lưu \/ Khôi phục/, 'Desktop navigation should expose Backup/Restore separately');
+assert.match(adminHtml, /mobile-more-item" data-view="backup"[\s\S]{0,300}Sao lưu \/ Khôi phục/, 'Mobile More menu should expose Backup/Restore separately');
+assert.match(adminHtml, /if\(view==='backup'\)\{\$\('#backupBtn'\)\.addEventListener\('click',downloadBackup\)/,
+  'Backup controls should bind only while the Backup/Restore view is rendered');
+
 // Preview CSSOM rules can group multiple selectors. Guard against regressions that
 // compare the complete selectorText string to just one member of that list.
 const previewSpec = readFileSync(new URL('./e2e/admin-preview.spec.js', import.meta.url), 'utf8');

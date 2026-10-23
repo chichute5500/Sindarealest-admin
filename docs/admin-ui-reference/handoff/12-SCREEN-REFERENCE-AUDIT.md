@@ -2,6 +2,11 @@
 
 **Current product progress: 50% PROVISIONAL.** No screen is fully accepted. Product code/UI evidence and the later handoff-integrity check are tracked separately.
 
+
+## Screen 10/11 structural parity work
+- Direct comparison is now possible using the approved reference crops and the Preview screenshot at 390×844. The source combined Screen 10 Website settings and Screen 11 Backup/Restore in one `settings` view/title, while the reference maps them separately; baseline capture consequently scrolled deep inside Settings for the backup image.
+- This change splits the existing Backup/Restore, D1 summary and binding-information panels into a dedicated `backup` view, adds desktop/mobile navigation and history routing, and updates the static baseline to capture that route from its top. This is a source-level UI correction only; it does not establish backend acceptance. Check live Validate/Preview for the candidate SHA before changing screen statuses.
+
 ## Latest successful UI evidence
 
 - Latest live branch checkpoint (documentation only): HEAD `83733513da6d3a28a13e773f479b596a4432df1f`; Validate [#39893834166](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39893834166) SUCCESS on exact SHA. This validates source integrity/tests but is not a new screenshot/Preview run.

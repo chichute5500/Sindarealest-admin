@@ -339,6 +339,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     customers: 'Số đơn',
     warranties: 'Mã bảo hành đã phát hành',
     settings: 'Watermark ảnh sản phẩm',
+    backup: 'Sao lưu & khôi phục',
     activity: 'Nhật ký hoạt động'
   };
   const visualAudit = {
@@ -2263,9 +2264,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(qrFileName).toHaveText('Chưa chọn tệp QR.');
       await expect(page.locator('#paymentQrMessage')).toBeEmpty();
     }, true);
-    await captureView('backup-restore', 'settings', async () => {
+    await captureView('backup-restore', 'backup', async () => {
       const section = page.locator('#main .setting').filter({ hasText: 'Sao lưu & khôi phục' });
-      await section.scrollIntoViewIfNeeded();
       await expect(section).toBeVisible();
       await expect(section.locator('#backupBtn')).toContainText('Tải bản sao lưu JSON');
       await expect(section.locator('#restoreFile')).toHaveAttribute('accept', 'application/json,.json');
@@ -2294,7 +2294,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         'Backup/restore actions should remain visible without clipped text: ' + JSON.stringify(backupLayout)).toBe(true);
       expect(backupLayout.noteScrollWidth, 'Backup safety note should not overflow its own content box').toBeLessThanOrEqual(backupLayout.noteClientWidth + 1);
       expect(await section.locator('#restoreFile').isVisible(), 'The JSON file input must remain visually hidden behind its label').toBe(false);
-    }, false, '.backup-actions');
+    }, false);
     await captureView('mobile-more-menu', 'dashboard', async variant => {
       if (variant.viewport.width > 680) return;
       const trigger = page.locator('#mobileMoreTrigger');
@@ -2304,7 +2304,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(trigger).toHaveAttribute('aria-expanded', 'true');
       await expect(trigger).toHaveAttribute('aria-controls', 'mobileMorePanel');
       await expect(menu.locator('[role="menuitem"][data-view="warranties"]')).toContainText('Bảo hành / hỗ trợ');
-      await expect(menu.locator('[role="menuitem"][data-view="settings"]')).toContainText('Cài đặt & sao lưu');
+      await expect(menu.locator('[role="menuitem"][data-view="settings"]')).toContainText('Cài đặt website');
+      await expect(menu.locator('[role="menuitem"][data-view="backup"]')).toContainText('Sao lưu / Khôi phục');
       const layout = await menu.evaluate(element => {
         const box = element.getBoundingClientRect();
         return { left: box.left, right: box.right, width: box.width, viewportWidth: document.documentElement.clientWidth, scrollWidth: element.scrollWidth, clientWidth: element.clientWidth };
@@ -2323,7 +2324,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(menu).toBeHidden();
       await expect(trigger).toHaveAttribute('aria-expanded', 'false');
       await expect(trigger, 'Choosing a More menu item should return focus to the visible trigger').toBeFocused();
-      await expect(page.locator('#main .pagehead h2')).toContainText('Cài đặt & sao lưu');
+      await expect(page.locator('#main .pagehead h2')).toContainText('Cài đặt website');
       await page.locator('[data-view="dashboard"]:visible').first().click();
       await trigger.click();
       await expect(menu).toBeVisible();
