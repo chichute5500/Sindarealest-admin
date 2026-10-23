@@ -1,3 +1,14 @@
+## LATEST TEST RECORD — COLLECTION SLIDESHOW PAUSE/RESUME — 2026-10-24
+
+- Exact source/test SHA: `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`.
+- Regression assertions validate: one 3000-ms autoplay timer; pause clears it and nulls timer handle; accessible label changes to resume and `aria-pressed=true`; resume starts one fresh timer; reduced-motion creates no timer, disables pause/resume action and leaves manual next available.
+- Full CI/test workflow PASS on this exact SHA: [#39994601040](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994601040).
+- Cloudflare Pages Preview deploy PASS on this exact SHA: [#39994600974](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39994600974); URL https://5052d769.sindarealest2.pages.dev/.
+- Deploy warning to preserve: `wrangler.toml` detected but ignored because `pages_build_output_dir` is missing. No config change made.
+- Source/test PASS + Preview deploy PASS only; no real-browser screenshot or manual visual PASS. Owner locks, PR #108 open/unmerged, no Production deploy.
+
+---
+
 ## LATEST TEST RECORD — FAVORITES LEGACY-KEY MIGRATION — 2026-10-24
 
 - Source/test SHA: `384e0b503416d9fa0395fd1d485ac522259c913a`.
