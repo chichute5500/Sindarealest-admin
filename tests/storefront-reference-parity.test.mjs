@@ -132,14 +132,14 @@ const welcomeGuard = html.slice(welcomeGuardStart, welcomeGuardEnd);
 assert.ok(welcomeGuardStart > -1 && welcomeGuardEnd > welcomeGuardStart
   && welcomeGuardStart < html.indexOf('</head>'),
   'The welcome first-paint guard must be parsed from the document head.');
-assert.ok(welcomeGuard.includes('body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}')
+assert.ok(welcomeGuard.includes('body.welcome-active #mobileBottomNav{visibility:visible!important;opacity:1!important;pointer-events:auto!important}')
   && welcomeGuard.includes('body.welcome-active #accountDrawer,')
   && welcomeGuard.includes('body.welcome-active #cartDrawer,')
   && welcomeGuard.includes('body.welcome-active #checkoutDrawer,')
   && welcomeGuard.includes('body.welcome-active #checkoutBackdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX(105%)!important}'),
-  'The initial body flag must hide the bottom toolbar and every commerce overlay before first paint without relying on :has().');
-assert.ok(welcomeGuard.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}'),
-  'The DOM splash selector remains a secondary guard for the welcome lifecycle.');
+  'The initial body flag must keep the mobile toolbar mounted beneath the welcome splash while hiding commerce overlays before first paint.');
+assert.ok(!welcomeGuard.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important'),
+  'The DOM splash selector must not remove the mobile toolbar from the welcome fade; the splash layer itself masks it until the transition.');
  
 assert.match(desktopLight, /data-satin-style="fine-satin-creases-v12"/);
 assert.match(desktopDark, /data-satin-style="fine-satin-creases-v13"/);
