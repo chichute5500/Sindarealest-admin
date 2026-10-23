@@ -1,12 +1,17 @@
 # HANDOFF — SHORT POINTER
 
-**MANDATORY BOOT GATE:** Before any code change, read `CURRENT-STATE.md`, then `TASKS.md`, then the relevant `TEST-RESULTS.md` evidence. These files override any copied prompt, prior chat, stale issue, screenshot, or older handoff if there is a conflict. If a chat prompt says to inspect, fix, or resume Hero while `CURRENT-STATE.md` marks Hero paused, do NOT touch Hero; follow the canonical state and task ledger. Ask no one to repeat already-recorded context.
+**MANDATORY BOOT GATE:** Before any code change, read `CURRENT-STATE.md`, then `TASKS.md`, then the relevant `TEST-RESULTS.md` evidence. Also read the latest prompt below. These files override copied prompts, prior chats, stale issues, screenshots, or older handoffs when they conflict. Never reopen an owner-paused/locked scope unless the owner explicitly does so.
 
-The current status and next actions live only in [CURRENT-STATE.md](CURRENT-STATE.md).
+## Latest active handoff — 2026-10-24
 
-- Active task ledger: [TASKS.md](TASKS.md)
-- Owner decisions and scope boundaries: [DECISIONS.md](DECISIONS.md)
-- Historical test/deployment evidence: [TEST-RESULTS.md](TEST-RESULTS.md)
-- New-chat prompt, only if needed: [PROMPT-NEXT-CHAT-2026-10-22.md](PROMPT-NEXT-CHAT-2026-10-22.md)
+- **Current prompt:** [PROMPT-NEXT-CHAT-2026-10-24.md](PROMPT-NEXT-CHAT-2026-10-24.md)
+- **Canonical project state:** [CURRENT-STATE.md](CURRENT-STATE.md)
+- **Task ledger:** [TASKS.md](TASKS.md)
+- **Owner decisions / locks:** [DECISIONS.md](DECISIONS.md)
+- **Test/deployment evidence:** [TEST-RESULTS.md](TEST-RESULTS.md)
 
-Do not use dated historical prompts as active instructions. Re-fetch current GitHub HEAD, PR #108, Actions and deployed Preview SHA before making claims. PR #108 stays open/unmerged; Preview only. The Hero image is temporarily hidden by owner request and is not approved.
+**Owner's latest acceptance:** PASS all current storefront sections except fullscreen product-image viewing. Fullscreen mobile gallery flicker is much reduced but still occasionally flashes 1–2 times. Continue only on that remaining defect; do not reopen accepted/locked sections.
+
+At the last live check, branch `fix/liquid-glass-audit-2026-10-19` / PR #108 HEAD was `700a651a1f92f35a7cc43bcc4b0ae96f2da26539`; validation run 40012914027 and Preview deploy run 40012914126 succeeded on that SHA. Re-fetch live HEAD, PR, Actions and deployed Preview SHA before making claims or changes.
+
+PR #108 must remain OPEN/unmerged. Preview only; no Production deployment. Hero remains paused by owner. Do not claim browser or visual acceptance from CI alone.
