@@ -269,3 +269,27 @@ Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test
 - Updated the catalog audit to sample a deterministic 205ms frame and assert that specular `background-position` changes between frames rather than relying on brittle box-shadow interpolation. Commit `1311be92c3a97931e09ee36bdc7b95c2f8e25269`.
 - Current validation [#39954296929](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39954296929) and live catalog audit [#39954296537](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39954296537) were pending at this checkpoint. Deployment/audit/validation on the immediately preceding CSS SHA are also running; check final results and use only matching deployment/source evidence.
 - Owner visual acceptance remains PENDING: after the technical audit succeeds, inspect real activation frames against `docs/design-reference/liquid-glass-product-filters.png` in all 8 viewport/theme combinations before inviting owner review.
+
+
+## HANDOFF CHECKPOINT — 2026-10-23 12:40 UTC — CATEGORY LIQUID GLASS STILL NOT OWNER-ACCEPTED
+
+### Verified repository and CI state
+- Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN and UNMERGED.
+- Current branch HEAD at handoff update: `cb67d9721ea115c4471241bcc47c2f5c9b4e789f`. The tested storefront source/deployed Preview SHA is `1311be92c3a97931e09ee36bdc7b95c2f8e25269`; later branch commits are handoff/documentation updates. Verify branch history before assuming all current HEAD commits affect storefront output.
+- Preview deploy for storefront SHA `7013ee6c9b4fe8a3247b0f2b7a7305ef7e044824` succeeded; the subsequent catalog audit reports exact source/deployed SHA match for `1311be92c3a97931e09ee36bdc7b95c2f8e25269` and public-tree equivalence.
+- Source/test validation #39954296929: SUCCESS. Live catalog audit #39954296537: SUCCESS.
+- Screenshot artifact: `sindarealest-catalog-filter-preview-63`, artifact ID `12501573249`, from [audit #39954296537](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39954296537). It contains base captures, real activation midframes and settled frames for mobile 360/390, tablet 768, desktop 1440, Light/Dark, plus touch activation captures and the reference image.
+- Audit manifest status is `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`; technical test PASS is not owner visual PASS.
+
+### Visual comparison finding — DO NOT ASK OWNER TO CHECK YET
+- The screenshot artifact was actually opened and compared against `docs/design-reference/liquid-glass-product-filters.png`.
+- The current selected category chip still reads too much like a bright cyan/blue outline with a strong halo; the reference has a softer frosted/translucent glass surface integrated with the filter panel and a more legible moving specular reflection. In the captured thumbnails the moving sheen is not yet unmistakable enough to claim it matches the sample.
+- Continue refining the category-chip Liquid Glass itself, not merely the audit. Make the specular sweep visible in real captured activation frames and tune border/glow/refraction/gradient toward the provided reference. Preserve the spring response, persistent selected state, Light/Dark parity, desktop/touch behavior and reduced-motion support.
+- Do not tell the owner to inspect until a direct side-by-side comparison of the actual captured activation frames across all 8 viewport/theme combinations shows a credible match to the reference. If not, change the CSS and rerun source validation, deploy, and the live catalog audit; inspect the next artifact rather than repeatedly handing off a weak result.
+
+### Strict boundaries remain
+- Catalog filter controls only. Do not inspect/change/test Hero.
+- `#order` / “Đặt hàng an tâm” remains owner PASS/LOCKED; do not touch it.
+- No Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes; no Production deployment; do not merge PR #108.
+- Do not restore the removed dedicated “Tình trạng sản phẩm” panel.
+- Continue autonomous work after reporting; update all four handoff documents and keep the prompt synchronized with the actual latest state.
