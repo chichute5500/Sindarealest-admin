@@ -2147,7 +2147,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           .toBeLessThanOrEqual(toastLayout.navTop - 8);
         await toast.evaluate((element, state) => {
           element.style.transition = state.transition;
-          if (!state.shown) element.classList.remove('show');
+          // Keep baseline screenshots deterministic even if a prior retry toast was already visible.
+          element.classList.remove('show');
         }, previousState);
       }
       await expect(page.getByLabel('Tìm mã bảo hành, mã đơn, SKU hoặc sản phẩm')).toBeVisible();
