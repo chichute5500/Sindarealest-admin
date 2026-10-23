@@ -373,6 +373,52 @@ assert.equal(reducedArt.elements['#artPause'].disabled, true, 'reduced-motion us
 assert.match(reducedArt.elements['#artPause'].attributes['aria-label'], /tắt theo cài đặt giảm chuyển động/);
 assert.equal(typeof reducedArt.elements['#artNext'].listeners.click, 'function', 'manual next control must remain available with reduced motion enabled');
 
+
+// The cart consultation path must not claim a product list was copied when
+// both clipboard mechanisms fail; the Zalo-blocked fallback must stay truthful.
+const consultCartStart = html.indexOf('async function consultCart(){');
+const consultCartEnd = html.indexOf(String.fromCharCode(10) + 'function setupArtSlideshow', consultCartStart);
+assert.ok(consultCartStart >= 0 && consultCartEnd > consultCartStart,
+  'cart consultation must have an isolated handler for behavioral regression tests');
+const consultCartContract = html.slice(consultCartStart, consultCartEnd);
+async function runCartConsultHarness(copySucceeded) {
+  const toastMessages = [];
+  let copiedMessage = null;
+  let scheduled = null;
+  const context = {
+    cart: { 'product-1': 2 },
+    products: [{ id: 'product-1', slug: 'product-1', sku: 'SD-001', title: 'Giày thử' }],
+    visibleSku: product => product.sku,
+    async copyText(value) { copiedMessage = value; return copySucceeded; },
+    showToast(message, url) { toastMessages.push({ message, url }); },
+    ZALO: 'https://zalo.me/test',
+    setTimeout(callback, delay) { scheduled = { callback, delay }; return 1; },
+    window: { open() { return null; } }
+  };
+  await vm.runInNewContext(consultCartContract + String.fromCharCode(10) + 'consultCart();', context, { timeout: 1000 });
+  return { toastMessages, copiedMessage, scheduled };
+}
+const cartConsultCopyFailed = await runCartConsultHarness(false);
+assert.equal(cartConsultCopyFailed.copiedMessage, 'SD-001 × 2',
+  'consultation must copy the visible SKU and quantity for the cart');
+assert.match(cartConsultCopyFailed.toastMessages[0].message, /Không thể tự sao chép/,
+  'a failed clipboard operation must never be presented as a successful copy');
+assert.equal(cartConsultCopyFailed.toastMessages[0].url, 'https://zalo.me/test',
+  'the user must still get the Zalo destination when manual sending is needed');
+assert.equal(cartConsultCopyFailed.scheduled.delay, 1000,
+  'Zalo opening remains delayed to preserve the existing handoff behavior');
+cartConsultCopyFailed.scheduled.callback();
+assert.match(cartConsultCopyFailed.toastMessages.at(-1).message, /Hãy dán hoặc gửi danh sách sản phẩm thủ công/,
+  'if the Zalo popup is blocked after copy failure, the fallback must direct the user to send manually');
+assert.doesNotMatch(cartConsultCopyFailed.toastMessages.map(item => item.message).join(' '), /đã sao chép|đã được sao chép/i,
+  'the failed-copy path must not make any false copy-success claim');
+const cartConsultCopySucceeded = await runCartConsultHarness(true);
+assert.match(cartConsultCopySucceeded.toastMessages[0].message, /Đã sao chép danh sách sản phẩm/,
+  'successful clipboard writes must retain positive confirmation');
+cartConsultCopySucceeded.scheduled.callback();
+assert.match(cartConsultCopySucceeded.toastMessages.at(-1).message, /Danh sách sản phẩm đã được sao chép/,
+  'the blocked-Zalo fallback may confirm a copy only when copying actually succeeded');
+
 console.log('PASS: collection slideshow autoplay can be paused/resumed and remains off under prefers-reduced-motion.');
 
 
