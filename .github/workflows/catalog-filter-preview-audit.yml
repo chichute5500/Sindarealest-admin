@@ -7,6 +7,7 @@ on:
       - fix/liquid-glass-audit-2026-10-19
     paths:
       - 'public/index.html'
+      - 'tests/storefront-operations.test.mjs'
       - 'scripts/cloudflare-access-service-token.mjs'
       - 'scripts/preview-external-read-allowlist.mjs'
       - '.github/workflows/catalog-filter-preview-audit.yml'
@@ -505,7 +506,7 @@ jobs:
                     const activationMidFrame = await otherCategory.evaluate(el => {
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                      const reflectionAnimation = el.getAnimations().find(item => item.animationName === 'sdCatalogSpecularSweep');
+                      const reflectionAnimation = document.getAnimations().find(item => item.animationName === 'sdCatalogSpecularSweep');
                       const wasRunningBeforeCapture = animation?.playState === 'running';
                       const reflectionWasRunningBeforeCapture = reflectionAnimation?.playState === 'running';
                       if (animation) {
@@ -567,7 +568,7 @@ jobs:
                     const activationLaterFrame = await otherCategory.evaluate(el => {
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                      const reflectionAnimation = el.getAnimations().find(item => item.animationName === 'sdCatalogSpecularSweep');
+                      const reflectionAnimation = document.getAnimations().find(item => item.animationName === 'sdCatalogSpecularSweep');
                       if (animation) {
                         animation.currentTime = 205;
                         animation.pause();
@@ -606,7 +607,7 @@ jobs:
                       'The 205ms reflection frame must still be visible while sweeping across the glass.');
 
                     await otherCategory.evaluate(el => {
-                      for (const animation of el.getAnimations()) {
+                      for (const animation of document.getAnimations()) {
                         if (typeof animation.animationName === 'string' &&
                           (animation.animationName.startsWith('sdCatalogGlassActivate') || animation.animationName === 'sdCatalogSpecularSweep')) {
                           animation.finish();
