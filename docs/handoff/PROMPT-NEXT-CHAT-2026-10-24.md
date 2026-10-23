@@ -180,3 +180,38 @@ Tiếp tục từ Preview hiện có, không khởi động lại dự án.
 - **Chưa được coi là PASS về hình ảnh.** Chủ dự án cần test trên điện thoại: nhấn chậm và nhấn nhanh liên tục nút trước/sau, xác nhận hết nháy và ảnh bóng. Nếu còn lỗi, tiếp tục trace CSS/layer thực tế, không quay lại cách bỏ hoàn toàn hiệu ứng.
 - Không merge PR, không deploy Production, không chỉnh `main`, không mở lại các mục PASS/LOCKED. Hero vẫn PAUSED BY OWNER và visual workflow có thể bị guard skip.
 
+
+
+# LATEST HANDOFF — OWNER PAUSED GALLERY; CONTINUE NEW WORK ONLY — 2026-10-24
+
+**Read this section first; it supersedes older instructions below that ask for a gallery phone retest.**
+
+## Current repository state
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — must stay OPEN/unmerged, base `main`.
+- Latest gallery source: `be27230919462aabbb86c8a9b4a2369375dd752f`; test commit: `87cef74f427ff7178e984e3bd836152948f1d974`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813
+- Preview: https://9fe68f80.sindarealest2.pages.dev/
+
+## Owner's latest decision
+- The fullscreen mobile gallery still flickers. Owner says: **pause this part and handle it later**. Its status is **PAUSED / NOT ACCEPTED**, despite CI/deploy passing. Do not keep investigating, edit CSS/JS, alter slide/preload behavior, change gallery tests, roll back, or ask for phone retesting until the owner explicitly reopens the issue.
+- The latest deployed gallery behavior currently uses a directional 300 ms slide on mobile/desktop and starts preloading every image in the opened album. Keep the current Preview/source in place while paused.
+
+## PASS / LOCKED — DO NOT REPEAT OR REOPEN
+The owner says the prior chat has already passed the following. Do not rerun the same checks or ask the owner to retest them:
+- Mobile cart/account controls and modal open/close/history behavior.
+- Shared icon system; accepted Liquid Glass appearance, press feedback, sizes/dimensions and controls.
+- Catalog Liquid Glass filters/chips/icons/heights/effects. Do not restore the removed standalone product-status filter panel.
+- `#order` / “Đặt hàng an tâm”.
+- Warranty claim and lookup flow; do not ask for invented warranty code/phone.
+- Mobile navigation focus/history; welcome dialog keyboard handling; gallery focus/accessibility handling (this is separate from the paused visual flicker); warranty-form focus transfer; favorites legacy-key normalization; collection slideshow pause/reduced-motion/missing-control guard; stale-cart cleanup/badge sync; Zalo/contact; and all other owner-accepted storefront work listed in CURRENT-STATE.md and TASKS.md.
+- Hero is PAUSED BY OWNER. Never inspect, capture, edit, or include it in any workflow. Respect all existing locked visual areas.
+
+## What to do next
+1. Read the newest sections of `docs/handoff/CURRENT-STATE.md`, `TASKS.md`, `DECISIONS.md`, and `TEST-RESULTS.md` before touching code. Do not treat old historical audit notes as open tasks.
+2. Continue the next safe task only if it is clearly authorized and unlocked in the existing backlog. Do not create scope by retesting accepted areas. If there is no clearly defined unlocked task, ask the owner one concise question: what new task should be started?
+3. Work directly in GitHub/repo/Actions where available; keep checking workflow runs while doing independent safe work. Report exact SHAs and links only after verification.
+4. Keep PR #108 open/unmerged. Preview only; never change `main` or deploy Production. Do not touch Admin/backend/API/auth, product/catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or live payments.
+5. Do not claim the gallery is fixed or accepted. Do not ask for its manual test until the owner reopens it.
