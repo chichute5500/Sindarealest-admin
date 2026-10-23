@@ -1,29 +1,29 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T07:01:48Z",
+  "capturedAtUtc": "2026-10-23T08:12:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "3f1b9f28d3f4b92600d752ab3de173c81940e0b0",
-  "codeTestSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
+  "branchHeadAtCheckpointStart": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+  "codeTestSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
   "latestRun": {
-    "id": 39911090605,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090605",
-    "headSha": "f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
+    "id": 39922500963,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963",
+    "headSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Last separate Validate workflow remains on an earlier SHA; on exact source/test SHA fa6937fea1a269a6b40de0e7f136ab969bd70a14, Admin Preview run #39914870835 succeeded and independently passed repository checks, npm run check, npm test, and the responsive/theme Playwright matrix. Artifact admin-preview-evidence-385 records the five Screen 12 mobile labels fix. Authenticated backend QA remains untested."
+    "summary": "Exact tested code SHA passed repository checks, npm test, local source screenshot matrix, and deployed Preview diagnostic. Target feature-admin-isolated-hando.sindarealest2.pages.dev/admin/ returned PASS_LOGIN_CSS_SIGNATURE; 2 passed. Historical Access block not reproduced; root cause remains unconfirmed."
   },
   "validatedChecks": {
-    "npmRunCheck": "PASS_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
-    "npmTest": "PASS_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
-    "testedSha": "f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
-    "projectIntegrity": "PASS_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
-    "localStaticPlaywright": "PASS_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
-    "responsiveThemeScreenshotMatrix": "PASS_132_GENERATED_PNGS_112_FIXTURE_METRICS_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
-    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31",
+    "npmRunCheck": "PASS_ON_8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "npmTest": "PASS_ON_8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "testedSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "projectIntegrity": "PASS_ON_8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "localStaticPlaywright": "PASS_ON_8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "responsiveThemeScreenshotMatrix": "PASS_132_GENERATED_PNGS_112_FIXTURE_METRICS_ON_8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7; HISTORICAL ACCESS BLOCK NOT REPRODUCED",
     "currentHeadPlaywright": "PASS_LOCAL_RESPONSIVE_THEME_MATRIX; DEPLOYED PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES NOT TESTED",
     "productionDeployment": "NOT_PERFORMED",
     "currentHead": "SOURCE_TESTS_AND_PREVIEW_MATRIX_PASS_ON_f2a3bee28523cc0ecb541a17b095c80acb2a4b31; BRANCH EVIDENCE CHILD a46eb2eb1bfa26055d21aaaaad8364d09a486674",
@@ -234,15 +234,15 @@
   },
   "latestCodeCommitSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
   "testedCommitSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
-  "capturedAt": "2026-10-23T08:09:20.333Z",
+  "capturedAt": "2026-10-23T08:10:45Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
     "localStaticPlaywrightBaseline": "PASS",
     "playwright": "PASS",
-    "playwrightPreviewDiagnostics": "success",
-    "deployedPreview": "PASS",
+    "playwrightPreviewDiagnostics": "PASS_LOGIN_CSS_SIGNATURE",
+    "deployedPreview": "PASS_LOGIN_CSS_SIGNATURE; HISTORICAL_ACCESS_ROOT_CAUSE_UNCONFIRMED",
     "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
     "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
     "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
@@ -379,40 +379,35 @@
     "testedSha": "f2a3bee28523cc0ecb541a17b095c80acb2a4b31"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T06:26:29Z",
-    "testedSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
-    "validateRun": {
-      "id": 39911090605,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39911090605",
-      "status": "completed",
-      "conclusion": "success"
-    },
+    "capturedAtUtc": "2026-10-23T08:10:45Z",
+    "testedSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
+    "validateRun": null,
     "previewRun": {
-      "id": 39914870835,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835",
+      "id": 39922500963,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963",
       "status": "completed",
       "conclusion": "success"
     },
     "previewArtifact": {
-      "name": "admin-preview-evidence-385",
-      "id": 12484820528,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835/artifacts/12484820528"
+      "name": "admin-preview-evidence-390",
+      "id": 12488445570,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963/artifacts/12488445570"
     },
-    "reason": "Exact-SHA Validate and Admin Preview passed after correcting the two false 360px rail-overflow expectations in tests only. The 320px scroll requirement remains unchanged. The artifact confirms a zero-horizontal-overflow responsive/theme matrix; deployed Preview diagnostic only verifies login CSS signature."
+    "reason": "Preview #39922500963 passed exact code SHA 8cfe44b; blocked Access now fails explicitly instead of being skipped, and workflow status prioritizes a recorded block. This run reported PASS_LOGIN_CSS_SIGNATURE, so the historical Access failure was not reproduced and root cause remains unconfirmed."
   },
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T07:01:48Z",
+    "lastSyncAtUtc": "2026-10-23T08:12:00Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "syncPurpose": "Record Screen 12 mobile audit-log field-label fix, exact-SHA Preview test results and artifact 385; preserve fixture-only/backend acceptance limitations."
+    "syncPurpose": "Record Access false-success fix, exact-SHA Preview verification, and unconfirmed historical root cause."
   },
   "latestProductSourceCommit": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
   "latestDiagnosticArtifact": {
-    "name": "admin-preview-evidence-385",
-    "id": 12484820528,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835/artifacts/12484820528",
-    "runId": 39914870835,
-    "sourceSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
+    "name": "admin-preview-evidence-390",
+    "id": 12488445570,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963/artifacts/12488445570",
+    "runId": 39922500963,
+    "sourceSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
   }
 }
