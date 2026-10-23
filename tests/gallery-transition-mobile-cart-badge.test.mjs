@@ -30,7 +30,7 @@ assert.match(html, /image\.fetchPriority='low';fullscreenPreloadCache\.set\(src,
 assert.match(html, /@media\(max-width:760px\)\{\.sd-fullscreen-image\{animation:none!important;transition:none!important;transform:none!important;will-change:auto!important/);
 
 const fullscreenMobileSwap = html.slice(html.indexOf('function setFullscreenPhoto('), html.indexOf('function renderFullscreenThumbs(', html.indexOf('function setFullscreenPhoto(')));
-assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
+assert.match(fullscreenMobileSwap, /if\(instant\|\|mobile\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
   'Mobile swaps must activate the already-decoded incoming layer before deactivating the current layer, preventing an intermediate frame with no active photo.');
 
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
