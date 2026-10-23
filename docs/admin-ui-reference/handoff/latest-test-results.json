@@ -217,10 +217,11 @@
     "exactReferenceParity": "NOT_VERIFIED"
   },
   "nextActions": [
-    "Compare the latest responsive screenshots against the approved reference and correct only reproducible ADMIN-specific visual differences.",
-    "Obtain an authorized authenticated Preview path before testing persisted business workflows; never bypass Cloudflare Access.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED until full behavior/reference evidence supports acceptance.",
-    "Keep PR #111/#108 open and unmerged; do not change main, deploy Production, or write remote D1/R2/schema/ledger data."
+    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
+    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
+    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
+    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
+    "Keep the public website branch and main untouched; do not merge or deploy Production."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -232,10 +233,10 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
-  "testedCommitSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
-  "capturedAt": "2026-10-23T11:03:30Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
+  "latestCodeCommitSha": "4ff850a117ad6a3850e5b37d00608953c0711f8b",
+  "testedCommitSha": "4ff850a117ad6a3850e5b37d00608953c0711f8b",
+  "capturedAt": "2026-10-23T11:08:01.120Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943805219",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -248,7 +249,7 @@
     "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
     "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
     "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "automatedTests": "PASS",
     "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
     "productionDeployment": "NOT_PERFORMED",
     "sourceValidation": "PASS_ON_f1fdd19db4d6aa87465d25274d27adfa60f558f9",
@@ -279,9 +280,9 @@
     "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_HEAD"
   },
   "latestLocalEvidence": {
-    "runId": 39943070469,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469",
-    "sourceCommit": "f1fdd19db4d6aa87465d25274d27adfa60f558f9",
+    "runId": 39943805219,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943805219",
+    "sourceCommit": "4ff850a117ad6a3850e5b37d00608953c0711f8b",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -289,7 +290,7 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-411",
+    "screenshotArtifact": "admin-preview-evidence-412",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
@@ -299,12 +300,16 @@
     "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
   },
   "latestScreenshotArtifact": {
-    "id": 12496308590,
-    "name": "admin-preview-evidence-411",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943070469/artifacts/12496308590",
-    "pngCount": 133,
-    "fixtureMetrics": 112,
-    "testedSha": "f1fdd19db4d6aa87465d25274d27adfa60f558f9"
+    "runId": 39943805219,
+    "name": "admin-preview-evidence-412",
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39943805219",
+    "sourceCommit": "4ff850a117ad6a3850e5b37d00608953c0711f8b",
+    "screenshotCount": 132,
+    "loginShellPngCount": 16,
+    "uiFixturePngCount": 120,
+    "uiFixtureMetricCount": 112,
+    "retentionDays": 14,
+    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
     "Preview #39928772347 has not completed Chromium installation; screenshot matrix, deployed Preview diagnostics and artifact upload remain pending.",
