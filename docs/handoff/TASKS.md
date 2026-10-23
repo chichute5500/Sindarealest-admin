@@ -33,3 +33,9 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 - **HERO-CAPTURE-GUARD:** applied in [0f7151a](https://github.com/chichute5500/Sindarealest-admin/commit/0f7151a95391fbe55c59d6c426b458f6e075d7ce); manual Hero authorization defaults false, and push-triggered comprehensive capture requires an explicit approval marker. Run [#39890961242](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39890961242) correctly SKIPPED.
 - **PREVIEW-DEPLOY:** PASS at exact SHA `0f7151a95391fbe55c59d6c426b458f6e075d7ce`, [run #39890961316](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39890961316). This is not visual acceptance.
 - **VISUAL ACCEPTANCE:** still pending authorized non-Hero-only live screenshots tied to exact deployed SHA and owner review. Earlier run #39890856540 was cancelled; local fixture capture was cancelled and live capture/deployment verification were skipped. No evidence that it completed a 128-image live capture.
+
+
+## Owner acceptance update — 2026-10-23
+
+- **ORDER-STEP-HEADING-READABILITY — PASS/LOCKED by owner.** Do not change this typography without explicit permission. Source/test CI and Preview deploy passed at `c8a14685efa3fbfa12475fe895405b5999489329` ([CI #39895567918](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567918), [Preview #39895567897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567897)).
+- Next active task: audit the next unfinished non-Hero storefront section. Inspect evidence and source first; make no speculative UI changes. Hero remains paused. PR #108 must remain open/unmerged; Preview only.
