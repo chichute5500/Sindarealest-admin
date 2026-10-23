@@ -82,3 +82,6 @@ Continued safe work after the Preview access blocker: completed a read-only stat
 5. `docs/handoff/PROMPT-NEXT-CHAT-2026-10-22.md` only when a new-chat prompt is needed
 
 Files labelled historical/archived are context, not active instructions.
+
+
+Latest verified handoff (2026-10-23): PR #108 remains OPEN/unmerged. Source/test and Preview deployment passed at `0f7151a95391fbe55c59d6c426b458f6e075d7ce`; the full visual workflow is guarded and was skipped. Gallery accessibility fix and Hero capture guard are committed. Live non-Hero screenshots and owner visual acceptance remain pending. Hero remains paused.
