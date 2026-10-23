@@ -483,7 +483,7 @@ jobs:
                       const css = getComputedStyle(el);
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                      const matrix = css.transform.match(/^matrix\\(([^)]+)\\)$/);
+                      const matrix = css.transform.match(/^matrix\(([^)]+)\)$/);
                       return {
                         animationName: css.animationName,
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
