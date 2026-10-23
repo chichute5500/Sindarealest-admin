@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   admin-preview:
-    name: Test Admin Preview (read-only smoke checks)
+    name: Test isolated Admin Preview (read-only smoke checks)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,8 +32,7 @@ jobs:
           npm install --no-save @playwright/test
           npx playwright install --with-deps chromium
 
-      - name: Test the supplied Preview URL
+      - name: Test the dedicated Admin Preview URL
         run: npx playwright test tests/e2e/admin-preview.spec.js
         env:
-          ADMIN_TEST_URL: ${{ secrets.ADMIN_TEST_URL }}
           ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}

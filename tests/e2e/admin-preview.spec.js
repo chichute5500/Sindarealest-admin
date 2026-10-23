@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-const adminUrl = process.env.ADMIN_TEST_URL;
+// Keep Admin smoke tests pinned to the dedicated Admin Pages project.
+// Do not use ADMIN_TEST_URL: it can point at the storefront/fix Preview.
+const adminUrl = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/';
 const adminPassword = process.env.ADMIN_TEST_PASSWORD;
 
-test.describe('SinDarealest2 Admin Preview', () => {
-  test('opens the admin login page without exposing protected content', async ({ page }) => {
-    if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
+test.describe('SinDarealest Admin isolated Preview', () => {
+  test('opens the Admin login page without exposing protected content', async ({ page }) => {
     await page.goto(adminUrl, { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('#loginView')).toBeVisible();
@@ -14,8 +15,7 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await expect(page.locator('#appView')).toBeHidden();
   });
 
-  test('logs in once and verifies the admin dashboard', async ({ page }) => {
-    if (!adminUrl) throw new Error('Missing GitHub Actions secret ADMIN_TEST_URL.');
+  test('logs in once and verifies the Admin dashboard', async ({ page }) => {
     if (!adminPassword) throw new Error('Missing GitHub Actions secret ADMIN_TEST_PASSWORD.');
 
     const serverErrors = [];
