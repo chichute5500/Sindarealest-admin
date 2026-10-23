@@ -2,6 +2,11 @@ name: Seed isolated Admin Preview products
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - fix/admin-preview-project-target
+    paths:
+      - .github/workflows/seed-admin-preview-products.trigger
 
 permissions:
   contents: read
@@ -77,8 +82,7 @@ jobs:
           npx --yes wrangler@4.149.0 d1 execute "$TARGET_DB_NAME" --remote --json --command="SELECT COUNT(*) AS product_count FROM products;" > before-count.json
           node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
-          const text = readFileSync("before-count.json", "utf8");
-          const payload = JSON.parse(text);
+          const payload = JSON.parse(readFileSync("before-count.json", "utf8"));
           const walk = value => {
             if (Array.isArray(value)) for (const item of value) { const n = walk(item); if (n !== null) return n; }
             else if (value && typeof value === "object") {
