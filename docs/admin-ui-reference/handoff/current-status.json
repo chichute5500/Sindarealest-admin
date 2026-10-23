@@ -410,8 +410,10 @@
     "Do not repeat completed B1 cleanup, merge/rebase/force-push, deploy Production, or write to main/PR #108."
   ],
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T04:56:00Z",
-    "syncPurpose": "Repair and synchronize canonical JSON handoff pointers to Screen 7 audit evidence."
+    "lastSyncAtUtc": "2026-10-23T04:58:00Z",
+    "syncPurpose": "Keep canonical entry-point metadata synchronized with latest evidence.",
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
   },
   "currentHeadAtCheckpoint": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
   "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_FOLLOWS",
