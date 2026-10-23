@@ -24,6 +24,7 @@ assert.equal(legacyProducts.length, 235, 'The read-only legacy product fixture s
 assert.ok(legacyProducts.every(product => product.sku === null && product.skuVerified === false), 'Legacy fixture SKUs must be null when unverified; do not retain generated commercial SKU values.');
 assert.ok(storefrontHtml.includes("function visibleSku(p){return p&&p.skuVerified!==false?String(p.sku||'').trim():''}"), 'Storefront must have one explicit helper that hides unverified fixture identifiers.');
 assert.ok(storefrontHtml.includes('<input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU"'), 'Catalog search input must have an explicit accessible name independent of its placeholder.');
+assert.ok(storefrontHtml.includes('placeholder="Tìm sản phẩm hoặc mã SKU…"'), 'Catalog search placeholder must stay concise enough to remain legible on narrow mobile screens.');
 assert.ok(storefrontHtml.includes("n===page?'aria-current=\"page\"':''"), "The currently selected catalog page must expose aria-current=\"page\" to assistive technology.");
 assert.ok(storefrontHtml.includes("<nav class=\"pagination\" id=\"pagination\" aria-label=\"Phân trang sản phẩm\"></nav>"), "Product pagination must be a named navigation landmark.");
 assert.ok(storefrontHtml.includes('id="categoryFilters" role="group" aria-label="Lọc theo danh mục"'), "Catalog category filters must be a named group in the accessibility tree.");
