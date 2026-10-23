@@ -369,3 +369,11 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Internal anchors: 23 checked, zero missing target IDs. Asset references: 7 checked against the current repository tree, zero missing files. New-tab links: 6 checked, all include `rel="noopener". Buttons: 62 checked, zero without text or an accessible label. Inputs: no unlabeled inputs found by this static rule set.
 - These are source-level checks only; they do not claim manual device/browser visual acceptance or replace runtime tests.
 - Exact-source CI PASS #39973525900 and Preview deploy PASS #39973526262 apply to source/test commit 2dd3bddfa2ddf13614491d2ac9d0b407157c32f9. Handoff docs were subsequently updated in docs-only commit d120c1152989cb3cd0a3508a6353a0eecae0bdf2; storefront source was unchanged by that documentation commit.
+
+
+## Latest verification correction — 2026-10-23 21:59 ICT
+- After the first passing run on `2dd3bddfa2ddf13614491d2ac9d0b407157c32f9`, a second pre-existing test contract in `tests/cart-checkout-separation.test.mjs` was aligned to the current `openCart(event)` signature in commit `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`. This was test-only; `public/index.html` remains SHA `560f4e3048f2c556da066b76767ebecea2da1004`.
+- CI PASS on `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038357
+- Preview deploy PASS on that commit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39974038555
+- Latest exact deployment from workflow log: https://2100d7ae.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Subsequent commits `d120c1152989cb3cd0a3508a6353a0eecae0bdf2` and `7a07dbbe3bedf31eff5994273311c4801bf2be00` are documentation-only and do not alter storefront source. Keep PR #108 OPEN/unmerged and all owner-locked scopes unchanged.
