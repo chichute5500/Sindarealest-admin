@@ -1,5 +1,19 @@
 # PROMPT CHAT MỚI — TIẾP QUẢN SINDAREALEST2
 
+
+## NEWEST AUTHORITATIVE HANDOFF — MOBILE NAV ESCAPE FOCUS FIX — 2026-10-23 22:10 ICT
+
+Use this newer status in preference to older SHA/checkpoint text below. Continue from GitHub; do not restart.
+
+- Latest storefront source/test/deployed Preview SHA: `e86403965ba8756167215e01d336328f28a7f22a`.
+- CI/source integrity/dependency audit/full tests PASS: [#39975779202](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975779202).
+- Preview deploy PASS: [#39975778958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975778958). Immutable Preview: https://2eef8103.sindarealest2.pages.dev/ ; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Concrete defect fixed in `public/index.html`: the broad global Escape handler called `closeDetail()` and `closeCart()` regardless of whether these dialogs were open, and changed the mobile nav class outside its own focus/history handler. Because `closeDetail()` can restore focus to search while no product modal is open, it could override the mobile-menu focus return. The handler now closes product detail only if `#productOverlay` is open and scopes gallery arrows to that open dialog; existing menu/cart handlers retain dismissal responsibility. Updated regression assertions in `tests/storefront-accessibility-contract.test.mjs`.
+- Source blob: `public/index.html` `fff501016c93deacd7d8d365ce275eda3d586974`; test blob `98fe797b814a4bae92a998bd095eb63fe1d24438`.
+- This change has **source/test PASS and Preview deploy PASS**. It has no new live screenshot or manual visual acceptance claim; the Liquid Glass and order capture workflows were skipped.
+- PR #108 remains OPEN/unmerged. Hero PAUSED BY OWNER; `#order` OWNER PASS/LOCKED; catalog filter chip height/Liquid Glass OWNER PASS/LOCKED. Do not inspect/edit/test/capture Hero, do not touch `#order` or locked filter controls, do not restore the removed dedicated product-status filter panel, and do not trigger the locked filter workflow without explicit owner authorization plus `CATALOG_FILTER_AUDIT_UNLOCKED=true`. Preview only; no Production, Admin/backend/API/auth/catalog-data/D1/R2/secrets/bindings/DNS/Cloudflare Access changes.
+- After this handoff-only commit, re-fetch branch HEAD/PR/actions before work. Continue source-first review in safe, unlocked non-Hero sections; require a concrete defect before editing. Preserve source/test PASS vs deployment SHA vs capture vs owner visual acceptance as separate gates.
+
 **Cập nhật: 23/10/2026 — Tiếp tục dự án đang có, không khởi động lại**
 
 Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:

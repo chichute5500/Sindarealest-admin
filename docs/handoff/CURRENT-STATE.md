@@ -1,6 +1,18 @@
 # CURRENT STATE — SINDAREALEST2 STATIC STOREFRONT
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
+## LATEST AUTHORITATIVE UPDATE — MOBILE NAV ESCAPE FOCUS — 2026-10-23 22:10 ICT
+
+- Current storefront source/test/deployed Preview SHA: `e86403965ba8756167215e01d336328f28a7f22a`. The latest branch/PR HEAD before this handoff-only refresh was that exact SHA; the following commit updates handoff documents only.
+- Concrete defect fixed: the broad global Escape handler used to call `closeDetail()` and `closeCart()` even if those dialogs were not open and force-removed the mobile-navigation open class outside its own focus/history handler. Since `closeDetail()` can restore focus to search even when no product dialog is open, this could override the mobile menu's correct focus return to `#menuToggle`.
+- Fix: `public/index.html` now lets this handler close product detail only when `#productOverlay` is open; arrow-key gallery behavior is also scoped to the open detail dialog. Mobile menu and cart dismissal remain owned by their dedicated handlers. Regression assertions in `tests/storefront-accessibility-contract.test.mjs` require the scoped behavior and forbid the previous broad handler.
+- Source/dependency validation and complete automated test suite: PASS — [CI #39975779202](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975779202).
+- Preview deploy: PASS — [deploy #39975778958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975778958). Immutable Preview: https://2eef8103.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Deployment workflow ran against the exact source/test SHA above. No Production deployment.
+- Current changed blob SHAs: `public/index.html` = `fff501016c93deacd7d8d365ce275eda3d586974`; `tests/storefront-accessibility-contract.test.mjs` = `98fe797b814a4bae92a998bd095eb63fe1d24438`.
+- Visual acceptance is NOT claimed: the generic live-capture workflows were skipped for this source change; no new screenshots or owner visual PASS are asserted. The change is a keyboard interaction/focus correction.
+- PR #108 remains OPEN/unmerged. Hero remains PAUSED BY OWNER; `#order` and catalog-filter chip height/Liquid Glass remain OWNER PASS/LOCKED. Do not touch these, do not restore the deleted product-status filter panel, and do not run the locked catalog audit without explicit owner authorization and unlock. Continue source-first checks in safe, unlocked areas only; do not edit Admin/backend/API/auth/data/config or deploy Production.
+
+
 ## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
 
 - Latest code/test/Preview SHA: `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`. This source+test commit passed CI and Preview deploy; later handoff-only commits may advance branch HEAD, so refetch HEAD before acting. PR #108 remains OPEN/unmerged. No Production changes.

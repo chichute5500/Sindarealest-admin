@@ -1,6 +1,24 @@
 # TEST & VISUAL AUDIT EVIDENCE INDEX
 Updated: 2026-10-23 — handoff protocol reconciled
 
+## LATEST EXACT-SHA REGRESSION / PREVIEW RESULT — MOBILE NAV ESCAPE FOCUS — 2026-10-23 22:10 ICT
+
+| Gate | Result |
+|---|---|
+| Source integrity, dependency audit and full automated tests | PASS — [CI #39975779202](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975779202) |
+| Preview deploy | PASS — [deploy #39975778958](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39975778958) |
+| Storefront source/test SHA | `e86403965ba8756167215e01d336328f28a7f22a` |
+| `public/index.html` blob | `fff501016c93deacd7d8d365ce275eda3d586974` |
+| `tests/storefront-accessibility-contract.test.mjs` blob | `98fe797b814a4bae92a998bd095eb63fe1d24438` |
+| Immutable Preview | https://2eef8103.sindarealest2.pages.dev/ |
+
+**Concrete regression fixed:** the old global Escape listener unconditionally called `closeDetail()` and `closeCart()` and removed `#mobileNav`'s open class without its dedicated focus/history logic. `closeDetail()` can schedule a focus restoration to search even while its overlay is closed, overriding the mobile menu's intended focus return. The revised handler closes detail only when `#productOverlay` is open, with left/right gallery-key handling restricted to that open dialog. The existing dedicated mobile menu and cart/drawer handlers continue to handle their own closure. Regression tests require the scoped listener and reject the old broad pattern.
+
+CI job logs show project-integrity checks and the full automated test command completed successfully, including `mobile-navigation-contract` and `storefront-accessibility-contract`. The Preview deployment run also completed successfully after its pre-deploy integrity/test gates. The deployment workflow was run for the exact source/test commit above.
+
+This is **source/test and Preview deployment PASS only**, not a visual audit or owner visual acceptance. The generic Liquid Glass capture and order-section audit workflows were skipped on this commit; no new screenshot artifact is asserted. No Hero, `#order`, catalog-filter UI, Admin/backend/data or Production changes were made. PR #108 remains OPEN/unmerged.
+
+
 ## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
 
 - Latest code/test/Preview SHA: `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`. This source+test commit passed CI and Preview deploy; later handoff-only commits may advance branch HEAD, so refetch HEAD before acting. PR #108 remains OPEN/unmerged. No Production changes.

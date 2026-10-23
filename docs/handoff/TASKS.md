@@ -1,6 +1,15 @@
 # ACTIVE TASK LEDGER — SINDAREALEST2
 Updated: 2026-10-23 — owner-confirmed report-then-continue protocol
 
+## LATEST VERIFIED TASK — MOBILE NAV ESCAPE FOCUS — 2026-10-23 22:10 ICT
+
+| ID | Status | Next action / acceptance |
+|---|---|---|
+| MOBILE-NAV-ESCAPE-FOCUS | COMPLETE — SOURCE/TEST + PREVIEW PASS | Fixed the overly broad global Escape handler in `public/index.html`: only close product detail when `#productOverlay` is open, leave cart and mobile menu dismissal to their focus/history-aware handlers, and scope arrow keys to the open detail dialog. Regression assertions in `tests/storefront-accessibility-contract.test.mjs`. CI #39975779202 PASS; Preview deploy #39975778958 PASS at exact source/test SHA `e86403965ba8756167215e01d336328f28a7f22a`; immutable Preview https://2eef8103.sindarealest2.pages.dev/. No live visual acceptance claimed. |
+
+The active branch HEAD just before this docs refresh was `e86403965ba8756167215e01d336328f28a7f22a`; this refresh changes handoff documents only. Next action is to continue a source-first audit of a safe, unlocked non-Hero section and establish a concrete defect before editing. Do not reopen completed work speculatively. Hero is PAUSED BY OWNER; `#order` and catalog-filter Liquid Glass/height are OWNER PASS/LOCKED; the dedicated product-status filter panel must stay deleted. PR #108 stays OPEN/unmerged; Preview only; no Production or Admin/backend/API/auth/data/config changes.
+
+
 ## AUTHORITATIVE CURRENT SNAPSHOT — 2026-10-23 (supersedes conflicting older status text below)
 
 - Latest code/test/Preview SHA: `3540e4c60f6a27a42c5a85bb0a57fa675f6eae7c`. This source+test commit passed CI and Preview deploy; later handoff-only commits may advance branch HEAD, so refetch HEAD before acting. PR #108 remains OPEN/unmerged. No Production changes.
