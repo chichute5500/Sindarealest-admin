@@ -7,7 +7,9 @@
 - Repository: `chichute5500/Sindarealest-admin`
 - Branch đang làm: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, chưa merge; base `main`.
-- HEAD branch/PR tại lần kiểm tra này: `700a651a1f92f35a7cc43bcc4b0ae96f2da26539`.
+- Source/test SHA của bản đang được chủ dự án kiểm tra: `700a651a1f92f35a7cc43bcc4b0ae96f2da26539`.
+- CI #40012914027 và Preview deploy #40012914126 đã PASS trên đúng source SHA `700a651a1f92f35a7cc43bcc4b0ae96f2da26539`.
+- Sau đó có các commit **chỉ cập nhật tài liệu bàn giao**; HEAD branch hiện tại là `aa9abe9d4d543a8d2d741b99c00b45c482cdead6`. Các commit tài liệu không thay đổi storefront và không phải deployment mới.
 - Cloudflare Pages project: `sindarealest2`; Production branch phải tiếp tục là `main`.
 - Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 - Không merge PR, không thay đổi `main`, không deploy Production nếu không có chỉ thị rõ ràng của chủ dự án.
