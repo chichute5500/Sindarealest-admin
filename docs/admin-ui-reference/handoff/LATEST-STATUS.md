@@ -45,8 +45,12 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 ## Kết quả kiểm thử tự động gần nhất
 
-- Validate [#39910157079](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910157079) on `feb29900e4680a1fec0a8411c6caa22c6d714d91`: `npm run check` PASS; dependency audit PASS; project integrity PASS; `npm test` FAILURE — handoff-integrity requires START-HERE to link PROMPT-NEXT-CHAT explicitly.
-- Preview diagnostic [#39910156991](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991) on the same SHA: FAILURE at the shared `npm test` gate; Chromium and responsive/theme matrix SKIPPED. Artifact [admin-preview-evidence-381](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910156991/artifacts/12482711337) is diagnostic only.
-- Last full screenshot matrix: Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`, FAILURE at 360×800 thumbnail reachability assertion (`scrollWidth=308`, expected `>318`). Artifact [admin-preview-evidence-380](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491/artifacts/12481833079): 51 real screenshots (16 login + 35 read-only fixture) and 33 fixture metrics.
-- The test-only fix at `feb29900e4680a1fec0a8411c6caa22c6d714d91` now allows thumbnails to fit without requiring artificial overflow and still tests reachability when scroll is needed. A fresh run on the post-sync HEAD is still required; no Preview pass is claimed.
-- Authenticated business/backend workflows remain NOT TESTED; fixture screenshots do not prove persistence or authorization. Remote D1 remains NOT VERIFIED; Production deployment NOT PERFORMED.
+- Tested commit: a17f068f22fd040810187fd4105d08a85dcb4d00
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39910790937
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: FAILURE; 54 real PNGs captured in artifact admin-preview-evidence-382 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 54 real PNGs; login shell: 16; read-only fixture module screens: 38; fixture metrics: 36.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
