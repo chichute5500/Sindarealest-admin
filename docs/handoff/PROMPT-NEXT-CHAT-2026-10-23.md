@@ -42,7 +42,7 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 ## Bước tiếp theo bắt buộc
 
 1. Chủ dự án đã xác nhận **PASS phiên bản hiện tại của toàn bộ phần quy trình đặt hàng an tâm (`#order`)**. Đánh dấu PASS/LOCKED; tuyệt đối không yêu cầu duyệt lại hoặc chỉnh phần này nếu chưa có phép mở khóa rõ ràng.
-2. Tiếp tục audit phần storefront **không phải Hero** tiếp theo từ source/tests/evidence hiện có. Ưu tiên khu vực danh mục/sản phẩm; xác định lỗi cụ thể trước khi sửa, từng thay đổi một, chạy đúng các kiểm tra bị ảnh hưởng.
+2. Active task: verify the catalog filter accessibility fix. `public/index.html` adds `role="group"` to `#categoryFilters` and `#fulfillmentFilters`; regression assertions are in `tests/storefront-operations.test.mjs`. Source commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`; test commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`. Static read-back passed, but combined CI statuses are empty and Preview is not yet verified at the new SHA. Run/obtain authorized validation, inspect results, then deploy Preview only and verify exact SHA. Do not claim PASS prematurely.
 3. Trước mọi thay đổi, đọc HEAD mới nhất, PR #108, trạng thái CI, Preview deploy và SHA đã deploy. Đối chiếu mọi thay đổi kể từ SHA trong prompt; không dựa vào SHA cũ như HEAD hiện tại.
 4. Sau mỗi thay đổi, kiểm tra workflow đến trạng thái cuối; trong lúc CI/deploy/capture chạy, làm việc độc lập an toàn nếu có. Không tuyên bố PASS khi chưa có bằng chứng.
 5. Cập nhật cả bốn file handoff sau mỗi trạng thái quan trọng. Commit tài liệu riêng khi cần; không đổi source chỉ để cập nhật handoff.
@@ -58,3 +58,13 @@ Bạn tiếp quản trực tiếp từ GitHub. Đọc theo thứ tự:
 - The latest documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7`; CI #39902525107, Preview deploy #39902525216, and technical live capture #39902525271 passed. The documentation-only handoff update does not alter `public/` or the deployed Preview source.
 - Next active task: continue source-first audit of the next unfinished **non-Hero** storefront section, starting with the product/catalog area and existing tests/evidence. Establish a concrete defect before changing source. Hero remains PAUSED BY OWNER and must not be opened, edited, tested, or captured.
 - PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
+
+## ACTIVE NON-HERO TASK — CATALOG FILTER ACCESSIBLE NAMES — 2026-10-23
+
+- Concrete source issue found in the product catalog: the category and fulfillment filter containers carried `aria-label` but had no explicit named grouping role. They are now `role="group"` with their existing Vietnamese accessible labels, so assistive technology can expose the two related button sets as named groups.
+- Source change: `public/index.html`, commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`.
+- Regression assertions: `tests/storefront-operations.test.mjs`, commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`.
+- Read-back verification confirms both role/label pairs and both regression assertions are present. This is static read-back only, **not** a passing Node test suite, Preview deployment, live capture, or owner visual acceptance.
+- GitHub combined-status queries for both commits currently return no statuses; no CI/deploy PASS has been established for this change. Do not claim this change is validated or deployed. The previously documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7` until a new successful deployment is verified.
+- Next: obtain/run the relevant validation using an authorized workflow path, inspect the final result, then deploy Preview only and verify exact deployed SHA before any live catalog capture. Do not change other catalog behavior without another concrete finding.
+- The previously owner-PASSed `#order` section remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged; no Production deployment or restricted-scope changes.
