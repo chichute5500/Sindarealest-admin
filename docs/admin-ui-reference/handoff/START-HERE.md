@@ -1,6 +1,6 @@
 # START HERE — SINDAREALEST ADMIN
 
-**Single entry point for every new chat.** Read this file and PROMPT-NEXT-CHAT.md, verify live GitHub state, then continue unfinished work. Do not ask the owner to paste prior history or repeat completed B1 cleanup.
+**Single entry point for every new chat.** Read this file and PROMPT-NEXT-CHAT.md. Before acting, fetch live GitHub PR #111/#108 metadata, main SHA, writable branch HEAD and recent Actions; treat the checkpoint below as historical until re-verified. Then continue unfinished work without asking the owner to paste prior history or repeating completed B1 cleanup.
 
 ## Canonical handoff
 - [Prompt for next chat](PROMPT-NEXT-CHAT.md)
