@@ -129,6 +129,8 @@ function createFullscreenHarness() {
   const prelude = [
     "let fullscreenSwapTimer = null;",
     "let fullscreenAnimationTimer = null;",
+    "function clearTimeout(timer) {}",
+    "function setTimeout(callback, delay) { return 0; }",
     "let fullscreenTransitionId = 0;",
     "let fullscreenActiveLayer = 0;",
     "function $(selector) { return context.$(selector); }",
