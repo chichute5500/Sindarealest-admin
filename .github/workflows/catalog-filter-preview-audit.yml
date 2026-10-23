@@ -490,24 +490,31 @@ jobs:
                       'Selecting a category must start the visible Liquid Glass activation animation for the current theme.');
                     assert.equal(selectedGlassMotion.animationDuration, '0.46s',
                       'Category activation must retain the visible 460ms glass-pop timing.');
-                    // Sample actual computed frames while the CSS animation is running, not just its declaration.
-                    await page.waitForTimeout(50);
+                    // Pin the real CSS animation at 100ms only inside this disposable audit page.
+                    // This captures the spring peak deterministically despite CI scheduling jitter.
                     const activationMidFrame = await otherCategory.evaluate(el => {
-                      const css = getComputedStyle(el);
                       const animation = el.getAnimations().find(item =>
                         typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      const wasRunningBeforeCapture = animation?.playState === 'running';
+                      if (animation) {
+                        animation.currentTime = 100;
+                        animation.pause();
+                      }
+                      const css = getComputedStyle(el);
                       const matrix = css.transform.match(/^matrix\(([^)]+)\)$/);
                       return {
                         animationName: css.animationName,
                         currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
                         playState: animation?.playState || 'missing',
+                        wasRunningBeforeCapture,
                         transform: css.transform,
                         scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
                         boxShadow: css.boxShadow
                       };
                     });
-                    assert.ok(activationMidFrame.currentTime !== null && activationMidFrame.currentTime < 460,
-                      'Category click must leave a live CSS animation in progress; observed ' + JSON.stringify(activationMidFrame));
+                    assert.ok(activationMidFrame.wasRunningBeforeCapture && activationMidFrame.currentTime === 100 &&
+                      activationMidFrame.playState === 'paused',
+                      'A real category click must start the live CSS animation before the audit pins its 100ms visual frame; observed ' + JSON.stringify(activationMidFrame));
                     assert.ok(activationMidFrame.scaleX > 1.04,
                       'The mid-animation category chip must visibly spring above its resting size; observed ' + JSON.stringify(activationMidFrame));
                     assert.ok(defaultChipStyleForActivation, 'The unselected category style must be captured before selection.');
@@ -633,36 +640,32 @@ jobs:
                     // and bloom against the unselected chip. The first activation above separately
                     // captures the actual peak (>1.04); this check proves reselection starts a fresh,
                     // running 460ms effect without requiring Playwright to resolve at the peak frame.
-                    const reselectionMotion = await nextCategory.evaluate(el => new Promise(resolve => {
-                      const startedAt = performance.now();
-                      const sample = () => {
-                        const css = getComputedStyle(el);
-                        const animation = el.getAnimations().find(item =>
-                          typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
-                        const currentTime = typeof animation?.currentTime === 'number' ? animation.currentTime : null;
-                        const scaleX = new DOMMatrixReadOnly(css.transform).a;
-                        if ((currentTime !== null && currentTime >= 120) || performance.now() - startedAt >= 280) {
-                          resolve({
-                            animationName: css.animationName,
-                            duration: css.animationDuration,
-                            currentTime,
-                            playState: animation?.playState || 'missing',
-                            scaleX,
-                            boxShadow: css.boxShadow
-                          });
-                          return;
-                        }
-                        requestAnimationFrame(sample);
+                    const reselectionMotion = await nextCategory.evaluate(el => {
+                      const animation = el.getAnimations().find(item =>
+                        typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      const wasRunningBeforeCapture = animation?.playState === 'running';
+                      if (animation) {
+                        animation.currentTime = 100;
+                        animation.pause();
+                      }
+                      const css = getComputedStyle(el);
+                      return {
+                        animationName: css.animationName,
+                        duration: css.animationDuration,
+                        currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
+                        playState: animation?.playState || 'missing',
+                        wasRunningBeforeCapture,
+                        scaleX: new DOMMatrixReadOnly(css.transform).a,
+                        boxShadow: css.boxShadow
                       };
-                      sample();
-                    }));
+                    });
                     assert.equal(reselectionMotion.animationName,
                       theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
                       'Switching to another category must retrigger the theme-appropriate glass animation.');
                     assert.equal(reselectionMotion.duration, '0.46s',
                       'Repeated category selection must retain the 460ms activation timing.');
-                    assert.ok(reselectionMotion.currentTime !== null && reselectionMotion.currentTime < 460 &&
-                      reselectionMotion.playState === 'running' && reselectionMotion.scaleX > 1.02 &&
+                    assert.ok(reselectionMotion.wasRunningBeforeCapture && reselectionMotion.currentTime === 100 &&
+                      reselectionMotion.playState === 'paused' && reselectionMotion.scaleX > 1.04 &&
                       reselectionMotion.boxShadow !== defaultChipStyleForActivation.shadow,
                       'The second category must show fresh live glass motion and a visible scale/bloom change; observed ' + JSON.stringify(reselectionMotion));
                     otherCategoryState.categoryReselection = 'PASS';
@@ -758,23 +761,30 @@ jobs:
                 await touchPage.touchscreen.tap(touchBox.x + touchBox.width / 2, touchBox.y + touchBox.height / 2);
                 assert.equal(await touchCategory.getAttribute('aria-pressed'), 'true',
                   'A real touchscreen tap must change selected category state.');
-                await touchPage.waitForTimeout(50);
                 const touchActivation = await touchCategory.evaluate(el => {
-                  const css = getComputedStyle(el);
                   const animation = el.getAnimations().find(item =>
                     typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                  const wasRunningBeforeCapture = animation?.playState === 'running';
+                  if (animation) {
+                    animation.currentTime = 100;
+                    animation.pause();
+                  }
+                  const css = getComputedStyle(el);
                   const matrix = css.transform.match(/^matrix\(([^)]+)\)$/);
                   return {
                     animationName: css.animationName,
                     currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
+                    playState: animation?.playState || 'missing',
+                    wasRunningBeforeCapture,
                     scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1,
                     boxShadow: css.boxShadow
                   };
                 });
                 assert.equal(touchActivation.animationName, theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
                   'Touch selection must trigger the theme-appropriate activation animation.');
-                assert.ok(touchActivation.currentTime !== null && touchActivation.currentTime < 460 && touchActivation.scaleX > 1.04,
-                  'Touch selection must expose a live, perceptible animation frame; observed ' + JSON.stringify(touchActivation));
+                assert.ok(touchActivation.wasRunningBeforeCapture && touchActivation.currentTime === 100 &&
+                  touchActivation.playState === 'paused' && touchActivation.scaleX > 1.04,
+                  'A real touchscreen tap must start the live glass animation before the audit pins its 100ms visual frame; observed ' + JSON.stringify(touchActivation));
                 const touchFrameFile = 'touch-category-activation-midframe-' + theme + '.png';
                 // Surround the chip with enough viewport context to inspect the activation halo.
                 const touchFrameBox = await touchCategory.boundingBox();
