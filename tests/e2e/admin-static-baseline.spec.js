@@ -2368,6 +2368,24 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#refreshActivityLogs')).toBeVisible();
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
 
+      // Screen 12 reference exposes activity and notification views as tabs inside the same screen.
+      await page.evaluate(() => localStorage.removeItem('sd-admin-last-seen'));
+      const activityTab = page.locator('[data-activity-tab="log"]');
+      const notificationsTab = page.locator('[data-activity-tab="notifications"]');
+      await expect(activityTab).toHaveAttribute('aria-pressed', 'true');
+      await expect(notificationsTab).toBeVisible();
+      await notificationsTab.click();
+      await expect(notificationsTab).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#activityNotificationList')).toContainText('product_updated');
+      await expect(page.locator('#activityNotificationsUnread')).toHaveText('1');
+      await page.locator('#activityMarkNotificationsRead').click();
+      const activityReadAt = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
+      expect(Number.isFinite(Date.parse(activityReadAt || '')), 'Screen 12 notification tab must persist the local read timestamp').toBe(true);
+      await expect(page.locator('#activityNotificationsUnread')).toBeHidden();
+      await activityTab.click();
+      await expect(activityTab).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#activityLogSearch')).toBeVisible();
+
       const width = page.viewportSize()?.width ?? 0;
       const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(documentWidth, 'Activity log must not cause document-level horizontal overflow').toBeLessThanOrEqual(width);
