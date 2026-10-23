@@ -113,3 +113,12 @@ Read-only static review of current `public/index.html` (blob `d54ed03b0f40e70d02
 ## Owner visual acceptance — order-step heading typography — 2026-10-23
 
 Owner explicitly confirmed PASS for the order-step heading readability change. This narrow item is PASS/LOCKED. Source/test CI and Preview deployment passed at commit `c8a14685efa3fbfa12475fe895405b5999489329`: [CI #39895567918](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567918), [Preview deploy #39895567897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567897). PR #108 remains open and unmerged; no Production deployment. Hero remains paused and untouched. Do not treat this owner acceptance as approval of other sections.
+
+
+## Regression fix — nested product detail dialog — 2026-10-23
+
+- Final tested SHA: `bc1a631d5ca82995b3a772da9bc26a4e8f241309`.
+- [Source/test CI PASS #39897235441](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897235441); [Preview deploy PASS #39897235447](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897235447). Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Deployment completed and verified against exact branch commit; Production branch remains `main`.
+- Fix: one modal dialog container for product detail; inner panel no longer declares a nested `role=dialog`. Regression test checks the outer overlay semantics and inner panel structure.
+- Order capture evidence is from earlier SHA `72cb5b365c5f7d6438e6ad0a37df43ba0142c1fc`, exact source/deployed match, 8 screenshots; later commit changed test file only, so storefront markup is identical. Do not claim the product-detail dialog itself has live visual capture or owner acceptance.
+- Owner acceptance for the narrow order-step heading typography is PASS/LOCKED. Broader order section acceptance remains pending. Hero remains paused.

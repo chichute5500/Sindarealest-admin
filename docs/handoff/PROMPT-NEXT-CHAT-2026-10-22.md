@@ -74,3 +74,12 @@ Start by reading, in order: `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS
 
 ### Immediate next action
 Continue the next unfinished storefront audit section OUTSIDE Hero. Re-fetch HEAD/PR/workflows/Preview deployment metadata; inspect current source, relevant tests, and existing artifacts; identify a concrete defect before editing. Change one item at a time, run impacted tests, deploy Preview only, verify exact deployed SHA, and request owner review only when visual acceptance is genuinely needed. Update the handoff files after verified state changes.
+
+
+## Handoff addendum — verified 2026-10-23
+
+Current HEAD is `bc1a631d5ca82995b3a772da9bc26a4e8f241309`; PR #108 must remain OPEN/unmerged. CI PASS [#39897235441](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897235441) and Preview deployment PASS [#39897235447](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897235447) at that exact SHA. Latest non-Hero source fix removes duplicate nested dialog semantics from product detail and has a focused regression assertion. Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ .
+
+Order-only capture [#39896962874 / artifact #12477450904](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896962874/artifacts/12477450904) has 8 screenshots and exact source/deployed SHA match at `72cb5b365c5f7d6438e6ad0a37df43ba0142c1fc`. Current source differs only in test assertions, so storefront HTML is unchanged, but this is not a visual review of the product-detail dialog. Owner visual acceptance for the broader order section remains pending; order-step heading typography alone is PASS/LOCKED.
+
+Continue the next concrete audit outside Hero. Hero remains PAUSED BY OWNER: do not edit it, restore assets, or run any capture including Hero. No merge, Production deploy, Admin/backend/API/auth/catalog, D1/R2, DNS, secrets, bindings, or Cloudflare Access bypass. Distinguish CI, Preview deployment, live capture, and owner visual acceptance. After each verified status change, update handoff files; while workflows run, perform independent useful work and return to check results.

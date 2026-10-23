@@ -39,3 +39,12 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 
 - **ORDER-STEP-HEADING-READABILITY — PASS/LOCKED by owner.** Do not change this typography without explicit permission. Source/test CI and Preview deploy passed at `c8a14685efa3fbfa12475fe895405b5999489329` ([CI #39895567918](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567918), [Preview #39895567897](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895567897)).
 - Next active task: audit the next unfinished non-Hero storefront section. Inspect evidence and source first; make no speculative UI changes. Hero remains paused. PR #108 must remain open/unmerged; Preview only.
+
+
+## Verified status — 2026-10-23
+
+- Current HEAD `bc1a631d5ca82995b3a772da9bc26a4e8f241309`; PR #108 OPEN/unmerged.
+- Fixed nested product-detail dialog semantics and added one focused regression assertion. CI PASS [#39897235441](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897235441); Preview deploy PASS [#39897235447](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39897235447).
+- Order-only live capture: 8 screenshots, exact SHA match at `72cb5b365c5f7d6438e6ad0a37df43ba0142c1fc`, artifact [#12477450904](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39896962874/artifacts/12477450904). Current HEAD differs only by removing two redundant test lines, so storefront HTML is unchanged. Capture does not visually verify the product-detail dialog; broader owner visual acceptance remains pending.
+- Hero stays paused. No Hero capture, merge, Production deploy, or restricted-scope changes.
+- Next: continue source-first audit outside Hero and outside the already locked order-step heading. Require a concrete finding before edits.
