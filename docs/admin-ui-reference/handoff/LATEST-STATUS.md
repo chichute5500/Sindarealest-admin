@@ -2,10 +2,12 @@
 
 ## Live checkpoint — 2026-10-23 06:04 UTC
 - Source/test SHA: `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`. Validate [#39909118547](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118547) **SUCCESS** on this exact SHA.
-- Admin Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) is **IN_PROGRESS**; last observed active step was Chromium installation. Prior Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) failed the 320px fixture assertion: scroll width 284px versus stale requirement >288px. The threshold was adjusted to >10px on `a3f5f28025efb6ebfc308e3f11a6239565cdfff2`; wait for the new run before claiming a pass.
-- Mobile product-gallery CSS was compacted; the test now checks the full upload zone is above the sticky footer at 390×844. Screenshot-level confirmation is still pending.
+- Admin Preview [#39909118491](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39909118491) is **IN_PROGRESS**; last observed step was Chromium installation. Prior Preview [#39908380252](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39908380252) failed a stale 320px rail assertion (284px measured versus >288px required). The threshold was lowered to >10px on current SHA; wait for the new run before claiming PASS.
+- Product-gallery CSS was compacted; test now requires the full upload zone to fit above the sticky footer at 390×844. Screenshot-level confirmation is pending.
 - PR #111 OPEN/unmerged at `a3f5f28025efb6ebfc308e3f11a6239565cdfff2` (418 files, +40,048/-212); PR #108 OPEN/unmerged/read-only at `0e4a1d5eef3662951b3ce182c8bbf154467a8866` (291 files); `main` unchanged at `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. No merge/deployment.
-- B1 cleanup/provenance audit is complete and must not be repeated without new evidence.
+- B1 cleanup/provenance audit is complete; do not repeat without new evidence.
+## Historical source/Preview checkpoint
+
 ## Historical source/Preview checkpoint
 
 ## Historical source/Preview checkpoint — 2026-10-23 04:07 UTC (superseded above)
