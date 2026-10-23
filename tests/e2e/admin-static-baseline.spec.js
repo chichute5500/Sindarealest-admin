@@ -1859,6 +1859,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
       expect(customerGridColumns, `Customer fields should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
+      const emailFieldGridColumn = await page.locator('#orderDetailContent .order-detail-customer-grid .field').nth(2).evaluate(element => getComputedStyle(element).gridColumn);
+      expect(emailFieldGridColumn, 'Customer email should use a compact grid slot instead of consuming a full row').not.toBe('1 / -1');
       expect(itemMetaGridColumns, `Order item details should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
       if (orderDetailViewportWidth <= 820) {
         await expect(page.locator('.mobiletabs')).toBeVisible();
