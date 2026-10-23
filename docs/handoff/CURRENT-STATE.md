@@ -1,3 +1,12 @@
+## LATEST AUTHORITATIVE UPDATE — SLIDESHOW HARNESS FIX ROUND 3 — 2026-10-24
+
+- Current source/test SHA: `74bcd512abc19d3fba4bad64654321091073b8ea`. Follow-up fixes the harness-only fixture issue: the reduced-motion scenario must retain the pause button so it can assert the control is disabled and labeled correctly. Missing-control scenario explicitly removes the pause button separately.
+- Prior attempts failed on test harness problems (incorrect vm return invocation, invalid embedded newline, then fixture accidentally deleting pause button for reduced-motion). Do not hide these failures; this SHA is awaiting its own gates.
+- CI #39995656182 and Preview #39995656107 are in progress at the time of this note. Verify exact SHA outcomes before marking PASS.
+- Last previously green pause/resume implementation is SHA `a3a6ac22840d17cd628fccab5b7b826bd5428c4c`, CI #39994601040, Preview #39994600974, URL https://5052d769.sindarealest2.pages.dev/.
+
+---
+
 ## LATEST AUTHORITATIVE UPDATE — SLIDESHOW TEST HARNESS CORRECTION — 2026-10-24
 
 - Current follow-up source/test SHA: `ed06d73b89477b637a72c25c7939ee94f32c056f`. The prior CI on `5c1ba570934588ec80b8fffd69d4f69f4ae6225a` exposed a harness-only issue: a literal newline was embedded in evaluated JavaScript, causing a SyntaxError. Corrected test assembly to use `String.fromCharCode(10)`.
