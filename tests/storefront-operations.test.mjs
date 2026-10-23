@@ -69,12 +69,15 @@ assert.ok(storefrontHtml.includes('#products .catalog-tools .filter-pills{\n  mi
   && storefrontHtml.includes('touch-action:manipulation;')
   && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:7px;column-gap:7px;row-gap:8px}'),
   'Desktop spacing and dedicated touch-first mobile sizing, tap targets, readable search text and compact 360px chip wrapping must all remain explicit.');
-assert.ok(storefrontHtml.includes('0 0 22px rgba(22,132,232,0.46)')
-  && storefrontHtml.includes('0 0 34px rgba(22,132,232,.62)')
-  && storefrontHtml.includes('scale(1.09) translateY(-2px)')
-  && storefrontHtml.includes('linear-gradient(135deg,rgba(255,255,255,.98) 0%,rgba(235,247,255,.96) 58%,rgba(213,236,255,.92) 100%)')
+assert.ok(storefrontHtml.includes('0 0 0 2.5px rgba(142,207,255,0.76)')
+  && storefrontHtml.includes('0 0 14px 3px rgba(83,169,255,0.28)')
+  && storefrontHtml.includes('0 0 24px rgba(83,169,255,0.25)')
+  && storefrontHtml.includes('26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.08) saturate(1.12);')
+  && storefrontHtml.includes('linear-gradient(180deg,rgba(255,255,255,.99) 0%,rgba(248,253,255,.97) 43%,rgba(218,240,255,.94) 100%)')
+  && storefrontHtml.includes('border-color:rgba(255,255,255,.98)')
+  && storefrontHtml.includes('backdrop-filter:blur(22px) saturate(175%);')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
-  'The selected pill must have a distinct visible blue glass glow and readable label typography.');
+  'The selected pill must use a layered translucent glass surface, pale reflective rim, soft diffuse blue halo, visible spring pop and readable label typography.');
 assert.ok(storefrontHtml.includes('#products .search-field:hover:not(:focus-within)')
   && storefrontHtml.includes('#products .search-field:active')
   && storefrontHtml.includes('#products .search-field:active svg')
