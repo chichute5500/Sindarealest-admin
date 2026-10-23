@@ -164,13 +164,13 @@ assert.ok(html.includes('<body class="welcome-active">'),
 assert.ok(html.includes("document.body.classList.remove('welcome-active')")
   && /s\.parentNode\.removeChild\(s\);\s*document\.body\.classList\.remove\('welcome-active'\)/.test(html),
   'The mobile toolbar and drawers remain hidden through the splash fade and are released only when the splash node is removed.');
-assert.ok(html.includes('body.welcome-active #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}')
+assert.ok(html.includes('body.welcome-active #mobileBottomNav{visibility:visible!important;opacity:1!important;pointer-events:auto!important}')
   && html.includes('body.welcome-active #accountDrawer,body.welcome-active #cartDrawer,body.welcome-active #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}'),
-  'The first-paint welcome class must hide the bottom toolbar and commerce drawers without depending solely on :has().');
+  'The first-paint welcome class must keep the toolbar mounted under the splash while hiding commerce drawers without depending solely on :has().');
 assert.ok(html.includes('/* sd-welcome-layering-fix-2026-10-22 */')
   && html.includes('.welcome-splash{z-index:2147483000!important}')
-  && html.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}'),
-  'The welcome splash must sit above the mobile toolbar and hide it for the full welcome lifecycle.');
+  && !html.includes('body:has(#welcomeSplash) #mobileBottomNav{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}'),
+  'The welcome splash must mask the mounted mobile toolbar with its higher stacking layer so the toolbar is revealed by the same fade.');
 assert.ok(html.includes('body:has(#welcomeSplash) #accountDrawer,')
   && html.includes('body:has(#welcomeSplash) #cartDrawer,')
   && html.includes('body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}'),
