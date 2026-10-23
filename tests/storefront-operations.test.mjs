@@ -16,7 +16,7 @@ const footerBottomStart = storefrontHtml.indexOf('<div class="footer-bottom">');
 assert.ok(contactEnd > contactStart && warrantyHelpStart > contactEnd && footerBottomStart > warrantyHelpStart, 'Warranty support must remain available but live outside the contact section.');
 assert.match(storefrontHtml, /@media\(max-width:760px\)\{\s*\.footer-contacts \.contact-grid\{grid-template-columns:minmax\(0,1fr\)/, 'Mobile contact links must follow the one-column reference layout.');
 assert.equal((contactMarkup.match(/class="contact-link/g) || []).length, 6, 'The contact area should use six reference-aligned rows, grouping Zalo and phone without duplicating the same number.');
-assert.match(storefrontHtml, /<a\\b[^>]*href="#about"[^>]*>Tìm hiểu thêm\\s*→<\\/a>/, 'The craftsmanship tile must link to the existing about section.');
+assert.ok(storefrontHtml.includes('class="text-link tap-target" href="#about">Tìm hiểu thêm →</a>'), 'The craftsmanship tile must link to the existing about section.');
 assert.ok(!storefrontHtml.includes('href="#craftsmanship"'), 'The storefront must not keep the missing #craftsmanship target.');
 assert.ok(contactMarkup.includes('<strong>Zalo / Điện thoại</strong>'), 'Zalo and phone must share one contact row as in the reference.');
 assert.ok(contactMarkup.includes('href="https://zalo.me/0827049192"') && contactMarkup.includes('href="tel:+84827049192"'), 'The combined contact row must keep both the Zalo and phone actions usable.');
