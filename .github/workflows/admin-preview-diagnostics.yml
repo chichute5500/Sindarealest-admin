@@ -179,8 +179,8 @@ jobs:
           data.checks.localStaticPlaywrightBaseline = checkState(process.env.BASELINE_OUTCOME);
           data.checks.playwright = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'PASS_LOCAL_MATRIX_BLOCKED_PREVIEW_ACCESS' : checkState(process.env.PREVIEW_OUTCOME);
           data.checks.playwrightPreviewDiagnostics = previewState;
-          data.checks.deployedPreview = process.env.PREVIEW_OUTCOME === 'success' ? 'PASS' :
-            (previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'BLOCKED_CLOUDFLARE_ACCESS' : 'FAIL_SIGNATURE_OR_NAVIGATION');
+          data.checks.deployedPreview = previewState === 'BLOCKED_CLOUDFLARE_ACCESS' ? 'BLOCKED_CLOUDFLARE_ACCESS' :
+            (process.env.PREVIEW_OUTCOME === 'success' ? 'PASS' : 'FAIL_SIGNATURE_OR_NAVIGATION');
           data.checks.responsiveViewports = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_SOURCE_SCREENSHOT_MATRIX' : 'FAIL_OR_NOT_RUN';
           data.checks.lightMode = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
           data.checks.darkMode = checkState(process.env.BASELINE_OUTCOME) === 'PASS' ? 'PASS_LOGIN_SCREEN_MATRIX' : 'FAIL_OR_NOT_RUN';
