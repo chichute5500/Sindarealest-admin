@@ -1,6 +1,22 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
-## LATEST HANDOFF CHECKPOINT — 2026-10-24 03:42 ICT
+## VERIFIED LIVE CHECKPOINT — 2026-10-24 03:55 ICT
+
+**Captured before this handoff-only synchronization.** At capture, permitted branch HEAD was `1c6c461be88b0e0c06c53894702e86338a23a205`; source/test SHA was `448e7d2b5840825e36c3215071260983badb9e39`. The intervening commit changed only the six handoff files. This synchronization also creates one docs-only commit; fetch live state again after it and before running Actions.
+
+- **Validate #40020808865:** SUCCESS on exact source/test SHA `448e7d2b5840825e36c3215071260983badb9e39` ([run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020808865)).
+- **Admin Preview #40020809121:** overall FAILURE only at `Verify branch HEAD still matches the tested SHA` ([run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020809121)). Source checks, tests, Chromium, the local screenshot matrix and read-only deployed Preview diagnostic all completed successfully on `448e7d2b5840825e36c3215071260983badb9e39`; the branch had advanced via a docs-only commit during the run. The exact-HEAD guard correctly rejected old-SHA evidence as latest-HEAD acceptance. Artifact upload succeeded.
+- **Artifact #470:** [admin-preview-evidence-470, ID 12531351041](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020809121/artifacts/12531351041); 20,856,703 bytes; SHA-256 `2a0bab8a4a90c9f8ea3d5a19674cde49b3a5983c9a4824368f767679e422a878`. Inspected the archive and Screen 9 warranty capture: the stale fixture toast is absent. Evidence includes 132 screenshot PNGs plus the approved reference, 120 UI-fixture capture entries and 112 layout metrics. All 112 report no horizontal overflow. Source capture has zero page/console/request/HTTP errors; fixture audit has zero page errors, fixture API errors, attempted writes or unexpected API paths. Its seven HTTP 503 console entries are expected simulated retry paths.
+- **Deployed diagnostic boundary:** `PASS_LOGIN_CSS_SIGNATURE` only—not authenticated backend/business QA or proof of exact reference parity.
+- **Static API review:** Backup is GET + `requireAdmin` + bounded snapshot/5,000-record limit. Restore is POST + `requireAdmin` + 20 MiB/5,000-record guards, relationship validation and a destructive atomic D1 batch. Tests use mocked D1. No endpoint was invoked; no data was written. No new source defect met the reproduce-before-fix threshold.
+- **Git state at capture:** branch `1c6c461be88b0e0c06c53894702e86338a23a205`; `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; #112 OPEN/unmerged/draft on `fix/admin-preview-project-target`. No merge, rebase, force-push, Production deployment, shared Cloudflare change or business-data mutation.
+- **Handoff integrity repair:** the previous docs-only commit removed `handoffSync.entryPoint` and `handoffSync.nextChatPrompt` from both status JSON files, although `tests/handoff-integrity.test.mjs` requires them. This synchronization restores both canonical paths. The source/test SHA `448e7d2b5840825e36c3215071260983badb9e39` was validated before the docs-only movement; the resulting HEAD still requires fresh validation.
+- **Acceptance remains unchanged:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. The 50% estimate remains provisional.
+- **Next required action:** after this sync commit, **fetch live state** and open GitHub Actions → **Admin Preview diagnostic smoke test** → **Run workflow**; select `feature/admin-isolated-handoff-2026-10-20` and click **Run workflow**. The workflow supports `workflow_dispatch`, but the connected GitHub tools do not expose dispatch. Do not use the old run as a retry—it is pinned to `448e7d2b5840825e36c3215071260983badb9e39`. Do not make any further commit while the new run is active; verify its tested SHA, exact-HEAD guard and artifact first.
+
+---
+
+## HISTORICAL CHECKPOINT — 2026-10-24 03:42 ICT (superseded by verified checkpoint above)
 
 ### State and exact-SHA verification
 - Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Live HEAD at checkpoint: `448e7d2b5840825e36c3215071260983badb9e39`. `main`: `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 OPEN/unmerged at this HEAD; PR #108 OPEN/unmerged/read-only at `62e83c29933c4d578065236e8df9cf0b21ece0ce`. Both PRs still target base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
