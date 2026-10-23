@@ -2350,7 +2350,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
 
       if (variant.viewport.width === 390 && variant.viewport.height === 844 && variant.theme === 'light') {
         const mobileNavTop = await page.locator('.mobiletabs').evaluate(element => element.getBoundingClientRect().top);
-        for (const selector of ['#watermarkEnabled', '#watermarkLogoUrl', '#watermarkPosition', '#watermarkSize', '#watermarkOpacity']) {
+        for (const selector of ['#watermarkSettingsForm > .switchrow', '#watermarkLogoUrl', '#watermarkPosition', '#watermarkSize', '#watermarkOpacity']) {
           const bounds = await page.locator(selector).boundingBox();
           expect(bounds, 'Reference Screen 10 control should render: ' + selector).not.toBeNull();
           expect(bounds.y + bounds.height,
