@@ -44,8 +44,8 @@ assert.doesNotMatch(html, /confirmHeaderCartAdd/);
 // Cart and account are true toggles on both the desktop cart and mobile controls.
 assert.match(html, /function toggleStorefrontModal\(type\)[\s\S]*?activeStorefrontModal\(\)===type[\s\S]*?requestStorefrontModalClose\(type/);
 assert.match(html, /\$\('#cartOpen'\)\.addEventListener\('click',\(\)=>toggleStorefrontModal\('cart'\)\)/);
-assert.match(html, /data-mobile-tab==='cart'\)\{tab\.addEventListener\('click',\(\)=>\{activate\('cart'\);toggleStorefrontModal\('cart'\)\}\)\}/);
-assert.match(html, /data-mobile-tab==='account'\)\{tab\.addEventListener\('click',\(\)=>\{activate\('account'\);toggleStorefrontModal\('account'\)\}\)\}/);
+assert.match(html, /tab\.dataset\.mobileTab==='cart'\)\{tab\.addEventListener\('click',\(\)=>\{activate\('cart'\);toggleStorefrontModal\('cart'\)\}\)\}/);
+assert.match(html, /tab\.dataset\.mobileTab==='account'\)\{tab\.addEventListener\('click',\(\)=>\{activate\('account'\);toggleStorefrontModal\('account'\)\}\)\}/);
 
 // Modal switches replace old cart/account entries; only cart -> checkout intentionally pushes a nested entry.
 // Popstate skips stale cart/account entries instead of reopening them after the user presses Back.
