@@ -43,6 +43,11 @@ assert.ok(storefrontHtml.includes('#products .filter-pill.active,')
   && storefrontHtml.includes('#products .filter-pill:active:not(:disabled)')
   && storefrontHtml.includes('#products .filter-pill:focus-visible'),
   'Persistent selected, physical pressed and keyboard-focus states must be implemented as distinct catalog-pill states.');
+assert.ok(storefrontHtml.includes('@keyframes sdCatalogGlassActivate{')
+  && storefrontHtml.includes('animation:sdCatalogGlassActivate .46s cubic-bezier(.2,.8,.2,1) both;')
+  && storefrontHtml.includes('@keyframes sdCatalogGlassActivateDark{')
+  && storefrontHtml.includes('#products .filter-pill[aria-pressed="true"]{animation:none!important}'),
+  'Selecting a category must produce a visible glass-pop/glow animation in light and dark themes, while respecting reduced-motion preferences.');
 assert.ok(storefrontHtml.includes('#products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"])')
   && storefrontHtml.includes('html.dark #products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"])'),
   'Pressed selectors must be at least as specific as unselected-chip hover selectors in both themes, so physical press overrides hover.');
