@@ -325,7 +325,13 @@ test.describe('SinDarealest2 Admin Preview', () => {
   });
 
   test('reads the live product catalog without product writes', async ({ page }, testInfo) => {
+    // The remote Preview is slower than the local fixture. Use a bounded diagnostic
+    // budget and emit safe stage markers so the next run identifies the exact wait.
+    test.setTimeout(90_000);
+    const stage = (name, details = {}) => console.info(`[ADMIN_CATALOG_STAGE] ${JSON.stringify({ stage: name, at: new Date().toISOString(), ...details })}`);
+    stage('start');
     const opened = await openLoginPage(page, testInfo);
+    stage('login-page-opened', { type: opened.type });
     if (opened.type === 'blocked') {
       throw new Error('BLOCKED_CLOUDFLARE_ACCESS: cannot test the live catalog without an authorized Preview path.');
     }
@@ -353,17 +359,21 @@ test.describe('SinDarealest2 Admin Preview', () => {
       }
     }, { timeout: 25_000 });
 
+    stage('login-submit');
     await page.locator('#password').fill(adminPassword);
     await page.locator('#loginForm button[type="submit"]').click();
     await expect(page.locator('#appView')).toBeVisible({ timeout: 20_000 });
     await expect(page.locator('#logout')).toBeVisible();
+    stage('dashboard-visible');
 
     const catalogResponse = await catalogResponsePromise;
+    stage('catalog-response-received', { status: catalogResponse.status() });
     expect(catalogResponse.status(), 'authenticated GET /api/admin/products should return 200').toBe(200);
     const payload = await catalogResponse.json();
     expect(Array.isArray(payload.products), 'catalog response should contain a products array').toBe(true);
 
     const products = payload.products;
+    stage('catalog-payload-parsed', { productCount: products.length });
     expect(products.length, 'live product catalog should contain more than one UI page').toBeGreaterThan(12);
     expect(products.every(product =>
       product && typeof product.id === 'string' &&
@@ -396,18 +406,22 @@ test.describe('SinDarealest2 Admin Preview', () => {
       ).length
     };
 
+    stage('opening-products-view');
     await page.locator('[data-view="products"]').first().click();
     await expect(page.locator('#searchBox')).toBeVisible();
+    stage('products-view-visible');
     const rows = page.locator('.tablewrap table tbody tr');
     await expect(rows, 'product list should show 12 items on the first page').toHaveCount(12);
     await expect(page.locator('.pagination .pageactions span')).toContainText('1/');
     await expect(page.locator('#next')).toBeEnabled();
+    stage('pagination-first-page-verified');
     await page.locator('#next').click();
     await expect(page.locator('.pagination .pageactions span')).toContainText('2/');
     await expect(rows).toHaveCount(12);
     await page.locator('#prev').click();
     await expect(page.locator('.pagination .pageactions span')).toContainText('1/');
 
+    stage('pagination-verified');
     await page.locator('#searchBox').fill(target.sku);
     await expect(rows).toHaveCount(1);
     await expect(rows.first()).toContainText(target.sku);
@@ -423,6 +437,7 @@ test.describe('SinDarealest2 Admin Preview', () => {
       publicationFilterState = 'PASS';
     }
 
+    stage('search-and-category-filter-verified');
     await page.locator('#categoryBox').selectOption('all');
     await page.locator('#searchBox').fill('');
     await expect(rows).toHaveCount(12);
@@ -452,13 +467,16 @@ test.describe('SinDarealest2 Admin Preview', () => {
       });
     }
 
+    stage('image-check-finished', { checked: imageState.checked, decoded: imageState.decoded ?? null });
     await page.locator('#categoryBox').selectOption('all');
     await page.locator('#searchBox').fill(target.sku);
     await expect(rows).toHaveCount(1);
+    stage('opening-product-editor');
     await rows.first().locator('button[data-action="edit"]').first().click();
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#pId')).toHaveValue(target.id);
     await expect(page.locator('#pTitle')).toHaveValue(target.title);
+    stage('product-editor-verified');
 
     const safeEvidence = {
       sourceCommit: commitKey,
