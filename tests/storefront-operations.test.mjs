@@ -53,6 +53,10 @@ assert.ok(storefrontHtml.includes('flex:0 0 auto;\n  min-width:max-content;\n  m
   && storefrontHtml.includes('white-space:nowrap;\n  overflow-wrap:normal;')
   && storefrontHtml.includes('flex-wrap:wrap;\n  align-content:flex-start;\n  overflow:visible;'),
   'Catalog pills must retain natural content width and wrap as complete chips rather than squeeze text vertically on mobile.');
+assert.ok(storefrontHtml.includes('#products .catalog-tools .filter-pills{\n  min-width:0;\n  max-width:100%;\n  column-gap:18px;\n  row-gap:10px;')
+  && storefrontHtml.includes('@media(min-width:1200px){\n  #products .catalog-tools{\n    width:calc(100% - 88px);\n    margin:0 auto 18px;\n  }\n}')
+  && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:8px;row-gap:8px}'),
+  'Desktop search/category panel width and chip spacing must match the source reference while mobile chips keep compact gaps.');
 assert.ok(storefrontHtml.includes('0 0 14px rgba(22,132,232,0.30)')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
   'The selected pill must have a distinct visible blue glass glow and readable label typography.');
