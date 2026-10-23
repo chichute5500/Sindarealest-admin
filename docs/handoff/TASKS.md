@@ -8,7 +8,8 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 | HANDOFF-CLEANUP | COMPLETED — verify links on each future change | Superseded dated prompts were removed; duplicate audit history consolidated into TEST-RESULTS.md; canonical state/prompt pointers updated. |
 | WORKFLOW-EFFICIENCY | APPLIED; source validation PASS | Commit `51e6f937b56c9c8ff04f4bbfd82298c3f8307d02`; [run #39843531405](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39843531405) PASS. Docs/README and workflow-only changes no longer trigger needless deployment/capture; Admin smoke is manual; stale validation/review runs are superseded. |
 | HERO-TEMP-HIDDEN | PAUSED BY OWNER — DO NOT TOUCH | Owner says leave Hero unchanged for now and return to it only after other storefront work is complete. Do not edit Hero markup/CSS/assets, run Hero-specific rework, or call it PASS during this pause. Preserve the uploaded image and derivative. |
-| STOREFRONT-VISUAL-AUDIT | ORDER SECTION OWNER PASS / LOCKED | Owner explicitly PASSed the current full `#order` section on 2026-10-23. Do not alter without explicit permission. Continue next unfinished non-Hero section; identify concrete defects before edits. |
+| STOREFRONT-VISUAL-AUDIT | ORDER SECTION OWNER PASS / LOCKED | Owner explicitly PASSed the current full `#order` section on 2026-10-23. Do not alter without explicit permission. |
+| CATALOG-FILTER-A11Y | SOURCE + REGRESSION ASSERTIONS COMMITTED; VALIDATION PENDING | Named `role=group` semantics added to category and fulfillment filters in `public/index.html`; assertions added to `tests/storefront-operations.test.mjs`. Source commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`; test commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`. Read-back passed; CI/deploy statuses are empty. Validate before Preview deployment/capture. |
 | QR-PAYMENT-CONTRACT | BLOCKED ON TRUSTED BACKEND CONTRACT/CONFIG | Keep fail-closed: no QR or transfer request until trusted order status and complete receiver/payment instructions exist. Do not modify Admin/backend in this branch. |
 
 ## Working protocol (owner-approved 2026-10-23)
@@ -97,3 +98,13 @@ Only current, actionable tasks belong here. Historical run-by-run evidence is in
 - The latest documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7`; CI #39902525107, Preview deploy #39902525216, and technical live capture #39902525271 passed. The documentation-only handoff update does not alter `public/` or the deployed Preview source.
 - Next active task: continue source-first audit of the next unfinished **non-Hero** storefront section, starting with the product/catalog area and existing tests/evidence. Establish a concrete defect before changing source. Hero remains PAUSED BY OWNER and must not be opened, edited, tested, or captured.
 - PR #108 stays OPEN/unmerged. Preview only; no Production deployment or restricted-scope changes.
+
+## ACTIVE NON-HERO TASK — CATALOG FILTER ACCESSIBLE NAMES — 2026-10-23
+
+- Concrete source issue found in the product catalog: the category and fulfillment filter containers carried `aria-label` but had no explicit named grouping role. They are now `role="group"` with their existing Vietnamese accessible labels, so assistive technology can expose the two related button sets as named groups.
+- Source change: `public/index.html`, commit `bd3d6f6d4268d63b1907a0533613d1cab6da3c05`.
+- Regression assertions: `tests/storefront-operations.test.mjs`, commit `a281f6de74ed506ac7b7eb3adcd8d075fc0a7b9a`.
+- Read-back verification confirms both role/label pairs and both regression assertions are present. This is static read-back only, **not** a passing Node test suite, Preview deployment, live capture, or owner visual acceptance.
+- GitHub combined-status queries for both commits currently return no statuses; no CI/deploy PASS has been established for this change. Do not claim this change is validated or deployed. The previously documented Preview source remains `a84eef725171826f595f61b236533d6dd882dbe7` until a new successful deployment is verified.
+- Next: obtain/run the relevant validation using an authorized workflow path, inspect the final result, then deploy Preview only and verify exact deployed SHA before any live catalog capture. Do not change other catalog behavior without another concrete finding.
+- The previously owner-PASSed `#order` section remains LOCKED. Hero remains PAUSED BY OWNER and untouched. PR #108 stays OPEN/unmerged; no Production deployment or restricted-scope changes.
