@@ -2331,6 +2331,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (width <= 680) {
         // The shared mobilecards layout uses a label/value flex row for each cell.
         await expect(page.locator('.activity-log-table tbody tr td').first()).toHaveCSS('display', 'flex');
+        const searchWidth = await page.locator('#activityLogSearch').evaluate(el => el.getBoundingClientRect().width);
+        expect(searchWidth, 'Activity-log search must have a usable full-width row on mobile').toBeGreaterThanOrEqual(width * 0.65);
       }
 
       await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');

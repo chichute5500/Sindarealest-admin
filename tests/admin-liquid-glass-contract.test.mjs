@@ -288,6 +288,9 @@ has('#main .product-table .prodname{font-size:11px;line-height:1.25;white-space:
 has('#main .product-table .product-row-info .sku{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}', 'SKU/category context wraps to two lines on 320–360px phones instead of losing its visible tail');
 has('class="prodname" title="${esc(p.title)}"', 'full product titles remain available via a title attribute when visually truncated');
 has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"search search" "category fulfillment";gap:7px;padding:10px}', 'product search spans the full mobile toolbar row');
+has('.activity-log-filters .field:first-child{grid-column:1/-1}', 'activity-log search gets a full-width row on mobile');
+has('.activity-log-filters .field:nth-child(2){grid-column:1}', 'activity filter select remains usable on mobile');
+has('.activity-log-filters .field:nth-child(3){grid-column:2}', 'clear-filters button stays beside the activity select on mobile');
 has('#main .product-table .product-mobile-edit{display:inline-flex;align-items:center;justify-content:center;width:28px;min-width:28px;min-height:28px;height:28px;padding:4px;border-radius:9px}', 'mobile edit action remains a compact touch-friendly control');
 has('aria-label="Sửa sản phẩm: ${esc(p.title)}"', 'mobile edit action retains a product-specific accessible name');
 has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
