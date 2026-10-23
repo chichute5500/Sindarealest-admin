@@ -80,7 +80,6 @@ assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incom
 assert.match(html, /active\.classList\.remove\('is-active'\);incoming\.classList\.add\('is-active'\)/);
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
 assert.match(html, /html:not\(\.dark\) \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/, 'Light fullscreen images must not blend with the outgoing image layer, which creates a ghosted double-image effect.');
-  'Light fullscreen product photos must preserve their source pixels so the incoming image cannot ghost the outgoing image.');
 assert.match(html, /html\.dark \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/,
   'Dark fullscreen product photos must preserve their real source colours without light-mode blending.');
 assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_MS=300/);
