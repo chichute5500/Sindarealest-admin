@@ -22,16 +22,20 @@ assert.match(detailTransition, /if\(transitionId!==detailTransitionId\)return/);
 assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
-assert.match(html, /const mobile=window\.matchMedia\('\(max-width:760px\)'\)\.matches/);
 assert.doesNotMatch(html, /sd-mobile-fade-(?:out|in)|FULLSCREEN_MOBILE_FADE_MS|sdFullscreenMobileFade/,
-  'Mobile must not crossfade two product photos, which creates the reported ghosted double image.');
-assert.match(html, /function preloadFullscreenPhotos\(/);
-assert.match(html, /image\.fetchPriority='low';fullscreenPreloadCache\.set\(src,image\);image\.src=src/);
-assert.match(html, /@media\(max-width:760px\)\{\.sd-fullscreen-image\{animation:none!important;transition:none!important;transform:none!important;will-change:auto!important/);
+  'Fullscreen transitions use the directional slide rather than a crossfade.');
+assert.match(html, /function preloadFullscreenPhotos\(index=detailIndex,all=false\)/);
+assert.match(html, /const indices=all\?detailImages\.map\(\(_,photoIndex\)=>photoIndex\)/);
+assert.match(html, /preloadFullscreenPhotos\(detailIndex,true\)/,
+  'Opening a product album must start preloading every image in that album.');
+assert.match(html, /image\.fetchPriority=photoIndex===index\?'high':'low'/);
+assert.doesNotMatch(html, /@media\(max-width:760px\)\{\.sd-fullscreen-image\{animation:none!important;transition:none!important;transform:none!important/);
 
 const fullscreenMobileSwap = html.slice(html.indexOf('function setFullscreenPhoto('), html.indexOf('function renderFullscreenThumbs(', html.indexOf('function setFullscreenPhoto(')));
-assert.match(fullscreenMobileSwap, /if\(instant\|\|mobile\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
-  'Mobile swaps must activate the already-decoded incoming layer before deactivating the current layer, preventing an intermediate frame with no active photo.');
+assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
+  'Initial display or missing outgoing image must still use a safe decoded-image activation path.');
+assert.match(fullscreenMobileSwap, /active\.classList\.add\(direction==='right'\?'sd-slide-out-right':'sd-slide-out-left'\)/);
+assert.match(fullscreenMobileSwap, /incoming\.classList\.add\(direction==='right'\?'sd-slide-in-left':'sd-slide-in-right'\)/);
 
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /let decoded;[\s\S]*?try\{decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)\}[\s\S]*?catch\{decoded=Promise\.reject\(\)\}/, 'Decode failures must be handled without revealing an unconfirmed image.');
@@ -193,11 +197,13 @@ function assertExactlyOneActivePhoto(images, expected) {
   assert.equal(gallery.decodeQueue.length, 1);
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  assert.equal(gallery.images[0].classList.contains('sd-slide-out-left'), true);
+  assert.equal(gallery.images[1].classList.contains('sd-slide-in-right'), true);
+  assert.equal(gallery.timers.size, 1,
+    'After decode, mobile must run the directional slide before committing the active layer.');
+  gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
-  assert.equal(gallery.images[0].classList.contains('sd-mobile-fade-out'), false);
-  assert.equal(gallery.images[1].classList.contains('sd-mobile-fade-in'), false);
-  assert.equal(gallery.timers.size, 0,
-    'Mobile must switch layers atomically after decode, with no overlapping fade or delayed z-index swap.');
   assert.equal(gallery.images[1].getAttribute('src'), 'new.jpg');
 }
 {
@@ -216,6 +222,9 @@ function assertExactlyOneActivePhoto(images, expected) {
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[1].resolve(); await flushGalleryMicrotasks();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  assert.equal(gallery.images[1].classList.contains('sd-slide-in-right'), true);
+  gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
   assert.equal(gallery.images[1].getAttribute('src'), 'newer.jpg',
     'A stale decode must never replace the latest requested next/previous photo.');
