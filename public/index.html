@@ -963,6 +963,8 @@ function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-
 function setFullscreenPhoto(src,direction='left',instant=false){
  clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
  const transitionId=++fullscreenTransitionId,images=fullscreenImages(),active=activeFullscreenImage(),incoming=images.find(img=>img!==active),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
+ // Mobile browsers can briefly composite two full-resolution layers unevenly; wait for decode, then swap atomically instead of animating both layers.
+ instant=instant||window.matchMedia('(max-width:760px)').matches;
  if(!active||!incoming||!frame)return;
  const imageIndex=Math.max(0,detailImages.indexOf(src))+1;
  const altText=(currentProduct?.title||'Sản phẩm SinDarealest')+' — ảnh '+imageIndex;
