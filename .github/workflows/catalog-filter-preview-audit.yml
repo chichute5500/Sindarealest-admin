@@ -1,0 +1,430 @@
+name: Non-Hero catalog-filter live Preview audit
+
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+    paths:
+      - 'public/index.html'
+      - 'scripts/cloudflare-access-service-token.mjs'
+      - 'scripts/preview-external-read-allowlist.mjs'
+      - '.github/workflows/catalog-filter-preview-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-filter-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Check out exact branch commit with ancestry
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install isolated Playwright
+        run: npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify Preview SHA and capture only catalog filters
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { promises as fs } from 'node:fs';
+          import path from 'node:path';
+          import { execFileSync } from 'node:child_process';
+          import { chromium } from 'playwright';
+          import { buildCloudflareAccessHeaders } from './scripts/cloudflare-access-service-token.mjs';
+          import { isApprovedPreviewExternalRead } from './scripts/preview-external-read-allowlist.mjs';
+          import { sanitizeText } from './scripts/sanitize-audit-value.mjs';
+
+          const expectedBranch = 'fix/liquid-glass-audit-2026-10-19';
+          const sourceSha = String(process.env.GITHUB_SHA || '').trim().toLowerCase();
+          const branch = String(process.env.GITHUB_REF_NAME || '').trim();
+          const accountId = String(process.env.CLOUDFLARE_ACCOUNT_ID || '').trim();
+          const apiToken = String(process.env.CLOUDFLARE_PAGES_READ_TOKEN || '').trim();
+          const outDir = path.join(process.cwd(), 'artifacts', 'catalog-filter-preview');
+          const manifestPath = path.join(outDir, 'catalog-filter-audit.json');
+          const viewports = [
+            { name: 'mobile-360', width: 360, height: 800 },
+            { name: 'mobile-390', width: 390, height: 844 },
+            { name: 'tablet-768', width: 768, height: 1024 },
+            { name: 'desktop-1440', width: 1440, height: 900 }
+          ];
+          const themes = ['light', 'dark'];
+          const targetSelectors = ['#products .catalog-tools', '#products .fulfillment-filter-row'];
+          const previewUrl = new URL(process.env.PREVIEW_URL);
+          const origin = previewUrl.origin;
+          const targetUrl = new URL('#products', previewUrl).href;
+          assert.equal(branch, expectedBranch, 'Capture is restricted to the approved Preview branch.');
+          assert.match(sourceSha, /^[a-f0-9]{40}$/, 'The triggering source revision must be an exact Git SHA.');
+          assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().toLowerCase(), sourceSha,
+            'Checked-out source must match the triggering commit.');
+          assert.equal(previewUrl.protocol, 'https:', 'Preview must use HTTPS.');
+          assert.match(previewUrl.hostname, /^[a-z0-9-]+\.sindarealest2\.pages\.dev$/i,
+            'Only the project Pages hostname is allowed.');
+          assert.notEqual(previewUrl.hostname.toLowerCase(), 'sindarealest2.pages.dev',
+            'Production Pages hostname is forbidden.');
+          assert.equal(previewUrl.username + previewUrl.password + previewUrl.search + previewUrl.hash, '',
+            'Preview base URL must not contain credentials, query parameters or a fragment.');
+          for (const selector of targetSelectors) {
+            assert.doesNotMatch(selector, /hero|order/i, 'Only catalog filter elements may be captured.');
+          }
+          if (!/^[a-f0-9]{32}$/i.test(accountId)) throw new Error('Missing or invalid Cloudflare account ID.');
+          if (!apiToken) throw new Error('Missing read-only Cloudflare Pages metadata token.');
+
+          const audit = {
+            sourceKind: 'cloudflare-pages-preview-live-read-only',
+            auditScope: 'catalog-filter-controls-only',
+            previewOrigin: origin,
+            branch,
+            sourceHeadSha: sourceSha,
+            deployedPreviewSha: null,
+            deployment: null,
+            sourcePublicTreeEquivalentToDeployment: false,
+            exactSourceHeadMatch: false,
+            captureCompleted: false,
+            status: 'IN_PROGRESS',
+            ownerVisualAcceptance: 'PENDING',
+            accessBlocked: false,
+            accessServiceTokenConfigured: false,
+            screenshotTargets: targetSelectors,
+            runtimeErrors: [],
+            sameOriginHttpErrors: [],
+            readOnlyViolations: [],
+            blockedExternalRequests: [],
+            filterChecks: [],
+            screenshots: [],
+            startedAtUtc: new Date().toISOString()
+          };
+          await fs.rm(outDir, { recursive: true, force: true });
+          await fs.mkdir(outDir, { recursive: true });
+          const writeAudit = async () => {
+            await fs.mkdir(outDir, { recursive: true });
+            await fs.writeFile(manifestPath, JSON.stringify(audit, null, 2) + '\n', 'utf8');
+          };
+
+          function publicTreeEquivalent(deployedSha) {
+            if (!/^[a-f0-9]{40}$/.test(deployedSha)) return false;
+            try {
+              execFileSync('git', ['merge-base', '--is-ancestor', deployedSha, sourceSha], { stdio: 'ignore' });
+              execFileSync('git', ['diff', '--quiet', deployedSha, sourceSha, '--', 'public'], { stdio: 'ignore' });
+              return true;
+            } catch { return false; }
+          }
+
+          async function readAliasDeployment() {
+            let totalPages = 1;
+            const matches = [];
+            for (let pageNumber = 1; pageNumber <= Math.min(totalPages, 10); pageNumber += 1) {
+              const endpoint = new URL('https://api.cloudflare.com/client/v4/accounts/' +
+                encodeURIComponent(accountId) + '/pages/projects/sindarealest2/deployments');
+              endpoint.searchParams.set('env', 'preview');
+              endpoint.searchParams.set('per_page', '20');
+              endpoint.searchParams.set('page', String(pageNumber));
+              const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: { Authorization: 'Bearer ' + apiToken, Accept: 'application/json' },
+                signal: AbortSignal.timeout(15000)
+              });
+              const payload = await response.json().catch(() => null);
+              if (!response.ok || payload?.success !== true || !Array.isArray(payload?.result)) {
+                throw new Error('Cloudflare Pages read-only metadata request failed (HTTP ' + response.status + ').');
+              }
+              totalPages = Number(payload?.result_info?.total_pages || 1);
+              for (const deployment of payload.result) {
+                const aliases = Array.isArray(deployment?.aliases) ? deployment.aliases : [];
+                let deployedOrigin = '';
+                try { deployedOrigin = new URL(deployment?.url || '').origin.toLowerCase(); } catch {}
+                const aliasOrigins = aliases.map((alias) => {
+                  try { return new URL(alias).origin.toLowerCase(); } catch { return ''; }
+                });
+                if (aliasOrigins.includes(origin.toLowerCase()) || deployedOrigin === origin.toLowerCase()) matches.push(deployment);
+              }
+            }
+            return matches.filter((item, index, all) => item?.id
+              ? all.findIndex((other) => other?.id === item.id) === index : true);
+          }
+
+          async function verifyDeployment() {
+            let reason = 'No deployment record matched the exact Preview alias.';
+            for (let attempt = 1; attempt <= 6; attempt += 1) {
+              const matches = await readAliasDeployment();
+              if (matches.length > 1) throw new Error('The Preview alias matched multiple deployments; refusing to guess.');
+              if (matches.length === 1) {
+                const deployment = matches[0];
+                const metadata = deployment?.deployment_trigger?.metadata || {};
+                const deployedSha = String(metadata.commit_hash || '').trim().toLowerCase();
+                const deployedBranch = String(metadata.branch || '').trim();
+                const stage = deployment?.latest_stage ||
+                  (Array.isArray(deployment?.stages) ? deployment.stages.at(-1) : null);
+                const stageStatus = String(stage?.status || '').toLowerCase();
+                const status = String(deployment?.status || stageStatus).toLowerCase();
+                const environment = String(deployment?.environment || '').toLowerCase();
+                if (environment !== 'preview' || deployedBranch !== expectedBranch) {
+                  throw new Error('Alias deployment is not the expected Preview branch; no screenshot was captured.');
+                }
+                if (!/^[a-f0-9]{40}$/.test(deployedSha) || stageStatus !== 'success' ||
+                    status !== 'success' || !deployment?.id || deployment?.is_skipped === true) {
+                  reason = 'Alias deployment metadata is incomplete or its deployment has not completed.';
+                } else if (deployedSha === sourceSha || publicTreeEquivalent(deployedSha)) {
+                  audit.deployment = {
+                    id: String(deployment.id),
+                    sha: deployedSha,
+                    branch: deployedBranch,
+                    environment,
+                    status,
+                    latestStage: { name: String(stage?.name || ''), status: stageStatus },
+                    url: typeof deployment.url === 'string' ? deployment.url : null,
+                    aliases: Array.isArray(deployment.aliases) ? deployment.aliases : []
+                  };
+                  audit.deployedPreviewSha = deployedSha;
+                  audit.exactSourceHeadMatch = deployedSha === sourceSha;
+                  audit.sourcePublicTreeEquivalentToDeployment = true;
+                  return;
+                } else {
+                  reason = 'Alias deployment SHA differs and public storefront files are not proven equivalent.';
+                }
+              }
+              if (attempt < 6) await new Promise((resolve) => setTimeout(resolve, 15000));
+            }
+            throw new Error('Preview alias could not be verified safely: ' + reason);
+          }
+
+          function isAccessPage(url, status, title, body) {
+            let parsed;
+            try { parsed = new URL(url); } catch { return true; }
+            return status === 401 || status === 403 ||
+              parsed.pathname.startsWith('/cdn-cgi/access/login') ||
+              parsed.hostname.toLowerCase().endsWith('.cloudflareaccess.com') ||
+              /cloudflare access|sign in to continue|log in to .*cloudflare pages|access denied/i.test((title || '') + '\n' + (body || ''));
+          }
+
+          const browserAccessHeaders = buildCloudflareAccessHeaders();
+          audit.accessServiceTokenConfigured = Object.keys(browserAccessHeaders).length > 0;
+          let browser;
+          try {
+            await writeAudit();
+            await verifyDeployment();
+            browser = await chromium.launch({ headless: true });
+            for (const viewport of viewports) {
+              for (const theme of themes) {
+                const contextName = viewport.name + '-' + theme;
+                const context = await browser.newContext({
+                  viewport: { width: viewport.width, height: viewport.height },
+                  deviceScaleFactor: 1,
+                  colorScheme: theme,
+                  reducedMotion: 'reduce',
+                  serviceWorkers: 'block'
+                });
+                await context.addInitScript(({ themeName }) => {
+                  try { localStorage.setItem('sd-theme-mode', themeName); } catch {}
+                }, { themeName: theme });
+                const page = await context.newPage();
+                page.setDefaultTimeout(20000);
+                page.on('pageerror', (error) => {
+                  if (audit.runtimeErrors.length < 80) audit.runtimeErrors.push({
+                    context: contextName, type: 'pageerror', message: sanitizeText(error.message || 'Page error')
+                  });
+                });
+                page.on('console', (message) => {
+                  if (message.type() !== 'error' || audit.runtimeErrors.length >= 80) return;
+                  const sourceUrl = message.location()?.url || '';
+                  try { if (sourceUrl && new URL(sourceUrl).origin !== origin) return; } catch {}
+                  audit.runtimeErrors.push({ context: contextName, type: 'console', message: sanitizeText(message.text()) });
+                });
+                page.on('response', (response) => {
+                  let responseUrl;
+                  try { responseUrl = new URL(response.url()); } catch { return; }
+                  if (responseUrl.origin === origin && response.status() >= 400 && audit.sameOriginHttpErrors.length < 80) {
+                    audit.sameOriginHttpErrors.push({
+                      context: contextName, status: response.status(), method: response.request().method(),
+                      path: responseUrl.pathname
+                    });
+                  }
+                });
+                await page.route('**/*', async (route) => {
+                  const request = route.request();
+                  let requestUrl;
+                  try { requestUrl = new URL(request.url()); } catch {
+                    await route.abort();
+                    return;
+                  }
+                  if (requestUrl.origin === origin) {
+                    if (!['GET', 'HEAD'].includes(request.method().toUpperCase())) {
+                      if (audit.readOnlyViolations.length < 80) audit.readOnlyViolations.push({
+                        context: contextName, method: request.method(), path: requestUrl.pathname
+                      });
+                      await route.abort();
+                      return;
+                    }
+                    const headers = Object.keys(browserAccessHeaders).length
+                      ? { ...request.headers(), ...browserAccessHeaders } : request.headers();
+                    await route.continue({ headers });
+                    return;
+                  }
+                  if (isApprovedPreviewExternalRead(request.url(), request.method())) {
+                    await route.continue();
+                    return;
+                  }
+                  if (audit.blockedExternalRequests.length < 80) audit.blockedExternalRequests.push({
+                    context: contextName, method: request.method(), origin: requestUrl.origin, type: request.resourceType()
+                  });
+                  await route.abort();
+                });
+                try {
+                  const response = await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+                  const title = await page.title().catch(() => '');
+                  const body = await page.locator('body').innerText().catch(() => '');
+                  if (isAccessPage(page.url(), response?.status() || 0, title, body)) {
+                    audit.accessBlocked = true;
+                    throw new Error('Cloudflare Access blocked the authorized Preview request; no bypass was attempted.');
+                  }
+                  if (!response || response.status() < 200 || response.status() >= 400) {
+                    throw new Error('Preview main document did not return a successful response.');
+                  }
+
+                  const productsSection = page.locator('#products');
+                  await productsSection.scrollIntoViewIfNeeded();
+                  const categoryGroup = page.locator('#categoryFilters');
+                  const fulfillmentGroup = page.locator('#fulfillmentFilters');
+                  await categoryGroup.waitFor({ state: 'visible', timeout: 25000 });
+                  await fulfillmentGroup.waitFor({ state: 'visible', timeout: 25000 });
+                  assert.equal(await categoryGroup.getAttribute('role'), 'group');
+                  assert.equal(await categoryGroup.getAttribute('aria-label'), 'Lọc theo danh mục');
+                  assert.equal(await fulfillmentGroup.getAttribute('role'), 'group');
+                  assert.equal(await fulfillmentGroup.getAttribute('aria-label'), 'Lọc theo tình trạng sản phẩm');
+
+                  const categoryButtons = categoryGroup.locator('button[data-category]');
+                  const fulfillmentButtons = fulfillmentGroup.locator('button[data-fulfillment]');
+                  assert.ok(await categoryButtons.count() >= 1, 'Category filter group has no buttons.');
+                  assert.equal(await fulfillmentButtons.count(), 4, 'Fulfillment filter group must expose four filter choices.');
+                  assert.equal(await categoryGroup.locator('button[aria-pressed="true"]').count(), 1);
+                  assert.equal(await fulfillmentGroup.locator('button[aria-pressed="true"]').count(), 1);
+
+                  for (const selector of targetSelectors) {
+                    const target = page.locator(selector);
+                    await target.scrollIntoViewIfNeeded();
+                    const box = await target.boundingBox();
+                    assert.ok(box && box.width > 0 && box.height > 0, 'Catalog filter target is missing or has no layout: ' + selector);
+                    const filename = selector.includes('catalog-tools')
+                      ? 'catalog-search-and-category-filters-' + contextName + '.png'
+                      : 'catalog-fulfillment-filters-' + contextName + '.png';
+                    await target.screenshot({
+                      path: path.join(outDir, filename),
+                      animations: 'disabled',
+                      timeout: 30000
+                    });
+                    audit.screenshots.push({
+                      filename,
+                      selector,
+                      viewport: viewport.name,
+                      width: viewport.width,
+                      height: viewport.height,
+                      theme
+                    });
+                  }
+
+                  let categoryInteraction = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
+                  const otherCategory = categoryGroup.locator('button[data-category]:not([data-category="all"])').first();
+                  if (await otherCategory.count() > 0) {
+                    await otherCategory.click();
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
+                      'Selected category did not expose aria-pressed=true.');
+                    await categoryGroup.locator('button[data-category="all"]').click();
+                    assert.equal(await categoryGroup.locator('button[data-category="all"]').getAttribute('aria-pressed'), 'true');
+                    categoryInteraction = 'PASS';
+                  }
+                  const otherFulfillment = fulfillmentGroup.locator('button[data-fulfillment]:not([data-fulfillment="all"])').first();
+                  await otherFulfillment.click();
+                  assert.equal(await otherFulfillment.getAttribute('aria-pressed'), 'true',
+                    'Selected fulfillment filter did not expose aria-pressed=true.');
+                  await fulfillmentGroup.locator('button[data-fulfillment="all"]').click();
+                  assert.equal(await fulfillmentGroup.locator('button[data-fulfillment="all"]').getAttribute('aria-pressed'), 'true');
+                  audit.filterChecks.push({
+                    context: contextName,
+                    namedCategoryGroup: true,
+                    namedFulfillmentGroup: true,
+                    categoryButtonCount: await categoryButtons.count(),
+                    fulfillmentButtonCount: await fulfillmentButtons.count(),
+                    categoryInteraction,
+                    fulfillmentInteraction: 'PASS'
+                  });
+                } finally {
+                  await context.close();
+                  await writeAudit();
+                }
+              }
+            }
+            audit.captureCompleted = audit.screenshots.length === 16;
+            audit.passed = audit.captureCompleted &&
+              audit.accessBlocked === false &&
+              audit.runtimeErrors.length === 0 &&
+              audit.sameOriginHttpErrors.length === 0 &&
+              audit.readOnlyViolations.length === 0 &&
+              audit.filterChecks.length === 8;
+            audit.status = audit.passed ? 'CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE' : 'CAPTURED_WITH_ISSUES';
+            audit.finishedAtUtc = new Date().toISOString();
+            await writeAudit();
+            assert.equal(audit.screenshots.length, 16, 'Expected eight viewport/theme pairs and two catalog-only screenshots per pair.');
+            assert.equal(audit.runtimeErrors.length, 0, 'Runtime errors were detected.');
+            assert.equal(audit.sameOriginHttpErrors.length, 0, 'Same-origin HTTP errors were detected.');
+            assert.equal(audit.readOnlyViolations.length, 0, 'Non-read-only requests were attempted.');
+            assert.equal(audit.filterChecks.length, 8, 'Some viewport/theme filter checks did not complete.');
+            assert.equal(audit.accessBlocked, false, 'Cloudflare Access blocked the Preview request.');
+            assert.equal(audit.passed, true, 'The catalog-only Preview audit did not pass.');
+            console.log(JSON.stringify({
+              status: audit.status,
+              sourceHeadSha: audit.sourceHeadSha,
+              deployedPreviewSha: audit.deployedPreviewSha,
+              exactSourceHeadMatch: audit.exactSourceHeadMatch,
+              sourcePublicTreeEquivalentToDeployment: audit.sourcePublicTreeEquivalentToDeployment,
+              screenshots: audit.screenshots.length,
+              filterChecks: audit.filterChecks.length,
+              runtimeErrors: audit.runtimeErrors.length,
+              sameOriginHttpErrors: audit.sameOriginHttpErrors.length,
+              readOnlyViolations: audit.readOnlyViolations.length,
+              accessBlocked: audit.accessBlocked
+            }, null, 2));
+          } catch (error) {
+            audit.status = audit.accessBlocked ? 'BLOCKED_ACCESS' : 'FAILED';
+            audit.error = sanitizeText(error?.message || 'Catalog Preview audit failed.');
+            audit.finishedAtUtc = new Date().toISOString();
+            await writeAudit();
+            throw error;
+          } finally {
+            if (browser) await browser.close();
+          }
+          NODE
+
+      - name: Upload catalog-only screenshots and manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sindarealest-catalog-filter-preview-${{ github.run_number }}
+          path: artifacts/catalog-filter-preview/
+          if-no-files-found: warn
+          retention-days: 14
