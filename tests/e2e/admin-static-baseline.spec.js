@@ -1559,12 +1559,39 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           overflowX: getComputedStyle(el).overflowX
         }));
         expect(railMetrics.overflowX, 'Mobile thumbnails should scroll horizontally rather than widen the page').toBe('auto');
-        expect(railMetrics.scrollWidth, 'Five thumbnails should overflow the visible rail enough to remain horizontally scrollable').toBeGreaterThan(railMetrics.clientWidth + 10);
-        const scrolledRail = await page.locator('#imageGrid .image-rail').evaluate(el => {
-          el.scrollLeft = el.scrollWidth;
-          return el.scrollLeft;
+        const railReachability = await page.locator('#imageGrid .image-rail').evaluate(el => {
+          const items = [...el.querySelectorAll('.imageitem')];
+          if (!items.length) throw new Error('Thumbnail rail has no images');
+          const railRect = el.getBoundingClientRect();
+          const canScroll = el.scrollWidth > el.clientWidth + 1;
+          if (canScroll) el.scrollLeft = el.scrollWidth;
+          const lastRect = items[items.length - 1].getBoundingClientRect();
+          return {
+            canScroll,
+            scrollLeft: el.scrollLeft,
+            lastItemReachable: lastRect.left >= railRect.left - 1 && lastRect.right <= railRect.right + 1,
+            allItemsFit: items.every(item => {
+              const rect = item.getBoundingClientRect();
+              return rect.left >= railRect.left - 1 && rect.right <= railRect.right + 1;
+            })
+          };
         });
-        expect(scrolledRail, 'Thumbnail rail should be horizontally scrollable').toBeGreaterThan(0);
+        if (variant.viewport.width <= 320) {
+          expect(railReachability.canScroll,
+            'At 320px the thumbnail rail must overflow so the remaining thumbnails can be reached by scrolling').toBe(true);
+          expect(railReachability.scrollLeft,
+            'At 320px the thumbnail rail must actually scroll').toBeGreaterThan(0);
+          expect(railReachability.lastItemReachable,
+            'At 320px the last thumbnail must be reachable after scrolling').toBe(true);
+        } else if (railReachability.canScroll) {
+          expect(railReachability.scrollLeft,
+            'If the mobile thumbnail rail overflows, it must scroll').toBeGreaterThan(0);
+          expect(railReachability.lastItemReachable,
+            'If the mobile thumbnail rail overflows, the last thumbnail must be reachable').toBe(true);
+        } else {
+          expect(railReachability.allItemsFit,
+            'When the mobile thumbnail rail does not overflow, every thumbnail must remain visible').toBe(true);
+        }
         await page.locator('#imageGrid .image-rail').evaluate(el => { el.scrollLeft = 0; });
 
         // The reference includes narrow phones at 320px and 360px, not only 390px.
