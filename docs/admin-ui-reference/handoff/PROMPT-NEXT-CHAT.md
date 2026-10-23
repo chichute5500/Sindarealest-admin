@@ -1,3 +1,17 @@
+## VERIFIED CHECKPOINT — 2026-10-23 18:01 UTC — Read-only isolated Preview catalog test PASS
+
+- Exact tested source SHA: `2e1262631be17f7ef9bf9d4e2102db0d3d2610bc`.
+- Validation run #39999486428: PASS. Preview diagnostic run #39999486463: SUCCESS.
+- Artifact: [admin-preview-evidence-438](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999486463/artifacts/12522085329).
+- Authenticated live Preview test passed: `GET /api/admin/products` returned HTTP 200 and 235 products; first-page 12 rows; pagination 1→2→1; search, category and publication filters PASS; persisted image URL decoded successfully (naturalWidth > 0, same origin); product editor opened and matched target ID/title.
+- Read-only guard: no product POST/PUT/DELETE requests were observed. All 235 products had images; 527 persisted relative image URLs were reported. This proves list/filter/image/editor loading only—not product save, CRUD persistence, other business modules, remote schema/ledger, or exact reference parity.
+- Diagnosed previous 90s timeout: Playwright selected a hidden responsive edit button. Test now selects `button[data-action="edit"]:visible`; this fixed the test selector, not application UI/API.
+- Local source matrix PASS: 132 PNGs (16 login-shell captures, 120 fixture module screens, 112 fixture metrics). Fixture screens use synthetic data and are not authenticated business-data acceptance.
+- No production deploy, database writes, seed/import rerun, or storefront/shared variable changes.
+- Next: continue independent read-only verification of authenticated module routes only where safely covered by existing tests; do not add write/CRUD tests without explicit isolated-data authorization. Review Node.js 20 deprecation separately; it was a warning, not the cause of this catalog test failure.
+
+---
+
 ## CURRENT HANDOFF — 2026-10-24 — Product catalog visible in isolated Admin Preview; continue runtime verification
 
 **User confirmation:** the user has now confirmed that products are visible in Admin Preview. Treat the “0 products” UI symptom as resolved for the current observed session; do not repeat seed/import or ask the user to re-check the same thing. This confirms the visible product list only, not full CRUD, images, login/session stability, or backend acceptance.
