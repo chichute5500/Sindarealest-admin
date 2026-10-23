@@ -593,3 +593,13 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
 - Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
 - Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.
+
+---
+
+## HANDOFF EVIDENCE CLARIFICATION — 2026-10-24
+
+- Icon-system owner acceptance is PASS for source `58f67a424e74b86e798cb5faa043a5d18e10b228`, Preview https://3587ce1f.sindarealest2.pages.dev/, CI run #39999873524 and Preview deploy run #39999874042.
+- These results are exact-source gates for the accepted icon source. The later branch head is documentation-only and is not asserted to have a fresh storefront deployment.
+- Most recent unlocked source audit: no concrete reproducible defect found; no code change and no new CI/deploy from that audit. Static anchor/button/image/link/ID checks are source-level only, not real browser or visual acceptance.
+- Keep CI, Preview deploy, browser capture, and owner acceptance as separate evidence categories. Never infer one from another.
+- Multi-track execution requirement: while one gate runs, perform a non-conflicting audit/review in an unlocked area; return to check gate result and exact SHA. Do not idle or stop after a status report.

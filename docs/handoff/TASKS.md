@@ -454,3 +454,21 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
 - Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
 - Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.
+
+---
+
+## NEXT TASK QUEUE — AUTONOMOUS PARALLEL WORK — 2026-10-24
+
+1. Re-fetch live branch HEAD, PR #108 state, recent Actions and deployment metadata before any changes.
+2. Continue source-first audit on unlocked storefront areas only. Identify and reproduce a concrete defect; avoid speculative redesign. Add a focused regression test for any fix.
+3. In parallel while tests/CI/Preview are running, inspect a separate safe source/test area or review workflow evidence. Do not start overlapping conflicting edits or touch locked scopes.
+4. For a code change: run focused test, full CI, Preview deploy, verify exact source SHA and deployment metadata/URL, inspect failure logs/artifacts if needed. Report each gate distinctly.
+5. After reporting any result, immediately continue the next safe independent task. Do not treat reporting as a reason to stop. Maintain handoff docs after meaningful work.
+6. Do not trigger visual workflows that capture Hero or locked `#order`; do not run catalog filter audit without explicit owner unlock and both `owner_authorized=true` and `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+7. Ask owner only for a real acceptance/decision, explicit unlock, or required action on their device/account. Then pause that dependent task only; continue unrelated safe work if possible.
+
+### Frozen owner decisions
+- Icon system: PASS; freeze appearance. Accepted Preview/source/gates are documented in CURRENT-STATE.md.
+- Hero: PAUSED.
+- `#order`, catalog Liquid Glass filters, warranty claim form: PASS/LOCKED.
+- PR #108 must remain OPEN/unmerged. No Production deploy or restricted-scope changes.

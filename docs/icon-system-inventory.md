@@ -260,3 +260,16 @@ The final Liquid Glass style is now placed after the legacy cascade, because pri
 - Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
 - Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
 - Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.
+
+---
+
+## OWNER ACCEPTANCE AND FREEZE — 2026-10-24
+
+The owner explicitly accepted the current icon system as PASS. Freeze icon appearance and icon-shell styling; do not continue visual iterations unless the owner explicitly unlocks this scope.
+
+Accepted source SHA: `58f67a424e74b86e798cb5faa043a5d18e10b228`.
+Accepted Preview: https://3587ce1f.sindarealest2.pages.dev/
+CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524
+Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042
+
+These gates refer to the accepted source SHA, not subsequent docs-only branch heads. Hero remains PAUSED; catalog filter controls and `#order` remain PASS/LOCKED; warranty form remains PASS/LOCKED. PR #108 remains open/unmerged; no Production deployment.

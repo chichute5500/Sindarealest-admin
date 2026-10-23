@@ -651,3 +651,42 @@ Continue from the latest GitHub branch; do not start over. Work only on the appr
 - Accepted Preview URL: https://3587ce1f.sindarealest2.pages.dev/ (built from source `58f67a424e74b86e798cb5faa043a5d18e10b228`). CI: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524. Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042. Both passed for that source SHA.
 - Current branch head at handoff update: `70cd43eb605876e36731213beb92cf015661b89b`. The docs-only update after the accepted source is not a new visual build; do not imply the current branch-head SHA was visually accepted. PR #108 remains open and unmerged; Production untouched.
 - Keep previous constraints: Hero paused by owner; catalog filter controls PASS/LOCKED; `#order` PASS/LOCKED; warranty form PASS/LOCKED. No backend/API/auth/data/Cloudflare/Production changes. Continue the next safe task without reopening accepted icon work.
+
+---
+
+# AUTHORITATIVE NEXT-CHAT PROMPT — REFRESHED 2026-10-24 — MULTI-TRACK AUTONOMOUS CONTINUATION
+
+You are continuing the existing SinDarealest2 project. Do not restart, redo completed work, or ask the owner to repeat known context. Begin by reading the handoff files, then verify live GitHub state.
+
+## Repository and source of truth
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — keep OPEN and UNMERGED; base `main`.
+- Branch HEAD verified immediately before this docs-only update: `10713a3bc3274b24cba765f9c2093cbbcc5fd856`. Re-fetch HEAD after this commit; never assume the recorded SHA remains current.
+- Accepted icon source SHA: `58f67a424e74b86e798cb5faa043a5d18e10b228`.
+- Accepted Preview: https://3587ce1f.sindarealest2.pages.dev/
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999873524
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39999874042
+- Those gates and owner PASS apply to the exact accepted source SHA above, not automatically to later documentation HEADs.
+
+## Mandatory owner decisions / hard locks
+- ICON SYSTEM: owner said PASS. Freeze all icon appearance/shell styling; do not change or reopen without explicit owner instruction.
+- HERO: PAUSED BY OWNER. Do not inspect, edit, test, redesign, restore, screenshot, or capture.
+- `#order` / “Đặt hàng an tâm”: PASS/LOCKED; do not touch or retest.
+- Catalog Liquid Glass filter chips/icons/height/effects/controls: PASS/LOCKED. Reopen only with explicit owner authorization AND `owner_authorized=true` AND repository variable `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+- Warranty claim form: PASS/LOCKED. No proactive edits/retests; no valid warranty code/registered phone was available for live lookup, so do not claim live-flow verification.
+- Never restore the separate product-status filter panel.
+- No `main` changes, merge, or Production deploy. Do not touch Admin/backend/API/auth, product/catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access/infrastructure, or real payment flows. Never bypass Access.
+
+## Required work style — optimize elapsed time, parallel tracks
+1. **Do not wait idle.** While CI/deploy is running, use the time for an independent, safe source/test audit in an unlocked area. Avoid conflicting simultaneous edits to the same files.
+2. Work in small evidence-driven units: reproduce defect → add regression test → minimal fix → focused test → full CI → Preview deploy → verify exact SHA and deployment metadata.
+3. Start independent read-only audits in parallel where useful. Keep each track scoped; no unsafe concurrency, duplicate work, or touching locked areas.
+4. When a command/workflow is pending, continue useful independent work, then return to inspect its actual result/logs/artifacts. Do not report PASS before confirmed.
+5. **After every report, automatically continue to the next safe task.** Reporting is not a stop condition. Stop only when the owner must inspect/approve something, a required owner unlock is missing, or a real user-side action is necessary. If only one track is blocked, continue other safe tracks.
+6. Keep source static checks, focused tests, full CI, Preview deployment, live browser evidence and owner visual acceptance separate. Never claim browser visual inspection unless actually performed.
+7. Update `CURRENT-STATE.md`, `TASKS.md`, `TEST-RESULTS.md`, this prompt, and `docs/icon-system-inventory.md` when relevant. Documentation-only commits are not storefront deployments.
+8. Before any write, verify latest branch HEAD and PR state; use non-force/expected-SHA update. Keep PR #108 open/unmerged.
+
+## Current next action
+Re-fetch branch HEAD, PR #108, recent workflow runs and Preview deployment metadata. Read all handoff files. Then continue a source-first audit on an unlocked storefront area, choose a concrete reproducible defect only, and follow the gates above. No new issue was established by the last read-only audit; do not invent one.
