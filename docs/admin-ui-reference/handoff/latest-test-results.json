@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T03:55:33+07:00",
+  "capturedAtUtc": "2026-10-24T06:31:30.400+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "1c6c461be88b0e0c06c53894702e86338a23a205",
+  "branchHeadAtCheckpointStart": "ea3942fe0ab106640b1d041e50bf5b3bb153d2fb",
   "codeTestSha": "448e7d2b5840825e36c3215071260983badb9e39",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "VALIDATE_PASS_ON_448; PREVIEW_CAPTURE_AND_LOGIN_DIAGNOSTIC_PASS_ON_448; EXACT_HEAD_GUARD_FAILED_AFTER_DOCS_ONLY_MOVEMENT",
+  "status": "LAST_CONFIRMED_VALIDATE_PASS_ON_448; PREVIEW_ON_448_REJECTED_BY_EXACT_HEAD_GUARD_AFTER_BRANCH_MOVEMENT; CURRENT_HEAD_NOT_YET_VALIDATED",
   "latestRun": {
     "id": 40020808865,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020808865",
@@ -235,11 +235,10 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "After this six-file docs-only sync, fetch live branch HEAD and run workflow_dispatch for Admin Preview diagnostic smoke test on the resulting feature branch HEAD. Keep the branch unchanged until completion, then verify tested SHA, exact-HEAD guard and artifact.",
-    "Do not rerun completed Preview #40020809121 as a substitute: it reuses source SHA 448e7d2 and repeats the exact-HEAD guard failure.",
-    "Continue read-only reference/API/test audit while Actions runs; do not edit source without a reproduced defect and regression test first.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED; exact parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
-    "Do not merge PR #111/#108/#112, alter main/storefront/shared Cloudflare settings, write business data, run seed/import/migrations, expose secrets or bypass Access."
+    "Fetch live branch HEAD and Actions state before relying on historical checkpoints.",
+    "Let Validate and Preview run on the handoff regression-test commit; keep the branch unchanged until the Preview exact-HEAD guard and artifact complete.",
+    "Continue read-only source/UI audits in parallel; add a test before any focused product-code fix.",
+    "Do not request the unavailable Run workflow control, create a dummy code/test commit, weaken exact-HEAD protection, bypass Access, deploy Production, or mutate real business data."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -395,7 +394,7 @@
     },
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a"
   },
-  "currentHeadValidationReason": "Branch HEAD at capture 1c6c461be88b0e0c06c53894702e86338a23a205 was docs-only beyond tested source/test SHA 448e7d2b5840825e36c3215071260983badb9e39. Exact-HEAD guard failed as intended. Artifact #470 belongs to 448e7d2b5840825e36c3215071260983badb9e39, not the post-sync branch tip.",
+  "currentHeadValidationReason": "Current branch HEAD at checkpoint capture was ea3942fe0ab106640b1d041e50bf5b3bb153d2fb; latest confirmed Validate and Preview are on 448e7d2b5840825e36c3215071260983badb9e39. Preview artifact #470 is not current-HEAD acceptance evidence. The current correction updates handoff instructions and adds a regression assertion; fetch Actions after this commit.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-23T20:04:14.947Z",
     "branchHeadAtCheckpointStart": "43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
@@ -500,21 +499,22 @@
     "result": "Validate passed on SHA 448; screenshot matrix and deployed login CSS signature passed; Preview run failed exact-HEAD guard only. Latest post-sync branch tip requires a fresh run."
   },
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-24T03:55:33+07:00",
+    "lastSyncAtUtc": "2026-10-24T06:31:30.400+07:00",
     "files": [
       "docs/admin-ui-reference/handoff/START-HERE.md",
       "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
       "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
       "docs/admin-ui-reference/handoff/current-status.json",
-      "docs/admin-ui-reference/handoff/latest-test-results.json",
-      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
+      "docs/admin-ui-reference/handoff/latest-test-results.json"
     ],
-    "purpose": "Record the final outcome of Preview #40020809121 and artifact #470, plus restoration of canonical handoff links.",
+    "purpose": "Correct stale workflow-dispatch instructions and add handoff-integrity regression coverage; preserve the Preview anti-loop and exact-HEAD guard.",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "checkpointHeadBeforeSync": "1c6c461be88b0e0c06c53894702e86338a23a205",
+    "checkpointHeadBeforeSync": "ea3942fe0ab106640b1d041e50bf5b3bb153d2fb",
     "sourceTestSha": "448e7d2b5840825e36c3215071260983badb9e39",
-    "nextRequiredAction": "Run workflow_dispatch on the resulting live branch HEAD; do not commit while it runs."
+    "nextRequiredAction": "Continue safe independent audits. For a reproducible product defect, add a regression test and make a focused change in a Preview-watched path. Current GitHub integration cannot dispatch a new Preview run; do not create a dummy commit or ask the user to find a missing UI control.",
+    "lastConfirmedSourceTestSha": "448e7d2b5840825e36c3215071260983badb9e39"
   },
   "latestProductSourceCommit": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
   "latestDiagnosticArtifact": {
@@ -544,7 +544,7 @@
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
     "inspection": "Screen 9 warranty capture has no stale synthetic retry toast; fixture-only evidence, not authenticated backend or full reference acceptance."
   },
-  "checkpointSemantics": "Captured at 2026-10-24T03:55:33+07:00 before this six-file docs-only sync. Branch HEAD at capture was 1c6c461be88b0e0c06c53894702e86338a23a205, one docs-only commit after source/test SHA 448e7d2b5840825e36c3215071260983badb9e39. Validate #40020808865 passed. Preview #40020809121 uploaded and inspected artifact #470 but failed only exact-HEAD guard because branch moved during the run. This sync repairs canonical handoff links and is docs-only; resulting HEAD needs fresh workflow_dispatch.",
+  "checkpointSemantics": "Live GitHub state was rechecked at 2026-10-24T06:31:30.400+07:00. Writable branch HEAD at capture was ea3942fe0ab106640b1d041e50bf5b3bb153d2fb; Validate #40020808865 passed on 448e7d2b5840825e36c3215071260983badb9e39. Preview #40020809121 completed screenshots and login CSS diagnostic but failed exact-HEAD guard after branch movement. The current handoff correction adds regression coverage for stale dispatch instructions; fetch Actions after this commit.",
   "latestActionsRun": {
     "id": 40018955530,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955530",
@@ -605,9 +605,9 @@
     "previewStatus": "SUCCESS",
     "summary": "Changed the long commercial-SKU placeholder to 'SKU chính thức' so it fits the 320px mobile field more cleanly; added Playwright assertion. Validate and Preview passed on exact SHA; artifact 421 confirms screenshot."
   },
-  "currentHeadAtCheckpoint": "1c6c461be88b0e0c06c53894702e86338a23a205",
+  "currentHeadAtCheckpoint": "ea3942fe0ab106640b1d041e50bf5b3bb153d2fb",
   "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083",
-  "latestReviewFinding": "Preview #40020809121 captured screenshot matrix and read-only login CSS diagnostic on 448e7d2b5840825e36c3215071260983badb9e39; artifact #470 was downloaded and inspected. Screen 9 fixture toast is absent. The run failed only because the exact-HEAD guard detected branch movement to 1c6c461be88b0e0c06c53894702e86338a23a205 via a docs-only commit. The docs-only commit also dropped required handoffSync.entryPoint and handoffSync.nextChatPrompt fields from both JSON status files; this sync restores them. Static Backup/Restore review found no newly reproducible source defect; no endpoint or data writes.",
+  "latestReviewFinding": "Live source audit at HEAD ea3942fe0ab106640b1d041e50bf5b3bb153d2fb reviewed Backup/Restore, warranty paths, and payment request/ledger handlers without calling endpoints or changing real data. No new reproducible product-code defect was found in these areas. Current handoff correction removes stale instructions to manually dispatch Preview when the UI has no control and the connected tools have no dispatch action.",
   "previewRuntimeCheckpoint": {
     "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
     "previewUrl": "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/",

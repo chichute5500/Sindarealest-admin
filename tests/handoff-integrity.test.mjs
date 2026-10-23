@@ -7,6 +7,8 @@ const status = readJson('../docs/admin-ui-reference/handoff/current-status.json'
 const results = readJson('../docs/admin-ui-reference/handoff/latest-test-results.json');
 const startHere = readText('../docs/admin-ui-reference/handoff/START-HERE.md');
 const nextPrompt = readText('../docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md');
+const latestStatusDoc = readText('../docs/admin-ui-reference/handoff/LATEST-STATUS.md');
+const screenAudit = readText('../docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md');
 const masterPrompt = readText('../docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md');
 const previewTest = readText('../tests/e2e/admin-preview.spec.js');
 const previewWorkflow = readText('../.github/workflows/admin-preview-diagnostics.yml');
@@ -65,6 +67,22 @@ assert.match(startHere, /fetch live/i,
   'START-HERE must require a live-state fetch rather than trusting historical checkpoints.');
 assert.match(nextPrompt, /START-HERE\.md/,
   'The next-chat prompt must point back to the single entry point.');
+const currentCheckpointDocs = [
+  ['START-HERE.md', startHere],
+  ['PROMPT-NEXT-CHAT.md', nextPrompt],
+  ['LATEST-STATUS.md', latestStatusDoc],
+  ['12-SCREEN-REFERENCE-AUDIT.md', screenAudit],
+];
+for (const [label, content] of currentCheckpointDocs) {
+  const checkpoint = content.split(/\n---\n/, 1)[0];
+  assert.doesNotMatch(checkpoint, /click\s+\*\*Run workflow\*\*|run workflow_dispatch/i,
+    `${label} current checkpoint must not tell the user to run an unavailable workflow-dispatch control.`);
+}
+assert.doesNotMatch(String(status.handoffSync.nextRequiredAction), /run workflow_dispatch|click\s+.*run workflow/i,
+  'Current status JSON must not retain the stale manual-dispatch instruction.');
+assert.doesNotMatch(String(results.handoffSync.nextRequiredAction), /run workflow_dispatch|click\s+.*run workflow/i,
+  'Latest test-result JSON must not retain the stale manual-dispatch instruction.');
+
 const historyRoot = new URL('../docs/admin-ui-reference/handoff/history/', import.meta.url);
 const historyFiles = [];
 const walkHistory = directory => {
