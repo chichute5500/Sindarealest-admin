@@ -212,7 +212,9 @@ assert.match(adminHtml, /mobilecards/,
   'Responsive order tables should provide the mobile-card layout checked by the visual matrix');
 assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
   'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
-assert.match(adminHtml, /\.order-detail-customer-grid \.field:nth-child\(3\)\{grid-column:auto\}/, 'Order detail email should use a compact grid slot on narrow screens');
+assert.match(adminHtml, /\.order-detail-customer-card\{display:grid;grid-template-columns:42px minmax\(0,1fr\) auto/, 'Order detail should render a compact customer identity/contact card with a distinct action');
+assert.match(adminHtml, /data-action="view-order-customer"/, 'The order-detail customer card should expose a read-only view-profile action rather than an unsupported edit control');
+assert.match(adminHtml, /async function showOrderCustomerProfile\(searchTerm\)/, 'The customer shortcut should route to the customer list with a searchable contact key');
 assert.match(baselineSpec, /const detailsButton = orderRow\.locator\('\[data-action="view-order-details"\]:visible'\)\.first\(\);\s*await expect\(orderRow\)\.toBeVisible\(\);\s*await detailsButton\.click\(\);/,
   'Order-detail capture should open the selected UI-only order from its visible row');
 assert.match(baselineSpec, /await expect\(page\.locator\('\.order-detail-page'\)\)\.toBeVisible\(\);/,

@@ -1851,16 +1851,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
       await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
       const orderDetailViewportWidth = page.viewportSize()?.width ?? 0;
-      const expectedDetailColumns = orderDetailViewportWidth >= 360 ? 2 : 1;
-      const customerGridColumns = await page.locator('#orderDetailContent .order-detail-customer-grid').evaluate(element =>
+      const customerCardColumns = await page.locator('#orderDetailContent .order-detail-customer-card').evaluate(element =>
         getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
+      const expectedDetailColumns = orderDetailViewportWidth >= 360 ? 2 : 1;
       const itemMetaGridColumns = await page.locator('#orderDetailContent .order-detail-item .order-detail-item-grid').first().evaluate(element =>
         getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
-      expect(customerGridColumns, `Customer fields should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
-      const emailFieldGridColumn = await page.locator('#orderDetailContent .order-detail-customer-grid .field').nth(2).evaluate(element => getComputedStyle(element).gridColumn);
-      expect(emailFieldGridColumn, 'Customer email should use a compact grid slot instead of consuming a full row').not.toBe('1 / -1');
+      expect(customerCardColumns, `Customer identity card should keep avatar, contact details, and action in separate columns at ${orderDetailViewportWidth}px`).toBe(3);
       expect(itemMetaGridColumns, `Order item details should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
       if (orderDetailViewportWidth <= 820) {
         await expect(page.locator('.mobiletabs')).toBeVisible();
@@ -1882,6 +1880,24 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(orderRow.locator('[data-action="save-order"]')).toBeFocused();
 
       await detailsButton.click();
+      await expect(page.locator('.order-detail-page')).toBeVisible();
+
+      const customerCard = page.locator('.order-detail-customer-card');
+      await expect(customerCard).toBeVisible();
+      await expect(customerCard.locator('.order-detail-customer-avatar')).toHaveText('KD');
+      await expect(customerCard.locator('.order-detail-customer-avatar')).toHaveAttribute('aria-hidden', 'true');
+      await expect(customerCard.locator('.order-detail-customer-name')).toHaveText('Khách thử nghiệm giao diện');
+      const customerProfileButton = customerCard.locator('[data-action="view-order-customer"]');
+      await expect(customerProfileButton).toBeVisible();
+      await customerProfileButton.click();
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Danh sách khách hàng');
+      await expect(page.locator('#customerSearch')).toHaveValue('Khách thử nghiệm giao diện');
+      await expect(page.locator('#customerSearch')).toBeFocused();
+      await expect(page.locator('.customer-table tbody tr')).toHaveCount(1);
+      await expect(page.locator('.customer-table tbody')).toContainText('Khách thử nghiệm giao diện');
+      await page.locator('[data-view="orders"]:visible').first().click();
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
+      await page.locator('[data-order-row="UI-ONLY-ORDER"] [data-action="view-order-details"]:visible').first().click();
       await expect(page.locator('.order-detail-page')).toBeVisible();
     }, true);
     await captureView('customers', 'customers', async variant => {
