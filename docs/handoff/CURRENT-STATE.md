@@ -474,3 +474,30 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Read-only review of the checkout/account address flow and product canonical-route regression contract did not establish a concrete reproducible defect. No source/test code changed and no CI/deploy was triggered for this source audit.
 - These are source-level checks, not live-browser/visual acceptance. Preserve warranty claim form OWNER PASS/LOCKED per owner decision; Hero remains PAUSED; `#order` and catalog Liquid Glass remain OWNER PASS/LOCKED. PR #108 OPEN/unmerged; Preview only; no restricted-scope changes.
 - Next: continue source-first review in an unlocked area, use existing tests as contracts, and edit only if a specific defect is evidenced.
+
+
+## LATEST HANDOFF STATE — 2026-10-24 — BRANCH HEAD de2bf78cae41985473ef9433e1c2e06b43f81d1d
+
+### Repository truth
+- Repository: `chichute5500/Sindarealest-admin`; working branch: `fix/liquid-glass-audit-2026-10-19`.
+- Branch HEAD at the start of this handoff update: `de2bf78cae41985473ef9433e1c2e06b43f81d1d` (documentation-only commit: `docs: record continued storefront source audit`). The next commit from this update is documentation-only and must not be described as a storefront source change or deploy.
+- PR #108: OPEN, not merged; base `main`. Keep it open and do not merge.
+- Last known source/test SHA with CI and Preview deployment PASS: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43`; CI run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991649 ; Preview run https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991635.
+- Preview immutable URL: https://00283315.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . No real browser/visual acceptance has been performed.
+
+### Owner decisions / locked scope
+- Warranty claim form: OWNER PASS / LOCKED by explicit owner instruction (“Pass đi. Tôi sẽ xử lý sau nếu có vấn đề”). Valid warranty code/registered phone unavailable, so live lookup flow was not manually verified. Keep evidence distinct: owner accepted scope; CI/Preview PASS on `a6097ad3…`; not browser PASS. Do not proactively edit or retest unless owner explicitly reopens.
+- Hero: PAUSED BY OWNER. Do not inspect/edit/test/redesign/capture.
+- “Đặt hàng an tâm” / `#order`: OWNER PASS / LOCKED.
+- Catalog Liquid Glass filters/chips/icons/height/effects/control: OWNER PASS / LOCKED. Do not reopen unless owner explicitly authorizes and `owner_authorized=true` plus repo variable `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+- Do not restore separate product-status filter panel.
+
+### Latest source-first audit (read-only)
+- Reviewed `public/index.html`, checkout/account address prefill and existing product canonical-route tests. No concrete reproducible defect established; no source/test code changed and no CI/deploy triggered.
+- Static checks: 23 internal fragment links, 0 missing targets; 62 buttons with a detectable accessible-name signal under the static check; no image missing `alt`; no `target=_blank` link missing `rel`; 0 duplicate static IDs (dynamic template ID excluded).
+- This is source-level evidence only, not live-browser/visual acceptance.
+
+### Hard safety rules
+- Preview only; never deploy Production. `main` must not change. Do not touch Admin/backend/API/auth, product/catalog data, D1/R2, secrets, bindings, DNS, Cloudflare Access, infrastructure, real payment flows, or other restricted scopes. Never bypass Cloudflare Access.
+- If a concrete defect is found in unlocked scope, make a minimal targeted fix, add/adjust regression tests, wait for CI and Preview, verify exact deployed SHA, and do safe independent audit while jobs run. Do not claim a browser check unless actually done.
+- After reporting a result, continue to the next safe task rather than stopping. Update all four handoff files after meaningful changes.

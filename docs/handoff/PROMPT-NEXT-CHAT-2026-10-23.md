@@ -466,3 +466,42 @@ The owner explicitly said to PASS the current warranty claim form and handle any
 ## LATEST CONTINUATION NOTE — SOURCE AUDIT 2026-10-24
 
 Re-fetched live branch before review. Read-only audit of `public/index.html`, checkout/account address prefill, and product canonical routing found no concrete reproducible defect. Static checks: 23 internal fragment links resolve; 62 buttons have accessible-name signals; no missing image alt, target-blank rel, or duplicate static ID found (dynamic template IDs excluded). No code was changed and no CI/deployment was triggered; do not represent this as browser/visual acceptance. Continue autonomous source-first audit only in unlocked scope. Warranty claim form OWNER PASS/LOCKED; Hero PAUSED; `#order` and catalog Liquid Glass OWNER PASS/LOCKED; PR #108 OPEN/unmerged; Preview only; no restricted-scope changes.
+
+
+# PROMPT FOR THE NEXT CHAT — CONTINUE SINDAREALEST2 (UPDATED 2026-10-24)
+
+You are continuing an existing project. Do not restart or redo completed work. First re-fetch the live GitHub branch and read all four handoff files; treat the live repository as source of truth.
+
+## Exact project state
+- Repository: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- At the start of this handoff update, HEAD was `de2bf78cae41985473ef9433e1c2e06b43f81d1d`; this update itself is documentation-only. Re-fetch branch HEAD when starting; do not assume the SHA is still current.
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — must remain OPEN and unmerged; base is `main`.
+- Last known code/test SHA with CI PASS: `a6097ad3ddc93c8c0141ab32426d2593d9dd4d43` (https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991649).
+- Last known Preview deployment PASS for that same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39986991635.
+- Preview immutable URL: https://00283315.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Browser visual acceptance has not been performed.
+
+## Mandatory owner decisions and locks
+1. Warranty claim form is OWNER PASS / LOCKED. Owner explicitly said: pass it now and they will handle issues later. No valid warranty code/registered phone was available, so do not claim live-flow verification. Do not proactively edit/retest unless the owner explicitly reopens this area.
+2. Hero is PAUSED BY OWNER. Do not inspect, edit, test, redesign, restore or capture.
+3. “Đặt hàng an tâm” / `#order` is OWNER PASS / LOCKED.
+4. Catalog Liquid Glass filter chips/icons/height/effects/control are OWNER PASS / LOCKED. Only reopen with explicit owner authorization, `owner_authorized=true`, and repo variable `CATALOG_FILTER_AUDIT_UNLOCKED=true`.
+5. Do not restore the separate product-status filter panel.
+
+## Latest work
+- Latest read-only audit covered `public/index.html`, checkout/account address prefill and existing canonical product-route tests. No reproducible defect was found, so no source/test change and no CI/deploy were triggered.
+- Static scan: 23 internal fragment links with no missing targets; 62 buttons had a detectable accessible-name signal under the static rule; no missing image `alt`, no target-blank link missing `rel`, and no duplicate static ID (dynamic template ID excluded).
+- These are source-level checks only, not browser/visual acceptance.
+- Four handoff files are kept current: `docs/handoff/CURRENT-STATE.md`, `docs/handoff/TASKS.md`, `docs/handoff/TEST-RESULTS.md`, `docs/handoff/PROMPT-NEXT-CHAT-2026-10-23.md`.
+
+## Hard boundaries
+- Never merge PR #108. Do not change `main`. Preview only; never deploy Production.
+- Do not touch Admin/backend/API/auth, catalog/product data, D1/R2, secrets, bindings, DNS, Cloudflare Access, infrastructure, real payment paths or other restricted scopes. Never bypass Cloudflare Access.
+- Keep evidence categories separate: source static scan, automated CI, Preview deployment and real browser/owner visual acceptance are not interchangeable.
+
+## How to continue (do not stop after reporting)
+- Re-fetch live branch/PR and handoff files before making changes.
+- Continue source-first audit in an unlocked storefront area. Use existing tests as contracts. Change code only for a concrete, reproducible defect; add regression coverage.
+- While CI/Preview runs, work independently on another safe audit task, then return to verify both results and exact deployed SHA.
+- For code changes, require CI PASS and Preview PASS for the exact source SHA. Do not claim browser inspection without actually doing it.
+- After each report, continue to the next safe task. Update these four handoff files after meaningful changes; docs-only commits are not storefront deployments.
