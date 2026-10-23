@@ -86,3 +86,14 @@ Read-only static review of current `public/index.html` (blob `d54ed03b0f40e70d02
 - No empty `href="#"` anchors or anchors without an `href` were found. The static heading scan found no heading-level jumps.
 - The simplistic duplicate-ID scan flagged the literal template placeholder `${escapeHtml(id)}` from generated markup, so that result is not treated as a confirmed duplicate runtime DOM ID.
 - This is a static source check, not a browser/axe audit and not visual PASS. It found no substantiated non-Hero defect to fix; storefront source remains unchanged. Preview still requires authorized access and exact-SHA proof.
+
+
+## Latest session evidence — 2026-10-23
+
+- PR #108 remains OPEN/unmerged. Code HEAD for the latest validation was `0f7151a95391fbe55c59d6c426b458f6e075d7ce`.
+- Commit `8b576e0f6c6ee07eebc24ef54cd4db5812241d79` fixes fullscreen gallery image accessibility: the shown image receives product-specific alt text, while the inactive preloaded layer is excluded from assistive technology. Regression assertions were added to `tests/detail-gallery-integrity.test.mjs`.
+- Commit `0f7151a95391fbe55c59d6c426b458f6e075d7ce` adds a guard to the comprehensive visual workflow because it covers Hero. Manual Hero authorization defaults to false; push-triggered runs require an explicit approval marker.
+- Source/test validation run #39890961293 PASS at SHA `0f7151a95391fbe55c59d6c426b458f6e075d7ce`. Preview deploy run #39890961316 PASS at the same SHA. Neither is visual PASS.
+- Guard verification run #39890961242 SKIPPED as intended at `0f7151a`. Earlier run #39890856540 at `8b576e0` was cancelled; job records show local fixture capture cancelled and live capture/deployment verification skipped. There is no evidence it completed a 128-image live capture.
+- Exact-SHA live non-Hero screenshots and owner visual acceptance remain PENDING. The previous browser route showed Cloudflare Access sign-in; use authorized access only. Local fixture screenshots are not live Preview evidence.
+- Hero remains PAUSED BY OWNER. No Hero markup/CSS/assets were edited; do not restore `hero-sd-gl052.png` or run comprehensive capture while paused. No merge or Production deployment occurred.
