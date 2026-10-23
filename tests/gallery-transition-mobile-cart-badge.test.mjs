@@ -22,8 +22,10 @@ assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
-assert.match(html, /@keyframes sdFullscreenOutLeft\{[\s\S]*?to\{opacity:\.22/);
-assert.match(html, /@keyframes sdFullscreenInRight\{from\{opacity:\.18/);
+assert.match(html, /const decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)/);
+assert.match(html, /Promise\.resolve\(decoded\)\.catch\(\(\)=>\{\}\)\.then\(revealDecodedImage\)/);
+assert.match(html, /@keyframes sdFullscreenOutLeft\{[\s\S]*?to\{opacity:\.88;transform:translateX\(-18%\)/);
+assert.match(html, /@keyframes sdFullscreenInRight\{from\{opacity:\.55;transform:translateX\(18%\)/);
 
 assert.equal((html.match(/id="mobileCartCount"/g) || []).length, 1);
 assert.match(html, /id="mobileCartCount"[^>]*aria-hidden="true" hidden/);
