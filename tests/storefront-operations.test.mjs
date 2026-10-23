@@ -52,7 +52,7 @@ assert.ok(storefrontHtml.includes("selectedCategory===c?'active':'')")
   && storefrontHtml.includes("selectedFulfillment===type?'active':'')")
   && storefrontHtml.includes("selectedCategory==='all'||p.category===selectedCategory")
   && storefrontHtml.includes("selectedFulfillment==='all'||productFulfillmentType(p)===selectedFulfillment")
-  && storefrontHtml.includes("const count=type==='all'?products.length:fulfillmentCounts[type]"),
+  && storefrontHtml.includes("count=type==='all'?products.length:fulfillmentCounts[type]"),
   'Catalog visual refinements must preserve dynamically counted category/status selection and combined filtering logic.');
 
 assert.ok(storefrontHtml.includes("#order .section-head .section-note{width:min(440px,48vw);max-width:100%;min-width:0;white-space:normal;overflow-wrap:break-word}"), "The order-section summary must wrap within the available heading width rather than clip at the right edge.");
