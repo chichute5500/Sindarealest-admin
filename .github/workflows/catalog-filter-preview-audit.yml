@@ -616,6 +616,38 @@ jobs:
                     assert.equal(keyboardActivation.running, true,
                       'Keyboard selection must start the category activation animation, not merely set aria-pressed.');
                     otherCategoryState.keyboardSelection = 'PASS';
+
+                    // A second, different category selection must trigger a fresh animation after the first one settles.
+                    await page.waitForTimeout(500);
+                    const nextCategory = categoryGroup.locator('button[data-category]:not([data-category="all"])').nth(1);
+                    assert.ok(await nextCategory.count() > 0, 'A second non-default category is required to verify animation retriggering.');
+                    await nextCategory.click();
+                    assert.equal(await nextCategory.getAttribute('aria-pressed'), 'true',
+                      'Switching to another category must update persistent selection.');
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
+                      'Switching categories must clear the previous selected state.');
+                    const reselectionMotion = await nextCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      const animation = el.getAnimations().find(item =>
+                        typeof item.animationName === 'string' && item.animationName.startsWith('sdCatalogGlassActivate'));
+                      const matrix = css.transform.match(/^matrix\\(([^)]+)\\)$/);
+                      return {
+                        animationName: css.animationName,
+                        duration: css.animationDuration,
+                        currentTime: typeof animation?.currentTime === 'number' ? animation.currentTime : null,
+                        playState: animation?.playState || 'missing',
+                        scaleX: matrix ? Number(matrix[1].split(',')[0]) : 1
+                      };
+                    });
+                    assert.equal(reselectionMotion.animationName,
+                      theme === 'dark' ? 'sdCatalogGlassActivateDark' : 'sdCatalogGlassActivate',
+                      'Switching to another category must retrigger the theme-appropriate glass animation.');
+                    assert.equal(reselectionMotion.duration, '0.46s',
+                      'Repeated category selection must retain the 460ms activation timing.');
+                    assert.ok(reselectionMotion.currentTime !== null && reselectionMotion.currentTime < 460 &&
+                      reselectionMotion.playState === 'running' && reselectionMotion.scaleX > 1.04,
+                      'The second category must show a live, perceptible spring animation after switching; observed ' + JSON.stringify(reselectionMotion));
+                    otherCategoryState.categoryReselection = 'PASS';
                     categoryInteraction = 'PASS';
                   }
                   audit.stateChecks.push(otherCategoryState);
