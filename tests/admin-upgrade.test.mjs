@@ -65,10 +65,18 @@ assert.ok(adminFeatureDeployWorkflow.includes("uses: actions/checkout@v7") &&
   adminFeatureDeployWorkflow.includes("uses: actions/setup-node@v7"),
   "Manual ADMIN Preview deployment must use Node.js 24-compatible Actions versions");
 
-assert.ok(previewWorkflow.includes("data.latestScreenshotArtifact = {"),
-  "The handoff must point to the latest screenshot artifact instead of committing every PNG");
-assert.ok(!previewWorkflow.includes('cp "$SOURCE_DIR"/screenshots/*.png "$DEST/screenshots/"'),
-  "The workflow must not commit each Playwright screenshot matrix to the ADMIN branch");
+assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v7"),
+  "Raw ADMIN screenshots and metadata must be stored in GitHub Actions artifacts");
+assert.ok(previewWorkflow.includes("artifacts/admin-preview-evidence/") &&
+  previewWorkflow.includes("test-results/") && previewWorkflow.includes("playwright-report/"),
+  "The Actions artifact must include screenshots, per-test results, and the Playwright report");
+assert.ok(previewWorkflow.includes("Verify branch HEAD still matches the tested SHA"),
+  "The workflow must verify that the branch still points to the exact tested commit");
+assert.ok(!previewWorkflow.includes("contents: write") &&
+  !previewWorkflow.includes("git commit") && !previewWorkflow.includes("git push"),
+  "The diagnostic workflow must not write evidence commits back to the source branch");
+assert.ok(!previewWorkflow.includes("docs/admin-ui-reference/handoff/**"),
+  "Evidence-only handoff updates must not trigger another diagnostic run");
 assert.ok(previewWorkflow.includes("retention-days: 14"),
   "The screenshot artifact retention window must remain explicit");
 
