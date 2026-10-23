@@ -31,4 +31,23 @@ assert.doesNotMatch(html, /body\.welcome-active #mobileBottomNav\{display:none!i
 assert.doesNotMatch(html, /body:has\(#welcomeSplash\) #mobileBottomNav\{display:none!important/);
 assert.match(html, /\.welcome-splash\.is-leaving\{opacity:0;visibility:hidden/);
 
-console.log('PASS: gallery changes preload/decode before outgoing animation; fullscreen retains layered images; mobile cart badge synchronizes and welcome fade reveals the bar.');
+
+// Both cart controls must react together to every successful add, using a gentle 1-second icon shake.
+assert.match(html, /function confirmCartTargets\(\)[\s\S]*?\$\('#cartOpen'\),\$\('#mobileCartNav'\)[\s\S]*?targets\.forEach\(target=>\{void target\.offsetWidth;target\.classList\.add\('sd-cart-bump'\)\}\)/);
+assert.match(html, /#cartOpen\.sd-cart-bump svg,#mobileCartNav\.sd-cart-bump svg\{animation:sdCartIconShake 1s/);
+assert.match(html, /function addToCartFromControl\(id,button\)[\s\S]*?confirmCartTargets\(\)[\s\S]*?flyProductImageToCart\(sourceImage,id\)/);
+assert.doesNotMatch(html, /confirmHeaderCartAdd/);
+
+// Cart and account are true toggles on both the desktop cart and mobile controls.
+assert.match(html, /function toggleStorefrontModal\(type\)[\s\S]*?activeStorefrontModal\(\)===type[\s\S]*?requestStorefrontModalClose\(type/);
+assert.match(html, /\$\('#cartOpen'\)\.addEventListener\('click',\(\)=>toggleStorefrontModal\('cart'\)\)/);
+assert.match(html, /data-mobile-tab==='cart'\)\{tab\.addEventListener\('click',\(\)=>\{activate\('cart'\);toggleStorefrontModal\('cart'\)\}\)\}/);
+assert.match(html, /data-mobile-tab==='account'\)\{tab\.addEventListener\('click',\(\)=>\{activate\('account'\);toggleStorefrontModal\('account'\)\}\)\}/);
+
+// Modal switches replace old cart/account entries; only cart -> checkout intentionally pushes a nested entry.
+// Popstate skips stale cart/account entries instead of reopening them after the user presses Back.
+assert.match(html, /currentType==='cart'&&type==='checkout'[\s\S]*?history\.pushState/);
+assert.match(html, /history\.replaceState\(\{\.\.\.current,\[SD_MODAL_HISTORY_KEY\]:type\},'',location\.href\)/);
+assert.match(html, /const intentionalCheckoutBack=currentModal==='checkout'&&targetModal==='cart'[\s\S]*?targetModal==='cart'\|\|targetModal==='account'[\s\S]*?history\.back\(\);return/);
+
+console.log('PASS: gallery changes preload/decode before outgoing animation; fullscreen retains layered images; synchronized 1-second cart animation, modal toggles/history, mobile cart badge synchronizes and welcome fade reveals the bar.');
