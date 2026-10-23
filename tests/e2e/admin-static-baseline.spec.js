@@ -2376,7 +2376,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(notificationsTab).toBeVisible();
       await notificationsTab.click();
       await expect(notificationsTab).toHaveAttribute('aria-pressed', 'true');
-      await expect(page.locator('#activityNotificationList')).toContainText('product_updated');
+      await expect(page.locator('#activityNotificationList')).toContainText('Đã sửa sản phẩm');
       await expect(page.locator('#activityNotificationsUnread')).toHaveText('1');
       await page.locator('#activityMarkNotificationsRead').click();
       const activityReadAt = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
