@@ -45,6 +45,8 @@ assert.ok(html.includes("function trapProductTab(event){trapTabWithin($('#produc
   'the product detail dialog must keep keyboard focus inside its modal while tabbing');
 assert.ok(html.includes("if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}"),
   'Tab events must invoke the product detail dialog focus trap when the modal is open');
-assert.ok(html.includes("document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();"),
-  'Escape must dismiss the product detail dialog');
+assert.ok(html.includes("document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#productOverlay').classList.contains('open')){closeDetail()}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowRight')"),
+  'Escape must dismiss only an open product detail dialog, preserving focus management for unrelated dialogs and the mobile navigation');
+assert.ok(!html.includes("if(e.key==='Escape'){closeDetail();closeCart();$('#mobileNav').classList.remove('open')}"),
+  'The legacy global Escape handler must not close inactive dialogs or override the mobile menu focus return');
 console.log('PASS: storefront accessibility contracts cover reduced motion, keyboard focus, safe areas, dialog semantics, live regions and mobile target sizing.');
