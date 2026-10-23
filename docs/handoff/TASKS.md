@@ -564,3 +564,12 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956856. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020956813. Preview: https://9fe68f80.sindarealest2.pages.dev/
 - Next: owner phone test, slow taps and rapid taps. If any flicker/ghost remains, keep this task OPEN and inspect actual rendered layer/CSS behavior; do not claim visual acceptance from CI alone.
 - Preserve PR #108 OPEN/unmerged; no Production deploy, no Hero work, no other PASS/LOCKED area reopening.
+
+
+## OWNER DIRECTIVE — GALLERY PAUSED; NEXT WORK MUST NOT REPEAT PASS ITEMS — 2026-10-24
+
+- **PAUSED / NOT ACCEPTED:** mobile fullscreen product-gallery flicker. Owner said pause this issue for now. Do not edit its CSS/JS, transition, preload, layer handling, or tests; do not ask for another phone test unless owner reopens it. Latest Preview: https://9fe68f80.sindarealest2.pages.dev/. Code SHA `be27230919462aabbb86c8a9b4a2369375dd752f`; test SHA `87cef74f427ff7178e984e3bd836152948f1d974`; CI and deploy are green but the visual defect remains unresolved by owner report.
+- **PASS / LOCKED — do not repeat:** mobile cart/account and modal/history; accepted icon system and Liquid Glass visual/press/dimension work; catalog filters/chips/icons/height/effects (never restore standalone product-status panel); `#order` / “Đặt hàng an tâm”; warranty claim and lookup; mobile navigation focus/history; welcome dialog keyboard accessibility; gallery focus/accessibility (distinct from flicker); warranty-form focus transfer; favorites legacy-key normalization; collection slideshow pause/reduced motion/missing-control guard; stale cart cleanup/badge sync; Zalo/contact; and all other owner-accepted storefront work already recorded in CURRENT-STATE.md. Existing owner PASS takes precedence over stale historical audit notes.
+- Hero is PAUSED BY OWNER. Do not inspect/capture/edit Hero or run any visual workflow that includes it. Keep all other locked scopes closed.
+- Start the next safe, explicitly unlocked backlog task only. If none is clear, ask the owner to specify the new task; do not manufacture a task or retest accepted sections.
+- PR #108 stays OPEN/unmerged. Preview only; no Production/main changes or restricted-scope edits.
