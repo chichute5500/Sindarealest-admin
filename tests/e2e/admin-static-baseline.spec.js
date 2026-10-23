@@ -2496,6 +2496,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(mobileFilterHeights.actorControl, 'Mobile actor filter should fit the compact control height').toBeLessThanOrEqual(36);
         expect(mobileFilterHeights.dateControl, 'Mobile date filters should fit the compact control height').toBeLessThanOrEqual(36);
         expect(mobileFilterHeights.advancedToggle, 'Mobile advanced-search toggle should be compact').toBeLessThanOrEqual(34);
+        const firstActivityCardHeight = await page.locator('.activity-log-card').first().evaluate(el => el.getBoundingClientRect().height);
+        expect(firstActivityCardHeight, 'Mobile activity cards should stay compact enough to show more audit events').toBeLessThanOrEqual(60);
       }
       await expect(page.locator('#refreshActivityLogs')).toBeVisible();
       await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
