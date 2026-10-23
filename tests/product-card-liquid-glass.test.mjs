@@ -231,3 +231,6 @@ assert.match(html, /\.filter-pill\.active,\.filter-pill:hover\{background:var\(-
   "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
 assert.match(html, /#products \\.filter-pill:active[^}]*transform:[^;]*scale\\\(/,
   "Slimming catalog filter pills must preserve the existing press feedback.");
+
+assert.match(html, /#products \.filter-pill\{[^}]*min-height:40px;\s*padding:9px 19px;/,
+  "The authoritative desktop product filter style should be 4px shorter while keeping its horizontal padding and glass layers.");
