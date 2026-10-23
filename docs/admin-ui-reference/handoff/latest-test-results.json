@@ -1,10 +1,10 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T03:27:21+07:00",
+  "capturedAtUtc": "2026-10-24T03:42:00+07:00",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-  "codeTestSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
+  "branchHeadAtCheckpointStart": "448e7d2b5840825e36c3215071260983badb9e39",
+  "codeTestSha": "448e7d2b5840825e36c3215071260983badb9e39",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "SOURCE_TEST_AND_PREVIEW_MATRIX_PASS_SCREEN12_NARROW_MOBILE_LAYOUT_FIX_VERIFIED",
@@ -235,11 +235,11 @@
     "productionDeployment": "NOT_PERFORMED"
   },
   "nextActions": [
-    "Fix Screen 9 synthetic screenshot-state leakage: assert #toast is not shown at screenshot time, then reset only the fixture toast after its position test and rerun exact-SHA Validate + Preview.",
-    "Continue comparing remaining screens against docs/admin-ui-reference/admin-mobile-reference.png; only change UI after a reproducible mismatch and regression coverage.",
-    "Run Validate and Admin Preview on the exact same source/test SHA for every code change; inspect exact-HEAD guard, logs and artifact before claiming PASS.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED; exact parity NOT_VERIFIED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
-    "Do not repeat Screen 12 narrow-mobile fix, Screen 10 compact-copy fix, concurrency fix, B1 cleanup or seed/import. No merge/rebase/force-push, Production deploy, remote D1/R2/schema/ledger writes, or writes to main/PR #108/storefront."
+    "Poll Preview #40020809121 until terminal; inspect logs if stalled and inspect artifact/exact-HEAD guard if successful.",
+    "Continue parallel read-only UI/reference audit; reproduce before any CSS change and add regression test first.",
+    "Static Backup/Restore audit done; do not invoke destructive restore/export/import or mutate business data.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED; parity NOT_VERIFIED; authenticated backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
+    "Do not repeat Screen 12/10, concurrency, B1 cleanup or seed/import without new evidence; no merge/rebase/force-push or shared infrastructure changes."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -251,8 +251,8 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-  "testedCommitSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
+  "latestCodeCommitSha": "448e7d2b5840825e36c3215071260983badb9e39",
+  "testedCommitSha": "448e7d2b5840825e36c3215071260983badb9e39",
   "capturedAt": "2026-10-23T20:04:14.947Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40002022790",
   "checks": {
@@ -471,10 +471,16 @@
     "result": "Screen 12 320×640 visibility regression reproduced test-first (card bottom 778px vs nav top 564px); heading-only CSS reduced to 723px but still failed. Exact-SHA compaction in 7a57dfa634151ece49d3eb7cb7b2f31cf8f19628 passes; artifact 467 shows multiple fixture records above navigation. Authenticated audit feed, real notification delivery and full reference parity remain untested."
   },
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-24T03:27:21+07:00",
-    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
-    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "purpose": "Sync six handoff files to exact-SHA Validate #40018955519 and Preview #40018955530; Screen 12 narrow-mobile fix verified; next task Screen 9 fixture screenshot hygiene."
+    "lastSyncAtUtc": "2026-10-24T03:42:00+07:00",
+    "files": [
+      "docs/admin-ui-reference/handoff/START-HERE.md",
+      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json",
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
+    ],
+    "purpose": "Update six canonical handoff files with all parallel workstreams and exact current Validate/Preview state."
   },
   "latestProductSourceCommit": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
   "latestDiagnosticArtifact": {
@@ -503,30 +509,24 @@
     "summary": "Source screenshot matrix and Screen 12 narrow viewport regression passed on exact SHA 7a57dfa634151ece49d3eb7cb7b2f31cf8f19628; artifact 467 inspected. Remote check is login CSS signature only."
   },
   "latestValidateAttempt": {
-    "id": 40018955519,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955519",
+    "id": 40020808865,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020808865",
     "status": "completed",
     "conclusion": "success",
-    "sha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-    "testedSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-    "workflow": "Validate source and tests",
-    "summary": "Repository integrity checks and automated tests passed on exact SHA 7a57dfa634151ece49d3eb7cb7b2f31cf8f19628."
+    "sha": "448e7d2b5840825e36c3215071260983badb9e39",
+    "testedSha": "448e7d2b5840825e36c3215071260983badb9e39"
   },
   "latestPreviewAttempt": {
-    "id": 40018955530,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955530",
-    "status": "completed",
-    "conclusion": "success",
-    "sha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-    "headSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-    "testedSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
-    "workflow": "Admin Preview diagnostic smoke test",
-    "activeStep": null,
-    "artifact": "admin-preview-evidence-467",
-    "artifactId": 12529347836,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955530/artifacts/12529347836",
-    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED",
-    "summary": "Source screenshot matrix and Screen 12 narrow viewport regression passed on exact SHA 7a57dfa634151ece49d3eb7cb7b2f31cf8f19628; artifact 467 inspected. Remote check is login CSS signature only."
+    "id": 40020809121,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020809121",
+    "status": "in_progress",
+    "conclusion": null,
+    "sha": "448e7d2b5840825e36c3215071260983badb9e39",
+    "testedSha": "448e7d2b5840825e36c3215071260983badb9e39",
+    "activeStep": "Install Chromium for Playwright",
+    "completedSteps": 7,
+    "totalSteps": 15,
+    "failures": []
   },
   "latestProductChange": {
     "status": "PRODUCT_EDITOR_NARROW_MOBILE_SKU_PLACEHOLDER_REFINED; VALIDATE_PASS; PREVIEW_PASS",
@@ -540,7 +540,7 @@
   },
   "currentHeadAtCheckpoint": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
   "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083",
-  "latestReviewFinding": "Screen 12 320×640 visibility regression reproduced test-first (card bottom 778px vs nav top 564px); heading-only CSS reduced to 723px but still failed. Exact-SHA compaction in 7a57dfa634151ece49d3eb7cb7b2f31cf8f19628 passes; artifact 467 shows multiple fixture records above navigation. Authenticated audit feed, real notification delivery and full reference parity remain untested.",
+  "latestReviewFinding": "Screen 9 synthetic warranty screenshot had a stale success toast in artifact #465; artifact #469 did not show it. Added a pre-capture assertion and deterministic fixture cleanup after toast layout measurement. Validate passed on 448e7d2; Preview remains in progress.",
   "previewRuntimeCheckpoint": {
     "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
     "previewUrl": "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/",
@@ -625,5 +625,53 @@
     "screenshot": "activity-log__320x640__light.png",
     "status": "FIXED_AND_EXACT_SHA_VALIDATE_PREVIEW_PASS",
     "acceptance": "SCREEN_12_REMAINS_PARTIAL_NOT_ACCEPTED"
+  },
+  "parallelWorkstreams": [
+    {
+      "name": "Screen 12 narrow-mobile regression",
+      "status": "verified on earlier source SHA",
+      "testedSha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
+      "validateRun": 40018955519,
+      "previewRun": 40018955530,
+      "artifactId": 12529347836,
+      "acceptance": "still PARTIAL_NOT_ACCEPTED"
+    },
+    {
+      "name": "Screen 9 warranty fixture toast leakage",
+      "status": "validate passed; preview in progress",
+      "testedSha": "448e7d2b5840825e36c3215071260983badb9e39",
+      "validateRun": 40020808865,
+      "previewRun": 40020809121,
+      "priorArtifactWithToast": 12530395063,
+      "priorArtifactWithoutToast": 12530930535,
+      "fix": "assert no .show before screenshot; always remove .show after toast layout measurement"
+    },
+    {
+      "name": "Backup/Restore static safety audit",
+      "status": "read-only review complete",
+      "backupHandler": "GET + admin auth",
+      "restoreHandler": "POST + admin auth + record limit + destructive delete/write",
+      "mutationsPerformed": 0
+    },
+    {
+      "name": "Branch/PR/CI integrity",
+      "status": "checked",
+      "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
+      "pr111": "OPEN_UNMERGED",
+      "pr108": "OPEN_UNMERGED_READ_ONLY"
+    },
+    {
+      "name": "Reference artifact review",
+      "status": "artifact #465 and #469 inspected",
+      "scope": "synthetic fixtures only"
+    }
+  ],
+  "acceptance": {
+    "screens": "ALL_12_PARTIAL_NOT_ACCEPTED",
+    "exactVisualParity": "NOT_VERIFIED",
+    "authenticatedBackendBusinessQA": "NOT_TESTED",
+    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "production": "NOT_PERFORMED",
+    "progressEstimate": "50% PROVISIONAL"
   }
 }

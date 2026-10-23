@@ -1,3 +1,27 @@
+## LATEST HANDOFF CHECKPOINT — 2026-10-24 03:42 ICT
+
+### State and exact-SHA verification
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Live HEAD at checkpoint: `448e7d2b5840825e36c3215071260983badb9e39`. `main`: `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 OPEN/unmerged at this HEAD; PR #108 OPEN/unmerged/read-only at `62e83c29933c4d578065236e8df9cf0b21ece0ce`. Both PRs still target base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+- [Validate #40020808865](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020808865) **SUCCESS** on exact SHA `448e7d2b5840825e36c3215071260983badb9e39`.
+- [Admin Preview #40020809121](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020809121) is **IN PROGRESS / NOT YET VERIFIED** on the same SHA. Last observed job: `Install Chromium for Playwright`, 7 of 15 steps completed, no failed steps reported. Do not claim Preview PASS until final conclusion is SUCCESS and its exact-HEAD guard/artifact are inspected.
+- Earlier Preview #40020318042 succeeded on test-only assertion commit `5bac87cb0f4c1eeec9db9251de7c651a5a1aa9f6`; artifact [469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40020318042/artifacts/12530930535) was inspected. Warranty screenshot in artifact #465 showed a stale success toast covering content; screenshot in artifact #469 did not show the toast. The harness now (a) asserts the toast is not shown before the Screen 9 warranty screenshot, and (b) always removes the fixture toast's `show` class after measuring toast layout, rather than restoring a prior visible state. Latest assertion+cleanup commit is `448e7d2b5840825e36c3215071260983badb9e39`. The assertion passed in the earlier test-only Preview run; final validation for cleanup commit is still pending Preview completion.
+- Static read-only Backup/Restore audit: `functions/api/admin/backup.js` has GET handler and admin auth; `functions/api/admin/restore.js` has POST handler, admin auth, record-count limit, and destructive delete/write logic. No endpoint was invoked; no export/import, mutation, migration, or business-data test was run. Screen 11 remains unaccepted.
+- Evidence remains limited to synthetic UI fixtures/read-only static review. The Preview diagnostic is not authenticated business/backend QA.
+
+### Parallel workstreams — completed and ongoing
+1. **Screen 12 mobile regression:** test-first reproduction: first activity card bottom 778px vs fixed-nav top 564px; title-only CSS attempt still bottom 723px. Targeted filter-stack compaction at `7a57dfa634151ece49d3eb7cb7b2f31cf8f19628` passed Validate #40018955519 and Preview #40018955530 on the same SHA; artifact #467 inspected and showed multiple activity records above navigation. No acceptance-status upgrade.
+2. **Screen 9 warranty fixture-state leakage:** inspected artifact #465 (toast visible) and #469 (toast absent); added a regression assertion, then corrected harness cleanup to make toast state deterministic after its position check. Validate #40020808865 passes on `448e7d2b5840825e36c3215071260983badb9e39`; Preview #40020809121 still running. This is screenshot/test-harness hygiene, not proof of a live warranty defect.
+3. **Backup/Restore safety audit:** static code only; GET export handler vs POST restore handler reviewed. Restore includes destructive operations, so do not call it in this environment. No writes performed.
+4. **Workflow/branch integrity:** checked current branch HEAD, live `main`, PR #111 and PR #108; no merge/rebase/force-push. Keep isolated feature branch.
+5. **Reference and capture evidence:** inspected screenshot artifacts #465 and #469 and maintained evidence boundaries; fixtures do not prove real backend behavior.
+6. **Handoff synchronization:** updating all six canonical files in one docs-only commit. Recheck live branch and workflow outcomes after this docs commit; docs-only child SHA will differ from the tested source SHA.
+
+### Next actions
+- Refresh Validate #40020808865 and Preview #40020809121. If Preview succeeds, inspect its new artifact and confirm exact-HEAD guard on `448e7d2b5840825e36c3215071260983badb9e39`; if it remains stalled/fails, inspect job logs and resolve the runner issue without relaxing checks.
+- Continue multi-track read-only reference audit on the next reproducible unaccepted screen. No speculative CSS: reproduce first and add regression coverage before any source fix.
+- Preserve all seven operational rules below exactly. Keep all 12 screens `PARTIAL_NOT_ACCEPTED`; exact visual parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. The 50% progress estimate remains provisional, not an acceptance percentage.
+
+
 ## VERIFIED HANDOFF UPDATE — 2026-10-24 ICT — Screen 12 narrow-mobile layout verified
 
 - **Exact source/test SHA:** `7a57dfa634151ece49d3eb7cb7b2f31cf8f19628` on `feature/admin-isolated-handoff-2026-10-20`. [Validate #40018955519](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955519) **PASS** and [Admin Preview #40018955530](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955530) **SUCCESS** on that exact same SHA; Preview's exact-HEAD guard passed.
