@@ -78,11 +78,25 @@ function makeDb(options = {}) {
         && statements[0]?.sql.includes("WHERE ? != 'refunded' OR ? <="));
       const cancellationRace = Boolean(options.cancelUpdateHasNoChanges
         && statements[0]?.sql.includes("UPDATE order_payment_requests SET status='cancelled'"));
-      return statements.map((statement, index) => ({
-        success: true,
-        // Simulate concurrent state changes at the guarded write boundary.
-        meta: { changes: atomicRefundRejected || (cancellationRace && index === 0) ? 0 : 1 }
-      }));
+      if (options.simulateOrderChangedBeforeBatch) {
+        options.order = {
+          ...(options.order ?? baseOrder),
+          total: 200000,
+          payment_terms_confirmed_at: "2026-10-24T07:00:01.000Z"
+        };
+        options.orderItems = [{ fulfillment_type: "made_to_order", quantity: 1, line_total: 200000 }];
+      }
+      return statements.map((statement, index) => {
+        const stalePaymentRequestInsert = Boolean(options.simulateOrderChangedBeforeBatch && index === 0
+          && statement.sql.includes("INSERT INTO order_payment_requests")
+          && statement.sql.includes("WHERE EXISTS (SELECT 1 FROM orders"));
+        const auditWithoutRequest = Boolean(options.simulateOrderChangedBeforeBatch && index === 1
+          && statement.sql.includes("payment_request_created")
+          && statement.sql.includes("WHERE EXISTS (SELECT 1 FROM order_payment_requests WHERE id=?"));
+        // The stale-snapshot case simulates a concurrent order repricing immediately before the insert statement runs.
+        const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest ? 0 : 1;
+        return { success: true, meta: { changes } };
+      });
     },
   };
 }
@@ -203,6 +217,29 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_requests")));
   assert.ok(db.batches[0].some(s => s.sql.includes("payment_request_created")));
   assert.doesNotMatch(JSON.stringify(db.batches[0]), /amount=(?:30000|100000)/, "QR config/ledger must not mutate QR image payload");
+}
+
+// An order can change after request preflight but before the atomic insert. Never commit a QR amount from the stale snapshot.
+{
+  const db = makeDb({
+    order: { ...baseOrder, total: 100000, payment_terms_confirmed_at: "2026-10-24T07:00:00.000Z" },
+    orderItems: [{ fulfillment_type: "made_to_order", quantity: 1, line_total: 100000 }],
+    simulateOrderChangedBeforeBatch: true
+  });
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit"
+  })));
+  assert.equal(response.status, 409, "a price/terms change after preflight must reject the stale payment request");
+  assert.equal(db.batches.length, 1, "the stale snapshot is rejected at the final write boundary");
+  const [insert, audit] = db.batches[0];
+  assert.ok(insert.sql.includes("INSERT INTO order_payment_requests") && insert.sql.includes("SELECT"),
+    "the request insert must be conditional, not a blind VALUES write");
+  assert.ok(insert.sql.includes("payment_terms_confirmed_at=?") && insert.sql.includes("total=?"),
+    "the insert must match the order price/terms snapshot validated before computing the amount");
+  assert.ok(insert.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions"),
+    "a concurrent verified transaction must not race with creation of a deposit/full request");
+  assert.ok(audit.sql.includes("WHERE EXISTS (SELECT 1 FROM order_payment_requests WHERE id=?"),
+    "audit log entry must exist only if the conditional payment request insert succeeds");
 }
 {
   const token = createOrderAccessToken();
