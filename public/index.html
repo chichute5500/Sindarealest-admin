@@ -963,7 +963,7 @@ function sizeFullscreenFrame(imageOverride){
 const FULLSCREEN_SLIDE_MS=300;
 const fullscreenPreloadCache=new Map();
 function preloadFullscreenPhotos(index=detailIndex){
- if(!detailImages.length)return;
+ if(!detailImages.length||typeof Image!=='function')return;
  const count=detailImages.length;
  for(const photoIndex of new Set([(index+1)%count,(index-1+count)%count])){
   const src=imgPath(detailImages[photoIndex]||'');
