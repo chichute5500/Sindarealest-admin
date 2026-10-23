@@ -1,3 +1,16 @@
+## VERIFIED HANDOFF UPDATE — 2026-10-24 ICT — concurrency isolation fixed; Preview still running
+
+- Live writable branch: `feature/admin-isolated-handoff-2026-10-20`; HEAD at this handoff update: `74268971ddf4bfe06827974b9efb5def12e60665`. PR #111 is OPEN/unmerged and points to this HEAD; PR #108 is OPEN/unmerged and read-only. Base/main SHA remains `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Do not merge either PR.
+- Confirmed latest Validate [#40012438226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40012438226) **SUCCESS** on exact SHA `74268971ddf4bfe06827974b9efb5def12e60665`.
+- Admin Preview diagnostic [#40012438208](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40012438208) is still **IN_PROGRESS** on the same exact SHA. Repository checks and automated tests passed; last observed active step was “Install Chromium for Playwright”. No artifact is available yet. Do not call Preview PASS until the run finishes, confirm exact `head_sha`, inspect jobs/logs and the uploaded artifact.
+- CI bottleneck: Preview concurrency had grouped by branch only, allowing a hung/older SHA run to block current evidence. Updated `.github/workflows/admin-preview-diagnostics.yml` concurrency group to include both branch ref and `github.sha`. Old-SHA Preview #40012383341 and Validate #40012383069 failed on `ee027289685cc171e0245eb3f3ca257cc99bf485`; the concurrency assertion failure was reproduced in logs. New Validate is green; new Preview is progressing independently. Do not retry blindly or change unrelated workflows.
+- Also fixed a reproducible mobile greeting-heading mismatch with a regression assertion before source change. It is included in the tested SHA above; review the exact diff and Preview screenshots after the run completes. Do not infer screen acceptance before comparing matching viewport/theme with `docs/admin-ui-reference/admin-mobile-reference.png`.
+- Product catalog was already confirmed visible by the user. Do not rerun seed/import or repeat the old “0 products” investigation. Continue read-only checks only; no business writes, CRUD, upload, QR activation, migrations, seed/import, remote D1/R2/schema/ledger operations, Access bypass, secrets/settings changes, or Production deployment.
+- Acceptance: all 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated business/backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. A successful Validate or synthetic fixture screenshots do not increase accepted-screen count by themselves. Project-level estimate may remain provisional 50%, but it is not a measured acceptance percentage.
+- Next: poll Preview #40012438208 to completion; if it fails, inspect exact failed step/log and fix only a reproduced issue. If it succeeds, download/inspect its artifact, check 390×844 light Screen 10 and the changed greeting heading against approved reference, then update these six handoff files after a meaningful verified checkpoint. Keep all seven operational rules and isolation boundaries intact.
+
+---
+
 # CURRENT HANDOFF — 2026-10-24 — Screen 10 settings UI fix; Preview run pending
 
 ## Verified live repository state
