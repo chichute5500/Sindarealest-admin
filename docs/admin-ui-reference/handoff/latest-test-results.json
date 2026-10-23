@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T13:02:11Z",
+  "capturedAtUtc": "2026-10-23T17:04:30.445Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
   "codeTestSha": "7f5df6bb63a264a495c1f76517861496e3cc3643",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
+  "status": "SOURCE_TEST_EVIDENCE_HISTORICAL; ADMIN_PREVIEW_PRODUCT_VISIBILITY_USER_CONFIRMED",
   "latestRun": {
     "id": 39953114181,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114181",
@@ -476,5 +476,17 @@
   },
   "currentHeadAtCheckpoint": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
   "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180",
-  "latestReviewFinding": " PR #108 read-only head snapshot refreshed at handoff verification."
+  "latestReviewFinding": " PR #108 read-only head snapshot refreshed at handoff verification.",
+  "previewRuntimeCheckpoint": {
+    "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
+    "previewUrl": "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/",
+    "d1DatabaseName": "sindarealest-admin-preview-db",
+    "d1DatabaseId": "573ad702-05fc-405e-8ef3-0cf2e7fea98d",
+    "productCountObservedByGuard": 235,
+    "seedWorkflowRunId": 39991459897,
+    "seedWorkflowResult": "GUARDED_REFUSAL; NO_DATABASE_WRITE",
+    "meaning": "Workflow refused because target Preview DB already contained 235 product rows. User subsequently confirmed products are visible in UI. Do not re-import.",
+    "unverified": "CRUD, image delivery, authenticated API end-to-end behavior, visual acceptance of all 12 screens, production"
+  },
+  "nextStep": "Inspect current live Actions/deployment and read-only product API/list, image URLs, detail/edit and pagination. Do not seed/import again. Only fix reproduced defects and validate exact SHA."
 }
