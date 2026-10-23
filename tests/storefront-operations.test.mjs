@@ -69,12 +69,13 @@ assert.ok(storefrontHtml.includes('#products .catalog-tools .filter-pills{\n  mi
   && storefrontHtml.includes('touch-action:manipulation;')
   && storefrontHtml.includes('#products .catalog-tools .filter-pills{gap:7px;column-gap:7px;row-gap:8px}'),
   'Desktop spacing and dedicated touch-first mobile sizing, tap targets, readable search text and compact 360px chip wrapping must all remain explicit.');
-assert.ok(storefrontHtml.includes('0 0 0 2.5px rgba(142,207,255,0.76)')
-  && storefrontHtml.includes('0 0 14px 3px rgba(83,169,255,0.28)')
-  && storefrontHtml.includes('0 0 24px rgba(83,169,255,0.25)')
+assert.ok(storefrontHtml.includes('0 0 0 3px rgba(142,207,255,0.90)')
+  && storefrontHtml.includes('0 0 18px 5px rgba(83,169,255,0.38)')
+  && storefrontHtml.includes('0 0 32px rgba(83,169,255,0.30)')
   && storefrontHtml.includes('26%{transform:scale(1.08) translateY(-2px);filter:brightness(1.08) saturate(1.12);')
-  && storefrontHtml.includes('linear-gradient(180deg,rgba(255,255,255,.99) 0%,rgba(248,253,255,.97) 43%,rgba(218,240,255,.94) 100%)')
+  && storefrontHtml.includes('linear-gradient(180deg,rgba(255,255,255,.86) 0%,rgba(239,249,255,.72) 45%,rgba(183,222,255,.58) 100%)')
   && storefrontHtml.includes('border-color:rgba(255,255,255,.98)')
+  && storefrontHtml.includes('radial-gradient(125% 160% at 18% 0%,rgba(255,255,255,.96) 0%,rgba(255,255,255,.46) 34%,rgba(255,255,255,0) 74%)')
   && storefrontHtml.includes('backdrop-filter:blur(22px) saturate(175%);')
   && storefrontHtml.includes('font-size:15px;\n  font-weight:650;'),
   'The selected pill must use a layered translucent glass surface, pale reflective rim, soft diffuse blue halo, visible spring pop and readable label typography.');
