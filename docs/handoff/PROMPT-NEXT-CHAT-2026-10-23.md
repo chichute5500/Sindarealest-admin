@@ -1,3 +1,23 @@
+# AUTHORITATIVE NEXT-CHAT UPDATE — GREEN SLIDESHOW GUARD — 2026-10-24
+
+Continue existing repo. First re-fetch branch HEAD and PR #108, then read all four handoff files.
+
+## Latest verified source/test
+- SHA `74bcd512abc19d3fba4bad64654321091073b8ea` contains Collections slideshow pause/resume, ARIA label/state updates, one managed timer, reduced-motion behavior and a defensive guard for missing controls.
+- CI/full suite PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656182.
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39995656107.
+- Immutable Preview https://e7b33eeb.sindarealest2.pages.dev/; alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deployment log confirms Pages project `sindarealest2`, Production branch `main`, and `--commit-hash=$GITHUB_SHA` on the exact workflow SHA.
+- No browser screenshot/manual visual acceptance; do not claim visual/browser PASS.
+
+## Next task
+Continue source-first audit of unlocked storefront. Re-check HEAD, PR and recent runs before editing. Fix only concrete reproducible defects, add regression tests, run CI and Preview on exact same source SHA. While workflows run, audit another safe unlocked area, then verify results. Keep all four handoff docs current and distinguish docs-only HEAD from deployed source SHA.
+
+## Locks
+Hero PAUSED BY OWNER. `#order`, catalog Liquid Glass/filter/height and warranty form OWNER PASS/LOCKED. Keep standalone product-status filter removed. PR #108 stays OPEN/unmerged. No Production deploy, `main`, Admin/backend/API/auth/catalog data/D1/R2/secrets/bindings/DNS/Cloudflare Access/infrastructure/real-payment changes.
+
+---
+
 # AUTHORITATIVE NEXT-CHAT OVERRIDE — SLIDESHOW REGRESSION GATES PENDING — 2026-10-24
 
 Continue current repo; fetch live HEAD, PR #108, and all four handoff files first.
