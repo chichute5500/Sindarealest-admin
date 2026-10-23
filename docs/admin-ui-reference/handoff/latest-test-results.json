@@ -1,158 +1,150 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T04:29:08.656Z",
+  "capturedAtUtc": "2026-10-23T04:50:00Z",
   "repository": "chichute5500/Sindarealest-admin",
-  "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
-  "codeTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
-  "progressPercent": 50,
-  "progressStatus": "PROVISIONAL",
-  "status": "SOURCE_AND_PREVIEW_CHECKS_PASS",
-  "latestRun": {
-    "id": 39899961344,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
-    "headSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+  "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
+  "branchHeadAtCheckpointStart": "d395aea6a39b503e9a43796b7c3ed161576625e0",
+  "checkpointSemantics": "Branch HEAD 290d3de4110f235c0a0ea963f0bc191dbd374b11 is an evidence-only child created by Admin Preview; application/source-test SHA a04e7f581f81403aae19aa9249d383a27f947ab5 passed Validate 39899961562 and Admin Preview 39899961344 on the exact same SHA. Artifact admin-preview-evidence-370 (ID 12478995473) contains 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one additional approved reference PNG. Local fixture evidence has 0 page errors, 0 unexpected API paths, 0 attempted writes and 0 fixture API errors; seven simulated HTTP 503 console entries are expected retry fixtures. Deployed diagnostic confirms login CSS signature only. The recorded branch head is the pre-handoff-sync evidence checkpoint; current branch/PR refs must always be fetched live.",
+  "codeTestSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+  "latestProductSourceCommit": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+  "latestActionsRun": {
+    "id": 39899961562,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
     "status": "completed",
     "conclusion": "success",
-    "summary": "Validate #39899961562 and Admin Preview #39899961344 passed on exact source/test SHA. Artifact admin-preview-evidence-370 has 132 unique generated screenshot PNGs (16 login + 116 distinct module PNGs), 120 module capture entries, 112 fixture metrics and one approved reference PNG. Seven expected fixture 503 console entries; no page errors, unexpected API paths, attempted writes or fixture API errors. Preview diagnostic verifies login CSS signature only."
+    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5"
   },
-  "validatedChecks": {
-    "npmRunCheck": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "npmTest": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "projectIntegrity": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "localStaticPlaywright": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "responsiveThemeScreenshotMatrix": "PASS_132_UNIQUE_PNGS_112_FIXTURE_METRICS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "currentHeadPlaywright": "PASS_LOCAL_MATRIX; PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES UNTESTED",
-    "productionDeployment": "NOT_PERFORMED",
-    "currentHead": "SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_a04e7f581f81403aae19aa9249d383a27f947ab5; PREVIEW EVIDENCE CHILD 290d3de4110f235c0a0ea963f0bc191dbd374b11",
-    "currentHeadSha": "290d3de4110f235c0a0ea963f0bc191dbd374b11",
-    "historicalSourceAndUIEvidence": "RETAINED_WITH_EXACT_SHA_REFERENCES",
-    "exactShaValidationRun": 39899961562,
-    "exactShaValidationUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
-    "automatedTests": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "publicQrCacheContract": "PASS_ON_1ec3cc72db94f07ce500d4e43830674b39a9eb03: public QR route sets Cache-Control no-store",
-    "publicQrCacheBehavior": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: existing public QR active=200/no-store; deactivated/replaced=404",
-    "settingsScreenOrder": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285: price, welcome, watermark, then QR panel",
-    "sourceValidation": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "uiFixtureConsoleErrors": "7 expected simulated HTTP 503 retry-path entries; no page errors, unexpected API paths, attempted writes or fixture API errors."
-  },
-  "historicalRuns": [
-    {
-      "id": 39888898010,
-      "sha": "bb001c7d047a94058a6c028a6748e5849a19442b",
-      "conclusion": "success",
-      "meaning": "Latest source Validate: dependency audit, project integrity and automated tests passed, including public QR active/deactivated behavior."
+  "progressPercent": 50,
+  "progressStatus": "PROVISIONAL",
+  "progressBasis": "50% PROVISIONAL remains an overall estimate only. Notification unread/mark-read UI regression checks and the responsive/theme fixture matrix passed on the exact source/test SHA, but all 12 screens remain unaccepted, full reference parity is unverified and authenticated backend workflows are untested.",
+  "pullRequests": {
+    "108": {
+      "state": "OPEN",
+      "merged": false,
+      "mergeable": false,
+      "branch": "fix/liquid-glass-audit-2026-10-19",
+      "base": "main",
+      "headSha": "c808d1dfba542e6bab78885d1e4b507a549e77d9",
+      "changedFiles": 287,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
+      "writeAllowed": false,
+      "additions": 21329,
+      "deletions": 406,
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+      "mergeableState": "dirty"
     },
-    {
-      "id": 39888898083,
-      "sha": "bb001c7d047a94058a6c028a6748e5849a19442b",
-      "conclusion": "success",
-      "meaning": "Preview diagnostic and 102-screenshot matrix passed on same SHA; artifact admin-preview-evidence-359 contains 102 PNGs and 78 fixture metrics; not authenticated backend acceptance."
-    },
-    {
-      "id": 39887267741,
-      "sha": "574a94827fa3429a2022e6cfca552bb3ded07315",
-      "conclusion": "success",
-      "meaning": "Validate passed on exact source SHA, including runtime route tests for active QR 200/no-store and deactivated/replaced QR 404."
-    },
-    {
-      "id": 39887267725,
-      "sha": "574a94827fa3429a2022e6cfca552bb3ded07315",
-      "conclusion": "success",
-      "meaning": "Preview diagnostic and source screenshot matrix passed on the same SHA; artifact admin-preview-evidence-357 contains 102 PNGs and is not authenticated backend acceptance."
-    },
-    {
-      "id": 39886592981,
-      "sha": "1ec3cc72db94f07ce500d4e43830674b39a9eb03",
-      "conclusion": "success",
-      "meaning": "Validate source and tests on exact SHA: dependency audit, project integrity, automated tests, including public QR no-store contract, all passed."
-    },
-    {
-      "id": 39886593197,
-      "sha": "1ec3cc72db94f07ce500d4e43830674b39a9eb03",
-      "conclusion": "success",
-      "meaning": "Preview diagnostic and source screenshot matrix passed on the same SHA; artifact admin-preview-evidence-356 contains 102 PNGs and is not authenticated backend acceptance."
-    },
-    {
-      "id": 39847591944,
-      "sha": "1674396bec433fb915e3a6b922b9f22436335786",
-      "conclusion": "success",
-      "meaning": "Latest source Validate pass on exact SHA: dependency audit, project integrity, and automated tests all succeeded."
-    },
-    {
-      "id": 39847591916,
-      "sha": "1674396bec433fb915e3a6b922b9f22436335786",
-      "conclusion": "success",
-      "meaning": "Preview diagnostic and source screenshot matrix passed on the same SHA; artifact admin-preview-evidence-355 contains 102 PNGs and is not authenticated backend acceptance."
-    },
-    {
-      "id": 39846423113,
-      "sha": "dacc776531248cd38bf761a2381b31b630f94213",
-      "conclusion": "success",
-      "meaning": "Exact-SHA Validate run on the latest handoff sync passed project integrity and all automated tests. A follow-up metadata synchronization commit requires its own exact-SHA validation."
-    },
-    {
-      "id": 39844529679,
-      "sha": "b8aff9d341e5c08d16ccc52efdab0b63da0e0869",
-      "conclusion": "success",
-      "meaning": "Exact-SHA Validate passed project integrity, npm run check and npm test; a later handoff-only child commit requires its own exact-SHA Actions check."
-    },
-    {
-      "id": 39844022556,
-      "sha": "e749873c0635eec31c4d5467cc357238edbebd6c",
-      "conclusion": "failure",
-      "failure": "tests/handoff-integrity.test.mjs:35 — latest-test-results.json latestRun.id/url were null; project integrity check passed.",
-      "meaning": "Latest failed exact-SHA Validate attempt at the handoff sync checkpoint; repair the pointer and rerun validation."
-    },
-    {
-      "id": 39804852564,
-      "sha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "conclusion": "success",
-      "meaning": "Source checks on older SHA; historical, superseded by latest run."
-    },
-    {
-      "id": 39804852604,
-      "sha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
-      "conclusion": "failure",
-      "failure": "Playwright screenshot matrix timed out waiting for retry-customers at tests/e2e/admin-static-baseline.spec.js:1940; deployed Preview diagnostic step succeeded.",
-      "meaning": "Historical failure; latest run on newer SHA passed."
-    },
-    {
-      "id": 39802525217,
-      "sha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
-      "conclusion": "cancelled",
-      "meaning": "Historical cancelled run, not an active concurrency blocker."
-    },
-    {
-      "id": 39811730522,
-      "sha": "483a03966ba2d1d2e46d2723f440b97ebc31d0e4",
-      "conclusion": "success",
-      "meaning": "Previous exact-SHA pass before the toast/navigation overlap fix."
-    },
-    {
-      "id": 39816652346,
-      "sha": "105f46b90dc5664dd091493dbd5cea1af7796c44",
-      "conclusion": "success",
-      "meaning": "Latest responsive/theme screenshot and configured Preview diagnostic run; artifact #344 is the current evidence."
-    },
-    {
-      "id": 39820101711,
-      "sha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
-      "conclusion": "failure",
-      "failure": "Automated test step failed at the new handoff integrity assertion; project integrity check passed.",
-      "meaning": "Latest failed Validate attempt before the single-entry-point link repair."
-    },
-    {
-      "id": 39820105048,
-      "sha": "7a60099f96bb0be4f68dbda47fbec9c10df44390",
-      "conclusion": "failure",
-      "failure": "Automated test step failed; Playwright and deployed Preview steps were skipped.",
-      "meaning": "Latest failed Preview workflow attempt before the single-entry-point link repair."
+    "111": {
+      "state": "OPEN",
+      "merged": false,
+      "mergeable": false,
+      "branch": "feature/admin-isolated-handoff-2026-10-20",
+      "base": "main",
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+      "headSha": "d395aea6a39b503e9a43796b7c3ed161576625e0",
+      "changedFiles": 410,
+      "additions": 39825,
+      "deletions": 212,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
+      "writeAllowed": true,
+      "validationRunId": 39901444416,
+      "validation": "PASS_ON_EXACT_SOURCE_TEST_SHA; PREVIEW_PASS_ON_SAME_SHA",
+      "mergeableState": "dirty"
     }
-  ],
-  "screens": {
+  },
+  "actions": {
+    "latestSuccessful": {
+      "id": 39899961562,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; branch evidence-only child 290d3de4110f235c0a0ea963f0bc191dbd374b11"
+    },
+    "historicalFailed": {
+      "id": 39804852604,
+      "testedSha": "326526f8f74172ae0aea7fa37739c9a8e8f513ec",
+      "conclusion": "failure",
+      "failureCause": "Older SHA timed out waiting for retry-customers selector; later exact-SHA run passed.",
+      "deployedPreviewDiagnostic": "success"
+    },
+    "historicalCancelled": {
+      "id": 39802525217,
+      "testedSha": "920f53d42c643084d7390198b1f6a875ec4f68e7",
+      "conclusion": "cancelled",
+      "activeBlocker": false
+    },
+    "latestAttempt": {
+      "capturedAtUtc": "2026-10-23T04:29:08.656Z",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "validateRun": {
+        "id": 39899961562,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "previewRun": {
+        "id": 39899961344,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "previewArtifact": {
+        "name": "admin-preview-evidence-370",
+        "id": 12478995473,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473",
+        "pngCount": 133,
+        "uniqueGeneratedScreenshots": 132,
+        "loginScreenshots": 16,
+        "distinctModuleScreenshots": 116,
+        "moduleCaptureEntries": 120,
+        "fixtureMetrics": 112
+      },
+      "reason": "Notification unread/mark-read regression test added; Validate and Admin Preview completed successfully on exact source/test SHA. Preview evidence is synthetic/read-only fixture coverage; authenticated business/backend acceptance remains incomplete."
+    },
+    "latestValidateAttempt": {
+      "id": 39899961562,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "currentHeadApplicability": "PASS_ON_EXACT_SOURCE_TEST_SHA; branch evidence-only child 290d3de4110f235c0a0ea963f0bc191dbd374b11",
+      "workflow": "Validate source and tests"
+    },
+    "lastFailed": {
+      "id": 39844022556,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39844022556",
+      "status": "completed",
+      "conclusion": "failure",
+      "testedSha": "e749873c0635eec31c4d5467cc357238edbebd6c",
+      "meaning": "Historical failure because latestRun.id/url were null; superseded by successful exact-SHA Validate #39844529679 on b8aff."
+    },
+    "latestPreviewAttempt": {
+      "id": 39899961344,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+      "status": "completed",
+      "conclusion": "success",
+      "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+      "artifact": {
+        "name": "admin-preview-evidence-370",
+        "id": 12478995473,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473"
+      },
+      "diagnostic": "PASS_LOGIN_CSS_SIGNATURE",
+      "evidence": "132 unique generated PNGs; 112 fixture metrics; zero page errors, unexpected API paths, attempted writes or fixture API errors."
+    }
+  },
+  "latestProductChange": {
+    "status": "NOTIFICATION_UNREAD_MARK_READ_REGRESSION_TEST_ADDED; VALIDATE_AND_PREVIEW_PASS; BACKEND_ACCEPTANCE_PARTIAL",
+    "sourceAndTestSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
+    "validateRunId": 39899961562,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
+    "previewRunId": 39899961344,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
+    "previewArtifact": "admin-preview-evidence-370",
+    "previewArtifactId": 12478995473,
+    "summary": "Added deterministic notification unread/mark-read persistence and keyboard close/focus regression checks. Exact-SHA Validate and Admin Preview passed; screenshot matrix completed. Authenticated notifications/business backend and full reference parity remain unverified."
+  },
+  "screenStatuses": {
     "1_login": {
       "status": "PARTIAL_NOT_ACCEPTED",
       "gap": "Unauthenticated login shell only."
@@ -187,7 +179,7 @@
     },
     "9_warranty_support": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Mobile toast clearance fixed and checked at 320x640; synthetic fixture/retry checks only, live warranty/support operations remain untested."
+      "gap": "Mobile toast clearance is corrected and tested at 320x640; current warranty evidence remains synthetic fixture/retry testing only, and live support/warranty operations are not tested."
     },
     "10_website_settings": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -202,222 +194,255 @@
       "gap": "Fixture records only; authenticated audit feed not tested."
     }
   },
-  "acceptanceBoundary": {
-    "all12Screens": "PARTIAL_NOT_ACCEPTED",
-    "authenticatedBusinessBackendQA": "NOT_TESTED",
+  "scopeAudit": {
+    "status": "B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
+    "liveChangedFiles": 406,
+    "previousCensus": 1314,
+    "previousCensusStatus": "Checkpoint-start PR #111 census: 390 changed paths, +39,075/-212. Fetch live PR metadata before acting; the Preview workflow may add compact evidence files.",
+    "priority": "B1 cleanup/provenance review complete for current diff; no further deletion or route consolidation without new evidence.",
     "remoteD1SchemaAndLedger": "NOT_VERIFIED",
-    "productImageSaveAndR2": "DEFERRED_BY_OWNER",
     "migration0009": "DEFERRED_BY_OWNER",
     "preProMigrations": "DEFERRED_BY_OWNER",
-    "productionDeployment": "NOT_PERFORMED"
-  },
-  "nextActions": [
-    "Review latest raw screenshots and full metadata in the linked GitHub Actions artifact; history stores a compact report and Preview diagnostics only.",
-    "Compare the screenshots against the approved admin-mobile-reference.png and fix only verified ADMIN-specific visual differences.",
-    "Provide an authorized Preview test path or approved Cloudflare Access service token to test authenticated modules; do not bypass Access.",
-    "Run the source checks and Playwright matrix again after every meaningful UI iteration.",
-    "Keep the public website branch and main untouched; do not merge or deploy Production."
-  ],
-  "mobileToastFix": {
-    "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
-    "sourceSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "description": "At mobile widths <=820px the toast bottom offset is calc(84px + env(safe-area-inset-bottom)); Playwright measures the shown toast and requires at least 8px clearance above fixed mobile navigation. Previous run 39897883648 measured only 6px at 320x640; the exact-SHA follow-up passed.",
-    "previousFailureRunId": 39897883648,
-    "validateRunId": 39898454195,
-    "previewRunId": 39898454274,
-    "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
-    "screenshot": "warranties-responsive__320x640__light.png"
-  },
-  "latestCodeCommitSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
-  "testedCommitSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
-  "capturedAt": "2026-10-23T04:45:00.530Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
-  "checks": {
-    "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
-    "applicationStartup": "PASS",
-    "localStaticPlaywrightBaseline": "PASS",
-    "playwright": "PASS",
-    "playwrightPreviewDiagnostics": "success",
-    "deployedPreview": "PASS",
-    "responsiveViewports": "PASS_SOURCE_SCREENSHOT_MATRIX",
-    "lightMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "darkMode": "PASS_LOGIN_SCREEN_MATRIX",
-    "consoleErrors": "PASS_LOCAL_LOGIN_ONLY",
-    "networkErrors": "PASS_LOCAL_FIXTURE_ONLY",
-    "automatedTests": "PASS",
-    "build": "NOT_CONFIGURED_IN_PACKAGE_SCRIPTS",
-    "productionDeployment": "NOT_PERFORMED",
-    "sourceValidation": "PASS_ON_a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "dependencyAudit": "PASS_ON_000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "projectIntegrity": "PASS_ON_000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "settingsScreenOrder": "PASS_ON_4ac7465539e746b7f37517327d7bf9bddcfa3285",
-    "sourceScreenshotCount": 132,
-    "uiFixtureMetricCount": 112
-  },
-  "latestLocalEvidence": {
-    "runId": 39901444449,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
-    "sourceCommit": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
-    "npmRunCheck": "PASS",
-    "npmTest": "PASS",
-    "localPlaywright": "PASS",
-    "sourceScreenshotCount": 132,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
-    "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-371",
-    "pageErrors": [],
-    "consoleErrors": [],
-    "failedRequests": [],
-    "httpErrors": [],
-    "attemptedWrites": [],
-    "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
-  },
-  "latestScreenshotArtifact": {
-    "runId": 39901444449,
-    "name": "admin-preview-evidence-371",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
-    "sourceCommit": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
-    "screenshotCount": 132,
-    "loginShellPngCount": 16,
-    "uiFixturePngCount": 120,
-    "uiFixtureMetricCount": 112,
-    "retentionDays": 14,
-    "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
-  },
-  "remainingIssues": [
-    "B1 cleanup/provenance review is complete; no further deletion/API consolidation without new consumer evidence.",
-    "All 12 screens remain PARTIAL_NOT_ACCEPTED until complete behavior and approved-reference parity are supported.",
-    "Authenticated business/backend QA remains NOT_TESTED; fixture screenshots do not prove persistence. Seven fixture console logs are expected simulated 503 failure/retry responses.",
-    "Remote D1 schema/ledger NOT_VERIFIED; migration 0009, PRE/PRO migrations, product-image/R2 persistence and AI image grouping DEFERRED_BY_OWNER.",
-    "Exact pixel-level parity remains NOT_VERIFIED; the approved composite reference can now be viewed, but screen-by-screen comparison is unfinished.",
-    "Production deployment NOT_PERFORMED; PR #111/#108 remain open and unmerged."
-  ],
-  "blockedItems": [
-    "Authenticated backend workflows require authorized Preview access; do not bypass Cloudflare Access or change secrets.",
-    "Migration 0009, PRE/PRO migration changes and product-image/R2 persistence remain DEFERRED_BY_OWNER.",
-    "PR #111 must remain open/unmerged; no merge/rebase/force-push."
-  ],
-  "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "PASS_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_FOLLOWS",
-  "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; OVERALL_ADMIN_ACCEPTANCE_PARTIAL",
-  "livePrState": {
-    "pr111": {
-      "state": "OPEN",
-      "merged": false,
-      "headAtStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-      "changedFiles": 406,
-      "additions": 39536,
+    "r2Persistence": "DEFERRED_BY_OWNER",
+    "aiImageGrouping": "BLOCKED_OWNER_APPROVED_API_CONTRACT_REQUIRED",
+    "livePathCensus": {
+      ".github": 1,
+      "(root)": 2,
+      "data": 1,
+      "docs": 352,
+      "functions": 24,
+      "migrations": 2,
+      "public": 1,
+      "scripts": 4,
+      "tests": 19
+    },
+    "liveExtensionCensus": {
+      "yml": 1,
+      "txt": 1,
+      "json": 176,
+      "md": 177,
+      "png": 1,
+      "js": 26,
+      "sql": 2,
+      "html": 1,
+      "mjs": 21
+    },
+    "cleanupCheckpoint": {
+      "capturedAtUtc": "2026-10-22T19:44:00Z",
+      "parentSha": "30fece366e559073f6c664f6ed0459712c1b0a84",
+      "changedFiles": 385,
+      "additions": 38848,
+      "deletions": 211,
+      "removedGeneratedHistoricalPngs": 912,
+      "removedLegacySnapshotFiles": 10,
+      "removedObsoletePromptAudit": true,
+      "removedOutOfScopeStaticAudit": true,
+      "removedStaticOnlyWorkflow": true,
+      "removedStaticOnlyCaptureScript": true,
+      "restoredPublicIndexToMain": true,
+      "approvedReferenceRetained": true,
+      "removedUnreferencedReferenceZip": true,
+      "historyRecordCount": 318,
+      "currentHeadValidation": "PASS_ON_30fece366e559073f6c664f6ed0459712c1b0a84",
+      "exactShaValidationRun": 39842366701,
+      "scopeAuditStatus": "PARTIAL",
+      "productionDeployment": "NOT_PERFORMED"
+    },
+    "historyRecordCount": 167,
+    "nonHistoryDocs": [
+      "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
+      "docs/admin-ui-reference/README.md",
+      "docs/admin-ui-reference/admin-mobile-reference.png",
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/PR-111-SCOPE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "docs/admin-ui-reference/handoff/START-HERE.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json",
+      "docs/admin-ui-reference/reference-instructions.md",
+      "docs/integration/QR-PAYMENT-AND-PRODUCT-TYPE-CONTRACT.md"
+    ],
+    "lastReviewCheckpoint": {
+      "capturedAtUtc": "2026-10-22T20:28:28.277Z",
+      "head": "b3b71fb925875e9dd8f1b38e71737a2af1bb71b2",
+      "sourceTestSha": "1674396bec433fb915e3a6b922b9f22436335786",
+      "changedFiles": 386,
+      "additions": 38838,
       "deletions": 212,
-      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+      "historyRunDirectories": 157,
+      "historyEvidenceFiles": 319,
+      "exactShaValidationRun": 39847591944,
+      "exactShaValidation": "PASS_ON_EXACT_SOURCE_SHA_1674396",
+      "previewRun": 39847591916,
+      "previewResult": "PASS_ON_EXACT_SOURCE_SHA_1674396",
+      "reviewedSlice": "Full changed-path category census plus source/data/workflow/test/config/migration dependency checks; payment and Orders/Order detail contracts retained from preceding source review.",
+      "findings": [
+        "The live 386-file diff is classified by path and consumer: docs/evidence 332; functions 24; migrations 2; Admin UI 1; scripts 4; tests 19; workflow 1; legacy seed-data source 1; root guide/package 2.",
+        "History currently contains 157 SHA-keyed run directories and 319 report/metadata/diagnostic files (plus the README policy); no generated PNG is stored in history. Keep per-run failure/success evidence under the explicit retention policy.",
+        "data/legacy-products.json is not an unused runtime catalogue: scripts/check-project.mjs validates its 235 entries, image files, IDs/SKU rules and correspondence with migration 0002 seed rows; smoke tests also exercise related data contracts.",
+        "README-DEPLOY.txt is intentionally retained and covered by tests/config-integrity.test.mjs. The package scripts call source/migration checks and the changed .mjs tests; the E2E specs are invoked by the Preview diagnostic workflow.",
+        "The approved PNG reference and written instructions are retained; the empty viewer was removed. public/admin/index.html is the only remaining changed HTML route/view.",
+        "The duplicate fulfillment helper/unused payment validators were removed earlier; current tests import normalizeFulfillmentType from functions/_lib.js. No further safe helper/endpoint merge was found.",
+        "Payment endpoints have distinct authorization, exposure, cache and state-transition contracts. Orders/Order detail still lack authenticated backend acceptance."
+      ],
+      "remoteActions": "NONE",
+      "productionDeployment": "NOT_PERFORMED"
     },
-    "pr108": {
-      "state": "OPEN",
-      "merged": false,
-      "headSha": "63079aabf853d6b4d492942020a71603754046d8",
-      "changedFiles": 287,
-      "readOnly": true,
-      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+    "latestReviewFinding": "Validate #39844022556 failed npm test at tests/handoff-integrity.test.mjs:35 because latest-test-results.json latestRun.id/url were null. Project integrity passed. Previous exact SHA 2ccfd452643c431a25f9bb7789f2bbe1acb41e5b passed.",
+    "currentHeadValidation": "SCREEN_10_SOURCE_AND_TESTS_PASS_ON_EXACT_SHA_4ac7465; PREVIEW PASS ON SAME SOURCE; CURRENT BRANCH HEAD 620d7b0 IS EVIDENCE-ONLY",
+    "preCleanupPathCensus": {
+      ".github": 1,
+      "(root)": 2,
+      "data": 1,
+      "docs": 331,
+      "functions": 24,
+      "migrations": 2,
+      "public": 1,
+      "scripts": 4,
+      "tests": 19
     },
-    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+    "preCleanupExtensionCensus": {
+      "yml": 1,
+      "txt": 1,
+      "json": 165,
+      "md": 166,
+      "html": 2,
+      "png": 1,
+      "js": 26,
+      "sql": 2,
+      "mjs": 21
+    },
+    "expectedPostCleanupPathCount": 384,
+    "expectedPostCleanupCensus": {
+      ".github": 1,
+      "(root)": 2,
+      "data": 1,
+      "docs": 330,
+      "functions": 24,
+      "migrations": 2,
+      "public": 1,
+      "scripts": 4,
+      "tests": 19
+    },
+    "expectedPostCleanupExtensions": {
+      "yml": 1,
+      "txt": 1,
+      "json": 165,
+      "md": 166,
+      "html": 1,
+      "png": 1,
+      "js": 26,
+      "sql": 2,
+      "mjs": 21
+    },
+    "emptyViewerCleanup": {
+      "path": "docs/admin-ui-reference/admin-mobile-reference.html",
+      "blobSha": "6ff4fc52979192eb8c6cb0cf23ab0c4079ca31f6",
+      "byteLength": 0,
+      "reason": "The tracked blob has zero bytes even though README called it a self-contained viewer; reference-instructions.md directs contributors to the approved PNG.",
+      "action": "Remove the empty viewer and its README entry; retain the approved PNG and written instructions."
+    },
+    "reviewedPaymentRoutes": {
+      "status": "SOURCE_REVIEWED_NO_SAFE_ROUTE_MERGE",
+      "routes": {
+        "functions/_payments.js": "Shared fulfillment/token/QR allowlist/full-ledger summary helper referenced by endpoints and tests.",
+        "functions/api/admin/payment-qr.js": "Admin-only bank configuration draft/save/activate/deactivate and audit.",
+        "functions/api/admin/payment-qr-upload.js": "Admin-only bounded/signature-checked upload creating a pending inactive QR image.",
+        "functions/api/admin/payment-qr-preview.js": "Admin-authenticated preview scoped to the pending image key; private/no-store.",
+        "functions/payment-qr/[key].js": "Public route serves only the exact active QR key; different exposure/cache contract.",
+        "functions/api/payment-settings.js": "Public active configuration GET only; PUT returns 405.",
+        "functions/api/admin/payment-requests.js": "Creates/cancels requests and presents bounded history with an independent full-ledger summary.",
+        "functions/api/admin/payment-transactions.js": "Manually verified receipts/refunds, atomic payment state updates and audit logging.",
+        "functions/api/order-payment.js": "Read-only customer payment view scoped to hashed capability token, private/no-store and term/current-QR gated."
+      },
+      "evidence": [
+        "tests/fulfillment-payment-contract.test.mjs",
+        "tests/payment-ledger-route.test.mjs",
+        "tests/handoff-integrity.test.mjs",
+        "migrations/0009_fulfillment_and_manual_payments.sql",
+        "package.json scripts check/test",
+        "scripts/check-migrations.mjs"
+      ],
+      "result": "Authorization, exposure, cache and state-transition boundaries differ; current evidence does not justify consolidation or deletion."
+    },
+    "historyEvidenceFileCount": 330,
+    "historyCountSemantics": "Live tree at checkpoint: 167 SHA-keyed history directories and 339 evidence files under handoff/history (computed from branch HEAD before this canonical handoff sync). No raw screenshot PNGs are stored in Git.",
+    "currentCleanupReview": {
+      "status": "COMPLETE_FOR_CURRENT_PR_DIFF",
+      "capturedAtUtc": "2026-10-23T02:37:02.015Z",
+      "changedFiles": 396,
+      "additions": 39234,
+      "deletions": 212,
+      "classified": {
+        "historyEvidenceDirectories": 162,
+        "historyEvidenceFiles": 328,
+        "docs": 340,
+        "functions": 24,
+        "migrations": 2,
+        "publicAdminUi": 1,
+        "scripts": 4,
+        "tests": 19,
+        "workflow": 1,
+        "dataSeedSource": 1,
+        "rootDeploymentGuideAndPackage": 2
+      },
+      "disposition": "Keep remaining files with documented consumers/purpose; no additional safe deletion or API/helper consolidation found."
+    },
+    "liveAdditions": 39536,
+    "liveDeletions": 212,
+    "historyRunDirectoryCount": 167,
+    "historyRunDirectories": 167,
+    "historyEvidenceFiles": 339
   },
+  "guardrails": [
+    "Only write feature/admin-isolated-handoff-2026-10-20.",
+    "Keep PR #111 and #108 open/unmerged; no main/static edits or production deploy.",
+    "No Cloudflare Access bypass; no secrets access/exposure/change.",
+    "No remote D1/R2/schema/ledger operations; do not execute setup/migration/deploy scripts.",
+    "No fabricated business data or unapproved API contracts."
+  ],
+  "nextActions": [
+    "Continue visual/behavior audit starting with Screens 12, 4, 5 and 7 against the approved reference; distinguish fixture-data differences from reproducible layout/interaction defects and keep each screen PARTIAL_NOT_ACCEPTED until acceptance evidence exists.",
+    "Obtain an authorized authenticated Preview path before testing persisted business workflows; never bypass Cloudflare Access or change secrets.",
+    "Keep full reference-image parity NOT_VERIFIED until each relevant screen is compared with matching viewport/theme; the composite reference is available and was rendered for qualitative comparison in this checkpoint.",
+    "Remote D1 schema/ledger remain NOT_VERIFIED; migration 0009, PRE/PRO changes, product-image/R2 persistence and AI image grouping remain deferred by owner.",
+    "Do not repeat completed B1 cleanup, merge/rebase/force-push, deploy Production, or write to main/PR #108."
+  ],
+  "handoffSync": {
+    "lastSyncAtUtc": "2026-10-23T04:50:00Z",
+    "syncPurpose": "Synchronize canonical handoff to live PR #111 and exact-SHA order-detail mobile scroll evidence."
+  },
+  "currentHeadAtCheckpoint": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
+  "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA; EVIDENCE_CHILD_FOLLOWS",
   "currentHeadValidationReason": "Validate #39898454195 and Admin Preview #39898454274 both succeeded on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. Artifact admin-preview-evidence-369 (ID 12478285219) records 132 unique generated PNGs and 112 fixture metrics. The broader fixture matrix passed with no horizontal overflow; Screen 9 toast gap measured 6px on prior SHA and passed after CSS offset changed 82px to 84px plus safe-area inset. Preview diagnostic is login-shell CSS signature only; authenticated backend remains NOT_TESTED.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T04:07:52Z",
-    "headAtStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-    "codeTestSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "validateRunId": 39898454195,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
+    "capturedAtUtc": "2026-10-23T04:50:00Z",
+    "branchHeadAtCheckpointStart": "d395aea6a39b503e9a43796b7c3ed161576625e0",
+    "codeTestSha": "9515d03d504ca9c49836b719ccede1eb3c2d2ce1",
+    "validateRunId": 39901444416,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444416",
     "validateConclusion": "success",
-    "previewRunId": 39898454274,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274",
+    "previewRunId": 39901444449,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39901444449",
     "previewConclusion": "success",
-    "previewArtifact": "admin-preview-evidence-369",
-    "previewArtifactId": 12478285219,
+    "previewArtifact": "admin-preview-evidence-371",
+    "previewArtifactId": 12478713244,
     "screenshotCount": 132,
     "loginShellPngCount": 16,
-    "uiFixturePngCount": 116,
-    "uiFixtureMetricCount": 112,
-    "fixturePageErrors": 0,
-    "fixtureConsoleErrors": 7,
-    "fixtureConsoleErrorMeaning": "Expected HTTP 503 logs during synthetic endpoint failure/retry tests.",
-    "fixtureUnexpectedApiPaths": 0,
-    "fixtureAttemptedWrites": 0,
-    "fixtureHorizontalOverflowMetrics": 0,
-    "toastClearance": {
-      "previousObservedGapPx": 6,
-      "minimumRequiredGapPx": 8,
-      "cssOffsetBeforePx": 82,
-      "cssOffsetAfterPx": 84,
-      "result": "PASS_ON_EXACT_SOURCE_TEST_SHA"
-    },
-    "pr111Head": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-    "pr111ChangedFiles": 406,
-    "pr111Additions": 39536,
-    "pr111Deletions": 212,
-    "pr108Head": "63079aabf853d6b4d492942020a71603754046d8",
-    "pr108ChangedFiles": 287,
-    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "distinctModuleScreenshots": 116,
     "uiFixtureCaptureEntryCount": 120,
-    "artifactArchivePngCount": 133,
-    "screenshotCountSemantics": "132 distinct screenshot PNGs (16 login + 116 module files); metadata records 120 module capture entries; archive includes the reference image as one extra PNG."
+    "uiFixtureMetricCount": 112,
+    "archivePngCount": 133,
+    "screen7OrderDetailMobileScrollAudit": "PASS_ON_EXACT_SOURCE_TEST_SHA",
+    "fixtureOnly": true,
+    "allScreens": "PARTIAL_NOT_ACCEPTED",
+    "authenticatedBackendQA": "NOT_TESTED",
+    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "exactReferenceParity": "NOT_VERIFIED",
+    "production": "NOT_PERFORMED"
   },
-  "currentChange": {
-    "status": "SCREEN_9_MOBILE_TOAST_CLEARANCE_FIX_VALIDATED; NARROW_VIEWPORT_MATRIX_PASS; B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
-    "headAtStart": "1596bbd07c2257f19ecad9b2f77a7a45e9161cd0",
-    "codeTestSha": "000d3d84a9cf8c63144388f80879b5cc1439d161",
-    "changedFiles": 406,
-    "additions": 39536,
-    "deletions": 212,
-    "findings": [
-      "Screen 9 toast/navigation gap was 6px at 320x640 versus 8px required, corrected with CSS bottom offset 84px plus safe-area inset.",
-      "Validate #39898454195 and Admin Preview #39898454274 passed on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161.",
-      "Artifact admin-preview-evidence-369 records 132 unique generated PNGs, 112 fixture metrics and no horizontal overflow in measured fixture screens.",
-      "Deployed diagnostic confirms login-shell CSS only; authenticated business data/workflows remain untested.",
-      "B1 provenance cleanup remains complete; generated evidence child 1596bbd07c2257f19ecad9b2f77a7a45e9161cd0 is not the application-source SHA."
-    ]
-  },
-  "latestValidateRun": {
-    "id": 39898454195,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454195",
-    "status": "completed",
-    "conclusion": "success",
-    "testedSha": "000d3d84a9cf8c63144388f80879b5cc1439d161"
-  },
-  "latestAttempt": {
-    "capturedAtUtc": "2026-10-23T04:29:08.656Z",
-    "testedSha": "a04e7f581f81403aae19aa9249d383a27f947ab5",
-    "validateRun": {
-      "id": 39899961562,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961562",
-      "status": "completed",
-      "conclusion": "success"
-    },
-    "previewRun": {
-      "id": 39899961344,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344",
-      "status": "completed",
-      "conclusion": "success"
-    },
-    "previewArtifact": {
-      "name": "admin-preview-evidence-370",
-      "id": 12478995473,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39899961344/artifacts/12478995473",
-      "pngCount": 133,
-      "uniqueGeneratedScreenshots": 132,
-      "loginScreenshots": 16,
-      "distinctModuleScreenshots": 116,
-      "moduleCaptureEntries": 120,
-      "fixtureMetrics": 112
-    },
-    "notificationRegression": "PASS: deterministic unread badge, mark-read local timestamp, Escape close and focus restoration on exact source/test SHA.",
-    "acceptanceBoundary": "Fixture-only; authenticated business/backend QA NOT_TESTED; all 12 screens PARTIAL_NOT_ACCEPTED."
-  },
-  "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T04:17:49Z",
-    "syncPurpose": "Clarify artifact counts accurately across canonical handoff files."
-  },
-  "latestProductSourceCommit": "a04e7f581f81403aae19aa9249d383a27f947ab5"
+  "latestReviewFinding": "Screen 9 responsive audit found a reproducible toast/navigation clearance gap of 6px at 320x640; CSS offset changed from 82px to 84px plus safe-area inset. Validate and Playwright passed on exact source/test SHA 000d3d84a9cf8c63144388f80879b5cc1439d161. The approved reference image has now been visually inspected, but full screen-by-screen parity remains NOT_VERIFIED. All screens remain PARTIAL_NOT_ACCEPTED.",
+  "snapshotCapturedBeforeHandoffSync": true,
+  "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
 }
