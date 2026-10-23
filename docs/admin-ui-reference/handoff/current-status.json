@@ -1,24 +1,24 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T08:23:00Z",
+  "capturedAtUtc": "2026-10-23T08:44:17Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "8e7914b7754ec4a80cde535ccee041636a256c9f",
-  "checkpointSemantics": "Live branch HEAD 8e7914b7754ec4a80cde535ccee041636a256c9f is an evidence-only Actions child of tested source/test SHA 7631f1badaf774fc35616fc21445e94af0bca027. Full Preview run 39923533998 passed on exact parent SHA; current evidence-only HEAD has not been independently tested as a separate source SHA. Historical BLOCKED_CLOUDFLARE_ACCESS root cause remains UNCONFIRMED. PR #111/#108 remain open/unmerged; main unchanged; no Cloudflare/production/remote data changes.",
-  "codeTestSha": "7631f1badaf774fc35616fc21445e94af0bca027",
-  "latestProductSourceCommit": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
+  "branchHeadAtCheckpointStart": "79554d75556664527ca41cf9bd6d334429b41305",
+  "checkpointSemantics": "Branch HEAD at checkpoint start was evidence-only child 79554d75556664527ca41cf9bd6d334429b41305 (\"test(admin): save Playwright evidence for 3290febb0e89\"), parent source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924. CI 39925598976 and full Preview 39925598940 both passed on exact source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924. Latest artifact admin-preview-evidence-401 (#12489985219) inspected; only UI-only local fixture evidence, no authenticated backend test. The handoff-only sync commit that follows is not an independent source/test SHA. Historical Cloudflare Access root cause remains UNCONFIRMED.",
+  "codeTestSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+  "latestProductSourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
   "latestActionsRun": {
-    "id": 39923533998,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39923533998",
-    "headSha": "7631f1badaf774fc35616fc21445e94af0bca027",
+    "id": 39925598940,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+    "headSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
     "status": "completed",
     "conclusion": "success",
     "workflow": "Admin Preview diagnostic smoke test",
-    "summary": "Exact parent source/test SHA passed npm run check, npm test, local responsive/theme screenshot matrix, and deployed Preview diagnostic. Artifact admin-preview-evidence-395; 132 generated PNGs, 112 fixture metrics. Read-only/synthetic fixture only; authenticated backend QA remains NOT_TESTED. Current branch HEAD is evidence-only child 8e7914b7754ec4a80cde535ccee041636a256c9f and is not claimed as separately tested."
+    "summary": "Exact source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924 passed CI #39925598976 and full Preview #39925598940. Artifact admin-preview-evidence-401 (#12489985219) contains 132 generated PNGs and 112 fixture metrics. The audit-log label is now Vietnamese (“Người thực hiện”) and is confirmed in 390×844 and 320×640 screenshots. Local UI fixtures only; authenticated business/backend QA NOT_TESTED."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL remains an overall estimate, not a measured acceptance percentage. Screen 12 mobile audit-log label visibility was fixed and verified, but all 12 screens remain PARTIAL_NOT_ACCEPTED; exact reference parity and authenticated business/backend QA are still incomplete.",
+  "progressBasis": "50% PROVISIONAL is an overall estimate, not a measured acceptance percentage. The Vietnamese activity actor label has now been localized and reverified in exact-SHA mobile screenshots; all 12 screens remain PARTIAL_NOT_ACCEPTED because exact reference parity, authenticated backend QA, and remote D1 schema/ledger remain unverified.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -26,14 +26,15 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "44baa3926bf6acca0110689ce440e7da101047ed",
+      "headSha": "c5198a82b6d2f3bcdbda70a7a3cd5febfb0ff807",
       "changedFiles": 291,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
-      "additions": 22224,
-      "deletions": 406,
+      "additions": 22541,
+      "deletions": 404,
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "mergeableState": "dirty"
+      "mergeableState": "dirty",
+      "readOnly": true
     },
     "111": {
       "state": "OPEN",
@@ -42,9 +43,9 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "3f1b9f28d3f4b92600d752ab3de173c81940e0b0",
-      "changedFiles": 426,
-      "additions": 40313,
+      "headSha": "79554d75556664527ca41cf9bd6d334429b41305",
+      "changedFiles": 436,
+      "additions": 40646,
       "deletions": 212,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
       "writeAllowed": true,
@@ -131,16 +132,16 @@
     }
   },
   "latestProductChange": {
-    "status": "SCREEN_12_MOBILE_AUDIT_LOG_LABELS_FIXED; EXACT_SHA_PREVIEW_PASS; SCREEN_ACCEPTANCE_PARTIAL",
-    "sourceAndTestSha": "fa6937fea1a269a6b40de0e7f136ab969bd70a14",
-    "validateRunId": null,
-    "validateRunUrl": null,
-    "previewRunId": 39914870835,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835",
-    "previewArtifact": "admin-preview-evidence-385",
-    "previewArtifactId": 12484820528,
-    "previewArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39914870835/artifacts/12484820528",
-    "summary": "Screen 12 mobile audit-log cells now render existing data-label values via CSS content:attr(data-label). New Playwright assertion verifies all five labels; exact-SHA Preview run passes. Screens 4/5/7 were reviewed; no additional reproducible defect confirmed. No business logic/API/data changed. Product/reference/backend acceptance remains partial."
+    "status": "VIETNAMESE_AUDIT_ACTOR_LABEL_FIXED; EXACT_SHA_CI_AND_PREVIEW_PASS; SCREEN_ACCEPTANCE_PARTIAL",
+    "sourceAndTestSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "validateRunId": 39925598976,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598976",
+    "previewRunId": 39925598940,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+    "previewArtifact": "admin-preview-evidence-401",
+    "previewArtifactId": 12489985219,
+    "previewArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
+    "summary": "Localized Actor to Người thực hiện in dashboard recent activity and dedicated audit log, updated E2E/contract expectations, and verified exact-SHA CI/Preview plus 320×640 and 390×844 screenshots. No business data, backend APIs or persistence changed. Overall UI/reference/backend acceptance remains partial."
   },
   "screenStatuses": {
     "1_login": {
@@ -149,7 +150,7 @@
     },
     "2_dashboard": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Fixture dashboard; live KPI/business data not accepted."
+      "gap": "Dashboard uses fixture activity only; the recent-activity actor field is now localized to “Người thực hiện” and covered by contract checks. Live KPI/business data and exact-reference acceptance remain unverified."
     },
     "3_product_list": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -189,7 +190,7 @@
     },
     "12_activity_log": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Mobile audit-log labels now display and the five field labels are asserted by Playwright on exact source/test SHA fa6937fea1a269a6b40de0e7f136ab969bd70a14; authenticated audit feed, real notification delivery and exact reference parity remain untested."
+      "gap": "The dashboard and dedicated activity table now show “Người thực hiện” rather than “Actor”; exact-SHA CI/Preview and mobile screenshots verified on 3290febb0e894e02988f2e9987d4ecb0c0ad6924. Authenticated audit feed, real notification delivery and exact reference parity remain untested."
     }
   },
   "scopeAudit": {
@@ -401,35 +402,45 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Continue reference-driven review of Screens 4, 5 and 7 using artifact admin-preview-evidence-385 and matching approved reference crops/viewports/themes; fix only reproducible layout/interaction defects. Do not repeat the completed Screen 12 label fix or B1 cleanup.",
-    "Obtain an authorized authenticated Preview path before testing persistence/business workflows; never bypass Cloudflare Access or change secrets.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED until matched reference and behavior evidence substantiates acceptance; keep remote D1 NOT_VERIFIED and Production NOT_PERFORMED.",
-    "Do not merge/rebase/force-push, deploy, alter main/PR #108, run migrations/setup/deploy scripts, or perform remote D1/R2/schema/ledger operations."
+    "Continue reference-driven UI review for the remaining PARTIAL_NOT_ACCEPTED screens; fix only a visual/interaction defect that is observable in the approved reference and reproducible in Playwright.",
+    "Do not repeat the completed B1 cleanup/provenance audit or the just-verified Vietnamese audit actor label fix.",
+    "Obtain an owner-authorized authenticated Preview path before testing business workflows or persistence; never bypass Cloudflare Access.",
+    "Keep remote D1 schema/ledger NOT_VERIFIED, all 12 screens PARTIAL_NOT_ACCEPTED, and Production NOT_PERFORMED until actual evidence changes those states.",
+    "Only write feature/admin-isolated-handoff-2026-10-20; keep PR #111/#108 open/unmerged; do not modify main/static website, Cloudflare settings/secrets/DNS, remote D1/R2/schema/ledger, or run migration/setup/deploy scripts."
   ],
   "handoffSync": {
-    "lastSyncAtUtc": "2026-10-23T08:23:00Z",
+    "lastSyncAtUtc": "2026-10-23T08:44:17Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "syncPurpose": "Reconcile live HEAD with latest exact-SHA Preview validation and preserve historical Access root-cause caveat."
+    "syncPurpose": "Synchronize the exact-SHA Vietnamese activity-label fix, passing CI #39925598976, passing Preview #39925598940, artifact admin-preview-evidence-401 #12489985219, and unconfirmed historical Cloudflare Access root cause."
   },
-  "currentHeadAtCheckpoint": "3f1b9f28d3f4b92600d752ab3de173c81940e0b0",
-  "currentHeadValidation": "SCREEN_12_MOBILE_LABEL_FIX_AND_E2E_PASS_ON_EXACT_SHA_fa6937fea1a269a6b40de0e7f136ab969bd70a14; PREVIEW RUN 39914870835 SUCCESS; CURRENT BRANCH HEAD IS EVIDENCE-ONLY CHILD",
-  "currentHeadValidationReason": "The Preview workflow ran repository checks, npm run check, npm test and the responsive/theme fixture matrix on the exact source/test SHA. Its deployed diagnostic checks only the login CSS signature, not authenticated module persistence.",
+  "currentHeadAtCheckpoint": "79554d75556664527ca41cf9bd6d334429b41305",
+  "currentHeadValidation": "VIETNAMESE_AUDIT_ACTOR_LABEL_PASS_ON_EXACT_SHA_3290febb0e894e02988f2e9987d4ecb0c0ad6924; CI 39925598976 SUCCESS; PREVIEW 39925598940 SUCCESS; BRANCH HEAD AT CHECKPOINT START IS EVIDENCE-ONLY CHILD 79554d75556664527ca41cf9bd6d334429b41305",
+  "currentHeadValidationReason": "CI and Preview both completed successfully on exact source/test SHA 3290febb0e894e02988f2e9987d4ecb0c0ad6924. Preview artifact admin-preview-evidence-401 confirms the localized label in mobile screenshots and 112 fixture metrics; local UI-only fixture and deployed diagnostic PASS_LOGIN_CSS_SIGNATURE only. Branch HEAD 79554d75556664527ca41cf9bd6d334429b41305 is an evidence-only child created after the tested source commit; the handoff-sync commit itself is not independently source-tested.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T08:10:45Z",
-    "headAtStart": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
-    "codeTestSha": "8cfe44b896eefbf6f5fb0365fa51c78b2b6f5ba7",
-    "validateRunId": null,
-    "validateRunUrl": null,
-    "validateConclusion": "No separate Validate workflow run on this exact SHA; repository checks and npm test passed in Preview workflow #39922500963.",
-    "previewRunId": 39922500963,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963",
+    "capturedAtUtc": "2026-10-23T08:44:17Z",
+    "headAtStart": "79554d75556664527ca41cf9bd6d334429b41305",
+    "codeTestSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "validateRunId": 39925598976,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598976",
+    "validateConclusion": "success",
+    "previewRunId": 39925598940,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
     "previewConclusion": "success",
-    "previewArtifact": "admin-preview-evidence-390",
-    "previewArtifactId": 12488445570,
-    "previewArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39922500963/artifacts/12488445570",
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "accessRootCause": "UNCONFIRMED; historical failure not reproduced",
+    "previewArtifact": "admin-preview-evidence-401",
+    "previewArtifactId": 12489985219,
+    "previewArtifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
+    "screenshotCount": 132,
+    "uiFixturePngCount": 120,
+    "uiFixtureMetricCount": 112,
+    "artifactSha256": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4",
+    "fixturePageErrors": 0,
+    "fixtureApiErrors": 0,
+    "expectedSimulated503ConsoleEntries": 7,
+    "attemptedWrites": 0,
+    "unexpectedApiPaths": 0,
+    "accessRootCause": "UNCONFIRMED; historical failure not reproduced with matching event evidence",
     "allScreens": "PARTIAL_NOT_ACCEPTED",
     "authenticatedBackendQA": "NOT_TESTED",
     "remoteD1SchemaLedger": "NOT_VERIFIED",
@@ -437,22 +448,22 @@
     "production": "NOT_PERFORMED",
     "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
   },
-  "latestReviewFinding": "Fixed false-success diagnostic behavior: blocked Access paths now fail explicitly instead of test.skip; workflow report prioritizes BLOCKED_CLOUDFLARE_ACCESS; regression guards added. Preview #39922500963 passes and reports PASS_LOGIN_CSS_SIGNATURE, so the historical Access block was not reproduced. Root cause remains unconfirmed pending the exact failed-run logs and matching Access events.",
+  "latestReviewFinding": "Confirmed and fixed a UI localization mismatch: old artifact admin-preview-evidence-395 showed “Actor” in a Vietnamese audit table. Commit 3290febb0e894e02988f2e9987d4ecb0c0ad6924 changes it to “Người thực hiện” and updates matching tests. Exact-SHA CI/Preview passed; new artifact admin-preview-evidence-401 confirms the label. All product acceptance boundaries stay partial.",
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-  "latestCodeCommitSha": "7631f1badaf774fc35616fc21445e94af0bca027",
-  "testedCommitSha": "7631f1badaf774fc35616fc21445e94af0bca027",
-  "capturedAt": "2026-10-23T08:20:52Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39923533998",
+  "latestCodeCommitSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+  "testedCommitSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+  "capturedAt": "2026-10-23T08:44:17Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
   "checks": {
-    "playwright": "PASS_ON_7631f1b",
-    "automatedTests": "PASS_ON_7631f1b",
-    "deployedPreview": "PASS_DIAGNOSTIC_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED; HISTORICAL_ACCESS_ROOT_CAUSE_UNCONFIRMED"
+    "playwright": "PASS_ON_3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "automatedTests": "PASS_ON_3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "deployedPreview": "PASS_LOGIN_CSS_SIGNATURE_ONLY_ON_3290febb0e894e02988f2e9987d4ecb0c0ad6924; AUTHENTICATED_BACKEND_NOT_TESTED; HISTORICAL_ACCESS_ROOT_CAUSE_UNCONFIRMED"
   },
   "latestLocalEvidence": {
-    "runId": 39923533998,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39923533998",
-    "sourceCommit": "7631f1badaf774fc35616fc21445e94af0bca027",
+    "runId": 39925598940,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "localPlaywright": "PASS",
@@ -460,29 +471,44 @@
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
-    "screenshotArtifact": "admin-preview-evidence-395",
+    "screenshotArtifact": "admin-preview-evidence-401",
     "pageErrors": [],
     "consoleErrors": [],
     "failedRequests": [],
     "httpErrors": [],
+    "fixtureVisualAuditConsoleEntries": 7,
+    "fixtureVisualAuditConsoleNote": "7 expected simulated HTTP 503 retry-path entries from the local retry fixture; fixtureApiErrors=0.",
     "attemptedWrites": [],
     "unexpectedApiPaths": [],
-    "scope": "LOCAL SOURCE AND READ-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND"
+    "scope": "LOCAL SOURCE AND READ-ONLY SYNTHETIC UI-ONLY FIXTURE; NOT AUTHENTICATED REAL BACKEND",
+    "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY"
   },
   "latestScreenshotArtifact": {
-    "runId": 39923533998,
-    "name": "admin-preview-evidence-395",
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39923533998",
-    "sourceCommit": "7631f1badaf774fc35616fc21445e94af0bca027",
+    "name": "admin-preview-evidence-401",
+    "id": 12489985219,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
+    "runId": 39925598940,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940",
+    "sourceCommit": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
     "screenshotCount": 132,
     "loginShellPngCount": 16,
     "uiFixturePngCount": 120,
     "uiFixtureMetricCount": 112,
+    "sha256Digest": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4",
     "retentionDays": 14,
     "storage": "GitHub Actions artifact; raw PNGs/full metadata are not committed to the branch"
   },
   "remainingIssues": [
     "Historical BLOCKED_CLOUDFLARE_ACCESS root cause remains UNCONFIRMED; correlate exact failed-run hostname/time with Cloudflare Access events before any configuration change.",
     "Current HEAD 8e7914b7754ec4a80cde535ccee041636a256c9f is evidence-only; latest full Preview run validated parent source/test SHA 7631f1badaf774fc35616fc21445e94af0bca027."
-  ]
+  ],
+  "latestDiagnosticArtifact": {
+    "name": "admin-preview-evidence-401",
+    "id": 12489985219,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39925598940/artifacts/12489985219",
+    "runId": 39925598940,
+    "sourceSha": "3290febb0e894e02988f2e9987d4ecb0c0ad6924",
+    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ONLY",
+    "sha256Digest": "3c7d80303ed30e49769eb8cb0e456c5d5b35f276612b3b1fd20eb49af71011a4"
+  }
 }
