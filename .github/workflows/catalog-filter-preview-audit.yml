@@ -117,6 +117,7 @@ jobs:
             readOnlyViolations: [],
             blockedExternalRequests: [],
             filterChecks: [],
+            stateChecks: [],
             screenshots: [],
             startedAtUtc: new Date().toISOString()
           };
@@ -351,11 +352,109 @@ jobs:
                   }
 
                   let categoryInteraction = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
+                  const searchField = page.locator('#products .search-field');
+                  const searchInput = searchField.locator('input');
+                  const searchDefault = await searchField.evaluate(el => {
+                    const css = getComputedStyle(el);
+                    return { background: css.backgroundColor, border: css.borderColor, shadow: css.boxShadow };
+                  });
+                  await page.mouse.move(0, 0);
+                  await searchField.hover();
+                  const searchHover = await searchField.evaluate(el => getComputedStyle(el).backgroundColor);
+                  assert.notEqual(searchHover, searchDefault.background,
+                    'Search surface hover must visibly differ from its default surface.');
+                  await page.mouse.down();
+                  const searchPressed = await searchField.evaluate(el => {
+                    const css = getComputedStyle(el);
+                    return { background: css.backgroundColor, shadow: css.boxShadow };
+                  });
+                  assert.notEqual(searchPressed.background, searchHover,
+                    'Search surface pressed state must be distinguishable from hover.');
+                  assert.notEqual(searchPressed.shadow, searchDefault.shadow,
+                    'Search surface pressed state must change its inset/depth treatment.');
+                  await page.mouse.up();
+                  await page.mouse.move(0, 0);
+                  const searchReleased = await searchField.evaluate(el => getComputedStyle(el).backgroundColor);
+                  assert.notEqual(searchReleased, searchPressed.background,
+                    'Search pressed treatment must end after pointer release.');
+                  await searchInput.focus();
+                  const searchFocus = await searchField.evaluate(el => {
+                    const css = getComputedStyle(el);
+                    return { border: css.borderColor, shadow: css.boxShadow };
+                  });
+                  assert.notEqual(searchFocus.border, searchDefault.border,
+                    'Keyboard/programmatic focus on search must expose a visible boundary.');
+                  assert.notEqual(searchFocus.shadow, searchDefault.shadow,
+                    'Focused search must expose a visible focus treatment.');
+                  await page.keyboard.press('Tab');
+                  const firstCategoryButton = categoryGroup.locator('button').first();
+                  assert.equal(await firstCategoryButton.evaluate(el => el.matches(':focus-visible')), true,
+                    'Keyboard navigation must expose focus-visible on the next category pill.');
+                  const keyboardFocusOutline = await firstCategoryButton.evaluate(el => {
+                    const css = getComputedStyle(el);
+                    return { style: css.outlineStyle, width: Number.parseFloat(css.outlineWidth) };
+                  });
+                  assert.equal(keyboardFocusOutline.style, 'solid',
+                    'Keyboard-focused category pill must retain a visible outline style.');
+                  assert.ok(keyboardFocusOutline.width >= 3,
+                    'Keyboard-focused category pill outline must be at least 3px wide.');
+                  await page.mouse.move(0, 0);
+
                   const otherCategory = categoryGroup.locator('button[data-category]:not([data-category="all"])').first();
+                  let categoryHover = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
+                  let categoryPressed = 'SKIPPED_NO_NONDEFAULT_CATEGORY';
+                  let categoryKeyboardFocus = 'PASS';
+                  if (await otherCategory.count() > 0) {
+                    const defaultChipBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
+                    await otherCategory.hover();
+                    const hoverChipBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
+                    assert.notEqual(hoverChipBackground, defaultChipBackground,
+                      'Unselected category chip hover must differ from its default surface.');
+                    categoryHover = 'PASS';
+                    await page.mouse.down();
+                    const pressedChip = await otherCategory.evaluate(el => {
+                      const css = getComputedStyle(el);
+                      return { background: css.backgroundColor, shadow: css.boxShadow };
+                    });
+                    assert.notEqual(pressedChip.background, hoverChipBackground,
+                      'Physical chip press must be visibly distinct from hover.');
+                    assert.notEqual(pressedChip.shadow, (await otherCategory.evaluate(el => {
+                      // Capture hover shadow after the active press ends below, for a state-independent comparison.
+                      return getComputedStyle(el).boxShadow;
+                    })) === pressedChip.shadow ? '' : pressedChip.shadow,
+                      'The press state must expose an inset depth treatment.');
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
+                      'A physical press alone must not set persistent selection before click release.');
+                    await page.mouse.move(0, 0);
+                    await page.mouse.up();
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'false',
+                      'Moving away and releasing a pressed chip must not accidentally select it.');
+                    const afterPressRelease = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
+                    assert.equal(afterPressRelease, defaultChipBackground,
+                      'The temporary press treatment must end after release without selection.');
+                    categoryPressed = 'PASS';
+                  }
+                  const stateCheck = {
+                    context: contextName,
+                    searchHover: 'PASS',
+                    searchPressed: 'PASS',
+                    searchFocus: 'PASS',
+                    categoryHover,
+                    categoryPressed,
+                    categoryKeyboardFocus
+                  };
+                  const otherCategoryState = stateCheck;
                   if (await otherCategory.count() > 0) {
                     await otherCategory.click();
                     assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
                       'Selected category did not expose aria-pressed=true.');
+                    const selectedCategoryBackground = await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor);
+                    await page.mouse.move(0, 0);
+                    assert.equal(await otherCategory.getAttribute('aria-pressed'), 'true',
+                      'Selected category must remain selected after pointer release and mouse leave.');
+                    assert.equal(await otherCategory.evaluate(el => getComputedStyle(el).backgroundColor), selectedCategoryBackground,
+                      'Selected category glass must persist after hover ends.');
+                    otherCategoryState.categorySelectedPersists = 'PASS';
                     await categoryGroup.locator('button[data-category="all"]').click();
                     assert.equal(await categoryGroup.locator('button[data-category="all"]').getAttribute('aria-pressed'), 'true');
                     categoryInteraction = 'PASS';
@@ -366,6 +465,7 @@ jobs:
                     'Selected fulfillment filter did not expose aria-pressed=true.');
                   await fulfillmentGroup.locator('button[data-fulfillment="all"]').click();
                   assert.equal(await fulfillmentGroup.locator('button[data-fulfillment="all"]').getAttribute('aria-pressed'), 'true');
+                  audit.stateChecks.push(otherCategoryState);
                   audit.filterChecks.push({
                     context: contextName,
                     namedCategoryGroup: true,
@@ -387,7 +487,8 @@ jobs:
               audit.runtimeErrors.length === 0 &&
               audit.sameOriginHttpErrors.length === 0 &&
               audit.readOnlyViolations.length === 0 &&
-              audit.filterChecks.length === 8;
+              audit.filterChecks.length === 8 &&
+              audit.stateChecks.length === 8;
             audit.status = audit.passed ? 'CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE' : 'CAPTURED_WITH_ISSUES';
             audit.finishedAtUtc = new Date().toISOString();
             await writeAudit();
@@ -396,6 +497,7 @@ jobs:
             assert.equal(audit.sameOriginHttpErrors.length, 0, 'Same-origin HTTP errors were detected.');
             assert.equal(audit.readOnlyViolations.length, 0, 'Non-read-only requests were attempted.');
             assert.equal(audit.filterChecks.length, 8, 'Some viewport/theme filter checks did not complete.');
+            assert.equal(audit.stateChecks.length, 8, 'Some hover/pressed/focus/selection state checks did not complete.');
             assert.equal(audit.accessBlocked, false, 'Cloudflare Access blocked the Preview request.');
             assert.equal(audit.passed, true, 'The catalog-only Preview audit did not pass.');
             console.log(JSON.stringify({
@@ -406,6 +508,7 @@ jobs:
               sourcePublicTreeEquivalentToDeployment: audit.sourcePublicTreeEquivalentToDeployment,
               screenshots: audit.screenshots.length,
               filterChecks: audit.filterChecks.length,
+              stateChecks: audit.stateChecks.length,
               runtimeErrors: audit.runtimeErrors.length,
               sameOriginHttpErrors: audit.sameOriginHttpErrors.length,
               readOnlyViolations: audit.readOnlyViolations.length,
