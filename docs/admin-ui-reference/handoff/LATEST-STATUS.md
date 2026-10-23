@@ -30,3 +30,14 @@
 3. No merge, Production deployment, setup/migration/deploy script, remote D1/R2, secret or Cloudflare Access changes.
 
 Checkpoint prepared: 2026-10-22T20:28:28.277Z.
+## Kết quả kiểm thử tự động gần nhất
+
+- Tested commit: 1ec3cc72db94f07ce500d4e43830674b39a9eb03
+- Run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/39886593197
+- npm run check: PASS
+- npm test: PASS
+- Local source Playwright matrix: PASS; 102 real PNGs captured in artifact admin-preview-evidence-356 (not committed to Git).
+- Deployed Preview: success.
+- Source screenshot matrix: 102 real PNGs; login shell: 16; read-only fixture module screens: 86; fixture metrics: 78.
+- Fixture screens use synthetic/read-only data and do not prove authenticated business-data workflows; those remain NOT TESTED.
+- Production deployment: NOT PERFORMED.
