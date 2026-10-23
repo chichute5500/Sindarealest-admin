@@ -1,3 +1,13 @@
+## LATEST TASK RESULT — LEGACY FAVORITES KEY MIGRATION — 2026-10-24
+
+- COMPLETE: normalize locally stored favorites that reference a legacy SKU into the canonical product ID/slug key; remove stale entries and collapse ID/SKU duplicates so a product appears once and its heart state matches its saved state.
+- Regression test added to `tests/storefront-accessibility-contract.test.mjs` covering legacy SKU/case-insensitive lookup, duplicates, stale keys, saved storage, and UI refresh calls.
+- Source/test SHA: `384e0b503416d9fa0395fd1d485ac522259c913a`; CI/full tests PASS [#39993582024](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993582024). Preview deploy PASS [#39993581910](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39993581910); immutable Preview https://e831f6dd.sindarealest2.pages.dev/.
+- Deploy log confirms the correct Pages project and keeps Production branch `main`; `--commit-hash=$GITHUB_SHA` was supplied for the exact workflow SHA. No browser/visual acceptance was run.
+- Continue source-first audit in unlocked storefront areas with owner locks and Preview-only rules intact. Do not conflate docs-only HEAD with deployed source SHA.
+
+---
+
 ## LATEST TASK UPDATE — WARRANTY CLAIM ACCESSIBILITY FIX — 2026-10-23 23:31 ICT
 
 - Fixed keyboard focus after dynamically revealing the warranty claim form: the newly opened form now focuses its first required field (`#claimIssueType`) using `focus({preventScroll:true})` after scrolling it into view.
