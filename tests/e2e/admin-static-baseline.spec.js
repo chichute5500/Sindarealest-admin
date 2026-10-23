@@ -1602,8 +1602,35 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           expect(narrowLayout.grid.right, 'Gallery grid should not escape the editor right edge').toBeLessThanOrEqual(narrowLayout.dialog.right + 1);
           expect(narrowLayout.rail.right, 'Thumbnail rail container should stay inside the gallery grid').toBeLessThanOrEqual(narrowLayout.grid.right + 1);
           expect(narrowLayout.railOverflowX, 'Only the thumbnail rail should scroll horizontally').toBe('auto');
-          expect(narrowLayout.railScrollWidth,
-            'At ' + narrowViewport.width + 'px all fixture thumbnails should remain horizontally reachable').toBeGreaterThan(narrowLayout.railClientWidth + 10);
+          // At 320px the five thumbnail cells overflow and must scroll to expose the final item.
+          // At 360px the same compact cells can fit entirely; don't require artificial overflow.
+          const thumbnailReachability = await page.locator('#imageGrid .image-rail').evaluate(el => {
+            const items = [...el.querySelectorAll('.imageitem')];
+            if (!items.length) throw new Error('Thumbnail rail has no images');
+            const railRect = el.getBoundingClientRect();
+            const canScroll = el.scrollWidth > el.clientWidth + 1;
+            if (canScroll) el.scrollLeft = el.scrollWidth;
+            const lastRect = items[items.length - 1].getBoundingClientRect();
+            return {
+              canScroll,
+              scrollLeft: el.scrollLeft,
+              lastItemReachable: lastRect.left >= railRect.left - 1 && lastRect.right <= railRect.right + 1,
+              allItemsFit: items.every(item => {
+                const rect = item.getBoundingClientRect();
+                return rect.left >= railRect.left - 1 && rect.right <= railRect.right + 1;
+              })
+            };
+          });
+          if (thumbnailReachability.canScroll) {
+            expect(thumbnailReachability.scrollLeft,
+              'Overflowing thumbnail rail should scroll horizontally').toBeGreaterThan(0);
+            expect(thumbnailReachability.lastItemReachable,
+              'The last thumbnail must be reachable after scrolling the rail').toBe(true);
+          } else {
+            expect(thumbnailReachability.allItemsFit,
+              'When the thumbnail strip fits, every thumbnail must be visible inside the rail').toBe(true);
+          }
+          await page.locator('#imageGrid .image-rail').evaluate(el => { el.scrollLeft = 0; });
           if (narrowViewport.width <= 360) {
             const footerActions = await page.evaluate(() => ['#deleteProduct', '#editorCancel', '#saveProduct'].map(selector => {
               const element = document.querySelector(selector);
