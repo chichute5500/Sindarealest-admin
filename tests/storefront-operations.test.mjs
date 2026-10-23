@@ -26,6 +26,8 @@ assert.ok(storefrontHtml.includes("function visibleSku(p){return p&&p.skuVerifie
 assert.ok(storefrontHtml.includes('<input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU"'), 'Catalog search input must have an explicit accessible name independent of its placeholder.');
 assert.ok(storefrontHtml.includes("n===page?'aria-current=\"page\"':''"), "The currently selected catalog page must expose aria-current=\"page\" to assistive technology.");
 assert.ok(storefrontHtml.includes("<nav class=\"pagination\" id=\"pagination\" aria-label=\"Phân trang sản phẩm\"></nav>"), "Product pagination must be a named navigation landmark.");
+assert.ok(storefrontHtml.includes('id="categoryFilters" role="group" aria-label="Lọc theo danh mục"'), "Catalog category filters must be a named group in the accessibility tree.");
+assert.ok(storefrontHtml.includes('id="fulfillmentFilters" role="group" aria-label="Lọc theo tình trạng sản phẩm"'), "Catalog fulfillment filters must be a named group in the accessibility tree.");
 assert.ok(storefrontHtml.includes("#order .section-head .section-note{width:min(440px,48vw);max-width:100%;min-width:0;white-space:normal;overflow-wrap:break-word}"), "The order-section summary must wrap within the available heading width rather than clip at the right edge.");
 assert.ok(storefrontHtml.includes("Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}"), 'Storefront product cards must clearly disclose when no verified SKU is available.');
 assert.ok(storefrontHtml.includes('mã SKU chưa được cung cấp') && storefrontHtml.includes('Chọn mẫu yêu thích và ghi lại tên mẫu'), 'Zalo/order guidance must use product names and disclose missing SKU rather than inventing one.');
