@@ -75,7 +75,7 @@ jobs:
             { name: 'desktop-1440', width: 1440, height: 900 }
           ];
           const themes = ['light', 'dark'];
-          const targetSelector = '#order';
+          const targetSelector = 'section.section.wrap#order';
           let previewUrl;
           try { previewUrl = new URL(String(process.env.PREVIEW_URL || '')); }
           catch { throw new Error('The configured Preview URL is invalid; capture refused.'); }
@@ -112,6 +112,7 @@ jobs:
             accessBlocked: false,
             accessServiceTokenConfigured: false,
             screenshotTarget: targetSelector,
+            requiredVisibleState: '#orderDetailsPanel:not([hidden]) with exactly four .order-step cards',
             runtimeErrors: [],
             sameOriginHttpErrors: [],
             readOnlyViolations: [],
@@ -321,6 +322,16 @@ jobs:
                   await page.waitForTimeout(350);
                   const order = page.locator(targetSelector).first();
                   await order.waitFor({ state: 'visible', timeout: 25000 });
+                  const toggle = page.locator('#orderDetailsToggle');
+                  await toggle.waitFor({ state: 'visible', timeout: 10000 });
+                  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+                  const detailsPanel = page.locator('#orderDetailsPanel:not([hidden])');
+                  await detailsPanel.waitFor({ state: 'visible', timeout: 15000 });
+                  const stepCards = detailsPanel.locator('.order-steps .order-step');
+                  await stepCards.first().waitFor({ state: 'visible', timeout: 15000 });
+                  const stepCount = await stepCards.count();
+                  assert.equal(stepCount, 4, 'The expanded order process must show exactly four steps before capture.');
+                  await page.waitForTimeout(350);
                   const screenshotFile = 'order-process-' + contextName + '.png';
                   await order.screenshot({
                     path: path.join(outDir, screenshotFile),
@@ -335,6 +346,7 @@ jobs:
                     width: viewport.width,
                     height: viewport.height,
                     theme,
+                    expandedProcessStepCount: 4,
                     deployedPreviewSha: audit.deployedPreviewSha
                   });
                 } catch (error) {
