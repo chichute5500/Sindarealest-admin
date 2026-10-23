@@ -182,3 +182,11 @@ Guardrails: Hero PAUSED/untouched; `#order` OWNER PASS/LOCKED/untouched; removed
 - Workflow commit `e9b35186e4273410253b4158f45105be19c7c483` corrects all three while retaining the visual thresholds.
 - Validation #39953590662 and catalog-only live audit #39953590658 are running; inspect final results and screenshots/manifest.
 - Active UI task remains OPEN. Owner says the effect differs materially from the reference. Compare real animation frames with `docs/design-reference/liquid-glass-product-filters.png` at 360/390 mobile, 768 tablet and 1440 desktop in Light/Dark, including mouse, touch, keyboard, reselection and reduced motion. Technical PASS alone does not complete the task.
+
+## Latest category Liquid Glass correction — 2026-10-23 12:30 UTC
+
+- Audit #39953590658 failed because its `box-shadow`-changes-between-frames assertion was brittle: computed shadow was identical at the sampled frames. This is not a valid visual PASS.
+- UI improvement in `public/index.html`, commit `7013ee6c9b4fe8a3247b0f2b7a7305ef7e044824`: Light/Dark activation keyframes now sweep the specular reflection through the spring settle instead of freezing it at the peak.
+- Workflow commit `1311be92c3a97931e09ee36bdc7b95c2f8e25269` deterministically samples 205ms and asserts background-position movement, preserving the spring scale threshold.
+- Validation #39954296929 and catalog audit #39954296537 are pending. Also check the deploy and earlier runs triggered by the CSS commit; verify exact deployed source/public tree before inspecting screenshots.
+- Still OPEN until actual frames are compared against `docs/design-reference/liquid-glass-product-filters.png` across 360/390 mobile, 768 tablet, 1440 desktop and Light/Dark. Do not ask owner to inspect until valid evidence is ready.
