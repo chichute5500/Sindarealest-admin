@@ -832,6 +832,8 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   #main:has(.website-settings) > .pagehead .eyebrow,
   #main:has(.website-settings) > .pagehead p{display:none}
   #main:has(.website-settings) > .pagehead h2{font-size:23px;margin:0}
+  /* The reference screen shows the public-price toggle state through the switch itself. */
+  .website-settings > section:first-child .switchrow .tiny.muted{display:none}
   .website-settings .switchrow{gap:8px}
   .website-settings .switchrow b{font-size:11px}
   .website-settings .switch{width:44px;height:26px}
