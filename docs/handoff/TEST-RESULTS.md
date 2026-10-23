@@ -97,3 +97,14 @@ Read-only static review of current `public/index.html` (blob `d54ed03b0f40e70d02
 - Guard verification run #39890961242 SKIPPED as intended at `0f7151a`. Earlier run #39890856540 at `8b576e0` was cancelled; job records show local fixture capture cancelled and live capture/deployment verification skipped. There is no evidence it completed a 128-image live capture.
 - Exact-SHA live non-Hero screenshots and owner visual acceptance remain PENDING. The previous browser route showed Cloudflare Access sign-in; use authorized access only. Local fixture screenshots are not live Preview evidence.
 - Hero remains PAUSED BY OWNER. No Hero markup/CSS/assets were edited; do not restore `hero-sd-gl052.png` or run comprehensive capture while paused. No merge or Production deployment occurred.
+
+
+## Verified non-Hero order-section live capture — 2026-10-23
+- Branch HEAD at capture: `cb8901b7218964e0609b5048a9ea28bfb52c42f7`; PR #108 remained OPEN and unmerged.
+- Source/test CI PASS on that exact SHA: [run #39894447637](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447637).
+- Isolated live order-section capture succeeded: [run #39894447648](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447648); commit status `non-hero-order-live-preview-capture: success`.
+- Cloudflare Pages read-only metadata verified the alias `https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/` resolves to Preview deployment `148c3208-1b1d-4182-81ba-0058ec7e0c0f`, deployed SHA `cb8901b7218964e0609b5048a9ea28bfb52c42f7`, branch `fix/liquid-glass-audit-2026-10-19`, successful deploy stage. Exact source SHA match: true.
+- Artifact: [8 live order-section screenshots and manifest](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39894447648/artifacts/12476071825) — mobile 360/390, tablet 768, desktop 1440; Light/Dark; element-only selector `section.section.wrap#order`. Exactly four expanded process cards. No Hero capture.
+- Manifest: `captureCompleted: true`, `CAPTURED_AWAITING_OWNER_VISUAL_ACCEPTANCE`, zero runtime errors, zero same-origin HTTP errors, zero read-only violations, no Access block. Cloudflare Insights requests were blocked by the external-read allowlist and are recorded as blocked external requests.
+- Owner visual acceptance remains **PENDING**. Capture success is not visual acceptance/PASS; owner review is required before this section can be marked PASS/LOCKED.
+- Earlier run #39894291884 failed before capture due a selector assertion mismatch (`section.section.wrap#order` versus `#order`); commit `cb8901b` corrected the assertion, and run #39894447648 succeeded.
