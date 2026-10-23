@@ -17,7 +17,7 @@
 B1 scope/provenance review is complete. The current diff is 396 files; the two additions after the last census are generated compact Preview evidence (`report.md`, `preview-diagnostics.json`). Current path census: docs 342, functions 24, migrations 2, Admin HTML 1, scripts 4, tests 19, workflow 1, seed data 1, root 2. History has 163 SHA-keyed directories and 330 compact text/JSON evidence files plus README. No further deletion or API consolidation is justified without newly discovered consumer/provenance evidence.
 
 ## Continue real work
-1. Continue the remaining screen acceptance audit using artifact 367 and the approved reference where direct inspection is possible; fix only reproducible defects.
+1. Continue the remaining screen acceptance audit using artifact admin-preview-evidence-374 (run 39906240167) and the approved reference where direct inspection is possible; fix only reproducible defects.
 2. Authenticated business/backend QA remains `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Fixture tests do not count as backend evidence.
 3. Obtain authorized Preview access before authenticated QA; never bypass Access or change secrets. Migration 0009, PRE/PRO, product-image/R2 and AI image grouping remain deferred by owner.
 4. Do not make metadata-only commits to chase the evidence child SHA; fetch live refs at the start of the next chat.
