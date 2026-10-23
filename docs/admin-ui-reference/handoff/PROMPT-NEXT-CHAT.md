@@ -2,13 +2,13 @@
 
 ## Latest verified checkpoint — 2026-10-24 ICT
 
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA: `43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3`; Validate #40014439171 PASS, Admin Preview #40014439083 PASS, artifact [admin-preview-evidence-464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083/artifacts/12528367116) inspected.
-- Screen 10 mobile welcome-copy height regression was measured at 76.375px on test-only SHA `4dadbccce7a15620baaafbf7e996ef4976a312a3`; regression assertion was added first, then the mobile textarea was set to 52px. Exact-SHA test matrix passed. Screen 10 remains `PARTIAL_NOT_ACCEPTED` because exact reference parity and real settings persistence are not proven.
-- Preview target is the isolated Cloudflare Pages project `sindarealest-admin-preview`, not `sindarealest2`. Its deployed diagnostic checks only the login CSS signature; fixture screenshots are synthetic and block all non-GET requests.
-- PR #111 and #108 remain OPEN/unmerged. Their reported base SHA is `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; live `main` SHA is `227622d3e3b7c75724ffa1775b193da71089269a`. Do not rebase/merge either PR or alter `main`, storefront or shared Cloudflare settings.
+- Writable branch `feature/admin-isolated-handoff-2026-10-20`; last verified source/test SHA `7a57dfa634151ece49d3eb7cb7b2f31cf8f19628`. Validate #40018955519 PASS and Preview #40018955530 SUCCESS on the same SHA; [artifact 467](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955530/artifacts/12529347836) inspected.
+- Screen 12 320×640 first-card visibility was test-first. It failed at bottom 778px versus nav top 564px; the heading-only CSS attempt still measured 723px. The filter-stack compaction at `7a57dfa634151ece49d3eb7cb7b2f31cf8f19628` now passes and shows multiple records above navigation.
+- Artifact: 132 screenshot PNGs plus reference PNG, 120 fixture capture entries, 116 distinct module screenshots and 112 metrics. All fixtures are read-only; remote diagnostic is only `PASS_LOGIN_CSS_SIGNATURE`.
+- PR #111 OPEN/unmerged; PR #108 OPEN/unmerged/read-only. Live `main` `227622d3e3b7c75724ffa1775b193da71089269a`; both PRs still report base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`. Do not merge/rebase or change main, storefront or shared Cloudflare settings.
 - All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
-Continue the project directly on GitHub. Do not ask the user to paste history or repeat the prompt. Read this handoff and then verify live state first.
+Continue directly on GitHub; refresh live state before the next action. Do not ask the user to repeat this history.
 
 ## Quy tắc vận hành bắt buộc — PHẢI GIỮ NGUYÊN
 
@@ -23,12 +23,12 @@ Continue the project directly on GitHub. Do not ask the user to paste history or
 
 ## First execution steps — current checkpoint supersedes historical run IDs
 
-1. Fetch live HEAD, PR #111/#108, live `main`, and newest Actions runs before doing anything.
-2. Treat source/test SHA `43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3` as the exact verified app-code point: Validate #40014439171 and Preview #40014439083 passed on it. The docs-only handoff commit that follows may move HEAD; it is not another source test SHA.
-3. Use artifact [admin-preview-evidence-464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083/artifacts/12528367116) for the Screen 10 fix. The mobile welcome-copy textarea is fixed to 52px and the `<=56px` regression assertion passes. Do not repeat this fix absent new evidence.
-4. Continue reference-driven review of the next screen with a concrete, reproducible UI mismatch; add regression coverage before source edits. Read exact logs on failures and distinguish app/test failures from the exact-HEAD guard.
-5. Keep the seven operating rules below and all isolation boundaries. Never seed/import, perform business writes, run migrations, deploy Production, bypass Access, change secrets/shared Cloudflare variables, or write to `main`/PR #108/storefront.
-6. Keep all 12 screens partial until evidence supports acceptance; do not infer backend QA from fixture captures. Sync all six handoff files after the next meaningful verified checkpoint.
+1. Refresh branch HEAD, PR #111/#108, live `main`, and newest Actions before new work. Source/test SHA `7a57dfa634151ece49d3eb7cb7b2f31cf8f19628` passed exact-SHA checks; a docs-only handoff child may move HEAD afterward.
+2. Treat Validate #40018955519 and Preview #40018955530 as PASS/SUCCESS for exact SHA `7a57dfa634151ece49d3eb7cb7b2f31cf8f19628`; inspect artifact [admin-preview-evidence-467](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955530/artifacts/12529347836). Preview diagnostic is login CSS signature only.
+3. Do not repeat Screen 12's narrow-mobile fix or Screen 10 compact-copy fix absent contrary evidence.
+4. Add a regression assertion that the Screen 9 warranty screenshot has no stale toast. Verify it fails on current harness, then reset only the synthetic toast state after toast-position testing. Rerun Validate + Preview on exact SHA and inspect the new artifact.
+5. Preserve all seven operating rules below and all isolation boundaries. Never seed/import, perform business writes, run migrations, deploy Production, bypass Access, change shared secrets/Cloudflare variables, or write to main/PR #108/storefront.
+6. Keep all 12 screens partial until evidence supports acceptance. Sync all six handoff files after the next meaningful verified checkpoint.
 
 ## Acceptance status
 
