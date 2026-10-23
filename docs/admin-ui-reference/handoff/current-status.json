@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T12:43:35Z",
+  "capturedAtUtc": "2026-10-23T13:02:11Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
@@ -27,7 +27,7 @@
       "mergeable": false,
       "branch": "fix/liquid-glass-audit-2026-10-19",
       "base": "main",
-      "headSha": "17e668a3091de609acac7b4cf2e5bec60bcb2617",
+      "headSha": "8fd2fd52c0657c533e4d0f9213319cedca8e4d55",
       "changedFiles": 291,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "writeAllowed": false,
@@ -440,7 +440,7 @@
     "pr111": "OPEN",
     "pr108": "OPEN"
   },
-  "latestReviewFinding": "Artifact 423 screen 4/5/7 captures and fixture metrics were checked against the approved mobile reference. Existing narrow-mobile SKU placeholder fix is visible; Gallery rail and Order Detail remain fixture-only. No additional reproducible source defect confirmed, so no speculative code patch was made. Latest verification: Validate #39953114181 + Preview #39953114180 PASS on 7f5df6b; artifact 423 inspected; no new reproducible UI defect. Read-only PR #108 head was refreshed from live GitHub metadata before handoff completion.",
+  "latestReviewFinding": "Artifact 423 screen 4/5/7 captures and fixture metrics were checked against the approved mobile reference. Existing narrow-mobile SKU placeholder fix is visible; Gallery rail and Order Detail remain fixture-only. No additional reproducible source defect confirmed, so no speculative code patch was made. Latest verification: Validate #39953114181 + Preview #39953114180 PASS on 7f5df6b; artifact 423 inspected; no new reproducible UI defect. Read-only PR #108 head was refreshed from live GitHub metadata before handoff completion. PR #108 read-only head snapshot refreshed at handoff verification.",
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
   "latestCodeCommitSha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",

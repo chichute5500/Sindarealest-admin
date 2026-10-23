@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-23T12:43:35Z",
+  "capturedAtUtc": "2026-10-23T13:02:11Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
@@ -349,7 +349,7 @@
     "pr108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "17e668a3091de609acac7b4cf2e5bec60bcb2617",
+      "headSha": "8fd2fd52c0657c533e4d0f9213319cedca8e4d55",
       "readOnly": true,
       "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
@@ -481,5 +481,6 @@
     "summary": "Changed the long commercial-SKU placeholder to 'SKU chính thức' so it fits the 320px mobile field more cleanly; added Playwright assertion. Validate and Preview passed on exact SHA; artifact 421 confirms screenshot."
   },
   "currentHeadAtCheckpoint": "4d44e397d892a3e3d4ec1d8a2ee75903a4a52e19",
-  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180"
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39953114180",
+  "latestReviewFinding": " PR #108 read-only head snapshot refreshed at handoff verification."
 }
