@@ -1,5 +1,13 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
+## Latest verified checkpoint — 2026-10-24 ICT
+
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA: `43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3`; Validate #40014439171 PASS, Admin Preview #40014439083 PASS, artifact [admin-preview-evidence-464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083/artifacts/12528367116) inspected.
+- Screen 10 mobile welcome-copy height regression was measured at 76.375px on test-only SHA `4dadbccce7a15620baaafbf7e996ef4976a312a3`; regression assertion was added first, then the mobile textarea was set to 52px. Exact-SHA test matrix passed. Screen 10 remains `PARTIAL_NOT_ACCEPTED` because exact reference parity and real settings persistence are not proven.
+- Preview target is the isolated Cloudflare Pages project `sindarealest-admin-preview`, not `sindarealest2`. Its deployed diagnostic checks only the login CSS signature; fixture screenshots are synthetic and block all non-GET requests.
+- PR #111 and #108 remain OPEN/unmerged. Their reported base SHA is `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; live `main` SHA is `227622d3e3b7c75724ffa1775b193da71089269a`. Do not rebase/merge either PR or alter `main`, storefront or shared Cloudflare settings.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact parity `NOT_VERIFIED`; authenticated backend QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+
 Continue the project directly on GitHub. Do not ask the user to paste history or repeat the prompt. Read this handoff and then verify live state first.
 
 ## Quy tắc vận hành bắt buộc — PHẢI GIỮ NGUYÊN
@@ -13,24 +21,14 @@ Continue the project directly on GitHub. Do not ask the user to paste history or
 7. **Tuân thủ ranh giới an toàn/cô lập.** Không deploy Production, không ghi dữ liệu nghiệp vụ, không chạy seed/import, không in/tiết lộ secret; không sửa `main`, storefront hoặc shared Cloudflare project/variables; không merge PR #111/#108/#112, không force-push, không bypass Cloudflare Access. Chỉ thao tác trên nhánh Admin được cho phép.
 
 
-## First execution steps
+## First execution steps — current checkpoint supersedes historical run IDs
 
-1. Fetch current HEAD for `feature/admin-isolated-handoff-2026-10-20`, PR #111 and #108 state, and latest Actions runs. Treat the live SHA as authoritative.
-2. Check Preview diagnostic run [#40010281144](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281144) (source SHA at handoff: `3341bc3d89652fc753a826d082c0a5e5bdf3db80`) to completion. Confirm exact `head_sha`, inspect jobs/logs and the artifact. Validate run [#40010281084](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281084) passed on that exact SHA.
-3. Inspect Screen 10 screenshots against `docs/admin-ui-reference/admin-mobile-reference.png`, especially 390×844 light, and confirm price-setting copy/state, compact card layout, and watermark control reachability above the fixed mobile nav.
-4. If a test fails, read its exact log. Reproduce the concrete defect and add regression coverage **before** changing source. Do not make another speculative CSS/test edit.
-5. If Screen 10 is accepted by evidence, proceed to the next screen with a reproducible mismatch. Continue independent safe work while waiting for Actions; reporting progress does not stop the work.
-6. Keep all three handoff files synchronized after the next meaningful verified checkpoint.
-
-## Checkpoint at handoff
-
-- Branch: `feature/admin-isolated-handoff-2026-10-20`
-- HEAD at sync start: `3341bc3d89652fc753a826d082c0a5e5bdf3db80`
-- Validate: [#40010281084 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281084) on exact HEAD.
-- Preview diagnostic: [#40010281144 IN_PROGRESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40010281144) at checkpoint; inspect fresh status.
-- PR #111 OPEN/unmerged, `mergeable=false`, 489 changed files; base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- Screen 10 work touched `public/admin/index.html`, `tests/e2e/admin-static-baseline.spec.js`, and `tests/admin-upgrade.test.mjs`. Latest commit `3341bc3d89652fc753a826d082c0a5e5bdf3db80`. UI changes target reference-aligned headings/copy and a mobile-only `.website-settings` compact layout. Preview evidence still needs inspection.
-- Do not repeat the B1 cleanup, do not merge PRs, do not deploy Production, and do not infer live backend acceptance from fixture screenshots.
+1. Fetch live HEAD, PR #111/#108, live `main`, and newest Actions runs before doing anything.
+2. Treat source/test SHA `43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3` as the exact verified app-code point: Validate #40014439171 and Preview #40014439083 passed on it. The docs-only handoff commit that follows may move HEAD; it is not another source test SHA.
+3. Use artifact [admin-preview-evidence-464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083/artifacts/12528367116) for the Screen 10 fix. The mobile welcome-copy textarea is fixed to 52px and the `<=56px` regression assertion passes. Do not repeat this fix absent new evidence.
+4. Continue reference-driven review of the next screen with a concrete, reproducible UI mismatch; add regression coverage before source edits. Read exact logs on failures and distinguish app/test failures from the exact-HEAD guard.
+5. Keep the seven operating rules below and all isolation boundaries. Never seed/import, perform business writes, run migrations, deploy Production, bypass Access, change secrets/shared Cloudflare variables, or write to `main`/PR #108/storefront.
+6. Keep all 12 screens partial until evidence supports acceptance; do not infer backend QA from fixture captures. Sync all six handoff files after the next meaningful verified checkpoint.
 
 ## Acceptance status
 
@@ -223,12 +221,9 @@ B1 scope/provenance review is complete. The current diff is 396 files; the two a
 Continue from live branch `feature/admin-isolated-handoff-2026-10-20`, not from a SHA copied from old messages. First fetch current branch HEAD, PR #111/#108, and latest Actions. At checkpoint time HEAD was `d763f0fe6742848d42626176627bf8edb20e9bfe`; tested SHA `19202ac0b351ab6623047c057a5c1af41f97cefe`; Validate #39952239465 and Preview #39952239467 both PASS; artifact admin-preview-evidence-422 ID 12500722416. Inspect its screenshots against `docs/admin-ui-reference/admin-mobile-reference.png`, prioritizing Screens 4/5 and 7 at matching viewport/theme. Fix only confirmed ADMIN-specific mismatches, add assertions, verify exact tested SHA, inspect artifact, then update all six handoff/audit files. Do not ask the owner to restate context or ask permission to continue routine work. Never claim complete until screen evidence supports it. All acceptance boundaries and hard restrictions in the checkpoint remain in force.
 
 
-## Immediate continuation checkpoint — 2026-10-24 ICT
+## Immediate continuation checkpoint — 2026-10-24 ICT — latest exact-SHA result
 
-1. Re-fetch live branch HEAD, PR #111/#108 and Actions before doing anything; handoff SHA `74268971ddf4bfe06827974b9efb5def12e60665` is a checkpoint, not a substitute for live verification.
-2. Validate #40012438226 is PASS on that exact SHA. Preview #40012438208 was IN_PROGRESS at handoff and last observed installing Chromium; inspect fresh status/jobs/logs/artifacts. Do not assume success or stop after reporting.
-3. Concurrency fix is already committed: `.github/workflows/admin-preview-diagnostics.yml` groups by branch plus SHA. Do not repeat this fix unless fresh evidence disproves it.
-4. A mobile greeting-heading UI fix plus regression assertion is included in the current tested SHA; verify the actual diff and screenshots before claiming acceptance. Compare Screen 10 and that heading with the approved reference at matching viewport/theme.
-5. User has confirmed catalog products are visible. Do not repeat the “0 products” investigation or seed/import. Keep all 12 screens PARTIAL_NOT_ACCEPTED until evidence supports acceptance.
-6. Synchronize exactly these six files after the next meaningful verified checkpoint: `START-HERE.md`, `PROMPT-NEXT-CHAT.md`, `LATEST-STATUS.md`, `current-status.json`, `latest-test-results.json`, `12-SCREEN-REFERENCE-AUDIT.md`.
-7. Preserve the seven mandatory operational rules and all safety boundaries in this prompt. No merge, production deploy, Access bypass, secret/shared Cloudflare changes, remote D1/R2/schema/ledger writes, migrations, seed/import, or business writes.
+1. Refresh live HEAD/PR/Actions; do not repeat Screen 10 textarea or concurrency fixes.
+2. Latest verified source/test SHA `43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3`: Validate #40014439171 SUCCESS; isolated Admin Preview #40014439083 SUCCESS; artifact [admin-preview-evidence-464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40014439083/artifacts/12528367116) inspected.
+3. Project is `sindarealest-admin-preview`, not `sindarealest2`. Keep PRs open/unmerged and preserve all safety rules.
+4. Continue the next concrete UI audit item. All 12 screens remain partial; authenticated business QA and exact reference parity remain unverified.
