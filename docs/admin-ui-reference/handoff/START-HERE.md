@@ -1,5 +1,7 @@
 # LIVE HANDOFF UPDATE — 2026-10-24 09:30 UTC
 
+**Handoff SHA semantics:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` was the live branch HEAD at the start of this documentation sync. The handoff-only commits made afterward change documentation/status snapshots only; they do not change source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`. Always fetch the live PR head before starting the next action; never treat the checkpoint-start SHA as the current live HEAD.
+
 **Live branch HEAD:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` (documentation-only commit updating `current-status.json`).  
 **Latest source/test SHA:** `cf340b686e0974ac5602b6ef4594c00e477c8932` (order cancellation race guard).  
 **PR #111:** OPEN, unmerged; do not merge/rebase.  
