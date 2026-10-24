@@ -15,7 +15,7 @@ const rid=String(process.env.GITHUB_RUN_ID||'');
 if(!/^\d{8,16}$/.test(rid)||!account||!token||process.env.GITHUB_REF!=='refs/heads/feature/admin-isolated-handoff-2026-10-20')
  throw new Error('Unsafe QA environment; no database operations performed');
 const tag='qa_'+rid;
-const rec=Object.fromEntries(['product','customer','order','item','warranty','claim','audit'].map(v=>[v,tag+'_'+v]));
+const rec=Object.fromEntries(['product','customer','order','item','warranty','claim','audit','issueItem'].map(v=>[v,tag+'_'+v]));
 const sku='QA-'+rid,code='QA-WARRANTY-'+rid,orderNo='QA-ORDER-'+rid;
 const folder=join(process.cwd(),'artifacts','admin-12-screen-live',(process.env.GITHUB_SHA||'unknown').slice(0,12));
 mkdirSync(folder,{recursive:true});
@@ -81,6 +81,16 @@ async function seed(db){
 }
 async function cleanup(db){
  let failures=[];
+ // A new warranty is generated only for the extra run-owned order item; delete
+ // its audit trail first, then the generated warranty, then the item. No broad DELETE.
+ try {
+   const issued=await sql(db,'SELECT id FROM warranties WHERE order_item_id=?',[rec.issueItem]);
+   for(const warranty of issued){
+     await sql(db,"DELETE FROM audit_logs WHERE entity_id=? AND actor='admin' AND action='warranty_issued'",[warranty.id]);
+     await sql(db,'DELETE FROM warranties WHERE id=? AND order_item_id=?',[warranty.id,rec.issueItem]);
+   }
+   await sql(db,'DELETE FROM order_items WHERE id=? AND order_id=?',[rec.issueItem,rec.order]);
+ } catch(e) { failures.push({table:'warranty_issuance_qa_only',error:e.message}) }
  // Delete exclusively run-owned IDs, in foreign-key-safe dependency order.
  const order=['warranty_claims','warranties','order_items','orders','customers','products','audit_logs'];
  for(const table of order){
@@ -97,6 +107,14 @@ async function cleanup(db){
    if(n!==0)failures.push({table,error:'remaining QA rows '+n});
   }catch(e){failures.push({table,error:e.message})}
  }
+ try {
+   const issued=await sql(db,'SELECT COUNT(1) AS n FROM warranties WHERE order_item_id=?',[rec.issueItem]);
+   const issueItem=await sql(db,'SELECT COUNT(1) AS n FROM order_items WHERE id=?',[rec.issueItem]);
+   journal.records.warranty_issue_item=Number(issueItem[0]?.n)===0?'REMOVED':'LEFTOVER';
+   journal.records.warranty_issued_by_qa=Number(issued[0]?.n)===0?'REMOVED':'LEFTOVER';
+   if(Number(issueItem[0]?.n)!==0||Number(issued[0]?.n)!==0)
+     failures.push({table:'warranty_issuance_qa_only',error:'Remaining QA issuance rows'});
+ }catch(e){failures.push({table:'warranty_issuance_qa_only',error:e.message})}
  journal.cleanupVerified=failures.length===0;journal.cleanedAtUtc=new Date().toISOString();journal.failures=failures;save();
  if(failures.length)throw Error('QA cleanup incomplete: '+JSON.stringify(failures));
  console.log('[QA_CLEANUP] Verified zero remaining run-owned synthetic records in all seven tables.');
@@ -149,6 +167,32 @@ async function main(){
    journal.orderApiPriceTermsVerified=true;
    journal.orderD1ReadbackVerified=true;
    journal.orderAuditVerified=true;
+   save();
+   // Insert a second, run-owned item only AFTER order pricing QA has read back the
+   // original one-item order, so it cannot alter that test or real orders.
+   const skuIssue='QA-ISSUE-'+rid;
+   if((await count(db,'order_items',rec.issueItem))!==0)
+     throw Error('Run-owned warranty issuance item already exists');
+   await sql(db,'INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)',[
+     rec.issueItem,rec.order,rec.product,skuIssue,'0','QA TEST - WARRANTY ISSUANCE ONLY','1','0','0','in_stock'
+   ]);
+   if((await count(db,'order_items',rec.issueItem))!==1)
+     throw Error('Run-owned warranty issuance item insert failed');
+   journal.records.warranty_issue_item='SEEDED';save();
+   const issueQa=spawnSync('npx',['playwright','test','tests/e2e/admin-qa-warranty-issuance.spec.js','--workers=1','--reporter=line'],{
+     stdio:'inherit',env:{...process.env,QA_TEST_ORDER_ID:rec.order,QA_TEST_ORDER_NUMBER:orderNo,
+       QA_TEST_WARRANTY_SKU:skuIssue,QA_TEST_ISSUE_ITEM_ID:rec.issueItem},timeout:180000});
+   if(issueQa.error||issueQa.status!==0)
+     throw Error('Run-owned warranty issue GET/POST duplicate/date QA failed; cleaning fixtures');
+   const warranties=await sql(db,'SELECT id,warranty_code,status,starts_at,ends_at FROM warranties WHERE order_item_id=?',[rec.issueItem]);
+   if(warranties.length!==1||!/^SDW-[A-Z0-9]{24}$/.test(warranties[0].warranty_code)||
+       warranties[0].status!=='active'||warranties[0].starts_at!=='2026-10-25'||
+       warranties[0].ends_at!=='2027-10-25')
+     throw Error('Run-owned issued warranty D1 readback failed');
+   const issueAudit=await sql(db,"SELECT COUNT(1) AS n FROM audit_logs WHERE entity_id=? AND actor='admin' AND action='warranty_issued'",[warranties[0].id]);
+   if(Number(issueAudit[0]?.n)!==1)throw Error('Run-owned warranty issued audit D1 readback failed');
+   journal.warrantyIssuedViaAdminApiVerified=true;
+   journal.warrantyIssuedD1AndAuditVerified=true;
    save();
   }catch(e){error=e;console.error('[QA_SCREEN_RESULT] '+e.message)}
   finally{try{await cleanup(db)}catch(cleanupErr){console.error('[QA_CLEANUP_ERROR] '+cleanupErr.message);error=error||cleanupErr}}
