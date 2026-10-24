@@ -28,6 +28,21 @@ assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER|warranty_ver
 const warrantyMigration = readFileSync('migrations/0006_remove_warranty_otp.sql', 'utf8');
 assert.ok(!/DROP\s+TABLE/i.test(warrantyMigration), 'Migration must not drop production tables');
 assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migration 0006 must not change production schema');
+// The isolated Admin deployment workflow must coexist with the shared Pages workflow on main.
+const isolatedAdminDeployPath = '.github/workflows/deploy-admin-isolated-preview.yml';
+assert.ok(existsSync(isolatedAdminDeployPath),
+  'The Admin isolated Preview workflow must use a distinct filename to avoid the main workflow path conflict.');
+assert.ok(!existsSync('.github/workflows/deploy-admin-feature-preview.yml'),
+  'The feature branch must not shadow main\'s shared Pages deployment workflow.');
+const isolatedAdminDeployWorkflow = readFileSync(isolatedAdminDeployPath, 'utf8');
+assert.ok(isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview'),
+  'The isolated workflow must pin the dedicated Admin Preview project.');
+assert.ok(isolatedAdminDeployWorkflow.includes('refs/heads/feature/admin-isolated-handoff-2026-10-20'),
+  'The isolated workflow must guard the exact approved branch.');
+assert.ok(isolatedAdminDeployWorkflow.includes('npx wrangler pages deploy public'),
+  'The isolated workflow must deploy only the approved public ADMIN build to the isolated Pages project.');
+assert.ok(!isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}'),
+  'The isolated workflow must not inherit the shared Pages project variable.');
 const deployReadme = readFileSync('README-DEPLOY.txt', 'utf8');
 assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && deployReadme.includes('migrations/0005_address_warranty_verification.sql') && deployReadme.includes('migrations/0006_remove_warranty_otp.sql') && deployReadme.includes('migrations/0007_order_contact_details.sql') && deployReadme.includes('migrations/0008_product_sku_verification.sql'), 'Deployment guide must match current migration sequence');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deployReadme), 'Deployment guide must not require obsolete SMS credentials');
