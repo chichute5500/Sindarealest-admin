@@ -1,5 +1,13 @@
 # LIVE HANDOFF — 2026-10-24 11:16 UTC
 
+## CHECKPOINT — 2026-10-25: WEIGHTED ACCEPTANCE + QA EVIDENCE HARDENING
+
+- New [weighted acceptance table](WEIGHTED-ACCEPTANCE.md) and [machine-readable rubric](weighted-acceptance.json): **32/100 evidence-weighted criteria have verified QA**, **68/100 not accepted**, **0/12 approved-reference visual parity signed off**. The historic `50% PROVISIONAL` remains unchanged and is NOT a computed completion percentage.
+- Test hardening: 12-screen screenshot QA no longer pins an obsolete Preview application SHA; `QA_DEPLOYED_APP_SHA` may supply a documented expectation, but screenshot tests explicitly do NOT independently verify deployed bytes. A document-level overflow now fails the QA run rather than being merely logged.
+- Baseline inspected: isolated branch `aa58800a37bd1d5347f355af60684ce9c9111cd7`, PR #111 OPEN/unmerged; existing deployment [#40122810186](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186) SUCCESS, current app SHA `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`. **Fresh CI for this new change must be checked before labeling these changes PASS.**
+- Safe scope: only feature branch tests/handoff; no `public/` or `functions/` runtime changes, no `main` or Production/secret/DNS changes, no deploy workflow. Existing synthetic QA action may run with run-owned fixtures and required cleanup; verify results before accepting.
+
+
 ## LATEST VERIFIED CHECKPOINT — 2026-10-25 (after six-photo Gallery deploy)
 
 - **LIVE GITHUB STATE VERIFIED:** writable branch `feature/admin-isolated-handoff-2026-10-20` at `b5c3e1d7bf72efafb488821674586691908f3d8d` before this documentation-only handoff commit; `main` at `227622d3e3b7c75724ffa1775b193da71089269a` (untouched). PR #111 OPEN/unmerged (513 changed files); PR #108 OPEN/read-only; PR #112 OPEN/DRAFT. The next chat MUST fetch live HEAD, PR and Actions anew because this handoff commit is a child of `b5c3e1d7bf72efafb488821674586691908f3d8d`.

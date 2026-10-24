@@ -1407,5 +1407,16 @@
   },
   "realWarrantyIssuanceQA": "PASS_ISOLATED_PREVIEW_RUN_OWNED",
   "visualDesignParity": "NOT_VERIFIED",
-  "progressMethodology": "50% is a historical provisional non-weighted marker; cannot infer percent completed from CI PASS alone."
+  "progressMethodology": "50% is a historical provisional non-weighted marker; cannot infer percent completed from CI PASS alone.",
+  "weightedAcceptance": {
+    "rubricPath": "docs/admin-ui-reference/handoff/weighted-acceptance.json",
+    "summaryPath": "docs/admin-ui-reference/handoff/WEIGHTED-ACCEPTANCE.md",
+    "evidencedWeight": 32,
+    "unacceptedWeight": 68,
+    "screensAcceptedAgainstApprovedReference": 0,
+    "basis": "EVIDENCE_WEIGHT_NOT_PROJECT_COMPLETION",
+    "verifiedAgainstCheckpoint": "aa58800a37bd1d5347f355af60684ce9c9111cd7",
+    "testHardening": "No stale hardcoded deployed Preview SHA; overflow now asserts",
+    "newChangesCiState": "PENDING_NEW_SHA_WORKFLOW"
+  }
 }

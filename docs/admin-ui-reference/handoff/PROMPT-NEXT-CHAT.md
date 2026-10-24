@@ -1,4 +1,12 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
+
+## CHECKPOINT — 2026-10-25: WEIGHTED ACCEPTANCE + QA EVIDENCE HARDENING
+
+- New [weighted acceptance table](WEIGHTED-ACCEPTANCE.md) and [machine-readable rubric](weighted-acceptance.json): **32/100 evidence-weighted criteria have verified QA**, **68/100 not accepted**, **0/12 approved-reference visual parity signed off**. The historic `50% PROVISIONAL` remains unchanged and is NOT a computed completion percentage.
+- Test hardening: 12-screen screenshot QA no longer pins an obsolete Preview application SHA; `QA_DEPLOYED_APP_SHA` may supply a documented expectation, but screenshot tests explicitly do NOT independently verify deployed bytes. A document-level overflow now fails the QA run rather than being merely logged.
+- Baseline inspected: isolated branch `aa58800a37bd1d5347f355af60684ce9c9111cd7`, PR #111 OPEN/unmerged; existing deployment [#40122810186](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186) SUCCESS, current app SHA `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`. **Fresh CI for this new change must be checked before labeling these changes PASS.**
+- Safe scope: only feature branch tests/handoff; no `public/` or `functions/` runtime changes, no `main` or Production/secret/DNS changes, no deploy workflow. Existing synthetic QA action may run with run-owned fixtures and required cleanup; verify results before accepting.
+
 ## Read this and continue the project immediately
 
 ## EXACT CURRENT CHECKPOINT — 2026-10-25

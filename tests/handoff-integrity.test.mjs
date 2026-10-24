@@ -106,4 +106,30 @@ assert.ok(historyFiles.some(path => path.endsWith('/report.md')) || historyFiles
 assert.match(masterPrompt, /START-HERE\.md/,
   'The master prompt must point to the same single entry point.');
 
+// A screenshot matrix is not equivalent to owner-approved visual parity.
+const rubric = readJson('../docs/admin-ui-reference/handoff/weighted-acceptance.json');
+const captureSpec = readText('../tests/e2e/admin-12-screen-live-qa.spec.js');
+assert.equal(rubric.sections.reduce((sum, section) => sum + section.weight, 0), 100, 'Rubric sections must total 100');
+assert.equal(rubric.sections[0].criteria.length, 12, 'Exactly 12 reference screens required');
+assert.deepEqual(rubric.sections[0].criteria.map(item => item.id), statusScreens.sort((a,b)=>Number(a.split('_')[0])-Number(b.split('_')[0])), 'Visual rubric must match the canonical 12 screens');
+for (const section of rubric.sections) {
+  assert.equal(section.criteria.reduce((sum,item)=>sum+item.weight,0),section.weight, 'Criterion weights must sum to section weight: '+section.id);
+  for (const criterion of section.criteria) {
+    assert.ok(['PASS_EVIDENCED','NOT_ACCEPTED'].includes(criterion.status),'Unknown rubric state');
+    if (criterion.status === 'PASS_EVIDENCED') {
+      assert.ok(criterion.evidence?.length>0,'PASS must cite evidence: '+criterion.id);
+      for (const url of criterion.evidence) assert.match(url,/^https:\/\/github\.com\/chichute5500\/Sindarealest-admin\/actions\/runs\/\d+(\/artifacts\/\d+)?$/);
+    }
+  }
+}
+const witnessed = rubric.sections.flatMap(section=>section.criteria).filter(item=>item.status==='PASS_EVIDENCED').reduce((sum,item)=>sum+item.weight,0);
+assert.equal(rubric.evidencedWeight,witnessed,'Evidenced score must be derived, not invented');
+assert.equal(rubric.unacceptedWeight,100-witnessed,'Unaccepted weight must be derived');
+assert.equal(rubric.screensAcceptedAgainstApprovedReference,0,'No 12-screen reference visual acceptance is currently signed off');
+assert.ok(!rubric.sections[0].criteria.some(c=>c.status==='PASS_EVIDENCED'),'Screenshot capture must not count as approved visual parity');
+assert.ok(captureSpec.includes('QA_DEPLOYED_APP_SHA') && captureSpec.includes("deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST'"),'Screenshot evidence must not pin an old deployed application SHA');
+assert.ok(captureSpec.includes('No screenshot may pass with document horizontal overflow'),'Capture test must fail for page overflow');
+assert.ok(startHere.includes('weighted-acceptance.json')&&nextPrompt.includes('weighted-acceptance.json')&&latestStatusDoc.includes('weighted-acceptance.json')&&screenAudit.includes('weighted-acceptance.json'),'All four handoff Markdown files must reference the weighted rubric');
+assert.equal(status.weightedAcceptance.evidencedWeight,rubric.evidencedWeight,'current-status must match weighted rubric');
+assert.equal(results.weightedAcceptance.evidencedWeight,rubric.evidencedWeight,'latest-test-results must match weighted rubric');
 console.log('PASS: handoff repository/branch, 12-screen statuses, progress, SHA formats and canonical next-chat links remain valid; Action records may advance independently.');

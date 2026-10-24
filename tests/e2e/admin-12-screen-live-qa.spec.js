@@ -7,6 +7,11 @@ test.use({ serviceWorkers: 'block' });
 const origin = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev';
 const testPassword = process.env.ADMIN_TEST_PASSWORD;
 const runSha = process.env.GITHUB_SHA || 'unknown';
+// A screenshot test cannot independently verify Cloudflare's deployed application SHA.
+// Never hardcode a historic source SHA into fresh screenshot evidence.
+const declaredDeployedSha = (process.env.QA_DEPLOYED_APP_SHA || '').trim();
+if (declaredDeployedSha && !/^[0-9a-f]{40}$/i.test(declaredDeployedSha))
+  throw new Error('QA_DEPLOYED_APP_SHA must be a complete Git SHA');
 const screens = [
   ['02_dashboard','dashboard'], ['03_product_list','products'],
   ['06_orders','orders'], ['08_customers','customers'], ['09_warranty_support','warranties'],
@@ -22,7 +27,7 @@ for (const {width,height,theme} of matrix) {
     if (!testPassword) throw new Error('ADMIN_TEST_PASSWORD missing; do not bypass Access');
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
-    const report={sourceSha:runSha,deployedShaExpected:'564ea556e6dee745eaaa491ee033a2a8cfbb595c',viewport:{width,height},theme,
+    const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',viewport:{width,height},theme,
       evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},colorScheme:theme,serviceWorkers:'block',reducedMotion:'reduce'});
     const page=await context.newPage();
@@ -58,6 +63,7 @@ for (const {width,height,theme} of matrix) {
               return el.getClientRects().length>0;
             }).length,heading:target?.querySelector('h1,h2')?.textContent?.trim().slice(0,90)||null};
         });
+        expect(m.horizontalOverflow,'No screenshot may pass with document horizontal overflow: '+name+' at '+width+'px').toBe(false);
         const nameFile=name+'.png';
         const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:true,animations:'disabled'});
         report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,
