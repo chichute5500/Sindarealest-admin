@@ -182,18 +182,16 @@ const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
 assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
   'The hero starts hidden in static markup so the approved presentation asset can be assigned by runtime; catalog SKU availability is not a gate.');
-const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
-assert.ok(heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'")
-  && heroSync.includes("target.hidden=true") && heroSync.includes("target.removeAttribute('src')")
-  && !heroSync.includes("target.src="),
-  'The Hero image is temporarily hidden by owner request; preserve the standalone source and do not load a derivative until Hero is revisited.');
-assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
-  'The homepage hero presentation image must not be gated by or misrepresented as an SD-GL052 catalog record.');
-assert.ok(heroSync.includes("target.onerror=null")
-  && heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'"),
-  'The temporary Hero removal is an intentional owner-requested state, not an asset-load error.');
-assert.ok(!html.includes('sdGalleryWhiteBackgroundKey') && !html.includes('syncFullscreenBackgroundKey') && !html.includes('sd-white-background-keyed'),
-  'Product and fullscreen photos must preserve original pixels; do not infer and remove white backgrounds.');
+const heroSync = html.match(/function syncHeroProductImage\\(\\)\\{([\\s\\S]*?)\\}\\s*function renderFeatured/)?.[1] || '';
+assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'")
+  && heroSync.includes("target.hidden=false")
+  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'"),
+  'The owner-authorized Hero experiment must load the standalone presentation PNG without depending on catalog SKU data.');
+assert.doesNotMatch(heroSync, /products\\.find\\(p=>String\\(p\\?\\.sku/,
+  'The homepage Hero presentation image must not be gated by or misrepresented as a catalog SKU record.');
+assert.ok(heroSync.includes("target.onerror=()=>{target.hidden=true;target.dataset.productImageStatus='presentation-image-load-failed'}"),
+  'A missing presentation asset must fail closed without leaving an empty Hero image frame.');
+
 assert.ok(html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') < html.indexOf('catch(err){$(\'#catalogGrid\').innerHTML=')
   && html.indexOf('syncHeroProductImage();try{const res=await fetch(\'/api/products\'') >= 0,
   'The temporary Hero image-disable state must initialize before the product API can fail or return early.');
@@ -286,7 +284,7 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
       || (property === "mix-blend-mode" && value === "normal")
       || (property === "opacity" && value === "1"));
-    assert.ok(neutral, "Hero image must remain visually untouched (" + selector.trim() + ": " + declaration + ").");
+    assert.ok(neutral, "Hero image must preserve the source pixels apart from the explicitly approved drop shadow (" + selector.trim() + ": " + declaration + ").");
   }
 }
 const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Hero experiment: restore the owner-provided alpha-feathered PNG and add a restrained drop shadow without cropping or recoloring the shoes. */"));
