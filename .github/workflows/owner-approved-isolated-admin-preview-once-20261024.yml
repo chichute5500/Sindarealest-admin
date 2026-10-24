@@ -1,0 +1,87 @@
+name: Owner-approved isolated Admin Preview (one time)
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - ".github/workflows/owner-approved-isolated-admin-preview-once-20261024.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-isolated-pages-preview
+  cancel-in-progress: false
+
+jobs:
+  deploy-approved-preview:
+    name: Deploy approved SHA to isolated non-production Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/admin-isolated-handoff-2026-10-20' && github.event.head_commit.message == '[CF-Pages-Skip] deploy: authorized isolated Admin Preview 564ea556e6dee745eaaa491ee033a2a8cfbb595c' }}
+    env:
+      APPROVED_SOURCE_SHA: 564ea556e6dee745eaaa491ee033a2a8cfbb595c
+      PREVIEW_PROJECT: sindarealest-admin-preview
+      PREVIEW_BRANCH: feature-admin-isolated-handoff-2026-10-20
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check approved target and latest branch guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REPOSITORY}" = "chichute5500/Sindarealest-admin"
+          test "${GITHUB_REF}" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test "${PREVIEW_PROJECT}" = "sindarealest-admin-preview"
+          test -n "${CLOUDFLARE_API_TOKEN}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID}"
+      - name: Check out exact approved source SHA
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.APPROVED_SOURCE_SHA }}
+      - name: Verify source SHA, feature HEAD and one-shot parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${APPROVED_SOURCE_SHA}"
+          current="$(git ls-remote origin refs/heads/feature/admin-isolated-handoff-2026-10-20 | awk '{print $1}')"
+          test "${current}" = "${GITHUB_SHA}" || { echo '::error::Feature HEAD moved; refusing deploy'; exit 1; }
+          approved_tree="$(git rev-parse "${APPROVED_SOURCE_SHA}^{tree}")"
+          test -n "${approved_tree}"
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-fund
+      - name: Validate approved source
+        run: |
+          npm run check
+          npm test
+      - name: Confirm isolated Pages project production branch is main
+        shell: bash
+        run: |
+          set -euo pipefail
+          result="$(curl --fail --silent --show-error --retry 0 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PREVIEW_PROJECT}")"
+          printf '%s' "${result}" | jq -e '.success == true and .result.name == "sindarealest-admin-preview" and .result.production_branch == "main"' >/dev/null || { echo '::error::Cloudflare project identity or production branch not verified'; exit 1; }
+      - name: Recheck feature ref just before deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          current="$(git ls-remote origin refs/heads/feature/admin-isolated-handoff-2026-10-20 | awk '{print $1}')"
+          test "${current}" = "${GITHUB_SHA}" || { echo '::error::Feature HEAD moved; refusing deployment'; exit 1; }
+      - name: Deploy ONLY the owner-approved SHA to isolated Preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${APPROVED_SOURCE_SHA}"
+          npx wrangler pages deploy public --project-name "${PREVIEW_PROJECT}" --branch "${PREVIEW_BRANCH}" --commit-hash "${APPROVED_SOURCE_SHA}" --commit-message "Owner-approved isolated ADMIN Preview ${APPROVED_SOURCE_SHA}"
+      - name: Print provenance receipt
+        if: success()
+        shell: bash
+        run: |
+          echo "Source SHA: ${APPROVED_SOURCE_SHA}"
+          echo "Pages project: ${PREVIEW_PROJECT}"
+          echo "Preview branch: ${PREVIEW_BRANCH}"
+          echo 'No Production deploy, PR merge, D1 migration, R2 write, or Cloudflare configuration mutation was requested by this job.'
