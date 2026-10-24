@@ -223,6 +223,18 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.ok(db.batches[0][0].sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status<>'cancelled')"),
     "the receipt INSERT must recheck the linked payment request at the write boundary");
 }
+
+{
+  const db = makeDb({
+    paymentRequest: { id: "request-already-settled", order_id: "order-1", status: "settled" }
+  });
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", paymentRequestId: "request-already-settled", direction: "received",
+    amount: 30000, transactionReference: "BANKREF-SETTLED-REQUEST"
+  })));
+  assert.equal(response.status, 409, "a settled QR request must not accept another receipt");
+  assert.equal(db.batches.length, 0, "a settled request must be rejected before ledger or audit writes");
+}
 {
   const db = makeDb({ failUnique: true });
   const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
