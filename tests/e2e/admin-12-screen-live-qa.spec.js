@@ -86,7 +86,8 @@ for (const {width,height,theme} of matrix) {
         await page.locator('#editorClose').click();
       } else for(const name of ['04_product_editor','05_product_gallery'])
         report.screens.push({screen:name,status:'UNAVAILABLE_NOT_ACCEPTED',reason:'No editable product UI row'});
-      await page.evaluate(async()=>window.setView('orders'));
+      await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='orders');if(!nav)throw Error('Order view navigation missing');nav.click()});
+      await page.waitForTimeout(500);
       const detail=page.locator('[data-action="view-order-details"]:visible').first();
       if(await detail.count()){
         await detail.click();
