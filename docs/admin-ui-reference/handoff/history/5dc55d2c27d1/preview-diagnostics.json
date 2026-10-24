@@ -1,0 +1,27 @@
+{
+  "status": "PASS_LOGIN_CSS_SIGNATURE",
+  "checkedAt": "2026-10-22T04:10:43.130Z",
+  "title": "Quản trị SinDarealest",
+  "lang": "vi",
+  "loginViewClass": "loginwrap",
+  "topbarBrandDisplay": "none",
+  "topbarBrandVisibility": "visible",
+  "topbarBrandOpacity": "1",
+  "browserSupportsHideSelector": true,
+  "hideSelectorMatchesBrand": true,
+  "stylesheetSources": [
+    {
+      "href": "[inline stylesheet]",
+      "ruleCount": 677,
+      "hasLoginHideRule": true,
+      "matchingRules": [
+        {
+          "selector": "body:has(#loginView:not(.hidden)) .topbar > .brand, body:has(#loginView:not(.hidden)) #conn, body:has(#loginView:not(.hidden)) #notificationToggle, body:has(#loginView:not(.hidden)) #logout",
+          "matchedSelector": "body:has(#loginView:not(.hidden)) .topbar>.brand",
+          "display": "none",
+          "displayPriority": "important"
+        }
+      ]
+    }
+  ]
+}

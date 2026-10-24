@@ -1,0 +1,122 @@
+name: Admin Preview diagnostic smoke test
+
+# Source validation and read-only Playwright only. Evidence lives in the Actions artifact.
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - "public/admin/**"
+      - "functions/**"
+      - "migrations/**"
+      - "scripts/**"
+      - "tests/**"
+      - "package.json"
+      - ".github/workflows/admin-preview-diagnostics.yml"
+      - ".github/workflows/deploy-admin-isolated-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-preview-diagnostics-${{ github.ref }}-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  admin-preview:
+    name: Validate ADMIN source and capture Preview evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ADMIN_TEST_URL: "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/"
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      LOCAL_ADMIN_URL: http://127.0.0.1:4173/admin/
+    steps:
+      - name: Guard exact feature branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20" || {
+            echo "::error::This diagnostic workflow may only run from the ADMIN feature branch."
+            exit 1
+          }
+
+      - name: Check out the exact tested commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install project and Playwright dependencies
+        run: npm install --no-save @playwright/test
+
+      - name: Run repository checks
+        id: project-check
+        run: npm run check
+
+      - name: Run automated tests
+        id: unit-tests
+        run: npm test
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local read-only static ADMIN preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --directory public > /tmp/sindarealest-admin-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/admin/ >/dev/null; then
+              echo "Local static ADMIN preview is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/sindarealest-admin-preview.log
+          exit 1
+
+      - name: Capture real source screenshots across responsive and theme matrix
+        id: baseline
+        run: npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --reporter=line,html
+
+      - name: Diagnose configured deployed Admin Preview (read-only)
+        id: preview
+        if: ${{ !cancelled() && steps.project-check.outcome == 'success' && steps.unit-tests.outcome == 'success' && env.ADMIN_TEST_URL != '' }}
+        run: npx playwright test tests/e2e/admin-isolated-preview.spec.js --reporter=line,html
+
+      - name: Verify branch HEAD still matches the tested SHA
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(git ls-remote origin "refs/heads/feature/admin-isolated-handoff-2026-10-20" | awk '{print $1}')"
+          echo "Tested SHA: $GITHUB_SHA"
+          echo "Current branch SHA: $remote_sha"
+          test -n "$remote_sha"
+          if [[ "$remote_sha" != "$GITHUB_SHA" ]]; then
+            echo "::error::The feature branch moved during this run. This run's evidence belongs only to $GITHUB_SHA and is not a latest-HEAD acceptance result."
+            exit 1
+          fi
+          echo "Verified: tested SHA is still branch HEAD."
+
+      - name: Upload Playwright screenshots, metadata, reports, and reference
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-preview-evidence-${{ github.run_number }}
+          path: |
+            artifacts/admin-preview-evidence/
+            artifacts/admin-reference-same-data/
+            test-results/
+            playwright-report/
+            docs/admin-ui-reference/admin-mobile-reference.png
+          if-no-files-found: warn
+          retention-days: 14

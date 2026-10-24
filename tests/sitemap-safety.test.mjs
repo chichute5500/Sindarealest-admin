@@ -8,9 +8,9 @@ const DB = {
       async all() {
         return {
           results: [
-            { id: "valid-id", sku: "SD-SN001", updated_at: "2026-10-17 10:00:00" },
-            { id: "bad-date", sku: "SD-SN002", updated_at: "not-a-date" },
-            { id: "bad-type", sku: "SD-SN003", updated_at: { unexpected: true } },
+            { id: "valid-id", sku: "SD-SN001", sku_verified: 1, updated_at: "2026-10-17 10:00:00" },
+            { id: "bad-date", sku: "SD-SN002", sku_verified: 1, updated_at: "not-a-date" },
+            { id: "bad-type", sku: "SD-SN003", sku_verified: 1, updated_at: { unexpected: true } },
           ],
         };
       },

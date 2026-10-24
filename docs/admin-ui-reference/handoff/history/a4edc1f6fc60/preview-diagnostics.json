@@ -1,0 +1,30 @@
+{
+  "status": "BLOCKED_CLOUDFLARE_ACCESS",
+  "message": "Preview is protected by Cloudflare Access. ADMIN smoke tests require an authorized test route or an explicitly configured Access service token.",
+  "page": {
+    "label": "initial-page",
+    "pageUrl": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/1f1dc981.sindarealest2.pages.dev",
+    "navigationStatus": 200,
+    "navigationStatusText": "",
+    "title": "Sign in ・ Cloudflare Access",
+    "lang": null,
+    "readyState": "complete",
+    "hasLoginView": false,
+    "hasLoginForm": false,
+    "hasPassword": false,
+    "hasAppView": false,
+    "forms": [
+      {
+        "id": "totp-form",
+        "role": null,
+        "actionPath": "/cdn-cgi/access/verify-code/1f1dc981.sindarealest2.pages.dev"
+      }
+    ],
+    "headingText": [
+      "Log in to sindarealest2 - Cloudflare Pages"
+    ],
+    "bodyText": "sindarealest2 - Cloudflare Access Log in to sindarealest2 - Cloudflare Pages Email Send login code",
+    "documentUrl": "https://sindarealest2-pages.cloudflareaccess.com/cdn-cgi/access/login/1f1dc981.sindarealest2.pages.dev",
+    "contentType": "text/html"
+  }
+}

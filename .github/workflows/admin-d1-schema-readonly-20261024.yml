@@ -1,0 +1,49 @@
+name: Isolated ADMIN Preview remote D1 schema (read-only)
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - ".github/workflows/admin-d1-schema-readonly-20261024.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  schema:
+    name: Verify isolated Preview D1 schema and payment ledger tables (no writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Guard exact branch and account credentials
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Inspect exact isolated binding and remote schema using only SELECT/PRAGMA
+        run: node scripts/qa-admin-d1-schema-readonly.mjs
+      - name: Verify branch SHA still matches read-only evidence
+        if: always()
+        run: |
+          remote="$(git ls-remote origin refs/heads/feature/admin-isolated-handoff-2026-10-20 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA" || { echo "::error::Feature HEAD moved"; exit 1; }
+      - name: Upload sanitized schema verification
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: isolated-admin-d1-schema-readonly
+          path: artifacts/admin-preview-evidence/
+          if-no-files-found: warn
+          retention-days: 14

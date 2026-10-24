@@ -10,17 +10,24 @@ export async function onRequestGet(context) {
     const result = await context.env.DB.prepare(
       "WITH recent_orders AS (" +
       " SELECT o.id,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
-      " o.customer_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
+      " o.customer_note,o.payment_terms_confirmed_at,o.payment_terms_confirmed_by,o.payment_terms_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
       " COALESCE(oc.phone,c.phone) AS phone,COALESCE(oc.email,c.email) AS email," +
       " COALESCE(sa.full_address,c.address) AS address" +
+      " ,(SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=o.id) AS received_amount" +
+      " ,(SELECT COALESCE(SUM(CASE WHEN direction='refunded' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=o.id) AS refunded_amount" +
+      " ,(SELECT id FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_request_id" +
+      " ,(SELECT amount FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_amount" +
+      " ,(SELECT installment_type FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_type" +
+      " ,(SELECT transfer_reference FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_reference" +
+      " ,(SELECT shipping_benefit FROM order_payment_requests WHERE order_id=o.id AND status='pending' ORDER BY created_at DESC LIMIT 1) AS pending_payment_shipping_benefit" +
       " FROM orders o JOIN customers c ON c.id=o.customer_id" +
       " LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id" +
       " LEFT JOIN order_contact_details oc ON oc.order_id=o.id" +
       " ORDER BY o.created_at DESC LIMIT 1000" +
       ") " +
-      "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku," +
+      "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku,oi.sku_verified AS itemSkuVerified," +
       " oi.title AS itemTitle,oi.quantity AS itemQuantity,oi.unit_price AS itemUnitPrice," +
-      " oi.line_total AS itemLineTotal" +
+      " oi.line_total AS itemLineTotal,oi.fulfillment_type AS itemFulfillmentType" +
       " FROM recent_orders ro LEFT JOIN order_items oi ON oi.order_id=ro.id" +
       " ORDER BY ro.created_at DESC,oi.rowid"
     ).all();
@@ -28,7 +35,7 @@ export async function onRequestGet(context) {
     const byId = new Map();
     for (const row of result.results || []) {
       const {
-        itemId, itemProductId, itemSku, itemTitle, itemQuantity, itemUnitPrice, itemLineTotal,
+        itemId, itemProductId, itemSku, itemSkuVerified, itemTitle, itemQuantity, itemUnitPrice, itemLineTotal, itemFulfillmentType,
         ...orderFields
       } = row;
       let order = byId.get(row.id);
@@ -41,10 +48,12 @@ export async function onRequestGet(context) {
           id: itemId,
           productId: itemProductId,
           sku: itemSku,
+          skuVerified: Number(itemSkuVerified) === 1,
           title: itemTitle,
           quantity: itemQuantity,
           unitPrice: itemUnitPrice,
-          lineTotal: itemLineTotal
+          lineTotal: itemLineTotal,
+          fulfillmentType: itemFulfillmentType || "unclassified"
         });
       }
     }
@@ -59,36 +68,129 @@ export async function onRequestPatch(context) {
   if (parsedBody.error === "too_large") return fail("Dữ liệu cập nhật đơn hàng vượt giới hạn kích thước.", 413);
   if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu cập nhật không hợp lệ.");
   const body = parsedBody.value;
-  const id = String(body?.id || ""), status = String(body?.status || ""), paymentStatus = body?.paymentStatus;
+  const id = String(body?.id || ""), status = String(body?.status || "");
   const statuses = ["pending_confirmation","confirmed","processing","shipped","completed","cancelled"];
-  const payments = ["unpaid","pending","paid","refunded"];
-  if (!id || !statuses.includes(status) || (paymentStatus !== undefined && !payments.includes(paymentStatus))) return fail("Trạng thái đơn hàng không hợp lệ.");
+  if (body?.paymentStatus !== undefined) return fail("Không được tự đặt trạng thái thanh toán. Chỉ giao dịch đã được Admin đối chiếu thực tế mới thay đổi trạng thái.",409);
+  if (!id || !statuses.includes(status)) return fail("Trạng thái đơn hàng không hợp lệ.");
   if (body?.prices !== undefined && (!Array.isArray(body.prices) || body.prices.length > 50)) return fail("Danh sách giá cần xác nhận không hợp lệ.");
   try {
-    const existing = await context.env.DB.prepare("SELECT id FROM orders WHERE id=?").bind(id).first();
+    const existing = await context.env.DB.prepare("SELECT id,status FROM orders WHERE id=?").bind(id).first();
     if (!existing) return fail("Không tìm thấy đơn hàng.", 404);
+    if (existing.status === "cancelled" && status !== "cancelled") return fail("Đơn đã hủy không thể mở lại hoặc tiếp tục xử lý.", 409);
+    // A cancelled order cannot accept a verified receipt while its QR request remains pending.
+    // Require explicit QR cancellation before cancelling the order, then recheck at UPDATE time below.
+    if (status === "cancelled") {
+      const pendingRequest = await context.env.DB.prepare(
+        "SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' LIMIT 1"
+      ).bind(id).first();
+      if (pendingRequest) return fail("Không thể hủy đơn khi yêu cầu QR còn chờ. Hãy hủy yêu cầu QR trước rồi thử lại.", 409);
+    }
     const itemResult = await context.env.DB.prepare("SELECT id,quantity,unit_price FROM order_items WHERE order_id=?").bind(id).all();
     const items = itemResult.results || [];
-    const itemMap = new Map(items.map(item => [item.id, { ...item, unit_price: item.unit_price === null ? null : Number(item.unit_price) }]));
-    const statements = [];
+    const itemMap = new Map(items.map(item => [item.id, { ...item, unit_price: item.unit_price === null || item.unit_price === undefined ? null : Number(item.unit_price) }]));
+    const priceUpdates = [];
+    let priceChanged = false;
     for (const price of body.prices || []) {
       const itemId = String(price?.itemId || "");
       const unitPrice = price?.unitPrice;
       if (!itemMap.has(itemId)) return fail("Một giá nhập không thuộc đơn hàng này.", 400);
       if (!Number.isSafeInteger(unitPrice) || unitPrice < 0 || unitPrice > 2_000_000_000) return fail("Giá phải là số nguyên không âm.");
-      const item = itemMap.get(itemId); item.unit_price = unitPrice;
-      statements.push(context.env.DB.prepare("UPDATE order_items SET unit_price=?,line_total=? WHERE id=? AND order_id=?").bind(unitPrice,unitPrice*Number(item.quantity),itemId,id));
+      const item = itemMap.get(itemId);
+      if (item.unit_price !== unitPrice) priceChanged = true;
+      item.unit_price = unitPrice;
+      priceUpdates.push({ itemId, unitPrice, lineTotal: unitPrice * Number(item.quantity) });
     }
     const pricedItems = [...itemMap.values()];
     const allPriced = pricedItems.length > 0 && pricedItems.every(item => item.unit_price !== null && Number.isSafeInteger(item.unit_price) && item.unit_price >= 0);
     const subtotal = allPriced ? pricedItems.reduce((sum,item) => sum + item.unit_price * Number(item.quantity),0) : null;
     if (subtotal !== null && !Number.isSafeInteger(subtotal)) return fail("Tổng giá trị đơn vượt giới hạn số nguyên an toàn.");
     if (["confirmed","processing","shipped","completed"].includes(status) && !allPriced) return fail("Hãy xác nhận giá của tất cả sản phẩm trước khi xác nhận hoặc xử lý đơn.",409);
-    if (paymentStatus === "paid" && !allPriced) return fail("Không thể đánh dấu đã thanh toán khi tổng tiền chưa được xác nhận.",409);
-    statements.push(context.env.DB.prepare("UPDATE orders SET status=?,payment_status=COALESCE(?,payment_status),subtotal=?,total=?,price_confirmation_required=?,updated_at=datetime('now') WHERE id=?").bind(status,paymentStatus ?? null,subtotal,subtotal,allPriced?0:1,id));
-    statements.push(context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'order_updated', 'order', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ status, paymentStatus: paymentStatus ?? null, pricesUpdated: (body.prices || []).length, priceConfirmed: allPriced })));
-    await context.env.DB.batch(statements);
-    await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (paymentStatus ? " · Thanh toán: " + paymentStatus : ""), url: "/admin/" });
+    if (body.termsConfirmed === true && !allPriced) return fail("Cần xác nhận giá của tất cả dòng hàng trước khi chốt điều kiện thanh toán.",409);
+    const note = String(body.paymentTermsNote || "").trim();
+    if (note.length > 1000) return fail("Ghi chú điều kiện thanh toán tối đa 1.000 ký tự.");
+    const termsConfirmed = body.termsConfirmed === true;
+    const confirmationAt = termsConfirmed ? new Date().toISOString() : null;
+
+    // Keep payment amounts and verified ledger history tied to the confirmed order total.
+    // The API/UI submits existing values during ordinary saves, so only real price changes
+    // must be blocked when a QR request is pending or a verified transaction already exists.
+    if (priceChanged) {
+      const financialState = await context.env.DB.prepare(
+        "SELECT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) AS has_transactions, " +
+        "EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') AS has_pending_request"
+      ).bind(id,id).first();
+      if (Number(financialState?.has_transactions) > 0) return fail("Không thể sửa giá khi đơn đã có giao dịch được xác minh. Cần đối soát lịch sử thanh toán trước khi thay đổi giá.",409);
+      if (Number(financialState?.has_pending_request) > 0) return fail("Không thể sửa giá khi đơn còn yêu cầu QR đang chờ. Hãy hủy yêu cầu QR trước khi thay đổi giá.",409);
+    }
+
+    const statements = [];
+    const priceGuardSql =
+      " AND NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?)" +
+      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
+    const terminalStatusGuardSql = " AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled')";
+    const cancellationRequestGuardSql =
+      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
+    for (const update of priceUpdates) {
+      const itemGuardSql = priceChanged ? priceGuardSql + (status === "cancelled" ? "" : terminalStatusGuardSql) : (status === "cancelled" ? cancellationRequestGuardSql : "");
+      const sql = "UPDATE order_items SET unit_price=?,line_total=? WHERE id=? AND order_id=?" + itemGuardSql;
+      const values = [update.unitPrice,update.lineTotal,update.itemId,id];
+      if (priceChanged) {
+        values.push(id,id);
+        if (status !== "cancelled") values.push(id);
+      } else if (status === "cancelled") values.push(id);
+      statements.push(context.env.DB.prepare(sql).bind(...values));
+    }
+
+    const orderUpdateIndex = statements.length;
+    const orderUpdateSql =
+      "UPDATE orders SET status=?,subtotal=?,total=?,price_confirmation_required=?," +
+      "payment_terms_confirmed_at=CASE WHEN ?=1 THEN ? WHEN ?=1 THEN NULL ELSE payment_terms_confirmed_at END," +
+      "payment_terms_confirmed_by=CASE WHEN ?=1 THEN 'admin' WHEN ?=1 THEN '' ELSE payment_terms_confirmed_by END," +
+      "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=?" +
+      (priceChanged ? priceGuardSql : "") +
+      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'");
+    const orderUpdateValues = [
+      status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
+      priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id
+    ];
+    if (priceChanged) orderUpdateValues.push(id,id);
+    // Non-cancelled UPDATE uses a literal status guard with no extra SQL bind.
+    // Binding one more ID here previously made every ordinary order save fail (503).
+    if (status === "cancelled") orderUpdateValues.push(id);
+    statements.push(context.env.DB.prepare(orderUpdateSql).bind(...orderUpdateValues));
+
+    const auditDetails = JSON.stringify({
+      status, pricesUpdated: priceUpdates.length, priceChanged, priceConfirmed: allPriced,
+      paymentTermsConfirmed: termsConfirmed, paymentTermsNoteLength: note.length
+    });
+    if (priceChanged) {
+      // Re-check the same invariant inside the atomic batch: if financial activity
+      // appeared after the preflight SELECT, all guarded item/order/audit writes are no-ops.
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
+        "WHERE NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) " +
+        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') " +
+        "AND changes()=1"
+      ).bind(crypto.randomUUID(),id,auditDetails,id,id));
+    } else if (status === "cancelled") {
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
+        "WHERE changes()=1 AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+      ).bind(crypto.randomUUID(),id,auditDetails,id));
+    } else {
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'order_updated', 'order', ?, ? WHERE changes()=1"
+      ).bind(crypto.randomUUID(),id,auditDetails));
+    }
+    const batchResults = await context.env.DB.batch(statements);
+    if (Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
+      if (status === "cancelled") return fail("Không thể hủy đơn vì yêu cầu QR đang chờ hoặc đơn vừa thay đổi. Hãy hủy yêu cầu QR trước rồi tải lại đơn.",409);
+      if (priceChanged) return fail("Giá không thể thay đổi vì đơn đã hủy, đã phát sinh giao dịch hoặc yêu cầu QR đang chờ. Không có thay đổi nào được lưu; hãy tải lại đơn và đối soát trước.",409);
+      return fail("Đơn hàng vừa thay đổi hoặc đã hủy. Hãy tải lại đơn trước khi cập nhật trạng thái.",409);
+    }
+    await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (termsConfirmed ? " · Đã xác nhận điều kiện" : ""), url: "/admin/" });
     return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, message: allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
   } catch { return fail("Không thể cập nhật đơn hàng.", 503); }
 }

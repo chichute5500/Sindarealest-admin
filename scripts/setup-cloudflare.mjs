@@ -7,6 +7,7 @@ import {
   listD1Databases,
   listPagesProjects,
   readProductCount,
+  parseCliJson,
   runWrangler,
 } from './cloudflare-utils.mjs';
 
@@ -94,20 +95,40 @@ async function main() {
     throw new Error('Chuỗi xác nhận không khớp. Đã hủy trước khi chạy SQL hoặc deploy.');
   }
 
-  console.log('\n1/5 · Áp dụng schema SQL idempotent cho D1…');
+  console.log('\n1/6 · Áp dụng schema SQL idempotent cho D1…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0001_schema.sql'], { interactive: true });
 
-  console.log('\n2/5 · Áp dụng bảng đơn hàng, khách hàng, bảo hành và audit log…');
+  console.log('\n2/6 · Áp dụng bảng đơn hàng, khách hàng, bảo hành và audit log…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0003_storefront_operations.sql'], { interactive: true });
   console.log('Áp dụng migration thông báo quản trị (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0004_admin_notifications.sql'], { interactive: true });
   console.log('Áp dụng địa chỉ giao hàng và metadata bảo hành (idempotent)…');
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0005_address_warranty_verification.sql'], { interactive: true });
   runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0006_remove_warranty_otp.sql'], { interactive: true });
+  console.log('Áp dụng snapshot liên hệ đơn hàng (idempotent)…');
+  runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0007_order_contact_details.sql'], { interactive: true });
+  console.log('Đảm bảo schema migrations/0008_product_sku_verification.sql; chỉ bổ sung các cột còn thiếu…');
+  const d1HasColumn = (tableName, columnName) => {
+    const result = runWrangler(['d1', 'execute', dbName, '--remote', '--json', '--command', `PRAGMA table_info(${tableName});`], { quiet: true });
+    const parsed = parseCliJson(result.stdout, `schema D1 ${tableName}`);
+    const containsColumn = (value) => {
+      if (Array.isArray(value)) return value.some(containsColumn);
+      if (!value || typeof value !== 'object') return false;
+      if (value.name === columnName) return true;
+      return Object.values(value).some(containsColumn);
+    };
+    return containsColumn(parsed);
+  };
+  if (!d1HasColumn('products', 'sku_verified')) {
+    runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE products ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
+  }
+  if (!d1HasColumn('order_items', 'sku_verified')) {
+    runWrangler(['d1', 'execute', dbName, '--remote', '--command', 'ALTER TABLE order_items ADD COLUMN sku_verified INTEGER NOT NULL DEFAULT 0 CHECK (sku_verified IN (0,1));'], { interactive: true });
+  }
 
-  console.log('\n3/5 · Xác minh các cột cần thiết của D1…');
+  console.log('\n3/6 · Xác minh các cột cần thiết của D1…');
   for (const query of [
-    'SELECT id, slug, sku, title, category, category_label, description, price, stock, published, images_json, source_price_confirmed, sort_order, created_at, updated_at FROM products LIMIT 0;',
+    'SELECT id, slug, sku, sku_verified, title, category, category_label, description, price, stock, published, images_json, source_price_confirmed, sort_order, created_at, updated_at FROM products LIMIT 0;',
     'SELECT key, value, updated_at FROM settings LIMIT 0;',
     'SELECT ip_hash, window_start, attempts FROM admin_login_attempts LIMIT 0;',
     'SELECT id, order_number, customer_id, status, total FROM orders LIMIT 0;',
@@ -118,9 +139,25 @@ async function main() {
     'SELECT scope, ip_hash, window_start, attempts FROM public_rate_limits LIMIT 0;',
     'SELECT customer_id, province_code, province, ward_code, ward, street_address FROM customer_address_details LIMIT 0;',
     'SELECT order_id, province_code, province, ward_code, ward, street_address, full_address FROM order_shipping_addresses LIMIT 0;',
-    'SELECT claim_id, image_key FROM warranty_claim_attachments LIMIT 0;'
+    'SELECT claim_id, image_key FROM warranty_claim_attachments LIMIT 0;',
+    'SELECT sku_verified FROM order_items LIMIT 0;'
   ]) {
     runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { interactive: true });
+  }
+
+  console.log('\n4/6 · Xác minh schema fulfillment/payment của migration 0009 trước seed/deploy…');
+  try {
+    for (const query of [
+      "SELECT fulfillment_type FROM products LIMIT 0;",
+      "SELECT fulfillment_type FROM order_items LIMIT 0;",
+      "SELECT payment_terms_confirmed_at, payment_terms_confirmed_by, payment_terms_note, public_access_token_hash FROM orders LIMIT 0;",
+      "SELECT id, order_id, installment_type, amount, shipping_benefit, transfer_reference, qr_image_key, bank_name, account_number, account_name, status, created_by, created_at, updated_at FROM order_payment_requests LIMIT 0;",
+      "SELECT id, order_id, payment_request_id, direction, amount, transaction_reference, note, actor, verified_at, created_at FROM order_payment_transactions LIMIT 0;"
+    ]) {
+      runWrangler(['d1', 'execute', dbName, '--remote', '--command', query], { quiet: true });
+    }
+  } catch {
+    throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Đã dừng trước bước seed và Pages deploy; script không tự động chạy migration 0009. Chỉ tiếp tục sau quy trình được chủ dự án phê duyệt và xác minh lại schema.');
   }
 
   let productCount = readProductCount(dbName);
@@ -128,17 +165,17 @@ async function main() {
     if (productCount !== 0) {
       throw new Error(`D1 đang có ${productCount} sản phẩm. Đã từ chối nạp seed để tránh khôi phục/trộn nhầm dữ liệu. Không có sản phẩm nào bị seed ghi đè.`);
     }
-    console.log('\n4/5 · D1 đang trống; nhập seed 235 sản phẩm…');
+    console.log('\n5/6 · D1 đang trống; nhập seed 235 sản phẩm…');
     runWrangler(['d1', 'execute', dbName, '--remote', '--file=migrations/0002_seed_products.sql'], { interactive: true });
     productCount = readProductCount(dbName);
     if (productCount !== 235) {
       throw new Error(`Seed kết thúc nhưng số sản phẩm là ${productCount}, không phải 235. Đã dừng trước khi deploy; kiểm tra D1 trước khi tiếp tục.`);
     }
   } else {
-    console.log(`\n4/5 · Giữ nguyên dữ liệu D1 hiện tại (${productCount} sản phẩm); bỏ qua seed.`);
+    console.log(`\n5/6 · Giữ nguyên dữ liệu D1 hiện tại (${productCount} sản phẩm); bỏ qua seed.`);
   }
 
-  console.log('\n5/5 · Triển khai website cùng Pages Functions…');
+  console.log('\n6/6 · Triển khai website cùng Pages Functions…');
   runWrangler(['pages', 'deploy', 'public', `--project-name=${project}`, `--branch=${branch}`], { interactive: true });
 
   console.log('\n=== KIỂM TRA SAU DEPLOY ===');

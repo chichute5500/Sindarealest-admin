@@ -16,8 +16,8 @@ export async function onRequestPut(context) {
     if (checked.error) return fail(checked.error);
     const p = checked.value;
     await context.env.DB.batch([
-      context.env.DB.prepare("UPDATE products SET slug=?,sku=?,title=?,category=?,category_label=?,description=?,price=?,stock=?,published=?,images_json=?,source_price_confirmed=?,sort_order=?,updated_at=datetime('now') WHERE id=?")
-        .bind(p.slug,p.sku,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,JSON.stringify(p.images),p.sourcePriceConfirmed?1:0,p.sortOrder,id),
+      context.env.DB.prepare("UPDATE products SET slug=?,sku=?,sku_verified=?,title=?,category=?,category_label=?,description=?,price=?,stock=?,published=?,images_json=?,source_price_confirmed=?,sort_order=?,fulfillment_type=?,updated_at=datetime('now') WHERE id=?")
+        .bind(p.slug,p.sku,p.skuVerified?1:0,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,JSON.stringify(p.images),p.sourcePriceConfirmed?1:0,p.sortOrder,p.fulfillmentType,id),
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_updated', 'product', ?, ?)").bind(crypto.randomUUID(),id,JSON.stringify({ sku:p.sku,title:p.title,published:!!p.published }))
     ]);
     return json({ ok: true, product: toAdminProduct(p), message: "Đã lưu thay đổi sản phẩm." });

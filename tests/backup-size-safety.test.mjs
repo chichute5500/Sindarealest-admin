@@ -63,8 +63,8 @@ const response = await createBackup({
 assert.equal(response.status, 413,
   "backup export above the shared record budget must fail explicitly rather than create an unrestorable file");
 assert.match((await response.json()).error, /5\.000 bản ghi/);
-const guardedQueries = db.executedQueries.filter((statement) => /SELECT \* FROM (products|customers|orders|order_items|warranties|warranty_claims|audit_logs|customer_address_details|order_shipping_addresses|order_contact_details|order_item_details|warranty_claim_attachments)/.test(statement.sql));
-assert.equal(guardedQueries.length, 12, "all exported data tables must be queried with a shared total-row guard");
+const guardedQueries = db.executedQueries.filter((statement) => /SELECT \* FROM (products|customers|orders|order_items|warranties|warranty_claims|audit_logs|customer_address_details|order_shipping_addresses|order_contact_details|order_item_details|warranty_claim_attachments|order_payment_requests|order_payment_transactions)/.test(statement.sql));
+assert.equal(guardedQueries.length, 14, "all exported data tables, including payment ledgers, must use the shared total-row guard");
 assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?") && statement.values[0] === 5000 && /LIMIT 5001$/.test(statement.sql)),
   "all table reads must be gated and capped before D1 materializes rows");
 assert.ok(guardedQueries.every((statement) => statement.sql.includes("WHERE (SELECT total_count FROM backup_counts) <= ?")),

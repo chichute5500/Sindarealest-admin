@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "repository": "chichute5500/Sindarealest-admin",
+  "branch": "feature/admin-isolated-handoff-2026-10-20",
+  "baselineApplicationSha": "6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef",
+  "githubCheckpointHead": "aa58800a37bd1d5347f355af60684ce9c9111cd7",
+  "scoreLabel": "EVIDENCE_WEIGHT_NOT_PROJECT_COMPLETION",
+  "legacyProgress": "50% PROVISIONAL (historical, unweighted; not recomputed)",
+  "ownerVisualApproval": "NOT_GRANTED",
+  "scoringRule": "Only PASS_EVIDENCED items contribute their full criterion weight. A screenshot capture does not prove approved design parity.",
+  "sections": [
+    {
+      "id": "visual_reference_12_screens",
+      "title": "12 màn hình so với mẫu được duyệt",
+      "weight": 48,
+      "criteria": [
+        {
+          "id": "1_login",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "2_dashboard",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "3_product_list",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "4_product_editor",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "5_product_gallery",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "6_orders",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "7_order_detail",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "8_customers",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "9_warranty_support",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "10_website_settings",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "11_backup_restore",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        },
+        {
+          "id": "12_activity_log",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidenceStatus": "CAPTURED_NOT_REFERENCE_VERIFIED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "gap": "Same-data approved-reference parity has not been signed off"
+        }
+      ]
+    },
+    {
+      "id": "ui_behavior_accessibility",
+      "title": "UI responsive và thao tác",
+      "weight": 16,
+      "criteria": [
+        {
+          "id": "all_distinct_screens",
+          "weight": 4,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "claim": "48 captures / 12 distinct page views in two viewports and two themes"
+        },
+        {
+          "id": "mobile_no_overflow",
+          "weight": 4,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035"
+          ],
+          "claim": "No document-level horizontal overflow in the last isolated QA matrix"
+        },
+        {
+          "id": "gallery_six_real_photos",
+          "weight": 4,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122361977/artifacts/12571935719"
+          ],
+          "claim": "6 loaded source images, 5 thumbnail rail images, mobile/desktop"
+        },
+        {
+          "id": "keyboard_screenreader_accessibility",
+          "weight": 4,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "Keyboard and assistive-technology acceptance not fully verified"
+        }
+      ]
+    },
+    {
+      "id": "isolated_business_integration",
+      "title": "Tích hợp nghiệp vụ ở môi trường cách ly",
+      "weight": 20,
+      "criteria": [
+        {
+          "id": "product_put_d1_readback",
+          "weight": 4,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186"
+          ],
+          "claim": "Authenticated run-owned product PUT/GET plus D1 readback"
+        },
+        {
+          "id": "order_price_terms_d1_audit",
+          "weight": 4,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186"
+          ],
+          "claim": "Authenticated run-owned order PATCH/GET + D1 and audit; invalid mutations rejected"
+        },
+        {
+          "id": "warranty_claim_and_issuance",
+          "weight": 4,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186"
+          ],
+          "claim": "Run-owned warranty claim, issuance, duplicate/date guard and D1/audit"
+        },
+        {
+          "id": "backup_v2_read",
+          "weight": 2,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186"
+          ],
+          "claim": "Backup V2 GET structure and run-owned records"
+        },
+        {
+          "id": "qr_r2_actual_integration",
+          "weight": 2,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "Actual isolated end-to-end R2/QR upload not yet accepted"
+        },
+        {
+          "id": "payment_refund_settlement",
+          "weight": 2,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "No real payment/refund end-to-end; avoid real ledger mutations"
+        },
+        {
+          "id": "restore_post_disposable_d1",
+          "weight": 2,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "Destructive Restore POST requires completely disposable database"
+        }
+      ]
+    },
+    {
+      "id": "isolation_cleanup_security",
+      "title": "Cách ly, dọn dữ liệu và bảo mật",
+      "weight": 11,
+      "criteria": [
+        {
+          "id": "preview_d1_separated",
+          "weight": 3,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186"
+          ],
+          "claim": "Preview project and D1 isolation preflight reported PASS"
+        },
+        {
+          "id": "run_owned_cleanup_verified_twice",
+          "weight": 3,
+          "status": "PASS_EVIDENCED",
+          "evidence": [
+            "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186"
+          ],
+          "claim": "Two cleanup passes; zero run-owned rows in seven QA tables"
+        },
+        {
+          "id": "complete_auth_security_audit",
+          "weight": 3,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "Complete authentication/authorization review not yet signed off"
+        },
+        {
+          "id": "performance_security_audit",
+          "weight": 2,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "Full performance/security audit not accepted"
+        }
+      ]
+    },
+    {
+      "id": "owner_signoff",
+      "title": "Nghiệm thu chủ dự án",
+      "weight": 5,
+      "criteria": [
+        {
+          "id": "owner_12_screen_final_signoff",
+          "weight": 5,
+          "status": "NOT_ACCEPTED",
+          "evidence": [],
+          "gap": "Owner has not approved exact same-data reference parity"
+        }
+      ]
+    }
+  ],
+  "evidencedWeight": 32,
+  "unacceptedWeight": 68,
+  "screensAcceptedAgainstApprovedReference": 0,
+  "visualInspection": {
+    "approvedReferenceAsset": "docs/admin-ui-reference/admin-mobile-reference.png",
+    "referenceNature": "1024x1536 composite design with 12 mobile conceptual screens",
+    "evidenceSource": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40124572580/artifacts/12572298914",
+    "baselineScreenshotsSha": "41637e02cfe676b7512a5a0b67e28ea83df78bd8",
+    "comparisonStatus": "QUALITATIVE_PARTIAL_NOT_ACCEPTED",
+    "findings": [
+      {
+        "screen": "01_login",
+        "type": "CONTROL_DIFFERENCE",
+        "finding": "The concept includes remember-login and forgot-password controls; actual login intentionally does not show these controls. Security/auth implications require deliberate design decision."
+      },
+      {
+        "screen": "02_dashboard",
+        "type": "STATE_DIFFERENCE",
+        "finding": "Concept shows a revenue trend graph; live screenshot correctly shows a no-revenue-data state instead of fabricated sales."
+      },
+      {
+        "screen": "05_product_gallery",
+        "type": "STATE_DIFFERENCE",
+        "finding": "Concept shows an active upload progress state; six-photo fixture shows static existing photos, not an in-flight upload."
+      },
+      {
+        "screen": "08_customers",
+        "type": "DATA_MISMATCH",
+        "finding": "Concept has six populated customer examples; isolated QA capture has a single run-owned customer fixture."
+      },
+      {
+        "screen": "04_product_editor",
+        "type": "EVIDENCE_CAPTURE_DEFECT",
+        "finding": "Previous fullPage screenshots included scrolling product list behind the editor; viewport-only PNG capture added to enable controlled comparison."
+      }
+    ],
+    "nextAction": "Capture exact same viewport/dataset/theme; do not claim pixel parity or owner acceptance from synthetic QA screenshots."
+  },
+  "exactViewportEvidence": {
+    "testedCodeSha": "40137cbdb7ac2c473cde981cd8214c28b00a6ef5",
+    "runId": 40125202714,
+    "artifactId": 12573100551,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551",
+    "status": "PASS_48_DISTINCT_MATCHING_PNG_DIMENSIONS",
+    "pixelMatrix": [
+      {
+        "viewport": "390x844",
+        "themes": 2,
+        "images": 24
+      },
+      {
+        "viewport": "1280x800",
+        "themes": 2,
+        "images": 24
+      }
+    ],
+    "screenshotCounts": {
+      "total": 48,
+      "duplicateSha256": 0,
+      "wrongPixelDimensions": 0
+    },
+    "manifests": {
+      "count": 4,
+      "imagesPerManifest": 12,
+      "acceptanceStatus": "CAPTURED_NOT_ACCEPTED"
+    },
+    "syntheticDataCleanup": {
+      "independentPasses": 2,
+      "remainingOwnedRows": 0,
+      "tableCount": 7
+    },
+    "visualSignoff": "NOT_VERIFIED"
+  }
+}

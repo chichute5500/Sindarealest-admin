@@ -23,11 +23,11 @@ function runTest(file) {
 
 for (const required of [
   'package.json', 'wrangler.toml',
-  'functions/_lib.js', 'functions/_lib/watermark-settings.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
+  'functions/_lib.js', 'functions/_lib/watermark-settings.js', 'functions/_middleware.js', 'functions/sitemap.xml.js', 'functions/robots.txt.js', 'functions/api/products.js', 'functions/api/settings.js', 'functions/api/orders.js', 'functions/api/payment-settings.js', 'functions/api/order-payment.js', 'functions/api/admin/payment-qr.js', 'functions/api/admin/payment-qr-upload.js', 'functions/api/admin/payment-qr-preview.js', 'functions/api/admin/payment-requests.js', 'functions/api/admin/payment-transactions.js', 'functions/payment-qr/[key].js', 'functions/api/warranty-claims.js', 'functions/api/warranty-lookup.js', 'functions/api/warranty-claim-uploads.js', 'functions/api/admin/orders.js', 'functions/api/admin/customers.js', 'functions/api/admin/warranties.js', 'functions/api/admin/audit-logs.js', 'functions/api/admin/login.js',
   'functions/api/admin/logout.js', 'functions/api/admin/session.js', 'functions/api/admin/products.js',
   'functions/api/admin/products/[id].js', 'functions/api/admin/products/reset-skus.js', 'functions/api/admin/ai-description.js', 'functions/api/admin/push-subscriptions.js', 'functions/api/admin/settings.js', 'functions/api/admin/backup.js',
   'functions/api/admin/restore.js', 'functions/api/admin/upload.js', 'functions/api/admin/warranty-claim-image.js', 'functions/media/[key].js',
-  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_order_contact_details.sql',
+  'migrations/0001_schema.sql', 'migrations/0002_seed_products.sql', 'migrations/0003_storefront_operations.sql', 'migrations/0004_admin_notifications.sql', 'migrations/0005_address_warranty_verification.sql', 'migrations/0006_remove_warranty_otp.sql', 'migrations/0007_order_contact_details.sql', 'migrations/0008_product_sku_verification.sql', 'migrations/0009_fulfillment_and_manual_payments.sql',
   'public/index.html', 'public/admin/index.html', 'public/_redirects', 'public/og-sindarealest.jpg', 'public/watermark.webp',
   '.github/workflows/deploy.yml', 'scripts/setup-cloudflare.mjs', 'scripts/deploy-cloudflare.mjs',
 ]) check(existsSync(join(root, required)), `Thiếu tệp bắt buộc: ${required}`);
@@ -59,23 +59,25 @@ let source = [];
 try { source = JSON.parse(readFileSync(sourcePath, 'utf8')); }
 catch { failures.push('Không đọc được data/legacy-products.json'); }
 check(source.length === 235, `Số sản phẩm nguồn thay đổi ngoài dự kiến: ${source.length}`);
-check(new Set(source.map(p => p.sku)).size === source.length, 'SKU bị trùng trong dữ liệu nguồn');
+const verifiedSourceSkus = source.filter(p => p.skuVerified !== false && typeof p.sku === 'string' && p.sku.trim()).map(p => p.sku.trim().toUpperCase());
+check(source.every(p => p.skuVerified === false ? p.sku === null : typeof p.sku === 'string' && /^[A-Z0-9][A-Z0-9._-]{0,47}$/.test(p.sku)), 'SKU chưa xác minh phải để null; SKU được xác minh phải hợp lệ');
+check(new Set(verifiedSourceSkus).size === verifiedSourceSkus.length, 'SKU đã xác minh bị trùng trong dữ liệu nguồn');
 check(new Set(source.map(p => p.id)).size === source.length, 'ID bị trùng trong dữ liệu nguồn');
 check(!existsSync(join(root, 'public/products.json')), 'products.json cũ không được phép nằm trong thư mục công khai');
 check(!existsSync(join(root, 'public/catalog-fallback.json')), 'Không được có catalogue tĩnh cũ có thể che lỗi API/D1');
 
 for (const p of source) {
-  check(Array.isArray(p.images), `Ảnh không phải mảng tại SKU ${p.sku}`);
-  for (const image of (p.images || [])) check(existsSync(join(root, 'public', image)), `Thiếu ảnh ${image} (${p.sku})`);
+  check(Array.isArray(p.images), `Ảnh không phải mảng tại ID ${p.id}`);
+  for (const image of (p.images || [])) check(existsSync(join(root, 'public', image)), `Thiếu ảnh ${image} (ID ${p.id})`);
 }
 
 const seed = existsSync(join(root, 'migrations/0002_seed_products.sql'))
   ? readFileSync(join(root, 'migrations/0002_seed_products.sql'), 'utf8') : '';
 check((seed.match(/INSERT OR IGNORE INTO products/g) || []).length === 235, 'Tệp seed SQL không có đúng 235 sản phẩm');
-const seedSkus = [...seed.matchAll(/,\s*'(SD\d{3})',/g)].map(m => m[1]);
-check(seedSkus.length === 235, `Số SKU đọc được trong SQL seed là ${seedSkus.length}, không phải 235`);
-check(new Set(seedSkus).size === seedSkus.length, 'SKU bị trùng trong tệp seed SQL');
-check(seedSkus.every(sku => source.some(p => p.sku === sku)), 'SKU trong SQL seed không khớp dữ liệu nguồn');
+const seedRows = [...seed.matchAll(/VALUES\s*\('([^']+)',\s*'([^']+)',\s*'(SD\d{3})',/g)].map(m => ({ id: m[1], slug: m[2], seedSku: m[3] }));
+check(seedRows.length === 235, `Số bản ghi đọc được trong SQL seed là ${seedRows.length}, không phải 235`);
+check(new Set(seedRows.map(row => row.seedSku)).size === seedRows.length, 'Mã seed nội bộ bị trùng trong SQL seed');
+check(seedRows.every(row => source.some(p => p.id === row.id && p.slug === row.slug && p.sku === null && p.skuVerified === false)), 'Mỗi hàng SQL seed phải khớp ID/slug fixture và không được coi mã seed nội bộ là SKU thương mại đã xác minh');
 
 const homepage = existsSync(join(root, 'public/index.html')) ? readFileSync(join(root, 'public/index.html'), 'utf8') : '';
 check(homepage.includes("fetch('/api/products'"), 'Trang chủ chưa lấy sản phẩm từ API');

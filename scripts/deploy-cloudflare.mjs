@@ -77,7 +77,27 @@ async function main() {
   if (missingSnapshots === null || missingSnapshots > 0) {
     throw new Error(`Migration 0007 chưa sẵn sàng: còn ${missingSnapshots ?? 'không xác định'} đơn hàng thiếu snapshot liên hệ. Deploy bị chặn; không tự chạy migration.`);
   }
+  try {
+    runWrangler(['d1', 'execute', databaseName, '--remote', '--command', 'SELECT sku_verified FROM products LIMIT 0;'], { quiet: true });
+    runWrangler(['d1', 'execute', databaseName, '--remote', '--command', 'SELECT sku_verified FROM order_items LIMIT 0;'], { quiet: true });
+  } catch {
+    throw new Error('Migration 0008_product_sku_verification.sql chưa được áp dụng trên D1. Deploy bị chặn; áp dụng và xác minh schema thủ công trước. Script không tự chạy migration production.');
+  }
 
+  console.log('Xác minh schema fulfillment/payment migration 0009 trước deploy…');
+  try {
+    for (const query of [
+      "SELECT fulfillment_type FROM products LIMIT 0;",
+      "SELECT fulfillment_type FROM order_items LIMIT 0;",
+      "SELECT payment_terms_confirmed_at, payment_terms_confirmed_by, payment_terms_note, public_access_token_hash FROM orders LIMIT 0;",
+      "SELECT id, order_id, installment_type, amount, shipping_benefit, transfer_reference, qr_image_key, bank_name, account_number, account_name, status, created_by, created_at, updated_at FROM order_payment_requests LIMIT 0;",
+      "SELECT id, order_id, payment_request_id, direction, amount, transaction_reference, note, actor, verified_at, created_at FROM order_payment_transactions LIMIT 0;"
+    ]) {
+      runWrangler(['d1', 'execute', databaseName, '--remote', '--command', query], { quiet: true });
+    }
+  } catch {
+    throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Deploy bị chặn; script chỉ đọc schema và không tự chạy hoặc sửa migration/D1.');
+  }
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);
     if (confirm !== `DEPLOY ${project} ${branch}`) throw new Error('Xác nhận không khớp; đã hủy deploy.');

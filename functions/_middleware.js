@@ -1,4 +1,4 @@
-import { createSession, sessionCookie, verifySession } from "./_lib.js";
+import { createSession, sessionCookie, verifySession, isVerifiedCommercialSku } from "./_lib.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -36,18 +36,19 @@ export async function onRequest(context) {
   const slug = match[1].toLowerCase();
   if (!context.env?.DB) return new Response("Dịch vụ dữ liệu chưa sẵn sàng.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   let product;
-  try { product = await context.env.DB.prepare("SELECT id,slug,sku,title,description,images_json,category_label,published FROM products WHERE lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?) LIMIT 1").bind(slug,slug,slug).first(); }
+  try { product = await context.env.DB.prepare("SELECT id,slug,sku,sku_verified,title,description,images_json,category_label,published FROM products WHERE lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?) LIMIT 1").bind(slug,slug,slug).first(); }
   catch { return new Response("Không thể tải sản phẩm.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } }); }
   if (!product || Number(product.published) !== 1) return new Response("Không tìm thấy sản phẩm.", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" } });
-  if (String(product.sku) !== match[1]) return Response.redirect(new URL(`/san-pham/${encodeURIComponent(product.sku)}`, url.origin), 301);
+  const productKey = isVerifiedCommercialSku(product) ? String(product.sku) : String(product.id);
+  if (productKey !== match[1]) return Response.redirect(new URL(`/san-pham/${encodeURIComponent(productKey)}`, url.origin), 301);
   let images = [];
   try { images = JSON.parse(product.images_json || "[]"); } catch {}
   const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
   const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest.jpg";
-  const canonical = `${url.origin}/san-pham/${encodeURIComponent(product.sku)}`;
+  const canonical = `${url.origin}/san-pham/${encodeURIComponent(productKey)}`;
   const title = `${product.title} | SinDarealest`;
   const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
-  const description = `${descriptionBase.slice(0, 250)} · Mã sản phẩm: ${product.sku}`.slice(0, 300);
+  const description = (isVerifiedCommercialSku(product) ? `${descriptionBase.slice(0, 250)} · SKU: ${product.sku}` : descriptionBase).slice(0, 300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();

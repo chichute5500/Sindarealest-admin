@@ -1,0 +1,108 @@
+# PROMPT NEXT CHAT — SINDAREALEST ADMIN
+
+## EXACT-HEAD VERIFIED — 2026-10-25: 7/7 PASS, 48 EXACT-VIEWPORT SCREENSHOTS
+
+- Code/test SHA `40137cbdb7ac2c473cde981cd8214c28b00a6ef5` **7/7 GitHub Actions SUCCESS**: Validate #40125207752/#40125202730; Admin Playwright #40125207756; isolated Playwright #40125207740; read-only 12-screen #40125202712; diagnostics #40125202720; synthetic D1 QA #40125202714.
+- [Verified screenshot/QA artifact #12573100551](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551) downloaded and independently inspected: **48/48 PNG**, zero duplicate SHA256, all **24 mobile images exactly 390×844** and all **24 desktop images exactly 1280×800**. Four manifests each show 12 CAPTURED_NOT_ACCEPTED; PNG captures do not independently verify deployment bytes.
+- Authenticated run-owned QA PASS on source SHA above; workflow logs show **two separate cleanup passes, both verified zero remaining run-owned rows in seven QA tables**. No Production, main, config, secrets, or deploy workflow changes.
+- Approved-reference visual parity **0/12 accepted**; evidence rubric **32/100** (NOT project completion), old 50% PROVISIONAL remains historical. Real QR/R2 integration, payment/refund settlement, completely disposable Restore POST, owner final signoff remain unaccepted.
+- This is a docs-only follow-up; verify fresh head/CI before calling docs commit checked.
+
+
+## CHECKPOINT — 2026-10-25: EXACT VIEWPORT PNG EVIDENCE + VISUAL FINDINGS
+
+- Prior head `41637e02cfe676b7512a5a0b67e28ea83df78bd8`: **7/7 workflow conclusions SUCCESS**: Validate #40124576175/#40124572854, Playwright #40124576202/#40124576136, diagnostic #40124572623, isolated read-only 12-screen #40124572733, synthetic D1+cleanup #40124572580. Last QA log confirms cleanup ran twice with zero run-owned rows across seven tables; QA screenshot artifact #12572298914 and read-only artifact #12572785300.
+- Extracted approved `admin-mobile-reference.png` and latest QA screenshots for manual qualitative comparison. Findings (login controls, Dashboard revenue-empty state, Gallery upload vs settled state, Customers fixture counts, fullPage capture mismatch) are tracked in [WEIGHTED-ACCEPTANCE.md](WEIGHTED-ACCEPTANCE.md) / [weighted-acceptance.json](weighted-acceptance.json). **Reference parity still 0/12 accepted**; weighted evidenced score 32/100 (not project completion).
+- This new code revision fixes capture reproducibility: screenshot PNGs must be exactly 390×844 or 1280×800 for each matrix; `fullPage:false` and PNG IHDR dimensions enforced. Unlike prior full-scroll PNG files, this yields comparable viewport images. New SHA CI remains to be verified after commit. No Admin runtime code/deploy changes.
+
+
+## CHECKPOINT — 2026-10-25: WEIGHTED ACCEPTANCE + QA EVIDENCE HARDENING
+
+- New [weighted acceptance table](WEIGHTED-ACCEPTANCE.md) and [machine-readable rubric](weighted-acceptance.json): **32/100 evidence-weighted criteria have verified QA**, **68/100 not accepted**, **0/12 approved-reference visual parity signed off**. The historic `50% PROVISIONAL` remains unchanged and is NOT a computed completion percentage.
+- Test hardening: 12-screen screenshot QA no longer pins an obsolete Preview application SHA; `QA_DEPLOYED_APP_SHA` may supply a documented expectation, but screenshot tests explicitly do NOT independently verify deployed bytes. A document-level overflow now fails the QA run rather than being merely logged.
+- Baseline inspected: isolated branch `aa58800a37bd1d5347f355af60684ce9c9111cd7`, PR #111 OPEN/unmerged; existing deployment [#40122810186](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186) SUCCESS, current app SHA `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`. **Fresh CI for this new change must be checked before labeling these changes PASS.**
+- Safe scope: only feature branch tests/handoff; no `public/` or `functions/` runtime changes, no `main` or Production/secret/DNS changes, no deploy workflow. Existing synthetic QA action may run with run-owned fixtures and required cleanup; verify results before accepting.
+
+## Read this and continue the project immediately
+
+## EXACT CURRENT CHECKPOINT — 2026-10-25
+
+Repo: `chichute5500/Sindarealest-admin`. Writable branch: `feature/admin-isolated-handoff-2026-10-20`. At start of handoff current SHA `b5c3e1d7bf72efafb488821674586691908f3d8d`, **deployed application source SHA `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`**. A new documentation-only handoff child commit is expected, so **fetch live GitHub HEAD before writes**. Admin Preview URL: https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/ . Last successful owner-approved Preview deploy, QA and D1 cleanup: [#40122810186](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186), Cloudflare deployment `35534df8-86f7-4c2c-9a18-f6387ee1aee0`, artifact [#12572171035](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035). SHA provenance is **Cloudflare API metadata match**, not independent served-byte verification.
+
+Latest Gallery UI patch: `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`, six real repo product photos, horizontal thumbnails and featured image in mobile; 390/1280 populated Gallery tests and six 390/412/1280 light/dark product-matrix captures PASS [diagnostics #40122361977](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122361977), [artifact #12571935719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122361977/artifacts/12571935719). Real Preview D1 QA PASS: product edit, order price/terms/audit, warranty claim and new warranty issuance duplicate/date checks, Backup GET; 48 screenshots PASS; two run-owned cleanup checks PASS. One-shot deployment workflow is removed in handoff child, Production untouched, PRs unmerged.
+
+**Acceptance remains 50% PROVISIONAL (historic arbitrary marker)**, 12 screens PARTIAL_NOT_ACCEPTED for exact approved-reference parity, actual finances/refunds, QR/R2, Restore POST, Production not signed off. Do not falsely claim 100%, do not fabricate prices/ledger. Scope: Admin isolated Preview only; no merging, Production, secrets/DNS, real customer/payment mutations. Owner authorized safe isolated QA fixtures, Preview changes and parallel work. Next: inspect Gallery/editor and other screen parity with same data, fix remaining differences test-first; perform missing high-risk API workflows on fully disposable environments; create weighted acceptance criteria. Continue autonomously; ask only if owner-only action is truly necessary.
+
+
+
+## CURRENT VERIFIED STATE — 2026-10-24 18:43 UTC (newest; supersedes older history)
+
+- Writable Admin branch is a documentation child of one-shot workflow SHA `1a3cd63444f58506546b73c9434a14709fabe201`. **Deployed application code = `078dd7cbccd6915f4923c3a52b61d27c6d9d4f7a`** to isolated Admin Preview project only, Cloudflare reported SHA match, deployment ID `0848b2d4-3196-46c0-9904-d190518ba2c4`. [Live deploy/QA PASS #40121670202](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202).
+- Approved 12-screen source visual polish and 390/412/1280 light/dark QA with **four actual repository product images and synthetic browser-only price/stock**. [Diagnostics PASS #40121235347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121235347), [same-data image artifact #12571356633](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121235347/artifacts/12571356633), no horizontal overflow, zero API writes. Source screenshots still **NOT approved-reference pixel parity**.
+- Authenticated isolated D1 QA: product save, order pricing/terms, claim update, **warranty issuance duplicate/date protections**, D1/audit readbacks, Backup GET all PASS; 48 distinct screen captures PASS. Synthetic journal `cleanupVerified=true`, `failures=[]`, **7/7 tables + generated warranty/item fully removed**, twice. Artifact [#12570909132](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202/artifacts/12570909132).
+- Historic 50% PROVISIONAL marker is not a mathematical progress calculation. 12/12 screens still PARTIAL_NOT_ACCEPTED for exact design parity; real payment/refund, full Restore POST, R2/QR and Production not accepted. Do not claim 100%. No merge/Production/secrets change. Temporary one-shot workflow removed with this handoff commit.
+- Next: use visual fixture evidence to reduce exact-reference layout differences, especially Gallery screen #5 and mobile editor; close missing business acceptance on **disposable** environments; run tests and compare screenshots before approving screens. Re-fetch GitHub HEAD, PRs and CI before writing; do not request earlier project context again.
+
+
+
+## NEWEST VERIFIED CHECKPOINT — owner-approved isolated Preview deployed (2026-10-24 17:50 UTC)
+
+- Exact approved **deployed application SHA** `fc760be6fe8a67cc07aa1d32f17d1d5be7b305ac`. Isolated Cloudflare Pages Preview deployment and metadata match **PASS** [Actions #40117657594](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594), deployment `dce25587-1869-42cb-abfb-a18c9ec4c925`. Exact GitHub QA/test SHA `4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad` differed only by one temporary workflow; no application code changes. This documentation handoff is a newer descendant; first **fetch live** HEAD, PR and Actions.
+- Genuine previously failing order PATCH HTTP 503 now **PASS** on deployed Preview with run-owned QA, confirmed price 135000 and payment terms, authenticated GET + D1 and audit readback. Fraudulent paid status 409; foreign item price 400. Existing product, warranty claim, Backup GET QA PASS. Artifact [#12569586706](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594/artifacts/12569586706) contains 48 unique captures (12 each × mobile/desktop light/dark) and journal confirming **7/7 QA rows deleted**, two cleanup PASS, `failures=[]`.
+- Still **50% PROVISIONAL**, twelve screens `PARTIAL_NOT_ACCEPTED`, approved-reference parity `NOT_VERIFIED`. No real bank ledger, full warranty issuance, destructive restore or Production acceptance. No merge, production deployment or new Preview deploy authorized. Temporary one-shot deploy workflow removed with this checkpoint.
+- Next: evidence-based same-data design parity against reference PNG and actual captured screenshots; warranty issuance QA, payment/refund mock negatives, disposable DB restore validation; preserve fixed order regression tests. Do not repeat past questions/permissions; only ask for genuinely new owner-only action.
+
+
+
+## Latest verified live findings — 2026-10-24 17:35 UTC
+
+- Current source and regression test SHA `904962ed1b4f94f14ba133ebf23227a40f098696`. **Live Preview remains on app SHA `564ea556e6dee745eaaa491ee033a2a8cfbb595c`**; source fix not deployed.
+- Real Admin PATCH order pricing/terms **503** reproduced in [QA #40115863792](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40115863792). Found extra SQL bind for non-cancelled order updates; removed at `68439bcd8d75e17930af275dc0f55acc5ff1c6a4`, bound-count regression corrected and PASS on `904962ed1b4f94f14ba133ebf23227a40f098696`. [QA #40116556468](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556468) still FAILS this live test because it exercises **old deployed code**, with two successful run-owned cleanup passes and other QA/screens PASS. **Do not call live order save accepted**.
+- 12-screen prior screenshots contained identical mislabeled Customers/Orders image on mobile. New heading wait, screenshot SHA256 and duplicate-image checks produced [read-only PASS #40116556561](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556561), artifact [#12570155268](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556561/artifacts/12570155268); **not pixel parity** to approved reference.
+- Exact-SHA push/PR Validate and Playwright and Preview diagnostic PASS: #40116556533, #40116560310, #40116560321, #40116560350, #40116556616. No new deploy authorized. Acceptance remains **50% PROVISIONAL**, all 12 `PARTIAL_NOT_ACCEPTED`, reference `NOT_VERIFIED`, Production unchanged.
+- Next user-only gating action: explicit authorization for **isolated Preview-only redeployment** of corrected app source, followed by real QA rerun; without authorization continue safe offline tests only. Keep original PR #111 OPEN, #108 read-only, #112 draft untouched. Before any write, **fetch live** branch HEAD, PR and Actions and use expected-SHA guard.
+
+
+
+Continue directly in GitHub repository `chichute5500/Sindarealest-admin`; canonical entry point [START-HERE.md](START-HERE.md), latest records [LATEST-STATUS.md](LATEST-STATUS.md), [12-SCREEN-REFERENCE-AUDIT.md](12-SCREEN-REFERENCE-AUDIT.md), [current-status.json](current-status.json), [latest-test-results.json](latest-test-results.json). **Do not ask user to paste the conversation.** The user wants execution, concurrent safe investigations, concise evidence-based reports, then automatic continuation within the current turn. Stop only for actual owner-only action.
+
+### Verified checkpoint (2026-10-24 16:40 UTC)
+
+- Writable **feature-only branch**: `feature/admin-isolated-handoff-2026-10-20`. Last **QA/test source SHA before this handoff-only commit**: `538b20fa04b1d3b15e98d5bad59b5992e2f1dc47`. The handoff commit is a descendant with a *different branch HEAD*: **fetch the live HEAD before writing or describing current CI**.
+- `main` checkpoint SHA `227622d3e3b7c75724ffa1775b193da71089269a`; do not touch.
+- PR #111 OPEN/unmerged, mergeable/CLEAN at checkpoint; #108 OPEN/read-only; #112 OPEN/DRAFT, untouched. Refresh all 3.
+- **Deployed isolated Preview app SHA**: `564ea556e6dee745eaaa491ee033a2a8cfbb595c`. Owner-authorized one-time Preview deployment [#40106880423](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40106880423) PASS; independent Cloudflare metadata check [#40107164294](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40107164294) `REPORTED_SHA_MATCH`. URL: https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/ . This proves metadata, not served-byte integrity. QA branch is 14 commits beyond deployed SHA; compare reports 16 changed QA/workflow/handoff paths and **no `public/` or `functions/` changes**. No new Preview deploy is authorized implicitly.
+- **Latest owner-approved isolated QA** [#40112502171](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171), SHA `538b20fa04b1d3b15e98d5bad59b5992e2f1dc47`, artifact [#12567645472](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171/artifacts/12567645472): PASS, QA-only product Admin PUT+GET+D1 readback, QA-owned warranty claim PATCH+GET+D1 readback, read-only authenticated Backup V2 GET with expected ledger arrays. **48/48 live screenshots**, 12 screens × 390×844/1280×800 × light/dark, screenshots only GET/read; zero document-level horizontal overflow at tested sizes. Manifest fields: `authenticatedAdminSaveVerified=true`, `d1ReadbackVerified=true`, `warrantyClaimWriteVerified=true`, `backupReadSnapshotVerified=true`, `cleanupVerified=true`, `failures=[]`, **all seven QA record IDs REMOVED** after *two* cleanup checks. QA records were synthetic, no real customer data overwritten, no real payment ledger record inserted.
+- **Read-only remote Preview D1 schema/ledger shape** [#40110704947](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40110704947) PASS. Verified Preview D1 is different from storefront Production and Admin project Production. Nine tables and selected required columns, including payment ledgers; **this does not verify financial writes, reconciliation, refund or migration-history completion**.
+- CI on `538b20fa04b1d3b15e98d5bad59b5992e2f1dc47`: Validate push/PR, read-only PR Playwright checks, diagnostic smoke, synthetic QA all **PASS**. For this new documentation child SHA, run/inspect CI separately and do not mark it passed until evidenced.
+- **Official acceptance 50% PROVISIONAL**. All twelve screen statuses are `PARTIAL_NOT_ACCEPTED`, approved-reference/same-data parity `NOT_VERIFIED`. Functional acceptance is **PARTIAL: product and claim writes only**. Production `NOT_PERFORMED`. Do not translate screenshot capture PASS into design parity PASS. User wants a better weighted progress model but do not fabricate a percentage; if scoring, distinguish completed engineering from accepted requirements.
+
+### Next work queue — execute, do not merely report
+
+1. **Immediately refresh GitHub HEAD, PR #111/#108/#112, Actions and exact documentation commit SHA**. Resolve any failed CI first. Inspect QA #40112502171 artifact if needed; link exact tests/artifacts. The old screenshots before this are historical.
+2. **Visual parity, 12 screens:** open approved `docs/admin-ui-reference/admin-mobile-reference.png`; pair with latest actual 390×844 light/dark artifact screenshot per screen. Group independent screen reviews in parallel. Record concrete measurable differences versus sample-data differences and auth/business semantics. If a real defect is found: reproduce with failing test → minimal feature-branch fix → exact SHA validation. **No changes to real data to satisfy a reference mock.** A new `public/admin/` UI change requires owner permission for isolated Preview deployment to see it live; never redeploy automatically.
+3. **Safe business QA:** Use owner-authorized synthetic records **only after checking Cloudflare Pages Preview D1 binding differs from both Production bindings**, and only exact `qa_<runId>_...` IDs. Extend `scripts/qa-admin-d1-synthetic-lifecycle.mjs` and tests for Admin order status/price save → authenticated GET → D1 readback and own audit entries → exact-ID cleanup. Then test warranty issuance, duplicate/race rejection, claim transitions similarly. Do not update legitimate records; cleanup **both success and failure**, verify zero QA leftovers, do not store secret/customer data in logs/artifacts. Workflows in `.github/workflows/admin-12-screen-synthetic-qa-20261024.yml` have owner-authorized guardrails.
+4. **Payments/refunds/QR:** preserve truth about verified bank receipts. Use code/unit/mocked or negative-path tests; do not fabricate verified financial transactions or alter real QR settings, R2 or payment ledgers. A dedicated disposable isolated DB/explicit approval is required before any risky financial lifecycle write.
+5. **Backup/Restore:** Backup **GET snapshot passed** (no private data echoed). Actual `POST /api/admin/restore` is destructive (deletes all products/operations) and **MUST NOT** be called on the populated shared isolated Preview; test validation and round-trip in an offline/disposable DB only.
+6. **Document and repeat:** synchronize `START-HERE.md`, `PROMPT-NEXT-CHAT.md`, `LATEST-STATUS.md`, `12-SCREEN-REFERENCE-AUDIT.md`, `current-status.json`, `latest-test-results.json` after material proof; status/JSON align and `tests/handoff-integrity.test.mjs` passes; report what is truly accepted and what isn't.
+
+### Mandatory guardrails
+
+- Write **only** to `feature/admin-isolated-handoff-2026-10-20`, update ref with `expected_sha` after fresh fetch, reject stale SHA. No merge/rebase/cherry-pick/force push; PR #111 stays OPEN/unmerged; PR #108 read-only, PR #112 OPEN DRAFT untouched; no `main`, storefront or Production edits.
+- Every handoff/documentation commit message begins `[CF-Pages-Skip]`. Inspect Actions on exact new SHA; investigate any unexpected Cloudflare Pages deploy.
+- No Production deployment; **no isolated Preview redeployment without a new explicit owner request**. No Access bypass, DNS/secrets changes, remote schema migrations, setup/deploy scripts, R2 writes, changes to real business records, or fake receipts/payments.
+- Temporary QA D1 insert/update/delete permitted **only** for identified run-owned synthetic records in positively isolated Preview DB, followed by mandatory 0-row verification. Owner approval for synthetic QA is already recorded in this conversation; do not broaden to real financial/payment/restore work.
+- Distinguish source/test SHA vs docs HEAD vs **deployed app SHA**; unit/fixture checks vs authenticated reads vs isolated QA writes vs true acceptance. Never invent test PASS, pixel parity, deployment SHA, or percent progress.
+- **Parallel investigations**, test-first changes, precise errors/SHA/Actions, concise report then continue without waiting unless truly owner-only.
+
+### Key links
+
+- Repo: https://github.com/chichute5500/Sindarealest-admin
+- PR #111: https://github.com/chichute5500/Sindarealest-admin/pull/111
+- Admin Preview: https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/
+- Latest exact-source QA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171
+- Evidence ZIP artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171/artifacts/12567645472
+- D1 read-only schema: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40110704947
+- Owner-approved Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40106880423
+
+**On opening the new chat: first fetch live state; then act on the next safe QA/visual workstream. No need to ask the owner to repeat any information.**

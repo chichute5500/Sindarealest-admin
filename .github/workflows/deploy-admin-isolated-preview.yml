@@ -1,0 +1,85 @@
+name: Deploy ADMIN to isolated Cloudflare Pages Preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-isolated-pages-preview
+  cancel-in-progress: false
+
+jobs:
+  deploy-admin-preview:
+    name: Deploy isolated feature Preview (never production)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # Pin this manual workflow to the isolated Admin project; never use the shared storefront variable.
+      CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview
+      PREVIEW_BRANCH: feature-admin-isolated-handoff-2026-10-20
+    steps:
+      - name: Guard exact feature branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/feature/admin-isolated-handoff-2026-10-20" || {
+            echo "::error::This workflow may only run from the ADMIN feature branch."
+            exit 1
+          }
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          test "$CLOUDFLARE_PAGES_PROJECT" = "sindarealest-admin-preview" || {
+            echo "::error::Unexpected Pages project; refusing to deploy."
+            exit 1
+          }
+
+      - name: Check out exact feature commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install --no-fund
+
+      - name: Validate source and tests
+        run: |
+          npm run check
+          npm test
+
+      - name: Verify project production branch remains main
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}")"
+          printf '%s' "$response" | jq -e '.success == true and .result.production_branch == "main"' >/dev/null || {
+            echo "::error::Production branch is not confirmed as main; refusing Preview deployment."
+            exit 1
+          }
+
+      - name: Deploy to isolated non-production branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public \
+            --project-name "$CLOUDFLARE_PAGES_PROJECT" \
+            --branch "$PREVIEW_BRANCH" \
+            --commit-hash "$GITHUB_SHA" \
+            --commit-message "ADMIN feature Preview $GITHUB_SHA"
+
+      - name: Print expected Preview alias
+        run: |
+          echo "Preview branch: $PREVIEW_BRANCH"
+          echo "Expected branch alias: https://${PREVIEW_BRANCH}.${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
+          echo "Deployed source commit: $GITHUB_SHA"
+          echo "This workflow does not change production branch or deploy to main."

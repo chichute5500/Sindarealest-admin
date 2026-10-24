@@ -15,7 +15,7 @@ function validateOperations(operations) {
   const keys = ["customers","orders","orderItems","warranties","warrantyClaims","auditLogs"];
   if (!operations || typeof operations !== "object" || keys.some(k => !Array.isArray(operations[k])) || keys.some(k => operations[k].length > 20000)) return { error: "Bản sao lưu thiếu danh sách dữ liệu vận hành hoặc vượt giới hạn." };
   const customers = operations.customers, orders = operations.orders, items = operations.orderItems, warranties = operations.warranties, claims = operations.warrantyClaims, logs = operations.auditLogs;
-  const optionalKeys = ["customerAddressDetails","orderShippingAddresses","orderContactDetails","orderItemDetails","warrantyClaimAttachments"];
+  const optionalKeys = ["customerAddressDetails","orderShippingAddresses","orderContactDetails","orderItemDetails","warrantyClaimAttachments","orderPaymentRequests","orderPaymentTransactions"];
   for (const key of optionalKeys) {
     if (operations[key] !== undefined && (!Array.isArray(operations[key]) || operations[key].length > 20000)) {
       return { error: "Bản sao lưu có danh sách địa chỉ/ảnh đính kèm không hợp lệ hoặc vượt giới hạn." };
@@ -31,6 +31,8 @@ function validateOperations(operations) {
   const orderShippingAddresses = operations.orderShippingAddresses || [];
   const orderItemDetails = operations.orderItemDetails || [];
   const warrantyClaimAttachments = operations.warrantyClaimAttachments || [];
+  const orderPaymentRequests = operations.orderPaymentRequests || [];
+  const orderPaymentTransactions = operations.orderPaymentTransactions || [];
   const providedOrderContactDetails = operations.orderContactDetails === undefined ? null : operations.orderContactDetails;
   const customerById = new Map();
   const orderById = new Map(), itemById = new Map();
@@ -43,7 +45,7 @@ function validateOperations(operations) {
     customerIds.add(c.id); phones.add(c.phone); customerById.set(c.id, c);
   }
   for (const o of orders) {
-    if (!str(o.id,100,true) || !str(o.order_number,80,true) || !customerIds.has(o.customer_id) || !["pending_confirmation","confirmed","processing","shipped","completed","cancelled"].includes(o.status) || !["unpaid","pending","paid","refunded"].includes(o.payment_status) || !nullableInteger(o.subtotal) || !nullableInteger(o.total) || ![0,1,"0","1",false,true].includes(o.price_confirmation_required) || !str(o.customer_note,1200) || !timestamp(o.created_at) || !timestamp(o.updated_at)) return { error: "Bản sao lưu có đơn hàng không hợp lệ hoặc tham chiếu khách hàng không tồn tại." };
+    if (!str(o.id,100,true) || !str(o.order_number,80,true) || !customerIds.has(o.customer_id) || !["pending_confirmation","confirmed","processing","shipped","completed","cancelled"].includes(o.status) || !["unpaid","pending","paid","refunded"].includes(o.payment_status) || !nullableInteger(o.subtotal) || !nullableInteger(o.total) || ![0,1,"0","1",false,true].includes(o.price_confirmation_required) || (o.payment_terms_confirmed_at != null && !timestamp(o.payment_terms_confirmed_at)) || (o.payment_terms_confirmed_by !== undefined && !str(o.payment_terms_confirmed_by,80)) || (o.payment_terms_note !== undefined && !str(o.payment_terms_note,1000)) || (o.public_access_token_hash != null && !/^[a-f0-9]{64}$/.test(o.public_access_token_hash)) || !str(o.customer_note,1200) || !timestamp(o.created_at) || !timestamp(o.updated_at)) return { error: "Bản sao lưu có đơn hàng không hợp lệ hoặc tham chiếu khách hàng không tồn tại." };
     if (orderIds.has(o.id) || orderNumbers.has(o.order_number)) return { error: "Bản sao lưu có ID hoặc mã đơn hàng trùng." };
     orderIds.add(o.id); orderNumbers.add(o.order_number); orderById.set(o.id, o);
   }
@@ -56,9 +58,53 @@ function validateOperations(operations) {
     }
   }
   for (const i of items) {
-    if (!str(i.id,100,true) || !orderIds.has(i.order_id) || !str(i.product_id,100,true) || !str(i.sku,48,true) || !str(i.title,180,true) || !integer(i.quantity,1,50) || !nullableInteger(i.unit_price,2_000_000_000) || !nullableInteger(i.line_total)) return { error: "Bản sao lưu có dòng sản phẩm trong đơn không hợp lệ." };
+    if (!str(i.id,100,true) || !orderIds.has(i.order_id) || !str(i.product_id,100,true) || !str(i.sku,48,true) || !str(i.title,180,true) || !integer(i.quantity,1,50) || !nullableInteger(i.unit_price,2_000_000_000) || !nullableInteger(i.line_total) || (i.fulfillment_type !== undefined && !["in_stock","made_to_order","unclassified"].includes(i.fulfillment_type))) return { error: "Bản sao lưu có dòng sản phẩm trong đơn không hợp lệ." };
     if (itemIds.has(i.id)) return { error: "Bản sao lưu có ID dòng đơn hàng trùng." };
     itemIds.add(i.id); itemById.set(i.id, i);
+  }
+  const paymentRequestIds = new Set(), paymentReferences = new Set(), pendingPaymentOrders = new Set();
+  for (const request of orderPaymentRequests) {
+    if (!str(request.id,100,true) || !orderIds.has(request.order_id) ||
+        !["deposit","balance","full"].includes(request.installment_type) ||
+        !integer(request.amount,1,2_000_000_000) ||
+        !str(request.transfer_reference,80,true) ||
+        !/^qr-[0-9a-f-]{36}\.(?:png|jpe?g|webp)$/.test(String(request.qr_image_key || "")) ||
+        !str(request.bank_name,100,true) || !/^\d{6,19}$/.test(String(request.account_number || "")) ||
+        !/^[A-Z0-9 ]{5,80}$/.test(String(request.account_name || "")) ||
+        !["pending","cancelled","settled"].includes(request.status) || (request.shipping_benefit !== undefined && !["standard_shipping","free_shipping"].includes(request.shipping_benefit)) ||
+        !str(request.created_by,80,true) || !timestamp(request.created_at) || !timestamp(request.updated_at)) {
+      return { error: "Bản sao lưu có yêu cầu thanh toán không hợp lệ." };
+    }
+    const normalizedReference = request.transfer_reference.toLocaleUpperCase("en-US");
+    if (paymentRequestIds.has(request.id) || paymentReferences.has(normalizedReference)) {
+      return { error: "Bản sao lưu có ID yêu cầu hoặc mã chuyển khoản trùng." };
+    }
+    if (request.status === "pending" && pendingPaymentOrders.has(request.order_id)) {
+      return { error: "Bản sao lưu có nhiều yêu cầu thanh toán đang chờ cho cùng một đơn." };
+    }
+    paymentRequestIds.add(request.id);
+    paymentReferences.add(normalizedReference);
+    if (request.status === "pending") pendingPaymentOrders.add(request.order_id);
+  }
+  const transactionIds = new Set(), transactionReferences = new Set();
+  for (const transaction of orderPaymentTransactions) {
+    if (!str(transaction.id,100,true) || !orderIds.has(transaction.order_id) ||
+        (transaction.payment_request_id != null && transaction.payment_request_id !== "" &&
+          (!paymentRequestIds.has(transaction.payment_request_id) ||
+            orderPaymentRequests.find(row => row.id === transaction.payment_request_id)?.order_id !== transaction.order_id)) ||
+        !["received","refunded"].includes(transaction.direction) ||
+        !integer(transaction.amount,1,2_000_000_000) ||
+        !str(transaction.transaction_reference,80,true) ||
+        !str(transaction.note,500) || !str(transaction.actor,80,true) ||
+        !timestamp(transaction.verified_at) || !timestamp(transaction.created_at)) {
+      return { error: "Bản sao lưu có giao dịch thanh toán không hợp lệ hoặc tham chiếu không khớp." };
+    }
+    const normalizedReference = transaction.transaction_reference.toLocaleUpperCase("en-US");
+    if (transactionIds.has(transaction.id) || transactionReferences.has(normalizedReference)) {
+      return { error: "Bản sao lưu có ID giao dịch hoặc mã giao dịch ngân hàng trùng." };
+    }
+    transactionIds.add(transaction.id);
+    transactionReferences.add(normalizedReference);
   }
   for (const w of warranties) {
     if (!str(w.id,100,true) || !orderIds.has(w.order_id) || !itemIds.has(w.order_item_id) || itemById.get(w.order_item_id)?.order_id !== w.order_id || !str(w.warranty_code,100,true) || !str(w.policy_name,160,true) || !integer(w.duration_months,1,120) || !str(w.starts_at,10,true) || !str(w.ends_at,10,true) || !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) return { error: "Bản sao lưu có bản ghi bảo hành không hợp lệ hoặc dòng sản phẩm không thuộc đúng đơn hàng." };
@@ -100,7 +146,7 @@ function validateOperations(operations) {
     const customer = customerById.get(order.customer_id);
     return { order_id: order.id, full_name: customer.full_name, phone: customer.phone, email: customer.email || "", created_at: order.created_at };
   });
-  return { value: { customers,orders,items,warranties,claims,logs,customerAddressDetails,orderShippingAddresses,orderContactDetails,orderItemDetails,warrantyClaimAttachments } };
+  return { value: { customers,orders,items,warranties,claims,logs,customerAddressDetails,orderShippingAddresses,orderContactDetails,orderItemDetails,warrantyClaimAttachments,orderPaymentRequests,orderPaymentTransactions } };
 }
 
 export async function onRequestPost(context) {
@@ -127,6 +173,7 @@ export async function onRequestPost(context) {
     if (present.length === watermarkFields.length) {
       const checkedWatermark = validateWatermarkSettingUpdates({
         watermarkEnabled: backup.settings.watermarkEnabled,
+        ...(Object.hasOwn(backup.settings, "watermarkLogoUrl") ? { watermarkLogoUrl: backup.settings.watermarkLogoUrl } : {}),
         watermarkPosition: backup.settings.watermarkPosition,
         watermarkSize: backup.settings.watermarkSize,
         watermarkOpacity: backup.settings.watermarkOpacity,
@@ -168,7 +215,7 @@ export async function onRequestPost(context) {
     if (operations) statements.push(
       db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'"), db.prepare("DELETE FROM warranty_claim_uploads"),
       db.prepare("DELETE FROM customer_address_details"), db.prepare("DELETE FROM order_shipping_addresses"), db.prepare("DELETE FROM order_item_details"),
-      db.prepare("DELETE FROM warranty_claims"), db.prepare("DELETE FROM warranties"), db.prepare("DELETE FROM order_items"),
+      db.prepare("DELETE FROM warranty_claims"), db.prepare("DELETE FROM warranties"), db.prepare("DELETE FROM order_payment_transactions"), db.prepare("DELETE FROM order_payment_requests"), db.prepare("DELETE FROM order_items"),
       db.prepare("DELETE FROM order_contact_details"), db.prepare("DELETE FROM orders"), db.prepare("DELETE FROM customers"), db.prepare("DELETE FROM audit_logs"), db.prepare("DELETE FROM public_rate_limits")
     );
     statements.push(db.prepare("DELETE FROM products"));
@@ -181,10 +228,12 @@ export async function onRequestPost(context) {
     if (operations) {
       for (const c of operations.customers) statements.push(db.prepare("INSERT INTO customers(id,full_name,phone,email,address,created_at,updated_at) VALUES(?,?,?,?,?,?,?)").bind(c.id,c.full_name,c.phone,c.email,c.address,c.created_at,c.updated_at));
       for (const a of operations.customerAddressDetails) statements.push(db.prepare("INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) VALUES(?,?,?,?,?,?,?)").bind(a.customer_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.updated_at));
-      for (const o of operations.orders) statements.push(db.prepare("INSERT INTO orders(id,order_number,customer_id,status,payment_status,subtotal,total,price_confirmation_required,customer_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)").bind(o.id,o.order_number,o.customer_id,o.status,o.payment_status,o.subtotal,o.total,Number(o.price_confirmation_required)?1:0,o.customer_note,o.created_at,o.updated_at));
+      for (const o of operations.orders) statements.push(db.prepare("INSERT INTO orders(id,order_number,customer_id,status,payment_status,subtotal,total,price_confirmation_required,customer_note,payment_terms_confirmed_at,payment_terms_confirmed_by,payment_terms_note,public_access_token_hash,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(o.id,o.order_number,o.customer_id,o.status,o.payment_status,o.subtotal,o.total,Number(o.price_confirmation_required)?1:0,o.customer_note,o.payment_terms_confirmed_at ?? null,o.payment_terms_confirmed_by || "",o.payment_terms_note || "",o.public_access_token_hash ?? null,o.created_at,o.updated_at));
       for (const a of operations.orderShippingAddresses) statements.push(db.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(a.order_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.full_address,a.created_at));
       for (const c of operations.orderContactDetails) statements.push(db.prepare("INSERT INTO order_contact_details(order_id,full_name,phone,email,created_at) VALUES(?,?,?,?,?)").bind(c.order_id,c.full_name,c.phone,c.email,c.created_at));
-      for (const i of operations.items) statements.push(db.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(i.id,i.order_id,i.product_id,i.sku,i.title,i.quantity,i.unit_price,i.line_total));
+      for (const i of operations.items) statements.push(db.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(i.id,i.order_id,i.product_id,i.sku,Number(i.sku_verified ?? i.skuVerified)===1?1:0,i.title,i.quantity,i.unit_price,i.line_total,["in_stock","made_to_order","unclassified"].includes(i.fulfillment_type)?i.fulfillment_type:"unclassified"));
+      for (const request of operations.orderPaymentRequests) statements.push(db.prepare("INSERT INTO order_payment_requests(id,order_id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(request.id,request.order_id,request.installment_type,request.amount,request.shipping_benefit || (request.installment_type === "full" ? "free_shipping" : "standard_shipping"),request.transfer_reference,request.qr_image_key,request.bank_name,request.account_number,request.account_name,request.status,request.created_by,request.created_at,request.updated_at));
+      for (const transaction of operations.orderPaymentTransactions) statements.push(db.prepare("INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor,verified_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(transaction.id,transaction.order_id,transaction.payment_request_id || null,transaction.direction,transaction.amount,transaction.transaction_reference,transaction.note,transaction.actor,transaction.verified_at,transaction.created_at));
       for (const d of operations.orderItemDetails) statements.push(db.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(d.item_id,d.size));
       for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
       for (const c of operations.claims) statements.push(db.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message,status,admin_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(c.id,c.order_id,c.customer_id,c.warranty_code,c.message,c.status,c.admin_note,c.created_at,c.updated_at));

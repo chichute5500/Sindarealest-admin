@@ -3,7 +3,7 @@ export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare(`SELECT wc.id,wc.order_id AS orderId,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone,wc.warranty_code AS warrantyCode,wc.message,wc.status,wc.admin_note AS adminNote,wc.created_at AS createdAt,a.image_key AS imageKey FROM warranty_claims wc JOIN orders o ON o.id=wc.order_id JOIN customers c ON c.id=wc.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=wc.order_id LEFT JOIN warranty_claim_attachments a ON a.claim_id=wc.id ORDER BY wc.created_at DESC LIMIT 1000`).all();
-    const issued = await context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.title,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id ORDER BY w.created_at DESC LIMIT 1000`).all();
+    const issued = await context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id ORDER BY w.created_at DESC LIMIT 1000`).all();
     const today = getCurrentDateInVietnam();
     const warranties = (issued.results || []).map((warranty) => ({
       ...warranty,
@@ -58,8 +58,9 @@ export async function onRequestPost(context) {
     const issued = await context.env.DB.batch([
       context.env.DB.prepare(
         "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
-        "SELECT ?,?,?,?,?,?,?,?,'active' WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=?)",
-      ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),item.itemId),
+        "SELECT ?,?,?,?,?,?,?,?,'active' WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=?) " +
+        "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='completed')",
+      ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),item.itemId,item.orderId),
       context.env.DB.prepare(
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
         "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)",
