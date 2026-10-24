@@ -544,8 +544,8 @@ assert.ok(mobileHeroReferenceMatch.includes("mask-image:linear-gradient(to botto
 
 const sharedHeroStyles=html.slice(html.lastIndexOf("/* Cross-device Hero design system: desktop and tablet inherit the same broad,"));
 assert.ok(sharedHeroStyles.includes("@media(min-width:761px){")
-  && sharedHeroStyles.includes("height:clamp(535px,43vw,620px)!important;")
-  && sharedHeroStyles.includes("width:clamp(565px,43vw,610px)!important;")
+  && sharedHeroStyles.includes("height:clamp(405px,32vw,460px)!important;")
+  && sharedHeroStyles.includes("width:clamp(470px,37vw,535px)!important;")
   && sharedHeroStyles.includes("border-radius:0 0 22% 22% / 0 0 12% 12%!important;")
   && sharedHeroStyles.includes("at 41% 82%")
   && sharedHeroStyles.includes("at 78% 40%")
@@ -553,11 +553,18 @@ assert.ok(sharedHeroStyles.includes("@media(min-width:761px){")
   && sharedHeroStyles.includes("height:clamp(455px,60vw,550px)!important;"),
   "Desktop/tablet Hero must use a compact layout and the same continuous marble shelf and two contact shadows as mobile.");
 
-assert.ok(sharedHeroStyles.includes("position:absolute!important;top:-25px!important;left:0!important;")
-  && sharedHeroStyles.includes("bottom:56px!important;")
+assert.ok(sharedHeroStyles.includes("position:absolute!important;top:-107px!important;left:0!important;")
+  && sharedHeroStyles.includes("left:43%!important;bottom:20px!important;")
   && sharedHeroStyles.includes("top:-20px!important;left:-28px!important;")
   && sharedHeroStyles.includes("width:clamp(430px,58vw,490px)!important;")
   && sharedHeroStyles.includes("@media (pointer:coarse) and (min-width:761px)")
   && sharedHeroStyles.includes(".nav-wrap .navlinks{display:none!important}")
   && sharedHeroStyles.includes(".featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;"),
   "Desktop product must fit below the header; touch-requested desktop view must expose menu and larger two-column product cards.");
+
+assert.ok(sharedHeroStyles.includes("width:78%!important;max-width:505px!important;height:40px!important;")
+  && sharedHeroStyles.includes("width:76%!important;max-width:493px!important;height:52px!important;")
+  && sharedHeroStyles.includes("left:43%!important;bottom:35px!important;")
+  && sharedHeroStyles.includes("#home .hero-visual::before{left:50%!important;")
+  && sharedHeroStyles.includes("#home .hero-visual::after{left:50%!important;"),
+  "Shortened desktop Hero must shrink/recenter the marble shelf and preserve the tablet center.");

@@ -400,8 +400,8 @@ try {
           }
         }
         if (m.viewport.width >= 761) {
-          const maxHeight=m.viewport.width>=1001?680:575;
-          if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<430) fail('Desktop/tablet Hero is oversized or collapsed.');
+          const maxHeight=m.viewport.width>=1001?485:575;
+          if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<(m.viewport.width>=1001?400:430)) fail('Desktop/tablet Hero is oversized or collapsed.');
           if(!m.pedestal || m.pedestal.face.clipPath!=='none' || !String(m.pedestal.face.maskImage).includes('linear-gradient'))
             fail('Desktop/tablet Hero uses a detached polygon platform instead of the shared curved stone shelf.');
           if(!m.contactShadow || m.contactShadow.display==='none'||!m.contactShadow.background.includes('radial-gradient'))
@@ -412,10 +412,16 @@ try {
         if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
           if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');
-          const minimumProductWidth = m.viewport.width >= 1400 ? 380 : 350;
-          const maximumProductWidth = m.viewport.width >= 1400 ? 460 : 435;
+          const minimumProductWidth = m.viewport.width >= 1400 ? 340 : 315;
+          const maximumProductWidth = m.viewport.width >= 1400 ? 390 : 370;
           if (!m.visibleProductRect || m.visibleProductRect.width < minimumProductWidth || m.visibleProductRect.width > maximumProductWidth)
             fail('Desktop Hero product must be scaled realistically (not cropped by header or exaggerated).');
+          const ovalTop=m.frameRect.top + m.pedestal.oval.top;
+          const shoeToOval=m.visibleProductRect?.bottom - ovalTop;
+          if(!Number.isFinite(shoeToOval) || shoeToOval < -3 || shoeToOval > 46)
+            fail('Compact desktop shoe soles must touch the downsized marble plane, not hover or sink through it.');
+          if (m.heroRect.height > 470) fail('Owner-marked desktop Hero boundary must stay above 470px.');
+
         }
         if (!String(m.filter).includes('drop-shadow')) fail('Hero image is missing the restrained drop shadow.');
         if (!m.expectedThemeApplied) fail('Requested light/dark theme was not applied.');
