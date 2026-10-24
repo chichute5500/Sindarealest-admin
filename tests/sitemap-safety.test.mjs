@@ -32,6 +32,16 @@ for (const previewUrl of [
   assert.equal(await previewResponse.text(), "Sitemap unavailable on Preview hosts");
 }
 
+// The primary Pages hostname is the production canonical host and must remain allowed.
+const primaryResponse = await sitemap({
+  request: new Request("https://sindarealest2.pages.dev/sitemap.xml"),
+  env: { DB },
+});
+assert.equal(primaryResponse.status, 200);
+const primaryXml = await primaryResponse.text();
+assert.match(primaryXml, /<loc>https:\/\/sindarealest2\.pages\.dev\/<\/loc>/);
+assert.match(primaryXml, /<loc>https:\/\/sindarealest2\.pages\.dev\/sanpham\/giaytay\/SD-SN001<\/loc>/);
+
 const response = await sitemap({
   request: new Request("https://shop.example/sitemap.xml"),
   env: { DB },
