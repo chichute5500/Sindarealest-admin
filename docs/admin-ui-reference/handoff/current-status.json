@@ -478,7 +478,9 @@
     "previewRunId": 40074512187,
     "diagnosticRunId": 40074508692,
     "artifactId": 12551859359,
-    "commitIsDocsOnly": true
+    "commitIsDocsOnly": true,
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
   },
   "currentHeadAtCheckpoint": "e55088d89632ff84ec68715cdee3ef64c1a9e964",
   "currentHeadValidation": "VALIDATE_5636_PASS_AND_PREVIEW_521_SUCCESS_ON_E55088D89632FF84EC68715CDEE3EF64C1A9E964",
