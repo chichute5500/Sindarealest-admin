@@ -50,6 +50,7 @@ const audit = {
     { name: 'mobile-360', width: 360, height: 800 },
     { name: 'mobile-390', width: 390, height: 844 },
     { name: 'tablet-768', width: 768, height: 1024 },
+    { name: 'phone-desktop-mode-980', width: 980, height: 800, hasTouch: true },
     { name: 'desktop-1280', width: 1280, height: 800 },
     { name: 'desktop-1440', width: 1440, height: 900 },
   ],
@@ -72,6 +73,7 @@ try {
       const context = await browser.newContext({
         viewport: { width: viewport.width, height: viewport.height },
         deviceScaleFactor: 1,
+        hasTouch: Boolean(viewport.hasTouch),
         colorScheme: theme,
         reducedMotion: 'reduce',
       });
@@ -305,6 +307,12 @@ try {
             objectPosition: imageStyle.objectPosition,
             filter: imageStyle.filter,
             imageRect, frameRect, copyRect, heroRect:rect(hero), visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal, contactShadow,
+            compactTouchDesktop: {
+              matches: matchMedia('(pointer: coarse) and (min-width:761px)').matches,
+              desktopLinksDisplay: getComputedStyle(document.querySelector('.navlinks')).display,
+              menuButtonDisplay: getComputedStyle(document.querySelector('#menuToggle')).display,
+              productColumns: getComputedStyle(document.querySelector('.featured-grid')).gridTemplateColumns,
+            },
             productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
             expectedThemeApplied: rootDark === (args.theme === 'dark'),
             viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
@@ -367,6 +375,14 @@ try {
           if (!m.visibleProductRect || m.visibleProductRect.top >= m.copyRect.bottom - 50) fail('Mobile Hero shoes fell below the copy instead of floating beside it.');
           if (m.visibleProductRect && m.visibleProductRect.bottom > m.heroRect.bottom + 2) fail('Visible shoes are clipped past the Hero frame.');
           if (m.visibleProductRect && (m.visibleProductRect.left < m.viewport.width*.43 || m.visibleProductRect.left > m.viewport.width*.63)) fail('Mobile Hero shoes do not start in the right-hand image column.');
+        }
+        if (viewport.hasTouch) {
+          const compact=m.compactTouchDesktop;
+          if(!compact.matches || compact.desktopLinksDisplay!=='none' || compact.menuButtonDisplay==='none')
+            fail('Touch desktop mode must show the compact hamburger header rather than miniature full desktop links.');
+          const colSizes=(compact.productColumns||'').split(' ').filter(Boolean);
+          if(colSizes.length!==2)
+            fail('Touch desktop mode must expose two usable product columns, not four tiny cards.');
         }
         if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 320)) fail('Tablet Hero product is too small compared with the reference-led layout.');
         if (m.viewport.width >= 761 && m.viewport.width <= 1000) {

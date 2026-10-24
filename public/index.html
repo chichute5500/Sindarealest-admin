@@ -3932,9 +3932,9 @@ html.dark #home .hero-visual::before{
     -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
   }
   #home .hero-visual img{
-    position:absolute!important;top:-90px!important;left:0!important;right:auto!important;bottom:auto!important;
+    position:absolute!important;top:-25px!important;left:0!important;right:auto!important;bottom:auto!important;
     z-index:2!important;display:block!important;
-    width:clamp(620px,46vw,700px)!important;max-width:none!important;
+    width:clamp(565px,43vw,610px)!important;max-width:none!important;
     height:auto!important;max-height:none!important;
     margin:0!important;padding:0!important;
     object-fit:contain!important;object-position:center center!important;
@@ -3945,7 +3945,7 @@ html.dark #home .hero-visual::before{
   }
   #home .hero-visual::before{
     content:""!important;position:absolute!important;display:block!important;
-    inset:auto!important;top:auto!important;left:50%!important;bottom:91px!important;
+    inset:auto!important;top:auto!important;left:50%!important;bottom:56px!important;
     transform:translateX(-50%)!important;
     width:92%!important;max-width:600px!important;height:56px!important;
     border:1px solid rgba(196,214,226,.21)!important;border-radius:50%!important;
@@ -3960,7 +3960,7 @@ html.dark #home .hero-visual::before{
     content:""!important;position:absolute!important;display:block!important;
     inset:auto!important;top:auto!important;left:50%!important;bottom:-10px!important;
     transform:translateX(-50%)!important;
-    width:90%!important;max-width:580px!important;height:108px!important;
+    width:90%!important;max-width:580px!important;height:82px!important;
     border:0!important;border-radius:0 0 22% 22% / 0 0 12% 12%!important;
     clip-path:none!important;
     -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 50%,rgba(0,0,0,.70) 72%,transparent 100%)!important;
@@ -3974,7 +3974,7 @@ html.dark #home .hero-visual::before{
   }
   #home .hero-visual-glow{
     position:absolute!important;display:block!important;
-    inset:auto!important;top:auto!important;left:50%!important;bottom:106px!important;
+    inset:auto!important;top:auto!important;left:50%!important;bottom:71px!important;
     width:85%!important;max-width:550px!important;height:44px!important;
     min-height:0!important;margin:0!important;padding:0!important;
     transform:translateX(-50%)!important;opacity:1!important;visibility:visible!important;
@@ -4021,11 +4021,54 @@ html.dark #home .hero-visual::before{
   #home .hero-actions{margin-top:16px!important}
   #home .hero-actions .pill-btn{font-size:12px!important;min-height:42px!important;padding:9px 15px!important}
   #home .hero-visual img{
-    top:-80px!important;left:-42px!important;
-    width:clamp(480px,64vw,570px)!important;
+    top:-20px!important;left:-28px!important;
+    width:clamp(430px,58vw,490px)!important;
   }
-  #home .hero-visual::before{width:100%!important;max-width:475px!important;height:40px!important;bottom:74px!important}
-  #home .hero-visual::after{width:95%!important;max-width:460px!important;height:85px!important;bottom:-5px!important}
-  #home .hero-visual-glow{width:92%!important;max-width:448px!important;height:30px!important;bottom:88px!important}
+  #home .hero-visual::before{width:100%!important;max-width:475px!important;height:40px!important;bottom:24px!important}
+  #home .hero-visual::after{width:95%!important;max-width:460px!important;height:68px!important;bottom:-5px!important}
+  #home .hero-visual-glow{width:92%!important;max-width:448px!important;height:30px!important;bottom:38px!important}
 }
 
+
+
+/* Touchscreen asking for desktop site: retain the same premium visual language,
+   but prioritize readable navigation and product cards over a miniature PC page.
+   Chrome's "Desktop site" may still choose a wide layout viewport; CSS cannot
+   override browser-controlled page zoom, so never promise forced mobile mode. */
+@media (pointer:coarse) and (min-width:761px) {
+  .nav-wrap .nav{min-height:68px!important;gap:10px!important;padding:9px 14px!important}
+  .nav-wrap .nav .brand{flex:1 1 auto!important;min-width:0!important}
+  .nav-wrap .nav .brand-symbol{width:38px!important;height:42px!important}
+  .nav-wrap .nav .brand-name{font-size:22px!important}
+  .nav-wrap .nav .brand-tagline{font-size:10px!important}
+  .nav-wrap .navlinks{display:none!important}
+  .nav-wrap .nav-actions{margin-left:auto!important}
+  .nav-wrap .nav-actions .icon-btn{width:42px!important;height:42px!important}
+  .nav-wrap .nav-actions .menu-btn{display:grid!important}
+  .mobile-nav.open{display:grid!important}
+  .mobile-nav .navlink{font-size:16px!important;min-height:46px!important}
+  #home.hero.wrap{
+    width:calc(100% - 30px)!important;
+    height:clamp(460px,54vw,535px)!important;
+    grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr)!important;
+    gap:12px!important;padding:25px!important;
+  }
+  #home .hero h1,#home .hero-copy h1{font-size:clamp(41px,4.65vw,52px)!important;line-height:1.07!important}
+  #home .hero-description{font-size:17px!important;line-height:1.55!important}
+  #home .hero-actions .pill-btn{min-height:53px!important;font-size:17px!important}
+  #home .hero-visual img{width:clamp(455px,54vw,540px)!important;top:-17px!important;left:-20px!important}
+  #home .hero-visual::before{bottom:38px!important}
+  #home .hero-visual::after{height:70px!important}
+  #home .hero-visual-glow{bottom:52px!important}
+  .featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
+  .product-card .product-info,.catalog-card .product-info{padding:16px 18px 44px!important}
+  .product-card .product-title,.catalog-card .product-title{font-size:20px!important}
+  .product-card .product-category,.catalog-card .product-category{font-size:14px!important}
+  .product-card .product-detail-cta,.catalog-card .product-detail-cta{font-size:14px!important}
+  .product-card .product-sku,.catalog-card .product-sku{font-size:11px!important}
+}
+@media (pointer:fine) and (min-width:1101px){
+  .nav-wrap .nav .brand-symbol{width:36px;height:40px}
+  .nav-wrap .nav .brand-name{font-size:20px}
+  .nav-wrap .navlinks .navlink{font-size:11px}
+}
