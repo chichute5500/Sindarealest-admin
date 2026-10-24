@@ -90,10 +90,13 @@ function makeDb(options = {}) {
         options.order = { ...(options.order ?? baseOrder), status: "cancelled" };
       }
       if (options.simulateOrderTermsUnconfirmedBeforeTransactionBatch) {
+        options.order = { ...(options.order ?? baseOrder), price_confirmation_required: 1, payment_terms_confirmed_at: null };
+      }
       if (options.simulatePaymentRequestCancelledBeforeTransactionBatch) {
         options.paymentRequest = { ...(options.paymentRequest ?? { id: "request-cancel-race", order_id: "order-1" }), status: "cancelled" };
       }
-        options.order = { ...(options.order ?? baseOrder), price_confirmation_required: 1, payment_terms_confirmed_at: null };
+      if (options.simulatePaymentRequestSettledBeforeTransactionBatch) {
+        options.paymentRequest = { ...(options.paymentRequest ?? { id: "request-settled-race", order_id: "order-1" }), status: "settled" };
       }
       return statements.map((statement, index) => {
         const stalePaymentRequestInsert = Boolean(options.simulateOrderChangedBeforeBatch && index === 0
@@ -107,10 +110,11 @@ function makeDb(options = {}) {
         const receiptOrderGuard = statement.sql.includes("EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled'")
           && statement.sql.includes("price_confirmation_required=0")
           && statement.sql.includes("payment_terms_confirmed_at IS NOT NULL");
-        const receiptRequestGuard = statement.sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status<>'cancelled')");
+        const receiptRequestGuard = statement.sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status='pending')");
         const staleReceiptRejected = (receivedInsert && receiptOrderGuard
           && (options.simulateOrderCancelledBeforeTransactionBatch || options.simulateOrderTermsUnconfirmedBeforeTransactionBatch))
-          || (receivedInsert && receiptRequestGuard && options.simulatePaymentRequestCancelledBeforeTransactionBatch);
+          || (receivedInsert && receiptRequestGuard
+            && (options.simulatePaymentRequestCancelledBeforeTransactionBatch || options.simulatePaymentRequestSettledBeforeTransactionBatch));
         // Simulate the final insert boundary: only SQL that rechecks order state can reject these races.
         const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest || staleReceiptRejected ? 0 : 1;
         return { success: true, meta: { changes } };
@@ -220,7 +224,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
     amount: 30000, transactionReference: "BANKREF-REQUEST-CANCEL-RACE"
   })));
   assert.equal(response.status, 409, "a request cancelled after preflight must not receive a newly recorded transaction");
-  assert.ok(db.batches[0][0].sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status<>'cancelled')"),
+  assert.ok(db.batches[0][0].sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status='pending')"),
     "the receipt INSERT must recheck the linked payment request at the write boundary");
 }
 
@@ -234,6 +238,19 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 409, "a settled QR request must not accept another receipt");
   assert.equal(db.batches.length, 0, "a settled request must be rejected before ledger or audit writes");
+}
+{
+  const db = makeDb({
+    paymentRequest: { id: "request-settled-race", order_id: "order-1", status: "pending" },
+    simulatePaymentRequestSettledBeforeTransactionBatch: true
+  });
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", paymentRequestId: "request-settled-race", direction: "received",
+    amount: 30000, transactionReference: "BANKREF-SETTLED-RACE"
+  })));
+  assert.equal(response.status, 409, "a request that settles after preflight must reject a second receipt at the atomic insert boundary");
+  assert.ok(db.batches[0][0].sql.includes("status='pending'"),
+    "the receipt INSERT must recheck that its linked QR request remains pending");
 }
 {
   const db = makeDb({ failUnique: true });

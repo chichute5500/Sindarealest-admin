@@ -22,7 +22,7 @@ export async function onRequestPost(context) {
     if(requestId){
       const pr=await db.prepare("SELECT id,order_id,status FROM order_payment_requests WHERE id=? LIMIT 1").bind(requestId).first();
       if(!pr||pr.order_id!==orderId)return fail("Yêu cầu thanh toán không thuộc đơn này.",400);
-      if(pr.status==="cancelled"&&direction==="received")return fail("Không ghi nhận giao dịch gắn với yêu cầu đã hủy.",409);
+      if(pr.status!=="pending"&&direction==="received")return fail("Chỉ ghi nhận khoản thu gắn với yêu cầu QR đang chờ xử lý; yêu cầu này đã kết thúc.",409);
     }
     const transactionId=crypto.randomUUID();
     const statements=[
@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
           ? " AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled' AND price_confirmation_required=0 AND total IS NOT NULL AND payment_terms_confirmed_at IS NOT NULL)"
           : "") +
         (direction === "received" && requestId
-          ? " AND EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status<>'cancelled')"
+          ? " AND EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status='pending')"
           : "")
       ).bind(
         transactionId,orderId,requestId||null,direction,amount,reference,note,
