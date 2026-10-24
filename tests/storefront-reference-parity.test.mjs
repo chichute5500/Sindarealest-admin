@@ -506,7 +506,16 @@ assert.ok(
 
 
 
-const mobileHeroRebuild = html.slice(html.lastIndexOf("/* Mobile Hero rebuild: readable copy first, complete product presentation second."));
+const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero reference-match v2: preserve the portrait PNG's natural ratio"));
+assert.ok(
+  mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,1fr)!important;") &&
+  mobileHeroReferenceMatch.includes("grid-template-rows:auto auto!important;") &&
+  mobileHeroReferenceMatch.includes("grid-row:1!important;") &&
+  mobileHeroReferenceMatch.includes("grid-row:2!important;") &&
+  mobileHeroReferenceMatch.includes("height:auto!important;max-width:100%!important;max-height:none!important;margin:-140px 0 0!important;") &&
+  mobileHeroReferenceMatch.includes("height:clamp(396px,110vw,430px)!important;") &&
+  mobileHeroReferenceMatch.includes("object-fit:contain!important;object-position:center top!important"),
+  "Mobile Hero must show copy and CTA above a naturally scaled original product image with transparent padding cropped by the visual frame.");
 assert.ok(
   mobileHeroRebuild.includes("grid-template-columns:minmax(0,1fr)!important;") &&
   mobileHeroRebuild.includes("grid-template-rows:auto auto!important;") &&
