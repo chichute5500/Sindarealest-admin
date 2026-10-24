@@ -37,3 +37,15 @@ Progress 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-referenc
 4. Update this prompt and `START-HERE.md` after new verified evidence. Keep the user informed briefly, then continue working unless a real user action is required.
 
 **Start-here file:** `docs/admin-ui-reference/handoff/START-HERE.md`
+
+
+## Latest verified continuation — 2026-10-24 09:24 UTC
+
+- Branch HEAD/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- PR #111 OPEN/unmerged; mergeable=true. Do not merge/rebase.
+- Validate #5688 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Payment/order/warranty concurrency read-only review completed for this pass; no additional reproducible defect established. Regression suite explicitly covers QR request/order cancellation races, verified receipt/refund constraints, duplicate warranty issuance and stale completion state.
+- Visual evidence remains old source SHA `e55088d89632ff84ec68715cdee3ef64c1a9e964`, synthetic fixture-only; latest run did not expose a screenshot artifact through the artifact listing. Therefore reference parity is NOT_VERIFIED and all 12 screens remain PARTIAL_NOT_ACCEPTED.
+- Progress stays 50% PROVISIONAL; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+- Continue: obtain latest-HEAD screenshot artifact or run approved non-mutating visual diagnostics, compare each screen/viewport/theme directly to reference, then investigate any new concrete concurrency failure. Do not deploy or perform remote writes.
