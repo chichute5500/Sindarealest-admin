@@ -45,6 +45,7 @@ assert.match(fullscreenMobileSwap, /commitFullscreenFade\(\);[\s\S]*?fullscreenF
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /let decoded;[\s\S]*?try\{decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)\}[\s\S]*?catch\{decoded=Promise\.reject\(\)\}/, 'Decode failures must be handled without revealing an unconfirmed image.');
 assert.match(html, /Promise\.resolve\(decoded\)\.then\(revealDecodedImage,rejectDecodedImage\)/);
+// A failed decode must restore the previous layer through the shared layer-state helper.
 assert.match(html, /const rejectDecodedImage=\(\)=>\{[\s\S]*?setFullscreenLayerState\(incoming,false\);setFullscreenLayerState\(active,true\)/);
 assert.match(html, /#sdFullscreenViewer \.sd-fullscreen-image\{[\s\S]*?transition:opacity 250ms ease-in-out!important/,
   'Fullscreen photos must use opacity-only motion instead of transform/keyframe motion.');
