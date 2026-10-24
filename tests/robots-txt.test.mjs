@@ -7,9 +7,9 @@ const responseBody = async (url) => {
   return { response, body: await response.text() };
 };
 
-const staticHeaders = readFileSync(new URL("../public/_headers", import.meta.url), "utf8");
-assert.match(staticHeaders, /\/admin\/\*[\s\S]*?X-Robots-Tag: noindex, nofollow/,
-  "the Admin response must keep its explicit noindex/nofollow header");
+const adminHtml = readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
+assert.match(adminHtml, /<meta name="robots" content="noindex,nofollow">/,
+  "the Admin document must contain a crawl-visible noindex directive");
 
 // Branch/immutable Pages previews must not advertise the whole storefront for indexing.
 const preview = await responseBody("https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/robots.txt");
