@@ -1,0 +1,68 @@
+name: Fullscreen gallery isolated Preview browser audit
+
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+    paths:
+      - 'public/index.html'
+      - 'data/legacy-products.json'
+      - 'scripts/audit-fullscreen-gallery-preview.mjs'
+      - '.github/workflows/gallery-preview-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fullscreen-gallery-preview-audit-fix-branch
+  cancel-in-progress: true
+
+jobs:
+  gallery-preview-audit:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Check out the authorized fix branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install isolated Playwright
+        run: npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify exact Preview deployment (read-only)
+        env:
+          EXPECTED_DEPLOYMENT_BRANCH: fix/liquid-glass-audit-2026-10-19
+        run: |
+          set -euo pipefail
+          export EXPECTED_DEPLOYMENT_SHA="$(git log -1 --format=%H -- public/index.html)"
+          node scripts/verify-cloudflare-preview-deployment.mjs
+
+      - name: Run gallery-only browser audit
+        run: node scripts/audit-fullscreen-gallery-preview.mjs
+
+      - name: Upload gallery-only screenshots and measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fullscreen-gallery-preview-audit
+          path: artifacts/fullscreen-gallery-preview/
+          if-no-files-found: warn
+          retention-days: 14
