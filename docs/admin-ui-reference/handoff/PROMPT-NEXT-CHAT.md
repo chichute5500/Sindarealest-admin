@@ -2,15 +2,16 @@
 
 Continue directly on GitHub. Do not ask the user to repeat history. Read this prompt and `docs/admin-ui-reference/handoff/START-HERE.md`, then verify live state before relying on the checkpoint.
 
-## Checkpoint — 2026-10-24 08:31 ICT
+## Latest checkpoint — 2026-10-24 08:35 ICT
 
-- Repository: `chichute5500/Sindarealest-admin`; only writable branch: `feature/admin-isolated-handoff-2026-10-20`.
-- Branch HEAD at checkpoint: `47b3dae8514540ac46b3a364bc552c8f003be4f1` (docs-only). `main`: `227622d3e3b7c75724ffa1775b193da71089269a`.
-- Validate #5549 SUCCESS on exact docs HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40050001852
-- Preview #493 tested source/test SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f`, captured artifact #493 and ran read-only diagnostics, but FAILED at the exact-HEAD guard because the branch moved during the run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302
-- Artifact #493: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534. Inspected: 133 PNGs, 120 synthetic fixture capture entries, 112 metrics, no horizontal overflow; zero source page/console/request/HTTP errors; zero fixture page/API errors, attempted writes or unexpected API paths; seven expected simulated fixture HTTP 503 console entries. Screen 7 Timeline visible at 390×844 using synthetic data. Read-only diagnostic passed 7/7 Admin GET routes and catalog checks of 235 products / 527 decoded image URLs. This is not exact-reference parity or business-write/persistence acceptance.
-- PR #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; #112 OPEN/unmerged/draft. Keep them open. Main unchanged.
-- Acceptance: all 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED. Progress 50% PROVISIONAL.
+- Writable branch `feature/admin-isolated-handoff-2026-10-20`, HEAD at checkpoint start `2e29abb2f7b137b0fa383fc2fe308360bd0139fe`; `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`. This handoff update is docs-only; refresh live refs after it.
+- Validate #5550 **SUCCESS on exact docs HEAD**: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40050367342 (`2e29abb2f7b137b0fa383fc2fe308360bd0139fe`).
+- Latest source/test SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f`; Validate #5540 **SUCCESS** on that exact SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343.
+- Preview #493 on that source/test SHA **FAILED at the exact-HEAD guard** because the branch moved during capture; do not call it PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302. Artifact #493 inspected: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534 — 133 PNGs, 120 synthetic fixture capture entries, 112 metrics; zero horizontal overflow, source page/console/request/HTTP errors, fixture page/API errors, attempted writes or unexpected API paths; seven expected simulated fixture HTTP 503 console entries. Read-only diagnostics passed 7/7 Admin GET routes; catalog check saw 235 products / 527 decoded image URLs. This is not authenticated business-write/persistence acceptance or exact-reference parity.
+- Previous Preview #490 succeeded on older SHA `739b862ebbf3f74d0bfee7cc9025cc0a632a9f7f`; it does not validate the newer source/test SHA.
+- PR #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; #112 OPEN/unmerged/draft. Keep them open. All 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`; progress 50% PROVISIONAL.
+- Next: refresh live HEAD/Actions, then continue parallel safe reference audit, test-first regression review, and static API audit. Docs-only commits do not trigger Preview; do not create dummy source/test commits or weaken the exact-HEAD guard.
+- Safety: no merge/rebase/cherry-pick/force-push/sync; no Production deploy; no Access/secrets/DNS changes or bypass; no remote D1/R2/schema/ledger/business writes; no migration/seed/import/setup scripts; do not modify `main`, storefront branches, PR #108 or #112.
 
 ## Mandatory seven operating rules
 
