@@ -1108,3 +1108,11 @@ Latest **runtime/source/test/Preview SHA**: `81abc218535b53f151c2d4d54758ec04d54
 - PR #108 remains OPEN/unmerged; changed-file count 302 and existing PR scope-disposition blockers remain. No `main` or Production changes; no merge. Do not mark global project completion 100%.
 
 This is the latest Hero automated outcome and supersedes older failed CI/audit notes above. A following documentation-only commit may advance branch HEAD; it does not change this validated runtime/test/Preview SHA.
+
+
+## 2026-10-24 — OWNER REJECTED MOBILE HERO VISUAL
+- Latest owner phone screenshot visibly shows an oversized, poorly balanced shoe pair and an unacceptable Hero composition. Hero status is OWNER-REJECTED / NOT ACCEPTED / NOT LOCKED despite earlier green automated checks.
+- Immediate work: audit the full mobile CSS cascade in public/index.html (several conflicting/repeated mobile Hero rules around lines 3708–3786), consolidate to one authoritative mobile layout, and inspect actual Playwright screenshots at 360×800 and 390×844 plus tablet/desktop light/dark before any claim of success.
+- Preserve the original owner-supplied RGBA PNG and product pixels; do not use blind height-only tweaks, negative vertical offsets, or remove tests to force green. Compare with the exact owner reference if available; otherwise clearly state exact reference parity remains unverified.
+- Previous automated run IDs 40103752991, 40103752988, and 40103753008 are not owner visual acceptance and must not be used to dismiss this rejection.
+- Follow the detailed mandatory continuation checklist at the end of docs/handoff/PROMPT-NEW-CHAT-FINAL-100.md. Do not ask the owner to retest until the agent has fixed the layout, deployed the exact tested SHA, and personally reviewed mobile screenshots. PR #108 stays open/unmerged; do not touch main, Production, or other PASS/LOCKED scope.
