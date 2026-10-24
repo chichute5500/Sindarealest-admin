@@ -1,20 +1,21 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T15:09:54.221Z",
+  "capturedAtUtc": "2026-10-24T15:31:44.461Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
-  "checkpointSemantics": "Latest exact-tested source SHA dbc951c213c7da453ed3410f91d8eb712c0bc89e; all six checks PASS. Cloudflare Pages reports isolated alias mapped to earlier deployment SHA 863b2d5b0a3f7d92b9b66587980f995184deb2e5, 226 commits behind; no deployment performed. Reference parity, authenticated business writes and remote D1 remain unverified.",
-  "codeTestSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+  "branchHeadAtCheckpointStart": "a3a75b6302e0d960f5e61ebd2ed2b00754ba30d2",
+  "checkpointSemantics": "At 2026-10-24T15:31:44.461Z: owner approved deployment of exact source 564ea556e6dee745eaaa491ee033a2a8cfbb595c, Cloudflare API metadata REPORTED_SHA_MATCH in post-deploy read-only job 40107164294; this docs-only cleanup removes temporary workflows without changing public/functions. Full reference parity and business write persistence still not tested.",
+  "codeTestSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
   "latestProductSourceCommit": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
   "latestActionsRun": {
-    "id": 40104728057,
+    "id": 40107164294,
+    "workflow": "Post-deployment isolated Admin read-only verification",
     "runNumber": 1,
-    "workflow": "Admin isolated Preview Playwright (read-only)",
     "status": "completed",
     "conclusion": "success",
-    "sha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40104728057"
+    "sha": "a3a75b6302e0d960f5e61ebd2ed2b00754ba30d2",
+    "checkoutSourceSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40107164294"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -44,7 +45,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+      "headSha": "a3a75b6302e0d960f5e61ebd2ed2b00754ba30d2",
       "changedFiles": 496,
       "additions": 46507,
       "deletions": 224,
@@ -474,13 +475,13 @@
     "No Production deploy, remote D1/R2 writes, business writes, migrations, secrets/Access/DNS changes, or edits to main/storefront/PR #108/#112."
   ],
   "handoffSync": {
-    "capturedAtUtc": "2026-10-24T15:09:54.221Z",
+    "capturedAtUtc": "2026-10-24T15:31:44.461Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "docsHeadAtCheckpoint": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-    "codeTestSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+    "codeTestSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "pr111Head": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+    "pr111Head": "a3a75b6302e0d960f5e61ebd2ed2b00754ba30d2",
     "pr111State": "OPEN_UNMERGED",
     "pr111BaseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
     "pr111ChangedFiles": 495,
@@ -825,13 +826,14 @@
     "headSha": "0469930f6836d5f8d87b155a538e1d68776e3913"
   },
   "latestRun": {
-    "id": 40104728057,
+    "id": 40107164294,
+    "workflow": "Post-deployment isolated Admin read-only verification",
     "runNumber": 1,
-    "workflow": "Admin isolated Preview Playwright (read-only)",
     "status": "completed",
     "conclusion": "success",
-    "sha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40104728057"
+    "sha": "a3a75b6302e0d960f5e61ebd2ed2b00754ba30d2",
+    "checkoutSourceSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40107164294"
   },
   "acceptance": {
     "progress": "50% PROVISIONAL",
@@ -1165,7 +1167,7 @@
       "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771"
     }
   },
-  "deploymentProvenance": "NOT_VERIFIED",
+  "deploymentProvenance": "REPORTED_SHA_MATCH_CLOUDFLARE_METADATA_ONLY",
   "approvedReferenceParity": "NOT_VERIFIED",
   "authenticatedBusinessWritePersistence": "NOT_TESTED",
   "remotePreviewD1SchemaLedger": "NOT_VERIFIED",
@@ -1190,5 +1192,24 @@
     "fixtureMetrics": 112,
     "horizontalOverflowObservations": 0,
     "fixtureWriteRequests": 0
+  },
+  "lastApprovedPreviewDeployment": {
+    "checkedAtUtc": "2026-10-24T15:29:14.407Z",
+    "approvedSourceSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "cloudflareReportedSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "metadataStatus": "REPORTED_SHA_MATCH",
+    "deploymentId": "7a8c3d73-c348-4adf-8560-cb90bcac19a8",
+    "cloudflareCreatedAtUtc": "2026-10-24T15:26:05.106Z",
+    "deployRunId": 40106880423,
+    "verificationRunId": 40107164294,
+    "verificationArtifactId": 12565002920,
+    "verifiedScope": "CLOUDFLARE_API_DEPLOYMENT_METADATA_AND_AUTHENTICATED_GET_ONLY_BROWSER_QA",
+    "screensAccepted": 0,
+    "screensTotal": 12,
+    "referenceParity": "NOT_VERIFIED",
+    "businessWrites": "NOT_TESTED",
+    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "production": "NOT_PERFORMED",
+    "servedAssetByteParity": "NOT_VERIFIED"
   }
 }
