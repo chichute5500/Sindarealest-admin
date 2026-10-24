@@ -504,3 +504,15 @@ assert.ok(
   'Trust chip SVGs must remain navy and compact inside the existing circular glass treatment.'
 );
 
+
+
+const mobileHeroRebuild = html.slice(html.lastIndexOf("/* Mobile Hero rebuild: readable copy first, complete product presentation second."));
+assert.ok(
+  mobileHeroRebuild.includes("grid-template-columns:minmax(0,1fr)!important;") &&
+  mobileHeroRebuild.includes("grid-template-rows:auto auto!important;") &&
+  mobileHeroRebuild.includes("grid-row:1!important;") &&
+  mobileHeroRebuild.includes("grid-row:2!important;") &&
+  mobileHeroRebuild.includes("width:100%!important;height:100%!important;") &&
+  mobileHeroRebuild.includes("max-width:100%!important;max-height:100%!important;") &&
+  mobileHeroRebuild.includes("object-fit:contain!important;object-position:center center!important"),
+  "Mobile Hero must show full-width readable copy and CTA above a contained, uncropped product image.");
