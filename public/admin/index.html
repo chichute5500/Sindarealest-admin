@@ -931,6 +931,62 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .order-detail-extra[open]>summary::after{content:"−"}
 .order-detail-extra[open]>summary{border-bottom:1px solid var(--line)}
 
+
+/* SD_ADMIN_REFERENCE_PRODUCT_TOOLBAR_V2: closer mobile search/filter hierarchy
+   to approved reference, without losing accessible labels or business controls. */
+@media (max-width:680px){
+  #main:has(#searchBox)>.pagehead{margin-bottom:9px}
+  #main:has(#searchBox) .toolbar{
+    background:transparent!important;border:0!important;
+    box-shadow:none!important;backdrop-filter:none!important;
+    padding:0 0 6px;gap:7px;
+  }
+  #main:has(#searchBox) .toolbar .field{min-width:0;position:relative}
+  #main:has(#searchBox) .toolbar .field>label{
+    position:absolute!important;width:1px!important;height:1px!important;
+    padding:0!important;margin:-1px!important;overflow:hidden!important;
+    clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;
+  }
+  #main:has(#searchBox) #searchBox{
+    min-height:43px;padding-left:36px;border-radius:12px;
+    background:rgba(255,255,255,.89);
+    box-shadow:0 2px 8px rgba(48,109,157,.055);
+  }
+  #main:has(#searchBox) .toolbar .field:first-child::before{
+    content:"⌕";position:absolute;left:13px;top:50%;transform:translateY(-50%);
+    color:#477eae;font-size:22px;line-height:1;pointer-events:none;z-index:1;
+  }
+  #main:has(#searchBox) #categoryBox,
+  #main:has(#searchBox) #fulfillmentBox{
+    min-height:39px;border-radius:11px;padding-block:7px;
+    background:rgba(251,254,255,.89);
+  }
+  #main:has(#searchBox) .product-publish-filter-row{
+    border:0!important;background:transparent!important;
+    padding:6px 0 4px!important;gap:5px!important;
+  }
+  #main:has(#searchBox) .product-publish-filter-row .warranty-filter-button{
+    min-height:31px;font-size:9px;border-radius:999px;
+    background:rgba(252,254,255,.75);
+  }
+  #main:has(#searchBox) .tablewrap{margin-top:2px}
+  #main .product-table .thumb{width:68px;height:68px;flex:0 0 68px;object-fit:cover}
+  #main .product-table tbody tr{background:var(--reference-sheet);border-radius:13px}
+  :root[data-admin-theme="dark"] #main:has(#searchBox) #searchBox,
+  :root[data-admin-theme="dark"] #main:has(#searchBox) #categoryBox,
+  :root[data-admin-theme="dark"] #main:has(#searchBox) #fulfillmentBox,
+  :root[data-admin-theme="dark"] #main:has(#searchBox) .product-publish-filter-row .warranty-filter-button{
+    background:rgba(22,44,61,.9);
+  }
+}
+@media(max-width:390px){
+  #main .product-table .thumb{width:60px;height:60px;flex-basis:60px}
+}
+@media(max-width:359px){
+  #main .product-table .thumb{width:52px;height:52px;flex-basis:52px}
+  #main:has(#searchBox) .product-publish-filter-row{gap:3px!important}
+}
+
 /* SD_ADMIN_REFERENCE_PARITY_MOBILE_V1 - 2026-10-25 */
 /* Based on the supplied 12-screen 1024×1536 mobile reference. Structural changes
    are confined to Admin skin; APIs, auth, D1, image metadata and unknown values remain intact. */

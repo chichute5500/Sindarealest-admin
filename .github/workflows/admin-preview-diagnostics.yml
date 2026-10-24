@@ -85,7 +85,7 @@ jobs:
 
       - name: Capture real source screenshots across responsive and theme matrix
         id: baseline
-        run: npx playwright test tests/e2e/admin-static-baseline.spec.js --reporter=line,html
+        run: npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --reporter=line,html
 
       - name: Diagnose configured deployed Admin Preview (read-only)
         id: preview
@@ -114,6 +114,7 @@ jobs:
           name: admin-preview-evidence-${{ github.run_number }}
           path: |
             artifacts/admin-preview-evidence/
+            artifacts/admin-reference-same-data/
             test-results/
             playwright-report/
             docs/admin-ui-reference/admin-mobile-reference.png
