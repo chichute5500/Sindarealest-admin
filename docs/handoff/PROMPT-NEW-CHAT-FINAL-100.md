@@ -1,3 +1,16 @@
+# LIVE HANDOFF REFRESH — 2026-10-24 — SUPERSEDES HISTORICAL TODO/COUNT NOTES
+
+- Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`.
+- Immediately before this documentation-only refresh, verified PR #108 and branch HEAD both equaled `0259dc38d5fd4ba4497b60fcf6236debb1f27f45`; PR remained OPEN/unmerged, base `main`. This commit advances docs only; re-fetch live PR/branch HEAD before any next write.
+- Live changed-file inventory is complete: **298 paths** in [PR-SCOPE-REVIEW.md](PR-SCOPE-REVIEW.md); do not repeat it unless the live PR diff changes.
+- Source/test/deployed baseline is `8a4cc6066436f040e7900709e8dd2047ab7ab579`: [Validate PASS](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/40052984815), [Preview deploy + authenticated HTTP diagnostic PASS](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/40052984918), Preview https://837f73ba.sindarealest2.pages.dev/.
+- Visual workflow [run 40052984980](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/40052984980) is SKIPPED by the Hero guard. Hero remains paused; the currently available non-Hero workflows target owner-locked `#order` or catalog filters and are not valid substitutes. Gallery remains PAUSED / NOT ACCEPTED pending authorized real-phone acceptance.
+- SKU URL builder passes its source-level strict contract (`skuVerified === true` and non-empty trimmed SKU; otherwise ID/key). Product-by-product authoritative SKU verification and live Preview D1 migration state remain NOT RUN/BLOCKED.
+- Important D1 correction: Preview deploy workflow runs `npm run check`, `npm test`, `wrangler pages deploy public`, and an HTTP SEO diagnostic; it does not apply remote D1 migrations. `scripts/check-migrations.mjs` verifies migrations on a temporary local D1 only. Do not assume `0008_product_sku_verification.sql` is applied to Preview; do not apply/query remote D1 or edit restricted API/shared-helper/catalog paths without separate authorization.
+- **Not 100% complete.** Remaining owner-dependent gates: approved scope disposition for this mixed-scope PR; a safe authorized visual path that excludes Hero and locked sections; real-phone gallery acceptance when reopened; approved read-only proof of Preview D1 migration 0008 and authoritative SKU API flags. No Production/main changes, no merge, no restricted data/API/Admin/infra/payment changes.
+
+---
+
 # PROMPT CHAT MỚI — SINDAREALEST2: XỬ LÝ TỒN ĐỌNG VÀ XÁC ĐỊNH HOÀN THÀNH 100%
 
 **Ngày bàn giao:** 24/10/2026  
@@ -102,4 +115,4 @@ Tạo checklist cuối cùng bao gồm **từng hạng mục đã xác định**
 
 Chỉ ghi **100% hoàn thành** khi không còn required item nào FAIL/BLOCKED/NOT RUN/SKIPPED hoặc chờ owner acceptance. Nếu có blocker, không làm tròn hay phỏng đoán phần trăm; ghi “chưa đủ điều kiện xác nhận 100%” và nêu đúng hành động cần làm tiếp theo.
 
-**Bắt đầu ngay:** fetch lại live PR #108 head và 4 handoff files, reconcile những ghi chú lịch sử đã bị supersede (đặc biệt Preview noindex/SEO), lập danh sách changed files/path classification, rồi chạy song song các việc độc lập an toàn. Không dừng ở báo cáo tiến độ.
+**Bắt đầu ngay (đã cập nhật sau audit 24/10/2026):** re-fetch live PR/branch HEAD và bốn handoff files. Kiểm kê path-by-path của 298 file đã hoàn tất trong `PR-SCOPE-REVIEW.md`, không làm lại nếu diff không đổi. Tiếp tục chỉ với các blocker chưa giải quyết: owner decision để cô lập phạm vi PR; bằng chứng read-only được phê duyệt cho migration D1 Preview 0008 và `skuVerified` authoritative; phương án visual an toàn không chụp Hero/khu vực LOCKED; gallery phone acceptance sau khi owner mở lại. Không merge, không thay `main`/Production, không truy cập/sửa D1/catalog/API/shared helper hoặc Gallery/Hero ngoài quyền được cấp.

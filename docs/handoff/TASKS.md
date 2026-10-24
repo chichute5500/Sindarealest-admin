@@ -1,3 +1,12 @@
+## CORRECTION — PREVIEW D1 MIGRATION EVIDENCE — 2026-10-24
+
+- Read-only review of `.github/workflows/deploy-storefront-preview.yml` (blob `15c1c189e4228334acc06e5de290a887a281f49d`) confirms the workflow runs project checks and tests, then `wrangler pages deploy public`, then the authenticated SEO HTTP diagnostic. It does **not** run `wrangler d1 migrations apply`.
+- `scripts/check-migrations.mjs` (blob `35c860a2bc25181ee28b4a89b1fea99b6f5b561a`) tests migrations against a temporary local D1 database using Wrangler's `--local` mode. The green CI check therefore verifies the migration contract locally, not that migration `0008_product_sku_verification.sql` is applied to the live Preview D1 database.
+- Remote Preview schema/migration state is **NOT VERIFIED**. Conditional consequence if the live schema lacks `sku_verified`: the product-route query explicitly selects that column and handles SQL errors as HTTP 503; the product-list mapping uses `SELECT *` and its legacy SKU helper can infer verification by code shape when both verification fields are absent. This is a schema-dependent risk, **not proof of a live failure**.
+- Do not apply remote migrations, query restricted catalog data, or edit shared `functions/_lib.js` / APIs / migrations from this task. Required evidence for closing the SKU data gate is an owner-approved, read-only confirmation of Preview schema/migration 0008 plus authoritative API data with `skuVerified === true`; no SKU values may be inferred or fabricated.
+
+---
+
 ## LIVE FINAL-AUDIT TASK STATUS — 2026-10-24
 
 > Supersedes outdated task counts/status below. Full per-path evidence: [PR-SCOPE-REVIEW.md](PR-SCOPE-REVIEW.md).
