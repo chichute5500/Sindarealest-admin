@@ -2,15 +2,15 @@
 
 Continue directly on GitHub. Do not ask the user to repeat history. Read this prompt and `docs/admin-ui-reference/handoff/START-HERE.md`, then verify live state before relying on the checkpoint.
 
-## Latest checkpoint — 2026-10-24 08:35 ICT
+## Latest checkpoint — 2026-10-24 08:39 ICT
 
-- Writable branch `feature/admin-isolated-handoff-2026-10-20`, HEAD at checkpoint start `2e29abb2f7b137b0fa383fc2fe308360bd0139fe`; `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`. This handoff update is docs-only; refresh live refs after it.
-- Validate #5550 **SUCCESS on exact docs HEAD**: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40050367342 (`2e29abb2f7b137b0fa383fc2fe308360bd0139fe`).
+- Writable branch `feature/admin-isolated-handoff-2026-10-20`, HEAD at checkpoint start `381065514663a2c57a9d6d6ca95880b835894bdc`; `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`. This is a docs-only handoff update; refresh live refs after it.
+- Validate #5551 **SUCCESS on exact docs HEAD**: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487 (`381065514663a2c57a9d6d6ca95880b835894bdc`).
 - Latest source/test SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f`; Validate #5540 **SUCCESS** on that exact SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343.
 - Preview #493 on that source/test SHA **FAILED at the exact-HEAD guard** because the branch moved during capture; do not call it PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302. Artifact #493 inspected: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534 — 133 PNGs, 120 synthetic fixture capture entries, 112 metrics; zero horizontal overflow, source page/console/request/HTTP errors, fixture page/API errors, attempted writes or unexpected API paths; seven expected simulated fixture HTTP 503 console entries. Read-only diagnostics passed 7/7 Admin GET routes; catalog check saw 235 products / 527 decoded image URLs. This is not authenticated business-write/persistence acceptance or exact-reference parity.
 - Previous Preview #490 succeeded on older SHA `739b862ebbf3f74d0bfee7cc9025cc0a632a9f7f`; it does not validate the newer source/test SHA.
 - PR #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; #112 OPEN/unmerged/draft. Keep them open. All 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`; progress 50% PROVISIONAL.
-- Next: refresh live HEAD/Actions, then continue parallel safe reference audit, test-first regression review, and static API audit. Docs-only commits do not trigger Preview; do not create dummy source/test commits or weaken the exact-HEAD guard.
+- Next: refresh live HEAD/Actions after this docs-only sync, then continue parallel safe reference audit, test-first regression review, and static API audit. Docs-only commits do not trigger Preview; do not create dummy source/test commits or weaken the exact-HEAD guard.
 - Safety: no merge/rebase/cherry-pick/force-push/sync; no Production deploy; no Access/secrets/DNS changes or bypass; no remote D1/R2/schema/ledger/business writes; no migration/seed/import/setup scripts; do not modify `main`, storefront branches, PR #108 or #112.
 
 ## Mandatory seven operating rules
@@ -34,7 +34,7 @@ Continue directly on GitHub. Do not ask the user to repeat history. Read this pr
 ## Required next steps
 
 1. Refresh branch HEAD, main, PR #111/#108/#112 and Actions before making claims.
-2. Inspect Validate #5549 jobs and the latest available Preview run/artifact. If no Preview exists for current source/test SHA, state that clearly and continue independent work.
+2. Inspect latest exact-SHA Validate jobs and latest available Preview run/artifact. If no Preview exists for current source/test SHA, state that clearly and continue independent work.
 3. Keep source/test and docs checkpoints separate. Do not make a docs-only commit while Preview exact-HEAD guard is running.
 4. For a source fix, show test failure first, then fix; push only to allowed branch and inspect exact-SHA Validate/Preview evidence.
 5. Update handoff after a meaningful verified checkpoint, then refresh live refs again.
