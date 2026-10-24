@@ -1,3 +1,15 @@
+## LATEST TASK RESULT — PREVENT PREVIEW SITEMAP URL LEAKAGE — 2026-10-24
+
+- Found that `robots.txt` blocked crawl on Preview hostnames, but a direct request to `/sitemap.xml` still generated up to 2,000 product URLs using that Preview origin.
+- Fixed `functions/sitemap.xml.js`: before accessing the DB, non-primary `*.sindarealest2.pages.dev` hosts now receive 404, `X-Robots-Tag: noindex, nofollow`, and `Cache-Control: no-store`. Hostname classification strips one terminal DNS dot. The primary Pages hostname and custom domains keep existing sitemap behavior.
+- Added regression coverage in `tests/sitemap-safety.test.mjs` for ordinary and terminal-dot Preview hostnames; both cases assert 404/noindex and assert that no DB query occurs.
+- Also corrected the outdated comment in `functions/robots.txt.js`: Admin's crawl-visible noindex signal is the HTML meta directive in `public/admin/index.html`, not an assumption that `public/_headers` applies to every Pages Function response.
+- Exact source/test SHA `2570487d80e54e4f423e8b930c4adce520c5879b`: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052071069; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052071039; Preview https://0048200d.sindarealest2.pages.dev/.
+- Live HTTP/browser verification not available from this runtime. The root Preview noindex signal remains a separately documented issue requiring explicit authorization before shared middleware/response-header changes.
+- PR #108 OPEN/unmerged; Production and main untouched. Keep SKU, gallery flicker and Hero paused; accepted sections locked.
+
+---
+
 ## LATEST VERIFIED RESULT — EFFECTIVE ADMIN NOINDEX TEST — 2026-10-24
 
 - Test-only SHA `de5b4efd95ad08cee5582520e74b5dd591c9d51a` has Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843359 and Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843460.

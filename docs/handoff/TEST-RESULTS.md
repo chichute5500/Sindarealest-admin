@@ -1,3 +1,24 @@
+## EXACT-SHA RESULT — PREVIEW SITEMAP GUARD — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit (high threshold) | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052071069 |
+| Project integrity checks | PASS | Same Validate run |
+| Full automated tests | PASS | Same Validate run |
+| Preview sitemap regression | PASS | Ordinary and terminal-dot Preview hosts return 404/noindex; DB is not queried |
+| Cloudflare Pages Preview deploy | PASS on exact SHA `2570487d80e54e4f423e8b930c4adce520c5879b` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052071039 |
+| Immutable Preview | Deployed | https://0048200d.sindarealest2.pages.dev/ |
+| Liquid Glass visual workflow | SKIPPED | Hero guard; do not bypass |
+| Independent live HTTP / browser / device acceptance | NOT VERIFIED | This runtime cannot confirm the deployed endpoint directly |
+
+- `functions/sitemap.xml.js` rejects non-primary Pages Preview hosts before DB access, returning 404, `X-Robots-Tag: noindex, nofollow`, and `Cache-Control: no-store`. Production Pages and custom-domain sitemap behavior remains covered by existing tests.
+- `functions/robots.txt.js` comment now accurately points to the Admin HTML meta robots directive.
+- Dependency audit remediation: `overrides.undici = 7.30.1`; no Wrangler downgrade/audit bypass.
+- Open follow-up: actual noindex behavior on the middleware-transformed Preview root is unverified. Do not change shared middleware/headers, Access or infrastructure without explicit scope authorization.
+- PR #108 remains OPEN/unmerged, base main; no Production deploy or main edits.
+
+---
+
 ## EXACT-SHA VALIDATION — EFFECTIVE ADMIN NOINDEX REGRESSION — 2026-10-24
 
 | Gate | Result | Evidence |

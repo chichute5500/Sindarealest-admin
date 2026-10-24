@@ -1,3 +1,14 @@
+## DECISION UPDATE — DO NOT PUBLISH PREVIEW-ORIGIN SITEMAPS — 2026-10-24
+
+- Non-primary `*.sindarealest2.pages.dev` hosts must not emit a product sitemap containing Preview-origin URLs. `functions/sitemap.xml.js` now returns 404 + `X-Robots-Tag: noindex, nofollow` + `Cache-Control: no-store` before querying the DB; normalize one terminal DNS dot when classifying hosts.
+- Keep primary `sindarealest2.pages.dev` and custom-domain sitemap behavior unchanged. Keep the Preview robots crawl guard, and keep production/custom-domain `/api/` disallowed while `/admin/` remains crawlable for its document-level HTML meta noindex.
+- Admin's effective noindex test must assert `<meta name="robots" content="noindex,nofollow">` in `public/admin/index.html`. Do not infer effective Pages Function response headers from `public/_headers` alone.
+- Exact source/test SHA `2570487d80e54e4f423e8b930c4adce520c5879b` has Validate and Preview deploy PASS. Dependency override remains `undici: 7.30.1`; Wrangler remains `4.149.0`.
+- Preview root noindex is still unverified: middleware transforms the root and source HTML lacks a robots meta. Robots disallow alone is not guaranteed de-indexing. Do not alter shared middleware/headers, Access or infrastructure without explicit authorization.
+- No external live HTTP or visual/device acceptance has been verified. PR #108 OPEN/unmerged; Production and main untouched. Hero, SKU verification, and fullscreen gallery flicker remain paused; accepted areas stay locked.
+
+---
+
 ## VERIFIED DECISION UPDATE — EFFECTIVE SIGNALS AND PREVIEW SCOPE — 2026-10-24
 
 - Test-only commit `de5b4efd95ad08cee5582520e74b5dd591c9d51a` passed Validate and Preview deployment; Preview URL: https://164c0deb.sindarealest2.pages.dev/.

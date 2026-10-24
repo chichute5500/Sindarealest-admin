@@ -1,3 +1,16 @@
+## LATEST VERIFIED UPDATE — PREVIEW SITEMAP GUARD — 2026-10-24
+
+- Exact source/test SHA: `2570487d80e54e4f423e8b930c4adce520c5879b`. Validate PASS (npm audit, integrity, full automated tests): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052071069. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052071039. Immutable Preview: https://0048200d.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- New SEO fix: `functions/sitemap.xml.js` returns 404 with `X-Robots-Tag: noindex, nofollow` and `Cache-Control: no-store` for non-primary `*.sindarealest2.pages.dev` hostnames before any DB query. This prevents the sitemap endpoint from emitting product URLs with a Preview origin if called directly. The guard strips one terminal DNS dot, matching the `robots.txt` guard. Regression in `tests/sitemap-safety.test.mjs` covers ordinary and terminal-dot Preview hosts and asserts DB is not queried.
+- `functions/robots.txt.js` comment corrected: the Admin crawl-visible directive is the document-level meta robots noindex in `public/admin/index.html`; do not claim `public/_headers` alone proves the header is effective on Pages Function responses.
+- Existing behavior preserved: Preview `robots.txt` returns `Disallow: /`; production/custom-domain robots allows `/admin/` so the Admin HTML meta noindex is crawl-visible and still disallows `/api/`. Admin HTML regression tests the actual meta directive.
+- Dependency audit fix remains `overrides.undici = 7.30.1` under Wrangler `4.149.0`; no forced Wrangler downgrade or audit bypass.
+- Remaining unresolved issue: the storefront root response is transformed by `functions/_middleware.js`, `public/index.html` has no robots meta, and the Preview root's actual noindex header was not independently verified. `robots.txt` disallow is not guaranteed de-indexing. Do not alter shared middleware/response headers, Cloudflare Access or infrastructure without explicit authorization.
+- Live HTTP/browser access from this runtime remains unverified; no visual/device or owner acceptance claimed. Liquid Glass visual workflow skipped by Hero guard.
+- PR #108 remains OPEN/unmerged, base `main`; no Production or `main` change. SKU verification PAUSED, fullscreen gallery flicker PAUSED / NOT ACCEPTED, Hero PAUSED; accepted areas stay locked.
+
+---
+
 ## VERIFIED UPDATE — ROBOTS REGRESSION PRECISION GREEN — 2026-10-24
 
 - Test-only SHA `de5b4efd95ad08cee5582520e74b5dd591c9d51a`: Validate PASS (npm audit, project integrity, full automated tests): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843359. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843460.
