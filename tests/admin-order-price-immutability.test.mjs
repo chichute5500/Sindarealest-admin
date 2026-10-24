@@ -41,12 +41,8 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
       return statements.map(statement => {
         const guardedWrite = statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
           && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests");
-        const cancelGuard = statement.sql.startsWith("UPDATE orders SET status=?")
-          && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')");
-        const blockedCancelAudit = statement.sql.includes("'order_updated'")
-          && statements.some(s => s.sql.startsWith("UPDATE orders SET status=?")
-            && s.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"));
-        return { success: true, meta: { changes: conflictDuringBatch && (guardedWrite || cancelGuard || blockedCancelAudit) ? 0 : 1 } };
+        const cancellationGuardedWrite = statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')");
+        return { success: true, meta: { changes: conflictDuringBatch && (guardedWrite || cancellationGuardedWrite) ? 0 : 1 } };
       });
     }
   };
