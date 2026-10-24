@@ -1,0 +1,106 @@
+name: Preview-only AI migration 0008
+
+on:
+  push:
+    branches:
+      - feature/ai-image-grouping
+
+permissions:
+  contents: read
+
+jobs:
+  migrate-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v7
+
+      - name: Verify Preview isolation and apply only additive migration 0008
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN."; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID."; exit 1; }
+          test -n "$CLOUDFLARE_PAGES_PROJECT" || { echo "::error::Missing CLOUDFLARE_PAGES_PROJECT."; exit 1; }
+
+          project="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}")"
+          printf '%s' "$project" | jq -e '.success == true' >/dev/null
+
+          production_branch="$(printf '%s' "$project" | jq -r '.result.production_branch // empty')"
+          preview_db_id="$(printf '%s' "$project" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          production_db_id="$(printf '%s' "$project" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          preview_images="$(printf '%s' "$project" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          production_images="$(printf '%s' "$project" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+
+          test "$production_branch" = "main" || { echo "::error::Production branch is not main; refusing all migration actions."; exit 1; }
+          test -n "$preview_db_id" && test -n "$production_db_id" || { echo "::error::Could not verify both Preview and Production D1 IDs."; exit 1; }
+          test "$preview_db_id" != "$production_db_id" || { echo "::error::Preview DB equals Production DB. No migration performed."; exit 1; }
+          test -n "$preview_images" && test -n "$production_images" || { echo "::error::Could not verify both IMAGES bindings."; exit 1; }
+          test "$preview_images" != "$production_images" || { echo "::error::Preview IMAGES equals Production IMAGES. No migration performed."; exit 1; }
+          echo "Safety gate passed: Production branch is main and Preview DB/IMAGES are isolated."
+
+          query_url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${preview_db_id}/query"
+          tables_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table'" '{sql:$sql}')"
+          tables="$(curl --fail --silent --show-error -X POST "$query_url" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$tables_body")"
+          printf '%s' "$tables" | jq -e '.success == true and .result[0].success == true' >/dev/null
+          table_names="$(printf '%s' "$tables" | jq -r '.result[0].results[].name')"
+          for table in products settings audit_logs admin_login_attempts public_rate_limits; do
+            grep -Fxq "$table" <<< "$table_names" || { echo "::error::Preview DB is missing expected table $table. Refusing migration."; exit 1; }
+          done
+
+          if grep -Fxq "image_group_reviews" <<< "$table_names"; then
+            echo "image_group_reviews already exists in isolated Preview D1; no schema write needed."
+          else
+            migration_sql="$(cat migrations/0008_image_group_reviews.sql)"
+            migration_body="$(jq -n --arg sql "$migration_sql" '{sql:$sql}')"
+            migration_result="$(curl --fail --silent --show-error -X POST "$query_url" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$migration_body")"
+            printf '%s' "$migration_result" | jq -e '.success == true and all(.result[]; .success == true)' >/dev/null
+            echo "Applied additive migration 0008 to isolated Preview D1 only."
+          fi
+
+          if grep -Fxq "image_group_index" <<< "$table_names"; then
+            echo "image_group_index already exists in isolated Preview D1; no schema write needed."
+          else
+            migration_sql="$(cat migrations/0011_image_similarity_index.sql)"
+            migration_body="$(jq -n --arg sql "$migration_sql" '{sql:$sql}')"
+            migration_result="$(curl --fail --silent --show-error -X POST "$query_url" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$migration_body")"
+            printf '%s' "$migration_result" | jq -e '.success == true and all(.result[]; .success == true)' >/dev/null
+            echo "Applied additive migration 0011 to isolated Preview D1 only."
+          fi
+
+          if ! grep -Fxq "image_group_image_claims" <<< "$table_names"; then
+            migration_sql="$(cat migrations/0012_image_group_claims.sql)"
+            migration_body="$(jq -n --arg sql "$migration_sql" '{sql:$sql}')"
+            migration_result="$(curl --fail --silent --show-error -X POST "$query_url" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$migration_body")"
+            printf '%s' "$migration_result" | jq -e '.success == true and all(.result[]; .success == true)' >/dev/null
+            echo "Applied additive migration 0012 to isolated Preview D1 only."
+          else
+            echo "image_group_image_claims already exists in isolated Preview D1; no schema write needed."
+          fi
+
+          verify_similarity_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('image_group_index','image_group_sets','image_group_set_members','image_group_image_claims')" '{sql:$sql}')"
+          verify_similarity="$(curl --fail --silent --show-error -X POST "$query_url" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$verify_similarity_body")"
+          printf '%s' "$verify_similarity" | jq -e '.success == true and .result[0].success == true and ([.result[0].results[].name] | sort) == ["image_group_image_claims","image_group_index","image_group_set_members","image_group_sets"]' >/dev/null
+          echo "PASS: the whole-inventory image index, review groups, and atomic membership claims exist in isolated Preview D1."
+          verify_body="$(jq -n --arg sql "SELECT name FROM sqlite_master WHERE type='table' AND name='image_group_reviews'" '{sql:$sql}')"
+          verify="$(curl --fail --silent --show-error -X POST "$query_url" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$verify_body")"
+          printf '%s' "$verify" | jq -e '.success == true and .result[0].success == true and .result[0].results[0].name == "image_group_reviews"' >/dev/null
+          echo "PASS: image_group_reviews exists in isolated Preview D1. Production was not modified."

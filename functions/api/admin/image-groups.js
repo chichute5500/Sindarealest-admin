@@ -1,0 +1,420 @@
+import { fail, json, rateLimitPublicRequest, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { normalizeIdentityDescriptor, isIdentityDescriptorValid } from "../../_lib/image-identity.js";
+const MODEL="@cf/meta/llama-3.2-11b-vision-instruct";
+function isWorkersAIDailyAllocationExhausted(value){
+  return /\b4006\b|daily free allocation|used up.{0,60}allocation.{0,40}neurons?|allocation of [\d,]+ neurons?/i.test(String(value||""));
+}
+function isWorkersAIQuotaError(status,value){
+  return Number(status)===429||isWorkersAIDailyAllocationExhausted(value)||/\b429\b|too many requests|rate.?limit|quota exceeded/i.test(String(value||""));
+}
+const KEY_RE=/^(?=.{1,1024}$)[^\u0000-\u001f\u007f]+$/, LEGACY_KEY_RE=/^[A-Za-z0-9-]{30,40}\.webp$/, MAX_SCAN=2500;
+function bytesToBase64(bytes){let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));return btoa(binary)}
+function parseVerdict(raw){const s=String(raw||"").trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");let v;try{v=JSON.parse(s)}catch{const m=s.match(/\{[\s\S]*\}/);if(m)try{v=JSON.parse(m[0])}catch{}}if(!v||typeof v!=="object")return null;const n=Number(v.confidence);if(!Number.isFinite(n)||n<0||n>100||typeof v.same_product!=="boolean")return null;return{sameProduct:v.same_product,confidence:Math.round(n),rationale:String(v.rationale||"").trim().slice(0,900)}}
+function parsePairList(value,imageCount=0){
+  const visited=new Set();
+  const pairLike=item=>item&&typeof item==="object"&&!Array.isArray(item)&&
+    ["a","b","imageA","imageB","image_a","image_b","left","right","left_index","right_index","first","second"].some(key=>Object.prototype.hasOwnProperty.call(item,key));
+  function extract(node,depth=0){
+    if(depth>8||node===null||node===undefined)return null;
+    if(typeof node==="string"){
+      const raw=node.trim().replace(/^\x60{3}(?:json)?\s*/i,"").replace(/\s*\x60{3}$/i,"");
+      if(!raw)return null;
+      try{return extract(JSON.parse(raw),depth+1)}catch{}
+      // Some model responses wrap JSON in prose. Scan balanced JSON values
+      // instead of greedily parsing from the first to last brace.
+      for(let start=0;start<raw.length;start++){
+        if(raw[start]!=="{"&&raw[start]!=="[")continue;
+        const stack=[];let inString=false,escaped=false;
+        for(let end=start;end<raw.length;end++){
+          const ch=raw[end];
+          if(inString){
+            if(escaped)escaped=false;
+            else if(ch==="\\")escaped=true;
+            else if(ch==='"')inString=false;
+            continue;
+          }
+          if(ch==='"'){inString=true;continue}
+          if(ch==="{"||ch==="[")stack.push(ch);
+          else if(ch==="}"||ch==="]"){
+            const opener=stack.pop();
+            if(!opener||((ch==="}"&&opener!=="{")||(ch==="]"&&opener!=="[")))break;
+            if(!stack.length){
+              try{const found=extract(JSON.parse(raw.slice(start,end+1)),depth+1);if(found)return found}catch{}
+              break;
+            }
+          }
+        }
+      }
+      return null;
+    }
+    if(Array.isArray(node)){
+      if(node.length&&node.every(pairLike))return{pairs:node};
+      for(const item of node.slice(0,20)){const found=extract(item,depth+1);if(found)return found}
+      return null;
+    }
+    if(typeof node!=="object"||visited.has(node))return null;
+    visited.add(node);
+    if(Array.isArray(node.pairs))return{pairs:node.pairs};
+    for(const key of ["matches","comparisons","pairMatches","pair_matches","pair_results"]){
+      if(Array.isArray(node[key]))return{pairs:node[key]};
+    }
+    if(imageCount===2&&typeof (node.same_product??node.sameProduct)==="boolean"){
+      const confidence=node.confidence??node.score??node.confidence_score;
+      if(Number.isFinite(Number(confidence)))return{pairs:[{a:0,b:1,same_product:node.same_product??node.sameProduct,confidence:Number(confidence),rationale:node.rationale??node.reason??""}]};
+    }
+    for(const key of ["response","choices","output_text","generated_text","text","content","message","result","data","output","json","parsed","payload","structured_output","function_call","arguments"]){
+      if(Object.prototype.hasOwnProperty.call(node,key)){const found=extract(node[key],depth+1);if(found)return found}
+    }
+    return null;
+  }
+  return extract(value);
+}
+function summarizePairResponse(value){
+  if(typeof value==="string")return "response_type=string,length="+value.length+",prefix="+value.replace(/[\r\n]+/g," ").slice(0,140);
+  if(value&&typeof value==="object")return "response_type=object,keys="+Object.keys(value).slice(0,12).join(",");
+  return "response_type="+typeof value;
+}
+function parseIndexedFeatures(row){let features={};try{features=JSON.parse(row?.features_json||"{}")}catch{}return{key:String(row?.image_key||""),pHash:String(row?.p_hash||"").toLowerCase(),features}}
+function visualPairGate(left,right){
+  if(!left||!right||!left.key||!right.key)return{match:false,reason:"missing_index"};
+  const a=left.features||{},b=right.features||{};
+  const allowed=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other"]);
+  const categoryA=String(a.category||"").toLowerCase(),categoryB=String(b.category||"").toLowerCase();
+  if(!allowed.has(categoryA)||categoryA!==categoryB||a.categoryStatus!=="classified"||b.categoryStatus!=="classified"||Number(a.categoryConfidence)<70||Number(b.categoryConfidence)<70)return{match:false,reason:"category_gate"};
+  if(!/^[0-9a-f]{16}$/.test(left.pHash)||!/^[0-9a-f]{16}$/.test(right.pHash))return{match:false,reason:"invalid_phash"};
+  const validArray=(value,length)=>Array.isArray(value)&&value.length===length&&value.every(item=>typeof item==="number"&&Number.isFinite(item));
+  if(!validArray(a.shape,64)||!validArray(b.shape,64)||!validArray(a.colors,12)||!validArray(b.colors,12))return{match:false,reason:"invalid_descriptor"};
+  const hashA=String(a.contentHash||"").toLowerCase(),hashB=String(b.contentHash||"").toLowerCase();
+  const exactDuplicate=/^[0-9a-f]{64}$/.test(hashA)&&hashA===hashB;
+  let distance=0;for(let i=0;i<16;i++)distance+=Number((parseInt(left.pHash[i],16)^parseInt(right.pHash[i],16)).toString(2).replace(/0/g,"").length);
+  if(exactDuplicate)return{match:true,score:100,exactDuplicate:true,distance};
+  let shapeDelta=0;for(let i=0;i<64;i++)shapeDelta+=Math.abs(a.shape[i]-b.shape[i]);
+  const shape=Math.max(0,Math.min(1,1-shapeDelta/64));
+  let colorOverlap=0;for(let channel=0;channel<3;channel++){let channelOverlap=0;for(let bin=0;bin<4;bin++){const i=channel*4+bin;channelOverlap+=Math.min(Number(a.colors[i])||0,Number(b.colors[i])||0)}colorOverlap+=Math.max(0,Math.min(1,channelOverlap))}
+  const color=colorOverlap/3,score=Math.round(((1-distance/64)*0.30+shape*0.35+color*0.35)*100);
+  return{match:score>=70&&shape>=0.58&&color>=0.58&&distance<=24,score,shape,color,distance,exactDuplicate:false};
+}
+
+export function parseCategoryResult(result, allowed = new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"])) {
+  const candidates = [];
+  const visitedObjects = new Set();
+  const visitedStrings = new Set();
+  let visited = 0;
+
+  const aliases = {
+    sneakers:"sneaker", sneaker_shoes:"sneaker", trainers:"sneaker", trainer:"sneaker", running_shoes:"sneaker", athletic_shoes:"sneaker", giay_the_thao:"sneaker",
+    loafers:"loafer", loafer_shoes:"loafer", slip_on_shoes:"loafer", giay_luoi:"loafer",
+    dress_shoes:"dress_shoe", dressshoe:"dress_shoe", formal_shoe:"dress_shoe", formal_shoes:"dress_shoe", giay_tay:"dress_shoe",
+    boots:"boot", sandals:"sandal", belts:"belt", that_lung:"belt", wallets:"wallet", vi:"wallet",
+    watchstraps:"watch_strap", watch_band:"watch_strap", watch_bands:"watch_strap", watchbands:"watch_strap", day_dong_ho:"watch_strap",
+    watches:"watch", dong_ho:"watch", bags:"bag", tui:"bag", shoe:"unknown", shoes:"unknown", footwear:"unknown", footwear_product:"unknown", unknown_product:"unknown", unknown_item:"unknown", khong_xac_dinh:"unknown", other_product:"other", khac:"other"
+  };
+  const normalize = value => {
+    if (value && typeof value === "object") value = value.category ?? value.label ?? value.name ?? value.value ?? value.text;
+    let category = String(value ?? "").trim().toLowerCase()
+      .replace(/đ/g, "d").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[ -]+/g, "_").replace(/[^a-z_]/g, "").replace(/^_+|_+$/g, "");
+    category = aliases[category] || category;
+    return allowed.has(category) ? category : null;
+  };
+  const scalar = value => {
+    if (value && typeof value === "object") return value.value ?? value.score ?? value.confidence ?? value.number ?? null;
+    return value;
+  };
+  const confidenceValue = value => {
+    value = scalar(value);
+    if (typeof value === "string") value = value.trim().replace(/%$/, "");
+    let confidence = Number(value);
+    if (Number.isFinite(confidence) && confidence > 0 && confidence <= 1) confidence *= 100;
+    return Number.isFinite(confidence) && confidence >= 0 && confidence <= 100 ? Math.round(confidence) : null;
+  };
+  const evaluateObject = value => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    const categoryRaw = value.category ?? value.product_category ?? value.productCategory ?? value.product_type ?? value.label ?? value.type;
+    const category = normalize(categoryRaw);
+    const confidence = confidenceValue(value.confidence ?? value.score ?? value.confidence_score ?? value.confidenceScore ?? value.confidence_percent ?? value.probability);
+    const identityRaw = value.identity_descriptor ?? value.identityDescriptor ?? value.visual_descriptor ?? value.visualDescriptor ?? value.product_identity_descriptor ?? value.identity;
+    const identityDescriptor = normalizeIdentityDescriptor(identityRaw);
+    return category && confidence !== null ? { category, confidence, ...(isIdentityDescriptorValid(identityDescriptor) ? { identityDescriptor } : {}) } : null;
+  };
+  const parseText = raw => {
+    const text = raw.trim().replace(/^\x60{3}(?:json)?\s*/i, "").replace(/\s*\x60{3}$/i, "").trim();
+    if (!text) return null;
+    const candidatesToParse = [text];
+    const objectMatch = text.match(/\{[\s\S]*\}/);
+    if (objectMatch && objectMatch[0] !== text) candidatesToParse.push(objectMatch[0]);
+    for (const candidate of candidatesToParse) {
+      try {
+        const parsed = JSON.parse(candidate);
+        const direct = evaluateObject(parsed);
+        if (direct) return direct;
+        collect(parsed, 1);
+      } catch {}
+    }
+    const categoryPatterns = [
+      [/\bwatch[ _-]?strap\b|\bwatch[ _-]?band\b|\bday dong ho\b/i, "watch_strap"],
+      [/\bdress[ _-]?shoe(?:s)?\b|\bformal[ _-]?shoe(?:s)?\b|\bgiay tay\b/i, "dress_shoe"],
+      [/\bsneakers?\b|\btrainers?\b|\brunning shoes\b|\bgiay the thao\b/i, "sneaker"],
+      [/\bloafers?\b|\bgiay luoi\b/i, "loafer"],
+      [/\bboots?\b/i, "boot"], [/\bsandals?\b/i, "sandal"], [/\bbelts?\b|\bthat lung\b/i, "belt"],
+      [/\bwallets?\b|\bvi\b/i, "wallet"], [/\bwatches?\b|\bdong ho\b/i, "watch"], [/\bbags?\b|\btui\b/i, "bag"],
+      [/\bunknown\b|\bkhong xac dinh\b/i, "unknown"], [/\bother\b|\bkhac\b/i, "other"]
+    ];
+    const confidenceMatch = text.match(/(?:confidence|score|confidence_score|confidenceScore|độ[_ ]tin[_ ]cậy|do[_ ]tin[_ ]cay|probability)\s*[ "'\x60]*[:=]\s*[ "'\x60]*([0-9]+(?:\.[0-9]+)?)\s*%?/i);
+    if (confidenceMatch) {
+      const confidence = confidenceValue(confidenceMatch[1]);
+      if (confidence !== null) {
+        for (const [pattern, name] of categoryPatterns) {
+          if (pattern.test(text)) {
+            const category = normalize(name);
+            if (category) return { category, confidence };
+          }
+        }
+      }
+    }
+    return null;
+  };
+  function collect(value, depth = 0) {
+    if (depth > 8 || value == null || visited++ > 300) return;
+    if (typeof value === "string") {
+      const raw = value.trim();
+      if (!raw || visitedStrings.has(raw)) return;
+      visitedStrings.add(raw);
+      const parsed = parseText(raw);
+      if (parsed) candidates.push(parsed);
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value.slice(0, 20)) collect(item, depth + 1);
+      return;
+    }
+    if (typeof value !== "object" || visitedObjects.has(value)) return;
+    visitedObjects.add(value);
+    const parsed = evaluateObject(value);
+    if (parsed) candidates.push(parsed);
+    // Workers AI can put generated JSON in response, in content parts, or in
+    // function-call arguments. Walk bounded nested payloads instead of guessing
+    // that response is always a plain string.
+    const preferred = ["response","tool_calls","content","text","generated_text","output_text","result","message","choices","output","function","arguments","args","input","data","json","parsed","payload"];
+    for (const key of preferred) if (Object.prototype.hasOwnProperty.call(value, key)) collect(value[key], depth + 1);
+    for (const [key, child] of Object.entries(value)) {
+      if (preferred.includes(key) || ["usage","timings","metrics","logprobs","id","created","model","object","finish_reason"].includes(key)) continue;
+      collect(child, depth + 1);
+    }
+  }
+
+  collect(result);
+  return candidates[0] || null;
+}
+
+function normalizeOwnedImageKey(reference){
+  let value=String(reference||"").trim();
+  if(!value)return "";
+  if(/^https?:\/\//i.test(value)){try{value=new URL(value).pathname}catch{return ""}}
+  value=value.split(/[?#]/,1)[0];
+  try{value=decodeURIComponent(value)}catch{}
+  value=value.replace(/^\/+/,"");
+  if(value.startsWith("media/"))value=value.slice(6);
+  return value;
+}
+async function ownersForImageKeys(env,keys){
+  const wanted=new Set(keys),owners=new Map();let offset=0;
+  while(true){
+    const page=await env.DB.prepare("SELECT id,sku,images_json FROM products ORDER BY sku ASC,id ASC LIMIT 500 OFFSET ?").bind(offset).all();
+    const rows=page.results||[];
+    for(const product of rows){let refs=[];try{refs=JSON.parse(product.images_json||"[]")}catch{}
+      for(const reference of Array.isArray(refs)?refs:[]){const key=normalizeOwnedImageKey(reference);if(!wanted.has(key))continue;
+        if(!owners.has(key))owners.set(key,new Set());owners.get(key).add(String(product.sku||product.id||""));
+      }
+    }
+    if(rows.length<500)break;offset+=rows.length;
+  }
+  return owners;
+}
+async function inventory(env){const ps=[];let productOffset=0;while(true){const page=await env.DB.prepare("SELECT id,sku,title,images_json FROM products ORDER BY sku ASC, id ASC LIMIT 500 OFFSET ?").bind(productOffset).all();const rows=page.results||[];ps.push(...rows);if(rows.length<500)break;productOffset+=rows.length}const assigned=new Map();for(const p of ps){let arr=[];try{arr=JSON.parse(p.images_json||"[]")}catch{}for(const entry of Array.isArray(arr)?arr:[]){const s=String(entry||""),m=s.match(/(?:^|\/)media\/([A-Za-z0-9-]{30,40}\.webp)(?:[?#].*)?$/i)||s.match(/^([A-Za-z0-9-]{30,40}\.webp)$/i);if(m){if(!assigned.has(m[1]))assigned.set(m[1],[]);assigned.get(m[1]).push({id:p.id,sku:p.sku,title:p.title})}}}const images=[];let cursor,scannedObjects=0,webpObjects=0,rejectedWebpCount=0;const sampleRejectedKeys=[];do{const page=await env.IMAGES.list({limit:1000,...(cursor?{cursor}:{})});for(const o of page.objects||[]){scannedObjects++;const key=String(o.key||"");if(/\.webp$/i.test(key))webpObjects++;if(LEGACY_KEY_RE.test(key))images.push({key,url:"/media/"+encodeURIComponent(key),size:Number(o.size||0),uploaded:o.uploaded?new Date(o.uploaded).toISOString():null,assignedTo:assigned.get(key)||[]});else if(/\.webp$/i.test(key)){rejectedWebpCount++;if(sampleRejectedKeys.length<5)sampleRejectedKeys.push(key.slice(0,120))}if(images.length>=MAX_SCAN)break}if(images.length>=MAX_SCAN||!page.truncated)break;cursor=page.cursor}while(cursor);return{images,truncated:images.length>=MAX_SCAN,total:images.length,assignedCount:images.filter(x=>x.assignedTo.length).length,diagnostics:{scannedObjects,webpObjects,rejectedWebpCount,sampleRejectedKeys,scanLimit:MAX_SCAN}}}
+export async function onRequestGet({request,env}){const auth=await requireAdmin({request,env});if(auth.response)return auth.response;if(!env.DB||!env.IMAGES)return fail("Thiếu binding D1 DB hoặc R2 IMAGES.",503);try{const [stock,rows]=await Promise.all([inventory(env),env.DB.prepare("SELECT id,image_a,image_b,same_product,confidence,rationale,status,product_id,created_at FROM image_group_reviews ORDER BY created_at DESC LIMIT 200").all()]);return json({...stock,reviews:rows.results||[]})}catch{return fail("Không thể kiểm kê kho ảnh. Kiểm tra binding R2 IMAGES và migration 0008.",503)}}
+export async function onRequestPost(context){const auth=await requireAdmin(context);if(auth.response)return auth.response;const env=context.env||{};if(!env.DB||!env.IMAGES)return fail("Thiếu binding D1 DB hoặc R2 IMAGES.",503);const parsed=await readJsonBodyLimited(context.request,3*1024*1024);if(parsed.error==="too_large")return fail("Yêu cầu vượt giới hạn.",413);if(parsed.error||!parsed.value||typeof parsed.value!=="object"||Array.isArray(parsed.value))return fail("Yêu cầu không hợp lệ.");const body=parsed.value,action=String(body.action||"");
+if(action==="classify-categories"){
+if(typeof env.AI?.run!=="function")return fail("Chưa cấu hình Workers AI binding AI trên Preview. Phân loại bị dừng an toàn.",503);
+const keys=Array.isArray(body.imageKeys)?body.imageKeys.map(x=>String(x||"")):[];
+const supplied=Array.isArray(body.imageData)?body.imageData:[];
+if(!keys.length||keys.length>8||new Set(keys).size!==keys.length||keys.some(k=>!KEY_RE.test(k)))return fail("Lô phân loại cần từ 1 đến 8 ảnh khác nhau.",400);
+if(supplied.length!==keys.length||supplied.some((x,i)=>!x||x.key!==keys[i]||typeof x.dataUrl!=="string"||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(x.dataUrl)||x.dataUrl.length>250000))return fail("Dữ liệu ảnh xem trước không hợp lệ.",400);
+if(supplied.reduce((sum,x)=>sum+x.dataUrl.length,0)>1200000)return fail("Lô ảnh vượt giới hạn 1,2 MB.",413);
+try{
+const objects=await Promise.all(keys.map(k=>env.IMAGES.head?env.IMAGES.head(k):env.IMAGES.get(k)));
+if(objects.some(x=>!x))return fail("Ảnh đã biến mất khỏi R2; hãy quét lại kho.",409);
+const limit=await rateLimitPublicRequest(env,context.request,"admin_image_category_classify",700,3600);
+if(limit.limited)return fail("Đã đạt giới hạn phân loại ảnh trong một giờ. Hãy đợi rồi quét tiếp; kết quả chưa rõ sẽ không được gom.",429,{"Retry-After":"3600"});
+const prompt="Phân loại vật thể chính trong ảnh thành ĐÚNG MỘT category trong danh sách: sneaker, loafer, dress_shoe, boot, sandal, belt, wallet, watch_strap, watch, bag, other, unknown. Không được trả category chung chung như shoe, shoes hoặc footwear. Nếu là giày, bắt buộc chọn sneaker (giày thể thao), loafer (giày lười), dress_shoe (giày tây/giày công sở), boot (bốt) hoặc sandal; chỉ chọn unknown nếu ảnh không đủ rõ để phân biệt. watch_strap là dây đồng hồ riêng lẻ; watch là đồng hồ nguyên chiếc. Ngoài category và confidence, trả identity_descriptor bằng tiếng Việt gồm ít nhất 5 trường ngăn bằng dấu chấm phẩy, chỉ ghi dấu hiệu nhìn thấy về chất liệu/vân cụ thể, mũi/đế, đường may, logo/vị trí, khóa/phụ kiện, dấu hiệu riêng và phần chưa nhìn rõ. Không dùng nền, màu chung hoặc loại giày làm bằng chứng duy nhất về danh tính mẫu; không bịa điều không thấy. Trả JSON duy nhất với category, confidence (0-100), identity_descriptor. Không markdown hoặc giải thích.";
+const allowed=new Set(["sneaker","loafer","dress_shoe","boot","sandal","belt","wallet","watch_strap","watch","bag","other","unknown"]);
+const items=[];
+for(let i=0;i<keys.length;i++){
+let result,classification=null;
+for(let attempt=0;attempt<2&&!classification;attempt++){
+  try{
+    // The live Preview smoke test showed that the vision binding rejects the
+    // schema-constrained, user-only request with AI error 3030. Use the documented
+    // system + user message shape that passed real inference, then validate JSON
+    // strictly with parseCategoryResult before storing any classification.
+    result=await env.AI.run(MODEL,{
+      messages:[
+        {role:"system",content:"You are a strict product image classification engine. Return exactly one JSON object with category, integer confidence 0-100 and identity_descriptor: at least five semicolon-separated visible product-defining traits. Do not hallucinate unseen details; record uncertainty explicitly. Never return markdown or prose."},
+        {role:"user",content:prompt+(attempt===1?"\nReturn only JSON with all required fields. identity_descriptor MUST be a string with at least five semicolon-separated concrete visible traits, for example product_type=...; dominant_colors=...; visible_material=...; texture_pattern=...; distinctive_details=.... Do not omit it. No explanation or markdown.":"")}
+      ],
+      image:supplied[i].dataUrl,
+      temperature:0,
+      max_tokens:420
+    });
+  }catch(error){
+    const detail=String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180);
+    const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
+    const dailyAllocationExhausted=isWorkersAIDailyAllocationExhausted(detail);
+    const quota=isWorkersAIQuotaError(upstreamStatus,detail);
+    const transient=upstreamStatus===500||upstreamStatus===502||upstreamStatus===503||upstreamStatus===504||
+      /\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+    // Do not hammer a quota-limited model. Retry one transient upstream failure only.
+    if(attempt===0&&transient&&!quota){
+      await new Promise(resolve=>setTimeout(resolve,250));
+      continue;
+    }
+    const status=quota?429:(transient?503:502);
+    const message=dailyAllocationExhausted?"Workers AI đã hết hạn mức neuron miễn phí hằng ngày (mã Cloudflare 4006). Chưa ghi kết quả; cần chờ hạn mức được cấp lại hoặc nâng cấp gói Workers AI.":"Workers AI lỗi khi phân loại ảnh "+(i+1)+"/"+keys.length+": "+detail+". Lô này chưa được đánh dấu phân loại xong; hãy thử lại.";
+    return fail(message,status,quota&&!dailyAllocationExhausted?{"Retry-After":"60"}:{});
+  }
+  classification=parseCategoryResult(result,allowed);
+  // A category-only answer is insufficient for identity grouping. Retry once for
+  // a required, concrete per-image descriptor instead of returning a false success.
+  if(classification&&!isIdentityDescriptorValid(classification.identityDescriptor))classification=null;
+}
+if(!classification){const source=result&&typeof result==="object"?result:{};const describe=(key,value)=>key+(Array.isArray(value)?"["+value.length+"]":value&&typeof value==="object"?"{"+Object.keys(value).slice(0,6).join(",")+"}":"("+typeof value+")");const shape=Object.entries(source).slice(0,8).map(([key,value])=>describe(key,value)).join(",")||typeof result;let sample="";try{sample=JSON.stringify({response:source.response,tool_calls:source.tool_calls,choices:Array.isArray(source.choices)?source.choices.slice(0,1):undefined,output_text:source.output_text})||""}catch{}sample=sample.replace(/[\\r\\n]+/g," ").slice(0,220);return fail("Workers AI trả phản hồi không hợp lệ cho ảnh "+(i+1)+"/"+keys.length+" (dạng: "+shape+(sample?"; mẫu JSON: "+sample:"")+"). Không lưu lô này; hãy thử lại.",502)}
+const candidate=classification.category,confidence=classification.confidence,categoryValid=candidate!=="unknown"&&confidence>=70;
+const identityDescriptor=normalizeIdentityDescriptor(classification.identityDescriptor);
+const confirmed=categoryValid&&isIdentityDescriptorValid(identityDescriptor);
+items.push({key:keys[i],category:categoryValid?candidate:"unknown",confidence:Math.round(confidence),identityDescriptor,status:confirmed?"classified":"needs_review"});
+}
+return json({ok:true,items,message:"Đã phân loại "+items.filter(x=>x.status==="classified").length+"/"+items.length+" ảnh với mô tả nhận diện hợp lệ. Ảnh thiếu đặc trưng hoặc chưa chắc chắn được giữ để xem xét thủ công."});
+}catch(error){return fail("Không thể phân loại ảnh. "+String(error?.message||error).replace(/[\r\n]+/g," ").slice(0,180),502)}
+}
+if(action==="compare"){
+  if(typeof env.AI?.run!=="function")return fail("Chưa cấu hình Workers AI binding tên AI trên Preview. Chưa gọi AI và chưa lưu kết quả.",503);
+  const keys=Array.isArray(body.imageKeys)?body.imageKeys.map(x=>String(x||"")):[String(body.imageA||""),String(body.imageB||"")];
+  if(keys.length<2||keys.length>8||new Set(keys).size!==keys.length||keys.some(k=>!KEY_RE.test(k)))return fail("Chọn từ 2 đến 8 ảnh khác nhau trong kho ảnh.");
+  try{
+    const objects=await Promise.all(keys.map(k=>env.IMAGES.get(k)));
+    if(objects.some(x=>!x))return fail("Một hoặc nhiều ảnh không còn tồn tại trong R2.",404);
+    const supplied=Array.isArray(body.imageData)?body.imageData:[];
+    if(supplied.length!==keys.length||supplied.some((x,i)=>!x||x.key!==keys[i]||typeof x.dataUrl!=="string"||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(x.dataUrl)))return fail("Không nhận được ảnh JPEG đã chuyển đổi từ trình duyệt. Hãy tải lại trang và thử lại.",400);
+    if(supplied.some(x=>x.dataUrl.length>700000))return fail("Ảnh sau chuyển đổi vẫn quá lớn. Hãy thử ảnh nhỏ hơn.",413);
+    const limit=await rateLimitPublicRequest(env,context.request,"admin_image_group_compare",30,3600);
+    if(limit.limited)return fail("Đã đạt giới hạn 30 lượt tìm nhóm AI mỗi giờ. Vui lòng thử lại sau.",429,{"Retry-After":"3600"});
+    const indexedResult=await env.DB.prepare("SELECT image_key,p_hash,features_json FROM image_group_index WHERE image_key IN ("+keys.map(()=>"?").join(",")+")").bind(...keys).all();
+    const indexedByKey=new Map((indexedResult.results||[]).map(row=>{const parsed=parseIndexedFeatures(row);return[parsed.key,parsed]}));
+    const promptBase="Bạn là chuyên gia đối chiếu ảnh sản phẩm giày và phụ kiện da. Hãy tìm các cặp có bằng chứng đủ mạnh rằng chúng thuộc CÙNG MỘT MẪU/BIẾN THỂ SẢN PHẨM CỤ THỂ, không phải chỉ giống kiểu dáng chung. Với giày, đối chiếu vân da/cá sấu, đường may, logo, khóa, mũi giày, đế, lỗ dây và dấu hiệu riêng; với phụ kiện, đối chiếu chất liệu/vân da, hình dáng, đường may, logo, khóa và chi tiết nhận diện. Góc chụp, ánh sáng, nền, watermark, crop và khoảng cách có thể khác ở ảnh cùng sản phẩm. Khác biệt thật về vân/chất liệu, đường may, logo, mũi/đế, khóa hoặc chi tiết riêng là bằng chứng chống ghép. Chỉ đề xuất cặp có đủ dấu hiệu về cùng mẫu/biến thể cụ thể, không ghép chỉ vì cùng loại hoặc kiểu dáng; confidence phải từ 91/100 trở lên. Trả JSON duy nhất có trường pairs là mảng đối tượng với a,b (chỉ số ảnh), same_product (boolean), confidence (0-100), rationale ngắn bằng tiếng Việt).";
+    const ownersByKey=await ownersForImageKeys(env,keys),prepared=[],seen=new Set();
+    async function runVisionWithRetry(input){
+      for(let attempt=0;attempt<2;attempt++){
+        try{return await env.AI.run(MODEL,input)}
+        catch(error){
+          const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,180);
+          const upstreamStatus=Number(error?.status||error?.statusCode||error?.status_code||0);
+          const quota=isWorkersAIQuotaError(upstreamStatus,detail);
+          const transient=[500,502,503,504].includes(upstreamStatus)||/\b(500|502|503|504)\b|time.?out|temporar|unavailable|overloaded|network error|internal server error/i.test(detail);
+          if(quota){error.status=429;throw error}
+          if(attempt===0&&transient&&!/\b3030\b/.test(detail)){await new Promise(resolve=>setTimeout(resolve,250));continue}
+          error.status=transient?503:upstreamStatus||502;
+          throw error;
+        }
+      }
+      throw new Error("Workers AI did not return a result");
+    }
+    // Analyze every selected image exactly once as a vision input. Do not
+    // compare isolated four-image windows: for eight images that silently
+    // misses pairs at opposite ends of the selection.
+    const descriptors=[];
+    for(let imageIndex=0;imageIndex<keys.length;imageIndex++){
+      const vision=await runVisionWithRetry({
+        messages:[
+          {role:"system",content:"You are a forensic product-photo analyst. Return one compact JSON object in Vietnamese with these fields: product_type, dominant_colors, visible_material, texture_pattern, silhouette, toe_or_edge_shape, sole_or_edge_profile, stitching, logo_placement, hardware_or_closure, distinctive_details, visible_uncertainty. Describe only what is visible; use 'không thấy rõ' instead of guessing. For shoes, distinguish crocodile texture from generic embossing only when visibly supported; record toe, sole, seam layout, lace holes, buckle and logo placement. For accessories, record silhouette, panel layout, seams, texture, hardware and logo placement. Prioritize stable product identity features over background, angle, lighting, crop and watermark. Be specific enough to compare another view of the same product; do not claim unseen details."},
+          {role:"user",content:"Analyze this product photo for exact model/variant matching. Record the most distinctive visible traits and clearly mark what cannot be seen from this angle. Return JSON only."}
+        ],
+        image:supplied[imageIndex].dataUrl,
+        temperature:0,
+        max_tokens:320
+      });
+      const descriptorValue=vision?.response??vision?.choices?.[0]?.message?.content??vision?.output_text??vision?.generated_text??vision?.text??vision?.content;
+      const descriptorText=typeof descriptorValue==="string"?descriptorValue:descriptorValue&&typeof descriptorValue==="object"?JSON.stringify(descriptorValue):"";
+      if(typeof descriptorText!=="string"||!descriptorText.trim())throw new Error("single-image descriptor was empty (response type="+typeof descriptorValue+(vision&&typeof vision==="object"?", keys="+Object.keys(vision).slice(0,8).join(","):"")+")");
+      descriptors.push(descriptorText.trim().slice(0,2200));
+    }
+    const comparisonMessages=[
+      {role:"system",content:`Compare visual descriptions of product photos, especially shoes and leather accessories. Decide which pairs show the SAME specific product model and variant, not merely similar style. Differences in view angle, lighting, crop, watermark or background are acceptable; differences in material/crocodile texture, stitching, logo, toe/sole, hardware or unique marks are evidence against a match. Compare every unordered pair independently rather than requiring one global conclusion. If two descriptions are effectively identical in all visible product-defining details, mark that pair same_product=true with confidence 95-99 even if the camera angle or background differs; if the descriptions are vague or omit distinguishing evidence, do not guess and leave the pair out. Return only valid JSON in this schema: {"pairs":[{"a":0,"b":1,"same_product":true,"confidence":95,"rationale":"brief Vietnamese reason"}]}. Use zero-based image indices, never pair an image with itself, and return an empty pairs array when uncertain. Check every unordered pair in the complete selection, including first-to-last. Only report confidence >= 91.`},
+      {role:"user",content:promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+" (mô tả từ phân tích thị giác):\n"+description).join("\n\n")+"\n\nCó "+keys.length+" ảnh đánh số 0 đến "+(keys.length-1)+". Hãy đối chiếu toàn bộ danh sách và xét mọi cặp i<j, kể cả ảnh đầu và ảnh cuối. Chỉ đưa vào pairs cặp đạt confidence từ 91 trở lên; nếu không có cặp nào đủ chắc chắn, trả pairs:[]. Chỉ JSON, không văn bản ngoài JSON."}
+    ];
+    let compared=await runVisionWithRetry({messages:comparisonMessages,temperature:0,max_tokens:1024});
+    let comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+    if(!parsePairList(comparedText,keys.length)){
+      compared=await runVisionWithRetry({
+        messages:[
+          {role:"system",content:"Return ONLY valid JSON with exactly one top-level pairs array. Each element needs numeric a and b indices, boolean same_product, numeric confidence 0-100, and a short Vietnamese rationale. No markdown or explanation. Return pairs:[] if no match qualifies."},
+          {role:"user",content:"The previous response was not valid JSON. Correct the format and compare every unordered pair in the complete list, including first-to-last. "+promptBase+"\n\n"+descriptors.map((description,index)=>"Ảnh "+index+":\n"+description).join("\n\n")+"\n\nSchema: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":true,\"confidence\":95,\"rationale\":\"reason\"}]}. Use pairs:[] if none qualify."}
+        ],
+        temperature:0,
+        max_tokens:1024
+      });
+      comparedText=compared?.response??compared?.choices?.[0]?.message?.content??compared?.output_text;
+    }
+    let parsedPairs=parsePairList(comparedText,keys.length);
+    if(!parsedPairs)throw new Error("text comparison response did not contain a valid pairs array after one format retry ("+summarizePairResponse(comparedText)+")");
+    // A valid empty match list can mean either "no pair matches" or that the
+    // model declined to enumerate pair-level verdicts. Ask for an explicit
+    // verdict for every unordered pair once; the server still accepts only
+    // same_product=true with confidence >=91 and the visual/ownership gates.
+    if(keys.length>1&&!parsedPairs.pairs.some(pair=>(pair?.same_product??pair?.sameProduct??pair?.match)===true&&Number.isFinite(Number(pair?.confidence??pair?.score))&&Number(pair?.confidence??pair?.score)>=91&&Number(pair?.confidence??pair?.score)<=100)){
+      const allPairLabels=[];
+      for(let a=0;a<keys.length;a++)for(let b=a+1;b<keys.length;b++)allPairLabels.push({a,b});
+      const exhaustive=await runVisionWithRetry({
+        messages:[
+          {role:"system",content:"You are a strict pairwise product-identity evaluator. Return ONLY JSON: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":false,\"confidence\":95,\"rationale\":\"reason\"}]}. You MUST provide exactly one verdict for EVERY listed pair, including negative verdicts. Never omit a pair. same_product=true only when the descriptions support the same specific physical product model/variant, not merely a similar style. Angle, lighting, crop, watermark and background differences alone do not mean different products. Distinct visible material texture, stitching, logo, toe/sole, hardware or unique marks are evidence for different products. If evidence is vague, set same_product=false and explain uncertainty. Confidence is 0-100."},
+          {role:"user",content:promptBase+"\n\nReturn one verdict for each of these pairs: "+JSON.stringify(allPairLabels)+". Use only the supplied visual descriptions, not image keys.\n\n"+descriptors.map((description,index)=>"Image "+index+" visual description:\n"+description).join("\n\n")+"\n\nSchema: {\"pairs\":[{\"a\":0,\"b\":1,\"same_product\":false,\"confidence\":95,\"rationale\":\"brief reason\"}]}. Include all "+allPairLabels.length+" pairs exactly once."}
+        ],
+        temperature:0,
+        max_tokens:Math.min(2048,512+allPairLabels.length*90)
+      });
+      const exhaustiveText=exhaustive?.response??exhaustive?.choices?.[0]?.message?.content??exhaustive?.output_text;
+      const exhaustivePairs=parsePairList(exhaustiveText,keys.length);
+      if(exhaustivePairs)parsedPairs=exhaustivePairs;
+    }
+    if(typeof comparedText!=="string")comparedText=JSON.stringify(parsedPairs);
+    const comparisonDiagnostics={modelPairs:parsedPairs.pairs.length,invalidOrLowConfidence:0,visualGateRejected:0,ownershipRejected:0,accepted:0,rejectedPairs:[]};
+    for(const pair of parsedPairs.pairs){
+      const a=Number(pair?.a??pair?.imageA??pair?.image_a??pair?.left_index??pair?.left??pair?.first),b=Number(pair?.b??pair?.imageB??pair?.image_b??pair?.right_index??pair?.right??pair?.second);
+      let confidence=Number(pair?.confidence??pair?.score??pair?.confidence_score??pair?.confidenceScore??pair?.probability);
+      if(confidence>0&&confidence<=1)confidence*=100;
+      if((pair?.same_product??pair?.sameProduct??pair?.match)!==true||!Number.isInteger(a)||!Number.isInteger(b)||a<0||b<0||a>=keys.length||b>=keys.length||a===b||!Number.isFinite(confidence)||confidence<91||confidence>100){comparisonDiagnostics.invalidOrLowConfidence++;comparisonDiagnostics.rejectedPairs.push({a,b,same_product:pair?.same_product??pair?.sameProduct??pair?.match??null,confidence:Number.isFinite(confidence)?confidence:null,rationale:String(pair?.rationale||pair?.reason||"").slice(0,180)});continue;}
+      const visual=visualPairGate(indexedByKey.get(keys[a]),indexedByKey.get(keys[b]));
+      if(!visual.match){comparisonDiagnostics.visualGateRejected++;continue;}
+      const first=keys[a]<keys[b]?keys[a]:keys[b],second=keys[a]<keys[b]?keys[b]:keys[a],id=first+"|"+second;
+      const ownerA=ownersByKey.get(first)||new Set(),ownerB=ownersByKey.get(second)||new Set();
+      if(ownerA.size>1||ownerB.size>1||(ownerA.size===1&&ownerB.size===1&&[...ownerA][0]!==[...ownerB][0])){comparisonDiagnostics.ownershipRejected++;continue;}
+      if(seen.has(id))continue;
+      seen.add(id);
+      prepared.push({first,second,confidence:Math.round(confidence),rationale:String(pair.rationale||pair.reason||pair.explanation||"").trim().slice(0,900)});
+      comparisonDiagnostics.accepted++;
+    }
+    if(!prepared.length)return json({ok:true,matches:[],batches:1,diagnostics:comparisonDiagnostics,message:"AI chưa tìm thấy cặp nào đủ bằng chứng trong toàn bộ "+keys.length+" ảnh đã kiểm tra. Có thể chạy lại với cặp ảnh nghi vấn; không có đề xuất nào được lưu."});
+    const statements=prepared.map(p=>env.DB.prepare("INSERT INTO image_group_reviews(id,image_a,image_b,same_product,confidence,rationale,status,created_at) VALUES(?,?,?,1,?,?,'pending',datetime('now'))").bind(crypto.randomUUID(),p.first,p.second,p.confidence,p.rationale));
+    await env.DB.batch(statements);
+    return json({ok:true,matches:prepared.length,batches:1,message:"AI đã so sánh đầy đủ "+keys.length+" ảnh và tạo "+prepared.length+" cặp đề xuất sau khi kiểm tra ngưỡng và đặc trưng. Các đề xuất đang chờ bạn duyệt; chưa ảnh nào được tự động công khai."},201);
+  }catch(error){
+    const detail=String(error?.message||error||"Unknown Workers AI error").replace(/[\r\n]+/g," ").slice(0,220);
+    const status=Number(error?.status||error?.statusCode||error?.status_code||0);
+    if(isWorkersAIDailyAllocationExhausted(detail))return fail("Workers AI đã hết hạn mức neuron miễn phí hằng ngày (mã Cloudflare 4006). Chưa lưu đề xuất; cần chờ hạn mức được cấp lại hoặc nâng cấp gói Workers AI.",429);
+    if(status===429||/\b429\b|quota exceeded|rate.?limit/i.test(detail))return fail("Workers AI đã giới hạn khi so sánh ảnh. Chưa lưu đề xuất; hãy thử lại sau.",429,{"Retry-After":"60"});
+    return fail("Không thể so sánh đủ các ảnh bằng Workers AI: "+detail+". Chưa lưu đề xuất nào.",status===503?503:502);
+  }
+}
+if(action==="reject"){const id=String(body.reviewId||"");if(!/^[0-9a-f-]{36}$/i.test(id))return fail("Mã lượt duyệt không hợp lệ.");const r=await env.DB.prepare("UPDATE image_group_reviews SET status='rejected' WHERE id=? AND status='pending'").bind(id).run();if(!r.meta?.changes)return fail("Lượt duyệt không tồn tại hoặc đã được xử lý.",409);return json({ok:true,message:"Đã loại đề xuất này."})}
+if(action==="approve"){const id=String(body.reviewId||""),productId=String(body.productId||"");if(!/^[0-9a-f-]{36}$/i.test(id)||!productId||productId.length>120)return fail("Thiếu lượt duyệt hoặc sản phẩm đích.");const review=await env.DB.prepare("SELECT * FROM image_group_reviews WHERE id=? AND status='pending' AND same_product=1 AND confidence>=91").bind(id).first();if(!review)return fail("Chỉ có thể duyệt đề xuất AI đánh giá cùng sản phẩm với độ tin cậy từ 91% trở lên.",409);const keys=[review.image_a,review.image_b];const liveObjects=await Promise.all(keys.map(key=>env.IMAGES.head?env.IMAGES.head(key):env.IMAGES.get(key)));if(liveObjects.some(object=>!object))return fail("Một hoặc nhiều ảnh đề xuất không còn tồn tại trong R2. Chưa cập nhật bộ ảnh sản phẩm; hãy quét lại kho.",409);const product=await env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(productId).first();if(!product)return fail("Không tìm thấy sản phẩm đích.",404);let images;const previousImagesJson=String(product.images_json??"[]");try{images=JSON.parse(previousImagesJson)}catch{return fail("Dữ liệu ảnh hiện tại của sản phẩm không hợp lệ. Không ghi đè để tránh mất dữ liệu.",409)}if(!Array.isArray(images)||images.some(value=>typeof value!=="string"))return fail("Danh sách ảnh hiện tại không hợp lệ. Không ghi đè dữ liệu cũ.",409);const others=await env.DB.prepare("SELECT id,sku,images_json FROM products WHERE id<>?").bind(productId).all(),owners=new Map();for(const row of others.results||[]){let refs=[];try{refs=JSON.parse(row.images_json||"[]")}catch{}for(const ref of Array.isArray(refs)?refs:[])for(const key of keys)if(String(ref||"").includes(key))owners.set(key,row.sku)}if(keys.some(k=>owners.has(k)))return fail("Một ảnh đã thuộc SKU khác. Hãy kiểm tra và gỡ liên kết cũ trước để tránh ghép nhầm sản phẩm.",409);const known=new Set(images.map(String));for(const key of keys){const url="/media/"+key;if(!known.has(url)&&!known.has(url.slice(1))&&!known.has(key))images.push(url)}if(images.length>30)return fail("Bộ ảnh sản phẩm đã đạt giới hạn 30 ảnh.",409);const nextImagesJson=JSON.stringify(images);const results=await env.DB.batch([env.DB.prepare("UPDATE products SET images_json=?,updated_at=datetime('now') WHERE id=? AND COALESCE(images_json,'[]')=? AND EXISTS (SELECT 1 FROM image_group_reviews WHERE id=? AND status='pending' AND same_product=1 AND confidence>=91)").bind(nextImagesJson,productId,previousImagesJson,id),env.DB.prepare("UPDATE image_group_reviews SET status='approved',product_id=? WHERE id=? AND status='pending' AND changes()=1").bind(productId,id),env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'image_group_approved', 'product', ?, ? WHERE changes()=1 AND EXISTS (SELECT 1 FROM image_group_reviews WHERE id=? AND status='approved' AND product_id=?)").bind(crypto.randomUUID(),productId,JSON.stringify({reviewId:id,keys,sku:product.sku,previousImagesJson,nextImagesJson}),id,productId)]);if(!results?.[0]?.meta?.changes||!results?.[1]?.meta?.changes)return fail("Sản phẩm hoặc đề xuất đã thay đổi đồng thời. Không ghi đè; hãy tải lại và kiểm tra.",409);return json({ok:true,message:"Đã thêm ảnh vào bộ ảnh sản phẩm.",sku:product.sku,imageCount:images.length})}
+return fail("Thao tác không được hỗ trợ.")}
+export async function onRequestDelete(){return fail("Phương thức không được hỗ trợ.",405)}

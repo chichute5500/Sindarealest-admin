@@ -1,0 +1,733 @@
+name: Bootstrap separate AI image test project
+
+on:
+  push:
+    branches:
+      - feature/ai-image-grouping
+    # Real inference is expensive and shares a daily account allocation. Run
+    # the live matrix only when AI runtime, inventory/grouping logic, fixtures,
+    # or dependencies change—not on test-only, diagnostic, or workflow edits.
+    paths:
+      - 'functions/api/admin/image-groups*.js'
+      - '.github/workflows/bootstrap-ai-image-test.yml'
+      - 'functions/_lib.js'
+      - 'functions/_lib/image-identity.js'
+      - 'tests/image-category-classification.test.mjs'
+      - 'public/admin/**'
+      - 'migrations/0008_image_group_reviews.sql'
+      - 'migrations/0011_image_similarity_index.sql'
+      - 'migrations/0012_image_group_claims.sql'
+      - 'data/legacy-products.json'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+
+# This workflow deploys a temporary token-gated route and then removes it.
+# Serialize runs so overlapping deploy/cleanup cycles cannot invalidate each
+# other's smoke token or test deployment.
+concurrency:
+  group: ai-image-test-project-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  create-isolated-pages-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify isolation and create a separate Pages project
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SOURCE_PROJECT: sindarealest2
+          TARGET_PROJECT: sindarealest-ai-image-test
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN."; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID."; exit 1; }
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+
+          source="$(curl --fail --silent --show-error -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api/pages/projects/$SOURCE_PROJECT")"
+          printf '%s' "$source" | jq -e '.success == true' >/dev/null
+          production_branch="$(printf '%s' "$source" | jq -r '.result.production_branch // empty')"
+          preview_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          production_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          preview_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          production_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+
+          test "$production_branch" = "main" || { echo "::error::Source Production branch is not main. Stopping."; exit 1; }
+          test -n "$preview_db" && test -n "$production_db" || { echo "::error::Cannot verify both D1 bindings. Stopping."; exit 1; }
+          test "$preview_db" != "$production_db" || { echo "::error::Source Preview DB is Production DB. Stopping."; exit 1; }
+          test -n "$preview_images" && test -n "$production_images" || { echo "::error::Cannot verify both IMAGES buckets. Stopping."; exit 1; }
+          test "$preview_images" != "$production_images" || { echo "::error::Source Preview IMAGES bucket is Production. Stopping."; exit 1; }
+
+          printf 'Isolation verified. Target project: %s\n' "$TARGET_PROJECT"
+          current="$(curl --silent --show-error -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api/pages/projects/$TARGET_PROJECT")"
+          exists="$(printf '%s' "$current" | jq -r '.success // false')"
+          if [ "$exists" = "true" ]; then
+                        target_db="$(printf '%s' "$current" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+                        target_images="$(printf '%s' "$current" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+            echo "Existing project found; isolated bindings will be applied below."
+            echo "Separate Pages project already exists."
+          else
+            payload="$(jq -n --arg name "$TARGET_PROJECT" --arg db "$preview_db" --arg images "$preview_images" '{
+              name:$name,
+              production_branch:"main",
+              deployment_configs:{
+                preview:{
+                  compatibility_date:"2026-10-17",
+                  d1_databases:{DB:{id:$db}},
+                  r2_buckets:{IMAGES:{name:$images}}
+                },
+                production:{compatibility_date:"2026-10-17"}
+              }
+            }')"
+            http_status="$(curl --silent --show-error -o /tmp/pages-create-response.json -w "%{http_code}" -X POST "$api/pages/projects" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" --data "$payload")"
+            created="$(cat /tmp/pages-create-response.json)"
+            if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
+              echo "::error::Cloudflare Pages project creation returned HTTP $http_status."
+              printf '%s' "$created" | jq -c '{errors, messages}' || true
+              exit 1
+            fi
+            printf '%s' "$created" | jq -e '.success == true' >/dev/null || { printf '%s' "$created" | jq -c '{errors, messages}'; exit 1; }
+            echo "Created separate Pages project with isolated Preview D1 and IMAGES bindings."
+          fi
+
+      - name: Configure isolated test bindings and optional test credentials
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET_PROJECT: sindarealest-ai-image-test
+          AI_TEST_ADMIN_PASSWORD: ${{ secrets.AI_TEST_ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+          source="$(curl --fail --silent --show-error -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api/pages/projects/sindarealest2")"
+          printf '%s' "$source" | jq -e '.success == true' >/dev/null
+          preview_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          preview_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          production_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          production_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          production_branch="$(printf '%s' "$source" | jq -r '.result.production_branch // empty')"
+          test "$production_branch" = "main" || { echo "::error::Source Production branch is not main."; exit 1; }
+          test -n "$preview_db" && test -n "$production_db" && test "$preview_db" != "$production_db" || { echo "::error::Preview D1 is missing or points to Production."; exit 1; }
+          test -n "$preview_images" && test -n "$production_images" && test "$preview_images" != "$production_images" || { echo "::error::Preview IMAGES is missing or points to Production."; exit 1; }
+
+          payload="$(jq -n --arg db "$preview_db" --arg images "$preview_images" '{deployment_configs:{production:{compatibility_date:"2026-10-17",d1_databases:{DB:{id:$db}},r2_buckets:{IMAGES:{name:$images}}}}}')"
+          response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$payload")"
+          printf '%s' "$response" | jq -e '.success == true' >/dev/null
+          echo "PASS: test project's D1 and R2 bindings point to the checked Preview resources, not source Production."
+
+          # Always create disposable credentials for the isolated test site. If a
+          # dedicated test-only password secret exists, use it; otherwise generate
+          # a random one so authenticated Preview/AI smoke tests are not silently skipped.
+          test_admin_password="${AI_TEST_ADMIN_PASSWORD:-$(openssl rand -hex 24)}"
+          test "${#test_admin_password}" -ge 12 || { echo "::error::Dedicated test password must be at least 12 characters."; exit 1; }
+          session_secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$test_admin_password"
+          echo "AI_TEST_ADMIN_PASSWORD=$test_admin_password" >> "$GITHUB_ENV"
+          env_vars="$(jq -n --arg password "$test_admin_password" --arg session "$session_secret" '{ADMIN_PASSWORD:{type:"secret_text",value:$password},SESSION_SECRET:{type:"secret_text",value:$session}}')"
+          unset session_secret test_admin_password
+          echo "Configuring disposable admin credentials and a fresh random SESSION_SECRET only on the isolated test project; values are not logged."
+          secret_payload="$(jq -n --argjson env_vars "$env_vars" '{deployment_configs:{production:{env_vars:$env_vars}}}')"
+          secret_response="$(curl --fail --silent --show-error -X PATCH "$api/pages/projects/$TARGET_PROJECT" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" --data "$secret_payload")"
+          printf '%s' "$secret_response" | jq -e '.success == true' >/dev/null
+          unset env_vars secret_payload secret_response
+          echo "PASS: disposable test admin credentials were saved as Cloudflare secret_text values."
+
+      - name: Install Wrangler and image smoke-test converter
+        run: npm install --no-save --no-package-lock wrangler sharp @napi-rs/canvas
+
+      - name: Deploy AI-enabled configuration to the separate test project only
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET_PROJECT: sindarealest-ai-image-test
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+
+          # Re-check isolation in the deployment step itself. Never deploy a test
+          # config if the source project's Preview DB or IMAGES points to Production.
+          source="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$api/pages/projects/sindarealest2")"
+          printf '%s' "$source" | jq -e '.success == true' >/dev/null
+          source_production_branch="$(printf '%s' "$source" | jq -r '.result.production_branch // empty')"
+          preview_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          production_db="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          preview_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          production_images="$(printf '%s' "$source" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          test "$source_production_branch" = "main" || { echo "::error::Source Production branch is not main; refusing test deployment."; exit 1; }
+          test -n "$preview_db" && test -n "$production_db" && test "$preview_db" != "$production_db" || { echo "::error::Preview D1 is missing or not isolated; refusing test deployment."; exit 1; }
+          test -n "$preview_images" && test -n "$production_images" && test "$preview_images" != "$production_images" || { echo "::error::Preview IMAGES is missing or not isolated; refusing test deployment."; exit 1; }
+
+          d1="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$api/d1/database/$preview_db")"
+          printf '%s' "$d1" | jq -e '.success == true' >/dev/null
+          preview_db_name="$(printf '%s' "$d1" | jq -r '.result.name // empty')"
+          test -n "$preview_db_name" || { echo "::error::Could not resolve the isolated Preview D1 name."; exit 1; }
+
+          target="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$api/pages/projects/$TARGET_PROJECT")"
+          printf '%s' "$target" | jq -e '.success == true' >/dev/null
+          target_branch="$(printf '%s' "$target" | jq -r '.result.production_branch // empty')"
+          test "$target_branch" = "main" || { echo "::error::Target test project's Production branch is not main; refusing deploy."; exit 1; }
+
+          # Preserve plain-text Dashboard vars if present. Secrets are not removed
+          # by Wrangler deployments and their values are never read or logged here.
+          target_vars="$(printf '%s' "$target" | jq -c '
+            ((.result.deployment_configs.production.env_vars // {})
+              | with_entries(select(.value.type == "plain_text"))
+              | with_entries(.value = .value.value))')"
+          # Pages Wrangler accepts its standard config filenames only. Keep the
+          # repository's local-only TOML out of the way for this runner step,
+          # generate a temporary wrangler.jsonc, and always restore the original.
+          config="$GITHUB_WORKSPACE/wrangler.jsonc"
+          original_config="$RUNNER_TEMP/wrangler.toml.original"
+          smoke_route="$GITHUB_WORKSPACE/functions/api/ai-smoke-ci.js"
+          smoke_token="$(openssl rand -hex 32)"
+          echo "::add-mask::$smoke_token"
+          cp "$GITHUB_WORKSPACE/wrangler.toml" "$original_config"
+          cleanup() {
+            status=$?
+            set +e
+            rm -f "$smoke_route"
+            # Remove the temporary inference route from the deployed test project
+            # even if the smoke request or later checks fail.
+            if [ -f "$config" ] && [ -f "$original_config" ]; then
+              npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true > /tmp/ai-test-cleanup-deploy.log 2>&1
+              cleanup_status=$?
+              if [ "$cleanup_status" -eq 0 ]; then
+                echo "PASS: temporary AI smoke route removed from the test deployment."
+              else
+                echo "::error::Could not confirm cleanup deployment; inspect the test project before reuse."
+                if [ "$status" -eq 0 ]; then status=1; fi
+              fi
+            fi
+            rm -f "$config"
+            cp "$original_config" "$GITHUB_WORKSPACE/wrangler.toml"
+            rm -f "$original_config"
+            rm -f /tmp/ai-test-cleanup-deploy.log
+            trap - EXIT
+            exit "$status"
+          }
+          trap cleanup EXIT
+          rm "$GITHUB_WORKSPACE/wrangler.toml"
+          jq -n \
+            --arg name "$TARGET_PROJECT" \
+            --arg db_name "$preview_db_name" \
+            --arg db_id "$preview_db" \
+            --arg images "$preview_images" \
+            --argjson vars "$target_vars" \
+            '{
+              name: $name,
+              pages_build_output_dir: "public",
+              compatibility_date: "2026-10-17",
+              ai: { binding: "AI" },
+              d1_databases: [{ binding: "DB", database_name: $db_name, database_id: $db_id }],
+              r2_buckets: [{ binding: "IMAGES", bucket_name: $images }]
+            } + (if ($vars | length) > 0 then { vars: $vars } else {} end)' > "$config"
+
+          # Install a one-run, token-gated smoke route only in the isolated test project.
+          # It reads one small Preview R2 raster, calls Workers AI once, and writes no data.
+          mkdir -p "$GITHUB_WORKSPACE/functions/api"
+          cat > "$smoke_route" <<'SMOKE_ROUTE'
+          import { onRequestPost as classifyImages } from "./admin/image-groups.js";
+          import { createSession } from "../_lib.js";
+          function response(body, status = 200, headers = {}) {
+            return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...headers } });
+          }
+          async function findSmallRaster(env, excludedKey = "", requestedKey = "") {
+            if(requestedKey){
+              if(requestedKey===excludedKey)return null;
+              const candidate=await env.IMAGES.get(requestedKey);if(!candidate)return null;
+              const bytes=new Uint8Array(await candidate.arrayBuffer());if(!bytes.length||bytes.length>5000000)return null;
+              let mime="";
+              if(bytes.length>=3&&bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff)mime="image/jpeg";
+              else if(bytes.length>=8&&bytes[0]===0x89&&bytes[1]===0x50&&bytes[2]===0x4e&&bytes[3]===0x47&&bytes[4]===0x0d&&bytes[5]===0x0a&&bytes[6]===0x1a&&bytes[7]===0x0a)mime="image/png";
+              else if(bytes.length>=12&&String.fromCharCode(...bytes.slice(0,4))==="RIFF"&&String.fromCharCode(...bytes.slice(8,12))==="WEBP")mime="image/webp";
+              return mime?{key:requestedKey,mime,bytes}:null;
+            }
+            let cursor;
+            for (let pageNumber = 0; pageNumber < 20; pageNumber++) {
+              const page = await env.IMAGES.list({ limit: 1000, ...(cursor ? { cursor } : {}), include: ["httpMetadata"] });
+              for (const object of page.objects || []) {
+                const supplied = String(object.httpMetadata?.contentType || "").split(";")[0].trim().toLowerCase();
+                const ext = String(object.key || "").split(".").pop().toLowerCase();
+                const fallback = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp"}[ext] || "";
+                const declared = supplied ? (["image/jpeg","image/png","image/webp"].includes(supplied) ? supplied : "") : fallback;
+                const maxBytes = requestedKey ? 5000000 : 350000;
+                if (object.key === excludedKey || (requestedKey && object.key !== requestedKey) || !declared || Number(object.size) <= 0 || Number(object.size) > maxBytes) continue;
+                // Metadata and file extensions can be stale. Verify the bytes before
+                // selecting a candidate, otherwise an HTML/XML placeholder can make
+                // Sharp fail before the AI request is even reached.
+                const candidate = await env.IMAGES.get(object.key);
+                if (!candidate) continue;
+                const bytes = new Uint8Array(await candidate.arrayBuffer());
+                if (!bytes.length || bytes.length > (requestedKey ? 5000000 : 350000)) continue;
+                let mime = "";
+                if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) mime = "image/jpeg";
+                else if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a) mime = "image/png";
+                else if (bytes.length >= 12 && String.fromCharCode(...bytes.slice(0,4)) === "RIFF" && String.fromCharCode(...bytes.slice(8,12)) === "WEBP") mime = "image/webp";
+                if (mime) return { key: object.key, mime, bytes };
+              }
+              if (!page.truncated || !page.cursor) break;
+              cursor = page.cursor;
+            }
+            return null;
+          }
+          function productImageKeys(raw) {
+            let refs=[];try{refs=JSON.parse(raw||"[]")}catch{}
+            const keys=[];
+            for(const ref of Array.isArray(refs)?refs:[]){
+              const value=String(ref||"").trim().split(/[?#]/,1)[0];if(!value)continue;
+              let key="";
+              try{const pathname=new URL(value,"https://inventory.invalid").pathname;const marker="/media/";const position=pathname.indexOf(marker);if(position>=0)key=decodeURIComponent(pathname.slice(position+marker.length))}catch{}
+              if(!key&&value.startsWith("media/")){try{key=decodeURIComponent(value.slice(6))}catch{key=value.slice(6)}}
+              if(!key&&!value.startsWith("/")&&!/^https?:\/\//i.test(value)){try{key=decodeURIComponent(value)}catch{key=value}}
+              if(key&&key.length<=1024&&!/[\u0000-\u001f\u007f]/.test(key)&&!keys.includes(key))keys.push(key);
+            }
+            return keys;
+          }
+          async function findAssignedProductPair(env) {
+            let offset=0;
+            while(true){
+              const page=await env.DB.prepare("SELECT sku,images_json FROM products ORDER BY sku ASC,id ASC LIMIT 500 OFFSET ?").bind(offset).all();
+              const rows=page.results||[];
+              for(const product of rows){
+                const keys=productImageKeys(product.images_json);if(keys.length<2)continue;
+                for(let i=0;i<keys.length;i++){
+                  const first=await findSmallRaster(env,"",keys[i]);if(!first)continue;
+                  for(let j=i+1;j<keys.length;j++){
+                    const second=await findSmallRaster(env,first.key,keys[j]);
+                    if(second){const identical=first.bytes.length===second.bytes.length&&first.bytes.every((byte,index)=>byte===second.bytes[index]);if(!identical)return{sku:String(product.sku||""),first,second};}
+                  }
+                }
+              }
+              if(rows.length<500)break;offset+=rows.length;
+            }
+            return null;
+          }
+          export async function onRequestGet({ request, env }) {
+            if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
+            if (typeof env?.IMAGES?.list !== "function") return response({ ok: false, reason: "r2_binding_missing" }, 503);
+            try {
+              const params = new URL(request.url).searchParams;
+              const excludedKey = params.get("exclude") || "";
+              const requestedKey = params.get("key") || "";
+              if (requestedKey.length > 1024) return response({ ok: false, reason: "invalid_requested_key" }, 400);
+              if (params.get("sameSkuPair") === "1") {
+                const pair = await findAssignedProductPair(env);
+                if (!pair) return response({ ok: false, reason: "no_same_sku_gallery_pair" }, 424);
+                return new Response(pair.first.bytes, { status: 200, headers: {
+                  "Content-Type": pair.first.mime,
+                  "X-Preview-Image-Key": encodeURIComponent(pair.first.key),
+                  "X-Preview-Pair-Second-Key": encodeURIComponent(pair.second.key),
+                  "X-Preview-Product-Sku": encodeURIComponent(pair.sku),
+                  "Cache-Control": "no-store"
+                }});
+              }
+              const chosen = await findSmallRaster(env, excludedKey, requestedKey);
+              if (!chosen) return response({ ok: false, reason: "no_small_preview_raster" }, 424);
+              const bytes = chosen.bytes;
+              return new Response(bytes, { status: 200, headers: { "Content-Type": chosen.mime, "X-Preview-Image-Key": encodeURIComponent(chosen.key), "Cache-Control": "no-store" } });
+            } catch (error) {
+              return response({ ok: false, reason: "r2_read_error", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 120) }, 502);
+            }
+          }
+          export async function onRequestPost({ request, env }) {
+            if (request.headers.get("Authorization") !== "Bearer __SMOKE_TOKEN__") return response({ ok: false }, 404);
+            try {
+              const body = await request.json();
+              const action = body?.action === "compare" ? "compare" : "classify";
+              const imageKeys = action === "compare" ? body.imageKeys : [body?.imageKey];
+              const imageData = action === "compare" ? body.imageData : [{ key: body?.imageKey, dataUrl: body?.dataUrl }];
+              if (!Array.isArray(imageKeys) || imageKeys.length !== (action === "compare" ? 2 : 1) || imageKeys.some(key => typeof key !== "string" || !key) || !Array.isArray(imageData) || imageData.length !== imageKeys.length || imageData.some((image, index) => !image || image.key !== imageKeys[index] || typeof image.dataUrl !== "string" || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(image.dataUrl) || image.dataUrl.length > 250000)) return response({ ok: false, reason: "invalid_jpeg_payload" }, 400);
+              // Invoke the real admin handler with a short-lived synthetic session
+              // and a no-write DB stub. Both classification and pair comparison
+              // exercise actual Workers AI without persisting products or reviews.
+              const sessionSecret = "__SMOKE_TOKEN__";
+              const session = await createSession(sessionSecret);
+              const origin = new URL(request.url).origin;
+              const internalRequest = new Request(origin + "/api/admin/image-groups", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Cookie": "sd_admin_session=" + session,
+                  "Origin": origin,
+                  "Sec-Fetch-Site": "same-origin"
+                },
+                body: JSON.stringify(action === "compare"
+                  ? { action: "compare", imageKeys, imageData }
+                  : { action: "classify-categories", imageKeys, imageData })
+              });
+              const fakeDB = {
+                prepare(sql) {
+                  return { sql, args: [], bind(...args) { this.args = args; return this; }, async run() { return { meta: { changes: 1 } }; }, async first() { return null; }, async all() {
+                    if (sql.includes("FROM image_group_index WHERE image_key IN")) {
+                      const identicalBytes = imageData.length === 2 && imageData[0].dataUrl === imageData[1].dataUrl;
+                      const positiveFixture = imageKeys.every(key => key.startsWith("test-fixtures/") && !key.startsWith("test-fixtures/negative/"));
+                      const similar = identicalBytes || positiveFixture || body?.testSameSku === true;
+                      const shapeA = Array(64).fill(0.9), shapeB = Array(64).fill(0.05);
+                      const colorsA = [1,0,0,0,1,0,0,0,0,0,1,0], colorsB = [0,0,0,1,0,0,0,1,1,0,0,0];
+                      return { results: imageKeys.map((key, index) => ({
+                        image_key: key,
+                        p_hash: similar ? "0011223344556677" : (index === 0 ? "0000000000000000" : "ffffffffffffffff"),
+                        features_json: JSON.stringify({
+                          category: "sneaker", categoryStatus: "classified", categoryConfidence: 95,
+                          shape: similar ? Array(64).fill(0.5) : (index === 0 ? shapeA : shapeB),
+                          colors: similar ? colorsA : (index === 0 ? colorsA : colorsB),
+                          contentHash: identicalBytes ? "a".repeat(64) : (index === 0 ? "b".repeat(64) : "c".repeat(64))
+                        })
+                      })) };
+                    }
+                    return { results: [] };
+                  } };
+                },
+                async batch() { return [{ meta: { changes: 1 } }, { results: [{ attempts: 1 }] }]; }
+              };
+              const fixtureOnly = action === "compare" && imageKeys.every(key => key.startsWith("test-fixtures/"));
+              const imageBinding = fixtureOnly
+                ? { async get(key) { return imageKeys.includes(key) ? { key } : null; } }
+                : env.IMAGES;
+              const handlerResponse = await classifyImages({
+                request: internalRequest,
+                env: { ...env, DB: fakeDB, IMAGES: imageBinding, ADMIN_PASSWORD: sessionSecret, SESSION_SECRET: sessionSecret },
+                context: { request: internalRequest }
+              });
+              const result = await handlerResponse.json();
+              if (action === "classify") {
+                if (handlerResponse.status !== 200 || result?.ok !== true || !Array.isArray(result.items) || result.items.length !== 1) {
+                  const exposedStatus = handlerResponse.status >= 400 && handlerResponse.status <= 599 ? handlerResponse.status : 502;
+                  return response({ ok: false, reason: "classification_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated classification").slice(0, 160) }, exposedStatus);
+                }
+                return response({ ok: true, action, category: result.items[0].category, confidence: result.items[0].confidence, identityDescriptor: result.items[0].identityDescriptor ?? null, status: result.items[0].status, adminPasswordConfigured: typeof env.ADMIN_PASSWORD === "string" && env.ADMIN_PASSWORD.length >= 12, sessionSecretConfigured: typeof env.SESSION_SECRET === "string" && env.SESSION_SECRET.length >= 32, imageBytes: imageData[0].dataUrl.length });
+              }
+              if (![200, 201].includes(handlerResponse.status) || result?.ok !== true || !(Array.isArray(result.matches) || Number.isInteger(result.matches))) {
+                return response({ ok: false, reason: "comparison_handler_failed", status: handlerResponse.status, detail: String(result?.error || result?.message || "No validated comparison result").slice(0, 160) }, 502);
+              }
+              return response({ ok: true, action, matches: result.matches, batches: result.batches ?? null, diagnostics: result.diagnostics ?? null });
+            } catch (error) {
+              return response({ ok: false, reason: "classification_handler_exception", message: String(error?.message || error).replace(/[\r\n]+/g, " ").slice(0, 160) }, 502);
+            }
+          }
+          SMOKE_ROUTE
+          sed -i "s/__SMOKE_TOKEN__/$smoke_token/" "$smoke_route"
+
+          echo "Deploying the AI binding only to $TARGET_PROJECT. DB/IMAGES point to the checked source Preview resources."
+          npx wrangler pages deploy public --project-name "$TARGET_PROJECT" --branch main --commit-dirty=true
+
+          # Every deploy gets public-route/auth-guard smoke checks. The temporary AI route is token-gated and removed by the EXIT cleanup above.
+          base="https://${TARGET_PROJECT}.pages.dev"
+          home_status="$(curl --silent --show-error -o /tmp/ai-test-home.html -w "%{http_code}" "$base/")"
+          admin_status="$(curl --silent --show-error -o /tmp/ai-test-admin.html -w "%{http_code}" "$base/admin/")"
+          test "$home_status" = "200" || { echo "::error::AI test project home smoke check returned HTTP $home_status."; exit 1; }
+          test "$admin_status" = "200" || { echo "::error::AI test project admin route smoke check returned HTTP $admin_status."; exit 1; }
+          grep -q "Đăng nhập quản trị" /tmp/ai-test-admin.html || { echo "::error::Admin login content missing from test deployment."; exit 1; }
+          api_status="$(curl --silent --show-error -o /tmp/ai-test-api.json -w "%{http_code}" "$base/api/admin/image-groups")"
+          test "$api_status" = "401" || { echo "::error::Unauthenticated admin API should return 401, received HTTP $api_status."; exit 1; }
+          echo "PASS: test site, admin route, and protected API smoke checks."
+
+          source_status="$(curl --connect-timeout 10 --max-time 30 --silent --show-error -D /tmp/ai-test-vision-headers -o /tmp/ai-test-vision-source -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci")"
+          if [ "$source_status" = "424" ]; then
+            echo "::warning::No suitable small raster image exists in Preview R2; actual vision inference could not be tested."
+          elif [ "$source_status" = "200" ]; then
+            node --input-type=module - <<'NODE'
+          import sharp from "sharp";
+          import { readFile, writeFile } from "node:fs/promises";
+          const source = await readFile("/tmp/ai-test-vision-source");
+          const jpeg = await sharp(source, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+          if (!jpeg.length || jpeg.length > 180000) throw new Error("Converted smoke image exceeds safe size.");
+          await writeFile("/tmp/ai-test-vision-jpeg.b64", jpeg.toString("base64"));
+          NODE
+            image_key_encoded="$(awk 'tolower($1)=="x-preview-image-key:" {gsub("\\r","",$2); print $2}' /tmp/ai-test-vision-headers)"
+            test -n "$image_key_encoded" || { echo "::error::Preview R2 image key header is missing."; exit 1; }
+            AI_TEST_IMAGE_KEY_ENCODED="$image_key_encoded" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const encoded = (await readFile("/tmp/ai-test-vision-jpeg.b64", "utf8")).trim();
+          const imageKey = decodeURIComponent(process.env.AI_TEST_IMAGE_KEY_ENCODED || "");
+          await writeFile("/tmp/ai-test-vision-request.json", JSON.stringify({ imageKey, dataUrl: "data:image/jpeg;base64," + encoded }));
+          NODE
+            ai_smoke_status="$(curl --connect-timeout 10 --max-time 60 --silent --show-error -o /tmp/ai-test-vision.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-vision-request.json "$base/api/ai-smoke-ci")"
+            if [ "$ai_smoke_status" = "200" ]; then
+              jq -e '.ok == true and (.category | type == "string") and (.category != "unknown") and (.confidence | type == "number") and (.confidence >= 70) and (.status == "classified") and (.identityDescriptor | type == "string") and (.identityDescriptor | length >= 48) and (([.identityDescriptor | splits("[;|]")] | length) >= 5) and (.imageBytes > 0)' /tmp/ai-test-vision.json >/dev/null || {
+                diagnostic="$(jq -c '{ok,reason,category,confidence,status,identityDescriptorLength:(.identityDescriptor|if type=="string" then length else 0 end),identityDescriptorParts:(.identityDescriptor|if type=="string" then ([splits("[;|]")]|length) else 0 end),imageBytes,handler_status,detail}' /tmp/ai-test-vision.json 2>/dev/null || true)"; echo "::error::Real Workers AI smoke response was invalid. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1;
+              }
+              result_summary="$(jq -r '"category=" + .category + ", confidence=" + (.confidence|tostring) + ", status=" + .status' /tmp/ai-test-vision.json)"
+              echo "PASS: real admin classifier on Preview R2 image: $result_summary. No database or product gallery was modified."
+              if jq -e '.adminPasswordConfigured == true and .sessionSecretConfigured == true' /tmp/ai-test-vision.json >/dev/null; then
+                echo "PASS: test-project admin security secrets are present (values not read or logged)."
+              else
+                echo "::warning::AI inference passed, but ADMIN_PASSWORD and/or SESSION_SECRET is missing/too short on the test project; admin browser login remains unverified."
+              fi
+
+              # Exercise the real pair-comparison action with a second, distinct,
+              # byte-verified Preview R2 image. The temporary route uses a no-write
+              # DB stub, so any proposal is validated but never persisted.
+              second_status=424
+              second_valid=false
+              second_exclude="$image_key_encoded"
+              for attempt in $(seq 1 8); do
+                second_status="$(curl --connect-timeout 10 --max-time 30 --silent --show-error -D /tmp/ai-test-vision-headers-2 -o /tmp/ai-test-vision-source-2 -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci?exclude=$second_exclude")"
+                [ "$second_status" = "200" ] || break
+                second_key_encoded="$(awk 'tolower($1)=="x-preview-image-key:" {gsub("\\r","",$2); print $2}' /tmp/ai-test-vision-headers-2)"
+                test -n "$second_key_encoded" || { echo "::error::Second Preview R2 image key header is missing."; exit 1; }
+                if node --input-type=module - <<'NODE'
+          import sharp from "sharp";
+          import { readFile, writeFile } from "node:fs/promises";
+          const source = await readFile("/tmp/ai-test-vision-source-2");
+          const jpeg = await sharp(source, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+          if (!jpeg.length || jpeg.length > 180000) throw new Error("Second comparison image exceeds safe size.");
+          await writeFile("/tmp/ai-test-vision-jpeg-2.b64", jpeg.toString("base64"));
+          NODE
+                then
+                  second_valid=true
+                  break
+                fi
+                echo "::warning::Skipping an undecodable Preview R2 image candidate; no source object was modified."
+                second_exclude="$second_key_encoded"
+              done
+              if [ "$second_valid" = "true" ]; then
+                AI_TEST_IMAGE_KEY_ENCODED="$image_key_encoded" AI_TEST_SECOND_IMAGE_KEY_ENCODED="$second_key_encoded" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const first = JSON.parse(await readFile("/tmp/ai-test-vision-request.json", "utf8"));
+          const secondKey = decodeURIComponent(process.env.AI_TEST_SECOND_IMAGE_KEY_ENCODED || "");
+          const secondEncoded = (await readFile("/tmp/ai-test-vision-jpeg-2.b64", "utf8")).trim();
+          await writeFile("/tmp/ai-test-compare-request.json", JSON.stringify({
+            action: "compare",
+            imageKeys: [first.imageKey, secondKey],
+            imageData: [
+              { key: first.imageKey, dataUrl: first.dataUrl },
+              { key: secondKey, dataUrl: "data:image/jpeg;base64," + secondEncoded }
+            ]
+          }));
+          NODE
+                compare_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-compare-request.json "$base/api/ai-smoke-ci")"
+                if [ "$compare_status" != "200" ]; then
+                  diagnostic="$(jq -c '{reason:(.reason // null), handler_status:(.status // null), detail:(.detail // null), error:(.error // null), message:(.message // null), diagnostics:(.diagnostics // null)}' /tmp/ai-test-compare.json 2>/dev/null | tr '\\r\\n' ' ' | cut -c1-360 || true)"
+                  echo "::error::Real Workers AI pair comparison failed with HTTP $compare_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
+                  exit 1
+                fi
+                jq -e '.ok == true and (.matches | type == "array" or type == "number")' /tmp/ai-test-compare.json >/dev/null || { echo "::error::Workers AI pair comparison returned an invalid result."; exit 1; }
+                compare_summary="$(jq -r 'if (.matches|type)=="array" then "candidate_pairs=" + (.matches|length|tostring) else "candidate_pairs=" + (.matches|tostring) end' /tmp/ai-test-compare.json)"
+                echo "PASS: real Workers AI pair comparison on two distinct decodable Preview R2 images: $compare_summary. Any review writes were intercepted by the no-write test DB."
+                # Positive control: compare the same verified image bytes under
+                # two existing R2 keys. This must yield at least one high-confidence
+                # pair, proving the live model can recognize an identical product image.
+                AI_TEST_IMAGE_KEY_ENCODED="$image_key_encoded" AI_TEST_SECOND_IMAGE_KEY_ENCODED="$second_key_encoded" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          const first = JSON.parse(await readFile("/tmp/ai-test-vision-request.json", "utf8"));
+          const secondKey = decodeURIComponent(process.env.AI_TEST_SECOND_IMAGE_KEY_ENCODED || "");
+          await writeFile("/tmp/ai-test-identical-compare-request.json", JSON.stringify({
+            action: "compare",
+            imageKeys: [first.imageKey, secondKey],
+            imageData: [
+              { key: first.imageKey, dataUrl: first.dataUrl },
+              { key: secondKey, dataUrl: first.dataUrl }
+            ]
+          }));
+          NODE
+                identical_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-identical-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-identical-compare-request.json "$base/api/ai-smoke-ci")"
+                if [ "$identical_status" != "200" ] || ! jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-identical-compare.json >/dev/null; then
+                  diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches,diagnostics}' /tmp/ai-test-identical-compare.json 2>/dev/null || true)"
+                  echo "::error::Real Workers AI failed the identical-image positive control (HTTP $identical_status). The same verified image bytes must produce a high-confidence pair; safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
+                  exit 1
+                fi
+                echo "PASS: real Workers AI matched identical verified image bytes at the 91% gate; the no-write DB prevented persistence."
+              elif [ "$second_status" = "424" ]; then
+                echo "::warning::Only one byte-verified small raster image exists in Preview R2; live pair-comparison smoke was skipped."
+              else
+                echo "::error::Could not retrieve a second Preview R2 image for pair comparison (HTTP $second_status)."
+                exit 1
+              fi
+            else
+              diagnostic="$(jq -c '{reason:(.reason // null), handler_status:(.status // null), detail:(.detail // null), message:(.message // null)}' /tmp/ai-test-vision.json 2>/dev/null | tr '\r\n' ' ' | cut -c1-300 || true)"
+              echo "::error::Real Workers AI smoke test failed with HTTP $ai_smoke_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}. Auth tokens and request headers are not logged."
+              exit 1
+            fi
+          else
+            diagnostic="$(jq -r '[.reason // empty, .message // empty] | map(select(length > 0)) | join(": ")' /tmp/ai-test-vision-source 2>/dev/null | tr '\r\n' ' ' | cut -c1-180 || true)"
+            echo "::error::Could not retrieve a test image from Preview R2 (HTTP $source_status). Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."
+            exit 1
+          fi
+
+            login_payload="$(jq -n --arg password "$AI_TEST_ADMIN_PASSWORD" '{password:$password}')"
+            login_status="$(curl --silent --show-error -o /tmp/ai-test-login.json -w "%{http_code}" \
+              -X POST "$base/api/admin/login" \
+              -H "Origin: $base" -H "Sec-Fetch-Site: same-origin" -H "Content-Type: application/json" \
+              -c /tmp/ai-test-cookies --data "$login_payload")"
+            test "$login_status" = "200" || { echo "::error::Dedicated test admin login failed with HTTP $login_status. Response body omitted to avoid exposing details."; exit 1; }
+            echo "PASS: dedicated test admin credentials work."
+
+            inventory_status="$(curl --silent --show-error -o /tmp/ai-test-inventory.json -w "%{http_code}" \
+              -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=1000")"
+            test "$inventory_status" = "200" || { echo "::error::Authenticated D1/R2 inventory returned HTTP $inventory_status."; exit 1; }
+            inventory_cursor="$(jq -r ".nextCursor // empty" /tmp/ai-test-inventory.json)"
+            for inventory_page in $(seq 2 10); do
+              [ -n "$inventory_cursor" ] || break
+              encoded_cursor="$(jq -rn --arg cursor "$inventory_cursor" '$cursor|@uri')"
+              page_status="$(curl --silent --show-error -o /tmp/ai-test-inventory-page.json -w "%{http_code}" \
+                -b /tmp/ai-test-cookies "$base/api/admin/image-groups-inventory?limit=1000&cursor=$encoded_cursor")"
+              test "$page_status" = "200" || { echo "::error::Authenticated inventory page $inventory_page failed with HTTP $page_status."; exit 1; }
+              jq -s '{images:(.[0].images + .[1].images),hasMore:.[1].hasMore,nextCursor:.[1].nextCursor}' /tmp/ai-test-inventory.json /tmp/ai-test-inventory-page.json > /tmp/ai-test-inventory-merged.json
+              mv /tmp/ai-test-inventory-merged.json /tmp/ai-test-inventory.json
+              inventory_cursor="$(jq -r ".nextCursor // empty" /tmp/ai-test-inventory.json)"
+            done
+            echo "PASS: authenticated D1/R2 inventory endpoint responded; scanned up to 10,000 inventory objects to find real same-SKU gallery pairs."
+            # Stable positive control: use two different, real images from one product gallery in the repository.
+            # The smoke route stubs only R2 existence for these fixture keys; Workers AI receives the actual image bytes.
+            node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          import { existsSync } from "node:fs";
+          import { createHash } from "node:crypto";
+          import path from "node:path";
+          import sharp from "sharp";
+          const products = JSON.parse(await readFile("data/legacy-products.json", "utf8"));
+          let selected = null;
+          for (const product of products) {
+            const candidates = [];
+            for (const image of Array.isArray(product.images) ? product.images : []) {
+              if (typeof image !== "string" || !image.startsWith("images/") || image.split("/").includes("..")) continue;
+              const file = path.join("public", image);
+              if (!existsSync(file)) continue;
+              try {
+                const bytes = await readFile(file);
+                const hash = createHash("sha256").update(bytes).digest("hex");
+                if (!candidates.some(item => item.hash === hash)) candidates.push({ file, bytes, hash, image });
+              } catch {}
+            }
+            if (candidates.length >= 2) { selected = { product, pair: candidates.slice(0, 2), gallery: candidates.slice(0, 6) }; break; }
+          }
+          if (!selected) throw new Error("No product gallery with two distinct repository image files was found.");
+          const keys = selected.pair.map((item, index) => `test-fixtures/${String(selected.product.sku || selected.product.id).replace(/[^A-Za-z0-9_-]/g, "_")}/${index + 1}-${path.basename(item.image)}`);
+          const imageData = [];
+          for (let index = 0; index < selected.pair.length; index++) {
+            const jpeg = await sharp(selected.pair[index].bytes, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+            if (!jpeg.length || jpeg.length > 180000) throw new Error("Repository gallery test image exceeds safe size.");
+            imageData.push({ key: keys[index], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
+          }
+          // Measure the browser-side grouping algorithm on up to six distinct photos from this same gallery.
+          const { createCanvas, loadImage } = await import("@napi-rs/canvas");
+          const originalFetch = globalThis.fetch;
+          const fixtureBytes = new Map(selected.gallery.map((item, index) => [`https://fixture.local/${index}`, item.bytes]));
+          globalThis.document = { createElement(tag) { if (tag !== "canvas") throw new Error("Unexpected DOM element: " + tag); return createCanvas(1, 1); } };
+          globalThis.createImageBitmap = async blob => loadImage(Buffer.from(await blob.arrayBuffer()));
+          globalThis.fetch = async input => { const bytes = fixtureBytes.get(String(input)); return bytes ? new Response(bytes, { status: 200, headers: { "Content-Type": "image/webp" } }) : originalFetch(input); };
+          const { computeImageDescriptor, findSimilarGroups } = await import(path.resolve("public/admin/image-similarity.js"));
+          const localItems = [];
+          for (let index = 0; index < selected.gallery.length; index++) {
+            const item = selected.gallery[index];
+            const key = `test-fixtures/local/${index}-${path.basename(item.image)}`;
+            const descriptor = await computeImageDescriptor(`https://fixture.local/${index}`, { key, size: item.bytes.length });
+            localItems.push({ key, p_hash: descriptor.p_hash, features: { ...descriptor.features, identityDescriptor: "product_type=sneaker; dominant_colors=black; visible_material=leather; texture_pattern=crocodile scales; distinctive_details=stitching and sole", category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 }, category: "sneaker", categoryStatus: "classified", categoryConfidence: 100 });
+          }
+          const localGroups = await findSimilarGroups(localItems, { threshold: 70 });
+          if (!localGroups.groups.length || !localGroups.groups.some(group => group.imageKeys.length >= 2)) throw new Error("The production local-similarity algorithm did not group any two distinct images from the same real product gallery.");
+          console.log(JSON.stringify({ sameGalleryImageCount: localItems.length, sameGalleryLocalGroups: localGroups.groups.length, sameGalleryLocalPairs: localGroups.groups.map(group => group.imageKeys.length) }));
+          globalThis.fetch = originalFetch;
+          await writeFile("/tmp/ai-test-repository-gallery-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData }));
+          console.log("Prepared two distinct image files from one repository product gallery for a no-write AI comparison.");
+          NODE
+            repository_gallery_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-repository-gallery.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-repository-gallery-request.json "$base/api/ai-smoke-ci")"
+            if [ "$repository_gallery_status" != "200" ]; then
+              diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"
+              echo "::error::Same-gallery real-image AI comparison failed with HTTP $repository_gallery_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
+            fi
+            jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-repository-gallery.json >/dev/null || { diagnostic="$(jq -c '{ok,reason,status,detail,error,message,matches,diagnostics}' /tmp/ai-test-repository-gallery.json 2>/dev/null || true)"; echo "::error::Real Workers AI failed the positive control for two distinct images from one repository product gallery. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1; }
+            echo "PASS: real Workers AI matched two distinct images from one repository product gallery at the 91% gate; all writes were intercepted by the no-write test DB."
+            # Negative control: two different products in the same shoe category must not be auto-grouped.
+            node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          import { existsSync } from "node:fs";
+          import { createHash } from "node:crypto";
+          import path from "node:path";
+          import sharp from "sharp";
+          const products = JSON.parse(await readFile("data/legacy-products.json", "utf8"));
+          const candidates = [];
+          for (const product of products) {
+            if (product.category !== "sneakers" || !product.sku) continue;
+            for (const image of Array.isArray(product.images) ? product.images : []) {
+              if (typeof image !== "string" || !image.startsWith("images/") || image.split("/").includes("..")) continue;
+              const file = path.join("public", image); if (!existsSync(file)) continue;
+              try {
+                const bytes = await readFile(file);
+                const hash = createHash("sha256").update(bytes).digest("hex");
+                if (candidates.some(item => item.sku === product.sku || item.hash === hash)) continue;
+                candidates.push({ sku: product.sku, image, bytes, hash });
+                break;
+              } catch {}
+            }
+            if (candidates.length >= 2) break;
+          }
+          if (candidates.length < 2) throw new Error("Could not find two distinct sneaker products for the negative control.");
+          const keys = candidates.map((item, index) => `test-fixtures/negative/${String(item.sku).replace(/[^A-Za-z0-9_-]/g, "_")}-${index + 1}-${path.basename(item.image)}`);
+          const imageData = [];
+          for (let index = 0; index < candidates.length; index++) {
+            const jpeg = await sharp(candidates[index].bytes, { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+            if (!jpeg.length || jpeg.length > 180000) throw new Error("Negative-control image exceeds safe size.");
+            imageData.push({ key: keys[index], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
+          }
+          await writeFile("/tmp/ai-test-distinct-products-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData }));
+          console.log("Prepared distinct SKU sneaker images for false-positive control.");
+          NODE
+            negative_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-distinct-products.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-distinct-products-request.json "$base/api/ai-smoke-ci")"
+            if [ "$negative_status" != "200" ]; then
+              diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-distinct-products.json 2>/dev/null || true)"
+              echo "::error::Distinct-product negative control failed with HTTP $negative_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
+            fi
+            jq -e '.ok == true and (((.matches|type)=="number" and .matches==0) or ((.matches|type)=="array" and (.matches|length)==0))' /tmp/ai-test-distinct-products.json >/dev/null || { echo "::error::AI proposed a high-confidence match for distinct SKU sneakers; false-positive control failed."; exit 1; }
+            echo "PASS: real Workers AI did not group two distinct SKU sneakers; false-positive control passed with no writes."
+            # Stronger positive control: use two distinct images actually listed in one product gallery.
+            sku_pair_status="$(curl --connect-timeout 10 --max-time 45 --silent --show-error -D /tmp/ai-test-sku-pair-headers -o /tmp/ai-test-sku-pair-source -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci?sameSkuPair=1")"
+            if [ "$sku_pair_status" = "200" ]; then
+              same_sku_key_1="$(awk 'tolower($1)=="x-preview-image-key:" {gsub("\\r","",$2); print $2}' /tmp/ai-test-sku-pair-headers)"
+              same_sku_key_2="$(awk 'tolower($1)=="x-preview-pair-second-key:" {gsub("\\r","",$2); print $2}' /tmp/ai-test-sku-pair-headers)"
+              test -n "$same_sku_key_1" && test -n "$same_sku_key_2" || { echo "::error::Same-SKU pair route did not return both image keys."; exit 1; }
+              second_status="$(curl --connect-timeout 10 --max-time 30 --silent --show-error -o /tmp/ai-test-sku-pair-second-source -w "%{http_code}" -H "Authorization: Bearer $smoke_token" "$base/api/ai-smoke-ci?key=$same_sku_key_2")"
+              test "$second_status" = "200" || { echo "::error::Could not fetch the second same-SKU gallery image (HTTP $second_status)."; exit 1; }
+              SAME_SKU_KEY_1="$same_sku_key_1" SAME_SKU_KEY_2="$same_sku_key_2" node --input-type=module - <<'NODE'
+          import { readFile, writeFile } from "node:fs/promises";
+          import sharp from "sharp";
+          const keys = [decodeURIComponent(process.env.SAME_SKU_KEY_1), decodeURIComponent(process.env.SAME_SKU_KEY_2)];
+          const sources = [await readFile("/tmp/ai-test-sku-pair-source"), await readFile("/tmp/ai-test-sku-pair-second-source")];
+          const data = [];
+          for (let i = 0; i < sources.length; i++) {
+            const jpeg = await sharp(sources[i], { failOn: "error" }).rotate().resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 65, mozjpeg: true }).toBuffer();
+            if (!jpeg.length || jpeg.length > 180000) throw new Error("Same-SKU test image exceeds safe size.");
+            data.push({ key: keys[i], dataUrl: "data:image/jpeg;base64," + jpeg.toString("base64") });
+          }
+          if (data[0].dataUrl === data[1].dataUrl) throw new Error("Same-SKU gallery pair contains identical decoded image bytes; different-angle matching cannot be validated by this pair.");
+          await writeFile("/tmp/ai-test-same-sku-compare-request.json", JSON.stringify({ action: "compare", imageKeys: keys, imageData: data, testSameSku: true }));
+          NODE
+              sku_status="$(curl --connect-timeout 10 --max-time 90 --silent --show-error -o /tmp/ai-test-same-sku-compare.json -w "%{http_code}" -X POST -H "Authorization: Bearer $smoke_token" -H "Content-Type: application/json" --data-binary @/tmp/ai-test-same-sku-compare-request.json "$base/api/ai-smoke-ci")"
+              if [ "$sku_status" != "200" ]; then
+                diagnostic="$(jq -c '{ok,reason,status,detail,error,message}' /tmp/ai-test-same-sku-compare.json 2>/dev/null || true)"
+                echo "::error::Same-SKU different-image AI comparison failed with HTTP $sku_status. Safe diagnostic: ${diagnostic:-no JSON diagnostic returned}."; exit 1
+              fi
+              jq -e '.ok == true and (((.matches|type)=="number" and .matches>=1) or ((.matches|type)=="array" and (.matches|length)>=1))' /tmp/ai-test-same-sku-compare.json >/dev/null || { echo "::error::AI did not identify a high-confidence match between two distinct images assigned to the same SKU."; exit 1; }
+              echo "PASS: real Workers AI matched two distinct Preview gallery images assigned to the same SKU; the no-write DB prevented persistence."
+            elif [ "$sku_pair_status" = "424" ]; then
+              echo "::warning::The additional D1-backed gallery-pair check was unavailable because Preview D1 has no product gallery with two distinct small raster images. The separate real Workers AI test using two distinct images from one repository product gallery passed above; only the D1-backed variant remains unverified."
+            else
+              echo "::error::Could not discover a same-SKU gallery pair (HTTP $sku_pair_status)."; exit 1
+            fi
+          rm -f /tmp/ai-test-cookies /tmp/ai-test-login.json /tmp/ai-test-inventory.json /tmp/ai-test-source-image /tmp/ai-test-source-image.jpg /tmp/ai-test-source-image.b64 /tmp/ai-test-classify.json /tmp/ai-test-classify-request.json /tmp/ai-test-vision-source /tmp/ai-test-vision-headers /tmp/ai-test-vision-jpeg.b64 /tmp/ai-test-vision-request.json /tmp/ai-test-vision.json
+          echo "Test project deployment: $base"
+          echo "::notice::This workflow changes only $TARGET_PROJECT. Source Production branch, D1, and R2 are never deployed to or modified."
