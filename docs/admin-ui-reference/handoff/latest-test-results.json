@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T02:35:30Z",
+  "capturedAtUtc": "2026-10-24T02:42:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "3ba0005ea3f896a06ac573f32f975d231d081835",
   "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "DOCS_HEAD_VALIDATE_PASS_5567_ON_BADBDF091B0FDF716A5F64A74E626694147BA95E; SOURCE_TEST_VALIDATE_PASS_5565_AND_PREVIEW_498_PASS_ON_AB0343F963F0F113DC6C88A601C5499EBE15D592",
+  "status": "DOCS_HEAD_VALIDATE_PASS_5568_ON_477BDDA196CE8D5A24D7671703BCEC3F5D6B5F63; SOURCE_TEST_VALIDATE_PASS_5565_AND_PREVIEW_498_PASS_ON_AB0343F963F0F113DC6C88A601C5499EBE15D592",
   "latestRun": {
     "id": 40053201632,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632",
@@ -15,7 +15,7 @@
     "conclusion": "success",
     "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
     "testedSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
-    "workflow": "Admin Preview",
+    "workflow": "Admin Preview diagnostic smoke test",
     "runNumber": 498,
     "exactHeadGuard": "PASS",
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677"
@@ -776,14 +776,14 @@
     "runNumber": 5565
   },
   "latestDocsHeadValidation": {
-    "id": 40054728143,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40054728143",
+    "id": 40055055104,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40055055104",
     "status": "completed",
     "conclusion": "success",
-    "sha": "badbdf091b0fdf716a5f64a74e626694147ba95e",
-    "testedSha": "badbdf091b0fdf716a5f64a74e626694147ba95e",
+    "sha": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63",
+    "testedSha": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63",
     "workflow": "Validate source and tests",
-    "runNumber": 5567
+    "runNumber": 5568
   },
   "latestSourceTestValidation": {
     "id": 40053201672,
@@ -803,23 +803,23 @@
     "conclusion": "success",
     "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
     "testedSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
-    "workflow": "Admin Preview",
+    "workflow": "Admin Preview diagnostic smoke test",
     "runNumber": 498,
     "exactHeadGuard": "PASS",
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677"
   },
   "liveRefsAtCheckpoint": {
-    "branchHead": "badbdf091b0fdf716a5f64a74e626694147ba95e",
+    "branchHead": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63",
     "mainHead": "227622d3e3b7c75724ffa1775b193da71089269a",
     "pr111": {
       "state": "open",
       "merged": false,
-      "head": "badbdf091b0fdf716a5f64a74e626694147ba95e"
+      "head": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63"
     },
     "pr108": {
       "state": "open",
       "merged": false,
-      "head": "62e21246a745835ea35bb148335e2877facad8d0",
+      "head": "e2f296719619286043c9d9b249caff536e87b9c8",
       "readOnly": true
     },
     "pr112": {
@@ -828,5 +828,12 @@
       "draft": true,
       "head": "87b794996aa9be065fb27616de4b1b1e69e8e94e"
     }
+  },
+  "staticSecurityAudit": {
+    "capturedAtUtc": "2026-10-24T02:42:00Z",
+    "sourceSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "adminApiFilesInspected": 22,
+    "missingRequireAdminConfirmed": 0,
+    "notes": "Login/logout are intentional session endpoints; unsupported methods return 405. Read-only static audit, not a live authorization penetration test."
   }
 }

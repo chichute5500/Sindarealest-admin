@@ -1,3 +1,29 @@
+## Live checkpoint — 2026-10-24 02:42 UTC
+
+- **Current branch HEAD:** `477bdda196ce8d5a24d7671703bcec3f5d6b5f63` on `feature/admin-isolated-handoff-2026-10-20`; PR #111 is OPEN/unmerged and points to this SHA.
+- **Validate #5568: SUCCESS** on exact docs HEAD `477bdda196ce8d5a24d7671703bcec3f5d6b5f63`: [run #5568](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40055055104). Dependency audit, integrity checks and automated tests passed.
+- **Preview evidence remains on source/test SHA** `ab0343f963f0f113dc6c88a601c5499ebe15d592`: Validate #5565 and Admin Preview #498 both succeeded on that exact SHA; exact-HEAD guard passed. Artifact #498 [download/evidence](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677) was re-opened for read-only review. Its fixture run reports no page errors, no failed requests, no unexpected API paths and no attempted writes; fixture-only data cannot establish production/backend behavior. The visible product-gallery image placeholders are synthetic fixture content, not a confirmed deployed product-image defect.
+- **Read-only API auth audit on source/test SHA `ab0343f...`:** inspected all 22 files under `functions/api/admin/`. Every operational route has `requireAdmin`; login/logout are intentional session entry/exit endpoints, and unsupported-method handlers return 405. No missing admin guard confirmed; no source patch justified by this scan.
+- **Live refs:** `main` = `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged at `477bdda196ce8d5a24d7671703bcec3f5d6b5f63`; PR #108 OPEN/unmerged/read-only, live head `e2f296719619286043c9d9b249caff536e87b9c8` (changed externally since prior checkpoint); PR #112 OPEN/unmerged/draft at `87b794996aa9be065fb27616de4b1b1e69e8e94e`.
+- **Progress/acceptance unchanged:** 50% PROVISIONAL; 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated business write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+
+### Continue next
+1. Keep source/test Preview SHA `ab0343f...` separate from current docs HEAD. Do not treat Validate #5568 as a Preview run.
+2. Continue reference-driven checks screen by screen using the approved reference and exact viewport screenshots; record specific mismatches, but patch only after a reproducible failure and a regression test that fails first.
+3. Continue independent read-only checks of payment/order invariants and tests; do not repeat the completed 22-file admin auth scan unless new evidence appears.
+4. For authenticated business workflows, obtain an authorized Preview path; never bypass Cloudflare Access or change secrets. Continue safe fixture/static work if that access is unavailable.
+
+### Seven mandatory rules and safety boundaries
+1. Parallelize independent safe workstreams; one blocker does not stop the others.
+2. Report verified progress, then continue; do not stop after reporting.
+3. State blockers and evidence, switch streams, and do not repeat an action without new evidence.
+4. Test-first: reproduce a concrete bug, add a failing regression test, then patch.
+5. Tie evidence to exact SHA; distinguish fixtures from authenticated backend evidence.
+6. Stop only for genuine owner action; do not ask about nonexistent “Run workflow” controls.
+7. Preserve isolation: write only to `feature/admin-isolated-handoff-2026-10-20`; no merge/rebase/cherry-pick/force-push; no Production deploy; no Cloudflare Access/secrets/DNS changes or bypass; no remote D1/R2/schema/ledger/business writes or migration/seed/import/setup scripts; do not modify `main`, storefront branches, PR #108 or #112; keep PR #111 open/unmerged; never weaken exact-HEAD guard or create dummy source commits.
+
+---
+
 ## Live handoff checkpoint — 2026-10-24 02:35 UTC
 
 - **Verified writable branch HEAD:** `badbdf091b0fdf716a5f64a74e626694147ba95e` on `feature/admin-isolated-handoff-2026-10-20`. Live branch and PR #111 head matched at checkpoint.
