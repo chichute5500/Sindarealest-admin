@@ -18,6 +18,9 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
         async first() {
           calls.first.push({ sql, values: this.values });
           if (sql === "SELECT id FROM orders WHERE id=?") return { id: "order-1" };
+          if (sql === "SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' LIMIT 1") {
+            return hasPendingRequest ? { id: "pending-request-1" } : null;
+          }
           if (sql.startsWith("SELECT EXISTS (SELECT 1 FROM order_payment_transactions")) {
             return { has_transactions: hasTransactions ? 1 : 0, has_pending_request: hasPendingRequest ? 1 : 0 };
           }
@@ -37,8 +40,13 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
       calls.batches.push(statements.map(s => ({ sql: s.sql, values: s.values })));
       return statements.map(statement => {
         const guardedWrite = statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
-          && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests")
-        return { success: true, meta: { changes: conflictDuringBatch && guardedWrite ? 0 : 1 } };
+          && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests");
+        const cancelGuard = statement.sql.startsWith("UPDATE orders SET status=?")
+          && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')");
+        const blockedCancelAudit = statement.sql.includes("'order_updated'")
+          && statements.some(s => s.sql.startsWith("UPDATE orders SET status=?")
+            && s.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"));
+        return { success: true, meta: { changes: conflictDuringBatch && (guardedWrite || cancelGuard || blockedCancelAudit) ? 0 : 1 } };
       });
     }
   };
@@ -88,6 +96,16 @@ async function patchOrder(DB, prices, status = "confirmed") {
 }
 
 {
+  const db = makeDB({ conflictDuringBatch: true });
+  const response = await patchOrder(db, [{ itemId: "item-1", unitPrice: 100000 }], "cancelled");
+  assert.equal(response.status, 409, "a QR request appearing after the preflight read must still block order cancellation at the atomic write boundary");
+  assert.equal(db.calls.batches.length, 1);
+  const orderUpdate = db.calls.batches[0].find(statement => statement.sql.startsWith("UPDATE orders SET status=?"));
+  assert.ok(orderUpdate?.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"),
+    "the order cancellation UPDATE must atomically require no pending QR request");
+}
+
+{
   const db = makeDB({ hasPendingRequest: true });
   const response = await patchOrder(db, [{ itemId: "item-1", unitPrice: 100000 }]);
   assert.equal(response.status, 200, "saving an order with unchanged prices must remain allowed even while a QR request is pending");
@@ -118,4 +136,4 @@ async function patchOrder(DB, prices, status = "confirmed") {
   ), "item, order, and audit writes must all be guarded against a concurrent payment");
 }
 
-console.log("PASS: order repricing respects pending QR requests and verified payment history, while unchanged-price saves remain allowed.");
+console.log("PASS: order repricing guards financial history and order cancellation refuses pending QR requests, including the concurrent-create race.");
