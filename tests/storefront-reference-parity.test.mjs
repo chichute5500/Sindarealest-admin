@@ -368,8 +368,8 @@ const heroBlendOverride = html.slice(html.lastIndexOf("/* Hero uses the original
 assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
   && heroBlendOverride.includes("mask-image:none!important")
   && !heroBlendOverride.includes("mask-image:radial-gradient(")
-  && heroBlendOverride.includes("width:122%!important")
-  && heroBlendOverride.includes("max-height:330px!important"),
+  && heroBlendOverride.includes("width:clamp(258px,70vw,286px)!important")
+  && heroBlendOverride.includes("max-height:none!important"),
   "The original mobile Hero PNG must stay enlarged, uncropped, unmasked, and color-preserving.");
 assert.ok(heroBlendOverride.includes("@media(min-width:761px) and (max-width:1000px)")
   && heroBlendOverride.includes("width:113%!important")
@@ -397,14 +397,15 @@ assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,")
   "The marble oval and slanted plinth stay visible and responsive; a legacy blur-only rule cannot override the platform.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
   "No page caption may cover any portion of the supplied image.");
-assert.ok(
-  heroAssetDisplayLock.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;") &&
-  heroAssetDisplayLock.includes("grid-column:1!important;") &&
-  heroAssetDisplayLock.includes("grid-column:2!important;") &&
-  heroAssetDisplayLock.includes("max-height:330px!important;") &&
-  heroAssetDisplayLock.includes("object-fit:contain!important"),
-  "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the enlarged alpha-feathered image remains visible."
-);
+const mobileReferenceCss = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
+assert.ok(mobileReferenceCss.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
+  && mobileReferenceCss.includes("height:clamp(216px,57vw,230px)!important;")
+  && mobileReferenceCss.includes("position:absolute!important;top:0!important;right:0!important;")
+  && mobileReferenceCss.includes("top:-55px!important;left:-43px!important;")
+  && mobileReferenceCss.includes("width:clamp(258px,70vw,286px)!important;")
+  && mobileReferenceCss.includes("object-fit:contain!important")
+  && !mobileReferenceCss.includes("grid-template-rows:auto auto!important;"),
+  "Mobile Hero must follow the supplied side-by-side reference, not stack the shoe below its copy.");
 
 // The approved icon board assigns the shopping-bag silhouette to Cart; Products remains a distinct catalogue/list destination.
 const mobileProductTab = html.match(/<a class="mobile-tab" href="#products" data-mobile-tab="products">([\s\S]*?)<\/a>/)?.[1] || '';
@@ -506,21 +507,20 @@ assert.ok(
 
 
 
-const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero reference-match v2: preserve the portrait PNG's natural ratio"));
-assert.ok(
-  mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,1fr)!important;") &&
-  mobileHeroReferenceMatch.includes("grid-template-rows:auto auto!important;") &&
-  mobileHeroReferenceMatch.includes("grid-row:1!important;") &&
-  mobileHeroReferenceMatch.includes("grid-row:2!important;") &&
-  mobileHeroReferenceMatch.includes("width:100%!important;height:100%!important;max-width:100%!important;max-height:330px!important;margin:0!important;") &&
-  mobileHeroReferenceMatch.includes("height:clamp(310px,85vw,330px)!important;") &&
-  mobileHeroReferenceMatch.includes("object-fit:contain!important;object-position:center center!important"),
-  "Mobile Hero must keep the original contained image at a balanced, compact size below the copy.");
+const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
+assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
+  && mobileHeroReferenceMatch.includes("grid-template-rows:1fr!important;")
+  && mobileHeroReferenceMatch.includes("height:clamp(216px,57vw,230px)!important;")
+  && mobileHeroReferenceMatch.includes("top:-55px!important;left:-43px!important;")
+  && mobileHeroReferenceMatch.includes("max-height:none!important")
+  && mobileHeroReferenceMatch.includes("opacity:1!important;mix-blend-mode:normal!important;"),
+  "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");
 assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
-  && heroPedestalStyles.includes("radial-gradient(ellipse at 30% 28%")
-  && mobileHeroReferenceMatch.includes("width:84%!important;height:11%!important;bottom:43%!important;")
-  && mobileHeroReferenceMatch.includes("width:81%!important;height:9%!important;bottom:34%!important;"),
-  "The mobile marble oval must override the obsolete blur and meet the visible pedestal front.");
+  && mobileHeroReferenceMatch.includes("bottom:20px!important;")
+  && mobileHeroReferenceMatch.includes("height:25px!important;")
+  && mobileHeroReferenceMatch.includes("bottom:4px!important;")
+  && mobileHeroReferenceMatch.includes("height:19px!important;"),
+  "Mobile pedestal top/front must form a compact marble display below the shoe soles.");
 
 assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoes")
   && heroPedestalStyles.includes("#home .hero-visual::before{left:40%!important;width:100%!important}")

@@ -68,8 +68,8 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
   && heroEdgeTreatment.includes("mask-image:none!important")
   && !heroEdgeTreatment.includes("mask-image:radial-gradient(")
-  && heroEdgeTreatment.includes("width:122%!important")
-  && heroEdgeTreatment.includes("max-height:330px!important"),
+  && heroEdgeTreatment.includes("width:clamp(258px,70vw,286px)!important")
+  && heroEdgeTreatment.includes("max-height:none!important"),
   "The derived Hero shoes must remain enlarged while alpha edges blend into the page and original RGB stays unchanged.");
 assert.ok(heroEdgeTreatment.includes("@media(min-width:761px) and (max-width:1000px)")
   && heroEdgeTreatment.includes("width:113%!important")
@@ -91,13 +91,13 @@ assert.ok(heroPedestalStyles.includes("#home .hero-visual::before,")
   && heroPedestalStyles.includes("width:145%;height:9%;bottom:30%;transform:translateX(-50%) rotate(-3deg)")
   && html.includes("position:relative!important;z-index:1!important;"),
   "Hero keeps an explicit pearl-marble oval, visible slanted plinth face, responsive sizing, and the original shoe PNG in front.");
-assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
-  && html.includes("grid-column:1!important;")
-  && html.includes("grid-column:2!important;")
-  && html.includes("width:122%!important;height:auto!important;max-width:none!important;max-height:330px!important;")
-  && html.includes("object-fit:contain!important;object-position:center!important;")
-  && html.includes("margin:0!important;"),
-  "On mobile, hero copy and image must use separate side-by-side columns while the full source-derived image stays centered and clear.");
+const canonicalMobile = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
+assert.ok(canonicalMobile.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
+  && canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
+  && canonicalMobile.includes("position:absolute!important;top:0!important;right:0!important;")
+  && canonicalMobile.includes("object-fit:contain!important;object-position:center center!important;")
+  && canonicalMobile.includes("top:-55px!important;left:-43px!important;"),
+  "Mobile Hero shoes must float beside, not beneath, the editorial copy.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
@@ -105,10 +105,9 @@ assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
   "The live audit must verify the authorized visible Hero presentation image.");
 
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
-const finalMobileHero = html.slice(html.lastIndexOf("/* Mobile Hero reference-match v2:"));
-assert.ok(finalMobileHero.includes("height:clamp(310px,85vw,330px)!important;")
-  && finalMobileHero.includes("width:84%!important;height:11%!important;bottom:43%!important;")
-  && finalMobileHero.includes("width:81%!important;height:9%!important;bottom:34%!important;")
+assert.ok(canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
+  && canonicalMobile.includes("bottom:20px!important;")
+  && canonicalMobile.includes("bottom:4px!important;")
   && heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;"),
-  "Final mobile Hero must balance size and restore the unblurred marble top.");
+  "The mobile Hero uses a single compact, visible platform beneath the unchanged shoe PNG.");
 console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");

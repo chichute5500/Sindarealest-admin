@@ -127,18 +127,16 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-const mobileHeroReferenceMatch = html.slice(html.lastIndexOf('/* Mobile Hero reference-match v2: preserve the portrait PNG\'s natural ratio'));
+const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
 assert.ok(html.includes('/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */')
   && html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
-  && mobileHeroReferenceMatch.includes('grid-template-columns:minmax(0,1fr)!important;')
-  && mobileHeroReferenceMatch.includes('grid-template-rows:auto auto!important;')
-  && mobileHeroReferenceMatch.includes('grid-row:1!important;')
-  && mobileHeroReferenceMatch.includes('grid-row:2!important;')
-  && mobileHeroReferenceMatch.includes('width:100%!important;height:100%!important;max-width:100%!important;max-height:330px!important;margin:0!important;')
-  && mobileHeroReferenceMatch.includes('height:clamp(310px,85vw,330px)!important;')
+  && mobileHeroReferenceMatch.includes('grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;')
+  && mobileHeroReferenceMatch.includes('height:clamp(216px,57vw,230px)!important;')
+  && mobileHeroReferenceMatch.includes('grid-template-rows:1fr!important;')
+  && mobileHeroReferenceMatch.includes('top:-55px!important;left:-43px!important;')
   && mobileHeroReferenceMatch.includes('object-fit:contain!important;object-position:center center!important;')
-  && mobileHeroReferenceMatch.includes('mix-blend-mode:normal!important;opacity:1!important;'),
-  "Mobile Hero must place readable copy above the undistorted original RGBA product image, crop transparent space rather than squeeze the shoes, and retain the approved shadow.");
+  && mobileHeroReferenceMatch.includes('opacity:1!important;mix-blend-mode:normal!important;'),
+  "Hero reference layout must not expand transparent PNG padding or stack the shoes below the copy.");
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");

@@ -3199,25 +3199,6 @@ html.dark #home .hero-visual::before{
 @media(min-width:761px) and (max-width:1000px){
   #home .hero-visual img{width:113%!important;max-width:none!important;height:auto!important;max-height:540px!important;margin-left:0!important;margin-right:0!important;}
 }
-@media(max-width:760px){
-  /* Copy left, product right: the same Hero hierarchy adapts without a separate mobile component. */
-  #home.hero.wrap{
-    display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
-    gap:10px!important;overflow:visible!important;align-items:center!important;padding:14px 10px!important;
-  }
-  #home .hero-copy{
-    grid-column:1!important;width:100%!important;max-width:100%!important;min-width:0!important;padding:0 2px!important;
-  }
-  #home .hero-visual{
-    position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
-    grid-column:2!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:auto!important;
-    margin:0!important;overflow:visible!important;display:flex!important;justify-content:center!important;align-items:center!important;
-  }
-  #home .hero-visual img{
-    width:122%!important;height:auto!important;max-width:none!important;max-height:330px!important;
-    margin:0!important;object-fit:contain!important;object-position:center!important;
-  }
-}
 
 
 
@@ -3720,33 +3701,8 @@ html.dark #home .hero-visual::before{
 #home .hero-visual::after{pointer-events:none!important}
 #home .hero-visual-caption{display:none!important}
 #home.hero:after{content:none!important;display:none!important;background:none!important}
-@media(max-width:760px){#home .hero-visual img{width:122%!important;max-height:330px!important}}
+
 @media(min-width:761px) and (max-width:1000px){#home .hero-visual img{width:113%!important;max-height:540px!important;margin-left:0!important;margin-right:0!important}}
-
-/* Mobile Hero rebuild: keep readable copy and the original product side-by-side within the viewport. */
-@media(max-width:760px){
-  #home.hero.wrap{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:auto!important;align-items:center!important;gap:4px!important;width:calc(100% - 24px)!important;max-width:calc(100% - 24px)!important;min-width:0!important;min-height:0!important;height:auto!important;margin:12px auto 10px!important;padding:20px 12px 16px!important;overflow:hidden!important;box-sizing:border-box!important}
-  #home .hero-copy{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;margin:0!important;padding:0!important}
-  #home .hero h1{width:100%!important;max-width:100%!important;margin:0 0 9px!important;font-size:clamp(23px,6.2vw,32px)!important;line-height:1.12!important;letter-spacing:-.035em!important;overflow-wrap:anywhere!important;word-break:normal!important}
-  #home .hero h1 span{display:block!important}
-  #home .hero-description{width:100%!important;max-width:100%!important;margin:0!important;font-size:clamp(11px,2.9vw,13px)!important;line-height:1.5!important}
-  #home .hero-actions{display:flex!important;flex-wrap:wrap!important;width:100%!important;margin:12px 0 0!important;gap:7px!important}
-  #home .hero-actions .pill-btn{min-height:38px!important;max-width:100%!important;padding:9px 10px!important;font-size:11px!important;white-space:normal!important}
-  #home .hero-visual{position:relative!important;grid-column:2!important;grid-row:1!important;justify-self:stretch!important;align-self:center!important;display:flex!important;justify-content:center!important;align-items:center!important;width:100%!important;max-width:100%!important;height:clamp(220px,66vw,330px)!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  #home .hero-visual img{position:relative!important;z-index:1!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:330px!important;margin:0!important;padding:0!important;object-fit:contain!important;object-position:center!important;padding:0!important;transform:none!important;mix-blend-mode:normal!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
-  #home .hero-visual::before{width:125%!important;height:9%!important;bottom:24%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual::after{width:120%!important;height:7%!important;bottom:16%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual-caption{display:none!important}
-}
-@media(max-width:390px){
-  #home.hero.wrap{padding:16px 9px 12px!important;gap:2px!important}
-  #home .hero h1{font-size:clamp(21px,6vw,25px)!important}
-  #home .hero-description{font-size:11px!important;line-height:1.45!important}
-  #home .hero-actions .pill-btn{font-size:10px!important;padding:8px 8px!important}
-  #home .hero-visual{height:clamp(220px,72vw,280px)!important}
-}
-
-
 
 /* Tablet Hero scale correction: account for the transparent margins inside the original PNG. */
 @media(min-width:761px) and (max-width:1000px){
@@ -3754,49 +3710,126 @@ html.dark #home .hero-visual::before{
   #home .hero-visual img{width:auto!important;height:auto!important;max-width:none!important;max-height:650px!important;margin-left:-85px!important;object-fit:contain!important;object-position:center!important}
 }
 
-/* Mobile Hero rebuild: readable copy first, complete product presentation second.
-   This final mobile-only override restores an unclipped copy-first layout; desktop/tablet rules remain untouched. */
+
+/* Mobile Hero — owner reference, single authoritative layout.
+   The 1200x1600 source PNG has ~83% alpha: never scale its blank canvas to the layout.
+   Reference composition: text on left, shoe silhouettes at upper right, marble below. */
 @media(max-width:760px){
-  #home.hero.wrap{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto!important;align-items:start!important;gap:8px!important;width:calc(100% - 28px)!important;max-width:calc(100% - 28px)!important;min-width:0!important;min-height:0!important;height:auto!important;margin:12px auto 10px!important;padding:20px 16px 12px!important;overflow:hidden!important;box-sizing:border-box!important}
-  #home .hero-copy{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;margin:0!important;padding:0!important}
-  #home .hero h1{width:100%!important;max-width:100%!important;margin:0 0 10px!important;font-size:clamp(29px,7.5vw,36px)!important;line-height:1.12!important;letter-spacing:-.035em!important;overflow-wrap:normal!important;word-break:normal!important}
-  #home .hero h1 span{display:block!important}
-  #home .hero-description{width:100%!important;max-width:34em!important;margin:0!important;font-size:clamp(12px,3.3vw,14px)!important;line-height:1.6!important}
-  #home .hero-actions{display:flex!important;flex-wrap:wrap!important;width:100%!important;margin:14px 0 0!important;gap:10px!important}
-  #home .hero-actions .pill-btn{min-height:42px!important;max-width:100%!important;padding:10px 16px!important;font-size:12px!important;white-space:nowrap!important}
-  #home .hero-visual{position:relative!important;grid-column:1!important;grid-row:2!important;justify-self:stretch!important;align-self:stretch!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;width:100%!important;max-width:100%!important;height:clamp(320px,86vw,350px)!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  #home .hero-visual img{position:relative!important;z-index:1!important;display:block!important;width:120%!important;height:100%!important;max-width:none!important;max-height:350px!important;margin:0 0 0 -10%!important;padding:0!important;object-fit:contain!important;object-position:center top!important;transform:none!important;mix-blend-mode:normal!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
-  #home .hero-visual::before{width:92%!important;height:9%!important;bottom:23%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual::after{width:88%!important;height:7%!important;bottom:15%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual-caption{display:none!important}
+  #home.hero.wrap{
+    display:grid!important;position:relative!important;
+    grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;
+    grid-template-rows:1fr!important;
+    width:calc(100% - 24px)!important;max-width:calc(100% - 24px)!important;
+    box-sizing:border-box!important;
+    height:clamp(216px,57vw,230px)!important;
+    min-height:0!important;
+    margin:9px auto 8px!important;padding:12px 14px 8px!important;
+    align-items:start!important;column-gap:0!important;row-gap:0!important;
+    overflow:hidden!important;
+  }
+  #home .hero-copy{
+    grid-column:1!important;grid-row:1!important;
+    z-index:3!important;position:relative!important;
+    display:flex!important;flex-direction:column!important;
+    align-items:flex-start!important;justify-content:flex-start!important;
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    height:auto!important;min-height:0!important;
+    margin:0!important;padding:0!important;
+  }
+  #home .hero h1,#home .hero-copy h1{
+    width:100%!important;max-width:none!important;
+    margin:0 0 10px!important;padding:0!important;
+    font-size:clamp(24px,6.65vw,28px)!important;line-height:1.12!important;
+    letter-spacing:-.035em!important;white-space:normal!important;
+    overflow-wrap:normal!important;word-break:normal!important;
+  }
+  #home .hero h1 span{display:block!important;max-width:none!important}
+  #home .hero-description{
+    width:100%!important;max-width:180px!important;
+    margin:0!important;font-size:clamp(10.5px,2.85vw,11.7px)!important;
+    line-height:1.42!important;
+  }
+  #home .hero-actions{
+    display:flex!important;flex-wrap:nowrap!important;
+    width:auto!important;max-width:100%!important;
+    margin:11px 0 0!important;gap:0!important;
+  }
+  #home .hero-actions .pill-btn{
+    display:inline-flex!important;align-items:center!important;justify-content:space-between!important;
+    width:auto!important;max-width:100%!important;
+    min-height:37px!important;padding:8px 13px!important;gap:12px!important;
+    border-radius:999px!important;white-space:nowrap!important;
+    font-size:12px!important;line-height:1.2!important;
+  }
+  #home .hero-visual{
+    position:absolute!important;top:0!important;right:0!important;left:auto!important;bottom:auto!important;
+    grid-column:auto!important;grid-row:auto!important;
+    display:block!important;width:50%!important;max-width:none!important;
+    height:100%!important;min-height:0!important;
+    margin:0!important;padding:0!important;
+    overflow:visible!important;aspect-ratio:auto!important;
+    border:0!important;border-radius:0!important;
+    background:transparent!important;box-shadow:none!important;
+    isolation:isolate!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    pointer-events:none!important;
+  }
+  #home .hero-visual img{
+    position:absolute!important;top:-55px!important;left:-43px!important;
+    right:auto!important;bottom:auto!important;
+    z-index:2!important;display:block!important;
+    width:clamp(258px,70vw,286px)!important;max-width:none!important;
+    height:auto!important;max-height:none!important;
+    margin:0!important;padding:0!important;
+    object-fit:contain!important;object-position:center center!important;
+    opacity:1!important;mix-blend-mode:normal!important;
+    transform:none!important;clip-path:none!important;
+    -webkit-mask:none!important;mask:none!important;
+    -webkit-mask-image:none!important;mask-image:none!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;
+    filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important;
+  }
+  #home .hero-visual::before{
+    content:""!important;display:block!important;position:absolute!important;
+    inset:auto!important;top:auto!important;
+    left:50%!important;bottom:20px!important;
+    transform:translateX(-50%)!important;
+    width:58vw!important;max-width:226px!important;
+    height:25px!important;min-height:0!important;
+    border-radius:50%!important;border:1px solid rgba(190,207,221,.72)!important;
+    background:radial-gradient(ellipse at 34% 20%,rgba(255,255,255,.98),rgba(241,248,253,.96) 49%,rgba(200,220,232,.93) 100%)!important;
+    filter:none!important;
+    box-shadow:0 9px 17px rgba(34,67,90,.15),inset 0 2px 3px rgba(255,255,255,.98)!important;
+    z-index:0!important;pointer-events:none!important;
+  }
+  #home .hero-visual::after{
+    content:""!important;display:block!important;position:absolute!important;
+    inset:auto!important;top:auto!important;
+    left:50%!important;bottom:4px!important;
+    transform:translateX(-50%)!important;
+    width:56vw!important;max-width:217px!important;
+    height:19px!important;
+    border:1px solid rgba(185,206,220,.64)!important;border-top:0!important;
+    clip-path:polygon(1% 0,99% 0,95% 100%,5% 100%)!important;
+    background:linear-gradient(180deg,rgba(238,247,252,.94),rgba(191,213,228,.96))!important;
+    box-shadow:0 11px 17px rgba(36,77,103,.11),inset 0 1px 0 rgba(255,255,255,.92)!important;
+    z-index:0!important;pointer-events:none!important;
+  }
+  #home .hero-visual-caption,#home .hero-visual-glow{display:none!important}
+  #home .hero-visual img[hidden]{display:none!important}
+  html.dark #home .hero-visual::before{
+    border-color:rgba(168,197,218,.65)!important;
+    background:radial-gradient(ellipse at 34% 20%,rgba(214,235,248,.98),rgba(140,176,200,.96) 52%,rgba(71,110,138,.98) 100%)!important;
+  }
+  html.dark #home .hero-visual::after{
+    background:linear-gradient(180deg,rgba(147,184,207,.98),rgba(67,107,139,.98))!important;
+    border-color:rgba(145,182,207,.6)!important;
+  }
 }
 @media(max-width:390px){
-  #home.hero.wrap{padding:18px 13px 10px!important;gap:5px!important}
-  #home .hero h1{font-size:clamp(27px,7.4vw,30px)!important}
-  #home .hero-description{font-size:12px!important}
-  #home .hero-visual{height:320px!important}
-}
-
-
-/* Mobile Hero reference-match v2: preserve the portrait PNG's natural ratio, crop only transparent top/bottom space,
-   and place the visible shoes directly beneath the copy. Never squeeze the source image into a short fixed box. */
-@media(max-width:760px){
-  #home.hero.wrap{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto!important;align-items:start!important;gap:0!important;width:calc(100% - 28px)!important;max-width:calc(100% - 28px)!important;min-width:0!important;height:auto!important;min-height:0!important;margin:12px auto 10px!important;padding:20px 16px 10px!important;overflow:hidden!important;box-sizing:border-box!important}
-  #home .hero-copy{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important}
-  #home .hero h1{width:100%!important;max-width:100%!important;margin:0 0 10px!important;font-size:clamp(29px,7.5vw,36px)!important;line-height:1.12!important;letter-spacing:-.035em!important;overflow-wrap:normal!important;word-break:normal!important}
-  #home .hero h1 span{display:block!important}
-  #home .hero-description{width:100%!important;max-width:34em!important;margin:0!important;font-size:clamp(12px,3.3vw,14px)!important;line-height:1.6!important}
-  #home .hero-actions{display:flex!important;flex-wrap:wrap!important;width:100%!important;margin:14px 0 0!important;gap:10px!important}
-  #home .hero-actions .pill-btn{min-height:42px!important;max-width:100%!important;padding:10px 16px!important;font-size:12px!important;white-space:nowrap!important}
-  #home .hero-visual{position:relative!important;grid-column:1!important;grid-row:2!important;justify-self:stretch!important;align-self:start!important;display:block!important;width:100%!important;max-width:100%!important;height:clamp(310px,85vw,330px)!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  #home .hero-visual img{position:relative!important;z-index:1!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:330px!important;margin:0!important;padding:0!important;object-fit:contain!important;object-position:center center!important;transform:none!important;mix-blend-mode:normal!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
-  #home .hero-visual::before{width:84%!important;height:11%!important;bottom:43%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual::after{width:81%!important;height:9%!important;bottom:34%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual-caption{display:none!important}
-}
-@media(max-width:390px){
-  #home.hero.wrap{padding:18px 13px 10px!important}
-  #home .hero h1{font-size:clamp(27px,7.4vw,30px)!important}
-  #home .hero-description{font-size:12px!important}
-  #home .hero-visual{height:clamp(310px,85vw,330px)!important}
+  #home.hero.wrap{padding:11px 12px 8px!important}
+  #home .hero h1,#home .hero-copy h1{font-size:clamp(23px,6.7vw,26px)!important}
+  #home .hero-description{font-size:10.6px!important;max-width:170px!important}
+  #home .hero-actions .pill-btn{font-size:11.5px!important;padding:8px 11px!important}
+  #home .hero-visual img{left:-44px!important}
 }

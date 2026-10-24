@@ -298,7 +298,7 @@ try {
             objectFit: imageStyle.objectFit,
             objectPosition: imageStyle.objectPosition,
             filter: imageStyle.filter,
-            imageRect, frameRect, copyRect, visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal,
+            imageRect, frameRect, copyRect, heroRect:rect(hero), visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal,
             productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
             expectedThemeApplied: rootDark === (args.theme === 'dark'),
             viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
@@ -328,10 +328,16 @@ try {
           const pl=m.pedestal;
           if(!pl||pl.oval.content==='none'||pl.oval.filter!=='none'||pl.oval.background==='none'||!Number.isFinite(pl.oval.top)||!Number.isFinite(pl.face.top))
             fail('Marble pedestal is suppressed by stale glow rules.');
-          else if(pl.oval.top/m.frameRect.height<.36||pl.oval.top/m.frameRect.height>.53
+          else if(pl.oval.top/m.frameRect.height<.65||pl.oval.top/m.frameRect.height>.90
             ||pl.face.top<=pl.oval.top||pl.face.top-pl.oval.top-pl.oval.height>10
             ||pl.oval.width<m.frameRect.width*.7||pl.oval.width>m.frameRect.width*.95)
             fail('Marble top/front are detached or incorrectly scaled.');
+        }
+        if (m.viewport.width <= 390) {
+          if (!m.heroRect || m.heroRect.height > 245 || m.heroRect.height < 195) fail('Mobile Hero no longer matches the short reference-height composition.');
+          if (!m.visibleProductRect || m.visibleProductRect.top >= m.copyRect.bottom - 50) fail('Mobile Hero shoes fell below the copy instead of floating beside it.');
+          if (m.visibleProductRect && m.visibleProductRect.bottom > m.heroRect.bottom + 2) fail('Visible shoes are clipped past the Hero frame.');
+          if (m.visibleProductRect && (m.visibleProductRect.left < m.viewport.width*.43 || m.visibleProductRect.left > m.viewport.width*.63)) fail('Mobile Hero shoes do not start in the right-hand image column.');
         }
         if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 320)) fail('Tablet Hero product is too small compared with the reference-led layout.');
         if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
