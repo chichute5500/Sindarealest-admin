@@ -117,7 +117,7 @@ has('Đã thanh toán (đã xác minh)', 'payment status must be presented as a 
 has('data-action="record-payment"', 'admin must have an explicit manual verification action for real bank receipts');
 assert.doesNotMatch(adminHtml, /data-payment-status=/, 'payment status must not be directly editable in the order UI');
 
-assert.match(adminHtml, /data-order-detail-status=\"\$\{id\}\"/, 'Order detail must expose the order-status control shown in the approved Screen 7 reference');
+assert.match(adminHtml, /data-order-detail-status=\"\$\{esc\(order\.id\)\}\"/, 'Order detail must expose the order-status control bound to the selected order in the approved Screen 7 reference');
 assert.match(adminHtml, /data-action=\"save-order-detail-status\"/, 'Order detail must provide a direct update action instead of requiring navigation back to the orders list');
 assert.match(adminHtml, /main\.querySelectorAll\('\[data-action=save-order-detail-status\]'\)/, 'The dedicated order-detail update action must be wired to the existing Admin orders PATCH API');
 assert.match(adminHtml, /order-detail-status-grid/, 'Order detail status and read-only payment state must be grouped in a compact responsive section');
