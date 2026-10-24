@@ -355,7 +355,7 @@ audit.hardFailures = [
     .map((item) => item.context + ': failed request ' + item.url + ' (' + item.failure + ')'),
   ...audit.readOnlyViolations.map((item) => item.context + ': blocked non-read request ' + item.method + ' ' + item.url),
 ];
-audit.passed = audit.results.length === 6
+audit.passed = audit.results.length === audit.requiredViewports.length * audit.themes.length
   && audit.results.every((item) => item.pass)
   && audit.hardFailures.length === 0;
 audit.completedAt = new Date().toISOString();

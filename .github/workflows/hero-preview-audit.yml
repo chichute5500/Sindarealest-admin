@@ -8,8 +8,11 @@ on:
       - '.github/workflows/hero-preview-audit.yml'
       - 'scripts/audit-hero-preview.mjs'
       - 'tests/storefront-reference-parity.test.mjs'
+      - 'tests/hero-product-sku.test.mjs'
+      - 'tests/storefront-html-safety.test.mjs'
+      - 'tests/product-card-liquid-glass.test.mjs'
       - 'public/index.html'
-      - 'public/images/hero-upload/tb_image_share_1792519964514-blended.png'
+      - 'public/images/hero-upload/tb_image_share_1792519964514 (1).png'
 
 permissions:
   contents: read
