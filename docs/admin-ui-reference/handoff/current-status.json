@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T09:32:00Z",
+  "capturedAtUtc": "2026-10-24T09:36:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+  "branchHeadAtCheckpointStart": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
   "checkpointSemantics": "2026-10-24 08:55 UTC: QR upload atomicity and feature workflow/spec path isolation included in source/test SHA 0469930f6836d5f8d87b155a538e1d68776e3913. Validate and Admin Preview Playwright both pass. Live read-only diagnostics from older SHA must not be attributed to this SHA.",
   "codeTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
   "latestProductSourceCommit": "cf340b686e0974ac5602b6ef4594c00e477c8932",
@@ -18,7 +18,7 @@
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "Validate #5688 and Admin Preview Playwright #1077 pass on exact source/test SHA cf340b686e0974ac5602b6ef4594c00e477c8932; live branch HEAD fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94 is docs-only. Reference parity and authenticated business-write QA remain unproven.",
+  "progressBasis": "Validate #5688 and Admin Preview Playwright #1077 passed on exact source/test SHA cf340b686e0974ac5602b6ef4594c00e477c8932. On docs checkpoint e5736c5542863fc23e5e235f5eaacc8c1374f325, Validate #5721 failed only at tests/handoff-integrity.test.mjs because current-status.json lacked entryPoint; correcting handoff metadata. Admin Preview Playwright #1091 passed on e5736. Re-run Validate after correction. Reference parity and authenticated business-write QA remain unproven.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -900,13 +900,12 @@
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892"
   },
   "latestPreviewValidation": {
-    "id": 40081623888,
-    "runNumber": 1077,
-    "workflow": "Admin Preview Playwright",
+    "runId": 40082444230,
+    "runNumber": 1091,
     "status": "completed",
     "conclusion": "success",
-    "sha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888"
+    "sha": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444230"
   },
   "staticSecurityAudit": {
     "capturedAtUtc": "2026-10-24T02:42:00Z",
@@ -945,19 +944,30 @@
   },
   "latestBranchHead": "cf340b686e0974ac5602b6ef4594c00e477c8932",
   "latestAudit": {
-    "capturedAtUtc": "2026-10-24T09:24:00Z",
+    "capturedAtUtc": "2026-10-24T09:36:00Z",
     "sourceSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
     "paymentOrderWarrantyConcurrency": "READ_ONLY_REVIEW_NO_NEW_REPRODUCIBLE_DEFECT",
     "referenceScreenshotEvidenceSha": "e55088d89632ff84ec68715cdee3ef64c1a9e964",
     "referenceScreenshotEvidence": "SYNTHETIC_FIXTURE_ONLY; NOT_LATEST_HEAD; PIXEL_PARITY_NOT_VERIFIED"
   },
-  "branchHead": "fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94",
-  "currentHead": "fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94",
+  "branchHead": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
+  "currentHead": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
   "latestConcurrencyFix": {
     "sourceTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
     "summary": "Order cancellation guards order-item writes against a pending QR payment request to avoid partial writes when cancellation is blocked.",
     "validateRun": 40081623892,
     "previewRun": 40081623888,
     "status": "VALIDATE_AND_PREVIEW_PASS"
+  },
+  "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+  "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+  "latestDocsValidation": {
+    "runId": 40082444182,
+    "runNumber": 5721,
+    "status": "completed",
+    "conclusion": "failure",
+    "sha": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
+    "failure": "tests/handoff-integrity.test.mjs: current-status.json.entryPoint missing; expected docs/admin-ui-reference/handoff/START-HERE.md",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444182"
   }
 }
