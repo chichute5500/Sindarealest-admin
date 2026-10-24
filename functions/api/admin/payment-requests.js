@@ -99,6 +99,11 @@ export async function onRequestPost(context) {
       " AND (SELECT COUNT(*) FROM order_payment_transactions WHERE order_id=?)=? " +
       "AND COALESCE((SELECT SUM(CASE WHEN direction='received' THEN amount ELSE -amount END) " +
       "FROM order_payment_transactions WHERE order_id=?),0)=? " +
+      "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_active' AND value='1') " +
+      "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_active_key' AND value=?) " +
+      "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_bank_name' AND value=?) " +
+      "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_account_number' AND value=?) " +
+      "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_account_name' AND value=?) " +
       "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
     const insertBindings = [
       id,orderId,installmentType,amount,shippingBenefit,reference,
@@ -110,6 +115,7 @@ export async function onRequestPost(context) {
       ...(paymentOption === "balance" ? [] : [orderId]),
       orderId,transactions.length,
       orderId,summary.netReceivedAmount,
+      cfg.payment_qr_active_key,cfg.payment_qr_bank_name,cfg.payment_qr_account_number,cfg.payment_qr_account_name,
       orderId
     ];
     const requestDetails = JSON.stringify({requestId:id,installmentType,fulfillmentType,amount,shippingBenefit,reference});

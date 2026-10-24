@@ -96,6 +96,13 @@ function makeDb(options = {}) {
           { key: "payment_qr_account_name", value: "NGUYEN VAN B" },
         ];
       }
+      const activeQrSnapshotGuardPresent = statement => [
+        "key='payment_qr_active' AND value='1'",
+        "key='payment_qr_active_key' AND value=?",
+        "key='payment_qr_bank_name' AND value=?",
+        "key='payment_qr_account_number' AND value=?",
+        "key='payment_qr_account_name' AND value=?",
+      ].every(fragment => statement.sql.includes(fragment));
       if (options.simulateOrderCancelledBeforeTransactionBatch) {
         options.order = { ...(options.order ?? baseOrder), status: "cancelled" };
       }
@@ -115,6 +122,12 @@ function makeDb(options = {}) {
         const auditWithoutRequest = Boolean(options.simulateOrderChangedBeforeBatch && index === 1
           && statement.sql.includes("payment_request_created")
           && statement.sql.includes("WHERE EXISTS (SELECT 1 FROM order_payment_requests WHERE id=?"));
+        const staleQrConfigRejected = Boolean(options.simulateQrConfigChangedBeforeBatch && index === 0
+          && statement.sql.includes("INSERT INTO order_payment_requests")
+          && activeQrSnapshotGuardPresent(statement));
+        const auditWithoutRequestAfterQrRotation = Boolean(options.simulateQrConfigChangedBeforeBatch && index === 1
+          && statement.sql.includes("payment_request_created")
+          && statement.sql.includes("WHERE EXISTS (SELECT 1 FROM order_payment_requests WHERE id=?"));
         const receivedInsert = index === 0 && statement.sql.includes("INSERT INTO order_payment_transactions")
           && statement.values?.includes("received");
         const receiptOrderGuard = statement.sql.includes("EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled'")
@@ -126,7 +139,7 @@ function makeDb(options = {}) {
           || (receivedInsert && receiptRequestGuard
             && (options.simulatePaymentRequestCancelledBeforeTransactionBatch || options.simulatePaymentRequestSettledBeforeTransactionBatch));
         // Simulate the final insert boundary: only SQL that rechecks order state can reject these races.
-        const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest || staleReceiptRejected ? 0 : 1;
+        const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest || staleQrConfigRejected || auditWithoutRequestAfterQrRotation || staleReceiptRejected ? 0 : 1;
         return { success: true, meta: { changes } };
       });
     },
@@ -322,6 +335,14 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 409, "a concurrent QR/receiver configuration change must reject the stale payment request");
   assert.equal(db.batches.length, 1, "the QR snapshot must be rechecked at the final atomic write boundary");
+  const [insert, audit] = db.batches[0];
+  assert.match(insert.sql, /EXISTS \(SELECT 1 FROM settings WHERE key='payment_qr_active' AND value='1'\)/);
+  for (const settingKey of ["payment_qr_active_key", "payment_qr_bank_name", "payment_qr_account_number", "payment_qr_account_name"]) {
+    assert.ok(insert.sql.includes("key='" + settingKey + "' AND value=?"), "request insert must match current " + settingKey);
+  }
+  assert.match(audit.sql, /payment_request_created/);
+  assert.match(audit.sql, /WHERE EXISTS \(SELECT 1 FROM order_payment_requests WHERE id=\?\)/,
+    "audit insertion must depend on the QR request insert succeeding");
 }
 
 // An order can change after request preflight but before the atomic insert. Never commit a QR amount from the stale snapshot.
