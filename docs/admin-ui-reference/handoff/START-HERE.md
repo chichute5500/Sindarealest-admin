@@ -603,3 +603,17 @@ Before any work, fetch live GitHub branch HEAD, PR #111/#108 state, and the late
 - Write only to `feature/admin-isolated-handoff-2026-10-20`. Keep PR #111 and PR #108 open/unmerged; do not write to PR #108, `main`, or the static website branch.
 - No merge/rebase/force-push, Production deployment, setup/migration/deploy scripts, remote D1/R2/schema/ledger operations, secrets or Access changes, or Access bypass.
 - Do not invent business data or unapproved API contracts. Migration 0009, PRE/PRO changes, product-image/R2 persistence and AI image grouping remain deferred by the owner.
+
+
+---
+# VERIFIED CHECKPOINT — 2026-10-24 09:24 UTC
+
+- Branch HEAD and application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- PR #111 remains OPEN/unmerged; live PR API reports mergeable=true. No merge/rebase/cherry-pick/force-push performed.
+- Validate #5688 PASS on exact SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077 PASS on exact SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Validate logs include passing payment-ledger, order cancellation/repricing race, QR upload atomicity and warranty issuance race regressions. Preview Playwright reports 2 passed. These are automated/unit/local static and read-only checks, not authenticated business-write QA.
+- Read-only audit: payment request insert rechecks the order price/terms, line totals, fulfillment classification, transaction snapshot and absence of another pending request inside its D1 batch; receipt/refund ledger insert rechecks order/request state and net receipts; warranty issuance atomically checks no existing warranty and order still completed. No new reproducible defect established in this pass.
+- UI evidence: the newest downloadable screenshot artifact available to this pass is older, source SHA `e55088d89632ff84ec68715cdee3ef64c1a9e964` (run #521). It contains synthetic fixture screenshots and the composite reference image, not a latest-HEAD authenticated capture. A same-viewport orders screenshot was inspected against the composite reference; this does not establish pixel parity. Keep all 12 screens PARTIAL_NOT_ACCEPTED and reference parity NOT_VERIFIED.
+- Acceptance unchanged: 50% PROVISIONAL; authenticated business-write QA NOT_TESTED; remote Preview D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+- Safety remains: write only to this feature branch; PR #111 open; no Production deploy, remote D1/R2 writes, secrets/Access/DNS changes, or Access bypass.
