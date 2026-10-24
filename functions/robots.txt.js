@@ -13,7 +13,7 @@ export async function onRequestGet({ request }) {
   if (previewHost) {
     return new Response("User-agent: *\nDisallow: /\n", { headers });
   }
-  // Keep /admin/ crawlable so search engines can see its X-Robots-Tag: noindex
-  // header from public/_headers; robots.txt blocking would hide that directive.
+  // Keep /admin/ crawlable so crawlers can see the document-level meta robots noindex
+  // directive in public/admin/index.html; robots.txt blocking would hide that directive.
   return new Response("User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: " + url.origin + "/sitemap.xml\n", { headers });
 }
