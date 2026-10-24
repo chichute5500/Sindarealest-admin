@@ -1,3 +1,17 @@
+## AUTHORITATIVE FINAL-HANDOFF STATUS — OWNER REQUEST TO FINISH ALL OUTSTANDING WORK — 2026-10-24
+
+- PR #108: OPEN, unmerged, base `main`; head before this documentation sequence: `6f7c8b5d336d83550d0d5328b3b68773114084db`. Documentation updates are being committed on the same feature branch; re-fetch PR head after these writes.
+- Latest verified storefront source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`. Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815. Preview deploy + authenticated HTTP diagnostic PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918. Immutable Preview: https://837f73ba.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Latest authenticated HTTP results on Preview: root HTTP 200 + `X-Robots-Tag: noindex`; canonical, `og:url`, `og:image`, and `twitter:image` point to the deployed Preview origin; `/robots.txt` is HTTP 200 with full crawl disallow and no sitemap; `/sitemap.xml` is HTTP 404 with `X-Robots-Tag: noindex, nofollow` and `Cache-Control: no-store`.
+- Source/test, deploy, and HTTP gates are green for SHA `8a4cc606...`. Browser/device visual acceptance is **NOT established** by those gates. The Hero-guarded visual workflow remains skipped; do not label it PASS.
+- The current owner request is to resolve the remaining items and establish a defensible 100% completion decision. The detailed final checklist is at `docs/handoff/TASKS.md`; the new-chat execution prompt is `docs/handoff/PROMPT-NEW-CHAT-FINAL-100.md`.
+- Remaining evidence/actions to reconcile explicitly: (1) full path-by-path review of PR #108's unusually broad 297-file diff against the allowed storefront scope; do not merge or alter restricted files automatically; (2) real mobile gallery flicker/ghosting acceptance; (3) safe Hero visual evidence path without bypassing safety guards; (4) authoritative SKU verification only where API states `skuVerified === true`; (5) final exact-SHA validation/deploy/HTTP after any source change; (6) final PASS/FAIL/BLOCKED/OWNER-ACCEPTANCE checklist.
+- Icon system remains owner PASS for source `58f67a424e74b86e798cb5faa043a5d18e10b228` and Preview https://3587ce1f.sindarealest2.pages.dev/; do not gratuitously modify accepted icons.
+- Treat older historical entries below as chronological evidence. Where they say Preview noindex/HTTP was “unverified,” those notes are superseded by the latest authenticated HTTP diagnostic above.
+- Hard boundaries remain: keep PR #108 OPEN/unmerged, do not edit/deploy `main`/Production, do not change Admin/backend/API/auth, catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or payments without separate explicit approval. Never fabricate SKU evidence or claim 100% when a required owner/device/source-data gate remains blocked.
+
+---
+
 ## LATEST VERIFIED UPDATE — PREVIEW SEO + CANONICAL METADATA HTTP CHECK — 2026-10-24
 
 - Exact source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`. Validate PASS (npm audit, integrity, full automated tests): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815. Preview deploy PASS with authenticated post-deploy HTTP diagnostic: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918. Immutable Preview: https://837f73ba.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
