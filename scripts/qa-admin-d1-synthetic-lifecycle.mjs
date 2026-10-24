@@ -117,6 +117,15 @@ async function main(){
    if(persisted.length!==1||persisted[0].title!==verifiedTitle||Number(persisted[0].price)!==123456||Number(persisted[0].stock)!==2)
       throw Error('Exact isolated D1 QA row did not persist expected API changes');
    journal.authenticatedAdminSaveVerified=true; journal.d1ReadbackVerified=true; save();
+   const warrantyBackup=spawnSync('npx',['playwright','test','tests/e2e/admin-qa-warranty-backup.spec.js','--workers=1','--reporter=line'],{
+      stdio:'inherit',env:{...process.env,QA_TEST_CLAIM_ID:rec.claim,QA_TEST_PRODUCT_ID:rec.product},timeout:180000});
+   if(warrantyBackup.error||warrantyBackup.status!==0)throw Error('QA claim update + backup GET verification failed; cleanup mandatory');
+   const claimReadback=await sql(db,'SELECT status,admin_note FROM warranty_claims WHERE id=?',[rec.claim]);
+   if(claimReadback.length!==1||claimReadback[0].status!=='approved'||claimReadback[0].admin_note!=='QA ONLY - AUTO DELETE '+rec.claim)
+     throw Error('QA warranty claim D1 readback mismatch');
+   journal.warrantyClaimWriteVerified=true;
+   journal.backupReadSnapshotVerified=true;
+   save();
    const child=spawnSync('npx',['playwright','test','tests/e2e/admin-12-screen-live-qa.spec.js','--workers=2','--reporter=line,html'],{stdio:'inherit',env:{...process.env,QA_EXPECT_ORDER_ID:rec.order},timeout:900000});
    if(child.error||child.status!==0)throw Error('12-screen Playwright not fully green; exit '+String(child.status));
   }catch(e){error=e;console.error('[QA_SCREEN_RESULT] '+e.message)}
