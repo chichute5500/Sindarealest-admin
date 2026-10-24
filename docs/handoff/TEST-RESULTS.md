@@ -1,3 +1,33 @@
+## FINAL GATE MATRIX — CURRENT BASELINE AND REQUIRED LAST MILE — 2026-10-24
+
+### Latest verified source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`
+
+| Gate | Status | Evidence / limitation |
+|---|---|---|
+| Dependency audit, integrity checks, full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815 |
+| Cloudflare Pages Preview deploy | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918 |
+| Authenticated Preview root HTTP | PASS | HTTP 200; `X-Robots-Tag: noindex`; canonical/OG/Twitter URL metadata uses Preview origin |
+| Authenticated Preview `/robots.txt` | PASS | HTTP 200; `User-agent: *\nDisallow: /\n`; no sitemap advertised |
+| Authenticated Preview `/sitemap.xml` | PASS | HTTP 404; `X-Robots-Tag: noindex, nofollow`; `Cache-Control: no-store` |
+| Browser/device visual acceptance | NOT CLAIMED | Hero-guarded visual workflow skipped; HTTP evidence is not visual evidence |
+| Fullscreen gallery no-flicker acceptance | BLOCKED / OWNER DEVICE CHECK REQUIRED | Owner previously reported residual flicker and paused the task; must be tested on a real phone before PASS |
+| Hero visual evidence | BLOCKED ON SAFE TEST PATH | Do not bypass existing safety guards; find an explicitly safe Hero-excluded test/capture design or document the exact owner decision needed |
+| SKU verification for each product route | CONDITIONAL / SOURCE EVIDENCE REQUIRED | SKU only when authoritative API explicitly sets `skuVerified === true`; otherwise ID/key fallback; never infer catalog truth |
+| PR #108 scope isolation | NOT YET FINALIZED | PR is open/unmerged with 297 changed files; full path-by-path classification and owner decision needed before any merge; merge is not authorized |
+| Final post-change exact-SHA gates | NOT RUN YET | Re-run only after source changes; current baseline gates apply to SHA above, not future commits |
+
+### Required finalization procedure
+1. Re-fetch live PR head and exact changed-file list; classify every path as authorized storefront, tests/docs/workflows, or restricted/out-of-scope. Do not change restricted files or merge PR #108.
+2. Finish every safe unlocked source/test audit and reproduce any claimed defect before editing. Preserve all accepted/locked UI.
+3. Design a safe visual test route that does not capture or alter guarded Hero content; if impossible under current workflow contracts, mark BLOCKED rather than bypassing the guard.
+4. For the gallery, obtain actual mobile-device slow-tap and rapid-tap evidence for flicker/ghosting. If the owner needs to perform this, report the exact steps and wait only on that gate while continuing independent tasks.
+5. Audit SKU routes against authoritative API responses; record verified/unverified cases and confirm ID/key fallback. Do not edit catalog data or invent SKU evidence.
+6. If code changes occur, run Validate and Preview deploy on the final exact source/test SHA, confirm deployed SHA and authenticated HTTP diagnostic, and inspect all relevant logs. Never conflate documentation HEAD with source/deployed SHA.
+7. Re-read all four handoff documents, resolve contradictions at the top/current sections, and publish a final checklist with PASS / FAIL / BLOCKED / NOT RUN / SKIPPED BY SAFETY GUARD / OWNER ACCEPTANCE REQUIRED.
+8. Declare 100% only if all required in-scope gates are passed and accepted. Otherwise state the remaining blocker and the single precise action needed; do not invent a completion percentage.
+
+---
+
 ## EXACT-SHA RESULT — PREVIEW SEO + CANONICAL METADATA DIAGNOSTIC — 2026-10-24
 
 | Gate | Result | Evidence |
